@@ -92,12 +92,64 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		this.exprInterpreter = new ExpressionEvaluator();
 	}
 
+	/**
+	 * Returns the value returned by the last procedure interpreted, or
+	 * <code>null</code>.
+	 * 
+	 * @return the value returned by the last procedure interpreted
+	 */
 	public Object getReturnValue() {
 		if (blockReturn) {
 			return returnValue;
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Returns a new string that is an unescaped version of the given string.
+	 * Unespaced means that "\\\\", "\\n", "\\r", "\\t" are replaced by '\\',
+	 * '\n', '\r', '\t' respectively.
+	 * 
+	 * @param string
+	 *            a string
+	 * @return a new string that is an unescaped version of the given string
+	 */
+	private String getUnescapedString(String string) {
+		StringBuilder builder = new StringBuilder(string.length());
+		boolean escape = false;
+		for (int i = 0; i < string.length(); i++) {
+			char chr = string.charAt(i);
+			if (escape) {
+				switch (chr) {
+				case '\\':
+					builder.append('\\');
+					break;
+				case 'n':
+					builder.append('\n');
+					break;
+				case 'r':
+					builder.append('\r');
+					break;
+				case 't':
+					builder.append('\t');
+					break;
+				default:
+					// we could throw an exception here
+					builder.append(chr);
+					break;
+				}
+				escape = false;
+			} else {
+				if (chr == '\\') {
+					escape = true;
+				} else {
+					builder.append(chr);
+				}
+			}
+		}
+
+		return builder.toString();
 	}
 
 	@Override
@@ -117,51 +169,27 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(Call instr, Object... args) {
+	public void visit(Call call, Object... args) {
 		// Get called procedure
-		Procedure proc = instr.getProcedure();
+		Procedure proc = call.getProcedure();
 
 		// Set the input parameters of the called procedure if any
-		List<Expression> callParams = instr.getParameters();
+		List<Expression> callParams = call.getParameters();
 
 		// Special "print" case
-		if (proc.getName().equals("print")) {
-			if (args.length > 1) {
-				for (int i = 0; i < callParams.size(); i++) {
-					if (callParams.get(i).isStringExpr()) {
-						// String characters rework for escaped control
-						// management
-						String str = ((StringExpr) callParams.get(i))
-								.getValue();
-						char[] strArray = str.toCharArray();
-						int idx = 0;
-						boolean esc = false;
-						for (char _char : strArray) {
-							if (_char == '\\') {
-								esc = true;
-							} else if ((_char == 'n') && (esc)) {
-								strArray[idx++] = 10;
-								esc = false;
-							} else if ((_char == 'r') && (esc)) {
-								strArray[idx++] = 13;
-								esc = false;
-							} else if ((_char == 't') && (esc)) {
-								strArray[idx++] = 9;
-								esc = false;
-							} else {
-								strArray[idx++] = _char;
-								esc = false;
-							}
-						}
-						char[] printStrArray = new char[idx];
-						for (int c = 0; c < idx; c++)
-							printStrArray[c] = strArray[c];
-						((OrccProcess) args[1])
-								.write(new String(printStrArray));
-					} else {
-						((OrccProcess) args[1]).write((callParams.get(i)
-								.accept(exprInterpreter)).toString());
-					}
+		if (call.isPrint()) {
+			OrccProcess process = (OrccProcess) args[1];
+
+			for (int i = 0; i < callParams.size(); i++) {
+				if (callParams.get(i).isStringExpr()) {
+					// String characters rework for escaped control
+					// management
+					String str = ((StringExpr) callParams.get(i)).getValue();
+					String unescaped = getUnescapedString(str);
+					process.write(unescaped);
+				} else {
+					Object value = callParams.get(i).accept(exprInterpreter);
+					process.write(String.valueOf(value));
 				}
 			}
 		} else {
@@ -181,12 +209,12 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 			// Interpret procedure body
 			for (CFGNode node : proc.getNodes()) {
-				node.accept(this);
+				node.accept(this, args);
 			}
 
 			// Get procedure result if any
-			if (instr.hasResult()) {
-				instr.getTarget().setValue(returnValue);
+			if (call.hasResult()) {
+				call.getTarget().setValue(returnValue);
 			}
 		}
 	}
