@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="BTYPE" x="157" y="73"/>
+      <vertex id="QFS" x="57" y="280"/>
+      <vertex id="QP" x="158" y="165"/>
+      <vertex id="f" x="1114" y="120"/>
+      <vertex id="DCsplit" x="158" y="260"/>
+      <vertex id="DCReconstruction" x="276" y="102"/>
+      <vertex id="IS" x="475" y="241"/>
+      <vertex id="IAP" x="675" y="199"/>
+      <vertex id="IQ" x="868" y="189"/>
+      <vertex id="idct2d" x="993" y="100"/>
+   </vertices>
+</layout>

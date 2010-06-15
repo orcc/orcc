@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="bits" x="56" y="291"/>
+      <vertex id="VID" x="659" y="378"/>
+      <vertex id="WIDTH" x="399" y="70"/>
+      <vertex id="HEIGHT" x="399" y="165"/>
+      <vertex id="serialize" x="156" y="280"/>
+      <vertex id="parser" x="277" y="230"/>
+      <vertex id="texture" x="399" y="260"/>
+      <vertex id="motion" x="522" y="348"/>
+   </vertices>
+</layout>

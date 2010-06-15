@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="decoder" x="172" y="118"/>
+      <vertex id="source" x="56" y="136"/>
+      <vertex id="display" x="455" y="118"/>
+      <vertex id="Merger" x="314" y="106"/>
+   </vertices>
+</layout>
