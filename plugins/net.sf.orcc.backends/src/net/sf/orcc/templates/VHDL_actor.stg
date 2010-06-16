@@ -628,6 +628,24 @@ $procedure(procedure=action.body)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// ACK management with combinatorial
+///////////////////////////////////////////////////////////////////////////////
+
+ManageACKs(actor) ::= <<
+$if (actor.actionScheduler.fsm)$
+-- ACK FSM
+$else$
+-- ACK NO FSM
+
+-- port_XXX_ack <= '1' when 
+--   (isSchedulable_A_go & output_X_full & output_Y_full = "100") else
+--                 '1' when
+--   (isSchedulable_B_go & output_Z_full = "10") else
+--                 '0';
+$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -656,6 +674,7 @@ $  $printActionBodyInline(action)$$
 $
 
 >>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler with FSM
 
@@ -784,16 +803,16 @@ architecture rtl_$actor.name$ of $actor.name$ is
   $DefineFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 
 begin
+
+  $Actor_Schedul(actor)$
+
+  $ManageACKs(actor)$
 $
 if(actor.actionScheduler.fsm)
 $
-  $Actor_Schedul(actor)$
-
   $Actor_Exec_FSM(actor)$$
 else
 $
-  $Actor_Schedul(actor)$
-
   $Actor_Exec(actor)$$
 endif
 $
