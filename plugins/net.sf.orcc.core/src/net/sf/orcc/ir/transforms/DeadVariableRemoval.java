@@ -37,6 +37,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
@@ -69,6 +70,25 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 
 			procedure.getLocals().remove(variable);
 			changed = true;
+		}
+	}
+
+	@Override
+	public void visit(Call call, Object... args) {
+		if (call.hasResult()) {
+			LocalVariable variable = call.getTarget();
+			if (!variable.isUsed()) {
+				// clean up target
+				call.setTarget(null);
+
+				// do not remove call instruction because it may have
+				// side-effects
+				// maybe something worth checking later
+
+				// remove result
+				procedure.getLocals().remove(variable);
+				changed = true;
+			}
 		}
 	}
 
@@ -130,6 +150,17 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	@Override
 	public void visit(Read read, Object... args) {
 		// do NOT remove read!
+		Variable variable = read.getTarget();
+		if (variable != null && !variable.isUsed()) {
+			// clean up target
+			read.setTarget(null);
+
+			// do not remove call instruction because it has side-effects!
+
+			// remove target
+			procedure.getLocals().remove(variable);
+			changed = true;
+		}
 	}
 
 	@Override

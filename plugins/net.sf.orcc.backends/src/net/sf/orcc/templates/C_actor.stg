@@ -147,7 +147,10 @@ $peek.target$ = fifo_$peek.port.type$_peek($instance.id$_$peek.port$, $peek.numT
 
 Read(read) ::= <<
 
-$read.target$ = fifo_$read.port.type$_read($instance.id$_$read.port$, $read.numTokens$);
+$if (read.target)
+$$read.target$ = fifo_$read.port.type$_read($instance.id$_$read.port$, $read.numTokens$);$
+else
+$fifo_$read.port.type$_read($instance.id$_$read.port$, $read.numTokens$);$endif$
 >>
 
 ReadEnd(readEnd) ::= <<

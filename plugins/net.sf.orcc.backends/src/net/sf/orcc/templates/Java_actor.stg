@@ -116,8 +116,12 @@ $Read(peek)$
 // read instruction
 Read(read) ::= <<
 
-int $read.port$_Index = fifo_$read.port$.getReadIndex($read.numTokens$);
-$read.target$ = fifo_$read.port$.getReadArray($read.numTokens$);
+$if (read.target)
+$int $read.port$_Index = fifo_$read.port$.getReadIndex($read.numTokens$);
+$read.target$ = fifo_$read.port$.getReadArray($read.numTokens$);$
+else
+$fifo_$read.port$.getReadIndex($read.numTokens$);
+fifo_$read.port$.getReadArray($read.numTokens$);$endif$
 >>
 
 ReadEnd(readEnd) ::= <<
@@ -150,6 +154,7 @@ fifo_$writeEnd.port$.writeEnd($writeEnd.numTokens$, $writeEnd.target$);
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
+$if(!procedure.external)$
 
 private $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
 $if(procedure.locals.list)$
@@ -158,6 +163,7 @@ $endif$
 	$procedure.nodes: {$(it.class.simpleName)(it)$}$
 }
 
+$endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
