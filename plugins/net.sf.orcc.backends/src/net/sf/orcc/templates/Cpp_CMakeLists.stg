@@ -1,3 +1,8 @@
+addActor(actor) ::= <<
+$if (!actor.system)$
+$actor.name$.cpp
+$endif$
+>>
 
 Cpp_CMakeLists(network) ::= <<
 # Generated from $network.name$
@@ -6,8 +11,8 @@ cmake_minimum_required (VERSION 2.8)
 project ($network.name$)
 
 if(MSVC)
-set(CMAKE_CXX_FLAGS_DEBUG /MTd)
-set(CMAKE_CXX_FLAGS_RELEASE /MT)
+set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /ZI /Ob0 /Od /RTC1")
+set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
 endif(MSVC)
 
 
@@ -26,7 +31,7 @@ $!$network.networks : addLibraries()$!$
 
 add_executable ($network.name$
 $network.name$.cpp
-$network.actors : {$it.name$.cpp};separator="\n"$
+$network.actors : addActor(); separator="\n"$
 )
 
 

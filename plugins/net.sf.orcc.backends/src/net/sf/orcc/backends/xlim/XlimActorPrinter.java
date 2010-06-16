@@ -667,6 +667,15 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 			e.printStackTrace();
 		}
 		root = xlim.getDocumentElement();
+		root.appendChild(xlim.createComment("Generated from: "));
+		root.appendChild(xlim.createComment(instance.getActor().getFile()));
+		root.appendChild(xlim.createComment("Instantiated with: "));
+		for (Entry<String, Expression> entry : instance.getParameters()
+				.entrySet()) {
+			root.appendChild(xlim.createComment(entry.getKey() + ":"
+					+ entry.getValue().toString()));
+		}
+
 		XlimNodeTemplate.newDesign(root, instance.getId());
 	}
 

@@ -31,7 +31,6 @@ package net.sf.orcc.backends.cpp;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
@@ -47,7 +46,6 @@ import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.serialize.XDFWriter;
 
 /**
  * C++ back-end.
@@ -80,7 +78,8 @@ public class CppBackendImpl extends AbstractBackend {
 				false);
 		if (partition) {
 			partitioning = true;
-			new NetworkPartitioner().transform(network);
+			new NetworkPartitioner().transform(network, false);
+
 		}
 
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
@@ -142,30 +141,20 @@ public class CppBackendImpl extends AbstractBackend {
 			networkImplPrinter.setExpressionPrinter(CppExprPrinter.class);
 			networkImplPrinter.setTypePrinter(CppTypePrinter.class);
 
-			List<Network> networks;
-			if (partitioning) {
-				networks = network.getNetworks();
-			} else {
-				networks = Arrays.asList(network);
-			}
-
+			List<Network> networks = (partitioning) ? network.getNetworks()
+					: Arrays.asList(network);
 			for (Network subnetwork : networks) {
 				if (partitioning) {
 					new WrapperAdder().transform(subnetwork);
 
 					Instance inst = subnetwork.getInstances().get(0);
 					if (inst.getAttribute("partName") != null) {
-						new NetworkPartitioner().transform(subnetwork);
-
-						Iterator<Network> it = subnetwork.getNetworks()
-								.iterator();
-						while (it.hasNext()) {
-							it.next().computeTemplateMaps();
+						new NetworkPartitioner().transform(subnetwork, true);
+						for (Network net : subnetwork.getNetworks()) {
+							net.computeTemplateMaps();
 						}
 					}
 				}
-
-				new XDFWriter(new File(path), network);
 
 				String name = subnetwork.getName();
 

@@ -29,10 +29,8 @@
 package net.sf.orcc.backends.cpp.codesign;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -67,6 +65,9 @@ public class NetworkPartitioner {
 	/**
 	 * 
 	 */
+
+	private boolean threadPartitioning;
+
 	private DirectedGraph<Vertex, Connection> graph;
 
 	private Map<Connection, Port> incomingPort = new HashMap<Connection, Port>();
@@ -80,6 +81,7 @@ public class NetworkPartitioner {
 	private Map<Port, String> partitionMap = new HashMap<Port, String>();
 
 	private List<Network> networks = new ArrayList<Network>();
+
 
 	/**
 	 * Copies connections between instances on the same partition.
@@ -233,43 +235,6 @@ public class NetworkPartitioner {
 		return subNetwork;
 	}
 
-	private void updatePartnames(Network network) {
-
-		for (Instance instance : network.getInstances()) {
-			if (instance.isActor()) {
-				updatePartname(instance);
-			} else {
-				updatePartnames(instance.getNetwork());
-			}
-
-		}
-	}
-
-	private void updatePartname(Instance instance) {
-
-		IValueAttribute attr = (IValueAttribute) instance
-				.getAttribute("partName");
-		StringExpr expr = (StringExpr) attr.getValue();
-		String[] partnames = expr.getValue().split("/");
-
-		StringBuffer strBuf = new StringBuffer();
-
-		Iterator<String> it = Arrays.asList(partnames).iterator();
-
-		if (it.next() != null) {
-			if (it.hasNext()) {
-				strBuf.append(it.next());
-				while (it.hasNext()) {
-					strBuf.append("/").append(it.next());
-				}
-			} else {
-				instance.getAttributes().remove("partName");
-			}
-		}
-		String str = strBuf.toString();
-		expr.setValue(str);
-	}
-
 	public Map<String, Set<Vertex>> getPartitionSets() throws OrccException {
 		Map<String, Set<Vertex>> partitionSets = new HashMap<String, Set<Vertex>>();
 
@@ -310,8 +275,11 @@ public class NetworkPartitioner {
 			Expression expr = ((IValueAttribute) attr).getValue();
 			if (expr.isStringExpr()) {
 				String[] partNames = ((StringExpr) expr).getValue().split("/");
-				partName = partNames[0];
-
+				if(threadPartitioning) {
+					partName = partNames[1];
+				} else {	
+					partName = partNames[0];
+				}
 			} else {
 				throw new OrccException(
 						"partName attribute must be a String expression");
@@ -335,9 +303,10 @@ public class NetworkPartitioner {
 	 *
 	 */
 
-	public void transform(Network network) throws OrccException {
+	public void transform(Network network, boolean threadPartitioning) throws OrccException {
 		graph = network.getGraph();
-
+		this.threadPartitioning = threadPartitioning;
+		
 		Map<String, Set<Vertex>> partitions = getPartitionSets();
 
 		// Creates a copy of vertices of graph
@@ -384,7 +353,6 @@ public class NetworkPartitioner {
 			}
 		}
 		graph.removeAllVertices(vertices);
-		updatePartnames(network);
 	}
 
 	public List<Network> getNetworks() {

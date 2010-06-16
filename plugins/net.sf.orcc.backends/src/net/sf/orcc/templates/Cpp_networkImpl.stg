@@ -112,26 +112,22 @@ printMain(net) ::= <<
 #include "FifoFactory.h"
 
 #include "$net.name$.h"
-$!
-#define SIZE 10000
-#ifdef __TRACE_TOKENS__
-TraceAka g_oTracer;
-#endif
-$if(net.networks)$
-$allocateFifos(net)$
-$endif$
-!$
+
+extern "C" {
+#include "orcc_util.h"
+}
 
 int main(int argc, char *argv[]) {
+	init_orcc(argc, argv, NULL);
 $if (net.networks)$
 	$net.networks : {network_$it.name$ $it.name$;};separator="\n"$
 	$net.networks : {$it.name$.start();};separator="\n"$
 	$net.networks : {$it.name$.stop();};separator="\n"$
 	return 0;
 $else$
-network_$net.name$ $net.name$;
-$net.name$.start();
-$net.name$.stop();
+	network_$net.name$ $net.name$;
+	$net.name$.start();
+	$net.name$.stop();
 $endif$
 }
  

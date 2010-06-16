@@ -121,10 +121,14 @@ $endif$
 >>
 
 Read(read) ::= <<
+$if (read.target)$
 $if(read.unit)$
 m_poTabIn[$actor.name$_$read.port$]->get($read.target$);$\n$
 $else$
 m_poTabIn[$actor.name$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
+$endif$
+$else$
+m_poTabIn[$actor.name$_$read.port$]->skip($read.numTokens$);$\n$
 $endif$
 
 >>

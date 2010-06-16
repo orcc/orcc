@@ -28,23 +28,27 @@ $instances: initializeInstance(); separator=", "$
 ///////////////////////////////////////////////////////////////////////////////
 // declare FIFOs
 
-printFifo(src, srcport, dst, dstport) ::= <<
-FifoAPI * $src$_$srcport$_$dst$_$dstport$ = FifoFactory<$edge.source.type$>::allocateFifo($edge.size$, 0);
->>
 
-doDeclareFifo(edge, src, tgt) ::= <<
-$if(src.instance && tgt.instance)$
-$printFifo(src=src.instance.id, srcport=edge.source, dst=tgt.instance.id, dstport=edge.target)$
+doDeclareFifo(edge, src, tgt, kind) ::= <<
+$if (src.instance && tgt.instance)$
+FifoAPI * $network.name$_fifo_$network.connectionMap.(edge)$ = FifoFactory<$edge.source.type$>::allocateFifo($edge.size$, $kind$);
+$if (network.networks && network.inputs.list.empty && network.outputs.list.empty)$
+#define $src.instance.id$_$edge.source$ $network.name$_fifo_$network.connectionMap.(edge)$
+#define $tgt.instance.id$_$edge.target$ $network.name$_fifo_$network.connectionMap.(edge)$
+$endif$
 $endif$
 >>
 
 declareFifo(edge) ::= <<
-$doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+$if(network.networks)$
+$doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind="2")$
+$else$
+$doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind="0")$
+$endif$
 >>
 
 declareFifos(network) ::= <<
 $network.connections: declareFifo()$
-
 $if (network.networks)$
 $network.networks: declareFifos()$
 $endif$
@@ -54,17 +58,30 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
+doAssignTargetPort(source, sourcePort, target) ::= <<
+$source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, $network.name$_$target.name$);
+>>
+
+doAssignSourcePort(source, target, targetPort) ::= <<
+$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, $network.name$_$source.name$);>>
+
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 $source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, $network.name$_fifo_$count$);
 $target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, $network.name$_fifo_$count$);
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$if (src.instance && tgt.instance)$
+$if (src.instance)$
+$if (tgt.instance)$
 $doAssignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
   count=network.connectionMap.(edge))$
+$else$
+$doAssignTargetPort(source=src.instance, sourcePort=edge.source, target=tgt.port)$
+$endif$
+$else$
+$doAssignSourcePort(source=src.port, target=tgt.instance, targetPort=edge.target)$
 $endif$
 >>
 
@@ -170,6 +187,8 @@ network(debugFifos, fifoSize, network) ::= <<
 #include "Threadaka.h"
 
 $includeActors(network.actors)$
+
+#define SIZE 10000
 
 $declareFifos(network)$
 
