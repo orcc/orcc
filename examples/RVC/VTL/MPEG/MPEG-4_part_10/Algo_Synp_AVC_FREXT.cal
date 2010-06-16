@@ -1751,6 +1751,10 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1  or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MVD_L0_0_0 or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := true;
@@ -1769,6 +1773,10 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1  or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MVD_L0_0_0 or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := false;
@@ -4399,6 +4407,58 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
+	procedure GetFlagParsing()
+	begin
+		
+		
+		if binValDecoded = false then
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG then
+				if slice_type = SLICE_TYPE_P then
+					ctxIdxOffset := 11;
+				else	
+					ctxIdxOffset := 23;
+				end
+				ctxIdxincMbSkipFlag();
+			else
+				if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG then
+					ctxIdxOffset := 85 + ctxIdxBlockCatOffset_tab[0][ctxBlockCat];
+					ctxIdxCodedBlockFlag();
+				else
+					if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG then
+						ctxIdxOffset := 105 + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
+						ctxIdxSignificantCoeffFlag();
+					else
+						if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG then
+							ctxIdxOffset := 166 + ctxIdxBlockCatOffset_tab[1][ctxBlockCat];
+							ctxIdxSignificantCoeffFlag();
+						else
+							if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG then
+								ctxIdxOffset := 68;
+								ctxIdxInc := 0;
+							end
+						end
+								
+					end
+				end
+			end
+			//calculate the value of the Context Index
+			ctxIdx := ctxIdxInc + ctxIdxOffset;
+			StartDecodeDecision := true;	
+			//Do not give the hand to GetFlagParsing
+			StopCabacProcess();
+		else
+			CabacValue := binVal;
+			FoundSE := true;
+		end
+		
+		
+		if FoundSE then
+			binValDecoded := false;
+			StopCabacProcess();
+			NextBitToDecode := true;
+		end
+	end
+	
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -4430,16 +4490,20 @@ actor Algo_Synp_AVC_FREXT()
 				GetMbTypeParsing();
 			end
 			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG or 
+			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or 
+			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or 
+			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or
+			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG then
+				GetFlagParsing();
+			end
+			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_QP_DELTA then
 				GetMbQpDelta();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
 			      CoeffAbsParsing();
-			end
-			
-			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG then
-				GetMbSkipFlag();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP then
