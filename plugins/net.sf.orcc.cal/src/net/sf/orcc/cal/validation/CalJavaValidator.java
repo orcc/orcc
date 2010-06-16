@@ -57,6 +57,7 @@ import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.validation.Check;
@@ -163,8 +164,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		reference.setVariable(variable);
 		expression.setSource(reference);
 
-		// add indexes
-		expression.getIndexes().addAll(assign.getIndexes());
+		// copy indexes
+		expression.getIndexes().addAll(EcoreUtil.copyAll(assign.getIndexes()));
 
 		// check types
 		Type targetType = checker.getType(expression);
