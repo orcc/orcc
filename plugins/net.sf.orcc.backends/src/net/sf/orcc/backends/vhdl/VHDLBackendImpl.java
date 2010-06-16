@@ -29,6 +29,8 @@
  */
 package net.sf.orcc.backends.vhdl;
 
+import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -86,7 +88,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		printer = new STPrinter();
+		printer = new STPrinter(getAttribute(DEBUG_MODE, false));
 		printer.loadGroups("VHDL_actor");
 		printer.setExpressionPrinter(VHDLExpressionPrinter.class);
 		printer.setTypePrinter(VHDLTypePrinter.class);

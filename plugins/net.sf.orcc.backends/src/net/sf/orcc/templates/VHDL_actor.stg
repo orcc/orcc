@@ -264,7 +264,7 @@ if(cast.extended)
   $$store.target$ := $store.value$$
 else
 $
-$target$ := cast($value$, $value.type.size$, $target.variable.type.size$)$
+$target$ := cast($value$, $value.type.size$, $target.type.size$)$
 endif
 $
 
@@ -376,7 +376,7 @@ if(read.target.type.int)
 $
 $read.target$ := to_integer(signed($actor.name$_$read.port$_data));
 $
-else
+elsif (read.target)
 $
 $read.target$ := to_integer(unsigned($actor.name$_$read.port$_data));$
 endif
@@ -414,7 +414,7 @@ Store(store) ::= <<
 
 $if(store.indexes)
 $$
-  if(store.target.variable.port)
+  if(store.target.port)
   $$
     if(store.cast)
 $$CastStore(value=store.value, target=store.target, cast=store.cast)$;
