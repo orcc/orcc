@@ -32,10 +32,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -44,7 +45,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class DeadGlobalElimination implements ActorTransformation {
+public class DeadGlobalElimination extends AbstractActorTransformation {
 
 	/**
 	 * Removes the given instructions that store to an unused state variable.
@@ -54,7 +55,12 @@ public class DeadGlobalElimination implements ActorTransformation {
 	 */
 	private void remove(List<Instruction> instructions) {
 		if (instructions != null) {
-			for (Instruction instruction : instructions) {
+			Iterator<Instruction> it = instructions.iterator();
+			while (it.hasNext()) {
+				Instruction instruction = it.next();
+				instruction.accept(this);
+				it.remove();
+
 				instruction.getBlock().getInstructions().remove(instruction);
 			}
 		}
@@ -71,6 +77,13 @@ public class DeadGlobalElimination implements ActorTransformation {
 				remove(variable.getInstructions());
 			}
 		}
+	}
+
+	@Override
+	public void visit(Store store, Object... args) {
+		// clean up uses
+		Use.removeUses(store, store.getIndexes());
+		store.setValue(null);
 	}
 
 }

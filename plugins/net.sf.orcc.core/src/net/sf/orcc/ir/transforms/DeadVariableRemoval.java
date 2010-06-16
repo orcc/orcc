@@ -93,31 +93,6 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public void visit(Store store, Object... args) {
-		Variable target = store.getTarget();
-		if (!target.isUsed()) {
-			// do not remove stores to variables that are used by writes, or
-			// variables that are parameters
-			if (target.isPort() || procedure.getParameters().contains(target)) {
-				return;
-			}
-
-			// clean up uses
-			store.setTarget(null);
-			Use.removeUses(store, store.getIndexes());
-			store.setValue(null);
-
-			// remove instruction
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			it.remove();
-
-			procedure.getLocals().remove(target);
-			changed = true;
-		}
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
 	public void visit(Peek peek, Object... args) {
 		Variable variable = peek.getTarget();
 		if (!variable.isUsed()) {
@@ -155,6 +130,31 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	@Override
 	public void visit(Read read, Object... args) {
 		// do NOT remove read!
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Store store, Object... args) {
+		Variable target = store.getTarget();
+		if (!target.isUsed()) {
+			// do not remove stores to variables that are used by writes, or
+			// variables that are parameters
+			if (target.isPort() || procedure.getParameters().contains(target)) {
+				return;
+			}
+
+			// clean up uses
+			store.setTarget(null);
+			Use.removeUses(store, store.getIndexes());
+			store.setValue(null);
+
+			// remove instruction
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			it.remove();
+
+			procedure.getLocals().remove(target);
+			changed = true;
+		}
 	}
 
 	@Override
