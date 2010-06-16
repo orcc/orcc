@@ -17,7 +17,7 @@
 *              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 *              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 */ 
-actor E___Framebuf_w_Address_y (int INTRA,
+actor E___Framebuf_w_Address (int INTRA,
 	int NEWVOP,
 	int MOTION,
 	int
