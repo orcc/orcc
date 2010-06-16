@@ -4,42 +4,42 @@
 fifo_in(port) ::= <<
 $
 if(port.type.bool)
-$$actor.name$_$port.name$_data  : in std_logic;$
+$$port.name$_data  : in std_logic;$
 else
-$$actor.name$_$port.name$_data  : in std_logic_vector($port.type.size$ -1 downto 0);$
+$$port.name$_data  : in std_logic_vector($port.type.size$ -1 downto 0);$
 endif
 $
 
-$actor.name$_$port.name$_send : in std_logic;
-$actor.name$_$port.name$_ack  : out std_logic;
+$port.name$_send : in std_logic;
+$port.name$_ack  : out std_logic;
 
 >>
 
 fifo_out(port) ::= <<
-$actor.name$_$port.name$_full  : in std_logic;
+$port.name$_full  : in std_logic;
 $
 if(last(port.name))
 $$
 if(port.type.bool)
-$$actor.name$_$port.name$_data  : out std_logic;$
+$$port.name$_data  : out std_logic;$
 else
-$$actor.name$_$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$
+$$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$
 endif
 $
 
-$actor.name$_$port.name$_write : out std_logic$
+$port.name$_write : out std_logic$
 else
-$$actor.name$_$port.name$_data  : out $port.type$;
-$actor.name$_$port.name$_write : out std_logic;$
+$$port.name$_data  : out $port.type$;
+$port.name$_write : out std_logic;$
 endif
 $
 >>
 
 fifo_in_init(port) ::=<<
-$actor.name$_$port.name$_ack <= '0';
+$port.name$_ack <= '0';
 >>
 fifo_out_init(port) ::=<<
-$actor.name$_$port.name$_write <= '0';
+$port.name$_write <= '0';
 >>
 
 
@@ -51,9 +51,9 @@ $actor.name$_$port.name$_write <= '0';
 Actor_out(port) ::= <<
 $
 if(port.type.bool)
-$$actor.name$_$port.name$_data  <= '0';$\n$$
+$$port.name$_data  <= '0';$\n$$
 else
-$$actor.name$_$port.name$_data  <= (others => '0');$\n$$
+$$port.name$_data  <= (others => '0');$\n$$
 endif
 $
 
@@ -68,7 +68,7 @@ $
 >>
 
 SensitivFIFO(port) ::=<<
-$actor.name$_$port.name$_send
+$port.name$_send
 >>
 
 Actor_Schedul(actor) ::= <<
@@ -314,7 +314,7 @@ $
 
 HasTokens(hasTokens) ::= <<
 
-$hasTokens.target$ := $actor.name$_$hasTokens.port$_send;
+$hasTokens.target$ := $hasTokens.port$_send;
 >>
 
 Load(load) ::= <<
@@ -344,13 +344,13 @@ Peek(peek) ::= <<
 $if(peek.unit)
 $$
 if(peek.target.type.bool)
-$$peek.target$ := $actor.name$_$peek.port$_data;$\n$$
+$$peek.target$ := $peek.port$_data;$\n$$
 else
 $$
 if(peek.target.type.int)
-$$peek.target$ := to_integer(signed($actor.name$_$peek.port$_data));$
+$$peek.target$ := to_integer(signed($peek.port$_data));$
 else
-$$peek.target$ := to_integer(unsigned($actor.name$_$peek.port$_data));$
+$$peek.target$ := to_integer(unsigned($peek.port$_data));$
 endif
 $$
 endif
@@ -368,21 +368,21 @@ $
 if(read.unit)
 $$
 if(read.target.type.bool)
-$$read.target$ := $actor.name$_$read.port$_data;$\n$
+$$read.target$ := $read.port$_data;$\n$
 $
 else
 $$
 if(read.target.type.int)
 $
-$read.target$ := to_integer(signed($actor.name$_$read.port$_data));
+$read.target$ := to_integer(signed($read.port$_data));
 $
-elsif (read.target)
+elseif (read.target)
 $
-$read.target$ := to_integer(unsigned($actor.name$_$read.port$_data));$
+$read.target$ := to_integer(unsigned($read.port$_data));$
 endif
 $$
 endif
-$$actor.name$_$read.port$_ack <= '1';$
+$$read.port$_ack <= '1';$
 else
 $-- read multiple token not coded yet
 $
@@ -439,21 +439,21 @@ Write(write) ::= <<
 
 $
 if(write.target.type.bool)
-$$actor.name$_$write.port$_data <= $write.target$;$
+$$write.port$_data <= $write.target$;$
 else
 $$
   if(write.target.type.int)
 $
-$actor.name$_$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
+$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
   else
 $
-$actor.name$_$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
+$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
   endif
 $$
 endif
 $
 
-$actor.name$_$write.port$_write <= '1';
+$write.port$_write <= '1';
 >>
 
 
@@ -632,7 +632,7 @@ $procedure(procedure=action.body)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|$actor.name$_$port$_full = '0'}; separator=" and "$
+$pattern.keys:{port|$port$_full = '0'}; separator=" and "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
