@@ -60,6 +60,9 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
+
+		network.flatten();
+
 		printer = new XlimActorPrinter();
 		printInstances(network);
 	}
@@ -75,12 +78,11 @@ public class XlimBackendImpl extends AbstractBackend {
 	@Override
 	protected void printInstance(Instance instance) throws OrccException {
 		String id = instance.getId();
-		Actor actor = instance.getActor();
 
 		System.out.println("FILE " + id);
 		String outputName = path + File.separator + id + ".xlim";
 		try {
-			printer.printActor(outputName, actor);
+			printer.printInstance(outputName, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

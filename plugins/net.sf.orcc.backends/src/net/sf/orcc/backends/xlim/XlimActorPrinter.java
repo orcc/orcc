@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.Vector;
@@ -51,6 +52,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
@@ -64,6 +66,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.util.DomUtil;
 
 import org.w3c.dom.Document;
@@ -498,18 +501,21 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 * @param actor
 	 *            Actor to analyze
 	 */
-	private void addStateVars(Actor actor) {
+	private void addStateVars(Instance instance) {
 		// removes phi assignments on the initialize actions
 		PhiRemoval phiRemoval = new PhiRemoval();
-		for (Action action : actor.getInitializes()) {
+		for (Action action : instance.getActor().getInitializes()) {
 			phiRemoval.visitProcedure(action.getBody());
 		}
 
 		// initializes the actor
 		// TODO : must get parameters map from instance for actors parameters
 		// initialization
+
+		Actor actor = instance.getActor();
+		Map<String, Expression> params = instance.getParameters();
 		InterpretedActor interpreted = new InterpretedActor(actor.getName(),
-				null, actor, null, null);
+				params, actor, null, null);
 		try {
 			interpreted.initialize();
 		} catch (Exception e) {
@@ -655,14 +661,14 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 * @param actor
 	 *            Actor to analyze (get the name)
 	 */
-	private void createXlimDocument(Actor actor) {
+	private void createXlimDocument(Instance instance) {
 		try {
 			xlim = DomUtil.createDocument(DESIGN);
 		} catch (OrccException e) {
 			e.printStackTrace();
 		}
 		root = xlim.getDocumentElement();
-		XlimNodeTemplate.newDesign(root, actor.getName());
+		XlimNodeTemplate.newDesign(root, instance.getId());
 	}
 
 	/**
@@ -674,12 +680,13 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 	 *            Actor to print
 	 * @throws IOException
 	 */
-	public void printActor(String fileName, Actor actor) throws IOException {
-		createXlimDocument(actor);
-		addPorts(actor);
-		addStateVars(actor);
-		addActions(actor);
-		addScheduler(actor);
+	public void printInstance(String fileName, Instance instance)
+			throws IOException {
+		createXlimDocument(instance);
+		addPorts(instance.getActor());
+		addStateVars(instance);
+		addActions(instance.getActor());
+		addScheduler(instance.getActor());
 		printXlimFile(new File(fileName));
 	}
 
