@@ -562,9 +562,8 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 					// For others just use the init value
 					Object value = state.getConstantValue();
 					if (value != null) {
-						// FIXME
-						// value.accept(new XlimValueVisitor(init2, state
-						// .getType()));
+						init2.setAttribute(VALUE, value.toString());
+						state.getType().accept(new XlimTypeSizeVisitor(init2));
 					} else {
 						init2.setAttribute(VALUE, "0");
 						state.getType().accept(new XlimTypeSizeVisitor(init2));
