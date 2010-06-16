@@ -4655,7 +4655,7 @@ actor Algo_Synp_AVC_FREXT()
 	var 
 		int tempOffest
 	do
-		if val_CurrMbAddr = 98 and SEARCH_MB_TYPE = false then 
+		if val_CurrMbAddr = PicSizeInMbs and SEARCH_MB_TYPE = false then 
 			binVal := 1;
 			binValDecoded := true;
 			// Start Cabac Process
