@@ -215,7 +215,11 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case NE:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
+			if (val1 instanceof Boolean && val2 instanceof Boolean) {
+				boolean b1 = (Boolean) val1;
+				boolean b2 = (Boolean) val2;
+				return b1 != b2;
+			}else if (val1 instanceof Integer && val2 instanceof Integer) {
 				int i1 = (Integer) val1;
 				int i2 = (Integer) val2;
 				return i1 != i2;
