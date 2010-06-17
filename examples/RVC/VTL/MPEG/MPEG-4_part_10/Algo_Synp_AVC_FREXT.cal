@@ -3667,53 +3667,6 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
-	procedure GetMbSkipFlag()
-	begin
-		
-		if slice_type = SLICE_TYPE_P then	
-			if binValDecoded = false then
-				ctxIdxincMbSkipFlag();
-				ctxIdx := 11 + ctxIdxInc;
-				PreviousCtxIdx := 3 + 2;
-				StartDecodeDecision := true;
-				StopCabacProcess();
-				NextBitToDecode := false;
-			else
-				if binVal = 0 then
-					FoundSE := true;
-					CabacValue := 0; 	/* INTRA 4x4*/
-				else
-					FoundSE := true;
-					CabacValue := 1;
-				end
-			end
-		end
-		
-		if slice_type = SLICE_TYPE_B then	
-			if binValDecoded = false then
-				ctxIdxincMbSkipFlag();
-				ctxIdx := 24 + ctxIdxInc;
-				PreviousCtxIdx := 3 + 2;
-				StartDecodeDecision := true;
-				StopCabacProcess();
-				NextBitToDecode := false;
-			else
-				if binVal = 0 then
-					FoundSE := true;
-					CabacValue := 0; 	/* INTRA 4x4*/
-				else
-					CabacValue := 1;
-					binValDecoded := false;
-				end
-			end
-		end
-		
-		if FoundSE then
-			binValDecoded := false;
-			StopCabacProcess();
-			NextBitToDecode := true;
-		end
-	end
 	
 	procedure GetMbType_I()
 	var

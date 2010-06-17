@@ -21,9 +21,7 @@ import all caltrop.lib.BitOps;
 
 actor E___Algo_Interpolation_halfpel () int(size=9) RD, int(size=4) halfpel ==> int(size=PIX_SZ) MOT :
 
-  bool _CAL_tokenMonitor := true;
   int PIX_SZ = 9;
-  int FLAG_SZ = 4;
   none: action halfpel:[ flags ], RD:[rd] repeat 81 ==> MOT:[mot] repeat 64
   guard
     rshift(flags,1) = 0
