@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.ide.projectNatureImages">
+      <image
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.ui.OrccNatureImage"
+            natureId="net.sf.orcc.ui.OrccNature">
+      </image>
+   </extension>
+   <extension
+         id="OrccNature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.sf.orcc.ui.OrccProjectNature">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="net.sf.orcc.ui.OrccCategory"
+            name="Orcc">
+      </category>
+      <wizard
+            canFinishEarly="false"
+            category="net.sf.orcc.ui.OrccCategory"
+            class="net.sf.orcc.ui.OrccProjectWizard"
+            hasPages="true"
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.ui.newOrccProject"
+            name="Orcc Project"
+            project="true">
+      </wizard>
+   </extension>
+</plugin>

@@ -13,9 +13,7 @@ Require-Bundle: org.eclipse.core.expressions,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ui.editors,
- org.eclipse.ui.ide,
- org.eclipse.xtext,
- org.eclipse.xtext.ui
+ org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,

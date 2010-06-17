@@ -195,39 +195,5 @@
          </adapter>
       </factory>
    </extension>
-   <extension
-         point="org.eclipse.ui.ide.projectNatureImages">
-      <image
-            icon="icons/orcc_run.gif"
-            id="net.sf.orcc.core.OrccNatureImage"
-            natureId="net.sf.orcc.core.OrccNature">
-      </image>
-   </extension>
-   <extension
-         id="OrccNature"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="net.sf.orcc.ui.OrccProjectNature">
-         </run>
-      </runtime>
-   </extension>
-   <extension
-         point="org.eclipse.ui.newWizards">
-      <category
-            id="net.sf.orcc.OrccCategory"
-            name="Orcc">
-      </category>
-      <wizard
-            canFinishEarly="false"
-            category="net.sf.orcc.OrccCategory"
-            class="net.sf.orcc.ui.OrccProjectWizard"
-            hasPages="true"
-            icon="icons/orcc_run.gif"
-            id="net.sf.orcc.core.newOrccProject"
-            name="Orcc Project"
-            project="true">
-      </wizard>
-   </extension>
 
 </plugin>
