@@ -1,8 +1,0 @@
-#Tue May 18 15:25:43 CEST 2010
-eclipse.preferences.version=1
-gmf_dashboard/domainGenerationModel=platform\:/resource/net.sf.orcc.cal/src-gen/net/sf/orcc/cal/Cal.genmodel
-gmf_dashboard/domainModel=platform\:/resource/net.sf.orcc.cal/src-gen/net/sf/orcc/cal/Cal.ecore
-gmf_dashboard/generationModel=platform\:/resource/net.sf.orcc.fsm/model/Fsm.gmfgen
-gmf_dashboard/graphicalDefinitionModel=platform\:/resource/net.sf.orcc.fsm/model/Fsm.gmfgraph
-gmf_dashboard/mappingModel=platform\:/resource/net.sf.orcc.fsm/model/Fsm.gmfmap
-gmf_dashboard/toolingDefinitionModel=platform\:/resource/net.sf.orcc.fsm/model/Fsm.gmftool
