@@ -1,0 +1,23 @@
+// GEN_mgnt_Merger420.cal
+//
+// Author: Christophe Lucarz (christophe.lucarz@epfl.ch)
+
+actor GEN_mgnt_Merger420 () int(size=9) Y, int(size=9) U, int(size=9) V ==> uint(size=8) YUV :
+
+int PIX_SZ := 9;
+// Select the Y blocks 
+aY:action Y:[y] repeat 4*64 ==> YUV:[ y ] repeat 256 end
+
+// Select the U blocks 
+aU:action U:[u] repeat 64 ==> YUV:[ u ] repeat 64 end
+
+// Select the V blocks 
+aV:action V:[v] repeat 64 ==> YUV:[ v ] repeat 64 end
+
+schedule fsm Y :
+   Y     ( aY ) --> U ;
+   U     ( aU ) --> V ;
+   V     ( aV ) --> Y ;
+ end
+
+end
