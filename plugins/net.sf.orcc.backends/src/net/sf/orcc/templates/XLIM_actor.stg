@@ -1,44 +1,60 @@
 
+///////////////////////////////////////////////////////////////////////////////
+// Ports
+///////////////////////////////////////////////////////////////////////////////
+
 actorPort(port, dir) ::= <<
-$if (port.type.bool)$
-<actor-port dir="$dir$" name="$port.name$" size="1" typeName="$port.type$"/>
-$else$
-<actor-port dir="$dir$" name="$port.name$" size="$port.type.size$" typeName="$port.type$"/>
-$endif$
+$if (port.type.bool)
+$<actor-port dir="$dir$" name="$port.name$" size="1" typeName="$port.type$"/>$
+else
+$<actor-port dir="$dir$" name="$port.name$" size="$port.type.size$" typeName="$port.type$"/>$
+endif$
 >>
 
 actorPorts() ::= <<
 <!-- Ports -->
-$instance.actor.inputs.list: {port | $actorPort(port=port, dir="in")$}; separator="\n"$
-$instance.actor.outputs.list: {port | $actorPort(port=port, dir="out")$}; separator="\n"$
+$instance.actor.inputs.list: {port|$actorPort(port=port, dir="in")$}; separator="\n"$
+$instance.actor.outputs.list: {port|$actorPort(port=port, dir="out")$}; separator="\n"$
 >>
 
 internalPorts() ::= <<
 >>
 
-initValue(type, size, value) ::= <<
-<initValue size="$size$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/>
+///////////////////////////////////////////////////////////////////////////////
+// State Variables
+///////////////////////////////////////////////////////////////////////////////
+
+initValue(type, value) ::= <<
+<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/>
 >>
- 
+
 stateVar(var) ::= <<
 <stateVar name="var_$var.name$" sourceName="$var.name$">
 $if (var.type.list)$
 	<initValue typeName="List">
-		$var.constantValue: {value | $initValue(type=var.type.elementType, size=var.type.elementType.size, value=value)$}; separator="\n" $
+		$var.constantValue: {value | $initValue(type=var.type.elementType, value=value)$}; separator="\n"$
 	</initValue>
 $else$
-	$initValue(type=var.type, size=var.type.size, value=var.constantValue)$
+	$initValue(type=var.type, value=var.constantValue)$
 $endif$
 </stateVar>
 >>
 
 stateVars() ::= <<
 <!-- State variables -->
-	$instance.actor.stateVars.list: stateVar(); separator="\n"$
+$instance.actor.stateVars.list: stateVar(); separator="\n"$
 >>
+
+///////////////////////////////////////////////////////////////////////////////
+// Modules
+///////////////////////////////////////////////////////////////////////////////
 
 modules() ::= <<
 >>
+
+///////////////////////////////////////////////////////////////////////////////
+// Design
+///////////////////////////////////////////////////////////////////////////////
 
 design() ::= <<
 <design name="$instance.id$">

@@ -51,8 +51,6 @@ import net.sf.orcc.network.Network;
  */
 public class XlimBackendImpl extends AbstractBackend {
 
-	public static Boolean partitioning = false;
-
 	/**
 	 * 
 	 * @param args
