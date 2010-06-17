@@ -57,13 +57,13 @@ public class TemplateGroupLoader {
 		STGroup group = null;
 
 		String root = groupNames[0];
-		String groupPath = "/net/sf/orcc/templates/" + root + ".stg";
+		String groupPath = "net/sf/orcc/templates/" + root + ".stg";
 		group = new STGroupFile(groupPath, '$', '$');
 
 		for (int i = 1; i < groupNames.length; i++) {
 			String groupName = groupNames[i];
 			STGroup previous = group;
-			groupPath = "/net/sf/orcc/templates/" + groupName + ".stg";
+			groupPath = "net/sf/orcc/templates/" + groupName + ".stg";
 			group = new STGroupFile(groupPath, '$', '$');
 			group.importTemplates(previous);
 		}

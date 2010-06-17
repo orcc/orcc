@@ -60,6 +60,14 @@ public class CBackendImpl extends AbstractBackend {
 	public static boolean merge = false;
 
 	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		main(CBackendImpl.class, args);
+	}
+
+	/**
 	 * printer is protected in order to be visible to CQuasiBackendImpl
 	 */
 	protected STPrinter printer;
