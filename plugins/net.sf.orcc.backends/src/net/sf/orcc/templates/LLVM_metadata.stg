@@ -115,7 +115,8 @@ $MD$$index$ = metadata !{metadata !"test"}
 
 
 parameter_MD(parameter) ::= <<
-$parameter_decl_MD(parameter)$ = metadata !{metadata $Location_decl_MD(parameter)$, metadata $Type_decl_MD(parameter)$}
+$parameter_decl_MD(parameter)$ = metadata !{metadata $VarDef_decl_MD(parameter)$, metadata $Location_decl_MD(parameter)$, metadata $Type_decl_MD(parameter)$, $parameter.type$* @$parameter$}
+$VarDef_MD(parameter)$
 $Location_MD(parameter)$
 $Type_MD(parameter)$
 >>
