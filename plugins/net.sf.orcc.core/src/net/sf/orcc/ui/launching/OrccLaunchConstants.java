@@ -56,11 +56,6 @@ public interface OrccLaunchConstants {
 	public static final String DEBUG_MODE = "net.sf.orcc.debugMode";
 
 	/**
-	 * Default value for {@value #ENABLE_CACHE}.
-	 */
-	public static final boolean DEFAULT_CACHE = false;
-
-	/**
 	 * Default value for {@value #DEBUG_MODE}.
 	 */
 	public static final boolean DEFAULT_DEBUG = false;
@@ -89,12 +84,6 @@ public interface OrccLaunchConstants {
 	 * When enabled, frontend prints DOT files showing CFG information.
 	 */
 	public static final String DOT_CFG = "net.sf.orcc.dotCfg";
-
-	/**
-	 * When enabled, code is only generated for actors that were modified after
-	 * code was last generated.
-	 */
-	public static final String ENABLE_CACHE = "net.sf.orcc.enableCache";
 
 	/**
 	 * When enabled, interpreter traces each time data is written to

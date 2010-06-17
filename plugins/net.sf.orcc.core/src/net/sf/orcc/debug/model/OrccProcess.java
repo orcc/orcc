@@ -30,14 +30,12 @@ package net.sf.orcc.debug.model;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DOT_CFG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_KEEP;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_TRACES;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DOT_CFG;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
@@ -277,9 +275,6 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		if (configuration.getAttribute(DEBUG_MODE, DEFAULT_DEBUG)) {
 			cmdList.add("--debug");
-		}
-		if (configuration.getAttribute(ENABLE_CACHE, DEFAULT_CACHE)) {
-			cmdList.add("--cache");
 		}
 		if (configuration.getAttribute(KEEP_INTERMEDIATE, DEFAULT_KEEP)) {
 			cmdList.add("--keep");

@@ -29,13 +29,11 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DOT_CFG;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_KEEP;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.DOT_CFG;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_CACHE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import net.sf.orcc.ui.OrccActivator;
@@ -69,8 +67,6 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 	protected Button debugMode;
 
 	protected Button dotCfg;
-
-	protected Button enableCache;
 
 	protected Text fifoSize;
 
@@ -136,11 +132,9 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 		group.setLayoutData(data);
 
 		debugMode = new Button(group, SWT.CHECK);
-		createButton(font, debugMode, "Debug mode", "Activates debug mode.");
-		enableCache = new Button(group, SWT.CHECK);
-		createButton(font, enableCache, "Enable cache", "When set, "
-				+ "code will only be generated for actors "
-				+ "modified after code was last generated.");
+		createButton(font, debugMode, "Debug mode",
+				"Activates debug mode: IR is pretty-printed, "
+						+ "and actors are not cached.");
 		keepIntermediate = new Button(group, SWT.CHECK);
 		createButton(font, keepIntermediate, "Keep intermediate files",
 				"When set, files will be printed after each step of "
@@ -167,9 +161,6 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 			boolean selected = configuration.getAttribute(DEBUG_MODE,
 					DEFAULT_DEBUG);
 			debugMode.setSelection(selected);
-
-			selected = configuration.getAttribute(ENABLE_CACHE, DEFAULT_CACHE);
-			enableCache.setSelection(selected);
 
 			selected = configuration.getAttribute(KEEP_INTERMEDIATE,
 					DEFAULT_KEEP);
@@ -216,9 +207,6 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 			boolean selected = debugMode.getSelection();
 			configuration.setAttribute(DEBUG_MODE, selected);
 
-			selected = enableCache.getSelection();
-			configuration.setAttribute(ENABLE_CACHE, selected);
-
 			selected = keepIntermediate.getSelection();
 			configuration.setAttribute(KEEP_INTERMEDIATE, selected);
 
@@ -233,7 +221,6 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(DEBUG_MODE, DEFAULT_DEBUG);
-		configuration.setAttribute(ENABLE_CACHE, DEFAULT_CACHE);
 		configuration.setAttribute(KEEP_INTERMEDIATE, DEFAULT_KEEP);
 		configuration.setAttribute(DOT_CFG, DEFAULT_DOT_CFG);
 		configuration.setAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
