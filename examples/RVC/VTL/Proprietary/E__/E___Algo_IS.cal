@@ -57,18 +57,9 @@ actor E___Algo_IS () int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS_AC ==> i
   // AC_PRED_DIR=0 --> ZZ; 1-->Alternate Vertical; 2 --> Alternate Horiz
 
   rw: action AC_PRED_DIR:[ dir ], QFS_AC:[ac_in] repeat 63
-                              ==> PQF_AC:[ ac_out ] repeat 63
+                              ==> PQF_AC:[ [ ac_in[Scanmode[offset+addr]-1] : for int addr in Integers(0,62) ] ] repeat 63
   var
-    int addr,
-    int offset=lshift(dir,6)+1,
-    List(type:int(size=SAMPLE_SZ), size=63) ac_out:=[0: for int i in Integers(1,63)]
-  do
-    // ac_out = [ ac_in[Scanmode[offset+addr]-1] : for addr in Integers(0,62) ]
-    addr:=0;
-    while addr<63 do
-      ac_out[addr]:=ac_in[ Scanmode[offset+addr]-1 ];
-      addr:=addr+1;
-    end
+    int offset=lshift(dir,6)+1
   end
  
   priority 

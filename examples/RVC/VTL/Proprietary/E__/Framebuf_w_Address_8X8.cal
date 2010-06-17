@@ -38,15 +38,14 @@ actor Framebuf_w_Address_8X8 (int INTRA,
   int SEARCHWIN_IN_MB =  3;    // search window size (in macroblocks)
   int MAXW_IN_MB = 121;          // maximum image width (in macroblocks)
   int MAXH_IN_MB =  69;         // maximum image height (in macroblocks)
-  int ADDR_SZ = 24;
   int FLAG_SZ = 4;
   int MV_SZ = 9;
   int BTYPE_SZ = 12;
   int PIX_SZ = 9;
  
 
-  int SAMPLES_PER_MB   = 16;
-  int COMP_PER_MB      = 4; // 8x8 blocks/MB
+  int SAMPLES_PER_MB   = 8;
+  int COMP_PER_MB      = 1; // 8x8 blocks/MB
 
   int MAXW_IN_SAMPLES  = MAXW_IN_MB * SAMPLES_PER_MB;
   int MAXH_IN_SAMPLES  = MAXH_IN_MB * SAMPLES_PER_MB;
@@ -186,8 +185,6 @@ actor Framebuf_w_Address_8X8 (int INTRA,
   //                          bit0 = round
   read_mv: action MV:[x,y] ==> halfpel:[ flags ]
   var
-    int flag_x = if (bitand(x,1) = 1) then 4 else 0 end,
-    int flag_y = if (bitand(y,1) = 1) then 2 else 0 end,
     int(size=FLAG_SZ) flags = lshift(bitand(x,1), 2) +
                               lshift(bitand(y,1), 1) +
                               vop_rounding_mode
@@ -211,22 +208,29 @@ actor Framebuf_w_Address_8X8 (int INTRA,
     List(type:int(size=9), size=81) rd := [0: for int k in Integers(1,81)],
     int x = mbx_read*SAMPLES_PER_MB + 8*bitand(comp_read,1) + mvx,
     int y := mby_read*SAMPLES_PER_MB + 8*rshift(comp_read,1) + mvy,
+    int y2,
     int clip_left := 0,
     int clip_right := 0,
     int clip_x := x,
-    int clip_y = if (y<0) then 0 
-                 else if (y<vop_height_in_samples) then y 
-                      else vop_height_in_samples-1 end
-                 end,
+    int clip_y,
     int start_of_row,
     int addr,
     int i,
+    int i2,
+    int i3,
+    int i4,
     int end_i,
     int temp
   do
     // clip x-coordinate: 0 <= clip_x < width_in_samples
     //                    0 <= clip_left  <= 9
     //                    0 <= clip_right <= 8
+   y2:=y;
+   clip_y:= if (y2<0) then 0 
+                 else if (y2<vop_height_in_samples) then y2 
+                      else vop_height_in_samples-1 end
+                 end;
+    y:=y2;
     if (x<0) then
       clip_x:=0;
       clip_left:=if x< -9 then 9 else -x end;
@@ -240,7 +244,6 @@ actor Framebuf_w_Address_8X8 (int INTRA,
         end
       end
     end
-
     // Compute start address
     start_of_row := start_of_frame + clip_y*MAXW_IN_SAMPLES + clip_x;
 
@@ -255,29 +258,35 @@ actor Framebuf_w_Address_8X8 (int INTRA,
       if (clip_left!=0) then
         end_i := i + clip_left;
         temp := frameBuffer[start_of_row];
-        while (i<end_i) do
-          rd[i] := temp;
-          i:=i+1;
+        i2:=i;
+        while (i2<end_i) do
+          rd[i2] := temp;
+          i2:=i2+1;
         end
+        i:=i2;
       end
 
       // copy from frame buffer to RD
       addr := start_of_row;
       end_i:= i + 9 - clip_left - clip_right;
-      while (i<end_i) do
-        rd[i] := frameBuffer[addr];
-        i := i + 1;
+      i3:=i;
+      while (i3<end_i) do
+        rd[i3] := frameBuffer[addr];
+        i3 := i3 + 1;
         addr := addr + 1;
       end
+      i:=i3;
 
       // then, possibly, clip to right border
       if (clip_right!=0) then
       	 end_i:= i + clip_right;
          temp := frameBuffer[addr-1];
-         while (i<end_i) do
-           rd[i] := temp;
-           i:=i+1;
+         i4:=i;
+         while (i4<end_i) do
+           rd[i4] := temp;
+           i4:=i4+1;
          end
+         i:=i4;
       end
 
       // Advance row (unless we're clipping)
@@ -291,7 +300,6 @@ actor Framebuf_w_Address_8X8 (int INTRA,
          end
       end
     end
-
     // Advance to next block
     advance_block();
   end
@@ -304,21 +312,22 @@ actor Framebuf_w_Address_8X8 (int INTRA,
   var
     // Offset (0, 8, 8*Width or 8+8*Width) of selected by comp
     int addr := mb_write_ptr + comp_offset[comp_write],
-    int i,
+    int i, 
+    int i2,
     int nextRow
   do
-    
     i:=0;
     while (i<64) do
       nextRow:=i+8;
-      while (i<nextRow) do
-        frameBuffer[addr] := wd[i];
+      i2:=i;
+      while (i2<nextRow) do
+        frameBuffer[addr] := wd[i2];
         addr := addr + 1;
-        i := i + 1;
+        i2 := i2 + 1;
       end
+      i:=i2;
       addr := addr + (MAXW_IN_SAMPLES-8);
     end
-
     // Advance component to write
     outstanding_writes := outstanding_writes - 1;
     comp_write := comp_write + 1;
