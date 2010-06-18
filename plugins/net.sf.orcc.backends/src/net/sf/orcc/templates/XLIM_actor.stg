@@ -1,3 +1,34 @@
+BinOp ::= [
+	"PLUS":"$add",
+	"BITAND":"bitand",
+	"BITOR":"bitor",
+	"BITXOR":"bitxor",
+	"DIV":"$div",
+	"DIV_INT":"$div",
+	"EQ":"$eq",
+	"EXP":"exp",
+	"GE":"$ge",
+	"GT":"$gt",
+	"LE":"$le",
+	"LOGIC_AND":"$and",
+	"LOGIC_OR":"$or",
+	"LT":"$lt",
+	"MINUS":"$sub",
+	"MOD":"$mod",
+	"NE":"$ne",
+	"PLUS":"$add",
+	"SHIFT_LEFT":"lshift",
+	"SHIFT_RIGHT":"rshift",
+	"TIMES":"$mul"
+]
+
+UnaryOp ::= [
+	"BITNOT":"bitnot",
+	"LOGIC_NOT":"$not",
+	"MINUS":"$negate",
+	"NUM_ELTS":"$size"
+]
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Ports
@@ -45,11 +76,110 @@ stateVars() ::= <<
 $instance.actor.stateVars.list: stateVar(); separator="\n"$
 >>
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Expression
+///////////////////////////////////////////////////////////////////////////////
+
+expr(op) ::= <<
+$(op.value.class.simpleName)(op)$
+>>
+
+
+BinaryExpr(op) ::= <<
+<operation kind="$BinOp.(op.value.op)$">
+	$port(dir="in", source=op.value.e1)$
+	$port(dir="in", source=op.value.e2)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Operation
+///////////////////////////////////////////////////////////////////////////////
+
+
+port(dir, type, source) ::= <<
+$if (!type)
+$<port dir="$dir$" source="$source$"/>$
+else
+$<port dir="$dir$" size="$if (type.bool)$1$else$$type.size$$endif$" source="$source$" typeName="$type$"/>$
+endif$
+>>
+
+operation(op) ::= <<
+$(op.class.simpleName)(op)$
+>>
+
+Read(op) ::= <<
+<operation kind="pinRead" portName="$op.port.name$" removable="no">
+	$port(dir="out", type=op.port.type, source=op.target)$
+</operation>
+>>
+
+Write(op) ::= <<
+<operation kind="pinWrite" portName="$op.port.name$" removable="no">
+	$port(dir="in", type=op.port.type, source=op.target)$
+</operation>
+>>
+
+Load(op) ::= <<
+<operation kind="noop">
+$port(dir="in", source=op.source)$
+$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+Store(op) ::= <<
+$op.class.simpleName$
+$op$
+>>
+
+Return(op) ::= <<
+$op.class.simpleName$
+$op$
+>>
+
+Call(op) ::= <<
+$op.class.simpleName$
+$op$
+>>
+
+Assign(op) ::= <<
+$expr(op)$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+node(node) ::= <<
+$(node.class.simpleName)(node)$
+>>
+
+BlockNode(blkNode) ::= <<
+$blkNode.instructions: operation(); separator="\n"$
+>>
+
+IfNode(ifNode) ::= <<
+>>
+
+WhileNode(whileNode) ::= <<
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Modules
 ///////////////////////////////////////////////////////////////////////////////
 
+
+module(action) ::= <<
+<module autostart="false" kind="action" name="$action.name$">
+$action.body.nodes: node(); separator="\n"$
+</module> 
+>>
+
 modules() ::= <<
+$instance.actor.actions : module()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
