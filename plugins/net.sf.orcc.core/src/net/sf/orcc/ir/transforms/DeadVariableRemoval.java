@@ -149,18 +149,17 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Read read, Object... args) {
-		// do NOT remove read!
-		/* Variable variable = read.getTarget();
+		Variable variable = read.getTarget();
 		if (variable != null && !variable.isUsed()) {
 			// clean up target
 			read.setTarget(null);
 
-			// do not remove call instruction because it has side-effects!
+			// do not remove read instruction because it has side-effects!
 
 			// remove target
 			procedure.getLocals().remove(variable);
 			changed = true;
-		}*/
+		}
 	}
 
 	@Override

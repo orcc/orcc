@@ -298,7 +298,14 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Read instr, Object... args) {
-		Object[] target = (Object[]) instr.getTarget().getValue();
+		Object[] target;
+		if (instr.getTarget() == null) {
+			// "get" needs a target
+			target = new Object[instr.getNumTokens()];
+		} else {
+			target = (Object[]) instr.getTarget().getValue();
+		}
+		
 		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
 				.get(instr.getPort().getName());
 		fifo.get(target);
