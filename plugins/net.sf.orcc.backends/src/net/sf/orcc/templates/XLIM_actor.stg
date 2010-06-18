@@ -77,22 +77,6 @@ $instance.actor.stateVars.list: stateVar(); separator="\n"$
 >>
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Expression
-///////////////////////////////////////////////////////////////////////////////
-
-expr(op) ::= <<
-$(op.value.class.simpleName)(op)$
->>
-
-
-BinaryExpr(op) ::= <<
-<operation kind="$BinOp.(op.value.op)$">
-	$port(dir="in", source=op.value.e1)$
-	$port(dir="in", source=op.value.e2)$
-	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Operation
@@ -108,7 +92,7 @@ endif$
 >>
 
 operation(op) ::= <<
-$(op.class.simpleName)(op)$
+	$(op.class.simpleName)(op)$
 >>
 
 Read(op) ::= <<
@@ -124,30 +108,47 @@ Write(op) ::= <<
 >>
 
 Load(op) ::= <<
+$if (op.source.variable.type.list)$
+$! TODO !$
+$else$
 <operation kind="noop">
-$port(dir="in", source=op.source)$
-$port(dir="out", type=op.target.type, source=op.target)$
+	$port(dir="in", source=op.source)$
+	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>
+$endif$
 >>
 
 Store(op) ::= <<
-$op.class.simpleName$
-$op$
->>
-
-Return(op) ::= <<
-$op.class.simpleName$
-$op$
->>
-
-Call(op) ::= <<
-$op.class.simpleName$
-$op$
+$if (op.target.global)$
+$! TODO !$
+$else$
+<operation kind="noop">
+	$port(dir="in", source=op.value.var)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+$endif$
 >>
 
 Assign(op) ::= <<
-$expr(op)$
+$if (op.value.binaryExpr)$
+<operation kind="$BinOp.(op.value.op)$">
+	$port(dir="in", source=op.value.e1)$
+	$port(dir="in", source=op.value.e2)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+$else$
+<operation kind="$UnaryOp.(op.value.op)$">
+	$port(dir="in", source=op.value.expr)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+$endif$
 >>
+
+PhiAssignment() ::= <<$! TODO !$>>
+
+Return(op) ::= <<$! TODO, what should we do? !$>>
+
+Call(op) ::= <<$! TODO !$>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
