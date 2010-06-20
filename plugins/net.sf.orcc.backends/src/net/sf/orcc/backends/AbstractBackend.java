@@ -246,6 +246,10 @@ public abstract class AbstractBackend implements Backend {
 				}
 			}
 
+			// shutdowns the pool
+			// no need to wait because tasks are completed after invokeAll
+			pool.shutdown();
+
 			return numCached;
 		} catch (InterruptedException e) {
 			throw new OrccException("actors could not be printed", e);
