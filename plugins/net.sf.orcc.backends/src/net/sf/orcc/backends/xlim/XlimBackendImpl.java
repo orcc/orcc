@@ -31,6 +31,7 @@ package net.sf.orcc.backends.xlim;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -39,9 +40,9 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 /**
- * XLIM back-end. XlimBackendImpl manages JSON to XLIM transformation
+ * This class defines a DOM-based XLIM back-end.
  * 
- * @author Matthieu Wipliez, Samuel Keller
+ * @author Samuel Keller
  */
 public class XlimBackendImpl extends AbstractBackend {
 
@@ -59,8 +60,17 @@ public class XlimBackendImpl extends AbstractBackend {
 	private XlimActorPrinter printer;
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
+	protected void doTransformActor(Actor actor) throws OrccException {
+		// no transformation
+	}
 
+	@Override
+	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+		// do not generate an XLIM VTL
+	}
+
+	@Override
+	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
 		printer = new XlimActorPrinter();
@@ -86,21 +96,6 @@ public class XlimBackendImpl extends AbstractBackend {
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
-	}
-
-	/**
-	 * Print the network
-	 * 
-	 * @param network
-	 *            Network structure
-	 */
-	@Override
-	protected void printNetwork(Network network) throws OrccException {
-	}
-
-	@Override
-	protected void transformActor(Actor actor) throws OrccException {
-		// no transformation
 	}
 
 }

@@ -51,7 +51,7 @@ import net.sf.orcc.network.serialize.XDFWriter;
 /**
  * LLVM back-end.
  * 
- * @author Jérôme GORIN
+ * @author JÃ©rÃ´me GORIN
  * 
  */
 public class LLVMBackendImpl extends AbstractBackend {
@@ -67,8 +67,15 @@ public class LLVMBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	@Override
-	protected void doInstantiation(Network network, String outputFolder) {
-		// we do not instantiate because we only want to flatten
+	protected void doTransformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new TypeSizeTransformation(),
+				new PrintlnTransformation(),
+				new ThreeAddressCodeTransformation(),
+				new MoveReadsWritesTransformation(), new BuildCFG() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
 	}
 
 	@Override
@@ -92,6 +99,15 @@ public class LLVMBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	protected void doXdfCodeGeneration(Network network) throws OrccException {
+		network.flatten();
+
+		// print network
+		write("Printing network...\n");
+		new XDFWriter(new File(path), network);
+	}
+
+	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
 		String outputName = path + File.separator + actor.getName() + ".s";
 
@@ -106,7 +122,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 					printBitcode(llvmAs, outputName, actor.getName());
 				}
 			}
-			
+
 			return cached;
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
@@ -130,26 +146,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 		} catch (IOException e) {
 			System.err.println("Could not print bitcode : ");
 			e.printStackTrace();
-		}
-	}
-
-	@Override
-	protected void printNetwork(Network network) throws OrccException {
-		network.flatten();
-		new XDFWriter(new File(path), network);
-	}
-
-	@Override
-	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { 
-				new TypeSizeTransformation(),
-				new PrintlnTransformation(),
-				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation(), 
-				new BuildCFG() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
 		}
 	}
 

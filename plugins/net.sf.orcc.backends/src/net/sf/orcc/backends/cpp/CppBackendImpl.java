@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009, Ecole Polytechnique Fï¿½dï¿½rale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *   * Neither the name of the Ecole Polytechnique Fï¿½dï¿½rale de Lausanne nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -71,6 +71,22 @@ public class CppBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	@Override
+	protected void doTransformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new PhiRemoval() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+	}
+
+	@Override
+	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+		// do not generate a C++ VTL
+	}
+
+	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
@@ -111,6 +127,10 @@ public class CppBackendImpl extends AbstractBackend {
 		transformActors(actors);
 
 		printActors(network.getActors());
+
+		// print network
+		write("Printing network...\n");
+		printNetwork(network);
 	}
 
 	@Override
@@ -128,8 +148,15 @@ public class CppBackendImpl extends AbstractBackend {
 		return res;
 	}
 
-	@Override
-	protected void printNetwork(Network network) throws OrccException {
+	/**
+	 * Prints the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	private void printNetwork(Network network) throws OrccException {
 		try {
 			STPrinter networkPrinter = new STPrinter();
 			networkPrinter.loadGroups("Cpp_networkDecl");
@@ -168,17 +195,6 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
-		}
-	}
-
-	@Override
-	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new PhiRemoval() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
 		}
 	}
 

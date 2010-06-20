@@ -65,6 +65,18 @@ public class JavaBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	@Override
+	protected void doTransformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new PhiRemoval(), new MoveReadsWritesTransformation() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+
+	}
+
+	@Override
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
@@ -80,6 +92,10 @@ public class JavaBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
+
+		// print network
+		write("Printing network...\n");
+		printNetwork(network);
 	}
 
 	@Override
@@ -93,7 +109,14 @@ public class JavaBackendImpl extends AbstractBackend {
 		}
 	}
 
-	@Override
+	/**
+	 * Prints the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
 	protected void printNetwork(Network network) throws OrccException {
 		try {
 			printer.loadGroups("C_network", "Java_network");
@@ -108,18 +131,6 @@ public class JavaBackendImpl extends AbstractBackend {
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
-	}
-
-	@Override
-	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new PhiRemoval(), new MoveReadsWritesTransformation() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
-
 	}
 
 }

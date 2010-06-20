@@ -87,25 +87,53 @@ public class VHDLBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	protected void doTransformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = {
+				new DeadGlobalElimination(),
+				new DeadCodeElimination(),
+				new DeadVariableRemoval(),
+				new RenameTransformation(this.transformations),
+				// replaces adjacent underscores by a single underscore
+				new RenameTransformation(adjacentUnderscores, "_"),
+				new Inline(), new PhiRemoval(), new VariableRedimension(),
+				new BoolExprTransform(), new VariableRenamer(),
+				new TransformConditionals() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+	}
+
+	@Override
+	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+		// do not generate a VHDL VTL
+	}
+
+	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		printer = new STPrinter(getAttribute(DEBUG_MODE, false));
 		printer.loadGroups("VHDL_actor");
 		printer.setExpressionPrinter(VHDLExpressionPrinter.class);
 		printer.setTypePrinter(VHDLTypePrinter.class);
-
-		List<Actor> actors = network.getActors();
-		transformActors(actors);
-		printActors(actors);
-	}
-
-	@Override
-	protected boolean printActor(Actor actor) throws OrccException {
-		String id = actor.getName();
+		
+		// checks output folder exists, and if not creates it
 		File folder = new File(path + File.separator + "Design");
 		if (!folder.exists()) {
 			folder.mkdir();
 		}
 
+		List<Actor> actors = network.getActors();
+		transformActors(actors);
+		printActors(actors);
+
+		// print network
+		write("Printing network...\n");
+		printNetwork(network);
+	}
+
+	@Override
+	protected boolean printActor(Actor actor) throws OrccException {
+		String id = actor.getName();
 		String outputName = path + File.separator + "Design" + File.separator
 				+ id + ".vhd";
 		try {
@@ -115,8 +143,15 @@ public class VHDLBackendImpl extends AbstractBackend {
 		}
 	}
 
-	@Override
-	protected void printNetwork(Network network) throws OrccException {
+	/**
+	 * Prints the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	private void printNetwork(Network network) throws OrccException {
 		printer.loadGroups("VHDL_testbench");
 
 		File folder = new File(path + File.separator + "Testbench");
@@ -161,24 +196,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
-		}
-	}
-
-	@Override
-	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = {
-				new DeadGlobalElimination(),
-				new DeadCodeElimination(),
-				new DeadVariableRemoval(),
-				new RenameTransformation(this.transformations),
-				// replaces adjacent underscores by a single underscore
-				new RenameTransformation(adjacentUnderscores, "_"),
-				new Inline(), new PhiRemoval(), new VariableRedimension(),
-				new BoolExprTransform(), new VariableRenamer(),
-				new TransformConditionals() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
 		}
 	}
 

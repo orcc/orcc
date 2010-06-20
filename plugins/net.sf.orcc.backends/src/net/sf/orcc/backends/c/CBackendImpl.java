@@ -83,6 +83,25 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	@Override
+	protected void doTransformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new RenameTransformation(this.transformations),
+				new PhiRemoval(), new MoveReadsWritesTransformation() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+
+		actor.computeTemplateMaps();
+	}
+
+	@Override
+	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+		// do not generate a C VTL
+	}
+
+	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
@@ -111,6 +130,10 @@ public class CBackendImpl extends AbstractBackend {
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printInstances(network);
+
+		// print network
+		write("Printing network...\n");
+		printNetwork(network);
 	}
 
 	@Override
@@ -124,8 +147,15 @@ public class CBackendImpl extends AbstractBackend {
 		}
 	}
 
-	@Override
-	protected void printNetwork(Network network) throws OrccException {
+	/**
+	 * Prints the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	private void printNetwork(Network network) throws OrccException {
 		try {
 			String[] networkTemplates;
 			boolean useNewScheduler = getAttribute(
@@ -152,20 +182,6 @@ public class CBackendImpl extends AbstractBackend {
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
-	}
-
-	@Override
-	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new RenameTransformation(this.transformations),
-				new PhiRemoval(), new MoveReadsWritesTransformation() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
-
-		actor.computeTemplateMaps();
 	}
 
 }

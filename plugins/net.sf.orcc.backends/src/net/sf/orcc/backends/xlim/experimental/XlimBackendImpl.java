@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009, Ecole Polytechnique FÃ©dÃ©rale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *   * Neither the name of the Ecole Polytechnique FÃ©dÃ©rale de Lausanne nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -30,6 +30,7 @@ package net.sf.orcc.backends.xlim.experimental;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -45,7 +46,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 /**
- * XLIM back-end.
+ * This class defines a template-based XLIM back-end.
  * 
  * @author Ghislain Roquier
  * 
@@ -63,6 +64,22 @@ public class XlimBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	@Override
+	protected void doTransformActor(Actor actor) throws OrccException {
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new PhiRemoval(), new ThreeAddressCodeTransformation() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+	}
+
+	@Override
+	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+		// do not generate an XLIM VTL
+	}
+
+	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
@@ -70,6 +87,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		printer.loadGroups("XLIM_actor");
 		printer.setExpressionPrinter(XlimExprPrinter.class);
 		printer.setTypePrinter(XlimTypePrinter.class);
+
 		transformActors(network.getActors());
 		printInstances(network);
 	}
@@ -82,17 +100,6 @@ public class XlimBackendImpl extends AbstractBackend {
 			printer.printInstance(outputName, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
-		}
-	}
-
-	@Override
-	protected void transformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new PhiRemoval(), new ThreeAddressCodeTransformation() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
 		}
 	}
 

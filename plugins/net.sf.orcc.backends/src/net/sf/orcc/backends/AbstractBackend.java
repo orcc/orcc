@@ -52,19 +52,32 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 
 /**
- * This class is an abstract implementation of {@link Backend}. The following
- * methods should be extended by back-ends:
+ * This class is an abstract implementation of {@link Backend}. The two entry
+ * points of this class are the public methods
+ * {@link #compileVTL(OrccProcess, String)} and
+ * {@link #compileXDF(OrccProcess, String, String)} which should NOT be called
+ * by back-ends themselves.
+ * 
+ * <p>
+ * The following methods are abstract and must be implemented by back-ends:
  * <ul>
- * <li>{@link #doVtlCodeGeneration(List)} is called when "Compile VTL" is
- * enabled</li>
- * <li>{@link #doXdfCodeGeneration(Network)} is called when "Compile XDF" is
- * enabled</li>
+ * <li>{@link #doTransformActor(Actor)} is called by
+ * {@link #transformActors(List)} to transform a list of actors.</li>
+ * <li>{@link #doVtlCodeGeneration(List)} is called to compile a list of actors.
+ * </li>
+ * <li>{@link #doXdfCodeGeneration(Network)} is called to compile a network.</li>
+ * </ul>
+ * </p>
+ * 
+ * The following methods may be extended by back-ends, if they print actors or
+ * instances respectively.
+ * <ul>
  * <li>{@link #printActor(Actor)} is called by {@link #printActors(List)}.</li>
  * <li>{@link #printInstance(Instance)} is called by
  * {@link #printInstances(Network)}.</li>
- * <li>{@link #printNetwork(Network)} is called by
- * {@link #compileXDF(OrccProcess, String, String)}.</li>
  * </ul>
+ * 
+ * The other methods declared <code>final</code> may be called by back-ends.
  * 
  * @author Matthieu Wipliez
  * 
@@ -153,31 +166,21 @@ public abstract class AbstractBackend implements Backend {
 		write("Parsing XDF network...\n");
 		Network network = new XDFParser(inputFile).parseNetwork();
 
-		doInstantiation(network, outputFolder);
-		doXdfCodeGeneration(network);
-
-		// print network
-		write("Printing network...\n");
-		printNetwork(network);
-	}
-
-	/**
-	 * This method may be implemented by subclasses that wish to skip
-	 * instantiation, or do something before/after.
-	 * 
-	 * @param network
-	 *            a network
-	 * @param outputFolder
-	 *            output folder
-	 * @throws OrccException
-	 */
-	protected void doInstantiation(Network network, String outputFolder)
-			throws OrccException {
 		write("Instantiating actors...\n");
 		network.instantiate(outputFolder);
 		Network.clearActorPool();
 		write("Instantiation done\n");
+
+		doXdfCodeGeneration(network);
 	}
+
+	/**
+	 * Transforms the given actor.
+	 * 
+	 * @param actor
+	 *            the actor
+	 */
+	abstract protected void doTransformActor(Actor actor) throws OrccException;
 
 	/**
 	 * This method must be implemented by subclasses to do the actual code
@@ -187,8 +190,8 @@ public abstract class AbstractBackend implements Backend {
 	 *            a list of IR files
 	 * @throws OrccException
 	 */
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
-	}
+	abstract protected void doVtlCodeGeneration(List<File> files)
+			throws OrccException;
 
 	/**
 	 * This method must be implemented by subclasses to do the actual code
@@ -198,8 +201,8 @@ public abstract class AbstractBackend implements Backend {
 	 *            a network
 	 * @throws OrccException
 	 */
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
-	}
+	abstract protected void doXdfCodeGeneration(Network network)
+			throws OrccException;
 
 	/**
 	 * Returns the boolean-valued attribute with the given name. Returns the
@@ -212,8 +215,8 @@ public abstract class AbstractBackend implements Backend {
 	 * @return the value or the default value if no value was found.
 	 * @throws OrccException
 	 */
-	final protected boolean getAttribute(String attributeName,
-			boolean defaultValue) throws OrccException {
+	final public boolean getAttribute(String attributeName, boolean defaultValue)
+			throws OrccException {
 		if (configuration == null) {
 			return defaultValue;
 		}
@@ -236,7 +239,7 @@ public abstract class AbstractBackend implements Backend {
 	 * @return the value or the default value if no value was found.
 	 * @throws OrccException
 	 */
-	final protected int getAttribute(String attributeName, int defaultValue)
+	final public int getAttribute(String attributeName, int defaultValue)
 			throws OrccException {
 		if (configuration == null) {
 			return defaultValue;
@@ -260,8 +263,8 @@ public abstract class AbstractBackend implements Backend {
 	 * @return the value or the default value if no value was found.
 	 * @throws OrccException
 	 */
-	final protected String getAttribute(String attributeName,
-			String defaultValue) throws OrccException {
+	final public String getAttribute(String attributeName, String defaultValue)
+			throws OrccException {
 		if (configuration == null) {
 			return defaultValue;
 		}
@@ -281,14 +284,14 @@ public abstract class AbstractBackend implements Backend {
 	 * @return a list of actors
 	 * @throws OrccException
 	 */
-	final protected List<Actor> parseActors(List<File> files)
-			throws OrccException {
+	final public List<Actor> parseActors(List<File> files) throws OrccException {
 		write("Parsing " + files.size() + " actors...\n");
 		List<Actor> actors = new ArrayList<Actor>();
 		try {
 			for (File file : files) {
 				InputStream in = new FileInputStream(file);
 				Actor actor = new IRParser().parseActor(in);
+				Network.putActorInPool(actor.getName(), actor);
 				actors.add(actor);
 			}
 		} catch (IOException e) {
@@ -316,7 +319,7 @@ public abstract class AbstractBackend implements Backend {
 	 *            a list of actors
 	 * @throws OrccException
 	 */
-	final protected void printActors(List<Actor> actors) throws OrccException {
+	final public void printActors(List<Actor> actors) throws OrccException {
 		write("Printing actors...\n");
 		long t0 = System.currentTimeMillis();
 		int numCached = 0;
@@ -355,7 +358,7 @@ public abstract class AbstractBackend implements Backend {
 	 *            a network
 	 * @throws OrccException
 	 */
-	final protected void printInstances(Network network) throws OrccException {
+	final public void printInstances(Network network) throws OrccException {
 		write("Printing instances...\n");
 		long t0 = System.currentTimeMillis();
 		for (Instance instance : network.getInstances()) {
@@ -375,21 +378,13 @@ public abstract class AbstractBackend implements Backend {
 	 * @param network
 	 *            the network
 	 */
-	protected void printNetwork(Network network) throws OrccException {
-	}
+	// abstract protected void printNetwork(Network network) throws
+	// OrccException;
 
 	@Override
 	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
 	}
-
-	/**
-	 * Transforms the given actor.
-	 * 
-	 * @param actor
-	 *            the actor
-	 */
-	abstract protected void transformActor(Actor actor) throws OrccException;
 
 	/**
 	 * Transforms instances of the given network.
@@ -398,11 +393,10 @@ public abstract class AbstractBackend implements Backend {
 	 *            a list of actors
 	 * @throws OrccException
 	 */
-	final protected void transformActors(List<Actor> actors)
-			throws OrccException {
+	final public void transformActors(List<Actor> actors) throws OrccException {
 		write("Transforming actors...\n");
 		for (Actor actor : actors) {
-			transformActor(actor);
+			doTransformActor(actor);
 		}
 	}
 
@@ -412,7 +406,7 @@ public abstract class AbstractBackend implements Backend {
 	 * @param text
 	 *            a string
 	 */
-	final protected void write(String text) {
+	final public void write(String text) {
 		if (process != null) {
 			process.write(text);
 		}
