@@ -39,6 +39,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.debug.model.OrccProcess;
@@ -205,6 +210,49 @@ public abstract class AbstractBackend implements Backend {
 			throws OrccException;
 
 	/**
+	 * Executes the given list of tasks using a thread pool with one thread per
+	 * processor available.
+	 * 
+	 * @param tasks
+	 *            a list of tasks
+	 * @throws OrccException
+	 *             if something goes wrong (code generation fails or a task is
+	 *             interrupted)
+	 */
+	private int executeTasks(List<Callable<Boolean>> tasks)
+			throws OrccException {
+		// creates the pool
+		int nThreads = Runtime.getRuntime().availableProcessors();
+		ExecutorService pool = Executors.newFixedThreadPool(nThreads);
+		try {
+			// invokes all tasks and wait for them to complete
+			List<Future<Boolean>> completeTasks = pool.invokeAll(tasks);
+
+			// counts number of cached actors and checks exceptions
+			int numCached = 0;
+			for (Future<Boolean> completeTask : completeTasks) {
+				try {
+					if (completeTask.get()) {
+						numCached++;
+					}
+				} catch (ExecutionException e) {
+					Throwable cause = e.getCause();
+					if (cause instanceof OrccException) {
+						throw (OrccException) e.getCause();
+					} else {
+						throw new OrccException(
+								"one actor could not be printed", cause);
+					}
+				}
+			}
+
+			return numCached;
+		} catch (InterruptedException e) {
+			throw new OrccException("actors could not be printed", e);
+		}
+	}
+
+	/**
 	 * Returns the boolean-valued attribute with the given name. Returns the
 	 * given default value if the attribute is undefined.
 	 * 
@@ -285,13 +333,16 @@ public abstract class AbstractBackend implements Backend {
 	 * @throws OrccException
 	 */
 	final public List<Actor> parseActors(List<File> files) throws OrccException {
+		// NOTE: the actors are parsed but are NOT put in the actor pool because
+		// they may be transformed and not have the same properties (in
+		// particular concerning types), and instantiation then complains.
+
 		write("Parsing " + files.size() + " actors...\n");
 		List<Actor> actors = new ArrayList<Actor>();
 		try {
 			for (File file : files) {
 				InputStream in = new FileInputStream(file);
 				Actor actor = new IRParser().parseActor(in);
-				Network.putActorInPool(actor.getName(), actor);
 				actors.add(actor);
 			}
 		} catch (IOException e) {
@@ -322,13 +373,22 @@ public abstract class AbstractBackend implements Backend {
 	final public void printActors(List<Actor> actors) throws OrccException {
 		write("Printing actors...\n");
 		long t0 = System.currentTimeMillis();
-		int numCached = 0;
 
-		for (Actor actor : actors) {
-			if (printActor(actor)) {
-				numCached++;
-			}
+		// creates a list of tasks: each task will print an actor when called
+		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
+		for (final Actor actor : actors) {
+			tasks.add(new Callable<Boolean>() {
+
+				@Override
+				public Boolean call() throws OrccException {
+					return printActor(actor);
+				}
+
+			});
 		}
+
+		// executes the tasks
+		int numCached = executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
 		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
@@ -361,11 +421,25 @@ public abstract class AbstractBackend implements Backend {
 	final public void printInstances(Network network) throws OrccException {
 		write("Printing instances...\n");
 		long t0 = System.currentTimeMillis();
-		for (Instance instance : network.getInstances()) {
-			if (instance.isActor()) {
-				printInstance(instance);
-			}
+
+		// creates a list of tasks: each task will print an instance when called
+		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
+		for (final Instance instance : network.getInstances()) {
+			tasks.add(new Callable<Boolean>() {
+
+				@Override
+				public Boolean call() throws OrccException {
+					if (instance.isActor()) {
+						printInstance(instance);
+					}
+					return false;
+				}
+
+			});
 		}
+
+		// executes the tasks
+		executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
 		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");

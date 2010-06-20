@@ -59,6 +59,7 @@ public class TemplateGroupLoader {
 		String root = groupNames[0];
 		String groupPath = "net/sf/orcc/templates/" + root + ".stg";
 		group = new STGroupFile(groupPath, '$', '$');
+		group.load();
 
 		for (int i = 1; i < groupNames.length; i++) {
 			String groupName = groupNames[i];
@@ -66,6 +67,7 @@ public class TemplateGroupLoader {
 			groupPath = "net/sf/orcc/templates/" + groupName + ".stg";
 			group = new STGroupFile(groupPath, '$', '$');
 			group.importTemplates(previous);
+			group.load();
 		}
 
 		return group;
