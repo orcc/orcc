@@ -64,11 +64,13 @@ const $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;$\n$$
 ///////////////////////////////////////////////////////////////////////////////
 StateVar(variable) ::= <<
 $if(variable.assignable)$
-$if(variable.type.list)$
-$variable$ = new $variable.type$$listSize(variable.type.dimensions)$;
-$endif$
 $if(variable.initialized)$
+$if (!variable.type.dimensions)$
 $variable$ = $Constant(variable.constantValue)$;
+$else$
+const $variable.type$ tmp_$variable$[$variable.type.dimensions$] = $Constant(variable.constantValue)$;
+memcpy($variable$, tmp_$variable$, $variable.type.dimensions$ * sizeof($variable.type$));
+$endif$
 $endif$
 $endif$
 
@@ -83,12 +85,24 @@ $assign.target$ = $assign.value$;
 
 >>
 
-Call(call) ::= <<
-$if(call.target)$
-$call.target$ = 
-$endif$
-$call.procedure$($call.parameters; separator=", "$);
+PrintFormat(parameter) ::= <<
+$if (parameter.stringExpr)
+$$parameter$$
+else
+$ "%$PrintFormatType(parameter.type)$" $
+endif$
+>>
 
+PrintParameter(parameter) ::= <<
+$if (!parameter.stringExpr)$, $parameter$$endif$
+>>
+
+Call(call) ::= <<
+
+$if(call.print)$printf($call.parameters: PrintFormat()$$call.parameters: PrintParameter()$);$
+else
+$$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
+endif$
 >>
 
 Decrement(decrement) ::= <<

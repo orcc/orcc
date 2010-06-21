@@ -4,12 +4,12 @@
 
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
-declarePointer(value) ::= <<
-$value : {*} $
+listSize(value) ::= <<
+$value : {[$it$]} $
 >>
 
 variableDeclaration(variable) ::= <<
-$variable.type$$declarePointer(variable.type.dimensions)$ $variable$
+$variable.type$ $variable$$listSize(variable.type.dimensions)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

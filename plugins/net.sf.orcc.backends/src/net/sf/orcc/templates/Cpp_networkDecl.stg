@@ -21,7 +21,7 @@ $instance.id$($instance.actor.parameters.list: argumentList(); separator=", "$)
 >>
 
 initializeInstances(instances) ::= <<
-$instances: initializeInstance(); separator=", "$
+$instances: initializeInstance(); wrap, separator=", "$
 >>
 
 
