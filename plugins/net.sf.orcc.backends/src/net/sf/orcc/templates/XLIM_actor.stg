@@ -159,17 +159,20 @@ $if (op.value.binaryExpr)$
 	$port(dir="in", source=op.value.e1)$
 	$port(dir="in", source=op.value.e2)$
 	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>
-$else$
-<operation kind="$UnaryOp.(op.value.op)$">
+</operation>$else$<operation kind="$UnaryOp.(op.value.op)$">
 	$port(dir="in", source=op.value.expr)$
 	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>
 $endif$
 >>
 
+
 PhiAssignment(phi) ::= <<
-$instructions(phi.instructions)$
+<PHI>
+	<port dir="in" qualifier="then" source="$first(phi.vars)$"/>
+	<port dir="in" qualifier="else" source="$rest(phi.vars)$"/>
+	<port dir="out" size="$phi.target.type.size$" source="$phi.target$" typeName="$phi.target.type$"/>
+</PHI>
 >>
 
 Return(return) ::= <<
