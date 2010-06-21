@@ -1755,6 +1755,7 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := true;
@@ -1777,6 +1778,7 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := false;
@@ -4412,6 +4414,66 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
+	procedure GetIntraChromaPredModeParsing()
+	begin
+		if binIdxMb = 0 then
+			if binValDecoded = false then
+				ctxIdxincIntraChromaPredmode();
+				ctxIdx := 64 + ctxIdxInc;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 0 then
+					CabacValue := 0;
+					FoundSE := true;
+				else
+					binIdxMb := binIdxMb + 1;
+				end
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdxMb = 1 and FoundSE = false then
+			if binValDecoded = false then
+				ctxIdx := 64 + 3;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 0 then
+					CabacValue := 1;
+					FoundSE := true;
+				else
+					binIdxMb := binIdxMb + 1;
+				end
+				binValDecoded := false;
+				
+			end
+		end
+		
+		if binIdxMb = 2 and FoundSE = false then
+			if binValDecoded = false then
+				ctxIdx := 64 + 3;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 0 then
+					CabacValue := 2;
+					FoundSE := true;
+				else
+					CabacValue := 3;
+					FoundSE := true;
+				end
+				binValDecoded := false;
+			end
+		end
+		
+		if FoundSE then
+			binValDecoded := false;
+			binIdxMb := -1;
+			StopCabacProcess();
+		end
+	end
+	
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -4453,6 +4515,10 @@ actor Algo_Synp_AVC_FREXT()
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_QP_DELTA then
 				GetMbQpDelta();
+			end
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE then
+				GetIntraChromaPredModeParsing();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
@@ -4794,8 +4860,7 @@ actor Algo_Synp_AVC_FREXT()
 	 // if profile is not Baseline or Main
 	 read_Sps_chroma_format_idc: action ==>
 	 guard
-		(profile_idc[sps_id] = 100 
-		or profile_idc[sps_id] = 110 
+		(profile_idc[sps_id] = 110 
 		or profile_idc[sps_id] = 122 
 		or profile_idc[sps_id] = 244 
 		or profile_idc[sps_id] = 44 
@@ -7931,6 +7996,7 @@ end
 			if IS_CABAC() then
 				GetCabacRemIntraChromaPredModeSyntaxElement();
 				StartCabacProcess();
+				binIdxMb := 0;
 			end
 		end
 	end
