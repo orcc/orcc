@@ -1756,6 +1756,7 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := true;
@@ -1779,6 +1780,7 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := false;
@@ -4390,6 +4392,11 @@ actor Algo_Synp_AVC_FREXT()
 							if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG then
 								ctxIdxOffset := 68;
 								ctxIdxInc := 0;
+							else
+								if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_TRANSFORM_SIZE_8x8_FLAG then
+									ctxIdxOffset := 399;
+									ctxIdxTransSize8x8Flag();
+								end
 							end
 						end
 								
@@ -4474,6 +4481,50 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
+	procedure GetIntraREM_Mode_4X4_8X8()
+	begin
+		if binIdx = 0 then
+			if binValDecoded = false then
+				ctxIdx := 69;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				CabacValue := binVal;
+				binIdx := binIdx + 1;
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdx = 1 then
+			if binValDecoded = false then
+				ctxIdx := 69;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				CabacValue := CabacValue + (binVal << 1);
+				binIdx := binIdx + 1;
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdx = 2 then
+			if binValDecoded = false then
+				ctxIdx := 69;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				CabacValue := CabacValue + (binVal << 2);
+				binValDecoded := false;
+				FoundSE := true;
+			end
+		end
+		
+		if FoundSE then
+			binValDecoded := false;
+			binIdx := -1;
+			StopCabacProcess();
+		end
+	end
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -4509,12 +4560,17 @@ actor Algo_Synp_AVC_FREXT()
 			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or 
 			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or 
 			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_LAST_SIGNIFICANT_COEFF_FLAG or
+			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_TRANSFORM_SIZE_8x8_FLAG or
 			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG then
 				GetFlagParsing();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_QP_DELTA then
 				GetMbQpDelta();
+			end
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE then
+				GetIntraREM_Mode_4X4_8X8();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE then
@@ -7861,6 +7917,7 @@ end
 				
 				if prev_intra4x4_pred_mode_flag = 0 then 
 					GetCabacRemIntra4x4_8x8PredModeSyntaxElement();
+					binIdx := 0;
 					StartCabacProcess();
 				end
 			end
@@ -7931,28 +7988,60 @@ end
 		IS_Intra_8x8()
 	do
 		luma4x4BlkIdx := 0;
-		set_bits_to_read(1);
+		if  IS_CAVLC() then
+			set_bits_to_read(1);
+		else
+			if IS_CABAC() then
+				GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+				StartCabacProcess();
+			end 
+		end
 	end
 
 	//for( luma8x8BlkIdx=0; luma8x8BlkIdx<4; luma8x8BlkIdx++ )
 	read_MB_pred_rem_intra8x8_pred_mode: action ==>
 	guard
-		done_reading_bits(),
-		luma4x4BlkIdx < 4
+		(IS_CAVLC() and done_reading_bits() and luma4x4BlkIdx < 4) or ( IS_CABAC() and cabac_end() and luma4x4BlkIdx < 4 )
 	do
-		prev_intra4x4_pred_mode_flag := read_result();
-		if prev_intra4x4_pred_mode_flag = 0 then set_bits_to_read(3); end
+		if IS_CAVLC() then
+			prev_intra4x4_pred_mode_flag := read_result();
+			
+			if prev_intra4x4_pred_mode_flag = 0 then 
+				set_bits_to_read(3); 
+			end
+		else 
+			if IS_CABAC() then
+				prev_intra4x4_pred_mode_flag := cabac_value();
+				
+				if prev_intra4x4_pred_mode_flag = 0 then 
+					GetCabacRemIntra4x4_8x8PredModeSyntaxElement();
+					binIdx := 0;
+					StartCabacProcess();
+				end
+			end
+		end
 	end
 
 	//if( !prev_intra8x8_pred_mode_flag[ luma8x8BlkIdx ] )
 	read_MB_pred_rem_intra8x8_pred_mode_done: action ==>
 	guard
-		done_reading_bits(),
-		prev_intra4x4_pred_mode_flag = 0
+		(IS_CAVLC() and done_reading_bits() and prev_intra4x4_pred_mode_flag = 0 ) or ( IS_CABAC() and cabac_end() and prev_intra4x4_pred_mode_flag = 0 )
 	do
-		rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
-		luma4x4BlkIdx := luma4x4BlkIdx +1;
-		if luma4x4BlkIdx < 4 then set_bits_to_read(1); end
+		if IS_CAVLC() then
+			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
+			luma4x4BlkIdx := luma4x4BlkIdx +1;
+			if luma4x4BlkIdx < 4 then set_bits_to_read(1); end
+		else 
+			if IS_CABAC() then
+				rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := cabac_value();
+				luma4x4BlkIdx := luma4x4BlkIdx +1;
+				//Read until luma4x4BlkIdx = 4
+				if luma4x4BlkIdx < 4 then
+					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+					StartCabacProcess();
+				end
+			end
+		end
 	end
 
 	//else
@@ -7960,9 +8049,21 @@ end
 	guard
 		prev_intra4x4_pred_mode_flag = 1
 	do
-		rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
-		luma4x4BlkIdx := luma4x4BlkIdx +1;
-		if luma4x4BlkIdx < 4 then set_bits_to_read(1); end
+		if IS_CAVLC() then
+			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
+			luma4x4BlkIdx := luma4x4BlkIdx +1;
+			if luma4x4BlkIdx < 4 then set_bits_to_read(1); end
+		else
+			if IS_CABAC() then
+				rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := 15; // indicates that the mode is predicted using the neighbourhood 
+				luma4x4BlkIdx := luma4x4BlkIdx + 1;
+				//Read until luma4x4BlkIdx = 16
+				if luma4x4BlkIdx < 4 then
+					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+					StartCabacProcess();
+				end
+			end
+		end
 	end
 	//end if
 
