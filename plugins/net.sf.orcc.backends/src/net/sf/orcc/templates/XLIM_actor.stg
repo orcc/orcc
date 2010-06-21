@@ -93,15 +93,13 @@ Decrement(decrement) ::= <<
 
 HasTokens(hasTokens) ::= <<
 <operation kind="pinStatus" portName="$hasTokens.port$" removable="no">
-	$port(dir="out", type=hasTokens.port.type, source=hasTokens.target)$
+	$port(dir="out", type=hasTokens.target.type, source=hasTokens.target)$
 </operation>
 >>
 
 Increment(increment) ::= <<
 <!-- TODO increment -->
->><operation kind="pinRead" portName="$op.port.name$" removable="no">
-	$port(dir="out", type=op.port.type, source=op.target)$
-</operation>
+>>
 
 Peek(peek) ::= <<
 <!-- TODO peek -->
@@ -206,6 +204,7 @@ $instructions(blockNode.instructions)$
 
 // if node
 IfNode(ifNode) ::= <<
+
 <module kind="if">
 	<module decision="" kind="test">
 		$ifNode.value$
@@ -238,16 +237,7 @@ $BlockNode(whileNode.joinNode)$
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-$if(!procedure.external)$
-
-static $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
-$if(procedure.locals.list)$
-	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
-$endif$
-	$procedure.nodes: {$(it.class.simpleName)(it)$}$
-}
-
-$endif$
+$procedure.nodes: {$(it.class.simpleName)(it)$}$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -264,39 +254,60 @@ action(action) ::= <<
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-outputPatternPort(port) ::= <<
-if (!fifo_$port.type$_has_room($instance.id$_$port$, $pattern.(port)$)) {
-	ports |= 0x0$instance.actor.maskOutput.(port)$;
-}
+outputPatternPort(port, index, index0) ::= <<
+<!--  OutputPattern -->
+<operation kind="pinStatus" portName="$port$" removable="no">
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$port$" typeName="bool"/>
+</operation>
+<operation kind="$BinOp.LOGIC_AND$">
+	<port dir="in" source="outputPattern_$instance.id$_$port$"/>
+	<port dir="in" source="outputPattern_$instance.id$_res_$index0$"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_res_$index$" typeName="bool"/>
+</operation>
+>>
+
+outputPatternPortDecision(index)::=<<
+<module kind="if">
+	<module decision="outputPattern_$instance.id$_decision_$index$" kind="test">
+			<operation kind="noop">
+			<port dir="in" source="outputPattern_$instance.id$_res_$index$"/>
+			<port dir="out" size="1" source="outputPattern_$instance.id$_decision_$index$" typeName="bool"/>
+		</operation>
+	</module>
 >>
 
 outputPattern(pattern) ::= <<
-int ports = 0;
-$pattern.keys: outputPatternPort(); separator="\n"$
-if (ports != 0) {
+$pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0)$}; separator="\n"$
+<!-- Last outputPattern -->
+$outputPatternPortDecision(length(pattern.keys)); separator="\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-$action.body$();
-i++;
+<module kind="then">
+	<operation kind="taskCall" target="$action.body$"/>
+</module>
 >>
 
 actionTest(action) ::= <<
 $procedure(action.scheduler)$
-if (isSchedulable_$action$()) {
-	$if(action.outputPattern)$
-	$outputPattern(pattern=action.outputPattern)$
-		si->num_firings = i;
-		si->reason = full;
-		si->ports = ports;
-		break;
-	}
-	$endif$
-	$actionCall(action)$
-}>>
+<module kind="if">
+	<module decision="isSchedulable_$action$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="isSchedulable_$action$_go"/>
+			<port dir="out" size="1" source="isSchedulable_$action$" typeName="bool"/>
+		</operation>
+	</module>
+	<module kind="then">
+		$if(action.outputPattern)$
+		$outputPattern(pattern=action.outputPattern)$
+		$endif$
+		$actionCall(action)$
+	</module>
+</module>
+>>
 
 schedulingTest(actions) ::= <<
 $actions: actionTest(); separator=" else "$
@@ -305,15 +316,10 @@ $actions: actionTest(); separator=" else "$
 scheduler(actions) ::= <<
 <module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
 	<module kind="loop">
-	int i = 0;
-  
-	while (1) {
-		$if(actions)$$schedulingTest(actions)$$endif$ else {
-			si->num_firings = i;
-			si->reason = starved;
-			si->ports = 0x0$instance.actor.maskInputs$;
-			break;
-		}
+		<module kind="body">
+			$if(actions)$$schedulingTest(actions)$$endif$
+			<module kind="else"/>
+		</module>
 	</module>
 </module>
 >>
