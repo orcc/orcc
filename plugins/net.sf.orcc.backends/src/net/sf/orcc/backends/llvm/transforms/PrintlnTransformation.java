@@ -70,7 +70,14 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 
 		strCnt = 0;
 		stateVars = actor.getStateVars();
-
+		OrderedMap<Procedure> procs = actor.getProcs();
+		Procedure print = procs.get("print");
+		
+		if (print != null){
+			procs.remove(print);
+			
+		}
+		
 		for (Procedure proc : actor.getProcs()) {
 			visitProcedure(proc);
 		}

@@ -14,6 +14,9 @@ $endif$
 $if(actor.stateVars.list)$
 !state_variables = !{$actor.stateVars.list: stateVar_decl_MD(); separator=", "$}
 $endif$
+$if(actor.procs.list)$ 
+!procedures = !{$actor.procs.list: proc_decl_MD(); separator=", "$}
+$endif$
 $if(actor.actions)$
 !actions = !{$actor.actions: action_decl_MD(); separator=", "$}
 $endif$
@@ -25,6 +28,7 @@ $actor.inputs.list: fifo_MD()$
 $actor.outputs.list: fifo_MD()$
 $actor.parameters.list: parameter_MD()$
 $actor.stateVars.list: stateVar_MD()$
+$actor.procs.list: proc_MD()$
 $actor.actions: action_MD()$
 
 >>
@@ -68,7 +72,7 @@ action_decl_MD(action) ::= <<
 !$Location(action.location)$
 >>
 
-Proc_decl_MD(proc) ::= <<
+proc_decl_MD(proc) ::= <<
 !$Location(proc.location)$
 >>
 
@@ -109,8 +113,10 @@ $Type_MD(port)$
 
 >>
 
-Proc_MD(proc, MD, index) ::= <<
-$MD$$index$ = metadata !{metadata !"test"}
+proc_MD(proc) ::= <<
+$proc_decl_MD(proc)$ = metadata !{$varName_MD(proc)$, $procExtern_MD(proc)$, metadata $Location_decl_MD(proc)$, metadata $RetType_decl_MD(proc)$}
+$Location_MD(proc)$
+$RetType_MD(proc)$
 >>
 
 
@@ -178,8 +184,12 @@ Type_decl_MD(var) ::= <<
 !$Location(var.location)$4
 >>
 
+RetType_decl_MD(proc)::= <<
+!$Location(proc.location)$5
+>>
+
 VarDef_decl_MD(var) ::= <<
-!$Location(var.location)$5
+!$Location(var.location)$6
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,6 +227,11 @@ $Type_decl_MD(var)$ = metadata  !{$varType_MD(var.type)$, $varSize_MD(var.type)$
 
 >>
 
+RetType_MD(proc) ::= <<
+$RetType_decl_MD(proc)$ = metadata  !{$varType_MD(proc.returnType)$, $varSize_MD(proc.returnType)$}
+
+>>
+
 Location_MD(var) ::=<<
 $Location_decl_MD(var)$ = metadata  !{$startLine_MD(var)$, $startColumn_MD(var)$, $endColumn_MD(var)$}
 >>
@@ -249,8 +264,8 @@ $Body_decl_MD(action)$ = metadata  !{$varName_MD(action.body)$, $procExtern_MD(a
 
 
 varType_MD(type) ::= <<
-$if(type.int)$ i32 $var.type.size$ $
-elseif(type.uint)$ i32 $var.type.size$ $
+$if(type.int)$ i32 $type.size$ $
+elseif(type.uint)$ i32 $type.size$ $
 elseif(type.bool)$ i32 1 $ 
 elseif(type.list)$ i32 $type.elementType.size$ $
 elseif(type.string)$ i32 8 $
