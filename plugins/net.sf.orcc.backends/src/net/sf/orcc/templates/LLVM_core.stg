@@ -64,6 +64,14 @@ $$variable.type$ %$variable$$
 endif$
 >>
 
+argumentTypeDeclaration(variable) ::= <<
+$if(variable.type.list)
+$$variable.type$*$
+else
+$$variable.type$$
+endif$
+>>
+
 Location(location) ::= <<
 $location.startLine$$location.startColumn$$location.endColumn$
 >>

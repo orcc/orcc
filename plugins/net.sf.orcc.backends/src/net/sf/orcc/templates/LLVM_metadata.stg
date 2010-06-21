@@ -114,9 +114,8 @@ $Type_MD(port)$
 >>
 
 proc_MD(proc) ::= <<
-$proc_decl_MD(proc)$ = metadata !{$varName_MD(proc)$, $procExtern_MD(proc)$, metadata $Location_decl_MD(proc)$, metadata $RetType_decl_MD(proc)$}
-$Location_MD(proc)$
-$RetType_MD(proc)$
+$proc_decl_MD(proc)$ = metadata !{$varName_MD(proc)$, $procExtern_MD(proc)$, $proc.returnType$($proc.parameters.list: argumentTypeDeclaration(); wrap, anchor, separator=", "$)* @$proc$}
+
 >>
 
 
