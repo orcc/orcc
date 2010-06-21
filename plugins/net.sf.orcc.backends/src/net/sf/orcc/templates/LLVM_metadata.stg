@@ -253,6 +253,7 @@ $if(type.int)$ i32 $var.type.size$ $
 elseif(type.uint)$ i32 $var.type.size$ $
 elseif(type.bool)$ i32 1 $ 
 elseif(type.list)$ i32 $type.elementType.size$ $
+elseif(type.string)$ i32 8 $
 endif$
 >>
 
