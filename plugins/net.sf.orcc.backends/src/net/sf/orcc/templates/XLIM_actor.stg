@@ -60,7 +60,7 @@ initValue(type, value) ::= <<
 >>
 
 stateVar(var) ::= <<
-<stateVar name="var_$var.name$" sourceName="$var.name$">
+<stateVar name="$var.name$" sourceName="$var.name$">
 $if (var.type.list)$
 	<initValue typeName="List">
 		$var.constantValue: {value | $initValue(type=var.type.elementType, value=value)$}; separator="\n"$
@@ -82,6 +82,30 @@ $instance.actor.stateVars.list: stateVar(); separator="\n"$
 // Operation
 ///////////////////////////////////////////////////////////////////////////////
 
+
+Call(call) ::= <<
+<!-- TODO call-->
+>>
+
+Decrement(decrement) ::= <<
+<!-- TODO decrement -->
+>>
+
+HasTokens(hasTokens) ::= <<
+<operation kind="pinStatus" portName="$hasTokens.port$" removable="no">
+	$port(dir="out", type=hasTokens.port.type, source=hasTokens.target)$
+</operation>
+>>
+
+Increment(increment) ::= <<
+<!-- TODO increment -->
+>><operation kind="pinRead" portName="$op.port.name$" removable="no">
+	$port(dir="out", type=op.port.type, source=op.target)$
+</operation>
+
+Peek(peek) ::= <<
+<!-- TODO peek -->
+>>
 
 port(dir, type, source) ::= <<
 $if (!type)
@@ -108,7 +132,7 @@ Write(op) ::= <<
 >>
 
 Load(op) ::= <<
-$if (op.source.variable.type.list)$
+$if (op.target.variable.type.list)$
 $! TODO !$
 $else$
 <operation kind="noop">
@@ -144,55 +168,298 @@ $else$
 $endif$
 >>
 
-PhiAssignment() ::= <<$! TODO !$>>
+PhiAssignment(phi) ::= <<
+$instructions(phi.instructions)$
+>>
 
-Return(op) ::= <<$! TODO, what should we do? !$>>
+Return(return) ::= <<
+<!-- TODO return -->
+>>
 
-Call(op) ::= <<$! TODO !$>>
+SelfAssignment(selfAssign) ::= <<
+<!-- TODO selfAssign -->
+>>
+
+WriteEnd(writeEnd) ::= <<
+<!-- TODO writeEnd -->
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-node(node) ::= <<
-$(node.class.simpleName)(node)$
+instructions(instructions) ::= <<
+$instructions: {$(it.class.simpleName)(it)$}$
 >>
 
-BlockNode(blkNode) ::= <<
-$blkNode.instructions: operation(); separator="\n"$
+nodes(nodes) ::= <<
+$nodes: {$(it.class.simpleName)(it)$}$
 >>
 
+// if node
+BlockNode(blockNode) ::= <<
+$instructions(blockNode.instructions)$
+>>
+
+// if node
 IfNode(ifNode) ::= <<
+<module kind="if">
+	<module decision="" kind="test">
+		$ifNode.value$
+	</module>
+	<module kind="then">
+		$nodes(ifNode.thenNodes)$
+	</module>
+$if(ifNode.elseNodes)$
+	<module kind="else">
+		$nodes(ifNode.elseNodes)$
+	</module>
+$endif$
+</module>
+<!-- joinnode -->
+$BlockNode(ifNode.joinNode)$
+<!-- end joinnode -->
 >>
 
+// while node
 WhileNode(whileNode) ::= <<
+
+while ($whileNode.value$) {
+	$nodes(whileNode.nodes)$
+}
+$BlockNode(whileNode.joinNode)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Modules
+// Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
+procedure(procedure) ::= <<
+$if(!procedure.external)$
 
-module(action) ::= <<
+static $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
+$if(procedure.locals.list)$
+	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
+$endif$
+	$procedure.nodes: {$(it.class.simpleName)(it)$}$
+}
+
+$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+action(action) ::= <<
 <module autostart="false" kind="action" name="$action.name$">
-$action.body.nodes: node(); separator="\n"$
+	$action.body.nodes: nodes(); separator="\n"$
 </module> 
 >>
 
-modules() ::= <<
-$instance.actor.actions : module()$
+///////////////////////////////////////////////////////////////////////////////
+// Action scheduler
+///////////////////////////////////////////////////////////////////////////////
+
+outputPatternPort(port) ::= <<
+if (!fifo_$port.type$_has_room($instance.id$_$port$, $pattern.(port)$)) {
+	ports |= 0x0$instance.actor.maskOutput.(port)$;
+}
+>>
+
+outputPattern(pattern) ::= <<
+int ports = 0;
+$pattern.keys: outputPatternPort(); separator="\n"$
+if (ports != 0) {
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Design
+// Scheduler without FSM
+
+actionCall(action) ::= <<
+$action.body$();
+i++;
+>>
+
+actionTest(action) ::= <<
+$procedure(action.scheduler)$
+if (isSchedulable_$action$()) {
+	$if(action.outputPattern)$
+	$outputPattern(pattern=action.outputPattern)$
+		si->num_firings = i;
+		si->reason = full;
+		si->ports = ports;
+		break;
+	}
+	$endif$
+	$actionCall(action)$
+}>>
+
+schedulingTest(actions) ::= <<
+$actions: actionTest(); separator=" else "$
+>>
+
+scheduler(actions) ::= <<
+<module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
+	<module kind="loop">
+	int i = 0;
+  
+	while (1) {
+		$if(actions)$$schedulingTest(actions)$$endif$ else {
+			si->num_firings = i;
+			si->reason = starved;
+			si->ports = 0x0$instance.actor.maskInputs$;
+			break;
+		}
+	</module>
+</module>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler with FSM
+
+actionCallState(nextState) ::= <<
+$nextState.action.body$();
+i++;
+goto l_$nextState.targetState$;
+>>
+
+actionTestState(nextState) ::= <<
+if (isSchedulable_$nextState.action$()) {
+	$if(nextState.action.outputPattern)$
+	$outputPattern(nextState.action.outputPattern)$
+		_FSM_state = s_$transition.sourceState$;
+		si->num_firings = i;
+		si->reason = full;
+		si->ports = ports;
+		return;
+	}
+	$endif$
+	$actionCallState(nextState)$
+}>>
+
+schedulingTestState(nextStates) ::= <<
+$nextStates: actionTestState(); separator=" else "$
+>>
+
+Transition(transition) ::= <<
+
+
+l_$transition.sourceState$:
+	$if (actions)$
+	while (outside_FSM_scheduler()) {
+		i++;
+	}
+	$endif$
+	$if (transition.nextStateInfo.empty)$
+	printf("stuck in state \"$transition.sourceState$\"\n");
+	wait_for_key();
+	exit(1);
+	$else$
+	$schedulingTestState(nextStates=transition.nextStateInfo)$ else {
+		_FSM_state = s_$transition.sourceState$;
+		si->num_firings = i;
+		si->reason = starved;
+		si->ports = 0x0$instance.actor.maskInputsTransition.(transition)$;
+		return;
+	}
+	$endif$
+>>
+
+Transitions(actions, transitions) ::= <<
+$transitions: Transition()$
+>>
+
+switchTransition(transition) ::= <<
+
+case s_$transition.sourceState$:
+	goto l_$transition.sourceState$;
+>>
+
+switch(transitions) ::= <<
+switch (_FSM_state) {
+$transitions: switchTransition()$
+default:
+	printf("unknown state: %s\n", stateNames[_FSM_state]);
+	wait_for_key();
+	exit(1);
+}
+>>
+
+schedulerFSM(actions, fsm) ::= <<
+enum states {
+	s_$first(fsm.states)$ = 0,
+	$rest(fsm.states) : {s_$it$}; separator=",\n"$
+};
+
+static char *stateNames[] = {
+	$fsm.states : {"s_$it$"}; separator=",\n"$
+};
+
+static enum states _FSM_state = s_$fsm.initialState$;
+
+$if(actions)$
+static int outside_FSM_scheduler() {
+	int i = 0;
+	$schedulingTest(actions)$ else {
+		return 0;
+	}
+	return 1;
+}
+$endif$
+
+void $instance.id$_scheduler(struct schedinfo_s *si) {
+	int i = 0;
+
+	// jump to FSM state 
+	$switch(fsm.transitions)$
+
+	// FSM transitions
+$Transitions(actions=actions, transitions=fsm.transitions)$
+}
+
+>>
+
+parameters(parameters) ::= <<
+$parameters.keys: { k | #define $k$ $parameters.(k)$
+}$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor
 ///////////////////////////////////////////////////////////////////////////////
 
+PrintHierarchicalPath(path) ::= <<
+$path; separator="/"$
+>>
+
+
 design() ::= <<
+<!-- /$first(instance.hierarchicalClass)$/$PrintHierarchicalPath(instance.hierarchicalId)$ -->
+<!-- Source file is "$instance.actor.file$" -->
 <design name="$instance.id$">
 	$actorPorts()$
-	$internalPorts()$
-	$stateVars()$
-	$modules()$
+	$parameters(instance.parameters)$
+	$instance.actor.stateVars.list: stateVar()$
+	$instance.actor.procs.list: procedure()$
+	$instance.actor.actions: action()$
+	$if(instance.actor.initializes)$
+	$instance.actor.initializes: action()$
+	void $instance.id$_initialize() {
+		int res = 1;
+		int i = 0;
+
+		$if(instance.actor.initializes)$
+		$schedulingTest(instance.actor.initializes)$
+		$endif$
+	}
+
+	$endif$
+	$if(instance.actor.actionScheduler.fsm)$
+	$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
+	$else$
+	$scheduler(actions=instance.actor.actionScheduler.actions)$
+	$endif$
 </design>
 >>
 
@@ -200,3 +467,4 @@ instance(instance) ::= <<
 <?xml version="1.0" encoding="UTF-8"?>
 $design()$
 >>
+
