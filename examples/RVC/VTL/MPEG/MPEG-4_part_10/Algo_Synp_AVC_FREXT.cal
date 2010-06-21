@@ -1757,6 +1757,7 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := true;
@@ -1781,6 +1782,7 @@ actor Algo_Synp_AVC_FREXT()
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE or
+		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA or
 		   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
 		   
 		   StartNewCabacParsing := false;
@@ -4481,7 +4483,7 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
-	procedure GetIntraREM_Mode_4X4_8X8()
+	procedure GetIntraREM_Mode_4X4_8X8Parsing()
 	begin
 		if binIdx = 0 then
 			if binValDecoded = false then
@@ -4525,6 +4527,77 @@ actor Algo_Synp_AVC_FREXT()
 			StopCabacProcess();
 		end
 	end
+	
+	procedure GetCbpLumaParsing()
+	begin
+		if binIdx = 0 then
+			if binValDecoded = false then
+				ctxIdxCodedBlockPatternLuma();
+				ctxIdx := 73 + ctxIdxInc;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+				CabacValue := 0;
+			else
+				if binVal = 1 then
+					CabacValue := CabacValue + bitor(CabacValue, ( 1 << binIdx));
+				end
+				binIdx := binIdx + 1;
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdx = 1 then
+			if binValDecoded = false then
+				ctxIdxCodedBlockPatternLuma();
+				ctxIdx := 73 + ctxIdxInc;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 1 then
+					CabacValue := CabacValue | ( 1 << binIdx);
+				end
+				binIdx := binIdx + 1;
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdx = 2 then
+			if binValDecoded = false then
+				ctxIdxCodedBlockPatternLuma();
+				ctxIdx := 73 + ctxIdxInc;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 1 then
+					CabacValue := CabacValue | ( 1 << binIdx);
+				end
+				binIdx := binIdx + 1;
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdx = 3 then
+			if binValDecoded = false then
+				ctxIdxCodedBlockPatternLuma();
+				ctxIdx := 73 + ctxIdxInc;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 1 then
+					CabacValue := CabacValue | ( 1 << binIdx);
+				end
+				FoundSE := true;
+				binValDecoded := false;
+			end
+		end
+		
+		if FoundSE then
+			binValDecoded := false;
+			binIdx := -1;
+			StopCabacProcess();
+		end
+	end
+	
 	//*************************************************************/
 	/*************************************************************
 	*************************************************************
@@ -4565,12 +4638,16 @@ actor Algo_Synp_AVC_FREXT()
 				GetFlagParsing();
 			end
 			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA then
+				GetCbpLumaParsing();
+			end
+			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_QP_DELTA then
 				GetMbQpDelta();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE then
-				GetIntraREM_Mode_4X4_8X8();
+				GetIntraREM_Mode_4X4_8X8Parsing();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE then
@@ -7365,6 +7442,7 @@ end
 			if IS_CABAC() then
 				GetCabacCodedBlockPatternLumaSyntaxElement();
 				StartCabacProcess();
+				binIdx := 0;
 			end 
 		end
 	end
