@@ -181,12 +181,17 @@ PhiAssignment(phi) ::= <<
 <PHI>
 	<port dir="in" qualifier="then" source="$first(phi.vars)$"/>
 	<port dir="in" qualifier="else" source="$rest(phi.vars)$"/>
-	<port dir="out" size="$phi.target.type.size$" source="$phi.target$" typeName="$phi.target.type$"/>
+	$port(dir="out", type=phi.target.type, source=phi.target)$
 </PHI>
 >>
 
 Return(return) ::= <<
-<!-- TODO return -->
+$if (return.value)$
+<operation kind="noop">
+	$port(dir="in", source=return.value)$
+	<port dir="out" size="1" source="isSchedulable_$action.name$_go" typeName="bool"/>
+</operation>
+$endif$
 >>
 
 SelfAssignment(selfAssign) ::= <<
@@ -238,7 +243,7 @@ IfNode(ifNode) ::= <<
 <module kind="if">
 	<module decision="decision_$ifNode.value$" kind="test">
 		<operation kind="noop">
-			<port dir="in" source="$ifNode.value$"/>
+			$port(dir="in", source=ifNode.value)$
 			<port dir="out" size="1" source="decision_$ifNode.value$" typeName="bool"/>
 		</operation>		
 	</module>
@@ -293,7 +298,7 @@ outputPatternPort(port, index, index0) ::= <<
 <operation kind="pinStatus" portName="$port$" removable="no">
 	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_$port$" typeName="bool"/>
 </operation>
-<operation kind="$BinOp.LOGIC_AND$">
+<operation kind="\$and">
 	<port dir="in" source="outputPattern_$instance.id$_$action.name$_$port$"/>
 	<port dir="in" source="outputPattern_$instance.id$_$action.name$_res_$index0$"/>
 	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_res_$index$" typeName="bool"/>
