@@ -113,7 +113,7 @@ actor Algo_Synp_AVC_FREXT()
 	bool First_part := false;
 	int Codeword;
 	int CodeLen;
-	
+	int Bbits := 0;
 	bool TRACE := false;//true;
 	bool TRACE_POC := false;
 	bool TRACE_MRL := false;//true;
@@ -243,6 +243,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	/* CABAC Mb type parsing */
 	bool SuffixMbTypeP := true;
+	bool SuffixMbTypeB := true;
 	int compIdx;
 	int binIdxMb := 0;
 	//CABAC Decode Variables
@@ -294,6 +295,12 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_Intra_Pred_CABAC(int mbAddr) --> bool : ( mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] > 4) or (mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] > 22) end
 	function IS_Intra(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 0 end
 	function IS_Inter(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 1 end
+	
+	/* Save Memory functions */
+	function GiveMbAddr(int mbAddr) --> int: if val_CurrMbAddr < PicWidthInMbs + 1 then val_CurrMbAddr else 12 end end
+	function GiveMbAddrA2(int mbAddr) --> int: GiveMbAddr(mbAddr) - 1 end
+	function GiveMbAddrB2(int mbAddr) --> int: GiveMbAddr(mbAddr) - PicWidthInMbs end
+	
 	
 	/* MVD and REF CABAC Neighbouring */
 	
@@ -3264,6 +3271,10 @@ actor Algo_Synp_AVC_FREXT()
 				CabacValue := CabacValue + 5;
 				SuffixMbTypeP := true;
 			end
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_B then
+				CabacValue := CabacValue + 23;
+				SuffixMbTypeB := true;
+			end
 			//Give type prediction
 			mbTab[val_CurrMbAddr][TypePred] := 0; 
 		end
@@ -3363,7 +3374,169 @@ actor Algo_Synp_AVC_FREXT()
 	
 	procedure GetMbType_B()
 	begin
-		println("Not yet implemented");
+		if SuffixMbTypeB then
+			/* IS B type */
+
+			if binIdxMb = 0 then
+				if binValDecoded = false then
+					ctxIdxOffset := 27;
+					ctxIdxincMbType();
+					ctxIdx := ctxIdxOffset + ctxIdxInc;
+					StartDecodeDecision := true;
+					StopCabacProcess();
+					CabacValue := 0;
+				else
+					if binVal = 0 then
+						CabacValue := 0;
+						FoundSE := true;
+					else
+						binIdxMb := binIdxMb + 1;
+					end
+					binValDecoded := false;
+				end
+			end
+			
+			if binIdxMb = 1 and FoundSE = false then
+				if binValDecoded = false then
+					ctxIdxOffset := 27;
+					ctxIdx := ctxIdxOffset + 3;
+					StartDecodeDecision := true;
+					StopCabacProcess();
+				else
+					if binVal = 0 then
+						binIdxMb := binIdxMb + 1;
+					else
+						binIdxMb := binIdxMb + 2;
+					end
+					binValDecoded := false;
+				end
+			end
+			
+			if binIdxMb = 2 and FoundSE = false then
+				if binValDecoded = false then
+					ctxIdxOffset := 27;
+					ctxIdx := ctxIdxOffset + 5;
+					StartDecodeDecision := true;
+					StopCabacProcess();
+				else
+					CabacValue := 1 + binVal;
+					FoundSE := true;
+					binValDecoded := false;
+				end
+			end
+			
+			if binIdxMb = 3 and FoundSE = false then
+				if binValDecoded = false then
+					ctxIdxOffset := 27;
+					ctxIdx := ctxIdxOffset + 4;
+					StartDecodeDecision := true;
+					StopCabacProcess();
+
+				else
+					Bbits := binVal << 3;
+					binValDecoded := false;
+					binIdxMb := binIdxMb + 1;
+				end
+			end
+		
+			if binIdxMb = 4 and FoundSE = false then
+				if binValDecoded = false then
+					ctxIdxOffset := 27;
+					ctxIdx := ctxIdxOffset + 5;
+					StartDecodeDecision := true;
+					StopCabacProcess();
+				else
+					Bbits := Bbits | (binVal << 2);
+					binValDecoded := false;
+					binIdxMb := binIdxMb + 1;
+				end
+			end
+			
+			if binIdxMb = 5 and FoundSE = false then
+				if binValDecoded = false then
+					ctxIdxOffset := 27;
+					ctxIdx := ctxIdxOffset + 5;
+					StartDecodeDecision := true;
+					StopCabacProcess();
+				else
+					Bbits := Bbits | (binVal << 1);
+					binValDecoded := false;
+					binIdxMb := binIdxMb + 1;
+				end
+			end
+			
+			if binIdxMb = 6 and FoundSE = false then
+				if binValDecoded = false then
+					ctxIdxOffset := 27;
+					ctxIdx := ctxIdxOffset + 5;
+					StartDecodeDecision := true;
+					StopCabacProcess();
+				else
+					Bbits := Bbits | binVal;
+					binValDecoded := false;
+					binIdxMb := binIdxMb + 1;
+				end
+			end
+			
+			if binIdxMb = 7 and FoundSE = false then
+				if Bbits < 8 then
+					CabacValue := Bbits + 3;
+					FoundSE := true;
+				else
+					if Bbits = 13 then
+						SuffixMbTypeB := false;
+						binValDecoded := false;
+						/* Get Intra Type Mb */
+						SearchForMbType := 0;
+					else
+						if Bbits = 14 then
+							CabacValue := 11;
+							FoundSE := true;
+						else
+							if Bbits = 15 then
+								CabacValue := 22;
+								FoundSE := true;
+							else
+								binValDecoded := false;
+								binIdxMb := binIdxMb + 1;
+							end
+						end
+					end
+				end
+			end
+			
+			if binIdxMb = 8 and FoundSE = false then
+				if binValDecoded = false then
+					ctxIdxOffset := 27;
+					ctxIdx := ctxIdxOffset + 5;
+					StartDecodeDecision := true;
+					StopCabacProcess();
+				else
+					Bbits := ( Bbits << 1) | binVal;
+					CabacValue := Bbits - 4;
+					binValDecoded := false;
+				end
+			end
+			
+			if FoundSE then
+				binValDecoded := false;
+				binIdxMb := -1;
+				NextBitToDecode := true;
+				StopCabacProcess();
+				binIdxOffset := 0;
+				//Give type prediction
+				mbTab[val_CurrMbAddr][TypePred] := 2; 
+			end
+		end
+		
+		if SearchForMbType = 0 then
+			binValDecoded := false;
+			binIdxMb := 0;
+			NextBitToDecode := true;
+			binIdxOffset := 0;
+			GetMbType_I();
+		end
+	
 	end
 	
 	procedure GetSubMbType_P()
@@ -3401,7 +3574,6 @@ actor Algo_Synp_AVC_FREXT()
 					binIdxMb := binIdxMb + 1;
 				end
 				binValDecoded := false;
-				
 			end
 		end
 		
@@ -3420,7 +3592,6 @@ actor Algo_Synp_AVC_FREXT()
 					FoundSE := true;
 				end
 				binValDecoded := false;
-				
 			end
 		end
 		
@@ -3685,7 +3856,7 @@ actor Algo_Synp_AVC_FREXT()
 				if slice_type = SLICE_TYPE_P then
 					ctxIdxOffset := 11;
 				else	
-					ctxIdxOffset := 23;
+					ctxIdxOffset := 24;
 				end
 				ctxIdxincMbSkipFlag();
 			else
@@ -8077,24 +8248,7 @@ end
 		i8x8 = 4
 	end
 	//end for
-	/* 
-	Residual_luma_AC_CABAC: action ==>
-	guard
-		IS_CABAC() and
-		( (val_CodedBlockPatternLuma & ( 1 << i8x8 )) = 1 )
-	do
-		block_startIdx := 4 * block_startIdx ;
-		block_endIdx := 4 * block_endIdx + 3;
-		maxNumCoeff := 64;
-		ctxBlockCat := 2;
-	end
-	//if not CABAC
-	Residual_luma_skip_AC_CABAC: action ==>
-	guard
-		IS_CABAC() and
-		(( val_CodedBlockPatternLuma &  ( 1 << i8x8 ) ) != 0)
-	end
-	*/
+	
 	//--> residual_block( level8x8[ i8x8 ], 4 * startIdx, 4 * endIdx + 3, 64 )
 	
 	//if( ChromaArrayType = = 1 | | ChromaArrayType = = 2 )
@@ -8162,8 +8316,6 @@ end
 		end
 	end
 	
-	
-
 	// else
 	Residual_skip_chroma_DC_init: action ==> LAST: [true]
 	guard
@@ -8277,8 +8429,6 @@ end
 		foreach int s in Integers(1, 15) do
 			level_temp[s] := level[s - 1];
 		end
-		
-		
 	end
 	
 	// else
