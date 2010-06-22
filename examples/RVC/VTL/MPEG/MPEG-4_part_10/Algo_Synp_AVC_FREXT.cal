@@ -2717,17 +2717,28 @@ actor Algo_Synp_AVC_FREXT()
 		
 		currSubMbType := sub_mb_type[mbPartIdx];
 		//Inverse sub-macroclock partiontion scanning process
-		x := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
-		y := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
+				
+		if slice_type = SLICE_TYPE_P then
+			x := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
+			y := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
+		else
+			x := InverseRasterScan(mbPartIdx, B_tab[mb_type][1], B_tab[mb_type][2], 16, 0);
+			y := InverseRasterScan(mbPartIdx, B_tab[mb_type][1], B_tab[mb_type][2], 16, 1);
+		end
 		
 		if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
-			xS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 0);
-			yS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 1);
+			if slice_type = SLICE_TYPE_P then
+				xS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 0);
+				yS := InverseRasterScan(subMbPartIdx, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 1);
+			else
+				xS := InverseRasterScan(subMbPartIdx, B_tab_sub[currSubMbType][1], B_tab_sub[currSubMbType][2], 8, 0);
+				yS := InverseRasterScan(subMbPartIdx, B_tab_sub[currSubMbType][1], B_tab_sub[currSubMbType][2], 8, 1);
+			end
 		else
 			xS := 0;
 			yS := 0;
 		end
-			
+		
 		//N = A
 		xN := x + xS - 1;
 		yN := y + yS;
@@ -2846,12 +2857,22 @@ actor Algo_Synp_AVC_FREXT()
 		
 		currSubMbType := sub_mb_type[mbPartIdx];
 		//Inverse sub-macroclock partiontion scanning process
-		x := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
-		y := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
+		if slice_type = SLICE_TYPE_P then
+			x := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 0);
+			y := InverseRasterScan(mbPartIdx, P_tab[mb_type][1], P_tab[mb_type][2], 16, 1);
+		else
+			x := InverseRasterScan(mbPartIdx, B_tab[mb_type][1], B_tab[mb_type][2], 16, 0);
+			y := InverseRasterScan(mbPartIdx, B_tab[mb_type][1], B_tab[mb_type][2], 16, 1);
+		end
 		
 		if IS_P_8x8() or IS_B_8x8() or IS_P_8x8ref0() then
-			xS := InverseRasterScan(0, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 0);
-			yS := InverseRasterScan(0, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 1);
+			if slice_type = SLICE_TYPE_P then
+				xS := InverseRasterScan(0, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 0);
+				yS := InverseRasterScan(0, P_tab_sub[currSubMbType][1], P_tab_sub[currSubMbType][2], 8, 1);
+			else
+				xS := InverseRasterScan(0, B_tab_sub[currSubMbType][1], B_tab_sub[currSubMbType][2], 8, 0);
+				yS := InverseRasterScan(0, B_tab_sub[currSubMbType][1], B_tab_sub[currSubMbType][2], 8, 1);
+			end
 		else
 			xS := 0;
 			yS := 0;
@@ -3603,6 +3624,129 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
+	procedure GetSubMbType_B()
+	begin
+		if binIdxMb = 0 then
+			if binValDecoded = false then
+				ctxIdx := 36;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 0 then
+					CabacValue := 0;
+					FoundSE := true;
+				else
+					binIdxMb := binIdxMb + 1;
+				end
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdxMb = 1 and FoundSE = false  then
+			if binValDecoded = false then
+				ctxIdx := 37;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 0 then
+					binIdxMb := binIdxMb + 1;
+				else
+					binIdxMb := binIdxMb + 2;
+				end
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdxMb = 2 and FoundSE = false  then
+			if binValDecoded = false then
+				ctxIdx := 39;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				CabacValue := 1 + binVal;
+				FoundSE := true;
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdxMb = 3 and FoundSE = false  then
+			if binValDecoded = false then
+				ctxIdx := 38;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+				CabacValue := 3;
+			else
+				if binVal = 1 then
+					binIdxMb := binIdxMb + 1;
+					CabacValue := 7;
+				else
+					binIdxMb := binIdxMb + 3;
+				end
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdxMb = 4 and FoundSE = false  then
+			if binValDecoded = false then
+				ctxIdx := 39;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				if binVal = 1 then
+					binIdxMb := binIdxMb + 1;
+				else
+					binIdxMb := binIdxMb + 2;
+				end
+				binValDecoded := false;
+			end
+		end
+		
+		if binIdxMb = 5 and FoundSE = false  then
+			if binValDecoded = false then
+				ctxIdx := 39;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				CabacValue := 11 + binVal;
+				FoundSE := true;
+				binValDecoded := false;
+				CabacValue := 7;
+			end
+		end
+		
+		if binIdxMb = 6 and FoundSE = false  then
+			if binValDecoded = false then
+				ctxIdx := 39;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				CabacValue := CabacValue + (binVal << 1);
+				binValDecoded := false;
+				binIdxMb := binIdxMb + 1;
+			end
+		end
+		
+		if binIdxMb = 7 and FoundSE = false  then
+			if binValDecoded = false then
+				ctxIdx := 39;
+				StartDecodeDecision := true;
+				StopCabacProcess();
+			else
+				CabacValue := CabacValue + binVal;
+				binValDecoded := false;
+				binIdxMb := binIdxMb + 1;
+				FoundSE := true;
+			end
+		end
+		
+		if FoundSE then
+			binValDecoded := false;
+			binIdxMb := -1;
+			NextBitToDecode := true;
+			StopCabacProcess();
+		end
+	end
+	
 	procedure GetMbTypeParsing()
 	begin
 		if SearchForMbType = 0 then
@@ -3615,6 +3759,16 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 	end
+	
+	procedure GetSubMbTypeParsing()
+	begin
+		if SearchForMbType = 0 then
+			GetSubMbType_P();
+		else
+			GetSubMbType_B();
+		end
+	end
+	
 	
 	procedure GetMvD_Lx()
 	begin
@@ -4160,6 +4314,10 @@ actor Algo_Synp_AVC_FREXT()
 				GetMbTypeParsing();
 			end
 			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_B then
+				GetSubMbTypeParsing();
+			end
+			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_FLAG or 
 			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_SKIP_FLAG or 
 			   CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SIGNIFICANT_COEFF_FLAG or 
@@ -4191,10 +4349,6 @@ actor Algo_Synp_AVC_FREXT()
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
 			      CoeffAbsParsing();
-			end
-			
-			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_SUB_MB_TYPE_P_SP then
-				GetSubMbType_P();
 			end
 			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MVD_L0_0_0 then
