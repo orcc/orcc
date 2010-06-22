@@ -43,12 +43,10 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.instructions.WriteEnd;
 
 import org.w3c.dom.Element;
 
@@ -179,17 +177,6 @@ public class XlimPhiInstructionVisitor implements InstructionVisitor,
 	}
 
 	/**
-	 * Add read end node
-	 * 
-	 * @param node
-	 *            Read end node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(ReadEnd node, Object... args) {
-	}
-
-	/**
 	 * Add return node
 	 * 
 	 * @param node
@@ -224,17 +211,6 @@ public class XlimPhiInstructionVisitor implements InstructionVisitor,
 	 *            Arguments sent (not used)
 	 */
 	public void visit(Write node, Object... args) {
-	}
-
-	/**
-	 * Add write end node
-	 * 
-	 * @param node
-	 *            Write end node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(WriteEnd node, Object... args) {
 	}
 
 }

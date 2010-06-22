@@ -114,17 +114,6 @@ public interface InstructionInterpreter {
 	public Object interpret(Read read, Object... args);
 
 	/**
-	 * Interprets a readEnd instruction.
-	 * 
-	 * @param readEnd
-	 *            a readEnd instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(ReadEnd readEnd, Object... args);
-
-	/**
 	 * Interprets a return instruction.
 	 * 
 	 * @param returnInst
@@ -167,16 +156,5 @@ public interface InstructionInterpreter {
 	 * @return an object
 	 */
 	public Object interpret(Write write, Object... args);
-
-	/**
-	 * Interprets a writeEnd instruction.
-	 * 
-	 * @param writeEnd
-	 *            a writeEnd instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(WriteEnd writeEnd, Object... args);
 
 }

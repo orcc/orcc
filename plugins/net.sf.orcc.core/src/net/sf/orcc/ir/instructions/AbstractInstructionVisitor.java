@@ -67,10 +67,6 @@ public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 	}
 
 	@Override
-	public void visit(ReadEnd node, Object... args) {
-	}
-
-	@Override
 	public void visit(Return node, Object... args) {
 	}
 
@@ -80,10 +76,6 @@ public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 
 	@Override
 	public void visit(Write node, Object... args) {
-	}
-
-	@Override
-	public void visit(WriteEnd node, Object... args) {
 	}
 
 }

@@ -26,41 +26,71 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.instructions;
+package net.sf.orcc.backends.instructions;
+
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.instructions.Write;
 
 /**
- * This class defines a ReadEnd instruction. This instruction is used in code
- * generation to signal that an action has finished reading from a FIFO.
+ * This class defines a WriteEnd instruction. This node is used in code
+ * generation to signal that an action has finished writing to a FIFO.
  * 
  * @author Jérôme Gorin
  * @author Matthieu Wipliez
  * 
  */
-public class ReadEnd extends AbstractFifoInstruction {
+public class WriteEnd extends SpecificInstruction {
 
-	public ReadEnd(Read read) {
-		super(read.getLocation(), read.getPort(), read.getNumTokens(), read
-				.getTarget());
+	private Write write;
+
+	/**
+	 * Creates a new WriteEnd from the given Write.
+	 * 
+	 * @param write
+	 *            a Write
+	 */
+	public WriteEnd(Write write) {
+		super(write.getLocation());
+		this.write = write;
+	}
+
+	/**
+	 * Returns the number of tokens used by this WriteEnd.
+	 * 
+	 * @return the number of tokens used by this WriteEnd
+	 */
+	public int getNumTokens() {
+		return write.getNumTokens();
+	}
+
+	/**
+	 * Returns the port used by this WriteEnd.
+	 * 
+	 * @return the port used by this WriteEnd
+	 */
+	public Port getPort() {
+		return write.getPort();
+	}
+
+	/**
+	 * Returns the target of this WriteEnd.
+	 * 
+	 * @return the target of this WriteEnd
+	 */
+	public Variable getTarget() {
+		return write.getTarget();
 	}
 
 	@Override
-	public Object accept(InstructionInterpreter interpreter, Object... args) {
-		return interpreter.interpret(this, args);
-	}
-
-	@Override
-	public void accept(InstructionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
-	}
-
-	@Override
-	public boolean isReadEnd() {
+	public boolean isWriteEnd() {
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "readEnd(" + getPort() + ", " + getNumTokens() + ")";
+		return "writeEnd(" + getPort() + ", " + getNumTokens() + ")";
 	}
 
 }

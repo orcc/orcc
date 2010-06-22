@@ -26,19 +26,19 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.c.transforms;
+package net.sf.orcc.backends.transformations;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.backends.instructions.ReadEnd;
+import net.sf.orcc.backends.instructions.WriteEnd;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;

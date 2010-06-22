@@ -53,12 +53,10 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
@@ -312,11 +310,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	}
 
 	@Override
-	public void visit(ReadEnd instr, Object... args) {
-		// Nothing to do
-	}
-
-	@Override
 	public void visit(Return instr, Object... args) {
 		if (instr.getValue() != null) {
 			this.returnValue = instr.getValue().accept(exprInterpreter);
@@ -382,11 +375,6 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
 				.get(instr.getPort().getName());
 		fifo.put(target);
-	}
-
-	@Override
-	public void visit(WriteEnd instr, Object... args) {
-		// Nothing to do
 	}
 
 }

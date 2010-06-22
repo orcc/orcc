@@ -55,12 +55,10 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.instructions.WriteEnd;
 
 import org.w3c.dom.Element;
 
@@ -290,19 +288,6 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 	}
 
 	/**
-	 * Add read end node
-	 * 
-	 * @param node
-	 *            Read end node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(ReadEnd node, Object... args) {
-		// TODO Auto-generated method stub
-		System.out.println("READ END");
-	}
-
-	/**
 	 * Add return node
 	 * 
 	 * @param node
@@ -380,19 +365,6 @@ public class XlimInstructionVisitor implements InstructionVisitor,
 
 		node.getPort().getType()
 				.accept(new XlimTypeSizeVisitor(writeMap.get(name)));
-	}
-
-	/**
-	 * Add write end node
-	 * 
-	 * @param node
-	 *            Write end node to add
-	 * @param args
-	 *            Arguments sent (not used)
-	 */
-	public void visit(WriteEnd node, Object... args) {
-		// TODO Auto-generated method stub.
-		System.out.println("WRITE END");
 	}
 
 }

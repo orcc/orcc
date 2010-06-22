@@ -107,16 +107,6 @@ public interface InstructionVisitor {
 	public void visit(Read read, Object... args);
 
 	/**
-	 * Visits a readEnd instruction.
-	 * 
-	 * @param readEnd
-	 *            a readEnd instruction
-	 * @param args
-	 *            arguments
-	 */
-	public void visit(ReadEnd readEnd, Object... args);
-
-	/**
 	 * Visits a return instruction.
 	 * 
 	 * @param returnInst
@@ -155,15 +145,5 @@ public interface InstructionVisitor {
 	 *            arguments
 	 */
 	public void visit(Write write, Object... args);
-
-	/**
-	 * Visits a writeEnd instruction.
-	 * 
-	 * @param writeEnd
-	 *            a writeEnd instruction
-	 * @param args
-	 *            arguments
-	 */
-	public void visit(WriteEnd writeEnd, Object... args);
 
 }

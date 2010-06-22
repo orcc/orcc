@@ -84,12 +84,10 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
@@ -292,11 +290,6 @@ public class IRWriter {
 		}
 
 		@Override
-		public void visit(ReadEnd readEnd, Object... args) {
-			// nothing to do
-		}
-
-		@Override
 		public void visit(Return returnInst, Object... args) {
 			JSONArray array = (JSONArray) args[0];
 			JSONArray instr = new JSONArray();
@@ -339,11 +332,6 @@ public class IRWriter {
 		@Override
 		public void visit(Write write, Object... args) {
 			visitFifoInstruction(NAME_WRITE, write, args[0]);
-		}
-
-		@Override
-		public void visit(WriteEnd writeEnd, Object... args) {
-			// nothing to do
 		}
 
 		/**

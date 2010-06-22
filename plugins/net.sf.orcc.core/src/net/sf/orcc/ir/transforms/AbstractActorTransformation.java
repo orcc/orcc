@@ -45,12 +45,10 @@ import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.ReadEnd;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.instructions.WriteEnd;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
@@ -145,10 +143,6 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(ReadEnd readEnd, Object... args) {
-	}
-
-	@Override
 	public void visit(Return returnInstr, Object... args) {
 	}
 
@@ -169,10 +163,6 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 
 	@Override
 	public void visit(Write write, Object... args) {
-	}
-
-	@Override
-	public void visit(WriteEnd writeEnd, Object... args) {
 	}
 
 	/**
