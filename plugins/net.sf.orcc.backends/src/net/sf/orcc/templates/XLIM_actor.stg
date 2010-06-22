@@ -26,7 +26,8 @@ UnaryOp ::= [
 	"BITNOT":"bitnot",
 	"LOGIC_NOT":"$not",
 	"MINUS":"$negate",
-	"NUM_ELTS":"$size"
+	"NUM_ELTS":"$size",
+	"LIT_INT":"$literal_Integer"
 ]
 
 
@@ -198,11 +199,6 @@ $nodes: {$(it.class.simpleName)(it)$}$
 >>
 
 // if node
-BlockNode(blockNode) ::= <<
-$instructions(blockNode.instructions)$
->>
-
-// if node
 IfNode(ifNode) ::= <<
 
 <module kind="if">
@@ -217,9 +213,10 @@ $if(ifNode.elseNodes)$
 		$nodes(ifNode.elseNodes)$
 	</module>
 $endif$
+	<!-- joinnode -->
+	$nodes(first(ifNode.joinNode.instructions))$
 </module>
-<!-- joinnode -->
-$BlockNode(ifNode.joinNode)$
+$nodes(rest(ifNode.joinNode.instructions))$
 <!-- end joinnode -->
 >>
 
@@ -269,7 +266,7 @@ outputPatternPort(port, index, index0) ::= <<
 outputPatternPortDecision(index)::=<<
 <module kind="if">
 	<module decision="outputPattern_$instance.id$_decision_$index$" kind="test">
-			<operation kind="noop">
+		<operation kind="noop">
 			<port dir="in" source="outputPattern_$instance.id$_res_$index$"/>
 			<port dir="out" size="1" source="outputPattern_$instance.id$_decision_$index$" typeName="bool"/>
 		</operation>
@@ -286,9 +283,7 @@ $outputPatternPortDecision(length(pattern.keys)); separator="\n"$
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-<module kind="then">
-	<operation kind="taskCall" target="$action.body$"/>
-</module>
+<operation kind="taskCall" target="$action.body$"/>
 >>
 
 actionTest(action) ::= <<
@@ -303,9 +298,15 @@ $procedure(action.scheduler)$
 	<module kind="then">
 		$if(action.outputPattern)$
 		$outputPattern(pattern=action.outputPattern)$
-		$endif$
+			<module kind="then">
+				$actionCall(action)$
+			</module>
+		</module>
+		$else$
 		$actionCall(action)$
+		$endif$
 	</module>
+	<module kind="else"/>
 </module>
 >>
 
@@ -315,10 +316,18 @@ $actions: actionTest(); separator=" else "$
 
 scheduler(actions) ::= <<
 <module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
+	<operation kind="$UnaryOp.LIT_INT$" value="1">
+		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
+	</operation>
 	<module kind="loop">
+		<module decision="var_$instance.id$_sched" kind="test">
+			<operation kind="noop">
+				<port dir="in" source="var_$instance.id$_sched"/>
+				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
+			</operation>
+		</module>
 		<module kind="body">
 			$if(actions)$$schedulingTest(actions)$$endif$
-			<module kind="else"/>
 		</module>
 	</module>
 </module>
