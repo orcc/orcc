@@ -26,8 +26,7 @@ UnaryOp ::= [
 	"BITNOT":"bitnot",
 	"LOGIC_NOT":"$not",
 	"MINUS":"$negate",
-	"NUM_ELTS":"$size",
-	"LIT_INT":"$literal_Integer"
+	"NUM_ELTS":"$size"
 ]
 
 
@@ -214,24 +213,47 @@ BlockNode(blkNode) ::= <<
 $blkNode.instructions: operation(); separator="\n"$
 >>
 
+PrintPhi(instruction) ::= <<
+$if(instruction.phi)$
+$nodes(instruction)$
+$endif$
+>>
+
+PrintNotPhi(instruction) ::= <<
+$if(!instruction.phi)$
+$nodes(instruction)$
+$endif$
+>>
+
+PhiNodes(phiNodes) ::= <<
+$phiNodes.instructions: PrintPhi()$
+>>
+
+NotPhiNodes(NotphiNodes) ::= <<
+$NotphiNodes.instructions: PrintNotPhi()$
+>>
+
 IfNode(ifNode) ::= <<
 
 <module kind="if">
-	<module decision="" kind="test">
-		$ifNode.value$
+	<module decision="decision_$ifNode.value$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="$ifNode.value$"/>
+			<port dir="out" size="1" source="decision_$ifNode.value$" typeName="bool"/>
+		</operation>		
 	</module>
 	<module kind="then">
-		$nodes(ifNode.thenNodes)$
+	$nodes(ifNode.thenNodes)$
 	</module>
 $if(ifNode.elseNodes)$
 	<module kind="else">
-		$nodes(ifNode.elseNodes)$
+	$nodes(ifNode.elseNodes)$
 	</module>
 $endif$
 	<!-- joinnode -->
-	$nodes(first(ifNode.joinNode.instructions))$
+	$PhiNodes(ifNode.joinNode)$
 </module>
-$nodes(rest(ifNode.joinNode.instructions))$
+$NotPhiNodes(ifNode.joinNode)$
 <!-- end joinnode -->
 >>
 
@@ -269,26 +291,29 @@ action(action) ::= <<
 outputPatternPort(port, index, index0) ::= <<
 <!--  OutputPattern -->
 <operation kind="pinStatus" portName="$port$" removable="no">
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$port$" typeName="bool"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_$port$" typeName="bool"/>
 </operation>
 <operation kind="$BinOp.LOGIC_AND$">
-	<port dir="in" source="outputPattern_$instance.id$_$port$"/>
-	<port dir="in" source="outputPattern_$instance.id$_res_$index0$"/>
-	<port dir="out" size="1" source="outputPattern_$instance.id$_res_$index$" typeName="bool"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_$port$"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_res_$index0$"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_res_$index$" typeName="bool"/>
 </operation>
 >>
 
 outputPatternPortDecision(index)::=<<
 <module kind="if">
-	<module decision="outputPattern_$instance.id$_decision_$index$" kind="test">
+	<module decision="outputPattern_$instance.id$_$action.name$_decision_$index$" kind="test">
 		<operation kind="noop">
-			<port dir="in" source="outputPattern_$instance.id$_res_$index$"/>
-			<port dir="out" size="1" source="outputPattern_$instance.id$_decision_$index$" typeName="bool"/>
+			<port dir="in" source="outputPattern_$instance.id$_$action.name$_res_$index$"/>
+			<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_decision_$index$" typeName="bool"/>
 		</operation>
 	</module>
 >>
 
 outputPattern(pattern) ::= <<
+<operation kind="\$literal_Integer" value="1">
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_res_0" typeName="bool"/>
+</operation>
 $pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0)$}; separator="\n"$
 <!-- Last outputPattern -->
 $outputPatternPortDecision(length(pattern.keys)); separator="\n"$
@@ -331,7 +356,7 @@ $actions: actionTest(); separator=" else "$
 
 scheduler(actions) ::= <<
 <module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
-	<operation kind="$UnaryOp.LIT_INT$" value="1">
+	<operation kind="\$literal_Integer" value="1">
 		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
 	</operation>
 	<module kind="loop">
