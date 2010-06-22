@@ -54,6 +54,11 @@ public class ReadEnd extends AbstractFifoInstruction {
 	}
 
 	@Override
+	public boolean isReadEnd() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return "readEnd(" + getPort() + ", " + getNumTokens() + ")";
 	}

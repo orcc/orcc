@@ -55,6 +55,11 @@ public class Peek extends AbstractFifoInstruction {
 	}
 
 	@Override
+	public boolean isPeek() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return getTarget() + " = peek(" + getPort() + ", " + getNumTokens()
 				+ ")";

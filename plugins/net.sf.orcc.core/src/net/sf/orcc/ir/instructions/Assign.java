@@ -114,6 +114,11 @@ public class Assign extends AbstractInstruction implements
 	}
 
 	@Override
+	public boolean isAssign() {
+		return true;
+	}
+
+	@Override
 	public void setTarget(LocalVariable target) {
 		CommonNodeOperations.setTarget(this, target);
 	}

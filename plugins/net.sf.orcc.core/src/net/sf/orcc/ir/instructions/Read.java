@@ -59,6 +59,11 @@ public class Read extends AbstractFifoInstruction {
 	}
 
 	@Override
+	public boolean isRead() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return getTarget() + " = read(" + getPort() + ", " + getNumTokens()
 				+ ")";

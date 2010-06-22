@@ -54,6 +54,11 @@ public class WriteEnd extends AbstractFifoInstruction {
 	}
 
 	@Override
+	public boolean isWriteEnd() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return "writeEnd(" + getPort() + ", " + getNumTokens() + ")";
 	}

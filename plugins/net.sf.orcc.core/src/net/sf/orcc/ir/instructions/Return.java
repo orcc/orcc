@@ -73,6 +73,11 @@ public class Return extends AbstractInstruction implements ValueContainer {
 	}
 
 	@Override
+	public boolean isReturn() {
+		return true;
+	}
+
+	@Override
 	public void setValue(Expression value) {
 		CommonNodeOperations.setValue(this, value);
 	}

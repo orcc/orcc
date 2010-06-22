@@ -90,6 +90,11 @@ public class PhiAssignment extends AbstractInstruction implements
 	}
 
 	@Override
+	public boolean isPhi() {
+		return true;
+	}
+
+	@Override
 	public void setTarget(LocalVariable target) {
 		CommonNodeOperations.setTarget(this, target);
 	}

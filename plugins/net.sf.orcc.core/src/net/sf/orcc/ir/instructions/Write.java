@@ -59,6 +59,11 @@ public class Write extends AbstractFifoInstruction {
 	}
 
 	@Override
+	public boolean isWrite() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return getTarget() + " = write(" + getPort() + ", " + getNumTokens()
 				+ ")";

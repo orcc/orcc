@@ -100,6 +100,11 @@ public class Store extends AbstractInstruction implements TargetContainer,
 		return null;
 	}
 
+	/**
+	 * Returns the (possibly empty) list of indexes of this store.
+	 * 
+	 * @return the (possibly empty) list of indexes of this store
+	 */
 	public List<Expression> getIndexes() {
 		return indexes;
 	}
@@ -126,6 +131,11 @@ public class Store extends AbstractInstruction implements TargetContainer,
 	@Override
 	public void internalSetValue(Expression value) {
 		this.value = value;
+	}
+
+	@Override
+	public boolean isStore() {
+		return true;
 	}
 
 	/**

@@ -56,6 +56,11 @@ public class HasTokens extends AbstractFifoInstruction {
 	}
 
 	@Override
+	public boolean isHasTokens() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return getTarget() + " = hasTokens(" + getPort() + ", "
 				+ getNumTokens() + ")";

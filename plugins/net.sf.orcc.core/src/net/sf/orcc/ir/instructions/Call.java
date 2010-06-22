@@ -149,6 +149,11 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 		this.target = target;
 	}
 
+	@Override
+	public boolean isCall() {
+		return true;
+	}
+
 	/**
 	 * Returns <code>true</code> if this call is a call to the built-in "print"
 	 * procedure.

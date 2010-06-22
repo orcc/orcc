@@ -37,8 +37,18 @@ package net.sf.orcc.ir;
  */
 public interface User extends Localizable {
 
+	/**
+	 * Returns <code>true</code> if the user is a CFG node.
+	 * 
+	 * @return <code>true</code> if the user is a CFG node
+	 */
 	boolean isCFGNode();
 
+	/**
+	 * Returns <code>true</code> if the user is an instruction.
+	 * 
+	 * @return <code>true</code> if the user is an instruction
+	 */
 	boolean isInstruction();
 
 }

@@ -49,7 +49,7 @@ public interface Instruction extends User {
 	 *            arguments
 	 * @return an object
 	 */
-	public Object accept(InstructionInterpreter interpreter, Object... args);
+	Object accept(InstructionInterpreter interpreter, Object... args);
 
 	/**
 	 * Accepts the given instruction visitor.
@@ -59,21 +59,105 @@ public interface Instruction extends User {
 	 * @param args
 	 *            arguments
 	 */
-	public void accept(InstructionVisitor visitor, Object... args);
+	void accept(InstructionVisitor visitor, Object... args);
 
 	/**
 	 * Returns the block that contains this instruction.
 	 * 
 	 * @return the block that contains this instruction
 	 */
-	public BlockNode getBlock();
+	BlockNode getBlock();
 
 	/**
 	 * Returns instruction casting type if needed.
 	 * 
 	 * @return Type of cast made by this instruction
 	 */
-	public Cast getCast();
+	Cast getCast();
+
+	/**
+	 * Returns <code>true</code> if the instruction is an Assign.
+	 * 
+	 * @return <code>true</code> if the instruction is an Assign
+	 */
+	boolean isAssign();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Call.
+	 * 
+	 * @return <code>true</code> if the instruction is a Call
+	 */
+	boolean isCall();
+
+	/**
+	 * Returns <code>true</code> if the instruction is an HasTokens.
+	 * 
+	 * @return <code>true</code> if the instruction is an HasTokens
+	 */
+	boolean isHasTokens();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Load.
+	 * 
+	 * @return <code>true</code> if the instruction is a Load
+	 */
+	boolean isLoad();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Peek.
+	 * 
+	 * @return <code>true</code> if the instruction is a Peek
+	 */
+	boolean isPeek();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Phi.
+	 * 
+	 * @return <code>true</code> if the instruction is a Phi
+	 */
+	boolean isPhi();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Read.
+	 * 
+	 * @return <code>true</code> if the instruction is a Read
+	 */
+	boolean isRead();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a ReadEnd.
+	 * 
+	 * @return <code>true</code> if the instruction is a ReadEnd
+	 */
+	boolean isReadEnd();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Return.
+	 * 
+	 * @return <code>true</code> if the instruction is a Return
+	 */
+	boolean isReturn();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Store.
+	 * 
+	 * @return <code>true</code> if the instruction is a Store
+	 */
+	boolean isStore();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a Write.
+	 * 
+	 * @return <code>true</code> if the instruction is a Write
+	 */
+	boolean isWrite();
+
+	/**
+	 * Returns <code>true</code> if the instruction is a WriteEnd.
+	 * 
+	 * @return <code>true</code> if the instruction is a WriteEnd
+	 */
+	boolean isWriteEnd();
 
 	/**
 	 * Sets the block that contains this instruction.
@@ -81,6 +165,6 @@ public interface Instruction extends User {
 	 * @param block
 	 *            the block that contains this instruction
 	 */
-	public void setBlock(BlockNode block);
+	void setBlock(BlockNode block);
 
 }

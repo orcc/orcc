@@ -90,6 +90,11 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 		return null;
 	}
 
+	/**
+	 * Returns the (possibly empty) list of indexes of this load.
+	 * 
+	 * @return the (possibly empty) list of indexes of this load
+	 */
 	public List<Expression> getIndexes() {
 		return indexes;
 	}
@@ -112,6 +117,11 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 	@Override
 	public void internalSetTarget(LocalVariable target) {
 		this.target = target;
+	}
+
+	@Override
+	public boolean isLoad() {
+		return true;
 	}
 
 	/**
