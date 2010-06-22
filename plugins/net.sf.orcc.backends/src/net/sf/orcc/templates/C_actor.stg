@@ -252,7 +252,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 
 outputPatternPort(port) ::= <<
 if (!fifo_$port.type$_has_room($instance.id$_$port$, $pattern.(port)$)) {
-	ports |= 0x0$instance.actor.maskOutput.(port)$;
+	ports |= 0x0$instance.actor.templateData.maskOutput.(port)$;
 }
 >>
 
@@ -295,7 +295,7 @@ void $instance.id$_scheduler(struct schedinfo_s *si) {
 		$if(actions)$$schedulingTest(actions)$$endif$ else {
 			si->num_firings = i;
 			si->reason = starved;
-			si->ports = 0x0$instance.actor.maskInputs$;
+			si->ports = 0x0$instance.actor.templateData.maskInputs$;
 			break;
 		}
 	}
@@ -348,7 +348,7 @@ l_$transition.sourceState$:
 		_FSM_state = s_$transition.sourceState$;
 		si->num_firings = i;
 		si->reason = starved;
-		si->ports = 0x0$instance.actor.maskInputsTransition.(transition)$;
+		si->ports = 0x0$instance.actor.templateData.maskInputsTransition.(transition)$;
 		return;
 	}
 	$endif$
