@@ -28,16 +28,9 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import net.sf.orcc.classes.IClass;
-import net.sf.orcc.ir.FSM.NextStateInfo;
-import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -69,10 +62,6 @@ public class Actor {
 
 	private OrderedMap<Port> inputs;
 
-	private Map<Transition, String> maskInputs;
-
-	private Map<Port, String> maskOutputs;
-
 	private String name;
 
 	private OrderedMap<Port> outputs;
@@ -83,6 +72,14 @@ public class Actor {
 
 	private OrderedMap<Variable> stateVars;
 
+	/**
+	 * holds template-specific data.
+	 */
+	private Object templateData;
+
+	/**
+	 * <code>true</code> if this actor is time-dependent.
+	 */
 	private boolean timeDependent;
 
 	/**
@@ -127,65 +124,19 @@ public class Actor {
 	}
 
 	/**
-	 * Builds the mask inputs map.
+	 * Returns all the actions of this actor.
+	 * 
+	 * @return all the actions of this actor
 	 */
-	private void buildMaskInputs() {
-		if (!actionScheduler.hasFsm()) {
-			return;
-		}
-
-		FSM fsm = actionScheduler.getFsm();
-		for (Transition transition : fsm.getTransitions()) {
-			Set<Port> ports = new HashSet<Port>();
-			for (NextStateInfo info : transition.getNextStateInfo()) {
-				Pattern pattern = info.getAction().getInputPattern();
-				for (Entry<Port, Integer> entry : pattern.entrySet()) {
-					ports.add(entry.getKey());
-				}
-			}
-
-			// create the mask
-			int mask = 0;
-			int i = 0;
-			for (Port port : inputs) {
-				if (ports.contains(port)) {
-					mask |= (1 << i);
-				}
-
-				i++;
-			}
-
-			maskInputs.put(transition, Integer.toHexString(mask));
-		}
-	}
-
-	/**
-	 * Builds the mask outputs map.
-	 */
-	private void buildMaskOutputs() {
-		int i = 0;
-		for (Port port : outputs) {
-			int mask = (1 << i);
-			i++;
-			maskOutputs.put(port, Integer.toHexString(mask));
-		}
-	}
-
-	/**
-	 * Computes the mask map that associate a port mask to a transition. The
-	 * port mask defines the port(s) read by actions in each transition.
-	 */
-	public void computeTemplateMaps() {
-		maskInputs = new HashMap<FSM.Transition, String>();
-		maskOutputs = new HashMap<Port, String>();
-		buildMaskInputs();
-		buildMaskOutputs();
-	}
-
 	public List<Action> getActions() {
 		return actions;
 	}
 
+	/**
+	 * Returns the action scheduler of this actor.
+	 * 
+	 * @return the action scheduler of this actor
+	 */
 	public ActionScheduler getActionScheduler() {
 		return actionScheduler;
 	}
@@ -208,6 +159,11 @@ public class Actor {
 		return file;
 	}
 
+	/**
+	 * Returns the list of initialize actions.
+	 * 
+	 * @return the list of initialize actions
+	 */
 	public List<Action> getInitializes() {
 		return initializes;
 	}
@@ -233,39 +189,10 @@ public class Actor {
 	}
 
 	/**
-	 * Returns the mask for all the input ports of the actor. Bit 0 is set for
-	 * port 0, until bit n is set for port n.
+	 * Returns the name of this actor.
 	 * 
-	 * @return an integer mask for all the input ports of the actor
+	 * @return the name of this actor
 	 */
-	public String getMaskInputs() {
-		int n = inputs.size();
-		int mask = (1 << n) - 1;
-		return Integer.toHexString(mask);
-	}
-
-	/**
-	 * Returns the map of transition to mask of input ports of the actor read by
-	 * actions in the transition. Bit 0 is set for port 0, until bit n is set
-	 * for port n.
-	 * 
-	 * @return a map of transitions to input ports' masks
-	 */
-	public Map<Transition, String> getMaskInputsTransition() {
-		return maskInputs;
-	}
-
-	/**
-	 * Returns the mask for the output port of the actor read by actions in the
-	 * given transition. Bit 0 is set for port 0, until bit n is set for port n.
-	 * 
-	 * @return an integer mask for the input ports of the actor read by actions
-	 *         in the given transition
-	 */
-	public Map<Port, String> getMaskOutput() {
-		return maskOutputs;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -316,7 +243,16 @@ public class Actor {
 	public OrderedMap<Variable> getStateVars() {
 		return stateVars;
 	}
-	
+
+	/**
+	 * Returns an object with template-specific data.
+	 * 
+	 * @return an object with template-specific data
+	 */
+	public Object getTemplateData() {
+		return templateData;
+	}
+
 	/**
 	 * Returns <code>true</code> if this actor is a <code>system</code> actor,
 	 * which means that it is supposed to be replaced by a hand-written
@@ -369,8 +305,25 @@ public class Actor {
 		this.actorClass = actorClass;
 	}
 
+	/**
+	 * Sets the name of this actor.
+	 * 
+	 * @param name
+	 *            the new name of this actor
+	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Sets the template data associated with this actor. Template data should
+	 * hold data that is specific to a given template.
+	 * 
+	 * @param templateData
+	 *            an object with template-specific data
+	 */
+	public void setTemplateData(Object templateData) {
+		this.templateData = templateData;
 	}
 
 	/**

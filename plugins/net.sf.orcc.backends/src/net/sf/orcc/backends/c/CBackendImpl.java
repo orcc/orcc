@@ -93,7 +93,9 @@ public class CBackendImpl extends AbstractBackend {
 			transformation.transform(actor);
 		}
 
-		actor.computeTemplateMaps();
+		CTemplateData data = new CTemplateData();
+		data.computeTemplateMaps(actor);
+		actor.setTemplateData(data);
 	}
 
 	@Override
