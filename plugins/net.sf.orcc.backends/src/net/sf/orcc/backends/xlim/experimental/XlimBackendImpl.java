@@ -35,7 +35,7 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
-import net.sf.orcc.backends.llvm.transforms.ThreeAddressCodeTransformation;
+import net.sf.orcc.backends.transformations.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;

@@ -42,10 +42,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.RenameTransformation;
+import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
-import net.sf.orcc.backends.vhdl.transforms.VariableRenamer;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
@@ -92,9 +92,13 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new DeadGlobalElimination(),
 				new DeadCodeElimination(),
 				new DeadVariableRemoval(),
+
+				// renames reserved keywords
 				new RenameTransformation(this.transformations),
+
 				// replaces adjacent underscores by a single underscore
 				new RenameTransformation(adjacentUnderscores, "_"),
+
 				new Inline(), new PhiRemoval(), new VariableRedimension(),
 				new BoolExprTransform(), new VariableRenamer(),
 				new TransformConditionals() };
@@ -115,7 +119,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 		printer.loadGroups("VHDL_actor");
 		printer.setExpressionPrinter(VHDLExpressionPrinter.class);
 		printer.setTypePrinter(VHDLTypePrinter.class);
-		
+
 		// checks output folder exists, and if not creates it
 		File folder = new File(path + File.separator + "Design");
 		if (!folder.exists()) {

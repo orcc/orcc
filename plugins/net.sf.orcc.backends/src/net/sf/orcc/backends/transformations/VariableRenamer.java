@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.transforms;
+package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
@@ -36,7 +36,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 /**
  * This class defines an actor transformation that renames all variables inside
  * a procedure by prefixing them with the name of the procedure. New variables
- * must not be added to any procedure after this pass, for they won't be
+ * MUST NOT be added to any procedure after this pass, for they won't be
  * renamed.
  * 
  * @author Matthieu Wipliez
@@ -49,10 +49,11 @@ public class VariableRenamer extends AbstractActorTransformation {
 		String procName = procedure.getName();
 		for (Variable variable : procedure.getLocals()) {
 			LocalVariable local = (LocalVariable) variable;
-			if (local.getBaseName().contains("tmp"))
+			if (local.getBaseName().contains("tmp")) {
 				variable.setName(procName);
-			else
+			} else {
 				variable.setName(procName + "_" + local.getBaseName());
+			}
 		}
 	}
 
