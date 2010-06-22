@@ -44,9 +44,12 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
- * Move writes to the beginning of an action (because we use pointers).
+ * This class defines a transformation that move writes to the beginning of an
+ * action (because we use pointers), and adds ReadEnd and WriteEnd to signal a
+ * read is finished (respectively a write).
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class MoveReadsWritesTransformation extends AbstractActorTransformation {
@@ -109,4 +112,5 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 		writes.clear();
 		readEnds.clear();
 	}
+
 }
