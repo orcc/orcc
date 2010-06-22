@@ -37,7 +37,7 @@ import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 
 /**
- * This class defines a C type printer.
+ * This class defines a XLIM type printer.
  * 
  * @author Matthieu Wipliez
  * 

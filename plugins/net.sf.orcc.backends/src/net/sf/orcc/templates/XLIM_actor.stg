@@ -141,9 +141,21 @@ $else$
 $endif$
 >>
 
+literals(expr) ::= <<
+$if (expr.intExpr)$
+<operation kind="\$literal_integers" value=$expr.value$>
+</operation>
+$endif$
+>>
+
+
 Store(op) ::= <<
 $if (op.target.global)$
 $! TODO !$
+$op.indexes: literals()$
+<operation kind="assign" target="$op.target$">
+	$port(dir="in", source=op.value.var)$
+</operation>
 $else$
 <operation kind="noop">
 	$port(dir="in", source=op.value.var)$
@@ -198,7 +210,10 @@ nodes(nodes) ::= <<
 $nodes: {$(it.class.simpleName)(it)$}$
 >>
 
-// if node
+BlockNode(blkNode) ::= <<
+$blkNode.instructions: operation(); separator="\n"$
+>>
+
 IfNode(ifNode) ::= <<
 
 <module kind="if">

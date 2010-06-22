@@ -41,7 +41,6 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
-import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
