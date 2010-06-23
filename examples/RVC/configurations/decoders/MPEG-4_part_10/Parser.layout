@@ -45,6 +45,8 @@
       <vertex id="DelList" x="1134" y="1671"/>
       <vertex id="FrameNum_CurrPic" x="690" y="1565"/>
       <vertex id="RefList" x="1301" y="1724"/>
+      <vertex id="SizeDPBMax" x="787" y="2013"/>
+      <vertex id="IsIDR" x="1269" y="1682"/>
       <vertex id="byte2bit" x="333" y="1704"/>
       <vertex id="Algo_NALU" x="164" y="1761"/>
       <vertex id="Algo_Synp_AVC" x="439" y="1508"/>
@@ -55,6 +57,5 @@
       <vertex id="Algo_MMCO" x="905" y="1678"/>
       <vertex id="Algo_Parser_IPCM" x="951" y="2125"/>
       <vertex id="Algo_RefList0" x="1181" y="1702"/>
-      <vertex id="SizeDPBMax" x="787" y="2013"/>
    </vertices>
 </layout>

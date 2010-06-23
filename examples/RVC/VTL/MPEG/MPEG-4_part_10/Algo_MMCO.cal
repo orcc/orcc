@@ -66,7 +66,8 @@ actor Algo_MMCO ()
 	uint(size=31) ShortTermList,
 	uint(size=5)  SzSTList,
 	uint(size=31) LongTermList,
-	uint(size=5)  NbLTFrame
+	uint(size=5)  NbLTFrame,
+	bool          IsIDR
 		:
 
 /*
@@ -91,6 +92,7 @@ actor Algo_MMCO ()
 	uint(size=5)  NbLongTermSent   := 0;
 	uint(size=1)  FlagLongTerm     := 0;
 	uint(size=4)  LongTermFrameIdx := 0;
+	bool          ValIsIDR         := false;
 
 /*
 *
@@ -111,6 +113,11 @@ actor Algo_MMCO ()
 			LastFrameNum   := FrameNum;
 			FrameNum       := ValFrame_Num;
 			NbFrameDel     := 0;
+			if(ValFrame_Num = 0) then
+				ValIsIDR := true;
+			else
+				ValIsIDR := false;
+			end
 		end
 
 
@@ -354,6 +361,7 @@ actor Algo_MMCO ()
 			LongTermCount  := 0;
 			LTList         := [-1 :for int s in Integers(0,16-1)];
 			NbFrameDel     := -1;
+			ValIsIDR       := true;
 		end
 
 
@@ -416,7 +424,8 @@ actor Algo_MMCO ()
 	//Send the length of the DelList
 	SendSizeDelList: action
 				==>
-			DelList:[NbFrameDel]
+			DelList:[NbFrameDel],
+			IsIDR  :[ValIsIDR]
 		end
 
 	//Send the DelList

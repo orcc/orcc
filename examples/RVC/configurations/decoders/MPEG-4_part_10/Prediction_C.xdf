@@ -191,6 +191,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="IsIDR">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -372,6 +375,7 @@
     <Connection dst="RefIdxtoPOC" dst-port="PicID" src="Inter" src-port="PicID"/>
     <Connection dst="RefIdxtoPOC" dst-port="RefList" src="" src-port="RefList"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="" src-port="POC"/>
-    <Connection dst="Mgnt_Display" dst-port="FrameNum" src="" src-port="FrameNum"/>
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
+    <Connection dst="Mgnt_Display" dst-port="IsIDR" src="" src-port="IsIDR"/>
+    <Connection dst="Buffer_inter" dst-port="IsIDR" src="" src-port="IsIDR"/>
 </XDF>

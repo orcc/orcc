@@ -69,7 +69,7 @@ actor Algo_NALU ()
 			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
 		do
 			byte_count       := 0;
-			Input_Bitstream[nb_bytes_mem]     := 0;
+			Input_Bitstream[nb_bytes_mem] := 0;
 			if(nb_bytes_mem - 1 < NB_RBSP_BYTE_MAX) then
 				Input_Bitstream[nb_bytes_mem + 1] := 0;
 				nb_bytes_mem := nb_bytes_mem + 1;

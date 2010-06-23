@@ -299,4 +299,7 @@
     <Connection dst="Decoding_Y" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
     <Connection dst="Decode_U" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
     <Connection dst="Decode_V" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
+    <Connection dst="Decoding_Y" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
+    <Connection dst="Decode_U" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
+    <Connection dst="Decode_V" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
 </XDF>

@@ -17,15 +17,14 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 actor Mgnt_Display ()
 	uint(size=32) POC,
-	uint(size=31) FrameNum,
-	uint(size=5)  MaxDPBSize
+	uint(size=5)  MaxDPBSize,
+	bool          IsIDR
 	
 		==>
   	int(size=32) POCtoDisplay
 		:
 
 
-	List(type:int (size=32),size=16) frame_num  := [-1    :for int s in Integers(0,15)];
 	List(type:int (size=32),size=16) ListPOC    := [-1    :for int s in Integers(0,15)];
 	List(type:bool         ,size=16) IsUsed     := [false :for int s in Integers(0,15)];
 	
@@ -38,8 +37,8 @@ actor Mgnt_Display ()
 
 	GetPOC: action
 			POC        :[ValPOC],
-			FrameNum   :[FrNu],
-			MaxDPBSize :[ValMaxDPBSize]
+			MaxDPBSize :[ValMaxDPBSize],
+			IsIDR      :[IsIDR_Picture]
 				==>
 		var
 			bool         idx_selected := false
@@ -48,10 +47,13 @@ actor Mgnt_Display ()
 			while( (CurrentIdx < 16) and (not idx_selected) )
 			do
 				if(IsUsed[CurrentIdx] = false) then
-					frame_num[CurrentIdx] := FrNu;
-					ListPOC[CurrentIdx]   := ValPOC;
-					IsUsed[CurrentIdx]    := true;
-					idx_selected          := true;
+					if(IsIDR_Picture)then
+						ListPOC[CurrentIdx] := 0;
+					else
+						ListPOC[CurrentIdx] := ValPOC;
+					end
+					IsUsed[CurrentIdx] := true;
+					idx_selected       := true;
 				end
 				CurrentIdx := CurrentIdx + 1;
 			end
@@ -60,9 +62,7 @@ actor Mgnt_Display ()
 			NbPic           := NbPic + 1;
 		end
 
-	SearchForNextPOC.buffer_full: action ==>
-		guard
-			NbPic = SizeDPBMax
+	SearchForNextPOC.BufferFull_or_IDR: action ==>
 		do
 			IdxNextPOC := -1;	
 			
@@ -93,17 +93,20 @@ actor Mgnt_Display ()
 						end
 					end
 				end
+				if(IdxNextPOC != -1) then
+					NextPOC := NextPOC + 1;
+				end
 			else
-				NextPOC := ListPOC[IdxNextPOC];
+				NextPOC := ListPOC[IdxNextPOC] + 1;
 			end
-			NextPOC := NextPOC + 1;
 		end
 
-	SearchForNextPOC.buffer_not_full: action ==>
+	SearchForNextPOC.BufferNotFull: action ==>
 		guard
-			NbPic < SizeDPBMax
+			NbPic < SizeDPBMax,
+			ListPOC[CurrentIdx] != 0
 		do
-			IdxNextPOC := -1;	
+			IdxNextPOC := -1;
 			foreach int i in Integers (0,15)
 			do
 				if((ListPOC[i] = NextPOC) and (IsUsed[i] = true)) then
@@ -115,7 +118,7 @@ actor Mgnt_Display ()
 			end
 		end
 
-	SendNextPOC: action
+	SendNextPOC.launch: action
 				==>
 			POCtoDisplay :[ ListPOC[IdxNextPOC] ]
 		guard
@@ -126,20 +129,21 @@ actor Mgnt_Display ()
 		end
 
 
-	skipSendNextPOC: action
+	SendNextPOC.skip: action
 				==>
 			POCtoDisplay :[ -1 ]
 		end
 
 
 	schedule fsm GetPOC:
-		GetPOC           (GetPOC           )-->SearchForNextPOC;
-		SearchForNextPOC (SearchForNextPOC )-->SendNextPOC;
-		SendNextPOC      (SendNextPOC      )-->SearchForNextPOC;
-		SendNextPOC      (skipSendNextPOC  )-->GetPOC;
+		GetPOC           (GetPOC             )-->SearchForNextPOC;
+		SearchForNextPOC (SearchForNextPOC   )-->SendNextPOC;
+		SendNextPOC      (SendNextPOC.launch )-->SearchForNextPOC;
+		SendNextPOC      (SendNextPOC.skip   )-->GetPOC;
 	end
 
 	priority
-		SendNextPOC > skipSendNextPOC;
+		SearchForNextPOC.BufferNotFull > SearchForNextPOC.BufferFull_or_IDR;
+		SendNextPOC.launch               > SendNextPOC.skip;
 	end
 end
