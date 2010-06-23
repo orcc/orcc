@@ -100,8 +100,12 @@ $endif$
 >>
 
 action_MD(actor, action) ::= <<
+$if(action.tag.identifiers.empty)$
+$action_decl_MD(actor=actor, action=action)$ = metadata !{null, metadata $Sched_decl_MD(actor=actor, action=action)$, metadata $Body_decl_MD(actor=actor, action=action)$}
+$else$
 $action_decl_MD(actor=actor, action=action)$ = metadata !{metadata $Tag_decl_MD(actor=actor, tag=action.tag)$, metadata $Sched_decl_MD(actor=actor, action=action)$, metadata $Body_decl_MD(actor=actor, action=action)$}
 $Tag_MD(actor=actor, tag=action.tag)$
+$endif$
 $Sched_MD(actor=actor, action=action)$
 $Body_MD(actor=actor, action=action)$
 >>
@@ -227,8 +231,7 @@ $Sched_decl_MD(actor=actor, action=action)$ = metadata  !{$varName_MD(action.sch
 >>
 
 Tag_MD(actor, tag)::=<<
-$Tag_decl_MD(actor=actor, tag=tag)$ = metadata  !{$if(tag.identifiers.empty)$ null $
-else$ $tag.identifiers: varIdentifier_MD() ; separator=", "$ $endif$}
+$Tag_decl_MD(actor=actor, tag=tag)$ = metadata  !{$tag.identifiers: varIdentifier_MD() ; separator=", "$}
 >>
 
 

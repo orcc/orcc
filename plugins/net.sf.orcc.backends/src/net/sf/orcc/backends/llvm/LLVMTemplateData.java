@@ -45,7 +45,10 @@ public class LLVMTemplateData {
 
 	private void computeAction(Action action) {
 		templateDataMap.put(action, id++);
-		templateDataMap.put(action.getTag(), id++);
+		//Avoid to add null id in map
+		if (!action.getTag().getIdentifiers().isEmpty()){
+			templateDataMap.put(action.getTag(), id++);
+		}
 		templateDataMap.put(action.getScheduler(), id++);
 		templateDataMap.put(action.getBody(), id++);
 	}
