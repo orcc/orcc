@@ -30,8 +30,29 @@ addList(EReference this, String name, EClassifier type) :
         eReferenceType.eStructuralFeatures.add(opp)
 ;
 
+addAttribute(EClass clasz, String typeName, String attributeName) :
+	let etype = getEcoreDataType(typeName) :
+	let field = new EAttribute :
+	field.setEType(etype) ->
+	field.setName(attributeName) ->
+	field.setTransient(true) ->
+	field.setLowerBound(0) ->
+	field.setUpperBound(1) ->
+	clasz.eStructuralFeatures.add(field)
+;
+
 process(EClass this) :
 	switch (this.name) {
+		case "AstFunction": (
+			// add an "irType" value field to functions
+			addAttribute(this, "EJavaObject", "irType")
+		)
+
+		case "AstPort": (
+			// add an "irType" value field to ports
+			addAttribute(this, "EJavaObject", "irType")
+		)
+
 		case "AstSchedule": (
 			// add a transient list of states referenced by transitions to Schedule class 
 			let etype = (EClass) ePackage.getEClassifier("AstState") :
@@ -43,36 +64,17 @@ process(EClass this) :
 			field.setLowerBound(0) ->
 			field.setUpperBound(-1) ->
 			this.eStructuralFeatures.add(field)
-        )
+		)
         
 		case "AstVariable": (
-			// add an "initial" value field to variables
-			let etype = getEcoreDataType("EJavaObject") :
-			let field = new EAttribute :
-			field.setEType(etype) ->
-			field.setName("initialValue") ->
-			field.setTransient(true) ->
-			field.setLowerBound(0) ->
-			field.setUpperBound(1) ->
-			this.eStructuralFeatures.add(field)
-        )
-        
-		case "AstVariableReference": (
-			//((EReference) getEStructuralFeature('variable')).defineEOpposite('references')
+			// add an "initialValue" value field to variables
+			addAttribute(this, "EJavaObject", "initialValue") ->
+
+			// add an "irType" value field to variables
+			addAttribute(this, "EJavaObject", "irType")
+		)
+
+		default:
 			null
-        )
-
-        case "AstCallExpression": (
-    		//((EReference) getEStructuralFeature('function')).defineEOpposite('calls')
-    		null
-    	)
-
-    	case "AstCallStatement": (
-    		//((EReference) getEStructuralFeature('procedure')).defineEOpposite('calls')
-    		null
-    	)
-
-    	default:
-    		null
-    }
+	}
 ;
