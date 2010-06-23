@@ -87,10 +87,13 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
@@ -358,18 +361,27 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Adds reads to the current {@link #procedure}'s node list. The number of
-	 * tokens to read on each port is stored in the given IR input pattern. This
-	 * method also reorganizes tokens if necessary (in cases such as [a, b]
-	 * repeat 3).
+	 * Adds a read to the current {@link #procedure}'s node list.
 	 * 
-	 * @param astAction
-	 *            the AST action
-	 * @param inputPattern
-	 *            the IR input pattern
+	 * @param port
+	 *            a port
+	 * @param numTokens
+	 *            number of tokens
 	 */
-	private void actionAddReads(AstAction astAction, Pattern inputPattern) {
-		// TODO add reads to the "nodes" node list
+	private LocalVariable actionAddRead(Port port, int numTokens) {
+		// create the variable to hold the tokens
+		LocalVariable target = new LocalVariable(true, 0,
+				procedure.getLocation(), port.getName(), null, new ListType(
+						numTokens, port.getType()));
+		procedure.getLocals().add(file, target.getLocation(), target.getName(),
+				target);
+
+		// add the read
+		BlockNode block = BlockNode.getLast(procedure);
+		Read read = new Read(port, numTokens, target);
+		block.add(read);
+
+		return target;
 	}
 
 	/**
@@ -407,39 +419,33 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Transforms the given list of AST input patterns as local variables and
-	 * fills the target IR input pattern.
+	 * Fills tokens from the data that was read and put in portVariable.
 	 * 
-	 * @param astInputPattern
-	 *            a list of AST input patterns, where an AST input patterns
-	 *            contains a list of tokens and possibly a repeat clause.
-	 * @param inputPattern
-	 *            target IR input pattern
+	 * @param portVariable
+	 *            a local array that contains data.
+	 * @param tokens
+	 *            a list of token variables
+	 * @param repeat
+	 *            an integer number of repeat (equals to one if there is no
+	 *            repeat)
 	 */
-	private void actionTransformInputPattern(
-			List<AstInputPattern> astInputPattern, Pattern inputPattern) {
-		for (AstInputPattern pattern : astInputPattern) {
-			Port port = portMap.get(pattern.getPort());
-			List<AstVariable> tokens = pattern.getTokens();
-
-			// declare tokens
+	private void actionFillTokens(LocalVariable portVariable,
+			List<AstVariable> tokens, int repeat) {
+		if (repeat == 1) {
+			BlockNode block = BlockNode.getLast(procedure);
+			int i = 0;
 			for (AstVariable token : tokens) {
-				LocalVariable local = transformLocalVariable(token);
-				procedure.getLocals().add(file, local.getLocation(),
-						local.getName(), local);
+				LocalVariable irToken = (LocalVariable) variablesMap.get(token);
+				List<Expression> indexes = new ArrayList<Expression>(1);
+				indexes.add(new IntExpr(i));
+				Load load = new Load(portVariable.getLocation(), irToken,
+						new Use(portVariable), indexes);
+				block.add(load);
+
+				i++;
 			}
-
-			// evaluates token consumption
-			int totalConsumption = tokens.size();
-
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				int repeat = new AstExpressionEvaluator()
-						.evaluateAsInteger(astRepeat);
-				totalConsumption *= repeat;
-			}
-
-			inputPattern.put(port, totalConsumption);
+		} else {
+			// TODO when repeat is greater than one
 		}
 	}
 
@@ -450,7 +456,7 @@ public class AstTransformer {
 	 *            an instruction
 	 */
 	private void addInstruction(Instruction instruction) {
-		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure);
 		block.add(instruction);
 	}
 
@@ -547,8 +553,7 @@ public class AstTransformer {
 		// current procedure is the body
 		procedure = body;
 
-		actionTransformInputPattern(astAction.getInputs(), inputPattern);
-		actionAddReads(astAction, inputPattern);
+		transformInputPattern(astAction, inputPattern);
 		transformLocalVariables(astAction.getVariables());
 		transformStatements(astAction.getStatements());
 		actionAddWrites(astAction, outputPattern);
@@ -683,6 +688,48 @@ public class AstTransformer {
 		}
 
 		return stateVars;
+	}
+
+	/**
+	 * Transforms the given list of AST input patterns as local variables and
+	 * fills the target IR input pattern.
+	 * 
+	 * @param astInputPattern
+	 *            a list of AST input patterns, where an AST input patterns
+	 *            contains a list of tokens and possibly a repeat clause.
+	 * @param inputPattern
+	 *            target IR input pattern
+	 */
+	private void transformInputPattern(AstAction astAction, Pattern inputPattern) {
+		List<AstInputPattern> astInputPattern = astAction.getInputs();
+		for (AstInputPattern pattern : astInputPattern) {
+			Port port = portMap.get(pattern.getPort());
+			List<AstVariable> tokens = pattern.getTokens();
+
+			// evaluates token consumption
+			int totalConsumption = tokens.size();
+			int repeat = 1;
+			AstExpression astRepeat = pattern.getRepeat();
+			if (astRepeat != null) {
+				repeat = new AstExpressionEvaluator()
+						.evaluateAsInteger(astRepeat);
+				totalConsumption *= repeat;
+			}
+			inputPattern.put(port, totalConsumption);
+
+			// add read
+			LocalVariable variable = actionAddRead(port, totalConsumption);
+
+			// declare tokens
+			for (AstVariable token : tokens) {
+				LocalVariable local = transformLocalVariable(token);
+				procedure.getLocals().add(file, local.getLocation(),
+						local.getName(), local);
+			}
+
+			// fill tokens
+			actionFillTokens(variable, tokens, repeat);
+		}
 	}
 
 	/**
