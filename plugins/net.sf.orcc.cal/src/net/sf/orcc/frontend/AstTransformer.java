@@ -170,7 +170,7 @@ public class AstTransformer {
 				AstExpressionVariable expression) {
 			AstVariable astVariable = expression.getValue().getVariable();
 			Location location = Util.getLocation(expression);
-			
+
 			Variable variable = variablesMap.get(astVariable);
 			Use use = new Use(variable);
 			Expression varExpr = new VarExpr(location, use);
@@ -247,11 +247,12 @@ public class AstTransformer {
 		public Void caseAstStatementIf(AstStatementIf stmtIf) {
 			Expression condition = transformExpression(stmtIf.getCondition());
 
-			transformStatements(stmtIf.getThen());
-			transformStatements(stmtIf.getElse());
-			IfNode node = new IfNode(procedure, condition,
-					new ArrayList<CFGNode>(0), new ArrayList<CFGNode>(0),
-					new BlockNode(procedure));
+			// transforms "then" statements and "else" statements
+			List<CFGNode> thenNodes = getNodes(stmtIf.getThen());
+			List<CFGNode> elseNodes = getNodes(stmtIf.getElse());
+
+			IfNode node = new IfNode(procedure, condition, thenNodes,
+					elseNodes, new BlockNode(procedure));
 			procedure.getNodes().add(node);
 
 			return null;
@@ -260,6 +261,32 @@ public class AstTransformer {
 		@Override
 		public Void caseAstStatementWhile(AstStatementWhile stmtWhile) {
 			return null;
+		}
+
+		/**
+		 * Returns a list of CFG nodes from the given list of statements. This
+		 * method creates a new block node to hold the statements, transforms
+		 * the statements, and transfers the nodes created to a new list that is
+		 * the result.
+		 * 
+		 * @param statements
+		 *            a list of statements
+		 * @return a list of CFG nodes
+		 */
+		private List<CFGNode> getNodes(List<AstStatement> statements) {
+			List<CFGNode> nodes = procedure.getNodes();
+
+			int first = nodes.size();
+			nodes.add(new BlockNode(procedure));
+			transformStatements(statements);
+			int last = nodes.size();
+
+			List<CFGNode> resultNodes = new ArrayList<CFGNode>(last - first);
+			for (int i = first; i < last; i++) {
+				resultNodes.add(nodes.remove(i));
+			}
+
+			return resultNodes;
 		}
 
 	}
