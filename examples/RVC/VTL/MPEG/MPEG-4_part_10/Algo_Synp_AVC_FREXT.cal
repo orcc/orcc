@@ -138,6 +138,7 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_P_8x8() --> bool: slice_type = SLICE_TYPE_P and mb_type = 3 end
 	function IS_B_8x8() --> bool: slice_type = SLICE_TYPE_B and mb_type = 22 end
 	function IS_B_Direct_8x8() --> bool: slice_type = SLICE_TYPE_B and sub_mb_type[mbPartIdx] = 0 end
+	function IS_B_Direct_16x16_CABAC(int mbAddr) --> bool: slice_type = SLICE_TYPE_B and mbTab[mbAddr][2] = 0 end
 	function IS_IPCM_Tab(int Addr, int MbType) -->bool: if Addr < 0 then false else mbTab[Addr][MbType] = 25 end end
 	
 	//Entropie decoding
@@ -2003,7 +2004,7 @@ actor Algo_Synp_AVC_FREXT()
 		else
 			if ( ( ctxIdxOffset = 0 and IS_SI(GiveMbSliceType(AvailMb,mbAddr))) or		  
 			     ( ctxIdxOffset = 3  and IS_INxN( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr) ) ) or
-			     ( ctxIdxOffset = 27 and ( IS_P_Skip_CABAC(mbAddr) or IS_B_Skip_CABAC(mbAddr) ) ) )then
+			     ( ctxIdxOffset = 27 and ( IS_P_Skip_CABAC(mbAddr) or IS_B_Skip_CABAC(mbAddr) or IS_B_Direct_16x16_CABAC(mbAddr) ) ) )then
 	
 				 condTermFlagA := 0;
 			else
@@ -2022,7 +2023,7 @@ actor Algo_Synp_AVC_FREXT()
 		else
 			if ( ( ctxIdxOffset = 0 and IS_SI(GiveMbSliceType(AvailMb,mbAddr))) or		  
 			     ( ctxIdxOffset = 3  and IS_INxN( GiveMbSliceType(AvailMb,mbAddr), GiveMbType(AvailMb,mbAddr) ) ) or
-			     ( ctxIdxOffset = 27 and (  IS_P_Skip_CABAC(mbAddr) or IS_B_Skip_CABAC(mbAddr) ) ) )then
+			     ( ctxIdxOffset = 27 and ( IS_P_Skip_CABAC(mbAddr) or IS_B_Skip_CABAC(mbAddr) or IS_B_Direct_16x16_CABAC(mbAddr) ) ) )then
 	
 				 condTermFlagB := 0;
 			else
@@ -2746,7 +2747,7 @@ actor Algo_Synp_AVC_FREXT()
 						subMbPartIdxN := 0;
 					end
 				else
-					if currSubType = 3 then
+					if currSubType > 9 then
 						if mbPart = 0 then
 							subMbPartIdxN := (yW >> 2) * 2 + (xW >> 2);
 						else
@@ -2952,15 +2953,15 @@ actor Algo_Synp_AVC_FREXT()
 				else
 					if IS_L0 then
 						if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-							predModeEqualFlagA := 0;
+							predModeEqualFlagB := 0;
 						else
-							predModeEqualFlagA := 1;
+							predModeEqualFlagB := 1;
 						end
 					else
 						if IS_MBPred_L1_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-							predModeEqualFlagA := 0;
+							predModeEqualFlagB := 0;
 						else
-							predModeEqualFlagA := 1;
+							predModeEqualFlagB := 1;
 						end
 					end
 				end
@@ -3172,15 +3173,15 @@ actor Algo_Synp_AVC_FREXT()
 				else
 					if IS_L0 then
 						if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-							predModeEqualFlagA := 0;
+							predModeEqualFlagB := 0;
 						else
-							predModeEqualFlagA := 1;
+							predModeEqualFlagB := 1;
 						end
 					else
 						if IS_MBPred_L1_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-							predModeEqualFlagA := 0;
+							predModeEqualFlagB := 0;
 						else
-							predModeEqualFlagA := 1;
+							predModeEqualFlagB := 1;
 						end
 					end
 				end
@@ -3948,7 +3949,6 @@ actor Algo_Synp_AVC_FREXT()
 				CabacValue := 11 + binVal;
 				FoundSE := true;
 				binValDecoded := false;
-				CabacValue := 7;
 			end
 		end
 		
@@ -8268,7 +8268,16 @@ end
 		(slice_num_ref_idx_l1_active_minus1 > 0 or mb_field_decoding_flag = 1),
 		not IS_MBPred_L0(mbPartIdx), not IS_MBNA(mbPartIdx)
 	do
-		if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+		if IS_CAVLC() then
+			if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
+		else
+			if IS_CABAC() then
+				//FIXME Maybe will do like CAVLC
+				GetCabacRefIdxLx();
+				StartCabacProcess();
+			end
+		end 
+		IS_L0 := false;
 	end
 
 	read_MB_pred_ref_idx_l1_done: action ==> 
