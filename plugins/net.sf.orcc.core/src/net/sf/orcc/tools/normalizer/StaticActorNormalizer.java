@@ -197,7 +197,7 @@ public class StaticActorNormalizer {
 	 *            input or output pattern
 	 */
 	private void addStateVariables(Procedure procedure, Pattern pattern) {
-		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure);
 		for (Entry<Port, Integer> entry : pattern.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
@@ -375,7 +375,7 @@ public class StaticActorNormalizer {
 	 */
 	private void createReads(Procedure procedure) {
 		Pattern inputPattern = staticCls.getInputPattern();
-		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure);
 		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
@@ -416,7 +416,7 @@ public class StaticActorNormalizer {
 	 */
 	private void createWrites(Procedure procedure) {
 		Pattern inputPattern = staticCls.getOutputPattern();
-		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure);
 		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();

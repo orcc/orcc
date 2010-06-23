@@ -460,7 +460,7 @@ public class ActorMerger implements INetworkTransformation {
 	 * Creates the read instructions of the static action
 	 */
 	private void createReads(Procedure procedure) {
-		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure);
 		for (Port port : inputsMap.values()) {
 			Variable local = loopVariables.get(port.getName());
 			int numTokens = port.getNumTokensConsumed();
@@ -493,7 +493,7 @@ public class ActorMerger implements INetworkTransformation {
 	 * Creates the write instructions of the static action
 	 */
 	private void createWrites(Procedure procedure) {
-		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
+		BlockNode block = BlockNode.getLast(procedure);
 		for (Port port : outputsMap.values()) {
 			Variable local = loopVariables.get(port.getName());
 			int numTokens = port.getNumTokensProduced();

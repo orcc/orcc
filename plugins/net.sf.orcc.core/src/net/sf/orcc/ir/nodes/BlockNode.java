@@ -76,6 +76,18 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	}
 
 	/**
+	 * Returns the last block in the list of nodes of the given procedure. A new
+	 * block is created if there is no block in the given node list.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @return a block
+	 */
+	public static BlockNode getLast(Procedure procedure) {
+		return getLast(procedure, procedure.getNodes());
+	}
+
+	/**
 	 * Returns the last block in the given list of nodes. A new block is created
 	 * if there is no block in the given node list.
 	 * 
