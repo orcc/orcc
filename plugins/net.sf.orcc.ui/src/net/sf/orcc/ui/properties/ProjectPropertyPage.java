@@ -28,28 +28,40 @@
  */
 package net.sf.orcc.ui.properties;
 
+import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
+import static net.sf.orcc.OrccProperties.OUTPUT_FOLDER;
+
+import java.io.File;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 
+/**
+ * This class defines a property page for an Orcc project.
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public class ProjectPropertyPage extends PropertyPage {
 
-	private static final String PATH_TITLE = "Path:";
-	private static final String OWNER_TITLE = "&Owner:";
-	private static final String OWNER_PROPERTY = "OWNER";
-	private static final String DEFAULT_OWNER = "John Doe";
-
-	private static final int TEXT_FIELD_WIDTH = 50;
-
-	private Text ownerText;
+	private Text textOutput;
+	private IProject project;
 
 	/**
 	 * Creates a new project property page.
@@ -58,96 +70,126 @@ public class ProjectPropertyPage extends PropertyPage {
 		super();
 	}
 
-	private void addFirstSection(Composite parent) {
-		Composite composite = createDefaultComposite(parent);
+	/**
+	 * Initializes a ProjectReferencePage.
+	 */
+	private void initialize() {
+		project = (IProject) getElement().getAdapter(IResource.class);
+		noDefaultAndApplyButton();
+		setDescription("Configure the properties of the project "
+				+ project.getName() + ".\n");
 
-		//Label for path field
-		Label pathLabel = new Label(composite, SWT.NONE);
-		pathLabel.setText(PATH_TITLE);
-
-		// Path text field
-		Text pathValueText = new Text(composite, SWT.WRAP | SWT.READ_ONLY);
-		pathValueText.setText(((IResource) getElement()).getFullPath().toString());
-	}
-
-	private void addSeparator(Composite parent) {
-		Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-		GridData gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		separator.setLayoutData(gridData);
-	}
-
-	private void addSecondSection(Composite parent) {
-		Composite composite = createDefaultComposite(parent);
-
-		// Label for owner field
-		Label ownerLabel = new Label(composite, SWT.NONE);
-		ownerLabel.setText(OWNER_TITLE);
-
-		// Owner text field
-		ownerText = new Text(composite, SWT.SINGLE | SWT.BORDER);
-		GridData gd = new GridData();
-		gd.widthHint = convertWidthInCharsToPixels(TEXT_FIELD_WIDTH);
-		ownerText.setLayoutData(gd);
-
-		// Populate owner text field
 		try {
-			String owner =
-				((IResource) getElement()).getPersistentProperty(
-					new QualifiedName("", OWNER_PROPERTY));
-			ownerText.setText((owner != null) ? owner : DEFAULT_OWNER);
+			String outputFolder = project
+					.getPersistentProperty(new QualifiedName("", OUTPUT_FOLDER));
+			if (outputFolder == null) {
+				project.setPersistentProperty(new QualifiedName("",
+						OUTPUT_FOLDER), new Path(project.getLocation()
+						.toOSString()).append(DEFAULT_OUTPUT).toOSString());
+			}
 		} catch (CoreException e) {
-			ownerText.setText(DEFAULT_OWNER);
 		}
 	}
 
-	/**
-	 * @see PreferencePage#createContents(Composite)
-	 */
+	private boolean getFolderFromText() {
+		String value = textOutput.getText();
+		File file = new File(value);
+		if (file.isDirectory()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private void browseOutputFolder(Shell shell) {
+		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
+		dialog.setMessage("Select output folder:");
+		if (getFolderFromText()) {
+			// set initial directory if it is valid
+			dialog.setFilterPath(textOutput.getText());
+		}
+
+		String dir = dialog.open();
+		if (dir != null) {
+			textOutput.setText(dir);
+		}
+	}
+
+	@Override
 	protected Control createContents(Composite parent) {
+		// top-level group
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
+		layout.marginWidth = 0;
+		layout.marginHeight = 0;
 		composite.setLayout(layout);
 		GridData data = new GridData(GridData.FILL);
 		data.grabExcessHorizontalSpace = true;
 		composite.setLayoutData(data);
 
-		addFirstSection(composite);
-		addSeparator(composite);
-		addSecondSection(composite);
-		return composite;
-	}
-
-	private Composite createDefaultComposite(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NULL);
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		composite.setLayout(layout);
-
-		GridData data = new GridData();
-		data.verticalAlignment = GridData.FILL;
-		data.horizontalAlignment = GridData.FILL;
-		composite.setLayoutData(data);
+		initialize();
+		createDescriptionLabel(composite);
+		createControlOutputFolder(composite);
+		applyDialogFont(composite);
 
 		return composite;
 	}
 
+	private void createControlOutputFolder(Composite composite) {
+		final Composite parent = new Composite(composite, SWT.NONE);
+
+		GridLayout layout = new GridLayout(3, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.verticalSpacing = 0;
+		parent.setLayout(layout);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		parent.setLayoutData(data);
+
+		Label lbl = new Label(parent, SWT.NONE);
+		lbl.setText("Output folder:");
+		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+
+		textOutput = new Text(parent, SWT.BORDER | SWT.SINGLE);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		textOutput.setLayoutData(data);
+		try {
+			textOutput.setText(project.getPersistentProperty(new QualifiedName(
+					"", OUTPUT_FOLDER)));
+		} catch (CoreException e) {
+		}
+
+		Button buttonBrowse = new Button(parent, SWT.PUSH);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseOutputFolder(parent.getShell());
+			}
+		});
+	}
+
+	@Override
 	protected void performDefaults() {
 		super.performDefaults();
 		// Populate the owner text field with the default value
-		ownerText.setText(DEFAULT_OWNER);
+		textOutput.setText(DEFAULT_OUTPUT);
 	}
-	
+
+	@Override
 	public boolean performOk() {
 		// store the value in the owner text field
 		try {
-			((IResource) getElement()).setPersistentProperty(
-				new QualifiedName("", OWNER_PROPERTY),
-				ownerText.getText());
+			project.setPersistentProperty(new QualifiedName("", OUTPUT_FOLDER),
+					textOutput.getText());
 		} catch (CoreException e) {
 			return false;
 		}
+
+		updateApplyButton();
 		return true;
 	}
 

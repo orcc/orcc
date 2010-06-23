@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2009, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,41 +26,24 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectNature;
-import org.eclipse.core.runtime.CoreException;
+package net.sf.orcc;
 
 /**
- * This class describes the "Orcc" project nature.
+ * Constants associated with an Orcc project.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class OrccProjectNature implements IProjectNature {
+public interface OrccProperties {
 
-	public static final String NATURE_ID = "net.sf.orcc.ui.OrccNature";
+	/**
+	 * Output folder for Xtext front-end.
+	 */
+	public static final String OUTPUT_FOLDER = "net.sf.orcc.debugMode";
 
-	private IProject project;
-
-	@Override
-	public void configure() throws CoreException {
-
-	}
-
-	@Override
-	public void deconfigure() throws CoreException {
-	}
-
-	@Override
-	public IProject getProject() {
-		return project;
-	}
-
-	@Override
-	public void setProject(IProject project) {
-		this.project = project;
-	}
+	/**
+	 * Default value for {@value #OUTPUT_FOLDER}.
+	 */
+	public static final String DEFAULT_OUTPUT = ".generated";
 
 }

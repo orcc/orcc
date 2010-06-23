@@ -15,7 +15,7 @@
             class="net.sf.orcc.ui.OrccPropertyTester"
             id="net.sf.orcc.propertyTester"
             namespace="net.sf.orcc"
-            properties="isVTL,isXDF"
+            properties="isVTL,isXDF,isOrccProject"
             type="org.eclipse.core.runtime.IAdaptable">
       </propertyTester>
    </extension>
@@ -49,9 +49,8 @@
          point="org.eclipse.ui.propertyPages">
       <page
             class="net.sf.orcc.ui.properties.ProjectPropertyPage"
-            id="net.sf.orcc.ui.properties.samplePropertyPage"
-            name="Project properties"
-            nameFilter="*.*">
+            id="net.sf.orcc.ui.properties.ProjectPropertyPage"
+            name="Orcc Settings">
          <enabledWhen>
             <test
                   forcePluginActivation="true"

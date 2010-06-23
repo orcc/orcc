@@ -28,8 +28,6 @@
  */
 package net.sf.orcc;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Constants associated with an Orcc launch configuration.
@@ -105,11 +103,6 @@ public interface OrccLaunchConstants {
 	 * Whether intermediate files should be kept.
 	 */
 	public static final String KEEP_INTERMEDIATE = "net.sf.orcc.keepIntermediate";
-
-	/**
-	 * Options associated to the backend.
-	 */
-	public static final Map<String, String> OPTIONS = new HashMap<String, String>();
 
 	/**
 	 * Output folder associated with an Orcc configuration.
