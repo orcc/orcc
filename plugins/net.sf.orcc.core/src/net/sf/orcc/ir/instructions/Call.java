@@ -62,7 +62,7 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 		super(location);
 		setParameters(parameters);
 		setTarget(target);
-		this.procedure = procedure;
+		setProcedure(procedure);
 	}
 
 	@Override
@@ -187,6 +187,10 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 	 *            a procedure
 	 */
 	public void setProcedure(Procedure procedure) {
+		if (procedure == null) {
+			throw new NullPointerException();
+		}
+
 		this.procedure = procedure;
 	}
 
