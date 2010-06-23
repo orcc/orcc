@@ -1,4 +1,4 @@
-actor Multiple_variables (int LUMA_CHROMA) uint(size=8) DB_I, uint(size=6) BS
+actor Multiple_variables () uint(size=8) DB_I, uint(size=6) BS
 ==> uint(size=8) DB_O :
 
 //LUMA_CHROMA luma:=0, chroma:=1
@@ -10,21 +10,6 @@ actor Multiple_variables (int LUMA_CHROMA) uint(size=8) DB_I, uint(size=6) BS
 	int MB_BLOCK_SIZE_MAX = 16;
 
 	int MB_BLOCK_SIZE_LUMA = 16;
-
-	int MB_BLOCK_SIZE_CHROMA = 8;
-
-	int MB_BLOCK_SIZE;
-
-	int FRAME = 0;
-
-	// image structures
-	int TOP_FIELD = 1;
-
-	int BOTTOM_FIELD = 2;
-
-	int MAXVAL_LUMA = 255;
-
-	int MAXVAL_CHROMA = 255;
 
 	/////////////////////
 	// State Variables //

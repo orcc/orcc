@@ -2,8 +2,6 @@ actor Load_store_test_simple () ==> :
 	
 	int s := 0;
 	
-	int t = 42;
-	
 	test: action ==>
 	do
 		println("s = " + s);
