@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -76,6 +77,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
+
+		LLVMTemplateData data = new LLVMTemplateData();
+		Map<Object, Integer> MDMap = data.computeTemplateMaps(actor);
+		actor.setTemplateData(MDMap);
 	}
 
 	@Override
