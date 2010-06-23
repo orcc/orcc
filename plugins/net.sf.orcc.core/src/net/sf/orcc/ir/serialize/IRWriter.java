@@ -28,8 +28,15 @@
  */
 package net.sf.orcc.ir.serialize;
 
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTIONS;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_INITIALIZES;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_INPUTS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_NAME;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_OUTPUTS;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_PARAMETERS;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_PROCEDURES;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_SOURCE_FILE;
+import static net.sf.orcc.ir.serialize.IRConstants.KEY_STATE_VARS;
 import static net.sf.orcc.ir.serialize.IRConstants.NAME_ASSIGN;
 import static net.sf.orcc.ir.serialize.IRConstants.NAME_CALL;
 import static net.sf.orcc.ir.serialize.IRConstants.NAME_HAS_TOKENS;
@@ -547,8 +554,11 @@ public class IRWriter {
 	private JSONArray writeActionPattern(Pattern pattern) {
 		JSONArray array = new JSONArray();
 		for (Entry<Port, Integer> entry : pattern.entrySet()) {
-			array.put(entry.getKey().getName());
-			array.put(entry.getValue().intValue());
+			JSONArray patternArray = new JSONArray();
+			array.put(patternArray);
+
+			patternArray.put(entry.getKey().getName());
+			patternArray.put(entry.getValue().intValue());
 		}
 
 		return array;
@@ -620,15 +630,14 @@ public class IRWriter {
 
 		obj.put(KEY_SOURCE_FILE, actor.getFile());
 		obj.put(KEY_NAME, actor.getName());
-		obj.put(IRConstants.KEY_INPUTS, writePorts(actor.getInputs()));
-		obj.put(IRConstants.KEY_OUTPUTS, writePorts(actor.getOutputs()));
-		obj.put(IRConstants.KEY_STATE_VARS,
-				writeStateVariables(actor.getStateVars()));
-		obj.put(IRConstants.KEY_PROCEDURES, writeProcedures(actor.getProcs()));
+		obj.put(KEY_PARAMETERS, writeStateVariables(actor.getParameters()));
+		obj.put(KEY_INPUTS, writePorts(actor.getInputs()));
+		obj.put(KEY_OUTPUTS, writePorts(actor.getOutputs()));
+		obj.put(KEY_STATE_VARS, writeStateVariables(actor.getStateVars()));
+		obj.put(KEY_PROCEDURES, writeProcedures(actor.getProcs()));
 
-		obj.put(IRConstants.KEY_ACTIONS, writeActions(actor.getActions()));
-		obj.put(IRConstants.KEY_INITIALIZES,
-				writeActions(actor.getInitializes()));
+		obj.put(KEY_ACTIONS, writeActions(actor.getActions()));
+		obj.put(KEY_INITIALIZES, writeActions(actor.getInitializes()));
 
 		array = writeActionScheduler(actor.getActionScheduler());
 		obj.put(IRConstants.KEY_ACTION_SCHED, array);
