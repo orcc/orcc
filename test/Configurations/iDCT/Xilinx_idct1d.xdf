@@ -61,7 +61,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_scale"/>
+        <Class name="../../VTL/iDCT/Xilinx_scale"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -70,7 +70,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_combine"/>
+        <Class name="../../VTL/iDCT/Xilinx_combine"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -79,7 +79,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_shuffleFly"/>
+        <Class name="../../VTL/iDCT/Xilinx_shuffleFly"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -88,7 +88,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_shuffle"/>
+        <Class name="../../VTL/iDCT/Xilinx_shuffle"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -97,7 +97,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_final"/>
+        <Class name="../../VTL/iDCT/Xilinx_final"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
