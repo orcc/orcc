@@ -44,7 +44,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 /**
  * This class defines an LLVM expression printer.
  * 
- * @author Jérôme GORIN
+ * @author Jerome GORIN
  * 
  */
 public class LLVMExprPrinter extends ExpressionPrinter {

@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -52,7 +51,7 @@ import net.sf.orcc.network.serialize.XDFWriter;
 /**
  * LLVM back-end.
  * 
- * @author Jérôme GORIN
+ * @author Jerome GORIN
  * 
  */
 public class LLVMBackendImpl extends AbstractBackend {
@@ -78,9 +77,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 			transformation.transform(actor);
 		}
 
-		LLVMTemplateData data = new LLVMTemplateData();
-		Map<Object, Integer> MDMap = data.computeTemplateMaps(actor);
-		actor.setTemplateData(MDMap);
+		//Organize medata information for the current actor
+		LLVMTemplateData templateData = new LLVMTemplateData(actor);
+		actor.setTemplateData(templateData.getTemplateData());
 	}
 
 	@Override

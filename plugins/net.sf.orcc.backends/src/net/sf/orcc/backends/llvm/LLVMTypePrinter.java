@@ -39,7 +39,7 @@ import net.sf.orcc.ir.type.VoidType;
 /**
  * This class defines a LLVM type printer.
  * 
- * @author Jérôme GORIN
+ * @author Jerome GORIN
  * 
  */
 public class LLVMTypePrinter extends TypePrinter {
