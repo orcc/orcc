@@ -405,6 +405,18 @@ public class IRWriter {
 			body.put(writeExpression(node.getValue()));
 			body.put(writeNodes(node.getThenNodes()));
 			body.put(writeNodes(node.getElseNodes()));
+			
+			// FIXME need to modify IR format to remove this sh*t
+			// complex stuff because JSON format is weird
+			JSONArray joinArray = new JSONArray();
+			array.put(joinArray);
+			
+			joinArray.put(IRConstants.NAME_JOIN);
+			joinArray.put(writeLocation(node.getLocation()));
+			
+			JSONArray phiArray = new JSONArray();
+			joinArray.put(phiArray);
+			node.getJoinNode().accept(this, phiArray);
 		}
 
 		@Override
