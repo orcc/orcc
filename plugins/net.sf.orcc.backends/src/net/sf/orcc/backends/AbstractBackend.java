@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.backends;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 
 import java.io.File;
 import java.io.FileFilter;

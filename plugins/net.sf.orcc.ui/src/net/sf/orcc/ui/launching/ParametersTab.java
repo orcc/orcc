@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.PARAMETERS;
+import static net.sf.orcc.OrccLaunchConstants.PARAMETERS;
 
 import java.util.HashMap;
 import java.util.Map;

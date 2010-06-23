@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.debug.sourceLookup;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;

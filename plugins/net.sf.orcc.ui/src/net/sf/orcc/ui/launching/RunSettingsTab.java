@@ -28,8 +28,8 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 
 import java.io.File;
 import java.util.HashMap;

@@ -10,6 +10,16 @@
       </image>
    </extension>
    <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="net.sf.orcc.ui.OrccPropertyTester"
+            id="net.sf.orcc.propertyTester"
+            namespace="net.sf.orcc"
+            properties="isVTL,isXDF"
+            type="org.eclipse.core.runtime.IAdaptable">
+      </propertyTester>
+   </extension>
+   <extension
          id="OrccNature"
          point="org.eclipse.core.resources.natures">
       <runtime>
@@ -34,5 +44,156 @@
             name="Orcc Project"
             project="true">
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="net.sf.orcc.ui.properties.ProjectPropertyPage"
+            id="net.sf.orcc.ui.properties.samplePropertyPage"
+            name="Project properties"
+            nameFilter="*.*">
+         <enabledWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="net.sf.orcc.isOrccProject">
+            </test>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="net.sf.orcc.ui.editors.StgEditor"
+            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
+            default="false"
+            extensions="stg"
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.ui.editors.StgEditor"
+            name="StringTemplateGroup editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+      <launchConfigurationType
+            delegate="net.sf.orcc.ui.launching.OrccRunLaunchDelegate"
+            id="net.sf.orcc.runLaunchConfigurationType"
+            modes="run"
+            name="Orcc compilation"
+            public="true">
+      </launchConfigurationType>
+      <launchConfigurationType
+            delegate="net.sf.orcc.ui.launching.OrccSimuLaunchDelegate"
+            id="net.sf.orcc.simuLaunchConfigurationType"
+            modes="debug, run"
+            name="Orcc simulation"
+            public="true"
+            sourceLocatorId="net.sf.orcc.debug.sourceLookupDirector.cal"
+            sourcePathComputerId="net.sf.orcc.debug.sourcePathComputer.cal">
+      </launchConfigurationType>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchShortcuts">
+      <shortcut
+            class="net.sf.orcc.ui.launching.OrccRunLaunchShortcut"
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.runLaunchShortcut"
+            label="Orcc compilation"
+            modes="run">
+         <configurationType
+               id="net.sf.orcc.runLaunchConfigurationType">
+         </configurationType>
+         <description
+               description="Compiles a dataflow program with Orcc"
+               mode="run">
+         </description>
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <or>
+                        <test
+                              forcePluginActivation="true"
+                              property="net.sf.orcc.isVTL">
+                        </test>
+                        <test
+                              forcePluginActivation="true"
+                              property="net.sf.orcc.isXDF">
+                        </test>
+                     </or>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+      <shortcut
+            class="net.sf.orcc.ui.launching.OrccSimuLaunchShortcut"
+            icon="icons/orcc_simu.gif"
+            id="net.sf.orcc.simuLaunchShortcut"
+            label="Orcc simulation"
+            modes="run">
+         <configurationType
+               id="net.sf.orcc.simuLaunchConfigurationType">
+         </configurationType>
+         <description
+               description="Simulates a dataflow program with Orcc"
+               mode="debug, run">
+         </description>
+         <contextualLaunch>
+            <enablement>
+               <with
+                     variable="selection">
+                  <count
+                        value="1">
+                  </count>
+                  <iterate>
+                     <test
+                           property="net.sf.orcc.isXDF">
+                     </test>
+                  </iterate>
+               </with>
+            </enablement>
+         </contextualLaunch>
+      </shortcut>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+      <launchConfigurationTabGroup
+            class="net.sf.orcc.ui.launching.OrccRunLaunchConfigurationTabGroup"
+            description="Compiles a dataflow program with Orcc."
+            id="net.sf.orcc.runLaunchConfigurationTabGroup"
+            type="net.sf.orcc.runLaunchConfigurationType">
+         <launchMode
+               mode="run">
+         </launchMode>
+      </launchConfigurationTabGroup>
+      <launchConfigurationTabGroup
+            class="net.sf.orcc.ui.launching.OrccSimuLaunchConfigurationTabGroup"
+            description="Simulates a dataflow program with Orcc."
+            id="net.sf.orcc.simuLaunchConfigurationTabGroup"
+            type="net.sf.orcc.simuLaunchConfigurationType">
+         <launchMode
+               mode="run">
+         </launchMode>
+         <launchMode
+               mode="debug">
+         </launchMode>
+      </launchConfigurationTabGroup>
+   </extension>
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+      <launchConfigurationTypeImage
+            configTypeID="net.sf.orcc.runLaunchConfigurationType"
+            icon="icons/orcc_run.gif"
+            id="net.sf.orcc.runLaunchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
+      <launchConfigurationTypeImage
+            configTypeID="net.sf.orcc.simuLaunchConfigurationType"
+            icon="icons/orcc_simu.gif"
+            id="orcc plugin.simuLaunchConfigurationTypeImage">
+      </launchConfigurationTypeImage>
    </extension>
 </plugin>

@@ -29,7 +29,7 @@
  */
 package net.sf.orcc.backends.vhdl;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
 import java.io.File;
 import java.io.IOException;

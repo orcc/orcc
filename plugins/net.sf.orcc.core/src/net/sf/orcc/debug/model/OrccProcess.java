@@ -28,20 +28,21 @@
  */
 package net.sf.orcc.debug.model;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DOT_CFG;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_KEEP;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_TRACES;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DOT_CFG;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.ENABLE_TRACES;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DEBUG;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DOT_CFG;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_KEEP;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_TRACES;
+import static net.sf.orcc.OrccLaunchConstants.DOT_CFG;
+import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
+import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
+import static net.sf.orcc.OrccLaunchConstants.KEEP_INTERMEDIATE;
+import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +55,6 @@ import net.sf.orcc.backends.BackendFactory;
 import net.sf.orcc.interpreter.InterpreterMain;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.ui.OrccActivator;
-import net.sf.orcc.ui.launching.OrccLaunchConstants;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -263,8 +263,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		File file = new File(exe);
 		file.setExecutable(true);
 
-		String inputFile = configuration.getAttribute(
-				OrccLaunchConstants.VTL_FOLDER, "");
+		String inputFile = configuration.getAttribute(VTL_FOLDER, "");
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
 
 		cmdList.add(quoteFile(exe));

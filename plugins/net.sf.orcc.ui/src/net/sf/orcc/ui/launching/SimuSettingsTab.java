@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.INPUT_STIMULUS;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.VTL_FOLDER;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
+import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.io.File;
 

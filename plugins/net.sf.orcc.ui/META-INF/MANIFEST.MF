@@ -4,10 +4,15 @@ Bundle-Name: Orcc UI
 Bundle-SymbolicName: net.sf.orcc.ui;singleton:=true
 Bundle-Version: 0.8.2
 Bundle-Activator: net.sf.orcc.ui.OrccActivator
-Require-Bundle: org.eclipse.core.resources,
+Require-Bundle: net.sf.orcc.core,
+ org.eclipse.core.expressions,
+ org.eclipse.core.resources,
  org.eclipse.core.runtime,
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.xtext.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: net.sf.orcc.ui.launching

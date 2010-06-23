@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.backends;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.COMPILE_XDF;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.OUTPUT_FOLDER;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
+import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.util.ArrayList;
 import java.util.HashMap;

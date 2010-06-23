@@ -1,4 +1,3 @@
-package net.sf.orcc.ui;
 /*
  * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
@@ -27,7 +26,7 @@ package net.sf.orcc.ui;
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-
+package net.sf.orcc.ui;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectNature;

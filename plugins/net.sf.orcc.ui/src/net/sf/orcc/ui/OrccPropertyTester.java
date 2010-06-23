@@ -26,11 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui.launching;
+package net.sf.orcc.ui;
+
 
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 
 /**
  * This class defines a property tester for the "isVTL" and "isXDF" properties.
@@ -51,6 +54,15 @@ public class OrccPropertyTester extends PropertyTester {
 			if (receiver instanceof IFile) {
 				IFile file = (IFile) receiver;
 				return ("xdf".equals(file.getFileExtension()));
+			}
+		} else if ("isOrccProject".equals(property)) {
+			if (receiver instanceof IProject) {
+				IProject project = (IProject) receiver;
+				try {
+					return project.hasNature(OrccProjectNature.NATURE_ID);
+				} catch (CoreException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 

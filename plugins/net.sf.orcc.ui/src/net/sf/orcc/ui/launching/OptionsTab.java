@@ -28,14 +28,14 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DEBUG;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_DOT_CFG;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DEFAULT_KEEP;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.DOT_CFG;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.ui.launching.OrccLaunchConstants.KEEP_INTERMEDIATE;
+import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DEBUG;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DOT_CFG;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_KEEP;
+import static net.sf.orcc.OrccLaunchConstants.DOT_CFG;
+import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
