@@ -2659,6 +2659,33 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 
+	procedure GiveMbPartIdxB(int MBtype, int xW, int yW)
+	begin
+		if MBtype = 0 or MBtype = 1 or MBtype = 2 or MBtype = 3 or MBtype > 22 then
+			mbPartIdxN := 0;
+		else
+			if MBtype = 4 or MBtype = 6 or MBtype = 8 or MBtype = 10 or MBtype = 12 or MBtype = 14 or MBtype = 16 or MBtype = 18 or MBtype = 20 then
+				if yW = 0 then
+					mbPartIdxN := 0;
+				else
+					mbPartIdxN := 1;
+				end
+			else
+				if MBtype = 5 or MBtype = 7 or MBtype = 9 or MBtype = 11 or MBtype = 13 or MBtype = 15 or MBtype = 17 or MBtype = 19 or MBtype = 21 then
+					if xW = 0 then
+						mbPartIdxN := 0;
+					else
+						mbPartIdxN := 1;
+					end
+				else
+					if MBtype = 22 then
+						mbPartIdxN := ( yW * 2 ) + xW;
+					end
+				end
+			end
+		end
+	end
+	
 	procedure GiveSubMbPartIdx(int currSubType, int xW,int yW, int mbPart)
 	begin
 		if currSubType = 0 then
@@ -2699,6 +2726,49 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		end
 	end
+	
+	procedure GiveSubMbPartIdxB(int currSubType, int xW,int yW, int mbPart)
+	begin
+		if currSubType = 0 or currSubType = 1 or currSubType = 2 or currSubType = 3 then
+			subMbPartIdxN := 0;		
+		else
+			if currSubType = 4 or currSubType = 6 or currSubType = 8 then
+				if yW = 4 or yW = 7 or yW = 12 or yW = 15 then
+					subMbPartIdxN := 1;
+				else
+					subMbPartIdxN := 0;
+				end
+			else
+				if currSubType = 5 or currSubType = 7 or currSubType = 9  then
+					if xW = 4 or xW = 7 or xW = 12 or xW = 15 then
+						subMbPartIdxN := 1;
+					else
+						subMbPartIdxN := 0;
+					end
+				else
+					if currSubType = 3 then
+						if mbPart = 0 then
+							subMbPartIdxN := (yW >> 2) * 2 + (xW >> 2);
+						else
+							if mbPart = 1 then
+								subMbPartIdxN := (yW >> 2) * 2 + ((xW -1 - 7) >> 2);
+							else	
+								if mbPart = 2 then
+									subMbPartIdxN := (((yW-1) - 7) >> 2) * 2 + (xW >> 2);
+								else
+									if mbPart = 3 then
+										subMbPartIdxN :=  ((yW - 1 - 7) >> 2) * 2 + ((xW - 1 - 7) >> 2);
+									end
+								end
+							end
+						end			
+					end
+				end
+			end
+		end
+	end
+
+	
 	
 	procedure GetCtxIdxMvd()
 	var
@@ -2750,25 +2820,65 @@ actor Algo_Synp_AVC_FREXT()
 			subMbPartIdxN := -1;
 			absMvdCompA := 0;
 		else
-			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
-						
+			if slice_type = SLICE_TYPE_P then
+				GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			else
+				GiveMbPartIdxB(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			end
+			
 			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
-				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+				if slice_type = SLICE_TYPE_P then
+					GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+				else
+					GiveSubMbPartIdxB(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+				end
 			else
 				subMbPartIdxN := 0;
 			end
 			
-			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
-				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-					predModeEqualFlagA := 0;
+			if slice_type = SLICE_TYPE_P then
+				if IS_MB_Type_P8X8(NeighMbAddr)then
+					if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false then
+						predModeEqualFlagA := 0;
+					else
+						predModeEqualFlagA := 1;
+					end
 				else
-					predModeEqualFlagA := 1;
+					if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false then
+						predModeEqualFlagA := 0;
+					else
+						predModeEqualFlagA := 1;
+					end
 				end
 			else
-				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-					predModeEqualFlagA := 0;
+				if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
+					if IS_L0 then
+						if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					else
+						if IS_SubMBPred_L1_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					end
 				else
-					predModeEqualFlagA := 1;
+					if IS_L0 then
+						if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					else
+						if IS_MBPred_L1_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					end
 				end
 			end
 			
@@ -2794,25 +2904,65 @@ actor Algo_Synp_AVC_FREXT()
 			subMbPartIdxN := -1;
 			absMvdCompB := 0;
 		else
-			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			if slice_type = SLICE_TYPE_P then
+				GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			else
+				GiveMbPartIdxB(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			end
 						
 			if IS_P_8x8_CABAC(NeighMbAddr) or IS_B_8x8_CABAC(NeighMbAddr) or IS_P_8x8ref0_CABAC(NeighMbAddr) then
-				GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+				if slice_type = SLICE_TYPE_P then
+					GiveSubMbPartIdx(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+				else
+					GiveSubMbPartIdxB(cabac_sub_mb_type[NeighMbAddr][mbPartIdxN], NeighMb_xW, NeighMb_yW, mbPartIdxN);
+				end
 			else
 				subMbPartIdxN := 0;
 			end
 			
-			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
-				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-					predModeEqualFlagB := 0;
+			if slice_type = SLICE_TYPE_P then
+				if IS_MB_Type_P8X8(NeighMbAddr)then
+					if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false then
+						predModeEqualFlagB := 0;
+					else
+						predModeEqualFlagB := 1;
+					end
 				else
-					predModeEqualFlagB := 1;
+					if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false then
+						predModeEqualFlagB := 0;
+					else
+						predModeEqualFlagB := 1;
+					end
 				end
 			else
-				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-					predModeEqualFlagB := 0;
+				if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
+					if IS_L0 then
+						if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagB := 0;
+						else
+							predModeEqualFlagB := 1;
+						end
+					else
+						if IS_SubMBPred_L1_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagB := 0;
+						else
+							predModeEqualFlagB := 1;
+						end
+					end
 				else
-					predModeEqualFlagB := 1;
+					if IS_L0 then
+						if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					else
+						if IS_MBPred_L1_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					end
 				end
 			end
 			
@@ -2888,7 +3038,11 @@ actor Algo_Synp_AVC_FREXT()
 			mbPartIdxN    := -1;
 			condTermFlagA := 0;
 		else
-			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			if slice_type = SLICE_TYPE_P then
+				GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			else
+				GiveMbPartIdxB(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			end
 			//Give refIdxZeroFlagX value
 			if IS_L0 then
 				refIdxZeroFlagA := if Ref_Idx_L0[NeighMbAddr][mbPartIdxN] > 0 then 0 else 1 end;
@@ -2909,6 +3063,53 @@ actor Algo_Synp_AVC_FREXT()
 					predModeEqualFlagA := 1;
 				end
 			end
+			
+			if slice_type = SLICE_TYPE_P then
+				if IS_MB_Type_P8X8(NeighMbAddr)then
+					if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false then
+						predModeEqualFlagA := 0;
+					else
+						predModeEqualFlagA := 1;
+					end
+				else
+					if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false then
+						predModeEqualFlagA := 0;
+					else
+						predModeEqualFlagA := 1;
+					end
+				end
+			else
+				if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
+					if IS_L0 then
+						if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					else
+						if IS_SubMBPred_L1_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					end
+				else
+					if IS_L0 then
+						if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					else
+						if IS_MBPred_L1_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					end
+				end
+			end
+			
 			if IS_P_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or 
 			   IS_Intra_Pred_CABAC(NeighMbAddr) or predModeEqualFlagA = 0 or refIdxZeroFlagA = 1 then
 				condTermFlagA := 0;
@@ -2927,7 +3128,11 @@ actor Algo_Synp_AVC_FREXT()
 			mbPartIdxN    := -1;
 			condTermFlagB := 0;
 		else
-			GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			if slice_type = SLICE_TYPE_P then
+				GiveMbPartIdx(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			else
+				GiveMbPartIdxB(mbTab[NeighMbAddr][mbTabMbtype], NeighMb_xW >> 3, NeighMb_yW >> 3);
+			end
 			//Give refIdxZeroFlagX value
 			if IS_L0 then
 				refIdxZeroFlagB := if Ref_Idx_L0[NeighMbAddr][mbPartIdxN] > 0 then 0 else 1 end;
@@ -2935,17 +3140,49 @@ actor Algo_Synp_AVC_FREXT()
 				refIdxZeroFlagB := if Ref_Idx_L1[NeighMbAddr][mbPartIdxN] > 0 then 0 else 1 end;
 			end
 					
-			if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
-				if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-					predModeEqualFlagB := 0;
+			if slice_type = SLICE_TYPE_P then
+				if IS_MB_Type_P8X8(NeighMbAddr)then
+					if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false then
+						predModeEqualFlagB := 0;
+					else
+						predModeEqualFlagB := 1;
+					end
 				else
-					predModeEqualFlagB := 1;
+					if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false then
+						predModeEqualFlagB := 0;
+					else
+						predModeEqualFlagB := 1;
+					end
 				end
 			else
-				if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
-					predModeEqualFlagB := 0;
+				if IS_MB_Type_P8X8(NeighMbAddr) or IS_MB_Type_B8X8(NeighMbAddr) then
+					if IS_L0 then
+						if IS_SubMBPred_L0_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagB := 0;
+						else
+							predModeEqualFlagB := 1;
+						end
+					else
+						if IS_SubMBPred_L1_CABAC(mbPartIdxN, NeighMbAddr) = false and IS_SubMBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagB := 0;
+						else
+							predModeEqualFlagB := 1;
+						end
+					end
 				else
-					predModeEqualFlagB := 1;
+					if IS_L0 then
+						if IS_MBPred_L0_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					else
+						if IS_MBPred_L1_CABAC(mbPartIdxN,NeighMbAddr) = false and IS_MBBiPred_CABAC(mbPartIdxN, NeighMbAddr) = false then
+							predModeEqualFlagA := 0;
+						else
+							predModeEqualFlagA := 1;
+						end
+					end
 				end
 			end
 			if IS_P_Skip_CABAC(NeighMbAddr) or IS_B_Skip_CABAC(NeighMbAddr) or 
@@ -3536,6 +3773,7 @@ actor Algo_Synp_AVC_FREXT()
 					Bbits := ( Bbits << 1) | binVal;
 					CabacValue := Bbits - 4;
 					binValDecoded := false;
+					FoundSE := true;
 				end
 			end
 			
@@ -6920,25 +7158,66 @@ end
 	end
 
 	function IS_MBPred_L0_CABAC(uint(size=1) x, int mbAddr) --> bool : 
-		if mbTab[mbAddr][2] > 3 then
-			false
+		if slice_type = SLICE_TYPE_P then
+			if mbTab[mbAddr][2] > 3 then
+				false
+			else
+				if mbAddr < 0 then 
+					false 
+				else 
+					MbPartPredModeCABAC(x, mbAddr) = 0 
+				end 
+			end
 		else
-			if mbAddr < 0 then 
-				false 
-			else 
-				MbPartPredModeCABAC(x, mbAddr) = 0 
-			end 
+			if mbTab[mbAddr][2] > 22  then
+				false
+			else
+				if mbAddr < 0 then 
+					false 
+				else 
+					MbPartPredModeCABAC(x, mbAddr) = 0 
+				end 
+			end
 		end
 	end
-	function IS_MBBiPred_CABAC(uint(size=1) x, int mbAddr) --> bool : 
-		if mbTab[mbAddr][2] > 3 then
-			false
+	
+	function IS_MBPred_L1_CABAC(uint(size=1) x, int mbAddr) --> bool : 
+		if slice_type = SLICE_TYPE_P then
+			if mbTab[mbAddr][2] > 3 then
+				false
+			else
+				if mbAddr < 0 then 
+					false 
+				else 
+					MbPartPredModeCABAC(x, mbAddr) = 1 
+				end 
+			end
 		else
-			if mbAddr < 0 then 
-				false 
-			else 
-				MbPartPredModeCABAC(x, mbAddr) = 2 
-			end 
+			if mbTab[mbAddr][2] > 22  then
+				false
+			else
+				if mbAddr < 0 then 
+					false 
+				else 
+					MbPartPredModeCABAC(x, mbAddr) = 1 
+				end 
+			end
+		end
+	end
+	
+	function IS_MBBiPred_CABAC(uint(size=1) x, int mbAddr) --> bool : 
+		if slice_type = SLICE_TYPE_B then
+			if mbTab[mbAddr][2] > 23 then
+				false
+			else
+				if mbAddr < 0 then 
+					false 
+				else 
+					MbPartPredModeCABAC(x, mbAddr) = 2 
+				end 
+			end
+		else
+			false
 		end
 	end
 
@@ -7324,6 +7603,7 @@ end
 
 	function SubMbPredMode_CABAC(int x, int mbAddr) --> uint(size=3) : if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then P_tab_sub[cabac_sub_mb_type[mbAddr][x]][3] else if slice_type = SLICE_TYPE_B then B_tab_sub[cabac_sub_mb_type[mbAddr][x]][3] else 7 end end end
 	function IS_SubMBPred_L0_CABAC(int x, int mbAddr) --> bool : SubMbPredMode_CABAC(x, mbAddr) = 0 end
+	function IS_SubMBPred_L1_CABAC(int x, int mbAddr) --> bool : SubMbPredMode_CABAC(x, mbAddr) = 1 end
 	function IS_SubMBBiPred_CABAC(int x, int mbAddr)  --> bool : SubMbPredMode_CABAC(x, mbAddr) = 2 end
 
 
