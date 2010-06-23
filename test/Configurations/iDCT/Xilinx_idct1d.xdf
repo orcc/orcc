@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Xilinx_idct1d">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="X0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="X1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ROW">
+        <Type name="bool"/>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Y0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Y1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Y2">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Y3">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="scale">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_scale"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="combine">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_combine"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="shufflefly">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_shuffleFly"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="shuffle">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_shuffle"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="final">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/iDCT/Xilinx_final"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="scale" dst-port="X0" src="" src-port="X0"/>
+    <Connection dst="scale" dst-port="X1" src="" src-port="X1"/>
+    <Connection dst="combine" dst-port="ROW" src="" src-port="ROW"/>
+    <Connection dst="combine" dst-port="X0" src="scale" src-port="Y0"/>
+    <Connection dst="combine" dst-port="X1" src="scale" src-port="Y1"/>
+    <Connection dst="combine" dst-port="X2" src="scale" src-port="Y2"/>
+    <Connection dst="combine" dst-port="X3" src="scale" src-port="Y3"/>
+    <Connection dst="shufflefly" dst-port="X0" src="combine" src-port="Y0"/>
+    <Connection dst="shufflefly" dst-port="X1" src="combine" src-port="Y1"/>
+    <Connection dst="shuffle" dst-port="X0" src="shufflefly" src-port="Y0"/>
+    <Connection dst="shuffle" dst-port="X1" src="shufflefly" src-port="Y1"/>
+    <Connection dst="shuffle" dst-port="X2" src="shufflefly" src-port="Y2"/>
+    <Connection dst="shuffle" dst-port="X3" src="shufflefly" src-port="Y3"/>
+    <Connection dst="final" dst-port="X0" src="shuffle" src-port="Y0"/>
+    <Connection dst="final" dst-port="X1" src="shuffle" src-port="Y1"/>
+    <Connection dst="final" dst-port="X2" src="shuffle" src-port="Y2"/>
+    <Connection dst="final" dst-port="X3" src="shuffle" src-port="Y3"/>
+    <Connection dst="" dst-port="Y0" src="final" src-port="Y0"/>
+    <Connection dst="" dst-port="Y1" src="final" src-port="Y1"/>
+    <Connection dst="" dst-port="Y2" src="final" src-port="Y2"/>
+    <Connection dst="" dst-port="Y3" src="final" src-port="Y3"/>
+</XDF>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="IN" x="57" y="305"/>
+      <vertex id="SIGNED" x="676" y="70"/>
+      <vertex id="OUT" x="910" y="135"/>
+      <vertex id="rowsort" x="148" y="287"/>
+      <vertex id="fairmerge" x="270" y="269"/>
+      <vertex id="downsample" x="414" y="124"/>
+      <vertex id="idct1d" x="414" y="235"/>
+      <vertex id="sep" x="553" y="163"/>
+      <vertex id="trans" x="676" y="328"/>
+      <vertex id="retrans" x="676" y="163"/>
+      <vertex id="clip" x="793" y="117"/>
+   </vertices>
+</layout>
