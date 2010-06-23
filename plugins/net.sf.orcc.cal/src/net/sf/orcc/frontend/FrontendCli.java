@@ -124,9 +124,11 @@ public class FrontendCli {
 				new CancelIndicator.NullImpl());
 
 		for (Issue issue : issues) {
-			System.err.println(issue.toString());
 			if (issue.getSeverity() == Severity.ERROR) {
+				System.err.println(issue.toString());
 				hasErrors = true;
+			} else {
+				System.out.println(issue.toString());
 			}
 		}
 

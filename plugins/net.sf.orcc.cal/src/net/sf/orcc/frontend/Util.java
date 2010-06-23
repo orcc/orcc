@@ -51,7 +51,11 @@ public class Util {
 	 */
 	public static Location getLocation(EObject object) {
 		CompositeNode node = NodeUtil.getNode(object);
-		return new Location(node.getLine(), 0, node.getLength());
+		if (node == null) {
+			return new Location();
+		} else {
+			return new Location(node.getLine(), 0, node.getLength());
+		}
 	}
 
 }

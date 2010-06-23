@@ -66,23 +66,17 @@ public class TypeTransformer extends VoidSwitch {
 	@Override
 	public Void caseAstInputPattern(AstInputPattern input) {
 		AstPort port = input.getPort();
-
 		doSwitch(port);
 
-		// number of repeats
-		int repeat;
-
 		// type of each token
-		Type type;
+		Type type = (Type) port.getIrType();
 
 		// repeat equals to 1 when absent
 		AstExpression astRepeat = input.getRepeat();
-		if (astRepeat == null) {
-			repeat = 1;
-			type = (Type) port.getIrType();
-		} else {
-			repeat = new AstExpressionEvaluator().evaluateAsInteger(astRepeat);
-			type = new ListType(repeat, (Type) port.getIrType());
+		if (astRepeat != null) {
+			int repeat = new AstExpressionEvaluator()
+					.evaluateAsInteger(astRepeat);
+			type = new ListType(repeat, type);
 		}
 
 		for (AstVariable token : input.getTokens()) {

@@ -59,11 +59,9 @@ import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstTag;
-import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
-import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.Action;
@@ -72,6 +70,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
@@ -80,13 +79,18 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
@@ -153,7 +157,7 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionString(AstExpressionString expression) {
-			return new IntExpr(42);
+			return new StringExpr(expression.getValue());
 		}
 
 		@Override
@@ -164,7 +168,11 @@ public class AstTransformer {
 		@Override
 		public Expression caseAstExpressionVariable(
 				AstExpressionVariable expression) {
-			return new IntExpr(42);
+			AstVariable variable = expression.getValue().getVariable();
+			Location location = Util.getLocation(expression);
+			Use use = new Use(variablesMap.get(variable));
+			Expression varExpr = new VarExpr(location, use);
+			return varExpr;
 		}
 
 	}
@@ -190,21 +198,41 @@ public class AstTransformer {
 					.getIndexes());
 			Expression value = transformExpression(astAssign.getValue());
 
-			List<CFGNode> nodes = procedure.getNodes();
-			BlockNode node = BlockNode.getLast(procedure, nodes);
+			// add assign or store instruction
+			Instruction instruction;
 			if (indexes.isEmpty() && !target.isGlobal()) {
 				LocalVariable local = (LocalVariable) target;
-				Assign assign = new Assign(location, local, value);
-				node.add(assign);
+				instruction = new Assign(location, local, value);
 			} else {
-				// create a store
+				instruction = new Store(location, target, indexes, value);
 			}
+			addInstruction(instruction);
 
 			return null;
 		}
 
 		@Override
-		public Void caseAstStatementCall(AstStatementCall call) {
+		public Void caseAstStatementCall(AstStatementCall astCall) {
+			Location location = Util.getLocation(astCall);
+
+			// retrieve IR procedure
+			AstProcedure astProcedure = astCall.getProcedure();
+			if (!proceduresMap.containsKey(astProcedure)) {
+				Procedure current = procedure;
+				transformProcedure(astProcedure);
+				procedure = current;
+			}
+
+			Procedure procedure = proceduresMap.get(astCall.getProcedure());
+
+			// transform parameters
+			List<Expression> parameters = transformExpressions(astCall
+					.getParameters());
+
+			// add call
+			Call call = new Call(location, null, procedure, parameters);
+			addInstruction(call);
+
 			return null;
 		}
 
@@ -215,6 +243,15 @@ public class AstTransformer {
 
 		@Override
 		public Void caseAstStatementIf(AstStatementIf stmtIf) {
+			Expression condition = transformExpression(stmtIf.getCondition());
+
+			transformStatements(stmtIf.getThen());
+			transformStatements(stmtIf.getElse());
+			IfNode node = new IfNode(procedure, condition,
+					new ArrayList<CFGNode>(0), new ArrayList<CFGNode>(0),
+					new BlockNode(procedure));
+			procedure.getNodes().add(node);
+
 			return null;
 		}
 
@@ -258,6 +295,11 @@ public class AstTransformer {
 	private Procedure procedure;
 
 	/**
+	 * the list of procedures of the IR actor.
+	 */
+	private OrderedMap<Procedure> procedures;
+
+	/**
 	 * A map from AST procedures to IR procedures.
 	 */
 	final private Map<AstProcedure, Procedure> proceduresMap;
@@ -266,11 +308,6 @@ public class AstTransformer {
 	 * statement transformer.
 	 */
 	final private StatementTransformer stmtTransformer;
-
-	/**
-	 * type transformer.
-	 */
-	final private TypeTransformer typeTransformer;
 
 	/**
 	 * A map from AST variables to IR variables.
@@ -289,8 +326,6 @@ public class AstTransformer {
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
-
-		typeTransformer = new TypeTransformer();
 	}
 
 	/**
@@ -358,34 +393,36 @@ public class AstTransformer {
 			Port port = portMap.get(pattern.getPort());
 			List<AstVariable> tokens = pattern.getTokens();
 
-			// number of repeats
-			int repeat;
-
-			// type of each token
-			Type type;
-
-			// repeat equals to 1 when absent
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat == null) {
-				repeat = 1;
-				type = port.getType();
-			} else {
-				repeat = new AstExpressionEvaluator()
-						.evaluateAsInteger(astRepeat);
-				type = new ListType(repeat, port.getType());
-			}
-
 			// declare tokens
 			for (AstVariable token : tokens) {
-				LocalVariable local = transformLocalVariable(token, type);
+				LocalVariable local = transformLocalVariable(token);
 				procedure.getLocals().add(file, local.getLocation(),
 						local.getName(), local);
 			}
 
-			// set port consumption
-			int totalConsumption = repeat * tokens.size();
+			// evaluates token consumption
+			int totalConsumption = tokens.size();
+
+			AstExpression astRepeat = pattern.getRepeat();
+			if (astRepeat != null) {
+				int repeat = new AstExpressionEvaluator()
+						.evaluateAsInteger(astRepeat);
+				totalConsumption *= repeat;
+			}
+
 			inputPattern.put(port, totalConsumption);
 		}
+	}
+
+	/**
+	 * Adds the given instruction to the last block of the current procedure.
+	 * 
+	 * @param instruction
+	 *            an instruction
+	 */
+	private void addInstruction(Instruction instruction) {
+		BlockNode block = BlockNode.getLast(procedure, procedure.getNodes());
+		block.add(instruction);
 	}
 
 	/**
@@ -401,19 +438,25 @@ public class AstTransformer {
 		this.file = file;
 
 		String name = astActor.getName();
-		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
-
 		try {
+			// parameters
+			OrderedMap<Variable> parameters = transformGlobalVariables(astActor
+					.getParameters());
+
 			// first state variables, because port's sizes may depend on them.
-			OrderedMap<Variable> stateVars = transformStateVariables(astActor
+			OrderedMap<Variable> stateVars = transformGlobalVariables(astActor
 					.getStateVariables());
 			OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
 			OrderedMap<Port> outputs = transformPorts(astActor.getOutputs());
 
 			// transforms functions and procedures
-			OrderedMap<Procedure> procedures = new OrderedMap<Procedure>();
-			transformFunctions(astActor.getFunctions(), procedures);
-			transformProcedures(astActor.getProcedures(), procedures);
+			procedures = new OrderedMap<Procedure>();
+			for (AstFunction astFunction : astActor.getFunctions()) {
+				transformFunction(astFunction);
+			}
+			for (AstProcedure astProcedure : astActor.getProcedures()) {
+				transformProcedure(astProcedure);
+			}
 
 			// transform actions
 			ActionList actions = transformActions(astActor.getActions());
@@ -558,42 +601,75 @@ public class AstTransformer {
 		return irExpressions;
 	}
 
-	private void transformFunctions(List<AstFunction> astFunctions,
-			OrderedMap<Procedure> procedures) {
-		for (AstFunction astFunction : astFunctions) {
-			String name = astFunction.getName();
-			Location location = Util.getLocation(astFunction);
-			Type type = transformType(astFunction.getType());
+	/**
+	 * Transforms the given AST function to an IR procedure, and adds it to the
+	 * IR procedure list {@link #procedures} and to the map
+	 * {@link #functionsMap}.
+	 * 
+	 * @param astFunction
+	 *            an AST function
+	 */
+	private void transformFunction(AstFunction astFunction) {
+		String name = astFunction.getName();
+		Location location = Util.getLocation(astFunction);
+		Type type = (Type) astFunction.getIrType();
 
-			// sets the current procedure
-			procedure = new Procedure(name, location, type);
+		// sets the current procedure
+		procedure = new Procedure(name, location, type);
 
-			transformParameters(astFunction.getParameters());
-			transformLocalVariables(astFunction.getVariables());
-			transformExpression(astFunction.getExpression());
+		transformParameters(astFunction.getParameters());
+		transformLocalVariables(astFunction.getVariables());
+		transformExpression(astFunction.getExpression());
 
-			procedures.add(file, location, name, procedure);
-
-			functionsMap.put(astFunction, procedure);
-		}
+		procedures.add(file, location, name, procedure);
+		functionsMap.put(astFunction, procedure);
 	}
 
 	/**
-	 * Transforms the given AST variable to an IR variable that has the name of
-	 * <code>astVariable</code> and the given type. A binding is added to the
+	 * Transforms AST state variables to IR state variables. The initial value
+	 * of an AST state variable is evaluated to a constant by
+	 * {@link #exprEvaluator}.
+	 * 
+	 * @param stateVariables
+	 *            a list of AST state variables
+	 * @return an ordered map of IR state variables
+	 */
+	private OrderedMap<Variable> transformGlobalVariables(
+			List<AstVariable> stateVariables) {
+		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
+		for (AstVariable astVariable : stateVariables) {
+			Location location = Util.getLocation(astVariable);
+			Type type = (Type) astVariable.getIrType();
+			String name = astVariable.getName();
+			boolean assignable = !astVariable.isConstant();
+
+			// initial value (if any) has been computed by validator
+			Object initialValue = astVariable.getInitialValue();
+
+			StateVariable stateVariable = new StateVariable(location, type,
+					name, assignable, initialValue);
+			stateVars.add(file, location, name, stateVariable);
+
+			variablesMap.put(astVariable, stateVariable);
+		}
+
+		return stateVars;
+	}
+
+	/**
+	 * Transforms the given AST variable to an IR variable that has the name and
+	 * type of <code>astVariable</code>. A binding is added to the
 	 * {@link #variablesMap} between astVariable and the created local variable.
 	 * 
 	 * @param astVariable
 	 *            an AST variable
-	 * @param type
-	 *            an IR type
 	 * @return the IR local variable created
 	 */
-	private LocalVariable transformLocalVariable(AstVariable astVariable,
-			Type type) {
+	private LocalVariable transformLocalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 		String name = astVariable.getName();
 		boolean assignable = !astVariable.isConstant();
+		Type type = (Type) astVariable.getIrType();
 
 		LocalVariable local = new LocalVariable(assignable, 0, location, name,
 				null, type);
@@ -601,8 +677,8 @@ public class AstTransformer {
 		AstExpression value = astVariable.getValue();
 		if (value != null) {
 			Expression expression = transformExpression(value);
-			// TODO assign to target variable
-			String.valueOf(expression);
+			Assign assign = new Assign(location, local, expression);
+			addInstruction(assign);
 		}
 
 		variablesMap.put(astVariable, local);
@@ -618,8 +694,7 @@ public class AstTransformer {
 	 */
 	private void transformLocalVariables(List<AstVariable> variables) {
 		for (AstVariable astVariable : variables) {
-			Type type = transformType(astVariable.getType());
-			LocalVariable local = transformLocalVariable(astVariable, type);
+			LocalVariable local = transformLocalVariable(astVariable);
 			procedure.getLocals().add(file, local.getLocation(),
 					local.getName(), local);
 		}
@@ -634,8 +709,7 @@ public class AstTransformer {
 	 */
 	private void transformParameters(List<AstVariable> parameters) {
 		for (AstVariable astParameter : parameters) {
-			Type type = transformType(astParameter.getType());
-			LocalVariable local = transformLocalVariable(astParameter, type);
+			LocalVariable local = transformLocalVariable(astParameter);
 			procedure.getParameters().add(file, local.getLocation(),
 					local.getName(), local);
 		}
@@ -650,34 +724,38 @@ public class AstTransformer {
 	 */
 	private OrderedMap<Port> transformPorts(List<AstPort> portList) {
 		OrderedMap<Port> ports = new OrderedMap<Port>();
-		for (AstPort aPort : portList) {
-			Location location = Util.getLocation(aPort);
-			Type type = transformType(aPort.getType());
-			Port port = new Port(location, type, aPort.getName());
-			portMap.put(aPort, port);
+		for (AstPort astPort : portList) {
+			Location location = Util.getLocation(astPort);
+			Type type = (Type) astPort.getIrType();
+			Port port = new Port(location, type, astPort.getName());
+			portMap.put(astPort, port);
 			ports.add(file, location, port.getName(), port);
 		}
 
 		return ports;
 	}
 
-	private void transformProcedures(List<AstProcedure> astProcedures,
-			OrderedMap<Procedure> procedures) {
-		for (AstProcedure astProcedure : astProcedures) {
-			String name = astProcedure.getName();
-			Location location = Util.getLocation(astProcedure);
+	/**
+	 * Transforms the given AST procedure to an IR procedure, and adds it to the
+	 * IR procedure list {@link #procedures} and to the map
+	 * {@link #proceduresMap}.
+	 * 
+	 * @param astProcedure
+	 *            an AST procedure
+	 */
+	private void transformProcedure(AstProcedure astProcedure) {
+		String name = astProcedure.getName();
+		Location location = Util.getLocation(astProcedure);
 
-			// sets the current procedure
-			procedure = new Procedure(name, location, new VoidType());
+		// sets the current procedure
+		procedure = new Procedure(name, location, new VoidType());
 
-			transformParameters(astProcedure.getParameters());
-			transformLocalVariables(astProcedure.getVariables());
-			transformStatements(astProcedure.getStatements());
+		transformParameters(astProcedure.getParameters());
+		transformLocalVariables(astProcedure.getVariables());
+		transformStatements(astProcedure.getStatements());
 
-			procedures.add(file, location, name, procedure);
-
-			proceduresMap.put(astProcedure, procedure);
-		}
+		procedures.add(file, location, name, procedure);
+		proceduresMap.put(astProcedure, procedure);
 	}
 
 	/**
@@ -702,57 +780,6 @@ public class AstTransformer {
 		for (AstStatement statement : statements) {
 			transformStatement(statement);
 		}
-	}
-
-	/**
-	 * Transforms AST state variables to IR state variables. The initial value
-	 * of an AST state variable is evaluated to a constant by
-	 * {@link #exprEvaluator}.
-	 * 
-	 * @param stateVariables
-	 *            a list of AST state variables
-	 * @return an ordered map of IR state variables
-	 */
-	private OrderedMap<Variable> transformStateVariables(
-			List<AstVariable> stateVariables) {
-		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
-		for (AstVariable astVariable : stateVariables) {
-			Location location = Util.getLocation(astVariable);
-			Type type = transformType(astVariable.getType());
-			String name = astVariable.getName();
-			boolean assignable = !astVariable.isConstant();
-
-			// evaluate initial value (if any)
-			AstExpression astValue = astVariable.getValue();
-			Object initialValue;
-			if (astValue == null) {
-				initialValue = null;
-			} else {
-				initialValue = new AstExpressionEvaluator().evaluate(astValue);
-
-				// register the value
-				astVariable.setInitialValue(initialValue);
-			}
-
-			StateVariable stateVariable = new StateVariable(location, type,
-					name, assignable, initialValue);
-			stateVars.add(file, location, name, stateVariable);
-
-			variablesMap.put(astVariable, stateVariable);
-		}
-
-		return stateVars;
-	}
-
-	/**
-	 * Transforms the given AST type to an IR type.
-	 * 
-	 * @param type
-	 *            an AST type
-	 * @return an IR type
-	 */
-	private Type transformType(AstType type) {
-		return typeTransformer.doSwitch(type);
 	}
 
 }
