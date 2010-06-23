@@ -1,5 +1,4 @@
 BinOp ::= [
-	"PLUS":"$add",
 	"BITAND":"bitand",
 	"BITOR":"bitor",
 	"BITXOR":"bitxor",
@@ -140,19 +139,10 @@ $else$
 $endif$
 >>
 
-literals(expr) ::= <<
-$if (expr.intExpr)$
-<operation kind="\$literal_integers" value=$expr.value$>
-</operation>
-$endif$
->>
-
-
 Store(op) ::= <<
 $if (op.target.global)$
-$! TODO !$
-$op.indexes: literals()$
 <operation kind="assign" target="$op.target$">
+	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
 	$port(dir="in", source=op.value.var)$
 </operation>
 $else$
@@ -169,8 +159,14 @@ $if (op.value.binaryExpr)$
 	$port(dir="in", source=op.value.e1)$
 	$port(dir="in", source=op.value.e2)$
 	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>$else$<operation kind="$UnaryOp.(op.value.op)$">
+</operation>
+$elseif (op.value.unaryExpr)$
+<operation kind="$UnaryOp.(op.value.op)$">
 	$port(dir="in", source=op.value.expr)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+$elseif (op.value.intExpr)$
+<operation kind="\$literal_integers" value="$op.value$">
 	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>
 $endif$
@@ -332,27 +328,6 @@ actionCall(action) ::= <<
 >>
 
 actionTest(action) ::= <<
-$procedure(action.scheduler)$
-<module kind="if">
-	<module decision="isSchedulable_$action$" kind="test">
-		<operation kind="noop">
-			<port dir="in" source="isSchedulable_$action$_go"/>
-			<port dir="out" size="1" source="isSchedulable_$action$" typeName="bool"/>
-		</operation>
-	</module>
-	<module kind="then">
-		$if(action.outputPattern)$
-		$outputPattern(pattern=action.outputPattern)$
-			<module kind="then">
-				$actionCall(action)$
-			</module>
-		</module>
-		$else$
-		$actionCall(action)$
-		$endif$
-	</module>
-	<module kind="else"/>
-</module>
 >>
 
 schedulingTest(actions) ::= <<
@@ -388,29 +363,6 @@ actionCallState(nextState) ::= <<
 >>
 
 actionTestState(nextState) ::= <<
-$procedure(nextState.action.scheduler)$
-<module kind="if">
-	<module decision="isSchedulable_$nextState.action$" kind="test">
-		<operation kind="noop">
-			<port dir="in" source="isSchedulable_$nextState.action$_go"/>
-			<port dir="out" size="1" source="isSchedulable_$nextState.action$" typeName="bool"/>
-		</operation>
-	</module>
-	<module kind="then">
-		$if(nextState.action.outputPattern)$
-		$outputPattern(pattern=nextState.action.outputPattern)$
-			<module kind="then">
-				$actionCall(nextState.action)$
-				$actionCallState(nextState)$
-			</module>
-		</module>
-		$else$
-		$actionCall(nextState.action)$
-		$actionCallState(nextState)$
-		$endif$
-	</module>
-	<module kind="else"/>
-</module>
 >>
 
 schedulingTestState(nextStates) ::= <<
