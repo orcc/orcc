@@ -90,6 +90,7 @@ import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.type.BoolType;
@@ -360,66 +361,13 @@ public class AstTransformer {
 		stmtTransformer = new StatementTransformer();
 	}
 
-	/**
-	 * Adds a read to the current {@link #procedure}'s node list.
-	 * 
-	 * @param port
-	 *            a port
-	 * @param numTokens
-	 *            number of tokens
-	 */
-	private LocalVariable actionAddRead(Port port, int numTokens) {
-		// create the variable to hold the tokens
-		LocalVariable target = new LocalVariable(true, 0,
-				procedure.getLocation(), port.getName(), null, new ListType(
-						numTokens, port.getType()));
-		procedure.getLocals().add(file, target.getLocation(), target.getName(),
-				target);
-
-		// add the read
-		BlockNode block = BlockNode.getLast(procedure);
-		Read read = new Read(port, numTokens, target);
-		block.add(read);
-
-		return target;
-	}
-
-	/**
-	 * Adds writes to the current {@link #procedure}'s node list. The number of
-	 * tokens to write on each port is stored in the given IR output pattern.
-	 * This method also reorganizes tokens if necessary (in cases such as [a, b]
-	 * repeat 3).
-	 * 
-	 * @param astAction
-	 *            the AST action
-	 * @param outputPattern
-	 *            the IR output pattern
-	 */
-	private void actionAddWrites(AstAction astAction, Pattern outputPattern) {
-		// TODO add writes to the "nodes" node list
-	}
-
 	private void actionFillIsSchedulable(AstAction astAction,
 			Procedure scheduler) {
 		// TODO fill is schedulable function
 	}
 
 	/**
-	 * Fills the IR output pattern from the list of AST output patterns.
-	 * 
-	 * @param outputs
-	 *            a list of AST output patterns, where an output pattern
-	 *            contains a list of expressions and possibly a repeat clause.
-	 * @param outputPattern
-	 *            target IR output pattern
-	 */
-	private void actionFillOutputPattern(List<AstOutputPattern> outputs,
-			Pattern outputPattern) {
-		// TODO fill output pattern
-	}
-
-	/**
-	 * Fills tokens from the data that was read and put in portVariable.
+	 * Loads tokens from the data that was read and put in portVariable.
 	 * 
 	 * @param portVariable
 	 *            a local array that contains data.
@@ -429,7 +377,7 @@ public class AstTransformer {
 	 *            an integer number of repeat (equals to one if there is no
 	 *            repeat)
 	 */
-	private void actionFillTokens(LocalVariable portVariable,
+	private void actionLoadTokens(LocalVariable portVariable,
 			List<AstVariable> tokens, int repeat) {
 		if (repeat == 1) {
 			BlockNode block = BlockNode.getLast(procedure);
@@ -450,6 +398,38 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Assigns tokens to the data that will be written.
+	 * 
+	 * @param portVariable
+	 *            a local array that will contain data.
+	 * @param values
+	 *            a list of AST expressions
+	 * @param repeat
+	 *            an integer number of repeat (equals to one if there is no
+	 *            repeat)
+	 */
+	private void actionStoreTokens(LocalVariable portVariable,
+			List<AstExpression> values, int repeat) {
+		if (repeat == 1) {
+			BlockNode block = BlockNode.getLast(procedure);
+			int i = 0;
+
+			for (AstExpression expression : values) {
+				List<Expression> indexes = new ArrayList<Expression>(1);
+				indexes.add(new IntExpr(i));
+
+				Expression value = transformExpression(expression);
+				Store store = new Store(portVariable, indexes, value);
+				block.add(store);
+
+				i++;
+			}
+		} else {
+			// TODO when repeat is greater than one
+		}
+	}
+
+	/**
 	 * Adds the given instruction to the last block of the current procedure.
 	 * 
 	 * @param instruction
@@ -458,6 +438,26 @@ public class AstTransformer {
 	private void addInstruction(Instruction instruction) {
 		BlockNode block = BlockNode.getLast(procedure);
 		block.add(instruction);
+	}
+
+	/**
+	 * Creates a variable to hold the number of tokens on the given port.
+	 * 
+	 * @param port
+	 *            a port
+	 * @param numTokens
+	 *            number of tokens
+	 * @return the local array created
+	 */
+	private LocalVariable createPortVariable(Port port, int numTokens) {
+		// create the variable to hold the tokens
+		LocalVariable target = new LocalVariable(true, 0,
+				procedure.getLocation(), port.getName(), null, new ListType(
+						numTokens, port.getType()));
+		procedure.getLocals().add(file, target.getLocation(), target.getName(),
+				target);
+
+		return target;
 	}
 
 	/**
@@ -521,11 +521,12 @@ public class AstTransformer {
 					initializes.getAllActions(), scheduler);
 		} finally {
 			// cleanup
-			portMap.clear();
-
-			variablesMap.clear();
-			proceduresMap.clear();
 			functionsMap.clear();
+			portMap.clear();
+			procedure = null;
+			procedures.clear();
+			proceduresMap.clear();
+			variablesMap.clear();
 		}
 	}
 
@@ -546,8 +547,6 @@ public class AstTransformer {
 	 */
 	private void transformAction(AstAction astAction, Pattern inputPattern,
 			Pattern outputPattern, Procedure scheduler, Procedure body) {
-		actionFillOutputPattern(astAction.getOutputs(), outputPattern);
-
 		actionFillIsSchedulable(astAction, scheduler);
 
 		// current procedure is the body
@@ -556,7 +555,7 @@ public class AstTransformer {
 		transformInputPattern(astAction, inputPattern);
 		transformLocalVariables(astAction.getVariables());
 		transformStatements(astAction.getStatements());
-		actionAddWrites(astAction, outputPattern);
+		transformOutputPattern(astAction, outputPattern);
 	}
 
 	/**
@@ -691,12 +690,11 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Transforms the given list of AST input patterns as local variables and
-	 * fills the target IR input pattern.
+	 * Transforms the AST input patterns of the given action as local variables,
+	 * fills the target IR input pattern, adds reads and assigns tokens.
 	 * 
-	 * @param astInputPattern
-	 *            a list of AST input patterns, where an AST input patterns
-	 *            contains a list of tokens and possibly a repeat clause.
+	 * @param astAction
+	 *            an AST action
 	 * @param inputPattern
 	 *            target IR input pattern
 	 */
@@ -717,8 +715,13 @@ public class AstTransformer {
 			}
 			inputPattern.put(port, totalConsumption);
 
-			// add read
-			LocalVariable variable = actionAddRead(port, totalConsumption);
+			// create port variable
+			LocalVariable variable = createPortVariable(port, totalConsumption);
+
+			// add the read
+			BlockNode block = BlockNode.getLast(procedure);
+			Read read = new Read(port, totalConsumption, variable);
+			block.add(read);
 
 			// declare tokens
 			for (AstVariable token : tokens) {
@@ -727,8 +730,8 @@ public class AstTransformer {
 						local.getName(), local);
 			}
 
-			// fill tokens
-			actionFillTokens(variable, tokens, repeat);
+			// loads tokens
+			actionLoadTokens(variable, tokens, repeat);
 		}
 	}
 
@@ -773,6 +776,47 @@ public class AstTransformer {
 			LocalVariable local = transformLocalVariable(astVariable);
 			procedure.getLocals().add(file, local.getLocation(),
 					local.getName(), local);
+		}
+	}
+
+	/**
+	 * Transforms the AST output patterns of the given action as expressions and
+	 * possibly statements, fills the target IR output pattern, assigns tokens
+	 * and adds writes.
+	 * 
+	 * @param astAction
+	 *            an AST action
+	 * @param outputPattern
+	 *            target IR output pattern
+	 */
+	private void transformOutputPattern(AstAction astAction,
+			Pattern outputPattern) {
+		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
+		for (AstOutputPattern pattern : astOutputPattern) {
+			Port port = portMap.get(pattern.getPort());
+			List<AstExpression> values = pattern.getValues();
+
+			// evaluates token consumption
+			int totalConsumption = values.size();
+			int repeat = 1;
+			AstExpression astRepeat = pattern.getRepeat();
+			if (astRepeat != null) {
+				repeat = new AstExpressionEvaluator()
+						.evaluateAsInteger(astRepeat);
+				totalConsumption *= repeat;
+			}
+			outputPattern.put(port, totalConsumption);
+
+			// create port variable
+			LocalVariable variable = createPortVariable(port, totalConsumption);
+
+			// store tokens
+			actionStoreTokens(variable, values, repeat);
+
+			// add the write
+			BlockNode block = BlockNode.getLast(procedure);
+			Write write = new Write(port, totalConsumption, variable);
+			block.add(write);
 		}
 	}
 
