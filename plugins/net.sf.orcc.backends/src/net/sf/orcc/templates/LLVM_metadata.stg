@@ -135,7 +135,11 @@ $Type_MD(actor=actor, var=var)$
 >>
 
 FSM_MD(actor) ::= <<
+$if(actor.actionScheduler.actions)$
+$FSM_decl_MD(actor)$ = metadata !{$varState_MD(actor.actionScheduler.fsm.initialState)$, metadata $State_decl_MD(actor)$, metadata $Transitions_decl_MD(actor)$, i32* @_FSM_state, i32()* @outside_FSM_scheduler}
+$else$
 $FSM_decl_MD(actor)$ = metadata !{$varState_MD(actor.actionScheduler.fsm.initialState)$, metadata $State_decl_MD(actor)$, metadata $Transitions_decl_MD(actor)$, i32* @_FSM_state}
+$endif$
 $State_MD(actor)$
 $Transitions_MD(actor)$
 >>
