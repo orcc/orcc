@@ -29,7 +29,7 @@
 package net.sf.orcc.ui.properties;
 
 import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
-import static net.sf.orcc.OrccProperties.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
 import java.io.File;
 
@@ -37,7 +37,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -81,11 +80,11 @@ public class ProjectPropertyPage extends PropertyPage {
 
 		try {
 			String outputFolder = project
-					.getPersistentProperty(new QualifiedName("", OUTPUT_FOLDER));
+					.getPersistentProperty(PROPERTY_OUTPUT);
 			if (outputFolder == null) {
-				project.setPersistentProperty(new QualifiedName("",
-						OUTPUT_FOLDER), new Path(project.getLocation()
-						.toOSString()).append(DEFAULT_OUTPUT).toOSString());
+				project.setPersistentProperty(PROPERTY_OUTPUT, new Path(project
+						.getLocation().toOSString()).append(DEFAULT_OUTPUT)
+						.toOSString());
 			}
 		} catch (CoreException e) {
 		}
@@ -155,8 +154,7 @@ public class ProjectPropertyPage extends PropertyPage {
 		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		textOutput.setLayoutData(data);
 		try {
-			textOutput.setText(project.getPersistentProperty(new QualifiedName(
-					"", OUTPUT_FOLDER)));
+			textOutput.setText(project.getPersistentProperty(PROPERTY_OUTPUT));
 		} catch (CoreException e) {
 		}
 
@@ -183,8 +181,7 @@ public class ProjectPropertyPage extends PropertyPage {
 	public boolean performOk() {
 		// store the value in the owner text field
 		try {
-			project.setPersistentProperty(new QualifiedName("", OUTPUT_FOLDER),
-					textOutput.getText());
+			project.setPersistentProperty(PROPERTY_OUTPUT, textOutput.getText());
 		} catch (CoreException e) {
 			return false;
 		}

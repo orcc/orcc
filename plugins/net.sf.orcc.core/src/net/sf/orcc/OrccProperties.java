@@ -28,6 +28,8 @@
  */
 package net.sf.orcc;
 
+import org.eclipse.core.runtime.QualifiedName;
+
 /**
  * Constants associated with an Orcc project.
  * 
@@ -37,13 +39,19 @@ package net.sf.orcc;
 public interface OrccProperties {
 
 	/**
-	 * Output folder for Xtext front-end.
-	 */
-	public static final String OUTPUT_FOLDER = "net.sf.orcc.debugMode";
-
-	/**
 	 * Default value for {@value #OUTPUT_FOLDER}.
 	 */
 	public static final String DEFAULT_OUTPUT = ".generated";
+
+	/**
+	 * Prefix for Orcc properties
+	 */
+	public static final String PREFIX = "net.sf.orcc";
+
+	/**
+	 * Property for output folder for Xtext front-end.
+	 */
+	public static final QualifiedName PROPERTY_OUTPUT = new QualifiedName(
+			PREFIX, "outputFolder");
 
 }

@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.cal.ui.builder;
 
+import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
+import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
@@ -38,7 +41,7 @@ import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
 
-import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -48,8 +51,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
 import org.eclipse.xtext.resource.XtextResource;
 import org.eclipse.xtext.util.CancelIndicator;
@@ -86,12 +89,15 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
 			throws CoreException {
-		IFolder folder = context.getBuiltProject().getFolder(".generated");
-		if (!folder.exists()) {
-			folder.create(true, true, null);
+		// retrieve output folder from project
+		// by default output in .generated
+		IProject project = context.getBuiltProject();
+		String outputFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
+		if (outputFolder == null) {
+			project.setPersistentProperty(PROPERTY_OUTPUT, new Path(project
+					.getLocation().toOSString()).append(DEFAULT_OUTPUT)
+					.toOSString());
 		}
-
-		String outputFolder = folder.getLocation().toOSString();
 		frontend.setOutputFolder(outputFolder);
 
 		ResourceSet set = context.getResourceSet();

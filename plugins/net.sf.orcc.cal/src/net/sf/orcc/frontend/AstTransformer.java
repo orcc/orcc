@@ -168,9 +168,11 @@ public class AstTransformer {
 		@Override
 		public Expression caseAstExpressionVariable(
 				AstExpressionVariable expression) {
-			AstVariable variable = expression.getValue().getVariable();
+			AstVariable astVariable = expression.getValue().getVariable();
 			Location location = Util.getLocation(expression);
-			Use use = new Use(variablesMap.get(variable));
+			
+			Variable variable = variablesMap.get(astVariable);
+			Use use = new Use(variable);
 			Expression varExpr = new VarExpr(location, use);
 			return varExpr;
 		}
