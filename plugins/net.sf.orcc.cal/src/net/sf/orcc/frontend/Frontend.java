@@ -75,6 +75,9 @@ public class Frontend {
 
 	public void setOutputFolder(String outputFolder) {
 		this.outputFolder = new File(outputFolder);
+		if (!this.outputFolder.exists()) {
+			this.outputFolder.mkdir();
+		}
 	}
 
 }

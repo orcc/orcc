@@ -94,9 +94,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		IProject project = context.getBuiltProject();
 		String outputFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
 		if (outputFolder == null) {
-			project.setPersistentProperty(PROPERTY_OUTPUT, new Path(project
-					.getLocation().toOSString()).append(DEFAULT_OUTPUT)
-					.toOSString());
+			outputFolder = new Path(project.getLocation().toOSString()).append(
+					DEFAULT_OUTPUT).toOSString();
+			project.setPersistentProperty(PROPERTY_OUTPUT, outputFolder);
 		}
 		frontend.setOutputFolder(outputFolder);
 
