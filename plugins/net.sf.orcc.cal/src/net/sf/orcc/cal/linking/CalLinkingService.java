@@ -40,6 +40,8 @@ import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.type.IntType;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
@@ -70,30 +72,17 @@ public class CalLinkingService extends DefaultLinkingService {
 	public CalLinkingService() {
 		functions = new HashMap<String, AstFunction>();
 
-		AstFunction function;
-		function = CalFactory.eINSTANCE.createAstFunction();
-		function.setName("bitand");
-		functions.put(function.getName(), function);
-
-		function = CalFactory.eINSTANCE.createAstFunction();
-		function.setName("bitnot");
-		functions.put(function.getName(), function);
-
-		function = CalFactory.eINSTANCE.createAstFunction();
-		function.setName("bitor");
-		functions.put(function.getName(), function);
-
-		function = CalFactory.eINSTANCE.createAstFunction();
-		function.setName("bitxor");
-		functions.put(function.getName(), function);
-
-		function = CalFactory.eINSTANCE.createAstFunction();
-		function.setName("lshift");
-		functions.put(function.getName(), function);
-
-		function = CalFactory.eINSTANCE.createAstFunction();
-		function.setName("rshift");
-		functions.put(function.getName(), function);
+		addFunction("bitand", new Type[] { new IntType(32), new IntType(32) },
+				new IntType(32));
+		addFunction("bitnot", new Type[] { new IntType(32) }, new IntType(32));
+		addFunction("bitor", new Type[] { new IntType(32), new IntType(32) },
+				new IntType(32));
+		addFunction("bitxor", new Type[] { new IntType(32), new IntType(32) },
+				new IntType(32));
+		addFunction("lshift", new Type[] { new IntType(32), new IntType(32) },
+				new IntType(32));
+		addFunction("rshift", new Type[] { new IntType(32), new IntType(32) },
+				new IntType(32));
 
 		procedures = new HashMap<String, AstProcedure>();
 
@@ -101,6 +90,25 @@ public class CalLinkingService extends DefaultLinkingService {
 		procedure = CalFactory.eINSTANCE.createAstProcedure();
 		procedure.setName("println");
 		procedures.put(procedure.getName(), procedure);
+	}
+
+	/**
+	 * Adds a new function to the built-in functions map with the given
+	 * parameters types and return type.
+	 * 
+	 * @param name
+	 *            function name
+	 * @param parameters
+	 *            types of function parameters
+	 * @param returnType
+	 *            return type
+	 */
+	private void addFunction(String name, Type[] parameters, Type returnType) {
+		AstFunction function;
+		function = CalFactory.eINSTANCE.createAstFunction();
+		function.setName(name);
+		function.setIrType(returnType);
+		functions.put(name, function);
 	}
 
 	/**
