@@ -41,8 +41,8 @@ import net.sf.orcc.cal.cal.AstExpressionList;
 import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
+import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
@@ -57,23 +57,18 @@ import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.UintType;
 
 /**
- * This class defines a type checker for RVC-CAL AST.
+ * This class defines a type checker for RVC-CAL AST. Note that types must have
+ * been transformed to IR types first.
  * 
  * @author Matthieu Wipliez
  * 
  */
 public class TypeChecker extends CalSwitch<Type> {
 
-	private TypeTransformer typeTransformer;
-
 	/**
-	 * Creates a new type checker with the given type transformer.
-	 * 
-	 * @param typeTransformer
-	 *            an AST type to IR type transformer
+	 * Creates a new type checker.
 	 */
-	public TypeChecker(TypeTransformer typeTransformer) {
-		this.typeTransformer = typeTransformer;
+	public TypeChecker() {
 	}
 
 	/**
@@ -204,8 +199,8 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionCall(AstExpressionCall expression) {
-		AstType type = expression.getFunction().getType();
-		return typeTransformer.transformType(type);
+		AstFunction function = expression.getFunction();
+		return (Type) function.getIrType();
 	}
 
 	@Override
@@ -242,7 +237,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Type type = typeTransformer.transformType(variable.getType());
+		Type type = (Type) variable.getIrType();
 
 		if (type == null) {
 			return null;
@@ -330,7 +325,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		return typeTransformer.transformType(variable.getType());
+		return (Type) variable.getIrType();
 	}
 
 	@Override

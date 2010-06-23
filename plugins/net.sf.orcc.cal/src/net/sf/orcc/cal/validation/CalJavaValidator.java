@@ -90,8 +90,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	@Inject
 	private IQualifiedNameProvider nameProvider;
 
-	private TypeTransformer typeTransformer;
-
 	/**
 	 * Creates a new CAL validator written in Java.
 	 */
@@ -140,10 +138,14 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
 	public void checkActor(AstActor actor) {
-		typeTransformer = new TypeTransformer();
-		checker = new TypeChecker(typeTransformer);
+		checker = new TypeChecker();
 
 		evaluateStateVariables(actor.getStateVariables());
+		
+		// transforms AST types to IR types
+		// this is a prerequisite for type checking
+		TypeTransformer typeTransformer = new TypeTransformer();
+		typeTransformer.transformTypes(actor);
 	}
 
 	@Check

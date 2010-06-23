@@ -28,85 +28,83 @@
  */
 package net.sf.orcc.cal.type;
 
-import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstInputPattern;
-import net.sf.orcc.cal.cal.AstPort;
-import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.AstType;
+import net.sf.orcc.cal.cal.AstTypeBool;
+import net.sf.orcc.cal.cal.AstTypeFloat;
+import net.sf.orcc.cal.cal.AstTypeInt;
+import net.sf.orcc.cal.cal.AstTypeList;
+import net.sf.orcc.cal.cal.AstTypeString;
+import net.sf.orcc.cal.cal.AstTypeUint;
+import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
-import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.FloatType;
+import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.UintType;
 
 /**
- * This class defines an AST type to IR type transformer.
+ * This class defines an AST type to IR type converter.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class TypeTransformer extends VoidSwitch {
-
-	private TypeConverter typeConverter;
+public class TypeConverter extends CalSwitch<Type> {
 
 	/**
-	 * Creates a new AST type to IR type transformation.
+	 * Creates a new AST type to IR type conversion.
 	 */
-	public TypeTransformer() {
-		typeConverter = new TypeConverter();
+	public TypeConverter() {
 	}
 
 	@Override
-	public Void caseAstFunction(AstFunction function) {
-		Type type = typeConverter.transformType(function.getType());
-		function.setIrType(type);
-		return super.caseAstFunction(function);
+	public Type caseAstTypeBool(AstTypeBool type) {
+		return new BoolType();
 	}
 
 	@Override
-	public Void caseAstInputPattern(AstInputPattern input) {
-		AstPort port = input.getPort();
+	public Type caseAstTypeFloat(AstTypeFloat type) {
+		return new FloatType();
+	}
 
-		doSwitch(port);
-
-		// number of repeats
-		int repeat;
-
-		// type of each token
-		Type type;
-
-		// repeat equals to 1 when absent
-		AstExpression astRepeat = input.getRepeat();
-		if (astRepeat == null) {
-			repeat = 1;
-			type = (Type) port.getIrType();
+	@Override
+	public Type caseAstTypeInt(AstTypeInt type) {
+		AstExpression astSize = type.getSize();
+		int size;
+		if (astSize == null) {
+			size = 32;
 		} else {
-			repeat = new AstExpressionEvaluator().evaluateAsInteger(astRepeat);
-			type = new ListType(repeat, (Type) port.getIrType());
+			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
-
-		for (AstVariable token : input.getTokens()) {
-			token.setIrType(type);
-		}
-
-		return null;
+		return new IntType(size);
 	}
 
 	@Override
-	public Void caseAstPort(AstPort port) {
-		if (port.getIrType() == null) {
-			Type type = typeConverter.transformType(port.getType());
-			port.setIrType(type);
-		}
-
-		return null;
+	public Type caseAstTypeList(AstTypeList listType) {
+		Type type = transformType(listType.getType());
+		AstExpression expression = listType.getSize();
+		int size = new AstExpressionEvaluator().evaluateAsInteger(expression);
+		return new ListType(size, type);
 	}
 
 	@Override
-	public Void caseAstVariable(AstVariable variable) {
-		Type type = typeConverter.transformType(variable.getType());
-		variable.setIrType(type);
-		return null;
+	public Type caseAstTypeString(AstTypeString type) {
+		return new StringType();
+	}
+
+	@Override
+	public Type caseAstTypeUint(AstTypeUint type) {
+		AstExpression astSize = type.getSize();
+		int size;
+		if (astSize == null) {
+			size = 32;
+		} else {
+			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
+		}
+		return new UintType(size);
 	}
 
 	/**
@@ -116,8 +114,8 @@ public class TypeTransformer extends VoidSwitch {
 	 *            an AST type
 	 * @return an IR type
 	 */
-	public void transformTypes(AstActor actor) {
-		doSwitch(actor);
+	public Type transformType(AstType type) {
+		return doSwitch(type);
 	}
 
 }

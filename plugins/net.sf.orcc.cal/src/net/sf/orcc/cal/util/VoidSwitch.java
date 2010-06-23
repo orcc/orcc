@@ -53,7 +53,6 @@ import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
-import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
 import net.sf.orcc.cal.cal.AstTypeFloat;
 import net.sf.orcc.cal.cal.AstTypeInt;
@@ -64,397 +63,338 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 
 /**
- * This class defines a basic switch that visits everything until
- * {@link #doSwitch(org.eclipse.emf.ecore.EObject)} returns <code>true</code>.
- * Case methods should be overridden to implement predicates.
+ * This class defines a basic switch that visits everything. Case methods should
+ * be overridden to implement the desired behavior.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class BooleanSwitch extends CalSwitch<Boolean> {
+public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
-	public Boolean caseAstAction(AstAction action) {
+	public Void caseAstAction(AstAction action) {
 		for (AstExpression guard : action.getGuards()) {
-			if (doSwitch(guard)) {
-				return true;
-			}
+			doSwitch(guard);
 		}
 
 		for (AstInputPattern input : action.getInputs()) {
-			if (doSwitch(input)) {
-				return true;
-			}
+			doSwitch(input);
 		}
 
 		for (AstVariable variable : action.getVariables()) {
-			if (doSwitch(variable)) {
-				return true;
-			}
+			doSwitch(variable);
 		}
 
 		for (AstStatement statement : action.getStatements()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
+			doSwitch(statement);
 		}
 
 		for (AstOutputPattern output : action.getOutputs()) {
-			if (doSwitch(output)) {
-				return true;
-			}
+			doSwitch(output);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstActor(AstActor actor) {
+	public Void caseAstActor(AstActor actor) {
 		for (AstAction action : actor.getActions()) {
-			if (doSwitch(action)) {
-				return true;
-			}
+			doSwitch(action);
 		}
 
 		for (AstFunction function : actor.getFunctions()) {
-			if (doSwitch(function)) {
-				return true;
-			}
+			doSwitch(function);
 		}
 
 		for (AstAction action : actor.getInitializes()) {
-			if (doSwitch(action)) {
-				return true;
-			}
+			doSwitch(action);
 		}
 
 		for (AstPort port : actor.getInputs()) {
-			if (doSwitch(port)) {
-				return true;
-			}
+			doSwitch(port);
 		}
 
 		for (AstPort port : actor.getOutputs()) {
-			if (doSwitch(port)) {
-				return true;
-			}
+			doSwitch(port);
 		}
 
 		for (AstVariable parameter : actor.getParameters()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
+			doSwitch(parameter);
 		}
 
 		for (AstProcedure procedure : actor.getProcedures()) {
-			if (doSwitch(procedure)) {
-				return true;
-			}
+			doSwitch(procedure);
 		}
 
 		for (AstVariable parameter : actor.getStateVariables()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
+			doSwitch(parameter);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionBinary(AstExpressionBinary expression) {
-		if (doSwitch(expression.getLeft()) || doSwitch(expression.getRight())) {
-			return true;
-		}
+	public Void caseAstExpressionBinary(AstExpressionBinary expression) {
+		doSwitch(expression.getLeft());
+		doSwitch(expression.getRight());
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionBoolean(AstExpressionBoolean expression) {
-		return false;
+	public Void caseAstExpressionBoolean(AstExpressionBoolean expression) {
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionCall(AstExpressionCall call) {
+	public Void caseAstExpressionCall(AstExpressionCall call) {
 		for (AstExpression parameter : call.getParameters()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
+			doSwitch(parameter);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionIf(AstExpressionIf expression) {
-		if (doSwitch(expression.getCondition())
-				|| doSwitch(expression.getThen())
-				|| doSwitch(expression.getElse())) {
-			return true;
-		}
+	public Void caseAstExpressionIf(AstExpressionIf expression) {
+		doSwitch(expression.getCondition());
+		doSwitch(expression.getThen());
+		doSwitch(expression.getElse());
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionIndex(AstExpressionIndex expression) {
+	public Void caseAstExpressionIndex(AstExpressionIndex expression) {
 		for (AstExpression index : expression.getIndexes()) {
-			if (doSwitch(index)) {
-				return true;
-			}
+			doSwitch(index);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionInteger(AstExpressionInteger expression) {
-		return false;
+	public Void caseAstExpressionInteger(AstExpressionInteger expression) {
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionList(AstExpressionList expression) {
+	public Void caseAstExpressionList(AstExpressionList expression) {
 		for (AstExpression subExpression : expression.getExpressions()) {
-			if (doSwitch(subExpression)) {
-				return true;
-			}
+			doSwitch(subExpression);
 		}
 
 		for (AstGenerator generator : expression.getGenerators()) {
-			if (doSwitch(generator.getLower())
-					|| doSwitch(generator.getHigher())) {
-				return true;
-			}
+			doSwitch(generator);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionString(AstExpressionString expression) {
-		return false;
+	public Void caseAstExpressionString(AstExpressionString expression) {
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionUnary(AstExpressionUnary expression) {
-		return doSwitch(expression.getExpression());
+	public Void caseAstExpressionUnary(AstExpressionUnary expression) {
+		doSwitch(expression.getExpression());
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstExpressionVariable(AstExpressionVariable expression) {
-		return false;
+	public Void caseAstExpressionVariable(AstExpressionVariable expression) {
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstFunction(AstFunction function) {
+	public Void caseAstFunction(AstFunction function) {
 		for (AstVariable parameter : function.getParameters()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
+			doSwitch(parameter);
 		}
 
 		for (AstVariable variable : function.getVariables()) {
-			if (doSwitch(variable)) {
-				return true;
-			}
+			doSwitch(variable);
 		}
 
-		return doSwitch(function.getType())
-				|| doSwitch(function.getExpression());
+		doSwitch(function.getType());
+		doSwitch(function.getExpression());
+
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstInputPattern(AstInputPattern input) {
-		if (doSwitch(input.getPort())) {
-			return true;
-		}
+	public Void caseAstGenerator(AstGenerator generator) {
+		doSwitch(generator.getVariable());
+		doSwitch(generator.getLower());
+		doSwitch(generator.getHigher());
+		return null;
+	}
+
+	@Override
+	public Void caseAstInputPattern(AstInputPattern input) {
+		doSwitch(input.getPort());
 
 		for (AstVariable token : input.getTokens()) {
-			if (doSwitch(token)) {
-				return true;
-			}
+			doSwitch(token);
 		}
 
 		AstExpression repeat = input.getRepeat();
-		if (repeat != null && doSwitch(repeat)) {
-			return true;
+		if (repeat != null) {
+			doSwitch(repeat);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstOutputPattern(AstOutputPattern output) {
-		if (doSwitch(output.getPort())) {
-			return true;
-		}
+	public Void caseAstOutputPattern(AstOutputPattern output) {
+		doSwitch(output.getPort());
 
 		for (AstExpression value : output.getValues()) {
-			if (doSwitch(value)) {
-				return true;
-			}
+			doSwitch(value);
 		}
 
 		AstExpression repeat = output.getRepeat();
-		if (repeat != null && doSwitch(repeat)) {
-			return true;
+		if (repeat != null) {
+			doSwitch(repeat);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstPort(AstPort port) {
-		return doSwitch(port.getType());
+	public Void caseAstPort(AstPort port) {
+		doSwitch(port.getType());
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstProcedure(AstProcedure procedure) {
+	public Void caseAstProcedure(AstProcedure procedure) {
 		for (AstVariable parameter : procedure.getParameters()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
+			doSwitch(parameter);
 		}
 
 		for (AstVariable variable : procedure.getVariables()) {
-			if (doSwitch(variable)) {
-				return true;
-			}
+			doSwitch(variable);
 		}
 
 		for (AstStatement statement : procedure.getStatements()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
+			doSwitch(statement);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstStatementAssign(AstStatementAssign assign) {
+	public Void caseAstStatementAssign(AstStatementAssign assign) {
 		for (AstExpression index : assign.getIndexes()) {
-			if (doSwitch(index)) {
-				return true;
-			}
+			doSwitch(index);
 		}
 
-		return doSwitch(assign.getValue());
+		doSwitch(assign.getValue());
+
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstStatementCall(AstStatementCall call) {
+	public Void caseAstStatementCall(AstStatementCall call) {
 		for (AstExpression parameter : call.getParameters()) {
-			if (doSwitch(parameter)) {
-				return true;
-			}
+			doSwitch(parameter);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstStatementForeach(AstStatementForeach foreach) {
-		if (doSwitch(foreach.getLower()) || doSwitch(foreach.getHigher())) {
-			return true;
-		}
+	public Void caseAstStatementForeach(AstStatementForeach foreach) {
+		doSwitch(foreach.getVariable());
+		doSwitch(foreach.getLower());
+		doSwitch(foreach.getHigher());
 
 		for (AstStatement statement : foreach.getStatements()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
+			doSwitch(statement);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstStatementIf(AstStatementIf stmtIf) {
-		if (doSwitch(stmtIf.getCondition())) {
-			return true;
-		}
+	public Void caseAstStatementIf(AstStatementIf stmtIf) {
+		doSwitch(stmtIf.getCondition());
 
 		for (AstStatement statement : stmtIf.getThen()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
+			doSwitch(statement);
 		}
 
 		for (AstStatement statement : stmtIf.getElse()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
+			doSwitch(statement);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstStatementWhile(AstStatementWhile stmtWhile) {
-		if (doSwitch(stmtWhile.getCondition())) {
-			return true;
-		}
+	public Void caseAstStatementWhile(AstStatementWhile stmtWhile) {
+		doSwitch(stmtWhile.getCondition());
 
 		for (AstStatement statement : stmtWhile.getStatements()) {
-			if (doSwitch(statement)) {
-				return true;
-			}
+			doSwitch(statement);
 		}
 
-		return false;
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstTypeBool(AstTypeBool type) {
-		return false;
+	public Void caseAstTypeBool(AstTypeBool type) {
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstTypeFloat(AstTypeFloat type) {
-		return false;
+	public Void caseAstTypeFloat(AstTypeFloat type) {
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstTypeInt(AstTypeInt type) {
+	public Void caseAstTypeInt(AstTypeInt type) {
 		AstExpression value = type.getSize();
 		if (value == null) {
-			return false;
+			return null;
 		} else {
 			return doSwitch(value);
 		}
 	}
 
 	@Override
-	public Boolean caseAstTypeList(AstTypeList type) {
-		return doSwitch(type.getType()) || doSwitch(type.getSize());
+	public Void caseAstTypeList(AstTypeList type) {
+		doSwitch(type.getType());
+		doSwitch(type.getSize());
+
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstTypeString(AstTypeString type) {
-		return false;
+	public Void caseAstTypeString(AstTypeString type) {
+		return null;
 	}
 
 	@Override
-	public Boolean caseAstTypeUint(AstTypeUint type) {
+	public Void caseAstTypeUint(AstTypeUint type) {
 		AstExpression value = type.getSize();
 		if (value == null) {
-			return false;
+			return null;
 		} else {
 			return doSwitch(value);
 		}
 	}
 
 	@Override
-	public Boolean caseAstVariable(AstVariable variable) {
-		AstType type = variable.getType();
-		if (type != null && doSwitch(type)) {
-			return true;
-		}
+	public Void caseAstVariable(AstVariable variable) {
+		doSwitch(variable.getType());
 
 		AstExpression value = variable.getValue();
 		if (value == null) {
-			return false;
+			return null;
 		} else {
 			return doSwitch(value);
 		}
