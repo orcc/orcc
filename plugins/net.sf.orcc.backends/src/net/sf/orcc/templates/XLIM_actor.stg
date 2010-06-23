@@ -189,7 +189,7 @@ Return(return) ::= <<
 $if (return.value)$
 <operation kind="noop">
 	$port(dir="in", source=return.value)$
-	<port dir="out" size="1" source="isSchedulable_$action.name$_go" typeName="bool"/>
+	<port dir="out" size="1" source="$procedure$_go" typeName="bool"/>
 </operation>
 $endif$
 >>
@@ -382,105 +382,107 @@ scheduler(actions) ::= <<
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-$nextState.action.body$();
-i++;
-goto l_$nextState.targetState$;
+<operation kind="assign" target="currentState">
+	<port dir="in" source="s_$nextState.targetState$"/>
+</operation>
 >>
 
 actionTestState(nextState) ::= <<
-if (isSchedulable_$nextState.action$()) {
-	$if(nextState.action.outputPattern)$
-	$outputPattern(nextState.action.outputPattern)$
-		_FSM_state = s_$transition.sourceState$;
-		si->num_firings = i;
-		si->reason = full;
-		si->ports = ports;
-		return;
-	}
-	$endif$
-	$actionCallState(nextState)$
-}>>
+$procedure(nextState.action.scheduler)$
+<module kind="if">
+	<module decision="isSchedulable_$nextState.action$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="isSchedulable_$nextState.action$_go"/>
+			<port dir="out" size="1" source="isSchedulable_$nextState.action$" typeName="bool"/>
+		</operation>
+	</module>
+	<module kind="then">
+		$if(nextState.action.outputPattern)$
+		$outputPattern(pattern=nextState.action.outputPattern)$
+			<module kind="then">
+				$actionCall(nextState.action)$
+				$actionCallState(nextState)$
+			</module>
+		</module>
+		$else$
+		$actionCall(nextState.action)$
+		$actionCallState(nextState)$
+		$endif$
+	</module>
+	<module kind="else"/>
+</module>
+>>
 
 schedulingTestState(nextStates) ::= <<
 $nextStates: actionTestState(); separator=" else "$
 >>
 
 Transition(transition) ::= <<
-
-
-l_$transition.sourceState$:
+<!-- State s_$transition.sourceState$ -->
+<module kind="if">
+	<module decision="s_$transition.sourceState$_enabled" kind="test">
+		<operation kind="\$eq">
+			<port dir="in" source="s_$transition.sourceState$"/>
+			<port dir="in" source="currentState"/>
+			<port dir="out" size="1" source="s_$transition.sourceState$_enabled" typeName="bool"/>
+		</operation>
+	</module>
 	$if (actions)$
 	while (outside_FSM_scheduler()) {
 		i++;
 	}
 	$endif$
-	$if (transition.nextStateInfo.empty)$
-	printf("stuck in state \"$transition.sourceState$\"\n");
-	wait_for_key();
-	exit(1);
-	$else$
-	$schedulingTestState(nextStates=transition.nextStateInfo)$ else {
-		_FSM_state = s_$transition.sourceState$;
-		si->num_firings = i;
-		si->reason = starved;
-		si->ports = 0x0$instance.actor.maskInputsTransition.(transition)$;
-		return;
-	}
-	$endif$
+	<module kind="then">
+		$schedulingTestState(nextStates=transition.nextStateInfo)$
+	</module>
+	<module kind="else"/>	
+</module>
 >>
 
 Transitions(actions, transitions) ::= <<
-$transitions: Transition()$
+$transitions:{transition | $Transition(transition=transition)$}$
 >>
 
-switchTransition(transition) ::= <<
-
-case s_$transition.sourceState$:
-	goto l_$transition.sourceState$;
->>
-
-switch(transitions) ::= <<
-switch (_FSM_state) {
-$transitions: switchTransition()$
-default:
-	printf("unknown state: %s\n", stateNames[_FSM_state]);
-	wait_for_key();
-	exit(1);
-}
+enumStates(state,id)::= <<
+<operation kind="\$literal_Integer" value="$id$">
+	<port dir="out" size="32" source="s_$state$" typeName="int"/>
+</operation>
 >>
 
 schedulerFSM(actions, fsm) ::= <<
-enum states {
-	s_$first(fsm.states)$ = 0,
-	$rest(fsm.states) : {s_$it$}; separator=",\n"$
-};
-
-static char *stateNames[] = {
-	$fsm.states : {"s_$it$"}; separator=",\n"$
-};
-
-static enum states _FSM_state = s_$fsm.initialState$;
-
-$if(actions)$
-static int outside_FSM_scheduler() {
-	int i = 0;
-	$schedulingTest(actions)$ else {
-		return 0;
-	}
-	return 1;
-}
-$endif$
-
-void $instance.id$_scheduler(struct schedinfo_s *si) {
-	int i = 0;
-
-	// jump to FSM state 
-	$switch(fsm.transitions)$
-
-	// FSM transitions
-$Transitions(actions=actions, transitions=fsm.transitions)$
-}
-
+<stateVar name="currentState">
+	<initValue size="32" typeName="int" value="1"/>
+</stateVar>
+<module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
+	<operation kind="\$literal_Integer" value="1">
+		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
+	</operation>
+	<!-- enumerate states -->
+	$fsm.states : {$enumStates(state=it, id=i)$}; separator="\n"$
+	<!-- TODO initializing with the initial state "s_$fsm.initialState$" -->
+	<!-- infinite loop -->
+	<module kind="loop">
+		<module decision="var_$instance.id$_sched" kind="test">
+			<operation kind="noop">
+				<port dir="in" source="var_$instance.id$_sched"/>
+				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
+			</operation>
+		</module>
+			$if(actions)$
+			static int outside_FSM_scheduler() {
+				int i = 0;
+				$schedulingTest(actions)$ else {
+					return 0;
+				}
+				return 1;
+			}
+			$endif$
+		<module kind="body">
+			<!-- FSM transitions -->
+			$Transitions(actions=actions, transitions=fsm.transitions)$
+		</module>
+	</module>
+</module>
 >>
 
 parameters(parameters) ::= <<
@@ -505,7 +507,7 @@ design() ::= <<
 	$parameters(instance.parameters)$
 	$instance.actor.stateVars.list: stateVar()$
 	$instance.actor.procs.list: procedure()$
-	$instance.actor.actions: action()$
+	$instance.actor.actions: action(); separator="\n"$
 	$if(instance.actor.initializes)$
 	$instance.actor.initializes: action()$
 	void $instance.id$_initialize() {
