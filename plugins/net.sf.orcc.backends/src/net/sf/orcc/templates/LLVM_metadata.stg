@@ -15,7 +15,7 @@ $if(actor.stateVars.list)$
 !state_variables = !{$actor.stateVars.list: {$stateVar_decl_MD(actor=actor, var =it)$}; separator=", "$}
 $endif$
 $if(actor.procs.list)$ 
-!procedures = !{$actor.procs.list: proc_decl_MD(); separator=", "$}
+!procedures = !{$actor.procs.list: {$proc_decl_MD(actor=actor, proc=it)$}; separator=", "$}
 $endif$
 $if(actor.actions)$
 !actions = !{$actor.actions: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
@@ -28,7 +28,7 @@ $actor.inputs.list: {$fifo_MD(actor= actor, port=it)$}$
 $actor.outputs.list: {$fifo_MD(actor= actor, port=it)$}$
 $actor.parameters.list: {$parameter_MD(actor=actor, parameter=it)$}$
 $actor.stateVars.list: {$stateVar_MD(actor=actor, var=it)$}$
-$actor.procs.list: proc_MD()$
+$actor.procs.list: {$proc_MD(actor=actor, proc=it)$}$
 $actor.actions: {$action_MD(actor=actor, action=it)$}$
 
 >>
@@ -72,8 +72,8 @@ action_decl_MD(actor, action) ::= <<
 !$actor.templateData.(action)$
 >>
 
-proc_decl_MD(proc) ::= <<
-!$Location(proc.location)$
+proc_decl_MD(actor, proc) ::= <<
+!$actor.templateData.(proc)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,8 +112,8 @@ $Type_MD(actor=actor, var=port)$
 
 >>
 
-proc_MD(proc) ::= <<
-$proc_decl_MD(proc)$ = metadata !{$varName_MD(proc)$, $procExtern_MD(proc)$, $proc.returnType$($proc.parameters.list: argumentTypeDeclaration(); wrap, anchor, separator=", "$)* @$proc$}
+proc_MD(actor, proc) ::= <<
+$proc_decl_MD(actor=actor, proc=proc)$ = metadata !{$varName_MD(proc)$, $procExtern_MD(proc)$, $proc.returnType$($proc.parameters.list: argumentTypeDeclaration(); wrap, anchor, separator=", "$)* @$proc$}
 
 >>
 
@@ -252,7 +252,7 @@ varType_MD(type) ::= <<
 $if(type.int)$ i32 $type.size$ $
 elseif(type.uint)$ i32 $type.size$ $
 elseif(type.bool)$ i32 1 $ 
-elseif(type.list)$ i32 $type.elementType.size$ $
+elseif(type.list)$$varType_MD(type.elementType)$$
 elseif(type.string)$ i32 8 $
 endif$
 >>

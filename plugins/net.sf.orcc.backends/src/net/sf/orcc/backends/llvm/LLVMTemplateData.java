@@ -10,6 +10,7 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 
 /**
@@ -73,6 +74,10 @@ public class LLVMTemplateData {
 		templateDataMap.put(port.getType(), id++);
 	}
 
+	private void computeProc(Procedure proc) {
+		templateDataMap.put(proc, id++);
+	}
+
 	private void computeTemplateMaps() {
 		// Insert source file info
 		templateDataMap.put(actor.getFile(), id++);
@@ -101,6 +106,11 @@ public class LLVMTemplateData {
 		// Insert parameters
 		for (Variable parameter : actor.getParameters()) {
 			computeVar(parameter);
+		}
+
+		// Insert procedures
+		for (Procedure procedure : actor.getProcs()) {
+			computeProc(procedure);
 		}
 
 		// Insert actions
