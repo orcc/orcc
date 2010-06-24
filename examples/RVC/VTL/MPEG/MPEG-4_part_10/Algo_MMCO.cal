@@ -63,10 +63,7 @@ actor Algo_MMCO ()
 	uint(size=5)  NumReferenceFrame
 		==>
 	int (size=32) DelList,
-	uint(size=31) ShortTermList,
-	uint(size=5)  SzSTList,
 	uint(size=31) LongTermList,
-	uint(size=5)  NbLTFrame,
 	bool          IsIDR
 		:
 
@@ -88,7 +85,6 @@ actor Algo_MMCO ()
 	uint(size=5)  NumRefFrame      := 0;
 	uint(size=5)  ShortTermCount   := 0;
 	uint(size=5)  LongTermCount    := 0;
-	uint(size=5)  NbShortTermSent  := 0;
 	uint(size=5)  NbLongTermSent   := 0;
 	uint(size=1)  FlagLongTerm     := 0;
 	uint(size=4)  LongTermFrameIdx := 0;
@@ -123,7 +119,7 @@ actor Algo_MMCO ()
 
 	//If the new frame num isn't following the previous frame num,
 	//we must fill the short term list with all the missed frame num
-	FillFalseRefFrame : action ==>
+	FillFalseRefFrame.launch : action ==>
 		var
 			uint(size=31) false_frame_num := (LastFrameNum + 1) mod ValMaxFrameNum
 		do
@@ -152,36 +148,13 @@ actor Algo_MMCO ()
 		end
 
 
-	FillFalseRefFrame_done : action ==>
+	FillFalseRefFrame.done : action ==>
 		guard
 			(FrameNum = (LastFrameNum + 1) mod ValMaxFrameNum) or (FrameNum = LastFrameNum)
 		end
 
 
-	SendSizeLists: action 
-				==>
-			SzSTList  :[ShortTermCount],
-			NbLTFrame :[LongTermCount]
-		do
-			NbShortTermSent := 0;
-			NbLongTermSent  := 0;
-		end
-
-
-	SendShortTermList: action
-				==>
-			ShortTermList :[ValShortTermList]
-		guard
-			NbShortTermSent < ShortTermCount
-		var
-			uint(size=31) ValShortTermList
-		do
-			ValShortTermList := STList[NbShortTermSent];
-			NbShortTermSent  := NbShortTermSent + 1;
-		end
-
-
-	SendLongTermList: action
+	SendLongTermList.launch: action
 				==>
 			LongTermList :[ValLongTermList]
 		guard
@@ -194,7 +167,9 @@ actor Algo_MMCO ()
 		end
 
 	
-	SendLists_Done: action ==>
+	SendLongTermList.done: action ==>
+		do
+			NbLongTermSent  := 0;
 		end
 
 
@@ -451,36 +426,32 @@ actor Algo_MMCO ()
 *
 */
 	schedule fsm  read_num_ref_frames:
-		read_num_ref_frames (read_num_ref_frames    )--> FillFalseRefFrame;
+		read_num_ref_frames (read_num_ref_frames     )--> FillFalseRefFrame;
 
-		FillFalseRefFrame   (FillFalseRefFrame      )--> SendSizeLists;
-		FillFalseRefFrame   (FillFalseRefFrame_done )--> SendSizeLists;
+		FillFalseRefFrame   (FillFalseRefFrame       )--> SendLongTermList;
 
-		SendSizeLists       (SendSizeLists          )--> SendLists;
-		SendLists           (SendShortTermList      )--> SendLists;
-		SendLists           (SendLongTermList       )--> SendLists;
-		SendLists           (SendLists_Done         )--> check_IDR;
+		SendLongTermList    (SendLongTermList.launch )--> SendLongTermList;
+		SendLongTermList    (SendLongTermList.done   )--> check_IDR;
 
 		/* Get values about memory_management_control_operation */
-		check_IDR           (read_IDR               )--> AddFrameInList;
-		check_IDR           (read_not_IDR_not_MMCO  )--> AddFrameInList;
-		check_IDR           (read_not_IDR_MMCO      )--> MMCO_opcode;
-		MMCO_opcode         (MMCO_opcode            )--> MMCO_opcode;
-		MMCO_opcode         (MMCO_opcode_IsEqualTo0 )--> AddFrameInList;
+		check_IDR           (read_IDR                )--> AddFrameInList;
+		check_IDR           (read_not_IDR_not_MMCO   )--> AddFrameInList;
+		check_IDR           (read_not_IDR_MMCO       )--> MMCO_opcode;
+		MMCO_opcode         (MMCO_opcode             )--> MMCO_opcode;
+		MMCO_opcode         (MMCO_opcode_IsEqualTo0  )--> AddFrameInList;
 
-		AddFrameInList      (AddFrameInLTList       )--> SendSizeDelList;
-		AddFrameInList      (AddFrameInSTList       )--> SendSizeDelList;
+		AddFrameInList      (AddFrameInLTList        )--> SendSizeDelList;
+		AddFrameInList      (AddFrameInSTList        )--> SendSizeDelList;
 
-		SendSizeDelList     (SendSizeDelList        )--> SendDelList;
-		SendDelList         (SendDelList            )--> SendDelList;
-		SendDelList         (SendDelListDone        )--> read_num_ref_frames;
+		SendSizeDelList     (SendSizeDelList         )--> SendDelList;
+		SendDelList         (SendDelList             )--> SendDelList;
+		SendDelList         (SendDelListDone         )--> read_num_ref_frames;
 	end
 
 	priority
-		SendDelList            > SendDelListDone;
-		SendShortTermList      > SendLists_Done;
-		SendLongTermList       > SendLists_Done;
-		FillFalseRefFrame_done > FillFalseRefFrame;
+		SendDelList             > SendDelListDone;
+		SendLongTermList.launch > SendLongTermList.done;
+		FillFalseRefFrame.done  > FillFalseRefFrame.launch;
 	end
 
 end

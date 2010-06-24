@@ -2,8 +2,8 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="57" y="1779"/>
-      <vertex id="CoefDC_L" x="1243" y="2037"/>
-      <vertex id="CoefAC_L" x="1243" y="2010"/>
+      <vertex id="CoefDC_L" x="1265" y="2101"/>
+      <vertex id="CoefAC_L" x="1265" y="2074"/>
       <vertex id="Intra_DC_flag" x="947" y="1028"/>
       <vertex id="PredMode" x="947" y="1121"/>
       <vertex id="ScalingList" x="711" y="90"/>
@@ -25,10 +25,10 @@
       <vertex id="LOCATION" x="1116" y="1458"/>
       <vertex id="PART_SZ" x="1120" y="1518"/>
       <vertex id="Mb_TypeC" x="947" y="1307"/>
-      <vertex id="CoefAC_Cb" x="1243" y="1898"/>
-      <vertex id="CoefDC_Cb" x="1240" y="1923"/>
-      <vertex id="CoefDC_Cr" x="1241" y="1980"/>
-      <vertex id="CoefAC_Cr" x="1241" y="1950"/>
+      <vertex id="CoefAC_Cb" x="1265" y="1962"/>
+      <vertex id="CoefDC_Cb" x="1262" y="1987"/>
+      <vertex id="CoefDC_Cr" x="1263" y="2044"/>
+      <vertex id="CoefAC_Cr" x="1263" y="2014"/>
       <vertex id="IntraPredModeC" x="711" y="1779"/>
       <vertex id="QP_Cb" x="711" y="1872"/>
       <vertex id="QP_Cr" x="711" y="1965"/>
@@ -50,11 +50,11 @@
       <vertex id="byte2bit" x="333" y="1704"/>
       <vertex id="Algo_NALU" x="164" y="1761"/>
       <vertex id="Algo_Synp_AVC" x="439" y="1508"/>
-      <vertex id="Algo_BlockExpand_AVC" x="911" y="1909"/>
-      <vertex id="Algo_BlockSplit_AVC" x="1083" y="1911"/>
+      <vertex id="Algo_BlockExpand_AVC" x="898" y="1931"/>
+      <vertex id="Algo_BlockSplit_AVC" x="1068" y="1939"/>
       <vertex id="Algo_IntraPred_Split" x="711" y="1113"/>
       <vertex id="MVReconstruct" x="926" y="1468"/>
-      <vertex id="Algo_MMCO" x="905" y="1678"/>
+      <vertex id="Algo_MMCO" x="873" y="1684"/>
       <vertex id="Algo_Parser_IPCM" x="951" y="2125"/>
       <vertex id="Algo_RefList0" x="1181" y="1702"/>
    </vertices>

@@ -62,10 +62,7 @@ actor Algo_RefList ()
 	uint(size=31) RefReordering,
 	uint(size=31) FraNum,
 	uint(size=31) MaxFrameNum,
-	uint(size=31) ShortTermList,
-	uint(size=5)  SzSTList,
 	uint(size=31) LongTermList,
-	uint(size=5)  NbLTFrame,
 	uint(size=5)  NbRefFrame,
 	int (size=32) DelList,
 	uint(size=32) POC,
@@ -88,17 +85,10 @@ actor Algo_RefList ()
 	List(type:int (size=6) , size=16) ValLTList    := [-1 :for int s in Integers(0,15)];
 
 
-	List(type:int(size=32), size=16) RefListTab := [0 :for int s in Integers(0,16-1)];
-	List(type:int(size=32), size=16) STList     := [0 :for int s in Integers(0,16-1)];
-	List(type:int(size=32), size=16) LTList     := [-1 :for int s in Integers(0,16-1)];
-
 	int (size=32) ValMovedFrame      := 0;
 	uint(size=31) ValMaxFrameNum     := 0;
 	uint(size=4)  IdxInsertFrame     := 0;
-	uint(size=5)  ShortTermCount     := 0; /* Contains number of available short term reference picture                 */
-	uint(size=5)  LongTermCount      := 0; /* Contains number of available long term reference picture                  */
 	uint(size=5)  CounterRefListTab  := 0; /* Contains the number of RefList's element which are sent                   */
-	uint(size=5)  NbSTRead           := 0; /* Contains the number of Short Term List's' element which are read          */
 	uint(size=5)  NbLTRead           := 0; /* Contains the number of Long Term List's' element which are read           */
 	uint(size=5)  NumMaxListRefFrame := 0; /* Frame Number of all pictures must be between 0 and NumMaxListRefFrame - 1 */
 	int (size=32) SizeList           := 0;
@@ -235,48 +225,24 @@ actor Algo_RefList ()
 			else
 				InsertPoc(IdxCurrentPic,0,frame_num,-1);
 			end
+
+			foreach int i in Integers(0,31)
+			do
+				IdxLTList[i] := -1;
+			end
+			NbLTRead       := 0;
 //		println("");
 //		println("Frame num ::"+frame_num);	
 		end
 
 
-	//Get the size of Long Term and Short Term lists
-	ReadSizeLists: action
-			SzSTList    :[size_short_term_list],
-			NbLTFrame :[val_long_term_count]
-				==>
-		do
-			ShortTermCount := size_short_term_list;
-			LongTermCount  := val_long_term_count;
-			NbSTRead       := 0;
-			NbLTRead       := 0;
-			foreach int i in Integers(0,31)
-			do
-				IdxLTList[i] := -1;
-			end
-		end
-
-
-	//Fill the Short Term List
-	ReadShortTermList: action
-			ShortTermList :[ValShortTerm]
-				==>
-		guard
-			NbSTRead < ShortTermCount
-		do
-			STList[NbSTRead] := ValShortTerm;
-			NbSTRead         := NbSTRead + 1;
-		end
-
-
 	//Fill the Long Term List
-	ReadLongTermList: action
+	ReadLongTermList.launch: action
 			LongTermList :[ValLongTerm]
 				==>
 		guard
 			NbLTRead < 16
 		do
-			LTList[NbLTRead] := ValLongTerm;
 			foreach int i in Integers(0,NbPOC)
 			do
 				if(FrameNumList[i] = ValLongTerm) then
@@ -288,7 +254,7 @@ actor Algo_RefList ()
 
 
 	//Long Term and Short Term are read
-	ReadListsDone: action ==>
+	ReadLongTermList.done: action ==>
 		end
 
 
@@ -298,14 +264,20 @@ actor Algo_RefList ()
 			==>
 		RefList      :[NumMaxListRefFrame]
 	var
-			int ListIndex := 0,
 			uint(size=4) IdxRefList2
 	do
 		//NumMaxListRefFrame = min(ValIDxMax, ShortTermCount + LongTermCount)
-		if(ValIDxMax < ShortTermCount + LongTermCount) then
+/*		if(ValIDxMax < ShortTermCount + LongTermCount) then
 			NumMaxListRefFrame := ValIDxMax + 1;
 		else
 			NumMaxListRefFrame := ShortTermCount + LongTermCount;
+		end
+*/
+		//IdxCurrentPic = Nb short term and long term ref
+		if(ValIDxMax < IdxCurrentPic) then
+			NumMaxListRefFrame := ValIDxMax + 1;
+		else
+			NumMaxListRefFrame := IdxCurrentPic;
 		end
 
 		foreach int i in Integers(0,15)
@@ -335,22 +307,6 @@ actor Algo_RefList ()
 					IdxRefList2         := IdxRefList2 + 1 ;
 				end
 				ValidxRefList := IdxRefList2;
-			end
-		end
-		
-		//Initialize RefListTab
-		foreach int i in Integers (0, ShortTermCount - 1)
-		do
-			RefListTab[i] := STList[i];
-		end
-		ListIndex := ShortTermCount;
-		if ( (LongTermCount != 0) and (ShortTermCount < NumMaxListRefFrame) ) then 
-			foreach int i in Integers(0,15)
-			do
-				if ( (LTList[i] != -1) and (ListIndex < 16) ) then 
-					RefListTab[ListIndex] := LTList[i]; 
-					ListIndex             := ListIndex + 1 ;
-				end
 			end
 		end
 		
@@ -422,24 +378,6 @@ actor Algo_RefList ()
 				//Put the short term ref picture in his new position
 				RefIdx[IdxInsertFrame] := ValMovedIdx;
 			end
-
-			//Search the location of the reference picture (ValMovedFrame) in the RefList
-			foreach int i in Integers(0, ShortTermCount + LongTermCount-1)
-			do
-				if (RefListTab[i] = ValMovedFrame) then 
-					ValidxRefList := i; 
-				end
-			end
-
-			//Shift to the right all the element with an index between 
-			//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
-			//Thanks to this shift, the short term reference picture located at idxRefList is deleted.
-			foreach int i in Integers (0, ValidxRefList - IdxInsertFrame - 1)
-			do
-				RefListTab[ValidxRefList - i] := RefListTab[ValidxRefList - i - 1];
-			end
-			//Put the short term ref picture in his new position
-			RefListTab[IdxInsertFrame] := ValMovedFrame;
 			//The next reference picture will be insert next to this ref picture
 			IdxInsertFrame             := IdxInsertFrame +1 ;
 		end
@@ -471,25 +409,6 @@ actor Algo_RefList ()
 			end
 			//Put the long term ref picture in his new position
 			RefIdx[IdxInsertFrame] := ValLTList[idx_LTList];
-
-
-			//Search the location of the reference picture in the RefList
-			foreach int i in Integers(0, ShortTermCount + LongTermCount - 1)
-			do
-				if (RefListTab[i] = LTList[idx_LTList]) then 
-					ValidxRefList := i;
-				end
-			end
-
-			//Shift to the right all the element with an index between 
-			//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
-			//Thanks to this shift, the long term reference picture located at idxRefList is deleted.
-			foreach int i in Integers (0, ValidxRefList - IdxInsertFrame - 1)
-			do
-				RefListTab[ValidxRefList - i] := RefListTab[ValidxRefList - i - 1];
-			end			
-			//Put the long term ref picture in his new position
-			RefListTab[IdxInsertFrame] := LTList[idx_LTList];
 			//The next reference picture will be insert next to this ref picture
 			IdxInsertFrame             := IdxInsertFrame + 1 ;
 		end
@@ -537,12 +456,10 @@ actor Algo_RefList ()
 		ReadDelList                       (ReadDelList                          )--> ReadDelList;
 		ReadDelList                       (ReadDelListDone                      )--> read_num_ref_frames;
 
-		read_num_ref_frames               (read_num_ref_frames                  )--> ReadSizeLists;
+		read_num_ref_frames               (read_num_ref_frames                  )--> ReadLongTerm;
 
-		ReadSizeLists                     (ReadSizeLists                        )--> ReadLists;
-		ReadLists                         (ReadShortTermList                    )--> ReadLists;
-		ReadLists                         (ReadLongTermList                     )--> ReadLists;
-		ReadLists                         (ReadListsDone                        )--> InitRefList;
+		ReadLongTerm                      (ReadLongTermList.launch              )--> ReadLongTerm;
+		ReadLongTerm                      (ReadLongTermList.done                )--> InitRefList;
 
 		InitRefList                       (InitRefList                          )--> read_ref_pic_list_reordering_flag;
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_0  )--> SendRefList;
@@ -560,9 +477,8 @@ actor Algo_RefList ()
 
 
 	priority
-		ReadShortTermList    > ReadListsDone;
-		ReadLongTermList     > ReadListsDone;
-		SendRefList          > SendRefListDone;
+		ReadLongTermList.launch > ReadLongTermList.done;
+		SendRefList             > SendRefListDone;
 	end
 
 end
