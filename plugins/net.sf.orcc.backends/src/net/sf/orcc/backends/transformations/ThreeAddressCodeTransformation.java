@@ -421,12 +421,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
-		
-		if (procedure.getName().compareTo("write_mode2")==0){
-			int i=0;
-			i++;
-			
-		}
 		// Transform Local boolean Variable into int Variable (to be remove
 		// later)
 		for (Variable var : procedure.getLocals()) {
