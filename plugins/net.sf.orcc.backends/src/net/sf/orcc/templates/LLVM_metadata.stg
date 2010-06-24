@@ -206,8 +206,12 @@ $actor.actionScheduler.fsm.transitions: { $Transition_MD(actor=actor, transition
 >>
 
 Transition_MD(actor, transition) ::= <<
+$if(transition.nextStateInfo.empty)$
+$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, null , i1()* @$transition.sourceState$_state_scheduler}
+$else$
 $Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, metadata $NextStates_decl_MD(actor=actor, nextStates=transition.nextStateInfo)$ , i1()* @$transition.sourceState$_state_scheduler}
 $NextStates_MD(actor= actor, nextStates=transition.nextStateInfo)$
+$endif$
 >>
 
 NextStates_MD(actor, nextStates) ::= <<
