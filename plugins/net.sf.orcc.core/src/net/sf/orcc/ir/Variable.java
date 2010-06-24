@@ -254,6 +254,10 @@ public class Variable implements INameable {
 	 * @return <code>true</code> if this variable is global
 	 */
 	public boolean isGlobal() {
+		if(name.compareTo("y_left")==0){
+			int i = 0;
+			i++;
+		}
 		return global;
 	}
 

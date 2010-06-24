@@ -15,7 +15,7 @@ $if(var.global)$@$else$%$endif$$var$
 >>
 
 Expr(expr) ::= <<
-$if(expr.varExpr)$$Var(expr.var)$$else$$expr$$endif$
+$if(expr.varExpr)$$Var(expr.var.variable)$$else$$expr$$endif$
 >>
 
 ExprType(expr) ::= <<
