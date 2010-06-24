@@ -76,10 +76,49 @@ $instance.actor.stateVars.list: stateVar(); separator="\n"$
 >>
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Expressions
+///////////////////////////////////////////////////////////////////////////////
+
+expression(expr) ::= <<
+	$(expr.class.simpleName)(expr)$
+>>
+
+
+BinaryExpr(expr) ::= <<
+<operation kind="$BinOp.(expr.op)$">
+	$port(dir="in", source=expr.e1)$
+	$port(dir="in", source=expr.e2)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+UnaryExpr(expr) ::= <<
+<operation kind="$UnaryOp.(expr.op)$">
+	$port(dir="in", source=expr.expr)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+IntExpr(expr) ::= <<
+<operation kind="\$literal_Integer" value="$expr$">
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+BoolExpr(expr) ::= <<
+<operation kind="\$literal_Integer" value="$expr$">
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Operation
+// Operations
 ///////////////////////////////////////////////////////////////////////////////
+
+operation(op) ::= <<
+	$(op.class.simpleName)(op)$
+>>
 
 
 Call(call) ::= <<
@@ -112,9 +151,6 @@ $<port dir="$dir$" size="$if (type.bool)$1$else$$type.size$$endif$" source="$sou
 endif$
 >>
 
-operation(op) ::= <<
-	$(op.class.simpleName)(op)$
->>
 
 Read(op) ::= <<
 <operation kind="pinRead" portName="$op.port.name$" removable="no">
@@ -154,22 +190,7 @@ $endif$
 >>
 
 Assign(op) ::= <<
-$if (op.value.binaryExpr)$
-<operation kind="$BinOp.(op.value.op)$">
-	$port(dir="in", source=op.value.e1)$
-	$port(dir="in", source=op.value.e2)$
-	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>
-$elseif (op.value.unaryExpr)$
-<operation kind="$UnaryOp.(op.value.op)$">
-	$port(dir="in", source=op.value.expr)$
-	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>
-$elseif (op.value.intExpr)$
-<operation kind="\$literal_Integer" value="$op.value$">
-	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>
-$endif$
+$expression(op.value)$
 >>
 
 
