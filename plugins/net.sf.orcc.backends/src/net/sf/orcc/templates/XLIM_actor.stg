@@ -166,7 +166,7 @@ $elseif (op.value.unaryExpr)$
 	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>
 $elseif (op.value.intExpr)$
-<operation kind="\$literal_integers" value="$op.value$">
+<operation kind="\$literal_Integer" value="$op.value$">
 	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>
 $endif$
@@ -311,7 +311,7 @@ outputPatternPortDecision(index)::=<<
 	</module>
 >>
 
-outputPattern(pattern) ::= <<
+outputPattern(pattern,action) ::= <<
 <operation kind="\$literal_Integer" value="1">
 	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_res_0" typeName="bool"/>
 </operation>
@@ -328,10 +328,31 @@ actionCall(action) ::= <<
 >>
 
 actionTest(action) ::= <<
+$procedure(action.scheduler)$
+<module kind="if">
+	<module decision="isSchedulable_$action$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="isSchedulable_$action$_go"/>
+			<port dir="out" size="1" source="isSchedulable_$action$" typeName="bool"/>
+		</operation>
+	</module>
+	<module kind="then">
+		$if(action.outputPattern)$
+		$outputPattern(pattern=action.outputPattern,action=action)$
+			<module kind="then">
+				$actionCall(action)$
+			</module>
+		</module>
+		$else$
+		$actionCall(action)$
+		$endif$
+	</module>
+	<module kind="else"/>
+</module>
 >>
 
 schedulingTest(actions) ::= <<
-$actions: actionTest(); separator=" else "$
+$actions: actionTest()$
 >>
 
 scheduler(actions) ::= <<
@@ -363,10 +384,33 @@ actionCallState(nextState) ::= <<
 >>
 
 actionTestState(nextState) ::= <<
+$procedure(nextState.action.scheduler)$
+<module kind="if">
+	<module decision="isSchedulable_$nextState.action$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="isSchedulable_$nextState.action$_go"/>
+			<port dir="out" size="1" source="isSchedulable_$nextState.action$" typeName="bool"/>
+		</operation>
+	</module>
+	<module kind="then">
+		$if(nextState.action.outputPattern)$
+		$outputPattern(pattern=nextState.action.outputPattern,action=nextState.action)$
+			<module kind="then">
+				$actionCall(nextState.action)$
+				$actionCallState(nextState)$
+			</module>
+		</module>
+		$else$
+		$actionCall(nextState.action)$
+		$actionCallState(nextState)$
+		$endif$
+	</module>
+	<module kind="else"/>
+</module>
 >>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(); separator=" else "$
+$nextStates: actionTestState()$
 >>
 
 Transition(transition) ::= <<
@@ -387,12 +431,12 @@ Transition(transition) ::= <<
 	<module kind="then">
 		$schedulingTestState(nextStates=transition.nextStateInfo)$
 	</module>
-	<module kind="else"/>	
-</module>
+	<module kind="else">
 >>
 
 Transitions(actions, transitions) ::= <<
-$transitions:{transition | $Transition(transition=transition)$}$
+$transitions:{transition | $Transition(transition=transition)$}; separator="\n"$
+$transitions:{</module></module>}$
 >>
 
 enumStates(state,id)::= <<
