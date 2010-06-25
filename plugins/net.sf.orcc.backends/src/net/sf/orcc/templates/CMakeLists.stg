@@ -37,6 +37,6 @@ ELSE(APPLE)
 add_executable($network.name$ \${filenames})
 ENDIF(APPLE)
 
-target_link_libraries($network.name$ \${orcc_LIBRARY} \${SDL_LIBRARY})
+target_link_libraries($network.name$ \${orcc_LIBRARY} \${SDL_LIBRARY} \${SDLIMAGE_LIBRARY})
 
 >>
