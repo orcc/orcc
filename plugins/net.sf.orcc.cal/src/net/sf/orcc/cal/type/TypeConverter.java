@@ -115,7 +115,11 @@ public class TypeConverter extends CalSwitch<Type> {
 	 * @return an IR type
 	 */
 	public Type transformType(AstType type) {
-		return doSwitch(type);
+		if (type == null) {
+			return null;
+		} else {
+			return doSwitch(type);
+		}
 	}
 
 }
