@@ -132,7 +132,9 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * Removes all the elements from this ordered map.
 	 */
 	public void clear() {
-		list.clear();
+		if (list != null) {
+			list.clear();
+		}
 		map.clear();
 		modified = true;
 	}
