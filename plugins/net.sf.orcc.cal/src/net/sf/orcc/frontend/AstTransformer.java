@@ -285,10 +285,10 @@ public class AstTransformer {
 			transformStatements(statements);
 			int last = nodes.size();
 
-			List<CFGNode> resultNodes = new ArrayList<CFGNode>(last - first);
-			for (int i = first; i < last; i++) {
-				resultNodes.add(nodes.remove(i));
-			}
+			// moves selected CFG nodes from "nodes" list to resultNodes
+			List<CFGNode> subList = nodes.subList(first, last);
+			List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
+			subList.clear();
 
 			return resultNodes;
 		}
