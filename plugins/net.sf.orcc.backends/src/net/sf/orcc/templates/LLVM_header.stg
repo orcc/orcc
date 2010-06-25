@@ -1,6 +1,6 @@
 header() ::= <<
 
-%struct.fifo_s = type { i32, i32, i8*, i32, i32 }
+%struct.fifo_s = type opaque
 
 declare i8* @getPeekPtr(%struct.fifo_s* %fifo, i32 %n);
 
