@@ -64,10 +64,25 @@ const $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;$\n$$
 ///////////////////////////////////////////////////////////////////////////////
 StateVar(variable) ::= <<
 $if(variable.assignable)$
-$if(variable.initialized)$
-$if (!variable.type.dimensions)$
-$variable$ = $Constant(variable.constantValue)$;
+$if (variable.type.dimensions)$
+$variable$(new $variable.type$$listSize(variable.type.dimensions)$),
 $else$
+$if (variable.initialized)$
+$variable$($Constant(variable.constantValue)$),
+$endif$
+$endif$
+$endif$
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// State variables
+///////////////////////////////////////////////////////////////////////////////
+ListStateVarInitialization(variable) ::= <<
+$if(variable.assignable)$
+$if (variable.type.dimensions)$
+$if (variable.initialized)$
 const $variable.type$ tmp_$variable$[$variable.type.dimensions$] = $Constant(variable.constantValue)$;
 memcpy($variable$, tmp_$variable$, $variable.type.dimensions$ * sizeof($variable.type$));
 $endif$
@@ -75,7 +90,6 @@ $endif$
 $endif$
 
 >>
-
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
@@ -384,14 +398,15 @@ int actor_$actor.name$::scheduler()
 constructor(parameters, stateVars) ::= <<
 actor_$actor.name$::actor_$actor.name$($parameters: {int $it$}; separator=", "$)
 :
-$parameters: {$it$($it$),}; separator="\n"$
+$parameters: {$it$($it$),}; wrap, separator="\n"$
 $if(actor.actionScheduler.fsm)$
 _FSM_state(state_$actor.actionScheduler.fsm.initialState$),
-
 $endif$
+$stateVars : StateVar()$
 ActorGen($length(actor.inputs.list)$, $length(actor.outputs.list)$)
 {
-	$stateVars : StateVar()$}
+$stateVars : ListStateVarInitialization()$
+}
 
 >>
 

@@ -9,7 +9,11 @@ $value : {[$it$]} $
 >>
 
 variableDeclaration(variable) ::= <<
-$variable.type$ $variable$$listSize(variable.type.dimensions)$
+$if (variable.type.dimensions)
+$$variable.type$ (*$variable$)$listSize(rest(variable.type.dimensions))$$
+else
+$$variable.type$ $variable$$
+endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

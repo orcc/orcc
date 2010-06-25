@@ -129,6 +129,8 @@ $else$
 	$net.name$.start();
 	$net.name$.stop();
 $endif$
+
+	return 0;
 }
  
 >>
