@@ -58,6 +58,9 @@ Copyright (c) ISO/IEC 2008.
 //To do : 
 //        delete ValidxRefList
 //        delete ValidxRefList2
+//        delete NbPOC2
+//        delete IdxFalsePic
+//        delete IdxNotFound42
 actor Algo_RefList ()
 	uint(size=31) RefReordering,
 	uint(size=31) FraNum,
@@ -65,6 +68,7 @@ actor Algo_RefList ()
 	uint(size=31) LongTermList,
 	uint(size=5)  NbRefFrame,
 	int (size=32) DelList,
+	int (size=32) DelFalseFrameList,
 	uint(size=32) POC,
 	bool          IsIDR
 		==>
@@ -77,31 +81,38 @@ actor Algo_RefList ()
 *
 */
 
-	List(type:int (size=32), size=32) FrameNumList := [-1 :for int s in Integers(0,31)];
+	List(type:int (size=32), size=32) FrameNumList := [ 0 :for int s in Integers(0,31)];
 	List(type:int (size=32), size=32) IdxLTList    := [-1 :for int s in Integers(0,31)];
 	List(type:uint(size=32), size=32) POCList      := [ 0 :for int s in Integers(0,31)];
 
-	List(type:uint(size=5) , size=16) RefIdx       := [ 0 :for int s in Integers(0,31)];
+	List(type:uint(size=5) , size=32) RefIdx       := [ 0 :for int s in Integers(0,31)];
+	List(type:int (size=32), size=32) FrameNumWrap := [-1 :for int s in Integers(0,31)];
 	List(type:int (size=6) , size=16) ValLTList    := [-1 :for int s in Integers(0,15)];
 
 
-	int (size=32) ValMovedFrame      := 0;
-	uint(size=31) ValMaxFrameNum     := 0;
-	uint(size=4)  IdxInsertFrame     := 0;
-	uint(size=5)  CounterRefListTab  := 0; /* Contains the number of RefList's element which are sent                   */
-	uint(size=5)  NbLTRead           := 0; /* Contains the number of Long Term List's' element which are read           */
-	uint(size=5)  NumMaxListRefFrame := 0; /* Frame Number of all pictures must be between 0 and NumMaxListRefFrame - 1 */
-	int (size=32) SizeList           := 0;
-	int (size=32) CounterList        := 0;
-	uint(size=5)  IdxCurrentPic      := 0;
-	uint(size=6)  NbPOC              := 0;
+	int (size=32) ValMovedFrame            := 0;
+	uint(size=31) ValMaxFrameNum           := 0;
+	uint(size=4)  IdxInsertFrame           := 0;
+	uint(size=5)  CounterRefListTab        := 0; /* Contains the number of RefList's element which are sent                   */
+	uint(size=5)  NbLTRead                 := 0; /* Contains the number of Long Term List's' element which are read           */
+	uint(size=5)  NumMaxListRefFrame       := 0; /* Frame Number of all pictures must be between 0 and NumMaxListRefFrame - 1 */
+	int (size=32) SzListDelFrame           := 0;
+	int (size=32) SzListDelFalseFrame      := 0;
+	int (size=32) CounterListDelList       := 0;
+	int (size=32) CounterListDelFalseFrame := 0;
+	uint(size=5)  IdxCurrentPic            := 0;
+	uint(size=5)  IdxFalsePic              := 0;
+	uint(size=6)  NbPOC                    := 0;
+	int (size=32) LastFrameNum             := 0;
 
-	uint(size=4) ValidxRefList         := 0;
+	uint(size=4) ValidxRefList             := 0;
+	
+	bool          IdxNotFound42            := true;
 
 	procedure InsertPoc(uint(size=6) IdxPOC, uint(size=32) ValPOC, int(size=32) ValFrameNum, int(size=32) ValIdxLT)
 		var
 			uint(size=6) ValIdxMax
-		begin 
+		begin
 			if(NbPOC < 32) then
 				ValIdxMax := NbPOC;
 			else
@@ -141,11 +152,8 @@ actor Algo_RefList ()
 				IdxLTList   [IdxToDel + i] := IdxLTList   [IdxToDel + i + 1];
 			end
 			NbPOC := NbPOC - 1;
-			if(POCList[IdxCurrentPic] > ValPOC) then
+			if(IdxToDel <= IdxCurrentPic and IdxCurrentPic > 0) then
 				IdxCurrentPic := IdxCurrentPic - 1;
-			end
-			if(IdxCurrentPic>=NbPOC)then
-				IdxCurrentPic := NbPOC - 1;
 			end
 		end
 
@@ -155,13 +163,16 @@ actor Algo_RefList ()
 *
 */
 
-	ReadSizeDelList: action
-			DelList :[SizeDelList]
+	ReadSizeDelLists: action
+			DelList           :[SizeDelListRealFrame],
+			DelFalseFrameList :[SizeDelListFalseFrame]
 				==>
 		do
-			SizeList    := SizeDelList;
-			CounterList := 0;
-			if(SizeList = -1) then
+			SzListDelFrame      := SizeDelListRealFrame;
+			SzListDelFalseFrame := SizeDelListFalseFrame;
+			CounterListDelList       := 0;
+			CounterListDelFalseFrame := 0;
+			if(SzListDelFrame = -1) then
 				FrameNumList[0]:= 0;
 				IdxLTList   [0]:= IdxLTList   [IdxCurrentPic];
 				POCList     [0]:= 0;
@@ -171,28 +182,52 @@ actor Algo_RefList ()
 		end
 
 
-	ReadDelList: action
+	ReadDelList.RealFrame: action
 			DelList :[ValDelList]
 				==>
 		guard
-			CounterList < SizeList
+			CounterListDelList < SzListDelFrame
 		var
-			uint(size=6) Idx := 0
+			uint(size=6) Idx := 0,
+			uint(size=6)  NbPOC2
 		do
-			while(Idx < NbPOC)
+			NbPOC2 := NbPOC;
+			while(Idx < NbPOC2)
 			do
 				if(FrameNumList[Idx] = ValDelList)then
 					DelPOC( POCList[Idx] );
 				else
 					Idx := Idx + 1;
 				end
+				NbPOC2 := NbPOC;
 			end
-			CounterList := CounterList + 1;
+			CounterListDelList := CounterListDelList + 1;
 		end
 
-	ReadDelListDone: action ==>
+
+	ReadDelList.FalseFrame: action
+			DelFalseFrameList :[ValDelList]
+				==>
 		guard
-			CounterList >= SizeList
+			CounterListDelFalseFrame < SzListDelFalseFrame
+		var
+			uint(size=6) Idx := 0,
+			uint(size=6) NbPOC2
+		do
+			NbPOC2 := NbPOC;
+			while(Idx < NbPOC2)
+			do
+				if(FrameNumList[Idx] = ValDelList)then
+					DelPOC( POCList[Idx] );
+				else
+					Idx := Idx + 1;
+				end
+				NbPOC2 := NbPOC;
+			end
+			CounterListDelFalseFrame := CounterListDelFalseFrame + 1;
+		end
+
+	ReadDelList.done: action ==>
 		end
 
 	//Gets slice's FrameNum and slice's MaxFrameNum
@@ -205,12 +240,13 @@ actor Algo_RefList ()
 		var
 			bool IdxNotFound := true
 		do
+			LastFrameNum := FrameNumList[IdxCurrentPic];
 			ValMaxFrameNum := MaxFrNu;
 
 			IdxCurrentPic := 0;
 			while(IdxNotFound)
 			do
-				if((POCList[IdxCurrentPic] > ValPOC) or (IdxCurrentPic = NbPOC)) then
+				if((FrameNumList[IdxCurrentPic] > frame_num) or (IdxCurrentPic = NbPOC)) then
 					IdxNotFound := false;
 				end			
 				IdxCurrentPic := IdxCurrentPic + 1;
@@ -220,6 +256,7 @@ actor Algo_RefList ()
 			if(IdxCurrentPic >= 32) then
 				IdxCurrentPic := 31;
 			end
+
 			if(not IsIDR_Pic) then
 				InsertPoc(IdxCurrentPic,ValPOC,frame_num,-1);
 			else
@@ -233,6 +270,43 @@ actor Algo_RefList ()
 			NbLTRead       := 0;
 //		println("");
 //		println("Frame num ::"+frame_num);	
+		end
+
+
+	//If the new frame num isn't following the previous frame num,
+	//we must fill the short term list with all the missed frame num
+	FillFalseRefFrame.launch : action ==>
+		var
+			uint(size=31) false_frame_num := (LastFrameNum + 1) mod ValMaxFrameNum,
+			bool          IdxNotFound     := true
+		do
+			while(false_frame_num != FrameNumList[IdxCurrentPic])
+			do
+			
+				IdxFalsePic := 0;
+				IdxNotFound:= IdxNotFound42;
+				while(IdxNotFound)
+				do
+					if((FrameNumList[IdxFalsePic] > false_frame_num) or (IdxFalsePic = NbPOC)) then
+						IdxNotFound42 := false;
+					end			
+					IdxFalsePic := IdxFalsePic + 1;
+					IdxNotFound :=IdxNotFound42;
+				end
+				IdxNotFound42 := true;
+				IdxFalsePic   := IdxFalsePic   - 1;
+				InsertPoc(IdxFalsePic,42,false_frame_num,-1);
+				if(IdxFalsePic <= IdxCurrentPic and IdxCurrentPic < 31) then
+					IdxCurrentPic := IdxCurrentPic + 1;
+				end
+				false_frame_num        := (false_frame_num + 1) mod ValMaxFrameNum;
+			end
+		end
+
+
+	FillFalseRefFrame.done : action ==>
+		guard
+			(FrameNumList[IdxCurrentPic] = (LastFrameNum + 1) mod ValMaxFrameNum) or (FrameNumList[IdxCurrentPic] = LastFrameNum)
 		end
 
 
@@ -264,38 +338,55 @@ actor Algo_RefList ()
 			==>
 		RefList      :[NumMaxListRefFrame]
 	var
-			uint(size=4) IdxRefList2
+			uint(size=4) IdxRefList2,
+			uint(size=5) IdxBuffer,
+			int (size=32) FrameNumBuffer
 	do
-		//NumMaxListRefFrame = min(ValIDxMax, ShortTermCount + LongTermCount)
-/*		if(ValIDxMax < ShortTermCount + LongTermCount) then
-			NumMaxListRefFrame := ValIDxMax + 1;
-		else
-			NumMaxListRefFrame := ShortTermCount + LongTermCount;
-		end
-*/
 		//IdxCurrentPic = Nb short term and long term ref
-		if(ValIDxMax < IdxCurrentPic) then
-			NumMaxListRefFrame := ValIDxMax + 1;
+		if(ValIDxMax < NbPOC - 1) then
+			NumMaxListRefFrame := ValIDxMax;
 		else
-			NumMaxListRefFrame := IdxCurrentPic;
+			NumMaxListRefFrame := NbPOC - 1;
 		end
 
 		foreach int i in Integers(0,15)
 		do
 			ValLTList[i] := -1;
 		end
-							ValidxRefList := 0;/////////////////////////
-		if(IdxCurrentPic > 0) then
-			foreach int i in Integers (0,IdxCurrentPic - 1)
-			do
-				IdxRefList2 := ValidxRefList; 
-				if(IdxLTList[IdxCurrentPic - 1 - i] = -1)then
-					RefIdx[IdxRefList2 ] := IdxCurrentPic - 1 - i;
+ValidxRefList := 0;//////
+		foreach int i in Integers (0,NbPOC - 1)
+		do
+			IdxRefList2 := ValidxRefList; 
+			if(i != IdxCurrentPic)then
+				if(IdxLTList[i] = -1)then
+					RefIdx[IdxRefList2] := i;
+					if(FrameNumList[i]>FrameNumList[IdxCurrentPic]) then
+						FrameNumWrap[IdxRefList2] := FrameNumList[i] - ValMaxFrameNum;
+					else
+						FrameNumWrap[IdxRefList2] := FrameNumList[i];
+					end
 					IdxRefList2         := IdxRefList2 + 1;
 				else
-					ValLTList[IdxLTList[IdxCurrentPic - 1 - i]] := IdxCurrentPic - 1 - i;
+					ValLTList[IdxLTList[i]] := i;
 				end
-				ValidxRefList := IdxRefList2;
+			end
+			ValidxRefList := IdxRefList2;
+		end
+		if(ValidxRefList>0) then
+			foreach int i in Integers(0,ValidxRefList - 1)
+			do
+				foreach int j in Integers(i + 1,ValidxRefList - 1)
+				do
+					if(FrameNumWrap[i] < FrameNumWrap[j])then
+						IdxBuffer       := RefIdx[j];
+						RefIdx[j]       := RefIdx[i];
+						RefIdx[i]       := IdxBuffer;
+
+						FrameNumBuffer  := FrameNumWrap[j];
+						FrameNumWrap[j] := FrameNumWrap[i];
+						FrameNumWrap[i] := FrameNumBuffer;
+					end
+				end
 			end
 		end
 		if(ValidxRefList < NumMaxListRefFrame)then
@@ -431,12 +522,6 @@ actor Algo_RefList ()
 		var
 			int (size = 32) poc := -1
 		do
-			/*foreach int i in Integers(0,NbPOC)
-			do
-				if(FrameNumList[i] = RefListTab[CounterRefListTab] and i != IdxCurrentPic) then
-					poc := POCList[i];
-				end
-			end*/
 //println("poc:"+POCList[RefIdx[CounterRefListTab]]+"; frnum:"+FrameNumList[RefIdx[CounterRefListTab]]+"; idx"+RefIdx[CounterRefListTab]);
 			poc := POCList[RefIdx[CounterRefListTab]];
 			CounterRefListTab := CounterRefListTab + 1;
@@ -452,11 +537,13 @@ actor Algo_RefList ()
 *
 */
 	schedule fsm  read_num_ref_frames:
-		ReadSizeDelList                   (ReadSizeDelList                      )--> ReadDelList;
-		ReadDelList                       (ReadDelList                          )--> ReadDelList;
-		ReadDelList                       (ReadDelListDone                      )--> read_num_ref_frames;
+		ReadSizeDelLists                  (ReadSizeDelLists                     )--> ReadDelLists;
+		ReadDelLists                      (ReadDelList.RealFrame                )--> ReadDelLists;
+		ReadDelLists                      (ReadDelList.FalseFrame               )--> ReadDelLists;
+		ReadDelLists                      (ReadDelList.done                     )--> read_num_ref_frames;
 
-		read_num_ref_frames               (read_num_ref_frames                  )--> ReadLongTerm;
+		read_num_ref_frames               (read_num_ref_frames                  )--> FillFalseRefFrame;
+		FillFalseRefFrame                 (FillFalseRefFrame                    )--> ReadLongTerm;
 
 		ReadLongTerm                      (ReadLongTermList.launch              )--> ReadLongTerm;
 		ReadLongTerm                      (ReadLongTermList.done                )--> InitRefList;
@@ -470,15 +557,17 @@ actor Algo_RefList ()
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_3    )--> SendRefList;
 
 		SendRefList                       (SendRefList                          )--> SendRefList;
-		SendRefList                       (SendRefListDone                      )--> ReadSizeDelList;
+		SendRefList                       (SendRefListDone                      )--> ReadSizeDelLists;
 
 
 	end
 
 
 	priority
+		ReadDelList.RealFrame   > ReadDelList.FalseFrame    > ReadDelList.done;
 		ReadLongTermList.launch > ReadLongTermList.done;
 		SendRefList             > SendRefListDone;
+		FillFalseRefFrame.done  > FillFalseRefFrame.launch;
 	end
 
 end

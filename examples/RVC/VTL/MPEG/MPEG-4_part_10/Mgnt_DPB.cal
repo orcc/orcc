@@ -162,7 +162,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				println("POC not found :"+poc2read);
 					foreach int i in Integers(0,NB_PIC-1)
 					do
-						println("POC n"+i+":"+ListPOC[i]+" frame:"+ListFrameNum[i]+ " ref:"+IsAReference[i]);
+						println("Idx n"+i+":"+ListPOC[i]+" frame:"+ListFrameNum[i]+ " is a ref:"+IsAReference[i]);
 					end
 				while(true)
 				do

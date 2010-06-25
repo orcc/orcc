@@ -564,4 +564,6 @@
     <Connection dst="Algo_RefList0" dst-port="IsIDR" src="Algo_MMCO" src-port="IsIDR"/>
     <Connection dst="Algo_RefList0" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
+    <Connection dst="Algo_RefList0" dst-port="DelFalseFrameList"
+        src="Algo_MMCO" src-port="DelFalseFrame"/>
 </XDF>
