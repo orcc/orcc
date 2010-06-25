@@ -5,7 +5,7 @@
 
 // Reads an image in raster scan order, fills a three-line cache, and apply Sobel filter.
 
-actor Sobel(uint(size=16) MAXW)
+actor Sobel()
   uint(size=16) width, uint(size=16) height, uint(size=8) y ==>
   uint(size=8) gradient :
 
@@ -16,35 +16,40 @@ actor Sobel(uint(size=16) MAXW)
   uint(size=16) fill_ptr := 0;
   uint(size=16) consume_ptr := 0;
   
+  // number of cache lines
   int CACHE_LINES = 3;
+  
+  // maximum width
+  uint(size=16) MAXW = 2048;
 
   // pixels contains three lines of MAXW pixels with Y component.
   List(type:uint(size=8), size=CACHE_LINES * MAXW) pixels;
-  
-  int res;
   
   // software version of SQRT
   procedure soft_sqrt(int num)
   var
     int op := num,
-    int one := lshift(1, 14) // The second-to-top bit is set: 1L<<30 for long
+    int one := lshift(1, 14), // The second-to-top bit is set: 1L<<30 for long
+    int lres := 0
   begin
-    res := 0;
-    
     // "one" starts at the highest power of four <= the argument.
     while (one > op) do
       one := rshift(one, 2);
     end
     
     while (one != 0) do
-      if (op >= res + one) then
-        op := op - (res + one);
-        res := res + lshift(one, 1);
+      if (op >= lres + one) then
+        op := op - (lres + one);
+        lres := lres + lshift(one, 1);
       end
-      res := rshift(res, 1);
+      lres := rshift(lres, 1);
       one := rshift(one, 2);
     end
+    
+    res := lres;
   end
+  
+  int res;
 
   // get image dimension
   get_dim: action width:[w], height: [h] ==>
@@ -100,7 +105,6 @@ actor Sobel(uint(size=16) MAXW)
     int i = wcnt,
     int j = consume_ptr,
     List(type:List(type:int, size=2), size=9) coord,
-    List(type:int, size=9) off,
     List(type:int, size=9) val
   do
     coord :=
@@ -113,7 +117,8 @@ actor Sobel(uint(size=16) MAXW)
     gx := - val[0] + val[2] - lshift(val[3], 1) + lshift(val[5], 1) - val[6] + val[8];
     gy := - val[0] - lshift(val[1], 1) - val[2] + val[6] + lshift(val[7], 1) + val[8];
     
-    g := soft_sqrt(gx * gx + gy * gy);
+    soft_sqrt(gx * gx + gy * gy);
+    g := res;
 
     wcnt := wcnt + 1;
   end
