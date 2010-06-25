@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.util;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
@@ -397,6 +399,15 @@ public class VoidSwitch extends CalSwitch<Void> {
 			return null;
 		} else {
 			return doSwitch(value);
+		}
+	}
+
+	@Override
+	public Void doSwitch(EObject theEObject) {
+		if (theEObject == null) {
+			return null;
+		} else {
+			return super.doSwitch(theEObject);
 		}
 	}
 

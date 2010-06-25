@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.util;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
@@ -457,6 +459,15 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 			return false;
 		} else {
 			return doSwitch(value);
+		}
+	}
+
+	@Override
+	public Boolean doSwitch(EObject theEObject) {
+		if (theEObject == null) {
+			return null;
+		} else {
+			return super.doSwitch(theEObject);
 		}
 	}
 
