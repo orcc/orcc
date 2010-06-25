@@ -6,8 +6,8 @@
 // Reads an image in raster scan order, fills a three-line cache, and apply Sobel filter.
 
 actor Sobel()
-  uint(size=16) width, uint(size=16) height, uint(size=8) y ==>
-  uint(size=8) gradient :
+  uint(size=16) WIDTH, uint(size=16) HEIGHT, uint(size=8) Y ==>
+  uint(size=8) GRADIENT :
 
   uint(size=16) img_w;
   uint(size=16) wcnt := 0;
@@ -52,14 +52,14 @@ actor Sobel()
   int res;
 
   // get image dimension
-  get_dim: action width:[w], height: [h] ==>
+  get_dim: action WIDTH:[w], HEIGHT: [h] ==>
   do
     img_w := w;
     img_h := h;
   end
 
   // get a pixel and store it in the cache
-  read_pixel: action y:[y_component] ==>
+  read_pixel: action Y:[y_component] ==>
   do
     pixels[fill_ptr * img_w + wcnt] := y_component;
     wcnt := wcnt + 1;
@@ -98,7 +98,7 @@ actor Sobel()
   end
   
   // applies Sobel filter on one line.
-  compute_sobel: action ==> gradient:[g]
+  compute_sobel: action ==> GRADIENT:[g]
   var
     uint(size=8) g,
     int gx, int gy,

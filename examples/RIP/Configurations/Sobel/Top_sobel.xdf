@@ -60,24 +60,24 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="img_display" dst-port="width" src="img_read" src-port="width">
+    <Connection dst="img_display" dst-port="WIDTH" src="img_read" src-port="WIDTH">
         <Attribute kind="Value" name="bufferSize">
             <Expr kind="Literal" literal-kind="Integer" value="1"/>
         </Attribute>
     </Connection>
-    <Connection dst="img_display" dst-port="height" src="img_read" src-port="height">
+    <Connection dst="img_display" dst-port="HEIGHT" src="img_read" src-port="HEIGHT">
         <Attribute kind="Value" name="bufferSize">
             <Expr kind="Literal" literal-kind="Integer" value="1"/>
         </Attribute>
     </Connection>
-    <Connection dst="rgb2y" dst-port="red" src="img_read" src-port="red"/>
-    <Connection dst="rgb2y" dst-port="green" src="img_read" src-port="green"/>
-    <Connection dst="rgb2y" dst-port="blue" src="img_read" src-port="blue"/>
-    <Connection dst="img_display" dst-port="red" src="y2rgb" src-port="red"/>
-    <Connection dst="img_display" dst-port="green" src="y2rgb" src-port="green"/>
-    <Connection dst="img_display" dst-port="blue" src="y2rgb" src-port="blue"/>
-    <Connection dst="sobel" dst-port="width" src="img_read" src-port="width"/>
-    <Connection dst="sobel" dst-port="height" src="img_read" src-port="height"/>
-    <Connection dst="sobel" dst-port="y" src="rgb2y" src-port="y"/>
-    <Connection dst="y2rgb" dst-port="y" src="sobel" src-port="gradient"/>
+    <Connection dst="rgb2y" dst-port="RED" src="img_read" src-port="RED"/>
+    <Connection dst="rgb2y" dst-port="GREEN" src="img_read" src-port="GREEN"/>
+    <Connection dst="rgb2y" dst-port="BLUE" src="img_read" src-port="BLUE"/>
+    <Connection dst="img_display" dst-port="RED" src="y2rgb" src-port="RED"/>
+    <Connection dst="img_display" dst-port="GREEN" src="y2rgb" src-port="GREEN"/>
+    <Connection dst="img_display" dst-port="BLUE" src="y2rgb" src-port="BLUE"/>
+    <Connection dst="sobel" dst-port="WIDTH" src="img_read" src-port="WIDTH"/>
+    <Connection dst="sobel" dst-port="HEIGHT" src="img_read" src-port="HEIGHT"/>
+    <Connection dst="sobel" dst-port="Y" src="rgb2y" src-port="Y"/>
+    <Connection dst="y2rgb" dst-port="Y" src="sobel" src-port="GRADIENT"/>
 </XDF>
