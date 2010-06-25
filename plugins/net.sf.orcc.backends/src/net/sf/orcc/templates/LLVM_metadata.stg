@@ -96,10 +96,12 @@ $name_decl_MD(actor)$ = metadata !{$varName_MD(actor)$}
 
 actionScheduler_MD(actor) ::= <<
 $if(actor.actionScheduler.fsm)$
-$actionScheduler_decl_MD(actor)$ = metadata !{metadata $FSM_decl_MD(actor)$, i32()* @scheduler}
+$actionScheduler_decl_MD(actor)$ = metadata !{metadata $FSM_decl_MD(actor)$, i32()* @scheduler $
+if(actor.initializes)$, i32()* @initialize $endif$}
 $FSM_MD(actor)$
 $else$
-$actionScheduler_decl_MD(actor)$ = metadata !{null, i32()* @scheduler}
+$actionScheduler_decl_MD(actor)$ = metadata !{null, i32()* @scheduler$
+if(actor.initializes)$, i32()* @initialize $endif$}
 $endif$
 >>
 
