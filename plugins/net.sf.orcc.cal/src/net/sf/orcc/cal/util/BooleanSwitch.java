@@ -465,7 +465,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	@Override
 	public Boolean doSwitch(EObject theEObject) {
 		if (theEObject == null) {
-			return null;
+			return false;
 		} else {
 			return super.doSwitch(theEObject);
 		}

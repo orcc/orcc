@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.type;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
@@ -105,6 +107,15 @@ public class TypeConverter extends CalSwitch<Type> {
 			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
 		return new UintType(size);
+	}
+
+	@Override
+	public Type doSwitch(EObject theEObject) {
+		if (theEObject == null) {
+			return null;
+		} else {
+			return super.doSwitch(theEObject);
+		}
 	}
 
 	/**
