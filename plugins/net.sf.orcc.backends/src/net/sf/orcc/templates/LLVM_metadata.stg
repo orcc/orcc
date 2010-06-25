@@ -17,6 +17,9 @@ $endif$
 $if(actor.procs.list)$ 
 !procedures = !{$actor.procs.list: {$proc_decl_MD(actor=actor, proc=it)$}; separator=", "$}
 $endif$
+$if(actor.initializes)$
+!initializes = !{$actor.initializes: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
+$endif$
 $if(actor.actions)$
 !actions = !{$actor.actions: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
 $endif$
@@ -29,6 +32,7 @@ $actor.outputs.list: {$fifo_MD(actor= actor, port=it)$}$
 $actor.parameters.list: {$parameter_MD(actor=actor, parameter=it)$}$
 $actor.stateVars.list: {$stateVar_MD(actor=actor, var=it)$}$
 $actor.procs.list: {$proc_MD(actor=actor, proc=it)$}$
+$actor.initializes: {$action_MD(actor=actor, action=it)$}$
 $actor.actions: {$action_MD(actor=actor, action=it)$}$
 
 >>

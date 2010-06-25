@@ -115,6 +115,11 @@ public class LLVMTemplateData {
 		for (Procedure procedure : actor.getProcs()) {
 			computeProc(procedure);
 		}
+		
+		// Insert procedures
+		for (Action initialize : actor.getInitializes()) {
+			computeAction(initialize);
+		}
 
 		// Insert actions
 		for (Action action : actor.getActions()) {
