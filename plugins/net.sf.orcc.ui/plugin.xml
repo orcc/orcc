@@ -52,10 +52,15 @@
             id="net.sf.orcc.ui.properties.ProjectPropertyPage"
             name="Orcc Settings">
          <enabledWhen>
-            <test
-                  forcePluginActivation="true"
-                  property="net.sf.orcc.isOrccProject">
-            </test>
+            <and>
+               <adapt
+                     type="org.eclipse.core.resources.IProject">
+               </adapt>
+               <test
+                     forcePluginActivation="true"
+                     property="net.sf.orcc.isOrccProject">
+               </test>
+            </and>
          </enabledWhen>
       </page>
    </extension>
