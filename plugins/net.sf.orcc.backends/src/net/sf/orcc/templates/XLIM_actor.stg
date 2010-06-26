@@ -140,7 +140,13 @@ Increment(increment) ::= <<
 >>
 
 Peek(peek) ::= <<
-<!-- TODO peek -->
+<operation kind="\$literal_Integer" value="0">
+	<port dir="out" size="32" source="peek_$instance.id$_$procedure$_0" typeName="int"/>
+</operation>
+<operation kind="pinPeek" portName="$peek.port.name$" removable="no">
+	<port dir="in" source="peek_$instance.id$_$procedure$_0"/>
+	$port(dir="out", type=peek.port.type, source=peek.target)$
+</operation>
 >>
 
 port(dir, type, source) ::= <<
@@ -310,35 +316,35 @@ action(action) ::= <<
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-outputPatternPort(port, index, index0) ::= <<
+outputPatternPort(port, index, index0, state) ::= <<
 <!--  OutputPattern -->
 <operation kind="pinStatus" portName="$port$" removable="no">
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_$port$" typeName="bool"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
 </operation>
 <operation kind="\$and">
-	<port dir="in" source="outputPattern_$instance.id$_$action.name$_$port$"/>
-	<port dir="in" source="outputPattern_$instance.id$_$action.name$_res_$index0$"/>
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_res_$index$" typeName="bool"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index0$"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$" typeName="bool"/>
 </operation>
 >>
 
-outputPatternPortDecision(index)::=<<
+outputPatternPortDecision(index,state)::=<<
 <module kind="if">
-	<module decision="outputPattern_$instance.id$_$action.name$_decision_$index$" kind="test">
+	<module decision="outputPattern_$instance.id$_$action.name$_decision_s_$state$_$index$" kind="test">
 		<operation kind="noop">
-			<port dir="in" source="outputPattern_$instance.id$_$action.name$_res_$index$"/>
-			<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_decision_$index$" typeName="bool"/>
+			<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$"/>
+			<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_decision_s_$state$_$index$" typeName="bool"/>
 		</operation>
 	</module>
 >>
 
-outputPattern(pattern,action) ::= <<
+outputPattern(pattern,action,state) ::= <<
 <operation kind="\$literal_Integer" value="1">
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_res_0" typeName="bool"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_0" typeName="bool"/>
 </operation>
-$pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0)$}; separator="\n"$
+$pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0, state=state)$}; separator="\n"$
 <!-- Last outputPattern -->
-$outputPatternPortDecision(length(pattern.keys)); separator="\n"$
+$outputPatternPortDecision(index=length(pattern.keys),state=state); separator="\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -349,7 +355,6 @@ actionCall(action) ::= <<
 >>
 
 actionTest(action) ::= <<
-$procedure(action.scheduler)$
 <module kind="if">
 	<module decision="isSchedulable_$action$" kind="test">
 		<operation kind="noop">
@@ -368,12 +373,13 @@ $procedure(action.scheduler)$
 		$actionCall(action)$
 		$endif$
 	</module>
-	<module kind="else"/>
-</module>
+	<module kind="else">
 >>
 
 schedulingTest(actions) ::= <<
-$actions: actionTest()$
+<!-- All Schedulable expressions -->
+$actions: actionTest(); separator="\n"$
+$actions:{</module></module>}; separator="\n"$
 >>
 
 scheduler(actions) ::= <<
@@ -389,6 +395,7 @@ scheduler(actions) ::= <<
 			</operation>
 		</module>
 		<module kind="body">
+			$instance.actor.actions: isSchedulableTest(); separator="\n"$
 			$if(actions)$$schedulingTest(actions)$$endif$
 		</module>
 	</module>
@@ -405,33 +412,33 @@ actionCallState(nextState) ::= <<
 >>
 
 actionTestState(nextState) ::= <<
-$procedure(nextState.action.scheduler)$
 <module kind="if">
-	<module decision="isSchedulable_$nextState.action$" kind="test">
+	<module decision="isSchedulable_$nextState.action$_$nextState.targetState$" kind="test">
 		<operation kind="noop">
 			<port dir="in" source="isSchedulable_$nextState.action$_go"/>
-			<port dir="out" size="1" source="isSchedulable_$nextState.action$" typeName="bool"/>
+			<port dir="out" size="1" source="isSchedulable_$nextState.action$_$nextState.targetState$" typeName="bool"/>
 		</operation>
 	</module>
 	<module kind="then">
 		$if(nextState.action.outputPattern)$
-		$outputPattern(pattern=nextState.action.outputPattern,action=nextState.action)$
+		$outputPattern(pattern=nextState.action.outputPattern,action=nextState.action,state=nextState.targetState)$
 			<module kind="then">
 				$actionCall(nextState.action)$
 				$actionCallState(nextState)$
 			</module>
 		</module>
 		$else$
+		<!-- no ouput pattern-->
 		$actionCall(nextState.action)$
 		$actionCallState(nextState)$
 		$endif$
 	</module>
-	<module kind="else"/>
-</module>
+	<module kind="else">
 >>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState()$
+$nextStates: actionTestState(); separator="\n"$
+$nextStates: {</module></module>}; separator="\n"$
 >>
 
 Transition(transition) ::= <<
@@ -455,9 +462,14 @@ Transition(transition) ::= <<
 	<module kind="else">
 >>
 
+isSchedulableTest(action) ::= <<
+$procedure(action.scheduler)$
+>>
+
 Transitions(actions, transitions) ::= <<
+<!-- All transitions -->
 $transitions:{transition | $Transition(transition=transition)$}; separator="\n"$
-$transitions:{</module></module>}$
+$transitions:{</module></module>}; separator="\n"$
 >>
 
 enumStates(state,id)::= <<
@@ -495,6 +507,8 @@ schedulerFSM(actions, fsm) ::= <<
 			}
 			$endif$
 		<module kind="body">
+			<!-- All Schedulable expressions -->
+			$instance.actor.actions: isSchedulableTest()$
 			<!-- FSM transitions -->
 			$Transitions(actions=actions, transitions=fsm.transitions)$
 		</module>

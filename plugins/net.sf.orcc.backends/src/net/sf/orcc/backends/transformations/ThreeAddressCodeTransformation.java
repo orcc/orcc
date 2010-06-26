@@ -306,10 +306,15 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		if (!(assign.getValue() instanceof BinaryExpr)) {
 			Expression expr = assign.getValue();
 			Location location = expr.getLocation();
-			BinaryOp op = BinaryOp.PLUS;
-
-			assign.setValue(new BinaryExpr(location, expr, op, new IntExpr(0),
-					expr.getType()));
+			if (expr.getType().isBool()) {
+				BinaryOp op = BinaryOp.LOGIC_AND;
+				assign.setValue(new BinaryExpr(location, expr, op, new IntExpr(
+						0), expr.getType()));
+			} else {
+				BinaryOp op = BinaryOp.PLUS;
+				assign.setValue(new BinaryExpr(location, expr, op, new IntExpr(
+						0), expr.getType()));
+			}
 		}
 	}
 
