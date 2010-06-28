@@ -278,8 +278,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 			}
 		}
 
-		AstExpression repeat = input.getRepeat();
-		if (repeat != null && doSwitch(repeat)) {
+		if (doSwitch(input.getRepeat())) {
 			return true;
 		}
 
@@ -298,8 +297,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 			}
 		}
 
-		AstExpression repeat = output.getRepeat();
-		if (repeat != null && doSwitch(repeat)) {
+		if (doSwitch(output.getRepeat())) {
 			return true;
 		}
 
@@ -419,12 +417,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseAstTypeInt(AstTypeInt type) {
-		AstExpression value = type.getSize();
-		if (value == null) {
-			return false;
-		} else {
-			return doSwitch(value);
-		}
+		return doSwitch(type.getSize());
 	}
 
 	@Override
@@ -439,27 +432,17 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseAstTypeUint(AstTypeUint type) {
-		AstExpression value = type.getSize();
-		if (value == null) {
-			return false;
-		} else {
-			return doSwitch(value);
-		}
+		return doSwitch(type.getSize());
 	}
 
 	@Override
 	public Boolean caseAstVariable(AstVariable variable) {
 		AstType type = variable.getType();
-		if (type != null && doSwitch(type)) {
+		if (doSwitch(type)) {
 			return true;
 		}
 
-		AstExpression value = variable.getValue();
-		if (value == null) {
-			return false;
-		} else {
-			return doSwitch(value);
-		}
+		return doSwitch(variable.getValue());
 	}
 
 	@Override

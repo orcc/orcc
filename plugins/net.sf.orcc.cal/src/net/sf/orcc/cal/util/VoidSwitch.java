@@ -108,6 +108,14 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(stateVariable);
 		}
 
+		for (AstFunction function : actor.getFunctions()) {
+			doSwitch(function);
+		}
+
+		for (AstProcedure procedure : actor.getProcedures()) {
+			doSwitch(procedure);
+		}
+
 		for (AstPort port : actor.getInputs()) {
 			doSwitch(port);
 		}
@@ -120,16 +128,8 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(action);
 		}
 
-		for (AstFunction function : actor.getFunctions()) {
-			doSwitch(function);
-		}
-
 		for (AstAction action : actor.getInitializes()) {
 			doSwitch(action);
-		}
-
-		for (AstProcedure procedure : actor.getProcedures()) {
-			doSwitch(procedure);
 		}
 
 		return null;
@@ -200,8 +200,7 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstExpressionUnary(AstExpressionUnary expression) {
-		doSwitch(expression.getExpression());
-		return null;
+		return doSwitch(expression.getExpression());
 	}
 
 	@Override
@@ -241,10 +240,7 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(token);
 		}
 
-		AstExpression repeat = input.getRepeat();
-		if (repeat != null) {
-			doSwitch(repeat);
-		}
+		doSwitch(input.getRepeat());
 
 		return null;
 	}
@@ -257,18 +253,14 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(value);
 		}
 
-		AstExpression repeat = output.getRepeat();
-		if (repeat != null) {
-			doSwitch(repeat);
-		}
+		doSwitch(output.getRepeat());
 
 		return null;
 	}
 
 	@Override
 	public Void caseAstPort(AstPort port) {
-		doSwitch(port.getType());
-		return null;
+		return doSwitch(port.getType());
 	}
 
 	@Override
@@ -359,12 +351,7 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstTypeInt(AstTypeInt type) {
-		AstExpression value = type.getSize();
-		if (value == null) {
-			return null;
-		} else {
-			return doSwitch(value);
-		}
+		return doSwitch(type.getSize());
 	}
 
 	@Override
@@ -382,24 +369,13 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstTypeUint(AstTypeUint type) {
-		AstExpression value = type.getSize();
-		if (value == null) {
-			return null;
-		} else {
-			return doSwitch(value);
-		}
+		return doSwitch(type.getSize());
 	}
 
 	@Override
 	public Void caseAstVariable(AstVariable variable) {
 		doSwitch(variable.getType());
-
-		AstExpression value = variable.getValue();
-		if (value == null) {
-			return null;
-		} else {
-			return doSwitch(value);
-		}
+		return doSwitch(variable.getValue());
 	}
 
 	@Override

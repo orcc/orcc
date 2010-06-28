@@ -119,7 +119,6 @@ public class TypeChecker extends CalSwitch<Type> {
 		case BITOR:
 		case BITXOR:
 		case MINUS:
-		case PLUS:
 		case TIMES:
 			if (!t1.isInt() && !t1.isUint()) {
 				CalJavaValidator.getInstance().error(
@@ -130,6 +129,41 @@ public class TypeChecker extends CalSwitch<Type> {
 			if (!t2.isInt() && !t2.isUint()) {
 				CalJavaValidator.getInstance().error(
 						"Cannot convert " + t2 + " to int/uint", expression,
+						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
+				return null;
+			}
+			return getLub(t1, t2);
+
+		case PLUS:
+			if (t1.isString()) {
+				if (t2.isList()) {
+					CalJavaValidator.getInstance().error(
+							"Cannot convert " + t2 + " to String", expression,
+							CalPackage.AST_EXPRESSION_BINARY__RIGHT);
+					return null;
+				} else {
+					return t1;
+				}
+			}
+			if (t2.isString()) {
+				if (t1.isList()) {
+					CalJavaValidator.getInstance().error(
+							"Cannot convert " + t1 + " to String", expression,
+							CalPackage.AST_EXPRESSION_BINARY__LEFT);
+					return null;
+				} else {
+					return t1;
+				}
+			}
+			if (t1.isList()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t1 + " to scalar", expression,
+						CalPackage.AST_EXPRESSION_BINARY__LEFT);
+				return null;
+			}
+			if (t2.isList()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + t2 + " to scalar", expression,
 						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 				return null;
 			}
@@ -307,6 +341,9 @@ public class TypeChecker extends CalSwitch<Type> {
 			}
 			return type;
 		case MINUS:
+			if (type.isUint()) {
+				return new IntType(((UintType) type).getSize());
+			}
 			if (!type.isInt()) {
 				CalJavaValidator.getInstance().error(
 						"Cannot convert " + type + " to int", expression,

@@ -59,7 +59,7 @@ public class TypeTransformer extends VoidSwitch {
 		checker.getType(expression);
 		return null;
 	}
-	
+
 	@Override
 	public Void caseAstFunction(AstFunction function) {
 		TypeConverter converter = new TypeConverter();
@@ -107,6 +107,9 @@ public class TypeTransformer extends VoidSwitch {
 		TypeConverter converter = new TypeConverter();
 		Type type = converter.transformType(variable.getType());
 		variable.setIrType(type);
+
+		doSwitch(variable.getValue());
+
 		return null;
 	}
 
