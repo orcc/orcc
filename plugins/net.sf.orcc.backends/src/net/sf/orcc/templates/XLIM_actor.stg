@@ -81,7 +81,7 @@ $instance.actor.stateVars.list: stateVar(); separator="\n"$
 ///////////////////////////////////////////////////////////////////////////////
 
 expression(expr) ::= <<
-	$(expr.class.simpleName)(expr)$
+$(expr.class.simpleName)(expr)$
 >>
 
 
@@ -117,7 +117,7 @@ BoolExpr(expr) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 operation(op) ::= <<
-	$(op.class.simpleName)(op)$
+$(op.class.simpleName)(op)$
 >>
 
 
@@ -173,26 +173,20 @@ Write(op) ::= <<
 Load(op) ::= <<
 $if (op.target.variable.type.list)$
 $! TODO !$
-$else$
-<operation kind="noop">
+$else$<operation kind="noop">
 	$port(dir="in", source=op.source)$
 	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>
-$endif$
+</operation>$endif$
 >>
 
 Store(op) ::= <<
-$if (op.target.global)$
-<operation kind="assign" target="$op.target$">
+$if (op.target.global)$<operation kind="assign" target="$op.target$">
 	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
 	$port(dir="in", source=op.value.var)$
-</operation>
-$else$
-<operation kind="noop">
+</operation>$else$<operation kind="noop">
 	$port(dir="in", source=op.value.var)$
 	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>
-$endif$
+</operation>$endif$
 >>
 
 Assign(op) ::= <<
@@ -209,12 +203,10 @@ PhiAssignment(phi) ::= <<
 >>
 
 Return(return) ::= <<
-$if (return.value)$
-<operation kind="noop">
+$if (return.value)$<operation kind="noop">
 	$port(dir="in", source=return.value)$
 	<port dir="out" size="1" source="$procedure$_go" typeName="bool"/>
-</operation>
-$endif$
+</operation>$endif$
 >>
 
 SelfAssignment(selfAssign) ::= <<
@@ -536,7 +528,7 @@ design() ::= <<
 <design name="$instance.id$">
 	$actorPorts()$
 	$parameters(instance.parameters)$
-	$instance.actor.stateVars.list: stateVar()$
+	$instance.actor.stateVars.list: stateVar(); separator="\n"$
 	$instance.actor.procs.list: procedure()$
 	$instance.actor.actions: action(); separator="\n"$
 	$if(instance.actor.initializes)$
