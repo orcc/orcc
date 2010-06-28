@@ -312,7 +312,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	//CABAC Neighbouring
 	
-	List ( type: List ( type: int, size = 10) , size = PICWIDTH*PICHEIGHT - 1 ) mbTab := [[ 0 : for int i in Integers( 0, 9)] : for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2)];
+	List ( type: List ( type: int, size = 10) , size = PICWIDTH + 1 ) mbTab := [[ 0 : for int i in Integers( 0, 9)] : for int j in Integers( 0, PICWIDTH)];
 	
 	int TypePred				:= 0; //0:Intra 1:Inter 2: B, used for ctx prediction
 	int mbSliceType				:= 1;
@@ -328,20 +328,20 @@ actor Algo_Synp_AVC_FREXT()
 	
 	 /* CABAC Coded Block Flag Lists */
 	 
-	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH*PICHEIGHT ) transblock_cbf	:=  [ [ 0 : for int i in Integers( 0, 15) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cr	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cb	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH + 1 ) transblock_cbf	:=  [ [ 0 : for int i in Integers( 0, 15) ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cr	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cb	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH + 1 ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH) ];
 	
 	/* CABAC MVD and REF Lists */
 														  /*val_CurrMbAddr, mbPartIdx, subMbPartIdx,compIdx*/
-	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L0 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L1 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH + 1 ) Mvd_L0 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH + 1 ) Mvd_L1 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH) ];
 	
-	List ( type: List ( type: int, size = 4)  , size = PICWIDTH*PICHEIGHT ) Ref_Idx_L0	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type: int, size = 4)  , size = PICWIDTH*PICHEIGHT ) Ref_Idx_L1	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int, size = 4)  , size = PICWIDTH + 1 ) Ref_Idx_L0	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int, size = 4)  , size = PICWIDTH + 1 ) Ref_Idx_L1	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
 	/* CABAC sub_mb_type */
-	List ( type: List ( type: int, size = 4) , size = PICWIDTH*PICHEIGHT ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int, size = 4) , size = PICWIDTH + 1 ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH) ];
 	
 	/* Residual Block arrays used in Cabac */
 	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 255)] ;
@@ -6500,7 +6500,7 @@ end
 		//Init Tabs 
 		
 		if IS_CABAC() then
-		  foreach int i in Integers(0,PicSizeInMbs - 1) do
+		  foreach int i in Integers(0,PicWidthInMbs - 1) do
 			  mbTab[i][mbCBF] := 0;
 			  foreach int j in Integers(0,3) do
 				  transblock_cbf_cr[i][j] := 0;
@@ -6508,13 +6508,13 @@ end
 			  end
 		  end
 		  
-		  foreach int i in Integers(0,PicSizeInMbs - 1) do
+		  foreach int i in Integers(0,PicWidthInMbs - 1) do
 			  foreach int j in Integers(0,15) do
 				  transblock_cbf[i][j] := 0;
 			  end
 		  end
 		  
-		  foreach int i in Integers(0,PicSizeInMbs - 1) do
+		  foreach int i in Integers(0,PicWidthInMbs - 1) do
 			  foreach int j in Integers(0,1) do
 				  transblock_cbf_dc_cr_cb[i][j] := 0;
 			  end
