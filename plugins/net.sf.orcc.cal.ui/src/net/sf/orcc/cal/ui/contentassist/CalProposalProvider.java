@@ -102,8 +102,9 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 	private void proposeAllTags(EObject model, ContentAssistContext context,
 			ICompletionProposalAcceptor acceptor) {
 		AstActor actor = (AstActor) model.eContainer();
-		List<AstAction> actions = actor.getActions();
-		List<AstTag> tags = new CalActionList(actions).getTags(1);
+		CalActionList actionList = new CalActionList();
+		actionList.addActions(actor.getActions());
+		List<AstTag> tags = actionList.getTags(1);
 		for (AstTag tag : tags) {
 			String tagName = getLabelProvider().getText(tag);
 			ICompletionProposal proposal = createCompletionProposal(tagName,
@@ -148,11 +149,12 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 	private void proposeTagAfter(AstTag tag, EObject parent,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		AstActor actor = (AstActor) parent.eContainer();
-		List<AstAction> actions = actor.getActions();
 		int n = tag.getIdentifiers().size() - 1;
 		List<String> identifiers = tag.getIdentifiers().subList(0, n);
 
-		actions = new CalActionList(actions).getActions(identifiers);
+		CalActionList actionList = new CalActionList();
+		actionList.addActions(actor.getActions());
+		List<AstAction> actions = actionList.getActions(identifiers);
 		for (AstAction action : actions) {
 			identifiers = action.getTag().getIdentifiers();
 			if (n < identifiers.size()) {

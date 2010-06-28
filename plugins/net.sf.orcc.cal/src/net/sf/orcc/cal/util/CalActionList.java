@@ -39,8 +39,8 @@ import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.CalFactory;
 
 /**
- * A list of action is like an ordered map, except keys are tags (list of
- * strings).
+ * This class defines a list of action as an ordered map, except keys are tags
+ * (list of strings).
  * 
  * @author Matthieu Wipliez
  * 
@@ -62,9 +62,7 @@ public class CalActionList implements Iterable<AstAction> {
 	/**
 	 * Creates an action list.
 	 */
-	public CalActionList(List<AstAction> actions) {
-		this();
-
+	public void addActions(List<AstAction> actions) {
 		for (AstAction action : actions) {
 			add(action);
 		}
@@ -76,7 +74,7 @@ public class CalActionList implements Iterable<AstAction> {
 	 * @param action
 	 *            an action
 	 */
-	public void add(AstAction action) {
+	private void add(AstAction action) {
 		actionList.add(action);
 
 		AstTag tag = action.getTag();

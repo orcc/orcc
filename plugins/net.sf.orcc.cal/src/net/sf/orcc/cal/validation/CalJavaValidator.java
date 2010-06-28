@@ -42,9 +42,12 @@ import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
+import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
+import net.sf.orcc.cal.cal.AstTag;
+import net.sf.orcc.cal.cal.AstTransition;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
@@ -53,6 +56,7 @@ import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.cal.util.BooleanSwitch;
+import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Type;
 
@@ -141,7 +145,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		checker = new TypeChecker();
 
 		evaluateStateVariables(actor.getStateVariables());
-		
+
 		// transforms AST types to IR types
 		// this is a prerequisite for type checking
 		TypeTransformer typeTransformer = new TypeTransformer();
@@ -175,6 +179,26 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		if (!checker.areTypeCompatible(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
 					+ targetType, CalPackage.AST_STATEMENT_ASSIGN__VALUE);
+		}
+	}
+
+	@Check
+	public void checkFsm(AstSchedule schedule) {
+		AstActor actor = (AstActor) schedule.eContainer();
+		CalActionList actionList = new CalActionList();
+		actionList.addActions(actor.getActions());
+
+		for (AstTransition transition : schedule.getTransitions()) {
+			AstTag tag = transition.getTag();
+			if (tag != null) {
+				List<AstAction> actions = actionList.getActions(tag
+						.getIdentifiers());
+				if (actions == null || actions.isEmpty()) {
+					error("tag " + nameProvider.getQualifiedName(tag)
+							+ " does not refer to any action", transition,
+							CalPackage.AST_TRANSITION__TAG);
+				}
+			}
 		}
 	}
 
