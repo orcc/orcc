@@ -499,20 +499,24 @@ end loop;
 
 function(procedure, transformReturn) ::= <<
 $
-if (procedure.returnType.void)
+if (!procedure.external)
+  $$
+  if (procedure.returnType.void)
 $procedure $procedure$($parameters(procedure.parameters.list)$dummy : std_logic) is
-$
-else
+  $
+  else
 $function $procedure$($VarUsed(procedure)$$parameters(procedure)$dummy : std_logic) $returnFunction(procedure.returnType) $ is
-$
-endif
+  $
+  endif
 $$
-if(procedure.locals.list)
+  if(procedure.locals.list)
 $$procedure.locals.list: {$VarInFctDeclaration(it)$;$\n$}$$
-endif
+  endif
 $begin
   $procedure.nodes: {$(it.class.simpleName)(it)$}$
-end $procedure$;
+end $procedure$;$
+endif
+$
 
 >>
 
