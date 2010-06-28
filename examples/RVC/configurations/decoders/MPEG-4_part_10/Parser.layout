@@ -44,7 +44,7 @@
       <vertex id="ConstrainedIFlag" x="711" y="2430"/>
       <vertex id="DelList" x="1134" y="1671"/>
       <vertex id="FrameNum_CurrPic" x="690" y="1565"/>
-      <vertex id="RefList" x="1301" y="1724"/>
+      <vertex id="RefList" x="1311" y="1713"/>
       <vertex id="SizeDPBMax" x="787" y="2013"/>
       <vertex id="IsIDR" x="1269" y="1682"/>
       <vertex id="byte2bit" x="333" y="1704"/>
@@ -56,6 +56,6 @@
       <vertex id="MVReconstruct" x="926" y="1468"/>
       <vertex id="Algo_MMCO" x="873" y="1684"/>
       <vertex id="Algo_Parser_IPCM" x="951" y="2125"/>
-      <vertex id="Algo_RefList0" x="1181" y="1702"/>
+      <vertex id="Algo_RefList0" x="1156" y="1702"/>
    </vertices>
 </layout>

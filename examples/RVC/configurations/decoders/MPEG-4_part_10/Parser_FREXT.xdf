@@ -556,7 +556,6 @@
         src="Algo_Synp_AVC" src-port="NumRefFrame"/>
     <Connection dst="Algo_RefList0" dst-port="NbRefFrame"
         src="Algo_Synp_AVC" src-port="Nb_RefFrame_l0"/>
-    <Connection dst="Algo_RefList0" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>
     <Connection dst="Algo_RefList0" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="" dst-port="RefList" src="Algo_RefList0" src-port="RefList"/>
     <Connection dst="" dst-port="SizeDPBMax" src="Algo_Synp_AVC" src-port="SizeDPBMax"/>
@@ -564,8 +563,10 @@
     <Connection dst="Algo_RefList0" dst-port="IsIDR" src="Algo_MMCO" src-port="IsIDR"/>
     <Connection dst="Algo_RefList0" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
-    <Connection dst="Algo_RefList0" dst-port="DelFalseFrameList"
-        src="Algo_MMCO" src-port="DelFalseFrame"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="ENTROPY_TYPE"
         src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
+    <Connection dst="Algo_RefList0" dst-port="SzShortTermList"
+        src="Algo_MMCO" src-port="SzShortTermList"/>
+    <Connection dst="Algo_RefList0" dst-port="ShortTermList"
+        src="Algo_MMCO" src-port="ShortTermList"/>
 </XDF>
