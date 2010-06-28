@@ -306,9 +306,6 @@ actor Algo_Synp_AVC_FREXT()
 	
 	// ********** CABAC Arrays ********* //
 	
-	/* List Used as a result for Binarization */
-	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 24)] : for int j in Integers( 0, 99)];
-	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 127)];
 	
 	//CABAC Neighbouring
 	
@@ -1689,12 +1686,6 @@ actor Algo_Synp_AVC_FREXT()
 	procedure StopCabacProcess() 
 	begin
 		StartNewCabacParsing := false;
-		
-		if FoundSE = true then
-			foreach int s in Integers(0,15) do
-			      ReadBinString[s] := 0;
-			end
-		end
 	end 
 	
 	function cabac_value() --> int:
@@ -4596,9 +4587,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	DecodeDecision: action ==>
 	guard
-		StartDecodeDecision and
-		bypassFlag = false and ctxIdx != 276 and
-		StartRenormD = false
+		StartDecodeDecision
 	do
 		qCodIRangeIdx := ( codIRange >> 6 ) & 3;
 		codIRangeLPS := rangeTabLPS[pStateIdx[ctxIdx]][qCodIRangeIdx];
@@ -4619,13 +4608,12 @@ actor Algo_Synp_AVC_FREXT()
 			pStateIdx[ctxIdx] := transIdxLPS[pStateIdx[ctxIdx]];
 		else
 			binVal := valMPS[ctxIdx]; 
-			pStateIdx[ctxIdx] := transIdxMPS[ pStateIdx[ctxIdx] ];
+			pStateIdx[ctxIdx] := transIdxMPS[pStateIdx[ctxIdx]];
 		end
 		
 		// Give the right to compare in CabacParsing
 		binValDecoded := true;
-		// write the bit into the  ReadBinString
-		ReadBinString[binIdx + 1] := binVal;
+
 		
 		if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA then
 			prior_decoded_bin_cbp[binIdx] := binVal;
@@ -4639,8 +4627,6 @@ actor Algo_Synp_AVC_FREXT()
 		end			
 		// Do not call again DecodeDecision
 		StartDecodeDecision := false;
-		// Do not give the hand to CabacParsing
-		
 	end
 	/********************** DecodeBypass actions **********************/
 	
@@ -4670,7 +4656,6 @@ actor Algo_Synp_AVC_FREXT()
 			binVal := 0;
 		end
 		
-		// Give the right write a bit into ReadBinString[]
 		binValDecoded := true;
 		bypassFlag := false;
 		StartDecodeBypassStart := false;
@@ -4690,10 +4675,8 @@ actor Algo_Synp_AVC_FREXT()
 			binValDecoded := true;
 			// Start Cabac Process
 			StartCabacProcess();
-			// Give the right write a bit into ReadBinString[]
 			binValDecoded := true;
 			// write the bit into the  ReadBinString
-			ReadBinString[binIdx + 1] := binVal;	
 			StartDecodeTerminate := false;
 		else
 		
@@ -4720,7 +4703,6 @@ actor Algo_Synp_AVC_FREXT()
 				end
 			end
 			// write the bit into the  ReadBinString
-			ReadBinString[binIdx + 1] := binVal;	
 			StartDecodeTerminate := false;
 		end
 
@@ -4756,7 +4738,7 @@ actor Algo_Synp_AVC_FREXT()
 	CabacInitDecoding_Done:
 	action ==>
 	guard
-		( (PcmAlignementZeroBitDone or PcmSampleLumaDone or PcmSampleChromaDone ) or StartInitializationDecoding ) and
+		( PcmAlignementZeroBitDone or PcmSampleLumaDone or PcmSampleChromaDone  or StartInitializationDecoding ) and
 		done_reading_bits()
 	do
 		/* Initialisation of decoding engine */
@@ -6524,8 +6506,6 @@ end
 		  //Init FoundSE
 		  FoundSE := false;
 		end
-		
-				
 	end
 
 	//do
