@@ -100,6 +100,22 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstActor(AstActor actor) {
+		for (AstVariable parameter : actor.getParameters()) {
+			doSwitch(parameter);
+		}
+
+		for (AstVariable stateVariable : actor.getStateVariables()) {
+			doSwitch(stateVariable);
+		}
+
+		for (AstPort port : actor.getInputs()) {
+			doSwitch(port);
+		}
+
+		for (AstPort port : actor.getOutputs()) {
+			doSwitch(port);
+		}
+
 		for (AstAction action : actor.getActions()) {
 			doSwitch(action);
 		}
@@ -112,24 +128,8 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(action);
 		}
 
-		for (AstPort port : actor.getInputs()) {
-			doSwitch(port);
-		}
-
-		for (AstPort port : actor.getOutputs()) {
-			doSwitch(port);
-		}
-
-		for (AstVariable parameter : actor.getParameters()) {
-			doSwitch(parameter);
-		}
-
 		for (AstProcedure procedure : actor.getProcedures()) {
 			doSwitch(procedure);
-		}
-
-		for (AstVariable parameter : actor.getStateVariables()) {
-			doSwitch(parameter);
 		}
 
 		return null;

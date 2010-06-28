@@ -381,14 +381,22 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Returns the size in bits needed to store the given number.
+	 * Returns the size in bits needed to store the given number as an int.
 	 * 
 	 * @param number
 	 *            a number
-	 * @return the size in bits
+	 * @return the size in bits needed to store the given number as an int
 	 */
 	private int getSize(int number) {
-		return (int) Math.floor(Math.log(number) / Math.log(2)) + 1;
+		int v;
+		if (number >= 0) {
+			v = number + 1;
+		} else {
+			v = -number;
+		}
+
+		int size = (int) Math.ceil(Math.log(v) / Math.log(2)) + 1;
+		return size;
 	}
 
 	/**
@@ -399,7 +407,13 @@ public class TypeChecker extends CalSwitch<Type> {
 	 * @return a type
 	 */
 	public Type getType(AstExpression expression) {
-		return doSwitch(expression);
+		Type type = (Type) expression.getIrType();
+		if (type == null) {
+			type = doSwitch(expression);
+			expression.setIrType(type);
+		}
+
+		return type;
 	}
 
 }

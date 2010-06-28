@@ -47,18 +47,23 @@ import net.sf.orcc.ir.type.ListType;
  */
 public class TypeTransformer extends VoidSwitch {
 
-	private TypeConverter typeConverter;
-
 	/**
 	 * Creates a new AST type to IR type transformation.
 	 */
 	public TypeTransformer() {
-		typeConverter = new TypeConverter();
 	}
 
 	@Override
+	public Void caseAstExpression(AstExpression expression) {
+		TypeChecker checker = new TypeChecker();
+		checker.getType(expression);
+		return null;
+	}
+	
+	@Override
 	public Void caseAstFunction(AstFunction function) {
-		Type type = typeConverter.transformType(function.getType());
+		TypeConverter converter = new TypeConverter();
+		Type type = converter.transformType(function.getType());
 		function.setIrType(type);
 		return super.caseAstFunction(function);
 	}
@@ -89,7 +94,8 @@ public class TypeTransformer extends VoidSwitch {
 	@Override
 	public Void caseAstPort(AstPort port) {
 		if (port.getIrType() == null) {
-			Type type = typeConverter.transformType(port.getType());
+			TypeConverter converter = new TypeConverter();
+			Type type = converter.transformType(port.getType());
 			port.setIrType(type);
 		}
 
@@ -98,7 +104,8 @@ public class TypeTransformer extends VoidSwitch {
 
 	@Override
 	public Void caseAstVariable(AstVariable variable) {
-		Type type = typeConverter.transformType(variable.getType());
+		TypeConverter converter = new TypeConverter();
+		Type type = converter.transformType(variable.getType());
 		variable.setIrType(type);
 		return null;
 	}

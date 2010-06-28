@@ -43,6 +43,11 @@ addAttribute(EClass clasz, String typeName, String attributeName) :
 
 process(EClass this) :
 	switch (this.name) {
+		case "AstExpression": (
+			// add an "irType" value field to expressions
+			addAttribute(this, "EJavaObject", "irType")
+		)
+
 		case "AstFunction": (
 			// add an "irType" value field to functions
 			addAttribute(this, "EJavaObject", "irType")

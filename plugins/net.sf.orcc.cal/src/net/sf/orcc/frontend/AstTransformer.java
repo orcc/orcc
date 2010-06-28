@@ -84,6 +84,8 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
@@ -166,7 +168,11 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
-			return new IntExpr(42);
+			UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
+			Expression expr = doSwitch(expression.getExpression());
+
+			return new UnaryExpr(Util.getLocation(expression), op, expr,
+					(Type) expression.getIrType());
 		}
 
 		@Override
