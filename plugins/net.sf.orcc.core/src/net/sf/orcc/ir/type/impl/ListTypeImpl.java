@@ -48,16 +48,13 @@ import org.eclipse.emf.ecore.util.EDataTypeEList;
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
  * 
- * 
- *         public List<Integer> getDimensions() { ArrayList<Integer> dimensions
- *         = new ArrayList<Integer>(1); dimensions.add(size);
- *         dimensions.addAll(getType().getDimensions()); return dimensions; }
  */
 public class ListTypeImpl extends TypeImpl implements ListType {
 
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSize()
 	 * @generated
 	 * @ordered
@@ -66,6 +63,7 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 	/**
 	 * The cached value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSize()
 	 * @generated
 	 * @ordered
@@ -74,6 +72,7 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 	/**
 	 * The cached value of the '{@link #getType() <em>Type</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getType()
 	 * @generated
 	 * @ordered
@@ -82,6 +81,7 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected ListTypeImpl() {
@@ -100,6 +100,7 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Type basicGetElementType() {
@@ -111,6 +112,7 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Type basicGetType() {
@@ -119,40 +121,44 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case TypePackage.LIST_TYPE__ELEMENT_TYPE:
-				if (resolve) return getElementType();
-				return basicGetElementType();
-			case TypePackage.LIST_TYPE__SIZE:
-				return getSize();
-			case TypePackage.LIST_TYPE__SIZE_ITERATOR:
-				return getSizeIterator();
-			case TypePackage.LIST_TYPE__TYPE:
-				if (resolve) return getType();
-				return basicGetType();
+		case TypePackage.LIST_TYPE__ELEMENT_TYPE:
+			if (resolve)
+				return getElementType();
+			return basicGetElementType();
+		case TypePackage.LIST_TYPE__SIZE:
+			return getSize();
+		case TypePackage.LIST_TYPE__SIZE_ITERATOR:
+			return getSizeIterator();
+		case TypePackage.LIST_TYPE__TYPE:
+			if (resolve)
+				return getType();
+			return basicGetType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case TypePackage.LIST_TYPE__ELEMENT_TYPE:
-				return basicGetElementType() != null;
-			case TypePackage.LIST_TYPE__SIZE:
-				return size != SIZE_EDEFAULT;
-			case TypePackage.LIST_TYPE__SIZE_ITERATOR:
-				return !getSizeIterator().isEmpty();
-			case TypePackage.LIST_TYPE__TYPE:
-				return type != null;
+		case TypePackage.LIST_TYPE__ELEMENT_TYPE:
+			return basicGetElementType() != null;
+		case TypePackage.LIST_TYPE__SIZE:
+			return size != SIZE_EDEFAULT;
+		case TypePackage.LIST_TYPE__SIZE_ITERATOR:
+			return !getSizeIterator().isEmpty();
+		case TypePackage.LIST_TYPE__TYPE:
+			return type != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -169,23 +175,25 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case TypePackage.LIST_TYPE__SIZE:
-				setSize((Integer)newValue);
-				return;
-			case TypePackage.LIST_TYPE__TYPE:
-				setType((Type)newValue);
-				return;
+		case TypePackage.LIST_TYPE__SIZE:
+			setSize((Integer) newValue);
+			return;
+		case TypePackage.LIST_TYPE__TYPE:
+			setType((Type) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -195,19 +203,28 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case TypePackage.LIST_TYPE__SIZE:
-				setSize(SIZE_EDEFAULT);
-				return;
-			case TypePackage.LIST_TYPE__TYPE:
-				setType((Type)null);
-				return;
+		case TypePackage.LIST_TYPE__SIZE:
+			setSize(SIZE_EDEFAULT);
+			return;
+		case TypePackage.LIST_TYPE__TYPE:
+			setType((Type) null);
+			return;
 		}
 		super.eUnset(featureID);
+	}
+
+	@Override
+	public EList<Integer> getDimensions() {
+		EList<Integer> dimensions = super.getDimensions();
+		dimensions.add(size);
+		dimensions.addAll(getType().getDimensions());
+		return dimensions;
 	}
 
 	/**
@@ -256,11 +273,12 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 	 */
 	public Type getType() {
 		if (type != null && type.eIsProxy()) {
-			InternalEObject oldType = (InternalEObject)type;
-			type = (Type)eResolveProxy(oldType);
+			InternalEObject oldType = (InternalEObject) type;
+			type = (Type) eResolveProxy(oldType);
 			if (type != oldType) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, TypePackage.LIST_TYPE__TYPE, oldType, type));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							TypePackage.LIST_TYPE__TYPE, oldType, type));
 			}
 		}
 		return type;
@@ -282,7 +300,8 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.LIST_TYPE__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					TypePackage.LIST_TYPE__SIZE, oldSize, size));
 	}
 
 	/**
@@ -296,7 +315,8 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.LIST_TYPE__TYPE, oldType, type));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					TypePackage.LIST_TYPE__TYPE, oldType, type));
 	}
 
 	@Override
