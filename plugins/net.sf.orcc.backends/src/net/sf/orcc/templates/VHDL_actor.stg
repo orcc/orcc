@@ -367,25 +367,23 @@ Read(read) ::= <<
 $
 if(read.unit)
 $$
-if(read.target.type.bool)
-$$read.target$ := $read.port$_data;$\n$
-$
-else
-$$
-if(read.target.type.int)
-$
+  if(read.target.type.bool)
+  $
+$read.target$ := $read.port$_data;
+  $
+  elseif(read.target.type.int)
+  $
 $read.target$ := to_integer(signed($read.port$_data));
-$
-elseif (read.target)
-$
-$read.target$ := to_integer(unsigned($read.port$_data));$
-endif
-$$
-endif
-$$read.port$_ack <= '1';$
+  $
+  elseif (read.target)
+  $
+$read.target$ := to_integer(unsigned($read.port$_data));
+  $
+  endif
+  $
+$read.port$_ack <= '1';$
 else
-$-- read multiple token not coded yet
-$
+$-- read multiple token not coded yet$
 endif
 $
 >>
@@ -627,6 +625,7 @@ $printLocals(action.body)$
 
 // prints the body of the given action "inline" (ie not within a function)
 printActionBodyInline(action) ::= <<
+
 -- body of "$action$" action
 $procedure(procedure=action.body)$
 >>
@@ -661,7 +660,6 @@ $pattern.keys:{port|$port$_full = '0'}; separator=" and "$
 // Scheduler without FSM
 
 schedulingTest(actions) ::= <<
--- Actions
 if $actions: actionTest(); separator="\nelsif "$
 >>
 

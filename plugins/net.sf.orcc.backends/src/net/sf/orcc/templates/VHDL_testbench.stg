@@ -1,63 +1,63 @@
 fifo_in(port) ::= <<
 $
 if(port.type.bool)
-$signal $instance.id$_$port.name$_data  : std_logic;$\n$$
+$signal $port.name$_data  : std_logic;$\n$$
 else
-$signal $instance.id$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif
 $
-signal $instance.id$_$port.name$_send : std_logic;
-signal $instance.id$_$port.name$_ack  : std_logic;
+signal $port.name$_send : std_logic;
+signal $port.name$_ack  : std_logic;
 >>
 
 fifo_out(port) ::= <<
-signal $instance.id$_$port.name$_full  : std_logic;
+signal $port.name$_full  : std_logic;
 $
 if(last(port.name))
 $$
 if(port.type.bool)
-$signal $instance.id$_$port.name$_data  : std_logic;$\n$$
+$signal $port.name$_data  : std_logic;$\n$$
 else
-$signal $instance.id$_$port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif
-$signal $instance.id$_$port.name$_write : std_logic;$
+$signal $port.name$_write : std_logic;$
 else
-$signal $instance.id$_$port.name$_data  : $port.type$;
-signal $instance.id$_$port.name$_write : std_logic;$
+$signal $port.name$_data  : $port.type$;
+signal $port.name$_write : std_logic;$
 endif
 $
 >>
 
 
 fifo_in_init(port) ::=<<
-$instance.id$_$port.name$_send <= '0';$"\n"$
+$port.name$_send <= '0';$"\n"$
 >>
 fifo_out_init(port) ::=<<
-$instance.id$_$port.name$_full <= '0';$"\n"$
+$port.name$_full <= '0';$"\n"$
 >>
 
 fifo_actor_in(port) ::= <<
-$instance.actor.name$_$port.name$_data  => $instance.id$_$port.name$_data,
-$instance.actor.name$_$port.name$_send  => $instance.id$_$port.name$_send,
-$instance.actor.name$_$port.name$_ack   => $instance.id$_$port.name$_ack
+$port.name$_data  => $port.name$_data,
+$port.name$_send  => $port.name$_send,
+$port.name$_ack   => $port.name$_ack
 >>
 
 fifo_actor_out(port) ::= <<
-$instance.actor.name$_$port.name$_data  => $instance.id$_$port.name$_data,
-$instance.actor.name$_$port.name$_full  => $instance.id$_$port.name$_full,
-$instance.actor.name$_$port.name$_write => $instance.id$_$port.name$_write
+$port.name$_data  => $port.name$_data,
+$port.name$_full  => $port.name$_full,
+$port.name$_write => $port.name$_write
 >>
 
 fifo_network_in(port) ::= <<
-$instance.network.name$_$port.name$_data  => $instance.id$_$port.name$_data,
-$instance.network.name$_$port.name$_send  => $instance.id$_$port.name$_send,
-$instance.network.name$_$port.name$_ack   => $instance.id$_$port.name$_ack
+$port.name$_data  => $port.name$_data,
+$port.name$_send  => $port.name$_send,
+$port.name$_ack   => $port.name$_ack
 >>
 
 fifo_network_out(port) ::= <<
-$instance.network.name$_$port.name$_data  => $instance.id$_$port.name$_data,
-$instance.network.name$_$port.name$_full  => $instance.id$_$port.name$_full,
-$instance.network.name$_$port.name$_write => $instance.id$_$port.name$_write
+$port.name$_data  => $port.name$_data,
+$port.name$_full  => $port.name$_full,
+$port.name$_write => $port.name$_write
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ signal reset_n           : std_logic := '0';
 >>
 
 signal_in(port) ::= <<
-signal tb_FSM_$instance.id$_$port.name$  : tb_type;
+signal tb_FSM_$port.name$  : tb_type;
 file sim_file_$instance.id$_$port.name$  : text is "$instance.id$_$port.name$_sim.txt";
 >>
 
@@ -117,7 +117,7 @@ reset_n <= '1' after 10*PERIOD;
 >>
 
 tb_FSM_init(port) ::= <<
-tb_FSM_$instance.id$_$port.name$ <= after_reset;
+tb_FSM_$port.name$ <= after_reset;
 
 >>
     
@@ -145,11 +145,11 @@ end process WaveGen_Proc_In;
 
 case_define_in(port) ::= <<
 
-case tb_FSM_$instance.id$_$port.name$ is
+case tb_FSM_$port.name$ is
   when after_reset =>
     count <= count + 1;
     if count = 15 then
-      tb_FSM_$instance.id$_$port.name$ <= read_file;
+      tb_FSM_$port.name$ <= read_file;
       count           <= 0;
     end if;
 
@@ -162,26 +162,26 @@ case tb_FSM_$instance.id$_$port.name$ is
 $
 if(port.type.bool)
 $      if (input_bit = 1) then
-         $instance.id$_$port.name$_data  <= '1';
+         $port.name$_data  <= '1';
        else
-         $instance.id$_$port.name$_data  <= '0';
+         $port.name$_data  <= '0';
        end if;$
 else
 $$
   if(port.type.int)
-  $        $instance.id$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
+  $        $port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
   else
-  $        $instance.id$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
+  $        $port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
   endif
   $$
 endif
-$        $instance.id$_$port.name$_send <= '1';    
-        tb_FSM_$instance.id$_$port.name$ <= CheckRead;
+$        $port.name$_send <= '1';    
+        tb_FSM_$port.name$ <= CheckRead;
       end if;
     end if;
 
   when CheckRead =>
-    if (not endfile (sim_file_$instance.id$_$port.name$)) and $instance.id$_$port.name$_ack = '1' then
+    if (not endfile (sim_file_$instance.id$_$port.name$)) and $port.name$_ack = '1' then
       readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
@@ -189,20 +189,20 @@ $        $instance.id$_$port.name$_send <= '1';
 $
 if(port.type.bool)
 $      if (input_bit = 1) then
-         $instance.id$_$port.name$_data  <= '1';
+         $port.name$_data  <= '1';
        else
-         $instance.id$_$port.name$_data  <= '0';
+         $port.name$_data  <= '0';
        end if;$
 else
 $$
   if(port.type.int)
-  $        $instance.id$_$port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
+  $        $port.name$_data  <= std_logic_vector(to_signed(input_bit, $port.type.size$));$\n$$
   else
-  $        $instance.id$_$port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
+  $        $port.name$_data  <= std_logic_vector(to_unsigned(input_bit, $port.type.size$));$\n$$
   endif
   $$
 endif
-$        $instance.id$_$port.name$_send <= '1';      
+$        $port.name$_send <= '1';      
       end if;
     end if;
 
@@ -228,7 +228,7 @@ end process WaveGen_Proc_Out;
 
 
 case_define_out(port) ::= <<
-    if (not endfile (sim_file_$instance.id$_$port.name$) and $instance.id$_$port.name$_write = '1') then
+    if (not endfile (sim_file_$instance.id$_$port.name$) and $port.name$_write = '1') then
       readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
@@ -236,31 +236,31 @@ case_define_out(port) ::= <<
 $
 if(port.type.bool)
 $        if Input_bit = 1 then
-          assert ($instance.id$_$port.name$_data = '1')
+          assert ($port.name$_data = '1')
             report "incorrectly value computed : 0 instead of : 1"
             severity error;
         else
-          assert ($instance.id$_$port.name$_data = '0')
+          assert ($port.name$_data = '0')
             report "incorrectly value computed : 1 instead of : 0"
             severity error;                
         end if;$
 else
 $$
   if(port.type.int)
-  $        assert ($instance.id$_$port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
-          -- report "incorrectly value computed : " & to_string(to_integer(to_signed($instance.id$_$port.name$_data))) & " instead of :" & to_string(input_bit)
-          report "incorrectly value computed : " & str(to_integer(signed($instance.id$_$port.name$_data))) & " instead of :" & str(input_bit)
+  $        assert ($port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
+          -- report "incorrectly value computed : " & to_string(to_integer(to_signed($port.name$_data))) & " instead of :" & to_string(input_bit)
+          report "incorrectly value computed : " & str(to_integer(signed($port.name$_data))) & " instead of :" & str(input_bit)
           severity error;$\n$$
   else
-  $        assert ($instance.id$_$port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
-          report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($instance.id$_$port.name$_data))) & " instead of :" & to_string(input_bit)
-          --report "Incorrectly value computed : " & str(to_integer(unsigned($instance.id$_$port.name$_data))) & " instead of :" & str(input_bit)
+  $        assert ($port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
+          report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($port.name$_data))) & " instead of :" & to_string(input_bit)
+          --report "Incorrectly value computed : " & str(to_integer(unsigned($port.name$_data))) & " instead of :" & str(input_bit)
           severity error;$\n$$
   endif
   $$
 endif
 $        --
-        $instance.id$_$port.name$_full <= '0';    
+        $port.name$_full <= '0';    
       end if;
     end if;
 
