@@ -48,7 +48,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines an actor transformation that transforms assignments whose
@@ -145,7 +145,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	 */
 	private LocalVariable newVariable() {
 		return new LocalVariable(true, tempVarCount++, new Location(),
-				"bool_expr", null, new BoolType());
+				"bool_expr", null, TypeFactory.eINSTANCE.createBoolType());
 	}
 
 	@Override

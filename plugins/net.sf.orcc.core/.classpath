@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/net.sf.orcc.runtime.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgrapht-jdk1.6.jar">
 		<attributes>
@@ -8,6 +9,5 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry excluding=".svn/|net/.svn/|net/sf/.svn/|net/sf/orcc/.svn/|net/sf/orcc/backends/.svn/|net/sf/orcc/frontend/.svn/|net/sf/orcc/frontend/parser/.svn/|net/sf/orcc/frontend/parser/internal/.svn/|net/sf/orcc/frontend/schedule/.svn/|net/sf/orcc/frontend/writer/.svn/|net/sf/orcc/ir/.svn/|net/sf/orcc/ir/consts/.svn/|net/sf/orcc/ir/expr/.svn/|net/sf/orcc/ir/instructions/.svn/|net/sf/orcc/ir/nodes/.svn/|net/sf/orcc/ir/printers/.svn/|net/sf/orcc/ir/serialize/.svn/|net/sf/orcc/ir/transforms/.svn/|net/sf/orcc/ir/type/.svn/|net/sf/orcc/ir/util/.svn/|net/sf/orcc/network/.svn/|net/sf/orcc/network/attributes/.svn/|net/sf/orcc/network/parser/.svn/|net/sf/orcc/network/serialize/.svn/|net/sf/orcc/network/transforms/.svn/|net/sf/orcc/ui/.svn/|net/sf/orcc/ui/launching/.svn/|net/sf/orcc/util/.svn/|org/.svn/|org/json/.svn/" kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

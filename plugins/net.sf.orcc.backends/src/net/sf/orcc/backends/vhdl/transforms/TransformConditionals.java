@@ -43,7 +43,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines an actor transformation that transform the simple
@@ -91,11 +91,11 @@ public class TransformConditionals extends AbstractActorTransformation
 		Expression subExpr = unaryExpr.getExpr();
 		if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT && subExpr.isVarExpr()) {
 			return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(false),
-					new BoolType());
+					TypeFactory.eINSTANCE.createBoolType());
 		} else {
 			subExpr = (Expression) subExpr.accept(this);
 			return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(false),
-					new BoolType());
+					TypeFactory.eINSTANCE.createBoolType());
 		}
 	}
 
@@ -103,7 +103,7 @@ public class TransformConditionals extends AbstractActorTransformation
 	public Object interpret(VarExpr expr, Object... args) {
 		if (expr.getType().isBool()) {
 			return new BinaryExpr(expr, BinaryOp.EQ, new BoolExpr(true),
-					new BoolType());
+					TypeFactory.eINSTANCE.createBoolType());
 		} else {
 			return expr;
 		}

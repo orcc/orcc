@@ -43,6 +43,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -72,12 +73,12 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 		stateVars = actor.getStateVars();
 		OrderedMap<Procedure> procs = actor.getProcs();
 		Procedure print = procs.get("print");
-		
-		if (print != null){
+
+		if (print != null) {
 			procs.remove(print);
-			
+
 		}
-		
+
 		for (Procedure proc : actor.getProcs()) {
 			visitProcedure(proc);
 		}
@@ -96,9 +97,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Call call, Object... args) {
-
 		if (call.isPrint()) {
-
 			String value = "";
 			List<Expression> parameters = new ArrayList<Expression>();
 			String name = "str" + strCnt++;
@@ -108,18 +107,20 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 			for (Expression expr : call.getParameters()) {
 				if (expr.isStringExpr()) {
 					String strExprVal = (((StringExpr) expr).getValue());
-					
-					if (!strExprVal.equals("\\n")){
+
+					if (!strExprVal.equals("\\n")) {
 						value += strExprVal;
 					}
-					
 
 				}
 			}
 
 			// Create state variable that contains println arguments
+			StringType type = TypeFactory.eINSTANCE.createStringType();
+			type.setSize(value.length() + 1);
+
 			StateVariable variable = new StateVariable(call.getLocation(),
-					new StringType(value.length()+1), name, false, value+"\\00");
+					type, name, false, value + "\\00");
 			Use use = new Use(variable);
 
 			// Set the created state variable into call argument

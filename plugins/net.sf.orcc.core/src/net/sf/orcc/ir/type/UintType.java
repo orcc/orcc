@@ -28,61 +28,27 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.Type;
+
 /**
  * This class defines an unsigned integer type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
+ * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public class UintType extends AbstractType {
+public interface UintType extends Type {
 
 	public static final String NAME = "uint";
-
-	private int size;
-
-	/**
-	 * Creates a new unsigned integer with the given size.
-	 * 
-	 * @param size
-	 *            the size of this unsigned integer type
-	 */
-	public UintType(int size) {
-		setSize(size);
-	}
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof UintType) {
-			return size == ((UintType) obj).size;
-		} else {
-			return false;
-		}
-	}
 
 	/**
 	 * Returns the size of this unsigned integer type.
 	 * 
 	 * @return the size of this unsigned integer type
+	 * @model default="32"
 	 */
-	public int getSize() {
-		return size;
-	}
-
-	@Override
-	public boolean isUint() {
-		return true;
-	}
+	public int getSize();
 
 	/**
 	 * Sets the size of this unsigned integer type.
@@ -90,8 +56,6 @@ public class UintType extends AbstractType {
 	 * @param size
 	 *            the size of this unsigned integer type
 	 */
-	public void setSize(int size) {
-		this.size = size;
-	}
+	public void setSize(int size);
 
 }

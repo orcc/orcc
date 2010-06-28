@@ -28,19 +28,21 @@
  */
 package net.sf.orcc.ir;
 
-import java.util.List;
-
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypeVisitor;
+
+import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This interface defines a type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
+ * @model abstract="true"
  * 
  */
-public interface Type {
+public interface Type extends EObject {
 
 	/**
 	 * Accepts an interpreter.
@@ -64,13 +66,15 @@ public interface Type {
 	 * type is not a list.
 	 * 
 	 * @return the list of dimensions of this type if it is a list
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
-	public List<Integer> getDimensions();
+	public EList<Integer> getDimensions();
 
 	/**
 	 * Returns true if this type is <tt>bool</tt>.
 	 * 
 	 * @return true if this type is <tt>bool</tt>
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
 	public boolean isBool();
 
@@ -78,6 +82,7 @@ public interface Type {
 	 * Returns true if this type is <tt>float</tt>.
 	 * 
 	 * @return true if this type is <tt>float</tt>
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
 	public boolean isFloat();
 
@@ -85,6 +90,7 @@ public interface Type {
 	 * Returns true if this type is <tt>int</tt>.
 	 * 
 	 * @return true if this type is <tt>int</tt>
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
 	public boolean isInt();
 
@@ -92,6 +98,7 @@ public interface Type {
 	 * Returns true if this type is <tt>List</tt>.
 	 * 
 	 * @return true if this type is <tt>List</tt>
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
 	public boolean isList();
 
@@ -99,6 +106,7 @@ public interface Type {
 	 * Returns true if this type is <tt>String</tt>.
 	 * 
 	 * @return true if this type is <tt>String</tt>
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
 	public boolean isString();
 
@@ -106,6 +114,7 @@ public interface Type {
 	 * Returns true if this type is <tt>uint</tt>.
 	 * 
 	 * @return true if this type is <tt>uint</tt>
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
 	public boolean isUint();
 
@@ -113,6 +122,7 @@ public interface Type {
 	 * Returns true if this type is <tt>void</tt>.
 	 * 
 	 * @return true if this type is <tt>void</tt>
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
 	public boolean isVoid();
 

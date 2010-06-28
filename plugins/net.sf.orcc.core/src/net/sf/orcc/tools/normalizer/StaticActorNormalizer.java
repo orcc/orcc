@@ -63,10 +63,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.tools.transforms.RemoveReadWrites;
 import net.sf.orcc.util.OrderedMap;
 
@@ -106,7 +103,8 @@ public class StaticActorNormalizer {
 			depth++;
 			if (indexes.size() < depth) {
 				LocalVariable varDef = new LocalVariable(true, depth - 1,
-						new Location(), "loop", null, new BoolType());
+						new Location(), "loop", null,
+						TypeFactory.eINSTANCE.createBoolType());
 				variables.add(actor.getFile(), varDef.getLocation(),
 						varDef.getName(), varDef);
 				indexes.add(varDef);
@@ -130,7 +128,8 @@ public class StaticActorNormalizer {
 			// assign condition
 			Expression condition = new BinaryExpr(new VarExpr(new Use(loopVar,
 					whileNode)), BinaryOp.LT, new IntExpr(
-					pattern.getNumIterations()), new BoolType());
+					pattern.getNumIterations()),
+					TypeFactory.eINSTANCE.createBoolType());
 			whileNode.setValue(condition);
 
 			// accept sub pattern
@@ -141,7 +140,7 @@ public class StaticActorNormalizer {
 			assign = new Assign(loopVar, null);
 			assign.setValue(new BinaryExpr(
 					new VarExpr(new Use(loopVar, assign)), BinaryOp.PLUS,
-					new IntExpr(1), new IntType(32)));
+					new IntExpr(1), TypeFactory.eINSTANCE.createIntType(32)));
 			block.add(assign);
 
 			// restore stuff
@@ -202,14 +201,16 @@ public class StaticActorNormalizer {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
 
-			Type type = new ListType(numTokens, port.getType());
+			Type type = TypeFactory.eINSTANCE.createListType(numTokens,
+					port.getType());
 			StateVariable var = new StateVariable(new Location(), type,
 					port.getName(), false);
 			stateVars.add(actor.getFile(), var.getLocation(), var.getName(),
 					var);
 
 			StateVariable varCount = new StateVariable(new Location(),
-					new IntType(32), port.getName() + "_count", true, 0);
+					TypeFactory.eINSTANCE.createIntType(32), port.getName()
+							+ "_count", true, 0);
 			stateVars.add(actor.getFile(), varCount.getLocation(),
 					varCount.getName(), varCount);
 
@@ -286,7 +287,8 @@ public class StaticActorNormalizer {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, location,
-				new VoidType(), new OrderedMap<Variable>(), variables, nodes);
+				TypeFactory.eINSTANCE.createVoidType(),
+				new OrderedMap<Variable>(), variables, nodes);
 
 		// add state variables
 		addStateVariables(procedure, staticCls.getInputPattern());
@@ -330,7 +332,8 @@ public class StaticActorNormalizer {
 			while (it.hasNext()) {
 				LocalVariable thisOne = (LocalVariable) it.next();
 				value = new BinaryExpr(value, BinaryOp.LOGIC_AND, new VarExpr(
-						new Use(thisOne, block)), new BoolType());
+						new Use(thisOne, block)),
+						TypeFactory.eINSTANCE.createBoolType());
 				previous = thisOne;
 			}
 		} else {
@@ -356,7 +359,7 @@ public class StaticActorNormalizer {
 			int numTokens = entry.getValue();
 
 			LocalVariable varDef = new LocalVariable(true, i, new Location(),
-					"pattern", null, new BoolType());
+					"pattern", null, TypeFactory.eINSTANCE.createBoolType());
 			i++;
 			variables.add(actor.getFile(), location, varDef.getName(), varDef);
 
@@ -397,7 +400,8 @@ public class StaticActorNormalizer {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
-				new BoolType(), new OrderedMap<Variable>(), variables, nodes);
+				TypeFactory.eINSTANCE.createBoolType(),
+				new OrderedMap<Variable>(), variables, nodes);
 
 		BlockNode block = new BlockNode(procedure);
 		nodes.add(block);

@@ -46,14 +46,14 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.FloatType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.TypePrinter;
-import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.ir.type.impl.BoolTypeImpl;
+import net.sf.orcc.ir.type.impl.FloatTypeImpl;
+import net.sf.orcc.ir.type.impl.IntTypeImpl;
+import net.sf.orcc.ir.type.impl.ListTypeImpl;
+import net.sf.orcc.ir.type.impl.StringTypeImpl;
+import net.sf.orcc.ir.type.impl.UintTypeImpl;
+import net.sf.orcc.ir.type.impl.VoidTypeImpl;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
@@ -138,9 +138,9 @@ public final class STPrinter {
 			group.registerRenderer(clasz, renderer);
 		}
 
-		Class<?>[] classesType = { BoolType.class, FloatType.class,
-				IntType.class, ListType.class, StringType.class,
-				UintType.class, VoidType.class };
+		Class<?>[] classesType = { BoolTypeImpl.class, FloatTypeImpl.class,
+				IntTypeImpl.class, ListTypeImpl.class, StringTypeImpl.class,
+				UintTypeImpl.class, VoidTypeImpl.class };
 		renderer = new TypeRenderer();
 		for (Class<?> clasz : classesType) {
 			group.registerRenderer(clasz, renderer);

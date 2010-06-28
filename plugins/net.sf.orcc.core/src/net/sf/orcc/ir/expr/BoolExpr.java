@@ -30,7 +30,7 @@ package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines a boolean expression.
@@ -64,7 +64,7 @@ public class BoolExpr extends AbstractExpression {
 
 	@Override
 	public Type getType() {
-		return new BoolType();
+		return TypeFactory.eINSTANCE.createBoolType();
 	}
 
 	public boolean getValue() {

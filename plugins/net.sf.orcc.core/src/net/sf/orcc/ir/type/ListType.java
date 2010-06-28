@@ -28,126 +28,53 @@
  */
 package net.sf.orcc.ir.type;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.orcc.ir.Type;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
  * This class defines a List type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
+ * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public class ListType extends AbstractType {
+public interface ListType extends Type {
 
 	public static final String NAME = "List";
-
-	private int size;
-
-	private Type type;
-
-	/**
-	 * Creates a new list type with the given size and element type.
-	 * 
-	 * @param size
-	 *            the size of this list type
-	 * @param type
-	 *            the type of this list's elements
-	 */
-	public ListType(int size, Type type) {
-		setSize(size);
-		setType(type);
-	}
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof ListType) {
-			ListType list = (ListType) obj;
-			return size == list.size && type.equals(list.type);
-		} else {
-			return false;
-		}
-	}
-
-	@Override
-	public List<Integer> getDimensions() {
-		ArrayList<Integer> dimensions = new ArrayList<Integer>(1);
-		dimensions.add(size);
-		dimensions.addAll(getType().getDimensions());
-		return dimensions;
-	}
 
 	/**
 	 * Returns the type of the elements of this list
 	 * 
 	 * @return the number of elements of this list
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
-	public Type getElementType() {
-		if (type.isList()) {
-			return ((ListType) type).getElementType();
-		}
-		return type;
-	}
+	public Type getElementType();
 
 	/**
 	 * Returns the number of elements of this list type.
 	 * 
 	 * @return the number of elements of this list type
+	 * @model
 	 */
-	public int getSize() {
-		return size;
-	}
+	public int getSize();
 
 	/**
 	 * Returns a list of indexes that can be used inside a template.
 	 * 
 	 * @return a list of indexes corresponding to the list size
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
-	public List<Integer> getSizeIterator() {
-		List<Integer> it = new ArrayList<Integer>();
-
-		for (int i = 0; i < size; i++) {
-			it.add(i);
-		}
-
-		return it;
-	}
+	public EList<Integer> getSizeIterator();
 
 	/**
 	 * Returns the type of the list
 	 * 
 	 * @return the type of the list
+	 * @model
 	 */
-	public Type getType() {
-		return type;
-	}
-
-	@Override
-	public boolean isList() {
-		return true;
-	}
-
-	/**
-	 * Set the type of the elements of this list
-	 * 
-	 * @param the
-	 *            type of the elements of this list
-	 */
-	public void setElementType(Type elementType) {
-		this.type = elementType;
-	}
+	public Type getType();
 
 	/**
 	 * Sets the number of elements of this list type.
@@ -155,16 +82,14 @@ public class ListType extends AbstractType {
 	 * @param size
 	 *            the number of elements of this list type
 	 */
-	public void setSize(int size) {
-		this.size = size;
-	}
+	public void setSize(int size);
 
-	public void setType(Type type) {
-		if (type == null) {
-			throw new NullPointerException();
-		}
-
-		this.type = type;
-	}
+	/**
+	 * Sets the type of this list.
+	 * 
+	 * @param type
+	 *            element type
+	 */
+	public void setType(Type type);
 
 }

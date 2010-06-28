@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.cal.type;
 
-import org.eclipse.emf.ecore.EObject;
-
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstType;
 import net.sf.orcc.cal.cal.AstTypeBool;
@@ -41,12 +39,10 @@ import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.FloatType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.ir.type.UintType;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an AST type to IR type converter.
@@ -64,12 +60,12 @@ public class TypeConverter extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstTypeBool(AstTypeBool type) {
-		return new BoolType();
+		return TypeFactory.eINSTANCE.createBoolType();
 	}
 
 	@Override
 	public Type caseAstTypeFloat(AstTypeFloat type) {
-		return new FloatType();
+		return TypeFactory.eINSTANCE.createFloatType();
 	}
 
 	@Override
@@ -81,7 +77,7 @@ public class TypeConverter extends CalSwitch<Type> {
 		} else {
 			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
-		return new IntType(size);
+		return TypeFactory.eINSTANCE.createIntType(size);
 	}
 
 	@Override
@@ -89,12 +85,12 @@ public class TypeConverter extends CalSwitch<Type> {
 		Type type = transformType(listType.getType());
 		AstExpression expression = listType.getSize();
 		int size = new AstExpressionEvaluator().evaluateAsInteger(expression);
-		return new ListType(size, type);
+		return TypeFactory.eINSTANCE.createListType(size, type);
 	}
 
 	@Override
 	public Type caseAstTypeString(AstTypeString type) {
-		return new StringType();
+		return TypeFactory.eINSTANCE.createStringType();
 	}
 
 	@Override
@@ -106,7 +102,11 @@ public class TypeConverter extends CalSwitch<Type> {
 		} else {
 			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
-		return new UintType(size);
+
+		UintType uintType = TypeFactory.eINSTANCE.createUintType();
+		uintType.setSize(size);
+
+		return uintType;
 	}
 
 	@Override

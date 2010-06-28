@@ -28,34 +28,17 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.Type;
+
 /**
  * This class defines a float type.
  * 
  * @author Matthieu Wipliez
+ * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public class FloatType extends AbstractType {
+public interface FloatType extends Type {
 
 	public static final String NAME = "float";
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof FloatType);
-	}
-
-	@Override
-	public boolean isFloat() {
-		return true;
-	}
 
 }

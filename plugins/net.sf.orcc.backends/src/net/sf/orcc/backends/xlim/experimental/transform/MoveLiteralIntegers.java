@@ -23,8 +23,7 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.util.OrderedMap;
 
 public class MoveLiteralIntegers extends AbstractActorTransformation {
@@ -44,7 +43,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			String name = "lit_int_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, null, new BoolType());
+					name, null, TypeFactory.eINSTANCE.createBoolType());
 			locals.add(var.getName(), var);
 
 			it.previous();
@@ -59,7 +58,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			String name = "lit_int_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, null, new IntType(32));
+					name, null, TypeFactory.eINSTANCE.createIntType(32));
 
 			locals.add(var.getName(), var);
 

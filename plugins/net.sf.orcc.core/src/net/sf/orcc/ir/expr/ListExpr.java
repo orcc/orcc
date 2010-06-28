@@ -33,7 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines a list expression. This kind of expression is only present
@@ -78,7 +78,7 @@ public class ListExpr extends AbstractExpression {
 			}
 		}
 
-		return new ListType(value.size(), refType);
+		return TypeFactory.eINSTANCE.createListType(value.size(), refType);
 	}
 
 	public List<Expression> getValue() {

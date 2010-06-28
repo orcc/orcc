@@ -45,7 +45,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -79,7 +79,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 			use = new Use(varCount);
 			Store store = new Store(varCount, indexes, new BinaryExpr(
 					new VarExpr(use), BinaryOp.PLUS, new IntExpr(1),
-					new IntType(32)));
+					TypeFactory.eINSTANCE.createIntType(32)));
 			use.setNode(store);
 
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];

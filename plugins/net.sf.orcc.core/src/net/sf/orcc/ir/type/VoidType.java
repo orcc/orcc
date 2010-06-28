@@ -28,35 +28,18 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.Type;
+
 /**
  * This class defines a void type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
+ * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public class VoidType extends AbstractType {
+public interface VoidType extends Type {
 
 	public static final String NAME = "void";
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof VoidType);
-	}
-
-	@Override
-	public boolean isVoid() {
-		return true;
-	}
 
 }

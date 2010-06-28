@@ -95,9 +95,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.VoidType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
@@ -458,8 +456,8 @@ public class AstTransformer {
 	private LocalVariable createPortVariable(Port port, int numTokens) {
 		// create the variable to hold the tokens
 		LocalVariable target = new LocalVariable(true, 0,
-				procedure.getLocation(), port.getName(), null, new ListType(
-						numTokens, port.getType()));
+				procedure.getLocation(), port.getName(), null,
+				TypeFactory.eINSTANCE.createListType(numTokens, port.getType()));
 		procedure.getLocals().add(file, target.getLocation(), target.getName(),
 				target);
 
@@ -593,8 +591,9 @@ public class AstTransformer {
 
 			// creates scheduler and body
 			Procedure scheduler = new Procedure("isSchedulable_" + name,
-					location, new BoolType());
-			Procedure body = new Procedure(name, location, new VoidType());
+					location, TypeFactory.eINSTANCE.createBoolType());
+			Procedure body = new Procedure(name, location,
+					TypeFactory.eINSTANCE.createVoidType());
 
 			// fills the patterns and procedures
 			transformAction(astAction, inputPattern, outputPattern, scheduler,
@@ -874,7 +873,8 @@ public class AstTransformer {
 		Location location = Util.getLocation(astProcedure);
 
 		// sets the current procedure
-		procedure = new Procedure(name, location, new VoidType());
+		procedure = new Procedure(name, location,
+				TypeFactory.eINSTANCE.createVoidType());
 
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="ir"
+    nsURI="http:///net/sf/orcc/ir.ecore" nsPrefix="net.sf.orcc.ir">
+  <eClassifiers xsi:type="ecore:EClass" name="Type" abstract="true">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="dimensions" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject"
+        changeable="false" volatile="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="bool" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        changeable="false" volatile="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="float" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        changeable="false" volatile="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="int" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        changeable="false" volatile="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="list" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        changeable="false" volatile="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="string" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        changeable="false" volatile="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="uint" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        changeable="false" volatile="true" derived="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="void" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        changeable="false" volatile="true" derived="true"/>
+  </eClassifiers>
+</ecore:EPackage>

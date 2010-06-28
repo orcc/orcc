@@ -59,6 +59,7 @@ import net.sf.orcc.ir.type.Entry;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -349,29 +350,32 @@ public class XDFParser {
 					Element eltType = (Element) node;
 					String name = eltType.getAttribute("name");
 					if (name.equals(BoolType.NAME)) {
-						return new ParseContinuation<Type>(node, new BoolType());
+						return new ParseContinuation<Type>(node,
+								TypeFactory.eINSTANCE.createBoolType());
 					} else if (name.equals(IntType.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
 						Expression expr = parseTypeSize(entries);
 						int size = new ExpressionEvaluator()
 								.evaluateAsInteger(expr);
-						return new ParseContinuation<Type>(node, new IntType(
-								size));
+						return new ParseContinuation<Type>(node,
+								TypeFactory.eINSTANCE.createIntType(size));
 					} else if (name.equals(ListType.NAME)) {
 						return new ParseContinuation<Type>(node,
 								parseTypeList(node));
 					} else if (name.equals(StringType.NAME)) {
 						return new ParseContinuation<Type>(node,
-								new StringType());
+								TypeFactory.eINSTANCE.createStringType());
 					} else if (name.equals(UintType.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
 						Expression expr = parseTypeSize(entries);
 						int size = new ExpressionEvaluator()
 								.evaluateAsInteger(expr);
-						return new ParseContinuation<Type>(node, new UintType(
-								size));
+
+						UintType type = TypeFactory.eINSTANCE.createUintType();
+						type.setSize(size);
+						return new ParseContinuation<Type>(node, type);
 					} else {
 						throw new OrccException("unknown type name: \"" + name
 								+ "\"");
@@ -450,7 +454,7 @@ public class XDFParser {
 			Type type = entry.getEntryAsType();
 
 			int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-			return new ListType(size, type);
+			return TypeFactory.eINSTANCE.createListType(size, type);
 		}
 
 		/**

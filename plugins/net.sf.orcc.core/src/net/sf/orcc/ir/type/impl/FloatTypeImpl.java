@@ -26,36 +26,65 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir.type.impl;
 
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.impl.TypeImpl;
+import net.sf.orcc.ir.type.FloatType;
+import net.sf.orcc.ir.type.TypePackage;
+import org.eclipse.emf.ecore.EClass;
+import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
- * This class defines a String type.
+ * This class defines a float type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
- * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public interface StringType extends Type {
-
-	public static final String NAME = "String";
+public class FloatTypeImpl extends TypeImpl implements FloatType {
 
 	/**
-	 * Returns the size of the string type.
-	 * 
-	 * @return size of string type
-	 * @model
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
 	 */
-	public int getSize();
+	protected FloatTypeImpl() {
+		super();
+	}
 
 	/**
-	 * Set the size of the string type.
-	 * 
-	 * @param size
-	 *            the size of the string type
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
 	 */
-	public void setSize(int size);
+	@Override
+	protected EClass eStaticClass() {
+		return TypePackage.Literals.FLOAT_TYPE;
+	}
+
+	@Override
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
+	}
+
+	@Override
+	public void accept(TypeVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof FloatType);
+	}
+
+	@Override
+	public boolean isFloat() {
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 
 }

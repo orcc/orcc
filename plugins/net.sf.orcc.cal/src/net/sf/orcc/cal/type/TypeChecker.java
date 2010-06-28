@@ -50,10 +50,10 @@ import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.ir.type.UintType;
 
 /**
@@ -199,7 +199,7 @@ public class TypeChecker extends CalSwitch<Type> {
 						expression, CalPackage.AST_EXPRESSION_BINARY);
 				return null;
 			}
-			return new BoolType();
+			return TypeFactory.eINSTANCE.createBoolType();
 
 		case EXP:
 			CalJavaValidator.getInstance().error("Operator ^ not implemented",
@@ -220,7 +220,7 @@ public class TypeChecker extends CalSwitch<Type> {
 						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 				return null;
 			}
-			return new BoolType();
+			return TypeFactory.eINSTANCE.createBoolType();
 		}
 
 		return null;
@@ -228,7 +228,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionBoolean(AstExpressionBoolean expression) {
-		return new BoolType();
+		return TypeFactory.eINSTANCE.createBoolType();
 	}
 
 	@Override
@@ -302,17 +302,21 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionInteger(AstExpressionInteger expression) {
-		return new IntType(getSize(expression.getValue()));
+		return TypeFactory.eINSTANCE.createIntType(getSize(expression
+				.getValue()));
 	}
 
 	@Override
 	public Type caseAstExpressionList(AstExpressionList expression) {
-		return new ListType(0, getType(expression.getExpressions().get(0)));
+		return TypeFactory.eINSTANCE.createListType(0, getType(expression
+				.getExpressions().get(0)));
 	}
 
 	@Override
 	public Type caseAstExpressionString(AstExpressionString expression) {
-		return new StringType(expression.getValue().length());
+		StringType type = TypeFactory.eINSTANCE.createStringType();
+		type.setSize(expression.getValue().length());
+		return type;
 	}
 
 	@Override
@@ -342,7 +346,8 @@ public class TypeChecker extends CalSwitch<Type> {
 			return type;
 		case MINUS:
 			if (type.isUint()) {
-				return new IntType(((UintType) type).getSize());
+				return TypeFactory.eINSTANCE.createIntType(((UintType) type)
+						.getSize());
 			}
 			if (!type.isInt()) {
 				CalJavaValidator.getInstance().error(
@@ -389,28 +394,28 @@ public class TypeChecker extends CalSwitch<Type> {
 		} else if (t1.isString() && t2.isString()) {
 			return t1;
 		} else if (t1.isInt() && t2.isInt()) {
-			return new IntType(Math.max(((IntType) t1).getSize(),
-					((IntType) t2).getSize()));
+			return TypeFactory.eINSTANCE.createIntType(Math.max(
+					((IntType) t1).getSize(), ((IntType) t2).getSize()));
 		} else if (t1.isList() && t2.isList()) {
 			return getLub(((ListType) t1).getType(), ((ListType) t2).getType());
 		} else if (t1.isUint() && t2.isUint()) {
-			return new IntType(Math.max(((UintType) t1).getSize(),
-					((UintType) t2).getSize()));
+			return TypeFactory.eINSTANCE.createIntType(Math.max(
+					((UintType) t1).getSize(), ((UintType) t2).getSize()));
 		} else if (t1.isInt() && t2.isUint()) {
 			int si = ((IntType) t1).getSize();
 			int su = ((UintType) t2).getSize();
 			if (si > su) {
-				return new IntType(si);
+				return TypeFactory.eINSTANCE.createIntType(si);
 			} else {
-				return new IntType(su + 1);
+				return TypeFactory.eINSTANCE.createIntType(su + 1);
 			}
 		} else if (t1.isUint() && t2.isInt()) {
 			int su = ((UintType) t1).getSize();
 			int si = ((IntType) t2).getSize();
 			if (si > su) {
-				return new IntType(si);
+				return TypeFactory.eINSTANCE.createIntType(si);
 			} else {
-				return new IntType(su + 1);
+				return TypeFactory.eINSTANCE.createIntType(su + 1);
 			}
 		} else {
 			return null;

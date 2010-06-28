@@ -65,9 +65,8 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
+import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * Split expression and effective node.
@@ -123,7 +122,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 			// Assign the correct type to the current expression
 			if (op.isComparison()) {
-				previousType = new BoolType();
+				previousType = TypeFactory.eINSTANCE.createBoolType();
 			}
 
 			// Make the final asssignment
@@ -220,7 +219,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		 */
 		private LocalVariable newVariable() {
 			return new LocalVariable(true, tempVarCount++, new Location(),
-					"expr", null, new IntType(32));
+					"expr", null, TypeFactory.eINSTANCE.createIntType(32));
 		}
 
 	}
@@ -265,13 +264,13 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		// Transform boolean Port into int port (to be remove later)
 		for (Port port : actor.getInputs()) {
 			if (port.getType().isBool()) {
-				port.setType(new IntType(32));
+				port.setType(TypeFactory.eINSTANCE.createIntType(32));
 			}
 		}
 
 		for (Port port : actor.getOutputs()) {
 			if (port.getType().isBool()) {
-				port.setType(new IntType(32));
+				port.setType(TypeFactory.eINSTANCE.createIntType(32));
 			}
 		}
 
@@ -334,7 +333,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	public void visit(IfNode ifNode, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
 		ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it),
-				new BoolType()));
+				TypeFactory.eINSTANCE.createBoolType()));
 		super.visit(ifNode, args);
 	}
 
@@ -343,7 +342,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		block = load.getBlock();
 		List<Type> types = new ArrayList<Type>(load.getIndexes().size());
 		for (int i = 0; i < load.getIndexes().size(); i++) {
-			types.add(new IntType(32));
+			types.add(TypeFactory.eINSTANCE.createIntType(32));
 		}
 		visitExpressions(load.getIndexes(), args[0], types);
 	}
@@ -377,13 +376,14 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
 		for (int i = 0; i < store.getIndexes().size(); i++) {
-			types.add(new IntType(32));
+			types.add(TypeFactory.eINSTANCE.createIntType(32));
 		}
 		visitExpressions(store.getIndexes(), it, types);
 		it.previous();
 
 		// Check store value
-		store.setValue(visitExpression(value, it, new IntType(32)));
+		store.setValue(visitExpression(value, it,
+				TypeFactory.eINSTANCE.createIntType(32)));
 		it.next();
 	}
 
@@ -396,7 +396,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			it.next();
 		}
 		whileNode.setValue(visitExpression(whileNode.getValue(), it,
-				new BoolType()));
+				TypeFactory.eINSTANCE.createBoolType()));
 
 		super.visit(whileNode, args);
 	}
@@ -432,7 +432,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			if (((LocalVariable) var).isPort()) {
 				ListType listType = (ListType) var.getType();
 				if (listType.getElementType().isBool()) {
-					listType.setElementType(new IntType(32));
+					listType.setType(TypeFactory.eINSTANCE.createIntType(32));
 				}
 			}
 		}

@@ -28,61 +28,27 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.Type;
+
 /**
  * This class defines an integer type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
+ * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public class IntType extends AbstractType {
+public interface IntType extends Type {
 
 	public static final String NAME = "int";
-
-	private int size;
-
-	/**
-	 * Creates a new integer with the given size.
-	 * 
-	 * @param size
-	 *            the size of this integer type
-	 */
-	public IntType(int size) {
-		setSize(size);
-	}
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof IntType) {
-			return size == ((IntType) obj).size;
-		} else {
-			return false;
-		}
-	}
 
 	/**
 	 * Returns the size of this integer type.
 	 * 
 	 * @return the size of this integer type
+	 * @model default="32"
 	 */
-	public int getSize() {
-		return size;
-	}
-
-	@Override
-	public boolean isInt() {
-		return true;
-	}
+	public int getSize();
 
 	/**
 	 * Sets the size of this integer type.
@@ -90,8 +56,6 @@ public class IntType extends AbstractType {
 	 * @param size
 	 *            the size of this integer type
 	 */
-	public void setSize(int size) {
-		this.size = size;
-	}
+	void setSize(int size);
 
 }

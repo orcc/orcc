@@ -26,73 +26,66 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir.type.impl;
 
-import java.util.Collections;
-import java.util.List;
-
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.impl.TypeImpl;
+import net.sf.orcc.ir.type.TypePackage;
+import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.ir.type.TypeVisitor;
+import net.sf.orcc.ir.type.VoidType;
+import org.eclipse.emf.ecore.EClass;
 
 /**
- * This class is an abstract implementation of {@link Type}.
+ * This class defines a void type.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
-public abstract class AbstractType implements Type {
+public class VoidTypeImpl extends TypeImpl implements VoidType {
 
-	@Override
-	public abstract Object accept(TypeInterpreter interpreter);
-
-	@Override
-	public abstract void accept(TypeVisitor visitor);
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<Integer> getDimensions() {
-		return Collections.EMPTY_LIST;
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VoidTypeImpl() {
+		super();
 	}
 
 	@Override
-	public boolean isBool() {
-		return false;
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
 	}
 
 	@Override
-	public boolean isFloat() {
-		return false;
+	public void accept(TypeVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override
-	public boolean isInt() {
-		return false;
+	public boolean equals(Object obj) {
+		return (obj instanceof VoidType);
 	}
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
-	public boolean isList() {
-		return false;
-	}
-
-	@Override
-	public boolean isString() {
-		return false;
-	}
-
-	@Override
-	public boolean isUint() {
-		return false;
+	protected EClass eStaticClass() {
+		return TypePackage.Literals.VOID_TYPE;
 	}
 
 	@Override
 	public boolean isVoid() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public String toString() {
-		TypePrinter printer = new TypePrinter();
-		accept(printer);
-		return printer.toString();
+		return super.toString();
 	}
 
 }

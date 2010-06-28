@@ -110,6 +110,7 @@ import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
@@ -829,11 +830,11 @@ public class IRParser {
 		if (obj instanceof String) {
 			String name = (String) obj;
 			if (name.equals(BoolType.NAME)) {
-				type = new BoolType();
+				type = TypeFactory.eINSTANCE.createBoolType();
 			} else if (name.equals(StringType.NAME)) {
-				type = new StringType();
+				type = TypeFactory.eINSTANCE.createStringType();
 			} else if (name.equals(VoidType.NAME)) {
-				type = new VoidType();
+				type = TypeFactory.eINSTANCE.createVoidType();
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}
@@ -844,18 +845,25 @@ public class IRParser {
 				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-				type = new IntType(size);
+
+				type = TypeFactory.eINSTANCE.createIntType();
+				((IntType) type).setSize(size);
 			} else if (name.equals(UintType.NAME)) {
 				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-				type = new UintType(size);
+
+				type = TypeFactory.eINSTANCE.createUintType();
+				((UintType) type).setSize(size);
 			} else if (name.equals(ListType.NAME)) {
 				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 				Type subType = parseType(array.get(2));
-				type = new ListType(size, subType);
+
+				type = TypeFactory.eINSTANCE.createListType();
+				((ListType) type).setSize(size);
+				((ListType) type).setType(subType);
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}

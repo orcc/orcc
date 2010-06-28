@@ -41,7 +41,7 @@ import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.type.TypeFactory;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
@@ -72,17 +72,29 @@ public class CalLinkingService extends DefaultLinkingService {
 	public CalLinkingService() {
 		functions = new HashMap<String, AstFunction>();
 
-		addFunction("bitand", new Type[] { new IntType(32), new IntType(32) },
-				new IntType(32));
-		addFunction("bitnot", new Type[] { new IntType(32) }, new IntType(32));
-		addFunction("bitor", new Type[] { new IntType(32), new IntType(32) },
-				new IntType(32));
-		addFunction("bitxor", new Type[] { new IntType(32), new IntType(32) },
-				new IntType(32));
-		addFunction("lshift", new Type[] { new IntType(32), new IntType(32) },
-				new IntType(32));
-		addFunction("rshift", new Type[] { new IntType(32), new IntType(32) },
-				new IntType(32));
+		addFunction("bitand",
+				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
+						TypeFactory.eINSTANCE.createIntType(32) },
+				TypeFactory.eINSTANCE.createIntType(32));
+		addFunction("bitnot",
+				new Type[] { TypeFactory.eINSTANCE.createIntType(32) },
+				TypeFactory.eINSTANCE.createIntType(32));
+		addFunction("bitor",
+				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
+						TypeFactory.eINSTANCE.createIntType(32) },
+				TypeFactory.eINSTANCE.createIntType(32));
+		addFunction("bitxor",
+				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
+						TypeFactory.eINSTANCE.createIntType(32) },
+				TypeFactory.eINSTANCE.createIntType(32));
+		addFunction("lshift",
+				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
+						TypeFactory.eINSTANCE.createIntType(32) },
+				TypeFactory.eINSTANCE.createIntType(32));
+		addFunction("rshift",
+				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
+						TypeFactory.eINSTANCE.createIntType(32) },
+				TypeFactory.eINSTANCE.createIntType(32));
 
 		procedures = new HashMap<String, AstProcedure>();
 
