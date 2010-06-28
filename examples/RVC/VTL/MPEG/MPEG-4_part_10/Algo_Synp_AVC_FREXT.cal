@@ -126,23 +126,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	// ********** read CABAC ********* //
 	
-	// SLICE TYPES
-	function IS_I16x16(int SliceType, int Mbtype) --> bool : (Mbtype >= 1 and Mbtype <= 24 ) and (SliceType = SLICE_TYPE_I) end
-	function IS_INxN(int SliceType, int Mbtype) --> bool : (Mbtype = 0) and (SliceType = SLICE_TYPE_I) end
-	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
-	
-	/* P and B Images */
-	function ABS(int x) --> int: if x < 0 then -x else x end end
-	function IS_P_8x8() --> bool: slice_type = SLICE_TYPE_P and mb_type = 3 end
-	function IS_B_8x8() --> bool: slice_type = SLICE_TYPE_B and mb_type = 22 end
-	function IS_B_Direct_8x8() --> bool: slice_type = SLICE_TYPE_B and sub_mb_type[mbPartIdx] = 0 end
-	function IS_B_Direct_16x16_CABAC(int mbAddr) --> bool: slice_type = SLICE_TYPE_B and mbTab[mbAddr][2] = 0 end
-	function IS_IPCM_Tab(int Addr, int MbType) -->bool: if Addr < 0 then false else mbTab[Addr][MbType] = 25 end end
-	
-	//Entropie decoding
-	function IS_CAVLC() --> bool: entropy_coding_mode_flag[pps_id] = 0 end
-	function IS_CABAC() --> bool: entropy_coding_mode_flag[pps_id] = 1 end
-	
+	// ********** CABAC Constants ********* //
 	
 	//Cabac State variables
 	int preCtxState;
@@ -151,22 +135,21 @@ actor Algo_Synp_AVC_FREXT()
 	int ctxIdxInc := 0;
 	int ctxIdx := 0;
 	int binIdx := -1;
+	int qCodIRangeIdx;
 	int codIRangeLPS;
 	uint binVal;
 	
 	bool SEARCH_MB_TYPE := false;
 	bool StartNewCabacParsing := false;
-	/* List Used as a result for Binarization */
-	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 24)] : for int j in Integers( 0, 99)];
-	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 127)];
-	
 	
 	/* Cabac intialisation process for the arithmetic decoding engine */
 	bool Cabac_Arithmetic_Decoding_Engine_Start := false;
-	
+	/* CABAC I_PCM decoding conditions */
 	bool PcmAlignementZeroBitDone := false;
 	bool PcmSampleLumaDone := false;
 	bool PcmSampleChromaDone := false;
+	
+	
 	bool SentChromaZeros := false;
 	bool SentLumaDCZeros := false;
 	
@@ -185,31 +168,13 @@ actor Algo_Synp_AVC_FREXT()
 	int ctxBlockCat;
 	
 	//Arithmetic Decoding
-	int ( size = 16 ) codIRange:=0;
+	int ( size = 16 ) codIRange := 0;
 	int ( size = 16 ) codIOffset;
 	
 	
 	//CBP
 	uint (size=6) cbp_cabac;
-	
-	int qCodIRangeIdx;
-	
-	//CABAC Neighbouring
-	/*
-		mbTab := [ Address ][ Availability, mbSliceType, mb_type, IntraChromaPredMode, mbQpDelta, mbCBPLuma, mbCBPChroma ]
-	*/
-	List ( type: List ( type: int, size = 10) , size = PICWIDTH*PICHEIGHT - 1 ) mbTab := [[ 0 : for int i in Integers( 0, 9)] : for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2)];
-	
-	int TypePred					:= 0; //0:Intra 1:Inter 2: B, used for ctx prediction
-	int mbSliceType				:= 1;
-	int mbTabMbtype				:= 2;
-	int mbIntraChromaPredMode	:= 3;
-	int mbQpDelta				:= 4;
-	int mbCBPLuma				:= 5;
-	int mbCBPChroma				:= 6;
-	int mbTransSize8x8Flag		:= 7;
-	int mbCBF					:= 8;
-	int mbSkipFlag				:= 9;
+	int bk_cbp := 0;
 	
 	//CABAC Process Conditions 
 	bool FirstSEinSlice					:= true;
@@ -252,79 +217,27 @@ actor Algo_Synp_AVC_FREXT()
 	int binIdxOffset := 0;
 	int PreviousCtxIdx := 0;
 	
-	
-	 /* CABAC Coded Block Flag Lists */
-	 
-	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH*PICHEIGHT ) transblock_cbf	:=  [ [ 0 : for int i in Integers( 0, 15) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cr	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cb	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	
-	/* CABAC MVD and REF Lists */
-														  /*val_CurrMbAddr, mbPartIdx, subMbPartIdx,compIdx*/
-	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L0 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L1 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	
-	List ( type: List ( type: int, size = 4)  , size = PICWIDTH*PICHEIGHT ) Ref_Idx_L0	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	List ( type: List ( type: int, size = 4)  , size = PICWIDTH*PICHEIGHT ) Ref_Idx_L1	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	
-	List ( type: List ( type: int, size = 4) , size = PICWIDTH*PICHEIGHT ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
-	
 	bool IS_L0 := false;
 	int mvd_temp :=0;
 	int ctx_temp :=0;
+	/* CABAC Neighbouring contstants */
 	uint NeighMbAddr;
 	bool NeighMbAvail;
 	uint NeighMb_xW;
 	uint NeighMb_yW;
 	
+	/* P_Skip and B_Skip MB type values */
 	uint P_Skip = 254;
 	uint B_Skip = 255;
+	
 	int tempCoeff;
-	
-	
-	/* CABAC Neighbourhood functions */
-	function IS_P_8x8_CABAC(int mbAddr) --> bool: mbTab[mbAddr][mbSliceType] = SLICE_TYPE_P and mbTab[mbAddr][mbTabMbtype] = 3 end
-	function IS_B_8x8_CABAC(int mbAddr) --> bool:  mbTab[mbAddr][mbSliceType] = SLICE_TYPE_B and mbTab[mbAddr][mbTabMbtype] = 22 end
-	function IS_P_8x8ref0_CABAC(int mbAddr) --> bool : mbTab[mbAddr][mbSliceType] = SLICE_TYPE_P and mbTab[mbAddr][mbTabMbtype] = 4 end
-	function IS_MB_Type_P8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_P and mbTab[mbAdd][2] = 3 end
-	function IS_MB_Type_B8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_B and mbTab[mbAdd][2] = 22 end
-	function IS_P_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] = P_Skip end
-	function IS_B_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] = B_Skip end
-	function IS_Intra_Pred_CABAC(int mbAddr) --> bool : ( mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] > 4) or (mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] > 22) end
-	function IS_Intra(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 0 end
-	function IS_Inter(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 1 end
-	
-	/* Save Memory functions */
-	function CabacCurrMbAddr(int mbAddr) --> int: 
-		if val_CurrMbAddr >= PicWidthInMbs + 1 then 
-			PicWidthInMbs 
-		else 
-			val_CurrMbAddr 
-		end 
-	end
-	
-	
 	/* MVD and REF CABAC Neighbouring */
-	
 	int mbPartIdxN;
 	int subMbPartIdxN;
-	/* reidual block Cabac */
 	
 	int blCabacIdx := 0;
 	uint(size=5) numCoeff := 0;
-	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 255)] ;
-	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 255)] ;
-	List (type: int(size = 16), size = 16) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 15)] ;
 	
-	List (type: int(size = 2), size = 4)   prior_decoded_bin_cbp		:= [0: for int i in Integers(0, 3)] ;
-	int bk_cbp := 0;
-		
-	/* Max Binary Index */
-	int MaxBinIdx;
-	
-	/* Max Elements Compare Tab*/
-	int MaxEleCompTab;
 	/* Syntax Element Enumeration */
 	
 	int CABAC_SEARCH_SYNTAX_ELEMENT				:= -1;
@@ -342,7 +255,7 @@ actor Algo_Synp_AVC_FREXT()
 	int CABAC_INTRA_CHROMA_PRED_MODE			:= 12;
 	int CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG	:= 13;
 	int CABAC_REM_INTRA4x4_8x8_PRED_MODE 		:= 14;
-	int CABAC_MB_FIELD_DECODING_FLAG 			:= 15;
+	//int CABAC_MB_FIELD_DECODING_FLAG 			:= 15;
 	int CABAC_CODED_BLOCK_PATERN_LUMA 			:= 16;
 	int CABAC_CODED_BLOCK_PATERN_CHROMA			:= 17;		
 	int CABAC_CODED_BLOCK_FLAG 					:= 18;
@@ -352,6 +265,92 @@ actor Algo_Synp_AVC_FREXT()
 	int CABAC_END_OF_SLICE_FLAG 				:= 23;
 	int CABAC_TRANSFORM_SIZE_8x8_FLAG 			:= 24;
 	
+		// ********** CABAC Functions ********* //
+	
+	// SLICE TYPES
+	function IS_I16x16(int SliceType, int Mbtype) --> bool : (Mbtype >= 1 and Mbtype <= 24 ) and (SliceType = SLICE_TYPE_I) end
+	function IS_INxN(int SliceType, int Mbtype) --> bool : (Mbtype = 0) and (SliceType = SLICE_TYPE_I) end
+	function IS_SI(int SliceType) --> bool : SliceType = SLICE_TYPE_SI end
+	
+	/* P and B Images */
+	function ABS(int x) --> int: if x < 0 then -x else x end end
+	function IS_P_8x8() --> bool: slice_type = SLICE_TYPE_P and mb_type = 3 end
+	function IS_B_8x8() --> bool: slice_type = SLICE_TYPE_B and mb_type = 22 end
+	function IS_B_Direct_8x8() --> bool: slice_type = SLICE_TYPE_B and sub_mb_type[mbPartIdx] = 0 end
+	function IS_B_Direct_16x16_CABAC(int mbAddr) --> bool: slice_type = SLICE_TYPE_B and mbTab[mbAddr][2] = 0 end
+	function IS_IPCM_Tab(int Addr, int MbType) -->bool: if Addr < 0 then false else mbTab[Addr][MbType] = 25 end end
+	
+	//Entropie decoding
+	function IS_CAVLC() --> bool: entropy_coding_mode_flag[pps_id] = 0 end
+	function IS_CABAC() --> bool: entropy_coding_mode_flag[pps_id] = 1 end
+	
+	/* CABAC Neighbourhood Prediction Functions */
+	function IS_P_8x8_CABAC(int mbAddr) --> bool: mbTab[mbAddr][mbSliceType] = SLICE_TYPE_P and mbTab[mbAddr][mbTabMbtype] = 3 end
+	function IS_B_8x8_CABAC(int mbAddr) --> bool:  mbTab[mbAddr][mbSliceType] = SLICE_TYPE_B and mbTab[mbAddr][mbTabMbtype] = 22 end
+	function IS_P_8x8ref0_CABAC(int mbAddr) --> bool : mbTab[mbAddr][mbSliceType] = SLICE_TYPE_P and mbTab[mbAddr][mbTabMbtype] = 4 end
+	function IS_MB_Type_P8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_P and mbTab[mbAdd][2] = 3 end
+	function IS_MB_Type_B8X8(int mbAdd) --> bool: mbTab[mbAdd][1] = SLICE_TYPE_B and mbTab[mbAdd][2] = 22 end
+	function IS_P_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] = P_Skip end
+	function IS_B_Skip_CABAC(int mbAddr) --> bool: mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] = B_Skip end
+	function IS_Intra_Pred_CABAC(int mbAddr) --> bool : ( mbTab[mbAddr][1] = SLICE_TYPE_P and mbTab[mbAddr][2] > 4) or (mbTab[mbAddr][1] = SLICE_TYPE_B and mbTab[mbAddr][2] > 22) end
+	function IS_Intra(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 0 end
+	function IS_Inter(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 1 end
+	/* Save Memory function */
+	function CabacCurrMbAddr(int mbAddr) --> int: 
+		if val_CurrMbAddr >= PicWidthInMbs + 1 then 
+			PicWidthInMbs 
+		else 
+			val_CurrMbAddr 
+		end 
+	end
+	
+	// ********** CABAC Arrays ********* //
+	
+	/* List Used as a result for Binarization */
+	List ( type: List ( type: uint(size = 8), size = 25) , size = 100 ) synElVal := [[ 0 : for int i in Integers( 0, 24)] : for int j in Integers( 0, 99)];
+	List ( type: uint(size=2), size=128 ) ReadBinString := [ 0 : for int i in Integers( 0, 127)];
+	
+	//CABAC Neighbouring
+	
+	List ( type: List ( type: int, size = 10) , size = PICWIDTH*PICHEIGHT - 1 ) mbTab := [[ 0 : for int i in Integers( 0, 9)] : for int j in Integers( 0, PICWIDTH*PICHEIGHT - 2)];
+	
+	int TypePred				:= 0; //0:Intra 1:Inter 2: B, used for ctx prediction
+	int mbSliceType				:= 1;
+	int mbTabMbtype				:= 2;
+	int mbIntraChromaPredMode	:= 3;
+	int mbQpDelta				:= 4;
+	int mbCBPLuma				:= 5;
+	int mbCBPChroma				:= 6;
+	int mbTransSize8x8Flag		:= 7;
+	int mbCBF					:= 8;
+	int mbSkipFlag				:= 9;
+	
+	
+	 /* CABAC Coded Block Flag Lists */
+	 
+	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH*PICHEIGHT ) transblock_cbf	:=  [ [ 0 : for int i in Integers( 0, 15) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cr	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_cb	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH*PICHEIGHT ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	
+	/* CABAC MVD and REF Lists */
+														  /*val_CurrMbAddr, mbPartIdx, subMbPartIdx,compIdx*/
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L0 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH*PICHEIGHT ) Mvd_L1 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	
+	List ( type: List ( type: int, size = 4)  , size = PICWIDTH*PICHEIGHT ) Ref_Idx_L0	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	List ( type: List ( type: int, size = 4)  , size = PICWIDTH*PICHEIGHT ) Ref_Idx_L1	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	/* CABAC sub_mb_type */
+	List ( type: List ( type: int, size = 4) , size = PICWIDTH*PICHEIGHT ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH*PICHEIGHT - 1) ];
+	
+	/* Residual Block arrays used in Cabac */
+	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 255)] ;
+	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 255)] ;
+	List (type: int(size = 16), size = 16) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 15)] ;
+	List (type: int(size = 2), size = 4)   prior_decoded_bin_cbp		:= [0: for int i in Integers(0, 3)] ;
+	
+	
+		
 	// ******** End of CABAC variables declaration ******
 	/*************************************************************
 	*************************************************************
@@ -1698,7 +1697,6 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end 
 	
-	
 	function cabac_value() --> int:
 		CabacValue
 	end	
@@ -1713,7 +1711,6 @@ actor Algo_Synp_AVC_FREXT()
 	begin
 		preCtxState := Clip3( 1, 126, ( ( m * Clip3( 0, 51, QPy ) ) >> 4 ) + n );
 	end
-	
 	
 	procedure GetCabacMbTypeSyntaxElement()
 	begin
@@ -1731,7 +1728,6 @@ actor Algo_Synp_AVC_FREXT()
 				CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_TYPE_B;
 				SearchForMbType := 2;
 		end end end end	
-		
 	end
 	
 	procedure GetCabacSubMbTypeSyntaxElement()
@@ -1746,83 +1742,6 @@ actor Algo_Synp_AVC_FREXT()
 				SearchForMbType := 1;	
 			end 
 		end	
-		
-	end
-	
-	procedure GetCabacRefIdxLx()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_REF_IDX_L0_L1;
-	end
-	
-	procedure GetCabacMvdLx()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MVD_L0_0_0;
-	end
-	
-	procedure GetCabacCodedBlockPatternLumaSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_CODED_BLOCK_PATERN_LUMA;
-	end
-	
-	procedure GetCabacCodedBlockPatternChromaSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_CODED_BLOCK_PATERN_CHROMA;
-	end
-	
-	procedure GetCabacMbQpDeltaSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_QP_DELTA;
-	end
-	
-	procedure GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG;
-	end
-	
-	procedure GetCabacRemIntra4x4_8x8PredModeSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_REM_INTRA4x4_8x8_PRED_MODE;
-	end
-	
-	procedure GetCabacRemIntraChromaPredModeSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_INTRA_CHROMA_PRED_MODE;
-	end
-	
-	procedure GetCabacTransSize8x8FlagSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_TRANSFORM_SIZE_8x8_FLAG;
-	end
-	
-	procedure GetCabacCodedBlockFlagSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_CODED_BLOCK_FLAG;
-	end
-	
-	procedure GetCabacSignificantCoeffFlagSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_SIGNIFICANT_COEFF_FLAG;
-	end
-	
-	procedure GetCabacLastSignificantCoeffFlagSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_LAST_SIGNIFICANT_COEFF_FLAG;
-	end
-	
-	procedure GetCabacCoeffAbsLevelMinus1SyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_COEFF_ABS_LEVEL_MINUS1;
-	end
-	
-		
-	procedure GetCabacEndOfSliceFlagSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_END_OF_SLICE_FLAG;
-	end
-	
-	procedure GetCabacMbSkipSyntaxElement()
-	begin
-		CABAC_SEARCH_SYNTAX_ELEMENT := CABAC_MB_SKIP_FLAG;
 	end
 	
 	procedure GetCabacSyntaxElement(int SyntaxElement)
@@ -4560,6 +4479,19 @@ actor Algo_Synp_AVC_FREXT()
 			StopCabacProcess();
 			FirstSEinSlice := false;  
 		else
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MVD_L0_0_0 then
+				GetMvD_Lx();
+			end
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
+				GetRefIdx_Lx();
+			end
+			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
+			      CoeffAbsParsing();
+			end
+			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_I or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_P_SP or CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MB_TYPE_B then	
 				GetMbTypeParsing();
 			end
@@ -4577,6 +4509,10 @@ actor Algo_Synp_AVC_FREXT()
 				GetFlagParsing();
 			end
 			
+			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE then
+				GetIntraREM_Mode_4X4_8X8Parsing();
+			end
+			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_CODED_BLOCK_PATERN_LUMA then
 				GetCbpLumaParsing();
 			end
@@ -4589,26 +4525,10 @@ actor Algo_Synp_AVC_FREXT()
 				GetMbQpDelta();
 			end
 			
-			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REM_INTRA4x4_8x8_PRED_MODE then
-				GetIntraREM_Mode_4X4_8X8Parsing();
-			end
-			
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_INTRA_CHROMA_PRED_MODE then
 				GetIntraChromaPredModeParsing();
 			end
-			
-			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_COEFF_ABS_LEVEL_MINUS1 then
-			      CoeffAbsParsing();
-			end
-			
-			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_MVD_L0_0_0 then
-				GetMvD_Lx();
-			end
-			
-			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_REF_IDX_L0_L1 then
-				GetRefIdx_Lx();
-			end
-			
+				
 			if CABAC_SEARCH_SYNTAX_ELEMENT = CABAC_END_OF_SLICE_FLAG then
 				GetEndOfSliceParsing();
 			end
@@ -6706,7 +6626,7 @@ end
 	guard
 		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI and IS_CABAC()
 	do
-		GetCabacMbSkipSyntaxElement();
+		GetCabacSyntaxElement(CABAC_MB_SKIP_FLAG);
 		StartCabacProcess();
 		// mb_skip_flag   ae(v)
 		// moreDataFlag = !mb_skip_flag
@@ -7023,7 +6943,7 @@ end
 			// moreDataFlag = !end_of_slice_flag end
 			////println("read ae end_of_slice_flag");
 		else
-		  GetCabacEndOfSliceFlagSyntaxElement();
+		  GetCabacSyntaxElement(CABAC_END_OF_SLICE_FLAG);
 		  StartCabacProcess();
 		end
 		
@@ -7339,7 +7259,7 @@ end
 			set_bits_to_read(1);
 		else
 			if IS_CABAC() then
-				GetCabacTransSize8x8FlagSyntaxElement();
+				GetCabacSyntaxElement(CABAC_TRANSFORM_SIZE_8x8_FLAG);
 				StartCabacProcess();
 			end
 		end
@@ -7378,7 +7298,7 @@ end
 		
 		else 
 			if IS_CABAC() then
-				GetCabacCodedBlockPatternLumaSyntaxElement();
+				GetCabacSyntaxElement(CABAC_CODED_BLOCK_PATERN_LUMA);
 				StartCabacProcess();
 				binIdx := 0;
 			end 
@@ -7391,7 +7311,7 @@ end
 	do
 		cbp_cabac := cabac_value();
 		//get CBP Chroma
-		GetCabacCodedBlockPatternChromaSyntaxElement();
+		GetCabacSyntaxElement(CABAC_CODED_BLOCK_PATERN_CHROMA);
 		StartCabacProcess();
 		cbp_done := true;
 		binIdx := 0;
@@ -7439,7 +7359,7 @@ end
 					set_bits_to_read(1); 
 				else
 					if IS_CABAC() then
-						GetCabacTransSize8x8FlagSyntaxElement();
+						GetCabacSyntaxElement(CABAC_TRANSFORM_SIZE_8x8_FLAG);
 						StartCabacProcess();
 					end
 				end
@@ -7485,7 +7405,7 @@ end
 		
 		else 
 			if IS_CABAC() then
-				GetCabacMbQpDeltaSyntaxElement();
+				GetCabacSyntaxElement(CABAC_MB_QP_DELTA);
 				StartCabacProcess();
 			end 
 		end
@@ -7617,8 +7537,7 @@ end
 			if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
 		else
 			if IS_CABAC() then
-				//FIXME Maybe will do like CAVLC
-				GetCabacRefIdxLx();
+				GetCabacSyntaxElement(CABAC_REF_IDX_L0_L1);
 				StartCabacProcess();
 			end
 		end
@@ -7670,7 +7589,7 @@ end
 			if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
 		else
 			//FIXME Maybe will do like CAVLC
-			GetCabacRefIdxLx();
+			GetCabacSyntaxElement(CABAC_REF_IDX_L0_L1);
 			StartCabacProcess();
 		end
 		IS_L0 := false;
@@ -7731,7 +7650,7 @@ end
 		else
 			if IS_CABAC() then
 				  compIdx := 0;
-			      GetCabacMvdLx();
+				  GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 			      StartCabacProcess();
 			end
 		end
@@ -7750,7 +7669,7 @@ end
 				//Save the decode mvd
 				Mvd_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][subMbPartIdx][0] := mvd_l0;
 				compIdx := 1;
-				GetCabacMvdLx();
+				GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 				StartCabacProcess();
 		
 			end
@@ -7820,7 +7739,7 @@ end
 		else
 			if IS_CABAC() then
 			      compIdx := 0;
-			      GetCabacMvdLx();
+			      GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 			      StartCabacProcess();
 			end
 		end
@@ -7839,7 +7758,7 @@ end
 				//Save the decode mvd
 				Mvd_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][subMbPartIdx][0] := mvd_l1;
 				compIdx := 1;
-				GetCabacMvdLx();
+				GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 				StartCabacProcess();
 		
 			end
@@ -7908,7 +7827,7 @@ end
 		else 
 			if IS_CABAC() then
 				luma4x4BlkIdx := 0;
-				GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+				GetCabacSyntaxElement(CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG);
 				StartCabacProcess();
 			end 
 		end
@@ -7934,7 +7853,7 @@ end
 				prev_intra4x4_pred_mode_flag := cabac_value();
 				
 				if prev_intra4x4_pred_mode_flag = 0 then 
-					GetCabacRemIntra4x4_8x8PredModeSyntaxElement();
+					GetCabacSyntaxElement(CABAC_REM_INTRA4x4_8x8_PRED_MODE);
 					binIdx := 0;
 					StartCabacProcess();
 				end
@@ -7957,7 +7876,7 @@ end
 				luma4x4BlkIdx := luma4x4BlkIdx +1;
 				//Read until luma4x4BlkIdx = 16
 				if luma4x4BlkIdx < 16 then
-					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+					GetCabacSyntaxElement(CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG);
 					StartCabacProcess();
 				end
 			end
@@ -7979,7 +7898,7 @@ end
 				luma4x4BlkIdx := luma4x4BlkIdx +1;
 				//Read until luma4x4BlkIdx = 16
 				if luma4x4BlkIdx < 16 then
-					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+					GetCabacSyntaxElement(CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG);
 					StartCabacProcess();
 				end
 			end
@@ -8010,7 +7929,7 @@ end
 			set_bits_to_read(1);
 		else
 			if IS_CABAC() then
-				GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+				GetCabacSyntaxElement(CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG);
 				StartCabacProcess();
 			end 
 		end
@@ -8032,7 +7951,7 @@ end
 				prev_intra4x4_pred_mode_flag := cabac_value();
 				
 				if prev_intra4x4_pred_mode_flag = 0 then 
-					GetCabacRemIntra4x4_8x8PredModeSyntaxElement();
+					GetCabacSyntaxElement(CABAC_REM_INTRA4x4_8x8_PRED_MODE);
 					binIdx := 0;
 					StartCabacProcess();
 				end
@@ -8055,7 +7974,7 @@ end
 				luma4x4BlkIdx := luma4x4BlkIdx +1;
 				//Read until luma4x4BlkIdx = 4
 				if luma4x4BlkIdx < 4 then
-					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+					GetCabacSyntaxElement(CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG);
 					StartCabacProcess();
 				end
 			end
@@ -8077,7 +7996,7 @@ end
 				luma4x4BlkIdx := luma4x4BlkIdx + 1;
 				//Read until luma4x4BlkIdx = 16
 				if luma4x4BlkIdx < 4 then
-					GetCabacPrevIntra4x4_8x8PredModeFlagSyntaxElement();
+					GetCabacSyntaxElement(CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG);
 					StartCabacProcess();
 				end
 			end
@@ -8113,7 +8032,7 @@ end
 			start_vld();
 		else
 			if IS_CABAC() then
-				GetCabacRemIntraChromaPredModeSyntaxElement();
+				GetCabacSyntaxElement(CABAC_INTRA_CHROMA_PRED_MODE);
 				StartCabacProcess();
 				binIdxMb := 0;
 			end
@@ -8167,8 +8086,7 @@ end
 			if slice_num_ref_idx_l0_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
 		else
 			if IS_CABAC() then
-				//FIXME Maybe will do like CAVLC
-				GetCabacRefIdxLx();
+				GetCabacSyntaxElement(CABAC_REF_IDX_L0_L1);
 				StartCabacProcess();
 			end
 		end 
@@ -8223,8 +8141,7 @@ end
 			if slice_num_ref_idx_l1_active_minus1 = 1 then set_bits_to_read(1); else start_vld(); end
 		else
 			if IS_CABAC() then
-				//FIXME Maybe will do like CAVLC
-				GetCabacRefIdxLx();
+				GetCabacSyntaxElement(CABAC_REF_IDX_L0_L1);
 				StartCabacProcess();
 			end
 		end 
@@ -8279,7 +8196,7 @@ end
 		else
 			if IS_CABAC() then
 				  compIdx := 0;
-			      GetCabacMvdLx();
+			      GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 			      StartCabacProcess();
 			end
 		end
@@ -8298,7 +8215,7 @@ end
 				//Save the decode mvd
 				Mvd_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][0][0] := mvd_l0;
 				compIdx := 1;
-				GetCabacMvdLx();
+				GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 				StartCabacProcess();
 			end
 		end
@@ -8350,7 +8267,7 @@ end
 		else
 			if IS_CABAC() then
 				  compIdx := 0;
-			      GetCabacMvdLx();
+			      GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 			      StartCabacProcess();
 			end
 		end
@@ -8369,7 +8286,7 @@ end
 				//Save the decode mvd
 				Mvd_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][0][0] := mvd_l1;
 				compIdx := 1;
-				GetCabacMvdLx();
+				GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 				StartCabacProcess();
 		
 			end
@@ -9159,8 +9076,7 @@ end
 		IS_CABAC()
 	do
 		//Read coded_block_flag Syntax Element
-		GetCabacCodedBlockFlagSyntaxElement();
-
+		GetCabacSyntaxElement(CABAC_CODED_BLOCK_FLAG);
 		StartCabacProcess();
 	end
 	
@@ -9214,7 +9130,7 @@ end
 	do	
 	
 		//read significant_coeff_flag Syntax Element
-		GetCabacSignificantCoeffFlagSyntaxElement();
+		GetCabacSyntaxElement(CABAC_SIGNIFICANT_COEFF_FLAG);
 		StartCabacProcess();
 	end
 		
@@ -9227,7 +9143,7 @@ end
 		significant_coeff_flag[ blCabacIdx ] := cabac_value();
 		
 		if significant_coeff_flag[ blCabacIdx ] = 1 then
-			GetCabacLastSignificantCoeffFlagSyntaxElement();
+			GetCabacSyntaxElement(CABAC_LAST_SIGNIFICANT_COEFF_FLAG);
 			StartCabacProcess();
 		end
 		
@@ -9263,7 +9179,7 @@ end
 		blCabacIdx >= numCoeff - 1
 	do
 		//Read coeff_abs_level_minus1[ numCoeff - 1 ]
-		GetCabacCoeffAbsLevelMinus1SyntaxElement();
+		GetCabacSyntaxElement(CABAC_COEFF_ABS_LEVEL_MINUS1);
 		StartCabacProcess();
 		numDecodAbsLevelEq1 := 1;
 		numDecodAbsLevelGt1 := 0;
@@ -9290,7 +9206,7 @@ end
 		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1
 	do
 		//Read coeff_abs_level_minus1[ numCoeff - 1 ]
-		GetCabacCoeffAbsLevelMinus1SyntaxElement();
+		GetCabacSyntaxElement(CABAC_COEFF_ABS_LEVEL_MINUS1);
 		StartCabacProcess();
 	end
 	
