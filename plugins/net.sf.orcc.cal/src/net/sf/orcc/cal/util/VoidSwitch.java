@@ -182,12 +182,12 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstExpressionList(AstExpressionList expression) {
-		for (AstExpression subExpression : expression.getExpressions()) {
-			doSwitch(subExpression);
-		}
-
 		for (AstGenerator generator : expression.getGenerators()) {
 			doSwitch(generator);
+		}
+
+		for (AstExpression subExpression : expression.getExpressions()) {
+			doSwitch(subExpression);
 		}
 
 		return null;
