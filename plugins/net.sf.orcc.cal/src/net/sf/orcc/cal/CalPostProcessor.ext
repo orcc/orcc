@@ -43,21 +43,6 @@ addAttribute(EClass clasz, String typeName, String attributeName) :
 
 process(EClass this) :
 	switch (this.name) {
-		case "AstExpression": (
-			// add an "irType" value field to expressions
-			addAttribute(this, "EJavaObject", "irType")
-		)
-
-		case "AstFunction": (
-			// add an "irType" value field to functions
-			addAttribute(this, "EJavaObject", "irType")
-		)
-
-		case "AstPort": (
-			// add an "irType" value field to ports
-			addAttribute(this, "EJavaObject", "irType")
-		)
-
 		case "AstSchedule": (
 			// add a transient list of states referenced by transitions to Schedule class 
 			let etype = (EClass) ePackage.getEClassifier("AstState") :
@@ -73,10 +58,7 @@ process(EClass this) :
         
 		case "AstVariable": (
 			// add an "initialValue" value field to variables
-			addAttribute(this, "EJavaObject", "initialValue") ->
-
-			// add an "irType" value field to variables
-			addAttribute(this, "EJavaObject", "irType")
+			addAttribute(this, "EJavaObject", "initialValue")
 		)
 
 		default:

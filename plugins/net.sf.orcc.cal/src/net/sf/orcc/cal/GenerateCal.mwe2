@@ -37,6 +37,7 @@ Workflow {
 			// generates Java API for the generated EPackages 
 			fragment = ecore.EcoreGeneratorFragment {
 			// referencedGenModels = "uri to genmodel, uri to next genmodel"
+				referencedGenModels = "platform:/resource/net.sf.orcc.core/model/IR.genmodel"	
 			}
 
 			// the serialization component

@@ -302,24 +302,24 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureFunction(FormattingConfig c) {
 		AstFunctionElements access = f.getAstFunctionAccess();
 
-		c.setNoSpace().around(access.getLeftParenthesisKeyword_2());
-		c.setNoSpace().before(access.getCommaKeyword_3_1_0());
-		c.setNoSpace().before(access.getRightParenthesisKeyword_4());
+		c.setNoSpace().around(access.getLeftParenthesisKeyword_3());
+		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_5());
 
 		// "procedure" indents
-		c.setIndentation(access.getFunctionKeyword_0(), null);
+		c.setIndentation(access.getFunctionKeyword_1(), null);
 
 		// "var" unindents and indents, configure comma rules
-		keywordAndCommas(c, access.getVarKeyword_7_0(),
-				access.getCommaKeyword_7_2_0());
+		keywordAndCommas(c, access.getVarKeyword_8_0(),
+				access.getCommaKeyword_8_2_0());
 
-		c.setLinewrap().after(access.getColonKeyword_8());
+		c.setLinewrap().after(access.getColonKeyword_9());
 
 		// "end" unindents
-		c.setIndentation(null, access.getEndKeyword_10());
+		c.setIndentation(null, access.getEndKeyword_11());
 
-		c.setLinewrap().before(access.getEndKeyword_10());
-		c.setLinewrap(2).after(access.getEndKeyword_10());
+		c.setLinewrap().before(access.getEndKeyword_11());
+		c.setLinewrap(2).after(access.getEndKeyword_11());
 	}
 
 	/**
