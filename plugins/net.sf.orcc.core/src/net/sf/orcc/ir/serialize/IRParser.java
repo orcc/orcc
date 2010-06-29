@@ -846,8 +846,7 @@ public class IRParser {
 				Expression expr = parseExpr(array.getJSONArray(1));
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
-				type = TypeFactory.eINSTANCE.createIntType();
-				((IntType) type).setSize(size);
+				type = TypeFactory.eINSTANCE.createIntType(size);
 			} else if (name.equals(UintType.NAME)) {
 				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
@@ -861,9 +860,7 @@ public class IRParser {
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 				Type subType = parseType(array.get(2));
 
-				type = TypeFactory.eINSTANCE.createListType();
-				((ListType) type).setSize(size);
-				((ListType) type).setType(subType);
+				type = TypeFactory.eINSTANCE.createListType(size, subType);
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}
