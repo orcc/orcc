@@ -1,0 +1,11 @@
+actor FSMError () ==> :
+
+	b: action ==>
+	end
+
+	schedule fsm s0 :
+		s0 ( a ) --> s1;
+		s1 ( b ) --> s0;
+	end
+
+end
