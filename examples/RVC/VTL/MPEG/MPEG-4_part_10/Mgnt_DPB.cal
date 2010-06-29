@@ -14,6 +14,8 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+//Modified by Damien de Saint Jorre IETR/INSA of Rennes
+
 actor Mgnt_DPB ( int MB_WIDTH )
 	uint(size=7)  PicWidthInMb, 
 	uint(size=13) CurrMbAddr, 

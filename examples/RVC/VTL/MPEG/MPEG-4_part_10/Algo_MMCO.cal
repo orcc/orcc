@@ -54,6 +54,7 @@ Copyright (c) ISO/IEC 2008.
 
 //Modified by Mederic Blestel and Endri Bezati IETR/INSA of Rennes
 //Modified by Mickael Raulet IETR/INSA of Rennes
+//Modified by Damien de Saint Jorre IETR/INSA of Rennes
 
 
 actor Algo_MMCO () 

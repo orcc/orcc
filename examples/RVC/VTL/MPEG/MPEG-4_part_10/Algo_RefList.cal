@@ -54,6 +54,7 @@ Copyright (c) ISO/IEC 2008.
 
 //Modified by Mederic Blestel and Endri Bezati IETR/INSA of Rennes
 //Modified by Mickael Raulet IETR/INSA of Rennes
+//Modified by Damien de Saint Jorre IETR/INSA of Rennes
 
 //To do : 
 //        delete ValidxRefList
@@ -213,8 +214,8 @@ actor Algo_RefList ()
 			NbSTRead       := 0;
 			NbSTCount      := ValSzSTList;
 			ValMovedFrame  := frame_num;
-		println("");
-		println("Frame num ::"+frame_num);	
+//		println("");
+//		println("Frame num ::"+frame_num);	
 		end
 
 	//Fill the Long Term List
@@ -512,7 +513,7 @@ ValidxRefList := 0;//////
 		var
 			int (size = 32) poc := -1
 		do
-println("poc:"+POCList[RefIdx[CounterRefListTab]]+"; frnum:"+FrameNumList[RefIdx[CounterRefListTab]]+"; idx"+RefIdx[CounterRefListTab]);
+//println("poc:"+POCList[RefIdx[CounterRefListTab]]+"; frnum:"+FrameNumList[RefIdx[CounterRefListTab]]+"; idx"+RefIdx[CounterRefListTab]);
 			poc := POCList[RefIdx[CounterRefListTab]];
 			CounterRefListTab := CounterRefListTab + 1;
 		end

@@ -52,152 +52,170 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+actor Algo_BlockExpand_AVC_FREXT()
+	int(size=2) ENTROPY_TYPE,
+	uint(size=4) RUN,
+	int(size=12) VALUE,
+	bool LAST
+		==>
+	int(size=16) Block
+		:
 
-actor Algo_BlockExpand_AVC_FREXT () 
-		int(size=2) ENTROPY_TYPE,
-		uint(size=4) RUN, 
-		int(size=12) VALUE,
-		bool LAST 
-  			==> 
-  			int(size=16) Block :
+	int CAVLC_ENTROPY = 0;
+	int CABAC_ENTROPY = 1;
 
-  int(size = 2) EntropyType:=0;
-  bool TypeNotReceived := false;
-  
-  List(type:int(size=16), size=16) value_buf := [ 0 : for int i in Integers(0,15) ];  
-  uint(size=5) stuff_count := 0;
-  
-  uint(size=5) count := 0;  // Index of next sample to be transmitted
-  int(size=5) run := -1;    // Index offset of next sample decoded (-1 means no sample pending)
-  bool last := false;       // the end of block.
-  
-  uint(size=2) leveltype := 0; // Intra16x16DCLevel 0, Intra16x16ACLevel / LumaLevel 1, ChromaDCLevel 2, ChromaACLevel 3
-  uint(size=5) nb4x4 :=0;
-  
-  action ENTROPY_TYPE:[ x ] ==>
-  guard
-  		not TypeNotReceived
-  do
-  		EntropyType  := x;
-  		TypeNotReceived := true;
-  end
- 
-  CAVLC_Split: action ==>
-  guard
-  	EntropyType = 0 and TypeNotReceived
-  end
-  
-  CABAC_Split: action ==>
-  guard
-  	EntropyType = 1 and TypeNotReceived
-  end
-  
-  sent_cabac_block: action VALUE:[x] ==> Block:[x]
-  end
-  
-  
-  //if it is the end of a block, begin to stuff 0.
-  //if it is not the end, begin to read data to buffer.
-  check_last: action LAST:[l] ==>
-  do
-    last := l;
-    if last then
-      if leveltype = 2 then stuff_count := 4 - count; else stuff_count := 16 - count; end
-    else
-      stuff_count := 0;
-    end
-  end
- 
-  // begin to output data in buffer: from high address to low address
-  out_buffer: action ==> Block:[b]
-  guard
-    last,
-    count > 0
-  var
-    int(size=12) b
-  do
-    b := value_buf[count-1];
-    count := count - 1;
-  end
-  
-  // output the stuff zero after the last level
-  out_zero: action ==> Block:[0]
-  guard
-    last,
-    stuff_count > 0,
-    count = 0
-  do
-    stuff_count := stuff_count - 1;  
-  end
-  
-  out_finish: action ==>
-  guard
-    last,
-    stuff_count = 0,
-    count = 0
-  do
-    nb4x4 := nb4x4 +1;
-    if (leveltype = 0 and nb4x4 = 1) or (leveltype = 1 and nb4x4 = 16) or (leveltype = 2 and nb4x4 = 2) then leveltype := leveltype +1; nb4x4 := 0; end
-    if leveltype = 3 and nb4x4 = 8 then leveltype := 0; nb4x4 := 0; end
-  end
+	List(type: int(size=16), size=16) value_buf := [ 0 : for int i in Integers(0, 15) ];
 
-  // Read and write the sample out immediately if RUN = 0
-  read_immediate: action RUN:[ r ], VALUE:[ v ] ==>
-  guard
-    r = 0,
-    not last
-  do
-    value_buf[count]:= v;
-    run := r;
-    count := count + 1;
-  end  
+	uint(size=5) stuff_count := 0;
+	uint(size=5) count := 0;
+	// Index of next sample to be transmitted
+	int(size=5) run := -1;
+	// Index offset of next sample decoded (-1 means no sample pending)
+	bool last := false;
+	// the end of block.
+	uint(size=2) leveltype := 0;
+	// Intra16x16DCLevel 0, Intra16x16ACLevel / LumaLevel 1, ChromaDCLevel 2, ChromaACLevel 3
+	uint(size=5) nb4x4 := 0;
 
-  // Save the level in buffer and write out a zero sample
-  read_save: action RUN:[ r ], VALUE:[ v ] ==>
-  guard
-    r > 0,
-    not last
-  do
-    value_buf[count]:= v;
-    run := r ;
-    count := count + 1;
-  end
 
-  // Stuff zeros after the sample value
-  write_zero: action ==>
-  guard 
-    run > 0
-  do
-    value_buf[count]:= 0;
-    run := run - 1;
-    count := count + 1;
-  end
-  
-  write_zero_finish: action ==>
-  guard 
-    run = 0
-  end
+	CAVLC_Split: action
+			ENTROPY_TYPE:[ EntropyType ]
+				==>
+		guard
+			EntropyType = CAVLC_ENTROPY
+		end
 
-  schedule fsm E_Type:
-	
-	E_Type			(CAVLC_Split)			--> check_last;
-		
-	check_last 		( check_last 		) --> check_last_done;
-	check_last_done ( read_immediate 	) --> check_last;
-	check_last_done ( read_save 		) --> write_zero;
-	write_zero 		( write_zero 		) --> write_zero;
-	write_zero 		( write_zero_finish ) --> check_last;
-	check_last_done	( out_buffer 		) --> out_buffer;
-	out_buffer 		( out_buffer 		) --> out_buffer;
-	out_buffer 		( out_zero 			) --> out_zero;
-	out_buffer 		( out_finish 		) --> check_last;
-	check_last_done	( out_zero			) --> out_zero;
-	out_zero 		( out_zero 			) --> out_zero;
-	out_zero 		( out_finish		) --> check_last; 
-	
-	E_Type			(CABAC_Split		) --> Sent_CABAC;
-	Sent_CABAC		(sent_cabac_block	) --> Sent_CABAC;	
-	 
-  end
-  
+
+	CABAC_Split: action
+			ENTROPY_TYPE:[ EntropyType ]
+				==>	
+		guard
+			EntropyType = CABAC_ENTROPY
+		end
+
+
+	sent_cabac_block: action VALUE:[ x ] ==> Block:[ x ]
+		end
+
+
+	//if it is the end of a block, begin to stuff 0.
+	//if it is not the end, begin to read data to buffer.
+	check_last: action LAST:[ l ] ==>
+		do
+			last := l;
+			if last then
+				if leveltype = 2 then
+					stuff_count := 4 - count;
+				else
+					stuff_count := 16 - count;
+				end
+			else
+				stuff_count := 0;
+			end
+		end
+
+
+	// begin to output data in buffer: from high address to low address
+	out_buffer: action ==> Block:[ b ]
+		guard
+			last,
+			count > 0
+		var
+			int(size=12) b
+		do
+			b := value_buf[count - 1];
+			count := count - 1;
+		end
+
+
+	// output the stuff zero after the last level
+	out_zero: action ==> Block:[ 0 ]
+		guard
+			last,
+			stuff_count > 0,
+			count = 0
+		do
+			stuff_count := stuff_count - 1;
+		end
+
+
+	out_finish: action ==>
+		guard
+			last,
+			stuff_count = 0,
+			count = 0
+		do
+			nb4x4 := nb4x4 + 1;
+			if (leveltype = 0 and nb4x4 = 1) or (leveltype = 1 and nb4x4 = 16) or
+			(leveltype = 2 and nb4x4 = 2) then
+				leveltype := leveltype + 1;
+				nb4x4 := 0;
+			end
+			if leveltype = 3 and nb4x4 = 8 then
+				leveltype := 0;
+				nb4x4 := 0;
+			end
+		end
+
+
+	// Read and write the sample out immediately if RUN = 0
+	read_immediate: action RUN:[ r ], VALUE:[ v ] ==>
+		guard
+			r = 0,
+			not last
+		do
+			value_buf[count] := v;
+			run := r;
+			count := count + 1;
+		end
+
+
+	// Save the level in buffer and write out a zero sample
+	read_save: action RUN:[ r ], VALUE:[ v ] ==>
+		guard
+			r > 0,
+			not last
+		do
+			value_buf[count] := v;
+			run := r;
+			count := count + 1;
+		end
+
+
+	// Stuff zeros after the sample value
+	write_zero: action ==>
+		guard
+			run > 0
+		do
+			value_buf[count] := 0;
+			run := run - 1;
+			count := count + 1;
+		end
+
+
+	write_zero_finish: action ==>
+		guard
+			run = 0
+		end
+
+	schedule fsm choose_E_Type :
+
+		choose_E_Type    ( CABAC_Split       ) --> Sent_CABAC;
+		Sent_CABAC       ( sent_cabac_block  ) --> Sent_CABAC;
+
+		choose_E_Type    ( CAVLC_Split       ) --> check_last;
+		check_last       ( check_last        ) --> check_last_done;
+		check_last_done  ( read_immediate    ) --> check_last;
+		check_last_done  ( read_save         ) --> write_zero;
+		write_zero       ( write_zero        ) --> write_zero;
+		write_zero       ( write_zero_finish ) --> check_last;
+		check_last_done  ( out_buffer        ) --> out_buffer;
+		out_buffer       ( out_buffer        ) --> out_buffer;
+		out_buffer       ( out_zero          ) --> out_zero;
+		out_buffer       ( out_finish        ) --> check_last;
+		check_last_done  ( out_zero          ) --> out_zero;
+		out_zero         ( out_zero          ) --> out_zero;
+		out_zero         ( out_finish        ) --> check_last;
+	end
+
 end

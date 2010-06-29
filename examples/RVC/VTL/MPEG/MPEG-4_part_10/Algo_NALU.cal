@@ -17,6 +17,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 This FU remove emulation_prevention_three_byte, send the RBSP bytes and the number of rbsp bytes between 2 NAL.
 
 ***********************************************************************/
+//Modified by Damien de Saint Jorre IETR/INSA of Rennes
 
 actor Algo_NALU ()
 		uint(size = 8) bits8
