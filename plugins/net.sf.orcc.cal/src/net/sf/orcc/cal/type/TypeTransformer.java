@@ -74,7 +74,7 @@ public class TypeTransformer extends VoidSwitch {
 		doSwitch(port);
 
 		// type of each token
-		Type type = (Type) port.getIrType();
+		Type type = port.getIrType();
 
 		// repeat equals to 1 when absent
 		AstExpression astRepeat = input.getRepeat();

@@ -41,7 +41,6 @@ import net.sf.orcc.cal.cal.AstExpressionList;
 import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
-import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
@@ -233,8 +232,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionCall(AstExpressionCall expression) {
-		AstFunction function = expression.getFunction();
-		return (Type) function.getIrType();
+		return expression.getFunction().getIrType();
 	}
 
 	@Override
@@ -271,7 +269,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Type type = (Type) variable.getIrType();
+		Type type = variable.getIrType();
 
 		if (type == null) {
 			return null;
@@ -367,7 +365,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		return (Type) variable.getIrType();
+		return variable.getIrType();
 	}
 
 	@Override
@@ -449,7 +447,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	 * @return a type
 	 */
 	public Type getType(AstExpression expression) {
-		Type type = (Type) expression.getIrType();
+		Type type = expression.getIrType();
 		if (type == null) {
 			type = doSwitch(expression);
 			expression.setIrType(type);

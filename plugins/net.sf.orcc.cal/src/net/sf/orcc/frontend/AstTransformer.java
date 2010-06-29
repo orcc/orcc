@@ -170,7 +170,7 @@ public class AstTransformer {
 			Expression expr = doSwitch(expression.getExpression());
 
 			return new UnaryExpr(Util.getLocation(expression), op, expr,
-					(Type) expression.getIrType());
+					expression.getIrType());
 		}
 
 		@Override
@@ -650,7 +650,7 @@ public class AstTransformer {
 	private void transformFunction(AstFunction astFunction) {
 		String name = astFunction.getName();
 		Location location = Util.getLocation(astFunction);
-		Type type = (Type) astFunction.getIrType();
+		Type type = astFunction.getIrType();
 
 		// sets the current procedure
 		procedure = new Procedure(name, location, type);
@@ -677,7 +677,7 @@ public class AstTransformer {
 		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
 		for (AstVariable astVariable : stateVariables) {
 			Location location = Util.getLocation(astVariable);
-			Type type = (Type) astVariable.getIrType();
+			Type type = astVariable.getIrType();
 			String name = astVariable.getName();
 			boolean assignable = !astVariable.isConstant();
 
@@ -753,7 +753,7 @@ public class AstTransformer {
 		Location location = Util.getLocation(astVariable);
 		String name = astVariable.getName();
 		boolean assignable = !astVariable.isConstant();
-		Type type = (Type) astVariable.getIrType();
+		Type type = astVariable.getIrType();
 
 		LocalVariable local = new LocalVariable(assignable, 0, location, name,
 				null, type);
@@ -851,7 +851,7 @@ public class AstTransformer {
 		OrderedMap<Port> ports = new OrderedMap<Port>();
 		for (AstPort astPort : portList) {
 			Location location = Util.getLocation(astPort);
-			Type type = (Type) astPort.getIrType();
+			Type type = astPort.getIrType();
 			Port port = new Port(location, type, astPort.getName());
 			portMap.put(astPort, port);
 			ports.add(file, location, port.getName(), port);
