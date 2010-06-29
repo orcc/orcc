@@ -66,6 +66,7 @@ public class Frontend {
 		if (errors.isEmpty()) {
 			try {
 				Actor actor = astTransformer.transform(file, astActor);
+				new SSATransformation().transform(actor);
 				new IRWriter(actor).write(outputFolder.toString());
 			} catch (OrccRuntimeException e) {
 				throw new OrccException(e.getMessage(), e);

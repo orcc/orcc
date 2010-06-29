@@ -203,7 +203,24 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionIndex(AstExpressionIndex expression) {
-			return new IntExpr(42);
+			// we always load in this case
+			
+			Location location = Util.getLocation(expression);
+			AstVariable astVariable = expression.getSource().getVariable();
+			Variable variable = variablesMap.get(astVariable);
+
+			List<Expression> indexes = transformExpressions(expression
+					.getIndexes());
+
+			LocalVariable target = newTempLocalVariable(variable.getType(),
+					"local_" + variable.getName());
+
+			Load load = new Load(location, target, new Use(variable), indexes);
+			addInstruction(load);
+
+			Use use = new Use(target);
+			Expression varExpr = new VarExpr(location, use);
+			return varExpr;
 		}
 
 		@Override
@@ -368,6 +385,7 @@ public class AstTransformer {
 				LocalVariable local = (LocalVariable) target;
 				instruction = new Assign(location, local, value);
 			} else {
+				// TODO only store when necessary
 				instruction = new Store(location, target, indexes, value);
 			}
 			addInstruction(instruction);
@@ -819,7 +837,8 @@ public class AstTransformer {
 	 */
 	private List<Expression> transformExpressions(
 			List<AstExpression> expressions) {
-		List<Expression> irExpressions = new ArrayList<Expression>(0);
+		int length = expressions.size();
+		List<Expression> irExpressions = new ArrayList<Expression>(length);
 		for (AstExpression expression : expressions) {
 			irExpressions.add(transformExpression(expression));
 		}
