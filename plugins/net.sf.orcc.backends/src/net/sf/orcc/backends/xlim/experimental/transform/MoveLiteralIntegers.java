@@ -1,3 +1,31 @@
+/*
+ * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
 package net.sf.orcc.backends.xlim.experimental.transform;
 
 import java.util.List;
@@ -12,12 +40,11 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -26,9 +53,23 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
+/**
+ * 
+ * This class defines a transformation that transforms literals used in
+ * instructions into variables. This transformation is needed since XLIM ports
+ * cannot contain literals.
+ * 
+ * @author Ghislain Roquier
+ * 
+ */
+
 public class MoveLiteralIntegers extends AbstractActorTransformation {
 
-	private class MyExpressionInterpreter implements ExpressionInterpreter {
+	private int index;
+
+	private OrderedMap<Variable> locals;
+
+	private ExpressionInterpreter exprInterpreter = new AbstractExpressionInterpreter() {
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
@@ -45,7 +86,6 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
 					name, null, IrFactory.eINSTANCE.createTypeBool());
 			locals.add(var.getName(), var);
-
 			it.previous();
 			it.add(new Assign(var, expr));
 			it.next();
@@ -59,9 +99,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			String name = "lit_int_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
 					name, null, IrFactory.eINSTANCE.createTypeInt(32));
-
 			locals.add(var.getName(), var);
-
 			it.previous();
 			it.add(new Assign(var, expr));
 			it.next();
@@ -69,35 +107,16 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		}
 
 		@Override
-		public Object interpret(ListExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
-		public Object interpret(StringExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
 		public Object interpret(UnaryExpr expr, Object... args) {
 			Expression e = (Expression) expr.getExpr().accept(this, args);
 			return new UnaryExpr(expr.getOp(), e, expr.getType());
 		}
-
-		@Override
-		public Object interpret(VarExpr expr, Object... args) {
-			return expr;
-		}
-	}
-
-	private static int index;
-
-	private OrderedMap<Variable> locals;
+	};
 
 	@Override
 	public void visit(Assign assign, Object... args) {
-		assign.setValue((Expression) assign.getValue().accept(
-				new MyExpressionInterpreter(), args));
+		assign.setValue((Expression) assign.getValue().accept(exprInterpreter,
+				args));
 	}
 
 	@Override
@@ -110,12 +129,12 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Store store, Object... args) {
-		MyExpressionInterpreter interpret = new MyExpressionInterpreter();
 		ListIterator<Expression> it = store.getIndexes().listIterator();
 		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(interpret, args));
+			it.set((Expression) it.next().accept(exprInterpreter, args));
 		}
-		store.setValue((Expression) store.getValue().accept(interpret, args));
+		store.setValue((Expression) store.getValue().accept(exprInterpreter,
+				args));
 	}
 
 	@Override
