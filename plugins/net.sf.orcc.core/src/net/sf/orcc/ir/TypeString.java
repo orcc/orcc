@@ -26,9 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.Type;
 
 /**
  * This class defines a String type.
@@ -38,7 +37,7 @@ import net.sf.orcc.ir.Type;
  * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public interface StringType extends Type {
+public interface TypeString extends Type {
 
 	public static final String NAME = "String";
 

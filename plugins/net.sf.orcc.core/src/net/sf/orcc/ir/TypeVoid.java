@@ -26,70 +26,19 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.Type;
-
-import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a List type.
+ * This class defines a void type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
  * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public interface ListType extends Type {
+public interface TypeVoid extends Type {
 
-	public static final String NAME = "List";
-
-	/**
-	 * Returns the type of the elements of this list
-	 * 
-	 * @return the number of elements of this list
-	 * @model changeable="false" derived="true" volatile="true"
-	 */
-	public Type getElementType();
-
-	/**
-	 * Returns the number of elements of this list type.
-	 * 
-	 * @return the number of elements of this list type
-	 * @model
-	 */
-	public int getSize();
-
-	/**
-	 * Returns a list of indexes that can be used inside a template.
-	 * 
-	 * @return a list of indexes corresponding to the list size
-	 * @model changeable="false" derived="true" volatile="true"
-	 */
-	public EList<Integer> getSizeIterator();
-
-	/**
-	 * Returns the type of the list
-	 * 
-	 * @return the type of the list
-	 * @model
-	 */
-	public Type getType();
-
-	/**
-	 * Sets the number of elements of this list type.
-	 * 
-	 * @param size
-	 *            the number of elements of this list type
-	 */
-	public void setSize(int size);
-
-	/**
-	 * Sets the type of this list.
-	 * 
-	 * @param type
-	 *            element type
-	 */
-	public void setType(Type type);
+	public static final String NAME = "void";
 
 }

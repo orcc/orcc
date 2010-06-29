@@ -54,6 +54,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.Instruction;
@@ -65,7 +66,6 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.PhiRemoval;
-import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.util.DomUtil;
 
@@ -549,13 +549,13 @@ public class XlimActorPrinter implements XlimTypeTemplate, XlimModuleTemplate,
 						if (obj != null) {
 							Element el = XlimNodeTemplate.newInitValue(init2);
 							el.setAttribute(VALUE, obj.toString());
-							((ListType) state.getType()).getElementType()
+							((TypeList) state.getType()).getElementType()
 									.accept(new XlimTypeSizeVisitor(el));
 						}
 					}
 					if (value[0] == null) {
 						init2.setAttribute(VALUE, "0");
-						((ListType) state.getType()).getElementType().accept(
+						((TypeList) state.getType()).getElementType().accept(
 								new XlimTypeSizeVisitor(init2));
 					}
 				} else {

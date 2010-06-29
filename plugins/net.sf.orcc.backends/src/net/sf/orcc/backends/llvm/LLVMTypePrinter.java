@@ -28,13 +28,13 @@
  */
 package net.sf.orcc.backends.llvm;
 
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.type.TypePrinter;
-import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
 
 /**
  * This class defines a LLVM type printer.
@@ -45,18 +45,18 @@ import net.sf.orcc.ir.type.VoidType;
 public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
-	public void visit(BoolType type) {
+	public void visit(TypeBool type) {
 		// boolean is a 1-bit integer.
 		builder.append("i1");
 	}
 
 	@Override
-	public void visit(IntType type) {
+	public void visit(TypeInt type) {
 		builder.append("i"+type.getSize());
 	}
 
 	@Override
-	public void visit(ListType type) {
+	public void visit(TypeList type) {
 		builder.append("[");
 		builder.append(type.getSize());
 
@@ -66,17 +66,17 @@ public class LLVMTypePrinter extends TypePrinter {
 	}
 
 	@Override
-	public void visit(StringType type) {
+	public void visit(TypeString type) {
 		builder.append("["+type.getSize()+" x i8]");
 	}
 
 	@Override
-	public void visit(UintType type) {
+	public void visit(TypeUint type) {
 		builder.append("i"+type.getSize());
 	}
 
 	@Override
-	public void visit(VoidType type) {
+	public void visit(TypeVoid type) {
 		builder.append("void");
 	}
 

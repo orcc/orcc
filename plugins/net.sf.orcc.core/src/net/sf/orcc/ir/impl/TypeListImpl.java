@@ -26,11 +26,10 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type.impl;
+package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.impl.TypeImpl;
-import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypePackage;
 import net.sf.orcc.ir.type.TypeVisitor;
@@ -49,7 +48,7 @@ import org.eclipse.emf.ecore.util.EDataTypeEList;
  * @author Jérôme Gorin
  * 
  */
-public class ListTypeImpl extends TypeImpl implements ListType {
+public class TypeListImpl extends TypeImpl implements TypeList {
 
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
@@ -84,7 +83,7 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 	 * 
 	 * @generated
 	 */
-	protected ListTypeImpl() {
+	protected TypeListImpl() {
 		super();
 	}
 
@@ -165,8 +164,8 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof ListType) {
-			ListType list = (ListType) obj;
+		if (obj instanceof TypeList) {
+			TypeList list = (TypeList) obj;
 			return size == list.getSize() && type.equals(list.getType());
 		} else {
 			return false;
@@ -234,7 +233,7 @@ public class ListTypeImpl extends TypeImpl implements ListType {
 	 */
 	public Type getElementType() {
 		if (type.isList()) {
-			return ((ListType) type).getElementType();
+			return ((TypeList) type).getElementType();
 		}
 		return type;
 	}

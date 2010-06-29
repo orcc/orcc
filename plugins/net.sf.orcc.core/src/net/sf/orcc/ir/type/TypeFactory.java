@@ -6,7 +6,14 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 
 import org.eclipse.emf.ecore.EFactory;
 
@@ -24,7 +31,7 @@ public interface TypeFactory extends EFactory {
 	 * 
 	 * @generated
 	 */
-	TypeFactory eINSTANCE = net.sf.orcc.ir.type.impl.TypeFactoryImpl.init();
+	TypeFactory eINSTANCE = net.sf.orcc.ir.impl.TypeFactoryImpl.init();
 
 	/**
 	 * Returns a new object of class '<em>Bool Type</em>'. <!-- begin-user-doc
@@ -33,7 +40,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Bool Type</em>'.
 	 * @generated
 	 */
-	BoolType createTypeBool();
+	TypeBool createTypeBool();
 
 	/**
 	 * Returns a new object of class '<em>Float Type</em>'. <!-- begin-user-doc
@@ -42,7 +49,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Float Type</em>'.
 	 * @generated
 	 */
-	FloatType createTypeFloat();
+	TypeFloat createTypeFloat();
 
 	/**
 	 * Returns a new object of class '<em>Int Type</em>'. <!-- begin-user-doc
@@ -51,7 +58,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Int Type</em>'.
 	 * @generated
 	 */
-	IntType createTypeInt();
+	TypeInt createTypeInt();
 
 	/**
 	 * Creates a new integer with the given size.
@@ -59,7 +66,7 @@ public interface TypeFactory extends EFactory {
 	 * @param size
 	 *            the size of this integer type
 	 */
-	IntType createTypeInt(int size);
+	TypeInt createTypeInt(int size);
 
 	/**
 	 * Returns a new object of class '<em>List Type</em>'. <!-- begin-user-doc
@@ -68,7 +75,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>List Type</em>'.
 	 * @generated
 	 */
-	ListType createTypeList();
+	TypeList createTypeList();
 
 	/**
 	 * Creates a new list type with the given size and element type.
@@ -78,7 +85,7 @@ public interface TypeFactory extends EFactory {
 	 * @param type
 	 *            the type of this list's elements
 	 */
-	ListType createTypeList(int size, Type type);
+	TypeList createTypeList(int size, Type type);
 
 	/**
 	 * Returns a new object of class '<em>String Type</em>'. <!-- begin-user-doc
@@ -87,7 +94,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>String Type</em>'.
 	 * @generated
 	 */
-	StringType createTypeString();
+	TypeString createTypeString();
 
 	/**
 	 * Returns a new object of class '<em>Uint Type</em>'. <!-- begin-user-doc
@@ -96,7 +103,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Uint Type</em>'.
 	 * @generated
 	 */
-	UintType createTypeUint();
+	TypeUint createTypeUint();
 
 	/**
 	 * Returns a new object of class '<em>Void Type</em>'. <!-- begin-user-doc
@@ -105,7 +112,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Void Type</em>'.
 	 * @generated
 	 */
-	VoidType createTypeVoid();
+	TypeVoid createTypeVoid();
 
 	/**
 	 * Returns the package supported by this factory. <!-- begin-user-doc -->

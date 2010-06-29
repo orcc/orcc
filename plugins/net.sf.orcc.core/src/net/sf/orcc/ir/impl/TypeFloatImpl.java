@@ -26,19 +26,64 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.type.TypePackage;
+import org.eclipse.emf.ecore.EClass;
+import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
  * This class defines a float type.
  * 
  * @author Matthieu Wipliez
- * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public interface FloatType extends Type {
+public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 
-	public static final String NAME = "float";
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TypeFloatImpl() {
+		super();
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return TypePackage.Literals.FLOAT_TYPE;
+	}
+
+	@Override
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
+	}
+
+	@Override
+	public void accept(TypeVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof TypeFloat);
+	}
+
+	@Override
+	public boolean isFloat() {
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 
 }

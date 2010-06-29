@@ -28,6 +28,14 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+
 /**
  * This class defines a type visitor.
  * 
@@ -36,18 +44,18 @@ package net.sf.orcc.ir.type;
  */
 public interface TypeVisitor {
 
-	public void visit(BoolType type);
+	public void visit(TypeBool type);
 
-	public void visit(FloatType type);
+	public void visit(TypeFloat type);
 
-	public void visit(IntType type);
+	public void visit(TypeInt type);
 
-	public void visit(ListType type);
+	public void visit(TypeList type);
 
-	public void visit(StringType type);
+	public void visit(TypeString type);
 
-	public void visit(UintType type);
+	public void visit(TypeUint type);
 
-	public void visit(VoidType type);
+	public void visit(TypeVoid type);
 
 }

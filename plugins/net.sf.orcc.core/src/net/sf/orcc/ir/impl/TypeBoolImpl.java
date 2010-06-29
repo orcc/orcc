@@ -4,11 +4,10 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.type.impl;
+package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.impl.TypeImpl;
 
-import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypePackage;
 import net.sf.orcc.ir.type.TypeVisitor;
@@ -22,13 +21,13 @@ import org.eclipse.emf.ecore.EClass;
  * @author Jérôme Gorin
  * 
  */
-public class BoolTypeImpl extends TypeImpl implements BoolType {
+public class TypeBoolImpl extends TypeImpl implements TypeBool {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected BoolTypeImpl() {
+	protected TypeBoolImpl() {
 		super();
 	}
 
@@ -53,7 +52,7 @@ public class BoolTypeImpl extends TypeImpl implements BoolType {
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof BoolType);
+		return (obj instanceof TypeBool);
 	}
 
 	@Override

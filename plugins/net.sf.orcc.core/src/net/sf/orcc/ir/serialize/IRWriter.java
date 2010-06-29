@@ -64,16 +64,23 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
@@ -99,14 +106,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.FloatType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
 import net.sf.orcc.util.OrderedMap;
 
 import org.json.JSONArray;
@@ -447,19 +447,19 @@ public class IRWriter {
 	private class TypeWriter implements TypeInterpreter {
 
 		@Override
-		public Object interpret(BoolType type) {
-			return BoolType.NAME;
+		public Object interpret(TypeBool type) {
+			return TypeBool.NAME;
 		}
 
 		@Override
-		public Object interpret(FloatType type) {
-			return FloatType.NAME;
+		public Object interpret(TypeFloat type) {
+			return TypeFloat.NAME;
 		}
 
 		@Override
-		public Object interpret(IntType type) {
+		public Object interpret(TypeInt type) {
 			JSONArray array = new JSONArray();
-			array.put(IntType.NAME);
+			array.put(TypeInt.NAME);
 			// FIXME change JSON format back to using integer size
 			Expression expr = new IntExpr(type.getSize());
 			array.put(writeExpression(expr));
@@ -467,9 +467,9 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(ListType type) {
+		public Object interpret(TypeList type) {
 			JSONArray array = new JSONArray();
-			array.put(ListType.NAME);
+			array.put(TypeList.NAME);
 			// FIXME change JSON format back to using integer size
 			Expression expr = new IntExpr(type.getSize());
 			array.put(writeExpression(expr));
@@ -478,14 +478,14 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(StringType type) {
-			return StringType.NAME;
+		public Object interpret(TypeString type) {
+			return TypeString.NAME;
 		}
 
 		@Override
-		public Object interpret(UintType type) {
+		public Object interpret(TypeUint type) {
 			JSONArray array = new JSONArray();
-			array.put(UintType.NAME);
+			array.put(TypeUint.NAME);
 			// FIXME change JSON format back to using integer size
 			Expression expr = new IntExpr(type.getSize());
 			array.put(writeExpression(expr));
@@ -493,8 +493,8 @@ public class IRWriter {
 		}
 
 		@Override
-		public Object interpret(VoidType type) {
-			return VoidType.NAME;
+		public Object interpret(TypeVoid type) {
+			return TypeVoid.NAME;
 		}
 
 	}

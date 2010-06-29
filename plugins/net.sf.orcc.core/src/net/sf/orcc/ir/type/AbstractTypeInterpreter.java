@@ -28,6 +28,13 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+
 /**
  * @author Pierre-Laurent Lagalaye
  * 
@@ -35,32 +42,32 @@ package net.sf.orcc.ir.type;
 public abstract class AbstractTypeInterpreter implements TypeInterpreter {
 
 	@Override
-	public Object interpret(BoolType type) {
+	public Object interpret(TypeBool type) {
 		return null;
 	}
 
 	@Override
-	public Object interpret(IntType type) {
+	public Object interpret(TypeInt type) {
 		return null;
 	}
 
 	@Override
-	public Object interpret(ListType type) {
+	public Object interpret(TypeList type) {
 		return null;
 	}
 
 	@Override
-	public Object interpret(StringType type) {
+	public Object interpret(TypeString type) {
 		return null;
 	}
 
 	@Override
-	public Object interpret(UintType type) {
+	public Object interpret(TypeUint type) {
 		return null;
 	}
 
 	@Override
-	public Object interpret(VoidType type) {
+	public Object interpret(TypeVoid type) {
 		return null;
 	}
 

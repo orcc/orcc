@@ -38,11 +38,16 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -54,13 +59,8 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.type.BoolType;
 import net.sf.orcc.ir.type.Entry;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.TypeFactory;
-import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -349,10 +349,10 @@ public class XDFParser {
 				if (node.getNodeName().equals("Type")) {
 					Element eltType = (Element) node;
 					String name = eltType.getAttribute("name");
-					if (name.equals(BoolType.NAME)) {
+					if (name.equals(TypeBool.NAME)) {
 						return new ParseContinuation<Type>(node,
 								TypeFactory.eINSTANCE.createTypeBool());
-					} else if (name.equals(IntType.NAME)) {
+					} else if (name.equals(TypeInt.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
 						Expression expr = parseTypeSize(entries);
@@ -360,20 +360,20 @@ public class XDFParser {
 								.evaluateAsInteger(expr);
 						return new ParseContinuation<Type>(node,
 								TypeFactory.eINSTANCE.createTypeInt(size));
-					} else if (name.equals(ListType.NAME)) {
+					} else if (name.equals(TypeList.NAME)) {
 						return new ParseContinuation<Type>(node,
 								parseTypeList(node));
-					} else if (name.equals(StringType.NAME)) {
+					} else if (name.equals(TypeString.NAME)) {
 						return new ParseContinuation<Type>(node,
 								TypeFactory.eINSTANCE.createTypeString());
-					} else if (name.equals(UintType.NAME)) {
+					} else if (name.equals(TypeUint.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
 						Expression expr = parseTypeSize(entries);
 						int size = new ExpressionEvaluator()
 								.evaluateAsInteger(expr);
 
-						UintType type = TypeFactory.eINSTANCE.createTypeUint();
+						TypeUint type = TypeFactory.eINSTANCE.createTypeUint();
 						type.setSize(size);
 						return new ParseContinuation<Type>(node, type);
 					} else {

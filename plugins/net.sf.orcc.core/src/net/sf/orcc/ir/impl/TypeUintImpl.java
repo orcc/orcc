@@ -26,24 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type.impl;
+package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.impl.TypeImpl;
-import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypePackage;
+import net.sf.orcc.ir.type.TypeVisitor;
+
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
- * This class defines a String type.
+ * This class defines an unsigned integer type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
+ * 
  */
-public class StringTypeImpl extends TypeImpl implements StringType {
+public class TypeUintImpl extends TypeImpl implements TypeUint {
 
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
@@ -52,22 +53,15 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int SIZE_EDEFAULT = 0;
+	protected static final int SIZE_EDEFAULT = 32;
 
-	/**
-	 * The cached value of the '{@link #getSize() <em>Size</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #getSize()
-	 * @generated
-	 * @ordered
-	 */
-	protected int size = SIZE_EDEFAULT;
+	private int size;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected StringTypeImpl() {
+	protected TypeUintImpl() {
 		super();
 	}
 
@@ -88,7 +82,7 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case TypePackage.STRING_TYPE__SIZE:
+			case TypePackage.UINT_TYPE__SIZE:
 				return getSize();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -101,7 +95,7 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case TypePackage.STRING_TYPE__SIZE:
+			case TypePackage.UINT_TYPE__SIZE:
 				return size != SIZE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
@@ -109,7 +103,11 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 
 	@Override
 	public boolean equals(Object obj) {
-		return (obj instanceof StringType);
+		if (obj instanceof TypeUint) {
+			return size == ((TypeUint) obj).getSize();
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -119,7 +117,7 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case TypePackage.STRING_TYPE__SIZE:
+			case TypePackage.UINT_TYPE__SIZE:
 				setSize((Integer)newValue);
 				return;
 		}
@@ -132,7 +130,7 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return TypePackage.Literals.STRING_TYPE;
+		return TypePackage.Literals.UINT_TYPE;
 	}
 
 	/**
@@ -142,7 +140,7 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case TypePackage.STRING_TYPE__SIZE:
+			case TypePackage.UINT_TYPE__SIZE:
 				setSize(SIZE_EDEFAULT);
 				return;
 		}
@@ -150,7 +148,9 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Returns the size of this unsigned integer type.
+	 * 
+	 * @return the size of this unsigned integer type
 	 * @generated
 	 */
 	public int getSize() {
@@ -158,19 +158,22 @@ public class StringTypeImpl extends TypeImpl implements StringType {
 	}
 
 	@Override
-	public boolean isString() {
+	public boolean isUint() {
 		return true;
 	}
 
 	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * Sets the size of this unsigned integer type.
+	 * 
+	 * @param size
+	 *            the size of this unsigned integer type
 	 * @generated
 	 */
 	public void setSize(int newSize) {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.STRING_TYPE__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.UINT_TYPE__SIZE, oldSize, size));
 	}
 
 	@Override

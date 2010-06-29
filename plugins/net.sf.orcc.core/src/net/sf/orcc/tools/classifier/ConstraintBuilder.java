@@ -39,8 +39,11 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -54,9 +57,6 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.UintType;
 
 public class ConstraintBuilder extends AbstractNodeInterpreter {
 
@@ -277,7 +277,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		Object value = variable.getValue();
 		Type type = variable.getType();
 		if (type.isList()) {
-			type = ((ListType) type).getElementType();
+			type = ((TypeList) type).getElementType();
 		}
 
 		if (type.isInt()) {
@@ -285,7 +285,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				lo = (Integer) value;
 				hi = lo;
 			} else {
-				int size = ((IntType) type).getSize();
+				int size = ((TypeInt) type).getSize();
 				lo = -(1 << (size - 1));
 				hi = (1 << (size - 1)) - 1;
 			}
@@ -294,7 +294,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				lo = (Integer) value;
 				hi = lo;
 			} else {
-				int size = ((UintType) type).getSize();
+				int size = ((TypeUint) type).getSize();
 				lo = 0;
 				hi = 1 << size - 1;
 			}

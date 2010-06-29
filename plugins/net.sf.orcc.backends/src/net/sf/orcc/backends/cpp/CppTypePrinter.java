@@ -29,7 +29,7 @@
 package net.sf.orcc.backends.cpp;
 
 import net.sf.orcc.backends.c.CTypePrinter;
-import net.sf.orcc.ir.type.BoolType;
+import net.sf.orcc.ir.TypeBool;
 
 /**
  * This class defines a C++ type printer. It extends the C type printer by
@@ -41,7 +41,7 @@ import net.sf.orcc.ir.type.BoolType;
 public class CppTypePrinter extends CTypePrinter {
 
 	@Override
-	public void visit(BoolType type) {
+	public void visit(TypeBool type) {
 		builder.append("bool");
 	}
 

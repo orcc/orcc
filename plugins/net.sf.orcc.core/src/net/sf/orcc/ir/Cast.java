@@ -28,9 +28,6 @@
  */
 package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.UintType;
 
 /**
  * This class provide information about cast associated to an instruction
@@ -59,13 +56,13 @@ public class Cast {
 		if (type.isBool()) {
 			return 1;
 		} else if (type.isInt()) {
-			IntType intType = (IntType) type;
+			TypeInt intType = (TypeInt) type;
 			return intType.getSize();
 		} else if (type.isUint()) {
-			UintType uintType = (UintType) type;
+			TypeUint uintType = (TypeUint) type;
 			return uintType.getSize();
 		} else if (type.isList()) {
-			ListType listType = (ListType) type;
+			TypeList listType = (TypeList) type;
 			return getSizeOf(listType.getElementType());
 		}
 
@@ -98,7 +95,7 @@ public class Cast {
 	 */
 	public boolean isExtended() {
 		if (target.isList()) {
-			ListType list = (ListType) target;
+			TypeList list = (TypeList) target;
 			if (source.toString().equals(list.getElementType().toString())) {
 				return false;
 			}
@@ -118,7 +115,7 @@ public class Cast {
 		}
 
 		if (source.isList()) {
-			ListType type = (ListType) source;
+			TypeList type = (TypeList) source;
 			if (type.getElementType().isUint()) {
 				return false;
 			}
@@ -135,7 +132,7 @@ public class Cast {
 	 */
 	public boolean isTrunced() {
 		if (target.isList()) {
-			ListType list = (ListType) target;
+			TypeList list = (TypeList) target;
 			if (source.toString().equals(list.getElementType().toString())) {
 				return false;
 			}

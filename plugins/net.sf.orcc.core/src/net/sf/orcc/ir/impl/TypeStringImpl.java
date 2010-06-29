@@ -26,26 +26,23 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type.impl;
+package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.impl.TypeImpl;
-import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.type.TypePackage;
-import net.sf.orcc.ir.type.TypeVisitor;
-import net.sf.orcc.ir.type.UintType;
-
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
- * This class defines an unsigned integer type.
+ * This class defines a String type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
- * 
  */
-public class UintTypeImpl extends TypeImpl implements UintType {
+public class TypeStringImpl extends TypeImpl implements TypeString {
 
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
@@ -54,15 +51,22 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int SIZE_EDEFAULT = 32;
+	protected static final int SIZE_EDEFAULT = 0;
 
-	private int size;
+	/**
+	 * The cached value of the '{@link #getSize() <em>Size</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @see #getSize()
+	 * @generated
+	 * @ordered
+	 */
+	protected int size = SIZE_EDEFAULT;
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected UintTypeImpl() {
+	protected TypeStringImpl() {
 		super();
 	}
 
@@ -83,7 +87,7 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case TypePackage.UINT_TYPE__SIZE:
+			case TypePackage.STRING_TYPE__SIZE:
 				return getSize();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -96,7 +100,7 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case TypePackage.UINT_TYPE__SIZE:
+			case TypePackage.STRING_TYPE__SIZE:
 				return size != SIZE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
@@ -104,11 +108,7 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof UintType) {
-			return size == ((UintType) obj).getSize();
-		} else {
-			return false;
-		}
+		return (obj instanceof TypeString);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case TypePackage.UINT_TYPE__SIZE:
+			case TypePackage.STRING_TYPE__SIZE:
 				setSize((Integer)newValue);
 				return;
 		}
@@ -131,7 +131,7 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return TypePackage.Literals.UINT_TYPE;
+		return TypePackage.Literals.STRING_TYPE;
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case TypePackage.UINT_TYPE__SIZE:
+			case TypePackage.STRING_TYPE__SIZE:
 				setSize(SIZE_EDEFAULT);
 				return;
 		}
@@ -149,9 +149,7 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 	}
 
 	/**
-	 * Returns the size of this unsigned integer type.
-	 * 
-	 * @return the size of this unsigned integer type
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public int getSize() {
@@ -159,22 +157,19 @@ public class UintTypeImpl extends TypeImpl implements UintType {
 	}
 
 	@Override
-	public boolean isUint() {
+	public boolean isString() {
 		return true;
 	}
 
 	/**
-	 * Sets the size of this unsigned integer type.
-	 * 
-	 * @param size
-	 *            the size of this unsigned integer type
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public void setSize(int newSize) {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.UINT_TYPE__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.STRING_TYPE__SIZE, oldSize, size));
 	}
 
 	@Override

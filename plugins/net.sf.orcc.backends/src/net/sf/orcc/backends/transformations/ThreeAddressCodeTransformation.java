@@ -39,6 +39,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -64,7 +65,6 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.ListType;
 import net.sf.orcc.ir.type.TypeFactory;
 
 /**
@@ -188,8 +188,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			if (!expr.getType().equals(type)) {
 				if (expr.getType().isList() && type.isList()) {
 					// compare type of two arrays
-					ListType exprtype = (ListType) expr.getType();
-					ListType refType = (ListType) type;
+					TypeList exprtype = (TypeList) expr.getType();
+					TypeList refType = (TypeList) type;
 					if (exprtype.getElementType().equals(
 							refType.getElementType())) {
 						return expr;
@@ -356,7 +356,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		Type targetType = target.getType();
 
 		if (targetType.isList()) {
-			targetType = ((ListType) targetType).getElementType();
+			targetType = ((TypeList) targetType).getElementType();
 		}
 
 		// Check indexes
@@ -416,7 +416,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		// later)
 		for (Variable var : procedure.getLocals()) {
 			if (((LocalVariable) var).isPort()) {
-				ListType listType = (ListType) var.getType();
+				TypeList listType = (TypeList) var.getType();
 				if (listType.getElementType().isBool()) {
 					listType.setType(TypeFactory.eINSTANCE.createTypeInt(32));
 				}

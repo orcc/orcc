@@ -30,12 +30,12 @@ package net.sf.orcc.backends.vhdl.transforms;
 
 import java.util.List;
 
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.ListType;
 
 /**
  * This class defines an actor transformation that modify the dimension of size
@@ -53,7 +53,7 @@ public class VariableRedimension extends AbstractActorTransformation {
 			// System.out.println("local : " + local.getType().getDimensions());
 			List<Integer> dimensions = local.getType().getDimensions();
 			if (!dimensions.isEmpty() && dimensions.get(0).equals(1)) {
-				Type type = ((ListType) local.getType()).getElementType();
+				Type type = ((TypeList) local.getType()).getElementType();
 				local.setType(type);
 			}
 		}

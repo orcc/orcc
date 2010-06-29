@@ -46,14 +46,14 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.validation.CalJavaValidator;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
 import net.sf.orcc.ir.type.TypeFactory;
-import net.sf.orcc.ir.type.UintType;
 
 /**
  * This class defines a type checker for RVC-CAL AST. Note that types must have
@@ -281,7 +281,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			Type subType = getType(index);
 			if (type.isList()) {
 				if (subType.isInt() || subType.isUint()) {
-					type = ((ListType) type).getType();
+					type = ((TypeList) type).getType();
 				} else {
 					CalJavaValidator.getInstance().error(
 							"index must be an integer", index,
@@ -312,7 +312,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionString(AstExpressionString expression) {
-		StringType type = TypeFactory.eINSTANCE.createTypeString();
+		TypeString type = TypeFactory.eINSTANCE.createTypeString();
 		type.setSize(expression.getValue().length());
 		return type;
 	}
@@ -344,7 +344,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return type;
 		case MINUS:
 			if (type.isUint()) {
-				return TypeFactory.eINSTANCE.createTypeInt(((UintType) type)
+				return TypeFactory.eINSTANCE.createTypeInt(((TypeUint) type)
 						.getSize());
 			}
 			if (!type.isInt()) {
@@ -393,23 +393,23 @@ public class TypeChecker extends CalSwitch<Type> {
 			return t1;
 		} else if (t1.isInt() && t2.isInt()) {
 			return TypeFactory.eINSTANCE.createTypeInt(Math.max(
-					((IntType) t1).getSize(), ((IntType) t2).getSize()));
+					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
 		} else if (t1.isList() && t2.isList()) {
-			return getLub(((ListType) t1).getType(), ((ListType) t2).getType());
+			return getLub(((TypeList) t1).getType(), ((TypeList) t2).getType());
 		} else if (t1.isUint() && t2.isUint()) {
 			return TypeFactory.eINSTANCE.createTypeInt(Math.max(
-					((UintType) t1).getSize(), ((UintType) t2).getSize()));
+					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
 		} else if (t1.isInt() && t2.isUint()) {
-			int si = ((IntType) t1).getSize();
-			int su = ((UintType) t2).getSize();
+			int si = ((TypeInt) t1).getSize();
+			int su = ((TypeUint) t2).getSize();
 			if (si > su) {
 				return TypeFactory.eINSTANCE.createTypeInt(si);
 			} else {
 				return TypeFactory.eINSTANCE.createTypeInt(su + 1);
 			}
 		} else if (t1.isUint() && t2.isInt()) {
-			int su = ((UintType) t1).getSize();
-			int si = ((IntType) t2).getSize();
+			int su = ((TypeUint) t1).getSize();
+			int si = ((TypeInt) t2).getSize();
 			if (si > su) {
 				return TypeFactory.eINSTANCE.createTypeInt(si);
 			} else {

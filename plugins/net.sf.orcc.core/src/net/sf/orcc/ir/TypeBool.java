@@ -26,20 +26,18 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.Type;
 
 /**
- * This class defines a void type.
+ * This class defines a boolean type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
  * @model extends="net.sf.orcc.ir.Type"
- * 
  */
-public interface VoidType extends Type {
+public interface TypeBool extends Type {
 
-	public static final String NAME = "void";
+	public static final String NAME = "bool";
 
 }

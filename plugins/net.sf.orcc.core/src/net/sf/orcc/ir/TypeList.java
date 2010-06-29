@@ -26,65 +26,69 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type.impl;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.impl.TypeImpl;
-import net.sf.orcc.ir.type.FloatType;
-import net.sf.orcc.ir.type.TypePackage;
-import org.eclipse.emf.ecore.EClass;
-import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypeVisitor;
+
+import org.eclipse.emf.common.util.EList;
 
 /**
- * This class defines a float type.
+ * This class defines a List type.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
+ * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public class FloatTypeImpl extends TypeImpl implements FloatType {
+public interface TypeList extends Type {
+
+	public static final String NAME = "List";
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
+	 * Returns the type of the elements of this list
+	 * 
+	 * @return the number of elements of this list
+	 * @model changeable="false" derived="true" volatile="true"
 	 */
-	protected FloatTypeImpl() {
-		super();
-	}
+	public Type getElementType();
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
+	 * Returns the number of elements of this list type.
+	 * 
+	 * @return the number of elements of this list type
+	 * @model
 	 */
-	@Override
-	protected EClass eStaticClass() {
-		return TypePackage.Literals.FLOAT_TYPE;
-	}
+	public int getSize();
 
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
-	}
+	/**
+	 * Returns a list of indexes that can be used inside a template.
+	 * 
+	 * @return a list of indexes corresponding to the list size
+	 * @model changeable="false" derived="true" volatile="true"
+	 */
+	public EList<Integer> getSizeIterator();
 
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
+	/**
+	 * Returns the type of the list
+	 * 
+	 * @return the type of the list
+	 * @model
+	 */
+	public Type getType();
 
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof FloatType);
-	}
+	/**
+	 * Sets the number of elements of this list type.
+	 * 
+	 * @param size
+	 *            the number of elements of this list type
+	 */
+	public void setSize(int size);
 
-	@Override
-	public boolean isFloat() {
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString();
-	}
+	/**
+	 * Sets the type of this list.
+	 * 
+	 * @param type
+	 *            element type
+	 */
+	public void setType(Type type);
 
 }

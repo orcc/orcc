@@ -4,9 +4,16 @@
  *
  * $Id$
  */
-package net.sf.orcc.ir.type.impl;
+package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.type.*;
 
 import org.eclipse.emf.ecore.EClass;
@@ -97,8 +104,8 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public BoolType createTypeBool() {
-		BoolTypeImpl boolType = new BoolTypeImpl();
+	public TypeBool createTypeBool() {
+		TypeBoolImpl boolType = new TypeBoolImpl();
 		return boolType;
 	}
 
@@ -107,8 +114,8 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public FloatType createTypeFloat() {
-		FloatTypeImpl floatType = new FloatTypeImpl();
+	public TypeFloat createTypeFloat() {
+		TypeFloatImpl floatType = new TypeFloatImpl();
 		return floatType;
 	}
 
@@ -117,14 +124,14 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public IntType createTypeInt() {
-		IntTypeImpl intType = new IntTypeImpl();
+	public TypeInt createTypeInt() {
+		TypeIntImpl intType = new TypeIntImpl();
 		return intType;
 	}
 
 	@Override
-	public IntType createTypeInt(int size) {
-		IntTypeImpl intType = new IntTypeImpl();
+	public TypeInt createTypeInt(int size) {
+		TypeIntImpl intType = new TypeIntImpl();
 		intType.setSize(size);
 		return intType;
 	}
@@ -134,14 +141,14 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public ListType createTypeList() {
-		ListTypeImpl listType = new ListTypeImpl();
+	public TypeList createTypeList() {
+		TypeListImpl listType = new TypeListImpl();
 		return listType;
 	}
 
 	@Override
-	public ListType createTypeList(int size, Type type) {
-		ListTypeImpl listType = new ListTypeImpl();
+	public TypeList createTypeList(int size, Type type) {
+		TypeListImpl listType = new TypeListImpl();
 		listType.setSize(size);
 		listType.setType(type);
 		return listType;
@@ -152,8 +159,8 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public StringType createTypeString() {
-		StringTypeImpl stringType = new StringTypeImpl();
+	public TypeString createTypeString() {
+		TypeStringImpl stringType = new TypeStringImpl();
 		return stringType;
 	}
 
@@ -162,8 +169,8 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public UintType createTypeUint() {
-		UintTypeImpl uintType = new UintTypeImpl();
+	public TypeUint createTypeUint() {
+		TypeUintImpl uintType = new TypeUintImpl();
 		return uintType;
 	}
 
@@ -172,8 +179,8 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public VoidType createTypeVoid() {
-		VoidTypeImpl voidType = new VoidTypeImpl();
+	public TypeVoid createTypeVoid() {
+		TypeVoidImpl voidType = new TypeVoidImpl();
 		return voidType;
 	}
 

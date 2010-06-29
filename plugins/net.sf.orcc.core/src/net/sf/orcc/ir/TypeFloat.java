@@ -26,66 +26,18 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type.impl;
+package net.sf.orcc.ir;
 
-import net.sf.orcc.ir.impl.TypeImpl;
-import net.sf.orcc.ir.type.TypePackage;
-import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypeVisitor;
-import net.sf.orcc.ir.type.VoidType;
-import org.eclipse.emf.ecore.EClass;
 
 /**
- * This class defines a void type.
+ * This class defines a float type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @model extends="net.sf.orcc.ir.Type"
  * 
  */
-public class VoidTypeImpl extends TypeImpl implements VoidType {
+public interface TypeFloat extends Type {
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected VoidTypeImpl() {
-		super();
-	}
-
-	@Override
-	public Object accept(TypeInterpreter interpreter) {
-		return interpreter.interpret(this);
-	}
-
-	@Override
-	public void accept(TypeVisitor visitor) {
-		visitor.visit(this);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof VoidType);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	protected EClass eStaticClass() {
-		return TypePackage.Literals.VOID_TYPE;
-	}
-
-	@Override
-	public boolean isVoid() {
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return super.toString();
-	}
+	public static final String NAME = "float";
 
 }

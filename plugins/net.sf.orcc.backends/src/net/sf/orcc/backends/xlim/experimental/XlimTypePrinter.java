@@ -28,13 +28,13 @@
  */
 package net.sf.orcc.backends.xlim.experimental;
 
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.type.TypePrinter;
-import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
 
 /**
  * This class defines a XLIM type printer.
@@ -49,33 +49,33 @@ public class XlimTypePrinter extends TypePrinter {
 	}
 
 	@Override
-	public void visit(BoolType type) {
+	public void visit(TypeBool type) {
 		builder.append("bool");
 	}
 
 	@Override
-	public void visit(IntType type) {
+	public void visit(TypeInt type) {
 		printInt(type.getSize());
 	}
 
 	@Override
-	public void visit(ListType type) {
+	public void visit(TypeList type) {
 		// size will be printed later
 		type.getElementType().accept(this);
 	}
 
 	@Override
-	public void visit(StringType type) {
+	public void visit(TypeString type) {
 		builder.append("String");
 	}
 
 	@Override
-	public void visit(UintType type) {
+	public void visit(TypeUint type) {
 		builder.append("uint");
 	}
 
 	@Override
-	public void visit(VoidType type) {
+	public void visit(TypeVoid type) {
 		builder.append("void");
 	}
 

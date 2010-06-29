@@ -11,7 +11,6 @@ import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 
 import net.sf.orcc.ir.type.TypePackage;
-import net.sf.orcc.ir.type.impl.TypePackageImpl;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;

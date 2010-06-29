@@ -28,6 +28,14 @@
  */
 package net.sf.orcc.ir.type;
 
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+
 /**
  * This class defines a type interpreter.
  * 
@@ -36,18 +44,18 @@ package net.sf.orcc.ir.type;
  */
 public interface TypeInterpreter {
 
-	public Object interpret(BoolType type);
+	public Object interpret(TypeBool type);
 
-	public Object interpret(FloatType type);
+	public Object interpret(TypeFloat type);
 
-	public Object interpret(IntType type);
+	public Object interpret(TypeInt type);
 
-	public Object interpret(ListType type);
+	public Object interpret(TypeList type);
 
-	public Object interpret(StringType type);
+	public Object interpret(TypeString type);
 
-	public Object interpret(UintType type);
+	public Object interpret(TypeUint type);
 
-	public Object interpret(VoidType type);
+	public Object interpret(TypeVoid type);
 
 }

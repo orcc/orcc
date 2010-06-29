@@ -31,7 +31,9 @@ package net.sf.orcc.backends.vhdl;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -39,8 +41,6 @@ import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.UintType;
 
 /**
  * This class defines a VHDL expression printer.
@@ -58,9 +58,9 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 			if (type.isBool()) {
 				return 1;
 			} else if (type.isInt()) {
-				return ((IntType) type).getSize();
+				return ((TypeInt) type).getSize();
 			} else if (type.isUint()) {
-				return ((UintType) type).getSize();
+				return ((TypeUint) type).getSize();
 			} else {
 				throw new OrccRuntimeException("cannot get size of type: "
 						+ type);

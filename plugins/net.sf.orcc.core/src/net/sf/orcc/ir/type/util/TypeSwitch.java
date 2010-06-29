@@ -8,7 +8,14 @@ package net.sf.orcc.ir.type.util;
 
 import java.util.List;
 
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 
 import net.sf.orcc.ir.type.*;
 
@@ -90,49 +97,49 @@ public class TypeSwitch<T> {
 	protected T doSwitch(int classifierID, EObject theEObject) {
 		switch (classifierID) {
 			case TypePackage.BOOL_TYPE: {
-				BoolType boolType = (BoolType)theEObject;
+				TypeBool boolType = (TypeBool)theEObject;
 				T result = caseBoolType(boolType);
 				if (result == null) result = caseType(boolType);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case TypePackage.FLOAT_TYPE: {
-				FloatType floatType = (FloatType)theEObject;
+				TypeFloat floatType = (TypeFloat)theEObject;
 				T result = caseFloatType(floatType);
 				if (result == null) result = caseType(floatType);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case TypePackage.INT_TYPE: {
-				IntType intType = (IntType)theEObject;
+				TypeInt intType = (TypeInt)theEObject;
 				T result = caseIntType(intType);
 				if (result == null) result = caseType(intType);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case TypePackage.UINT_TYPE: {
-				UintType uintType = (UintType)theEObject;
+				TypeUint uintType = (TypeUint)theEObject;
 				T result = caseUintType(uintType);
 				if (result == null) result = caseType(uintType);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case TypePackage.VOID_TYPE: {
-				VoidType voidType = (VoidType)theEObject;
+				TypeVoid voidType = (TypeVoid)theEObject;
 				T result = caseVoidType(voidType);
 				if (result == null) result = caseType(voidType);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case TypePackage.STRING_TYPE: {
-				StringType stringType = (StringType)theEObject;
+				TypeString stringType = (TypeString)theEObject;
 				T result = caseStringType(stringType);
 				if (result == null) result = caseType(stringType);
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
 			case TypePackage.LIST_TYPE: {
-				ListType listType = (ListType)theEObject;
+				TypeList listType = (TypeList)theEObject;
 				T result = caseListType(listType);
 				if (result == null) result = caseType(listType);
 				if (result == null) result = defaultCase(theEObject);
@@ -153,7 +160,7 @@ public class TypeSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseBoolType(BoolType object) {
+	public T caseBoolType(TypeBool object) {
 		return null;
 	}
 
@@ -168,7 +175,7 @@ public class TypeSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseFloatType(FloatType object) {
+	public T caseFloatType(TypeFloat object) {
 		return null;
 	}
 
@@ -183,7 +190,7 @@ public class TypeSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseIntType(IntType object) {
+	public T caseIntType(TypeInt object) {
 		return null;
 	}
 
@@ -198,7 +205,7 @@ public class TypeSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseUintType(UintType object) {
+	public T caseUintType(TypeUint object) {
 		return null;
 	}
 
@@ -213,7 +220,7 @@ public class TypeSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseVoidType(VoidType object) {
+	public T caseVoidType(TypeVoid object) {
 		return null;
 	}
 
@@ -228,7 +235,7 @@ public class TypeSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseStringType(StringType object) {
+	public T caseStringType(TypeString object) {
 		return null;
 	}
 
@@ -243,7 +250,7 @@ public class TypeSwitch<T> {
 	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
 	 * @generated
 	 */
-	public T caseListType(ListType object) {
+	public T caseListType(TypeList object) {
 		return null;
 	}
 

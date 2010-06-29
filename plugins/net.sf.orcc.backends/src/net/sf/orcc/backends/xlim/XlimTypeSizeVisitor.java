@@ -30,14 +30,14 @@ package net.sf.orcc.backends.xlim;
 
 import net.sf.orcc.backends.xlim.templates.XlimAttributeTemplate;
 import net.sf.orcc.backends.xlim.templates.XlimTypeTemplate;
-import net.sf.orcc.ir.type.BoolType;
-import net.sf.orcc.ir.type.FloatType;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.StringType;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.type.TypeVisitor;
-import net.sf.orcc.ir.type.UintType;
-import net.sf.orcc.ir.type.VoidType;
 
 import org.w3c.dom.Element;
 
@@ -70,7 +70,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 * @param type
 	 *            Boolean type
 	 */
-	public void visit(BoolType type) {
+	public void visit(TypeBool type) {
 		element.setAttribute(SIZE, "1");
 		element.setAttribute(TYPENAME, BOOL);
 	}
@@ -81,7 +81,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 * @param type
 	 *            Integer type
 	 */
-	public void visit(IntType type) {
+	public void visit(TypeInt type) {
 		element.setAttribute(SIZE, Integer.toString(type.getSize()));
 		element.setAttribute(TYPENAME, INT);
 	}
@@ -92,7 +92,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 * @param type
 	 *            List type
 	 */
-	public void visit(ListType type) {
+	public void visit(TypeList type) {
 		element.setAttribute(TYPENAME, LIST);
 	}
 
@@ -102,7 +102,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 * @param type
 	 *            String type
 	 */
-	public void visit(StringType type) {
+	public void visit(TypeString type) {
 		element.setAttribute(TYPENAME, STRING);
 
 	}
@@ -113,7 +113,7 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 * @param type
 	 *            Unsigned integer type
 	 */
-	public void visit(UintType type) {
+	public void visit(TypeUint type) {
 		element.setAttribute(SIZE, Integer.toString(type.getSize()));
 		element.setAttribute(TYPENAME, UINT);
 	}
@@ -124,11 +124,11 @@ public class XlimTypeSizeVisitor implements TypeVisitor, XlimTypeTemplate,
 	 * @param type
 	 *            Void type
 	 */
-	public void visit(VoidType type) {
+	public void visit(TypeVoid type) {
 	}
 
 	@Override
-	public void visit(FloatType type) {
+	public void visit(TypeFloat type) {
 		element.setAttribute(SIZE, "32");
 		element.setAttribute(TYPENAME, FLOAT);
 	}

@@ -59,14 +59,14 @@ public interface TypePackage extends EPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	TypePackage eINSTANCE = net.sf.orcc.ir.type.impl.TypePackageImpl.init();
+	TypePackage eINSTANCE = net.sf.orcc.ir.impl.TypePackageImpl.init();
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.type.impl.BoolTypeImpl <em>Bool Type</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeBoolImpl <em>Bool Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.type.impl.BoolTypeImpl
-	 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getBoolType()
+	 * @see net.sf.orcc.ir.impl.TypeBoolImpl
+	 * @see net.sf.orcc.ir.impl.TypePackageImpl#getBoolType()
 	 * @generated
 	 */
 	int BOOL_TYPE = 0;
@@ -153,11 +153,11 @@ public interface TypePackage extends EPackage {
 	int BOOL_TYPE_FEATURE_COUNT = IrPackage.TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.type.impl.FloatTypeImpl <em>Float Type</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeFloatImpl <em>Float Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.type.impl.FloatTypeImpl
-	 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getFloatType()
+	 * @see net.sf.orcc.ir.impl.TypeFloatImpl
+	 * @see net.sf.orcc.ir.impl.TypePackageImpl#getFloatType()
 	 * @generated
 	 */
 	int FLOAT_TYPE = 1;
@@ -244,11 +244,11 @@ public interface TypePackage extends EPackage {
 	int FLOAT_TYPE_FEATURE_COUNT = IrPackage.TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.type.impl.IntTypeImpl <em>Int Type</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeIntImpl <em>Int Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.type.impl.IntTypeImpl
-	 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getIntType()
+	 * @see net.sf.orcc.ir.impl.TypeIntImpl
+	 * @see net.sf.orcc.ir.impl.TypePackageImpl#getIntType()
 	 * @generated
 	 */
 	int INT_TYPE = 2;
@@ -344,11 +344,11 @@ public interface TypePackage extends EPackage {
 	int INT_TYPE_FEATURE_COUNT = IrPackage.TYPE_FEATURE_COUNT + 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.type.impl.UintTypeImpl <em>Uint Type</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeUintImpl <em>Uint Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.type.impl.UintTypeImpl
-	 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getUintType()
+	 * @see net.sf.orcc.ir.impl.TypeUintImpl
+	 * @see net.sf.orcc.ir.impl.TypePackageImpl#getUintType()
 	 * @generated
 	 */
 	int UINT_TYPE = 3;
@@ -444,11 +444,11 @@ public interface TypePackage extends EPackage {
 	int UINT_TYPE_FEATURE_COUNT = IrPackage.TYPE_FEATURE_COUNT + 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.type.impl.VoidTypeImpl <em>Void Type</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeVoidImpl <em>Void Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.type.impl.VoidTypeImpl
-	 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getVoidType()
+	 * @see net.sf.orcc.ir.impl.TypeVoidImpl
+	 * @see net.sf.orcc.ir.impl.TypePackageImpl#getVoidType()
 	 * @generated
 	 */
 	int VOID_TYPE = 4;
@@ -535,11 +535,11 @@ public interface TypePackage extends EPackage {
 	int VOID_TYPE_FEATURE_COUNT = IrPackage.TYPE_FEATURE_COUNT + 0;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.type.impl.StringTypeImpl <em>String Type</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeStringImpl <em>String Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.type.impl.StringTypeImpl
-	 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getStringType()
+	 * @see net.sf.orcc.ir.impl.TypeStringImpl
+	 * @see net.sf.orcc.ir.impl.TypePackageImpl#getStringType()
 	 * @generated
 	 */
 	int STRING_TYPE = 5;
@@ -635,11 +635,11 @@ public interface TypePackage extends EPackage {
 	int STRING_TYPE_FEATURE_COUNT = IrPackage.TYPE_FEATURE_COUNT + 1;
 
 	/**
-	 * The meta object id for the '{@link net.sf.orcc.ir.type.impl.ListTypeImpl <em>List Type</em>}' class.
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeListImpl <em>List Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see net.sf.orcc.ir.type.impl.ListTypeImpl
-	 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getListType()
+	 * @see net.sf.orcc.ir.impl.TypeListImpl
+	 * @see net.sf.orcc.ir.impl.TypePackageImpl#getListType()
 	 * @generated
 	 */
 	int LIST_TYPE = 6;
@@ -763,147 +763,147 @@ public interface TypePackage extends EPackage {
 
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.type.BoolType <em>Bool Type</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeBool <em>Bool Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Bool Type</em>'.
-	 * @see net.sf.orcc.ir.type.BoolType
+	 * @see net.sf.orcc.ir.TypeBool
 	 * @generated
 	 */
 	EClass getBoolType();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.type.FloatType <em>Float Type</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeFloat <em>Float Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Float Type</em>'.
-	 * @see net.sf.orcc.ir.type.FloatType
+	 * @see net.sf.orcc.ir.TypeFloat
 	 * @generated
 	 */
 	EClass getFloatType();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.type.IntType <em>Int Type</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeInt <em>Int Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Int Type</em>'.
-	 * @see net.sf.orcc.ir.type.IntType
+	 * @see net.sf.orcc.ir.TypeInt
 	 * @generated
 	 */
 	EClass getIntType();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.type.IntType#getSize <em>Size</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeInt#getSize <em>Size</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Size</em>'.
-	 * @see net.sf.orcc.ir.type.IntType#getSize()
+	 * @see net.sf.orcc.ir.TypeInt#getSize()
 	 * @see #getIntType()
 	 * @generated
 	 */
 	EAttribute getIntType_Size();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.type.UintType <em>Uint Type</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeUint <em>Uint Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Uint Type</em>'.
-	 * @see net.sf.orcc.ir.type.UintType
+	 * @see net.sf.orcc.ir.TypeUint
 	 * @generated
 	 */
 	EClass getUintType();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.type.UintType#getSize <em>Size</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeUint#getSize <em>Size</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Size</em>'.
-	 * @see net.sf.orcc.ir.type.UintType#getSize()
+	 * @see net.sf.orcc.ir.TypeUint#getSize()
 	 * @see #getUintType()
 	 * @generated
 	 */
 	EAttribute getUintType_Size();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.type.VoidType <em>Void Type</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeVoid <em>Void Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>Void Type</em>'.
-	 * @see net.sf.orcc.ir.type.VoidType
+	 * @see net.sf.orcc.ir.TypeVoid
 	 * @generated
 	 */
 	EClass getVoidType();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.type.StringType <em>String Type</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeString <em>String Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>String Type</em>'.
-	 * @see net.sf.orcc.ir.type.StringType
+	 * @see net.sf.orcc.ir.TypeString
 	 * @generated
 	 */
 	EClass getStringType();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.type.StringType#getSize <em>Size</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeString#getSize <em>Size</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Size</em>'.
-	 * @see net.sf.orcc.ir.type.StringType#getSize()
+	 * @see net.sf.orcc.ir.TypeString#getSize()
 	 * @see #getStringType()
 	 * @generated
 	 */
 	EAttribute getStringType_Size();
 
 	/**
-	 * Returns the meta object for class '{@link net.sf.orcc.ir.type.ListType <em>List Type</em>}'.
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeList <em>List Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for class '<em>List Type</em>'.
-	 * @see net.sf.orcc.ir.type.ListType
+	 * @see net.sf.orcc.ir.TypeList
 	 * @generated
 	 */
 	EClass getListType();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.type.ListType#getElementType <em>Element Type</em>}'.
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.TypeList#getElementType <em>Element Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Element Type</em>'.
-	 * @see net.sf.orcc.ir.type.ListType#getElementType()
+	 * @see net.sf.orcc.ir.TypeList#getElementType()
 	 * @see #getListType()
 	 * @generated
 	 */
 	EReference getListType_ElementType();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.type.ListType#getSize <em>Size</em>}'.
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeList#getSize <em>Size</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute '<em>Size</em>'.
-	 * @see net.sf.orcc.ir.type.ListType#getSize()
+	 * @see net.sf.orcc.ir.TypeList#getSize()
 	 * @see #getListType()
 	 * @generated
 	 */
 	EAttribute getListType_Size();
 
 	/**
-	 * Returns the meta object for the attribute list '{@link net.sf.orcc.ir.type.ListType#getSizeIterator <em>Size Iterator</em>}'.
+	 * Returns the meta object for the attribute list '{@link net.sf.orcc.ir.TypeList#getSizeIterator <em>Size Iterator</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the attribute list '<em>Size Iterator</em>'.
-	 * @see net.sf.orcc.ir.type.ListType#getSizeIterator()
+	 * @see net.sf.orcc.ir.TypeList#getSizeIterator()
 	 * @see #getListType()
 	 * @generated
 	 */
 	EAttribute getListType_SizeIterator();
 
 	/**
-	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.type.ListType#getType <em>Type</em>}'.
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.TypeList#getType <em>Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @return the meta object for the reference '<em>Type</em>'.
-	 * @see net.sf.orcc.ir.type.ListType#getType()
+	 * @see net.sf.orcc.ir.TypeList#getType()
 	 * @see #getListType()
 	 * @generated
 	 */
@@ -932,31 +932,31 @@ public interface TypePackage extends EPackage {
 	 */
 	interface Literals {
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.type.impl.BoolTypeImpl <em>Bool Type</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeBoolImpl <em>Bool Type</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.type.impl.BoolTypeImpl
-		 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getBoolType()
+		 * @see net.sf.orcc.ir.impl.TypeBoolImpl
+		 * @see net.sf.orcc.ir.impl.TypePackageImpl#getBoolType()
 		 * @generated
 		 */
 		EClass BOOL_TYPE = eINSTANCE.getBoolType();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.type.impl.FloatTypeImpl <em>Float Type</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeFloatImpl <em>Float Type</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.type.impl.FloatTypeImpl
-		 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getFloatType()
+		 * @see net.sf.orcc.ir.impl.TypeFloatImpl
+		 * @see net.sf.orcc.ir.impl.TypePackageImpl#getFloatType()
 		 * @generated
 		 */
 		EClass FLOAT_TYPE = eINSTANCE.getFloatType();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.type.impl.IntTypeImpl <em>Int Type</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeIntImpl <em>Int Type</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.type.impl.IntTypeImpl
-		 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getIntType()
+		 * @see net.sf.orcc.ir.impl.TypeIntImpl
+		 * @see net.sf.orcc.ir.impl.TypePackageImpl#getIntType()
 		 * @generated
 		 */
 		EClass INT_TYPE = eINSTANCE.getIntType();
@@ -970,11 +970,11 @@ public interface TypePackage extends EPackage {
 		EAttribute INT_TYPE__SIZE = eINSTANCE.getIntType_Size();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.type.impl.UintTypeImpl <em>Uint Type</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeUintImpl <em>Uint Type</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.type.impl.UintTypeImpl
-		 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getUintType()
+		 * @see net.sf.orcc.ir.impl.TypeUintImpl
+		 * @see net.sf.orcc.ir.impl.TypePackageImpl#getUintType()
 		 * @generated
 		 */
 		EClass UINT_TYPE = eINSTANCE.getUintType();
@@ -988,21 +988,21 @@ public interface TypePackage extends EPackage {
 		EAttribute UINT_TYPE__SIZE = eINSTANCE.getUintType_Size();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.type.impl.VoidTypeImpl <em>Void Type</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeVoidImpl <em>Void Type</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.type.impl.VoidTypeImpl
-		 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getVoidType()
+		 * @see net.sf.orcc.ir.impl.TypeVoidImpl
+		 * @see net.sf.orcc.ir.impl.TypePackageImpl#getVoidType()
 		 * @generated
 		 */
 		EClass VOID_TYPE = eINSTANCE.getVoidType();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.type.impl.StringTypeImpl <em>String Type</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeStringImpl <em>String Type</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.type.impl.StringTypeImpl
-		 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getStringType()
+		 * @see net.sf.orcc.ir.impl.TypeStringImpl
+		 * @see net.sf.orcc.ir.impl.TypePackageImpl#getStringType()
 		 * @generated
 		 */
 		EClass STRING_TYPE = eINSTANCE.getStringType();
@@ -1016,11 +1016,11 @@ public interface TypePackage extends EPackage {
 		EAttribute STRING_TYPE__SIZE = eINSTANCE.getStringType_Size();
 
 		/**
-		 * The meta object literal for the '{@link net.sf.orcc.ir.type.impl.ListTypeImpl <em>List Type</em>}' class.
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeListImpl <em>List Type</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
-		 * @see net.sf.orcc.ir.type.impl.ListTypeImpl
-		 * @see net.sf.orcc.ir.type.impl.TypePackageImpl#getListType()
+		 * @see net.sf.orcc.ir.impl.TypeListImpl
+		 * @see net.sf.orcc.ir.impl.TypePackageImpl#getListType()
 		 * @generated
 		 */
 		EClass LIST_TYPE = eINSTANCE.getListType();

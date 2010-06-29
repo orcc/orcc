@@ -40,8 +40,11 @@ import java.util.TreeMap;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -51,9 +54,6 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -516,19 +516,19 @@ public class XDFWriter {
 			name = "bool";
 		} else if (type.isInt()) {
 			name = "int";
-			size = ((IntType) type).getSize();
+			size = ((TypeInt) type).getSize();
 			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
 		} else if (type.isList()) {
 			name = "List";
-			size = ((ListType) type).getSize();
-			type = ((ListType) type).getElementType();
+			size = ((TypeList) type).getSize();
+			type = ((TypeList) type).getElementType();
 			typeElt.appendChild(writeEntry("type", type));
 			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
 		} else if (type.isString()) {
 			name = "String";
 		} else if (type.isUint()) {
 			name = "uint";
-			size = ((UintType) type).getSize();
+			size = ((TypeUint) type).getSize();
 			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
 		} else if (type.isVoid()) {
 			throw new OrccException("void type is invalid in XDF");

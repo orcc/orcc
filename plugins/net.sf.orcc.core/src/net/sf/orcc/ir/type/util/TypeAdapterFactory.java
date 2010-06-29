@@ -6,7 +6,14 @@
  */
 package net.sf.orcc.ir.type.util;
 
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 
 import net.sf.orcc.ir.type.*;
 
@@ -74,31 +81,31 @@ public class TypeAdapterFactory extends AdapterFactoryImpl {
 	protected TypeSwitch<Adapter> modelSwitch =
 		new TypeSwitch<Adapter>() {
 			@Override
-			public Adapter caseBoolType(BoolType object) {
+			public Adapter caseBoolType(TypeBool object) {
 				return createBoolTypeAdapter();
 			}
 			@Override
-			public Adapter caseFloatType(FloatType object) {
+			public Adapter caseFloatType(TypeFloat object) {
 				return createFloatTypeAdapter();
 			}
 			@Override
-			public Adapter caseIntType(IntType object) {
+			public Adapter caseIntType(TypeInt object) {
 				return createIntTypeAdapter();
 			}
 			@Override
-			public Adapter caseUintType(UintType object) {
+			public Adapter caseUintType(TypeUint object) {
 				return createUintTypeAdapter();
 			}
 			@Override
-			public Adapter caseVoidType(VoidType object) {
+			public Adapter caseVoidType(TypeVoid object) {
 				return createVoidTypeAdapter();
 			}
 			@Override
-			public Adapter caseStringType(StringType object) {
+			public Adapter caseStringType(TypeString object) {
 				return createStringTypeAdapter();
 			}
 			@Override
-			public Adapter caseListType(ListType object) {
+			public Adapter caseListType(TypeList object) {
 				return createListTypeAdapter();
 			}
 			@Override
@@ -126,13 +133,13 @@ public class TypeAdapterFactory extends AdapterFactoryImpl {
 
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.type.BoolType <em>Bool Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeBool <em>Bool Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.type.BoolType
+	 * @see net.sf.orcc.ir.TypeBool
 	 * @generated
 	 */
 	public Adapter createBoolTypeAdapter() {
@@ -140,13 +147,13 @@ public class TypeAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.type.FloatType <em>Float Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeFloat <em>Float Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.type.FloatType
+	 * @see net.sf.orcc.ir.TypeFloat
 	 * @generated
 	 */
 	public Adapter createFloatTypeAdapter() {
@@ -154,13 +161,13 @@ public class TypeAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.type.IntType <em>Int Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeInt <em>Int Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.type.IntType
+	 * @see net.sf.orcc.ir.TypeInt
 	 * @generated
 	 */
 	public Adapter createIntTypeAdapter() {
@@ -168,13 +175,13 @@ public class TypeAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.type.UintType <em>Uint Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeUint <em>Uint Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.type.UintType
+	 * @see net.sf.orcc.ir.TypeUint
 	 * @generated
 	 */
 	public Adapter createUintTypeAdapter() {
@@ -182,13 +189,13 @@ public class TypeAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.type.VoidType <em>Void Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeVoid <em>Void Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.type.VoidType
+	 * @see net.sf.orcc.ir.TypeVoid
 	 * @generated
 	 */
 	public Adapter createVoidTypeAdapter() {
@@ -196,13 +203,13 @@ public class TypeAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.type.StringType <em>String Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeString <em>String Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.type.StringType
+	 * @see net.sf.orcc.ir.TypeString
 	 * @generated
 	 */
 	public Adapter createStringTypeAdapter() {
@@ -210,13 +217,13 @@ public class TypeAdapterFactory extends AdapterFactoryImpl {
 	}
 
 	/**
-	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.type.ListType <em>List Type</em>}'.
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeList <em>List Type</em>}'.
 	 * <!-- begin-user-doc -->
 	 * This default implementation returns null so that we can easily ignore cases;
 	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
 	 * <!-- end-user-doc -->
 	 * @return the new adapter.
-	 * @see net.sf.orcc.ir.type.ListType
+	 * @see net.sf.orcc.ir.TypeList
 	 * @generated
 	 */
 	public Adapter createListTypeAdapter() {

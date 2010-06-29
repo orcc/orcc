@@ -26,19 +26,65 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type;
+package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.type.TypePackage;
+import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.ir.type.TypeVisitor;
+import org.eclipse.emf.ecore.EClass;
 
 /**
- * This class defines a boolean type.
+ * This class defines a void type.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
- * @model extends="net.sf.orcc.ir.Type"
+ * 
  */
-public interface BoolType extends Type {
+public class TypeVoidImpl extends TypeImpl implements TypeVoid {
 
-	public static final String NAME = "bool";
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TypeVoidImpl() {
+		super();
+	}
+
+	@Override
+	public Object accept(TypeInterpreter interpreter) {
+		return interpreter.interpret(this);
+	}
+
+	@Override
+	public void accept(TypeVisitor visitor) {
+		visitor.visit(this);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof TypeVoid);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return TypePackage.Literals.VOID_TYPE;
+	}
+
+	@Override
+	public boolean isVoid() {
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString();
+	}
 
 }

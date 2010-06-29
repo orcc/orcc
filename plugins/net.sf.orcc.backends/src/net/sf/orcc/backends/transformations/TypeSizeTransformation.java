@@ -29,13 +29,13 @@
 package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.IntType;
-import net.sf.orcc.ir.type.ListType;
-import net.sf.orcc.ir.type.UintType;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -51,15 +51,15 @@ public class TypeSizeTransformation extends AbstractActorTransformation {
 		int size;
 
 		if (type.isInt()) {
-			IntType intType = (IntType) type;
+			TypeInt intType = (TypeInt) type;
 			size = getIntSize(intType.getSize());
 			intType.setSize(size);
 		} else if (type.isUint()) {
-			UintType uintType = (UintType) type;
+			TypeUint uintType = (TypeUint) type;
 			size = getIntSize(uintType.getSize());
 			uintType.setSize(size);
 		} else if (type.isList()) {
-			ListType listType = (ListType) type;
+			TypeList listType = (TypeList) type;
 			checkType(listType.getElementType());
 		}
 

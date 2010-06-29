@@ -26,10 +26,9 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.type.impl;
+package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.impl.TypeImpl;
-import net.sf.orcc.ir.type.IntType;
+import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypePackage;
 import org.eclipse.emf.common.notify.Notification;
@@ -45,7 +44,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * @author Jérôme Gorin
  * 
  */
-public class IntTypeImpl extends TypeImpl implements IntType {
+public class TypeIntImpl extends TypeImpl implements TypeInt {
 
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
@@ -62,7 +61,7 @@ public class IntTypeImpl extends TypeImpl implements IntType {
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected IntTypeImpl() {
+	protected TypeIntImpl() {
 		super();
 	}
 
@@ -104,8 +103,8 @@ public class IntTypeImpl extends TypeImpl implements IntType {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof IntType) {
-			return size == ((IntType) obj).getSize();
+		if (obj instanceof TypeInt) {
+			return size == ((TypeInt) obj).getSize();
 		} else {
 			return false;
 		}
