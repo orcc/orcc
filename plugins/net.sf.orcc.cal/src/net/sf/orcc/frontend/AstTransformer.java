@@ -204,7 +204,7 @@ public class AstTransformer {
 		@Override
 		public Expression caseAstExpressionIndex(AstExpressionIndex expression) {
 			// we always load in this case
-			
+
 			Location location = Util.getLocation(expression);
 			AstVariable astVariable = expression.getSource().getVariable();
 			Variable variable = variablesMap.get(astVariable);
@@ -212,7 +212,7 @@ public class AstTransformer {
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
 
-			LocalVariable target = newTempLocalVariable(variable.getType(),
+			LocalVariable target = newTempLocalVariable(expression.getIrType(),
 					"local_" + variable.getName());
 
 			Load load = new Load(location, target, new Use(variable), indexes);
