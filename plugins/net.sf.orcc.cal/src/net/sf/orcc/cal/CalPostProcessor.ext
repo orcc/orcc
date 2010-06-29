@@ -20,6 +20,10 @@ EDataType getEcoreDataType(String name) :
     org::eclipse::emf::ecore::EcorePackage::eINSTANCE.getEClassifier(name)
 ;
 
+EClass getIrClass(String name) :
+    net::sf::orcc::ir::IrPackage::eINSTANCE.getEClassifier(name)
+;
+
 addList(EReference this, String name, EClassifier type) :
     let opp = new EReference :
         opp.setName(name) ->
@@ -28,6 +32,17 @@ addList(EReference this, String name, EClassifier type) :
         opp.setEOpposite(this) ->
         opp.setUpperBound(-1) ->
         eReferenceType.eStructuralFeatures.add(opp)
+;
+
+addReference(EClass clasz, String typeName, String attributeName) :
+	let etype = getIrClass(typeName) :
+	let field = new EReference :
+	field.setEType(etype) ->
+	field.setName(attributeName) ->
+	field.setTransient(true) ->
+	field.setLowerBound(0) ->
+	field.setUpperBound(1) ->
+	clasz.eStructuralFeatures.add(field)
 ;
 
 addAttribute(EClass clasz, String typeName, String attributeName) :
@@ -43,6 +58,21 @@ addAttribute(EClass clasz, String typeName, String attributeName) :
 
 process(EClass this) :
 	switch (this.name) {
+		case "AstExpression": (
+			// add an "irType" reference to expressions
+			addReference(this, "Type", "irType")
+		)
+
+		case "AstFunction": (
+			// add an "irType" reference to functions
+			addReference(this, "Type", "irType")
+		)
+
+		case "AstPort": (
+			// add an "irType" reference to ports
+			addReference(this, "Type", "irType")
+		)
+
 		case "AstSchedule": (
 			// add a transient list of states referenced by transitions to Schedule class 
 			let etype = (EClass) ePackage.getEClassifier("AstState") :
@@ -57,6 +87,9 @@ process(EClass this) :
 		)
         
 		case "AstVariable": (
+			// add an "irType" reference to variables 
+			addReference(this, "Type", "irType") -> 
+		
 			// add an "initialValue" value field to variables
 			addAttribute(this, "EJavaObject", "initialValue")
 		)
