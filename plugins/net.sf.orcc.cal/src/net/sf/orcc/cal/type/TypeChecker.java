@@ -384,7 +384,7 @@ public class TypeChecker extends CalSwitch<Type> {
 	 *            another type
 	 * @return the Least Upper Bound of the given types
 	 */
-	private Type getLub(Type t1, Type t2) {
+	public Type getLub(Type t1, Type t2) {
 		if (t1.isBool() && t2.isBool()) {
 			return t1;
 		} else if (t1.isFloat() && t2.isFloat()) {

@@ -62,6 +62,7 @@ import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.Action;
@@ -82,6 +83,8 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -120,7 +123,12 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
-			return new IntExpr(42);
+			BinaryOp op = BinaryOp.getOperator(expression.getOperator());
+			Expression e1 = doSwitch(expression.getLeft());
+			Expression e2 = doSwitch(expression.getRight());
+
+			return new BinaryExpr(Util.getLocation(expression), e1, op, e2,
+					expression.getIrType());
 		}
 
 		@Override
@@ -132,8 +140,41 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionCall(AstExpressionCall call) {
-			return new IntExpr(42);
+		public Expression caseAstExpressionCall(AstExpressionCall astCall) {
+			Location location = Util.getLocation(astCall);
+
+			// retrieve IR procedure
+			AstFunction astFunction = astCall.getFunction();
+
+			// special case if the function is a built-in function
+			Expression result = transformBuiltinFunction(astCall);
+			if (result != null) {
+				return result;
+			}
+
+			if (!functionsMap.containsKey(astFunction)) {
+				Procedure current = procedure;
+				transformFunction(astFunction);
+				procedure = current;
+			}
+			Procedure procedure = functionsMap.get(astFunction);
+
+			// transform parameters
+			List<Expression> parameters = transformExpressions(astCall
+					.getParameters());
+
+			// generates a new target
+			LocalVariable target = newTempLocalVariable(
+					procedure.getReturnType(), "call_" + procedure.getName());
+
+			// add call
+			Call call = new Call(location, target, procedure, parameters);
+			addInstruction(call);
+
+			// return local variable
+			Use use = new Use(target);
+			Expression varExpr = new VarExpr(location, use);
+			return varExpr;
 		}
 
 		@Override
@@ -179,10 +220,72 @@ public class AstTransformer {
 			AstVariable astVariable = expression.getValue().getVariable();
 			Location location = Util.getLocation(expression);
 
-			Variable variable = variablesMap.get(astVariable);
-			Use use = new Use(variable);
+			LocalVariable local = getLocalVariable(astVariable);
+			Use use = new Use(local);
 			Expression varExpr = new VarExpr(location, use);
 			return varExpr;
+		}
+
+		/**
+		 * Returns the IR mapping of the given AST variable. If the AST variable
+		 * is a global, loads it.
+		 * 
+		 * @param astVariable
+		 *            an AST variable
+		 * @return a local IR variable
+		 */
+		private LocalVariable getLocalVariable(AstVariable astVariable) {
+			Variable variable = variablesMap.get(astVariable);
+			if (variable.isGlobal()) {
+				// TODO use a map to only load when necessary
+
+				List<Expression> indexes = new ArrayList<Expression>(0);
+				LocalVariable target = newTempLocalVariable(variable.getType(),
+						"local_" + variable.getName());
+				Load load = new Load(new Location(), target, new Use(variable),
+						indexes);
+				addInstruction(load);
+				return target;
+			}
+
+			return (LocalVariable) variable;
+		}
+
+		private Expression transformBuiltinFunction(AstExpressionCall astCall) {
+			Location location = Util.getLocation(astCall);
+			String name = astCall.getFunction().getName();
+			if ("bitnot".equals(name)) {
+				Expression expr = transformExpression(astCall.getParameters()
+						.get(0));
+				return new UnaryExpr(location, UnaryOp.BITNOT, expr,
+						expr.getType());
+			}
+
+			BinaryOp op = null;
+			if ("bitand".equals(name)) {
+				op = BinaryOp.BITAND;
+			}
+			if ("bitor".equals(name)) {
+				op = BinaryOp.BITOR;
+			}
+			if ("bitxor".equals(name)) {
+				op = BinaryOp.BITXOR;
+			}
+			if ("lshift".equals(name)) {
+				op = BinaryOp.SHIFT_LEFT;
+			}
+			if ("rshift".equals(name)) {
+				op = BinaryOp.SHIFT_RIGHT;
+			}
+
+			if (op == null) {
+				return null;
+			}
+
+			Expression e1 = transformExpression(astCall.getParameters().get(0));
+			Expression e2 = transformExpression(astCall.getParameters().get(1));
+			return new BinaryExpr(location, e1, op, e2,
+					new TypeChecker().getLub(e1.getType(), e2.getType()));
 		}
 
 	}
@@ -232,8 +335,7 @@ public class AstTransformer {
 				transformProcedure(astProcedure);
 				procedure = current;
 			}
-
-			Procedure procedure = proceduresMap.get(astCall.getProcedure());
+			Procedure procedure = proceduresMap.get(astProcedure);
 
 			// transform parameters
 			List<Expression> parameters = transformExpressions(astCall
@@ -462,6 +564,32 @@ public class AstTransformer {
 				target);
 
 		return target;
+	}
+
+	/**
+	 * Creates a new local variable that can be used to hold intermediate
+	 * results. The variable is added to {@link #procedure}'s locals.
+	 * 
+	 * @param type
+	 *            type of the variable
+	 * @param name
+	 *            hint for the variable name
+	 * @return a new local variable
+	 */
+	private LocalVariable newTempLocalVariable(Type type, String hint) {
+		String name = hint;
+		OrderedMap<Variable> locals = procedure.getLocals();
+		Variable variable = locals.get(name);
+		int i = 0;
+		while (variable != null) {
+			name = hint + i;
+			variable = locals.get(name);
+			i++;
+		}
+
+		variable = new LocalVariable(true, 0, new Location(), name, null, type);
+		locals.add(hint, variable.getLocation(), variable.getName(), variable);
+		return (LocalVariable) variable;
 	}
 
 	/**
