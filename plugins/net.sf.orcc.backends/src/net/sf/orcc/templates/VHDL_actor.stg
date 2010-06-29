@@ -59,6 +59,7 @@ $
 
 >>
 
+
 SensitivSig(variable) ::= <<
 $
 if(variable.port)
@@ -67,30 +68,45 @@ endif
 $
 >>
 
-SensitivFIFO(port) ::=<<
+SensitivFIFOin(port) ::=<<
 $port.name$_send
 >>
 
+SensitivFIFOout(port) ::=<<
+$port.name$_full
+>>
+
 Actor_Schedul(actor) ::= <<
-  $actor.name$_scheduler : process (reset_n, $actor.stateVars.list: SensitivSig()$ $actor.inputs.list: SensitivFIFO(); separator=", "$) is
+  $actor.name$_scheduler : process (reset_n, 
+  $actor.inputs.list: SensitivFIFOin(); separator=", "$
+  $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
     $actor.actions: printActionLocalSchedul()$  --
   begin
     if reset_n = '0' then 
       $actor.actions: {action| $action.scheduler$_go <= '0';}; separator="\n"$
     else
       $actor.actions: printActionSchedulerInline(); separator="\n"$
+    
+      -- ACK
+      if $actor.actions:printActionACK(); separator="      elsif "$
+      end if;
     end if;
   end process $actor.name$_scheduler;
 
--- test
-$actor.action.inputPattern.keys : printActionTest(); separator="\n"$
-$actor.action.inputPattern.keys$
+>>
+
+
+
+
+printActionACK(action) ::= <<
+($outputPattern(pattern=action.outputPattern)$) then
+        $action.inputPattern.keys : ValidAck(); separator="\n"$
+        -- Action : $action$
 
 >>
 
-printActionTest() ::= <<
-$it$
-
+ValidAck(port) ::= <<
+$port$_ack <= '1';
 >>
 
 
@@ -141,12 +157,6 @@ $
       $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$   
     end if;
   end process $actor.name$_execute;
-
--- test
-$actor:printActionTest(); separator="\n"$
-$actor.action:printActionTest(); separator="\n"$
-$actor.action.inputPattern:printActionTest(); separator="\n"$
-$actor.action.inputPattern.keys:printActionTest(); separator="\n"$
 
 >>
 
