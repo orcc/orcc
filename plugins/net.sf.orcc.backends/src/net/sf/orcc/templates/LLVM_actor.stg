@@ -52,12 +52,12 @@ s_$transition.sourceState$:
 >>
 
 schedulerFSM(actions, fsm) ::= <<
-@_FSM_state = internal global i32 $fsm.initialState.index$
+@_FSM_state = global i32 $fsm.initialState.index$
 
 $fsm.transitions: stateScheduler(); separator="\n"$
 
 $if(actions)$
-define internal i32 @outside_FSM_scheduler() {
+define i32 @outside_FSM_scheduler() {
 entry:
 	$AllocaOp(result="%i", type="i32")$ 
 	store i32 0, i32* %i
@@ -111,7 +111,7 @@ return:
 >>
 
 stateScheduler(transition) ::= <<
-define internal i1 @$transition.sourceState$_state_scheduler() {
+define i1 @$transition.sourceState$_state_scheduler() {
 entry:
 $schedulingTestState(nextStates=transition.nextStateInfo)$	$BrOp(dest="%sched_nok")$
 
@@ -231,7 +231,7 @@ $actionCall(action)$
 
 procedure(procedure) ::= <<
 $if(!procedure.external)$
-define internal $procedure.returnType$ @$procedure$($procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", "$) {
+define $procedure.returnType$ @$procedure$($procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", "$) {
 entry:
 $if(procedure.locals.list)$
 	$procedure.locals.list: variableDeclaration()$
