@@ -45,7 +45,7 @@ $port.name$_write <= '0';
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Actor VHDL Architecture
+// Actor VHDL Architecture - Scheduler process
 ///////////////////////////////////////////////////////////////////////////////
 
 Actor_out(port) ::= <<
@@ -83,24 +83,33 @@ Actor_Schedul(actor) ::= <<
     $actor.actions: printActionLocalSchedul()$  --
   begin
     if reset_n = '0' then 
-      $actor.actions: {action| $action.scheduler$_go <= '0';}; separator="\n"$
+      $actor.actions:printActionNoACK(); separator="\n"$
+      $actor.inputs.list: NoACK(); separator="\n"$      
     else
       $actor.actions: printActionSchedulerInline(); separator="\n"$
     
       -- ACK
-      if $actor.actions:printActionACK(); separator="      elsif "$
+      if $actor.actions:printActionACK(); separator="      elsif "$      else
+        $actor.actions:printActionNoACK(); separator="\n"$
+        $actor.inputs.list: NoACK(); separator="\n"$
       end if;
     end if;
   end process $actor.name$_scheduler;
 
 >>
 
+printActionNoACK(action) ::= <<
+$action$_go <= '0';
+>>
 
-
+NoACK(port) ::= <<
+$port.name$_ack <= '0';
+>>
 
 printActionACK(action) ::= <<
-($outputPattern(pattern=action.outputPattern)$) then
+($outputPattern(pattern=action.outputPattern)$ and isSchedulable_$action$_go = '1') then
         $action.inputPattern.keys : ValidAck(); separator="\n"$
+        $action$_go <= '1'
         -- Action : $action$
 
 >>
@@ -108,6 +117,12 @@ printActionACK(action) ::= <<
 ValidAck(port) ::= <<
 $port$_ack <= '1';
 >>
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor VHDL Architecture - Execute process
+///////////////////////////////////////////////////////////////////////////////
 
 
 Actor_Exec(actor) ::= <<
@@ -159,6 +174,7 @@ $
   end process $actor.name$_execute;
 
 >>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
@@ -415,7 +431,7 @@ if(return.value)
 $$
   if(transformReturn)
 $
-$procedure$_go <= $return.value$;$
+$procedure$_go := $return.value$;$
   else
 $
 return $return.value$;$
@@ -606,6 +622,7 @@ if(procedure.locals.list)
 $$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$$
 endif
 $
+
 >>
 
 // this template prints the locals of the body and the scheduler function
@@ -615,7 +632,8 @@ $printLocals(action.body)$$printLocals(action.scheduler)$
 >>
 
 printActionLocalSchedul(action) ::= <<
-$printLocals(action.scheduler)$
+$printLocals(action.scheduler)$variable $action.scheduler$_go : std_logic;
+
 >>
 
 printActionLocalBody(action) ::= <<
@@ -645,7 +663,7 @@ if $actions: actionTest(); separator="\nelsif "$
 >>
 
 actionTest(action) ::= <<
-(isSchedulable_$action$_go = '1') then$
+($action$_go = '1') then$
 if(action.outputPattern)
 $
   if ($outputPattern(pattern=action.outputPattern)$) then
@@ -772,7 +790,7 @@ architecture rtl_$actor.name$ of $actor.name$ is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
-  $actor.actions: {action|signal $action.scheduler$_go : std_logic;}; separator="\n"$  
+  $actor.actions: {action| signal $action$_go : std_logic}; separator="\n"$  
   $actor.stateVars.list: signalDeclaration()$
 
   ---------------------------------------------------------------------------
