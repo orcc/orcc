@@ -3282,14 +3282,20 @@ actor Algo_Synp_AVC_FREXT()
 		
 		if binIdxMb = 0 then
 			if binValDecoded = false then
-				ctxIdxOffset := 3; 
 				if slice_type = SLICE_TYPE_I then
+					ctxIdxOffset := 3; 
 					ctxIdxincMbType();
 					ctxIdx := 3 + ctxIdxInc;
 					PreviousCtxIdx := 3 + 2;
 				else
-					ctxIdx := 17;
-					PreviousCtxIdx := 17;
+					if slice_type = SLICE_TYPE_P then
+						ctxIdx := 17;
+						PreviousCtxIdx := 17;
+					else
+						/* SLICE TYPE B */
+						ctxIdx := 32;
+						PreviousCtxIdx := 32;
+					end
 				end
 				
 				StartDecodeDecision := true;
@@ -4670,7 +4676,7 @@ actor Algo_Synp_AVC_FREXT()
 	var 
 		int tempOffest
 	do
-		if val_CurrMbAddr = PicSizeInMbs and SEARCH_MB_TYPE = false then 
+		if val_CurrMbAddr = PicSizeInMbs - 1 and SEARCH_MB_TYPE = false then 
 			binVal := 1;
 			binValDecoded := true;
 			// Start Cabac Process
