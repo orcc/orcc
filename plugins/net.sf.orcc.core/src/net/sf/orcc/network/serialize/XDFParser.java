@@ -738,14 +738,14 @@ public class XDFParser {
 					.getFirstChild());
 			Type type = cont.getResult();
 			GlobalVariable var = new GlobalVariable(location, type, name);
-			parameters.add(file.getAbsolutePath(), location, name, var);
+			parameters.put(file.getAbsolutePath(), location, name, var);
 		} else if (kind.equals("Variable")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
 			Expression expr = exprParser.parseExpr(cont.getNode());
 			GlobalVariable var = new GlobalVariable(location, type, name, expr);
-			variables.add(file.getAbsolutePath(), location, name, var);
+			variables.put(file.getAbsolutePath(), location, name, var);
 		} else {
 			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
 		}
@@ -869,9 +869,9 @@ public class XDFParser {
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");
 		if (kind.equals("Input")) {
-			inputs.add(file.toString(), location, name, port);
+			inputs.put(file.toString(), location, name, port);
 		} else if (kind.equals("Output")) {
-			outputs.add(file.toString(), location, name, port);
+			outputs.put(file.toString(), location, name, port);
 		} else {
 			throw new OrccException("Port \"" + name + "\", invalid kind: \""
 					+ kind + "\"");

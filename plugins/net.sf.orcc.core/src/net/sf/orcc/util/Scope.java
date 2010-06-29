@@ -73,53 +73,6 @@ public class Scope<K, V> extends OrderedMap<K, V> {
 	}
 
 	/**
-	 * Adds an object to this ordered map with the given name. The file and
-	 * location information are only used for error reporting if the object is
-	 * already present in the map and {@link #isOverrideAllowed()} is
-	 * <code>true</code>.
-	 * 
-	 * @param file
-	 *            the file where the object located
-	 * @param location
-	 *            the location of the object
-	 * @param name
-	 *            the name of an object
-	 * @param object
-	 *            an object
-	 * @throws OrccRuntimeException
-	 *             if the object is already defined
-	 */
-	@Override
-	public void add(String file, Location location, K name, V object)
-			throws OrccRuntimeException {
-		if (allowOverride) {
-			// a variable is allowed to override a variable defined in a
-			// different scope
-			super.add(file, location, name, object);
-		} else {
-			// check if there already is a variable with the same name in this
-			// scope or parent scopes
-			V existingObject = super.get(name);
-			if (existingObject == null) {
-				// no existing variable in this scope, check parent's
-				if (parent != null) {
-					existingObject = parent.get(name, false);
-					if (existingObject != null) {
-						throw new OrccRuntimeException(file, location, "\""
-								+ name + "\" already defined in parent scope");
-					}
-				}
-			} else {
-				throw new OrccRuntimeException(file, location, "\"" + name
-						+ "\" already defined in this scope");
-			}
-
-			// no existing object in this scope, nor in parent's => we're cool
-			addNoCheck(name, object);
-		}
-	}
-
-	/**
 	 * Returns the object that has the given name. If the object is not found in
 	 * the current scope, the parent scope is queried.
 	 * 
@@ -176,6 +129,53 @@ public class Scope<K, V> extends OrderedMap<K, V> {
 	 */
 	public boolean isOverrideAllowed() {
 		return allowOverride;
+	}
+
+	/**
+	 * Adds an object to this ordered map with the given name. The file and
+	 * location information are only used for error reporting if the object is
+	 * already present in the map and {@link #isOverrideAllowed()} is
+	 * <code>true</code>.
+	 * 
+	 * @param file
+	 *            the file where the object located
+	 * @param location
+	 *            the location of the object
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 * @throws OrccRuntimeException
+	 *             if the object is already defined
+	 */
+	@Override
+	public void put(String file, Location location, K name, V object)
+			throws OrccRuntimeException {
+		if (allowOverride) {
+			// a variable is allowed to override a variable defined in a
+			// different scope
+			super.put(file, location, name, object);
+		} else {
+			// check if there already is a variable with the same name in this
+			// scope or parent scopes
+			V existingObject = super.get(name);
+			if (existingObject == null) {
+				// no existing variable in this scope, check parent's
+				if (parent != null) {
+					existingObject = parent.get(name, false);
+					if (existingObject != null) {
+						throw new OrccRuntimeException(file, location, "\""
+								+ name + "\" already defined in parent scope");
+					}
+				}
+			} else {
+				throw new OrccRuntimeException(file, location, "\"" + name
+						+ "\" already defined in this scope");
+			}
+
+			// no existing object in this scope, nor in parent's => we're cool
+			putNoCheck(name, object);
+		}
 	}
 
 	@Override

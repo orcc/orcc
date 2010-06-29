@@ -115,7 +115,7 @@ public class ActorMerger implements INetworkTransformation {
 	private void addLocalVars() {
 		for (Variable var : buffersMap.values()) {
 			if (loopVariables.get(var.getName()) == null) {
-				loopVariables.add(var.getName(), var);
+				loopVariables.put(var.getName(), var);
 			}
 		}
 	}
@@ -186,7 +186,7 @@ public class ActorMerger implements INetworkTransformation {
 						entry.getValue(), port.getType());
 				LocalVariable param = new LocalVariable(false, 0,
 						new Location(), port.getName(), null, type);
-				parameters.add(param.getName(), param);
+				parameters.put(param.getName(), param);
 			}
 		}
 
@@ -198,7 +198,7 @@ public class ActorMerger implements INetworkTransformation {
 					port.getType());
 			LocalVariable param = new LocalVariable(false, 0, new Location(),
 					port.getName(), null, type);
-			parameters.add(param.getName(), param);
+			parameters.put(param.getName(), param);
 		}
 
 		return new Procedure(action.getName(), false, new Location(),
@@ -322,7 +322,7 @@ public class ActorMerger implements INetworkTransformation {
 			LocalVariable varDef = new LocalVariable(true, i, new Location(),
 					"pattern", null, IrFactory.eINSTANCE.createTypeBool());
 			i++;
-			variables.add(varDef.getName(), varDef);
+			variables.put(varDef.getName(), varDef);
 			HasTokens hasTokens = new HasTokens(location, port, numTokens,
 					varDef);
 			varDef.setInstruction(hasTokens);
@@ -373,7 +373,7 @@ public class ActorMerger implements INetworkTransformation {
 							String name = actor.getName() + "_"
 									+ proc.getName();
 							proc.setName(name);
-							procs.add(proc.getName(), proc);
+							procs.put(proc.getName(), proc);
 						}
 					} else {
 						// TODO manage procedure with side effects
@@ -385,7 +385,7 @@ public class ActorMerger implements INetworkTransformation {
 				for (Variable var : actor.getStateVars()) {
 					String name = id + "_" + var.getName();
 					var.setName(name);
-					vars.add(name, var);
+					vars.put(name, var);
 				}
 
 				List<Action> actions = actor.getActions();
@@ -405,7 +405,7 @@ public class ActorMerger implements INetworkTransformation {
 					blkNode.add(new Call(new Location(), null, proc, parameters));
 					blkNode.add(new Assign(counter, binopExpr));
 					nodes.add(blkNode);
-					procs.add(proc.getName(), proc);
+					procs.put(proc.getName(), proc);
 				} else {
 					throw new OrccException(
 							"SDF actor with multiple actions is not yet supported!");
@@ -419,7 +419,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				if (indexes.size() <= index) {
 					indexes.add(loopVar);
-					loopVariables.add(loopVar.getName(), loopVar);
+					loopVariables.put(loopVar.getName(), loopVar);
 				}
 
 				Schedule sched = iterand.getSchedule();
@@ -513,7 +513,7 @@ public class ActorMerger implements INetworkTransformation {
 				port.setName("input_" + index);
 				port.increaseTokenConsumption(tgtPort.getNumTokensConsumed());
 				inputsMap.put(connection, port);
-				actor.getInputs().add(port.getName(), port);
+				actor.getInputs().put(port.getName(), port);
 
 				int size = port.getNumTokensConsumed();
 				Type type = IrFactory.eINSTANCE.createTypeList(size,
@@ -541,7 +541,7 @@ public class ActorMerger implements INetworkTransformation {
 				port.setName("output_" + index);
 				port.increaseTokenProduction(srcPort.getNumTokensProduced());
 				outputsMap.put(connection, port);
-				actor.getOutputs().add(port.getName(), port);
+				actor.getOutputs().put(port.getName(), port);
 
 				int size = port.getNumTokensProduced();
 				Type type = IrFactory.eINSTANCE.createTypeList(size,

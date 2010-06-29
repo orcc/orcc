@@ -78,13 +78,13 @@ public class Broadcast {
 
 		inputs = new OrderedMap<String, Port>();
 		String name = "input";
-		inputs.add(name, new Port(location, type, name));
+		inputs.put(name, new Port(location, type, name));
 
 		outputs = new OrderedMap<String, Port>();
 		for (int i = 0; i < numOutputs; i++) {
 			location = new Location();
 			name = "output_" + i;
-			outputs.add(name, new Port(location, type, name));
+			outputs.put(name, new Port(location, type, name));
 		}
 	}
 

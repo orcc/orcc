@@ -299,7 +299,7 @@ public class IRParser {
 			variables = new Scope<String, Variable>();
 
 			// register built-in procedures
-			procs.add(file, print.getLocation(), print.getName(), print);
+			procs.put(file, print.getLocation(), print.getName(), print);
 
 			JSONTokener tokener = new JSONTokener(new InputStreamReader(in));
 			JSONObject obj = new JSONObject(tokener);
@@ -320,7 +320,7 @@ public class IRParser {
 			array = obj.getJSONArray(KEY_PROCEDURES);
 			for (int i = 0; i < array.length(); i++) {
 				Procedure proc = parseProc(array.getJSONArray(i));
-				procs.add(file, proc.getLocation(), proc.getName(), proc);
+				procs.put(file, proc.getLocation(), proc.getName(), proc);
 			}
 
 			array = obj.getJSONArray(KEY_ACTIONS);
@@ -635,7 +635,7 @@ public class IRParser {
 					false);
 
 			// register the state variable
-			variables.add(file, location, name, parameter);
+			variables.put(file, location, name, parameter);
 		}
 	}
 
@@ -700,7 +700,7 @@ public class IRParser {
 			String name = port.getString(2);
 
 			Port po = new Port(location, type, name);
-			ports.add(file, location, name, po);
+			ports.put(file, location, name, po);
 		}
 
 		return ports;
@@ -796,10 +796,10 @@ public class IRParser {
 
 			StateVariable stateVar = new StateVariable(location, type, name,
 					assignable, init);
-			stateVars.add(file, location, name, stateVar);
+			stateVars.put(file, location, name, stateVar);
 
 			// register the state variable
-			variables.add(file, location, name, stateVar);
+			variables.put(file, location, name, stateVar);
 		}
 
 		return stateVars;
@@ -905,7 +905,7 @@ public class IRParser {
 				suffix, type);
 
 		// register the variable definition
-		variables.add(file, loc, varDef.getName(), varDef);
+		variables.put(file, loc, varDef.getName(), varDef);
 
 		return varDef;
 	}

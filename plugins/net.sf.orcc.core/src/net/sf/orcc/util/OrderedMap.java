@@ -71,64 +71,6 @@ public class OrderedMap<K, V> implements Iterable<V> {
 	}
 
 	/**
-	 * Adds an object to this ordered map with the given name. The file and
-	 * location information are only used for error reporting if the object is
-	 * already present in the map.
-	 * 
-	 * @param file
-	 *            the file where the object located
-	 * @param location
-	 *            the location of the object
-	 * @param name
-	 *            the name of an object
-	 * @param object
-	 *            an object
-	 * @throws OrccRuntimeException
-	 *             if the object is already defined
-	 */
-	public void add(String file, Location location, K name, V object)
-			throws OrccRuntimeException {
-		if (map.containsKey(name)) {
-			throw new OrccRuntimeException(file, location, "\"" + name
-					+ "\" already defined in this scope");
-		}
-
-		map.put(name, object);
-		modified = true;
-	}
-
-	/**
-	 * Adds an object to this ordered map with the given name.
-	 * 
-	 * @param name
-	 *            the name of an object
-	 * @param object
-	 *            an object
-	 */
-	public final void add(K name, V object) {
-		if (map.containsKey(name)) {
-			throw new OrccRuntimeException("\"" + name
-					+ "\" already defined in this scope");
-		}
-
-		addNoCheck(name, object);
-	}
-
-	/**
-	 * Adds an object to this ordered map with the given name without checking
-	 * if the variable already exists.
-	 * 
-	 * @param name
-	 *            the name of an object
-	 * @param object
-	 *            an object
-	 */
-	protected final void addNoCheck(K name, V object) {
-		map.put(name, object);
-		modified = true;
-	}
-
-	/**
 	 * Removes all the elements from this ordered map.
 	 */
 	public void clear() {
@@ -214,6 +156,64 @@ public class OrderedMap<K, V> implements Iterable<V> {
 				it.remove();
 			}
 		};
+	}
+
+	/**
+	 * Adds an object to this ordered map with the given name.
+	 * 
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 */
+	public final void put(K name, V object) {
+		if (map.containsKey(name)) {
+			throw new OrccRuntimeException("\"" + name
+					+ "\" already defined in this scope");
+		}
+
+		putNoCheck(name, object);
+	}
+
+	/**
+	 * Adds an object to this ordered map with the given name. The file and
+	 * location information are only used for error reporting if the object is
+	 * already present in the map.
+	 * 
+	 * @param file
+	 *            the file where the object located
+	 * @param location
+	 *            the location of the object
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 * @throws OrccRuntimeException
+	 *             if the object is already defined
+	 */
+	public void put(String file, Location location, K name, V object)
+			throws OrccRuntimeException {
+		if (map.containsKey(name)) {
+			throw new OrccRuntimeException(file, location, "\"" + name
+					+ "\" already defined in this scope");
+		}
+
+		map.put(name, object);
+		modified = true;
+	}
+
+	/**
+	 * Adds an object to this ordered map with the given name without checking
+	 * if the variable already exists.
+	 * 
+	 * @param name
+	 *            the name of an object
+	 * @param object
+	 *            an object
+	 */
+	protected final void putNoCheck(K name, V object) {
+		map.put(name, object);
+		modified = true;
 	}
 
 	/**

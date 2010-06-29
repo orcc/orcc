@@ -105,7 +105,7 @@ public class StaticActorNormalizer {
 				LocalVariable varDef = new LocalVariable(true, depth - 1,
 						new Location(), "loop", null,
 						IrFactory.eINSTANCE.createTypeBool());
-				variables.add(actor.getFile(), varDef.getLocation(),
+				variables.put(actor.getFile(), varDef.getLocation(),
 						varDef.getName(), varDef);
 				indexes.add(varDef);
 			}
@@ -205,13 +205,13 @@ public class StaticActorNormalizer {
 					port.getType());
 			StateVariable var = new StateVariable(new Location(), type,
 					port.getName(), false);
-			stateVars.add(actor.getFile(), var.getLocation(), var.getName(),
+			stateVars.put(actor.getFile(), var.getLocation(), var.getName(),
 					var);
 
 			StateVariable varCount = new StateVariable(new Location(),
 					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
 							+ "_count", true, 0);
-			stateVars.add(actor.getFile(), varCount.getLocation(),
+			stateVars.put(actor.getFile(), varCount.getLocation(),
 					varCount.getName(), varCount);
 
 			Store store = new Store(varCount, new ArrayList<Expression>(),
@@ -361,7 +361,7 @@ public class StaticActorNormalizer {
 			LocalVariable varDef = new LocalVariable(true, i, new Location(),
 					"pattern", null, IrFactory.eINSTANCE.createTypeBool());
 			i++;
-			variables.add(actor.getFile(), location, varDef.getName(), varDef);
+			variables.put(actor.getFile(), location, varDef.getName(), varDef);
 
 			HasTokens hasTokens = new HasTokens(location, port, numTokens,
 					varDef);

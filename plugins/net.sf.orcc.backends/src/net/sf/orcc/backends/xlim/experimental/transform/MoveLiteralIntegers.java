@@ -85,7 +85,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			String name = "lit_bool_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
 					name, null, IrFactory.eINSTANCE.createTypeBool());
-			locals.add(var.getName(), var);
+			locals.put(var.getName(), var);
 			it.previous();
 			it.add(new Assign(var, expr));
 			it.next();
@@ -99,7 +99,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			String name = "lit_int_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
 					name, null, IrFactory.eINSTANCE.createTypeInt(32));
-			locals.add(var.getName(), var);
+			locals.put(var.getName(), var);
 			it.previous();
 			it.add(new Assign(var, expr));
 			it.next();

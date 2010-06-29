@@ -101,6 +101,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.Scope;
 
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 
@@ -451,7 +452,7 @@ public class AstTransformer {
 	/**
 	 * A map from AST variables to IR variables.
 	 */
-	final private Map<AstVariable, Variable> variablesMap;
+	final private Scope<AstVariable, Variable> variablesMap;
 
 	/**
 	 * Creates a new AST to IR transformation.
@@ -459,7 +460,7 @@ public class AstTransformer {
 	public AstTransformer() {
 		portMap = new HashMap<AstPort, Port>();
 
-		variablesMap = new HashMap<AstVariable, Variable>();
+		variablesMap = new Scope<AstVariable, Variable>();
 		proceduresMap = new HashMap<AstProcedure, Procedure>();
 		functionsMap = new HashMap<AstFunction, Procedure>();
 
@@ -560,7 +561,7 @@ public class AstTransformer {
 		LocalVariable target = new LocalVariable(true, 0,
 				procedure.getLocation(), port.getName(), null,
 				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()));
-		procedure.getLocals().add(file, target.getLocation(), target.getName(),
+		procedure.getLocals().put(file, target.getLocation(), target.getName(),
 				target);
 
 		return target;
@@ -588,7 +589,7 @@ public class AstTransformer {
 		}
 
 		variable = new LocalVariable(true, 0, new Location(), name, null, type);
-		locals.add(hint, variable.getLocation(), variable.getName(), variable);
+		locals.put(file, variable.getLocation(), variable.getName(), variable);
 		return (LocalVariable) variable;
 	}
 
@@ -789,7 +790,7 @@ public class AstTransformer {
 		transformLocalVariables(astFunction.getVariables());
 		transformExpression(astFunction.getExpression());
 
-		procedures.add(file, location, name, procedure);
+		procedures.put(file, location, name, procedure);
 		functionsMap.put(astFunction, procedure);
 	}
 
@@ -816,7 +817,7 @@ public class AstTransformer {
 
 			StateVariable stateVariable = new StateVariable(location, type,
 					name, assignable, initialValue);
-			stateVars.add(file, location, name, stateVariable);
+			stateVars.put(file, location, name, stateVariable);
 
 			variablesMap.put(astVariable, stateVariable);
 		}
@@ -861,7 +862,7 @@ public class AstTransformer {
 			// declare tokens
 			for (AstVariable token : tokens) {
 				LocalVariable local = transformLocalVariable(token);
-				procedure.getLocals().add(file, local.getLocation(),
+				procedure.getLocals().put(file, local.getLocation(),
 						local.getName(), local);
 			}
 
@@ -909,7 +910,7 @@ public class AstTransformer {
 	private void transformLocalVariables(List<AstVariable> variables) {
 		for (AstVariable astVariable : variables) {
 			LocalVariable local = transformLocalVariable(astVariable);
-			procedure.getLocals().add(file, local.getLocation(),
+			procedure.getLocals().put(file, local.getLocation(),
 					local.getName(), local);
 		}
 	}
@@ -965,7 +966,7 @@ public class AstTransformer {
 	private void transformParameters(List<AstVariable> parameters) {
 		for (AstVariable astParameter : parameters) {
 			LocalVariable local = transformLocalVariable(astParameter);
-			procedure.getParameters().add(file, local.getLocation(),
+			procedure.getParameters().put(file, local.getLocation(),
 					local.getName(), local);
 		}
 	}
@@ -984,7 +985,7 @@ public class AstTransformer {
 			Type type = astPort.getIrType();
 			Port port = new Port(location, type, astPort.getName());
 			portMap.put(astPort, port);
-			ports.add(file, location, port.getName(), port);
+			ports.put(file, location, port.getName(), port);
 		}
 
 		return ports;
@@ -1010,7 +1011,7 @@ public class AstTransformer {
 		transformLocalVariables(astProcedure.getVariables());
 		transformStatements(astProcedure.getStatements());
 
-		procedures.add(file, location, name, procedure);
+		procedures.put(file, location, name, procedure);
 		proceduresMap.put(astProcedure, procedure);
 	}
 

@@ -113,7 +113,7 @@ public class StaticSubsetDetector {
 
 				Port tgtPort = new Port(edge.getTarget());
 				tgtPort.setName("input_" + outIndex++);
-				cluster.getInputs().add(tgtPort.getName(), tgtPort);
+				cluster.getInputs().put(tgtPort.getName(), tgtPort);
 				Connection incoming = new Connection(edge.getSource(), tgtPort,
 						edge.getAttributes());
 				clusteredGraph.addEdge(srcVertex, clusterVertex, incoming);
@@ -122,7 +122,7 @@ public class StaticSubsetDetector {
 
 				Port srcPort = new Port(edge.getSource());
 				srcPort.setName("output_" + inIndex++);
-				cluster.getOutputs().add(srcPort.getName(), srcPort);
+				cluster.getOutputs().put(srcPort.getName(), srcPort);
 				Connection outgoing = new Connection(srcPort, edge.getTarget(),
 						edge.getAttributes());
 				clusteredGraph.addEdge(clusterVertex, tgtVertex, outgoing);

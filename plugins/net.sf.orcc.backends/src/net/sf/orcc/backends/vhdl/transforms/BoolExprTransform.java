@@ -184,7 +184,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 			Expression expr = returnInstr.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				LocalVariable local = newVariable();
-				procedure.getLocals().add(local.getName(), local);
+				procedure.getLocals().put(local.getName(), local);
 				returnInstr.setValue(new VarExpr(new Use(local)));
 				createIfNode(local, expr);
 
@@ -204,7 +204,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 			Expression expr = store.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
 				LocalVariable local = newVariable();
-				procedure.getLocals().add(local.getName(), local);
+				procedure.getLocals().put(local.getName(), local);
 				store.setValue(new VarExpr(new Use(local)));
 				createIfNode(local, expr);
 
