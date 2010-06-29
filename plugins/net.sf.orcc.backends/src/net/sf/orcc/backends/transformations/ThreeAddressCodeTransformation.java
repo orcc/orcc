@@ -217,8 +217,11 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		 * @return a new local variable with type int(size=32)
 		 */
 		private LocalVariable newVariable() {
+			String procName = procedure.getName();
+
 			return new LocalVariable(true, tempVarCount++, new Location(),
-					"expr", null, IrFactory.eINSTANCE.createTypeInt(32));
+					procName + "_" + "expr", null,
+					IrFactory.eINSTANCE.createTypeInt(32));
 		}
 
 	}

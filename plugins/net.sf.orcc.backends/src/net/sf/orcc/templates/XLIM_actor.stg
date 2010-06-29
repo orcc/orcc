@@ -173,7 +173,9 @@ Write(op) ::= <<
 Load(op) ::= <<
 $if (op.target.variable.type.list)$
 $! TODO !$
-$else$<operation kind="noop">
+$
+else
+$<operation kind="noop">
 	$port(dir="in", source=op.source)$
 	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>$endif$
@@ -206,10 +208,12 @@ PhiAssignment(phi) ::= <<
 >>
 
 Return(return) ::= <<
-$if (return.value)$<operation kind="noop">
+$if (return.value)
+$<operation kind="noop">
 	$port(dir="in", source=return.value)$
 	<port dir="out" size="1" source="$procedure$_go" typeName="bool"/>
-</operation>$endif$
+</operation>$
+endif$
 >>
 
 SelfAssignment(selfAssign) ::= <<
