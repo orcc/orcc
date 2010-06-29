@@ -77,7 +77,7 @@ public class CTemplateData {
 		buildMaskInputs(actor);
 		buildMaskOutputs(actor);
 		
-		numInputs = actor.getInputs().size();
+		numInputs = actor.getInputs().getLength();
 	}
 
 	/**

@@ -68,7 +68,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
 
-			procedure.getLocals().remove(variable);
+			procedure.getLocals().remove(variable.getName());
 			changed = true;
 		}
 	}
@@ -86,7 +86,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 				// maybe something worth checking later
 
 				// remove result
-				procedure.getLocals().remove(variable);
+				procedure.getLocals().remove(variable.getName());
 				changed = true;
 			}
 		}
@@ -106,7 +106,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
 
-			procedure.getLocals().remove(target);
+			procedure.getLocals().remove(target.getName());
 			changed = true;
 		}
 	}
@@ -124,7 +124,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
 
-			procedure.getLocals().remove(variable);
+			procedure.getLocals().remove(variable.getName());
 			changed = true;
 		}
 	}
@@ -142,7 +142,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
 
-			procedure.getLocals().remove(variable);
+			procedure.getLocals().remove(variable.getName());
 			changed = true;
 		}
 	}
@@ -157,7 +157,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			// do not remove read instruction because it has side-effects!
 
 			// remove target
-			procedure.getLocals().remove(variable);
+			procedure.getLocals().remove(variable.getName());
 			changed = true;
 		}
 	}
@@ -169,7 +169,8 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 		if (!target.isUsed()) {
 			// do not remove stores to variables that are used by writes, or
 			// variables that are parameters
-			if (target.isPort() || procedure.getParameters().contains(target)) {
+			if (target.isPort()
+					|| procedure.getParameters().contains(target.getName())) {
 				return;
 			}
 
@@ -182,7 +183,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			it.remove();
 
-			procedure.getLocals().remove(target);
+			procedure.getLocals().remove(target.getName());
 			changed = true;
 		}
 	}
@@ -195,7 +196,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			changed = false;
 
 			// first shot: removes locals not used by any instruction
-			OrderedMap<Variable> locals = procedure.getLocals();
+			OrderedMap<String, Variable> locals = procedure.getLocals();
 			Iterator<Variable> it = locals.iterator();
 			while (it.hasNext()) {
 				LocalVariable local = (LocalVariable) it.next();

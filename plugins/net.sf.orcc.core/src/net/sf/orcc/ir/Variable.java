@@ -34,7 +34,6 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.HasTokens;
-import net.sf.orcc.util.INameable;
 
 /**
  * This class represents a variable. A variable has a location, a type, a name
@@ -45,7 +44,7 @@ import net.sf.orcc.util.INameable;
  * @author Matthieu Wipliez
  * 
  */
-public class Variable implements INameable {
+public class Variable {
 
 	/**
 	 * whether the variable is assignable.
@@ -208,7 +207,6 @@ public class Variable implements INameable {
 	 * 
 	 * @return the name of this variable
 	 */
-	@Override
 	public String getName() {
 		return name;
 	}

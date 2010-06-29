@@ -118,10 +118,10 @@ public class PhiRemoval extends AbstractActorTransformation {
 		// if source is a local variable with index = 0, we remove it from the
 		// procedure and translate the PHI by an assignment of 0 (zero) to
 		// target. Otherwise, we just create an assignment target = source.
-		OrderedMap<Variable> parameters = procedure.getParameters();
+		OrderedMap<String, Variable> parameters = procedure.getParameters();
 		Assign assign;
-		if (source.getIndex() == 0 && !parameters.contains(source)) {
-			procedure.getLocals().remove(source);
+		if (source.getIndex() == 0 && !parameters.contains(source.getName())) {
+			procedure.getLocals().remove(source.getName());
 			Expression expr;
 			if (target.getType().isBool()) {
 				expr = new BoolExpr(false);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009, Ecole Polytechnique Fï¿½dï¿½rale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *   * Neither the name of the Ecole Polytechnique Fï¿½dï¿½rale de Lausanne nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -67,7 +67,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 
 	private int index;
 
-	private OrderedMap<Variable> locals;
+	private OrderedMap<String, Variable> locals;
 
 	private ExpressionInterpreter exprInterpreter = new AbstractExpressionInterpreter() {
 

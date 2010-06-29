@@ -68,7 +68,7 @@ public class DeadGlobalElimination extends AbstractActorTransformation {
 
 	@Override
 	public void transform(Actor actor) {
-		OrderedMap<Variable> stateVariables = actor.getStateVars();
+		OrderedMap<String, Variable> stateVariables = actor.getStateVars();
 		Iterator<Variable> it = stateVariables.iterator();
 		while (it.hasNext()) {
 			StateVariable variable = (StateVariable) it.next();

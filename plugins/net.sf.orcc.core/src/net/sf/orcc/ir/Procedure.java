@@ -43,7 +43,6 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.util.INameable;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -52,7 +51,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class Procedure extends AbstractLocalizable implements INameable {
+public class Procedure extends AbstractLocalizable {
 
 	/**
 	 * This class visits the procedure to find the state variables used.
@@ -134,8 +133,8 @@ public class Procedure extends AbstractLocalizable implements INameable {
 
 	public static final Procedure print = new Procedure("print", true,
 			new Location(), IrFactory.eINSTANCE.createTypeVoid(),
-			new OrderedMap<Variable>(), new OrderedMap<Variable>(),
-			new ArrayList<CFGNode>());
+			new OrderedMap<String, Variable>(),
+			new OrderedMap<String, Variable>(), new ArrayList<CFGNode>());
 
 	/**
 	 * whether this procedure is external.
@@ -147,7 +146,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	/**
 	 * ordered map of local variables
 	 */
-	private OrderedMap<Variable> locals;
+	private OrderedMap<String, Variable> locals;
 
 	/**
 	 * the name of this procedure
@@ -162,7 +161,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	/**
 	 * ordered map of parameters
 	 */
-	private OrderedMap<Variable> parameters;
+	private OrderedMap<String, Variable> parameters;
 
 	private Expression result;
 
@@ -188,8 +187,8 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 *            The procedure local variables.
 	 */
 	public Procedure(String name, boolean external, Location location,
-			Type returnType, OrderedMap<Variable> parameters,
-			OrderedMap<Variable> locals, List<CFGNode> nodes) {
+			Type returnType, OrderedMap<String, Variable> parameters,
+			OrderedMap<String, Variable> locals, List<CFGNode> nodes) {
 		super(location);
 		this.external = external;
 		this.nodes = nodes;
@@ -216,9 +215,9 @@ public class Procedure extends AbstractLocalizable implements INameable {
 		super(location);
 		this.external = false;
 		this.nodes = new ArrayList<CFGNode>();
-		this.locals = new OrderedMap<Variable>();
+		this.locals = new OrderedMap<String, Variable>();
 		this.name = name;
-		this.parameters = new OrderedMap<Variable>();
+		this.parameters = new OrderedMap<String, Variable>();
 		this.returnType = returnType;
 	}
 
@@ -237,7 +236,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 * 
 	 * @return the local variables of this procedure as an ordered map
 	 */
-	public OrderedMap<Variable> getLocals() {
+	public OrderedMap<String, Variable> getLocals() {
 		return locals;
 	}
 
@@ -246,7 +245,6 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 * 
 	 * @return the name of this procedure
 	 */
-	@Override
 	public String getName() {
 		return name;
 	}
@@ -265,7 +263,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	 * 
 	 * @return the parameters of this procedure as an ordered map
 	 */
-	public OrderedMap<Variable> getParameters() {
+	public OrderedMap<String, Variable> getParameters() {
 		return parameters;
 	}
 

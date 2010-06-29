@@ -405,15 +405,15 @@ public class IRWriter {
 			body.put(writeExpression(node.getValue()));
 			body.put(writeNodes(node.getThenNodes()));
 			body.put(writeNodes(node.getElseNodes()));
-			
+
 			// FIXME need to modify IR format to remove this sh*t
 			// complex stuff because JSON format is weird
 			JSONArray joinArray = new JSONArray();
 			array.put(joinArray);
-			
+
 			joinArray.put(IRConstants.NAME_JOIN);
 			joinArray.put(writeLocation(node.getLocation()));
-			
+
 			JSONArray phiArray = new JSONArray();
 			joinArray.put(phiArray);
 			node.getJoinNode().accept(this, phiArray);
@@ -772,7 +772,7 @@ public class IRWriter {
 	 *            an ordered map of variables
 	 * @return a JSON array
 	 */
-	private JSONArray writeLocalVariables(OrderedMap<Variable> variables) {
+	private JSONArray writeLocalVariables(OrderedMap<String, Variable> variables) {
 		JSONArray array = new JSONArray();
 		for (Variable variable : variables) {
 			array.put(writeLocalVariable((LocalVariable) variable));
@@ -820,7 +820,7 @@ public class IRWriter {
 		return array;
 	}
 
-	private JSONArray writePorts(OrderedMap<Port> ports) {
+	private JSONArray writePorts(OrderedMap<String, Port> ports) {
 		JSONArray array = new JSONArray();
 		for (Port port : ports) {
 			array.put(writePort(port));
@@ -857,7 +857,7 @@ public class IRWriter {
 	 *            an ordered map of procedures
 	 * @return a JSON array
 	 */
-	private JSONArray writeProcedures(OrderedMap<Procedure> procedures) {
+	private JSONArray writeProcedures(OrderedMap<String, Procedure> procedures) {
 		JSONArray array = new JSONArray();
 		for (Procedure procedure : procedures) {
 			array.put(writeProcedure(procedure));
@@ -908,7 +908,7 @@ public class IRWriter {
 	 *            an ordered map of variables
 	 * @return a JSON array
 	 */
-	private JSONArray writeStateVariables(OrderedMap<Variable> variables) {
+	private JSONArray writeStateVariables(OrderedMap<String, Variable> variables) {
 		JSONArray array = new JSONArray();
 		for (Variable variable : variables) {
 			array.put(writeStateVariable((StateVariable) variable));

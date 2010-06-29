@@ -57,7 +57,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 
-	private OrderedMap<Variable> stateVars;
+	private OrderedMap<String, Variable> stateVars;
 
 	@Override
 	public void transform(Actor actor) {

@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne 
+ *   * Neither the name of the Ecole Polytechnique Fï¿½dï¿½rale de Lausanne 
  *     nor the names of its contributors may be used to endorse or promote products
  *     derived from this software without specific prior written permission.
  * 
@@ -82,7 +82,6 @@ public class NetworkPartitioner {
 
 	private List<Network> networks = new ArrayList<Network>();
 
-
 	/**
 	 * Copies connections between instances on the same partition.
 	 * 
@@ -139,13 +138,13 @@ public class NetworkPartitioner {
 			Connection connection, Network network) throws OrccException {
 		Port srcPort = connection.getSource();
 		Instance tgtInstance = tgt.getInstance();
-		
+
 		Port port = new Port(srcPort);
 		port.setName("input_" + nbInput++);
 		Vertex vertex = new Vertex("Input", port);
 		network.getGraph().addVertex(vertex);
 		network.getInputs().add(port.getName(), port);
-		
+
 		incomingPort.put(connection, port);
 		partitionMap.put(port, getPartNameAttribute(tgtInstance));
 
@@ -196,12 +195,12 @@ public class NetworkPartitioner {
 
 		DirectedGraph<Vertex, Connection> graph = new DirectedMultigraph<Vertex, Connection>(
 				Connection.class);
-		OrderedMap<Port> inputs = new OrderedMap<Port>();
+		OrderedMap<String, Port> inputs = new OrderedMap<String, Port>();
 		Map<String, Instance> instances = new HashMap<String, Instance>();
-		OrderedMap<Port> outputs = new OrderedMap<Port>();
-		Scope<GlobalVariable> parameters = new Scope<GlobalVariable>();
-		Scope<GlobalVariable> variables = new Scope<GlobalVariable>(parameters,
-				false);
+		OrderedMap<String, Port> outputs = new OrderedMap<String, Port>();
+		Scope<String, GlobalVariable> parameters = new Scope<String, GlobalVariable>();
+		Scope<String, GlobalVariable> variables = new Scope<String, GlobalVariable>(
+				parameters, false);
 
 		Network subNetwork = new Network(name, inputs, outputs, parameters,
 				variables, graph);
@@ -265,9 +264,9 @@ public class NetworkPartitioner {
 			Expression expr = ((IValueAttribute) attr).getValue();
 			if (expr.isStringExpr()) {
 				String[] partNames = ((StringExpr) expr).getValue().split("/");
-				if(threadPartitioning) {
+				if (threadPartitioning) {
 					partName = partNames[1];
-				} else {	
+				} else {
 					partName = partNames[0];
 				}
 			} else {
@@ -293,10 +292,11 @@ public class NetworkPartitioner {
 	 *
 	 */
 
-	public void transform(Network network, boolean threadPartitioning) throws OrccException {
+	public void transform(Network network, boolean threadPartitioning)
+			throws OrccException {
 		graph = network.getGraph();
 		this.threadPartitioning = threadPartitioning;
-		
+
 		Map<String, Set<Vertex>> partitions = getPartitionSets();
 
 		// Creates a copy of vertices of graph

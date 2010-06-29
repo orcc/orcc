@@ -374,7 +374,7 @@ public class XDFWriter {
 	 * @throws OrccException
 	 */
 	private void writeDecls(Element parent, String kind,
-			OrderedMap<GlobalVariable> variables) throws OrccException {
+			OrderedMap<String, GlobalVariable> variables) throws OrccException {
 		for (GlobalVariable variable : variables) {
 			Element decl = document.createElement("Decl");
 			parent.appendChild(decl);
@@ -486,8 +486,8 @@ public class XDFWriter {
 	 *            an ordered map of ports
 	 * @throws OrccException
 	 */
-	private void writePorts(Element parent, String kind, OrderedMap<Port> ports)
-			throws OrccException {
+	private void writePorts(Element parent, String kind,
+			OrderedMap<String, Port> ports) throws OrccException {
 		for (Port port : ports) {
 			Element portElt = document.createElement("Port");
 			parent.appendChild(portElt);

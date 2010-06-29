@@ -51,7 +51,7 @@ import net.sf.orcc.util.OrderedMap;
  * println becomes state variables into the current actor
  * 
  * 
- * @author Jérôme GORIN
+ * @author Jï¿½rï¿½me GORIN
  * 
  */
 public class PrintlnTransformation extends AbstractActorTransformation {
@@ -64,19 +64,17 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 	/**
 	 * State variables of the actor
 	 */
-	private OrderedMap<Variable> stateVars;
+	private OrderedMap<String, Variable> stateVars;
 
 	@Override
 	public void transform(Actor actor) {
-
 		strCnt = 0;
 		stateVars = actor.getStateVars();
-		OrderedMap<Procedure> procs = actor.getProcs();
+		OrderedMap<String, Procedure> procs = actor.getProcs();
 		Procedure print = procs.get("print");
 
 		if (print != null) {
-			procs.remove(print);
-
+			procs.remove(print.getName());
 		}
 
 		for (Procedure proc : actor.getProcs()) {

@@ -87,7 +87,7 @@ public class DeadCodeElimination extends AbstractActorTransformation {
 				// remove the other variable
 				LocalVariable local = (LocalVariable) phi.getVars()
 						.get(1 - index).getVariable();
-				procedure.getLocals().remove(local);
+				procedure.getLocals().remove(local.getName());
 			}
 		}
 	}

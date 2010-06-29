@@ -98,7 +98,7 @@ public class SolveParametersTransform implements ExpressionInterpreter,
 	@Override
 	public Object interpret(VarExpr expr, Object... args) {
 		Variable var = expr.getVar().getVariable();
-		OrderedMap<GlobalVariable> variables = network.getVariables();
+		OrderedMap<String, GlobalVariable> variables = network.getVariables();
 		GlobalVariable variable = variables.get(var.getName());
 		Expression value = variable.getExpression();
 		return value;

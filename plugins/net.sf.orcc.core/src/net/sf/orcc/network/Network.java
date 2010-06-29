@@ -102,7 +102,7 @@ public class Network {
 
 	private Map<Instance, List<Connection>> incomingMap;
 
-	private OrderedMap<Port> inputs;
+	private OrderedMap<String, Port> inputs;
 
 	private String name;
 
@@ -113,9 +113,9 @@ public class Network {
 
 	private Map<Instance, List<Connection>> outgoingMap;
 
-	private OrderedMap<Port> outputs;
+	private OrderedMap<String, Port> outputs;
 
-	private OrderedMap<GlobalVariable> parameters;
+	private OrderedMap<String, GlobalVariable> parameters;
 
 	private Map<Instance, Map<Port, Instance>> predecessorsMap;
 
@@ -125,7 +125,7 @@ public class Network {
 
 	private Map<Connection, Vertex> targetMap;
 
-	private OrderedMap<GlobalVariable> variables;
+	private OrderedMap<String, GlobalVariable> variables;
 
 	/**
 	 * Creates a new network with the given name, inputs, outputs, and graph.
@@ -139,9 +139,10 @@ public class Network {
 	 * @param graph
 	 *            graph representing the network's contents
 	 */
-	public Network(String name, OrderedMap<Port> inputs,
-			OrderedMap<Port> outputs, OrderedMap<GlobalVariable> parameters,
-			OrderedMap<GlobalVariable> variables,
+	public Network(String name, OrderedMap<String, Port> inputs,
+			OrderedMap<String, Port> outputs,
+			OrderedMap<String, GlobalVariable> parameters,
+			OrderedMap<String, GlobalVariable> variables,
 			DirectedGraph<Vertex, Connection> graph) {
 		this.name = name;
 		this.inputs = inputs;
@@ -202,8 +203,8 @@ public class Network {
 		}
 	}
 
-	private void computePredSucc(Vertex vertex, OrderedMap<Port> inputs,
-			OrderedMap<Port> outputs) {
+	private void computePredSucc(Vertex vertex,
+			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs) {
 		Map<Port, Instance> map = new LinkedHashMap<Port, Instance>();
 		predecessorsMap.put(vertex.getInstance(), map);
 		Set<Connection> incoming = graph.incomingEdgesOf(vertex);
@@ -345,7 +346,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's input ports
 	 */
-	public OrderedMap<Port> getInputs() {
+	public OrderedMap<String, Port> getInputs() {
 		return inputs;
 	}
 
@@ -435,7 +436,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's output ports
 	 */
-	public OrderedMap<Port> getOutputs() {
+	public OrderedMap<String, Port> getOutputs() {
 		return outputs;
 	}
 
@@ -444,7 +445,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's parameters
 	 */
-	public OrderedMap<GlobalVariable> getParameters() {
+	public OrderedMap<String, GlobalVariable> getParameters() {
 		return parameters;
 	}
 
@@ -489,7 +490,7 @@ public class Network {
 	 * 
 	 * @return the list of this network's variables
 	 */
-	public OrderedMap<GlobalVariable> getVariables() {
+	public OrderedMap<String, GlobalVariable> getVariables() {
 		return variables;
 	}
 

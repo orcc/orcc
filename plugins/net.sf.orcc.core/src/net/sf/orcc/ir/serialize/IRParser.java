@@ -136,21 +136,21 @@ public class IRParser {
 
 	private String file;
 
-	private OrderedMap<Port> inputs;
+	private OrderedMap<String, Port> inputs;
 
 	private boolean isInitialize;
 
-	private OrderedMap<Port> outputs;
+	private OrderedMap<String, Port> outputs;
 
 	private CFGNode previousNode;
 
 	private Procedure procedure;
 
-	private OrderedMap<Procedure> procs;
+	private OrderedMap<String, Procedure> procs;
 
 	private List<Action> untaggedActions;
 
-	private Scope<Variable> variables;
+	private Scope<String, Variable> variables;
 
 	/**
 	 * Returns the action associated with the tag represented by the given JSON
@@ -294,9 +294,9 @@ public class IRParser {
 	public Actor parseActor(InputStream in) throws OrccException {
 		try {
 			actions = new HashMap<Tag, Action>();
-			procs = new OrderedMap<Procedure>();
+			procs = new OrderedMap<String, Procedure>();
 			untaggedActions = new ArrayList<Action>();
-			variables = new Scope<Variable>();
+			variables = new Scope<String, Variable>();
 
 			// register built-in procedures
 			procs.add(file, print.getLocation(), print.getName(), print);
@@ -307,15 +307,15 @@ public class IRParser {
 			file = obj.getString(KEY_SOURCE_FILE);
 			String name = obj.getString(KEY_NAME);
 
-			OrderedMap<Variable> parameters = variables;
+			OrderedMap<String, Variable> parameters = variables;
 			parseParameters(obj.getJSONArray(KEY_PARAMETERS));
-			variables = new Scope<Variable>(variables, true);
+			variables = new Scope<String, Variable>(variables, true);
 
 			inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
 			outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
 
 			JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
-			OrderedMap<Variable> stateVars = parseStateVars(array);
+			OrderedMap<String, Variable> stateVars = parseStateVars(array);
 
 			array = obj.getJSONArray(KEY_PROCEDURES);
 			for (int i = 0; i < array.length(); i++) {
@@ -639,7 +639,7 @@ public class IRParser {
 		}
 	}
 
-	private Pattern parsePattern(OrderedMap<Port> ports, JSONArray array)
+	private Pattern parsePattern(OrderedMap<String, Port> ports, JSONArray array)
 			throws JSONException, OrccException {
 		Pattern pattern = new Pattern();
 		for (int i = 0; i < array.length(); i++) {
@@ -689,9 +689,9 @@ public class IRParser {
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
-	private OrderedMap<Port> parsePorts(JSONArray array) throws JSONException,
-			OrccException {
-		OrderedMap<Port> ports = new OrderedMap<Port>();
+	private OrderedMap<String, Port> parsePorts(JSONArray array)
+			throws JSONException, OrccException {
+		OrderedMap<String, Port> ports = new OrderedMap<String, Port>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray port = array.getJSONArray(i);
 
@@ -722,11 +722,11 @@ public class IRParser {
 
 		Location location = parseLocation(array.getJSONArray(2));
 		Type returnType = parseType(array.get(3));
-		variables = new Scope<Variable>(variables, true);
-		OrderedMap<Variable> parameters = variables;
+		variables = new Scope<String, Variable>(variables, true);
+		OrderedMap<String, Variable> parameters = variables;
 		parseVarDefs(array.getJSONArray(4));
-		variables = new Scope<Variable>(variables, false);
-		OrderedMap<Variable> locals = variables;
+		variables = new Scope<String, Variable>(variables, false);
+		OrderedMap<String, Variable> locals = variables;
 		parseVarDefs(array.getJSONArray(5));
 
 		procedure = new Procedure(name, external, location, returnType,
@@ -775,9 +775,9 @@ public class IRParser {
 	 * @return A {@link List}&lt;{@link StateVariable}&gt;.
 	 * @throws JSONException
 	 */
-	private OrderedMap<Variable> parseStateVars(JSONArray array)
+	private OrderedMap<String, Variable> parseStateVars(JSONArray array)
 			throws JSONException, OrccException {
-		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
+		OrderedMap<String, Variable> stateVars = new OrderedMap<String, Variable>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray stateArray = array.getJSONArray(i);
 

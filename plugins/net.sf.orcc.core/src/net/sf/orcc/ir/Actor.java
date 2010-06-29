@@ -60,17 +60,17 @@ public class Actor {
 
 	private List<Action> initializes;
 
-	private OrderedMap<Port> inputs;
+	private OrderedMap<String, Port> inputs;
 
 	private String name;
 
-	private OrderedMap<Port> outputs;
+	private OrderedMap<String, Port> outputs;
 
-	private OrderedMap<Variable> parameters;
+	private OrderedMap<String, Variable> parameters;
 
-	private OrderedMap<Procedure> procs;
+	private OrderedMap<String, Procedure> procs;
 
-	private OrderedMap<Variable> stateVars;
+	private OrderedMap<String, Variable> stateVars;
 
 	/**
 	 * holds template-specific data.
@@ -106,11 +106,12 @@ public class Actor {
 	 * @param scheduler
 	 *            an action scheduler
 	 */
-	public Actor(String name, String file, OrderedMap<Variable> parameters,
-			OrderedMap<Port> inputs, OrderedMap<Port> outputs,
-			OrderedMap<Variable> stateVars, OrderedMap<Procedure> procs,
-			List<Action> actions, List<Action> initializes,
-			ActionScheduler scheduler) {
+	public Actor(String name, String file,
+			OrderedMap<String, Variable> parameters,
+			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
+			OrderedMap<String, Variable> stateVars,
+			OrderedMap<String, Procedure> procs, List<Action> actions,
+			List<Action> initializes, ActionScheduler scheduler) {
 		this.actions = actions;
 		this.file = file;
 		this.initializes = initializes;
@@ -184,7 +185,7 @@ public class Actor {
 	 * 
 	 * @return the ordered map of input ports
 	 */
-	public OrderedMap<Port> getInputs() {
+	public OrderedMap<String, Port> getInputs() {
 		return inputs;
 	}
 
@@ -213,7 +214,7 @@ public class Actor {
 	 * 
 	 * @return the ordered map of output ports
 	 */
-	public OrderedMap<Port> getOutputs() {
+	public OrderedMap<String, Port> getOutputs() {
 		return outputs;
 	}
 
@@ -222,7 +223,7 @@ public class Actor {
 	 * 
 	 * @return the ordered map of parameters
 	 */
-	public OrderedMap<Variable> getParameters() {
+	public OrderedMap<String, Variable> getParameters() {
 		return parameters;
 	}
 
@@ -231,7 +232,7 @@ public class Actor {
 	 * 
 	 * @return the ordered map of procedures
 	 */
-	public OrderedMap<Procedure> getProcs() {
+	public OrderedMap<String, Procedure> getProcs() {
 		return procs;
 	}
 
@@ -240,7 +241,7 @@ public class Actor {
 	 * 
 	 * @return the ordered map of state variables
 	 */
-	public OrderedMap<Variable> getStateVars() {
+	public OrderedMap<String, Variable> getStateVars() {
 		return stateVars;
 	}
 

@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.util.INameable;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -57,7 +56,7 @@ import org.w3c.dom.Node;
  * @author Matthieu Wipliez
  * 
  */
-public class XmlElement implements INameable {
+public class XmlElement {
 
 	private Map<String, String> attributes;
 
@@ -157,7 +156,11 @@ public class XmlElement implements INameable {
 		return element;
 	}
 
-	@Override
+	/**
+	 * Returns the name of this object.
+	 * 
+	 * @return the name of this object
+	 */
 	public String getName() {
 		return name;
 	}

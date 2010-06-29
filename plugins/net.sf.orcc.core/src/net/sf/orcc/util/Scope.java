@@ -32,13 +32,13 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Location;
 
 /**
- * A scope is an ordered map of <string, object> extended with the notion of
+ * This class defines a scope as an ordered map extended with the notion of
  * hierarchy.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class Scope<T extends INameable> extends OrderedMap<T> {
+public class Scope<K, V> extends OrderedMap<K, V> {
 
 	/**
 	 * if <code>true</code>, a variable is allowed to override a variable with
@@ -49,7 +49,7 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	/**
 	 * parent scope
 	 */
-	private Scope<T> parent;
+	private Scope<K, V> parent;
 
 	/**
 	 * Creates a top-level scope.
@@ -67,7 +67,7 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 *            if <code>true</code>, a variable is allowed to override a
 	 *            variable with the same name
 	 */
-	public Scope(Scope<T> parent, boolean allowOverride) {
+	public Scope(Scope<K, V> parent, boolean allowOverride) {
 		this.parent = parent;
 		this.allowOverride = allowOverride;
 	}
@@ -90,7 +90,7 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 *             if the object is already defined
 	 */
 	@Override
-	public void add(String file, Location location, String name, T object)
+	public void add(String file, Location location, K name, V object)
 			throws OrccRuntimeException {
 		if (allowOverride) {
 			// a variable is allowed to override a variable defined in a
@@ -99,7 +99,7 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 		} else {
 			// check if there already is a variable with the same name in this
 			// scope or parent scopes
-			T existingObject = super.get(name);
+			V existingObject = super.get(name);
 			if (existingObject == null) {
 				// no existing variable in this scope, check parent's
 				if (parent != null) {
@@ -128,7 +128,7 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 * @return the object that has the given name, or <code>null</code>
 	 */
 	@Override
-	public T get(String name) {
+	public V get(K name) {
 		return get(name, true);
 	}
 
@@ -143,8 +143,8 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 *            if <code>true</code>, the parent is checked
 	 * @return the object that has the given name, or <code>null</code>
 	 */
-	public T get(String name, boolean checkParent) {
-		T object = super.get(name);
+	public V get(K name, boolean checkParent) {
+		V object = super.get(name);
 		if (object == null) {
 			if (parent != null && checkParent) {
 				// query parent
@@ -163,7 +163,7 @@ public class Scope<T extends INameable> extends OrderedMap<T> {
 	 * 
 	 * @return a scope, or <code>null</code> if this scope has no parent
 	 */
-	public Scope<T> getParent() {
+	public Scope<K, V> getParent() {
 		return parent;
 	}
 

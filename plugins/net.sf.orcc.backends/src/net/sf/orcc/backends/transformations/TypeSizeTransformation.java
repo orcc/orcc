@@ -39,10 +39,10 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * This class defines a transformation that changes size of variable to fit types
- * of general-purpose programming language such as C, C++ or Java.
+ * This class defines a transformation that changes size of variable to fit
+ * types of general-purpose programming language such as C, C++ or Java.
  * 
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class TypeSizeTransformation extends AbstractActorTransformation {
@@ -65,7 +65,7 @@ public class TypeSizeTransformation extends AbstractActorTransformation {
 
 	}
 
-	private void checkVariables(OrderedMap<? extends Variable> variables) {
+	private void checkVariables(OrderedMap<String, ? extends Variable> variables) {
 		for (Variable variable : variables) {
 			checkType(variable.getType());
 		}

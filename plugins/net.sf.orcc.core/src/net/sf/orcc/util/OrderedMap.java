@@ -45,17 +45,17 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public class OrderedMap<T extends INameable> implements Iterable<T> {
+public class OrderedMap<K, V> implements Iterable<V> {
 
 	/**
 	 * a cache for the getList method
 	 */
-	private List<T> list;
+	private List<V> list;
 
 	/**
 	 * a linked hash map which maintains the order in which objects are added
 	 */
-	private LinkedHashMap<String, T> map;
+	private LinkedHashMap<K, V> map;
 
 	/**
 	 * <code>true</code> if the map has been modified
@@ -66,7 +66,7 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * Creates an empty ordered map.
 	 */
 	public OrderedMap() {
-		map = new LinkedHashMap<String, T>();
+		map = new LinkedHashMap<K, V>();
 		modified = true;
 	}
 
@@ -86,7 +86,7 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * @throws OrccRuntimeException
 	 *             if the object is already defined
 	 */
-	public void add(String file, Location location, String name, T object)
+	public void add(String file, Location location, K name, V object)
 			throws OrccRuntimeException {
 		if (map.containsKey(name)) {
 			throw new OrccRuntimeException(file, location, "\"" + name
@@ -105,7 +105,7 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * @param object
 	 *            an object
 	 */
-	public final void add(String name, T object) {
+	public final void add(K name, V object) {
 		if (map.containsKey(name)) {
 			throw new OrccRuntimeException("\"" + name
 					+ "\" already defined in this scope");
@@ -123,7 +123,7 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * @param object
 	 *            an object
 	 */
-	protected final void addNoCheck(String name, T object) {
+	protected final void addNoCheck(K name, V object) {
 		map.put(name, object);
 		modified = true;
 	}
@@ -148,8 +148,8 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * @return <code>true</code> if this map contains this object,
 	 *         <code>false</code> otherwise.
 	 */
-	public boolean contains(T object) {
-		return map.containsKey(object.getName());
+	public boolean contains(K name) {
+		return map.containsKey(name);
 	}
 
 	/**
@@ -160,7 +160,7 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * @return the object that has the given name, or if it could not be found,
 	 *         <code>null</code>
 	 */
-	public T get(String name) {
+	public V get(K name) {
 		return map.get(name);
 	}
 
@@ -172,7 +172,7 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * @return the number of elements in this ordered map
 	 */
 	public int getLength() {
-		return size();
+		return map.size();
 	}
 
 	/**
@@ -183,19 +183,37 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * 
 	 * @return the list of objects of this scope
 	 */
-	public List<T> getList() {
+	public List<V> getList() {
 		if (modified) {
-			list = new ArrayList<T>(map.values());
+			list = new ArrayList<V>(map.values());
 		}
 		return list;
 	}
 
 	@Override
-	public Iterator<T> iterator() {
-		Iterator<T> it = map.values().iterator();
-		// because somebody may call "remove" on the iterator
-		modified = true;
-		return it;
+	public Iterator<V> iterator() {
+		final Iterator<V> it = map.values().iterator();
+
+		// returns an iterator that sets modified to "true" when remove is
+		// called
+		return new Iterator<V>() {
+
+			@Override
+			public boolean hasNext() {
+				return it.hasNext();
+			}
+
+			@Override
+			public V next() {
+				return it.next();
+			}
+
+			@Override
+			public void remove() {
+				modified = true;
+				it.remove();
+			}
+		};
 	}
 
 	/**
@@ -207,18 +225,9 @@ public class OrderedMap<T extends INameable> implements Iterable<T> {
 	 * @param object
 	 *            the object to remove
 	 */
-	public void remove(T object) {
-		map.remove(object.getName());
+	public void remove(K name) {
+		map.remove(name);
 		modified = true;
-	}
-
-	/**
-	 * Returns the number of elements in this ordered map.
-	 * 
-	 * @return the number of elements in this ordered map
-	 */
-	public int size() {
-		return map.size();
 	}
 
 	@Override

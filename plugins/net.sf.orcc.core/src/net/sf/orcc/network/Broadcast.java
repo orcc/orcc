@@ -46,13 +46,13 @@ public class Broadcast {
 
 	public static final String CLASS = "";
 
-	private OrderedMap<Port> inputs;
+	private OrderedMap<String, Port> inputs;
 
 	private int numOutputs;
 
 	private List<Integer> outputList;
 
-	private OrderedMap<Port> outputs;
+	private OrderedMap<String, Port> outputs;
 
 	private Type type;
 
@@ -76,11 +76,11 @@ public class Broadcast {
 
 		Location location = new Location();
 
-		inputs = new OrderedMap<Port>();
+		inputs = new OrderedMap<String, Port>();
 		String name = "input";
 		inputs.add(name, new Port(location, type, name));
 
-		outputs = new OrderedMap<Port>();
+		outputs = new OrderedMap<String, Port>();
 		for (int i = 0; i < numOutputs; i++) {
 			location = new Location();
 			name = "output_" + i;
@@ -97,7 +97,7 @@ public class Broadcast {
 	 * 
 	 * @return the ordered map of input ports
 	 */
-	public OrderedMap<Port> getInputs() {
+	public OrderedMap<String, Port> getInputs() {
 		return inputs;
 	}
 
@@ -131,7 +131,7 @@ public class Broadcast {
 	 * 
 	 * @return the ordered map of output ports
 	 */
-	public OrderedMap<Port> getOutputs() {
+	public OrderedMap<String, Port> getOutputs() {
 		return outputs;
 	}
 

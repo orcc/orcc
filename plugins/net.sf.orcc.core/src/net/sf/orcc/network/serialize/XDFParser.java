@@ -514,7 +514,7 @@ public class XDFParser {
 	/**
 	 * list of input ports
 	 */
-	private OrderedMap<Port> inputs;
+	private OrderedMap<String, Port> inputs;
 
 	/**
 	 * map of string -> instances
@@ -524,12 +524,12 @@ public class XDFParser {
 	/**
 	 * list of output ports
 	 */
-	private OrderedMap<Port> outputs;
+	private OrderedMap<String, Port> outputs;
 
 	/**
 	 * list of parameters
 	 */
-	private Scope<GlobalVariable> parameters;
+	private Scope<String, GlobalVariable> parameters;
 
 	/**
 	 * parent path of {@link #file}
@@ -544,7 +544,7 @@ public class XDFParser {
 	/**
 	 * list of variables
 	 */
-	private Scope<GlobalVariable> variables;
+	private Scope<String, GlobalVariable> variables;
 
 	/**
 	 * Creates a new network parser.
@@ -591,7 +591,7 @@ public class XDFParser {
 	 * @return a vertex that contains a port or an instance
 	 */
 	private Vertex getVertex(String vertexName, String portName, String kind,
-			OrderedMap<Port> ports) throws OrccException {
+			OrderedMap<String, Port> ports) throws OrccException {
 		if (vertexName.isEmpty()) {
 			Port port = ports.get(portName);
 			if (port == null) {
@@ -901,11 +901,11 @@ public class XDFParser {
 		}
 
 		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
-		inputs = new OrderedMap<Port>();
+		inputs = new OrderedMap<String, Port>();
 		instances = new HashMap<String, Instance>();
-		outputs = new OrderedMap<Port>();
-		parameters = new Scope<GlobalVariable>();
-		variables = new Scope<GlobalVariable>(parameters, false);
+		outputs = new OrderedMap<String, Port>();
+		parameters = new Scope<String, GlobalVariable>();
+		variables = new Scope<String, GlobalVariable>(parameters, false);
 
 		parseBody(root);
 

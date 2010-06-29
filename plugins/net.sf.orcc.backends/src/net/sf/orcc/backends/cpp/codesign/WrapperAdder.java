@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Ecole Polytechnique Fédérale de Lausanne 
+ * Copyright (c) 2010, Ecole Polytechnique Fï¿½dï¿½rale de Lausanne 
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne 
+ *   * Neither the name of the Ecole Polytechnique Fï¿½dï¿½rale de Lausanne 
  *     nor the names of its contributors may be used to endorse or promote products
  *     derived from this software without specific prior written permission.
  * 
@@ -170,14 +170,14 @@ public class WrapperAdder {
 	}
 
 	public void transform(Network network) throws OrccException {
-
 		graph = network.getGraph();
 
-		OrderedMap<Port> inputs = network.getInputs();
-		OrderedMap<Port> outputs = network.getOutputs();
+		OrderedMap<String, Port> inputs = network.getInputs();
+		OrderedMap<String, Port> outputs = network.getOutputs();
 
-		if (inputs.size() > 0 || outputs.size() > 0) {
-			Wrapper wrapper = new Wrapper(inputs.size(), outputs.size());
+		if (inputs.getLength() > 0 || outputs.getLength() > 0) {
+			Wrapper wrapper = new Wrapper(inputs.getLength(),
+					outputs.getLength());
 			Vertex vWrap = new Vertex(new Instance(network.getName(), wrapper));
 
 			graph.addVertex(vWrap);
@@ -187,7 +187,7 @@ public class WrapperAdder {
 			for (Vertex vertex : graph.vertexSet()) {
 				if (vertex.isPort()) {
 					Port port = vertex.getPort();
-					if (outputs.contains(port)) {
+					if (outputs.contains(port.getName())) {
 						Set<Connection> conns = graph.incomingEdgesOf(vertex);
 
 						// FIXME: there should be only one connection since
@@ -206,10 +206,9 @@ public class WrapperAdder {
 							graph.addEdge(vSrc, vWrap, incoming);
 
 							vertexToRemove.add(vertex);
-							outputs.remove(port);
+							outputs.remove(port.getName());
 						}
 					} else {
-
 						Iterator<Connection> it = graph.outgoingEdgesOf(vertex)
 								.iterator();
 
@@ -224,7 +223,7 @@ public class WrapperAdder {
 								connection.getAttributes());
 						graph.addEdge(vWrap, vTgt, outgoing);
 						vertexToRemove.add(vertex);
-						inputs.remove(port);
+						inputs.remove(port.getName());
 
 						while (it.hasNext()) {
 							connection = it.next();
@@ -241,10 +240,11 @@ public class WrapperAdder {
 				} else {
 				}
 			}
+
 			examineVertex(vWrap);
 			graph.removeAllVertices(vertexToRemove);
 			graph.removeAllEdges(toBeRemoved);
 		}
-
 	}
+
 }

@@ -96,9 +96,9 @@ public class ActorMerger implements INetworkTransformation {
 
 	private IScheduler scheduler;
 
-	private OrderedMap<Variable> loopVariables;
+	private OrderedMap<String, Variable> loopVariables;
 
-	private OrderedMap<Variable> variables;
+	private OrderedMap<String, Variable> variables;
 
 	private List<LocalVariable> indexes;
 
@@ -139,8 +139,7 @@ public class ActorMerger implements INetworkTransformation {
 					IrFactory.eINSTANCE.createTypeInt(32));
 
 			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
-					BinaryOp.PLUS, expr,
-					IrFactory.eINSTANCE.createTypeInt(32));
+					BinaryOp.PLUS, expr, IrFactory.eINSTANCE.createTypeInt(32));
 
 			params.add(param);
 		}
@@ -160,8 +159,7 @@ public class ActorMerger implements INetworkTransformation {
 					IrFactory.eINSTANCE.createTypeInt(32));
 
 			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
-					BinaryOp.PLUS, expr,
-					IrFactory.eINSTANCE.createTypeInt(32));
+					BinaryOp.PLUS, expr, IrFactory.eINSTANCE.createTypeInt(32));
 
 			params.add(param);
 		}
@@ -175,15 +173,15 @@ public class ActorMerger implements INetworkTransformation {
 	 * @param action
 	 */
 	private Procedure convertAction(Action action) {
-		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
-		OrderedMap<Variable> locals = action.getBody().getLocals();
+		OrderedMap<String, Variable> parameters = new OrderedMap<String, Variable>();
+		OrderedMap<String, Variable> locals = action.getBody().getLocals();
 		List<CFGNode> nodes = action.getBody().getNodes();
 
 		Pattern inputPattern = action.getInputPattern();
 
 		for (Map.Entry<Port, Integer> entry : inputPattern.entrySet()) {
 			Port port = entry.getKey();
-			if (!parameters.contains(port)) {
+			if (!parameters.contains(port.getName())) {
 				Type type = IrFactory.eINSTANCE.createTypeList(
 						entry.getValue(), port.getType());
 				LocalVariable param = new LocalVariable(false, 0,
@@ -204,8 +202,7 @@ public class ActorMerger implements INetworkTransformation {
 		}
 
 		return new Procedure(action.getName(), false, new Location(),
-				IrFactory.eINSTANCE.createTypeVoid(), parameters, locals,
-				nodes);
+				IrFactory.eINSTANCE.createTypeVoid(), parameters, locals, nodes);
 	}
 
 	/**
@@ -235,12 +232,12 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	private Actor createActor(Set<Vertex> vertices) throws OrccException {
-		OrderedMap<Port> inputs = new OrderedMap<Port>();
-		OrderedMap<Port> outputs = new OrderedMap<Port>();
-		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
-		OrderedMap<Procedure> procs = new OrderedMap<Procedure>();
+		OrderedMap<String, Port> inputs = new OrderedMap<String, Port>();
+		OrderedMap<String, Port> outputs = new OrderedMap<String, Port>();
+		OrderedMap<String, Variable> stateVars = new OrderedMap<String, Variable>();
+		OrderedMap<String, Procedure> procs = new OrderedMap<String, Procedure>();
 
-		OrderedMap<Variable> parameters = new OrderedMap<Variable>();
+		OrderedMap<String, Variable> parameters = new OrderedMap<String, Variable>();
 		ActionList actions = new ActionList();
 		ActionList initializes = new ActionList();
 		ActionScheduler scheduler = new ActionScheduler(
@@ -268,11 +265,11 @@ public class ActorMerger implements INetworkTransformation {
 	private Procedure createBody() throws OrccException {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 		indexes = new ArrayList<LocalVariable>();
-		loopVariables = new OrderedMap<Variable>();
+		loopVariables = new OrderedMap<String, Variable>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, new Location(),
 				IrFactory.eINSTANCE.createTypeVoid(),
-				new OrderedMap<Variable>(), loopVariables, nodes);
+				new OrderedMap<String, Variable>(), loopVariables, nodes);
 
 		createInternalBuffers();
 		addLocalVars();
@@ -361,8 +358,8 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private void createLoopedSchedule(Procedure procedure, Schedule schedule,
 			List<CFGNode> nodes) throws OrccException {
-		OrderedMap<Procedure> procs = actor.getProcs();
-		OrderedMap<Variable> vars = actor.getStateVars();
+		OrderedMap<String, Procedure> procs = actor.getProcs();
+		OrderedMap<String, Variable> vars = actor.getStateVars();
 
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
@@ -372,7 +369,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				for (Procedure proc : actor.getProcs()) {
 					if (procedure.getStateVarsUsed().isEmpty()) {
-						if (!procs.contains(proc)) {
+						if (!procs.contains(proc.getName())) {
 							String name = actor.getName() + "_"
 									+ proc.getName();
 							proc.setName(name);
@@ -476,11 +473,11 @@ public class ActorMerger implements INetworkTransformation {
 
 	private Procedure createScheduler() {
 		Location location = new Location();
-		variables = new OrderedMap<Variable>();
+		variables = new OrderedMap<String, Variable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
-				new OrderedMap<Variable>(), variables, nodes);
+				new OrderedMap<String, Variable>(), variables, nodes);
 		BlockNode block = new BlockNode(procedure);
 		nodes.add(block);
 		createInputTests(block);

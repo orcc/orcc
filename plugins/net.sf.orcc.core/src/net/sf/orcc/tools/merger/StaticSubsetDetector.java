@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Ecole Polytechnique Fédérale de Lausanne 
+ * Copyright (c) 2010, Ecole Polytechnique Fï¿½dï¿½rale de Lausanne 
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the 
+ *   * Neither the name of the Ecole Polytechnique Fï¿½dï¿½rale de Lausanne nor the 
  *     names of its contributors may be used to endorse or promote products 
  *     derived from this software without specific prior written permission.
  * 
@@ -97,8 +97,9 @@ public class StaticSubsetDetector {
 					graph.getEdgeTarget(connection), connection);
 		}
 
-		Actor cluster = new Actor("cluster", "", null, new OrderedMap<Port>(),
-				new OrderedMap<Port>(), null, null, null, null, null);
+		Actor cluster = new Actor("cluster", "", null,
+				new OrderedMap<String, Port>(), new OrderedMap<String, Port>(),
+				null, null, null, null, null);
 		Vertex clusterVertex = new Vertex(new Instance(cluster.getName(),
 				cluster));
 

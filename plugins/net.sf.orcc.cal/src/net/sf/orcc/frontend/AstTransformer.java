@@ -436,7 +436,7 @@ public class AstTransformer {
 	/**
 	 * the list of procedures of the IR actor.
 	 */
-	private OrderedMap<Procedure> procedures;
+	private OrderedMap<String, Procedure> procedures;
 
 	/**
 	 * A map from AST procedures to IR procedures.
@@ -578,7 +578,7 @@ public class AstTransformer {
 	 */
 	private LocalVariable newTempLocalVariable(Type type, String hint) {
 		String name = hint;
-		OrderedMap<Variable> locals = procedure.getLocals();
+		OrderedMap<String, Variable> locals = procedure.getLocals();
 		Variable variable = locals.get(name);
 		int i = 0;
 		while (variable != null) {
@@ -607,17 +607,19 @@ public class AstTransformer {
 		String name = astActor.getName();
 		try {
 			// parameters
-			OrderedMap<Variable> parameters = transformGlobalVariables(astActor
+			OrderedMap<String, Variable> parameters = transformGlobalVariables(astActor
 					.getParameters());
 
 			// first state variables, because port's sizes may depend on them.
-			OrderedMap<Variable> stateVars = transformGlobalVariables(astActor
+			OrderedMap<String, Variable> stateVars = transformGlobalVariables(astActor
 					.getStateVariables());
-			OrderedMap<Port> inputs = transformPorts(astActor.getInputs());
-			OrderedMap<Port> outputs = transformPorts(astActor.getOutputs());
+			OrderedMap<String, Port> inputs = transformPorts(astActor
+					.getInputs());
+			OrderedMap<String, Port> outputs = transformPorts(astActor
+					.getOutputs());
 
 			// transforms functions and procedures
-			procedures = new OrderedMap<Procedure>();
+			procedures = new OrderedMap<String, Procedure>();
 			for (AstFunction astFunction : astActor.getFunctions()) {
 				transformFunction(astFunction);
 			}
@@ -800,9 +802,9 @@ public class AstTransformer {
 	 *            a list of AST state variables
 	 * @return an ordered map of IR state variables
 	 */
-	private OrderedMap<Variable> transformGlobalVariables(
+	private OrderedMap<String, Variable> transformGlobalVariables(
 			List<AstVariable> stateVariables) {
-		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
+		OrderedMap<String, Variable> stateVars = new OrderedMap<String, Variable>();
 		for (AstVariable astVariable : stateVariables) {
 			Location location = Util.getLocation(astVariable);
 			Type type = astVariable.getIrType();
@@ -975,8 +977,8 @@ public class AstTransformer {
 	 *            a list of AST ports
 	 * @return an ordered map of IR ports
 	 */
-	private OrderedMap<Port> transformPorts(List<AstPort> portList) {
-		OrderedMap<Port> ports = new OrderedMap<Port>();
+	private OrderedMap<String, Port> transformPorts(List<AstPort> portList) {
+		OrderedMap<String, Port> ports = new OrderedMap<String, Port>();
 		for (AstPort astPort : portList) {
 			Location location = Util.getLocation(astPort);
 			Type type = astPort.getIrType();

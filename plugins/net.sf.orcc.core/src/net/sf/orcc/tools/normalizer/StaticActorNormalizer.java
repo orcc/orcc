@@ -171,11 +171,11 @@ public class StaticActorNormalizer {
 
 	private Actor actor;
 
-	private OrderedMap<Variable> stateVars;
+	private OrderedMap<String, Variable> stateVars;
 
 	private CSDFActorClass staticCls;
 
-	private OrderedMap<Variable> variables;
+	private OrderedMap<String, Variable> variables;
 
 	/**
 	 * Creates a new normalizer
@@ -283,12 +283,12 @@ public class StaticActorNormalizer {
 	 */
 	private Procedure createBody() {
 		Location location = new Location();
-		variables = new OrderedMap<Variable>();
+		variables = new OrderedMap<String, Variable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeVoid(),
-				new OrderedMap<Variable>(), variables, nodes);
+				new OrderedMap<String, Variable>(), variables, nodes);
 
 		// add state variables
 		addStateVariables(procedure, staticCls.getInputPattern());
@@ -396,12 +396,12 @@ public class StaticActorNormalizer {
 	 */
 	private Procedure createScheduler() {
 		Location location = new Location();
-		variables = new OrderedMap<Variable>();
+		variables = new OrderedMap<String, Variable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
 				IrFactory.eINSTANCE.createTypeBool(),
-				new OrderedMap<Variable>(), variables, nodes);
+				new OrderedMap<String, Variable>(), variables, nodes);
 
 		BlockNode block = new BlockNode(procedure);
 		nodes.add(block);
