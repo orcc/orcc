@@ -88,7 +88,6 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		public Object interpret(VarExpr expr, Object... args) {
 			return expr;
 		}
-
 	}
 
 	private static int index;
@@ -112,12 +111,13 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	@Override
 	public void visit(Store store, Object... args) {
 
+		MyExpressionInterpreter interpret = new MyExpressionInterpreter();
 		ListIterator<Expression> it = store.getIndexes().listIterator();
 		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(new MyExpressionInterpreter(),
-					args));
+			it.set((Expression) it.next().accept(interpret, args));
 		}
 
+		store.setValue((Expression) store.getValue().accept(interpret, args));
 	}
 
 	@Override

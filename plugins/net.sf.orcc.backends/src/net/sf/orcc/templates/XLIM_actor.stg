@@ -113,10 +113,10 @@ BoolExpr(expr) ::= <<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Operations
+// Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-operation(op) ::= <<
+instruction(op) ::= <<
 $(op.class.simpleName)(op)$
 >>
 
@@ -180,10 +180,13 @@ $else$<operation kind="noop">
 >>
 
 Store(op) ::= <<
-$if (op.target.global)$<operation kind="assign" target="$op.target$">
+$if (op.target.global)
+$<operation kind="assign" target="$op.target$">
 	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
 	$port(dir="in", source=op.value.var)$
-</operation>$else$<operation kind="noop">
+</operation>$
+else
+$<operation kind="noop">
 	$port(dir="in", source=op.value.var)$
 	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>$endif$
@@ -221,16 +224,12 @@ WriteEnd(writeEnd) ::= <<
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
->>
-
 nodes(nodes) ::= <<
 $nodes: {$(it.class.simpleName)(it)$}$
 >>
 
 BlockNode(blkNode) ::= <<
-$blkNode.instructions: operation(); separator="\n"$
+$blkNode.instructions: instruction(); separator="\n"$
 >>
 
 PrintPhi(instruction) ::= <<
