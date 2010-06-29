@@ -41,7 +41,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		@Override
 		public Object interpret(BoolExpr expr, Object... args) {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			String name = "lit_int_" + index++;
+			String name = "lit_bool_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
 					name, null, TypeFactory.eINSTANCE.createBoolType());
 			locals.add(var.getName(), var);

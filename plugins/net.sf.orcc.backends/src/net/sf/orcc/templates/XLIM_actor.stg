@@ -262,11 +262,11 @@ IfNode(ifNode) ::= <<
 		</operation>		
 	</module>
 	<module kind="then">
-	$nodes(ifNode.thenNodes)$
+		$nodes(ifNode.thenNodes)$
 	</module>
 $if(ifNode.elseNodes)$
 	<module kind="else">
-	$nodes(ifNode.elseNodes)$
+		$nodes(ifNode.elseNodes)$
 	</module>
 $endif$
 	<!-- joinnode -->

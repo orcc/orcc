@@ -64,7 +64,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new Inline(),
+		ActorTransformation[] transformations = {
 				new ThreeAddressCodeTransformation(),
 				new MoveLiteralIntegers(), new VariableRenamer() };
 
