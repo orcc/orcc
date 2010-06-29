@@ -2,8 +2,8 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="57" y="2555"/>
-      <vertex id="CoefDC_L" x="1346" y="2324"/>
-      <vertex id="CoefAC_L" x="1346" y="2424"/>
+      <vertex id="CoefDC_L" x="1201" y="2548"/>
+      <vertex id="CoefAC_L" x="1200" y="2509"/>
       <vertex id="Intra_DC_flag" x="1098" y="1530"/>
       <vertex id="PredMode" x="1098" y="1630"/>
       <vertex id="ScalingList" x="777" y="105"/>
@@ -25,10 +25,10 @@
       <vertex id="LOCATION" x="1098" y="3424"/>
       <vertex id="PART_SZ" x="1098" y="3524"/>
       <vertex id="Mb_TypeC" x="1098" y="1830"/>
-      <vertex id="CoefAC_Cb" x="1346" y="2524"/>
-      <vertex id="CoefDC_Cb" x="1346" y="2624"/>
-      <vertex id="CoefDC_Cr" x="1346" y="2724"/>
-      <vertex id="CoefAC_Cr" x="1346" y="2824"/>
+      <vertex id="CoefAC_Cb" x="1185" y="2358"/>
+      <vertex id="CoefDC_Cb" x="1187" y="2401"/>
+      <vertex id="CoefDC_Cr" x="1190" y="2466"/>
+      <vertex id="CoefAC_Cr" x="1190" y="2433"/>
       <vertex id="IntraPredModeC" x="777" y="1505"/>
       <vertex id="QP_Cb" x="777" y="1855"/>
       <vertex id="QP_Cr" x="777" y="1955"/>
@@ -44,18 +44,20 @@
       <vertex id="ConstrainedIFlag" x="777" y="2455"/>
       <vertex id="DelList" x="1098" y="3124"/>
       <vertex id="FrameNum_CurrPic" x="777" y="2555"/>
-      <vertex id="RefList" x="1346" y="2924"/>
+      <vertex id="RefList" x="1232" y="2816"/>
       <vertex id="SizeDPBMax" x="777" y="2655"/>
       <vertex id="IsIDR" x="1098" y="3224"/>
       <vertex id="byte2bit" x="353" y="2470"/>
       <vertex id="Algo_NALU" x="169" y="2530"/>
       <vertex id="Algo_Synp_AVC" x="488" y="2118"/>
       <vertex id="Algo_BlockExpand_AVC" x="777" y="2755"/>
-      <vertex id="Algo_BlockSplit_AVC" x="1098" y="2549"/>
+      <vertex id="Algo_BlockSplit_AVC" x="1016" y="2419"/>
       <vertex id="Algo_IntraPred_Split" x="777" y="1605"/>
       <vertex id="MVReconstruct" x="777" y="3235"/>
       <vertex id="Algo_MMCO" x="777" y="3035"/>
       <vertex id="Algo_Parser_IPCM" x="777" y="3787"/>
-      <vertex id="Algo_RefList0" x="1098" y="2799"/>
+      <vertex id="Algo_RefList0" x="1073" y="2793"/>
+      <vertex id="Algo_RefList1" x="1072" y="2593"/>
+      <vertex id="Black_Hole" x="1210" y="2592"/>
    </vertices>
 </layout>
