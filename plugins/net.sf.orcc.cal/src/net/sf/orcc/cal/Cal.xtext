@@ -1,7 +1,6 @@
 grammar net.sf.orcc.cal.Cal with org.eclipse.xtext.common.Terminals
 
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
-import "platform:/resource/net.sf.orcc.core/model/ir.ecore" as ir
 
 generate cal "http://orcc.sf.net/cal/Cal"
 
@@ -28,13 +27,12 @@ AstActor:
 
 	'end';
 
-AstPort: (irType = [ir::Type]) type=AstType name=ID;
+AstPort: type=AstType name=ID;
 
 AstImport:
 	'import' ('all' tag=AstTag | tag=AstTag ('=' id = ID)?) ';';
 
 AstFunction:
-	(irType = [ir::Type])
 	'function' name=ID
 	'('
 		(parameters += AstVariableDeclaration (',' parameters += AstVariableDeclaration)*)?
@@ -128,7 +126,7 @@ AstInitialize returns AstAction:
 AstInputPattern: port=[AstPort] ':' '[' tokens+=AstToken (',' tokens+=AstToken)* ']'
 	('repeat' repeat=AstExpression)?;
 
-AstToken returns AstVariable: (irType = [ir::Type]) name=ID;
+AstToken returns AstVariable: name=ID;
 
 AstOutputPattern: port=[AstPort] ':' '[' values+=AstExpression (',' values+=AstExpression)* ']'
 	('repeat' repeat=AstExpression)?;
@@ -177,7 +175,7 @@ AstStatement:
 ///////////////////////////////////////////////////////////////////////////////
 
 AstExpression:
-	AstExpressionAnd ((irType = [ir::Type]) {AstExpressionBinary.left=current} operator=('||' | 'or') right=AstExpressionAnd)*;
+	AstExpressionAnd ({AstExpressionBinary.left=current} operator=('||' | 'or') right=AstExpressionAnd)*;
 AstExpressionAnd returns AstExpression:
 	AstExpressionBitor ({AstExpressionBinary.left=current} operator=('&&' | 'and') right=AstExpressionBitor)*;
 AstExpressionBitor returns AstExpression:
@@ -270,7 +268,7 @@ AstTypeString: name='String';
 
 AstTypeUint: name='uint' ('(' 'size' '=' size = AstExpression ')')?;
 
-AstVariableDeclaration returns AstVariable: (irType = [ir::Type]) type=AstType name=ID;
+AstVariableDeclaration returns AstVariable: type=AstType name=ID;
 
 AstValuedVariableDeclaration returns AstVariable:
 	AstVariableDeclaration ((constant?='=' | ':=') value=AstExpression)?;
