@@ -40,7 +40,6 @@ import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.xlim.experimental.transform.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.transforms.Inline;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
