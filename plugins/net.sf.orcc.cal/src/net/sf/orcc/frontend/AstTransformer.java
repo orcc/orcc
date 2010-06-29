@@ -457,7 +457,7 @@ public class AstTransformer {
 		// create the variable to hold the tokens
 		LocalVariable target = new LocalVariable(true, 0,
 				procedure.getLocation(), port.getName(), null,
-				TypeFactory.eINSTANCE.createListType(numTokens, port.getType()));
+				TypeFactory.eINSTANCE.createTypeList(numTokens, port.getType()));
 		procedure.getLocals().add(file, target.getLocation(), target.getName(),
 				target);
 
@@ -591,9 +591,9 @@ public class AstTransformer {
 
 			// creates scheduler and body
 			Procedure scheduler = new Procedure("isSchedulable_" + name,
-					location, TypeFactory.eINSTANCE.createBoolType());
+					location, TypeFactory.eINSTANCE.createTypeBool());
 			Procedure body = new Procedure(name, location,
-					TypeFactory.eINSTANCE.createVoidType());
+					TypeFactory.eINSTANCE.createTypeVoid());
 
 			// fills the patterns and procedures
 			transformAction(astAction, inputPattern, outputPattern, scheduler,
@@ -874,7 +874,7 @@ public class AstTransformer {
 
 		// sets the current procedure
 		procedure = new Procedure(name, location,
-				TypeFactory.eINSTANCE.createVoidType());
+				TypeFactory.eINSTANCE.createTypeVoid());
 
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());

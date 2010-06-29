@@ -33,7 +33,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Bool Type</em>'.
 	 * @generated
 	 */
-	BoolType createBoolType();
+	BoolType createTypeBool();
 
 	/**
 	 * Returns a new object of class '<em>Float Type</em>'. <!-- begin-user-doc
@@ -42,7 +42,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Float Type</em>'.
 	 * @generated
 	 */
-	FloatType createFloatType();
+	FloatType createTypeFloat();
 
 	/**
 	 * Returns a new object of class '<em>Int Type</em>'. <!-- begin-user-doc
@@ -51,7 +51,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Int Type</em>'.
 	 * @generated
 	 */
-	IntType createIntType();
+	IntType createTypeInt();
 
 	/**
 	 * Creates a new integer with the given size.
@@ -59,7 +59,7 @@ public interface TypeFactory extends EFactory {
 	 * @param size
 	 *            the size of this integer type
 	 */
-	IntType createIntType(int size);
+	IntType createTypeInt(int size);
 
 	/**
 	 * Returns a new object of class '<em>List Type</em>'. <!-- begin-user-doc
@@ -68,7 +68,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>List Type</em>'.
 	 * @generated
 	 */
-	ListType createListType();
+	ListType createTypeList();
 
 	/**
 	 * Creates a new list type with the given size and element type.
@@ -78,7 +78,7 @@ public interface TypeFactory extends EFactory {
 	 * @param type
 	 *            the type of this list's elements
 	 */
-	ListType createListType(int size, Type type);
+	ListType createTypeList(int size, Type type);
 
 	/**
 	 * Returns a new object of class '<em>String Type</em>'. <!-- begin-user-doc
@@ -87,7 +87,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>String Type</em>'.
 	 * @generated
 	 */
-	StringType createStringType();
+	StringType createTypeString();
 
 	/**
 	 * Returns a new object of class '<em>Uint Type</em>'. <!-- begin-user-doc
@@ -96,7 +96,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Uint Type</em>'.
 	 * @generated
 	 */
-	UintType createUintType();
+	UintType createTypeUint();
 
 	/**
 	 * Returns a new object of class '<em>Void Type</em>'. <!-- begin-user-doc
@@ -105,7 +105,7 @@ public interface TypeFactory extends EFactory {
 	 * @return a new object of class '<em>Void Type</em>'.
 	 * @generated
 	 */
-	VoidType createVoidType();
+	VoidType createTypeVoid();
 
 	/**
 	 * Returns the package supported by this factory. <!-- begin-user-doc -->

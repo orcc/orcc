@@ -91,11 +91,11 @@ public class TransformConditionals extends AbstractActorTransformation
 		Expression subExpr = unaryExpr.getExpr();
 		if (unaryExpr.getOp() == UnaryOp.LOGIC_NOT && subExpr.isVarExpr()) {
 			return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(false),
-					TypeFactory.eINSTANCE.createBoolType());
+					TypeFactory.eINSTANCE.createTypeBool());
 		} else {
 			subExpr = (Expression) subExpr.accept(this);
 			return new BinaryExpr(subExpr, BinaryOp.EQ, new BoolExpr(false),
-					TypeFactory.eINSTANCE.createBoolType());
+					TypeFactory.eINSTANCE.createTypeBool());
 		}
 	}
 
@@ -103,7 +103,7 @@ public class TransformConditionals extends AbstractActorTransformation
 	public Object interpret(VarExpr expr, Object... args) {
 		if (expr.getType().isBool()) {
 			return new BinaryExpr(expr, BinaryOp.EQ, new BoolExpr(true),
-					TypeFactory.eINSTANCE.createBoolType());
+					TypeFactory.eINSTANCE.createTypeBool());
 		} else {
 			return expr;
 		}

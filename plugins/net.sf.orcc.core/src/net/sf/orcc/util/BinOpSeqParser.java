@@ -82,7 +82,7 @@ public class BinOpSeqParser {
 		Location location = new Location(e1.getLocation(), e2.getLocation());
 
 		return new BinaryExpr(location, e1, op, e2,
-				TypeFactory.eINSTANCE.createVoidType());
+				TypeFactory.eINSTANCE.createTypeVoid());
 	}
 
 	/**

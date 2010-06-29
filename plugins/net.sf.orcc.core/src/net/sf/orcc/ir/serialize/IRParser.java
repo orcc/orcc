@@ -830,11 +830,11 @@ public class IRParser {
 		if (obj instanceof String) {
 			String name = (String) obj;
 			if (name.equals(BoolType.NAME)) {
-				type = TypeFactory.eINSTANCE.createBoolType();
+				type = TypeFactory.eINSTANCE.createTypeBool();
 			} else if (name.equals(StringType.NAME)) {
-				type = TypeFactory.eINSTANCE.createStringType();
+				type = TypeFactory.eINSTANCE.createTypeString();
 			} else if (name.equals(VoidType.NAME)) {
-				type = TypeFactory.eINSTANCE.createVoidType();
+				type = TypeFactory.eINSTANCE.createTypeVoid();
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}
@@ -846,13 +846,13 @@ public class IRParser {
 				Expression expr = parseExpr(array.getJSONArray(1));
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
-				type = TypeFactory.eINSTANCE.createIntType(size);
+				type = TypeFactory.eINSTANCE.createTypeInt(size);
 			} else if (name.equals(UintType.NAME)) {
 				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
-				type = TypeFactory.eINSTANCE.createUintType();
+				type = TypeFactory.eINSTANCE.createTypeUint();
 				((UintType) type).setSize(size);
 			} else if (name.equals(ListType.NAME)) {
 				// FIXME change JSON format back to using integer size
@@ -860,7 +860,7 @@ public class IRParser {
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 				Type subType = parseType(array.get(2));
 
-				type = TypeFactory.eINSTANCE.createListType(size, subType);
+				type = TypeFactory.eINSTANCE.createTypeList(size, subType);
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}

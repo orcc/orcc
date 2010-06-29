@@ -116,7 +116,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 			}
 
 			// Create state variable that contains println arguments
-			StringType type = TypeFactory.eINSTANCE.createStringType();
+			StringType type = TypeFactory.eINSTANCE.createTypeString();
 			type.setSize(value.length() + 1);
 
 			StateVariable variable = new StateVariable(call.getLocation(),

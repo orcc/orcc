@@ -351,7 +351,7 @@ public class XDFParser {
 					String name = eltType.getAttribute("name");
 					if (name.equals(BoolType.NAME)) {
 						return new ParseContinuation<Type>(node,
-								TypeFactory.eINSTANCE.createBoolType());
+								TypeFactory.eINSTANCE.createTypeBool());
 					} else if (name.equals(IntType.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
@@ -359,13 +359,13 @@ public class XDFParser {
 						int size = new ExpressionEvaluator()
 								.evaluateAsInteger(expr);
 						return new ParseContinuation<Type>(node,
-								TypeFactory.eINSTANCE.createIntType(size));
+								TypeFactory.eINSTANCE.createTypeInt(size));
 					} else if (name.equals(ListType.NAME)) {
 						return new ParseContinuation<Type>(node,
 								parseTypeList(node));
 					} else if (name.equals(StringType.NAME)) {
 						return new ParseContinuation<Type>(node,
-								TypeFactory.eINSTANCE.createStringType());
+								TypeFactory.eINSTANCE.createTypeString());
 					} else if (name.equals(UintType.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
@@ -373,7 +373,7 @@ public class XDFParser {
 						int size = new ExpressionEvaluator()
 								.evaluateAsInteger(expr);
 
-						UintType type = TypeFactory.eINSTANCE.createUintType();
+						UintType type = TypeFactory.eINSTANCE.createTypeUint();
 						type.setSize(size);
 						return new ParseContinuation<Type>(node, type);
 					} else {
@@ -454,7 +454,7 @@ public class XDFParser {
 			Type type = entry.getEntryAsType();
 
 			int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-			return TypeFactory.eINSTANCE.createListType(size, type);
+			return TypeFactory.eINSTANCE.createTypeList(size, type);
 		}
 
 		/**

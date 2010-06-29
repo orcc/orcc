@@ -60,12 +60,12 @@ public class TypeConverter extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstTypeBool(AstTypeBool type) {
-		return TypeFactory.eINSTANCE.createBoolType();
+		return TypeFactory.eINSTANCE.createTypeBool();
 	}
 
 	@Override
 	public Type caseAstTypeFloat(AstTypeFloat type) {
-		return TypeFactory.eINSTANCE.createFloatType();
+		return TypeFactory.eINSTANCE.createTypeFloat();
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class TypeConverter extends CalSwitch<Type> {
 		} else {
 			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
-		return TypeFactory.eINSTANCE.createIntType(size);
+		return TypeFactory.eINSTANCE.createTypeInt(size);
 	}
 
 	@Override
@@ -85,12 +85,12 @@ public class TypeConverter extends CalSwitch<Type> {
 		Type type = transformType(listType.getType());
 		AstExpression expression = listType.getSize();
 		int size = new AstExpressionEvaluator().evaluateAsInteger(expression);
-		return TypeFactory.eINSTANCE.createListType(size, type);
+		return TypeFactory.eINSTANCE.createTypeList(size, type);
 	}
 
 	@Override
 	public Type caseAstTypeString(AstTypeString type) {
-		return TypeFactory.eINSTANCE.createStringType();
+		return TypeFactory.eINSTANCE.createTypeString();
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class TypeConverter extends CalSwitch<Type> {
 			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
 
-		UintType uintType = TypeFactory.eINSTANCE.createUintType();
+		UintType uintType = TypeFactory.eINSTANCE.createTypeUint();
 		uintType.setSize(size);
 
 		return uintType;

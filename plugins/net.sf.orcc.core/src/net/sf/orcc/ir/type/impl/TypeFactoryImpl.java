@@ -73,19 +73,19 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 		case TypePackage.BOOL_TYPE:
-			return createBoolType();
+			return createTypeBool();
 		case TypePackage.FLOAT_TYPE:
-			return createFloatType();
+			return createTypeFloat();
 		case TypePackage.INT_TYPE:
-			return createIntType();
+			return createTypeInt();
 		case TypePackage.UINT_TYPE:
-			return createUintType();
+			return createTypeUint();
 		case TypePackage.VOID_TYPE:
-			return createVoidType();
+			return createTypeVoid();
 		case TypePackage.STRING_TYPE:
-			return createStringType();
+			return createTypeString();
 		case TypePackage.LIST_TYPE:
-			return createListType();
+			return createTypeList();
 		default:
 			throw new IllegalArgumentException("The class '" + eClass.getName()
 					+ "' is not a valid classifier");
@@ -97,7 +97,7 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public BoolType createBoolType() {
+	public BoolType createTypeBool() {
 		BoolTypeImpl boolType = new BoolTypeImpl();
 		return boolType;
 	}
@@ -107,7 +107,7 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public FloatType createFloatType() {
+	public FloatType createTypeFloat() {
 		FloatTypeImpl floatType = new FloatTypeImpl();
 		return floatType;
 	}
@@ -117,13 +117,13 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public IntType createIntType() {
+	public IntType createTypeInt() {
 		IntTypeImpl intType = new IntTypeImpl();
 		return intType;
 	}
 
 	@Override
-	public IntType createIntType(int size) {
+	public IntType createTypeInt(int size) {
 		IntTypeImpl intType = new IntTypeImpl();
 		intType.setSize(size);
 		return intType;
@@ -134,13 +134,13 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public ListType createListType() {
+	public ListType createTypeList() {
 		ListTypeImpl listType = new ListTypeImpl();
 		return listType;
 	}
 
 	@Override
-	public ListType createListType(int size, Type type) {
+	public ListType createTypeList(int size, Type type) {
 		ListTypeImpl listType = new ListTypeImpl();
 		listType.setSize(size);
 		listType.setType(type);
@@ -152,7 +152,7 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public StringType createStringType() {
+	public StringType createTypeString() {
 		StringTypeImpl stringType = new StringTypeImpl();
 		return stringType;
 	}
@@ -162,7 +162,7 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public UintType createUintType() {
+	public UintType createTypeUint() {
 		UintTypeImpl uintType = new UintTypeImpl();
 		return uintType;
 	}
@@ -172,7 +172,7 @@ public class TypeFactoryImpl extends EFactoryImpl implements TypeFactory {
 	 * 
 	 * @generated
 	 */
-	public VoidType createVoidType() {
+	public VoidType createTypeVoid() {
 		VoidTypeImpl voidType = new VoidTypeImpl();
 		return voidType;
 	}

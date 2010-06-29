@@ -81,7 +81,7 @@ public class TypeTransformer extends VoidSwitch {
 		if (astRepeat != null) {
 			int repeat = new AstExpressionEvaluator()
 					.evaluateAsInteger(astRepeat);
-			type = TypeFactory.eINSTANCE.createListType(repeat, type);
+			type = TypeFactory.eINSTANCE.createTypeList(repeat, type);
 		}
 
 		for (AstVariable token : input.getTokens()) {

@@ -134,7 +134,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	}
 
 	public static final Procedure print = new Procedure("print", true,
-			new Location(), TypeFactory.eINSTANCE.createVoidType(),
+			new Location(), TypeFactory.eINSTANCE.createTypeVoid(),
 			new OrderedMap<Variable>(), new OrderedMap<Variable>(),
 			new ArrayList<CFGNode>());
 

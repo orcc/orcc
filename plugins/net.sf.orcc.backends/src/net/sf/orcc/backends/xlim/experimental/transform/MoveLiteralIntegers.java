@@ -43,7 +43,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			String name = "lit_bool_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, null, TypeFactory.eINSTANCE.createBoolType());
+					name, null, TypeFactory.eINSTANCE.createTypeBool());
 			locals.add(var.getName(), var);
 
 			it.previous();
@@ -58,7 +58,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			String name = "lit_int_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, null, TypeFactory.eINSTANCE.createIntType(32));
+					name, null, TypeFactory.eINSTANCE.createTypeInt(32));
 
 			locals.add(var.getName(), var);
 

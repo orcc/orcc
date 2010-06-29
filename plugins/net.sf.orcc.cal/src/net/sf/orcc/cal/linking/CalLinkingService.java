@@ -73,28 +73,28 @@ public class CalLinkingService extends DefaultLinkingService {
 		functions = new HashMap<String, AstFunction>();
 
 		addFunction("bitand",
-				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
-						TypeFactory.eINSTANCE.createIntType(32) },
-				TypeFactory.eINSTANCE.createIntType(32));
+				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
+						TypeFactory.eINSTANCE.createTypeInt(32) },
+				TypeFactory.eINSTANCE.createTypeInt(32));
 		addFunction("bitnot",
-				new Type[] { TypeFactory.eINSTANCE.createIntType(32) },
-				TypeFactory.eINSTANCE.createIntType(32));
+				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32) },
+				TypeFactory.eINSTANCE.createTypeInt(32));
 		addFunction("bitor",
-				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
-						TypeFactory.eINSTANCE.createIntType(32) },
-				TypeFactory.eINSTANCE.createIntType(32));
+				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
+						TypeFactory.eINSTANCE.createTypeInt(32) },
+				TypeFactory.eINSTANCE.createTypeInt(32));
 		addFunction("bitxor",
-				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
-						TypeFactory.eINSTANCE.createIntType(32) },
-				TypeFactory.eINSTANCE.createIntType(32));
+				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
+						TypeFactory.eINSTANCE.createTypeInt(32) },
+				TypeFactory.eINSTANCE.createTypeInt(32));
 		addFunction("lshift",
-				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
-						TypeFactory.eINSTANCE.createIntType(32) },
-				TypeFactory.eINSTANCE.createIntType(32));
+				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
+						TypeFactory.eINSTANCE.createTypeInt(32) },
+				TypeFactory.eINSTANCE.createTypeInt(32));
 		addFunction("rshift",
-				new Type[] { TypeFactory.eINSTANCE.createIntType(32),
-						TypeFactory.eINSTANCE.createIntType(32) },
-				TypeFactory.eINSTANCE.createIntType(32));
+				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
+						TypeFactory.eINSTANCE.createTypeInt(32) },
+				TypeFactory.eINSTANCE.createTypeInt(32));
 
 		procedures = new HashMap<String, AstProcedure>();
 

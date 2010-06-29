@@ -79,7 +79,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 			use = new Use(varCount);
 			Store store = new Store(varCount, indexes, new BinaryExpr(
 					new VarExpr(use), BinaryOp.PLUS, new IntExpr(1),
-					TypeFactory.eINSTANCE.createIntType(32)));
+					TypeFactory.eINSTANCE.createTypeInt(32)));
 			use.setNode(store);
 
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];

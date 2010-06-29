@@ -78,7 +78,7 @@ public class ListExpr extends AbstractExpression {
 			}
 		}
 
-		return TypeFactory.eINSTANCE.createListType(value.size(), refType);
+		return TypeFactory.eINSTANCE.createTypeList(value.size(), refType);
 	}
 
 	public List<Expression> getValue() {

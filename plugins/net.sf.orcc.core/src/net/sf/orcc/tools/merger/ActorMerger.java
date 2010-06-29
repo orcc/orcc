@@ -136,11 +136,11 @@ public class ActorMerger implements INetworkTransformation {
 
 			Expression expr = new BinaryExpr(new IntExpr(entry.getValue()),
 					BinaryOp.TIMES, new VarExpr(new Use(loopVar)),
-					TypeFactory.eINSTANCE.createIntType(32));
+					TypeFactory.eINSTANCE.createTypeInt(32));
 
 			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
 					BinaryOp.PLUS, expr,
-					TypeFactory.eINSTANCE.createIntType(32));
+					TypeFactory.eINSTANCE.createTypeInt(32));
 
 			params.add(param);
 		}
@@ -157,11 +157,11 @@ public class ActorMerger implements INetworkTransformation {
 
 			Expression expr = new BinaryExpr(new IntExpr(entry.getValue()),
 					BinaryOp.TIMES, new VarExpr(new Use(loopVar)),
-					TypeFactory.eINSTANCE.createIntType(32));
+					TypeFactory.eINSTANCE.createTypeInt(32));
 
 			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
 					BinaryOp.PLUS, expr,
-					TypeFactory.eINSTANCE.createIntType(32));
+					TypeFactory.eINSTANCE.createTypeInt(32));
 
 			params.add(param);
 		}
@@ -184,7 +184,7 @@ public class ActorMerger implements INetworkTransformation {
 		for (Map.Entry<Port, Integer> entry : inputPattern.entrySet()) {
 			Port port = entry.getKey();
 			if (!parameters.contains(port)) {
-				Type type = TypeFactory.eINSTANCE.createListType(
+				Type type = TypeFactory.eINSTANCE.createTypeList(
 						entry.getValue(), port.getType());
 				LocalVariable param = new LocalVariable(false, 0,
 						new Location(), port.getName(), null, type);
@@ -196,7 +196,7 @@ public class ActorMerger implements INetworkTransformation {
 
 		for (Map.Entry<Port, Integer> entry : outputPattern.entrySet()) {
 			Port port = entry.getKey();
-			Type type = TypeFactory.eINSTANCE.createListType(entry.getValue(),
+			Type type = TypeFactory.eINSTANCE.createTypeList(entry.getValue(),
 					port.getType());
 			LocalVariable param = new LocalVariable(false, 0, new Location(),
 					port.getName(), null, type);
@@ -204,7 +204,7 @@ public class ActorMerger implements INetworkTransformation {
 		}
 
 		return new Procedure(action.getName(), false, new Location(),
-				TypeFactory.eINSTANCE.createVoidType(), parameters, locals,
+				TypeFactory.eINSTANCE.createTypeVoid(), parameters, locals,
 				nodes);
 	}
 
@@ -271,7 +271,7 @@ public class ActorMerger implements INetworkTransformation {
 		loopVariables = new OrderedMap<Variable>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, new Location(),
-				TypeFactory.eINSTANCE.createVoidType(),
+				TypeFactory.eINSTANCE.createTypeVoid(),
 				new OrderedMap<Variable>(), loopVariables, nodes);
 
 		createInternalBuffers();
@@ -300,7 +300,7 @@ public class ActorMerger implements INetworkTransformation {
 				LocalVariable thisOne = (LocalVariable) it.next();
 				value = new BinaryExpr(value, BinaryOp.LOGIC_AND, new VarExpr(
 						new Use(thisOne, block)),
-						TypeFactory.eINSTANCE.createBoolType());
+						TypeFactory.eINSTANCE.createTypeBool());
 				previous = thisOne;
 			}
 		} else {
@@ -323,7 +323,7 @@ public class ActorMerger implements INetworkTransformation {
 			Location location = new Location();
 			int numTokens = port.getNumTokensConsumed();
 			LocalVariable varDef = new LocalVariable(true, i, new Location(),
-					"pattern", null, TypeFactory.eINSTANCE.createBoolType());
+					"pattern", null, TypeFactory.eINSTANCE.createTypeBool());
 			i++;
 			variables.add(varDef.getName(), varDef);
 			HasTokens hasTokens = new HasTokens(location, port, numTokens,
@@ -346,7 +346,7 @@ public class ActorMerger implements INetworkTransformation {
 			Connection connection = entry.getKey();
 			int size = entry.getValue();
 			String name = "buf_" + index;
-			Type type = TypeFactory.eINSTANCE.createListType(size, connection
+			Type type = TypeFactory.eINSTANCE.createTypeList(size, connection
 					.getSource().getType());
 			Variable buf = new LocalVariable(true, 0, new Location(), name,
 					null, type);
@@ -404,7 +404,7 @@ public class ActorMerger implements INetworkTransformation {
 
 					Expression binopExpr = new BinaryExpr(new VarExpr(new Use(
 							counter)), BinaryOp.PLUS, new IntExpr(1),
-							TypeFactory.eINSTANCE.createIntType(32));
+							TypeFactory.eINSTANCE.createTypeInt(32));
 					blkNode.add(new Call(new Location(), null, proc, parameters));
 					blkNode.add(new Assign(counter, binopExpr));
 					nodes.add(blkNode);
@@ -418,7 +418,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				LocalVariable loopVar = new LocalVariable(true, 0,
 						new Location(), "idx_" + index, null,
-						TypeFactory.eINSTANCE.createIntType(32));
+						TypeFactory.eINSTANCE.createTypeInt(32));
 
 				if (indexes.size() <= index) {
 					indexes.add(loopVar);
@@ -440,7 +440,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				Expression condition = new BinaryExpr(new VarExpr(new Use(
 						loopVar)), BinaryOp.LT, new IntExpr(interationCount),
-						TypeFactory.eINSTANCE.createBoolType());
+						TypeFactory.eINSTANCE.createTypeBool());
 				whileNode.setValue(condition);
 
 				nodes.add(whileNode);
@@ -479,7 +479,7 @@ public class ActorMerger implements INetworkTransformation {
 		variables = new OrderedMap<Variable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 		Procedure procedure = new Procedure(SCHEDULER_NAME, false, location,
-				TypeFactory.eINSTANCE.createBoolType(),
+				TypeFactory.eINSTANCE.createTypeBool(),
 				new OrderedMap<Variable>(), variables, nodes);
 		BlockNode block = new BlockNode(procedure);
 		nodes.add(block);
@@ -519,7 +519,7 @@ public class ActorMerger implements INetworkTransformation {
 				actor.getInputs().add(port.getName(), port);
 
 				int size = port.getNumTokensConsumed();
-				Type type = TypeFactory.eINSTANCE.createListType(size,
+				Type type = TypeFactory.eINSTANCE.createTypeList(size,
 						port.getType());
 				Variable var = new LocalVariable(true, 0, new Location(),
 						port.getName(), null, type);
@@ -547,7 +547,7 @@ public class ActorMerger implements INetworkTransformation {
 				actor.getOutputs().add(port.getName(), port);
 
 				int size = port.getNumTokensProduced();
-				Type type = TypeFactory.eINSTANCE.createListType(size,
+				Type type = TypeFactory.eINSTANCE.createTypeList(size,
 						port.getType());
 				Variable var = new LocalVariable(true, 0, new Location(),
 						port.getName(), null, type);

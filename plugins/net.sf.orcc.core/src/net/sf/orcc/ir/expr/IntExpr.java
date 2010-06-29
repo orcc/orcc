@@ -98,7 +98,7 @@ public class IntExpr extends AbstractExpression {
 			size = (int) Math.ceil(Math.log(-value) / Math.log(2.0)) + 1;
 		}
 
-		return TypeFactory.eINSTANCE.createIntType(size);
+		return TypeFactory.eINSTANCE.createTypeInt(size);
 	}
 
 	public int getValue() {

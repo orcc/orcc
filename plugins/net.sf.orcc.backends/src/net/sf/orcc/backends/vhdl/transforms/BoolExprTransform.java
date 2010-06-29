@@ -145,7 +145,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	 */
 	private LocalVariable newVariable() {
 		return new LocalVariable(true, tempVarCount++, new Location(),
-				"bool_expr", null, TypeFactory.eINSTANCE.createBoolType());
+				"bool_expr", null, TypeFactory.eINSTANCE.createTypeBool());
 	}
 
 	@Override

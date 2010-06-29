@@ -64,7 +64,7 @@ public class StringExpr extends AbstractExpression {
 
 	@Override
 	public Type getType() {
-		return TypeFactory.eINSTANCE.createStringType();
+		return TypeFactory.eINSTANCE.createTypeString();
 	}
 
 	public String getValue() {

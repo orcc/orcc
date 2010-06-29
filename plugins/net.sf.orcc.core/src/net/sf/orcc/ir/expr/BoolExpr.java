@@ -64,7 +64,7 @@ public class BoolExpr extends AbstractExpression {
 
 	@Override
 	public Type getType() {
-		return TypeFactory.eINSTANCE.createBoolType();
+		return TypeFactory.eINSTANCE.createTypeBool();
 	}
 
 	public boolean getValue() {
