@@ -180,7 +180,25 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionIf(AstExpressionIf expression) {
-			return new IntExpr(42);
+			Location location = Util.getLocation(expression);
+
+			Expression condition = transformExpression(expression
+					.getCondition());
+
+			LocalVariable target = newTempLocalVariable(expression.getIrType(),
+					"_tmp_if");
+
+			// transforms "then" statements and "else" statements
+			List<CFGNode> thenNodes = getNodes(target, expression.getThen());
+			List<CFGNode> elseNodes = getNodes(target, expression.getElse());
+
+			IfNode node = new IfNode(location, procedure, condition, thenNodes,
+					elseNodes, new BlockNode(procedure));
+			procedure.getNodes().add(node);
+
+			Use use = new Use(target);
+			Expression varExpr = new VarExpr(location, use);
+			return varExpr;
 		}
 
 		@Override
@@ -250,6 +268,38 @@ public class AstTransformer {
 			}
 
 			return (LocalVariable) variable;
+		}
+
+		/**
+		 * Returns a list of CFG nodes from the given list of statements. This
+		 * method creates a new block node to hold the statements, transforms
+		 * the statements, and transfers the nodes created to a new list that is
+		 * the result.
+		 * 
+		 * @param statements
+		 *            a list of statements
+		 * @return a list of CFG nodes
+		 */
+		private List<CFGNode> getNodes(LocalVariable target,
+				AstExpression astExpression) {
+			Location location = Util.getLocation(astExpression);
+			List<CFGNode> nodes = procedure.getNodes();
+
+			int first = nodes.size();
+			nodes.add(new BlockNode(procedure));
+
+			Expression value = transformExpression(astExpression);
+			Assign assign = new Assign(location, target, value);
+			addInstruction(assign);
+
+			int last = nodes.size();
+
+			// moves selected CFG nodes from "nodes" list to resultNodes
+			List<CFGNode> subList = nodes.subList(first, last);
+			List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
+			subList.clear();
+
+			return resultNodes;
 		}
 
 		private Expression transformBuiltinFunction(AstExpressionCall astCall) {
@@ -518,7 +568,6 @@ public class AstTransformer {
 	private void actionStoreTokens(LocalVariable portVariable,
 			List<AstExpression> values, int repeat) {
 		if (repeat == 1) {
-			BlockNode block = BlockNode.getLast(procedure);
 			int i = 0;
 
 			for (AstExpression expression : values) {
@@ -527,7 +576,7 @@ public class AstTransformer {
 
 				Expression value = transformExpression(expression);
 				Store store = new Store(portVariable, indexes, value);
-				block.add(store);
+				addInstruction(store);
 
 				i++;
 			}
