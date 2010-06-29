@@ -452,7 +452,7 @@ public class AstTransformer {
 	/**
 	 * A map from AST variables to IR variables.
 	 */
-	final private Scope<AstVariable, Variable> variablesMap;
+	private Scope<AstVariable, Variable> variablesMap;
 
 	/**
 	 * Creates a new AST to IR transformation.
@@ -687,10 +687,17 @@ public class AstTransformer {
 		// current procedure is the body
 		procedure = body;
 
+		// create a new scope that extends variablesMap
+		Scope<AstVariable, Variable> current = variablesMap;
+		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
+
 		transformInputPattern(astAction, inputPattern);
 		transformLocalVariables(astAction.getVariables());
 		transformStatements(astAction.getStatements());
 		transformOutputPattern(astAction, outputPattern);
+
+		// restore previous scope
+		variablesMap = current;
 	}
 
 	/**
@@ -786,9 +793,16 @@ public class AstTransformer {
 		// sets the current procedure
 		procedure = new Procedure(name, location, type);
 
+		// create a new scope that extends variablesMap
+		Scope<AstVariable, Variable> current = variablesMap;
+		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
+
 		transformParameters(astFunction.getParameters());
 		transformLocalVariables(astFunction.getVariables());
 		transformExpression(astFunction.getExpression());
+
+		// restore previous scope
+		variablesMap = current;
 
 		procedures.put(file, location, name, procedure);
 		functionsMap.put(astFunction, procedure);
@@ -1007,9 +1021,16 @@ public class AstTransformer {
 		procedure = new Procedure(name, location,
 				IrFactory.eINSTANCE.createTypeVoid());
 
+		// create a new scope that extends variablesMap
+		Scope<AstVariable, Variable> current = variablesMap;
+		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
+
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
 		transformStatements(astProcedure.getStatements());
+
+		// restore previous scope
+		variablesMap = current;
 
 		procedures.put(file, location, name, procedure);
 		proceduresMap.put(astProcedure, procedure);
