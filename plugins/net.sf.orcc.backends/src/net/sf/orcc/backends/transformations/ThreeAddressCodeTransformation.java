@@ -261,19 +261,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	public void transform(Actor actor) {
-		// Transform boolean Port into int port (to be remove later)
-		for (Port port : actor.getInputs()) {
-			if (port.getType().isBool()) {
-				port.setType(TypeFactory.eINSTANCE.createIntType(32));
-			}
-		}
-
-		for (Port port : actor.getOutputs()) {
-			if (port.getType().isBool()) {
-				port.setType(TypeFactory.eINSTANCE.createIntType(32));
-			}
-		}
-
 		// Visit procedure
 		for (Procedure proc : actor.getProcs()) {
 			visitProcedure(proc);
