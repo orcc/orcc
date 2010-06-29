@@ -104,9 +104,10 @@ actor Algo_RefList ()
 	int (size=32) LastFrameNum             := 0;
 
 	/*Delete this variables !!!*/
-	uint(size=4) ValidxRefList             := 0;
+	int(size=5) ValidxRefList             := 0;
 	bool         idx_found                 := false;
 	bool frame_found := false;
+	int ValMovedIdx                 := 0;
 	
 
 	procedure InsertPoc(uint(size=6) IdxPOC, int(size=32) ValPOC, int(size=32) ValFrameNum, int(size=32) ValIdxLT)
@@ -212,8 +213,8 @@ actor Algo_RefList ()
 			NbSTRead       := 0;
 			NbSTCount      := ValSzSTList;
 			ValMovedFrame  := frame_num;
-//		println("");
-//		println("Frame num ::"+frame_num);	
+		println("");
+		println("Frame num ::"+frame_num);	
 		end
 
 	//Fill the Long Term List
@@ -411,9 +412,8 @@ ValidxRefList := 0;//////
 				==>
 		guard 
 			(reordering_of_pic_nums_idc = 0 or reordering_of_pic_nums_idc = 1) 
-		var 
-			int ValMovedIdx                 := 0
-			
+		var
+			bool IsInRefList := false
 		do
 			//Compute the value of the re-mapped reference picture
 			if (reordering_of_pic_nums_idc = 0) then 
@@ -427,16 +427,28 @@ ValidxRefList := 0;//////
 					ValMovedFrame := ValMovedFrame - ValMaxFrameNum;
 				end
 			end
-		ValidxRefList:=0;
+		ValidxRefList:=-1;
+		ValMovedIdx  := 0;
 			//Search the location of the reference picture (ValMovedFrame) in the RefList
 			foreach int i in Integers(0, NumMaxListRefFrame-1)
 			do
 				if (FrameNumList[RefIdx[i]] = ValMovedFrame) then 
 					ValidxRefList  := i;
 					ValMovedIdx := RefIdx[i];
+					if(ValidxRefList > IdxInsertFrame) then
+						IsInRefList := true;
+					end
 				end
 			end
-			if(ValidxRefList > IdxInsertFrame) then
+			if(ValidxRefList = -1) then
+				foreach int i in Integers(0, NbPOC - 1)
+				do
+					if (FrameNumList[i] = ValMovedFrame) then 
+						ValMovedIdx    := i;
+					end
+				end
+			end
+			if(IsInRefList) then
 				//Shift to the right all the element with an index between 
 				//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
 				//Thanks to this shift, the short term reference picture located at idxRefList is deleted.
@@ -444,9 +456,9 @@ ValidxRefList := 0;//////
 				do
 					RefIdx[ValidxRefList - i] := RefIdx[ValidxRefList - i - 1];
 				end
-				//Put the short term ref picture in his new position
-				RefIdx[IdxInsertFrame] := ValMovedIdx;
 			end
+			//Put the short term ref picture in his new position
+			RefIdx[IdxInsertFrame] := ValMovedIdx;
 			//The next reference picture will be insert next to this ref picture
 			IdxInsertFrame             := IdxInsertFrame +1 ;
 		end
@@ -500,7 +512,7 @@ ValidxRefList := 0;//////
 		var
 			int (size = 32) poc := -1
 		do
-//println("poc:"+POCList[RefIdx[CounterRefListTab]]+"; frnum:"+FrameNumList[RefIdx[CounterRefListTab]]+"; idx"+RefIdx[CounterRefListTab]);
+println("poc:"+POCList[RefIdx[CounterRefListTab]]+"; frnum:"+FrameNumList[RefIdx[CounterRefListTab]]+"; idx"+RefIdx[CounterRefListTab]);
 			poc := POCList[RefIdx[CounterRefListTab]];
 			CounterRefListTab := CounterRefListTab + 1;
 		end

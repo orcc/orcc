@@ -6259,9 +6259,14 @@ end
 	end
 
 	//else (nal_ref_idc == 0)
-	read_SliceH_skip_dec_ref_pic_marking: action ==>
+	read_SliceH_skip_dec_ref_pic_marking: action ==> MMCO :[0,0]
 	guard
-		nal_ref_idc = 0
+		nal_ref_idc = 0, first_mb_in_slice=0
+	end	
+
+	skip_read_SliceH_skip_dec_ref_pic_marking: action ==>
+	guard
+		nal_ref_idc = 0, first_mb_in_slice!=0
 	end
 	//end if
 	//******* End of dec_ref_pic_marking  ********/
@@ -9450,6 +9455,7 @@ end
 		read_SliceH_check_mmco_done							( skip_read_SliceH_max_long_term_frame_idx_plus1_done	) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( read_SliceH_mmco_5								) --> read_SliceH_check_mmco;
 		read_SliceH_dec_ref_pic_marking						( read_SliceH_skip_dec_ref_pic_marking				) --> read_SliceH_cabac_init_idc;
+		read_SliceH_dec_ref_pic_marking						( skip_read_SliceH_skip_dec_ref_pic_marking			) --> read_SliceH_cabac_init_idc;
 
 		read_SliceH_cabac_init_idc							( read_SliceH_cabac_init_idc						) --> read_SliceH_cabac_init_idc_done;
 		read_SliceH_cabac_init_idc_done						( read_SliceH_cabac_init_idc_done	                ) --> read_SliceH_slice_qp_delta_done;
