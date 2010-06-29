@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines an integer expression.
@@ -98,7 +98,7 @@ public class IntExpr extends AbstractExpression {
 			size = (int) Math.ceil(Math.log(-value) / Math.log(2.0)) + 1;
 		}
 
-		return TypeFactory.eINSTANCE.createTypeInt(size);
+		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
 
 	public int getValue() {

@@ -36,8 +36,8 @@ import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.util.VoidSwitch;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines an AST type to IR type transformer.
@@ -81,7 +81,7 @@ public class TypeTransformer extends VoidSwitch {
 		if (astRepeat != null) {
 			int repeat = new AstExpressionEvaluator()
 					.evaluateAsInteger(astRepeat);
-			type = TypeFactory.eINSTANCE.createTypeList(repeat, type);
+			type = IrFactory.eINSTANCE.createTypeList(repeat, type);
 		}
 
 		for (AstVariable token : input.getTokens()) {

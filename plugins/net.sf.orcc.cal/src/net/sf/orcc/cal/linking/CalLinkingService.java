@@ -40,8 +40,8 @@ import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.TypeFactory;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
@@ -73,28 +73,28 @@ public class CalLinkingService extends DefaultLinkingService {
 		functions = new HashMap<String, AstFunction>();
 
 		addFunction("bitand",
-				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
-						TypeFactory.eINSTANCE.createTypeInt(32) },
-				TypeFactory.eINSTANCE.createTypeInt(32));
+				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
+						IrFactory.eINSTANCE.createTypeInt(32) },
+				IrFactory.eINSTANCE.createTypeInt(32));
 		addFunction("bitnot",
-				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32) },
-				TypeFactory.eINSTANCE.createTypeInt(32));
+				new Type[] { IrFactory.eINSTANCE.createTypeInt(32) },
+				IrFactory.eINSTANCE.createTypeInt(32));
 		addFunction("bitor",
-				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
-						TypeFactory.eINSTANCE.createTypeInt(32) },
-				TypeFactory.eINSTANCE.createTypeInt(32));
+				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
+						IrFactory.eINSTANCE.createTypeInt(32) },
+				IrFactory.eINSTANCE.createTypeInt(32));
 		addFunction("bitxor",
-				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
-						TypeFactory.eINSTANCE.createTypeInt(32) },
-				TypeFactory.eINSTANCE.createTypeInt(32));
+				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
+						IrFactory.eINSTANCE.createTypeInt(32) },
+				IrFactory.eINSTANCE.createTypeInt(32));
 		addFunction("lshift",
-				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
-						TypeFactory.eINSTANCE.createTypeInt(32) },
-				TypeFactory.eINSTANCE.createTypeInt(32));
+				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
+						IrFactory.eINSTANCE.createTypeInt(32) },
+				IrFactory.eINSTANCE.createTypeInt(32));
 		addFunction("rshift",
-				new Type[] { TypeFactory.eINSTANCE.createTypeInt(32),
-						TypeFactory.eINSTANCE.createTypeInt(32) },
-				TypeFactory.eINSTANCE.createTypeInt(32));
+				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
+						IrFactory.eINSTANCE.createTypeInt(32) },
+				IrFactory.eINSTANCE.createTypeInt(32));
 
 		procedures = new HashMap<String, AstProcedure>();
 

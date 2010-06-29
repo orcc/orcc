@@ -6,6 +6,7 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -23,7 +24,6 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.util.OrderedMap;
 
 public class MoveLiteralIntegers extends AbstractActorTransformation {
@@ -43,7 +43,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			String name = "lit_bool_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, null, TypeFactory.eINSTANCE.createTypeBool());
+					name, null, IrFactory.eINSTANCE.createTypeBool());
 			locals.add(var.getName(), var);
 
 			it.previous();
@@ -58,7 +58,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			String name = "lit_int_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, null, TypeFactory.eINSTANCE.createTypeInt(32));
+					name, null, IrFactory.eINSTANCE.createTypeInt(32));
 
 			locals.add(var.getName(), var);
 

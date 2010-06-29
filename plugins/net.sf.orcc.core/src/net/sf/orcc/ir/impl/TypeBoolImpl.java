@@ -7,9 +7,9 @@
 package net.sf.orcc.ir.impl;
 
 
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypePackage;
 import net.sf.orcc.ir.type.TypeVisitor;
 
 import org.eclipse.emf.ecore.EClass;
@@ -37,7 +37,7 @@ public class TypeBoolImpl extends TypeImpl implements TypeBool {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return TypePackage.Literals.BOOL_TYPE;
+		return IrPackage.Literals.TYPE_BOOL;
 	}
 
 	@Override

@@ -28,13 +28,14 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeString;
-import net.sf.orcc.ir.type.TypePackage;
+import net.sf.orcc.ir.type.TypeInterpreter;
+import net.sf.orcc.ir.type.TypeVisitor;
+
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypeVisitor;
 
 /**
  * This class defines a String type.
@@ -87,7 +88,7 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case TypePackage.STRING_TYPE__SIZE:
+			case IrPackage.TYPE_STRING__SIZE:
 				return getSize();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -100,7 +101,7 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case TypePackage.STRING_TYPE__SIZE:
+			case IrPackage.TYPE_STRING__SIZE:
 				return size != SIZE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
@@ -118,7 +119,7 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case TypePackage.STRING_TYPE__SIZE:
+			case IrPackage.TYPE_STRING__SIZE:
 				setSize((Integer)newValue);
 				return;
 		}
@@ -131,7 +132,7 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return TypePackage.Literals.STRING_TYPE;
+		return IrPackage.Literals.TYPE_STRING;
 	}
 
 	/**
@@ -141,7 +142,7 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case TypePackage.STRING_TYPE__SIZE:
+			case IrPackage.TYPE_STRING__SIZE:
 				setSize(SIZE_EDEFAULT);
 				return;
 		}
@@ -169,7 +170,7 @@ public class TypeStringImpl extends TypeImpl implements TypeString {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.STRING_TYPE__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_STRING__SIZE, oldSize, size));
 	}
 
 	@Override

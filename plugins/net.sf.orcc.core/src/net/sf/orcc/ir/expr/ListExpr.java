@@ -31,9 +31,9 @@ package net.sf.orcc.ir.expr;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines a list expression. This kind of expression is only present
@@ -78,7 +78,7 @@ public class ListExpr extends AbstractExpression {
 			}
 		}
 
-		return TypeFactory.eINSTANCE.createTypeList(value.size(), refType);
+		return IrFactory.eINSTANCE.createTypeList(value.size(), refType);
 	}
 
 	public List<Expression> getValue() {

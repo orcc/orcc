@@ -35,6 +35,7 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -48,7 +49,6 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines an actor transformation that transforms assignments whose
@@ -145,7 +145,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	 */
 	private LocalVariable newVariable() {
 		return new LocalVariable(true, tempVarCount++, new Location(),
-				"bool_expr", null, TypeFactory.eINSTANCE.createTypeBool());
+				"bool_expr", null, IrFactory.eINSTANCE.createTypeBool());
 	}
 
 	@Override

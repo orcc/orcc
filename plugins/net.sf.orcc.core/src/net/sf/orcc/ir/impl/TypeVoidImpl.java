@@ -28,10 +28,11 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.type.TypePackage;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypeVisitor;
+
 import org.eclipse.emf.ecore.EClass;
 
 /**
@@ -74,7 +75,7 @@ public class TypeVoidImpl extends TypeImpl implements TypeVoid {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return TypePackage.Literals.VOID_TYPE;
+		return IrPackage.Literals.TYPE_VOID;
 	}
 
 	@Override

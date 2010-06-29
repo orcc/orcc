@@ -76,6 +76,34 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 				return createTypeAdapter();
 			}
 			@Override
+			public Adapter caseTypeBool(TypeBool object) {
+				return createTypeBoolAdapter();
+			}
+			@Override
+			public Adapter caseTypeFloat(TypeFloat object) {
+				return createTypeFloatAdapter();
+			}
+			@Override
+			public Adapter caseTypeInt(TypeInt object) {
+				return createTypeIntAdapter();
+			}
+			@Override
+			public Adapter caseTypeList(TypeList object) {
+				return createTypeListAdapter();
+			}
+			@Override
+			public Adapter caseTypeString(TypeString object) {
+				return createTypeStringAdapter();
+			}
+			@Override
+			public Adapter caseTypeUint(TypeUint object) {
+				return createTypeUintAdapter();
+			}
+			@Override
+			public Adapter caseTypeVoid(TypeVoid object) {
+				return createTypeVoidAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -106,6 +134,104 @@ public class IrAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createTypeAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeBool <em>Type Bool</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.TypeBool
+	 * @generated
+	 */
+	public Adapter createTypeBoolAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeFloat <em>Type Float</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.TypeFloat
+	 * @generated
+	 */
+	public Adapter createTypeFloatAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeInt <em>Type Int</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.TypeInt
+	 * @generated
+	 */
+	public Adapter createTypeIntAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeList <em>Type List</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.TypeList
+	 * @generated
+	 */
+	public Adapter createTypeListAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeString <em>Type String</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.TypeString
+	 * @generated
+	 */
+	public Adapter createTypeStringAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeUint <em>Type Uint</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.TypeUint
+	 * @generated
+	 */
+	public Adapter createTypeUintAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link net.sf.orcc.ir.TypeVoid <em>Type Void</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see net.sf.orcc.ir.TypeVoid
+	 * @generated
+	 */
+	public Adapter createTypeVoidAdapter() {
 		return null;
 	}
 

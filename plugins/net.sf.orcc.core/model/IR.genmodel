@@ -17,26 +17,23 @@
       <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute ir.ecore#//Type/uint"/>
       <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute ir.ecore#//Type/void"/>
     </genClasses>
-  </genPackages>
-  <genPackages prefix="Type" basePackage="net.sf.orcc.ir" disposableProviderFactory="true"
-      ecorePackage="type.ecore#/">
-    <genClasses ecoreClass="type.ecore#//BoolType"/>
-    <genClasses ecoreClass="type.ecore#//FloatType"/>
-    <genClasses ecoreClass="type.ecore#//IntType">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute type.ecore#//IntType/size"/>
+    <genClasses ecoreClass="ir.ecore#//TypeBool"/>
+    <genClasses ecoreClass="ir.ecore#//TypeFloat"/>
+    <genClasses ecoreClass="ir.ecore#//TypeInt">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ir.ecore#//TypeInt/size"/>
     </genClasses>
-    <genClasses ecoreClass="type.ecore#//UintType">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute type.ecore#//UintType/size"/>
+    <genClasses ecoreClass="ir.ecore#//TypeList">
+      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference ir.ecore#//TypeList/elementType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ir.ecore#//TypeList/size"/>
+      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute ir.ecore#//TypeList/sizeIterator"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference ir.ecore#//TypeList/type"/>
     </genClasses>
-    <genClasses ecoreClass="type.ecore#//VoidType"/>
-    <genClasses ecoreClass="type.ecore#//StringType">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute type.ecore#//StringType/size"/>
+    <genClasses ecoreClass="ir.ecore#//TypeString">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ir.ecore#//TypeString/size"/>
     </genClasses>
-    <genClasses ecoreClass="type.ecore#//ListType">
-      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference type.ecore#//ListType/elementType"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute type.ecore#//ListType/size"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute type.ecore#//ListType/sizeIterator"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference type.ecore#//ListType/type"/>
+    <genClasses ecoreClass="ir.ecore#//TypeUint">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute ir.ecore#//TypeUint/size"/>
     </genClasses>
+    <genClasses ecoreClass="ir.ecore#//TypeVoid"/>
   </genPackages>
 </genmodel:GenModel>

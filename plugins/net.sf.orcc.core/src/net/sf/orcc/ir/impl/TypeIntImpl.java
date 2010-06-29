@@ -28,12 +28,12 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypePackage;
-import org.eclipse.emf.common.notify.Notification;
 import net.sf.orcc.ir.type.TypeVisitor;
 
+import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 
@@ -82,7 +82,7 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case TypePackage.INT_TYPE__SIZE:
+			case IrPackage.TYPE_INT__SIZE:
 				return getSize();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -95,7 +95,7 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case TypePackage.INT_TYPE__SIZE:
+			case IrPackage.TYPE_INT__SIZE:
 				return size != SIZE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
@@ -117,7 +117,7 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case TypePackage.INT_TYPE__SIZE:
+			case IrPackage.TYPE_INT__SIZE:
 				setSize((Integer)newValue);
 				return;
 		}
@@ -130,7 +130,7 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return TypePackage.Literals.INT_TYPE;
+		return IrPackage.Literals.TYPE_INT;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case TypePackage.INT_TYPE__SIZE:
+			case IrPackage.TYPE_INT__SIZE:
 				setSize(SIZE_EDEFAULT);
 				return;
 		}
@@ -173,7 +173,7 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.INT_TYPE__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_INT__SIZE, oldSize, size));
 	}
 
 	@Override

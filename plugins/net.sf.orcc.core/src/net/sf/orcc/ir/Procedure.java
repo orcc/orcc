@@ -43,7 +43,6 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.util.INameable;
 import net.sf.orcc.util.OrderedMap;
 
@@ -134,7 +133,7 @@ public class Procedure extends AbstractLocalizable implements INameable {
 	}
 
 	public static final Procedure print = new Procedure("print", true,
-			new Location(), TypeFactory.eINSTANCE.createTypeVoid(),
+			new Location(), IrFactory.eINSTANCE.createTypeVoid(),
 			new OrderedMap<Variable>(), new OrderedMap<Variable>(),
 			new ArrayList<CFGNode>());
 

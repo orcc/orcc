@@ -28,11 +28,12 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeFloat;
-import net.sf.orcc.ir.type.TypePackage;
-import org.eclipse.emf.ecore.EClass;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypeVisitor;
+
+import org.eclipse.emf.ecore.EClass;
 
 /**
  * This class defines a float type.
@@ -58,7 +59,7 @@ public class TypeFloatImpl extends TypeImpl implements TypeFloat {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return TypePackage.Literals.FLOAT_TYPE;
+		return IrPackage.Literals.TYPE_FLOAT;
 	}
 
 	@Override

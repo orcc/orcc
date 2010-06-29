@@ -56,11 +56,6 @@
             genModel="model/IR.genmodel"
             uri="platform:/resource/net.sf.orcc.core/model/ir.ecore">
       </package>
-      <package
-            class="net.sf.orcc.ir.type.TypePackage"
-            genModel="model/IR.genmodel"
-            uri="platform:/resource/net.sf.orcc.core/model/type.ecore">
-      </package>
    </extension>
 
 </plugin>

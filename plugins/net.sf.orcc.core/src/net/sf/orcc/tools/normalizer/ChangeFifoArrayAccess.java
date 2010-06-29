@@ -35,6 +35,7 @@ import java.util.ListIterator;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -45,7 +46,6 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -79,7 +79,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 			use = new Use(varCount);
 			Store store = new Store(varCount, indexes, new BinaryExpr(
 					new VarExpr(use), BinaryOp.PLUS, new IntExpr(1),
-					TypeFactory.eINSTANCE.createTypeInt(32)));
+					IrFactory.eINSTANCE.createTypeInt(32)));
 			use.setNode(store);
 
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];

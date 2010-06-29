@@ -32,10 +32,10 @@ import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines a parser of binary operation sequences. This parser
@@ -82,7 +82,7 @@ public class BinOpSeqParser {
 		Location location = new Location(e1.getLocation(), e2.getLocation());
 
 		return new BinaryExpr(location, e1, op, e2,
-				TypeFactory.eINSTANCE.createTypeVoid());
+				IrFactory.eINSTANCE.createTypeVoid());
 	}
 
 	/**

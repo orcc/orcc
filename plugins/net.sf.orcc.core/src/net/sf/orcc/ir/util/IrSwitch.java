@@ -93,6 +93,55 @@ public class IrSwitch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case IrPackage.TYPE_BOOL: {
+				TypeBool typeBool = (TypeBool)theEObject;
+				T result = caseTypeBool(typeBool);
+				if (result == null) result = caseType(typeBool);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_FLOAT: {
+				TypeFloat typeFloat = (TypeFloat)theEObject;
+				T result = caseTypeFloat(typeFloat);
+				if (result == null) result = caseType(typeFloat);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_INT: {
+				TypeInt typeInt = (TypeInt)theEObject;
+				T result = caseTypeInt(typeInt);
+				if (result == null) result = caseType(typeInt);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_LIST: {
+				TypeList typeList = (TypeList)theEObject;
+				T result = caseTypeList(typeList);
+				if (result == null) result = caseType(typeList);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_STRING: {
+				TypeString typeString = (TypeString)theEObject;
+				T result = caseTypeString(typeString);
+				if (result == null) result = caseType(typeString);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_UINT: {
+				TypeUint typeUint = (TypeUint)theEObject;
+				T result = caseTypeUint(typeUint);
+				if (result == null) result = caseType(typeUint);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
+			case IrPackage.TYPE_VOID: {
+				TypeVoid typeVoid = (TypeVoid)theEObject;
+				T result = caseTypeVoid(typeVoid);
+				if (result == null) result = caseType(typeVoid);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			default: return defaultCase(theEObject);
 		}
 	}
@@ -109,6 +158,111 @@ public class IrSwitch<T> {
 	 * @generated
 	 */
 	public T caseType(Type object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type Bool</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type Bool</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeBool(TypeBool object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type Float</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type Float</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeFloat(TypeFloat object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type Int</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type Int</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeInt(TypeInt object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type List</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type List</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeList(TypeList object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type String</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type String</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeString(TypeString object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type Uint</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type Uint</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeUint(TypeUint object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Type Void</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Type Void</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseTypeVoid(TypeVoid object) {
 		return null;
 	}
 

@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir.impl;
 
+import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.type.TypeInterpreter;
-import net.sf.orcc.ir.type.TypePackage;
 import net.sf.orcc.ir.type.TypeVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -82,7 +82,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case TypePackage.UINT_TYPE__SIZE:
+			case IrPackage.TYPE_UINT__SIZE:
 				return getSize();
 		}
 		return super.eGet(featureID, resolve, coreType);
@@ -95,7 +95,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case TypePackage.UINT_TYPE__SIZE:
+			case IrPackage.TYPE_UINT__SIZE:
 				return size != SIZE_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
@@ -117,7 +117,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case TypePackage.UINT_TYPE__SIZE:
+			case IrPackage.TYPE_UINT__SIZE:
 				setSize((Integer)newValue);
 				return;
 		}
@@ -130,7 +130,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return TypePackage.Literals.UINT_TYPE;
+		return IrPackage.Literals.TYPE_UINT;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case TypePackage.UINT_TYPE__SIZE:
+			case IrPackage.TYPE_UINT__SIZE:
 				setSize(SIZE_EDEFAULT);
 				return;
 		}
@@ -173,7 +173,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, TypePackage.UINT_TYPE__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_UINT__SIZE, oldSize, size));
 	}
 
 	@Override

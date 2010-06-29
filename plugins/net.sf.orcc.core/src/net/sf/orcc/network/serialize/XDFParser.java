@@ -38,15 +38,16 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -60,7 +61,6 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.type.Entry;
-import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -351,7 +351,7 @@ public class XDFParser {
 					String name = eltType.getAttribute("name");
 					if (name.equals(TypeBool.NAME)) {
 						return new ParseContinuation<Type>(node,
-								TypeFactory.eINSTANCE.createTypeBool());
+								IrFactory.eINSTANCE.createTypeBool());
 					} else if (name.equals(TypeInt.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
@@ -359,13 +359,13 @@ public class XDFParser {
 						int size = new ExpressionEvaluator()
 								.evaluateAsInteger(expr);
 						return new ParseContinuation<Type>(node,
-								TypeFactory.eINSTANCE.createTypeInt(size));
+								IrFactory.eINSTANCE.createTypeInt(size));
 					} else if (name.equals(TypeList.NAME)) {
 						return new ParseContinuation<Type>(node,
 								parseTypeList(node));
 					} else if (name.equals(TypeString.NAME)) {
 						return new ParseContinuation<Type>(node,
-								TypeFactory.eINSTANCE.createTypeString());
+								IrFactory.eINSTANCE.createTypeString());
 					} else if (name.equals(TypeUint.NAME)) {
 						Map<String, Entry> entries = parseTypeEntries(node
 								.getFirstChild());
@@ -373,7 +373,7 @@ public class XDFParser {
 						int size = new ExpressionEvaluator()
 								.evaluateAsInteger(expr);
 
-						TypeUint type = TypeFactory.eINSTANCE.createTypeUint();
+						TypeUint type = IrFactory.eINSTANCE.createTypeUint();
 						type.setSize(size);
 						return new ParseContinuation<Type>(node, type);
 					} else {
@@ -454,7 +454,7 @@ public class XDFParser {
 			Type type = entry.getEntryAsType();
 
 			int size = new ExpressionEvaluator().evaluateAsInteger(expr);
-			return TypeFactory.eINSTANCE.createTypeList(size, type);
+			return IrFactory.eINSTANCE.createTypeList(size, type);
 		}
 
 		/**

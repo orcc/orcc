@@ -28,9 +28,9 @@
  */
 package net.sf.orcc.ir.expr;
 
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines a String expression.
@@ -64,7 +64,7 @@ public class StringExpr extends AbstractExpression {
 
 	@Override
 	public Type getType() {
-		return TypeFactory.eINSTANCE.createTypeString();
+		return IrFactory.eINSTANCE.createTypeString();
 	}
 
 	public String getValue() {

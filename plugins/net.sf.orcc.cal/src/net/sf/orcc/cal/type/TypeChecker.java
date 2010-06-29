@@ -46,14 +46,14 @@ import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.validation.CalJavaValidator;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.type.TypeFactory;
 
 /**
  * This class defines a type checker for RVC-CAL AST. Note that types must have
@@ -198,7 +198,7 @@ public class TypeChecker extends CalSwitch<Type> {
 						expression, CalPackage.AST_EXPRESSION_BINARY);
 				return null;
 			}
-			return TypeFactory.eINSTANCE.createTypeBool();
+			return IrFactory.eINSTANCE.createTypeBool();
 
 		case EXP:
 			CalJavaValidator.getInstance().error("Operator ^ not implemented",
@@ -219,7 +219,7 @@ public class TypeChecker extends CalSwitch<Type> {
 						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 				return null;
 			}
-			return TypeFactory.eINSTANCE.createTypeBool();
+			return IrFactory.eINSTANCE.createTypeBool();
 		}
 
 		return null;
@@ -227,7 +227,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionBoolean(AstExpressionBoolean expression) {
-		return TypeFactory.eINSTANCE.createTypeBool();
+		return IrFactory.eINSTANCE.createTypeBool();
 	}
 
 	@Override
@@ -300,19 +300,19 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionInteger(AstExpressionInteger expression) {
-		return TypeFactory.eINSTANCE.createTypeInt(getSize(expression
+		return IrFactory.eINSTANCE.createTypeInt(getSize(expression
 				.getValue()));
 	}
 
 	@Override
 	public Type caseAstExpressionList(AstExpressionList expression) {
-		return TypeFactory.eINSTANCE.createTypeList(0, getType(expression
+		return IrFactory.eINSTANCE.createTypeList(0, getType(expression
 				.getExpressions().get(0)));
 	}
 
 	@Override
 	public Type caseAstExpressionString(AstExpressionString expression) {
-		TypeString type = TypeFactory.eINSTANCE.createTypeString();
+		TypeString type = IrFactory.eINSTANCE.createTypeString();
 		type.setSize(expression.getValue().length());
 		return type;
 	}
@@ -344,7 +344,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return type;
 		case MINUS:
 			if (type.isUint()) {
-				return TypeFactory.eINSTANCE.createTypeInt(((TypeUint) type)
+				return IrFactory.eINSTANCE.createTypeInt(((TypeUint) type)
 						.getSize());
 			}
 			if (!type.isInt()) {
@@ -392,28 +392,28 @@ public class TypeChecker extends CalSwitch<Type> {
 		} else if (t1.isString() && t2.isString()) {
 			return t1;
 		} else if (t1.isInt() && t2.isInt()) {
-			return TypeFactory.eINSTANCE.createTypeInt(Math.max(
+			return IrFactory.eINSTANCE.createTypeInt(Math.max(
 					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
 		} else if (t1.isList() && t2.isList()) {
 			return getLub(((TypeList) t1).getType(), ((TypeList) t2).getType());
 		} else if (t1.isUint() && t2.isUint()) {
-			return TypeFactory.eINSTANCE.createTypeInt(Math.max(
+			return IrFactory.eINSTANCE.createTypeInt(Math.max(
 					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
 		} else if (t1.isInt() && t2.isUint()) {
 			int si = ((TypeInt) t1).getSize();
 			int su = ((TypeUint) t2).getSize();
 			if (si > su) {
-				return TypeFactory.eINSTANCE.createTypeInt(si);
+				return IrFactory.eINSTANCE.createTypeInt(si);
 			} else {
-				return TypeFactory.eINSTANCE.createTypeInt(su + 1);
+				return IrFactory.eINSTANCE.createTypeInt(su + 1);
 			}
 		} else if (t1.isUint() && t2.isInt()) {
 			int su = ((TypeUint) t1).getSize();
 			int si = ((TypeInt) t2).getSize();
 			if (si > su) {
-				return TypeFactory.eINSTANCE.createTypeInt(si);
+				return IrFactory.eINSTANCE.createTypeInt(si);
 			} else {
-				return TypeFactory.eINSTANCE.createTypeInt(su + 1);
+				return IrFactory.eINSTANCE.createTypeInt(su + 1);
 			}
 		} else {
 			return null;

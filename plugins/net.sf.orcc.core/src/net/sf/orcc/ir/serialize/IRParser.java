@@ -68,26 +68,27 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
-import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -112,7 +113,6 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.BlockCombine;
-import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
@@ -830,11 +830,11 @@ public class IRParser {
 		if (obj instanceof String) {
 			String name = (String) obj;
 			if (name.equals(TypeBool.NAME)) {
-				type = TypeFactory.eINSTANCE.createTypeBool();
+				type = IrFactory.eINSTANCE.createTypeBool();
 			} else if (name.equals(TypeString.NAME)) {
-				type = TypeFactory.eINSTANCE.createTypeString();
+				type = IrFactory.eINSTANCE.createTypeString();
 			} else if (name.equals(TypeVoid.NAME)) {
-				type = TypeFactory.eINSTANCE.createTypeVoid();
+				type = IrFactory.eINSTANCE.createTypeVoid();
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}
@@ -846,13 +846,13 @@ public class IRParser {
 				Expression expr = parseExpr(array.getJSONArray(1));
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
-				type = TypeFactory.eINSTANCE.createTypeInt(size);
+				type = IrFactory.eINSTANCE.createTypeInt(size);
 			} else if (name.equals(TypeUint.NAME)) {
 				// FIXME change JSON format back to using integer size
 				Expression expr = parseExpr(array.getJSONArray(1));
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
-				type = TypeFactory.eINSTANCE.createTypeUint();
+				type = IrFactory.eINSTANCE.createTypeUint();
 				((TypeUint) type).setSize(size);
 			} else if (name.equals(TypeList.NAME)) {
 				// FIXME change JSON format back to using integer size
@@ -860,7 +860,7 @@ public class IRParser {
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 				Type subType = parseType(array.get(2));
 
-				type = TypeFactory.eINSTANCE.createTypeList(size, subType);
+				type = IrFactory.eINSTANCE.createTypeList(size, subType);
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}

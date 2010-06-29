@@ -38,9 +38,9 @@ import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.type.TypeFactory;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -60,12 +60,12 @@ public class TypeConverter extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstTypeBool(AstTypeBool type) {
-		return TypeFactory.eINSTANCE.createTypeBool();
+		return IrFactory.eINSTANCE.createTypeBool();
 	}
 
 	@Override
 	public Type caseAstTypeFloat(AstTypeFloat type) {
-		return TypeFactory.eINSTANCE.createTypeFloat();
+		return IrFactory.eINSTANCE.createTypeFloat();
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class TypeConverter extends CalSwitch<Type> {
 		} else {
 			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
-		return TypeFactory.eINSTANCE.createTypeInt(size);
+		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
 
 	@Override
@@ -85,12 +85,12 @@ public class TypeConverter extends CalSwitch<Type> {
 		Type type = transformType(listType.getType());
 		AstExpression expression = listType.getSize();
 		int size = new AstExpressionEvaluator().evaluateAsInteger(expression);
-		return TypeFactory.eINSTANCE.createTypeList(size, type);
+		return IrFactory.eINSTANCE.createTypeList(size, type);
 	}
 
 	@Override
 	public Type caseAstTypeString(AstTypeString type) {
-		return TypeFactory.eINSTANCE.createTypeString();
+		return IrFactory.eINSTANCE.createTypeString();
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class TypeConverter extends CalSwitch<Type> {
 			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
 		}
 
-		TypeUint uintType = TypeFactory.eINSTANCE.createTypeUint();
+		TypeUint uintType = IrFactory.eINSTANCE.createTypeUint();
 		uintType.setSize(size);
 
 		return uintType;
