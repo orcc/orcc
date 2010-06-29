@@ -66,14 +66,14 @@ public class Schedule {
 		return iterationCount;
 	}
 
-	public Set<Vertex> getScheduledActors() {
-		Set<Vertex> scheduledActors = new LinkedHashSet<Vertex>();
+	public Set<Vertex> getActors() {
+		Set<Vertex> actors = new LinkedHashSet<Vertex>();
 		LinkedList<Iterand> stack = new LinkedList<Iterand>(iterands);
 
 		while (!stack.isEmpty()) {
 			Iterand iterand = stack.pop();
 			if (iterand.isVertex()) {
-				scheduledActors.add(iterand.getVertex());
+				actors.add(iterand.getVertex());
 			} else {
 				Schedule schedule = iterand.getSchedule();
 				for (Iterand subIterand : schedule.getIterands()) {
@@ -81,7 +81,7 @@ public class Schedule {
 				}
 			}
 		}
-		return scheduledActors;
+		return actors;
 	}
 
 	public void remove() {

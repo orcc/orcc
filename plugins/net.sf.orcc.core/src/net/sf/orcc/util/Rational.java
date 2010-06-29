@@ -4,10 +4,6 @@ public class Rational implements Comparable<Rational> {
 	private static Rational zero = new Rational(0, 1);
 
 	public static int gcd(int m, int n) {
-		if (m < 0)
-			m = -m;
-		if (n < 0)
-			n = -n;
 		if (0 == n) {
 			return m;
 		} else {
@@ -16,10 +12,6 @@ public class Rational implements Comparable<Rational> {
 	}
 
 	public static int lcm(int m, int n) {
-		if (m < 0)
-			m = -m;
-		if (n < 0)
-			n = -n;
 		return m * (n / gcd(m, n));
 	}
 
@@ -50,8 +42,8 @@ public class Rational implements Comparable<Rational> {
 	}
 
 	// return a / b
-	public Rational divides(Rational b) {
-		return this.times(b.reciprocal());
+	public Rational div(Rational b) {
+		return this.mul(b.reciprocal());
 	}
 
 	public boolean equals(Object y) {
@@ -72,8 +64,8 @@ public class Rational implements Comparable<Rational> {
 	}
 
 	// return a - b
-	public Rational minus(Rational b) {
-		return this.plus(b.negate());
+	public Rational sub(Rational b) {
+		return this.add(b.negate());
 	}
 
 	// return -a
@@ -81,7 +73,7 @@ public class Rational implements Comparable<Rational> {
 		return new Rational(-numerator, denominator);
 	}
 
-	public Rational plus(Rational b) {
+	public Rational add(Rational b) {
 		if (this.compareTo(zero) == 0) {
 			return b;
 		}
@@ -107,8 +99,7 @@ public class Rational implements Comparable<Rational> {
 		return new Rational(denominator, numerator);
 	}
 
-	public Rational times(Rational b) {
-		// reduce p1/q2 and p2/q1, then multiply, where a = p1/q1 and b = p2/q2
+	public Rational mul(Rational b) {
 		Rational c = new Rational(numerator, b.denominator);
 		Rational d = new Rational(b.numerator, denominator);
 		return new Rational(c.numerator * d.numerator, c.denominator

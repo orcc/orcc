@@ -55,7 +55,6 @@ public class FlatSASScheduler extends AbstractScheduler {
 	}
 
 	public Schedule schedule() throws OrccException {
-
 		Map<Vertex, Integer> repetitions = new RepetitionVectorAnalyzer(graph)
 				.computeRepetitionsVector();
 

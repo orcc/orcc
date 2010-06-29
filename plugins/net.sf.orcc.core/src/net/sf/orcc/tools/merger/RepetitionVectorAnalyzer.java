@@ -35,7 +35,6 @@ import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.classes.StaticClass;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
@@ -86,14 +85,12 @@ public class RepetitionVectorAnalyzer {
 			if (tgt.isInstance()) {
 				if (!rationals.containsKey(tgt)) {
 
-					Port srcPort = connection.getSource();
-					Port tgtPort = connection.getTarget();
-					StaticClass tgtSdfActor = getStaticClass(tgt);
+					int produced = SdfActor.getNumTokensProduced(connection
+							.getSource());
+					int consumed = getStaticClass(tgt).getNumTokensConsumed(
+							connection.getTarget());
 
-					int produced = SdfActor.getNumTokensProduced(srcPort);
-					int consumed = tgtSdfActor.getNumTokensConsumed(tgtPort);
-
-					Rational outgoingRate = rate.times(new Rational(produced,
+					Rational outgoingRate = rate.mul(new Rational(produced,
 							consumed));
 					calculateRate(tgt, outgoingRate);
 				}
@@ -104,14 +101,12 @@ public class RepetitionVectorAnalyzer {
 			if (src.isInstance()) {
 				if (!rationals.containsKey(src)) {
 
-					Port srcPort = connection.getSource();
-					Port tgtPort = connection.getTarget();
-					StaticClass srcSdfActor = getStaticClass(src);
+					int produced = getStaticClass(src).getNumTokensProduced(
+							connection.getSource());
+					int consumed = SdfActor.getNumTokensConsumed(connection
+							.getTarget());
 
-					int produced = srcSdfActor.getNumTokensProduced(srcPort);
-					int consumed = SdfActor.getNumTokensConsumed(tgtPort);
-
-					Rational incomingRate = rate.times(new Rational(consumed,
+					Rational incomingRate = rate.mul(new Rational(consumed,
 							produced));
 					calculateRate(src, incomingRate);
 				}
@@ -132,15 +127,10 @@ public class RepetitionVectorAnalyzer {
 			Vertex tgt = graph.getEdgeTarget(connection);
 
 			if (src.isInstance() && tgt.isInstance()) {
-
-				Port srcPort = connection.getSource();
-				Port tgtPort = connection.getTarget();
-
-				StaticClass srcStaticActor = getStaticClass(src);
-				StaticClass tgtStaticActor = getStaticClass(tgt);
-
-				int produced = srcStaticActor.getNumTokensProduced(srcPort);
-				int consumed = tgtStaticActor.getNumTokensConsumed(tgtPort);
+				int produced = getStaticClass(src).getNumTokensProduced(
+						connection.getSource());
+				int consumed = getStaticClass(tgt).getNumTokensConsumed(
+						connection.getTarget());
 
 				int srcRate = repetitionVector.get(src);
 				int tgtRate = repetitionVector.get(tgt);

@@ -102,9 +102,7 @@ public class NetworkPartitioner {
 
 	private void createConnections(Set<Vertex> vertices, Network network)
 			throws OrccException {
-
 		nbInput = nbOutput = 0;
-
 		for (Vertex vertex : vertices) {
 			for (Connection connection : graph.incomingEdgesOf(vertex)) {
 				Vertex src = graph.getEdgeSource(connection);
@@ -139,24 +137,17 @@ public class NetworkPartitioner {
 
 	private void createIncomingConnection(Vertex src, Vertex tgt,
 			Connection connection, Network network) throws OrccException {
-
 		Port srcPort = connection.getSource();
-
 		Instance tgtInstance = tgt.getInstance();
-
-		Vertex vertex = null;
+		
 		Port port = new Port(srcPort);
-		port.setName("input_" + nbInput);
-
-		vertex = new Vertex("Input", port);
+		port.setName("input_" + nbInput++);
+		Vertex vertex = new Vertex("Input", port);
 		network.getGraph().addVertex(vertex);
-
 		network.getInputs().add(port.getName(), port);
-
+		
 		incomingPort.put(connection, port);
 		partitionMap.put(port, getPartNameAttribute(tgtInstance));
-
-		nbInput++;
 
 		Connection incoming = new Connection(null, connection.getTarget(),
 				connection.getAttributes());
@@ -173,7 +164,6 @@ public class NetworkPartitioner {
 
 	private void createOutgoingConnection(Vertex src, Vertex tgt,
 			Connection connection, Network network) throws OrccException {
-
 		Instance inst = tgt.getInstance();
 		Port tgtPort = connection.getTarget();
 

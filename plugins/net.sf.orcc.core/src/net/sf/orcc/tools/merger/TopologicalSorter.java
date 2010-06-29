@@ -59,7 +59,6 @@ public class TopologicalSorter {
 	}
 
 	public List<Vertex> topologicalSort() throws OrccException {
-
 		return new DFS(graph).orderedByFinishingTime();
 	}
 

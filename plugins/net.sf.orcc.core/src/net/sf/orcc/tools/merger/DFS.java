@@ -117,7 +117,6 @@ public class DFS {
 	}
 
 	private Map<Vertex, TimeStamp> getTimestamps() {
-
 		for (Vertex vertex : graph.vertexSet()) {
 			if (!defined.contains(vertex)) {
 				dfsVisit(vertex);

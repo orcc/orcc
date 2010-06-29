@@ -58,7 +58,6 @@ public abstract class AbstractScheduler implements IScheduler {
 	}
 
 	public Map<Connection, Integer> getBufferCapacities() {
-
 		Map<Connection, Integer> bufferCapacities = new HashMap<Connection, Integer>();
 
 		LinkedList<Iterand> stack = new LinkedList<Iterand>(
@@ -68,10 +67,8 @@ public abstract class AbstractScheduler implements IScheduler {
 
 		while (!stack.isEmpty()) {
 			Iterand iterand = stack.pop();
-
 			if (iterand.isVertex()) {
 				Vertex vertex = iterand.getVertex();
-
 				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
 					int prd = connection.getSource().getNumTokensProduced();
 					bufferCapacities.put(connection, rep * prd);

@@ -64,7 +64,6 @@ import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.type.IntType;
 import net.sf.orcc.ir.type.TypeFactory;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -121,15 +120,8 @@ public class ActorMerger implements INetworkTransformation {
 		}
 	}
 
-	private IntType createIntType() {
-		IntType type = TypeFactory.eINSTANCE.createIntType();
-		type.setSize(32);
-		return type;
-	}
-
 	private List<Expression> addParameters(LocalVariable loopVar,
 			Action action, Vertex vertex) {
-
 		List<Expression> params = new ArrayList<Expression>();
 
 		for (Map.Entry<Port, Integer> entry : action.getInputPattern()
@@ -144,10 +136,11 @@ public class ActorMerger implements INetworkTransformation {
 
 			Expression expr = new BinaryExpr(new IntExpr(entry.getValue()),
 					BinaryOp.TIMES, new VarExpr(new Use(loopVar)),
-					createIntType());
+					TypeFactory.eINSTANCE.createIntType(32));
 
 			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
-					BinaryOp.PLUS, expr, createIntType());
+					BinaryOp.PLUS, expr,
+					TypeFactory.eINSTANCE.createIntType(32));
 
 			params.add(param);
 		}
@@ -164,10 +157,11 @@ public class ActorMerger implements INetworkTransformation {
 
 			Expression expr = new BinaryExpr(new IntExpr(entry.getValue()),
 					BinaryOp.TIMES, new VarExpr(new Use(loopVar)),
-					createIntType());
+					TypeFactory.eINSTANCE.createIntType(32));
 
 			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
-					BinaryOp.PLUS, expr, createIntType());
+					BinaryOp.PLUS, expr,
+					TypeFactory.eINSTANCE.createIntType(32));
 
 			params.add(param);
 		}
@@ -221,7 +215,6 @@ public class ActorMerger implements INetworkTransformation {
 	 * @throws OrccException
 	 */
 	private Action createAction() throws OrccException {
-
 		Pattern inputPattern = new Pattern();
 		Pattern outputPattern = new Pattern();
 
@@ -242,7 +235,6 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	private Actor createActor(Set<Vertex> vertices) throws OrccException {
-
 		OrderedMap<Port> inputs = new OrderedMap<Port>();
 		OrderedMap<Port> outputs = new OrderedMap<Port>();
 		OrderedMap<Variable> stateVars = new OrderedMap<Variable>();
@@ -326,7 +318,6 @@ public class ActorMerger implements INetworkTransformation {
 	 *            the block to which hasTokens instructions are added
 	 */
 	private void createInputTests(BlockNode block) {
-
 		int i = 0;
 		for (Port port : inputsMap.values()) {
 			Location location = new Location();
@@ -347,7 +338,6 @@ public class ActorMerger implements INetworkTransformation {
 	 * 
 	 */
 	private void createInternalBuffers() {
-
 		int index = 0;
 
 		Map<Connection, Integer> bufferCapacities = scheduler
@@ -362,7 +352,6 @@ public class ActorMerger implements INetworkTransformation {
 					null, type);
 			buffersMap.put(connection, buf);
 			index++;
-
 		}
 	}
 
@@ -372,7 +361,6 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private void createLoopedSchedule(Procedure procedure, Schedule schedule,
 			List<CFGNode> nodes) throws OrccException {
-
 		OrderedMap<Procedure> procs = actor.getProcs();
 		OrderedMap<Variable> vars = actor.getStateVars();
 
@@ -543,9 +531,9 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	private void getOutputs(Set<Vertex> vertices) {
+		int index = 0;
 		outputsMap = new HashMap<Connection, Port>();
 
-		int index = 0;
 		for (Connection connection : graph.edgeSet()) {
 			Vertex src = graph.getEdgeSource(connection);
 			Vertex tgt = graph.getEdgeTarget(connection);
@@ -601,9 +589,7 @@ public class ActorMerger implements INetworkTransformation {
 				Actor actor = vertex.getInstance().getActor();
 				new RemoveReadWrites().transform(actor);
 			}
-
 			mergeActors(vertices);
-
 		}
 	}
 
