@@ -68,7 +68,7 @@ public class XlimExprPrinter extends ExpressionPrinter {
 
 	@Override
 	public void visit(BoolExpr expr, Object... args) {
-		builder.append(expr.getValue() ? "1" : "0");
+		builder.append(expr.getValue() ? "true" : "false");
 	}
 
 	@Override
