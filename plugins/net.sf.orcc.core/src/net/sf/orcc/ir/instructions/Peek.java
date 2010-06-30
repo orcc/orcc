@@ -39,6 +39,9 @@ import net.sf.orcc.ir.Variable;
  * 
  */
 public class Peek extends AbstractFifoInstruction {
+	
+	public Peek() {
+	}
 
 	public Peek(Location location, Port port, int numTokens, Variable target) {
 		super(location, port, numTokens, target);

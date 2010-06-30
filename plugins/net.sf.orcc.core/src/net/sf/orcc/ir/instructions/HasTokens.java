@@ -45,6 +45,10 @@ public class HasTokens extends AbstractFifoInstruction {
 		super(location, port, numTokens, target);
 	}
 
+	public HasTokens(Port port, int numTokens, Variable varDef) {
+		this(new Location(), port, numTokens, varDef);
+	}
+
 	@Override
 	public Object accept(InstructionInterpreter interpreter, Object... args) {
 		return interpreter.interpret(this, args);

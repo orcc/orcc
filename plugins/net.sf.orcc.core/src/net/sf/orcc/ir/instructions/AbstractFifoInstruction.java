@@ -50,6 +50,10 @@ public abstract class AbstractFifoInstruction extends AbstractInstruction
 
 	private Variable target;
 
+	protected AbstractFifoInstruction() {
+		super(new Location());
+	}
+
 	public AbstractFifoInstruction(Location location, Port port, int numTokens,
 			Variable target) {
 		super(location);

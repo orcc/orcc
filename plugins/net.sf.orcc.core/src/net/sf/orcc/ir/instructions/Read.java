@@ -39,6 +39,9 @@ import net.sf.orcc.ir.Variable;
  * 
  */
 public class Read extends AbstractFifoInstruction {
+	
+	public Read() {
+	}
 
 	public Read(Location location, Port port, int numTokens, Variable varDef) {
 		super(location, port, numTokens, varDef);
