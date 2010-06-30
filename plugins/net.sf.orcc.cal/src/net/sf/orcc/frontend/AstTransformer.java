@@ -30,8 +30,10 @@ package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
@@ -91,10 +93,14 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -536,9 +542,30 @@ public class AstTransformer {
 		stmtTransformer = new StatementTransformer();
 	}
 
-	private void actionFillIsSchedulable(AstAction astAction,
-			Procedure scheduler) {
-		// TODO fill is schedulable function
+	/**
+	 * Creates calls to hasTokens to test that the given input pattern is
+	 * fulfilled.
+	 * 
+	 * @param inputPattern
+	 *            an IR input pattern
+	 * @return a list of local variables that contain the result of the
+	 *         hasTokens
+	 */
+	private List<LocalVariable> actionCreateHasTokens(Pattern inputPattern) {
+		List<LocalVariable> hasTokenList = new ArrayList<LocalVariable>(
+				inputPattern.size());
+		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
+			LocalVariable target = newTempLocalVariable(
+					IrFactory.eINSTANCE.createTypeBool(), "_tmp_hasTokens");
+			hasTokenList.add(target);
+
+			Port port = entry.getKey();
+			int numTokens = entry.getValue();
+			HasTokens hasTokens = new HasTokens(port, numTokens, target);
+			addInstruction(hasTokens);
+		}
+
+		return hasTokenList;
 	}
 
 	/**
@@ -616,6 +643,51 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Creates the test for schedulability of the given action.
+	 * 
+	 * @param astAction
+	 *            an AST action
+	 * @param inputPattern
+	 *            input pattern of action
+	 * @param result
+	 *            target local variable
+	 */
+	private void createActionTest(AstAction astAction, Pattern inputPattern,
+			LocalVariable result) {
+		if (inputPattern.isEmpty()) {
+			transformGuards(astAction.getGuards(), result);
+		} else {
+			// create calls to hasTokens
+			List<LocalVariable> hasTokenList = actionCreateHasTokens(inputPattern);
+
+			// create "then" nodes with peeks and guards
+			List<CFGNode> thenNodes = transformInputPatternAndGuards(astAction,
+					result);
+
+			// create "else" node with Assign(result, false)
+			List<CFGNode> elseNodes = new ArrayList<CFGNode>(1);
+			BlockNode block = new BlockNode(procedure);
+			Assign assign = new Assign(result, new BoolExpr(false));
+			block.add(assign);
+			elseNodes.add(block);
+
+			// create condition hasTokens1 && hasTokens2 && ... && hasTokensn
+			Iterator<LocalVariable> it = hasTokenList.iterator();
+			Expression condition = new VarExpr(new Use(it.next()));
+			while (it.hasNext()) {
+				Expression e2 = new VarExpr(new Use(it.next()));
+				condition = new BinaryExpr(condition, BinaryOp.LOGIC_AND, e2,
+						IrFactory.eINSTANCE.createTypeBool());
+			}
+
+			// create "if" node
+			IfNode node = new IfNode(procedure, condition, thenNodes,
+					elseNodes, new BlockNode(procedure));
+			procedure.getNodes().add(node);
+		}
+	}
+
+	/**
 	 * Creates a variable to hold the number of tokens on the given port.
 	 * 
 	 * @param port
@@ -633,6 +705,60 @@ public class AstTransformer {
 				target);
 
 		return target;
+	}
+
+	/**
+	 * Fills the target IR input pattern.
+	 * 
+	 * @param astAction
+	 *            an AST action
+	 * @param inputPattern
+	 *            target IR input pattern
+	 */
+	private void fillsInputPattern(AstAction astAction, Pattern inputPattern) {
+		List<AstInputPattern> astInputPattern = astAction.getInputs();
+		for (AstInputPattern pattern : astInputPattern) {
+			Port port = portMap.get(pattern.getPort());
+			List<AstVariable> tokens = pattern.getTokens();
+
+			// evaluates token consumption
+			int totalConsumption = tokens.size();
+			int repeat = 1;
+			AstExpression astRepeat = pattern.getRepeat();
+			if (astRepeat != null) {
+				repeat = new AstExpressionEvaluator()
+						.evaluateAsInteger(astRepeat);
+				totalConsumption *= repeat;
+			}
+			inputPattern.put(port, totalConsumption);
+		}
+	}
+
+	/**
+	 * Fills the target IR output pattern.
+	 * 
+	 * @param astAction
+	 *            an AST action
+	 * @param outputPattern
+	 *            target IR output pattern
+	 */
+	private void fillsOutputPattern(AstAction astAction, Pattern outputPattern) {
+		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
+		for (AstOutputPattern pattern : astOutputPattern) {
+			Port port = portMap.get(pattern.getPort());
+			List<AstExpression> values = pattern.getValues();
+
+			// evaluates token consumption
+			int totalConsumption = values.size();
+			int repeat = 1;
+			AstExpression astRepeat = pattern.getRepeat();
+			if (astRepeat != null) {
+				repeat = new AstExpressionEvaluator()
+						.evaluateAsInteger(astRepeat);
+				totalConsumption *= repeat;
+			}
+			outputPattern.put(port, totalConsumption);
+		}
 	}
 
 	/**
@@ -734,8 +860,8 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Fills the input/output patterns and the scheduler and body procedures
-	 * from the given AST action.
+	 * Transforms the given AST action and fills the input pattern, output
+	 * pattern, scheduler procedure and body procedure.
 	 * 
 	 * @param astAction
 	 *            an AST action
@@ -750,8 +876,23 @@ public class AstTransformer {
 	 */
 	private void transformAction(AstAction astAction, Pattern inputPattern,
 			Pattern outputPattern, Procedure scheduler, Procedure body) {
-		actionFillIsSchedulable(astAction, scheduler);
+		fillsInputPattern(astAction, inputPattern);
+		fillsOutputPattern(astAction, outputPattern);
 
+		transformActionBody(astAction, body);
+		transformActionScheduler(astAction, scheduler, inputPattern);
+	}
+
+	/**
+	 * Transforms the body of the given AST action into the given body
+	 * procedure.
+	 * 
+	 * @param astAction
+	 *            an AST action
+	 * @param body
+	 *            the procedure that will contain the body
+	 */
+	private void transformActionBody(AstAction astAction, Procedure body) {
 		// current procedure is the body
 		procedure = body;
 
@@ -759,10 +900,10 @@ public class AstTransformer {
 		Scope<AstVariable, Variable> current = variablesMap;
 		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
 
-		transformInputPattern(astAction, inputPattern);
+		transformInputPattern(astAction, Read.class);
 		transformLocalVariables(astAction.getVariables());
 		transformStatements(astAction.getStatements());
-		transformOutputPattern(astAction, outputPattern);
+		transformOutputPattern(astAction);
 
 		// restore previous scope
 		variablesMap = current;
@@ -812,6 +953,47 @@ public class AstTransformer {
 		}
 
 		return actionList;
+	}
+
+	/**
+	 * Transforms the scheduling information of the given AST action into the
+	 * given scheduler procedure.
+	 * 
+	 * @param astAction
+	 *            an AST action
+	 * @param scheduler
+	 *            the procedure that will contain the scheduler
+	 * @param inputPattern
+	 *            the input pattern filled by
+	 *            {@link #fillsInputPattern(AstAction, Pattern)}
+	 */
+	private void transformActionScheduler(AstAction astAction,
+			Procedure scheduler, Pattern inputPattern) {
+		// current procedure is the scheduler
+		procedure = scheduler;
+
+		// create a new scope that extends variablesMap
+		Scope<AstVariable, Variable> current = variablesMap;
+		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
+
+		LocalVariable result = newTempLocalVariable(
+				IrFactory.eINSTANCE.createTypeBool(), "result");
+
+		List<AstExpression> guards = astAction.getGuards();
+		if (inputPattern.isEmpty() && guards.isEmpty()) {
+			// the action is always fireable
+			Assign assign = new Assign(result, new BoolExpr(true));
+			addInstruction(assign);
+		} else {
+			createActionTest(astAction, inputPattern, result);
+		}
+
+		// return result
+		Return returnInstr = new Return(new VarExpr(new Use(result)));
+		addInstruction(returnInstr);
+
+		// restore previous scope
+		variablesMap = current;
 	}
 
 	/**
@@ -909,15 +1091,36 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Transforms the given guards and assign result the expression g1 && g2 &&
+	 * .. && gn.
+	 * 
+	 * @param guards
+	 *            list of guard expressions
+	 * @param result
+	 *            target local variable
+	 */
+	private void transformGuards(List<AstExpression> guards,
+			LocalVariable result) {
+		List<Expression> expressions = transformExpressions(guards);
+		Iterator<Expression> it = expressions.iterator();
+		Expression value = it.next();
+		while (it.hasNext()) {
+			value = new BinaryExpr(value, BinaryOp.LOGIC_AND, it.next(),
+					IrFactory.eINSTANCE.createTypeBool());
+		}
+
+		Assign assign = new Assign(result, value);
+		addInstruction(assign);
+	}
+
+	/**
 	 * Transforms the AST input patterns of the given action as local variables,
-	 * fills the target IR input pattern, adds reads and assigns tokens.
+	 * adds reads and assigns tokens.
 	 * 
 	 * @param astAction
 	 *            an AST action
-	 * @param inputPattern
-	 *            target IR input pattern
 	 */
-	private void transformInputPattern(AstAction astAction, Pattern inputPattern) {
+	private void transformInputPattern(AstAction astAction, Class<?> clasz) {
 		List<AstInputPattern> astInputPattern = astAction.getInputs();
 		for (AstInputPattern pattern : astInputPattern) {
 			Port port = portMap.get(pattern.getPort());
@@ -932,14 +1135,23 @@ public class AstTransformer {
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}
-			inputPattern.put(port, totalConsumption);
 
 			// create port variable
 			LocalVariable variable = createPortVariable(port, totalConsumption);
 
-			// add the read
-			Read read = new Read(port, totalConsumption, variable);
-			addInstruction(read);
+			// add the peek/read
+			try {
+				Object obj = clasz.newInstance();
+				AbstractFifoInstruction instr = (AbstractFifoInstruction) obj;
+				instr.setPort(port);
+				instr.setNumTokens(totalConsumption);
+				instr.setTarget(variable);
+				addInstruction(instr);
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
 
 			// declare tokens
 			for (AstVariable token : tokens) {
@@ -951,6 +1163,45 @@ public class AstTransformer {
 			// loads tokens
 			actionLoadTokens(variable, tokens, repeat);
 		}
+	}
+
+	/**
+	 * Returns a list of CFG nodes where the input pattern of the given action
+	 * is peeked. This method creates a new block node to hold the blocks, peeks
+	 * the input pattern, and transfers the nodes created to a new list that is
+	 * the result.
+	 * 
+	 * @param astAction
+	 *            an AST action
+	 * @param result
+	 *            a local variable
+	 * @return a list of CFG nodes
+	 */
+	private List<CFGNode> transformInputPatternAndGuards(AstAction astAction,
+			LocalVariable result) {
+		List<CFGNode> nodes = procedure.getNodes();
+
+		int first = nodes.size();
+		nodes.add(new BlockNode(procedure));
+
+		List<AstExpression> guards = astAction.getGuards();
+		if (guards.isEmpty()) {
+			Assign assign = new Assign(result, new BoolExpr(true));
+			addInstruction(assign);
+		} else {
+			transformInputPattern(astAction, Peek.class);
+			transformLocalVariables(astAction.getVariables());
+			transformGuards(astAction.getGuards(), result);
+		}
+
+		int last = nodes.size();
+
+		// moves selected CFG nodes from "nodes" list to resultNodes
+		List<CFGNode> subList = nodes.subList(first, last);
+		List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
+		subList.clear();
+
+		return resultNodes;
 	}
 
 	/**
@@ -999,16 +1250,12 @@ public class AstTransformer {
 
 	/**
 	 * Transforms the AST output patterns of the given action as expressions and
-	 * possibly statements, fills the target IR output pattern, assigns tokens
-	 * and adds writes.
+	 * possibly statements, assigns tokens and adds writes.
 	 * 
 	 * @param astAction
 	 *            an AST action
-	 * @param outputPattern
-	 *            target IR output pattern
 	 */
-	private void transformOutputPattern(AstAction astAction,
-			Pattern outputPattern) {
+	private void transformOutputPattern(AstAction astAction) {
 		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
 		for (AstOutputPattern pattern : astOutputPattern) {
 			Port port = portMap.get(pattern.getPort());
@@ -1023,7 +1270,6 @@ public class AstTransformer {
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}
-			outputPattern.put(port, totalConsumption);
 
 			// create port variable
 			LocalVariable variable = createPortVariable(port, totalConsumption);
