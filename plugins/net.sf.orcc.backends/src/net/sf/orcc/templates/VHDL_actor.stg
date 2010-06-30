@@ -134,10 +134,8 @@ Actor_Schedul_FSM(actor) ::= <<
       $actor.actions: printActionSchedulerInline(); separator="\n"$
     
       -- ACK
-        $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
-        --
-        $actor.actions:printActionNoACK(); separator="\n"$
-        $actor.inputs.list: NoACK(); separator="\n"$
+      $schedulerAckFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
+      --
       end if;
     end if;
   end process $actor.name$_scheduler;
@@ -704,7 +702,7 @@ $
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Scheduler with FSM
+// Scheduler with FSM (execute)
 
 DefineFSM(actions, fsm) ::= <<
 $
@@ -744,7 +742,6 @@ $
 
 
 switch(transitions) ::= <<
-
 $transitions: switchTransition()$
 >>
 
@@ -782,6 +779,78 @@ actionCallState(nextState) ::= <<
 $printActionBodyInline(nextState.action)$FSM <= s_$nextState.targetState$;
 >>
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler with FSM (schedule)
+
+
+schedulerAckFSM(actions, fsm) ::= <<
+
+$
+if(actions)
+$
+$schedulingTestAck(actions)$
+else
+  case FSM is
+  $switchAck(fsm.transitions)$
+end case;
+end if;$
+else
+$
+
+case FSM is
+  $switchAck(fsm.transitions)$
+  
+  when others =>
+    $actor.inputs.list: NoACK(); separator="\n"$
+    $actor.actions:printActionNoACK(); separator="\n"$
+end case;$
+endif
+$
+>>
+
+
+switchAck(transitions) ::= <<
+$transitions: switchTransitionAck()$
+>>
+
+switchTransitionAck(transition) ::= <<
+
+
+when s_$transition.sourceState$ =>
+$stateSchedulerAck(transition)$
+>>
+
+
+stateSchedulerAck(transition) ::= <<
+  -- $transition.sourceState$_state_scheduler
+  $schedulingTestStateAck(nextStates=transition.nextStateInfo)$
+>>
+
+schedulingTestStateAck(nextStates) ::= <<
+
+if $nextStates: actionTestStateAck(); separator="--\nelsif"$end if;
+>>
+
+actionTestStateAck(nextState) ::= <<
+(isSchedulable_$nextState.action$_go = '1' and$
+if(nextState.action.outputPattern)
+$ $outputPattern(nextState.action.outputPattern)$) then
+  $nextState.action.inputPattern.keys : ValidAck(); separator="\n"$
+  $nextState.action$_go <= '1'
+    -- Action : $nextState.action$
+$
+else
+$  $nextState.action.inputPattern.keys : ValidAck(); separator="\n"$
+  $nextState.action$_go <= '1'
+  -- Action : $nextState.action$$
+endif
+$
+else
+  $actor.inputs.list: NoACK(); separator="\n"$
+  $nextState.action:printActionNoACK(); separator="\n"$
+
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
