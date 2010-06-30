@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CoefAC_L" x="263" y="81"/>
+      <vertex id="CoefAC_L" x="270" y="65"/>
       <vertex id="CoefDC_L" x="37" y="109"/>
       <vertex id="Intra_DC_flag" x="252" y="129"/>
       <vertex id="QP" x="20" y="238"/>
       <vertex id="ScalingList" x="36" y="285"/>
-      <vertex id="CoefACR_L" x="725" y="90"/>
-      <vertex id="FUN_dcr" x="130" y="90"/>
-      <vertex id="FUN_IS_IQ_IT_L" x="386" y="60"/>
-      <vertex id="Algo_Merge_4x4_to_16x16" x="544" y="61"/>
+      <vertex id="CoefACR_L" x="799" y="67"/>
+      <vertex id="FUN_dcr" x="137" y="68"/>
+      <vertex id="FUN_IS_IQ_IT_L" x="429" y="51"/>
+      <vertex id="Algo_Merge_4x4_to_16x16" x="616" y="47"/>
    </vertices>
 </layout>

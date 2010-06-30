@@ -53,12 +53,12 @@ Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
 actor Algo_BlockExpand_AVC_FREXT()
-	int(size=2) ENTROPY_TYPE,
-	uint(size=4) RUN,
-	int(size=12) VALUE,
-	bool LAST
+	int (size=2)  ENTROPY_TYPE,
+	uint(size=4)  RUN,
+	int (size=12) VALUE,
+	bool          LAST
 		==>
-	int(size=16) Block
+	int (size=16) Block
 		:
 
 	int CAVLC_ENTROPY = 0;
