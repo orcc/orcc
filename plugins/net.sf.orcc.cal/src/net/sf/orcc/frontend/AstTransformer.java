@@ -555,15 +555,16 @@ public class AstTransformer {
 	private void actionLoadTokens(LocalVariable portVariable,
 			List<AstVariable> tokens, int repeat) {
 		if (repeat == 1) {
-			BlockNode block = BlockNode.getLast(procedure);
 			int i = 0;
+
 			for (AstVariable token : tokens) {
-				LocalVariable irToken = (LocalVariable) variablesMap.get(token);
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new IntExpr(i));
+
+				LocalVariable irToken = (LocalVariable) variablesMap.get(token);
 				Load load = new Load(portVariable.getLocation(), irToken,
 						new Use(portVariable), indexes);
-				block.add(load);
+				addInstruction(load);
 
 				i++;
 			}
@@ -937,9 +938,8 @@ public class AstTransformer {
 			LocalVariable variable = createPortVariable(port, totalConsumption);
 
 			// add the read
-			BlockNode block = BlockNode.getLast(procedure);
 			Read read = new Read(port, totalConsumption, variable);
-			block.add(read);
+			addInstruction(read);
 
 			// declare tokens
 			for (AstVariable token : tokens) {
@@ -1032,9 +1032,8 @@ public class AstTransformer {
 			actionStoreTokens(variable, values, repeat);
 
 			// add the write
-			BlockNode block = BlockNode.getLast(procedure);
 			Write write = new Write(port, totalConsumption, variable);
-			block.add(write);
+			addInstruction(write);
 		}
 	}
 
