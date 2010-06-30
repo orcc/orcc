@@ -201,11 +201,20 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				Use use = new Use(target);
 				Location location = expr.getLocation();
 				target.setType(type);
-				Assign assign = new Assign(location, target, new BinaryExpr(
-						location, expr, BinaryOp.PLUS, new IntExpr(0),
-						expr.getType()));
-				assign.setBlock(block);
-				it.add(assign);
+				if (expr.getType().isBool()) {
+
+					Assign assign = new Assign(location, target, new BinaryExpr(
+							location, expr, BinaryOp.LOGIC_OR, new BoolExpr(false),
+							expr.getType()));
+					assign.setBlock(block);
+					it.add(assign);
+				} else{
+					Assign assign = new Assign(location, target, new BinaryExpr(
+							location, expr, BinaryOp.PLUS, new IntExpr(0),
+							expr.getType()));
+					assign.setBlock(block);
+					it.add(assign);
+				}
 				return new VarExpr(use);
 			}
 			return expr;
