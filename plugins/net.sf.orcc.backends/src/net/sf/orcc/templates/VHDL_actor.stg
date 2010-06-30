@@ -120,6 +120,33 @@ $port$_ack <= '1';
 
 
 
+
+Actor_Schedul_FSM(actor) ::= <<
+  $actor.name$_scheduler : process (reset_n, 
+  $actor.inputs.list: SensitivFIFOin(); separator=", "$
+  $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
+    $actor.actions: printActionLocalSchedul()$  --
+  begin
+    if reset_n = '0' then 
+      $actor.actions:printActionNoACK(); separator="\n"$
+      $actor.inputs.list: NoACK(); separator="\n"$      
+    else
+      $actor.actions: printActionSchedulerInline(); separator="\n"$
+    
+      -- ACK
+        $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
+        --
+        $actor.actions:printActionNoACK(); separator="\n"$
+        $actor.inputs.list: NoACK(); separator="\n"$
+      end if;
+    end if;
+  end process $actor.name$_scheduler;
+
+>>
+
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Execute process
 ///////////////////////////////////////////////////////////////////////////////
@@ -805,14 +832,14 @@ architecture rtl_$actor.name$ of $actor.name$ is
 
 begin
 
-  $Actor_Schedul(actor)$
-
 $
 if(actor.actionScheduler.fsm)
 $
+  $Actor_Schedul_FSM(actor)$
   $Actor_Exec_FSM(actor)$$
 else
 $
+  $Actor_Schedul(actor)$
   $Actor_Exec(actor)$$
 endif
 $
