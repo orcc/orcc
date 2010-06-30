@@ -75,7 +75,7 @@ $port.name$_full
 
 Actor_Schedul(actor) ::= <<
   $actor.name$_scheduler : process (reset_n, 
-  $actor.inputs.list: SensitivFIFOin(); separator=", "$
+  $actor.inputs.list: SensitivFIFOin(); separator=", "$,
   $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
     $actor.actions: printActionLocalSchedul()$  --
   begin
@@ -106,7 +106,7 @@ $port.name$_ack <= '0';
 printActionACK(action) ::= <<
 ($outputPattern(pattern=action.outputPattern)$ and isSchedulable_$action$_go = '1') then
         $action.inputPattern.keys : ValidAck(); separator="\n"$
-        $action$_go <= '1'
+        $action$_go <= '1';
         -- Action : $action$
 
 >>
@@ -119,8 +119,8 @@ $port$_ack <= '1';
 
 
 Actor_Schedul_FSM(actor) ::= <<
-  $actor.name$_scheduler : process (reset_n, 
-  $actor.inputs.list: SensitivFIFOin(); separator=", "$
+  $actor.name$_scheduler : process (reset_n, FSM,
+  $actor.inputs.list: SensitivFIFOin(); separator=", "$,
   $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
     $actor.actions: printActionLocalSchedul()$  --
   begin
@@ -132,8 +132,7 @@ Actor_Schedul_FSM(actor) ::= <<
     
       -- ACK
       $schedulerAckFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
-      --
-      end if;
+    --
     end if;
   end process $actor.name$_scheduler;
 
@@ -752,6 +751,7 @@ actionTestState(nextState) ::= <<
 // and updates the FSM state
 actionCallState(nextState) ::= <<
 $printActionBodyInline(nextState.action)$FSM <= s_$nextState.targetState$;
+
 >>
 
 
@@ -808,17 +808,19 @@ if $nextStates: actionTestStateAck(); separator="--\nelsif"$end if;
 >>
 
 actionTestStateAck(nextState) ::= <<
-(isSchedulable_$nextState.action$_go = '1' and$
+(isSchedulable_$nextState.action$_go = '1'$
 if(nextState.action.outputPattern)
-$ $outputPattern(nextState.action.outputPattern)$) then
+$ and $outputPattern(nextState.action.outputPattern)$) then
   $nextState.action.inputPattern.keys : ValidAck(); separator="\n"$
-  $nextState.action$_go <= '1'
+  $nextState.action$_go <= '1';
     -- Action : $nextState.action$
 $
 else
-$  $nextState.action.inputPattern.keys : ValidAck(); separator="\n"$
-  $nextState.action$_go <= '1'
-  -- Action : $nextState.action$$
+$) then
+  $nextState.action.inputPattern.keys : ValidAck(); separator="\n"$
+  $nextState.action$_go <= '1';
+  -- Action : $nextState.action$
+$
 endif
 $
 else
@@ -861,7 +863,7 @@ architecture rtl_$actor.name$ of $actor.name$ is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
-  $actor.actions: {action| signal $action$_go : std_logic}; separator="\n"$  
+  $actor.actions: {action| signal $action$_go : std_logic;}; separator="\n"$  
   $actor.stateVars.list: signalDeclaration()$
 
   ---------------------------------------------------------------------------
