@@ -35,9 +35,6 @@ endif
 $
 >>
 
-fifo_in_init(port) ::=<<
-$port.name$_ack <= '0';
->>
 fifo_out_init(port) ::=<<
 $port.name$_write <= '0';
 >>
@@ -156,7 +153,6 @@ Actor_Exec(actor) ::= <<
   begin
     if reset_n = '0' then 
       $actor.stateVars.list: stateConst()$      --
-      $actor.inputs.list: fifo_in_init(); separator="\n"$
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       $actor.outputs.list: Actor_out()$    --
     elsif rising_edge(clock) then
@@ -165,7 +161,6 @@ if(actor.initializes)
       $$actor.initializes: action()$$
 endif
 $
-      $actor.inputs.list: fifo_in_init(); separator="\n"$
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       --  
       $schedulingTest(actor.actions)$
@@ -182,7 +177,6 @@ Actor_Exec_FSM(actor) ::= <<
   begin
     if reset_n = '0' then 
       $actor.stateVars.list: stateConst()$      $InitFSM(actor.actionScheduler.fsm)$      --
-      $actor.inputs.list: fifo_in_init(); separator="\n"$
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       $actor.outputs.list: Actor_out()$    --
     elsif rising_edge(clock) then
@@ -191,7 +185,6 @@ if(actor.initializes)
       $$actor.initializes: action()$$
 endif
 $
-      $actor.inputs.list: fifo_in_init(); separator="\n"$
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       --     
       $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$   
@@ -427,19 +420,15 @@ if(read.unit)
 $$
   if(read.target.type.bool)
   $
-$read.target$ := $read.port$_data;
-  $
+$read.target$ := $read.port$_data;$
   elseif(read.target.type.int)
   $
-$read.target$ := to_integer(signed($read.port$_data));
-  $
+$read.target$ := to_integer(signed($read.port$_data));$
   elseif (read.target)
   $
-$read.target$ := to_integer(unsigned($read.port$_data));
-  $
+$read.target$ := to_integer(unsigned($read.port$_data));$
   endif
-  $
-$read.port$_ack <= '1';$
+  $$
 else
 $-- read multiple token not coded yet$
 endif
@@ -688,16 +677,8 @@ if $actions: actionTest(); separator="\nelsif "$
 >>
 
 actionTest(action) ::= <<
-($action$_go = '1') then$
-if(action.outputPattern)
-$
-  if ($outputPattern(pattern=action.outputPattern)$) then
-    $printActionBodyInline(action)$
-  end if;$
-else
-$  $printActionBodyInline(action)$$
-  endif
-$
+($action$_go = '1') then
+  $printActionBodyInline(action)$
 
 >>
 
@@ -763,14 +744,8 @@ if $nextStates: actionTestState(); separator="--\nelsif"$end if;
 >>
 
 actionTestState(nextState) ::= <<
-(isSchedulable_$nextState.action$_go = '1') then
-  $if(nextState.action.outputPattern)$
-  if ($outputPattern(nextState.action.outputPattern)$) then
-    $actionCallState(nextState)$
-  end if;
-  $else$
+($nextState.action$_go = '1') then
   $actionCallState(nextState)$
-  $endif$
 >>
 
 // prints the action referenced by the "nextState" parameter
