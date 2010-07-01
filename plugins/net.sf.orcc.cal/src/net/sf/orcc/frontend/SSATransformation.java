@@ -33,13 +33,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
@@ -52,22 +60,61 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class SSATransformation extends AbstractActorTransformation {
 
+	/**
+	 * This class replaces uses of a given variables by another variable
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class UseUpdater extends AbstractExpressionVisitor {
+
+		@Override
+		public void visit(VarExpr expr, Object... args) {
+			Use use = expr.getVar();
+			LocalVariable oldVar = (LocalVariable) use.getVariable();
+			LocalVariable newVar = uses.get(oldVar.getBaseName());
+			use.setVariable(newVar);
+		}
+
+	}
+
+	/**
+	 * ith branch (or 0 if we are not in a branch)
+	 */
 	private int branch;
 
-	private Map<String, Integer> definitions;
+	/**
+	 * maps a variable name to a local variable (used when creating new
+	 * definitions)
+	 */
+	private Map<String, LocalVariable> definitions;
 
+	/**
+	 * join node (if any)
+	 */
 	private BlockNode join;
 
-	private Map<String, Integer> uses;
+	/**
+	 * maps a variable name to a local variable (used when replacing uses)
+	 */
+	private Map<String, LocalVariable> uses;
 
 	/**
 	 * Creates a new SSA transformation.
 	 */
 	public SSATransformation() {
-		definitions = new HashMap<String, Integer>();
-		uses = new HashMap<String, Integer>();
+		definitions = new HashMap<String, LocalVariable>();
+		uses = new HashMap<String, LocalVariable>();
 	}
 
+	/**
+	 * Inserts a phi in the (current) join node.
+	 * 
+	 * @param oldVar
+	 *            old variable
+	 * @param newVar
+	 *            new variable
+	 */
 	private void insertPhi(LocalVariable oldVar, LocalVariable newVar) {
 		String name = oldVar.getBaseName();
 		PhiAssignment phi = null;
@@ -85,8 +132,9 @@ public class SSATransformation extends AbstractActorTransformation {
 			LocalVariable target = newDefinition(oldVar);
 			List<Use> uses = new ArrayList<Use>(2);
 			phi = new PhiAssignment(new Location(), target, uses);
+			phi.setOldVariable(oldVar);
 			join.add(phi);
-			
+
 			Use use = new Use(oldVar, phi);
 			uses.add(use);
 			use = new Use(oldVar, phi);
@@ -112,27 +160,60 @@ public class SSATransformation extends AbstractActorTransformation {
 		// get index
 		int index;
 		if (definitions.containsKey(name)) {
-			index = definitions.get(name) + 1;
+			index = definitions.get(name).getIndex() + 1;
 		} else {
 			index = 1;
 		}
-		definitions.put(name, index);
 
 		// create new variable
 		LocalVariable newVar = new LocalVariable(oldVar.isAssignable(), index,
 				oldVar.getLocation(), name, oldVar.getType());
 		procedure.getLocals().put(newVar.getName(), newVar);
+		definitions.put(name, newVar);
+		uses.put(name, newVar);
 
 		return newVar;
 	}
 
+	/**
+	 * Replaces uses in the given expression.
+	 * 
+	 * @param expression
+	 *            an expression
+	 */
+	private void replaceUses(Expression expression) {
+		expression.accept(new UseUpdater());
+	}
+
+	/**
+	 * Replaces uses of oldVar by newVar in the given expressions.
+	 * 
+	 * @param expressions
+	 *            a list of expressions
+	 */
+	private void replaceUses(List<Expression> expressions) {
+		for (Expression value : expressions) {
+			value.accept(new UseUpdater());
+		}
+	}
+
+	/**
+	 * Restore variables that were concerned by phi assignments.
+	 */
+	private void restoreVariables() {
+		for (Instruction instruction : join.getInstructions()) {
+			PhiAssignment phi = (PhiAssignment) instruction;
+			LocalVariable oldVar = phi.getOldVariable();
+			uses.put(oldVar.getBaseName(), oldVar);
+		}
+	}
+
 	@Override
 	public void visit(Assign assign, Object... args) {
+		replaceUses(assign.getValue());
+
 		LocalVariable target = assign.getTarget();
 		LocalVariable newTarget = newDefinition(target);
-
-		// replace target by newTarget
-		Use.replaceUses(target, newTarget);
 		assign.setTarget(newTarget);
 
 		if (branch != 0) {
@@ -141,16 +222,102 @@ public class SSATransformation extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(Call call, Object... args) {
+		replaceUses(call.getParameters());
+
+		LocalVariable target = call.getTarget();
+		if (target != null) {
+			LocalVariable newTarget = newDefinition(target);
+			call.setTarget(newTarget);
+
+			if (branch != 0) {
+				insertPhi(target, newTarget);
+			}
+		}
+	}
+
+	@Override
+	public void visit(HasTokens hasTokens, Object... args) {
+		LocalVariable target = (LocalVariable) hasTokens.getTarget();
+		LocalVariable newTarget = newDefinition(target);
+		hasTokens.setTarget(newTarget);
+
+		if (branch != 0) {
+			insertPhi(target, newTarget);
+		}
+	}
+
+	@Override
 	public void visit(IfNode ifNode, Object... args) {
+		BlockNode outerJoin = join;
+		int outerBranch = branch;
+
+		replaceUses(ifNode.getValue());
+
 		join = ifNode.getJoinNode();
 
 		branch = 1;
 		visit(ifNode.getThenNodes());
+
+		// restore variables used in phi assignments
+		restoreVariables();
+
 		branch = 2;
 		visit(ifNode.getElseNodes());
 
 		branch = 0;
 		visit(ifNode.getJoinNode(), args);
+
+		// commit phi
+		BlockNode innerJoin = join;
+		join = outerJoin;
+		branch = outerBranch;
+		commitPhi(innerJoin);
+	}
+
+	/**
+	 * Commits the phi assignments in the given join node.
+	 * 
+	 * @param innerJoin
+	 *            a BlockNode that contains phi assignments
+	 */
+	private void commitPhi(BlockNode innerJoin) {
+		for (Instruction instruction : innerJoin.getInstructions()) {
+			PhiAssignment phi = (PhiAssignment) instruction;
+			LocalVariable oldVar = phi.getOldVariable();
+			LocalVariable newVar = phi.getTarget();
+
+			// updates the current value of "var"
+			uses.put(oldVar.getBaseName(), newVar);
+
+			if (join != null) {
+				insertPhi(oldVar, newVar);
+			}
+		}
+	}
+
+	@Override
+	public void visit(Load load, Object... args) {
+		replaceUses(load.getIndexes());
+
+		LocalVariable target = load.getTarget();
+		LocalVariable newTarget = newDefinition(target);
+		load.setTarget(newTarget);
+
+		if (branch != 0) {
+			insertPhi(target, newTarget);
+		}
+	}
+
+	@Override
+	public void visit(Return returnInstr, Object... args) {
+		replaceUses(returnInstr.getValue());
+	}
+
+	@Override
+	public void visit(Store store, Object... args) {
+		replaceUses(store.getIndexes());
+		replaceUses(store.getValue());
 	}
 
 	@Override
