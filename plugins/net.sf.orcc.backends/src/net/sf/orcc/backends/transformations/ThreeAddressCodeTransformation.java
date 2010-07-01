@@ -125,7 +125,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			}
 
 			// Make the final asssignment
-			LocalVariable target = newVariable();
+			LocalVariable target = newVariable(type);
 			target.setType(type);
 			Assign assign = new Assign(location, target, new BinaryExpr(
 					location, e1, op, e2, previousType));
@@ -197,7 +197,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				}
 
 				// Make the final asssignment
-				LocalVariable target = newVariable();
+				LocalVariable target = newVariable(type);
 				Use use = new Use(target);
 				Location location = expr.getLocation();
 				target.setType(type);
@@ -221,16 +221,16 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		}
 
 		/**
-		 * Creates a new local variable with type int(size=32).
+		 * Creates a new local variable with type 
 		 * 
-		 * @return a new local variable with type int(size=32)
+		 * @return a new local variable with type 
 		 */
-		private LocalVariable newVariable() {
+		private LocalVariable newVariable(Type type) {
 			String procName = procedure.getName();
 
 			return new LocalVariable(true, tempVarCount++, new Location(),
 					procName + "_" + "expr", null,
-					IrFactory.eINSTANCE.createTypeInt(32));
+					type);
 		}
 
 	}
@@ -381,7 +381,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 		// Check store value
 		store.setValue(visitExpression(value, it,
-				IrFactory.eINSTANCE.createTypeInt(32)));
+				target.getType()));
 		it.next();
 	}
 
@@ -424,16 +424,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
-		// Transform Local boolean Variable into int Variable (to be remove
-		// later)
-		for (Variable var : procedure.getLocals()) {
-			if (((LocalVariable) var).isPort()) {
-				TypeList listType = (TypeList) var.getType();
-				if (listType.getElementType().isBool()) {
-					listType.setType(IrFactory.eINSTANCE.createTypeInt(32));
-				}
-			}
-		}
 
 		tempVarCount = 1;
 
