@@ -108,9 +108,9 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	private Map<String, Expression> parameters;
 
 	/**
-	 * the wrapper referenced by this instance.
+	 * the serializer/deserializer referenced by this instance.
 	 */
-	private Wrapper wrapper;
+	private SerDes serdes;
 
 	/**
 	 * Creates a new instance of the given actor with the given identifier.
@@ -213,16 +213,17 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	}
 
 	/**
-	 * Creates a new instance of the given wrapper with the given identifier.
+	 * Creates a new instance of the given serializer/deserializer with the
+	 * given identifier.
 	 * 
 	 * @param id
 	 *            the instance identifier
-	 * @param wrapper
+	 * @param serdes
 	 *            a wrapper
 	 */
-	public Instance(String id, Wrapper wrapper) {
-		this(id, "Wrapper");
-		this.wrapper = wrapper;
+	public Instance(String id, SerDes serdes) {
+		this(id, "SerDes");
+		this.serdes = serdes;
 	}
 
 	@Override
@@ -348,8 +349,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @return the wrapper referenced by this instance, or <code>null</code> if
 	 *         this instance does not reference a wrapper
 	 */
-	public Wrapper getWrapper() {
-		return wrapper;
+	public SerDes getWrapper() {
+		return serdes;
 	}
 
 	@Override
@@ -429,7 +430,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @return true if this instance is a wrapper
 	 */
 	public boolean isWrapper() {
-		return (wrapper != null);
+		return (serdes != null);
 	}
 
 	/**

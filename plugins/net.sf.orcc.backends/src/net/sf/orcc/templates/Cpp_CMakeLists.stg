@@ -1,6 +1,6 @@
 addActor(actor) ::= <<
-$if (!actor.system)$
-$actor.name$.cpp
+$if (!actor.system)
+$$actor.name$.cpp
 $endif$
 >>
 
@@ -31,7 +31,7 @@ $!$network.networks : addLibraries()$!$
 
 add_executable ($network.name$
 $network.name$.cpp
-$network.actors : addActor(); separator="\n"$
+$network.actors : addActor()$
 )
 
 

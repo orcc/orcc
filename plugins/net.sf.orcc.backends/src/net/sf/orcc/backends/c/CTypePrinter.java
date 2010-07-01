@@ -44,7 +44,7 @@ import net.sf.orcc.ir.type.TypePrinter;
  */
 public class CTypePrinter extends TypePrinter {
 
-	private void printInt(int size) {
+	public void printInt(int size) {
 		if (size <= 8) {
 			builder.append("char");
 		} else if (size <= 16) {

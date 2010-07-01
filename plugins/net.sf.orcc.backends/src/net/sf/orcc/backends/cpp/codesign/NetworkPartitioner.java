@@ -29,8 +29,10 @@
 package net.sf.orcc.backends.cpp.codesign;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,8 +68,6 @@ public class NetworkPartitioner {
 	 * 
 	 */
 
-	private boolean threadPartitioning;
-
 	private DirectedGraph<Vertex, Connection> graph;
 
 	private Map<Connection, Port> incomingPort = new HashMap<Connection, Port>();
@@ -75,6 +75,8 @@ public class NetworkPartitioner {
 	private int nbInput;
 
 	private int nbOutput;
+
+	private Map<Instance, List<String>> partNames;
 
 	private Map<Connection, Port> outgoingPort = new HashMap<Connection, Port>();
 
@@ -146,7 +148,7 @@ public class NetworkPartitioner {
 		network.getInputs().put(port.getName(), port);
 
 		incomingPort.put(connection, port);
-		partitionMap.put(port, getPartNameAttribute(tgtInstance));
+		partitionMap.put(port, getPartNameAttribute(tgtInstance).get(0));
 
 		Connection incoming = new Connection(null, connection.getTarget(),
 				connection.getAttributes());
@@ -173,7 +175,7 @@ public class NetworkPartitioner {
 		network.getOutputs().put(port.getName(), port);
 
 		Map<String, Vertex> map = new HashMap<String, Vertex>();
-		map.put(getPartNameAttribute(inst), vertex);
+		map.put(getPartNameAttribute(inst).get(0), vertex);
 
 		outgoingPort.put(connection, port);
 
@@ -228,7 +230,7 @@ public class NetworkPartitioner {
 		Map<String, Set<Vertex>> partitionSets = new HashMap<String, Set<Vertex>>();
 
 		for (Vertex vertex : graph.vertexSet()) {
-			String partName = getPartNameAttribute(vertex.getInstance());
+			String partName = partNames.get(vertex.getInstance()).get(0);
 
 			if (partName == null) {
 				throw new OrccException("partName attribute of instance "
@@ -256,25 +258,22 @@ public class NetworkPartitioner {
 	 * @throws OrccException
 	 *             If the instance does not contain a partName attribute.
 	 */
-	private String getPartNameAttribute(Instance instance) throws OrccException {
-		String partName = null;
+	public List<String> getPartNameAttribute(Instance instance)
+			throws OrccException {
+		List<String> partNames = null;
 
 		IAttribute attr = instance.getAttribute("partName");
 		if (attr != null && attr.getType() == IAttribute.VALUE) {
 			Expression expr = ((IValueAttribute) attr).getValue();
 			if (expr.isStringExpr()) {
-				String[] partNames = ((StringExpr) expr).getValue().split("/");
-				if (threadPartitioning) {
-					partName = partNames[1];
-				} else {
-					partName = partNames[0];
-				}
+				partNames = new LinkedList<String>(
+						Arrays.asList(((StringExpr) expr).getValue().split("/")));
 			} else {
 				throw new OrccException(
 						"partName attribute must be a String expression");
 			}
 		}
-		return partName;
+		return partNames;
 	}
 
 	public List<Network> getSubnetworks(Network network) throws OrccException {
@@ -292,11 +291,13 @@ public class NetworkPartitioner {
 	 *
 	 */
 
-	public void transform(Network network, boolean threadPartitioning)
-			throws OrccException {
-		graph = network.getGraph();
-		this.threadPartitioning = threadPartitioning;
+	public void transform(Network network) throws OrccException {
 
+		if (partNames == null) {
+			initPartNames(network);
+		}
+
+		graph = network.getGraph();
 		Map<String, Set<Vertex>> partitions = getPartitionSets();
 
 		// Creates a copy of vertices of graph
@@ -310,9 +311,8 @@ public class NetworkPartitioner {
 
 			networks.add(subNetwork);
 
-			Instance instance = new Instance(subNetwork.getName(), subNetwork);
-
-			Vertex vertex = new Vertex(instance);
+			Vertex vertex = new Vertex(new Instance(subNetwork.getName(),
+					subNetwork));
 
 			graph.addVertex(vertex);
 
@@ -335,18 +335,42 @@ public class NetworkPartitioner {
 						connection.getAttributes());
 
 				Vertex srcVertex = topHierNetworkVertices
-						.get(getPartNameAttribute(src.getInstance()));
+						.get(partNames.get(src.getInstance()).get(0));
 				Vertex tgtVertex = topHierNetworkVertices
-						.get(getPartNameAttribute(tgt.getInstance()));
+						.get(partNames.get(tgt.getInstance()).get(0));
 
 				graph.addEdge(srcVertex, tgtVertex, conn);
 			}
 		}
+
 		graph.removeAllVertices(vertices);
+
+		updatePartNames();		
+	}
+
+	private void updatePartNames() {
+		for (List<String> stringList : partNames.values()) {
+			stringList.remove(0);
+		}
+	}
+
+	private void initPartNames(Network network) throws OrccException {
+		partNames = new HashMap<Instance, List<String>>();
+		for (Instance instance : network.getInstances()) {
+			partNames.put(instance, getPartNameAttribute(instance));
+		}
 	}
 
 	public List<Network> getNetworks() {
 		return networks;
+	}
+
+	public boolean hasThreadParallelism() {
+		int size = 0;
+		for(List<String> stringList : partNames.values()) {
+			size = stringList.size();
+		}
+		return size > 1;
 	}
 
 }

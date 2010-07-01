@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fï¿½dï¿½rale de Lausanne
+ * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fï¿½dï¿½rale de Lausanne nor the names of its
+ *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -37,14 +37,13 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.cpp.codesign.NetworkPartitioner;
-import net.sf.orcc.backends.cpp.codesign.WrapperAdder;
+import net.sf.orcc.backends.cpp.codesign.SerDesAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
-import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 /**
@@ -57,6 +56,8 @@ import net.sf.orcc.network.Network;
 public class CppBackendImpl extends AbstractBackend {
 
 	public static Boolean partitioning = false;
+
+	private NetworkPartitioner partitioner = new NetworkPartitioner();
 
 	/**
 	 * 
@@ -90,11 +91,10 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				false);
+		boolean partition = getAttribute("net.sf.orcc.backends.partition", true);
 		if (partition) {
 			partitioning = true;
-			new NetworkPartitioner().transform(network, false);
+			partitioner.transform(network);
 
 		}
 
@@ -172,17 +172,18 @@ public class CppBackendImpl extends AbstractBackend {
 					: Arrays.asList(network);
 			for (Network subnetwork : networks) {
 				if (partitioning) {
-					new WrapperAdder().transform(subnetwork);
+					new SerDesAdder().transform(subnetwork);
 
-					Instance inst = subnetwork.getInstances().get(0);
-					if (inst.getAttribute("partName") != null) {
-						new NetworkPartitioner().transform(subnetwork, true);
+					if (partitioner.hasThreadParallelism()) {
+						partitioner.transform(subnetwork);
 						for (Network net : subnetwork.getNetworks()) {
 							net.computeTemplateMaps();
 						}
 					}
 				}
 
+				path = path + File.separator + subnetwork.getName();
+				new File(path).mkdir();
 				String name = subnetwork.getName();
 
 				String outputName = path + File.separator + name + ".h";
@@ -191,7 +192,10 @@ public class CppBackendImpl extends AbstractBackend {
 				outputName = path + File.separator + name + ".cpp";
 				networkImplPrinter.printNetwork(outputName, subnetwork, false,
 						fifoSize);
-				new CppCMakePrinter().printCMake(path, subnetwork);
+				new CppCMakePrinter().printCMake(path, subnetwork);	
+			
+				
+				path = new File(path).getParent();
 			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);

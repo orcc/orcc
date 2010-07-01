@@ -43,7 +43,7 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
-import net.sf.orcc.network.Wrapper;
+import net.sf.orcc.network.SerDes;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.util.OrderedMap;
 
@@ -58,7 +58,7 @@ import org.jgrapht.DirectedGraph;
  * 
  */
 
-public class WrapperAdder {
+public class SerDesAdder {
 
 	private DirectedGraph<Vertex, Connection> graph;
 
@@ -153,8 +153,6 @@ public class WrapperAdder {
 		Set<Connection> connections = new HashSet<Connection>(
 				graph.outgoingEdgesOf(vertex));
 
-		// for each connection, add it to a port => connection map
-		// port is a port of vertex
 		Map<Port, List<Connection>> outMap = new HashMap<Port, List<Connection>>();
 		for (Connection connection : connections) {
 			Port src = connection.getSource();
@@ -176,11 +174,10 @@ public class WrapperAdder {
 		OrderedMap<String, Port> outputs = network.getOutputs();
 
 		if (inputs.getLength() > 0 || outputs.getLength() > 0) {
-			Wrapper wrapper = new Wrapper(inputs.getLength(),
-					outputs.getLength());
-			Vertex vWrap = new Vertex(new Instance(network.getName(), wrapper));
+			Vertex serdes = new Vertex(new Instance("SerDes", new SerDes(
+					inputs.getLength(), outputs.getLength())));
 
-			graph.addVertex(vWrap);
+			graph.addVertex(serdes);
 
 			Set<Vertex> vertexToRemove = new HashSet<Vertex>();
 
@@ -195,15 +192,13 @@ public class WrapperAdder {
 						for (Connection connection : conns) {
 
 							Port srcPort = connection.getSource();
-							// FIXME: set the type of the source port to the one
-							// of the target
 							srcPort.setType(port.getType());
 							Port tgtPort = new Port(port);
 
 							Connection incoming = new Connection(srcPort,
 									tgtPort, connection.getAttributes());
 							Vertex vSrc = graph.getEdgeSource(connection);
-							graph.addEdge(vSrc, vWrap, incoming);
+							graph.addEdge(vSrc, serdes, incoming);
 
 							vertexToRemove.add(vertex);
 							outputs.remove(port.getName());
@@ -215,33 +210,28 @@ public class WrapperAdder {
 						Connection connection = it.next();
 						Port srcPort = new Port(port);
 						Port tgtPort = connection.getTarget();
-						// FIX: set the type of the target port to the one of
-						// the source
 						tgtPort.setType(port.getType());
 						Vertex vTgt = graph.getEdgeTarget(connection);
 						Connection outgoing = new Connection(srcPort, tgtPort,
 								connection.getAttributes());
-						graph.addEdge(vWrap, vTgt, outgoing);
+						graph.addEdge(serdes, vTgt, outgoing);
 						vertexToRemove.add(vertex);
 						inputs.remove(port.getName());
 
 						while (it.hasNext()) {
 							connection = it.next();
 							tgtPort = connection.getTarget();
-							// FIX: set the type of the target port to the one
-							// of the source
 							tgtPort.setType(port.getType());
 							vTgt = graph.getEdgeTarget(connection);
 							Connection newOutgoing = new Connection(srcPort,
 									tgtPort, connection.getAttributes());
-							graph.addEdge(vWrap, vTgt, newOutgoing);
+							graph.addEdge(serdes, vTgt, newOutgoing);
 						}
 					}
-				} else {
 				}
 			}
 
-			examineVertex(vWrap);
+			examineVertex(serdes);
 			graph.removeAllVertices(vertexToRemove);
 			graph.removeAllEdges(toBeRemoved);
 		}

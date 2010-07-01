@@ -36,7 +36,7 @@ package net.sf.orcc.network;
  * @author Ghislain Roquier
  * 
  */
-public class Wrapper {
+public class SerDes {
 
 	private int numInputs;
 
@@ -50,7 +50,7 @@ public class Wrapper {
 	 * @param numOutput
 	 *            number of outputs
 	 */
-	public Wrapper(int numInputs, int numOutputs) {
+	public SerDes(int numInputs, int numOutputs) {
 		this.numInputs = numInputs;
 		this.numOutputs = numOutputs;
 	}
