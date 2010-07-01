@@ -28,6 +28,20 @@
  */
 package net.sf.orcc.frontend;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -37,5 +51,112 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * 
  */
 public class SSATransformation extends AbstractActorTransformation {
+
+	private int branch;
+
+	private Map<String, Integer> definitions;
+
+	private BlockNode join;
+
+	private Map<String, Integer> uses;
+
+	/**
+	 * Creates a new SSA transformation.
+	 */
+	public SSATransformation() {
+		definitions = new HashMap<String, Integer>();
+		uses = new HashMap<String, Integer>();
+	}
+
+	private void insertPhi(LocalVariable oldVar, LocalVariable newVar) {
+		String name = oldVar.getBaseName();
+		PhiAssignment phi = null;
+		for (Instruction instruction : join.getInstructions()) {
+			if (instruction.isPhi()) {
+				PhiAssignment tempPhi = (PhiAssignment) instruction;
+				if (tempPhi.getTarget().getBaseName().equals(name)) {
+					phi = tempPhi;
+					break;
+				}
+			}
+		}
+
+		if (phi == null) {
+			LocalVariable target = newDefinition(oldVar);
+			List<Use> uses = new ArrayList<Use>(2);
+			phi = new PhiAssignment(new Location(), target, uses);
+			
+			Use use = new Use(oldVar, phi);
+			uses.add(use);
+			use = new Use(oldVar, phi);
+			uses.add(use);
+		}
+
+		// replace use
+		phi.getVars().get(branch - 1).remove();
+		Use use = new Use(newVar, phi);
+		phi.getVars().set(branch - 1, use);
+	}
+
+	/**
+	 * Creates a new definition based on the given old variable.
+	 * 
+	 * @param oldVar
+	 *            a variable
+	 * @return a new definition based on the given old variable
+	 */
+	private LocalVariable newDefinition(LocalVariable oldVar) {
+		String name = oldVar.getBaseName();
+
+		// get index
+		int index;
+		if (definitions.containsKey(name)) {
+			index = definitions.get(name) + 1;
+		} else {
+			index = 1;
+		}
+		definitions.put(name, index);
+
+		// create new variable
+		LocalVariable newVar = new LocalVariable(oldVar.isAssignable(), index,
+				oldVar.getLocation(), name, oldVar.getType());
+		procedure.getLocals().put(newVar.getName(), newVar);
+
+		return newVar;
+	}
+
+	@Override
+	public void visit(Assign assign, Object... args) {
+		LocalVariable target = assign.getTarget();
+		LocalVariable newTarget = newDefinition(target);
+
+		// replace target by newTarget
+		Use.replaceUses(target, newTarget);
+		assign.setTarget(newTarget);
+
+		if (branch != 0) {
+			insertPhi(target, newTarget);
+		}
+	}
+
+	@Override
+	public void visit(IfNode ifNode, Object... args) {
+		join = ifNode.getJoinNode();
+
+		branch = 1;
+		visit(ifNode.getThenNodes());
+		branch = 2;
+		visit(ifNode.getElseNodes());
+
+		branch = 0;
+		visit(ifNode.getJoinNode(), args);
+	}
+
+	@Override
+	public void visitProcedure(Procedure procedure) {
+		definitions.clear();
+		uses.clear();
+		super.visitProcedure(procedure);
+	}
 
 }

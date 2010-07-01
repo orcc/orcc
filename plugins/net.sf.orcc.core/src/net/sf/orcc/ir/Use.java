@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
@@ -164,6 +165,24 @@ public class Use {
 	public static void removeUses(User node, List<Expression> values) {
 		for (Expression value : values) {
 			removeUses(node, value);
+		}
+	}
+
+	/**
+	 * Replaces uses of oldVar by uses of newVar.
+	 * 
+	 * @param oldVar
+	 *            old variable
+	 * @param newVar
+	 *            new variable
+	 */
+	public static void replaceUses(LocalVariable oldVar, LocalVariable newVar) {
+		// copy uses because #setVariable will change oldVar's uses
+		List<Use> existingUses = new ArrayList<Use>(oldVar.getUses());
+		for (Use use : existingUses) {
+			if (use.getVariable().equals(oldVar)) {
+				use.setVariable(newVar);
+			}
 		}
 	}
 
