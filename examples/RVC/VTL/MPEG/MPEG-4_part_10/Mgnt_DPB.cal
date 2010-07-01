@@ -76,7 +76,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	uint(size=SZ_NBPIC) Ref_idx    := 0;
 
 	/*Display Information*/
-//	int(size=14)          nbMBdisplay         := 0;
 	int(size=14)          nbMBdisplayForXaxis := 0;
 	int(size=14)          nbMBdisplayForYaxis := 0;
 	int(size=32)          NextPOCtoDisplay    := -1;
@@ -266,12 +265,11 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			uint         CurrAddrYaxis,
 			List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff := [ 0 :for int t in Integers(0,MB_WIDTH_CHROMA*MB_WIDTH_CHROMA) ] 
 		do
-//			CurrAddrInPix := (nbMBdisplay mod PicWidthInMacroB)*MB_WIDTH_CHROMA + (nbMBdisplay / PicWidthInMacroB)*MB_WIDTH_CHROMA*MB_WIDTH_CHROMA*PicWidthInMacroB ;
 			CurrAddrInPix := nbMBdisplayForXaxis * MB_WIDTH_CHROMA + nbMBdisplayForYaxis * MB_WIDTH_CHROMA * MB_WIDTH_CHROMA * PicWidthInMacroB;
 			CurrAddrYaxis := 0;
 			foreach int y in Integers(0, (MB_WIDTH_CHROMA-1))
 			do
-				foreach int x in Integers(0, (MB_WIDTH_LUMA-1))
+				foreach int x in Integers(0, (MB_WIDTH_CHROMA-1))
 				do
 					buff[x + y * MB_WIDTH_CHROMA] := pic[IdxNextPOCtoDisplay][CurrAddrInPix + x + CurrAddrYaxis];
 				end
@@ -282,7 +280,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				nbMBdisplayForXaxis := 0;
 				nbMBdisplayForYaxis := nbMBdisplayForYaxis + 1;
 			end
-			//nbMBdisplay := nbMBdisplay +1;
 		end
 
 
@@ -297,7 +294,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			uint         CurrAddrYaxis,
 			List(type:int(size=16),size = MB_WIDTH_LUMA * MB_WIDTH_LUMA + 1) buff := [ 0 :for int t in Integers(0,MB_WIDTH_LUMA*MB_WIDTH_LUMA) ] 
 		do
-			//CurrAddrInPix := (nbMBdisplay mod PicWidthInMacroB)*MB_WIDTH_LUMA + (nbMBdisplay / PicWidthInMacroB)*MB_WIDTH_LUMA*MB_WIDTH_LUMA*PicWidthInMacroB ;
 			CurrAddrInPix := nbMBdisplayForXaxis * MB_WIDTH_LUMA + nbMBdisplayForYaxis * MB_WIDTH_LUMA * MB_WIDTH_LUMA * PicWidthInMacroB;
 			CurrAddrYaxis := 0;
 			foreach int y in Integers(0, (MB_WIDTH_LUMA-1))
@@ -313,7 +309,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				nbMBdisplayForXaxis := 0;
 				nbMBdisplayForYaxis := nbMBdisplayForYaxis + 1;
 			end
-			//nbMBdisplay := nbMBdisplay +1;
 		end
   Display.skip: action ==>
   guard
@@ -323,16 +318,12 @@ actor Mgnt_DPB ( int MB_WIDTH )
   Display.done: action ==>
   guard
 	nbMBdisplayForYaxis = PicHeightInMacroB
-//  	nbMBdisplayForXaxis + nbMBdisplayForYaxis * PicWidthInMacroB = PicSizeInMacroB
-  
-  //	nbMBdisplay = PicSizeInMacroB
   do
 	PicDisplayed[IdxNextPOCtoDisplay] := true;
 	NextPOCtoDisplay := -1;
 	IdxNextPOCtoDisplay := -1;
 	nbMBdisplayForXaxis := 0;
 	nbMBdisplayForYaxis := 0;
-	//nbMBdisplay := 0;
   end
 
 
