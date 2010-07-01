@@ -48,6 +48,11 @@ public class PhiAssignment extends AbstractInstruction implements
 
 	private List<Use> localUses;
 
+	/**
+	 * Only used when translating to SSA form.
+	 */
+	private LocalVariable oldVariable;
+
 	private LocalVariable target;
 
 	/**
@@ -75,6 +80,16 @@ public class PhiAssignment extends AbstractInstruction implements
 		visitor.visit(this, args);
 	}
 
+	/**
+	 * Returns the "old" variable of this phi. Only used when translating to SSA
+	 * form.
+	 * 
+	 * @return the "old" variable of this phi
+	 */
+	public LocalVariable getOldVariable() {
+		return oldVariable;
+	}
+
 	@Override
 	public LocalVariable getTarget() {
 		return target;
@@ -92,6 +107,17 @@ public class PhiAssignment extends AbstractInstruction implements
 	@Override
 	public boolean isPhi() {
 		return true;
+	}
+
+	/**
+	 * Sets the "old" variable to be remembered when examining the "else" branch
+	 * of an if. Only used when translating to SSA form.
+	 * 
+	 * @param old
+	 *            an "old" variable
+	 */
+	public void setOldVariable(LocalVariable old) {
+		this.oldVariable = old;
 	}
 
 	@Override

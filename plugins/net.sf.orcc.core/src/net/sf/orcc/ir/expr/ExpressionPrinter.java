@@ -32,17 +32,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionVisitor;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.ir.expr.VarExpr;
 
 /**
  * This class defines the default expression printer.
@@ -166,8 +155,7 @@ public class ExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(VarExpr expr, Object... args) {
-		Variable variable = expr.getVar().getVariable();
-		builder.append(variable.toString());
+		builder.append(expr.getVar());
 	}
 
 }

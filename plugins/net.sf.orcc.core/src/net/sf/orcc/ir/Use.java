@@ -283,7 +283,7 @@ public class Use {
 
 	@Override
 	public String toString() {
-		return variable.toString();
+		return String.valueOf(variable);
 	}
 
 }
