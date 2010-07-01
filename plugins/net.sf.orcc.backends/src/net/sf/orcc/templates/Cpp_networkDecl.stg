@@ -9,6 +9,14 @@ $actors: includeActor(); separator="\n"$
 >>
 
 
+includeSerDes(instance) ::= <<
+$if (instance.serdes)$#include "WrapperAka.h"$endif$
+>>
+
+includeSerDeses(instances) ::= <<
+$instances: includeSerDes()$
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // initialize Instances
@@ -17,7 +25,9 @@ $instance.parameters.(parameter)$
 >>
 
 initializeInstance(instance) ::= <<
-$instance.id$($instance.actor.parameters.list: argumentList(); separator=", "$)
+$if (!instance.serdes)
+$$instance.id$($instance.actor.parameters.list: argumentList(); separator=", "$)$
+endif$
 >>
 
 initializeInstances(instances) ::= <<
@@ -43,7 +53,11 @@ declareFifo(edge) ::= <<
 $if(network.networks)$
 $doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind="2")$
 $else$
+$if (network.sourceMap.(edge).instance.serdes || network.targetMap.(edge).instance.serdes)$
+$doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind="1")$
+$else$
 $doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind="0")$
+$endif$
 $endif$
 >>
 
@@ -66,8 +80,16 @@ doAssignSourcePort(source, target, targetPort) ::= <<
 $target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, $network.name$_$source.name$);>>
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
-$source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, $network.name$_fifo_$count$);
-$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, $network.name$_fifo_$count$);
+$if (source.actor)$$
+source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, $network.name$_fifo_$count$);$
+else
+$$source.id$.connect(ACTOR_PORT_OUT, $network.name$_$sourcePort.name$, $network.name$_fifo_$count$);$
+endif$
+$if (target.actor)$
+$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, $network.name$_fifo_$count$);$
+else
+$$target.id$.connect(ACTOR_PORT_IN, $network.name$_$targetPort.name$, $network.name$_fifo_$count$);$
+endif$
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
@@ -100,7 +122,11 @@ declareInstance(instance) ::= <<
 $if (instance.network)$
 $declareInstances(instance.network.instances)$
 $else$
+$if(instance.serdes)$
+WrapperAka $instance.id$;
+$else$
 actor_$instance.actor.name$ $instance.id$;
+$endif$
 $endif$
 >>
 
@@ -116,7 +142,6 @@ printInitialize(instance) ::= <<
 $if (instance.actor)$
 $if (!instance.actor.initializes.empty)$
 $instance.id$.initialize();
-
 $endif$
 $endif$
 >>
@@ -126,7 +151,7 @@ $instances: printInitialize()$
 >>
 
 printScheduler(instance) ::= <<
-res += $instance.id$.scheduler();
+$if (!instance.serdes)$res += $instance.id$.scheduler();$endif$
 >>
 
 printSchedulers(instances) ::= <<
@@ -187,6 +212,8 @@ network(debugFifos, fifoSize, network) ::= <<
 #include "Threadaka.h"
 
 $includeActors(network.actors)$
+
+$includeSerDeses(network.instances)$
 
 #define SIZE 10000
 

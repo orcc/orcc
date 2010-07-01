@@ -429,7 +429,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * 
 	 * @return true if this instance is a wrapper
 	 */
-	public boolean isWrapper() {
+	public boolean isSerdes() {
 		return (serdes != null);
 	}
 

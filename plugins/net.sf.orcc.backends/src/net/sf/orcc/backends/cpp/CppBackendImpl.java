@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009, Ecole Polytechnique FÃ©dÃ©rale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *   * Neither the name of the Ecole Polytechnique FÃ©dÃ©rale de Lausanne nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -36,6 +36,7 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.cpp.codesign.CppHeaderPrinter;
 import net.sf.orcc.backends.cpp.codesign.NetworkPartitioner;
 import net.sf.orcc.backends.cpp.codesign.SerDesAdder;
 import net.sf.orcc.ir.Actor;
@@ -95,7 +96,14 @@ public class CppBackendImpl extends AbstractBackend {
 		if (partition) {
 			partitioning = true;
 			partitioner.transform(network);
-
+			if (network.getNetworks().size() > 1) {
+				try {
+					network.computeTemplateMaps();
+					new CppHeaderPrinter().print(path, network);
+				} catch (IOException e) {
+					throw new OrccException("I/O error", e);
+				}
+			}
 		}
 
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
@@ -192,11 +200,11 @@ public class CppBackendImpl extends AbstractBackend {
 				outputName = path + File.separator + name + ".cpp";
 				networkImplPrinter.printNetwork(outputName, subnetwork, false,
 						fifoSize);
-				new CppCMakePrinter().printCMake(path, subnetwork);	
-			
-				
+				new CppCMakePrinter().printCMake(path, subnetwork);
+
 				path = new File(path).getParent();
 			}
+
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
