@@ -85,6 +85,7 @@ public class SSATransformation extends AbstractActorTransformation {
 			LocalVariable target = newDefinition(oldVar);
 			List<Use> uses = new ArrayList<Use>(2);
 			phi = new PhiAssignment(new Location(), target, uses);
+			join.add(phi);
 			
 			Use use = new Use(oldVar, phi);
 			uses.add(use);
