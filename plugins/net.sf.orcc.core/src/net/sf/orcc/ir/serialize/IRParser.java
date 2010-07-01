@@ -191,11 +191,11 @@ public class IRParser {
 	private Variable getVariable(JSONArray array) throws JSONException,
 			OrccException {
 		String name = array.getString(0);
-		Integer suffix = array.isNull(1) ? null : array.getInt(1);
-		int index = array.getInt(2);
+		int index = array.getInt(1);
 
 		// retrieve the variable definition
-		String varName = stringOfVar(name, suffix, index);
+		String indexStr = (index == 0) ? "" : "_" + index;
+		String varName = name + indexStr;
 		Variable varDef = variables.get(varName);
 		if (varDef == null) {
 			throw new OrccException("unknown variable: " + varName);
@@ -895,14 +895,13 @@ public class IRParser {
 		JSONArray details = array.getJSONArray(0);
 		String name = details.getString(0);
 		boolean assignable = details.getBoolean(1);
-		Integer suffix = details.isNull(2) ? null : details.getInt(2);
-		int index = details.getInt(3);
+		int index = details.getInt(2);
 
 		Location loc = parseLocation(array.getJSONArray(1));
 		Type type = parseType(array.get(2));
 
 		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
-				suffix, type);
+				type);
 
 		// register the variable definition
 		variables.put(file, loc, varDef.getName(), varDef);
@@ -950,11 +949,6 @@ public class IRParser {
 				actions.put(tag, action);
 			}
 		}
-	}
-
-	private String stringOfVar(String name, Integer suffix, int index) {
-		String indexStr = (index == 0) ? "" : "_" + index;
-		return name + (suffix == null ? "" : suffix) + indexStr;
 	}
 
 }

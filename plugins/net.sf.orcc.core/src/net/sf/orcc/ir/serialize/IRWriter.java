@@ -754,9 +754,6 @@ public class IRWriter {
 		array.put(details);
 		details.put(variable.getBaseName());
 		details.put(variable.isAssignable());
-		Object suffix = variable.hasSuffix() ? variable.getSuffix()
-				: JSONObject.NULL;
-		details.put(suffix);
 		details.put(variable.getIndex());
 
 		array.put(writeLocation(variable.getLocation()));
@@ -884,8 +881,6 @@ public class IRWriter {
 
 		details.put(variable.getName());
 		details.put(variable.isAssignable());
-		details.put(JSONObject.NULL);
-		details.put(0);
 
 		variableArray.put(writeLocation(variable.getLocation()));
 		variableArray.put(writeType(variable.getType()));
@@ -938,12 +933,10 @@ public class IRWriter {
 		JSONArray array = new JSONArray();
 		if (variable.isGlobal()) {
 			array.put(variable.getName());
-			array.put(JSONObject.NULL);
 			array.put(0);
 		} else {
 			LocalVariable local = (LocalVariable) variable;
 			array.put(local.getBaseName());
-			array.put(local.hasSuffix() ? local.getSuffix() : JSONObject.NULL);
 			array.put(local.getIndex());
 		}
 
