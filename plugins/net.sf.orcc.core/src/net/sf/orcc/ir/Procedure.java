@@ -293,10 +293,49 @@ public class Procedure extends AbstractLocalizable {
 		return visitor.getStateVarsUsed();
 	}
 
+	/**
+	 * Returns <code>true</code> if this procedure is external.
+	 * 
+	 * @return <code>true</code> if this procedure is external
+	 */
 	public boolean isExternal() {
 		return external;
 	}
 
+	/**
+	 * Creates a new local variable that can be used to hold intermediate
+	 * results. The variable is added to {@link #procedure}'s locals.
+	 * 
+	 * @param file
+	 *            the file in which this procedure resides
+	 * @param type
+	 *            type of the variable
+	 * @param name
+	 *            hint for the variable name
+	 * @return a new local variable
+	 */
+	public LocalVariable newTempLocalVariable(String file, Type type,
+			String hint) {
+		String name = hint;
+		Variable variable = locals.get(name);
+		int i = 0;
+		while (variable != null) {
+			name = hint + i;
+			variable = locals.get(name);
+			i++;
+		}
+
+		variable = new LocalVariable(true, 0, new Location(), name, null, type);
+		locals.put(file, variable.getLocation(), variable.getName(), variable);
+		return (LocalVariable) variable;
+	}
+
+	/**
+	 * Sets this procedure as "external".
+	 * 
+	 * @param external
+	 *            value of external flag
+	 */
 	public void setExternal(boolean external) {
 		this.external = external;
 	}

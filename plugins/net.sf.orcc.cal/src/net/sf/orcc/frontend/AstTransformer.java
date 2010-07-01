@@ -171,7 +171,7 @@ public class AstTransformer {
 					.getParameters());
 
 			// generates a new target
-			LocalVariable target = newTempLocalVariable(
+			LocalVariable target = procedure.newTempLocalVariable(file,
 					procedure.getReturnType(), "call_" + procedure.getName());
 
 			// add call
@@ -191,8 +191,8 @@ public class AstTransformer {
 			Expression condition = transformExpression(expression
 					.getCondition());
 
-			LocalVariable target = newTempLocalVariable(expression.getIrType(),
-					"_tmp_if");
+			LocalVariable target = procedure.newTempLocalVariable(file,
+					expression.getIrType(), "_tmp_if");
 
 			// transforms "then" statements and "else" statements
 			List<CFGNode> thenNodes = getNodes(target, expression.getThen());
@@ -218,8 +218,8 @@ public class AstTransformer {
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
 
-			LocalVariable target = newTempLocalVariable(expression.getIrType(),
-					"local_" + variable.getName());
+			LocalVariable target = procedure.newTempLocalVariable(file,
+					expression.getIrType(), "local_" + variable.getName());
 
 			Load load = new Load(location, target, new Use(variable), indexes);
 			addInstruction(load);
@@ -282,8 +282,8 @@ public class AstTransformer {
 				// TODO use a map to only load when necessary
 
 				List<Expression> indexes = new ArrayList<Expression>(0);
-				LocalVariable target = newTempLocalVariable(variable.getType(),
-						"local_" + variable.getName());
+				LocalVariable target = procedure.newTempLocalVariable(file,
+						variable.getType(), "local_" + variable.getName());
 				Load load = new Load(new Location(), target, new Use(variable),
 						indexes);
 				addInstruction(load);
@@ -555,7 +555,7 @@ public class AstTransformer {
 		List<LocalVariable> hasTokenList = new ArrayList<LocalVariable>(
 				inputPattern.size());
 		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
-			LocalVariable target = newTempLocalVariable(
+			LocalVariable target = procedure.newTempLocalVariable(file,
 					IrFactory.eINSTANCE.createTypeBool(), "_tmp_hasTokens");
 			hasTokenList.add(target);
 
@@ -762,32 +762,6 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Creates a new local variable that can be used to hold intermediate
-	 * results. The variable is added to {@link #procedure}'s locals.
-	 * 
-	 * @param type
-	 *            type of the variable
-	 * @param name
-	 *            hint for the variable name
-	 * @return a new local variable
-	 */
-	private LocalVariable newTempLocalVariable(Type type, String hint) {
-		String name = hint;
-		OrderedMap<String, Variable> locals = procedure.getLocals();
-		Variable variable = locals.get(name);
-		int i = 0;
-		while (variable != null) {
-			name = hint + i;
-			variable = locals.get(name);
-			i++;
-		}
-
-		variable = new LocalVariable(true, 0, new Location(), name, null, type);
-		locals.put(file, variable.getLocation(), variable.getName(), variable);
-		return (LocalVariable) variable;
-	}
-
-	/**
 	 * Transforms the given AST Actor to an IR actor.
 	 * 
 	 * @param file
@@ -976,7 +950,7 @@ public class AstTransformer {
 		Scope<AstVariable, Variable> current = variablesMap;
 		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
 
-		LocalVariable result = newTempLocalVariable(
+		LocalVariable result = procedure.newTempLocalVariable(file,
 				IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		List<AstExpression> guards = astAction.getGuards();
