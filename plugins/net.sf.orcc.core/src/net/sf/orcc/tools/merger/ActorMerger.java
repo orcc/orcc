@@ -185,7 +185,7 @@ public class ActorMerger implements INetworkTransformation {
 				Type type = IrFactory.eINSTANCE.createTypeList(
 						entry.getValue(), port.getType());
 				LocalVariable param = new LocalVariable(false, 0,
-						new Location(), port.getName(), null, type);
+						new Location(), port.getName(), type);
 				parameters.put(param.getName(), param);
 			}
 		}
@@ -197,7 +197,7 @@ public class ActorMerger implements INetworkTransformation {
 			Type type = IrFactory.eINSTANCE.createTypeList(entry.getValue(),
 					port.getType());
 			LocalVariable param = new LocalVariable(false, 0, new Location(),
-					port.getName(), null, type);
+					port.getName(), type);
 			parameters.put(param.getName(), param);
 		}
 
@@ -320,7 +320,7 @@ public class ActorMerger implements INetworkTransformation {
 			Location location = new Location();
 			int numTokens = port.getNumTokensConsumed();
 			LocalVariable varDef = new LocalVariable(true, i, new Location(),
-					"pattern", null, IrFactory.eINSTANCE.createTypeBool());
+					"pattern", IrFactory.eINSTANCE.createTypeBool());
 			i++;
 			variables.put(varDef.getName(), varDef);
 			HasTokens hasTokens = new HasTokens(location, port, numTokens,
@@ -346,7 +346,7 @@ public class ActorMerger implements INetworkTransformation {
 			Type type = IrFactory.eINSTANCE.createTypeList(size, connection
 					.getSource().getType());
 			Variable buf = new LocalVariable(true, 0, new Location(), name,
-					null, type);
+					type);
 			buffersMap.put(connection, buf);
 			index++;
 		}
@@ -414,7 +414,7 @@ public class ActorMerger implements INetworkTransformation {
 			} else {
 
 				LocalVariable loopVar = new LocalVariable(true, 0,
-						new Location(), "idx_" + index, null,
+						new Location(), "idx_" + index,
 						IrFactory.eINSTANCE.createTypeInt(32));
 
 				if (indexes.size() <= index) {
@@ -519,7 +519,7 @@ public class ActorMerger implements INetworkTransformation {
 				Type type = IrFactory.eINSTANCE.createTypeList(size,
 						port.getType());
 				Variable var = new LocalVariable(true, 0, new Location(),
-						port.getName(), null, type);
+						port.getName(), type);
 
 				buffersMap.put(connection, var);
 				index++;
@@ -547,7 +547,7 @@ public class ActorMerger implements INetworkTransformation {
 				Type type = IrFactory.eINSTANCE.createTypeList(size,
 						port.getType());
 				Variable var = new LocalVariable(true, 0, new Location(),
-						port.getName(), null, type);
+						port.getName(), type);
 
 				buffersMap.put(connection, var);
 				index++;

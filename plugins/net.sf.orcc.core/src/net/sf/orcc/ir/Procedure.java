@@ -325,7 +325,7 @@ public class Procedure extends AbstractLocalizable {
 			i++;
 		}
 
-		variable = new LocalVariable(true, 0, new Location(), name, null, type);
+		variable = new LocalVariable(true, 0, new Location(), name, type);
 		locals.put(file, variable.getLocation(), variable.getName(), variable);
 		return (LocalVariable) variable;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique F�d�rale de Lausanne
+ * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique F�d�rale de Lausanne nor the names of its
+ *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -62,7 +62,6 @@ import net.sf.orcc.util.OrderedMap;
  * @author Ghislain Roquier
  * 
  */
-
 public class MoveLiteralIntegers extends AbstractActorTransformation {
 
 	private int index;
@@ -84,7 +83,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			String name = "lit_bool_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, null, IrFactory.eINSTANCE.createTypeBool());
+					name, IrFactory.eINSTANCE.createTypeBool());
 			locals.put(var.getName(), var);
 			it.previous();
 			it.add(new Assign(var, expr));
@@ -98,7 +97,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			String name = "lit_int_" + index++;
 			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, null, IrFactory.eINSTANCE.createTypeInt(32));
+					name, IrFactory.eINSTANCE.createTypeInt(32));
 			locals.put(var.getName(), var);
 			it.previous();
 			it.add(new Assign(var, expr));

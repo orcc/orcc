@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, Ecole Polytechnique F�d�rale de Lausanne 
+ * Copyright (c) 2010, Ecole Polytechnique Fédérale de Lausanne 
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique F�d�rale de Lausanne 
+ *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne 
  *     nor the names of its contributors may be used to endorse or promote products
  *     derived from this software without specific prior written permission.
  * 
@@ -42,8 +42,8 @@ import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.SerDes;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.util.OrderedMap;
 
@@ -57,7 +57,6 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-
 public class SerDesAdder {
 
 	private DirectedGraph<Vertex, Connection> graph;

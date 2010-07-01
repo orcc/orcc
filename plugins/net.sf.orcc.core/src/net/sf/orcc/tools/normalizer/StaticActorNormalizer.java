@@ -103,7 +103,7 @@ public class StaticActorNormalizer {
 			depth++;
 			if (indexes.size() < depth) {
 				LocalVariable varDef = new LocalVariable(true, depth - 1,
-						new Location(), "loop", null,
+						new Location(), "loop",
 						IrFactory.eINSTANCE.createTypeBool());
 				variables.put(actor.getFile(), varDef.getLocation(),
 						varDef.getName(), varDef);
@@ -359,7 +359,7 @@ public class StaticActorNormalizer {
 			int numTokens = entry.getValue();
 
 			LocalVariable varDef = new LocalVariable(true, i, new Location(),
-					"pattern", null, IrFactory.eINSTANCE.createTypeBool());
+					"pattern", IrFactory.eINSTANCE.createTypeBool());
 			i++;
 			variables.put(actor.getFile(), location, varDef.getName(), varDef);
 

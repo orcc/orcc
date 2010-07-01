@@ -203,15 +203,15 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				target.setType(type);
 				if (expr.getType().isBool()) {
 
-					Assign assign = new Assign(location, target, new BinaryExpr(
-							location, expr, BinaryOp.LOGIC_OR, new BoolExpr(false),
-							expr.getType()));
+					Assign assign = new Assign(location, target,
+							new BinaryExpr(location, expr, BinaryOp.LOGIC_OR,
+									new BoolExpr(false), expr.getType()));
 					assign.setBlock(block);
 					it.add(assign);
-				} else{
-					Assign assign = new Assign(location, target, new BinaryExpr(
-							location, expr, BinaryOp.PLUS, new IntExpr(0),
-							expr.getType()));
+				} else {
+					Assign assign = new Assign(location, target,
+							new BinaryExpr(location, expr, BinaryOp.PLUS,
+									new IntExpr(0), expr.getType()));
 					assign.setBlock(block);
 					it.add(assign);
 				}
@@ -229,7 +229,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			String procName = procedure.getName();
 
 			return new LocalVariable(true, tempVarCount++, new Location(),
-					procName + "_" + "expr", null,
+					procName + "_" + "expr",
 					type);
 		}
 
@@ -305,8 +305,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			Location location = expr.getLocation();
 			if (expr.getType().isBool()) {
 				BinaryOp op = BinaryOp.LOGIC_OR;
-				assign.setValue(new BinaryExpr(location, expr, op, new BoolExpr(
-						false), expr.getType()));
+				assign.setValue(new BinaryExpr(location, expr, op,
+						new BoolExpr(false), expr.getType()));
 			} else {
 				BinaryOp op = BinaryOp.PLUS;
 				assign.setValue(new BinaryExpr(location, expr, op, new IntExpr(

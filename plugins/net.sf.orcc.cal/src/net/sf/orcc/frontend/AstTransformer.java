@@ -699,7 +699,7 @@ public class AstTransformer {
 	private LocalVariable createPortVariable(Port port, int numTokens) {
 		// create the variable to hold the tokens
 		LocalVariable target = new LocalVariable(true, 0,
-				procedure.getLocation(), port.getName(), null,
+				procedure.getLocation(), port.getName(),
 				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()));
 		procedure.getLocals().put(file, target.getLocation(), target.getName(),
 				target);
@@ -1194,7 +1194,7 @@ public class AstTransformer {
 		Type type = astVariable.getIrType();
 
 		LocalVariable local = new LocalVariable(assignable, 0, location, name,
-				null, type);
+				type);
 
 		AstExpression value = astVariable.getValue();
 		if (value != null) {

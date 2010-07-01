@@ -43,16 +43,10 @@ public class LocalVariable extends Variable implements
 	 */
 	private int index;
 
-	/**
-	 * when local variables have the same name but different scopes.
-	 */
-	private Integer suffix;
-
 	public LocalVariable(boolean assignable, int index, Location loc,
-			String name, Integer suffix, Type type) {
+			String name, Type type) {
 		super(loc, type, name, false, assignable);
 		this.index = index;
-		this.suffix = suffix;
 	}
 
 	@Override
@@ -79,9 +73,10 @@ public class LocalVariable extends Variable implements
 	public int getIndex() {
 		return index;
 	}
-	
+
 	/**
-	 * Returns true if this variable has been assigned to an SSA index of this variable. 
+	 * Returns true if this variable has been assigned to an SSA index of this
+	 * variable.
 	 * 
 	 * @return true if the variable has an index otherwise false.
 	 */
@@ -92,29 +87,18 @@ public class LocalVariable extends Variable implements
 	@Override
 	public String getName() {
 		String indexStr = (index == 0) ? "" : "_" + index;
-		return getBaseName() + (suffix == null ? "" : suffix) + indexStr;
+		return getBaseName() + indexStr;
 	}
 
 	/**
-	 * Returns the suffix of this variable. This information is used to
-	 * disambiguate variables declared with similar names in different scopes.
+	 * Sets the SSA index of this variable. This information is added when
+	 * translating CAL to SSA form.
 	 * 
-	 * @return the suffix of this variable
+	 * @param index
+	 *            the SSA index of this variable
 	 */
-	public int getSuffix() {
-		return suffix;
-	}
-
-	public boolean hasSuffix() {
-		return (suffix != null);
-	}
-
 	public void setIndex(int index) {
 		this.index = index;
-	}
-
-	public void setSuffix(int suffix) {
-		this.suffix = suffix;
 	}
 
 }
