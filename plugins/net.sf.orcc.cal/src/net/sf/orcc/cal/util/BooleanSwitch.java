@@ -77,14 +77,14 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseAstAction(AstAction action) {
-		for (AstExpression guard : action.getGuards()) {
-			if (doSwitch(guard)) {
+		for (AstInputPattern input : action.getInputs()) {
+			if (doSwitch(input)) {
 				return true;
 			}
 		}
 
-		for (AstInputPattern input : action.getInputs()) {
-			if (doSwitch(input)) {
+		for (AstExpression guard : action.getGuards()) {
+			if (doSwitch(guard)) {
 				return true;
 			}
 		}

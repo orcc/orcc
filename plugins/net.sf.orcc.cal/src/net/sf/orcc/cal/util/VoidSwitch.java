@@ -75,12 +75,12 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstAction(AstAction action) {
-		for (AstExpression guard : action.getGuards()) {
-			doSwitch(guard);
-		}
-
 		for (AstInputPattern input : action.getInputs()) {
 			doSwitch(input);
+		}
+
+		for (AstExpression guard : action.getGuards()) {
+			doSwitch(guard);
 		}
 
 		for (AstVariable variable : action.getVariables()) {
