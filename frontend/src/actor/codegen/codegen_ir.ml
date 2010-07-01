@@ -54,15 +54,14 @@ let rec mk_cst cst =
 	| CStr s -> string s
 
 (** [mk_suffix suffix]. *)
-let mk_suffix = function
-	| None -> null
-	| Some suffix -> int suffix
+let string_of_suffix = function
+	| None -> ""
+	| Some suffix -> string_of_int suffix
 
 (** [mk_var_ref var_def existing] *)
 let mk_var_ref var_def =
 	array
-		[string var_def.v_name;
-		mk_suffix var_def.v_suffix;
+		[string (var_def.v_name ^ string_of_suffix var_def.v_suffix);
 		int var_def.v_index]
 
 (** [mk_var_use var_use] calls [mk_var_ref] and adds a "node" attribute. *)
@@ -139,9 +138,8 @@ or an array for complex types ("int", "uint" and "List") *)
 (** [mk_var_def var_def] *)
 let mk_var_def var_def =
 	let var =
-		[string var_def.v_name;
+		[string (var_def.v_name ^ string_of_suffix var_def.v_suffix);
 		bool var_def.v_assignable;
-		mk_suffix var_def.v_suffix;
 		int var_def.v_index]
 	in
 	array
