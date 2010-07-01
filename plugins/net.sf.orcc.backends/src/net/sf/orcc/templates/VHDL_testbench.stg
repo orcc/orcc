@@ -134,7 +134,7 @@ begin
     $input.list: fifo_in_init()$    --
     $input.list: tb_FSM_init()$    count <= 0;
   --  
-  elsif falling_edge(clock) then
+  elsif rising_edge(clock) then
     --
     $input.list: case_define_in(); separator="\n"$$\n$
   end if;

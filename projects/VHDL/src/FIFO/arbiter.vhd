@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
--- Title      : FIFO TOP
+-- Title      : Arbiter
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : fifo_top.vhd
+-- File       : arbiter.vhd
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-04-27
+-- Last update: 2010-07-01
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -49,83 +49,87 @@ use ieee.std_logic_1164.all;
 -------------------------------------------------------------------------------
 
 
-entity fifo_top is
+entity arbiter is
   generic
     (
-      depth : integer := 32;
       width : integer := 32);
-  port
-    (
-      reset_n  : in  std_logic;
-      --
-      wr_clk   : in  std_logic;
-      wr_data  : in  std_logic;
-      data_in  : in  std_logic_vector (width -1 downto 0);
-      full     : out std_logic;
-      --
-      rd_clk   : in  std_logic;
-      rd_ack   : in  std_logic;
-      send     : out std_logic;
-      data_out : out std_logic_vector (width -1 downto 0);
-      empty    : out std_logic);
-end fifo_top;
+  port (
+    reset_n  : in    std_logic;
+    --
+    wr_clk   : in    std_logic;
+    wr_data  : in    std_logic;
+    data_in  : in    std_logic_vector(width -1 downto 0);
+    full     : inout std_logic;
+    --
+    rd_clk   : in    std_logic;
+    rd_ack   : in    std_logic;
+    send     : out   std_logic;
+    data_out : out   std_logic_vector(width -1 downto 0);
+    empty    : out   std_logic);
+end arbiter;
 
 
 -------------------------------------------------------------------------------
 
 
-architecture arch_fifo_top of fifo_top is
+architecture arch_arbiter of arbiter is
+
 
   -----------------------------------------------------------------------------
   -- Internal signal declarations
   -----------------------------------------------------------------------------
   --
-  signal link_send  : std_logic;
-  signal link_full  : std_logic;
-  signal dest_ready : std_logic;
-  signal link_data  : std_logic_vector (width -1 downto 0);
+  signal register_data : std_logic_vector (width -1 downto 0);
+  signal data_in_reg   : std_logic;
   -----------------------------------------------------------------------------
+  
 begin
 
-  create_FIFO : if depth > 0 generate
-    FIFO_generic_1 : entity work.FIFO_generic
-      generic map (
-        depth => depth,
-        width => width)
-      port map (
-        reset_n  => reset_n,
-        wr_clk   => wr_clk,
-        wr_data  => wr_data,
-        data_in  => data_in,
-        full     => full,
-        rd_clk   => rd_clk,
-        rd_ack   => dest_ready,
-        send     => link_send,
-        data_out => link_data,
-        empty    => empty);
-  end generate;
+  wr_proc : process (wr_clk, reset_n) is
+  begin
+    if reset_n = '0' then
+      register_data <= (others => '0');
+    elsif rising_edge(wr_clk) then
+      if wr_data = '1' and full = '0' then
+        register_data <= data_in;
+      end if;
+    end if;
+  end process wr_proc;
 
-  create_link : if depth = 0 generate
-    link_data <= data_in;
-    link_send <= wr_data;
-    full      <= not dest_ready;
-    empty     <= '0';
-  end generate;
+  rd_proc : process (rd_clk, reset_n) is
+  begin
+    if reset_n = '0' then
+      data_out <= (others => '0');
+      send     <= '0';
+    elsif rising_edge(rd_clk) then
+      if data_in_reg = '1' then
+        data_out <= register_data;
+        send     <= '1';
+      else
+        send <= '0';
+      end if;
+    end if;
+  end process rd_proc;
 
 
-  arbiter_1 : entity work.arbiter
-    generic map (
-      width => width)
-    port map (
-      clock         => rd_clk,
-      reset_n       => reset_n,
-      data_in       => link_data,
-      data_in_send  => link_send,
-      dest_ready    => dest_ready,
-      data_out      => data_out,
-      data_out_send => send,
-      data_out_ack  => rd_ack);
+  arbiter_proc : process (rd_ack, reset_n, wr_data) is
+  begin
+    if reset_n = '0' then
+      data_in_reg <= '0';
+      full        <= '0';
+    elsif wr_data = '1' and data_in_reg = '0' then
+      data_in_reg <= '1';
+      full        <= '0';
+    elsif wr_data = '1' and data_in_reg = '1' and rd_ack = '1' then
+      data_in_reg <= '1';
+      full        <= '0';
+    elsif wr_data = '1' and data_in_reg = '1' and rd_ack = '0' then
+      data_in_reg <= '1';
+      full        <= '1';
+    else
+      data_in_reg <= '0';
+      full        <= '0';
+    end if;
+  end process arbiter_proc;
 
-end arch_fifo_top;
-
---------------------------------------------------------------------------
+end arch_arbiter;

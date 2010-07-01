@@ -1,12 +1,12 @@
 -------------------------------------------------------------------------------
--- Title      : Generic FIFO
+-- Title      : Gray counter
 -- Project    : ORCC
 -------------------------------------------------------------------------------
--- File       : generic_fifo.vhd
+-- File       : gray_cnt.vhd
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-04-20
+-- Last update: 2010-07-01
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -39,136 +39,74 @@
 -- SUCH DAMAGE.
 -------------------------------------------------------------------------------
 -- Revisions  :
--- Date        Version  Author  Description
--- 2010-02-09  1.0      LTD      Created
+-- Date        Version  Author       Description
+-- 2010-02-09  1.0      Nicolas      Created
 -------------------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+library work;
+use work.orcc_package.all;
+-------------------------------------------------------------------------------
+
+
+entity ram_generic is
+  generic (
+    depth : integer := 32;
+    width : integer := 32);
+  port (
+    rd_address : in  std_logic_vector(bit_width(depth)-1 downto 0);
+    q          : out std_logic_vector(width -1 downto 0);
+    --
+    data       : in  std_logic_vector(width -1 downto 0);
+    wr_address : in  std_logic_vector(bit_width(depth)-1 downto 0);
+    wrclock    : in  std_logic;
+    wren       : in  std_logic
+    );
+end ram_generic;
 
 -------------------------------------------------------------------------------
 
 
-entity FIFO_generic is
-  generic
-    (
-      depth : integer := 32;
-      width : integer := 32);
-  port
-    (
-      reset_n  : in  std_logic;
-      --
-      wr_clk   : in  std_logic;
-      wr_data  : in  std_logic;
-      data_in  : in  std_logic_vector (width -1 downto 0);
-      full     : out std_logic;
-      --
-      rd_clk   : in  std_logic;
-      rd_ack   : in  std_logic;
-      send     : out std_logic;
-      data_out : out std_logic_vector (width -1 downto 0);
-      empty    : out std_logic);
-end FIFO_generic;
-
-
--------------------------------------------------------------------------------
-
-
-architecture arch_FIFO_generic of FIFO_generic is
+architecture arch_RAM_generic of RAM_generic is
 
 
   -----------------------------------------------------------------------------
   -- Internal type declarations
   -----------------------------------------------------------------------------
 
-  type memory_type is array (depth -1 downto 0) of
+  type ram_type is array (depth -1 downto 0) of
     std_logic_vector(width -1 downto 0);
-  signal memory : memory_type;
 
   -----------------------------------------------------------------------------
   -- Internal signal declarations
   -----------------------------------------------------------------------------
+
+  signal ram       : ram_type;
+  signal adress_wr : integer range DEPTH - 1 downto 0;
+  signal adress_rd : integer range DEPTH - 1 downto 0;
   --
-  signal adresse_RAM_w         : integer range (depth -1) downto 0 := 0;
-  signal adresse_RAM_r         : integer range (depth -1) downto 0 := 0;
-  signal full_FIFO, empty_FIFO : std_logic;
-  --
+
   -----------------------------------------------------------------------------
   
-begin
+begin  -- arch_RAM
 
-  send     <= not empty_FIFO;
-  empty    <= empty_FIFO;
-  full     <= full_FIFO;
-  data_out <= memory(adresse_RAM_r);
+  adress_wr <= to_integer(unsigned(wr_address));
+  adress_rd <= to_integer(unsigned(rd_address));
+  q         <= ram(adress_rd);
 
-  -- purpose: store data
-  RAM_write : process (wr_clk, reset_n)
+  -- purpose: to store the data
+  RAM_wr : process (wrclock)
   begin
-    if reset_n = '0' then
-      adresse_RAM_w <= 0;
+    if rising_edge(wrclock) then
       --
-    elsif rising_edge(wr_clk) then
-      if (wr_data = '1' and adresse_RAM_w < depth -1) then
-        memory(adresse_RAM_w) <= data_in;
-        adresse_RAM_w         <= adresse_RAM_w + 1;
-      elsif (wr_data = '1') then
-        memory(adresse_RAM_w) <= data_in;
-        adresse_RAM_w         <= 0;
+      if wren = '1' then
+        ram(adress_wr) <= data;
       end if;
     end if;
-  end process RAM_write;
+  end process RAM_wr;
 
+end arch_RAM_generic;
 
--- purpose: load data
-  RAM_read : process (rd_clk, reset_n)
-  begin
-    if reset_n = '0' then
-      adresse_RAM_r <= 0;
-      --
-    elsif rising_edge(rd_clk) then
-      if (rd_ack = '1' and adresse_RAM_r < depth -1) then
-        adresse_RAM_r <= adresse_RAM_r + 1;
-      elsif (rd_ack = '1') then
-        adresse_RAM_r <= 0;
-      end if;
-    end if;
-  end process RAM_read;
-
-
-
--- Management of the flags
-  Flag_proc : process (adresse_RAM_r, adresse_RAM_w) is
-  begin
-    if (adresse_RAM_w = adresse_RAM_r) then
-      empty_FIFO <= '1';
-      full_FIFO  <= '0';
-      --
-    elsif (adresse_RAM_w > adresse_RAM_r) then
-      if (adresse_RAM_w - adresse_RAM_r < 3) then
-        empty_FIFO <= '1';
-        full_FIFO  <= '0';
-      elsif (depth - adresse_RAM_w + adresse_RAM_r < 3) then
-        empty_FIFO <= '0';
-        full_FIFO  <= '1';
-      else
-        empty_FIFO <= '0';
-        full_FIFO  <= '0';
-      end if;
-    else
-      if (adresse_RAM_r - adresse_RAM_w < 3) then
-        empty_FIFO <= '0';
-        full_FIFO  <= '1';
-      elsif (depth - adresse_RAM_r + adresse_RAM_w < 3) then
-        empty_FIFO <= '1';
-        full_FIFO  <= '0';
-      else
-        empty_FIFO <= '0';
-        full_FIFO  <= '0';
-      end if;
-    end if;
-  end process Flag_proc;
-
-end arch_FIFO_generic;
-
---------------------------------------------------------------------------

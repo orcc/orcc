@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-06-04
+-- Last update: 2010-06-30
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -59,6 +59,7 @@ package orcc_package is
   function shift_left (op1  : integer; op2 : integer; size : integer) return integer;
   function shift_right (op1 : integer; op2 : integer; size : integer) return integer;
   function cast (op1        : integer; sizeop1 : integer; sizeresult : integer) return integer;
+  function bit_width (op1   : integer) return integer;
 
 end;
 
@@ -155,4 +156,15 @@ package body orcc_package is
     return to_integer(signed(arg1(sizeresult - 1 downto 0)));
   end function;
 
+  -----------------------------------------------------------------------------
+  -- Compute the size
+  function bit_width (op1 : integer) return integer is
+    variable arg1 : integer := 0;
+  begin
+    while 2**arg1 <= op1 loop
+      arg1 := arg1 + 1;
+    end loop;
+    return arg1;
+  end function;
+  
 end package body orcc_package;

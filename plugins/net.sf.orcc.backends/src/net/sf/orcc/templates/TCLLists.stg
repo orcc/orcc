@@ -8,12 +8,20 @@ set SRC "../Src"
 set Design "../Src/Design"
 set Testbench "../Src/Testbench"
 
-# Compile
+# Compile Packages
 vcom -93 -reportprogress 30 -work work \$SRC/orcc_package.vhd
-vcom -93 -reportprogress 30 -work work \$SRC/arbiter.vhd
-vcom -93 -reportprogress 30 -work work \$SRC/fifo_generic.vhd
-vcom -93 -reportprogress 30 -work work \$SRC/fifo_top.vhd
 vcom -93 -reportprogress 30 -work work \$SRC/sim_package.vhd
+# Compile FIFO
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/ram_generic.vhd 
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/gray_cnt.vhd 
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/gray_cnt_n.vhd
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/gray2bin.vhd 
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/counter.vhd 
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/arbiter.vhd 
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/control.vhd 
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/fifo.vhd 
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/fifo_top.vhd 
+# Compile actors and networks
 $entities: printEntity(); separator="\n"$
 vcom -93 -reportprogress 30 -work work \$Testbench/$name$_tb.vhd
 
