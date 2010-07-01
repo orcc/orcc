@@ -79,6 +79,7 @@ import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -287,8 +288,19 @@ public class IRWriter {
 
 		@Override
 		public void visit(PhiAssignment phi, Object... args) {
-			// TODO Auto-generated method stub
+			JSONArray array = (JSONArray) args[0];
+			JSONArray instr = new JSONArray();
+			array.put(instr);
 
+			// target
+			instr.put(writeVariable(phi.getTarget()));
+
+			// sources
+			JSONArray sources = new JSONArray();
+			instr.put(sources);
+			for (Use use : phi.getVars()) {
+				sources.put(writeVariable(use.getVariable()));
+			}
 		}
 
 		@Override
@@ -406,8 +418,7 @@ public class IRWriter {
 			body.put(writeNodes(node.getThenNodes()));
 			body.put(writeNodes(node.getElseNodes()));
 
-			// FIXME need to modify IR format to remove this sh*t
-			// complex stuff because JSON format is weird
+			// FIXME need to modify this weird stuff in JSON format
 			JSONArray joinArray = new JSONArray();
 			array.put(joinArray);
 
@@ -435,6 +446,17 @@ public class IRWriter {
 
 			body.put(writeExpression(node.getValue()));
 			body.put(writeNodes(node.getNodes()));
+
+			// FIXME need to modify this weird stuff in JSON format
+			JSONArray joinArray = new JSONArray();
+			array.put(joinArray);
+
+			joinArray.put(IRConstants.NAME_JOIN);
+			joinArray.put(writeLocation(node.getLocation()));
+
+			JSONArray phiArray = new JSONArray();
+			joinArray.put(phiArray);
+			node.getJoinNode().accept(this, phiArray);
 		}
 	}
 
