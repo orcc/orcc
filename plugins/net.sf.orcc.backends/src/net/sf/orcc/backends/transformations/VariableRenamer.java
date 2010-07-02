@@ -49,11 +49,7 @@ public class VariableRenamer extends AbstractActorTransformation {
 		String procName = procedure.getName();
 		for (Variable variable : procedure.getLocals()) {
 			LocalVariable local = (LocalVariable) variable;
-			if (local.getBaseName().contains("tmp")) {
-				variable.setName(procName);
-			} else {
-				variable.setName(procName + "_" + local.getBaseName());
-			}
+			variable.setName(procName + "_" + local.getBaseName());
 		}
 	}
 
