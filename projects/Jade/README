@@ -1,0 +1,13 @@
+The Just-In-Time Adaptive Decoder Engine (Jade) is a new RVC decoder, based on the Low Level Virtual Machine (LLVM), that dynamically instantiates several RVC decoder descriptions produce by the LLVM back-end.
+
+This project requires the following libraries:
+- LibXml V2.7.6 (http://xmlsoft.org)
+- SDL-1.2.14 (http://www.libsdl.org)
+- LLVM 2.7 (http://llvm.org)
+
+The project is based on the Cross-platform Make CMake (at least 2.6), which can be found at http://www.cmake.org.
+
+If you are using Visual Studio 2010, 2008 or 2005, the two first libraries can be found in runtime folder. Simply run cmake.bat to automatically set environment variables.
+
+
+Documentation is coming at http://sourceforge.net/apps/trac/orcc/wiki/OrccDeveloperDocumentation.
