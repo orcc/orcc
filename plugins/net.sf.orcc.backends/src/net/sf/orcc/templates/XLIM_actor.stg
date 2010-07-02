@@ -171,8 +171,11 @@ Write(op) ::= <<
 >>
 
 Load(op) ::= <<
-$if (op.target.variable.type.list)$
-$! TODO !$
+$if (op.source.variable.type.list && !op.source.port)$
+<operation kind="var_ref" name="$op.source$">
+	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
 $
 else
 $<operation kind="noop">
