@@ -171,7 +171,7 @@ Write(op) ::= <<
 >>
 
 Load(op) ::= <<
-$if (op.source.variable.type.list && !op.source.port)$
+$if (op.target.variable.type.list)$
 <operation kind="var_ref" name="$op.source$">
 	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
 	$port(dir="out", type=op.target.type, source=op.target)$
@@ -285,11 +285,22 @@ $NotPhiNodes(ifNode.joinNode)$
 
 // while node
 WhileNode(whileNode) ::= <<
-
-while ($whileNode.value$) {
+<module kind="loop">
+	<!-- joinnode -->
+	$PhiNodes(whileNode.joinNode)$
+	<module decision="decision_$whileNode.value$" kind="test">
+		<!-- Begin joinnode -->
+		$NotPhiNodes(whileNode.joinNode)$
+		<!-- End joinnode -->
+		<operation kind="noop">
+			$port(dir="in", source=whileNode.value)$
+			<port dir="out" size="1" source="decision_$whileNode.value$" typeName="bool"/>
+		</operation>
+	</module>		
+	<module kind="body">
 	$nodes(whileNode.nodes)$
-}
-$BlockNode(whileNode.joinNode)$
+	</module>
+</module>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -411,15 +422,15 @@ actionCallState(nextState) ::= <<
 
 actionTestState(nextState) ::= <<
 <module kind="if">
-	<module decision="isSchedulable_$nextState.action$_$nextState.targetState$" kind="test">
+	<module decision="isSchedulable_$nextState.action$_$transition.sourceState$" kind="test">
 		<operation kind="noop">
 			<port dir="in" source="isSchedulable_$nextState.action$_go"/>
-			<port dir="out" size="1" source="isSchedulable_$nextState.action$_$nextState.targetState$" typeName="bool"/>
+			<port dir="out" size="1" source="isSchedulable_$nextState.action$_$transition.sourceState$" typeName="bool"/>
 		</operation>
 	</module>
 	<module kind="then">
 		$if(nextState.action.outputPattern)$
-		$outputPattern(pattern=nextState.action.outputPattern,action=nextState.action,state=nextState.targetState)$
+		$outputPattern(pattern=nextState.action.outputPattern,action=nextState.action,state=transition.sourceState)$
 			<module kind="then">
 				$actionCall(nextState.action)$
 				$actionCallState(nextState)$
