@@ -101,7 +101,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		frontend.setOutputFolder(outputFolder);
 
 		ResourceSet set = context.getResourceSet();
-		for (Resource resource : set.getResources()) {
+		List<Resource> resources = set.getResources();
+		monitor.beginTask("Building actors", resources.size());
+		for (Resource resource : resources) {
 			List<EObject> contents = resource.getContents();
 			Iterator<EObject> it = contents.iterator();
 			if (it.hasNext()) {
@@ -111,6 +113,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 					build(resource, actor);
 				}
 			}
+
+			if (monitor.isCanceled()) {
+				return;
+			}
+			monitor.worked(1);
 		}
 	}
 

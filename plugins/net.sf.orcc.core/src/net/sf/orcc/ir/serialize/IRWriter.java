@@ -576,7 +576,10 @@ public class IRWriter {
 			OutputStream os = new FileOutputStream(outputDir + File.separator
 					+ actor.getName() + ".json");
 			JSONObject obj = writeActor();
-			os.write(obj.toString(/*2*/).getBytes("UTF-8"));
+
+			// use compact form
+			os.write(obj.toString().getBytes("UTF-8"));
+
 			os.close();
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
