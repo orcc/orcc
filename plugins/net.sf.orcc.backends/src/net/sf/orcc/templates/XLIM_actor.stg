@@ -131,14 +131,14 @@ Decrement(decrement) ::= <<
 
 HasTokens(hasTokens) ::= <<
 <operation kind="pinAvail" portName="$hasTokens.port$">
-	<port dir="out" size="32" source="$hasTokens.port$_pinAvail" typeName="int"/>
+	<port dir="out" size="32" source="$hasTokens.target$_pinAvail" typeName="int"/>
 </operation>
 <operation kind="\$literal_Integer" value="$hasTokens.numTokens$">
-	<port dir="out" size="32" source="$hasTokens.port$_tokenCount" typeName="int"/>
+	<port dir="out" size="32" source="$hasTokens.target$_tokenCount" typeName="int"/>
 </operation>
 <operation kind="\$ge">
-	<port dir="in" source="$hasTokens.port$_pinAvail"/>
-	<port dir="in" source="$hasTokens.port$_tokenCount"/>
+	<port dir="in" source="$hasTokens.target$_pinAvail"/>
+	<port dir="in" source="$hasTokens.target$_tokenCount"/>
 	$port(dir="out", type=hasTokens.target.type, source=hasTokens.target)$
 </operation>
 >>
@@ -336,14 +336,14 @@ action(action) ::= <<
 outputPatternPort(port, index, index0, state) ::= <<
 <!--  OutputPattern -->
 <operation kind="pinAvail" portName="$port$">
-	<port dir="out" size="32" source="$port$_pinAvail" typeName="int"/>
+	<port dir="out" size="32" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_pinAvail" typeName="int"/>
 </operation>
 <operation kind="\$literal_Integer" value="$pattern.(port)$">
-	<port dir="out" size="32" source="$port$_tokenCount" typeName="int"/>
+	<port dir="out" size="32" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount" typeName="int"/>
 </operation>
 <operation kind="\$ge">
-	<port dir="in" source="$port$_pinAvail"/>
-	<port dir="in" source="$port$_tokenCount"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_pinAvail"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount"/>
 	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
 </operation>
 
