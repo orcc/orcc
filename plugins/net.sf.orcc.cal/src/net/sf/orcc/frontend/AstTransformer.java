@@ -159,12 +159,12 @@ public class AstTransformer {
 				return result;
 			}
 
-			if (!functionsMap.containsKey(astFunction)) {
+			if (!mapFunctions.containsKey(astFunction)) {
 				Procedure current = procedure;
 				transformFunction(astFunction);
 				procedure = current;
 			}
-			Procedure procedure = functionsMap.get(astFunction);
+			Procedure procedure = mapFunctions.get(astFunction);
 
 			// transform parameters
 			List<Expression> parameters = transformExpressions(astCall
@@ -213,7 +213,7 @@ public class AstTransformer {
 
 			Location location = Util.getLocation(expression);
 			AstVariable astVariable = expression.getSource().getVariable();
-			Variable variable = variablesMap.get(astVariable);
+			Variable variable = mapVariables.get(astVariable);
 
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
@@ -277,7 +277,7 @@ public class AstTransformer {
 		 * @return a local IR variable
 		 */
 		private LocalVariable getLocalVariable(AstVariable astVariable) {
-			Variable variable = variablesMap.get(astVariable);
+			Variable variable = mapVariables.get(astVariable);
 			if (variable.isGlobal()) {
 				// TODO use a map to only load when necessary
 
@@ -378,7 +378,7 @@ public class AstTransformer {
 
 			// get target
 			AstVariable astTarget = astAssign.getTarget().getVariable();
-			Variable target = variablesMap.get(astTarget);
+			Variable target = mapVariables.get(astTarget);
 
 			// transform indexes and value
 			List<Expression> indexes = transformExpressions(astAssign
@@ -405,12 +405,12 @@ public class AstTransformer {
 
 			// retrieve IR procedure
 			AstProcedure astProcedure = astCall.getProcedure();
-			if (!proceduresMap.containsKey(astProcedure)) {
+			if (!mapProcedures.containsKey(astProcedure)) {
 				Procedure current = procedure;
 				transformProcedure(astProcedure);
 				procedure = current;
 			}
-			Procedure procedure = proceduresMap.get(astProcedure);
+			Procedure procedure = mapProcedures.get(astProcedure);
 
 			// transform parameters
 			List<Expression> parameters = transformExpressions(astCall
@@ -492,15 +492,25 @@ public class AstTransformer {
 	/**
 	 * A map from AST functions to IR procedures.
 	 */
-	final private Map<AstFunction, Procedure> functionsMap;
-
-	@Inject
-	private IQualifiedNameProvider nameProvider;
+	final private Map<AstFunction, Procedure> mapFunctions;
 
 	/**
 	 * A map from AST ports to IR ports.
 	 */
-	final private Map<AstPort, Port> portMap;
+	final private Map<AstPort, Port> mapPorts;
+
+	/**
+	 * A map from AST procedures to IR procedures.
+	 */
+	final private Map<AstProcedure, Procedure> mapProcedures;
+
+	/**
+	 * A map from AST variables to IR variables.
+	 */
+	private Scope<AstVariable, Variable> mapVariables;
+
+	@Inject
+	private IQualifiedNameProvider nameProvider;
 
 	/**
 	 * Contains the current procedures where local variables or nodes should be
@@ -514,29 +524,19 @@ public class AstTransformer {
 	private OrderedMap<String, Procedure> procedures;
 
 	/**
-	 * A map from AST procedures to IR procedures.
-	 */
-	final private Map<AstProcedure, Procedure> proceduresMap;
-
-	/**
 	 * statement transformer.
 	 */
 	final private StatementTransformer stmtTransformer;
 
 	/**
-	 * A map from AST variables to IR variables.
-	 */
-	private Scope<AstVariable, Variable> variablesMap;
-
-	/**
 	 * Creates a new AST to IR transformation.
 	 */
 	public AstTransformer() {
-		portMap = new HashMap<AstPort, Port>();
+		mapPorts = new HashMap<AstPort, Port>();
 
-		variablesMap = new Scope<AstVariable, Variable>();
-		proceduresMap = new HashMap<AstProcedure, Procedure>();
-		functionsMap = new HashMap<AstFunction, Procedure>();
+		mapVariables = new Scope<AstVariable, Variable>();
+		mapProcedures = new HashMap<AstProcedure, Procedure>();
+		mapFunctions = new HashMap<AstFunction, Procedure>();
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
@@ -588,7 +588,7 @@ public class AstTransformer {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new IntExpr(i));
 
-				LocalVariable irToken = (LocalVariable) variablesMap.get(token);
+				LocalVariable irToken = (LocalVariable) mapVariables.get(token);
 				Load load = new Load(portVariable.getLocation(), irToken,
 						new Use(portVariable), indexes);
 				addInstruction(load);
@@ -718,7 +718,7 @@ public class AstTransformer {
 	private void fillsInputPattern(AstAction astAction, Pattern inputPattern) {
 		List<AstInputPattern> astInputPattern = astAction.getInputs();
 		for (AstInputPattern pattern : astInputPattern) {
-			Port port = portMap.get(pattern.getPort());
+			Port port = mapPorts.get(pattern.getPort());
 			List<AstVariable> tokens = pattern.getTokens();
 
 			// evaluates token consumption
@@ -745,7 +745,7 @@ public class AstTransformer {
 	private void fillsOutputPattern(AstAction astAction, Pattern outputPattern) {
 		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
 		for (AstOutputPattern pattern : astOutputPattern) {
-			Port port = portMap.get(pattern.getPort());
+			Port port = mapPorts.get(pattern.getPort());
 			List<AstExpression> values = pattern.getValues();
 
 			// evaluates token consumption
@@ -773,7 +773,8 @@ public class AstTransformer {
 	public Actor transform(String file, AstActor astActor) {
 		this.file = file;
 
-		String name = astActor.getName();
+		// gets the name of the actor and resets the untagged action counter
+		String name = nameProvider.getQualifiedName(astActor);
 		try {
 			// parameters
 			OrderedMap<String, Variable> parameters = transformGlobalVariables(astActor
@@ -824,37 +825,58 @@ public class AstTransformer {
 					initializes.getAllActions(), scheduler);
 		} finally {
 			// cleanup
-			functionsMap.clear();
-			portMap.clear();
+			mapFunctions.clear();
+			mapPorts.clear();
 			procedure = null;
 			procedures.clear();
-			proceduresMap.clear();
-			variablesMap.clear();
+			mapProcedures.clear();
+			mapVariables.clear();
 		}
 	}
 
 	/**
-	 * Transforms the given AST action and fills the input pattern, output
-	 * pattern, scheduler procedure and body procedure.
+	 * Transforms the given AST action and adds it to the given action list.
 	 * 
+	 * @param actionList
+	 *            an action list
 	 * @param astAction
 	 *            an AST action
-	 * @param inputPattern
-	 *            the IR input pattern
-	 * @param outputPattern
-	 *            the IR output pattern
-	 * @param scheduler
-	 *            the IR isSchedulable function
-	 * @param body
-	 *            the IR body of the action
 	 */
-	private void transformAction(AstAction astAction, Pattern inputPattern,
-			Pattern outputPattern, Procedure scheduler, Procedure body) {
+	private void transformAction(AstAction astAction, ActionList actionList) {
+		Location location = Util.getLocation(astAction);
+
+		// transform tag
+		AstTag astTag = astAction.getTag();
+		Tag tag;
+		if (astTag == null) {
+			tag = new Tag();
+		} else {
+			tag = new Tag(astAction.getTag().getIdentifiers());
+		}
+
+		Pattern inputPattern = new Pattern();
+		Pattern outputPattern = new Pattern();
+
+		String name = nameProvider.getQualifiedName(astAction);
+		name = dotPattern.matcher(name).replaceAll("_");
+
+		// creates scheduler and body
+		Procedure scheduler = new Procedure("isSchedulable_" + name, location,
+				IrFactory.eINSTANCE.createTypeBool());
+		Procedure body = new Procedure(name, location,
+				IrFactory.eINSTANCE.createTypeVoid());
+
+		// fills the patterns and procedures
 		fillsInputPattern(astAction, inputPattern);
 		fillsOutputPattern(astAction, outputPattern);
 
 		transformActionBody(astAction, body);
 		transformActionScheduler(astAction, scheduler, inputPattern);
+
+		// creates IR action and add it to action list
+		Action action = new Action(location, tag, inputPattern, outputPattern,
+				scheduler, body);
+		actionList.add(action);
 	}
 
 	/**
@@ -871,8 +893,8 @@ public class AstTransformer {
 		procedure = body;
 
 		// create a new scope that extends variablesMap
-		Scope<AstVariable, Variable> current = variablesMap;
-		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
+		Scope<AstVariable, Variable> current = mapVariables;
+		mapVariables = new Scope<AstVariable, Variable>(mapVariables, true);
 
 		transformInputPattern(astAction, Read.class);
 		transformLocalVariables(astAction.getVariables());
@@ -880,7 +902,7 @@ public class AstTransformer {
 		transformOutputPattern(astAction);
 
 		// restore previous scope
-		variablesMap = current;
+		mapVariables = current;
 	}
 
 	/**
@@ -893,37 +915,7 @@ public class AstTransformer {
 	private ActionList transformActions(List<AstAction> actions) {
 		ActionList actionList = new ActionList();
 		for (AstAction astAction : actions) {
-			Location location = Util.getLocation(astAction);
-
-			// transform tag
-			AstTag astTag = astAction.getTag();
-			Tag tag;
-			if (astTag == null) {
-				tag = new Tag();
-			} else {
-				tag = new Tag(astAction.getTag().getIdentifiers());
-			}
-
-			Pattern inputPattern = new Pattern();
-			Pattern outputPattern = new Pattern();
-
-			String name = nameProvider.getQualifiedName(astAction);
-			name = dotPattern.matcher(name).replaceAll("_");
-
-			// creates scheduler and body
-			Procedure scheduler = new Procedure("isSchedulable_" + name,
-					location, IrFactory.eINSTANCE.createTypeBool());
-			Procedure body = new Procedure(name, location,
-					IrFactory.eINSTANCE.createTypeVoid());
-
-			// fills the patterns and procedures
-			transformAction(astAction, inputPattern, outputPattern, scheduler,
-					body);
-
-			// creates IR action and add it to action list
-			Action action = new Action(location, tag, inputPattern,
-					outputPattern, scheduler, body);
-			actionList.add(action);
+			transformAction(astAction, actionList);
 		}
 
 		return actionList;
@@ -947,8 +939,8 @@ public class AstTransformer {
 		procedure = scheduler;
 
 		// create a new scope that extends variablesMap
-		Scope<AstVariable, Variable> current = variablesMap;
-		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
+		Scope<AstVariable, Variable> current = mapVariables;
+		mapVariables = new Scope<AstVariable, Variable>(mapVariables, true);
 
 		LocalVariable result = procedure.newTempLocalVariable(file,
 				IrFactory.eINSTANCE.createTypeBool(), "result");
@@ -967,7 +959,7 @@ public class AstTransformer {
 		addInstruction(returnInstr);
 
 		// restore previous scope
-		variablesMap = current;
+		mapVariables = current;
 	}
 
 	/**
@@ -1005,7 +997,7 @@ public class AstTransformer {
 	/**
 	 * Transforms the given AST function to an IR procedure, and adds it to the
 	 * IR procedure list {@link #procedures} and to the map
-	 * {@link #functionsMap}.
+	 * {@link #mapFunctions}.
 	 * 
 	 * @param astFunction
 	 *            an AST function
@@ -1019,18 +1011,18 @@ public class AstTransformer {
 		procedure = new Procedure(name, location, type);
 
 		// create a new scope that extends variablesMap
-		Scope<AstVariable, Variable> current = variablesMap;
-		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
+		Scope<AstVariable, Variable> current = mapVariables;
+		mapVariables = new Scope<AstVariable, Variable>(mapVariables, true);
 
 		transformParameters(astFunction.getParameters());
 		transformLocalVariables(astFunction.getVariables());
 		transformExpression(astFunction.getExpression());
 
 		// restore previous scope
-		variablesMap = current;
+		mapVariables = current;
 
 		procedures.put(file, location, name, procedure);
-		functionsMap.put(astFunction, procedure);
+		mapFunctions.put(astFunction, procedure);
 	}
 
 	/**
@@ -1058,7 +1050,7 @@ public class AstTransformer {
 					name, assignable, initialValue);
 			stateVars.put(file, location, name, stateVariable);
 
-			variablesMap.put(astVariable, stateVariable);
+			mapVariables.put(astVariable, stateVariable);
 		}
 
 		return stateVars;
@@ -1097,7 +1089,7 @@ public class AstTransformer {
 	private void transformInputPattern(AstAction astAction, Class<?> clasz) {
 		List<AstInputPattern> astInputPattern = astAction.getInputs();
 		for (AstInputPattern pattern : astInputPattern) {
-			Port port = portMap.get(pattern.getPort());
+			Port port = mapPorts.get(pattern.getPort());
 			List<AstVariable> tokens = pattern.getTokens();
 
 			// evaluates token consumption
@@ -1181,7 +1173,7 @@ public class AstTransformer {
 	/**
 	 * Transforms the given AST variable to an IR variable that has the name and
 	 * type of <code>astVariable</code>. A binding is added to the
-	 * {@link #variablesMap} between astVariable and the created local variable.
+	 * {@link #mapVariables} between astVariable and the created local variable.
 	 * 
 	 * @param astVariable
 	 *            an AST variable
@@ -1203,7 +1195,7 @@ public class AstTransformer {
 			addInstruction(assign);
 		}
 
-		variablesMap.put(astVariable, local);
+		mapVariables.put(astVariable, local);
 		return local;
 	}
 
@@ -1232,7 +1224,7 @@ public class AstTransformer {
 	private void transformOutputPattern(AstAction astAction) {
 		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
 		for (AstOutputPattern pattern : astOutputPattern) {
-			Port port = portMap.get(pattern.getPort());
+			Port port = mapPorts.get(pattern.getPort());
 			List<AstExpression> values = pattern.getValues();
 
 			// evaluates token consumption
@@ -1285,7 +1277,7 @@ public class AstTransformer {
 			Location location = Util.getLocation(astPort);
 			Type type = astPort.getIrType();
 			Port port = new Port(location, type, astPort.getName());
-			portMap.put(astPort, port);
+			mapPorts.put(astPort, port);
 			ports.put(file, location, port.getName(), port);
 		}
 
@@ -1295,7 +1287,7 @@ public class AstTransformer {
 	/**
 	 * Transforms the given AST procedure to an IR procedure, and adds it to the
 	 * IR procedure list {@link #procedures} and to the map
-	 * {@link #proceduresMap}.
+	 * {@link #mapProcedures}.
 	 * 
 	 * @param astProcedure
 	 *            an AST procedure
@@ -1309,18 +1301,18 @@ public class AstTransformer {
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		// create a new scope that extends variablesMap
-		Scope<AstVariable, Variable> current = variablesMap;
-		variablesMap = new Scope<AstVariable, Variable>(variablesMap, true);
+		Scope<AstVariable, Variable> current = mapVariables;
+		mapVariables = new Scope<AstVariable, Variable>(mapVariables, true);
 
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
 		transformStatements(astProcedure.getStatements());
 
 		// restore previous scope
-		variablesMap = current;
+		mapVariables = current;
 
 		procedures.put(file, location, name, procedure);
-		proceduresMap.put(astProcedure, procedure);
+		mapProcedures.put(astProcedure, procedure);
 	}
 
 	/**

@@ -109,7 +109,7 @@ public abstract class AbstractBackend implements Backend {
 			}
 		} else {
 			System.err.println("Usage: " + clasz.getSimpleName()
-					+ "<input XDF network> <output folder>");
+					+ " <input XDF network> <output folder>");
 		}
 	}
 
