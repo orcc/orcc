@@ -269,7 +269,7 @@ public class SSATransformation extends AbstractActorTransformation {
 		hasTokens.setTarget(newTarget);
 
 		String name = target.getBaseName();
-		uses.put(name, target);
+		uses.put(name, newTarget);
 
 		if (branch != 0) {
 			insertPhi(target, newTarget);
