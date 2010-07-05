@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2009, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,60 +26,51 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends;
+package net.sf.orcc.plugins.backends;
+
+import net.sf.orcc.OrccException;
+import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.plugins.Plugin;
 
 /**
- * This interface defines an option of a back-end.
+ * This interface defines a back-end.
  * 
- * @author Jérôme Gorin
  * @author Matthieu Wipliez
  * 
  */
-public interface BrowseFileOption extends BackendOption {
+public interface Backend extends Plugin {
 
 	/**
-	 * Returns the extension that this "input file" should have.
+	 * Compiles the VTL by loading IR files, transforming actors and printing
+	 * them.
 	 * 
-	 * @return the extension that this "input file" should have
+	 * @param process
+	 *            the process that launched the back-end, so we can report
+	 *            messages to it
+	 * @param outputFolder
+	 *            absolute path of folder that contains IR files
+	 * @throws OrccException
+	 *             if something goes wrong
 	 */
-	String getExtension();
+	void compileVTL(OrccProcess process, String outputFolder)
+			throws OrccException;
 
 	/**
-	 * Returns whether we should select a folder or a regular file.
+	 * Loads a hierarchical XDF network and compile it. Compilation may include
+	 * instantiation, flattening, transforming, printing the network, or a
+	 * subset of these steps.
 	 * 
-	 * @return whether we should select a folder or a regular file
+	 * @param process
+	 *            the process that launched the back-end, so we can report
+	 *            messages to it
+	 * @param inputFile
+	 *            absolute path of top-level input network
+	 * @param outputFolder
+	 *            absolute path of output folder
+	 * @throws OrccException
+	 *             if something goes wrong
 	 */
-	boolean isFolder();
-
-	/**
-	 * Returns whether we should browse the workspace or the file system.
-	 * 
-	 * @return whether we should browse the workspace or the file system
-	 */
-	boolean isWorkspace();
-
-	/**
-	 * Sets the extension that this "input file" should have.
-	 * 
-	 * @param extension
-	 *            the extension that this "input file" should have
-	 */
-	void setExtension(String extension);
-
-	/**
-	 * Sets whether we should select a folder or a regular file.
-	 * 
-	 * @param folder
-	 *            whether we should select a folder or a regular file
-	 */
-	void setFolder(boolean folder);
-
-	/**
-	 * Sets whether we should browse the workspace or the file system.
-	 * 
-	 * @param workspace
-	 *            whether we should browse the workspace or the file system
-	 */
-	void setWorkspace(boolean workspace);
+	void compileXDF(OrccProcess process, String inputFile, String outputFolder)
+			throws OrccException;
 
 }
