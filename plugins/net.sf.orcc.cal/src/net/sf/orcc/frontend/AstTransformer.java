@@ -30,9 +30,11 @@ package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import net.sf.orcc.cal.cal.AstAction;
@@ -465,8 +467,9 @@ public class AstTransformer {
 					local = procedure.newTempLocalVariable(file,
 							variable.getType(), "local_" + variable.getName());
 					mapGlobals.put(variable, local);
-					listGlobalsToStore.add(variable);
 				}
+
+				setGlobalsToStore.add(variable);
 
 				return local;
 			}
@@ -515,8 +518,6 @@ public class AstTransformer {
 	 */
 	private String file;
 
-	final private List<Variable> listGlobalsToStore;
-
 	/**
 	 * A map from AST functions to IR procedures.
 	 */
@@ -553,6 +554,8 @@ public class AstTransformer {
 	 */
 	private OrderedMap<String, Procedure> procedures;
 
+	final private Set<Variable> setGlobalsToStore;
+
 	/**
 	 * statement transformer.
 	 */
@@ -562,13 +565,13 @@ public class AstTransformer {
 	 * Creates a new AST to IR transformation.
 	 */
 	public AstTransformer() {
-		listGlobalsToStore = new ArrayList<Variable>();
-
 		mapFunctions = new HashMap<AstFunction, Procedure>();
 		mapGlobals = new HashMap<Variable, LocalVariable>();
 		mapPorts = new HashMap<AstPort, Port>();
 		mapProcedures = new HashMap<AstProcedure, Procedure>();
 		mapVariables = new Scope<AstVariable, Variable>();
+
+		setGlobalsToStore = new HashSet<Variable>();
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
@@ -885,13 +888,13 @@ public class AstTransformer {
 					initializes.getAllActions(), scheduler);
 		} finally {
 			// cleanup
-			listGlobalsToStore.clear();
-
 			mapFunctions.clear();
 			mapGlobals.clear();
 			mapPorts.clear();
 			mapProcedures.clear();
 			mapVariables.clear();
+
+			setGlobalsToStore.clear();
 
 			procedure = null;
 			procedures.clear();
@@ -1397,7 +1400,7 @@ public class AstTransformer {
 	 * Writes back the globals that need to be stored.
 	 */
 	private void writeBackGlobals() {
-		for (Variable global : listGlobalsToStore) {
+		for (Variable global : setGlobalsToStore) {
 			LocalVariable local = mapGlobals.get(global);
 			VarExpr value = new VarExpr(new Use(local));
 
@@ -1406,7 +1409,7 @@ public class AstTransformer {
 			addInstruction(store);
 		}
 
-		listGlobalsToStore.clear();
+		setGlobalsToStore.clear();
 	}
 
 }
