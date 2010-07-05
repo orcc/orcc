@@ -472,7 +472,7 @@ public class AstTransformer {
 	 */
 	final private Map<AstFunction, Procedure> mapFunctions;
 
-	final private Map<Variable, LocalVariable> mapGlobals;
+	private Map<Variable, LocalVariable> mapGlobals;
 
 	/**
 	 * A map from AST ports to IR ports.
@@ -503,9 +503,9 @@ public class AstTransformer {
 	 */
 	private OrderedMap<String, Procedure> procedures;
 
-	final private Set<Variable> setGlobalsToLoad;
+	private Set<Variable> setGlobalsToLoad;
 
-	final private Set<Variable> setGlobalsToStore;
+	private Set<Variable> setGlobalsToStore;
 
 	/**
 	 * statement transformer.
@@ -517,13 +517,9 @@ public class AstTransformer {
 	 */
 	public AstTransformer() {
 		mapFunctions = new HashMap<AstFunction, Procedure>();
-		mapGlobals = new HashMap<Variable, LocalVariable>();
 		mapPorts = new HashMap<AstPort, Port>();
 		mapProcedures = new HashMap<AstProcedure, Procedure>();
 		mapVariables = new Scope<AstVariable, Variable>();
-
-		setGlobalsToLoad = new LinkedHashSet<Variable>();
-		setGlobalsToStore = new LinkedHashSet<Variable>();
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
@@ -799,10 +795,18 @@ public class AstTransformer {
 	 * 
 	 * @return the previous scope
 	 */
-	private Scope<AstVariable, Variable> newContext() {
-		Scope<AstVariable, Variable> current = mapVariables;
+	private Context newContext() {
+		Context context = new Context(mapGlobals, mapVariables,
+				setGlobalsToLoad, setGlobalsToStore);
+
+		// new scope that inherits from previous mapVariables scope
 		mapVariables = new Scope<AstVariable, Variable>(mapVariables, true);
-		return current;
+
+		mapGlobals = new HashMap<Variable, LocalVariable>();
+		setGlobalsToLoad = new LinkedHashSet<Variable>();
+		setGlobalsToStore = new LinkedHashSet<Variable>();
+
+		return context;
 	}
 
 	/**
@@ -815,14 +819,16 @@ public class AstTransformer {
 	 * @param oldScope
 	 *            the previous scope returned by {@link #newContext()}
 	 */
-	private void restoreContext(Scope<AstVariable, Variable> oldScope) {
+	private void restoreContext(Context context) {
 		loadGlobals();
 		storeGlobals();
 
-		mapGlobals.clear();
+		mapGlobals = context.getMapGlobals();
+		setGlobalsToLoad = context.getSetGlobalsToLoad();
+		setGlobalsToStore = context.getSetGlobalsToStore();
 
 		// restore previous scope
-		mapVariables = oldScope;
+		mapVariables = context.getMapVariables();
 	}
 
 	/**
@@ -906,13 +912,9 @@ public class AstTransformer {
 		} finally {
 			// cleanup
 			mapFunctions.clear();
-			mapGlobals.clear();
 			mapPorts.clear();
 			mapProcedures.clear();
 			mapVariables.clear();
-
-			setGlobalsToLoad.clear();
-			setGlobalsToStore.clear();
 
 			procedure = null;
 			procedures.clear();
@@ -977,14 +979,14 @@ public class AstTransformer {
 		// current procedure is the body
 		procedure = body;
 
-		Scope<AstVariable, Variable> oldScope = newContext();
+		Context context = newContext();
 
 		transformInputPattern(astAction, Read.class);
 		transformLocalVariables(astAction.getVariables());
 		transformStatements(astAction.getStatements());
 		transformOutputPattern(astAction);
 
-		restoreContext(oldScope);
+		restoreContext(context);
 	}
 
 	/**
@@ -1020,7 +1022,7 @@ public class AstTransformer {
 		// current procedure is the scheduler
 		procedure = scheduler;
 
-		Scope<AstVariable, Variable> oldScope = newContext();
+		Context context = newContext();
 
 		LocalVariable result = procedure.newTempLocalVariable(file,
 				IrFactory.eINSTANCE.createTypeBool(), "result");
@@ -1034,7 +1036,7 @@ public class AstTransformer {
 			createActionTest(astAction, inputPattern, result);
 		}
 
-		restoreContext(oldScope);
+		restoreContext(context);
 
 		// return result
 		Return returnInstr = new Return(new VarExpr(new Use(result)));
@@ -1089,13 +1091,13 @@ public class AstTransformer {
 		// sets the current procedure
 		procedure = new Procedure(name, location, type);
 
-		Scope<AstVariable, Variable> oldScope = newContext();
+		Context context = newContext();
 
 		transformParameters(astFunction.getParameters());
 		transformLocalVariables(astFunction.getVariables());
 		Expression value = transformExpression(astFunction.getExpression());
 
-		restoreContext(oldScope);
+		restoreContext(context);
 
 		Return returnInstr = new Return(location, value);
 		addInstruction(returnInstr);
@@ -1379,13 +1381,13 @@ public class AstTransformer {
 		procedure = new Procedure(name, location,
 				IrFactory.eINSTANCE.createTypeVoid());
 
-		Scope<AstVariable, Variable> oldScope = newContext();
+		Context context = newContext();
 
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
 		transformStatements(astProcedure.getStatements());
 
-		restoreContext(oldScope);
+		restoreContext(context);
 
 		procedures.put(file, location, name, procedure);
 		mapProcedures.put(astProcedure, procedure);
