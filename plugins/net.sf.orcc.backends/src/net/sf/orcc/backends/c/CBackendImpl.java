@@ -107,17 +107,17 @@ public class CBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
+		boolean classify = getAttribute("net.sf.orcc.plugins.backends.classify", false);
 		if (classify) {
 			network.classifyActors();
 
-			boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
+			boolean normalize = getAttribute("net.sf.orcc.plugins.backends.normalize",
 					false);
 			if (normalize) {
 				network.normalizeActors();
 			}
 
-			boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
+			boolean merge = getAttribute("net.sf.orcc.plugins.backends.merge", false);
 			if (merge) {
 				network.mergeActors();
 			}
@@ -161,7 +161,7 @@ public class CBackendImpl extends AbstractBackend {
 		try {
 			String[] networkTemplates;
 			boolean useNewScheduler = getAttribute(
-					"net.sf.orcc.backends.newScheduler", false);
+					"net.sf.orcc.plugins.backends.newScheduler", false);
 			if (useNewScheduler) {
 				networkTemplates = new String[2];
 				networkTemplates[0] = "C_network";

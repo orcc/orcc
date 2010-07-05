@@ -61,6 +61,10 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.Fifo_String;
+import net.sf.orcc.runtime.Fifo_boolean;
+import net.sf.orcc.runtime.Fifo_int;
 
 /**
  * This class defines a node interpreter.
@@ -68,7 +72,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
+public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 
 	private boolean blockReturn;
 
@@ -168,6 +172,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 
 	@Override
 	public void visit(Call call, Object... args) {
+
 		// Get called procedure
 		Procedure proc = call.getProcedure();
 
@@ -220,7 +225,7 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(HasTokens instr, Object... args) {
-		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
+		Fifo fifo = ((Map<String, Fifo>) args[0])
 				.get(instr.getPort().getName());
 		boolean hasTok = fifo.hasTokens(instr.getNumTokens());
 		instr.getTarget().setValue(hasTok);
@@ -278,10 +283,26 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Peek instr, Object... args) {
-		Object[] target = (Object[]) (instr.getTarget().getValue());
-		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
+		int numTokens = instr.getNumTokens();
+		Fifo fifo = ((Map<String, Fifo>) args[0])
 				.get(instr.getPort().getName());
-		fifo.peek(target);
+		// Object[] target = (Object[]) (instr.getTarget().getValue());
+		//
+		// System.arraycopy(((Fifo_Object) fifo).getReadArray(numTokens),
+		// fifo.getReadIndex(numTokens), target, 0, numTokens);
+		if (fifo instanceof Fifo_int) {
+			Integer[] target = (Integer[]) (instr.getTarget().getValue());
+			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), target, 0, numTokens);
+		} else if (fifo instanceof Fifo_boolean) {
+			Boolean[] target = (Boolean[]) (instr.getTarget().getValue());
+			System.arraycopy(((Fifo_boolean) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), target, 0, numTokens);
+		} else if (fifo instanceof Fifo_String) {
+			String[] target = (String[]) (instr.getTarget().getValue());
+			System.arraycopy(((Fifo_String) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), target, 0, numTokens);
+		}
 	}
 
 	@Override
@@ -296,17 +317,51 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Read instr, Object... args) {
-		Object[] target;
-		if (instr.getTarget() == null) {
-			// "get" needs a target
-			target = new Object[instr.getNumTokens()];
-		} else {
-			target = (Object[]) instr.getTarget().getValue();
-		}
-		
-		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
+		int numTokens = instr.getNumTokens();
+		Fifo fifo = ((Map<String, Fifo>) args[0])
 				.get(instr.getPort().getName());
-		fifo.get(target);
+		// Object[] target;
+		// if (instr.getTarget() == null) {
+		// // "get" needs a target
+		// target = new Object[instr.getNumTokens()];
+		// } else {
+		// target = (Object[]) instr.getTarget().getValue();
+		// }
+		//
+		// System.arraycopy(((Fifo_Object) fifo).getReadArray(numTokens),
+		// fifo.getReadIndex(numTokens), target, 0, numTokens);
+		if (fifo instanceof Fifo_int) {
+			Integer[] target;
+			if (instr.getTarget() == null) {
+				// "get" needs a target
+				target = new Integer[instr.getNumTokens()];
+			} else {
+				target = (Integer[]) instr.getTarget().getValue();
+			}
+			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), target, 0, numTokens);
+		} else if (fifo instanceof Fifo_boolean) {
+			Boolean[] target;
+			if (instr.getTarget() == null) {
+				// "get" needs a target
+				target = new Boolean[instr.getNumTokens()];
+			} else {
+				target = (Boolean[]) instr.getTarget().getValue();
+			}
+			System.arraycopy(((Fifo_boolean) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), target, 0, numTokens);
+		} else if (fifo instanceof Fifo_String) {
+			String[] target;
+			if (instr.getTarget() == null) {
+				// "get" needs a target
+				target = new String[instr.getNumTokens()];
+			} else {
+				target = (String[]) instr.getTarget().getValue();
+			}
+			System.arraycopy(((Fifo_String) fifo).getReadArray(numTokens),
+					fifo.getReadIndex(numTokens), target, 0, numTokens);
+		}
+		fifo.readEnd(numTokens);
 	}
 
 	@Override
@@ -329,10 +384,10 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 		if (instr.getIndexes().isEmpty()) {
 			variable.setValue(instr.getValue().accept(exprInterpreter));
 		} else {
-			Object obj = variable.getValue();
-			Object objPrev = obj;
-			Integer lastIndex = 0;
 			try {
+				Object obj = variable.getValue();
+				Object objPrev = obj;
+				Integer lastIndex = 0;
 				for (Expression index : instr.getIndexes()) {
 					objPrev = obj;
 					lastIndex = (Integer) index.accept(exprInterpreter);
@@ -371,10 +426,35 @@ public class NodeInterpreter implements InstructionVisitor, NodeVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Write instr, Object... args) {
-		Object[] target = (Object[]) instr.getTarget().getValue();
-		CommunicationFifo fifo = ((Map<String, CommunicationFifo>) args[0])
+		int numTokens = instr.getNumTokens();
+		Fifo fifo = ((Map<String, Fifo>) args[0])
 				.get(instr.getPort().getName());
-		fifo.put(target);
+		// Object[] target = (Object[]) instr.getTarget().getValue();
+		// Object[] fifoArray = ((Fifo_Object) fifo).getWriteArray(numTokens);
+		//
+		// System.arraycopy(target, 0, fifoArray, fifo.getWriteIndex(numTokens),
+		// numTokens);
+		// ((Fifo_Object) fifo).writeEnd(numTokens, fifoArray);
+		if (fifo instanceof Fifo_int) {
+			Integer[] target = (Integer[]) instr.getTarget().getValue();
+			Integer[] fifoArray = ((Fifo_int) fifo).getWriteArray(numTokens);
+			System.arraycopy(target, 0, fifoArray,
+					fifo.getWriteIndex(numTokens), numTokens);
+			((Fifo_int) fifo).writeEnd(numTokens, fifoArray);
+		} else if (fifo instanceof Fifo_boolean) {
+			Boolean[] target = (Boolean[]) instr.getTarget().getValue();
+			Boolean[] fifoArray = ((Fifo_boolean) fifo)
+					.getWriteArray(numTokens);
+			System.arraycopy(target, 0, fifoArray,
+					fifo.getWriteIndex(numTokens), numTokens);
+			((Fifo_boolean) fifo).writeEnd(numTokens, fifoArray);
+		} else if (fifo instanceof Fifo_String) {
+			String[] target = (String[]) instr.getTarget().getValue();
+			String[] fifoArray = ((Fifo_String) fifo).getWriteArray(numTokens);
+			System.arraycopy(target, 0, fifoArray,
+					fifo.getWriteIndex(numTokens), numTokens);
+			((Fifo_String) fifo).writeEnd(numTokens, fifoArray);
+		}
 	}
 
 }

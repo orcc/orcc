@@ -28,9 +28,7 @@
  */
 package net.sf.orcc.runtime.actors;
 
-import net.sf.orcc.debug.Location;
 import net.sf.orcc.runtime.Fifo;
-import net.sf.orcc.runtime.debug.AbstractActorDebug;
 
 /**
  * This class defines a generic broadcast actor.
@@ -38,7 +36,7 @@ import net.sf.orcc.runtime.debug.AbstractActorDebug;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class Broadcast extends AbstractActorDebug {
+public abstract class Broadcast implements IActor {
 
 	protected Fifo input;
 
@@ -51,13 +49,9 @@ public abstract class Broadcast extends AbstractActorDebug {
 	 *            number of output ports.
 	 */
 	public Broadcast(int numOutputs) {
-		super("Broadcast.java");
-
 		outputs = new Fifo[numOutputs];
-		actionLocation.put("untagged", new Location(89, 13, 31));
 	}
 
-	@Override
 	final public String getNextSchedulableAction() {
 		if (input.hasTokens(1) && outputsHaveRoom()) {
 			return "untagged";
@@ -66,6 +60,10 @@ public abstract class Broadcast extends AbstractActorDebug {
 		return null;
 	}
 
+	@Override
+	public void initialize() {
+	}
+	
 	final protected boolean outputsHaveRoom() {
 		boolean hasRoom = true;
 		for (int i = 0; i < outputs.length && hasRoom; i++) {

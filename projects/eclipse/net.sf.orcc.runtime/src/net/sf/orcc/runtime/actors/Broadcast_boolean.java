@@ -52,13 +52,14 @@ public class Broadcast_boolean extends Broadcast {
 	@Override
 	public int schedule() {
 		int i = 0;
-		while (!suspended && input.hasTokens(1) && outputsHaveRoom()) {
-			boolean[] tokens = ((Fifo_boolean) input).getReadArray(1); 
+		while (input.hasTokens(1) && outputsHaveRoom()) {
+			Boolean[] tokens = ((Fifo_boolean) input).getReadArray(1);
 			int tokens_Index = input.getReadIndex(1);
 			boolean token = tokens[tokens_Index];
-			
+
 			for (Fifo output : outputs) {
-				boolean[] outputTokens = ((Fifo_boolean) output).getWriteArray(1);
+				Boolean[] outputTokens = ((Fifo_boolean) output)
+						.getWriteArray(1);
 				int output_Index = output.getWriteIndex(1);
 				outputTokens[output_Index] = token;
 				((Fifo_boolean) output).writeEnd(1, outputTokens);

@@ -37,6 +37,9 @@ package net.sf.orcc;
  */
 public interface OrccLaunchConstants {
 
+	
+	public static final String ACTIVATE_BACKEND = "net.sf.orcc.simulators.activateBackend";
+	
 	/**
 	 * Back-end associated with an Orcc configuration.
 	 */
@@ -46,18 +49,23 @@ public interface OrccLaunchConstants {
 	 * Whether we should compile the given XDF input file. Must be kept in sync
 	 * with options in the back-ends plug-in.
 	 */
-	public static final String COMPILE_XDF = "net.sf.orcc.backends.compileXDF";
-
+	public static final String COMPILE_XDF = "net.sf.orcc.plugins.compileXDF";
+	
 	/**
 	 * When set, Orcc frontend will be launched in debug mode.
 	 */
 	public static final String DEBUG_MODE = "net.sf.orcc.debugMode";
 
 	/**
+	 * Default value for {@value #ACTIVATE_BACKEND}.
+	 */
+	public static final boolean DEFAULT_BACKEND = false;
+
+	/**
 	 * Default value for {@value #DEBUG_MODE}.
 	 */
 	public static final boolean DEFAULT_DEBUG = false;
-
+	
 	/**
 	 * Default value for {@value #DOT_CFG}.
 	 */
@@ -87,7 +95,7 @@ public interface OrccLaunchConstants {
 	 * When enabled, interpreter traces each time data is written to
 	 * (output)FIFO
 	 */
-	public static final String ENABLE_TRACES = "net.sf.orcc.enableTraces";
+	public static final String ENABLE_TRACES = "net.sf.orcc.simulators.enableTraces";
 
 	/**
 	 * Size of FIFO channels when not specified by the network.
@@ -97,7 +105,7 @@ public interface OrccLaunchConstants {
 	/**
 	 * Input stimulus file associated with an Orcc configuration.
 	 */
-	public static final String INPUT_STIMULUS = "net.sf.orcc.inputStimulus";
+	public static final String INPUT_STIMULUS = "net.sf.orcc.simulators.inputStimulus";
 
 	/**
 	 * Whether intermediate files should be kept.
@@ -109,6 +117,11 @@ public interface OrccLaunchConstants {
 	 */
 	public static final String OUTPUT_FOLDER = "net.sf.orcc.outputFolder";
 
+	/**
+	 * Parent of the output folder associated with an Orcc configuration.
+	 */
+	public static final String OUTPUT_PARENT_FOLDER = "net.sf.orcc.simulators.outputParentFolder";
+	
 	/**
 	 * Parameters associated with an Orcc configuration.
 	 */
@@ -122,18 +135,28 @@ public interface OrccLaunchConstants {
 	/**
 	 * Orcc simulation configuration type.
 	 */
-	public static final String SIMULATION_CONFIG_TYPE = "net.sf.orcc.simuLaunchConfigurationType";
+	public static final String SIMU_CONFIG_TYPE = "net.sf.orcc.simuLaunchConfigurationType";
 
+	/**
+	 * Simulator associated with an Orcc configuration.
+	 */
+	public static final String SIMULATOR = "net.sf.orcc.simulator";
+	
+	/**
+	 * Simulator traces folder associated with an Orcc configuration
+	 */
+	public static final String TRACES_FOLDER = "net.sf.orcc.simulators.tracesFolder";
+	
 	/**
 	 * Folder of the VTL associated with an Orcc configuration. Must be kept in
 	 * sync with options in the back-ends plug-in.
 	 */
-	public static final String VTL_FOLDER = "net.sf.orcc.backends.vtlFolder";
+	public static final String VTL_FOLDER = "net.sf.orcc.plugins.vtlFolder";
 
 	/**
 	 * Input file associated with an Orcc configuration. Must be kept in sync
 	 * with options in the back-ends plug-in.
 	 */
-	public static final String XDF_FILE = "net.sf.orcc.backends.xdfFile";
+	public static final String XDF_FILE = "net.sf.orcc.plugins.xdfFile";
 
 }

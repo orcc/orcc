@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009/2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -30,13 +30,15 @@ package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
-import static net.sf.orcc.OrccLaunchConstants.SIMULATION_CONFIG_TYPE;
+import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
+import static net.sf.orcc.OrccLaunchConstants.SIMU_CONFIG_TYPE;
 import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.plugins.simulators.SimulatorFactory;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
@@ -57,8 +59,10 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.debug.ui.ILaunchShortcut2;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
@@ -175,7 +179,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
 				getShell(), labelProvider);
 		dialog.setElements(configs);
-		dialog.setTitle("Select Orcc interpretation");
+		dialog.setTitle("Select Orcc simulation");
 		dialog.setMessage("&Select existing configuration:");
 		dialog.setMultipleSelection(false);
 		int result = dialog.open();
@@ -186,17 +190,48 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 		return null;
 	}
 
+	/**
+	 * Prompts the user to choose a simulator.
+	 * 
+	 * @return the simulator chosen, or <code>null</code>
+	 */
+	private String chooseSimulator() {
+		ILabelProvider labelProvider = new LabelProvider();
+		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
+				getShell(), labelProvider);
+		SimulatorFactory factory = SimulatorFactory.getInstance();
+		dialog.setElements(factory.listPlugins().toArray());
+		dialog.setTitle("Select simulator");
+		dialog.setMessage("&Select simulator:");
+		dialog.setMultipleSelection(false);
+		int result = dialog.open();
+		labelProvider.dispose();
+		if (result == Window.OK) {
+			return (String) dialog.getFirstResult();
+		}
+
+		return null;
+	}
+
 	private ILaunchConfiguration createConfiguration(IFile file) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-		String id = SIMULATION_CONFIG_TYPE;
+		String id = SIMU_CONFIG_TYPE;
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(id);
 
-		ILaunchConfigurationWorkingCopy wc;
 		ILaunchConfiguration config = null;
 		try {
+
+			String simulator = chooseSimulator();
+			if (simulator == null) {
+				return null;
+			}
+			// generate configuration name
 			String name = file.getName();
 			name = manager.generateLaunchConfigurationName(name);
-			wc = type.newInstance(null, name);
+
+			// create configuration
+			ILaunchConfigurationWorkingCopy wc = type.newInstance(null, name);
+			wc.setAttribute(SIMULATOR, simulator);
 
 			// source XDF file
 			wc.setAttribute(XDF_FILE, file.getLocation().toOSString());
@@ -234,7 +269,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 
 	private ILaunchConfiguration[] getConfigurations(IFile file) {
 		ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
-		String id = SIMULATION_CONFIG_TYPE;
+		String id = SIMU_CONFIG_TYPE;
 		ILaunchConfigurationType type = manager.getLaunchConfigurationType(id);
 		try {
 			// configurations that match the given resource

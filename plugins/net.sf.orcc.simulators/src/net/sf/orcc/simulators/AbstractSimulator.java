@@ -1,0 +1,637 @@
+/*
+ * Copyright (c) 2010, IETR/INSA of Rennes
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *     contributors may be used to endorse or promote products derived from this
+ *     software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+package net.sf.orcc.simulators;
+
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
+import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
+import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
+import net.sf.orcc.OrccException;
+import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.serialize.IRParser;
+import net.sf.orcc.ir.transforms.DeadCodeElimination;
+import net.sf.orcc.ir.transforms.DeadGlobalElimination;
+import net.sf.orcc.ir.transforms.DeadVariableRemoval;
+import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Instance;
+import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.attributes.IAttribute;
+import net.sf.orcc.network.attributes.IValueAttribute;
+import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.network.transforms.BroadcastAdder;
+import net.sf.orcc.plugins.simulators.Simulator;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.jgrapht.DirectedGraph;
+
+public abstract class AbstractSimulator implements Simulator {
+
+	public AbstractSimulator() {
+		messageQueue = new LinkedList<SimulatorMessage>();
+		simuActorsMap = new HashMap<String, SimuActor>();
+	}
+
+	@Override
+	final public void addPropertyChangeListener(PropertyChangeListener listener) {
+		propertyChange.addPropertyChangeListener(listener);
+	}
+
+	@Override
+	public synchronized List<String> getActorsInstanceIds() {
+		List<String> instanceIds = new ArrayList<String>();
+		for (SimuActor simuActorInstance : simuActorsMap.values()) {
+			instanceIds.add(simuActorInstance.getInstanceId());
+		}
+		return instanceIds;
+	}
+
+	@Override
+	public synchronized String getActorName(String instanceId) {
+		return simuActorsMap.get(instanceId).getActorName();
+	}
+
+	@Override
+	public String getNetworkName() {
+		return new File(xdfFile).getName();
+	}
+
+	@Override
+	public synchronized DebugStackFrame getStackFrame(String instanceID) {
+		return simuActorsMap.get(instanceID).getStackFrame();
+	}
+
+	@Override
+	public synchronized void message(SimulatorEvent event, Object[] data) {
+		messageQueue.add(new SimulatorMessage(event, data));
+	}
+
+	@Override
+	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		this.configuration = configuration;
+		// Property change support creation for sending interpreter events
+		propertyChange = new PropertyChangeSupport(this);
+	}
+
+	/**
+	 * the configuration used to launch this back-end.
+	 */
+	protected ILaunchConfiguration configuration = null;
+
+	/**
+	 * Monitor associated to the simulator execution. Used for user
+	 * cancellation.
+	 */
+	private IProgressMonitor monitor = null;
+
+	/**
+	 * Master caller associated process for console I/O access.
+	 */
+	protected OrccProcess process;
+
+	/**
+	 * Configuration attributes : traces enable flag, input XDF network file
+	 * name, input stimulus file name, Video Tool Library (VTL) folder name,
+	 * output folder name, default FIFO size.
+	 */
+	protected String xdfFile;
+	protected String stimulusFile;
+	protected String vtlFolder;
+	protected String outputFolder;
+	protected int fifoSize;
+
+	/**
+	 * For the moment, merge of actors is not possible for any simulator. This
+	 * flag should be set later through the launch configuration with specific
+	 * simulators checkbox option.
+	 */
+	public static boolean merge = false;
+
+	/**
+	 * The utility class that makes us able to support bound properties. This is
+	 * used for easy "debug events" exchange.
+	 */
+	private PropertyChangeSupport propertyChange;
+
+	/**
+	 * Simulator current automaton state, initialized to "IDLE" by default
+	 */
+	private SimulatorState state = SimulatorState.IDLE;
+
+	/**
+	 * Simulator control message. Consists of an event ID and message data given
+	 * as an object.
+	 * 
+	 * @author plagalay
+	 * 
+	 */
+	public class SimulatorMessage {
+		public SimulatorMessage(SimulatorEvent event, Object[] data) {
+			this.event = event;
+			this.data = data;
+		}
+
+		public SimulatorEvent event;
+		public Object[] data;
+	}
+
+	/**
+	 * Simulator control messages (infinite) queue.
+	 */
+	private Queue<SimulatorMessage> messageQueue;
+
+	/**
+	 * Hash table containing actors instances from the network to be simulated.
+	 * Key = instance ID; Value = a simulator actor instance implementing
+	 * SimuActor interface.
+	 */
+	protected Map<String, SimuActor> simuActorsMap;
+
+	/**
+	 * Create a broadcast actor. Broadcasts have been detected by the XDF parser
+	 * and instantiated in the directed graph.
+	 */
+	abstract protected SimuActor createSimuActorBroadcast(String instanceId,
+			int numOutputs, boolean isBool);
+
+	/**
+	 * Create an actor instance for the simulation. This actor must implement
+	 * the SimuActor interface.
+	 */
+	abstract protected SimuActor createSimuActorInstance(String instanceId,
+			Map<String, Expression> actorParameters, Actor actorIR);
+
+	/**
+	 * Close the network
+	 * 
+	 */
+	abstract protected void closeNetwork();
+
+	/**
+	 * Connect two actors instances from the network together.
+	 * 
+	 * @param source
+	 *            : the source actor
+	 * @param srcPort
+	 *            : source actor's output port
+	 * @param target
+	 *            : the target actor
+	 * @param tgtPort
+	 *            : target actor's input port
+	 * @param fifoSize
+	 *            : the limited size of the FIFO
+	 */
+	abstract protected void connectActors(SimuActor source, Port srcPort,
+			SimuActor target, Port tgtPort, int fifoSize);
+
+	/**
+	 * Get the instance ID of the actor that has just hit a breakpoint.
+	 * 
+	 * @return String : breakpoint actor's instance ID
+	 */
+	abstract protected String getBreakpointActorInstanceId();
+
+	/**
+	 * Get the line number of the current hit breakpoint.
+	 * 
+	 * @return Integer : the line number of the current breakpoint
+	 */
+	abstract protected Integer getBreakpointLineNumber();
+
+	/**
+	 * Initialize the network
+	 */
+	abstract protected void initializeNetwork();
+
+	/**
+	 * Start (again) the actor network before going to RUNNING state
+	 * 
+	 */
+	abstract protected int resumeNetwork();
+
+	/**
+	 * Simulate the actor network until SUSPEND command or BREAKPOINT hit.
+	 * 
+	 */
+	abstract protected int runNetwork();
+
+	/**
+	 * Step over the whole network of actors.
+	 * 
+	 */
+	abstract protected int stepNetwork();
+
+	/**
+	 * Step into a specific actor instance.
+	 * 
+	 */
+	abstract protected int stepInto(String instanceId);
+
+	/**
+	 * Step over a specific actor instance.
+	 * 
+	 */
+	abstract protected int stepOver(String instanceId);
+
+	/**
+	 * Step return from specific actor instance.
+	 * 
+	 */
+	abstract protected void stepReturn(String instanceId);
+
+	/**
+	 * Suspend the network simulation until next RESUME or STEP command.
+	 */
+	abstract protected void suspendNetwork();
+
+	/**
+	 * Visit the network graph for building the required topology. Edges of the
+	 * graph correspond to the connections between the actors. These connections
+	 * should be implemented as FIFOs of specific size as defined in the CAL
+	 * model or a common default size.
+	 * 
+	 * @param graph
+	 */
+	public void connectNetwork(DirectedGraph<Vertex, Connection> graph) {
+		// Get edges from the graph has actors point-to-point connections.
+		Set<Connection> connections = graph.edgeSet();
+		// Loop over the connections and ask for the source and target actors
+		// connection through specified I/O ports.
+		for (Connection connection : connections) {
+			Vertex srcVertex = graph.getEdgeSource(connection);
+			Vertex tgtVertex = graph.getEdgeTarget(connection);
+
+			if (srcVertex.isInstance() && tgtVertex.isInstance()) {
+				Instance srcInst = srcVertex.getInstance();
+				Instance tgtInst = tgtVertex.getInstance();
+
+				// get FIFO size (user-defined nor default)
+				int size;
+				IAttribute attr = connection
+						.getAttribute(Connection.BUFFER_SIZE);
+				if (attr != null && attr.getType() == IAttribute.VALUE) {
+					Expression expr = ((IValueAttribute) attr).getValue();
+					size = new ExpressionEvaluator().evaluateAsInteger(expr) + 1;
+				} else {
+					size = fifoSize;
+				}
+
+				// create the communication FIFO between source and target
+				// actors
+				Port srcPort = connection.getSource();
+				Port tgtPort = connection.getTarget();
+
+				// connect source and target actors
+				if ((srcPort != null) && (tgtPort != null)) {
+					// Connect actors through specific simulator method
+					connectActors(simuActorsMap.get(srcInst.getId()), srcPort,
+							simuActorsMap.get(tgtInst.getId()), tgtPort, size);
+					process.write("Connecting " + srcInst.getId() + "."
+							+ srcPort.getName() + " to " + tgtInst.getId()
+							+ "." + tgtPort.getName() + "\n");
+				}
+			}
+		}
+	}
+
+	/**
+	 * Parse XDF input file and build a directed graph representing the network
+	 * with actors as vertexes and FIFO connections as edges. We then
+	 * instantiate the network from JSON descriptors in order to do some
+	 * transformations on the model. The modified (transformed) graph is then
+	 * returned.
+	 * 
+	 * @return A directed graph representing the flat network of connected
+	 *         actors instances
+	 * @throws OrccException
+	 */
+	private DirectedGraph<Vertex, Connection> getGraphFromNetwork()
+			throws OrccException {
+		// Parses top network
+		Network network;
+		network = new XDFParser(xdfFile).parseNetwork();
+		// Instantiate the network
+		network.instantiate(outputFolder);
+		Network.clearActorPool();
+		// Flatten the hierarchical network
+		network.flatten();
+		// Try to merge some actors
+		if (merge) {
+			network.classifyActors();
+			network.normalizeActors();
+			network.mergeActors();
+		}
+		// Add broadcasts before connecting actors
+		new BroadcastAdder().transform(network);
+
+		return network.getGraph();
+	}
+
+	/**
+	 * Visit the network graph for instantiating the vertexes (actors we want to
+	 * simulate). Created actor instances are stored in the simuActorsMap.
+	 * 
+	 * @param graph
+	 * @throws OrccException
+	 * @throws FileNotFoundException
+	 */
+	private void instantiateNetwork(DirectedGraph<Vertex, Connection> graph)
+			throws OrccException, FileNotFoundException {
+		// Loop over the graph vertexes and get instances definition for
+		// instantiating the network to simulate.
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				SimuActor simuActorInstance = null;
+				if (instance.isActor()) {
+					// Create a new actor instance for interpretation
+					InputStream in = new FileInputStream(instance.getFile());
+					Actor actorIR = new IRParser().parseActor(in);
+					// Apply some simplification transformations
+					ActorTransformation[] transformations = {
+							new DeadGlobalElimination(),
+							new DeadCodeElimination(),
+							new DeadVariableRemoval(), new PhiRemoval() };
+					for (ActorTransformation transformation : transformations) {
+						transformation.transform(actorIR);
+					}
+					simuActorInstance = createSimuActorInstance(
+							instance.getId(), instance.getParameters(), actorIR);
+				} else if (instance.isBroadcast()) {
+					// Broadcast simulated actor
+					simuActorInstance = createSimuActorBroadcast(
+							instance.getId(), instance.getBroadcast()
+									.getNumOutputs(), instance.getBroadcast()
+									.getInput().getType().isBool());
+				}
+				// Register the simulated actor instance to the hash map.
+				if (simuActorInstance != null) {
+					simuActorsMap.put(instance.getId(), simuActorInstance);
+				}
+			}
+		}
+	}
+
+	/**
+	 * This methods calls
+	 * {@link PropertyChangeSupport#firePropertyChange(String, Object, Object)}
+	 * on the underlying {@link PropertyChangeSupport} without updating the
+	 * value of the property <code>propertyName</code>. This method is
+	 * particularly useful when a property should be fired regardless of the
+	 * previous value (in case of undo/redo for example, when a same object is
+	 * added, removed, and added again).
+	 * 
+	 * @param propertyName
+	 *            The name of the property concerned.
+	 * @param oldValue
+	 *            The old value of the property.
+	 * @param newValue
+	 *            The new value of the property.
+	 */
+	public void firePropertyChange(String propertyName, Object oldValue,
+			Object newValue) {
+		propertyChange.firePropertyChange(propertyName, oldValue, newValue);
+	}
+
+	/**
+	 * Main simulator thread entry : implements the simulation FSM.
+	 */
+	@Override
+	public void run() {
+		try {
+
+			// Loop until the simulator has terminated
+			while (state != SimulatorState.TERMINATED) {
+				// Synchronous behavior : check propertyChanges (events)
+				// for transitions and apply current state action
+				SimulatorMessage msg = messageQueue.peek();
+				// Synchronous events received at any state :
+				if (msg != null) {
+					switch (msg.event) {
+					case SET_BREAKPOINT:
+						// TODO : check message data is valid
+						simuActorsMap.get((String) msg.data[0]).setBreakpoint(
+								(Integer) msg.data[1]);
+						messageQueue.remove();
+						break;
+					case CLEAR_BREAKPOINT:
+						// TODO : check message data is valid
+						simuActorsMap.get((String) msg.data[0])
+								.clearBreakpoint((Integer) msg.data[1]);
+						messageQueue.remove();
+						break;
+					case TERMINATE:
+						messageQueue.remove();
+						terminate();
+						break;
+					}
+				}
+				// FSM :
+				switch (state) {
+				//
+				// IDLE state : wait for the simulator to be configured. Go to
+				// CONFIGURED state when CONFIGURE event has been received.
+				//
+				case IDLE:
+					if ((msg != null)
+							&& (msg.event == SimulatorEvent.CONFIGURE)
+							&& (msg.data != null) && (msg.data.length == 1)
+							&& (configuration != null)) {
+						// Get system objects
+						process = (OrccProcess) msg.data[0];
+						monitor = process.getProgressMonitor();
+						// Get configuration attributes
+						stimulusFile = configuration.getAttribute(
+								INPUT_STIMULUS, "");
+						outputFolder = configuration.getAttribute(
+								OUTPUT_FOLDER, "");
+						fifoSize = configuration.getAttribute(FIFO_SIZE,
+								DEFAULT_FIFO_SIZE);
+						xdfFile = configuration.getAttribute(XDF_FILE, "");
+						messageQueue.remove();
+						state = SimulatorState.CONFIGURED;
+					}
+					// TODO : throw OrccException if CONFIGURE message data is
+					// not valid
+					break;
+				//
+				// CONFIGURED : transitory state exploiting the configuration
+				// attributes for parsing and instantiating the network we want
+				// to simulate. Automatic transition to SUSPENDED state if
+				// DEBUG_MODE is enabled. RUNNING state otherwise.
+				//
+				case CONFIGURED:
+					// Parse XDF file, do some transformations and return the
+					// graph corresponding to the flat network instantiation.
+					DirectedGraph<Vertex, Connection> graph = getGraphFromNetwork();
+					// Instantiate simulator actors from the graph
+					instantiateNetwork(graph);
+					// Build the network according to the specified topology.
+					connectNetwork(graph);
+					initializeNetwork();
+					state = SimulatorState.SUSPENDED;
+					firePropertyChange("started", null, null);
+					break;
+				//
+				// RUNNING : this state corresponds to an execution of the
+				// entire network until every actor is waiting for input data
+				// (end of the network simulation) or until the simulator has
+				// been interrupted by the user (suspend, close, cancel) or a
+				// breakpoint has been hit. GOTO SUSPENDED state if a SUSPEND
+				// event has been received or a breakpoint has been hit. GOTO
+				// TERMINATED if no more action is schedulable in the entire
+				// network.
+				//
+				case RUNNING:
+					// "Asynchronous" user cancel
+					if (monitor.isCanceled()) {
+						terminate();
+					}
+					// Check suspension
+					if ((msg != null) && (msg.event == SimulatorEvent.SUSPEND)) {
+						messageQueue.remove();
+						suspendNetwork();
+						state = SimulatorState.SUSPENDED;
+						firePropertyChange("suspended client", null, null);
+					} else {
+						// Continue running the whole network of actors
+						int status = runNetwork();
+						if (status == -2) {
+							// Breakpoint hit
+							state = SimulatorState.SUSPENDED;
+							String instanceId = getBreakpointActorInstanceId();
+							Integer breakpointLineNumber = getBreakpointLineNumber();
+							firePropertyChange("suspended breakpoint"
+									+ breakpointLineNumber, null, instanceId);
+						} else if (status <= 0) {
+							terminate();
+						}
+					}
+					break;
+				//
+				// SUSPENDED : network simulation has been suspended. This state
+				// admits events asking for stepping.
+				//
+				case SUSPENDED:
+					// "Asynchronous" user cancel
+					if (monitor.isCanceled()) {
+						terminate();
+					}
+					// Wait for STEP or RESUME
+					if (msg != null) {
+						messageQueue.remove();
+						switch (msg.event) {
+						case RESUME:
+							resumeNetwork();
+							state = SimulatorState.RUNNING;
+							firePropertyChange("resumed client", null, null);
+							break;
+						case STEP_ALL:
+							firePropertyChange("resumed step", null, null);
+							if (stepNetwork() <= 0) {
+								terminate();
+							} else {
+								// Suspended again
+								firePropertyChange("suspended step", null, null);
+							}
+							break;
+						case STEP_INTO:
+						case STEP_OVER:
+						case STEP_RETURN:
+							// Get step parameters
+							String instanceId = (String) msg.data[0];
+							int status = 0;
+							// Send resumed event to debug target
+							firePropertyChange("resumed step", null, instanceId);
+							// Run required step command
+							if (msg.event == SimulatorEvent.STEP_INTO)
+								status = stepInto(instanceId);
+							else if (msg.event == SimulatorEvent.STEP_OVER)
+								status = stepOver(instanceId);
+							else if (msg.event == SimulatorEvent.STEP_RETURN)
+								stepReturn(instanceId);
+							// Check returned status
+							if (status <= 0) {
+								terminate();
+							} else {
+								// Suspended again
+								firePropertyChange("suspended step", null,
+										instanceId);
+							}
+							break;
+						}
+					}
+					break;
+				}
+			}
+		} catch (CoreException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (OrccException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * End of simulation reached or required by user
+	 */
+	private void terminate() {
+		closeNetwork();
+		state = SimulatorState.TERMINATED;
+		firePropertyChange("terminated", null, null);
+	}
+}

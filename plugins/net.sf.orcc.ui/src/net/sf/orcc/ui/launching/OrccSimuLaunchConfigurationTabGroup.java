@@ -46,8 +46,7 @@ public class OrccSimuLaunchConfigurationTabGroup extends
 	@Override
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
-				new SimuSettingsTab(), new ParametersTab(),
-				new SimuOptionsTab(), new CommonTab() };
+				new SimuSettingsTab(), new SimuOptionsTab(), new CommonTab() };
 		setTabs(tabs);
 	}
 

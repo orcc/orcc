@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.debug.model;
 
-import net.sf.orcc.interpreter.AbstractInterpretedActor.InterpreterStackFrame;
+import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspace;
@@ -62,7 +62,7 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 	 * @param id
 	 *            stack frame id (0 is the bottom of the stack)
 	 */
-	public OrccStackFrame(OrccThread thread, InterpreterStackFrame frame, int id) {
+	public OrccStackFrame(OrccThread thread, DebugStackFrame frame, int id) {
 		super((OrccDebugTarget) thread.getDebugTarget());
 		fId = id;
 		fThread = thread;

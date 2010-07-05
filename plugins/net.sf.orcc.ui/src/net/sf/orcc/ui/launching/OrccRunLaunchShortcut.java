@@ -38,7 +38,7 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.backends.BackendFactory;
+import net.sf.orcc.plugins.backends.BackendFactory;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -147,7 +147,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 		ElementListSelectionDialog dialog = new ElementListSelectionDialog(
 				getShell(), labelProvider);
 		BackendFactory factory = BackendFactory.getInstance();
-		dialog.setElements(factory.listBackends().toArray());
+		dialog.setElements(factory.listPlugins().toArray());
 		dialog.setTitle("Select backend");
 		dialog.setMessage("&Select backend:");
 		dialog.setMultipleSelection(false);

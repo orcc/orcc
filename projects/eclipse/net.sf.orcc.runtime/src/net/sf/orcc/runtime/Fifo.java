@@ -28,6 +28,13 @@
  */
 package net.sf.orcc.runtime;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+
 /**
  * This class defines an abstract FIFO.
  * 
@@ -44,6 +51,10 @@ public abstract class Fifo {
 
 	protected int write;
 
+	protected FileOutputStream fos = null;
+
+	protected OutputStreamWriter out = null;
+
 	/**
 	 * Creates a new FIFO with the given size.
 	 * 
@@ -52,6 +63,51 @@ public abstract class Fifo {
 	 */
 	public Fifo(int size) {
 		this.size = size;
+	}
+
+	/**
+	 * Creates a new FIFO with the given size and a file for tracing exchanged
+	 * data.
+	 * 
+	 * @param size
+	 *            the size of the FIFO
+	 * @param folderName
+	 *            output traces folder
+	 * @param fifoName
+	 *            name of the fifo (and the trace file)
+	 */
+	public Fifo(int size, String folderName, String fifoName) {
+		this.size = size;
+		// Create network communication tracing file
+		File file = new File(folderName);
+		try {
+			fos = new FileOutputStream(new File(file, fifoName + "_traces.txt"));
+			this.out = new OutputStreamWriter(fos, "UTF-8");
+		} catch (FileNotFoundException e) {
+			String msg = "folder not found: \"" + folderName + "\"";
+			throw new RuntimeException(msg, e);
+		} catch (UnsupportedEncodingException e) {
+			String msg = "unsupported utf8 encoding for folder : \""
+					+ folderName + "\"";
+			throw new RuntimeException(msg, e);
+		}
+	}
+
+	public void close() {
+		if (out != null) {
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if (fos != null) {
+			try {
+				fos.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**

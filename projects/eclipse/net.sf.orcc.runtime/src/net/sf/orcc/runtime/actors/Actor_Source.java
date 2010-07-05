@@ -32,39 +32,28 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import net.sf.orcc.debug.Location;
-import net.sf.orcc.debug.type.StringType;
-import net.sf.orcc.runtime.CLIParameters;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_int;
-import net.sf.orcc.runtime.debug.AbstractActorDebug;
 
-public class Actor_Source extends AbstractActorDebug {
+public class Actor_Source implements IActor {
 
 	private Fifo_int fifo_O;
 
-	public String fileName;
+	private String fileName;
 
 	private RandomAccessFile in;
 
-	public Actor_Source() {
-		super("Actor_Source.java");
-
-		fileName = CLIParameters.getInstance().getSourceFile();
-		actionLocation.put("untagged", new Location(80, 17, 42));
-
-		variables.put("fileName", new StringType());
+	public Actor_Source(String fileName) {
+		this.fileName = fileName;
 	}
 
-	@Override
 	public String getNextSchedulableAction() {
 		if (fifo_O.hasRoom(1)) {
 			return "untagged";
 		}
-
 		return null;
 	}
-
+	
 	@Override
 	public void initialize() {
 		try {
@@ -80,7 +69,7 @@ public class Actor_Source extends AbstractActorDebug {
 		int i = 0;
 
 		try {
-			while (!suspended && fifo_O.hasRoom(1)) {
+			while (fifo_O.hasRoom(1)) {
 				int byteRead = in.read();
 				if (byteRead == -1) {
 					// back to beginning
@@ -88,7 +77,7 @@ public class Actor_Source extends AbstractActorDebug {
 					byteRead = in.read();
 				}
 
-				int[] source = fifo_O.getWriteArray(1);
+				Integer[] source = fifo_O.getWriteArray(1);
 				int source_Index = fifo_O.getWriteIndex(1);
 				source[source_Index] = byteRead;
 				fifo_O.writeEnd(1, source);
@@ -113,4 +102,16 @@ public class Actor_Source extends AbstractActorDebug {
 		}
 	}
 
+	/**
+	 * Close the input stream file
+	 */
+	public void close() {
+		try {
+			if (in != null) {
+				in.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

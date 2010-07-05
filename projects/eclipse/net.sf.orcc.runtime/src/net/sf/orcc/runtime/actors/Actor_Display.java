@@ -36,19 +36,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-import java.util.TreeMap;
 
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-import net.sf.orcc.debug.Location;
-import net.sf.orcc.debug.type.AbstractType;
-import net.sf.orcc.debug.type.IntType;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_int;
-import net.sf.orcc.runtime.debug.AbstractActorDebug;
 
-public class Actor_Display extends AbstractActorDebug implements ActionListener {
+public class Actor_Display implements IActor, ActionListener {
 
 	private static Actor_Display instance;
 
@@ -114,9 +109,9 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 
 	private long startTime;
 
-	public Actor_Display() {
-		super("Actor_Display.java");
+	private boolean userInterruption;
 
+	public Actor_Display() {
 		frame = new JFrame("display");
 
 		canvas = new Canvas();
@@ -127,7 +122,8 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 
 			@Override
 			public void windowClosing(WindowEvent e) {
-				System.exit(0);
+				// Indicate the end of interpretation (will be returned to main)
+				userInterruption = true;
 			}
 
 		});
@@ -136,15 +132,7 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 		timer.start();
 
 		instance = this;
-
-		actionLocation.put("setVideoSize", new Location(188, 1, 34));
-		actionLocation.put("writeMB", new Location(213, 1, 29));
-
-		variables = new TreeMap<String, AbstractType>();
-		variables.put("x", new IntType(16));
-		variables.put("y", new IntType(16));
-		variables.put("width", new IntType(32));
-		variables.put("height", new IntType(32));
+		userInterruption = false;
 	}
 
 	@Override
@@ -157,7 +145,6 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 		}
 	}
 
-	@Override
 	public String getNextSchedulableAction() {
 		if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
 			return "setVideoSize";
@@ -171,9 +158,17 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 	}
 
 	@Override
+	public void initialize() {
+	}
+
+	@Override
 	public int schedule() {
-		boolean res = !suspended;
+		boolean res = true;
 		int i = 0;
+
+		if (userInterruption) {
+			return -1;
+		}
 
 		if (startTime == 0L) {
 			startTime = System.currentTimeMillis();
@@ -181,14 +176,13 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 
 		while (res) {
 			res = false;
-			if (!suspended && fifo_WIDTH.hasTokens(1)
-					&& fifo_HEIGHT.hasTokens(1)) {
+			if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
 				setVideoSize();
 				res = true;
 				i++;
 			}
 
-			if (!suspended && fifo_B.hasTokens(384)) {
+			if (fifo_B.hasTokens(384)) {
 				writeMB();
 				res = true;
 				i++;
@@ -213,9 +207,9 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 	}
 
 	private void setVideoSize() {
-		int[] width = fifo_WIDTH.getReadArray(1);
+		Integer[] width = fifo_WIDTH.getReadArray(1);
 		int width_Index = fifo_WIDTH.getReadIndex(1);
-		int[] height = fifo_HEIGHT.getReadArray(1);
+		Integer[] height = fifo_HEIGHT.getReadArray(1);
 		int height_Index = fifo_HEIGHT.getReadIndex(1);
 
 		int newWidth = width[width_Index] << 4;
@@ -234,13 +228,13 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 			image = new BufferedImage(this.width, this.height,
 					BufferedImage.TYPE_INT_RGB);
 		}
-		
+
 		fifo_WIDTH.readEnd(1);
 		fifo_HEIGHT.readEnd(1);
 	}
 
 	private void writeMB() {
-		int[] mb = fifo_B.getReadArray(384);
+		Integer[] mb = fifo_B.getReadArray(384);
 		int mb_Index = fifo_B.getReadIndex(384);
 
 		for (int i = 0; i < 8; i++) {
@@ -264,7 +258,7 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 				image.setRGB(x + j * 2 + 1, y + i * 2 + 1, rgb3);
 			}
 		}
-		
+
 		fifo_B.readEnd(384);
 
 		x += 16;
@@ -278,7 +272,7 @@ public class Actor_Display extends AbstractActorDebug implements ActionListener 
 			y = 0;
 			numImages++;
 			long t = System.currentTimeMillis();
-			long t2= t - startTime;
+			long t2 = t - startTime;
 			System.out.println(numImages + " in " + t2);
 			startTime = t;
 		}

@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.runtime;
 
+import java.io.IOException;
+
 /**
  * This class defines a FIFO of integers.
  * 
@@ -49,6 +51,22 @@ public class Fifo_String extends Fifo {
 	 */
 	public Fifo_String(int size) {
 		super(size);
+		contents = new String[size];
+	}
+
+	/**
+	 * Creates a new FIFO with the given size and a file for tracing exchanged
+	 * data.
+	 * 
+	 * @param size
+	 *            the size of the FIFO
+	 * @param folderName
+	 *            output traces folder
+	 * @param fifoName
+	 *            name of the fifo (and the trace file)
+	 */
+	public Fifo_String(int size, String folderName, String fifoName) {
+		super(size, folderName, fifoName);
 		contents = new String[size];
 	}
 
@@ -126,6 +144,19 @@ public class Fifo_String extends Fifo {
 			}
 
 			write = numBeginning;
+		}
+		// Trace writing
+		if (out != null) {
+			try {
+				for (int i = 0; i < buffer.length; i++) {
+					if (buffer[i] == null)
+						break;
+					out.write(buffer[i] + "\n");
+				}
+				out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="backends" name="backends" schema="schema/backends.exsd"/>
    <extension-point id="options" name="options" schema="schema/options.exsd"/>
+   <extension-point id="simulators" name="simulators" schema="schema/simulators.exsd"/>
    <extension
          point="org.eclipse.debug.core.sourcePathComputers">
       <sourcePathComputer

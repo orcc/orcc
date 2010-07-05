@@ -30,10 +30,10 @@ package net.sf.orcc.ui.launching.impl;
 
 import java.io.File;
 
-import net.sf.orcc.backends.BrowseFileOption;
+import net.sf.orcc.plugins.BrowseFileOption;
 import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
-import net.sf.orcc.ui.launching.RunSettingsTab;
+import net.sf.orcc.ui.launching.OrccAbstractSettingsTab;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -70,7 +70,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * 
- * Class that create input file interface into backend options.
+ * Class that create input file interface into plugin options.
  * 
  * @author Jérôme Gorin
  * @author Matthieu Wipliez
@@ -83,7 +83,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 */
 	private Composite composite;
 
-	private RunSettingsTab launchConfigurationTab;
+	private OrccAbstractSettingsTab launchConfigurationTab;
 
 	private BrowseFileOption option;
 
@@ -102,7 +102,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	/**
 	 * Creates a new input file option.
 	 */
-	public BrowseFileOptionWidget(RunSettingsTab tab, BrowseFileOption option,
+	public BrowseFileOptionWidget(OrccAbstractSettingsTab tab, BrowseFileOption option,
 			Composite parent) {
 		this.launchConfigurationTab = tab;
 		this.option = option;
@@ -118,7 +118,6 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 	 *            a shell
 	 */
 	private void browseFileSystem(Shell shell) {
-		IResource resource = getResourceFromText();
 		String file;
 		if (option.isFolder()) {
 			DirectoryDialog dialog = new DirectoryDialog(shell, SWT.OPEN);
@@ -126,8 +125,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 			dialog.setText("Choose output folder");
 
 			// set initial directory
-			String location = resource.getParent().getLocation().toOSString();
-			dialog.setFilterPath(location);
+			dialog.setFilterPath(value);
 
 			file = dialog.open();
 		} else {
@@ -139,8 +137,7 @@ public class BrowseFileOptionWidget implements ModifyListener, OptionWidget {
 			}
 
 			// set initial directory
-			String location = resource.getParent().getLocation().toOSString();
-			dialog.setFilterPath(location);
+			dialog.setFilterPath(value);
 
 			file = dialog.open();
 		}

@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.runtime;
 
+import java.io.IOException;
+
 /**
  * This class defines a FIFO of booleans.
  * 
@@ -39,7 +41,7 @@ public class Fifo_boolean extends Fifo {
 	/**
 	 * The contents of the FIFO.
 	 */
-	private final boolean[] contents;
+	private final Boolean[] contents;
 
 	/**
 	 * Creates a new FIFO with the given size.
@@ -49,7 +51,23 @@ public class Fifo_boolean extends Fifo {
 	 */
 	public Fifo_boolean(int size) {
 		super(size);
-		contents = new boolean[size];
+		contents = new Boolean[size];
+	}
+
+	/**
+	 * Creates a new FIFO with the given size and a file for tracing exchanged
+	 * data.
+	 * 
+	 * @param size
+	 *            the size of the FIFO
+	 * @param folderName
+	 *            output traces folder
+	 * @param fifoName
+	 *            name of the fifo (and the trace file)
+	 */
+	public Fifo_boolean(int size, String folderName, String fifoName) {
+		super(size, folderName, fifoName);
+		contents = new Boolean[size];
 	}
 
 	/**
@@ -59,11 +77,11 @@ public class Fifo_boolean extends Fifo {
 	 *            a number of tokens to read
 	 * @return the array where <code>numTokens</code> can be read
 	 */
-	final public boolean[] getReadArray(int numTokens) {
+	final public Boolean[] getReadArray(int numTokens) {
 		if (read + numTokens <= size) {
 			return contents;
 		} else {
-			boolean[] buffer = new boolean[numTokens];
+			Boolean[] buffer = new Boolean[numTokens];
 
 			int numEnd = size - read;
 			int numBeginning = numTokens - numEnd;
@@ -89,11 +107,11 @@ public class Fifo_boolean extends Fifo {
 	 *            a number of tokens to write
 	 * @return the array where <code>numTokens</code> can be written
 	 */
-	final public boolean[] getWriteArray(int numTokens) {
+	final public Boolean[] getWriteArray(int numTokens) {
 		if (write + numTokens <= size) {
 			return contents;
 		} else {
-			return new boolean[numTokens];
+			return new Boolean[numTokens];
 		}
 	}
 
@@ -107,7 +125,7 @@ public class Fifo_boolean extends Fifo {
 	 * @param numTokens
 	 *            the number of tokens that were written
 	 */
-	final public void writeEnd(int numTokens, boolean[] buffer) {
+	final public void writeEnd(int numTokens, Boolean[] buffer) {
 		fillCount += numTokens;
 		if (write + numTokens <= size) {
 			write += numTokens;
@@ -126,6 +144,23 @@ public class Fifo_boolean extends Fifo {
 			}
 
 			write = numBeginning;
+		}
+		// Output tracing if required
+		if (out != null) {
+			try {
+				for (int i = 0; i < buffer.length; i++) {
+					if (buffer[i] == null)
+						break;
+					if (buffer[i]) {
+						out.write("1\n");
+					} else {
+						out.write("0\n");
+					}
+				}
+				out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

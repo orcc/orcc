@@ -411,7 +411,7 @@ public class ActorClassifierIndependent {
 	 */
 	private AbstractInterpretedActor newInterpreter() {
 		AbstractInterpretedActor interpretedActor = new AbstractInterpretedActor(
-				actor.getName(), actor, analyzer);
+				actor, analyzer);
 
 		actor.resetTokenConsumption();
 		actor.resetTokenProduction();

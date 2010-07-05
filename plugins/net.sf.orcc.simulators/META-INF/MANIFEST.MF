@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Orcc simulators plug-in
+Bundle-SymbolicName: net.sf.orcc.simulators;singleton:=true
+Bundle-Version: 0.8.1.rc1
+Bundle-Activator: net.sf.orcc.simulators.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ net.sf.orcc.core;bundle-version="0.8.1",
+ org.eclipse.debug.core;bundle-version="3.6.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: IETR/INSA Rennes
+Export-Package: net.sf.orcc.simulators;
+  uses:="org.eclipse.debug.core,
+   org.jgrapht,
+   org.eclipse.ui.plugin,
+   net.sf.orcc.ir,
+   org.osgi.framework,
+   net.sf.orcc.debug.model,
+   net.sf.orcc.plugins.simulators"

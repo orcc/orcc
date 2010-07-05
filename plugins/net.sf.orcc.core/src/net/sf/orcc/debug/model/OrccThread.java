@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.debug.model;
 
-import net.sf.orcc.interpreter.DebugThread;
-
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -40,13 +38,21 @@ import org.eclipse.debug.core.model.IThread;
  */
 public class OrccThread extends OrccDebugElement implements IThread {
 
+	/**
+	 * Name of the CAL actor model associated to the current debug thread
+	 */
 	private String actorName;
+
+	/**
+	 * Actor instance ID associated to the current debug thread
+	 */
+	private String threadId;
 
 	/**
 	 * Breakpoints this thread is suspended at or <code>null</code> if none.
 	 */
-	private IBreakpoint[] fBreakpoints;
-	private DebugThread fThread;
+	private IBreakpoint[] breakpoints;
+
 	/**
 	 * Debugging objects
 	 */
@@ -56,13 +62,14 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * Constructs a new thread for the given target
 	 * 
 	 * @param target
-	 *            VM
+	 * @param threadId
+	 * @param actorName
 	 */
-	public OrccThread(OrccDebugTarget target, DebugThread thread) {
+	public OrccThread(OrccDebugTarget target, String threadId, String actorName) {
 		super(target);
 		this.target = target;
-		this.fThread = thread;
-		this.actorName = thread.getActorName();
+		this.threadId = threadId;
+		this.actorName = actorName;
 	}
 
 	/*
@@ -129,10 +136,10 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getBreakpoints()
 	 */
 	public IBreakpoint[] getBreakpoints() {
-		if (fBreakpoints == null) {
+		if (breakpoints == null) {
 			return new IBreakpoint[0];
 		}
-		return fBreakpoints;
+		return breakpoints;
 	}
 
 	/*
@@ -141,7 +148,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IThread#getName()
 	 */
 	public String getName() throws DebugException {
-		return fThread.getName();
+		return threadId;
 	}
 
 	/*
@@ -161,7 +168,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	public IStackFrame[] getStackFrames() throws DebugException {
 		if (isSuspended()) {
 			return new IStackFrame[] { new OrccStackFrame(this,
-					fThread.getStackFrame(), 0) };
+					target.getStackFrame(threadId), 0) };
 		} else {
 			return new IStackFrame[0];
 		}
@@ -195,7 +202,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#isStepping()
 	 */
 	public boolean isStepping() {
-		return fThread.isStepping() && !isTerminated();
+		return target.isStepping() && !isTerminated();
 	}
 
 	/*
@@ -204,7 +211,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#isSuspended()
 	 */
 	public boolean isSuspended() {
-		return fThread.isSuspended() && !isTerminated();
+		return target.isSuspended() && !isTerminated();
 	}
 
 	/*
@@ -233,7 +240,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 *            <code>null</code> if none
 	 */
 	protected void setBreakpoints(IBreakpoint[] breakpoints) {
-		fBreakpoints = breakpoints;
+		this.breakpoints = breakpoints;
 	}
 
 	/*
@@ -242,7 +249,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#stepInto()
 	 */
 	public void stepInto() throws DebugException {
-		fThread.stepInto();
+		target.stepInto(threadId);
 	}
 
 	/*
@@ -251,7 +258,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#stepOver()
 	 */
 	public void stepOver() throws DebugException {
-		fThread.stepOver();
+		target.stepOver(threadId);
 	}
 
 	/*
@@ -260,7 +267,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#stepReturn()
 	 */
 	public void stepReturn() throws DebugException {
-		fThread.stepReturn();
+		target.stepReturn(threadId);
 	}
 
 	/*

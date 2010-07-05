@@ -28,21 +28,18 @@
  */
 package net.sf.orcc.debug.model;
 
+import static net.sf.orcc.OrccLaunchConstants.ACTIVATE_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DEBUG;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DOT_CFG;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_KEEP;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.DOT_CFG;
-import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
-import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
-import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,9 +48,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.backends.BackendFactory;
-import net.sf.orcc.interpreter.InterpreterMain;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.plugins.backends.BackendFactory;
+import net.sf.orcc.plugins.simulators.SimulatorFactory;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -344,6 +341,10 @@ public class OrccProcess extends PlatformObject implements IProcess {
 		return launch;
 	}
 
+	public IProgressMonitor getProgressMonitor() {
+		return monitor;
+	}
+
 	@Override
 	public IStreamsProxy getStreamsProxy() {
 		return proxy;
@@ -411,55 +412,22 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	}
 
 	/**
-	 * Calls the Orcc RVC-CAL interpreter for simulation.
+	 * Calls one of the simulators.
 	 * 
-	 * @param option
-	 *            Selects debugger or simulator.
-	 * @param launch
-	 *            The current launch context.
-	 * @param monitor
-	 *            The progress monitor.
-	 * @param configuration
-	 *            The configuration.
 	 * @throws CoreException
 	 */
-	private void launchInterpreter(String option) throws CoreException {
-		// Get configuration options
-		String inputStimulus = configuration.getAttribute(INPUT_STIMULUS, "");
-		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
-		String tracesFolder = outputFolder + File.separator + "traces";
-		boolean enableTraces = configuration.getAttribute(ENABLE_TRACES,
-				DEFAULT_TRACES);
-		if (enableTraces)
-			new File(tracesFolder).mkdirs();
-
-		int fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-
-		String xdfFile = configuration.getAttribute(XDF_FILE, "");
-
+	private void launchSimulator(String option) throws CoreException {
+		String simulator = configuration.getAttribute(SIMULATOR, "");
 		try {
-			// Get interpreter instance and configure it
-			InterpreterMain interpreter = new InterpreterMain();
-			interpreter.configSystem(this, monitor);
-			interpreter.configNetwork(xdfFile, fifoSize, inputStimulus,
-					enableTraces, outputFolder, tracesFolder);
-			if (option.equals("debugger")) {
-				// Add the DebugTarget as a listener of interpreter
-				OrccDebugTarget target = new OrccDebugTarget(launch, this,
-						interpreter);
-				launch.addDebugTarget(target);
-				interpreter.addPropertyChangeListener(target);
-				// Start interpreter thread...
-				interpreter.start();
-				// ...wait for the end of inputStimulus consumption
-				interpreter.join();
-			} else {
-				// No debug thread to be used : call directly the simulator
-				interpreter.simulate();
-			}
+			SimulatorFactory factory = SimulatorFactory.getInstance();
+			factory.runSimulator(this, launch, configuration, option);
 		} catch (Exception e) {
+			// clear actor pool because it might not have been done if we got an
+			// error too soon
+			Network.clearActorPool();
+
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					"simulator error", e);
+					simulator + " simulation error", e);
 			throw new CoreException(status);
 		}
 	}
@@ -487,7 +455,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 * Starts this process with the given option
 	 * 
 	 * @param option
-	 *            "backend" or "interpreter"
+	 *            "backend" and/or ("simulator" or "debugger")
 	 * @throws CoreException
 	 */
 	public void start(String option) throws CoreException {
@@ -495,7 +463,9 @@ public class OrccProcess extends PlatformObject implements IProcess {
 
 		try {
 			if (value == 0) {
-				if (option.equals("backend")) {
+				if ((option.equals("backend"))
+						|| configuration.getAttribute(ACTIVATE_BACKEND,
+								DEFAULT_BACKEND)) {
 					monitor.subTask("Launching backend...");
 					write("\n");
 					write("*********************************************"
@@ -503,13 +473,15 @@ public class OrccProcess extends PlatformObject implements IProcess {
 					write("Launching Orcc backend...\n");
 					launchBackend();
 					write("Orcc backend done.");
-				} else {
+				} 
+				
+				if (option.equals("simulator") || option.equals("debugger")) {
 					monitor.subTask("Launching simulator...");
 					write("\n");
 					write("*********************************************"
 							+ "**********************************\n");
 					write("Launching Orcc simulator...\n");
-					launchInterpreter(option);
+					launchSimulator(option);
 					write("Orcc simulation done.");
 				}
 			}

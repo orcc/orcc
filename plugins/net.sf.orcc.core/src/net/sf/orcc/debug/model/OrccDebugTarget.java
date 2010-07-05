@@ -34,8 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.interpreter.DebugThread;
-import net.sf.orcc.interpreter.InterpreterMain;
+import net.sf.orcc.plugins.simulators.Simulator;
+import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
+import net.sf.orcc.plugins.simulators.Simulator.SimulatorEvent;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IMarkerDelta;
@@ -58,7 +59,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		PropertyChangeListener {
 
 	// associated interpreter
-	private InterpreterMain fInterpreter;
+	public Simulator fSimulator;
 
 	// containing launch object
 	private ILaunch fLaunch;
@@ -91,20 +92,21 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @exception CoreException
 	 *                if unable to connect to host
 	 */
-	public OrccDebugTarget(ILaunch launch, IProcess process,
-			InterpreterMain interpreter) throws CoreException {
+	public OrccDebugTarget(ILaunch launch, IProcess process, Simulator simulator)
+			throws CoreException {
 		super(null);
 		fLaunch = launch;
 		fTarget = this;
 		fProcess = process;
-		fInterpreter = interpreter;
+		fSimulator = simulator;
 		threadMap = new HashMap<String, OrccThread>();
-		List<DebugThread> threads = fInterpreter.getThreads();
-		fThreads = new IThread[threads.size()];
+		List<String> threadIds = fSimulator.getActorsInstanceIds();
+		fThreads = new IThread[threadIds.size()];
 		int idx = 0;
-		for (DebugThread thread : threads) {
-			fThreads[idx] = new OrccThread(this, thread);
-			threadMap.put(thread.getName(), (OrccThread) fThreads[idx]);
+		for (String threadId : threadIds) {
+			fThreads[idx] = new OrccThread(this, threadId,
+					fSimulator.getActorName(threadId));
+			threadMap.put(threadId, (OrccThread) fThreads[idx]);
 			idx++;
 		}
 		DebugPlugin.getDefault().getBreakpointManager()
@@ -122,13 +124,10 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		if (supportsBreakpoint(breakpoint)) {
 			try {
 				if (breakpoint.isEnabled()) {
-					try {
-						sendRequest(
-								"set",
-								breakpoint.getMarker().getResource().getName(),
-								(((ILineBreakpoint) breakpoint).getLineNumber()));
-					} catch (CoreException e) {
-					}
+					Object[] data = new Object[2];
+					data[0] = breakpoint.getMarker().getResource().getName();
+					data[1] = (((ILineBreakpoint) breakpoint).getLineNumber());
+					fSimulator.message(SimulatorEvent.SET_BREAKPOINT, data);
 				}
 			} catch (CoreException e) {
 			}
@@ -199,9 +198,10 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	public void breakpointRemoved(IBreakpoint breakpoint, IMarkerDelta delta) {
 		if (supportsBreakpoint(breakpoint)) {
 			try {
-				sendRequest("clear", breakpoint.getMarker().getResource()
-						.getName(),
-						(((ILineBreakpoint) breakpoint).getLineNumber()));
+				Object[] data = new Object[2];
+				data[0] = breakpoint.getMarker().getResource().getName();
+				data[1] = (((ILineBreakpoint) breakpoint).getLineNumber());
+				fSimulator.message(SimulatorEvent.CLEAR_BREAKPOINT, data);
 			} catch (CoreException e) {
 			}
 		}
@@ -289,7 +289,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @see org.eclipse.debug.core.model.IDebugTarget#getName()
 	 */
 	public String getName() throws DebugException {
-		String name = fInterpreter.getNetworkName();
+		String name = fSimulator.getNetworkName();
 		if (name == null) {
 			name = "RVC-CAL model";
 		}
@@ -305,6 +305,11 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		return fProcess;
 	}
 
+	
+	public DebugStackFrame getStackFrame(String instanceId) {
+		return fSimulator.getStackFrame(instanceId);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -377,6 +382,12 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		return fTerminated;
 	}
 
+	/**
+	 * Listen to the properties changes from target simulator
+	 * 
+	 * @param event
+	 *            : received event from target simulator plugin
+	 */
 	public void propertyChange(PropertyChangeEvent event) {
 		OrccThread orccThread = threadMap.get(event.getNewValue());
 		if (orccThread != null) {
@@ -413,7 +424,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
-		sendRequest("resume");
+		fSimulator.message(SimulatorEvent.RESUME, null);
 	}
 
 	/**
@@ -431,35 +442,6 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 				((OrccThread) thread).fireResumeEvent(detail);
 			}
 			fireResumeEvent(detail);
-		}
-	}
-
-	/**
-	 * Sends a request to the Orcc VM and waits for an OK.
-	 * 
-	 * @param request
-	 *            debug command
-	 * @throws DebugException
-	 *             if the request fails
-	 */
-	private void sendRequest(String request) throws DebugException {
-		if (request.equals("resume")) {
-			fInterpreter.resumeAll();
-		} else if (request.equals("suspend")) {
-			fInterpreter.suspendAll();
-		} else if (request.equals("step")) {
-			fInterpreter.stepAll();
-		} else if (request.equals("terminate")) {
-			fInterpreter.terminate();
-		}
-	}
-
-	private void sendRequest(String request, String id, int lineNumber)
-			throws DebugException {
-		if (request.equals("set")) {
-			fInterpreter.set_breakpoint(id, lineNumber);
-		} else if (request.equals("clear")) {
-			fInterpreter.clear_breakpoint(id, lineNumber);
 		}
 	}
 
@@ -483,7 +465,43 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 *             if the request fails
 	 */
 	protected void step() throws DebugException {
-		sendRequest("step");
+		fSimulator.message(SimulatorEvent.STEP_ALL, null);
+	}
+
+	/**
+	 * Step into the specified instance actor's stack frame.
+	 * 
+	 * @param instanceId
+	 * @throws DebugException
+	 */
+	protected void stepInto(String instanceId) throws DebugException {
+		Object[] data = new Object[1];
+		data[0] = instanceId;
+		fSimulator.message(SimulatorEvent.STEP_INTO, data);
+	}
+
+	/**
+	 * Step over the specified instance actor's stack frame.
+	 * 
+	 * @param instanceId
+	 * @throws DebugException
+	 */
+	protected void stepOver(String instanceId) throws DebugException {
+		Object[] data = new Object[1];
+		data[0] = instanceId;
+		fSimulator.message(SimulatorEvent.STEP_OVER, data);
+	}
+
+	/**
+	 * Step return from the specified instance actor's stack frame.
+	 * 
+	 * @param instanceId
+	 * @throws DebugException
+	 */
+	protected void stepReturn(String instanceId) throws DebugException {
+		Object[] data = new Object[1];
+		data[0] = instanceId;
+		fSimulator.message(SimulatorEvent.STEP_RETURN, data);
 	}
 
 	/*
@@ -528,7 +546,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
-		sendRequest("suspend");
+		fSimulator.message(SimulatorEvent.SUSPEND, null);
 	}
 
 	/**
@@ -555,7 +573,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
-		sendRequest("terminate");
+		fSimulator.message(SimulatorEvent.TERMINATE, null);
 	}
 
 	/**

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="net.sf.orcc.core.options">
+      <option
+            defaultValue="false"
+            description="Enable tracing feature of a simulator"
+            id="net.sf.orcc.simulators.enableTraces"
+            name="Enable Traces">
+         <checkBox>
+            <option
+                  description="An other output folder for receiving simulator trace files"
+                  id="net.sf.orcc.simulators.tracesFolder"
+                  name="Traces folder">
+               <browseFile
+                     folder="true"
+                     workspace="false">
+               </browseFile>
+            </option>
+         </checkBox>
+      </option>
+      <option
+            description="Specify VTL (Video Tool Library) location folder"
+            id="net.sf.orcc.plugins.vtlFolder"
+            name="VTL folder">
+         <browseFile
+               folder="true"
+               workspace="true">
+         </browseFile>
+      </option>
+      <option
+            description="XDF description of the CAL actors network"
+            id="net.sf.orcc.plugins.xdfFile"
+            name="XDF file">
+         <browseFile
+               folder="false"
+               workspace="true">
+         </browseFile>
+      </option>
+      <option
+            description="Input data to be pushed to the CAL network we want to simulate"
+            id="net.sf.orcc.simulators.inputStimulus"
+            name="Input stimulus">
+         <browseFile
+               folder="false"
+               workspace="false">
+         </browseFile>
+      </option>
+   </extension>
+   <extension
+         point="net.sf.orcc.core.simulators">
+      <simulator
+            class="net.sf.orcc.simulators.interpreter.InterpreterSimulatorImpl"
+            name="Visitor interpreter and debugger">
+         <option
+               id="net.sf.orcc.simulators.enableTraces">
+         </option>
+         <option
+               id="net.sf.orcc.plugins.vtlFolder">
+         </option>
+         <option
+               id="net.sf.orcc.plugins.xdfFile">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.inputStimulus">
+         </option>
+      </simulator>
+   </extension>
+
+</plugin>

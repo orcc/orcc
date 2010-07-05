@@ -30,7 +30,7 @@ package net.sf.orcc.tools.classifier;
 
 import java.util.HashMap;
 
-import net.sf.orcc.interpreter.InterpretedActor;
+import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
@@ -44,7 +44,7 @@ import net.sf.orcc.ir.Pattern;
  * @author Matthieu Wipliez
  * 
  */
-public class AbstractInterpretedActor extends InterpretedActor {
+public class AbstractInterpretedActor extends ActorInterpreter {
 
 	private Action scheduledAction;
 
@@ -56,12 +56,12 @@ public class AbstractInterpretedActor extends InterpretedActor {
 	 * @param actor
 	 *            an actor
 	 */
-	public AbstractInterpretedActor(String id, Actor actor,
+	public AbstractInterpretedActor(Actor actor,
 			ConfigurationAnalyzer analyzer) {
-		super(id, new HashMap<String, Expression>(), actor, null, null);
+		super(new HashMap<String, Expression>(), actor, null);
 
 		// Build a node interpreter for visiting CFG and instructions
-		interpret = new AbstractNodeInterpreter(analyzer);
+		nodeInterpreter = new AbstractNodeInterpreter(analyzer);
 	}
 
 	@Override
@@ -70,9 +70,9 @@ public class AbstractInterpretedActor extends InterpretedActor {
 	}
 
 	@Override
-	protected int execute(Action action) {
+	public int execute(Action action) {
 		scheduledAction = action;
-		((AbstractNodeInterpreter) interpret).setSchedulableMode(false);
+		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(false);
 		return super.execute(action);
 	}
 
@@ -88,7 +88,7 @@ public class AbstractInterpretedActor extends InterpretedActor {
 
 	@Override
 	protected boolean isSchedulable(Action action) {
-		((AbstractNodeInterpreter) interpret).setSchedulableMode(true);
+		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(true);
 		Object isSchedulable = interpretProc(action.getScheduler());
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
@@ -100,7 +100,7 @@ public class AbstractInterpretedActor extends InterpretedActor {
 	 *            an action
 	 */
 	public void setAction(Action action) {
-		((AbstractNodeInterpreter) interpret).setAction(action);
+		((AbstractNodeInterpreter) nodeInterpreter).setAction(action);
 	}
 
 }

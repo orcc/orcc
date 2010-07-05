@@ -32,6 +32,7 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.type.AbstractTypeVisitor;
 
 /**
@@ -54,7 +55,13 @@ public class ListAllocator extends AbstractTypeVisitor {
 		}
 		sizeList.clear();
 
-		return Array.newInstance(Object.class, dimensions);
+		if (((TypeList) type).getElementType().isBool()) {
+			return Array.newInstance(Boolean.class, dimensions);
+		} else if (((TypeList) type).getElementType().isString()) {
+			return Array.newInstance(String.class, dimensions);
+		} else {
+			return Array.newInstance(Integer.class, dimensions);
+		}
 	}
 
 }

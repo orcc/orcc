@@ -31,11 +31,11 @@ package net.sf.orcc.ui.launching.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.backends.BackendOption;
-import net.sf.orcc.backends.BrowseFileOption;
-import net.sf.orcc.backends.CheckboxOption;
+import net.sf.orcc.plugins.BrowseFileOption;
+import net.sf.orcc.plugins.CheckboxOption;
+import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.ui.launching.OptionWidget;
-import net.sf.orcc.ui.launching.RunSettingsTab;
+import net.sf.orcc.ui.launching.OrccAbstractSettingsTab;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -50,8 +50,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class OptionWidgetManager {
 
-	private static OptionWidget createOption(RunSettingsTab tab,
-			BackendOption option, Composite parent) {
+	private static OptionWidget createOption(OrccAbstractSettingsTab tab,
+			PluginOption option, Composite parent) {
 		if (option instanceof CheckboxOption) {
 			return new CheckBoxOptionWidget(tab, (CheckboxOption) option,
 					parent);
@@ -63,10 +63,10 @@ public class OptionWidgetManager {
 		}
 	}
 
-	public static List<OptionWidget> createOptions(RunSettingsTab tab,
-			List<BackendOption> options, Composite parent) {
+	public static List<OptionWidget> createOptions(OrccAbstractSettingsTab tab,
+			List<PluginOption> options, Composite parent) {
 		List<OptionWidget> widgets = new ArrayList<OptionWidget>();
-		for (BackendOption option : options) {
+		for (PluginOption option : options) {
 			OptionWidget widget = createOption(tab, option, parent);
 			if (widget != null) {
 				widgets.add(widget);

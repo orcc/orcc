@@ -52,6 +52,7 @@ import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.plugins.backends.Backend;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;

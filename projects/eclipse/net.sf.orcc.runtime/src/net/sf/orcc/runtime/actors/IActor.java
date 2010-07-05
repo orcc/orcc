@@ -34,7 +34,7 @@ import net.sf.orcc.runtime.Fifo;
  * This interface defines an actor.
  * 
  * @author Matthieu Wipliez
- *
+ * 
  */
 public interface IActor {
 

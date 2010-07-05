@@ -65,7 +65,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":net.sf.orcc.backends.IBackend"/>
+                  <meta.attribute kind="java" basedOn=":net.sf.orcc.plugins.backends.Backend"/>
                </appInfo>
             </annotation>
          </attribute>

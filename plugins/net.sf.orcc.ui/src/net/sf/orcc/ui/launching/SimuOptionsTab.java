@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,16 +28,8 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DEBUG;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DOT_CFG;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_KEEP;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_TRACES;
-import static net.sf.orcc.OrccLaunchConstants.DOT_CFG;
-import static net.sf.orcc.OrccLaunchConstants.ENABLE_TRACES;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -48,18 +40,15 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
 /**
  * 
- * @author Pierre-Laurent Lagalaye
+ * @author plagalay
  * 
  */
 public class SimuOptionsTab extends OptionsTab {
-
-	private Button enableTraces;
 
 	@Override
 	protected void createGroup(Font font, Composite parent) {
@@ -70,20 +59,6 @@ public class SimuOptionsTab extends OptionsTab {
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		group.setLayoutData(data);
 
-		debugMode = new Button(group, SWT.CHECK);
-		createButton(font, debugMode, "Debug mode",
-				"Activates debug mode: IR is pretty-printed, "
-						+ "and actors are not cached.");
-		keepIntermediate = new Button(group, SWT.CHECK);
-		createButton(font, keepIntermediate, "Keep intermediate files",
-				"When set, files will be printed after each step of "
-						+ "code generation.");
-		dotCfg = new Button(group, SWT.CHECK);
-		createButton(font, dotCfg, "Print CFG information",
-				"Prints DOT files showing CFG information.");
-		enableTraces = new Button(group, SWT.CHECK);
-		createButton(font, enableTraces, "Enable traces",
-				"Activates traces when simulating.");
 		createFifoSize(font, group);
 	}
 
@@ -100,21 +75,6 @@ public class SimuOptionsTab extends OptionsTab {
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
-			boolean selected = configuration.getAttribute(DEBUG_MODE,
-					DEFAULT_DEBUG);
-			debugMode.setSelection(selected);
-
-			selected = configuration.getAttribute(KEEP_INTERMEDIATE,
-					DEFAULT_KEEP);
-			keepIntermediate.setSelection(selected);
-
-			selected = configuration.getAttribute(DOT_CFG, DEFAULT_DOT_CFG);
-			dotCfg.setSelection(selected);
-
-			selected = configuration
-					.getAttribute(ENABLE_TRACES, DEFAULT_TRACES);
-			enableTraces.setSelection(selected);
-
 			int size = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			fifoSize.setText(Integer.toString(size));
 		} catch (CoreException e) {
@@ -125,18 +85,6 @@ public class SimuOptionsTab extends OptionsTab {
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		if (isValid(configuration)) {
-			boolean selected = debugMode.getSelection();
-			configuration.setAttribute(DEBUG_MODE, selected);
-
-			selected = keepIntermediate.getSelection();
-			configuration.setAttribute(KEEP_INTERMEDIATE, selected);
-
-			selected = dotCfg.getSelection();
-			configuration.setAttribute(DOT_CFG, selected);
-
-			selected = enableTraces.getSelection();
-			configuration.setAttribute(ENABLE_TRACES, selected);
-
 			String text = fifoSize.getText();
 			configuration.setAttribute(FIFO_SIZE, Integer.parseInt(text));
 		}
@@ -144,10 +92,6 @@ public class SimuOptionsTab extends OptionsTab {
 
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(DEBUG_MODE, DEFAULT_DEBUG);
-		configuration.setAttribute(KEEP_INTERMEDIATE, DEFAULT_KEEP);
-		configuration.setAttribute(DOT_CFG, DEFAULT_DOT_CFG);
-		configuration.setAttribute(ENABLE_TRACES, DEFAULT_TRACES);
 		configuration.setAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 	}
 

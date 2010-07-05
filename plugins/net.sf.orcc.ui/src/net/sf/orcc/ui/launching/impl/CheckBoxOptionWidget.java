@@ -30,9 +30,9 @@ package net.sf.orcc.ui.launching.impl;
 
 import java.util.List;
 
-import net.sf.orcc.backends.CheckboxOption;
+import net.sf.orcc.plugins.CheckboxOption;
 import net.sf.orcc.ui.launching.OptionWidget;
-import net.sf.orcc.ui.launching.RunSettingsTab;
+import net.sf.orcc.ui.launching.OrccAbstractSettingsTab;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * 
- * Class that add a check box input into backend options.
+ * Class that add a check box input into plugin options.
  * 
  * @author Jérôme Gorin
  * @author Matthieu Wipliez
@@ -63,7 +63,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	 */
 	private Composite composite;
 
-	private RunSettingsTab launchConfigurationTab;
+	private OrccAbstractSettingsTab launchConfigurationTab;
 
 	private CheckboxOption option;
 
@@ -77,7 +77,7 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	/**
 	 * Creates a new input file option.
 	 */
-	public CheckBoxOptionWidget(RunSettingsTab tab, CheckboxOption option,
+	public CheckBoxOptionWidget(OrccAbstractSettingsTab tab, CheckboxOption option,
 			Composite parent) {
 		this.launchConfigurationTab = tab;
 		this.option = option;
