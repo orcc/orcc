@@ -35,8 +35,7 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public class LocalVariable extends Variable implements
-		Comparable<LocalVariable> {
+public class LocalVariable extends Variable {
 
 	/**
 	 * SSA index.
@@ -47,11 +46,6 @@ public class LocalVariable extends Variable implements
 			String name, Type type) {
 		super(loc, type, name, false, assignable);
 		this.index = index;
-	}
-
-	@Override
-	public int compareTo(LocalVariable varDef) {
-		return getName().compareTo(varDef.getName());
 	}
 
 	/**

@@ -33,7 +33,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
-import net.sf.orcc.ir.instructions.HasTokens;
 
 /**
  * This class represents a variable. A variable has a location, a type, a name
@@ -263,12 +262,7 @@ public class Variable {
 	 *         peek, read(end), write(end)
 	 */
 	public boolean isPort() {
-		if (instruction instanceof AbstractFifoInstruction
-				&& !(instruction instanceof HasTokens)) {
-			return true;
-		}
-
-		return false;
+		return (instruction instanceof AbstractFifoInstruction);
 	}
 
 	/**
