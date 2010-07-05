@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.xlim.experimental.transform;
+package net.sf.orcc.backends.xlim.transforms;
 
 import java.util.List;
 import java.util.ListIterator;
