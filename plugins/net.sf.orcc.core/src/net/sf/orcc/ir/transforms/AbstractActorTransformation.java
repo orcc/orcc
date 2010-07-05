@@ -91,7 +91,8 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	public void visit(BlockNode blockNode, Object... args) {
 		ListIterator<Instruction> it = blockNode.listIterator();
 		while (it.hasNext()) {
-			it.next().accept(this, it);
+			Instruction instruction = it.next();
+			instruction.accept(this, it);
 		}
 	}
 

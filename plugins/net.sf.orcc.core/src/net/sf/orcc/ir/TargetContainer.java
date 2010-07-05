@@ -29,7 +29,7 @@
 package net.sf.orcc.ir;
 
 /**
- * This interface defines a node that has a target local variable.
+ * This interface defines an instruction that has a target variable.
  * 
  * @author Matthieu Wipliez
  * 
@@ -37,9 +37,9 @@ package net.sf.orcc.ir;
 public interface TargetContainer extends User {
 
 	/**
-	 * Returns the target of this node.
+	 * Returns the target of this instruction.
 	 * 
-	 * @return the target of this node
+	 * @return the target of this instruction
 	 */
 	public Variable getTarget();
 
@@ -47,7 +47,7 @@ public interface TargetContainer extends User {
 	 * Warning: this method is for internal uses only!
 	 * 
 	 * <p>
-	 * Sets the target of this node without updating the target variable.
+	 * Sets the target of this instruction without updating the target variable.
 	 * </p>
 	 * 
 	 * @param target
@@ -56,7 +56,7 @@ public interface TargetContainer extends User {
 	public void internalSetTarget(Variable target);
 
 	/**
-	 * Sets the target of this node.
+	 * Sets the target of this instruction.
 	 * 
 	 * @param target
 	 *            a variable
