@@ -264,16 +264,7 @@ public class SSATransformation extends AbstractActorTransformation {
 
 	@Override
 	public void visit(HasTokens hasTokens, Object... args) {
-		LocalVariable target = (LocalVariable) hasTokens.getTarget();
-		LocalVariable newTarget = newDefinition(target);
-		hasTokens.setTarget(newTarget);
-
-		String name = target.getBaseName();
-		uses.put(name, newTarget);
-
-		if (branch != 0) {
-			insertPhi(target, newTarget);
-		}
+		replaceDef(hasTokens);
 	}
 
 	@Override

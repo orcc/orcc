@@ -498,7 +498,9 @@ public class IRParser {
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		HasTokens hasTokens = new HasTokens(loc, port, numTokens, target);
+		
+		LocalVariable local = (LocalVariable) target;
+		HasTokens hasTokens = new HasTokens(loc, port, numTokens, local);
 		target.setInstruction(hasTokens);
 		return hasTokens;
 	}

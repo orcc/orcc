@@ -28,9 +28,11 @@
  */
 package net.sf.orcc.ir.instructions;
 
+import net.sf.orcc.ir.LocalTargetContainer;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Port;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines a HasTokens instruction.
@@ -38,14 +40,24 @@ import net.sf.orcc.ir.Variable;
  * @author Matthieu Wipliez
  * 
  */
-public class HasTokens extends AbstractFifoInstruction {
+public class HasTokens extends AbstractInstruction implements
+		LocalTargetContainer {
+
+	private int numTokens;
+
+	private Port port;
+
+	private LocalVariable target;
 
 	public HasTokens(Location location, Port port, int numTokens,
-			Variable target) {
-		super(location, port, numTokens, target);
+			LocalVariable target) {
+		super(location);
+		this.numTokens = numTokens;
+		setPort(port);
+		setTarget(target);
 	}
 
-	public HasTokens(Port port, int numTokens, Variable varDef) {
+	public HasTokens(Port port, int numTokens, LocalVariable varDef) {
 		this(new Location(), port, numTokens, varDef);
 	}
 
@@ -59,9 +71,58 @@ public class HasTokens extends AbstractFifoInstruction {
 		visitor.visit(this, args);
 	}
 
+	/**
+	 * Returns the number of tokens used by this FIFO operation.
+	 * 
+	 * @return the number of tokens used by this FIFO operation
+	 */
+	public int getNumTokens() {
+		return numTokens;
+	}
+
+	/**
+	 * Returns the port used by this FIFO operation.
+	 * 
+	 * @return the port used by this FIFO operation
+	 */
+	public Port getPort() {
+		return port;
+	}
+
+	@Override
+	public LocalVariable getTarget() {
+		return target;
+	}
+
+	@Override
+	public void internalSetTarget(LocalVariable target) {
+		this.target = target;
+	}
+
 	@Override
 	public boolean isHasTokens() {
 		return true;
+	}
+
+	/**
+	 * Sets the port used by this FIFO operation.
+	 * 
+	 * @param port
+	 *            the port used by this FIFO operation
+	 */
+	public void setPort(Port port) {
+		if (this.port != null) {
+			this.port.removeUse(this);
+		}
+		this.port = port;
+		if (port != null) {
+			port.addUse(this);
+		}
+	}
+
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
 	}
 
 	@Override

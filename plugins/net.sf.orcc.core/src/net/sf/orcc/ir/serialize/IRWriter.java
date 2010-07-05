@@ -261,7 +261,9 @@ public class IRWriter {
 
 		@Override
 		public void visit(HasTokens hasTokens, Object... args) {
-			visitFifoInstruction(NAME_HAS_TOKENS, hasTokens, args[0]);
+			visitFifoOperation(NAME_HAS_TOKENS, hasTokens.getLocation(),
+					hasTokens.getTarget(), hasTokens.getPort(),
+					hasTokens.getNumTokens(), (JSONArray) args[0]);
 		}
 
 		@Override
@@ -360,27 +362,50 @@ public class IRWriter {
 		 *            name of the instruction as indicated in
 		 *            {@link IRConstants}. Expected to be the name of a
 		 *            hasTokens, peek, read, write.
-		 * @param fifoInstr
+		 * @param instr
 		 *            the {@link AbstractFifoInstruction} we want to visit
 		 * @param object
 		 *            the object passed in args[0], expected to be the target
 		 *            JSON array
 		 */
 		private void visitFifoInstruction(String name,
-				AbstractFifoInstruction fifoInstr, Object object) {
-			JSONArray array = (JSONArray) object;
+				AbstractFifoInstruction instr, Object object) {
+			visitFifoOperation(name, instr.getLocation(), instr.getTarget(),
+					instr.getPort(), instr.getNumTokens(), (JSONArray) object);
+		}
+
+		/**
+		 * Visits the given FIFO operation.
+		 * 
+		 * @param name
+		 *            name of the instruction as indicated in
+		 *            {@link IRConstants}. Expected to be the name of a
+		 *            hasTokens, peek, read, write.
+		 * @param location
+		 *            the location
+		 * @param target
+		 *            the target variable
+		 * @param port
+		 *            the source port
+		 * @param numTokens
+		 *            the number of tokens
+		 * @param array
+		 *            the target JSON array
+		 */
+		private void visitFifoOperation(String name, Location location,
+				Variable target, Port port, int numTokens, JSONArray array) {
 			JSONArray instr = new JSONArray();
 			array.put(instr);
 
 			instr.put(name);
-			instr.put(writeLocation(fifoInstr.getLocation()));
+			instr.put(writeLocation(location));
 
 			JSONArray body = new JSONArray();
 			instr.put(body);
 
-			body.put(writeVariable(fifoInstr.getTarget()));
-			body.put(fifoInstr.getPort().getName());
-			body.put(fifoInstr.getNumTokens());
+			body.put(writeVariable(target));
+			body.put(port.getName());
+			body.put(numTokens);
 		}
 
 	}
