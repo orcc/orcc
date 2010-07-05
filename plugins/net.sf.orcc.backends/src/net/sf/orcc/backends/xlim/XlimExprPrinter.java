@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Samuel Keller EPFL
+ * Copyright (c) 2009, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the EPFL nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,31 +26,54 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.xlim.templates;
+package net.sf.orcc.backends.xlim;
+
+import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionPrinter;
+import net.sf.orcc.ir.expr.ListExpr;
 
 /**
- * XlimAttributeTemplate interface holds attributes for XLIM printing
+ * This class defines a XLIM expression printer.
  * 
- * @author Samuel Keller EPFL
+ * @author Matthieu Wipliez
+ * 
  */
-public interface XlimAttributeTemplate {
-	public static final String ACTORPORT = "actor-port";
-	public static final String AUTOSTART = "autostart";
-	public static final String DECISION = "decision";
-	public static final String DIR = "dir";
-	public static final String INITVALUE = "initValue";
-	public static final String KIND = "kind";
-	public static final String MUTEX = "mutex";
-	public static final String NAME = "name";
-	public static final String PORTNAME = "portName";
-	public static final String QUALIFIER = "qualifier";
-	public static final String REMOVABLE = "removable";
-	public static final String SIZE = "size";
-	public static final String SOURCE = "source";
-	public static final String SOURCENAME = "sourceName";
-	public static final String SOURCENAME_ = "sourcename";
-	public static final String STYLE = "style";
-	public static final String TARGET = "target";
-	public static final String TYPENAME = "typeName";
-	public static final String VALUE = "value";
+public class XlimExprPrinter extends ExpressionPrinter {
+
+	@Override
+	public void visit(BinaryExpr expr, Object... args) {
+		BinaryOp op = expr.getOp();
+		int currentPrec = op.getPrecedence();
+
+		int nextPrec;
+		if (op == BinaryOp.SHIFT_LEFT || op == BinaryOp.SHIFT_RIGHT) {
+			// special case, for shifts always put parentheses because compilers
+			// often issue warnings
+			nextPrec = Integer.MIN_VALUE;
+		} else {
+			nextPrec = currentPrec;
+		}
+
+		if (op.needsParentheses(args)) {
+			builder.append("(");
+			toString(nextPrec, expr.getE1(), op, expr.getE2());
+			builder.append(")");
+		} else {
+			toString(nextPrec, expr.getE1(), op, expr.getE2());
+		}
+	}
+
+	@Override
+	public void visit(BoolExpr expr, Object... args) {
+		builder.append(expr.getValue() ? "1" : "0");
+	}
+
+	@Override
+	public void visit(ListExpr expr, Object... args) {
+		throw new OrccRuntimeException("List expression not supported");
+	}
+
 }

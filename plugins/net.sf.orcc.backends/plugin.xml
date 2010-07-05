@@ -81,16 +81,6 @@
                id="net.sf.orcc.backends.compileXDF">
          </option>
       </backend>
-      <backend
-            class="net.sf.orcc.backends.xlim.experimental.XlimBackendImpl"
-            name="XLIM (experimental)">
-         <option
-               id="net.sf.orcc.backends.vtlFolder">
-         </option>
-         <option
-               id="net.sf.orcc.backends.compileXDF">
-         </option>
-      </backend>
    </extension>
    <extension
          point="net.sf.orcc.core.options">

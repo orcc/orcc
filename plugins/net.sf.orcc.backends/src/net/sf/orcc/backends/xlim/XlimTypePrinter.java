@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Samuel Keller EPFL
+ * Copyright (c) 2009, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the EPFL nor the names of its
+ *   * Neither the name of the IETR/INSA of Rennes nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -26,18 +26,57 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.xlim.templates;
+package net.sf.orcc.backends.xlim;
+
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
+import net.sf.orcc.ir.type.TypePrinter;
 
 /**
- * XlimValueTemplate interface holds some default values for XLIM printing
+ * This class defines a XLIM type printer.
  * 
- * @author Samuel Keller EPFL
+ * @author Matthieu Wipliez
+ * 
  */
-public interface XlimValueTemplate {
-	public static final String FALSE = "false";
-	public static final String IN = "in";
-	public static final String NO = "no";
-	public static final String OUT = "out";
-	public static final String SIMPLE = "simple";
-	public static final String TRUE = "true";
+public class XlimTypePrinter extends TypePrinter {
+
+	private void printInt(int size) {
+		builder.append("int");
+	}
+
+	@Override
+	public void visit(TypeBool type) {
+		builder.append("bool");
+	}
+
+	@Override
+	public void visit(TypeInt type) {
+		printInt(type.getSize());
+	}
+
+	@Override
+	public void visit(TypeList type) {
+		// size will be printed later
+		type.getElementType().accept(this);
+	}
+
+	@Override
+	public void visit(TypeString type) {
+		builder.append("String");
+	}
+
+	@Override
+	public void visit(TypeUint type) {
+		builder.append("int");
+	}
+
+	@Override
+	public void visit(TypeVoid type) {
+		builder.append("void");
+	}
+
 }
