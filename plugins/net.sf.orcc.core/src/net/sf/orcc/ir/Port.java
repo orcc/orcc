@@ -35,7 +35,7 @@ package net.sf.orcc.ir;
  * @author Matthieu Wipliez
  * 
  */
-public class Port extends Variable implements Comparable<Port> {
+public class Port extends Variable {
 
 	/**
 	 * the number of tokens consumed by this port.
@@ -67,11 +67,6 @@ public class Port extends Variable implements Comparable<Port> {
 	 */
 	public Port(Port port) {
 		this(port.getLocation(), port.getType(), port.getName());
-	}
-
-	@Override
-	public int compareTo(Port port) {
-		return getName().compareTo(port.getName());
 	}
 
 	/**

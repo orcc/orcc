@@ -166,9 +166,13 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	@Override
 	public void visit(Read read, Object... args) {
 		if (read.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
-			int value = analyzer.getConfigurationValue(action);
-			Object[] target = (Object[]) read.getTarget().getValue();
-			target[0] = value;
+			Variable variable = read.getTarget();
+			if (variable != null) {
+				Object[] target = (Object[]) variable.getValue();
+				int value = analyzer.getConfigurationValue(action);
+				target[0] = value;
+			}
+
 			portRead = true;
 		}
 

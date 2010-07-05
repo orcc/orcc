@@ -38,7 +38,7 @@ import java.util.List;
  * @author Matthieu Wipliez
  * 
  */
-public class Tag implements Comparable<Tag>, Iterable<String> {
+public class Tag implements Iterable<String> {
 
 	private List<String> identifiers;
 
@@ -89,11 +89,6 @@ public class Tag implements Comparable<Tag>, Iterable<String> {
 	 */
 	public void add(String identifier) {
 		identifiers.add(identifier);
-	}
-
-	@Override
-	public int compareTo(Tag tag) {
-		return toString().compareTo(tag.toString());
 	}
 
 	@Override
