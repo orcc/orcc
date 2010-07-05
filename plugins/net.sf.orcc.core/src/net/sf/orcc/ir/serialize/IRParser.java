@@ -130,7 +130,7 @@ import org.json.JSONTokener;
  */
 public class IRParser {
 
-	private Map<Tag, Action> actions;
+	final private Map<Tag, Action> actions;
 
 	private BlockNode block;
 
@@ -146,11 +146,24 @@ public class IRParser {
 
 	private Procedure procedure;
 
-	private OrderedMap<String, Procedure> procs;
+	final private OrderedMap<String, Procedure> procs;
 
-	private List<Action> untaggedActions;
+	final private List<Action> untaggedActions;
 
 	private Scope<String, Variable> variables;
+
+	/**
+	 * Creates a new IR parser.
+	 */
+	public IRParser() {
+		actions = new HashMap<Tag, Action>();
+		procs = new OrderedMap<String, Procedure>();
+		untaggedActions = new ArrayList<Action>();
+		variables = new Scope<String, Variable>();
+
+		// register built-in procedures
+		procs.put(file, print.getLocation(), print.getName(), print);
+	}
 
 	/**
 	 * Returns the action associated with the tag represented by the given JSON
@@ -283,7 +296,8 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the given input stream as JSON and returns an IR actor.
+	 * Parses the given input stream as JSON and returns an IR actor. The input
+	 * stream is closed once the JSON has been parsed.
 	 * 
 	 * @param in
 	 *            an input stream that contains JSON content
@@ -293,14 +307,6 @@ public class IRParser {
 	 */
 	public Actor parseActor(InputStream in) throws OrccException {
 		try {
-			actions = new HashMap<Tag, Action>();
-			procs = new OrderedMap<String, Procedure>();
-			untaggedActions = new ArrayList<Action>();
-			variables = new Scope<String, Variable>();
-
-			// register built-in procedures
-			procs.put(file, print.getLocation(), print.getName(), print);
-
 			JSONTokener tokener = new JSONTokener(new InputStreamReader(in));
 			JSONObject obj = new JSONObject(tokener);
 
@@ -337,7 +343,6 @@ public class IRParser {
 
 			Actor actor = new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procs, actions, initializes, sched);
-			in.close();
 
 			// combine basic blocks
 			new BlockCombine().transform(actor);
@@ -345,8 +350,13 @@ public class IRParser {
 			return actor;
 		} catch (JSONException e) {
 			throw new OrccException("JSON error", e);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
+		} finally {
+			try {
+				// closes the input stream
+				in.close();
+			} catch (IOException e) {
+				throw new OrccException("I/O error", e);
+			}
 		}
 	}
 
@@ -498,7 +508,7 @@ public class IRParser {
 		String fifoName = array.getString(1);
 		Port port = inputs.get(fifoName);
 		int numTokens = array.getInt(2);
-		
+
 		LocalVariable local = (LocalVariable) target;
 		HasTokens hasTokens = new HasTokens(loc, port, numTokens, local);
 		target.setInstruction(hasTokens);
