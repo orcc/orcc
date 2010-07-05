@@ -91,10 +91,8 @@ begin
       reset_n     => reset_n,
       rd_clk      => rd_clk,
       rd_ack      => rd_ack,
-      rd_en       => rd_en,
       wr_clk      => wr_clk,
       wr_data     => wr_data,
-      wr_en       => wr_en,
       rd_add_gray => rd_add_gray,
       wr_add_gray => wr_add_gray);
 

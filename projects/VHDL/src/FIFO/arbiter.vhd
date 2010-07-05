@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-01
+-- Last update: 2010-07-05
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -45,7 +45,8 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-
+use ieee.std_logic_unsigned.all;
+use ieee.numeric_std.all;
 -------------------------------------------------------------------------------
 
 
@@ -81,55 +82,95 @@ architecture arch_arbiter of arbiter is
   --
   signal register_data : std_logic_vector (width -1 downto 0);
   signal data_in_reg   : std_logic;
+  signal count_in      : std_logic_vector(3 downto 0);
+  signal count_out     : std_logic_vector(3 downto 0);
   -----------------------------------------------------------------------------
   
 begin
 
   wr_proc : process (wr_clk, reset_n) is
+    variable count : std_logic_vector(3 downto 0);
   begin
     if reset_n = '0' then
       register_data <= (others => '0');
+      data_in_reg   <= '0';
+      empty         <= '1';
+      full          <= '0';
+      count_in      <= (others => '0');
+      count         := (others => '0');
     elsif rising_edge(wr_clk) then
-      if wr_data = '1' and full = '0' then
+      if wr_data = '1' and count_in = count_out then
         register_data <= data_in;
+        data_in_reg   <= '1';
+        empty         <= '0';
+        count         := count +'1';
+        count         := '0' & count (2 downto 0);
+      elsif wr_data = '1' and rd_ack = '1' then
+        register_data <= data_in;
+        data_in_reg   <= '1';
+        empty         <= '0';
+        full          <= '0';
+        count         := count +'1';
+        count         := '0' & count (2 downto 0);
+      elsif wr_data = '1' and rd_ack = '0' then
+        data_in_reg <= '1';
+        full        <= '1';
+        empty       <= '0';
+      elsif wr_data = '0' and rd_ack = '1' then
+        data_in_reg <= '0';
+        empty       <= '1';
+        full        <= '0';
       end if;
+      count_in <= count;
     end if;
   end process wr_proc;
 
-  rd_proc : process (rd_clk, reset_n) is
+
+  rd_proc : process (count_in, count_out, register_data, reset_n) is
   begin
     if reset_n = '0' then
       data_out <= (others => '0');
       send     <= '0';
-    elsif rising_edge(rd_clk) then
-      if data_in_reg = '1' then
-        data_out <= register_data;
-        send     <= '1';
-      else
-        send <= '0';
-      end if;
+    elsif count_in /= count_out then
+      data_out <= register_data;
+      send     <= '1';
+    else
+      data_out <= register_data;
+      send     <= '0';
     end if;
   end process rd_proc;
 
 
-  arbiter_proc : process (rd_ack, reset_n, wr_data) is
+  cnt_proc : process (rd_clk, reset_n) is
+    variable count : std_logic_vector(3 downto 0);
   begin
     if reset_n = '0' then
-      data_in_reg <= '0';
-      full        <= '0';
-    elsif wr_data = '1' and data_in_reg = '0' then
-      data_in_reg <= '1';
-      full        <= '0';
-    elsif wr_data = '1' and data_in_reg = '1' and rd_ack = '1' then
-      data_in_reg <= '1';
-      full        <= '0';
-    elsif wr_data = '1' and data_in_reg = '1' and rd_ack = '0' then
-      data_in_reg <= '1';
-      full        <= '1';
-    else
-      data_in_reg <= '0';
-      full        <= '0';
+      count_out <= (others => '0');
+      count     := (others => '0');
+    elsif rising_edge(rd_clk) then
+      if rd_ack = '1' then
+        count     := count +'1';
+        count     := '0' & count (2 downto 0);
+        count_out <= count;
+      end if;
     end if;
-  end process arbiter_proc;
+  end process cnt_proc;
+
+--  arbiter_proc : process (data_in_reg, rd_ack, reset_n, wr_data) is
+--  begin
+--    if reset_n = '0' then
+--      reg_done <= '0';
+--      full     <= '0';
+--    elsif wr_data = '1' and data_in_reg = '1' and rd_ack = '1' then
+--      reg_done <= '1';
+--      full     <= '0';
+--    elsif wr_data = '1' and data_in_reg = '1' and rd_ack = '0' then
+--      reg_done <= '1';
+--      full     <= '1';
+--    else
+--      reg_done <= '0';
+--      full     <= '0';
+--    end if;
+--  end process arbiter_proc;
 
 end arch_arbiter;

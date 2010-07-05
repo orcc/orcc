@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-01
+-- Last update: 2010-07-05
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ architecture arch_fifo_top of fifo_top is
 
 begin
 
-  create_FIFO : if depth > 0 generate
+  create_FIFO : if depth > 1 generate
     FIFO_generic_1 : entity work.FIFO_generic
       generic map (
         depth => depth,
@@ -96,7 +96,7 @@ begin
         empty    => empty);
   end generate;
 
-  create_link : if depth = 0 generate
+  create_link : if depth = 1 generate
     arbiter_1 : entity work.arbiter
       generic map (
         width => width)

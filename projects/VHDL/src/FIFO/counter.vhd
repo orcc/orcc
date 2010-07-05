@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-06-30
+-- Last update: 2010-07-01
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -57,10 +57,8 @@ entity counter is
     reset_n       : in  std_logic;
     rd_clk        : in  std_logic;
     rd_ack        : in  std_logic;
-    rd_en         : in  std_logic;
     wr_clk        : in  std_logic;
     wr_data       : in  std_logic;
-    wr_en         : in  std_logic;
     rd_add_gray : inout std_logic_vector(bit_width(depth) -1 downto 0);
     wr_add_gray : inout std_logic_vector(bit_width(depth) -1 downto 0));
 end counter;
