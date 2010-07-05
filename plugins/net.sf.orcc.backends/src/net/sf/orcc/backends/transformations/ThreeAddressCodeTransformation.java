@@ -70,7 +70,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 /**
  * Split expression and effective node.
  * 
- * @author Jï¿½rï¿½me GORIN
+ * @author Jérôme GORIN
  * @author Matthieu Wipliez
  * 
  */
@@ -363,6 +363,11 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = store.getValue();
 		Variable target = store.getTarget();
+		Type targetType = target.getType();
+
+		if (targetType.isList()) {
+			targetType = ((TypeList) targetType).getElementType();
+		}
 
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
@@ -373,7 +378,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		it.previous();
 
 		// Check store value
-		store.setValue(visitExpression(value, it, target.getType()));
+		store.setValue(visitExpression(value, it,
+				IrFactory.eINSTANCE.createTypeInt(32)));
 		it.next();
 	}
 
@@ -416,7 +422,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
-
 		tempVarCount = 1;
 
 		// set the label counter to prevent new nodes from having the same label
