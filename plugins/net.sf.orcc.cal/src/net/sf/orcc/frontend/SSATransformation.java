@@ -35,6 +35,7 @@ import java.util.Map;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -108,6 +109,27 @@ public class SSATransformation extends AbstractActorTransformation {
 	}
 
 	/**
+	 * Commits the phi assignments in the given join node.
+	 * 
+	 * @param innerJoin
+	 *            a BlockNode that contains phi assignments
+	 */
+	private void commitPhi(BlockNode innerJoin) {
+		for (Instruction instruction : innerJoin.getInstructions()) {
+			PhiAssignment phi = (PhiAssignment) instruction;
+			LocalVariable oldVar = phi.getOldVariable();
+			LocalVariable newVar = phi.getTarget();
+
+			// updates the current value of "var"
+			uses.put(oldVar.getBaseName(), newVar);
+
+			if (join != null) {
+				insertPhi(oldVar, newVar);
+			}
+		}
+	}
+
+	/**
 	 * Inserts a phi in the (current) join node.
 	 * 
 	 * @param oldVar
@@ -170,9 +192,29 @@ public class SSATransformation extends AbstractActorTransformation {
 				oldVar.getLocation(), name, oldVar.getType());
 		procedure.getLocals().put(newVar.getName(), newVar);
 		definitions.put(name, newVar);
-		uses.put(name, newVar);
 
 		return newVar;
+	}
+
+	/**
+	 * Replaces the definition created by the given local target container.
+	 * 
+	 * @param cter
+	 *            a local target container
+	 */
+	private void replaceDef(LocalTargetContainer cter) {
+		LocalVariable target = cter.getTarget();
+		if (target != null) {
+			LocalVariable newTarget = newDefinition(target);
+			cter.setTarget(newTarget);
+
+			String name = target.getBaseName();
+			uses.put(name, newTarget);
+
+			if (branch != 0) {
+				insertPhi(target, newTarget);
+			}
+		}
 	}
 
 	/**
@@ -211,29 +253,13 @@ public class SSATransformation extends AbstractActorTransformation {
 	@Override
 	public void visit(Assign assign, Object... args) {
 		replaceUses(assign.getValue());
-
-		LocalVariable target = assign.getTarget();
-		LocalVariable newTarget = newDefinition(target);
-		assign.setTarget(newTarget);
-
-		if (branch != 0) {
-			insertPhi(target, newTarget);
-		}
+		replaceDef(assign);
 	}
 
 	@Override
 	public void visit(Call call, Object... args) {
 		replaceUses(call.getParameters());
-
-		LocalVariable target = call.getTarget();
-		if (target != null) {
-			LocalVariable newTarget = newDefinition(target);
-			call.setTarget(newTarget);
-
-			if (branch != 0) {
-				insertPhi(target, newTarget);
-			}
-		}
+		replaceDef(call);
 	}
 
 	@Override
@@ -241,6 +267,9 @@ public class SSATransformation extends AbstractActorTransformation {
 		LocalVariable target = (LocalVariable) hasTokens.getTarget();
 		LocalVariable newTarget = newDefinition(target);
 		hasTokens.setTarget(newTarget);
+
+		String name = target.getBaseName();
+		uses.put(name, target);
 
 		if (branch != 0) {
 			insertPhi(target, newTarget);
@@ -265,9 +294,6 @@ public class SSATransformation extends AbstractActorTransformation {
 		branch = 2;
 		visit(ifNode.getElseNodes());
 
-		branch = 0;
-		visit(ifNode.getJoinNode(), args);
-
 		// commit phi
 		BlockNode innerJoin = join;
 		join = outerJoin;
@@ -275,38 +301,10 @@ public class SSATransformation extends AbstractActorTransformation {
 		commitPhi(innerJoin);
 	}
 
-	/**
-	 * Commits the phi assignments in the given join node.
-	 * 
-	 * @param innerJoin
-	 *            a BlockNode that contains phi assignments
-	 */
-	private void commitPhi(BlockNode innerJoin) {
-		for (Instruction instruction : innerJoin.getInstructions()) {
-			PhiAssignment phi = (PhiAssignment) instruction;
-			LocalVariable oldVar = phi.getOldVariable();
-			LocalVariable newVar = phi.getTarget();
-
-			// updates the current value of "var"
-			uses.put(oldVar.getBaseName(), newVar);
-
-			if (join != null) {
-				insertPhi(oldVar, newVar);
-			}
-		}
-	}
-
 	@Override
 	public void visit(Load load, Object... args) {
 		replaceUses(load.getIndexes());
-
-		LocalVariable target = load.getTarget();
-		LocalVariable newTarget = newDefinition(target);
-		load.setTarget(newTarget);
-
-		if (branch != 0) {
-			insertPhi(target, newTarget);
-		}
+		replaceDef(load);
 	}
 
 	@Override
