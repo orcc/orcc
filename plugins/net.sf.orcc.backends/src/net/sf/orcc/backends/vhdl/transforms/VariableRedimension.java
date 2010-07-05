@@ -53,7 +53,7 @@ public class VariableRedimension extends AbstractActorTransformation {
 			// System.out.println("local : " + local.getType().getDimensions());
 			List<Integer> dimensions = local.getType().getDimensions();
 			if (!dimensions.isEmpty() && dimensions.get(0).equals(1)) {
-				Type type = ((TypeList) local.getType()).getElementType();
+				Type type = ((TypeList) local.getType()).getType();
 				local.setType(type);
 			}
 		}

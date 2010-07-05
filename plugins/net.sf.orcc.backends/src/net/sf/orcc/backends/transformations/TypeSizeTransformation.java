@@ -60,9 +60,8 @@ public class TypeSizeTransformation extends AbstractActorTransformation {
 			uintType.setSize(size);
 		} else if (type.isList()) {
 			TypeList listType = (TypeList) type;
-			checkType(listType.getElementType());
+			checkType(listType.getType());
 		}
-
 	}
 
 	private void checkVariables(OrderedMap<String, ? extends Variable> variables) {

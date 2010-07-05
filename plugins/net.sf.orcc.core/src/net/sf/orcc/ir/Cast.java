@@ -28,11 +28,10 @@
  */
 package net.sf.orcc.ir;
 
-
 /**
  * This class provide information about cast associated to an instruction
  * 
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class Cast {
@@ -63,7 +62,7 @@ public class Cast {
 			return uintType.getSize();
 		} else if (type.isList()) {
 			TypeList listType = (TypeList) type;
-			return getSizeOf(listType.getElementType());
+			return getSizeOf(listType.getType());
 		}
 
 		return 0;
@@ -96,7 +95,7 @@ public class Cast {
 	public boolean isExtended() {
 		if (target.isList()) {
 			TypeList list = (TypeList) target;
-			if (source.toString().equals(list.getElementType().toString())) {
+			if (source.equals(list.getElementType())) {
 				return false;
 			}
 		}
@@ -133,11 +132,12 @@ public class Cast {
 	public boolean isTrunced() {
 		if (target.isList()) {
 			TypeList list = (TypeList) target;
-			if (source.toString().equals(list.getElementType().toString())) {
+			if (source.equals(list.getElementType())) {
 				return false;
 			}
 		}
 
 		return getSizeOf(source) > getSizeOf(target);
 	}
+
 }

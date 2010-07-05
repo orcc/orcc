@@ -56,7 +56,7 @@ public class JavaTypePrinter extends TypePrinter {
 	@Override
 	public void visit(TypeList type) {
 		// size will be printed later
-		type.getElementType().accept(this);
+		type.getType().accept(this);
 	}
 
 	@Override

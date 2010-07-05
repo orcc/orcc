@@ -520,7 +520,7 @@ public class IRWriter {
 			// FIXME change JSON format back to using integer size
 			Expression expr = new IntExpr(type.getSize());
 			array.put(writeExpression(expr));
-			array.put(writeType(type.getElementType()));
+			array.put(writeType(type.getType()));
 			return array;
 		}
 

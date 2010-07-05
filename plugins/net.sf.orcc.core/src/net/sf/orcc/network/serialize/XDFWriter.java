@@ -521,7 +521,7 @@ public class XDFWriter {
 		} else if (type.isList()) {
 			name = "List";
 			size = ((TypeList) type).getSize();
-			type = ((TypeList) type).getElementType();
+			type = ((TypeList) type).getType();
 			typeElt.appendChild(writeEntry("type", type));
 			typeElt.appendChild(writeEntry("size", new IntExpr(size)));
 		} else if (type.isString()) {

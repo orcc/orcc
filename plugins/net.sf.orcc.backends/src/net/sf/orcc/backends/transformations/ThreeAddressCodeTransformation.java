@@ -70,7 +70,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 /**
  * Split expression and effective node.
  * 
- * @author Jérôme GORIN
+ * @author Jï¿½rï¿½me GORIN
  * @author Matthieu Wipliez
  * 
  */
@@ -190,8 +190,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 					// compare type of two arrays
 					TypeList exprtype = (TypeList) expr.getType();
 					TypeList refType = (TypeList) type;
-					if (exprtype.getElementType().equals(
-							refType.getElementType())) {
+					if (exprtype.getType().equals(refType.getType())) {
 						return expr;
 					}
 				}
@@ -221,16 +220,15 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		}
 
 		/**
-		 * Creates a new local variable with type 
+		 * Creates a new local variable with type
 		 * 
-		 * @return a new local variable with type 
+		 * @return a new local variable with type
 		 */
 		private LocalVariable newVariable(Type type) {
 			String procName = procedure.getName();
 
 			return new LocalVariable(true, tempVarCount++, new Location(),
-					procName + "_" + "expr",
-					type);
+					procName + "_" + "expr", type);
 		}
 
 	}
@@ -365,11 +363,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = store.getValue();
 		Variable target = store.getTarget();
-		Type targetType = target.getType();
-
-		if (targetType.isList()) {
-			targetType = ((TypeList) targetType).getElementType();
-		}
 
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
@@ -380,8 +373,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		it.previous();
 
 		// Check store value
-		store.setValue(visitExpression(value, it,
-				target.getType()));
+		store.setValue(visitExpression(value, it, target.getType()));
 		it.next();
 	}
 

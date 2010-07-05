@@ -45,7 +45,7 @@ import org.eclipse.emf.ecore.util.EDataTypeEList;
  * This class defines a List type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class TypeListImpl extends TypeImpl implements TypeList {
@@ -213,11 +213,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		return dimensions;
 	}
 
-	/**
-	 * Returns the type of the elements of this list
-	 * 
-	 * @return the number of elements of this list
-	 */
+	@Override
 	public Type getElementType() {
 		if (type.isList()) {
 			return ((TypeList) type).getElementType();
