@@ -30,12 +30,12 @@ package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
@@ -264,38 +264,11 @@ public class AstTransformer {
 			AstVariable astVariable = expression.getValue().getVariable();
 			Location location = Util.getLocation(expression);
 
-			LocalVariable local = getLocalVariable(astVariable);
+			Variable variable = mapVariables.get(astVariable);
+			LocalVariable local = getLocalVariable(setGlobalsToLoad, variable);
 			Use use = new Use(local);
 			Expression varExpr = new VarExpr(location, use);
 			return varExpr;
-		}
-
-		/**
-		 * Returns the IR mapping of the given AST variable. If the AST variable
-		 * is a global, loads it if necessary.
-		 * 
-		 * @param astVariable
-		 *            an AST variable
-		 * @return a local IR variable
-		 */
-		private LocalVariable getLocalVariable(AstVariable astVariable) {
-			Variable variable = mapVariables.get(astVariable);
-			if (variable.isGlobal()) {
-				LocalVariable local = mapGlobals.get(variable);
-				if (local == null) {
-					List<Expression> indexes = new ArrayList<Expression>(0);
-					local = procedure.newTempLocalVariable(file,
-							variable.getType(), "local_" + variable.getName());
-					mapGlobals.put(variable, local);
-
-					Load load = new Load(new Location(), local, new Use(
-							variable), indexes);
-					addInstruction(load);
-				}
-				return local;
-			}
-
-			return (LocalVariable) variable;
 		}
 
 		/**
@@ -393,7 +366,8 @@ public class AstTransformer {
 			// add assign or store instruction
 			Instruction instruction;
 			if (indexes.isEmpty()) {
-				LocalVariable local = getLocalVariable(target);
+				LocalVariable local = getLocalVariable(setGlobalsToStore,
+						target);
 				instruction = new Assign(location, local, value);
 			} else {
 				instruction = new Store(location, target, indexes, value);
@@ -450,31 +424,6 @@ public class AstTransformer {
 		@Override
 		public Void caseAstStatementWhile(AstStatementWhile stmtWhile) {
 			return null;
-		}
-
-		/**
-		 * Returns the IR mapping of the given variable. If the variable is a
-		 * global, returns a local associated with it.
-		 * 
-		 * @param variable
-		 *            an IR variable, possibly global
-		 * @return a local IR variable
-		 */
-		private LocalVariable getLocalVariable(Variable variable) {
-			if (variable.isGlobal()) {
-				LocalVariable local = mapGlobals.get(variable);
-				if (local == null) {
-					local = procedure.newTempLocalVariable(file,
-							variable.getType(), "local_" + variable.getName());
-					mapGlobals.put(variable, local);
-				}
-
-				setGlobalsToStore.add(variable);
-
-				return local;
-			}
-
-			return (LocalVariable) variable;
 		}
 
 		/**
@@ -554,6 +503,8 @@ public class AstTransformer {
 	 */
 	private OrderedMap<String, Procedure> procedures;
 
+	final private Set<Variable> setGlobalsToLoad;
+
 	final private Set<Variable> setGlobalsToStore;
 
 	/**
@@ -571,7 +522,8 @@ public class AstTransformer {
 		mapProcedures = new HashMap<AstProcedure, Procedure>();
 		mapVariables = new Scope<AstVariable, Variable>();
 
-		setGlobalsToStore = new HashSet<Variable>();
+		setGlobalsToLoad = new LinkedHashSet<Variable>();
+		setGlobalsToStore = new LinkedHashSet<Variable>();
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
@@ -797,6 +749,52 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Returns the IR mapping of the given variable. If the variable is a
+	 * global, returns a local associated with it. The variable is added to a
+	 * set of variables that should be loaded or stored.
+	 * 
+	 * @param set
+	 *            a set of variables
+	 * @param variable
+	 *            an IR variable, possibly global
+	 * @return a local IR variable
+	 */
+	private LocalVariable getLocalVariable(Set<Variable> set, Variable variable) {
+		if (variable.isGlobal()) {
+			LocalVariable local = mapGlobals.get(variable);
+			if (local == null) {
+				local = procedure.newTempLocalVariable(file,
+						variable.getType(), "local_" + variable.getName());
+				mapGlobals.put(variable, local);
+			}
+
+			set.add(variable);
+
+			return local;
+		}
+
+		return (LocalVariable) variable;
+	}
+
+	/**
+	 * Loads the globals that need to be loaded.
+	 */
+	private void loadGlobals() {
+		int i = 0;
+		for (Variable global : setGlobalsToLoad) {
+			LocalVariable local = mapGlobals.get(global);
+
+			List<Expression> indexes = new ArrayList<Expression>(0);
+			Load load = new Load(local, new Use(global), indexes);
+			BlockNode block = BlockNode.getFirst(procedure);
+			block.add(i, load);
+			i++;
+		}
+
+		setGlobalsToLoad.clear();
+	}
+
+	/**
 	 * Create a new scope that extends variablesMap.
 	 * 
 	 * @return the previous scope
@@ -818,10 +816,29 @@ public class AstTransformer {
 	 *            the previous scope returned by {@link #newContext()}
 	 */
 	private void restoreContext(Scope<AstVariable, Variable> oldScope) {
+		loadGlobals();
+		storeGlobals();
+
 		mapGlobals.clear();
 
 		// restore previous scope
 		mapVariables = oldScope;
+	}
+
+	/**
+	 * Writes back the globals that need to be stored.
+	 */
+	private void storeGlobals() {
+		for (Variable global : setGlobalsToStore) {
+			LocalVariable local = mapGlobals.get(global);
+			VarExpr value = new VarExpr(new Use(local));
+
+			List<Expression> indexes = new ArrayList<Expression>(0);
+			Store store = new Store(global, indexes, value);
+			addInstruction(store);
+		}
+
+		setGlobalsToStore.clear();
 	}
 
 	/**
@@ -894,6 +911,7 @@ public class AstTransformer {
 			mapProcedures.clear();
 			mapVariables.clear();
 
+			setGlobalsToLoad.clear();
 			setGlobalsToStore.clear();
 
 			procedure = null;
@@ -964,7 +982,6 @@ public class AstTransformer {
 		transformInputPattern(astAction, Read.class);
 		transformLocalVariables(astAction.getVariables());
 		transformStatements(astAction.getStatements());
-		writeBackGlobals();
 		transformOutputPattern(astAction);
 
 		restoreContext(oldScope);
@@ -1017,11 +1034,11 @@ public class AstTransformer {
 			createActionTest(astAction, inputPattern, result);
 		}
 
+		restoreContext(oldScope);
+
 		// return result
 		Return returnInstr = new Return(new VarExpr(new Use(result)));
 		addInstruction(returnInstr);
-
-		restoreContext(oldScope);
 	}
 
 	/**
@@ -1076,9 +1093,12 @@ public class AstTransformer {
 
 		transformParameters(astFunction.getParameters());
 		transformLocalVariables(astFunction.getVariables());
-		transformExpression(astFunction.getExpression());
+		Expression value = transformExpression(astFunction.getExpression());
 
 		restoreContext(oldScope);
+
+		Return returnInstr = new Return(location, value);
+		addInstruction(returnInstr);
 
 		procedures.put(file, location, name, procedure);
 		mapFunctions.put(astFunction, procedure);
@@ -1364,7 +1384,6 @@ public class AstTransformer {
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
 		transformStatements(astProcedure.getStatements());
-		writeBackGlobals();
 
 		restoreContext(oldScope);
 
@@ -1394,22 +1413,6 @@ public class AstTransformer {
 		for (AstStatement statement : statements) {
 			transformStatement(statement);
 		}
-	}
-
-	/**
-	 * Writes back the globals that need to be stored.
-	 */
-	private void writeBackGlobals() {
-		for (Variable global : setGlobalsToStore) {
-			LocalVariable local = mapGlobals.get(global);
-			VarExpr value = new VarExpr(new Use(local));
-
-			List<Expression> indexes = new ArrayList<Expression>(0);
-			Store store = new Store(global, indexes, value);
-			addInstruction(store);
-		}
-
-		setGlobalsToStore.clear();
 	}
 
 }

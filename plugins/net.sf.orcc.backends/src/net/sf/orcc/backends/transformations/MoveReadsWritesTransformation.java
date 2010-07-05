@@ -49,7 +49,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * read is finished (respectively a write).
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class MoveReadsWritesTransformation extends AbstractActorTransformation {
@@ -83,8 +83,7 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 		List<CFGNode> nodes = procedure.getNodes();
 
 		// add writes at the beginning of the node list, and read at the ends
-		BlockNode.getFirst(procedure, nodes).getInstructions()
-				.addAll(0, writes);
+		BlockNode.getFirst(procedure).getInstructions().addAll(0, writes);
 
 		// Put readend nodes before last instruction in the last block.
 		// In the general case the last block is expected to contain a return

@@ -54,6 +54,10 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 
 	private LocalVariable target;
 
+	public Load(LocalVariable target, Use source, List<Expression> indexes) {
+		this(new Location(), target, source, indexes);
+	}
+
 	public Load(Location location, LocalVariable target, Use source,
 			List<Expression> indexes) {
 		super(location);

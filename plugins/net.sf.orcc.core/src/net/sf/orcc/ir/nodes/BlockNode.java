@@ -45,7 +45,20 @@ import net.sf.orcc.ir.Procedure;
  * @author Matthieu Wipliez
  * 
  */
-public class BlockNode extends AbstractNode implements Iterable<Instruction> {
+public final class BlockNode extends AbstractNode implements
+		Iterable<Instruction> {
+
+	/**
+	 * Returns the first block in the list of nodes of the given procedure. A
+	 * new block is created if there is no block in the given node list.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @return a block
+	 */
+	public static BlockNode getFirst(Procedure procedure) {
+		return getFirst(procedure, procedure.getNodes());
+	}
 
 	/**
 	 * Returns the first block in the given list of nodes. A new block is
@@ -166,6 +179,19 @@ public class BlockNode extends AbstractNode implements Iterable<Instruction> {
 	public void add(Instruction instruction) {
 		instruction.setBlock(this);
 		instructions.add(instruction);
+	}
+
+	/**
+	 * Appends the specified instruction to this block at the specified index.
+	 * 
+	 * @param index
+	 *            the index
+	 * @param instruction
+	 *            an instruction
+	 */
+	public void add(int index, Instruction instruction) {
+		instruction.setBlock(this);
+		instructions.add(index, instruction);
 	}
 
 	/**
