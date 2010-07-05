@@ -1,7 +1,7 @@
 /********************************************************************************
 
 This software module was originally developed by 
-Florian Decologne (IETR/INSA of Rennes), 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
 in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
 for reference purposes and its performance may not have been optimized. 
 This software module is an implementation of one or more tools as 
@@ -53,119 +53,323 @@ Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
 
-actor Algo_BlockExpand_AVC () 
-		uint(size=4) RUN, 
-		int(size=12) VALUE, 
-		bool LAST 
-  			==> 
-  			int(size=16) Block :
+actor Algo_BlockExpand_AVC ()
+	uint(size=8)  BlockType,
+	int (size=12) Value,
+	uint(size=4)  Run,  
+	bool          Last
+		==> 
+	int(size=16) Coeff
+		:
 
-  
-  List(type:int(size=16), size=16) value_buf := [ 0 : for int i in Integers(0,15) ];  
-  uint(size=5) stuff_count := 0;
-  
-  uint(size=5) count := 0;  // Index of next sample to be transmitted
-  int(size=5) run := -1;    // Index offset of next sample decoded (-1 means no sample pending)
-  bool last := false;       // the end of block.
-  
-  uint(size=2) leveltype := 0; // Intra16x16DCLevel 0, Intra16x16ACLevel / LumaLevel 1, ChromaDCLevel 2, ChromaACLevel 3
-  uint(size=5) nb4x4 :=0;
-  
-  //if it is the end of a block, begin to stuff 0.
-  //if it is not the end, begin to read data to buffer.
-  check_last: action LAST:[l] ==>
-  do
-    last := l;
-    if last then
-      if leveltype = 2 then stuff_count := 4 - count; else stuff_count := 16 - count; end
-    else
-      stuff_count := 0;
-    end
-  end
- 
-  // begin to output data in buffer: from high address to low address
-  out_buffer: action ==> Block:[b]
-  guard
-    last,
-    count > 0
-  var
-    int(size=12) b
-  do
-    b := value_buf[count-1];
-    count := count - 1;
-  end
-  
-  // output the stuff zero after the last level
-  out_zero: action ==> Block:[0]
-  guard
-    last,
-    stuff_count > 0,
-    count = 0
-  do
-    stuff_count := stuff_count - 1;  
-  end
-  
-  out_finish: action ==>
-  guard
-    last,
-    stuff_count = 0,
-    count = 0
-  do
-    nb4x4 := nb4x4 +1;
-    if (leveltype = 0 and nb4x4 = 1) or (leveltype = 1 and nb4x4 = 16) or (leveltype = 2 and nb4x4 = 2) then leveltype := leveltype +1; nb4x4 := 0; end
-    if leveltype = 3 and nb4x4 = 8 then leveltype := 0; nb4x4 := 0; end
-  end
+	/* Constants */
+	uint(size=8) INTRA_4x4   = 0;
+//	uint(size=8) INTRA_8x8   = 3;
+	uint(size=8) INTRA_16x16 = 1;
+	uint(size=8) I_PCM       = 4;
+	uint(size=8) INTER       = 2;
 
-  // Read and write the sample out immediately if RUN = 0
-  read_immediate: action RUN:[ r ], VALUE:[ v ] ==>
-  guard
-    r = 0,
-    not last
-  do
-    value_buf[count]:= v;
-    run := r;
-    count := count + 1;
-  end  
+	uint(size=2)  Y_COMPONENT = 0;
+	uint(size=2)  U_COMPONENT = 1;
+	uint(size=2)  V_COMPONENT = 2;
 
-  // Save the level in buffer and write out a zero sample
-  read_save: action RUN:[ r ], VALUE:[ v ] ==>
-  guard
-    r > 0,
-    not last
-  do
-    value_buf[count]:= v;
-    run := r ;
-    count := count + 1;
-  end
+	int (size=5) SZ_LUMA_DC_16X16 = 16;
+	int (size=5) SZ_LUMA_AC_16X16 = 16;
+	int (size=5) SZ_LUMA_AC_4X4   = 16;
+	int (size=5) SZ_CHROMA_DC     = 4;
+	int (size=5) SZ_CHROMA_AC     = 16;
 
-  // Stuff zeros after the sample value
-  write_zero: action ==>
-  guard 
-    run > 0
-  do
-    value_buf[count]:= 0;
-    run := run - 1;
-    count := count + 1;
-  end
-  
-  write_zero_finish: action ==>
-  guard 
-    run = 0
-  end
+	/* State Variable */
+	List(type:int(size=12), size=16000) ValCoeff := [ 0 : for int i in Integers(0,15)];
+	uint(size=4) IdxValCoeff      := 0;
 
-  schedule fsm check_last:
-	check_last 		( check_last 		) --> check_last_done;
-	check_last_done ( read_immediate 	) --> check_last;
-	check_last_done ( read_save 		) --> write_zero;
-	write_zero 		( write_zero 		) --> write_zero;
-	write_zero 		( write_zero_finish ) --> check_last;
-	check_last_done	( out_buffer 		) --> out_buffer;
-	out_buffer 		( out_buffer 		) --> out_buffer;
-	out_buffer 		( out_zero 			) --> out_zero;
-	out_buffer 		( out_finish 		) --> check_last;
-	check_last_done	( out_zero			) --> out_zero;
-	out_zero 		( out_zero 			) --> out_zero;
-	out_zero 		( out_finish		) --> check_last;  
-  end
-  
+	uint(size=8) LumaMBType       := INTRA_16x16;
+	uint(size=2) Component        := Y_COMPONENT;
+	bool         DC_ComponentSent := false;
+	uint(size=2) NbBlocksSent     := 0;
+
+
+
+	/* Actions */
+
+	ReadBlockType: action
+			BlockType :[Type]
+				==>
+		guard
+			Type != I_PCM
+		do
+			if(Type != INTER) then
+				LumaMBType       := Type;
+			else
+				LumaMBType       := INTRA_16x16;
+			end
+			NbBlocksSent     := 0;
+			DC_ComponentSent := false;
+//			println("ReadBlockType: "+Type);
+/*			if(Type != INTRA_4x4 and Type != INTRA_16x16 and Type != INTER)then
+				println("bah on n'est pas dans la merde MBType:"+Type);
+			end
+*/		end
+
+
+	Block_Inter_or_PCM: action
+			BlockType :[Type]
+				==>	
+		do
+			println("Block_Inter_or_PCM:"+Type);
+		end
+
+
+	NoLast_NoRun: action
+			Last  :[ValLast],
+			Run   :[ValRun],
+			Value :[Val]
+				==>
+		guard
+			ValLast = false,
+			ValRun  = 0
+		do
+			ValCoeff[IdxValCoeff] := Val;
+			IdxValCoeff           := IdxValCoeff + 1;
+		end
+
+
+	NoLast_Run: action
+			Last  :[ValLast],
+			Run   :[ValRun],
+			Value :[Val]
+				==>
+		guard
+			ValLast = false,
+			ValRun  > 0
+		do
+			ValCoeff[IdxValCoeff] := Val;
+			IdxValCoeff           := IdxValCoeff + 1;
+			foreach int j in Integers(0,ValRun - 1)
+			do
+				ValCoeff[IdxValCoeff + j] := 0;
+			end
+			IdxValCoeff           := IdxValCoeff + ValRun;
+		end
+
+
+	Last_equaltrue: action
+			Last :[ValLast]
+				==>
+		guard
+			ValLast = true
+		var
+			int(size=12) buff
+		do
+			if(IdxValCoeff > 0) then
+				foreach int j in Integers(0, (IdxValCoeff -1)/2)
+				do
+					buff                      := ValCoeff[j];
+					ValCoeff[j]               := ValCoeff[IdxValCoeff - 1 - j];
+					ValCoeff[IdxValCoeff - 1 - j] := buff;
+				end
+			end
+		end
+
+
+		/************ Send Luma DC Component (16x16) ************/
+	isLumaDC_16x16: action ==>
+		guard
+			Component        = Y_COMPONENT,
+			DC_ComponentSent = false,
+			LumaMBType       = INTRA_16x16
+		do	
+			foreach int j in Integers(IdxValCoeff, SZ_LUMA_DC_16X16 - 1)
+			do
+				ValCoeff[j] := 0;
+			end
+			IdxValCoeff := 0;
+		end
+
+
+	SendLumaDC_16x16: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_LUMA_DC_16X16
+		do
+			DC_ComponentSent := true;
+		end
+
+
+		/************ Send Luma AC Component (16x16) ************/
+	isLumaAC_16x16: action ==>
+		guard
+			Component        = Y_COMPONENT,
+			DC_ComponentSent = true,
+			LumaMBType       = INTRA_16x16
+		do
+			foreach int j in Integers(IdxValCoeff, SZ_LUMA_AC_16X16 - 1)
+			do
+				ValCoeff[j] := 0;
+			end
+			IdxValCoeff := 0;	
+		end
+
+
+	SendLumaAC_16x16.Launch: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_LUMA_AC_16X16
+		guard
+			NbBlocksSent     < 15
+		do
+			NbBlocksSent := NbBlocksSent + 1;
+		end	
+
+
+	SendLumaAC_16x16.LastBlock: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_LUMA_AC_16X16
+		do
+			NbBlocksSent     := 0;
+			Component        := U_COMPONENT;	
+			DC_ComponentSent := false;
+		end	
+
+
+		/************ Send Luma AC Component (4x4) ************/
+	isLumaAC_4x4: action ==>
+		guard
+			Component        = Y_COMPONENT,
+			LumaMBType       = INTRA_4x4
+		do	
+			foreach int j in Integers(IdxValCoeff, SZ_LUMA_AC_4X4 - 1)
+			do
+				ValCoeff[j] := 0;
+			end
+			IdxValCoeff := 0;	
+		end
+
+
+	SendLumaAC_4x4.Launch: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_LUMA_AC_4X4
+		guard
+			NbBlocksSent     < 16
+		do	
+			NbBlocksSent := NbBlocksSent + 1;
+		end
+
+
+	SendLumaAC_4x4.LastBlock: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_LUMA_AC_4X4
+		do	
+			Component        := U_COMPONENT;
+			NbBlocksSent     := 0;
+		end
+
+
+		/************ Send Chroma DC Component ************/
+	isChromaDC: action ==>
+		guard
+			Component        != Y_COMPONENT,
+			DC_ComponentSent  = false
+		do
+			foreach int j in Integers(IdxValCoeff, SZ_CHROMA_DC - 1)
+			do
+				ValCoeff[j] := 0;
+			end
+			IdxValCoeff := 0;	
+		end
+
+
+	SendChromaDC: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_CHROMA_DC
+		do	
+			if(Component = U_COMPONENT) then
+				Component := V_COMPONENT;
+			else
+				Component := U_COMPONENT;	
+				DC_ComponentSent := true;	
+			end
+		end
+
+
+		/************ Send Chroma AC Component (4x4) ************/
+	isChromaAC: action ==>
+		guard
+			Component        != Y_COMPONENT,
+			DC_ComponentSent  = true
+		do	
+			foreach int j in Integers(IdxValCoeff, SZ_CHROMA_AC - 1)
+			do
+				ValCoeff[j] := 0;
+			end
+			IdxValCoeff := 0;	
+		end
+
+
+	SendChromaAC.Launch: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_CHROMA_AC
+		guard
+			NbBlocksSent     < 3
+		do
+			NbBlocksSent := NbBlocksSent + 1;
+		end
+
+
+	SendChromaAC.LastBlock_UComponent: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_CHROMA_AC
+		guard
+			Component = U_COMPONENT
+		do	
+			Component        := V_COMPONENT;
+			NbBlocksSent     := 0;
+		end
+
+
+	SendChromaAC.LastBlock_VComponent: action
+				==>
+			Coeff :[ValCoeff] repeat SZ_CHROMA_AC
+		do	
+			Component        := Y_COMPONENT;
+			NbBlocksSent     := 0;
+			DC_ComponentSent := false;
+		end
+
+	/* Scheduler */
+
+	schedule fsm ReadBlockType:
+
+		ReadBlockType    ( ReadBlockType                     )--> ReadData;
+		ReadBlockType    ( Block_Inter_or_PCM                )--> ReadBlockType;	
+
+		ReadData         ( NoLast_NoRun                      )--> ReadData;
+		ReadData         ( NoLast_Run                        )--> ReadData;
+		ReadData         ( Last_equaltrue                    )--> ChooseSizeData;
+
+		ChooseSizeData   ( isLumaDC_16x16                    )--> SendLumaDC_16x16;
+		SendLumaDC_16x16 ( SendLumaDC_16x16                  )--> ReadData;
+
+		ChooseSizeData   ( isLumaAC_16x16                    )--> SendLumaAC_16x16;
+		SendLumaAC_16x16 ( SendLumaAC_16x16                  )--> ReadData;
+
+		ChooseSizeData   ( isLumaAC_4x4                      )--> SendLuma_4x4;
+		SendLuma_4x4     ( SendLumaAC_4x4                    )--> ReadData;
+
+		ChooseSizeData   ( isChromaDC                        )--> SendChromaDC;
+		SendChromaDC     ( SendChromaDC                      )--> ReadData;
+
+		ChooseSizeData   ( isChromaAC                        )--> SendChromaAC;
+		SendChromaAC     ( SendChromaAC.Launch               )--> ReadData;
+		SendChromaAC     ( SendChromaAC.LastBlock_UComponent )--> ReadData;
+		SendChromaAC     ( SendChromaAC.LastBlock_VComponent )--> ReadBlockType;
+	end
+
+	priority
+		ReadBlockType           > Block_Inter_or_PCM;
+		NoLast_Run              > NoLast_NoRun                      > Last_equaltrue;
+		SendLumaAC_16x16.Launch > SendLumaAC_16x16.LastBlock;
+		SendLumaAC_4x4.Launch   > SendLumaAC_4x4.LastBlock;
+		SendChromaAC.Launch     > SendChromaAC.LastBlock_UComponent > SendChromaAC.LastBlock_VComponent;
+		isLumaAC_4x4            > isLumaAC_16x16                    > isChromaAC;
+		isChromaAC              > isChromaDC                        > isLumaDC_16x16;
+	end
 end

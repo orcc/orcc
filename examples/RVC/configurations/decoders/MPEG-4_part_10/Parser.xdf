@@ -474,14 +474,6 @@
     </Connection>
     <Connection dst="Algo_Synp_AVC" dst-port="nb_rbsp_bytes"
         src="Algo_NALU" src-port="nb_rbsp_bytes"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="RUN"
-        src="Algo_Synp_AVC" src-port="RUN"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="VALUE"
-        src="Algo_Synp_AVC" src-port="VALUE"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="LAST"
-        src="Algo_Synp_AVC" src-port="LAST"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
-        src="Algo_BlockExpand_AVC" src-port="Block"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="CurrMbAddr"
         src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="MbIntraFlag"
@@ -567,4 +559,14 @@
         src="Algo_MMCO" src-port="ShortTermList"/>
     <Connection dst="Algo_RefList0" dst-port="SzShortTermList"
         src="Algo_MMCO" src-port="SzShortTermList"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="Last"
+        src="Algo_Synp_AVC" src-port="LAST"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="Run"
+        src="Algo_Synp_AVC" src-port="RUN"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="Value"
+        src="Algo_Synp_AVC" src-port="VALUE"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="BlockType"
+        src="Algo_IntraPred_Split" src-port="MbType"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
+        src="Algo_BlockExpand_AVC" src-port="Coeff"/>
 </XDF>
