@@ -72,8 +72,7 @@ public class BoolToIntTransformation extends AbstractActorTransformation {
 	}
 
 	public void visitPort(OrderedMap<String, Port> ports) {
-		// Transform Local boolean Variable into int Variable (to be remove
-		// later)
+		// Transform Port into int Variable 
 		for (Port port : ports) {
 			if (port.getType().isBool()) {
 				port.setType(IrFactory.eINSTANCE.createTypeInt(32));
@@ -83,8 +82,7 @@ public class BoolToIntTransformation extends AbstractActorTransformation {
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
-		// Transform Local boolean Variable into int Variable (to be remove
-		// later)
+		// Transform Local boolean Variable assigned to port into int Variable
 		for (Variable var : procedure.getLocals()) {
 			if (((LocalVariable) var).isPort()) {
 				TypeList listType = (TypeList) var.getType();
