@@ -614,6 +614,8 @@ public abstract class AbstractSimulator implements Simulator {
 					break;
 				}
 			}
+			// Reset the state to IDLE for next launch
+			state = SimulatorState.IDLE;
 		} catch (CoreException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
