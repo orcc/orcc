@@ -57,19 +57,15 @@ using namespace std;
 
 static cl::opt<bool> Verbose("v", cl::desc("Print information about actions taken"));
  
-static cl::opt<std::string>
-VTLDir("L", cl::desc("Video Tools Library directory"), cl::value_desc("VTL Folder"));
-
-Module* JIT::LoadBitcode(string file) {
+Module* JIT::LoadBitcode(string file, string directory) {
 	sys::Path Filename;
 	string ErrorMessage;
 	file.append(".bc");
   
 
-	if (!VTLDir.empty()){
-		file.insert(0,VTLDir);
+	if (!directory.empty()){
+		file.insert(0,directory);
 	}
-
 
 	if (!Filename.set(file)) {
 		cout << "Invalid file name: '" << file << "'\n";

@@ -100,7 +100,7 @@ void UnprotectedFifo::createFifoMap (){
 }
 
 void UnprotectedFifo::parseHeader (){
-	header = jit->LoadBitcode("UnprotectedFifo");
+	header = jit->LoadBitcode("UnprotectedFifo", ToolsDir);
 
 	if (header == NULL){
 		fprintf(stderr,"Unable to parse fifo header file");

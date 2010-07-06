@@ -43,7 +43,7 @@
 #include "llvm/Metadata.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/ADT/StringRef.h"
-
+#include "llvm/Support/CommandLine.h"
 
 #include "llvm/Module.h"
 
@@ -65,6 +65,9 @@
 using namespace std;
 using namespace llvm;
 
+extern cl::opt<std::string> VTLDir;
+
+
 IRParser::IRParser(llvm::LLVMContext& C, JIT* jit) : Context(C){
 	this->jit = jit;
 }
@@ -80,7 +83,7 @@ Actor* IRParser::parseActor(string classz){
 		file = classz;
 	}
 	
-	Module* module = jit->LoadBitcode(file);
+	Module* module = jit->LoadBitcode(file, VTLDir);
 
 	if (module == 0){
 		fprintf(stderr,"Error when parsing bytecode");

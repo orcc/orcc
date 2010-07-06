@@ -39,6 +39,7 @@
 #ifndef JIT_H
 #define JIT_H
 
+// Video Tools Library directory
 #include <list>
 #include <map>
 
@@ -98,7 +99,7 @@ public:
 	 * @return the corresponding llvm::Module
 	 *
      */
-	llvm::Module* LoadBitcode(std::string file);
+	llvm::Module* LoadBitcode(std::string file, std::string directory);
 
 	
 	/**

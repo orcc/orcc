@@ -39,10 +39,14 @@
 #ifndef CIRCULARFIFO_H
 #define CIRCULARFIFO_H
 
+
+
 #include <list>
 #include <map>
 
 #include "llvm/Module.h"
+#include "llvm/Support/CommandLine.h"
+
 
 namespace llvm{
 	class LLVMContext;
@@ -51,8 +55,10 @@ namespace llvm{
 class Decoder;
 class JIT;
 class Connection;
-//------------------------------
 
+extern llvm::cl::opt<std::string> ToolsDir;
+
+//------------------------------
 /**
  * @brief  This class defines AbstractFifo.
  * 

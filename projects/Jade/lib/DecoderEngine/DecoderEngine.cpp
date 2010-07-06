@@ -51,6 +51,7 @@
 #include "SourceActor.h"
 #include "DisplayActor.h"
 #include "UnprotectedFifo.h"
+#include "Options.h"
 
 //------------------------------
 
@@ -62,6 +63,8 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C): Context(C) {
 	irParser = new IRParser(C, jit);
 
 	fus = new map<string, FuncUnit*>();
+
+	setOptions();
 	
 }
 

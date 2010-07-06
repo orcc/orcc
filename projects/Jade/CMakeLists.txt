@@ -59,9 +59,14 @@ else(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 	SEPARATE_ARGUMENTS(LLVM_CPP_FLAGS)
 endif(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 
-# Main directories
+# Set Jade flags
 set(JADE_MAIN_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(JADE_MAIN_INCLUDE_DIR ${JADE_MAIN_SRC_DIR}/include)
+set(JADE_TOOLS_DIR ${JADE_MAIN_SRC_DIR}/tools)
+set(JADE_VTL_DIR ${JADE_MAIN_SRC_DIR}/vtl)
+
+set(JADE_CPP_FLAGS  /D JADE_TOOLS_DIR=\\"${JADE_TOOLS_DIR}\\";
+				    /D JADE_VTL_DIR=\\"${JADE_VTL_DIR}\\")
 
 # Generate documentation option
 option(GENERATE_DOCS "Generate documentation using doxygen.")
@@ -89,7 +94,7 @@ add_subdirectory(lib/Graph)
 # Include directories
 include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS})
  
-add_definitions(${LLVM_CPP_FLAGS})
+add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
  
 # Executable
 add_executable(Jade Jade.cpp)

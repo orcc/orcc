@@ -54,35 +54,14 @@
 using namespace llvm;
 using namespace std;
 
+//Execution engine options
+extern cl::opt<bool> ForceInterpreter;
+extern cl::opt<std::string> MArch;
+extern cl::opt<bool> DisableCoreFiles;
+extern cl::opt<bool> NoLazyCompilation;
+extern cl::list<std::string> MAttrs;
+extern cl::opt<std::string> MCPU;
 
-  cl::opt<bool> ForceInterpreter("force-interpreter",
-                                 cl::desc("Force interpretation: disable JIT"),
-                                 cl::init(false));
-
-    cl::opt<std::string>
-  MArch("march",
-        cl::desc("Architecture to generate assembly for (see --version)"));
-
-	  cl::opt<bool>
-  DisableCoreFiles("disable-core-files", cl::Hidden,
-                   cl::desc("Disable emission of core files if possible"));
-
-    cl::opt<bool>
-  NoLazyCompilation("disable-lazy-compilation",
-                  cl::desc("Disable JIT lazy compilation"),
-                  cl::init(false));
-
-	  cl::list<std::string>
-  MAttrs("mattr",
-         cl::CommaSeparated,
-         cl::desc("Target specific attributes (-mattr=help for details)"),
-         cl::value_desc("a1,+a2,-a3,..."));
-
-cl::opt<std::string>
-  MCPU("mcpu",
-       cl::desc("Target a specific cpu type (-mcpu=help for details)"),
-       cl::value_desc("cpu-name"),
-       cl::init(""));
 
 //===----------------------------------------------------------------------===//
 // main Driver function

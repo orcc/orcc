@@ -1,6 +1,6 @@
 find_package(LibXml2)
 
-add_definitions(${LLVM_CPP_FLAGS})
+add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 
 IF (NOT LIBXML2_FOUND)
    FIND_PATH(LIBXML2_INCLUDE_DIR libxml/parser.h
