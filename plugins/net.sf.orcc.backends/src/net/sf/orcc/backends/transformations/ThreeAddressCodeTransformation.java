@@ -70,7 +70,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 /**
  * Split expression and effective node.
  * 
- * @author JŽr™me GORIN
+ * @author Jï¿½rï¿½me GORIN
  * @author Matthieu Wipliez
  * 
  */
@@ -125,25 +125,14 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			}
 
 			// Make the final asssignment
-			if (type.isBool()){
-				LocalVariable target = newVariableBool();
-				target.setType(type);
-				Assign assign = new Assign(location, target, new BinaryExpr(
-						location, e1, op, e2, IrFactory.eINSTANCE.createTypeBool()));
-				assign.setBlock(block);
-				it.add(assign);
-	
-				return new VarExpr(location, new Use(target));
-			} else {
-				LocalVariable target = newVariableInt();
-				target.setType(type);
-				Assign assign = new Assign(location, target, new BinaryExpr(
-						location, e1, op, e2, IrFactory.eINSTANCE.createTypeInt(32)));
-				assign.setBlock(block);
-				it.add(assign);
-	
-				return new VarExpr(location, new Use(target));				
-			}
+			LocalVariable target = newVariable(type);
+			target.setType(type);
+			Assign assign = new Assign(location, target, new BinaryExpr(
+					location, e1, op, e2, previousType));
+			assign.setBlock(block);
+			it.add(assign);
+
+			return new VarExpr(location, new Use(target));
 		}
 
 		@Override
@@ -206,60 +195,40 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 					}
 				}
 
+				// Make the final asssignment
+				LocalVariable target = newVariable(type);
+				Use use = new Use(target);
+				Location location = expr.getLocation();
+				target.setType(type);
 				if (expr.getType().isBool()) {
-					// Make the final asssignment
-					LocalVariable target = newVariableBool();
-					Use use = new Use(target);
-					Location location = expr.getLocation();
-					target.setType(type);
+
 					Assign assign = new Assign(location, target,
 							new BinaryExpr(location, expr, BinaryOp.LOGIC_OR,
-									new BoolExpr(false),
-									IrFactory.eINSTANCE.createTypeBool()));
+									new BoolExpr(false), expr.getType()));
 					assign.setBlock(block);
 					it.add(assign);
-					return new VarExpr(use);
 				} else {
-					LocalVariable target = newVariableInt();
-					Use use = new Use(target);
-					Location location = expr.getLocation();
-					target.setType(type);
 					Assign assign = new Assign(location, target,
 							new BinaryExpr(location, expr, BinaryOp.PLUS,
-									new IntExpr(0),
-									IrFactory.eINSTANCE.createTypeInt(32)));
+									new IntExpr(0), expr.getType()));
 					assign.setBlock(block);
 					it.add(assign);
-					return new VarExpr(use);
 				}
+				return new VarExpr(use);
 			}
 			return expr;
 		}
 
 		/**
-		 * Creates a new local variable with int(size=32) type
+		 * Creates a new local variable with type
 		 * 
-		 * @return a new local variable with int(size=32) type
+		 * @return a new local variable with type
 		 */
-		private LocalVariable newVariableInt() {
+		private LocalVariable newVariable(Type type) {
 			String procName = procedure.getName();
 
 			return new LocalVariable(true, tempVarCount++, new Location(),
-					procName + "_" + "expr",
-					IrFactory.eINSTANCE.createTypeInt(32));
-		}
-
-		/**
-		 * Creates a new local variable with boolean type
-		 * 
-		 * @return a new local variable with boolean type
-		 */
-		private LocalVariable newVariableBool() {
-			String procName = procedure.getName();
-
-			return new LocalVariable(true, tempVarCount++, new Location(),
-					procName + "_" + "expr",
-					IrFactory.eINSTANCE.createTypeBool());
+					procName + "_" + "expr", type);
 		}
 
 	}
@@ -335,12 +304,11 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			if (expr.getType().isBool()) {
 				BinaryOp op = BinaryOp.LOGIC_OR;
 				assign.setValue(new BinaryExpr(location, expr, op,
-						new BoolExpr(false), IrFactory.eINSTANCE
-								.createTypeBool()));
+						new BoolExpr(false), expr.getType()));
 			} else {
 				BinaryOp op = BinaryOp.PLUS;
 				assign.setValue(new BinaryExpr(location, expr, op, new IntExpr(
-						0), IrFactory.eINSTANCE.createTypeInt(32)));
+						0), expr.getType()));
 			}
 		}
 	}
@@ -392,10 +360,10 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	@Override
 	public void visit(Store store, Object... args) {
 		block = store.getBlock();
-		Variable target = store.getTarget();
-		Type targetType = target.getType(); 
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = store.getValue();
+		Variable target = store.getTarget();
+		Type targetType = target.getType(); 
 
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
@@ -413,6 +381,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			store.setValue(visitExpression(value, it,
 					IrFactory.eINSTANCE.createTypeInt(32)));
 		}
+		
 		it.next();
 	}
 
