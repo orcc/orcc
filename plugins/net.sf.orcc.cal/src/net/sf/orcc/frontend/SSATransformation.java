@@ -224,7 +224,9 @@ public class SSATransformation extends AbstractActorTransformation {
 	 *            an expression
 	 */
 	private void replaceUses(Expression expression) {
-		expression.accept(new UseUpdater());
+		if (expression != null) {
+			expression.accept(new UseUpdater());
+		}
 	}
 
 	/**

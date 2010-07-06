@@ -28,11 +28,14 @@
  */
 package net.sf.orcc.frontend;
 
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.util.Scope;
 
@@ -54,27 +57,51 @@ public class Context {
 	 */
 	private Scope<AstVariable, Variable> mapVariables;
 
+	/**
+	 * Contains the current procedures where local variables or nodes should be
+	 * added by the expression transformer or statement transformer.
+	 */
+	private Procedure procedure;
+
 	private Set<Variable> setGlobalsToLoad;
 
 	private Set<Variable> setGlobalsToStore;
 
 	/**
-	 * Creates a new context with the given values.
-	 * 
-	 * @param mapVariables
-	 *            a map from AST variables to IR variables
-	 * @param setGlobalsToLoad
-	 *            a set of globals to load
-	 * @param setGlobalsToStore
-	 *            a set of globals to store
+	 * Creates a new empty context.
 	 */
-	public Context(Map<Variable, LocalVariable> mapGlobals,
-			Scope<AstVariable, Variable> mapVariables,
-			Set<Variable> setGlobalsToLoad, Set<Variable> setGlobalsToStore) {
-		this.mapGlobals = mapGlobals;
-		this.mapVariables = mapVariables;
-		this.setGlobalsToLoad = setGlobalsToLoad;
-		this.setGlobalsToStore = setGlobalsToStore;
+	public Context() {
+		mapVariables = new Scope<AstVariable, Variable>();
+		mapGlobals = new HashMap<Variable, LocalVariable>();
+		setGlobalsToLoad = new LinkedHashSet<Variable>();
+		setGlobalsToStore = new LinkedHashSet<Variable>();
+	}
+
+	/**
+	 * Creates a new context with the given procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
+	public Context(Context context, Procedure procedure) {
+		this.procedure = procedure;
+
+		mapGlobals = new HashMap<Variable, LocalVariable>();
+		mapVariables = new Scope<AstVariable, Variable>(context
+				.getMapVariables().getParent(), true);
+		setGlobalsToLoad = new LinkedHashSet<Variable>();
+		setGlobalsToStore = new LinkedHashSet<Variable>();
+	}
+
+	/**
+	 * Clears this context.
+	 */
+	public void clear() {
+		mapGlobals.clear();
+		mapVariables.clear();
+		procedure = null;
+		setGlobalsToLoad.clear();
+		setGlobalsToStore.clear();
 	}
 
 	/**
@@ -96,6 +123,15 @@ public class Context {
 	}
 
 	/**
+	 * Returns the procedure field.
+	 * 
+	 * @return the procedure field
+	 */
+	public Procedure getProcedure() {
+		return procedure;
+	}
+
+	/**
 	 * Returns the setGlobalsToLoad field.
 	 * 
 	 * @return the setGlobalsToLoad field
@@ -111,6 +147,36 @@ public class Context {
 	 */
 	public Set<Variable> getSetGlobalsToStore() {
 		return setGlobalsToStore;
+	}
+
+	/**
+	 * Returns the IR variable associated with the given AST variable.
+	 * 
+	 * @param variable
+	 *            an AST variable
+	 * @return the IR variable associated with the given AST variable
+	 */
+	public Variable getVariable(AstVariable variable) {
+		return mapVariables.get(variable);
+	}
+
+	/**
+	 * Creates a new scope for mapVariables.
+	 */
+	public void newScope() {
+		mapVariables = new Scope<AstVariable, Variable>(mapVariables, true);
+	}
+
+	/**
+	 * Associates an IR variable with the given AST variable.
+	 * 
+	 * @param astVariable
+	 *            an AST variable
+	 * @param variable
+	 *            an IR variable associated with the given AST variable
+	 */
+	public void putVariable(AstVariable astVariable, Variable variable) {
+		mapVariables.put(astVariable, variable);
 	}
 
 }

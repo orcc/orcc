@@ -31,7 +31,6 @@ package net.sf.orcc.frontend;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -109,7 +108,6 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
-import net.sf.orcc.util.Scope;
 
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 
@@ -162,9 +160,7 @@ public class AstTransformer {
 			}
 
 			if (!mapFunctions.containsKey(astFunction)) {
-				Procedure current = procedure;
 				transformFunction(astFunction);
-				procedure = current;
 			}
 			Procedure procedure = mapFunctions.get(astFunction);
 
@@ -193,16 +189,17 @@ public class AstTransformer {
 			Expression condition = transformExpression(expression
 					.getCondition());
 
-			LocalVariable target = procedure.newTempLocalVariable(file,
-					expression.getIrType(), "_tmp_if");
+			LocalVariable target = context.getProcedure().newTempLocalVariable(
+					file, expression.getIrType(), "_tmp_if");
 
 			// transforms "then" statements and "else" statements
 			List<CFGNode> thenNodes = getNodes(target, expression.getThen());
 			List<CFGNode> elseNodes = getNodes(target, expression.getElse());
 
-			IfNode node = new IfNode(location, procedure, condition, thenNodes,
-					elseNodes, new BlockNode(procedure));
-			procedure.getNodes().add(node);
+			IfNode node = new IfNode(location, context.getProcedure(),
+					condition, thenNodes, elseNodes, new BlockNode(
+							context.getProcedure()));
+			context.getProcedure().getNodes().add(node);
 
 			Use use = new Use(target);
 			Expression varExpr = new VarExpr(location, use);
@@ -215,13 +212,14 @@ public class AstTransformer {
 
 			Location location = Util.getLocation(expression);
 			AstVariable astVariable = expression.getSource().getVariable();
-			Variable variable = mapVariables.get(astVariable);
+			Variable variable = context.getVariable(astVariable);
 
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
 
-			LocalVariable target = procedure.newTempLocalVariable(file,
-					expression.getIrType(), "local_" + variable.getName());
+			LocalVariable target = context.getProcedure()
+					.newTempLocalVariable(file, expression.getIrType(),
+							"local_" + variable.getName());
 
 			Load load = new Load(location, target, new Use(variable), indexes);
 			addInstruction(load);
@@ -264,8 +262,9 @@ public class AstTransformer {
 			AstVariable astVariable = expression.getValue().getVariable();
 			Location location = Util.getLocation(expression);
 
-			Variable variable = mapVariables.get(astVariable);
-			LocalVariable local = getLocalVariable(setGlobalsToLoad, variable);
+			Variable variable = context.getVariable(astVariable);
+			LocalVariable local = getLocalVariable(
+					context.getSetGlobalsToLoad(), variable);
 			Use use = new Use(local);
 			Expression varExpr = new VarExpr(location, use);
 			return varExpr;
@@ -284,10 +283,10 @@ public class AstTransformer {
 		private List<CFGNode> getNodes(LocalVariable target,
 				AstExpression astExpression) {
 			Location location = Util.getLocation(astExpression);
-			List<CFGNode> nodes = procedure.getNodes();
+			List<CFGNode> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
-			nodes.add(new BlockNode(procedure));
+			nodes.add(new BlockNode(context.getProcedure()));
 
 			Expression value = transformExpression(astExpression);
 			Assign assign = new Assign(location, target, value);
@@ -356,7 +355,7 @@ public class AstTransformer {
 
 			// get target
 			AstVariable astTarget = astAssign.getTarget().getVariable();
-			Variable target = mapVariables.get(astTarget);
+			Variable target = context.getVariable(astTarget);
 
 			// transform indexes and value
 			List<Expression> indexes = transformExpressions(astAssign
@@ -366,8 +365,8 @@ public class AstTransformer {
 			// add assign or store instruction
 			Instruction instruction;
 			if (indexes.isEmpty()) {
-				LocalVariable local = getLocalVariable(setGlobalsToStore,
-						target);
+				LocalVariable local = getLocalVariable(
+						context.getSetGlobalsToStore(), target);
 				instruction = new Assign(location, local, value);
 			} else {
 				instruction = new Store(location, target, indexes, value);
@@ -384,9 +383,7 @@ public class AstTransformer {
 			// retrieve IR procedure
 			AstProcedure astProcedure = astCall.getProcedure();
 			if (!mapProcedures.containsKey(astProcedure)) {
-				Procedure current = procedure;
 				transformProcedure(astProcedure);
-				procedure = current;
 			}
 			Procedure procedure = mapProcedures.get(astProcedure);
 
@@ -414,9 +411,9 @@ public class AstTransformer {
 			List<CFGNode> thenNodes = getNodes(stmtIf.getThen());
 			List<CFGNode> elseNodes = getNodes(stmtIf.getElse());
 
-			IfNode node = new IfNode(procedure, condition, thenNodes,
-					elseNodes, new BlockNode(procedure));
-			procedure.getNodes().add(node);
+			IfNode node = new IfNode(context.getProcedure(), condition,
+					thenNodes, elseNodes, new BlockNode(context.getProcedure()));
+			context.getProcedure().getNodes().add(node);
 
 			return null;
 		}
@@ -437,10 +434,10 @@ public class AstTransformer {
 		 * @return a list of CFG nodes
 		 */
 		private List<CFGNode> getNodes(List<AstStatement> statements) {
-			List<CFGNode> nodes = procedure.getNodes();
+			List<CFGNode> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
-			nodes.add(new BlockNode(procedure));
+			nodes.add(new BlockNode(context.getProcedure()));
 			transformStatements(statements);
 			int last = nodes.size();
 
@@ -453,6 +450,8 @@ public class AstTransformer {
 		}
 
 	}
+
+	private Context context;
 
 	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
 			.compile("\\.");
@@ -472,8 +471,6 @@ public class AstTransformer {
 	 */
 	final private Map<AstFunction, Procedure> mapFunctions;
 
-	private Map<Variable, LocalVariable> mapGlobals;
-
 	/**
 	 * A map from AST ports to IR ports.
 	 */
@@ -484,28 +481,13 @@ public class AstTransformer {
 	 */
 	final private Map<AstProcedure, Procedure> mapProcedures;
 
-	/**
-	 * A map from AST variables to IR variables.
-	 */
-	private Scope<AstVariable, Variable> mapVariables;
-
 	@Inject
 	private IQualifiedNameProvider nameProvider;
-
-	/**
-	 * Contains the current procedures where local variables or nodes should be
-	 * added by the expression transformer or statement transformer.
-	 */
-	private Procedure procedure;
 
 	/**
 	 * the list of procedures of the IR actor.
 	 */
 	private OrderedMap<String, Procedure> procedures;
-
-	private Set<Variable> setGlobalsToLoad;
-
-	private Set<Variable> setGlobalsToStore;
 
 	/**
 	 * statement transformer.
@@ -519,7 +501,8 @@ public class AstTransformer {
 		mapFunctions = new HashMap<AstFunction, Procedure>();
 		mapPorts = new HashMap<AstPort, Port>();
 		mapProcedures = new HashMap<AstProcedure, Procedure>();
-		mapVariables = new Scope<AstVariable, Variable>();
+
+		context = new Context();
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
@@ -538,8 +521,9 @@ public class AstTransformer {
 		List<LocalVariable> hasTokenList = new ArrayList<LocalVariable>(
 				inputPattern.size());
 		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
-			LocalVariable target = procedure.newTempLocalVariable(file,
-					IrFactory.eINSTANCE.createTypeBool(), "_tmp_hasTokens");
+			LocalVariable target = context.getProcedure().newTempLocalVariable(
+					file, IrFactory.eINSTANCE.createTypeBool(),
+					"_tmp_hasTokens");
 			hasTokenList.add(target);
 
 			Port port = entry.getKey();
@@ -571,7 +555,8 @@ public class AstTransformer {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new IntExpr(i));
 
-				LocalVariable irToken = (LocalVariable) mapVariables.get(token);
+				LocalVariable irToken = (LocalVariable) context
+						.getVariable(token);
 				Load load = new Load(portVariable.getLocation(), irToken,
 						new Use(portVariable), indexes);
 				addInstruction(load);
@@ -621,7 +606,7 @@ public class AstTransformer {
 	 *            an instruction
 	 */
 	private void addInstruction(Instruction instruction) {
-		BlockNode block = BlockNode.getLast(procedure);
+		BlockNode block = BlockNode.getLast(context.getProcedure());
 		block.add(instruction);
 	}
 
@@ -649,7 +634,7 @@ public class AstTransformer {
 
 			// create "else" node with Assign(result, false)
 			List<CFGNode> elseNodes = new ArrayList<CFGNode>(1);
-			BlockNode block = new BlockNode(procedure);
+			BlockNode block = new BlockNode(context.getProcedure());
 			Assign assign = new Assign(result, new BoolExpr(false));
 			block.add(assign);
 			elseNodes.add(block);
@@ -664,9 +649,9 @@ public class AstTransformer {
 			}
 
 			// create "if" node
-			IfNode node = new IfNode(procedure, condition, thenNodes,
-					elseNodes, new BlockNode(procedure));
-			procedure.getNodes().add(node);
+			IfNode node = new IfNode(context.getProcedure(), condition,
+					thenNodes, elseNodes, new BlockNode(context.getProcedure()));
+			context.getProcedure().getNodes().add(node);
 		}
 	}
 
@@ -681,11 +666,11 @@ public class AstTransformer {
 	 */
 	private LocalVariable createPortVariable(Port port, int numTokens) {
 		// create the variable to hold the tokens
-		LocalVariable target = new LocalVariable(true, 0,
-				procedure.getLocation(), port.getName(),
+		LocalVariable target = new LocalVariable(true, 0, context
+				.getProcedure().getLocation(), port.getName(),
 				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()));
-		procedure.getLocals().put(file, target.getLocation(), target.getName(),
-				target);
+		context.getProcedure().getLocals()
+				.put(file, target.getLocation(), target.getName(), target);
 
 		return target;
 	}
@@ -757,11 +742,11 @@ public class AstTransformer {
 	 */
 	private LocalVariable getLocalVariable(Set<Variable> set, Variable variable) {
 		if (variable.isGlobal()) {
-			LocalVariable local = mapGlobals.get(variable);
+			LocalVariable local = context.getMapGlobals().get(variable);
 			if (local == null) {
-				local = procedure.newTempLocalVariable(file,
+				local = context.getProcedure().newTempLocalVariable(file,
 						variable.getType(), "local_" + variable.getName());
-				mapGlobals.put(variable, local);
+				context.getMapGlobals().put(variable, local);
 			}
 
 			set.add(variable);
@@ -777,66 +762,56 @@ public class AstTransformer {
 	 */
 	private void loadGlobals() {
 		int i = 0;
-		for (Variable global : setGlobalsToLoad) {
-			LocalVariable local = mapGlobals.get(global);
+		for (Variable global : context.getSetGlobalsToLoad()) {
+			LocalVariable local = context.getMapGlobals().get(global);
 
 			List<Expression> indexes = new ArrayList<Expression>(0);
 			Load load = new Load(local, new Use(global), indexes);
-			BlockNode block = BlockNode.getFirst(procedure);
+			BlockNode block = BlockNode.getFirst(context.getProcedure());
 			block.add(i, load);
 			i++;
 		}
 
-		setGlobalsToLoad.clear();
+		context.getSetGlobalsToLoad().clear();
 	}
 
 	/**
-	 * Create a new scope that extends variablesMap.
+	 * Returns the current context, and creates a new one.
 	 * 
-	 * @return the previous scope
+	 * @return the current context
 	 */
-	private Context newContext() {
-		Context context = new Context(mapGlobals, mapVariables,
-				setGlobalsToLoad, setGlobalsToStore);
-
-		// new scope that inherits from previous mapVariables scope
-		mapVariables = new Scope<AstVariable, Variable>(mapVariables, true);
-
-		mapGlobals = new HashMap<Variable, LocalVariable>();
-		setGlobalsToLoad = new LinkedHashSet<Variable>();
-		setGlobalsToStore = new LinkedHashSet<Variable>();
-
-		return context;
+	private Context newContext(Procedure procedure) {
+		Context oldContext = context;
+		context = new Context(context, procedure);
+		return oldContext;
 	}
 
 	/**
-	 * Restores the context:
-	 * <ul>
-	 * <li>clears {@link #mapGlobals}</li>
-	 * <li>restores previous scope
-	 * </ul>
+	 * Loads globals at the beginning of the current procedure, stores them at
+	 * the end, add a return instruction, and restores the con
 	 * 
-	 * @param oldScope
-	 *            the previous scope returned by {@link #newContext()}
+	 * @param context
+	 *            the context returned by {@link #newContext()}
+	 * @param value
+	 *            an expression to return, possibly <code>null</code> for
+	 *            imperative procedures
 	 */
-	private void restoreContext(Context context) {
+	private void restoreContext(Context context, Expression value) {
 		loadGlobals();
 		storeGlobals();
 
-		mapGlobals = context.getMapGlobals();
-		setGlobalsToLoad = context.getSetGlobalsToLoad();
-		setGlobalsToStore = context.getSetGlobalsToStore();
+		Return returnInstr = new Return(value);
+		addInstruction(returnInstr);
 
-		// restore previous scope
-		mapVariables = context.getMapVariables();
+		this.context = context;
 	}
 
 	/**
 	 * Writes back the globals that need to be stored.
 	 */
 	private void storeGlobals() {
-		for (Variable global : setGlobalsToStore) {
-			LocalVariable local = mapGlobals.get(global);
+		for (Variable global : context.getSetGlobalsToStore()) {
+			LocalVariable local = context.getMapGlobals().get(global);
 			VarExpr value = new VarExpr(new Use(local));
 
 			List<Expression> indexes = new ArrayList<Expression>(0);
@@ -844,7 +819,7 @@ public class AstTransformer {
 			addInstruction(store);
 		}
 
-		setGlobalsToStore.clear();
+		context.getSetGlobalsToStore().clear();
 	}
 
 	/**
@@ -869,10 +844,16 @@ public class AstTransformer {
 			// first state variables, because port's sizes may depend on them.
 			OrderedMap<String, Variable> stateVars = transformGlobalVariables(astActor
 					.getStateVariables());
+
+			// then ports
 			OrderedMap<String, Port> inputs = transformPorts(astActor
 					.getInputs());
 			OrderedMap<String, Port> outputs = transformPorts(astActor
 					.getOutputs());
+
+			// creates a new scope before translating things with local
+			// variables
+			context.newScope();
 
 			// transforms functions and procedures
 			procedures = new OrderedMap<String, Procedure>();
@@ -911,12 +892,12 @@ public class AstTransformer {
 					initializes.getAllActions(), scheduler);
 		} finally {
 			// cleanup
+			context.clear();
+
 			mapFunctions.clear();
 			mapPorts.clear();
 			mapProcedures.clear();
-			mapVariables.clear();
 
-			procedure = null;
 			procedures.clear();
 		}
 	}
@@ -976,17 +957,14 @@ public class AstTransformer {
 	 *            the procedure that will contain the body
 	 */
 	private void transformActionBody(AstAction astAction, Procedure body) {
-		// current procedure is the body
-		procedure = body;
-
-		Context context = newContext();
+		Context oldContext = newContext(body);
 
 		transformInputPattern(astAction, Read.class);
 		transformLocalVariables(astAction.getVariables());
 		transformStatements(astAction.getStatements());
 		transformOutputPattern(astAction);
 
-		restoreContext(context);
+		restoreContext(oldContext, null);
 	}
 
 	/**
@@ -1019,13 +997,10 @@ public class AstTransformer {
 	 */
 	private void transformActionScheduler(AstAction astAction,
 			Procedure scheduler, Pattern inputPattern) {
-		// current procedure is the scheduler
-		procedure = scheduler;
+		Context oldContext = newContext(scheduler);
 
-		Context context = newContext();
-
-		LocalVariable result = procedure.newTempLocalVariable(file,
-				IrFactory.eINSTANCE.createTypeBool(), "result");
+		LocalVariable result = context.getProcedure().newTempLocalVariable(
+				file, IrFactory.eINSTANCE.createTypeBool(), "result");
 
 		List<AstExpression> guards = astAction.getGuards();
 		if (inputPattern.isEmpty() && guards.isEmpty()) {
@@ -1036,11 +1011,7 @@ public class AstTransformer {
 			createActionTest(astAction, inputPattern, result);
 		}
 
-		restoreContext(context);
-
-		// return result
-		Return returnInstr = new Return(new VarExpr(new Use(result)));
-		addInstruction(returnInstr);
+		restoreContext(oldContext, new VarExpr(new Use(result)));
 	}
 
 	/**
@@ -1088,19 +1059,14 @@ public class AstTransformer {
 		Location location = Util.getLocation(astFunction);
 		Type type = astFunction.getIrType();
 
-		// sets the current procedure
-		procedure = new Procedure(name, location, type);
-
-		Context context = newContext();
+		Procedure procedure = new Procedure(name, location, type);
+		Context oldContext = newContext(procedure);
 
 		transformParameters(astFunction.getParameters());
 		transformLocalVariables(astFunction.getVariables());
 		Expression value = transformExpression(astFunction.getExpression());
 
-		restoreContext(context);
-
-		Return returnInstr = new Return(location, value);
-		addInstruction(returnInstr);
+		restoreContext(oldContext, value);
 
 		procedures.put(file, location, name, procedure);
 		mapFunctions.put(astFunction, procedure);
@@ -1131,7 +1097,7 @@ public class AstTransformer {
 					name, assignable, initialValue);
 			stateVars.put(file, location, name, stateVariable);
 
-			mapVariables.put(astVariable, stateVariable);
+			context.putVariable(astVariable, stateVariable);
 		}
 
 		return stateVars;
@@ -1203,8 +1169,8 @@ public class AstTransformer {
 			// declare tokens
 			for (AstVariable token : tokens) {
 				LocalVariable local = transformLocalVariable(token);
-				procedure.getLocals().put(file, local.getLocation(),
-						local.getName(), local);
+				context.getProcedure().getLocals()
+						.put(file, local.getLocation(), local.getName(), local);
 			}
 
 			// loads tokens
@@ -1226,10 +1192,10 @@ public class AstTransformer {
 	 */
 	private List<CFGNode> transformInputPatternAndGuards(AstAction astAction,
 			LocalVariable result) {
-		List<CFGNode> nodes = procedure.getNodes();
+		List<CFGNode> nodes = context.getProcedure().getNodes();
 
 		int first = nodes.size();
-		nodes.add(new BlockNode(procedure));
+		nodes.add(new BlockNode(context.getProcedure()));
 
 		List<AstExpression> guards = astAction.getGuards();
 		if (guards.isEmpty()) {
@@ -1276,7 +1242,7 @@ public class AstTransformer {
 			addInstruction(assign);
 		}
 
-		mapVariables.put(astVariable, local);
+		context.putVariable(astVariable, local);
 		return local;
 	}
 
@@ -1290,8 +1256,8 @@ public class AstTransformer {
 	private void transformLocalVariables(List<AstVariable> variables) {
 		for (AstVariable astVariable : variables) {
 			LocalVariable local = transformLocalVariable(astVariable);
-			procedure.getLocals().put(file, local.getLocation(),
-					local.getName(), local);
+			context.getProcedure().getLocals()
+					.put(file, local.getLocation(), local.getName(), local);
 		}
 	}
 
@@ -1340,8 +1306,8 @@ public class AstTransformer {
 	private void transformParameters(List<AstVariable> parameters) {
 		for (AstVariable astParameter : parameters) {
 			LocalVariable local = transformLocalVariable(astParameter);
-			procedure.getParameters().put(file, local.getLocation(),
-					local.getName(), local);
+			context.getProcedure().getParameters()
+					.put(file, local.getLocation(), local.getName(), local);
 		}
 	}
 
@@ -1377,17 +1343,15 @@ public class AstTransformer {
 		String name = astProcedure.getName();
 		Location location = Util.getLocation(astProcedure);
 
-		// sets the current procedure
-		procedure = new Procedure(name, location,
+		Procedure procedure = new Procedure(name, location,
 				IrFactory.eINSTANCE.createTypeVoid());
-
-		Context context = newContext();
+		Context oldContext = newContext(procedure);
 
 		transformParameters(astProcedure.getParameters());
 		transformLocalVariables(astProcedure.getVariables());
 		transformStatements(astProcedure.getStatements());
 
-		restoreContext(context);
+		restoreContext(oldContext, null);
 
 		procedures.put(file, location, name, procedure);
 		mapProcedures.put(astProcedure, procedure);
