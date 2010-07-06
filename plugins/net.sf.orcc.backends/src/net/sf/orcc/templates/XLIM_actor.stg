@@ -201,7 +201,7 @@ $<operation kind="assign" target="$op.target$">
 else
 $<operation kind="noop">
 	$port(dir="in", source=op.value.var)$
-	$port(dir="out", type=op.target.type, source=op.target)$
+	$port(dir="out", type=op.value.type, source=op.target)$
 </operation>$endif$
 >>
 
