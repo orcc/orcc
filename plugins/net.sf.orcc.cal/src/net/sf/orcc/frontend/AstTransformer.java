@@ -502,8 +502,6 @@ public class AstTransformer {
 		mapPorts = new HashMap<AstPort, Port>();
 		mapProcedures = new HashMap<AstProcedure, Procedure>();
 
-		context = new Context();
-
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
 	}
@@ -836,6 +834,8 @@ public class AstTransformer {
 
 		// gets the name of the actor and resets the untagged action counter
 		String name = nameProvider.getQualifiedName(astActor);
+
+		context = new Context();
 		try {
 			// parameters
 			OrderedMap<String, Variable> parameters = transformGlobalVariables(astActor
@@ -886,6 +886,8 @@ public class AstTransformer {
 						fsm);
 			}
 
+			context.restoreScope();
+
 			// create IR actor
 			return new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procedures, actions.getAllActions(),
@@ -893,6 +895,7 @@ public class AstTransformer {
 		} finally {
 			// cleanup
 			context.clear();
+			context = null;
 
 			mapFunctions.clear();
 			mapPorts.clear();

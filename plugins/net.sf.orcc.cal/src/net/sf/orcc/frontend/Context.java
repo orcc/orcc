@@ -168,6 +168,13 @@ public class Context {
 	}
 
 	/**
+	 * Restores the scope for mapVariables.
+	 */
+	public void restoreScope() {
+		mapVariables = mapVariables.getParent();
+	}
+
+	/**
 	 * Associates an IR variable with the given AST variable.
 	 * 
 	 * @param astVariable
