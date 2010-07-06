@@ -88,19 +88,18 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = {
-				new DeadGlobalElimination(),
-				new DeadCodeElimination(),
-				new DeadVariableRemoval(),
+		ActorTransformation[] transformations = { new DeadGlobalElimination(),
+				new DeadCodeElimination(), new DeadVariableRemoval(),
 
 				// renames reserved keywords
 				new RenameTransformation(this.transformations),
 
+				new Inline(), new PhiRemoval(), new VariableRedimension(),
+				new BoolExprTransform(), new VariableRenamer(),
+
 				// replaces adjacent underscores by a single underscore
 				new RenameTransformation(adjacentUnderscores, "_"),
 
-				new Inline(), new PhiRemoval(), new VariableRedimension(),
-				new BoolExprTransform(), new VariableRenamer(),
 				new TransformConditionals() };
 
 		for (ActorTransformation transformation : transformations) {
