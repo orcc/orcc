@@ -375,7 +375,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockExpand_AVC_FREXT"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockExpand_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -461,6 +461,24 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Demux_Cavlc_Cabac">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Demux_Cavlc_Cabac"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Mux_Cavlc_Cabac">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Mux_Cavlc_Cabac"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -492,14 +510,6 @@
     </Connection>
     <Connection dst="Algo_Synp_AVC" dst-port="nb_rbsp_bytes"
         src="Algo_NALU" src-port="nb_rbsp_bytes"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="RUN"
-        src="Algo_Synp_AVC" src-port="RUN"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="VALUE"
-        src="Algo_Synp_AVC" src-port="VALUE"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="LAST"
-        src="Algo_Synp_AVC" src-port="LAST"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
-        src="Algo_BlockExpand_AVC" src-port="Block"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="CurrMbAddr"
         src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
     <Connection dst="Algo_IntraPred_Split" dst-port="MbIntraFlag"
@@ -579,8 +589,6 @@
     <Connection dst="Algo_RefList0" dst-port="IsIDR" src="Algo_MMCO" src-port="IsIDR"/>
     <Connection dst="Algo_RefList0" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="ENTROPY_TYPE"
-        src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
     <Connection dst="Algo_RefList0" dst-port="SzShortTermList"
         src="Algo_MMCO" src-port="SzShortTermList"/>
     <Connection dst="Algo_RefList0" dst-port="ShortTermList"
@@ -604,4 +612,24 @@
     <Connection dst="Algo_RefList1" dst-port="RefReordering"
         src="Algo_Synp_AVC" src-port="RefReordering_l1"/>
     <Connection dst="Black_Hole" dst-port="Token" src="Algo_RefList1" src-port="RefList"/>
+    <Connection dst="Demux_Cavlc_Cabac" dst-port="EntropyType"
+        src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
+    <Connection dst="Demux_Cavlc_Cabac" dst-port="Value"
+        src="Algo_Synp_AVC" src-port="VALUE"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="Last"
+        src="Algo_Synp_AVC" src-port="LAST"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="Run"
+        src="Algo_Synp_AVC" src-port="RUN"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="Value"
+        src="Demux_Cavlc_Cabac" src-port="Cavlc_output"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="BlockType"
+        src="Algo_IntraPred_Split" src-port="MbType"/>
+    <Connection dst="Mux_Cavlc_Cabac" dst-port="Cabac_coeff"
+        src="Demux_Cavlc_Cabac" src-port="Cabac_output"/>
+    <Connection dst="Mux_Cavlc_Cabac" dst-port="Cavlc_coeff"
+        src="Algo_BlockExpand_AVC" src-port="Coeff"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
+        src="Mux_Cavlc_Cabac" src-port="Coeff"/>
+    <Connection dst="Mux_Cavlc_Cabac" dst-port="EntropyType"
+        src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
 </XDF>

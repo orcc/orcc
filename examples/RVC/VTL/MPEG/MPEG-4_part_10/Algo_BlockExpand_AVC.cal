@@ -59,7 +59,7 @@ actor Algo_BlockExpand_AVC ()
 	uint(size=4)  Run,  
 	bool          Last
 		==> 
-	int(size=16) Coeff
+	int(size=12) Coeff
 		:
 
 	/* Constants */

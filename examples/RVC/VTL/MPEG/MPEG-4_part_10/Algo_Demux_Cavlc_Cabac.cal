@@ -1,7 +1,7 @@
 /********************************************************************************
 
 This software module was originally developed by 
-Florian Decologne (IETR/INSA of Rennes), 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
 in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
 for reference purposes and its performance may not have been optimized. 
 This software module is an implementation of one or more tools as 
@@ -50,43 +50,57 @@ Standards.
 
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
+
 *****************************************************************************/
 
-actor Algo_BlockSplit_AVC () 
-		int(size=12) Block 
-		==>  
-			int(size=16) Block_Y_DC, 
-			int(size=16) Block_Y_AC,
-			int(size=16) Block_U_DC,
-			int(size=16) Block_U_AC,
-			int(size=16) Block_V_DC,
-			int(size=16) Block_V_AC:
+actor Algo_Demux_Cavlc_Cabac()
+	int(size=2)  EntropyType,
+	int(size=12) Value
+		==>
+	int(size=12) Cavlc_output,
+	int(size=12) Cabac_output
+		:
 
-  splitY_DC: action Block:[ x ] repeat 16 ==> Block_Y_DC:[ x ] repeat 16 
-  end
-  
-  splitY_AC: action Block:[ x ] repeat 16 * 16 ==> Block_Y_AC:[ x ] repeat 16 * 16 
-  end
-  
-  splitU_DC: action Block:[ x ] repeat 4 ==> Block_U_DC:[ x ] repeat 4
-  end
-  
-  splitV_DC: action Block:[ x ] repeat 4 ==> Block_V_DC:[ x ] repeat 4 
-  end
-  
-  splitU_AC: action Block:[ x ] repeat 8 * 8 ==> Block_U_AC:[ x ] repeat 8 * 8 
-  end
-  
-  splitV_AC: action Block:[ x ] repeat 8 * 8 ==> Block_V_AC:[ x ] repeat 8 * 8 
-  end
-  
-  schedule fsm  splitY_DC:
-  	splitY_DC				(splitY_DC) 		--> splitY_AC;
-  	splitY_AC			  	(splitY_AC) 		--> splitU_DC;
-  	splitU_DC				(splitU_DC) 		--> splitV_DC;
-  	splitV_DC				(splitV_DC) 		--> splitU_AC;
-  	splitU_AC			  	(splitU_AC) 		--> splitV_AC;
-  	splitV_AC			  	(splitV_AC) 		--> splitY_DC;
-  end
-  
+	int(size=2) CAVLC_TYPE = 0;
+	int(size=2) CABAC_TYPE = 1;
+
+
+	IsCAVLC: action
+			EntropyType :[Entropy_type]
+				==>
+		guard
+			Entropy_type = CAVLC_TYPE
+		end
+
+
+	IsCABAC: action
+			EntropyType :[Entropy_type]
+				==>
+		guard
+			Entropy_type = CABAC_TYPE
+		end
+
+
+	CavlcEntropy: action
+			Value        :[Val]
+				==>
+			Cavlc_output :[Val]
+		end	
+
+
+	CabacEntropy: action
+			Value        :[Val]
+				==>
+			Cabac_output :[Val]
+		end	
+
+
+	schedule fsm choose_entropy:
+		choose_entropy (IsCAVLC      )--> CavlcEntropy;
+		choose_entropy (IsCABAC      )--> CabacEntropy;
+
+		CavlcEntropy   (CavlcEntropy )--> CavlcEntropy;
+
+		CabacEntropy   (CabacEntropy )--> CabacEntropy;
+	end
 end
