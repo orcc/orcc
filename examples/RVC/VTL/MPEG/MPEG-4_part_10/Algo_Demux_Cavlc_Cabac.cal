@@ -54,11 +54,13 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
 actor Algo_Demux_Cavlc_Cabac()
-	int(size=2)  EntropyType,
-	int(size=12) Value
+	int (size=2)  EntropyType,
+	uint(size=8)  BlockType,
+	int (size=12) Value
 		==>
-	int(size=12) Cavlc_output,
-	int(size=12) Cabac_output
+	int (size=12) Cavlc_value,
+	uint(size=8)  Cavlc_BlockType,	
+	int (size=12) Cabac_value
 		:
 
 	int(size=2) CAVLC_TYPE = 0;
@@ -81,18 +83,31 @@ actor Algo_Demux_Cavlc_Cabac()
 		end
 
 
-	CavlcEntropy: action
-			Value        :[Val]
+	CavlcEntropy.TransmitValue: action
+			Value       :[Val]
 				==>
-			Cavlc_output :[Val]
-		end	
+			Cavlc_value :[Val]
+		end
 
 
-	CabacEntropy: action
+	CavlcEntropy.TransmitBlockType: action
+			BlockType       :[Val]
+				==>
+			Cavlc_BlockType :[Val]
+		end
+
+
+	CabacEntropy.TransmitValue: action
 			Value        :[Val]
 				==>
-			Cabac_output :[Val]
-		end	
+			Cabac_value :[Val]
+		end
+
+
+	CabacEntropy.EatToken: action
+			BlockType       :[Val]	
+				==>
+		end
 
 
 	schedule fsm choose_entropy:
@@ -102,5 +117,9 @@ actor Algo_Demux_Cavlc_Cabac()
 		CavlcEntropy   (CavlcEntropy )--> CavlcEntropy;
 
 		CabacEntropy   (CabacEntropy )--> CabacEntropy;
+	end
+	priority
+		CabacEntropy.EatToken      > CabacEntropy.TransmitValue;
+		CavlcEntropy.TransmitValue > CavlcEntropy.TransmitBlockType;
 	end
 end

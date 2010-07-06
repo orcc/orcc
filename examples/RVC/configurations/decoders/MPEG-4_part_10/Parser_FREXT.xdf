@@ -620,16 +620,18 @@
         src="Algo_Synp_AVC" src-port="LAST"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="Run"
         src="Algo_Synp_AVC" src-port="RUN"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="Value"
-        src="Demux_Cavlc_Cabac" src-port="Cavlc_output"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="BlockType"
-        src="Algo_IntraPred_Split" src-port="MbType"/>
-    <Connection dst="Mux_Cavlc_Cabac" dst-port="Cabac_coeff"
-        src="Demux_Cavlc_Cabac" src-port="Cabac_output"/>
     <Connection dst="Mux_Cavlc_Cabac" dst-port="Cavlc_coeff"
         src="Algo_BlockExpand_AVC" src-port="Coeff"/>
     <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
         src="Mux_Cavlc_Cabac" src-port="Coeff"/>
     <Connection dst="Mux_Cavlc_Cabac" dst-port="EntropyType"
         src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="BlockType"
+        src="Demux_Cavlc_Cabac" src-port="Cavlc_BlockType"/>
+    <Connection dst="Demux_Cavlc_Cabac" dst-port="BlockType"
+        src="Algo_IntraPred_Split" src-port="MbType"/>
+    <Connection dst="Mux_Cavlc_Cabac" dst-port="Cabac_coeff"
+        src="Demux_Cavlc_Cabac" src-port="Cabac_value"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="Value"
+        src="Demux_Cavlc_Cabac" src-port="Cavlc_value"/>
 </XDF>
