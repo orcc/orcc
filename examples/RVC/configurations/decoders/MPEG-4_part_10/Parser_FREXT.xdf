@@ -483,8 +483,6 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="Algo_NALU" dst-port="bits8" src="" src-port="bits8"/>
-    <Connection dst="" dst-port="CoefDC_L" src="Algo_BlockSplit_AVC" src-port="Block_Y_DC"/>
-    <Connection dst="" dst-port="CoefAC_L" src="Algo_BlockSplit_AVC" src-port="Block_Y_AC"/>
     <Connection dst="" dst-port="ScalingList" src="Algo_Synp_AVC" src-port="ScalingList"/>
     <Connection dst="" dst-port="QP" src="Algo_Synp_AVC" src-port="QP"/>
     <Connection dst="" dst-port="CurrMbAddr" src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
@@ -539,10 +537,6 @@
         src="Algo_Synp_AVC" src-port="RefIdx"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
     <Connection dst="Algo_MMCO" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
-    <Connection dst="" dst-port="CoefDC_Cr" src="Algo_BlockSplit_AVC" src-port="Block_V_DC"/>
-    <Connection dst="" dst-port="CoefDC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_DC"/>
-    <Connection dst="" dst-port="CoefAC_Cb" src="Algo_BlockSplit_AVC" src-port="Block_U_AC"/>
-    <Connection dst="" dst-port="CoefAC_Cr" src="Algo_BlockSplit_AVC" src-port="Block_V_AC"/>
     <Connection dst="" dst-port="QP_Cb" src="Algo_Synp_AVC" src-port="QP_Cb"/>
     <Connection dst="" dst-port="QP_Cr" src="Algo_Synp_AVC" src-port="QP_Cr"/>
     <Connection dst="" dst-port="IntraPredModeC" src="Algo_Synp_AVC" src-port="IntraPredModeC"/>
@@ -622,8 +616,6 @@
         src="Algo_Synp_AVC" src-port="RUN"/>
     <Connection dst="Mux_Cavlc_Cabac" dst-port="Cavlc_coeff"
         src="Algo_BlockExpand_AVC" src-port="Coeff"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Block"
-        src="Mux_Cavlc_Cabac" src-port="Coeff"/>
     <Connection dst="Mux_Cavlc_Cabac" dst-port="EntropyType"
         src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="BlockType"
@@ -634,4 +626,14 @@
         src="Demux_Cavlc_Cabac" src-port="Cabac_value"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="Value"
         src="Demux_Cavlc_Cabac" src-port="Cavlc_value"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Coeff"
+        src="Mux_Cavlc_Cabac" src-port="Coeff"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="MbType"
+        src="Algo_IntraPred_Split" src-port="MbType"/>
+    <Connection dst="" dst-port="CoefAC_Cb" src="Algo_BlockSplit_AVC" src-port="Coeff_U_AC"/>
+    <Connection dst="" dst-port="CoefDC_Cb" src="Algo_BlockSplit_AVC" src-port="Coeff_U_DC"/>
+    <Connection dst="" dst-port="CoefAC_Cr" src="Algo_BlockSplit_AVC" src-port="Coeff_V_AC"/>
+    <Connection dst="" dst-port="CoefDC_Cr" src="Algo_BlockSplit_AVC" src-port="Coeff_V_DC"/>
+    <Connection dst="" dst-port="CoefAC_L" src="Algo_BlockSplit_AVC" src-port="Coeff_Y_AC"/>
+    <Connection dst="" dst-port="CoefDC_L" src="Algo_BlockSplit_AVC" src-port="Coeff_Y_DC"/>
 </XDF>

@@ -105,18 +105,12 @@ actor Algo_BlockExpand_AVC ()
 			end
 			NbBlocksSent     := 0;
 			DC_ComponentSent := false;
-//			println("ReadBlockType: "+Type);
-/*			if(Type != INTRA_4x4 and Type != INTRA_16x16 and Type != INTER)then
-				println("bah on n'est pas dans la merde MBType:"+Type);
-			end
-*/		end
+		end
 
 
-	Block_Inter_or_PCM: action
+	Block_I_PCM: action
 			BlockType :[Type]
-				==>	
-		do
-			println("Block_Inter_or_PCM:"+Type);
+				==>
 		end
 
 
@@ -235,7 +229,7 @@ actor Algo_BlockExpand_AVC ()
 		guard
 			Component        = Y_COMPONENT,
 			LumaMBType       = INTRA_4x4
-		do	
+		do
 			foreach int j in Integers(IdxValCoeff, SZ_LUMA_AC_4X4 - 1)
 			do
 				ValCoeff[j] := 0;
@@ -248,8 +242,8 @@ actor Algo_BlockExpand_AVC ()
 				==>
 			Coeff :[ValCoeff] repeat SZ_LUMA_AC_4X4
 		guard
-			NbBlocksSent     < 16
-		do	
+			NbBlocksSent     < 15
+		do
 			NbBlocksSent := NbBlocksSent + 1;
 		end
 
@@ -339,7 +333,7 @@ actor Algo_BlockExpand_AVC ()
 	schedule fsm ReadBlockType:
 
 		ReadBlockType    ( ReadBlockType                     )--> ReadData;
-		ReadBlockType    ( Block_Inter_or_PCM                )--> ReadBlockType;	
+		ReadBlockType    ( Block_I_PCM                       )--> ReadBlockType;	
 
 		ReadData         ( NoLast_NoRun                      )--> ReadData;
 		ReadData         ( NoLast_Run                        )--> ReadData;
@@ -364,7 +358,7 @@ actor Algo_BlockExpand_AVC ()
 	end
 
 	priority
-		ReadBlockType           > Block_Inter_or_PCM;
+		ReadBlockType           > Block_I_PCM;
 		NoLast_Run              > NoLast_NoRun                      > Last_equaltrue;
 		SendLumaAC_16x16.Launch > SendLumaAC_16x16.LastBlock;
 		SendLumaAC_4x4.Launch   > SendLumaAC_4x4.LastBlock;
