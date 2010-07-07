@@ -98,11 +98,7 @@ actor Algo_BlockExpand_AVC ()
 		guard
 			Type != I_PCM
 		do
-			if(Type != INTER) then
-				LumaMBType       := Type;
-			else
-				LumaMBType       := INTRA_16x16;
-			end
+			LumaMBType       := Type;
 			NbBlocksSent     := 0;
 			DC_ComponentSent := false;
 		end
@@ -227,8 +223,8 @@ actor Algo_BlockExpand_AVC ()
 		/************ Send Luma AC Component (4x4) ************/
 	isLumaAC_4x4: action ==>
 		guard
-			Component        = Y_COMPONENT,
-			LumaMBType       = INTRA_4x4
+			Component   = Y_COMPONENT,
+			(LumaMBType = INTRA_4x4) or (LumaMBType = INTER)
 		do
 			foreach int j in Integers(IdxValCoeff, SZ_LUMA_AC_4X4 - 1)
 			do

@@ -2459,7 +2459,7 @@ actor Algo_Synp_AVC_CBP()
 		end
 		end
 
-	read_SliceD_mb_skip_run_done1: action 
+	read_SliceD_mb_skip_run_done1.I_BLOCK: action 
 		==> 
 			CurrMbAddr:[mb_addr],
 			PicWidthInMb:[PicWidthInMbs],
@@ -2482,7 +2482,45 @@ actor Algo_Synp_AVC_CBP()
 			MvRes:[0,0], 
 			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
 	guard
-		prevMbSkipped = 1
+		prevMbSkipped = 1,
+		slice_type != SLICE_TYPE_P
+	var 
+		int mb_addr
+	do
+		mb_addr:=val_CurrMbAddr;
+		NextMbAddress();
+		mb_skip_run := mb_skip_run -1;
+		if mb_skip_run = 0 then 
+			prevMbSkipped := 0; 
+			moreDataFlag := more_rbsp_data();
+		end
+	end
+
+	read_SliceD_mb_skip_run_done1.P_BLOCK: action 
+		==> 
+			CurrMbAddr:[mb_addr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[first_mb_in_slice],
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
+			slice_beta_offset:[val_slice_beta_offset],
+			LFDisable:[disable_deblocking_filter_idc],
+			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
+			cbp_blk:[0],
+			QP:[val_QP], 
+			QP_Cb:[val_QP_Cb], 
+			QP_Cr:[val_QP_Cr], 
+			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			MbIntraFlag:[0], 
+			MbPartIdx:[1], 
+			RefIdx:[0], 
+			MbPartWidth:[16], 
+			MbPartHeigth:[16], 
+			MvRes:[0,0], 
+			LAST:[[true: for int t in Integers(0,25) ]] repeat 26
+	guard
+		prevMbSkipped = 1,
+		slice_type = SLICE_TYPE_P
 	var 
 		int mb_addr
 	do
@@ -2891,14 +2929,9 @@ actor Algo_Synp_AVC_CBP()
 	// --> residual( )
 
 	//else	
-	read_MB_layer_skip_mb_qp_delta.Block_4x4: action ==>  LAST:[[true: for int t in Integers(0,25) ]] repeat 26//27
+	read_MB_layer_skip_mb_qp_delta: action ==>  LAST:[[true: for int t in Integers(0,25) ]] repeat 26
 	guard
-		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and IS_Intra_4x4() )
-	end
-
-	read_MB_layer_skip_mb_qp_delta.others: action ==>  LAST:[[true: for int t in Integers(0,26) ]] repeat 27
-	guard
-		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and ( not IS_Intra_16x16()) and (not IS_Intra_4x4()) )
+		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and not IS_Intra_16x16() )
 	end
 	//end if
 
@@ -3486,12 +3519,7 @@ actor Algo_Synp_AVC_CBP()
 	//else
 	Residual_luma_skip_DC_init.Block_4x4: action ==> //LAST:[true]
 	guard
-		( bmFlag != 0 or startIdx != 0 or IS_Intra_4x4() )
-	end
-
-	Residual_luma_skip_DC_init.others: action ==> LAST:[true]
-	guard
-		( bmFlag != 0 or startIdx != 0 or (not IS_Intra_16x16() and not IS_Intra_4x4() ) )
+		( bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16() )
 	end
 	//end if
 
