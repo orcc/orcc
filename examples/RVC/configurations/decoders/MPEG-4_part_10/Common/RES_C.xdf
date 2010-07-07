@@ -1,26 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="RES_L">
+<XDF name="RES_C">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="CoefAC_L">
+    <Port kind="Input" name="CoefDC">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="CoefDC_L">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="Intra_DC_flag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
             </Entry>
         </Type>
     </Port>
@@ -38,10 +24,17 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="CoefAC">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
-    <Port kind="Output" name="CoefACR_L">
+    <Port kind="Output" name="CoefACR_C">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="16"/>
@@ -54,59 +47,35 @@
     <Decl kind="Param" name="SAMPLE_SIZE">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="PREDTYPE_SIZE">
+    <Decl kind="Param" name="QUANT_SIZE">
         <Type name="int"/>
-    </Decl>
-    <Decl kind="Variable" name="DPBMAXSIZE">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="16"/>
     </Decl>
     <Decl kind="Variable" name="MB_WIDTH">
-        <Type name="int"/>
-        <Expr kind="Literal" literal-kind="Integer" value="16"/>
-    </Decl>
-    <Decl kind="Variable" name="NM_TOKENS">
-        <Type name="int"/>
-        <Expr kind="BinOpSeq">
-            <Expr kind="Literal" literal-kind="Integer" value="176"/>
-            <Op name="*"/>
-            <Expr kind="Literal" literal-kind="Integer" value="144"/>
-            <Op name="*"/>
-            <Expr kind="Literal" literal-kind="Integer" value="10"/>
-        </Expr>
-    </Decl>
-    <Decl kind="Variable" name="QUANT_SIZE">
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="8"/>
     </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="FUN_dcr">
+    <Instance id="Algo_DCR_Hadamard_CHROMA">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="dcr"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_DCR_Hadamard_CHROMA"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="QUANT_SIZE">
-            <Expr kind="Var" name="QUANT_SIZE"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SIZE">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
-    <Instance id="FUN_IS_IQ_IT_L">
+    <Instance id="IS_IQ_IT_C">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="IS_IQ_IT_L"/>
+        <Class name="IS_IQ_IT_C"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
         <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
+            <Expr kind="Literal" literal-kind="Integer" value="2"/>
         </Parameter>
         <Parameter name="QUANT_SIZE">
             <Expr kind="Var" name="QUANT_SIZE"/>
@@ -115,11 +84,11 @@
             <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
-    <Instance id="Algo_Merge_4x4_to_16x16">
+    <Instance id="Algo_Merge_4x4_to_8x8">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Merge_4x4_to_16x16"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Merge_4x4_to_8x8"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -127,16 +96,16 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="FUN_IS_IQ_IT_L" dst-port="CoefAC_L" src="" src-port="CoefAC_L"/>
-    <Connection dst="FUN_dcr" dst-port="CoefDC_L" src="" src-port="CoefDC_L"/>
-    <Connection dst="FUN_IS_IQ_IT_L" dst-port="Intra_DC_flag" src="" src-port="Intra_DC_flag"/>
-    <Connection dst="FUN_dcr" dst-port="QP" src="" src-port="QP"/>
-    <Connection dst="FUN_IS_IQ_IT_L" dst-port="QP" src="" src-port="QP"/>
-    <Connection dst="FUN_dcr" dst-port="ScalingList" src="" src-port="ScalingList"/>
-    <Connection dst="FUN_IS_IQ_IT_L" dst-port="ScalingList" src="" src-port="ScalingList"/>
-    <Connection dst="FUN_IS_IQ_IT_L" dst-port="CoefDCR_L" src="FUN_dcr" src-port="CoefDCR_L"/>
-    <Connection dst="Algo_Merge_4x4_to_16x16" dst-port="X"
-        src="FUN_IS_IQ_IT_L" src-port="CoefACR_L"/>
-    <Connection dst="" dst-port="CoefACR_L"
-        src="Algo_Merge_4x4_to_16x16" src-port="Y"/>
+    <Connection dst="Algo_DCR_Hadamard_CHROMA" dst-port="levarr" src="" src-port="CoefDC"/>
+    <Connection dst="Algo_DCR_Hadamard_CHROMA" dst-port="ScalingList"
+        src="" src-port="ScalingList"/>
+    <Connection dst="Algo_DCR_Hadamard_CHROMA" dst-port="QP" src="" src-port="QP"/>
+    <Connection dst="IS_IQ_IT_C" dst-port="ScalingList" src="" src-port="ScalingList"/>
+    <Connection dst="IS_IQ_IT_C" dst-port="QP_C" src="" src-port="QP"/>
+    <Connection dst="IS_IQ_IT_C" dst-port="CoefAC_C" src="" src-port="CoefAC"/>
+    <Connection dst="IS_IQ_IT_C" dst-port="CoefDCR_C"
+        src="Algo_DCR_Hadamard_CHROMA" src-port="Cof"/>
+    <Connection dst="Algo_Merge_4x4_to_8x8" dst-port="X"
+        src="IS_IQ_IT_C" src-port="CoefACR_C"/>
+    <Connection dst="" dst-port="CoefACR_C" src="Algo_Merge_4x4_to_8x8" src-port="Y"/>
 </XDF>

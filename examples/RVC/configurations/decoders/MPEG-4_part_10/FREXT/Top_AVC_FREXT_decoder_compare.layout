@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="source" x="57" y="172"/>
+      <vertex id="AVCDecoder" x="169" y="136"/>
+      <vertex id="Merger" x="330" y="154"/>
+      <vertex id="display" x="444" y="70"/>
+      <vertex id="Compare" x="444" y="238"/>
+   </vertices>
+</layout>

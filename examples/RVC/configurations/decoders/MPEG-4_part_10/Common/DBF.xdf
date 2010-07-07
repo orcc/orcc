@@ -119,7 +119,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_DBF"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_DBF"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -131,7 +131,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_DBF"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_DBF"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

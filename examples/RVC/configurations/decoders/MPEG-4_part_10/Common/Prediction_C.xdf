@@ -259,7 +259,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_DPB"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_DPB"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -271,7 +271,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Select2"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Select2"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -301,7 +301,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Display"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Display"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -310,7 +310,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

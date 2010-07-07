@@ -81,7 +81,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Intra4x4"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Intra_4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -90,7 +90,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_LUMA_4x4"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_LUMA_4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -99,7 +99,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Add"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Add"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -108,7 +108,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Merge_4x4_to_16x16_norasterscan"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Merge_4x4_to_16x16_norasterscan"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -117,7 +117,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Split_16x16_to_4x4_norasterscan"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Split_16x16_to_4x4_norasterscan"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -126,7 +126,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Buffer_Neighbour_4x4"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Buffer_Neighbour_4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

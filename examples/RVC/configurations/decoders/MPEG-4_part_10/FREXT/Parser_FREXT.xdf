@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Parser">
+<XDF name="Parser_FREXT">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -348,7 +348,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/byte2bit"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/byte2bit"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -357,7 +357,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_NALU"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_NALU"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -366,7 +366,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Synp_AVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Synp_AVC_FREXT"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -375,7 +375,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockExpand_AVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockExpand_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -384,7 +384,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockSplit_AVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockSplit_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -393,7 +393,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Split"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Split"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -402,7 +402,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="MVReconstruct"/>
+        <Class name="../Common/MVReconstruct"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -420,7 +420,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_MMCO"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_MMCO"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -429,7 +429,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Parser_IPCM"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Parser_IPCM"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -438,7 +438,43 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_RefList"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefList"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_RefList1">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefList"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Black_Hole">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/Dave_Null"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Demux_Cavlc_Cabac">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Demux_Cavlc_Cabac"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Mux_Cavlc_Cabac">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Mux_Cavlc_Cabac"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -536,8 +572,6 @@
         src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
     <Connection dst="Algo_RefList0" dst-port="MaxFrameNum"
         src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
-    <Connection dst="Algo_RefList0" dst-port="RefReordering"
-        src="Algo_Synp_AVC" src-port="RefReordering"/>
     <Connection dst="Algo_MMCO" dst-port="NumReferenceFrame"
         src="Algo_Synp_AVC" src-port="NumRefFrame"/>
     <Connection dst="Algo_RefList0" dst-port="NbRefFrame"
@@ -549,26 +583,57 @@
     <Connection dst="Algo_RefList0" dst-port="IsIDR" src="Algo_MMCO" src-port="IsIDR"/>
     <Connection dst="Algo_RefList0" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
-    <Connection dst="Algo_RefList0" dst-port="ShortTermList"
-        src="Algo_MMCO" src-port="ShortTermList"/>
     <Connection dst="Algo_RefList0" dst-port="SzShortTermList"
         src="Algo_MMCO" src-port="SzShortTermList"/>
+    <Connection dst="Algo_RefList0" dst-port="ShortTermList"
+        src="Algo_MMCO" src-port="ShortTermList"/>
+    <Connection dst="Algo_RefList0" dst-port="RefReordering"
+        src="Algo_Synp_AVC" src-port="RefReordering_l0"/>
+    <Connection dst="Algo_RefList1" dst-port="IsIDR" src="Algo_MMCO" src-port="IsIDR"/>
+    <Connection dst="Algo_RefList1" dst-port="LongTermList"
+        src="Algo_MMCO" src-port="LongTermList"/>
+    <Connection dst="Algo_RefList1" dst-port="ShortTermList"
+        src="Algo_MMCO" src-port="ShortTermList"/>
+    <Connection dst="Algo_RefList1" dst-port="SzShortTermList"
+        src="Algo_MMCO" src-port="SzShortTermList"/>
+    <Connection dst="Algo_RefList1" dst-port="FraNum"
+        src="Algo_Synp_AVC" src-port="FramNumCurrPic"/>
+    <Connection dst="Algo_RefList1" dst-port="MaxFrameNum"
+        src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
+    <Connection dst="Algo_RefList1" dst-port="NbRefFrame"
+        src="Algo_Synp_AVC" src-port="Nb_RefFrame_l1"/>
+    <Connection dst="Algo_RefList1" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
+    <Connection dst="Algo_RefList1" dst-port="RefReordering"
+        src="Algo_Synp_AVC" src-port="RefReordering_l1"/>
+    <Connection dst="Black_Hole" dst-port="Token" src="Algo_RefList1" src-port="RefList"/>
+    <Connection dst="Demux_Cavlc_Cabac" dst-port="EntropyType"
+        src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
+    <Connection dst="Demux_Cavlc_Cabac" dst-port="Value"
+        src="Algo_Synp_AVC" src-port="VALUE"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="Last"
         src="Algo_Synp_AVC" src-port="LAST"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="Run"
         src="Algo_Synp_AVC" src-port="RUN"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="Value"
-        src="Algo_Synp_AVC" src-port="VALUE"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="BlockType"
-        src="Algo_IntraPred_Split" src-port="MbType"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="Coeff"
+    <Connection dst="Mux_Cavlc_Cabac" dst-port="Cavlc_coeff"
         src="Algo_BlockExpand_AVC" src-port="Coeff"/>
+    <Connection dst="Mux_Cavlc_Cabac" dst-port="EntropyType"
+        src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="BlockType"
+        src="Demux_Cavlc_Cabac" src-port="Cavlc_BlockType"/>
+    <Connection dst="Demux_Cavlc_Cabac" dst-port="BlockType"
+        src="Algo_IntraPred_Split" src-port="MbType"/>
+    <Connection dst="Mux_Cavlc_Cabac" dst-port="Cabac_coeff"
+        src="Demux_Cavlc_Cabac" src-port="Cabac_value"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="Value"
+        src="Demux_Cavlc_Cabac" src-port="Cavlc_value"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="Coeff"
+        src="Mux_Cavlc_Cabac" src-port="Coeff"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="MbType"
+        src="Algo_IntraPred_Split" src-port="MbType"/>
     <Connection dst="" dst-port="CoefAC_Cb" src="Algo_BlockSplit_AVC" src-port="Coeff_U_AC"/>
     <Connection dst="" dst-port="CoefDC_Cb" src="Algo_BlockSplit_AVC" src-port="Coeff_U_DC"/>
     <Connection dst="" dst-port="CoefAC_Cr" src="Algo_BlockSplit_AVC" src-port="Coeff_V_AC"/>
     <Connection dst="" dst-port="CoefDC_Cr" src="Algo_BlockSplit_AVC" src-port="Coeff_V_DC"/>
     <Connection dst="" dst-port="CoefAC_L" src="Algo_BlockSplit_AVC" src-port="Coeff_Y_AC"/>
     <Connection dst="" dst-port="CoefDC_L" src="Algo_BlockSplit_AVC" src-port="Coeff_Y_DC"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="MbType"
-        src="Algo_IntraPred_Split" src-port="MbType"/>
 </XDF>

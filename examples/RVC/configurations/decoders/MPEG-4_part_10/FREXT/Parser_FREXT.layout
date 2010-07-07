@@ -39,7 +39,7 @@
       <vertex id="mv_out" x="1073" y="2811"/>
       <vertex id="ref_idx" x="1073" y="2908"/>
       <vertex id="I_PCM_Y" x="1073" y="3789"/>
-      <vertex id="I_PCM_U" x="1073" y="3886"/>
+      <vertex id="I_PCM_U" x="980" y="3761"/>
       <vertex id="I_PCM_V" x="1073" y="3983"/>
       <vertex id="ConstrainedIFlag" x="766" y="2371"/>
       <vertex id="DelList" x="1073" y="3300"/>

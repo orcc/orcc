@@ -167,7 +167,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Interp_FBAddr_Luma_MxN"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Interp_FBAddr_Luma_MxN"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -176,7 +176,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Interp_SeparableSixTapQuarterPelAVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Interp_SeparableSixTapQuarterPelAVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -185,7 +185,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_Interp_split_MB"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Interp_split_MB"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -194,7 +194,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Add"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Add"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

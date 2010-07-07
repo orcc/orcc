@@ -81,7 +81,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Intra"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Intra_16x16"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -93,7 +93,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_LUMA_16x16"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_LUMA_16x16"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -102,7 +102,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Add"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Add"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -111,7 +111,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Buffer_Neighbour_FullMb"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Buffer_Neighbour_FullMb"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

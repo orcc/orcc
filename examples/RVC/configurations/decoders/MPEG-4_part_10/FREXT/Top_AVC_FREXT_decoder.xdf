@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Orcc_AVC_CBP_decoder">
+<XDF name="Top_AVC_FREXT_decoder">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -16,7 +16,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/System/Source"/>
+        <Class name="../../../../VTL/System/Source"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -25,7 +25,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="AVC_CBP_decoder"/>
+        <Class name="AVC_FREXT_decoder"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -34,7 +34,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Merger420_AVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Merger420_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -43,7 +43,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/System/Display"/>
+        <Class name="../../../../VTL/System/Display"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

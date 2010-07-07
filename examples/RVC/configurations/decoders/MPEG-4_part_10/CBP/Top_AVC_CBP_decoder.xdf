@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Orcc_AVC_FREXT_decoder_compare">
+<XDF name="Top_AVC_CBP_decoder">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -16,7 +16,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/System/Source"/>
+        <Class name="../../../../VTL/System/Source"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -25,7 +25,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="AVC_FREXT_decoder"/>
+        <Class name="AVC_CBP_decoder"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -34,7 +34,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Merger420_AVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Merger420_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -43,16 +43,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/System/Display"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="Compare">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/System/Compare"/>
+        <Class name="../../../../VTL/System/Display"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -67,7 +58,4 @@
     <Connection dst="display" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
     <Connection dst="display" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
     <Connection dst="Merger" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
-    <Connection dst="Compare" dst-port="B" src="Merger" src-port="YUV"/>
-    <Connection dst="Compare" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
-    <Connection dst="Compare" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
 </XDF>
