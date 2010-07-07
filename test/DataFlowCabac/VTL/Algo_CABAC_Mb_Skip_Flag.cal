@@ -136,7 +136,7 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	/* Input binary Array */
 	int maxReadBits = 32;
 	
-	int ReadBits := maxReadBits;
+	int ReadBitsIdx := 0;
 	int ReadResult := 0;
 	List ( type : int (size = 6), size = 32 ) readBits := [0:for int i in Integers(0,31)] ;
 	
@@ -231,10 +231,10 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	
 	procedure read_bits(int count)
 	begin
-		ReadBits := ReadBits - count;
 		
-		foreach int i in Integers(ReadBits, maxReadBits) do
-			ReadResult := bitor( lshift( ReadResult, 1), readBits[maxReadBits - i] );
+		foreach int i in Integers(0, count - 1) do
+			ReadResult := bitor( lshift( ReadResult, 1), readBits[ReadBitsIdx] );
+			ReadBitsIdx := ReadBitsIdx + 1;
 		end
 	end
 	
@@ -305,10 +305,6 @@ actor Algo_CABAC_Mb_Skip_Flag()
 				valMPS[i]		:= 1;
 			end
 		end
-		
-		codIRange	:= 0x01FE;
-		read_bits(9);
-		codIOffset	:= ReadResult;
 	end
 	
 	GetCtxIdxmbSkipFlag: action ==>
@@ -394,7 +390,7 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	end
 	
 	
-	SentValue: action ==> Dbits_Read:[ReadBits], Mb_Skip_Flag:[CabacValue],
+	SentValue: action ==> Dbits_Read:[ReadBitsIdx], Mb_Skip_Flag:[CabacValue],
                           Out_CodIRange:[codIRange], Out_CodIOffset:[codIOffset]
 	guard
 		codIRange >= 0x0100

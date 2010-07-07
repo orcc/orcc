@@ -16,8 +16,9 @@ actor ParserSim()
 									uint(size=6) 	val_QP:
 
 	bool Init := false;
+	bool MnSkip := false;
 	
-	SentInit: action ==> bits:[[0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,1,1,0]] repeat 32,
+	SentInit: action ==> bits:[0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,1,1,0],
 						 Cabac_Init_Idc:[0], 
 						 Entropy_Coding:[1],
 						 In_CodIRange:[0],
@@ -34,7 +35,34 @@ actor ParserSim()
 		Init := true;
 	end 
 
+	SentMbSkipSE: action ==> bits:[1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,1,1,0],
+						 Cabac_Init_Idc:[0], 
+						 Entropy_Coding:[1],
+						 In_CodIRange:[510],
+						 In_CodIOffset:[461],
+						 Curr_Mb_Addr:[0],
+						 Pic_Width_In_Mbs:[11],
+						 Pic_Size_In_Mbs:[99],
+					 	 Slice_Type:[2],
+					 	 Syntax_Element:[5],
+					 	 val_QP:[28]
+	guard 
+		MnSkip = false and Init = true
+	do	
+		MnSkip := true;
+	end
 
+	ReceivedData: action Mb_Skip_Flag:[val],
+	                     Dbits_Read:[bR],
+	                     Out_CodIRange:[codIRange],
+	                     Out_CodIOffset:[codIOffset] ==>
+	do
+		println("Mb Skip Flag := " +val);
+		println("Dbits_Read := " +bR);
+		println("codIRange := " +codIRange);
+		println("codIOffset := " +codIOffset);
+	end
+	                     
 
 end
 		
