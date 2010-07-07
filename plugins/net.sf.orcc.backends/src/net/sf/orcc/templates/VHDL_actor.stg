@@ -131,6 +131,8 @@ Actor_Schedul_FSM(actor) ::= <<
       $actor.actions: printActionSchedulerInline(); separator="\n"$
     
       -- ACK
+      $actor.actions:printActionNoACK(); separator="\n"$
+      $actor.inputs.list: NoACK(); separator="\n"$          
       $schedulerAckFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
     --
     end if;
@@ -777,8 +779,7 @@ case FSM is
   $switchAck(fsm.transitions)$
   
   when others =>
-    $actor.inputs.list: NoACK(); separator="\n"$
-    $actor.actions:printActionNoACK(); separator="\n"$
+    null;
 end case;$
 endif
 $
@@ -798,7 +799,6 @@ $stateSchedulerAck(transition)$
 
 
 stateSchedulerAck(transition) ::= <<
-  -- $transition.sourceState$_state_scheduler
   $schedulingTestStateAck(nextStates=transition.nextStateInfo)$
 >>
 
@@ -823,9 +823,6 @@ $) then
 $
 endif
 $
-else
-  $actor.inputs.list: NoACK(); separator="\n"$
-  $actor.actions:printActionNoACK(); separator="\n"$
 
 >>
 
