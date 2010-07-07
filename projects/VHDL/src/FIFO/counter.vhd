@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-01
+-- Last update: 2010-07-07
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -54,11 +54,13 @@ entity counter is
   generic (
     depth : integer := 32);
   port (
-    reset_n       : in  std_logic;
-    rd_clk        : in  std_logic;
-    rd_ack        : in  std_logic;
-    wr_clk        : in  std_logic;
-    wr_data       : in  std_logic;
+    reset_n     : in    std_logic;
+    reset_rd    : in    std_logic;
+    reset_wr    : in    std_logic;
+    rd_clk      : in    std_logic;
+    rd_ack      : in    std_logic;
+    wr_clk      : in    std_logic;
+    wr_data     : in    std_logic;
     rd_add_gray : inout std_logic_vector(bit_width(depth) -1 downto 0);
     wr_add_gray : inout std_logic_vector(bit_width(depth) -1 downto 0));
 end counter;
@@ -67,13 +69,19 @@ end counter;
 
 architecture archcounter of counter is
 
+  signal ireset_rd : std_logic;
+  signal ireset_wr : std_logic;
+  
 begin
+  
+  ireset_rd <= reset_n and reset_rd;
+  ireset_wr <= reset_n and reset_wr;
 
   rd_cur_add_gray : entity work.gray_cnt_n
     generic map (
       width => bit_width(depth))
     port map (
-      reset_n => reset_n,
+      reset_n => ireset_rd,
       clk     => rd_clk,
       en      => rd_ack,
       q       => rd_add_gray);
@@ -82,7 +90,7 @@ begin
     generic map (
       width => bit_width(depth))
     port map (
-      reset_n => reset_n,
+      reset_n => ireset_wr,
       clk     => wr_clk,
       en      => wr_data,
       q       => wr_add_gray);

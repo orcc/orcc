@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-01
+-- Last update: 2010-07-07
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -73,15 +73,26 @@ end controler;
 
 architecture archcontroler of controler is
 
+
   -----------------------------------------------------------------------------
   -- Internal signals and constants declaration
   -----------------------------------------------------------------------------
   --
+  constant depth_bin : std_logic_vector(bit_width(depth)-1 downto 0)
+    := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
+  --
   signal wr_add_bin : std_logic_vector(bit_width(depth)-1 downto 0);
   signal rd_add_bin : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal reset_rd   : std_logic;
+  signal reset_wr   : std_logic;
   --
   
 begin
+
+  reset_wr <= '0' when wr_add_bin = depth_bin else
+              '1';
+  reset_rd <= '0' when rd_add_bin = depth_bin else
+              '1';
 
   -- Counter
   counter_1 : entity work.counter
@@ -89,6 +100,8 @@ begin
       depth => depth)
     port map (
       reset_n     => reset_n,
+      reset_rd    => reset_rd,
+      reset_wr    => reset_wr,
       rd_clk      => rd_clk,
       rd_ack      => rd_ack,
       wr_clk      => wr_clk,
