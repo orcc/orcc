@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="mb_skip_flag" x="344" y="70"/>
+      <vertex id="ParserSim" x="57" y="70"/>
+   </vertices>
+</layout>
