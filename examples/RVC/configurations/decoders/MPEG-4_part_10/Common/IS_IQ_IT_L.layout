@@ -6,11 +6,11 @@
       <vertex id="Intra_DC_flag" x="99" y="364"/>
       <vertex id="QP" x="308" y="313"/>
       <vertex id="ScalingList" x="289" y="352"/>
+      <vertex id="MBType" x="91" y="326"/>
       <vertex id="CoefACR_L" x="729" y="199"/>
       <vertex id="Algo_IS_Zigzag_4x4_AC" x="91" y="182"/>
       <vertex id="Mgnt_IQ_INTRA16x16" x="245" y="182"/>
       <vertex id="Algo_IQ_QSAndSLAndIDCTScaler_4x4" x="433" y="182"/>
       <vertex id="IT4x4" x="667" y="184"/>
-      <vertex id="MBType" x="91" y="326"/>
    </vertices>
 </layout>

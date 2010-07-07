@@ -117,7 +117,6 @@
     <!-- ************************************** -->
     <Connection dst="Algo_IS_Zigzag_4x4_AC" dst-port="levarr" src="" src-port="CoefAC_L"/>
     <Connection dst="Mgnt_IQ_INTRA16x16" dst-port="CoefDCR_L" src="" src-port="CoefDCR_L"/>
-    <Connection dst="Mgnt_IQ_INTRA16x16" dst-port="Intra_DC_flag" src="" src-port="Intra_DC_flag"/>
     <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4" dst-port="QP"
         src="" src-port="QP"/>
     <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4"
