@@ -38,6 +38,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="MBType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -124,4 +131,5 @@
         src="Mgnt_IQ_INTRA16x16" src-port="Lev2d"/>
     <Connection dst="IT4x4" dst-port="X"
         src="Algo_IQ_QSAndSLAndIDCTScaler_4x4" src-port="Cof"/>
+    <Connection dst="Mgnt_IQ_INTRA16x16" dst-port="MBType" src="" src-port="MBType"/>
 </XDF>

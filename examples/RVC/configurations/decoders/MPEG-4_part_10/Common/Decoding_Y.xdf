@@ -341,4 +341,5 @@
     <Connection dst="TEX_L" dst-port="FrameNum" src="" src-port="FrameNum"/>
     <Connection dst="TEX_L" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="TEX_L" dst-port="IsIDR" src="" src-port="IsIDR"/>
+    <Connection dst="RES_L" dst-port="MBType" src="" src-port="Mb_Type"/>
 </XDF>

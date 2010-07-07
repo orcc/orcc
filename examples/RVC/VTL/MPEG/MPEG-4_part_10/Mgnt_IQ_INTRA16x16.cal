@@ -14,50 +14,175 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+//Modified by Damien de Saint Jorre, IETR/INSA of Rennes
 
-actor Mgnt_IQ_INTRA16x16 () int(size=16) CoefDCR_L, int(size=2) Intra_DC_flag, int(size=16) CoefAC_L ==> int(size=16) Lev2d
-:  
+actor Mgnt_IQ_INTRA16x16()
+	int (size=16) CoefDCR_L,
+	int (size=2)  Intra_DC_flag,
+	uint(size=8)  MBType,
+	int (size=16) CoefAC_L
+		==>
+	int(size=16) Lev2d
+		:
 
-  int(size=2) intra_dc_flag :=0;
-  int(size=16) coef_dc:=0;
-  int nb_4x4:=0;
-  
-  
-  read_intra_DC_flag: action Intra_DC_flag:[x] ==>
-  do
-    intra_dc_flag := x;
-  end
-  
-  read_CoefDCR_L: action CoefDCR_L:[x] ==>
-  do
-    coef_dc := x;
-  end
-  
-  Coef_AC: action CoefAC_L:[ x ] repeat 16 ==> Lev2d:[buff] repeat 16
-  var
-	List (type: int(size=16), size=16) buff := [ 0 : for int s in Integers( 0, 15) ]
-  do
-    nb_4x4 := nb_4x4 + 1;
-    
-    buff[0] := if intra_dc_flag = 0 then x[0] else coef_dc end;
-    foreach int i in Integers(1,15) do
-    	buff[i] := x[i];
-    end
-  end
-  
-  done: action ==>
-  guard nb_4x4 = 16
-  do
-    nb_4x4 := 0;
-  end
-  
-  schedule fsm  read_intra_dc:
-  	read_intra_dc				(read_intra_DC_flag ) 		--> read_intra_DC_done;
-    read_intra_DC_done		  	(done				) 		--> read_intra_dc;
-    read_intra_DC_done		  	(read_CoefDCR_L		) 		--> read_CoefDCR_L_done;
-  	read_CoefDCR_L_done			(Coef_AC            ) 		--> read_intra_DC_done;
-  end
-  priority
-  	done > read_CoefDCR_L;
-  end
+
+	/* Constants */
+	uint(size=8) INTRA_4x4   = 0;
+//	uint(size=8) INTRA_8x8   = 3;
+/*	uint(size=8) INTRA_16x16 = 1; */
+	uint(size=8) I_PCM       = 4;
+/*	uint(size=8) INTER       = 2; */
+
+
+	int (size=2)  intra_dc_flag := 0;
+	uint(size=5)  NbBlock       := 0;
+	uint(size=8)  MacroBType;
+
+
+
+
+	read_intra_DC_flag: action
+			Intra_DC_flag :[ x ]
+				==>
+		do
+			intra_dc_flag := x;
+		end
+
+
+	ReadMBType: action
+			MBType    :[Type]
+				==>
+		guard
+			Type != I_PCM
+		do
+			MacroBType := Type;
+		end
+
+
+	EatTokenMBType: action
+			MBType    :[Type]
+				==>
+		end
+
+
+	HasDCCoeff: action ==>
+		guard
+			MacroBType != INTRA_4x4 
+		end
+
+
+	HasNotDCCoeff: action ==>
+		end
+
+
+	Merge_DCandAC_Coeff.Launch: action
+			CoefDCR_L :[DcCoeff],
+			CoefAC_L  :[AcCoeff]      repeat 16
+				==>
+			Lev2d     :[BlockMerged]  repeat 16
+		guard
+			NbBlock < 15
+		var
+			List(type: int(size=16), size=16) BlockMerged := [ 0 : for int s in Integers(0, 15) ]
+		do
+/**/		BlockMerged[0] := if intra_dc_flag = 0 then
+				AcCoeff[0]
+			else
+				DcCoeff
+			end;/**/
+//			BlockMerged[0] := DcCoeff;
+			foreach int i in Integers(1, 15) do
+				BlockMerged[i] := AcCoeff[i];
+			end
+			NbBlock := NbBlock + 1;
+		end
+
+
+	Merge_DCandAC_Coeff.LastBlock: action
+			CoefDCR_L :[DcCoeff],
+			CoefAC_L  :[AcCoeff]      repeat 16
+				==>
+			Lev2d     :[BlockMerged]  repeat 16
+		var
+			List(type: int(size=16), size=16) BlockMerged := [ 0 : for int s in Integers(0, 15) ]
+		do
+/**/		BlockMerged[0] := if intra_dc_flag = 0 then
+				AcCoeff[0]
+			else
+				DcCoeff
+			end;/**/
+//			BlockMerged[0] := DcCoeff;
+			foreach int i in Integers(1, 15) do
+				BlockMerged[i] := AcCoeff[i];
+			end
+			NbBlock := 0;
+		end
+
+
+	Send_AC_Coeff.Launch: action
+			CoefDCR_L :[DcCoeff],
+			CoefAC_L  :[AcCoeff]  repeat 16
+				==>
+/**/		Lev2d     :[BlockMerged]  repeat 16/**/
+//			Lev2d     :[AcCoeff]  repeat 16
+		guard
+			NbBlock < 15
+		var
+			List(type: int(size=16), size=16) BlockMerged := [ 0 : for int s in Integers(0, 15) ]
+		do
+/**/		BlockMerged[0] := if intra_dc_flag = 0 then
+				AcCoeff[0]
+			else
+				DcCoeff
+			end;
+			foreach int i in Integers(1, 15) do
+				BlockMerged[i] := AcCoeff[i];
+			end/**/
+			NbBlock := NbBlock + 1;
+		end
+
+
+	Send_AC_Coeff.LastBlock: action
+			CoefDCR_L :[DcCoeff],
+			CoefAC_L  :[AcCoeff]      repeat 16
+				==>
+/**/		Lev2d     :[BlockMerged]  repeat 16/**/
+//			Lev2d     :[AcCoeff]  repeat 16
+		var
+			List(type: int(size=16), size=16) BlockMerged := [ 0 : for int s in Integers(0, 15) ]
+		do
+/**/			BlockMerged[0] := if intra_dc_flag = 0 then
+				AcCoeff[0]
+			else
+				DcCoeff
+			end;
+			foreach int i in Integers(1, 15) do
+				BlockMerged[i] := AcCoeff[i];
+			end/**/
+			NbBlock := 0;
+		end
+
+
+	schedule fsm read_intra_dc :
+		read_intra_dc       ( read_intra_DC_flag             )--> ReadMBType;
+
+		ReadMBType          ( EatTokenMBType                 )--> ReadMBType;
+		ReadMBType          ( ReadMBType                     )--> CheckMBType;
+
+		CheckMBType         ( HasDCCoeff                     )--> Merge_DCandAC_Coeff;
+		CheckMBType         ( HasNotDCCoeff                  )--> Merge_DCandAC_Coeff;
+
+		Merge_DCandAC_Coeff  ( Merge_DCandAC_Coeff.Launch    )--> Merge_DCandAC_Coeff;
+		Merge_DCandAC_Coeff  ( Merge_DCandAC_Coeff.LastBlock )--> read_intra_dc;
+
+		Send_AC_Coeff        ( Send_AC_Coeff.Launch          )--> Send_AC_Coeff;
+		Send_AC_Coeff        ( Send_AC_Coeff.LastBlock       )--> read_intra_dc;
+	end
+
+	priority
+		ReadMBType                 > EatTokenMBType;
+		Merge_DCandAC_Coeff.Launch > Merge_DCandAC_Coeff.LastBlock;
+		Send_AC_Coeff.Launch       > Send_AC_Coeff.LastBlock;
+	end
+
 end
