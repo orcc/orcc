@@ -1,35 +1,78 @@
-/*
- * Copyright (C) 2010 Swiss Federal Institution of Technology (EPFL)
- * Author: Endri Bezati
- *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
- * may be copied, distributed, and modified under those terms.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- */
+/*************************************************************************
+This software module was originally developed by Endri Bezati, 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+Swiss Federal Institution of Technology grants ISO/IEC all rights necessary 
+to include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that Swiss Federal Institution 
+of Technology owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, Swiss Federal 
+Institution of Technology will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing the ISO/IEC 23002-4
+
+Swiss Federal Institution of Technology retains full right to modify and use 
+the code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2007.
+*************************************************************************/
 
 actor Algo_CABAC_Mb_Skip_Flag()
-	uint(size=4)	bits,
-	uint(size=4)	Cabac_Init_Idc,
-	uint(size=4)	Entropy_Coding,
-	uint(size=9)	In_CodIRange,
-	uint(size=9)	In_CodIOffset,
-	uint(size=32)	Curr_Mb_Addr,
-	uint(size=32)	Pic_Width_In_Mbs,
-	uint(size=32)	Pic_Size_In_Mbs,
-	uint(size=3)	Slice_Type,
-	uint(size=5)	Syntax_Element,
-	uint(size=6) 	val_QP
+	int(size=4)	 bits,
+	int(size=4)	 Cabac_Init_Idc,
+	int(size=4)	 Entropy_Coding,
+	int(size=9)	 In_CodIRange,
+	int(size=9)	 In_CodIOffset,
+	int(size=10) In_Ctx_Idx,
+	int(size=4)	 In_val_MPS,
+	int			 In_p_State_Idx,
+	int(size=32) Curr_Mb_Addr,
+	int(size=32) Pic_Width_In_Mbs,
+	int(size=32) Pic_Size_In_Mbs,
+	int(size=4)	 Slice_Type,
+	int(size=5)	 Syntax_Element,
+	int(size=6)  val_QP
 		==>
-			uint(size=4)	Mb_Skip_Flag,
-			uint(size=9)	Dbits_Read,
-			uint(size=9)	Out_CodIRange,
-			uint(size=9)	Out_CodIOffset:
+			int(size=4)	 Mb_Skip_Flag,
+			int(size=9)	 Dbits_Read,
+			int(size=9)	 Out_CodIRange,
+			int(size=9)	 Out_CodIOffset,
+			int(size=10) Out_Ctx_Idx,
+			int(size=4)  Out_val_MPS,
+			int			 Out_p_State_Idx:
 
 
 /******************************************************************************
@@ -74,7 +117,7 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	];
 	
 	/* CABAC Arithmetic Decoding qCodIRangeIdx */
-	List ( type:uint, size = 64 ) transIdxMPS = 
+	List ( type:int, size = 64 ) transIdxMPS = 
 	[
 		1, 2, 3, 4, 5, 6, 7, 8,
 		9,10,11,12,13,14,15,16,
@@ -86,7 +129,7 @@ actor Algo_CABAC_Mb_Skip_Flag()
 		57,58,59,60,61,62,62,63
 	];
 	//
-	List ( type:uint, size = 64 ) transIdxLPS = 
+	List ( type:int, size = 64 ) transIdxLPS = 
 	[
 		0, 0, 1, 2, 2, 4, 4, 5,
 		6, 7, 8, 9, 9,11,11,12,
@@ -99,8 +142,7 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	];
 	
 	//
-	List ( type: List ( type: uint , size = 4), size = 64 ) rangeTabLPS = 
-	
+	List ( type: List ( type: int , size = 4), size = 64 ) rangeTabLPS = 
 	[
 		[128,176,208,240], [128,167,197,227], [128,158,187,216], [123,150,178,205],
 		[116,142,169,195], [111,135,160,185], [105,128,152,175], [100,122,144,166],
@@ -120,13 +162,13 @@ actor Algo_CABAC_Mb_Skip_Flag()
 		[  6,  8,  9, 11], [  6,  7,  9, 10], [  6,  7,  8,  9], [  2,  2,  2,  2]
 	];
 	
-	uint(size=7) PICWIDTH = 1280/16;
+	int(size=7) PICWIDTH = 1280/16;
 	
 
 	// AVC/H.264 Slice Types
 	
-	uint(size=3) SLICE_TYPE_P  = 0;
-	uint(size=3) SLICE_TYPE_SP = 3;
+	int(size=3) SLICE_TYPE_P  = 0;
+	int(size=3) SLICE_TYPE_SP = 3;
 	
 	/* Mb skip Flag */
 	int CABAC_MB_SKIP_FLAG_SE = 5;
@@ -135,6 +177,11 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	
 	/* Input binary Array */
 	int maxReadBits = 32;
+	
+	/* ctxIdx offset for mb_skip_flag */
+	
+	int ctxIdxOffsetP_SP = 	11;
+	int ctxIdxOffsetB	 =	24;
 	
 	int ReadBitsIdx := 0;
 	int ReadResult := 0;
@@ -149,22 +196,22 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	
 	//Basic Variables
 	
-	uint SliceType;
-	uint(size=6) QP;
+	int SliceType;
+	int(size=6) QP;
 	int preCtxState;
-	uint(size=4) CabacInitIdc; 
-	uint PicWidthInMbs;
-	uint PicSizeInMbs;
-	uint CurrMbAddr;
+	int(size=4) CabacInitIdc; 
+	int PicWidthInMbs;
+	int PicSizeInMbs;
+	int CurrMbAddr;
 
 	
 	//Cabac Variables
-	uint codIRange;
-	uint codIOffset;
-	uint ctxIdx;
-	uint qCodIRangeIdx;
-	uint codIRangeLPS;
-	uint CabacValue;
+	int codIRange;
+	int codIOffset;
+	int ctxIdx;
+	int qCodIRangeIdx;
+	int codIRangeLPS;
+	int CabacValue;
 
 	// Neighbouring Variables
 	int  NeighMbAddr;
@@ -391,55 +438,121 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	
 	
 	SentValue: action ==> Dbits_Read:[ReadBitsIdx], Mb_Skip_Flag:[CabacValue],
-                          Out_CodIRange:[codIRange], Out_CodIOffset:[codIOffset]
+                          Out_CodIRange:[codIRange], Out_CodIOffset:[codIOffset],
+                          Out_Ctx_Idx:[out_ctxIdx], Out_val_MPS:[vMPS],
+						  Out_p_State_Idx:[pState]
 	guard
 		codIRange >= 0x0100
+	var
+		int out_ctxIdx,
+		int vMPS,
+		int pState
+	do
+		
+		// Give the ctxIdx with it's offset
+		if SliceType = SLICE_TYPE_P or SliceType = SLICE_TYPE_SP then	
+			out_ctxIdx := ctxIdx + ctxIdxOffsetP_SP;
+		else
+			out_ctxIdx := ctxIdx + ctxIdxOffsetB;
+		end
+		
+		pState := pStateIdx[ctxIdx];
+		
+		if pStateIdx[ctxIdx] = 0 then
+			vMPS := valMPS[ctxIdx];
+		else
+			vMPS := -1;
+		end	
 	end
 	
 	ReadSE: action bits:[ bRead ] repeat 32,
 				   Cabac_Init_Idc:[a],
 				   In_CodIRange:[b],
 				   In_CodIOffset:[c],
-				   Curr_Mb_Addr:[d],
+				   In_Ctx_Idx:[d],
+				   In_val_MPS:[e],			
+				   In_p_State_Idx:[f],
+				   Curr_Mb_Addr:[g],
 				   Entropy_Coding:[entropy],
-				   Pic_Width_In_Mbs:[e],
-				   Pic_Size_In_Mbs:[f],
-				   Slice_Type:[g],
+				   Pic_Width_In_Mbs:[h],
+				   Pic_Size_In_Mbs:[i],
+				   Slice_Type:[j],
 				   Syntax_Element:[se],
-				   val_QP:[i]==>
+				   val_QP:[k]==>
 	guard
 		( se = CABAC_MB_SKIP_FLAG_SE or se = CABAC_INIT_SE ) and entropy = 1
 	do
 		//Copy bRead List;
 		
-		foreach int s in Integers(0, maxReadBits-1) do
-			readBits[s] := bRead[s];
-		end
+		
+		readBits := [bRead[s]:for int s in Integers(0,31)];
+		
 		
 		CabacInitIdc	:= a;
 		codIRange		:= b;
 		codIOffset		:= c;
-		CurrMbAddr		:= d;
-		PicWidthInMbs	:= e;
-		PicSizeInMbs	:= f;
-		SliceType		:= g;
+		CurrMbAddr		:= g;
+		PicWidthInMbs	:= h;
+		PicSizeInMbs	:= i;
+		SliceType		:= j;
 		SE				:= se;
-		QP				:= i;
+		QP				:= k;
+		
+		if SliceType = SLICE_TYPE_P or SliceType = SLICE_TYPE_SP then	
+			if d >= 11 and d <= 13 then
+				pStateIdx[d-ctxIdxOffsetP_SP] := f;
+			end
+			
+			if f = 0 then
+				valMPS[d-ctxIdxOffsetP_SP] := e;
+			end
+			
+		else
+			if d >= 24 and d <= 26 then
+				pStateIdx[d-ctxIdxOffsetB] := f;
+			end
+			
+			if f = 0 then
+				valMPS[d-ctxIdxOffsetB] := e;
+			end
+		end
 	end 
 	
 	Skip_ReadSE: action bits:[ bRead ] repeat 32,
-				   		Cabac_Init_Idc:[a],
-				   		In_CodIRange:[b],
-				   		In_CodIOffset:[c],
-				   		Curr_Mb_Addr:[d],
-				   		Entropy_Coding:[e],
-				   		Pic_Width_In_Mbs:[f],
-				   		Pic_Size_In_Mbs:[g],
-				   		Slice_Type:[h],
-				   		Syntax_Element:[se],
-				   		val_QP:[j]==>
+				   Cabac_Init_Idc:[a],
+				   In_CodIRange:[b],
+				   In_CodIOffset:[c],
+				   In_Ctx_Idx:[d],
+				   In_val_MPS:[e],			
+				   In_p_State_Idx:[f],
+				   Curr_Mb_Addr:[g],
+				   Entropy_Coding:[entropy],
+				   Pic_Width_In_Mbs:[h],
+				   Pic_Size_In_Mbs:[i],
+				   Slice_Type:[j],
+				   Syntax_Element:[se],
+				   val_QP:[k]==>
 	guard
 		se != CABAC_MB_SKIP_FLAG_SE or se != CABAC_INIT_SE
+	do
+		if SliceType = SLICE_TYPE_P or SliceType = SLICE_TYPE_SP then	
+			if d >= 11 and d <= 13 then
+				pStateIdx[d-ctxIdxOffsetP_SP] := f;
+			end
+			
+			if f = 0 then
+				valMPS[d-ctxIdxOffsetP_SP] := e;
+			end
+			
+		else
+			if d >= 24 and d <= 26 then
+				pStateIdx[d-ctxIdxOffsetB] := f;
+			end
+			
+			if f = 0 then
+				valMPS[d-ctxIdxOffsetB] := e;
+			end
+		end
 	end 
 	
 	schedule fsm Read:

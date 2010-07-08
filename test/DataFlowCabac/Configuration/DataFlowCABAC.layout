@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="mb_skip_flag" x="344" y="70"/>
-      <vertex id="ParserSim" x="57" y="70"/>
+      <vertex id="CABAC_Entropy_Decoding" x="549" y="145"/>
+      <vertex id="ParserSim" x="262" y="145"/>
    </vertices>
 </layout>
