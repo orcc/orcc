@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -120,6 +122,11 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 	@Override
 	public String getName() {
 		return "Simulation settings";
+	}
+
+	@Override
+	public String getPluginType() {
+		return SIMULATOR;
 	}
 
 	@Override

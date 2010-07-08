@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -122,6 +124,11 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 	@Override
 	public String getName() {
 		return "Compilation settings";
+	}
+
+	@Override
+	public String getPluginType() {
+		return BACKEND;
 	}
 
 	@Override

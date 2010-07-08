@@ -60,8 +60,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public abstract class OrccAbstractSettingsTab extends AbstractLaunchConfigurationTab implements
-		ModifyListener {
+public abstract class OrccAbstractSettingsTab extends
+		AbstractLaunchConfigurationTab implements ModifyListener {
 
 	protected Text textOutput;
 
@@ -177,6 +177,18 @@ public abstract class OrccAbstractSettingsTab extends AbstractLaunchConfiguratio
 		return null;
 	}
 
+	/**
+	 * Get the current plugin type (BACKEND in compilation mode, SIMULATOR in
+	 * simulation mode)
+	 * 
+	 * @return Correct OrccLaunchConstant plugin type identifier according to
+	 *         current mode (compilation or simulation)
+	 */
+	public String getPluginType() {
+		// By default, plugin is a backend
+		return BACKEND;
+	}
+
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
@@ -186,8 +198,8 @@ public abstract class OrccAbstractSettingsTab extends AbstractLaunchConfiguratio
 				OptionWidgetManager.hideOptions(widgets);
 			}
 
-			plugin = configuration.getAttribute(BACKEND, "");
-			plugin = configuration.getAttribute(SIMULATOR, "");
+			plugin = configuration.getAttribute(getPluginType(), "");
+
 			int index = comboPlugin.indexOf(plugin);
 			if (index == -1) {
 				comboPlugin.deselectAll();
@@ -239,7 +251,7 @@ public abstract class OrccAbstractSettingsTab extends AbstractLaunchConfiguratio
 			return false;
 		}
 	}
-	
+
 	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		String value = textOutput.getText();
