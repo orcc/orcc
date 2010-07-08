@@ -200,4 +200,18 @@
             id="orcc plugin.simuLaunchConfigurationTypeImage">
       </launchConfigurationTypeImage>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="net.sf.orcc.ui.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="net.sf.orcc.ui.preferences.OrccPreferencePage"
+            id="net.sf.orcc.ui.preferences.OrccPreferencePage"
+            name="Orcc">
+      </page>
+   </extension>
 </plugin>
