@@ -49,7 +49,7 @@ using namespace std;
 
 void AbstractFifo::refineActor(Actor* actor){
 	map<string, Type*>::iterator itFifo;
-	itFifo = types.find("struct.fifo_s");
+	itFifo = structAcces.find("struct.fifo_s");
 	Type* fifoDest = itFifo->second;
 	
 	std::map<std::string, llvm::Type*>* sourceTypes = actor->getFifoTypes();
@@ -57,7 +57,7 @@ void AbstractFifo::refineActor(Actor* actor){
 	llvm::OpaqueType* fifoType = cast<llvm::OpaqueType>(itFifo->second);
 
 	fifoType->refineAbstractTypeTo(fifoDest);
-};
+}
 
 
 void AbstractFifo::setFifoFunction(std::string name, llvm::Function* function){
@@ -71,4 +71,41 @@ void AbstractFifo::setFifoFunction(std::string name, llvm::Function* function){
 		}
 	
 		(*it).second = function;
-};
+}
+
+void AbstractFifo::createFifoMap (){
+	std::map<std::string,std::string>::iterator it;
+
+	// Create a map that bound fifo access to their function name
+	fifoFunct = fifoMap();
+	
+	// Initialized element 
+	for(it = fifoFunct.begin(); it != fifoFunct.end(); ++it){
+		fifoAccess.insert(pair<string,Function*>((*it).second,NULL));
+	}
+}
+
+void AbstractFifo::createStructMap (){
+	std::map<std::string,std::string>::iterator it;
+
+	// Create a map that bound fifo access to their function name
+	structName = structMap();
+	
+	// Initialized element 
+	for(it = structName.begin(); it != structName.end(); ++it){
+		structAcces.insert(pair<string,Type*>((*it).second,NULL));
+	}
+}
+
+void AbstractFifo::setFifoStruct(std::string name, llvm::Type* type){
+		std::map<std::string,llvm::Type*>::iterator it;
+
+		it = structAcces.find(name);
+
+		if (it == structAcces.end()){
+			fprintf(stderr,"Error when setting structure of fifo");
+			exit(0);
+		}
+	
+		(*it).second = type;
+}

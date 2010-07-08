@@ -117,7 +117,7 @@ public abstract class AbstractSimulator implements Simulator {
 	}
 
 	@Override
-	public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
 		// Property change support creation for sending interpreter events
 		propertyChange = new PropertyChangeSupport(this);
@@ -132,7 +132,7 @@ public abstract class AbstractSimulator implements Simulator {
 	 * Monitor associated to the simulator execution. Used for user
 	 * cancellation.
 	 */
-	protected IProgressMonitor monitor = null;
+	private IProgressMonitor monitor = null;
 
 	/**
 	 * Master caller associated process for console I/O access.

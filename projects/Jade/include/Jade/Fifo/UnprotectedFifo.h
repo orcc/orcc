@@ -61,8 +61,31 @@ private:
 		fifo["hasRoom"] = "hasRoom";
 		fifo["writeEnd"] = "setWriteEnd";
 		fifo["readEnd"] = "setReadEnd";
+		
+		fifo["char_peek"] = "fifo_char_peek";
+		fifo["char_write"] = "fifo_char_write";
+		fifo["char_read"] = "fifo_char_read";
+		fifo["char_hasToken"] = "fifo_char_has_tokens";
+		fifo["char_hasRoom"] = "fifo_char_has_room";
+		fifo["char_writeEnd"] = "fifo_char_write_end";
+		fifo["char_readEnd"] = "fifo_char_read_end";
+
 		fifo["printf"] = "printf";
 		return fifo;
+	}
+
+	/** Fifo function name */
+	std::map<std::string,std::string> structMap()
+	{
+		std::map<std::string,std::string> fifoStruct;	
+		fifoStruct["default"] = "struct.fifo_s";
+		fifoStruct["char_s"] = "struct.fifo_char_s";
+		fifoStruct["int_s"] = "struct.fifo_int_s";
+		fifoStruct["short_s"] = "struct.fifo_short_s";
+		fifoStruct["u_char_s"] = "struct.fifo_u_char_s";
+		fifoStruct["u_int_s"] = "struct.fifo_u_int_s";
+		fifoStruct["u_short_s"] = "struct.fifo_u_short_s";
+		return fifoStruct;
 	}
 
 public:
@@ -113,14 +136,6 @@ private:
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 	
-	/** module of the fifo */
-	llvm::Module* header;
-	
-	/**
-    *  @brief Initialized fifo access map
-    */
-	void createFifoMap();
-
 	/**
     *  @brief Parse fifo module
     */
@@ -139,6 +154,8 @@ private:
 	* @param decoder : Decoder to had fifo functions
     */
 	void parseFifoFunctions();
+
+	void parseFifoStructs();
 
 	/**
     * @brief add fifo function corresponding to the given name into the given decoder

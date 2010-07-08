@@ -65,6 +65,9 @@ protected:
 	/** Fifo function name */
 	virtual std::map<std::string,std::string> fifoMap() = 0;
 
+	/** Fifo function name */
+	virtual std::map<std::string,std::string> structMap() = 0;
+
 public:
 	/**
      *  @brief Constructor
@@ -97,7 +100,7 @@ public:
 	 *
      */
 	std::map<std::string, llvm::Type*>* getFifoTypes(){
-		return &types;
+		return &structAcces;
 	};
 
 	/**
@@ -189,15 +192,6 @@ public:
 
 
 	/**
-     *  @brief set an llvm::function to a fifo function
-     *
-	 *  @param name : std::string of the fifo function name
-	 *
-	 *  @param function : llvm::function corresponding to the fifo function name
-     */
-	void setFifoFunction(std::string name, llvm::Function* function);
-
-	/**
      *  @brief get the llvm::function from the given fifo function
      *
 	 *  @param name : std::string of the fifo function name
@@ -231,19 +225,41 @@ public:
 	
 
 protected:
+	/** module of the fifo */
+	llvm::Module* header;
 
-	/**
-    * @brief a map relying fifo function and their name in the headeer
-    */
+	/** a map relying fifo struct and their name in the header */
+	std::map<std::string,std::string> structName;
+
+	/** a map relying fifo struct and their llvm::struct equivalentin the header */
+	std::map<std::string,llvm::Type*> structAcces;
+
+	/** a map relying fifo function and their name in the header */
 	std::map<std::string,std::string> fifoFunct;
 
-	/**
-    * @brief a map relying fifo function and their llvm::function equilent in the header
-    */
+	/** a map relying fifo function and their llvm::function equivalent in the header */
 	std::map<std::string,llvm::Function*> fifoAccess;
 
-	/** Structure type of the fifo */
-	std::map<std::string, llvm::Type*> types;
+	/**
+    *  @brief Initialize fifo access map
+    */
+	void createFifoMap();
+
+	/**
+    *  @brief Initialize struct access map
+    */
+	void createStructMap();
+
+	/**
+     *  @brief set an llvm::function to a fifo function
+     *
+	 *  @param name : std::string of the fifo function name
+	 *
+	 *  @param function : llvm::function corresponding to the fifo function name
+     */
+	void setFifoFunction(std::string name, llvm::Function* function);
+
+	void setFifoStruct(std::string name, llvm::Type* type);
 };
 
 #endif
