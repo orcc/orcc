@@ -6,10 +6,10 @@
       <vertex id="Intra_DC_flag" x="271" y="109"/>
       <vertex id="QP" x="20" y="238"/>
       <vertex id="ScalingList" x="36" y="285"/>
+      <vertex id="MBType" x="17" y="195"/>
       <vertex id="CoefACR_L" x="799" y="67"/>
       <vertex id="FUN_dcr" x="137" y="68"/>
       <vertex id="FUN_IS_IQ_IT_L" x="429" y="51"/>
       <vertex id="Algo_Merge_4x4_to_16x16" x="616" y="47"/>
-      <vertex id="MBType" x="279" y="141"/>
    </vertices>
 </layout>

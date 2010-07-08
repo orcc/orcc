@@ -24,6 +24,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="MBType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -131,4 +138,6 @@
         src="Algo_DC_Transpose4x4_1" src-port="Y"/>
     <Connection dst="" dst-port="CoefDCR_L"
         src="Algo_DCR_Hadamard_LUMA_Reordering" src-port="Y"/>
+    <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling" dst-port="MbType"
+        src="" src-port="MBType"/>
 </XDF>

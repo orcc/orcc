@@ -364,7 +364,6 @@
     <Connection dst="Intra8x8" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Deblocking_Filter" dst-port="Alpha_offset" src="" src-port="slice_alpha_c0_offset"/>
-    <Connection dst="" dst-port="Display_C" src="Buffer_inter" src-port="Display"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="Buffer_inter" dst-port="FrameNum_CurrPic" src="" src-port="FrameNum"/>
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay"
@@ -378,4 +377,5 @@
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="Mgnt_Display" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="Buffer_inter" dst-port="IsIDR" src="" src-port="IsIDR"/>
+    <Connection dst="" dst-port="Display_C" src="Buffer_inter" src-port="Display"/>
 </XDF>

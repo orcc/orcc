@@ -14,7 +14,7 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-//Modified by Damien de Saint Jorre, IETR/INSA of Rennes
+//Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
 
 actor Mgnt_IQ_INTRA16x16()
 	int (size=16) CoefDCR_L,
@@ -27,7 +27,7 @@ actor Mgnt_IQ_INTRA16x16()
 
 	/* Constants */
 //	uint(size=8) INTRA_4x4   = 0;
-//	uint(size=8) INTRA_8x8   = 3;
+//	uint(size=8) INTRA_8x8   = ;
 	uint(size=8) INTRA_16x16 = 1;
 	uint(size=8) I_PCM       = 4;
 /*	uint(size=8) INTER       = 2; */
@@ -71,7 +71,7 @@ actor Mgnt_IQ_INTRA16x16()
 		guard
 			NbBlock < 15
 		var
-			List(type: int(size=16), size=16) BlockMerged := [ 0 : for int s in Integers(0, 15) ]
+			List(type: int(size=16), size=16) BlockMerged
 		do
 			BlockMerged[0] := DcCoeff;
 			foreach int i in Integers(1, 15) do
@@ -87,7 +87,7 @@ actor Mgnt_IQ_INTRA16x16()
 				==>
 			Lev2d     :[BlockMerged]  repeat 16
 		var
-			List(type: int(size=16), size=16) BlockMerged := [ 0 : for int s in Integers(0, 15) ]
+			List(type: int(size=16), size=16) BlockMerged
 		do
 			BlockMerged[0] := DcCoeff;
 			foreach int i in Integers(1, 15) do
@@ -98,7 +98,7 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	Send_AC_Coeff.Launch: action
-			CoefDCR_L :[DcCoeff],
+//			CoefDCR_L :[DcCoeff],
 			CoefAC_L  :[AcCoeff]  repeat 16
 				==>
 			Lev2d     :[AcCoeff]  repeat 16
@@ -110,8 +110,8 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	Send_AC_Coeff.LastBlock: action
-			CoefDCR_L :[DcCoeff],
-			CoefAC_L  :[AcCoeff]      repeat 16
+//			CoefDCR_L :[DcCoeff],
+			CoefAC_L  :[AcCoeff]  repeat 16
 				==>
 			Lev2d     :[AcCoeff]  repeat 16
 		do

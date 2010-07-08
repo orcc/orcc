@@ -147,4 +147,5 @@
     <Connection dst="" dst-port="CoefACR_L"
         src="Algo_Merge_4x4_to_16x16" src-port="Y"/>
     <Connection dst="FUN_IS_IQ_IT_L" dst-port="MBType" src="" src-port="MBType"/>
+    <Connection dst="FUN_dcr" dst-port="MBType" src="" src-port="MBType"/>
 </XDF>

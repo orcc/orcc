@@ -51,6 +51,8 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
+//Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
+
 actor Algo_BlockSplit_AVC()
 	int (size=12) Coeff,
 	uint(size=8)  MbType
@@ -73,11 +75,11 @@ actor Algo_BlockSplit_AVC()
 //			Coeff  :[ x ] repeat 16,
 			MbType :[PredMode]
 				==>
-			Coeff_Y_DC :[ ValDC ] repeat 16
+//			Coeff_Y_DC :[ ValDC ] repeat 16
 		guard
 			PredMode = INTRA_4x4 or PredMode = INTER
-		var
-			List(type: int(size=16), size=16) ValDC := [0 : for int i in Integers(0,15)]
+//		var
+//			List(type: int(size=16), size=16) ValDC := [0 : for int i in Integers(0,15)]
 		end	
 
 

@@ -77,7 +77,7 @@ actor Algo_IntraPred_Split()
 	uint(size=4) MB_TYPE_INTRA_4x4   = 0;
 	uint(size=4) MB_TYPE_INTRA_16x16 = 1;	
 	uint(size=4) MB_TYPE_INTER       = 2;
-	uint(size=4) MB_TYPE_I_PCM       = 4;	
+	uint(size=4) MB_TYPE_I_PCM       = 4;
 //	uint(size=4) MB_TYPE_INTRA_8x8   = ??;		
 	
 	
