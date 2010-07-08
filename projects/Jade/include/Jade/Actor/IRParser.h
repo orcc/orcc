@@ -185,6 +185,20 @@ private:
 	 */
 	std::map<std::string, llvm::Type*>* parseFifos(llvm::Module* module);
 
+	
+	/**
+	 * @brief Parses a fifo structure
+	 *
+	 * Parses the given fifo structure in the module
+	 *
+	 * @param name : std::string of the structure name
+	 *
+	 * @param module : llvm::Module to parse
+	 *
+	 * @return the corresponding llvm::Type
+	 */
+	llvm::Type* parseFifo(std::string name, llvm::Module* module);
+
 	/**
 	 * @brief Parses a port
 	 *

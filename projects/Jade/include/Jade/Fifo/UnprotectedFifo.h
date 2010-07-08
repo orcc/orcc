@@ -70,6 +70,46 @@ private:
 		fifo["char_writeEnd"] = "fifo_char_write_end";
 		fifo["char_readEnd"] = "fifo_char_read_end";
 
+		fifo["int_peek"] = "fifo_int_peek";
+		fifo["int_write"] = "fifo_int_write";
+		fifo["int_read"] = "fifo_int_read";
+		fifo["int_hasToken"] = "fifo_int_has_tokens";
+		fifo["int_hasRoom"] = "fifo_int_has_room";
+		fifo["int_writeEnd"] = "fifo_int_write_end";
+		fifo["int_readEnd"] = "fifo_int_read_end";
+
+		fifo["short_peek"] = "fifo_short_peek";
+		fifo["short_write"] = "fifo_short_write";
+		fifo["short_read"] = "fifo_short_read";
+		fifo["short_hasToken"] = "fifo_short_has_tokens";
+		fifo["short_hasRoom"] = "fifo_short_has_room";
+		fifo["short_writeEnd"] = "fifo_short_write_end";
+		fifo["short_readEnd"] = "fifo_short_read_end";
+
+		fifo["u_char_peek"] = "fifo_u_char_peek";
+		fifo["u_char_write"] = "fifo_u_char_write";
+		fifo["u_char_read"] = "fifo_u_char_read";
+		fifo["u_char_hasToken"] = "fifo_u_char_has_tokens";
+		fifo["u_char_hasRoom"] = "fifo_u_char_has_room";
+		fifo["u_char_writeEnd"] = "fifo_u_char_write_end";
+		fifo["u_char_readEnd"] = "fifo_u_char_read_end";
+
+		fifo["u_int_peek"] = "fifo_u_int_peek";
+		fifo["u_int_write"] = "fifo_u_int_write";
+		fifo["u_int_read"] = "fifo_u_int_read";
+		fifo["u_int_hasToken"] = "fifo_u_int_has_tokens";
+		fifo["u_int_hasRoom"] = "fifo_u_int_has_room";
+		fifo["u_int_writeEnd"] = "fifo_u_int_write_end";
+		fifo["u_int_readEnd"] = "fifo_u_int_read_end";
+
+		fifo["char_peek"] = "fifo_char_peek";
+		fifo["char_write"] = "fifo_char_write";
+		fifo["char_read"] = "fifo_char_read";
+		fifo["char_hasToken"] = "fifo_char_has_tokens";
+		fifo["char_hasRoom"] = "fifo_char_has_room";
+		fifo["char_writeEnd"] = "fifo_char_write_end";
+		fifo["char_readEnd"] = "fifo_char_read_end";
+
 		fifo["printf"] = "printf";
 		return fifo;
 	}
@@ -109,23 +149,10 @@ public:
 	
 	~UnprotectedFifo();
 
-	/**
-     *  @brief Getter of fifo structure
-     *
-	 *	Return the llvm::Type of the fifo structure
-	 *
-	 *  @return llvm::Type of the fifo
-	 *
-     */
-	void addFifoHeader(Decoder* decoder);
-
 	void setConnection(Connection* connection);
 	
 
 private:
-
-	/** Decoder engine's jit */
-	JIT* jit;
 
 	/** Counter of fifo */
 	int fifoCnt;
@@ -140,13 +167,6 @@ private:
     *  @brief Parse fifo module
     */
 	void parseHeader();
-
-	/**
-    * @brief add fifo structure
-	*
-	* @return llvm::Type of the fifo structure
-    */
-	void addFifoType(Decoder* decoder);
 
 	/**
     * @brief add fifo functions into the given decoder

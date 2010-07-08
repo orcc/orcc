@@ -62,8 +62,10 @@ DisplayActor::DisplayActor(llvm::LLVMContext& C, AbstractFifo* fifo): Actor("dis
 	module = new Module("display", Context);
 
 	//Add fifo type
-	OpaqueType* fifoStruct = OpaqueType::get(C);
-	fifoTypes->insert(pair<string, Type*>("struct.fifo_s", fifoStruct));
+	map<string, Type*>::iterator it;
+	fifoTypes = fifo->getFifoTypes();
+	it = fifoTypes->find("struct.fifo_s");
+	Type* fifoStruct = it->second;
 
 	// Getting type of fifo
 	PointerType* fifoType = (PointerType*)fifoStruct->getPointerTo();

@@ -40,6 +40,7 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/Support/CommandLine.h"
 
+#include "Jade/JIT.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Actor/Actor.h"
 //------------------------------
@@ -48,15 +49,24 @@ using namespace llvm;
 using namespace std;
 
 void AbstractFifo::refineActor(Actor* actor){
-	map<string, Type*>::iterator itFifo;
-	itFifo = structAcces.find("struct.fifo_s");
-	Type* fifoDest = itFifo->second;
+	map<string, Type*>::iterator it;
 	
-	std::map<std::string, llvm::Type*>* sourceTypes = actor->getFifoTypes();
-	itFifo = sourceTypes->find("struct.fifo_s");
-	llvm::OpaqueType* fifoType = cast<llvm::OpaqueType>(itFifo->second);
+	for (it = structAcces.begin(); it != structAcces.end(); ++it){
+		
+		//Get opaquetype of the current fifo in the actor
+		Type* type = actor->getFifoType(it->first);
+		if (type == NULL){
+			fprintf(stderr,"Structure of fifo %d hasn't been found in actor %d", it->first, actor->getName());
+			exit(0);
+		}
 
-	fifoType->refineAbstractTypeTo(fifoDest);
+		if (isa<OpaqueType>(type)){
+			OpaqueType* opaqueFifoType = cast<OpaqueType>(type);
+
+			//Refine opaque type of the corresponding fifo structure
+			opaqueFifoType->refineAbstractTypeTo(it->second);
+		}
+	}
 }
 
 
@@ -108,4 +118,18 @@ void AbstractFifo::setFifoStruct(std::string name, llvm::Type* type){
 		}
 	
 		(*it).second = type;
+}
+
+void AbstractFifo::addFifoType(Decoder* decoder){
+	//Get fifos
+	map<string, Type*>::iterator it;
+
+	for (it = structAcces.begin(); it != structAcces.end(); ++it){
+		jit->addType(it->first, it->second, decoder);
+	}
+}
+
+void AbstractFifo::addFifoHeader(Decoder* decoder){
+	addFifoType(decoder);
+	addFunctions(decoder);
 }

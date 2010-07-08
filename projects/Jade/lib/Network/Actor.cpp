@@ -98,6 +98,18 @@ Port* Actor::getInput(string portName){
 	return (*it).second;
 }
 
+Type* Actor::getFifoType(string name) {
+	map<string, Type*>::iterator it;
+
+	it = fifoTypes->find(name);
+
+	if(it == fifoTypes->end()){
+		return NULL;
+	}
+
+	return (*it).second;
+}
+
 Port* Actor::getOutput(string portName){
 	if (outputs->empty()){
 		return NULL;

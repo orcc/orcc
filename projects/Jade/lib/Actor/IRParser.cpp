@@ -132,9 +132,41 @@ map<string, Port*>* IRParser::parsePorts(string key, Module* module){
 
 map<string, Type*>* IRParser::parseFifos(Module* module){
 	map<string,Type*>* fifos = new map<string,Type*>();
-	OpaqueType* fifo = (OpaqueType*)cast<OpaqueType>(module->getTypeByName("struct.fifo_s"));
-	fifos->insert(pair<string, Type*>("struct.fifo_s", fifo));
+	std::string structName;
+
+	structName = "struct.fifo_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_char_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_int_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_short_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_u_char_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_u_int_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_u_short_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
 	return fifos;
+}
+
+Type* IRParser::parseFifo(std::string name, Module* module){
+	Type* type = (Type*)module->getTypeByName(name);
+
+	if (type == NULL){
+		fprintf(stderr,"Structure %d hasn't been found in a parsed actor.", name);
+		exit(0);
+	}
+
+	return type;
 }
 
 

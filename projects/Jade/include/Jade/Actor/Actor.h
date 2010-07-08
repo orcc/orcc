@@ -243,15 +243,26 @@ public:
 	}
 
 	/**
-	 * @brief Getter of fifo type
+	 * @brief Getter of fifo types
 	 *
-	 * Returns the llvm::Type of fifo for this actor.
+	 * Returns a map of llvm::Type for fifos of this actor.
 	 * 
-	 * @return llvm::Type for fifo of this actor
+	 * @return a map of llvm::Type for fifos of this actor
 	 */
 	std::map<std::string, llvm::Type*>* getFifoTypes() {
 		return fifoTypes;
 	}
+
+	/**
+	 * @brief Getter of a fifo type
+	 *
+	 * Returns the llvm::Type of fifo corresponding to the given name
+	 * 
+	 * @param name: std::string of the fifo struct
+	 *
+	 * @return the corresponding llvm::Type
+	 */
+	llvm::Type* getFifoType(std::string name);
 
 	/**
 	 * @brief Getter of procedures

@@ -77,7 +77,9 @@ public:
 	 *  @param jit : JIT use to load bitcoder
 	 *
      */
-	AbstractFifo(){};
+	AbstractFifo(JIT* jit){
+		this->jit = jit;
+	};
 
 	~AbstractFifo(){};
 
@@ -89,7 +91,7 @@ public:
 	 *  @return llvm::Type of the fifo
 	 *
      */
-	virtual void addFifoHeader(Decoder* decoder) = 0;
+	virtual void addFifoHeader(Decoder* decoder);
 
 	/**
      *  @brief Getter of fifo structure
@@ -221,6 +223,16 @@ public:
      */
 	void refineActor(Actor* actor);
 
+	/**
+    * @brief add fifo structure
+	*
+	* @return llvm::Type of the fifo structure
+    */
+	void addFifoType(Decoder* decoder);
+
+
+	virtual void addFunctions(Decoder* decoder) =0;
+
 	virtual void setConnection(Connection* connection)=0;
 	
 
@@ -239,6 +251,9 @@ protected:
 
 	/** a map relying fifo function and their llvm::function equivalent in the header */
 	std::map<std::string,llvm::Function*> fifoAccess;
+
+	/** Decoder engine's jit */
+	JIT* jit;
 
 	/**
     *  @brief Initialize fifo access map

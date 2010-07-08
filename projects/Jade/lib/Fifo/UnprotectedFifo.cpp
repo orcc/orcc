@@ -47,8 +47,6 @@
 #include "llvm/Support/CommandLine.h"
 
 #include "Jade/JIT.h"
-
-
 #include "Jade/Actor/Port.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/UnprotectedFifo.h"
@@ -61,10 +59,8 @@ using namespace std;
 
 extern cl::opt<string> ToolsDir;
 
-UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C, JIT* jit): Context(C), AbstractFifo()
+UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C, JIT* jit): Context(C), AbstractFifo(jit)
 {
-	this->jit = jit;
-	
 	//Initialize map
 	createFifoMap();
 	createStructMap();
@@ -76,10 +72,8 @@ UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C, JIT* jit): Context(C), Ab
 	fifoCnt = 0;
 }
 
-UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C): Context(C), AbstractFifo()
+UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C): Context(C), AbstractFifo(NULL)
 {
-	this->jit = NULL;
-
 	// Initialize fifo counter 
 	fifoCnt = 0;
 
@@ -104,21 +98,6 @@ void UnprotectedFifo::parseHeader (){
 		fprintf(stderr,"Unable to parse fifo header file");
 		exit(0);
 	}
-}
-
-
-void UnprotectedFifo::addFifoHeader(Decoder* decoder){
-	addFifoType(decoder);
-	addFunctions(decoder);
-}
-
-void UnprotectedFifo::addFifoType(Decoder* decoder){
-	//Get fifos
-	map<string, Type*>::iterator it;
-	it = structAcces.find("struct.fifo_s");
-	StructType* type = cast<StructType>(it->second);
-
-	jit->addType("struct.fifo_s", type, decoder);
 }
 
 void UnprotectedFifo::parseFifoFunctions(){
@@ -153,8 +132,6 @@ void UnprotectedFifo::parseFifoStructs(){
 		setFifoStruct(name, type);
 		
 	}
-	
-
 }
 
 void UnprotectedFifo::addFunctions(Decoder* decoder){

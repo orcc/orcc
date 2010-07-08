@@ -59,9 +59,12 @@ SourceActor::SourceActor(llvm::LLVMContext& C, AbstractFifo* fifo): Actor("sourc
 
 	module = new Module("source", Context);
 
-		//Add fifo type
-	OpaqueType* fifoStruct = OpaqueType::get(C);
-	fifoTypes->insert(pair<string, Type*>("struct.fifo_s", fifoStruct));
+	//Add fifo type
+	map<string, Type*>::iterator it;
+	fifoTypes = fifo->getFifoTypes();
+	it = fifoTypes->find("struct.fifo_s");
+	Type* fifoStruct = it->second;
+	
 
 	/** Creating port O of size 16 */
 	string portName("O");
