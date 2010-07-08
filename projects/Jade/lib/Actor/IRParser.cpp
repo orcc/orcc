@@ -98,7 +98,7 @@ Actor* IRParser::parseActor(string classz){
 	MDString* name = cast<MDString>(nameMD->getOperand(0));
 
 	// Parse actor elements
-	OpaqueType* fifo = (OpaqueType*)cast<OpaqueType>(module->getTypeByName("struct.fifo_s"));
+	map<string, Type*>* fifos = parseFifos(module);
 	map<string, Port*>* inputs = parsePorts(IRConstant::KEY_INPUTS, module);
 	map<string, Port*>* outputs = parsePorts(IRConstant::KEY_OUTPUTS, module);
 	map<string, Variable*>* parameters =  parseParameters(module);
@@ -108,7 +108,7 @@ Actor* IRParser::parseActor(string classz){
 	list<Action*>* actions = parseActions(IRConstant::KEY_ACTIONS, module);
 	ActionScheduler* actionScheduler = parseActionScheduler(module);
 
-	return new Actor(name->getString(), classz, fifo, inputs, outputs, stateVars, 
+	return new Actor(name->getString(), classz, fifos, inputs, outputs, stateVars, 
 						parameters, procs, initializes, actions, actionScheduler);
 }
 
@@ -127,6 +127,14 @@ map<string, Port*>* IRParser::parsePorts(string key, Module* module){
 	 }
 
 	return ports;
+}
+
+
+map<string, Type*>* IRParser::parseFifos(Module* module){
+	map<string,Type*>* fifos = new map<string,Type*>();
+	OpaqueType* fifo = (OpaqueType*)cast<OpaqueType>(module->getTypeByName("struct.fifo_s"));
+	fifos->insert(pair<string, Type*>("struct.fifo_s", fifo));
+	return fifos;
 }
 
 

@@ -44,7 +44,7 @@
 using namespace std;
 using namespace llvm;
 
-Actor::Actor(string name, string file, Type* fifo, map<string, Port*>* inputs, 
+Actor::Actor(string name, string file, map<string, Type*>* fifoTypes, map<string, Port*>* inputs, 
 		     map<string, Port*>* outputs, map<string, Variable*>* stateVars,
 			 std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures,
 			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler){
@@ -58,7 +58,7 @@ Actor::Actor(string name, string file, Type* fifo, map<string, Port*>* inputs,
 	this->parameters = parameters;
 	this->procedures = procedures;
 	this->actionScheduler = actionScheduler;
-	this->fifo = fifo;
+	this->fifoTypes = fifoTypes;
 }
 
 Actor::~Actor (){

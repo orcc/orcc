@@ -39,24 +39,19 @@
 #ifndef CIRCULARFIFO_H
 #define CIRCULARFIFO_H
 
-
-
 #include <list>
 #include <map>
 
-#include "llvm/Module.h"
-#include "llvm/Support/CommandLine.h"
-
-
 namespace llvm{
+	class Function;
 	class LLVMContext;
+	class Type;
 }
 
+class Actor;
 class Decoder;
 class JIT;
 class Connection;
-
-extern llvm::cl::opt<std::string> ToolsDir;
 
 //------------------------------
 /**
@@ -66,7 +61,7 @@ extern llvm::cl::opt<std::string> ToolsDir;
  * 
  */
 class AbstractFifo{
-private:
+protected:
 	/** Fifo function name */
 	virtual std::map<std::string,std::string> fifoMap() = 0;
 
@@ -101,8 +96,8 @@ public:
 	 *  @return llvm::Type of the fifo
 	 *
      */
-	llvm::StructType* getFifoType(){
-		return type;
+	std::map<std::string, llvm::Type*>* getFifoTypes(){
+		return &types;
 	};
 
 	/**
@@ -200,18 +195,7 @@ public:
 	 *
 	 *  @param function : llvm::function corresponding to the fifo function name
      */
-	void setFifoFunction(std::string name, llvm::Function* function){
-		std::map<std::string,llvm::Function*>::iterator it;
-
-		it = fifoAccess.find(name);
-
-		if (it == fifoAccess.end()){
-			fprintf(stderr,"Error when setting circular fifo");
-			exit(0);
-		}
-	
-		(*it).second = function;
-	};
+	void setFifoFunction(std::string name, llvm::Function* function);
 
 	/**
      *  @brief get the llvm::function from the given fifo function
@@ -234,6 +218,14 @@ public:
 		return &fifoAccess;
 	};
 
+	/**
+     *  @brief refine Fifos of the actor
+	 *	
+	 *  Set Abstract fifos from the current actor into the Fifo
+	 *
+	 *  @param actor: the Actor to refine
+     */
+	void refineActor(Actor* actor);
 
 	virtual void setConnection(Connection* connection)=0;
 	
@@ -250,8 +242,8 @@ protected:
     */
 	std::map<std::string,llvm::Function*> fifoAccess;
 
-	/** structure type of the fifo */
-	llvm::StructType* type;
+	/** Structure type of the fifo */
+	std::map<std::string, llvm::Type*> types;
 };
 
 #endif

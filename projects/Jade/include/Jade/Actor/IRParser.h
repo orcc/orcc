@@ -170,10 +170,20 @@ private:
 	 *
 	 * @param module : llvm::Module to parse
 	 *
-	 * @return an map of ports
+	 * @return a map of ports
 	 */
 	std::map<std::string, Port*>* parsePorts(std::string key, llvm::Module* module);
 
+	/**
+	 * @brief Parses fifo structures
+	 *
+	 * Parses the given module to produce a map of fifo structure.
+	 *
+	 * @param module : llvm::Module to parse
+	 *
+	 * @return a map of llvm::StructType corresponding to an llvm::Type
+	 */
+	std::map<std::string, llvm::Type*>* parseFifos(llvm::Module* module);
 
 	/**
 	 * @brief Parses a port

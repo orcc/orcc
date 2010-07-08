@@ -28,55 +28,47 @@
  */
 
 /**
-@brief Implementation of class SourceActor
+@brief Implementation of class FifoCircular
 @author Jerome Gorin
-@file SourceActor.cpp
+@file FifoCircular.cpp
 @version 0.1
 @date 2010/04/12
 */
 
 //------------------------------
-#include "SourceActor.h"
-
-#include "llvm/Constants.h"
-#include "llvm/DerivedTypes.h"
-#include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
+#include "llvm/DerivedTypes.h"
+#include "llvm/Support/CommandLine.h"
 
-#include "Jade/Actor/ActionScheduler.h"
-#include "Jade/Actor/Port.h"
-#include "Jade/Actor/Location.h"
 #include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Actor/Actor.h"
 //------------------------------
 
-using namespace std;
 using namespace llvm;
+using namespace std;
 
-SourceActor::SourceActor(llvm::LLVMContext& C, AbstractFifo* fifo): Actor("source", "", new map<string, Type*>(), new map<string, Port*>(), 
-		  new map<string, Port*>(), new map<string, Variable*>(), new map<string, Variable*>(), new map<string, Procedure*>(),
-		  new list<Action*> (), new list<Action*> (), NULL) , Context(C)
-{
-
-	module = new Module("source", Context);
-
-		//Add fifo type
-	OpaqueType* fifoStruct = OpaqueType::get(C);
-	fifoTypes->insert(pair<string, Type*>("struct.fifo_s", fifoStruct));
-
-	/** Creating port O of size 16 */
-	string portName("O");
-	Type* portType = (Type*)IntegerType::get(Context, 8);
-	PointerType* type = (PointerType*)fifoStruct->getPointerTo();
-	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(type));
-	GlobalVariable* varO = new GlobalVariable(type, true, GlobalValue::ExternalLinkage, portValue, "O");
-	Port* portO = new Port(new Location, portName, portType, varO);
-
-	/** Creating action scheduler */
-	FunctionType *FTy = FunctionType::get(Type::getVoidTy(Context),false);
-	Function *NewF = Function::Create(FTy, Function::InternalLinkage , "scheduler", module);
-	this->actionScheduler = new ActionScheduler(NewF, NULL, NULL);
+void AbstractFifo::refineActor(Actor* actor){
+	map<string, Type*>::iterator itFifo;
+	itFifo = types.find("struct.fifo_s");
+	Type* fifoDest = itFifo->second;
 	
-	/** Inserting O in outputs list */
-	outputs->insert(pair<string, Port*>(portName, portO));
+	std::map<std::string, llvm::Type*>* sourceTypes = actor->getFifoTypes();
+	itFifo = sourceTypes->find("struct.fifo_s");
+	llvm::OpaqueType* fifoType = cast<llvm::OpaqueType>(itFifo->second);
 
-}
+	fifoType->refineAbstractTypeTo(fifoDest);
+};
+
+
+void AbstractFifo::setFifoFunction(std::string name, llvm::Function* function){
+		std::map<std::string,llvm::Function*>::iterator it;
+
+		it = fifoAccess.find(name);
+
+		if (it == fifoAccess.end()){
+			fprintf(stderr,"Error when setting circular fifo");
+			exit(0);
+		}
+	
+		(*it).second = function;
+};

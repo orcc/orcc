@@ -41,6 +41,7 @@
 #include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
 
 #include "Jade/Actor/ActionScheduler.h"
 #include "Jade/Actor/Port.h"
@@ -53,15 +54,19 @@ using namespace std;
 using namespace llvm;
 
 
-DisplayActor::DisplayActor(llvm::LLVMContext& C, AbstractFifo* fifo): Actor("display", "", OpaqueType::get(C), new std::map<std::string, Port*>(), 
+DisplayActor::DisplayActor(llvm::LLVMContext& C, AbstractFifo* fifo): Actor("display", "", new map<string, Type*>(), new std::map<std::string, Port*>(), 
 		  new std::map<std::string, Port*>(), new map<string, Variable*>(), new map<string, Variable*>(), 
 		  new map<string, Procedure*>(), new std::list<Action*> (), new std::list<Action*> (), NULL) , Context(C)
 {
 	
 	module = new Module("display", Context);
 
+	//Add fifo type
+	OpaqueType* fifoStruct = OpaqueType::get(C);
+	fifoTypes->insert(pair<string, Type*>("struct.fifo_s", fifoStruct));
+
 	// Getting type of fifo
-	PointerType* fifoType = (PointerType*)fifo->getFifoType()->getPointerTo();
+	PointerType* fifoType = (PointerType*)fifoStruct->getPointerTo();
 	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoType));
 	
 	

@@ -9,8 +9,4 @@ add_library (DecoderEngine
   Options.h
   SourceActor.cpp
   SourceActor.h
-  UnprotectedFifo.cpp
-  UnprotectedFifo.h
-  FifoCircular.cpp
-  FifoCircular.h
  )

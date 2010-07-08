@@ -45,6 +45,7 @@
 
 namespace llvm{
 	class Type;
+	class StructType;
 }
 
 class Action;
@@ -93,7 +94,7 @@ public:
 	 * @param actions : a list of actions
 	 *
      */
-	Actor(std::string name, std::string file, llvm::Type* fifo, std::map<std::string, Port*>* inputs, 
+	Actor(std::string name, std::string file, std::map<std::string, llvm::Type*>* fifoTypes, std::map<std::string, Port*>* inputs, 
 		std::map<std::string, Port*>* outputs, std::map<std::string, Variable*>* stateVars, 
 		std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures, 
 		std::list<Action*>* initializes, std::list<Action*>* actions, ActionScheduler* actionScheduler);
@@ -248,8 +249,8 @@ public:
 	 * 
 	 * @return llvm::Type for fifo of this actor
 	 */
-	llvm::Type* getFifoType() {
-		return fifo;
+	std::map<std::string, llvm::Type*>* getFifoTypes() {
+		return fifoTypes;
 	}
 
 	/**
@@ -356,8 +357,8 @@ protected:
 	/** Action schedumer of this actor */
 	ActionScheduler* actionScheduler;
 
-	/** Structure type from fifo of this actor */
-	llvm::Type* fifo;
+	/** Structure types from fifo of this actor */
+	std::map<std::string, llvm::Type*>* fifoTypes;
 };
 
 #endif

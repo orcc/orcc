@@ -45,12 +45,12 @@
 #include "Jade/Actor/IRParser.h"
 #include "Jade/Actor/Port.h"
 #include "Jade/Decoder/Decoder.h"
+#include "Jade/Fifo/UnprotectedFifo.h"
 #include "Jade/Network/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
 #include "SourceActor.h"
 #include "DisplayActor.h"
-#include "UnprotectedFifo.h"
 #include "Options.h"
 
 //------------------------------
@@ -73,6 +73,7 @@ DecoderEngine::~DecoderEngine(){
 }
 
 int DecoderEngine::load(Network* network) {
+	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 	XDFnetwork = network;
 
@@ -92,13 +93,9 @@ int DecoderEngine::load(Network* network) {
 	// Parsing actor
 	parseActors(network);
 
-	//Set abstract type of fifo from actors into the fifo used in the decoder engine
-	map<string, Actor*>::iterator it;
-
+	// Remove opaque type from actor
 	for ( it = actors.begin(); it != actors.end(); ++it ){
-		Actor* actor = it->second;
-		OpaqueType* fifoType = cast<OpaqueType>(actor->getFifoType());
-		fifoType->refineAbstractTypeTo(fifo->getFifoType());
+		fifo->refineActor(it->second);
 	}
 
 

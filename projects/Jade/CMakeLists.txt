@@ -89,7 +89,7 @@ add_subdirectory(lib/JIT)
 add_subdirectory(lib/Decoder)
 add_subdirectory(lib/DecoderEngine)
 add_subdirectory(lib/Graph)
-#add_subdirectory(lib/TinyXml)
+add_subdirectory(lib/Fifo)
 
 # Include directories
 include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS})
@@ -100,4 +100,4 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 add_executable(Jade Jade.cpp)
 
 # Library requiered
-target_link_libraries(Jade XDFParser DecoderEngine Network Actor JIT Scheduler HDAGGraph Decoder ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(Jade XDFParser Fifo DecoderEngine Network Actor JIT Scheduler HDAGGraph Decoder ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})

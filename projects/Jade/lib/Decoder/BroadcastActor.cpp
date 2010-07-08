@@ -45,6 +45,7 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Instructions.h"
+#include "llvm/Module.h"
 
 #include "Jade/Actor/ActionScheduler.h"
 #include "Jade/Actor/Port.h"
@@ -57,7 +58,7 @@
 using namespace std;
 using namespace llvm;
 
-BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string name, int numOutputs, Type* type, AbstractFifo* fifo): Actor(name, "", fifo->getFifoType(), 
+BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string name, int numOutputs, Type* type, AbstractFifo* fifo): Actor(name, "", fifo->getFifoTypes(), 
 		  new map<string, Port*>(), new map<string, Port*>(), new map<string, Variable*>(), new map<string, Variable*>(), new map<string, Procedure*>(), new list<Action*> (),
 		  new list<Action*> (), NULL) , Context(C)
 {
@@ -69,7 +70,10 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 	module = decoder->getModule();
 
 	// Getting type of fifo
-	PointerType* fifoType = (PointerType*)fifo->getFifoType()->getPointerTo();
+	map<string, Type*>::iterator it;
+	map<string, Type*>* fifoTypes = fifo->getFifoTypes();
+	it = fifoTypes->find("struct.fifo_s");
+	PointerType* fifoType = (PointerType*)it->second->getPointerTo();
 	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoType));
 
 	Location* location = new Location();
