@@ -67,19 +67,12 @@ actor Algo_Demux_Cavlc_Cabac()
 	int(size=2) CABAC_TYPE = 1;
 
 
+	/***** CAVLC *****/
 	IsCAVLC: action
 			EntropyType :[Entropy_type]
 				==>
 		guard
 			Entropy_type = CAVLC_TYPE
-		end
-
-
-	IsCABAC: action
-			EntropyType :[Entropy_type]
-				==>
-		guard
-			Entropy_type = CABAC_TYPE
 		end
 
 
@@ -95,6 +88,16 @@ actor Algo_Demux_Cavlc_Cabac()
 				==>
 			Cavlc_BlockType :[Val]
 		end
+
+
+
+	/***** CABAC *****/
+	IsCABAC: action
+			EntropyType :[Entropy_type]
+				==>
+		guard
+			Entropy_type = CABAC_TYPE
+		end	
 
 
 	CabacEntropy.TransmitValue: action

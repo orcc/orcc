@@ -69,28 +69,7 @@ actor Algo_BlockSplit_AVC()
 	uint(size=4) INTRA_16x16 = 1;	
 	uint(size=4) INTER       = 2;
 	uint(size=4) I_PCM       = 4;	
-//	uint(size=4) INTRA_8x8   = ??;		
-
-	Intra4x4orInter_splitY_DC: action
-//			Coeff  :[ x ] repeat 16,
-			MbType :[PredMode]
-				==>
-//			Coeff_Y_DC :[ ValDC ] repeat 16
-		guard
-			PredMode = INTRA_4x4 or PredMode = INTER
-//		var
-//			List(type: int(size=16), size=16) ValDC := [0 : for int i in Integers(0,15)]
-		end	
-
-
-	Intra16x16_splitY_DC: action
-			Coeff  :[ x ] repeat 16,
-			MbType :[PredMode]
-				==>
-			Coeff_Y_DC :[ x ] repeat 16
-		guard
-			PredMode = INTRA_16x16
-		end
+//	uint(size=4) INTRA_8x8   = ??;
 
 
 	SkipUselessToken: action
@@ -101,18 +80,31 @@ actor Algo_BlockSplit_AVC()
 		end
 
 
-	Intra4x4orInter_splitY_AC: action
+	Block_16x16_Luma.Send_Y_DC: action
+			MbType     :[PredMode],
+			Coeff      :[ x ] repeat 16
+				==>
+			Coeff_Y_DC :[ x ] repeat 16
+		guard
+			PredMode = INTRA_16x16
+		end
+
+
+	Block_16x16_Luma.Send_Y_AC: action
 			Coeff      :[ x ] repeat 16 * 16
 				==>
 			Coeff_Y_AC :[ x ] repeat 16 * 16
 		end
 
 
-	Intra16x16_splitY_AC: action
+	Block_4x4_Luma.Send_Y_AC: action
+			MbType     :[PredMode],
 			Coeff      :[ x ] repeat 16 * 16
 				==>
 			Coeff_Y_AC :[ x ] repeat 16 * 16
-		end	
+		guard
+			PredMode = INTRA_4x4 or PredMode = INTER	
+		end
 
 
 	splitU_DC: action
@@ -143,22 +135,21 @@ actor Algo_BlockSplit_AVC()
 		end
 
 
-	schedule fsm splitY_DC :
-		splitY_DC            ( Intra4x4orInter_splitY_DC ) --> Intra4x4orInter_splitY_AC;
-		Intra4x4orInter_splitY_AC   ( Intra4x4orInter_splitY_AC    ) --> splitU_DC;	
+	schedule fsm Check_Luma_MBSize :
+		Check_Luma_MBSize (Block_4x4_Luma.Send_Y_AC   )--> splitU_DC;
 
-		splitY_DC            ( Intra16x16_splitY_DC  ) --> Intra16x16_splitY_AC;
-		Intra16x16_splitY_AC ( Intra16x16_splitY_AC  ) --> splitU_DC;
+		Check_Luma_MBSize (Block_16x16_Luma.Send_Y_DC )--> Send_Y_AC_16x16;
+		Send_Y_AC_16x16   (Block_16x16_Luma.Send_Y_AC )--> splitU_DC;
 
-		splitY_DC            ( SkipUselessToken      ) --> splitY_DC;	
-	
-		splitU_DC            ( splitU_DC             ) --> splitV_DC;
-		splitV_DC            ( splitV_DC             ) --> splitU_AC;
-		splitU_AC            ( splitU_AC             ) --> splitV_AC;
-		splitV_AC            ( splitV_AC             ) --> splitY_DC;
+		Check_Luma_MBSize (SkipUselessToken           )--> Check_Luma_MBSize;	
+
+		splitU_DC         (splitU_DC                  )--> splitV_DC;
+		splitV_DC         (splitV_DC                  )--> splitU_AC;
+		splitU_AC         (splitU_AC                  )--> splitV_AC;
+		splitV_AC         (splitV_AC                  )--> Check_Luma_MBSize;
 	end
 
 	priority
-		Intra4x4orInter_splitY_DC > Intra16x16_splitY_DC > SkipUselessToken;
+		Block_4x4_Luma > Block_16x16_Luma > SkipUselessToken;
 	end
 end

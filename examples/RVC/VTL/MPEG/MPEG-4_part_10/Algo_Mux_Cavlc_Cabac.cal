@@ -65,6 +65,7 @@ actor Algo_Mux_Cavlc_Cabac()
 	int(size=2) CABAC_TYPE = 1;
 
 
+	/***** CAVLC *****/
 	IsCAVLC: action
 			EntropyType :[Entropy_type]
 				==>
@@ -73,18 +74,20 @@ actor Algo_Mux_Cavlc_Cabac()
 		end
 
 
+	CavlcEntropy: action
+			Cavlc_coeff :[ValCoeff]
+				==>
+			Coeff       :[ValCoeff]
+		end
+
+
+
+	/***** CABAC *****/
 	IsCABAC: action
 			EntropyType :[Entropy_type]
 				==>
 		guard
 			Entropy_type = CABAC_TYPE
-		end
-
-
-	CavlcEntropy: action
-			Cavlc_coeff :[ValCoeff]
-				==>
-			Coeff       :[ValCoeff]
 		end	
 
 

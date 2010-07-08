@@ -34,17 +34,6 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	uint(size=5)  NbBlock       := 0;
-	uint(size=8)  MacroBType;
-
-
-	ReadMBType: action
-			MBType    :[Type]
-				==>
-		guard
-			Type != I_PCM
-		do
-			MacroBType := Type;
-		end
 
 
 	EatTokenMBType: action
@@ -53,13 +42,19 @@ actor Mgnt_IQ_INTRA16x16()
 		end
 
 
-	HasDCCoeff: action ==>
+	HasDCCoeff: action
+			MBType    :[MacroBType]
+				==>
 		guard
 			MacroBType = INTRA_16x16 
 		end
 
 
-	HasNotDCCoeff: action ==>
+	HasNotDCCoeff: action
+			MBType    :[MacroBType]
+				==>
+		guard
+			MacroBType != I_PCM
 		end
 
 
@@ -98,7 +93,6 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	Send_AC_Coeff.Launch: action
-//			CoefDCR_L :[DcCoeff],
 			CoefAC_L  :[AcCoeff]  repeat 16
 				==>
 			Lev2d     :[AcCoeff]  repeat 16
@@ -110,7 +104,6 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	Send_AC_Coeff.LastBlock: action
-//			CoefDCR_L :[DcCoeff],
 			CoefAC_L  :[AcCoeff]  repeat 16
 				==>
 			Lev2d     :[AcCoeff]  repeat 16
@@ -119,23 +112,21 @@ actor Mgnt_IQ_INTRA16x16()
 		end
 
 
-	schedule fsm ReadMBType :
+	schedule fsm CheckMBType :
 
-		ReadMBType          ( EatTokenMBType                 )--> ReadMBType;
-		ReadMBType          ( ReadMBType                     )--> CheckMBType;
-
+		CheckMBType         ( EatTokenMBType                 )--> CheckMBType;
 		CheckMBType         ( HasDCCoeff                     )--> Merge_DCandAC_Coeff;
 		CheckMBType         ( HasNotDCCoeff                  )--> Send_AC_Coeff;
 
 		Merge_DCandAC_Coeff  ( Merge_DCandAC_Coeff.Launch    )--> Merge_DCandAC_Coeff;
-		Merge_DCandAC_Coeff  ( Merge_DCandAC_Coeff.LastBlock )--> ReadMBType;
+		Merge_DCandAC_Coeff  ( Merge_DCandAC_Coeff.LastBlock )--> CheckMBType;
 
 		Send_AC_Coeff        ( Send_AC_Coeff.Launch          )--> Send_AC_Coeff;
-		Send_AC_Coeff        ( Send_AC_Coeff.LastBlock       )--> ReadMBType;
+		Send_AC_Coeff        ( Send_AC_Coeff.LastBlock       )--> CheckMBType;
 	end
 
 	priority
-		ReadMBType                 > EatTokenMBType;
+		HasDCCoeff                 > HasNotDCCoeff                  > EatTokenMBType;
 		Merge_DCandAC_Coeff.Launch > Merge_DCandAC_Coeff.LastBlock;
 		Send_AC_Coeff.Launch       > Send_AC_Coeff.LastBlock;
 	end
