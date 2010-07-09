@@ -2,8 +2,12 @@
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
 
+fifoName(port) ::= <<
+%struct.fifo_$port.type$_s*
+>>
+
 fifo(port) ::= <<
-@$port.name$ = constant %struct.fifo_s* null
+@$port.name$ = constant $fifoName(port)$ null
 
 >>
 
@@ -356,14 +360,7 @@ b$label(ifNode.joinNode)$:
 >>
 
 LoadLocalPort(instr) ::= <<
-%local_$instr.port$$instr.block.label$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$instr.port$})$
->>
-
-HasRoom(result, action, port, numToken) ::= <<
-
-%$port$_$action$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$port$})$
-%$result$32 = $CallOp(ty="i32", fnptrval="hasRoom", function_args={%struct.fifo_s* %$port$_$action$, i32 $numToken$})$
-%$result$ = trunc i32 %$result$32 to i1
+%local_$instr.port$$instr.block.label$ = $LoadOp(ty=fifoName(instr.port), pointer={@$instr.port$})$
 >>
 
 label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
@@ -421,37 +418,51 @@ PhiAssignment(phi) ::= <<
 Read(read) ::= <<
 
 $LoadLocalPort(read)$
-%$read.target$_$read.block.label$ = $CallOp(ty ="i8*", fnptrval="getReadPtr", function_args={%struct.fifo_s* %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
-$BitcastOp(result={%$read.target$_$read.block.label$_cast}, ty="i8*", value={%$read.target$_$read.block.label$}, ty2={$ExprType(read.port)$*})$
-store $ExprType(read.port)$* %$read.target$_$read.block.label$_cast, $ExprType(read.port)$** %$read.port$
+%$read.target$_$read.block.label$ = $CallOp(ty ={$read.port.type$*}, fnptrval={fifo_$read.port.type$_read}, function_args={$fifoName(read.port)$ %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
+store $ExprType(read.port)$* %$read.target$_$read.block.label$, $ExprType(read.port)$** %$read.port$
 >>
 
-ReadEnd(readEnd) ::= <<
-
-%end_$readEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$readEnd.port$})$
-$CallOp(ty ="void", fnptrval="setReadEnd", function_args={%struct.fifo_s* %end_$readEnd.port$})$
->>
 
 Peek(peek) ::= <<
 
 $LoadLocalPort(peek)$
-%$peek.target$_$peek.block.label$ = $CallOp(ty ="i8*", fnptrval="getPeekPtr", function_args={%struct.fifo_s* %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
-$BitcastOp(result={%$peek.target$_$peek.block.label$_cast}, ty="i8*", value={%$peek.target$_$peek.block.label$}, ty2={$ExprType(peek.port)$*})$
-store $ExprType(peek.port)$* %$peek.target$_$peek.block.label$_cast, $ExprType(peek.port)$** %$peek.port$
+%$peek.target$_$peek.block.label$ = $CallOp(ty ={$peek.port.type$*}, fnptrval={fifo_$peek.port.type$_peek}, function_args={$fifoName(peek.port)$ %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
+store $ExprType(peek.port)$* %$peek.target$_$peek.block.label$, $ExprType(peek.port)$** %$peek.port$
 >>
 
 Write(write) ::= <<
 
 $LoadLocalPort(write)$
-%$write.target$_$write.block.label$ = $CallOp(ty ="i8*", fnptrval="getWritePtr", function_args={%struct.fifo_s* %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
+%$write.target$_$write.block.label$ = $CallOp(ty ="i8*", fnptrval={fifo_$write.port.type$_write}, function_args={$fifoName(write.port)$ %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
 $BitcastOp(result={%$write.target$_$write.block.label$_cast}, ty="i8*", value={%$write.target$_$write.block.label$}, ty2={$ExprType(write.port)$*})$
 store $ExprType(write.port)$* %$write.target$_$write.block.label$_cast, $ExprType(write.port)$** %$write.port$
 >>
 
+HasRoom(result, action, port, numToken) ::= <<
+
+%$port$_$action$ = $LoadOp(ty=fifoName(port), pointer={@$port$})$
+%$result$32 = $CallOp(ty="i32", fnptrval={fifo_$port.type$_has_room}, function_args={$fifoName(port)$ %$port$_$action$, i32 $numToken$})$
+%$result$ = trunc i32 %$result$32 to i1
+>>
+
+HasTokens(hasTokens) ::= <<
+
+$LoadLocalPort(hasTokens)$
+%$hasTokens.target$32 = $CallOp(ty="i32", fnptrval={fifo_$hasTokens.port.type$_has_tokens}, function_args={$fifoName(hasTokens.port)$ %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$})$
+%$hasTokens.target$ = trunc i32 %$hasTokens.target$32 to i1
+>>
+
 WriteEnd(writeEnd) ::= <<
 
-%end_$writeEnd.port$ = $LoadOp(ty="%struct.fifo_s*", pointer={@$writeEnd.port$})$
-$CallOp(ty ="void", fnptrval="setWriteEnd", function_args={%struct.fifo_s* %end_$writeEnd.port$})$
+%end_$writeEnd.port$ = $LoadOp(ty=fifoName(writeEnd.port), pointer={@$writeEnd.port$})$
+$CallOp(ty ="void", fnptrval={fifo_$writeEnd.port.type$_write_end}, function_args={$fifoName(writeEnd.port)$ %end_$writeEnd.port$})$
+>>
+
+
+ReadEnd(readEnd) ::= <<
+
+%end_$readEnd.port$ = $LoadOp(ty=fifoName(readEnd.port), pointer={@$readEnd.port$})$
+$CallOp(ty ="void", fnptrval={fifo_$readEnd.port.type$_read_end}, function_args={$fifoName(readEnd.port)$ %end_$readEnd.port$})$
 >>
 
 Return(return) ::= <<
@@ -461,13 +472,6 @@ RetOp(type=return.value.type, value=Expr(return.value))$$
 else
 $$RetOp()$$
 endif$
->>
-
-HasTokens(hasTokens) ::= <<
-
-$LoadLocalPort(hasTokens)$
-%$hasTokens.target$32 = $CallOp(ty="i32", fnptrval="hasTokens", function_args={%struct.fifo_s* %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$})$
-%$hasTokens.target$ = trunc i32 %$hasTokens.target$32 to i1
 >>
 
 Store(store) ::= <<

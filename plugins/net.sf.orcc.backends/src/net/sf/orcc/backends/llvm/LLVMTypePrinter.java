@@ -72,7 +72,7 @@ public class LLVMTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(TypeUint type) {
-		builder.append("i"+type.getSize());
+		builder.append("u_i"+type.getSize());
 	}
 
 	@Override

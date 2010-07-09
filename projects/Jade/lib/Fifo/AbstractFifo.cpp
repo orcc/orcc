@@ -56,7 +56,7 @@ void AbstractFifo::refineActor(Actor* actor){
 		//Get opaquetype of the current fifo in the actor
 		Type* type = actor->getFifoType(it->first);
 		if (type == NULL){
-			fprintf(stderr,"Structure of fifo %d hasn't been found in actor %d", it->first, actor->getName());
+			fprintf(stderr,"Structure of fifo %d hasn't been found in actor %d", it->first.c_str(), actor->getName().c_str());
 			exit(0);
 		}
 

@@ -62,53 +62,53 @@ private:
 		fifo["writeEnd"] = "setWriteEnd";
 		fifo["readEnd"] = "setReadEnd";
 		
-		fifo["char_peek"] = "fifo_char_peek";
-		fifo["char_write"] = "fifo_char_write";
-		fifo["char_read"] = "fifo_char_read";
-		fifo["char_hasToken"] = "fifo_char_has_tokens";
-		fifo["char_hasRoom"] = "fifo_char_has_room";
-		fifo["char_writeEnd"] = "fifo_char_write_end";
-		fifo["char_readEnd"] = "fifo_char_read_end";
+		fifo["i8_peek"] = "fifo_i8_peek";
+		fifo["i8_write"] = "fifo_i8_write";
+		fifo["i8_read"] = "fifo_i8_read";
+		fifo["i8_hasToken"] = "fifo_i8_has_tokens";
+		fifo["i8_hasRoom"] = "fifo_i8_has_room";
+		fifo["i8_writeEnd"] = "fifo_i8_write_end";
+		fifo["i8_readEnd"] = "fifo_i8_read_end";
 
-		fifo["int_peek"] = "fifo_int_peek";
-		fifo["int_write"] = "fifo_int_write";
-		fifo["int_read"] = "fifo_int_read";
-		fifo["int_hasToken"] = "fifo_int_has_tokens";
-		fifo["int_hasRoom"] = "fifo_int_has_room";
-		fifo["int_writeEnd"] = "fifo_int_write_end";
-		fifo["int_readEnd"] = "fifo_int_read_end";
+		fifo["i32_peek"] = "fifo_i32_peek";
+		fifo["i32_write"] = "fifo_i32_write";
+		fifo["i32_read"] = "fifo_i32_read";
+		fifo["i32_hasToken"] = "fifo_i32_has_tokens";
+		fifo["i32_hasRoom"] = "fifo_i32_has_room";
+		fifo["i32_writeEnd"] = "fifo_i32_write_end";
+		fifo["i32_readEnd"] = "fifo_i32_read_end";
 
-		fifo["short_peek"] = "fifo_short_peek";
-		fifo["short_write"] = "fifo_short_write";
-		fifo["short_read"] = "fifo_short_read";
-		fifo["short_hasToken"] = "fifo_short_has_tokens";
-		fifo["short_hasRoom"] = "fifo_short_has_room";
-		fifo["short_writeEnd"] = "fifo_short_write_end";
-		fifo["short_readEnd"] = "fifo_short_read_end";
+		fifo["i16_peek"] = "fifo_i16_peek";
+		fifo["i16_write"] = "fifo_i16_write";
+		fifo["i16_read"] = "fifo_i16_read";
+		fifo["i16_hasToken"] = "fifo_i16_has_tokens";
+		fifo["i16_hasRoom"] = "fifo_i16_has_room";
+		fifo["i16_writeEnd"] = "fifo_i16_write_end";
+		fifo["i16_readEnd"] = "fifo_i16_read_end";
 
-		fifo["u_char_peek"] = "fifo_u_char_peek";
-		fifo["u_char_write"] = "fifo_u_char_write";
-		fifo["u_char_read"] = "fifo_u_char_read";
-		fifo["u_char_hasToken"] = "fifo_u_char_has_tokens";
-		fifo["u_char_hasRoom"] = "fifo_u_char_has_room";
-		fifo["u_char_writeEnd"] = "fifo_u_char_write_end";
-		fifo["u_char_readEnd"] = "fifo_u_char_read_end";
+		fifo["u_i8_peek"] = "fifo_u_i8_peek";
+		fifo["u_i8_write"] = "fifo_u_i8_write";
+		fifo["u_i8_read"] = "fifo_u_i8_read";
+		fifo["u_i8_hasToken"] = "fifo_u_i8_has_tokens";
+		fifo["u_i8_hasRoom"] = "fifo_u_i8_has_room";
+		fifo["u_i8_writeEnd"] = "fifo_u_i8_write_end";
+		fifo["u_i8_readEnd"] = "fifo_u_i8_read_end";
 
-		fifo["u_int_peek"] = "fifo_u_int_peek";
-		fifo["u_int_write"] = "fifo_u_int_write";
-		fifo["u_int_read"] = "fifo_u_int_read";
-		fifo["u_int_hasToken"] = "fifo_u_int_has_tokens";
-		fifo["u_int_hasRoom"] = "fifo_u_int_has_room";
-		fifo["u_int_writeEnd"] = "fifo_u_int_write_end";
-		fifo["u_int_readEnd"] = "fifo_u_int_read_end";
+		fifo["u_i32_peek"] = "fifo_u_i32_peek";
+		fifo["u_i32_write"] = "fifo_u_i32_write";
+		fifo["u_i32_read"] = "fifo_u_i32_read";
+		fifo["u_i32_hasToken"] = "fifo_u_i32_has_tokens";
+		fifo["u_i32_hasRoom"] = "fifo_u_i32_has_room";
+		fifo["u_i32_writeEnd"] = "fifo_u_i32_write_end";
+		fifo["u_i32_readEnd"] = "fifo_u_i32_read_end";
 
-		fifo["char_peek"] = "fifo_char_peek";
-		fifo["char_write"] = "fifo_char_write";
-		fifo["char_read"] = "fifo_char_read";
-		fifo["char_hasToken"] = "fifo_char_has_tokens";
-		fifo["char_hasRoom"] = "fifo_char_has_room";
-		fifo["char_writeEnd"] = "fifo_char_write_end";
-		fifo["char_readEnd"] = "fifo_char_read_end";
+		fifo["i8_peek"] = "fifo_i8_peek";
+		fifo["i8_write"] = "fifo_i8_write";
+		fifo["i8_read"] = "fifo_i8_read";
+		fifo["i8_hasToken"] = "fifo_i8_has_tokens";
+		fifo["i8_hasRoom"] = "fifo_i8_has_room";
+		fifo["i8_writeEnd"] = "fifo_i8_write_end";
+		fifo["i8_readEnd"] = "fifo_i8_read_end";
 
 		fifo["printf"] = "printf";
 		return fifo;
@@ -119,12 +119,9 @@ private:
 	{
 		std::map<std::string,std::string> fifoStruct;	
 		fifoStruct["default"] = "struct.fifo_s";
-		fifoStruct["char_s"] = "struct.fifo_char_s";
-		fifoStruct["int_s"] = "struct.fifo_int_s";
-		fifoStruct["short_s"] = "struct.fifo_short_s";
-		fifoStruct["u_char_s"] = "struct.fifo_u_char_s";
-		fifoStruct["u_int_s"] = "struct.fifo_u_int_s";
-		fifoStruct["u_short_s"] = "struct.fifo_u_short_s";
+		fifoStruct["char_s"] = "struct.fifo_i8_s";
+		fifoStruct["int_s"] = "struct.fifo_i32_s";
+		fifoStruct["short_s"] = "struct.fifo_i16_s";
 		return fifoStruct;
 	}
 

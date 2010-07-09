@@ -125,7 +125,7 @@ void UnprotectedFifo::parseFifoStructs(){
 		Type* type = (Type*)header->getTypeByName(name);
 
 		if (type == NULL){
-			fprintf(stderr,"Error when parsing fifo, structure %s has not beend found", name);
+			fprintf(stderr,"Error when parsing fifo, structure %s has not beend found", name.c_str());
 			exit(0);
 		}
 

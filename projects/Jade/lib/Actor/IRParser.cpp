@@ -137,22 +137,13 @@ map<string, Type*>* IRParser::parseFifos(Module* module){
 	structName = "struct.fifo_s";
 	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
 
-	structName = "struct.fifo_char_s";
+	structName = "struct.fifo_i8_s";
 	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
 
-	structName = "struct.fifo_int_s";
+	structName = "struct.fifo_i32_s";
 	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
 
-	structName = "struct.fifo_short_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_u_char_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_u_int_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_u_short_s";
+	structName = "struct.fifo_i16_s";
 	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
 
 	return fifos;
@@ -162,7 +153,7 @@ Type* IRParser::parseFifo(std::string name, Module* module){
 	Type* type = (Type*)module->getTypeByName(name);
 
 	if (type == NULL){
-		fprintf(stderr,"Structure %d hasn't been found in a parsed actor.", name);
+		fprintf(stderr,"Structure %s hasn't been found in a parsed actor.", name.c_str());
 		exit(0);
 	}
 

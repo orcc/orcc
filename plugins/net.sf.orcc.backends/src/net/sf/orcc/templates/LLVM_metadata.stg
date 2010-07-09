@@ -117,7 +117,7 @@ $Body_MD(actor=actor, action=action)$
 >>
 
 fifo_MD(actor, port) ::= <<
-$fifo_decl_MD(actor=actor, port=port)$ = metadata !{metadata $Type_decl_MD(actor=actor, var=port)$, $varName_MD(port)$, %struct.fifo_s** @$port.name$}
+$fifo_decl_MD(actor=actor, port=port)$ = metadata !{metadata $Type_decl_MD(actor=actor, var=port)$, $varName_MD(port)$, $fifoName(port)$* @$port.name$}
 $Type_MD(actor=actor, var=port)$
 
 >>
