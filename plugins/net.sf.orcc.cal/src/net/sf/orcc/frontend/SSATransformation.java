@@ -219,14 +219,24 @@ public class SSATransformation extends AbstractActorTransformation {
 	private void replaceDef(LocalTargetContainer cter) {
 		LocalVariable target = cter.getTarget();
 		if (target != null) {
+			String name = target.getBaseName();
+
+			// v_old is the value of the variable before the assignment
+			LocalVariable oldVar = uses.get(name);
+			if (oldVar == null) {
+				// may be null if the variable is used without having been
+				// assigned first
+				// happens with function parameters for instance
+				oldVar = target;
+			}
+
 			LocalVariable newTarget = newDefinition(target);
 			cter.setTarget(newTarget);
 
-			String name = target.getBaseName();
 			uses.put(name, newTarget);
 
 			if (branch != 0) {
-				insertPhi(target, newTarget);
+				insertPhi(oldVar, newTarget);
 			}
 		}
 	}
