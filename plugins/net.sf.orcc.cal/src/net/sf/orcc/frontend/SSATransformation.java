@@ -30,9 +30,12 @@ package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalTargetContainer;
@@ -40,6 +43,7 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.User;
 import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -51,6 +55,7 @@ import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -94,6 +99,11 @@ public class SSATransformation extends AbstractActorTransformation {
 	 * join node (if any)
 	 */
 	private BlockNode join;
+
+	/**
+	 * contains the current while node being treated (if any)
+	 */
+	private WhileNode loop;
 
 	/**
 	 * maps a variable name to a local variable (used when replacing uses)
@@ -161,6 +171,10 @@ public class SSATransformation extends AbstractActorTransformation {
 			uses.add(use);
 			use = new Use(oldVar, phi);
 			uses.add(use);
+
+			if (loop != null) {
+				replaceUsesInLoop(oldVar, target);
+			}
 		}
 
 		// replace use
@@ -242,6 +256,64 @@ public class SSATransformation extends AbstractActorTransformation {
 	}
 
 	/**
+	 * Replaces uses of the given variable <code>oldVar</code> by uses of the
+	 * given variable <code>newVar</code> in the current loop.
+	 * 
+	 * @param oldVar
+	 *            old variable
+	 * @param newVar
+	 *            new variable
+	 */
+	private void replaceUsesInLoop(LocalVariable oldVar, LocalVariable newVar) {
+		List<Use> uses = new ArrayList<Use>(oldVar.getUses());
+		Set<CFGNode> nodes = new HashSet<CFGNode>();
+		findNodes(nodes, loop);
+
+		for (Use use : uses) {
+			User user = use.getNode();
+			CFGNode node;
+			if (user.isCFGNode()) {
+				node = (CFGNode) user;
+			} else {
+				Instruction instruction = (Instruction) user;
+				node = instruction.getBlock();
+			}
+
+			// only changes uses that are in the loop
+			if (node != join && nodes.contains(node)) {
+				use.setVariable(newVar);
+			}
+		}
+	}
+
+	/**
+	 * Find all the CFG nodes in the given node, and puts them in the given set.
+	 * 
+	 * @param nodes
+	 *            resultant set of nodes
+	 * @param node
+	 *            a CFG node
+	 */
+	private void findNodes(Set<CFGNode> nodes, CFGNode node) {
+		nodes.add(node);
+		if (node.isIfNode()) {
+			IfNode ifNode = (IfNode) node;
+			for (CFGNode subNode : ifNode.getThenNodes()) {
+				findNodes(nodes, subNode);
+			}
+
+			for (CFGNode subNode : ifNode.getElseNodes()) {
+				findNodes(nodes, subNode);
+			}
+		} else if (node.isWhileNode()) {
+			WhileNode whileNode = (WhileNode) node;
+			for (CFGNode subNode : whileNode.getNodes()) {
+				findNodes(nodes, subNode);
+			}
+		}
+	}
+
+	/**
 	 * Restore variables that were concerned by phi assignments.
 	 */
 	private void restoreVariables() {
@@ -309,6 +381,28 @@ public class SSATransformation extends AbstractActorTransformation {
 	public void visit(Store store, Object... args) {
 		replaceUses(store.getIndexes());
 		replaceUses(store.getValue());
+	}
+
+	@Override
+	public void visit(WhileNode whileNode, Object... args) {
+		int outerBranch = branch;
+		BlockNode outerJoin = join;
+		WhileNode outerLoop = loop;
+
+		replaceUses(whileNode.getValue());
+
+		join = whileNode.getJoinNode();
+		loop = whileNode;
+
+		branch = 2;
+		visit(whileNode.getNodes());
+		loop = outerLoop;
+
+		// commit phi
+		BlockNode innerJoin = join;
+		join = outerJoin;
+		branch = outerBranch;
+		commitPhi(innerJoin);
 	}
 
 	@Override

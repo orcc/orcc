@@ -106,6 +106,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
@@ -405,21 +406,35 @@ public class AstTransformer {
 
 		@Override
 		public Void caseAstStatementIf(AstStatementIf stmtIf) {
+			Location location = Util.getLocation(stmtIf);
+			Procedure procedure = context.getProcedure();
+
 			Expression condition = transformExpression(stmtIf.getCondition());
 
 			// transforms "then" statements and "else" statements
 			List<CFGNode> thenNodes = getNodes(stmtIf.getThen());
 			List<CFGNode> elseNodes = getNodes(stmtIf.getElse());
 
-			IfNode node = new IfNode(context.getProcedure(), condition,
-					thenNodes, elseNodes, new BlockNode(context.getProcedure()));
-			context.getProcedure().getNodes().add(node);
+			IfNode node = new IfNode(location, procedure, condition, thenNodes,
+					elseNodes, new BlockNode(procedure));
+			procedure.getNodes().add(node);
 
 			return null;
 		}
 
 		@Override
 		public Void caseAstStatementWhile(AstStatementWhile stmtWhile) {
+			Location location = Util.getLocation(stmtWhile);
+			Procedure procedure = context.getProcedure();
+
+			Expression condition = transformExpression(stmtWhile.getCondition());
+
+			List<CFGNode> nodes = getNodes(stmtWhile.getStatements());
+
+			WhileNode whileNode = new WhileNode(location, procedure, condition,
+					nodes, new BlockNode(procedure));
+			procedure.getNodes().add(whileNode);
+
 			return null;
 		}
 
@@ -900,8 +915,6 @@ public class AstTransformer {
 			mapFunctions.clear();
 			mapPorts.clear();
 			mapProcedures.clear();
-
-			procedures.clear();
 		}
 	}
 
@@ -1070,6 +1083,10 @@ public class AstTransformer {
 		Expression value = transformExpression(astFunction.getExpression());
 
 		restoreContext(oldContext, value);
+
+		if (astFunction.eContainer() == null) {
+			procedure.setExternal(true);
+		}
 
 		procedures.put(file, location, name, procedure);
 		mapFunctions.put(astFunction, procedure);
@@ -1355,6 +1372,10 @@ public class AstTransformer {
 		transformStatements(astProcedure.getStatements());
 
 		restoreContext(oldContext, null);
+
+		if (astProcedure.eContainer() == null) {
+			procedure.setExternal(true);
+		}
 
 		procedures.put(file, location, name, procedure);
 		mapProcedures.put(astProcedure, procedure);
