@@ -703,7 +703,7 @@ public class IRWriter {
 
 		obj.put(KEY_SOURCE_FILE, actor.getFile());
 		obj.put(KEY_NAME, actor.getName());
-		obj.put(KEY_PARAMETERS, writeStateVariables(actor.getParameters()));
+		obj.put(KEY_PARAMETERS, writeParameters(actor.getParameters()));
 		obj.put(KEY_INPUTS, writePorts(actor.getInputs()));
 		obj.put(KEY_OUTPUTS, writePorts(actor.getOutputs()));
 		obj.put(KEY_STATE_VARS, writeStateVariables(actor.getStateVars()));
@@ -864,6 +864,44 @@ public class IRWriter {
 	}
 
 	/**
+	 * Serializes the given variable declaration to JSON.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return
+	 */
+	private JSONArray writeParameter(StateVariable variable) {
+		JSONArray variableArray = new JSONArray();
+
+		JSONArray details = new JSONArray();
+		variableArray.put(details);
+
+		details.put(variable.getName());
+		details.put(variable.isAssignable());
+
+		variableArray.put(writeLocation(variable.getLocation()));
+		variableArray.put(writeType(variable.getType()));
+
+		return variableArray;
+	}
+
+	/**
+	 * Writes the given ordered map of state variables.
+	 * 
+	 * @param variables
+	 *            an ordered map of variables
+	 * @return a JSON array
+	 */
+	private JSONArray writeParameters(
+			OrderedMap<String, ? extends Variable> variables) {
+		JSONArray array = new JSONArray();
+		for (Variable variable : variables) {
+			array.put(writeParameter((StateVariable) variable));
+		}
+		return array;
+	}
+
+	/**
 	 * Writes the given port.
 	 * 
 	 * @param port
@@ -965,10 +1003,10 @@ public class IRWriter {
 	 * @return a JSON array
 	 */
 	private JSONArray writeStateVariables(
-			OrderedMap<String, ? extends Variable> variables) {
+			OrderedMap<String, StateVariable> variables) {
 		JSONArray array = new JSONArray();
-		for (Variable variable : variables) {
-			array.put(writeStateVariable((StateVariable) variable));
+		for (StateVariable variable : variables) {
+			array.put(writeStateVariable(variable));
 		}
 		return array;
 	}
