@@ -35,7 +35,6 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.util.OrderedMap;
 
@@ -68,10 +67,10 @@ public class DeadGlobalElimination extends AbstractActorTransformation {
 
 	@Override
 	public void transform(Actor actor) {
-		OrderedMap<String, Variable> stateVariables = actor.getStateVars();
-		Iterator<Variable> it = stateVariables.iterator();
+		OrderedMap<String, StateVariable> stateVariables = actor.getStateVars();
+		Iterator<StateVariable> it = stateVariables.iterator();
 		while (it.hasNext()) {
-			StateVariable variable = (StateVariable) it.next();
+			StateVariable variable = it.next();
 			if (!variable.isUsed()) {
 				it.remove();
 				remove(variable.getInstructions());

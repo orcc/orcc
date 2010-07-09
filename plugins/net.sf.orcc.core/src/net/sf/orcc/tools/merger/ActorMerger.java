@@ -48,6 +48,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -234,7 +235,7 @@ public class ActorMerger implements INetworkTransformation {
 	private Actor createActor(Set<Vertex> vertices) throws OrccException {
 		OrderedMap<String, Port> inputs = new OrderedMap<String, Port>();
 		OrderedMap<String, Port> outputs = new OrderedMap<String, Port>();
-		OrderedMap<String, Variable> stateVars = new OrderedMap<String, Variable>();
+		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
 		OrderedMap<String, Procedure> procs = new OrderedMap<String, Procedure>();
 
 		OrderedMap<String, Variable> parameters = new OrderedMap<String, Variable>();
@@ -359,7 +360,7 @@ public class ActorMerger implements INetworkTransformation {
 	private void createLoopedSchedule(Procedure procedure, Schedule schedule,
 			List<CFGNode> nodes) throws OrccException {
 		OrderedMap<String, Procedure> procs = actor.getProcs();
-		OrderedMap<String, Variable> vars = actor.getStateVars();
+		OrderedMap<String, StateVariable> vars = actor.getStateVars();
 
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
@@ -382,7 +383,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				String id = vertex.getInstance().getId();
 
-				for (Variable var : actor.getStateVars()) {
+				for (StateVariable var : actor.getStateVars()) {
 					String name = id + "_" + var.getName();
 					var.setName(name);
 					vars.put(name, var);

@@ -321,7 +321,7 @@ public class IRParser {
 			outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
 
 			JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
-			OrderedMap<String, Variable> stateVars = parseStateVars(array);
+			OrderedMap<String, StateVariable> stateVars = parseStateVars(array);
 
 			array = obj.getJSONArray(KEY_PROCEDURES);
 			for (int i = 0; i < array.length(); i++) {
@@ -787,9 +787,9 @@ public class IRParser {
 	 * @return A {@link List}&lt;{@link StateVariable}&gt;.
 	 * @throws JSONException
 	 */
-	private OrderedMap<String, Variable> parseStateVars(JSONArray array)
+	private OrderedMap<String, StateVariable> parseStateVars(JSONArray array)
 			throws JSONException, OrccException {
-		OrderedMap<String, Variable> stateVars = new OrderedMap<String, Variable>();
+		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
 		for (int i = 0; i < array.length(); i++) {
 			JSONArray stateArray = array.getJSONArray(i);
 

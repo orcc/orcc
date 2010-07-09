@@ -838,11 +838,11 @@ public class AstTransformer {
 		context = new Context();
 		try {
 			// parameters
-			OrderedMap<String, Variable> parameters = transformGlobalVariables(astActor
+			OrderedMap<String, StateVariable> parameters = transformGlobalVariables(astActor
 					.getParameters());
 
 			// first state variables, because port's sizes may depend on them.
-			OrderedMap<String, Variable> stateVars = transformGlobalVariables(astActor
+			OrderedMap<String, StateVariable> stateVars = transformGlobalVariables(astActor
 					.getStateVariables());
 
 			// then ports
@@ -1084,9 +1084,9 @@ public class AstTransformer {
 	 *            a list of AST state variables
 	 * @return an ordered map of IR state variables
 	 */
-	private OrderedMap<String, Variable> transformGlobalVariables(
+	private OrderedMap<String, StateVariable> transformGlobalVariables(
 			List<AstVariable> stateVariables) {
-		OrderedMap<String, Variable> stateVars = new OrderedMap<String, Variable>();
+		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
 		for (AstVariable astVariable : stateVariables) {
 			Location location = Util.getLocation(astVariable);
 			Type type = astVariable.getIrType();

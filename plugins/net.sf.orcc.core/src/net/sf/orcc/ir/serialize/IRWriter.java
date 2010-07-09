@@ -954,7 +954,8 @@ public class IRWriter {
 	 *            an ordered map of variables
 	 * @return a JSON array
 	 */
-	private JSONArray writeStateVariables(OrderedMap<String, Variable> variables) {
+	private JSONArray writeStateVariables(
+			OrderedMap<String, ? extends Variable> variables) {
 		JSONArray array = new JSONArray();
 		for (Variable variable : variables) {
 			array.put(writeStateVariable((StateVariable) variable));

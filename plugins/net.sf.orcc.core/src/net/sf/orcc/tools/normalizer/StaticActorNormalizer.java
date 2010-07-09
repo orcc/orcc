@@ -171,7 +171,7 @@ public class StaticActorNormalizer {
 
 	private Actor actor;
 
-	private OrderedMap<String, Variable> stateVars;
+	private OrderedMap<String, StateVariable> stateVars;
 
 	private CSDFActorClass staticCls;
 

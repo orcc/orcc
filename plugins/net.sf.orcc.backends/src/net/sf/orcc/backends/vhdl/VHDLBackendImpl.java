@@ -33,6 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,11 @@ import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
+import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
@@ -109,6 +113,27 @@ public class VHDLBackendImpl extends AbstractBackend {
 		VHDLTemplateData templateData = new VHDLTemplateData();
 		templateData.transform(actor);
 		actor.setTemplateData(templateData.getVariablesList());
+
+		evaluateInitializeActions(actor);
+	}
+
+	private void evaluateInitializeActions(Actor actor) {
+		// initializes the actor
+		Map<String, Expression> parameters = Collections.emptyMap();
+		ActorInterpreter interpreter = new ActorInterpreter(parameters, actor,
+				null);
+		try {
+			interpreter.initialize();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// Prints all stateVars
+		for (StateVariable stateVar : actor.getStateVars()) {
+			if (stateVar.getType().isList()) {
+				stateVar.setConstantValue(stateVar.getValue());
+			}
+		}
 	}
 
 	@Override

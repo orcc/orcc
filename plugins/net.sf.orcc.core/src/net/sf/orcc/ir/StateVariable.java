@@ -97,4 +97,16 @@ public class StateVariable extends Variable {
 		return (initialValue != null);
 	}
 
+	/**
+	 * Sets the initial value of this state variable. The initial value may be a
+	 * boolean, an integer, a list or a string.
+	 * 
+	 * @param initialValue
+	 *            an object, or <code>null</code> if this variable has no
+	 *            constant value
+	 */
+	public void setConstantValue(Object initialValue) {
+		this.initialValue = initialValue;
+	}
+
 }

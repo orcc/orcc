@@ -37,6 +37,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -57,7 +58,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 
-	private OrderedMap<String, Variable> stateVars;
+	private OrderedMap<String, StateVariable> stateVars;
 
 	@Override
 	public void transform(Actor actor) {

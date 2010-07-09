@@ -80,7 +80,7 @@ public class RenameTransformation extends AbstractActorTransformation {
 		this.replacement = replacement;
 	}
 
-	private void checkVariables(OrderedMap<String, Variable> variables) {
+	private void checkVariables(OrderedMap<String, ? extends Variable> variables) {
 		for (Variable variable : variables) {
 			String name = variable.getName();
 			if (transformations != null && transformations.containsKey(name)) {

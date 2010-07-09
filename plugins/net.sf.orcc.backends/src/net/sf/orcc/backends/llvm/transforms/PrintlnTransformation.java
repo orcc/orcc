@@ -39,7 +39,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Call;
@@ -64,7 +63,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 	/**
 	 * State variables of the actor
 	 */
-	private OrderedMap<String, Variable> stateVars;
+	private OrderedMap<String, StateVariable> stateVars;
 
 	@Override
 	public void transform(Actor actor) {

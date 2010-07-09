@@ -66,11 +66,11 @@ public class Actor {
 
 	private OrderedMap<String, Port> outputs;
 
-	private OrderedMap<String, Variable> parameters;
+	private OrderedMap<String, ? extends Variable> parameters;
 
 	private OrderedMap<String, Procedure> procs;
 
-	private OrderedMap<String, Variable> stateVars;
+	private OrderedMap<String, StateVariable> stateVars;
 
 	/**
 	 * holds template-specific data.
@@ -107,9 +107,9 @@ public class Actor {
 	 *            an action scheduler
 	 */
 	public Actor(String name, String file,
-			OrderedMap<String, Variable> parameters,
+			OrderedMap<String, ? extends Variable> parameters,
 			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
-			OrderedMap<String, Variable> stateVars,
+			OrderedMap<String, StateVariable> stateVars,
 			OrderedMap<String, Procedure> procs, List<Action> actions,
 			List<Action> initializes, ActionScheduler scheduler) {
 		this.actions = actions;
@@ -223,7 +223,7 @@ public class Actor {
 	 * 
 	 * @return the ordered map of parameters
 	 */
-	public OrderedMap<String, Variable> getParameters() {
+	public OrderedMap<String, ? extends Variable> getParameters() {
 		return parameters;
 	}
 
@@ -241,7 +241,7 @@ public class Actor {
 	 * 
 	 * @return the ordered map of state variables
 	 */
-	public OrderedMap<String, Variable> getStateVars() {
+	public OrderedMap<String, StateVariable> getStateVars() {
 		return stateVars;
 	}
 
