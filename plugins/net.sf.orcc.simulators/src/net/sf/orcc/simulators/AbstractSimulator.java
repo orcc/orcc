@@ -103,7 +103,12 @@ public abstract class AbstractSimulator implements Simulator {
 
 	@Override
 	public String getNetworkName() {
-		return new File(xdfFile).getName();
+		File file = new File(xdfFile);
+		int index = file.getName().lastIndexOf('.');
+		if ((index > 0) && (index <= file.getName().length() - 2)) {
+			return file.getName().substring(0, index);
+		}
+		return file.getName();
 	}
 
 	@Override
@@ -132,7 +137,7 @@ public abstract class AbstractSimulator implements Simulator {
 	 * Monitor associated to the simulator execution. Used for user
 	 * cancellation.
 	 */
-	private IProgressMonitor monitor = null;
+	protected IProgressMonitor monitor = null;
 
 	/**
 	 * Master caller associated process for console I/O access.

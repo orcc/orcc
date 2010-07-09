@@ -41,7 +41,7 @@ public class Fifo_boolean extends Fifo {
 	/**
 	 * The contents of the FIFO.
 	 */
-	private final Boolean[] contents;
+	private final boolean[] contents;
 
 	/**
 	 * Creates a new FIFO with the given size.
@@ -51,7 +51,7 @@ public class Fifo_boolean extends Fifo {
 	 */
 	public Fifo_boolean(int size) {
 		super(size);
-		contents = new Boolean[size];
+		contents = new boolean[size];
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class Fifo_boolean extends Fifo {
 	 */
 	public Fifo_boolean(int size, String folderName, String fifoName) {
 		super(size, folderName, fifoName);
-		contents = new Boolean[size];
+		contents = new boolean[size];
 	}
 
 	/**
@@ -77,11 +77,11 @@ public class Fifo_boolean extends Fifo {
 	 *            a number of tokens to read
 	 * @return the array where <code>numTokens</code> can be read
 	 */
-	final public Boolean[] getReadArray(int numTokens) {
+	final public boolean[] getReadArray(int numTokens) {
 		if (read + numTokens <= size) {
 			return contents;
 		} else {
-			Boolean[] buffer = new Boolean[numTokens];
+			boolean[] buffer = new boolean[numTokens];
 
 			int numEnd = size - read;
 			int numBeginning = numTokens - numEnd;
@@ -107,11 +107,11 @@ public class Fifo_boolean extends Fifo {
 	 *            a number of tokens to write
 	 * @return the array where <code>numTokens</code> can be written
 	 */
-	final public Boolean[] getWriteArray(int numTokens) {
+	final public boolean[] getWriteArray(int numTokens) {
 		if (write + numTokens <= size) {
 			return contents;
 		} else {
-			return new Boolean[numTokens];
+			return new boolean[numTokens];
 		}
 	}
 
@@ -125,7 +125,7 @@ public class Fifo_boolean extends Fifo {
 	 * @param numTokens
 	 *            the number of tokens that were written
 	 */
-	final public void writeEnd(int numTokens, Boolean[] buffer) {
+	final public void writeEnd(int numTokens, boolean[] buffer) {
 		fillCount += numTokens;
 		if (write + numTokens <= size) {
 			write += numTokens;
@@ -149,8 +149,8 @@ public class Fifo_boolean extends Fifo {
 		if (out != null) {
 			try {
 				for (int i = 0; i < buffer.length; i++) {
-					if (buffer[i] == null)
-						break;
+//					if (buffer[i] == null)
+//						break;
 					if (buffer[i]) {
 						out.write("1\n");
 					} else {

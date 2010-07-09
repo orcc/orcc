@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,82 +26,47 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.interpreter;
+package net.sf.orcc.plugins.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Port;
+import net.sf.orcc.plugins.ComboBoxOption;
+import net.sf.orcc.plugins.PluginOption;
 
-/**
- * This class describes a broadcast actor.
- * 
- * @author Pierre-Laurent Lagalaye
- * 
- */
-public class BroadcastActor extends AbstractInterpretedActor {
+public class ComboboxOptionImpl extends PluginOptionImpl implements
+		ComboBoxOption {
 
-	private CommunicationFifo inFifo;
-	private Port inport;
+	private List<String> selections;
+	private List<PluginOption> options;
 
-	private List<Port> outports;
-
-	public BroadcastActor(String id, Actor actor) {
-		super(id, actor);
-		outports = new ArrayList<Port>();
+	public ComboboxOptionImpl() {
+		this.selections = new ArrayList<String>();
+	}
+	
+	@Override
+	public List<PluginOption> getOptions() {
+		return options;
 	}
 
 	@Override
-	public void close() {
-	}
-
-	private boolean hasRoom(List<Port> outports) {
-		for (Port out : outports) {
-			CommunicationFifo outFifo = ioFifos.get(out.getName());
-			if (!outFifo.hasRoom(1))
-				return false;
-		}
-		return true;
+	public void setOptions(List<PluginOption> options) {
+		this.options = options;
 	}
 
 	@Override
-	public void initialize() {
-		inFifo = ioFifos.get(inport.getName());
+	public String toString() {
+		return super.toString() + ", options: " + getOptions();
 	}
 
 	@Override
-	public Integer run() {
-		return schedule();
+	public void addSelection(String selection) {
+		this.selections.add(selection);
 	}
 
 	@Override
-	public Integer schedule() {
-		Object[] inData = new Object[1];
-		Integer running = 0;
-		while ((inFifo.hasTokens(1)) && hasRoom(outports)) {
-			running = 1;
-			inFifo.get(inData);
-			for (Port outport : outports) {
-				CommunicationFifo outFifo = ioFifos.get(outport.getName());
-				outFifo.put(inData);
-			}
-		}
-
-		return running;
-	}
-
-	public void setInport(Port inport) {
-		this.inport = inport;
-	}
-
-	public void setOutport(Port outport) {
-		this.outports.add(outport);
-	}
-
-	@Override
-	public int step(boolean doStepInto) {
-		return schedule();
+	public List<String> getSelections() {
+		return this.selections;
 	}
 
 }

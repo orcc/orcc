@@ -73,7 +73,7 @@ $constant$
 
 // a state variable
 stateVar(variable) ::= <<
-$if(variable.constantValue)$
+$if(variable.initialized)$
 private $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;
 $else$
 private $variableDeclarationInit(variable)$;

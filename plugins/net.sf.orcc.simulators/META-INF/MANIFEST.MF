@@ -18,4 +18,5 @@ Export-Package: net.sf.orcc.simulators;
    net.sf.orcc.ir,
    org.osgi.framework,
    net.sf.orcc.debug.model,
-   net.sf.orcc.plugins.simulators"
+   net.sf.orcc.plugins.simulators",
+ net.sf.orcc.simulators.interpreter

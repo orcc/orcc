@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import net.sf.orcc.plugins.backends.Backend;
 import net.sf.orcc.plugins.impl.BrowseFileOptionImpl;
 import net.sf.orcc.plugins.impl.CheckboxOptionImpl;
+import net.sf.orcc.plugins.impl.ComboboxOptionImpl;
 import net.sf.orcc.plugins.impl.PluginOptionImpl;
 import net.sf.orcc.plugins.simulators.Simulator;
 
@@ -189,6 +190,20 @@ public class PluginFactory {
 	}
 
 	/**
+	 * Parses the given configuration element as a "combobox" option.
+	 * 
+	 * @param element
+	 *            a configuration element
+	 * @return a "combobox" option
+	 */
+	protected ComboBoxOption parseCombobox(IConfigurationElement element) {
+		ComboBoxOption option = new ComboboxOptionImpl();
+		List<PluginOption> options = parseOptions(element.getChildren());
+		option.setOptions(options);
+		return option;
+	}
+	
+	/**
 	 * Parses the given configuration elements as a list of options. The options
 	 * are added to the option map of this factory, and also returned as a list.
 	 * This allows checkbox options to have sub-options.
@@ -213,7 +228,9 @@ public class PluginFactory {
 					option = parseBrowseFile(child);
 				} else if (type.equals("checkBox")) {
 					option = parseCheckbox(child);
-				} else {
+				} else if (type.equals("comboBox")) {
+					option = parseCombobox(child);
+				}else {
 					continue;
 				}
 			} else {

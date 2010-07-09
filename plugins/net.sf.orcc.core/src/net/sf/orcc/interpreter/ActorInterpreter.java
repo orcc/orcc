@@ -108,8 +108,6 @@ public class ActorInterpreter {
 	 *            actor's parameters to be set
 	 * @param actor
 	 *            actor class definition
-	 * @param outputFolder
-	 *            location of compiled actors objects
 	 */
 	public ActorInterpreter(Map<String, Expression> parameters,
 			Actor actor, OrccProcess process) {

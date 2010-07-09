@@ -32,6 +32,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import net.sf.orcc.runtime.CLIParameters;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_int;
 
@@ -43,6 +44,10 @@ public class Actor_Source implements IActor {
 
 	private RandomAccessFile in;
 
+	public Actor_Source() {
+		fileName = CLIParameters.getInstance().getSourceFile();
+	}
+
 	public Actor_Source(String fileName) {
 		this.fileName = fileName;
 	}
@@ -53,7 +58,7 @@ public class Actor_Source implements IActor {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void initialize() {
 		try {
@@ -77,7 +82,7 @@ public class Actor_Source implements IActor {
 					byteRead = in.read();
 				}
 
-				Integer[] source = fifo_O.getWriteArray(1);
+				int[] source = fifo_O.getWriteArray(1);
 				int source_Index = fifo_O.getWriteIndex(1);
 				source[source_Index] = byteRead;
 				fifo_O.writeEnd(1, source);

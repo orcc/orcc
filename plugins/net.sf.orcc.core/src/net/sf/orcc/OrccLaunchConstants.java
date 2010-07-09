@@ -116,11 +116,6 @@ public interface OrccLaunchConstants {
 	 * Output folder associated with an Orcc configuration.
 	 */
 	public static final String OUTPUT_FOLDER = "net.sf.orcc.outputFolder";
-
-	/**
-	 * Parent of the output folder associated with an Orcc configuration.
-	 */
-	public static final String OUTPUT_PARENT_FOLDER = "net.sf.orcc.simulators.outputParentFolder";
 	
 	/**
 	 * Parameters associated with an Orcc configuration.

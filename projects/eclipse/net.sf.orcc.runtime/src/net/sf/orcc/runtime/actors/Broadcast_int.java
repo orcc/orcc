@@ -53,12 +53,12 @@ public class Broadcast_int extends Broadcast {
 	public int schedule() {
 		int i = 0;
 		while (input.hasTokens(1) && outputsHaveRoom()) {
-			Integer[] tokens = ((Fifo_int) input).getReadArray(1);
+			int[] tokens = ((Fifo_int) input).getReadArray(1);
 			int tokens_Index = input.getReadIndex(1);
 			int token = tokens[tokens_Index];
 
 			for (Fifo output : outputs) {
-				Integer[] outputTokens = ((Fifo_int) output).getWriteArray(1);
+				int[] outputTokens = ((Fifo_int) output).getWriteArray(1);
 				int output_Index = output.getWriteIndex(1);
 				outputTokens[output_Index] = token;
 				((Fifo_int) output).writeEnd(1, outputTokens);

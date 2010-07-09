@@ -207,9 +207,9 @@ public class Actor_Display implements IActor, ActionListener {
 	}
 
 	private void setVideoSize() {
-		Integer[] width = fifo_WIDTH.getReadArray(1);
+		int[] width = fifo_WIDTH.getReadArray(1);
 		int width_Index = fifo_WIDTH.getReadIndex(1);
-		Integer[] height = fifo_HEIGHT.getReadArray(1);
+		int[] height = fifo_HEIGHT.getReadArray(1);
 		int height_Index = fifo_HEIGHT.getReadIndex(1);
 
 		int newWidth = width[width_Index] << 4;
@@ -234,7 +234,7 @@ public class Actor_Display implements IActor, ActionListener {
 	}
 
 	private void writeMB() {
-		Integer[] mb = fifo_B.getReadArray(384);
+		int[] mb = fifo_B.getReadArray(384);
 		int mb_Index = fifo_B.getReadIndex(384);
 
 		for (int i = 0; i < 8; i++) {

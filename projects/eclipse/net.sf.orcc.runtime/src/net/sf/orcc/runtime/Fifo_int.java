@@ -41,7 +41,7 @@ public class Fifo_int extends Fifo {
 	/**
 	 * The contents of the FIFO.
 	 */
-	private Integer[] contents;
+	private int[] contents;
 
 	/**
 	 * Creates a new FIFO with the given size.
@@ -51,7 +51,7 @@ public class Fifo_int extends Fifo {
 	 */
 	public Fifo_int(int size) {
 		super(size);
-		contents = new Integer[size];
+		contents = new int[size];
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class Fifo_int extends Fifo {
 	 */
 	public Fifo_int(int size, String folderName, String fifoName) {
 		super(size, folderName, fifoName);
-		contents = new Integer[size];
+		contents = new int[size];
 	}
 
 	/**
@@ -77,11 +77,11 @@ public class Fifo_int extends Fifo {
 	 *            a number of tokens to read
 	 * @return the array where <code>numTokens</code> can be read
 	 */
-	final public Integer[] getReadArray(int numTokens) {
+	final public int[] getReadArray(int numTokens) {
 		if (read + numTokens <= size) {
 			return contents;
 		} else {
-			Integer[] buffer = new Integer[numTokens];
+			int[] buffer = new int[numTokens];
 
 			int numEnd = size - read;
 			int numBeginning = numTokens - numEnd;
@@ -107,11 +107,11 @@ public class Fifo_int extends Fifo {
 	 *            a number of tokens to write
 	 * @return the array where <code>numTokens</code> can be written
 	 */
-	final public Integer[] getWriteArray(int numTokens) {
+	final public int[] getWriteArray(int numTokens) {
 		if (write + numTokens <= size) {
 			return contents;
 		} else {
-			return new Integer[numTokens];
+			return new int[numTokens];
 		}
 	}
 
@@ -125,7 +125,7 @@ public class Fifo_int extends Fifo {
 	 * @param numTokens
 	 *            the number of tokens that were written
 	 */
-	final public void writeEnd(int numTokens, Integer[] buffer) {
+	final public void writeEnd(int numTokens, int[] buffer) {
 		fillCount += numTokens;
 		if (write + numTokens <= size) {
 			write += numTokens;
@@ -149,8 +149,8 @@ public class Fifo_int extends Fifo {
 		if (out != null) {
 			try {
 				for (int i = 0; i < buffer.length; i++) {
-					if (buffer[i] == null)
-						break;
+//					if (buffer[i] == null)
+//						break;
 					out.write(buffer[i] + "\n");
 				}
 				out.flush();

@@ -70,6 +70,11 @@ public class InterpreterSimuBroadcast extends AbstractInterpreterSimuActor
 	}
 
 	@Override
+	public String getFileName() {
+		return "";
+	}
+
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}

@@ -125,7 +125,7 @@ public abstract class AbstractBackend implements Backend {
 	protected int fifoSize;
 
 	/**
-	 * Path of the network.
+	 * Path of the IR files.
 	 */
 	protected String path;
 

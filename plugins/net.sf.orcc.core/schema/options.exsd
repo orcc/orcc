@@ -52,6 +52,7 @@
          <choice minOccurs="0" maxOccurs="1">
             <element ref="browseFile"/>
             <element ref="checkBox"/>
+            <element ref="comboBox"/>
          </choice>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -118,6 +119,14 @@
       </complexType>
    </element>
 
+   <element name="comboBox">
+      <complexType>
+        <sequence>
+            <element ref="option" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+   </element>
+   
    <annotation>
       <appInfo>
          <meta.section type="since"/>

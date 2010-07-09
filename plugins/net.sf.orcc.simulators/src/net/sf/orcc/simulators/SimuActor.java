@@ -55,6 +55,13 @@ public interface SimuActor {
 	public String getActorName();
 
 	/**
+	 * Return the name of the Actor description file of this actor instance.
+	 * 
+	 * @return The name of the Actor description file
+	 */
+	public String getFileName();
+	
+	/**
 	 * Return the identifier of the current actor instance.
 	 * 
 	 * @return The ID of the current actor instance

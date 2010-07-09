@@ -11,6 +11,15 @@
         </sealing>
     </manifest>
     <selectedElements exportClassFiles="true" exportJavaFiles="true" exportOutputFolder="false">
-        <javaElement handleIdentifier="=net.sf.orcc.runtime/src"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc.runtime.actors"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc.debug"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc.debug.type"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc.runtime.debug"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;org"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;net.sf.orcc.runtime"/>
+        <javaElement handleIdentifier="=net.sf.orcc.runtime/src&lt;org.json"/>
     </selectedElements>
 </jardesc>

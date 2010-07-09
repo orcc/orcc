@@ -174,6 +174,11 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	}
 
 	@Override
+	public String getFileName() {
+		return actorIR.getFile();
+	}
+	
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}

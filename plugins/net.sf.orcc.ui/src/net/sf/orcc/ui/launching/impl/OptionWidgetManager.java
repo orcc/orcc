@@ -33,6 +33,7 @@ import java.util.List;
 
 import net.sf.orcc.plugins.BrowseFileOption;
 import net.sf.orcc.plugins.CheckboxOption;
+import net.sf.orcc.plugins.ComboBoxOption;
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.OrccAbstractSettingsTab;
@@ -57,6 +58,9 @@ public class OptionWidgetManager {
 					parent);
 		} else if (option instanceof BrowseFileOption) {
 			return new BrowseFileOptionWidget(tab, (BrowseFileOption) option,
+					parent);
+		} else if (option instanceof ComboBoxOption) {
+			return new ComboBoxOptionWidget(tab, (ComboBoxOption) option,
 					parent);
 		} else {
 			return null;

@@ -26,50 +26,39 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.runtime.actors;
+package net.sf.orcc.plugins;
 
-import net.sf.orcc.runtime.Fifo;
-import net.sf.orcc.runtime.Fifo_boolean;
+import java.util.List;
 
-/**
- * This class defines a broadcast actor for boolean FIFOs.
- * 
- * @author Matthieu Wipliez
- * 
- */
-public class Broadcast_boolean extends Broadcast {
+public interface ComboBoxOption extends PluginOption {
 
 	/**
-	 * Creates a new broadcast with the given number of outputs.
+	 * Add a new possible selection Strings.
 	 * 
-	 * @param numOutputs
-	 *            number of output ports.
+	 * @param selection
+	 *            a new possible selection Strings
 	 */
-	public Broadcast_boolean(int numOutputs) {
-		super(numOutputs);
-	}
+	void addSelection(String selection);
+	
+	/**
+	 * Returns all the possible selections Strings.
+	 * 
+	 * @return all the possible selections Strings
+	 */
+	List<String> getSelections();
+	
+	/**
+	 * Returns the options that are required with the current choice.
+	 * 
+	 * @return the options that are required with the current choice
+	 */
+	List<PluginOption> getOptions();
 
-	@Override
-	public int schedule() {
-		int i = 0;
-		while (input.hasTokens(1) && outputsHaveRoom()) {
-			boolean[] tokens = ((Fifo_boolean) input).getReadArray(1);
-			int tokens_Index = input.getReadIndex(1);
-			boolean token = tokens[tokens_Index];
-
-			for (Fifo output : outputs) {
-				boolean[] outputTokens = ((Fifo_boolean) output)
-						.getWriteArray(1);
-				int output_Index = output.getWriteIndex(1);
-				outputTokens[output_Index] = token;
-				((Fifo_boolean) output).writeEnd(1, outputTokens);
-			}
-
-			((Fifo_boolean) input).readEnd(1);
-			i++;
-		}
-
-		return i;
-	}
-
+	/**
+	 * Sets the options that are required with the current choice.
+	 * 
+	 * @param options
+	 *            the options that are required with the current choice
+	 */
+	void setOptions(List<PluginOption> options);
 }

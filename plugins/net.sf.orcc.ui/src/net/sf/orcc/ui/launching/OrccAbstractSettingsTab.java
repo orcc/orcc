@@ -28,7 +28,9 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.OrccLaunchConstants.ACTIVATE_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+import static net.sf.orcc.OrccLaunchConstants.DEFAULT_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
@@ -283,6 +285,7 @@ public abstract class OrccAbstractSettingsTab extends
 		configuration.setAttribute(OUTPUT_FOLDER, "");
 		configuration.setAttribute(BACKEND, "");
 		configuration.setAttribute(SIMULATOR, "");
+		configuration.setAttribute(ACTIVATE_BACKEND, DEFAULT_BACKEND);
 	}
 
 	@Override

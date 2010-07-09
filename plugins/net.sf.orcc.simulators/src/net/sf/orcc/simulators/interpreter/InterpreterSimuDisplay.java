@@ -64,6 +64,11 @@ public class InterpreterSimuDisplay extends AbstractInterpreterSimuActor
 	}
 
 	@Override
+	public String getFileName() {
+		return "";
+	}
+	
+	@Override
 	public String getInstanceId() {
 		return instanceId;
 	}
