@@ -470,18 +470,28 @@ public class IRWriter {
 			whileArray.put(body);
 
 			body.put(writeExpression(node.getValue()));
-			body.put(writeNodes(node.getNodes()));
 
-			// FIXME need to modify this weird stuff in JSON format
+			// creates the join instruction
 			JSONArray joinArray = new JSONArray();
-			array.put(joinArray);
 
 			joinArray.put(IRConstants.NAME_JOIN);
 			joinArray.put(writeLocation(node.getLocation()));
 
+			// with all the phis
 			JSONArray phiArray = new JSONArray();
 			joinArray.put(phiArray);
 			node.getJoinNode().accept(this, phiArray);
+
+			// transforms all the other nodes
+			JSONArray nodesArray = writeNodes(node.getNodes());
+
+			// FIXME in the IR the join node of a while is its first node...
+			JSONArray bodyArray = new JSONArray();
+			bodyArray.put(joinArray);
+			for (int i = 0; i < nodesArray.length(); i++) {
+				bodyArray.put(nodesArray.opt(i));
+			}
+			body.put(bodyArray);
 		}
 	}
 
