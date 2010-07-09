@@ -59,6 +59,7 @@ import net.sf.orcc.ir.transforms.Inline;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.CollectionsUtil;
 
 /**
  * VHDL back-end.
@@ -130,8 +131,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		// Prints all stateVars
 		for (StateVariable stateVar : actor.getStateVars()) {
-			if (stateVar.getType().isList()) {
-				stateVar.setConstantValue(stateVar.getValue());
+			if (stateVar.getType().isList() && !stateVar.isInitialized()) {
+				Object value = stateVar.getValue();
+				List<?> list = CollectionsUtil.toList((Object[]) value);
+				stateVar.setConstantValue(list);
 			}
 		}
 	}

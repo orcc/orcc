@@ -229,7 +229,7 @@ signal $variable$ : $variable.type$;$
   $$
     if(!variable.assignable)
     $$
-      if(variable.constantValue)
+      if(variable.initialized)
       $
 type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
 constant $variable$ : memory_type_$variable$ := $Constant(variable.constantValue)$;$ 
@@ -238,7 +238,7 @@ constant $variable$ : memory_type_$variable$ := $Constant(variable.constantValue
     else
     $
 type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
-signal $variable$ : memory_type_$variable$;$
+signal $variable$ : memory_type_$variable$ := $Constant(variable.constantValue)$;$
     endif
   $$
   endif
