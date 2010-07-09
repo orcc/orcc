@@ -105,6 +105,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
+
+		VHDLTemplateData templateData = new VHDLTemplateData();
+		templateData.transform(actor);
+		actor.setTemplateData(templateData.getVariablesList());
 	}
 
 	@Override

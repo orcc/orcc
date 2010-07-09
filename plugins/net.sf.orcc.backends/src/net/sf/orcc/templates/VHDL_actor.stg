@@ -65,16 +65,20 @@ endif
 $
 >>
 
-SensitivFIFOin(port) ::=<<
+SensitivFIFOin(port) ::= <<
 $port.name$_send
 >>
 
-SensitivFIFOout(port) ::=<<
+SensitivFIFOout(port) ::= <<
 $port.name$_full
 >>
 
+SensitivVars(action) ::= <<
+$action.scheduler.stateVarsUsed: {$it$}; separator=", "$
+>>
+
 Actor_Schedul(actor) ::= <<
-  $actor.name$_scheduler : process (reset_n,
+  $actor.name$_scheduler : process (reset_n$actor.templateData: {, $it$}$,
   $actor.inputs.list: SensitivFIFOin(); separator=", "$,
   $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
     $actor.actions: printActionLocalSchedul()$  --
@@ -118,7 +122,7 @@ $port$_ack <= '1';
 
 
 Actor_Schedul_FSM(actor) ::= <<
-  $actor.name$_scheduler : process (reset_n, FSM,
+  $actor.name$_scheduler : process (reset_n, FSM$actor.templateData: {, $it$}$,
   $actor.inputs.list: SensitivFIFOin(); separator=", "$,
   $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
     $actor.actions: printActionLocalSchedul()$  --
