@@ -74,7 +74,7 @@ $port.name$_full
 >>
 
 Actor_Schedul(actor) ::= <<
-  $actor.name$_scheduler : process (reset_n, 
+  $actor.name$_scheduler : process (reset_n,
   $actor.inputs.list: SensitivFIFOin(); separator=", "$,
   $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
     $actor.actions: printActionLocalSchedul()$  --
@@ -86,10 +86,9 @@ Actor_Schedul(actor) ::= <<
       $actor.actions: printActionSchedulerInline(); separator="\n"$
     
       -- ACK
-      if $actor.actions:printActionACK(); separator="      elsif "$      else
-        $actor.actions:printActionNoACK(); separator="\n"$
-        $actor.inputs.list: NoACK(); separator="\n"$
-      end if;
+      $actor.actions:printActionNoACK(); separator="\n"$
+      $actor.inputs.list: NoACK(); separator="\n"$
+      if $actor.actions:printActionACK(); separator="      elsif "$      end if;
     end if;
   end process $actor.name$_scheduler;
 
