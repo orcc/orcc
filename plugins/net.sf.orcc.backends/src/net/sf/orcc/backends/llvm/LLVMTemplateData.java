@@ -22,20 +22,26 @@ import net.sf.orcc.ir.Variable;
  */
 public class LLVMTemplateData {
 
-	/** Medata container */
-	HashMap<Object, Integer> templateDataMap;
+	/**
+	 * Actor to compute
+	 */
+	private Actor actor;
 
-	/** Medata identifier counter */
-	int id;
+	/**
+	 * Medata identifier counter
+	 */
+	private int id;
 
-	/** Actor to compute */
-	Actor actor;
+	/**
+	 * Medata container
+	 */
+	private HashMap<Object, Integer> templateDataMap;
 
 	/**
 	 * Computes a map of metadata for LLVM template
 	 * 
 	 */
-	LLVMTemplateData(Actor actor) {
+	public LLVMTemplateData(Actor actor) {
 		templateDataMap = new HashMap<Object, Integer>();
 		this.actor = actor;
 		this.id = 0;
@@ -45,8 +51,8 @@ public class LLVMTemplateData {
 
 	private void computeAction(Action action) {
 		templateDataMap.put(action, id++);
-		//Avoid to add null id in map
-		if (!action.getTag().getIdentifiers().isEmpty()){
+		// Avoid to add null id in map
+		if (!action.getTag().getIdentifiers().isEmpty()) {
 			templateDataMap.put(action.getTag(), id++);
 		}
 		templateDataMap.put(action.getScheduler(), id++);
@@ -115,7 +121,7 @@ public class LLVMTemplateData {
 		for (Procedure procedure : actor.getProcs()) {
 			computeProc(procedure);
 		}
-		
+
 		// Insert procedures
 		for (Action initialize : actor.getInitializes()) {
 			computeAction(initialize);
@@ -138,7 +144,8 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of metadata information associated with their id.
 	 */
-	Map<Object, Integer> getTemplateData() {
+	public Map<Object, Integer> getTemplateData() {
 		return templateDataMap;
 	}
+
 }
