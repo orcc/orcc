@@ -54,15 +54,67 @@ private:
 	std::map<std::string,std::string> fifoMap()
 	{
 		std::map<std::string,std::string> fifo;
-		fifo["peek"] = "getPeekPtr";
-		fifo["write"] = "getWritePtr";
-		fifo["read"] = "getReadPtr";
-		fifo["hasToken"] = "hasTokens";
-		fifo["hasRoom"] = "hasRoom";
-		fifo["writeEnd"] = "setWriteEnd";
-		fifo["readEnd"] = "setReadEnd";
+	
+		fifo["i8_peek"] = "fifo_i8_peek";
+		fifo["i8_write"] = "fifo_i8_write";
+		fifo["i8_read"] = "fifo_i8_read";
+		fifo["i8_hasToken"] = "fifo_i8_has_tokens";
+		fifo["i8_hasRoom"] = "fifo_i8_has_room";
+		fifo["i8_writeEnd"] = "fifo_i8_write_end";
+		fifo["i8_readEnd"] = "fifo_i8_read_end";
+
+		fifo["i32_peek"] = "fifo_i32_peek";
+		fifo["i32_write"] = "fifo_i32_write";
+		fifo["i32_read"] = "fifo_i32_read";
+		fifo["i32_hasToken"] = "fifo_i32_has_tokens";
+		fifo["i32_hasRoom"] = "fifo_i32_has_room";
+		fifo["i32_writeEnd"] = "fifo_i32_write_end";
+		fifo["i32_readEnd"] = "fifo_i32_read_end";
+
+		fifo["i16_peek"] = "fifo_i16_peek";
+		fifo["i16_write"] = "fifo_i16_write";
+		fifo["i16_read"] = "fifo_i16_read";
+		fifo["i16_hasToken"] = "fifo_i16_has_tokens";
+		fifo["i16_hasRoom"] = "fifo_i16_has_room";
+		fifo["i16_writeEnd"] = "fifo_i16_write_end";
+		fifo["i16_readEnd"] = "fifo_i16_read_end";
+
+		fifo["u_i8_peek"] = "fifo_u_i8_peek";
+		fifo["u_i8_write"] = "fifo_u_i8_write";
+		fifo["u_i8_read"] = "fifo_u_i8_read";
+		fifo["u_i8_hasToken"] = "fifo_u_i8_has_tokens";
+		fifo["u_i8_hasRoom"] = "fifo_u_i8_has_room";
+		fifo["u_i8_writeEnd"] = "fifo_u_i8_write_end";
+		fifo["u_i8_readEnd"] = "fifo_u_i8_read_end";
+
+		fifo["u_i32_peek"] = "fifo_u_i32_peek";
+		fifo["u_i32_write"] = "fifo_u_i32_write";
+		fifo["u_i32_read"] = "fifo_u_i32_read";
+		fifo["u_i32_hasToken"] = "fifo_u_i32_has_tokens";
+		fifo["u_i32_hasRoom"] = "fifo_u_i32_has_room";
+		fifo["u_i32_writeEnd"] = "fifo_u_i32_write_end";
+		fifo["u_i32_readEnd"] = "fifo_u_i32_read_end";
+
+		fifo["i8_peek"] = "fifo_i8_peek";
+		fifo["i8_write"] = "fifo_i8_write";
+		fifo["i8_read"] = "fifo_i8_read";
+		fifo["i8_hasToken"] = "fifo_i8_has_tokens";
+		fifo["i8_hasRoom"] = "fifo_i8_has_room";
+		fifo["i8_writeEnd"] = "fifo_i8_write_end";
+		fifo["i8_readEnd"] = "fifo_i8_read_end";
+
 		fifo["printf"] = "printf";
 		return fifo;
+	}
+
+	/** Fifo function name */
+	std::map<std::string,std::string> structMap()
+	{
+		std::map<std::string,std::string> fifoStruct;	
+		fifoStruct["char_s"] = "struct.fifo_i8_s";
+		fifoStruct["int_s"] = "struct.fifo_i32_s";
+		fifoStruct["short_s"] = "struct.fifo_i16_s";
+		return fifoStruct;
 	}
 
 public:
@@ -86,23 +138,10 @@ public:
 	
 	~FifoCircular();
 
-	/**
-     *  @brief Getter of fifo structure
-     *
-	 *	Return the llvm::Type of the fifo structure
-	 *
-	 *  @return llvm::Type of the fifo
-	 *
-     */
-	void addFifoHeader(Decoder* decoder);
-
 	void setConnection(Connection* connection);
 	
 
 private:
-
-	/** Decoder engine's jit */
-	JIT* jit;
 
 	/** Counter of fifo */
 	int fifoCnt;
@@ -113,25 +152,10 @@ private:
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 	
-	/** module of the fifo */
-	llvm::Module* header;
-	
-	/**
-    *  @brief Initialized fifo access map
-    */
-	void createFifoMap();
-
 	/**
     *  @brief Parse fifo module
     */
 	void parseHeader();
-
-	/**
-    * @brief add fifo structure
-	*
-	* @return llvm::Type of the fifo structure
-    */
-	void addFifoType(Decoder* decoder);
 
 	/**
     * @brief add fifo functions into the given decoder
@@ -139,6 +163,8 @@ private:
 	* @param decoder : Decoder to had fifo functions
     */
 	void parseFifoFunctions();
+
+	void parseFifoStructs();
 
 	/**
     * @brief add fifo function corresponding to the given name into the given decoder
@@ -155,6 +181,8 @@ private:
     * @brief declareFifoHeader inside decoder
     */
 	void declareFifoHeader();
+
+	llvm::StructType* getFifoType(llvm::IntegerType* type);
 
 };
 

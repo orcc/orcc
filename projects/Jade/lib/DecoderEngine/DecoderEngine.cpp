@@ -45,7 +45,7 @@
 #include "Jade/Actor/IRParser.h"
 #include "Jade/Actor/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Fifo/UnprotectedFifo.h"
+#include "Jade/Fifo/FifoCircular.h"
 #include "Jade/Network/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
@@ -78,7 +78,7 @@ int DecoderEngine::load(Network* network) {
 	XDFnetwork = network;
 
 	// Parsing Fifo 
-	UnprotectedFifo* fifo = new UnprotectedFifo(Context, jit);
+	FifoCircular* fifo = new FifoCircular(Context, jit);
 	
 	// Insert actor source and display 
 	//actors.insert(pair<string,Actor*>("../../VTL/System/Source", new SourceActor(Context, fifo)));
