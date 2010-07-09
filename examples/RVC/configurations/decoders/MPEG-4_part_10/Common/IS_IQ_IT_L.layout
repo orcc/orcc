@@ -6,7 +6,6 @@
       <vertex id="QP" x="298" y="272"/>
       <vertex id="ScalingList" x="280" y="304"/>
       <vertex id="BlocksSize" x="144" y="138"/>
-      <vertex id="IntraDCFlag" x="271" y="338"/>
       <vertex id="CoefACR_L" x="729" y="199"/>
       <vertex id="Algo_IS_Zigzag_4x4_AC" x="73" y="183"/>
       <vertex id="Mgnt_IQ_INTRA16x16" x="245" y="182"/>

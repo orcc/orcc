@@ -27,13 +27,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="Intra_DC_flag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="PredMode">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -532,8 +525,6 @@
         src="Algo_Synp_AVC" src-port="ConstrainedIFlag"/>
     <Connection dst="" dst-port="Mb_TypeC" src="Algo_IntraPred_Split" src-port="MbTypeC"/>
     <Connection dst="" dst-port="Mb_Type" src="Algo_IntraPred_Split" src-port="MbType"/>
-    <Connection dst="" dst-port="Intra_DC_flag"
-        src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
     <Connection dst="Algo_MMCO" dst-port="MaxFrameNum"
         src="Algo_Synp_AVC" src-port="MaxFrameNum"/>
     <Connection dst="" dst-port="DelList" src="Algo_MMCO" src-port="DelList"/>

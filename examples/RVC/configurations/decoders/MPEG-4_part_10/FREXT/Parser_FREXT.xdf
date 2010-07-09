@@ -320,13 +320,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="Intra_DC_flag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -643,6 +636,4 @@
         src="Demux_Cavlc_Cabac" src-port="Cavlc_BlSize_L"/>
     <Connection dst="" dst-port="BlocksSize_Luma"
         src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
-    <Connection dst="" dst-port="Intra_DC_flag"
-        src="Algo_IntraPred_Split" src-port="IntraDCflag"/>
 </XDF>

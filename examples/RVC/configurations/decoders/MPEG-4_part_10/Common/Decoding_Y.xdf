@@ -215,13 +215,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="IntraDCFlag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -348,5 +341,4 @@
     <Connection dst="TEX_L" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="TEX_L" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="RES_L" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
-    <Connection dst="RES_L" dst-port="IntraDCFlag" src="" src-port="IntraDCFlag"/>
 </XDF>

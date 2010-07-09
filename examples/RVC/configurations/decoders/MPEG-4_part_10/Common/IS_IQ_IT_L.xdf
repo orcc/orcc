@@ -38,13 +38,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="IntraDCFlag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -130,5 +123,5 @@
         src="Algo_IQ_QSAndSLAndIDCTScaler_4x4" src-port="Cof"/>
     <Connection dst="Mgnt_IQ_INTRA16x16" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
     <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4"
-        dst-port="intra_DC_flag" src="" src-port="IntraDCFlag"/>
+        dst-port="DCCoeff_Present" src="Mgnt_IQ_INTRA16x16" src-port="DCCoeff_Present"/>
 </XDF>

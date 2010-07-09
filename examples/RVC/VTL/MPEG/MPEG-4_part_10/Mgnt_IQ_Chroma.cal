@@ -14,31 +14,38 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+actor Mgnt_IQ_Chroma()
+	int(size=16) CoefDCR_C,
+	int(size=16) CoefAC_C
+		==>
+	int(size=16) Lev2d,
+	bool        DCCoeff_Present
+		:
 
-actor Mgnt_IQ_Chroma() int(size=16) CoefDCR_C, int(size=16) CoefAC_C ==> int(size=16) Lev2d, int(size=2) intra_DC_flag
-:  
-  int Nb4x4:=4;
-   
-  lev2d: action CoefDCR_C:[x], CoefAC_C:[ y ] repeat 16 ==> Lev2d:[ buff ] repeat 16
-  var
-  	List (type: int(size=16), size=16) buff := [ 0 : for int s in Integers( 0, 15) ]
-  	do
-  	buff[0] := x;
-  	foreach int i in Integers(1,15) do
-  		buff[i] := y[i];
-  	end
-  	Nb4x4:=Nb4x4+1;
-  end
-  
-  intra_dc: action ==> intra_DC_flag:[1]
-  guard Nb4x4=4
-  do
-  	Nb4x4:=0;
-  end
-  
-  priority
-    intra_dc > lev2d;
-  end
-  
-  
+	int Nb4x4 := 4;
+
+	lev2d: action CoefDCR_C:[ x ], CoefAC_C:[ y ] repeat 16 ==> Lev2d:[ buff ]
+		repeat 16
+	var
+		List(type: int(size=16), size=16) buff := [ 0 : for int s in Integers(0, 15)
+		]
+	do
+		buff[0] := x;
+		foreach int i in Integers(1, 15) do
+			buff[i] := y[i];
+		end
+		Nb4x4 := Nb4x4 + 1;
+	end
+
+	intra_dc: action ==> DCCoeff_Present:[true]
+	guard
+		Nb4x4 = 4
+	do
+		Nb4x4 := 0;
+	end
+
+	priority
+		intra_dc > lev2d;
+	end
+
 end

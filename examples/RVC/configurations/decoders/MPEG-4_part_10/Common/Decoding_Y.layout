@@ -33,7 +33,6 @@
       <vertex id="MaxDPBSize" x="270" y="363"/>
       <vertex id="IsIDR" x="282" y="252"/>
       <vertex id="BlocksSize" x="21" y="29"/>
-      <vertex id="IntraDCFlag" x="17" y="152"/>
       <vertex id="Display_L" x="648" y="77"/>
       <vertex id="TEX_L" x="469" y="74"/>
       <vertex id="RES_L" x="134" y="87"/>

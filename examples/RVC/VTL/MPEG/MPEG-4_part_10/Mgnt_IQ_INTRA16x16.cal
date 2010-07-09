@@ -21,7 +21,8 @@ actor Mgnt_IQ_INTRA16x16()
 	uint(size=2)  BlocksSize,
 	int (size=16) CoefAC_L
 		==>
-	int(size=16) Lev2d
+	int(size=16) Lev2d,
+	bool         DCCoeff_Present
 		:
 
 
@@ -35,14 +36,16 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	HasDCCoeff: action
-			BlocksSize :[MacroBSize]
+			BlocksSize      :[MacroBSize]
 				==>
+			DCCoeff_Present :[true]
 		end
 
 
 	HasNotDCCoeff: action
-			BlocksSize :[MacroBSize]
+			BlocksSize      :[MacroBSize]
 				==>
+			DCCoeff_Present :[false]
 		guard
 			MacroBSize != BLOCK_16x16
 		end

@@ -4,7 +4,6 @@
       <vertex id="bits8" x="57" y="1779"/>
       <vertex id="CoefDC_L" x="1265" y="2101"/>
       <vertex id="CoefAC_L" x="1265" y="2074"/>
-      <vertex id="Intra_DC_flag" x="1126" y="1293"/>
       <vertex id="PredMode" x="1142" y="1398"/>
       <vertex id="ScalingList" x="711" y="90"/>
       <vertex id="QP" x="711" y="183"/>
@@ -47,6 +46,7 @@
       <vertex id="RefList" x="1311" y="1713"/>
       <vertex id="SizeDPBMax" x="787" y="2013"/>
       <vertex id="IsIDR" x="1269" y="1682"/>
+      <vertex id="BlockSize_L" x="1148" y="1267"/>
       <vertex id="byte2bit" x="333" y="1704"/>
       <vertex id="Algo_NALU" x="164" y="1761"/>
       <vertex id="Algo_Synp_AVC" x="439" y="1508"/>
@@ -57,6 +57,5 @@
       <vertex id="Algo_MMCO" x="873" y="1684"/>
       <vertex id="Algo_Parser_IPCM" x="951" y="2125"/>
       <vertex id="Algo_RefList0" x="1156" y="1702"/>
-      <vertex id="BlockSize_L" x="1148" y="1267"/>
    </vertices>
 </layout>

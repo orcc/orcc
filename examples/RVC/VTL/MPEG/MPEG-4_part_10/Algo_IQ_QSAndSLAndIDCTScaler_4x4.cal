@@ -56,8 +56,8 @@ Copyright (c) ISO/IEC 2007.
 
 actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
 		int(size=16) Lev2d, 
-		int(size=8) QP, 
-		int(size=2) intra_DC_flag, 
+		int(size=8) QP,
+		bool        DCCoeff_Present, 
 		int(size=8) ScalingList
 				==> 
 				int(size=16) Cof:
@@ -75,7 +75,7 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
   ];
 
   List (type: int(size=32), size=96) t_LevelScale;
-  int(size=2) intradcflag;
+  bool ValDCCoeff_Present;
 
   int(size=8) qp;
   int(size=8) qp_per;
@@ -97,9 +97,9 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
     t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in Integers(0,5), for int s in Integers(0,15) ];
   end
 
-  read_idf: action intra_DC_flag:[x] ==>
+  read_idf: action DCCoeff_Present:[x] ==>
   do
-    intradcflag := x;
+    ValDCCoeff_Present := x;
   end
   
   
@@ -108,7 +108,7 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
     List (type: int(size=16), size=16) buff := [ 0 : for int s in Integers( 0, 15) ]
   do
     nb_4x4:= nb_4x4 + 1;
-    buff [0] := if intradcflag = 1 then
+    buff [0] := if (ValDCCoeff_Present)then
     				x[0] 
                 else         // DC coefficient
                   if qp >= 24 then

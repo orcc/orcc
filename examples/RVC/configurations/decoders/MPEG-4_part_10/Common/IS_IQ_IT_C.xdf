@@ -112,8 +112,8 @@
         src="Algo_IS_Zigzag_4x4" src-port="Lev2d"/>
     <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4" dst-port="Lev2d"
         src="Mgnt_IQ_Chroma" src-port="Lev2d"/>
-    <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4"
-        dst-port="intra_DC_flag" src="Mgnt_IQ_Chroma" src-port="intra_DC_flag"/>
     <Connection dst="IT4x4" dst-port="X"
         src="Algo_IQ_QSAndSLAndIDCTScaler_4x4" src-port="Cof"/>
+    <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4"
+        dst-port="DCCoeff_Present" src="Mgnt_IQ_Chroma" src-port="DCCoeff_Present"/>
 </XDF>

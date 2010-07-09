@@ -46,6 +46,7 @@
       <vertex id="RefList" x="1283" y="3104"/>
       <vertex id="SizeDPBMax" x="766" y="2565"/>
       <vertex id="IsIDR" x="1073" y="3397"/>
+      <vertex id="BlocksSize_Luma" x="1238" y="2109"/>
       <vertex id="byte2bit" x="350" y="2625"/>
       <vertex id="Algo_NALU" x="168" y="2684"/>
       <vertex id="Algo_Synp_AVC" x="482" y="2288"/>
@@ -60,7 +61,5 @@
       <vertex id="Black_Hole" x="1283" y="3582"/>
       <vertex id="Demux_Cavlc_Cabac" x="943" y="2344"/>
       <vertex id="Mux_Cavlc_Cabac" x="1326" y="2326"/>
-      <vertex id="BlocksSize_Luma" x="1238" y="2109"/>
-      <vertex id="Intra_DC_flag" x="1247" y="2136"/>
    </vertices>
 </layout>
