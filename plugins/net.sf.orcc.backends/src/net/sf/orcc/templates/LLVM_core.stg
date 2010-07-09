@@ -455,14 +455,14 @@ $LoadLocalPort(hasTokens)$
 WriteEnd(writeEnd) ::= <<
 
 %end_$writeEnd.port$ = $LoadOp(ty=fifoName(writeEnd.port), pointer={@$writeEnd.port$})$
-$CallOp(ty ="void", fnptrval={fifo_$writeEnd.port.type$_write_end}, function_args={$fifoName(writeEnd.port)$ %end_$writeEnd.port$})$
+$CallOp(ty ="void", fnptrval={fifo_$writeEnd.port.type$_write_end}, function_args={$fifoName(writeEnd.port)$ %end_$writeEnd.port$, i32 $writeEnd.numTokens$})$
 >>
 
 
 ReadEnd(readEnd) ::= <<
 
 %end_$readEnd.port$ = $LoadOp(ty=fifoName(readEnd.port), pointer={@$readEnd.port$})$
-$CallOp(ty ="void", fnptrval={fifo_$readEnd.port.type$_read_end}, function_args={$fifoName(readEnd.port)$ %end_$readEnd.port$})$
+$CallOp(ty ="void", fnptrval={fifo_$readEnd.port.type$_read_end}, function_args={$fifoName(readEnd.port)$ %end_$readEnd.port$, i32 $readEnd.numTokens$})$
 >>
 
 Return(return) ::= <<

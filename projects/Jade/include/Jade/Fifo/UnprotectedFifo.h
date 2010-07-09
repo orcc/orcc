@@ -190,6 +190,8 @@ private:
     */
 	void declareFifoHeader();
 
+	llvm::StructType* getFifoType(int size);
+
 };
 
 #endif

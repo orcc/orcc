@@ -163,16 +163,14 @@ void UnprotectedFifo::setConnection(Connection* connection){
 	arrayName << "array_" << fifoCnt;
 	fifoName << "fifo_" << fifoCnt;
 
-	//Get fifos
-	map<string, Type*>::iterator it;
-	it = structAcces.find("struct.fifo_s");
-	StructType* type = cast<StructType>(it->second);
-
 	// Get vertex of the connection
 	Port* src = connection->getSourcePort();
 	Port* dst = connection->getDestinationPort();
 	GlobalVariable* srcVar = src->getGlobalVariable();
 	GlobalVariable* dstVar = dst->getGlobalVariable();
+
+	//Get fifo structure
+	StructType* structType = getFifoType(connection->getType());
 
 	// Initialize array 
 	PATypeHolder EltTy(connection->getIntegerType());
@@ -197,11 +195,11 @@ void UnprotectedFifo::setConnection(Connection* connection){
 	Elts.push_back(expr);
 	Elts.push_back(read_ptr);
 	Elts.push_back(write_ptr);
-	Constant* fifoStruct =  ConstantStruct::get(type, Elts);
+	Constant* fifoStruct =  ConstantStruct::get(structType, Elts);
 
 	// Create fifo 
 	GlobalVariable *NewFifo =
-        new GlobalVariable(*module, type,
+        new GlobalVariable(*module, structType,
 		true, GlobalVariable::InternalLinkage, fifoStruct, fifoName.str());
 
 	// Set initialize to instance port 
@@ -211,4 +209,17 @@ void UnprotectedFifo::setConnection(Connection* connection){
 	// Increment fifo counter 
 	fifoCnt++;
 	
+}
+
+StructType* UnprotectedFifo::getFifoType(int size){
+	int tokenWidth = size * 8;
+	map<string,Type*>::iterator it;
+
+	// Struct name 
+	ostringstream structName;
+	structName << "struct.fifo_i" << tokenWidth << "_s";
+
+	it = structAcces.find(structName.str());
+		
+	return cast<StructType>(it->second);
 }
