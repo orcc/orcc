@@ -150,20 +150,20 @@ public class AstTransformer {
 		@Override
 		public Expression caseAstExpressionCall(AstExpressionCall astCall) {
 			Location location = Util.getLocation(astCall);
+			Procedure procedure = context.getProcedure();
 
 			// retrieve IR procedure
 			AstFunction astFunction = astCall.getFunction();
 
 			// special case if the function is a built-in function
-			Expression result = transformBuiltinFunction(astCall);
-			if (result != null) {
-				return result;
+			if (astFunction.eContainer() == null) {
+				return transformBuiltinFunction(astCall);
 			}
 
 			if (!mapFunctions.containsKey(astFunction)) {
 				transformFunction(astFunction);
 			}
-			Procedure procedure = mapFunctions.get(astFunction);
+			Procedure calledProcedure = mapFunctions.get(astFunction);
 
 			// transform parameters
 			List<Expression> parameters = transformExpressions(astCall
@@ -171,10 +171,11 @@ public class AstTransformer {
 
 			// generates a new target
 			LocalVariable target = procedure.newTempLocalVariable(file,
-					procedure.getReturnType(), "call_" + procedure.getName());
+					calledProcedure.getReturnType(),
+					"call_" + calledProcedure.getName());
 
 			// add call
-			Call call = new Call(location, target, procedure, parameters);
+			Call call = new Call(location, target, calledProcedure, parameters);
 			addInstruction(call);
 
 			// return local variable
