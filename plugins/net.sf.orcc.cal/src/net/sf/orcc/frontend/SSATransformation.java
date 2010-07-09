@@ -79,7 +79,10 @@ public class SSATransformation extends AbstractActorTransformation {
 			Use use = expr.getVar();
 			LocalVariable oldVar = (LocalVariable) use.getVariable();
 			LocalVariable newVar = uses.get(oldVar.getBaseName());
-			use.setVariable(newVar);
+			if (newVar != null) {
+				// newVar may be null if oldVar is a function parameter for instance
+				use.setVariable(newVar);
+			}
 		}
 
 	}
