@@ -45,6 +45,7 @@
 namespace llvm{
 	class Function;
 	class LLVMContext;
+	class IntegerType;
 	class Type;
 }
 
@@ -110,63 +111,48 @@ public:
      *
 	 *	@Return the llvm::Function of peek function in the final decoder
      */
-	llvm::Function* getPeekFunction(){
-		return fifoAccess[fifoFunct["peek"]];
-	};
+	llvm::Function* getPeekFunction(llvm::Type* type);
 
 	/**
      *  @brief Getter of read function
      *
 	 *	@Return the llvm::Function of read function in the final decoder
      */
-	llvm::Function* getReadFunction(){
-		return fifoAccess[fifoFunct["read"]];
-	};
+	llvm::Function* getReadFunction(llvm::Type* type);
 
 	/**
      *  @brief Getter of write function
      *
 	 *	@Return the llvm::Function of write function in the final decoder
      */
-	llvm::Function* getWriteFunction(){
-		return fifoAccess[fifoFunct["write"]];
-	};
+	llvm::Function* getWriteFunction(llvm::Type* type);
 
 	/**
      *  @brief Getter of hasToken function
      *
 	 *	@Return the llvm::Function of hasToken function in the final decoder
      */
-	llvm::Function* getHasTokenFunction(){
-		return fifoAccess[fifoFunct["hasToken"]];
-	};
+	llvm::Function* getHasTokenFunction(llvm::Type* type);
 
 	/**
      *  @brief Getter of hasRoom function
      *
 	 *	@Return the llvm::Function of hasRoom function in the final decoder
      */
-	llvm::Function* getHasRoomFunction(){
-		return fifoAccess[fifoFunct["hasRoom"]];
-	};
+	llvm::Function* getHasRoomFunction(llvm::Type* type);
 
 	/**
      *  @brief Getter of writeEnd function
      *
 	 *	@Return the llvm::Function of writeEnd function in the final decoder
      */
-	llvm::Function* getWriteEndFunction(){
-		return fifoAccess[fifoFunct["writeEnd"]];
-	};
-
+	llvm::Function* getWriteEndFunction(llvm::Type* type);
 	/**
      *  @brief Getter of readEnd function
      *
 	 *	@Return the llvm::Function of readEnd function in the final decoder
      */
-	llvm::Function* getReadEndFunction(){
-		return fifoAccess[fifoFunct["readEnd"]];
-	};
+	llvm::Function* getReadEndFunction(llvm::Type* type);
 
 	
 	/**
@@ -234,6 +220,8 @@ public:
 	virtual void addFunctions(Decoder* decoder) =0;
 
 	virtual void setConnection(Connection* connection)=0;
+
+	virtual llvm::StructType* getFifoType(llvm::IntegerType* type)=0;
 	
 
 protected:
@@ -275,6 +263,11 @@ protected:
 	void setFifoFunction(std::string name, llvm::Function* function);
 
 	void setFifoStruct(std::string name, llvm::Type* type);
+
+	/**
+     *  @brief set fifo function name
+     */
+	std::string funcName(llvm::IntegerType* type, std::string func);
 };
 
 #endif

@@ -58,7 +58,7 @@
 using namespace std;
 using namespace llvm;
 
-BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string name, int numOutputs, Type* type, AbstractFifo* fifo): Actor(name, "", fifo->getFifoTypes(), 
+BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string name, int numOutputs, IntegerType* type, AbstractFifo* fifo): Actor(name, "", fifo->getFifoTypes(), 
 		  new map<string, Port*>(), new map<string, Port*>(), new map<string, Variable*>(), new map<string, Variable*>(), new map<string, Procedure*>(), new list<Action*> (),
 		  new list<Action*> (), NULL) , Context(C)
 {
@@ -70,10 +70,8 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 	module = decoder->getModule();
 
 	// Getting type of fifo
-	map<string, Type*>::iterator it;
-	map<string, Type*>* fifoTypes = fifo->getFifoTypes();
-	it = fifoTypes->find("struct.fifo_s");
-	PointerType* fifoType = (PointerType*)it->second->getPointerTo();
+	StructType* structType = fifo->getFifoType(cast<IntegerType>(type));
+	PointerType* fifoType = (PointerType*)structType->getPointerTo();
 	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoType));
 
 	Location* location = new Location();
@@ -186,7 +184,7 @@ BasicBlock* BroadcastActor::createHasTokenTest(Function* func, LoadInst* fifoStr
 	vector.push_back(fifoStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getHasTokenFunction(), vector.begin(), vector.end(), "c"+port->getName(), current);
+	CallInst* retVal = CallInst::Create(fifo->getHasTokenFunction(port->getType()), vector.begin(), vector.end(), "c"+port->getName(), current);
 	TruncInst* truncInst = new TruncInst(retVal, Type::getInt1Ty(Context), "t"+port->getName(), current);
 
 	// Add a basic block to bb to the scheduler.
@@ -205,7 +203,7 @@ BasicBlock* BroadcastActor::createHasRoomTest(Function* func, LoadInst* fifoStru
 	vector.push_back(fifoStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getHasRoomFunction(), vector.begin(), vector.end(), "c"+port->getName(), current);
+	CallInst* retVal = CallInst::Create(fifo->getHasRoomFunction(port->getType()), vector.begin(), vector.end(), "c"+port->getName(), current);
 	TruncInst* truncInst = new TruncInst(retVal, Type::getInt1Ty(Context), "t"+port->getName(), current);
 
 	// Add a basic block to bb to the scheduler.
@@ -224,7 +222,7 @@ Value* BroadcastActor::createReadFifo(Port* port, LoadInst* fifoStruct, BasicBlo
 	vector.push_back(fifoStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getReadFunction(), vector.begin(), vector.end(), "tokenPtri8", current);
+	CallInst* retVal = CallInst::Create(fifo->getReadFunction(port->getType()), vector.begin(), vector.end(), "tokenPtri8", current);
 	BitCastInst* bitCastInst = new BitCastInst(retVal, Type::getInt32PtrTy(Context), "tokenPtr",current);
 	
 	return new LoadInst(bitCastInst,"token", current);
@@ -238,7 +236,7 @@ void BroadcastActor::createWriteFifo(Port* port, LoadInst* fifoStruct, Value* to
 	vector.push_back(fifoStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getWriteFunction(), vector.begin(), vector.end(), "w"+port->getName(), current);
+	CallInst* retVal = CallInst::Create(fifo->getWriteFunction(port->getType()), vector.begin(), vector.end(), "w"+port->getName(), current);
 	
 	BitCastInst* bitCastInst = new BitCastInst(retVal, Type::getInt32PtrTy(Context), "wb"+port->getName(),current);
 	
@@ -251,8 +249,9 @@ void BroadcastActor::createSetReadEnd(Port* port, LoadInst* fifoStruct,BasicBloc
 	// Call readPtr
 	vector<Value*> vector;
 	vector.push_back(fifoStruct);
+	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getReadEndFunction(), vector.begin(), vector.end(), "", current);
+	CallInst* retVal = CallInst::Create(fifo->getReadEndFunction(port->getType()), vector.begin(), vector.end(), "", current);
 }
 
 void BroadcastActor::createSetWriteEnd(Port* port, LoadInst* fifoStruct,BasicBlock* current){
@@ -260,6 +259,7 @@ void BroadcastActor::createSetWriteEnd(Port* port, LoadInst* fifoStruct,BasicBlo
 	// Call readPtr
 	vector<Value*> vector;
 	vector.push_back(fifoStruct);
+	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getWriteEndFunction(), vector.begin(), vector.end(), "", current);
+	CallInst* retVal = CallInst::Create(fifo->getWriteEndFunction(port->getType()), vector.begin(), vector.end(), "", current);
 }

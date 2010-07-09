@@ -36,6 +36,8 @@
 */
 
 //------------------------------
+#include <sstream>
+
 #include "llvm/Module.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/Support/CommandLine.h"
@@ -132,4 +134,40 @@ void AbstractFifo::addFifoType(Decoder* decoder){
 void AbstractFifo::addFifoHeader(Decoder* decoder){
 	addFifoType(decoder);
 	addFunctions(decoder);
+}
+
+string AbstractFifo::funcName(IntegerType* type, string func){
+	ostringstream name;
+
+	name << "i" <<type->getBitWidth()<< "_" << func;
+
+	return name.str();
+}
+
+Function* AbstractFifo::getPeekFunction(Type* type){
+	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "peek")]];
+}
+
+Function* AbstractFifo::getReadFunction(Type* type){
+	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "read")]];
+}
+
+Function* AbstractFifo::getWriteFunction(Type* type){
+	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "write")]];
+}
+
+Function* AbstractFifo::getHasTokenFunction(Type* type){
+	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "hasToken")]];
+}
+
+Function* AbstractFifo::getHasRoomFunction(Type* type){
+	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "hasRoom")]];
+}
+
+Function* AbstractFifo::getWriteEndFunction(Type* type){
+	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "writeEnd")]];
+}
+
+Function* AbstractFifo::getReadEndFunction(Type* type){	
+	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "readEnd")]];
 }

@@ -44,6 +44,7 @@
 namespace llvm{
 	class LLVMContext;
 	class Function;
+	class IntegerType;
 	class Module;
 	class Type;
 	class BasicBlock;
@@ -64,7 +65,7 @@ class InstancedActor;
  */
 class BroadcastActor  : public Actor {
 public:
-	BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, std::string name, int numOutputs, llvm::Type* type, AbstractFifo* fifo);
+	BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, std::string name, int numOutputs, llvm::IntegerType* type, AbstractFifo* fifo);
 	~BroadcastActor();
 
 	/**

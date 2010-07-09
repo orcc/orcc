@@ -134,9 +134,6 @@ map<string, Type*>* IRParser::parseFifos(Module* module){
 	map<string,Type*>* fifos = new map<string,Type*>();
 	std::string structName;
 
-	structName = "struct.fifo_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
 	structName = "struct.fifo_i8_s";
 	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
 

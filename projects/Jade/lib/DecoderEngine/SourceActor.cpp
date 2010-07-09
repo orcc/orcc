@@ -57,19 +57,14 @@ SourceActor::SourceActor(llvm::LLVMContext& C, AbstractFifo* fifo): Actor("sourc
 		  new list<Action*> (), new list<Action*> (), NULL) , Context(C)
 {
 
-	module = new Module("source", Context);
+	module = new Module("source", Context);	
 
-	//Add fifo type
-	map<string, Type*>::iterator it;
 	fifoTypes = fifo->getFifoTypes();
-	it = fifoTypes->find("struct.fifo_s");
-	Type* fifoStruct = it->second;
-	
 
-	/** Creating port O of size 16 */
+	/** Creating port O of size 8 */
 	string portName("O");
-	Type* portType = (Type*)IntegerType::get(Context, 8);
-	PointerType* type = (PointerType*)fifoStruct->getPointerTo();
+	IntegerType* portType = (IntegerType*)IntegerType::get(Context, 8);
+	PointerType* type = (PointerType*)fifo->getFifoType(portType)->getPointerTo();
 	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(type));
 	GlobalVariable* varO = new GlobalVariable(type, true, GlobalValue::ExternalLinkage, portValue, "O");
 	Port* portO = new Port(new Location, portName, portType, varO);

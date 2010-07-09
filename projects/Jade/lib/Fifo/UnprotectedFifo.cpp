@@ -170,7 +170,7 @@ void UnprotectedFifo::setConnection(Connection* connection){
 	GlobalVariable* dstVar = dst->getGlobalVariable();
 
 	//Get fifo structure
-	StructType* structType = getFifoType(connection->getType());
+	StructType* structType = getFifoType(connection->getIntegerType());
 
 	// Initialize array 
 	PATypeHolder EltTy(connection->getIntegerType());
@@ -211,13 +211,12 @@ void UnprotectedFifo::setConnection(Connection* connection){
 	
 }
 
-StructType* UnprotectedFifo::getFifoType(int size){
-	int tokenWidth = size * 8;
+StructType* UnprotectedFifo::getFifoType(IntegerType* type){
 	map<string,Type*>::iterator it;
 
 	// Struct name 
 	ostringstream structName;
-	structName << "struct.fifo_i" << tokenWidth << "_s";
+	structName << "struct.fifo_i" << type->getBitWidth() << "_s";
 
 	it = structAcces.find(structName.str());
 		

@@ -54,14 +54,7 @@ private:
 	std::map<std::string,std::string> fifoMap()
 	{
 		std::map<std::string,std::string> fifo;
-		fifo["peek"] = "getPeekPtr";
-		fifo["write"] = "getWritePtr";
-		fifo["read"] = "getReadPtr";
-		fifo["hasToken"] = "hasTokens";
-		fifo["hasRoom"] = "hasRoom";
-		fifo["writeEnd"] = "setWriteEnd";
-		fifo["readEnd"] = "setReadEnd";
-		
+	
 		fifo["i8_peek"] = "fifo_i8_peek";
 		fifo["i8_write"] = "fifo_i8_write";
 		fifo["i8_read"] = "fifo_i8_read";
@@ -118,7 +111,6 @@ private:
 	std::map<std::string,std::string> structMap()
 	{
 		std::map<std::string,std::string> fifoStruct;	
-		fifoStruct["default"] = "struct.fifo_s";
 		fifoStruct["char_s"] = "struct.fifo_i8_s";
 		fifoStruct["int_s"] = "struct.fifo_i32_s";
 		fifoStruct["short_s"] = "struct.fifo_i16_s";
@@ -190,7 +182,7 @@ private:
     */
 	void declareFifoHeader();
 
-	llvm::StructType* getFifoType(int size);
+	llvm::StructType* getFifoType(llvm::IntegerType* type);
 
 };
 

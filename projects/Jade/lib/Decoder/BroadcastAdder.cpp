@@ -112,7 +112,8 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 	map<Port*, list<Connection*>*, ltstr>::iterator it;
 
 	for (int i = 0; i < nbEdges; i++){
-		Port* srcPort = connections[i]->getSourcePort();
+		Connection* connection = connections[i];
+		Port* srcPort = connection->getSourcePort();
 		it = outMap->find(srcPort);
 		if (it != outMap->end()){
 			list<Connection*>* outList = (*it).second;
@@ -122,7 +123,7 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				
 				//Create a new actor for this broadcast
 				string name = "broadcast_"+ instance->getId()+"_"+ srcPort->getName();
-				BroadcastActor* actorBCast = new BroadcastActor(Context, decoder, name, numOuputs, srcPort->getType(), fifo);
+				BroadcastActor* actorBCast = new BroadcastActor(Context, decoder, name, numOuputs, connection->getIntegerType(), fifo);
 				
 				//Instanciate broadcast
 				Instance* newInstance = new Instance(name, actorBCast);

@@ -61,34 +61,31 @@ DisplayActor::DisplayActor(llvm::LLVMContext& C, AbstractFifo* fifo): Actor("dis
 	
 	module = new Module("display", Context);
 
-	//Add fifo type
-	map<string, Type*>::iterator it;
 	fifoTypes = fifo->getFifoTypes();
-	it = fifoTypes->find("struct.fifo_s");
-	Type* fifoStruct = it->second;
 
-	// Getting type of fifo
-	PointerType* fifoType = (PointerType*)fifoStruct->getPointerTo();
-	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoType));
-	
-	
 	// Creating port B of size 16
 	string portNameB("B");
-	Type* portTypeB = (Type*)IntegerType::get(Context, 8);
-	GlobalVariable* varB = new GlobalVariable(fifoType, true, GlobalValue::ExternalLinkage, portValue, "B");
+	IntegerType* portTypeB = (IntegerType*)IntegerType::get(Context, 8);
+	PointerType* fifoPtr = (PointerType*)fifo->getFifoType(portTypeB)->getPointerTo();
+	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoPtr));
+	GlobalVariable* varB = new GlobalVariable(fifoPtr, true, GlobalValue::ExternalLinkage, portValue, "B");
 	Port* portB = new Port(new Location(), portNameB, portTypeB, varB);
 
 	// Creating port WIDTH of size 16 
 	string portNameW("WIDTH");
-	Type* portTypeW = (Type*)IntegerType::get(Context, 16);
-	GlobalVariable* varW = new GlobalVariable(fifoType, true, GlobalValue::ExternalLinkage, portValue, "WIDTH");
+	IntegerType* portTypeW = (IntegerType*)IntegerType::get(Context, 16);
+	fifoPtr = (PointerType*)fifo->getFifoType(portTypeW)->getPointerTo();
+	portValue = ConstantPointerNull::get(cast<PointerType>(fifoPtr));
+	GlobalVariable* varW = new GlobalVariable(fifoPtr, true, GlobalValue::ExternalLinkage, portValue, "WIDTH");
 	Port* portW = new Port(new Location(), portNameW, portTypeW, varW);
 
 
 	// Creating port HEIGHT of size 16 
 	string portNameH("HEIGHT");
-	Type* portTypeH = (Type*)IntegerType::get(Context, 16);
-	GlobalVariable* varH = new GlobalVariable(fifoType, true, GlobalValue::ExternalLinkage, portValue, "HEIGHT");
+	IntegerType* portTypeH = (IntegerType*)IntegerType::get(Context, 16);
+	fifoPtr = (PointerType*)fifo->getFifoType(portTypeH)->getPointerTo();
+	portValue = ConstantPointerNull::get(cast<PointerType>(fifoPtr));
+	GlobalVariable* varH = new GlobalVariable(fifoPtr, true, GlobalValue::ExternalLinkage, portValue, "HEIGHT");
 	Port* portH = new Port(new Location(), portNameH, portTypeH, varH);
 	
 	// Creating action scheduler 
