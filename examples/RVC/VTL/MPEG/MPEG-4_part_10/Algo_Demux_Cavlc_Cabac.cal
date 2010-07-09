@@ -55,11 +55,11 @@ Copyright (c) ISO/IEC 2008.
 
 actor Algo_Demux_Cavlc_Cabac()
 	int (size=2)  EntropyType,
-	uint(size=8)  BlockType,
+	uint(size=2)  BlocksSize_Luma,
 	int (size=12) Value
 		==>
 	int (size=12) Cavlc_value,
-	uint(size=8)  Cavlc_BlockType,	
+	uint(size=2)  Cavlc_BlSize_L,
 	int (size=12) Cabac_value
 		:
 
@@ -84,9 +84,9 @@ actor Algo_Demux_Cavlc_Cabac()
 
 
 	CavlcEntropy.TransmitBlockType: action
-			BlockType       :[Val]
+			BlocksSize_Luma :[Val]
 				==>
-			Cavlc_BlockType :[Val]
+			Cavlc_BlSize_L :[Val]
 		end
 
 
@@ -108,7 +108,7 @@ actor Algo_Demux_Cavlc_Cabac()
 
 
 	CabacEntropy.EatToken: action
-			BlockType       :[Val]	
+			BlocksSize_Luma :[Val]	
 				==>
 		end
 

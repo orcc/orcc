@@ -55,7 +55,7 @@ Copyright (c) ISO/IEC 2008.
 
 actor Algo_BlockSplit_AVC()
 	int (size=12) Coeff,
-	uint(size=8)  MbType
+	uint(size=2)  BlocksSize_Luma
 		==>
 	int(size=16) Coeff_Y_DC,
 	int(size=16) Coeff_Y_AC,
@@ -65,28 +65,19 @@ actor Algo_BlockSplit_AVC()
 	int(size=16) Coeff_V_AC
 		:
 
-	uint(size=4) INTRA_4x4   = 0;
-	uint(size=4) INTRA_16x16 = 1;	
-	uint(size=4) INTER       = 2;
-	uint(size=4) I_PCM       = 4;	
-//	uint(size=4) INTRA_8x8   = ??;
 
-
-	SkipUselessToken: action
-			MbType :[PredMode]
-				==>
-		guard
-			PredMode = I_PCM
-		end
+//	uint(size=2) BLOCK_4x4   = 0;
+//	uint(size=2) BLOCK_8x8   = 1;
+	uint(size=2) BLOCK_16x16 = 2;
 
 
 	Block_16x16_Luma.Send_Y_DC: action
-			MbType     :[PredMode],
-			Coeff      :[ x ] repeat 16
+			BlocksSize_Luma :[MBSize],
+			Coeff           :[ x ] repeat 16
 				==>
-			Coeff_Y_DC :[ x ] repeat 16
+			Coeff_Y_DC      :[ x ] repeat 16
 		guard
-			PredMode = INTRA_16x16
+			MBSize = BLOCK_16x16
 		end
 
 
@@ -98,12 +89,10 @@ actor Algo_BlockSplit_AVC()
 
 
 	Block_4x4_Luma.Send_Y_AC: action
-			MbType     :[PredMode],
-			Coeff      :[ x ] repeat 16 * 16
+			BlocksSize_Luma :[MBSize],	
+			Coeff           :[ x ] repeat 16 * 16
 				==>
-			Coeff_Y_AC :[ x ] repeat 16 * 16
-		guard
-			PredMode = INTRA_4x4 or PredMode = INTER	
+			Coeff_Y_AC      :[ x ] repeat 16 * 16
 		end
 
 
@@ -141,8 +130,6 @@ actor Algo_BlockSplit_AVC()
 		Check_Luma_MBSize (Block_16x16_Luma.Send_Y_DC )--> Send_Y_AC_16x16;
 		Send_Y_AC_16x16   (Block_16x16_Luma.Send_Y_AC )--> splitU_DC;
 
-		Check_Luma_MBSize (SkipUselessToken           )--> Check_Luma_MBSize;	
-
 		splitU_DC         (splitU_DC                  )--> splitV_DC;
 		splitV_DC         (splitV_DC                  )--> splitU_AC;
 		splitU_AC         (splitU_AC                  )--> splitV_AC;
@@ -150,6 +137,6 @@ actor Algo_BlockSplit_AVC()
 	end
 
 	priority
-		Block_4x4_Luma > Block_16x16_Luma > SkipUselessToken;
+		Block_16x16_Luma > Block_4x4_Luma;
 	end
 end

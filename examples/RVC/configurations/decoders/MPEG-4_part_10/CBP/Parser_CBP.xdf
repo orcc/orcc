@@ -320,6 +320,13 @@
     <Port kind="Output" name="IsIDR">
         <Type name="bool"/>
     </Port>
+    <Port kind="Output" name="BlockSize_L">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -559,8 +566,6 @@
         src="Algo_Synp_AVC" src-port="RUN"/>
     <Connection dst="Algo_BlockExpand_AVC" dst-port="Value"
         src="Algo_Synp_AVC" src-port="VALUE"/>
-    <Connection dst="Algo_BlockExpand_AVC" dst-port="BlockType"
-        src="Algo_IntraPred_Split" src-port="MbType"/>
     <Connection dst="Algo_BlockSplit_AVC" dst-port="Coeff"
         src="Algo_BlockExpand_AVC" src-port="Coeff"/>
     <Connection dst="" dst-port="CoefAC_Cb" src="Algo_BlockSplit_AVC" src-port="Coeff_U_AC"/>
@@ -569,6 +574,9 @@
     <Connection dst="" dst-port="CoefDC_Cr" src="Algo_BlockSplit_AVC" src-port="Coeff_V_DC"/>
     <Connection dst="" dst-port="CoefAC_L" src="Algo_BlockSplit_AVC" src-port="Coeff_Y_AC"/>
     <Connection dst="" dst-port="CoefDC_L" src="Algo_BlockSplit_AVC" src-port="Coeff_Y_DC"/>
-    <Connection dst="Algo_BlockSplit_AVC" dst-port="MbType"
-        src="Algo_IntraPred_Split" src-port="MbType"/>
+    <Connection dst="Algo_BlockExpand_AVC" dst-port="BlocksSize_Luma"
+        src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
+    <Connection dst="Algo_BlockSplit_AVC" dst-port="BlocksSize_Luma"
+        src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
+    <Connection dst="" dst-port="BlockSize_L" src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
 </XDF>

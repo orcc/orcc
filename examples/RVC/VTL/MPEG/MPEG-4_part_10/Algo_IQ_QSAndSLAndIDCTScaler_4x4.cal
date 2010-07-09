@@ -108,7 +108,8 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
     List (type: int(size=16), size=16) buff := [ 0 : for int s in Integers( 0, 15) ]
   do
     nb_4x4:= nb_4x4 + 1;
-    buff [0] := if intradcflag = 1 then x[0] 
+    buff [0] := if intradcflag = 1 then
+    				x[0] 
                 else         // DC coefficient
                   if qp >= 24 then
                     lshift(x[0]*t_LevelScale[qp_rem*16], qp_per-4)

@@ -18,7 +18,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 actor Mgnt_IQ_INTRA16x16()
 	int (size=16) CoefDCR_L,
-	uint(size=8)  MBType,
+	uint(size=2)  BlocksSize,
 	int (size=16) CoefAC_L
 		==>
 	int(size=16) Lev2d
@@ -26,35 +26,25 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	/* Constants */
-//	uint(size=8) INTRA_4x4   = 0;
-//	uint(size=8) INTRA_8x8   = ;
-	uint(size=8) INTRA_16x16 = 1;
-	uint(size=8) I_PCM       = 4;
-/*	uint(size=8) INTER       = 2; */
+//	uint(size=2) BLOCK_4x4   = 0;
+//	uint(size=2) BLOCK_8x8   = 1;
+	uint(size=2) BLOCK_16x16 = 2;
 
 
 	uint(size=5)  NbBlock       := 0;
 
 
-	EatTokenMBType: action
-			MBType    :[Type]
-				==>
-		end
-
-
 	HasDCCoeff: action
-			MBType    :[MacroBType]
+			BlocksSize :[MacroBSize]
 				==>
-		guard
-			MacroBType = INTRA_16x16 
 		end
 
 
 	HasNotDCCoeff: action
-			MBType    :[MacroBType]
+			BlocksSize :[MacroBSize]
 				==>
 		guard
-			MacroBType != I_PCM
+			MacroBSize != BLOCK_16x16
 		end
 
 
@@ -114,9 +104,8 @@ actor Mgnt_IQ_INTRA16x16()
 
 	schedule fsm CheckMBType :
 
-		CheckMBType         ( EatTokenMBType                 )--> CheckMBType;
-		CheckMBType         ( HasDCCoeff                     )--> Merge_DCandAC_Coeff;
-		CheckMBType         ( HasNotDCCoeff                  )--> Send_AC_Coeff;
+		CheckMBType          ( HasDCCoeff                    )--> Merge_DCandAC_Coeff;
+		CheckMBType          ( HasNotDCCoeff                 )--> Send_AC_Coeff;
 
 		Merge_DCandAC_Coeff  ( Merge_DCandAC_Coeff.Launch    )--> Merge_DCandAC_Coeff;
 		Merge_DCandAC_Coeff  ( Merge_DCandAC_Coeff.LastBlock )--> CheckMBType;
@@ -126,7 +115,7 @@ actor Mgnt_IQ_INTRA16x16()
 	end
 
 	priority
-		HasDCCoeff                 > HasNotDCCoeff                  > EatTokenMBType;
+		HasNotDCCoeff              > HasDCCoeff;
 		Merge_DCandAC_Coeff.Launch > Merge_DCandAC_Coeff.LastBlock;
 		Send_AC_Coeff.Launch       > Send_AC_Coeff.LastBlock;
 	end

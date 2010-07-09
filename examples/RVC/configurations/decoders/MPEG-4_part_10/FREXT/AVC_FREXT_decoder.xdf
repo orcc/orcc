@@ -189,8 +189,6 @@
     <Connection dst="Decoding_Y" dst-port="CurrMbAddr" src="FUN_Parser" src-port="CurrMbAddr"/>
     <Connection dst="Decoding_Y" dst-port="FirstMbInSlice"
         src="FUN_Parser" src-port="FirstMbInSlice"/>
-    <Connection dst="Decoding_Y" dst-port="Intra_DC_flag"
-        src="FUN_Parser" src-port="Intra_DC_flag"/>
     <Connection dst="Decoding_Y" dst-port="PredMode" src="FUN_Parser" src-port="PredMode"/>
     <Connection dst="Decoding_Y" dst-port="CoefDC_L" src="FUN_Parser" src-port="CoefDC_L"/>
     <Connection dst="Decoding_Y" dst-port="QP" src="FUN_Parser" src-port="QP"/>
@@ -302,4 +300,6 @@
     <Connection dst="Decoding_Y" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decode_U" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decode_V" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
+    <Connection dst="Decoding_Y" dst-port="BlocksSize" src="FUN_Parser" src-port="BlocksSize_Luma"/>
+    <Connection dst="Decoding_Y" dst-port="IntraDCFlag" src="FUN_Parser" src-port="Intra_DC_flag"/>
 </XDF>

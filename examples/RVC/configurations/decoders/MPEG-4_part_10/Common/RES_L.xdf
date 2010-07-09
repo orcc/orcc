@@ -17,13 +17,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="Intra_DC_flag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="QP">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -38,10 +31,17 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MBType">
+    <Port kind="Input" name="BlocksSize">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="IntraDCFlag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
             </Entry>
         </Type>
     </Port>
@@ -136,7 +136,6 @@
     <!-- ************************************** -->
     <Connection dst="FUN_IS_IQ_IT_L" dst-port="CoefAC_L" src="" src-port="CoefAC_L"/>
     <Connection dst="FUN_dcr" dst-port="CoefDC_L" src="" src-port="CoefDC_L"/>
-    <Connection dst="FUN_IS_IQ_IT_L" dst-port="Intra_DC_flag" src="" src-port="Intra_DC_flag"/>
     <Connection dst="FUN_dcr" dst-port="QP" src="" src-port="QP"/>
     <Connection dst="FUN_IS_IQ_IT_L" dst-port="QP" src="" src-port="QP"/>
     <Connection dst="FUN_dcr" dst-port="ScalingList" src="" src-port="ScalingList"/>
@@ -146,6 +145,7 @@
         src="FUN_IS_IQ_IT_L" src-port="CoefACR_L"/>
     <Connection dst="" dst-port="CoefACR_L"
         src="Algo_Merge_4x4_to_16x16" src-port="Y"/>
-    <Connection dst="FUN_IS_IQ_IT_L" dst-port="MBType" src="" src-port="MBType"/>
-    <Connection dst="FUN_dcr" dst-port="MBType" src="" src-port="MBType"/>
+    <Connection dst="FUN_IS_IQ_IT_L" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
+    <Connection dst="FUN_dcr" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
+    <Connection dst="FUN_IS_IQ_IT_L" dst-port="IntraDCFlag" src="" src-port="IntraDCFlag"/>
 </XDF>

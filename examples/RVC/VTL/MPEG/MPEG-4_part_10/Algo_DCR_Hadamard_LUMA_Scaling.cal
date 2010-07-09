@@ -58,14 +58,14 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
 		int (size=16) I, 
 		int (size=8)  QP,
 		int (size=8)  ScalingList,
-		uint(size=8)  MbType
+		uint(size=2)  BlocksSize
 				==>
-				int(size=16) O:
+		int(size=16) O:
 
-	uint(size=4) INTRA_4x4   = 0;
-	uint(size=4) INTRA_16x16 = 1;	
-	uint(size=4) INTER       = 2;
-	uint(size=4) I_PCM       = 4;
+
+//	uint(size=2) BLOCK_4x4   = 0;
+//	uint(size=2) BLOCK_8x8   = 1;
+	uint(size=2) BLOCK_16x16 = 2;
 	
   List( type:uint(size=5), size=6*16 ) t_normAdjust4x4  = [// same as a AVC_IQ4x4's t_normAdjust4x4. used only 16*n-th(n=0..5) elements in this FU. 
     // qp_rem = 0
@@ -112,7 +112,7 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
 
   iquantise.Launch: action
   		I:[i] repeat 16,
-		MbType :[PredMode]
+		BlocksSize :[BlckSz]
 			==>
 		O:[ [
     			if qp_per < 6 then
@@ -121,32 +121,22 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
       			  lshift( i[s] * t_LevelScale[16*qp_rem], qp_per - 6)
     			end : for int s in Integers(0,15) 
     	  ] ] repeat 16
-	guard
-		PredMode = INTRA_16x16
 	end
 
 
   iquantise.Skip: action
-		MbType :[PredMode]
+		BlocksSize :[BlckSz]
 			==>
 	guard
-		PredMode = INTRA_4x4 or PredMode = INTER
+		BlckSz != BLOCK_16x16
   	end
-
-	EatTokenMbType: action
-			MbType :[PredMode]
-				==>
-		guard
-			PredMode = I_PCM
-		end
 
   schedule fsm read_qp:
     read_qp      ( read_qp 	  		) --> read_sl;
     read_sl      ( read_sl    		) --> iquantise;
-    iquantise    ( EatTokenMbType 	) --> iquantise;
     iquantise    ( iquantise 		) --> read_qp;
   end
   priority
-  	iquantise.Launch > iquantise.Skip > EatTokenMbType;
+  	iquantise.Skip > iquantise.Launch;
   end
 end

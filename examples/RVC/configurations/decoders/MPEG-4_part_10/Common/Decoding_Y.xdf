@@ -31,13 +31,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="Intra_DC_flag">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PredMode">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -215,6 +208,20 @@
     <Port kind="Input" name="IsIDR">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="BlocksSize">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="IntraDCFlag">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -314,7 +321,6 @@
     <Connection dst="RES_L" dst-port="QP" src="" src-port="QP"/>
     <Connection dst="RES_L" dst-port="ScalingList" src="" src-port="ScalingList"/>
     <Connection dst="TEX_L" dst-port="Coef_ACR" src="RES_L" src-port="CoefACR_L"/>
-    <Connection dst="RES_L" dst-port="Intra_DC_flag" src="" src-port="Intra_DC_flag"/>
     <Connection dst="" dst-port="Display_L" src="TEX_L" src-port="Display_L"/>
     <Connection dst="TEX_L" dst-port="Mb_Type" src="" src-port="Mb_Type"/>
     <Connection dst="TEX_L" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
@@ -341,5 +347,6 @@
     <Connection dst="TEX_L" dst-port="FrameNum" src="" src-port="FrameNum"/>
     <Connection dst="TEX_L" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="TEX_L" dst-port="IsIDR" src="" src-port="IsIDR"/>
-    <Connection dst="RES_L" dst-port="MBType" src="" src-port="Mb_Type"/>
+    <Connection dst="RES_L" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
+    <Connection dst="RES_L" dst-port="IntraDCFlag" src="" src-port="IntraDCFlag"/>
 </XDF>

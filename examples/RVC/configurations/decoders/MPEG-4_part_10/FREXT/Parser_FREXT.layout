@@ -4,7 +4,6 @@
       <vertex id="bits8" x="57" y="2706"/>
       <vertex id="CoefDC_L" x="1704" y="2529"/>
       <vertex id="CoefAC_L" x="1706" y="2493"/>
-      <vertex id="Intra_DC_flag" x="1247" y="2136"/>
       <vertex id="PredMode" x="1248" y="2238"/>
       <vertex id="ScalingList" x="766" y="105"/>
       <vertex id="QP" x="766" y="202"/>
@@ -60,6 +59,8 @@
       <vertex id="Algo_RefList1" x="1073" y="3494"/>
       <vertex id="Black_Hole" x="1283" y="3582"/>
       <vertex id="Demux_Cavlc_Cabac" x="943" y="2344"/>
-      <vertex id="Mux_Cavlc_Cabac" x="1338" y="2316"/>
+      <vertex id="Mux_Cavlc_Cabac" x="1326" y="2326"/>
+      <vertex id="BlocksSize_Luma" x="1238" y="2109"/>
+      <vertex id="Intra_DC_flag" x="1247" y="2136"/>
    </vertices>
 </layout>

@@ -54,7 +54,7 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
 actor Algo_BlockExpand_AVC ()
-	uint(size=8)  BlockType,
+	uint(size=2)  BlocksSize_Luma,
 	int (size=12) Value,
 	uint(size=4)  Run,  
 	bool          Last
@@ -63,11 +63,9 @@ actor Algo_BlockExpand_AVC ()
 		:
 
 	/* Constants */
-	uint(size=8) INTRA_4x4   = 0;
-//	uint(size=8) INTRA_8x8   = 3;
-	uint(size=8) INTRA_16x16 = 1;
-	uint(size=8) I_PCM       = 4;
-	uint(size=8) INTER       = 2;
+//	uint(size=2) BLOCK_4x4   = 0;
+//	uint(size=2) BLOCK_8x8   = 1;
+	uint(size=2) BLOCK_16x16 = 2;	
 
 	uint(size=2)  Y_COMPONENT = 0;
 	uint(size=2)  U_COMPONENT = 1;
@@ -83,7 +81,7 @@ actor Algo_BlockExpand_AVC ()
 	List(type:int(size=12), size=16000) ValCoeff := [ 0 : for int i in Integers(0,15)];
 	uint(size=4) IdxValCoeff      := 0;
 
-	uint(size=8) LumaMBType       := INTRA_16x16;
+	uint(size=8) LumaMBSize;
 	uint(size=2) Component        := Y_COMPONENT;
 	bool         DC_ComponentSent := false;
 	uint(size=2) NbBlocksSent     := 0;
@@ -92,21 +90,13 @@ actor Algo_BlockExpand_AVC ()
 
 	/* Actions */
 
-	ReadBlockType: action
-			BlockType :[Type]
+	ReadBlockSize: action
+			BlocksSize_Luma :[Size]
 				==>
-		guard
-			Type != I_PCM
 		do
-			LumaMBType       := Type;
+			LumaMBSize       := Size;
 			NbBlocksSent     := 0;
 			DC_ComponentSent := false;
-		end
-
-
-	Block_I_PCM: action
-			BlockType :[Type]
-				==>
 		end
 
 
@@ -167,7 +157,7 @@ actor Algo_BlockExpand_AVC ()
 		guard
 			Component        = Y_COMPONENT,
 			DC_ComponentSent = false,
-			LumaMBType       = INTRA_16x16
+			LumaMBSize       = BLOCK_16x16
 		do	
 			foreach int j in Integers(IdxValCoeff, SZ_LUMA_DC_16X16 - 1)
 			do
@@ -190,7 +180,7 @@ actor Algo_BlockExpand_AVC ()
 		guard
 			Component        = Y_COMPONENT,
 			DC_ComponentSent = true,
-			LumaMBType       = INTRA_16x16
+			LumaMBSize       = BLOCK_16x16
 		do
 			foreach int j in Integers(IdxValCoeff, SZ_LUMA_AC_16X16 - 1)
 			do
@@ -224,7 +214,7 @@ actor Algo_BlockExpand_AVC ()
 	isLumaAC_4x4: action ==>
 		guard
 			Component   = Y_COMPONENT,
-			(LumaMBType = INTRA_4x4) or (LumaMBType = INTER)
+			LumaMBSize != BLOCK_16x16
 		do
 			foreach int j in Integers(IdxValCoeff, SZ_LUMA_AC_4X4 - 1)
 			do
@@ -326,10 +316,9 @@ actor Algo_BlockExpand_AVC ()
 
 	/* Scheduler */
 
-	schedule fsm ReadBlockType:
+	schedule fsm ReadBlockSize:
 
-		ReadBlockType    ( ReadBlockType                     )--> ReadData;
-		ReadBlockType    ( Block_I_PCM                       )--> ReadBlockType;	
+		ReadBlockSize    ( ReadBlockSize                     )--> ReadData;
 
 		ReadData         ( NoLast_NoRun                      )--> ReadData;
 		ReadData         ( NoLast_Run                        )--> ReadData;
@@ -350,11 +339,10 @@ actor Algo_BlockExpand_AVC ()
 		ChooseSizeData   ( isChromaAC                        )--> SendChromaAC;
 		SendChromaAC     ( SendChromaAC.Launch               )--> ReadData;
 		SendChromaAC     ( SendChromaAC.LastBlock_UComponent )--> ReadData;
-		SendChromaAC     ( SendChromaAC.LastBlock_VComponent )--> ReadBlockType;
+		SendChromaAC     ( SendChromaAC.LastBlock_VComponent )--> ReadBlockSize;
 	end
 
 	priority
-		ReadBlockType           > Block_I_PCM;
 		NoLast_Run              > NoLast_NoRun                      > Last_equaltrue;
 		SendLumaAC_16x16.Launch > SendLumaAC_16x16.LastBlock;
 		SendLumaAC_4x4.Launch   > SendLumaAC_4x4.LastBlock;
