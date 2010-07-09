@@ -93,6 +93,11 @@ public class WhileNode extends AbstractNode implements ValueContainer {
 		this.value = value;
 	}
 
+	@Override
+	public boolean isWhileNode() {
+		return true;
+	}
+
 	public void setJoinNode(BlockNode joinNode) {
 		this.joinNode = joinNode;
 	}

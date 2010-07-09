@@ -101,6 +101,11 @@ public class IfNode extends AbstractNode implements ValueContainer {
 		this.value = value;
 	}
 
+	@Override
+	public boolean isIfNode() {
+		return true;
+	}
+
 	public void setJoinNode(BlockNode joinNode) {
 		this.joinNode = joinNode;
 	}

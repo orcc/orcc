@@ -204,6 +204,11 @@ public final class BlockNode extends AbstractNode implements
 	}
 
 	@Override
+	public boolean isBlockNode() {
+		return true;
+	}
+
+	@Override
 	public Iterator<Instruction> iterator() {
 		return instructions.iterator();
 	}

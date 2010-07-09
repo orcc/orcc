@@ -132,12 +132,27 @@ public abstract class AbstractNode extends AbstractLocalizable implements
 	}
 
 	@Override
+	public boolean isBlockNode() {
+		return false;
+	}
+
+	@Override
 	public boolean isCFGNode() {
 		return true;
 	}
 
 	@Override
+	public boolean isIfNode() {
+		return false;
+	}
+
+	@Override
 	public boolean isInstruction() {
+		return false;
+	}
+
+	@Override
+	public boolean isWhileNode() {
 		return false;
 	}
 
