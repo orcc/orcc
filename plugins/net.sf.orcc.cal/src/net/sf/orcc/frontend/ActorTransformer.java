@@ -65,6 +65,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -81,6 +82,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
@@ -157,6 +159,7 @@ public class ActorTransformer {
 	 */
 	private void actionLoadTokens(LocalVariable portVariable,
 			List<AstVariable> tokens, int repeat) {
+		Context context = astTransformer.getContext();
 		if (repeat == 1) {
 			int i = 0;
 
@@ -164,8 +167,8 @@ public class ActorTransformer {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new IntExpr(i));
 
-				LocalVariable irToken = (LocalVariable) astTransformer
-						.getContext().getVariable(token);
+				LocalVariable irToken = (LocalVariable) context
+						.getVariable(token);
 				Load load = new Load(portVariable.getLocation(), irToken,
 						new Use(portVariable), indexes);
 				addInstruction(load);
@@ -173,7 +176,60 @@ public class ActorTransformer {
 				i++;
 			}
 		} else {
-			// TODO when repeat is greater than one
+			Procedure procedure = context.getProcedure();
+
+			// creates loop variable and initializes it
+			LocalVariable loopVar = procedure.newTempLocalVariable(file,
+					IrFactory.eINSTANCE.createTypeInt(32), "num_repeats");
+			Assign assign = new Assign(loopVar, new IntExpr(0));
+			addInstruction(assign);
+
+			BlockNode block = new BlockNode(procedure);
+
+			int i = 0;
+			int numTokens = tokens.size();
+			Type type = ((TypeList) portVariable.getType()).getType();
+			for (AstVariable token : tokens) {
+				List<Expression> indexes = new ArrayList<Expression>(1);
+				indexes.add(new BinaryExpr(new BinaryExpr(
+						new IntExpr(numTokens), BinaryOp.TIMES, new VarExpr(
+								new Use(loopVar)), IrFactory.eINSTANCE
+								.createTypeInt(32)), BinaryOp.PLUS,
+						new IntExpr(i), IrFactory.eINSTANCE.createTypeInt(32)));
+
+				LocalVariable tmpVar = procedure.newTempLocalVariable(file,
+						type, "token");
+				Load load = new Load(portVariable.getLocation(), tmpVar,
+						new Use(portVariable), indexes);
+				block.add(load);
+
+				LocalVariable irToken = (LocalVariable) context
+						.getVariable(token);
+
+				indexes = new ArrayList<Expression>(1);
+				indexes.add(new VarExpr(new Use(loopVar)));
+				Store store = new Store(irToken, indexes, new VarExpr(new Use(
+						tmpVar)));
+				block.add(store);
+
+				i++;
+			}
+
+			// add increment
+			assign = new Assign(loopVar,
+					new BinaryExpr(new VarExpr(new Use(loopVar)),
+							BinaryOp.PLUS, new IntExpr(1), loopVar.getType()));
+			block.add(assign);
+
+			// create while node
+			Expression condition = new BinaryExpr(
+					new VarExpr(new Use(loopVar)), BinaryOp.LT, new IntExpr(
+							repeat), IrFactory.eINSTANCE.createTypeBool());
+			List<CFGNode> nodes = new ArrayList<CFGNode>(1);
+			nodes.add(block);
+			WhileNode whileNode = new WhileNode(procedure, condition, nodes,
+					new BlockNode(procedure));
+			procedure.getNodes().add(whileNode);
 		}
 	}
 
@@ -205,7 +261,64 @@ public class ActorTransformer {
 				i++;
 			}
 		} else {
-			// TODO when repeat is greater than one
+			Context context = astTransformer.getContext();
+			Procedure procedure = context.getProcedure();
+
+			// creates loop variable and initializes it
+			LocalVariable loopVar = procedure.newTempLocalVariable(file,
+					IrFactory.eINSTANCE.createTypeInt(32), "num_repeats");
+			Assign assign = new Assign(loopVar, new IntExpr(0));
+			addInstruction(assign);
+
+			BlockNode block = new BlockNode(procedure);
+
+			int i = 0;
+			int numTokens = values.size();
+			Type type = ((TypeList) portVariable.getType()).getType();
+			for (AstExpression value : values) {
+				List<Expression> indexes = new ArrayList<Expression>(1);
+				indexes.add(new VarExpr(new Use(loopVar)));
+
+				// each expression of an output pattern must be of type list
+				// so they are necessarily variables
+				LocalVariable tmpVar = procedure.newTempLocalVariable(file,
+						type, "token");
+				Expression expression = astTransformer
+						.transformExpression(value);
+				Use use = ((VarExpr) expression).getVar();
+				use.remove();
+				use = new Use(use.getVariable());
+				Load load = new Load(tmpVar, use, indexes);
+				block.add(load);
+
+				indexes = new ArrayList<Expression>(1);
+				indexes.add(new BinaryExpr(new BinaryExpr(
+						new IntExpr(numTokens), BinaryOp.TIMES, new VarExpr(
+								new Use(loopVar)), IrFactory.eINSTANCE
+								.createTypeInt(32)), BinaryOp.PLUS,
+						new IntExpr(i), IrFactory.eINSTANCE.createTypeInt(32)));
+				Store store = new Store(portVariable, indexes, new VarExpr(
+						new Use(tmpVar)));
+				block.add(store);
+
+				i++;
+			}
+
+			// add increment
+			assign = new Assign(loopVar,
+					new BinaryExpr(new VarExpr(new Use(loopVar)),
+							BinaryOp.PLUS, new IntExpr(1), loopVar.getType()));
+			block.add(assign);
+
+			// create while node
+			Expression condition = new BinaryExpr(
+					new VarExpr(new Use(loopVar)), BinaryOp.LT, new IntExpr(
+							repeat), IrFactory.eINSTANCE.createTypeBool());
+			List<CFGNode> nodes = new ArrayList<CFGNode>(1);
+			nodes.add(block);
+			WhileNode whileNode = new WhileNode(procedure, condition, nodes,
+					new BlockNode(procedure));
+			procedure.getNodes().add(whileNode);
 		}
 	}
 

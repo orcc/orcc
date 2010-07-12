@@ -44,6 +44,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -77,12 +78,15 @@ public class SSATransformation extends AbstractActorTransformation {
 		@Override
 		public void visit(VarExpr expr, Object... args) {
 			Use use = expr.getVar();
-			LocalVariable oldVar = (LocalVariable) use.getVariable();
-			LocalVariable newVar = uses.get(oldVar.getBaseName());
-			if (newVar != null) {
-				// newVar may be null if oldVar is a function parameter for
-				// instance
-				use.setVariable(newVar);
+			Variable oldVar = use.getVariable();
+			if (!oldVar.isGlobal()) {
+				LocalVariable newVar = uses.get(((LocalVariable) oldVar)
+						.getBaseName());
+				if (newVar != null) {
+					// newVar may be null if oldVar is a function parameter for
+					// instance
+					use.setVariable(newVar);
+				}
 			}
 		}
 

@@ -45,6 +45,7 @@ import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatement;
 import net.sf.orcc.cal.cal.AstStatementAssign;
@@ -53,7 +54,9 @@ import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.ir.CFGNode;
@@ -95,15 +98,14 @@ import org.eclipse.xtext.naming.IQualifiedNameProvider;
  */
 public class AstTransformer {
 
-	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
-			.compile("\\.");
-
 	/**
 	 * This class transforms an AST statement into one or more IR instructions
 	 * and/or nodes.
 	 * 
 	 */
 	private class ExpressionTransformer extends CalSwitch<Expression> {
+
+		private Variable listTarget;
 
 		@Override
 		public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
@@ -212,8 +214,35 @@ public class AstTransformer {
 		}
 
 		@Override
-		public Expression caseAstExpressionList(AstExpressionList expression) {
-			return new IntExpr(42);
+		public Expression caseAstExpressionList(AstExpressionList astExpression) {
+			int size = 1;
+			for (AstGenerator generator : astExpression.getGenerators()) {
+				AstExpression astValue = generator.getLower();
+				int lower = new AstExpressionEvaluator()
+						.evaluateAsInteger(astValue);
+
+				astValue = generator.getHigher();
+				int higher = new AstExpressionEvaluator()
+						.evaluateAsInteger(astValue);
+				size *= (higher - lower) + 1;
+			}
+
+			if (listTarget == null) {
+				List<AstExpression> expressions = astExpression
+						.getExpressions();
+				TypeChecker checker = new TypeChecker();
+				Type type = checker.getType(expressions);
+				size *= expressions.size();
+
+				Procedure procedure = context.getProcedure();
+				Type listType = IrFactory.eINSTANCE.createTypeList(size, type);
+				listTarget = procedure.newTempLocalVariable(file, listType,
+						"_list");
+			}
+
+			Expression expression = new VarExpr(new Use(listTarget));
+			listTarget = null;
+			return expression;
 		}
 
 		@Override
@@ -237,10 +266,16 @@ public class AstTransformer {
 			Location location = Util.getLocation(expression);
 
 			Variable variable = context.getVariable(astVariable);
-			LocalVariable local = getLocalVariable(variable, false);
-			Use use = new Use(local);
-			Expression varExpr = new VarExpr(location, use);
-			return varExpr;
+			if (variable.getType().isList()) {
+				Use use = new Use(variable);
+				Expression varExpr = new VarExpr(location, use);
+				return varExpr;
+			} else {
+				LocalVariable local = getLocalVariable(variable, false);
+				Use use = new Use(local);
+				Expression varExpr = new VarExpr(location, use);
+				return varExpr;
+			}
 		}
 
 		/**
@@ -273,6 +308,16 @@ public class AstTransformer {
 			subList.clear();
 
 			return resultNodes;
+		}
+
+		/**
+		 * Sets the target variable that is assigned a list expression.
+		 * 
+		 * @param target
+		 *            a variable
+		 */
+		public void setListTarget(Variable target) {
+			this.listTarget = target;
 		}
 
 		private Expression transformBuiltinFunction(AstExpressionCall astCall) {
@@ -331,19 +376,29 @@ public class AstTransformer {
 			Variable target = context.getVariable(astTarget);
 
 			// transform indexes and value
-			List<Expression> indexes = transformExpressions(astAssign
-					.getIndexes());
-			Expression value = transformExpression(astAssign.getValue());
-
-			// add assign or store instruction
-			Instruction instruction;
-			if (indexes.isEmpty()) {
-				LocalVariable local = getLocalVariable(target, true);
-				instruction = new Assign(location, local, value);
+			if (CalPackage.eINSTANCE.getAstExpressionList().isSuperTypeOf(
+					astAssign.getValue().eClass())) {
+				exprTransformer.setListTarget(target);
+				Expression value = transformExpression(astAssign.getValue());
+				if (value.isVarExpr()) {
+					((VarExpr) value).getVar().remove();
+				}
+				exprTransformer.setListTarget(null);
 			} else {
-				instruction = new Store(location, target, indexes, value);
+				List<Expression> indexes = transformExpressions(astAssign
+						.getIndexes());
+				Expression value = transformExpression(astAssign.getValue());
+
+				// add assign or store instruction
+				Instruction instruction;
+				if (indexes.isEmpty()) {
+					LocalVariable local = getLocalVariable(target, true);
+					instruction = new Assign(location, local, value);
+				} else {
+					instruction = new Store(location, target, indexes, value);
+				}
+				addInstruction(instruction);
 			}
-			addInstruction(instruction);
 
 			return null;
 		}
@@ -385,7 +440,7 @@ public class AstTransformer {
 			AstExpression astHigher = foreach.getHigher();
 			Expression higher = transformExpression(astHigher);
 			Expression condition = new BinaryExpr(higher.getLocation(),
-					new VarExpr(new Use(loopVar)), BinaryOp.LT, higher,
+					new VarExpr(new Use(loopVar)), BinaryOp.LE, higher,
 					IrFactory.eINSTANCE.createTypeBool());
 
 			// body
@@ -467,6 +522,9 @@ public class AstTransformer {
 	}
 
 	private Context context;
+
+	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
+			.compile("\\.");
 
 	/**
 	 * expression transformer.
