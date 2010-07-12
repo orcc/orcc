@@ -34,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
@@ -265,8 +264,7 @@ public class AstTransformer {
 			Location location = Util.getLocation(expression);
 
 			Variable variable = context.getVariable(astVariable);
-			LocalVariable local = getLocalVariable(
-					context.getSetGlobalsToLoad(), variable);
+			LocalVariable local = getLocalVariable(variable, false);
 			Use use = new Use(local);
 			Expression varExpr = new VarExpr(location, use);
 			return varExpr;
@@ -367,8 +365,7 @@ public class AstTransformer {
 			// add assign or store instruction
 			Instruction instruction;
 			if (indexes.isEmpty()) {
-				LocalVariable local = getLocalVariable(
-						context.getSetGlobalsToStore(), target);
+				LocalVariable local = getLocalVariable(target, true);
 				instruction = new Assign(location, local, value);
 			} else {
 				instruction = new Store(location, target, indexes, value);
@@ -745,16 +742,18 @@ public class AstTransformer {
 
 	/**
 	 * Returns the IR mapping of the given variable. If the variable is a
-	 * global, returns a local associated with it. The variable is added to a
-	 * set of variables that should be loaded or stored.
+	 * global, returns a local associated with it. The variable is added to the
+	 * set of globals to load, and if <code>isStored</code> is <code>true</code>
+	 * , the variable is added to the set of variables to store, too.
 	 * 
-	 * @param set
-	 *            a set of variables
 	 * @param variable
 	 *            an IR variable, possibly global
+	 * @param isStored
+	 *            <code>true</code> if the variable is stored,
+	 *            <code>false</code> otherwise
 	 * @return a local IR variable
 	 */
-	private LocalVariable getLocalVariable(Set<Variable> set, Variable variable) {
+	private LocalVariable getLocalVariable(Variable variable, boolean isStored) {
 		if (variable.isGlobal()) {
 			LocalVariable local = context.getMapGlobals().get(variable);
 			if (local == null) {
@@ -763,7 +762,10 @@ public class AstTransformer {
 				context.getMapGlobals().put(variable, local);
 			}
 
-			set.add(variable);
+			context.getSetGlobalsToLoad().add(variable);
+			if (isStored) {
+				context.getSetGlobalsToStore().add(variable);
+			}
 
 			return local;
 		}
