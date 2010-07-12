@@ -35,6 +35,7 @@ import java.io.File;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
@@ -59,45 +60,15 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class ProjectPropertyPage extends PropertyPage {
 
-	private Text textOutput;
 	private IProject project;
+
+	private Text textOutput;
 
 	/**
 	 * Creates a new project property page.
 	 */
 	public ProjectPropertyPage() {
 		super();
-	}
-
-	/**
-	 * Initializes a ProjectReferencePage.
-	 */
-	private void initialize() {
-		project = (IProject) getElement().getAdapter(IResource.class);
-		noDefaultAndApplyButton();
-		setDescription("Configure the properties of the project "
-				+ project.getName() + ".\n");
-
-		try {
-			String outputFolder = project
-					.getPersistentProperty(PROPERTY_OUTPUT);
-			if (outputFolder == null) {
-				project.setPersistentProperty(PROPERTY_OUTPUT, new Path(project
-						.getLocation().toOSString()).append(DEFAULT_OUTPUT)
-						.toOSString());
-			}
-		} catch (CoreException e) {
-		}
-	}
-
-	private boolean getFolderFromText() {
-		String value = textOutput.getText();
-		File file = new File(value);
-		if (file.isDirectory()) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 
 	private void browseOutputFolder(Shell shell) {
@@ -170,6 +141,37 @@ public class ProjectPropertyPage extends PropertyPage {
 		});
 	}
 
+	private boolean getFolderFromText() {
+		String value = textOutput.getText();
+		File file = new File(value);
+		if (file.isDirectory()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Initializes a ProjectReferencePage.
+	 */
+	private void initialize() {
+		project = (IProject) getElement().getAdapter(IResource.class);
+		noDefaultAndApplyButton();
+		setDescription("Configure the properties of the project "
+				+ project.getName() + ".\n");
+
+		try {
+			String outputFolder = project
+					.getPersistentProperty(PROPERTY_OUTPUT);
+			if (outputFolder == null) {
+				project.setPersistentProperty(PROPERTY_OUTPUT, new Path(project
+						.getLocation().toOSString()).append(DEFAULT_OUTPUT)
+						.toOSString());
+			}
+		} catch (CoreException e) {
+		}
+	}
+
 	@Override
 	protected void performDefaults() {
 		super.performDefaults();
@@ -179,9 +181,14 @@ public class ProjectPropertyPage extends PropertyPage {
 
 	@Override
 	public boolean performOk() {
-		// store the value in the owner text field
 		try {
-			project.setPersistentProperty(PROPERTY_OUTPUT, textOutput.getText());
+			String oldOutput = project.getPersistentProperty(PROPERTY_OUTPUT);
+			String newOutput = textOutput.getText();
+			project.setPersistentProperty(PROPERTY_OUTPUT, newOutput);
+			if (!newOutput.equals(oldOutput)) {
+				// build if new value is different from old value
+				project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
+			}
 		} catch (CoreException e) {
 			return false;
 		}
