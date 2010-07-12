@@ -68,18 +68,11 @@ public class Context {
 	private Set<Variable> setGlobalsToStore;
 
 	/**
-	 * Creates a new empty context.
-	 */
-	public Context() {
-		mapVariables = new Scope<AstVariable, Variable>();
-		mapGlobals = new HashMap<Variable, LocalVariable>();
-		setGlobalsToLoad = new LinkedHashSet<Variable>();
-		setGlobalsToStore = new LinkedHashSet<Variable>();
-	}
-
-	/**
-	 * Creates a new context with the given procedure.
+	 * Creates a new context with the given parent context and the given
+	 * procedure.
 	 * 
+	 * @param context
+	 *            a context, or <code>null</code> to create a new empty context
 	 * @param procedure
 	 *            a procedure
 	 */
@@ -87,8 +80,13 @@ public class Context {
 		this.procedure = procedure;
 
 		mapGlobals = new HashMap<Variable, LocalVariable>();
-		mapVariables = new Scope<AstVariable, Variable>(context
-				.getMapVariables().getParent(), true);
+
+		if (context == null) {
+			mapVariables = new Scope<AstVariable, Variable>();
+		} else {
+			mapVariables = new Scope<AstVariable, Variable>(context
+					.getMapVariables().getParent(), true);
+		}
 		setGlobalsToLoad = new LinkedHashSet<Variable>();
 		setGlobalsToStore = new LinkedHashSet<Variable>();
 	}

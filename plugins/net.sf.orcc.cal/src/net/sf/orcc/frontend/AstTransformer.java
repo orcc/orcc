@@ -30,13 +30,9 @@ package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import net.sf.orcc.cal.cal.AstAction;
-import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -49,39 +45,23 @@ import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstFunction;
-import net.sf.orcc.cal.cal.AstInputPattern;
-import net.sf.orcc.cal.cal.AstOutputPattern;
-import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstProcedure;
-import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstStatement;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
-import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
-import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
-import net.sf.orcc.frontend.schedule.ActionSorter;
-import net.sf.orcc.frontend.schedule.FSMBuilder;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
-import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -93,25 +73,15 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
-import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
-
-import org.eclipse.xtext.naming.IQualifiedNameProvider;
-
-import com.google.inject.Inject;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -466,9 +436,6 @@ public class AstTransformer {
 
 	private Context context;
 
-	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
-			.compile("\\.");
-
 	/**
 	 * expression transformer.
 	 */
@@ -485,17 +452,9 @@ public class AstTransformer {
 	final private Map<AstFunction, Procedure> mapFunctions;
 
 	/**
-	 * A map from AST ports to IR ports.
-	 */
-	final private Map<AstPort, Port> mapPorts;
-
-	/**
 	 * A map from AST procedures to IR procedures.
 	 */
 	final private Map<AstProcedure, Procedure> mapProcedures;
-
-	@Inject
-	private IQualifiedNameProvider nameProvider;
 
 	/**
 	 * the list of procedures of the IR actor.
@@ -512,102 +471,10 @@ public class AstTransformer {
 	 */
 	public AstTransformer() {
 		mapFunctions = new HashMap<AstFunction, Procedure>();
-		mapPorts = new HashMap<AstPort, Port>();
 		mapProcedures = new HashMap<AstProcedure, Procedure>();
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
-	}
-
-	/**
-	 * Creates calls to hasTokens to test that the given input pattern is
-	 * fulfilled.
-	 * 
-	 * @param inputPattern
-	 *            an IR input pattern
-	 * @return a list of local variables that contain the result of the
-	 *         hasTokens
-	 */
-	private List<LocalVariable> actionCreateHasTokens(Pattern inputPattern) {
-		List<LocalVariable> hasTokenList = new ArrayList<LocalVariable>(
-				inputPattern.size());
-		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
-			LocalVariable target = context.getProcedure().newTempLocalVariable(
-					file, IrFactory.eINSTANCE.createTypeBool(),
-					"_tmp_hasTokens");
-			hasTokenList.add(target);
-
-			Port port = entry.getKey();
-			int numTokens = entry.getValue();
-			HasTokens hasTokens = new HasTokens(port, numTokens, target);
-			addInstruction(hasTokens);
-		}
-
-		return hasTokenList;
-	}
-
-	/**
-	 * Loads tokens from the data that was read and put in portVariable.
-	 * 
-	 * @param portVariable
-	 *            a local array that contains data.
-	 * @param tokens
-	 *            a list of token variables
-	 * @param repeat
-	 *            an integer number of repeat (equals to one if there is no
-	 *            repeat)
-	 */
-	private void actionLoadTokens(LocalVariable portVariable,
-			List<AstVariable> tokens, int repeat) {
-		if (repeat == 1) {
-			int i = 0;
-
-			for (AstVariable token : tokens) {
-				List<Expression> indexes = new ArrayList<Expression>(1);
-				indexes.add(new IntExpr(i));
-
-				LocalVariable irToken = (LocalVariable) context
-						.getVariable(token);
-				Load load = new Load(portVariable.getLocation(), irToken,
-						new Use(portVariable), indexes);
-				addInstruction(load);
-
-				i++;
-			}
-		} else {
-			// TODO when repeat is greater than one
-		}
-	}
-
-	/**
-	 * Assigns tokens to the data that will be written.
-	 * 
-	 * @param portVariable
-	 *            a local array that will contain data.
-	 * @param values
-	 *            a list of AST expressions
-	 * @param repeat
-	 *            an integer number of repeat (equals to one if there is no
-	 *            repeat)
-	 */
-	private void actionStoreTokens(LocalVariable portVariable,
-			List<AstExpression> values, int repeat) {
-		if (repeat == 1) {
-			int i = 0;
-
-			for (AstExpression expression : values) {
-				List<Expression> indexes = new ArrayList<Expression>(1);
-				indexes.add(new IntExpr(i));
-
-				Expression value = transformExpression(expression);
-				Store store = new Store(portVariable, indexes, value);
-				addInstruction(store);
-
-				i++;
-			}
-		} else {
-			// TODO when repeat is greater than one
-		}
 	}
 
 	/**
@@ -622,122 +489,23 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Creates the test for schedulability of the given action.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param inputPattern
-	 *            input pattern of action
-	 * @param result
-	 *            target local variable
+	 * Clears up context and functions/proceudres maps.
 	 */
-	private void createActionTest(AstAction astAction, Pattern inputPattern,
-			LocalVariable result) {
-		if (inputPattern.isEmpty()) {
-			transformGuards(astAction.getGuards(), result);
-		} else {
-			// create calls to hasTokens
-			List<LocalVariable> hasTokenList = actionCreateHasTokens(inputPattern);
+	public void clear() {
+		context.clear();
+		context = null;
 
-			// create "then" nodes with peeks and guards
-			List<CFGNode> thenNodes = transformInputPatternAndGuards(astAction,
-					result);
-
-			// create "else" node with Assign(result, false)
-			List<CFGNode> elseNodes = new ArrayList<CFGNode>(1);
-			BlockNode block = new BlockNode(context.getProcedure());
-			Assign assign = new Assign(result, new BoolExpr(false));
-			block.add(assign);
-			elseNodes.add(block);
-
-			// create condition hasTokens1 && hasTokens2 && ... && hasTokensn
-			Iterator<LocalVariable> it = hasTokenList.iterator();
-			Expression condition = new VarExpr(new Use(it.next()));
-			while (it.hasNext()) {
-				Expression e2 = new VarExpr(new Use(it.next()));
-				condition = new BinaryExpr(condition, BinaryOp.LOGIC_AND, e2,
-						IrFactory.eINSTANCE.createTypeBool());
-			}
-
-			// create "if" node
-			IfNode node = new IfNode(context.getProcedure(), condition,
-					thenNodes, elseNodes, new BlockNode(context.getProcedure()));
-			context.getProcedure().getNodes().add(node);
-		}
+		mapFunctions.clear();
+		mapProcedures.clear();
 	}
 
 	/**
-	 * Creates a variable to hold the number of tokens on the given port.
+	 * Returns the current context of this AST transformer.
 	 * 
-	 * @param port
-	 *            a port
-	 * @param numTokens
-	 *            number of tokens
-	 * @return the local array created
+	 * @return the current context of this AST transformer
 	 */
-	private LocalVariable createPortVariable(Port port, int numTokens) {
-		// create the variable to hold the tokens
-		LocalVariable target = new LocalVariable(true, 0, context
-				.getProcedure().getLocation(), port.getName(),
-				IrFactory.eINSTANCE.createTypeList(numTokens, port.getType()));
-		context.getProcedure().getLocals()
-				.put(file, target.getLocation(), target.getName(), target);
-
-		return target;
-	}
-
-	/**
-	 * Fills the target IR input pattern.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param inputPattern
-	 *            target IR input pattern
-	 */
-	private void fillsInputPattern(AstAction astAction, Pattern inputPattern) {
-		List<AstInputPattern> astInputPattern = astAction.getInputs();
-		for (AstInputPattern pattern : astInputPattern) {
-			Port port = mapPorts.get(pattern.getPort());
-			List<AstVariable> tokens = pattern.getTokens();
-
-			// evaluates token consumption
-			int totalConsumption = tokens.size();
-			int repeat = 1;
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator()
-						.evaluateAsInteger(astRepeat);
-				totalConsumption *= repeat;
-			}
-			inputPattern.put(port, totalConsumption);
-		}
-	}
-
-	/**
-	 * Fills the target IR output pattern.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param outputPattern
-	 *            target IR output pattern
-	 */
-	private void fillsOutputPattern(AstAction astAction, Pattern outputPattern) {
-		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
-		for (AstOutputPattern pattern : astOutputPattern) {
-			Port port = mapPorts.get(pattern.getPort());
-			List<AstExpression> values = pattern.getValues();
-
-			// evaluates token consumption
-			int totalConsumption = values.size();
-			int repeat = 1;
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator()
-						.evaluateAsInteger(astRepeat);
-				totalConsumption *= repeat;
-			}
-			outputPattern.put(port, totalConsumption);
-		}
+	public Context getContext() {
+		return context;
 	}
 
 	/**
@@ -796,10 +564,21 @@ public class AstTransformer {
 	 * 
 	 * @return the current context
 	 */
-	private Context newContext(Procedure procedure) {
+	public Context newContext(Procedure procedure) {
 		Context oldContext = context;
 		context = new Context(context, procedure);
 		return oldContext;
+	}
+
+	/**
+	 * Creates a new map of procedures, assigns it to the {@link #procedures}
+	 * attribute, and returns the newly-created procedure map.
+	 * 
+	 * @return a newly-created procedure map
+	 */
+	public OrderedMap<String, Procedure> newProceduresMap() {
+		procedures = new OrderedMap<String, Procedure>();
+		return procedures;
 	}
 
 	/**
@@ -812,7 +591,7 @@ public class AstTransformer {
 	 *            an expression to return, possibly <code>null</code> for
 	 *            imperative procedures
 	 */
-	private void restoreContext(Context context, Expression value) {
+	public void restoreContext(Context context, Expression value) {
 		loadGlobals();
 		storeGlobals();
 
@@ -839,201 +618,6 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Transforms the given AST Actor to an IR actor.
-	 * 
-	 * @param file
-	 *            the .cal file where the actor is defined
-	 * @param astActor
-	 *            the AST of the actor
-	 * @return the actor in IR form
-	 */
-	public Actor transform(String file, AstActor astActor) {
-		this.file = file;
-
-		// gets the name of the actor and resets the untagged action counter
-		String name = nameProvider.getQualifiedName(astActor);
-
-		context = new Context();
-		try {
-			// parameters
-			OrderedMap<String, StateVariable> parameters = transformGlobalVariables(astActor
-					.getParameters());
-
-			// first state variables, because port's sizes may depend on them.
-			OrderedMap<String, StateVariable> stateVars = transformGlobalVariables(astActor
-					.getStateVariables());
-
-			// then ports
-			OrderedMap<String, Port> inputs = transformPorts(astActor
-					.getInputs());
-			OrderedMap<String, Port> outputs = transformPorts(astActor
-					.getOutputs());
-
-			// creates a new scope before translating things with local
-			// variables
-			context.newScope();
-
-			// transforms functions and procedures
-			procedures = new OrderedMap<String, Procedure>();
-			for (AstFunction astFunction : astActor.getFunctions()) {
-				transformFunction(astFunction);
-			}
-			for (AstProcedure astProcedure : astActor.getProcedures()) {
-				transformProcedure(astProcedure);
-			}
-
-			// transform actions
-			ActionList actions = transformActions(astActor.getActions());
-
-			// transform initializes
-			ActionList initializes = transformActions(astActor.getInitializes());
-
-			// sort actions by priority
-			ActionSorter sorter = new ActionSorter(actions);
-			actions = sorter.applyPriority(astActor.getPriorities());
-
-			// transform FSM
-			AstSchedule schedule = astActor.getSchedule();
-			ActionScheduler scheduler;
-			if (schedule == null) {
-				scheduler = new ActionScheduler(actions.getAllActions(), null);
-			} else {
-				FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
-				FSM fsm = builder.buildFSM(actions);
-				scheduler = new ActionScheduler(actions.getUntaggedActions(),
-						fsm);
-			}
-
-			context.restoreScope();
-
-			// create IR actor
-			return new Actor(name, file, parameters, inputs, outputs,
-					stateVars, procedures, actions.getAllActions(),
-					initializes.getAllActions(), scheduler);
-		} finally {
-			// cleanup
-			context.clear();
-			context = null;
-
-			mapFunctions.clear();
-			mapPorts.clear();
-			mapProcedures.clear();
-		}
-	}
-
-	/**
-	 * Transforms the given AST action and adds it to the given action list.
-	 * 
-	 * @param actionList
-	 *            an action list
-	 * @param astAction
-	 *            an AST action
-	 */
-	private void transformAction(AstAction astAction, ActionList actionList) {
-		Location location = Util.getLocation(astAction);
-
-		// transform tag
-		AstTag astTag = astAction.getTag();
-		Tag tag;
-		if (astTag == null) {
-			tag = new Tag();
-		} else {
-			tag = new Tag(astAction.getTag().getIdentifiers());
-		}
-
-		Pattern inputPattern = new Pattern();
-		Pattern outputPattern = new Pattern();
-
-		String name = nameProvider.getQualifiedName(astAction);
-		name = dotPattern.matcher(name).replaceAll("_");
-
-		// creates scheduler and body
-		Procedure scheduler = new Procedure("isSchedulable_" + name, location,
-				IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = new Procedure(name, location,
-				IrFactory.eINSTANCE.createTypeVoid());
-
-		// fills the patterns and procedures
-		fillsInputPattern(astAction, inputPattern);
-		fillsOutputPattern(astAction, outputPattern);
-
-		transformActionBody(astAction, body);
-		transformActionScheduler(astAction, scheduler, inputPattern);
-
-		// creates IR action and add it to action list
-		Action action = new Action(location, tag, inputPattern, outputPattern,
-				scheduler, body);
-		actionList.add(action);
-	}
-
-	/**
-	 * Transforms the body of the given AST action into the given body
-	 * procedure.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param body
-	 *            the procedure that will contain the body
-	 */
-	private void transformActionBody(AstAction astAction, Procedure body) {
-		Context oldContext = newContext(body);
-
-		transformInputPattern(astAction, Read.class);
-		transformLocalVariables(astAction.getVariables());
-		transformStatements(astAction.getStatements());
-		transformOutputPattern(astAction);
-
-		restoreContext(oldContext, null);
-	}
-
-	/**
-	 * Transforms the given list of AST actions to an ActionList of IR actions.
-	 * 
-	 * @param actions
-	 *            a list of AST actions
-	 * @return an ActionList of IR actions
-	 */
-	private ActionList transformActions(List<AstAction> actions) {
-		ActionList actionList = new ActionList();
-		for (AstAction astAction : actions) {
-			transformAction(astAction, actionList);
-		}
-
-		return actionList;
-	}
-
-	/**
-	 * Transforms the scheduling information of the given AST action into the
-	 * given scheduler procedure.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param scheduler
-	 *            the procedure that will contain the scheduler
-	 * @param inputPattern
-	 *            the input pattern filled by
-	 *            {@link #fillsInputPattern(AstAction, Pattern)}
-	 */
-	private void transformActionScheduler(AstAction astAction,
-			Procedure scheduler, Pattern inputPattern) {
-		Context oldContext = newContext(scheduler);
-
-		LocalVariable result = context.getProcedure().newTempLocalVariable(
-				file, IrFactory.eINSTANCE.createTypeBool(), "result");
-
-		List<AstExpression> guards = astAction.getGuards();
-		if (inputPattern.isEmpty() && guards.isEmpty()) {
-			// the action is always fireable
-			Assign assign = new Assign(result, new BoolExpr(true));
-			addInstruction(assign);
-		} else {
-			createActionTest(astAction, inputPattern, result);
-		}
-
-		restoreContext(oldContext, new VarExpr(new Use(result)));
-	}
-
-	/**
 	 * Transforms the given AST expression to an IR expression. In the process
 	 * nodes may be created and added to the current {@link #procedure}, since
 	 * many RVC-CAL expressions are expressed with IR statements.
@@ -1042,7 +626,7 @@ public class AstTransformer {
 	 *            an AST expression
 	 * @return an IR expression
 	 */
-	private Expression transformExpression(AstExpression expression) {
+	public Expression transformExpression(AstExpression expression) {
 		return exprTransformer.doSwitch(expression);
 	}
 
@@ -1055,8 +639,7 @@ public class AstTransformer {
 	 *            a list of AST expressions
 	 * @return a list of IR expressions
 	 */
-	private List<Expression> transformExpressions(
-			List<AstExpression> expressions) {
+	public List<Expression> transformExpressions(List<AstExpression> expressions) {
 		int length = expressions.size();
 		List<Expression> irExpressions = new ArrayList<Expression>(length);
 		for (AstExpression expression : expressions) {
@@ -1073,7 +656,7 @@ public class AstTransformer {
 	 * @param astFunction
 	 *            an AST function
 	 */
-	private void transformFunction(AstFunction astFunction) {
+	public void transformFunction(AstFunction astFunction) {
 		String name = astFunction.getName();
 		Location location = Util.getLocation(astFunction);
 		Type type = astFunction.getIrType();
@@ -1096,151 +679,6 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Transforms AST state variables to IR state variables. The initial value
-	 * of an AST state variable is evaluated to a constant by
-	 * {@link #exprEvaluator}.
-	 * 
-	 * @param stateVariables
-	 *            a list of AST state variables
-	 * @return an ordered map of IR state variables
-	 */
-	private OrderedMap<String, StateVariable> transformGlobalVariables(
-			List<AstVariable> stateVariables) {
-		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
-		for (AstVariable astVariable : stateVariables) {
-			Location location = Util.getLocation(astVariable);
-			Type type = astVariable.getIrType();
-			String name = astVariable.getName();
-			boolean assignable = !astVariable.isConstant();
-
-			// initial value (if any) has been computed by validator
-			Object initialValue = astVariable.getInitialValue();
-
-			StateVariable stateVariable = new StateVariable(location, type,
-					name, assignable, initialValue);
-			stateVars.put(file, location, name, stateVariable);
-
-			context.putVariable(astVariable, stateVariable);
-		}
-
-		return stateVars;
-	}
-
-	/**
-	 * Transforms the given guards and assign result the expression g1 && g2 &&
-	 * .. && gn.
-	 * 
-	 * @param guards
-	 *            list of guard expressions
-	 * @param result
-	 *            target local variable
-	 */
-	private void transformGuards(List<AstExpression> guards,
-			LocalVariable result) {
-		List<Expression> expressions = transformExpressions(guards);
-		Iterator<Expression> it = expressions.iterator();
-		Expression value = it.next();
-		while (it.hasNext()) {
-			value = new BinaryExpr(value, BinaryOp.LOGIC_AND, it.next(),
-					IrFactory.eINSTANCE.createTypeBool());
-		}
-
-		Assign assign = new Assign(result, value);
-		addInstruction(assign);
-	}
-
-	/**
-	 * Transforms the AST input patterns of the given action as local variables,
-	 * adds reads and assigns tokens.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 */
-	private void transformInputPattern(AstAction astAction, Class<?> clasz) {
-		List<AstInputPattern> astInputPattern = astAction.getInputs();
-		for (AstInputPattern pattern : astInputPattern) {
-			Port port = mapPorts.get(pattern.getPort());
-			List<AstVariable> tokens = pattern.getTokens();
-
-			// evaluates token consumption
-			int totalConsumption = tokens.size();
-			int repeat = 1;
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator()
-						.evaluateAsInteger(astRepeat);
-				totalConsumption *= repeat;
-			}
-
-			// create port variable
-			LocalVariable variable = createPortVariable(port, totalConsumption);
-
-			// add the peek/read
-			try {
-				Object obj = clasz.newInstance();
-				AbstractFifoInstruction instr = (AbstractFifoInstruction) obj;
-				instr.setPort(port);
-				instr.setNumTokens(totalConsumption);
-				instr.setTarget(variable);
-				addInstruction(instr);
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-
-			// declare tokens
-			for (AstVariable token : tokens) {
-				LocalVariable local = transformLocalVariable(token);
-				context.getProcedure().getLocals()
-						.put(file, local.getLocation(), local.getName(), local);
-			}
-
-			// loads tokens
-			actionLoadTokens(variable, tokens, repeat);
-		}
-	}
-
-	/**
-	 * Returns a list of CFG nodes where the input pattern of the given action
-	 * is peeked. This method creates a new block node to hold the blocks, peeks
-	 * the input pattern, and transfers the nodes created to a new list that is
-	 * the result.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param result
-	 *            a local variable
-	 * @return a list of CFG nodes
-	 */
-	private List<CFGNode> transformInputPatternAndGuards(AstAction astAction,
-			LocalVariable result) {
-		List<CFGNode> nodes = context.getProcedure().getNodes();
-
-		int first = nodes.size();
-		nodes.add(new BlockNode(context.getProcedure()));
-
-		List<AstExpression> guards = astAction.getGuards();
-		if (guards.isEmpty()) {
-			Assign assign = new Assign(result, new BoolExpr(true));
-			addInstruction(assign);
-		} else {
-			transformInputPattern(astAction, Peek.class);
-			transformLocalVariables(astAction.getVariables());
-			transformGuards(astAction.getGuards(), result);
-		}
-
-		int last = nodes.size();
-
-		// moves selected CFG nodes from "nodes" list to resultNodes
-		List<CFGNode> subList = nodes.subList(first, last);
-		List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
-		subList.clear();
-
-		return resultNodes;
-	}
-
-	/**
 	 * Transforms the given AST variable to an IR variable that has the name and
 	 * type of <code>astVariable</code>. A binding is added to the
 	 * {@link #mapVariables} between astVariable and the created local variable.
@@ -1249,7 +687,7 @@ public class AstTransformer {
 	 *            an AST variable
 	 * @return the IR local variable created
 	 */
-	private LocalVariable transformLocalVariable(AstVariable astVariable) {
+	public LocalVariable transformLocalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 		String name = astVariable.getName();
 		boolean assignable = !astVariable.isConstant();
@@ -1276,46 +714,11 @@ public class AstTransformer {
 	 * @param variables
 	 *            a list of AST variables
 	 */
-	private void transformLocalVariables(List<AstVariable> variables) {
+	public void transformLocalVariables(List<AstVariable> variables) {
 		for (AstVariable astVariable : variables) {
 			LocalVariable local = transformLocalVariable(astVariable);
 			context.getProcedure().getLocals()
 					.put(file, local.getLocation(), local.getName(), local);
-		}
-	}
-
-	/**
-	 * Transforms the AST output patterns of the given action as expressions and
-	 * possibly statements, assigns tokens and adds writes.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 */
-	private void transformOutputPattern(AstAction astAction) {
-		List<AstOutputPattern> astOutputPattern = astAction.getOutputs();
-		for (AstOutputPattern pattern : astOutputPattern) {
-			Port port = mapPorts.get(pattern.getPort());
-			List<AstExpression> values = pattern.getValues();
-
-			// evaluates token consumption
-			int totalConsumption = values.size();
-			int repeat = 1;
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator()
-						.evaluateAsInteger(astRepeat);
-				totalConsumption *= repeat;
-			}
-
-			// create port variable
-			LocalVariable variable = createPortVariable(port, totalConsumption);
-
-			// store tokens
-			actionStoreTokens(variable, values, repeat);
-
-			// add the write
-			Write write = new Write(port, totalConsumption, variable);
-			addInstruction(write);
 		}
 	}
 
@@ -1335,26 +738,6 @@ public class AstTransformer {
 	}
 
 	/**
-	 * Transforms the given AST ports in an ordered map of IR ports.
-	 * 
-	 * @param portList
-	 *            a list of AST ports
-	 * @return an ordered map of IR ports
-	 */
-	private OrderedMap<String, Port> transformPorts(List<AstPort> portList) {
-		OrderedMap<String, Port> ports = new OrderedMap<String, Port>();
-		for (AstPort astPort : portList) {
-			Location location = Util.getLocation(astPort);
-			Type type = astPort.getIrType();
-			Port port = new Port(location, type, astPort.getName());
-			mapPorts.put(astPort, port);
-			ports.put(file, location, port.getName(), port);
-		}
-
-		return ports;
-	}
-
-	/**
 	 * Transforms the given AST procedure to an IR procedure, and adds it to the
 	 * IR procedure list {@link #procedures} and to the map
 	 * {@link #mapProcedures}.
@@ -1362,7 +745,7 @@ public class AstTransformer {
 	 * @param astProcedure
 	 *            an AST procedure
 	 */
-	private void transformProcedure(AstProcedure astProcedure) {
+	public void transformProcedure(AstProcedure astProcedure) {
 		String name = astProcedure.getName();
 		Location location = Util.getLocation(astProcedure);
 
@@ -1402,7 +785,7 @@ public class AstTransformer {
 	 * @param statements
 	 *            a list of AST statements
 	 */
-	private void transformStatements(List<AstStatement> statements) {
+	public void transformStatements(List<AstStatement> statements) {
 		for (AstStatement statement : statements) {
 			transformStatement(statement);
 		}

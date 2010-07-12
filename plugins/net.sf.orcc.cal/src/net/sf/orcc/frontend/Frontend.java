@@ -50,7 +50,7 @@ import com.google.inject.Inject;
 public class Frontend {
 
 	@Inject
-	private AstTransformer astTransformer;
+	private ActorTransformer actorTransformer;
 
 	/**
 	 * output folder
@@ -65,7 +65,7 @@ public class Frontend {
 		List<Diagnostic> errors = astActor.eResource().getErrors();
 		if (errors.isEmpty()) {
 			try {
-				Actor actor = astTransformer.transform(file, astActor);
+				Actor actor = actorTransformer.transform(file, astActor);
 				new SSATransformation().transform(actor);
 				new IRWriter(actor).write(outputFolder.toString());
 			} catch (OrccRuntimeException e) {
