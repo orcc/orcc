@@ -54,6 +54,7 @@ import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -83,6 +84,9 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
 
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.naming.IQualifiedNameProvider;
+
 /**
  * This class transforms an AST actor to its IR equivalent.
  * 
@@ -90,6 +94,9 @@ import net.sf.orcc.util.OrderedMap;
  * 
  */
 public class AstTransformer {
+
+	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
+			.compile("\\.");
 
 	/**
 	 * This class transforms an AST statement into one or more IR instructions
@@ -139,6 +146,7 @@ public class AstTransformer {
 					calledProcedure.getReturnType(),
 					"call_" + calledProcedure.getName());
 
+			// creates call with spilling code around it
 			createCall(location, target, calledProcedure,
 					astCall.getParameters());
 
@@ -351,6 +359,7 @@ public class AstTransformer {
 			}
 			Procedure procedure = mapProcedures.get(astProcedure);
 
+			// creates call with spilling code around it
 			createCall(location, null, procedure, astCall.getParameters());
 
 			return null;
@@ -358,6 +367,40 @@ public class AstTransformer {
 
 		@Override
 		public Void caseAstStatementForeach(AstStatementForeach foreach) {
+			Location location = Util.getLocation(foreach);
+			Procedure procedure = context.getProcedure();
+
+			// creates loop variable and assigns it
+			AstVariable astVariable = foreach.getVariable();
+			LocalVariable loopVar = transformLocalVariable(astVariable);
+			procedure.getLocals().put(file, loopVar.getLocation(),
+					loopVar.getName(), loopVar);
+
+			AstExpression astLower = foreach.getLower();
+			Expression lower = transformExpression(astLower);
+			Assign assign = new Assign(location, loopVar, lower);
+			addInstruction(assign);
+
+			// condition
+			AstExpression astHigher = foreach.getHigher();
+			Expression higher = transformExpression(astHigher);
+			Expression condition = new BinaryExpr(higher.getLocation(),
+					new VarExpr(new Use(loopVar)), BinaryOp.LT, higher,
+					IrFactory.eINSTANCE.createTypeBool());
+
+			// body
+			List<CFGNode> nodes = getNodes(foreach.getStatements());
+			BlockNode block = BlockNode.getLast(procedure, nodes);
+			assign = new Assign(location, loopVar, new BinaryExpr(new VarExpr(
+					new Use(loopVar)), BinaryOp.PLUS, new IntExpr(1),
+					loopVar.getType()));
+			block.add(assign);
+
+			// create while
+			WhileNode whileNode = new WhileNode(location, procedure, condition,
+					nodes, new BlockNode(procedure));
+			procedure.getNodes().add(whileNode);
+
 			return null;
 		}
 
@@ -445,6 +488,8 @@ public class AstTransformer {
 	 */
 	final private Map<AstProcedure, Procedure> mapProcedures;
 
+	private IQualifiedNameProvider nameProvider;
+
 	/**
 	 * the list of procedures of the IR actor.
 	 */
@@ -464,6 +509,9 @@ public class AstTransformer {
 
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
+
+		nameProvider = new CalQualifiedNameProvider();
+		context = new Context(null, null);
 	}
 
 	/**
@@ -486,77 +534,6 @@ public class AstTransformer {
 
 		mapFunctions.clear();
 		mapProcedures.clear();
-	}
-
-	/**
-	 * Returns the current context of this AST transformer.
-	 * 
-	 * @return the current context of this AST transformer
-	 */
-	public Context getContext() {
-		return context;
-	}
-
-	/**
-	 * Returns the IR mapping of the given variable. If the variable is a
-	 * global, returns a local associated with it. The variable is added to the
-	 * set of globals to load, and if <code>isStored</code> is <code>true</code>
-	 * , the variable is added to the set of variables to store, too.
-	 * 
-	 * @param variable
-	 *            an IR variable, possibly global
-	 * @param isStored
-	 *            <code>true</code> if the variable is stored,
-	 *            <code>false</code> otherwise
-	 * @return a local IR variable
-	 */
-	private LocalVariable getLocalVariable(Variable variable, boolean isStored) {
-		if (variable.isGlobal()) {
-			LocalVariable local = context.getMapGlobals().get(variable);
-			if (local == null) {
-				local = context.getProcedure().newTempLocalVariable(file,
-						variable.getType(), "local_" + variable.getName());
-				context.getMapGlobals().put(variable, local);
-			}
-
-			context.getSetGlobalsToLoad().add(variable);
-			if (isStored) {
-				context.getSetGlobalsToStore().add(variable);
-			}
-
-			return local;
-		}
-
-		return (LocalVariable) variable;
-	}
-
-	/**
-	 * Loads the globals that need to be loaded.
-	 */
-	private void loadGlobals() {
-		int i = 0;
-		for (Variable global : context.getSetGlobalsToLoad()) {
-			LocalVariable local = context.getMapGlobals().get(global);
-
-			List<Expression> indexes = new ArrayList<Expression>(0);
-			Load load = new Load(local, new Use(global), indexes);
-			BlockNode block = BlockNode.getFirst(context.getProcedure());
-			block.add(i, load);
-			i++;
-		}
-
-		context.getSetGlobalsToLoad().clear();
-	}
-
-	/**
-	 * Returns the current context, and creates a new one.
-	 * 
-	 * @return the current context
-	 */
-	public Context newContext(Procedure procedure) {
-		Context oldContext = context;
-		context = new Context(context, procedure);
-		return oldContext;
 	}
 
 	/**
@@ -609,6 +586,88 @@ public class AstTransformer {
 			Load load = new Load(local, new Use(global), indexes);
 			addInstruction(load);
 		}
+	}
+
+	/**
+	 * Returns the current context of this AST transformer.
+	 * 
+	 * @return the current context of this AST transformer
+	 */
+	public Context getContext() {
+		return context;
+	}
+
+	/**
+	 * Returns the IR mapping of the given variable. If the variable is a
+	 * global, returns a local associated with it. The variable is added to the
+	 * set of globals to load, and if <code>isStored</code> is <code>true</code>
+	 * , the variable is added to the set of variables to store, too.
+	 * 
+	 * @param variable
+	 *            an IR variable, possibly global
+	 * @param isStored
+	 *            <code>true</code> if the variable is stored,
+	 *            <code>false</code> otherwise
+	 * @return a local IR variable
+	 */
+	private LocalVariable getLocalVariable(Variable variable, boolean isStored) {
+		if (variable.isGlobal()) {
+			LocalVariable local = context.getMapGlobals().get(variable);
+			if (local == null) {
+				local = context.getProcedure().newTempLocalVariable(file,
+						variable.getType(), "local_" + variable.getName());
+				context.getMapGlobals().put(variable, local);
+			}
+
+			context.getSetGlobalsToLoad().add(variable);
+			if (isStored) {
+				context.getSetGlobalsToStore().add(variable);
+			}
+
+			return local;
+		}
+
+		return (LocalVariable) variable;
+	}
+
+	/**
+	 * Returns the qualified name for the given object.
+	 * 
+	 * @param obj
+	 *            an object
+	 * @return the qualified name for the given object
+	 */
+	public String getQualifiedName(EObject obj) {
+		return nameProvider.getQualifiedName(obj);
+	}
+
+	/**
+	 * Loads the globals that need to be loaded.
+	 */
+	private void loadGlobals() {
+		int i = 0;
+		for (Variable global : context.getSetGlobalsToLoad()) {
+			LocalVariable local = context.getMapGlobals().get(global);
+
+			List<Expression> indexes = new ArrayList<Expression>(0);
+			Load load = new Load(local, new Use(global), indexes);
+			BlockNode block = BlockNode.getFirst(context.getProcedure());
+			block.add(i, load);
+			i++;
+		}
+
+		context.getSetGlobalsToLoad().clear();
+	}
+
+	/**
+	 * Returns the current context, and creates a new one.
+	 * 
+	 * @return the current context
+	 */
+	public Context newContext(Procedure procedure) {
+		Context oldContext = context;
+		context = new Context(context, procedure);
+		return oldContext;
 	}
 
 	/**
@@ -730,10 +789,14 @@ public class AstTransformer {
 	 */
 	public LocalVariable transformLocalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
-		String name = astVariable.getName();
+
+		String name = nameProvider.getQualifiedName(astVariable);
+		name = dotPattern.matcher(name).replaceAll("_");
+
 		boolean assignable = !astVariable.isConstant();
 		Type type = astVariable.getIrType();
 
+		// create local variable with the given name
 		LocalVariable local = new LocalVariable(assignable, 0, location, name,
 				type);
 

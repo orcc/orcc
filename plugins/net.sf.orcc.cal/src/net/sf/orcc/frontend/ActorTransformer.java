@@ -47,7 +47,6 @@ import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
-import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.Action;
@@ -85,8 +84,6 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
-import com.google.inject.Inject;
-
 /**
  * This class transforms an AST actor to its IR equivalent.
  * 
@@ -95,10 +92,6 @@ import com.google.inject.Inject;
  */
 public class ActorTransformer {
 
-	/**
-	 * expression transformer.
-	 */
-	@Inject
 	private AstTransformer astTransformer;
 
 	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
@@ -113,8 +106,6 @@ public class ActorTransformer {
 	 * A map from AST ports to IR ports.
 	 */
 	final private Map<AstPort, Port> mapPorts;
-
-	private CalQualifiedNameProvider nameProvider;
 
 	/**
 	 * Creates a new AST to IR transformation.
@@ -362,9 +353,8 @@ public class ActorTransformer {
 	 */
 	public Actor transform(String file, AstActor astActor) {
 		this.file = file;
-		nameProvider = new CalQualifiedNameProvider();
 
-		astTransformer.newContext(null);
+		astTransformer = new AstTransformer();
 		Context context = astTransformer.getContext();
 		try {
 			// parameters
@@ -454,7 +444,7 @@ public class ActorTransformer {
 		Pattern inputPattern = new Pattern();
 		Pattern outputPattern = new Pattern();
 
-		String name = nameProvider.getQualifiedName(astAction);
+		String name = astTransformer.getQualifiedName(astAction);
 		name = dotPattern.matcher(name).replaceAll("_");
 
 		// creates scheduler and body
