@@ -433,9 +433,8 @@ store $ExprType(peek.port)$* %$peek.target$_$peek.block.label$, $ExprType(peek.p
 Write(write) ::= <<
 
 $LoadLocalPort(write)$
-%$write.target$_$write.block.label$ = $CallOp(ty ="i8*", fnptrval={fifo_$write.port.type$_write}, function_args={$fifoName(write.port)$ %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
-$BitcastOp(result={%$write.target$_$write.block.label$_cast}, ty="i8*", value={%$write.target$_$write.block.label$}, ty2={$ExprType(write.port)$*})$
-store $ExprType(write.port)$* %$write.target$_$write.block.label$_cast, $ExprType(write.port)$** %$write.port$
+%$write.target$_$write.block.label$ = $CallOp(ty ={$write.port.type$*}, fnptrval={fifo_$write.port.type$_write}, function_args={$fifoName(write.port)$ %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
+store $ExprType(write.port)$* %$write.target$_$write.block.label$, $ExprType(write.port)$** %$write.port$
 >>
 
 HasRoom(result, action, port, numToken) ::= <<

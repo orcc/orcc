@@ -64,10 +64,10 @@ using namespace llvm;
 extern "C" void source_initialize();
 extern "C" void source_scheduler();
 extern "C" void display_scheduler();
-extern "C" struct fifo_s *display_B;
-extern "C" struct fifo_s *display_WIDTH;
-extern "C" struct fifo_s *display_HEIGHT;
-extern "C" struct fifo_s *source_O;
+extern "C" struct fifo_char_s *display_B;
+extern "C" struct fifo_short_s *display_WIDTH;
+extern "C" struct fifo_short_s *display_HEIGHT;
+extern "C" struct fifo_char_s *source_O;
 
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder* decoder): Context(C) {
 	this->jit = jit;
@@ -144,10 +144,10 @@ void RoundRobinScheduler::execute(){
 	// Get pointer 
 	jit->GlobalMapped(sourceFunc, (void*) source_scheduler);
 	jit->GlobalMapped(displayFunc, (void*) display_scheduler);
-	display_B = (fifo_s*)(*(fifo_s**)jit->getFifoPointer(displayB));
-	display_WIDTH = (fifo_s*)(*(fifo_s**)jit->getFifoPointer(displayW));
-	display_HEIGHT = (fifo_s*)(*(fifo_s**)jit->getFifoPointer(displayH));
-	source_O = (fifo_s*)(*(fifo_s**)jit->getFifoPointer(sourceO));
+	display_B = (fifo_char_s*)(*(fifo_char_s**)jit->getFifoPointer(displayB));
+	display_WIDTH = (fifo_short_s*)(*(fifo_short_s**)jit->getFifoPointer(displayW));
+	display_HEIGHT = (fifo_short_s*)(*(fifo_short_s**)jit->getFifoPointer(displayH));
+	source_O = (fifo_char_s*)(*(fifo_char_s**)jit->getFifoPointer(sourceO));
 	
 	
 

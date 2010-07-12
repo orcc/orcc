@@ -23,4 +23,10 @@ add_library (Scheduler
   RoundRobinScheduler.cpp
   display.c
   source.c
+  fifoCircular.h
+  fifoCircular_generic.h
+  fifoCircular_generic.inl
+  unprotectedFifo.h
+  unprotectedFifo_generic.h
+  unprotectedFifo_generic.inl
  )

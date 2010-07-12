@@ -174,7 +174,7 @@ void FifoCircular::setConnection(Connection* connection){
 
 	// Initialize array 
 	PATypeHolder EltTy(connection->getIntegerType());
-	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize()+1);
+	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize());
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArray =
         new GlobalVariable(*module, arrayType,
@@ -186,6 +186,7 @@ void FifoCircular::setConnection(Connection* connection){
 	Constant* write_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* fill_count = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* expr = ConstantExpr::getBitCast(NewArray, structType->getElementType(1));
+	Constant* arrConst = ConstantAggregateZero::get(structType->getElementType(5));
 	
 	// Add initialization vector 
 	vector<Constant*> Elts;
@@ -194,6 +195,7 @@ void FifoCircular::setConnection(Connection* connection){
 	Elts.push_back(read_ind);
 	Elts.push_back(write_ind);
 	Elts.push_back(fill_count);
+	Elts.push_back(arrConst);
 	Constant* fifoStruct =  ConstantStruct::get(structType, Elts);
 
 	// Create fifo 
