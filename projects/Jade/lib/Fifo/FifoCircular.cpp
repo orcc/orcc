@@ -174,7 +174,7 @@ void FifoCircular::setConnection(Connection* connection){
 
 	// Initialize array 
 	PATypeHolder EltTy(connection->getIntegerType());
-	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize());
+	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize()+1);
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArray =
         new GlobalVariable(*module, arrayType,
