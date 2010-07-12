@@ -74,7 +74,7 @@ $port.name$_full
 >>
 
 SensitivVars(action) ::= <<
-$action.scheduler.stateVarsUsed: {$it$}; separator=", "$
+$action.scheduler.loadedVariables: {$it$}; separator=", "$
 >>
 
 Actor_Schedul(actor) ::= <<
@@ -356,7 +356,7 @@ Call(call) ::= <<
 $
 if(call.target)
 $
-$call.target$ := $call.procedure$($call.procedure.stateVarsUsed: {$it$, }$$call.parameters: {$it$, }$'1');$
+$call.target$ := $call.procedure$($call.procedure.loadedVariables: {$it$, }$$call.parameters: {$it$, }$'1');$
 elseif(call.parameters)
 $
 $call.procedure$($call.parameters; separator=", "$, '1');$
@@ -566,7 +566,7 @@ $
 >>
 
 VarUsed(procedure) ::= <<
-$procedure.stateVarsUsed: functionParameter(); wrap$
+$procedure.loadedVariables: functionParameter(); wrap$
 >>
 
 parameters(procedure) ::= <<

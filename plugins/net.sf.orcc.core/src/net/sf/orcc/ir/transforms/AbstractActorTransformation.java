@@ -119,7 +119,7 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	 * @param args
 	 *            arguments
 	 */
-	protected void visit(List<CFGNode> nodes, Object... args) {
+	public void visit(List<CFGNode> nodes, Object... args) {
 		ListIterator<CFGNode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			CFGNode node = it.next();

@@ -369,7 +369,7 @@ public class ActorMerger implements INetworkTransformation {
 				Actor actor = vertex.getInstance().getActor();
 
 				for (Procedure proc : actor.getProcs()) {
-					if (procedure.getStateVarsUsed().isEmpty()) {
+					if (procedure.getStoredVariables().isEmpty()) {
 						if (!procs.contains(proc.getName())) {
 							String name = actor.getName() + "_"
 									+ proc.getName();

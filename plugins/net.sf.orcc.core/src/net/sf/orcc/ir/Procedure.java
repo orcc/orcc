@@ -29,20 +29,13 @@
 package net.sf.orcc.ir;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 
-import net.sf.orcc.ir.instructions.AbstractInstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -59,74 +52,39 @@ public class Procedure extends AbstractLocalizable {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class ProcVisitor extends AbstractInstructionVisitor implements
-			NodeVisitor {
+	private class ProcVisitor extends AbstractActorTransformation {
 
-		private Set<StateVariable> vars;
+		private Set<StateVariable> loadedVariables;
+
+		private Set<StateVariable> storedVariables;
 
 		public ProcVisitor() {
-			vars = new HashSet<StateVariable>();
+			storedVariables = new HashSet<StateVariable>();
+			loadedVariables = new HashSet<StateVariable>();
 		}
 
-		public List<StateVariable> getStateVarsUsed() {
-			return Arrays.asList(vars.toArray(new StateVariable[0]));
+		public List<StateVariable> getLoadedVariables() {
+			return new ArrayList<StateVariable>(loadedVariables);
 		}
 
-		@Override
-		public void visit(BlockNode node, Object... args) {
-			ListIterator<Instruction> it = node.listIterator();
-			while (it.hasNext()) {
-				it.next().accept(this, it);
-			}
-		}
-
-		@Override
-		public void visit(IfNode node, Object... args) {
-			visit(node.getThenNodes());
-			visit(node.getElseNodes());
-			visit(node.getJoinNode(), args);
-		}
-
-		/**
-		 * Visits the nodes of the given node list.
-		 * 
-		 * @param nodes
-		 *            a list of nodes that belong to a procedure
-		 * @param args
-		 *            arguments
-		 */
-		public void visit(List<CFGNode> nodes, Object... args) {
-			ListIterator<CFGNode> it = nodes.listIterator();
-			while (it.hasNext()) {
-				CFGNode node = it.next();
-				node.accept(this, it);
-			}
+		public List<StateVariable> getStoredVariables() {
+			return new ArrayList<StateVariable>(storedVariables);
 		}
 
 		@Override
 		public void visit(Load node, Object... args) {
 			Variable var = node.getSource().getVariable();
 			if (!var.getType().isList()) {
-				vars.add((StateVariable) var);
+				loadedVariables.add((StateVariable) var);
 			}
-		}
-
-		@Override
-		public void visit(SpecificInstruction specific, Object... args) {
 		}
 
 		@Override
 		public void visit(Store store, Object... args) {
 			Variable var = store.getTarget();
 			if (!var.getType().isList()) {
-				vars.add((StateVariable) var);
+				storedVariables.add((StateVariable) var);
 			}
-		}
-
-		@Override
-		public void visit(WhileNode node, Object... args) {
-			visit(node.getNodes());
-			visit(node.getJoinNode(), args);
 		}
 
 	}
@@ -232,6 +190,18 @@ public class Procedure extends AbstractLocalizable {
 	}
 
 	/**
+	 * Computes and returns the list of scalar variables loaded by this
+	 * procedure.
+	 * 
+	 * @return the list of scalar variables loaded by this procedure
+	 */
+	public List<StateVariable> getLoadedVariables() {
+		ProcVisitor visitor = new ProcVisitor();
+		visitor.visit(nodes);
+		return visitor.getLoadedVariables();
+	}
+
+	/**
 	 * Returns the local variables of this procedure as an ordered map.
 	 * 
 	 * @return the local variables of this procedure as an ordered map
@@ -281,16 +251,15 @@ public class Procedure extends AbstractLocalizable {
 	}
 
 	/**
-	 * Computes and returns the list of state variables used (loaded or stored)
-	 * by this procedure.
+	 * Computes and returns the list of scalar variables stored by this
+	 * procedure.
 	 * 
-	 * @return the list of state variables used (loaded or stored) by this
-	 *         procedure
+	 * @return the list of scalar variables stored by this procedure
 	 */
-	public List<StateVariable> getStateVarsUsed() {
+	public List<StateVariable> getStoredVariables() {
 		ProcVisitor visitor = new ProcVisitor();
 		visitor.visit(nodes);
-		return visitor.getStateVarsUsed();
+		return visitor.getStoredVariables();
 	}
 
 	/**
