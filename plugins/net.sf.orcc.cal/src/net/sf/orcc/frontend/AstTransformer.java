@@ -134,18 +134,13 @@ public class AstTransformer {
 			}
 			Procedure calledProcedure = mapFunctions.get(astFunction);
 
-			// transform parameters
-			List<Expression> parameters = transformExpressions(astCall
-					.getParameters());
-
 			// generates a new target
 			LocalVariable target = procedure.newTempLocalVariable(file,
 					calledProcedure.getReturnType(),
 					"call_" + calledProcedure.getName());
 
-			// add call
-			Call call = new Call(location, target, calledProcedure, parameters);
-			addInstruction(call);
+			createCall(location, target, calledProcedure,
+					astCall.getParameters());
 
 			// return local variable
 			Use use = new Use(target);
@@ -356,13 +351,7 @@ public class AstTransformer {
 			}
 			Procedure procedure = mapProcedures.get(astProcedure);
 
-			// transform parameters
-			List<Expression> parameters = transformExpressions(astCall
-					.getParameters());
-
-			// add call
-			Call call = new Call(location, null, procedure, parameters);
-			addInstruction(call);
+			createCall(location, null, procedure, astCall.getParameters());
 
 			return null;
 		}
@@ -568,6 +557,58 @@ public class AstTransformer {
 		Context oldContext = context;
 		context = new Context(context, procedure);
 		return oldContext;
+	}
+
+	/**
+	 * Creates a call with the given arguments, and adds spilling code.
+	 * 
+	 * @param location
+	 *            location of the call
+	 * @param target
+	 *            target (or <code>null</code>)
+	 * @param procedure
+	 *            procedure being called
+	 * @param expressions
+	 *            arguments
+	 */
+	private void createCall(Location location, LocalVariable target,
+			Procedure procedure, List<AstExpression> expressions) {
+		// transform parameters
+		List<Expression> parameters = transformExpressions(expressions);
+
+		// stores variables that have been loaded and modified, and are loaded
+		// by the procedure
+		for (Variable global : procedure.getLoadedVariables()) {
+			LocalVariable local = context.getMapGlobals().get(global);
+			if (local != null
+					&& context.getSetGlobalsToStore().contains(global)) {
+				// variable already loaded somewhere and modified
+				VarExpr value = new VarExpr(new Use(local));
+
+				List<Expression> indexes = new ArrayList<Expression>(0);
+				Store store = new Store(global, indexes, value);
+				addInstruction(store);
+			}
+		}
+
+		// add call
+		Call call = new Call(location, target, procedure, parameters);
+		addInstruction(call);
+
+		// loads variables that are stored by the procedure
+		for (Variable global : procedure.getStoredVariables()) {
+			LocalVariable local = context.getMapGlobals().get(global);
+			if (local == null) {
+				// creates a new local variable
+				local = context.getProcedure().newTempLocalVariable(file,
+						global.getType(), "local_" + global.getName());
+				context.getMapGlobals().put(global, local);
+			}
+
+			List<Expression> indexes = new ArrayList<Expression>(0);
+			Load load = new Load(local, new Use(global), indexes);
+			addInstruction(load);
+		}
 	}
 
 	/**
