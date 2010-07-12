@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.cal.type;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AstExpression;
@@ -300,8 +301,8 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionInteger(AstExpressionInteger expression) {
-		return IrFactory.eINSTANCE.createTypeInt(getSize(expression
-				.getValue()));
+		return IrFactory.eINSTANCE
+				.createTypeInt(getSize(expression.getValue()));
 	}
 
 	@Override
@@ -454,6 +455,28 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		return type;
+	}
+
+	/**
+	 * Computes and returns the type that is the Least Upper Bound of the types
+	 * for the given expressions.
+	 * 
+	 * @param expressions
+	 *            a list of expressions
+	 * @return the common type to the given expressions
+	 */
+	public Type getType(List<AstExpression> expressions) {
+		Iterator<AstExpression> it = expressions.iterator();
+		if (it.hasNext()) {
+			Type t1 = getType(it.next());
+			while (it.hasNext()) {
+				Type t2 = getType(it.next());
+				t1 = getLub(t1, t2);
+			}
+			return t1;
+		}
+
+		return null;
 	}
 
 }
