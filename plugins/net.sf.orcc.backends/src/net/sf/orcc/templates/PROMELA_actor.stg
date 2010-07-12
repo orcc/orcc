@@ -1,0 +1,152 @@
+///////////////////////////////////////////////////////////////////////////////
+// Composite types
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Channel declaration
+///////////////////////////////////////////////////////////////////////////////
+
+channels(port) ::= <<
+chan chan_$port.name$ = [100] of {$port.type$}
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// parameters
+///////////////////////////////////////////////////////////////////////////////
+
+// the dimensions of a list: [dim1][dim2]...[dimn]
+// does not output anything if $value$ is empty
+listSize(value) ::= <<
+$value : {[$it$]} $
+>>
+
+variableDeclaration(variable) ::= <<
+$
+if(variable.port)
+$$variable.type$ *$variable$$
+else
+$$variable.type$ $variable$$listSize(variable.type.dimensions)$$
+endif
+$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Constants
+///////////////////////////////////////////////////////////////////////////////
+
+Constant(constant) ::= <<
+$(constant.class.simpleName)(constant)$
+>>
+
+Boolean(constant) ::= <<
+$if (constant)$1$else$0$endif$
+>>
+
+Integer(constant) ::= <<
+$constant$
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+List(constant) ::= <<
+{$constant: Constant(); wrap, separator=", "$}
+>>
+
+ArrayList(constant) ::= <<$List(constant)$>>
+
+String(constant) ::= <<
+"$constant$"
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// State variable declaration
+///////////////////////////////////////////////////////////////////////////////
+
+stateVar(var) ::= <<
+$if (var.assignable)$
+$if (var.initialized)$
+$variableDeclaration(var)$ = $Constant(var.constantValue)$;
+$else$
+$variableDeclaration(var)$;
+$endif$
+$endif$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler with fsm
+///////////////////////////////////////////////////////////////////////////////
+
+schedulerFSM() ::= <<
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler without fsm
+///////////////////////////////////////////////////////////////////////////////
+
+guard() ::= <<
+>>
+
+inputPatternPort(port) ::= <<
+chan_$port.name$?trash
+>>
+
+inputPattern(pattern) ::= <<
+$pattern.keys: inputPatternPort(); separator="\n"$
+>>
+
+outputPatternPort(port) ::= <<
+chan_$port$?trash
+>>
+
+outputPattern(pattern) ::= <<
+$pattern.keys: outputPatternPort(); separator="\n"$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler without fsm
+///////////////////////////////////////////////////////////////////////////////
+
+scheduler(action) ::= <<
+/* $action.name$ */
+:: $guard()$ -> 
+	$inputPattern(action.inputPattern)$;
+	$outputPattern(action.outputPattern)$;	
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Process declaration
+///////////////////////////////////////////////////////////////////////////////
+
+proctype() ::= <<
+active proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap, separator=", "$) {
+
+	/* State variables */
+	$actor.stateVars.list : stateVar(); separator="\n"$
+
+	do
+	$if (actor.actionScheduler.fsm)$
+	$else$
+		$actor.actionScheduler.actions: scheduler(); separator="\n"$
+	$endif$
+	od
+
+}
+>>
+
+
+actor(actor) ::= <<
+/* Composite type */
+
+/* Channels */
+$ [actor.inputs.list, actor.outputs.list] : channels(); separator="\n"$
+
+
+/* Process */
+$proctype()$
+
+>>
