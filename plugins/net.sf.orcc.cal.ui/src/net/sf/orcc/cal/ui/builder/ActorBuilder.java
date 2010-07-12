@@ -115,10 +115,12 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			}
 
 			if (monitor.isCanceled()) {
-				return;
+				break;
 			}
 			monitor.worked(1);
 		}
+
+		monitor.done();
 	}
 
 	/**

@@ -47,6 +47,7 @@ import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.ir.Action;
@@ -84,8 +85,6 @@ import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
-import org.eclipse.xtext.naming.IQualifiedNameProvider;
-
 import com.google.inject.Inject;
 
 /**
@@ -115,8 +114,7 @@ public class ActorTransformer {
 	 */
 	final private Map<AstPort, Port> mapPorts;
 
-	@Inject
-	private IQualifiedNameProvider nameProvider;
+	private CalQualifiedNameProvider nameProvider;
 
 	/**
 	 * Creates a new AST to IR transformation.
@@ -364,9 +362,7 @@ public class ActorTransformer {
 	 */
 	public Actor transform(String file, AstActor astActor) {
 		this.file = file;
-
-		// gets the name of the actor and resets the untagged action counter
-		String name = nameProvider.getQualifiedName(astActor);
+		nameProvider = new CalQualifiedNameProvider();
 
 		astTransformer.newContext(null);
 		Context context = astTransformer.getContext();
@@ -424,6 +420,7 @@ public class ActorTransformer {
 			context.restoreScope();
 
 			// create IR actor
+			String name = astActor.getName();
 			return new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procedures, actions.getAllActions(),
 					initializes.getAllActions(), scheduler);
