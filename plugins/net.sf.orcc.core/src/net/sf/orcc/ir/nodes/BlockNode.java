@@ -240,7 +240,7 @@ public final class BlockNode extends AbstractNode implements
 		StringBuilder sb = new StringBuilder();
 		for (Instruction instruction : this) {
 			sb.append(instruction.toString());
-			sb.append("\\n");
+			sb.append("\n");
 		}
 
 		return sb.toString();

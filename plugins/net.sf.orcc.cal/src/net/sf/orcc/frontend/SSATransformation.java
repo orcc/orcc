@@ -80,7 +80,8 @@ public class SSATransformation extends AbstractActorTransformation {
 			LocalVariable oldVar = (LocalVariable) use.getVariable();
 			LocalVariable newVar = uses.get(oldVar.getBaseName());
 			if (newVar != null) {
-				// newVar may be null if oldVar is a function parameter for instance
+				// newVar may be null if oldVar is a function parameter for
+				// instance
 				use.setVariable(newVar);
 			}
 		}
@@ -318,11 +319,14 @@ public class SSATransformation extends AbstractActorTransformation {
 			for (CFGNode subNode : ifNode.getElseNodes()) {
 				findNodes(nodes, subNode);
 			}
+
+			nodes.add(ifNode.getJoinNode());
 		} else if (node.isWhileNode()) {
 			WhileNode whileNode = (WhileNode) node;
 			for (CFGNode subNode : whileNode.getNodes()) {
 				findNodes(nodes, subNode);
 			}
+			nodes.add(whileNode.getJoinNode());
 		}
 	}
 
@@ -356,12 +360,14 @@ public class SSATransformation extends AbstractActorTransformation {
 
 	@Override
 	public void visit(IfNode ifNode, Object... args) {
-		BlockNode outerJoin = join;
 		int outerBranch = branch;
+		BlockNode outerJoin = join;
+		WhileNode outerLoop = loop;
 
 		replaceUses(ifNode.getValue());
 
 		join = ifNode.getJoinNode();
+		loop = null;
 
 		branch = 1;
 		visit(ifNode.getThenNodes());
@@ -374,8 +380,9 @@ public class SSATransformation extends AbstractActorTransformation {
 
 		// commit phi
 		BlockNode innerJoin = join;
-		join = outerJoin;
 		branch = outerBranch;
+		join = outerJoin;
+		loop = outerLoop;
 		commitPhi(innerJoin);
 	}
 
@@ -404,17 +411,17 @@ public class SSATransformation extends AbstractActorTransformation {
 
 		replaceUses(whileNode.getValue());
 
+		branch = 2;
 		join = whileNode.getJoinNode();
 		loop = whileNode;
 
-		branch = 2;
 		visit(whileNode.getNodes());
-		loop = outerLoop;
 
 		// commit phi
 		BlockNode innerJoin = join;
-		join = outerJoin;
 		branch = outerBranch;
+		join = outerJoin;
+		loop = outerLoop;
 		commitPhi(innerJoin);
 	}
 
