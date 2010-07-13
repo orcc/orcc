@@ -107,7 +107,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="RVC_iDCT2D"/>
+        <Class name="../../../VTL/MPEG/MPEG-4_part_2/iDCT/Algo_IDCT2D_ISOIEC_23002_1"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
