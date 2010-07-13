@@ -156,16 +156,29 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public void checkGenerator(AstGenerator generator) {
 		AstExpression astValue = generator.getLower();
 		Object initialValue = new AstExpressionEvaluator().evaluate(astValue);
-		if (!(initialValue instanceof Integer)) {
+		Integer lower = null;
+		if (initialValue instanceof Integer) {
+			lower = (Integer) initialValue;
+		} else {
 			error("lower bound must be a compile-time constant", generator,
 					CalPackage.AST_GENERATOR__LOWER);
 		}
 
 		astValue = generator.getHigher();
 		initialValue = new AstExpressionEvaluator().evaluate(astValue);
-		if (!(initialValue instanceof Integer)) {
+		Integer higher = null;
+		if (initialValue instanceof Integer) {
+			higher = (Integer) initialValue;
+		} else {
 			error("higher bound must be a compile-time constant", generator,
 					CalPackage.AST_GENERATOR__HIGHER);
+		}
+
+		if (lower != null && higher != null) {
+			if (higher < lower) {
+				error("higher bound must be greater than lower bound",
+						generator, CalPackage.AST_GENERATOR);
+			}
 		}
 	}
 
