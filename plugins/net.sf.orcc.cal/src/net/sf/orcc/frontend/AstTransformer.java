@@ -29,6 +29,7 @@
 package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,6 @@ import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
@@ -105,7 +105,13 @@ public class AstTransformer {
 	 */
 	private class ExpressionTransformer extends CalSwitch<Expression> {
 
-		private Variable listTarget;
+		private List<Expression> indexes;
+
+		private Variable target;
+
+		public ExpressionTransformer() {
+			indexes = new ArrayList<Expression>();
+		}
 
 		@Override
 		public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
@@ -215,33 +221,24 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionList(AstExpressionList astExpression) {
-			int size = 1;
-			for (AstGenerator generator : astExpression.getGenerators()) {
-				AstExpression astValue = generator.getLower();
-				int lower = new AstExpressionEvaluator()
-						.evaluateAsInteger(astValue);
+			List<AstExpression> expressions = astExpression.getExpressions();
+			List<AstGenerator> generators = astExpression.getGenerators();
 
-				astValue = generator.getHigher();
-				int higher = new AstExpressionEvaluator()
-						.evaluateAsInteger(astValue);
-				size *= (higher - lower) + 1;
+			checkTarget(expressions, generators);
+
+			if (generators.isEmpty()) {
+				transformListSimple(expressions);
+			} else {
+				transformListGenerators(expressions, generators);
 			}
 
-			if (listTarget == null) {
-				List<AstExpression> expressions = astExpression
-						.getExpressions();
-				TypeChecker checker = new TypeChecker();
-				Type type = checker.getType(expressions);
-				size *= expressions.size();
+			Expression expression = new VarExpr(new Use(target));
 
-				Procedure procedure = context.getProcedure();
-				Type listType = IrFactory.eINSTANCE.createTypeList(size, type);
-				listTarget = procedure.newTempLocalVariable(file, listType,
-						"_list");
-			}
+			// reset target and indexes
+			target = null;
+			indexes = Collections.<Expression> emptyList();
 
-			Expression expression = new VarExpr(new Use(listTarget));
-			listTarget = null;
+			// return the expression
 			return expression;
 		}
 
@@ -279,6 +276,46 @@ public class AstTransformer {
 		}
 
 		/**
+		 * Checks that the current target is not <code>null</code>. If it is,
+		 * this method initializes it according to the expressions and
+		 * generators.
+		 * 
+		 * @param expressions
+		 *            a list of expressions
+		 * @param generators
+		 *            a list of generators
+		 */
+		private void checkTarget(List<AstExpression> expressions,
+				List<AstGenerator> generators) {
+			if (target != null) {
+				return;
+			}
+
+			int size = 1;
+
+			// size of generators
+			for (AstGenerator generator : generators) {
+				AstExpression astValue = generator.getLower();
+				int lower = new AstExpressionEvaluator()
+						.evaluateAsInteger(astValue);
+
+				astValue = generator.getHigher();
+				int higher = new AstExpressionEvaluator()
+						.evaluateAsInteger(astValue);
+				size *= (higher - lower) + 1;
+			}
+
+			// size of expressions
+			TypeChecker checker = new TypeChecker();
+			Type type = checker.getType(expressions);
+			size *= expressions.size();
+
+			Procedure procedure = context.getProcedure();
+			Type listType = IrFactory.eINSTANCE.createTypeList(size, type);
+			target = procedure.newTempLocalVariable(file, listType, "_list");
+		}
+
+		/**
 		 * Returns a list of CFG nodes from the given list of statements. This
 		 * method creates a new block node to hold the statements, transforms
 		 * the statements, and transfers the nodes created to a new list that is
@@ -311,13 +348,17 @@ public class AstTransformer {
 		}
 
 		/**
-		 * Sets the target variable that is assigned a list expression.
+		 * Sets the target variable that is assigned a list expression with the
+		 * given indexes.
 		 * 
 		 * @param target
 		 *            a variable
+		 * @param indexes
+		 *            a list of indexes
 		 */
-		public void setListTarget(Variable target) {
-			this.listTarget = target;
+		public void setTarget(Variable target, List<Expression> indexes) {
+			this.target = target;
+			this.indexes = indexes;
 		}
 
 		private Expression transformBuiltinFunction(AstExpressionCall astCall) {
@@ -357,6 +398,61 @@ public class AstTransformer {
 					new TypeChecker().getLub(e1.getType(), e2.getType()));
 		}
 
+		private void transformListGenerators(List<AstExpression> expressions,
+				List<AstGenerator> generators) {
+			Variable currentTarget = target;
+			List<Expression> currentIndexes = indexes;
+
+			for (AstGenerator generator : generators) {
+				Location location = Util.getLocation(generator);
+				Procedure procedure = context.getProcedure();
+
+				// creates loop variable and assigns it
+				AstVariable astVariable = generator.getVariable();
+				LocalVariable loopVar = transformLocalVariable(astVariable);
+				procedure.getLocals().put(file, loopVar.getLocation(),
+						loopVar.getName(), loopVar);
+
+				AstExpression astLower = generator.getLower();
+				Expression lower = transformExpression(astLower);
+				Assign assign = new Assign(location, loopVar, lower);
+				addInstruction(assign);
+			}
+
+			transformListSimple(expressions);
+
+			target = currentTarget;
+			indexes = currentIndexes;
+		}
+
+		private void transformListSimple(List<AstExpression> expressions) {
+			Variable currentTarget = target;
+			List<Expression> currentIndexes = indexes;
+
+			int i = 0;
+			for (AstExpression expression : expressions) {
+				Expression value = transformExpression(expression);
+
+				// special case for list expressions
+				if (value.isVarExpr()) {
+					Use use = ((VarExpr) value).getVar();
+					if (use.getVariable().getType().isList()) {
+						use.remove();
+					}
+					continue;
+				}
+
+				List<Expression> indexes = new ArrayList<Expression>(
+						currentIndexes);
+				indexes.add(new IntExpr(i));
+				Store store = new Store(currentTarget, currentIndexes, value);
+				addInstruction(store);
+			}
+
+			target = currentTarget;
+			indexes = currentIndexes;
+		}
+
 	}
 
 	/**
@@ -376,29 +472,30 @@ public class AstTransformer {
 			Variable target = context.getVariable(astTarget);
 
 			// transform indexes and value
-			if (CalPackage.eINSTANCE.getAstExpressionList().isSuperTypeOf(
-					astAssign.getValue().eClass())) {
-				exprTransformer.setListTarget(target);
-				Expression value = transformExpression(astAssign.getValue());
-				if (value.isVarExpr()) {
-					((VarExpr) value).getVar().remove();
-				}
-				exprTransformer.setListTarget(null);
-			} else {
-				List<Expression> indexes = transformExpressions(astAssign
-						.getIndexes());
-				Expression value = transformExpression(astAssign.getValue());
+			List<Expression> indexes = transformExpressions(astAssign
+					.getIndexes());
 
-				// add assign or store instruction
-				Instruction instruction;
-				if (indexes.isEmpty()) {
-					LocalVariable local = getLocalVariable(target, true);
-					instruction = new Assign(location, local, value);
-				} else {
-					instruction = new Store(location, target, indexes, value);
+			exprTransformer.setTarget(target, indexes);
+			Expression value = transformExpression(astAssign.getValue());
+
+			// special case for list expressions
+			if (value.isVarExpr()) {
+				Use use = ((VarExpr) value).getVar();
+				if (use.getVariable().getType().isList()) {
+					use.remove();
+					return null;
 				}
-				addInstruction(instruction);
 			}
+
+			// other expressions: add assign or store instruction
+			Instruction instruction;
+			if (indexes.isEmpty()) {
+				LocalVariable local = getLocalVariable(target, true);
+				instruction = new Assign(location, local, value);
+			} else {
+				instruction = new Store(location, target, indexes, value);
+			}
+			addInstruction(instruction);
 
 			return null;
 		}

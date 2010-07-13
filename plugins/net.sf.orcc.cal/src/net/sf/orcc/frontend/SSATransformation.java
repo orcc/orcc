@@ -289,6 +289,11 @@ public class SSATransformation extends AbstractActorTransformation {
 
 		for (Use use : uses) {
 			User user = use.getNode();
+			if (user == null) {
+				// TODO to be removed when AstTransformer works on generators
+				System.err.println("null user of " + oldVar + " !!");
+				continue;
+			}
 			CFGNode node;
 			if (user.isCFGNode()) {
 				node = (CFGNode) user;
