@@ -11,4 +11,17 @@ actor Load_store_test_simple () ==> :
 		println("s = " + s);
 	end
 	
+	test2: action ==>
+	var
+		int i := 0,
+		int n = 64,
+		int sum := 0
+	do
+		while i < n do
+			sum := sum + i;
+			i := i + 1;
+		end
+		println("sum = " + sum);
+	end
+	
 end
