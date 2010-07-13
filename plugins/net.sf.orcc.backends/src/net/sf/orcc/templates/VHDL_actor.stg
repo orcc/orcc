@@ -56,25 +56,12 @@ $
 
 >>
 
-
-SensitivSig(variable) ::= <<
-$
-if(variable.port)
- $$variable$,$
-endif
-$
->>
-
 SensitivFIFOin(port) ::= <<
 $port.name$_send
 >>
 
 SensitivFIFOout(port) ::= <<
 $port.name$_full
->>
-
-SensitivVars(action) ::= <<
-$action.scheduler.loadedVariables: {$it$}; separator=", "$
 >>
 
 Actor_Schedul(actor) ::= <<
@@ -891,15 +878,5 @@ endif
 $
 
 end architecture rtl_$actor.name$;
-
->>
-
-
-action(action) ::= <<
-
-----------------------------------------------
---  !!!!           TODO               !!!   --
- $procedure(procedure=action.body)$
-----------------------------------------------
 
 >>

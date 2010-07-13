@@ -45,14 +45,15 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * are loaded by its scheduler procedure.
  * 
  * @author Matthieu Wipliez
+ * @author Nicolas Siret
  * 
  */
 public class VHDLTemplateData extends AbstractActorTransformation {
 
-	private Set<Variable> variables;
+	private Set<String> strings;
 
 	public VHDLTemplateData() {
-		variables = new HashSet<Variable>();
+		strings = new HashSet<String>();
 	}
 
 	/**
@@ -60,8 +61,8 @@ public class VHDLTemplateData extends AbstractActorTransformation {
 	 * 
 	 * @return the list of variables
 	 */
-	public List<Variable> getVariablesList() {
-		return new ArrayList<Variable>(variables);
+	public List<String> getVariablesList() {
+		return new ArrayList<String>(strings);
 	}
 
 	@Override
@@ -75,13 +76,15 @@ public class VHDLTemplateData extends AbstractActorTransformation {
 	public void visit(Load node, Object... args) {
 		Variable var = node.getSource().getVariable();
 		if (!var.isPort() && !var.getType().isList()) {
-			variables.add(var);
+			strings.add(var.getName());
 		}
 	}
 
 	@Override
 	public void visit(Peek node, Object... args) {
-		variables.add(node.getPort());
+		Variable port = node.getPort();
+		String name = port.getName() + "_data";
+		strings.add(name);
 	}
 
 }
