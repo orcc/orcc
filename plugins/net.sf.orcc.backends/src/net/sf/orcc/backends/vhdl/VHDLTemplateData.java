@@ -37,6 +37,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -76,6 +77,11 @@ public class VHDLTemplateData extends AbstractActorTransformation {
 		if (!var.isPort() && !var.getType().isList()) {
 			variables.add(var);
 		}
+	}
+
+	@Override
+	public void visit(Peek node, Object... args) {
+		variables.add(node.getPort());
 	}
 
 }
