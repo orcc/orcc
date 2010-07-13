@@ -95,8 +95,8 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 Assign(assign) ::= <<
-$assign.target$ = $assign.value$;
 
+$assign.target$ = $assign.value$;
 >>
 
 PrintFormat(parameter) ::= <<
@@ -120,35 +120,36 @@ endif$
 >>
 
 Decrement(decrement) ::= <<
-$decrement.target$--;
 
+$decrement.target$--;
 >>
 
 HasTokens(hasTokens) ::= <<
-$hasTokens.target$ = m_poTabIn[$actor.name$_$hasTokens.port$]->hasTokens($hasTokens.numTokens$);
 
+$hasTokens.target$ = m_poTabIn[$actor.name$_$hasTokens.port$]->hasTokens($hasTokens.numTokens$);
 >>
 
 Increment(increment) ::= <<
-$increment.target$++;
 
+$increment.target$++;
 >>
 
 Load(load) ::= <<
-$load.target$ = $load.source$$load.indexes : {[$it$]}$;
 
+$load.target$ = $load.source$$load.indexes : {[$it$]}$;
 >>
 
 Peek(peek) ::= <<
+
 $if(peek.unit)$
 m_poTabIn[$actor.name$_$peek.port$]->peek($peek.target$);$\n$
 $else$
 m_poTabIn[$actor.name$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
 $endif$
-
 >>
 
 Read(read) ::= <<
+
 $if (read.target)$
 $if(read.unit)$
 m_poTabIn[$actor.name$_$read.port$]->get($read.target$);$\n$
@@ -158,30 +159,30 @@ $endif$
 $else$
 m_poTabIn[$actor.name$_$read.port$]->skip($read.numTokens$);$\n$
 $endif$
-
 >>
 
 ReadEnd(readEnd) ::= <<
 >>
 
 Return(return) ::= <<
+
 $if(return.value)$
 return $return.value$;
-
 $endif$
 >>
 
 SelfAssignment(selfAssign) ::= <<
-$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
 
+$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
 >>
 
 Store(store) ::= <<
-$store.target$$store.indexes : {[$it$]}$ = $store.value$;
 
+$store.target$$store.indexes : {[$it$]}$ = $store.value$;
 >>
 
 Write(write) ::= <<
+
 $if(write.unit)$
 m_poTabOut[$actor.name$_$write.port$]->put($write.target$);$\n$
 $else$
@@ -191,6 +192,7 @@ $endif$
 >>
 
 WriteEnd(writeEnd) ::= <<
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -207,11 +209,13 @@ $nodes: {$(it.class.simpleName)(it)$}$
 
 // if node
 BlockNode(blockNode) ::= <<
+
 $instructions(blockNode.instructions)$
 >>
 
 // if node
 IfNode(ifNode) ::= <<
+
 if($ifNode.value$)
 {
 	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$
@@ -224,9 +228,11 @@ $BlockNode(ifNode.joinNode)$
 
 // while node
 WhileNode(whileNode) ::= <<
+
 while ($whileNode.value$)
 {
-	$nodes(whileNode.nodes)$}
+	$nodes(whileNode.nodes)$
+}
 $BlockNode(whileNode.joinNode)$
 >>
 

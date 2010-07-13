@@ -92,8 +92,8 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean partition = getAttribute("net.sf.orcc.plugins.backends.partition",
-				true);
+		boolean partition = getAttribute("net.sf.orcc.backends.partition",
+				false);
 
 		if (partition) {
 			partitioning = true;
@@ -108,17 +108,17 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 		}
 
-		boolean classify = getAttribute("net.sf.orcc.plugins.backends.classify", false);
+		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
 			network.classifyActors();
 
-			boolean normalize = getAttribute("net.sf.orcc.plugins.backends.normalize",
+			boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
 					false);
 			if (normalize) {
 				network.normalizeActors();
 			}
 
-			boolean merge = getAttribute("net.sf.orcc.plugins.backends.merge", false);
+			boolean merge = getAttribute("net.sf.orcc.backends.merge", false);
 			if (merge) {
 				network.mergeActors();
 			}
@@ -192,8 +192,6 @@ public class CppBackendImpl extends AbstractBackend {
 					}
 				}
 
-				path = path + File.separator + subnetwork.getName();
-				new File(path).mkdir();
 				String name = subnetwork.getName();
 
 				String outputName = path + File.separator + name + ".h";
@@ -203,8 +201,6 @@ public class CppBackendImpl extends AbstractBackend {
 				networkImplPrinter.printNetwork(outputName, subnetwork, false,
 						fifoSize);
 				new CppCMakePrinter().printCMake(path, subnetwork);
-
-				path = new File(path).getParent();
 			}
 
 		} catch (IOException e) {
