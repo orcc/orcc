@@ -15,3 +15,7 @@ Bundle-ClassPath: .,
  lib/antlr-runtime-3.2.jar,
  lib/st4.jar
 Bundle-Activator: net.sf.orcc.backends.Activator
+Export-Package: net.sf.orcc.backends,
+ net.sf.orcc.backends.cpp,
+ net.sf.orcc.backends.java,
+ net.sf.orcc.backends.transformations

@@ -140,6 +140,10 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
+		for (SimuActor simuActorInstance : simuActorsMap.values()) {
+			AbstractInterpreterSimuActor myInstance = (AbstractInterpreterSimuActor) simuActorInstance;
+			myInstance.connect();
+		}
 	}
 
 	@Override

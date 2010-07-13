@@ -49,6 +49,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -154,6 +155,11 @@ public abstract class AbstractSimulator implements Simulator {
 	protected String vtlFolder;
 	protected String outputFolder;
 	protected int fifoSize;
+
+	/**
+	 * Indicate to the simulator implementation the we are in debug mode.
+	 */
+	protected boolean debugMode;
 
 	/**
 	 * For the moment, merge of actors is not possible for any simulator. This
@@ -267,6 +273,8 @@ public abstract class AbstractSimulator implements Simulator {
 	/**
 	 * Simulate the actor network until SUSPEND command or BREAKPOINT hit.
 	 * 
+	 * @param debugMode
+	 * @return
 	 */
 	abstract protected int runNetwork();
 
@@ -452,7 +460,7 @@ public abstract class AbstractSimulator implements Simulator {
 	 * Main simulator thread entry : implements the simulation FSM.
 	 */
 	@Override
-	public void run() {
+	public void run() throws OrccRuntimeException {
 		try {
 
 			// Loop until the simulator has terminated
@@ -512,8 +520,7 @@ public abstract class AbstractSimulator implements Simulator {
 				//
 				// CONFIGURED : transitory state exploiting the configuration
 				// attributes for parsing and instantiating the network we want
-				// to simulate. Automatic transition to SUSPENDED state if
-				// DEBUG_MODE is enabled. RUNNING state otherwise.
+				// to simulate. Automatic transition to SUSPENDED state.
 				//
 				case CONFIGURED:
 					// Parse XDF file, do some transformations and return the
@@ -522,8 +529,8 @@ public abstract class AbstractSimulator implements Simulator {
 					// Instantiate simulator actors from the graph
 					instantiateNetwork(graph);
 					// Build the network according to the specified topology.
-					connectNetwork(graph);
 					initializeNetwork();
+					connectNetwork(graph);
 					state = SimulatorState.SUSPENDED;
 					firePropertyChange("started", null, null);
 					break;
@@ -541,25 +548,29 @@ public abstract class AbstractSimulator implements Simulator {
 					// "Asynchronous" user cancel
 					if (monitor.isCanceled()) {
 						terminate();
-					}
-					// Check suspension
-					if ((msg != null) && (msg.event == SimulatorEvent.SUSPEND)) {
-						messageQueue.remove();
-						suspendNetwork();
-						state = SimulatorState.SUSPENDED;
-						firePropertyChange("suspended client", null, null);
 					} else {
-						// Continue running the whole network of actors
-						int status = runNetwork();
-						if (status == -2) {
-							// Breakpoint hit
+
+						// Check suspension
+						if ((msg != null)
+								&& (msg.event == SimulatorEvent.SUSPEND)) {
+							messageQueue.remove();
+							suspendNetwork();
 							state = SimulatorState.SUSPENDED;
-							String instanceId = getBreakpointActorInstanceId();
-							Integer breakpointLineNumber = getBreakpointLineNumber();
-							firePropertyChange("suspended breakpoint"
-									+ breakpointLineNumber, null, instanceId);
-						} else if (status <= 0) {
-							terminate();
+							firePropertyChange("suspended client", null, null);
+						} else {
+							// Continue running the whole network of actors
+							int status = runNetwork();
+							if (status == -2) {
+								// Breakpoint hit
+								state = SimulatorState.SUSPENDED;
+								String instanceId = getBreakpointActorInstanceId();
+								Integer breakpointLineNumber = getBreakpointLineNumber();
+								firePropertyChange("suspended breakpoint"
+										+ breakpointLineNumber, null,
+										instanceId);
+							} else if (status <= 0) {
+								terminate();
+							}
 						}
 					}
 					break;
@@ -571,49 +582,58 @@ public abstract class AbstractSimulator implements Simulator {
 					// "Asynchronous" user cancel
 					if (monitor.isCanceled()) {
 						terminate();
-					}
-					// Wait for STEP or RESUME
-					if (msg != null) {
-						messageQueue.remove();
-						switch (msg.event) {
-						case RESUME:
-							resumeNetwork();
-							state = SimulatorState.RUNNING;
-							firePropertyChange("resumed client", null, null);
-							break;
-						case STEP_ALL:
-							firePropertyChange("resumed step", null, null);
-							if (stepNetwork() <= 0) {
-								terminate();
-							} else {
-								// Suspended again
-								firePropertyChange("suspended step", null, null);
-							}
-							break;
-						case STEP_INTO:
-						case STEP_OVER:
-						case STEP_RETURN:
-							// Get step parameters
-							String instanceId = (String) msg.data[0];
-							int status = 0;
-							// Send resumed event to debug target
-							firePropertyChange("resumed step", null, instanceId);
-							// Run required step command
-							if (msg.event == SimulatorEvent.STEP_INTO)
-								status = stepInto(instanceId);
-							else if (msg.event == SimulatorEvent.STEP_OVER)
-								status = stepOver(instanceId);
-							else if (msg.event == SimulatorEvent.STEP_RETURN)
-								stepReturn(instanceId);
-							// Check returned status
-							if (status <= 0) {
-								terminate();
-							} else {
-								// Suspended again
-								firePropertyChange("suspended step", null,
+					} else {
+						// Wait for STEP or RESUME
+						if (msg != null) {
+							messageQueue.remove();
+							switch (msg.event) {
+							case RUN:
+								debugMode = false;
+								runNetwork();
+								state = SimulatorState.RUNNING;
+								break;
+							case RESUME:
+								debugMode = true;
+								resumeNetwork();
+								state = SimulatorState.RUNNING;
+								firePropertyChange("resumed client", null, null);
+								break;
+							case STEP_ALL:
+								firePropertyChange("resumed step", null, null);
+								if (stepNetwork() <= 0) {
+									terminate();
+								} else {
+									// Suspended again
+									firePropertyChange("suspended step", null,
+											null);
+								}
+								break;
+							case STEP_INTO:
+							case STEP_OVER:
+							case STEP_RETURN:
+								// Get step parameters
+								String instanceId = (String) msg.data[0];
+								int status = 0;
+								// Send resumed event to debug target
+								firePropertyChange("resumed step", null,
 										instanceId);
+								// Run required step command
+								if (msg.event == SimulatorEvent.STEP_INTO)
+									status = stepInto(instanceId);
+								else if (msg.event == SimulatorEvent.STEP_OVER)
+									status = stepOver(instanceId);
+								else if (msg.event == SimulatorEvent.STEP_RETURN)
+									stepReturn(instanceId);
+								// Check returned status
+								if (status <= 0) {
+									terminate();
+								} else {
+									// Suspended again
+									firePropertyChange("suspended step", null,
+											instanceId);
+								}
+								break;
 							}
-							break;
 						}
 					}
 					break;
@@ -622,14 +642,11 @@ public abstract class AbstractSimulator implements Simulator {
 			// Reset the state to IDLE for next launch
 			state = SimulatorState.IDLE;
 		} catch (CoreException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OrccRuntimeException(e.getMessage());
 		} catch (OrccException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OrccRuntimeException(e.getMessage());
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OrccRuntimeException(e.getMessage());
 		}
 	}
 

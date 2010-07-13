@@ -48,7 +48,7 @@ public interface Simulator extends Plugin, Runnable {
 	 * Simulator automaton control events
 	 */
 	public enum SimulatorEvent {
-		CLEAR_BREAKPOINT, CONFIGURE, RESUME, SET_BREAKPOINT, SUSPEND, STEP_ALL, STEP_OVER, STEP_INTO, STEP_RETURN, TERMINATE
+		CLEAR_BREAKPOINT, CONFIGURE, RESUME, RUN, SET_BREAKPOINT, SUSPEND, STEP_ALL, STEP_OVER, STEP_INTO, STEP_RETURN, TERMINATE
 	}
 
 	/**

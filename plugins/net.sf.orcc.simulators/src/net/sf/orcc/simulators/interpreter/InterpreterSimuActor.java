@@ -58,17 +58,15 @@ import net.sf.orcc.simulators.SimuActor;
 public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		implements SimuActor {
 
-	private OrccProcess process;
-
-	private String instanceId;
-	private Actor actorIR;
-
-	private Map<String, Fifo> fifos;
+	protected OrccProcess process;
+	protected String instanceId;
+	protected Actor actorIR;
+	protected Map<String, Fifo> fifos;
 
 	/**
 	 * Debugger utils
 	 */
-	private class Breakpoint {
+	protected class Breakpoint {
 		public Action action;
 
 		public int lineNb;
@@ -78,6 +76,9 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			this.lineNb = lineNb;
 		}
 	}
+
+	protected List<Breakpoint> breakpoints;
+	protected boolean isStepping = false;
 
 	private class NodeInfo {
 		public Expression condition;
@@ -97,12 +98,10 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	}
 
 	private Action breakAction = null;
-	private List<Breakpoint> breakpoints;
 	private Action currentAction = null;
 	private List<Instruction> instrStack;
 	private List<NodeInfo> nodeStack;
 	private int nodeStackLevel;
-	private boolean isStepping = false;
 
 	/**
 	 * Interpretation and evaluation tools
@@ -169,6 +168,11 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	}
 
 	@Override
+	public void connect() {
+		actorInterpreter.setFifos(fifos);
+	}
+
+	@Override
 	public String getActorName() {
 		return actorIR.getName();
 	}
@@ -177,7 +181,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	public String getFileName() {
 		return actorIR.getFile();
 	}
-	
+
 	@Override
 	public String getInstanceId() {
 		return instanceId;
@@ -222,7 +226,6 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	@Override
 	public void initialize() {
 		actorInterpreter.initialize();
-		actorInterpreter.setFifos(fifos);
 	}
 
 	/**

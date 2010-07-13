@@ -65,6 +65,12 @@ public abstract class AbstractInterpreterSimuActor {
 	}
 
 	/**
+	 * Indicate actor can connect itself to its FIFOs
+	 */
+	public void connect() {
+	}
+	
+	/**
 	 * Initialize the actor instance : instantiate parameters values and set
 	 * initial values of actor's state variables.
 	 */

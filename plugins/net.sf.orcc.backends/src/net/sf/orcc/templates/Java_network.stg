@@ -47,7 +47,11 @@ $endif$
 
 scheduleActor(instance) ::= <<
 $if (instance.actor || instance.broadcast)$
-i += actor_$instance.id$.schedule();
+nbOfFiredActions = actor_$instance.id$.schedule();
+if (nbOfFiredActions < 0)
+	stop = true;
+else
+	i += nbOfFiredActions;
 $endif$
 >>
 
@@ -85,12 +89,14 @@ public class Network_$network.name$ implements IScheduler {
 	public void schedule() {
 		$printInitializes(network.instances)$
 		int i = 1;
-		while (i > 0) {
+		boolean stop = false;
+		int nbOfFiredActions = 0;
+		while ((i > 0) && (!stop)) {
 			i = 0;
 			$network.instances: scheduleActor()$
 		}
 	}
-
+	 
 	/**
 	 * 
 	 * @param args

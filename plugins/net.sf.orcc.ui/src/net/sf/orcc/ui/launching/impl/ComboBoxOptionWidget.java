@@ -31,6 +31,7 @@ package net.sf.orcc.ui.launching.impl;
 import java.util.List;
 
 import net.sf.orcc.plugins.ComboBoxOption;
+import net.sf.orcc.plugins.backends.BackendFactory;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.OrccAbstractSettingsTab;
 
@@ -120,8 +121,11 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 		// for (String selection : selections) {
 		// comboBox.add(selection);
 		// }
-		// For the moment : comboBox only lists ORCC Java backend
-		comboBox.add("Java");
+		// For the moment : comboBox lists all ORCC backends
+		BackendFactory factory = BackendFactory.getInstance();
+		for (String backend : factory.listPlugins()) {
+			comboBox.add(backend);
+		}
 
 		composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout(1, false);

@@ -59,6 +59,11 @@ public class InterpreterSimuDisplay extends AbstractInterpreterSimuActor
 	}
 
 	@Override
+	public void close() {
+		Actor_Display.closeDisplay();
+	}
+	
+	@Override
 	public String getActorName() {
 		return "Display";
 	}

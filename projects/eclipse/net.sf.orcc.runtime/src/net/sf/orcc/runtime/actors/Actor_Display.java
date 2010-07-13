@@ -167,6 +167,7 @@ public class Actor_Display implements IActor, ActionListener {
 		int i = 0;
 
 		if (userInterruption) {
+			System.out.println("Display closed by user.");
 			return -1;
 		}
 
@@ -273,7 +274,7 @@ public class Actor_Display implements IActor, ActionListener {
 			numImages++;
 			long t = System.currentTimeMillis();
 			long t2 = t - startTime;
-			System.out.println(numImages + " in " + t2);
+			System.out.println("Image nb " + numImages + " decoded in " + t2);
 			startTime = t;
 		}
 	}
