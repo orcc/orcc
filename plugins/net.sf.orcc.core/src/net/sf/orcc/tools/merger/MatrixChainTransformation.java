@@ -1,0 +1,166 @@
+/*
+ * Copyright (c) 2010, Ecole Polytechnique Fédérale de Lausanne
+ * All rights reserved.
+ * 
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * 
+ *   * Redistributions of source code must retain the above copyright notice,
+ *     this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright notice,
+ *     this list of conditions and the following disclaimer in the documentation
+ *     and/or other materials provided with the distribution.
+ *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the 
+ *     names of its contributors may be used to endorse or promote products derived 
+ *     from this software without specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY
+ * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+package net.sf.orcc.tools.merger;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Vertex;
+import net.sf.orcc.util.Rational;
+
+import org.jgrapht.DirectedGraph;
+
+/**
+ * 
+ * This class computes a looped schedule from a flat schedule in order to
+ * mimimize memory usage.
+ * 
+ * @author Ghislain Roquier
+ * 
+ */
+
+public class MatrixChainTransformation implements IScheduleTransformation {
+
+	private double[][] m;
+
+	private int[][] s, gcds;
+
+	private int size;
+
+	private DirectedGraph<Vertex, Connection> graph;
+
+	Schedule schedule;
+
+	public MatrixChainTransformation(DirectedGraph<Vertex, Connection> graph) {
+		this.graph = graph;
+	}
+
+	private void computeMatrixChainOrder(Schedule schedule) {
+		List<Iterand> iterands = schedule.getIterands();
+
+		for (int i = 0; i < size; i++) {
+			int gcd = iterands.get(i).getSchedule().getIterationCount();
+			gcds[i][i] = gcd;
+		}
+
+		for (int L = 1; L < size; L++) {
+			for (int i = 0; i < size - L; i++) {
+				int j = i + L;
+
+				m[i][j] = Double.MAX_VALUE;
+
+				int gcd = Rational.gcd(gcds[i][j - 1], iterands.get(j)
+						.getSchedule().getIterationCount());
+
+				for (int k = i; k < j; k++) {
+					List<Vertex> left = new ArrayList<Vertex>();
+					for (int index = i; index < k + 1; index++) {
+						left.add(iterands.get(index).getSchedule()
+								.getIterands().get(0).getVertex());
+					}
+
+					List<Vertex> right = new ArrayList<Vertex>();
+					for (int index = k + 1; index < j + 1; index++) {
+						right.add(iterands.get(index).getSchedule()
+								.getIterands().get(0).getVertex());
+					}
+
+					Schedule subsched = iterands.get(k).getSchedule();
+					int q = subsched.getIterationCount();
+
+					double cost = m[i][k] + m[k + 1][j];
+
+					for (Vertex vertex : left) {
+						for (Connection connection : graph
+								.outgoingEdgesOf(vertex)) {
+							if (right.contains(graph.getEdgeTarget(connection))) {
+								cost += connection.getSource()
+										.getNumTokensProduced() * q / gcd;
+							}
+						}
+					}
+
+					if (cost < m[i][j]) {
+						m[i][j] = cost;
+						gcds[i][j] = gcd;
+						s[i][j] = k;
+					}
+				}
+			}
+		}
+	}
+
+	private void computeOptimalParens(Schedule schedule, int i, int j) {
+		if (i == j) {
+			Vertex vertex = this.schedule.getIterands().get(i).getSchedule()
+					.getIterands().get(0).getVertex();
+			schedule.add(new Iterand(vertex));
+		} else {
+
+			Schedule left = new Schedule();
+			Schedule right = new Schedule();
+
+			int gcd = gcds[i][j];
+			int split = s[i][j];
+
+			left.setIterationCount(gcds[i][split] / gcd);
+			schedule.add(new Iterand(left));
+
+			right.setIterationCount(gcds[split + 1][j] / gcd);
+			schedule.add(new Iterand(right));
+
+			computeOptimalParens(left, i, split);
+			computeOptimalParens(right, split + 1, j);
+		}
+	}
+
+	@Override
+	public void transform(Schedule schedule) {
+		new ScheduleFlattener().transform(schedule);
+
+		this.schedule = new Schedule(schedule);
+
+		size = schedule.getIterands().size();
+		m = new double[size][size];
+		s = new int[size][size];
+		gcds = new int[size][size];
+
+		computeMatrixChainOrder(schedule);
+
+		schedule.removeAll(schedule.getIterands());
+
+		schedule.setIterationCount(1);
+
+		computeOptimalParens(schedule, 0, size - 1);
+		System.out.println(schedule);
+	}
+
+}

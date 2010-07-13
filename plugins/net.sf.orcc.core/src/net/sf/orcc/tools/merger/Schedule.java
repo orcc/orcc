@@ -54,16 +54,17 @@ public class Schedule {
 		iterands = new LinkedList<Iterand>();
 	}
 
+	public Schedule(Schedule schedule) {
+		this.setIterationCount(schedule.getIterationCount());
+		iterands = new LinkedList<Iterand>(schedule.getIterands());
+	}
+
 	public void add(Iterand iterand) {
 		iterands.offer(iterand);
 	}
 
-	public List<Iterand> getIterands() {
-		return iterands;
-	}
-
-	public int getIterationCount() {
-		return iterationCount;
+	public void addAll(List<Iterand> iterands) {
+		this.iterands.addAll(iterands);
 	}
 
 	public Set<Vertex> getActors() {
@@ -84,8 +85,24 @@ public class Schedule {
 		return actors;
 	}
 
+	public List<Iterand> getIterands() {
+		return iterands;
+	}
+
+	public int getIterationCount() {
+		return iterationCount;
+	}
+
 	public void remove() {
 		iterands.poll();
+	}
+
+	public void remove(Iterand iterand) {
+		iterands.remove(iterand);
+	}
+
+	public void removeAll(List<Iterand> iterands) {
+		iterands.removeAll(iterands);
 	}
 
 	public void setIterationCount(int interationCount) {

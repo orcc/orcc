@@ -50,7 +50,6 @@ import net.sf.orcc.util.OrderedMap;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.StrongConnectivityInspector;
 import org.jgrapht.graph.DirectedMultigraph;
-import org.jgrapht.graph.EdgeReversedGraph;
 
 /**
  * This class detects statically schedulable regions of the graph. A region
@@ -220,40 +219,10 @@ public class StaticSubsetDetector {
 			}
 		}
 
-		// 3) detects static region considering vertices in order of
-		// decreasing finishing time
-		discovered = new HashSet<Vertex>();
-		finished = new HashSet<Vertex>();
-
-		DirectedGraph<Vertex, Connection> inverseGraph = new EdgeReversedGraph<Vertex, Connection>(
-				graph);
-
-		it = ((LinkedList<Vertex>) orderedVertices).descendingIterator();
-		while (it.hasNext()) {
-			Vertex vertex = it.next();
-			IClass clasz = vertex.getInstance().getContentClass();
-			if (!discovered.contains(vertex) && clasz.isSDF()) {
-				List<Vertex> set = new LinkedList<Vertex>();
-				staticRegionList.add(set);
-				staticRegionAnalysis(inverseGraph, vertex, set);
-			}
-		}
-
-		/*
-		 * for (List<Vertex> list : staticRegionList) { Set<Vertex> set = new
-		 * HashSet<Vertex>(list); staticRegionSet.add(set); }
-		 */
-
 		for (List<Vertex> list1 : staticRegionList) {
 			if (list1.size() > 1) {
-				for (List<Vertex> list2 : staticRegionList) {
-					Set<Vertex> set1 = new HashSet<Vertex>(list1);
-					Set<Vertex> set2 = new HashSet<Vertex>(list2);
-					staticRegionSet.add(set1);
-					if (set1.containsAll(set2)) {
-						staticRegionSet.remove(set2);
-					}
-				}
+				Set<Vertex> set1 = new HashSet<Vertex>(list1);
+				staticRegionSet.add(set1);
 			}
 		}
 
