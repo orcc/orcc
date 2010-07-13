@@ -144,8 +144,6 @@ public class MatrixChainTransformation implements IScheduleTransformation {
 
 	@Override
 	public void transform(Schedule schedule) {
-		new ScheduleFlattener().transform(schedule);
-
 		this.schedule = new Schedule(schedule);
 
 		size = schedule.getIterands().size();
