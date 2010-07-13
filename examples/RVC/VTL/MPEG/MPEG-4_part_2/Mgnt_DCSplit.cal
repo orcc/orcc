@@ -18,7 +18,13 @@ int(size=SAMPLE_SZ) AC :
 // Port size declaration
 	int SAMPLE_SZ = 13;
 
-	action IN:[ x ] repeat 64 ==> DC:[ x[0] ], AC:[ [ x[i] : for int i in Integers(1, 63) ] ] repeat 63
+	action IN:[ x ] repeat 64 ==> DC:[ x[0] ], AC:[ o ] repeat 63
+	var
+		List(type: int(size=SAMPLE_SZ), size=63) o
+	do
+		foreach int i in Integers(1, 63) do
+			o[i-1]:=x[i];
+		end
 	end
 
 end

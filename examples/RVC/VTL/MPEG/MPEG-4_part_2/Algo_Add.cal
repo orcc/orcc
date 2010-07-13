@@ -56,15 +56,22 @@ actor Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ)
 	motion: action MOT:[ mot ] repeat 64 ==> VID:[ mot ] repeat 64
 	end
 
-	combine: action MOT:[ mot ] repeat 64, TEX:[ tex ] repeat 64 ==> VID:[ [ if tex[i] + mot[i] < 0 then
-			0
+	combine: action MOT:[ mot ] repeat 64, TEX:[ tex ] repeat 64 ==> VID:[ o ] repeat 64
+		var List(type: int(size=PIX_SZ), size=63) o
+	do
+		foreach int i in Integers(0,63) do
+		if tex[i] + mot[i] < 0 then
+			o[i]:=0;
 		else
 			if tex[i] + mot[i] > 255 then
-				255
+				o[i]:=255;
 			else
-				tex[i] + mot[i]
+				o[i]:=tex[i] + mot[i];
 			end
-		end : for int i in Integers(0, 63) ] ] repeat 64
+		end
+		
+		end	
+	
 	end
 
 	schedule fsm cmd :
