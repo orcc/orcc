@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="Source" x="57" y="70"/>
-      <vertex id="AES Encipher" x="210" y="117"/>
-      <vertex id="KeyGenerator" x="57" y="181"/>
-      <vertex id="Print_val" x="364" y="216"/>
-   </vertices>
-</layout>
