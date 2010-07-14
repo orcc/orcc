@@ -77,7 +77,7 @@ int Connection::getFifoSize(){
 	}		
 	
 	return SIZE;
-};
+}
 
 int Connection::getType(){
 	return type->getBitWidth()/8;

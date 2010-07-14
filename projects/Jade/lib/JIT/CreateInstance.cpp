@@ -70,12 +70,12 @@ void JIT::setDecoder(Decoder* decoder){
 	this->decoder = decoder;
 	this->module = decoder->getModule(); 
 	
-};
+}
 
 void JIT::setNewInstance(){
 	ValueMap.clear();
 	
-};
+}
 
 bool JIT::LinkProcedureBody(Function* function){
 	Function *F = cast<Function>(ValueMap[function]);
