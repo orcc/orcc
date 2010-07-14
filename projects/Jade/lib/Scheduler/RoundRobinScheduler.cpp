@@ -130,25 +130,28 @@ void RoundRobinScheduler::createScheduler(){
 
 void RoundRobinScheduler::execute(){
 	Module* module = decoder->getModule();
-	
-	// Get elements from source and display 
-	Function* sourceFunc = module->getFunction("source_scheduler");
-	Function* displayFunc = module->getFunction("display_scheduler");
-	GlobalVariable* displayB = module->getGlobalVariable("display_B");
-	GlobalVariable* displayW = module->getGlobalVariable("display_WIDTH");
-	GlobalVariable* displayH = module->getGlobalVariable("display_HEIGHT");
-	GlobalVariable* sourceO = module->getGlobalVariable("source_O");
-	
 
+	//Get instance source and display
+	Instance* source = decoder->getInstance("source");
+	Instance* display = decoder->getInstance("display");
+
+	//Get port to connect
+	Port* port_O = source->getActor()->getPort("O");
+	Port* port_B = display->getActor()->getPort("WIDTH");
+	Port* port_WIDTH = display->getActor()->getPort("HEIGHT");
+	Port* port_HEIGHT = display->getActor()->getPort("B");
+
+	//Get instance scheduler
+	ActionScheduler* source_scheduler = source->getInstancedActor()->getActionScheduler();
+	ActionScheduler* display_scheduler = display->getInstancedActor()->getActionScheduler();
 
 	// Get pointer 
-	jit->GlobalMapped(sourceFunc, (void*) source_scheduler);
-	jit->GlobalMapped(displayFunc, (void*) display_scheduler);
-	display_B = (fifo_char_s*)(*(fifo_char_s**)jit->getFifoPointer(displayB));
-	display_WIDTH = (fifo_short_s*)(*(fifo_short_s**)jit->getFifoPointer(displayW));
-	display_HEIGHT = (fifo_short_s*)(*(fifo_short_s**)jit->getFifoPointer(displayH));
-	source_O = (fifo_char_s*)(*(fifo_char_s**)jit->getFifoPointer(sourceO));
-	
+	jit->MapActionScheduler(source_scheduler, (void*) source_scheduler);
+	jit->MapActionScheduler(display_scheduler, (void*) display_scheduler);
+	display_B = (fifo_char_s*)(*(fifo_char_s**)jit->getPortPointer(port_B));
+	display_WIDTH = (fifo_short_s*)(*(fifo_short_s**)jit->getPortPointer(port_WIDTH));
+	display_HEIGHT = (fifo_short_s*)(*(fifo_short_s**)jit->getPortPointer(port_HEIGHT));
+	source_O = (fifo_char_s*)(*(fifo_char_s**)jit->getPortPointer(port_O));
 	
 
 	source_initialize();

@@ -79,7 +79,7 @@ public:
 	 *
      *  @return a map of Actor contained in the network
      */
-	std::list<Instance*>* getInstances();
+	std::map<std::string, Instance*>* getInstances();
 
 
 	/*!
@@ -134,7 +134,7 @@ private:
 	std::list<Actor*> actors;
 	
 	/** instances of the network  */
-	std::list<Instance*> instances;
+	std::map<std::string, Instance*> instances;
 
 };
 

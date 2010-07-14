@@ -4,6 +4,7 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 
 add_library (Fifo
   FifoCircular.cpp
+  FifoTrace.cpp
   AbstractFifo.cpp
   UnprotectedFifo.cpp
  )

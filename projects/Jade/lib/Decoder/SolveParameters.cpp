@@ -58,11 +58,11 @@ SolveParameters::SolveParameters(Decoder* decoder){
 }
 
 void SolveParameters::transform(){
-	list<Instance*>::iterator it;
-	list<Instance*>* instances = network->getInstances();
+	map<string, Instance*>::iterator it;
+	map<string, Instance*>* instances = network->getInstances();
 
 	for (it = instances->begin(); it != instances->end(); it++){
-		solve(*it);
+		solve((*it).second);
 	}
 }
 

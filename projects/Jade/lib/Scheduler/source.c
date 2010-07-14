@@ -33,7 +33,8 @@
 #ifdef FAST_FIFO
 #include "unprotectedFifo.h"
 #else
-#include "fifoCircular.h"
+//#include "fifoCircular.h"
+#include "fifoTrace.h"
 #endif
 
 extern char *input_file;

@@ -219,10 +219,13 @@ public:
 
 	virtual void addFunctions(Decoder* decoder) =0;
 
-	virtual void setConnection(Connection* connection)=0;
-
 	virtual llvm::StructType* getFifoType(llvm::IntegerType* type)=0;
 	
+	/**
+	 * @brief print connections in the given decoder.
+	 *
+	 */
+	virtual void setConnections(Decoder* decoder);
 
 protected:
 	/** module of the fifo */
@@ -263,6 +266,8 @@ protected:
 	void setFifoFunction(std::string name, llvm::Function* function);
 
 	void setFifoStruct(std::string name, llvm::Type* type);
+
+	virtual void setConnection(Connection* connection)=0;
 
 	/**
      *  @brief set fifo function name

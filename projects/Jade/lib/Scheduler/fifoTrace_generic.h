@@ -40,4 +40,4 @@ struct FIFO_S(T) {
 	T fifo_buffer[1024];
 };
 
-#include "fifo_generic.inl"
+#include "fifoTrace_generic.inl"

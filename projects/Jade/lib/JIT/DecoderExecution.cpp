@@ -48,6 +48,7 @@
 #include "llvm/Target/TargetSelect.h"
 
 #include "Jade/JIT.h"
+#include "Jade/Actor/ActionScheduler.h"
 #include "Jade/Decoder/Decoder.h"
 //------------------------------
 
@@ -119,8 +120,8 @@ int JIT::initEngine(Decoder* decoder) {
   EE->runStaticConstructorsDestructors(false);
 }
 
-void JIT::GlobalMapped(const GlobalValue *GV, void *Addr) {
-	EE->addGlobalMapping(GV, Addr);
+void JIT::MapActionScheduler(ActionScheduler* actionScheduler, void *Addr) {
+	EE->addGlobalMapping(actionScheduler->getSchedulerFunction(), Addr);
 }
 
 void JIT::run(Function* func) {

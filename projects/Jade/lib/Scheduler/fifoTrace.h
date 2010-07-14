@@ -65,27 +65,27 @@ static struct FIFO_S(type) fifo_##count = { (size), array_##count, 0, 0, NULL };
 #define FIFO_WRITE_END_EXPAND(T) fifo_ ## T ## _write_end
 
 #define T char
-#include "fifo_generic.h"
+#include "fifoTrace_generic.h"
 #undef T
 
 #define T u_char
-#include "fifo_generic.h"
+#include "fifoTrace_generic.h"
 #undef T
 
 #define T short
-#include "fifo_generic.h"
+#include "fifoTrace_generic.h"
 #undef T
 
 #define T u_short
-#include "fifo_generic.h"
+#include "fifoTrace_generic.h"
 #undef T
 
 #define T int
-#include "fifo_generic.h"
+#include "fifoTrace_generic.h"
 #undef T
 
 #define T u_int
-#include "fifo_generic.h"
+#include "fifoTrace_generic.h"
 #undef T
 
 #endif

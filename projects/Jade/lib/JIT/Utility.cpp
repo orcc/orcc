@@ -105,8 +105,8 @@ void JIT::verify(string file, Decoder* decoder){
 
 }
 
-void* JIT::getFifoPointer(GlobalVariable* variable){
-	return EE->getPointerToGlobal(variable);
+void* JIT::getPortPointer(Port* port){
+	return EE->getPointerToGlobal(port->getGlobalVariable());
 }
 
 

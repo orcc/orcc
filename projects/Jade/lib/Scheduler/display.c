@@ -31,7 +31,8 @@
 #ifdef FAST_FIFO
 #include "unprotectedFifo.h"
 #else
-#include "fifoCircular.h"
+//#include "fifoCircular.h"
+#include "fifoTrace.h"
 #endif
 
 #ifdef BENCHMARK

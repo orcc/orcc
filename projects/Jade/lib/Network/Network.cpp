@@ -59,7 +59,7 @@ list<Actor*>* Network::getActors(){
 	return &actors;
 }
 
-list<Instance*>* Network::getInstances(){
+std::map<std::string, Instance*>* Network::getInstances(){
 	
 	// Create list of actor if not done before 
 	if (instances.empty()){
@@ -70,7 +70,7 @@ list<Instance*>* Network::getInstances(){
 
 			if(vertex->isInstance()){
 				Instance* instance = vertex->getInstance();
-				instances.push_back(instance);
+				instances.insert(pair<string,Instance*>(instance->getId(), instance));
 			}
 		}
 	}

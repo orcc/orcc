@@ -106,7 +106,7 @@ public:
 	std::list<AbstractFifo*>* getFifos(){return &fifos;};
 
 	/**
-     *  @brief Getter of an instances
+     *  @brief Getter of instances
 	 * 
 	 *	Return a map of instances link with their name in the decoder
 	 *
@@ -114,6 +114,16 @@ public:
 	 *
      */
 	std::map<std::string, Instance*>* getInstances(){return instances;};
+
+	/**
+     *  @brief Getter of an instance
+	 * 
+	 *	Return the instance with the given name
+	 *
+	 *  @return the instance if found, otherwise NULL
+	 *
+     */
+	Instance* getInstance(std::string name);
 
 	/**
      *  @brief Getter of a network
@@ -169,12 +179,6 @@ private:
 	 *
      */
 	void createActorInstances();
-
-	/**
-	 * @brief print connections of the network.
-	 *
-	 */
-	void printNetwork(AbstractFifo* fifo);
 
 	/**
      *  @brief Create the current instance inside the final decoder Module

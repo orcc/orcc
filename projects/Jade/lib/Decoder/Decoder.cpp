@@ -69,8 +69,8 @@ Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo*
 
 	module = new Module("decoder", C);
 	jit->setDecoder(this);
-	/*instancedFus = new map<std::string, InstancedActor*>();
-	instances = network->getInstances();*/
+	//instancedFus = new map<std::string, InstancedActor*>();
+	instances = network->getInstances();
 }
 
 Decoder::~Decoder (){
@@ -93,23 +93,21 @@ int Decoder::instanciate(){
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, this);
 	broadAdder.transform();
-
-	// Instanciate the network
-	printNetwork(fifo);
 	
 	return 0;
 }
 
 void Decoder::createActorInstances(){
 	// Initialize all instances into the decoder
-	list<Instance*>::iterator it;
-	list<Instance*>* instances = network->getInstances();
+	map<string, Instance*>::iterator it;
+	map<string, Instance*>* instances = network->getInstances();
 	
 
 	for(it = instances->begin(); it != instances->end(); ++it){
-		InstancedActor* instancedActor = createInstance(*it);
-		(*it)->setInstancedActor(instancedActor);
-		instancedActors.insert(pair<Instance*, InstancedActor*>(*it, instancedActor));
+		Instance* instance = (*it).second;
+		InstancedActor* instancedActor = createInstance(instance);
+		instance->setInstancedActor(instancedActor);
+		instancedActors.insert(pair<Instance*, InstancedActor*>(instance, instancedActor));
 
 	}
 }
@@ -133,13 +131,15 @@ InstancedActor* Decoder::createInstance(Instance* instance){
 	return new InstancedActor(this, instance, inputs, outputs, stateVars, parameters, procs, actions, actionScheduler);
 }
 
-void Decoder::printNetwork(AbstractFifo* fifo){
-	HDAGGraph* graph = network->getGraph();
-	
-	int edges = graph->getNbEdges();
-	
-	for (int i = 0; i < edges; i++){
-		fifo->setConnection((Connection*)graph->getEdge(i));
+
+Instance* Decoder::getInstance(std::string name){
+	map<string, Instance*>::iterator it;
+
+	it = instances->find(name);
+
+	if (it == instances->end()){
+		return NULL;
 	}
 
+	return it->second;
 }

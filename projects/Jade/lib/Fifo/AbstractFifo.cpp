@@ -45,6 +45,9 @@
 #include "Jade/JIT.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Actor/Actor.h"
+#include "Jade/Decoder/Decoder.h"
+#include "Jade/Graph/HDAGGraph.h"
+#include "Jade/Network/Network.h"
 //------------------------------
 
 using namespace llvm;
@@ -58,8 +61,7 @@ void AbstractFifo::refineActor(Actor* actor){
 		//Get opaquetype of the current fifo in the actor
 		Type* type = actor->getFifoType(it->first);
 		if (type == NULL){
-			fprintf(stderr,"Structure of fifo %d hasn't been found in actor %d", it->first.c_str(), actor->getName().c_str());
-			exit(0);
+			continue;
 		}
 
 		if (isa<OpaqueType>(type)){
@@ -170,4 +172,16 @@ Function* AbstractFifo::getWriteEndFunction(Type* type){
 
 Function* AbstractFifo::getReadEndFunction(Type* type){	
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "readEnd")]];
+}
+
+void AbstractFifo::setConnections(Decoder* decoder){
+	
+	Network* network = decoder->getNetwork();
+	HDAGGraph* graph = network->getGraph();
+	
+	int edges = graph->getNbEdges();
+	
+	for (int i = 0; i < edges; i++){
+		setConnection((Connection*)graph->getEdge(i));
+	}
 }

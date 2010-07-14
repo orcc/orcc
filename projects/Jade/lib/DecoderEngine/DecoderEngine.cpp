@@ -46,6 +46,7 @@
 #include "Jade/Actor/Port.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/FifoCircular.h"
+#include "Jade/Fifo/FifoTrace.h"
 #include "Jade/Fifo/UnprotectedFifo.h"
 #include "Jade/Network/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
@@ -82,7 +83,8 @@ int DecoderEngine::load(Network* network) {
 	#ifdef FAST_FIFO
 	UnprotectedFifo* fifo = new UnprotectedFifo(Context, jit);
 	#else
-	FifoCircular* fifo = new FifoCircular(Context, jit);
+	//FifoCircular* fifo = new FifoCircular(Context, jit);
+	FifoTrace* fifo = new FifoTrace(Context, jit);
 	#endif
 
 	
@@ -109,6 +111,9 @@ int DecoderEngine::load(Network* network) {
 	decoder->instanciate();
 
 	RoundRobinScheduler scheduler(Context, jit, decoder);
+	
+	// Setting connections of the decoder
+	fifo->setConnections(decoder);
 
 	jit->initEngine(decoder);
 
@@ -137,12 +142,12 @@ int DecoderEngine::load(Network* network) {
 
 void DecoderEngine::parseActors(Network* network) {
 
-	list<Instance*>::iterator it;
+	map<string, Instance*>::iterator it;
 	map<string, Actor*>::iterator itActor;
-	list<Instance*>* instances = network->getInstances();
+	map<string, Instance*>* instances = network->getInstances();
 
 	for ( it = instances->begin(); it != instances->end(); ++it ){
-		Instance* instance = *it;
+		Instance* instance = (*it).second;
 		Actor* actor;
 		string classz = instance->getClasz();
 		itActor = actors.find(classz);

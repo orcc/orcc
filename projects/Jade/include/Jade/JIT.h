@@ -209,7 +209,7 @@ public:
 	 *
 	 * @param decoder	:  Decoder to take the pointer from.
      */
-	void* getFifoPointer(llvm::GlobalVariable* variable);
+	void* getPortPointer(Port* port);
 
 	/**
      *  @brief get pointer from a functiont
@@ -261,7 +261,7 @@ public:
 
 	void setDecoder(Decoder* decoder);
 	llvm::Module* getModule(){return module;};
-	void GlobalMapped(const llvm::GlobalValue *GV, void *Addr);
+	void MapActionScheduler(ActionScheduler* actionScheduler, void *Addr);
 	void run(llvm::Function* func);
 	void setNewInstance();
 	void optimize(Decoder* decoder);
