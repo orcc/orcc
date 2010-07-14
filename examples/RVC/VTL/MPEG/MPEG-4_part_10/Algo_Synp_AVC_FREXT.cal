@@ -184,7 +184,6 @@ actor Algo_Synp_AVC_FREXT()
 	bool StartRenormD					:= false;
 	bool StartInitializationDecoding	:= false;
 	bool StartCabacInit					:= false;
-	bool GetBinarizationFlag			:= false;
 	bool binValDecoded					:= false;
 	bool StartDecodeTerminate			:= false;
 	bool StartDecodeDecision			:= false;
@@ -214,7 +213,6 @@ actor Algo_Synp_AVC_FREXT()
 	int binIdxMb := 0;
 	//CABAC Decode Variables
 	/* Defines the Final Value of the Cabac Decoding Process and the Index of the Cabac Compare Tbale SynElVal */
-	int ValueIndex;
 	int CabacValue;
 	int binIdxOffset := 0;
 	int PreviousCtxIdx := 0;
@@ -298,7 +296,7 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_Intra(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 0 end
 	function IS_Inter(int mbAddr) --> bool: mbTab[mbAddr][TypePred] = 1 end
 	/* Save Memory function */
-	function CabacCurrMbAddr(int mbAddr) --> int: 
+	function CabacCurrMbAddr() --> int: 
 		if val_CurrMbAddr >= PicWidthInMbs + 1 then 
 			PicWidthInMbs 
 		else 
@@ -1787,7 +1785,7 @@ actor Algo_Synp_AVC_FREXT()
   				else
     				if yN < maxH - 1 then
       					NeighMbAvail := true;
-      					NeighMbAddr  := CabacCurrMbAddr(val_CurrMbAddr);
+      					NeighMbAddr  := CabacCurrMbAddr();
     				end
 			end
 			else
@@ -1813,7 +1811,7 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	
 	function GiveMbAddrA( ) --> int :
-		CabacCurrMbAddr(val_CurrMbAddr) - 1
+		CabacCurrMbAddr() - 1
 	end
 	
 	function mbAddrA_Avail() --> bool :
@@ -1825,20 +1823,12 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	
 	function GiveMbAddrB( ) --> int :
-		CabacCurrMbAddr(val_CurrMbAddr) - PicWidthInMbs
+		CabacCurrMbAddr() - PicWidthInMbs
 	end
 	
 	
 	function mbAddrB_Avail() --> bool :
 		mbAddrAvailable( GiveMbAddrB() )
-	end
-		
-	function GivePrevMbAdd() --> int :
-		CabacCurrMbAddr(val_CurrMbAddr) - 1
-	end
-	
-	function prevMbAddr_Avail() --> bool:
-		CabacCurrMbAddr(val_CurrMbAddr) != 0
 	end
 	
 	function GiveMbSliceType(bool MbAvail, int mbAdresse) --> int :
@@ -2059,8 +2049,8 @@ actor Algo_Synp_AVC_FREXT()
 			
 			luma8x8BlkIdxN := 2*(NeighMb_yW >> 3) + (NeighMb_xW >> 3) ;
 			if  ( GiveMbType(AvailMb,mbAddr) = 25  or 
-			    ( slice and ( mbAddr != CabacCurrMbAddr(val_CurrMbAddr)) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
-			    (( mbAddr = CabacCurrMbAddr(val_CurrMbAddr) ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
+			    ( slice and ( mbAddr != CabacCurrMbAddr()) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
+			    (( mbAddr = CabacCurrMbAddr() ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
 				condTermFlagA := 0;
 			else
 				condTermFlagA := 1;
@@ -2085,8 +2075,8 @@ actor Algo_Synp_AVC_FREXT()
 			end
 			luma8x8BlkIdxN := 2*(NeighMb_yW >> 3) + (NeighMb_xW >> 3) ;
 			if  ( GiveMbType(AvailMb,mbAddr) = 25  or 
-			    ( slice and ( mbAddr != CabacCurrMbAddr(val_CurrMbAddr)) and ( mbAddr != CabacCurrMbAddr(val_CurrMbAddr)) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
-			    (( mbAddr = CabacCurrMbAddr(val_CurrMbAddr) ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
+			    ( slice and ( mbAddr != CabacCurrMbAddr()) and ( mbAddr != CabacCurrMbAddr()) and ( ( ( GiveCBPLuma(AvailMb, mbAddr) >> luma8x8BlkIdxN ) & 1)  != 0 ) ) or
+			    (( mbAddr = CabacCurrMbAddr() ) and ( prior_decoded_bin_cbp[luma8x8BlkIdxN] != 0) ) ) then
 			    condTermFlagB := 0;
 			else
 				condTermFlagB := 1;
@@ -2391,11 +2381,11 @@ actor Algo_Synp_AVC_FREXT()
 		
 		// condTermFlagA
 		
-		if not AvailMbA and IS_Inter(CabacCurrMbAddr(val_CurrMbAddr)) or
+		if not AvailMbA and IS_Inter(CabacCurrMbAddr()) or
 		   AvailMbA and transBlockA = -1 and IS_IPCM_Tab(mbAddrA,mbTabMbtype) = false then
 			condTermFlagA := 0;
 		else
-			if not AvailMbA and IS_Intra(CabacCurrMbAddr(val_CurrMbAddr)) or
+			if not AvailMbA and IS_Intra(CabacCurrMbAddr()) or
 			  IS_IPCM_Tab(mbAddrA,mbTabMbtype) then
 				condTermFlagA := 1;
 			else
@@ -2424,11 +2414,11 @@ actor Algo_Synp_AVC_FREXT()
 		
 		// condTermFlagB
 
-		if not AvailMbB and IS_Inter(CabacCurrMbAddr(val_CurrMbAddr)) or
+		if not AvailMbB and IS_Inter(CabacCurrMbAddr()) or
 		   AvailMbB and transBlockB = -1 and IS_IPCM_Tab(mbAddrB,mbTabMbtype) = false then
 			condTermFlagB := 0;
 		else
-			if not AvailMbB and IS_Intra(CabacCurrMbAddr(val_CurrMbAddr)) or
+			if not AvailMbB and IS_Intra(CabacCurrMbAddr()) or
 			   IS_IPCM_Tab(mbAddrB,mbTabMbtype) then
 				condTermFlagB := 1;
 			else
@@ -3462,7 +3452,7 @@ actor Algo_Synp_AVC_FREXT()
 				SuffixMbTypeB := true;
 			end
 			//Give type prediction
-			mbTab[CabacCurrMbAddr(val_CurrMbAddr)][TypePred] := 0; 
+			mbTab[CabacCurrMbAddr()][TypePred] := 0; 
 		end
 	end
 	
@@ -3545,7 +3535,7 @@ actor Algo_Synp_AVC_FREXT()
 				StopCabacProcess();
 				binIdxOffset := 0;
 				//Give type prediction
-				mbTab[CabacCurrMbAddr(val_CurrMbAddr)][TypePred] := 1; 
+				mbTab[CabacCurrMbAddr()][TypePred] := 1; 
 			end
 		end
 		
@@ -3712,7 +3702,7 @@ actor Algo_Synp_AVC_FREXT()
 				StopCabacProcess();
 				binIdxOffset := 0;
 				//Give type prediction
-				mbTab[CabacCurrMbAddr(val_CurrMbAddr)][TypePred] := 2; 
+				mbTab[CabacCurrMbAddr()][TypePred] := 2; 
 			end
 		end
 		
@@ -6778,17 +6768,17 @@ end
 		
 		if mb_skip_flag = 1 then
 			if slice_type = SLICE_TYPE_P then 
-					mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbTabMbtype] := P_Skip;
-					mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbSliceType] := SLICE_TYPE_P;
+					mbTab[CabacCurrMbAddr()][mbTabMbtype] := P_Skip;
+					mbTab[CabacCurrMbAddr()][mbSliceType] := SLICE_TYPE_P;
 			else 
 				if slice_type = SLICE_TYPE_B then 
-					mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbTabMbtype] := B_Skip; 
-					mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbSliceType] := SLICE_TYPE_B;
+					mbTab[CabacCurrMbAddr()][mbTabMbtype] := B_Skip; 
+					mbTab[CabacCurrMbAddr()][mbSliceType] := SLICE_TYPE_B;
 				end 
 			end
 		end
 			
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbSkipFlag] := mb_skip_flag;
+		mbTab[CabacCurrMbAddr()][mbSkipFlag] := mb_skip_flag;
 		moreDataFlag := if mb_skip_flag = 1 then 0 else 1 end;
 		SentMbSkipZeros := true;
 	end
@@ -6814,7 +6804,7 @@ end
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
 	do
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbSkipFlag] := 0;
+		mbTab[CabacCurrMbAddr()][mbSkipFlag] := 0;
 	end
 	//end if
 
@@ -6867,32 +6857,32 @@ end
 			end
 
 			foreach int i in Integers(0,9) do
-				mbTab[CabacCurrMbAddr(val_CurrMbAddr)][i] := 0;
+				mbTab[CabacCurrMbAddr()][i] := 0;
 			end
 			
 			foreach int j in Integers(0,15) do
-					transblock_cbf[CabacCurrMbAddr(val_CurrMbAddr)][j] := 0;
+					transblock_cbf[CabacCurrMbAddr()][j] := 0;
 				end
 			
 			foreach int j in Integers(0,3) do
-				Ref_Idx_L0[CabacCurrMbAddr(val_CurrMbAddr)][j] := 0;
-				Ref_Idx_L1[CabacCurrMbAddr(val_CurrMbAddr)][j] := 0;
-				cabac_sub_mb_type[CabacCurrMbAddr(val_CurrMbAddr)][j] := 0;
-				transblock_cbf_cr[CabacCurrMbAddr(val_CurrMbAddr)][j] := 0;
-				transblock_cbf_cb[CabacCurrMbAddr(val_CurrMbAddr)][j] := 0;
+				Ref_Idx_L0[CabacCurrMbAddr()][j] := 0;
+				Ref_Idx_L1[CabacCurrMbAddr()][j] := 0;
+				cabac_sub_mb_type[CabacCurrMbAddr()][j] := 0;
+				transblock_cbf_cr[CabacCurrMbAddr()][j] := 0;
+				transblock_cbf_cb[CabacCurrMbAddr()][j] := 0;
 			end
 			
 			foreach int i in Integers(0,3) do
 				foreach int j in Integers(0,3) do
 					foreach int l in Integers(0,1) do
-						Mvd_L0[CabacCurrMbAddr(val_CurrMbAddr)][i][j][l] := 0;
-						Mvd_L1[CabacCurrMbAddr(val_CurrMbAddr)][i][j][l] := 0;
+						Mvd_L0[CabacCurrMbAddr()][i][j][l] := 0;
+						Mvd_L1[CabacCurrMbAddr()][i][j][l] := 0;
 					end
 				end
 			end
 			
 			foreach int l in Integers(0,1) do
-				transblock_cbf_dc_cr_cb[CabacCurrMbAddr(val_CurrMbAddr)][l] := 0;
+				transblock_cbf_dc_cr_cb[CabacCurrMbAddr()][l] := 0;
 			end
 				
 			
@@ -7312,8 +7302,8 @@ end
 		if slice_type = SLICE_TYPE_B then if mb_type < 23 then mb_intra_flag := 0; else mb_type:= mb_type -23; mb_intra_flag := 1; end end
 		
 		//Update mbTab with the current type of mb and slice_type
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbSliceType] := slice_type;
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbTabMbtype] := mb_type;
+		mbTab[CabacCurrMbAddr()][mbSliceType] := slice_type;
+		mbTab[CabacCurrMbAddr()][mbTabMbtype] := mb_type;
 		
 		//Initialize bk counter for cbp_Luma, see Derivation process of ctxIdxInc for the syntax element coded_block_flag
 		bk_cbp := 0;
@@ -7537,8 +7527,8 @@ end
 		val_CodedBlockPatternLuma := coded_block_pattern mod 16;
 		CodedBlockPatternChroma := coded_block_pattern / 16;
 		
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbCBPLuma]	:= val_CodedBlockPatternLuma;
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbCBPChroma]	:= CodedBlockPatternChroma;
+		mbTab[CabacCurrMbAddr()][mbCBPLuma]	:= val_CodedBlockPatternLuma;
+		mbTab[CabacCurrMbAddr()][mbCBPChroma]	:= CodedBlockPatternChroma;
 		
 		if( val_CodedBlockPatternLuma > 0 and 
 			transform_8x8_mode_flag[pps_id]=1 and 
@@ -7580,8 +7570,8 @@ end
 	do
 		val_CodedBlockPatternLuma := Intra_16x16_tab[mb_type][2];
 		CodedBlockPatternChroma := Intra_16x16_tab[mb_type][1];
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbCBPLuma]	:= val_CodedBlockPatternLuma;
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbCBPChroma]	:= CodedBlockPatternChroma;
+		mbTab[CabacCurrMbAddr()][mbCBPLuma]	:= val_CodedBlockPatternLuma;
+		mbTab[CabacCurrMbAddr()][mbCBPChroma]	:= CodedBlockPatternChroma;
 	end
 	//end if
 
@@ -7618,7 +7608,7 @@ end
 				end
 			end
 		end
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbQpDelta] := mb_qp_delta;
+		mbTab[CabacCurrMbAddr()][mbQpDelta] := mb_qp_delta;
 		val_QP := (val_QP + mb_qp_delta + 52) mod 52;
 		val_QP_Cb := qP_tab[val_QP + chroma_qp_index_offset[pps_id]];
 		val_QP_Cr := qP_tab[val_QP + second_chroma_qp_index_offset[pps_id]];
@@ -7704,7 +7694,7 @@ end
 		else
 			if IS_CABAC() then
 				sub_mb_type[mbPartIdx] := cabac_value();
-				cabac_sub_mb_type[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := cabac_value();
+				cabac_sub_mb_type[CabacCurrMbAddr()][mbPartIdx] := cabac_value();
 				mbPartIdx := mbPartIdx +1;
 				if mbPartIdx < 4 then 
 					binIdxMb := 0;
@@ -7751,7 +7741,7 @@ end
 		else
 			if IS_CABAC() then
 				ref_idx_l0[mbPartIdx] := cabac_value();
-				Ref_Idx_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := cabac_value();
+				Ref_Idx_L0[CabacCurrMbAddr()][mbPartIdx] := cabac_value();
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
@@ -7763,7 +7753,7 @@ end
 		mbPartIdx < 4
 	do
 		ref_idx_l0[mbPartIdx] := 0;
-		Ref_Idx_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := 0;
+		Ref_Idx_L0[CabacCurrMbAddr()][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end
 	//end if
@@ -7804,7 +7794,7 @@ end
 		else
 			if IS_CABAC() then
 				 ref_idx_l1[mbPartIdx] := cabac_value();
-				 Ref_Idx_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := cabac_value();
+				 Ref_Idx_L1[CabacCurrMbAddr()][mbPartIdx] := cabac_value();
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
@@ -7816,7 +7806,7 @@ end
 		mbPartIdx < 4
 	do
 		ref_idx_l1[mbPartIdx] := 0;
-		Ref_Idx_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := 0;
+		Ref_Idx_L1[CabacCurrMbAddr()][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end
 	//end if
@@ -7866,7 +7856,7 @@ end
 			if IS_CABAC() then
 				mvd_l0 := cabac_value();
 				//Save the decode mvd
-				Mvd_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][subMbPartIdx][0] := mvd_l0;
+				Mvd_L0[CabacCurrMbAddr()][mbPartIdx][subMbPartIdx][0] := mvd_l0;
 				compIdx := 1;
 				GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 				StartCabacProcess();
@@ -7885,7 +7875,7 @@ end
 			if IS_CABAC() then
 				mvd_l0 := cabac_value();
 				//Save the decode mvd
-				Mvd_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][subMbPartIdx][1] := mvd_l0;
+				Mvd_L0[CabacCurrMbAddr()][mbPartIdx][subMbPartIdx][1] := mvd_l0;
 			end
 		end
 		subMbPartIdx := subMbPartIdx +1;
@@ -7955,7 +7945,7 @@ end
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
 				//Save the decode mvd
-				Mvd_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][subMbPartIdx][0] := mvd_l1;
+				Mvd_L1[CabacCurrMbAddr()][mbPartIdx][subMbPartIdx][0] := mvd_l1;
 				compIdx := 1;
 				GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 				StartCabacProcess();
@@ -7975,7 +7965,7 @@ end
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
 				//Save the decode mvd
-				Mvd_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][subMbPartIdx][1] := mvd_l1;
+				Mvd_L1[CabacCurrMbAddr()][mbPartIdx][subMbPartIdx][1] := mvd_l1;
 			end
 		end
 		subMbPartIdx := subMbPartIdx +1;
@@ -8250,7 +8240,7 @@ end
 			end
 		end
 		
-		mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbIntraChromaPredMode] := intra_chroma_pred_mode;
+		mbTab[CabacCurrMbAddr()][mbIntraChromaPredMode] := intra_chroma_pred_mode;
 if TRACE_MRL then
 		println("IntraPredModeC "+ intra_chroma_pred_mode);
 end
@@ -8302,7 +8292,7 @@ end
 		else
 			if IS_CABAC() then
 				 ref_idx_l0[mbPartIdx] := cabac_value();
-				 Ref_Idx_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := cabac_value();
+				 Ref_Idx_L0[CabacCurrMbAddr()][mbPartIdx] := cabac_value();
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
@@ -8314,7 +8304,7 @@ end
 		mbPartIdx < NumMbPart()
 	do
 		ref_idx_l0[mbPartIdx] := 0;
-		Ref_Idx_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := 0;
+		Ref_Idx_L0[CabacCurrMbAddr()][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end
 	//end if
@@ -8357,7 +8347,7 @@ end
 		else
 			if IS_CABAC() then
 				 ref_idx_l1[mbPartIdx] := cabac_value();
-				 Ref_Idx_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := cabac_value();
+				 Ref_Idx_L1[CabacCurrMbAddr()][mbPartIdx] := cabac_value();
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
@@ -8369,7 +8359,7 @@ end
 		mbPartIdx < NumMbPart()
 	do
 		ref_idx_l1[mbPartIdx] := 0;
-		Ref_Idx_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx] := 0;
+		Ref_Idx_L1[CabacCurrMbAddr()][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end
 	//end if
@@ -8412,7 +8402,7 @@ end
 			if IS_CABAC() then
 				mvd_l0 := cabac_value();
 				//Save the decode mvd
-				Mvd_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][0][0] := mvd_l0;
+				Mvd_L0[CabacCurrMbAddr()][mbPartIdx][0][0] := mvd_l0;
 				compIdx := 1;
 				GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 				StartCabacProcess();
@@ -8430,7 +8420,7 @@ end
 			if IS_CABAC() then
 				mvd_l0 := cabac_value();
 				//Save the decode mvd
-				Mvd_L0[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][0][1] := mvd_l0;
+				Mvd_L0[CabacCurrMbAddr()][mbPartIdx][0][1] := mvd_l0;
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
@@ -8483,7 +8473,7 @@ end
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
 				//Save the decode mvd
-				Mvd_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][0][0] := mvd_l1;
+				Mvd_L1[CabacCurrMbAddr()][mbPartIdx][0][0] := mvd_l1;
 				compIdx := 1;
 				GetCabacSyntaxElement(CABAC_MVD_L0_0_0);
 				StartCabacProcess();
@@ -8502,7 +8492,7 @@ end
 			if IS_CABAC() then
 				mvd_l1 := cabac_value();
 				//Save the decode mvd
-				Mvd_L1[CabacCurrMbAddr(val_CurrMbAddr)][mbPartIdx][0][1] := mvd_l1;
+				Mvd_L1[CabacCurrMbAddr()][mbPartIdx][0][1] := mvd_l1;
 			end
 		end
 		mbPartIdx := mbPartIdx +1;
@@ -9299,24 +9289,24 @@ end
 		//16x16 Luma DC Block
 		
 		if ctxBlockCat = 0 then
-			mbTab[CabacCurrMbAddr(val_CurrMbAddr)][mbCBF] := coded_block_flag;
+			mbTab[CabacCurrMbAddr()][mbCBF] := coded_block_flag;
 		end
 		
 		// 4x4 Luma AC Block
 		if ctxBlockCat = 1 or ctxBlockCat = 2 then
-			transblock_cbf[CabacCurrMbAddr(val_CurrMbAddr)][luma4x4BlkIdx] := coded_block_flag;
+			transblock_cbf[CabacCurrMbAddr()][luma4x4BlkIdx] := coded_block_flag;
 			val_cbp_blk:=(coded_block_flag <<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
 		end
 		
 		if ctxBlockCat = 3 then
-			transblock_cbf_dc_cr_cb[CabacCurrMbAddr(val_CurrMbAddr)][iCbCr] := coded_block_flag;
+			transblock_cbf_dc_cr_cb[CabacCurrMbAddr()][iCbCr] := coded_block_flag;
 		end
 		
 		if ctxBlockCat = 4 then
 			if iCbCr = 0 then
-				transblock_cbf_cb[CabacCurrMbAddr(val_CurrMbAddr)][luma4x4BlkIdx] := coded_block_flag;
+				transblock_cbf_cb[CabacCurrMbAddr()][luma4x4BlkIdx] := coded_block_flag;
 			else
-				transblock_cbf_cr[CabacCurrMbAddr(val_CurrMbAddr)][luma4x4BlkIdx] := coded_block_flag;
+				transblock_cbf_cr[CabacCurrMbAddr()][luma4x4BlkIdx] := coded_block_flag;
 			end
 		end
 	

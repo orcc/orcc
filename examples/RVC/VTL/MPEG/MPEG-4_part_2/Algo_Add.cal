@@ -57,7 +57,7 @@ actor Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ)
 	end
 
 	combine: action MOT:[ mot ] repeat 64, TEX:[ tex ] repeat 64 ==> VID:[ o ] repeat 64
-		var List(type: int(size=PIX_SZ), size=63) o
+		var List(type: int(size=PIX_SZ), size=64) o
 	do
 		foreach int i in Integers(0,63) do
 		if tex[i] + mot[i] < 0 then

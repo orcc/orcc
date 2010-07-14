@@ -35,7 +35,7 @@
 
 // 
 import all caltrop.lib.BitOps;
-actor Framebuf_w_Address_8x8 (int INTRA,
+actor Framebuf_w_Address_8X8 (int INTRA,
 	int NEWVOP,
 	int MOTION,
 	int

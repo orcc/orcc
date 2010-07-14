@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="X" x="59" y="85"/>
-      <vertex id="Y" x="852" y="89"/>
-      <vertex id="Algo_IT4x4_1d_0" x="143" y="70"/>
-      <vertex id="Algo_Transpose4x4_0" x="284" y="70"/>
-      <vertex id="Algo_IT4x4_1d_1" x="435" y="70"/>
-      <vertex id="Algo_Transpose4x4_1" x="550" y="70"/>
-      <vertex id="Algo_IT4x4_Addshift" x="700" y="70"/>
+      <vertex id="X" x="21" y="74"/>
+      <vertex id="Y" x="925" y="94"/>
+      <vertex id="Algo_IT4x4_1d_0" x="28" y="225"/>
+      <vertex id="Algo_Transpose4x4_0" x="172" y="331"/>
+      <vertex id="Algo_IT4x4_1d_1" x="393" y="332"/>
+      <vertex id="Algo_Transpose4x4_1" x="603" y="331"/>
+      <vertex id="Algo_IT4x4_Addshift" x="729" y="71"/>
    </vertices>
 </layout>
