@@ -102,6 +102,8 @@ public class CalLinkingService extends DefaultLinkingService {
 		procedure = CalFactory.eINSTANCE.createAstProcedure();
 		procedure.setName("println");
 		procedures.put(procedure.getName(), procedure);
+		procedure.setName("print");
+		procedures.put(procedure.getName(), procedure);
 	}
 
 	/**
