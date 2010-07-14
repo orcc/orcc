@@ -78,7 +78,7 @@ actor Algo_RefList ()
 
 /*
 *
-* Global variables
+* State variables
 *
 */
 
@@ -94,7 +94,6 @@ actor Algo_RefList ()
 
 	int (size=32) ValMovedFrame            := 0;
 	uint(size=31) ValMaxFrameNum           := 0;
-	uint(size=4)  IdxInsertFrame           := 0;
 	uint(size=5)  CounterRefListTab        := 0; /* Contains the number of RefList's element which are sent                   */
 	uint(size=5)  NbLTRead                 := 0; /* Contains the number of Long Term List's' element which are read           */
 	uint(size=5)  NbSTRead                 := 0; /* Contains the number of Long Term List's' element which are read           */
@@ -105,11 +104,17 @@ actor Algo_RefList ()
 	int (size=32) LastFrameNum             := 0;
 
 	/*Delete this variables !!!*/
-	int(size=5) ValidxRefList             := 0;
+	int(size=5)  ValidxRefList             := 0;
 	bool         idx_found                 := false;
-	bool frame_found := false;
-	int ValMovedIdx                 := 0;
-	
+	bool         frame_found := false;
+	int(size=32) ValMovedIdx                 := 0;
+
+
+/*
+*
+* Procedure and Fontion
+*
+*/
 
 	procedure InsertPoc(uint(size=6) IdxPOC, int(size=32) ValPOC, int(size=32) ValFrameNum, int(size=32) ValIdxLT)
 		var
@@ -162,6 +167,7 @@ actor Algo_RefList ()
 				IdxCurrentPic := IdxCurrentPic - 1;
 			end
 		end
+
 
 /*
 *
@@ -217,6 +223,7 @@ actor Algo_RefList ()
 //		println("");
 //		println("Frame num ::"+frame_num);	
 		end
+
 
 	//Fill the Long Term List
 	ReadLists.LongTerm: action
@@ -385,7 +392,6 @@ ValidxRefList := 0;//////
 		
 		//Indicates that nothing in RefList has been sent
 		CounterRefListTab := 0;
-		IdxInsertFrame    := 0;
 	end
 
 
@@ -411,10 +417,12 @@ ValidxRefList := 0;//////
 	read_reordering_of_pic_nums_idc_0or1: action
 			RefReordering :[reordering_of_pic_nums_idc, abs_diff_pic_num_minus1]
 				==>
+			RefList:[poc]
 		guard 
 			(reordering_of_pic_nums_idc = 0 or reordering_of_pic_nums_idc = 1) 
 		var
-			bool IsInRefList := false
+			bool IsInRefList := false,
+			int (size = 32) poc
 		do
 			//Compute the value of the re-mapped reference picture
 			if (reordering_of_pic_nums_idc = 0) then 
@@ -436,7 +444,7 @@ ValidxRefList := 0;//////
 				if (FrameNumList[RefIdx[i]] = ValMovedFrame) then 
 					ValidxRefList  := i;
 					ValMovedIdx := RefIdx[i];
-					if(ValidxRefList > IdxInsertFrame) then
+					if(ValidxRefList > CounterRefListTab) then
 						IsInRefList := true;
 					end
 				end
@@ -453,15 +461,15 @@ ValidxRefList := 0;//////
 				//Shift to the right all the element with an index between 
 				//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
 				//Thanks to this shift, the short term reference picture located at idxRefList is deleted.
-				foreach int i in Integers (0, ValidxRefList - IdxInsertFrame - 1)
+				foreach int i in Integers (0, ValidxRefList - CounterRefListTab - 1)
 				do
 					RefIdx[ValidxRefList - i] := RefIdx[ValidxRefList - i - 1];
 				end
 			end
-			//Put the short term ref picture in his new position
-			RefIdx[IdxInsertFrame] := ValMovedIdx;
-			//The next reference picture will be insert next to this ref picture
-			IdxInsertFrame             := IdxInsertFrame +1 ;
+
+			//We send the Poc value of the next element
+			poc := POCList[ValMovedIdx];
+			CounterRefListTab := CounterRefListTab + 1;
 		end
 
 
@@ -469,8 +477,11 @@ ValidxRefList := 0;//////
 	read_reordering_of_pic_nums_idc_2: action
 			RefReordering:[reordering_of_pic_nums_idc, idx_LTList]
 				==>
+			RefList:[poc]
 		guard 
 			reordering_of_pic_nums_idc = 2
+		var
+			int (size = 32) poc
 		do
 			ValidxRefList := 0;
 			//Search the location of the reference picture in the RefList
@@ -483,16 +494,16 @@ ValidxRefList := 0;//////
 			//Shift to the right all the element with an index between 
 			//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
 			//Thanks to this shift, the long term reference picture located at idxRefList is deleted.
-			if(ValidxRefList > IdxInsertFrame) then
-				foreach int i in Integers (0, ValidxRefList - IdxInsertFrame - 1)
+			if(ValidxRefList > CounterRefListTab) then
+				foreach int i in Integers (0, ValidxRefList - CounterRefListTab - 1)
 				do
 					RefIdx[ValidxRefList - i] := RefIdx[ValidxRefList - i - 1];
 				end
 			end
-			//Put the long term ref picture in his new position
-			RefIdx[IdxInsertFrame] := ValLTList[idx_LTList];
-			//The next reference picture will be insert next to this ref picture
-			IdxInsertFrame             := IdxInsertFrame + 1 ;
+
+			//We send the Poc value of the next element
+			poc := POCList[ValLTList[idx_LTList]];
+			CounterRefListTab := CounterRefListTab + 1;
 		end
 
 
@@ -504,6 +515,7 @@ ValidxRefList := 0;//////
 			reordering_of_pic_nums_idc = 3
 		end
 
+
 	//Send the RefList
 	SendRefList: action 
 				==>
@@ -513,10 +525,10 @@ ValidxRefList := 0;//////
 		var
 			int (size = 32) poc := -1
 		do
-//println("poc:"+POCList[RefIdx[CounterRefListTab]]+"; frnum:"+FrameNumList[RefIdx[CounterRefListTab]]+"; idx"+RefIdx[CounterRefListTab]);
 			poc := POCList[RefIdx[CounterRefListTab]];
 			CounterRefListTab := CounterRefListTab + 1;
 		end
+
 
 	//The RefList is sent
 	SendRefListDone: action ==>
@@ -533,12 +545,14 @@ ValidxRefList := 0;//////
 
 		ReadLists                         (ReadLists.ShortTerm                  )--> ReadLists;
 		ReadLists                         (ReadLists.LongTerm                   )--> ReadLists;
-		ReadLists                         (ReadLists.done                )--> InitRefList;
+		ReadLists                         (ReadLists.done                       )--> InitRefList;
 
 		InitRefList                       (InitRefList                          )--> read_ref_pic_list_reordering_flag;
+
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_0  )--> SendRefList;
 
 		read_ref_pic_list_reordering_flag (read_ref_pic_list_reordering_flag_1  )--> read_reordering_of_pic_nums_idc;
+
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_0or1 )--> read_reordering_of_pic_nums_idc;
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_2    )--> read_reordering_of_pic_nums_idc;
 		read_reordering_of_pic_nums_idc   (read_reordering_of_pic_nums_idc_3    )--> SendRefList;
@@ -553,7 +567,6 @@ ValidxRefList := 0;//////
 	priority
 		ReadLists.LongTerm      > ReadLists.ShortTerm       > ReadLists.done;
 		SendRefList             > SendRefListDone;
-//		FillFalseRefFrame.done  > FillFalseRefFrame.launch;
 	end
 
 end

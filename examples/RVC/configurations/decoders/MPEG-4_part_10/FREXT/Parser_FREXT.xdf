@@ -636,4 +636,5 @@
         src="Demux_Cavlc_Cabac" src-port="Cavlc_BlSize_L"/>
     <Connection dst="" dst-port="BlocksSize_Luma"
         src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
+    <Connection dst="Algo_MMCO" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
 </XDF>

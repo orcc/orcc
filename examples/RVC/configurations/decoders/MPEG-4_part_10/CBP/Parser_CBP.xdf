@@ -570,4 +570,5 @@
     <Connection dst="Algo_BlockSplit_AVC" dst-port="BlocksSize_Luma"
         src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
     <Connection dst="" dst-port="BlockSize_L" src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
+    <Connection dst="Algo_MMCO" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
 </XDF>

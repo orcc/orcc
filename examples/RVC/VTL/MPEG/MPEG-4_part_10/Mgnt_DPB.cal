@@ -36,14 +36,23 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	bool         Write_Done
 		:
 
-	uint NB_PIC         = 33;
-	uint SZ_NBPIC       = 6; /* >= log2(NB_PIC) */
 
-	int MB_WIDTH_CHROMA = 8;
-	int MB_WIDTH_LUMA   = 16;
+/*
+*
+* CONSTANTS
+*
+*/
+
+	int (size=32) SENT_DONE       = -2;
+
+	uint(size=32) NB_PIC          = 33;
+	uint(size=32) SZ_NBPIC        = 6; /* >= log2(NB_PIC) */
+
+	int (size=32) MB_WIDTH_CHROMA = 8;
+	int (size=32) MB_WIDTH_LUMA   = 16;
 	//FIXME! number of MB per line of picture
-	int PICWIDTH        = 1280/16; //number of MB per lines
-	int PICHEIGHT       = 720/16; //number of MB per columns
+	int (size=32) PICWIDTH        = 1280/16; //number of MB per lines
+	int (size=32) PICHEIGHT       = 720/16; //number of MB per columns
 
 	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
 	List(type:uint,size=NB_PIC)            ListPOC       := [ 0    :for int s in Integers(0,NB_PIC-1)];
@@ -83,7 +92,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	bool                  ListScanned         := true;
 
 	/*Delete information*/
-	int(size=32)  nb_del := 0;
+//	int(size=32)  nb_del   := 0;
+	bool          ValIsIDR := false;
 
 
 	initialize ==>
@@ -242,6 +252,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				end
 				i := i + 1;
 			end
+			ValIsIDR := IsIDRPic;
 			/*Fix Me!!! ==> exception*/
 			if(pic_curr_idx = -1) then
 				pic_curr_idx    := 0;
@@ -310,108 +321,96 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				nbMBdisplayForYaxis := nbMBdisplayForYaxis + 1;
 			end
 		end
-  Display.skip: action ==>
-  guard
-  	IdxNextPOCtoDisplay = -1
-  end
 
-  Display.done: action ==>
-  guard
-	nbMBdisplayForYaxis = PicHeightInMacroB
-  do
-	PicDisplayed[IdxNextPOCtoDisplay] := true;
-	NextPOCtoDisplay := -1;
-	IdxNextPOCtoDisplay := -1;
-	nbMBdisplayForXaxis := 0;
-	nbMBdisplayForYaxis := 0;
-  end
+	Display.skip: action ==>
+		guard
+			IdxNextPOCtoDisplay = -1
+		end
 
-
-
-purge_List: action 
-		DelList:[val_nb_del]
-			==>
-	guard
-		val_nb_del = -1
-	do
-		foreach int i in Integers(0,NB_PIC - 1)
+	Display.done: action ==>
+		guard
+			nbMBdisplayForYaxis = PicHeightInMacroB
 		do
-			if(i != pic_curr_idx) then
-				ListFrameNum[i] := -1;
-				IsAReference[i] := false;
-			else
-				ListFrameNum[i] := 0;
-				ListPOC[i]      := 0;
+			PicDisplayed[IdxNextPOCtoDisplay] := true;
+			NextPOCtoDisplay := -1;
+			IdxNextPOCtoDisplay := -1;
+			nbMBdisplayForXaxis := 0;
+			nbMBdisplayForYaxis := 0;
+		end
+
+	ReadDelList.Launch: action
+			DelList:[DelVal]
+				==>
+		guard
+			DelVal != SENT_DONE
+		do
+			foreach int i in Integers (0,NB_PIC - 1)
+			do
+				if(ListFrameNum[i]   = DelVal) then
+					ListFrameNum[i] := -1;
+					IsAReference[i] := false;
+				end
 			end
 		end
-	end
 
 
-read_del_parameters: action
-		DelList:[val_nb_del]
-			==>
-	do
-		nb_del := val_nb_del;
-	end
-
-
-read_delList: action DelList:[ValFrameNum] ==>
-	do
-		foreach int i in Integers (0,NB_PIC - 1)
+	ReadDelList.Done: action
+			DelList:[DelVal]
+				==>
 		do
-			if(ListFrameNum[i]   = ValFrameNum) then
-				ListFrameNum[i] := -1;
-				IsAReference[i] := false;
-			end
-		end
-		nb_del := nb_del - 1;
-	end
-
-
-read_delList_done: action ==>
-	guard
-		nb_del = 0
-	end
-
-
-getNextPOCtoDisplay.launch: action
-		POCtoDisplay :[poc2disp]
-			==>
-	guard
-		poc2disp         != -1,
-		NextPOCtoDisplay = -1
-	do
-		NextPOCtoDisplay := poc2disp;
-		ListScanned      := false;
-	end
-
-getNextPOCtoDisplay.sync: action
-		POCtoDisplay :[poc2disp]
-			==>
-	guard
-		poc2disp         = -1
-	end
-
-getNextPOCtoDisplay.skip: action
-			==>
-	end
-
-getidxdisplay.launch: action ==>
-	guard
-		ListScanned = false
-	do
-		IdxNextPOCtoDisplay := -1;
-		foreach int i in Integers (0,NB_PIC - 1)
-		do
-			if(ListPOC[i] = NextPOCtoDisplay)then
-					if(PictureReady[i] = true) then
-						if(PicDisplayed[i] = false) then
-							IdxNextPOCtoDisplay := i;
-						end
+			if(ValIsIDR)then
+				foreach int i in Integers(0,NB_PIC - 1)
+				do
+					if(i != pic_curr_idx) then
+						ListFrameNum[i] := -1;
+						IsAReference[i] := false;
+					else
+						ListFrameNum[i] := 0;
+						ListPOC[i]      := 0;
 					end
+				end
 			end
 		end
-		ListScanned := true;
+
+
+	getNextPOCtoDisplay.launch: action
+			POCtoDisplay :[poc2disp]
+				==>
+		guard
+			poc2disp         != -1,
+			NextPOCtoDisplay = -1
+		do
+			NextPOCtoDisplay := poc2disp;
+			ListScanned      := false;
+		end
+
+	getNextPOCtoDisplay.sync: action
+			POCtoDisplay :[poc2disp]
+				==>
+		guard
+			poc2disp         = -1
+		end
+	
+	getNextPOCtoDisplay.skip: action
+				==>
+		end
+	
+	getidxdisplay.launch: action ==>
+		guard
+			ListScanned = false
+		do
+			IdxNextPOCtoDisplay := -1;
+			foreach int i in Integers (0,NB_PIC - 1)
+			do
+				if(ListPOC[i] = NextPOCtoDisplay)then
+						if(PictureReady[i] = true) then
+							if(PicDisplayed[i] = false) then
+								IdxNextPOCtoDisplay := i;
+							end
+						end
+				end
+			end
+			ListScanned := true;
 	end
 
 	getidxdisplay.skip: action ==>
@@ -433,20 +432,17 @@ getidxdisplay.launch: action ==>
 		read_write          (read_data                )--> read_write;
 		read_write          (get_writeAddr            )--> read_write;
 		read_write          (get_readAddr             )--> read_write;
-		read_write          (write_picture_done       )--> read_del_parameters;
-		
-		read_del_parameters (purge_List               )--> read_ref_parameters;
-		read_del_parameters (read_del_parameters      )--> read_del_list;
-		read_del_list       (read_delList             )--> read_del_list;
-		read_del_list       (read_delList_done        )--> read_ref_parameters;
+		read_write          (write_picture_done       )--> read_del_list;
+
+		read_del_list       (ReadDelList.Launch      )--> read_del_list;
+		read_del_list       (ReadDelList.Done        )--> read_ref_parameters;
 	end
 
   priority
-    write_data        > read_data > write_picture_done  > get_writeAddr > get_readAddr ;
-  	Display.skip > Display.done >Display.chroma >Display.luma;
-  	purge_List        > read_del_parameters;
-  	read_delList_done > read_delList;
+    write_data                 > read_data                > write_picture_done  > get_writeAddr > get_readAddr ;
+  	Display.skip               > Display.done             > Display.chroma      > Display.luma;
+  	ReadDelList.Launch         > ReadDelList.Done;
   	getNextPOCtoDisplay.launch > getNextPOCtoDisplay.sync > getNextPOCtoDisplay.skip;
-  	getidxdisplay.launch > getidxdisplay.skip;
+  	getidxdisplay.launch       > getidxdisplay.skip;
   end
 end
