@@ -38,7 +38,6 @@ actor Framebuf_w_Address_16X16 (int INTRA,
   int SEARCHWIN_IN_MB =  3;    // search window size (in macroblocks)
   int MAXW_IN_MB = 121;          // maximum image width (in macroblocks)
   int MAXH_IN_MB =  69;         // maximum image height (in macroblocks)
-  int ADDR_SZ = 24;
   int FLAG_SZ = 4;
   int MV_SZ = 9;
   int BTYPE_SZ = 12;
@@ -186,8 +185,6 @@ actor Framebuf_w_Address_16X16 (int INTRA,
   //                          bit0 = round
   read_mv: action MV:[x,y] ==> halfpel:[ flags ]
   var
-    int flag_x = if (bitand(x,1) = 1) then 4 else 0 end,
-    int flag_y = if (bitand(y,1) = 1) then 2 else 0 end,
     int(size=FLAG_SZ) flags = lshift(bitand(x,1), 2) +
                               lshift(bitand(y,1), 1) +
                               vop_rounding_mode
