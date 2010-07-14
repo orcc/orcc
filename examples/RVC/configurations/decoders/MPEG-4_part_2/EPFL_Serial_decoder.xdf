@@ -170,7 +170,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="EPFL_Serial_IETR_new_motion"/>
+        <Class name="EPFL_Serial_motion"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -183,6 +183,9 @@
         <Parameter name="INTRA">
             <Expr kind="Var" name="INTRA"/>
         </Parameter>
+        <Parameter name="LAYOUT">
+            <Expr kind="Literal" literal-kind="Integer" value="1"/>
+        </Parameter>
         <Parameter name="MOTION">
             <Expr kind="Var" name="MOTION"/>
         </Parameter>
@@ -192,6 +195,12 @@
         <Parameter name="ROUND_TYPE">
             <Expr kind="Var" name="ROUND_TYPE"/>
         </Parameter>
+        <Parameter name="SEARCHWIN_IN_MB">
+            <Expr kind="Literal" literal-kind="Integer" value="3"/>
+        </Parameter>
+        <Attribute kind="Value" name="partName">
+            <Expr kind="Literal" literal-kind="String" value="x86_1"/>
+        </Attribute>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
@@ -199,12 +208,12 @@
     <Connection dst="serialize" dst-port="in8" src="" src-port="bits"/>
     <Connection dst="parser" dst-port="BITS" src="serialize" src-port="out"/>
     <Connection dst="texture" dst-port="QFS" src="parser" src-port="B"/>
-    <Connection dst="texture" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
     <Connection dst="" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
     <Connection dst="" dst-port="HEIGHT" src="parser" src-port="HEIGHT"/>
     <Connection dst="motion" dst-port="TEX" src="texture" src-port="f"/>
     <Connection dst="motion" dst-port="MV" src="parser" src-port="MV"/>
-    <Connection dst="motion" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
     <Connection dst="" dst-port="VID" src="motion" src-port="VID"/>
     <Connection dst="texture" dst-port="QP" src="parser" src-port="QP"/>
+    <Connection dst="texture" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
+    <Connection dst="motion" dst-port="BTYPE" src="parser" src-port="BTYPE"/>
 </XDF>

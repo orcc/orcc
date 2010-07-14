@@ -43,9 +43,6 @@
     <Decl kind="Param" name="INTRA">
         <Type name="int"/>
     </Decl>
-    <Decl kind="Param" name="INTER">
-        <Type name="int"/>
-    </Decl>
     <Decl kind="Param" name="ACCODED">
         <Type name="int"/>
     </Decl>
@@ -53,6 +50,15 @@
         <Type name="int"/>
     </Decl>
     <Decl kind="Param" name="MOTION">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="INTER">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="LAYOUT">
+        <Type name="int"/>
+    </Decl>
+    <Decl kind="Param" name="SEARCHWIN_IN_MB">
         <Type name="int"/>
     </Decl>
     <!-- ************************************** -->
@@ -66,9 +72,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTER">
-            <Expr kind="Var" name="INTER"/>
-        </Parameter>
         <Parameter name="INTRA">
             <Expr kind="Var" name="INTRA"/>
         </Parameter>
@@ -122,8 +125,6 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="address" dst-port="MV" src="" src-port="MV"/>
-    <Connection dst="address" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="add" dst-port="BTYPE" src="" src-port="BTYPE"/>
     <Connection dst="add" dst-port="TEX" src="" src-port="TEX"/>
     <Connection dst="buffer" dst-port="WA" src="address" src-port="WA"/>
     <Connection dst="buffer" dst-port="RA" src="address" src-port="RA"/>
@@ -134,10 +135,8 @@
         </Attribute>
     </Connection>
     <Connection dst="add" dst-port="MOT" src="interpolation" src-port="MOT"/>
-    <Connection dst="buffer" dst-port="WD" src="add" src-port="VID">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="100"/>
-        </Attribute>
-    </Connection>
+    <Connection dst="buffer" dst-port="WD" src="add" src-port="VID"/>
     <Connection dst="" dst-port="VID" src="add" src-port="VID"/>
+    <Connection dst="address" dst-port="BTYPE" src="" src-port="BTYPE"/>
+    <Connection dst="add" dst-port="BTYPE" src="" src-port="BTYPE"/>
 </XDF>

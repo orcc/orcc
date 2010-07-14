@@ -18,9 +18,10 @@ import all caltrop.lib.BitOps;
 actor MPEG4_algo_Interpolation_halfpel () int(size=PIX_SZ) RD,
 int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
 
-	int PIX_SZ = 9;
-
+// Port size declaration
 	int FLAG_SZ = 4;
+
+	int PIX_SZ = 9;
 
 	// Compensation function
 	function compensate(int p00, int p10, int p01, int p11) --> int :
@@ -54,7 +55,8 @@ int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
 		round := bitand(f, 1);
 		foreach int i in Integers(0, 7) do
 			foreach int j in Integers(0, 7) do
-				o[8 * i + j] := compensate(d[9 * i + j], d[9 * i + j + 1], d[9 * (i + 1) + j], d[9 * (i + 1) + j + 1]);
+				o[8 * i + j] := compensate(d[9 * i + j], d[9 * i + j + 1], d[9 * (i + 1) +
+				j], d[9 * (i + 1) + j + 1]);
 			end
 		end
 	end

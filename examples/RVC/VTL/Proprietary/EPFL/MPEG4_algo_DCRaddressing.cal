@@ -1,12 +1,14 @@
+import all caltrop.lib.BitOps;
 actor MPEG4_algo_DCRaddressing (int NEWVOP,
-	int INTRA) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A , int(size=MB_COORD_SZ
-+ 3) B , int(size=MB_COORD_SZ + 3) C :
+	int INTRA) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A,
+int(size=MB_COORD_SZ + 3) B, int(size=MB_COORD_SZ + 3) C :
 
-	int MAXW_IN_MB = 121;
+// Port size declaration
+	int BTYPE_SZ = 12;
 
 	int MB_COORD_SZ = 8;
 
-	int BTYPE_SZ = 12;
+	int MAXW_IN_MB = 121;
 
 	int(size=MB_COORD_SZ) mbx := 0;
 
@@ -25,7 +27,8 @@ actor MPEG4_algo_DCRaddressing (int NEWVOP,
 	// Macroblock width of current vop
 	int BUF_SIZE = (MAXW_IN_MB + 2);
 
-	List(type: bool, size=BUF_SIZE * 8) coded := [ false : for int i in Integers(1, BUF_SIZE * 8) ];
+	List(type: bool, size=BUF_SIZE * 8) coded := [ false : for int i in Integers(1
+	, BUF_SIZE * 8) ];
 
 	int(size=MB_COORD_SZ) ptr;
 
@@ -44,8 +47,9 @@ actor MPEG4_algo_DCRaddressing (int NEWVOP,
 		end
 	end
 
-	function access(int(size=MB_COORD_SZ) p, int(size=4) c) --> int(size=MB_COORD_SZ + 3) :
-	// JWJ: increased size of c
+	function access(int(size=MB_COORD_SZ) p, int(size=4) c) -->
+		int(size=MB_COORD_SZ + 3) :
+		// JWJ: increased size of c
 		bitor(lshift(p, 3), c)
 	end
 
@@ -107,8 +111,8 @@ actor MPEG4_algo_DCRaddressing (int NEWVOP,
 	guard
 		comp = 0
 	var
-		int(size=MB_COORD_SZ + 3) a := 0 , int(size=MB_COORD_SZ + 3) b := 0 , int(size=MB_COORD_SZ + 3) c
-		:= 0
+		int(size=MB_COORD_SZ + 3) a := 0 , int(size=MB_COORD_SZ + 3) b := 0 ,
+		int(size=MB_COORD_SZ + 3) c := 0
 	do
 		if not left_edge then
 		// left-neighbor is block 1 from previous macroblock
@@ -162,8 +166,8 @@ actor MPEG4_algo_DCRaddressing (int NEWVOP,
 	guard
 		comp = 2
 	var
-		int(size=MB_COORD_SZ + 3) a := 0 , int(size=MB_COORD_SZ + 3) b := 0 , int(size=MB_COORD_SZ + 3) c
-		:= access(ptr, 0) // above-neighbor is block 0 from this macroblock
+		int(size=MB_COORD_SZ + 3) a := 0 , int(size=MB_COORD_SZ + 3) b := 0 ,
+		int(size=MB_COORD_SZ + 3) c := access(ptr, 0) // above-neighbor is block 0 from this macroblock
 
 	do
 		if not left_edge then
@@ -206,8 +210,8 @@ actor MPEG4_algo_DCRaddressing (int NEWVOP,
 	// Locate prediction indices for blocks 4, 5
 	predict.b45: action ==> A:[ a ], B:[ b ], C:[ c ]
 	var
-		int(size=MB_COORD_SZ + 3) a := 0 , int(size=MB_COORD_SZ + 3) b := 0 , int(size=MB_COORD_SZ + 3) c
-		:= 0
+		int(size=MB_COORD_SZ + 3) a := 0 , int(size=MB_COORD_SZ + 3) b := 0 ,
+		int(size=MB_COORD_SZ + 3) c := 0
 	do
 		if not left_edge then
 			a := access(ptr_left, comp);
