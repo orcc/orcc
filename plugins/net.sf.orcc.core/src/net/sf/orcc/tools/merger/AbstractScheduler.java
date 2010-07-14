@@ -30,7 +30,6 @@
 package net.sf.orcc.tools.merger;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
@@ -51,22 +50,16 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	protected Schedule schedule;
 
+	protected Map<Connection, Integer> bufferCapacities;
+
 	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph)
 			throws OrccException {
 		this.graph = graph;
 		schedule = schedule();
 	}
 
-	public Map<Connection, Integer> getBufferCapacities() {
-		Map<Connection, Integer> bufferCapacities = new HashMap<Connection, Integer>();
-
-		LinkedList<Iterand> stack = new LinkedList<Iterand>(
-				schedule.getIterands());
-
-		int rep = schedule.getIterationCount();
-
-		while (!stack.isEmpty()) {
-			Iterand iterand = stack.pop();
+	private void capacities(Schedule schedule, int rep) {
+		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
 				Vertex vertex = iterand.getVertex();
 				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
@@ -82,11 +75,17 @@ public abstract class AbstractScheduler implements IScheduler {
 				}
 			} else {
 				Schedule sched = iterand.getSchedule();
-				rep = sched.getIterationCount();
-				for (Iterand subIterand : sched.getIterands()) {
-					stack.push(subIterand);
-				}
+				rep *= sched.getIterationCount();
+				capacities(sched, rep);
+				rep /= sched.getIterationCount();
 			}
+		}
+	}
+
+	public Map<Connection, Integer> getBufferCapacities() {
+		if (bufferCapacities == null) {
+			bufferCapacities = new HashMap<Connection, Integer>();
+			capacities(schedule, 1);
 		}
 		return bufferCapacities;
 	}

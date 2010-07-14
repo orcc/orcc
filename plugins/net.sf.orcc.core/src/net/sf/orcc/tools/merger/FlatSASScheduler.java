@@ -59,14 +59,22 @@ public class FlatSASScheduler extends AbstractScheduler {
 				.computeRepetitionsVector();
 
 		Schedule schedule = new Schedule();
+		schedule.setIterationCount(1);
 
 		List<Vertex> sort = new TopologicalSorter(graph).topologicalSort();
 		for (Vertex vertex : sort) {
 			if (vertex.isInstance()) {
-				Schedule subSched = new Schedule();
-				subSched.setIterationCount(repetitions.get(vertex));
-				subSched.add(new Iterand(vertex));
-				schedule.add(new Iterand(subSched));
+				int rep = repetitions.get(vertex);
+				Iterand iterand = null;
+				if(rep > 1) {
+					Schedule subSched = new Schedule();
+					subSched.setIterationCount(repetitions.get(vertex));
+					subSched.add(new Iterand(vertex));
+					iterand = new Iterand(subSched);
+				} else {
+					iterand = new Iterand(vertex);
+				}
+				schedule.add(iterand);
 			}
 		}
 		return schedule;

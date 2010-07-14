@@ -67,7 +67,10 @@ public class MatrixChainTransformation implements IScheduleTransformation {
 		List<Iterand> iterands = schedule.getIterands();
 
 		for (int i = 0; i < size; i++) {
-			int gcd = iterands.get(i).getSchedule().getIterationCount();
+			int gcd = 1;
+			if (iterands.get(i).isSchedule()) {
+				gcd = iterands.get(i).getSchedule().getIterationCount();
+			}
 			gcds[i][i] = gcd;
 		}
 
@@ -77,8 +80,12 @@ public class MatrixChainTransformation implements IScheduleTransformation {
 
 				m[i][j] = Double.MAX_VALUE;
 
-				int gcd = Rational.gcd(gcds[i][j - 1], iterands.get(j)
-						.getSchedule().getIterationCount());
+				int rep = 1;
+				if (iterands.get(j).isSchedule()) {
+					rep = iterands.get(j).getSchedule().getIterationCount();
+				}
+
+				int gcd = Rational.gcd(gcds[i][j - 1], rep);
 
 				for (int k = i; k < j; k++) {
 					List<Vertex> left = new ArrayList<Vertex>();
@@ -120,26 +127,43 @@ public class MatrixChainTransformation implements IScheduleTransformation {
 
 	private void computeOptimalParens(Schedule schedule, int i, int j) {
 		if (i == j) {
-			Vertex vertex = this.schedule.getIterands().get(i).getSchedule()
-					.getIterands().get(0).getVertex();
+			Vertex vertex = getVertex(this.schedule.getIterands().get(i));
 			schedule.add(new Iterand(vertex));
 		} else {
-
-			Schedule left = new Schedule();
-			Schedule right = new Schedule();
 
 			int gcd = gcds[i][j];
 			int split = s[i][j];
 
-			left.setIterationCount(gcds[i][split] / gcd);
-			schedule.add(new Iterand(left));
+			int rep = gcds[i][split] / gcd;
+			if (rep > 1) {
+				Schedule left = new Schedule();
+				left.setIterationCount(rep);
+				schedule.add(new Iterand(left));
+				computeOptimalParens(left, i, split);
+			} else {
+				computeOptimalParens(schedule, i, split);
+			}
 
-			right.setIterationCount(gcds[split + 1][j] / gcd);
-			schedule.add(new Iterand(right));
-
-			computeOptimalParens(left, i, split);
-			computeOptimalParens(right, split + 1, j);
+			rep = gcds[split + 1][j] / gcd;
+			if (rep > 1) {
+				Schedule right = new Schedule();
+				right.setIterationCount(rep);
+				schedule.add(new Iterand(right));
+				computeOptimalParens(right, split + 1, j);
+			} else {
+				computeOptimalParens(schedule, split + 1, j);
+			}
 		}
+	}
+
+	private Vertex getVertex(Iterand iterand) {
+		Vertex vertex = null;
+		if (iterand.isSchedule()) {
+			vertex = iterand.getSchedule().getIterands().get(0).getVertex();
+		} else {
+			vertex = iterand.getVertex();
+		}
+		return vertex;
 	}
 
 	@Override

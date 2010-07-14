@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -121,8 +122,7 @@ public class ActorMerger implements INetworkTransformation {
 		}
 	}
 
-	private List<Expression> addParameters(LocalVariable loopVar,
-			Action action, Vertex vertex) {
+	private List<Expression> addCallArguments(Action action, Vertex vertex) {
 		List<Expression> params = new ArrayList<Expression>();
 
 		for (Map.Entry<Port, Integer> entry : action.getInputPattern()
@@ -135,13 +135,19 @@ public class ActorMerger implements INetworkTransformation {
 				}
 			}
 
-			Expression expr = new BinaryExpr(new IntExpr(entry.getValue()),
-					BinaryOp.TIMES, new VarExpr(new Use(loopVar)),
-					IrFactory.eINSTANCE.createTypeInt(32));
+			Expression param = null;
+			if (index > 0) {
+				LocalVariable loopVar = indexes.get(index - 1);
+				Expression expr = new BinaryExpr(new IntExpr(entry.getValue()),
+						BinaryOp.TIMES, new VarExpr(new Use(loopVar)),
+						IrFactory.eINSTANCE.createTypeInt(32));
 
-			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
-					BinaryOp.PLUS, expr, IrFactory.eINSTANCE.createTypeInt(32));
-
+				param = new BinaryExpr(new VarExpr(new Use(var)),
+						BinaryOp.PLUS, expr,
+						IrFactory.eINSTANCE.createTypeInt(32));
+			} else {
+				param = new VarExpr(new Use(var));
+			}
 			params.add(param);
 		}
 
@@ -155,17 +161,48 @@ public class ActorMerger implements INetworkTransformation {
 				}
 			}
 
-			Expression expr = new BinaryExpr(new IntExpr(entry.getValue()),
-					BinaryOp.TIMES, new VarExpr(new Use(loopVar)),
-					IrFactory.eINSTANCE.createTypeInt(32));
+			Expression param = null;
+			if (index > 0) {
+				LocalVariable loopVar = indexes.get(index - 1);
+				Expression expr = new BinaryExpr(new IntExpr(entry.getValue()),
+						BinaryOp.TIMES, new VarExpr(new Use(loopVar)),
+						IrFactory.eINSTANCE.createTypeInt(32));
 
-			Expression param = new BinaryExpr(new VarExpr(new Use(var)),
-					BinaryOp.PLUS, expr, IrFactory.eINSTANCE.createTypeInt(32));
-
+				param = new BinaryExpr(new VarExpr(new Use(var)),
+						BinaryOp.PLUS, expr,
+						IrFactory.eINSTANCE.createTypeInt(32));
+			} else {
+				param = new VarExpr(new Use(var));
+			}
 			params.add(param);
 		}
 
 		return params;
+	}
+
+	private void addProcedures(Actor actor, Procedure procedure) {
+		OrderedMap<String, Procedure> procs = this.actor.getProcs();
+		for (Procedure proc : actor.getProcs()) {
+			if (procedure.getStoredVariables().isEmpty()) {
+				if (!procs.contains(proc.getName())) {
+					String name = actor.getName() + "_" + proc.getName();
+					proc.setName(name);
+					procs.put(proc.getName(), proc);
+				}
+			} else {
+				// TODO manage procedure with side effects
+			}
+		}
+
+	}
+
+	private void addStateVars(String id, Actor actor) {
+		OrderedMap<String, StateVariable> vars = this.actor.getStateVars();
+		for (StateVariable var : actor.getStateVars()) {
+			String name = id + "_" + var.getName();
+			var.setName(name);
+			vars.put(name, var);
+		}
 	}
 
 	/**
@@ -265,7 +302,7 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private Procedure createBody() throws OrccException {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
-		indexes = new ArrayList<LocalVariable>();
+		indexes = new LinkedList<LocalVariable>();
 		loopVariables = new OrderedMap<String, Variable>();
 
 		Procedure procedure = new Procedure(ACTION_NAME, false, new Location(),
@@ -360,7 +397,6 @@ public class ActorMerger implements INetworkTransformation {
 	private void createLoopedSchedule(Procedure procedure, Schedule schedule,
 			List<CFGNode> nodes) throws OrccException {
 		OrderedMap<String, Procedure> procs = actor.getProcs();
-		OrderedMap<String, StateVariable> vars = actor.getStateVars();
 
 		for (Iterand iterand : schedule.getIterands()) {
 			if (iterand.isVertex()) {
@@ -368,43 +404,35 @@ public class ActorMerger implements INetworkTransformation {
 
 				Actor actor = vertex.getInstance().getActor();
 
-				for (Procedure proc : actor.getProcs()) {
-					if (procedure.getStoredVariables().isEmpty()) {
-						if (!procs.contains(proc.getName())) {
-							String name = actor.getName() + "_"
-									+ proc.getName();
-							proc.setName(name);
-							procs.put(proc.getName(), proc);
-						}
-					} else {
-						// TODO manage procedure with side effects
-					}
-				}
+				addProcedures(actor, procedure);
 
-				String id = vertex.getInstance().getId();
-
-				for (StateVariable var : actor.getStateVars()) {
-					String name = id + "_" + var.getName();
-					var.setName(name);
-					vars.put(name, var);
-				}
+				addStateVars(vertex.getInstance().getId(), actor);
 
 				List<Action> actions = actor.getActions();
 				if (actions.size() == 1) {
 					Procedure proc = convertAction(actions.get(0));
 
-					proc.setName(id + "_" + proc.getName());
+					proc.setName(vertex.getInstance().getId() + "_"
+							+ proc.getName());
 					BlockNode blkNode = new BlockNode(procedure);
-					LocalVariable counter = indexes.get(index - 1);
 
-					List<Expression> parameters = addParameters(counter,
-							actions.get(0), vertex);
+					List<Expression> callArguments = new ArrayList<Expression>();
+					Expression binopExpr = null;
+					callArguments = addCallArguments(actions.get(0), vertex);
 
-					Expression binopExpr = new BinaryExpr(new VarExpr(new Use(
-							counter)), BinaryOp.PLUS, new IntExpr(1),
-							IrFactory.eINSTANCE.createTypeInt(32));
-					blkNode.add(new Call(new Location(), null, proc, parameters));
-					blkNode.add(new Assign(counter, binopExpr));
+					if (index > 0) {
+						binopExpr = new BinaryExpr(new VarExpr(new Use(
+								indexes.get(index - 1))), BinaryOp.PLUS,
+								new IntExpr(1),
+								IrFactory.eINSTANCE.createTypeInt(32));
+					}
+
+					blkNode.add(new Call(new Location(), null, proc,
+							callArguments));
+					
+					if (index > 0) {
+						blkNode.add(new Assign(indexes.get(index - 1), binopExpr));
+					}
 					nodes.add(blkNode);
 					procs.put(proc.getName(), proc);
 				} else {
@@ -413,7 +441,6 @@ public class ActorMerger implements INetworkTransformation {
 				}
 
 			} else {
-
 				LocalVariable loopVar = new LocalVariable(true, 0,
 						new Location(), "idx_" + index,
 						IrFactory.eINSTANCE.createTypeInt(32));
@@ -425,19 +452,18 @@ public class ActorMerger implements INetworkTransformation {
 
 				Schedule sched = iterand.getSchedule();
 
+				int iterationCount = sched.getIterationCount();
+
 				BlockNode blkNode = new BlockNode(procedure);
-				List<CFGNode> statements = new ArrayList<CFGNode>();
-
-				int interationCount = sched.getIterationCount();
-
 				blkNode.add(new Assign(loopVar, new IntExpr(0)));
+
 				nodes.add(blkNode);
 
 				WhileNode whileNode = new WhileNode(procedure, null,
-						statements, new BlockNode(procedure));
+						new ArrayList<CFGNode>(), new BlockNode(procedure));
 
 				Expression condition = new BinaryExpr(new VarExpr(new Use(
-						loopVar)), BinaryOp.LT, new IntExpr(interationCount),
+						loopVar)), BinaryOp.LT, new IntExpr(iterationCount),
 						IrFactory.eINSTANCE.createTypeBool());
 				whileNode.setValue(condition);
 
@@ -445,7 +471,7 @@ public class ActorMerger implements INetworkTransformation {
 
 				index++;
 
-				createLoopedSchedule(procedure, sched, statements);
+				createLoopedSchedule(procedure, sched, whileNode.getNodes());
 
 				index--;
 			}
@@ -582,6 +608,7 @@ public class ActorMerger implements INetworkTransformation {
 					graph, vertices, null);
 
 			scheduler = new FlatSASScheduler(subgraph);
+			//new MatrixChainTransformation(subgraph).transform(scheduler.getSchedule());
 
 			for (Vertex vertex : vertices) {
 				Actor actor = vertex.getInstance().getActor();
@@ -598,12 +625,12 @@ public class ActorMerger implements INetworkTransformation {
 			Vertex tgt = graph.getEdgeTarget(connection);
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Connection newConn = new Connection(connection.getSource(),
-						inputsMap.get(connection), null);
+						inputsMap.get(connection), connection.getAttributes());
 				graph.addEdge(graph.getEdgeSource(connection), merge, newConn);
 			}
 			if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Connection newConn = new Connection(outputsMap.get(connection),
-						connection.getTarget(), null);
+						connection.getTarget(), connection.getAttributes());
 				graph.addEdge(merge, graph.getEdgeTarget(connection), newConn);
 			}
 		}
