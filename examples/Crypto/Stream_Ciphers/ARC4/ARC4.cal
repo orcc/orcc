@@ -1,0 +1,78 @@
+/**
+ * This FU gives implementation of ARC4 (stream cipher) in RVC-CAL.
+ * The terms and names of variables used in this FU follow the Wikipedia page of RC4:
+ * http://en.wikipedia.org/wiki/RC4
+ * 
+ * FU ID: ARC4
+ * Two input ports:
+ * (1) IP1_Key:
+ * 	   The key represented as a (n+1)-byte sequence:
+ * 	    n, KeyByte 1, ..., KeyByte n, where n is the size of the key (in byte).
+ * 	   This port is read only once at the initialization stage of the actor, 
+ * 	    so the key is fixed during the whole process.
+ * (2) IP2_Text:
+ * 	   Input byte (plaintext or ciphertext).
+ * One output port:
+ * (1) OP:
+ * 	   Output byte (ciphertext or plaintext).
+ * 
+ * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010 
+ */
+
+actor ARC4() uint(size=8) IP1_Key, uint(size=8) IP2_Text ==> uint(size=8) OP:
+
+	uint KEY_SIZE_MAX = 256; // maximum key size (in byte)
+	List(type:uint(size=8), size=KEY_SIZE_MAX) key := [0: for int a in Integers(1,KEY_SIZE_MAX)];
+	List(type:uint(size=8), size=256) S := [a: for int a in Integers(0,255)]; // S-box
+
+	// Two flags controlling firings of different actions.
+	bool keySizeReceived := false;
+	bool keyReceived := false;
+
+	uint keySize := 0; // size of the received key (in byte)
+	action IP1_Key:[k] ==>
+	guard not keySizeReceived
+	do
+		keySize := k;
+		keySizeReceived := true;
+	end
+		
+	procedure swap(int a, int b)
+	var uint(size=8) temp
+	begin	
+		temp := S[a];
+		S[a] := S[b];
+		S[b] := temp;	
+	end
+
+	// Key-scheduling action, which also reads the key from the input port.
+	uint(size=8) keyCounter := 0; // index of the current key byte 
+	action IP1_Key:[k] ==>
+	guard (keySizeReceived and not keyReceived)
+	var int b
+	do
+		key[keyCounter] := k;
+		keyCounter := keyCounter + 1;
+		if (keyCounter = keySize) then
+			keyReceived := true;
+			b := 0;
+			foreach int a in Integers(0,255) do
+				b := (b + S[a] + key[a mod keySize]) mod 256;
+				swap(a,b);
+			end
+		end
+	end
+
+	// Main action: PRGA and encryption/decryption.
+	int i := 0;
+	int j := 0;
+	action IP2_Text:[byte] ==> OP:[byte]
+	guard keyReceived
+	do
+		i := (i + 1) mod 256;
+		j := (j + S[i]) mod 256;
+		swap(i,j);
+		byte := bitxor(byte, S[(S[i] + S[j]) mod 256]);
+	end
+	
+end

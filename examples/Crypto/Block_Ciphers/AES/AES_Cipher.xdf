@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="AES_Cipher">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="Plaintext">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="Key">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="Ciphertext">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="AddRoundKey">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="AddRoundKey"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="bEncipher">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
+    </Instance>
+    <Instance id="SubBytes">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="SubBytes"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="ShiftRows">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="ShiftRows"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="MixColumns">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="MixColumns"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="SubBytes" dst-port="IP" src="AddRoundKey" src-port="OP2_FD"/>
+    <Connection dst="ShiftRows" dst-port="IP" src="SubBytes" src-port="OP"/>
+    <Connection dst="MixColumns" dst-port="IP1_PT" src="ShiftRows" src-port="OP"/>
+    <Connection dst="AddRoundKey" dst-port="IP3_FD" src="MixColumns" src-port="OP"/>
+    <Connection dst="AddRoundKey" dst-port="IP2_Key" src="" src-port="Key"/>
+    <Connection dst="MixColumns" dst-port="IP0_Key" src="" src-port="Key"/>
+    <Connection dst="AddRoundKey" dst-port="IP1_Text" src="" src-port="Plaintext"/>
+    <Connection dst="" dst-port="Ciphertext" src="AddRoundKey" src-port="OP1_Text"/>
+</XDF>

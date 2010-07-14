@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="ARC4_testbed">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="ARC4">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="ARC4"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Source_ARC4">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Source_ARC4"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Validator_ARC4">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Validator_ARC4"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="ARC4" dst-port="IP1_Key" src="Source_ARC4" src-port="OP1_Key"/>
+    <Connection dst="ARC4" dst-port="IP2_Text" src="Source_ARC4" src-port="OP2_PT"/>
+    <Connection dst="Validator_ARC4" dst-port="IP2_PT" src="Source_ARC4" src-port="OP2_PT"/>
+    <Connection dst="Validator_ARC4" dst-port="IP3_GR" src="Source_ARC4" src-port="OP3_GR"/>
+    <Connection dst="Validator_ARC4" dst-port="IP1_CT" src="ARC4" src-port="OP"/>
+</XDF>
