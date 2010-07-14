@@ -52,7 +52,9 @@ public class RemoveReadWrites extends AbstractActorTransformation {
 	@SuppressWarnings("unchecked")
 	public void visit(Read read, Object... args) {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		read.getTarget().removeUse(read);
+		if(read.getTarget() != null) {			
+			read.getTarget().removeUse(read);
+		}
 		read.getPort().removeUse(read);
 		it.remove();
 	}
