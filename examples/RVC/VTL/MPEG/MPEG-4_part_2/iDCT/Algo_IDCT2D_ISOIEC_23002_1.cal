@@ -1,5 +1,4 @@
-actor Algo_IDCT2D_ISOIEC_23002_1 () int(size=13) IN, bool
-SIGNED ==> int(size=9) OUT :
+actor Algo_IDCT2D_ISOIEC_23002_1 () int(size=13) IN, bool SIGNED ==> int(size=9) OUT :
 
 	int A = 1024;
 
@@ -21,36 +20,29 @@ SIGNED ==> int(size=9) OUT :
 
 	int J = 2528;
 
-	List(type: int, size=64) scale = [ A, B, C, D, A, D, C, B, B, E, F, G, B, G,
-	F, E, C, F, H, I, C, I, H, F, D, G, I, J, D, J, I, G, A, B, C, D, A, D, C, B,
-	D, G, I, J, D, J, I, G, C, F, H, I, C, I, H, F, B, E, F, G, B, G, F, E ];
+	List(type: int, size=64) scale = [ A, B, C, D, A, D, C, B, B, E, F, G, B, G, F, E, C, F, H, I, C, I, H, F, D, G
+	, I, J, D, J, I, G, A, B, C, D, A, D, C, B, D, G, I, J, D, J, I, G, C, F, H, I, C, I, H, F, B, E, F, G, B, G, F, E ];
 
 	action IN:[ x ] repeat 64, SIGNED:[ s ] ==> OUT:[ block1 ] repeat 64
 	var
 		List(type: int, size=64) block1 , List(type: int, size=64) block2
 	do
-	// multiplier-based scaling
-		foreach int n in Integers(0, 63) do
-			block1[n] := scale[n] * x[n];
-		end
+		block1 := [ 0 : for int n in Integers(0, 63) ];
+		block2 := [ 0 : for int n in Integers(0, 63) ];
+		// multiplier-based scaling
+		block1 := [ scale[n] * x[n] : for int n in Integers(0, 63) ];
 		block1[0] := block1[0] + lshift(1, 12);
 		// scaled 1D IDCT for rows and columns
 		idct1d(block1, block2);
 		idct1d(block2, block1);
 		// downshifting
-		foreach int n in Integers(0, 63) do
-			block1[n] := rshift(block1[n], 13);
-		end
+		block1 := [ rshift(block1[n], 13) : for int n in Integers(0, 63) ];
 		// clipping
-		if s then
-			foreach int n in Integers(0, 63) do
-				block1[n] := clip(block1[n], -255);
-			end
+		block1 := [ clip(block1[n], if s then
+			-255
 		else
-			foreach int n in Integers(0, 63) do
-				block1[n] := clip(block1[n], 0);
-			end
-		end
+			0
+		end) : for int n in Integers(0, 63) ];
 	end
 
 	procedure idct1d(List(type: int, size=64) X, List(type: int, size=64) Y)

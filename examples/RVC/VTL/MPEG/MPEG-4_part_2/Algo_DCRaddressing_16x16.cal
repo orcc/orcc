@@ -1,103 +1,55 @@
-
 // Algo_DCRaddressing_16x16
-
 //
-
 // Created By:  David B. Parlour (dave.parlour@xilinx.com)
-
 // Modified By: Andrew Kinane (kinanea@eeng.dcu.ie)
-
 //         
-
 // Copyright (c) 2004-2005 Xilinx Inc.
-
 // All Rights Reserved
-
 //
-
 // Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
-
 //              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
-
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
-
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
-
 //
-
 // Functionality:
-
 // This module calculates the addresses of the three neighbouring blocks for the current
-
 // 8x8 block used for DC prediction. If any of the neighbours is not coded for some reason
-
 // (either outside frame boundaries or skipped by encoder), the address is set as zero.
-
 // Otherwise the lowest two bits specify the 8x8 component in the macroblock and the other
-
 // higher order bits specify the macroblock index using circular buffer addressing. 
-
 //
-
 // Input Ports:
-
 // ============
-
 // int(size=BTYPE_SZ) BTYPE
-
 // This input token specifies the coding mode of the current 8x8 block. When executing, 
-
 // the first 3 BTYPE tokens of a VOP relate to global parameters of the VOP. The first BTYPE 
-
 // token indicates a new VOP, and the subsequent two BTYPE tokens indicate the width and the 
-
 // height of the VOP in macroblocks respectively. All subsequent BTYPE tokens for the VOP 
-
 // specify the coding mode of the current 8x8 block. For details on the structure of the
-
 // BTYPE token, refer to ParseHeaders.cal
-
 //
-
 // Output Ports:
-
 // =============
-
 // int(size=MB_COORD_SZ+2) A
-
 // The address of the 8x8 block neighbour to the left of the current 8x8 block.
-
 //
-
 // int(size=MB_COORD_SZ+2) B
-
 // The address of the 8x8 block neighbour to the above left of the current 8x8 block.
-
 //
-
 // int(size=MB_COORD_SZ+2) C
-
 // The address of the 8x8 block neighbour to the above of the current 8x8 block.
-
 //
-
 // Modifications:
-
 // * Original file was Sequence.cal
-
 // * In advance action, indices adjust after every 4 components instead of 6 since now
-
 //   dealing with 4 8x8 blocks rather than 6 8x8 blocks.
-
 // * The action predict.b45 is removed since not needed.
-
 // * Block pointer bitwidth reduced from MB_COORD_SZ+3 to MB_COORD_SZ+2 since only
-
 //   4 components per block.
 import all caltrop.lib.BitOps;
-actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
-==> int(size=MB_COORD_SZ + 2) A, int(size=MB_COORD_SZ +
-2) B, int(size=MB_COORD_SZ + 2) C :
+actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
++ 2) B , int(size=MB_COORD_SZ + 2) C :
+
 // Port size declaration
 	int BTYPE_SZ = 12;
 
@@ -108,63 +60,53 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 	int NEWVOP = 2048;
 
 	int INTRA = 1024;
+
 	// Generate indices into the stream history to locate
-
 	//   A  neighbour to the left
-
 	//   B  neighbour above left
-
 	//   C  neighbour above
-
 	// Use 3 address lines for component index to save address calculation effort
-
 	// Also, location 0 is reserved for all uncoded blocks. This protocol must
-
 	// be identical to the buffer addressing in DCR_invpred_16x16_L.cal and IAP_16x16.cal, 
-
 	// since pointer values are passed on ports A, B, C.  
-
 	// Layout of macroblock components (the variable 'comp')
-
 	//  +---+---+ 
-
 	//  | 0 | 1 | 
-
 	//  +---+---+  
-
 	//  | 2 | 3 | 
-
 	//  +---+---+
 	int(size=MB_COORD_SZ) mbx := 0;
+
 	// Current macroblock x position
 	bool top_edge := true;
+
 	// Top edge macroblock flag
 	bool left_edge;
+
 	// Left edge macroblock flag
 	int(size=4) comp := 0;
+
 	// 8x8 block component in macroblock index // JWJ: increased size
 	int(size=MB_COORD_SZ) mbwidth := 0;
+
 	// Macroblock width of current vop
 	int BUF_SIZE = (MAXW_IN_MB + 2);
 
-	List(type: bool, size=BUF_SIZE * 4) coded ;
-	
-	initialize ==>
-	do
-		foreach int i in Integers(0, BUF_SIZE * 4 - 1) do
-			coded[i] := false;
-		end
-	end
+	List(type: bool, size=BUF_SIZE * 4) coded := [ false : for int i in Integers(1, BUF_SIZE * 4) ];
+
 	// Buffer to record if 8x8 block is coded or not (i.e. are there DCT coeffs in the bitstream for this block?
 	int(size=MB_COORD_SZ) ptr;
+
 	// Pointer to current macroblock
 	int(size=MB_COORD_SZ) ptr_left;
+
 	// Pointer to left neighbour macroblock ('A')
 	int(size=MB_COORD_SZ) ptr_above;
+
 	// Pointer to above neighbour macroblock ('C')
 	int(size=MB_COORD_SZ) ptr_above_left;
-	// Pointer to above left neighbour macroblock ('B')
 
+	// Pointer to above left neighbour macroblock ('B')
 	// Buffer pointer wrap, skipping over address 0
 	function decrement(int(size=MB_COORD_SZ) p) --> int(size=MB_COORD_SZ) :
 		if p = 1 then
@@ -173,12 +115,13 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 			p - 1
 		end
 	end
+
 	// Fuse the macroblock address and the 8x8 block component address to get appropriate address of desired 8x8 block in memory
-	function access(int(size=MB_COORD_SZ) p, int(size=4) c) -->
-		int(size=MB_COORD_SZ + 2) :
-		// JWJ: increased size of c
+	function access(int(size=MB_COORD_SZ) p, int(size=4) c) --> int(size=MB_COORD_SZ + 2) :
+	// JWJ: increased size of c
 		bitor(lshift(p, 2), c)
 	end
+
 	// New VOP
 	start: action BTYPE:[ cmd ] ==>
 	guard
@@ -189,6 +132,7 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 		left_edge := true;
 		comp := 0;
 	end
+
 	// Decode width of VOP and initialise flags
 	getw: action BTYPE:[ w ] ==>
 	do
@@ -198,9 +142,11 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 		ptr_above := 1 + w;
 		ptr_above_left := 2 + w;
 	end
+
 	// Decode height of macroblock (not needed in this FU)
 	geth: action BTYPE:[ h ] ==>
 	end
+
 	// Is this an INTRA 8x8 block?
 	read.intra: action BTYPE:[ btype ] ==>
 	guard
@@ -209,6 +155,7 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 	do
 		coded[access(ptr, comp)] := true;
 	end
+
 	// Is this not an INTRA 8x8 block?
 	read.other: action BTYPE:[ btype ] ==>
 	guard
@@ -217,6 +164,7 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 	do
 		coded[access(ptr, comp)] := false;
 	end
+
 	// Move to the next 8x8 block and set flags appropriately
 	advance: action ==>
 	do
@@ -236,13 +184,14 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 			ptr_above_left := decrement(ptr_above_left);
 		end
 	end
+
 	// Locate prediction indices for block 0
 	predict.b0: action ==> A:[ a ], B:[ b ], C:[ c ]
 	guard
 		comp = 0
 	var
-		int(size=MB_COORD_SZ + 2) a := 0 , int(size=MB_COORD_SZ + 2) b := 0 ,
-		int(size=MB_COORD_SZ + 2) c := 0
+		int(size=MB_COORD_SZ + 2) a := 0 , int(size=MB_COORD_SZ + 2) b := 0 , int(size=MB_COORD_SZ + 2) c
+		:= 0
 	do
 		if not left_edge then
 		// left-neighbor is block 1 from previous macroblock
@@ -266,13 +215,13 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 			end
 		end
 	end
+
 	// Locate prediction indices for block 1
 	predict.b1: action ==> A:[ a ], B:[ b ], C:[ c ]
 	guard
 		comp = 1
 	var
-		int(size=MB_COORD_SZ + 2) a := access(ptr, 0) ,
-		// left-neighbor is block 0 from this macroblock
+		int(size=MB_COORD_SZ + 2) a := access(ptr, 0) , // left-neighbor is block 0 from this macroblock
 		int(size=MB_COORD_SZ + 2) b := 0 , int(size=MB_COORD_SZ + 2) c := 0
 	do
 		if not coded[a] then
@@ -291,14 +240,14 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 			end
 		end
 	end
+
 	// Locate prediction indices for block 2
 	predict.b2: action ==> A:[ a ], B:[ b ], C:[ c ]
 	guard
 		comp = 2
 	var
-		int(size=MB_COORD_SZ + 2) a := 0 , int(size=MB_COORD_SZ + 2) b := 0 ,
-		int(size=MB_COORD_SZ + 2) c := access(ptr, 0)
-		// above-neighbor is block 0 from this macroblock
+		int(size=MB_COORD_SZ + 2) a := 0 , int(size=MB_COORD_SZ + 2) b := 0 , int(size=MB_COORD_SZ + 2) c
+		:= access(ptr, 0) // above-neighbor is block 0 from this macroblock
 
 	do
 		if not left_edge then
@@ -317,17 +266,15 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE
 			c := 0;
 		end
 	end
+
 	// Locate prediction indices for block 3
 	predict.b3: action ==> A:[ a ], B:[ b ], C:[ c ]
 	guard
 		comp = 3
 	var
-		int(size=MB_COORD_SZ + 2) a := access(ptr, 2) ,
-		// left-neighbor is block 2 from this macroblock
-		int(size=MB_COORD_SZ + 2) b := access(ptr, 0) ,
-		// above-left-neighbor is block 0 from this macroblock
-		int(size=MB_COORD_SZ + 2) c := access(ptr, 1)
-		// above-neighbor is block 1 from this macroblock
+		int(size=MB_COORD_SZ + 2) a := access(ptr, 2) , // left-neighbor is block 2 from this macroblock
+		int(size=MB_COORD_SZ + 2) b := access(ptr, 0) , // above-left-neighbor is block 0 from this macroblock
+		int(size=MB_COORD_SZ + 2) c := access(ptr, 1) // above-neighbor is block 1 from this macroblock
 
 	do
 		if not coded[a] then

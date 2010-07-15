@@ -1,31 +1,19 @@
-
 // Algo_Inversequant
-
 //
-
 // Author: David B. Parlour (dave.parlour@xilinx.com)
-
 //
-
 // Copyright (c) 2004-2005 Xilinx Inc.
-
 // All Rights Reserved
-
 //
-
 // Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
-
 //              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
-
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
-
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
-
 // MPEG-4 inverse quantization function
 import all caltrop.lib.BitOps;
-actor Algo_Inversequant
-() int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP
-==> int(size=SAMPLE_SZ) OUT :
+actor Algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC,
+int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
+
 // Port size declaration
 	int SAMPLE_SZ = 13;
 
@@ -45,6 +33,7 @@ actor Algo_Inversequant
 			end
 		end
 	end
+
 
 	int(size=QUANT_SZ) quant;
 
@@ -66,23 +55,16 @@ actor Algo_Inversequant
 
 	ac: action AC:[ i ] repeat 63 ==> OUT:[ o ] repeat 63
 	var
-		List(type: int(size=SAMPLE_SZ), size=63) v ,
-		List(type: int(size=SAMPLE_SZ), size=63) o
-	do
-		foreach int j in Integers(0, 62) do
-			v[j] := (quant * (lshift(abs(i[j]), 1) + 1)) - round;
-		end
-		foreach int k in Integers(0, 62) do
-			if i[k] = 0 then
-				o[k] := 0;
+		List(type: int(size=SAMPLE_SZ), size=63) v = [ (quant * (lshift(abs(i[j]), 1) + 1)) - round :
+		for int j in Integers(0, 62) ] , List(type: int(size=SAMPLE_SZ), size=63) o = [ if i[k] = 0 then
+			0
+		else
+			if i[k] < 0 then
+				saturate(-v[k])
 			else
-				if i[k] < 0 then
-					o[k] := saturate(-v[k]);
-				else
-					o[k] := saturate(v[k]);
-				end
+				saturate(v[k])
 			end
-		end
+		end : for int k in Integers(0, 62) ]
 	end
 
 	schedule fsm start :
