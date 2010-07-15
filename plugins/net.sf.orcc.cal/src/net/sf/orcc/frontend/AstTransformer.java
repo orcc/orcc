@@ -477,7 +477,16 @@ public class AstTransformer {
 				procedure.getLocals().put(file, loopVar.getLocation(),
 						loopVar.getName(), loopVar);
 
-				indexes.add(new VarExpr(new Use(loopVar)));
+				AstExpression astLower = generator.getLower();
+				int lower = new AstExpressionEvaluator()
+						.evaluateAsInteger(astLower);
+				Expression index = new VarExpr(new Use(loopVar));
+				if (lower != 0) {
+					index = new BinaryExpr(index, BinaryOp.MINUS, new IntExpr(
+							lower), index.getType());
+				}
+
+				indexes.add(index);
 			}
 
 			// translates the expression (this will form the innermost nodes)
