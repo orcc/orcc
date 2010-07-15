@@ -87,6 +87,16 @@ public:
 	ActionScheduler* getActionScheduler(){return scheduler;};
 
 	/**
+     *  @brief get the Port llvm::GlobalVariable corresponding to the port
+	 *
+	 *  @param port : Port to look for
+	 *
+	 *  @return the corresponding llvm::GlobalVariable 
+	 *
+     */
+	llvm::GlobalVariable* getVar(Port* port);
+
+	/**
      *  @brief get the output Port llvm::GlobalVariable corresponding to the port
 	 *
 	 *  @param port : Port to look for
@@ -94,7 +104,7 @@ public:
 	 *  @return the corresponding llvm::GlobalVariable 
 	 *
      */
-	llvm::GlobalVariable* getOutput(Port* port);
+	llvm::GlobalVariable* getOutputVar(Port* port);
 
 	/**
      *  @brief get the input Port llvm::GlobalVariable corresponding to the port
@@ -104,7 +114,7 @@ public:
 	 *  @return the corresponding llvm::GlobalVariable  
 	 *
      */
-	llvm::GlobalVariable* getInput(Port* port);
+	llvm::GlobalVariable* getInputVar(Port* port);
 
 	/**
      *  @brief get the llvm::GlobalVariable corresponding to the parameter
@@ -142,6 +152,37 @@ public:
 	void addOutputConnection(Port* port, llvm::GlobalVariable* variable);
 
 
+	/**
+     *  @brief get the Port corresponding to string name
+	 *
+	 *  @param portName : Name of the port
+	 *
+	 *  @return the corresponding Port if port found, otherwise NULL 
+	 *
+     */
+	Port* getPort(std::string portName);
+
+	/**
+     *  @brief get the input Port corresponding to string name
+	 *
+	 *  @param portName : Name of the input port
+	 *
+	 *  @return the corresponding Port if port found, otherwise NULL 
+	 *
+     */
+	Port* getInput(std::string portName);
+
+	/**
+     *  @brief get the output Port corresponding to string name
+	 *
+	 *  @param portName : Name of the input port
+	 *
+	 *  @return the corresponding Port if port found, otherwise NULL 
+	 *
+     */
+	Port* getOutput(std::string portName);
+
+
 private:
 	/** Original actor of this instance */
 	Actor* actor;
@@ -164,6 +205,8 @@ private:
 	Decoder* decoder;
 
 	/** List of port from the actor */
+	std::map<std::string, Port*> inputsName;
+	std::map<std::string, Port*> outputsName;
 	std::map<Port*, llvm::GlobalVariable*>* inputs;
 	std::map<Port*, llvm::GlobalVariable*>* outputs;
 

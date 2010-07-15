@@ -68,7 +68,7 @@ InstancedActor::InstancedActor(Decoder* decoder, Instance* instance,
 
 
 
-GlobalVariable* InstancedActor::getInput(Port* port){
+GlobalVariable* InstancedActor::getInputVar(Port* port){
 	map<Port*, llvm::GlobalVariable*>::iterator it;
 	
 	it = inputs->find(port);
@@ -81,7 +81,7 @@ GlobalVariable* InstancedActor::getInput(Port* port){
 	return (*it).second;
 }
 
-GlobalVariable* InstancedActor::getOutput(Port* port){
+GlobalVariable* InstancedActor::getOutputVar(Port* port){
 	map<Port*, llvm::GlobalVariable*>::iterator it;
 	
 	it = outputs->find(port);
@@ -95,16 +95,18 @@ GlobalVariable* InstancedActor::getOutput(Port* port){
 }
 
 void InstancedActor::addOutputConnection(Port* port, GlobalVariable* variable){
+	inputsName.insert(pair<string,Port*>(port->getName(), port));
 	outputConnection.insert(pair<Port*, GlobalVariable*>(port, variable));
 	port->setGlobalVariable(variable);
 }
 
 void InstancedActor::addInputConnection(Port* port, GlobalVariable* variable){
+	outputsName.insert(pair<string,Port*>(port->getName(), port));
 	inputConnection.insert(pair<Port*, GlobalVariable*>(port, variable));
 	port->setGlobalVariable(variable);
 }
 
-llvm::GlobalVariable* InstancedActor::getParameter(Variable* parameter){
+GlobalVariable* InstancedActor::getParameter(Variable* parameter){
 	map<Variable*, llvm::GlobalVariable*>::iterator it;
 	
 	it = parameters->find(parameter);
@@ -116,4 +118,53 @@ llvm::GlobalVariable* InstancedActor::getParameter(Variable* parameter){
 
 	return (*it).second;
 
+}
+
+GlobalVariable* InstancedActor::getVar(Port* port){
+	GlobalVariable* var = getInputVar(port);
+
+	// Search inside input ports 
+	if (var!= NULL){
+		return var;
+	}
+
+	// Search inside output ports 
+	return getOutputVar(port);
+}
+
+Port* InstancedActor::getPort(string portName){
+	Port* port = getInput(portName);
+
+	// Search inside input ports 
+	if (port!= NULL){
+		return port;
+	}
+
+	// Search inside output ports 
+	return getOutput(portName);
+}
+
+
+Port* InstancedActor::getInput(string portName){
+	std::map<std::string, Port*>::iterator it;
+	
+	it = inputsName.find(portName);
+
+	if(it == inputsName.end()){
+		return NULL;
+	}
+
+	return (*it).second;
+}
+
+Port* InstancedActor::getOutput(string portName){
+	std::map<std::string, Port*>::iterator it;
+	
+	it = outputsName.find(portName);
+
+	if(it == outputsName.end()){
+		return NULL;
+	}
+
+	return (*it).second;
 }
