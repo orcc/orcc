@@ -67,6 +67,8 @@ public enum UnaryOp {
 		for (UnaryOp op : UnaryOp.values()) {
 			operators.put(op.text, op);
 		}
+
+		operators.put("bitnot", BITNOT);
 		operators.put("not", LOGIC_NOT);
 	}
 

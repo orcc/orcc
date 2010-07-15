@@ -107,7 +107,8 @@ public final class BlockNode extends AbstractNode implements
 	 * @param procedure
 	 *            a procedure
 	 * @param nodes
-	 *            a list of nodes of the given procedure
+	 *            a list of nodes that are a subset of the given procedure's
+	 *            nodes
 	 * @return a block
 	 */
 	public static BlockNode getLast(Procedure procedure, List<CFGNode> nodes) {

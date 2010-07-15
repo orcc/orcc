@@ -247,6 +247,11 @@ public enum BinaryOp {
 		operators.put("and", LOGIC_AND);
 		operators.put("or", LOGIC_OR);
 		operators.put("mod", MOD);
+		operators.put("bitand", BITAND);
+		operators.put("bitor", BITOR);
+		operators.put("bitxor", BITXOR);
+		operators.put("lshift", SHIFT_LEFT);
+		operators.put("rshift", SHIFT_RIGHT);
 	}
 
 	/**
