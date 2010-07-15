@@ -469,6 +469,7 @@ public class ActorTransformer {
 	 */
 	public Actor transform(String file, AstActor astActor) {
 		this.file = file;
+		astTransformer.setFile(file);
 
 		Context context = astTransformer.getContext();
 		try {

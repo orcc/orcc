@@ -861,6 +861,16 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Sets the field "file" with the given value.
+	 * 
+	 * @param file
+	 *            a file name
+	 */
+	public void setFile(String file) {
+		this.file = file;
+	}
+
+	/**
 	 * Writes back the globals that need to be stored.
 	 */
 	private void storeGlobals() {
