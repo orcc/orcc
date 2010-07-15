@@ -57,7 +57,6 @@ import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
-import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -89,6 +88,8 @@ import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
+
+import com.google.inject.Inject;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -643,6 +644,7 @@ public class AstTransformer {
 	 */
 	final private Map<AstProcedure, Procedure> mapProcedures;
 
+	@Inject
 	private IQualifiedNameProvider nameProvider;
 
 	/**
@@ -665,8 +667,9 @@ public class AstTransformer {
 		exprTransformer = new ExpressionTransformer();
 		stmtTransformer = new StatementTransformer();
 
-		nameProvider = new CalQualifiedNameProvider();
 		context = new Context(null, null);
+
+		procedures = new OrderedMap<String, Procedure>();
 	}
 
 	/**
@@ -684,11 +687,14 @@ public class AstTransformer {
 	 * Clears up context and functions/proceudres maps.
 	 */
 	public void clear() {
-		context.clear();
-		context = null;
-
 		mapFunctions.clear();
 		mapProcedures.clear();
+
+		exprTransformer.setTarget(null, Collections.<Expression> emptyList());
+
+		context = new Context(null, null);
+
+		procedures = new OrderedMap<String, Procedure>();
 	}
 
 	/**
@@ -786,6 +792,15 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Returns the procedure map.
+	 * 
+	 * @return the procedure map
+	 */
+	public OrderedMap<String, Procedure> getProcedures() {
+		return procedures;
+	}
+
+	/**
 	 * Returns the qualified name for the given object.
 	 * 
 	 * @param obj
@@ -823,17 +838,6 @@ public class AstTransformer {
 		Context oldContext = context;
 		context = new Context(context, procedure);
 		return oldContext;
-	}
-
-	/**
-	 * Creates a new map of procedures, assigns it to the {@link #procedures}
-	 * attribute, and returns the newly-created procedure map.
-	 * 
-	 * @return a newly-created procedure map
-	 */
-	public OrderedMap<String, Procedure> newProceduresMap() {
-		procedures = new OrderedMap<String, Procedure>();
-		return procedures;
 	}
 
 	/**

@@ -86,6 +86,8 @@ import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
+import com.google.inject.Inject;
+
 /**
  * This class transforms an AST actor to its IR equivalent.
  * 
@@ -94,6 +96,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class ActorTransformer {
 
+	@Inject
 	private AstTransformer astTransformer;
 
 	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
@@ -467,7 +470,6 @@ public class ActorTransformer {
 	public Actor transform(String file, AstActor astActor) {
 		this.file = file;
 
-		astTransformer = new AstTransformer();
 		Context context = astTransformer.getContext();
 		try {
 			// parameters
@@ -490,7 +492,7 @@ public class ActorTransformer {
 
 			// transforms functions and procedures
 			OrderedMap<String, Procedure> procedures = astTransformer
-					.newProceduresMap();
+					.getProcedures();
 			for (AstFunction astFunction : astActor.getFunctions()) {
 				astTransformer.transformFunction(astFunction);
 			}
