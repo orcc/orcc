@@ -29,9 +29,9 @@
 package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.cal.cal.AstExpression;
@@ -172,12 +172,19 @@ public class AstTransformer {
 			Expression condition = transformExpression(expression
 					.getCondition());
 
-			LocalVariable target = context.getProcedure().newTempLocalVariable(
-					file, expression.getIrType(), "_tmp_if");
+			Variable currentTarget = target;
+			List<Expression> currentIndexes = indexes;
+
+			Type type = expression.getIrType();
+			if (target == null || !type.isList()) {
+				target = context.getProcedure().newTempLocalVariable(file,
+						expression.getIrType(), "_tmp_if");
+				indexes = new ArrayList<Expression>(0);
+			}
 
 			// transforms "then" statements and "else" statements
-			List<CFGNode> thenNodes = getNodes(target, expression.getThen());
-			List<CFGNode> elseNodes = getNodes(target, expression.getElse());
+			List<CFGNode> thenNodes = getNodes(expression.getThen());
+			List<CFGNode> elseNodes = getNodes(expression.getElse());
 
 			IfNode node = new IfNode(location, context.getProcedure(),
 					condition, thenNodes, elseNodes, new BlockNode(
@@ -186,6 +193,12 @@ public class AstTransformer {
 
 			Use use = new Use(target);
 			Expression varExpr = new VarExpr(location, use);
+
+			// restores target and indexes
+			target = currentTarget;
+			indexes = currentIndexes;
+
+			// return the expression
 			return varExpr;
 		}
 
@@ -222,6 +235,9 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionList(AstExpressionList astExpression) {
+			Variable currentTarget = target;
+			List<Expression> currentIndexes = indexes;
+
 			List<AstExpression> expressions = astExpression.getExpressions();
 			List<AstGenerator> generators = astExpression.getGenerators();
 
@@ -235,9 +251,9 @@ public class AstTransformer {
 
 			Expression expression = new VarExpr(new Use(target));
 
-			// reset target and indexes
-			target = null;
-			indexes = Collections.<Expression> emptyList();
+			// restores target and indexes
+			target = currentTarget;
+			indexes = currentIndexes;
 
 			// return the expression
 			return expression;
@@ -317,6 +333,36 @@ public class AstTransformer {
 		}
 
 		/**
+		 * Returns a list of CFG nodes from the given expression. This method
+		 * creates a new block node to hold the statements created when
+		 * translating the expression, transforms the expression, and transfers
+		 * the nodes created to a new list that is the result.
+		 * 
+		 * @param astExpression
+		 *            an AST expression
+		 * @return a list of CFG nodes
+		 */
+		private List<CFGNode> getNodes(AstExpression astExpression) {
+			Location location = Util.getLocation(astExpression);
+			List<CFGNode> nodes = context.getProcedure().getNodes();
+
+			int first = nodes.size();
+			nodes.add(new BlockNode(context.getProcedure()));
+
+			Expression value = transformExpression(astExpression);
+			createAssignOrStore(location, target, indexes, value);
+
+			int last = nodes.size();
+
+			// moves selected CFG nodes from "nodes" list to resultNodes
+			List<CFGNode> subList = nodes.subList(first, last);
+			List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
+			subList.clear();
+
+			return resultNodes;
+		}
+
+		/**
 		 * Returns a list of CFG nodes from the given list of statements. This
 		 * method creates a new block node to hold the statements, transforms
 		 * the statements, and transfers the nodes created to a new list that is
@@ -326,17 +372,17 @@ public class AstTransformer {
 		 *            a list of statements
 		 * @return a list of CFG nodes
 		 */
-		private List<CFGNode> getNodes(LocalVariable target,
-				AstExpression astExpression) {
-			Location location = Util.getLocation(astExpression);
+		private List<CFGNode> getNodes(List<AstExpression> astExpressions) {
 			List<CFGNode> nodes = context.getProcedure().getNodes();
 
 			int first = nodes.size();
 			nodes.add(new BlockNode(context.getProcedure()));
 
-			Expression value = transformExpression(astExpression);
-			Assign assign = new Assign(location, target, value);
-			addInstruction(assign);
+			for (AstExpression astExpression : astExpressions) {
+				Location location = Util.getLocation(astExpression);
+				Expression value = transformExpression(astExpression);
+				createAssignOrStore(location, target, indexes, value);
+			}
 
 			int last = nodes.size();
 
@@ -362,6 +408,15 @@ public class AstTransformer {
 			this.indexes = indexes;
 		}
 
+		/**
+		 * Transforms the given function call to an expression. This method is
+		 * only called when the function is an intrinsic/built-in function (like
+		 * bitand, lshift, etc.)
+		 * 
+		 * @param astCall
+		 *            a call
+		 * @return an IR expression
+		 */
 		private Expression transformBuiltinFunction(AstExpressionCall astCall) {
 			Location location = Util.getLocation(astCall);
 			String name = astCall.getFunction().getName();
@@ -372,23 +427,7 @@ public class AstTransformer {
 						expr.getType());
 			}
 
-			BinaryOp op = null;
-			if ("bitand".equals(name)) {
-				op = BinaryOp.BITAND;
-			}
-			if ("bitor".equals(name)) {
-				op = BinaryOp.BITOR;
-			}
-			if ("bitxor".equals(name)) {
-				op = BinaryOp.BITXOR;
-			}
-			if ("lshift".equals(name)) {
-				op = BinaryOp.SHIFT_LEFT;
-			}
-			if ("rshift".equals(name)) {
-				op = BinaryOp.SHIFT_RIGHT;
-			}
-
+			BinaryOp op = BinaryOp.getOperator(name);
 			if (op == null) {
 				return null;
 			}
@@ -399,59 +438,99 @@ public class AstTransformer {
 					new TypeChecker().getLub(e1.getType(), e2.getType()));
 		}
 
+		/**
+		 * Transforms the given expressions and generators.
+		 * 
+		 * @param expressions
+		 *            a list of expressions
+		 * @param generators
+		 *            a list of generators
+		 */
 		private void transformListGenerators(List<AstExpression> expressions,
 				List<AstGenerator> generators) {
 			Variable currentTarget = target;
 			List<Expression> currentIndexes = indexes;
 
-			for (AstGenerator generator : generators) {
-				Location location = Util.getLocation(generator);
-				Procedure procedure = context.getProcedure();
+			indexes = new ArrayList<Expression>(currentIndexes);
 
-				// creates loop variable and assigns it
+			Procedure procedure = context.getProcedure();
+
+			// first add local variables
+			for (AstGenerator generator : generators) {
 				AstVariable astVariable = generator.getVariable();
 				LocalVariable loopVar = transformLocalVariable(astVariable);
 				procedure.getLocals().put(file, loopVar.getLocation(),
 						loopVar.getName(), loopVar);
 
+				indexes.add(new VarExpr(new Use(loopVar)));
+			}
+
+			// translates the expression (this will form the innermost nodes)
+			List<CFGNode> nodes = getNodes(expressions);
+
+			// build the loops from the inside out
+			ListIterator<AstGenerator> it = generators.listIterator(generators
+					.size());
+			while (it.hasPrevious()) {
+				AstGenerator generator = it.previous();
+				Location location = Util.getLocation(generator);
+
+				// assigns the loop variable its initial value
+				AstVariable astVariable = generator.getVariable();
+				LocalVariable loopVar = (LocalVariable) context
+						.getVariable(astVariable);
 				AstExpression astLower = generator.getLower();
 				Expression lower = transformExpression(astLower);
 				Assign assign = new Assign(location, loopVar, lower);
 				addInstruction(assign);
+
+				// condition
+				AstExpression astHigher = generator.getHigher();
+				Expression higher = transformExpression(astHigher);
+				Expression condition = new BinaryExpr(higher.getLocation(),
+						new VarExpr(new Use(loopVar)), BinaryOp.LE, higher,
+						IrFactory.eINSTANCE.createTypeBool());
+
+				// body
+				BlockNode block = BlockNode.getLast(procedure, nodes);
+				assign = new Assign(location, loopVar, new BinaryExpr(
+						new VarExpr(new Use(loopVar)), BinaryOp.PLUS,
+						new IntExpr(1), loopVar.getType()));
+				block.add(assign);
+
+				// create while
+				WhileNode whileNode = new WhileNode(location, procedure,
+						condition, nodes, new BlockNode(procedure));
+				nodes = new ArrayList<CFGNode>(1);
+				nodes.add(whileNode);
 			}
 
-			transformListSimple(expressions);
+			// add the outer while node
+			procedure.getNodes().addAll(nodes);
 
 			target = currentTarget;
 			indexes = currentIndexes;
 		}
 
+		/**
+		 * Transforms the list of expressions of an AstExpressionList (without
+		 * generators).
+		 * 
+		 * @param expressions
+		 *            a list of AST expressions
+		 */
 		private void transformListSimple(List<AstExpression> expressions) {
-			Variable currentTarget = target;
-			List<Expression> currentIndexes = indexes;
-
 			int i = 0;
 			for (AstExpression expression : expressions) {
+				Location location = Util.getLocation(expression);
 				Expression value = transformExpression(expression);
 
-				// special case for list expressions
-				if (value.isVarExpr()) {
-					Use use = ((VarExpr) value).getVar();
-					if (use.getVariable().getType().isList()) {
-						use.remove();
-					}
-					continue;
-				}
+				List<Expression> currentIndexes = new ArrayList<Expression>(
+						indexes);
+				currentIndexes.add(new IntExpr(i));
 
-				List<Expression> indexes = new ArrayList<Expression>(
-						currentIndexes);
-				indexes.add(new IntExpr(i));
-				Store store = new Store(currentTarget, currentIndexes, value);
-				addInstruction(store);
+				createAssignOrStore(location, target, currentIndexes, value);
 			}
-
-			target = currentTarget;
-			indexes = currentIndexes;
 		}
 
 	}
@@ -478,25 +557,7 @@ public class AstTransformer {
 
 			exprTransformer.setTarget(target, indexes);
 			Expression value = transformExpression(astAssign.getValue());
-
-			// special case for list expressions
-			if (value.isVarExpr()) {
-				Use use = ((VarExpr) value).getVar();
-				if (use.getVariable().getType().isList()) {
-					use.remove();
-					return null;
-				}
-			}
-
-			// other expressions: add assign or store instruction
-			Instruction instruction;
-			if (indexes.isEmpty()) {
-				LocalVariable local = getLocalVariable(target, true);
-				instruction = new Assign(location, local, value);
-			} else {
-				instruction = new Store(location, target, indexes, value);
-			}
-			addInstruction(instruction);
+			createAssignOrStore(location, target, indexes, value);
 
 			return null;
 		}
@@ -690,11 +751,30 @@ public class AstTransformer {
 		mapFunctions.clear();
 		mapProcedures.clear();
 
-		exprTransformer.setTarget(null, Collections.<Expression> emptyList());
-
 		context = new Context(null, null);
 
 		procedures = new OrderedMap<String, Procedure>();
+	}
+
+	private void createAssignOrStore(Location location, Variable target,
+			List<Expression> indexes, Expression value) {
+		// special case for list expressions
+		if (value.isVarExpr()) {
+			Use use = ((VarExpr) value).getVar();
+			if (use.getVariable().getType().isList()) {
+				use.remove();
+				return;
+			}
+		}
+
+		Instruction instruction;
+		if (indexes == null || indexes.isEmpty()) {
+			LocalVariable local = getLocalVariable(target, true);
+			instruction = new Assign(location, local, value);
+		} else {
+			instruction = new Store(location, target, indexes, value);
+		}
+		addInstruction(instruction);
 	}
 
 	/**
