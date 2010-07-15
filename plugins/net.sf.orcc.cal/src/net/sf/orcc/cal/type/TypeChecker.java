@@ -233,6 +233,10 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionCall(AstExpressionCall expression) {
+		if (expression.getFunction().eContainer() == null) {
+			return getTypeBuiltin(expression);
+		}
+
 		return expression.getFunction().getIrType();
 	}
 
@@ -307,8 +311,15 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionList(AstExpressionList expression) {
-		return IrFactory.eINSTANCE.createTypeList(0, getType(expression
-				.getExpressions().get(0)));
+		List<AstExpression> expressions = expression.getExpressions();
+		Type type = getType(expressions);
+
+		for (AstGenerator generator : expression.getGenerators()) {
+			getType(generator.getLower());
+			getType(generator.getHigher());
+		}
+
+		return IrFactory.eINSTANCE.createTypeList(0, type);
 	}
 
 	@Override
@@ -477,6 +488,18 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		return null;
+	}
+
+	private Type getTypeBuiltin(AstExpressionCall astCall) {
+		String name = astCall.getFunction().getName();
+		if ("bitnot".equals(name)) {
+			Type type = getType(astCall.getParameters().get(0));
+			return type;
+		}
+
+		Type t1 = getType(astCall.getParameters().get(0));
+		Type t2 = getType(astCall.getParameters().get(1));
+		return getLub(t1, t2);
 	}
 
 }
