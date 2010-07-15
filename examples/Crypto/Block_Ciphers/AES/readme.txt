@@ -69,11 +69,6 @@ Validator_AES.cal: comparing the output of a FU against a golden response (used 
 AES_Cipher_testbed.xdf
 AES_InvCipher_testbed.xdf
 
----- Testbeds for OpenDF (Test vectors and golden response) ----
-
-AES_Cipher_testbed_OpenDF.xdf
-AES_InvCipher_testbed_OpenDF.xdf
-
 ---- Testbeds for Orcc (Read a file and encrypt/decrypt it) ----
 
 AES_Cipher_Orcc.xdf
