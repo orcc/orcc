@@ -94,10 +94,15 @@ $port.name$_ack <= '0';
 >>
 
 printActionACK(action) ::= <<
-($outputPattern(pattern=action.outputPattern)$ and isSchedulable_$action$_go = '1') then
-        $action.inputPattern.keys : ValidAck(); separator="\n"$
+$
+if(action.outputPattern)
+$($outputPattern(pattern=action.outputPattern)$ and isSchedulable_$action$_go = '1') then$
+else
+$(isSchedulable_$action$_go = '1') then$
+endif
+$        -- Action : $action$
         $action$_go <= '1';
-        -- Action : $action$
+        $action.inputPattern.keys : ValidAck(); separator="\n"$
 
 >>
 
