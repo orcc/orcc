@@ -191,13 +191,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="FrameNum">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="31"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MaxDPBSize">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -337,7 +330,6 @@
     <Connection dst="TEX_L" dst-port="slice_alpha_c0_offset" src="" src-port="slice_alpha_c0_offset"/>
     <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_beta_offset"/>
     <Connection dst="TEX_L" dst-port="DelList" src="" src-port="DelList"/>
-    <Connection dst="TEX_L" dst-port="FrameNum" src="" src-port="FrameNum"/>
     <Connection dst="TEX_L" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="TEX_L" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="RES_L" dst-port="BlocksSize" src="" src-port="BlocksSize"/>

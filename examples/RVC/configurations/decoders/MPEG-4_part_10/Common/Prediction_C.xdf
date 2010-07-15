@@ -177,13 +177,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="FrameNum">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="31"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MaxDPBSize">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -365,7 +358,6 @@
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Deblocking_Filter" dst-port="Alpha_offset" src="" src-port="slice_alpha_c0_offset"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
-    <Connection dst="Buffer_inter" dst-port="FrameNum_CurrPic" src="" src-port="FrameNum"/>
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay"
         src="Mgnt_Display" src-port="POCtoDisplay"/>
     <Connection dst="RefIdxtoPOC" dst-port="RefIdx" src="Inter" src-port="RefIdx_C"/>

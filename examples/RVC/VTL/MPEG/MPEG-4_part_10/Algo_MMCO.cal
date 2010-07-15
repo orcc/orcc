@@ -56,7 +56,7 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Mickael Raulet IETR/INSA of Rennes
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes
 
-
+//Delete IdxNotFound
 actor Algo_MMCO () 
 	uint(size=31) MMCO,
 	uint(size=31) FraNum,
@@ -87,13 +87,16 @@ actor Algo_MMCO ()
 *
 */
 
-	List(type:uint(size=31), size=16) STList              := [0     : for int s in Integers(0,15)];
-	List(type:bool         , size=16) ShortTermFalseFrame := [false : for int s in Integers(0,15)];
-	List(type:int (size=32), size=16) LTList              := [-1    : for int s in Integers(0,15)];
-	List(type:uint(size=31), size=16) DelListTab          := [0     : for int s in Integers(0,15)];
+	List(type:uint(size=31), size=16) STList              := [  0    : for int s in Integers(0,15)];
+	List(type:bool         , size=16) ShortTermFalseFrame := [ false : for int s in Integers(0,15)];
+	List(type:int (size=32), size=16) LTList              := [ -1    : for int s in Integers(0,15)];
+	List(type:uint(size=31), size=16) DelListTab          := [  0    : for int s in Integers(0,15)];
+	List(type:int (size=32), size=32) FrameNumList        := [ -1    : for int s in Integers(0,31)];
+	List(type:int (size=32), size=32) PocList             := [  0    : for int s in Integers(0,31)];
 
 	int (size=6)  NbFrameDel       := 0;
 	uint(size=31) FrameNum         := 0;
+	uint(size=32) ValCurrPoc       := 0;
 	uint(size=31) LastFrameNum     := 0;
 	uint(size=31) ValMaxFrameNum   := 0;
 	uint(size=5)  NumRefFrame      := 0;
@@ -103,7 +106,14 @@ actor Algo_MMCO ()
 	uint(size=5)  NbLongTermSent   := 0;
 	uint(size=1)  FlagLongTerm     := 0;
 	uint(size=4)  LongTermFrameIdx := 0;
+	uint(size=6)  IdxPocList       := 0;
 	bool          ValIsIDR         := false;
+	int (size=32) ValDelPoc        := 0;
+
+
+
+
+	bool IdxNotFound;
 
 /*
 *
@@ -126,8 +136,13 @@ actor Algo_MMCO ()
 			FrameNum        := ValFrame_Num;
 			NbFrameDel      := 0;
 			NbShortTermSent := 0;
+			ValCurrPoc      := PicOrderCnt;
 			if(ValFrame_Num = 0 and PicOrderCnt = 0) then
 				ValIsIDR := true;
+				foreach int j in Integers(0,31)
+				do
+					FrameNumList[j] := -1;
+				end
 			else
 				ValIsIDR := false;
 			end
@@ -373,6 +388,10 @@ actor Algo_MMCO ()
 			LTList          := [-1 :for int s in Integers(0,16-1)];
 			NbFrameDel      := -1;
 			ValIsIDR        := true;
+			foreach int j in Integers(0,31)
+			do
+				FrameNumList[j] := -1;
+			end
 		end
 
 
@@ -409,6 +428,7 @@ actor Algo_MMCO ()
 			STList[0]              := FrameNum;
 			ShortTermFalseFrame[0] := false;
 			ShortTermCount         := ShortTermCount +1;
+			IdxPocList             := 0;
 		end
 
 
@@ -432,25 +452,75 @@ actor Algo_MMCO ()
 					NbFrameDel             := NbFrameDel + 1;
 				end
 			end
+			IdxPocList             := 0;
+		end
+
+
+	GetNextPocToDel: action ==>
+		var
+			bool IdxNotFound2
+		do
+			//It will be modified when the front-end will be fixed !!!!!!
+			IdxNotFound := true;
+			foreach int i in Integers(0,NbFrameDel-1)
+			do
+				IdxNotFound2 := IdxNotFound;
+				if(IdxNotFound)
+				then
+					foreach int j in Integers(0,31)
+					do
+						if(FrameNumList[j]   = DelListTab[i])then
+							FrameNumList[j] := -1;
+							ValDelPoc       := PocList[j];
+							IdxNotFound2    := false;
+						end
+					end
+				end
+				IdxNotFound := IdxNotFound2;
+			end
+			if(IdxNotFound = true)then
+				NbFrameDel := 0;
+			end
 		end
 
 	//Send the DelList
-	SendDelList.RealFrame : action
+	SendDelList.PocValue : action
 				==>
-			DelList:[ValDelFrame]
+			DelList:[ValDelPoc]
 		guard
 			NbFrameDel > 0
-		var
-			int(size=32) ValDelFrame
-		do
-			NbFrameDel  := NbFrameDel - 1;
-			ValDelFrame := DelListTab[NbFrameDel];
 		end
 
 	//Sent of the DelList is completed
 	SendDelList.done : action
 				==>
 			DelList :[SENT_DONE]
+		var
+			bool IdxNotFound2
+		do
+			IdxNotFound := true;
+/*			while(IdxNotFound)
+			do
+				IdxNotFound2 := IdxNotFound;
+				if(FrameNumList[ValIdx] = -1 or ValIdx = 31) then
+					PocList[ValIdx]      := PicOrderCnt;
+					FrameNumList[ValIdx] := ValFrame_Num;
+					IdxNotFound2         := false;
+				end
+				IdxNotFound := IdxNotFound2;
+				ValIdx := ValIdx + 1;
+			end
+*/
+			foreach int i in Integers(0,31)
+			do
+				IdxNotFound2 := IdxNotFound;
+				if((FrameNumList[i] = -1 or i = 31) and (IdxNotFound)) then
+					PocList[i]      := ValCurrPoc;
+					FrameNumList[i] := FrameNum;
+					IdxNotFound2    := false;
+				end
+				IdxNotFound := IdxNotFound2;
+			end
 		end
 
 /*
@@ -474,17 +544,19 @@ actor Algo_MMCO ()
 		MMCO_opcode         (MMCO_opcode              )--> MMCO_opcode;
 		MMCO_opcode         (MMCO_opcode_IsEqualTo0   )--> AddFrameInList;
 
-		AddFrameInList      (AddFrame                 )--> SendDelLists;
+		AddFrameInList      (AddFrame                 )--> GetNextPocToDel;
 
-		SendDelLists        (SendDelList.RealFrame    )--> SendDelLists;
+		GetNextPocToDel     (GetNextPocToDel          )--> SendDelLists;
+
+		SendDelLists        (SendDelList.PocValue     )--> GetNextPocToDel;
 		SendDelLists        (SendDelList.done         )--> read_num_ref_frames;
 	end
 
 	priority
-		SendDelList.RealFrame   > SendDelList.done;
+		SendDelList.PocValue    > SendDelList.done;
 		SendLongTermList.launch > SendShortTermList.launch  > SendLongTermList.done;
 		FillFalseRefFrame.done  > FillFalseRefFrame.launch;
-		AddFrame.InSTList        > AddFrame.InLTList;
+		AddFrame.InSTList       > AddFrame.InLTList;
 	end
 
 end

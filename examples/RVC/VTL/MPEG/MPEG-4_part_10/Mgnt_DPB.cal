@@ -23,8 +23,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	uint          POC, 
 	int( size=32) POCtoDisplay,
 	uint(size=32) POCtoRead,
-	int(size=32)  DelList, 
-	uint(size=31) FrameNum_CurrPic,
+	int(size=32)  DelList,
 	int(size=9)   WD,
 	uint(size=21) RA,
 	uint(size=11) RA_Width,
@@ -56,7 +55,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
 	List(type:uint,size=NB_PIC)            ListPOC       := [ 0    :for int s in Integers(0,NB_PIC-1)];
-	List(type:int(size=32),size=NB_PIC)    ListFrameNum  := [-1    :for int s in Integers(0,NB_PIC-1)];
 	List(type:bool        ,size=NB_PIC)    PictureReady  := [false :for int s in Integers(0,NB_PIC-1)];
 	List(type:bool        ,size=NB_PIC)    PicDisplayed  := [true  :for int s in Integers(0,NB_PIC-1)];
 	List(type:bool        ,size=NB_PIC)    IsAReference  := [false :for int s in Integers(0,NB_PIC-1)];
@@ -176,7 +174,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				println("POC not found :"+poc2read);
 					foreach int i in Integers(0,NB_PIC-1)
 					do
-						println("Idx n"+i+":"+ListPOC[i]+" frame:"+ListFrameNum[i]+ " is a ref:"+IsAReference[i]);
+						println("Idx n"+i+"; PocVal:"+ListPOC[i]+ " is a ref:"+IsAReference[i]);
 					end
 				while(true)
 				do
@@ -225,7 +223,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 
 	read_ref_parameters: action
-			FrameNum_CurrPic :[FrNu],
 			POC              :[Valpoc],
 			IsIDR            :[IsIDRPic]
 				==>
@@ -241,10 +238,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 					pic_curr_idx    := i;
 					if(not IsIDRPic) then
 						ListPOC[i]      := Valpoc;
-						ListFrameNum[i] := FrNu;
 					else
 						ListPOC[i]      := 0;
-						ListFrameNum[i] := 0;
 					end
 					IsAReference[i] := true;
 					PictureReady[i] := false;
@@ -256,7 +251,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			/*Fix Me!!! ==> exception*/
 			if(pic_curr_idx = -1) then
 				pic_curr_idx    := 0;
-				ListFrameNum[0] := FrNu;
 				ListPOC[0]      := Valpoc;
 				IsAReference[0] := true;
 				PictureReady[0] := false;
@@ -346,8 +340,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		do
 			foreach int i in Integers (0,NB_PIC - 1)
 			do
-				if(ListFrameNum[i]   = DelVal) then
-					ListFrameNum[i] := -1;
+				if(ListPOC[i]   = DelVal) then
 					IsAReference[i] := false;
 				end
 			end
@@ -362,10 +355,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				foreach int i in Integers(0,NB_PIC - 1)
 				do
 					if(i != pic_curr_idx) then
-						ListFrameNum[i] := -1;
 						IsAReference[i] := false;
 					else
-						ListFrameNum[i] := 0;
 						ListPOC[i]      := 0;
 					end
 				end

@@ -191,13 +191,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="FrameNum">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="31"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MaxDPBSize">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -313,7 +306,6 @@
     <Connection dst="PRED_C" dst-port="I_PCM_C" src="" src-port="I_PCM_C"/>
     <Connection dst="PRED_C" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="PRED_C" dst-port="DelList" src="" src-port="DelList"/>
-    <Connection dst="PRED_C" dst-port="FrameNum" src="" src-port="FrameNum"/>
     <Connection dst="PRED_C" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="PRED_C" dst-port="IsIDR" src="" src-port="IsIDR"/>
 </XDF>

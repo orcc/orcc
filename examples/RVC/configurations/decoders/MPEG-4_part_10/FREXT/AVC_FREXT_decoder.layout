@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="8" y="1011"/>
-      <vertex id="Display_L" x="964" y="343"/>
-      <vertex id="Display_Cb" x="958" y="1179"/>
-      <vertex id="Display_Cr" x="982" y="1998"/>
-      <vertex id="Width" x="979" y="1781"/>
-      <vertex id="Height" x="993" y="1051"/>
-      <vertex id="FUN_Parser" x="91" y="987"/>
-      <vertex id="Decoding_Y" x="755" y="329"/>
-      <vertex id="Decode_U" x="782" y="1161"/>
-      <vertex id="Decode_V" x="784" y="1964"/>
+      <vertex id="bits8" x="57" y="1434"/>
+      <vertex id="Display_L" x="647" y="644"/>
+      <vertex id="Display_Cb" x="647" y="1434"/>
+      <vertex id="Display_Cr" x="647" y="2213"/>
+      <vertex id="Width" x="395" y="98"/>
+      <vertex id="Height" x="395" y="195"/>
+      <vertex id="FUN_Parser" x="168" y="950"/>
+      <vertex id="Decoding_Y" x="395" y="292"/>
+      <vertex id="Decode_U" x="395" y="1093"/>
+      <vertex id="Decode_V" x="395" y="1872"/>
    </vertices>
 </layout>
