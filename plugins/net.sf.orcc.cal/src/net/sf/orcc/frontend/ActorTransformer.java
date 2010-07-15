@@ -74,10 +74,12 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -384,6 +386,36 @@ public class ActorTransformer {
 	}
 
 	/**
+	 * Creates a new empty "initialize" action that is empty and always
+	 * schedulable.
+	 * 
+	 * @return an initialize action
+	 */
+	private Action createInitialize() {
+		Location location = new Location();
+
+		// transform tag
+		Tag tag = new Tag();
+
+		Pattern inputPattern = new Pattern(0);
+		Pattern outputPattern = new Pattern(0);
+
+		Procedure scheduler = new Procedure("isSchedulable_initialize",
+				location, IrFactory.eINSTANCE.createTypeBool());
+		Procedure body = new Procedure("initialize", location,
+				IrFactory.eINSTANCE.createTypeVoid());
+
+		Context oldContext = astTransformer.newContext(scheduler);
+		addInstruction(new Return(new BoolExpr(true)));
+		astTransformer.restoreContext(oldContext, null);
+
+		// creates action
+		Action action = new Action(location, tag, inputPattern, outputPattern,
+				scheduler, body);
+		return action;
+	}
+
+	/**
 	 * Creates a variable to hold the number of tokens on the given port.
 	 * 
 	 * @param port
@@ -473,13 +505,15 @@ public class ActorTransformer {
 
 		Context context = astTransformer.getContext();
 		try {
+			Location location = Util.getLocation(astActor);
+
 			// parameters
-			OrderedMap<String, StateVariable> parameters = transformGlobalVariables(astActor
-					.getParameters());
+			OrderedMap<String, StateVariable> parameters = astTransformer
+					.transformGlobalVariables(astActor.getParameters());
 
 			// first state variables, because port's sizes may depend on them.
-			OrderedMap<String, StateVariable> stateVars = transformGlobalVariables(astActor
-					.getStateVariables());
+			OrderedMap<String, StateVariable> stateVars = astTransformer
+					.transformGlobalVariables(astActor.getStateVariables());
 
 			// then ports
 			OrderedMap<String, Port> inputs = transformPorts(astActor
@@ -506,6 +540,24 @@ public class ActorTransformer {
 
 			// transform initializes
 			ActionList initializes = transformActions(astActor.getInitializes());
+
+			// add call to initialize procedure (if any)
+			Procedure initialize = astTransformer.getInitialize();
+			if (initialize != null) {
+				procedures
+						.put(file, location, initialize.getName(), initialize);
+
+				if (initializes.isEmpty()) {
+					Action action = createInitialize();
+					initializes.add(action);
+				}
+
+				for (Action action : initializes) {
+					BlockNode block = BlockNode.getLast(action.getBody());
+					List<Expression> params = new ArrayList<Expression>(0);
+					block.add(new Call(location, null, initialize, params));
+				}
+			}
 
 			// sort actions by priority
 			ActionSorter sorter = new ActionSorter(actions);
@@ -648,38 +700,6 @@ public class ActorTransformer {
 		}
 
 		astTransformer.restoreContext(oldContext, new VarExpr(new Use(result)));
-	}
-
-	/**
-	 * Transforms AST state variables to IR state variables. The initial value
-	 * of an AST state variable is evaluated to a constant by
-	 * {@link #exprEvaluator}.
-	 * 
-	 * @param stateVariables
-	 *            a list of AST state variables
-	 * @return an ordered map of IR state variables
-	 */
-	private OrderedMap<String, StateVariable> transformGlobalVariables(
-			List<AstVariable> stateVariables) {
-		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
-		Context context = astTransformer.getContext();
-		for (AstVariable astVariable : stateVariables) {
-			Location location = Util.getLocation(astVariable);
-			Type type = astVariable.getIrType();
-			String name = astVariable.getName();
-			boolean assignable = !astVariable.isConstant();
-
-			// initial value (if any) has been computed by validator
-			Object initialValue = astVariable.getInitialValue();
-
-			StateVariable stateVariable = new StateVariable(location, type,
-					name, assignable, initialValue);
-			stateVars.put(file, location, name, stateVariable);
-
-			context.putVariable(astVariable, stateVariable);
-		}
-
-		return stateVars;
 	}
 
 	/**

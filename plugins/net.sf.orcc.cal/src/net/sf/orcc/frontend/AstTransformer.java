@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -65,6 +66,7 @@ import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -280,6 +282,11 @@ public class AstTransformer {
 			Location location = Util.getLocation(expression);
 
 			Variable variable = context.getVariable(astVariable);
+			if (variable == null
+					&& astVariable.eContainer() instanceof AstActor) {
+				variable = transformGlobalVariable(astVariable);
+			}
+
 			if (variable.getType().isList()) {
 				Use use = new Use(variable);
 				Expression varExpr = new VarExpr(location, use);
@@ -704,6 +711,8 @@ public class AstTransformer {
 	 */
 	private String file;
 
+	private Procedure initialize;
+
 	/**
 	 * A map from AST functions to IR procedures.
 	 */
@@ -847,6 +856,18 @@ public class AstTransformer {
 	 */
 	public Context getContext() {
 		return context;
+	}
+
+	/**
+	 * Returns the value of the initialize attribute (which is set to null when
+	 * the method returns).
+	 * 
+	 * @return the initialize procedure (or <code>null</code>)
+	 */
+	public Procedure getInitialize() {
+		Procedure initialize = this.initialize;
+		this.initialize = null;
+		return initialize;
 	}
 
 	/**
@@ -1036,6 +1057,84 @@ public class AstTransformer {
 
 		procedures.put(file, location, name, procedure);
 		mapFunctions.put(astFunction, procedure);
+	}
+
+	/**
+	 * Transforms AST state variables to IR state variables. The initial value
+	 * of an AST state variable is evaluated to a constant by
+	 * {@link #exprEvaluator}.
+	 * 
+	 * @param stateVariables
+	 *            a list of AST state variables
+	 * @return an ordered map of IR state variables
+	 */
+	public StateVariable transformGlobalVariable(AstVariable astVariable) {
+		Location location = Util.getLocation(astVariable);
+		Type type = astVariable.getIrType();
+		String name = astVariable.getName();
+		boolean assignable = !astVariable.isConstant();
+
+		// initial value (if any) has been computed by validator
+		Object initialValue = astVariable.getInitialValue();
+
+		// this is true when the variable is initialized by a generator
+		boolean mustInitialize = false;
+		if (type.isList() && initialValue != null) {
+			AstExpressionList list = (AstExpressionList) astVariable.getValue();
+			if (!list.getGenerators().isEmpty()) {
+				initialValue = null;
+				mustInitialize = true;
+			}
+		}
+
+		// create state variable with no initialize
+		StateVariable stateVariable = new StateVariable(location, type, name,
+				assignable, initialValue);
+
+		context.putVariable(astVariable, stateVariable);
+
+		// translate and add to initialize
+		if (mustInitialize) {
+			if (initialize == null) {
+				initialize = new Procedure("_initialize", location,
+						IrFactory.eINSTANCE.createTypeVoid());
+			}
+
+			Context oldContext = newContext(initialize);
+			context.newScope();
+
+			exprTransformer.setTarget(stateVariable, new ArrayList<Expression>(
+					0));
+			Expression expression = transformExpression(astVariable.getValue());
+			createAssignOrStore(location, stateVariable, null, expression);
+			exprTransformer.clearTarget();
+
+			context.restoreScope();
+			restoreContext(oldContext, null);
+		}
+
+		return stateVariable;
+	}
+
+	/**
+	 * Transforms AST state variables to IR state variables. The initial value
+	 * of an AST state variable is evaluated to a constant by
+	 * {@link #exprEvaluator}.
+	 * 
+	 * @param stateVariables
+	 *            a list of AST state variables
+	 * @return an ordered map of IR state variables
+	 */
+	public OrderedMap<String, StateVariable> transformGlobalVariables(
+			List<AstVariable> stateVariables) {
+		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
+		for (AstVariable astVariable : stateVariables) {
+			StateVariable variable = transformGlobalVariable(astVariable);
+			stateVars.put(file, variable.getLocation(), variable.getName(),
+					variable);
+		}
+
+		return stateVars;
 	}
 
 	/**
