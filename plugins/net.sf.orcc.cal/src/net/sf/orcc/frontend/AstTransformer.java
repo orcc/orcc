@@ -566,6 +566,7 @@ public class AstTransformer {
 				List<Expression> currentIndexes = new ArrayList<Expression>(
 						indexes);
 				currentIndexes.add(new IntExpr(i));
+				i++;
 
 				createAssignOrStore(location, target, currentIndexes, value);
 			}
@@ -607,6 +608,12 @@ public class AstTransformer {
 
 			// retrieve IR procedure
 			AstProcedure astProcedure = astCall.getProcedure();
+			// special case if the procedure is a built-in procedure
+			if (astProcedure.eContainer() == null) {
+				System.err.println("TODO built-in procedure");
+				return null;
+			}
+
 			if (!mapProcedures.containsKey(astProcedure)) {
 				transformProcedure(astProcedure);
 			}
