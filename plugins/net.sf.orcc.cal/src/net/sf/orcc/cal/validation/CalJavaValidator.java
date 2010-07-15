@@ -394,6 +394,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			@Override
 			public Void caseAstGenerator(AstGenerator generator) {
 				nameProvider.getQualifiedName(generator);
+				super.caseAstGenerator(generator);
 				return null;
 			}
 
@@ -407,6 +408,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			@Override
 			public Void caseAstStatementForeach(AstStatementForeach foreach) {
 				nameProvider.getQualifiedName(foreach);
+				super.caseAstStatementForeach(foreach);
 				return null;
 			}
 
