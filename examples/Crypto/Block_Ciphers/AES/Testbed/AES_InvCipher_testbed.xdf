@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="ARC4_testbed">
+<XDF name="AES_InvCipher_testbed">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -12,29 +12,29 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="ARC4">
+    <Instance id="Validator">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="ARC4"/>
+        <Class name="Validator_AES"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Source_ARC4">
+    <Instance id="AES_InvCipher">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Source_ARC4"/>
+        <Class name="../AES_InvCipher"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Validator_ARC4">
+    <Instance id="Source">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Validator_ARC4"/>
+        <Class name="Source_AES_InvCipher"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -42,9 +42,8 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="ARC4" dst-port="IP1_Key" src="Source_ARC4" src-port="OP1_Key"/>
-    <Connection dst="ARC4" dst-port="IP2_Text" src="Source_ARC4" src-port="OP2_PT"/>
-    <Connection dst="Validator_ARC4" dst-port="IP2_PT" src="Source_ARC4" src-port="OP2_PT"/>
-    <Connection dst="Validator_ARC4" dst-port="IP3_GR" src="Source_ARC4" src-port="OP3_GR"/>
-    <Connection dst="Validator_ARC4" dst-port="IP1_CT" src="ARC4" src-port="OP"/>
+    <Connection dst="AES_InvCipher" dst-port="Key" src="Source" src-port="OP2_Key"/>
+    <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP3_GR"/>
+    <Connection dst="AES_InvCipher" dst-port="Ciphertext" src="Source" src-port="OP1_CT"/>
+    <Connection dst="Validator" dst-port="IP1_Data" src="AES_InvCipher" src-port="Plaintext"/>
 </XDF>

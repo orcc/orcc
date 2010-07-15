@@ -1,4 +1,4 @@
-/*-
+/**
  * This FU is part of the testbed of a CAL implementation of AES (Rijndael).
  * It sends a key, a sequence of plaintext and the golden response (ciphertext) to the AES decipher for testing purpose.
  * 

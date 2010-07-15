@@ -1,8 +1,10 @@
-/*-
+/**
  * This FU is part of a CAL implementation of AES (Rijndael).
  * It performs AddRoundKey process in each round of the AES encipher/decipher.
  * 
  * FU ID: AddRoundKey
+ * One actor parameter:
+ * 1) IS_ENCIPHER: true = encipher mode, false = decipher mode
  * Three input ports:
  * 1) IP1_Text: the plaintext/ciphertext
  * 2) IP2_Key: the key (the first byte should be the key size)
@@ -20,7 +22,7 @@
 
 // import all caltrop.lib.BitOps;
 
-actor AddRoundKey (bool bEncipher=true) uint(size=8) IP1_Text, uint(size=8) IP2_Key, uint(size=8) IP3_FD ==> 
+actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP2_Key, uint(size=8) IP3_FD ==> 
 		uint(size=8) OP1_Text, uint(size=8) OP2_FD :
 
 	// The following variables are values for AES-256.
@@ -134,7 +136,7 @@ actor AddRoundKey (bool bEncipher=true) uint(size=8) IP1_Text, uint(size=8) IP2_
 		// printKeyEx();
 		// Reverse the expanded key round by round for decipher.
 		// This will allow us not to change the other actions in this actor.
-	 	if not bEncipher then
+	 	if not IS_ENCIPHER then
 			index := 0;
 			index2 := lshift(Nr,4);
 			foreach int r in Integers(0,Nr/2) do

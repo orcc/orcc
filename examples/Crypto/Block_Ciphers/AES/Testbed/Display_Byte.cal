@@ -1,4 +1,4 @@
-/*-
+/**
  * This FU is used to display a sequence of tokens byte by byte in hexadecimal format.
  * 
  * FU ID: Display_Byte

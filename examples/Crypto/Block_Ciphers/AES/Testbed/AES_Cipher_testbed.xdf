@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="AES_Cipher_Orcc">
+<XDF name="AES_Cipher_testbed">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -12,38 +12,29 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="source">
+    <Instance id="Source">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Source"/>
+        <Class name="Source_AES_Cipher"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="AES_Encipher">
+    <Instance id="Validator">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="AES_Cipher"/>
+        <Class name="Validator_AES"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="KeyGenerator">
+    <Instance id="AES_Cipher">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="KeyGenerator_AES"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="Display">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Display_Byte"/>
+        <Class name="../AES_Cipher"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -51,7 +42,8 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="AES_Encipher" dst-port="Key" src="KeyGenerator" src-port="Key"/>
-    <Connection dst="AES_Encipher" dst-port="Plaintext" src="source" src-port="O"/>
-    <Connection dst="Display" dst-port="IP" src="AES_Encipher" src-port="Ciphertext"/>
+    <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP3_GR"/>
+    <Connection dst="Validator" dst-port="IP1_Data" src="AES_Cipher" src-port="Ciphertext"/>
+    <Connection dst="AES_Cipher" dst-port="Plaintext" src="Source" src-port="OP1_PT"/>
+    <Connection dst="AES_Cipher" dst-port="Key" src="Source" src-port="OP2_Key"/>
 </XDF>

@@ -1,4 +1,4 @@
-/*-
+/**
  * This FU is part of the testbed of a CAL implementation of AES (Rijndael).
  * It validates if the output of the AES encipher/decipher matches the golden responses.
  * 

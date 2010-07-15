@@ -1,4 +1,4 @@
-/*-
+/**
  * This FU is part of a CAL implementation of AES (Rijndael).
  * It performs MixColumns process in each round of the AES encipher.
  * 

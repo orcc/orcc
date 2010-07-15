@@ -1,4 +1,4 @@
-/*-
+/**
  * This FU is part of the testbed of a CAL implementation of AES (Rijndael).
  * It sends a key to the AES encipher and decipher for testing purpose.
  * 

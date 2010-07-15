@@ -1,15 +1,12 @@
 *********** CAL Implementation of AES Standard ***********
 
-Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz
-
-14 July, 2010
+Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz, 15 July, 2010
 
 **********************************************************
 
 This CAL implementation of AES Standard (FIPS 197) is composed of the following files.
 The naming of cal files follow the terms used in FIPS 197.
 
-All cal and xdf files have been tested with OpenDF and Orcc simulators.
 The test vectors and golden responses are taken from FIPS 197.
 
 All the three editions of AES are implemented: AES-128, AES-192, and AES-256.
@@ -44,7 +41,7 @@ AES_Cipher.xdf: AES encipher (input ports: plaintext and key, output port: ciphe
 
 AES_InvCipher.xdf: AES decipher (input ports: ciphertext and key, output port: plaintext)
 
-== Source and Display FUs ==
+== Testbeds ==
 
 -- Source FUs --
 
@@ -61,18 +58,23 @@ KeyGenerator_AES.cal: generating key for AES encipher and decipher
 
 Display_Byte.cal: Display FU showing results as hexadecimal numbers
 
-== Validator FU ==
+-- Validator FU --
 
 Validator_AES.cal: comparing the output of a FU against a golden response (used for validating the functionalities of AES encipher and decipher)
 
-== FU Networks ==
+-- FU Networks --
 
--- Testbeds with test vectors and golden responses --
+---- Testbeds for Orcc (Test vectors and golden response) ----
 
 AES_Cipher_testbed.xdf
 AES_InvCipher_testbed.xdf
 
--- Testbeds working with Orcc --
+---- Testbeds for OpenDF (Test vectors and golden response) ----
+
+AES_Cipher_testbed_OpenDF.xdf
+AES_InvCipher_testbed_OpenDF.xdf
+
+---- Testbeds for Orcc (Read a file and encrypt/decrypt it) ----
 
 AES_Cipher_Orcc.xdf
 AES_InvCipher_Orcc.xdf
