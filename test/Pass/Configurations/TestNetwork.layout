@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="load_store_test" x="57" y="70"/>
+      <vertex id="idct_high_level" x="145" y="84"/>
    </vertices>
 </layout>
