@@ -333,6 +333,14 @@ public class AstTransformer {
 		}
 
 		/**
+		 * Clears the target and indexes attributes.
+		 */
+		public void clearTarget() {
+			target = null;
+			indexes = new ArrayList<Expression>(0);
+		}
+
+		/**
 		 * Returns a list of CFG nodes from the given expression. This method
 		 * creates a new block node to hold the statements created when
 		 * translating the expression, transforms the expression, and transfers
@@ -557,6 +565,7 @@ public class AstTransformer {
 
 			exprTransformer.setTarget(target, indexes);
 			Expression value = transformExpression(astAssign.getValue());
+			exprTransformer.clearTarget();
 			createAssignOrStore(location, target, indexes, value);
 
 			return null;
@@ -750,6 +759,8 @@ public class AstTransformer {
 	public void clear() {
 		mapFunctions.clear();
 		mapProcedures.clear();
+
+		exprTransformer.clearTarget();
 
 		context = new Context(null, null);
 
@@ -1051,9 +1062,10 @@ public class AstTransformer {
 
 		AstExpression value = astVariable.getValue();
 		if (value != null) {
+			exprTransformer.setTarget(local, new ArrayList<Expression>(0));
 			Expression expression = transformExpression(value);
-			Assign assign = new Assign(location, local, expression);
-			addInstruction(assign);
+			createAssignOrStore(location, local, null, expression);
+			exprTransformer.clearTarget();
 		}
 
 		context.putVariable(astVariable, local);
