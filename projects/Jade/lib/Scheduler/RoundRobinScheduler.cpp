@@ -47,6 +47,8 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
 #include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallString.h"
+#include "llvm/Support/CommandLine.h"
 
 #include "Jade/JIT.h"
 #include "Jade/Actor/Actor.h"
@@ -60,14 +62,12 @@ using namespace std;
 using namespace llvm;
 
 
+extern cl::opt<std::string> VidFile;
 
-extern "C" void source_initialize();
-extern "C" void source_scheduler();
 extern "C" void display_scheduler();
 extern "C" struct fifo_char_s *display_B;
 extern "C" struct fifo_short_s *display_WIDTH;
 extern "C" struct fifo_short_s *display_HEIGHT;
-extern "C" struct fifo_char_s *source_O;
 
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder* decoder): Context(C) {
 	this->jit = jit;
@@ -87,7 +87,6 @@ void RoundRobinScheduler::createScheduler(){
 
 	// create scheduler
 	map<Instance*, InstancedActor*>* InstancedActors = decoder->getInstancedActors();
-
 	scheduler = cast<Function>(module->getOrInsertFunction("scheduler", Type::getVoidTy(Context),
                                           (Type *)0));
 										  
@@ -132,30 +131,35 @@ void RoundRobinScheduler::execute(){
 	Module* module = decoder->getModule();
 
 	//Get instance source and display
-	Instance* source = decoder->getInstance("source");
-	Instance* display = decoder->getInstance("display");
+	Instance* displayInst = decoder->getInstance("display");
+	InstancedActor* display = displayInst->getInstancedActor();
+	Instance* sourceInst = decoder->getInstance("source");
+	InstancedActor* source = sourceInst->getInstancedActor();
+
+	
+	//Insert source file string
+	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),VidFile.size()+1); 
+	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context,VidFile), "fileName", 0, false, 0);
+
+	//Store adress in input file of source
+	GlobalVariable* sourceFile = source->getStateVar(sourceInst->getActor()->getStateVar("input_file"));
+	Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
+	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
 
 	//Get port to connect
-	Port* port_O = source->getActor()->getPort("O");
-	Port* port_B = display->getActor()->getPort("WIDTH");
-	Port* port_WIDTH = display->getActor()->getPort("HEIGHT");
-	Port* port_HEIGHT = display->getActor()->getPort("B");
+	Port* port_WIDTH = display->getPort("WIDTH");
+	Port* port_HEIGHT = display->getPort("HEIGHT");
+	Port* port_B = display->getPort("B");
 
 	//Get instance scheduler
-	ActionScheduler* source_scheduler = source->getInstancedActor()->getActionScheduler();
-	ActionScheduler* display_scheduler = display->getInstancedActor()->getActionScheduler();
+	ActionScheduler* llvmdisplaySched = display->getActionScheduler();
 
 	// Get pointer 
-	jit->MapActionScheduler(source_scheduler, (void*) source_scheduler);
-	jit->MapActionScheduler(display_scheduler, (void*) display_scheduler);
+	jit->MapActionScheduler(llvmdisplaySched, (void*) display_scheduler);
 	display_B = (fifo_char_s*)(*(fifo_char_s**)jit->getPortPointer(port_B));
 	display_WIDTH = (fifo_short_s*)(*(fifo_short_s**)jit->getPortPointer(port_WIDTH));
 	display_HEIGHT = (fifo_short_s*)(*(fifo_short_s**)jit->getPortPointer(port_HEIGHT));
-	source_O = (fifo_char_s*)(*(fifo_char_s**)jit->getPortPointer(port_O));
 	
-
-	source_initialize();
-
 	Function* main = module->getFunction("scheduler");
 	jit->run(main);
 }

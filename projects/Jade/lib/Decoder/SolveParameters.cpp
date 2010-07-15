@@ -74,13 +74,8 @@ void SolveParameters::solve(Instance* instance){
 	
 	for (it= parameters->begin(); it != parameters->end(); it++){
 		Variable* parameter = actor->getParameter(it->first);
-		GlobalVariable* parameterVar = instancedActor->getParameter(parameter);
+		GlobalVariable* parameterVar = instancedActor->getParameterVar(parameter);
 		ConstantInt* value = cast<ConstantInt>(it->second);
-		const IntegerType* type = value->getType();
 		parameterVar->setInitializer(value);
-		
-
 	}
-
-
 }

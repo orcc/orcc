@@ -2,11 +2,17 @@
 target datalayout = "e-p:32:32:32-i1:8:8-i8:8:8-i16:16:16-i32:32:32-i64:64:64-f32:32:32-f64:64:64-v64:64:64-v128:128:128-a0:0:64-f80:32:32-n8:16:32"
 target triple = "i386-mingw32"
 
+%struct.FILE = type { i8*, i32, i8*, i32, i32, i32, i32, i8* }
 %struct.fifo_i8_s = type { i32, i8*, i32, i32, i32, [1024 x i8] }
 %struct.fifo_i32_s = type { i32, i32*, i32, i32, i32, [1024 x i32] }
 %struct.fifo_i16_s = type { i32, i16*, i32, i32, i32, [1024 x i16] }
 
-declare i32 @printf(i8* noalias , ...) nounwind 
+declare i32 @fseek(%struct.FILE*, i32, i32) nounwind
+declare i32 @fread(i8*, i32, i32, %struct.FILE*) nounwind
+declare i32 @puts(i8*)
+declare void @exit(i32) noreturn nounwind
+declare %struct.FILE* @fopen(i8*, i8*) nounwind
+declare i32 @printf(i8*, ...) nounwind 
 
 define internal i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:

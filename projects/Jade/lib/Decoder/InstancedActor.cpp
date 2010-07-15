@@ -106,7 +106,7 @@ void InstancedActor::addInputConnection(Port* port, GlobalVariable* variable){
 	port->setGlobalVariable(variable);
 }
 
-GlobalVariable* InstancedActor::getParameter(Variable* parameter){
+GlobalVariable* InstancedActor::getParameterVar(Variable* parameter){
 	map<Variable*, llvm::GlobalVariable*>::iterator it;
 	
 	it = parameters->find(parameter);
@@ -130,6 +130,19 @@ GlobalVariable* InstancedActor::getVar(Port* port){
 
 	// Search inside output ports 
 	return getOutputVar(port);
+}
+
+GlobalVariable* InstancedActor::getStateVar(Variable* stateVar){
+	map<Variable*, GlobalVariable*>::iterator it;
+	
+	it = stateVars->find(stateVar);
+
+	if(it == stateVars->end()){
+		// This parameter has not be found in the instanced actor
+		return NULL;
+	}
+
+	return (*it).second;
 }
 
 Port* InstancedActor::getPort(string portName){

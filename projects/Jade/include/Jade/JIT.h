@@ -48,7 +48,7 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/PassManager.h"
 #include "llvm/ExecutionEngine/JIT.h"
-
+#include "llvm/System/Signals.h"
 #include "llvm/Transforms/Utils/Cloning.h"
 
 class AbstractFifo;
@@ -132,6 +132,8 @@ public:
 	 * @return True if successfull, otherwise false
      */
 	llvm::GlobalVariable* addVariable(std::string prefix, llvm::GlobalVariable* variable);
+
+	llvm::sys::Path getFilename(std::string bitcode, std::string directory);
 
 
 	/**

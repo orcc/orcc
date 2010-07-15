@@ -59,11 +59,11 @@ using namespace llvm;
 
 // options
 
-static cl::opt<std::string>
+cl::opt<std::string>
 XDFFile("xdf", cl::Required, cl::ValueRequired, cl::desc("XDF network file"), cl::value_desc("XDF filename"));
-static cl::opt<std::string>
+cl::opt<std::string>
 BSDLFile("bsdl", cl::desc("Bitstream description file"), cl::value_desc("BSDL filename"));
-static cl::opt<std::string>
+cl::opt<std::string>
 VidFile("i", cl::Required, cl::ValueRequired, cl::desc("Encoded video file"), cl::value_desc("Video filename"));
 
 extern "C"{

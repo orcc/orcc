@@ -44,7 +44,6 @@
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/MemoryBuffer.h"
-#include "llvm/System/Signals.h"
 
 #include "Jade/JIT.h"
 #include "Jade/Actor/Actor.h"
@@ -56,45 +55,88 @@ using namespace llvm;
 using namespace std;
 
 static cl::opt<bool> Verbose("v", cl::desc("Print information about actions taken"));
+extern cl::opt<std::string> VTLDir;
+extern cl::opt<std::string> ToolsDir;
  
 Module* JIT::LoadBitcode(string file, string directory) {
-	sys::Path Filename;
 	string ErrorMessage;
 	file.append(".bc");
+
+	sys::Path Filename = getFilename(file, directory);
   
+	if (Verbose) cout << "Loading '" << Filename.c_str() << "'\n";
+	Module* Result = 0;
 
-	if (!directory.empty()){
-		file.insert(0,directory);
+	const std::string &FNStr = Filename.c_str();
+	if (MemoryBuffer *Buffer = MemoryBuffer::getFileOrSTDIN(FNStr,
+															&ErrorMessage)) {
+		Result = ParseBitcodeFile(Buffer, Context, &ErrorMessage);
+		delete Buffer;
 	}
+	if (Result) return Result;   // Load successful!
 
-	if (!Filename.set(file)) {
-		cout << "Invalid file name: '" << file << "'\n";
-		return NULL;
+	if (Verbose) {
+		cout << "Error opening bitcode file: '" << Filename.c_str() << "'";
+		if (ErrorMessage.size()) cout << ": " << ErrorMessage;
+		cout << "\n";
+
 	}
-
-	if (Filename.exists()) {
-		if (Verbose) cout << "Loading '" << Filename.c_str() << "'\n";
-		Module* Result = 0;
-
-		const std::string &FNStr = Filename.c_str();
-		if (MemoryBuffer *Buffer = MemoryBuffer::getFileOrSTDIN(FNStr,
-																&ErrorMessage)) {
-			Result = ParseBitcodeFile(Buffer, Context, &ErrorMessage);
-			delete Buffer;
-		}
-		if (Result) return Result;   // Load successful!
-
-		if (Verbose) {
-			cout << "Error opening bitcode file: '" << Filename.c_str() << "'";
-			if (ErrorMessage.size()) cout << ": " << ErrorMessage;
-			cout << "\n";
-
-		}
-	} else {
-		cout << "Bitcode file: '" << Filename.c_str() << "' does not exist.\n";
-	}
-
+	
 	return NULL;
+}
+
+sys::Path JIT::getFilename(string bitcode, string directory){
+	sys::Path Filename;
+
+	//Filename is correct
+	if (!Filename.set(bitcode)) {
+		cout << "Invalid file name: '" << bitcode << "'\n";
+		exit(0);
+	}
+
+	//Test if file is located in current folder
+	if (Filename.exists()) {
+		return Filename;
+	}
+
+	//Test if file is located in directory
+	if (!directory.empty()){
+		string DirFile = bitcode;
+
+		DirFile.insert(0,directory);
+		Filename.set(DirFile);
+
+		if (Filename.exists()) {
+			return Filename;
+		}
+	}
+
+	//Test if file is located in VTL Folder
+	if (!VTLDir.empty()){
+		string VtlFile = bitcode;
+
+		VtlFile.insert(0,VTLDir);
+		Filename.set(VtlFile);
+
+		if (Filename.exists()) {
+			return Filename;
+		}
+	}
+
+	//Test if file is located in tools Folder
+	if (!ToolsDir.empty()){
+		string ToolFile = bitcode;
+
+		ToolFile.insert(0,ToolsDir);
+		Filename.set(ToolFile);
+
+		if (Filename.exists()) {
+			return Filename;
+		}
+	}
+
+	cout << "Bitcode file: '" << Filename.c_str() << "' does not exist.\n";
+	exit(0);
 }
 
 

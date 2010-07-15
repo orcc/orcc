@@ -9,7 +9,12 @@ target triple = "i386-mingw32"
 
 @.str = private constant [5 x i8] c"%d \0A\00", align 1 ; <[5 x i8]*> [#uses=1]
 
-declare i32 @printf(i8* noalias , ...) nounwind 
+declare i32 @fseek(%struct.FILE*, i32, i32) nounwind
+declare i32 @fread(i8*, i32, i32, %struct.FILE*) nounwind
+declare i32 @puts(i8*)
+declare void @exit(i32) noreturn nounwind
+declare %struct.FILE* @fopen(i8*, i8*) nounwind
+declare i32 @printf(i8*, ...) nounwind
 
 define internal i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:

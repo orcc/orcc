@@ -232,6 +232,16 @@ public:
 	}
 
 	/**
+	 * @brief Getter of a state variable
+	 *
+	 *  @param name : name of string of the port identifier
+	 * 
+	 * @return the corresponding state variable
+	 */
+	Variable* getStateVar(std::string name);
+
+
+	/**
 	 * @brief Getter of actionScheduler
 	 *
 	 * Returns the action scheduler of this actor.

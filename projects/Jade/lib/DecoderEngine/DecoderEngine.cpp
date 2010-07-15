@@ -51,7 +51,6 @@
 #include "Jade/Network/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
-#include "SourceActor.h"
 #include "DisplayActor.h"
 #include "Options.h"
 
@@ -89,10 +88,6 @@ int DecoderEngine::load(Network* network) {
 
 	
 	// Insert actor source and display 
-	//actors.insert(pair<string,Actor*>("../../VTL/System/Source", new SourceActor(Context, fifo)));
-	//actors.insert(pair<string,Actor*>("../../VTL/System/Display", new DisplayActor(Context, fifo)));
-	
-	actors.insert(pair<string,Actor*>("Source", new SourceActor(Context, fifo)));
 	actors.insert(pair<string,Actor*>("Display", new DisplayActor(Context, fifo)));
 	
 
@@ -110,14 +105,14 @@ int DecoderEngine::load(Network* network) {
 	// Instanciating decoder
 	decoder->instanciate();
 
-	RoundRobinScheduler scheduler(Context, jit, decoder);
-	
 	// Setting connections of the decoder
 	fifo->setConnections(decoder);
 
+	RoundRobinScheduler scheduler(Context, jit, decoder);
+
 	jit->initEngine(decoder);
 
-	jit->optimize(decoder);
+	//jit->optimize(decoder);
 
 	jit->printModule("module.txt", decoder);
 

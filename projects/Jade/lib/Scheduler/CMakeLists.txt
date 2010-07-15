@@ -22,7 +22,6 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 add_library (Scheduler
   RoundRobinScheduler.cpp
   display.c
-  source.c
   fifoCircular.h
   fifoCircular_generic.h
   fifoCircular_generic.inl

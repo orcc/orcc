@@ -7,6 +7,4 @@ add_library (DecoderEngine
   DisplayActor.cpp
   DisplayActor.h
   Options.h
-  SourceActor.cpp
-  SourceActor.h
  )

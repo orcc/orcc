@@ -124,7 +124,28 @@ public:
 	 *  @return the corresponding llvm::GlobalVariable  
 	 *
      */
-	llvm::GlobalVariable* getParameter(Variable* parameter);
+	llvm::GlobalVariable* getParameterVar(Variable* parameter);
+
+	/**
+     *  @brief get the Parameter corresponding to the given name
+	 *
+	 *  @param name : string name of the paramter
+	 *
+	 *  @return the corresponding Variable  
+	 *
+     */
+	Variable* getParameter(std::string name);
+
+
+	/**
+     *  @brief get the llvm::GlobalVariable corresponding to the parameter
+	 *
+	 *  @param parameter : Variable of the parameter
+	 *
+	 *  @return the corresponding llvm::GlobalVariable  
+	 *
+     */
+	//llvm::GlobalVariable* getParameterVar(Variable* parameter);
 
 	/**
      *  @brief add an input connection to the instance
@@ -181,6 +202,8 @@ public:
 	 *
      */
 	Port* getOutput(std::string portName);
+
+	llvm::GlobalVariable* getStateVar(Variable* port);
 
 
 private:

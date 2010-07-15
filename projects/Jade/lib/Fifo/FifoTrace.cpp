@@ -54,6 +54,8 @@
 #include "Jade/Network/Network.h"
 #include "Jade/Network/Connection.h"
 #include "Jade/Network/Vertex.h"
+
+#include "fifoTrace.h"
 //------------------------------
 
 using namespace llvm;
@@ -246,7 +248,7 @@ void FifoTrace::setConnections(Decoder* decoder){
 
 	//Associate connections to a file
 	for (int i = 0; i < edges; i++){
-		setFile((Connection*)graph->getEdge(i));
+		//setFile((Connection*)graph->getEdge(i));
 	}
 }
 
@@ -259,8 +261,9 @@ void FifoTrace::setFile(Connection* connection){
 	Vertex* dstInstance = (Vertex*)connection->getSink();
 
 	//Creating file
-	fileName << dstInstance->getName() << dst->getName();
+	fileName << dstInstance->getName() << dst->getName() << ".txt";
 	FILE* filePtr = fopen(fileName.str().c_str(),"w");
 
-
+	fifo_char_s* fifo = (fifo_char_s*)(*(fifo_char_s**)jit->getPortPointer(dst));
+	fifo->pFile = filePtr;
 }

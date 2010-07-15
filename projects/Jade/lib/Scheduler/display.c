@@ -263,14 +263,14 @@ void display_scheduler() {
 		if (fifo_short_has_tokens(display_WIDTH, 1) && fifo_short_has_tokens(display_HEIGHT, 1)) {
 			short *ptr, width, height;
 
-			//ptr = fifo_short_read(display_WIDTH, 1);
-			ptr = (short*)fifo_char_read((struct fifo_char_s *)display_WIDTH, 1); //This is a fix for an unknow bug yet
+			ptr = fifo_short_read(display_WIDTH, 1);
+			//ptr = (short*)fifo_char_read((struct fifo_char_s *)display_WIDTH, 1); //This is a fix for an unknow bug yet
 			//ptr = (short*)getReadPtr((struct fifo_s *)display_WIDTH, 1);
 			width = ptr[0] * 16;
 			fifo_short_read_end(display_WIDTH, 1);
 
-			//ptr = fifo_short_read(display_HEIGHT, 1);
-			ptr = (short*)fifo_char_read((struct fifo_char_s *)display_HEIGHT, 1); //As well as there
+			ptr = fifo_short_read(display_HEIGHT, 1);
+			//ptr = (short*)fifo_char_read((struct fifo_char_s *)display_HEIGHT, 1); //As well as there
 			//ptr = (short*)getReadPtr((struct fifo_s *)display_HEIGHT, 1);
 			height = ptr[0] * 16;
 			fifo_short_read_end(display_HEIGHT, 1);

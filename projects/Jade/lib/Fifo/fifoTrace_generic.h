@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,53 +27,17 @@
  * SUCH DAMAGE.
  */
 
-/**
-@brief Description of the SourceActor class interface
-@author Jerome Gorin
-@file SourceActor.h
-@version 0.1
-@date 22/03/2010
-*/
-
-//------------------------------
-#ifndef SOURCEACTOR_H
-#define SOURCEACTOR_H
-
-namespace llvm{
-	class LLVMContext;
-	class Module;
-}
-
-class AbstractFifo;
-
-#include "Jade/Actor/Actor.h"
-//------------------------------
-
-/**
- * @brief  This class defines a source actor to be connected in the DecoderEngine.
- * 
- * @author Jerome Gorin
- * 
- */
-class SourceActor : public Actor  {
-public:
-	SourceActor(llvm::LLVMContext& C, AbstractFifo* fifo);
-	~SourceActor();
-
-
-	/**
-     *  @brief Indicate whether this actor is parseable or not
-	 *  
-	 *  @return boolean designing the actor parsing ability
-	 *
-     */
-	bool isParseable(){return false;};
-
-private:
-	llvm::Module* module;
-
-	/** LLVM Context */
-	llvm::LLVMContext &Context;
+/** lock free fifo ring buffer structure */
+struct FIFO_S(T) {
+	int size; /** size of the ringbuffer */
+	T *contents; /** the memory containing the ringbuffer */
+	
+	int read_ind; /** the current position of the reader */
+	int write_ind; /** the current position of the writer */
+	int fill_count; /** the fill count */
+	
+	FILE * pFile;
+	T fifo_buffer[1024];
 };
 
-#endif
+#include "fifoTrace_generic.inl"

@@ -136,3 +136,14 @@ Variable* Actor::getParameter(std::string name){
 
 	return (*it).second;
 }
+
+Variable* Actor::getStateVar(std::string name){
+	map<string, Variable*>::iterator it;
+	it = stateVars->find(name);
+
+	if(it == stateVars->end()){
+		return NULL;
+	}
+
+	return (*it).second;
+}

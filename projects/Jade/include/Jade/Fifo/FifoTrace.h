@@ -104,6 +104,11 @@ private:
 		fifo["i8_readEnd"] = "fifo_i8_read_end";
 
 		fifo["printf"] = "printf";
+		fifo["fseek"] = "fseek";
+		fifo["fread"] = "fread";
+		fifo["puts"] = "puts";
+		fifo["exit"] = "exit";
+		fifo["fopen"] = "fopen";
 		return fifo;
 	}
 
