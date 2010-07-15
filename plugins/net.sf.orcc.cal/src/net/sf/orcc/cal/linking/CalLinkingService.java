@@ -72,38 +72,28 @@ public class CalLinkingService extends DefaultLinkingService {
 	public CalLinkingService() {
 		functions = new HashMap<String, AstFunction>();
 
-		addFunction("bitand",
-				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
-						IrFactory.eINSTANCE.createTypeInt(32) },
+		addFunction("bitand", IrFactory.eINSTANCE.createTypeInt(32),
+				IrFactory.eINSTANCE.createTypeInt(32),
 				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("bitnot",
-				new Type[] { IrFactory.eINSTANCE.createTypeInt(32) },
+		addFunction("bitnot", IrFactory.eINSTANCE.createTypeInt(32),
 				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("bitor",
-				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
-						IrFactory.eINSTANCE.createTypeInt(32) },
+		addFunction("bitor", IrFactory.eINSTANCE.createTypeInt(32),
+				IrFactory.eINSTANCE.createTypeInt(32),
 				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("bitxor",
-				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
-						IrFactory.eINSTANCE.createTypeInt(32) },
+		addFunction("bitxor", IrFactory.eINSTANCE.createTypeInt(32),
+				IrFactory.eINSTANCE.createTypeInt(32),
 				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("lshift",
-				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
-						IrFactory.eINSTANCE.createTypeInt(32) },
+		addFunction("lshift", IrFactory.eINSTANCE.createTypeInt(32),
+				IrFactory.eINSTANCE.createTypeInt(32),
 				IrFactory.eINSTANCE.createTypeInt(32));
-		addFunction("rshift",
-				new Type[] { IrFactory.eINSTANCE.createTypeInt(32),
-						IrFactory.eINSTANCE.createTypeInt(32) },
+		addFunction("rshift", IrFactory.eINSTANCE.createTypeInt(32),
+				IrFactory.eINSTANCE.createTypeInt(32),
 				IrFactory.eINSTANCE.createTypeInt(32));
 
 		procedures = new HashMap<String, AstProcedure>();
 
-		AstProcedure procedure;
-		procedure = CalFactory.eINSTANCE.createAstProcedure();
-		procedure.setName("println");
-		procedures.put(procedure.getName(), procedure);
-		procedure.setName("print");
-		procedures.put(procedure.getName(), procedure);
+		addProcedure("print");
+		addProcedure("println");
 	}
 
 	/**
@@ -117,12 +107,28 @@ public class CalLinkingService extends DefaultLinkingService {
 	 * @param returnType
 	 *            return type
 	 */
-	private void addFunction(String name, Type[] parameters, Type returnType) {
+	private void addFunction(String name, Type returnType, Type... parameters) {
 		AstFunction function;
 		function = CalFactory.eINSTANCE.createAstFunction();
 		function.setName(name);
 		function.setIrType(returnType);
 		functions.put(name, function);
+	}
+
+	/**
+	 * Adds a new procedure to the built-in procedures map with the given
+	 * parameters types .
+	 * 
+	 * @param name
+	 *            function name
+	 * @param parameters
+	 *            types of function parameters
+	 */
+	private void addProcedure(String name, Type... parameters) {
+		AstProcedure procedure;
+		procedure = CalFactory.eINSTANCE.createAstProcedure();
+		procedure.setName(name);
+		procedures.put(name, procedure);
 	}
 
 	/**
