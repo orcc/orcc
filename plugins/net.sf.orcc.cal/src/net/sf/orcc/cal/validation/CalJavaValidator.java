@@ -53,11 +53,13 @@ import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
+import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.ir.Type;
 
 import org.eclipse.emf.ecore.EObject;
@@ -144,42 +146,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public void checkActor(AstActor actor) {
 		checker = new TypeChecker();
 
+		((CalQualifiedNameProvider) nameProvider).resetUntaggedCount();
+		getNames(actor);
+
 		evaluateStateVariables(actor.getStateVariables());
 
 		// transforms AST types to IR types
 		// this is a prerequisite for type checking
 		TypeTransformer typeTransformer = new TypeTransformer();
 		typeTransformer.transformTypes(actor);
-	}
-
-	@Check
-	public void checkGenerator(AstGenerator generator) {
-		AstExpression astValue = generator.getLower();
-		Object initialValue = new AstExpressionEvaluator().evaluate(astValue);
-		Integer lower = null;
-		if (initialValue instanceof Integer) {
-			lower = (Integer) initialValue;
-		} else {
-			error("lower bound must be a compile-time constant", generator,
-					CalPackage.AST_GENERATOR__LOWER);
-		}
-
-		astValue = generator.getHigher();
-		initialValue = new AstExpressionEvaluator().evaluate(astValue);
-		Integer higher = null;
-		if (initialValue instanceof Integer) {
-			higher = (Integer) initialValue;
-		} else {
-			error("higher bound must be a compile-time constant", generator,
-					CalPackage.AST_GENERATOR__HIGHER);
-		}
-
-		if (lower != null && higher != null) {
-			if (higher < lower) {
-				error("higher bound must be greater than lower bound",
-						generator, CalPackage.AST_GENERATOR);
-			}
-		}
 	}
 
 	@Check
@@ -228,6 +203,36 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 							+ " does not refer to any action", transition,
 							CalPackage.AST_TRANSITION__TAG);
 				}
+			}
+		}
+	}
+
+	@Check
+	public void checkGenerator(AstGenerator generator) {
+		AstExpression astValue = generator.getLower();
+		Object initialValue = new AstExpressionEvaluator().evaluate(astValue);
+		Integer lower = null;
+		if (initialValue instanceof Integer) {
+			lower = (Integer) initialValue;
+		} else {
+			error("lower bound must be a compile-time constant", generator,
+					CalPackage.AST_GENERATOR__LOWER);
+		}
+
+		astValue = generator.getHigher();
+		initialValue = new AstExpressionEvaluator().evaluate(astValue);
+		Integer higher = null;
+		if (initialValue instanceof Integer) {
+			higher = (Integer) initialValue;
+		} else {
+			error("higher bound must be a compile-time constant", generator,
+					CalPackage.AST_GENERATOR__HIGHER);
+		}
+
+		if (lower != null && higher != null) {
+			if (higher < lower) {
+				error("higher bound must be greater than lower bound",
+						generator, CalPackage.AST_GENERATOR);
 			}
 		}
 	}
@@ -367,6 +372,45 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				}
 			}
 		}
+	}
+
+	private void getNames(AstActor actor) {
+		new VoidSwitch() {
+
+			@Override
+			public Void caseAstAction(AstAction action) {
+				((CalQualifiedNameProvider) nameProvider).resetBlockCount();
+				super.caseAstAction(action);
+				return null;
+			}
+
+			@Override
+			public Void caseAstFunction(AstFunction function) {
+				((CalQualifiedNameProvider) nameProvider).resetBlockCount();
+				super.caseAstFunction(function);
+				return null;
+			}
+
+			@Override
+			public Void caseAstGenerator(AstGenerator generator) {
+				nameProvider.getQualifiedName(generator);
+				return null;
+			}
+
+			@Override
+			public Void caseAstProcedure(AstProcedure procedure) {
+				((CalQualifiedNameProvider) nameProvider).resetBlockCount();
+				super.caseAstProcedure(procedure);
+				return null;
+			}
+
+			@Override
+			public Void caseAstStatementForeach(AstStatementForeach foreach) {
+				nameProvider.getQualifiedName(foreach);
+				return null;
+			}
+
+		}.doSwitch(actor);
 	}
 
 }
