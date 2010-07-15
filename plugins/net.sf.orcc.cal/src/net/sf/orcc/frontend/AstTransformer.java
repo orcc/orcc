@@ -471,6 +471,7 @@ public class AstTransformer {
 			Procedure procedure = context.getProcedure();
 
 			// first add local variables
+			Expression index = null;
 			for (AstGenerator generator : generators) {
 				AstVariable astVariable = generator.getVariable();
 				LocalVariable loopVar = transformLocalVariable(astVariable);
@@ -480,14 +481,27 @@ public class AstTransformer {
 				AstExpression astLower = generator.getLower();
 				int lower = new AstExpressionEvaluator()
 						.evaluateAsInteger(astLower);
-				Expression index = new VarExpr(new Use(loopVar));
+				Expression thisIndex = new VarExpr(new Use(loopVar));
 				if (lower != 0) {
-					index = new BinaryExpr(index, BinaryOp.MINUS, new IntExpr(
-							lower), index.getType());
+					thisIndex = new BinaryExpr(thisIndex, BinaryOp.MINUS,
+							new IntExpr(lower), thisIndex.getType());
 				}
 
-				indexes.add(index);
+				AstExpression astHigher = generator.getHigher();
+				int higher = new AstExpressionEvaluator()
+						.evaluateAsInteger(astHigher);
+
+				if (index == null) {
+					index = thisIndex;
+				} else {
+					index = new BinaryExpr(new BinaryExpr(index,
+							BinaryOp.TIMES, new IntExpr(higher - lower + 1),
+							index.getType()), BinaryOp.PLUS, thisIndex,
+							index.getType());
+				}
 			}
+
+			indexes.add(index);
 
 			// translates the expression (this will form the innermost nodes)
 			List<CFGNode> nodes = getNodes(expressions);
