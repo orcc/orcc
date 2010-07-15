@@ -225,7 +225,7 @@ constant $variable$ : memory_type_$variable$ := $Constant(variable.constantValue
     else
     $
 type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
-signal $variable$ : memory_type_$variable$ := $Constant(variable.constantValue)$;$
+signal $variable$ : memory_type_$variable$;$
     endif
   $$
   endif
@@ -261,10 +261,18 @@ $$declareConst(variable)$$
   endif
   $$
 endif
+$$
+if(variable.type.list)
+$$
+  if(variable.assignable)
+  $
+$variable$ <= $Constant(variable.constantValue)$;$\n$$
+  endif
+$$
+endif
 $
 
 >>
-
 
 declareConst(variable) ::= <<
 $variable$ <= $Constant(variable.constantValue)$;
