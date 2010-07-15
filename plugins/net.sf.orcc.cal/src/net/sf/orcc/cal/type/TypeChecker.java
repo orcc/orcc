@@ -46,6 +46,7 @@ import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
@@ -312,14 +313,29 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionList(AstExpressionList expression) {
 		List<AstExpression> expressions = expression.getExpressions();
-		Type type = getType(expressions);
 
+		int size = 1;
+
+		// size of generators
 		for (AstGenerator generator : expression.getGenerators()) {
 			getType(generator.getLower());
 			getType(generator.getHigher());
+
+			AstExpression astValue = generator.getLower();
+			int lower = new AstExpressionEvaluator()
+					.evaluateAsInteger(astValue);
+
+			astValue = generator.getHigher();
+			int higher = new AstExpressionEvaluator()
+					.evaluateAsInteger(astValue);
+			size *= (higher - lower) + 1;
 		}
 
-		return IrFactory.eINSTANCE.createTypeList(0, type);
+		// size of expressions
+		size *= expressions.size();
+
+		Type type = getType(expressions);
+		return IrFactory.eINSTANCE.createTypeList(size, type);
 	}
 
 	@Override
@@ -407,7 +423,11 @@ public class TypeChecker extends CalSwitch<Type> {
 			return IrFactory.eINSTANCE.createTypeInt(Math.max(
 					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
 		} else if (t1.isList() && t2.isList()) {
-			return getLub(((TypeList) t1).getType(), ((TypeList) t2).getType());
+			TypeList listType1 = (TypeList) t1;
+			TypeList listType2 = (TypeList) t2;
+			int size = Math.max(listType1.getSize(), listType2.getSize());
+			Type type = getLub(listType1.getType(), listType2.getType());
+			return IrFactory.eINSTANCE.createTypeList(size, type);
 		} else if (t1.isUint() && t2.isUint()) {
 			return IrFactory.eINSTANCE.createTypeInt(Math.max(
 					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
@@ -479,9 +499,11 @@ public class TypeChecker extends CalSwitch<Type> {
 	public Type getType(List<AstExpression> expressions) {
 		Iterator<AstExpression> it = expressions.iterator();
 		if (it.hasNext()) {
-			Type t1 = getType(it.next());
+			AstExpression expression = it.next();
+			Type t1 = getType(expression);
 			while (it.hasNext()) {
-				Type t2 = getType(it.next());
+				expression = it.next();
+				Type t2 = getType(expression);
 				t1 = getLub(t1, t2);
 			}
 			return t1;
