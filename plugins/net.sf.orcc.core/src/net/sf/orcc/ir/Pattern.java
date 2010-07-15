@@ -46,6 +46,11 @@ public class Pattern extends LinkedHashMap<Port, Integer> {
 	private static final long serialVersionUID = 1L;
 
 	public Pattern() {
+		super(4);
+	}
+
+	public Pattern(int initialCapacity) {
+		super(initialCapacity);
 	}
 
 	/**

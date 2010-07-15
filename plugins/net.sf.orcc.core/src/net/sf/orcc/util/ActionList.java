@@ -130,6 +130,15 @@ public class ActionList implements Iterable<Action> {
 		return untaggedList;
 	}
 
+	/**
+	 * Returns true if this action list is empty.
+	 * 
+	 * @return true if this action list is empty
+	 */
+	public boolean isEmpty() {
+		return actionList.isEmpty();
+	}
+
 	@Override
 	public Iterator<Action> iterator() {
 		return actionList.iterator();
@@ -147,4 +156,5 @@ public class ActionList implements Iterable<Action> {
 
 		return builder.toString();
 	}
+
 }
