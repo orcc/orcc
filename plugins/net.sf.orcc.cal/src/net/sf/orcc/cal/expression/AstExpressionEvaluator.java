@@ -233,82 +233,92 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			values.add(evaluate(parameter));
 		}
 
-		if ("bitand".equals(name)) {
-			if (values.size() == 2) {
-				Object obj1 = values.get(0);
-				Object obj2 = values.get(1);
-				if (obj1 instanceof Integer && obj2 instanceof Integer) {
-					return (Integer) obj1 & (Integer) obj2;
+		if (expression.getFunction().eContainer() == null) {
+			if ("bitnot".equals(name)) {
+				if (values.size() == 1) {
+					Object obj = values.get(0);
+					if (obj instanceof Integer) {
+						return ~(Integer) obj;
+					}
 				}
+
+				CalJavaValidator.getInstance().error(
+						"bitnot expects one integer expression", expression,
+						CalPackage.AST_EXPRESSION_CALL);
+				return null;
 			}
 
-			CalJavaValidator.getInstance().error(
-					"bitand expects two integer expressions", expression,
-					CalPackage.AST_EXPRESSION_CALL);
-		}
-		if ("bitor".equals(name)) {
-			if (values.size() == 2) {
-				Object obj1 = values.get(0);
-				Object obj2 = values.get(1);
-				if (obj1 instanceof Integer && obj2 instanceof Integer) {
-					return (Integer) obj1 | (Integer) obj2;
-				}
-			}
+			BinaryOp op = BinaryOp.getOperator(name);
 
-			CalJavaValidator.getInstance().error(
-					"bitor expects two integer expressions", expression,
-					CalPackage.AST_EXPRESSION_CALL);
-		}
-		if ("bitxor".equals(name)) {
-			if (values.size() == 2) {
-				Object obj1 = values.get(0);
-				Object obj2 = values.get(1);
-				if (obj1 instanceof Integer && obj2 instanceof Integer) {
-					return (Integer) obj1 ^ (Integer) obj2;
+			switch (op) {
+			case BITAND:
+				if (values.size() == 2) {
+					Object obj1 = values.get(0);
+					Object obj2 = values.get(1);
+					if (obj1 instanceof Integer && obj2 instanceof Integer) {
+						return (Integer) obj1 & (Integer) obj2;
+					}
 				}
-			}
 
-			CalJavaValidator.getInstance().error(
-					"bitxor expects two integer expressions", expression,
-					CalPackage.AST_EXPRESSION_CALL);
-		}
-		if ("bitnot".equals(name)) {
-			if (values.size() == 1) {
-				Object obj = values.get(0);
-				if (obj instanceof Integer) {
-					return ~(Integer) obj;
+				CalJavaValidator.getInstance().error(
+						"bitand expects two integer expressions", expression,
+						CalPackage.AST_EXPRESSION_CALL);
+				return null;
+			case BITOR:
+				if (values.size() == 2) {
+					Object obj1 = values.get(0);
+					Object obj2 = values.get(1);
+					if (obj1 instanceof Integer && obj2 instanceof Integer) {
+						return (Integer) obj1 | (Integer) obj2;
+					}
 				}
-			}
 
-			CalJavaValidator.getInstance().error(
-					"bitnot expects one integer expression", expression,
-					CalPackage.AST_EXPRESSION_CALL);
-		}
-		if ("lshift".equals(name)) {
-			if (values.size() == 2) {
-				Object obj1 = values.get(0);
-				Object obj2 = values.get(1);
-				if (obj1 instanceof Integer && obj2 instanceof Integer) {
-					return (Integer) obj1 << (Integer) obj2;
+				CalJavaValidator.getInstance().error(
+						"bitor expects two integer expressions", expression,
+						CalPackage.AST_EXPRESSION_CALL);
+				return null;
+			case BITXOR:
+				if (values.size() == 2) {
+					Object obj1 = values.get(0);
+					Object obj2 = values.get(1);
+					if (obj1 instanceof Integer && obj2 instanceof Integer) {
+						return (Integer) obj1 ^ (Integer) obj2;
+					}
 				}
-			}
 
-			CalJavaValidator.getInstance().error(
-					"lshift expects two integer expressions", expression,
-					CalPackage.AST_EXPRESSION_CALL);
-		}
-		if ("rshift".equals(name)) {
-			if (values.size() == 2) {
-				Object obj1 = values.get(0);
-				Object obj2 = values.get(1);
-				if (obj1 instanceof Integer && obj2 instanceof Integer) {
-					return (Integer) obj1 >> (Integer) obj2;
+				CalJavaValidator.getInstance().error(
+						"bitxor expects two integer expressions", expression,
+						CalPackage.AST_EXPRESSION_CALL);
+				return null;
+			case SHIFT_LEFT:
+				if (values.size() == 2) {
+					Object obj1 = values.get(0);
+					Object obj2 = values.get(1);
+					if (obj1 instanceof Integer && obj2 instanceof Integer) {
+						return (Integer) obj1 << (Integer) obj2;
+					}
 				}
-			}
 
-			CalJavaValidator.getInstance().error(
-					"rshift expects two integer expressions", expression,
-					CalPackage.AST_EXPRESSION_CALL);
+				CalJavaValidator.getInstance().error(
+						"lshift expects two integer expressions", expression,
+						CalPackage.AST_EXPRESSION_CALL);
+				return null;
+			case SHIFT_RIGHT:
+				if (values.size() == 2) {
+					Object obj1 = values.get(0);
+					Object obj2 = values.get(1);
+					if (obj1 instanceof Integer && obj2 instanceof Integer) {
+						return (Integer) obj1 >> (Integer) obj2;
+					}
+				}
+
+				CalJavaValidator.getInstance().error(
+						"rshift expects two integer expressions", expression,
+						CalPackage.AST_EXPRESSION_CALL);
+				return null;
+			default:
+				break;
+			}
 		}
 
 		CalJavaValidator.getInstance().error(
