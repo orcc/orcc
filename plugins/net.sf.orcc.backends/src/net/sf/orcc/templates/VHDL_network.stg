@@ -6,21 +6,33 @@ $instances: printSig()$
 >>
 
 printSig(instance) ::= <<
+
 $
 if(instance.actor)
-$$instance.actor.inputs.list: printSigInput()$
-$instance.actor.outputs.list: printSigOutput()$$
+$                                             
+                                             -- Actor : $instance.id$
+$instance.actor.inputs.list: printSigInput()$
+$instance.actor.outputs.list: printSigOutput()$
+$
+else
+$
+                                             -- Network : $instance.id$
+$instance.network.inputs.list: printSigInput()$
+$instance.network.outputs.list: printSigOutput()$
+$
 endif
 $
 >>
 
 printSigInput(port) ::= <<
---
+
 $
 if(port.type.bool)
-$signal $instance.id$_$port.name$_data_in   : std_logic;$\n$$
+$signal $instance.id$_$port.name$_data_in   : std_logic;
+$
 else
-$signal $instance.id$_$port.name$_data_in   : std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+$signal $instance.id$_$port.name$_data_in   : std_logic_vector($port.type.size$ - 1 downto 0);
+$
 endif
 $
 signal $instance.id$_$port.name$_ack       : std_logic;
@@ -31,9 +43,12 @@ printSigOutput(port) ::= <<
 --
 $
 if(port.type.bool)
-$signal $instance.id$_$port.name$_data_out   : std_logic;$\n$$
+$
+signal $instance.id$_$port.name$_data_out   : std_logic;
+$
 else
-$signal $instance.id$_$port.name$_data_out   : std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+$signal $instance.id$_$port.name$_data_out   : std_logic_vector($port.type.size$ - 1 downto 0);
+$
 endif
 $
 signal $instance.id$_$port.name$_full       : std_logic;
