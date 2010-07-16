@@ -68,6 +68,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -178,9 +179,21 @@ public class AstTransformer {
 			List<Expression> currentIndexes = indexes;
 
 			Type type = expression.getIrType();
+			// create a temporary variable if the target is null
+			// or it is not null and the expression does not return a list
 			if (target == null || !type.isList()) {
+				// type of the new target will be the same as the type of the
+				// existing target (if it is a scalar) or its innermost type (if
+				// it is a list)
+				if (target != null) {
+					type = target.getType();
+					if (type.isList()) {
+						type = ((TypeList) type).getElementType();
+					}
+				}
+
 				target = context.getProcedure().newTempLocalVariable(file,
-						expression.getIrType(), "_tmp_if");
+						type, "_tmp_if");
 				indexes = new ArrayList<Expression>(0);
 			}
 
@@ -617,7 +630,7 @@ public class AstTransformer {
 			AstProcedure astProcedure = astCall.getProcedure();
 			// special case if the procedure is a built-in procedure
 			if (astProcedure.eContainer() == null) {
-				System.err.println("TODO built-in procedure");
+				// TODO built-in procedure
 				return null;
 			}
 
