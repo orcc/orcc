@@ -31,7 +31,9 @@ package net.sf.orcc.plugins.backends;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +43,9 @@ import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.ui.OrccActivator;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
@@ -52,7 +57,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
  * declared in the <code>net.sf.orcc.plugin.backend</code> extension point.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class BackendFactory extends PluginFactory {
@@ -104,14 +109,21 @@ public class BackendFactory extends PluginFactory {
 
 		Backend backendObj = (Backend) plugins.get(backend);
 		backendObj.setLaunchConfiguration(configuration);
+		backendObj.setOutputFolder(outputFolder);
+
+		String name = configuration.getAttribute(PROJECT, "");
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject project = root.getProject(name);
+
+		String vtlFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)
-		backendObj.compileVTL(process, outputFolder);
+		backendObj.compileVTL(process, vtlFolder);
 
 		if (configuration.getAttribute(COMPILE_XDF, false)) {
 			String xdfFile = configuration.getAttribute(XDF_FILE, "");
-			backendObj.compileXDF(process, xdfFile, outputFolder);
+			backendObj.compileXDF(process, xdfFile);
 		}
 	}
 

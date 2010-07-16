@@ -47,13 +47,12 @@ public interface Backend extends Plugin {
 	 * @param process
 	 *            the process that launched the back-end, so we can report
 	 *            messages to it
-	 * @param outputFolder
+	 * @param vtlFolder
 	 *            absolute path of folder that contains IR files
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void compileVTL(OrccProcess process, String outputFolder)
-			throws OrccException;
+	void compileVTL(OrccProcess process, String vtlFolder) throws OrccException;
 
 	/**
 	 * Loads a hierarchical XDF network and compile it. Compilation may include
@@ -65,12 +64,18 @@ public interface Backend extends Plugin {
 	 *            messages to it
 	 * @param inputFile
 	 *            absolute path of top-level input network
-	 * @param outputFolder
-	 *            absolute path of output folder
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void compileXDF(OrccProcess process, String inputFile, String outputFolder)
-			throws OrccException;
+	void compileXDF(OrccProcess process, String inputFile) throws OrccException;
+
+	/**
+	 * Sets the output folder of this back-end. This is the folder where files
+	 * will be generated.
+	 * 
+	 * @param outputFolder
+	 *            output folder
+	 */
+	public void setOutputFolder(String outputFolder);
 
 }
