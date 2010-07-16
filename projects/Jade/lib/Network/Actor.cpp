@@ -81,6 +81,17 @@ Port* Actor::getPort(string portName){
 	return getOutput(portName);
 }
 
+Procedure* Actor::getProcedure(string name){
+	map<string, Procedure*>::iterator it;
+	
+	it = procedures->find(name);
+
+	if(it == procedures->end()){
+		return NULL;
+	}
+
+	return (*it).second;
+}
 
 Port* Actor::getInput(string portName){
 	if (inputs->empty()){

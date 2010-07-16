@@ -117,6 +117,16 @@ public:
 	llvm::GlobalVariable* getInputVar(Port* port);
 
 	/**
+     *  @brief get the llvm::Function corresponding to the procedure
+	 *
+	 *  @param parameter : Procedure to look for
+	 *
+	 *  @return the corresponding llvm::Function  
+	 *
+     */
+	llvm::Function* getProcedureVar(Procedure* procedure);
+
+	/**
      *  @brief get the llvm::GlobalVariable corresponding to the parameter
 	 *
 	 *  @param parameter : Variable of the parameter
@@ -203,7 +213,7 @@ public:
      */
 	Port* getOutput(std::string portName);
 
-	llvm::GlobalVariable* getStateVar(Variable* port);
+	llvm::GlobalVariable* getStateVar(Variable* stateVar);
 
 
 private:

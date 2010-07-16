@@ -181,3 +181,15 @@ Port* InstancedActor::getOutput(string portName){
 
 	return (*it).second;
 }
+
+Function* InstancedActor::getProcedureVar(Procedure* procedure){
+	map<Procedure*, Function*>::iterator it;
+	
+	it = procedures->find(procedure);
+
+	if(it == procedures->end()){
+		return NULL;
+	}
+
+	return (*it).second;
+}

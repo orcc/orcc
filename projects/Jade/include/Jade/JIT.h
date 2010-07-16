@@ -263,7 +263,7 @@ public:
 
 	void setDecoder(Decoder* decoder);
 	llvm::Module* getModule(){return module;};
-	void MapActionScheduler(ActionScheduler* actionScheduler, void *Addr);
+	void MapFunction(llvm::Function* function, void *Addr);
 	void run(llvm::Function* func);
 	void setNewInstance();
 	void optimize(Decoder* decoder);

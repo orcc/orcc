@@ -56,6 +56,8 @@
 #include "Jade/Decoder/InstancedActor.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Network/Instance.h"
+
+#include "display.h"
 //------------------------------
 
 using namespace std;
@@ -63,11 +65,6 @@ using namespace llvm;
 
 
 extern cl::opt<std::string> VidFile;
-
-extern "C" void display_scheduler();
-extern "C" struct fifo_char_s *display_B;
-extern "C" struct fifo_short_s *display_WIDTH;
-extern "C" struct fifo_short_s *display_HEIGHT;
 
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder* decoder): Context(C) {
 	this->jit = jit;
@@ -120,19 +117,23 @@ void RoundRobinScheduler::createScheduler(){
 	
 	// Create a branch to entry
 	Instruction* brBbInst = BranchInst::Create(BB, BB);
-/*
-	Value *Ten = ConstantInt::get(Type::getInt32Ty(Context), 0);
-
-	// Create the return instruction and add it to the basic block.
-	ReturnInst::Create(Context, BB);*/
 }
 
 void RoundRobinScheduler::execute(){
+	//Connect decoder to input and output of Jade
+	setSource();
+	setDisplay();
+	
+	//Run decoder
 	Module* module = decoder->getModule();
+	Function* main = module->getFunction("scheduler");
+	jit->run(main);
+}
 
-	//Get instance source and display
-	Instance* displayInst = decoder->getInstance("display");
-	InstancedActor* display = displayInst->getInstancedActor();
+void RoundRobinScheduler::setSource(){
+	Module* module = decoder->getModule();
+	
+	//Get source instance
 	Instance* sourceInst = decoder->getInstance("source");
 	InstancedActor* source = sourceInst->getInstancedActor();
 
@@ -145,21 +146,20 @@ void RoundRobinScheduler::execute(){
 	GlobalVariable* sourceFile = source->getStateVar(sourceInst->getActor()->getStateVar("input_file"));
 	Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
 	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
+}
 
-	//Get port to connect
-	Port* port_WIDTH = display->getPort("WIDTH");
-	Port* port_HEIGHT = display->getPort("HEIGHT");
-	Port* port_B = display->getPort("B");
+void RoundRobinScheduler::setDisplay(){
+	//Get display instance
+	Instance* displayInst = decoder->getInstance("display");
+	InstancedActor* display = displayInst->getInstancedActor();
 
-	//Get instance scheduler
-	ActionScheduler* llvmdisplaySched = display->getActionScheduler();
+	//Get procedures from display
+	Function* setVideo = display->getProcedureVar(displayInst->getActor()->getProcedure("set_video"));
+	Function* setInit = display->getProcedureVar(displayInst->getActor()->getProcedure("set_init"));
+	Function* writeMb = display->getProcedureVar(displayInst->getActor()->getProcedure("write_mb"));
 
-	// Get pointer 
-	jit->MapActionScheduler(llvmdisplaySched, (void*) display_scheduler);
-	display_B = (fifo_char_s*)(*(fifo_char_s**)jit->getPortPointer(port_B));
-	display_WIDTH = (fifo_short_s*)(*(fifo_short_s**)jit->getPortPointer(port_WIDTH));
-	display_HEIGHT = (fifo_short_s*)(*(fifo_short_s**)jit->getPortPointer(port_HEIGHT));
-	
-	Function* main = module->getFunction("scheduler");
-	jit->run(main);
+	//Map procedure to display
+	jit->MapFunction(setVideo, display_set_video);
+	jit->MapFunction(setInit, display_init);
+	jit->MapFunction(writeMb, display_write_mb);
 }

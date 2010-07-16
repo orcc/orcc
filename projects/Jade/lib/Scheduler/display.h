@@ -28,24 +28,12 @@
 */
 #include "SDL.h"
 
-#ifdef FAST_FIFO
-#include "unprotectedFifo.h"
-#else
-//#include "fifoCircular.h"
-#include "fifoTrace.h"
-#endif
-
 #ifdef BENCHMARK
 #include <locale.h>
 #include <time.h>
 FILE * pFile;
 static Uint32 tInit = 0;
 #endif
-
-
-struct fifo_char_s *display_B;
-struct fifo_short_s *display_WIDTH;
-struct fifo_short_s *display_HEIGHT;
 
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
@@ -253,42 +241,5 @@ static void display_set_video(int width, int height) {
 	if (m_overlay == NULL) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
-	}
-}
-
-void display_scheduler() {
-	int i = 0;
-
-	while (1) {
-		if (fifo_short_has_tokens(display_WIDTH, 1) && fifo_short_has_tokens(display_HEIGHT, 1)) {
-			short *ptr, width, height;
-
-			ptr = fifo_short_read(display_WIDTH, 1);
-			//ptr = (short*)fifo_char_read((struct fifo_char_s *)display_WIDTH, 1); //This is a fix for an unknow bug yet
-			//ptr = (short*)getReadPtr((struct fifo_s *)display_WIDTH, 1);
-			width = ptr[0] * 16;
-			fifo_short_read_end(display_WIDTH, 1);
-
-			ptr = fifo_short_read(display_HEIGHT, 1);
-			//ptr = (short*)fifo_char_read((struct fifo_char_s *)display_HEIGHT, 1); //As well as there
-			//ptr = (short*)getReadPtr((struct fifo_s *)display_HEIGHT, 1);
-			height = ptr[0] * 16;
-			fifo_short_read_end(display_HEIGHT, 1);
-
-			display_set_video(width, height);
-			i++;
-		}
-
-		if (fifo_char_has_tokens(display_B, 384)) {
-			if (!init) {
-				display_init();
-			}
-
-			display_write_mb(fifo_char_read(display_B, 384));
-			fifo_char_read_end(display_B, 384);
-			i++;
-		} else {
-			break;
-		}
 	}
 }

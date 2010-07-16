@@ -86,11 +86,6 @@ int DecoderEngine::load(Network* network) {
 	FifoTrace* fifo = new FifoTrace(Context, jit);
 	#endif
 
-	
-	// Insert actor source and display 
-	actors.insert(pair<string,Actor*>("Display", new DisplayActor(Context, fifo)));
-	
-
 	decoder = new Decoder(Context, jit, network, fifo);
 	
 	// Parsing actor

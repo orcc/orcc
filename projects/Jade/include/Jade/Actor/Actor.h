@@ -286,6 +286,17 @@ public:
 	}
 
 	/**
+	 * @brief Getter of a procedure
+	 *
+	 * Returns the procedure corresponding to the given name
+	 * 
+	 * @param name: std::string of the procedure
+	 *
+	 * @return the corresponding procedure
+	 */
+	Procedure* getProcedure(std::string name);
+
+	/**
      *  @brief Create a port
 	 *
 	 *  Create a port inside the actor similar to the given Port

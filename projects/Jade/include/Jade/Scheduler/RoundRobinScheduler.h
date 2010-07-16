@@ -74,6 +74,10 @@ private:
 
 	void createScheduler();
 
+	void setSource();
+
+	void setDisplay();
+
 	/** JIT accessor */
 	JIT* jit;
 

@@ -120,8 +120,8 @@ int JIT::initEngine(Decoder* decoder) {
   EE->runStaticConstructorsDestructors(false);
 }
 
-void JIT::MapActionScheduler(ActionScheduler* actionScheduler, void *Addr) {
-	EE->addGlobalMapping(actionScheduler->getSchedulerFunction(), Addr);
+void JIT::MapFunction(Function* function, void *Addr) {
+	EE->addGlobalMapping(function, Addr);
 }
 
 void JIT::run(Function* func) {
