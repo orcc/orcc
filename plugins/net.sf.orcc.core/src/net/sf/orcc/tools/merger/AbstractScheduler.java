@@ -30,6 +30,9 @@
 package net.sf.orcc.tools.merger;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
@@ -52,42 +55,58 @@ public abstract class AbstractScheduler implements IScheduler {
 
 	protected Map<Connection, Integer> bufferCapacities;
 
+	private boolean stop = false;
+
 	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph)
 			throws OrccException {
 		this.graph = graph;
 		schedule = schedule();
 	}
 
-	private void capacities(Schedule schedule, int rep) {
-		for (Iterand iterand : schedule.getIterands()) {
-			if (iterand.isVertex()) {
-				Vertex vertex = iterand.getVertex();
-				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-					int prd = connection.getSource().getNumTokensProduced();
-					bufferCapacities.put(connection, rep * prd);
-				}
+	public Map<Connection, Integer> getBufferCapacities() {
+		bufferCapacities = new HashMap<Connection, Integer>();
+		
+		for (Connection edge : graph.edgeSet()) {
+			Vertex src = graph.getEdgeSource(edge);
+			Vertex tgt = graph.getEdgeTarget(edge);
 
-				for (Connection connection : graph.incomingEdgesOf(vertex)) {
-					if (!bufferCapacities.containsKey(connection)) {
-						int cns = connection.getTarget().getNumTokensConsumed();
-						bufferCapacities.put(connection, rep * cns);
-					}
+			List<Schedule> schedules = getHierarchy(schedule, src);
+			schedules.removeAll(getHierarchy(schedule, tgt));
+
+			int q = 1;
+			for (Schedule schedule : schedules) {
+				q *= schedule.getIterationCount();
+			}
+			
+			int p = edge.getSource().getNumTokensProduced();
+			bufferCapacities.put(edge, p * q);
+		}
+		
+		return bufferCapacities;
+	}
+
+	private List<Schedule> getHierarchy(Schedule schedule, Vertex vertex) {
+		List<Schedule> schedules = new LinkedList<Schedule>();
+		Iterator<Iterand> it = schedule.getIterands().iterator();
+		stop = false;
+		
+		while (it.hasNext()) {
+			Iterand iterand = it.next();
+			if (iterand.isVertex()) {
+				if (iterand.getVertex().equals(vertex)) {
+					stop = true;
 				}
 			} else {
 				Schedule sched = iterand.getSchedule();
-				rep *= sched.getIterationCount();
-				capacities(sched, rep);
-				rep /= sched.getIterationCount();
+				((LinkedList<Schedule>) schedules).addLast(sched);
+				schedules.addAll(getHierarchy(sched, vertex));
+				if (stop == true)
+					break;
+				((LinkedList<Schedule>) schedules).removeLast();
 			}
 		}
-	}
 
-	public Map<Connection, Integer> getBufferCapacities() {
-		if (bufferCapacities == null) {
-			bufferCapacities = new HashMap<Connection, Integer>();
-			capacities(schedule, 1);
-		}
-		return bufferCapacities;
+		return schedules;
 	}
 
 	public Schedule getSchedule() {

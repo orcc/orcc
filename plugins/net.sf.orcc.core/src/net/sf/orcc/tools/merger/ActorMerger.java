@@ -429,9 +429,10 @@ public class ActorMerger implements INetworkTransformation {
 
 					blkNode.add(new Call(new Location(), null, proc,
 							callArguments));
-					
+
 					if (index > 0) {
-						blkNode.add(new Assign(indexes.get(index - 1), binopExpr));
+						blkNode.add(new Assign(indexes.get(index - 1),
+								binopExpr));
 					}
 					nodes.add(blkNode);
 					procs.put(proc.getName(), proc);
@@ -608,7 +609,6 @@ public class ActorMerger implements INetworkTransformation {
 					graph, vertices, null);
 
 			scheduler = new FlatSASScheduler(subgraph);
-			//new MatrixChainTransformation(subgraph).transform(scheduler.getSchedule());
 
 			for (Vertex vertex : vertices) {
 				Actor actor = vertex.getInstance().getActor();
