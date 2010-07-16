@@ -46,6 +46,11 @@ llvm::cl::opt<std::string> MCPU("mcpu",
        llvm::cl::value_desc("cpu-name"),
        llvm::cl::init(""));
 
+llvm::cl::opt<std::string> Fifo("fifo",
+         llvm::cl::CommaSeparated,
+         llvm::cl::desc("Specify fifo to be used in the decoder"),
+         llvm::cl::value_desc("trace, circular, fast"),
+		 llvm::cl::init("trace"));
 
 //Verify if directory is well formed
 void setDirectory(std::string* dir){
@@ -54,6 +59,7 @@ void setDirectory(std::string* dir){
 		dir->insert(dir->length(),"/");
 	}
 }
+
 
 //Check options of the decoder engine
 void setOptions(){

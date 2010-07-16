@@ -46,6 +46,7 @@ namespace llvm{
 	class LLVMContext;
 }
 
+class AbstractFifo;
 class JIT;
 class Decoder;
 class FifoCircular;
@@ -68,6 +69,7 @@ private:
 	void parseActors(Network* network);
 
 	void createDecoder();
+	AbstractFifo* getFifo();
 	
 	Network* XDFnetwork;
 	Decoder* decoder;

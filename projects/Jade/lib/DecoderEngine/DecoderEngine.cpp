@@ -51,7 +51,6 @@
 #include "Jade/Network/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
-#include "DisplayActor.h"
 #include "Options.h"
 
 //------------------------------
@@ -77,15 +76,11 @@ int DecoderEngine::load(Network* network) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 	XDFnetwork = network;
+	
+	//Set type of fifos
+	AbstractFifo* fifo = getFifo();
 
-	// Parsing Fifo 
-	#ifdef FAST_FIFO
-	UnprotectedFifo* fifo = new UnprotectedFifo(Context, jit);
-	#else
-	//FifoCircular* fifo = new FifoCircular(Context, jit);
-	FifoTrace* fifo = new FifoTrace(Context, jit);
-	#endif
-
+	//Create decoder
 	decoder = new Decoder(Context, jit, network, fifo);
 	
 	// Parsing actor
@@ -151,5 +146,18 @@ void DecoderEngine::parseActors(Network* network) {
 	
 		instance->setActor(actor);
 
+	}
+}
+
+AbstractFifo* DecoderEngine::getFifo(){
+	if(Fifo.compare("trace")==0){
+		return new FifoTrace(Context, jit);
+	}else if(Fifo.compare("circular")==0){
+		return new FifoCircular(Context, jit);
+	}else if(Fifo.compare("fast")==0){
+		return new UnprotectedFifo(Context, jit);
+	}else{
+		printf("Fifo selection error: type undefined.\n");
+		exit(0);
 	}
 }

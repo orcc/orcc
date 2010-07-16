@@ -117,7 +117,7 @@ public abstract class AbstractBackend implements Backend {
 	/**
 	 * the configuration used to launch this back-end.
 	 */
-	private ILaunchConfiguration configuration;
+	protected ILaunchConfiguration configuration;
 
 	/**
 	 * Fifo size used in backend.
