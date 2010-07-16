@@ -450,16 +450,6 @@ public abstract class AbstractBackend implements Backend {
 		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
 	}
 
-	/**
-	 * Prints the given network. Should be overridden by back-ends that wish to
-	 * print the given network.
-	 * 
-	 * @param network
-	 *            the network
-	 */
-	// abstract protected void printNetwork(Network network) throws
-	// OrccException;
-
 	@Override
 	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
