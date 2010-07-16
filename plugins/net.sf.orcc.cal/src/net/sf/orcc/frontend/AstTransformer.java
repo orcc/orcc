@@ -546,6 +546,7 @@ public class AstTransformer {
 			// add the outer while node
 			procedure.getNodes().addAll(nodes);
 
+			// restores target and indexes
 			target = currentTarget;
 			indexes = currentIndexes;
 		}
@@ -558,20 +559,26 @@ public class AstTransformer {
 		 *            a list of AST expressions
 		 */
 		private void transformListSimple(List<AstExpression> expressions) {
+			Variable currentTarget = target;
+			List<Expression> currentIndexes = indexes;
+
 			int i = 0;
 			for (AstExpression expression : expressions) {
 				Location location = Util.getLocation(expression);
-				Expression value = transformExpression(expression);
 
-				List<Expression> currentIndexes = new ArrayList<Expression>(
-						indexes);
-				currentIndexes.add(new IntExpr(i));
+				indexes = new ArrayList<Expression>(currentIndexes);
+				indexes.add(new IntExpr(i));
 				i++;
 
-				createAssignOrStore(location, target, currentIndexes, value);
-			}
-		}
+				Expression value = transformExpression(expression);
 
+				createAssignOrStore(location, target, indexes, value);
+			}
+
+			// restores target and indexes
+			target = currentTarget;
+			indexes = currentIndexes;
+		}
 	}
 
 	/**

@@ -79,7 +79,6 @@ import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -406,8 +405,7 @@ public class ActorTransformer {
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		Context oldContext = astTransformer.newContext(scheduler);
-		addInstruction(new Return(new BoolExpr(true)));
-		astTransformer.restoreContext(oldContext, null);
+		astTransformer.restoreContext(oldContext, new BoolExpr(true));
 
 		// creates action
 		Action action = new Action(location, tag, inputPattern, outputPattern,
