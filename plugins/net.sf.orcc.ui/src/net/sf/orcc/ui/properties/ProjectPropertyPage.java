@@ -118,6 +118,7 @@ public class ProjectPropertyPage extends PropertyPage {
 
 		Label lbl = new Label(parent, SWT.NONE);
 		lbl.setText("Output folder:");
+		lbl.setToolTipText("The folder where IR files will be generated.");
 		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
 		lbl.setLayoutData(data);
 
@@ -158,7 +159,9 @@ public class ProjectPropertyPage extends PropertyPage {
 		project = (IProject) getElement().getAdapter(IResource.class);
 		noDefaultAndApplyButton();
 		setDescription("Configure the properties of the project "
-				+ project.getName() + ".\n");
+				+ project.getName()
+				+ ".\n"
+				+ "Please read tooltips for more information on configuration properties.");
 
 		try {
 			String outputFolder = project

@@ -32,7 +32,6 @@ import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.RUN_CONFIG_TYPE;
-import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.util.ArrayList;
@@ -220,13 +219,8 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			ILaunchConfigurationWorkingCopy wc = type.newInstance(null, name);
 			wc.setAttribute(BACKEND, backend);
 
-			if (resource.getType() == IResource.FOLDER) {
-				wc.setAttribute(VTL_FOLDER, inputFile);
-			} else {
-				wc.setAttribute(VTL_FOLDER, "<put VTL folder here>");
-				wc.setAttribute(COMPILE_XDF, true);
-				wc.setAttribute(XDF_FILE, inputFile);
-			}
+			wc.setAttribute(COMPILE_XDF, true);
+			wc.setAttribute(XDF_FILE, inputFile);
 			wc.setAttribute(OUTPUT_FOLDER, folder);
 
 			config = wc.doSave();
@@ -257,7 +251,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			ILaunchConfiguration[] candidates = manager
 					.getLaunchConfigurations(type);
 			for (ILaunchConfiguration config : candidates) {
-				String fileName = getInput(config);
+				String fileName = config.getAttribute(XDF_FILE, "");
 				if (file.getLocation().toOSString().equals(fileName)) {
 					configs.add(config);
 				}
@@ -268,29 +262,6 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	/**
-	 * Returns the input field of the back-end set in the given configuration.
-	 * 
-	 * @param configuration
-	 *            a launch configuration (or a copy of)
-	 * @return the identifier of the input field, or <code>null</code> if not
-	 *         set.
-	 * @throws CoreException
-	 *             if something goes wrong with the configuration
-	 */
-	private String getInput(ILaunchConfiguration configuration)
-			throws CoreException {
-		String input = configuration.getAttribute(XDF_FILE, "");
-		if (input.isEmpty()) {
-			input = configuration.getAttribute(VTL_FOLDER, "");
-			if (input.isEmpty()) {
-				return null;
-			}
-		}
-
-		return input;
 	}
 
 	public IResource getLaunchableResource(IEditorPart editorpart) {

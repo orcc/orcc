@@ -30,12 +30,8 @@ package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DEBUG;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_DOT_CFG;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_KEEP;
-import static net.sf.orcc.OrccLaunchConstants.DOT_CFG;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
-import static net.sf.orcc.OrccLaunchConstants.KEEP_INTERMEDIATE;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -58,6 +54,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
+ * This class defines a tab for options.
  * 
  * @author Matthieu Wipliez
  * 
@@ -66,11 +63,7 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 
 	protected Button debugMode;
 
-	protected Button dotCfg;
-
 	protected Text fifoSize;
-
-	protected Button keepIntermediate;
 
 	protected void createButton(Font font, Button button, String text,
 			String tooltip) {
@@ -135,13 +128,6 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 		createButton(font, debugMode, "Debug mode",
 				"Activates debug mode: IR is pretty-printed, "
 						+ "and actors are not cached.");
-		keepIntermediate = new Button(group, SWT.CHECK);
-		createButton(font, keepIntermediate, "Keep intermediate files",
-				"When set, files will be printed after each step of "
-						+ "code generation.");
-		dotCfg = new Button(group, SWT.CHECK);
-		createButton(font, dotCfg, "Print CFG information",
-				"Prints DOT files showing CFG information.");
 		createFifoSize(font, group);
 	}
 
@@ -161,13 +147,6 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 			boolean selected = configuration.getAttribute(DEBUG_MODE,
 					DEFAULT_DEBUG);
 			debugMode.setSelection(selected);
-
-			selected = configuration.getAttribute(KEEP_INTERMEDIATE,
-					DEFAULT_KEEP);
-			keepIntermediate.setSelection(selected);
-
-			selected = configuration.getAttribute(DOT_CFG, DEFAULT_DOT_CFG);
-			dotCfg.setSelection(selected);
 
 			int size = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			fifoSize.setText(Integer.toString(size));
@@ -207,12 +186,6 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 			boolean selected = debugMode.getSelection();
 			configuration.setAttribute(DEBUG_MODE, selected);
 
-			selected = keepIntermediate.getSelection();
-			configuration.setAttribute(KEEP_INTERMEDIATE, selected);
-
-			selected = dotCfg.getSelection();
-			configuration.setAttribute(DOT_CFG, selected);
-
 			String text = fifoSize.getText();
 			configuration.setAttribute(FIFO_SIZE, Integer.parseInt(text));
 		}
@@ -221,8 +194,6 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		configuration.setAttribute(DEBUG_MODE, DEFAULT_DEBUG);
-		configuration.setAttribute(KEEP_INTERMEDIATE, DEFAULT_KEEP);
-		configuration.setAttribute(DOT_CFG, DEFAULT_DOT_CFG);
 		configuration.setAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 	}
 

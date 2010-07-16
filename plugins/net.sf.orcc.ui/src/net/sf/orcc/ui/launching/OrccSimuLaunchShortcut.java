@@ -33,25 +33,16 @@ import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.SIMU_CONFIG_TYPE;
-import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.plugins.simulators.SimulatorFactory;
-import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -76,10 +67,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ElementListSelectionDialog;
-import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
-import org.eclipse.ui.dialogs.ISelectionStatusValidator;
-import org.eclipse.ui.model.WorkbenchContentProvider;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 /**
  * 
@@ -107,54 +94,6 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 		String location = file.getParent().getLocation().toOSString();
 		fd.setFilterPath(location);
 		return fd.open();
-	}
-
-	private String browseVTLFolder(Shell shell, IFile file) {
-		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
-				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
-				new WorkbenchContentProvider());
-		tree.setAllowMultiple(false);
-		tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
-
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		String location = file.getParent().getLocation().toOSString();
-		IResource resource = root.getContainerForLocation(new Path(location));
-
-		if (resource != null) {
-			tree.setInitialSelection(resource);
-		}
-
-		tree.setMessage("Please select an existing folder :");
-		tree.setTitle("Choose VTL folder");
-
-		tree.setValidator(new ISelectionStatusValidator() {
-
-			@Override
-			public IStatus validate(Object[] selection) {
-				if (selection.length == 1) {
-					if (selection[0] instanceof IFolder) {
-						return new Status(IStatus.OK, OrccActivator.PLUGIN_ID,
-								"");
-					} else {
-						return new Status(IStatus.ERROR,
-								OrccActivator.PLUGIN_ID,
-								"Only folders can be selected, not files nor projects");
-					}
-				}
-
-				return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-						"No folder selected.");
-			}
-
-		});
-
-		// opens the dialog
-		if (tree.open() == Window.OK) {
-			resource = (IResource) tree.getFirstResult();
-			return resource.getLocation().toOSString();
-		}
-		return null;
 	}
 
 	private void chooseAndLaunch(IFile file, ILaunchConfiguration[] configs,
@@ -238,13 +177,6 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			wc.setAttribute(XDF_FILE, file.getLocation().toOSString());
 			wc.setAttribute(COMPILE_XDF, true);
 
-			// source VTL folder
-			String folder = browseVTLFolder(getShell(), file);
-			if (folder == null) {
-				return null;
-			}
-			wc.setAttribute(VTL_FOLDER, folder);
-
 			// stimulus file
 			String stimulus = browseStimulusFiles(getShell(), file);
 			if (stimulus == null) {
@@ -253,7 +185,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			wc.setAttribute(INPUT_STIMULUS, stimulus);
 
 			// output folder
-			folder = browseOutputFolder(getShell(), file);
+			String folder = browseOutputFolder(getShell(), file);
 			if (folder == null) {
 				return null;
 			}

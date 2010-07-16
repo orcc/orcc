@@ -32,6 +32,7 @@ import static net.sf.orcc.OrccLaunchConstants.ACTIVATE_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
 import java.io.File;
@@ -39,12 +40,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -61,11 +69,13 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
+import org.eclipse.ui.dialogs.ISelectionStatusValidator;
+import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 public abstract class OrccAbstractSettingsTab extends
 		AbstractLaunchConfigurationTab implements ModifyListener {
-
-	protected Text textOutput;
 
 	protected Combo comboPlugin;
 
@@ -74,6 +84,10 @@ public abstract class OrccAbstractSettingsTab extends
 	protected Map<String, List<OptionWidget>> optionWidgets;
 
 	protected String plugin;
+
+	protected Text textOutput;
+
+	private Text textProject;
 
 	protected boolean updateLaunchConfiguration;
 
@@ -91,6 +105,49 @@ public abstract class OrccAbstractSettingsTab extends
 		}
 	}
 
+	private void browseProject(Shell shell) {
+		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
+				WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider(),
+				new WorkbenchContentProvider());
+		tree.setAllowMultiple(false);
+		tree.setInput(ResourcesPlugin.getWorkspace().getRoot());
+
+		IProject project = getProjectFromText();
+		if (project != null) {
+			tree.setInitialSelection(project);
+		}
+
+		tree.setMessage("Please select an existing project:");
+		tree.setTitle("Choose an existing project");
+
+		tree.setValidator(new ISelectionStatusValidator() {
+
+			@Override
+			public IStatus validate(Object[] selection) {
+				if (selection.length == 1) {
+					if (selection[0] instanceof IProject) {
+						return new Status(IStatus.OK, OrccActivator.PLUGIN_ID,
+								"");
+					} else {
+						return new Status(IStatus.ERROR,
+								OrccActivator.PLUGIN_ID,
+								"Only projects can be selected");
+					}
+				}
+
+				return new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
+						"No project selected.");
+			}
+
+		});
+
+		// opens the dialog
+		if (tree.open() == Window.OK) {
+			project = (IProject) tree.getFirstResult();
+			textProject.setText(project.getName());
+		}
+	}
+
 	@Override
 	public void createControl(Composite parent) {
 		Font font = parent.getFont();
@@ -104,9 +161,30 @@ public abstract class OrccAbstractSettingsTab extends
 		composite.setLayoutData(data);
 		setControl(composite);
 
+		createControlProject(font, composite);
 		createControlPlugin(font, composite);
 		createControlOption(font, composite);
 		createOptions();
+	}
+
+	private void createControlBrowseProject(Font font, final Group group) {
+		textProject = new Text(group, SWT.BORDER | SWT.SINGLE);
+		textProject.setFont(font);
+		GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		textProject.setLayoutData(data);
+		textProject.addModifyListener(this);
+
+		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseProject(group.getShell());
+			}
+		});
 	}
 
 	protected void createControlOption(Font font, Composite parent) {
@@ -122,8 +200,6 @@ public abstract class OrccAbstractSettingsTab extends
 		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
 		groupOptions.setLayoutData(data);
 	}
-
-	abstract protected void createControlPlugin(Font font, Composite parent);
 
 	protected void createControlOutputFolder(Font font, final Group group) {
 		Label lbl = new Label(group, SWT.NONE);
@@ -149,6 +225,19 @@ public abstract class OrccAbstractSettingsTab extends
 				browseOutputFolder(group.getShell());
 			}
 		});
+	}
+
+	abstract protected void createControlPlugin(Font font, Composite parent);
+
+	private void createControlProject(Font font, Composite parent) {
+		final Group group = new Group(parent, SWT.NONE);
+		group.setFont(font);
+		group.setText("&Project:");
+		group.setLayout(new GridLayout(2, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		group.setLayoutData(data);
+
+		createControlBrowseProject(font, group);
 	}
 
 	/**
@@ -191,6 +280,16 @@ public abstract class OrccAbstractSettingsTab extends
 		return BACKEND;
 	}
 
+	private IProject getProjectFromText() {
+		String value = textProject.getText();
+		if (value.isEmpty()) {
+			return null;
+		}
+
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		return root.getProject(value);
+	}
+
 	@Override
 	public void initializeFrom(ILaunchConfiguration configuration) {
 		try {
@@ -210,7 +309,10 @@ public abstract class OrccAbstractSettingsTab extends
 			}
 
 			updateLaunchConfiguration = false;
-			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
+			String value = configuration.getAttribute(PROJECT, "");
+			textProject.setText(value);
+
+			value = configuration.getAttribute(OUTPUT_FOLDER, "");
 			textOutput.setText(value);
 			updateLaunchConfiguration = true;
 
@@ -229,12 +331,25 @@ public abstract class OrccAbstractSettingsTab extends
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
+			updateLaunchConfiguration = true;
 		}
 	}
 
 	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
-		String value = textOutput.getText();
+		String value = textProject.getText();
+		if (value.isEmpty()) {
+			setErrorMessage("Project not specified");
+			return false;
+		}
+
+		IProject project = getProjectFromText();
+		if (project == null || !project.exists()) {
+			setErrorMessage("Specified project does not exist");
+			return false;
+		}
+
+		value = textOutput.getText();
 		if (value.isEmpty()) {
 			setErrorMessage("Output path not specified");
 			return false;
@@ -255,8 +370,18 @@ public abstract class OrccAbstractSettingsTab extends
 	}
 
 	@Override
+	public void modifyText(ModifyEvent e) {
+		if (updateLaunchConfiguration) {
+			updateLaunchConfigurationDialog();
+		}
+	}
+
+	@Override
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		String value = textOutput.getText();
+		String value = textProject.getText();
+		configuration.setAttribute(PROJECT, value);
+
+		value = textOutput.getText();
 		configuration.setAttribute(OUTPUT_FOLDER, value);
 
 		int index = comboPlugin.getSelectionIndex();
@@ -270,13 +395,6 @@ public abstract class OrccAbstractSettingsTab extends
 		List<OptionWidget> widgets = optionWidgets.get(plugin);
 		if (widgets != null) {
 			OptionWidgetManager.performApplyOptions(widgets, configuration);
-		}
-	}
-
-	@Override
-	public void modifyText(ModifyEvent e) {
-		if (updateLaunchConfiguration) {
-			updateLaunchConfigurationDialog();
 		}
 	}
 
