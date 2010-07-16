@@ -2,9 +2,9 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="57" y="2518"/>
-      <vertex id="CoefDC_L" x="1587" y="1941"/>
-      <vertex id="CoefAC_L" x="1586" y="1907"/>
-      <vertex id="PredMode" x="1095" y="2043"/>
+      <vertex id="CoefDC_L" x="1590" y="1606"/>
+      <vertex id="CoefAC_L" x="1590" y="1703"/>
+      <vertex id="PredMode" x="1089" y="1790"/>
       <vertex id="ScalingList" x="766" y="96"/>
       <vertex id="QP" x="766" y="193"/>
       <vertex id="CurrMbAddr" x="766" y="290"/>
@@ -17,17 +17,17 @@
       <vertex id="MbPartWidth" x="766" y="969"/>
       <vertex id="MbPartHeigth" x="766" y="1066"/>
       <vertex id="MvRes" x="766" y="1163"/>
-      <vertex id="Mb_Type" x="1101" y="1971"/>
+      <vertex id="Mb_Type" x="1089" y="1908"/>
       <vertex id="Width" x="766" y="1260"/>
       <vertex id="Height" x="766" y="1357"/>
-      <vertex id="MV" x="1310" y="2593"/>
-      <vertex id="LOCATION" x="1294" y="2553"/>
-      <vertex id="PART_SZ" x="1294" y="2636"/>
-      <vertex id="Mb_TypeC" x="1097" y="2005"/>
-      <vertex id="CoefAC_Cb" x="1590" y="1769"/>
-      <vertex id="CoefDC_Cb" x="1587" y="1803"/>
-      <vertex id="CoefDC_Cr" x="1585" y="1875"/>
-      <vertex id="CoefAC_Cr" x="1591" y="1841"/>
+      <vertex id="MV" x="1089" y="2384"/>
+      <vertex id="LOCATION" x="1089" y="2481"/>
+      <vertex id="PART_SZ" x="1089" y="2578"/>
+      <vertex id="Mb_TypeC" x="1089" y="2005"/>
+      <vertex id="CoefAC_Cb" x="1590" y="1800"/>
+      <vertex id="CoefDC_Cb" x="1590" y="1897"/>
+      <vertex id="CoefDC_Cr" x="1590" y="1994"/>
+      <vertex id="CoefAC_Cr" x="1590" y="2091"/>
       <vertex id="IntraPredModeC" x="766" y="1454"/>
       <vertex id="QP_Cb" x="766" y="1551"/>
       <vertex id="QP_Cr" x="766" y="1648"/>
@@ -35,24 +35,24 @@
       <vertex id="slice_beta_offset" x="766" y="1842"/>
       <vertex id="LFDisable" x="766" y="2168"/>
       <vertex id="CodedBlockPattern" x="766" y="2265"/>
-      <vertex id="mv_out" x="1301" y="2677"/>
-      <vertex id="ref_idx" x="1300" y="2730"/>
-      <vertex id="I_PCM_Y" x="964" y="3405"/>
-      <vertex id="I_PCM_U" x="964" y="3325"/>
-      <vertex id="I_PCM_V" x="960" y="3366"/>
+      <vertex id="mv_out" x="1089" y="2675"/>
+      <vertex id="ref_idx" x="1089" y="2772"/>
+      <vertex id="I_PCM_Y" x="1089" y="3358"/>
+      <vertex id="I_PCM_U" x="1089" y="3455"/>
+      <vertex id="I_PCM_V" x="1089" y="3552"/>
       <vertex id="ConstrainedIFlag" x="766" y="2362"/>
       <vertex id="DelList" x="1089" y="3164"/>
       <vertex id="RefList" x="1318" y="2968"/>
       <vertex id="SizeDPBMax" x="766" y="2459"/>
       <vertex id="IsIDR" x="1089" y="3261"/>
-      <vertex id="BlockSize_L" x="1093" y="1938"/>
+      <vertex id="BlockSize_L" x="1089" y="2102"/>
       <vertex id="byte2bit" x="350" y="2437"/>
       <vertex id="Algo_NALU" x="168" y="2496"/>
       <vertex id="Algo_Synp_AVC" x="482" y="2133"/>
       <vertex id="Algo_BlockExpand_AVC" x="1089" y="2199"/>
       <vertex id="Algo_BlockSplit_AVC" x="1318" y="1783"/>
       <vertex id="Algo_IntraPred_Split" x="766" y="1939"/>
-      <vertex id="MVReconstruct" x="1023" y="2565"/>
+      <vertex id="MVReconstruct" x="766" y="2619"/>
       <vertex id="Algo_MMCO" x="766" y="3019"/>
       <vertex id="Algo_Parser_IPCM" x="766" y="3325"/>
       <vertex id="Algo_RefList0" x="1089" y="2869"/>

@@ -72,6 +72,7 @@ actor Algo_MMCO ()
 		:
 
 
+			uint(size=4) j42 := 0;
 /*
 *
 * Constant
@@ -91,6 +92,7 @@ actor Algo_MMCO ()
 	List(type:bool         , size=16) ShortTermFalseFrame := [ false : for int s in Integers(0,15)];
 	List(type:int (size=32), size=16) LTList              := [ -1    : for int s in Integers(0,15)];
 	List(type:uint(size=31), size=16) DelListTab          := [  0    : for int s in Integers(0,15)];
+
 	List(type:int (size=32), size=32) FrameNumList        := [ -1    : for int s in Integers(0,31)];
 	List(type:int (size=32), size=32) PocList             := [  0    : for int s in Integers(0,31)];
 
@@ -425,7 +427,31 @@ actor Algo_MMCO ()
 			IsIDR         :[ValIsIDR]
 		guard
 			FlagLongTerm = 0
+		var
+			uint(size=4) j := 0
 		do
+			j42 := 0;
+			foreach int i in Integers(0,ShortTermCount -1)
+			do
+				j := j42;
+				if(STList[i] != FrameNum)then
+					STList[j] := STList[i];
+					j := j + 1;
+				else
+					ShortTermCount := ShortTermCount - 1;
+				end
+				j42:=j;
+			end
+			foreach int i in Integers(0,LongTermCount - 1)
+			do
+				if(LTList[i] = FrameNum)then
+					LTList[i]     := -1;
+					LongTermCount := LongTermCount - 1;
+				end
+			end
+			DelListTab[NbFrameDel] := FrameNum;
+			NbFrameDel             := NbFrameDel + 1;
+
 			if (LongTermCount + ShortTermCount = NumRefFrame) then
 				ShortTermCount := ShortTermCount - 1;
 				if(ShortTermFalseFrame[ShortTermCount] = false) then
@@ -449,7 +475,30 @@ actor Algo_MMCO ()
 	AddFrame.InLTList: action
 				==>
 			IsIDR         :[ValIsIDR]
+		var
+			uint(size=4) j := 0
 		do
+			j42 := 0;
+			foreach int i in Integers(0,ShortTermCount -1)
+			do
+			j:=j42;
+				if(STList[i] != FrameNum)then
+					STList[j] := STList[i];
+					j := j + 1;
+				else
+					ShortTermCount := ShortTermCount - 1;
+				end
+			j42:=j;
+			end
+			foreach int i in Integers(0,LongTermCount - 1)
+			do
+				if(LTList[i] = FrameNum)then
+					LTList[i]     := -1;
+					LongTermCount := LongTermCount - 1;
+				end
+			end
+			DelListTab[NbFrameDel] := FrameNum;
+			NbFrameDel             := NbFrameDel + 1;
 
 			if (LTList[LongTermFrameIdx] != -1) then
 				DelListTab[NbFrameDel] := LTList[LongTermFrameIdx];
@@ -484,7 +533,7 @@ actor Algo_MMCO ()
 				then
 					foreach int j in Integers(0,31)
 					do
-						if(FrameNumList[j]   = DelListTab[i])then
+						if(FrameNumList[j]   = DelListTab[i] and (PocList[j] != ValCurrPoc))then
 							FrameNumList[j] := -1;
 							ValDelPoc       := PocList[j];
 							IdxNotFound2    := false;

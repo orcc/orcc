@@ -155,16 +155,18 @@ actor Algo_RefList ()
 					IdxToDel := i;
 				end
 			end
-			foreach int i in Integers(0,NbPOC - IdxToDel - 2)
-			do
-				POCList     [IdxToDel + i] := POCList     [IdxToDel + i + 1];
-				FrameNumList[IdxToDel + i] := FrameNumList[IdxToDel + i + 1];
-				IdxLTList   [IdxToDel + i] := IdxLTList   [IdxToDel + i + 1];
-				PicIsUsed   [IdxToDel + i] := PicIsUsed   [IdxToDel + i + 1];
-			end
-			NbPOC := NbPOC - 1;
-			if(IdxToDel <= IdxCurrentPic and IdxCurrentPic > 0) then
-				IdxCurrentPic := IdxCurrentPic - 1;
+			if(IdxToDel != -1)then
+				foreach int i in Integers(0,NbPOC - IdxToDel - 2)
+				do
+					POCList     [IdxToDel + i] := POCList     [IdxToDel + i + 1];
+					FrameNumList[IdxToDel + i] := FrameNumList[IdxToDel + i + 1];
+					IdxLTList   [IdxToDel + i] := IdxLTList   [IdxToDel + i + 1];
+					PicIsUsed   [IdxToDel + i] := PicIsUsed   [IdxToDel + i + 1];
+				end
+				NbPOC := NbPOC - 1;
+				if(IdxToDel <= IdxCurrentPic and IdxCurrentPic > 0) then
+					IdxCurrentPic := IdxCurrentPic - 1;
+				end
 			end
 		end
 
@@ -192,7 +194,7 @@ actor Algo_RefList ()
 			IdxCurrentPic := 0;
 			while(IdxNotFound)
 			do
-				if((FrameNumList[IdxCurrentPic] > frame_num) or (IdxCurrentPic = NbPOC)) then
+				if((FrameNumList[IdxCurrentPic] > frame_num) or (IdxCurrentPic = NbPOC - 1)) then
 					IdxNotFound := false;
 				end			
 				IdxCurrentPic := IdxCurrentPic + 1;
@@ -204,6 +206,7 @@ actor Algo_RefList ()
 			end
 
 			if(not IsIDR_Pic) then
+				DelFrame(frame_num);
 				InsertPoc(IdxCurrentPic,ValPOC,frame_num,-1);
 			else
 				InsertPoc(0,0,0,-1);
@@ -223,8 +226,7 @@ actor Algo_RefList ()
 //		println("\n\n\n\n\n***************** New Picture ************************");
 //		println("Frame Num Curr Pic:"+frame_num+" Poc:"+ValPOC);
 //		println("\nListReceived");
-//		println("");
-//		println("Frame num ::"+frame_num);	
+//		println("SizeShortTermList:"+ValSzSTList);
 		end
 
 
@@ -279,7 +281,7 @@ actor Algo_RefList ()
 		do
 //		println("ShortTermFrame:"+ValShortTerm);
 			frame_found := false;
-			foreach int i in Integers(0,NbPOC)
+			foreach int i in Integers(0,NbPOC - 1)
 			do
 				if(FrameNumList[i] = ValShortTerm) then
 					PicIsUsed[i] := true;
@@ -287,6 +289,7 @@ actor Algo_RefList ()
 				end
 			end
 			idx_found := false;
+			//Insert False Frame
 			if(not frame_found) then
 				foreach int i in Integers(0, NbPOC - 1)
 				do
@@ -311,16 +314,15 @@ actor Algo_RefList ()
 			uint(size=5) idx       := 0,
 			uint(size=6) NbPOCtemp := 0
 		do
-//	println("");
 			//I use NBSTRead variable because of the bug in frontend which will be solved quickly. 
 			NbSTRead := 0;
 			NbPOCtemp := NbPOC;
 			while((idx < NbPOCtemp) and (NbPOCtemp > 0))
 			do
 				idx := NbSTRead;
-				if((PicIsUsed[idx] = false) and (FrameNumList[idx] != FrameNumList[IdxCurrentPic]))then
-					DelFrame(FrameNumList[idx]);
+				if((PicIsUsed[idx] = false) and (idx != IdxCurrentPic))then
 //		println("DelFrame:"+FrameNumList[idx]);
+					DelFrame(FrameNumList[idx]);
 				else
 					idx := idx + 1;
 				end
@@ -389,23 +391,23 @@ ValidxRefList := 0;//////
 			end
 		end
 //		println("Buffer POCLIst and FrameNumList:");
-/*		foreach int i in Integers(0,NbPOC - 1)
-		do
-			println("FrameNum:"+FrameNumList[i]+" Poc:"+POCList[i]);
-		end
-*/		
+//		foreach int i in Integers(0,NbPOC - 1)
+//		do
+//			println("FrameNum:"+FrameNumList[i]+" Poc:"+POCList[i]);
+//		end
+		
 //		println("\nSizeBuffer:"+NumMaxListRefFrame+"\nShortTermPart");
-/*		foreach int i in Integers(0,ValidxRefList - 1)
-		do
-			println("ValFrameNum:"+FrameNumList[RefIdx[i]]);
-		end
-		println("LongTermPart");
-*/		if(ValidxRefList < NumMaxListRefFrame)then
+//		foreach int i in Integers(0,ValidxRefList - 1)
+//		do
+//			println("ValFrameNum:"+FrameNumList[RefIdx[i]]);
+//		end
+//		println("LongTermPart");
+		if(ValidxRefList < NumMaxListRefFrame)then
 			foreach int i in Integers(0,15)
 			do
 				IdxRefList2 := ValidxRefList; 
 				if ( (ValLTList[i] != -1) and (IdxRefList2 < NumMaxListRefFrame) ) then 
-	//				println("ValFrameNum:"+ValLTList[i]);
+//					println("ValFrameNum:"+ValLTList[i]);
 					RefIdx[IdxRefList2] := ValLTList[i]; 
 					IdxRefList2         := IdxRefList2 + 1 ;
 				end
@@ -447,11 +449,11 @@ ValidxRefList := 0;//////
 			bool IsInRefList := false,
 			int (size = 32) poc
 		do
-/*	foreach int i in Integers(0,NumMaxListRefFrame - 1)
-	do
-		println("BufferRefList:"+FrameNumList[RefIdx[i]]+" idx:"+RefIdx[i]);
-	end
-*/			//Compute the value of the re-mapped reference picture
+//	foreach int i in Integers(0,NumMaxListRefFrame - 1)
+//	do
+//		println("BufferRefList:"+FrameNumList[RefIdx[i]]+" idx:"+RefIdx[i]);
+//	end
+			//Compute the value of the re-mapped reference picture
 			if (reordering_of_pic_nums_idc = 0) then 
 				ValMovedFrame := ValMovedFrame - abs_diff_pic_num_minus1 - 1 ; 
 				if(ValMovedFrame < 0) then
@@ -496,10 +498,8 @@ ValidxRefList := 0;//////
 					end
 				end
 				poc := POCList[ValMovedIdx];
-				//poc := POCList[RefIdx[CounterRefListTab]];
-				//println("RefListSentttt; FrNu:"+FrameNumList[RefIdx[CounterRefListTab]]+" Poc:"+POCList[RefIdx[CounterRefListTab]]);
 				CounterRefListTab := CounterRefListTab + 1;
-//				NumMaxListRefFrame := NumMaxListRefFrame - 1;
+				NumMaxListRefFrame := NumMaxListRefFrame - 1;
 //				println("RefListSent:"+FrameNumList[ValMovedIdx]+" Poc:"+POCList[ValMovedIdx]);
 			end
 
@@ -516,11 +516,11 @@ ValidxRefList := 0;//////
 		var
 			int (size = 32) poc
 		do
-/*	foreach int i in Integers(0,NumMaxListRefFrame - 1)
-	do
-		println("BufferRefList:"+FrameNumList[RefIdx[i]]+" idx:"+RefIdx[i]);
-	end
-*/			ValidxRefList := 0;
+//	foreach int i in Integers(0,NumMaxListRefFrame - 1)
+//	do
+//		println("BufferRefList:"+FrameNumList[RefIdx[i]]+" idx:"+RefIdx[i]);
+//	end
+			ValidxRefList := 0;
 			//Search the location of the reference picture in the RefList
 			foreach int i in Integers(0, NumMaxListRefFrame-1)
 			do

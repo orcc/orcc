@@ -325,6 +325,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard
 			nbMBdisplayForYaxis = PicHeightInMacroB
 		do
+println("Decoded Picture Buffer, Pic Displayed : "+ListPOC[IdxNextPOCtoDisplay]);
 			PicDisplayed[IdxNextPOCtoDisplay] := true;
 			NextPOCtoDisplay := -1;
 			IdxNextPOCtoDisplay := -1;
