@@ -174,7 +174,9 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 	@Override
 	protected int resumeNetwork() {
 		if (breakpointActor != null) {
-			breakpointActor.step(false);
+			while (breakpointActor.step(false) > 1)
+				;
+			breakpointActor = null;
 		}
 		return 0;
 	}
@@ -192,7 +194,6 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 			if (actorStatus < 0) {
 				if (actorStatus == -2) {
 					breakpointActor = myInstance;
-					breakpointLine = breakpointActor.goToBreakpoint();
 				}
 				return actorStatus;
 			} else if (actorStatus > 0) {
@@ -216,7 +217,6 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 			if (actorStatus < 0) {
 				if (actorStatus == -2) {
 					breakpointActor = myInstance;
-					breakpointLine = breakpointActor.goToBreakpoint();
 				}
 				return actorStatus;
 			} else {
@@ -251,13 +251,7 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 			// Stepping thread cannot schedule any action, so run all actors
 			// to generate required inputs
 			networkState = stepNetwork();
-			if (networkState <= 0) {
-				return networkState;
-			}
-		}
-		if (status == 1) {
-			networkState = stepNetwork();
-			if (networkState <= 0) {
+			if (networkState < 0) {
 				return networkState;
 			}
 		}
@@ -282,13 +276,17 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 	protected void stepReturn(String instanceId) {
 		AbstractInterpreterSimuActor myInstance = (AbstractInterpreterSimuActor) simuActorsMap
 				.get(instanceId);
-		while (myInstance.step(false) > 1)
-			;
+		if (myInstance.isStepping()) {
+			while (myInstance.step(false) > 1)
+				;
+		}
 	}
 
 	@Override
 	protected void suspendNetwork() {
-		// Nothing TODO ?
+		if (breakpointActor != null) {
+			breakpointLine = breakpointActor.goToBreakpoint();
+		}
 	}
 
 }

@@ -70,8 +70,12 @@ public class OrccStackFrame extends OrccDebugElement implements IStackFrame {
 		// Get relative path in the workspace :
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
-		IFile file = root.getFileForLocation(new Path(frame.actorFilename));
-		fFileName = file.getProjectRelativePath().toString();
+		if (frame.actorFilename.length() > 0) {
+			IFile file = root.getFileForLocation(new Path(frame.actorFilename));
+			fFileName = file.getProjectRelativePath().toString();
+		}else {
+			fFileName = "";
+		}
 		fLineNumber = frame.codeLine;
 		try {
 			fName = "ACTOR : " + thread.getActorName() + " (fired "

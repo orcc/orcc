@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ui.launching;
 
+import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
 import java.util.HashMap;
@@ -39,6 +40,7 @@ import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -142,4 +144,9 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 		return super.isValid(launchConfig);
 	}
 
+	@Override
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		super.setDefaults(configuration);
+		configuration.setAttribute(COMPILE_XDF, true);
+	}
 }

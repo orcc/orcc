@@ -33,7 +33,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.plugins.Plugin;
+
+import org.eclipse.core.runtime.IProgressMonitor;
 
 public interface Simulator extends Plugin, Runnable {
 
@@ -48,7 +51,7 @@ public interface Simulator extends Plugin, Runnable {
 	 * Simulator automaton control events
 	 */
 	public enum SimulatorEvent {
-		CLEAR_BREAKPOINT, CONFIGURE, RESUME, RUN, SET_BREAKPOINT, SUSPEND, STEP_ALL, STEP_OVER, STEP_INTO, STEP_RETURN, TERMINATE
+		CLEAR_BREAKPOINT, START, RESUME, SET_BREAKPOINT, SUSPEND, STEP_ALL, STEP_OVER, STEP_INTO, STEP_RETURN, TERMINATE
 	}
 
 	/**
@@ -75,12 +78,27 @@ public interface Simulator extends Plugin, Runnable {
 	}
 
 	/**
-	 * Add the listener <code>listener</code> to the registered listeners.
+	 * Add the listener <code>listener</code> to the registered listeners. Must
+	 * be called before starting the simulator thread.
 	 * 
 	 * @param listener
 	 *            The PropertyChangeListener to add.
 	 */
 	public void addPropertyChangeListener(PropertyChangeListener listener);
+
+	/**
+	 * Synchronous configuration of the simulator. Must be called before
+	 * starting the simulator thread.
+	 * 
+	 * @param process
+	 *            the parent OrccProcess of this plugin
+	 * @param monitor
+	 *            the progress monitor associated with this plugin
+	 * @param debugMode
+	 *            true if simulator is launched as a debugger
+	 */
+	void configure(OrccProcess process, IProgressMonitor monitor,
+			boolean debugMode);
 
 	/**
 	 * Get a list corresponding to the simulated actors instances identifiers.
@@ -114,15 +132,28 @@ public interface Simulator extends Plugin, Runnable {
 	public DebugStackFrame getStackFrame(String instanceID);
 
 	/**
+	 * Return the current simulator thread state.
+	 * 
+	 * @return simulator state
+	 */
+	public SimulatorState getSimulatorState();
+
+	/**
+	 * Indicate if the target simulator is currently in "stepping" mode
+	 * 
+	 * @return true if stepping, false otherwise
+	 */
+	public boolean isStepping();
+
+	/**
 	 * Receive a message with data content from master caller
 	 * 
 	 * @param event
 	 *            CLEAR_BREAKPOINT : remove a breakpoint from the simulator list
 	 *            (must be associated with 2 arguments data : the file name and
-	 *            the line number of the source code); CONFIGURE : set to
-	 *            simulator ready for simulation (must be associated with an
-	 *            OrccProcess as data); RESUME : run the network; SET_BREAKPOINT
-	 *            : add a breakpoint to the simulator list (data = file name and
+	 *            the line number of the source code); START : requires the
+	 *            simulator to start; RESUME : run the network; SET_BREAKPOINT :
+	 *            add a breakpoint to the simulator list (data = file name and
 	 *            line number); STEP_ALL : requires a step over all the actors
 	 *            of the simulated network; STEP_INTO/OVER/RETURN : step
 	 *            into/over/return from an actor action (data = target actor

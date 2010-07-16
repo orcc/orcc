@@ -114,6 +114,9 @@ public class SimulatorFactory extends PluginFactory {
 		// thread if we are not in debug mode.
 		try {
 			if (option.equals("debugger")) {
+				// Set the parent OrccProcess of the simulator, the progress
+				// monitor and activate debug mode
+				simuObj.configure(process, process.getProgressMonitor(), true);
 				// Add the DebugTarget as a listener of the simulator
 				OrccDebugTarget target = new OrccDebugTarget(launch, process,
 						(Simulator) simuObj);
@@ -121,19 +124,15 @@ public class SimulatorFactory extends PluginFactory {
 				((Simulator) simuObj).addPropertyChangeListener(target);
 				// Start the thread...
 				simulatorThread.start();
-				// ...wait for the end of simulation
-				simulatorThread.join();
 			} else {
+				simuObj.configure(process, process.getProgressMonitor(), false);
 				// Start the thread...
 				simulatorThread.start();
-				// Automatically configure the simulator
-				Object[] data = new Object[1];
-				data[0] = process;
-				((Simulator) simuObj).message(SimulatorEvent.CONFIGURE, data);
-				((Simulator) simuObj).message(SimulatorEvent.RESUME, null);
-				// ...wait for the end of simulation
-				simulatorThread.join();
 			}
+			// Start the simulator
+			((Simulator) simuObj).message(SimulatorEvent.START, null);
+			// ...wait for the end of simulation
+			simulatorThread.join();
 		} catch (Exception e) {
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
 					"simulator error", e);

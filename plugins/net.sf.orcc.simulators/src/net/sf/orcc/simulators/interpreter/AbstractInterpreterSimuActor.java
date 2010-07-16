@@ -41,10 +41,10 @@ import net.sf.orcc.runtime.Fifo;
  */
 public abstract class AbstractInterpreterSimuActor {
 
-	protected String lastVisitedAction;
+	protected String lastVisitedAction = "NA";
 
-	protected Location lastVisitedLocation;
-
+	protected Location lastVisitedLocation = new Location(0, 0, 0);
+	
 	protected int nbOfFirings;
 
 	/**
@@ -75,6 +75,15 @@ public abstract class AbstractInterpreterSimuActor {
 	 * initial values of actor's state variables.
 	 */
 	public void initialize() {
+	}
+	
+	/**
+	 * Indicate if the current actor is stepping.
+	 * 
+	 * @return true if actor is stepping over an action
+	 */
+	public boolean isStepping() {
+		return false;
 	}
 
 	/**

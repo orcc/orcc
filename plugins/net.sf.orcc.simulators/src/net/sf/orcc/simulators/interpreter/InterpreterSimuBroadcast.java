@@ -82,11 +82,10 @@ public class InterpreterSimuBroadcast extends AbstractInterpreterSimuActor
 	@Override
 	public DebugStackFrame getStackFrame() {
 		DebugStackFrame stackFrame = new DebugStackFrame();
-		stackFrame.actorFilename = instanceId;
+		stackFrame.actorFilename = "";
 		stackFrame.codeLine = 0;
 		stackFrame.nbOfFirings = nbOfFirings;
 		stackFrame.stateVars.clear();
-		stackFrame.currentAction = broadcast.getNextSchedulableAction();
 		stackFrame.fsmState = "IDLE";
 		return stackFrame;
 	}

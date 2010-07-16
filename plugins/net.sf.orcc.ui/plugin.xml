@@ -180,10 +180,10 @@
             id="net.sf.orcc.simuLaunchConfigurationTabGroup"
             type="net.sf.orcc.simuLaunchConfigurationType">
          <launchMode
-               mode="run">
+               mode="debug">
          </launchMode>
          <launchMode
-               mode="debug">
+               mode="run">
          </launchMode>
       </launchConfigurationTabGroup>
    </extension>

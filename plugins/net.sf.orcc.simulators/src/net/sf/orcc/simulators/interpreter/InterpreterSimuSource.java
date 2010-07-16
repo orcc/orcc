@@ -82,11 +82,10 @@ public class InterpreterSimuSource extends AbstractInterpreterSimuActor
 	@Override
 	public DebugStackFrame getStackFrame() {
 		DebugStackFrame stackFrame = new DebugStackFrame();
-		stackFrame.actorFilename = "Actor_Source";
+		stackFrame.actorFilename = "";
 		stackFrame.codeLine = 0;
 		stackFrame.nbOfFirings = nbOfFirings;
 		stackFrame.stateVars.clear();
-		stackFrame.currentAction = source.getNextSchedulableAction();
 		stackFrame.fsmState = "IDLE";
 		return stackFrame;
 	}

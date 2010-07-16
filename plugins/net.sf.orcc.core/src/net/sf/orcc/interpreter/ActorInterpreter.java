@@ -75,12 +75,12 @@ public class ActorInterpreter {
 	 * Actor's constant parameters to be set at initialization time
 	 */
 	private Map<String, Expression> parameters;
-	
+
 	/**
 	 * Actor's FSM current state
 	 */
 	protected String fsmState;
-	
+
 	/**
 	 * Actor's action scheduler
 	 */
@@ -98,7 +98,6 @@ public class ActorInterpreter {
 	 */
 	private OrccProcess process;
 
-
 	/**
 	 * Creates a new interpreted actor instance for simulation or debug
 	 * 
@@ -109,8 +108,8 @@ public class ActorInterpreter {
 	 * @param actor
 	 *            actor class definition
 	 */
-	public ActorInterpreter(Map<String, Expression> parameters,
-			Actor actor, OrccProcess process) {
+	public ActorInterpreter(Map<String, Expression> parameters, Actor actor,
+			OrccProcess process) {
 		// Set instance name and actor class definition at parent level
 		this.actor = actor;
 
@@ -121,7 +120,7 @@ public class ActorInterpreter {
 		nodeInterpreter = new NodeInterpreter();
 		// Create the List allocator for state and procedure local vars
 		this.listAllocator = new ListAllocator();
-		
+
 		// Create the expression evaluator
 		this.exprInterpreter = new ExpressionEvaluator();
 
@@ -242,7 +241,7 @@ public class ActorInterpreter {
 		}
 		return null;
 	}
-
+	
 	/**
 	 * Initialize interpreted actor. That is to say constant parameters,
 	 * initialized state variables, allocation and initialization of state
@@ -334,6 +333,11 @@ public class ActorInterpreter {
 		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
 	}
 
+	/**
+	 * Schedule next schedulable action if any
+	 * 
+	 * @return the number of scheduled actions (1 or 0)
+	 */
 	public Integer schedule() {
 		try {
 			// "Synchronous-like" scheduling policy : schedule only 1 action per
@@ -350,7 +354,23 @@ public class ActorInterpreter {
 		}
 	}
 
+	/**
+	 * Set the communication FIFOs map for interpreter to be able to execute
+	 * read/write accesses.
+	 * 
+	 * @param fifos
+	 */
 	public void setFifos(Map<String, Fifo> fifos) {
 		ioFifos = fifos;
+	}
+
+	/**
+	 * Set the interpreter FSM state. Must be used with caution. This method is
+	 * useful for synchronizing the interpretation with an external actor's
+	 * instance state.
+	 * 
+	 */
+	public void setFsmState(String newState) {
+		fsmState = newState;
 	}
 }

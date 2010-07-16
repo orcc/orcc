@@ -74,7 +74,7 @@ public interface OrccLaunchConstants {
 	/**
 	 * Default value for {@value #FIFO_SIZE}.
 	 */
-	public static final int DEFAULT_FIFO_SIZE = 10000;
+	public static final int DEFAULT_FIFO_SIZE = 512;
 
 	/**
 	 * Default value for {@value #KEEP_INTERMEDIATE}.

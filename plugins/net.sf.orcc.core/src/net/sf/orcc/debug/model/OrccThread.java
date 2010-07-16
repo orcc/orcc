@@ -78,7 +78,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#canResume()
 	 */
 	public boolean canResume() {
-		return false;
+		return isSuspended() && !isStepping();
 	}
 
 	/*
@@ -87,7 +87,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#canStepInto()
 	 */
 	public boolean canStepInto() {
-		return isSuspended() && isStepping();
+		return isSuspended() && !isStepping();
 	}
 
 	/*
@@ -96,7 +96,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#canStepOver()
 	 */
 	public boolean canStepOver() {
-		return isSuspended() && isStepping();
+		return isSuspended() && !isStepping();
 	}
 
 	/*
@@ -105,7 +105,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.IStep#canStepReturn()
 	 */
 	public boolean canStepReturn() {
-		return isSuspended() && isStepping();
+		return isSuspended() && !isStepping();
 	}
 
 	/*
@@ -123,7 +123,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#canTerminate()
 	 */
 	public boolean canTerminate() {
-		return false;
+		return target.canTerminate();
 	}
 
 	public String getActorName() throws DebugException {
@@ -229,6 +229,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#resume()
 	 */
 	public void resume() throws DebugException {
+		target.resume();
 	}
 
 	/**
@@ -276,6 +277,7 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ISuspendResume#suspend()
 	 */
 	public void suspend() throws DebugException {
+		target.suspend();
 	}
 
 	/*
@@ -284,5 +286,6 @@ public class OrccThread extends OrccDebugElement implements IThread {
 	 * @see org.eclipse.debug.core.model.ITerminate#terminate()
 	 */
 	public void terminate() throws DebugException {
+		target.terminate();
 	}
 }

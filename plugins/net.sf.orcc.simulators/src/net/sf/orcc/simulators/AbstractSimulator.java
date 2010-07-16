@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.Set;
 
@@ -103,18 +104,23 @@ public abstract class AbstractSimulator implements Simulator {
 	}
 
 	@Override
-	public String getNetworkName() {
-		File file = new File(xdfFile);
-		int index = file.getName().lastIndexOf('.');
-		if ((index > 0) && (index <= file.getName().length() - 2)) {
-			return file.getName().substring(0, index);
-		}
-		return file.getName();
+	public synchronized String getNetworkName() {
+		return getFilenameWithoutExtension(xdfFile);
 	}
 
 	@Override
 	public synchronized DebugStackFrame getStackFrame(String instanceID) {
 		return simuActorsMap.get(instanceID).getStackFrame();
+	}
+	
+	@Override
+	public synchronized SimulatorState getSimulatorState() {
+		return state;
+	}
+
+	@Override
+	public synchronized boolean isStepping() {
+		return isStepping;
 	}
 
 	@Override
@@ -125,8 +131,38 @@ public abstract class AbstractSimulator implements Simulator {
 	@Override
 	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
+		try {
+			// Get configuration attributes
+			stimulusFile = configuration.getAttribute(INPUT_STIMULUS, "");
+			outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
+			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+			xdfFile = configuration.getAttribute(XDF_FILE, "");
+		} catch (CoreException e) {
+			throw new OrccRuntimeException(e.getMessage());
+		}
 		// Property change support creation for sending interpreter events
 		propertyChange = new PropertyChangeSupport(this);
+	}
+
+	@Override
+	final public void configure(OrccProcess process, IProgressMonitor monitor, boolean debugMode) {
+		this.process = process;
+		this.monitor = monitor;
+		this.debugMode = debugMode;
+		try {
+			// Parse XDF file, do some transformations and return the
+			// graph corresponding to the flat network instantiation.
+			DirectedGraph<Vertex, Connection> graph = getGraphFromNetwork();
+			// Instantiate simulator actors from the graph
+			instantiateNetwork(graph);
+			// Build the network according to the specified topology.
+			initializeNetwork();
+			connectNetwork(graph);
+		} catch (OrccException e) {
+			throw new OrccRuntimeException(e.getMessage());
+		} catch (FileNotFoundException e) {
+			throw new OrccRuntimeException(e.getMessage());
+		}
 	}
 
 	/**
@@ -173,6 +209,11 @@ public abstract class AbstractSimulator implements Simulator {
 	 * used for easy "debug events" exchange.
 	 */
 	private PropertyChangeSupport propertyChange;
+
+	/**
+	 * Flag indicating the simulator is currently stepping
+	 */
+	private boolean isStepping = false;
 
 	/**
 	 * Simulator current automaton state, initialized to "IDLE" by default
@@ -308,6 +349,22 @@ public abstract class AbstractSimulator implements Simulator {
 	abstract protected void suspendNetwork();
 
 	/**
+	 * Clear a breakpoint related to one or several instances according to the
+	 * actor source file and the line number.
+	 * 
+	 * @param actorFileName
+	 * @param lineNumber
+	 */
+	private void clearBreakpoint(String actorName, int lineNumber) {
+		for (Entry<String, SimuActor> entry : simuActorsMap.entrySet()) {
+			SimuActor instance = entry.getValue();
+			if (instance.getActorName().equals(actorName)) {
+				instance.clearBreakpoint(lineNumber);
+			}
+		}
+	}
+
+	/**
 	 * Visit the network graph for building the required topology. Edges of the
 	 * graph correspond to the connections between the actors. These connections
 	 * should be implemented as FIFOs of specific size as defined in the CAL
@@ -349,12 +406,27 @@ public abstract class AbstractSimulator implements Simulator {
 					// Connect actors through specific simulator method
 					connectActors(simuActorsMap.get(srcInst.getId()), srcPort,
 							simuActorsMap.get(tgtInst.getId()), tgtPort, size);
-					process.write("Connecting " + srcInst.getId() + "."
-							+ srcPort.getName() + " to " + tgtInst.getId()
-							+ "." + tgtPort.getName() + "\n");
+					// process.write("Connecting " + srcInst.getId() + "."
+					// + srcPort.getName() + " to " + tgtInst.getId()
+					// + "." + tgtPort.getName() + "\n");
 				}
 			}
 		}
+	}
+
+	/**
+	 * Util function for getting actor or network names from file names.
+	 * 
+	 * @param filename
+	 * @return the filename without complete path abnd without the extension
+	 */
+	private String getFilenameWithoutExtension(String filename) {
+		File file = new File(filename);
+		int index = file.getName().lastIndexOf('.');
+		if ((index > 0) && (index <= file.getName().length() - 2)) {
+			return file.getName().substring(0, index);
+		}
+		return file.getName();
 	}
 
 	/**
@@ -461,192 +533,195 @@ public abstract class AbstractSimulator implements Simulator {
 	 */
 	@Override
 	public void run() throws OrccRuntimeException {
-		try {
-
-			// Loop until the simulator has terminated
-			while (state != SimulatorState.TERMINATED) {
-				// Synchronous behavior : check propertyChanges (events)
-				// for transitions and apply current state action
-				SimulatorMessage msg = messageQueue.peek();
-				// Synchronous events received at any state :
-				if (msg != null) {
-					switch (msg.event) {
-					case SET_BREAKPOINT:
-						// TODO : check message data is valid
-						simuActorsMap.get((String) msg.data[0]).setBreakpoint(
-								(Integer) msg.data[1]);
-						messageQueue.remove();
-						break;
-					case CLEAR_BREAKPOINT:
-						// TODO : check message data is valid
-						simuActorsMap.get((String) msg.data[0])
-								.clearBreakpoint((Integer) msg.data[1]);
-						messageQueue.remove();
-						break;
-					case TERMINATE:
-						messageQueue.remove();
-						terminate();
-						break;
+		// Loop until the simulator has terminated
+		while (state != SimulatorState.TERMINATED) {
+			// Synchronous behavior : check propertyChanges (events)
+			// for transitions and apply current state action
+			SimulatorMessage msg = messageQueue.peek();
+			// Synchronous events received at any state :
+			if (msg != null) {
+				switch (msg.event) {
+				case TERMINATE:
+					messageQueue.remove();
+					terminate();
+					break;
+				}
+			}
+			// FSM :
+			switch (state) {
+			//
+			// IDLE state : wait for the simulator to be configured. Go to
+			// CONFIGURED state when CONFIGURE event has been received.
+			//
+			case IDLE:
+				isStepping = false;
+				if ((msg != null) && (msg.event == SimulatorEvent.START)) {
+					// Check debug mode is activated
+					messageQueue.remove();
+					if (debugMode) {
+						state = SimulatorState.CONFIGURED;
+					} else {
+						state = SimulatorState.RUNNING;
 					}
 				}
-				// FSM :
-				switch (state) {
-				//
-				// IDLE state : wait for the simulator to be configured. Go to
-				// CONFIGURED state when CONFIGURE event has been received.
-				//
-				case IDLE:
-					if ((msg != null)
-							&& (msg.event == SimulatorEvent.CONFIGURE)
-							&& (msg.data != null) && (msg.data.length == 1)
-							&& (configuration != null)) {
-						// Get system objects
-						process = (OrccProcess) msg.data[0];
-						monitor = process.getProgressMonitor();
-						// Get configuration attributes
-						stimulusFile = configuration.getAttribute(
-								INPUT_STIMULUS, "");
-						outputFolder = configuration.getAttribute(
-								OUTPUT_FOLDER, "");
-						fifoSize = configuration.getAttribute(FIFO_SIZE,
-								DEFAULT_FIFO_SIZE);
-						xdfFile = configuration.getAttribute(XDF_FILE, "");
-						messageQueue.remove();
-						state = SimulatorState.CONFIGURED;
-					}
-					// TODO : throw OrccException if CONFIGURE message data is
-					// not valid
-					break;
-				//
-				// CONFIGURED : transitory state exploiting the configuration
-				// attributes for parsing and instantiating the network we want
-				// to simulate. Automatic transition to SUSPENDED state.
-				//
-				case CONFIGURED:
-					// Parse XDF file, do some transformations and return the
-					// graph corresponding to the flat network instantiation.
-					DirectedGraph<Vertex, Connection> graph = getGraphFromNetwork();
-					// Instantiate simulator actors from the graph
-					instantiateNetwork(graph);
-					// Build the network according to the specified topology.
-					initializeNetwork();
-					connectNetwork(graph);
-					state = SimulatorState.SUSPENDED;
-					firePropertyChange("started", null, null);
-					break;
-				//
-				// RUNNING : this state corresponds to an execution of the
-				// entire network until every actor is waiting for input data
-				// (end of the network simulation) or until the simulator has
-				// been interrupted by the user (suspend, close, cancel) or a
-				// breakpoint has been hit. GOTO SUSPENDED state if a SUSPEND
-				// event has been received or a breakpoint has been hit. GOTO
-				// TERMINATED if no more action is schedulable in the entire
-				// network.
-				//
-				case RUNNING:
-					// "Asynchronous" user cancel
-					if (monitor.isCanceled()) {
-						terminate();
-					} else {
-
-						// Check suspension
-						if ((msg != null)
-								&& (msg.event == SimulatorEvent.SUSPEND)) {
+				// TODO : throw OrccException if CONFIGURE message data is
+				// not valid
+				break;
+			//
+			// CONFIGURED : transitory state for indicate the debug target that
+			// we have started debugging mode. Automatic transition to SUSPENDED
+			// state, waiting for RESUME event.
+			//
+			case CONFIGURED:
+				state = SimulatorState.SUSPENDED;
+				firePropertyChange("started", null, null);
+				break;
+			//
+			// RUNNING : this state corresponds to an execution of the
+			// entire network until every actor is waiting for input data
+			// (end of the network simulation) or until the simulator has
+			// been interrupted by the user (suspend, close, cancel) or a
+			// breakpoint has been hit. GOTO SUSPENDED state if a SUSPEND
+			// event has been received or a breakpoint has been hit. GOTO
+			// TERMINATED if no more action is schedulable in the entire
+			// network.
+			//
+			case RUNNING:
+				// "Asynchronous" user cancel
+				if (monitor.isCanceled()) {
+					terminate();
+				} else {
+					// Check suspension or unchanging state events
+					if (msg != null) {
+						switch (msg.event) {
+						case SUSPEND:
 							messageQueue.remove();
 							suspendNetwork();
 							state = SimulatorState.SUSPENDED;
 							firePropertyChange("suspended client", null, null);
-						} else {
-							// Continue running the whole network of actors
-							int status = runNetwork();
-							if (status == -2) {
-								// Breakpoint hit
-								state = SimulatorState.SUSPENDED;
-								String instanceId = getBreakpointActorInstanceId();
-								Integer breakpointLineNumber = getBreakpointLineNumber();
-								firePropertyChange("suspended breakpoint"
-										+ breakpointLineNumber, null,
-										instanceId);
-							} else if (status <= 0) {
-								terminate();
-							}
-						}
-					}
-					break;
-				//
-				// SUSPENDED : network simulation has been suspended. This state
-				// admits events asking for stepping.
-				//
-				case SUSPENDED:
-					// "Asynchronous" user cancel
-					if (monitor.isCanceled()) {
-						terminate();
-					} else {
-						// Wait for STEP or RESUME
-						if (msg != null) {
+							break;
+						case SET_BREAKPOINT:
 							messageQueue.remove();
-							switch (msg.event) {
-							case RUN:
-								debugMode = false;
-								runNetwork();
-								state = SimulatorState.RUNNING;
-								break;
-							case RESUME:
-								debugMode = true;
-								resumeNetwork();
-								state = SimulatorState.RUNNING;
-								firePropertyChange("resumed client", null, null);
-								break;
-							case STEP_ALL:
-								firePropertyChange("resumed step", null, null);
-								if (stepNetwork() <= 0) {
-									terminate();
-								} else {
-									// Suspended again
-									firePropertyChange("suspended step", null,
-											null);
-								}
-								break;
-							case STEP_INTO:
-							case STEP_OVER:
-							case STEP_RETURN:
-								// Get step parameters
-								String instanceId = (String) msg.data[0];
-								int status = 0;
-								// Send resumed event to debug target
-								firePropertyChange("resumed step", null,
-										instanceId);
-								// Run required step command
-								if (msg.event == SimulatorEvent.STEP_INTO)
-									status = stepInto(instanceId);
-								else if (msg.event == SimulatorEvent.STEP_OVER)
-									status = stepOver(instanceId);
-								else if (msg.event == SimulatorEvent.STEP_RETURN)
-									stepReturn(instanceId);
-								// Check returned status
-								if (status <= 0) {
-									terminate();
-								} else {
-									// Suspended again
-									firePropertyChange("suspended step", null,
-											instanceId);
-								}
-								break;
-							}
+							// TODO : check message data is valid
+							setBreakpoint(
+									getFilenameWithoutExtension((String) msg.data[0]),
+									(Integer) msg.data[1]);
+							break;
+						case CLEAR_BREAKPOINT:
+							messageQueue.remove();
+							// TODO : check message data is valid
+							clearBreakpoint(
+									getFilenameWithoutExtension((String) msg.data[0]),
+									(Integer) msg.data[1]);
+							break;
+						}
+					} else {
+						// Continue running the whole network of actors
+						int status = runNetwork();
+						if (status == -2) {
+							// Breakpoint hit
+							suspendNetwork();
+							state = SimulatorState.SUSPENDED;
+							String instanceId = getBreakpointActorInstanceId();
+							Integer breakpointLineNumber = getBreakpointLineNumber();
+							firePropertyChange("suspended breakpoint "
+									+ breakpointLineNumber, null, instanceId);
+						} else if (status <= 0) {
+							terminate();
 						}
 					}
-					break;
 				}
+				break;
+			//
+			// SUSPENDED : network simulation has been suspended. This state
+			// admits events asking for stepping.
+			//
+			case SUSPENDED:
+				// "Asynchronous" user cancel
+				if (monitor.isCanceled()) {
+					terminate();
+				} else {
+					// Wait for STEP or RESUME
+					if (msg != null) {
+						messageQueue.remove();
+						switch (msg.event) {
+						case RESUME:
+							resumeNetwork();
+							state = SimulatorState.RUNNING;
+							firePropertyChange("resumed client", null, null);
+							break;
+						case SET_BREAKPOINT:
+							// TODO : check message data is valid
+							setBreakpoint(
+									getFilenameWithoutExtension((String) msg.data[0]),
+									(Integer) msg.data[1]);
+							break;
+						case CLEAR_BREAKPOINT:
+							// TODO : check message data is valid
+							clearBreakpoint(
+									getFilenameWithoutExtension((String) msg.data[0]),
+									(Integer) msg.data[1]);
+							break;
+						case STEP_ALL:
+							firePropertyChange("resumed step", null, null);
+							isStepping = true;
+							if (stepNetwork() <= 0) {
+								terminate();
+							} else {
+								// Suspended again
+								isStepping = false;
+								firePropertyChange("suspended step", null, null);
+							}
+							break;
+						case STEP_INTO:
+						case STEP_OVER:
+						case STEP_RETURN:
+							// Get step parameters
+							String instanceId = (String) msg.data[0];
+							int status = 1;
+							// Send resumed event to debug target
+							firePropertyChange("resumed step", null, instanceId);
+							isStepping = true;
+							// Run required step command
+							if (msg.event == SimulatorEvent.STEP_INTO)
+								status = stepInto(instanceId);
+							else if (msg.event == SimulatorEvent.STEP_OVER)
+								status = stepOver(instanceId);
+							else if (msg.event == SimulatorEvent.STEP_RETURN)
+								stepReturn(instanceId);
+							// Check returned status
+							if (status <= 0) {
+								terminate();
+							} else {
+								// Suspended again
+								isStepping = false;
+								firePropertyChange("suspended step", null,
+										instanceId);
+							}
+							break;
+						}
+					}
+				}
+				break;
 			}
-			// Reset the state to IDLE for next launch
-			state = SimulatorState.IDLE;
-		} catch (CoreException e) {
-			throw new OrccRuntimeException(e.getMessage());
-		} catch (OrccException e) {
-			throw new OrccRuntimeException(e.getMessage());
-		} catch (FileNotFoundException e) {
-			throw new OrccRuntimeException(e.getMessage());
+		}
+		// Reset the state to IDLE for next launch
+		state = SimulatorState.IDLE;
+	}
+
+	/**
+	 * Set a breakpoint related to one or several instances according to the
+	 * actor source file and the line number.
+	 * 
+	 * @param actorFileName
+	 * @param lineNumber
+	 */
+	private void setBreakpoint(String actorName, int lineNumber) {
+		for (Entry<String, SimuActor> entry : simuActorsMap.entrySet()) {
+			SimuActor instance = entry.getValue();
+			if (instance.getActorName().equals(actorName)) {
+				instance.setBreakpoint(lineNumber);
+			}
 		}
 	}
 

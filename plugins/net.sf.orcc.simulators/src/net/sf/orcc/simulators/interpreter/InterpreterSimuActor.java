@@ -79,6 +79,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 
 	protected List<Breakpoint> breakpoints;
 	protected boolean isStepping = false;
+	protected Action breakAction = null;
 
 	private class NodeInfo {
 		public Expression condition;
@@ -97,7 +98,6 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		}
 	}
 
-	private Action breakAction = null;
 	private Action currentAction = null;
 	private List<Instruction> instrStack;
 	private List<NodeInfo> nodeStack;
@@ -106,7 +106,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	/**
 	 * Interpretation and evaluation tools
 	 */
-	private ActorInterpreter actorInterpreter;
+	protected ActorInterpreter actorInterpreter;
 	protected ExpressionEvaluator exprEvaluator;
 	private ListAllocator listAllocator;
 
@@ -155,12 +155,16 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 
 	@Override
 	public void clearBreakpoint(int breakpoint) {
+		Breakpoint rm_bkpt=null;
 		// Remove breakpoint from the list
 		for (Breakpoint bkpt : breakpoints) {
 			if ((breakpoint == bkpt.lineNb)) {
-				breakpoints.remove(bkpt);
+				rm_bkpt = bkpt;
+				break;
 			}
 		}
+		if (rm_bkpt != null)
+			breakpoints.remove(rm_bkpt);
 	}
 
 	@Override
@@ -209,13 +213,11 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		while (bkptLine == 0) {
 			int actorStatus = step(false);
 			if (actorStatus <= 1) {
-				throw new OrccRuntimeException(
-						"Error : cannot synchronize to action breakpoint");
+				process.write("! Breakpoint location forbidden !");
 			} else {
 				for (Breakpoint bkpt : breakpoints) {
 					if ((bkpt.lineNb == lastVisitedLocation.getStartLine())) {
 						bkptLine = bkpt.lineNb;
-						isStepping = true;
 					}
 				}
 			}
@@ -228,6 +230,11 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		actorInterpreter.initialize();
 	}
 
+	@Override
+	public boolean isStepping() {
+		return isStepping;
+	}
+	
 	/**
 	 * Manages the stack of nodes to be interpreted by the debugger
 	 */
@@ -255,7 +262,6 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 				}
 			} else {
 				CFGNode subNode = node.subNodes.get(node.subNodeIdx++);
-				lastVisitedLocation = subNode.getLocation();
 				if (subNode instanceof IfNode) {
 					Object condition = ((IfNode) subNode).getValue().accept(
 							exprEvaluator);
@@ -295,8 +301,11 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			if (instrStack.size() > 0) {
 				Instruction instr = instrStack.remove(0);
 				instr.accept(new NodeInterpreter(), fifos, process);
-				lastVisitedLocation = instr.getLocation();
-				exeStmt = true;
+				if ((instr.getLocation().getStartLine() != lastVisitedLocation.getStartLine()) &&
+						(instr.getLocation().getStartLine() != 0)) {
+					lastVisitedLocation = instr.getLocation();
+					exeStmt = true;
+				}
 			}
 			if (instrStack.size() == 0) {
 				nodeStack.remove(nodeStackLevel - 1);
@@ -391,6 +400,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			if (currentAction == null) {
 				if (isStepping == false) {
 					currentAction = breakAction;
+					isStepping = true;
 				} else {
 					currentAction = actorInterpreter.getNextAction();
 				}
@@ -418,9 +428,11 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 					return 2;
 				} else {
 					currentAction = null;
+					isStepping = false;
 					return 1;
 				}
 			} else {
+				isStepping = false;
 				return 0;
 			}
 		} catch (OrccRuntimeException ex) {

@@ -305,11 +305,10 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 		return fProcess;
 	}
 
-	
 	public DebugStackFrame getStackFrame(String instanceId) {
 		return fSimulator.getStackFrame(instanceId);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -355,12 +354,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 * @return
 	 */
 	public boolean isStepping() {
-		for (OrccThread thread : threadMap.values()) {
-			if (thread.isStepping()) {
-				return true;
-			}
-		}
-		return false;
+		return fSimulator.isStepping();
 	}
 
 	/*
@@ -412,7 +406,7 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 			} else if (event.getPropertyName().indexOf("breakpoint") >= 0) {
 				if (orccThread != null) {
 					breakpointHit(event.getPropertyName(), orccThread);
-					suspended(DebugEvent.BREAKPOINT, null);
+					suspended(DebugEvent.BREAKPOINT, orccThread);
 				}
 			}
 		}
@@ -556,15 +550,11 @@ public class OrccDebugTarget extends OrccDebugElement implements IDebugTarget,
 	 *            reason for the suspend
 	 */
 	private void suspended(int detail, OrccThread orccThread) {
+		fSuspended = true;
 		if (orccThread != null) {
 			orccThread.fireSuspendEvent(detail);
-		} else {
-			fSuspended = true;
-			for (IThread thread : fThreads) {
-				((OrccThread) thread).fireSuspendEvent(detail);
-			}
-			fireSuspendEvent(detail);
 		}
+		fireSuspendEvent(detail);
 	}
 
 	/*
