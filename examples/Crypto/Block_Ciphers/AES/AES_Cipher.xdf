@@ -41,7 +41,7 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="bEncipher">
+        <Parameter name="IS_ENCIPHER">
             <Expr kind="Literal" literal-kind="Boolean" value="true"/>
         </Parameter>
     </Instance>
