@@ -146,6 +146,7 @@ actor Algo_MMCO ()
 			else
 				ValIsIDR := false;
 			end
+//println("\tMMCO FrNu:"+ValFrame_Num+" MaxFrameNum:"+MaxFrNu);
 		end
 
 
@@ -200,6 +201,9 @@ actor Algo_MMCO ()
 		do
 			ValLongTermList := LTList[NbLongTermSent];
 			NbLongTermSent  := NbLongTermSent + 1;
+//	if(ValLongTermList!= -1)then
+//println("\tMMCO LTList:"+ValLongTermList);
+//	end
 		end
 
 
@@ -213,6 +217,7 @@ actor Algo_MMCO ()
 		do
 			ValShortTermList := STList[NbShortTermSent];
 			NbShortTermSent  := NbShortTermSent + 1;
+//println("\tMMCO STList:"+ValShortTermList);
 		end
 
 	
@@ -234,6 +239,7 @@ actor Algo_MMCO ()
 			LongTermCount    := 0;
 			LTList           := [-1 :for int s in Integers(0,15)];
 			NbFrameDel       := -1;
+//println("\tMMCO IDR Pict");
 		end
 
 
@@ -244,6 +250,7 @@ actor Algo_MMCO ()
 			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 0)
 		do
 			FlagLongTerm := 0;
+//println("\tMMCO Not IDR and Not MMCO");
 		end
 
 
@@ -254,6 +261,7 @@ actor Algo_MMCO ()
 			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 1)
 		do
 			FlagLongTerm := 0;
+//println("\tMMCO MMCO on");
 		end
 
 
@@ -262,6 +270,8 @@ actor Algo_MMCO ()
 				==>
 		guard 
 			opcode = 0
+		do
+//println("\tMMCO MMCO finished");
 		end
 
 
@@ -285,6 +295,7 @@ actor Algo_MMCO ()
 					idx := i;
 				end
 			end
+//println("\tMMCO Del:"+FrameNumST);
 			if(idx != -1) then
 				if (ShortTermFalseFrame[idx] = false) then
 					DelListTab[NbFrameDel] := FrameNumST;
@@ -308,6 +319,7 @@ actor Algo_MMCO ()
 			opcode = 2
 		do
 			if(LTList[IdxLTFrame]  != -1) then
+//println("\tMMCO Del:"+LTList[IdxLTFrame]);
 				DelListTab[NbFrameDel] := LTList[IdxLTFrame];
 				NbFrameDel             := NbFrameDel + 1;
 				LTList[IdxLTFrame]     := -1;
@@ -365,6 +377,7 @@ actor Algo_MMCO ()
 			foreach int i in Integers(long_term_max_idx, 15)
 			do
 				if (LTList[i] != -1) then
+//println("\tMMCO Del:"+LTList[i]);
 					DelListTab[NbFrameDel] := LTList[i];
 					NbFrameDel             := NbFrameDel + 1;
 					LTList[i]              := -1;
@@ -429,6 +442,7 @@ actor Algo_MMCO ()
 			ShortTermFalseFrame[0] := false;
 			ShortTermCount         := ShortTermCount +1;
 			IdxPocList             := 0;
+//println("\tMMCO IsIDR:"+ValIsIDR);
 		end
 
 
@@ -453,6 +467,7 @@ actor Algo_MMCO ()
 				end
 			end
 			IdxPocList             := 0;
+//println("\tMMCO IsIDR:"+ValIsIDR);
 		end
 
 

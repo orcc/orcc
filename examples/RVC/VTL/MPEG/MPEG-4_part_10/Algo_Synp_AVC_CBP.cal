@@ -750,7 +750,7 @@ actor Algo_Synp_AVC_CBP()
 	do
 		nal_unit_type := mask_bits(read_result(), 5);
 		nal_ref_idc := mask_bits(rshift(read_result(), 5), 2);
-		//println("nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
+//		println("\t\tParser nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
 		bit_count := 0;
 	end
  
@@ -2031,6 +2031,7 @@ actor Algo_Synp_AVC_CBP()
 		nal_unit_type = 5, first_mb_in_slice=0,
 		done_reading_bits()
 	do
+//	println("\t\tParser NalUnitType:"+nal_unit_type);
 		no_output_of_prior_pics_flag := rshift(read_result(),1);
 		long_term_reference_flag := mask_bits(read_result(),1);
 	end
@@ -2050,6 +2051,7 @@ actor Algo_Synp_AVC_CBP()
 		nal_unit_type != 5, first_mb_in_slice = 0,
 		done_reading_bits()
 	do
+//	println("\t\tParser NalUnitType:"+nal_unit_type);
 		adaptative_ref_pic_marking_mode_flag := read_result();
 		if adaptative_ref_pic_marking_mode_flag = 1 then start_vld(); end
 	end
@@ -2208,9 +2210,14 @@ actor Algo_Synp_AVC_CBP()
 	end
 
 	//else (nal_ref_idc == 0)
-	read_SliceH_skip_dec_ref_pic_marking: action ==> MMCO :[0,0]
+	read_SliceH_skip_dec_ref_pic_marking.IDRPic: action ==> MMCO :[0,0]
 	guard
-		nal_ref_idc = 0, first_mb_in_slice=0
+		nal_ref_idc = 0, first_mb_in_slice=0, nal_unit_type = 5
+	end
+
+	read_SliceH_skip_dec_ref_pic_marking.NonIDRPic: action ==> MMCO :[1,0]
+	guard
+		nal_ref_idc = 0, first_mb_in_slice=0, nal_unit_type != 5
 	end
 
 	skip_read_SliceH_skip_dec_ref_pic_marking: action ==>

@@ -6347,10 +6347,15 @@ end
 	end
 
 	//else (nal_ref_idc == 0)
-	read_SliceH_skip_dec_ref_pic_marking: action ==> MMCO :[0,0]
+	read_SliceH_skip_dec_ref_pic_marking.IDRPic: action ==> MMCO :[0,0]
 	guard
-		nal_ref_idc = 0, first_mb_in_slice=0
-	end	
+		nal_ref_idc = 0, first_mb_in_slice=0, nal_unit_type = 5
+	end
+
+	read_SliceH_skip_dec_ref_pic_marking.NonIDRPic: action ==> MMCO :[1,0]
+	guard
+		nal_ref_idc = 0, first_mb_in_slice=0, nal_unit_type != 5
+	end
 
 	skip_read_SliceH_skip_dec_ref_pic_marking: action ==>
 	guard
