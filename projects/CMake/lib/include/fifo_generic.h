@@ -31,12 +31,11 @@
 struct FIFO_S(T) {
 	int size; /** size of the ringbuffer */
 	T *contents; /** the memory containing the ringbuffer */
+	T *fifo_buffer;
 	
 	int read_ind; /** the current position of the reader */
 	int write_ind; /** the current position of the writer */
 	int fill_count; /** the fill count */
-
-	T fifo_buffer[1024];
 };
 
 #include "fifo_generic.inl"

@@ -36,8 +36,11 @@ DECL int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, int n) {
 }
 
 DECL int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, int n) {
-	// Test if distance between the read ptr and the write is longer than n
 	return (fifo->size - fifo->fill_count) >= n;
+}
+
+DECL int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo) {
+	return fifo->size - fifo->fill_count;
 }
 
 DECL T *FIFO_PEEK(T)(struct FIFO_S(T) *fifo, int n) {
@@ -67,8 +70,10 @@ DECL T *FIFO_READ(T)(struct FIFO_S(T) *fifo, int n) {
 
 DECL void FIFO_READ_END(T)(struct FIFO_S(T) *fifo, int n) {
 	fifo->fill_count -= n;
-	if (fifo->read_ind + n <= fifo->size) {
+	if (fifo->read_ind + n < fifo->size) {
 		fifo->read_ind += n;
+	} else if (fifo->read_ind + n == fifo->size) {
+		fifo->read_ind = 0;
 	} else {
 		int num_beginning = fifo->read_ind + n - fifo->size;
 		fifo->read_ind = num_beginning;
@@ -85,8 +90,10 @@ DECL T *FIFO_WRITE(T)(struct FIFO_S(T) *fifo, int n) {
 
 DECL void FIFO_WRITE_END(T)(struct FIFO_S(T) *fifo, int n) {
 	fifo->fill_count += n;
-	if (fifo->write_ind + n <= fifo->size) {
+	if (fifo->write_ind + n < fifo->size) {
 		fifo->write_ind += n;
+	} else if (fifo->write_ind + n == fifo->size) {
+		fifo->write_ind = 0;
 	} else {
 		int num_end = fifo->size - fifo->write_ind;
 		int num_beginning = n - num_end;

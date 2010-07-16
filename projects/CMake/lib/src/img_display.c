@@ -57,7 +57,7 @@ static void img_display_init() {
 		exit(1);
 	}
 
-	m_screen = SDL_SetVideoMode(m_width, m_height, 24, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	m_screen = SDL_SetVideoMode(m_width, m_height, 24, 0);
 	if (m_screen == NULL) {
 		fprintf(stderr, "Couldn't set %ix%ix24 video mode: %s\n", m_width, m_height,
 			SDL_GetError());
@@ -73,13 +73,17 @@ static void img_display_init() {
 		m_screen->format->Rmask, m_screen->format->Gmask, m_screen->format->Bmask, m_screen->format->Amask);
 }
 
-static int i = 0;
+static int idx_pixel = 0;
 
 static void read_pixel() {
 	unsigned char *ptr, red, green, blue;
 	int pixel;
 
 	SDL_PixelFormat *format = m_image->format;
+
+	if (SDL_MUSTLOCK(m_image)) {
+		SDL_LockSurface(m_image);
+	}
 
 	ptr = fifo_char_read(img_display_RED, 1);
 	red = ptr[0];
@@ -97,47 +101,58 @@ static void read_pixel() {
 		| (green << format->Gshift) & format->Gmask
 		| (blue << format->Bshift) & format->Bmask;
 
-	* (int *) &((char *)m_image->pixels)[i * format->BytesPerPixel] = pixel;
+	* (int *) &((char *)m_image->pixels)[idx_pixel * format->BytesPerPixel] = pixel;
+	idx_pixel++;
+
+	if (SDL_MUSTLOCK(m_image)) {
+		SDL_UnlockSurface(m_image);
+	}
 }
 
 void img_display_scheduler(struct schedinfo_s *si) {
-	while (1) {
-		if (fifo_short_has_tokens(img_display_WIDTH, 1) && fifo_short_has_tokens(img_display_HEIGHT, 1)) {
-			short *ptr = fifo_short_read(img_display_HEIGHT, 1);
-			m_height = ptr[0];
-			fifo_short_read_end(img_display_HEIGHT, 1);
+	SDL_Event event;
+	int ports = 0x1f; // FIFOs connected to first five input ports are empty
 
-			ptr = fifo_short_read(img_display_WIDTH, 1);
-			m_width = ptr[0];
-			fifo_short_read_end(img_display_WIDTH, 1);
+	int i = 0;
+	if (fifo_short_has_tokens(img_display_WIDTH, 1) && fifo_short_has_tokens(img_display_HEIGHT, 1)) {
+		short *ptr = fifo_short_read(img_display_HEIGHT, 1);
+		m_height = ptr[0];
+		fifo_short_read_end(img_display_HEIGHT, 1);
 
-			img_display_init();
-		}
+		ptr = fifo_short_read(img_display_WIDTH, 1);
+		m_width = ptr[0];
+		fifo_short_read_end(img_display_WIDTH, 1);
 
-		if (m_count == 0) {
+		img_display_init();
+	}
+
+	while (idx_pixel < m_count) {
+		if (fifo_char_has_tokens(img_display_RED, 1) && fifo_char_has_tokens(img_display_GREEN, 1) && fifo_char_has_tokens(img_display_BLUE, 1)) {
+			read_pixel();
+			i++;
+		} else {
+			ports = 0x07; // FIFOs connected to first three input ports are empty
 			break;
 		}
+	}
 
-		while (i < m_count) {
-			if (fifo_char_has_tokens(img_display_RED, 1) && fifo_char_has_tokens(img_display_GREEN, 1) && fifo_char_has_tokens(img_display_BLUE, 1)) {
-				read_pixel();
-				i++;
-			} else {
-				si->num_firings = i;
-				si->reason = starved;
-				si->ports = 0x07; // FIFOs connected to first three input ports are empty
-				return;
-			}
-		}
+	// Draws the image on the screen
+	if (m_screen != NULL) {
+		SDL_BlitSurface(m_image, NULL, m_screen, NULL);
+		SDL_Flip(m_screen);
+	}
 
-		// Draws the image on the screen
-		if (m_screen != NULL) {
-			SDL_BlitSurface(m_image, NULL, m_screen, NULL);
-			SDL_Flip(m_screen);
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
+			case SDL_QUIT:
+				exit(0);
+				break;
+			default:
+				break;
 		}
 	}
 
 	si->num_firings = i;
 	si->reason = starved;
-	si->ports = 0x1f; // FIFOs connected to first five input ports are empty
+	si->ports = ports;
 }

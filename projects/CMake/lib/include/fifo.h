@@ -46,10 +46,14 @@ typedef unsigned int u_int;
 
 // declare FIFO with a size equal to (size)
 #define DECLARE_FIFO(type, size, count) static type array_##count[(size)]; \
-static struct FIFO_S(type) fifo_##count = { (size), array_##count, 0, 0 };
+static type array2_##count[(size)]; \
+static struct FIFO_S(type) fifo_##count = { (size), array_##count, array2_##count, 0, 0 };
 
 #define FIFO_S(T) FIFO_S_EXPAND(T)
 #define FIFO_S_EXPAND(T) fifo_##T##_s
+
+#define FIFO_GET_ROOM(T) FIFO_GET_ROOM_EXPAND(T)
+#define FIFO_GET_ROOM_EXPAND(T) fifo_ ## T ## _get_room
 
 #define FIFO_HAS_ROOM(T) FIFO_HAS_ROOM_EXPAND(T)
 #define FIFO_HAS_ROOM_EXPAND(T) fifo_ ## T ## _has_room
