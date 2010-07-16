@@ -7,9 +7,6 @@
             class="net.sf.orcc.backends.c.CBackendImpl"
             name="C">
          <option
-               id="net.sf.orcc.plugins.vtlFolder">
-         </option>
-         <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
@@ -23,18 +20,12 @@
             class="net.sf.orcc.backends.java.JavaBackendImpl"
             name="Java">
          <option
-               id="net.sf.orcc.plugins.vtlFolder">
-         </option>
-         <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.cpp.CppBackendImpl"
             name="C++">
-         <option
-               id="net.sf.orcc.plugins.vtlFolder">
-         </option>
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
@@ -49,9 +40,6 @@
             class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
             name="LLVM">
          <option
-               id="net.sf.orcc.plugins.vtlFolder">
-         </option>
-         <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
@@ -65,18 +53,12 @@
             class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
             name="VHDL">
          <option
-               id="net.sf.orcc.plugins.vtlFolder">
-         </option>
-         <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.xlim.XlimBackendImpl"
             name="XLIM">
-         <option
-               id="net.sf.orcc.plugins.vtlFolder">
-         </option>
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
@@ -135,15 +117,6 @@
                id="net.sf.orcc.backends.newScheduler"
                name="Use the experimental scheduler">
             <checkBox></checkBox>
-         </option>
-         <option
-               description="The folder that contains the Video Tool Library (VTL)"
-               id="net.sf.orcc.plugins.vtlFolder"
-               name="VTL folder">
-            <browseFile
-                  folder="true"
-                  workspace="true">
-            </browseFile>
          </option>
          <option
                description="Whether Orcc should compile the given hierarchical XDF network"

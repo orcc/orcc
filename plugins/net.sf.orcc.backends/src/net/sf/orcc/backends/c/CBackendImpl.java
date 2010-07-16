@@ -34,8 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.CoreException;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
@@ -109,17 +107,19 @@ public class CBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean classify = getAttribute("net.sf.orcc.plugins.backends.classify", false);
+		boolean classify = getAttribute(
+				"net.sf.orcc.plugins.backends.classify", false);
 		if (classify) {
 			network.classifyActors();
 
-			boolean normalize = getAttribute("net.sf.orcc.plugins.backends.normalize",
-					false);
+			boolean normalize = getAttribute(
+					"net.sf.orcc.plugins.backends.normalize", false);
 			if (normalize) {
 				network.normalizeActors();
 			}
 
-			boolean merge = getAttribute("net.sf.orcc.plugins.backends.merge", false);
+			boolean merge = getAttribute("net.sf.orcc.plugins.backends.merge",
+					false);
 			if (merge) {
 				network.mergeActors();
 			}

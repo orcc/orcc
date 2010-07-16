@@ -98,19 +98,21 @@ public abstract class AbstractBackend implements Backend {
 			String[] args) {
 		if (args.length == 2) {
 			String inputFile = args[0];
-			String outputFolder = args[1];
+			String vtlFolder = args[1];
+			String outputFolder = args[2];
 
 			try {
 				AbstractBackend backend = clasz.newInstance();
-				backend.compileVTL(null, outputFolder);
-				backend.compileXDF(null, inputFile, outputFolder);
+				backend.setOutputFolder(outputFolder);
+				backend.compileVTL(null, vtlFolder);
+				backend.compileXDF(null, inputFile);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
 				e.printStackTrace();
 			}
 		} else {
 			System.err.println("Usage: " + clasz.getSimpleName()
-					+ " <input XDF network> <output folder>");
+					+ " <input XDF network> <VTL folder> <output folder>");
 		}
 	}
 
@@ -125,7 +127,7 @@ public abstract class AbstractBackend implements Backend {
 	protected int fifoSize;
 
 	/**
-	 * Path of the IR files.
+	 * Path where output files will be written.
 	 */
 	protected String path;
 
@@ -134,17 +136,20 @@ public abstract class AbstractBackend implements Backend {
 	 */
 	private OrccProcess process;
 
+	/**
+	 * Path of the folder that contains VTL under IR form.
+	 */
+	private String vtlFolder;
+
 	@Override
-	final public void compileVTL(OrccProcess process, String outputFolder)
+	final public void compileVTL(OrccProcess process, String vtlFolder)
 			throws OrccException {
 		this.process = process;
-
-		// set output path
-		path = new File(outputFolder).getAbsolutePath();
+		this.vtlFolder = vtlFolder;
 
 		// lists actors
 		write("Lists actors...\n");
-		File[] files = new File(outputFolder).listFiles(new FileFilter() {
+		File[] files = new File(vtlFolder).listFiles(new FileFilter() {
 
 			@Override
 			public boolean accept(File pathname) {
@@ -157,23 +162,19 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	@Override
-	final public void compileXDF(OrccProcess process, String inputFile,
-			String outputFolder) throws OrccException {
+	final public void compileXDF(OrccProcess process, String inputFile)
+			throws OrccException {
 		this.process = process;
 
 		// set FIFO size
 		this.fifoSize = getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-
-		// set output path. Not sure if getAbsolutePath is necessary, I can't
-		// remember why it's used
-		path = new File(outputFolder).getAbsolutePath();
 
 		// parses top network
 		write("Parsing XDF network...\n");
 		Network network = new XDFParser(inputFile).parseNetwork();
 
 		write("Instantiating actors...\n");
-		network.instantiate(outputFolder);
+		network.instantiate(vtlFolder);
 		Network.clearActorPool();
 		write("Instantiation done\n");
 
@@ -453,6 +454,11 @@ public abstract class AbstractBackend implements Backend {
 	@Override
 	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
 		this.configuration = configuration;
+	}
+
+	final public void setOutputFolder(String outputFolder) {
+		// set output path
+		path = new File(outputFolder).getAbsolutePath();
 	}
 
 	/**
