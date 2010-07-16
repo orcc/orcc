@@ -530,10 +530,6 @@ public class AstTransformer {
 				AstVariable astVariable = generator.getVariable();
 				LocalVariable loopVar = (LocalVariable) context
 						.getVariable(astVariable);
-				AstExpression astLower = generator.getLower();
-				Expression lower = transformExpression(astLower);
-				Assign assign = new Assign(location, loopVar, lower);
-				addInstruction(assign);
 
 				// condition
 				AstExpression astHigher = generator.getHigher();
@@ -542,9 +538,9 @@ public class AstTransformer {
 						new VarExpr(new Use(loopVar)), BinaryOp.LE, higher,
 						IrFactory.eINSTANCE.createTypeBool());
 
-				// body
+				// add increment to body
 				BlockNode block = BlockNode.getLast(procedure, nodes);
-				assign = new Assign(location, loopVar, new BinaryExpr(
+				Assign assign = new Assign(location, loopVar, new BinaryExpr(
 						new VarExpr(new Use(loopVar)), BinaryOp.PLUS,
 						new IntExpr(1), loopVar.getType()));
 				block.add(assign);
@@ -552,7 +548,17 @@ public class AstTransformer {
 				// create while
 				WhileNode whileNode = new WhileNode(location, procedure,
 						condition, nodes, new BlockNode(procedure));
-				nodes = new ArrayList<CFGNode>(1);
+
+				// create assign
+				block = new BlockNode(procedure);
+				AstExpression astLower = generator.getLower();
+				Expression lower = transformExpression(astLower);
+				Assign assignInit = new Assign(location, loopVar, lower);
+				block.add(assignInit);
+
+				// nodes
+				nodes = new ArrayList<CFGNode>(2);
+				nodes.add(block);
 				nodes.add(whileNode);
 			}
 
