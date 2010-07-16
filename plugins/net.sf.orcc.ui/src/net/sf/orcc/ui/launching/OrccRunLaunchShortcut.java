@@ -31,6 +31,7 @@ package net.sf.orcc.ui.launching;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.RUN_CONFIG_TYPE;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 
@@ -217,6 +218,7 @@ public class OrccRunLaunchShortcut implements ILaunchShortcut {
 
 			// create configuration
 			ILaunchConfigurationWorkingCopy wc = type.newInstance(null, name);
+			wc.setAttribute(PROJECT, resource.getProject().getName());
 			wc.setAttribute(BACKEND, backend);
 
 			wc.setAttribute(COMPILE_XDF, true);
