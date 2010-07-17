@@ -30,13 +30,16 @@ package net.sf.orcc.backends.java;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.cpp.CppExprPrinter;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
+import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
@@ -64,10 +67,19 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	private STPrinter printer;
 
+	private final Map<String, String> transformations;
+
+	public JavaBackendImpl() {
+		transformations = new HashMap<String, String>();
+		transformations.put("initialize", "initialize_");
+		transformations.put("isSchedulable_initialize", "isSchedulable_initialize_");
+	}
+
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new RenameTransformation(this.transformations),
 				new PhiRemoval(), new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
