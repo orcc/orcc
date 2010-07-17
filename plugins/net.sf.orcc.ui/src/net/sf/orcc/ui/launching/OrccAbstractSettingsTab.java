@@ -35,7 +35,6 @@ import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -64,9 +63,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
@@ -85,25 +82,9 @@ public abstract class OrccAbstractSettingsTab extends
 
 	protected String plugin;
 
-	protected Text textOutput;
-
 	private Text textProject;
 
 	protected boolean updateLaunchConfiguration;
-
-	protected void browseOutputFolder(Shell shell) {
-		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select output folder:");
-		if (getFolderFromText()) {
-			// set initial directory if it is valid
-			dialog.setFilterPath(textOutput.getText());
-		}
-
-		String dir = dialog.open();
-		if (dir != null) {
-			textOutput.setText(dir);
-		}
-	}
 
 	private void browseProject(Shell shell) {
 		ElementTreeSelectionDialog tree = new ElementTreeSelectionDialog(shell,
@@ -201,32 +182,6 @@ public abstract class OrccAbstractSettingsTab extends
 		groupOptions.setLayoutData(data);
 	}
 
-	protected void createControlOutputFolder(Font font, final Group group) {
-		Label lbl = new Label(group, SWT.NONE);
-		lbl.setFont(font);
-		lbl.setText("Output folder:");
-		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		lbl.setLayoutData(data);
-
-		textOutput = new Text(group, SWT.BORDER | SWT.SINGLE);
-		textOutput.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		textOutput.setLayoutData(data);
-		textOutput.addModifyListener(this);
-
-		Button buttonBrowse = new Button(group, SWT.PUSH);
-		buttonBrowse.setFont(font);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				browseOutputFolder(group.getShell());
-			}
-		});
-	}
-
 	abstract protected void createControlPlugin(Font font, Composite parent);
 
 	private void createControlProject(Font font, Composite parent) {
@@ -250,16 +205,6 @@ public abstract class OrccAbstractSettingsTab extends
 		optionWidgets.clear();
 		if (groupOptions != null) {
 			groupOptions.dispose();
-		}
-	}
-
-	protected boolean getFolderFromText() {
-		String value = textOutput.getText();
-		File file = new File(value);
-		if (file.isDirectory()) {
-			return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -311,9 +256,6 @@ public abstract class OrccAbstractSettingsTab extends
 			updateLaunchConfiguration = false;
 			String value = configuration.getAttribute(PROJECT, "");
 			textProject.setText(value);
-
-			value = configuration.getAttribute(OUTPUT_FOLDER, "");
-			textOutput.setText(value);
 			updateLaunchConfiguration = true;
 
 			// initialize from all options
@@ -349,17 +291,6 @@ public abstract class OrccAbstractSettingsTab extends
 			return false;
 		}
 
-		value = textOutput.getText();
-		if (value.isEmpty()) {
-			setErrorMessage("Output path not specified");
-			return false;
-		}
-
-		if (!getFolderFromText()) {
-			setErrorMessage("Given output path does not specify an existing folder");
-			return false;
-		}
-
 		List<OptionWidget> widgets = optionWidgets.get(plugin);
 		if (OptionWidgetManager.isValidOptions(widgets, launchConfig)) {
 			setErrorMessage(null);
@@ -380,9 +311,6 @@ public abstract class OrccAbstractSettingsTab extends
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
 		String value = textProject.getText();
 		configuration.setAttribute(PROJECT, value);
-
-		value = textOutput.getText();
-		configuration.setAttribute(OUTPUT_FOLDER, value);
 
 		int index = comboPlugin.getSelectionIndex();
 		if (index != -1) {

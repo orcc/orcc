@@ -21,15 +21,6 @@
          </checkBox>
       </option>
       <option
-            description="Specify VTL (Video Tool Library) location folder"
-            id="net.sf.orcc.plugins.vtlFolder"
-            name="VTL folder">
-         <browseFile
-               folder="true"
-               workspace="true">
-         </browseFile>
-      </option>
-      <option
             description="XDF description of the CAL actors network"
             id="net.sf.orcc.plugins.xdfFile"
             name="XDF file">
@@ -55,9 +46,6 @@
             name="Visitor interpreter and debugger">
          <option
                id="net.sf.orcc.simulators.enableTraces">
-         </option>
-         <option
-               id="net.sf.orcc.plugins.vtlFolder">
          </option>
          <option
                id="net.sf.orcc.plugins.xdfFile">

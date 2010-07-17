@@ -29,7 +29,9 @@
 package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
+import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,7 +40,9 @@ import net.sf.orcc.plugins.backends.BackendFactory;
 import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -46,36 +50,43 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * This class defines the settings tab for a "run" configuration of
  * "Orcc compilation".
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class RunSettingsTab extends OrccAbstractSettingsTab {
+
+	private Text textOutput;
 
 	public RunSettingsTab() {
 		optionWidgets = new HashMap<String, List<OptionWidget>>();
 	}
 
-	@Override
-	protected void createControlPlugin(Font font, Composite parent) {
-		final Group group = new Group(parent, SWT.NONE);
-		group.setFont(font);
-		group.setText("&Backend:");
-		group.setLayout(new GridLayout(3, false));
-		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
-		group.setLayoutData(data);
+	private void browseOutputFolder(Shell shell) {
+		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
+		dialog.setMessage("Select output folder:");
+		if (getFolderFromText()) {
+			// set initial directory if it is valid
+			dialog.setFilterPath(textOutput.getText());
+		}
 
-		createControlOutputBackend(font, group);
-		createControlOutputFolder(font, group);
+		String dir = dialog.open();
+		if (dir != null) {
+			textOutput.setText(dir);
+		}
 	}
 
 	private void createControlOutputBackend(final Font font, final Group group) {
@@ -105,6 +116,45 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 		});
 	}
 
+	private void createControlOutputFolder(Font font, final Group group) {
+		Label lbl = new Label(group, SWT.NONE);
+		lbl.setFont(font);
+		lbl.setText("Output folder:");
+		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+
+		textOutput = new Text(group, SWT.BORDER | SWT.SINGLE);
+		textOutput.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		textOutput.setLayoutData(data);
+		textOutput.addModifyListener(this);
+
+		Button buttonBrowse = new Button(group, SWT.PUSH);
+		buttonBrowse.setFont(font);
+		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+		buttonBrowse.setLayoutData(data);
+		buttonBrowse.setText("&Browse...");
+		buttonBrowse.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				browseOutputFolder(group.getShell());
+			}
+		});
+	}
+
+	@Override
+	protected void createControlPlugin(Font font, Composite parent) {
+		final Group group = new Group(parent, SWT.NONE);
+		group.setFont(font);
+		group.setText("&Backend:");
+		group.setLayout(new GridLayout(3, false));
+		GridData data = new GridData(SWT.FILL, SWT.TOP, true, false);
+		group.setLayoutData(data);
+
+		createControlOutputBackend(font, group);
+		createControlOutputFolder(font, group);
+	}
+
 	@Override
 	protected void createOptions() {
 		BackendFactory factory = BackendFactory.getInstance();
@@ -113,6 +163,16 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 			List<OptionWidget> widgets = OptionWidgetManager.createOptions(
 					this, options, groupOptions);
 			optionWidgets.put(backend, widgets);
+		}
+	}
+
+	private boolean getFolderFromText() {
+		String value = textOutput.getText();
+		File file = new File(value);
+		if (file.isDirectory()) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -132,7 +192,32 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 	}
 
 	@Override
+	public void initializeFrom(ILaunchConfiguration configuration) {
+		try {
+			updateLaunchConfiguration = false;
+			String value = configuration.getAttribute(OUTPUT_FOLDER, "");
+			textOutput.setText(value);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+
+		updateLaunchConfiguration = true;
+		super.initializeFrom(configuration);
+	}
+
+	@Override
 	public boolean isValid(ILaunchConfiguration launchConfig) {
+		String value = textOutput.getText();
+		if (value.isEmpty()) {
+			setErrorMessage("Output path not specified");
+			return false;
+		}
+
+		if (!getFolderFromText()) {
+			setErrorMessage("Given output path does not specify an existing folder");
+			return false;
+		}
+
 		int index = comboPlugin.getSelectionIndex();
 		if (index == -1) {
 			setErrorMessage("No backend selected.");
@@ -140,6 +225,13 @@ public class RunSettingsTab extends OrccAbstractSettingsTab {
 		}
 
 		return super.isValid(launchConfig);
+	}
+
+	@Override
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		String value = textOutput.getText();
+		configuration.setAttribute(OUTPUT_FOLDER, value);
+		super.performApply(configuration);
 	}
 
 }

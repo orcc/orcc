@@ -75,7 +75,6 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 		group.setLayoutData(data);
 
 		createControlOutputSimulator(font, group);
-		createControlOutputFolder(font, group);
 	}
 
 	private void createControlOutputSimulator(final Font font, final Group group) {
@@ -149,4 +148,5 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 		super.setDefaults(configuration);
 		configuration.setAttribute(COMPILE_XDF, true);
 	}
+
 }

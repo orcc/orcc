@@ -31,8 +31,9 @@ package net.sf.orcc.simulators;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
-import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -72,6 +73,9 @@ import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 import net.sf.orcc.plugins.simulators.Simulator;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -79,73 +83,131 @@ import org.jgrapht.DirectedGraph;
 
 public abstract class AbstractSimulator implements Simulator {
 
+	/**
+	 * Simulator control message. Consists of an event ID and message data given
+	 * as an object.
+	 * 
+	 * @author plagalay
+	 * 
+	 */
+	public class SimulatorMessage {
+		public Object[] data;
+
+		public SimulatorEvent event;
+		public SimulatorMessage(SimulatorEvent event, Object[] data) {
+			this.event = event;
+			this.data = data;
+		}
+	}
+
+	/**
+	 * For the moment, merge of actors is not possible for any simulator. This
+	 * flag should be set later through the launch configuration with specific
+	 * simulators checkbox option.
+	 */
+	public static boolean merge = false;
+
+	/**
+	 * the configuration used to launch this back-end.
+	 */
+	protected ILaunchConfiguration configuration = null;
+
+	/**
+	 * Indicate to the simulator implementation the we are in debug mode.
+	 */
+	protected boolean debugMode;
+
+	/**
+	 * default FIFO size.
+	 */
+	protected int fifoSize;
+
+	/**
+	 * Flag indicating the simulator is currently stepping
+	 */
+	private boolean isStepping = false;
+
+	/**
+	 * Simulator control messages (infinite) queue.
+	 */
+	private Queue<SimulatorMessage> messageQueue;
+
+	/**
+	 * Monitor associated to the simulator execution. Used for user
+	 * cancellation.
+	 */
+	protected IProgressMonitor monitor = null;
+
+	/**
+	 * Master caller associated process for console I/O access.
+	 */
+	protected OrccProcess process;
+
+	/**
+	 * The utility class that makes us able to support bound properties. This is
+	 * used for easy "debug events" exchange.
+	 */
+	private PropertyChangeSupport propertyChange;
+
+	/**
+	 * Hash table containing actors instances from the network to be simulated.
+	 * Key = instance ID; Value = a simulator actor instance implementing
+	 * SimuActor interface.
+	 */
+	protected Map<String, SimuActor> simuActorsMap;
+
+	/**
+	 * Simulator current automaton state, initialized to "IDLE" by default
+	 */
+	private SimulatorState state = SimulatorState.IDLE;
+
+	/**
+	 * input stimulus file name
+	 */
+	protected String stimulusFile;
+
+	protected String vtlFolder;
+
+	/**
+	 * input XDF network file name
+	 */
+	protected String xdfFile;
+	
 	public AbstractSimulator() {
 		messageQueue = new LinkedList<SimulatorMessage>();
 		simuActorsMap = new HashMap<String, SimuActor>();
 	}
-
+	
 	@Override
 	final public void addPropertyChangeListener(PropertyChangeListener listener) {
 		propertyChange.addPropertyChangeListener(listener);
 	}
-
-	@Override
-	public synchronized List<String> getActorsInstanceIds() {
-		List<String> instanceIds = new ArrayList<String>();
-		for (SimuActor simuActorInstance : simuActorsMap.values()) {
-			instanceIds.add(simuActorInstance.getInstanceId());
-		}
-		return instanceIds;
-	}
-
-	@Override
-	public synchronized String getActorName(String instanceId) {
-		return simuActorsMap.get(instanceId).getActorName();
-	}
-
-	@Override
-	public synchronized String getNetworkName() {
-		return getFilenameWithoutExtension(xdfFile);
-	}
-
-	@Override
-	public synchronized DebugStackFrame getStackFrame(String instanceID) {
-		return simuActorsMap.get(instanceID).getStackFrame();
-	}
 	
-	@Override
-	public synchronized SimulatorState getSimulatorState() {
-		return state;
-	}
-
-	@Override
-	public synchronized boolean isStepping() {
-		return isStepping;
-	}
-
-	@Override
-	public synchronized void message(SimulatorEvent event, Object[] data) {
-		messageQueue.add(new SimulatorMessage(event, data));
-	}
-
-	@Override
-	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
-		this.configuration = configuration;
-		try {
-			// Get configuration attributes
-			stimulusFile = configuration.getAttribute(INPUT_STIMULUS, "");
-			outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
-			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
-			xdfFile = configuration.getAttribute(XDF_FILE, "");
-		} catch (CoreException e) {
-			throw new OrccRuntimeException(e.getMessage());
+	/**
+	 * Clear a breakpoint related to one or several instances according to the
+	 * actor source file and the line number.
+	 * 
+	 * @param actorFileName
+	 * @param lineNumber
+	 */
+	private void clearBreakpoint(String actorName, int lineNumber) {
+		for (Entry<String, SimuActor> entry : simuActorsMap.entrySet()) {
+			SimuActor instance = entry.getValue();
+			if (instance.getActorName().equals(actorName)) {
+				instance.clearBreakpoint(lineNumber);
+			}
 		}
-		// Property change support creation for sending interpreter events
-		propertyChange = new PropertyChangeSupport(this);
 	}
 
+	/**
+	 * Close the network
+	 * 
+	 */
+	abstract protected void closeNetwork();
+
 	@Override
-	final public void configure(OrccProcess process, IProgressMonitor monitor, boolean debugMode) {
+	final public void configure(OrccProcess process, IProgressMonitor monitor,
+			boolean debugMode) {
 		this.process = process;
 		this.monitor = monitor;
 		this.debugMode = debugMode;
@@ -166,110 +228,6 @@ public abstract class AbstractSimulator implements Simulator {
 	}
 
 	/**
-	 * the configuration used to launch this back-end.
-	 */
-	protected ILaunchConfiguration configuration = null;
-
-	/**
-	 * Monitor associated to the simulator execution. Used for user
-	 * cancellation.
-	 */
-	protected IProgressMonitor monitor = null;
-
-	/**
-	 * Master caller associated process for console I/O access.
-	 */
-	protected OrccProcess process;
-
-	/**
-	 * Configuration attributes : traces enable flag, input XDF network file
-	 * name, input stimulus file name, Video Tool Library (VTL) folder name,
-	 * output folder name, default FIFO size.
-	 */
-	protected String xdfFile;
-	protected String stimulusFile;
-	protected String vtlFolder;
-	protected String outputFolder;
-	protected int fifoSize;
-
-	/**
-	 * Indicate to the simulator implementation the we are in debug mode.
-	 */
-	protected boolean debugMode;
-
-	/**
-	 * For the moment, merge of actors is not possible for any simulator. This
-	 * flag should be set later through the launch configuration with specific
-	 * simulators checkbox option.
-	 */
-	public static boolean merge = false;
-
-	/**
-	 * The utility class that makes us able to support bound properties. This is
-	 * used for easy "debug events" exchange.
-	 */
-	private PropertyChangeSupport propertyChange;
-
-	/**
-	 * Flag indicating the simulator is currently stepping
-	 */
-	private boolean isStepping = false;
-
-	/**
-	 * Simulator current automaton state, initialized to "IDLE" by default
-	 */
-	private SimulatorState state = SimulatorState.IDLE;
-
-	/**
-	 * Simulator control message. Consists of an event ID and message data given
-	 * as an object.
-	 * 
-	 * @author plagalay
-	 * 
-	 */
-	public class SimulatorMessage {
-		public SimulatorMessage(SimulatorEvent event, Object[] data) {
-			this.event = event;
-			this.data = data;
-		}
-
-		public SimulatorEvent event;
-		public Object[] data;
-	}
-
-	/**
-	 * Simulator control messages (infinite) queue.
-	 */
-	private Queue<SimulatorMessage> messageQueue;
-
-	/**
-	 * Hash table containing actors instances from the network to be simulated.
-	 * Key = instance ID; Value = a simulator actor instance implementing
-	 * SimuActor interface.
-	 */
-	protected Map<String, SimuActor> simuActorsMap;
-
-	/**
-	 * Create a broadcast actor. Broadcasts have been detected by the XDF parser
-	 * and instantiated in the directed graph.
-	 */
-	abstract protected SimuActor createSimuActorBroadcast(String instanceId,
-			int numOutputs, boolean isBool);
-
-	/**
-	 * Create an actor instance for the simulation. This actor must implement
-	 * the SimuActor interface.
-	 */
-	abstract protected SimuActor createSimuActorInstance(String instanceId,
-			Map<String, Expression> actorParameters, Actor actorIR);
-
-	/**
-	 * Close the network
-	 * 
-	 */
-	abstract protected void closeNetwork();
-
-	/**
 	 * Connect two actors instances from the network together.
 	 * 
 	 * @param source
@@ -285,84 +243,6 @@ public abstract class AbstractSimulator implements Simulator {
 	 */
 	abstract protected void connectActors(SimuActor source, Port srcPort,
 			SimuActor target, Port tgtPort, int fifoSize);
-
-	/**
-	 * Get the instance ID of the actor that has just hit a breakpoint.
-	 * 
-	 * @return String : breakpoint actor's instance ID
-	 */
-	abstract protected String getBreakpointActorInstanceId();
-
-	/**
-	 * Get the line number of the current hit breakpoint.
-	 * 
-	 * @return Integer : the line number of the current breakpoint
-	 */
-	abstract protected Integer getBreakpointLineNumber();
-
-	/**
-	 * Initialize the network
-	 */
-	abstract protected void initializeNetwork();
-
-	/**
-	 * Start (again) the actor network before going to RUNNING state
-	 * 
-	 */
-	abstract protected int resumeNetwork();
-
-	/**
-	 * Simulate the actor network until SUSPEND command or BREAKPOINT hit.
-	 * 
-	 * @param debugMode
-	 * @return
-	 */
-	abstract protected int runNetwork();
-
-	/**
-	 * Step over the whole network of actors.
-	 * 
-	 */
-	abstract protected int stepNetwork();
-
-	/**
-	 * Step into a specific actor instance.
-	 * 
-	 */
-	abstract protected int stepInto(String instanceId);
-
-	/**
-	 * Step over a specific actor instance.
-	 * 
-	 */
-	abstract protected int stepOver(String instanceId);
-
-	/**
-	 * Step return from specific actor instance.
-	 * 
-	 */
-	abstract protected void stepReturn(String instanceId);
-
-	/**
-	 * Suspend the network simulation until next RESUME or STEP command.
-	 */
-	abstract protected void suspendNetwork();
-
-	/**
-	 * Clear a breakpoint related to one or several instances according to the
-	 * actor source file and the line number.
-	 * 
-	 * @param actorFileName
-	 * @param lineNumber
-	 */
-	private void clearBreakpoint(String actorName, int lineNumber) {
-		for (Entry<String, SimuActor> entry : simuActorsMap.entrySet()) {
-			SimuActor instance = entry.getValue();
-			if (instance.getActorName().equals(actorName)) {
-				instance.clearBreakpoint(lineNumber);
-			}
-		}
-	}
 
 	/**
 	 * Visit the network graph for building the required topology. Edges of the
@@ -415,6 +295,69 @@ public abstract class AbstractSimulator implements Simulator {
 	}
 
 	/**
+	 * Create a broadcast actor. Broadcasts have been detected by the XDF parser
+	 * and instantiated in the directed graph.
+	 */
+	abstract protected SimuActor createSimuActorBroadcast(String instanceId,
+			int numOutputs, boolean isBool);
+
+	/**
+	 * Create an actor instance for the simulation. This actor must implement
+	 * the SimuActor interface.
+	 */
+	abstract protected SimuActor createSimuActorInstance(String instanceId,
+			Map<String, Expression> actorParameters, Actor actorIR);
+
+	/**
+	 * This methods calls
+	 * {@link PropertyChangeSupport#firePropertyChange(String, Object, Object)}
+	 * on the underlying {@link PropertyChangeSupport} without updating the
+	 * value of the property <code>propertyName</code>. This method is
+	 * particularly useful when a property should be fired regardless of the
+	 * previous value (in case of undo/redo for example, when a same object is
+	 * added, removed, and added again).
+	 * 
+	 * @param propertyName
+	 *            The name of the property concerned.
+	 * @param oldValue
+	 *            The old value of the property.
+	 * @param newValue
+	 *            The new value of the property.
+	 */
+	public void firePropertyChange(String propertyName, Object oldValue,
+			Object newValue) {
+		propertyChange.firePropertyChange(propertyName, oldValue, newValue);
+	}
+
+	@Override
+	public synchronized String getActorName(String instanceId) {
+		return simuActorsMap.get(instanceId).getActorName();
+	}
+
+	@Override
+	public synchronized List<String> getActorsInstanceIds() {
+		List<String> instanceIds = new ArrayList<String>();
+		for (SimuActor simuActorInstance : simuActorsMap.values()) {
+			instanceIds.add(simuActorInstance.getInstanceId());
+		}
+		return instanceIds;
+	}
+
+	/**
+	 * Get the instance ID of the actor that has just hit a breakpoint.
+	 * 
+	 * @return String : breakpoint actor's instance ID
+	 */
+	abstract protected String getBreakpointActorInstanceId();
+
+	/**
+	 * Get the line number of the current hit breakpoint.
+	 * 
+	 * @return Integer : the line number of the current breakpoint
+	 */
+	abstract protected Integer getBreakpointLineNumber();
+
+	/**
 	 * Util function for getting actor or network names from file names.
 	 * 
 	 * @param filename
@@ -446,7 +389,7 @@ public abstract class AbstractSimulator implements Simulator {
 		Network network;
 		network = new XDFParser(xdfFile).parseNetwork();
 		// Instantiate the network
-		network.instantiate(outputFolder);
+		network.instantiate(vtlFolder);
 		Network.clearActorPool();
 		// Flatten the hierarchical network
 		network.flatten();
@@ -461,6 +404,26 @@ public abstract class AbstractSimulator implements Simulator {
 
 		return network.getGraph();
 	}
+
+	@Override
+	public synchronized String getNetworkName() {
+		return getFilenameWithoutExtension(xdfFile);
+	}
+
+	@Override
+	public synchronized SimulatorState getSimulatorState() {
+		return state;
+	}
+
+	@Override
+	public synchronized DebugStackFrame getStackFrame(String instanceID) {
+		return simuActorsMap.get(instanceID).getStackFrame();
+	}
+
+	/**
+	 * Initialize the network
+	 */
+	abstract protected void initializeNetwork();
 
 	/**
 	 * Visit the network graph for instantiating the vertexes (actors we want to
@@ -507,26 +470,21 @@ public abstract class AbstractSimulator implements Simulator {
 		}
 	}
 
-	/**
-	 * This methods calls
-	 * {@link PropertyChangeSupport#firePropertyChange(String, Object, Object)}
-	 * on the underlying {@link PropertyChangeSupport} without updating the
-	 * value of the property <code>propertyName</code>. This method is
-	 * particularly useful when a property should be fired regardless of the
-	 * previous value (in case of undo/redo for example, when a same object is
-	 * added, removed, and added again).
-	 * 
-	 * @param propertyName
-	 *            The name of the property concerned.
-	 * @param oldValue
-	 *            The old value of the property.
-	 * @param newValue
-	 *            The new value of the property.
-	 */
-	public void firePropertyChange(String propertyName, Object oldValue,
-			Object newValue) {
-		propertyChange.firePropertyChange(propertyName, oldValue, newValue);
+	@Override
+	public synchronized boolean isStepping() {
+		return isStepping;
 	}
+
+	@Override
+	public synchronized void message(SimulatorEvent event, Object[] data) {
+		messageQueue.add(new SimulatorMessage(event, data));
+	}
+
+	/**
+	 * Start (again) the actor network before going to RUNNING state
+	 * 
+	 */
+	abstract protected int resumeNetwork();
 
 	/**
 	 * Main simulator thread entry : implements the simulation FSM.
@@ -710,6 +668,14 @@ public abstract class AbstractSimulator implements Simulator {
 	}
 
 	/**
+	 * Simulate the actor network until SUSPEND command or BREAKPOINT hit.
+	 * 
+	 * @param debugMode
+	 * @return
+	 */
+	abstract protected int runNetwork();
+
+	/**
 	 * Set a breakpoint related to one or several instances according to the
 	 * actor source file and the line number.
 	 * 
@@ -724,6 +690,57 @@ public abstract class AbstractSimulator implements Simulator {
 			}
 		}
 	}
+
+	@Override
+	final public void setLaunchConfiguration(ILaunchConfiguration configuration) {
+		this.configuration = configuration;
+		try {
+			// Get configuration attributes
+			stimulusFile = configuration.getAttribute(INPUT_STIMULUS, "");
+			
+			String name = configuration.getAttribute(PROJECT, "");
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			IProject project = root.getProject(name);
+
+			vtlFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
+			
+			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
+			xdfFile = configuration.getAttribute(XDF_FILE, "");
+		} catch (CoreException e) {
+			throw new OrccRuntimeException(e.getMessage());
+		}
+		// Property change support creation for sending interpreter events
+		propertyChange = new PropertyChangeSupport(this);
+	}
+
+	/**
+	 * Step into a specific actor instance.
+	 * 
+	 */
+	abstract protected int stepInto(String instanceId);
+
+	/**
+	 * Step over the whole network of actors.
+	 * 
+	 */
+	abstract protected int stepNetwork();
+
+	/**
+	 * Step over a specific actor instance.
+	 * 
+	 */
+	abstract protected int stepOver(String instanceId);
+
+	/**
+	 * Step return from specific actor instance.
+	 * 
+	 */
+	abstract protected void stepReturn(String instanceId);
+
+	/**
+	 * Suspend the network simulation until next RESUME or STEP command.
+	 */
+	abstract protected void suspendNetwork();
 
 	/**
 	 * End of simulation reached or required by user

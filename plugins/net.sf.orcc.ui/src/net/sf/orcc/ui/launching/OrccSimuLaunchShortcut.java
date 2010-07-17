@@ -30,7 +30,7 @@ package net.sf.orcc.ui.launching;
 
 import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
-import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
+import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 import static net.sf.orcc.OrccLaunchConstants.SIMU_CONFIG_TYPE;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
@@ -57,7 +57,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -75,16 +74,6 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
  * 
  */
 public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
-
-	private String browseOutputFolder(Shell shell, IFile file) {
-		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select output folder :");
-		// set initial directory
-		String location = file.getParent().getLocation().toOSString();
-		dialog.setFilterPath(location);
-
-		return dialog.open();
-	}
 
 	private String browseStimulusFiles(Shell shell, IFile file) {
 		FileDialog fd = new FileDialog(shell, SWT.OPEN);
@@ -172,6 +161,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 			// create configuration
 			ILaunchConfigurationWorkingCopy wc = type.newInstance(null, name);
 			wc.setAttribute(SIMULATOR, simulator);
+			wc.setAttribute(PROJECT, file.getProject().getName());
 
 			// source XDF file
 			wc.setAttribute(XDF_FILE, file.getLocation().toOSString());
@@ -183,13 +173,6 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 				return null;
 			}
 			wc.setAttribute(INPUT_STIMULUS, stimulus);
-
-			// output folder
-			String folder = browseOutputFolder(getShell(), file);
-			if (folder == null) {
-				return null;
-			}
-			wc.setAttribute(OUTPUT_FOLDER, folder);
 
 			// other options need not be set.
 
