@@ -400,7 +400,7 @@ actor Algo_MMCO ()
 			STList          := [-1 :for int s in Integers(0,16-1)];
 			LongTermCount   := 0;
 			LTList          := [-1 :for int s in Integers(0,16-1)];
-			NbFrameDel      := -1;
+			NbFrameDel      := 0;
 			ValIsIDR        := true;
 			foreach int j in Integers(0,31)
 			do
