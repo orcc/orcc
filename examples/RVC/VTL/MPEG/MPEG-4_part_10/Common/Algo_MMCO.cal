@@ -72,7 +72,6 @@ actor Algo_MMCO ()
 		:
 
 
-			uint(size=4) j42 := 0;
 /*
 *
 * Constant
@@ -430,17 +429,14 @@ actor Algo_MMCO ()
 		var
 			uint(size=4) j := 0
 		do
-			j42 := 0;
 			foreach int i in Integers(0,ShortTermCount -1)
 			do
-				j := j42;
 				if(STList[i] != FrameNum)then
 					STList[j] := STList[i];
 					j := j + 1;
 				else
 					ShortTermCount := ShortTermCount - 1;
 				end
-				j42:=j;
 			end
 			foreach int i in Integers(0,LongTermCount - 1)
 			do
@@ -478,17 +474,14 @@ actor Algo_MMCO ()
 		var
 			uint(size=4) j := 0
 		do
-			j42 := 0;
 			foreach int i in Integers(0,ShortTermCount -1)
 			do
-			j:=j42;
 				if(STList[i] != FrameNum)then
 					STList[j] := STList[i];
 					j := j + 1;
 				else
 					ShortTermCount := ShortTermCount - 1;
 				end
-			j42:=j;
 			end
 			foreach int i in Integers(0,LongTermCount - 1)
 			do

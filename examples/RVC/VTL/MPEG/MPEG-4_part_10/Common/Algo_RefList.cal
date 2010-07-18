@@ -192,7 +192,7 @@ actor Algo_RefList ()
 			ValMaxFrameNum := MaxFrNu;
 
 			IdxCurrentPic := 0;
-			while(IdxNotFound)
+			while(IdxNotFound && IdxCurrentPic<32)
 			do
 				if((FrameNumList[IdxCurrentPic] > frame_num) or (IdxCurrentPic = NbPOC - 1)) then
 					IdxNotFound := false;
