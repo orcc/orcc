@@ -456,6 +456,7 @@ public abstract class AbstractBackend implements Backend {
 		this.configuration = configuration;
 	}
 
+	@Override
 	final public void setOutputFolder(String outputFolder) {
 		// set output path
 		path = new File(outputFolder).getAbsolutePath();

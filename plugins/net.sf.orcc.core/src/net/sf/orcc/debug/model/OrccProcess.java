@@ -260,7 +260,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 */
 	public void start(String option) throws CoreException {
 		try {
-			if ((option.equals("backend"))
+			if (option.equals("backend")
 					|| configuration.getAttribute(ACTIVATE_BACKEND,
 							DEFAULT_BACKEND)) {
 				monitor.subTask("Launching backend...");

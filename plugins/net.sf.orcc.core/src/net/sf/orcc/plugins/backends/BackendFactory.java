@@ -35,6 +35,7 @@ import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -105,6 +106,13 @@ public class BackendFactory extends PluginFactory {
 	public void runBackend(OrccProcess process,
 			ILaunchConfiguration configuration) throws Exception {
 		String outputFolder = configuration.getAttribute(OUTPUT_FOLDER, "");
+		if (outputFolder.isEmpty()) {
+			String tmpdir = System.getProperty("java.io.tmpdir");
+			File output = new File(tmpdir, "orcc");
+			output.mkdir();
+			outputFolder = output.getAbsolutePath();
+		}
+		
 		String backend = configuration.getAttribute(BACKEND, "");
 
 		Backend backendObj = (Backend) plugins.get(backend);
