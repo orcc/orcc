@@ -89,11 +89,6 @@ public class Procedure extends AbstractLocalizable {
 
 	}
 
-	public static final Procedure print = new Procedure("print", true,
-			new Location(), IrFactory.eINSTANCE.createTypeVoid(),
-			new OrderedMap<String, Variable>(),
-			new OrderedMap<String, Variable>(), new ArrayList<CFGNode>());
-
 	/**
 	 * whether this procedure is external.
 	 */

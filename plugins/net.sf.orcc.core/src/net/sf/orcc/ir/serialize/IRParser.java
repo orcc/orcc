@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.serialize;
 
-import static net.sf.orcc.ir.Procedure.print;
 import static net.sf.orcc.ir.serialize.IRConstants.BINARY_EXPR;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTIONS;
 import static net.sf.orcc.ir.serialize.IRConstants.KEY_ACTION_SCHED;
@@ -160,9 +159,6 @@ public class IRParser {
 		procs = new OrderedMap<String, Procedure>();
 		untaggedActions = new ArrayList<Action>();
 		variables = new Scope<String, Variable>();
-
-		// register built-in procedures
-		procs.put(file, print.getLocation(), print.getName(), print);
 	}
 
 	/**

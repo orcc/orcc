@@ -162,7 +162,7 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 	 *         procedure
 	 */
 	public boolean isPrint() {
-		return procedure == Procedure.print;
+		return "print".equals(procedure.getName());
 	}
 
 	/**
