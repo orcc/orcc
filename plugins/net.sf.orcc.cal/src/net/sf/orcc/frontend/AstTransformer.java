@@ -103,8 +103,8 @@ import com.google.inject.Inject;
 public class AstTransformer {
 
 	/**
-	 * This class transforms an AST statement into one or more IR instructions
-	 * and/or nodes.
+	 * This class transforms an AST expression into one or more IR instructions
+	 * and/or nodes, and returns an IR expression.
 	 * 
 	 */
 	private class ExpressionTransformer extends CalSwitch<Expression> {
@@ -601,15 +601,65 @@ public class AstTransformer {
 	}
 
 	/**
+	 * This class transforms the expression passed to a print/println procedure
+	 * to a list of IR expressions.
+	 * 
+	 * @author Matthieu Wipliez
+	 * 
+	 */
+	private class PrintlnTransformer extends CalSwitch<Object> {
+
+		private List<Expression> parameters;
+
+		private Object object;
+
+		public PrintlnTransformer(List<Expression> parameters) {
+			this.parameters = parameters;
+			this.object = new Object();
+		}
+
+		@Override
+		public Object caseAstExpression(AstExpression astExpression) {
+			Expression expression = transformExpression(astExpression);
+			parameters.add(expression);
+
+			return object;
+		}
+
+		@Override
+		public Object caseAstExpressionBinary(AstExpressionBinary astExpression) {
+			BinaryOp op = BinaryOp.getOperator(astExpression.getOperator());
+			if (op == BinaryOp.PLUS) {
+				doSwitch(astExpression.getLeft());
+				Expression expression = transformExpression(astExpression
+						.getRight());
+				parameters.add(expression);
+
+				return object;
+			}
+
+			// fall back to general case
+			return null;
+		}
+
+	}
+
+	/**
 	 * This class transforms an AST statement into one or more IR instructions
 	 * and/or nodes. It returns null because it appends the instructions/nodes
 	 * directly to the {@link #nodes} field.
 	 * 
 	 */
-	private class StatementTransformer extends CalSwitch<Void> {
+	private class StatementTransformer extends CalSwitch<Object> {
+
+		private Object object;
+		
+		public StatementTransformer() {
+			this.object = new Object();
+		}
 
 		@Override
-		public Void caseAstStatementAssign(AstStatementAssign astAssign) {
+		public Object caseAstStatementAssign(AstStatementAssign astAssign) {
 			Location location = Util.getLocation(astAssign);
 
 			// get target
@@ -625,18 +675,18 @@ public class AstTransformer {
 			exprTransformer.clearTarget();
 			createAssignOrStore(location, target, indexes, value);
 
-			return null;
+			return object;
 		}
 
 		@Override
-		public Void caseAstStatementCall(AstStatementCall astCall) {
+		public Object caseAstStatementCall(AstStatementCall astCall) {
 			Location location = Util.getLocation(astCall);
 
 			// retrieve IR procedure
 			AstProcedure astProcedure = astCall.getProcedure();
 			// special case if the procedure is a built-in procedure
 			if (astProcedure.eContainer() == null) {
-				// TODO built-in procedure
+				transformBuiltinProcedure(astCall);
 				return null;
 			}
 
@@ -648,11 +698,11 @@ public class AstTransformer {
 			// creates call with spilling code around it
 			createCall(location, null, procedure, astCall.getParameters());
 
-			return null;
+			return object;
 		}
 
 		@Override
-		public Void caseAstStatementForeach(AstStatementForeach foreach) {
+		public Object caseAstStatementForeach(AstStatementForeach foreach) {
 			Location location = Util.getLocation(foreach);
 			Procedure procedure = context.getProcedure();
 
@@ -687,11 +737,11 @@ public class AstTransformer {
 					nodes, new BlockNode(procedure));
 			procedure.getNodes().add(whileNode);
 
-			return null;
+			return object;
 		}
 
 		@Override
-		public Void caseAstStatementIf(AstStatementIf stmtIf) {
+		public Object caseAstStatementIf(AstStatementIf stmtIf) {
 			Location location = Util.getLocation(stmtIf);
 			Procedure procedure = context.getProcedure();
 
@@ -705,11 +755,11 @@ public class AstTransformer {
 					elseNodes, new BlockNode(procedure));
 			procedure.getNodes().add(node);
 
-			return null;
+			return object;
 		}
 
 		@Override
-		public Void caseAstStatementWhile(AstStatementWhile stmtWhile) {
+		public Object caseAstStatementWhile(AstStatementWhile stmtWhile) {
 			Location location = Util.getLocation(stmtWhile);
 			Procedure procedure = context.getProcedure();
 
@@ -721,7 +771,7 @@ public class AstTransformer {
 					nodes, new BlockNode(procedure));
 			procedure.getNodes().add(whileNode);
 
-			return null;
+			return object;
 		}
 
 		/**
@@ -748,6 +798,41 @@ public class AstTransformer {
 			subList.clear();
 
 			return resultNodes;
+		}
+
+		/**
+		 * Transforms a call to a built-in procedure (print or println). Both
+		 * are transformed to a call to print, with an additional "\\n"
+		 * parameter in the case of println.
+		 * 
+		 * @param astCall
+		 *            an AST call statement
+		 */
+		private void transformBuiltinProcedure(AstStatementCall astCall) {
+			Location location = Util.getLocation(astCall);
+			String name = astCall.getProcedure().getName();
+			if ("print".equals(name) || "println".equals(name)) {
+				Procedure procedure = procedures.get("print");
+				if (procedure == null) {
+					procedure = new Procedure("print", location,
+							IrFactory.eINSTANCE.createTypeVoid());
+					procedure.setExternal(true);
+					procedures.put("print", procedure);
+				}
+
+				List<AstExpression> astParameters = astCall.getParameters();
+				List<Expression> parameters = new ArrayList<Expression>(7);
+				if (!astParameters.isEmpty()) {
+					AstExpression astExpression = astParameters.get(0);
+					new PrintlnTransformer(parameters).doSwitch(astExpression);
+				}
+
+				if ("println".equals(name)) {
+					parameters.add(new StringExpr("\\n"));
+				}
+
+				addInstruction(new Call(location, null, procedure, parameters));
+			}
 		}
 
 	}

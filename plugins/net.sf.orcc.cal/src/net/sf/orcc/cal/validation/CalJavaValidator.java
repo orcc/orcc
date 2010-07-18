@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.cal.validation;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.cal.cal.AstAction;
@@ -184,6 +185,46 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		if (!checker.areTypeCompatible(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
 					+ targetType, CalPackage.AST_STATEMENT_ASSIGN__VALUE);
+		}
+	}
+
+	@Check
+	public void checkAstStatementCall(AstStatementCall astCall) {
+		AstProcedure procedure = astCall.getProcedure();
+		String name = procedure.getName();
+		List<AstExpression> parameters = astCall.getParameters();
+		if (procedure.eContainer() == null) {
+			if ("print".equals(name) || "println".equals(name)) {
+				if (parameters.size() > 1) {
+					error("built-in procedure " + name
+							+ " takes at most one expression", astCall,
+							CalPackage.AST_STATEMENT_CALL);
+				}
+			}
+
+			return;
+		}
+
+		if (procedure.getParameters().size() != parameters.size()) {
+			error("procedure " + name + " takes "
+					+ procedure.getParameters().size() + " arguments.",
+					astCall, CalPackage.AST_STATEMENT_CALL);
+			return;
+		}
+
+		Iterator<AstVariable> itFormal = procedure.getParameters().iterator();
+		Iterator<AstExpression> itActual = parameters.iterator();
+		while (itFormal.hasNext() && itActual.hasNext()) {
+			Type formalType = itFormal.next().getIrType();
+			AstExpression expression = itActual.next();
+			Type actualType = checker.getType(expression);
+
+			// check types
+			if (!checker.areTypeCompatible(formalType, actualType)) {
+				error("Type mismatch: cannot convert from " + actualType
+						+ " to " + formalType, expression,
+						CalPackage.AST_EXPRESSION);
+			}
 		}
 	}
 
