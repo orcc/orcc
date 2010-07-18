@@ -588,8 +588,7 @@ actor Algo_MMCO ()
 	schedule fsm  read_num_ref_frames:
 		read_num_ref_frames (read_num_ref_frames      )--> FillFalseRefFrame;
 
-		FillFalseRefFrame   (FillFalseRefFrame.done        )--> SendLongTermList;
-		FillFalseRefFrame   (FillFalseRefFrame.launch        )--> SendLongTermList;
+		FillFalseRefFrame   (FillFalseRefFrame        )--> SendLongTermList;
 
 		SendLongTermList    (SendLongTermList.launch  )--> SendLongTermList;
 		SendLongTermList    (SendShortTermList.launch )--> SendLongTermList;
@@ -602,8 +601,7 @@ actor Algo_MMCO ()
 		MMCO_opcode         (MMCO_opcode              )--> MMCO_opcode;
 		MMCO_opcode         (MMCO_opcode_IsEqualTo0   )--> AddFrameInList;
 
-		AddFrameInList      (AddFrame.InSTList                 )--> GetNextPocToDel;
-		AddFrameInList      (AddFrame.InLTList                 )--> GetNextPocToDel;
+		AddFrameInList      (AddFrame                 )--> GetNextPocToDel;
 
 		GetNextPocToDel     (GetNextPocToDel          )--> SendDelLists;
 
