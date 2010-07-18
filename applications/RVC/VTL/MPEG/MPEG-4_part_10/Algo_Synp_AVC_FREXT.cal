@@ -4454,8 +4454,8 @@ actor Algo_Synp_AVC_FREXT()
 	********      CABAC Parsing                     	*********
 	*************************************************************
 	*************************************************************/
-	
-	NewCabacParsing: action ==>
+	/* CabacParsing */
+	action ==>
 	guard
 		StartNewCabacParsing
 	do
@@ -4537,8 +4537,8 @@ actor Algo_Synp_AVC_FREXT()
 	end
 		
 	/********************** RenormD actions **********************/
-	
-	RenormD_Read: action ==>
+	/* RenormD_Read */
+	action ==>
 	guard
 		StartRenormDRead and
 		codIRange < 0x0100
@@ -4548,7 +4548,8 @@ actor Algo_Synp_AVC_FREXT()
 		StartRenormDRead := false;
 	end
 	
-	RenormD_Start: action ==>
+	/* RenormD_Start */
+	action ==>
 	guard
 		StartRenormD and
 		codIRange < 0x0100 and
@@ -4562,7 +4563,8 @@ actor Algo_Synp_AVC_FREXT()
 		end
 	end
 	
-	RenormD_Done: action ==>
+	/* RenormD_Done */
+	action ==>
 	guard
 		StartRenormD and
 		codIRange >= 0x0100
@@ -4580,7 +4582,8 @@ actor Algo_Synp_AVC_FREXT()
 	end	
 	/********************** DecodeDecision action **********************/
 	
-	DecodeDecision: action ==>
+	/* DecodeDecision */
+	action ==>
 	guard
 		StartDecodeDecision
 	do
@@ -4625,7 +4628,8 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	/********************** DecodeBypass actions **********************/
 	
-	DecodeBypassRead: action ==>
+	/* DecodeBypassRead*/ 
+	action ==>
 	guard
 		StartDecodeBypass and
 		bypassFlag 
@@ -4637,7 +4641,8 @@ actor Algo_Synp_AVC_FREXT()
 		StartDecodeBypassStart := true;
 	end
 	
-	DecodeBypassStart: action ==>
+	/* DecodeBypassStart */ 
+	action ==>
 	guard
 		StartDecodeBypassStart and bypassFlag and done_reading_bits()
 	do
@@ -4658,7 +4663,8 @@ actor Algo_Synp_AVC_FREXT()
 		StartCabacProcess();
 	end
 	
-	DecodeTerminate: action ==>
+	/* DecodeTerminate */
+	action ==>
 	guard
 		StartDecodeTerminate and
 		ctxIdx = 276
@@ -4704,7 +4710,8 @@ actor Algo_Synp_AVC_FREXT()
 	end
 	/********************** Cabac Initialization **********************/
 	
-	CabacInit: action ==>
+	/* CabacInit */
+	action ==>
 	guard
 		StartCabacInit
 	do
@@ -4730,7 +4737,8 @@ actor Algo_Synp_AVC_FREXT()
 		StopCabacProcess();
 	end	
 	
-	CabacInitDecoding_Done:
+	
+	/* CabacInitDecoding_Done */
 	action ==>
 	guard
 		( PcmAlignementZeroBitDone or PcmSampleLumaDone or PcmSampleChromaDone  or StartInitializationDecoding ) and
