@@ -25,15 +25,6 @@ ${orcc_SOURCE_DIR}/src/scheduler.c
 ${orcc_SOURCE_DIR}/src/sink.c
 ${orcc_SOURCE_DIR}/src/source.c
 ${orcc_SOURCE_DIR}/src/orcc_util.c
-
-${orcc_SOURCE_DIR}/src/Actor_img_display.cpp
-${orcc_SOURCE_DIR}/src/Actor_img_read.cpp
-${orcc_SOURCE_DIR}/src/Actor_display.cpp
-${orcc_SOURCE_DIR}/src/Actor_source.cpp
-${orcc_SOURCE_DIR}/src/actoraka.cpp
-${orcc_SOURCE_DIR}/src/fifoFanOut.cpp
-${orcc_SOURCE_DIR}/src/traceaka.cpp
-
 )
 
 install (TARGETS orcc DESTINATION lib)
