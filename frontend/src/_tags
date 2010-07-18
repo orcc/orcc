@@ -1,9 +1,0 @@
-true: warn_A, warn_e, warn_error_A, warn_error_e
-
-"actor": include
-"cli": include
-"expr": include
-"parsers": include
-
-<cli/cal2ir.d.byte>: debug
-<cli/cal2ir.{d.byte,byte,native}>: use_camlp4, use_dynlink, use_graph, use_str, use_unix
