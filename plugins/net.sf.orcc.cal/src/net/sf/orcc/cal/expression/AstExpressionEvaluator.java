@@ -249,6 +249,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			}
 
 			BinaryOp op = BinaryOp.getOperator(name);
+			if (op == null) {
+				return null;
+			}
 
 			switch (op) {
 			case BITAND:
@@ -473,6 +476,10 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	 *             if the given expression cannot be evaluated.
 	 */
 	public Object evaluate(AstExpression expression) {
+		if (expression == null) {
+			return null;
+		}
+
 		return doSwitch(expression);
 	}
 

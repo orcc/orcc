@@ -9,7 +9,6 @@ generate cal "http://orcc.sf.net/cal/Cal"
 ///////////////////////////////////////////////////////////////////////////////
 
 AstActor:
-	(imports+=AstImport)*
 	'actor' name=ID
 		'(' (parameters += AstParameter (',' parameters += AstParameter)*)? ')'
 		(inputs += AstPort (',' inputs += AstPort)*)? '==>'
@@ -28,9 +27,6 @@ AstActor:
 	'end';
 
 AstPort: type=AstType name=ID;
-
-AstImport:
-	'import' ('all' tag=AstTag | tag=AstTag ('=' id = ID)?) ';';
 
 AstFunction:
 	'function' name=ID
@@ -145,9 +141,8 @@ AstStatementCall:
 	'(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')' ';';
 
 AstStatementForeach:
-	'foreach' variable=AstVariableDeclaration 'in'
-		'Integers' '(' lower=AstExpression ',' higher=AstExpression ')'
-	 'do'
+	'foreach' variable=AstVariableDeclaration 'in' lower=AstExpression '..' higher=AstExpression
+	'do'
 		(statements += AstStatement)*
 	'end';
 
@@ -226,8 +221,7 @@ AstExpressionList:
 	(':' generators+=AstGenerator (',' generators+=AstGenerator)*)? ']';
 
 AstGenerator:
-	'for' variable=AstVariableDeclaration 'in'
-	'Integers' '(' lower=AstExpression ',' higher=AstExpression ')';
+	'for' variable=AstVariableDeclaration 'in' lower=AstExpression '..' higher=AstExpression;
 
 AstExpressionVariable: value=AstVariableReference;
 

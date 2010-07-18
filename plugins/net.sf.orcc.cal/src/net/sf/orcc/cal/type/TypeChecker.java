@@ -286,7 +286,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		for (AstExpression index : indexes) {
 			Type subType = getType(index);
 			if (type.isList()) {
-				if (subType.isInt() || subType.isUint()) {
+				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
 				} else {
 					CalJavaValidator.getInstance().error(
@@ -413,6 +413,10 @@ public class TypeChecker extends CalSwitch<Type> {
 	 * @return the Least Upper Bound of the given types
 	 */
 	public Type getLub(Type t1, Type t2) {
+		if (t1 == null || t2 == null) {
+			return null;
+		}
+
 		if (t1.isBool() && t2.isBool()) {
 			return t1;
 		} else if (t1.isFloat() && t2.isFloat()) {
@@ -447,9 +451,9 @@ public class TypeChecker extends CalSwitch<Type> {
 			} else {
 				return IrFactory.eINSTANCE.createTypeInt(su + 1);
 			}
-		} else {
-			return null;
 		}
+
+		return null;
 	}
 
 	/**
@@ -479,6 +483,10 @@ public class TypeChecker extends CalSwitch<Type> {
 	 * @return a type
 	 */
 	public Type getType(AstExpression expression) {
+		if (expression == null) {
+			return null;
+		}
+
 		Type type = expression.getIrType();
 		if (type == null) {
 			type = doSwitch(expression);
@@ -514,14 +522,33 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	private Type getTypeBuiltin(AstExpressionCall astCall) {
 		String name = astCall.getFunction().getName();
+		List<AstExpression> parameters = astCall.getParameters();
 		if ("bitnot".equals(name)) {
+			if (parameters.size() != 1) {
+				CalJavaValidator.getInstance().error(
+						"bitnot function takes exactly one parameter", astCall,
+						CalPackage.AST_EXPRESSION_CALL__FUNCTION);
+				return null;
+			}
 			Type type = getType(astCall.getParameters().get(0));
 			return type;
+		}
+
+		BinaryOp op = BinaryOp.getOperator(name);
+		if (op == null) {
+			// unknown operator
+			return null;
+		}
+
+		if (parameters.size() != 2) {
+			CalJavaValidator.getInstance().error(
+					name + "function takes exactly two parameters", astCall,
+					CalPackage.AST_EXPRESSION_CALL__FUNCTION);
+			return null;
 		}
 
 		Type t1 = getType(astCall.getParameters().get(0));
 		Type t2 = getType(astCall.getParameters().get(1));
 		return getLub(t1, t2);
 	}
-
 }
