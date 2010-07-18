@@ -42,12 +42,12 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   	uint(size=2) mb_type_ok:=0;
   	
 	//List containing edge pixel value 
-	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH_MAX) top_edge := [0 : for int i in Integers( 0, PICWIDTH * MB_WIDTH_MAX-1)];
-	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH_MAX ) left_edge := [ 0 : for int i in Integers( 0, MB_WIDTH_MAX-1)];
+	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH_MAX) top_edge := [0 : for int i in 0 .. PICWIDTH * MB_WIDTH_MAX-1];
+	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH_MAX ) left_edge := [ 0 : for int i in 0 .. MB_WIDTH_MAX-1];
 	uint(size=SAMPLE_SZ) topLeft_edge := 0;
 	
 	//FIXME! PICWIDTH used
-	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH_MAX) result := [0 : for int i in Integers( 0, PICWIDTH * MB_WIDTH_MAX-1)];
+	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH_MAX) result := [0 : for int i in 0 .. PICWIDTH * MB_WIDTH_MAX-1];
 	
   
   	//Mb_Type_OK : Send value of edge needed and store the edge of macroblock decoded
@@ -65,11 +65,11 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   	do
   		//Store bottom , right and bottom right edge
   		topLeft_edge := top_edge[MB_WIDTH-1+ mb_Index*MB_WIDTH];
-  		foreach int s in Integers(0,MB_WIDTH-1)
+  		foreach int s in 0 .. MB_WIDTH-1
   		do
   			top_edge[s+ mb_Index *MB_WIDTH]:= v[s+(MB_WIDTH-1)*MB_WIDTH];
   		end
-  		left_edge :=  [v[s*MB_WIDTH-1]:for int s in Integers(1,MB_WIDTH_LUMA)];
+  		left_edge :=  [v[s*MB_WIDTH-1]:for int s in 1 .. MB_WIDTH_LUMA];
   	end
   
   	//Receive pixel value from current decoded macroblock
@@ -79,11 +79,11 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   	do
   		//Store bottom , right and bottom right edge
   		topLeft_edge := top_edge[MB_WIDTH-1+ mb_Index*MB_WIDTH];
-  		foreach int s in Integers(0,MB_WIDTH-1)
+  		foreach int s in 0 .. MB_WIDTH-1
   		do
   			top_edge[s+ mb_Index *MB_WIDTH]:= v[s+(MB_WIDTH-1)*MB_WIDTH];
   		end
-  		left_edge :=  [v[s*MB_WIDTH-1]:for int s in Integers(1,MB_WIDTH_CHROMA)];
+  		left_edge :=  [v[s*MB_WIDTH-1]:for int s in 1 .. MB_WIDTH_CHROMA];
   	end
   
   	EDGE_CALC_LUMA: action ==> EDGE:[ result	] repeat 2*MB_WIDTH_LUMA+1
@@ -92,13 +92,13 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   		MB_WIDTH = MB_WIDTH_LUMA
   	do
 		
-		foreach int s in Integers(0, MB_WIDTH-1)
+		foreach int s in 0 .. MB_WIDTH-1
 		do
   			result[s]:= left_edge[s];
   		end
   		result[MB_WIDTH]:= topLeft_edge;
   		
-  		foreach int s in Integers(0, MB_WIDTH-1) 
+  		foreach int s in 0 .. MB_WIDTH-1 
 		do
   			result[MB_WIDTH+1+s]:= top_edge [s+ mb_Index *MB_WIDTH];
   		end
@@ -111,13 +111,13 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   		MB_WIDTH = MB_WIDTH_CHROMA
   	do
 		
-		foreach int s in Integers(0, MB_WIDTH-1)
+		foreach int s in 0 .. MB_WIDTH-1
 		do
   			result[s]:= left_edge[s];
   		end
   		result[MB_WIDTH]:= topLeft_edge;
   		
-  		foreach int s in Integers(0, MB_WIDTH-1) 
+  		foreach int s in 0 .. MB_WIDTH-1 
 		do
   			result[MB_WIDTH+1+s]:= top_edge [s+ mb_Index *MB_WIDTH];
   		end

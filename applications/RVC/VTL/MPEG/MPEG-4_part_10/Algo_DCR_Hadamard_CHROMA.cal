@@ -51,7 +51,7 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-import all caltrop.lib.BitOps;
+
 
 actor Algo_DCR_Hadamard_CHROMA ()
   	int(size=16) levarr, 
@@ -97,7 +97,7 @@ actor Algo_DCR_Hadamard_CHROMA ()
 
   read_sl: action ScalingList:[SL] repeat 4*4 ==>
   do
-    t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in Integers(0,5), for int s in Integers(0,15) ];
+    t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in 0 .. 5, for int s in 0 .. 15 ];
   end
 
   itrans:
@@ -106,7 +106,7 @@ actor Algo_DCR_Hadamard_CHROMA ()
       rshift(y[s] * t_LevelScale[16*qp_rem], 5 - qp_per)
     else
       lshift(y[s] * t_LevelScale[16*qp_rem], qp_per - 5)
-    end :for int s in Integers(0,3)]] repeat 4
+    end :for int s in 0 .. 3]] repeat 4
   var
    List(type:int(size=16), size=4) buf,
    List(type:int(size=16), size=4) y

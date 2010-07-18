@@ -82,14 +82,14 @@ actor Algo_RefList ()
 *
 */
 
-	List(type:int (size=32), size=32) FrameNumList := [ 0     : for int s in Integers(0,31)];
-	List(type:int (size=32), size=32) IdxLTList    := [-1     : for int s in Integers(0,31)];
-	List(type:int (size=32), size=32) POCList      := [ 0     : for int s in Integers(0,31)];
-	List(type:bool         , size=32) PicIsUsed    := [ false : for int s in Integers(0,31)];
+	List(type:int (size=32), size=32) FrameNumList := [ 0     : for int s in 0 .. 31];
+	List(type:int (size=32), size=32) IdxLTList    := [-1     : for int s in 0 .. 31];
+	List(type:int (size=32), size=32) POCList      := [ 0     : for int s in 0 .. 31];
+	List(type:bool         , size=32) PicIsUsed    := [ false : for int s in 0 .. 31];
 
-	List(type:uint(size=5) , size=32) RefIdx       := [ 0 : for int s in Integers(0,31)];
-	List(type:int (size=32), size=32) FrameNumWrap := [-1 : for int s in Integers(0,31)];
-	List(type:int (size=6) , size=16) ValLTList    := [-1 : for int s in Integers(0,15)];
+	List(type:uint(size=5) , size=32) RefIdx       := [ 0 : for int s in 0 .. 31];
+	List(type:int (size=32), size=32) FrameNumWrap := [-1 : for int s in 0 .. 31];
+	List(type:int (size=6) , size=16) ValLTList    := [-1 : for int s in 0 .. 15];
 
 
 	int (size=32) ValMovedFrame            := 0;
@@ -126,7 +126,7 @@ actor Algo_RefList ()
 				ValIdxMax := 31;
 			end
 			if(ValIdxMax>IdxPOC) then
-				foreach int i in Integers(0, ValIdxMax - IdxPOC - 1)
+				foreach int i in 0 .. ValIdxMax - IdxPOC - 1
 				do
 					POCList     [ValIdxMax - i] := POCList     [ValIdxMax - i - 1];
 					FrameNumList[ValIdxMax - i] := FrameNumList[ValIdxMax - i - 1];
@@ -149,14 +149,14 @@ actor Algo_RefList ()
 		var
 			int(size=7) IdxToDel := -1
 		begin
-			foreach int i in Integers(0, NbPOC - 1)
+			foreach int i in 0 .. NbPOC - 1
 			do
 				if(FrameNumList[i] = ValFrame)then
 					IdxToDel := i;
 				end
 			end
 			if(IdxToDel != -1)then
-				foreach int i in Integers(0,NbPOC - IdxToDel - 2)
+				foreach int i in 0 .. NbPOC - IdxToDel - 2
 				do
 					POCList     [IdxToDel + i] := POCList     [IdxToDel + i + 1];
 					FrameNumList[IdxToDel + i] := FrameNumList[IdxToDel + i + 1];
@@ -214,7 +214,7 @@ actor Algo_RefList ()
 				IdxCurrentPic := 0;
 			end
 
-			foreach int i in Integers(0, NbPOC - 1)
+			foreach int i in 0 .. NbPOC - 1
 			do
 				IdxLTList[i] := -1;
 				PicIsUsed[i] := false;
@@ -243,7 +243,7 @@ actor Algo_RefList ()
 //			println("LongTermFrame:"+ValLongTerm);
 //		end
 			frame_found := false;
-			foreach int i in Integers(0, NbPOC - 1)
+			foreach int i in 0 .. NbPOC - 1
 			do
 				if(FrameNumList[i] = ValLongTerm) then
 					IdxLTList[i] := NbLTRead;
@@ -253,7 +253,7 @@ actor Algo_RefList ()
 			end
 			idx_found := false;
 			if(not frame_found) then
-				foreach int i in Integers(0, NbPOC - 1)
+				foreach int i in 0 .. NbPOC - 1
 				do
 					idx_found2 :=idx_found;
 					if(FrameNumList[i] > ValLongTerm and idx_found = false) then
@@ -281,7 +281,7 @@ actor Algo_RefList ()
 		do
 //		println("ShortTermFrame:"+ValShortTerm);
 			frame_found := false;
-			foreach int i in Integers(0,NbPOC - 1)
+			foreach int i in 0 .. NbPOC - 1
 			do
 				if(FrameNumList[i] = ValShortTerm) then
 					PicIsUsed[i] := true;
@@ -291,7 +291,7 @@ actor Algo_RefList ()
 			idx_found := false;
 			//Insert False Frame
 			if(not frame_found) then
-				foreach int i in Integers(0, NbPOC - 1)
+				foreach int i in 0 .. NbPOC - 1
 				do
 					idx_found2 :=idx_found;
 					if(FrameNumList[i] > ValShortTerm and idx_found = false) then
@@ -350,12 +350,12 @@ actor Algo_RefList ()
 			NumMaxListRefFrame := NbPOC - 1;
 		end
 
-		foreach int i in Integers(0,15)
+		foreach int i in 0 .. 15
 		do
 			ValLTList[i] := -1;
 		end
 ValidxRefList := 0;//////
-		foreach int i in Integers (0,NbPOC - 1)
+		foreach int i in 0 .. NbPOC - 1
 		do
 			IdxRefList2 := ValidxRefList; 
 			if(i != IdxCurrentPic)then
@@ -374,9 +374,9 @@ ValidxRefList := 0;//////
 			ValidxRefList := IdxRefList2;
 		end
 		if(ValidxRefList>0) then
-			foreach int i in Integers(0,ValidxRefList - 1)
+			foreach int i in 0 .. ValidxRefList - 1
 			do
-				foreach int j in Integers(i + 1,ValidxRefList - 1)
+				foreach int j in i + 1 .. ValidxRefList - 1
 				do
 					if(FrameNumWrap[i] < FrameNumWrap[j])then
 						IdxBuffer       := RefIdx[j];
@@ -391,19 +391,19 @@ ValidxRefList := 0;//////
 			end
 		end
 //		println("Buffer POCLIst and FrameNumList:");
-//		foreach int i in Integers(0,NbPOC - 1)
+//		foreach int i in 0 .. NbPOC - 1
 //		do
 //			println("FrameNum:"+FrameNumList[i]+" Poc:"+POCList[i]);
 //		end
 		
 //		println("\nSizeBuffer:"+NumMaxListRefFrame+"\nShortTermPart");
-//		foreach int i in Integers(0,ValidxRefList - 1)
+//		foreach int i in 0 .. ValidxRefList - 1
 //		do
 //			println("ValFrameNum:"+FrameNumList[RefIdx[i]]);
 //		end
 //		println("LongTermPart");
 		if(ValidxRefList < NumMaxListRefFrame)then
-			foreach int i in Integers(0,15)
+			foreach int i in 0 .. 15
 			do
 				IdxRefList2 := ValidxRefList; 
 				if ( (ValLTList[i] != -1) and (IdxRefList2 < NumMaxListRefFrame) ) then 
@@ -449,7 +449,7 @@ ValidxRefList := 0;//////
 			bool IsInRefList := false,
 			int (size = 32) poc
 		do
-//	foreach int i in Integers(0,NumMaxListRefFrame - 1)
+//	foreach int i in 0 .. NumMaxListRefFrame - 1
 //	do
 //		println("BufferRefList:"+FrameNumList[RefIdx[i]]+" idx:"+RefIdx[i]);
 //	end
@@ -469,7 +469,7 @@ ValidxRefList := 0;//////
 		ValMovedIdx  := 0;
 			//Search the location of the reference picture (ValMovedFrame) in the RefList
 			if(CounterRefListTab < NumMaxListRefFrame)then
-				foreach int i in Integers(CounterRefListTab, NumMaxListRefFrame-1)
+				foreach int i in CounterRefListTab .. NumMaxListRefFrame-1
 				do
 					if (FrameNumList[RefIdx[i]] = ValMovedFrame) then 
 						ValidxRefList  := i;
@@ -482,7 +482,7 @@ ValidxRefList := 0;//////
 				//Shift to the right all the element with an index between 
 				//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
 				//Thanks to this shift, the short term reference picture located at idxRefList is deleted.
-				foreach int i in Integers (0, ValidxRefList - CounterRefListTab - 1)
+				foreach int i in 0 .. ValidxRefList - CounterRefListTab - 1
 				do
 					RefIdx[ValidxRefList - i] := RefIdx[ValidxRefList - i - 1];
 				end
@@ -491,7 +491,7 @@ ValidxRefList := 0;//////
 				CounterRefListTab := CounterRefListTab + 1;
 //				println("RefListSent; FrNu:"+FrameNumList[ValMovedIdx]+" Poc:"+POCList[ValMovedIdx]);
 			else
-				foreach int i in Integers(0, NbPOC - 1)
+				foreach int i in 0 .. NbPOC - 1
 				do
 					if (FrameNumList[i] = ValMovedFrame and i !=IdxCurrentPic) then 
 						ValMovedIdx    := i;
@@ -516,13 +516,13 @@ ValidxRefList := 0;//////
 		var
 			int (size = 32) poc
 		do
-//	foreach int i in Integers(0,NumMaxListRefFrame - 1)
+//	foreach int i in 0 .. NumMaxListRefFrame - 1
 //	do
 //		println("BufferRefList:"+FrameNumList[RefIdx[i]]+" idx:"+RefIdx[i]);
 //	end
 			ValidxRefList := 0;
 			//Search the location of the reference picture in the RefList
-			foreach int i in Integers(0, NumMaxListRefFrame-1)
+			foreach int i in 0 .. NumMaxListRefFrame-1
 			do
 				if (RefIdx[i] = ValLTList[idx_LTList]) then 
 					ValidxRefList := i;
@@ -533,7 +533,7 @@ ValidxRefList := 0;//////
 			//IdxInsertFrame and idxRefList - 1 (IdxInsertFrame and idxRefList - 1 are also shifted).
 			//Thanks to this shift, the long term reference picture located at idxRefList is deleted.
 			if(ValidxRefList > CounterRefListTab) then
-				foreach int i in Integers (0, ValidxRefList - CounterRefListTab - 1)
+				foreach int i in 0 .. ValidxRefList - CounterRefListTab - 1
 				do
 					RefIdx[ValidxRefList - i] := RefIdx[ValidxRefList - i - 1];
 				end

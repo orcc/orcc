@@ -40,7 +40,7 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 // Put pixels out of col IDCT back into scan order
-import all caltrop.lib.BitOps;
+
 actor Xilinx_retranspose () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2,
 int(size=isz) X3 ==> int(size=osz) Y :
 
@@ -49,7 +49,7 @@ int(size=isz) X3 ==> int(size=osz) Y :
 	int osz = 10;
 
 	//List[ List[ List[ int(size=osz) ] ] ] mem :=
-	List(type: int(size=osz), size=128) mem := [ 0 : for int k in Integers(1, 128) ];
+	List(type: int(size=osz), size=128) mem := [ 0 : for int k in 1 .. 128 ];
 
 	int rcount := 0;
 

@@ -97,8 +97,8 @@ actor Mgnt_MVR ()
 
 	initialize ==>
 	do
-		mv := [ [[0, 0] : for int i in Integers(0, 15) ]: for int j in Integers(0, PICWIDTH*PICHEIGHT-1) ];
-		refidx:=[[-2 : for int i in Integers(0,15)]: for int j in Integers(0,PICWIDTH*PICHEIGHT-1) ];
+		mv := [ [[0, 0] : for int i in 0 .. 15 ]: for int j in 0 .. PICWIDTH*PICHEIGHT-1 ];
+		refidx:=[[-2 : for int i in 0 .. 15]: for int j in 0 .. PICWIDTH*PICHEIGHT-1 ];
 	end
   
 	get_pos_intra: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c], FirstMbInSlice:[d] ==>
@@ -106,8 +106,8 @@ actor Mgnt_MVR ()
 		count >= 16,
     	c !=0
   	do
-  	    refidx[a]:=[-1 : for int i in Integers(0,15)];
-  	    mv[a] := [ [0, 0] : for int i in Integers(0,15)];
+  	    refidx[a]:=[-1 : for int i in 0 .. 15];
+  	    mv[a] := [ [0, 0] : for int i in 0 .. 15];
 	end
   
 	get_pos_inter: action CurrMbAddr: [a], PicWidthInMb: [b], MbIntraFlag:[c], FirstMbInSlice:[d] ==>  
@@ -122,7 +122,7 @@ actor Mgnt_MVR ()
 		y := a / picW;
 		count := 0;
 		mvdone:=false;
-  	    refidx[a]:=[-2 : for int i in Integers(0,15)];
+  	    refidx[a]:=[-2 : for int i in 0 .. 15];
 	end
   
 	get_part: action MbPartIdx:[a], RefIdx:[b], MbPartWidth:[c], MbPartHeigth:[d] ==> PartSZ:[c , d], Location:[locx , locy]
@@ -139,12 +139,12 @@ actor Mgnt_MVR ()
 		locy := lshift(y,4)+ lshift(InverseScan4x4Tab[count] /4, 2) ;
 	end
   
-	send_part.others: action ==> refIdxLXN:[[refABC[t]:for int t in Integers(0,2)]] repeat 3, mvLX:[[mvABC[s]:for int s in Integers(0,5)]] repeat 6
+	send_part.others: action ==> refIdxLXN:[[refABC[t]:for int t in 0 .. 2]] repeat 3, mvLX:[[mvABC[s]:for int s in 0 .. 5]] repeat 6
 	var 
 		// uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2)+ (InverseScan4x4Tab[count] /4) * lshift( picW,2) + (InverseScan4x4Tab[count] mod 4),
-		List(type:int(size=5),size=3) refABC := [-2 : for int i in Integers(0,2)],
+		List(type:int(size=5),size=3) refABC := [-2 : for int i in 0 .. 2],
 		uint(size=2) match_count := 0,
-		List(type:int,size=6) mvABC := [0 : for int i0 in Integers(0,5)]
+		List(type:int,size=6) mvABC := [0 : for int i0 in 0 .. 5]
 	do
 		if ((x=0 or currmb = first_mb_in_slice) and InverseScan4x4Tab[count] mod 4=0)=false then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
 			if (InverseScan4x4Tab[count] mod 4 =0) then
@@ -193,7 +193,7 @@ actor Mgnt_MVR ()
 		   and (refABC[0] = -2 or refABC[1] = -2 or (refABC[0] = 0 
 		   and mvABC[0] = 0 and mvABC[1] = 0) or (refABC[1] = 0 
 		   and mvABC[2] = 0 and mvABC[3] = 0)) then
-      		mvABC := [0 : for int t in Integers(0,5)];
+      		mvABC := [0 : for int t in 0 .. 5];
 		else 
 			if (( (currmb + rshift(InverseScan4x4Tab[count] mod 4 + rshift(mbpart_w,2),2) <picW+first_mb_in_slice and InverseScan4x4Tab[count]<4 )
 			    or x+rshift(InverseScan4x4Tab[count] mod 4 + rshift(mbpart_w,2),2) = picW)
@@ -320,7 +320,7 @@ actor Mgnt_MVR ()
   guard
     mbpart_w = 8 and mbpart_h = 16  
   do
-    foreach int i in Integers(0, 3) do
+    foreach int i in 0 .. 3 do
       mv[currmb,InverseScan4x4Tab[count]] := [a,b];
       refidx[currmb,InverseScan4x4Tab[count]]:=ref_idx;
       mv[currmb,InverseScan4x4Tab[count] + 8] := [a,b];
@@ -332,25 +332,25 @@ actor Mgnt_MVR ()
   
   get_mv.others: action MV:[a,b] ==> 
   do
-    foreach int i in Integers(0, (rshift(mbpart_w,2)*rshift(mbpart_h,2)-1)) do
+    foreach int i in 0 .. rshift(mbpart_w,2)*rshift(mbpart_h,2)-1 do
       mv[currmb,InverseScan4x4Tab[count]] := [a,b];
       refidx[currmb,InverseScan4x4Tab[count]]:=ref_idx;
       count := count+1;
     end
   end
   
-  a_mv_out: action  ==>  refidx_out:[[refidx_out_l[i0]:for int i0 in Integers(0,15)]] repeat 16, mv_out:[[mv_out_l[s]:for int s in Integers(0,31)]] repeat 32
+  a_mv_out: action  ==>  refidx_out:[[refidx_out_l[i0]:for int i0 in 0 .. 15]] repeat 16, mv_out:[[mv_out_l[s]:for int s in 0 .. 31]] repeat 32
   guard
     count >= 16 and  mvdone=false
   var 
-    List(type:uint(size=5),size=16) refidx_out_l := [-2 : for int i2 in Integers(0,15)],
-    List(type:int(size=14),size=32) mv_out_l := [0 : for int i1 in Integers(0,31)]   
+    List(type:uint(size=5),size=16) refidx_out_l := [-2 : for int i2 in 0 .. 15],
+    List(type:int(size=14),size=32) mv_out_l := [0 : for int i1 in 0 .. 31]   
   do    
-    foreach int i in Integers(0, 15) do
+    foreach int i in 0 .. 15 do
 	    mv_out_l[2*i]:= mv[currmb][i][0];
 	    mv_out_l[2*i+1]:= mv[currmb][i][1];
 	end
-    refidx_out_l := [refidx[currmb][i]: for int i in Integers(0,15)];
+    refidx_out_l := [refidx[currmb][i]: for int i in 0 .. 15];
     mvdone:=true;
   end
   

@@ -4,7 +4,7 @@
 	int frameSize=width*height;
 	int rowSize=width*16;
 	
-	List(type:int, size=rowSize) frameRow := [0: for int t in Integers(1,rowSize)];
+	List(type:int, size=rowSize) frameRow := [0: for int t in 1 .. rowSize];
  
 	int count:=0;
 	int i:=0;

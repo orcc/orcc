@@ -54,13 +54,13 @@ int MAXVAL_CHROMA         = 255;
 /////////////////////
 // State Variables //
 /////////////////////
-List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BLOCK_SIZE_MAX) curr_mb:= [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE_MAX-1)]: for int j in Integers( 0, MB_BLOCK_SIZE_MAX-1) ];
-List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BLOCK_SIZE_MAX) up_mb  := [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE_MAX-1)]: for int j in Integers( 0, MB_BLOCK_SIZE_MAX-1) ];
-List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BLOCK_SIZE_MAX) left_mb:= [ [0 : for int i in Integers( 0, MB_BLOCK_SIZE_MAX-1)]: for int j in Integers( 0, MB_BLOCK_SIZE_MAX-1) ];
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BLOCK_SIZE_MAX) curr_mb:= [ [0 : for int i in 0 .. MB_BLOCK_SIZE_MAX-1]: for int j in 0 .. MB_BLOCK_SIZE_MAX-1 ];
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BLOCK_SIZE_MAX) up_mb  := [ [0 : for int i in 0 .. MB_BLOCK_SIZE_MAX-1]: for int j in 0 .. MB_BLOCK_SIZE_MAX-1 ];
+List(type :List( type:uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX ), size=MB_BLOCK_SIZE_MAX) left_mb:= [ [0 : for int i in 0 .. MB_BLOCK_SIZE_MAX-1]: for int j in 0 .. MB_BLOCK_SIZE_MAX-1 ];
 
 // Macroblock parameters
-List(type:uint(size=6), size=3) Alist := [ 0 : for int i in Integers(0, 3 - 1) ]; //curr,left,up
-List(type:uint(size=6), size=3) Blist := [ 0 : for int i in Integers(0, 3 - 1) ]; //curr,left,up 
+List(type:uint(size=6), size=3) Alist := [ 0 : for int i in 0 .. 3 - 1 ]; //curr,left,up
+List(type:uint(size=6), size=3) Blist := [ 0 : for int i in 0 .. 3 - 1 ]; //curr,left,up 
 uint(size=1) StrengthNotZero := 0;
 uint(size=1) useLeft := 0;
 uint(size=1) useUp := 0;
@@ -70,7 +70,7 @@ int xQ := 0;
 int yQ := 0;
 int xP := 0; 
 int yP := 0;
-List( type:uint(size=3), size=32 ) Strength := [ 0 : for int i in Integers(0, 32 - 1) ];
+List( type:uint(size=3), size=32 ) Strength := [ 0 : for int i in 0 .. 32 - 1 ];
 int count:=0;
 ////////////////
 // ROM Tables //
@@ -204,75 +204,75 @@ StartMB_CHROMA: action DB_I:[v] repeat (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_C
 guard
 	MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
 var
-    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int k in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
-    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
-    List(type:int(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int k in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int l in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int m in 0 .. MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1 ],
 	int uc:=0,
 	int lc:=0,
 	int cc:=0     
 do  
-    foreach int i in Integers(0, (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1) do
+    foreach int i in 0 .. (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1 do
       if (i<4*(MB_BLOCK_SIZE_CHROMA+4)) then  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
       else  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
     end        
-    foreach int y in Integers(0, MB_BLOCK_SIZE_CHROMA-1) do
-        foreach int x in Integers(0, MB_BLOCK_SIZE_CHROMA-1) do  
+    foreach int y in 0 .. MB_BLOCK_SIZE_CHROMA-1 do
+        foreach int x in 0 .. MB_BLOCK_SIZE_CHROMA-1 do  
         	curr_mb[y,x]:= currbuf[x + y * MB_BLOCK_SIZE_CHROMA]; 
         end
     end			   
-    foreach int y in Integers(0, MB_BLOCK_SIZE_CHROMA-1) do
-        foreach int x in Integers(MB_BLOCK_SIZE_CHROMA-4, MB_BLOCK_SIZE_CHROMA-1) do  
+    foreach int y in 0 .. MB_BLOCK_SIZE_CHROMA-1 do
+        foreach int x in MB_BLOCK_SIZE_CHROMA-4 .. MB_BLOCK_SIZE_CHROMA-1 do  
         	left_mb[y,x]:= leftbuf[(x mod 4)+y*4]; 
     	end
     end			   
-    foreach int y in Integers(MB_BLOCK_SIZE_CHROMA-4, MB_BLOCK_SIZE_CHROMA-1) do
-        foreach int x in Integers(0, MB_BLOCK_SIZE_CHROMA-1) do  
+    foreach int y in MB_BLOCK_SIZE_CHROMA-4 .. MB_BLOCK_SIZE_CHROMA-1 do
+        foreach int x in 0 .. MB_BLOCK_SIZE_CHROMA-1 do  
         	up_mb[y,x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE_CHROMA)]; 
     	end
     end         
     StrengthNotZero :=0;    
-    foreach int i in Integers(0, 31) do 
+    foreach int i in 0 .. 31 do 
     	Strength[i] := u[i]; if (Strength[i] != 0) then StrengthNotZero := 1; end 
 	end
-    Alist :=[u[i] :for int i in Integers(32, 34) ];
-    Blist :=[u[i] :for int i in Integers(35, 37) ];    
+    Alist :=[u[i] :for int i in 32 .. 34 ];
+    Blist :=[u[i] :for int i in 35 .. 37 ];    
 end 
 
 // Read Macroblock data
 StartMB_LUMA: action DB_I:[v] repeat (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4), BS:[u] repeat 38==>
 var
-    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) upbuf := [0 : for int k in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ],
-    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) leftbuf := [0 : for int l in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ],
-    List(type:int(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int m in Integers(0, MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1) ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) upbuf := [0 : for int k in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) leftbuf := [0 : for int l in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int m in 0 .. MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1 ],
 	int uc:=0,
 	int lc:=0,
 	int cc:=0     
 do  
-    foreach int i in Integers(0, (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1) do
+    foreach int i in 0 .. (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1 do
       if (i<4*(MB_BLOCK_SIZE_LUMA+4)) then  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
       else  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
     end        
-    foreach int y in Integers(0, MB_BLOCK_SIZE_LUMA-1) do
-        foreach int x in Integers(0, MB_BLOCK_SIZE_LUMA-1) do  
+    foreach int y in 0 .. MB_BLOCK_SIZE_LUMA-1 do
+        foreach int x in 0 .. MB_BLOCK_SIZE_LUMA-1 do  
         	curr_mb[y,x]:= currbuf[x + y * MB_BLOCK_SIZE_LUMA]; 
         end
     end			   
-    foreach int y in Integers(0, MB_BLOCK_SIZE_LUMA-1) do
-        foreach int x in Integers(MB_BLOCK_SIZE_LUMA-4, MB_BLOCK_SIZE_LUMA-1) do  
+    foreach int y in 0 .. MB_BLOCK_SIZE_LUMA-1 do
+        foreach int x in MB_BLOCK_SIZE_LUMA-4 .. MB_BLOCK_SIZE_LUMA-1 do  
         	left_mb[y,x]:= leftbuf[(x mod 4)+y*4]; 
     	end
     end			   
-    foreach int y in Integers(MB_BLOCK_SIZE_LUMA-4, MB_BLOCK_SIZE_LUMA-1) do
-        foreach int x in Integers(0, MB_BLOCK_SIZE_LUMA-1) do  
+    foreach int y in MB_BLOCK_SIZE_LUMA-4 .. MB_BLOCK_SIZE_LUMA-1 do
+        foreach int x in 0 .. MB_BLOCK_SIZE_LUMA-1 do  
         	up_mb[y,x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE_LUMA)]; 
     	end
     end         
     StrengthNotZero :=0;    
-    foreach int i in Integers(0, 31) do 
+    foreach int i in 0 .. 31 do 
     	Strength[i] := u[i]; if (Strength[i] != 0) then StrengthNotZero := 1; end 
 	end
-    Alist :=[u[i] :for int i in Integers(32, 34) ];
-    Blist :=[u[i] :for int i in Integers(35, 37) ];    
+    Alist :=[u[i] :for int i in 32 .. 34 ];
+    Blist :=[u[i] :for int i in 35 .. 37 ];    
 end 
 
 ZeroStrengths: action ==>
@@ -287,8 +287,8 @@ EdgeLoops: action ==>
     int dif,int Delta,int AbsDelta,
     int Alpha := 0, int Beta := 0
   do       
-    foreach int dir in Integers(0,1) do
-      foreach int edge in Integers(0,3) do
+    foreach int dir in 0 .. 1 do
+      foreach int edge in 0 .. 3 do
         if (LUMA_CHROMA = 8) then edge_curr := chroma_edge(dir, edge, 1); else edge_curr := edge;  end
         		if (edge_curr<4 and edge_curr>=0) then           
 			    pel := 0;
@@ -378,16 +378,16 @@ EdgeLoops: action ==>
   guard
     MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
   var 
-  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)) buff := [0:for int s in Integers(0,(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1)],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int j in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int k in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ],
-    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int l in Integers(0, MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1) ],
+  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)) buff := [0:for int s in 0 .. (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int j in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int k in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ],
+    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int l in 0 .. MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1 ],
     int uc:=0,int lc:=0,int cc:=0     
   do
-    upbuf   := [up_mb[ MB_BLOCK_SIZE_CHROMA - 4 + i / MB_BLOCK_SIZE_CHROMA ][i mod MB_BLOCK_SIZE_CHROMA] : for int i in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ];
-    leftbuf := [left_mb[i / 4 ][MB_BLOCK_SIZE_CHROMA - 4 + (i mod 4)] : for int i in Integers(0, 4*MB_BLOCK_SIZE_CHROMA-1) ];
-    currbuf := [curr_mb[i / MB_BLOCK_SIZE_CHROMA][i mod MB_BLOCK_SIZE_CHROMA] : for int i in Integers(0, MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1)];
-    foreach int i in Integers(0, (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1) do
+    upbuf   := [up_mb[ MB_BLOCK_SIZE_CHROMA - 4 + i / MB_BLOCK_SIZE_CHROMA ][i mod MB_BLOCK_SIZE_CHROMA] : for int i in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ];
+    leftbuf := [left_mb[i / 4 ][MB_BLOCK_SIZE_CHROMA - 4 + (i mod 4)] : for int i in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ];
+    currbuf := [curr_mb[i / MB_BLOCK_SIZE_CHROMA][i mod MB_BLOCK_SIZE_CHROMA] : for int i in 0 .. MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1];
+    foreach int i in 0 .. (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1 do
         if (i<4*(MB_BLOCK_SIZE_CHROMA+4)) then  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then buff[i]:=upbuf[uc]; uc:=uc+1; end
         else  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then buff[i]:=currbuf[cc]; cc:=cc+1; else buff[i]:=leftbuf[lc]; lc:=lc+1; end  end
     end      
@@ -396,16 +396,16 @@ EdgeLoops: action ==>
  
  OutMB_LUMA: action ==> DB_O:[buff] repeat (MB_BLOCK_SIZE_LUMA+4) * (MB_BLOCK_SIZE_LUMA+4)
   var 
-  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)) buff := [0:for int s in Integers(0,(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1)],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) upbuf := [0 : for int j in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) leftbuf := [0 : for int k in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ],
-    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int l in Integers(0, MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1) ],
+  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)) buff := [0:for int s in 0 .. (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) upbuf := [0 : for int j in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) leftbuf := [0 : for int k in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ],
+    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int l in 0 .. MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1 ],
     int uc:=0,int lc:=0,int cc:=0     
   do
-    upbuf   := [up_mb[ MB_BLOCK_SIZE_LUMA - 4 + i / MB_BLOCK_SIZE ][i mod MB_BLOCK_SIZE] : for int i in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ];
-    leftbuf := [left_mb[i / 4 ][MB_BLOCK_SIZE_LUMA - 4 + (i mod 4)] : for int i in Integers(0, 4*MB_BLOCK_SIZE_LUMA-1) ];
-    currbuf := [curr_mb[i / MB_BLOCK_SIZE_LUMA][i mod MB_BLOCK_SIZE_LUMA] : for int i in Integers(0, MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1)];
-    foreach int i in Integers(0, (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1) do
+    upbuf   := [up_mb[ MB_BLOCK_SIZE_LUMA - 4 + i / MB_BLOCK_SIZE ][i mod MB_BLOCK_SIZE] : for int i in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ];
+    leftbuf := [left_mb[i / 4 ][MB_BLOCK_SIZE_LUMA - 4 + (i mod 4)] : for int i in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ];
+    currbuf := [curr_mb[i / MB_BLOCK_SIZE_LUMA][i mod MB_BLOCK_SIZE_LUMA] : for int i in 0 .. MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1];
+    foreach int i in 0 .. (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1 do
         if (i<4*(MB_BLOCK_SIZE_LUMA+4)) then  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then buff[i]:=upbuf[uc]; uc:=uc+1; end
         else  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then buff[i]:=currbuf[cc]; cc:=cc+1; else buff[i]:=leftbuf[lc]; lc:=lc+1; end  end
     end      

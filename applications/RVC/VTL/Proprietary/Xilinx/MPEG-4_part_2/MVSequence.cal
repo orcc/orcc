@@ -39,7 +39,7 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-import all caltrop.lib.BitOps;
+
 actor MVSequence () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A :
 
 	int MAXW_IN_MB = 121;

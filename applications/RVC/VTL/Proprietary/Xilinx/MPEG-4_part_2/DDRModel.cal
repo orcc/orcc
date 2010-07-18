@@ -39,8 +39,8 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com), Ian Miller (ian.miller@xilinx.com)
 //
-import all caltrop.lib.BitOps;
-import java.lang.Math;
+
+
 actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
 
 	//bool _CAL_tokenMonitor := true;
@@ -57,7 +57,7 @@ actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size
 	//int BURSTSIZE       = COMPONENTS * BLOCKSIZE / PIXELS_PER_WORD;
 	int BURSTSIZE = 96;
 
-	List(type: int(size=32), size=MEMSIZE) buf := [ 0 : for int i in Integers(1, MEMSIZE) ];
+	List(type: int(size=32), size=MEMSIZE) buf := [ 0 : for int i in 1 .. MEMSIZE ];
 
 	int address_t := 0;
 

@@ -10,14 +10,13 @@ MBType_16, int BlockType_4, int OutBlock_4, int OutPredictor_4, int MBType_4 :
 
 	int rowSize = width * 16;
 
-	List(type: int, size=rowSize) frameRow := [ 0 : for int t in Integers(1,
-	rowSize) ];
+	List(type: int, size=rowSize) frameRow := [ 0 : for int t in 1 .. rowSize ];
 
-	List(type: int, size=width) top := [ 128 : for int t in Integers(1, width) ];
+	List(type: int, size=width) top := [ 128 : for int t in 1 .. width ];
 
-	List(type: int, size=16) left := [ 128 : for int t in Integers(0, 15) ];
+	List(type: int, size=16) left := [ 128 : for int t in 0 .. 15 ];
 
-	List(type: int, size=4) M := [ 128 : for int t in Integers(0, 3) ];
+	List(type: int, size=4) M := [ 128 : for int t in 0 .. 3 ];
 
 	int i := 0;
 

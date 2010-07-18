@@ -74,7 +74,7 @@ uint(size=8) CtrlBitstreamReader :
 	guard
 	  testing
 	do
-	 	foreach int i in Integers(0,10) do
+	 	foreach int i in 0 .. 10 do
 			if symbol[i] = expected[i] then
 				println("Test OK");
 			else

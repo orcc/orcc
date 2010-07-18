@@ -10,7 +10,7 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
-import all caltrop.lib.BitOps;
+
 
 // BTYPE Output
 // A single stream of control tokens is sent on the BTYPE output to distribute

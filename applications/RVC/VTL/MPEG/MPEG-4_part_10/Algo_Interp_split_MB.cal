@@ -30,7 +30,7 @@ actor Algo_Interp_split_MB ()
   uint(size=5) mbpart_w;
   uint(size=5) mbpart_h;
   
-  List ( type:int(size=16), size=256) MB := [ 0 : for int i in Integers(0,255)];
+  List ( type:int(size=16), size=256) MB := [ 0 : for int i in 0 .. 255];
   List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];  
   
   get_part: action MbPartIdx:[a], MbPartWidth:[b], MbPartHeigth:[c] ==> 
@@ -49,8 +49,8 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
-    foreach int j in Integers (0, mbpart_h-1) do
-      foreach int i in Integers(0, mbpart_w-1) do
+    foreach int j in 0 .. mbpart_h-1 do
+      foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
@@ -65,8 +65,8 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
-    foreach int j in Integers (0, mbpart_h-1) do
-      foreach int i in Integers(0, mbpart_w-1) do
+    foreach int j in 0 .. mbpart_h-1 do
+      foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
@@ -79,8 +79,8 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
-    foreach int j in Integers (0, mbpart_h-1) do
-      foreach int i in Integers(0, mbpart_w-1) do
+    foreach int j in 0 .. mbpart_h-1 do
+      foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
@@ -93,8 +93,8 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
-    foreach int j in Integers (0, mbpart_h-1) do
-      foreach int i in Integers(0, mbpart_w-1) do
+    foreach int j in 0 .. mbpart_h-1 do
+      foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
@@ -107,8 +107,8 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
-    foreach int j in Integers (0, mbpart_h-1) do
-      foreach int i in Integers(0, mbpart_w-1) do
+    foreach int j in 0 .. mbpart_h-1 do
+      foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
@@ -121,8 +121,8 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
-    foreach int j in Integers (0, mbpart_h-1) do
-      foreach int i in Integers(0, mbpart_w-1) do
+    foreach int j in 0 .. mbpart_h-1 do
+      foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
@@ -135,15 +135,15 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
-    foreach int j in Integers (0, mbpart_h-1) do
-      foreach int i in Integers(0, mbpart_w-1) do
+    foreach int j in 0 .. mbpart_h-1 do
+      foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
     count := count+rshift(mbpart_w,2)*rshift(mbpart_h,2);
   end
   
-  send_data: action ==> MBPred:[ [MB[s]: for int s in Integers(0,255)] ] repeat 16*16
+  send_data: action ==> MBPred:[ [MB[s]: for int s in 0 .. 255] ] repeat 16*16
   guard
     count = 16
   do

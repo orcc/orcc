@@ -68,7 +68,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-import all caltrop.lib.BitOps;
+
 
 actor Algo_IntraPred_CHROMA ()
 		int(size=16) C_LEFT,     // List
@@ -85,7 +85,7 @@ actor Algo_IntraPred_CHROMA ()
   begin
  	res := 0;
  	if n > 0 then   	
- 	   	foreach int i in Integers(0, n-1) do
+ 	   	foreach int i in 0 .. n-1 do
       		res := res + list[i]; 
      	end
     end
@@ -103,7 +103,7 @@ actor Algo_IntraPred_CHROMA ()
   List(type:int(size=16), size=8) c_left;
   List(type:int(size=16), size=8) c_up;
   int(size=16)       c_up_left:= 0 ;
-  List( type:int(size=16), size=8*8 ) mpr := [ 0 : for int i in Integers( 0, 63) ];
+  List( type:int(size=16), size=8*8 ) mpr := [ 0 : for int i in 0 .. 63 ];
   
   read.avail: action AVAIL:[avail] repeat 3 ==>
   do
@@ -116,13 +116,13 @@ actor Algo_IntraPred_CHROMA ()
   readpix.l.av: action C_LEFT:[x] repeat 8 ==>
   guard left_avail = 1
   do
-    c_left:=[ x[i]: for int i in Integers(0,7) ];
+    c_left:=[ x[i]: for int i in 0 .. 7 ];
     //println("c_left "+c_left);
   end
   readpix.u.av: action C_UP:[x] repeat 8 ==>
   guard up_avail = 1
   do
-    c_up:=[ x[i]: for int i in Integers(0,7) ];
+    c_up:=[ x[i]: for int i in 0 .. 7 ];
     //println("c_up "+c_up);
   end
   readpix.ul.av: action C_UP_LEFT:[x] ==>
@@ -146,7 +146,7 @@ actor Algo_IntraPred_CHROMA ()
   end
 
   write.mode0: action PredMode:[mode] ==>
-    MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
+    MPR:[[mpr[8*j+i]: for int i in  0 .. 7, for int j in 0 .. 7]] repeat 8*8
   guard
  	mode = 0
   var
@@ -162,30 +162,30 @@ actor Algo_IntraPred_CHROMA ()
   	do
   		if up_avail = 1 then
     		/*	
-    			s0 := sum([c_up[i]:for int i in Integers(0,3)],4);
+    			s0 := sum([c_up[i]:for int i in 0 .. 3],4);
     		*/
-    		sum_list := [c_up[i]:for int i in Integers(0,3)];//todo
+    		sum_list := [c_up[i]:for int i in 0 .. 3];//todo
     		Sum(sum_list,4);
     		s0 := res;
     		
     		/*
-    			s1 := sum([c_up[i]:for int i in Integers(4,7)],4);
+    			s1 := sum([c_up[i]:for int i in 4 .. 7],4);
     		*/
-    		sum_list := [c_up[i]:for int i in Integers(4,7)];
+    		sum_list := [c_up[i]:for int i in 4 .. 7];
     		Sum(sum_list,4);
     		s1 := res;
     	end
     	
     	if left_avail = 1 then
           	/*
-          		s2 := sum([c_left[i]:for int i in Integers(0,3)],4);
-          		s3 := sum([c_left[i]:for int i in Integers(4,7)],4);
+          		s2 := sum([c_left[i]:for int i in 0 .. 3],4);
+          		s3 := sum([c_left[i]:for int i in 4 .. 7],4);
           	*/
-          	sum_list := [c_left[i]:for int i in Integers(0,3)];
+          	sum_list := [c_left[i]:for int i in 0 .. 3];
     		Sum(sum_list,4);
     		s2 := res;
     		
-    		sum_list := [c_left[i]:for int i in Integers(4,7)];
+    		sum_list := [c_left[i]:for int i in 4 .. 7];
     		Sum(sum_list,4);
     		s3 := res;
           	
@@ -215,38 +215,38 @@ actor Algo_IntraPred_CHROMA ()
                 if i<4 then m0 else m1 end
               else
                 if i<4 then m2 else m3 end
-              end: for int i in  Integers(0,7), for int j in Integers(0,7)];
+              end: for int i in  0 .. 7, for int j in 0 .. 7];
   end
 
   write.mode1: action PredMode:[mode] ==>
-    MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
+    MPR:[[mpr[8*j+i]: for int i in  0 .. 7, for int j in 0 .. 7]] repeat 8*8
   guard
  	mode = 1
   do
-    mpr := [c_left[j]: for int i in  Integers(0,7), for int j in Integers(0,7)];
+    mpr := [c_left[j]: for int i in  0 .. 7, for int j in 0 .. 7];
   end
  
   write.mode2: action PredMode:[mode] ==>
-    MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
+    MPR:[[mpr[8*j+i]: for int i in  0 .. 7, for int j in 0 .. 7]] repeat 8*8
   guard
  	mode = 2
   do
-    mpr := [c_up[i]  : for int i in  Integers(0,7), for int j in Integers(0,7)];
+    mpr := [c_up[i]  : for int i in  0 .. 7, for int j in 0 .. 7];
   end
 
   write.mode3: action PredMode:[mode] ==>
-    MPR:[[mpr[8*j+i]: for int i in  Integers(0,7), for int j in Integers(0,7)]] repeat 8*8
+    MPR:[[mpr[8*j+i]: for int i in  0 .. 7, for int j in 0 .. 7]] repeat 8*8
   guard
 	mode = 3
   var
     int H, int V, int a, int b, int c,
     List(type: int(size = 16), size = 3) sum_list
   do
-    sum_list := [(i+1)*(c_up[4+i]  - c_up[2-i]  ):for int i in Integers(0,2)];
+    sum_list := [(i+1)*(c_up[4+i]  - c_up[2-i]  ):for int i in 0 .. 2];
     Sum(sum_list,3);
     H := res + (3+1)*(c_up[4+3]  - c_up_left);
       
-    sum_list := [(j+1)*(c_left[4+j] - c_left[2-j]):for int j in Integers(0,2)];
+    sum_list := [(j+1)*(c_left[4+j] - c_left[2-j]):for int j in 0 .. 2];
     Sum(sum_list,3);
     V := res + (3+1)*(c_left[4+3] - c_up_left);
       
@@ -254,7 +254,7 @@ actor Algo_IntraPred_CHROMA ()
     b:= rshift( 34*H + 32, 6);
     c:= rshift( 34*V + 32, 6);
 
-    mpr := [clip( rshift(a + b*(i-3) + c*(j-3) + 16, 5) ): for int i in  Integers(0,7), for int j in Integers(0,7)];
+    mpr := [clip( rshift(a + b*(i-3) + c*(j-3) + 16, 5) ): for int i in  0 .. 7, for int j in 0 .. 7];
   end
 
 

@@ -1,6 +1,6 @@
 actor MB () int In, int MBType ==> int Out0, int Out1, int Out2, int Out3:
 
-	List(type:int, size=16*16) mb := [0: for int t in Integers(0,(16*16)-1)]; 
+	List(type:int, size=16*16) mb := [0: for int t in 0 .. (16*16)-1]; 
 	int i := 0;
 	int count := 0;
 	int origin:= 0;

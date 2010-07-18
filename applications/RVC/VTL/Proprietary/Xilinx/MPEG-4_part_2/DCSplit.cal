@@ -38,7 +38,7 @@ ENDCOPYRIGHT
 // DCSplit.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
-import all caltrop.lib.BitOps;
+
 actor DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC ,
 int(size=SAMPLE_SZ) AC :
 

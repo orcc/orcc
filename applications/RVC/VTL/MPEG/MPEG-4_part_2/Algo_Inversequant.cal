@@ -10,7 +10,7 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // MPEG-4 inverse quantization function
-import all caltrop.lib.BitOps;
+
 actor Algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC,
 int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 
@@ -56,7 +56,7 @@ int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 	ac: action AC:[ i ] repeat 63 ==> OUT:[ o ] repeat 63
 	var
 		List(type: int(size=SAMPLE_SZ), size=63) v = [ (quant * (lshift(abs(i[j]), 1) + 1)) - round :
-		for int j in Integers(0, 62) ] , List(type: int(size=SAMPLE_SZ), size=63) o = [ if i[k] = 0 then
+		for int j in 0 .. 62 ] , List(type: int(size=SAMPLE_SZ), size=63) o = [ if i[k] = 0 then
 			0
 		else
 			if i[k] < 0 then
@@ -64,7 +64,7 @@ int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 			else
 				saturate(v[k])
 			end
-		end : for int k in Integers(0, 62) ]
+		end : for int k in 0 .. 62 ]
 	end
 
 	schedule fsm start :

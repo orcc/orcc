@@ -44,7 +44,7 @@ actor Algo_NALU ()
 		uint(size = SZ_NB_RBSP) nb_bytes_sent      := 0;
 		uint(size = 2)          start_code         := 0;
 		bool                    nb_rbsp_byte_ready := false;
-		List (type: int(size = 8), size = NB_RBSP_BYTE_MAX) Input_Bitstream := [0 : for int l in Integers(0, NB_RBSP_BYTE_MAX - 1)];
+		List (type: int(size = 8), size = NB_RBSP_BYTE_MAX) Input_Bitstream := [0 : for int l in 0 .. NB_RBSP_BYTE_MAX - 1];
 
 /*
 *

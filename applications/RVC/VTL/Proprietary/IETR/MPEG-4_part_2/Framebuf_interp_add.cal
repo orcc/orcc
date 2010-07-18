@@ -1,7 +1,7 @@
 // Interpolation for motion compensation, frame buffer and add motion and texture to produce pixels
 //
 // Authors: Ghislain Roquier(ghislain.roquier@epfl.ch), Matthieu Wipliez <mwipliez@insa-rennes.fr>
-import all caltrop.lib.BitOps;
+
 actor Framebuf_interp_add (// Command flags from parser
 	int NEWVOP,
 	int INTRA,
@@ -32,7 +32,7 @@ int(size=PIX_SZ) VID :
 
 	/////////////////////////////////////////////////////////////////////////////
 	// buffer
-	List(type: int(size=PIX_SZ), size=BUF_SZ) buf := [ 0 : for int i in Integers(1, BUF_SZ) ];
+	List(type: int(size=PIX_SZ), size=BUF_SZ) buf := [ 0 : for int i in 1 .. BUF_SZ ];
 
 	/////////////////////////////////////////////////////////////////////////////
 	// interpolation
@@ -86,7 +86,7 @@ int(size=PIX_SZ) VID :
 
 	texture: action TEX:[ tex ] repeat 64, WA:[ a ] repeat 64 ==> VID:[ tex ] repeat 64
 	do
-		foreach int i in Integers(0, 63) do
+		foreach int i in 0 .. 63 do
 			buf[a[i]] := tex[i];
 		end
 	end
@@ -94,17 +94,17 @@ int(size=PIX_SZ) VID :
 	// compensation action
 	motion: action halfpel:[ f ], RA:[ d ] repeat 81, WA:[ a ] repeat 64 ==> VID:[ mot ] repeat 64
 	var
-		List(type: int, size=64) mot := [ 0 : for int n in Integers(0, 63) ]
+		List(type: int, size=64) mot := [ 0 : for int n in 0 .. 63 ]
 	do
 		flags := rshift(f, 1);
 		round := bitand(f, 1);
-		foreach int i in Integers(0, 7) do
-			foreach int j in Integers(0, 7) do
+		foreach int i in 0 .. 7 do
+			foreach int j in 0 .. 7 do
 				mot[8 * i + j] := compensate(buf[d[9 * i + j]], buf[d[9 * i + j + 1]], buf[d[9 * (i + 1) + j]], buf[d[9 * (
 				i + 1) + j + 1]]);
 			end
 		end
-		foreach int i in Integers(0, 63) do
+		foreach int i in 0 .. 63 do
 			buf[a[i]] := mot[i];
 		end
 	end
@@ -112,18 +112,18 @@ int(size=PIX_SZ) VID :
 	combine: action halfpel:[ f ], RA:[ d ] repeat 81, WA:[ a ] repeat 64, TEX:[ tex ] repeat 64 ==> VID:
 		[ vid ] repeat 64
 	var
-		int output , List(type: int, size=64) mot := [ 0 : for int n1 in Integers(0, 63) ] ,
-		List(type: int, size=64) vid := [ 0 : for int n2 in Integers(0, 63) ]
+		int output , List(type: int, size=64) mot := [ 0 : for int n1 in 0 .. 63 ] ,
+		List(type: int, size=64) vid := [ 0 : for int n2 in 0 .. 63 ]
 	do
 		flags := rshift(f, 1);
 		round := bitand(f, 1);
-		foreach int i in Integers(0, 7) do
-			foreach int j in Integers(0, 7) do
+		foreach int i in 0 .. 7 do
+			foreach int j in 0 .. 7 do
 				mot[8 * i + j] := compensate(buf[d[9 * i + j]], buf[d[9 * i + j + 1]], buf[d[9 * (i + 1) + j]], buf[d[9 * (
 				i + 1) + j + 1]]);
 			end
 		end
-		foreach int i in Integers(0, 63) do
+		foreach int i in 0 .. 63 do
 			output := tex[i] + mot[i];
 			vid[i] := if output < 0 then
 				0
@@ -135,7 +135,7 @@ int(size=PIX_SZ) VID :
 				end
 			end;
 		end
-		foreach int i in Integers(0, 63) do
+		foreach int i in 0 .. 63 do
 			buf[a[i]] := vid[i];
 		end
 	end

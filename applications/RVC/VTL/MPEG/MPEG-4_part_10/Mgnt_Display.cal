@@ -25,8 +25,8 @@ actor Mgnt_Display ()
 		:
 
 
-	List(type:int (size=32),size=16) ListPOC    := [-1    :for int s in Integers(0,15)];
-	List(type:bool         ,size=16) IsUsed     := [false :for int s in Integers(0,15)];
+	List(type:int (size=32),size=16) ListPOC    := [-1    :for int s in 0 .. 15];
+	List(type:bool         ,size=16) IsUsed     := [false :for int s in 0 .. 15];
 	
 	int (size=5)  IdxNextPOC      := -1;
 	uint(size=4)  CurrentIdx      := 0;
@@ -66,7 +66,7 @@ actor Mgnt_Display ()
 		do
 			IdxNextPOC := -1;	
 			
-			foreach int i in Integers (0,15)
+			foreach int i in 0 .. 15
 			do
 				if((ListPOC[i] >= NextPOC) and (IsUsed[i] = true)) then
 					if(IdxNextPOC != -1) then
@@ -79,7 +79,7 @@ actor Mgnt_Display ()
 				end
 			end
 			if(IdxNextPOC = -1) then
-				foreach int i in Integers (0,15)
+				foreach int i in 0 .. 15
 				do
 					if((ListPOC[i] >= 0) and(IsUsed[i] = true)) then
 						if(IdxNextPOC != -1) then
@@ -107,7 +107,7 @@ actor Mgnt_Display ()
 			ListPOC[CurrentIdx] != 0
 		do
 			IdxNextPOC := -1;
-			foreach int i in Integers (0,15)
+			foreach int i in 0 .. 15
 			do
 				if((ListPOC[i] = NextPOC) and (IsUsed[i] = true)) then
 					if(IdxNextPOC = -1) then

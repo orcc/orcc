@@ -9,7 +9,7 @@
 //              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
-import all caltrop.lib.BitOps;
+
 actor Mgnt_MVSequence (int FOURMV,
 	int NEWVOP,
 	int INTER,

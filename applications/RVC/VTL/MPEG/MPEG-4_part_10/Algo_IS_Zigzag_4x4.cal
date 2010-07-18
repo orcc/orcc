@@ -56,6 +56,6 @@ actor Algo_IS_Zigzag_4x4 () int(size=16) levarr ==> int(size=16) Lev2d :
     0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
   ];
 
-  action levarr:[ x ] repeat 16 ==> Lev2d:[ [ x[t_Index[s]] : for int s in Integers(0,15) ] ] repeat 16
+  action levarr:[ x ] repeat 16 ==> Lev2d:[ [ x[t_Index[s]] : for int s in 0 .. 15 ] ] repeat 16
   end
 end

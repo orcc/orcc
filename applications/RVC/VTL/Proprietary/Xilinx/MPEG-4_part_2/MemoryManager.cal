@@ -40,8 +40,8 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 // Frame buffer address generation for motion compensation
-import all caltrop.lib.BitOps;
-import java.lang.Math;
+
+
 actor MemoryManager () int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA , int(size=32) WA :
 
 	// search window size (in macroblocks)

@@ -8,7 +8,7 @@
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-// import all caltrop.lib.BitOps; 
+//  
 
 actor Display_Byte () uint(size=8) IP ==> :
 

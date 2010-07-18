@@ -34,7 +34,7 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
 // 
-import all caltrop.lib.BitOps;
+
 actor Framebuf_w_Address_8X8 (int INTRA,
 	int NEWVOP,
 	int MOTION,
@@ -93,7 +93,7 @@ actor Framebuf_w_Address_8X8 (int INTRA,
 
 	// List(type:int(size=PIX_SZ), size=BUFFER_SIZE) frameBuffer = 
 
-	// [ 0 : for i in Integers(1,BUFFER_SIZE)]
+	// [ 0 : for i in 1 .. BUFFER_SIZE]
 
 	// properties of the VOP
 	int vop_width := 0;
@@ -245,8 +245,8 @@ actor Framebuf_w_Address_8X8 (int INTRA,
 	guard
 		outstanding_writes < max_outstanding_writes
 	var
-		List(type: int(size=PIX_SZ), size=81) rd := [ 0 : for int k in Integers(1,
-		81) ] , int x = mbx_read * SAMPLES_PER_MB + 8 * bitand(comp_read, 1) + mvx ,
+		List(type: int(size=PIX_SZ), size=81) rd := [ 0 : for int k in 1 .. 81 ],
+		int x = mbx_read * SAMPLES_PER_MB + 8 * bitand(comp_read, 1) + mvx ,
 		int y := mby_read * SAMPLES_PER_MB + 8 * rshift(comp_read, 1) + mvy , int
 		clip_left := 0 , int clip_right := 0 , int clip_x := x , int clip_y = if (y <
 		0) then

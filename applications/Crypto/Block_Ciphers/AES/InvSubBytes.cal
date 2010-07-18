@@ -11,7 +11,7 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-// import all caltrop.lib.BitOps;
+// 
 
 actor InvSubBytes () uint(size=8) IP ==> uint(size=8) OP:
 
@@ -23,7 +23,7 @@ actor InvSubBytes () uint(size=8) IP ==> uint(size=8) OP:
 		"0x"+hexDigits[rshift(x,4)]+hexDigits[bitand(x,0x0f)]
 	end
 	function list2hex (List(type:uint(size=8), size=BLOCK_SIZE) x, int x_size) --> List(type:String, size=BLOCK_SIZE):
-		[byte2hex(x[i]) : for int i in Integers(0,x_size-1)]
+		[byte2hex(x[i]) : for int i in 0 .. x_size-1]
 	end */
 
 	List(type:uint(size=8), size=256) S_BOX_INV = 
@@ -46,17 +46,17 @@ actor InvSubBytes () uint(size=8) IP ==> uint(size=8) OP:
 		0x17,0x2b,0x04,0x7e,0xba,0x77,0xd6,0x26,0xe1,0x69,0x14,0x63,0x55,0x21,0x0c,0x7d
 	];
 
-	List(type:uint(size=8), size=17) y := [0 : for int i in Integers(1,17)];
+	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
 
 	action IP:[x] repeat 17 ==> OP:[y] repeat 17
 	do
 		y[0] := x[0];
-		foreach int i in Integers(1,16)
+		foreach int i in 1 .. 16
 		do
 			y[i] := S_BOX_INV[x[i]];
 		end
 		// println("InvSubBytes " + y[0] + " action has been executed.");
-		// println(list2hex([y[i]: for int i in Integers(1,16)]));
+		// println(list2hex([y[i]: for int i in 1 .. 16)]);
 	end
 
 end

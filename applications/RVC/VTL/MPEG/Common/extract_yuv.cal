@@ -61,8 +61,8 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 	var
 		List(type: int(size=PIX_SZ), size=MAX_BLOCKSZ_Y * MAX_BLOCKSZ_Y) _buf_y
 	do
-		foreach int i in Integers(0, MAX_BLOCKSZ_Y - 1) do
-			foreach int j in Integers(0, MAX_BLOCKSZ_Y - 1) do
+		foreach int i in 0 .. MAX_BLOCKSZ_Y - 1 do
+			foreach int j in 0 .. MAX_BLOCKSZ_Y - 1 do
 				_buf_y[(i * MAX_BLOCKSZ_Y) + j] := _buf[cnt_y + i * _width_y + j];
 			end
 		end
@@ -87,8 +87,8 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 	var
 		List(type: int(size=PIX_SZ), size=MAX_BLOCKSZ_UV * MAX_BLOCKSZ_UV) _buf_u
 	do
-		foreach int i in Integers(0, MAX_BLOCKSZ_UV - 1) do
-			foreach int j in Integers(0, MAX_BLOCKSZ_UV - 1) do
+		foreach int i in 0 .. MAX_BLOCKSZ_UV - 1 do
+			foreach int j in 0 .. MAX_BLOCKSZ_UV - 1 do
 				_buf_u[i * MAX_BLOCKSZ_UV + j] := _buf[cnt_u + i * _width_uv + j];
 			end
 		end
@@ -103,8 +103,8 @@ int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 	var
 		List(type: int(size=PIX_SZ), size=MAX_BLOCKSZ_UV * MAX_BLOCKSZ_UV) _buf_v
 	do
-		foreach int i in Integers(0, MAX_BLOCKSZ_UV - 1) do
-			foreach int j in Integers(0, MAX_BLOCKSZ_UV - 1) do
+		foreach int i in 0 .. MAX_BLOCKSZ_UV - 1 do
+			foreach int j in 0 .. MAX_BLOCKSZ_UV - 1 do
 				_buf_v[i * MAX_BLOCKSZ_UV + j] := _buf[cnt_v + i * _width_uv + j];
 			end
 		end

@@ -39,7 +39,7 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-import all caltrop.lib.BitOps;
+
 actor DCPred () int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ + 3) A,
 int(size=MB_COORD_SZ + 3) B, int(size=MB_COORD_SZ + 3) C, int(size=SAMPLE_SZ) IN,
 int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT , int(size=MB_COORD_SZ + 3) PTR ,
@@ -83,8 +83,7 @@ int(size=3) START , bool SIGNED , int(size=QUANT_SZ) QUANT :
 
 	// Start at 8, since 0-7 are reserved
 	// Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
-	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) dc_buf := [ DCVAL : for int k in Integers(1,
-	BUF_SIZE) ];
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) dc_buf := [ DCVAL : for int k in 1 .. BUF_SIZE ];
 
 	int(size=4) comp := 0;
 

@@ -51,7 +51,7 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-import all caltrop.lib.BitOps;
+
 
 actor Algo_IntraPred_LUMA_4x4 ()
   int(size=16) Y_LEFT,     // List
@@ -72,16 +72,16 @@ actor Algo_IntraPred_LUMA_4x4 ()
   int(size=2) up_left_avail;
   int(size=16)       y_up_left;
 
-  List(type:int(size=16), size=4) y_left := [ 0 : for int i in Integers( 0, 3) ];
-  List(type:int(size=16), size=8) y_up := [ 0 : for int i in Integers( 0, 7) ];
-  List(type:int(size=16), size=4*4 ) mpr := [ 0 : for int i in Integers( 0, 15) ];
+  List(type:int(size=16), size=4) y_left := [ 0 : for int i in 0 .. 3 ];
+  List(type:int(size=16), size=8) y_up := [ 0 : for int i in 0 .. 7 ];
+  List(type:int(size=16), size=4*4 ) mpr := [ 0 : for int i in 0 .. 15 ];
   
   
   procedure Summ(List(type:int(size=16), size=16) list, int n)
   begin
     res := 0;
     if n > 0 then
-    	foreach int i in Integers(0, n - 1) do
+    	foreach int i in 0 .. n - 1 do
       		res := res + list[i]; 
      	end
     end
@@ -97,7 +97,7 @@ actor Algo_IntraPred_LUMA_4x4 ()
   readpix.l.av: action Y_LEFT:[x] repeat 4 ==>
   guard left_avail = 1
   do
-    y_left := [ x[i] :  for int i in Integers(0,3) ];
+    y_left := [ x[i] :  for int i in 0 .. 3 ];
   end
   
   
@@ -105,7 +105,7 @@ actor Algo_IntraPred_LUMA_4x4 ()
   readpix.u.av: action Y_UP:[x] repeat 8 ==>
   guard up_avail = 1
   do
-    y_up := [ x[i] :  for int i in Integers(0, 7) ];
+    y_up := [ x[i] :  for int i in 0 .. 7 ];
   end
   
   
@@ -128,25 +128,25 @@ actor Algo_IntraPred_LUMA_4x4 ()
   end
 
   write.mode0: action PredMode:[mode] ==>
-    MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+    MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
   guard 
   	mode = 0 
   do
-    mpr := [y_up[i]  : for int i in  Integers(0,3), for int j in Integers(0,3)];
+    mpr := [y_up[i]  : for int i in  0 .. 3, for int j in 0 .. 3];
   end
   
   
   
   write.mode1: action PredMode:[mode] ==>
-    MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+    MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
   guard 
   	mode = 1 
    do
-    mpr := [y_left[j]: for int i in  Integers(0,3), for int j in Integers(0,3)];
+    mpr := [y_left[j]: for int i in  0 .. 3, for int j in 0 .. 3];
   end
   
   write.mode2: action PredMode:[mode] ==>
-   	 MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+   	 MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
    guard 
   		mode = 2 
    var
@@ -169,18 +169,18 @@ actor Algo_IntraPred_LUMA_4x4 ()
       else mean := 128;
       end end end
       
-      mpr := [mean     : for int i in  Integers(0,3), for int j in Integers(0,3)];
+      mpr := [mean     : for int i in  0 .. 3, for int j in 0 .. 3];
    end
 	
    write.mode3: action PredMode:[mode] ==>
-    MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+    MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
   guard 
   	mode = 3 
    do
      // y_uur is a List that is like
      // abcd efgh h, when the part efgh exists
-	 foreach int i in Integers(0,3) do
-	  	foreach int j in Integers(0,3) do
+	 foreach int i in 0 .. 3 do
+	  	foreach int j in 0 .. 3 do
 	  		mpr [4 * i + j] := 
 	  			if i = 3 and j = 3 then
 	      			 rshift( y_up[i+j+1 -1] + 2*y_up[i+j+1 ] + y_up[7] + 2, 2) 
@@ -192,7 +192,7 @@ actor Algo_IntraPred_LUMA_4x4 ()
 	end
 	
    write.mode4: action PredMode:[mode] ==>
-    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+    	MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
    guard 
   		mode = 4 
    do
@@ -207,12 +207,12 @@ actor Algo_IntraPred_LUMA_4x4 ()
         else if i - j = -1 then rshift( y_up_left   + 2*y_left[0]   + y_left[1] +2, 2)
         else if i - j = -2 then rshift( y_left[0]   + 2*y_left[1]   + y_left[2] +2, 2)
         else /* i - j = -3 */   rshift( y_left[1]   + 2*y_left[2]   + y_left[3] +2, 2)
-        end end end end end end : for int i in  Integers(0,3), for int j in Integers(0,3)
+        end end end end end end : for int i in  0 .. 3, for int j in 0 .. 3
       ];
    end
 	
    write.mode5: action PredMode:[mode] ==>
-    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+    	MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
    guard 
   		mode = 5 
    do
@@ -231,13 +231,13 @@ actor Algo_IntraPred_LUMA_4x4 ()
         else if 2*i - j= 3  then rshift( y_up[0]   + 2*y_up[1] + y_up[2] +2, 2)
         else /* 2*i - j= 5  */   rshift( y_up[1]    + 2*y_up[2] + y_up[3] +2, 2)
         end end end end end end end end end :
-        for int i in  Integers(0,3), for int j in Integers(0,3)
+        for int i in  0 .. 3, for int j in 0 .. 3
       ];
 
    end
 	
    write.mode6: action PredMode:[mode] ==>
-    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+    	MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
    guard 
   		mode = 6 
    do
@@ -256,13 +256,13 @@ actor Algo_IntraPred_LUMA_4x4 ()
         else if i - 2*j= -3  then rshift( y_left[0]   + 2*y_left[1] + y_left[2] +2, 2)
         else /* i - 2*j= -5  */  rshift( y_left[1]   + 2*y_left[2] + y_left[3] +2, 2)
         end end end end end end end end end :
-        for int i in  Integers(0,3), for int j in Integers(0,3)
+        for int i in  0 .. 3, for int j in 0 .. 3
       ];
 
     end
 	
    write.mode7: action PredMode:[mode] ==>
-    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+    	MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
    guard 
   		mode = 7 
    do
@@ -280,12 +280,12 @@ actor Algo_IntraPred_LUMA_4x4 ()
         else if 2*i + j= 7  then rshift( y_up[3] + 2*y_up[4] + y_up[5] +2, 2)
         else /* 2*i + j= 9 */   rshift( y_up[4] + 2*y_up[5] + y_up[6] +2, 2)
         end end end end end end end end end:
-        for int i in  Integers(0,3), for int j in Integers(0,3)
+        for int i in  0 .. 3, for int j in 0 .. 3
       ];
     end
 	
    write.mode8: action PredMode:[mode] ==>
-    	MPR:[[mpr[4*j+i]: for int i in  Integers(0,3), for int j in Integers(0,3)]] repeat 4*4
+    	MPR:[[mpr[4*j+i]: for int i in  0 .. 3, for int j in 0 .. 3]] repeat 4*4
    guard 
   		mode = 8 
    do
@@ -299,7 +299,7 @@ actor Algo_IntraPred_LUMA_4x4 ()
         else if i + 2*j= 3  then rshift( y_left[1] + 2*y_left[2] + y_left[3] +2, 2)
         else if i + 2*j= 5  then rshift( y_left[2] + 3*y_left[3]             +2, 2)
         else /* otherwise */     y_left[3]
-        end end end end end end: for int i in  Integers(0,3), for int j in Integers(0,3)
+        end end end end end end: for int i in  0 .. 3, for int j in 0 .. 3
       ];
    end
 

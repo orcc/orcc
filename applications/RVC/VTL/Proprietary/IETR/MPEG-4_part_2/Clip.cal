@@ -38,7 +38,7 @@ actor Clip () int(size=isz) I, bool SIGNED ==> int(size=osz) O :
 					x[i]
 				end
 			end
-		end : for int i in Integers(0, 63) ] ] repeat 64
+		end : for int i in 0 .. 63 ] ] repeat 64
 	end
 
 	schedule fsm set_sign :

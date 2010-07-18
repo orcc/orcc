@@ -24,7 +24,7 @@
 // Author: Ghislain Roquier(ghislain.roquier@epfl.ch)
 // Rewrote the actor at block level
 // The actor has now the SDF property
-import all caltrop.lib.BitOps;
+
 actor MPEG4_algo_IS () int(size=3) AC_PRED_DIR, int(size=SAMPLE_SZ) QFS_AC ==>
 int(size=SAMPLE_SZ) PQF_AC :
 
@@ -50,7 +50,7 @@ int(size=SAMPLE_SZ) PQF_AC :
 	read_write: action AC_PRED_DIR:[ mode ], QFS_AC:[ ac ] repeat 63 ==> PQF_AC:[
 		o ] repeat 63
 	var
-		List(type: int(size=32), size=63) o := [ 0 : for int n in Integers(0, 62) ]
+		List(type: int(size=32), size=63) o := [ 0 : for int n in 0 .. 62 ]
 	do
 		addr := if mode = 0 then
 			0
@@ -61,7 +61,7 @@ int(size=SAMPLE_SZ) PQF_AC :
 				128
 			end
 		end;
-		foreach int i in Integers(0, 62) do
+		foreach int i in 0 .. 62 do
 			o[i] := ac[Scanmode[addr + i + 1] - 1];
 		end
 	end

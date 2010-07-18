@@ -39,7 +39,7 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 // Add motion and texture to produce pixels
-import all caltrop.lib.BitOps;
+
 actor Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==>
 int(size=PIX_SZ) VID :
 

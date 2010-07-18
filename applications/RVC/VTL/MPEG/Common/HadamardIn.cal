@@ -4,7 +4,7 @@ actor HadamardIn () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, i
 														   int Out12, int Out13, int Out14, int Out15:
 
 
-List(type:int, size=16) block := [0: for int t in Integers(0,15)];
+List(type:int, size=16) block := [0: for int t in 0 .. 15];
 
  
 

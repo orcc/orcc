@@ -36,11 +36,11 @@ uint(size=16) EDGE
   	
   	
 	//List containing edge pixel value 
-	List( type:uint(size=16), size=PICWIDTH * 16) top_edge := [0 : for int i in Integers( 0, PICWIDTH * 16-1)];
-	List( type:uint(size=16), size=16 ) left_edge := [ 0 : for int i in Integers( 0, 16-1)];
+	List( type:uint(size=16), size=PICWIDTH * 16) top_edge := [0 : for int i in 0 .. PICWIDTH * 16-1];
+	List( type:uint(size=16), size=16 ) left_edge := [ 0 : for int i in 0 .. 16-1];
 	uint(size=16) topLeft_edge := 0;
 	
-	List( type:uint(size=16), size=PICWIDTH * 16) result := [0 : for int i in Integers( 0, PICWIDTH * 16-1)];
+	List( type:uint(size=16), size=PICWIDTH * 16) result := [0 : for int i in 0 .. PICWIDTH * 16-1];
 	
   
   	//Mb_Type_OK : Send value of edge needed and store the edge of macroblock decoded
@@ -57,11 +57,11 @@ uint(size=16) EDGE
   	do
   		//Store bottom , right and bottom right edge
   		topLeft_edge := top_edge[16-1+ mb_Index*16];
-  		foreach int s in Integers(0,16-1)
+  		foreach int s in 0 .. 16-1
   		do
   			top_edge[s+ mb_Index *16]:= v[s+(16-1)*16];
   		end
-  		left_edge :=  [v[s*16-1]:for int s in Integers(1,16)];
+  		left_edge :=  [v[s*16-1]:for int s in 1 .. 16];
   	end
   
   	//Send the edge needed to process the intra prediction of the current macroblock
@@ -71,13 +71,13 @@ uint(size=16) EDGE
   		mb_Index < PICWIDTH-1
   	do
 		
-		foreach int s in Integers(0,16-1)
+		foreach int s in 0 .. 16-1
 		do
   			result[s]:= left_edge[s];
   		end
   		result[16]:= topLeft_edge;
   		
-  		foreach int s in Integers(0,16+5)
+  		foreach int s in 0 .. 16+5
 		do
   			result[16+1+s]:= top_edge [s+ mb_Index *16];
   		end
@@ -88,18 +88,18 @@ uint(size=16) EDGE
 		mb_type_ok = 0,
 		mb_Index = PICWIDTH-1
   	do		
-		foreach int s in Integers(0,16-1)
+		foreach int s in 0 .. 16-1
 		do
   			result[s]:= left_edge[s];
   		end
   		result[16]:= topLeft_edge;
   		
-  		foreach int s in Integers(0,16-1)
+  		foreach int s in 0 .. 16-1
 		do
   			result[16+1+s]:= top_edge [s+ mb_Index *16];
   		end
 
-  		foreach int s in Integers(0,3)
+  		foreach int s in 0 .. 3
 		do
   			result[2*16+1+s]:= top_edge [16-1+ mb_Index *16];
   		end

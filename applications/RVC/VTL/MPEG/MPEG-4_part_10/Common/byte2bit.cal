@@ -8,11 +8,11 @@
 // Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
 //              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
-//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.import all caltrop.lib.BitOps;
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
 // Read in bytes and shift out serially in msb-first order.
 
-import all caltrop.lib.BitOps;
+
 
 actor byte2bit () uint(size=8) in8 ==> uint(size=1) out :
 

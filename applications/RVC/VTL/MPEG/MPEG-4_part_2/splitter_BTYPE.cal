@@ -3,7 +3,7 @@
 // Author: Christophe Lucarz (christophe.lucarz@epfl.ch) 
 // 
 // Description: the sequence of BTYPE token is not homogeneous, there is fist a NEW VOP command, then, the width and height of this VOP, then the  corresponding 8x8 blocks of texture, motion or mixed tex/mot. This actor will delete the tokens concerning the information of the VOP and redistribute the tokens to the Y, U and V components. So that the adder have directly the token intra, accoded or mixed.
-import all caltrop.lib.BitOps;
+
 actor splitter_BTYPE () int(size=BTYPE_SZ) BTYPE ==> int(size=BTYPE_SZ) Y ,
 int(size=BTYPE_SZ) U , int(size=BTYPE_SZ) V :
 

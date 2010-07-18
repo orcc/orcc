@@ -52,6 +52,6 @@ Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
 actor Algo_Transpose4x4 () int(size=16) X ==> int(size=16) Y :
-  action X:[ x ] repeat 16 ==> Y: [ [ x[ 4 * c + r ] : for int r in Integers(0,3), for int c in Integers(0,3) ] ] repeat 16
+  action X:[ x ] repeat 16 ==> Y: [ [ x[ 4 * c + r ] : for int r in 0 .. 3, for int c in 0 .. 3 ] ] repeat 16
   end
 end

@@ -5,7 +5,7 @@
 // Chroma frame buffer generator for AVC inter prediction
 //Modified By Endri Bezati <endri.bezati@insa-rennes.fr>IETR/INSA
 
-import all caltrop.lib.BitOps;
+
 
 
 // BTYPE

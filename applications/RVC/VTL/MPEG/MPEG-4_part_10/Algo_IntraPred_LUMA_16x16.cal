@@ -69,7 +69,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 //For making possible to work with ORCC interpreter
 
-import all caltrop.lib.BitOps;
+
 
 actor Algo_IntraPred_LUMA_16x16 ()
   int(size=16) Y_LEFT,     // List
@@ -93,7 +93,7 @@ actor Algo_IntraPred_LUMA_16x16 ()
   begin
     res := 0;
     if n > 0 then
-    	foreach int i in Integers(0, n-1) do
+    	foreach int i in 0 .. n-1 do
       		res := res + list[i]; 
      	end
     end
@@ -110,7 +110,7 @@ actor Algo_IntraPred_LUMA_16x16 ()
   List(type:int(size=16), size= 16) y_left;
   List(type:int(size=16), size= 16) y_up;
   int(size=16)       y_up_left;
-  List( type:int(size=16), size=16*16 ) mpr := [ 0 : for int i in Integers( 0, 16*16 - 1) ];
+  List( type:int(size=16), size=16*16 ) mpr := [ 0 : for int i in 0 .. 16*16 - 1 ];
 
   read.avail: action AVAIL:[avail] repeat 3 ==>
   do
@@ -122,13 +122,13 @@ actor Algo_IntraPred_LUMA_16x16 ()
   readpix.l.av: action Y_LEFT:[x] repeat 16 ==>
   guard left_avail = 1
   do
-    y_left := [ x[i] : for int i in Integers(0, 15) ];
+    y_left := [ x[i] : for int i in 0 .. 15 ];
    
   end
   readpix.u.av: action Y_UP:[x] repeat 16 ==>
   guard up_avail = 1
   do
-    y_up := [ x[i] : for int i in Integers(0, 15) ];
+    y_up := [ x[i] : for int i in 0 .. 15 ];
   end
   readpix.ul.av: action Y_UP_LEFT:[x] ==>
   guard up_left_avail = 1
@@ -147,23 +147,23 @@ actor Algo_IntraPred_LUMA_16x16 ()
   end
 
   write.mode0: action PredMode:[mode] ==>
-  	 MPR:[[mpr[16*j+i]: for int i in  Integers(0,15), for int j in Integers(0,15)]] repeat 16*16
+  	 MPR:[[mpr[16*j+i]: for int i in  0 .. 15, for int j in 0 .. 15]] repeat 16*16
   guard
   	mode = 0
   do
-  	 mpr := [y_up[i]  : for int i in  Integers(0,15), for int j in Integers(0,15)];
+  	 mpr := [y_up[i]  : for int i in  0 .. 15, for int j in 0 .. 15];
   end
 
  write.mode1: action PredMode:[mode] ==>
- 	MPR:[[mpr[16*j+i]: for int i in  Integers(0,15), for int j in Integers(0,15)]] repeat 16*16
+ 	MPR:[[mpr[16*j+i]: for int i in  0 .. 15, for int j in 0 .. 15]] repeat 16*16
  guard
  	mode = 1
  do
- 	mpr := [y_left[j]: for int i in  Integers(0,15), for int j in Integers(0,15)];
+ 	mpr := [y_left[j]: for int i in  0 .. 15, for int j in 0 .. 15];
  end
  
  write.mode2:  action PredMode:[mode] ==>
- 	MPR:[[mpr[16*j+i]: for int i in  Integers(0,15), for int j in Integers(0,15)]] repeat 16*16
+ 	MPR:[[mpr[16*j+i]: for int i in  0 .. 15, for int j in 0 .. 15]] repeat 16*16
  guard
  	mode = 2
  var
@@ -189,11 +189,11 @@ actor Algo_IntraPred_LUMA_16x16 ()
         end 
     end
              
-     mpr := [mean     : for int i in  Integers(0,15), for int j in Integers(0,15)];
+     mpr := [mean     : for int i in  0 .. 15, for int j in 0 .. 15];
  end
  
  write.mode3: action PredMode:[mode] ==>
-    MPR:[[mpr[16*j+i]: for int i in  Integers(0,15), for int j in Integers(0,15)]] repeat 16*16	
+    MPR:[[mpr[16*j+i]: for int i in  0 .. 15, for int j in 0 .. 15]] repeat 16*16	
  guard
  	mode = 3
  var
@@ -201,11 +201,11 @@ actor Algo_IntraPred_LUMA_16x16 ()
     List(type: int(size=16), size = 7) sum_list,
     List(type: int(size=16), size = 7) sum_list2
  do
- 	sum_list := [(i+1)*(y_up[8+i]  -y_up[6-i]  ):for int i in Integers(0,6)];
+ 	sum_list := [(i+1)*(y_up[8+i]  -y_up[6-i]  ):for int i in 0 .. 6];
     summ(sum_list,7);
     H := res + (7+1)*(y_up[8+7]  -y_up_left);
            
-    sum_list2 := [(j+1)*(y_left[8+j]-y_left[6-j]):for int j in Integers(0,6)];
+    sum_list2 := [(j+1)*(y_left[8+j]-y_left[6-j]):for int j in 0 .. 6];
     summ(sum_list2,7);
     V := res + (7+1)*(y_left[8+7]-y_up_left);
      
@@ -214,7 +214,7 @@ actor Algo_IntraPred_LUMA_16x16 ()
     b:= rshift( 5*H + 32, 6);
     c:= rshift( 5*V + 32, 6);
 
-    mpr := [clip( rshift(a + b*(i-7) + c*(j-7) + 16, 5) ): for int i in  Integers(0,15), for int j in Integers(0,15)];
+    mpr := [clip( rshift(a + b*(i-7) + c*(j-7) + 16, 5) ): for int i in  0 .. 15, for int j in 0 .. 15];
  end
  		
   schedule fsm start:

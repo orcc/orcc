@@ -94,7 +94,7 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
 
   read_sl: action ScalingList:[SL] repeat 4*4 ==>
   do
-    t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in Integers(0,5), for int s in Integers(0,15) ];
+    t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in 0 .. 5, for int s in 0 .. 15 ];
   end
 
   read_idf: action DCCoeff_Present:[x] ==>
@@ -105,7 +105,7 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
   
   read_coeff: action Lev2d:[ x ] repeat 16 ==> Cof:[buff] repeat 16
   var
-    List (type: int(size=16), size=16) buff := [ 0 : for int s in Integers( 0, 15) ]
+    List (type: int(size=16), size=16) buff := [ 0 : for int s in 0 .. 15 ]
   do
     nb_4x4:= nb_4x4 + 1;
     buff [0] := if (ValDCCoeff_Present)then
@@ -117,7 +117,7 @@ actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
                     rshift(x[0]*t_LevelScale[qp_rem*16]+qp_sft, 4-qp_per)
                   end 
                 end;
-	foreach int i in Integers(1,15) do
+	foreach int i in 1 .. 15 do
         buff[i] := 
         	if qp >= 24 then         // AC coefficient
 				 lshift(x[i]*t_LevelScale[qp_rem*16+i], qp_per-4 )

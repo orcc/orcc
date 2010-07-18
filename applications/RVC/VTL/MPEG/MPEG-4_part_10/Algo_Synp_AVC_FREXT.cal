@@ -309,7 +309,7 @@ actor Algo_Synp_AVC_FREXT()
 	
 	//CABAC Neighbouring
 	
-	List ( type: List ( type: int, size = 10) , size = PICWIDTH + 1 ) mbTab := [[ 0 : for int i in Integers( 0, 9)] : for int j in Integers( 0, PICWIDTH)];
+	List ( type: List ( type: int, size = 10) , size = PICWIDTH + 1 ) mbTab := [[ 0 : for int i in 0 .. 9] : for int j in 0 .. PICWIDTH];
 	
 	int TypePred				:= 0; //0:Intra 1:Inter 2: B, used for ctx prediction
 	int mbSliceType				:= 1;
@@ -325,26 +325,26 @@ actor Algo_Synp_AVC_FREXT()
 	
 	 /* CABAC Coded Block Flag Lists */
 	 
-	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH + 1 ) transblock_cbf	:=  [ [ 0 : for int i in Integers( 0, 15) ]: for int j in Integers( 0, PICWIDTH) ];
-	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cr	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
-	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cb	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
-	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH + 1 ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in Integers( 0, 1)  ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int(size = 2), size = 16) , size = PICWIDTH + 1 ) transblock_cbf	:=  [ [ 0 : for int i in 0 .. 15 ]: for int j in 0 .. PICWIDTH ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cr	:=  [ [ 0 : for int i in 0 .. 3  ]: for int j in 0 .. PICWIDTH ];
+	List ( type: List ( type: int(size = 2), size = 4)  , size = PICWIDTH + 1 ) transblock_cbf_cb	:=  [ [ 0 : for int i in 0 .. 3  ]: for int j in 0 .. PICWIDTH ];
+	List ( type: List ( type: int(size = 2), size = 2)  , size = PICWIDTH + 1 ) transblock_cbf_dc_cr_cb	:=  [ [ 0 : for int i in 0 .. 1  ]: for int j in 0 .. PICWIDTH ];
 	
 	/* CABAC MVD and REF Lists */
 														  /*val_CurrMbAddr, mbPartIdx, subMbPartIdx,compIdx*/
-	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH + 1 ) Mvd_L0 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH) ];
-	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH + 1 ) Mvd_L1 :=  [ [ [ [ 0:for int i in Integers( 0, 1) ]: for int j in Integers( 0, 3) ]: for int l in Integers( 0, 3) ]: for int m in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH + 1 ) Mvd_L0 :=  [ [ [ [ 0:for int i in 0 .. 1 ]: for int j in 0 .. 3 ]: for int l in 0 .. 3 ]: for int m in 0 .. PICWIDTH ];
+	List ( type: List ( type : List (type: List ( type: int, size = 2), size  = 4), size = 4 ), size = PICWIDTH + 1 ) Mvd_L1 :=  [ [ [ [ 0:for int i in 0 .. 1 ]: for int j in 0 .. 3 ]: for int l in 0 .. 3 ]: for int m in 0 .. PICWIDTH ];
 	
-	List ( type: List ( type: int, size = 4)  , size = PICWIDTH + 1 ) Ref_Idx_L0	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
-	List ( type: List ( type: int, size = 4)  , size = PICWIDTH + 1 ) Ref_Idx_L1	:=  [ [ 0 : for int i in Integers( 0, 3)  ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int, size = 4)  , size = PICWIDTH + 1 ) Ref_Idx_L0	:=  [ [ 0 : for int i in 0 .. 3  ]: for int j in 0 .. PICWIDTH ];
+	List ( type: List ( type: int, size = 4)  , size = PICWIDTH + 1 ) Ref_Idx_L1	:=  [ [ 0 : for int i in 0 .. 3  ]: for int j in 0 .. PICWIDTH ];
 	/* CABAC sub_mb_type */
-	List ( type: List ( type: int, size = 4) , size = PICWIDTH + 1 ) cabac_sub_mb_type :=  [ [ 0 : for int i in Integers( 0, 3) ]: for int j in Integers( 0, PICWIDTH) ];
+	List ( type: List ( type: int, size = 4) , size = PICWIDTH + 1 ) cabac_sub_mb_type :=  [ [ 0 : for int i in 0 .. 3 ]: for int j in 0 .. PICWIDTH ];
 	
 	/* Residual Block arrays used in Cabac */
-	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in Integers(0, 255)] ;
-	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in Integers(0, 255)] ;
-	List (type: int(size = 16), size = 16) coeff_abs_level_minus1		:= [0: for int i in Integers(0, 15)] ;
-	List (type: int(size = 2), size = 4)   prior_decoded_bin_cbp		:= [0: for int i in Integers(0, 3)] ;
+	List (type: int(size = 8), size = 256) significant_coeff_flag 		:= [0: for int i in 0 .. 255] ;
+	List (type: int(size = 8), size = 256) last_significant_coeff_flag	:= [0: for int i in 0 .. 255] ;
+	List (type: int(size = 16), size = 16) coeff_abs_level_minus1		:= [0: for int i in 0 .. 15] ;
+	List (type: int(size = 2), size = 4)   prior_decoded_bin_cbp		:= [0: for int i in 0 .. 3] ;
 	
 	
 		
@@ -366,41 +366,41 @@ actor Algo_Synp_AVC_FREXT()
 	*************************************************************/
 
 	uint Sps_inc;
-	List (type: uint(size=8), size=32) profile_idc := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=4), size=32) constraint_set_flag := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=8), size=32) level_idc := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=8), size=32) profile_idc := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=4), size=32) constraint_set_flag := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=8), size=32) level_idc := [ 0 : for int i in 0 .. 31 ];
 	uint(size=5) sps_id ;
 	// High Profile
-	List (type:uint(size=2), size=32 ) chroma_format_idc := [ 1 : for int i in Integers( 0, 31) ];
-	List (type:uint(size=1), size=32 ) separate_colour_plane_flag := [ 0 : for int i in Integers( 0, 31) ];
-	List (type:uint(size=3), size=32 ) bit_depth_luma_minus8 := [ 0 : for int i in Integers( 0, 31) ];
-	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8 := [ 0 : for int i in Integers( 0, 31) ];
+	List (type:uint(size=2), size=32 ) chroma_format_idc := [ 1 : for int i in 0 .. 31 ];
+	List (type:uint(size=1), size=32 ) separate_colour_plane_flag := [ 0 : for int i in 0 .. 31 ];
+	List (type:uint(size=3), size=32 ) bit_depth_luma_minus8 := [ 0 : for int i in 0 .. 31 ];
+	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8 := [ 0 : for int i in 0 .. 31 ];
 
-	List (type: uint(size=4), size=32) log2_max_frame_num_minus4 := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=2), size=32) pic_order_cnt_type := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=4), size=32) log2_max_pic_order_cnt_lsb_minus4 := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint(size=4), size=32) log2_max_frame_num_minus4 := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=2), size=32) pic_order_cnt_type := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=4), size=32) log2_max_pic_order_cnt_lsb_minus4 := [ 0 : for int i in 0 .. 31 ];
   
-	List (type: uint(size=1), size=32) delta_pic_order_always_zero_flag := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: int, size=32) offset_for_non_ref_pic := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: int, size=32) offset_for_top_to_bottom_field := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=8), size=32) num_ref_frames_in_pic_order_cnt_cycle := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: List ( type: int, size=255), size=32 ) offset_for_ref_frame := [[ 0 : for int i in Integers( 0, 254) ]: for int j in Integers( 0, 31) ];
+	List (type: uint(size=1), size=32) delta_pic_order_always_zero_flag := [ 0 : for int i in 0 .. 31 ];
+	List (type: int, size=32) offset_for_non_ref_pic := [ 0 : for int i in 0 .. 31 ];
+	List (type: int, size=32) offset_for_top_to_bottom_field := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=8), size=32) num_ref_frames_in_pic_order_cnt_cycle := [ 0 : for int i in 0 .. 31 ];
+	List (type: List ( type: int, size=255), size=32 ) offset_for_ref_frame := [[ 0 : for int i in 0 .. 254 ]: for int j in 0 .. 31 ];
 
-	List (type: uint, size=32) num_ref_frames := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=1), size=32) gaps_in_frame_num_value_allowed_flag := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint, size=32) pic_width_in_mbs_minus1 := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint, size=32) pic_height_in_map_units_minus1 := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=1), size=32) frame_mbs_only_flag := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=1), size=32) mb_adaptive_frame_field_flag := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=1), size=32) direct_8x8_interference_flag := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=1), size=32) frame_cropping_flag := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint, size=32) frame_crop_left_offset := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint, size=32) frame_crop_right_offset := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint, size=32) frame_crop_top_offset := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint, size=32) frame_crop_bottom_offset := [ 0 : for int i in Integers( 0, 31) ];
-	List (type: uint(size=1), size=32) vui_parameters_present_flag := [ 0 : for int i in Integers( 0, 31) ];
+	List (type: uint, size=32) num_ref_frames := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=1), size=32) gaps_in_frame_num_value_allowed_flag := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint, size=32) pic_width_in_mbs_minus1 := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint, size=32) pic_height_in_map_units_minus1 := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=1), size=32) frame_mbs_only_flag := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=1), size=32) mb_adaptive_frame_field_flag := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=1), size=32) direct_8x8_interference_flag := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=1), size=32) frame_cropping_flag := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint, size=32) frame_crop_left_offset := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint, size=32) frame_crop_right_offset := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint, size=32) frame_crop_top_offset := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint, size=32) frame_crop_bottom_offset := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=1), size=32) vui_parameters_present_flag := [ 0 : for int i in 0 .. 31 ];
 
-	List (type: uint(size=5), size=32) MaxDPBSz := [16 : for int i in Integers(0,31)];
+	List (type: uint(size=5), size=32) MaxDPBSz := [16 : for int i in 0 .. 31];
 
 	/*************************************************************
 	*************************************************************
@@ -409,34 +409,34 @@ actor Algo_Synp_AVC_FREXT()
 	*************************************************************/
 
 	uint(size=8) pps_id;
-	List (type:uint(size=5),size=255) sequence_parameter_set_id := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=1),size=255) entropy_coding_mode_flag := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=1),size=255) pic_order_present_flag := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=3),size=255) num_slice_groups_minus1 := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=3),size=255) slice_group_map_type := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=5),size=255) sequence_parameter_set_id := [ 0 : for int i in 0 .. 254];
+	List (type:uint(size=1),size=255) entropy_coding_mode_flag := [ 0 : for int i in 0 .. 254];
+	List (type:uint(size=1),size=255) pic_order_present_flag := [ 0 : for int i in 0 .. 254];
+	List (type:uint(size=3),size=255) num_slice_groups_minus1 := [ 0 : for int i in 0 .. 254];
+	List (type:uint(size=3),size=255) slice_group_map_type := [ 0 : for int i in 0 .. 254];
 
 	uint Pps_inc;
-	List (type:List (type:uint,size=7),size=255) run_length_minus1 := [[ 0 : for int i in Integers( 1, 7)] :for int j in Integers( 0, 254)];
-	List (type:List (type:uint,size=7),size=255) top_left := [[ 0 : for int i in Integers( 1, 7)] : for int j in Integers( 0, 254)];
-	List (type:List (type:uint,size=7),size=255) bottom_right := [[ 0 : for int i in Integers( 1, 7)] : for int j in Integers( 0, 254)];	
-	List (type:uint(size=1),size=255) slice_group_change_direction_flag := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint,size=255) slice_group_change_rate_minus1 := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint,size=255) pic_size_in_map_units_minus1 := [ 0 : for int i in Integers( 0, 254)];
+	List (type:List (type:uint,size=7),size=255) run_length_minus1 := [[ 0 : for int i in 1 .. 7] :for int j in 0 .. 254];
+	List (type:List (type:uint,size=7),size=255) top_left := [[ 0 : for int i in 1 .. 7] : for int j in 0 .. 254];
+	List (type:List (type:uint,size=7),size=255) bottom_right := [[ 0 : for int i in 1 .. 7] : for int j in 0 .. 254];	
+	List (type:uint(size=1),size=255) slice_group_change_direction_flag := [ 0 : for int i in 0 .. 254];
+	List (type:uint,size=255) slice_group_change_rate_minus1 := [ 0 : for int i in 0 .. 254];
+	List (type:uint,size=255) pic_size_in_map_units_minus1 := [ 0 : for int i in 0 .. 254];
 
-	List (type:uint(size=5),size=255) num_ref_idx_l0_active_minus1 := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=5),size=255) num_ref_idx_l1_active_minus1 := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=1),size=255) weighted_pred_flag := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=2),size=255) weighted_bipred_idc := [ 0 : for int i in Integers( 0, 254)];
-	List (type:int(size=6),size=255) pic_init_qp_minus26 := [ 0 : for int i in Integers( 0, 254)];
-	List (type:int(size=6),size=255) pic_init_qs_minus26 := [ 0 : for int i in Integers( 0, 254)];
-	List (type:int(size=5),size=255) chroma_qp_index_offset := [ 0 : for int i in Integers( 0, 254)];
-	List (type:uint(size=1),size=255) deblocking_filter_control_present_flag := [ 0 : for int i in Integers( 0, 254)];
-	List (type:bool,size=255) constrained_intra_pred_flag := [ false : for int i in Integers( 0, 254)];
-	List (type:uint(size=1),size=255) redundant_pic_cnt_present_flag := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=5),size=255) num_ref_idx_l0_active_minus1 := [ 0 : for int i in 0 .. 254];
+	List (type:uint(size=5),size=255) num_ref_idx_l1_active_minus1 := [ 0 : for int i in 0 .. 254];
+	List (type:uint(size=1),size=255) weighted_pred_flag := [ 0 : for int i in 0 .. 254];
+	List (type:uint(size=2),size=255) weighted_bipred_idc := [ 0 : for int i in 0 .. 254];
+	List (type:int(size=6),size=255) pic_init_qp_minus26 := [ 0 : for int i in 0 .. 254];
+	List (type:int(size=6),size=255) pic_init_qs_minus26 := [ 0 : for int i in 0 .. 254];
+	List (type:int(size=5),size=255) chroma_qp_index_offset := [ 0 : for int i in 0 .. 254];
+	List (type:uint(size=1),size=255) deblocking_filter_control_present_flag := [ 0 : for int i in 0 .. 254];
+	List (type:bool,size=255) constrained_intra_pred_flag := [ false : for int i in 0 .. 254];
+	List (type:uint(size=1),size=255) redundant_pic_cnt_present_flag := [ 0 : for int i in 0 .. 254];
 
 	//High profile 
-	List (type:uint(size=1),size=255) transform_8x8_mode_flag := [ 0 : for int i in Integers(0, 254)];
-	List (type:int(size=5),size=255) second_chroma_qp_index_offset := [ 0 : for int i in Integers( 0, 254)];
+	List (type:uint(size=1),size=255) transform_8x8_mode_flag := [ 0 : for int i in 0 .. 254];
+	List (type:int(size=5),size=255) second_chroma_qp_index_offset := [ 0 : for int i in 0 .. 254];
 
 	/*************************************************************
 	*************************************************************
@@ -452,7 +452,7 @@ actor Algo_Synp_AVC_FREXT()
 	uint(size=16) idr_pic_id := 0;
 	int pic_order_cnt_lsb := 0;
 	int delta_pic_order_cnt_bottom := 0;
-	List (type:int,size=2)delta_pic_order_cnt  := [ 0 : for int i in Integers(0, 1)];
+	List (type:int,size=2)delta_pic_order_cnt  := [ 0 : for int i in 0 .. 1];
 	uint(size=7) redundant_pic_cnt := 0;
 	uint(size=1) direct_spatial_mv_pred_flag := 0;
 	uint(size=1) num_ref_idx_active_override_flag := 0;
@@ -571,9 +571,9 @@ actor Algo_Synp_AVC_FREXT()
 
 	uint(size=3) mbPartIdx;
 	uint(size=3) subMbPartIdx;
-	List (type:uint,size=5) sub_mb_type := [ 0 : for int i in Integers( 0, 4)];
-	List (type:int,size=4) ref_idx_l0 := [ 0 : for int i in Integers( 0, 3)];
-	List (type:int,size=4) ref_idx_l1 := [ 0 : for int i in Integers( 0, 3)];
+	List (type:uint,size=5) sub_mb_type := [ 0 : for int i in 0 .. 4];
+	List (type:int,size=4) ref_idx_l0 := [ 0 : for int i in 0 .. 3];
+	List (type:int,size=4) ref_idx_l1 := [ 0 : for int i in 0 .. 3];
 	int mvd_l0 := 0;
 	int mvd_l1 := 0;
 
@@ -585,7 +585,7 @@ actor Algo_Synp_AVC_FREXT()
 
 	uint(size=5) luma4x4BlkIdx;
 	uint(size=1) prev_intra4x4_pred_mode_flag := 0;
-	List (type:uint(size=4),size=16) rem_intra4x4_pred_mode := [ 0 : for int i in Integers( 1, 16)];
+	List (type:uint(size=4),size=16) rem_intra4x4_pred_mode := [ 0 : for int i in 1 .. 16];
 	uint(size=2) intra_chroma_pred_mode;
 	//*************************************************************/
 
@@ -617,8 +617,8 @@ actor Algo_Synp_AVC_FREXT()
 	uint(size=4) zerosLeft;
 	int(size=16) coeff_sent := 0;
 
-	List (type:int(size=16),size=16) level := [ 0 : for int i in Integers( 1, 16)];
-	List (type:uint(size=4),size=16) run := [ 0 : for int i in Integers( 1, 16)];
+	List (type:int(size=16),size=16) level := [ 0 : for int i in 1 .. 16];
+	List (type:uint(size=4),size=16) run := [ 0 : for int i in 1 .. 16];
 	List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
 
 	List ( type: List ( type: uint(size=7), size=3), size=62 ) VLC_nC_0to2 = //[n][coef_length / coef_val / coef_token]
@@ -1531,7 +1531,7 @@ actor Algo_Synp_AVC_FREXT()
 		bitand( v, lshift(1,n)-1 )
 	end
 
-	List (type:bool, size=8 ) bit_read:=[false: for int i in Integers(0,7)];
+	List (type:bool, size=8 ) bit_read:=[false: for int i in 0 .. 7];
 	int bit_read_cnt:=8;
 
 	action bits:[ b ] repeat 8==>
@@ -1539,7 +1539,7 @@ actor Algo_Synp_AVC_FREXT()
 		bit_read_cnt=8
 	do
 		bit_read_cnt:=0;
-		bit_read:=[(b[i]=1):for int i in Integers(0,7)];
+		bit_read:=[(b[i]=1):for int i in 0 .. 7];
 	end 
   
 	action /*bits:[ b ]*/ ==>
@@ -1606,7 +1606,7 @@ actor Algo_Synp_AVC_FREXT()
 		VLD_Counter := VLD_Counter + 1;
 		Codeword := bitor( lshift( Codeword, 1), if bit_read[bit_read_cnt] = true then 1 else 0 end);
 		if CAVLC_type =0 then // coeff_token
-			foreach int i in Integers(0,61) do
+			foreach int i in 0 .. 61 do
 				if nc >=0 and nc < 2 then
 					if VLD_Counter = VLC_nC_0to2[i][0] and Codeword = VLC_nC_0to2[i][1] then coeff_token := VLC_nC_0to2[i][2]; NewCoeff := false; end
 				else
@@ -1633,7 +1633,7 @@ actor Algo_Synp_AVC_FREXT()
 			end
 		else
 			if CAVLC_type = 1 then // total_zeros
-				foreach int i in Integers(0, (maxNumCoeff - TotalCoeff() )) do
+				foreach int i in 0 .. (maxNumCoeff - TotalCoeff() ) do
 					if maxNumCoeff != 4 and maxNumCoeff !=8 then 
 						if VLD_Counter = VLC_total0[TotalCoeff()-1][i][0] and Codeword = VLC_total0[TotalCoeff()-1][i][1] then 
 							total_zeros := VLC_total0[TotalCoeff()-1][i][2]; NewCoeff := false; 
@@ -1649,7 +1649,7 @@ actor Algo_Synp_AVC_FREXT()
 					end
 				end
 			else //run_before
-				foreach int i in Integers(0,zerosLeft) do
+				foreach int i in 0 .. zerosLeft do
 					if zerosLeft > 6 then
 						if VLD_Counter = VLC_run_before[6][i][0] and Codeword = VLC_run_before[6][i][1] then 
 							run_before := VLC_run_before[6][i][2]; NewCoeff := false; 
@@ -4715,7 +4715,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		StartCabacInit
 	do
-		foreach int i in Integers(0, 459) do
+		foreach int i in 0 .. 459 do
 					if (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI )then
 						preCtxState_pro(val_QP, Cabac_Context_Init_I[i][0], Cabac_Context_Init_I[i][1]);
 					else
@@ -5796,12 +5796,12 @@ actor Algo_Synp_AVC_FREXT()
 			if pic_order_cnt_type[sps_id] = 1 then
 				abs_frame_num := if num_ref_frames_in_pic_order_cnt_cycle[sps_id] != 0 then frame_num_offset + frame_num else 0 end ;
 				if nal_ref_idc = 0 and abs_frame_num > 0 then abs_frame_num := abs_frame_num -1; end
-				foreach int i in Integers (0, num_ref_frames_in_pic_order_cnt_cycle[sps_id]-1) do
+				foreach int i in 0 .. num_ref_frames_in_pic_order_cnt_cycle[sps_id]-1 do
 					expected_delta_per_poc_cycle := expected_delta_per_poc_cycle + offset_for_ref_frame[sps_id][ i ];
 				end
 				if abs_frame_num > 0 then
 					expectedpoc := expected_delta_per_poc_cycle * ((abs_frame_num - 1) / num_ref_frames_in_pic_order_cnt_cycle[sps_id]);
-					foreach int i in Integers(0, ((abs_frame_num - 1) mod num_ref_frames_in_pic_order_cnt_cycle[sps_id])) do
+					foreach int i in 0 .. ((abs_frame_num - 1) mod num_ref_frames_in_pic_order_cnt_cycle[sps_id]) do
 						expectedpoc := expectedpoc + offset_for_ref_frame[sps_id][ i ];
 					end
 				else
@@ -6573,9 +6573,9 @@ end
 		PicSizeInMbs := PicWidthInMbs * (pic_height_in_map_units_minus1[sps_id] +1);
 		
 		if IS_CAVLC() then
-		  NonZeroCount   := [[ 0 : for int j in Integers(0, 16-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
-		  NonZeroCountCb := [[ 0 : for int j in Integers(0, 4-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
-		  NonZeroCountCr := [[ 0 : for int j in Integers(0, 4-1)] : for int i in Integers(0, PICHEIGHT*PICWIDTH-1)]; //FIXME ! size is not right
+		  NonZeroCount   := [[ 0 : for int j in 0 .. 16-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
+		  NonZeroCountCb := [[ 0 : for int j in 0 .. 4-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
+		  NonZeroCountCr := [[ 0 : for int j in 0 .. 4-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
 		end
 		
 		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
@@ -6588,22 +6588,22 @@ end
 		//Init Tabs 
 		
 		if IS_CABAC() then
-		  foreach int i in Integers(0,PicWidthInMbs - 1) do
+		  foreach int i in 0 .. PicWidthInMbs - 1 do
 			  mbTab[i][mbCBF] := 0;
-			  foreach int j in Integers(0,3) do
+			  foreach int j in 0 .. 3 do
 				  transblock_cbf_cr[i][j] := 0;
 				  transblock_cbf_cb[i][j] := 0;
 			  end
 		  end
 		  
-		  foreach int i in Integers(0,PicWidthInMbs - 1) do
-			  foreach int j in Integers(0,15) do
+		  foreach int i in 0 .. PicWidthInMbs - 1 do
+			  foreach int j in 0 .. 15 do
 				  transblock_cbf[i][j] := 0;
 			  end
 		  end
 		  
-		  foreach int i in Integers(0,PicWidthInMbs - 1) do
-			  foreach int j in Integers(0,1) do
+		  foreach int i in 0 .. PicWidthInMbs - 1 do
+			  foreach int j in 0 .. 1 do
 				  transblock_cbf_dc_cr_cb[i][j] := 0;
 			  end
 		  end
@@ -6656,14 +6656,14 @@ end
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
-			LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+			LAST:[[true: for int t in 0 .. 26 ]] repeat 27
 			
 	guard
 		prevMbSkipped = 1 and IS_CAVLC(),
@@ -6709,14 +6709,14 @@ end
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
-			LAST:[[true: for int t in Integers(0,25) ]] repeat 26
+			LAST:[[true: for int t in 0 .. 25 ]] repeat 26
 			
 	guard
 		prevMbSkipped = 1 and IS_CAVLC(),
@@ -6836,17 +6836,17 @@ end
 	begin
 		if IS_CABAC() then
 			if val_CurrMbAddr >= PicWidthInMbs + 1 then
-				foreach int i in Integers(1,PicWidthInMbs + 1) do
+				foreach int i in 1 .. PicWidthInMbs + 1 do
 					/* MbTab */
-					foreach int j in Integers(0,9) do
+					foreach int j in 0 .. 9 do
 						mbTab[i-1][j] := mbTab[i][j];
 					end
 					
-					foreach int j in Integers(0,15) do
+					foreach int j in 0 .. 15 do
 						transblock_cbf[i-1][j] := transblock_cbf[i][j];
 					end
 					
-					foreach int j in Integers(0,3) do
+					foreach int j in 0 .. 3 do
 						Ref_Idx_L0[i-1][j] := Ref_Idx_L0[i][j];
 						Ref_Idx_L1[i-1][j] := Ref_Idx_L1[i][j];
 						cabac_sub_mb_type[i-1][j] := cabac_sub_mb_type[i][j];
@@ -6854,30 +6854,30 @@ end
 						transblock_cbf_cb[i-1][j] := transblock_cbf_cb[i][j];
 					end
 					
-					foreach int k in Integers(0,3) do
-						foreach int m in Integers(0,3) do
-							foreach int l in Integers(0,1) do
+					foreach int k in 0 .. 3 do
+						foreach int m in 0 .. 3 do
+							foreach int l in 0 .. 1 do
 								Mvd_L0[i-1][k][m][l] := Mvd_L0[i][k][m][l];
 								Mvd_L1[i-1][k][m][l] := Mvd_L1[i][k][m][l];
 							end
 						end
 					end
 					
-					foreach int l in Integers(0,1) do
+					foreach int l in 0 .. 1 do
 						transblock_cbf_dc_cr_cb[i-1][l] := transblock_cbf_dc_cr_cb[i][l];
 					end
 				end
 			end
 
-			foreach int i in Integers(0,9) do
+			foreach int i in 0 .. 9 do
 				mbTab[CabacCurrMbAddr()][i] := 0;
 			end
 			
-			foreach int j in Integers(0,15) do
+			foreach int j in 0 .. 15 do
 					transblock_cbf[CabacCurrMbAddr()][j] := 0;
 				end
 			
-			foreach int j in Integers(0,3) do
+			foreach int j in 0 .. 3 do
 				Ref_Idx_L0[CabacCurrMbAddr()][j] := 0;
 				Ref_Idx_L1[CabacCurrMbAddr()][j] := 0;
 				cabac_sub_mb_type[CabacCurrMbAddr()][j] := 0;
@@ -6885,16 +6885,16 @@ end
 				transblock_cbf_cb[CabacCurrMbAddr()][j] := 0;
 			end
 			
-			foreach int i in Integers(0,3) do
-				foreach int j in Integers(0,3) do
-					foreach int l in Integers(0,1) do
+			foreach int i in 0 .. 3 do
+				foreach int j in 0 .. 3 do
+					foreach int l in 0 .. 1 do
 						Mvd_L0[CabacCurrMbAddr()][i][j][l] := 0;
 						Mvd_L1[CabacCurrMbAddr()][i][j][l] := 0;
 					end
 				end
 			end
 			
-			foreach int l in Integers(0,1) do
+			foreach int l in 0 .. 1 do
 				transblock_cbf_dc_cr_cb[CabacCurrMbAddr()][l] := 0;
 			end
 				
@@ -6973,7 +6973,7 @@ end
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16,
+			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16,
 			MbIntraFlag:[mb_intra_flag]
 	guard
 		mb_skip_flag = 0
@@ -7017,14 +7017,14 @@ end
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
-			VALUE:[[0: for int i in Integers(0,407) ]] repeat 408
+			VALUE:[[0: for int i in 0 .. 407 ]] repeat 408
 	guard
 		mb_skip_flag = 1,
 		slice_type != SLICE_TYPE_P
@@ -7069,14 +7069,14 @@ end
 			QP:[val_QP], 
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
-			ScalingList:[[16: for int s in Integers(0,15) ]] repeat 16, 
+			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
 			RefIdx:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
-			VALUE:[[0: for int i in Integers(0,391) ]] repeat 392
+			VALUE:[[0: for int i in 0 .. 391 ]] repeat 392
 	guard
 		mb_skip_flag = 1,
 		slice_type = SLICE_TYPE_P
@@ -7344,7 +7344,7 @@ end
 	do
 		MB_inc := 0;
 		set_bits_to_read(bit_depth_luma_minus8[sps_id]+8);
-		foreach int i in Integers (0, 15) do
+		foreach int i in 0 .. 15 do
 			NonZeroCount[val_CurrMbAddr,i] := 16;
 		end
 	end
@@ -7380,7 +7380,7 @@ end
 	do
 		MB_inc := 0;
 		set_bits_to_read(bit_depth_chroma_minus8[sps_id]+8);
-		foreach  int i in Integers(0, 3) do
+		foreach  int i in 0 .. 3 do
 			NonZeroCountCb[val_CurrMbAddr,i] := 16;
 			NonZeroCountCr[val_CurrMbAddr,i] := 16;
 		end
@@ -7429,7 +7429,7 @@ end
 	read_MB_layer_sub_mb_pred_done: action ==>
 	do
 	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
-		foreach int i in Integers(0,3) do
+		foreach int i in 0 .. 3 do
 			mbPartIdx := i;
 			//  if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 )
 			if not IS_B_Direct_8x8() then
@@ -7630,22 +7630,22 @@ end
 
 	//else
 		
-	read_MB_layer_skip_mb_qp_delta: action ==>  LAST:[[true: for int t in Integers(0,25) ]] repeat 26//27
+	read_MB_layer_skip_mb_qp_delta: action ==>  LAST:[[true: for int t in 0 .. 25 ]] repeat 26//27
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and not IS_Intra_16x16() ) and IS_CAVLC()
 	end
 /*		
-	read_MB_layer_skip_mb_qp_delta.Block_4x4: action ==>  LAST:[[true: for int t in Integers(0,25) ]] repeat 26//27
+	read_MB_layer_skip_mb_qp_delta.Block_4x4: action ==>  LAST:[[true: for int t in 0 .. 25 ]] repeat 26//27
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and IS_Intra_4x4() ) and IS_CAVLC()
 	end
 		
-	read_MB_layer_skip_mb_qp_delta.others: action ==>  LAST:[[true: for int t in Integers(0,26) ]] repeat 27
+	read_MB_layer_skip_mb_qp_delta.others: action ==>  LAST:[[true: for int t in 0 .. 26 ]] repeat 27
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and ( not IS_Intra_16x16()) and (not IS_Intra_4x4()) ) and IS_CAVLC()
 	end*/
 
-	read_MB_layer_skip_mb_qp_delta_CABAC: action ==> VALUE:[[0: for int i in Integers(0,391)]] repeat 392
+	read_MB_layer_skip_mb_qp_delta_CABAC: action ==> VALUE:[[0: for int i in 0 .. 391]] repeat 392
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and not IS_Intra_16x16() ) and IS_CABAC()
 	end	
@@ -8109,12 +8109,12 @@ end
 	end
 	//end if
 
-	read_MB_pred_skip_rem_intra4x4_pred_mode: action ==> IntraPredMode: [ [ rem_intra4x4_pred_mode[ s ] :for int s in Integers(0,15)] ] repeat 16
+	read_MB_pred_skip_rem_intra4x4_pred_mode: action ==> IntraPredMode: [ [ rem_intra4x4_pred_mode[ s ] :for int s in 0 .. 15] ] repeat 16
 	guard
 		luma4x4BlkIdx = 16
 	do
 if TRACE_MRL then
-		foreach int i in Integers(0,15) do
+		foreach int i in 0 .. 15 do
 			println("IntraPredMode: "+rem_intra4x4_pred_mode[ i ]);
 		end
 end
@@ -8206,7 +8206,7 @@ end
 	end
 	//end if
 
-	read_MB_pred_skip_rem_intra8x8_pred_mode: action ==> IntraPredMode: [ [ rem_intra4x4_pred_mode[ s ] :for int s in Integers(0,3)] ] repeat 4
+	read_MB_pred_skip_rem_intra8x8_pred_mode: action ==> IntraPredMode: [ [ rem_intra4x4_pred_mode[ s ] :for int s in 0 .. 3] ] repeat 4
 	guard
 		luma4x4BlkIdx = 4
 	end
@@ -8574,14 +8574,14 @@ end
 		leveltype=0 and IS_CAVLC()
 	end
 	
-	Residual_return_luma_DC_CABAC: action ==> VALUE:[ [level[i]: for int i in Integers(0,15)]] repeat 16
+	Residual_return_luma_DC_CABAC: action ==> VALUE:[ [level[i]: for int i in 0 .. 15]] repeat 16
 	guard
 		leveltype=0 and IS_CABAC()
 	do
 		SentLumaDCZeros := false;
 		if TRACE then
 			println("Luma DC 16x16");
-			foreach int s in Integers(0, 15) do
+			foreach int s in 0 .. 15 do
 				println("LumaDC16x16[" + s + "] := " + level[s]);
 			end
 		end
@@ -8602,7 +8602,7 @@ end
 		( bmFlag != 0 or startIdx != 0 or (not IS_Intra_16x16() and not IS_Intra_4x4() ) ) and IS_CAVLC()
 	end
 */	
-	Residual_luma_skip_DC_init_CABAC: action ==> //VALUE:[ [0: for int i in Integers(0,15)]] repeat 16
+	Residual_luma_skip_DC_init_CABAC: action ==> //VALUE:[ [0: for int i in 0 .. 15]] repeat 16
 	guard
 		( bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16() )and IS_CABAC()
 	do
@@ -8671,30 +8671,30 @@ end
 		leveltype = 1 and IS_CAVLC()
 	end
 	
-	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [level_temp[i]: for int i in Integers(0,15)]] repeat 16
+	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [level_temp[i]: for int i in 0 .. 15]] repeat 16
 	guard
 		leveltype = 1 and maxNumCoeff = 15 and IS_CABAC()
 	var
 		List (type:int(size=16),size=16) level_temp
 	do
 		if TRACE then
-			foreach int s in Integers(0, 14) do
+			foreach int s in 0 .. 14 do
 				println("LumaAC16x16[" + s + "] := " + level[s]);
 			end
 		end
 		
 		level_temp[0] := 0;
-		foreach int s in Integers(1, 15) do
+		foreach int s in 1 .. 15 do
 			level_temp[s] := level[s - 1];
 		end
 	end
 	
-	Residual_return_luma_AC_CABAC_16_Coeff: action ==> VALUE:[ [level[i]: for int i in Integers(0,15)]] repeat 16
+	Residual_return_luma_AC_CABAC_16_Coeff: action ==> VALUE:[ [level[i]: for int i in 0 .. 15]] repeat 16
 	guard
 		leveltype = 1 and maxNumCoeff = 16 and IS_CABAC()
 	do
 		if TRACE then
-			foreach int s in Integers(0, 15) do
+			foreach int s in 0 .. 15 do
 				println("LumaAC4x4[" + s + "] := " + level[s]);
 			end
 		end
@@ -8719,7 +8719,7 @@ end
 	end
 	// end if
 	
-	Residual_luma_skip_AC_CodedBlock8x8_CABAC_16: action ==> VALUE:[[0: for int i in Integers(0,15)]] repeat 16
+	Residual_luma_skip_AC_CodedBlock8x8_CABAC_16: action ==> VALUE:[[0: for int i in 0 .. 15]] repeat 16
 	guard
 		( (i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC() )
 	do
@@ -8813,25 +8813,25 @@ end
 		iCbCr := iCbCr + 1; 
 	end
 	
-	Residual_return_chroma_DC_CABAC_4_Coeff: action ==> VALUE:[[level[i]: for int i in Integers(0,3)]] repeat 4
+	Residual_return_chroma_DC_CABAC_4_Coeff: action ==> VALUE:[[level[i]: for int i in 0 .. 3]] repeat 4
 	guard
 		leveltype = 2 and maxNumCoeff = 4 and IS_CABAC()
 	do
 		iCbCr := iCbCr + 1;
 		if TRACE then
-			foreach int s in Integers(0, 3) do
+			foreach int s in 0 .. 3 do
 				println("ChromaDC[" + s + "] := " + level[s]);
 			end
 		end
 	end
 	
-	Residual_return_chroma_DC_CABAC_8_Coeff: action ==> VALUE:[[level[i]: for int i in Integers(0,7)]] repeat 8
+	Residual_return_chroma_DC_CABAC_8_Coeff: action ==> VALUE:[[level[i]: for int i in 0 .. 7]] repeat 8
 	guard
 		leveltype = 2 and maxNumCoeff = 8 and IS_CABAC()
 	do
 		iCbCr := iCbCr + 1;
 		if TRACE then
-			foreach int s in Integers(0, 7) do
+			foreach int s in 0 .. 7 do
 				println("ChromaDC[" + s + "] := " + level[s]);
 			end
 		end
@@ -8848,7 +8848,7 @@ end
 	end   
 	//end if
 	
-	Residual_skip_chroma_DC_init_CABAC_1: action ==> VALUE:[[0: for int i in Integers(0,3)]] repeat 4 
+	Residual_skip_chroma_DC_init_CABAC_1: action ==> VALUE:[[0: for int i in 0 .. 3]] repeat 4 
 	guard
 		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC() and NumC8x8 = 1
 	do
@@ -8860,7 +8860,7 @@ end
 		end
 	end   
 	
-	Residual_skip_chroma_DC_init_CABAC_2: action ==> VALUE:[[0: for int i in Integers(0,7)]] repeat 8 
+	Residual_skip_chroma_DC_init_CABAC_2: action ==> VALUE:[[0: for int i in 0 .. 7]] repeat 8 
 	guard
 		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC() and NumC8x8 = 2
 	do
@@ -8923,7 +8923,7 @@ end
 		end
 	end
 	
-	Residual_return_chroma_AC_CABAC: action ==> VALUE:[[level_temp[i]: for int i in Integers(0,15)]] repeat 16
+	Residual_return_chroma_AC_CABAC: action ==> VALUE:[[level_temp[i]: for int i in 0 .. 15]] repeat 16
 	guard
 		leveltype = 3 and IS_CABAC()
 	var
@@ -8942,12 +8942,12 @@ end
 		end
 		if TRACE then
 			println("luma4x4BlkIdx := " + luma4x4BlkIdx);
-			foreach int s in Integers(0, 7) do
+			foreach int s in 0 .. 7 do
 				println("ChromaAC[" + s + "] := " + level[s]);
 			end
 		end
 		level_temp[0] := 0;
-		foreach int s in Integers(1, 15) do
+		foreach int s in 1 .. 15 do
 			level_temp[s] := level[s - 1];
 		end
 	end
@@ -8967,7 +8967,7 @@ end
 	end
 	
 	
-	Residual_chroma_AC_skip_CodedBlock4x4_CABAC: action ==> VALUE: [[0: for int j in Integers(0,15)]] repeat 16
+	Residual_chroma_AC_skip_CodedBlock4x4_CABAC: action ==> VALUE: [[0: for int j in 0 .. 15]] repeat 16
 	guard
 		(iCbCr < 2 and bitand(CodedBlockPatternChroma, 2) != 2 or endIdx <= 0) and IS_CABAC()
 	do
@@ -9084,7 +9084,7 @@ end
 			if top = 1 and left = 1 then nc := rshift(nA + nB +1, 1); else nc := nA + nB ; end
 		end
 		start_CAVLC(0);
-		level := [0 : for int i in Integers(0,15)];
+		level := [0 : for int i in 0 .. 15];
 	end
 
 	//if( TotalCoeff( coeff_token ) > 0 ) 
@@ -9191,7 +9191,7 @@ end
 	do
 		//if( TotalCoeff( coeff_token ) < endIdx startIdx + 1 )
 		if TotalCoeff() < block_endIdx - block_startIdx +1 then start_CAVLC(1); end
-		run := [0 : for int i in Integers(0,15)];
+		run := [0 : for int i in 0 .. 15];
 	end
 
 	Residual_block_read_total_zeros_done: action ==>
@@ -9326,7 +9326,7 @@ end
 		numCoeff := block_endIdx + 1;
 		blCabacIdx := block_startIdx;
 		//Delete previous Decoded level
-		foreach int i in Integers(0, maxNumCoeff - 1) do
+		foreach int i in 0 .. maxNumCoeff - 1 do
 			 significant_coeff_flag[i]      := 0;
 			 last_significant_coeff_flag[i] := 0;
 			 level[i] := 0;

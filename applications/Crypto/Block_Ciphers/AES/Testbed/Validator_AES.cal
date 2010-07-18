@@ -11,7 +11,7 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-// import all caltrop.lib.BitOps; 
+//  
 
 actor Validator_AES () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = Golden response
 
@@ -25,7 +25,7 @@ actor Validator_AES () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = 
 	procedure printList(List(type:uint(size=8), size=BLOCK_SIZE) x, bool bLineBreak)
 	begin
 		print("[ ");
-		foreach int i in Integers(0,BLOCK_SIZE-1)
+		foreach int i in 0 .. BLOCK_SIZE-1
 		do
 			print("0x"+hexDigits[x[i]>>4]+hexDigits[x[i] & 0x0f]+" ");
 		end
@@ -39,7 +39,7 @@ actor Validator_AES () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = 
 		"0x"+hexDigits[x>>4]+hexDigits[x & 0x0f]
 	end
 	function list2hex (List(type:uint(size=8), size=BLOCK_SIZE) x) --> List(type:String, size=BLOCK_SIZE):
-		[byte2hex(x[i]) : for int i in Integers(0,BLOCK_SIZE-1)]
+		[byte2hex(x[i]) : for int i in 0 .. BLOCK_SIZE-1]
 	end */
 	
 	int blockCounter := 0;
@@ -57,7 +57,7 @@ actor Validator_AES () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = 
 		// Uncomment the following lines if you want to simulate with OpenDF.
 		// println("Actual Response = " + list2hex(x));
 		// println("Golden Response = " + list2hex(gr));
-		foreach int i in Integers(0,BLOCK_SIZE-1)
+		foreach int i in 0 .. BLOCK_SIZE-1
 		do
 			if x[i]!=gr[i] then
 				errorCounter := errorCounter + 1;

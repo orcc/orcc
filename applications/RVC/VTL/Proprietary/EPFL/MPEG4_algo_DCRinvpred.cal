@@ -38,8 +38,7 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 
 	// 8x8 block component in macroblock index  // JWJ: increased size
 	// Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
-	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) dc_buf := [ DCVAL : for int k in Integers(1,
-	BUF_SIZE) ];
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) dc_buf := [ DCVAL : for int k in 1 .. BUF_SIZE ];
 
 	int(size=SAMPLE_SZ) dc_pred;
 

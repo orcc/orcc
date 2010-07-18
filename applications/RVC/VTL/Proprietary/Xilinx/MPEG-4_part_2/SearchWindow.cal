@@ -39,7 +39,7 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-import all caltrop.lib.BitOps;
+
 actor SearchWindow () int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI ==>
 int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
@@ -88,12 +88,12 @@ int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
 	//  list( type:list(type:int(size=32), size=LUMA_X_SIZE), size=LUMA_Y_SIZE )
 	//           luma := initList( initList(0,LUMA_X_SIZE), LUMA_Y_SIZE );   // 2 BRAMs
-	List(type: int(size=32), size=16 * 64) luma := [ 0 : for int i in Integers(1, 16 * 64) ];
+	List(type: int(size=32), size=16 * 64) luma := [ 0 : for int i in 1 .. 16 * 64 ];
 
 	// 2 BRAMs
 	//  list( type:list( type:list(type:int(size=32), size=CHROMA_X_SIZE), size=CHROMA_Y_SIZE ), size=2 )
 	//           chroma := initList( initList( initList(0,CHROMA_X_SIZE), CHROMA_Y_SIZE), 2);    // 1 BRAM
-	List(type: int(size=32), size=8 * 32 * 2) chroma := [ 0 : for int i in Integers(1, 8 * 32 * 2) ];
+	List(type: int(size=32), size=8 * 32 * 2) chroma := [ 0 : for int i in 1 .. 8 * 32 * 2 ];
 
 	// 1 BRAM
 	bool prediction_is_INTRA;

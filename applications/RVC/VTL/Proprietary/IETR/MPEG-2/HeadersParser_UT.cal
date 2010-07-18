@@ -587,7 +587,7 @@ end
 //	List(type:String, size=34) check;
 //	test_result: action Symbol:[symbol] repeat (34+64) ==> Check:[check] repeat 34
 //	do
-//	 	foreach int i in Integers(0,10) do
+//	 	foreach int i in 0 .. 10 do
 //			if symbol[i] = expected[i] then
 //				check[i]:="Test OK";
 //			else
@@ -595,7 +595,7 @@ end
 //			end
 //		end
 //		// Do not check non intra quant matrix
-//		foreach int i in Integers(75,97) do
+//		foreach int i in 75 .. 97 do
 //			if symbol[i-64] = expected[i] then
 //				check[i]:="Test OK";
 //			else

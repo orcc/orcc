@@ -99,14 +99,14 @@ actor Algo_IntraPred_Split()
 	List(type: List(type: int(size=5), size=16), size=PICWIDTH) intra4x4predmode;
 	List(type: uint(size=4) , size=16)   InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
 	//FIXME! Maximum size of a line in macroclock
-	List(type: bool, size=PICWIDTH) is_constrained_i_flag := [ false : for int i in Integers(0, PICWIDTH - 1) ];
+	List(type: bool, size=PICWIDTH) is_constrained_i_flag := [ false : for int i in 0 .. PICWIDTH - 1 ];
 
 
 	// initialize intra4x4predmode to a huge list of 2's
 	initialize ==>
 		do
-			intra4x4predmode := [ [ 2 : for int j in Integers(0, 15) ] : for int i in
-			Integers(0, PICWIDTH - 1) ];
+			intra4x4predmode := [ [ 2 : for int j in 0 .. 15 ] : for int i in
+			0 .. PICWIDTH - 1 ];
 		end
 
 
@@ -134,7 +134,7 @@ actor Algo_IntraPred_Split()
 			curr_mb_addr       := Curr_Mb_Addr;
 			first_mb_in_slice  := First_MB_In_Slice;
 			mb_x               := curr_mb_addr mod pic_width_in_mb;
-			intra4x4predmode[mb_x]      := [ 2 : for int j in Integers(0, 15) ];
+			intra4x4predmode[mb_x]      := [ 2 : for int j in 0 .. 15 ];
 			is_constrained_i_flag[mb_x] := not (Constrained_I_Flag);
 		end
 
@@ -258,7 +258,7 @@ actor Algo_IntraPred_Split()
     if a < predicted then val := a+1; else val := a; end
     if a = 15 then val := predicted; end
     println("Prediction : Intra8x8 "+CurrMb4x4Addr+" get "+a+" pred "+predicted+" --> val = "+val);
-    foreach int i in Integers(0,3) do
+    foreach int i in 0 .. 3 do
       CurrMb8x8Addr := y * lshift( picW,4) + lshift(x,2) + InverseScan4x4(count+i,lshift( picW,2));
       intra4x4predmode[CurrMb8x8Addr] := val;
     end
@@ -277,7 +277,7 @@ actor Algo_IntraPred_Split()
 		guard
 			mb_intra_type = INTRA_16x16
 		do
-			intra4x4predmode[mb_x] := [ 2 : for int j in Integers(0, 15) ];
+			intra4x4predmode[mb_x] := [ 2 : for int j in 0 .. 15 ];
 			is_constrained_i_flag[mb_x] := true;
 		end
 
@@ -290,7 +290,7 @@ actor Algo_IntraPred_Split()
 		guard
 			mb_intra_type = I_PCM
 		do
-			intra4x4predmode[mb_x] := [ 2 : for int j in Integers(0, 15) ];
+			intra4x4predmode[mb_x] := [ 2 : for int j in 0 .. 15 ];
 			is_constrained_i_flag[mb_x] := true;
 		end
 

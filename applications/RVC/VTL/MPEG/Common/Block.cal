@@ -1,7 +1,7 @@
 actor Block () int In, int BlockType ==> int Out0, int Out1, int Out2, int Out3
 :
 
-	List(type: int, size=4 * 4) block := [ 0 : for int t in Integers(0, (4 * 4) -
+	List(type: int, size=4 * 4) block := [ 0 : for int t in 0 .. (4 * 4 -
 	1) ];
 
 	int bType := 0;

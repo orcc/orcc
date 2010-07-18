@@ -39,7 +39,7 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-import all caltrop.lib.BitOps;
+
 actor Zigzag () int(size=SAMPLE_SZ) AC, int(size=3) START, int(size=7) ADDR ==>
 int(size=SAMPLE_SZ) OUT :
 
@@ -51,8 +51,7 @@ int(size=SAMPLE_SZ) OUT :
 
 	bool half := false;
 
-	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) buf := [ 0 : for int k in Integers(1, BUF_SIZE
-	) ];
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) buf := [ 0 : for int k in 1 .. BUF_SIZE ];
 
 	skip: action START:[ s ] ==>
 	guard

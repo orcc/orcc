@@ -46,7 +46,7 @@
 // * The action predict.b45 is removed since not needed.
 // * Block pointer bitwidth reduced from MB_COORD_SZ+3 to MB_COORD_SZ+2 since only
 //   4 components per block.
-import all caltrop.lib.BitOps;
+
 actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
 + 2) B , int(size=MB_COORD_SZ + 2) C :
 
@@ -92,7 +92,7 @@ actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD
 	// Macroblock width of current vop
 	int BUF_SIZE = (MAXW_IN_MB + 2);
 
-	List(type: bool, size=BUF_SIZE * 4) coded := [ false : for int i in Integers(1, BUF_SIZE * 4) ];
+	List(type: bool, size=BUF_SIZE * 4) coded := [ false : for int i in 1 .. BUF_SIZE * 4 ];
 
 	// Buffer to record if 8x8 block is coded or not (i.e. are there DCT coeffs in the bitstream for this block?
 	int(size=MB_COORD_SZ) ptr;

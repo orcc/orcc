@@ -1,9 +1,9 @@
 actor PredictedMB () int In0, int In1, int In2, int In3, int BestMode, int MBType ==> int Out:
 
-	List(type:int, size=256) Array0 := [0 : for int t in Integers(0,255)];
-	List(type:int, size=256) Array1 := [0 : for int t in Integers(0,255)];
-	List(type:int, size=256) Array2 := [0 : for int t in Integers(0,255)];
-	List(type:int, size=256) Array3 := [0 : for int t in Integers(0,255)];
+	List(type:int, size=256) Array0 := [0 : for int t in 0 .. 255];
+	List(type:int, size=256) Array1 := [0 : for int t in 0 .. 255];
+	List(type:int, size=256) Array2 := [0 : for int t in 0 .. 255];
+	List(type:int, size=256) Array3 := [0 : for int t in 0 .. 255];
 	
 	int i:=0;
 	int count:=0;

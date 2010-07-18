@@ -112,7 +112,7 @@ actor Sobel()
         [i - 1,   j  ], [i,   j  ], [i + 1,   j  ],
         [i - 1, j + 1], [i, j + 1], [i + 1, j + 1] ];
     
-    val := [ get_pixel(coord[k][0], coord[k][1]) : for int k in Integers(0, 8) ];
+    val := [ get_pixel(coord[k][0], coord[k][1]) : for int k in 0 .. 8 ];
   
     gx := - val[0] + val[2] - lshift(val[3], 1) + lshift(val[5], 1) - val[6] + val[8];
     gy := - val[0] - lshift(val[1], 1) - val[2] + val[6] + lshift(val[7], 1) + val[8];

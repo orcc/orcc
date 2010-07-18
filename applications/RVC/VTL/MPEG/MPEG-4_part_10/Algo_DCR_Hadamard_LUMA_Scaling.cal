@@ -52,7 +52,7 @@ Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
 
-import all caltrop.lib.BitOps;
+
 
 actor Algo_DCR_Hadamard_LUMA_Scaling ()
 		int (size=16) I, 
@@ -106,7 +106,7 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
 
   read_sl: action ScalingList:[SL] repeat 4*4 ==>
   do
-    t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in Integers(0,5), for int s in Integers(0,15) ];
+    t_LevelScale := [ SL[t_Index[s]] *t_normAdjust4x4[t*16 + s]:for int t in 0 .. 5, for int s in 0 .. 15 ];
   end
 
 
@@ -119,7 +119,7 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
     			  rshift( i[s] * t_LevelScale[16*qp_rem] + qp_sft, 6 - qp_per)
    				else
       			  lshift( i[s] * t_LevelScale[16*qp_rem], qp_per - 6)
-    			end : for int s in Integers(0,15) 
+    			end : for int s in 0 .. 15 
     	  ] ] repeat 16
 	end
 

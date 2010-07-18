@@ -39,7 +39,7 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-import all caltrop.lib.BitOps;
+
 actor Sequence () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A ,
 int(size=MB_COORD_SZ + 3) B , int(size=MB_COORD_SZ + 3) C :
 
@@ -83,7 +83,7 @@ int(size=MB_COORD_SZ + 3) B , int(size=MB_COORD_SZ + 3) C :
 	// values are passed on ports A, B, C.
 	int BUF_SIZE = (MAXW_IN_MB + 2);
 
-	List(type: bool, size=BUF_SIZE * 8) coded := [ false : for int i in Integers(1, BUF_SIZE * 8) ];
+	List(type: bool, size=BUF_SIZE * 8) coded := [ false : for int i in 1 .. BUF_SIZE * 8 ];
 
 	int(size=MB_COORD_SZ) ptr;
 

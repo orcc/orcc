@@ -38,7 +38,7 @@ ENDCOPYRIGHT
 // ACPred.cal
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
-import all caltrop.lib.BitOps;
+
 actor ACPred () int(size=SAMPLE_SZ) AC, int(size=MB_COORD_SZ + 3) PTR, int(size=3) START
 ==> int(size=SAMPLE_SZ) OUT :
 
@@ -62,8 +62,7 @@ actor ACPred () int(size=SAMPLE_SZ) AC, int(size=MB_COORD_SZ + 3) PTR, int(size=
 
 	// Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
 	// Add 4 address lines  so that we can store the left edge and top edge AC values (14 in all).
-	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE * 16) buf := [ 0 : for int k in Integers(1,
-	BUF_SIZE * 16) ];
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE * 16) buf := [ 0 : for int k in 1 .. BUF_SIZE * 16 ];
 
 	int(size=4) comp;
 

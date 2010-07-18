@@ -41,7 +41,7 @@ ENDCOPYRIGHT
 //
 // Each row of compensation data arrives as 3 32 bits numbers. This actor extracts
 // the 9 relevant horizontal pixels. This must take no more than 9 clocks for HD rate!
-import all caltrop.lib.BitOps;
+
 actor Unpack () int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI ==>
 int(size=PIX_SZ) DO :
 
@@ -116,7 +116,7 @@ int(size=PIX_SZ) DO :
 	end
 
 	cmd.other: action BTYPE:[ cmd ] ==>
-		/* debugggggggggg DO:[ [0:for i in Integers(1,81)] ] repeat 81 */
+		/* debugggggggggg DO:[ [0:for i in 1 .. 81] ] repeat 81 */
 	do
 		row := 9;
 		// skip extraction process

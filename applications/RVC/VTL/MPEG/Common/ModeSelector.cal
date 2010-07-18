@@ -1,6 +1,6 @@
 actor ModeSelector () int MBType, int SATD ==> int Mode, int Score:
 
-	List (type:int, size=4) scores := [0: for int t in Integers(0,3)];
+	List (type:int, size=4) scores := [0: for int t in 0 .. 3];
 	int score:=0;
 	int mode:=0;
 	int block:=0;

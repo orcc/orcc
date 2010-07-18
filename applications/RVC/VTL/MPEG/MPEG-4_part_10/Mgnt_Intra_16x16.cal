@@ -40,12 +40,12 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	int MB_WIDTH_LUMA   = 16;
 	int MB_WIDTH_CHROMA = 8;
 	//List that contains the neighbouring pixel of the current 16x16 Mb, from bottom to top then left to right 
-	List( type:uint(size=16), size=MB_WIDTH_MAX ) left_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH_MAX-1)];
-  	List( type:uint(size=16), size=MB_WIDTH_MAX + 4 ) top_16x16_edge := [ 0 : for int i in Integers( 0, MB_WIDTH_MAX+3)];
+	List( type:uint(size=16), size=MB_WIDTH_MAX ) left_16x16_edge := [ 0 : for int i in 0 .. MB_WIDTH_MAX-1];
+  	List( type:uint(size=16), size=MB_WIDTH_MAX + 4 ) top_16x16_edge := [ 0 : for int i in 0 .. MB_WIDTH_MAX+3];
   	uint(size=16) topLeft_16x16_edge := 0;
   
 	// Available edge for prediction [left, top, top left, top right]
-	List( type:uint(size=1), size=3 ) avail := [ 0 : for int i in Integers( 0, 2) ];
+	List( type:uint(size=1), size=3 ) avail := [ 0 : for int i in 0 .. 2 ];
 	
 	// Available 16x16 edge for prediction
 	uint(size=1) left_16x16_avail := 0;
@@ -54,7 +54,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 
   	//FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =45;
-	List( type:bool, size=PICWIDTH) is_intra := [false : for int i in Integers( 0, PICWIDTH-1)];
+	List( type:bool, size=PICWIDTH) is_intra := [false : for int i in 0 .. PICWIDTH-1];
 	uint(size=13) curr_pos:=0;
 	bool intra_top_left:=false;
 	
@@ -182,24 +182,24 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 		MB_WIDTH = MB_WIDTH_CHROMA
 	do
 		//Store left, top and top left border
-		left_16x16_edge := [v[s]:for int s in Integers(0,MB_WIDTH_CHROMA-1)];
+		left_16x16_edge := [v[s]:for int s in 0 .. MB_WIDTH_CHROMA-1];
 		topLeft_16x16_edge := v[MB_WIDTH_CHROMA];
-		top_16x16_edge := [v[s]:for int s in Integers(MB_WIDTH_CHROMA+1,2*MB_WIDTH_CHROMA)];
+		top_16x16_edge := [v[s]:for int s in MB_WIDTH_CHROMA+1 .. 2*MB_WIDTH_CHROMA];
 	end
   
 	//Receive the value of the 16x16 Mb neighbouring pixel from bottom to top, then corner, then left to right 
 	InitEdge_LUMA:action EDGE:[v] repeat 2*MB_WIDTH_LUMA+1 ==> 
 	do
 		//Store left, top and top left border
-		left_16x16_edge := [v[s]:for int s in Integers(0,MB_WIDTH_LUMA-1)];
+		left_16x16_edge := [v[s]:for int s in 0 .. MB_WIDTH_LUMA-1];
 		topLeft_16x16_edge := v[MB_WIDTH_LUMA];
-		top_16x16_edge := [v[s]:for int s in Integers(MB_WIDTH_LUMA+1,2*MB_WIDTH_LUMA)];
+		top_16x16_edge := [v[s]:for int s in MB_WIDTH_LUMA+1 .. 2*MB_WIDTH_LUMA];
 	end
    
 	//******************************* Processing ********************************************
  
 	//**** Select and send available edge ****
-	InitAvail:action ==> Avail:[ [ avail[s] : for int s in Integers(0,2) ] ] repeat 3
+	InitAvail:action ==> Avail:[ [ avail[s] : for int s in 0 .. 2 ] ] repeat 3
 	do
 		//edge available for left
 		avail[0] := left_16x16_avail;

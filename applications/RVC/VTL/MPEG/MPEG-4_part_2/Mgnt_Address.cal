@@ -12,7 +12,7 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Frame buffer address generation for motion compensation
-import all caltrop.lib.BitOps;
+
 actor Mgnt_Address (int INTRA,
 	int NEWVOP,
 	int MOTION,

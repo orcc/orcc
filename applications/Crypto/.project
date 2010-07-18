@@ -12,6 +12,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>net.sf.orcc.ui.OrccNature</nature>
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
 	</natures>
 </projectDescription>

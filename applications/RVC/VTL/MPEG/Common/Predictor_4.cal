@@ -1,7 +1,7 @@
 actor Predictor_4 () int In, int BlockType ==> int Out0, int Out1, int Out2, int
 Out3 :
 
-	List(type: int, size=13) AtoM := [ 128 : for int t in Integers(0, 12) ];
+	List(type: int, size=13) AtoM := [ 128 : for int t in 0 .. 12 ];
 
 	//BlockType=0	--> [ABCDIJKLEFGHM]
 	//BlockType=1	--> [ABCDXXXXEFGHX]

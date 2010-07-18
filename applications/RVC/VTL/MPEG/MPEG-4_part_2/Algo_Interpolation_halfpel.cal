@@ -10,7 +10,7 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Interpolation for motion compensation
-import all caltrop.lib.BitOps;
+
 actor Algo_Interpolation_halfpel () int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==>
 int(size=PIX_SZ) MOT :
 

@@ -27,11 +27,11 @@ actor Mgnt_IQ_Chroma()
 	lev2d: action CoefDCR_C:[ x ], CoefAC_C:[ y ] repeat 16 ==> Lev2d:[ buff ]
 		repeat 16
 	var
-		List(type: int(size=16), size=16) buff := [ 0 : for int s in Integers(0, 15)
+		List(type: int(size=16), size=16) buff := [ 0 : for int s in 0 .. 15
 		]
 	do
 		buff[0] := x;
-		foreach int i in Integers(1, 15) do
+		foreach int i in 1 .. 15 do
 			buff[i] := y[i];
 		end
 		Nb4x4 := Nb4x4 + 1;

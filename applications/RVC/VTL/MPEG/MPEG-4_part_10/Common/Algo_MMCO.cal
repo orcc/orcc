@@ -87,13 +87,13 @@ actor Algo_MMCO ()
 *
 */
 
-	List(type:uint(size=31), size=16) STList              := [  0    : for int s in Integers(0,15)];
-	List(type:bool         , size=16) ShortTermFalseFrame := [ false : for int s in Integers(0,15)];
-	List(type:int (size=32), size=16) LTList              := [ -1    : for int s in Integers(0,15)];
-	List(type:uint(size=31), size=16) DelListTab          := [  0    : for int s in Integers(0,15)];
+	List(type:uint(size=31), size=16) STList              := [  0    : for int s in 0 .. 15];
+	List(type:bool         , size=16) ShortTermFalseFrame := [ false : for int s in 0 .. 15];
+	List(type:int (size=32), size=16) LTList              := [ -1    : for int s in 0 .. 15];
+	List(type:uint(size=31), size=16) DelListTab          := [  0    : for int s in 0 .. 15];
 
-	List(type:int (size=32), size=32) FrameNumList        := [ -1    : for int s in Integers(0,31)];
-	List(type:int (size=32), size=32) PocList             := [  0    : for int s in Integers(0,31)];
+	List(type:int (size=32), size=32) FrameNumList        := [ -1    : for int s in 0 .. 31];
+	List(type:int (size=32), size=32) PocList             := [  0    : for int s in 0 .. 31];
 
 	int (size=6)  NbFrameDel       := 0;
 	uint(size=31) FrameNum         := 0;
@@ -140,7 +140,7 @@ actor Algo_MMCO ()
 			ValCurrPoc      := PicOrderCnt;
 			if(ValFrame_Num = 0 and PicOrderCnt = 0) then
 				ValIsIDR := true;
-				foreach int j in Integers(0,31)
+				foreach int j in 0 .. 31
 				do
 					FrameNumList[j] := -1;
 				end
@@ -171,7 +171,7 @@ actor Algo_MMCO ()
 						end
 						ShortTermCount := ShortTermCount - 1;
 					end
-					foreach int i in Integers(0,ShortTermCount - 1)
+					foreach int i in 0 .. ShortTermCount - 1
 					do
 						STList             [ShortTermCount - i] := STList             [ShortTermCount - i - 1];
 						ShortTermFalseFrame[ShortTermCount - i] := ShortTermFalseFrame[ShortTermCount - i - 1];
@@ -238,7 +238,7 @@ actor Algo_MMCO ()
 			LongTermFrameIdx := 0;
 			ShortTermCount   := 0;
 			LongTermCount    := 0;
-			LTList           := [-1 :for int s in Integers(0,15)];
+			LTList           := [-1 :for int s in 0 .. 15];
 			NbFrameDel       := 0;
 //println("\tMMCO IDR Pict");
 		end
@@ -290,7 +290,7 @@ actor Algo_MMCO ()
 			if(FrameNumST < 0) then
 				FrameNumST := FrameNumST + ValMaxFrameNum;
 			end
-			foreach int i in Integers( 0, ShortTermCount - 1 )
+			foreach int i in 0 .. ShortTermCount - 1 
 			do
 				if (STList[i] = FrameNumST) then 
 					idx := i;
@@ -302,7 +302,7 @@ actor Algo_MMCO ()
 					DelListTab[NbFrameDel] := FrameNumST;
 					NbFrameDel             := NbFrameDel + 1;
 				end
-				foreach int i in Integers(idx, ShortTermCount - 2)
+				foreach int i in idx .. ShortTermCount - 2
 				do
 					STList[i]              := STList[i+1];
 					ShortTermFalseFrame[i] := ShortTermFalseFrame[i+1];
@@ -343,14 +343,14 @@ actor Algo_MMCO ()
 			if(FrameNumST < 0) then
 				FrameNumST := FrameNumST + ValMaxFrameNum;
 			end
-			foreach int i in Integers(0, ShortTermCount-1)
+			foreach int i in 0 .. ShortTermCount-1
 			do
 				if (STList[i] = FrameNumST) then
 					idx := i;
 				end
 			end
 			if(idx != -1) then
-				foreach int i in Integers(idx, ShortTermCount - 2)
+				foreach int i in idx .. ShortTermCount - 2
 				do
 						STList[i]              := STList[i + 1];
 						ShortTermFalseFrame[i] := ShortTermFalseFrame[i + 1];
@@ -375,7 +375,7 @@ actor Algo_MMCO ()
 		guard 
 			opcode = 4
 		do
-			foreach int i in Integers(long_term_max_idx, 15)
+			foreach int i in long_term_max_idx .. 15
 			do
 				if (LTList[i] != -1) then
 //println("\tMMCO Del:"+LTList[i]);
@@ -397,12 +397,12 @@ actor Algo_MMCO ()
 		do
 			FrameNum        := 0;
 			ShortTermCount  := 0;
-			STList          := [-1 :for int s in Integers(0,16-1)];
+			STList          := [-1 :for int s in 0 .. 16-1];
 			LongTermCount   := 0;
-			LTList          := [-1 :for int s in Integers(0,16-1)];
+			LTList          := [-1 :for int s in 0 .. 16-1];
 			NbFrameDel      := 0;
 			ValIsIDR        := true;
-			foreach int j in Integers(0,31)
+			foreach int j in 0 .. 31
 			do
 				FrameNumList[j] := -1;
 			end
@@ -429,7 +429,7 @@ actor Algo_MMCO ()
 		var
 			uint(size=4) j := 0
 		do
-			foreach int i in Integers(0,ShortTermCount -1)
+			foreach int i in 0 .. ShortTermCount -1
 			do
 				if(STList[i] != FrameNum)then
 					STList[j] := STList[i];
@@ -438,7 +438,7 @@ actor Algo_MMCO ()
 					ShortTermCount := ShortTermCount - 1;
 				end
 			end
-			foreach int i in Integers(0,LongTermCount - 1)
+			foreach int i in 0 .. LongTermCount - 1
 			do
 				if(LTList[i] = FrameNum)then
 					LTList[i]     := -1;
@@ -455,7 +455,7 @@ actor Algo_MMCO ()
 					NbFrameDel             := NbFrameDel + 1;
 				end
 			end
-			foreach int i in Integers (0, ShortTermCount - 1)
+			foreach int i in 0 .. ShortTermCount - 1
 			do
 				STList             [ShortTermCount - i] := STList             [ShortTermCount - i - 1];
 				ShortTermFalseFrame[ShortTermCount - i] := ShortTermFalseFrame[ShortTermCount - i - 1];
@@ -474,7 +474,7 @@ actor Algo_MMCO ()
 		var
 			uint(size=4) j := 0
 		do
-			foreach int i in Integers(0,ShortTermCount -1)
+			foreach int i in 0 .. ShortTermCount -1
 			do
 				if(STList[i] != FrameNum)then
 					STList[j] := STList[i];
@@ -483,7 +483,7 @@ actor Algo_MMCO ()
 					ShortTermCount := ShortTermCount - 1;
 				end
 			end
-			foreach int i in Integers(0,LongTermCount - 1)
+			foreach int i in 0 .. LongTermCount - 1
 			do
 				if(LTList[i] = FrameNum)then
 					LTList[i]     := -1;
@@ -519,12 +519,12 @@ actor Algo_MMCO ()
 		do
 			//It will be modified when the front-end will be fixed !!!!!!
 			IdxNotFound := true;
-			foreach int i in Integers(0,NbFrameDel-1)
+			foreach int i in 0 .. NbFrameDel-1
 			do
 				IdxNotFound2 := IdxNotFound;
 				if(IdxNotFound)
 				then
-					foreach int j in Integers(0,31)
+					foreach int j in 0 .. 31
 					do
 						if(FrameNumList[j]   = DelListTab[i] and (PocList[j] != ValCurrPoc))then
 							FrameNumList[j] := -1;
@@ -568,7 +568,7 @@ actor Algo_MMCO ()
 				ValIdx := ValIdx + 1;
 			end
 */
-			foreach int i in Integers(0,31)
+			foreach int i in 0 .. 31
 			do
 				IdxNotFound2 := IdxNotFound;
 				if((FrameNumList[i] = -1 or i = 31) and (IdxNotFound)) then

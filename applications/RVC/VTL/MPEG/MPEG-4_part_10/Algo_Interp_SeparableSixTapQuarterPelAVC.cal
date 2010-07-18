@@ -3,7 +3,7 @@
 // Author: He-Yuan Lin
 //
 // Fractional luma sample interpolation for motion compensation of AVC
-import all caltrop.lib.BitOps;
+
 
 actor Algo_Interp_SeparableSixTapQuarterPelAVC () 
 		uint(size=16) Frac, int(size=16) RD,
@@ -22,8 +22,8 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
   int temp; 
   int temp2;
   uint(size=1) buf_done;  
-  List( type:int(size=16), size=441 ) inbuf := [ 0 : for int i in Integers( 0, 440) ];
-  List( type:int(size=32), size=6 ) half_pel := [ 0 : for int i in Integers( 0, 5) ];
+  List( type:int(size=16), size=441 ) inbuf := [ 0 : for int i in 0 .. 440 ];
+  List( type:int(size=32), size=6 ) half_pel := [ 0 : for int i in 0 .. 5 ];
   
   procedure compensate( )
   var

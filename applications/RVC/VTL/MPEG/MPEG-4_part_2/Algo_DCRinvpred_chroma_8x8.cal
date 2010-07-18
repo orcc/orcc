@@ -70,7 +70,7 @@
 // * Function dc_scaler() is now luminance specific. 
 // * In advance action, indices adjust after every component instead of 6 since now
 //   dealing with a single 8x8 block rather than 6 8x8 blocks.
-import all caltrop.lib.BitOps;
+
 actor Algo_DCRinvpred_chroma_8x8 () int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B,
 int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
 int(size=SAMPLE_SZ) QF_DC , int(size=MB_COORD_SZ) PTR , int(size=3) AC_PRED_DIR , bool
@@ -123,8 +123,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	// Pointer to current 8x8 block on current row                          
 	// using circular buffer addressing. Start at 4, since 0-3 are reserved.
 	// Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
-	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) dc_buf := [ DCVAL : for int k in Integers(1,
-	BUF_SIZE) ];
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) dc_buf := [ DCVAL : for int k in 1 .. BUF_SIZE ];
 
 	int(size=SAMPLE_SZ) dc_pred;
 
@@ -138,8 +137,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	int(size=SAMPLE_SZ) dc_val;
 
 	// Reconstructed DC coefficient  
-	List(type: int(size=QUANT_SZ), size=BUF_SIZE) buf_qp := [ 0 : for int k in Integers(1,
-	BUF_SIZE) ];
+	List(type: int(size=QUANT_SZ), size=BUF_SIZE) buf_qp := [ 0 : for int k in 1 .. BUF_SIZE ];
 
 	int(size=MB_COORD_SZ) mbwidth := 0;
 

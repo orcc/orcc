@@ -5,7 +5,7 @@
 // Description: This module splits a 4:2:0 chroma subsampled serial macroblock (YYYYUV)
 //              into its respective Y, U and V components.
 //
-import all caltrop.lib.BitOps;
+
 actor splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BTYPE ==> int(size=SAMPLE_SZ) Y ,
 int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 

@@ -78,7 +78,7 @@ actor Algo_BlockExpand_AVC ()
 	int (size=5) SZ_CHROMA_AC     = 16;
 
 	/* State Variable */
-	List(type:int(size=12), size=16000) ValCoeff := [ 0 : for int i in Integers(0,15)];
+	List(type:int(size=12), size=16000) ValCoeff := [ 0 : for int i in 0 .. 15];
 	uint(size=4) IdxValCoeff      := 0;
 
 	uint(size=8) LumaMBSize;
@@ -125,7 +125,7 @@ actor Algo_BlockExpand_AVC ()
 		do
 			ValCoeff[IdxValCoeff] := Val;
 			IdxValCoeff           := IdxValCoeff + 1;
-			foreach int j in Integers(0,ValRun - 1)
+			foreach int j in 0 .. ValRun - 1
 			do
 				ValCoeff[IdxValCoeff + j] := 0;
 			end
@@ -142,7 +142,7 @@ actor Algo_BlockExpand_AVC ()
 			int(size=12) buff
 		do
 			if(IdxValCoeff > 0) then
-				foreach int j in Integers(0, (IdxValCoeff -1)/2)
+				foreach int j in 0 .. (IdxValCoeff -1)/2
 				do
 					buff                      := ValCoeff[j];
 					ValCoeff[j]               := ValCoeff[IdxValCoeff - 1 - j];
@@ -159,7 +159,7 @@ actor Algo_BlockExpand_AVC ()
 			DC_ComponentSent = false,
 			LumaMBSize       = BLOCK_16x16
 		do	
-			foreach int j in Integers(IdxValCoeff, SZ_LUMA_DC_16X16 - 1)
+			foreach int j in IdxValCoeff .. SZ_LUMA_DC_16X16 - 1
 			do
 				ValCoeff[j] := 0;
 			end
@@ -182,7 +182,7 @@ actor Algo_BlockExpand_AVC ()
 			DC_ComponentSent = true,
 			LumaMBSize       = BLOCK_16x16
 		do
-			foreach int j in Integers(IdxValCoeff, SZ_LUMA_AC_16X16 - 1)
+			foreach int j in IdxValCoeff .. SZ_LUMA_AC_16X16 - 1
 			do
 				ValCoeff[j] := 0;
 			end
@@ -216,7 +216,7 @@ actor Algo_BlockExpand_AVC ()
 			Component   = Y_COMPONENT,
 			LumaMBSize != BLOCK_16x16
 		do
-			foreach int j in Integers(IdxValCoeff, SZ_LUMA_AC_4X4 - 1)
+			foreach int j in IdxValCoeff .. SZ_LUMA_AC_4X4 - 1
 			do
 				ValCoeff[j] := 0;
 			end
@@ -249,7 +249,7 @@ actor Algo_BlockExpand_AVC ()
 			Component        != Y_COMPONENT,
 			DC_ComponentSent  = false
 		do
-			foreach int j in Integers(IdxValCoeff, SZ_CHROMA_DC - 1)
+			foreach int j in IdxValCoeff .. SZ_CHROMA_DC - 1
 			do
 				ValCoeff[j] := 0;
 			end
@@ -276,7 +276,7 @@ actor Algo_BlockExpand_AVC ()
 			Component        != Y_COMPONENT,
 			DC_ComponentSent  = true
 		do	
-			foreach int j in Integers(IdxValCoeff, SZ_CHROMA_AC - 1)
+			foreach int j in IdxValCoeff .. SZ_CHROMA_AC - 1
 			do
 				ValCoeff[j] := 0;
 			end

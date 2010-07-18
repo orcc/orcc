@@ -17,7 +17,7 @@
 
 // Interpolation for motion compensation
 
-import all caltrop.lib.BitOps;
+
 
 actor E___Algo_Interpolation_halfpel () int(size=9) RD, int(size=4) halfpel ==> int(size=PIX_SZ) MOT :
 
@@ -29,9 +29,9 @@ actor E___Algo_Interpolation_halfpel () int(size=9) RD, int(size=4) halfpel ==> 
     int rdRow,
     int motRow,
     int k,
-    List(type:int(size=PIX_SZ), size=64) mot := [0 : for int i in Integers(0,63)]
+    List(type:int(size=PIX_SZ), size=64) mot := [0 : for int i in 0 .. 63]
   do
-    // mot := [ rd[9*j+k] : for k in Integers(0,7), for j in Integers(0,7)]
+    // mot := [ rd[9*j+k] : for k in 0 .. 7, for j in 0 .. 7]
     rdRow:=0;
     motRow:=0;
     while (motRow<64) do
@@ -53,10 +53,10 @@ actor E___Algo_Interpolation_halfpel () int(size=9) RD, int(size=4) halfpel ==> 
     int rdRow,
     int motRow,
     int k,
-    List(type:int(size=PIX_SZ), size=64) mot := [0 : for int i in Integers(0,63)]
+    List(type:int(size=PIX_SZ), size=64) mot := [0 : for int i in 0 .. 63]
   do
     // mot := [ rshift(rd[9*j+k] + rd[9*(j+1)+k] + round, 1) 
-    //          : for k in Integers(0,7), for j in Integers(0,7)]
+    //          : for k in 0 .. 7, for j in 0 .. 7]
     rdRow:=0;
     motRow:=0;
     while (motRow<64) do
@@ -78,10 +78,10 @@ actor E___Algo_Interpolation_halfpel () int(size=9) RD, int(size=4) halfpel ==> 
     int rdRow,
     int motRow,
     int k,
-    List(type:int(size=PIX_SZ), size=64) mot := [0 : for int i in Integers(0,63)]
+    List(type:int(size=PIX_SZ), size=64) mot := [0 : for int i in 0 .. 63]
   do
     // mot := [ rshift(rd[9*j+k] + rd[9*j+k+1] + round, 1) 
-    //          : for k in Integers(0,7), for j in Integers(0,7)]
+    //          : for k in 0 .. 7, for j in 0 .. 7]
     rdRow:=0;
     motRow:=0;
     while (motRow<64) do
@@ -104,11 +104,11 @@ actor E___Algo_Interpolation_halfpel () int(size=9) RD, int(size=4) halfpel ==> 
     int rdRow,
     int motRow,
     int k,
-    List(type:int(size=PIX_SZ), size=64) mot := [0 : for int i in Integers(0,63)]
+    List(type:int(size=PIX_SZ), size=64) mot := [0 : for int i in 0 .. 63]
   do
     // mot := [ rshift(rd[9*j+k] + rd[9*(j+1)+k]
     //                 rd[9*(j+1)+k] + rd[9*(j+1)+k+1] + round, 2) 
-    //          : for k in Integers(0,7), for j in Integers(0,7)]
+    //          : for k in 0 .. 7, for j in 0 .. 7]
     rdRow:=0;
     motRow:=0;
     while (motRow<64) do

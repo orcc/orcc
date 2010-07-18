@@ -1,4 +1,4 @@
-import all caltrop.lib.BitOps;
+
 actor MPEG4_algo_IAP () int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ +
 3) PTR, int(size=3) AC_PRED_DIR ==> int(size=SAMPLE_SZ) QF_AC :
 
@@ -29,7 +29,7 @@ actor MPEG4_algo_IAP () int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ +
 
   // Add 4 address lines  so that we can store the left edge and top edge AC values (14 in all).
   List(type: int(size=SAMPLE_SZ), size=BUF_SIZE * 16) buf := [ 0 : for int k in
-  Integers(1, BUF_SIZE * 16) ];
+  1 .. BUF_SIZE * 16 ];
 
   int(size=4) comp;
 

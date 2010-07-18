@@ -18,7 +18,7 @@
 
 // 
 
-import all caltrop.lib.BitOps;
+
 
 actor Framebuf_w_Address_16X16 (int INTRA,
 	int NEWVOP,
@@ -65,7 +65,7 @@ actor Framebuf_w_Address_16X16 (int INTRA,
 
   // Removed initializer (otherwise: huge XLIM document results)
   // List(type:int(size=PIX_SZ), size=BUFFER_SIZE) frameBuffer = 
-  // [ 0 : for i in Integers(1,BUFFER_SIZE)]
+  // [ 0 : for i in 1 .. BUFFER_SIZE]
   
   // properties of the VOP
   int vop_width := 0;             // width in macro blocks
@@ -205,7 +205,7 @@ actor Framebuf_w_Address_16X16 (int INTRA,
   read_fb: action ==> RD:[rd] repeat 81
   guard outstanding_writes < max_outstanding_writes
   var
-    List(type:int(size=9), size=81) rd := [0: for int k in Integers(1,81)],
+    List(type:int(size=9), size=81) rd := [0: for int k in 1 .. 81],
     int x = mbx_read*SAMPLES_PER_MB + 8*bitand(comp_read,1) + mvx,
     int y := mby_read*SAMPLES_PER_MB + 8*rshift(comp_read,1) + mvy,
     int clip_left := 0,

@@ -4,7 +4,7 @@
 //
 // Fractional chroma sample interpolation for motion compensation of AVC
 
-import all caltrop.lib.BitOps;
+
 
 actor Algo_Interp_EighthPelBilinear() 
 		int(size=4) Frac, 
@@ -23,7 +23,7 @@ actor Algo_Interp_EighthPelBilinear()
   int width;
   int height;
 
-  List( type:int(size=16), size=289 ) inbuf := [ 0 : for int i in Integers( 0, 288) ];
+  List( type:int(size=16), size=289 ) inbuf := [ 0 : for int i in 0 .. 288 ];
 
   procedure compensate( )
   begin  

@@ -1,6 +1,6 @@
 actor Transposer () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, int Out2, int Out3:
 	
-	List(type:int, size=16) Array0 := [0 : for int i in Integers(1,16)];
+	List(type:int, size=16) Array0 := [0 : for int i in 1 .. 16];
 	
 
 	int a:=0;

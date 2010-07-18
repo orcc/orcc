@@ -62,7 +62,7 @@ actor Mgnt_IQ_INTRA16x16()
 			List(type: int(size=16), size=16) BlockMerged
 		do
 			BlockMerged[0] := DcCoeff;
-			foreach int i in Integers(1, 15) do
+			foreach int i in 1 .. 15 do
 				BlockMerged[i] := AcCoeff[i];
 			end
 			NbBlock := NbBlock + 1;
@@ -78,7 +78,7 @@ actor Mgnt_IQ_INTRA16x16()
 			List(type: int(size=16), size=16) BlockMerged
 		do
 			BlockMerged[0] := DcCoeff;
-			foreach int i in Integers(1, 15) do
+			foreach int i in 1 .. 15 do
 				BlockMerged[i] := AcCoeff[i];
 			end
 			NbBlock := 0;

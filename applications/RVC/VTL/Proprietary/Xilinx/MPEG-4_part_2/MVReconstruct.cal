@@ -39,7 +39,7 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-import all caltrop.lib.BitOps;
+
 actor MVReconstruct (// Maximum image width (in units of macroblocks) that the decoder can handle.
 	// It is used to allocate line buffer space at compile time.
 ) int(size=BTYPE_SZ) BTYPE, int(size=MV_SZ) MVIN, int(size=MB_COORD_SZ + 3) A ==>
@@ -88,7 +88,7 @@ int(size=MV_SZ) MV :
 
 	int(size=MB_COORD_SZ + 3) ptr;
 
-	List(type: int(size=MV_SZ), size=BUF_SIZE) buf := [ 0 : for int i in Integers(1, BUF_SIZE) ];
+	List(type: int(size=MV_SZ), size=BUF_SIZE) buf := [ 0 : for int i in 1 .. BUF_SIZE ];
 
 	int(size=MV_SZ) mv_rsize;
 

@@ -3,7 +3,7 @@
 // Author Christophe Lucarz (christophe.lucarz@epfl.ch)
 //
 // Description for each block a couple (x,y) is associated, the coordinates of the motion vector. The x coordinate arrives first, followed by the Y  coordinate. This splitter send the 8 first token for the Y component (4 block  2 tokens), then, the 9th and 10th token to the U component and the 11th and  12th token to the U component 
-import all caltrop.lib.BitOps;
+
 actor splitter_MV () int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE ==> int(size=MV_SZ) Y ,
 int(size=MV_SZ) U , int(size=MV_SZ) V :
 

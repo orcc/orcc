@@ -14,7 +14,7 @@
 // Author: Ghislain Roquier(ghislain.roquier@epfl.ch)
 // Rewrote the actor at block level
 // The actor has now the SDF property
-import all caltrop.lib.BitOps;
+
 actor MPEG4_algo_Interpolation_halfpel () int(size=PIX_SZ) RD,
 int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
 
@@ -49,12 +49,12 @@ int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
 
 	start: action halfpel:[ f ], RD:[ d ] repeat 81 ==> MOT:[ o ] repeat 64
 	var
-		List(type: int, size=64) o := [ 0 : for int n in Integers(0, 63) ]
+		List(type: int, size=64) o := [ 0 : for int n in 0 .. 63 ]
 	do
 		flags := rshift(f, 1);
 		round := bitand(f, 1);
-		foreach int i in Integers(0, 7) do
-			foreach int j in Integers(0, 7) do
+		foreach int i in 0 .. 7 do
+			foreach int j in 0 .. 7 do
 				o[8 * i + j] := compensate(d[9 * i + j], d[9 * i + j + 1], d[9 * (i + 1) +
 				j], d[9 * (i + 1) + j + 1]);
 			end

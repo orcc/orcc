@@ -40,7 +40,7 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 // MPEG-4 inverse quantization function
-import all caltrop.lib.BitOps;
+
 actor Dequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC, int(size=QUANT_SZ) QP
 ==> int(size=SAMPLE_SZ) OUT :
 

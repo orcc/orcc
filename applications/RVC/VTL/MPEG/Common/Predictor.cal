@@ -1,9 +1,9 @@
 actor Predictor () int In, int MBType ==> int Out0, int Out1, int Out2, int Out3
 :
 
-	List(type: int, size=16) prevRow := [ 0 : for int t in Integers(0, 15) ];
+	List(type: int, size=16) prevRow := [ 0 : for int t in 0 .. 15 ];
 
-	List(type: int, size=16) prevCol := [ 0 : for int t in Integers(0, 15) ];
+	List(type: int, size=16) prevCol := [ 0 : for int t in 0 .. 15 ];
 
 	int count := 0;
 

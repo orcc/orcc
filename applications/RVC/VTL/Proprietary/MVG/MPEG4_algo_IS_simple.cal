@@ -21,7 +21,7 @@
 // Differs from original IS actor by lacking the read_write action
 // that complicates the actor unnecessarily 
 
-import all caltrop.lib.BitOps;
+
 
 actor MPEG4_algo_IS_simple () int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS_AC ==> int(size=SAMPLE_SZ) PQF_AC :
 
@@ -50,7 +50,7 @@ actor MPEG4_algo_IS_simple () int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS
   int(size=9) addr;			//Inverse Scan base address from list Scanmode for current block of 64 Ac coeffs --> 0;64;128 // JWJ: increased size of addr
   int(size=3) add_buf;		//Inverse Scan for next block of 64 Ac coeffs 0;1;2
 
-  List( type:int(size=SAMPLE_SZ), size=BUF_SIZE ) buf := [ 0 : for int k in Integers(1,BUF_SIZE) ];	//Stores incoming Ac coeffs 128 divided to 64::64
+  List( type:int(size=SAMPLE_SZ), size=BUF_SIZE ) buf := [ 0 : for int k in 1 .. BUF_SIZE ];	//Stores incoming Ac coeffs 128 divided to 64::64
   bool half := false;		//flag to change buffer
 
   function wa() --> int :

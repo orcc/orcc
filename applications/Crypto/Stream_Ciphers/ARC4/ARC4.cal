@@ -22,8 +22,8 @@
 actor ARC4() uint(size=8) IP1_Key, uint(size=8) IP2_Text ==> uint(size=8) OP:
 
 	uint KEY_SIZE_MAX = 256; // maximum key size (in byte)
-	List(type:uint(size=8), size=KEY_SIZE_MAX) key := [0: for int a in Integers(1,KEY_SIZE_MAX)];
-	List(type:uint(size=8), size=256) S := [a: for int a in Integers(0,255)]; // S-box
+	List(type:uint(size=8), size=KEY_SIZE_MAX) key := [0: for int a in 1 .. KEY_SIZE_MAX];
+	List(type:uint(size=8), size=256) S := [a: for int a in 0 .. 255]; // S-box
 
 	// Two flags controlling firings of different actions.
 	bool keySizeReceived := false;
@@ -56,7 +56,7 @@ actor ARC4() uint(size=8) IP1_Key, uint(size=8) IP2_Text ==> uint(size=8) OP:
 		if (keyCounter = keySize) then
 			keyReceived := true;
 			b := 0;
-			foreach int a in Integers(0,255) do
+			foreach int a in 0 .. 255 do
 				b := (b + S[a] + key[a mod keySize]) mod 256;
 				swap(a,b);
 			end

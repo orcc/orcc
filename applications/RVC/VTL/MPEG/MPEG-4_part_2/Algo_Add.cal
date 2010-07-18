@@ -11,7 +11,7 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Add motion and texture to produce pixels
-import all caltrop.lib.BitOps;
+
 actor Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE
 ==> int(size=PIX_SZ) VID :
 
@@ -64,7 +64,7 @@ actor Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ)
 			else
 				tex[i] + mot[i]
 			end
-		end : for int i in Integers(0, 63) ] ] repeat 64
+		end : for int i in 0 .. 63 ] ] repeat 64
 	end
 
 	schedule fsm cmd :

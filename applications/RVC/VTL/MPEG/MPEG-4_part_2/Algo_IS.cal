@@ -20,7 +20,7 @@
 // write_only -->Ac in buf --> PQF_AC in raster order; fired only when there are on fresh tokens on AC_PRED_DIR
 // read_write -->tokens on QFS_AC --> buf ; AC coeffs in buf --> PQF_AC; fired only when buf is full and tokens are available on AC_PRED_DIR
 // done --> done reading or writing or both (64 AC coeffs) --> fired when count is 64
-import all caltrop.lib.BitOps;
+
 actor Algo_IS () int(size=3) AC_PRED_DIR, int(size=SAMPLE_SZ) QFS_AC ==>
 int(size=SAMPLE_SZ) PQF_AC :
 
@@ -49,8 +49,7 @@ int(size=SAMPLE_SZ) PQF_AC :
 	int(size=3) add_buf;
 
 	//Inverse Scan for next block of 64 Ac coeffs 0;1;2
-	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) buf := [ 0 : for int k in Integers(1, BUF_SIZE
-	) ];
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE) buf := [ 0 : for int k in 1 .. BUF_SIZE ];
 
 	//Stores incoming Ac coeffs 128 divided to 64::64
 	bool half := false;
