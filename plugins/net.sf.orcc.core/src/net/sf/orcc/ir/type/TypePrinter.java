@@ -79,7 +79,7 @@ public class TypePrinter implements TypeVisitor {
 	@Override
 	public void visit(TypeList type) {
 		builder.append("List(type:");
-		builder.append(type.getType().toString());
+		builder.append(String.valueOf(type.getType()));
 		builder.append(", size=");
 		builder.append(type.getSize());
 		builder.append(")");
