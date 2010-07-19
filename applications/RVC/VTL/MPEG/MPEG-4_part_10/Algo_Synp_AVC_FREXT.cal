@@ -279,7 +279,7 @@ actor Algo_Synp_AVC_FREXT()
 	function IS_B_Direct_8x8() --> bool: slice_type = SLICE_TYPE_B and sub_mb_type[mbPartIdx] = 0 end
 	function IS_B_Direct_16x16_CABAC(int mbAddr) --> bool: slice_type = SLICE_TYPE_B and mbTab[mbAddr][2] = 0 end
 	function IS_IPCM_Tab(int Addr, int MbType) -->bool: if Addr < 0 then false else mbTab[Addr][MbType] = 25 end end
-	
+	function TestSignificantCoeffFlag(int Addr, int Val) --> bool: if Addr < 0 then false else significant_coeff_flag[Addr] = Val end end
 	//Entropie decoding
 	function IS_CAVLC() --> bool: entropy_coding_mode_flag[pps_id] = 0 end
 	function IS_CABAC() --> bool: entropy_coding_mode_flag[pps_id] = 1 end
@@ -9413,7 +9413,7 @@ end
 	//for( i = numCoeff - 2; i >= 0; i-- )
 	Residual_block_update_coeffLevel_start: action ==>
 	guard
-		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1
+		blCabacIdx >= 0 and TestSignificantCoeffFlag(blCabacIdx, 1)
 	do
 		//Read coeff_abs_level_minus1[ numCoeff - 1 ]
 		GetCabacSyntaxElement(CABAC_COEFF_ABS_LEVEL_MINUS1);
@@ -9422,7 +9422,7 @@ end
 	
 	Residual_block_update_coeffLevel_read: action ==>
 	guard
-		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 1 and cabac_end()
+		blCabacIdx >= 0 and TestSignificantCoeffFlag(blCabacIdx, 1) and cabac_end()
 	do
 		coeff_abs_level_minus1[ blCabacIdx ] := cabac_value();	
 		
@@ -9434,7 +9434,7 @@ end
 	
 	Residual_block_update_coeffLevel_not_read: action ==> 
 	guard
-		blCabacIdx >= 0 and significant_coeff_flag[ blCabacIdx ] = 0
+		blCabacIdx >= 0 and TestSignificantCoeffFlag(blCabacIdx, 0)
 	do
 		blCabacIdx := blCabacIdx - 1;
 	end
