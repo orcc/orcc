@@ -416,21 +416,18 @@ public class ActorMerger implements INetworkTransformation {
 							+ proc.getName());
 					BlockNode blkNode = new BlockNode(procedure);
 
-					List<Expression> callArguments = new ArrayList<Expression>();
-					Expression binopExpr = null;
-					callArguments = addCallArguments(actions.get(0), vertex);
-
-					if (index > 0) {
-						binopExpr = new BinaryExpr(new VarExpr(new Use(
-								indexes.get(index - 1))), BinaryOp.PLUS,
-								new IntExpr(1),
-								IrFactory.eINSTANCE.createTypeInt(32));
-					}
+					List<Expression> callArguments = addCallArguments(
+							actions.get(0), vertex);
 
 					blkNode.add(new Call(new Location(), null, proc,
 							callArguments));
 
 					if (index > 0) {
+						Expression binopExpr = new BinaryExpr(new VarExpr(
+								new Use(indexes.get(index - 1))),
+								BinaryOp.PLUS, new IntExpr(1),
+								IrFactory.eINSTANCE.createTypeInt(32));
+
 						blkNode.add(new Assign(indexes.get(index - 1),
 								binopExpr));
 					}

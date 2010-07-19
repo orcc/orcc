@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -335,10 +334,10 @@ public class NetworkPartitioner {
 				Connection conn = new Connection(srcPort, tgtPort,
 						connection.getAttributes());
 
-				Vertex srcVertex = topHierNetworkVertices
-						.get(partNames.get(src.getInstance()).get(0));
-				Vertex tgtVertex = topHierNetworkVertices
-						.get(partNames.get(tgt.getInstance()).get(0));
+				Vertex srcVertex = topHierNetworkVertices.get(partNames.get(
+						src.getInstance()).get(0));
+				Vertex tgtVertex = topHierNetworkVertices.get(partNames.get(
+						tgt.getInstance()).get(0));
 
 				graph.addEdge(srcVertex, tgtVertex, conn);
 			}
@@ -365,13 +364,17 @@ public class NetworkPartitioner {
 	}
 
 	public boolean hasThreadParallelism() {
-		int size = 0;
-		Iterator<List<String>> it = partNames.values().iterator();
-		size = it.next().size();
+		boolean hasThreadParallelism = false;
 
-		updatePartNames();
+		for (List<String> stringList : partNames.values()) {
+			hasThreadParallelism |= stringList.size() > 1;
+		}
 
-		return size > 1;
+		if (hasThreadParallelism) {
+			updatePartNames();
+		}
+
+		return hasThreadParallelism;
 	}
 
 }
