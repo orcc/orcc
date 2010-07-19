@@ -152,11 +152,6 @@ Actor_Exec(actor) ::= <<
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       $actor.outputs.list: Actor_out()$    --
     elsif rising_edge(clock) then
-$
-if(actor.initializes)
-      $$actor.initializes: action()$$
-endif
-$
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       --  
       $schedulingTest(actor.actions)$
@@ -176,11 +171,6 @@ Actor_Exec_FSM(actor) ::= <<
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       $actor.outputs.list: Actor_out()$    --
     elsif rising_edge(clock) then
-$
-if(actor.initializes)
-      $$actor.initializes: action()$$
-endif
-$
       $actor.outputs.list: fifo_out_init(); separator="\n"$
       --     
       $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$   
@@ -265,15 +255,6 @@ if(variable.constantValue)
 $$declareConst(variable)$$
   endif
   $$
-endif
-$$
-if(variable.type.list)
-$$
-  if(variable.assignable)
-  $
-$variable$ <= $Constant(variable.constantValue)$;$\n$$
-  endif
-$$
 endif
 $
 

@@ -25,7 +25,6 @@ $
 >>
 
 printSigInput(port) ::= <<
-
 $
 if(port.type.bool)
 $signal $instance.id$_$port.name$_data_in   : std_logic;
