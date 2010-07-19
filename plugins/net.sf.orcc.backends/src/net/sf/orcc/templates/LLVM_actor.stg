@@ -263,7 +263,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor) ::= <<
+actor(actor, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Generated from "$actor.name$"
 declare i32 @printf(i8* noalias , ...) nounwind 

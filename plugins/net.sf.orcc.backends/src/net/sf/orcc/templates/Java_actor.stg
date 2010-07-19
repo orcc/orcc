@@ -313,7 +313,7 @@ public int schedule() {
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor) ::= <<
+actor(actor, options) ::= <<
 /**
  * Generated from "$actor.name$"
  */

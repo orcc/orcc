@@ -247,7 +247,7 @@ $instances: printNetwork(); separator="\n"$
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
-network(debugFifos, fifoSize, network) ::= <<
+network(debugFifos, fifoSize, network, options) ::= <<
 ------------------------------------------------------------------------------
 -- Generated from $network.name$ actor
 ------------------------------------------------------------------------------

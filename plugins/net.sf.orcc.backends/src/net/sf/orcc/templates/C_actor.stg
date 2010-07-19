@@ -8,6 +8,15 @@ extern struct fifo_$port.type$_s *$instance.id$_$port.name$;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// FIFO trace
+///////////////////////////////////////////////////////////////////////////////
+
+trace(port) ::= <<
+extern FILE* trace_$instance.id$_$port.name$;
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -180,7 +189,9 @@ $write.target$ = fifo_$write.port.type$_write($instance.id$_$write.port$, $write
 >>
 
 WriteEnd(writeEnd) ::= <<
-
+$if(options.("net.sf.orcc.backends.enableTrace"))$
+fifo_$writeEnd.port.type$_trace($instance.id$_$writeEnd.port$, trace_$instance.id$_$writeEnd.port$, $writeEnd.numTokens$);
+$endif$
 fifo_$writeEnd.port.type$_write_end($instance.id$_$writeEnd.port$, $writeEnd.numTokens$);
 >>
 
@@ -421,7 +432,7 @@ PrintHierarchicalPath(path) ::= <<
 $path; separator="/"$
 >>
 
-instance(instance) ::= <<
+instance(instance, options) ::= <<
 // /$first(instance.hierarchicalClass)$/$PrintHierarchicalPath(instance.hierarchicalId)$
 // Source file is "$instance.actor.file$"
 
@@ -430,6 +441,9 @@ instance(instance) ::= <<
 
 #include "fifo.h"
 #include "orcc_util.h"
+$if(options.("net.sf.orcc.backends.enableTrace"))$
+#include "trace.h"
+$endif$
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
@@ -437,6 +451,13 @@ $instance.actor.inputs.list: fifo()$
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
 $instance.actor.outputs.list: fifo()$
+
+$if(options.("net.sf.orcc.backends.enableTrace"))$
+////////////////////////////////////////////////////////////////////////////////
+// File for fifo Trace 
+$instance.actor.outputs.list: trace()$
+$endif$
+
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance
 $parameters(instance.parameters)$

@@ -38,7 +38,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -119,7 +121,7 @@ public abstract class AbstractBackend implements Backend {
 	/**
 	 * the configuration used to launch this back-end.
 	 */
-	protected ILaunchConfiguration configuration;
+	private ILaunchConfiguration configuration;
 
 	/**
 	 * Fifo size used in backend.
@@ -325,6 +327,27 @@ public abstract class AbstractBackend implements Backend {
 
 		try {
 			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
+	}
+
+	/**
+	 * Returns a map containing the backend attributes in this launch
+	 * configuration. Returns an empty map if the backend configuration has no
+	 * attributes.
+	 * 
+	 * @return a map of attribute keys and values.
+	 * @throws OrccException
+	 */
+	@SuppressWarnings("unchecked")
+	final public Map<String, Object> getAttributes() throws OrccException {
+		if (configuration == null) {
+			return new HashMap<String, Object>();
+		}
+
+		try {
+			return configuration.getAttributes();
 		} catch (CoreException e) {
 			throw new OrccException("could not read configuration", e);
 		}

@@ -15,6 +15,9 @@
          <option
                id="net.sf.orcc.backends.newScheduler">
          </option>
+         <option
+               id="net.sf.orcc.backends.enableTrace">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.java.JavaBackendImpl"
@@ -133,6 +136,14 @@
                         workspace="true">
                   </browseFile>
                </option>
+            </checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="Enable traces in fifo"
+               id="net.sf.orcc.backends.enableTrace"
+               name="Enable trace">
+            <checkBox>
             </checkBox>
          </option>
    </extension>

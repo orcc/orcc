@@ -417,7 +417,7 @@ $stateVars : ListStateVarInitialization()$
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor) ::= <<
+actor(actor, options) ::= <<
 
 #include "$actor.name$.h"
 

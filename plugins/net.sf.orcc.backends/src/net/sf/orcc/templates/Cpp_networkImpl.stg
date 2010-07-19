@@ -99,7 +99,7 @@ $instances: initializeInstance(); separator=",\n"$
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
-network(debugFifos, fifoSize, network) ::= <<
+network(debugFifos, fifoSize, network, options) ::= <<
 
 $printMain(net=network)$
 

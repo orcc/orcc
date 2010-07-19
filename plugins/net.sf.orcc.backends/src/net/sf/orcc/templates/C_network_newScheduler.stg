@@ -79,7 +79,7 @@ $instances: fillActorStruct()$
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
-network(debugFifos, fifoSize, network) ::= <<
+network(debugFifos, fifoSize, network, options) ::= <<
 // Generated from "$network.name$"
 
 #include <locale.h>

@@ -210,7 +210,7 @@ $parameters: { k | int $k$;}; separator="\n"$
 // Actor
 ///////////////////////////////////////////////////////////////////////////////
 
-actor(actor) ::= <<
+actor(actor, options) ::= <<
 
 #ifndef __ACTOR_$actor.name$_H__
 #define __ACTOR_$actor.name$_H__

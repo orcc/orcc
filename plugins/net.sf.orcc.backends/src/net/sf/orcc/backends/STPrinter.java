@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Locale;
+import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
@@ -96,6 +97,8 @@ public final class STPrinter {
 
 	private Class<? extends TypePrinter> typePrinter;
 
+	private Map<String, Object> options;
+
 	/**
 	 * Creates a new printer.
 	 */
@@ -111,6 +114,16 @@ public final class STPrinter {
 	 */
 	public STPrinter(boolean debugMode) {
 		this.debugMode = debugMode;
+	}
+
+	/**
+	 * Returns a map of options corresponding to attribute of the selected
+	 * backend.
+	 * 
+	 * @return a map of options
+	 */
+	public Map<String, Object> getOptions() {
+		return options;
 	}
 
 	/**
@@ -170,11 +183,13 @@ public final class STPrinter {
 			if (group.debug) {
 				DebugST template = (DebugST) group.getInstanceOf("actor");
 				template.add("actor", actor);
+				template.add("options", options);
 				template.inspect();
 			} else {
 				ST template = group.getInstanceOf("actor");
 				template.add("actor", actor);
-
+				template.add("options", options);
+				
 				byte[] b = template.render(80).getBytes();
 				OutputStream os = new FileOutputStream(fileName);
 				os.write(b);
@@ -200,6 +215,7 @@ public final class STPrinter {
 			ST template = group.getInstanceOf("instance");
 
 			template.add("instance", instance);
+			template.add("options", options);
 
 			byte[] b = template.render(80).getBytes();
 			OutputStream os = new FileOutputStream(fileName);
@@ -233,6 +249,7 @@ public final class STPrinter {
 		template.add("debugFifos", debugFifos);
 		template.add("network", network);
 		template.add("fifoSize", fifoSize);
+		template.add("options", options);
 
 		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
@@ -242,6 +259,16 @@ public final class STPrinter {
 
 	public void setExpressionPrinter(Class<? extends ExpressionPrinter> printer) {
 		this.expressionPrinter = printer;
+	}
+
+	/**
+	 * Set the map of options for the selected backend.
+	 * 
+	 * @param options
+	 *            : a map of options
+	 */
+	public void setOptions(Map<String, Object> options) {
+		this.options = options;
 	}
 
 	public void setTypePrinter(Class<? extends TypePrinter> printer) {

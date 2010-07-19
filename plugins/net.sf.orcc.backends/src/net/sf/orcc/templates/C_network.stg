@@ -85,6 +85,49 @@ allocateFifos(edges) ::= <<
 $edges: allocateFifo()$
 >>
 
+
+///////////////////////////////////////////////////////////////////////////////
+// assigns Traces
+doDeclareTrace(source, sourcePort) ::= <<
+DECLARE_TRACE($source.id$_$sourcePort.name$)
+>>
+
+
+tryDeclareTrace(edge, src, tgt) ::= <<
+$if (src.instance)$
+$doDeclareTrace(
+  source=src.instance, sourcePort=edge.source
+  )$$endif$
+>>
+
+declareTrace(edge) ::= <<
+$tryDeclareTrace(edge=edge, src=network.sourceMap.(edge))$
+>>
+
+doAssignTrace(source, sourcePort) ::= <<
+trace_$source.id$_$sourcePort.name$= fopen("$source.id$_$sourcePort.name$_trace.txt", "w");
+>>
+
+tryAssignTrace(edge, src, tgt) ::= <<
+$if (src.instance)$
+$doAssignTrace(
+  source=src.instance, sourcePort=edge.source
+  )$$endif$
+>>
+
+assignTrace(edge) ::= <<
+$tryAssignTrace(edge=edge, src=network.sourceMap.(edge))$
+>>
+
+declareTraces(edges) ::= <<
+$edges: declareTrace()$
+
+void assignTrace(){
+	$edges: assignTrace()$
+}
+>>
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
@@ -147,6 +190,16 @@ printf("$instance.id$_scheduler: %i\n", si.num_firings);
 #endif
 >>
 
+openTrace(edge, srcPort) ::= <<
+$edge.instance.id$_$srcPort$->pFile = fopen ("$edge.instance.id$_$srcPort$_trace.txt","w");
+>>
+
+setTraceFile(connection) ::= <<
+$openTrace(edge=network.sourceMap.(connection), srcPort=connection.source)$
+
+>>
+
+
 printSchedulers(instances) ::= <<
 $instances: printSchedulerInstance(); separator="\n"$
 
@@ -157,7 +210,7 @@ printf("\n");
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
-network(debugFifos, fifoSize, network) ::= <<
+network(debugFifos, fifoSize, network, options) ::= <<
 // Generated from "$network.name$"
 
 #include <locale.h>
@@ -169,6 +222,10 @@ network(debugFifos, fifoSize, network) ::= <<
 
 #include "fifo.h"
 #include "orcc_util.h"
+
+$if(options.("net.sf.orcc.backends.enableTrace"))$
+#include "Trace.h"
+$endif$
 
 #define SIZE $fifoSize$
 // #define PRINT_FIRINGS
@@ -182,6 +239,12 @@ $assignFifos(network.connections)$
 
 ////////////////////////////////////////////////////////////////////////////////
 $declareBroadcasts(network.instances)$
+
+$if(options.("net.sf.orcc.backends.enableTrace"))$
+////////////////////////////////////////////////////////////////////////////////
+// Trace allocation
+$declareTraces(network.connections)$
+$endif$
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
@@ -203,7 +266,11 @@ static void scheduler() {
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[]) {
 	init_orcc(argc, argv);
-
+	
+	$if(options.("net.sf.orcc.backends.enableTrace"))$
+	assignTrace();
+	$endif$
+	
 	scheduler();
 
 	printf("End of simulation! Press a key to continue\n");

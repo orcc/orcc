@@ -139,7 +139,7 @@ active proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap
 >>
 
 
-actor(actor) ::= <<
+actor(actor, options) ::= <<
 /* Composite type */
 
 /* Channels */

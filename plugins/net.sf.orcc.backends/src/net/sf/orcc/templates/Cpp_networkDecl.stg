@@ -205,7 +205,7 @@ declareNetworks(networks) ::= <<
 $networks : declareNetwork()$
 >>
 
-network(debugFifos, fifoSize, network) ::= <<
+network(debugFifos, fifoSize, network, options) ::= <<
 // Generated from "$network.name$"
 
 #include "FifoFactory.h"
