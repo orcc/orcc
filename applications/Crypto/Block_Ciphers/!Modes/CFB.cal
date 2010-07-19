@@ -34,7 +34,7 @@ actor CFB(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=1, bool IS_ENCIPHER=tr
 	// The scheduling of the steps are as follows: 0 --> 1; 1 --> 2 --> 3 --> 1.
 	int step_index := 0; // 0 = readIV, 1 = sendIB, 2 = readOB, 3 = handleIT
 
-	List(type:uint(size=8), size=BLOCK_SIZE_MAX) inputBlock := [0: for int i in Integers(1,BLOCK_SIZE_MAX)];
+	List(type:uint(size=8), size=BLOCK_SIZE_MAX) inputBlock := [0: for int i in 1 .. BLOCK_SIZE_MAX];
 
 	// Read the initial vector and forward it to the block encipher.
 	int ivCounter := 0;
@@ -62,13 +62,13 @@ actor CFB(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=1, bool IS_ENCIPHER=tr
 			ibCounter := 0;
 			step_index := 2;
 			// Shift BLOCK_SIZE_MODE bytes to the left.
-			foreach int i in Integers(BLOCK_SIZE_MODE,BLOCK_SIZE_CIPHER-1) do
+			foreach int i in BLOCK_SIZE_MODE .. BLOCK_SIZE_CIPHER-1 do
 				inputBlock[i-BLOCK_SIZE_MODE] := inputBlock[i];
 			end
 		end
 	end
 
-	List(type:uint(size=8), size=BLOCK_SIZE_MAX) outputBlock := [0: for int i in Integers(1,BLOCK_SIZE_MAX)];
+	List(type:uint(size=8), size=BLOCK_SIZE_MAX) outputBlock := [0: for int i in 1 .. BLOCK_SIZE_MAX];
 
 	// Read the output block from the block encipher and save it in the state variable outputBlock.
 	int obCounter := 0;

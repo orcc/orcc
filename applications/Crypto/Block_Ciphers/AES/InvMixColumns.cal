@@ -80,7 +80,7 @@ actor InvMixColumns () uint(size=8) IP ==> uint(size=8) OP:
 	end
 
 	// Internal variable storing the calcualtion result.
-	List(type:uint(size=8), size=17) y := [0 : for int i in Integers(1,17)];
+	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
 
 	// InvMixColumn based on multiplication over GF(2^8).
 	// The inverse polynomial is f(x) = 11*x^3 + 13*x^2 + 9*x + 14.	
@@ -99,7 +99,7 @@ actor InvMixColumns () uint(size=8) IP ==> uint(size=8) OP:
 		int index := 1 // Start from the second byte.
 	do
 		y[0] := x[0];
-		foreach int i in Integers(0,3)
+		foreach int i in 0 .. 3
 		do
 			InvMixColumn([x[index],x[index+1],x[index+2],x[index+3]], index);
 			index := index + 4;

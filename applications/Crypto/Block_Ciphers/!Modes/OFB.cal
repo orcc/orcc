@@ -42,7 +42,7 @@ actor OFB(uint BLOCK_SIZE=16) uint(size=8) IP1_IV, uint(size=8) IP2_IT, uint(siz
 		end
 	end
 
-	List(type:uint(size=8), size=BLOCK_SIZE_MAX) outputBlock := [0: for int i in Integers(1,BLOCK_SIZE_MAX)];
+	List(type:uint(size=8), size=BLOCK_SIZE_MAX) outputBlock := [0: for int i in 1 .. BLOCK_SIZE_MAX];
 
 	// Read the output block from the block encipher and save it in the state variable outputBlock.
 	// This action also forwards outputBlock back to the block encipher as the next block for encryption. 

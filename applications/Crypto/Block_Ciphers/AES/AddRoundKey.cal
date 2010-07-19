@@ -30,12 +30,12 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	// Note: Nr and Nk are variables in FIPS standard, so they don't follow the normal naming convention.
 	int keySize := 32;
 	int Nk := rshift(keySize,2); // = keySize/4 = Nk @ FIPS 197
-	List(type:uint(size=8), size=32) key := [0 : for int i in Integers(1,32)];
+	List(type:uint(size=8), size=32) key := [0 : for int i in 1 .. 32];
 	int Nr := 6 + Nk; // keySize = [16, 24, 32] => Nr = [10, 12, 14] (Nr = number of rounds)
 	int Nr16 := lshift(Nr+1,4); // = 16*(Nr+1)
 	int Nr4 := rshift(Nr16,2); // = 4*(Nr+1) = Nb * (Nr+1) @ FIPS 197
 	// A list for storing expanded keys for all rounds.
-	List(type:uint(size=8), size=240) keyEx := [0 : for int i in Integers(1,240)]; // Nr16 = 240
+	List(type:uint(size=8), size=240) keyEx := [0 : for int i in 1 .. 240]; // Nr16 = 240
 
 /*	int BLOCK_SIZE = 16;
 	List(type:String, size=16) hexDigits = [
@@ -92,12 +92,12 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 		int index,
 		int index2
 	begin
-		foreach int i in Integers(0,keySize-1) do
+		foreach int i in 0 .. keySize - 1 do
 			// println("i = " + i + ", Key[i] = " + Key[i]);
 			keyEx[i] := key[i];
 		end
 		i_byte := keySize; // 4*Nk
-		foreach int i_word in Integers(Nk, Nr4-1) do
+		foreach int i_word in Nk .. Nr4 - 1 do
 			i_word_mod_Nk := i_word mod Nk;
 			// println("i_byte = " + i_byte);
 			if i_word_mod_Nk=0 then
@@ -139,8 +139,8 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	 	if not IS_ENCIPHER then
 			index := 0;
 			index2 := lshift(Nr,4);
-			foreach int r in Integers(0,Nr/2) do
-				foreach int i in Integers(0,15) do
+			foreach int r in 0 .. Nr/2 do
+				foreach int i in 0 .. 15 do
 					byte := keyEx[index+i];
 					keyEx[index+i] := keyEx[index2+i];
 					keyEx[index2+i] := byte;
@@ -182,7 +182,7 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	end
 
 	// y is used to assemble a 17-byte output due to the lack of support of list concatenation by ORCC.
-	List(type:uint(size=8), size=17) y := [0 : for int i in Integers(1,17)];
+	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
 
 	// A common procedure for performing AddRoundKey.
 	// Because ORCC does not support #, we have to send a second argument for this value.
@@ -192,13 +192,13 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	begin
 		if xSize=16 then
 			y[0] := 0;
-			foreach int i in Integers(0,15) do
+			foreach int i in 0 .. 15 do
 				y[i+1] := bitxor(x[i], keyEx[i]);
 			end
 		else
 			y[0] := x[0];
 			index := lshift(x[0],4); // x[0]*16;
-			foreach int i in Integers(0,15) do
+			foreach int i in 0 .. 15 do
 				y[i+1] := bitxor(x[i+1], keyEx[index+i]);
 			end
 		end
@@ -229,7 +229,7 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	
 	// For the last round, output a 16-byte ciphertext block to OP1_CT.
 	lastRound:
-	action IP3_FD:[x] repeat 17 ==> OP1_Text:[ [y[i] : for int i in Integers(1,16)] ] repeat 16
+	action IP3_FD:[x] repeat 17 ==> OP1_Text:[ [y[i] : for int i in 1 .. 16] ] repeat 16
 	guard keyExpanded and x[0]=Nr
 	do
 		AddRoundKey(x,17);
