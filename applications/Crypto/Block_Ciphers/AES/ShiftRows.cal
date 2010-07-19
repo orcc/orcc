@@ -21,12 +21,12 @@ actor ShiftRows () uint(size=8) IP ==> uint(size=8) OP:
 		12, 1, 6,11
 	];
 
-	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
+	List(type:uint(size=8), size=17) y := [0 : for int i in Integers(1,17)];
 
 	action IP:[x] repeat 17 ==> OP:[y] repeat 17
 	do
 		y[0] := x[0];
-		foreach int i in 1 .. 16
+		foreach int i in Integers(1,16)
 		do
 			y[i] := x[INDICES[i-1]+1];
 		end

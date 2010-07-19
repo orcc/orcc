@@ -11,7 +11,7 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-// 
+// import all caltrop.lib.BitOps;
 
 actor InvShiftRows () uint(size=8) IP ==> uint(size=8) OP:
 
@@ -23,7 +23,7 @@ actor InvShiftRows () uint(size=8) IP ==> uint(size=8) OP:
 		"0x"+hexDigits[rshift(x,4)]+hexDigits[bitand(x,0x0f)]
 	end
 	function list2hex (List(type:uint(size=8), size=BLOCK_SIZE) x, int x_size) --> List(type:String, size=BLOCK_SIZE):
-		[byte2hex(x[i]) : for int i in 0 .. x_size-1]
+		[byte2hex(x[i]) : for int i in Integers(0,x_size-1)]
 	end */
 
 	List(type:int, size=16) INDICES = 
@@ -34,17 +34,17 @@ actor InvShiftRows () uint(size=8) IP ==> uint(size=8) OP:
 		12, 9, 6, 3
 	];
 
-	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
+	List(type:uint(size=8), size=17) y := [0 : for int i in Integers(1,17)];
 
 	action IP:[x] repeat 17 ==> OP:[y] repeat 17
 	do
 		y[0] := x[0] + 1;
-		foreach int i in 1 .. 16
+		foreach int i in Integers(1,16)
 		do
 			y[i] := x[INDICES[i-1]+1];
 		end
 		// println("InvShiftRows " + y[0] + " action has been executed.");
-		// println(list2hex([y[i]: for int i in 1 .. 16)]);
+		// println(list2hex([y[i]: for int i in Integers(1,16)]));
 	end
 
 end

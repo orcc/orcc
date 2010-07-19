@@ -1,6 +1,8 @@
 *********** CAL Implementation of AES Standard ***********
 
-Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz, 15 July, 2010
+Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz
+
+18 July, 2010
 
 **********************************************************
 
@@ -35,13 +37,39 @@ InvSubBytes.cal
 InvShiftRows.cal
 InvMixColumns.cal
 
+-- Modes of operations --
+
+CBC.cal: CBC mode
+OFB.cal: OFB mode
+CFB.cal: CFB mode
+
 == AES encipher and decipher as FU networks ==
 
-AES_Cipher.xdf: AES encipher (input ports: plaintext and key, output port: ciphertext)
+-- ECB mode --
 
-AES_InvCipher.xdf: AES decipher (input ports: ciphertext and key, output port: plaintext)
+AES_Cipher.xdf: AES encipher
+AES_InvCipher.xdf: AES decipher
+
+-- CBC mode --
+
+AES_CBC_Cipher.xdf: AES encipher
+AES_CBC_InvCipher.xdf: AES decipher
+
+-- OFB mode --
+
+AES_OFB_Cipher.xdf: AES encipher/decipher
+
+-- CFB mode --
+
+AES_CFB8_Encipher.xdf: 8-bit CFB AES encipher
+AES_CFB8_Encipher.xdf: 8-bit CFB AES encipher
+
+AES_CFB128_Encipher.xdf: 128-bit CFB AES encipher
+AES_CFB128_Encipher.xdf: 128-bit CFB AES encipher
 
 == Testbeds ==
+
+Only testbeds for ECB mode is included.
 
 -- Source FUs --
 
@@ -68,6 +96,11 @@ Validator_AES.cal: comparing the output of a FU against a golden response (used 
 
 AES_Cipher_testbed.xdf
 AES_InvCipher_testbed.xdf
+
+---- Testbeds for OpenDF (Test vectors and golden response) ----
+
+AES_Cipher_testbed_OpenDF.xdf
+AES_InvCipher_testbed_OpenDF.xdf
 
 ---- Testbeds for Orcc (Read a file and encrypt/decrypt it) ----
 

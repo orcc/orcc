@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="AES_CFB128_Encipher">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="IP3_Text">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="IP1_IV">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="IP2_Key">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="OP">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="AES_Cipher">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="AES_Cipher"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="CFB128_Encipher">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="CFB"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="BLOCK_SIZE_CIPHER">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+        </Parameter>
+        <Parameter name="BLOCK_SIZE_MODE">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+        </Parameter>
+        <Parameter name="IS_ENCIPHER">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="AES_Cipher" dst-port="Key" src="" src-port="IP2_Key"/>
+    <Connection dst="CFB128_Encipher" dst-port="IP1_IV" src="" src-port="IP1_IV"/>
+    <Connection dst="CFB128_Encipher" dst-port="IP2_IT" src="" src-port="IP3_Text"/>
+    <Connection dst="CFB128_Encipher" dst-port="IP3_OB" src="AES_Cipher" src-port="Ciphertext"/>
+    <Connection dst="AES_Cipher" dst-port="Plaintext"
+        src="CFB128_Encipher" src-port="OP2_IB"/>
+    <Connection dst="" dst-port="OP" src="CFB128_Encipher" src-port="OP1_OT"/>
+</XDF>

@@ -24,13 +24,13 @@ actor MixColumns () uint(size=8) IP1_PT, uint(size=8) IP0_Key ==> uint(size=8) O
 	lastRound: // If it is the last round, simply forward tokens to the next FU.
 	action IP1_PT:[x] repeat 17 ==> OP:[x] repeat 17 guard x[0]>=Nr end
 	
-	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
+	List(type:uint(size=8), size=17) y := [0 : for int i in Integers(1,17)];
 	List(type:uint(size=8), size=4) b := [0, 0, 0, 0];
 
 	// MixColumn based on simplified multiplifications.
 	procedure MixColumn (List(type:uint(size=8),size=4) a, int i)
 	begin
-		foreach int j in 0 .. 3 do
+		foreach int j in Integers(0,3) do
 			b[j] := lshift(a[j],1) mod 256;
 			if bitand(a[j],0x80)=0x80 then
 				b[j] := bitxor(b[j],0x1b);
@@ -49,7 +49,7 @@ actor MixColumns () uint(size=8) IP1_PT, uint(size=8) IP0_Key ==> uint(size=8) O
 		int index := 1 // Start from the second byte.
 	do
 		y[0] := x[0];
-		foreach int i in 0 .. 3
+		foreach int i in Integers(0,3)
 		do
 			MixColumn([x[index],x[index+1],x[index+2],x[index+3]], index);
 			index := index + 4;
