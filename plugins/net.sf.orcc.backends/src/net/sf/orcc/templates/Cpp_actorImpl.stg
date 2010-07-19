@@ -216,21 +216,18 @@ $instructions(blockNode.instructions)$
 // if node
 IfNode(ifNode) ::= <<
 
-if($ifNode.value$)
-{
-	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$
-
-else
-{
-	$nodes(ifNode.elseNodes)$}$endif$
+if ($ifNode.value$) {
+	$nodes(ifNode.thenNodes)$
+}$if(ifNode.elseNodes)$ else {
+	$nodes(ifNode.elseNodes)$
+}$endif$
 $BlockNode(ifNode.joinNode)$
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
 
-while ($whileNode.value$)
-{
+while ($whileNode.value$) {
 	$nodes(whileNode.nodes)$
 }
 $BlockNode(whileNode.joinNode)$
@@ -453,7 +450,7 @@ $if(actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
 $actor.initializes: action()$
-void actor_$actor.name$::initialize()
+void actor_$actor.name$::init()
 {
 	bool res = true;
 	int i = 0;

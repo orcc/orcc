@@ -96,7 +96,7 @@ public abstract class AbstractBackend implements Backend {
 	 */
 	public static void main(Class<? extends AbstractBackend> clasz,
 			String[] args) {
-		if (args.length == 2) {
+		if (args.length == 3) {
 			String inputFile = args[0];
 			String vtlFolder = args[1];
 			String outputFolder = args[2];

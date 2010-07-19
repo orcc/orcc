@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -344,8 +345,6 @@ public class NetworkPartitioner {
 		}
 
 		graph.removeAllVertices(vertices);
-
-		updatePartNames();		
 	}
 
 	private void updatePartNames() {
@@ -367,9 +366,11 @@ public class NetworkPartitioner {
 
 	public boolean hasThreadParallelism() {
 		int size = 0;
-		for(List<String> stringList : partNames.values()) {
-			size = stringList.size();
-		}
+		Iterator<List<String>> it = partNames.values().iterator();
+		size = it.next().size();
+
+		updatePartNames();
+
 		return size > 1;
 	}
 

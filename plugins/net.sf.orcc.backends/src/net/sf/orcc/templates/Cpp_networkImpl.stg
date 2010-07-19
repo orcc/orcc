@@ -58,7 +58,7 @@ $edges: assignFifo()$
 printInitialize(instance) ::= <<
 $if (instance.actor)$
 $if (!instance.actor.initializes.empty)$
-$instance.id$.initialize();
+$instance.id$.init();
 
 $endif$
 $endif$
