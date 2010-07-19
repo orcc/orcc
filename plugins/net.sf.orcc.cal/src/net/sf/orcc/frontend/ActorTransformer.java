@@ -79,6 +79,7 @@ import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -404,8 +405,10 @@ public class ActorTransformer {
 		Procedure body = new Procedure("init_actor", location,
 				IrFactory.eINSTANCE.createTypeVoid());
 
-		Context oldContext = astTransformer.newContext(scheduler);
-		astTransformer.restoreContext(oldContext, new BoolExpr(true));
+		BlockNode block = BlockNode.getFirst(scheduler);
+		block.add(new Return(new BoolExpr(true)));
+		block = BlockNode.getFirst(body);
+		block.add(new Return(null));
 
 		// creates action
 		Action action = new Action(location, tag, inputPattern, outputPattern,
@@ -551,9 +554,9 @@ public class ActorTransformer {
 				}
 
 				for (Action action : initializes) {
-					BlockNode block = BlockNode.getLast(action.getBody());
+					BlockNode block = BlockNode.getFirst(action.getBody());
 					List<Expression> params = new ArrayList<Expression>(0);
-					block.add(new Call(location, null, initialize, params));
+					block.add(0, new Call(location, null, initialize, params));
 				}
 			}
 
