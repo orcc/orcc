@@ -173,12 +173,12 @@ actor Algo_IntraPred_Split()
 			else
 				if InverseScan4x4Tab[count] < 4 then
 					if (is_constrained_i_flag[mb_x]) then
-						top := intra4x4predmode[mb_x, 12 + InverseScan4x4Tab[count]];
+						top := intra4x4predmode[mb_x][12 + InverseScan4x4Tab[count]];
 					else
 						top := -1;
 					end
 				else
-					top := intra4x4predmode[mb_x, InverseScan4x4Tab[count] - 4];
+					top := intra4x4predmode[mb_x][InverseScan4x4Tab[count] - 4];
 				end
 			end
 			if (curr_mb_addr = first_mb_in_slice or mb_x = 0) and
@@ -188,12 +188,12 @@ actor Algo_IntraPred_Split()
 			else
 				if InverseScan4x4Tab[count] mod 4 = 0 then
 					if (is_constrained_i_flag[mb_x - 1]) then
-						left := intra4x4predmode[mb_x - 1, 3 + InverseScan4x4Tab[count]];
+						left := intra4x4predmode[mb_x - 1][3 + InverseScan4x4Tab[count]];
 					else
 						left := -1;
 					end
 				else
-					left := intra4x4predmode[mb_x, InverseScan4x4Tab[count] - 1];
+					left := intra4x4predmode[mb_x][InverseScan4x4Tab[count] - 1];
 				end
 			end
 			if left < top then
@@ -213,7 +213,7 @@ actor Algo_IntraPred_Split()
 			if Intra_Pred_Mode = 15 then
 				pred_mode := predicted;
 			end
-			intra4x4predmode[mb_x, InverseScan4x4Tab[count]] := pred_mode;
+			intra4x4predmode[mb_x][InverseScan4x4Tab[count]] := pred_mode;
 			count := count + 1;
 		end
 

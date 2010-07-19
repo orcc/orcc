@@ -143,18 +143,18 @@ function chroma_edge( int d, int e, int f ) --> int :  CHROMA_EDGE_ROM[d*16 + e*
 function getPixelPosX( int pel, int dir ) --> int : if (dir=1) then pel else 4*edge_curr end end
 // Get the Y position in the current MB (0 to 15)
 function getPixelPosY( int pel, int dir) --> int : if (dir=1) then if (edge_curr < 4) then 4*edge_curr else 1 end else pel end end
-function getLeftPixel( int i, int dir ) --> int : if useLeft=1 then left_mb[yP - i*dir, xP - i*(1-dir)]
-      else if useUp=1 then up_mb[yP - i*dir, xP - i*(1-dir)] else curr_mb[yP - i*dir, xP - i*(1-dir)] end end end
-function getRightPixel( int i, int dir ) --> int : curr_mb[yQ + i*dir, xQ + i*(1-dir)] end
+function getLeftPixel( int i, int dir ) --> int : if useLeft=1 then left_mb[yP - i*dir][xP - i*(1-dir)]
+      else if useUp=1 then up_mb[yP - i*dir][xP - i*(1-dir)] else curr_mb[yP - i*dir][xP - i*(1-dir)] end end end
+function getRightPixel( int i, int dir ) --> int : curr_mb[yQ + i*dir][xQ + i*(1-dir)] end
 procedure setLeftPixel( int i, int val, int dir )
 	var  
 		int xmod = xP - i*(1-dir),
 		int ymod = yP - i*dir
     begin  
-    	if useLeft=1 then left_mb[ymod, xmod] := val; 
+    	if useLeft=1 then left_mb[ymod][xmod] := val; 
     	else 
-    		if useUp=1 then up_mb[ymod, xmod] := val; 
-           	else  curr_mb[ymod, xmod] := val; 
+    		if useUp=1 then up_mb[ymod][xmod] := val; 
+           	else  curr_mb[ymod][xmod] := val; 
           	end 
    	 	end
 end
@@ -163,7 +163,7 @@ procedure setRightPixel( int i, int val, int dir )
 		int xmod = xQ + i*(1-dir),
 		int ymod = yQ + i*dir 
 	begin 
-		curr_mb[ymod, xmod] := val; 
+		curr_mb[ymod][xmod] := val; 
 end
 // Set the neighbour (used in GetStrengths)
 //
@@ -217,17 +217,17 @@ do
     end        
     foreach int y in 0 .. MB_BLOCK_SIZE_CHROMA-1 do
         foreach int x in 0 .. MB_BLOCK_SIZE_CHROMA-1 do  
-        	curr_mb[y,x]:= currbuf[x + y * MB_BLOCK_SIZE_CHROMA]; 
+        	curr_mb[y][x]:= currbuf[x + y * MB_BLOCK_SIZE_CHROMA]; 
         end
     end			   
     foreach int y in 0 .. MB_BLOCK_SIZE_CHROMA-1 do
         foreach int x in MB_BLOCK_SIZE_CHROMA-4 .. MB_BLOCK_SIZE_CHROMA-1 do  
-        	left_mb[y,x]:= leftbuf[(x mod 4)+y*4]; 
+        	left_mb[y][x]:= leftbuf[(x mod 4)+y*4]; 
     	end
     end			   
     foreach int y in MB_BLOCK_SIZE_CHROMA-4 .. MB_BLOCK_SIZE_CHROMA-1 do
         foreach int x in 0 .. MB_BLOCK_SIZE_CHROMA-1 do  
-        	up_mb[y,x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE_CHROMA)]; 
+        	up_mb[y][x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE_CHROMA)]; 
     	end
     end         
     StrengthNotZero :=0;    
@@ -254,17 +254,17 @@ do
     end        
     foreach int y in 0 .. MB_BLOCK_SIZE_LUMA-1 do
         foreach int x in 0 .. MB_BLOCK_SIZE_LUMA-1 do  
-        	curr_mb[y,x]:= currbuf[x + y * MB_BLOCK_SIZE_LUMA]; 
+        	curr_mb[y][x]:= currbuf[x + y * MB_BLOCK_SIZE_LUMA]; 
         end
     end			   
     foreach int y in 0 .. MB_BLOCK_SIZE_LUMA-1 do
         foreach int x in MB_BLOCK_SIZE_LUMA-4 .. MB_BLOCK_SIZE_LUMA-1 do  
-        	left_mb[y,x]:= leftbuf[(x mod 4)+y*4]; 
+        	left_mb[y][x]:= leftbuf[(x mod 4)+y*4]; 
     	end
     end			   
     foreach int y in MB_BLOCK_SIZE_LUMA-4 .. MB_BLOCK_SIZE_LUMA-1 do
         foreach int x in 0 .. MB_BLOCK_SIZE_LUMA-1 do  
-        	up_mb[y,x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE_LUMA)]; 
+        	up_mb[y][x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE_LUMA)]; 
     	end
     end         
     StrengthNotZero :=0;    

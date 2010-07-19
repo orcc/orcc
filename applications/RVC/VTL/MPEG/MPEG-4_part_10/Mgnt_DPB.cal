@@ -132,7 +132,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard 
 			write_done = false
 		do
-			pic[pic_curr_idx, wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
+			pic[pic_curr_idx][wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
 			wa_x := wa_x +1;
 			if(wa_x = wa_W) then
 				wa_y := wa_y +1;

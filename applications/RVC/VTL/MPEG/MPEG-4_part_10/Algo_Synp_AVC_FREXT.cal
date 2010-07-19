@@ -4948,7 +4948,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		Sps_inc < num_ref_frames_in_pic_order_cnt_cycle[sps_id]
 	do
-		offset_for_ref_frame[sps_id,Sps_inc] := vld_se();
+		offset_for_ref_frame[sps_id][Sps_inc] := vld_se();
 		Sps_inc := Sps_inc + 1;
 		if Sps_inc < num_ref_frames_in_pic_order_cnt_cycle[sps_id] then start_vld();  end
 	end
@@ -5371,7 +5371,7 @@ actor Algo_Synp_AVC_FREXT()
 		slice_group_map_type[pps_id] = 0,
 		Pps_inc < num_slice_groups_minus1[pps_id]
 	do
-		run_length_minus1[pps_id,Pps_inc] := vld_ue();
+		run_length_minus1[pps_id][Pps_inc] := vld_ue();
 		Pps_inc := Pps_inc +1;
 		if Pps_inc < num_slice_groups_minus1[pps_id] then start_vld();end
 	end
@@ -5391,7 +5391,7 @@ actor Algo_Synp_AVC_FREXT()
 		slice_group_map_type[pps_id] = 2,
 		Pps_inc < num_slice_groups_minus1[pps_id]
 	do
-		top_left[pps_id,Pps_inc] := vld_ue();
+		top_left[pps_id][Pps_inc] := vld_ue();
 		start_vld();
 	end
 
@@ -5399,7 +5399,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
-		bottom_right[pps_id,Pps_inc] := vld_ue();
+		bottom_right[pps_id][Pps_inc] := vld_ue();
 		Pps_inc := Pps_inc +1;
 		if Pps_inc < num_slice_groups_minus1[pps_id] then start_vld();end
 	end
@@ -7345,7 +7345,7 @@ end
 		MB_inc := 0;
 		set_bits_to_read(bit_depth_luma_minus8[sps_id]+8);
 		foreach int i in 0 .. 15 do
-			NonZeroCount[val_CurrMbAddr,i] := 16;
+			NonZeroCount[val_CurrMbAddr][i] := 16;
 		end
 	end
 
@@ -7381,8 +7381,8 @@ end
 		MB_inc := 0;
 		set_bits_to_read(bit_depth_chroma_minus8[sps_id]+8);
 		foreach  int i in 0 .. 3 do
-			NonZeroCountCb[val_CurrMbAddr,i] := 16;
-			NonZeroCountCr[val_CurrMbAddr,i] := 16;
+			NonZeroCountCb[val_CurrMbAddr][i] := 16;
+			NonZeroCountCr[val_CurrMbAddr][i] := 16;
 		end
 		start_pcm_chroma := false;
 
@@ -9031,18 +9031,18 @@ end
 					nB :=0; top:=0;
 				else
 					if(InverseScan4x4Tab[luma4x4BlkIdx]<4) then
-						nB := NonZeroCount[val_CurrMbAddr-PicWidthInMbs,12+InverseScan4x4Tab[luma4x4BlkIdx]]; 
+						nB := NonZeroCount[val_CurrMbAddr-PicWidthInMbs][12+InverseScan4x4Tab[luma4x4BlkIdx]]; 
 					else
-						nB := NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]-4];
+						nB := NonZeroCount[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]-4];
 					end					
 				end
 				if ((val_CurrMbAddr = first_mb_in_slice and InverseScan4x4Tab[luma4x4BlkIdx] mod 4 = 0) or (Mb_x = 0 and InverseScan4x4Tab[luma4x4BlkIdx] mod 4 = 0))  then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
 					nA :=0; left:=0;
 				else
 					if(InverseScan4x4Tab[luma4x4BlkIdx] mod 4 = 0) then
-						nA := NonZeroCount[val_CurrMbAddr-1,3+InverseScan4x4Tab[luma4x4BlkIdx]]; 
+						nA := NonZeroCount[val_CurrMbAddr-1][3+InverseScan4x4Tab[luma4x4BlkIdx]]; 
 					else
-						nA := NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]-1];
+						nA := NonZeroCount[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]-1];
 					end
 				end
 			else //chroma
@@ -9051,15 +9051,15 @@ end
 				else
 					nB := if iCbCr = 0 then 
 						if(luma4x4BlkIdx<2) then
-							NonZeroCountCb[val_CurrMbAddr-PicWidthInMbs, 2 + luma4x4BlkIdx]
+							NonZeroCountCb[val_CurrMbAddr-PicWidthInMbs][2 + luma4x4BlkIdx]
 						else
-							NonZeroCountCb[val_CurrMbAddr, luma4x4BlkIdx- 2]
+							NonZeroCountCb[val_CurrMbAddr][luma4x4BlkIdx- 2]
 						end					
 					else 
 						if(InverseScan4x4Tab[luma4x4BlkIdx]<2) then
-							NonZeroCountCr[val_CurrMbAddr-PicWidthInMbs, 2 + luma4x4BlkIdx]
+							NonZeroCountCr[val_CurrMbAddr-PicWidthInMbs][2 + luma4x4BlkIdx]
 						else
-							NonZeroCountCr[val_CurrMbAddr, luma4x4BlkIdx - 2]
+							NonZeroCountCr[val_CurrMbAddr][luma4x4BlkIdx - 2]
 						end					
 					end;
 						end					
@@ -9068,15 +9068,15 @@ end
 				else
 					nA := if iCbCr = 0 then 
 						if(luma4x4BlkIdx mod 2 = 0) then
-							NonZeroCountCb[val_CurrMbAddr-1, 1 + luma4x4BlkIdx]
+							NonZeroCountCb[val_CurrMbAddr-1][1 + luma4x4BlkIdx]
 						else
-							NonZeroCountCb[val_CurrMbAddr, luma4x4BlkIdx - 1]
+							NonZeroCountCb[val_CurrMbAddr][luma4x4BlkIdx - 1]
 						end
 					else 
 						if(InverseScan4x4Tab[luma4x4BlkIdx] mod 2 = 0) then
-							NonZeroCountCr[val_CurrMbAddr-1, 1 + luma4x4BlkIdx]
+							NonZeroCountCr[val_CurrMbAddr-1][1 + luma4x4BlkIdx]
 						else
-							NonZeroCountCr[val_CurrMbAddr, luma4x4BlkIdx - 1]
+							NonZeroCountCr[val_CurrMbAddr][luma4x4BlkIdx - 1]
 						end
 					end;
 				end
@@ -9095,9 +9095,13 @@ end
 	do
 		if leveltype = 1 then //luma
     			val_cbp_blk:=(1<<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
-			NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]] := TotalCoeff();
+			NonZeroCount[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]] := TotalCoeff();
 		else //chroma
-			if iCbCr = 0 then NonZeroCountCb[val_CurrMbAddr, luma4x4BlkIdx] := TotalCoeff(); else NonZeroCountCr[val_CurrMbAddr, luma4x4BlkIdx] := TotalCoeff(); end
+			if iCbCr = 0 then
+				NonZeroCountCb[val_CurrMbAddr][luma4x4BlkIdx] := TotalCoeff();
+			else
+				NonZeroCountCr[val_CurrMbAddr][luma4x4BlkIdx] := TotalCoeff();
+			end
 		end
 		if TotalCoeff() > 10 and TrailingOnes() < 3 then suffixLength := 1; else suffixLength := 0; end
 		inc_nb_coeff := 0;
@@ -9264,9 +9268,13 @@ end
 		TotalCoeff() = 0
 	do
 		if leveltype < 2 then //luma
-			NonZeroCount[val_CurrMbAddr,InverseScan4x4Tab[luma4x4BlkIdx]] := 0;
+			NonZeroCount[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]] := 0;
 		else //chroma
-			if iCbCr = 0 then NonZeroCountCb[val_CurrMbAddr, luma4x4BlkIdx] := 0; else NonZeroCountCr[val_CurrMbAddr, luma4x4BlkIdx] := 0; end
+			if iCbCr = 0 then
+				NonZeroCountCb[val_CurrMbAddr][luma4x4BlkIdx] := 0;
+			else
+				NonZeroCountCr[val_CurrMbAddr][luma4x4BlkIdx] := 0;
+			end
 		end
 	end 
 	// --> residual return

@@ -148,19 +148,19 @@ actor Mgnt_MVR ()
 	do
 		if ((x=0 or currmb = first_mb_in_slice) and InverseScan4x4Tab[count] mod 4=0)=false then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
 			if (InverseScan4x4Tab[count] mod 4 =0) then
-				refABC[0]:=refidx[currmb - 1, InverseScan4x4Tab[count] + 3];
+				refABC[0]:=refidx[currmb - 1][InverseScan4x4Tab[count] + 3];
 				if refABC[0] != -2 then 
-					mvABC[0] := mv[currmb - 1, InverseScan4x4Tab[count] + 3][0];
-					mvABC[1] := mv[currmb - 1, InverseScan4x4Tab[count] + 3][1];
+					mvABC[0] := mv[currmb - 1][InverseScan4x4Tab[count] + 3][0];
+					mvABC[1] := mv[currmb - 1][InverseScan4x4Tab[count] + 3][1];
 					if refABC[0] = ref_idx then 
 						match_count := match_count +1;
 					end
 				end
 			else
-				refABC[0]:=refidx[currmb, InverseScan4x4Tab[count] - 1];
+				refABC[0]:=refidx[currmb][InverseScan4x4Tab[count] - 1];
 				if refABC[0] != -2 then 
-					mvABC[0] := mv[currmb, InverseScan4x4Tab[count] - 1][0];
-					mvABC[1] := mv[currmb, InverseScan4x4Tab[count] - 1][1];
+					mvABC[0] := mv[currmb][InverseScan4x4Tab[count] - 1][0];
+					mvABC[1] := mv[currmb][InverseScan4x4Tab[count] - 1][1];
 					if refABC[0] = ref_idx then 
 						match_count := match_count +1;
 					end
@@ -169,19 +169,19 @@ actor Mgnt_MVR ()
 		end
 		if (currmb<picW+first_mb_in_slice and InverseScan4x4Tab[count]<4)=false then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
 			if (InverseScan4x4Tab[count] < 4) then
-				refABC[1]:=refidx[currmb - picW, InverseScan4x4Tab[count] + 12];
+				refABC[1]:=refidx[currmb - picW][InverseScan4x4Tab[count] + 12];
 				if refABC[1] != -2 then 
-					mvABC[2] := mv[currmb - picW, InverseScan4x4Tab[count] + 12][0];
-					mvABC[3] := mv[currmb - picW, InverseScan4x4Tab[count] + 12][1];
+					mvABC[2] := mv[currmb - picW][InverseScan4x4Tab[count] + 12][0];
+					mvABC[3] := mv[currmb - picW][InverseScan4x4Tab[count] + 12][1];
 					if refABC[1] = ref_idx then 
 						match_count := match_count +1;
 					end
 				end
 			else
-				refABC[1]:=refidx[currmb, InverseScan4x4Tab[count] - 4];
+				refABC[1]:=refidx[currmb][InverseScan4x4Tab[count] - 4];
 				if refABC[1] != -2 then 
-					mvABC[2] := mv[currmb, InverseScan4x4Tab[count] - 4][0];
-					mvABC[3] := mv[currmb, InverseScan4x4Tab[count] - 4][1];
+					mvABC[2] := mv[currmb][InverseScan4x4Tab[count] - 4][0];
+					mvABC[3] := mv[currmb][InverseScan4x4Tab[count] - 4][1];
 					if refABC[1] = ref_idx then 
 						match_count := match_count +1;
 					end
@@ -199,20 +199,20 @@ actor Mgnt_MVR ()
 			    or x+rshift(InverseScan4x4Tab[count] mod 4 + rshift(mbpart_w,2),2) = picW)
 			    =false) then
 				if(InverseScan4x4Tab[count] + rshift(mbpart_w,2) < 4) then
-					refABC[2]:= refidx[currmb - picW, InverseScan4x4Tab[count] + rshift(mbpart_w,2) + 12];
+					refABC[2]:= refidx[currmb - picW][InverseScan4x4Tab[count] + rshift(mbpart_w,2) + 12];
 					if refABC[2] != -2 then 
-						mvABC[4] := mv[currmb - picW, InverseScan4x4Tab[count] + rshift(mbpart_w,2) + 12][0];
-						mvABC[5] := mv[currmb - picW, InverseScan4x4Tab[count] + rshift(mbpart_w,2) + 12][1];
+						mvABC[4] := mv[currmb - picW][InverseScan4x4Tab[count] + rshift(mbpart_w,2) + 12][0];
+						mvABC[5] := mv[currmb - picW][InverseScan4x4Tab[count] + rshift(mbpart_w,2) + 12][1];
 						if refABC[2] = ref_idx then 
 							match_count := match_count +1;
 						end
 					end
 				else
 					if (InverseScan4x4Tab[count] + mbpart_w /4)=4 then
-						refABC[2]:= refidx[currmb+1-picW, 12];
+						refABC[2]:= refidx[currmb+1-picW][12];
 						if refABC[2] != -2 then 
-							mvABC[4] := mv[currmb+1-picW, 12][0];
-							mvABC[5] := mv[currmb+1-picW, 12][1];
+							mvABC[4] := mv[currmb+1-picW][12][0];
+							mvABC[5] := mv[currmb+1-picW][12][1];
 							if refABC[2] = ref_idx then 
 								match_count := match_count +1;
 							end
@@ -221,10 +221,10 @@ actor Mgnt_MVR ()
 						if (InverseScan4x4Tab[count] mod 4 + rshift(mbpart_w,2)=4) then
 							refABC[2]:= -2;
 						else
-							refABC[2]:= refidx[currmb, InverseScan4x4Tab[count] + rshift(mbpart_w,2) - 4];
+							refABC[2]:= refidx[currmb][InverseScan4x4Tab[count] + rshift(mbpart_w,2) - 4];
 							if refABC[2] != -2 then 
-								mvABC[4] := mv[currmb, InverseScan4x4Tab[count] + rshift(mbpart_w,2) - 4][0];
-								mvABC[5] := mv[currmb, InverseScan4x4Tab[count] + rshift(mbpart_w,2) - 4][1];
+								mvABC[4] := mv[currmb][InverseScan4x4Tab[count] + rshift(mbpart_w,2) - 4][0];
+								mvABC[5] := mv[currmb][InverseScan4x4Tab[count] + rshift(mbpart_w,2) - 4][1];
 								if refABC[2] = ref_idx then 
 									match_count := match_count +1;
 								end
@@ -238,39 +238,39 @@ actor Mgnt_MVR ()
 			   and ((x=0 or currmb  = first_mb_in_slice) and InverseScan4x4Tab[count] mod 4=0)=false 
 			   and (currmb<=picW+first_mb_in_slice and InverseScan4x4Tab[count] < 4)=false then 
 				if (InverseScan4x4Tab[count] =0 and currmb >= first_mb_in_slice + picW + 1) then
-					refABC[2]:=refidx[currmb - 1 - picW, 15];
+					refABC[2]:=refidx[currmb - 1 - picW][15];
 					if refABC[2] != -2 then 
-						mvABC[4] := mv[currmb - 1 - picW, 15][0];
-						mvABC[5] := mv[currmb - 1 - picW, 15][1];
+						mvABC[4] := mv[currmb - 1 - picW][15][0];
+						mvABC[5] := mv[currmb - 1 - picW][15][1];
 						if refABC[2] = ref_idx then 
 							match_count := match_count + 1;
 						end
 					end
 				else
 					if (InverseScan4x4Tab[count] < 4) then
-						refABC[2]:=refidx[currmb - picW, InverseScan4x4Tab[count] + 12 - 1];
+						refABC[2]:=refidx[currmb - picW][InverseScan4x4Tab[count] + 12 - 1];
 						if refABC[2] != -2 then 
-							mvABC[4] := mv[currmb - picW, InverseScan4x4Tab[count] + 12 - 1][0];
-							mvABC[5] := mv[currmb - picW, InverseScan4x4Tab[count] + 12 - 1][1];
+							mvABC[4] := mv[currmb - picW][InverseScan4x4Tab[count] + 12 - 1][0];
+							mvABC[5] := mv[currmb - picW][InverseScan4x4Tab[count] + 12 - 1][1];
 							if refABC[2] = ref_idx then 
 								match_count := match_count + 1;
 							end
 						end
 					else 
 						if (InverseScan4x4Tab[count] mod 4 = 0) then
-							refABC[2]:=refidx[currmb - 1, InverseScan4x4Tab[count] - 1];
+							refABC[2]:=refidx[currmb - 1][InverseScan4x4Tab[count] - 1];
 							if refABC[2] != -2 then 
-								mvABC[4] := mv[currmb - 1, InverseScan4x4Tab[count] - 1][0];
-								mvABC[5] := mv[currmb - 1, InverseScan4x4Tab[count] - 1][1];
+								mvABC[4] := mv[currmb - 1][InverseScan4x4Tab[count] - 1][0];
+								mvABC[5] := mv[currmb - 1][InverseScan4x4Tab[count] - 1][1];
 								if refABC[2] = ref_idx then 
 									match_count := match_count + 1;
 								end
 							end
 						else
-							refABC[2]:=refidx[currmb, InverseScan4x4Tab[count] - 1 - 4];
+							refABC[2]:=refidx[currmb][InverseScan4x4Tab[count] - 1 - 4];
 							if refABC[2] != -2 then 
-								mvABC[4] := mv[currmb, InverseScan4x4Tab[count] - 1 - 4][0];
-								mvABC[5] := mv[currmb, InverseScan4x4Tab[count] - 1 - 4][1];
+								mvABC[4] := mv[currmb][InverseScan4x4Tab[count] - 1 - 4][0];
+								mvABC[5] := mv[currmb][InverseScan4x4Tab[count] - 1 - 4][1];
 								if refABC[2] = ref_idx then 
 									match_count := match_count + 1;
 								end
@@ -307,12 +307,12 @@ actor Mgnt_MVR ()
   guard
     mbpart_w = 4 and mbpart_h = 8 
   do
-      mv[currmb,InverseScan4x4Tab[count],0] := a;
-      mv[currmb,InverseScan4x4Tab[count],1] := b;
-      refidx[currmb,InverseScan4x4Tab[count]]:=ref_idx;
-      mv[currmb,InverseScan4x4Tab[count]+4,0] := a;
-      mv[currmb,InverseScan4x4Tab[count]+4,1] := b;
-      refidx[currmb,InverseScan4x4Tab[count]+4]:=ref_idx;
+      mv[currmb][InverseScan4x4Tab[count]][0] := a;
+      mv[currmb][InverseScan4x4Tab[count]][1] := b;
+      refidx[currmb][InverseScan4x4Tab[count]]:=ref_idx;
+      mv[currmb][InverseScan4x4Tab[count] + 4][0] := a;
+      mv[currmb][InverseScan4x4Tab[count] + 4][1] := b;
+      refidx[currmb][InverseScan4x4Tab[count] + 4] :=ref_idx;
       count := count+1+lshift(mbpart_idx,1);
   end
   
@@ -321,10 +321,10 @@ actor Mgnt_MVR ()
     mbpart_w = 8 and mbpart_h = 16  
   do
     foreach int i in 0 .. 3 do
-      mv[currmb,InverseScan4x4Tab[count]] := [a,b];
-      refidx[currmb,InverseScan4x4Tab[count]]:=ref_idx;
-      mv[currmb,InverseScan4x4Tab[count] + 8] := [a,b];
-      refidx[currmb,InverseScan4x4Tab[count] + 8]:=ref_idx;
+      mv[currmb][InverseScan4x4Tab[count]] := [a,b];
+      refidx[currmb][InverseScan4x4Tab[count]]:=ref_idx;
+      mv[currmb][InverseScan4x4Tab[count] + 8] := [a,b];
+      refidx[currmb][InverseScan4x4Tab[count] + 8]:=ref_idx;
       count := count+1;
     end
     if mbpart_idx = 1 then count :=16; end
@@ -333,8 +333,8 @@ actor Mgnt_MVR ()
   get_mv.others: action MV:[a,b] ==> 
   do
     foreach int i in 0 .. rshift(mbpart_w,2)*rshift(mbpart_h,2)-1 do
-      mv[currmb,InverseScan4x4Tab[count]] := [a,b];
-      refidx[currmb,InverseScan4x4Tab[count]]:=ref_idx;
+      mv[currmb][InverseScan4x4Tab[count]] := [a,b];
+      refidx[currmb][InverseScan4x4Tab[count]]:=ref_idx;
       count := count+1;
     end
   end
