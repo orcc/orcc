@@ -399,9 +399,9 @@ public class ActorTransformer {
 		Pattern inputPattern = new Pattern(0);
 		Pattern outputPattern = new Pattern(0);
 
-		Procedure scheduler = new Procedure("isSchedulable_initialize",
+		Procedure scheduler = new Procedure("isSchedulable_init_actor",
 				location, IrFactory.eINSTANCE.createTypeBool());
-		Procedure body = new Procedure("initialize", location,
+		Procedure body = new Procedure("init_actor", location,
 				IrFactory.eINSTANCE.createTypeVoid());
 
 		Context oldContext = astTransformer.newContext(scheduler);
