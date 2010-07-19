@@ -1,0 +1,50 @@
+/**
+ * This FU is part of a CAL implementation of AES (Rijndael).
+ * It performs InvShiftRows process in each round of the decipher.
+ * 
+ * FU ID: InvShiftRows
+ * One input port:
+ * 1) IP: the input
+ * One output port:
+ * 1) OP: the output
+ *
+ * Developer: Shujun Li @ Uni-Konstanz 2010
+ */
+
+// import all caltrop.lib.BitOps;
+
+actor InvShiftRows () uint(size=8) IP ==> uint(size=8) OP:
+
+/*	int BLOCK_SIZE = 16;
+	List(type:String, size=16) hexDigits = [
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"
+	];
+	function byte2hex (uint(size=8) x) --> String:
+		"0x"+hexDigits[rshift(x,4)]+hexDigits[bitand(x,0x0f)]
+	end
+	function list2hex (List(type:uint(size=8), size=BLOCK_SIZE) x, int x_size) --> List(type:String, size=BLOCK_SIZE):
+		[byte2hex(x[i]) : for int i in 0 .. x_size-1]
+	end */
+
+	List(type:int, size=16) INDICES = 
+	[ // Note that the plaintext is columnwise.
+		 0,13,10, 7,
+		 4, 1,14,11,
+		 8, 5, 2,15,
+		12, 9, 6, 3
+	];
+
+	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
+
+	action IP:[x] repeat 17 ==> OP:[y] repeat 17
+	do
+		y[0] := x[0] + 1;
+		foreach int i in 1 .. 16
+		do
+			y[i] := x[INDICES[i-1]+1];
+		end
+		// println("InvShiftRows " + y[0] + " action has been executed.");
+		// println(list2hex([y[i]: for int i in 1 .. 16)]);
+	end
+
+end

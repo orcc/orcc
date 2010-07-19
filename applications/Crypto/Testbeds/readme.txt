@@ -1,4 +1,4 @@
-RVC-CAL Crypto Tools Library (CTL) with Testbeds
+RVC-CAL Crypto Tools Library (CTL) Testbeds
 
 *****************************************************
 
@@ -8,8 +8,7 @@ Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz
 
 *****************************************************
 
-"CTL" folder accommodates a CTL (Cryptographic Tool Library) implemented with RVC-CAL.
-Testbeds of these CTL FUs locate in "Testbeds" folder.
+This folder accommodates testbeds of RVC-CAL CTL FUs.
 
 Due to the discrepancies between Orcc and OpenDF, we chose to keep the files to pass Orcc simulation.
 If you want to test the files with OpenDF, you need to do the following:

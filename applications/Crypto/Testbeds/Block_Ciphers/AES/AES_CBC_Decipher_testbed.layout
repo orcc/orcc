@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Source" x="54" y="93"/>
+      <vertex id="Validator" x="402" y="133"/>
+      <vertex id="AES_CBC_Decipher" x="196" y="93"/>
+   </vertices>
+</layout>

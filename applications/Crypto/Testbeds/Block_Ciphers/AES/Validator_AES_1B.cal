@@ -1,0 +1,44 @@
+/**
+ * This FU is part of the testbed of a CAL implementation of AES (Rijndael).
+ * It validates if the output of the AES encipher/decipher matches the golden responses.
+ * It compares the actual response with the golden standard byte by byte.
+ * 
+ * FU ID: Validator_AES_1B
+ * Two input ports:
+ * 1) IP1_Data: the output of the AES encipher/decipher
+ * 2) IP2_GR: the golden response
+ *
+ * Developer: Shujun Li @ Uni-Konstanz 2010
+ */
+
+// import all caltrop.lib.BitOps; 
+
+actor Validator_AES_1B () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = Golden response
+
+	List(type:String, size=16) hexDigits = [
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"
+	];
+	// The following procedure is for Orcc simulation.
+	// Print a byte without a line break.
+	procedure printByte (uint(size=8) x)
+	begin
+		print("0x"+hexDigits[x>>4]+hexDigits[x & 0x0f]);
+	end
+	// Uncomment the following function if you want to simulate with OpenDF.
+/*	function byte2hex (uint(size=8) x) --> String:
+		"0x"+hexDigits[x>>4]+hexDigits[x & 0x0f]
+	end */
+	
+	action IP1_Data:[x], IP2_GR:[gr] ==>
+	do
+		// The following lines are for Orcc simulation.
+		print("Actual Response vs. Golden Response = ");
+		printByte(x); print(" .vs "); printByte(gr); print("\n");
+		// Uncomment the following line if you want to simulate with OpenDF.
+		// println("Actual Response vs. Golden Response = " + byte2hex(x) + " vs. "+ byte2hex(gr));
+		if x!=gr then
+			println("The received response does not match the golden response!");
+		end
+	end
+
+end
