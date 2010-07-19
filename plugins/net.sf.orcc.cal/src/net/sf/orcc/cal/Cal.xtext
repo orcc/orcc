@@ -133,8 +133,7 @@ AstOutputPattern: port=[AstPort] ':' '[' values+=AstExpression (',' values+=AstE
 
 AstStatementAssign:
 	target=AstVariableReference
-	('[' (indexes += AstExpression (',' indexes += AstExpression)*)? ']')*
-	':=' value=AstExpression ';';
+		('[' indexes += AstExpression ']')* ':=' value=AstExpression ';';
 
 AstStatementCall:
 	procedure=[AstProcedure]
@@ -207,8 +206,7 @@ AstExpressionCall:
 	function=[AstFunction] '(' (parameters += AstExpression (',' parameters += AstExpression)*)? ')';
 
 AstExpressionIndex:
-	source=AstVariableReference
-	('[' (indexes += AstExpression (',' indexes += AstExpression)*)? ']')+;
+	source=AstVariableReference ('[' indexes += AstExpression ']')+;
 
 AstExpressionIf:
 	'if' condition=AstExpression

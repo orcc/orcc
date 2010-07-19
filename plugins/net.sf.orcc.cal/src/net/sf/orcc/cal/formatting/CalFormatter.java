@@ -204,8 +204,6 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		c.setNoSpace().around(access.getLeftSquareBracketKeyword_1_0());
 		c.setNoSpace().before(access.getRightSquareBracketKeyword_1_2());
-
-		c.setNoSpace().before(access.getCommaKeyword_1_1_1_0());
 	}
 
 	/**
@@ -425,8 +423,6 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		c.setNoSpace().around(access.getLeftSquareBracketKeyword_1_0());
 		c.setNoSpace().before(access.getRightSquareBracketKeyword_1_2());
-
-		c.setNoSpace().before(access.getCommaKeyword_1_1_1_0());
 
 		c.setLinewrap().after(access.getSemicolonKeyword_4());
 		c.setNoSpace().before(access.getSemicolonKeyword_4());
