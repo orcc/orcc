@@ -147,6 +147,13 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return typeUint;
 	}
 
+	@Override
+	public TypeUint createTypeUint(int size) {
+		TypeUintImpl typeUint = new TypeUintImpl();
+		typeUint.setSize(size);
+		return typeUint;
+	}
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

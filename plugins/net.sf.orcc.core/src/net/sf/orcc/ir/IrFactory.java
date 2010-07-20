@@ -53,6 +53,14 @@ public interface IrFactory extends EFactory {
 	TypeInt createTypeInt();
 
 	/**
+	 * Creates a new int type with the given size.
+	 * 
+	 * @param size
+	 *            the size of this int type
+	 */
+	TypeInt createTypeInt(int size);
+
+	/**
 	 * Returns a new object of class '<em>Type List</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -60,6 +68,16 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	TypeList createTypeList();
+
+	/**
+	 * Creates a new list type with the given size and element type.
+	 * 
+	 * @param size
+	 *            the size of this list type
+	 * @param type
+	 *            the type of this list's elements
+	 */
+	TypeList createTypeList(int size, Type type);
 
 	/**
 	 * Returns a new object of class '<em>Type String</em>'.
@@ -80,6 +98,14 @@ public interface IrFactory extends EFactory {
 	TypeUint createTypeUint();
 
 	/**
+	 * Creates a new uint type with the given size.
+	 * 
+	 * @param size
+	 *            the size of this uint type
+	 */
+	TypeUint createTypeUint(int size);
+
+	/**
 	 * Returns a new object of class '<em>Type Void</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -87,24 +113,6 @@ public interface IrFactory extends EFactory {
 	 * @generated
 	 */
 	TypeVoid createTypeVoid();
-
-	/**
-	 * Creates a new integer with the given size.
-	 * 
-	 * @param size
-	 *            the size of this integer type
-	 */
-	TypeInt createTypeInt(int size);
-
-	/**
-	 * Creates a new list type with the given size and element type.
-	 * 
-	 * @param size
-	 *            the size of this list type
-	 * @param type
-	 *            the type of this list's elements
-	 */
-	TypeList createTypeList(int size, Type type);
 
 	/**
 	 * Returns the package supported by this factory.
