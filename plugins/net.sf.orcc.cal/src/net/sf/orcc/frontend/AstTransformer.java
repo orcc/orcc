@@ -828,7 +828,7 @@ public class AstTransformer {
 				}
 
 				if ("println".equals(name)) {
-					parameters.add(new StringExpr("\\n"));
+					parameters.add(new StringExpr("\n"));
 				}
 
 				addInstruction(new Call(location, null, procedure, parameters));

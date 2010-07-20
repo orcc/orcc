@@ -44,7 +44,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
@@ -108,52 +107,6 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 		}
 	}
 
-	/**
-	 * Returns a new string that is an unescaped version of the given string.
-	 * Unespaced means that "\\\\", "\\n", "\\r", "\\t" are replaced by '\\',
-	 * '\n', '\r', '\t' respectively.
-	 * 
-	 * @param string
-	 *            a string
-	 * @return a new string that is an unescaped version of the given string
-	 */
-	private String getUnescapedString(String string) {
-		StringBuilder builder = new StringBuilder(string.length());
-		boolean escape = false;
-		for (int i = 0; i < string.length(); i++) {
-			char chr = string.charAt(i);
-			if (escape) {
-				switch (chr) {
-				case '\\':
-					builder.append('\\');
-					break;
-				case 'n':
-					builder.append('\n');
-					break;
-				case 'r':
-					builder.append('\r');
-					break;
-				case 't':
-					builder.append('\t');
-					break;
-				default:
-					// we could throw an exception here
-					builder.append(chr);
-					break;
-				}
-				escape = false;
-			} else {
-				if (chr == '\\') {
-					escape = true;
-				} else {
-					builder.append(chr);
-				}
-			}
-		}
-
-		return builder.toString();
-	}
-
 	@Override
 	public void visit(Assign instr, Object... args) {
 		LocalVariable target = instr.getTarget();
@@ -185,18 +138,9 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 				OrccProcess process = (OrccProcess) args[1];
 				if (process != null) {
 					for (int i = 0; i < callParams.size(); i++) {
-						if (callParams.get(i).isStringExpr()) {
-							// String characters rework for escaped control
-							// management
-							String str = ((StringExpr) callParams.get(i))
-									.getValue();
-							String unescaped = getUnescapedString(str);
-							process.write(unescaped);
-						} else {
-							Object value = callParams.get(i).accept(
-									exprInterpreter);
-							process.write(String.valueOf(value));
-						}
+						Object value = callParams.get(i)
+								.accept(exprInterpreter);
+						process.write(String.valueOf(value));
 					}
 				}
 			}
@@ -301,7 +245,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), int_target, 0, numTokens);
 			for (int i = 0; i < int_target.length; i++) {
-				target[i] = (Integer)int_target[i];
+				target[i] = (Integer) int_target[i];
 			}
 		} else if (fifo instanceof Fifo_boolean) {
 			Boolean[] target = (Boolean[]) (instr.getTarget().getValue());
@@ -309,7 +253,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 			System.arraycopy(((Fifo_boolean) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), bool_target, 0, numTokens);
 			for (int i = 0; i < bool_target.length; i++) {
-				target[i] = (Boolean)bool_target[i];
+				target[i] = (Boolean) bool_target[i];
 			}
 		} else if (fifo instanceof Fifo_String) {
 			String[] target = (String[]) (instr.getTarget().getValue());
@@ -355,7 +299,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), int_target, 0, numTokens);
 			for (int i = 0; i < int_target.length; i++) {
-				target[i] = (Integer)int_target[i];
+				target[i] = (Integer) int_target[i];
 			}
 		} else if (fifo instanceof Fifo_boolean) {
 			Boolean[] target;
@@ -369,7 +313,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 			System.arraycopy(((Fifo_boolean) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), bool_target, 0, numTokens);
 			for (int i = 0; i < bool_target.length; i++) {
-				target[i] = (Boolean)bool_target[i];
+				target[i] = (Boolean) bool_target[i];
 			}
 		} else if (fifo instanceof Fifo_String) {
 			String[] target;
@@ -458,11 +402,10 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 		// ((Fifo_Object) fifo).writeEnd(numTokens, fifoArray);
 		if (fifo instanceof Fifo_int) {
 			Integer[] target = (Integer[]) instr.getTarget().getValue();
-			int[] fifoArray = ((Fifo_int) fifo)
-					.getWriteArray(numTokens);
+			int[] fifoArray = ((Fifo_int) fifo).getWriteArray(numTokens);
 			int index = fifo.getWriteIndex(numTokens);
 			for (Integer obj_elem : target) {
-				fifoArray[index++] = (int)obj_elem;
+				fifoArray[index++] = (int) obj_elem;
 			}
 			((Fifo_int) fifo).writeEnd(numTokens, fifoArray);
 		} else if (fifo instanceof Fifo_boolean) {
@@ -471,7 +414,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 					.getWriteArray(numTokens);
 			int index = fifo.getWriteIndex(numTokens);
 			for (Boolean obj_elem : target) {
-				fifoArray[index++] = (boolean)obj_elem;
+				fifoArray[index++] = (boolean) obj_elem;
 			}
 			((Fifo_boolean) fifo).writeEnd(numTokens, fifoArray);
 		} else if (fifo instanceof Fifo_String) {
