@@ -439,10 +439,10 @@ instance(instance, options) ::= <<
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fifo.h"
-#include "orcc_util.h"
+#include <orcc/fifo.h>
+#include <orcc/orcc_util.h>
 $if(options.("net.sf.orcc.backends.enableTrace"))$
-#include "trace.h"
+#include <orcc/trace.h>
 $endif$
 
 ////////////////////////////////////////////////////////////////////////////////

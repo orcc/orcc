@@ -223,16 +223,10 @@ actor Algo_RefList (bool IsRefList0)
 			NbSTRead       := 0;
 			NbSTCount      := ValSzSTList;
 			ValMovedFrame  := frame_num;
-		println("");
-		println("");
-		println("");
-		println("");
-		println("***************** New Picture ************************");
-		//println("\n\n\n\n\n***************** New Picture ************************");
+		println("\n\n\n\n\n***************** New Picture ************************");
 		println("Frame Num Curr Pic:"+frame_num+" Poc:"+ValPOC);
 		println("");
-		println("ListReceived");
-		//println("\nListReceived");
+		println("\nListReceived");
 		println("SizeShortTermList:"+ValSzSTList);
 		end
 
