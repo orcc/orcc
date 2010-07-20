@@ -433,7 +433,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			Type type = getLub(listType1.getType(), listType2.getType());
 			return IrFactory.eINSTANCE.createTypeList(size, type);
 		} else if (t1.isUint() && t2.isUint()) {
-			return IrFactory.eINSTANCE.createTypeInt(Math.max(
+			return IrFactory.eINSTANCE.createTypeUint(Math.max(
 					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
 		} else if (t1.isInt() && t2.isUint()) {
 			int si = ((TypeInt) t1).getSize();
