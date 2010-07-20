@@ -359,7 +359,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Synp_AVC_FREXT"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Dirty/Algo_Synp_AVC_FREXT"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -368,7 +368,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockExpand_AVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_BlockExpand_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -377,7 +377,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_BlockSplit_AVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_BlockSplit_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -435,6 +435,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="IsRefList0">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
     </Instance>
     <Instance id="Algo_RefList1">
         <!-- ************************* -->
@@ -444,6 +447,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="IsRefList0">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
     </Instance>
     <Instance id="Black_Hole">
         <!-- ************************* -->
@@ -458,7 +464,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Demux_Cavlc_Cabac"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_Demux_Cavlc_Cabac"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -467,7 +473,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Mux_Cavlc_Cabac"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_Mux_Cavlc_Cabac"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
