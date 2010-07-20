@@ -44,6 +44,7 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
@@ -64,6 +65,7 @@ import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
 import net.sf.orcc.runtime.Fifo_int;
+import net.sf.orcc.util.StringUtil;
 
 /**
  * This class defines a node interpreter.
@@ -125,7 +127,6 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 
 	@Override
 	public void visit(Call call, Object... args) {
-
 		// Get called procedure
 		Procedure proc = call.getProcedure();
 
@@ -138,9 +139,19 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 				OrccProcess process = (OrccProcess) args[1];
 				if (process != null) {
 					for (int i = 0; i < callParams.size(); i++) {
-						Object value = callParams.get(i)
-								.accept(exprInterpreter);
-						process.write(String.valueOf(value));
+						if (callParams.get(i).isStringExpr()) {
+							// String characters rework for escaped control
+							// management
+							String str = ((StringExpr) callParams.get(i))
+									.getValue();
+							String unescaped = StringUtil
+									.getUnescapedString(str);
+							process.write(unescaped);
+						} else {
+							Object value = callParams.get(i).accept(
+									exprInterpreter);
+							process.write(String.valueOf(value));
+						}
 					}
 				}
 			}

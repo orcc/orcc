@@ -53,6 +53,7 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.util.StringUtil;
 
 /**
  * This class defines an expression evaluator.
@@ -415,7 +416,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 
 	@Override
 	public Object caseAstExpressionString(AstExpressionString expression) {
-		return expression.getValue();
+		return StringUtil.getEscapedString(expression.getValue());
 	}
 
 	@Override

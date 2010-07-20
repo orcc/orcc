@@ -50,44 +50,6 @@ public class ExpressionPrinter implements ExpressionVisitor {
 		builder = new StringBuilder();
 	}
 
-	/**
-	 * Returns a new string that is an escaped version of the given string.
-	 * Espaced means that '\\', '\n', '\r', '\t' are replaced by "\\\\, "\\n",
-	 * "\\r", "\\t" respectively.
-	 * 
-	 * @param string
-	 *            a string
-	 * @return a new string that is an escaped version of the given string
-	 */
-	private String getEscapedString(String string) {
-		StringBuilder builder = new StringBuilder(string.length());
-		for (int i = 0; i < string.length(); i++) {
-			char chr = string.charAt(i);
-			switch (chr) {
-			case '\\':
-				builder.append("\\\\");
-				break;
-			case '"':
-				builder.append("\"");
-				break;
-			case '\n':
-				builder.append("\\n");
-				break;
-			case '\r':
-				builder.append("\\r");
-				break;
-			case '\t':
-				builder.append("\\t");
-				break;
-			default:
-				builder.append(chr);
-				break;
-			}
-		}
-
-		return builder.toString();
-	}
-
 	@Override
 	public String toString() {
 		return builder.toString();
@@ -181,7 +143,7 @@ public class ExpressionPrinter implements ExpressionVisitor {
 	@Override
 	public void visit(StringExpr expr, Object... args) {
 		builder.append('"');
-		builder.append(getEscapedString(expr.getValue()));
+		builder.append(expr.getValue());
 		builder.append('"');
 	}
 

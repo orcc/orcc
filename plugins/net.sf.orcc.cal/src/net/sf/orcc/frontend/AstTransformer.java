@@ -88,6 +88,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.StringUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
@@ -276,7 +277,7 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionString(AstExpressionString expression) {
-			return new StringExpr(expression.getValue());
+			return new StringExpr(StringUtil.getEscapedString(expression.getValue()));
 		}
 
 		@Override
@@ -828,7 +829,7 @@ public class AstTransformer {
 				}
 
 				if ("println".equals(name)) {
-					parameters.add(new StringExpr("\n"));
+					parameters.add(new StringExpr("\\n"));
 				}
 
 				addInstruction(new Call(location, null, procedure, parameters));
