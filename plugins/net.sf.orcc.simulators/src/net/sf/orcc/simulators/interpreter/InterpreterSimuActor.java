@@ -398,7 +398,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	public int step(boolean stepInto) {
 		try {
 			if (currentAction == null) {
-				if (isStepping == false) {
+				if ((isStepping == false) && (breakAction != null)) {
 					currentAction = breakAction;
 					isStepping = true;
 				} else {

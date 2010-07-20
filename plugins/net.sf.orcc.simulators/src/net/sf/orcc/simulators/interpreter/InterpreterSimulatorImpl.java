@@ -52,7 +52,7 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 
 	private List<Fifo> fifoList;
 
-	private int nbOfCycles;
+	protected int nbOfCycles;
 
 	private AbstractInterpreterSimuActor breakpointActor = null;
 	private Integer breakpointLine = 0;
@@ -148,7 +148,11 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 
 	@Override
 	protected String getBreakpointActorInstanceId() {
-		return ((SimuActor) breakpointActor).getInstanceId();
+		if (breakpointActor != null) {
+			return ((SimuActor) breakpointActor).getInstanceId();
+		}else {
+			return "";
+		}
 	}
 
 	@Override
@@ -283,10 +287,12 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 	}
 
 	@Override
-	protected void suspendNetwork() {
+	protected int suspendNetwork() {
 		if (breakpointActor != null) {
 			breakpointLine = breakpointActor.goToBreakpoint();
+			return breakpointLine;
 		}
+		return 0;
 	}
 
 }

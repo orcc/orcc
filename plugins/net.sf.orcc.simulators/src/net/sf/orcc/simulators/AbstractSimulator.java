@@ -208,6 +208,7 @@ public abstract class AbstractSimulator implements Simulator {
 	@Override
 	final public void configure(OrccProcess process, IProgressMonitor monitor,
 			boolean debugMode) {
+		this.state = SimulatorState.IDLE;
 		this.process = process;
 		this.monitor = monitor;
 		this.debugMode = debugMode;
@@ -554,9 +555,10 @@ public abstract class AbstractSimulator implements Simulator {
 						switch (msg.event) {
 						case SUSPEND:
 							messageQueue.remove();
-							suspendNetwork();
-							state = SimulatorState.SUSPENDED;
-							firePropertyChange("suspended client", null, null);
+							if (suspendNetwork() > 0) {
+								state = SimulatorState.SUSPENDED;
+								firePropertyChange("suspended client", null, null);
+							}
 							break;
 						case SET_BREAKPOINT:
 							messageQueue.remove();
@@ -740,7 +742,7 @@ public abstract class AbstractSimulator implements Simulator {
 	/**
 	 * Suspend the network simulation until next RESUME or STEP command.
 	 */
-	abstract protected void suspendNetwork();
+	abstract protected int suspendNetwork();
 
 	/**
 	 * End of simulation reached or required by user

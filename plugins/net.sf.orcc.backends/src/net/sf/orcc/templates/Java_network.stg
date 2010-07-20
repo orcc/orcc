@@ -96,7 +96,22 @@ public class Network_$network.name$ implements IScheduler {
 			$network.instances: scheduleActor()$
 		}
 	}
-	 
+	
+	public void setDisplayOutputStream(Object displayOstream) {
+		Actor_Display.setOutputStreamProxy(displayOstream);
+	}
+	
+	public void runNetwork(String sourceFilename, Object displayOutputStreamProxy) {
+		String[] args = new String[1];
+		args[0] = sourceFilename;
+		CLIParameters.getInstance().setArguments(args);
+		IScheduler scheduler = new Network_$network.name$();
+		scheduler.initialize();
+		Actor_Display.setOutputStreamProxy(displayOutputStreamProxy);
+		scheduler.schedule();
+		Actor_Display.closeDisplay();
+	}
+	
 	/**
 	 * 
 	 * @param args

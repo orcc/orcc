@@ -33,6 +33,7 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.actors.Actor_Display;
+import net.sf.orcc.runtime.actors.Actor_Display.OutputStreamProxy;
 import net.sf.orcc.simulators.SimuActor;
 
 /**
@@ -47,9 +48,27 @@ public class InterpreterSimuDisplay extends AbstractInterpreterSimuActor
 
 	private Actor_Display display;
 	private String instanceId;
-
+	
+	public class DisplayOutputStreamProxy implements OutputStreamProxy {
+		
+		private OrccProcess process;
+		
+		public DisplayOutputStreamProxy(OrccProcess process) {
+			this.process = process;
+		}
+		
+		@Override
+		public void write(String text) {
+			process.write(text);
+		}
+	}
+	
+	public InterpreterSimuDisplay() {
+	}
+	
 	public InterpreterSimuDisplay(String instanceId, OrccProcess process) {
 		this.display = new Actor_Display();
+		Actor_Display.setOutputStreamProxy(new DisplayOutputStreamProxy(process));
 		this.instanceId = instanceId;
 	}
 
@@ -61,6 +80,10 @@ public class InterpreterSimuDisplay extends AbstractInterpreterSimuActor
 	@Override
 	public void close() {
 		Actor_Display.closeDisplay();
+	}
+
+	public DisplayOutputStreamProxy createOutputStreamProxy(OrccProcess process) {
+		return new DisplayOutputStreamProxy(process);
 	}
 	
 	@Override

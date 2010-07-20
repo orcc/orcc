@@ -45,6 +45,12 @@ import net.sf.orcc.runtime.Fifo_int;
 
 public class Actor_Display implements IActor, ActionListener {
 
+	public interface OutputStreamProxy {
+		public void write(String text);
+	}
+
+	private OutputStreamProxy proxy;
+
 	private static Actor_Display instance;
 
 	/**
@@ -133,6 +139,7 @@ public class Actor_Display implements IActor, ActionListener {
 
 		instance = this;
 		userInterruption = false;
+		proxy = null;
 	}
 
 	@Override
@@ -167,7 +174,6 @@ public class Actor_Display implements IActor, ActionListener {
 		int i = 0;
 
 		if (userInterruption) {
-			System.out.println("Display closed by user.");
 			return -1;
 		}
 
@@ -204,6 +210,12 @@ public class Actor_Display implements IActor, ActionListener {
 		} else {
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
+		}
+	}
+
+	public static void setOutputStreamProxy(Object proxy) {
+		if (instance != null) {
+			instance.proxy = (OutputStreamProxy) proxy;
 		}
 	}
 
@@ -274,7 +286,13 @@ public class Actor_Display implements IActor, ActionListener {
 			numImages++;
 			long t = System.currentTimeMillis();
 			long t2 = t - startTime;
-			System.out.println("Image nb " + numImages + " decoded in " + t2);
+			if (proxy != null) {
+				proxy.write("Image nb " + numImages + " decoded in " + t2
+						+ "ms\n");
+			} else {
+				System.out.println("Image nb " + numImages + " decoded in "
+						+ t2 + "ms");
+			}
 			startTime = t;
 		}
 	}
