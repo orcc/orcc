@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="MV" x="57" y="184"/>
+      <vertex id="BTYPE" x="57" y="277"/>
+      <vertex id="TEX" x="325" y="70"/>
+      <vertex id="VID" x="611" y="250"/>
+      <vertex id="interpolation" x="325" y="163"/>
+      <vertex id="add" x="474" y="223"/>
+      <vertex id="framebuff" x="170" y="166"/>
+   </vertices>
+</layout>

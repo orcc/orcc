@@ -1,22 +1,21 @@
-// MPEG4_mgnt_Address.cal
-//
-// Author: David B. Parlour (dave.parlour@xilinx.com)
-//
-// Modified by: Christophe Lucarz (christophe.lucarz@epfl.ch)
-//
-// Modified by: Carl von Platen (carl.von.platen@ericsson.com) 
-//              Ericsson AB, 2009
-//              Integrated frame buffer with address generation
-//
-// Copyright (c) 2004-2005 Xilinx Inc.
-// All Rights Reserved
-//
-// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
-//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
-//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
-//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
-
-// 
+/* MPEG4_mgnt_Address.cal
+*
+* Author: David B. Parlour (dave.parlour@xilinx.com)
+*
+* Modified by: Christophe Lucarz (christophe.lucarz@epfl.ch)
+*
+* Modified by: Carl von Platen (carl.von.platen@ericsson.com) 
+*              Ericsson AB, 2009
+*              Integrated frame buffer with address generation
+*
+* Copyright (c) 2004-2005 Xilinx Inc.
+* All Rights Reserved
+*
+* Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+*              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+*              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+*              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+*/ 
 
 
 

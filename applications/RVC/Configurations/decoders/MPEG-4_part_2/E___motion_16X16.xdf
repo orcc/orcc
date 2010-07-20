@@ -68,7 +68,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/EPFL/MPEG4_algo_Interpolation_halfpel"/>
+        <Class name="../../../VTL/Proprietary/E__/E___Algo_Interpolation_halfpel"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
