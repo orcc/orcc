@@ -386,7 +386,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IntraPred_Split"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_IntraPred_Split"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

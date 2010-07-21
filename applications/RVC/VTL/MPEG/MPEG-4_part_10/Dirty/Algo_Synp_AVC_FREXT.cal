@@ -5956,7 +5956,6 @@ end
 	var
 		uint(size=2) ValRefListType
 	do
-	println("Transmit RefList0");
 		set_bits_to_read(1);
 		if(slice_type = SLICE_TYPE_B) then
 			ValRefListType := REFLIST0_BI_PRED;
@@ -6049,7 +6048,6 @@ end
 					guard
 						slice_type = SLICE_TYPE_B
 					do
-	println("Transmit RefList1");
 						set_bits_to_read(1);
 					end
 
@@ -6138,8 +6136,6 @@ end
 					read_SliceH_skip_ref_pic_list_reordering_l1: action ==> RefReordering_l1:[0], Nb_RefFrame_l1:[0], RefList1Type:[0]
 					guard
 						slice_type != SLICE_TYPE_B
-					do
-	println("Transmit RefList1");
 					end
 
 					skip_read_SliceH_skip_ref_pic_list_reordering_l1: action ==>
@@ -6154,15 +6150,11 @@ end
 	read_SliceH_skip_ref_pic_list_reordering: action ==> RefReordering_l0:[0], Nb_RefFrame_l0:[0], RefReordering_l1:[0], Nb_RefFrame_l1:[0], RefList0Type:[0]
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI, first_mb_in_slice=0
-	do
-	println("Transmit RefList0");
 	end
 
 	skip_read_SliceH_skip_ref_pic_list_reordering: action ==>
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI, first_mb_in_slice!=0
-	do
-		println("\t\tParser stuff : Crap!");
 	end
 	//end if
 	//******* End of ref_pic_list_reordering  ********/
