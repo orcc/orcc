@@ -56,9 +56,12 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * This class defines a property page for an Orcc project.
  * 
  * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
 public class ProjectPropertyPage extends PropertyPage {
+
+	private Button isReadable;
 
 	private IProject project;
 
@@ -100,6 +103,7 @@ public class ProjectPropertyPage extends PropertyPage {
 		initialize();
 		createDescriptionLabel(composite);
 		createControlOutputFolder(composite);
+		createControlReadableJson(composite);
 		applyDialogFont(composite);
 
 		return composite;
@@ -140,6 +144,29 @@ public class ProjectPropertyPage extends PropertyPage {
 				browseOutputFolder(parent.getShell());
 			}
 		});
+	}
+
+	private void createControlReadableJson(Composite composite) {
+		final Composite parent = new Composite(composite, SWT.NONE);
+
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.verticalSpacing = 0;
+		parent.setLayout(layout);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		parent.setLayoutData(data);
+
+		Label lbl = new Label(parent, SWT.NONE);
+		lbl.setText("Readable IR:");
+		lbl.setToolTipText("Generate a readable version of the IR of Orcc.");
+		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		lbl.setLayoutData(data);
+
+		isReadable = new Button(parent, SWT.CHECK);
+		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		isReadable.setLayoutData(data);
+
 	}
 
 	private boolean getFolderFromText() {
