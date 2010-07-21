@@ -79,7 +79,7 @@ actor Algo_MMCO ()
 */
 
 	int (size=32) SENT_DONE = -2;
-
+bool DEBUG = false;
 
 /*
 *
@@ -147,7 +147,9 @@ actor Algo_MMCO ()
 			else
 				ValIsIDR := false;
 			end
-//println("\tMMCO FrNu:"+ValFrame_Num+" MaxFrameNum:"+MaxFrNu);
+if(DEBUG)then
+println("\n\tMMCO *******New Pic*******\n\tMMCO FrNu:"+ValFrame_Num+" MaxFrameNum:"+MaxFrNu);
+end
 		end
 
 
@@ -202,9 +204,9 @@ actor Algo_MMCO ()
 		do
 			ValLongTermList := LTList[NbLongTermSent];
 			NbLongTermSent  := NbLongTermSent + 1;
-//	if(ValLongTermList!= -1)then
-//println("\tMMCO LTList:"+ValLongTermList);
-//	end
+	if(ValLongTermList!= -1 and DEBUG)then
+println("\tMMCO LTList:"+ValLongTermList);
+	end
 		end
 
 
@@ -218,7 +220,9 @@ actor Algo_MMCO ()
 		do
 			ValShortTermList := STList[NbShortTermSent];
 			NbShortTermSent  := NbShortTermSent + 1;
-//println("\tMMCO STList:"+ValShortTermList);
+if(DEBUG)then
+println("\tMMCO STList:"+ValShortTermList);
+end
 		end
 
 	
@@ -240,7 +244,9 @@ actor Algo_MMCO ()
 			LongTermCount    := 0;
 			LTList           := [-1 :for int s in 0 .. 15];
 			NbFrameDel       := 0;
-//println("\tMMCO IDR Pict");
+if(DEBUG)then
+println("\tMMCO IDR Pict");
+end
 		end
 
 
@@ -251,7 +257,9 @@ actor Algo_MMCO ()
 			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 0)
 		do
 			FlagLongTerm := 0;
-//println("\tMMCO Not IDR and Not MMCO");
+if(DEBUG)then
+println("\tMMCO Not IDR and Not MMCO");
+end
 		end
 
 
@@ -262,7 +270,9 @@ actor Algo_MMCO ()
 			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 1)
 		do
 			FlagLongTerm := 0;
-//println("\tMMCO MMCO on");
+if(DEBUG)then
+println("\tMMCO MMCO on");
+end
 		end
 
 
@@ -272,7 +282,9 @@ actor Algo_MMCO ()
 		guard 
 			opcode = 0
 		do
-//println("\tMMCO MMCO finished");
+if(DEBUG)then
+println("\tMMCO MMCO finished");
+end
 		end
 
 
@@ -296,7 +308,9 @@ actor Algo_MMCO ()
 					idx := i;
 				end
 			end
-//println("\tMMCO Del:"+FrameNumST);
+if(DEBUG)then
+println("\tMMCO Del:"+FrameNumST);
+end
 			if(idx != -1) then
 				if (ShortTermFalseFrame[idx] = false) then
 					DelListTab[NbFrameDel] := FrameNumST;
@@ -320,7 +334,9 @@ actor Algo_MMCO ()
 			opcode = 2
 		do
 			if(LTList[IdxLTFrame]  != -1) then
-//println("\tMMCO Del:"+LTList[IdxLTFrame]);
+if(DEBUG)then
+println("\tMMCO Del:"+LTList[IdxLTFrame]);
+end
 				DelListTab[NbFrameDel] := LTList[IdxLTFrame];
 				NbFrameDel             := NbFrameDel + 1;
 				LTList[IdxLTFrame]     := -1;
@@ -378,7 +394,9 @@ actor Algo_MMCO ()
 			foreach int i in long_term_max_idx .. 15
 			do
 				if (LTList[i] != -1) then
-//println("\tMMCO Del:"+LTList[i]);
+if(DEBUG)then
+println("\tMMCO Del:"+LTList[i]);
+end
 					DelListTab[NbFrameDel] := LTList[i];
 					NbFrameDel             := NbFrameDel + 1;
 					LTList[i]              := -1;
@@ -427,7 +445,8 @@ actor Algo_MMCO ()
 		guard
 			FlagLongTerm = 0
 		var
-			uint(size=4) j := 0
+			uint(size=4) j            := 0,
+			uint(size=4) NbSTFrameDel := 0
 		do
 			foreach int i in 0 .. ShortTermCount -1
 			do
@@ -435,12 +454,14 @@ actor Algo_MMCO ()
 					STList[j] := STList[i];
 					j := j + 1;
 				else
-					ShortTermCount := ShortTermCount - 1;
+					NbSTFrameDel := NbSTFrameDel + 1;
 				end
 			end
-			foreach int i in 0 .. LongTermCount - 1
+			ShortTermCount := ShortTermCount - NbSTFrameDel;
+
+			foreach int i in 0 .. 15
 			do
-				if(LTList[i] = FrameNum)then
+				if( (LTList[i] = FrameNum) and (LTList[i] != -1) )then
 					LTList[i]     := -1;
 					LongTermCount := LongTermCount - 1;
 				end
@@ -464,7 +485,9 @@ actor Algo_MMCO ()
 			ShortTermFalseFrame[0] := false;
 			ShortTermCount         := ShortTermCount +1;
 			IdxPocList             := 0;
-//println("\tMMCO IsIDR:"+ValIsIDR);
+if(DEBUG)then
+println("\tMMCO IsIDR:"+ValIsIDR);
+end
 		end
 
 
@@ -472,7 +495,8 @@ actor Algo_MMCO ()
 				==>
 			IsIDR         :[ValIsIDR]
 		var
-			uint(size=4) j := 0
+			uint(size=4) j            := 0,
+			uint(size=4) NbSTFrameDel := 0
 		do
 			foreach int i in 0 .. ShortTermCount -1
 			do
@@ -480,9 +504,10 @@ actor Algo_MMCO ()
 					STList[j] := STList[i];
 					j := j + 1;
 				else
-					ShortTermCount := ShortTermCount - 1;
+					NbSTFrameDel := NbSTFrameDel + 1;
 				end
 			end
+			ShortTermCount := ShortTermCount - NbSTFrameDel;
 			foreach int i in 0 .. LongTermCount - 1
 			do
 				if(LTList[i] = FrameNum)then
@@ -509,7 +534,9 @@ actor Algo_MMCO ()
 				end
 			end
 			IdxPocList             := 0;
-//println("\tMMCO IsIDR:"+ValIsIDR);
+if(DEBUG)then
+println("\tMMCO IsIDR:"+ValIsIDR);
+end
 		end
 
 

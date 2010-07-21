@@ -435,9 +435,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="IsRefList0">
-            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_RefList1">
         <!-- ************************* -->
@@ -447,9 +444,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="IsRefList0">
-            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
-        </Parameter>
     </Instance>
     <Instance id="Black_Hole">
         <!-- ************************* -->
@@ -635,4 +629,8 @@
     <Connection dst="" dst-port="BlocksSize_Luma"
         src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
     <Connection dst="Algo_MMCO" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
+    <Connection dst="Algo_RefList1" dst-port="RefListType"
+        src="Algo_Synp_AVC" src-port="RefList1Type"/>
+    <Connection dst="Algo_RefList0" dst-port="RefListType"
+        src="Algo_Synp_AVC" src-port="RefList0Type"/>
 </XDF>

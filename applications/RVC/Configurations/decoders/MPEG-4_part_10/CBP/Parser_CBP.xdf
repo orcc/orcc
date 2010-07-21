@@ -435,9 +435,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="IsRefList0">
-            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
@@ -566,4 +563,6 @@
         src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
     <Connection dst="" dst-port="BlockSize_L" src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
     <Connection dst="Algo_MMCO" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
+    <Connection dst="Algo_RefList0" dst-port="RefListType"
+        src="Algo_Synp_AVC" src-port="RefList0Type"/>
 </XDF>
