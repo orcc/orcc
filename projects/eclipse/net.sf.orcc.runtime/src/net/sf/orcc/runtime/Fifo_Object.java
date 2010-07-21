@@ -31,8 +31,8 @@ public class Fifo_Object extends Fifo {
 	 * @param fifoName
 	 *            name of the fifo (and the trace file)
 	 */
-	public Fifo_Object(int size, String folderName, String fifoName) {
-		super(size, folderName, fifoName);
+	public Fifo_Object(int size, String folderName, String fifoName, boolean enableTraces) {
+		super(size, folderName, fifoName, enableTraces);
 		contents = new Object[size];
 	}
 

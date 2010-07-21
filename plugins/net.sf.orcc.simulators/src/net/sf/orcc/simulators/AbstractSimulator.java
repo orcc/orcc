@@ -110,7 +110,7 @@ public abstract class AbstractSimulator implements Simulator {
 	/**
 	 * the configuration used to launch this back-end.
 	 */
-	protected ILaunchConfiguration configuration = null;
+	private ILaunchConfiguration configuration = null;
 
 	/**
 	 * Indicate to the simulator implementation the we are in debug mode.
@@ -345,6 +345,78 @@ public abstract class AbstractSimulator implements Simulator {
 	}
 
 	/**
+	 * Returns the boolean-valued attribute with the given name. Returns the
+	 * given default value if the attribute is undefined.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @param defaultValue
+	 *            the value to use if no value is found
+	 * @return the value or the default value if no value was found.
+	 * @throws OrccException
+	 */
+	final public boolean getAttribute(String attributeName, boolean defaultValue)
+			throws OrccException {
+		if (configuration == null) {
+			return defaultValue;
+		}
+
+		try {
+			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
+	}
+
+	/**
+	 * Returns the integer-valued attribute with the given name. Returns the
+	 * given default value if the attribute is undefined.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @param defaultValue
+	 *            the value to use if no value is found
+	 * @return the value or the default value if no value was found.
+	 * @throws OrccException
+	 */
+	final public int getAttribute(String attributeName, int defaultValue)
+			throws OrccException {
+		if (configuration == null) {
+			return defaultValue;
+		}
+
+		try {
+			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
+	}
+
+	/**
+	 * Returns the string-valued attribute with the given name. Returns the
+	 * given default value if the attribute is undefined.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @param defaultValue
+	 *            the value to use if no value is found
+	 * @return the value or the default value if no value was found.
+	 * @throws OrccException
+	 */
+	final public String getAttribute(String attributeName, String defaultValue)
+			throws OrccException {
+		if (configuration == null) {
+			return defaultValue;
+		}
+
+		try {
+			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
+	}
+
+	/**
 	 * Get the instance ID of the actor that has just hit a breakpoint.
 	 * 
 	 * @return String : breakpoint actor's instance ID
@@ -434,7 +506,7 @@ public abstract class AbstractSimulator implements Simulator {
 	 * @throws OrccException
 	 * @throws FileNotFoundException
 	 */
-	private void instantiateNetwork(DirectedGraph<Vertex, Connection> graph)
+	public void instantiateNetwork(DirectedGraph<Vertex, Connection> graph)
 			throws OrccException, FileNotFoundException {
 		// Loop over the graph vertexes and get instances definition for
 		// instantiating the network to simulate.

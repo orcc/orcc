@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
@@ -46,11 +47,9 @@ import net.sf.orcc.runtime.Fifo_int;
 import net.sf.orcc.simulators.AbstractSimulator;
 import net.sf.orcc.simulators.SimuActor;
 
-import org.eclipse.core.runtime.CoreException;
-
 public class InterpreterSimulatorImpl extends AbstractSimulator {
 
-	private List<Fifo> fifoList;
+	protected List<Fifo> fifoList;
 
 	protected int nbOfCycles;
 
@@ -106,38 +105,26 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 		Fifo fifo = null;
 		// Get traces folder and build fifo traces file name
 		try {
-			enableTraces = configuration.getAttribute(ENABLE_TRACES,
-					DEFAULT_TRACES);
-			if (enableTraces) {
-				String tracesFolder = configuration.getAttribute(TRACES_FOLDER,
-						"");
-				String fifoName = source.getInstanceId() + "_"
-						+ srcPort.getName();
-				// Create FIFO with tracing capability
-				if (srcPort.getType().isBool()) {
-					fifo = new Fifo_boolean(fifoSize, tracesFolder, fifoName);
-				} else if (srcPort.getType().isString()) {
-					fifo = new Fifo_String(fifoSize, tracesFolder, fifoName);
-				} else { // (srcPort.getType().isInt() or isUInt() TODO : manage
-							// floats ?) {
-					fifo = new Fifo_int(fifoSize, tracesFolder, fifoName);
-				}
-			} else {
-				// Create FIFO without tracing capability
-				if (srcPort.getType().isBool()) {
-					fifo = new Fifo_boolean(fifoSize);
-				} else if (srcPort.getType().isString()) {
-					fifo = new Fifo_String(fifoSize);
-				} else { // (srcPort.getType().isInt() or isUInt() TODO : manage
-							// floats ?) {
-					fifo = new Fifo_int(fifoSize);
-				}
+			enableTraces = getAttribute(ENABLE_TRACES, DEFAULT_TRACES);
+			String tracesFolder = getAttribute(TRACES_FOLDER, "");
+			String fifoName = source.getInstanceId() + "_" + srcPort.getName();
+			// Create FIFO with tracing capability
+			if (srcPort.getType().isBool()) {
+				fifo = new Fifo_boolean(fifoSize, tracesFolder, fifoName,
+						enableTraces);
+			} else if (srcPort.getType().isString()) {
+				fifo = new Fifo_String(fifoSize, tracesFolder, fifoName,
+						enableTraces);
+			} else { // (srcPort.getType().isInt() or isUInt() TODO : manage
+						// floats ?) {
+				fifo = new Fifo_int(fifoSize, tracesFolder, fifoName,
+						enableTraces);
 			}
 			fifoList.add(fifo);
 			// Connect actors
 			((AbstractInterpreterSimuActor) source).setFifo(srcPort, fifo);
 			((AbstractInterpreterSimuActor) target).setFifo(tgtPort, fifo);
-		} catch (CoreException e) {
+		} catch (OrccException e) {
 			e.printStackTrace();
 		}
 		for (SimuActor simuActorInstance : simuActorsMap.values()) {
@@ -150,7 +137,7 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 	protected String getBreakpointActorInstanceId() {
 		if (breakpointActor != null) {
 			return ((SimuActor) breakpointActor).getInstanceId();
-		}else {
+		} else {
 			return "";
 		}
 	}
@@ -292,7 +279,7 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 			breakpointLine = breakpointActor.goToBreakpoint();
 			return breakpointLine;
 		}
-		return 0;
+		return 1;
 	}
 
 }

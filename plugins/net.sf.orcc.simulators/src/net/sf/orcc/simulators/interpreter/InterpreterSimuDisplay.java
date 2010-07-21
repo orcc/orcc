@@ -62,8 +62,8 @@ public class InterpreterSimuDisplay extends AbstractInterpreterSimuActor
 			process.write(text);
 		}
 	}
-	
-	public InterpreterSimuDisplay() {
+	public InterpreterSimuDisplay(String instanceId) {
+		this.instanceId = instanceId;
 	}
 	
 	public InterpreterSimuDisplay(String instanceId, OrccProcess process) {

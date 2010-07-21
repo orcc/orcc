@@ -55,6 +55,8 @@ public abstract class Fifo {
 
 	protected OutputStreamWriter out = null;
 
+	private String fifoName;
+
 	/**
 	 * Creates a new FIFO with the given size.
 	 * 
@@ -76,20 +78,25 @@ public abstract class Fifo {
 	 * @param fifoName
 	 *            name of the fifo (and the trace file)
 	 */
-	public Fifo(int size, String folderName, String fifoName) {
+	public Fifo(int size, String folderName, String fifoName,
+			boolean enableTraces) {
 		this.size = size;
-		// Create network communication tracing file
-		File file = new File(folderName);
-		try {
-			fos = new FileOutputStream(new File(file, fifoName + "_traces.txt"));
-			this.out = new OutputStreamWriter(fos, "UTF-8");
-		} catch (FileNotFoundException e) {
-			String msg = "folder not found: \"" + folderName + "\"";
-			throw new RuntimeException(msg, e);
-		} catch (UnsupportedEncodingException e) {
-			String msg = "unsupported utf8 encoding for folder : \""
-					+ folderName + "\"";
-			throw new RuntimeException(msg, e);
+		this.fifoName = fifoName;
+		if (enableTraces) {
+			// Create network communication tracing file
+			File file = new File(folderName);
+			try {
+				fos = new FileOutputStream(new File(file, fifoName
+						+ "_traces.txt"));
+				this.out = new OutputStreamWriter(fos, "UTF-8");
+			} catch (FileNotFoundException e) {
+				String msg = "folder not found: \"" + folderName + "\"";
+				throw new RuntimeException(msg, e);
+			} catch (UnsupportedEncodingException e) {
+				String msg = "unsupported utf8 encoding for folder : \""
+						+ folderName + "\"";
+				throw new RuntimeException(msg, e);
+			}
 		}
 	}
 
@@ -108,6 +115,34 @@ public abstract class Fifo {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	/**
+	 * Returns the level of the fifo.
+	 * 
+	 * @return fifo level
+	 */
+	public int getLevel() {
+		return fillCount;
+	}
+
+	/**
+	 * Returns the name of the fifo (name of writing actor and its corresponding
+	 * output port.
+	 * 
+	 * @return the fifo name
+	 */
+	public String getName() {
+		return fifoName;
+	}
+
+	/**
+	 * Returns the size of the FIFO.
+	 * 
+	 * @return fifo size
+	 */
+	public int getSize() {
+		return size;
 	}
 
 	/**
