@@ -102,7 +102,7 @@ int DecoderEngine::load(Network* network) {
 
 	jit->initEngine(decoder);
 
-	//jit->optimize(decoder);
+	jit->optimize(decoder);
 
 	jit->printModule("module.txt", decoder);
 
