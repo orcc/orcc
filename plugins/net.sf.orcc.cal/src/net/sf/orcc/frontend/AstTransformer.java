@@ -277,7 +277,8 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionString(AstExpressionString expression) {
-			return new StringExpr(StringUtil.getEscapedString(expression.getValue()));
+			return new StringExpr(StringUtil.getEscapedString(expression
+					.getValue()));
 		}
 
 		@Override
@@ -610,9 +611,9 @@ public class AstTransformer {
 	 */
 	private class PrintlnTransformer extends CalSwitch<Object> {
 
-		private List<Expression> parameters;
-
 		private Object object;
+
+		private List<Expression> parameters;
 
 		public PrintlnTransformer(List<Expression> parameters) {
 			this.parameters = parameters;
@@ -654,7 +655,7 @@ public class AstTransformer {
 	private class StatementTransformer extends CalSwitch<Object> {
 
 		private Object object;
-		
+
 		public StatementTransformer() {
 			this.object = new Object();
 		}
@@ -905,6 +906,21 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Adds a return with the given value at the end of the given procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 * @param value
+	 *            an expression, possibly <code>null</code> for procedures that
+	 *            do not have a return value
+	 */
+	public void addReturn(Procedure procedure, Expression value) {
+		BlockNode block = BlockNode.getLast(procedure);
+		Return returnInstr = new Return(value);
+		block.add(returnInstr);
+	}
+
+	/**
 	 * Clears up context and functions/proceudres maps.
 	 */
 	public void clear() {
@@ -1096,20 +1112,14 @@ public class AstTransformer {
 
 	/**
 	 * Loads globals at the beginning of the current procedure, stores them at
-	 * the end, add a return instruction, and restores the con
+	 * the end, and restores the context
 	 * 
 	 * @param context
 	 *            the context returned by {@link #newContext()}
-	 * @param value
-	 *            an expression to return, possibly <code>null</code> for
-	 *            imperative procedures
 	 */
-	public void restoreContext(Context context, Expression value) {
+	public void restoreContext(Context context) {
 		loadGlobals();
 		storeGlobals();
-
-		Return returnInstr = new Return(value);
-		addInstruction(returnInstr);
 
 		this.context = context;
 	}
@@ -1191,7 +1201,8 @@ public class AstTransformer {
 		transformLocalVariables(astFunction.getVariables());
 		Expression value = transformExpression(astFunction.getExpression());
 
-		restoreContext(oldContext, value);
+		restoreContext(oldContext);
+		addReturn(procedure, value);
 
 		if (astFunction.eContainer() == null) {
 			procedure.setExternal(true);
@@ -1252,7 +1263,7 @@ public class AstTransformer {
 			exprTransformer.clearTarget();
 
 			context.restoreScope();
-			restoreContext(oldContext, null);
+			restoreContext(oldContext);
 		}
 
 		return stateVariable;
@@ -1363,7 +1374,8 @@ public class AstTransformer {
 		transformLocalVariables(astProcedure.getVariables());
 		transformStatements(astProcedure.getStatements());
 
-		restoreContext(oldContext, null);
+		restoreContext(oldContext);
+		addReturn(procedure, null);
 
 		if (astProcedure.eContainer() == null) {
 			procedure.setExternal(true);

@@ -79,7 +79,6 @@ import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -405,10 +404,9 @@ public class ActorTransformer {
 		Procedure body = new Procedure("init_actor", location,
 				IrFactory.eINSTANCE.createTypeVoid());
 
-		BlockNode block = BlockNode.getFirst(scheduler);
-		block.add(new Return(new BoolExpr(true)));
-		block = BlockNode.getFirst(body);
-		block.add(new Return(null));
+		// add return instructions
+		astTransformer.addReturn(scheduler, new BoolExpr(true));
+		astTransformer.addReturn(body, null);
 
 		// creates action
 		Action action = new Action(location, tag, inputPattern, outputPattern,
@@ -652,7 +650,8 @@ public class ActorTransformer {
 		astTransformer.transformStatements(astAction.getStatements());
 		transformOutputPattern(astAction);
 
-		astTransformer.restoreContext(oldContext, null);
+		astTransformer.restoreContext(oldContext);
+		astTransformer.addReturn(body, null);
 	}
 
 	/**
@@ -700,7 +699,8 @@ public class ActorTransformer {
 			createActionTest(astAction, inputPattern, result);
 		}
 
-		astTransformer.restoreContext(oldContext, new VarExpr(new Use(result)));
+		astTransformer.restoreContext(oldContext);
+		astTransformer.addReturn(scheduler, new VarExpr(new Use(result)));
 	}
 
 	/**
