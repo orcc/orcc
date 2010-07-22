@@ -1287,6 +1287,11 @@ public class AstTransformer {
 					variable);
 		}
 
+		// Add return inst to initialize if exist
+		if (initialize != null) {
+			addReturn(initialize, null);
+
+		}
 		return stateVars;
 	}
 
