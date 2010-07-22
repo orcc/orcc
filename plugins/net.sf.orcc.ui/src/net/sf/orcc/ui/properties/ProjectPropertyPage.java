@@ -30,8 +30,6 @@ package net.sf.orcc.ui.properties;
 
 import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
 import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
-import static net.sf.orcc.OrccProperties.DEFAULT_COMPACTJSON;
-import static net.sf.orcc.OrccProperties.COMPACT_JSON;
 
 import java.io.File;
 
@@ -63,7 +61,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class ProjectPropertyPage extends PropertyPage {
 
-	private Button compactIR;
+	private Button isReadable;
 
 	private IProject project;
 
@@ -98,34 +96,30 @@ public class ProjectPropertyPage extends PropertyPage {
 		layout.marginWidth = 0;
 		layout.marginHeight = 0;
 		composite.setLayout(layout);
-		GridData data = new GridData(GridData.FILL);
-		data.grabExcessHorizontalSpace = true;
+		GridData data = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		composite.setLayoutData(data);
 
 		initialize();
 		createDescriptionLabel(composite);
-		createControlOutputFolder(composite);
-		createControlCompactIR(composite);
+
+		Composite container = createTopLevelComposite(composite);
+
+		createControlOutputFolder(container);
+		createControlReadableJson(container);
+
+		// apply dialog font to the whole composite
 		applyDialogFont(composite);
 
 		return composite;
 	}
 
-	private void createControlOutputFolder(Composite composite) {
-		final Composite parent = new Composite(composite, SWT.NONE);
-
-		GridLayout layout = new GridLayout(3, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		layout.verticalSpacing = 0;
-		parent.setLayout(layout);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		parent.setLayoutData(data);
+	private void createControlOutputFolder(final Composite parent) {
+		GridData data;
 
 		Label lbl = new Label(parent, SWT.NONE);
 		lbl.setText("Output folder:");
 		lbl.setToolTipText("The folder where IR files will be generated.");
-		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		lbl.setLayoutData(data);
 
 		textOutput = new Text(parent, SWT.BORDER | SWT.SINGLE);
@@ -148,27 +142,37 @@ public class ProjectPropertyPage extends PropertyPage {
 		});
 	}
 
-	private void createControlCompactIR(Composite composite) {
-		final Composite parent = new Composite(composite, SWT.NONE);
+	private void createControlReadableJson(Composite parent) {
+		GridData data;
 
-		GridLayout layout = new GridLayout(2, false);
+		isReadable = new Button(parent, SWT.CHECK);
+		isReadable.setText("Pretty-print the IR");
+		isReadable.setToolTipText("Generate readable JSON files.");
+		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		data.horizontalSpan = 3;
+		isReadable.setLayoutData(data);
+	}
+
+	/**
+	 * Creates a new Composite with a 3-column grid layout, with components
+	 * aligned towards the top.
+	 * 
+	 * @param composite
+	 *            parent composite
+	 * @return a new Composite with a 3-column grid layout
+	 */
+	private Composite createTopLevelComposite(Composite composite) {
+		final Composite container = new Composite(composite, SWT.NONE);
+
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.verticalSpacing = 0;
-		parent.setLayout(layout);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		parent.setLayoutData(data);
+		container.setLayout(layout);
+		GridData data = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		container.setLayoutData(data);
 
-		Label lbl = new Label(parent, SWT.NONE);
-		lbl.setText("Compact version of IR:");
-		lbl.setToolTipText("Generate a compact version of the IR of Orcc.");
-		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		lbl.setLayoutData(data);
-
-		compactIR = new Button(parent, SWT.CHECK);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		compactIR.setLayoutData(data);
-
+		return container;
 	}
 
 	private boolean getFolderFromText() {
@@ -193,8 +197,6 @@ public class ProjectPropertyPage extends PropertyPage {
 				+ "Please read tooltips for more information on configuration properties.");
 
 		try {
-			
-			//Initialize output folder
 			String outputFolder = project
 					.getPersistentProperty(PROPERTY_OUTPUT);
 			if (outputFolder == null) {
@@ -211,7 +213,6 @@ public class ProjectPropertyPage extends PropertyPage {
 		super.performDefaults();
 		// Populate the owner text field with the default value
 		textOutput.setText(DEFAULT_OUTPUT);
-		compactIR.setEnabled(DEFAULT_COMPACTJSON);
 	}
 
 	@Override
@@ -219,11 +220,8 @@ public class ProjectPropertyPage extends PropertyPage {
 		try {
 			String oldOutput = project.getPersistentProperty(PROPERTY_OUTPUT);
 			String newOutput = textOutput.getText();
-			String oldIsCompact = project.getPersistentProperty(COMPACT_JSON);
-			String newIsCompact = Boolean.toString(compactIR.getEnabled());
 			project.setPersistentProperty(PROPERTY_OUTPUT, newOutput);
-			project.setPersistentProperty(COMPACT_JSON, newIsCompact);
-			if (!newOutput.equals(oldOutput)|| !newIsCompact.equals(oldIsCompact)) {
+			if (!newOutput.equals(oldOutput)) {
 				// build if new value is different from old value
 				project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
 			}
