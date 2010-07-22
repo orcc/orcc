@@ -581,14 +581,19 @@ public class IRWriter {
 		typeWriter = new TypeWriter();
 	}
 
-	public void write(String outputDir) throws OrccException {
+	public void write(String outputDir, boolean compactIR) throws OrccException {
 		try {
 			OutputStream os = new FileOutputStream(outputDir + File.separator
 					+ actor.getName() + ".json");
 			JSONObject obj = writeActor();
 
-			// use compact form
-			os.write(obj.toString().getBytes("UTF-8"));
+			if (compactIR){
+				// use compact form
+				os.write(obj.toString().getBytes("UTF-8"));
+			}else{
+				// use readeable form
+				os.write(obj.toString(2).getBytes("UTF-8"));
+			}
 
 			os.close();
 		} catch (IOException e) {

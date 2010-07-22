@@ -42,6 +42,11 @@ public interface OrccProperties {
 	 * Default value for {@value #OUTPUT_FOLDER}.
 	 */
 	public static final String DEFAULT_OUTPUT = ".generated";
+	
+	/**
+	 * Default value for {@value #COMPACTJSON}.
+	 */
+	public static final boolean DEFAULT_COMPACTJSON = true;
 
 	/**
 	 * Prefix for Orcc properties
@@ -53,5 +58,11 @@ public interface OrccProperties {
 	 */
 	public static final QualifiedName PROPERTY_OUTPUT = new QualifiedName(
 			PREFIX, "outputFolder");
+	
+	/**
+	 * Property for producing compact json for Xtext front-end.
+	 */
+	public static final QualifiedName COMPACT_JSON = new QualifiedName(
+			PREFIX, "compactJson");
 
 }

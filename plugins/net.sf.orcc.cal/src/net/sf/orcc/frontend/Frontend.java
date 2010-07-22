@@ -56,6 +56,11 @@ public class Frontend {
 	 * output folder
 	 */
 	private File outputFolder;
+	
+	/**
+	 * Compact version of the IR
+	 */
+	private boolean compactIR;
 
 	public Frontend() {
 	}
@@ -67,7 +72,7 @@ public class Frontend {
 			try {
 				Actor actor = actorTransformer.transform(file, astActor);
 				new SSATransformation().transform(actor);
-				new IRWriter(actor).write(outputFolder.toString());
+				new IRWriter(actor).write(outputFolder.toString(), compactIR);
 			} catch (OrccRuntimeException e) {
 				throw new OrccException(e.getMessage(), e);
 			}
@@ -79,6 +84,10 @@ public class Frontend {
 		if (!this.outputFolder.exists()) {
 			this.outputFolder.mkdir();
 		}
+	}
+	
+	public void setCompactIR(boolean compactIR) {
+		this.compactIR = compactIR;
 	}
 
 }
