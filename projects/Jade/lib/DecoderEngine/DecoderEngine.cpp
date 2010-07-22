@@ -98,9 +98,9 @@ int DecoderEngine::load(Network* network) {
 	// Setting connections of the decoder
 	fifo->setConnections(decoder);
 
-	RoundRobinScheduler scheduler(Context, jit, decoder);
-
 	jit->initEngine(decoder);
+	
+	RoundRobinScheduler scheduler(Context, jit, decoder);
 
 	jit->optimize(decoder);
 

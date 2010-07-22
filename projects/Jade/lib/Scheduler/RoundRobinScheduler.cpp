@@ -70,6 +70,10 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder
 	this->jit = jit;
 	this->decoder = decoder;
 	createScheduler();
+	
+	//Connect decoder to input and output of Jade
+	setSource();
+	setDisplay();
 }
 
 RoundRobinScheduler::~RoundRobinScheduler (){
@@ -120,10 +124,7 @@ void RoundRobinScheduler::createScheduler(){
 }
 
 void RoundRobinScheduler::execute(){
-	//Connect decoder to input and output of Jade
-	setSource();
-	setDisplay();
-	
+
 	//Run decoder
 	Module* module = decoder->getModule();
 	Function* main = module->getFunction("scheduler");
