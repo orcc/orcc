@@ -123,7 +123,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_MVR"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Mgnt_MVR"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -132,7 +132,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_MVR_MultiFrameAdptive"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MVR_MultiFrameAdptive"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -141,7 +141,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Add_AVC"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_Add_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

@@ -169,9 +169,8 @@ actor Algo_NALU ()
 	end
 
 	priority
-	mem_received_byte>delete_emul_3_byte>send_nb_rbsp_bytes>buffer_overflow;
-	send_rbsp>send_rbsp_done;
-//		send_nb_rbsp_bytes > send_rbsp > delete_emul_3_byte > mem_received_byte;
+		mem_received_byte > delete_emul_3_byte > send_nb_rbsp_bytes > buffer_overflow;
+		send_rbsp         > send_rbsp_done;
 	end /* priority */
 
 end /* actor */

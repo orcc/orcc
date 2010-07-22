@@ -448,7 +448,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
         <Parameter name="a">
-            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
         </Parameter>
     </Instance>
     <Instance id="Black_Hole">
