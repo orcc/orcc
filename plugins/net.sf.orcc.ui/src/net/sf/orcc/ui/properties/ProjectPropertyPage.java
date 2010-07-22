@@ -29,6 +29,8 @@
 package net.sf.orcc.ui.properties;
 
 import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
+import static net.sf.orcc.OrccProperties.DEFAULT_PRETTYPRINT;
+import static net.sf.orcc.OrccProperties.PRETTYPRINT_JSON;
 import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
 import java.io.File;
@@ -61,7 +63,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  */
 public class ProjectPropertyPage extends PropertyPage {
 
-	private Button isReadable;
+	private Button prettyPrintIR;
 
 	private IProject project;
 
@@ -105,7 +107,7 @@ public class ProjectPropertyPage extends PropertyPage {
 		Composite container = createTopLevelComposite(composite);
 
 		createControlOutputFolder(container);
-		createControlReadableJson(container);
+		createControlPrettyPrint(container);
 
 		// apply dialog font to the whole composite
 		applyDialogFont(composite);
@@ -142,15 +144,20 @@ public class ProjectPropertyPage extends PropertyPage {
 		});
 	}
 
-	private void createControlReadableJson(Composite parent) {
+	private void createControlPrettyPrint(Composite parent) {
 		GridData data;
 
-		isReadable = new Button(parent, SWT.CHECK);
-		isReadable.setText("Pretty-print the IR");
-		isReadable.setToolTipText("Generate readable JSON files.");
+		prettyPrintIR = new Button(parent, SWT.CHECK);
+		prettyPrintIR.setText("Pretty-print the IR");
+		prettyPrintIR.setToolTipText("Generate readable JSON files.");
 		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		data.horizontalSpan = 3;
-		isReadable.setLayoutData(data);
+		prettyPrintIR.setLayoutData(data);
+		try {
+			String selection = project.getPersistentProperty(PRETTYPRINT_JSON);
+			prettyPrintIR.setSelection(Boolean.valueOf(selection));
+		} catch (CoreException e) {
+		}
 	}
 
 	/**
@@ -204,6 +211,14 @@ public class ProjectPropertyPage extends PropertyPage {
 						.getLocation().toOSString()).append(DEFAULT_OUTPUT)
 						.toOSString());
 			}
+			String prettyPrint = project
+					.getPersistentProperty(PRETTYPRINT_JSON);
+
+			if (prettyPrint == null) {
+				project.setPersistentProperty(PRETTYPRINT_JSON,
+						Boolean.toString(DEFAULT_PRETTYPRINT));
+
+			}
 		} catch (CoreException e) {
 		}
 	}
@@ -213,6 +228,7 @@ public class ProjectPropertyPage extends PropertyPage {
 		super.performDefaults();
 		// Populate the owner text field with the default value
 		textOutput.setText(DEFAULT_OUTPUT);
+		prettyPrintIR.setSelection(DEFAULT_PRETTYPRINT);
 	}
 
 	@Override
@@ -221,7 +237,13 @@ public class ProjectPropertyPage extends PropertyPage {
 			String oldOutput = project.getPersistentProperty(PROPERTY_OUTPUT);
 			String newOutput = textOutput.getText();
 			project.setPersistentProperty(PROPERTY_OUTPUT, newOutput);
-			if (!newOutput.equals(oldOutput)) {
+			String oldPrettyPrint = project
+					.getPersistentProperty(PRETTYPRINT_JSON);
+			String newPrettyPrint = Boolean.toString(prettyPrintIR
+					.getSelection());
+			project.setPersistentProperty(PRETTYPRINT_JSON, newPrettyPrint);
+			if (!newOutput.equals(oldOutput)
+					|| !oldPrettyPrint.equals(newPrettyPrint)) {
 				// build if new value is different from old value
 				project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
 			}

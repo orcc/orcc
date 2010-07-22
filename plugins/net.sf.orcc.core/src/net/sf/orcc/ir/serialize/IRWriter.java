@@ -64,24 +64,24 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
-import net.sf.orcc.ir.TypeBool;
-import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
-import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.TypeVoid;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
@@ -581,18 +581,19 @@ public class IRWriter {
 		typeWriter = new TypeWriter();
 	}
 
-	public void write(String outputDir, boolean compactIR) throws OrccException {
+	public void write(String outputDir, boolean prettyPrint)
+			throws OrccException {
 		try {
 			OutputStream os = new FileOutputStream(outputDir + File.separator
 					+ actor.getName() + ".json");
 			JSONObject obj = writeActor();
 
-			if (compactIR){
-				// use compact form
-				os.write(obj.toString().getBytes("UTF-8"));
-			}else{
+			if (prettyPrint) {
 				// use readeable form
 				os.write(obj.toString(2).getBytes("UTF-8"));
+			} else {
+				// use compact form
+				os.write(obj.toString().getBytes("UTF-8"));
 			}
 
 			os.close();

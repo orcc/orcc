@@ -29,8 +29,8 @@
 package net.sf.orcc.cal.ui.builder;
 
 import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
+import static net.sf.orcc.OrccProperties.PRETTYPRINT_JSON;
 import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
-import static net.sf.orcc.OrccProperties.COMPACT_JSON;
 
 import java.io.IOException;
 import java.net.URL;
@@ -100,9 +100,9 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			project.setPersistentProperty(PROPERTY_OUTPUT, outputFolder);
 		}
 		frontend.setOutputFolder(outputFolder);
-		
-		String compactIR = project.getPersistentProperty(COMPACT_JSON);
-		frontend.setCompactIR(Boolean.parseBoolean(compactIR));
+
+		String compactIR = project.getPersistentProperty(PRETTYPRINT_JSON);
+		frontend.setPrettyPrint(Boolean.parseBoolean(compactIR));
 
 		ResourceSet set = context.getResourceSet();
 		List<Resource> resources = set.getResources();

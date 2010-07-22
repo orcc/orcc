@@ -46,7 +46,7 @@ public interface OrccProperties {
 	/**
 	 * Default value for {@value #COMPACTJSON}.
 	 */
-	public static final boolean DEFAULT_COMPACTJSON = true;
+	public static final boolean DEFAULT_PRETTYPRINT = false;
 
 	/**
 	 * Prefix for Orcc properties
@@ -62,7 +62,7 @@ public interface OrccProperties {
 	/**
 	 * Property for producing compact json for Xtext front-end.
 	 */
-	public static final QualifiedName COMPACT_JSON = new QualifiedName(
+	public static final QualifiedName PRETTYPRINT_JSON = new QualifiedName(
 			PREFIX, "compactJson");
 
 }
