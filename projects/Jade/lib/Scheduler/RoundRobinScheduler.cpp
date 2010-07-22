@@ -159,7 +159,7 @@ void RoundRobinScheduler::setDisplay(){
 	Function* writeMb = display->getProcedureVar(displayInst->getActor()->getProcedure("write_mb"));
 
 	//Map procedure to display
-	jit->MapFunction(setVideo, display_set_video);
-	jit->MapFunction(setInit, display_init);
-	jit->MapFunction(writeMb, display_write_mb);
+	jit->MapFunction(setVideo, (void *)display_set_video);
+	jit->MapFunction(setInit, (void *)display_init);
+	jit->MapFunction(writeMb, (void *)display_write_mb);
 }

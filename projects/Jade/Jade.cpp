@@ -54,6 +54,10 @@
 #endif
 //------------------------------
 
+#ifdef __APPLE__
+#include "SDL.h"
+#endif
+
 using namespace llvm;
 
 

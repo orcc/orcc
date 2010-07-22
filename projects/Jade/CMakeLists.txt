@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 project (Jade)
 
 find_program(LLVM_CONFIG llvm-config ${LLVM_INSTDIR}/bin DOC "path to llvm-config tool")
+find_package(SDL REQUIRED)
 
 IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 	set(LLVM_DIR /where/llvm/lives CACHE STRING "llvm source directory")
@@ -65,8 +66,6 @@ set(JADE_MAIN_INCLUDE_DIR ${JADE_MAIN_SRC_DIR}/include)
 set(JADE_TOOLS_DIR ${JADE_MAIN_SRC_DIR}/tools)
 set(JADE_VTL_DIR ${JADE_MAIN_SRC_DIR}/vtl)
 
-set(JADE_CPP_FLAGS  /D JADE_TOOLS_DIR=\\"${JADE_TOOLS_DIR}\\";
-				    /D JADE_VTL_DIR=\\"${JADE_VTL_DIR}\\")
 
 # Generate documentation option
 option(GENERATE_DOCS "Generate documentation using doxygen.")
@@ -92,12 +91,16 @@ add_subdirectory(lib/Graph)
 add_subdirectory(lib/Fifo)
 
 # Include directories
-include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS})
+include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_DIR})
  
 add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
  
 # Executable
+IF(APPLE)
+add_executable(Jade Jade.cpp /Library/Frameworks/SDL.framework/Resources/SDLMain.m)
+ELSE(APPLE)
 add_executable(Jade Jade.cpp)
+ENDIF(APPLE)
 
 # Library requiered
 target_link_libraries(Jade XDFParser Fifo DecoderEngine Network Actor JIT Scheduler HDAGGraph Decoder ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
