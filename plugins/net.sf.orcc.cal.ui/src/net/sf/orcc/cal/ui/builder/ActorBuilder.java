@@ -102,7 +102,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		frontend.setOutputFolder(outputFolder);
 		
 		String compactIR = project.getPersistentProperty(COMPACT_JSON);
-		frontend.setCompactIR(Boolean.getBoolean(compactIR));
+		frontend.setCompactIR(Boolean.parseBoolean(compactIR));
 
 		ResourceSet set = context.getResourceSet();
 		List<Resource> resources = set.getResources();
