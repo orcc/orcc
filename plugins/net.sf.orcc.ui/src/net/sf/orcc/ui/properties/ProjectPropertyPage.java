@@ -96,34 +96,30 @@ public class ProjectPropertyPage extends PropertyPage {
 		layout.marginWidth = 0;
 		layout.marginHeight = 0;
 		composite.setLayout(layout);
-		GridData data = new GridData(GridData.FILL);
-		data.grabExcessHorizontalSpace = true;
+		GridData data = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		composite.setLayoutData(data);
 
 		initialize();
 		createDescriptionLabel(composite);
-		createControlOutputFolder(composite);
-		createControlReadableJson(composite);
+
+		Composite container = createTopLevelComposite(composite);
+
+		createControlOutputFolder(container);
+		createControlReadableJson(container);
+
+		// apply dialog font to the whole composite
 		applyDialogFont(composite);
 
 		return composite;
 	}
 
-	private void createControlOutputFolder(Composite composite) {
-		final Composite parent = new Composite(composite, SWT.NONE);
-
-		GridLayout layout = new GridLayout(3, false);
-		layout.marginHeight = 0;
-		layout.marginWidth = 0;
-		layout.verticalSpacing = 0;
-		parent.setLayout(layout);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		parent.setLayoutData(data);
+	private void createControlOutputFolder(final Composite parent) {
+		GridData data;
 
 		Label lbl = new Label(parent, SWT.NONE);
 		lbl.setText("Output folder:");
 		lbl.setToolTipText("The folder where IR files will be generated.");
-		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
 		lbl.setLayoutData(data);
 
 		textOutput = new Text(parent, SWT.BORDER | SWT.SINGLE);
@@ -146,27 +142,37 @@ public class ProjectPropertyPage extends PropertyPage {
 		});
 	}
 
-	private void createControlReadableJson(Composite composite) {
-		final Composite parent = new Composite(composite, SWT.NONE);
+	private void createControlReadableJson(Composite parent) {
+		GridData data;
 
-		GridLayout layout = new GridLayout(2, false);
+		isReadable = new Button(parent, SWT.CHECK);
+		isReadable.setText("Pretty-print the IR");
+		isReadable.setToolTipText("Generate readable JSON files.");
+		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
+		data.horizontalSpan = 3;
+		isReadable.setLayoutData(data);
+	}
+
+	/**
+	 * Creates a new Composite with a 3-column grid layout, with components
+	 * aligned towards the top.
+	 * 
+	 * @param composite
+	 *            parent composite
+	 * @return a new Composite with a 3-column grid layout
+	 */
+	private Composite createTopLevelComposite(Composite composite) {
+		final Composite container = new Composite(composite, SWT.NONE);
+
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.verticalSpacing = 0;
-		parent.setLayout(layout);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		parent.setLayoutData(data);
+		container.setLayout(layout);
+		GridData data = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
+		container.setLayoutData(data);
 
-		Label lbl = new Label(parent, SWT.NONE);
-		lbl.setText("Readable IR:");
-		lbl.setToolTipText("Generate a readable version of the IR of Orcc.");
-		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		lbl.setLayoutData(data);
-
-		isReadable = new Button(parent, SWT.CHECK);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		isReadable.setLayoutData(data);
-
+		return container;
 	}
 
 	private boolean getFolderFromText() {
