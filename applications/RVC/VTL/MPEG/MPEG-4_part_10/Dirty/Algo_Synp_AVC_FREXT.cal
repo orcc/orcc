@@ -6051,7 +6051,7 @@ end
 						set_bits_to_read(1);
 					end
 
-					read_SliceH_ref_pic_list_reordering_flag_l1_done: action ==> RefReordering_l1:[ref_pic_list_reordering_flag], Nb_RefFrame_l1:[slice_num_ref_idx_l0_active_minus1 + 1]
+					read_SliceH_ref_pic_list_reordering_flag_l1_done: action ==> RefReordering_l1:[ref_pic_list_reordering_flag], Nb_RefFrame_l1:[slice_num_ref_idx_l1_active_minus1 + 1]
 					guard 
 						done_reading_bits(), first_mb_in_slice=0
 					do

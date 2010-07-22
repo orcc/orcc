@@ -62,7 +62,7 @@ Copyright (c) ISO/IEC 2008.
 //        delete NbPOC2
 //        delete IdxFalsePic
 //        delete IdxNotFound42
-actor Algo_RefList ()
+actor Algo_RefList (bool a)
 	uint(size=31) RefReordering,
 	uint(size=31) FraNum,
 	uint(size=31) MaxFrameNum,
@@ -84,7 +84,7 @@ actor Algo_RefList ()
 */
 	uint(size=2) REFLIST0_PRED    = 0;
 	uint(size=2) REFLIST0_BI_PRED = 1;
-	uint(size=2) REFLIST1_BI_PRED = 2;
+//	uint(size=2) REFLIST1_BI_PRED = 2;
 
 /*
 *
@@ -203,7 +203,7 @@ bool DEBUG;
 			LastFrameNum   := FrameNumList[IdxCurrentPic];
 			ValMaxFrameNum := MaxFrNu;
 			ListType       := ValRefListType;
-DEBUG := false;//if(a)then true else false end;
+DEBUG := if(a)then true else false end;
 
 			IdxCurrentPic := 0;
 			while(IdxNotFound && IdxCurrentPic<32)
@@ -432,7 +432,7 @@ end
 
 
 	//Get the Length of the Reference Frame (and send it throw RefList) and initialize the RefListTab
-	InitRefList.RefList0_Bi_Pred: action
+	InitRefList.RefListX_Bi_Pred: action
 		NbRefFrame :[ValIDxMax]
 			==>
 		RefList      :[NumMaxListRefFrame]
@@ -479,15 +479,28 @@ end
 			end
 		end
 		if(IdxLastPocInf >= 0)then
-			foreach int i in 0 .. IdxLastPocInf
-			do
-				RefIdx[IdxRefList] := RefSTList[IdxLastPocInf - i];
-				IdxRefList         := IdxRefList + 1;
-			end
-			foreach int i in IdxLastPocInf + 1 .. SzRefSTList - 1
-			do
-				RefIdx[IdxRefList] := RefSTList[i];
-				IdxRefList         := IdxRefList + 1;
+			if(ListType = REFLIST0_BI_PRED)then
+				foreach int i in 0 .. IdxLastPocInf
+				do
+					RefIdx[IdxRefList] := RefSTList[IdxLastPocInf - i];
+					IdxRefList         := IdxRefList + 1;
+				end
+				foreach int i in IdxLastPocInf + 1 .. SzRefSTList - 1
+				do
+					RefIdx[IdxRefList] := RefSTList[i];
+					IdxRefList         := IdxRefList + 1;
+				end
+			else
+				foreach int i in IdxLastPocInf + 1 .. SzRefSTList - 1
+				do
+					RefIdx[IdxRefList] := RefSTList[i];
+					IdxRefList         := IdxRefList + 1;
+				end
+				foreach int i in 0 .. IdxLastPocInf
+				do
+					RefIdx[IdxRefList] := RefSTList[IdxLastPocInf - i];
+					IdxRefList         := IdxRefList + 1;
+				end
 			end
 		else
 			foreach int i in 0 .. SzRefSTList - 1
@@ -517,8 +530,6 @@ end
 		//Indicates that nothing in RefList has been sent
 		CounterRefListTab := 0;
 	end
-
-
 	//If we don't have to reorder the list, we jump to SendRefList (see scheduler)
 	read_ref_pic_list_reordering_flag_0: action 
 			RefReordering :[reordering_flag]
@@ -693,9 +704,9 @@ end
 
 
 	priority
-		ReadLists.LongTerm        > ReadLists.ShortTerm       > ReadLists.done;
+		ReadLists.LongTerm        > ReadLists.ShortTerm          > ReadLists.done;
 		SendRefList               > SendRefListDone;
-		InitRefList.RefList0_Pred > InitRefList.RefList0_Bi_Pred;
+		InitRefList.RefList0_Pred > InitRefList.RefListX_Bi_Pred;
 	end
 
 end
