@@ -50,7 +50,7 @@ llvm::cl::opt<std::string> Fifo("fifo",
          llvm::cl::CommaSeparated,
          llvm::cl::desc("Specify fifo to be used in the decoder"),
          llvm::cl::value_desc("trace, circular, fast"),
-		 llvm::cl::init("trace"));
+		 llvm::cl::init("circular"));
 
 //Verify if directory is well formed
 void setDirectory(std::string* dir){
