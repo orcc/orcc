@@ -15,10 +15,12 @@
 // Commande line options
 llvm::cl::opt<std::string>
 VTLDir("L", llvm::cl::desc("Video Tools Library directory"), 
+	   llvm::cl::ValueRequired,
 	   llvm::cl::value_desc("VTL Folder"), 
 	   llvm::cl::init(JADE_VTL_DIR));
 
 llvm::cl::opt<std::string> ToolsDir("T", llvm::cl::desc("Jade tools directory"), 
+									llvm::cl::ValueRequired,
 									llvm::cl::value_desc("Tools Folder"), 
 									llvm::cl::init(JADE_TOOLS_DIR));
 
