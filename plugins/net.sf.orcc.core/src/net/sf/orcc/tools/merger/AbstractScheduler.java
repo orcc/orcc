@@ -64,24 +64,25 @@ public abstract class AbstractScheduler implements IScheduler {
 	}
 
 	public Map<Connection, Integer> getBufferCapacities() {
-		bufferCapacities = new HashMap<Connection, Integer>();
-		
-		for (Connection edge : graph.edgeSet()) {
-			Vertex src = graph.getEdgeSource(edge);
-			Vertex tgt = graph.getEdgeTarget(edge);
+		if (bufferCapacities == null) {
+			bufferCapacities = new HashMap<Connection, Integer>();
 
-			List<Schedule> schedules = getHierarchy(schedule, src);
-			schedules.removeAll(getHierarchy(schedule, tgt));
+			for (Connection edge : graph.edgeSet()) {
+				Vertex src = graph.getEdgeSource(edge);
+				Vertex tgt = graph.getEdgeTarget(edge);
 
-			int q = 1;
-			for (Schedule schedule : schedules) {
-				q *= schedule.getIterationCount();
+				List<Schedule> schedules = getHierarchy(schedule, src);
+				schedules.removeAll(getHierarchy(schedule, tgt));
+
+				int q = 1;
+				for (Schedule schedule : schedules) {
+					q *= schedule.getIterationCount();
+				}
+
+				int p = edge.getSource().getNumTokensProduced();
+				bufferCapacities.put(edge, p * q);
 			}
-			
-			int p = edge.getSource().getNumTokensProduced();
-			bufferCapacities.put(edge, p * q);
 		}
-		
 		return bufferCapacities;
 	}
 
@@ -89,7 +90,7 @@ public abstract class AbstractScheduler implements IScheduler {
 		List<Schedule> schedules = new LinkedList<Schedule>();
 		Iterator<Iterand> it = schedule.getIterands().iterator();
 		stop = false;
-		
+
 		while (it.hasNext()) {
 			Iterand iterand = it.next();
 			if (iterand.isVertex()) {

@@ -29,7 +29,14 @@
 
 package net.sf.orcc.tools.merger;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Connection;
@@ -47,6 +54,89 @@ import org.jgrapht.alg.CycleDetector;
 
 public class TopologicalSorter {
 
+	private static class TimeStamp {
+
+		static int currentTime = 0;
+		private int finish;
+		private int start;
+
+		public TimeStamp(int discovered, int finished) {
+			this.start = discovered;
+			this.finish = finished;
+		}
+
+		public int getFinished() {
+			return finish;
+		}
+
+		@SuppressWarnings("unused")
+		public int getStarted() {
+			return start;
+		}
+
+		public void setFinished(int finished) {
+			this.finish = finished;
+		}
+	};
+	
+	private class TimeStampComparator implements Comparator<Vertex> {
+
+		private Map<Vertex, TimeStamp> map;
+
+		public TimeStampComparator(Map<Vertex, TimeStamp> map) {
+			this.map = map;
+		}
+
+		public int compare(Vertex v1, Vertex v2) {
+			return map.get(v2).getFinished() - map.get(v1).getFinished();
+		}
+
+	};
+	
+	private class DFS {
+		
+		private Set<Vertex> defined = new HashSet<Vertex>();
+
+		private DirectedGraph<Vertex, Connection> graph;
+
+		private Map<Vertex, TimeStamp> timeStamps = new HashMap<Vertex, TimeStamp>();
+
+		public DFS(DirectedGraph<Vertex, Connection> graph) {
+			this.graph = graph;
+		}
+
+		private void dfsVisit(Vertex vertex) {
+			defined.add(vertex);
+			TimeStamp.currentTime++;
+			timeStamps.put(vertex, new TimeStamp(TimeStamp.currentTime, 0));
+
+			for (Connection connection : graph.outgoingEdgesOf(vertex)) {
+				Vertex tgtVertex = graph.getEdgeTarget(connection);
+				if (!defined.contains(tgtVertex)) {
+					dfsVisit(tgtVertex);
+				}
+			}
+			TimeStamp.currentTime++;
+			timeStamps.get(vertex).setFinished(TimeStamp.currentTime);
+		}
+
+		private Map<Vertex, TimeStamp> getTimestamps() {
+			for (Vertex vertex : graph.vertexSet()) {
+				if (!defined.contains(vertex)) {
+					dfsVisit(vertex);
+				}
+			}
+			return timeStamps;
+		}
+
+		public List<Vertex> orderedByFinishingTime() {
+			List<Vertex> sorted = new LinkedList<Vertex>(getTimestamps().keySet());
+			Collections.sort(sorted, new TimeStampComparator(timeStamps));
+			return sorted;
+		}
+
+	};
+	
 	private DirectedGraph<Vertex, Connection> graph;
 
 	public TopologicalSorter(DirectedGraph<Vertex, Connection> graph) {
