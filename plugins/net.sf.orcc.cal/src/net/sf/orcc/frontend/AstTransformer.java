@@ -1024,6 +1024,12 @@ public class AstTransformer {
 	 */
 	public Procedure getInitialize() {
 		Procedure initialize = this.initialize;
+
+		// adds return inst to initialize if it is not null
+		if (initialize != null) {
+			addReturn(initialize, null);
+		}
+
 		this.initialize = null;
 		return initialize;
 	}
@@ -1285,12 +1291,6 @@ public class AstTransformer {
 			StateVariable variable = transformGlobalVariable(astVariable);
 			stateVars.put(file, variable.getLocation(), variable.getName(),
 					variable);
-		}
-
-		// Add return inst to initialize if exist
-		if (initialize != null) {
-			addReturn(initialize, null);
-
 		}
 		return stateVars;
 	}
