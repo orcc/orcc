@@ -31,27 +31,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="In_Ctx_Idx">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="10"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="In_p_State_Idx">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="In_val_MPS">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="Pic_Size_In_Mbs">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -132,27 +111,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="Out_Ctx_Idx">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="10"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="Out_p_State_Idx">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="Out_val_MPS">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -193,9 +151,6 @@
     <Connection dst="mb_skip_flag" dst-port="Curr_Mb_Addr" src="" src-port="Curr_Mb_Addr"/>
     <Connection dst="mb_skip_flag" dst-port="In_CodIOffset" src="" src-port="In_CodIOffset"/>
     <Connection dst="mb_skip_flag" dst-port="In_CodIRange" src="" src-port="In_CodIRange"/>
-    <Connection dst="mb_skip_flag" dst-port="In_Ctx_Idx" src="" src-port="In_Ctx_Idx"/>
-    <Connection dst="mb_skip_flag" dst-port="In_p_State_Idx" src="" src-port="In_p_State_Idx"/>
-    <Connection dst="mb_skip_flag" dst-port="In_val_MPS" src="" src-port="In_val_MPS"/>
     <Connection dst="mb_skip_flag" dst-port="Pic_Size_In_Mbs" src="" src-port="Pic_Size_In_Mbs"/>
     <Connection dst="mb_skip_flag" dst-port="Pic_Width_In_Mbs" src="" src-port="Pic_Width_In_Mbs"/>
     <Connection dst="mb_skip_flag" dst-port="Slice_Type" src="" src-port="Slice_Type"/>
@@ -209,19 +164,10 @@
         src="mb_skip_flag" src-port="Out_CodIRange"/>
     <Connection dst="SE_Mux" dst-port="Mb_Skip_CodIOffset"
         src="mb_skip_flag" src-port="Out_CodIOffset"/>
-    <Connection dst="SE_Mux" dst-port="Mb_Skip_Ctx_Idx"
-        src="mb_skip_flag" src-port="Out_Ctx_Idx"/>
-    <Connection dst="SE_Mux" dst-port="Mb_Skip_val_MPS"
-        src="mb_skip_flag" src-port="Out_val_MPS"/>
-    <Connection dst="SE_Mux" dst-port="Mb_Skip_p_State_Idx"
-        src="mb_skip_flag" src-port="Out_p_State_Idx"/>
     <Connection dst="" dst-port="Dbits_Read" src="SE_Mux" src-port="Dbits_Read"/>
     <Connection dst="" dst-port="CabacValue" src="SE_Mux" src-port="CabacValue"/>
     <Connection dst="" dst-port="Out_CodIOffset" src="SE_Mux" src-port="Out_CodIOffset"/>
     <Connection dst="" dst-port="Out_CodIRange" src="SE_Mux" src-port="Out_CodIRange"/>
-    <Connection dst="" dst-port="Out_Ctx_Idx" src="SE_Mux" src-port="Out_Ctx_Idx"/>
-    <Connection dst="" dst-port="Out_p_State_Idx" src="SE_Mux" src-port="Out_p_State_Idx"/>
-    <Connection dst="" dst-port="Out_val_MPS" src="SE_Mux" src-port="Out_val_MPS"/>
     <Connection dst="mb_skip_flag" dst-port="Entropy_Coding" src="" src-port="Entropy_Coding"/>
     <Connection dst="prev_intra_pred_mode" dst-port="Curr_Mb_Addr"
         src="" src-port="Curr_Mb_Addr"/>
@@ -231,10 +177,6 @@
         src="" src-port="In_CodIOffset"/>
     <Connection dst="prev_intra_pred_mode" dst-port="In_CodIRange"
         src="" src-port="In_CodIRange"/>
-    <Connection dst="prev_intra_pred_mode" dst-port="In_Ctx_Idx" src="" src-port="In_Ctx_Idx"/>
-    <Connection dst="prev_intra_pred_mode" dst-port="In_p_State_Idx"
-        src="" src-port="In_p_State_Idx"/>
-    <Connection dst="prev_intra_pred_mode" dst-port="In_val_MPS" src="" src-port="In_val_MPS"/>
     <Connection dst="prev_intra_pred_mode" dst-port="Pic_Width_In_Mbs"
         src="" src-port="Pic_Width_In_Mbs"/>
     <Connection dst="prev_intra_pred_mode" dst-port="Syntax_Element"
@@ -247,12 +189,6 @@
         src="prev_intra_pred_mode" src-port="Out_CodIOffset"/>
     <Connection dst="SE_Mux" dst-port="Prev_CodIRange"
         src="prev_intra_pred_mode" src-port="Out_CodIRange"/>
-    <Connection dst="SE_Mux" dst-port="Prev_Ctx_Idx"
-        src="prev_intra_pred_mode" src-port="Out_Ctx_Idx"/>
-    <Connection dst="SE_Mux" dst-port="Prev_val_MPS"
-        src="prev_intra_pred_mode" src-port="Out_val_MPS"/>
-    <Connection dst="SE_Mux" dst-port="Prev_p_State_Idx"
-        src="prev_intra_pred_mode" src-port="Out_p_State_Idx"/>
     <Connection dst="SE_Mux" dst-port="Prev_Dbits_Read"
         src="prev_intra_pred_mode" src-port="Dbits_Read"/>
 </XDF>

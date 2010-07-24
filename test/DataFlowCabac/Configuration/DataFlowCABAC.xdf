@@ -43,12 +43,6 @@
         src="ParserSim" src-port="In_CodIRange"/>
     <Connection dst="CABAC_Entropy_Decoding" dst-port="In_CodIOffset"
         src="ParserSim" src-port="In_CodIOffset"/>
-    <Connection dst="CABAC_Entropy_Decoding" dst-port="In_Ctx_Idx"
-        src="ParserSim" src-port="In_Ctx_Idx"/>
-    <Connection dst="CABAC_Entropy_Decoding" dst-port="In_val_MPS"
-        src="ParserSim" src-port="In_val_MPS"/>
-    <Connection dst="CABAC_Entropy_Decoding" dst-port="In_p_State_Idx"
-        src="ParserSim" src-port="In_p_State_Idx"/>
     <Connection dst="CABAC_Entropy_Decoding" dst-port="Curr_Mb_Addr"
         src="ParserSim" src-port="Curr_Mb_Addr"/>
     <Connection dst="CABAC_Entropy_Decoding" dst-port="Pic_Width_In_Mbs"
@@ -67,12 +61,6 @@
         src="CABAC_Entropy_Decoding" src-port="Out_CodIRange"/>
     <Connection dst="ParserSim" dst-port="Out_CodIOffset"
         src="CABAC_Entropy_Decoding" src-port="Out_CodIOffset"/>
-    <Connection dst="ParserSim" dst-port="Out_Ctx_Idx"
-        src="CABAC_Entropy_Decoding" src-port="Out_Ctx_Idx"/>
-    <Connection dst="ParserSim" dst-port="Out_val_MPS"
-        src="CABAC_Entropy_Decoding" src-port="Out_val_MPS"/>
-    <Connection dst="ParserSim" dst-port="Out_p_State_Idx"
-        src="CABAC_Entropy_Decoding" src-port="Out_p_State_Idx"/>
     <Connection dst="ParserSim" dst-port="CabacValue"
         src="CABAC_Entropy_Decoding" src-port="CabacValue"/>
 </XDF>

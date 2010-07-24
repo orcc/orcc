@@ -56,9 +56,6 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	int(size=4)	 Entropy_Coding,
 	int(size=9)	 In_CodIRange,
 	int(size=9)	 In_CodIOffset,
-	int(size=10) In_Ctx_Idx,
-	int(size=4)	 In_val_MPS,
-	int			 In_p_State_Idx,
 	int(size=32) Curr_Mb_Addr,
 	int(size=32) Pic_Width_In_Mbs,
 	int(size=32) Pic_Size_In_Mbs,
@@ -69,10 +66,7 @@ actor Algo_CABAC_Mb_Skip_Flag()
 			int(size=4)	 Mb_Skip_Flag,
 			int(size=9)	 Dbits_Read,
 			int(size=9)	 Out_CodIRange,
-			int(size=9)	 Out_CodIOffset,
-			int(size=10) Out_Ctx_Idx,
-			int(size=4)  Out_val_MPS,
-			int			 Out_p_State_Idx:
+			int(size=9)	 Out_CodIOffset:
 
 
 /******************************************************************************
@@ -176,7 +170,6 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	/* Variables */
 	
 	/* Input binary Array */
-	int maxReadBits = 32;
 	
 	/* ctxIdx offset for mb_skip_flag */
 	
@@ -185,13 +178,13 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	
 	int ReadBitsIdx := 0;
 	int ReadResult := 0;
-	List ( type : int (size = 6), size = 32 ) readBits := [0:for int i in Integers(0,31)] ;
+	List ( type : int (size = 6), size = 32 ) readBits := [0:for int i in 0 .. 31] ;
 	
 	
-	List ( type : int (size = 6), size = 3 ) pStateIdx	:= [0:for int i in Integers(0,2)] ;
-	List ( type : int (size = 4), size = 3 ) valMPS		:= [0:for int i in Integers(0,2)] ;
+	List ( type : int (size = 6), size = 3 ) pStateIdx	:= [0:for int i in 0 .. 2] ;
+	List ( type : int (size = 4), size = 3 ) valMPS		:= [0:for int i in 0 .. 2] ;
 	
-	List ( type : int (size=4), size = PICWIDTH + 1) mb_skip_flag := [0:for int i in Integers(0,PICWIDTH)] ;
+	List ( type : int (size=4), size = PICWIDTH + 1) mb_skip_flag := [0:for int i in 0 .. PICWIDTH] ;
 	
 	
 	//Basic Variables
@@ -279,7 +272,8 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	procedure read_bits(int count)
 	begin
 		
-		foreach int i in Integers(0, count - 1) do
+		foreach int i in 0 .. count - 1 
+		do
 			ReadResult := bitor( lshift( ReadResult, 1), readBits[ReadBitsIdx] );
 			ReadBitsIdx := ReadBitsIdx + 1;
 		end
@@ -319,7 +313,8 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	procedure CabacCycleCopy()
 	begin
 		if CurrMbAddr >= PicWidthInMbs + 1 then
-			foreach int i in Integers(1,PicWidthInMbs + 1) do
+			foreach int i in 1 .. PicWidthInMbs + 1
+			 do
 				mb_skip_flag[i-1] := mb_skip_flag[i];
 			end
 			
@@ -337,7 +332,8 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	guard
 		SE = CABAC_INIT_SE
 	do
-		foreach int i in Integers(0, 2) do	
+		foreach int i in 0 .. 2
+		do	
 			if SliceType = SLICE_TYPE_P or SliceType = SLICE_TYPE_SP then
 				preCtxState_pro(QP, Cabac_Context_Init_P_SP[CabacInitIdc][i][0], Cabac_Context_Init_P_SP[CabacInitIdc][i][1]);
 			else
@@ -438,40 +434,15 @@ actor Algo_CABAC_Mb_Skip_Flag()
 	
 	
 	SentValue: action ==> Dbits_Read:[ReadBitsIdx], Mb_Skip_Flag:[CabacValue],
-                          Out_CodIRange:[codIRange], Out_CodIOffset:[codIOffset],
-                          Out_Ctx_Idx:[out_ctxIdx], Out_val_MPS:[vMPS],
-						  Out_p_State_Idx:[pState]
+                          Out_CodIRange:[codIRange], Out_CodIOffset:[codIOffset]
 	guard
 		codIRange >= 0x0100
-	var
-		int out_ctxIdx,
-		int vMPS,
-		int pState
-	do
-		
-		// Give the ctxIdx with it's offset
-		if SliceType = SLICE_TYPE_P or SliceType = SLICE_TYPE_SP then	
-			out_ctxIdx := ctxIdx + ctxIdxOffsetP_SP;
-		else
-			out_ctxIdx := ctxIdx + ctxIdxOffsetB;
-		end
-		
-		pState := pStateIdx[ctxIdx];
-		
-		if pStateIdx[ctxIdx] = 0 then
-			vMPS := valMPS[ctxIdx];
-		else
-			vMPS := -1;
-		end	
 	end
 	
 	ReadSE: action bits:[ bRead ] repeat 32,
 				   Cabac_Init_Idc:[a],
 				   In_CodIRange:[b],
 				   In_CodIOffset:[c],
-				   In_Ctx_Idx:[d],
-				   In_val_MPS:[e],			
-				   In_p_State_Idx:[f],
 				   Curr_Mb_Addr:[g],
 				   Entropy_Coding:[entropy],
 				   Pic_Width_In_Mbs:[h],
@@ -485,7 +456,7 @@ actor Algo_CABAC_Mb_Skip_Flag()
 		//Copy bRead List;
 		
 		
-		readBits := [bRead[s]:for int s in Integers(0,31)];
+		readBits := [bRead[s]:for int s in 0 .. 31];
 		
 		
 		CabacInitIdc	:= a;
@@ -497,34 +468,12 @@ actor Algo_CABAC_Mb_Skip_Flag()
 		SliceType		:= j;
 		SE				:= se;
 		QP				:= k;
-		
-		if SliceType = SLICE_TYPE_P or SliceType = SLICE_TYPE_SP then	
-			if d >= 11 and d <= 13 then
-				pStateIdx[d-ctxIdxOffsetP_SP] := f;
-			end
-			
-			if f = 0 then
-				valMPS[d-ctxIdxOffsetP_SP] := e;
-			end
-			
-		else
-			if d >= 24 and d <= 26 then
-				pStateIdx[d-ctxIdxOffsetB] := f;
-			end
-			
-			if f = 0 then
-				valMPS[d-ctxIdxOffsetB] := e;
-			end
-		end
 	end 
 	
 	Skip_ReadSE: action bits:[ bRead ] repeat 32,
 				   Cabac_Init_Idc:[a],
 				   In_CodIRange:[b],
 				   In_CodIOffset:[c],
-				   In_Ctx_Idx:[d],
-				   In_val_MPS:[e],			
-				   In_p_State_Idx:[f],
 				   Curr_Mb_Addr:[g],
 				   Entropy_Coding:[entropy],
 				   Pic_Width_In_Mbs:[h],
@@ -534,25 +483,6 @@ actor Algo_CABAC_Mb_Skip_Flag()
 				   val_QP:[k]==>
 	guard
 		se != CABAC_MB_SKIP_FLAG_SE or se != CABAC_INIT_SE
-	do
-		if SliceType = SLICE_TYPE_P or SliceType = SLICE_TYPE_SP then	
-			if d >= 11 and d <= 13 then
-				pStateIdx[d-ctxIdxOffsetP_SP] := f;
-			end
-			
-			if f = 0 then
-				valMPS[d-ctxIdxOffsetP_SP] := e;
-			end
-			
-		else
-			if d >= 24 and d <= 26 then
-				pStateIdx[d-ctxIdxOffsetB] := f;
-			end
-			
-			if f = 0 then
-				valMPS[d-ctxIdxOffsetB] := e;
-			end
-		end
 	end 
 	
 	schedule fsm Read:

@@ -2,19 +2,13 @@ actor ParserSim()
 	int			CabacValue,
 	int(size=9)	Dbits_Read,
 	int(size=9)	Out_CodIRange,
-	int(size=9)	Out_CodIOffset,
-	int(size=10)	Out_Ctx_Idx,
-	int(size=4)		Out_val_MPS,
-	int				Out_p_State_Idx 
+	int(size=9)	Out_CodIOffset
 		==>
 				int(size=4)	bits,
 				int(size=4)	Cabac_Init_Idc,
 				int(size=4)	Entropy_Coding,
 				int(size=9)	In_CodIRange,
 				int(size=9)	In_CodIOffset,
-				int(size=10)	In_Ctx_Idx,
-				int(size=4)		In_val_MPS,
-				int				In_p_State_Idx,
 				int(size=32)	Curr_Mb_Addr,
 				int(size=32)	Pic_Width_In_Mbs,
 				int(size=32)	Pic_Size_In_Mbs,

@@ -56,27 +56,63 @@ actor Algo_CABAC_Mux_SE()
 	int(size=9)	 Mb_Skip_Dbits_Read,
 	int(size=9)	 Mb_Skip_CodIRange,
 	int(size=9)	 Mb_Skip_CodIOffset,
-	int(size=10) Mb_Skip_Ctx_Idx,
-	int(size=4)	 Mb_Skip_val_MPS,
-	int			 Mb_Skip_p_State_Idx,
 	
 	//Prev Intra Pred Mode Flag SE
 	int(size=4)	 Prev_Intra_Pred_Mode_Flag,
 	int(size=9)	 Prev_Dbits_Read,
 	int(size=9)	 Prev_CodIRange,
-	int(size=9)	 Prev_CodIOffset,
-	int(size=10) Prev_Ctx_Idx,
-	int(size=4)	 Prev_val_MPS,
-	int			 Prev_p_State_Idx
+	int(size=9)	 Prev_CodIOffset
 		==>
 			int			CabacValue,
 			int(size=9)	Dbits_Read,
 			int(size=9)	Out_CodIRange,
-			int(size=9)	Out_CodIOffset,
-			int(size=10)	Out_Ctx_Idx,
-			int(size=4)		Out_val_MPS,
-			int				Out_p_State_Idx:
+			int(size=9)	Out_CodIOffset:
 
 
 
+/* *****************************************************************************
+								Constants
+***************************************************************************** */
+
+	int CABAC_MB_TYPE_SI    	 				= 0;
+	int CABAC_MB_TYPE_I     	 				= 1;
+	int CABAC_MB_TYPE_P_SP  	 				= 2;
+	int CABAC_MB_TYPE_B      	 				= 3;
+	int CABAC_MB_SKIP_FLAG	    				= 5;
+	int CABAC_SUB_MB_TYPE_P_SP   				= 6;
+	int CABAC_SUB_MB_TYPE_B	     				= 7; 
+	int CABAC_MVD_L0_0_0	     				= 8;
+	int CABAC_REF_IDX_L0_L1						= 10;
+	int CABAC_MB_QP_DELTA						= 11;
+	int CABAC_INTRA_CHROMA_PRED_MODE			= 12;
+	int CABAC_PREV_INTRA4x4_8x8_PRED_MODE_FLAG	= 13;
+	int CABAC_REM_INTRA4x4_8x8_PRED_MODE 		= 14;
+	//int CABAC_MB_FIELD_DECODING_FLAG 			= 15;
+	int CABAC_CODED_BLOCK_PATERN_LUMA 			= 16;
+	int CABAC_CODED_BLOCK_PATERN_CHROMA			= 17;		
+	int CABAC_CODED_BLOCK_FLAG 					= 18;
+	int CABAC_SIGNIFICANT_COEFF_FLAG 			= 19;
+	int CABAC_LAST_SIGNIFICANT_COEFF_FLAG 		= 20;
+	int CABAC_COEFF_ABS_LEVEL_MINUS1 			= 21;
+	int CABAC_END_OF_SLICE_FLAG 				= 23;
+	int CABAC_TRANSFORM_SIZE_8x8_FLAG 			= 24;
+	
+	//Sent MbSkipFlag
+	
+	SentMbSkipFlag: action Mb_Skip_Flag:[cabaValue], 
+						   Mb_Skip_Dbits_Read:[dbits], Mb_Skip_CodIRange:[Irange],
+						   Mb_Skip_CodIOffset:[Ioffset]
+						   		==>
+						   			CabacValue:[cabaValue], Dbits_Read:[dbits],
+						   			Out_CodIRange:[Irange], Out_CodIOffset:[Ioffset]
+					
+	end	
+	
+	SentPrevFlag: action Prev_Intra_Pred_Mode_Flag:[cabaValue], 
+						 Prev_Dbits_Read:[dbits], Prev_CodIRange:[Irange],
+						 Prev_CodIOffset:[Ioffset]
+						   		==>
+						   			CabacValue:[cabaValue], Dbits_Read:[dbits],
+						   			Out_CodIRange:[Irange], Out_CodIOffset:[Ioffset]						  
+	end	
 end
