@@ -139,7 +139,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="RVC_texture_16x16"/>
+        <Class name="GUC_RVC_texture_16x16"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -220,7 +220,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="RVC_motion"/>
+        <Class name="GUC_RVC_motion"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -330,7 +330,6 @@
     <Connection dst="serialize" dst-port="in8" src="" src-port="bits"/>
     <Connection dst="parser" dst-port="BITS" src="serialize" src-port="out"/>
     <Connection dst="motion_Y" dst-port="MV" src="parser" src-port="MV_Y"/>
-    <Connection dst="motion_Y" dst-port="BTYPE" src="parser" src-port="BTYPE_Y"/>
     <Connection dst="texture_Y" dst-port="BTYPE" src="parser" src-port="BTYPE_Y"/>
     <Connection dst="texture_Y" dst-port="QFS" src="parser" src-port="B_Y"/>
     <Connection dst="motion_Y" dst-port="TEX" src="texture_Y" src-port="f"/>
@@ -369,4 +368,8 @@
     <Connection dst="texture_Y" dst-port="QP" src="parser" src-port="QUANT_Y"/>
     <Connection dst="texture_V" dst-port="QP" src="parser" src-port="QUANT_V"/>
     <Connection dst="texture_U" dst-port="QP" src="parser" src-port="QUANT_U"/>
+    <Connection dst="texture_Y" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
+    <Connection dst="texture_Y" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_Y"/>
+    <Connection dst="motion_Y" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_Y"/>
+    <Connection dst="motion_Y" dst-port="BTYPE" src="parser" src-port="BTYPE_Y"/>
 </XDF>

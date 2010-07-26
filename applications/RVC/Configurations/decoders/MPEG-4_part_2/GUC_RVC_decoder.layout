@@ -6,7 +6,7 @@
       <vertex id="WIDTH" x="436" y="75"/>
       <vertex id="HEIGHT" x="436" y="168"/>
       <vertex id="serialize" x="157" y="468"/>
-      <vertex id="parser" x="282" y="351"/>
+      <vertex id="parser" x="241" y="348"/>
       <vertex id="texture_Y" x="436" y="261"/>
       <vertex id="texture_U" x="436" y="450"/>
       <vertex id="texture_V" x="436" y="639"/>
