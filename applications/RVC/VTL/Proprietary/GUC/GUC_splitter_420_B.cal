@@ -1,0 +1,95 @@
+// splitter_420_B
+//
+// Author: Andrew Kinane (kinanea@eeng.dcu.ie)
+// 
+// Description: This module splits a 4:2:0 chroma subsampled serial macroblock (YYYYUV)
+//              into its respective Y, U and V components.
+//
+
+actor GUC_splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BLOCKTYPE ==> int(size=SAMPLE_SZ) Y ,
+int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
+
+// Port size declaration
+	int BTYPE_SZ = 12;
+
+	int SAMPLE_SZ = 13;
+
+	int BLOCK_SZ = 64;
+
+	int INTRA = 1024;
+
+	int INTER = 512;
+
+	int ACCODED = 2;
+
+	int(size=4) comp := 0;
+
+	//         comp layout
+	//      Y         U       V
+	//  +---+---+   +---+   +---+
+	//  | 0 | 1 |   | 4 |   | 5 |
+	//  +---+---+   +---+   +---+
+	//  | 2 | 3 | 
+	//  +---+---+  
+
+	skip_uncoded: action BLOCKTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, INTER) != 0,
+		// An INTER block
+		bitand(cmd, ACCODED) = 0 // Not ACCODED
+
+	do
+		comp := comp + 1;
+		if comp = 6 then
+			comp := 0;
+		end
+	end
+
+	skip_other: action BLOCKTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, INTER) = 0,
+		// Not an INTER block
+		bitand(cmd, INTRA) = 0 // Not an INTRA block
+
+	do
+		comp := comp + 1;
+		if comp = 6 then
+			comp := 0;
+		end
+	end
+
+	splitY: action BLOCKTYPE:[ cmd ], B:[ x ] repeat BLOCK_SZ ==> Y:[ x ] repeat BLOCK_SZ
+	guard
+		comp < 4
+	do
+		comp := comp + 1;
+	end
+
+	splitU: action BLOCKTYPE:[ cmd ], B:[ x ] repeat BLOCK_SZ ==> U:[ x ] repeat BLOCK_SZ
+	guard
+		comp = 4
+	do
+		comp := comp + 1;
+	end
+
+	splitV: action BLOCKTYPE:[ cmd ], B:[ x ] repeat BLOCK_SZ ==> V:[ x ] repeat BLOCK_SZ
+	guard
+		comp = 5
+	do
+		comp := 0;
+	end
+
+	// 4:2:0 schedule.
+	schedule fsm READ :
+		READ ( skip_uncoded ) --> READ;
+		READ ( skip_other ) --> READ;
+		READ ( splitY ) --> READ;
+		READ ( splitU ) --> READ;
+		READ ( splitV ) --> READ;
+	end
+
+	priority
+		skip_uncoded > skip_other > splitY > splitU > splitV;
+	end
+
+end

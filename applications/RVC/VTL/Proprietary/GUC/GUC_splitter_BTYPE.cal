@@ -1,0 +1,42 @@
+// splitter_BTYPE
+//
+// Author: Christophe Lucarz (christophe.lucarz@epfl.ch) 
+// 
+// Description: the sequence of BTYPE token is not homogeneous, there is fist a NEW VOP command, then, the width and height of this VOP, then the  corresponding 8x8 blocks of texture, motion or mixed tex/mot. This actor will delete the tokens concerning the information of the VOP and redistribute the tokens to the Y, U and V components. So that the adder have directly the token intra, accoded or mixed.
+
+actor GUC_splitter_BTYPE () int(size=BTYPE_SZ) NEW_VOP, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BTYPE_SZ) BLOCKTYPE ==> int(size=BTYPE_SZ) Y ,
+int(size=BTYPE_SZ) U , int(size=BTYPE_SZ) V :
+
+// Port size declaration
+	int BTYPE_SZ = 12;
+
+	int NEWVOP = 2048;
+
+	// to send the newvop token to the address and add block (arrggg) 
+	cmd.newVop: action NEW_VOP:[cmd] ==> Y:[ cmd ], U:[ cmd ], V:[ cmd ]
+	guard
+		bitand(cmd, NEWVOP) != 0
+	end
+
+	w_h: action WIDTH:[w], HEIGHT:[h] ==> Y:[ w, h ], U:[ w, h ], V:[ w, h ]
+	end
+
+	// to split the tokens 
+	cmd.split: action NEW_VOP:[lnewvop] repeat 6, BLOCKTYPE:[ list ] repeat 6 ==> Y:[ list[0], list[1], list[2], list[3] ], U:[
+		list[4] ], V:[ list[5] ]
+	guard
+		lnewvop[0] = 0
+	end
+
+	schedule fsm cmd :
+		cmd ( cmd.newVop ) --> w_h;
+		cmd ( cmd.split ) --> cmd;
+		w_h ( w_h ) --> cmd;
+	end
+
+	priority
+		cmd.newVop > cmd.split;
+	end
+
+end
+

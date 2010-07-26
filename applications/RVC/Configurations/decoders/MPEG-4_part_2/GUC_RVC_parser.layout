@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="BITS" x="57" y="542"/>
+      <vertex id="BTYPE_Y" x="468" y="127"/>
+      <vertex id="BTYPE_U" x="468" y="220"/>
+      <vertex id="BTYPE_V" x="468" y="313"/>
+      <vertex id="MV_Y" x="764" y="721"/>
+      <vertex id="MV_U" x="764" y="814"/>
+      <vertex id="MV_V" x="764" y="907"/>
+      <vertex id="B_Y" x="624" y="340"/>
+      <vertex id="B_U" x="624" y="433"/>
+      <vertex id="B_V" x="624" y="526"/>
+      <vertex id="WIDTH" x="312" y="70"/>
+      <vertex id="HEIGHT" x="312" y="163"/>
+      <vertex id="QUANT_Y" x="468" y="700"/>
+      <vertex id="QUANT_U" x="468" y="793"/>
+      <vertex id="QUANT_V" x="468" y="886"/>
+      <vertex id="parseheaders" x="160" y="470"/>
+      <vertex id="mvseq" x="312" y="571"/>
+      <vertex id="blkexp" x="312" y="403"/>
+      <vertex id="mvrecon" x="468" y="553"/>
+      <vertex id="splitter_BTYPE" x="312" y="256"/>
+      <vertex id="splitter_MV" x="624" y="791"/>
+      <vertex id="splitter_420_B" x="468" y="406"/>
+      <vertex id="splitter_Qp" x="312" y="724"/>
+   </vertices>
+</layout>
