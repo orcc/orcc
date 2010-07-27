@@ -145,6 +145,7 @@ public class ActorMerger implements INetworkTransformation {
 			if (!var.isGlobal() && var.isPort()) {
 				var = portsMap.get(id + var.getName());
 				store.setTarget(var);
+				new Use(var, store);
 				updateIndex(var, store, store.getIndexes(), "_w", args);
 			}
 		}
@@ -221,7 +222,7 @@ public class ActorMerger implements INetworkTransformation {
 	/**
 	 * 
 	 */
-	private Actor createActor(Set<Vertex> vertices) throws OrccException {
+	private void createActor(Set<Vertex> vertices) throws OrccException {
 		OrderedMap<String, Port> inputs = new OrderedMap<String, Port>();
 		OrderedMap<String, Port> outputs = new OrderedMap<String, Port>();
 		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
@@ -239,42 +240,28 @@ public class ActorMerger implements INetworkTransformation {
 		getInputs(vertices);
 		getOutputs(vertices);
 		createInternalBuffers();
-		// addProceduresAndStateVars();
+		addProceduresAndStateVars();
 
 		Action action = createAction();
 		actor.getActions().add(action);
-
-		return actor;
 	}
 
 	/**
 	 * @throws OrccException
 	 * 
 	 */
-	@SuppressWarnings("unused")
 	private void addProceduresAndStateVars() throws OrccException {
 		for (Vertex vertex : scheduler.getSchedule().getActors()) {
 			Instance instance = vertex.getInstance();
 
-			for (StateVariable oldVar : instance.getActor().getStateVars()) {
-				String name = instance.getId() + "_" + oldVar.getName();
-				StateVariable newVar = new StateVariable(new Location(),
-						oldVar.getType(), name, oldVar.isAssignable(),
-						oldVar.getConstantValue());
-
-				List<Use> uses = new ArrayList<Use>(oldVar.getUses());
-				for (Use use : uses) {
-					use.setVariable(newVar);
-				}
-				actor.getStateVars().put(newVar.getName(), newVar);
+			for (StateVariable var : instance.getActor().getStateVars()) {
+				var.setName(instance.getId() + "_" + var.getName());
+				actor.getStateVars().put(var.getName(), var);
 			}
 
-			for (Procedure oldProc : instance.getActor().getProcs()) {
-				String name = instance.getId() + "_" + oldProc.getName();
-				Procedure newProc = new Procedure(name, false, new Location(),
-						oldProc.getReturnType(), oldProc.getParameters(),
-						oldProc.getLocals(), oldProc.getNodes());
-				actor.getProcs().put(name, newProc);
+			for (Procedure proc : instance.getActor().getProcs()) {
+				proc.setName(instance.getId() + "_" + proc.getName());
+				actor.getProcs().put(proc.getName(), proc);
 			}
 		}
 	}
@@ -388,6 +375,10 @@ public class ActorMerger implements INetworkTransformation {
 			Variable var = new StateVariable(new Location(), type,
 					port.getName(), true);
 			buffersMap.put(entry.getKey(), var);
+			String srcName = graph.getEdgeTarget(entry.getKey()).getInstance()
+					.getId()
+					+ "" + entry.getKey().getTarget().getName();
+			portsMap.put(srcName, var);
 		}
 
 		// Create internal buffer for outputs
@@ -399,6 +390,10 @@ public class ActorMerger implements INetworkTransformation {
 			Variable var = new StateVariable(new Location(), type,
 					port.getName(), true);
 			buffersMap.put(entry.getKey(), var);
+			String srcName = graph.getEdgeSource(entry.getKey()).getInstance()
+					.getId()
+					+ "" + entry.getKey().getSource().getName();
+			portsMap.put(srcName, var);
 		}
 
 		// Create internal buffer connections inside the cluster
@@ -417,7 +412,6 @@ public class ActorMerger implements INetworkTransformation {
 			String tgtName = graph.getEdgeSource(connection).getInstance()
 					.getId()
 					+ "" + connection.getSource().getName();
-
 			portsMap.put(tgtName, buf);
 		}
 	}
@@ -432,7 +426,6 @@ public class ActorMerger implements INetworkTransformation {
 			if (iterand.isVertex()) {
 				Vertex vertex = iterand.getVertex();
 				Instance instance = vertex.getInstance();
-
 				Procedure proc;
 				if (instance.getActor().getActions().size() == 1) {
 					Action action = instance.getActor().getActions().get(0);
@@ -443,7 +436,6 @@ public class ActorMerger implements INetworkTransformation {
 							"SDF actor with multiple actions is not yet supported!");
 				}
 				new ModifyAccess(instance.getId()).transform(actor);
-				new RemoveReadWrites().transform(actor);
 
 				BlockNode blkNode = BlockNode.getLast(procedure, nodes);
 
@@ -505,9 +497,9 @@ public class ActorMerger implements INetworkTransformation {
 	private void createReads(Procedure procedure) {
 		BlockNode block = BlockNode.getLast(procedure);
 		for (Port port : actor.getInputs()) {
-			Variable local = procedure.getLocals().get(port.getName());
+			Variable var = actor.getStateVars().get(port.getName());
 			int numTokens = port.getNumTokensConsumed();
-			Read read = new Read(port, numTokens, local);
+			Read read = new Read(port, numTokens, var);
 			block.add(read);
 		}
 	}
@@ -539,9 +531,9 @@ public class ActorMerger implements INetworkTransformation {
 	private void createWrites(Procedure procedure) {
 		BlockNode block = BlockNode.getLast(procedure);
 		for (Port port : actor.getOutputs()) {
-			Variable local = procedure.getLocals().get(port.getName());
+			Variable var = actor.getStateVars().get(port.getName());
 			int numTokens = port.getNumTokensProduced();
-			Write read = new Write(port, numTokens, local);
+			Write read = new Write(port, numTokens, var);
 			block.add(read);
 		}
 	}
@@ -613,6 +605,11 @@ public class ActorMerger implements INetworkTransformation {
 					graph, vertices, null);
 
 			scheduler = new FlatSASScheduler(subgraph);
+
+			for (Vertex vertex : vertices) {
+				Actor actor = vertex.getInstance().getActor();
+				new RemoveReadWrites().transform(actor);
+			}
 
 			mergeActors(vertices);
 		}
