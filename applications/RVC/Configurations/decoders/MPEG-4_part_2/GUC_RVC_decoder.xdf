@@ -330,7 +330,6 @@
     <Connection dst="serialize" dst-port="in8" src="" src-port="bits"/>
     <Connection dst="parser" dst-port="BITS" src="serialize" src-port="out"/>
     <Connection dst="motion_Y" dst-port="MV" src="parser" src-port="MV_Y"/>
-    <Connection dst="texture_Y" dst-port="BTYPE" src="parser" src-port="BTYPE_Y"/>
     <Connection dst="texture_Y" dst-port="QFS" src="parser" src-port="B_Y"/>
     <Connection dst="motion_Y" dst-port="TEX" src="texture_Y" src-port="f"/>
     <Connection dst="motion_U" dst-port="MV" src="parser" src-port="MV_U"/>
@@ -371,5 +370,8 @@
     <Connection dst="texture_Y" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
     <Connection dst="texture_Y" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_Y"/>
     <Connection dst="motion_Y" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_Y"/>
-    <Connection dst="motion_Y" dst-port="BTYPE" src="parser" src-port="BTYPE_Y"/>
+    <Connection dst="texture_Y" dst-port="NEW_VOP" src="parser" src-port="NEW_VOP"/>
+    <Connection dst="motion_Y" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
+    <Connection dst="motion_Y" dst-port="HEIGHT" src="parser" src-port="HEIGHT"/>
+    <Connection dst="motion_Y" dst-port="NEW_VOP" src="parser" src-port="NEW_VOP"/>
 </XDF>

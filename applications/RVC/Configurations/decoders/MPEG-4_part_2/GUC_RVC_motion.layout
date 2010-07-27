@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="MV" x="57" y="78"/>
-      <vertex id="BTYPE" x="57" y="171"/>
+      <vertex id="MV" x="59" y="154"/>
       <vertex id="TEX" x="57" y="264"/>
-      <vertex id="BLOCKTYPE" x="56" y="209"/>
-      <vertex id="VID" x="307" y="271"/>
+      <vertex id="BLOCKTYPE" x="50" y="216"/>
+      <vertex id="WIDTH" x="52" y="73"/>
+      <vertex id="NEW_VOP" x="44" y="25"/>
+      <vertex id="HEIGHT" x="56" y="183"/>
+      <vertex id="VID" x="480" y="269"/>
       <vertex id="address" x="170" y="70"/>
       <vertex id="buffer" x="307" y="103"/>
       <vertex id="interpolation" x="423" y="112"/>
-      <vertex id="add1" x="170" y="217"/>
+      <vertex id="add" x="244" y="237"/>
    </vertices>
 </layout>

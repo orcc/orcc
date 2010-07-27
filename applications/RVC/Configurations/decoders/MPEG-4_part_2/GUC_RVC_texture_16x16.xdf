@@ -3,13 +3,6 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="BTYPE">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="QFS">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -32,6 +25,13 @@
         </Type>
     </Port>
     <Port kind="Input" name="BLOCKTYPE">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="NEW_VOP">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="12"/>
@@ -129,7 +129,6 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="DCRecontruction" dst-port="BTYPE" src="" src-port="BTYPE"/>
     <Connection dst="DCsplit" dst-port="IN" src="" src-port="QFS"/>
     <Connection dst="DCRecontruction" dst-port="QFS_DC" src="DCsplit" src-port="DC"/>
     <Connection dst="IS" dst-port="QFS_AC" src="DCsplit" src-port="AC"/>
@@ -148,4 +147,5 @@
     <Connection dst="IAP" dst-port="PREV_QP" src="DCRecontruction" src-port="PREV_QUANT"/>
     <Connection dst="DCRecontruction" dst-port="BLOCKTYPE" src="" src-port="BLOCKTYPE"/>
     <Connection dst="DCRecontruction" dst-port="WIDTH" src="" src-port="WIDTH"/>
+    <Connection dst="DCRecontruction" dst-port="NEW_VOP" src="" src-port="NEW_VOP"/>
 </XDF>

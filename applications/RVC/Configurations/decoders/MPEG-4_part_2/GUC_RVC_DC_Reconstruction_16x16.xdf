@@ -3,13 +3,6 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="BTYPE">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="QFS_DC">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -32,6 +25,13 @@
         </Type>
     </Port>
     <Port kind="Input" name="BLOCKTYPE">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="NEW_VOP">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="12"/>
@@ -98,7 +98,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_DCRinvpred_luma_16x16"/>
+        <Class name="../../../VTL/Proprietary/GUC/GUC_Algo_DCRinvpred_luma_16x16"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -106,8 +106,6 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="addressing" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="invpred" dst-port="BTYPE" src="" src-port="BTYPE"/>
     <Connection dst="invpred" dst-port="QFS_DC" src="" src-port="QFS_DC"/>
     <Connection dst="invpred" dst-port="A" src="addressing" src-port="A"/>
     <Connection dst="invpred" dst-port="B" src="addressing" src-port="B"/>
@@ -121,4 +119,8 @@
     <Connection dst="" dst-port="PREV_QUANT" src="invpred" src-port="PREV_QUANT"/>
     <Connection dst="addressing" dst-port="WIDTH" src="" src-port="WIDTH"/>
     <Connection dst="addressing" dst-port="BLOCKTYPE" src="" src-port="BLOCKTYPE"/>
+    <Connection dst="addressing" dst-port="NEW_VOP" src="" src-port="NEW_VOP"/>
+    <Connection dst="invpred" dst-port="NEW_VOP" src="" src-port="NEW_VOP"/>
+    <Connection dst="invpred" dst-port="WIDTH" src="" src-port="WIDTH"/>
+    <Connection dst="invpred" dst-port="BLOCKTYPE" src="" src-port="BLOCKTYPE"/>
 </XDF>
