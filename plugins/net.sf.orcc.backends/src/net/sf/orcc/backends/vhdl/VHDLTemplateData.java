@@ -86,5 +86,4 @@ public class VHDLTemplateData extends AbstractActorTransformation {
 		String name = port.getName() + "_data";
 		strings.add(name);
 	}
-
 }

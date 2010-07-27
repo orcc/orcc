@@ -79,7 +79,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	 * @param e2
 	 *            second expression
 	 */
-	private void printCall(String function, Expression e1, Expression e2) {
+	private void printCall(String function, Expression e1, Expression e2, Type size) {
 		// parent precedence is the highest possible to prevent top-level binary
 		// expression from being parenthesized
 		int nextPrec = Integer.MAX_VALUE;
@@ -90,23 +90,24 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		builder.append(", ");
 		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
 		builder.append(", ");
-
-		int s1 = getSizeOfType(e1);
-		int s2 = getSizeOfType(e2);
-		if (s1 == 32) {
-			if (s2 == 32) {
-				builder.append(32);
-			} else {
-				builder.append(s2);
-			}
+		
+		int s_op;
+		if (size == null) {
+			s_op = 32;
 		} else {
-			if (s2 == 32) {
-				builder.append(s1);
+			if (size.isBool()) {
+				s_op = 1;
+			} else if (size.isInt()) {
+				s_op = ((TypeInt) size).getSize();
+			} else if (size.isUint()) {
+				s_op = ((TypeUint) size).getSize();
 			} else {
-				builder.append(Math.max(s1, s2));
+				throw new OrccRuntimeException("cannot get size of type: "
+						+ size);
 			}
 		}
 
+		builder.append(s_op);
 		builder.append(")");
 	}
 
@@ -141,29 +142,30 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		BinaryOp op = expr.getOp();
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
-
+		Type size = expr.getType();
+		
 		switch (op) {
 		case BITAND:
-			printCall("bitand", e1, e2);
+			printCall("bitand", e1, e2, size);
 			break;
 		case BITOR:
-			printCall("bitor", e1, e2);
+			printCall("bitor", e1, e2, size);
 			break;
 		case BITXOR:
-			printCall("bitxor", e1, e2);
+			printCall("bitxor", e1, e2, size);
 			break;
 		case DIV:
 		case DIV_INT:
-			printCall("div", e1, e2);
+			printCall("div", e1, e2, size);
 			break;
 		case MOD:
-			printCall("get_mod", e1, e2);
+			printCall("get_mod", e1, e2, size);
 			break;
 		case SHIFT_LEFT:
-			printCall("shift_left", e1, e2);
+			printCall("shift_left", e1, e2, size);
 			break;
 		case SHIFT_RIGHT:
-			printCall("shift_right", e1, e2);
+			printCall("shift_right", e1, e2, size);
 			break;
 		default: {
 			int currentPrec = op.getPrecedence();
