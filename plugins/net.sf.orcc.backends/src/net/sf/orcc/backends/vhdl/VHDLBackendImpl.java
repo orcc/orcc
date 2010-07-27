@@ -46,6 +46,7 @@ import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.SizeRedimension;
+import net.sf.orcc.backends.vhdl.transforms.SupressInit;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
 import net.sf.orcc.interpreter.ActorInterpreter;
@@ -106,8 +107,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// replaces adjacent underscores by a single underscore
 				new RenameTransformation(adjacentUnderscores, "_"),
 
-				new TransformConditionals(),
-				new SizeRedimension() };
+				new TransformConditionals(), new SizeRedimension(),
+				new SupressInit() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
