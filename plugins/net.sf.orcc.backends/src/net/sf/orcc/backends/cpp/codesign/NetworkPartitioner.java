@@ -49,6 +49,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
+import net.sf.orcc.network.transforms.INetworkTransformation;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
@@ -63,7 +64,7 @@ import org.jgrapht.graph.DirectedMultigraph;
  * 
  */
 
-public class NetworkPartitioner {
+public class NetworkPartitioner implements INetworkTransformation {
 	/**
 	 * 
 	 */

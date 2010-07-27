@@ -450,7 +450,7 @@ $if(actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
 $actor.initializes: action()$
-void actor_$actor.name$::init()
+void actor_$actor.name$::initialize()
 {
 	bool res = true;
 	int i = 0;
