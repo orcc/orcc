@@ -121,9 +121,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 			boolean cached = printer.printActor(outputName, actor);
 
 			boolean llvmBitcode = getAttribute(
-					"net.sf.orcc.plugins.backends.llvmBitcode", false);
+					"net.sf.orcc.backends.llvmBitcode", false);
+					
 			if (llvmBitcode) {
-				String llvmAs = getAttribute("net.sf.orcc.plugins.backends.llvm-as", "");
+				String llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
 				if (!llvmAs.isEmpty()) {
 					printBitcode(llvmAs, outputName, actor.getName());
 				}
