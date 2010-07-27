@@ -478,6 +478,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="CheckNaluType">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_Check_NALU_type_Frext"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -495,11 +504,6 @@
     <Connection dst="" dst-port="MbPartHeigth" src="Algo_Synp_AVC" src-port="MbPartHeigth"/>
     <Connection dst="" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
     <Connection dst="" dst-port="PredMode" src="Algo_IntraPred_Split" src-port="PredMode"/>
-    <Connection dst="byte2bit" dst-port="in8" src="Algo_NALU" src-port="bits_rbsp8">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="1000"/>
-        </Attribute>
-    </Connection>
     <Connection dst="Algo_Synp_AVC" dst-port="bits" src="byte2bit" src-port="out">
         <Attribute kind="Value" name="bufferSize">
             <Expr kind="Literal" literal-kind="Integer" value="10000"/>
@@ -639,4 +643,8 @@
         src="Algo_Synp_AVC" src-port="RefList1Type"/>
     <Connection dst="Algo_RefList0" dst-port="RefListType"
         src="Algo_Synp_AVC" src-port="RefList0Type"/>
+    <Connection dst="CheckNaluType" dst-port="RbspByte" src="Algo_NALU" src-port="bits_rbsp8"/>
+    <Connection dst="byte2bit" dst-port="in8" src="CheckNaluType" src-port="Nalu_1"/>
+    <Connection dst="CheckNaluType" dst-port="ReadNextByte"
+        src="Algo_Synp_AVC" src-port="ReadNextByte"/>
 </XDF>

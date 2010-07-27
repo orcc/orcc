@@ -99,7 +99,8 @@ actor Algo_Synp_AVC_FREXT()
 			bool ConstrainedIFlag,
 			int(size=16) WIDTH, 
 			int(size=16) HEIGHT,
-			uint(size=5) SizeDPBMax
+			uint(size=5) SizeDPBMax,
+			bool ReadNextByte
 		:
   	// FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =1280/16;
@@ -112,6 +113,7 @@ actor Algo_Synp_AVC_FREXT()
 
 	// ********** Read bits ********** //  
 	int(size=9) bits_to_read_count := -1;
+	bool        bit_read_cnt_finish := true;
 	int(size=41) read_result_in_progress; 
 	uint bit_count := 0;
 	uint val_nb_rbsp_bytes := 0;
@@ -1494,7 +1496,7 @@ actor Algo_Synp_AVC_FREXT()
 		read_result_in_progress := 0;
 	end
 
-	function done_reading_bits() --> bool : bits_to_read_count < 0 end
+	function done_reading_bits() --> bool : (bits_to_read_count < 0) and (bit_read_cnt_finish) end
 	function read_result() --> int : read_result_in_progress end
 	function more_rbsp_data() --> uint(size=1) : 
 		if (bit_count + 8)/ 8  < val_nb_rbsp_bytes
@@ -1543,12 +1545,17 @@ actor Algo_Synp_AVC_FREXT()
 	int bit_read_cnt:=8;
 
 	action bits:[ b ] repeat 8==>
-	guard 
-		bit_read_cnt=8
+	guard
+		bit_read_cnt_finish = false
 	do
-		bit_read_cnt:=0;
+		bit_read_cnt_finish := true;
 		bit_read:=[(b[i]=1):for int i in 0 .. 7];
-	end 
+	//	println("new value read:");
+	//	foreach int i in  0 .. 7
+	//	do
+	//		println(bit_read[i]+ ";"+b[i]);
+	//	end
+	end
   
 	action /*bits:[ b ]*/ ==>
 	guard 
@@ -4784,7 +4791,14 @@ actor Algo_Synp_AVC_FREXT()
 	********              NAL Unit HEADER                ********
 	*************************************************************
 	*************************************************************/
-
+	read_next_byte : action ==> ReadNextByte:[true]
+	guard
+		bit_read_cnt = 8
+	do
+	//	println("read_next_byte");
+		bit_read_cnt := 0;
+		bit_read_cnt_finish := false;
+	end
 
 	look_for_Sequence_Header: action ==>
 	end
@@ -4797,6 +4811,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
     	done_reading_bits()
 	do
+		//println("bouh");
 		val_nb_rbsp_bytes := n;
 		set_bits_to_read(NAL_UNIT_HEADER_LENGTH);
 	end
@@ -4808,19 +4823,23 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		nal_unit_type := mask_bits(read_result(), 5);
 		nal_ref_idc := mask_bits(rshift(read_result(), 5), 2);
-		////println("nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
+		//println("look_for_which_Header");
+		//println("nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
 		bit_count := 0;
 	end
  
 	look_for_other_header: action ==>
 	guard
 		nal_unit_type != 7 and nal_unit_type != 8 and nal_unit_type != 5 and nal_unit_type != 1
+	do
+		//println("look_for_other_header");
 	end
  
 	look_for_Sps_header: action ==>
 	guard
 		nal_unit_type = 7
 	do
+		//println("look_for_Sps_header");
 		set_bits_to_read(24); //8 + 1+1+1+1 + 4 + 8
 	end
 
@@ -4828,6 +4847,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		nal_unit_type = 8
 	do
+		//println("look_for_Pps_header");
 		start_vld();
 	end
  
@@ -4835,6 +4855,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		nal_unit_type = 5 or nal_unit_type = 1
 	do
+		//println("look_for_Slice_header");
 		start_vld();
 		//Initialisation process for the arithmetic decoding engine //FIXME
 		Cabac_Arithmetic_Decoding_Engine_Start := true; 
@@ -4851,6 +4872,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
+		//println("read Sps id");
 		start_vld();
 	end
 
@@ -4858,6 +4880,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read Sps id done");
 		sps_id := vld_ue();
 		level_idc[sps_id] := mask_bits(read_result(), 8);
 		constraint_set_flag[sps_id] := mask_bits(rshift(read_result(),12), 4);
@@ -4881,12 +4904,14 @@ actor Algo_Synp_AVC_FREXT()
 	read_Sps_log2_max_frame_num_minus4: action ==>
 	do
 		start_vld();
+		//println("read_Sps_log2_max_frame_num_minus4");
 	end
  
 	read_Sps_pic_order_cnt_type: action ==>
 	guard
 		vld_end()
 	do
+		//println("read_Sps_pic_order_cnt_type");
 		log2_max_frame_num_minus4[sps_id] := vld_ue();
 		start_vld();
 	end
@@ -4897,6 +4922,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		vld_ue() = 0
 	do
+		//println("read_Sps_log2_max_pic_order_cnt_lsb_minus4");
 		pic_order_cnt_type[sps_id] := 0;
 		start_vld();
 	end
@@ -4905,6 +4931,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Sps_log2_max_pic_order_cnt_lsb_minus4_done");
 		log2_max_pic_order_cnt_lsb_minus4[sps_id] := vld_ue();
 	end
 
@@ -4914,6 +4941,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end() and
 		vld_ue() = 1
 	do
+		//println("read_Sps_delta_pic_order_always_zero_flag");
 		pic_order_cnt_type[sps_id] := 1;
 		set_bits_to_read(1);
 	end
@@ -4922,6 +4950,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
+		//println("read_Sps_offset_for_non_ref_pic");
 		delta_pic_order_always_zero_flag[sps_id] := read_result();
 		start_vld();
 	end
@@ -4930,6 +4959,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Sps_offset_for_top_to_bottom_field");
 		offset_for_non_ref_pic[sps_id] := vld_se();
 		start_vld();
 	end
@@ -4938,6 +4968,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Sps_num_ref_frames_in_pic_order_cnt_cycle");
 		offset_for_top_to_bottom_field[sps_id] := vld_se();
 		start_vld();
 	end
@@ -4947,6 +4978,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Sps_offset_for_ref_frame0");
 		num_ref_frames_in_pic_order_cnt_cycle[sps_id] := vld_ue();
 		if num_ref_frames_in_pic_order_cnt_cycle[sps_id] >0 then start_vld(); Sps_inc:=0; end
 	end
@@ -4956,6 +4988,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		Sps_inc < num_ref_frames_in_pic_order_cnt_cycle[sps_id]
 	do
+		//println("read_Sps_offset_for_ref_frame1");
 		offset_for_ref_frame[sps_id][Sps_inc] := vld_se();
 		Sps_inc := Sps_inc + 1;
 		if Sps_inc < num_ref_frames_in_pic_order_cnt_cycle[sps_id] then start_vld();  end
@@ -4964,6 +4997,8 @@ actor Algo_Synp_AVC_FREXT()
 	read_Sps_skip_offset_for_ref_frame1: action ==>
 	guard
 		Sps_inc = num_ref_frames_in_pic_order_cnt_cycle[sps_id]
+	do
+		//println("read_Sps_skip_offset_for_ref_frame1");
 	end
 	// end for
 
@@ -5319,6 +5354,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_seq_parameter_set_id");
 		pps_id := vld_ue();
 		start_vld();
 	end
@@ -5327,6 +5363,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_entropy_coding_mode_pic_order_flag");
 		sequence_parameter_set_id[pps_id] := vld_ue();
 		set_bits_to_read(2);
 	end
@@ -5335,6 +5372,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
+		//println("read_Pps_num_slice_groups_minus1");
 		pic_order_present_flag[pps_id] := mask_bits(read_result(), 1);
 		entropy_coding_mode_flag[pps_id] := mask_bits(rshift(read_result(),1), 1);
 		start_vld();
@@ -5346,6 +5384,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		vld_ue() <= 0
 	do
+		//println("read_Pps_slice_group_map_type_skip");
 		num_slice_groups_minus1[pps_id] := vld_ue();
 	end
 
@@ -5355,6 +5394,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		vld_ue() > 0
 	do
+		//println("read_Pps_slice_group_map_type");
 		num_slice_groups_minus1[pps_id] := vld_ue();
 		start_vld();
 		//println("num_slice_groups_minus1 > 0 not yet implemented");
@@ -5364,8 +5404,9 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_check_slice_group_map_type");
 		slice_group_map_type[pps_id] := vld_ue();
-		//println("read_Pps_check_slice_group_map_type : "+slice_group_map_type[pps_id]);
+		////println("read_Pps_check_slice_group_map_type : "+slice_group_map_type[pps_id]);
 		if slice_group_map_type[pps_id] = 0 or slice_group_map_type[pps_id] = 2 or slice_group_map_type[pps_id] = 6 then start_vld(); end
 		if slice_group_map_type[pps_id] = 3 or slice_group_map_type[pps_id] = 4 or slice_group_map_type[pps_id] =5 then set_bits_to_read(1); end
 		Pps_inc :=0;
@@ -5379,6 +5420,7 @@ actor Algo_Synp_AVC_FREXT()
 		slice_group_map_type[pps_id] = 0,
 		Pps_inc < num_slice_groups_minus1[pps_id]
 	do
+		//println("read_Pps_run_length_minus1");
 		run_length_minus1[pps_id][Pps_inc] := vld_ue();
 		Pps_inc := Pps_inc +1;
 		if Pps_inc < num_slice_groups_minus1[pps_id] then start_vld();end
@@ -5389,6 +5431,8 @@ actor Algo_Synp_AVC_FREXT()
 	read_Pps_check_slice_group_map_type1: action ==>
 	guard
 		slice_group_map_type[pps_id] = 1
+	do
+		//println("read_Pps_check_slice_group_map_type1");
 	end
 
 	// else if (slice_group_map_type == 2)
@@ -5399,6 +5443,7 @@ actor Algo_Synp_AVC_FREXT()
 		slice_group_map_type[pps_id] = 2,
 		Pps_inc < num_slice_groups_minus1[pps_id]
 	do
+		//println("read_Pps_top_left");
 		top_left[pps_id][Pps_inc] := vld_ue();
 		start_vld();
 	end
@@ -5407,6 +5452,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_bottom_right");
 		bottom_right[pps_id][Pps_inc] := vld_ue();
 		Pps_inc := Pps_inc +1;
 		if Pps_inc < num_slice_groups_minus1[pps_id] then start_vld();end
@@ -5419,6 +5465,7 @@ actor Algo_Synp_AVC_FREXT()
 		done_reading_bits(),
 		slice_group_map_type[pps_id] = 3 or slice_group_map_type[pps_id] = 4 or slice_group_map_type[pps_id] = 5
 	do
+		//println("read_Pps_slice_group_change_direction_flag");
 		slice_group_change_direction_flag[pps_id] := read_result();
 		start_vld();
 	end
@@ -5427,6 +5474,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_slice_group_change_rate_minus1");
 		slice_group_change_rate_minus1[pps_id] := vld_ue();
 	end
 
@@ -5436,6 +5484,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		slice_group_map_type[pps_id] = 6
 	do
+		//println("read_Pps_pic_size_in_map_units_minus1");
 		pic_size_in_map_units_minus1[pps_id] := vld_ue();
 		//println(" PB : slice_group_map_type = 6 -> search code_start"); 
 	end
@@ -5443,6 +5492,7 @@ actor Algo_Synp_AVC_FREXT()
 
 	read_Pps_num_ref_idx_l0_active_minus1: action ==>
 	do
+		//println("read_Pps_num_ref_idx_l0_active_minus1");
 		start_vld();
 	end
 
@@ -5450,6 +5500,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_num_ref_idx_l1_active_minus1");
 		num_ref_idx_l0_active_minus1[pps_id] := vld_ue();
 		start_vld();
 	end
@@ -5458,6 +5509,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_weighted_pred_bipred");
 		num_ref_idx_l1_active_minus1[pps_id] := vld_ue();
 		set_bits_to_read(3);
 	end
@@ -5466,6 +5518,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
+		//println("read_Pps_pic_init_qp_minus26");
 		weighted_pred_flag[pps_id] := mask_bits(rshift(read_result(),2), 1);
 		weighted_bipred_idc[pps_id] := mask_bits(read_result(), 2);
 		start_vld();
@@ -5475,6 +5528,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_pic_init_qs_minus26");
 		pic_init_qp_minus26[pps_id] := vld_se();
 		start_vld();
 	end
@@ -5483,6 +5537,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_chroma_qp_index_offset");
 		pic_init_qs_minus26[pps_id] := vld_se();
 		start_vld();
 	end
@@ -5491,6 +5546,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_Pps_flag_deblocking_constrained_redundant");
 		chroma_qp_index_offset[pps_id] := vld_se();
 		second_chroma_qp_index_offset[pps_id] := vld_se();
 		set_bits_to_read(3);
@@ -5500,6 +5556,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
+		//println("read_Pps_check_High_Profile");
 		deblocking_filter_control_present_flag[pps_id] := mask_bits(rshift(read_result(),2), 1);
 		constrained_intra_pred_flag[pps_id] := (mask_bits(rshift(read_result(),1), 1) = 1);
 		redundant_pic_cnt_present_flag[pps_id] := mask_bits(read_result(), 1);
@@ -5511,6 +5568,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
+		//println("read_Pps_not_High_Profile");
 		////println("read Pps header done");
 		//println("");
 	end
@@ -5520,7 +5578,8 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 	more_rbsp_data()=1
 	do
-	//println("PPS High Profile not yet implemented !");
+		//println("read_Pps_pic_scaling_matrix_present_flag");
+	////println("PPS High Profile not yet implemented !");
 	//println("");
 	end
 	*/
@@ -5539,6 +5598,8 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_slice_type");
+		//println("read_SliceH_slice_type");
 		first_mb_in_slice := vld_ue();
 		start_vld();
 	end
@@ -5547,6 +5608,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_pps_id");
 		slice_type := vld_ue();
 		slice_type := slice_type mod 5;
 		start_vld();
@@ -5556,6 +5618,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_check_separate_colour_plane_flag");
 		pps_id := vld_ue();
 		sps_id := sequence_parameter_set_id[pps_id];
 	end
@@ -5564,6 +5627,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		separate_colour_plane_flag[sps_id] = 1
 	do
+		//println("read_SliceH_separate_colour_plane_flag_done");
 		set_bits_to_read(2);
 	end
 
@@ -5572,6 +5636,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
+		//println("read_SliceH_read_colour_plane_id");
 		colour_plane_id := read_result();
 		set_bits_to_read(4+log2_max_frame_num_minus4[sps_id]);
 	end
@@ -5581,6 +5646,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		separate_colour_plane_flag[sps_id] != 1
 	do
+		//println("read_SliceH_skip_separate_colour_plane_flag");
 		set_bits_to_read(4+log2_max_frame_num_minus4[sps_id]);
 	end
 
@@ -5591,6 +5657,7 @@ actor Algo_Synp_AVC_FREXT()
 	var
 		int(size=32) ValMaxFrameNum
 	do
+		//println("read_SliceH_frame_num");
 		frame_num      := read_result();
 		ValMaxFrameNum := 1 << (log2_max_frame_num_minus4[sps_id] + 4);
 	end
@@ -5599,6 +5666,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits(),first_mb_in_slice!=0
 	do
+		//println("skip_read_SliceH_frame_num");
 		frame_num := read_result();
 	end
 
@@ -5607,6 +5675,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		frame_mbs_only_flag[sps_id] = 0
 	do
+		//println("read_SliceH_field_pic_flag");
 		set_bits_to_read(1);
 	end
 
@@ -5616,6 +5685,7 @@ actor Algo_Synp_AVC_FREXT()
 		done_reading_bits(),
 		read_result() = 1
 	do
+		//println("read_SliceH_bottom_field_flag");
 		field_pic_flag := 1;
 		set_bits_to_read(1);
 	end
@@ -5625,6 +5695,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		done_reading_bits()
 	do
+		//println("read_SliceH_bottom_field_flag_done");
 		bottom_field_flag := read_result();
 	end
 
@@ -5634,6 +5705,7 @@ actor Algo_Synp_AVC_FREXT()
 		done_reading_bits(),
 		read_result() = 0
 	do
+		//println("read_SliceH_skip_bottom_field_flag");
 		field_pic_flag := 0;
 	end
 	//end if
@@ -5642,6 +5714,8 @@ actor Algo_Synp_AVC_FREXT()
 	read_SliceH_skip_field_pic_flag: action ==>
 	guard
 		frame_mbs_only_flag[sps_id] = 1
+	do
+		//println("read_SliceH_skip_field_pic_flag");
 	end
 	//end if
 
@@ -5650,6 +5724,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		nal_unit_type = 5
 	do
+		//println("read_SliceH_idr_pic_id");
 		start_vld();
 	end
 
@@ -5657,6 +5732,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_idr_pic_id_done");
 		idr_pic_id := vld_ue();
 	end
 
@@ -5664,6 +5740,8 @@ actor Algo_Synp_AVC_FREXT()
 	read_SliceH_skip_idr_pic_id: action ==>
 	guard
 		nal_unit_type != 5
+	do
+		//println("read_SliceH_skip_idr_pic_id");
 	end
 	//end if
 
@@ -5671,12 +5749,15 @@ actor Algo_Synp_AVC_FREXT()
 	guard 
 		pic_order_cnt_type[sps_id] = 0
 	do
+		//println("read_SliceH_pic_order_cnt_lsb");
 		set_bits_to_read(log2_max_pic_order_cnt_lsb_minus4[sps_id] +4);
 	end
 
 	read_SliceH_skip_pic_order_cnt_lsb: action ==>
 	guard 
 		pic_order_cnt_type[sps_id] != 0
+	do
+		//println("read_SliceH_skip_pic_order_cnt_lsb");
 	end
 
 	//if (pic_order_cnt_type == 0)
@@ -5685,6 +5766,7 @@ actor Algo_Synp_AVC_FREXT()
 		done_reading_bits(),
 		pic_order_cnt_type[sps_id] = 0
 	do
+		//println("read_SliceH_pic_order_cnt_lsb_done");
 		pic_order_cnt_lsb := read_result();
 	end
 
@@ -5692,6 +5774,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard 
 		pic_order_present_flag[pps_id] = 1 and field_pic_flag = 0
 	do
+		//println("read_SliceH_delta_pic_order_cnt_bottom");
 		start_vld();
 	end
 
@@ -5701,6 +5784,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		pic_order_present_flag[pps_id] = 1 and field_pic_flag = 0
 	do
+		//println("read_SliceH_delta_pic_order_cnt_bottom_done");
 		delta_pic_order_cnt_bottom := vld_se();
 	end
 
@@ -5708,6 +5792,8 @@ actor Algo_Synp_AVC_FREXT()
 	read_SliceH_skip_delta_pic_order_cnt_bottom: action ==>
 	guard
 		pic_order_present_flag[pps_id] != 1 or field_pic_flag != 0
+	do
+		//println("read_SliceH_skip_delta_pic_order_cnt_bottom");
 	end
 	//end if
 
@@ -5715,12 +5801,15 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		pic_order_cnt_type[sps_id] = 1 and delta_pic_order_always_zero_flag[sps_id] = 0
 	do
+		//println("read_SliceH_delta_pic_order_cnt0");
 		start_vld();
 	end
 
 	read_SliceH_skip_delta_pic_order_cnt0 : action ==>
 	guard
 		pic_order_cnt_type[sps_id] != 1 or delta_pic_order_always_zero_flag[sps_id] != 0
+	do
+		//println("read_SliceH_skip_delta_pic_order_cnt0");
 	end
 
 	//else if (pic_order_cnt_type ==1 && !delta_pic_order_always_zero_flag)
@@ -5729,6 +5818,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		pic_order_cnt_type[sps_id] = 1 and delta_pic_order_always_zero_flag[sps_id] = 0
 	do
+		//println("read_SliceH_delta_pic_order_cnt0_done");
 		delta_pic_order_cnt[0] := vld_se();
 	end
 
@@ -5736,6 +5826,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard 
 		pic_order_present_flag[pps_id] = 1 and field_pic_flag = 0
 	do
+		//println("read_SliceH_delta_pic_order_cnt1");
 		start_vld(); 
 	end
 
@@ -5745,6 +5836,7 @@ actor Algo_Synp_AVC_FREXT()
 		vld_end(),
 		pic_order_present_flag[pps_id] = 1 and field_pic_flag = 0
 	do
+		//println("read_SliceH_delta_pic_order_cnt1_done");
 		delta_pic_order_cnt[1] := vld_se();
 	end
 
@@ -5752,11 +5844,15 @@ actor Algo_Synp_AVC_FREXT()
 	read_SliceH_skip_delta_pic_order_cnt1: action ==>
 	guard
 		pic_order_present_flag[pps_id] != 1 or field_pic_flag != 0
+	do
+		//println("read_SliceH_skip_delta_pic_order_cnt1");
 	end
 	//end if
 	
 	skipPOC: action ==> 
 	guard first_mb_in_slice!=0
+	do
+		//println("skipPOC");
 	end
 
 	CalcPOC: action ==> POC:[POC_val], SizeDPBMax :[MaxDPBSz[sps_id]]
@@ -5772,6 +5868,7 @@ actor Algo_Synp_AVC_FREXT()
 		int expected_delta_per_poc_cycle := 0, 
 		int expectedpoc := 0
 	do
+		//println("CalcPOC");
 		if nal_unit_type = 5 then 
 			frame_num_offset := 0;
 		else 
@@ -5839,6 +5936,7 @@ end
 	guard
 		redundant_pic_cnt_present_flag[pps_id] = 1
 	do
+		//println("read_SliceH_redundant_pic_cnt");
 		start_vld();
 	end
 
@@ -5846,6 +5944,7 @@ end
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_redundant_pic_cnt_done");
 		redundant_pic_cnt := vld_ue();
 	end
 
@@ -5853,6 +5952,8 @@ end
 	read_SliceH_skip_redundant_pic_cnt: action ==>
 	guard
 		redundant_pic_cnt_present_flag[pps_id] = 0
+	do
+		//println("read_SliceH_skip_redundant_pic_cnt");
 	end
 	//end if
 
@@ -5861,6 +5962,7 @@ end
 	guard
 		slice_type = SLICE_TYPE_B
 	do
+		//println("read_SliceH_direct_spatial_mv_pred_flag");
 		set_bits_to_read(1);
 	end
 
@@ -5868,6 +5970,7 @@ end
 	guard
 		done_reading_bits()
 	do
+		//println("read_SliceH_direct_spatial_mv_pred_flag_done");
 		direct_spatial_mv_pred_flag := read_result();
 	end
 
@@ -5875,6 +5978,8 @@ end
 	read_SliceH_skip_direct_spatial_mv_pred_flag: action ==>
 	guard
 		slice_type != SLICE_TYPE_B
+	do
+		//println("read_SliceH_skip_direct_spatial_mv_pred_flag");
 	end
 	//end if
 
@@ -5883,6 +5988,7 @@ end
 	guard
 		slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP or slice_type = SLICE_TYPE_B
 	do
+		//println("read_SliceH_num_ref_idx_active_override_flag");
 		set_bits_to_read(1);
 	end
 
@@ -5892,6 +5998,7 @@ end
 		done_reading_bits(),
 		read_result() = 1
 	do
+		//println("read_SliceH_num_ref_idx_l0_active_minus1");
 		num_ref_idx_active_override_flag := 1;
 		start_vld();
 	end
@@ -5902,6 +6009,7 @@ end
 		vld_end(),
 		slice_type = SLICE_TYPE_B
 	do
+		//println("read_SliceH_num_ref_idx_l1_active_minus1");
 		slice_num_ref_idx_l0_active_minus1 := vld_ue();
 		start_vld();
 	end
@@ -5910,6 +6018,7 @@ end
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_num_ref_idx_l1_active_minus1_done");
 		slice_num_ref_idx_l1_active_minus1 := vld_ue();
 	end
  
@@ -5919,6 +6028,7 @@ end
 		vld_end(),
 		slice_type != SLICE_TYPE_B
 	do
+		//println("read_SliceH_skip_num_ref_idx_l1_active_minus1");
 		slice_num_ref_idx_l0_active_minus1 := vld_ue();
 	end
 	//end if
@@ -5929,6 +6039,7 @@ end
 		done_reading_bits(),
 		read_result() = 0
 	do
+		//println("read_SliceH_skip_num_ref_idx_l0_active_minus1");
 		num_ref_idx_active_override_flag := 0;
 		slice_num_ref_idx_l0_active_minus1 := num_ref_idx_l0_active_minus1[pps_id];
 		slice_num_ref_idx_l1_active_minus1 := num_ref_idx_l1_active_minus1[pps_id];
@@ -5940,6 +6051,7 @@ end
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
 	do
+		//println("read_SliceH_skip_num_ref_idx_active_override_flag");
 		slice_num_ref_idx_l0_active_minus1 := num_ref_idx_l0_active_minus1[pps_id];
 		slice_num_ref_idx_l1_active_minus1 := num_ref_idx_l1_active_minus1[pps_id];
 	end
@@ -5956,6 +6068,7 @@ end
 	var
 		uint(size=2) ValRefListType
 	do
+		//println("read_SliceH_ref_pic_list_reordering_flag_l0");
 		set_bits_to_read(1);
 		if(slice_type = SLICE_TYPE_B) then
 			ValRefListType := REFLIST0_BI_PRED;
@@ -5968,6 +6081,7 @@ end
 	guard 
 		done_reading_bits(), first_mb_in_slice=0
 	do
+		//println("read_SliceH_ref_pic_list_reordering_flag_l0_done");
 		ref_pic_list_reordering_flag := read_result();
 		reordering_of_pic_nums_idc :=0;
 	end
@@ -5976,6 +6090,7 @@ end
 	guard
 		done_reading_bits(), first_mb_in_slice!=0
 	do
+		//println("skip_read_SliceH_ref_pic_list_reordering_flag_l0_done");
 		ref_pic_list_reordering_flag := read_result();
 		reordering_of_pic_nums_idc :=0;
 	end
@@ -5986,6 +6101,7 @@ end
 	guard 
 		ref_pic_list_reordering_flag = 1
 	do
+		//println("read_SliceH_reordering_of_pic_nums_idc_l0");
 		start_vld();
 	end
 
@@ -5993,6 +6109,7 @@ end
 	guard
 		vld_end(), first_mb_in_slice=0
 	do
+		//println("read_SliceH_reordering_of_pic_nums_idc_l0_done");
 		reordering_of_pic_nums_idc := vld_ue();
 		if reordering_of_pic_nums_idc != 3 then start_vld(); end
 	end
@@ -6001,6 +6118,7 @@ end
 	guard
 		vld_end(), first_mb_in_slice!=0
 	do
+		//println("skip_read_SliceH_reordering_of_pic_nums_idc_l0_done");
 		reordering_of_pic_nums_idc := vld_ue();
 		if reordering_of_pic_nums_idc != 3 then start_vld(); end
 	end
@@ -6010,6 +6128,8 @@ end
 	guard
 		vld_end(), first_mb_in_slice=0,
 		reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
+	do
+		//println("read_SliceH_abs_diff_pic_num_minus1_l0_done");
 	end
 
 	//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
@@ -6017,23 +6137,31 @@ end
 	guard
 		vld_end(), first_mb_in_slice!=0,
 		reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
+	do
+		//println("skip_read_SliceH_abs_diff_pic_num_minus1_l0_done");
 	end
 	// else if (reordering_of_pic_nums_idc == 2)
 	read_SliceH_long_term_pic_num_idc2_l0_done: action ==> RefReordering_l0:[vld_ue()]
 	guard
 		vld_end(), first_mb_in_slice=0,
 		reordering_of_pic_nums_idc =2
+	do
+		//println("read_SliceH_long_term_pic_num_idc2_l0_done");
 	end
 
 	skip_read_SliceH_long_term_pic_num_idc2_l0_done: action ==>
 	guard
 		vld_end(), first_mb_in_slice!=0,
 		reordering_of_pic_nums_idc =2
+	do
+		//println("skip_read_SliceH_long_term_pic_num_idc2_l0_done");
 	end
 	//else (reordering_of_pic_nums_idc == 3)
 	read_SliceH_skip_reordering_of_pic_nums_idc3_l0: action ==>
 	guard
 		reordering_of_pic_nums_idc = 3
+	do
+		//println("read_SliceH_skip_reordering_of_pic_nums_idc3_l0");
 	end
 	//end if
 	//while (reordering_of_pic_nums_idc != 3)
@@ -6042,12 +6170,15 @@ end
 	read_SliceH_skip_reordering_of_pic_nums_idc_l0: action ==>
 	guard 
 		ref_pic_list_reordering_flag = 0
+	do
+		//println("read_SliceH_skip_reordering_of_pic_nums_idc_l0");
 	end
 					//if (slice_type % 5 == 1)
 					read_SliceH_ref_pic_list_reordering_flag_l1: action ==> RefList1Type:[REFLIST1_BI_PRED]
 					guard
 						slice_type = SLICE_TYPE_B
 					do
+						//println("read_SliceH_ref_pic_list_reordering_flag_l1");
 						set_bits_to_read(1);
 					end
 
@@ -6055,6 +6186,7 @@ end
 					guard 
 						done_reading_bits(), first_mb_in_slice=0
 					do
+						//println("read_SliceH_ref_pic_list_reordering_flag_l1_done");
 						ref_pic_list_reordering_flag := read_result();
 						reordering_of_pic_nums_idc :=0;
 					end
@@ -6063,6 +6195,7 @@ end
 					guard
 						done_reading_bits(), first_mb_in_slice!=0
 					do
+						//println("skip_read_SliceH_ref_pic_list_reordering_flag_l1_done");
 						ref_pic_list_reordering_flag := read_result();
 						reordering_of_pic_nums_idc :=0;
 					end
@@ -6073,6 +6206,7 @@ end
 					guard 
 						ref_pic_list_reordering_flag = 1
 					do
+						//println("read_SliceH_reordering_of_pic_nums_idc_l1");
 						start_vld();
 					end
 
@@ -6080,6 +6214,7 @@ end
 					guard
 						vld_end(), first_mb_in_slice=0
 					do
+						//println("read_SliceH_reordering_of_pic_nums_idc_l1_done");
 						reordering_of_pic_nums_idc := vld_ue();
 						if reordering_of_pic_nums_idc != 3 then start_vld(); end
 					end
@@ -6088,6 +6223,7 @@ end
 					guard
 						vld_end(), first_mb_in_slice!=0
 					do
+						//println("skip_read_SliceH_reordering_of_pic_nums_idc_l1_done");
 						reordering_of_pic_nums_idc := vld_ue();
 						if reordering_of_pic_nums_idc != 3 then start_vld(); end
 					end
@@ -6097,6 +6233,8 @@ end
 					guard
 						vld_end(), first_mb_in_slice=0,
 						reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
+					do
+						//println("read_SliceH_abs_diff_pic_num_minus1_l1_done");
 					end
 
 					//if (reordering_of_pic_nums_idc == 0 || reordering_of_pic_nums_idc == 1)
@@ -6104,23 +6242,31 @@ end
 					guard
 						vld_end(), first_mb_in_slice!=0,
 						reordering_of_pic_nums_idc =0 or reordering_of_pic_nums_idc =1
+					do
+						//println("skip_read_SliceH_abs_diff_pic_num_minus1_l1_done");
 					end
 					// else if (reordering_of_pic_nums_idc == 2)
 					read_SliceH_long_term_pic_num_idc2_l1_done: action ==> RefReordering_l1:[vld_ue()]
 					guard
 						vld_end(), first_mb_in_slice=0,
 						reordering_of_pic_nums_idc =2
+					do
+						//println("read_SliceH_long_term_pic_num_idc2_l1_done");
 					end
 
 					skip_read_SliceH_long_term_pic_num_idc2_l1_done: action ==>
 					guard
 						vld_end(), first_mb_in_slice!=0,
 						reordering_of_pic_nums_idc =2
+					do
+						//println("skip_read_SliceH_long_term_pic_num_idc2_l1_done");
 					end
 					//else (reordering_of_pic_nums_idc == 3)
 					read_SliceH_skip_reordering_of_pic_nums_idc3_l1: action ==>
 					guard
 						reordering_of_pic_nums_idc = 3
+					do
+						//println("read_SliceH_skip_reordering_of_pic_nums_idc3_l1");
 					end
 					//end if
 					//while (reordering_of_pic_nums_idc != 3)
@@ -6129,6 +6275,8 @@ end
 					read_SliceH_skip_reordering_of_pic_nums_idc_l1: action ==>
 					guard 
 						ref_pic_list_reordering_flag = 0
+					do
+						//println("read_SliceH_skip_reordering_of_pic_nums_idc_l1");
 					end
 					//end if
 
@@ -6136,11 +6284,15 @@ end
 					read_SliceH_skip_ref_pic_list_reordering_l1: action ==> RefReordering_l1:[0], Nb_RefFrame_l1:[0], RefList1Type:[0]
 					guard
 						slice_type != SLICE_TYPE_B
+					do
+						//println("read_SliceH_skip_ref_pic_list_reordering_l1");
 					end
 
 					skip_read_SliceH_skip_ref_pic_list_reordering_l1: action ==>
 					guard
 						slice_type != SLICE_TYPE_B
+					do
+						//println("skip_read_SliceH_skip_ref_pic_list_reordering_l1");
 					end
 					//end if
 	
@@ -6150,11 +6302,15 @@ end
 	read_SliceH_skip_ref_pic_list_reordering: action ==> RefReordering_l0:[0], Nb_RefFrame_l0:[0], RefReordering_l1:[0], Nb_RefFrame_l1:[0], RefList0Type:[0]
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI, first_mb_in_slice=0
+	do
+		//println("read_SliceH_skip_ref_pic_list_reordering");
 	end
 
 	skip_read_SliceH_skip_ref_pic_list_reordering: action ==>
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI, first_mb_in_slice!=0
+	do
+		//println("skip_read_SliceH_skip_ref_pic_list_reordering");
 	end
 	//end if
 	//******* End of ref_pic_list_reordering  ********/
@@ -6168,11 +6324,13 @@ end
 		(weighted_pred_flag[sps_id] = 1 and (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP))
 		or (weighted_bipred_idc[sps_id] = 1 and slice_type = SLICE_TYPE_B)
 	do
-		println("SliceH : pred_weight_table not yet implemented"); 
+		//println("SliceH : pred_weight_table not yet implemented"); 
 	end
  
 	//else
 	read_SliceH_skip_pred_weight_table: action ==>
+	do
+		//println("read_SliceH_skip_pred_weight_table"); 
 	end
 	//end if
 	//******* End of pred_weight_table  ********/
@@ -6184,6 +6342,7 @@ end
 	guard
 		nal_ref_idc !=0
 	do
+		//println("read_SliceH_dec_ref_pic_marking"); 
 		if nal_unit_type = 5 then set_bits_to_read(2); else set_bits_to_read(1); end  
 	end
 
@@ -6193,6 +6352,7 @@ end
 		nal_unit_type = 5, first_mb_in_slice=0,
 		done_reading_bits()
 	do
+		//println("read_SliceH_no_output_of_prior_pics_flag_done"); 
 		no_output_of_prior_pics_flag := rshift(read_result(),1);
 		long_term_reference_flag := mask_bits(read_result(),1);
 	end
@@ -6202,6 +6362,7 @@ end
 		nal_unit_type = 5, first_mb_in_slice!=0,
 		done_reading_bits()
 	do
+		//println("skip_read_SliceH_no_output_of_prior_pics_flag_done"); 
 		no_output_of_prior_pics_flag := rshift(read_result(),1);
 		long_term_reference_flag := mask_bits(read_result(),1);
 	end
@@ -6212,6 +6373,7 @@ end
 		nal_unit_type != 5, first_mb_in_slice = 0,
 		done_reading_bits()
 	do
+		//println("read_SliceH_adaptative_ref_pic_marking_mode_flag_done"); 
 		adaptative_ref_pic_marking_mode_flag := read_result();
 		if adaptative_ref_pic_marking_mode_flag = 1 then start_vld(); end
 	end
@@ -6221,6 +6383,7 @@ end
 		nal_unit_type != 5, first_mb_in_slice != 0,
 		done_reading_bits()
 	do
+		//println("skip_read_SliceH_adaptative_ref_pic_marking_mode_flag_done"); 
 		adaptative_ref_pic_marking_mode_flag := read_result();
 		if adaptative_ref_pic_marking_mode_flag = 1 then start_vld(); end
 	end
@@ -6232,6 +6395,7 @@ end
 		adaptative_ref_pic_marking_mode_flag = 1, first_mb_in_slice=0,
 		vld_end()
 	do
+		//println("read_SliceH_memory_management_control_operation_done"); 
 		memory_management_control_operation := vld_ue();
 		if 	memory_management_control_operation = 1 or 
 			memory_management_control_operation = 2 or 
@@ -6247,6 +6411,7 @@ end
 		adaptative_ref_pic_marking_mode_flag = 1, first_mb_in_slice!=0,
 		vld_end()
 	do
+		//println("skip_read_SliceH_memory_management_control_operation_done"); 
 		memory_management_control_operation := vld_ue();
 		if 	memory_management_control_operation = 1 or 
 			memory_management_control_operation = 2 or 
@@ -6263,6 +6428,7 @@ end
 		memory_management_control_operation = 1 or memory_management_control_operation = 3,
 		vld_end(), first_mb_in_slice=0
 	do
+		//println("read_SliceH_difference_of_pic_nums_minus1_done"); 
 		difference_of_pic_nums_minus1 := vld_ue();
 		start_vld();
 	end
@@ -6272,6 +6438,7 @@ end
 		memory_management_control_operation = 1 or memory_management_control_operation = 3,
 		vld_end(), first_mb_in_slice!=0
 	do
+		//println("skip_read_SliceH_difference_of_pic_nums_minus1_done"); 
 		difference_of_pic_nums_minus1 := vld_ue();
 		start_vld();
 	end
@@ -6283,6 +6450,7 @@ end
 		memory_management_control_operation = 2,
 		vld_end(), first_mb_in_slice=0
 	do
+		//println("read_SliceH_long_term_pic_num_done"); 
 		long_term_pic_num := vld_ue();
 		start_vld();
 	end
@@ -6292,6 +6460,7 @@ end
 		memory_management_control_operation = 2,
 		vld_end(), first_mb_in_slice!=0
 	do
+		//println("skip_read_SliceH_long_term_pic_num_done"); 
 		long_term_pic_num := vld_ue();
 		start_vld();
 	end
@@ -6303,6 +6472,7 @@ end
 		memory_management_control_operation = 3 or memory_management_control_operation = 6,
 		vld_end(), first_mb_in_slice=0
 	do
+		//println("read_SliceH_long_term_frame_idx_done"); 
 		long_term_frame_idx := vld_ue();
 		start_vld();
 	end
@@ -6313,6 +6483,7 @@ end
 		memory_management_control_operation = 3 or memory_management_control_operation = 6,
 		vld_end(), first_mb_in_slice!=0
 	do
+		//println("skip_read_SliceH_long_term_frame_idx_done"); 
 		long_term_frame_idx := vld_ue();
 		start_vld();
 	end
@@ -6320,6 +6491,8 @@ end
 	read_SliceH_long_not_term_frame_idx_done: action ==> 
 	guard
 		memory_management_control_operation != 3 and memory_management_control_operation != 6
+	do
+		//println("read_SliceH_long_not_term_frame_idx_done"); 
 	end
 
 
@@ -6331,6 +6504,7 @@ end
 		memory_management_control_operation = 4,
 		vld_end(), first_mb_in_slice=0
 	do
+		//println("read_SliceH_max_long_term_frame_idx_plus1_done"); 
 		max_long_term_frame_idx_plus1 := vld_ue();
 		start_vld();
 	end
@@ -6340,6 +6514,7 @@ end
 		memory_management_control_operation = 4,
 		vld_end(), first_mb_in_slice!=0
 	do
+		//println("skip_read_SliceH_max_long_term_frame_idx_plus1_done"); 
 		max_long_term_frame_idx_plus1 := vld_ue();
 		start_vld();
 	end
@@ -6350,6 +6525,7 @@ end
 	guard
 		memory_management_control_operation = 5
 	do
+		//println("read_SliceH_mmco_5"); 
 		start_vld();
 		prev_frame_num:=0;
 	end
@@ -6359,6 +6535,8 @@ end
 	read_SliceH_mmco_0: action ==>
 	guard
 		memory_management_control_operation = 0
+	do
+		//println("read_SliceH_mmco_0"); 
 	end
 	// end if
 	// while (mmco != 0)
@@ -6367,22 +6545,30 @@ end
 	read_SliceH_skip_memory_management_control_operation_done: action ==>
 	guard
 		adaptative_ref_pic_marking_mode_flag = 0
+	do
+		//println("read_SliceH_skip_memory_management_control_operation_done"); 
 	end
 
 	//else (nal_ref_idc == 0)
 	read_SliceH_skip_dec_ref_pic_marking.IDRPic: action ==> MMCO :[0,0]
 	guard
 		nal_ref_idc = 0, first_mb_in_slice=0, nal_unit_type = 5
+	do
+		//println("read_SliceH_skip_dec_ref_pic_marking.IDRPic"); 
 	end
 
 	read_SliceH_skip_dec_ref_pic_marking.NonIDRPic: action ==> MMCO :[1,0]
 	guard
 		nal_ref_idc = 0, first_mb_in_slice=0, nal_unit_type != 5
+	do
+		//println("read_SliceH_skip_dec_ref_pic_marking.NonIDRPic"); 
 	end
 
 	skip_read_SliceH_skip_dec_ref_pic_marking: action ==>
 	guard
 		nal_ref_idc = 0, first_mb_in_slice!=0
+	do
+		//println("skip_read_SliceH_skip_dec_ref_pic_marking"); 
 	end
 	//end if
 	//******* End of dec_ref_pic_marking  ********/
@@ -6393,6 +6579,7 @@ end
 		entropy_coding_mode_flag[pps_id] = 1,
 		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI
 	do
+		//println("read_SliceH_cabac_init_idc"); 
 		start_vld();
 	end
 
@@ -6400,6 +6587,7 @@ end
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_cabac_init_idc_done"); 
 		cabac_init_idc := vld_ue();
 		start_vld();
 	end
@@ -6409,6 +6597,7 @@ end
 	guard
 		entropy_coding_mode_flag[pps_id] = 0 or slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
 	do
+		//println("read_SliceH_skip_cabac_init_idc"); 
 		start_vld();
 	end
 	//end if
@@ -6417,6 +6606,7 @@ end
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_slice_qp_delta_done"); 
 		slice_qp_delta := vld_se();
 		val_QP := 26 + pic_init_qp_minus26[pps_id] + slice_qp_delta;
 		val_QP_Cb := qP_tab[val_QP + chroma_qp_index_offset[pps_id]];
@@ -6428,6 +6618,7 @@ end
 	guard
 		slice_type = SLICE_TYPE_SP or slice_type = SLICE_TYPE_SI 
 	do
+		//println("read_SliceH_sp_for_switch_flag"); 
 		if slice_type = SLICE_TYPE_SP then set_bits_to_read(1); else start_vld(); end
 	end
 
@@ -6437,6 +6628,7 @@ end
 		slice_type = SLICE_TYPE_SP,
 		done_reading_bits()
 	do
+		//println("read_SliceH_sp_for_switch_flag_done"); 
 		sp_for_switch_flag := read_result();
 		start_vld();
 	end
@@ -6446,6 +6638,7 @@ end
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_slice_qs_delta_done"); 
 		slice_qs_delta := vld_se();
 	end
 
@@ -6453,6 +6646,8 @@ end
 	read_SliceH_skip_sp_for_switch_flag: action ==>
 	guard
 		slice_type != SLICE_TYPE_SP and slice_type != SLICE_TYPE_SI 
+	do
+		//println("read_SliceH_skip_sp_for_switch_flag"); 
 	end
 	//end if
 
@@ -6461,6 +6656,7 @@ end
 	guard
 		deblocking_filter_control_present_flag[pps_id] = 1
 	do
+		//println("read_SliceH_disable_deblocking_filter_idc"); 
 		start_vld();
 	end
 
@@ -6470,6 +6666,7 @@ end
 		vld_end(),
 		vld_ue() != 1
 	do
+		//println("read_SliceH_slice_alpha_c0_offset_div2"); 
 		disable_deblocking_filter_idc := vld_ue();
 		start_vld();
 	end
@@ -6478,6 +6675,7 @@ end
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_slice_beta_offset_div2"); 
 		slice_alpha_c0_offset_div2 := vld_se();
 		val_slice_alpha_c0_offset:=lshift(slice_alpha_c0_offset_div2,1);
 		start_vld();
@@ -6487,6 +6685,7 @@ end
 	guard
 		vld_end()
 	do
+		//println("read_SliceH_slice_beta_offset_div2_done"); 
 		slice_beta_offset_div2 := vld_se();
 		val_slice_beta_offset:=lshift(slice_beta_offset_div2,1);
 	end
@@ -6497,6 +6696,7 @@ end
 		vld_end(),
 		vld_ue() = 1
 	do
+		//println("read_SliceH_skip_slice_alpha_c0_offset_div2"); 
 		disable_deblocking_filter_idc := vld_ue();
 		val_slice_alpha_c0_offset:=0;
 		val_slice_beta_offset:=0;
@@ -6508,6 +6708,7 @@ end
 	guard
 		deblocking_filter_control_present_flag[pps_id] = 0
 	do
+		//println("read_SliceH_skip_disable_deblocking_filter_idc"); 
 		val_slice_alpha_c0_offset:=0;
 		val_slice_beta_offset:=0;
 	end
@@ -6523,6 +6724,7 @@ end
 		int x, 
 		int n
 	do
+		//println("read_SliceH_slice_group_change_cycle");
 		x := (pic_width_in_mbs_minus1[sps_id] + 1) * (pic_height_in_map_units_minus1[sps_id] +1) / slice_group_change_rate_minus1[pps_id] +1;
 		//n := log_base2( x )
 		x := x -1;
@@ -6538,13 +6740,15 @@ end
 	guard
 		done_reading_bits()
 	do
+		//println("read_SliceH_slice_group_change_cycle_done");
 		slice_group_change_cycle := read_result();
-		////println("read Slice header done");
+		//println("read Slice header done");
 	end
 
 	//else
 	read_SliceH_skip_slice_group_change_cycle: action ==>
-	//do
+	do
+		//println("read_SliceH_skip_slice_group_change_cycle");
 	////println("read Slice header done");
 	end
 	//end if
@@ -6571,18 +6775,22 @@ end
 	guard
 		entropy_coding_mode_flag[pps_id] = 1
 	do
+		//println("read_SliceD_CABAC_alignement");
 		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
 	end
 
 	read_SliceD_skip_CABAC_alignement: action ==>
 	guard
 		entropy_coding_mode_flag[pps_id] = 0
+	do
+		//println("read_SliceD_skip_CABAC_alignement");
 	end
 
 	SliceD_init: action ==>  ENTROPY_TYPE:[entropy_coding_mode_flag[pps_id]]
 	guard
 		(entropy_coding_mode_flag[pps_id] = 1 and done_reading_bits()) or entropy_coding_mode_flag[pps_id] = 0
 	do
+		//println("SliceD_init");
 		val_CurrMbAddr := first_mb_in_slice;
 		PicWidthInMbs := (pic_width_in_mbs_minus1[sps_id] +1);
 		PicSizeInMbs := PicWidthInMbs * (pic_height_in_map_units_minus1[sps_id] +1);
@@ -6632,6 +6840,8 @@ end
 	//do
 	sync_do_mb_layer: action
 		==> 
+	do
+		//println("sync_do_mb_layer");
 	end
 
 
@@ -6642,6 +6852,7 @@ end
 		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI,
 		entropy_coding_mode_flag[pps_id] = 0
 	do
+		//println("read_SliceD_mb_skip_run");
 		start_vld();
 	end
 
@@ -6649,6 +6860,7 @@ end
 	guard
 		vld_end()
 	do
+		//println("read_SliceD_mb_skip_run_done0");
 		mb_skip_run := vld_ue();
 		if mb_skip_run >0 then 
 			prevMbSkipped := 1; 
@@ -6686,6 +6898,7 @@ end
 	var 
 		int mb_addr
 	do
+		//println("read_SliceD_mb_skip_run_done1.I_BLOC");
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
 		mb_skip_run := mb_skip_run -1;
@@ -6739,6 +6952,7 @@ end
 	var 
 		int mb_addr
 	do
+		//println("read_SliceD_mb_skip_run_done1.P_BLOC");
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
 		mb_skip_run := mb_skip_run -1;
@@ -6766,14 +6980,20 @@ end
 		read_SliceD_mb_skip_run_done2: action ==>
 	guard
 		prevMbSkipped = 0
+	do
+		//println("read_SliceD_mb_skip_run_done2");
 	end
 
 	read_SliceD_mb_skip_run_done2_moredata_1: action ==>
 	guard moreDataFlag = 1
+	do
+		//println("read_SliceD_mb_skip_run_done2_moredata_1");
 	end
 
 	read_SliceD_mb_skip_run_done2_moredata_0: action ==>
 	guard moreDataFlag = 0
+	do
+		//println("read_SliceD_mb_skip_run_done2_moredata_0");
 	end
 
 	// else if(CABAC && (slice_type != I && slice_type != SI))
@@ -6781,6 +7001,7 @@ end
 	guard
 		slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI and IS_CABAC()
 	do
+		//println("read_SliceD_mb_skip_flag");
 		GetCabacSyntaxElement(CABAC_MB_SKIP_FLAG);
 		StartCabacProcess();
 		// mb_skip_flag   ae(v)
@@ -6792,6 +7013,7 @@ end
 		(slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI and IS_CABAC()) and cabac_end()
 		
 	do
+		//println("read_SliceD_mb_skip_flag_done");
 		mb_skip_flag := cabac_value();
 		
 		if mb_skip_flag = 1 then
@@ -6832,6 +7054,7 @@ end
 	guard
 		slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI
 	do
+		//println("read_SliceD_skip_mb_skip");
 		mbTab[CabacCurrMbAddr()][mbSkipFlag] := 0;
 	end
 	//end if
@@ -6844,6 +7067,7 @@ end
 		MbaffFrameFlag = 1,
 		(( val_CurrMbAddr mod 2) = 0 or ( (val_CurrMbAddr mod 2) = 1 and prevMbSkipped = 1) )
 	do
+		//println("read_SliceD_mb_field_decoding_flag");
 		////println("read_SliceD_mb_field_decoding_flag : interleaved not implemented");
 	end
 
@@ -6921,6 +7145,8 @@ end
 	read_SliceD_skip_mb_field_decoding_flag: action ==>
 	guard
 		moreDataFlag = 1
+	do
+		//println("read_SliceD_skip_mb_field_decoding_flag");
 	end
 	//end if
 	// --> macrobloc_layer()
@@ -6930,6 +7156,7 @@ end
 	guard
 		entropy_coding_mode_flag[pps_id] = 0
 	do
+		//println("SliceD_update_CAVLC");
 		moreDataFlag := more_rbsp_data();
 	end
 
@@ -6951,6 +7178,7 @@ end
 		int mb_addr,
 		int cbp_blk_tmp=val_cbp_blk
 	do
+		//println("send_data_position_information_is_ipcm");
 if TRACE_MRL then
 println("CurrMbAddr "+ val_CurrMbAddr);
 println("MbIntraFlag "+ mb_intra_flag);
@@ -6996,6 +7224,7 @@ end
 		int mb_addr,
 		int cbp_blk_tmp=val_cbp_blk
 	do
+		//println("send_data_position_information");
 if TRACE_MRL then 
 println("CurrMbAddr "+ val_CurrMbAddr);
 println("MbIntraFlag "+ mb_intra_flag);
@@ -7046,6 +7275,7 @@ end
 	var 
 		int mb_addr
 	do
+		//println("send_data_position_information_mb_skip_flag");
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
 		/* Save Memory procedure, cycle copy*/
@@ -7098,6 +7328,7 @@ end
 	var 
 		int mb_addr
 	do
+		//println("send_data_position_information_mb_skip_flag");
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
 		/* Save Memory procedure, cycle copy*/
@@ -7123,14 +7354,20 @@ end
 	
 	
 	syncSliceD_endwhile: action ==>
+	do
+		//println("syncSliceD_endwhile");
 	end
 
 	SliceD_moredata_1: action ==>
 	guard moreDataFlag = 1
+	do
+		//println("SliceD_moredata_1");
 	end
 
 	SliceD_moredata_0: action ==>
 	guard moreDataFlag = 0
+	do
+		//println("SliceD_moredata_0");
 	end
 
 	//else (CABAC)
@@ -7138,6 +7375,7 @@ end
 	guard
 		IS_CABAC()
 	do
+		//println("SliceD_update_CABAC");
 		//if( slice_type != I && slice_type != SI )
 		if slice_type != SLICE_TYPE_I and slice_type != SLICE_TYPE_SI then 
 		  prevMbSkipped := mb_skip_flag; 
@@ -7149,7 +7387,7 @@ end
 			//else 
 			// end_of_slice_flag 2 ae(v)
 			// moreDataFlag = !end_of_slice_flag end
-			////println("read ae end_of_slice_flag");
+			//println("read ae end_of_slice_flag");
 		else
 		  GetCabacSyntaxElement(CABAC_END_OF_SLICE_FLAG);
 		  StartCabacProcess();
@@ -7161,6 +7399,7 @@ end
 	guard
 		IS_CABAC() and cabac_end()
 	do
+		//println("SliceD_update_CABAC_done");
 		moreDataFlag :=  if cabac_value() = 1 then 0 else 1 end;
 		//end if
 		//NextMbAddress();
@@ -7172,14 +7411,17 @@ end
 	SliceD_while_moreDataFlag: action ==>
 	guard
 		moreDataFlag = 1
+	do
+		//println("SliceD_while_moreDataFlag");
 	end
 
 	SliceD_end: action ==>
 	guard
 		moreDataFlag = 0
-	//do
-	////println("read Slice Data done");
-	////println("");
+	do
+		//println("SliceD_end");
+	//println("read Slice Data done");
+	//println("");
 	end
 	//******* End of Slice DATA  ********/
  
@@ -7295,6 +7537,7 @@ end
 	
 	read_MB_layer_mb_type: action ==>
 	do
+		//println("read_MB_layer_mb_type");
 		if  IS_CAVLC() then
 			start_vld();
 		
@@ -7315,6 +7558,7 @@ end
 	guard
 		( IS_CAVLC() and vld_end()) or (IS_CABAC() and cabac_end() )
 	do
+		//println("read_MB_layer_mb_type_done");
 		if IS_CAVLC() then
 			mb_type := vld_ue();
 		
@@ -7344,6 +7588,7 @@ end
 	guard
 		IS_I_PCM()
 	do
+		//println("read_MB_layer_I_PCM_alignement");
 		if bit_count mod 8 != 0 then set_bits_to_read(8-bit_count mod 8); /*else bits_to_read_count := -1;*/ end
 		//Initialisation process for the arithmetic decoding engine
 		if IS_CABAC() then
@@ -7357,6 +7602,7 @@ end
 	guard
 		done_reading_bits()
 	do
+		//println("read_MB_layer_pcm_sample_luma0");
 		MB_inc := 0;
 		set_bits_to_read(bit_depth_luma_minus8[sps_id]+8);
 		foreach int i in 0 .. 15 do
@@ -7371,6 +7617,7 @@ end
 	var 
 		int v
 	do
+		//println("read_MB_layer_pcm_sample_luma1");
 		v := read_result();
 		MB_inc := MB_inc + 1;
 		if MB_inc < 256 then set_bits_to_read(bit_depth_luma_minus8[sps_id]+8); end 
@@ -7380,6 +7627,7 @@ end
 	guard
 		MB_inc = 256
 	do
+		//println("read_MB_layer_pcm_sample_luma1_done");
 		start_pcm_chroma := true;
 		//Initialisation process for the arithmetic decoding engine
 		if IS_CABAC() then
@@ -7393,6 +7641,7 @@ end
 	guard
 		start_pcm_chroma
 	do
+		//println("read_MB_layer_pcm_sample_chroma0");
 		MB_inc := 0;
 		set_bits_to_read(bit_depth_chroma_minus8[sps_id]+8);
 		foreach  int i in 0 .. 3 do
@@ -7410,6 +7659,7 @@ end
 	var 
 		int v
 	do
+		//println("read_MB_layer_pcm_sample_chroma1");
 		v := read_result();
 		MB_inc := MB_inc + 1;
 		if MB_inc < 2*64 then set_bits_to_read(bit_depth_chroma_minus8[sps_id]+8); end 
@@ -7419,6 +7669,7 @@ end
 	guard
 		MB_inc = 2*64
 	do
+		//println("read_MB_layer_pcm_sample_done");
 		//Initialisation process for the arithmetic decoding engine
 		if IS_CABAC() then
 			PcmSampleChromaDone := true;
@@ -7431,6 +7682,7 @@ end
 	guard
 		not IS_I_PCM()
 	do
+		//println("read_MB_layer_not_I_PCM");
 		noSubMbPartSizeLessThan8x8Flag := 1;
 	end
 
@@ -7438,11 +7690,14 @@ end
 	read_MB_layer_sub_mb_pred: action ==>
 	guard
 		NumMbPart() = 4 // NumMbPart() tests the slice_type and return 0 if slice_type is I or SI
+	do
+		//println("read_MB_layer_sub_mb_pred");
 	end
 	// --> sub_mb_pred( mb_type )
 
 	read_MB_layer_sub_mb_pred_done: action ==>
 	do
+		//println("read_MB_layer_sub_mb_pred_done");
 	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 		foreach int i in 0 .. 3 do
 			mbPartIdx := i;
@@ -7463,6 +7718,7 @@ end
 		NumMbPart() != 4, // NumMbPart() tests the slice_type and return 0 if slice_type is I or SI
 		transform_8x8_mode_flag[pps_id] = 1 and IS_Intra_4x4()
 	do
+		//println("read_MB_layer_transform_size_8x8_flag");
 		if IS_CAVLC() then
 			set_bits_to_read(1);
 		else
@@ -7478,6 +7734,7 @@ end
 		NumMbPart() != 4,
 		(IS_CAVLC() and done_reading_bits() ) or ( IS_CABAC() and cabac_end() )
 	do
+		//println("read_MB_layer_transform_size_8x8_flag_done");
 		if IS_CAVLC() then
 			transform_size_8x8_flag := read_result();
 		else
@@ -7491,6 +7748,8 @@ end
 	read_MB_layer_skip_transform_size_8x8_flag: action ==>
 	guard
 		NumMbPart() != 4
+	do
+		//println("read_MB_layer_skip_transform_size_8x8_flag");
 	end
 	// end if 
 	// --> mb_pred( mb_type )
@@ -7501,6 +7760,7 @@ end
 	guard
 	not IS_Intra_16x16()
 	do
+		//println("read_MB_layer_coded_block_pattern");
 		if  IS_CAVLC() then
 			start_vld();
 		
@@ -7517,6 +7777,7 @@ end
 	guard
 		IS_CABAC() and cabac_end() and ( not cbp_done ) 
 	do
+		//println("read_MB_layer_coded_block_pattern_start_cabac_chroma");
 		cbp_cabac := cabac_value();
 		//get CBP Chroma
 		GetCabacSyntaxElement(CABAC_CODED_BLOCK_PATERN_CHROMA);
@@ -7532,6 +7793,7 @@ end
 		uint(size=6) coded_block_pattern,
 		uint(size=6) cbp_temp
 	do
+		//println("read_MB_layer_coded_block_pattern_done");
 		
 		if  IS_CAVLC() then
 			coded_block_pattern := vld_me();
@@ -7579,6 +7841,7 @@ end
 	guard
 		(IS_CAVLC() and done_reading_bits() ) or ( IS_CABAC() and cabac_end() )
 	do
+		//println("read_MB_layer_cbp_transform_size_8x8_flag_done");
 		if( val_CodedBlockPatternLuma > 0 and transform_8x8_mode_flag[pps_id]=1 and not IS_Intra_4x4()and not IS_Intra_8x8() and noSubMbPartSizeLessThan8x8Flag =1 and (( slice_type = SLICE_TYPE_B and mb_type = 0) or direct_8x8_interference_flag[sps_id]=1 ) )then
 			if IS_CAVLC() then
 				transform_size_8x8_flag := read_result();
@@ -7596,6 +7859,7 @@ end
 	guard
 		IS_Intra_16x16()
 	do
+		//println("read_MB_layer_skip_coded_block_pattern");
 		val_CodedBlockPatternLuma := Intra_16x16_tab[mb_type][2];
 		CodedBlockPatternChroma := Intra_16x16_tab[mb_type][1];
 		mbTab[CabacCurrMbAddr()][mbCBPLuma]	:= val_CodedBlockPatternLuma;
@@ -7608,6 +7872,7 @@ end
 	guard
 		val_CodedBlockPatternLuma > 0 or CodedBlockPatternChroma > 0 or IS_Intra_16x16()
 	do
+		//println("read_MB_layer_mb_qp_delta");
 		if IS_CAVLC() then
 			start_vld();
 		
@@ -7623,6 +7888,7 @@ end
 	guard
 		( IS_CAVLC() and vld_end() ) or ( cabac_end() and IS_CABAC() )
 	do
+		//println("read_MB_layer_mb_qp_delta_done");
 		if IS_CAVLC() then
 			mb_qp_delta := vld_se();
 		else 
@@ -7648,21 +7914,29 @@ end
 	read_MB_layer_skip_mb_qp_delta: action ==>  LAST:[[true: for int t in 0 .. 25 ]] repeat 26//27
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and not IS_Intra_16x16() ) and IS_CAVLC()
+	do
+		//println("read_MB_layer_skip_mb_qp_delta");
 	end
 /*		
 	read_MB_layer_skip_mb_qp_delta.Block_4x4: action ==>  LAST:[[true: for int t in 0 .. 25 ]] repeat 26//27
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and IS_Intra_4x4() ) and IS_CAVLC()
+	do
+		//println("read_MB_layer_skip_mb_qp_delta");
 	end
 		
 	read_MB_layer_skip_mb_qp_delta.others: action ==>  LAST:[[true: for int t in 0 .. 26 ]] repeat 27
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and ( not IS_Intra_16x16()) and (not IS_Intra_4x4()) ) and IS_CAVLC()
+	do
+		//println("read_MB_layer_skip_mb_qp_delta");
 	end*/
 
 	read_MB_layer_skip_mb_qp_delta_CABAC: action ==> VALUE:[[0: for int i in 0 .. 391]] repeat 392
 	guard
 		( val_CodedBlockPatternLuma = 0 and CodedBlockPatternChroma = 0 and not IS_Intra_16x16() ) and IS_CABAC()
+	do
+		//println("read_MB_layer_skip_mb_qp_delta_CABAC");
 	end	
 	//end if
 
@@ -7697,6 +7971,7 @@ end
 
 	sub_MB_pred_init_sub_mb_type: action ==> 
 	do
+		//println("sub_MB_pred_init_sub_mb_type");
 		mbPartIdx := 0;
 		
 		if IS_CAVLC() then
@@ -7715,6 +7990,7 @@ end
 		( (vld_end() and mbPartIdx < 4) and IS_CAVLC() ) or
 		( (cabac_end() and mbPartIdx < 4) and IS_CABAC() )
 	do
+		//println("read_sub_MB_pred_sub_mb_type");
 		if IS_CAVLC() then
 			sub_mb_type[mbPartIdx] := vld_ue();
 			mbPartIdx := mbPartIdx +1;
@@ -8558,6 +8834,7 @@ end
 
 	Residual_init: action ==>
 	do
+		//println("Residual_init");
 		bmFlag := 0;
 		startIdx := 0;
 		endIdx := 15;
@@ -8575,6 +8852,7 @@ end
 		startIdx = 0,
 		IS_Intra_16x16()
 	do
+		//println("Residual_luma_DC_init");
 		block_startIdx := 0;
 		block_endIdx := 15;
 		maxNumCoeff := 16;
@@ -8587,12 +8865,15 @@ end
 	Residual_return_luma_DC: action ==> LAST:[true]
 	guard
 		leveltype=0 and IS_CAVLC()
+	do
+		//println("Residual_return_luma_DC");
 	end
 	
 	Residual_return_luma_DC_CABAC: action ==> VALUE:[ [level[i]: for int i in 0 .. 15]] repeat 16
 	guard
 		leveltype=0 and IS_CABAC()
 	do
+		//println("Residual_return_luma_DC_CABAC");
 		SentLumaDCZeros := false;
 		if TRACE then
 			println("Luma DC 16x16");
@@ -8606,6 +8887,8 @@ end
 	Residual_luma_skip_DC_init: action ==> //LAST:[true]
 	guard
 		( bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16() ) and IS_CAVLC()
+	do
+		//println("Residual_luma_skip_DC_init");
 	end
 /*	Residual_luma_skip_DC_init.Block_4x4: action ==> //LAST:[true]
 	guard
@@ -8621,6 +8904,7 @@ end
 	guard
 		( bmFlag != 0 or startIdx != 0 or not IS_Intra_16x16() )and IS_CABAC()
 	do
+		//println("Residual_luma_skip_DC_init_CABAC");
 		if TRACE then
 			println("Skip Luma DC 16x16");
 		end
@@ -8630,6 +8914,7 @@ end
 
 	Residual_luma_AC_init: action ==>
 	do
+		//println("Residual_luma_AC_init");
 		leveltype := 1;
 		i8x8 := 0;
 		i4x4 := 0; 
@@ -8643,6 +8928,7 @@ end
 		i8x8 < 4,
 		transform_size_8x8_flag = 0 or entropy_coding_mode_flag[pps_id] = 0 // bloc4x4 or CAVLC
 	do
+		//println("Residual_luma_AC_CAVLC");
 		if IS_Intra_16x16() then
 			ctxBlockCat := 1;  
 		else  
@@ -8661,6 +8947,7 @@ end
 		i4x4 < 4,
 		rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 1 // MB sub part 8x8 != 0
 	do
+		//println("Residual_luma_AC_CodedBlock8x8");
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 		//if( !bmFlag && endIdx > 0 &&  MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
 		if bmFlag = 0 and endIdx > 0 and  IS_Intra_16x16() then 
@@ -8684,6 +8971,8 @@ end
 	Residual_return_luma_AC: action ==> LAST: [true]
 	guard
 		leveltype = 1 and IS_CAVLC()
+	do
+		//println("Residual_return_luma_AC");
 	end
 	
 	Residual_return_luma_AC_CABAC_15_Coeff: action ==> VALUE:[ [level_temp[i]: for int i in 0 .. 15]] repeat 16
@@ -8692,6 +8981,7 @@ end
 	var
 		List (type:int(size=16),size=16) level_temp
 	do
+		//println("Residual_return_luma_AC_CABAC_15_Coeff");
 		if TRACE then
 			foreach int s in 0 .. 14 do
 				println("LumaAC16x16[" + s + "] := " + level[s]);
@@ -8708,6 +8998,7 @@ end
 	guard
 		leveltype = 1 and maxNumCoeff = 16 and IS_CABAC()
 	do
+		//println("Residual_return_luma_AC_CABAC_16_Coeff");
 		if TRACE then
 			foreach int s in 0 .. 15 do
 				println("LumaAC4x4[" + s + "] := " + level[s]);
@@ -8721,6 +9012,7 @@ end
 	guard
 		(i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CAVLC()
 	do
+		//println("Residual_luma_skip_AC_CodedBlock8x8");
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 		/*
 		// if( !bmFlag && MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
@@ -8738,6 +9030,7 @@ end
 	guard
 		( (i4x4 < 4 and rshift(bitand(val_CodedBlockPatternLuma, lshift(1,i8x8) ), i8x8) = 0 ) and IS_CABAC() )
 	do
+		//println("Residual_luma_skip_AC_CodedBlock8x8_CABAC_16");
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 		/*
 		// if( !bmFlag && MbPartPredMode( mb_type, 0 ) = = Intra_16x16 )
@@ -8762,6 +9055,7 @@ end
 	*/
 	Residual_luma_inc_AC_4x4: action ==>
 	do
+		//println("Residual_luma_inc_AC_4x4");
 		i4x4 := i4x4 +1;
 		if i4x4 = 4 then 
 		  i4x4 := 0; 
@@ -8782,6 +9076,8 @@ end
 	Residual_luma_skip_AC_CAVLC: action ==> 
 	guard
 		i8x8 = 4
+	do
+		//println("Residual_luma_skip_AC_CAVLC");
 	end
 	//end for
 	
@@ -8792,6 +9088,7 @@ end
 	guard
 		(chroma_format_idc[sps_id] = 1 or chroma_format_idc[sps_id] = 2) and separate_colour_plane_flag[sps_id] = 0 
 	do
+		//println("Residual_ChromaArrayType_1_2_init");
 		if chroma_format_idc[sps_id] = 1 then 
 			NumC8x8 := 1;
 		else 
@@ -8810,6 +9107,7 @@ end
 		iCbCr < 2,
 		bitand(CodedBlockPatternChroma, 3) != 0 and startIdx = 0
 	do
+		//println("Residual_chroma_DC_init");
 		block_startIdx := 0;
 		block_endIdx := 4 * NumC8x8 - 1;
 		maxNumCoeff := 4 * NumC8x8;
@@ -8825,6 +9123,7 @@ end
 	guard
 		leveltype = 2 and IS_CAVLC()
 	do
+		//println("Residual_return_chroma_DC");
 		iCbCr := iCbCr + 1; 
 	end
 	
@@ -8832,6 +9131,7 @@ end
 	guard
 		leveltype = 2 and maxNumCoeff = 4 and IS_CABAC()
 	do
+		//println("Residual_return_chroma_DC_CABAC_4_Coeff");
 		iCbCr := iCbCr + 1;
 		if TRACE then
 			foreach int s in 0 .. 3 do
@@ -8844,6 +9144,7 @@ end
 	guard
 		leveltype = 2 and maxNumCoeff = 8 and IS_CABAC()
 	do
+		//println("Residual_return_chroma_DC_CABAC_8_Coeff");
 		iCbCr := iCbCr + 1;
 		if TRACE then
 			foreach int s in 0 .. 7 do
@@ -8857,6 +9158,7 @@ end
 	guard
 		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CAVLC()
 	do
+		//println("Residual_skip_chroma_DC_init");
 		//for( i = 0; i < 4 * NumC8x8; i++ )
 		//ChromaDCLevel[ iCbCr ][ i ] = 0
 		iCbCr := iCbCr + 1; 
@@ -8867,6 +9169,7 @@ end
 	guard
 		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC() and NumC8x8 = 1
 	do
+		//println("Residual_skip_chroma_DC_init_CABAC_1");
 		//for( i = 0; i < 4 * NumC8x8; i++ )
 		//ChromaDCLevel[ iCbCr ][ i ] = 0
 		iCbCr := iCbCr + 1; 
@@ -8879,6 +9182,7 @@ end
 	guard
 		( iCbCr < 2 and bitand(CodedBlockPatternChroma, 3) =0 or startIdx != 0 ) and IS_CABAC() and NumC8x8 = 2
 	do
+		//println("Residual_skip_chroma_DC_init_CABAC_2");
 		//for( i = 0; i < 4 * NumC8x8; i++ )
 		//ChromaDCLevel[ iCbCr ][ i ] = 0
 		iCbCr := iCbCr + 1; 
@@ -8890,11 +9194,14 @@ end
 	Residual_skip_chroma_DC: action ==>
 	guard
 		iCbCr = 2
+	do
+		//println("Residual_skip_chroma_DC");
 	end
 	//end for  
 
 	Residual_chroma_AC_init: action ==>
 	do
+		//println("Residual_chroma_AC_init");
 		leveltype := 3;
 		iCbCr := 0;
 		i8x8 := 0;
@@ -8915,6 +9222,7 @@ end
 		iCbCr < 2,
 		bitand(CodedBlockPatternChroma, 2) = 2 and endIdx > 0
 	do
+		//println("Residual_chroma_AC_CodedBlock4x4");
 		luma4x4BlkIdx := i4x4 + lshift( i8x8, 2);
 		block_startIdx := if startIdx - 1 > 0 then startIdx - 1 else 0 end ;
 		block_endIdx := endIdx - 1;
@@ -8926,6 +9234,7 @@ end
 	guard
 		leveltype = 3 and IS_CAVLC()
 	do
+		//println("Residual_return_chroma_AC");
 		i4x4 := i4x4 +1;
 		if i4x4 = 4 then 
 			i4x4 := 0; 
@@ -8944,6 +9253,7 @@ end
 	var
 		List (type:int(size=16),size=16) level_temp
 	do
+		//println("Residual_return_chroma_AC_CABAC");
 		i4x4 := i4x4 +1;
 		if i4x4 = 4 then 
 			i4x4 := 0; 
@@ -9036,6 +9346,7 @@ end
 		uint(size=5) nA, 
 		uint(size=5) nB
 	do
+		//println("Residual_block_init_coeff_token");
 		if leveltype = 2 then //chromaDC
 			nc := -1;
 		else
@@ -9108,6 +9419,7 @@ end
 		CAVLC_end(),
 		TotalCoeff() >0
 	do
+		//println("Residual_block_read_suffixLength");
 		if leveltype = 1 then //luma
     			val_cbp_blk:=(1<<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
 			NonZeroCount[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]] := TotalCoeff();
@@ -9129,6 +9441,7 @@ end
 		inc_nb_coeff < TotalCoeff(),
 		inc_nb_coeff < TrailingOnes()
 	do
+		//println("Residual_block_read_trailing_ones_sign_flag");
 		set_bits_to_read(1);
 	end
 
@@ -9136,6 +9449,7 @@ end
 	guard
 		done_reading_bits()
 	do
+		//println("Residual_block_read_trailing_ones_sign_flag_done");
 		level[ inc_nb_coeff ] := 1 - 2 * read_result();
 		inc_nb_coeff := inc_nb_coeff +1 ;
 	end
@@ -9146,6 +9460,7 @@ end
 		inc_nb_coeff < TotalCoeff(),
 		inc_nb_coeff >= TrailingOnes()
 	do
+		//println("Residual_block_read_level_prefix");
 		set_bits_to_read(1);
 		level_prefix := 0;
 	end
@@ -9155,6 +9470,7 @@ end
 		done_reading_bits(),
 		read_result() = 0
 	do
+		//println("Residual_block_read_level_prefix_done0");
 		level_prefix := level_prefix +1;
 		set_bits_to_read(1);
 	end
@@ -9166,6 +9482,7 @@ end
 	var
 		uint levelSuffixSize
 	do
+		//println("Residual_block_read_level_prefix_done1");
 		levelCode := lshift( if level_prefix < 15 then level_prefix else 15 end, suffixLength );
 		if level_prefix = 14 and suffixLength = 0 then levelSuffixSize := 4;
 		else if level_prefix >=15 then levelSuffixSize := level_prefix - 3;
@@ -9177,6 +9494,7 @@ end
 	guard
 		done_reading_bits()
 	do
+		//println("Residual_block_read_level_suffix_done");
 		//if( suffixLength > 0 | | level_prefix >= 14 )
 		if suffixLength > 0 or level_prefix >= 14 then levelCode := levelCode + read_result(); end
 
@@ -9208,6 +9526,7 @@ end
 	guard
 		inc_nb_coeff = TotalCoeff()
 	do
+		//println("Residual_block_read_TotalCoeff_done");
 		//if( TotalCoeff( coeff_token ) < endIdx startIdx + 1 )
 		if TotalCoeff() < block_endIdx - block_startIdx +1 then start_CAVLC(1); end
 		run := [0 : for int i in 0 .. 15];
@@ -9217,6 +9536,7 @@ end
 	guard
 		CAVLC_end()
 	do
+		//println("Residual_block_read_total_zeros_done");
 		//if( TotalCoeff( coeff_token ) < endIdx startIdx + 1 )
 		if TotalCoeff() < block_endIdx - block_startIdx +1 then zerosLeft := total_zeros; else zerosLeft := 0; end
 		inc_nb_coeff := 0;
@@ -9228,6 +9548,7 @@ end
 		inc_nb_coeff < TotalCoeff()-1,
 		zerosLeft > 0
 	do
+		//println("Residual_block_read_run_before");
 		start_CAVLC(2);
 	end
 
@@ -9235,6 +9556,7 @@ end
 	guard
 		CAVLC_end()
 	do
+		//println("Residual_block_read_run_before_done");
 		run[inc_nb_coeff] := run_before;
 		zerosLeft := zerosLeft - run_before;
 		inc_nb_coeff := inc_nb_coeff+1;
@@ -9245,6 +9567,7 @@ end
 		inc_nb_coeff < TotalCoeff()-1,
 		zerosLeft = 0
 	do
+		//println("Residual_block_skip_read_run_before");
 		run[inc_nb_coeff] := 0;
 		inc_nb_coeff := inc_nb_coeff+1;
 	end
@@ -9254,6 +9577,7 @@ end
 	guard
 		inc_nb_coeff = TotalCoeff()-1
 	do
+		//println("Residual_block_read_run_done");
 		run[TotalCoeff()-1] := zerosLeft;
 		if (IS_Intra_16x16() and leveltype = 1) or leveltype = 3 then run[TotalCoeff()-1] := run[TotalCoeff()-1] +1; end//the first coeffAC will be replaced by coeffDC
 		coeff_sent := -1;
@@ -9308,6 +9632,7 @@ end
 	guard
 		IS_CABAC()
 	do
+		//println("Residual_block_Cabac_coded_block_flag_start");
 		//Read coded_block_flag Syntax Element
 		GetCabacSyntaxElement(CABAC_CODED_BLOCK_FLAG);
 		StartCabacProcess();
@@ -9478,28 +9803,36 @@ end
 	guard
 		done_reading_bits(),
 		bitand( read_result(), 255 ) = 1
+	do
+	//	println("test_one_byte");
 	end
 
 	test_zero_byte: action ==>
 	guard
 		done_reading_bits(),
 		bitand( read_result(), 255 ) = 0
+	do
+	//	println("test_zero_byte");
 	end
 
 	request_byte: action ==>
 	guard
 		done_reading_bits()
 	do
+	//	println("request_byte");
 		set_bits_to_read( 8 );
 	end
 	
 	generic_done: action ==>
 	guard
 		done_reading_bits()
+	do
+	//	println("generic_done");
 	end
 
 	byte_align: action ==>
 	do
+	//	println("byte_align");
 		if(bitand( bit_count, 7 )!=0) then
 			set_bits_to_read( 8 - bitand( bit_count, 7 ) );
 		end
@@ -9509,32 +9842,40 @@ end
 //********************************************************************************************************************************** 
 	schedule fsm look_for_Sequence_Header :
 		look_for_Sequence_Header						( look_for_Sequence_Header							) --> search_start_code;
+		look_for_Sequence_Header(read_next_byte)-->look_for_Sequence_Header;
 		search_start_code ( search_start_code  ) --> stuck;
+		search_start_code(read_next_byte)-->search_start_code;
 
 	    // FIXME: add minimal error resilience.
 	    // byte align, then look for a starting on any byte boundary.
 	    // is hex 00000100.
 	    stuck    ( byte_align     ) --> stuck_1a;
-	
+
 	    stuck_1a ( request_byte   ) --> stuck_1b;
 	    stuck_1b ( test_zero_byte ) --> stuck_2a;
 	    stuck_1b ( generic_done   ) --> stuck_1a;
-	
+	    stuck_1b(read_next_byte)-->stuck_1b;
 	    stuck_2a ( request_byte   ) --> stuck_2b;
+	    stuck_2a(read_next_byte)-->stuck_2a;
 	    stuck_2b ( test_zero_byte ) --> stuck_3a;
 	    stuck_2b ( generic_done   ) --> stuck_1a;
+	    stuck_2b(read_next_byte)-->stuck_2b;
 	
 	    stuck_3a ( request_byte   ) --> stuck_3b;
+	    stuck_3a(read_next_byte)-->stuck_3a;
 	    stuck_3b ( test_zero_byte ) --> stuck_3a;
 	    stuck_3b ( test_one_byte  ) --> read_Nal_unit_header;
 	    stuck_3b ( generic_done   ) --> stuck_1a;
-	    
+	    stuck_3b(read_next_byte)-->stuck_3b;
 
 		// read Nal Unit header
 		read_Nal_unit_header							( read_Nal_unit_header								) --> look_for_which_Header;
+		read_Nal_unit_header (read_next_byte) --> read_Nal_unit_header;
 
 		//
 		look_for_which_Header                         	( look_for_which_Header								) --> find_header;
+		look_for_which_Header                         	( read_next_byte								) --> look_for_which_Header;
+		find_header	  									( read_next_byte								) --> find_header;
 		find_header	  									( look_for_other_header								) --> search_start_code;
 		find_header	  									( look_for_Sps_header	  							) --> read_Sps_id;
 		find_header	  									( look_for_Pps_header	  							) --> read_Pps_seq_parameter_set_id;
@@ -9542,151 +9883,239 @@ end
 
 		// read Sps header
 		read_Sps_id	  										( read_Sps_id	    								) --> read_Sps_id_done;
+		read_Sps_id (read_next_byte)-->read_Sps_id;
 		read_Sps_id_done	 								( read_Sps_id_done	    							) --> read_Sps_check_profile_idc;
+		read_Sps_id_done (read_next_byte)--> read_Sps_id_done;
 		read_Sps_check_profile_idc	 						( read_Sps_chroma_format_idc	  					) --> undefined; //not yet realized
 		read_Sps_check_profile_idc	 						( read_Sps_log2_max_frame_num_minus4				) --> read_Sps_pic_order_cnt_type;
-		read_Sps_pic_order_cnt_type	 						( read_Sps_pic_order_cnt_type	   					) --> read_Sps_check_pic_order_cnt_type; 
+		read_Sps_check_profile_idc (read_next_byte)--> read_Sps_check_profile_idc;
+		read_Sps_pic_order_cnt_type	 						( read_Sps_pic_order_cnt_type	   					) --> read_Sps_check_pic_order_cnt_type;
+		read_Sps_pic_order_cnt_type (read_next_byte)-->read_Sps_pic_order_cnt_type;
 		read_Sps_check_pic_order_cnt_type	 				( read_Sps_pic_order_cnt_type_skip01				) --> read_Sps_num_ref_frames; 
 		read_Sps_check_pic_order_cnt_type	 				( read_Sps_log2_max_pic_order_cnt_lsb_minus4		) --> read_Sps_log2_max_pic_order_cnt_lsb_minus4_done;
+		read_Sps_check_pic_order_cnt_type(read_next_byte)-->read_Sps_check_pic_order_cnt_type;
 		read_Sps_log2_max_pic_order_cnt_lsb_minus4_done		( read_Sps_log2_max_pic_order_cnt_lsb_minus4_done 	) --> read_Sps_num_ref_frames;
+		read_Sps_log2_max_pic_order_cnt_lsb_minus4_done(read_next_byte)-->read_Sps_log2_max_pic_order_cnt_lsb_minus4_done;
 		read_Sps_check_pic_order_cnt_type	 				( read_Sps_delta_pic_order_always_zero_flag			) --> read_Sps_offset_for_non_ref_pic;   
+		read_Sps_check_pic_order_cnt_type(read_next_byte)-->read_Sps_check_pic_order_cnt_type;
 		read_Sps_offset_for_non_ref_pic						( read_Sps_offset_for_non_ref_pic					) --> read_Sps_offset_for_top_to_bottom_field;	
+		read_Sps_offset_for_non_ref_pic(read_next_byte)-->read_Sps_offset_for_non_ref_pic;
 		read_Sps_offset_for_top_to_bottom_field				( read_Sps_offset_for_top_to_bottom_field	        ) --> read_Sps_num_ref_frames_in_pic_order_cnt_cycle;
+		read_Sps_offset_for_top_to_bottom_field(read_next_byte)-->read_Sps_offset_for_top_to_bottom_field;
 		read_Sps_num_ref_frames_in_pic_order_cnt_cycle		( read_Sps_num_ref_frames_in_pic_order_cnt_cycle	) --> read_Sps_offset_for_ref_frame0;
+		read_Sps_num_ref_frames_in_pic_order_cnt_cycle(read_next_byte)-->read_Sps_num_ref_frames_in_pic_order_cnt_cycle;
 		read_Sps_offset_for_ref_frame0						( read_Sps_offset_for_ref_frame0	                ) --> read_Sps_offset_for_ref_frame1;
+		read_Sps_offset_for_ref_frame0(read_next_byte)-->read_Sps_offset_for_ref_frame0;
 		read_Sps_offset_for_ref_frame1						( read_Sps_offset_for_ref_frame1 	                ) --> read_Sps_offset_for_ref_frame1;
 		read_Sps_offset_for_ref_frame1						( read_Sps_skip_offset_for_ref_frame1				) --> read_Sps_num_ref_frames;      
+		read_Sps_offset_for_ref_frame1(read_next_byte)-->read_Sps_offset_for_ref_frame1;
 		read_Sps_num_ref_frames 							( read_Sps_num_ref_frames  	                        ) --> read_Sps_gaps_in_frame_num_value_allowed_flag;
+		read_Sps_num_ref_frames(read_next_byte)-->read_Sps_num_ref_frames;
 		read_Sps_gaps_in_frame_num_value_allowed_flag		( read_Sps_gaps_in_frame_num_value_allowed_flag  	) --> read_Sps_pic_width_in_mbs_minus1;
+		read_Sps_gaps_in_frame_num_value_allowed_flag(read_next_byte)-->read_Sps_gaps_in_frame_num_value_allowed_flag;
 		read_Sps_pic_width_in_mbs_minus1	 				( read_Sps_pic_width_in_mbs_minus1              	) --> read_Sps_pic_height_in_map_units_minus1;
+		read_Sps_pic_width_in_mbs_minus1(read_next_byte)-->read_Sps_pic_width_in_mbs_minus1;
 		read_Sps_pic_height_in_map_units_minus1 			( read_Sps_pic_height_in_map_units_minus1 	        ) --> read_Sps_frame_mbs_only_flag;
+		read_Sps_pic_height_in_map_units_minus1(read_next_byte)-->read_Sps_pic_height_in_map_units_minus1;
 		read_Sps_frame_mbs_only_flag 						( read_Sps_frame_mbs_only_flag	  	                ) --> read_Sps_mb_adaptive_frame_field_flag;
+		read_Sps_frame_mbs_only_flag(read_next_byte)-->read_Sps_frame_mbs_only_flag;
 		read_Sps_mb_adaptive_frame_field_flag				( read_Sps_mb_adaptive_frame_field_flag  	        ) --> read_Sps_mb_adaptive_frame_field_flag_done;
+		read_Sps_mb_adaptive_frame_field_flag(read_next_byte)-->read_Sps_mb_adaptive_frame_field_flag;
 		read_Sps_mb_adaptive_frame_field_flag_done			( read_Sps_mb_adaptive_frame_field_flag_done        ) --> read_Sps_direct_8x8_interference_flag;
+		read_Sps_mb_adaptive_frame_field_flag_done(read_next_byte)-->read_Sps_mb_adaptive_frame_field_flag_done;
 		read_Sps_mb_adaptive_frame_field_flag				( read_Sps_skip_mb_adaptive_frame_field_flag        ) --> read_Sps_direct_8x8_interference_flag;
 		read_Sps_direct_8x8_interference_flag 				( read_Sps_direct_8x8_interference_flag             ) --> read_Sps_frame_cropping_flag;    
+		read_Sps_direct_8x8_interference_flag(read_next_byte)-->read_Sps_direct_8x8_interference_flag;
 		read_Sps_frame_cropping_flag						( read_Sps_frame_cropping_flag	  	                ) --> read_Sps_frame_crop_left_offset;
+		read_Sps_frame_cropping_flag(read_next_byte)-->read_Sps_frame_cropping_flag;
 
 		read_Sps_frame_crop_left_offset						( read_Sps_frame_crop_left_offset  	                ) --> read_Sps_frame_crop_right_offset;
+		read_Sps_frame_crop_left_offset(read_next_byte)-->read_Sps_frame_crop_left_offset;
 		read_Sps_frame_crop_right_offset					( read_Sps_frame_crop_right_offset				  	) --> read_Sps_frame_crop_top_offset;
+		read_Sps_frame_crop_right_offset(read_next_byte)-->read_Sps_frame_crop_right_offset;
 		read_Sps_frame_crop_top_offset						( read_Sps_frame_crop_top_offset  	                ) --> read_Sps_frame_crop_bottom_offset;
+		read_Sps_frame_crop_top_offset(read_next_byte)-->read_Sps_frame_crop_top_offset;
 		read_Sps_frame_crop_bottom_offset					( read_Sps_frame_crop_bottom_offset				  	) --> read_Sps_frame_crop_bottom_offset_done;
+		read_Sps_frame_crop_bottom_offset(read_next_byte)-->read_Sps_frame_crop_bottom_offset;
 		read_Sps_frame_crop_bottom_offset_done				( read_Sps_frame_crop_bottom_offset_done	        ) --> read_Sps_vui_parameters_present_flag;    
+		read_Sps_frame_crop_bottom_offset_done(read_next_byte)-->read_Sps_frame_crop_bottom_offset_done;
 		read_Sps_frame_crop_left_offset						( read_Sps_skip_frame_crop_left_offset	  	        ) --> read_Sps_vui_parameters_present_flag; 
+		read_Sps_frame_crop_left_offset(read_next_byte)-->read_Sps_frame_crop_left_offset;
 		read_Sps_vui_parameters_present_flag				( read_Sps_vui_parameters_present_flag	  	        ) --> read_Sps_vui_parameters_present_flag_done;
+		read_Sps_vui_parameters_present_flag(read_next_byte)-->read_Sps_vui_parameters_present_flag;
 		read_Sps_vui_parameters_present_flag_done			( read_Sps_vui_parameters_present_flag_done	  		) --> search_start_code; //end of Sps
+		read_Sps_vui_parameters_present_flag_done(read_next_byte)-->read_Sps_vui_parameters_present_flag_done;
 
 		// read Pps header
 		read_Pps_seq_parameter_set_id 						( read_Pps_seq_parameter_set_id                     ) --> read_Pps_entropy_coding_mode_pic_order_flag;
+		read_Pps_seq_parameter_set_id(read_next_byte)-->read_Pps_seq_parameter_set_id;
 		read_Pps_entropy_coding_mode_pic_order_flag  		( read_Pps_entropy_coding_mode_pic_order_flag	  	) --> read_Pps_num_slice_groups_minus1;
+		read_Pps_entropy_coding_mode_pic_order_flag(read_next_byte)-->read_Pps_entropy_coding_mode_pic_order_flag;
 		read_Pps_num_slice_groups_minus1					( read_Pps_num_slice_groups_minus1				  	) --> look_Pps_slice_group_map_type; 			  
+		read_Pps_num_slice_groups_minus1(read_next_byte)-->read_Pps_num_slice_groups_minus1;
 		look_Pps_slice_group_map_type						( read_Pps_slice_group_map_type                     ) --> read_Pps_check_slice_group_map_type;
+		look_Pps_slice_group_map_type(read_next_byte)-->look_Pps_slice_group_map_type;
 		read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type0;
+		read_Pps_check_slice_group_map_type(read_next_byte)-->read_Pps_check_slice_group_map_type;
 		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type1;
 		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type2;
 		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type345;
 		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_check_slice_group_map_type6;
 		//gorinje read_Pps_check_slice_group_map_type					( read_Pps_check_slice_group_map_type				) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_check_slice_group_map_type0				( read_Pps_run_length_minus1						) --> read_Pps_check_slice_group_map_type0;
+		read_Pps_check_slice_group_map_type0(read_next_byte)-->read_Pps_check_slice_group_map_type0;
 		//gorinje read_Pps_check_slice_group_map_type0				( read_Pps_run_length_minus1						) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_check_slice_group_map_type1				( read_Pps_check_slice_group_map_type1				) --> read_Pps_num_ref_idx_l0_active_minus1;
+		read_Pps_check_slice_group_map_type1(read_next_byte)-->read_Pps_check_slice_group_map_type1;
 		read_Pps_check_slice_group_map_type2				( read_Pps_top_left	                                ) --> read_Pps_bottom_right;
+		read_Pps_check_slice_group_map_type2(read_next_byte)-->read_Pps_check_slice_group_map_type2;
 		read_Pps_bottom_right								( read_Pps_bottom_right								) --> read_Pps_check_slice_group_map_type2;
+		read_Pps_bottom_right(read_next_byte)-->read_Pps_bottom_right;
 		//gorinje read_Pps_bottom_right								( read_Pps_bottom_right								) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_check_slice_group_map_type345				( read_Pps_slice_group_change_direction_flag		) --> read_Pps_slice_group_change_rate_minus1;
+		read_Pps_check_slice_group_map_type345(read_next_byte)-->read_Pps_check_slice_group_map_type345;
 		read_Pps_slice_group_change_rate_minus1			    ( read_Pps_slice_group_change_rate_minus1	        ) --> read_Pps_num_ref_idx_l0_active_minus1;
+		read_Pps_slice_group_change_rate_minus1(read_next_byte)-->read_Pps_slice_group_change_rate_minus1;
 		read_Pps_check_slice_group_map_type6				( read_Pps_pic_size_in_map_units_minus1				) --> search_start_code; //not yet realized
-		  	
+		read_Pps_check_slice_group_map_type6(read_next_byte)-->read_Pps_check_slice_group_map_type6;
+
 		look_Pps_slice_group_map_type					    ( read_Pps_slice_group_map_type_skip 	  	        ) --> read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_num_ref_idx_l0_active_minus1				( read_Pps_num_ref_idx_l0_active_minus1	 	        ) --> read_Pps_num_ref_idx_l1_active_minus1;
+		read_Pps_num_ref_idx_l0_active_minus1(read_next_byte)-->read_Pps_num_ref_idx_l0_active_minus1;
 		read_Pps_num_ref_idx_l1_active_minus1				( read_Pps_num_ref_idx_l1_active_minus1             ) --> read_Pps_weighted_pred_bipred;
+		read_Pps_num_ref_idx_l1_active_minus1(read_next_byte)-->read_Pps_num_ref_idx_l1_active_minus1;
 		read_Pps_weighted_pred_bipred						( read_Pps_weighted_pred_bipred   	                ) --> read_Pps_pic_init_qp_minus26;
+		read_Pps_weighted_pred_bipred(read_next_byte)-->read_Pps_weighted_pred_bipred;
 		read_Pps_pic_init_qp_minus26						( read_Pps_pic_init_qp_minus26	  	                ) --> read_Pps_pic_init_qs_minus26;
+		read_Pps_pic_init_qp_minus26(read_next_byte)-->read_Pps_pic_init_qp_minus26;
 		read_Pps_pic_init_qs_minus26						( read_Pps_pic_init_qs_minus26	  	                ) --> read_Pps_chroma_qp_index_offset;
+		read_Pps_pic_init_qs_minus26(read_next_byte)-->read_Pps_pic_init_qs_minus26;
 		read_Pps_chroma_qp_index_offset						( read_Pps_chroma_qp_index_offset 	                ) --> read_Pps_flag_deblocking_constrained_redundant;
+		read_Pps_chroma_qp_index_offset(read_next_byte)-->read_Pps_chroma_qp_index_offset;
 		read_Pps_flag_deblocking_constrained_redundant		( read_Pps_flag_deblocking_constrained_redundant	) --> read_Pps_check_High_Profile;
+		read_Pps_flag_deblocking_constrained_redundant(read_next_byte)-->read_Pps_flag_deblocking_constrained_redundant;
 		read_Pps_check_High_Profile							( read_Pps_check_High_Profile					  	) --> read_Pps_not_High_Profile;
+		read_Pps_check_High_Profile(read_next_byte)-->read_Pps_check_High_Profile;
 		read_Pps_not_High_Profile							( read_Pps_not_High_Profile						  	) --> search_start_code;
 		//read_Pps_not_High_Profile							( read_Pps_pic_scaling_matrix_present_flag		  	) --> read_Nal_unit_header; //not yet realized
+		read_Pps_not_High_Profile(read_next_byte)-->read_Pps_not_High_Profile;
 
 		// read Slice header
 		read_SliceH_slice_type								( read_SliceH_slice_type  	                        ) --> read_SliceH_pps_id;
+		read_SliceH_slice_type(read_next_byte)-->read_SliceH_slice_type;
 		read_SliceH_pps_id									( read_SliceH_pps_id						  		) --> read_SliceH_check_separate_colour_plane_flag;
+		read_SliceH_pps_id(read_next_byte)-->read_SliceH_pps_id;
 		read_SliceH_check_separate_colour_plane_flag		( read_SliceH_check_separate_colour_plane_flag	 	) --> read_SliceH_check_separate_colour_plane_flag_done; 
+		read_SliceH_check_separate_colour_plane_flag(read_next_byte)-->read_SliceH_check_separate_colour_plane_flag;
 		read_SliceH_check_separate_colour_plane_flag_done	( read_SliceH_separate_colour_plane_flag_done		) --> read_SliceH_read_colour_plane_id;
 		read_SliceH_check_separate_colour_plane_flag_done	( read_SliceH_skip_separate_colour_plane_flag	  	) --> read_SliceH_frame_num;	
+		read_SliceH_check_separate_colour_plane_flag_done(read_next_byte)-->read_SliceH_check_separate_colour_plane_flag_done;
 		read_SliceH_read_colour_plane_id					( read_SliceH_read_colour_plane_id				  	) --> read_SliceH_frame_num;
+		read_SliceH_read_colour_plane_id(read_next_byte)-->read_SliceH_read_colour_plane_id;
 		read_SliceH_frame_num								( read_SliceH_frame_num	  	                        ) --> read_SliceH_field_pic_flag;
 		read_SliceH_frame_num								( skip_read_SliceH_frame_num	  	                        ) --> read_SliceH_field_pic_flag;
+		read_SliceH_frame_num(read_next_byte)-->read_SliceH_frame_num;
 		read_SliceH_field_pic_flag							( read_SliceH_field_pic_flag						) --> read_SliceH_bottom_field_flag;
 		read_SliceH_field_pic_flag							( read_SliceH_skip_field_pic_flag					) --> read_SliceH_idr_pic_id;
+		read_SliceH_field_pic_flag(read_next_byte)-->read_SliceH_field_pic_flag;
 		read_SliceH_bottom_field_flag						( read_SliceH_bottom_field_flag						) --> read_SliceH_bottom_field_flag_done;
 		read_SliceH_bottom_field_flag						( read_SliceH_skip_bottom_field_flag				) --> read_SliceH_idr_pic_id;
+		read_SliceH_bottom_field_flag(read_next_byte)-->read_SliceH_bottom_field_flag;
 		read_SliceH_bottom_field_flag_done					( read_SliceH_bottom_field_flag_done				) --> read_SliceH_idr_pic_id;
+		read_SliceH_bottom_field_flag_done(read_next_byte)-->read_SliceH_bottom_field_flag_done;
 
 		read_SliceH_idr_pic_id								( read_SliceH_idr_pic_id  	                        ) --> read_SliceH_idr_pic_id_done;
 		read_SliceH_idr_pic_id								( read_SliceH_skip_idr_pic_id                       ) --> read_SliceH_pic_order_cnt_lsb;
+		read_SliceH_idr_pic_id(read_next_byte)-->read_SliceH_idr_pic_id;
 		read_SliceH_idr_pic_id_done							( read_SliceH_idr_pic_id_done		  				) --> read_SliceH_pic_order_cnt_lsb;	
-		
+		read_SliceH_idr_pic_id_done(read_next_byte)-->read_SliceH_idr_pic_id_done;
+
 		read_SliceH_pic_order_cnt_lsb						( read_SliceH_pic_order_cnt_lsb  					) --> read_SliceH_pic_order_cnt_lsb_start;
+		read_SliceH_pic_order_cnt_lsb(read_next_byte)-->read_SliceH_pic_order_cnt_lsb;
 		read_SliceH_pic_order_cnt_lsb_start					( read_SliceH_pic_order_cnt_lsb_done  				) --> read_SliceH_pic_order_cnt_lsb_done;
+		read_SliceH_pic_order_cnt_lsb_start(read_next_byte)-->read_SliceH_pic_order_cnt_lsb_start;
 		read_SliceH_pic_order_cnt_lsb						( read_SliceH_skip_pic_order_cnt_lsb  				) --> read_SliceH_delta_pic_order_cnt_bottom_done;
 
 		read_SliceH_pic_order_cnt_lsb_done					( read_SliceH_delta_pic_order_cnt_bottom			) --> read_SliceH_delta_pic_order_cnt_bottom_start;
+		read_SliceH_pic_order_cnt_lsb_done(read_next_byte)-->read_SliceH_pic_order_cnt_lsb_done;
 		read_SliceH_delta_pic_order_cnt_bottom_start		( read_SliceH_delta_pic_order_cnt_bottom_done		) --> CalcPOC;
+		read_SliceH_delta_pic_order_cnt_bottom_start(read_next_byte)-->read_SliceH_delta_pic_order_cnt_bottom_start;
 		read_SliceH_pic_order_cnt_lsb_done					( read_SliceH_skip_delta_pic_order_cnt_bottom		) --> CalcPOC;    
 
 		read_SliceH_delta_pic_order_cnt_bottom_done			( read_SliceH_delta_pic_order_cnt0					) --> read_SliceH_delta_pic_order_cnt0_start;
+		read_SliceH_delta_pic_order_cnt_bottom_done(read_next_byte)-->read_SliceH_delta_pic_order_cnt_bottom_done;
 		read_SliceH_delta_pic_order_cnt0_start				( read_SliceH_delta_pic_order_cnt0_done				) --> read_SliceH_delta_pic_order_cnt0_done;
+		read_SliceH_delta_pic_order_cnt0_start(read_next_byte)-->read_SliceH_delta_pic_order_cnt0_start;
 		read_SliceH_delta_pic_order_cnt_bottom_done			( read_SliceH_skip_delta_pic_order_cnt0				) --> CalcPOC;
+		read_SliceH_delta_pic_order_cnt_bottom_done(read_next_byte)-->read_SliceH_delta_pic_order_cnt_bottom_done;
 
-		read_SliceH_delta_pic_order_cnt0_done				( read_SliceH_delta_pic_order_cnt1		 	        ) --> read_SliceH_delta_pic_order_cnt1_start;	
+		read_SliceH_delta_pic_order_cnt0_done				( read_SliceH_delta_pic_order_cnt1		 	        ) --> read_SliceH_delta_pic_order_cnt1_start;
+		read_SliceH_delta_pic_order_cnt0_done(read_next_byte)-->read_SliceH_delta_pic_order_cnt0_done;
 		read_SliceH_delta_pic_order_cnt1_start				( read_SliceH_delta_pic_order_cnt1_done 		    ) --> CalcPOC;	
+		read_SliceH_delta_pic_order_cnt1_start(read_next_byte)-->read_SliceH_delta_pic_order_cnt1_start;
 		read_SliceH_delta_pic_order_cnt0_done				( read_SliceH_skip_delta_pic_order_cnt1				) --> CalcPOC;
 
 		CalcPOC												( CalcPOC	                                        ) --> read_SliceH_redundant_pic_cnt;
 		CalcPOC												( skipPOC	                                        ) --> read_SliceH_redundant_pic_cnt;
+		CalcPOC(read_next_byte)-->CalcPOC;
 		read_SliceH_redundant_pic_cnt						( read_SliceH_redundant_pic_cnt                     ) --> read_SliceH_redundant_pic_cnt_done;
+		read_SliceH_redundant_pic_cnt(read_next_byte)-->read_SliceH_redundant_pic_cnt;
 		read_SliceH_redundant_pic_cnt_done					( read_SliceH_redundant_pic_cnt_done  				) --> read_SliceH_direct_spatial_mv_pred_flag;
+		read_SliceH_redundant_pic_cnt_done(read_next_byte)-->read_SliceH_redundant_pic_cnt_done;
 		read_SliceH_redundant_pic_cnt						( read_SliceH_skip_redundant_pic_cnt                ) --> read_SliceH_direct_spatial_mv_pred_flag;
 
 		read_SliceH_direct_spatial_mv_pred_flag				( read_SliceH_direct_spatial_mv_pred_flag	        ) --> read_SliceH_direct_spatial_mv_pred_flag_done;
+		read_SliceH_direct_spatial_mv_pred_flag(read_next_byte)-->read_SliceH_direct_spatial_mv_pred_flag;
 		read_SliceH_direct_spatial_mv_pred_flag_done		( read_SliceH_direct_spatial_mv_pred_flag_done		) --> read_SliceH_num_ref_idx_active_override_flag;
+		read_SliceH_direct_spatial_mv_pred_flag_done(read_next_byte)-->read_SliceH_direct_spatial_mv_pred_flag_done;
 		read_SliceH_direct_spatial_mv_pred_flag				( read_SliceH_skip_direct_spatial_mv_pred_flag		) --> read_SliceH_num_ref_idx_active_override_flag;
 
 		read_SliceH_num_ref_idx_active_override_flag		( read_SliceH_num_ref_idx_active_override_flag		) --> read_SliceH_num_ref_idx_l0_active_minus1;
+		read_SliceH_num_ref_idx_active_override_flag(read_next_byte)-->read_SliceH_num_ref_idx_active_override_flag;
 		read_SliceH_num_ref_idx_l0_active_minus1			( read_SliceH_num_ref_idx_l0_active_minus1			) --> read_SliceH_num_ref_idx_l1_active_minus1;
+		read_SliceH_num_ref_idx_l0_active_minus1(read_next_byte)-->read_SliceH_num_ref_idx_l0_active_minus1;
 		read_SliceH_num_ref_idx_l1_active_minus1			( read_SliceH_num_ref_idx_l1_active_minus1			) --> read_SliceH_num_ref_idx_l1_active_minus1_done;
+		read_SliceH_num_ref_idx_l1_active_minus1(read_next_byte)-->read_SliceH_num_ref_idx_l1_active_minus1;
 		read_SliceH_num_ref_idx_l1_active_minus1_done		( read_SliceH_num_ref_idx_l1_active_minus1_done		) --> read_SliceH_ref_pic_list_reordering_l0;
+		read_SliceH_num_ref_idx_l1_active_minus1_done(read_next_byte)-->read_SliceH_num_ref_idx_l1_active_minus1_done;
 		read_SliceH_num_ref_idx_l1_active_minus1			( read_SliceH_skip_num_ref_idx_l1_active_minus1		) --> read_SliceH_ref_pic_list_reordering_l0;
 		read_SliceH_num_ref_idx_l0_active_minus1			( read_SliceH_skip_num_ref_idx_l0_active_minus1		) --> read_SliceH_ref_pic_list_reordering_l0;
 		read_SliceH_num_ref_idx_active_override_flag		( read_SliceH_skip_num_ref_idx_active_override_flag	) --> read_SliceH_ref_pic_list_reordering_l0;
 
 		//ref_pic_list_reordering_l0
 		read_SliceH_ref_pic_list_reordering_l0				( read_SliceH_ref_pic_list_reordering_flag_l0           ) --> read_SliceH_ref_pic_list_reordering_flag_l0_done;
+		read_SliceH_ref_pic_list_reordering_l0(read_next_byte)-->read_SliceH_ref_pic_list_reordering_l0;
 		read_SliceH_ref_pic_list_reordering_l0				( read_SliceH_skip_ref_pic_list_reordering              ) --> read_SliceH_pred_weight_table;
 		read_SliceH_ref_pic_list_reordering_l0				( skip_read_SliceH_skip_ref_pic_list_reordering         ) --> read_SliceH_pred_weight_table;
 		read_SliceH_ref_pic_list_reordering_flag_l0_done	( read_SliceH_ref_pic_list_reordering_flag_l0_done      ) --> read_SliceH_reordering_of_pic_nums_idc_l0;
 		read_SliceH_ref_pic_list_reordering_flag_l0_done	( skip_read_SliceH_ref_pic_list_reordering_flag_l0_done ) --> read_SliceH_reordering_of_pic_nums_idc_l0;
+		read_SliceH_ref_pic_list_reordering_flag_l0_done(read_next_byte)-->read_SliceH_ref_pic_list_reordering_flag_l0_done;
 		read_SliceH_reordering_of_pic_nums_idc_l0 			( read_SliceH_reordering_of_pic_nums_idc_l0             ) --> read_SliceH_reordering_of_pic_nums_idc_l0_done;
 		read_SliceH_reordering_of_pic_nums_idc_l0			( read_SliceH_skip_reordering_of_pic_nums_idc_l0        ) --> read_SliceH_ref_pic_list_reordering_l1;	
+		read_SliceH_reordering_of_pic_nums_idc_l0(read_next_byte)-->read_SliceH_reordering_of_pic_nums_idc_l0;
 		read_SliceH_reordering_of_pic_nums_idc_l0_done		( read_SliceH_reordering_of_pic_nums_idc_l0_done        ) --> look_SliceH_reordering_of_pic_nums_idc_l0;	
 		read_SliceH_reordering_of_pic_nums_idc_l0_done		( skip_read_SliceH_reordering_of_pic_nums_idc_l0_done   ) --> look_SliceH_reordering_of_pic_nums_idc_l0;	
+		read_SliceH_reordering_of_pic_nums_idc_l0_done(read_next_byte)-->read_SliceH_reordering_of_pic_nums_idc_l0_done;
 		look_SliceH_reordering_of_pic_nums_idc_l0			( read_SliceH_abs_diff_pic_num_minus1_l0_done           ) --> read_SliceH_reordering_of_pic_nums_idc_l0;	
 		look_SliceH_reordering_of_pic_nums_idc_l0			( skip_read_SliceH_abs_diff_pic_num_minus1_l0_done      ) --> read_SliceH_reordering_of_pic_nums_idc_l0;	
 		look_SliceH_reordering_of_pic_nums_idc_l0			( read_SliceH_long_term_pic_num_idc2_l0_done            ) --> read_SliceH_reordering_of_pic_nums_idc_l0;
 		look_SliceH_reordering_of_pic_nums_idc_l0			( skip_read_SliceH_long_term_pic_num_idc2_l0_done       ) --> read_SliceH_reordering_of_pic_nums_idc_l0;
 		look_SliceH_reordering_of_pic_nums_idc_l0			( read_SliceH_skip_reordering_of_pic_nums_idc3_l0       ) --> read_SliceH_ref_pic_list_reordering_l1;
+		look_SliceH_reordering_of_pic_nums_idc_l0(read_next_byte)-->look_SliceH_reordering_of_pic_nums_idc_l0;
 		//ref_pic_list_reordering_l1
 		read_SliceH_ref_pic_list_reordering_l1				( read_SliceH_ref_pic_list_reordering_flag_l1           ) --> read_SliceH_ref_pic_list_reordering_flag_l1_done;
 		read_SliceH_ref_pic_list_reordering_l1				( read_SliceH_skip_ref_pic_list_reordering_l1           ) --> read_SliceH_pred_weight_table;
 		read_SliceH_ref_pic_list_reordering_l1				( skip_read_SliceH_skip_ref_pic_list_reordering_l1      ) --> read_SliceH_pred_weight_table;
+		read_SliceH_ref_pic_list_reordering_l1(read_next_byte)-->read_SliceH_ref_pic_list_reordering_l1;
 		read_SliceH_ref_pic_list_reordering_flag_l1_done	( read_SliceH_ref_pic_list_reordering_flag_l1_done      ) --> read_SliceH_reordering_of_pic_nums_idc_l1;
 		read_SliceH_ref_pic_list_reordering_flag_l1_done	( skip_read_SliceH_ref_pic_list_reordering_flag_l1_done ) --> read_SliceH_reordering_of_pic_nums_idc_l1;
+		read_SliceH_ref_pic_list_reordering_flag_l1_done(read_next_byte)-->read_SliceH_ref_pic_list_reordering_flag_l1_done;
 		read_SliceH_reordering_of_pic_nums_idc_l1 			( read_SliceH_reordering_of_pic_nums_idc_l1             ) --> read_SliceH_reordering_of_pic_nums_idc_l1_done;
 		read_SliceH_reordering_of_pic_nums_idc_l1			( read_SliceH_skip_reordering_of_pic_nums_idc_l1        ) --> read_SliceH_pred_weight_table;	
+		read_SliceH_reordering_of_pic_nums_idc_l1(read_next_byte)-->read_SliceH_reordering_of_pic_nums_idc_l1;
 		read_SliceH_reordering_of_pic_nums_idc_l1_done		( read_SliceH_reordering_of_pic_nums_idc_l1_done        ) --> look_SliceH_reordering_of_pic_nums_idc_l1;	
 		read_SliceH_reordering_of_pic_nums_idc_l1_done		( skip_read_SliceH_reordering_of_pic_nums_idc_l1_done   ) --> look_SliceH_reordering_of_pic_nums_idc_l1;	
+		read_SliceH_reordering_of_pic_nums_idc_l1_done(read_next_byte)-->read_SliceH_reordering_of_pic_nums_idc_l1_done;
 		look_SliceH_reordering_of_pic_nums_idc_l1			( read_SliceH_abs_diff_pic_num_minus1_l1_done           ) --> read_SliceH_reordering_of_pic_nums_idc_l1;	
 		look_SliceH_reordering_of_pic_nums_idc_l1			( skip_read_SliceH_abs_diff_pic_num_minus1_l1_done      ) --> read_SliceH_reordering_of_pic_nums_idc_l1;	
 		look_SliceH_reordering_of_pic_nums_idc_l1			( read_SliceH_long_term_pic_num_idc2_l1_done            ) --> read_SliceH_reordering_of_pic_nums_idc_l1;
@@ -9698,14 +10127,18 @@ end
 		read_SliceH_pred_weight_table						( read_SliceH_pred_weight_table						) --> read_SliceH_dec_ref_pic_marking; //not yet realised
 		read_SliceH_pred_weight_table						( read_SliceH_skip_pred_weight_table				) --> read_SliceH_dec_ref_pic_marking;
 		//dec_ref_pic_marking
+		read_SliceH_pred_weight_table(read_next_byte)-->read_SliceH_pred_weight_table;
 		read_SliceH_dec_ref_pic_marking						( read_SliceH_dec_ref_pic_marking	                ) --> read_SliceH_check_IdrPicFlag;
+		read_SliceH_dec_ref_pic_marking(read_next_byte)-->read_SliceH_dec_ref_pic_marking;
 		read_SliceH_check_IdrPicFlag						( read_SliceH_no_output_of_prior_pics_flag_done		) --> read_SliceH_cabac_init_idc;
 		read_SliceH_check_IdrPicFlag						( skip_read_SliceH_no_output_of_prior_pics_flag_done		) --> read_SliceH_cabac_init_idc;
 		read_SliceH_check_IdrPicFlag						( read_SliceH_adaptative_ref_pic_marking_mode_flag_done) --> read_SliceH_check_mmco;
 		read_SliceH_check_IdrPicFlag						( skip_read_SliceH_adaptative_ref_pic_marking_mode_flag_done) --> read_SliceH_check_mmco;
+		read_SliceH_check_IdrPicFlag(read_next_byte)-->read_SliceH_check_IdrPicFlag;
 		read_SliceH_check_mmco								( read_SliceH_skip_memory_management_control_operation_done ) --> read_SliceH_cabac_init_idc;
 		read_SliceH_check_mmco								( read_SliceH_memory_management_control_operation_done) --> read_SliceH_check_mmco_done;
 		read_SliceH_check_mmco								( skip_read_SliceH_memory_management_control_operation_done) --> read_SliceH_check_mmco_done;
+		read_SliceH_check_mmco(read_next_byte)-->read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( read_SliceH_mmco_0								) --> read_SliceH_cabac_init_idc;
 		read_SliceH_check_mmco_done							( read_SliceH_difference_of_pic_nums_minus1_done	) --> read_SliceH_check_mmco_36;
 		read_SliceH_check_mmco_done							( skip_read_SliceH_difference_of_pic_nums_minus1_done	) --> read_SliceH_check_mmco_36;
@@ -9713,204 +10146,307 @@ end
 		read_SliceH_check_mmco_done							( skip_read_SliceH_long_term_pic_num_done				) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( skip_read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_done(read_next_byte)-->read_SliceH_check_mmco_done;
 		read_SliceH_check_mmco_36							( read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_36							( skip_read_SliceH_long_term_frame_idx_done				) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_36							( read_SliceH_long_not_term_frame_idx_done				) --> read_SliceH_check_mmco;
+		read_SliceH_check_mmco_36(read_next_byte)-->read_SliceH_check_mmco_36;
 		read_SliceH_check_mmco_done							( read_SliceH_max_long_term_frame_idx_plus1_done	) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( skip_read_SliceH_max_long_term_frame_idx_plus1_done	) --> read_SliceH_check_mmco;
 		read_SliceH_check_mmco_done							( read_SliceH_mmco_5								) --> read_SliceH_check_mmco;
 		read_SliceH_dec_ref_pic_marking						( read_SliceH_skip_dec_ref_pic_marking				) --> read_SliceH_cabac_init_idc;
 		read_SliceH_dec_ref_pic_marking						( skip_read_SliceH_skip_dec_ref_pic_marking			) --> read_SliceH_cabac_init_idc;
+		read_SliceH_dec_ref_pic_marking(read_next_byte)-->read_SliceH_dec_ref_pic_marking;
 
 		read_SliceH_cabac_init_idc							( read_SliceH_cabac_init_idc						) --> read_SliceH_cabac_init_idc_done;
+		read_SliceH_cabac_init_idc(read_next_byte)-->read_SliceH_cabac_init_idc;
 		read_SliceH_cabac_init_idc_done						( read_SliceH_cabac_init_idc_done	                ) --> read_SliceH_slice_qp_delta_done;
+		read_SliceH_cabac_init_idc_done(read_next_byte)-->read_SliceH_cabac_init_idc_done;
 		read_SliceH_cabac_init_idc							( read_SliceH_skip_cabac_init_idc					) --> read_SliceH_slice_qp_delta_done;
 
 		read_SliceH_slice_qp_delta_done						( read_SliceH_slice_qp_delta_done	                ) --> read_SliceH_sp_for_switch_flag;
+		read_SliceH_slice_qp_delta_done(read_next_byte)-->read_SliceH_slice_qp_delta_done;
 
 		read_SliceH_sp_for_switch_flag						( read_SliceH_sp_for_switch_flag	                ) --> read_SliceH_sp_for_switch_flag_done;
+		read_SliceH_sp_for_switch_flag(read_next_byte)-->read_SliceH_sp_for_switch_flag;
 		read_SliceH_sp_for_switch_flag_done					( read_SliceH_sp_for_switch_flag_done				) --> read_SliceH_slice_qs_delta_done;
+		read_SliceH_sp_for_switch_flag_done(read_next_byte)-->read_SliceH_sp_for_switch_flag_done;
 		read_SliceH_slice_qs_delta_done						( read_SliceH_slice_qs_delta_done	                ) --> read_SliceH_disable_deblocking_filter_idc;
+		read_SliceH_slice_qs_delta_done(read_next_byte)-->read_SliceH_slice_qs_delta_done;
 		read_SliceH_sp_for_switch_flag						( read_SliceH_skip_sp_for_switch_flag				) --> read_SliceH_disable_deblocking_filter_idc;
+		read_SliceH_sp_for_switch_flag(read_next_byte)-->read_SliceH_sp_for_switch_flag;
 
 		read_SliceH_disable_deblocking_filter_idc			( read_SliceH_disable_deblocking_filter_idc 		) --> read_SliceH_slice_alpha_c0_offset_div2;		
+		read_SliceH_disable_deblocking_filter_idc(read_next_byte)-->read_SliceH_disable_deblocking_filter_idc;
 		read_SliceH_slice_alpha_c0_offset_div2				( read_SliceH_slice_alpha_c0_offset_div2	        ) --> read_SliceH_slice_beta_offset_div2;
+		read_SliceH_slice_alpha_c0_offset_div2(read_next_byte)-->read_SliceH_slice_alpha_c0_offset_div2;
 		read_SliceH_slice_beta_offset_div2					( read_SliceH_slice_beta_offset_div2				) --> read_SliceH_slice_beta_offset_div2_done;
+		read_SliceH_slice_beta_offset_div2(read_next_byte)-->read_SliceH_slice_beta_offset_div2;
 		read_SliceH_slice_beta_offset_div2_done				( read_SliceH_slice_beta_offset_div2_done	        ) --> read_SliceH_slice_group_change_cycle;
+		read_SliceH_slice_beta_offset_div2_done(read_next_byte)-->read_SliceH_slice_beta_offset_div2_done;
 		read_SliceH_slice_alpha_c0_offset_div2				( read_SliceH_skip_slice_alpha_c0_offset_div2		) --> read_SliceH_slice_group_change_cycle;
+		read_SliceH_slice_alpha_c0_offset_div2(read_next_byte)-->read_SliceH_slice_alpha_c0_offset_div2;
 		read_SliceH_disable_deblocking_filter_idc			( read_SliceH_skip_disable_deblocking_filter_idc 	) --> read_SliceH_slice_group_change_cycle;
+		read_SliceH_disable_deblocking_filter_idc(read_next_byte)-->read_SliceH_disable_deblocking_filter_idc;
 
 		read_SliceH_slice_group_change_cycle				( read_SliceH_slice_group_change_cycle				) --> read_SliceH_slice_group_change_cycle_done;
+		read_SliceH_slice_group_change_cycle(read_next_byte)-->read_SliceH_slice_group_change_cycle;
 		read_SliceH_slice_group_change_cycle_done			( read_SliceH_slice_group_change_cycle_done			) --> read_SliceD_CABAC_alignement;
+		read_SliceH_slice_group_change_cycle_done(read_next_byte)-->read_SliceH_slice_group_change_cycle_done;
 		read_SliceH_slice_group_change_cycle				( read_SliceH_skip_slice_group_change_cycle	) --> read_SliceD_CABAC_alignement;
 
 		// read Slice Data    
 		read_SliceD_CABAC_alignement						( read_SliceD_CABAC_alignement						) --> read_SliceD_init;
+		read_SliceD_CABAC_alignement(read_next_byte)-->read_SliceD_CABAC_alignement;
 		read_SliceD_CABAC_alignement						( read_SliceD_skip_CABAC_alignement	                ) --> read_SliceD_init;
 		read_SliceD_init									( SliceD_init										) --> sync_do_mb_layer;
+		read_SliceD_init(read_next_byte)-->read_SliceD_init;
 		sync_do_mb_layer 									( sync_do_mb_layer									) --> read_SliceD_mb_skip;
+		sync_do_mb_layer(read_next_byte)-->sync_do_mb_layer;
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_run							) --> read_SliceD_mb_skip_run_done0;
+		read_SliceD_mb_skip(read_next_byte)-->read_SliceD_mb_skip;
 		read_SliceD_mb_skip_run_done0						( read_SliceD_mb_skip_run_done0						) --> read_SliceD_mb_skip_run_done1;
+		read_SliceD_mb_skip_run_done0(read_next_byte)-->read_SliceD_mb_skip_run_done0;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done1						) --> read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done1						( read_SliceD_mb_skip_run_done2						) --> read_SliceD_mb_skip_run_done2_moredata;
+		read_SliceD_mb_skip_run_done1(read_next_byte)-->read_SliceD_mb_skip_run_done1;
 		read_SliceD_mb_skip_run_done2_moredata              ( read_SliceD_mb_skip_run_done2_moredata_1          ) --> read_SliceD_mb_field_decoding_flag;
 		read_SliceD_mb_skip_run_done2_moredata 				( read_SliceD_mb_skip_run_done2_moredata_0			) --> syncSliceD_endwhile;
+		read_SliceD_mb_skip_run_done2_moredata(read_next_byte)-->read_SliceD_mb_skip_run_done2_moredata;
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag 							) --> read_SliceD_mb_skip; 
 		read_SliceD_mb_skip									( read_SliceD_mb_skip_flag_done						) --> read_SliceD_mb_skip_flag_sent_zeros;
 		read_SliceD_mb_skip									( read_SliceD_skip_mb_skip 							) --> read_SliceD_mb_field_decoding_flag;
-		
+		read_SliceD_mb_skip(read_next_byte)-->read_SliceD_mb_skip;
+
 		read_SliceD_mb_skip_flag_sent_zeros					(read_SliceD_mb_skip_flag_sent_zeros				) --> SliceD_update;
 		read_SliceD_mb_skip_flag_sent_zeros					(read_SliceD_mb_skip_flag_skip_sent_zeros			) --> read_SliceD_mb_field_decoding_flag;
-		
+		read_SliceD_mb_skip_flag_sent_zeros(read_next_byte)-->read_SliceD_mb_skip_flag_sent_zeros;
 		
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_mb_field_decoding_flag				) --> undefined; // interleaved not implemented
 		read_SliceD_mb_field_decoding_flag					( read_SliceD_skip_mb_field_decoding_flag			) --> read_MB_layer_mb_type;
-		// --> macrobloc_layer()
+		read_SliceD_mb_field_decoding_flag(read_next_byte)-->read_SliceD_mb_field_decoding_flag;
+		// --> macrobloc_layer(read_next_byte)
 		
 		SliceD_update										( SliceD_update_CAVLC								) --> SliceD_moredata;
-		
+		SliceD_update(read_next_byte)-->SliceD_update;
 		SliceD_update										( SliceD_update_CABAC								) --> SliceD_Update_done;
 		SliceD_Update_done									( SliceD_update_CABAC_done							) --> SliceD_moredata;
-		
+		SliceD_Update_done(read_next_byte)-->SliceD_Update_done;
+
 		SliceD_moredata                                     ( SliceD_moredata_1                                 ) --> SliceD_moredata_1_done;
+		SliceD_moredata(read_next_byte)-->SliceD_moredata;
 		SliceD_moredata_1_done								( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_moredata_1_done								( send_data_position_information	                ) --> syncSliceD_endwhile;
 		SliceD_moredata_1_done								( send_data_position_information_mb_skip_flag       ) --> syncSliceD_endwhile;
+		SliceD_moredata_1_done(read_next_byte)-->SliceD_moredata_1_done;
 		SliceD_moredata 									( SliceD_moredata_0									) --> SliceD_stop_byte_align_done;
 		SliceD_stop_byte_align_done							( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
 		SliceD_stop_byte_align_done							( send_data_position_information	                ) --> syncSliceD_endwhile;
 		SliceD_stop_byte_align_done							( send_data_position_information_mb_skip_flag       ) --> syncSliceD_endwhile;
+		SliceD_stop_byte_align_done(read_next_byte)-->SliceD_stop_byte_align_done;
 		syncSliceD_endwhile									( syncSliceD_endwhile								) --> SliceD_while_moreDataFlag;
-	
+		syncSliceD_endwhile(read_next_byte)-->syncSliceD_endwhile;
+
 		SliceD_while_moreDataFlag							( SliceD_while_moreDataFlag							) --> sync_do_mb_layer;
 		SliceD_while_moreDataFlag							( SliceD_end										) --> search_start_code;
+		SliceD_while_moreDataFlag(read_next_byte)-->SliceD_while_moreDataFlag;
 		read_SliceD_mb_field_decoding_flag					( SliceD_end										) --> search_start_code;
-		
+		read_SliceD_mb_field_decoding_flag(read_next_byte)-->read_SliceD_mb_field_decoding_flag;
+
 		// macrobloc_layer
 		read_MB_layer_mb_type								( read_MB_layer_mb_type								) --> read_MB_layer_mb_type_done;
+		read_MB_layer_mb_type(read_next_byte)-->read_MB_layer_mb_type;
 		//read_MB_layer_mb_type_done						( read_MB_layer_mb_type_not_done					) --> read_MB_layer_mb_type_done;
 		read_MB_layer_mb_type_done							( read_MB_layer_mb_type_done						) --> read_MB_layer_check_I_PCM;
+		read_MB_layer_mb_type_done(read_next_byte)-->read_MB_layer_mb_type_done;
 		read_MB_layer_check_I_PCM							( read_MB_layer_I_PCM_alignement					) --> read_MB_layer_pcm_sample_luma0;
+		read_MB_layer_check_I_PCM(read_next_byte)-->read_MB_layer_check_I_PCM;
 		read_MB_layer_pcm_sample_luma0					    ( read_MB_layer_pcm_sample_luma0	                ) --> read_MB_layer_pcm_sample_luma1;
+		read_MB_layer_pcm_sample_luma0(read_next_byte)-->read_MB_layer_pcm_sample_luma0;
 		read_MB_layer_pcm_sample_luma1						( read_MB_layer_pcm_sample_luma1	                ) --> read_MB_layer_pcm_sample_luma1;
 		read_MB_layer_pcm_sample_luma1						( read_MB_layer_pcm_sample_luma1_done		        ) --> read_MB_layer_pcm_sample_chroma0;	
+		read_MB_layer_pcm_sample_luma1(read_next_byte)-->read_MB_layer_pcm_sample_luma1;
 		read_MB_layer_pcm_sample_chroma0					( read_MB_layer_pcm_sample_chroma0					) --> read_MB_layer_pcm_sample_chroma1;	
+		read_MB_layer_pcm_sample_chroma0(read_next_byte)-->read_MB_layer_pcm_sample_chroma0;
 		read_MB_layer_pcm_sample_chroma1					( read_MB_layer_pcm_sample_chroma1					) --> read_MB_layer_pcm_sample_chroma1;
 		read_MB_layer_pcm_sample_chroma1					( read_MB_layer_pcm_sample_done						) --> SliceD_update;	
+		read_MB_layer_pcm_sample_chroma1(read_next_byte)-->read_MB_layer_pcm_sample_chroma1;
 		read_MB_layer_check_I_PCM							( read_MB_layer_not_I_PCM							) --> read_MB_layer_check_pred;
 		read_MB_layer_check_pred							( read_MB_layer_sub_mb_pred							) --> Sub_mb_pred; //--> sub_mb_pred
+		read_MB_layer_check_pred(read_next_byte)-->read_MB_layer_check_pred;
 		read_MB_layer_sub_mb_pred_done				        ( read_MB_layer_sub_mb_pred_done	                ) --> read_MB_layer_coded_block_pattern;
+		read_MB_layer_sub_mb_pred_done(read_next_byte)-->read_MB_layer_sub_mb_pred_done;
 		read_MB_layer_check_pred							( read_MB_layer_transform_size_8x8_flag				) --> read_MB_layer_transform_size_8x8_flag_done;
+		read_MB_layer_check_pred(read_next_byte)-->read_MB_layer_check_pred;
 		read_MB_layer_transform_size_8x8_flag_done			( read_MB_layer_transform_size_8x8_flag_done		) --> MB_pred; //--> mb_pred 
+		read_MB_layer_transform_size_8x8_flag_done(read_next_byte)-->read_MB_layer_transform_size_8x8_flag_done;
 		read_MB_layer_check_pred							( read_MB_layer_skip_transform_size_8x8_flag		) --> MB_pred; 
-		// --> mb_pred()	
+		read_MB_layer_check_pred(read_next_byte)-->read_MB_layer_check_pred;
+		// --> mb_pred(read_next_byte)	
 
 		read_MB_layer_coded_block_pattern					( read_MB_layer_coded_block_pattern					) --> read_MB_layer_coded_block_pattern_done;
+		read_MB_layer_coded_block_pattern(read_next_byte)-->read_MB_layer_coded_block_pattern;
 		read_MB_layer_coded_block_pattern_done				( read_MB_layer_coded_block_pattern_start_cabac_chroma ) --> read_MB_layer_coded_block_pattern_done;
 		read_MB_layer_coded_block_pattern_done			    ( read_MB_layer_coded_block_pattern_done	        ) --> read_MB_layer_cbp_transform_size_8x8_flag_done;
+		read_MB_layer_coded_block_pattern_done(read_next_byte)-->read_MB_layer_coded_block_pattern_done;
 		read_MB_layer_cbp_transform_size_8x8_flag_done		( read_MB_layer_cbp_transform_size_8x8_flag_done	) --> read_MB_layer_mb_qp_delta;
+		read_MB_layer_cbp_transform_size_8x8_flag_done(read_next_byte)-->read_MB_layer_cbp_transform_size_8x8_flag_done;
 		read_MB_layer_coded_block_pattern					( read_MB_layer_skip_coded_block_pattern			) --> read_MB_layer_mb_qp_delta;
+		read_MB_layer_coded_block_pattern(read_next_byte)-->read_MB_layer_coded_block_pattern;
 		read_MB_layer_mb_qp_delta							( read_MB_layer_mb_qp_delta							) --> read_MB_layer_mb_qp_delta_done;
+		read_MB_layer_mb_qp_delta(read_next_byte)-->read_MB_layer_mb_qp_delta;
 		read_MB_layer_mb_qp_delta_done						( read_MB_layer_mb_qp_delta_done	                ) --> Residual_init; 
-		// --> residual ()
+		read_MB_layer_mb_qp_delta_done(read_next_byte)-->read_MB_layer_mb_qp_delta_done;
+		// --> residual (read_next_byte)
 		read_MB_layer_mb_qp_delta							( read_MB_layer_skip_mb_qp_delta					) --> SliceD_update;
 		read_MB_layer_mb_qp_delta							( read_MB_layer_skip_mb_qp_delta_CABAC				) --> SliceD_update;
+		read_MB_layer_mb_qp_delta(read_next_byte)-->read_MB_layer_mb_qp_delta;
 
 		// sub_mb_pred
 		Sub_mb_pred											( sub_MB_pred_init_sub_mb_type						) --> read_sub_MB_pred_sub_mb_type;
+		Sub_mb_pred(read_next_byte)-->Sub_mb_pred;
 		read_sub_MB_pred_sub_mb_type						( read_sub_MB_pred_sub_mb_type						) --> read_sub_MB_pred_sub_mb_type;
 		read_sub_MB_pred_sub_mb_type						( sub_MB_pred_init_ref_idx_l0						) --> read_sub_MB_pred_ref_idx_l0;
+		read_sub_MB_pred_sub_mb_type(read_next_byte)-->read_sub_MB_pred_sub_mb_type;
 		read_sub_MB_pred_ref_idx_l0							( read_sub_MB_pred_ref_idx_l0						) --> read_sub_MB_pred_ref_idx_l0_done;
+		read_sub_MB_pred_ref_idx_l0(read_next_byte)-->read_sub_MB_pred_ref_idx_l0;
 		read_sub_MB_pred_ref_idx_l0_done					( read_sub_MB_pred_ref_idx_l0_done					) --> read_sub_MB_pred_ref_idx_l0;
+		read_sub_MB_pred_ref_idx_l0_done(read_next_byte)-->read_sub_MB_pred_ref_idx_l0_done;
 		read_sub_MB_pred_ref_idx_l0							( read_sub_MB_pred_skip_ref_idx_l0					) --> read_sub_MB_pred_ref_idx_l0;
 		read_sub_MB_pred_ref_idx_l0							( sub_MB_pred_init_ref_idx_l1						) --> read_sub_MB_pred_ref_idx_l1;
+		read_sub_MB_pred_ref_idx_l0(read_next_byte)-->read_sub_MB_pred_ref_idx_l0;
 		read_sub_MB_pred_ref_idx_l1							( read_sub_MB_pred_ref_idx_l1						) --> read_sub_MB_pred_ref_idx_l1_done;
+		read_sub_MB_pred_ref_idx_l1(read_next_byte)-->read_sub_MB_pred_ref_idx_l1;
 		read_sub_MB_pred_ref_idx_l1_done					( read_sub_MB_pred_ref_idx_l1_done					) --> read_sub_MB_pred_ref_idx_l1;
+		read_sub_MB_pred_ref_idx_l1_done(read_next_byte)-->read_sub_MB_pred_ref_idx_l1_done;
 		read_sub_MB_pred_ref_idx_l1							( read_sub_MB_pred_skip_ref_idx_l1					) --> read_sub_MB_pred_ref_idx_l1;
 		read_sub_MB_pred_ref_idx_l1							( sub_MB_pred_init_mvd_l0							) --> read_sub_MB_pred_mvd_l0;
 		read_sub_MB_pred_mvd_l0								( read_sub_MB_pred_mvd_l0	                        ) --> read_sub_MB_pred_mvd_l0_done0;
+		read_sub_MB_pred_mvd_l0(read_next_byte)-->read_sub_MB_pred_mvd_l0;
 		read_sub_MB_pred_mvd_l0_done0						( read_sub_MB_pred_mvd_l0_done0						) --> read_sub_MB_pred_mvd_l0_done1;
+		read_sub_MB_pred_mvd_l0_done0(read_next_byte)-->read_sub_MB_pred_mvd_l0_done0;
 		read_sub_MB_pred_mvd_l0_done1						( read_sub_MB_pred_mvd_l0_done1						) --> read_sub_MB_pred_mvd_l0_done2;
+		read_sub_MB_pred_mvd_l0_done1(read_next_byte)-->read_sub_MB_pred_mvd_l0_done1;
 		read_sub_MB_pred_mvd_l0_done2						( read_sub_MB_pred_mvd_l0_done2						) --> read_sub_MB_pred_mvd_l0_done0;
+		read_sub_MB_pred_mvd_l0_done2(read_next_byte)-->read_sub_MB_pred_mvd_l0_done2;
 		read_sub_MB_pred_mvd_l0_done0						( read_sub_MB_pred_skip_mvd_l0_done0				) --> read_sub_MB_pred_mvd_l0;
 		read_sub_MB_pred_mvd_l0								( read_sub_MB_pred_skip_mvd_l0						) --> read_sub_MB_pred_mvd_l0;
 		read_sub_MB_pred_mvd_l0								( sub_MB_pred_init_mvd_l1							) --> read_sub_MB_pred_mvd_l1;
+		read_sub_MB_pred_mvd_l0(read_next_byte)-->read_sub_MB_pred_mvd_l0;
 		read_sub_MB_pred_mvd_l1								( read_sub_MB_pred_mvd_l1							) --> read_sub_MB_pred_mvd_l1_done0;
+		read_sub_MB_pred_mvd_l1(read_next_byte)-->read_sub_MB_pred_mvd_l1;
 		read_sub_MB_pred_mvd_l1_done0						( read_sub_MB_pred_mvd_l1_done0						) --> read_sub_MB_pred_mvd_l1_done1;
+		read_sub_MB_pred_mvd_l1_done0(read_next_byte)-->read_sub_MB_pred_mvd_l1_done0;
 		read_sub_MB_pred_mvd_l1_done1						( read_sub_MB_pred_mvd_l1_done1						) --> read_sub_MB_pred_mvd_l1_done2;
+		read_sub_MB_pred_mvd_l1_done1(read_next_byte)-->read_sub_MB_pred_mvd_l1_done1;
 		read_sub_MB_pred_mvd_l1_done2						( read_sub_MB_pred_mvd_l1_done2						) --> read_sub_MB_pred_mvd_l1_done0;
+		read_sub_MB_pred_mvd_l1_done2(read_next_byte)-->read_sub_MB_pred_mvd_l1_done2;
 		read_sub_MB_pred_mvd_l1_done0						( read_sub_MB_pred_skip_mvd_l1_done0				) --> read_sub_MB_pred_mvd_l1;
 		read_sub_MB_pred_mvd_l1								( read_sub_MB_pred_skip_mvd_l1						) --> read_sub_MB_pred_mvd_l1;
-		read_sub_MB_pred_mvd_l1								( sub_MB_pred_done									) --> read_MB_layer_sub_mb_pred_done; // --> macrobloc_layer()	
+		read_sub_MB_pred_mvd_l1								( sub_MB_pred_done									) --> read_MB_layer_sub_mb_pred_done; // --> macrobloc_layer(read_next_byte)	
+		read_sub_MB_pred_mvd_l1(read_next_byte)-->read_sub_MB_pred_mvd_l1;
 
 		// mb_pred
 		MB_pred												( MB_pred_init_Intra_4x4							) --> read_MB_pred_rem_intra4x4_pred_mode;
+		MB_pred(read_next_byte)-->MB_pred;
 		read_MB_pred_rem_intra4x4_pred_mode					( read_MB_pred_rem_intra4x4_pred_mode				) --> read_MB_pred_rem_intra4x4_pred_mode_done;
+		read_MB_pred_rem_intra4x4_pred_mode(read_next_byte)-->read_MB_pred_rem_intra4x4_pred_mode;
 		read_MB_pred_rem_intra4x4_pred_mode_done			( read_MB_pred_rem_intra4x4_pred_mode_done			) --> read_MB_pred_rem_intra4x4_pred_mode;
 		read_MB_pred_rem_intra4x4_pred_mode_done			( read_MB_pred_skip_rem_intra4x4_pred_mode_done		) --> read_MB_pred_rem_intra4x4_pred_mode;	
+		read_MB_pred_rem_intra4x4_pred_mode_done(read_next_byte)-->read_MB_pred_rem_intra4x4_pred_mode_done;
 		read_MB_pred_rem_intra4x4_pred_mode					( read_MB_pred_skip_rem_intra4x4_pred_mode			) --> read_MB_pred_intra_chroma_pred_mode;
 		MB_pred												( MB_pred_init_Intra_8x8							) --> read_MB_pred_rem_intra8x8_pred_mode;
 		read_MB_pred_rem_intra8x8_pred_mode					( read_MB_pred_rem_intra8x8_pred_mode				) --> read_MB_pred_rem_intra8x8_pred_mode_done;
+		read_MB_pred_rem_intra8x8_pred_mode(read_next_byte)-->read_MB_pred_rem_intra8x8_pred_mode;
 		read_MB_pred_rem_intra8x8_pred_mode_done			( read_MB_pred_rem_intra8x8_pred_mode_done			) --> read_MB_pred_rem_intra8x8_pred_mode;
 		read_MB_pred_rem_intra8x8_pred_mode_done			( read_MB_pred_skip_rem_intra8x8_pred_mode_done		) --> read_MB_pred_rem_intra8x8_pred_mode;	
+		read_MB_pred_rem_intra8x8_pred_mode_done(read_next_byte)-->read_MB_pred_rem_intra8x8_pred_mode_done;
 		read_MB_pred_rem_intra8x8_pred_mode					( read_MB_pred_skip_rem_intra8x8_pred_mode			) --> read_MB_pred_intra_chroma_pred_mode;
 		MB_pred												( MB_pred_init_Intra_16x16							) --> read_MB_pred_intra_chroma_pred_mode;
 		read_MB_pred_intra_chroma_pred_mode					( read_MB_pred_intra_chroma_pred_mode				) --> read_MB_pred_intra_chroma_pred_mode_done;
-		read_MB_pred_intra_chroma_pred_mode_done			( read_MB_pred_intra_chroma_pred_mode_done			) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer()
-		read_MB_pred_intra_chroma_pred_mode					( read_MB_pred_skip_intra_chroma_pred_mode			) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer()
+		read_MB_pred_intra_chroma_pred_mode(read_next_byte)-->read_MB_pred_intra_chroma_pred_mode;
+		read_MB_pred_intra_chroma_pred_mode_done			( read_MB_pred_intra_chroma_pred_mode_done			) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer(read_next_byte)
+		read_MB_pred_intra_chroma_pred_mode_done(read_next_byte)-->read_MB_pred_intra_chroma_pred_mode_done;
+		read_MB_pred_intra_chroma_pred_mode					( read_MB_pred_skip_intra_chroma_pred_mode			) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer(read_next_byte)
 		MB_pred												( MB_pred_Inter_not_direct							) --> read_MB_pred_ref_idx_l0;
 		read_MB_pred_ref_idx_l0								( read_MB_pred_ref_idx_l0							) --> read_MB_pred_ref_idx_l0_done;
+		read_MB_pred_ref_idx_l0(read_next_byte)-->read_MB_pred_ref_idx_l0;
 		read_MB_pred_ref_idx_l0_done						( read_MB_pred_ref_idx_l0_done						) --> read_MB_pred_ref_idx_l0;
+		read_MB_pred_ref_idx_l0_done(read_next_byte)-->read_MB_pred_ref_idx_l0_done;
 		read_MB_pred_ref_idx_l0								( read_MB_pred_skip_ref_idx_l0						) --> read_MB_pred_ref_idx_l0;
 		read_MB_pred_ref_idx_l0								( MB_pred_init_ref_idx_l1							) --> read_MB_pred_ref_idx_l1;
 		read_MB_pred_ref_idx_l1								( read_MB_pred_ref_idx_l1							) --> read_MB_pred_ref_idx_l1_done;
+		read_MB_pred_ref_idx_l1(read_next_byte)-->read_MB_pred_ref_idx_l1;
 		read_MB_pred_ref_idx_l1_done						( read_MB_pred_ref_idx_l1_done						) --> read_MB_pred_ref_idx_l1;
+		read_MB_pred_ref_idx_l1_done(read_next_byte)-->read_MB_pred_ref_idx_l1_done;
 		read_MB_pred_ref_idx_l1								( read_MB_pred_skip_ref_idx_l1						) --> read_MB_pred_ref_idx_l1;
 		read_MB_pred_ref_idx_l1								( MB_pred_init_mvd_l0								) --> read_MB_pred_mvd_l0;
 		read_MB_pred_mvd_l0									( read_MB_pred_mvd_l0								) --> read_MB_pred_mvd_l0_done0;
+		read_MB_pred_mvd_l0(read_next_byte)-->read_MB_pred_mvd_l0;
 		read_MB_pred_mvd_l0_done0							( read_MB_pred_mvd_l0_done0							) --> read_MB_pred_mvd_l0_done1;
+		read_MB_pred_mvd_l0_done0(read_next_byte)-->read_MB_pred_mvd_l0_done0;
 		read_MB_pred_mvd_l0_done1							( read_MB_pred_mvd_l0_done1							) --> read_MB_pred_mvd_l0;
+		read_MB_pred_mvd_l0_done1(read_next_byte)-->read_MB_pred_mvd_l0_done1;
 		read_MB_pred_mvd_l0									( read_MB_pred_skip_mvd_l0							) --> read_MB_pred_mvd_l0;
 		read_MB_pred_mvd_l0									( MB_pred_init_mvd_l1								) --> read_MB_pred_mvd_l1;
 		read_MB_pred_mvd_l1									( read_MB_pred_mvd_l1								) --> read_MB_pred_mvd_l1_done0;
+		read_MB_pred_mvd_l1(read_next_byte)-->read_MB_pred_mvd_l1;
 		read_MB_pred_mvd_l1_done0							( read_MB_pred_mvd_l1_done0							) --> read_MB_pred_mvd_l1_done1;
+		read_MB_pred_mvd_l1_done0(read_next_byte)-->read_MB_pred_mvd_l1_done0;
 		read_MB_pred_mvd_l1_done1							( read_MB_pred_mvd_l1_done1							) --> read_MB_pred_mvd_l1;
+		read_MB_pred_mvd_l1_done1(read_next_byte)-->read_MB_pred_mvd_l1_done1;
 		read_MB_pred_mvd_l1									( read_MB_pred_skip_mvd_l1							) --> read_MB_pred_mvd_l1;
-		read_MB_pred_mvd_l1									( MB_pred_done										) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer()	
-		MB_pred												( MB_pred_Inter_direct								) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer()
+		read_MB_pred_mvd_l1									( MB_pred_done										) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer(read_next_byte)	
+		MB_pred												( MB_pred_Inter_direct								) --> read_MB_layer_coded_block_pattern; // --> macrobloc_layer(read_next_byte)
 
 		// residual
 		Residual_init										( Residual_init										) --> Residual_luma_DC_init;
-		Residual_luma_DC_init								( Residual_luma_DC_init								) --> Residual_block; // --> residual_block()
+		Residual_init(read_next_byte)-->Residual_init;
+		Residual_luma_DC_init								( Residual_luma_DC_init								) --> Residual_block; // --> residual_block(read_next_byte)
+		Residual_luma_DC_init(read_next_byte)-->Residual_luma_DC_init;
 		Residual_return										( Residual_return_luma_DC							) --> Residual_luma_AC_init;
 		Residual_return										( Residual_return_luma_DC_CABAC						) --> Residual_luma_AC_init;
+		Residual_return(read_next_byte)-->Residual_return;
 		Residual_luma_DC_init								( Residual_luma_skip_DC_init						) --> Residual_luma_AC_init;
 		Residual_luma_DC_init								( Residual_luma_skip_DC_init_CABAC					) --> Residual_luma_AC_init;
+		Residual_luma_DC_init(read_next_byte)-->Residual_luma_DC_init;
 		Residual_luma_AC_init								( Residual_luma_AC_init								) --> Residual_luma_AC_CAVLC;
-		
+		Residual_luma_AC_init(read_next_byte)-->Residual_luma_AC_init;
+
 		Residual_luma_AC_CAVLC								( Residual_luma_AC_CAVLC							) --> Residual_luma_AC_CodedBlock8x8;
-		Residual_luma_AC_CodedBlock8x8						( Residual_luma_AC_CodedBlock8x8					) --> Residual_block; // --> residual_block()
+		Residual_luma_AC_CAVLC(read_next_byte)-->Residual_luma_AC_CAVLC;
+		Residual_luma_AC_CodedBlock8x8						( Residual_luma_AC_CodedBlock8x8					) --> Residual_block; // --> residual_block(read_next_byte)
+		Residual_luma_AC_CodedBlock8x8(read_next_byte)-->Residual_luma_AC_CodedBlock8x8;
 		Residual_return										( Residual_return_luma_AC							) --> Residual_luma_inc_AC_4x4;
 		Residual_return										( Residual_return_luma_AC_CABAC_15_Coeff			) --> Residual_luma_inc_AC_4x4;
 		Residual_return										( Residual_return_luma_AC_CABAC_16_Coeff			) --> Residual_luma_inc_AC_4x4;
-		
+		Residual_return(read_next_byte)-->Residual_return;
 		
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8				) --> Residual_luma_inc_AC_4x4;
 		Residual_luma_AC_CodedBlock8x8						( Residual_luma_skip_AC_CodedBlock8x8_CABAC_16			) --> Residual_luma_inc_AC_4x4;
+		Residual_luma_AC_CodedBlock8x8(read_next_byte)-->Residual_luma_AC_CodedBlock8x8;
 		Residual_luma_inc_AC_4x4							( Residual_luma_inc_AC_4x4							) --> Residual_luma_AC_CAVLC; 
+		Residual_luma_inc_AC_4x4(read_next_byte)-->Residual_luma_inc_AC_4x4;
 		Residual_luma_AC_CAVLC								( Residual_luma_skip_AC_CAVLC						) --> Residual_chroma;		
+		Residual_luma_AC_CAVLC(read_next_byte)-->Residual_luma_AC_CAVLC;
 		Residual_chroma										( Residual_ChromaArrayType_1_2_init					) --> Residual_chroma_DC_init;
-		Residual_chroma_DC_init								( Residual_chroma_DC_init							) --> Residual_block; // --> residual_block()
+		Residual_chroma(read_next_byte)-->Residual_chroma;
+		Residual_chroma_DC_init								( Residual_chroma_DC_init							) --> Residual_block; // --> residual_block(read_next_byte)
+		Residual_chroma_DC_init(read_next_byte)-->Residual_chroma_DC_init;
 		Residual_return										( Residual_return_chroma_DC							) --> Residual_chroma_DC_init;
 		Residual_return										( Residual_return_chroma_DC_CABAC_4_Coeff			) --> Residual_chroma_DC_init;
 		Residual_return										( Residual_return_chroma_DC_CABAC_8_Coeff			) --> Residual_chroma_DC_init;
-		
+		Residual_return(read_next_byte)-->Residual_return;
+
 		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init						) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init_CABAC_1				) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_skip_chroma_DC_init_CABAC_2				) --> Residual_chroma_DC_init;
 		Residual_chroma_DC_init								( Residual_skip_chroma_DC							) --> Residual_chroma_AC_init;
+		Residual_chroma_DC_init(read_next_byte)-->Residual_chroma_DC_init;
 		Residual_chroma_AC_init								( Residual_chroma_AC_init							) --> Residual_chroma_AC_CodedBlock4x4;
-		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_CodedBlock4x4 					) --> Residual_block; // --> residual_block()
+		Residual_chroma_AC_init(read_next_byte)-->Residual_chroma_AC_init;
+		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_CodedBlock4x4 					) --> Residual_block; // --> residual_block(read_next_byte)
+		Residual_chroma_AC_CodedBlock4x4(read_next_byte)-->Residual_chroma_AC_CodedBlock4x4;
 		Residual_return										( Residual_return_chroma_AC							) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_return										( Residual_return_chroma_AC_CABAC					) --> Residual_chroma_AC_CodedBlock4x4;
 		Residual_chroma_AC_CodedBlock4x4					( Residual_chroma_AC_skip_CodedBlock4x4 			) --> Residual_chroma_AC_CodedBlock4x4;
@@ -9921,43 +10457,63 @@ end
 
 		// residual_block CAVLC
 		Residual_block										( Residual_block_init_coeff_token					) --> Residual_block_read_suffixLength;
+		Residual_block(read_next_byte)-->Residual_block;
 		Residual_block_read_suffixLength					( Residual_block_read_suffixLength					) --> Residual_block_read_non_zero_coeff;
+		Residual_block_read_suffixLength(read_next_byte)-->Residual_block_read_suffixLength;
 		Residual_block_read_non_zero_coeff					( Residual_block_read_trailing_ones_sign_flag		) --> Residual_block_read_trailing_ones_sign_flag_done;
+		Residual_block_read_non_zero_coeff(read_next_byte)-->Residual_block_read_non_zero_coeff;
 		Residual_block_read_trailing_ones_sign_flag_done	( Residual_block_read_trailing_ones_sign_flag_done  ) --> Residual_block_read_non_zero_coeff;
+		Residual_block_read_trailing_ones_sign_flag_done(read_next_byte)-->Residual_block_read_trailing_ones_sign_flag_done;
 		Residual_block_read_non_zero_coeff					( Residual_block_read_level_prefix					) --> Residual_block_read_level_prefix_done;
+		Residual_block_read_non_zero_coeff(read_next_byte)-->Residual_block_read_non_zero_coeff;
 		Residual_block_read_level_prefix_done				( Residual_block_read_level_prefix_done0			) --> Residual_block_read_level_prefix_done;
 		Residual_block_read_level_prefix_done				( Residual_block_read_level_prefix_done1			) --> Residual_block_read_level_suffix_done;
+		Residual_block_read_level_prefix_done(read_next_byte)-->Residual_block_read_level_prefix_done;
 		Residual_block_read_level_suffix_done				( Residual_block_read_level_suffix_done				) --> Residual_block_read_non_zero_coeff;
+		Residual_block_read_level_suffix_done(read_next_byte)-->Residual_block_read_level_suffix_done;
 		Residual_block_read_non_zero_coeff					( Residual_block_read_TotalCoeff_done				) --> Residual_block_read_total_zeros_done;
+		Residual_block_read_non_zero_coeff(read_next_byte)-->Residual_block_read_non_zero_coeff;
 		Residual_block_read_total_zeros_done				( Residual_block_read_total_zeros_done				) --> Residual_block_read_run_before;
+		Residual_block_read_total_zeros_done(read_next_byte)-->Residual_block_read_total_zeros_done;
 		Residual_block_read_run_before						( Residual_block_read_run_before					) --> Residual_block_read_run_before_done;
+		Residual_block_read_run_before(read_next_byte)-->Residual_block_read_run_before;
 		Residual_block_read_run_before_done					( Residual_block_read_run_before_done				) --> Residual_block_read_run_before;
+		Residual_block_read_run_before_done(read_next_byte)-->Residual_block_read_run_before_done;
 		Residual_block_read_run_before						( Residual_block_skip_read_run_before				) --> Residual_block_read_run_before;
 		Residual_block_read_run_before						( Residual_block_read_run_done						) --> Residual_block_send_run;
 		Residual_block_send_run								( Residual_block_send_run							) --> Residual_block_send_run;
 		Residual_block_send_run								( Residual_block_send_done							) --> Residual_return;
+		Residual_block_send_run(read_next_byte)-->Residual_block_send_run;
 		Residual_block_read_suffixLength					( Residual_block_skip_read_suffixLength				) --> Residual_return;
+		Residual_block_read_suffixLength(read_next_byte)-->Residual_block_read_suffixLength;
 
 		// residual_block CABAC
 		Residual_block										( Residual_block_Cabac_coded_block_flag_start		) --> Residual_Cabac_coded_block_flag_done;
+		Residual_block(read_next_byte)-->Residual_block;
 		Residual_Cabac_coded_block_flag_done				( Residual_block_Cabac_coded_block_flag_done		) --> Residual_block_Cabac_read_significant_coeff_flag;
-		
+		Residual_Cabac_coded_block_flag_done(read_next_byte)-->Residual_Cabac_coded_block_flag_done;
+
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_Cabac_read_significant_coeff_flag	) --> Residual_block_read_significant_coeff_flag_done;
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_Sent_Zeros								) --> Residual_return;
 		Residual_block_Cabac_read_significant_coeff_flag	( Residual_block_skip_significant_coeff_flag_while	) --> Residual_block_read_coeff_abs_level_minus1_first;
-		
+		Residual_block_Cabac_read_significant_coeff_flag(read_next_byte)-->Residual_block_Cabac_read_significant_coeff_flag;
+
 		Residual_block_read_significant_coeff_flag_done		( Residual_block_read_significant_coeff_flag_done	) --> Residual_block_read_last_significant_coeff_flag;
-		
+		Residual_block_read_significant_coeff_flag_done(read_next_byte)-->Residual_block_read_significant_coeff_flag_done;
+
 		Residual_block_read_last_significant_coeff_flag		( Residual_block_read_last_significant_coeff_flag_done ) --> Residual_block_Cabac_read_significant_coeff_flag;
 		Residual_block_read_last_significant_coeff_flag		( Residual_block_skip_last_significant_coeff_flag	) --> Residual_block_Cabac_read_significant_coeff_flag;
-		
+		Residual_block_read_last_significant_coeff_flag(read_next_byte)-->Residual_block_read_last_significant_coeff_flag;
+
 		Residual_block_read_coeff_abs_level_minus1_first	( Residual_block_read_coeff_abs_level_minus1_done	) --> Residual_block_update_coeffLevel;
-		
+		Residual_block_read_coeff_abs_level_minus1_first(read_next_byte)-->Residual_block_read_coeff_abs_level_minus1_first;
+
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_start			) --> Residual_block_update_coeffLevel_read;
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_done				) --> Residual_return;
 		Residual_block_update_coeffLevel					( Residual_block_update_coeffLevel_not_read			) --> Residual_block_update_coeffLevel;
+		Residual_block_update_coeffLevel(read_next_byte)-->Residual_block_update_coeffLevel;
 		Residual_block_update_coeffLevel_read				( Residual_block_update_coeffLevel_read				) --> Residual_block_update_coeffLevel;
-							
+		Residual_block_update_coeffLevel_read(read_next_byte)-->Residual_block_update_coeffLevel_read;
 	
 	end
 	

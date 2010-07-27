@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="57" y="2601"/>
+      <vertex id="bits8" x="15" y="2490"/>
       <vertex id="CoefDC_L" x="2076" y="1581"/>
       <vertex id="CoefAC_L" x="2076" y="1678"/>
       <vertex id="PredMode" x="1089" y="1883"/>
@@ -46,8 +46,8 @@
       <vertex id="SizeDPBMax" x="766" y="2229"/>
       <vertex id="IsIDR" x="1089" y="2685"/>
       <vertex id="BlocksSize_Luma" x="1089" y="2174"/>
-      <vertex id="byte2bit" x="350" y="2520"/>
-      <vertex id="Algo_NALU" x="168" y="2579"/>
+      <vertex id="byte2bit" x="379" y="2376"/>
+      <vertex id="Algo_NALU" x="37" y="2540"/>
       <vertex id="Algo_Synp_AVC" x="482" y="2161"/>
       <vertex id="Algo_BlockExpand_AVC" x="1379" y="3119"/>
       <vertex id="Algo_BlockSplit_AVC" x="1804" y="1758"/>
@@ -60,5 +60,6 @@
       <vertex id="Black_Hole" x="1379" y="2881"/>
       <vertex id="Demux_Cavlc_Cabac" x="1089" y="3099"/>
       <vertex id="Mux_Cavlc_Cabac" x="1608" y="3027"/>
+      <vertex id="CheckNaluType" x="233" y="2381"/>
    </vertices>
 </layout>
