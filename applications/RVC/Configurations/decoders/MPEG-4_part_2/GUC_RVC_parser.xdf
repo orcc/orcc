@@ -107,7 +107,21 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="NEW_VOP">
+    <Port kind="Output" name="NEW_VOP_Y">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="BLOCKTYPE_U">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="NEW_VOP_U">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="12"/>
@@ -328,5 +342,7 @@
     <Connection dst="mvseq" dst-port="WIDTH" src="parseheaders" src-port="WIDTH"/>
     <Connection dst="mvseq" dst-port="BLOCKTYPE" src="parseheaders" src-port="BLOCKTYPE"/>
     <Connection dst="" dst-port="BLOCKTYPE_Y" src="splitter_BTYPE" src-port="BLOCKTYPE_Y"/>
-    <Connection dst="" dst-port="NEW_VOP" src="splitter_BTYPE" src-port="NEW_VOP_Y"/>
+    <Connection dst="" dst-port="NEW_VOP_Y" src="splitter_BTYPE" src-port="NEW_VOP_Y"/>
+    <Connection dst="" dst-port="BLOCKTYPE_U" src="splitter_BTYPE" src-port="BLOCKTYPE_U"/>
+    <Connection dst="" dst-port="NEW_VOP_U" src="splitter_BTYPE" src-port="NEW_VOP_U"/>
 </XDF>
