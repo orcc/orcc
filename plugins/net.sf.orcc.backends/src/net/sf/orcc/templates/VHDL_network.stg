@@ -27,10 +27,12 @@ $
 printSigInput(port) ::= <<
 $
 if(port.type.bool)
-$signal $instance.id$_$port.name$_data_in   : std_logic;
+$
+signal $instance.id$_$port.name$_data_in   : std_logic;
 $
 else
-$signal $instance.id$_$port.name$_data_in   : std_logic_vector($port.type.size$ - 1 downto 0);
+$
+signal $instance.id$_$port.name$_data_in   : std_logic_vector($port.type.size$ - 1 downto 0);
 $
 endif
 $
