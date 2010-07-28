@@ -169,7 +169,8 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 		QUANT:[ s_qp ], PREV_QUANT:[ s_prev_qp ]
 	guard
 		bitand(cmd, INTER) != 0,
-		bitand(cmd, ACCODED) != 0
+		bitand(cmd, ACCODED) != 0,
+		newvop=0
 	do
 		s_qp := qp;
 		round := bitxor(bitand(s_qp, 1), 1);
@@ -221,7 +222,8 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 			a
 		end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[ s_qp ], PREV_QUANT:[ s_prev_qp ]
 	guard
-		bitand(cmd, INTRA) != 0
+		bitand(cmd, INTRA) != 0,
+		newvop=0
 	var
 		int(size=SAMPLE_SZ) dca = dc_buf[a] , int(size=SAMPLE_SZ) dcb = dc_buf[b] ,
 		int(size=SAMPLE_SZ) dcc = dc_buf[c] , int(size=SAMPLE_SZ) horiz = abs(dcb - dcc) ,

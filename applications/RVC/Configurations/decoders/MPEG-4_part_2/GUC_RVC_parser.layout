@@ -2,8 +2,6 @@
 <layout>
    <vertices>
       <vertex id="BITS" x="57" y="542"/>
-      <vertex id="BTYPE_U" x="562" y="305"/>
-      <vertex id="BTYPE_V" x="557" y="342"/>
       <vertex id="MV_Y" x="764" y="721"/>
       <vertex id="MV_U" x="764" y="814"/>
       <vertex id="MV_V" x="764" y="907"/>
@@ -18,7 +16,7 @@
       <vertex id="BLOCKTYPE_Y" x="552" y="236"/>
       <vertex id="NEW_VOP_Y" x="554" y="275"/>
       <vertex id="BLOCKTYPE_U" x="547" y="191"/>
-      <vertex id="NEW_VOP_U" x="646" y="299"/>
+      <vertex id="NEW_VOP_U" x="565" y="305"/>
       <vertex id="parseheaders" x="160" y="470"/>
       <vertex id="mvseq" x="312" y="571"/>
       <vertex id="blkexp" x="312" y="403"/>
@@ -27,5 +25,7 @@
       <vertex id="splitter_MV" x="624" y="791"/>
       <vertex id="splitter_420_B" x="468" y="406"/>
       <vertex id="splitter_Qp" x="312" y="724"/>
+      <vertex id="NEW_VOP_V" x="554" y="152"/>
+      <vertex id="BLOCKTYPE_V" x="554" y="120"/>
    </vertices>
 </layout>

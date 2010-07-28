@@ -310,11 +310,11 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	bool round;
 
 	// Start a new VOP by setting VOP parameters and initializing the block scan
-	cmd.newVop: action NEW_VOP:[newvop], BLOCKTYPE:[cmd] ==>
+	cmd.newVop: action NEW_VOP:[newvop] ==>
 	guard
 		bitand(newvop, NEWVOP) != 0
 	do
-		round := bitand(cmd, ROUND_TYPE) != 0;
+		round := bitand(newvop, ROUND_TYPE) != 0;
 	end
 
 	getw: action WIDTH:[w] ==>
@@ -331,7 +331,7 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	// Pure texture
 	cmd.noMotion: action NEW_VOP:[newvop], BLOCKTYPE:[cmd] ==>
 	guard
-		bitand(cmd, INTRA) != 0
+		bitand(cmd, INTRA) != 0, newvop=0
 	do
 	// Disable motion comp addressing
 		read_count := 81;
@@ -350,7 +350,7 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	//                          bit0 = round
 	cmd.motion: action NEW_VOP:[newvop], BLOCKTYPE:[cmd] ==>
 	guard
-		bitand(cmd, MOTION) != 0
+		bitand(cmd, MOTION) != 0, newvop=0
 	end
 
 	getmvx: action MV:[ x ] ==>
@@ -384,6 +384,8 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 
 	// No change in the block
 	cmd.neither: action NEW_VOP:[newvop], BLOCKTYPE:[cmd] ==> halfpel:[ 0 ]
+	guard
+		newvop=0
 	do
 		mvx := 0;
 		mvy := 0;

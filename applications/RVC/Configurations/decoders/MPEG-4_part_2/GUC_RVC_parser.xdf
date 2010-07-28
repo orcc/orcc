@@ -9,20 +9,6 @@
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
-    <Port kind="Output" name="BTYPE_U">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="BTYPE_V">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="MV_Y">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -122,6 +108,20 @@
         </Type>
     </Port>
     <Port kind="Output" name="NEW_VOP_U">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="NEW_VOP_V">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="BLOCKTYPE_V">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="12"/>
@@ -310,8 +310,6 @@
     <Connection dst="mvrecon" dst-port="A" src="mvseq" src-port="A"/>
     <Connection dst="splitter_420_B" dst-port="B" src="blkexp" src-port="OUT"/>
     <Connection dst="splitter_MV" dst-port="MV" src="mvrecon" src-port="MV"/>
-    <Connection dst="" dst-port="BTYPE_U" src="splitter_BTYPE" src-port="U"/>
-    <Connection dst="" dst-port="BTYPE_V" src="splitter_BTYPE" src-port="V"/>
     <Connection dst="" dst-port="MV_Y" src="splitter_MV" src-port="Y"/>
     <Connection dst="" dst-port="MV_U" src="splitter_MV" src-port="U"/>
     <Connection dst="" dst-port="MV_V" src="splitter_MV" src-port="V"/>
@@ -345,4 +343,6 @@
     <Connection dst="" dst-port="NEW_VOP_Y" src="splitter_BTYPE" src-port="NEW_VOP_Y"/>
     <Connection dst="" dst-port="BLOCKTYPE_U" src="splitter_BTYPE" src-port="BLOCKTYPE_U"/>
     <Connection dst="" dst-port="NEW_VOP_U" src="splitter_BTYPE" src-port="NEW_VOP_U"/>
+    <Connection dst="" dst-port="NEW_VOP_V" src="splitter_BTYPE" src-port="NEW_VOP_V"/>
+    <Connection dst="" dst-port="BLOCKTYPE_V" src="splitter_BTYPE" src-port="BLOCKTYPE_V"/>
 </XDF>
