@@ -54,7 +54,7 @@ actor GUC_Algo_Synp_MPEG_4 (
   int INTER,
   int ACCODED,
   int MOTION
- ) bool bits ==> int(size=BTYPE_SZ) NEW_VOP, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
+ ) bool bits ==> bool NEW_VOP, bool ROUND, int(size=VOP_FCODE_FOR_LENGTH+1) FCODE, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
   bool LAST, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BITS_QUANT+1) QP, int (size=BTYPE_SZ)BLOCKTYPE :
 
 
@@ -356,12 +356,11 @@ actor GUC_Algo_Synp_MPEG_4 (
   int(size=7) intra_dc_vlc_thr;
 
 	
-  send_new_vop_cmd: action ==>  NEW_VOP:[ cmd ]
+  send_new_vop_cmd: action ==>  NEW_VOP:[ true ], ROUND:[round], FCODE:[fcode]
   guard
     done_reading_bits()
   var
-    bool round := false,
-	int(size=BTYPE_SZ) cmd:= bitor( NEWVOP, if prediction_is_IVOP then INTRA else INTER end )
+    bool round := false
   do
     if not prediction_is_IVOP then
       round := bitand( rshift( read_result(), INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 1 ) = 1;
@@ -376,8 +375,6 @@ actor GUC_Algo_Synp_MPEG_4 (
       // resync_marker_length := 17;
     end
 	prev_quant:=vop_quant;
-    cmd := bitor( cmd, if round then ROUND_TYPE else 0 end );
-    cmd := bitor( cmd, bitand( lshift( fcode, FCODE_SHIFT), FCODE_MASK) );
 end
 
 send_new_vop_width: action ==>  WIDTH: [ vol_width ] end
@@ -428,7 +425,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
 
   // Nothing to do - uncoded
   mcbpc_pvop_uncoded: action bits:[b] ==>
-       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ 0 ]
+       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ false ]
   guard
     not prediction_is_IVOP
   do
@@ -437,7 +434,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mcbpc_pvop_uncoded1: action ==>
-       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ 0 ]
+       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ false ]
   end
 
   bool acpredflag;
@@ -536,7 +533,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
     next_mbxy();
   end
 
-  mb_dispatch_intra: action ==> QP:[vop_quant], BLOCKTYPE: [cmd], NEW_VOP:[ 0 ]
+  mb_dispatch_intra: action ==> QP:[vop_quant], BLOCKTYPE: [cmd], NEW_VOP:[ false ]
   guard
     btype_is_INTRA
   var
@@ -548,7 +545,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mb_dispatch_inter_no_ac: action ==> QP:[vop_quant], 
-  BLOCKTYPE: [bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) )], NEW_VOP:[ 0 ]
+  BLOCKTYPE: [bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) )], NEW_VOP:[ false ]
   guard
     bitand( cbp, lshift( 1,  5 - comp)) = 0
   do
@@ -557,7 +554,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mb_dispatch_inter_ac_coded: action ==> QP:[vop_quant], 
-  BLOCKTYPE: [bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], NEW_VOP:[ 0 ]
+  BLOCKTYPE: [bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], NEW_VOP:[ false ]
   do
     ac_coded := true;
   end

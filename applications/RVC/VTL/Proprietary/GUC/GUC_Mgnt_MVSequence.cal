@@ -13,7 +13,7 @@
 actor GUC_Mgnt_MVSequence (int FOURMV,
 	int NEWVOP,
 	int INTER,
-	int MOTION) int(size=BTYPE_SZ) NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE ==> int(size=MB_COORD_SZ + 3) A :
+	int MOTION) bool NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE ==> int(size=MB_COORD_SZ + 3) A :
 
 	// Port size declaration
 	int BTYPE_SZ = 12;
@@ -79,9 +79,9 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 	// New VOP
-	start: action NEW_VOP:[ cmd ] ==>
+	start: action NEW_VOP:[ newvop ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
+		newvop
 	do
 		mbx := 0;
 		top_edge := true;
@@ -103,7 +103,7 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 
 	read.noPredict: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ] ==>
 	guard
-		newvop = 0,
+		not(newvop),
 		comp > 3 or bitand(cmd, INTER) = 0 or bitand(cmd, MOTION) = 0 or (comp != 0 and bitand(cmd, FOURMV)
 		= 0)
 	do
@@ -131,7 +131,7 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	// block 0 left->1   above->2    above_right->3
 	read.predict.y0: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ] ==> A:[ access(pl, 1), access(pa, 2), access(par, 2) ]
 	guard
-		newvop = 0,
+		not(newvop),
 		bitand(cmd, INTER) != 0,
 		bitand(cmd, MOTION) != 0,
 		comp = 0
@@ -156,7 +156,7 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	// block 1    0      above->3    above_right->2
 	read.predict.y1: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ] ==> A:[ access(ptr, 0), access(pa, 3), access(par, 2) ]
 	guard
-		newvop = 0,
+		not(newvop),
 		bitand(cmd, INTER) != 0,
 		bitand(cmd, MOTION) != 0,
 		bitand(cmd, FOURMV) != 0,
@@ -178,7 +178,7 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	// block 2 left->3       0            1
 	read.predict.y2: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ] ==> A:[ access(pl, 3), access(ptr, 0), access(ptr, 1) ]
 	guard
-		newvop = 0,
+		not(newvop),
 		bitand(cmd, INTER) != 0,
 		bitand(cmd, MOTION) != 0,
 		bitand(cmd, FOURMV) != 0,
@@ -197,7 +197,7 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	read.predict.y3: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ] ==> A:[ access(ptr, 2), access(ptr, 0), access(ptr, 1)
 		]
 	guard
-		bitand(cmd, NEWVOP) = 0,
+		not(newvop),
 		bitand(cmd, INTER) != 0,
 		bitand(cmd, MOTION) != 0,
 		bitand(cmd, FOURMV) != 0,

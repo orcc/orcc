@@ -128,6 +128,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="ROUND">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -345,4 +348,6 @@
     <Connection dst="" dst-port="NEW_VOP_U" src="splitter_BTYPE" src-port="NEW_VOP_U"/>
     <Connection dst="" dst-port="NEW_VOP_V" src="splitter_BTYPE" src-port="NEW_VOP_V"/>
     <Connection dst="" dst-port="BLOCKTYPE_V" src="splitter_BTYPE" src-port="BLOCKTYPE_V"/>
+    <Connection dst="" dst-port="ROUND" src="parseheaders" src-port="ROUND"/>
+    <Connection dst="mvrecon" dst-port="FCODE" src="parseheaders" src-port="FCODE"/>
 </XDF>

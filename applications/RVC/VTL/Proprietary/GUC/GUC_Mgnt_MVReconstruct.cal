@@ -1,25 +1,37 @@
-// MVReconstruct.cal
-//
-// Author: David B. Parlour (dave.parlour@xilinx.com)
-//
-// Copyright (c) 2004-2006 Xilinx Inc.
-// All Rights Reserved
-//
-// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
-//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
-//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
-//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
-actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) that the decoder can handle.
-	// It is used to allocate line buffer space at compile time.
+// MVReconstruct.cal
+
+//
+
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+
+//
+
+// Copyright (c) 2004-2006 Xilinx Inc.
+
+// All Rights Reserved
+
+//
+
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+actor GUC_Mgnt_MVReconstruct (
+// Maximum image width (in units of macroblocks) that the decoder can handle.
+
+// It is used to allocate line buffer space at compile time.
 	int FCODE_MASK,
 	int FCODE_SHIFT,
 	int FOURMV,
 	int NEWVOP,
 	int INTER,
-	int MOTION) int(size=BTYPE_SZ) NEW_VOP, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BTYPE_SZ) BLOCKTYPE, int(size=MV_SZ) MVIN, int(size=MB_COORD_SZ + 3) A
-==> int(size=MV_SZ) MV :
-
+	int MOTION) bool NEW_VOP, int(size=VOP_FCODE_FOR_LENGTH +
+1) FCODE, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BTYPE_SZ) BLOCKTYPE, int(size=MV_SZ) MVIN, int(size=MB_COORD_SZ
++ 3) A ==> int(size=MV_SZ) MV :
 // Port size declaration
 	int BTYPE_SZ = 12;
 
@@ -29,22 +41,25 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 
 	int MAXW_IN_MB = 121;
 
+	int VOP_FCODE_FOR_LENGTH = 3;
 	// Motion vector line buffers - pointer behavior must be implemented exactly as in MVSequence.cal
 	int(size=MB_COORD_SZ) mbx := 0;
-
 	// Current macroblock x position
 	bool top_edge := true;
-
 	// Top edge macroblock flag
 	int(size=4) comp := 0;
 
 	int(size=MB_COORD_SZ) mbwidth := 0;
-
 	// Macroblock width of current vop
+
 	// A0, A1 used for component index.
+
 	// A2 used to select y vs x.
+
 	// Also, locations 0-7 are reserved for all blocks without motion vectors. This protocol
+
 	// must be identical to the buffer addressing in MVSequence.cal which generates pointers.
+
 	// MAXW_IN_MB MUST BE A POWER OF 2, and no more than 2**(MB_COORD_SZ-4).
 	int BUF_SIZE = MAXW_IN_MB * 8;
 
@@ -52,7 +67,8 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 
 	int(size=MB_COORD_SZ + 3) ptr;
 
-	List(type: int(size=MV_SZ), size=BUF_SIZE) buf := [ 0 : for int i in 1 .. BUF_SIZE ];
+	List(type: int(size=MV_SZ), size=BUF_SIZE) buf := [ 0 : for int i in 1 ..
+	BUF_SIZE ];
 
 	int(size=MV_SZ) mv_rsize;
 
@@ -61,13 +77,10 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 	int(size=MV_SZ) mv_low;
 
 	int(size=MV_SZ) mv_high;
-
 	// New VOP
-	start: action NEW_VOP:[ cmd ] ==>
+	start: action NEW_VOP:[ newvop ], FCODE:[ fcode ] ==>
 	guard
-		bitand(cmd, NEWVOP) != 0
-	var
-		int(size=4) fcode = rshift(bitand(cmd, FCODE_MASK), FCODE_SHIFT)
+		newvop
 	do
 		mbx := 0;
 		top_edge := true;
@@ -89,12 +102,11 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 		// Start at 8, since 0-7 are reserved
 
 	end
-
 	// No motion vector
 	read.noMotion: action NEW_VOP:[ newvop ], BLOCKTYPE:[ cmd ] ==>
 	guard
 		bitand(cmd, INTER) = 0 or bitand(cmd, MOTION) = 0,
-		newvop = 0
+		not(newvop)
 	var
 		int(size=MB_COORD_SZ + 3) p = bitor(ptr, comp)
 	do
@@ -105,13 +117,12 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 	end
 
 	bool fourmv;
-
 	// Motion vectors - detect fourmv
 	read.motion: action NEW_VOP:[ newvop ], BLOCKTYPE:[ cmd ] ==>
 	guard
 		bitand(cmd, INTER) != 0,
 		bitand(cmd, MOTION) != 0,
-		newvop = 0
+		not(newvop)
 	do
 		if comp = 0 then
 			fourmv := bitand(cmd, FOURMV) != 0;
@@ -119,7 +130,6 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 			sum_y := 0;
 		end
 	end
-
 	// Return the middle of three values
 	function middle(int a, int b, int c) --> int :
 		if a < b then
@@ -156,14 +166,13 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 	int(size=MV_SZ) bpred;
 
 	int(size=MV_SZ) cpred;
-
 	// No need to compute any more MVs for chroma or for luma blocks > 1 if not fourmv
 	compute.done: action ==>
 	guard
 		comp > 3 or (comp != 0 and not fourmv)
 	end
-
 	// Compute MVs for all Y components in FOURMV mode, otherwise just one
+
 	// Invoke 3 times to get all the prediction pointers
 	compute.start: action A:[ a ] ==>
 	do
@@ -171,7 +180,6 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 		bptr := cptr;
 		cptr := a;
 	end
-
 	// Invoke 3 times to get the X predictions, 3 more times to get the Y predictions
 	get_pred: action ==>
 	var
@@ -189,12 +197,13 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 	do
 		if comp >= 2 or not top_edge then
 		// When two or more of the predictors exist, take the middle of all three
-			// The non-existent one will default to 0. When there are less than two
-			// predictors, a will contain the value or a 0 default.
+
+		// The non-existent one will default to 0. When there are less than two
+
+		// predictors, a will contain the value or a 0 default.
 			apred := middle(apred, bpred, cpred);
 		end
 	end
-
 	// Compute the MVs - written so that same actions used for both x,y
 	int(size=MV_SZ) mag;
 
@@ -235,9 +244,7 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 		end
 	end
 
-	bool x_flag;
-
-	/*
+	bool x_flag; /*
   get_residual: action MVIN:[s] ==>
   var
     int(size=MV_SZ) shift = lshift( if mag < 0 then bitnot(mag) else mag - 1 end, mv_rsize) + s + 1,
@@ -355,7 +362,6 @@ actor GUC_Mgnt_MVReconstruct (// Maximum image width (in units of macroblocks) t
 			vv
 		end
 	end
-
 	// Written to be called four times in succession ( u.x, u.y, v.x, v.y )
 	write.chroma: action ==> MV:[ mv ]
 	var

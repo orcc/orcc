@@ -8,8 +8,8 @@
 // 
 
 // Description: the sequence of BTYPE token is not homogeneous, there is fist a NEW VOP command, then, the width and height of this VOP, then the  corresponding 8x8 blocks of texture, motion or mixed tex/mot. This actor will delete the tokens concerning the information of the VOP and redistribute the tokens to the Y, U and V components. So that the adder have directly the token intra, accoded or mixed.
-actor GUC_splitter_BTYPE
-() int(size=BTYPE_SZ) NEW_VOP, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BTYPE_SZ) BLOCKTYPE
+actor GUC_splitter_BTYPE () bool
+NEW_VOP, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BTYPE_SZ) BLOCKTYPE
 ==> int(size=BTYPE_SZ) BLOCKTYPE_Y, int(size=BTYPE_SZ) BLOCKTYPE_U, int(size=BTYPE_SZ) BLOCKTYPE_V, int(size=BTYPE_SZ) NEW_VOP_Y, int(size=BTYPE_SZ) NEW_VOP_U, int(size=BTYPE_SZ) NEW_VOP_V
 :
 // Port size declaration
@@ -17,18 +17,18 @@ actor GUC_splitter_BTYPE
 
 	int NEWVOP = 2048;
 	// to send the newvop token to the address and add block (arrggg) 
-	cmd.newVop: action NEW_VOP:[ cmd ] ==> NEW_VOP_Y:[ cmd ], NEW_VOP_U:[ cmd ],
-		NEW_VOP_V:[ cmd ]
+	cmd.newVop: action NEW_VOP:[ newvop ] ==> NEW_VOP_Y:[ NEWVOP ], NEW_VOP_U:[
+		NEWVOP ], NEW_VOP_V:[ NEWVOP ]
 	guard
-		bitand(cmd, NEWVOP) != 0
+		newvop
 	end
 	// to split the tokens 
 	cmd.split: action NEW_VOP:[ lnewvop ] repeat 6, BLOCKTYPE:[ list ] repeat 6 ==>
 		BLOCKTYPE_Y:[ list[0], list[1], list[2], list[3] ], BLOCKTYPE_U:[ list[4] ],
-		BLOCKTYPE_V:[ list[5] ], NEW_VOP_Y:[ lnewvop[0], lnewvop[1], lnewvop[2],
-		lnewvop[3] ], NEW_VOP_U:[ lnewvop[4] ], NEW_VOP_V:[ lnewvop[5] ]
+		BLOCKTYPE_V:[ list[5] ], NEW_VOP_Y:[ 0, 0, 0, 0 ], NEW_VOP_U:[ 0 ],
+		NEW_VOP_V:[ 0 ]
 	guard
-		lnewvop[0] = 0
+		not (lnewvop[0])
 	end
 
 	priority

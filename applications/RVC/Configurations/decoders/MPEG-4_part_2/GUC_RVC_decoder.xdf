@@ -384,4 +384,7 @@
     <Connection dst="texture_V" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
     <Connection dst="motion_V" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
     <Connection dst="motion_V" dst-port="HEIGHT" src="parser" src-port="HEIGHT"/>
+    <Connection dst="motion_Y" dst-port="ROUND" src="parser" src-port="ROUND"/>
+    <Connection dst="motion_V" dst-port="ROUND" src="parser" src-port="ROUND"/>
+    <Connection dst="motion_U" dst-port="ROUND" src="parser" src-port="ROUND"/>
 </XDF>
