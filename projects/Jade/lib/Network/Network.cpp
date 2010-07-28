@@ -50,9 +50,6 @@ Network::Network(std::string name, std::map<std::string, Port*>* inputs, std::ma
 	this->inputs = inputs;
 	this->outputs = outputs;
 	this->graph = graph;
-
-	//graph->precomputeSuccessors();
-	
 }
 
 list<Actor*>* Network::getActors(){

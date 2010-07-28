@@ -43,10 +43,12 @@
 #include <list>
 #include <string>
 
-class Port;
+class Actor;
 class Instance;
 class HDAGGraph;
-class Actor;
+class Port;
+class Procedure;
+
 //------------------------------
 
 /**
@@ -135,6 +137,9 @@ private:
 	
 	/** instances of the network  */
 	std::map<std::string, Instance*> instances;
+
+	/** initialization procedure of the network  */
+	Procedure* initialize;
 
 };
 

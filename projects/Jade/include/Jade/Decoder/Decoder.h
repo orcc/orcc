@@ -126,6 +126,24 @@ public:
 	Instance* getInstance(std::string name);
 
 	/**
+     *  @brief Getter of initialization
+	 * 
+	 *
+	 *  @return initialization procedure of the decoder
+	 *
+     */
+	Procedure* getInitialization(){return initialization;};
+
+	/**
+     *  @brief Setter of initialization
+	 * 
+	 *
+	 *  @param initialization : initialization procedure of the decoder
+	 *
+     */
+	void setInitialization(Procedure* initialization){this->initialization = initialization;};
+
+	/**
      *  @brief Getter of a network
 	 * 
 	 *  @return network of the decoder
@@ -170,6 +188,9 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Initialization procedure */
+	Procedure* initialization;
 
 	/**
      *  @brief Create instance of actors

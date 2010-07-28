@@ -49,6 +49,7 @@
 #include "Jade/JIT.h"
 #include "Jade/Actor/Port.h"
 #include "Jade/Decoder/Decoder.h"
+#include "Jade/Decoder/Procedure.h"
 #include "Jade/Fifo/FifoTrace.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Network/Network.h"
@@ -194,18 +195,18 @@ void FifoTrace::setConnection(Connection* connection){
 	Constant* fill_count = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* expr = ConstantExpr::getBitCast(NewArray, structType->getElementType(1));
 	
-	Constant* file =  ConstantPointerNull::get(cast<PointerType>(structType->getElementType(5)));
-	Constant* arrConst = ConstantAggregateZero::get(structType->getElementType(6));
+	Constant* file =  ConstantPointerNull::get(cast<PointerType>(structType->getElementType(3)));
+	Constant* arrConst = ConstantPointerNull::get(cast<PointerType>(structType->getElementType(2)));
 	
 	// Add initialization vector 
 	vector<Constant*> Elts;
 	Elts.push_back(size);
 	Elts.push_back(expr);
+	Elts.push_back(arrConst);
+	Elts.push_back(file);
 	Elts.push_back(read_ind);
 	Elts.push_back(write_ind);
 	Elts.push_back(fill_count);
-	Elts.push_back(file);
-	Elts.push_back(arrConst);
 	Constant* fifoStruct =  ConstantStruct::get(structType, Elts);
 
 	// Create fifo 
@@ -246,15 +247,14 @@ void FifoTrace::setConnections(Decoder* decoder){
 		setConnection((Connection*)graph->getEdge(i));
 	}
 
-	//Associate connections to a file
-	for (int i = 0; i < edges; i++){
-		//setFile((Connection*)graph->getEdge(i));
-	}
+	setFiles(decoder);
 }
 
 
-void FifoTrace::setFile(Connection* connection){
-	ostringstream fileName;
+void FifoTrace::setFile(Connection* connection, BasicBlock* bb, Function* fOpenFunc){
+	//CallInst::Create(fOpenFunc, "", bb);
+
+	/*	ostringstream fileName;
 
 	// Get vertex of the connection
 	Port* dst = connection->getDestinationPort();
@@ -265,5 +265,37 @@ void FifoTrace::setFile(Connection* connection){
 	FILE* filePtr = fopen(fileName.str().c_str(),"w");
 
 	fifo_char_s* fifo = (fifo_char_s*)(*(fifo_char_s**)jit->getPortPointer(dst));
-	fifo->pFile = filePtr;
+	fifo->pFile = filePtr;*/
+}
+
+
+void FifoTrace::setFiles(Decoder* decoder){
+	
+	// Create initialization procedure
+	Module* module = decoder->getModule();
+	string initName = "init_decoder";
+	ConstantInt* isExtern = ConstantInt::get(IntegerType::get(Context,1),0);
+	
+	Function* init = cast<Function>(module->getOrInsertFunction(initName, Type::getVoidTy(Context),
+                                          (Type *)0));
+	Procedure* initialize = new Procedure(initName, isExtern, init);
+	decoder->setInitialization(initialize);
+
+	// Create entry basic block
+	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", init);
+
+
+	// Set opening Files
+	Network* network = decoder->getNetwork();
+	HDAGGraph* graph = network->getGraph();
+	int edges = graph->getNbEdges();
+
+	// Get fopen function
+	map<string,Function*>::iterator it;
+	it = fifoAccess.find("fopen");
+
+	//Associate connections to a file
+	for (int i = 0; i < edges; i++){
+		setFile((Connection*)graph->getEdge(i), BBEntry, it->second);
+	}
 }
