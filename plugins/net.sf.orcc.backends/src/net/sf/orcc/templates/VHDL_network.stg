@@ -103,7 +103,7 @@ generic map (
 depth => $edge.size$,
 $
 if(targetPort.type.bool)
-$width => 0)
+$width => 1)
 $
 else
 $width => $targetPort.type.size$)
