@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-05
+-- Last update: 2010-07-30
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -55,18 +55,18 @@ entity arbiter is
     (
       width : integer := 32);
   port (
-    reset_n  : in    std_logic;
+    reset_n  : in  std_logic;
     --
-    wr_clk   : in    std_logic;
-    wr_data  : in    std_logic;
-    data_in  : in    std_logic_vector(width -1 downto 0);
-    full     : inout std_logic;
+    wr_clk   : in  std_logic;
+    wr_data  : in  std_logic;
+    data_in  : in  std_logic_vector(width -1 downto 0);
+    full     : out std_logic;
     --
-    rd_clk   : in    std_logic;
-    rd_ack   : in    std_logic;
-    send     : out   std_logic;
-    data_out : out   std_logic_vector(width -1 downto 0);
-    empty    : out   std_logic);
+    rd_clk   : in  std_logic;
+    rd_ack   : in  std_logic;
+    send     : out std_logic;
+    data_out : out std_logic_vector(width -1 downto 0);
+    empty    : out std_logic);
 end arbiter;
 
 
@@ -155,22 +155,5 @@ begin
       end if;
     end if;
   end process cnt_proc;
-
---  arbiter_proc : process (data_in_reg, rd_ack, reset_n, wr_data) is
---  begin
---    if reset_n = '0' then
---      reg_done <= '0';
---      full     <= '0';
---    elsif wr_data = '1' and data_in_reg = '1' and rd_ack = '1' then
---      reg_done <= '1';
---      full     <= '0';
---    elsif wr_data = '1' and data_in_reg = '1' and rd_ack = '0' then
---      reg_done <= '1';
---      full     <= '1';
---    else
---      reg_done <= '0';
---      full     <= '0';
---    end if;
---  end process arbiter_proc;
 
 end arch_arbiter;
