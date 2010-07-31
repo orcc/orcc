@@ -55,7 +55,7 @@ actor GUC_Algo_Synp_MPEG_4 (
   int ACCODED,
   int MOTION
  ) bool bits ==> bool NEW_VOP, bool ROUND, int(size=VOP_FCODE_FOR_LENGTH+1) FCODE, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
-  bool LAST, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BITS_QUANT+1) QP, int (size=BTYPE_SZ)BLOCKTYPE :
+  bool LAST, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BITS_QUANT+1) QP, int (size=BTYPE_SZ)BLOCKTYPE, bool AC_CODED :
 
 
   // Port size declaration
@@ -425,7 +425,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
 
   // Nothing to do - uncoded
   mcbpc_pvop_uncoded: action bits:[b] ==>
-       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ false ]
+       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ false ], AC_CODED:[false]
   guard
     not prediction_is_IVOP
   do
@@ -434,7 +434,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mcbpc_pvop_uncoded1: action ==>
-       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ false ]
+       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ false ], AC_CODED:[false]
   end
 
   bool acpredflag;
@@ -533,7 +533,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
     next_mbxy();
   end
 
-  mb_dispatch_intra: action ==> QP:[vop_quant], BLOCKTYPE: [cmd], NEW_VOP:[ false ]
+  mb_dispatch_intra: action ==> QP:[vop_quant], BLOCKTYPE: [cmd], NEW_VOP:[ false ], AC_CODED:[ac_coded]
   guard
     btype_is_INTRA
   var
@@ -545,7 +545,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mb_dispatch_inter_no_ac: action ==> QP:[vop_quant], 
-  BLOCKTYPE: [bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) )], NEW_VOP:[ false ]
+  BLOCKTYPE: [bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) )], NEW_VOP:[ false ], AC_CODED:[false]
   guard
     bitand( cbp, lshift( 1,  5 - comp)) = 0
   do
@@ -554,7 +554,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mb_dispatch_inter_ac_coded: action ==> QP:[vop_quant], 
-  BLOCKTYPE: [bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], NEW_VOP:[ false ]
+  BLOCKTYPE: [bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], NEW_VOP:[ false ], AC_CODED:[ac_coded]
   do
     ac_coded := true;
   end
