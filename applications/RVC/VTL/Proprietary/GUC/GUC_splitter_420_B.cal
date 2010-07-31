@@ -46,10 +46,7 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
 			comp := 0;
 		end
 	end
-//	skip_accoded: action AC_CODED:[ac_coded] ==>
-	//	guard
-		//	ac_coded
-	//end
+
 	skip_other: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded] ==>
 	guard
 		bitand(cmd, INTER) = 0,
@@ -63,21 +60,21 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
 		end
 	end
 
-	splitY: action BLOCKTYPE:[ cmd ],  B:[ x ] repeat BLOCK_SZ ==>  Y:[ x ] repeat BLOCK_SZ 
+	splitY: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded],  B:[ x ] repeat BLOCK_SZ ==>  Y:[ x ] repeat BLOCK_SZ 
 	guard
 		comp < 4
 	do
 		comp := comp + 1;
 	end
 
-	splitU: action BLOCKTYPE:[ cmd ], B:[ x ] repeat BLOCK_SZ ==> U:[ x ] repeat BLOCK_SZ
+	splitU: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], B:[ x ] repeat BLOCK_SZ ==> U:[ x ] repeat BLOCK_SZ
 	guard
 		comp = 4
 	do
 		comp := comp + 1;
 	end
 
-	splitV: action BLOCKTYPE:[ cmd ],  B:[ x ] repeat BLOCK_SZ ==> V:[ x ] repeat BLOCK_SZ
+	splitV: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded],  B:[ x ] repeat BLOCK_SZ ==> V:[ x ] repeat BLOCK_SZ
 	guard
 		comp = 5
 	do

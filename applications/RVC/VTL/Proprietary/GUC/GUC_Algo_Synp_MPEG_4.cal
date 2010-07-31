@@ -545,7 +545,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mb_dispatch_inter_no_ac: action ==> QP:[vop_quant], 
-  BLOCKTYPE: [bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) )], NEW_VOP:[ false ], AC_CODED:[false]
+  BLOCKTYPE: [bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) )], NEW_VOP:[ false ], AC_CODED:[ac_coded]
   guard
     bitand( cbp, lshift( 1,  5 - comp)) = 0
   do
