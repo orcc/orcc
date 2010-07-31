@@ -7,8 +7,8 @@
 //
 
 actor GUC_splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED ==> int(size=SAMPLE_SZ) Y ,
-int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V, 
-bool AC_Y , bool AC_U , bool AC_V :
+int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
+ :
 
 // Port size declaration
 	int BTYPE_SZ = 12;
