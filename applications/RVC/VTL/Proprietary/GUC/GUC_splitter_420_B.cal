@@ -6,8 +6,9 @@
 //              into its respective Y, U and V components.
 //
 
-actor GUC_splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BLOCKTYPE ==> int(size=SAMPLE_SZ) Y ,
-int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
+actor GUC_splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED ==> int(size=SAMPLE_SZ) Y ,
+int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V, 
+bool AC_Y , bool AC_U , bool AC_V :
 
 // Port size declaration
 	int BTYPE_SZ = 12;
@@ -20,7 +21,7 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 
 	int INTER = 512;
 
-	int ACCODED = 2;
+	//int ACCODED = 2;
 
 	int(size=4) comp := 0;
 
@@ -32,25 +33,29 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 	//  | 2 | 3 | 
 	//  +---+---+  
 
-	skip_uncoded: action BLOCKTYPE:[ cmd ] ==>
+	
+	skip_uncoded: action BLOCKTYPE:[ cmd ], 
+	AC_CODED:[ac_coded] ==>
 	guard
 		bitand(cmd, INTER) != 0,
 		// An INTER block
-		bitand(cmd, ACCODED) = 0 // Not ACCODED
-
+		not ac_coded 
 	do
 		comp := comp + 1;
 		if comp = 6 then
 			comp := 0;
 		end
 	end
-
-	skip_other: action BLOCKTYPE:[ cmd ] ==>
+//	skip_accoded: action AC_CODED:[ac_coded] ==>
+	//	guard
+		//	ac_coded
+	//end
+	skip_other: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded] ==>
 	guard
 		bitand(cmd, INTER) = 0,
 		// Not an INTER block
 		bitand(cmd, INTRA) = 0 // Not an INTRA block
-
+		
 	do
 		comp := comp + 1;
 		if comp = 6 then
@@ -58,7 +63,7 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 		end
 	end
 
-	splitY: action BLOCKTYPE:[ cmd ], B:[ x ] repeat BLOCK_SZ ==> Y:[ x ] repeat BLOCK_SZ
+	splitY: action BLOCKTYPE:[ cmd ],  B:[ x ] repeat BLOCK_SZ ==>  Y:[ x ] repeat BLOCK_SZ 
 	guard
 		comp < 4
 	do
@@ -72,7 +77,7 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 		comp := comp + 1;
 	end
 
-	splitV: action BLOCKTYPE:[ cmd ], B:[ x ] repeat BLOCK_SZ ==> V:[ x ] repeat BLOCK_SZ
+	splitV: action BLOCKTYPE:[ cmd ],  B:[ x ] repeat BLOCK_SZ ==> V:[ x ] repeat BLOCK_SZ
 	guard
 		comp = 5
 	do
