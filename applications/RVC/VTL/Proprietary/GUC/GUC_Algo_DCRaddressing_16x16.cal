@@ -47,7 +47,7 @@
 // * Block pointer bitwidth reduced from MB_COORD_SZ+3 to MB_COORD_SZ+2 since only
 //   4 components per block.
 
-actor GUC_Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, int(size=16) WIDTH ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
+actor GUC_Algo_DCRaddressing_16x16 () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, int(size=16) WIDTH ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
 + 2) B , int(size=MB_COORD_SZ + 2) C :
 
 // Port size declaration
@@ -125,7 +125,7 @@ actor GUC_Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) NEW_VOP, int(size=BTYPE
 	// New VOP
 	start: action NEW_VOP:[newvop] ==>
 	guard
-		bitand(newvop, NEWVOP) != 0
+		newvop
 	do
 		mbx := 0;
 		top_edge := true;
@@ -147,7 +147,7 @@ actor GUC_Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) NEW_VOP, int(size=BTYPE
 	read.intra: action NEW_VOP:[newvop], BLOCKTYPE:[btype] ==>
 	guard
 		bitand(btype, INTRA) != 0,
-		newvop = 0
+		not(newvop)
 	do
 		coded[access(ptr, comp)] := true;
 	end
@@ -156,7 +156,7 @@ actor GUC_Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) NEW_VOP, int(size=BTYPE
 	read.other: action NEW_VOP:[newvop], BLOCKTYPE:[btype] ==>
 	guard
 		bitand(btype, INTRA) = 0,
-		newvop = 0
+		not(newvop)
 	do
 		coded[access(ptr, comp)] := false;
 	end

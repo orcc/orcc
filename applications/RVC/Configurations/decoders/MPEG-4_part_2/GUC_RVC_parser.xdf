@@ -94,11 +94,7 @@
         </Type>
     </Port>
     <Port kind="Output" name="NEW_VOP_Y">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <Port kind="Output" name="BLOCKTYPE_U">
         <Type name="int">
@@ -108,18 +104,10 @@
         </Type>
     </Port>
     <Port kind="Output" name="NEW_VOP_U">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <Port kind="Output" name="NEW_VOP_V">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <Port kind="Output" name="BLOCKTYPE_V">
         <Type name="int">

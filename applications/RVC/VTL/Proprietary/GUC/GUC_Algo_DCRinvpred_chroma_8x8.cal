@@ -71,7 +71,7 @@
 // * In advance action, indices adjust after every component instead of 6 since now
 //   dealing with a single 8x8 block rather than 6 8x8 blocks.
 
-actor GUC_Algo_DCRinvpred_chroma_8x8 () int(size=BTYPE_SZ) NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B,
+actor GUC_Algo_DCRinvpred_chroma_8x8 () bool NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B,
 int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
 int(size=SAMPLE_SZ) QF_DC , int(size=MB_COORD_SZ) PTR , int(size=3) AC_PRED_DIR , bool
 SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
@@ -147,9 +147,9 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	// Pointer to current 8x8 block
 	// Check for NEWVOP flag
 	// A -ve means there is no data, so the inverse zigzag may flush its buffer
-	start: action NEW_VOP:[ cmd ] ==> AC_PRED_DIR:[ -2 ]
+	start: action NEW_VOP:[ newvop ] ==> AC_PRED_DIR:[ -2 ]
 	guard
-		bitand(cmd, NEWVOP) != 0
+		newvop
 	do
 		ptr := 1;
 	end

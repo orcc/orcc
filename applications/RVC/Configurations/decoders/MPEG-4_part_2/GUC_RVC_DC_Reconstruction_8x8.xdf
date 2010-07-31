@@ -25,11 +25,7 @@
         </Type>
     </Port>
     <Port kind="Input" name="NEW_VOP">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
+        <Type name="bool"/>
     </Port>
     <Port kind="Input" name="BLOCKTYPE">
         <Type name="int">
