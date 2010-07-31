@@ -338,4 +338,6 @@
     <Connection dst="" dst-port="BLOCKTYPE_V" src="splitter_BTYPE" src-port="BLOCKTYPE_V"/>
     <Connection dst="" dst-port="ROUND" src="parseheaders" src-port="ROUND"/>
     <Connection dst="mvrecon" dst-port="FCODE" src="parseheaders" src-port="FCODE"/>
+    <Connection dst="splitter_420_B" dst-port="AC_CODED"
+        src="parseheaders" src-port="AC_CODED"/>
 </XDF>
