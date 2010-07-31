@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/net.sf.orcc_0.9.0.beta1.jar" id="net.sf.orcc" version="0.9.0.beta1">
+   <feature url="features/net.sf.orcc_0.9.0.beta2.jar" id="net.sf.orcc" version="0.9.0.beta2">
       <category name="Open RVC-CAL Compiler"/>
    </feature>
    <category-def name="Open RVC-CAL Compiler" label="Open RVC-CAL Compiler">
