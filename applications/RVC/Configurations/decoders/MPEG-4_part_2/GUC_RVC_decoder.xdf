@@ -388,9 +388,9 @@
     <Connection dst="motion_V" dst-port="ROUND" src="parser" src-port="ROUND"/>
     <Connection dst="motion_U" dst-port="ROUND" src="parser" src-port="ROUND"/>
     <Connection dst="texture_Y" dst-port="ACCODED" src="parser" src-port="Y_AC"/>
-    <Connection dst="texture_U" dst-port="ACCODED" src="parser" src-port="U_AC"/>
-    <Connection dst="texture_V" dst-port="ACCODED" src="parser" src-port="V_AC"/>
     <Connection dst="motion_Y" dst-port="ACCODED" src="parser" src-port="Y_AC"/>
+    <Connection dst="texture_U" dst-port="ACCODED" src="parser" src-port="U_AC"/>
     <Connection dst="motion_U" dst-port="ACCODED" src="parser" src-port="U_AC"/>
+    <Connection dst="texture_V" dst-port="ACCODED" src="parser" src-port="V_AC"/>
     <Connection dst="motion_V" dst-port="ACCODED" src="parser" src-port="V_AC"/>
 </XDF>
