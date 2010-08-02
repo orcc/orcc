@@ -337,9 +337,6 @@
         src="parseheaders" src-port="NEW_VOP"/>
     <Connection dst="splitter_BTYPE" dst-port="BLOCKTYPE"
         src="parseheaders" src-port="BLOCKTYPE"/>
-    <Connection dst="splitter_BTYPE" dst-port="WIDTH" src="parseheaders" src-port="WIDTH"/>
-    <Connection dst="splitter_BTYPE" dst-port="HEIGHT"
-        src="parseheaders" src-port="HEIGHT"/>
     <Connection dst="splitter_420_B" dst-port="BLOCKTYPE"
         src="parseheaders" src-port="BLOCKTYPE"/>
     <Connection dst="mvrecon" dst-port="NEW_VOP" src="parseheaders" src-port="NEW_VOP"/>
