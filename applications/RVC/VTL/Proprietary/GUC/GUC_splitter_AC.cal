@@ -1,0 +1,22 @@
+actor GUC_splitter_AC () bool AC_CODED ==> bool Y_AC, bool U_AC, bool V_AC:
+	Y1: action AC_CODED:[ac] ==> Y_AC:[ac]
+	end
+	Y2: action AC_CODED:[ac] ==> Y_AC:[ac]
+	end
+	Y3: action AC_CODED:[ac] ==> Y_AC:[ac]
+	end
+	Y4: action AC_CODED:[ac] ==> Y_AC:[ac]
+	end
+	U: action AC_CODED:[ac] ==> U_AC:[ac]
+	end
+	V: action AC_CODED:[ac] ==> V_AC:[ac]
+	end
+	schedule fsm Y1:
+		Y1 (Y1)-->Y2;
+		Y2 (Y2)-->Y3;
+		Y3 (Y3)-->Y4;
+		Y4 (Y4)-->U;
+		U (U)-->V;
+		V (V)-->Y1;
+	end
+end

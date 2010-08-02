@@ -60,14 +60,14 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
 		end
 	end
 
-	splitY: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded],  B:[ x ] repeat BLOCK_SZ ==>  Y:[ x ] repeat BLOCK_SZ 
+	splitY: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], B:[ x ] repeat BLOCK_SZ ==>Y:[ x ] repeat BLOCK_SZ 
 	guard
 		comp < 4
 	do
 		comp := comp + 1;
 	end
 
-	splitU: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], B:[ x ] repeat BLOCK_SZ ==> U:[ x ] repeat BLOCK_SZ
+	splitU: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], B:[ x ] repeat BLOCK_SZ ==>U:[ x ] repeat BLOCK_SZ
 	guard
 		comp = 4
 	do

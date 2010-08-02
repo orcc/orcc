@@ -44,6 +44,9 @@
     <Port kind="Input" name="ROUND">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="ACCODED">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -165,4 +168,5 @@
     <Connection dst="address" dst-port="NEW_VOP" src="" src-port="NEW_VOP"/>
     <Connection dst="address" dst-port="BLOCKTYPE" src="" src-port="BLOCKTYPE"/>
     <Connection dst="address" dst-port="ROUND" src="" src-port="ROUND"/>
+    <Connection dst="add" dst-port="AC_CODED" src="" src-port="ACCODED"/>
 </XDF>
