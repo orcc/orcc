@@ -1,4 +1,4 @@
-package net.sf.orcc.backends.cpp.codesign;
+package net.sf.orcc.backends.cpp;
 
 import java.io.File;
 import java.io.FileOutputStream;
