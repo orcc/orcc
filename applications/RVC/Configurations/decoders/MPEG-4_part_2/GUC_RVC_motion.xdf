@@ -47,6 +47,9 @@
     <Port kind="Input" name="ACCODED">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="MOTION">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -100,9 +103,6 @@
         </Parameter>
         <Parameter name="LAYOUT">
             <Expr kind="Var" name="LAYOUT"/>
-        </Parameter>
-        <Parameter name="MOTION">
-            <Expr kind="Var" name="MOTION"/>
         </Parameter>
         <Parameter name="NEWVOP">
             <Expr kind="Var" name="NEWVOP"/>
@@ -169,4 +169,5 @@
     <Connection dst="address" dst-port="BLOCKTYPE" src="" src-port="BLOCKTYPE"/>
     <Connection dst="address" dst-port="ROUND" src="" src-port="ROUND"/>
     <Connection dst="add" dst-port="AC_CODED" src="" src-port="ACCODED"/>
+    <Connection dst="address" dst-port="MOT" src="" src-port="MOTION"/>
 </XDF>

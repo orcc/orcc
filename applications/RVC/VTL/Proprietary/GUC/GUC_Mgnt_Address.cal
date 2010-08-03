@@ -15,9 +15,9 @@
 
 actor GUC_Mgnt_Address (int INTRA,
 	int NEWVOP,
-	int MOTION,
 	int ROUND_TYPE,
-	int LAYOUT) bool NEW_VOP, bool ROUND, int(size=BTYPE_SZ) BLOCKTYPE, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=MV_SZ) MV ==> int(size=ADDR_SZ) RA ,
+	int LAYOUT) bool NEW_VOP, bool ROUND, int(size=BTYPE_SZ) BLOCKTYPE, bool MOT, 
+	int(size=16) WIDTH, int(size=16) HEIGHT, int(size=MV_SZ) MV ==> int(size=ADDR_SZ) RA ,
 int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 
 // Port size declaration
@@ -329,7 +329,8 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	end
 
 	// Pure texture
-	cmd.noMotion: action NEW_VOP:[newvop], BLOCKTYPE:[cmd] ==>
+	cmd.noMotion: action NEW_VOP:[newvop], BLOCKTYPE:[cmd], MOT:[mot] 
+	==>
 	guard
 		bitand(cmd, INTRA) != 0, not(newvop)
 	do
@@ -348,9 +349,10 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	// Encode flags on halfpel: bit2 = interp. x
 	//                          bit1 = interp. y
 	//                          bit0 = round
-	cmd.motion: action NEW_VOP:[newvop], BLOCKTYPE:[cmd] ==>
-	guard
-		bitand(cmd, MOTION) != 0, not(newvop)
+	cmd.motion: action NEW_VOP:[newvop], BLOCKTYPE:[cmd] , MOT:[mot] 
+	==>
+	guard 
+		not(newvop), mot
 	end
 
 	getmvx: action MV:[ x ] ==>
@@ -383,7 +385,8 @@ int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 	end
 
 	// No change in the block
-	cmd.neither: action NEW_VOP:[newvop], BLOCKTYPE:[cmd] ==> halfpel:[ 0 ]
+	cmd.neither: action NEW_VOP:[newvop], BLOCKTYPE:[cmd], MOT:[mot] 
+	==> halfpel:[ 0 ]
 	guard
 		not(newvop)
 	do

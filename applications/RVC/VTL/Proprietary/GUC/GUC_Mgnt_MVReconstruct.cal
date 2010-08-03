@@ -28,9 +28,8 @@ actor GUC_Mgnt_MVReconstruct (
 	int FCODE_SHIFT,
 	int FOURMV,
 	int NEWVOP,
-	int INTER,
-	int MOTION) bool NEW_VOP, int(size=VOP_FCODE_FOR_LENGTH +
-1) FCODE, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BTYPE_SZ) BLOCKTYPE, int(size=MV_SZ) MVIN, int(size=MB_COORD_SZ
+	int INTER) bool NEW_VOP, int(size=VOP_FCODE_FOR_LENGTH +
+1) FCODE, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BTYPE_SZ) BLOCKTYPE, bool MOT, int(size=MV_SZ) MVIN, int(size=MB_COORD_SZ
 + 3) A ==> int(size=MV_SZ) MV :
 // Port size declaration
 	int BTYPE_SZ = 12;
@@ -103,9 +102,9 @@ actor GUC_Mgnt_MVReconstruct (
 
 	end
 	// No motion vector
-	read.noMotion: action NEW_VOP:[ newvop ], BLOCKTYPE:[ cmd ] ==>
+	read.noMotion: action NEW_VOP:[ newvop ], BLOCKTYPE:[ cmd ], MOT:[mot] ==>
 	guard
-		bitand(cmd, INTER) = 0 or bitand(cmd, MOTION) = 0,
+		bitand(cmd, INTER) = 0 or not mot,
 		not(newvop)
 	var
 		int(size=MB_COORD_SZ + 3) p = bitor(ptr, comp)
@@ -118,10 +117,10 @@ actor GUC_Mgnt_MVReconstruct (
 
 	bool fourmv;
 	// Motion vectors - detect fourmv
-	read.motion: action NEW_VOP:[ newvop ], BLOCKTYPE:[ cmd ] ==>
+	read.motion: action NEW_VOP:[ newvop ], BLOCKTYPE:[ cmd ], MOT:[mot] ==>
 	guard
 		bitand(cmd, INTER) != 0,
-		bitand(cmd, MOTION) != 0,
+		mot,
 		not(newvop)
 	do
 		if comp = 0 then

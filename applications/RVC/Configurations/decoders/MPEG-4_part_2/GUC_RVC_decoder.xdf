@@ -393,4 +393,7 @@
     <Connection dst="motion_U" dst-port="ACCODED" src="parser" src-port="U_AC"/>
     <Connection dst="texture_V" dst-port="ACCODED" src="parser" src-port="V_AC"/>
     <Connection dst="motion_V" dst-port="ACCODED" src="parser" src-port="V_AC"/>
+    <Connection dst="motion_Y" dst-port="MOTION" src="parser" src-port="Y_MOT"/>
+    <Connection dst="motion_U" dst-port="MOTION" src="parser" src-port="U_MOT"/>
+    <Connection dst="motion_V" dst-port="MOTION" src="parser" src-port="V_MOT"/>
 </XDF>
