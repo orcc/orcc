@@ -1,0 +1,329 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+actor Algo_VariableLengthDecoding()
+	uint(size=8)  RbspByte,
+	uint(size=3)  TypeOfVLD,
+	uint(size=5)  NbBitsToRead,
+	bool          EndOfNal
+		==>
+	int (size=32) ValDecoded,
+	bool          ReadNextByte,
+	bool          SkipNal
+		:
+
+
+/*
+*
+* Constants
+*
+*/
+
+	uint(size=3) READ_BITS = 0;
+	uint(size=3) VLD_UE    = 1;
+	uint(size=3) VLD_SE    = 2;
+
+
+/*
+*
+* State variables
+*
+*/
+
+	uint(size=8)  BufferRbsp      := 0;
+	uint(size=3)  CountBufferRbsp := 0;
+
+	/* ue(v) */
+	bool          Bit1Found       := false;
+	uint(size=5)  leadingZeroBits := -1;
+	uint(size=31) CodeNum         := 0;
+
+	/* u(n) */
+	uint(size=5)  BitsCount       := 0;
+	uint(size=31) ReadValue       := 0;
+
+/*
+*
+* State variables
+*
+*/
+
+	function mask_bits( int(size=32)v, int(size=32)n ) --> int :
+		bitand( v, lshift(1,n)-1 )
+	end
+
+
+/*
+*
+* Actions
+*
+*/
+
+	IsEndOfNal: action
+			EndOfNal :[ValEndOfNal]
+				==>
+			SkipNal  :[true]
+		guard
+			ValEndOfNal = true
+		do
+//			println("EndOfNal");
+		end
+
+
+	IsVldUe: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = VLD_UE
+		do
+//			println("IsVldUe");
+			Bit1Found       := false;
+			leadingZeroBits := 0;
+			CodeNum         := 0;
+		end
+
+
+	IsVldSe: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = VLD_SE
+		do
+//			println("IsVldSe");
+			Bit1Found       := false;
+			leadingZeroBits := 0;
+			CodeNum         := 0;
+		end
+
+
+	IsReadBits: action
+			TypeOfVLD    :[ValTypeOfVLD],
+			EndOfNal     :[ValEndOfNal],
+			NbBitsToRead :[ValNbBits]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = READ_BITS
+		do
+//			println("IsReadBits");
+			BitsCount := ValNbBits;
+			ReadValue := 0;
+		end
+
+
+	Buffer.IsEmpty: action
+				==>
+			ReadNextByte :[true],
+			SkipNal      :[false]
+		guard
+			CountBufferRbsp = 0
+		do
+//			println("Buffer.IsEmpty");
+		end
+
+
+	Buffer.IsNotEmpty: action ==>
+		do
+//			println("Buffer.IsNotEmpty");
+		end
+
+
+	GetNextByte: action
+			RbspByte :[ValRbspByte]
+				==>
+		do
+//			println("GetNextByte");
+			CountBufferRbsp := 8;
+			BufferRbsp      := ValRbspByte;
+		end
+
+
+	GetCodeNum.Launch: action ==>
+		var
+			uint(size=5) NbBitsToAdd
+		do
+//			println("GetCodeNum.Launch");
+			if(not Bit1Found)then
+				while( (bitand(BufferRbsp,0x80) = 0) and (CountBufferRbsp > 0))
+				do
+					CountBufferRbsp := CountBufferRbsp - 1;
+					BufferRbsp      := lshift(BufferRbsp,1);
+					leadingZeroBits := leadingZeroBits + 1;
+				end
+				if(CountBufferRbsp > 0)then
+					leadingZeroBits := leadingZeroBits + 1;
+					Bit1Found       := true;
+				end
+			end
+			if(Bit1Found)then
+				NbBitsToAdd :=
+					if(CountBufferRbsp < leadingZeroBits)then
+						CountBufferRbsp
+					else
+						leadingZeroBits
+					end;
+				CodeNum         := lshift(CodeNum,NbBitsToAdd);
+				CodeNum         := CodeNum + mask_bits( rshift(BufferRbsp,8-NbBitsToAdd) , NbBitsToAdd);
+				leadingZeroBits := leadingZeroBits - NbBitsToAdd;
+				BufferRbsp      := lshift(BufferRbsp,NbBitsToAdd);
+				CountBufferRbsp := CountBufferRbsp - NbBitsToAdd;
+			end
+		end
+
+
+	GetCodeNum.Finished: action ==>
+		guard
+			leadingZeroBits = 0
+//			println("GetCodeNum.Finished");
+		end
+
+
+	GetCodeNum.NotFinished: action ==>
+		guard
+			leadingZeroBits != 0
+		do
+//			println("GetCodeNum.NotFinished");
+		end
+
+
+	SendUeValue: action
+				==>
+			ValDecoded :[CodeNum]
+		do
+			CodeNum := CodeNum - 1;
+//			println("SendUeValue");
+		end
+
+
+	SendSeValue: action
+				==>
+			ValDecoded :[CodeNum]
+		do
+			//CodeNum computed is equal to CodeNum + 1
+			if( (CodeNum mod 2) = 0 )then
+				CodeNum := CodeNum / 2;
+			else
+				CodeNum := -CodeNum / 2;
+			end
+//			println("SendSeValue");
+		end
+
+	Get_u.Launch: action ==>
+		var
+			uint(size=5) NbBitsToAdd
+		do
+//			println("Get_u.Launch");
+			NbBitsToAdd :=
+				if(CountBufferRbsp < BitsCount)then
+					CountBufferRbsp
+				else
+					BitsCount
+				end;
+			ReadValue       := lshift(ReadValue,NbBitsToAdd);
+			ReadValue       := ReadValue + mask_bits( rshift(BufferRbsp,8-NbBitsToAdd) , NbBitsToAdd);
+			BitsCount       := BitsCount - NbBitsToAdd;
+			BufferRbsp      := lshift(BufferRbsp,NbBitsToAdd);
+			CountBufferRbsp := CountBufferRbsp - NbBitsToAdd;
+		end
+
+
+	Get_u.Finished: action ==>
+		guard
+			BitsCount = 0
+		do
+//			println("Get_u.Finished");
+		end
+
+
+	Get_u.NotFinished: action ==>
+		guard
+			BitsCount != 0
+		do
+//			println("Get_u.NotFinished");
+		end
+
+
+	SendUValue: action
+				==>
+			ValDecoded :[ReadValue]
+		do
+//			println("SendUValue");
+		end
+
+
+/*
+*
+* Scheduler
+*
+*/
+
+	schedule fsm CheckVLDType:
+		CheckVLDType    (IsEndOfNal             )--> CheckVLDType;
+		CheckVLDType    (IsVldUe                )--> VLDecoding_Ue;
+		CheckVLDType    (IsVldSe                )--> VLDecoding_Se;
+		CheckVLDType    (IsReadBits             )--> Decode_u;
+
+
+		/* ue(v) decoding process */
+		VLDecoding_Ue   (Buffer.IsEmpty         )--> GetNextByte4ue;
+		VLDecoding_Ue   (Buffer.IsNotEmpty      )--> GetCodeNum4ue;
+
+		GetNextByte4ue  (GetNextByte            )--> GetCodeNum4ue;
+
+		GetCodeNum4ue   (GetCodeNum.Launch      )--> CheckCodeNum4ue;
+
+		CheckCodeNum4ue (GetCodeNum.NotFinished )--> VLDecoding_Ue;
+		CheckCodeNum4ue (GetCodeNum.Finished    )--> SendUeValue;
+
+		SendUeValue     (SendUeValue            )--> CheckVLDType;
+
+
+		/* se(v) decoding process */
+		VLDecoding_Se   (Buffer.IsEmpty         )--> GetNextByte4se;
+		VLDecoding_Se   (Buffer.IsNotEmpty      )--> GetCodeNum4se;
+
+		GetNextByte4se  (GetNextByte            )--> GetCodeNum4se;
+
+		GetCodeNum4se   (GetCodeNum.Launch      )--> CheckCodeNum4se;
+
+		CheckCodeNum4se (GetCodeNum.NotFinished )--> VLDecoding_Se;
+		CheckCodeNum4se (GetCodeNum.Finished    )--> SendUeValse;
+
+		SendUeValse     (SendSeValue            )--> CheckVLDType;
+
+
+		/* u(n) decoding process */
+		Decode_u        (Buffer.IsEmpty         )--> GetNextByte4u;
+		Decode_u        (Buffer.IsNotEmpty      )--> Get_u;
+
+		GetNextByte4u   (GetNextByte             )--> Get_u;
+
+		Get_u           (Get_u.Launch           )--> Check_u_Val;
+
+		Check_u_Val     (Get_u.NotFinished      )--> Decode_u;
+		Check_u_Val     (Get_u.Finished         )--> SendUValue;
+
+		SendUValue      (SendUValue             )--> CheckVLDType;
+	end
+	
+	priority
+		GetCodeNum.NotFinished > GetCodeNum.Finished;
+		Buffer.IsEmpty         > Buffer.IsNotEmpty;
+	end
+end

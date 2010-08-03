@@ -13,92 +13,51 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
-actor Algo_NALU ()
-		uint(size = 8) bits8
-			==>
-		uint(size = 8) RbspByte,
-		bool           NewNal
-			:
+actor Algo_Slice_layer_without_partitioning()
+	int (size=32) ValVLD,
+	bool          IsAnIdrPic,
+	bool          DecodeSliceHeaderDone
+//	bool          DecodeSliceDataDone
+		==>
+	bool          DecodeSliceHeader,
+//	bool          DecodeSliceData,
+	bool          SkipNal
+		:
 
 
-/*
-*
-* State variables
-*
-*/
-
-	uint(size = 8) fifo_lsb := 0;
-	uint(size = 8) fifo_msb := 0;
-
-
-/*
-*
-* Actions
-*
-*/
-
-
-	fill_fifo: action 
-			bits8:[b]
+	SliceHeader.Launch: action
 				==>
+			DecodeSliceHeader :[true]
 		do
-			fifo_msb   := fifo_lsb;
-			fifo_lsb   := b;
-		end /* fill_fifo */
-
-
-
-	Pattern.Is003Bytes: action
-			bits8:[b]
-				==>
-			RbspByte :[0,0],
-			NewNal     :[false,false]
-//		guard
-//			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
-		end 
-
-
-	Pattern.Is001Bytes: action
-			bits8:[b]
-				==>
-			NewNal     :[true]
-		guard
-			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 1)
-		end
-
-	NoPattern: action
-			bits8:[b]
-				==>
-			RbspByte :[ValRbsp],
-			NewNal   :[false]
-		guard
-			not( (fifo_msb = 0) and (fifo_lsb = 0)  and  ((b = 3) or (b = 1)) )
-		var
-			uint(size=8) ValRbsp
-		do
-			ValRbsp  := fifo_msb;
-			fifo_msb := fifo_lsb;
-			fifo_lsb := b;
+			println("SliceHeader not implemented yet");
 		end
 
 
-/*
-*
-* Scheduler
-*
-*/
+	SliceHeader.Done: action
+			DecodeSliceHeaderDone :[Val]
+				==>
+		end
 
-	schedule fsm fill_fifo1:
-		fill_fifo1 (fill_fifo )--> fill_fifo2;
 
-		fill_fifo2 (fill_fifo )--> fifo_full;
-	
-		fifo_full  (NoPattern )--> fifo_full;
-		fifo_full  (Pattern   )--> fill_fifo1;
+	SliceData.Launch: action ==>
+		do
+			println("SliceData not implemented yet");
+		end
+
+
+	SliceData.Done: action
+				==>
+			SkipNal :[true]
+		end
+
+
+	schedule fsm LaunchSliceHeader:
+		LaunchSliceHeader (SliceHeader.Launch )--> SliceHeaderDone;
+
+		SliceHeaderDone   (SliceHeader.Done   )--> LaunchSliceData;
+
+		LaunchSliceData   (SliceData.Launch   )--> SliceDataDone;
+
+		SliceDataDone     (SliceData.Done     )--> LaunchSliceHeader;
 	end
-
-	priority
-		NoPattern > Pattern.Is001Bytes > Pattern.Is003Bytes;
-	end /* priority */
-
-end /* actor */
+end

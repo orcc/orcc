@@ -54,23 +54,202 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 actor Algo_Check_NALU_type_Frext()
 	uint(size=8) RbspByte,
-	bool         ReadNextByte
-		==>
-	uint(size=8) Nalu_1
-		:
+	bool         NewNal,
 
-	Check_Nalu_type: action
-			ReadNextByte :[ReadAsked],
+	bool         SpsReadNextByte,
+	bool         SpsSkipNal,
+
+	bool         PpsReadNextByte,
+	bool         PpsSkipNal//,
+
+//	bool         PicReadNextByte,
+//	bool         PicSkipNal
+		==>
+	uint(size=8) SpsRbsp,
+	uint(size=8) PpsRbsp/*,
+	uint(size=8) PicRbsp,
+	bool         PicIsAnIdr
+*/		:
+
+
+/*
+* 
+* Constants 
+*
+*/
+	uint(size=5) NAL_SLICE_NON_IDR = 1;
+	uint(size=5) NAL_SLICE_IDR     = 42;//5;
+	uint(size=5) NAL_SPS           = 7;
+	uint(size=5) NAL_PPS           = 8;
+
+
+/*
+* 
+* State variables 
+*
+*/
+
+	uint(size=5) nal_unit_type := 0;
+	uint(size=2) nal_ref_idc   := 0;
+
+
+/*
+* 
+* Actions 
+*
+*/
+
+	WaitForNewNal: action
+			NewNal       :[IsNewNal],
 			RbspByte     :[ValRbsp]
 				==>
-			Nalu_1       :[ValRbsp]
-//		guard
-//			ReadAsked = true
+		guard
+			IsNewNal = false
 		do
-//			println("\tcheck_nalu:"+ValRbsp);
+			println("Skip : "+ValRbsp);	
 		end
 
-	schedule fsm Check_Nalu_type:
-		Check_Nalu_type (Check_Nalu_type )--> Check_Nalu_type;
+
+	NewNalDetected: action
+			NewNal :[IsNewNal]
+				==>
+		do
+			println("NewNalDetected");	
+		end
+
+
+	ReadNaluType: action
+			NewNal       :[IsNewNal],
+			RbspByte     :[ValRbsp]
+				==>
+		do
+			nal_unit_type := bitand( ValRbsp           , 0x1F );
+			nal_ref_idc   := bitand( rshift(ValRbsp,5) , 0x03 );
+			println("nal_unit_type:"+nal_unit_type+"; nal_ref_idc:"+nal_ref_idc);
+		end
+
+	IsSps: action ==>
+		guard
+			nal_unit_type = NAL_SPS
+		do
+			println("Is Sps");
+		end
+
+
+	IsPps: action ==>
+		guard
+			nal_unit_type = NAL_PPS
+		do
+			println("Is Pps");
+		end
+
+
+/*	IsSliceIdr: action
+				==>
+			PicIsAnIdr :[true]
+		guard
+			nal_unit_type = NAL_SLICE_IDR
+		do
+			println("Is SliceIdr");
+		end
+*/
+
+	NalUnitType_Unknown: action ==>
+		do
+			println("NalUnitType_Unknown");	
+		end
+
+
+	ReadData.Sps: action
+			NewNal          :[IsNewNal],
+			RbspByte        :[ValRbsp],
+			SpsReadNextByte :[ReadAsked],
+			SpsSkipNal      :[ValSkipNal]
+				==>
+			SpsRbsp         :[ValRbsp]
+		guard
+			ReadAsked  = true,
+			ValSkipNal = false,
+			IsNewNal   = false
+		end
+
+
+	ReadData.Pps: action
+			NewNal          :[IsNewNal],
+			RbspByte        :[ValRbsp],
+			PpsReadNextByte :[ReadAsked],
+			PpsSkipNal      :[ValSkipNal]
+				==>
+			PpsRbsp         :[ValRbsp]
+		guard
+			ReadAsked  = true,
+			ValSkipNal = false,
+			IsNewNal   = false
+		end
+
+
+/*	ReadData.SliceIdr: action
+			NewNal             :[IsNewNal],
+			RbspByte           :[ValRbsp],
+			PicReadNextByte :[ReadAsked],
+			PicSkipNal      :[ValSkipNal]
+				==>
+			PicRbsp         :[ValRbsp]
+		guard
+			ReadAsked  = true,
+			ValSkipNal = false,
+			IsNewNal   = false
+		end
+*/
+
+	SkipNalAsked.Sps: action
+			SpsSkipNal :[ValSkipNal]
+				==>
+		guard
+			ValSkipNal = true
+		end
+
+
+	SkipNalAsked.Pps: action
+			PpsSkipNal :[ValSkipNal]
+				==>
+		guard
+			ValSkipNal = true
+		end
+
+
+/*	SkipNalAsked.SliceIdr: action
+			PicSkipNal :[ValSkipNal]
+				==>
+		guard
+			ValSkipNal = true
+		end
+*/
+
+	schedule fsm WaitForNewNal:
+		WaitForNewNal      (WaitForNewNal         )--> WaitForNewNal;
+		WaitForNewNal      (NewNalDetected        )--> ReadNaluType;
+
+		ReadNaluType       (ReadNaluType          )--> CheckNaluType;
+
+//		CheckNaluType      (IsSliceIdr            )--> ReadData4SliceIdr;
+		CheckNaluType      (IsSps                 )--> ReadData4Sps;
+		CheckNaluType      (IsPps                 )--> ReadData4Pps;
+		CheckNaluType      (NalUnitType_Unknown   )--> undefined;
+
+		ReadData4Sps       (ReadData.Sps          )--> ReadData4Sps;
+		ReadData4Sps       (SkipNalAsked.Sps      )--> WaitForNewNal;
+
+		ReadData4Pps       (ReadData.Pps          )--> ReadData4Pps;
+		ReadData4Pps       (SkipNalAsked.Pps      )--> WaitForNewNal;
+
+/*		ReadData4SliceIdr  (ReadData.SliceIdr     )--> ReadData4SliceIdr;
+		ReadData4SliceIdr  (SkipNalAsked.SliceIdr )--> WaitForNewNal;	
+*/	end
+
+	priority
+		/*IsSliceIdr    >*/ IsPps          > IsSps > NalUnitType_Unknown;
+		ReadData      > SkipNalAsked;
+		WaitForNewNal > NewNalDetected;
 	end
 end
