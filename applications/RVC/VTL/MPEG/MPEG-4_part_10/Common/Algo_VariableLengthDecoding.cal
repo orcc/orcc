@@ -48,7 +48,7 @@ actor Algo_VariableLengthDecoding()
 	/* ue(v) */
 	bool          Bit1Found       := false;
 	uint(size=5)  leadingZeroBits := -1;
-	uint(size=31) CodeNum         := 0;
+	int (size=31) CodeNum         := 0;
 
 	/* u(n) */
 	uint(size=5)  BitsCount       := 0;
@@ -78,6 +78,7 @@ actor Algo_VariableLengthDecoding()
 		guard
 			ValEndOfNal = true
 		do
+			CountBufferRbsp := 0;
 //			println("EndOfNal");
 		end
 
@@ -207,7 +208,7 @@ actor Algo_VariableLengthDecoding()
 			ValDecoded :[CodeNum]
 		do
 			CodeNum := CodeNum - 1;
-//			println("SendUeValue");
+			println("\tUeValue:"+CodeNum);
 		end
 
 
@@ -222,6 +223,7 @@ actor Algo_VariableLengthDecoding()
 				CodeNum := -CodeNum / 2;
 			end
 //			println("SendSeValue");
+			println("\tSeValue:"+CodeNum);
 		end
 
 	Get_u.Launch: action ==>
@@ -264,6 +266,7 @@ actor Algo_VariableLengthDecoding()
 			ValDecoded :[ReadValue]
 		do
 //			println("SendUValue");
+			println("\tUValue:"+ReadValue);
 		end
 
 

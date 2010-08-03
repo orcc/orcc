@@ -14,11 +14,14 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
 actor Algo_DecodeSps()
-	int (size=32) ValVLD
+	int (size=32) ValVLD,
+	uint(size=5)  SpsAsked
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
-	bool          SkipNal
+	bool          SkipNal,
+
+	uint(size=32) log2_max_frame_num
 		:
 
 
@@ -110,6 +113,11 @@ actor Algo_DecodeSps()
 //			println("ReadSps");
 		end
 
+	SpsParam.Asked: action
+			SpsAsked :[ValSps]
+				==>
+			log2_max_frame_num :[log2_max_frame_num_minus4[ValSps] + 4]
+		end
 
 	ReadSpsId.Done: action
 			ValVLD :[ValueOfVLD] repeat 5
@@ -398,6 +406,7 @@ actor Algo_DecodeSps()
 	schedule fsm AskReadSpsId:
 		AskReadSpsId                 (ReadSpsId.Asked                )--> ReadSpsIdDone;
 
+		ReadSpsIdDone                (SpsParam.Asked                 )--> ReadSpsIdDone;
 		ReadSpsIdDone                (ReadSpsId.Done                 )--> CheckChromaFormatIdc;
 
 		CheckChromaFormatIdc         (ReadChromaFormatIdc.Asked      )--> ReadChormaFormatIdcDone;
@@ -445,6 +454,7 @@ actor Algo_DecodeSps()
 	end
 
 	priority
+		SpsParam.Asked               > ReadSpsId.Done;
 		ReadChromaFormatIdc.Asked    > Read_MaxFrameNum_PocType.Asked;
 		ReadPocType.IsEqualTo0       > ReadPocType.IsEqualTo1          > ReadNumRefFrame.Asked;
 		CheckNumRefInPocCycle        > ReadNumRefFrame.Asked;

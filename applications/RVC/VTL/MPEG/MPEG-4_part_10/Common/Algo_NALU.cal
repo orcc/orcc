@@ -37,7 +37,6 @@ actor Algo_NALU ()
 *
 */
 
-
 	fill_fifo: action 
 			bits8:[b]
 				==>
@@ -51,10 +50,10 @@ actor Algo_NALU ()
 	Pattern.Is003Bytes: action
 			bits8:[b]
 				==>
-			RbspByte :[0,0],
-			NewNal     :[false,false]
-//		guard
-//			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
+			RbspByte :[  0  ,  0  ],
+			NewNal   :[false,false]
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
 		end 
 
 

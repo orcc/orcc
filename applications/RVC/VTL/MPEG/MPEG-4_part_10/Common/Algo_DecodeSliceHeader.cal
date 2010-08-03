@@ -13,93 +13,123 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
-actor Algo_Slice_layer_without_partitioning()
-	bool          IsAnIdrPic,
-//	bool          DecodeSliceDataDone
-
+actor Algo_DecodeSliceHeader()
 	int (size=32) ValVLD,
-
-	uint(size=3)  HeaderTypeOfVLD,
-	uint(size=5)  HeaderNbBitsToRead,
-	bool          HeaderSkipNal
+	
+	uint(size=32) log2_max_frame_num
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
 	bool          SkipNal,
 
-	int (size=32) HeaderValVLD
+	uint(size=8)  GetPps
 		:
 
 
-/*
+/*   
 *
 * Constants
 *
 */
 
 	uint(size=3) READ_BITS = 0;
+	uint(size=3) VLD_UE    = 1;
+	uint(size=3) VLD_SE    = 2;
 
-	SliceHeader.GetVLDVal: action
-			ValVLD       :[VLDecoding]
+
+/*   
+*
+* State variables
+*
+*/
+
+	uint(size=32) first_mb_in_slice;
+	uint(size=4)  slice_type;
+	bool          separate_colour_plane_flag := false;
+
+/*   
+*
+* Actions
+*
+*/
+
+	ReadSliceType.Asked: action
+			==>
+			//              first_ , slice_ , pic_par
+			SkipNal      :[  false ,  false ,  false ],//Keep synchro
+			TypeOfVLD    :[ VLD_UE , VLD_UE , VLD_UE ]
+	end
+
+
+	ReadSliceType.Done: action
+			ValVLD :[ValueOfVLD] repeat 3
 				==>
-			HeaderValVLD :[VLDecoding]
+			GetPps :[ValueOfVLD[2]]
+		do
+			first_mb_in_slice := ValueOfVLD[0];
+			slice_type        :=
+				if( ValueOfVLD[1] < 5) then
+					ValueOfVLD[1]
+				else
+					ValueOfVLD[1] - 5
+				end;
+			println("\t\tfirst_mb_in_slice:"+first_mb_in_slice);
+			println("\t\tslice_type:       "+slice_type);
+			println("\t\tpps_id:           "+ValueOfVLD[2]);
+			//pps_id            := ValueOfVLD[2]; ==> don't need
+			//Ask sps_id
+			//Ask and get separate_colour_plane_flag ==> not implemented in decodeSpsHeader yet !!
 		end
 
-
-	SliceHeader.AskVLD: action
-			HeaderTypeOfVLD :[ValTypeOfVLD],
-			HeaderSkipNal   :[EndOfDecoding]
+	SeparateColourPlane.IsEqualToTrue: action
 				==>
-			TypeOfVLD       :[ValTypeOfVLD],
-			SkipNal         :[false]
+			//           colour_plane_id
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     2     ]
 		guard
-			ValTypeOfVLD  != READ_BITS,
-			EndOfDecoding  = false
+			separate_colour_plane_flag = true
 		end
 
 
-	SliceHeader.AskReadBits: action
-			HeaderTypeOfVLD    :[ValTypeOfVLD],
-			HeaderNbBitsToRead :[NbBits],
-			HeaderSkipNal      :[EndOfDecoding]
+	ReadFrameNum.Asked: action
+			log2_max_frame_num :[SzMaxFrameNum]
 				==>
-			TypeOfVLD          :[ValTypeOfVLD],
-			NbBitsToRead       :[NbBits],
-			SkipNal            :[false]
-		guard
-			ValTypeOfVLD  = READ_BITS,
-			EndOfDecoding = false
+			//                frame_num
+			SkipNal      :[     false     ],//Keep synchro
+			TypeOfVLD    :[   READ_BITS   ],
+			NbBitsToRead :[ SzMaxFrameNum ]
 		end
 
 
-	SliceHeader.Done: action
-			HeaderSkipNal :[EndOfDecoding]
+	ReadFrameNum.Done: action
+			ValVLD :[ValueOfVLD]
 				==>
-		guard
-			EndOfDecoding = true
+		do
+			println("\t\tFrame num:"+ValueOfVLD);
 		end
 
-
-	SliceData.Done: action
+	SendEndSliceHeader: action
 				==>
-			SkipNal : [true]
+			SkipNal :[true]
 		end
 
+	
 
-	schedule fsm LaunchSliceHeader:
-		LaunchSliceHeader (SliceHeader.AskVLD      )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.AskReadBits )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.GetVLDVal   )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.Done        )--> LaunchSliceData;
+	schedule fsm ReadSliceTypeAsked:
+		ReadSliceTypeAsked (ReadSliceType.Asked )--> ReadSliceTypeDone;
 
-/*		LaunchSliceData   (SliceData.AskVLD        )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.AskReadBits   )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.GetVLDVal     )--> LaunchSliceData;*/
-		LaunchSliceData   (SliceData.Done          )--> LaunchSliceHeader;
+		ReadSliceTypeDone  (ReadSliceType.Done  )--> CheckSeparateColourPlane;
+
+		CheckSeparateColourPlane (SeparateColourPlane.IsEqualToTrue )--> undefined; //Not implemented yet
+		CheckSeparateColourPlane (ReadFrameNum.Asked )-->ReadFrameNumDone;
+
+		ReadFrameNumDone  (ReadFrameNum.Done )-->EndSliceHeader;
+
+		EndSliceHeader           (SendEndSliceHeader )--> ReadSliceTypeAsked;
 	end
 
 	priority
-		SliceHeader.GetVLDVal > SliceHeader.AskVLD > SliceHeader.AskReadBits > SliceHeader.Done;
-//		SliceData.GetVLDVal   > SliceData.AskVLD   > SliceData.AskReadBits   > SliceData.Done;
+		SeparateColourPlane > ReadFrameNum;
 	end
 end

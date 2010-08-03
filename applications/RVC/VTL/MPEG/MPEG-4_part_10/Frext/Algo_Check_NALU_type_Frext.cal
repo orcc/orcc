@@ -60,16 +60,16 @@ actor Algo_Check_NALU_type_Frext()
 	bool         SpsSkipNal,
 
 	bool         PpsReadNextByte,
-	bool         PpsSkipNal//,
+	bool         PpsSkipNal,
 
-//	bool         PicReadNextByte,
-//	bool         PicSkipNal
+	bool         PicReadNextByte,
+	bool         PicSkipNal
 		==>
 	uint(size=8) SpsRbsp,
-	uint(size=8) PpsRbsp/*,
+	uint(size=8) PpsRbsp,
 	uint(size=8) PicRbsp,
 	bool         PicIsAnIdr
-*/		:
+		:
 
 
 /*
@@ -78,7 +78,7 @@ actor Algo_Check_NALU_type_Frext()
 *
 */
 	uint(size=5) NAL_SLICE_NON_IDR = 1;
-	uint(size=5) NAL_SLICE_IDR     = 42;//5;
+	uint(size=5) NAL_SLICE_IDR     = 5;
 	uint(size=5) NAL_SPS           = 7;
 	uint(size=5) NAL_PPS           = 8;
 
@@ -106,7 +106,7 @@ actor Algo_Check_NALU_type_Frext()
 		guard
 			IsNewNal = false
 		do
-			println("Skip : "+ValRbsp);	
+	//		println("Skip : "+ValRbsp);	
 		end
 
 
@@ -144,15 +144,25 @@ actor Algo_Check_NALU_type_Frext()
 		end
 
 
-/*	IsSliceIdr: action
+	IsSliceIdr: action
 				==>
 			PicIsAnIdr :[true]
 		guard
 			nal_unit_type = NAL_SLICE_IDR
 		do
 			println("Is SliceIdr");
-		end
-*/
+		end	
+
+
+	IsSliceNonIdr: action
+				==>
+			PicIsAnIdr :[false]
+		guard
+			nal_unit_type = NAL_SLICE_NON_IDR
+		do
+			println("Is SliceNonIdr");
+		end	
+
 
 	NalUnitType_Unknown: action ==>
 		do
@@ -188,7 +198,7 @@ actor Algo_Check_NALU_type_Frext()
 		end
 
 
-/*	ReadData.SliceIdr: action
+	ReadData.SliceIdr: action
 			NewNal             :[IsNewNal],
 			RbspByte           :[ValRbsp],
 			PicReadNextByte :[ReadAsked],
@@ -200,7 +210,7 @@ actor Algo_Check_NALU_type_Frext()
 			ValSkipNal = false,
 			IsNewNal   = false
 		end
-*/
+
 
 	SkipNalAsked.Sps: action
 			SpsSkipNal :[ValSkipNal]
@@ -218,37 +228,38 @@ actor Algo_Check_NALU_type_Frext()
 		end
 
 
-/*	SkipNalAsked.SliceIdr: action
+	SkipNalAsked.SliceIdr: action
 			PicSkipNal :[ValSkipNal]
 				==>
 		guard
 			ValSkipNal = true
 		end
-*/
+
 
 	schedule fsm WaitForNewNal:
-		WaitForNewNal      (WaitForNewNal         )--> WaitForNewNal;
-		WaitForNewNal      (NewNalDetected        )--> ReadNaluType;
+		WaitForNewNal  (WaitForNewNal         )--> WaitForNewNal;
+		WaitForNewNal  (NewNalDetected        )--> ReadNaluType;
 
-		ReadNaluType       (ReadNaluType          )--> CheckNaluType;
+		ReadNaluType   (ReadNaluType          )--> CheckNaluType;
 
-//		CheckNaluType      (IsSliceIdr            )--> ReadData4SliceIdr;
-		CheckNaluType      (IsSps                 )--> ReadData4Sps;
-		CheckNaluType      (IsPps                 )--> ReadData4Pps;
-		CheckNaluType      (NalUnitType_Unknown   )--> undefined;
+		CheckNaluType  (IsSliceIdr            )--> ReadData4Slice;
+		CheckNaluType  (IsSliceNonIdr         )--> ReadData4Slice;	
+		CheckNaluType  (IsSps                 )--> ReadData4Sps;
+		CheckNaluType  (IsPps                 )--> ReadData4Pps;
+		CheckNaluType  (NalUnitType_Unknown   )--> undefined;
 
-		ReadData4Sps       (ReadData.Sps          )--> ReadData4Sps;
-		ReadData4Sps       (SkipNalAsked.Sps      )--> WaitForNewNal;
+		ReadData4Sps   (ReadData.Sps          )--> ReadData4Sps;
+		ReadData4Sps   (SkipNalAsked.Sps      )--> WaitForNewNal;
 
-		ReadData4Pps       (ReadData.Pps          )--> ReadData4Pps;
-		ReadData4Pps       (SkipNalAsked.Pps      )--> WaitForNewNal;
+		ReadData4Pps   (ReadData.Pps          )--> ReadData4Pps;
+		ReadData4Pps   (SkipNalAsked.Pps      )--> WaitForNewNal;
 
-/*		ReadData4SliceIdr  (ReadData.SliceIdr     )--> ReadData4SliceIdr;
-		ReadData4SliceIdr  (SkipNalAsked.SliceIdr )--> WaitForNewNal;	
-*/	end
+		ReadData4Slice (ReadData.SliceIdr     )--> ReadData4Slice;
+		ReadData4Slice (SkipNalAsked.SliceIdr )--> WaitForNewNal;	
+	end
 
 	priority
-		/*IsSliceIdr    >*/ IsPps          > IsSps > NalUnitType_Unknown;
+		IsSliceNonIdr > IsSliceIdr     > IsPps > IsSps > NalUnitType_Unknown;
 		ReadData      > SkipNalAsked;
 		WaitForNewNal > NewNalDetected;
 	end

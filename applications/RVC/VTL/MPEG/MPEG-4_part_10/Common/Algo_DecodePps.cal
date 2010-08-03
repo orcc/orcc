@@ -14,11 +14,14 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
 actor Algo_DecodePps()
-	int (size=32) ValVLD
+	int (size=32) ValVLD,
+	uint(size=8)  PpsAsked
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
-	bool          SkipNal
+	bool          SkipNal,
+
+	uint(size=5)  GetSps
 		:
 
 
@@ -77,6 +80,12 @@ actor Algo_DecodePps()
 			SkipNal      :[  false ,  false ,   false   ,   false   ,  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE , VLD_UE , READ_BITS , READ_BITS , VLD_UE ],
 			NbBitsToRead :[                       1     ,     1              ]
+		end
+
+	PpsParam.Asked: action
+			PpsAsked: [ValPps]
+				==>
+			GetSps :[sequence_parameter_set_id[ValPps]]
 		end
 
 
@@ -271,9 +280,10 @@ actor Algo_DecodePps()
 */
 
 	schedule fsm AskReadPpsId:
-		AskReadPpsId              (ReadPpsId.Asked                          )--> ReadPpsIdDone;
+		AskReadPpsId              (ReadPpsId.Asked                          )--> ReadPpsIdDoneOrPpsAsked;
 
-		ReadPpsIdDone             (ReadPpsId.Done                           )--> CheckNumSliceGroup;
+		ReadPpsIdDoneOrPpsAsked   (PpsParam.Asked                           )--> ReadPpsIdDoneOrPpsAsked;
+		ReadPpsIdDoneOrPpsAsked   (ReadPpsId.Done                           )--> CheckNumSliceGroup;
 
 		CheckNumSliceGroup        (ReadSliceGroupMapType.IsAsked            )--> ReadSliceGroupMapType;
 		CheckNumSliceGroup        (ReadNumRefIdx.Asked                      )--> ReadNumRefIdxDone;
@@ -309,6 +319,7 @@ actor Algo_DecodePps()
 		EndPPS                    (SendEndPps                               )--> AskReadPpsId;
 	end
 	priority
+		PpsParam.Asked                           > ReadPpsId.Done;
 		ReadSliceGroupMapType.IsAsked            > ReadNumRefIdx.Asked;
 		CheckSliceGroupMapType                   > ReadNumRefIdx.Asked;
 		CheckNumSliceGroup.SliceGroupMapEqualTo0 > ReadNumRefIdx.Asked;
