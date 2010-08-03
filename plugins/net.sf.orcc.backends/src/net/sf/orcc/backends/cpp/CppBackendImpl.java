@@ -106,7 +106,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				false);
+				true);
 
 		if (partition) {
 			partitioning = true;
@@ -114,7 +114,7 @@ public class CppBackendImpl extends AbstractBackend {
 			if (network.getNetworks().size() > 1) {
 				try {
 					network.computeTemplateMaps();
-					new CppHeaderPrinter().print(path, network);
+					new CppConfigPrinter().print(path, network);
 				} catch (IOException e) {
 					throw new OrccException("I/O error", e);
 				}

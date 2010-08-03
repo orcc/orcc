@@ -4,16 +4,32 @@ $$actor.name$.cpp
 $endif$
 >>
 
+
+addLibraries(instance) ::= <<
+$if(instance.serdes)$
+add_library(LibAdaptorConfig STATIC \${LIBCAL2CPP_ROOT_PATH}/src/LibAdaptorConfig.cpp)
+add_library(LibWrapper STATIC \${LIBCAL2CPP_ROOT_PATH}/src/wrapperaka.cpp)
+$endif$
+>>
+
+addDependencies(instance) ::= <<
+$if(instance.serdes)$
+add_dependencies($network.name$ LibWrapper LibAdaptorConfig)
+$endif$
+>>
+targetLinkWrapper(instance) ::= <<
+$if(instance.serdes)$
+LibAdaptorFactory LibWrapper LibAdaptorConfig
+$endif$
+>>
+
+
 Cpp_CMakeLists(network) ::= <<
 # Generated from $network.name$
 
 cmake_minimum_required (VERSION 2.8)
 project ($network.name$)
 
-if(MSVC)
-set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /ZI /Ob0 /Od /RTC1")
-set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
-endif(MSVC)
 
 
 # Common include directories
@@ -28,17 +44,20 @@ link_directories(
 
 $!$network.networks : addLibraries()$!$
 
+$network.instances: addLibraries()$
 
 add_executable ($network.name$
 $network.name$.cpp
 $network.actors : addActor()$
 )
 
+$network.instances: addDependencies()$
 
 target_link_libraries($network.name$
 LibOrcc
 LibCALaka
 LibThread
+$network.instances: targetLinkWrapper()$
 )
 
 >>

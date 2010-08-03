@@ -12,12 +12,12 @@ import net.sf.orcc.network.Network;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 
-public class CppHeaderPrinter {
+public class CppConfigPrinter {
 
 	private STGroup group;
 
-	public CppHeaderPrinter() throws OrccException {
-		group = TemplateGroupLoader.loadGroup("Cpp_Header");
+	public CppConfigPrinter() throws OrccException {
+		group = TemplateGroupLoader.loadGroup("Cpp_Codesign");
 	}
 
 	public void print(String path, Network network) throws IOException {
@@ -30,6 +30,17 @@ public class CppHeaderPrinter {
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();
+		
+		template = group.getInstanceOf("AdaptorConfig");
+		template.add("network", network);
+
+		fileName = path + File.separator + "AdaptorConfig.h";
+
+		b = template.render(80).getBytes();
+		os = new FileOutputStream(fileName);
+		os.write(b);
+		os.close();
+
 	}
 
 }

@@ -25,9 +25,7 @@ $instance.parameters.(parameter)$
 >>
 
 initializeInstance(instance) ::= <<
-$if (!instance.serdes)
-$$instance.id$($instance.actor.parameters.list: argumentList(); separator=", "$)$
-endif$
+$instance.id$($instance.actor.parameters.list: argumentList(); separator=", "$)
 >>
 
 initializeInstances(instances) ::= <<
@@ -74,10 +72,13 @@ $endif$
 
 doAssignTargetPort(source, sourcePort, target) ::= <<
 $source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, $network.name$_$target.name$);
+
 >>
 
 doAssignSourcePort(source, target, targetPort) ::= <<
-$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, $network.name$_$source.name$);>>
+$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, $network.name$_$source.name$);
+
+>>
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 $if (source.actor)$$
