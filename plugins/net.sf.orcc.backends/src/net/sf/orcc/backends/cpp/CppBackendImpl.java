@@ -36,9 +36,6 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
-import net.sf.orcc.backends.cpp.codesign.CppHeaderPrinter;
-import net.sf.orcc.backends.cpp.codesign.NetworkPartitioner;
-import net.sf.orcc.backends.cpp.codesign.SerDesAdder;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
@@ -92,22 +89,6 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
-		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				false);
-
-		if (partition) {
-			partitioning = true;
-			partitioner.transform(network);
-			if (network.getNetworks().size() > 1) {
-				try {
-					network.computeTemplateMaps();
-					new CppHeaderPrinter().print(path, network);
-				} catch (IOException e) {
-					throw new OrccException("I/O error", e);
-				}
-			}
-		}
-
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
 			network.classifyActors();
@@ -124,6 +105,22 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 		}
 
+		boolean partition = getAttribute("net.sf.orcc.backends.partition",
+				false);
+
+		if (partition) {
+			partitioning = true;
+			partitioner.transform(network);
+			if (network.getNetworks().size() > 1) {
+				try {
+					network.computeTemplateMaps();
+					new CppHeaderPrinter().print(path, network);
+				} catch (IOException e) {
+					throw new OrccException("I/O error", e);
+				}
+			}
+		}
+
 		printer = new STPrinter();
 		printer.loadGroups("C_actor", "Cpp_actorDecl");
 		printer.setExpressionPrinter(CppExprPrinter.class);
@@ -135,8 +132,7 @@ public class CppBackendImpl extends AbstractBackend {
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
-
-		printActors(network.getActors());
+		printActors(actors);
 
 		// print network
 		write("Printing network...\n");

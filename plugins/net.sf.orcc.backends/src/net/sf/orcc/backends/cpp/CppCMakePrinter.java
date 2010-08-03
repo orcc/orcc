@@ -76,7 +76,7 @@ public class CppCMakePrinter {
 		ST template = group.getInstanceOf("Cpp_CMakeLists");
 		template.add("network", network);
 
-		String fileName = path + File.separator + "CMakeLists.txt";
+		String fileName = path + File.separator + network.getName()+".cmake";
 
 		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
