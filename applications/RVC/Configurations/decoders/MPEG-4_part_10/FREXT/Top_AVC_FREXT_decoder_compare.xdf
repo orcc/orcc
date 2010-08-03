@@ -25,7 +25,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="AVC_FREXT_decoder"/>
+        <Class name="AVC_FREXT_decoder_old"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
