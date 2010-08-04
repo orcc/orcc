@@ -71,13 +71,12 @@
 // * In advance action, indices adjust after every 4 components instead of 6 since now
 //   dealing with 4 8x8 blocks rather than 6 8x8 blocks.
 
-actor GUC_Algo_DCRinvpred_luma_16x16 () bool NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED, int(size=MB_COORD_SZ + 2) A, int(size=MB_COORD_SZ +
-2) B, int(size=MB_COORD_SZ + 2) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP, int (size=2)TYPE ==>
+actor GUC_Algo_DCRinvpred_luma_16x16 () bool NEW_VOP, int(size=16) WIDTH, bool AC_CODED, int(size=MB_COORD_SZ + 2) A, int(size=MB_COORD_SZ +
+2) B, int(size=MB_COORD_SZ + 2) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP, int (size=2)BTYPE, bool AC_PRED ==>
 int(size=SAMPLE_SZ) QF_DC , int(size=MB_COORD_SZ + 2) PTR , int(size=3) AC_PRED_DIR , bool
 SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 
 // Port size declaration
-	int BTYPE_SZ = 12;
 
 	int MB_COORD_SZ = 8;
 
@@ -89,16 +88,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 
 	int DCVAL = 128*8;
 
-	int NEWVOP = 2048;
-
-	int INTRA = 1024;
-
-	int INTER = 512;
-
-	int ACCODED = 2;
-
-	int ACPRED = 1;
-
+	
 	// Use 3 address lines for component index to save address calculation effort
 	// Also, location 0 is reserved for all uncoded blocks. This protocol must
 	// be identical to the buffer addressing in DCR_addressing_16x16.cal and IAP_16x16.cal, 
@@ -165,7 +155,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	end
 
 	// Check for an INTER block with coded AC coefficients
-	read.inter_ac: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], QP:[ qp ], TYPE:[btype] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ],
+	read.inter_ac: action NEW_VOP:[newvop], AC_CODED:[ac_coded], AC_PRED:[ac_pred], QP:[ qp ], BTYPE:[btype] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ],
 		QUANT:[ s_qp ], PREV_QUANT:[ s_prev_qp ]
 	guard
 		btype=1,
@@ -180,7 +170,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	end
 
 	// Any other block except INTRA
-	read.other: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], QP:[ qp ], TYPE:[btype] ==> AC_PRED_DIR:[ -1 ]
+	read.other: action NEW_VOP:[newvop], AC_CODED:[ac_coded], AC_PRED:[ac_pred], QP:[ qp ], BTYPE:[btype] ==> AC_PRED_DIR:[ -1 ]
 	guard
 		not ac_coded,
 		btype!=2,
@@ -216,7 +206,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	end
 
 	// Read an INTRA block
-	read.intra: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], TYPE:[btype], AC_CODED:[ac_coded], QP:[ qp ], A:[ a ], B:[ b ], C:[ c ] ==> PTR:[ if top then
+	read.intra: action NEW_VOP:[newvop], BTYPE:[btype], AC_CODED:[ac_coded], AC_PRED:[ac_pred], QP:[ qp ], A:[ a ], B:[ b ], C:[ c ] ==> PTR:[ if top then
 			c
 		else
 			a
@@ -227,8 +217,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	var
 		int(size=SAMPLE_SZ) dca = dc_buf[a] , int(size=SAMPLE_SZ) dcb = dc_buf[b] ,
 		int(size=SAMPLE_SZ) dcc = dc_buf[c] , int(size=SAMPLE_SZ) horiz = abs(dcb - dcc) ,
-		int(size=SAMPLE_SZ) vert = abs(dca - dcb) , bool top = vert < horiz , int(size=3) s , bool ac =
-		bitand(cmd, ACPRED) != 0
+		int(size=SAMPLE_SZ) vert = abs(dca - dcb) , bool top = vert < horiz , int(size=3) s 
 	do
 		s_qp := qp;
 		s_prev_qp := qp;
@@ -241,7 +230,7 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 			dca
 		end) + rshift(scaler, 1)) / scaler;
 		// See ISO/IEC 14496-2 Section 7.4.3.2.
-		s := if not ac then
+		s := if not ac_pred then
 			0
 		else
 			if top then

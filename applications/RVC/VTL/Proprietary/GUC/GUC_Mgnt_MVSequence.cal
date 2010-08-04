@@ -10,13 +10,10 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
-actor GUC_Mgnt_MVSequence (int FOURMV,
-	int NEWVOP,
-	int INTER) 
-	bool NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE, bool MOT, int (size=2) TYPE ==> int(size=MB_COORD_SZ + 3) A:
+actor GUC_Mgnt_MVSequence () 
+	bool NEW_VOP, int(size=16) WIDTH, bool MOT, int (size=2) BTYPE, bool FOUR_MV ==> int(size=MB_COORD_SZ + 3) A:
 
 	// Port size declaration
-	int BTYPE_SZ = 12;
 
 	int MB_COORD_SZ = 8;
 
@@ -101,14 +98,14 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 
-	read.noPredict: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==>
+	read.noPredict: action NEW_VOP:[newvop], MOT:[mot], BTYPE:[btype], FOUR_MV:[four_mv] ==>
 	guard
 		not(newvop),
 		comp > 3 
 		or btype!=1
 		or not mot 
-		or (comp != 0 and bitand(cmd, FOURMV)
-		= 0)
+		or (comp != 0 and 
+		not(four_mv))
 	do
 		comp := comp + 1;
 		if comp = 6 then
@@ -132,7 +129,7 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 
 	// Locate prediction indices:
 	// block 0 left->1   above->2    above_right->3
-	read.predict.y0: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==> A:[ access(pl, 1), access(pa, 2), access(par, 2) ]
+	read.predict.y0: action NEW_VOP:[newvop], MOT:[mot], BTYPE:[btype], FOUR_MV:[four_mv] ==> A:[ access(pl, 1), access(pa, 2), access(par, 2) ]
 	guard
 		not(newvop),
 		btype=1,
@@ -157,12 +154,12 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 	// block 1    0      above->3    above_right->2
-	read.predict.y1: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot] ,TYPE:[btype]==> A:[ access(ptr, 0), access(pa, 3), access(par, 2) ]
+	read.predict.y1: action NEW_VOP:[newvop], MOT:[mot] ,BTYPE:[btype], FOUR_MV:[four_mv]==> A:[ access(ptr, 0), access(pa, 3), access(par, 2) ]
 	guard
 		not(newvop),
 		btype=1,
 		mot,
-		bitand(cmd, FOURMV) != 0,
+		four_mv,
 		comp = 1
 	var
 		int(size=MB_COORD_SZ) pa = if top_edge then
@@ -179,12 +176,12 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 	// block 2 left->3       0            1
-	read.predict.y2: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==> A:[ access(pl, 3), access(ptr, 0), access(ptr, 1) ]
+	read.predict.y2: action NEW_VOP:[newvop], MOT:[mot], BTYPE:[btype], FOUR_MV:[four_mv] ==> A:[ access(pl, 3), access(ptr, 0), access(ptr, 1) ]
 	guard
 		not(newvop),
 		btype=1,
 		mot,
-		bitand(cmd, FOURMV) != 0,
+		four_mv,
 		comp = 2
 	var
 		int(size=MB_COORD_SZ) pl = if mbx = 0 then
@@ -197,13 +194,13 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 	// block 3    2          0            1
-	read.predict.y3: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==> A:[ access(ptr, 2), access(ptr, 0), access(ptr, 1)
+	read.predict.y3: action NEW_VOP:[newvop], MOT:[mot], BTYPE:[btype], FOUR_MV:[four_mv] ==> A:[ access(ptr, 2), access(ptr, 0), access(ptr, 1)
 		]
 	guard
 		not(newvop),
 		btype=1,
 		mot,
-		bitand(cmd, FOURMV) != 0,
+		four_mv,
 		comp = 3
 	do
 		comp := comp + 1;

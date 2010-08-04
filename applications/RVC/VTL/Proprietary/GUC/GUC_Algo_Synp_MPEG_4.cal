@@ -41,25 +41,11 @@
 
 //  The INTRA type also has ACPRED
 
-actor GUC_Algo_Synp_MPEG_4 (
-    // Maximum image width (in units of macroblocks) that the decoder can handle.
-    // It is used to allocate line buffer space at compile time.
-  int ROUND_TYPE,
-  int FCODE_MASK,
-  int FCODE_SHIFT,
-  int ACPRED,
-  int FOURMV,
-  int NEWVOP,
-  int INTRA,
-  int INTER,
-  int ACCODED,
-  int MOTION
- ) bool bits ==> bool NEW_VOP, bool ROUND, int(size=VOP_FCODE_FOR_LENGTH+1) FCODE, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
-  bool LAST, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BITS_QUANT+1) QP, int (size=BTYPE_SZ)BLOCKTYPE, bool AC_CODED, bool MOT, int(size=2) TYPE :
+actor GUC_Algo_Synp_MPEG_4 () bool bits ==> bool NEW_VOP, bool ROUND, int(size=VOP_FCODE_FOR_LENGTH+1) FCODE, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
+  bool LAST, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BITS_QUANT+1) QP, bool AC_CODED, bool MOT, bool AC_PRED, int(size=2) BTYPE, bool FOUR_MV :
 
 
   // Port size declaration
-  int BTYPE_SZ			= 12;
   int MB_COORD_SZ 		= 8;
   int SAMPLE_SZ 		= 13;
   int MV_SZ				= 9;
@@ -425,7 +411,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
 
   // Nothing to do - uncoded
   mcbpc_pvop_uncoded: action bits:[b] ==>
-       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ false ], AC_CODED:[false], MOT:[false], TYPE:[0]
+       QP:[vop_quant], NEW_VOP:[ false ], AC_CODED:[false], MOT:[false], BTYPE:[0], AC_PRED:[false], FOUR_MV:[false]
   guard
     not prediction_is_IVOP
   do
@@ -435,7 +421,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mcbpc_pvop_uncoded1: action ==>
-       QP:[vop_quant], BLOCKTYPE: [INTER], NEW_VOP:[ false ], AC_CODED:[false], MOT:[false], TYPE:[0]
+       QP:[vop_quant],  NEW_VOP:[ false ], AC_CODED:[false], MOT:[false], BTYPE:[0], AC_PRED:[false], FOUR_MV:[false]
   end
 
   bool acpredflag;
@@ -534,20 +520,16 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
     next_mbxy();
   end
 
-  mb_dispatch_intra: action ==> QP:[vop_quant], BLOCKTYPE: [cmd], NEW_VOP:[ false ], AC_CODED:[ac_coded], MOT:[false], TYPE:[2]
+  mb_dispatch_intra: action ==> QP:[vop_quant], NEW_VOP:[ false ], AC_CODED:[ac_coded], MOT:[false], BTYPE:[2], AC_PRED:[acpredflag], FOUR_MV:[fourmvflag]
   guard
     btype_is_INTRA
-  var
-    int(size=BTYPE_SZ) cmd := INTRA
   do
     ac_coded := bitand( cbp, lshift( 1,  5 - comp)) != 0;
-    cmd := bitor( cmd, if ac_coded then ACCODED else 0 end );
-    cmd := bitor( cmd, if acpredflag then ACPRED else 0 end );
+    
   end
 
   mb_dispatch_inter_no_ac: action ==> QP:[vop_quant], 
-  BLOCKTYPE: [bitor( INTER, bitor( MOTION, if fourmvflag then FOURMV else 0 end ) )], NEW_VOP:[ false ], 
-  AC_CODED:[ac_coded], MOT:[true], TYPE:[1]
+  NEW_VOP:[ false ], AC_CODED:[ac_coded], MOT:[true], BTYPE:[1], AC_PRED:[acpredflag], FOUR_MV:[fourmvflag]
   guard
     bitand( cbp, lshift( 1,  5 - comp)) = 0
   do
@@ -556,8 +538,7 @@ send_new_vop_height: action ==>  HEIGHT: [ vol_height ] end
   end
 
   mb_dispatch_inter_ac_coded: action ==> QP:[vop_quant], 
-  BLOCKTYPE: [bitor(bitor( INTER, ACCODED ), bitor( MOTION, if fourmvflag then FOURMV else 0 end ) ) ], NEW_VOP:[ false ], 
-  AC_CODED:[ac_coded], MOT:[true], TYPE:[1]
+  NEW_VOP:[ false ], AC_CODED:[ac_coded], MOT:[true], BTYPE:[1], AC_PRED:[acpredflag], FOUR_MV:[fourmvflag]
   do
     ac_coded := true;
   end

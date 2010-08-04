@@ -20,19 +20,10 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
-actor GUC_Mgnt_MVReconstruct (
-// Maximum image width (in units of macroblocks) that the decoder can handle.
-
-// It is used to allocate line buffer space at compile time.
-	int FCODE_MASK,
-	int FCODE_SHIFT,
-	int FOURMV,
-	int NEWVOP,
-	int INTER) bool NEW_VOP, int(size=VOP_FCODE_FOR_LENGTH +
-1) FCODE, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BTYPE_SZ) BLOCKTYPE, int (size=2) TYPE, bool MOT, int(size=MV_SZ) MVIN, int(size=MB_COORD_SZ
+actor GUC_Mgnt_MVReconstruct () bool NEW_VOP, int(size=VOP_FCODE_FOR_LENGTH +
+1) FCODE, int(size=16) WIDTH, int(size=16) HEIGHT, int (size=2) BTYPE, bool MOT, bool FOUR_MV, int(size=MV_SZ) MVIN, int(size=MB_COORD_SZ
 + 3) A ==> int(size=MV_SZ) MV :
 // Port size declaration
-	int BTYPE_SZ = 12;
 
 	int MB_COORD_SZ = 8;
 
@@ -102,7 +93,7 @@ actor GUC_Mgnt_MVReconstruct (
 
 	end
 	// No motion vector
-	read.noMotion: action NEW_VOP:[ newvop ], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==>
+	read.noMotion: action NEW_VOP:[ newvop ], MOT:[mot], BTYPE:[btype], FOUR_MV:[four_mv] ==>
 	guard
 		btype!=1 or not mot,
 		not(newvop)
@@ -117,14 +108,14 @@ actor GUC_Mgnt_MVReconstruct (
 
 	bool fourmv;
 	// Motion vectors - detect fourmv
-	read.motion: action NEW_VOP:[ newvop ], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==>
+	read.motion: action NEW_VOP:[ newvop ], MOT:[mot], BTYPE:[btype], FOUR_MV:[four_mv] ==>
 	guard
 		btype=1,
 		mot,
 		not(newvop)
 	do
 		if comp = 0 then
-			fourmv := bitand(cmd, FOURMV) != 0;
+			fourmv := four_mv;
 			sum_x := 0;
 			sum_y := 0;
 		end

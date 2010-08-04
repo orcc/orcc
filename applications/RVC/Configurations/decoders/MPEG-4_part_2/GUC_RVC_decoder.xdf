@@ -364,21 +364,15 @@
     <Connection dst="texture_V" dst-port="QP" src="parser" src-port="QUANT_V"/>
     <Connection dst="texture_U" dst-port="QP" src="parser" src-port="QUANT_U"/>
     <Connection dst="texture_Y" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
-    <Connection dst="texture_Y" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_Y"/>
-    <Connection dst="motion_Y" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_Y"/>
     <Connection dst="motion_Y" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
     <Connection dst="motion_Y" dst-port="HEIGHT" src="parser" src-port="HEIGHT"/>
     <Connection dst="motion_U" dst-port="HEIGHT" src="parser" src-port="HEIGHT"/>
     <Connection dst="motion_U" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
     <Connection dst="motion_Y" dst-port="NEW_VOP" src="parser" src-port="NEW_VOP_Y"/>
-    <Connection dst="motion_U" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_U"/>
     <Connection dst="motion_U" dst-port="NEW_VOP" src="parser" src-port="NEW_VOP_U"/>
     <Connection dst="texture_Y" dst-port="NEW_VOP" src="parser" src-port="NEW_VOP_Y"/>
     <Connection dst="texture_U" dst-port="NEW_VOP" src="parser" src-port="NEW_VOP_U"/>
-    <Connection dst="texture_U" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_U"/>
     <Connection dst="texture_U" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
-    <Connection dst="texture_V" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_V"/>
-    <Connection dst="motion_V" dst-port="BLOCKTYPE" src="parser" src-port="BLOCKTYPE_V"/>
     <Connection dst="texture_V" dst-port="NEW_VOP" src="parser" src-port="NEW_VOP_V"/>
     <Connection dst="motion_V" dst-port="NEW_VOP" src="parser" src-port="NEW_VOP_V"/>
     <Connection dst="texture_V" dst-port="WIDTH" src="parser" src-port="WIDTH"/>
@@ -396,10 +390,13 @@
     <Connection dst="motion_Y" dst-port="MOTION" src="parser" src-port="Y_MOT"/>
     <Connection dst="motion_U" dst-port="MOTION" src="parser" src-port="U_MOT"/>
     <Connection dst="motion_V" dst-port="MOTION" src="parser" src-port="V_MOT"/>
-    <Connection dst="texture_Y" dst-port="TYPE" src="parser" src-port="TYPE_Y"/>
-    <Connection dst="motion_Y" dst-port="TYPE" src="parser" src-port="TYPE_Y"/>
-    <Connection dst="motion_U" dst-port="TYPE" src="parser" src-port="TYPE_U"/>
-    <Connection dst="motion_V" dst-port="TYPE" src="parser" src-port="TYPE_V"/>
-    <Connection dst="texture_U" dst-port="TYPE" src="parser" src-port="TYPE_U"/>
-    <Connection dst="texture_V" dst-port="TYPE" src="parser" src-port="TYPE_V"/>
+    <Connection dst="texture_Y" dst-port="ACPRED" src="parser" src-port="ACP_Y"/>
+    <Connection dst="texture_U" dst-port="ACPRED" src="parser" src-port="ACP_U"/>
+    <Connection dst="texture_V" dst-port="ACPRED" src="parser" src-port="ACP_V"/>
+    <Connection dst="texture_Y" dst-port="BTYPE" src="parser" src-port="BTYPE_Y"/>
+    <Connection dst="motion_Y" dst-port="BTYPE" src="parser" src-port="BTYPE_Y"/>
+    <Connection dst="texture_U" dst-port="BTYPE" src="parser" src-port="BTYPE_U"/>
+    <Connection dst="motion_U" dst-port="BTYPE" src="parser" src-port="BTYPE_U"/>
+    <Connection dst="texture_V" dst-port="BTYPE" src="parser" src-port="BTYPE_V"/>
+    <Connection dst="motion_V" dst-port="BTYPE" src="parser" src-port="BTYPE_V"/>
 </XDF>

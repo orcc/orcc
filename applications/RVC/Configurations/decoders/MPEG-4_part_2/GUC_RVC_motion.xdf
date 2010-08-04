@@ -17,13 +17,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="BLOCKTYPE">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="WIDTH">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -50,7 +43,7 @@
     <Port kind="Input" name="MOTION">
         <Type name="bool"/>
     </Port>
-    <Port kind="Input" name="TYPE">
+    <Port kind="Input" name="BTYPE">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="2"/>
@@ -105,17 +98,8 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="INTRA">
-            <Expr kind="Var" name="INTRA"/>
-        </Parameter>
         <Parameter name="LAYOUT">
             <Expr kind="Var" name="LAYOUT"/>
-        </Parameter>
-        <Parameter name="NEWVOP">
-            <Expr kind="Var" name="NEWVOP"/>
-        </Parameter>
-        <Parameter name="ROUND_TYPE">
-            <Expr kind="Var" name="ROUND_TYPE"/>
         </Parameter>
     </Instance>
     <Instance id="buffer">
@@ -169,14 +153,12 @@
         </Attribute>
     </Connection>
     <Connection dst="" dst-port="VID" src="add" src-port="VID"/>
-    <Connection dst="add" dst-port="BLOCKTYPE" src="" src-port="BLOCKTYPE"/>
     <Connection dst="address" dst-port="HEIGHT" src="" src-port="HEIGHT"/>
     <Connection dst="address" dst-port="WIDTH" src="" src-port="WIDTH"/>
     <Connection dst="address" dst-port="NEW_VOP" src="" src-port="NEW_VOP"/>
-    <Connection dst="address" dst-port="BLOCKTYPE" src="" src-port="BLOCKTYPE"/>
     <Connection dst="address" dst-port="ROUND" src="" src-port="ROUND"/>
     <Connection dst="add" dst-port="AC_CODED" src="" src-port="ACCODED"/>
     <Connection dst="address" dst-port="MOT" src="" src-port="MOTION"/>
-    <Connection dst="add" dst-port="TYPE" src="" src-port="TYPE"/>
-    <Connection dst="address" dst-port="TYPE" src="" src-port="TYPE"/>
+    <Connection dst="add" dst-port="BTYPE" src="" src-port="BTYPE"/>
+    <Connection dst="address" dst-port="BTYPE" src="" src-port="BTYPE"/>
 </XDF>
