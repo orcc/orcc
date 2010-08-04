@@ -8,9 +8,9 @@
 // 
 
 // Description: the sequence of BTYPE token is not homogeneous, there is fist a NEW VOP command, then, the width and height of this VOP, then the  corresponding 8x8 blocks of texture, motion or mixed tex/mot. This actor will delete the tokens concerning the information of the VOP and redistribute the tokens to the Y, U and V components. So that the adder have directly the token intra, accoded or mixed.
-actor GUC_splitter_BTYPE () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED, bool MOT
+actor GUC_splitter_BTYPE () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED, bool MOT, int (size=2) TYPE
 ==> int(size=BTYPE_SZ) BLOCKTYPE_Y, int(size=BTYPE_SZ) BLOCKTYPE_U, int(size=BTYPE_SZ) BLOCKTYPE_V, bool
-NEW_VOP_Y, bool NEW_VOP_U, bool NEW_VOP_V, bool AC_Y, bool AC_U, bool AC_V, bool MOT_Y, bool MOT_U, bool MOT_V :
+NEW_VOP_Y, bool NEW_VOP_U, bool NEW_VOP_V, bool AC_Y, bool AC_U, bool AC_V, bool MOT_Y, bool MOT_U, bool MOT_V, int (size=2)TYPE_Y, int (size=2)TYPE_U, int (size=2)TYPE_V :
 // Port size declaration
 	int BTYPE_SZ = 12;
 	// to send the newvop token to the address and add block (arrggg) 
@@ -20,11 +20,12 @@ NEW_VOP_Y, bool NEW_VOP_U, bool NEW_VOP_V, bool AC_Y, bool AC_U, bool AC_V, bool
 		newvop
 	end
 	// to split the tokens 
-	cmd.split: action NEW_VOP:[ lnewvop ] repeat 6, BLOCKTYPE:[ list ] repeat 6, AC_CODED:[ac] repeat 6, MOT:[mot] repeat 6 ==>
+	cmd.split: action NEW_VOP:[ lnewvop ] repeat 6, BLOCKTYPE:[ list ] repeat 6, AC_CODED:[ac] repeat 6, MOT:[mot] repeat 6, TYPE:[btype] repeat 6 ==>
 		BLOCKTYPE_Y:[ list[0], list[1], list[2], list[3] ], BLOCKTYPE_U:[ list[4] ],
 		BLOCKTYPE_V:[ list[5] ], NEW_VOP_Y:[ false, false, false, false ],
 		NEW_VOP_U:[ false ], NEW_VOP_V:[ false ], AC_Y:[ac [0], ac[1], ac[2], ac[3]], AC_U:[ac[4]], AC_V:[ac[5]], 
-		MOT_Y:[mot [0], mot[1], mot[2], mot[3]], MOT_U:[mot[4]], MOT_V:[mot[5]]
+		MOT_Y:[mot [0], mot[1], mot[2], mot[3]], MOT_U:[mot[4]], MOT_V:[mot[5]], 
+		TYPE_Y:[ btype[0], btype[1], btype[2], btype[3] ], TYPE_U:[ btype[4] ], TYPE_V:[ btype[5] ]
 	guard
 		not (lnewvop[0])
 	end

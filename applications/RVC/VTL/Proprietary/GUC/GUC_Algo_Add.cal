@@ -12,8 +12,9 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Add motion and texture to produce pixels
 
-actor GUC_Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED
-==> int(size=PIX_SZ) VID:
+actor GUC_Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED, int (size=2)TYPE
+==> int(size=PIX_SZ) VID 
+:
 
 // Port size declaration
 	int BTYPE_SZ = 12;
@@ -25,20 +26,20 @@ actor GUC_Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE
 	int INTRA = 1024;
 
 	// Pure texture
-	cmd.textureOnly: action BLOCKTYPE:[cmd], AC_CODED:[ac_coded] ==> 
+	cmd.textureOnly: action BLOCKTYPE:[cmd], AC_CODED:[ac_coded], TYPE:[btype]==> 
 	guard
-		bitand(cmd, INTRA) != 0
+		btype =2
 	end
 
 	// Pure motion
-	cmd.motionOnly: action BLOCKTYPE:[cmd], AC_CODED:[ac_coded] ==> 
+	cmd.motionOnly: action BLOCKTYPE:[cmd], AC_CODED:[ac_coded], TYPE:[btype] ==> 
 	guard
 		not ac_coded
 	end
 
 	// Mixed texture and motion
 	// (Also used to skip vop w,h)
-	cmd.other: action BLOCKTYPE:[cmd], AC_CODED: [ac_coded] ==> 
+	cmd.other: action BLOCKTYPE:[cmd], AC_CODED: [ac_coded],TYPE:[btype]==>
 	end
 	
 texture: action TEX:[ tex ] repeat 64 ==> VID:[ tex ] repeat 64

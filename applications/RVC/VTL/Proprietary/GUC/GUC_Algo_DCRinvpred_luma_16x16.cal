@@ -72,7 +72,7 @@
 //   dealing with 4 8x8 blocks rather than 6 8x8 blocks.
 
 actor GUC_Algo_DCRinvpred_luma_16x16 () bool NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED, int(size=MB_COORD_SZ + 2) A, int(size=MB_COORD_SZ +
-2) B, int(size=MB_COORD_SZ + 2) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
+2) B, int(size=MB_COORD_SZ + 2) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP, int (size=2)TYPE ==>
 int(size=SAMPLE_SZ) QF_DC , int(size=MB_COORD_SZ + 2) PTR , int(size=3) AC_PRED_DIR , bool
 SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 
@@ -165,10 +165,10 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	end
 
 	// Check for an INTER block with coded AC coefficients
-	read.inter_ac: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], QP:[ qp ] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ],
+	read.inter_ac: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], QP:[ qp ], TYPE:[btype] ==> AC_PRED_DIR:[ 0 ], PTR:[ 0 ], SIGNED:[ true ],
 		QUANT:[ s_qp ], PREV_QUANT:[ s_prev_qp ]
 	guard
-		bitand(cmd, INTER) != 0,
+		btype=1,
 		ac_coded,
 		not(newvop)
 	do
@@ -180,10 +180,10 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	end
 
 	// Any other block except INTRA
-	read.other: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], QP:[ qp ] ==> AC_PRED_DIR:[ -1 ]
+	read.other: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], QP:[ qp ], TYPE:[btype] ==> AC_PRED_DIR:[ -1 ]
 	guard
 		not ac_coded,
-		bitand(cmd, INTRA) = 0,
+		btype!=2,
 		not(newvop)
 	end
 
@@ -216,13 +216,13 @@ SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :
 	end
 
 	// Read an INTRA block
-	read.intra: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], QP:[ qp ], A:[ a ], B:[ b ], C:[ c ] ==> PTR:[ if top then
+	read.intra: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], TYPE:[btype], AC_CODED:[ac_coded], QP:[ qp ], A:[ a ], B:[ b ], C:[ c ] ==> PTR:[ if top then
 			c
 		else
 			a
 		end ], AC_PRED_DIR:[ s ], SIGNED:[ is_signed ], QUANT:[ s_qp ], PREV_QUANT:[ s_prev_qp ]
 	guard
-		bitand(cmd, INTRA) != 0,
+		 btype=2,
 		not(newvop)
 	var
 		int(size=SAMPLE_SZ) dca = dc_buf[a] , int(size=SAMPLE_SZ) dcb = dc_buf[b] ,

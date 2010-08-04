@@ -50,6 +50,13 @@
     <Port kind="Input" name="MOTION">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="TYPE">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -170,4 +177,6 @@
     <Connection dst="address" dst-port="ROUND" src="" src-port="ROUND"/>
     <Connection dst="add" dst-port="AC_CODED" src="" src-port="ACCODED"/>
     <Connection dst="address" dst-port="MOT" src="" src-port="MOTION"/>
+    <Connection dst="add" dst-port="TYPE" src="" src-port="TYPE"/>
+    <Connection dst="address" dst-port="TYPE" src="" src-port="TYPE"/>
 </XDF>

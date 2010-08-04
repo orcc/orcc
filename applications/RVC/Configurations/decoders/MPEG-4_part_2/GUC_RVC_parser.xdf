@@ -137,6 +137,27 @@
     <Port kind="Output" name="V_MOT">
         <Type name="bool"/>
     </Port>
+    <Port kind="Output" name="TYPE_U">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="TYPE_Y">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="TYPE_V">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -361,4 +382,11 @@
     <Connection dst="" dst-port="Y_MOT" src="splitter_BTYPE" src-port="MOT_Y"/>
     <Connection dst="" dst-port="U_MOT" src="splitter_BTYPE" src-port="MOT_U"/>
     <Connection dst="" dst-port="V_MOT" src="splitter_BTYPE" src-port="MOT_V"/>
+    <Connection dst="splitter_420_B" dst-port="TYPE" src="parseheaders" src-port="TYPE"/>
+    <Connection dst="mvseq" dst-port="TYPE" src="parseheaders" src-port="TYPE"/>
+    <Connection dst="mvrecon" dst-port="TYPE" src="parseheaders" src-port="TYPE"/>
+    <Connection dst="splitter_BTYPE" dst-port="TYPE" src="parseheaders" src-port="TYPE"/>
+    <Connection dst="" dst-port="TYPE_Y" src="splitter_BTYPE" src-port="TYPE_Y"/>
+    <Connection dst="" dst-port="TYPE_U" src="splitter_BTYPE" src-port="TYPE_U"/>
+    <Connection dst="" dst-port="TYPE_V" src="splitter_BTYPE" src-port="TYPE_V"/>
 </XDF>

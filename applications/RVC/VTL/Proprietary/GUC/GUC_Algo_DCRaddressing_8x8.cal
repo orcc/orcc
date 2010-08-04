@@ -48,7 +48,7 @@
 //   1 component per block.
 // * Variable 'comp' removed since only one component.
 
-actor GUC_Algo_DCRaddressing_8x8 () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, int(size=16) WIDTH ==> int(size=MB_COORD_SZ) A , int(size=MB_COORD_SZ) B
+actor GUC_Algo_DCRaddressing_8x8 () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, int(size=16) WIDTH, int (size=2) TYPE ==> int(size=MB_COORD_SZ) A , int(size=MB_COORD_SZ) B
 , int(size=MB_COORD_SZ) C :
 
 // Port size declaration
@@ -128,15 +128,15 @@ actor GUC_Algo_DCRaddressing_8x8 () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, 
 	end
 
 	// Is this an INTRA 8x8 block?
-	read.intra: action NEW_VOP:[newvop], BLOCKTYPE:[btype] ==>
+	read.intra: action NEW_VOP:[newvop], BLOCKTYPE:[btype], TYPE:[blocktype] ==>
 	guard
-		bitand(btype, INTRA) != 0, not(newvop)
+		blocktype=2, not(newvop)
 	do
 		coded[ptr] := true;
 	end
 
 	// Is this not an INTRA 8x8 block?
-	read.other: action NEW_VOP:[newvop], BLOCKTYPE:[btype_] ==>
+	read.other: action NEW_VOP:[newvop], BLOCKTYPE:[btype], TYPE:[blocktype] ==>
 	guard not(newvop)
 	do
 		coded[ptr] := false;

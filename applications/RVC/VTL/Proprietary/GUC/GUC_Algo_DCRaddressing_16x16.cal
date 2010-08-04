@@ -47,7 +47,7 @@
 // * Block pointer bitwidth reduced from MB_COORD_SZ+3 to MB_COORD_SZ+2 since only
 //   4 components per block.
 
-actor GUC_Algo_DCRaddressing_16x16 () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, int(size=16) WIDTH ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
+actor GUC_Algo_DCRaddressing_16x16 () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE, int(size=16) WIDTH, int (size=2) TYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
 + 2) B , int(size=MB_COORD_SZ + 2) C :
 
 // Port size declaration
@@ -144,21 +144,21 @@ actor GUC_Algo_DCRaddressing_16x16 () bool NEW_VOP, int(size=BTYPE_SZ) BLOCKTYPE
 	end
 
 	// Is this an INTRA 8x8 block?
-	read.intra: action NEW_VOP:[newvop], BLOCKTYPE:[btype] ==>
+	read.intra: action NEW_VOP:[newvop], BLOCKTYPE:[btype], TYPE:[blocktype] ==>
 	guard
-		bitand(btype, INTRA) != 0,
-		not(newvop)
+		blocktype=2, not(newvop)
 	do
 		coded[access(ptr, comp)] := true;
+		
 	end
  
 	// Is this not an INTRA 8x8 block?
-	read.other: action NEW_VOP:[newvop], BLOCKTYPE:[btype] ==>
+	read.other: action NEW_VOP:[newvop], BLOCKTYPE:[btype], TYPE:[blocktype] ==>
 	guard
-		bitand(btype, INTRA) = 0,
-		not(newvop)
+		btype!=2, not(newvop)
 	do
 		coded[access(ptr, comp)] := false;
+		
 	end
 
 	// Move to the next 8x8 block and set flags appropriately

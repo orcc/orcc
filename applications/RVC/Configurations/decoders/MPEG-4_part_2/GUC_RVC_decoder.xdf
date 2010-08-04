@@ -396,4 +396,10 @@
     <Connection dst="motion_Y" dst-port="MOTION" src="parser" src-port="Y_MOT"/>
     <Connection dst="motion_U" dst-port="MOTION" src="parser" src-port="U_MOT"/>
     <Connection dst="motion_V" dst-port="MOTION" src="parser" src-port="V_MOT"/>
+    <Connection dst="texture_Y" dst-port="TYPE" src="parser" src-port="TYPE_Y"/>
+    <Connection dst="motion_Y" dst-port="TYPE" src="parser" src-port="TYPE_Y"/>
+    <Connection dst="motion_U" dst-port="TYPE" src="parser" src-port="TYPE_U"/>
+    <Connection dst="motion_V" dst-port="TYPE" src="parser" src-port="TYPE_V"/>
+    <Connection dst="texture_U" dst-port="TYPE" src="parser" src-port="TYPE_U"/>
+    <Connection dst="texture_V" dst-port="TYPE" src="parser" src-port="TYPE_V"/>
 </XDF>

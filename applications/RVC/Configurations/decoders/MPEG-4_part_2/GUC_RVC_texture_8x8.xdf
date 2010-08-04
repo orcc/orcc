@@ -37,6 +37,13 @@
     <Port kind="Input" name="ACCODED">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="TYPE">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -148,4 +155,5 @@
     <Connection dst="DCRecontruction" dst-port="WIDTH" src="" src-port="WIDTH"/>
     <Connection dst="DCRecontruction" dst-port="NEW_VOP" src="" src-port="NEW_VOP"/>
     <Connection dst="DCRecontruction" dst-port="ACCODED" src="" src-port="ACCODED"/>
+    <Connection dst="DCRecontruction" dst-port="TYPE" src="" src-port="TYPE"/>
 </XDF>

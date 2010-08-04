@@ -6,7 +6,7 @@
 //              into its respective Y, U and V components.
 //
 
-actor GUC_splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED ==> int(size=SAMPLE_SZ) Y ,
+actor GUC_splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BLOCKTYPE, bool AC_CODED, int (size=2) TYPE ==> int(size=SAMPLE_SZ) Y ,
 int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
  :
 
@@ -35,9 +35,9 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
 
 	
 	skip_uncoded: action BLOCKTYPE:[ cmd ], 
-	AC_CODED:[ac_coded] ==>
+	AC_CODED:[ac_coded], TYPE:[btype] ==>
 	guard
-		bitand(cmd, INTER) != 0,
+		btype=1,
 		// An INTER block
 		not ac_coded 
 	do
@@ -47,11 +47,11 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
 		end
 	end
 
-	skip_other: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded] ==>
+	skip_other: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], TYPE:[btype] 
+	==>
 	guard
-		bitand(cmd, INTER) = 0,
-		// Not an INTER block
-		bitand(cmd, INTRA) = 0 // Not an INTRA block
+		// Not an INTER or INTRA block
+		btype=0
 		
 	do
 		comp := comp + 1;
@@ -60,21 +60,21 @@ int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
 		end
 	end
 
-	splitY: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], B:[ x ] repeat BLOCK_SZ ==>Y:[ x ] repeat BLOCK_SZ 
+	splitY: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], TYPE:[btype], B:[ x ] repeat BLOCK_SZ ==>Y:[ x ] repeat BLOCK_SZ 
 	guard
 		comp < 4
 	do
 		comp := comp + 1;
 	end
 
-	splitU: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], B:[ x ] repeat BLOCK_SZ ==>U:[ x ] repeat BLOCK_SZ
+	splitU: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], TYPE:[btype], B:[ x ] repeat BLOCK_SZ ==>U:[ x ] repeat BLOCK_SZ
 	guard
 		comp = 4
 	do
 		comp := comp + 1;
 	end
 
-	splitV: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded],  B:[ x ] repeat BLOCK_SZ ==> V:[ x ] repeat BLOCK_SZ
+	splitV: action BLOCKTYPE:[ cmd ], AC_CODED:[ac_coded], TYPE:[btype],  B:[ x ] repeat BLOCK_SZ ==> V:[ x ] repeat BLOCK_SZ
 	guard
 		comp = 5
 	do

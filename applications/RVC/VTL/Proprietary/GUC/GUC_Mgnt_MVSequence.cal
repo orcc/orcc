@@ -13,7 +13,7 @@
 actor GUC_Mgnt_MVSequence (int FOURMV,
 	int NEWVOP,
 	int INTER) 
-	bool NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE, bool MOT ==> int(size=MB_COORD_SZ + 3) A:
+	bool NEW_VOP, int(size=16) WIDTH, int(size=BTYPE_SZ) BLOCKTYPE, bool MOT, int (size=2) TYPE ==> int(size=MB_COORD_SZ + 3) A:
 
 	// Port size declaration
 	int BTYPE_SZ = 12;
@@ -101,10 +101,12 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 
-	read.noPredict: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot] ==>
+	read.noPredict: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==>
 	guard
 		not(newvop),
-		comp > 3 or bitand(cmd, INTER) = 0 or not mot 
+		comp > 3 
+		or btype!=1
+		or not mot 
 		or (comp != 0 and bitand(cmd, FOURMV)
 		= 0)
 	do
@@ -130,10 +132,10 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 
 	// Locate prediction indices:
 	// block 0 left->1   above->2    above_right->3
-	read.predict.y0: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot] ==> A:[ access(pl, 1), access(pa, 2), access(par, 2) ]
+	read.predict.y0: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==> A:[ access(pl, 1), access(pa, 2), access(par, 2) ]
 	guard
 		not(newvop),
-		bitand(cmd, INTER) != 0,
+		btype=1,
 		mot,
 		comp = 0
 	var
@@ -155,10 +157,10 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 	// block 1    0      above->3    above_right->2
-	read.predict.y1: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot] ==> A:[ access(ptr, 0), access(pa, 3), access(par, 2) ]
+	read.predict.y1: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot] ,TYPE:[btype]==> A:[ access(ptr, 0), access(pa, 3), access(par, 2) ]
 	guard
 		not(newvop),
-		bitand(cmd, INTER) != 0,
+		btype=1,
 		mot,
 		bitand(cmd, FOURMV) != 0,
 		comp = 1
@@ -177,10 +179,10 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 	// block 2 left->3       0            1
-	read.predict.y2: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot] ==> A:[ access(pl, 3), access(ptr, 0), access(ptr, 1) ]
+	read.predict.y2: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==> A:[ access(pl, 3), access(ptr, 0), access(ptr, 1) ]
 	guard
 		not(newvop),
-		bitand(cmd, INTER) != 0,
+		btype=1,
 		mot,
 		bitand(cmd, FOURMV) != 0,
 		comp = 2
@@ -195,11 +197,11 @@ actor GUC_Mgnt_MVSequence (int FOURMV,
 	end
 
 	// block 3    2          0            1
-	read.predict.y3: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot] ==> A:[ access(ptr, 2), access(ptr, 0), access(ptr, 1)
+	read.predict.y3: action NEW_VOP:[newvop], BLOCKTYPE:[ cmd ], MOT:[mot], TYPE:[btype] ==> A:[ access(ptr, 2), access(ptr, 0), access(ptr, 1)
 		]
 	guard
 		not(newvop),
-		bitand(cmd, INTER) != 0,
+		btype=1,
 		mot,
 		bitand(cmd, FOURMV) != 0,
 		comp = 3

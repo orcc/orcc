@@ -37,6 +37,13 @@
     <Port kind="Input" name="ACCODED">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="TYPE">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -123,4 +130,6 @@
     <Connection dst="invpred" dst-port="WIDTH" src="" src-port="WIDTH"/>
     <Connection dst="invpred" dst-port="BLOCKTYPE" src="" src-port="BLOCKTYPE"/>
     <Connection dst="invpred" dst-port="AC_CODED" src="" src-port="ACCODED"/>
+    <Connection dst="addressing" dst-port="TYPE" src="" src-port="TYPE"/>
+    <Connection dst="invpred" dst-port="TYPE" src="" src-port="TYPE"/>
 </XDF>
