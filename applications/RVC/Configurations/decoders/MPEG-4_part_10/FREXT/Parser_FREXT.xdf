@@ -188,7 +188,6 @@
         src="DecodeSliceHeader" src-port="SkipNal"/>
     <Connection dst="DecodePps" dst-port="PpsAsked"
         src="DecodeSliceHeader" src-port="GetPps"/>
-    <Connection dst="DecodeSps" dst-port="SpsAsked" src="DecodePps" src-port="GetSps"/>
     <Connection dst="DecodeSliceHeader" dst-port="log2_max_frame_num"
         src="DecodeSps" src-port="log2_max_frame_num"/>
     <Connection dst="DecodeSliceHeader" dst-port="frame_mbs_only"
@@ -231,4 +230,21 @@
         src="CheckNaluType" src-port="PicIsAnIdr"/>
     <Connection dst="DecodeDecRefPicMarking" dst-port="PicNalRefIdc"
         src="CheckNaluType" src-port="PicNalRefIdc"/>
+    <Connection dst="DecodePps" dst-port="PicWidthInMbs" src="DecodeSps" src-port="Pps_PicWidthInMbs"/>
+    <Connection dst="DecodePps" dst-port="PicHeightInMapUnits"
+        src="DecodeSps" src-port="Pps_PicHeightInMapUnits"/>
+    <Connection dst="DecodeSps" dst-port="SpsAskedFromPic"
+        src="DecodePps" src-port="GetSps4Pic"/>
+    <Connection dst="DecodeSps" dst-port="SpsAskedFromPps"
+        src="DecodePps" src-port="GetSps"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="SizeSliceGroupChgCycle" src="DecodePps" src-port="SizeSliceGroupChgCycle"/>
+    <Connection dst="DecodeSliceHeader" dst-port="entropy_coding_mode"
+        src="DecodePps" src-port="entropy_coding_mode"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="deblocking_filter_control_present" src="DecodePps" src-port="deblocking_filter_control_present"/>
+    <Connection dst="DecodeSliceHeader" dst-port="NumSliceGroups"
+        src="DecodePps" src-port="NumSliceGroups"/>
+    <Connection dst="DecodeSliceHeader" dst-port="SliceGroupMapType"
+        src="DecodePps" src-port="SliceGroupMapType"/>
 </XDF>

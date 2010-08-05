@@ -15,7 +15,8 @@ This copyright notice must be included in all copies or derivative works. Copyri
 ***********************************************************************/
 actor Algo_DecodeSps()
 	int (size=32) ValVLD,
-	uint(size=5)  SpsAsked
+	uint(size=5)  SpsAskedFromPic,
+	uint(size=5)  SpsAskedFromPps
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
@@ -25,7 +26,10 @@ actor Algo_DecodeSps()
 	bool          frame_mbs_only,
 	uint(size=2)  poc_type,
 	uint(size=6)  SzMaxPocLsb,
-	bool          delta_pic_order_always_zero
+	bool          delta_pic_order_always_zero,
+
+	uint(size=32) Pps_PicWidthInMbs,
+	uint(size=32) Pps_PicHeightInMapUnits
 		:
 
 
@@ -113,12 +117,10 @@ actor Algo_DecodeSps()
 			SkipNal      :[   false   ,   false   ,   false   ,   false   ,  false ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , READ_BITS , READ_BITS , READ_BITS , VLD_UE ],
 			NbBitsToRead :[     8     ,     4     ,     4     ,     8     ]
-		do
-//			println("ReadSps");
 		end
 
-	SpsParam.Asked: action
-			SpsAsked :[ValSps]
+	SpsParam.AskedFromPic: action
+			SpsAskedFromPic :[ValSps]
 				==>
 			log2_max_frame_num          :[log2_max_frame_num_minus4[ValSps] + 4],
 			frame_mbs_only              :[val_frame_mbs_only],
@@ -143,15 +145,23 @@ actor Algo_DecodeSps()
 				end;
 		end
 
+	SpsParam.AskedFromPps: action
+			SpsAskedFromPps :[ValSps]
+				==>
+			Pps_PicWidthInMbs       :[pic_width_in_mbs_minus1[ValSps] + 1],
+			Pps_PicHeightInMapUnits :[pic_height_in_map_units_minus1[ValSps] + 1]
+		do
+		end
+
 	ReadSpsId.Done: action
 			ValVLD :[ValueOfVLD] repeat 5
 				==>
 		do
-/*			println("profile_idc:"+ValueOfVLD[0]);
+			println("profile_idc:"+ValueOfVLD[0]);
 			println("constrained_set_flag:"+ValueOfVLD[1]);
 			println("level_idc:"+ValueOfVLD[3]);
 			println("sps_id:"+ValueOfVLD[4]);
-*/
+
 			sps_id                      := ValueOfVLD[4];
 			profile_idc[sps_id]         := ValueOfVLD[0];
 			constraint_set_flag[sps_id] := ValueOfVLD[1];
@@ -430,7 +440,8 @@ actor Algo_DecodeSps()
 	schedule fsm AskReadSpsId:
 		AskReadSpsId                 (ReadSpsId.Asked                )--> ReadSpsIdDone;
 
-		ReadSpsIdDone                (SpsParam.Asked                 )--> ReadSpsIdDone;
+		ReadSpsIdDone                (SpsParam.AskedFromPic           )--> ReadSpsIdDone;
+		ReadSpsIdDone                (SpsParam.AskedFromPps           )--> ReadSpsIdDone;
 		ReadSpsIdDone                (ReadSpsId.Done                 )--> CheckChromaFormatIdc;
 
 		CheckChromaFormatIdc         (ReadChromaFormatIdc.Asked      )--> ReadChormaFormatIdcDone;
@@ -478,7 +489,7 @@ actor Algo_DecodeSps()
 	end
 
 	priority
-		SpsParam.Asked               > ReadSpsId.Done;
+		SpsParam.AskedFromPic        > SpsParam.AskedFromPps           > ReadSpsId.Done;
 		ReadChromaFormatIdc.Asked    > Read_MaxFrameNum_PocType.Asked;
 		ReadPocType.IsEqualTo0       > ReadPocType.IsEqualTo1          > ReadNumRefFrame.Asked;
 		CheckNumRefInPocCycle        > ReadNumRefFrame.Asked;
