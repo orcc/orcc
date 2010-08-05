@@ -13,7 +13,7 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
-actor Algo_DecodePps()
+actor Algo_DecodePps(bool IsCBP)
 	int (size=32) ValVLD,
 	uint(size=8)  PpsAsked
 		==>
@@ -21,7 +21,12 @@ actor Algo_DecodePps()
 	uint(size=5)  NbBitsToRead,
 	bool          SkipNal,
 
-	uint(size=5)  GetSps
+	uint(size=5)  GetSps,
+
+	bool          pic_order_present,
+	bool          redundant_pic_cnt_present,
+
+	uint(size=5)  NumRefIdxLXActive
 		:
 
 
@@ -82,10 +87,34 @@ actor Algo_DecodePps()
 			NbBitsToRead :[                       1     ,     1              ]
 		end
 
-	PpsParam.Asked: action
+	PpsParamAsked.Frext: action
 			PpsAsked: [ValPps]
 				==>
-			GetSps :[sequence_parameter_set_id[ValPps]]
+			GetSps                    :[sequence_parameter_set_id[ValPps]],
+			pic_order_present         :[ValPicOrderPresent],
+			redundant_pic_cnt_present :[ValRedPicCntPres],
+			NumRefIdxLXActive         :[ValNumRefIdxAct] repeat 2
+		guard
+			not IsCBP
+		var
+			bool ValPicOrderPresent,
+			bool ValRedPicCntPres,
+			List(type:uint(size=5), size=2) ValNumRefIdxAct
+		do
+			ValPicOrderPresent :=
+				if(pic_order_present_flag[ValPps] = 0)then
+					false
+				else
+					true
+				end;
+			ValRedPicCntPres :=
+				if(redundant_pic_cnt_present_flag[ValPps] = 0)then
+					false
+				else
+					true
+				end;
+			ValNumRefIdxAct[0] := num_ref_idx_l0_active_minus1[ValPps] + 1;
+			ValNumRefIdxAct[1] := num_ref_idx_l1_active_minus1[ValPps] + 1;
 		end
 
 
@@ -282,7 +311,7 @@ actor Algo_DecodePps()
 	schedule fsm AskReadPpsId:
 		AskReadPpsId              (ReadPpsId.Asked                          )--> ReadPpsIdDoneOrPpsAsked;
 
-		ReadPpsIdDoneOrPpsAsked   (PpsParam.Asked                           )--> ReadPpsIdDoneOrPpsAsked;
+		ReadPpsIdDoneOrPpsAsked   (PpsParamAsked                            )--> ReadPpsIdDoneOrPpsAsked;
 		ReadPpsIdDoneOrPpsAsked   (ReadPpsId.Done                           )--> CheckNumSliceGroup;
 
 		CheckNumSliceGroup        (ReadSliceGroupMapType.IsAsked            )--> ReadSliceGroupMapType;
@@ -319,7 +348,7 @@ actor Algo_DecodePps()
 		EndPPS                    (SendEndPps                               )--> AskReadPpsId;
 	end
 	priority
-		PpsParam.Asked                           > ReadPpsId.Done;
+		PpsParamAsked                            > ReadPpsId.Done;
 		ReadSliceGroupMapType.IsAsked            > ReadNumRefIdx.Asked;
 		CheckSliceGroupMapType                   > ReadNumRefIdx.Asked;
 		CheckNumSliceGroup.SliceGroupMapEqualTo0 > ReadNumRefIdx.Asked;

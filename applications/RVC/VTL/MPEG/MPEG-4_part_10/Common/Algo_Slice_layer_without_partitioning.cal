@@ -14,9 +14,6 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
 actor Algo_Slice_layer_without_partitioning()
-	bool          IsAnIdrPic,
-//	bool          DecodeSliceDataDone
-
 	int (size=32) ValVLD,
 
 	uint(size=3)  HeaderTypeOfVLD,
@@ -63,7 +60,7 @@ actor Algo_Slice_layer_without_partitioning()
 			HeaderNbBitsToRead :[NbBits],
 			HeaderSkipNal      :[EndOfDecoding]
 				==>
-			TypeOfVLD          :[ValTypeOfVLD],
+			TypeOfVLD          :[READ_BITS],
 			NbBitsToRead       :[NbBits],
 			SkipNal            :[false]
 		guard

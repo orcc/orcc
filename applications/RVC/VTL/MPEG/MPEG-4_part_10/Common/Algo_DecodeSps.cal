@@ -21,7 +21,11 @@ actor Algo_DecodeSps()
 	uint(size=5)  NbBitsToRead,
 	bool          SkipNal,
 
-	uint(size=32) log2_max_frame_num
+	uint(size=6)  log2_max_frame_num,
+	bool          frame_mbs_only,
+	uint(size=2)  poc_type,
+	uint(size=6)  SzMaxPocLsb,
+	bool          delta_pic_order_always_zero
 		:
 
 
@@ -116,7 +120,27 @@ actor Algo_DecodeSps()
 	SpsParam.Asked: action
 			SpsAsked :[ValSps]
 				==>
-			log2_max_frame_num :[log2_max_frame_num_minus4[ValSps] + 4]
+			log2_max_frame_num          :[log2_max_frame_num_minus4[ValSps] + 4],
+			frame_mbs_only              :[val_frame_mbs_only],
+			poc_type                    :[pic_order_cnt_type[ValSps]],
+			SzMaxPocLsb                 :[log2_max_pic_order_cnt_lsb_minus4[ValSps] + 4],
+			delta_pic_order_always_zero :[ValDeltaPic]
+		var
+			bool val_frame_mbs_only,
+			bool ValDeltaPic
+		do
+			val_frame_mbs_only :=
+				if(frame_mbs_only_flag[ValSps] = 0)then
+					false
+				else
+					true
+				end;
+			ValDeltaPic :=
+				if(delta_pic_order_always_zero_flag[ValSps] = 0)then
+					false
+				else
+					true
+				end;
 		end
 
 	ReadSpsId.Done: action

@@ -68,7 +68,9 @@ actor Algo_Check_NALU_type_Frext()
 	uint(size=8) SpsRbsp,
 	uint(size=8) PpsRbsp,
 	uint(size=8) PicRbsp,
-	bool         PicIsAnIdr
+	bool         PicIsAnIdr,
+	uint(size=2) PicNalRefIdc	
+	
 		:
 
 
@@ -146,7 +148,8 @@ actor Algo_Check_NALU_type_Frext()
 
 	IsSliceIdr: action
 				==>
-			PicIsAnIdr :[true]
+			PicIsAnIdr   :[true],
+			PicNalRefIdc :[nal_ref_idc]
 		guard
 			nal_unit_type = NAL_SLICE_IDR
 		do
@@ -156,7 +159,8 @@ actor Algo_Check_NALU_type_Frext()
 
 	IsSliceNonIdr: action
 				==>
-			PicIsAnIdr :[false]
+			PicIsAnIdr   :[false],
+			PicNalRefIdc :[nal_ref_idc]
 		guard
 			nal_unit_type = NAL_SLICE_NON_IDR
 		do

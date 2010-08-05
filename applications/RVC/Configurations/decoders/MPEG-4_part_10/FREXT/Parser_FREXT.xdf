@@ -90,6 +90,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="IsCBP">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
     </Instance>
     <Instance id="PicVLDecoding">
         <!-- ************************* -->
@@ -114,6 +117,24 @@
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
         <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSliceHeader"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeRefPicList">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_DecodeRefPicList_Frext"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeDecRefPicMarking">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeDecRefPicMarking"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -152,8 +173,6 @@
         src="PicVLDecoding" src-port="SkipNal"/>
     <Connection dst="PicVLDecoding" dst-port="RbspByte"
         src="CheckNaluType" src-port="PicRbsp"/>
-    <Connection dst="DecodePic" dst-port="IsAnIdrPic"
-        src="CheckNaluType" src-port="PicIsAnIdr"/>
     <Connection dst="PicVLDecoding" dst-port="EndOfNal" src="DecodePic" src-port="SkipNal"/>
     <Connection dst="PicVLDecoding" dst-port="NbBitsToRead"
         src="DecodePic" src-port="NbBitsToRead"/>
@@ -172,4 +191,44 @@
     <Connection dst="DecodeSps" dst-port="SpsAsked" src="DecodePps" src-port="GetSps"/>
     <Connection dst="DecodeSliceHeader" dst-port="log2_max_frame_num"
         src="DecodeSps" src-port="log2_max_frame_num"/>
+    <Connection dst="DecodeSliceHeader" dst-port="frame_mbs_only"
+        src="DecodeSps" src-port="frame_mbs_only"/>
+    <Connection dst="DecodeSliceHeader" dst-port="log2_max_poc_lsb"
+        src="DecodeSps" src-port="SzMaxPocLsb"/>
+    <Connection dst="DecodeSliceHeader" dst-port="pic_order_present"
+        src="DecodePps" src-port="pic_order_present"/>
+    <Connection dst="DecodeSliceHeader" dst-port="IsAnIdrPic"
+        src="CheckNaluType" src-port="PicIsAnIdr"/>
+    <Connection dst="DecodeSliceHeader" dst-port="poc_type"
+        src="DecodeSps" src-port="poc_type"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="redundant_pic_cnt_present" src="DecodePps" src-port="redundant_pic_cnt_present"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="delta_pic_order_always_zero" src="DecodeSps" src-port="delta_pic_order_always_zero"/>
+    <Connection dst="DecodeRefPicList" dst-port="ValVLD"
+        src="DecodeSliceHeader" src-port="RefPicListValVLD"/>
+    <Connection dst="DecodeSliceHeader" dst-port="RefPicListTypeOfVLD"
+        src="DecodeRefPicList" src-port="TypeOfVLD"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="RefPicListNbBitsToRead" src="DecodeRefPicList" src-port="NbBitsToRead"/>
+    <Connection dst="DecodeSliceHeader" dst-port="RefPicListSkipNal"
+        src="DecodeRefPicList" src-port="SkipNal"/>
+    <Connection dst="DecodeRefPicList" dst-port="NumRefIdxLXActive"
+        src="DecodePps" src-port="NumRefIdxLXActive"/>
+    <Connection dst="DecodeRefPicList" dst-port="Slice_Type"
+        src="DecodeSliceHeader" src-port="SliceType"/>
+    <Connection dst="DecodeDecRefPicMarking" dst-port="ValVLD"
+        src="DecodeSliceHeader" src-port="DecRefPicMarkingValVLD"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="DecRefPicMarkingTypeOfVLD"
+        src="DecodeDecRefPicMarking" src-port="TypeOfVLD"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="DecRefPicMarkingNbBitsToRead"
+        src="DecodeDecRefPicMarking" src-port="NbBitsToRead"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="DecRefPicMarkingSkipNal" src="DecodeDecRefPicMarking" src-port="SkipNal"/>
+    <Connection dst="DecodeDecRefPicMarking" dst-port="IdrPic"
+        src="CheckNaluType" src-port="PicIsAnIdr"/>
+    <Connection dst="DecodeDecRefPicMarking" dst-port="PicNalRefIdc"
+        src="CheckNaluType" src-port="PicNalRefIdc"/>
 </XDF>

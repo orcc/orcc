@@ -15,14 +15,35 @@ This copyright notice must be included in all copies or derivative works. Copyri
 ***********************************************************************/
 actor Algo_DecodeSliceHeader()
 	int (size=32) ValVLD,
+	bool          IsAnIdrPic,
 	
-	uint(size=32) log2_max_frame_num
+	uint(size=6)  log2_max_frame_num,
+	bool          frame_mbs_only,
+	uint(size=2)  poc_type,
+	uint(size=6)  log2_max_poc_lsb,
+	bool          delta_pic_order_always_zero,
+
+	bool          pic_order_present,
+	bool          redundant_pic_cnt_present,
+
+	uint(size=3)  RefPicListTypeOfVLD,
+	uint(size=5)  RefPicListNbBitsToRead,
+	bool          RefPicListSkipNal,
+
+	uint(size=3)  DecRefPicMarkingTypeOfVLD,
+	uint(size=5)  DecRefPicMarkingNbBitsToRead,
+	bool          DecRefPicMarkingSkipNal
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
 	bool          SkipNal,
 
-	uint(size=8)  GetPps
+	uint(size=8)  GetPps,
+
+	uint(size=4)  SliceType,
+	int (size=32) RefPicListValVLD,
+
+	int (size=32) DecRefPicMarkingValVLD
 		:
 
 
@@ -43,9 +64,27 @@ actor Algo_DecodeSliceHeader()
 *
 */
 
+	List (type:int(size=32), size=2) delta_pic_order_cnt  := [ 0 : for int i in 0 .. 1];
+
+	bool          Idr_flag;
 	uint(size=32) first_mb_in_slice;
 	uint(size=4)  slice_type;
 	bool          separate_colour_plane_flag := false;
+	bool          field_pic_flag;
+	bool          bottom_field_flag;
+	uint(size=16) idr_pic_id := 0;
+	int (size=32) pic_order_cnt_lsb := 0;
+	int (size=32) delta_pic_order_cnt_bottom := 0;
+	uint(size=7)  redundant_pic_cnt := 0;
+	//Sps Parameters
+	bool          frame_mbs_only_flag;
+	uint(size=2)  pic_order_cnt_type;
+	uint(size=6)  SzMaxPocLsb;
+	bool          delta_pic_order_always_zero_flag;
+	//PpsParameters
+	bool          pic_order_present_flag;
+	bool          redundant_pic_cnt_present_flag;
+
 
 /*   
 *
@@ -62,10 +101,13 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadSliceType.Done: action
-			ValVLD :[ValueOfVLD] repeat 3
+			ValVLD     :[ValueOfVLD] repeat 3,
+			IsAnIdrPic :[IdrPic]
 				==>
-			GetPps :[ValueOfVLD[2]]
+			GetPps     :[ValueOfVLD[2]],
+			SliceType  :[slice_type]
 		do
+			Idr_flag           := IdrPic;
 			first_mb_in_slice := ValueOfVLD[0];
 			slice_type        :=
 				if( ValueOfVLD[1] < 5) then
@@ -80,6 +122,7 @@ actor Algo_DecodeSliceHeader()
 			//Ask sps_id
 			//Ask and get separate_colour_plane_flag ==> not implemented in decodeSpsHeader yet !!
 		end
+
 
 	SeparateColourPlane.IsEqualToTrue: action
 				==>
@@ -103,10 +146,336 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadFrameNum.Done: action
+			ValVLD                      :[ValueOfVLD],
+
+			frame_mbs_only              :[ValFrameMbsOnly],
+			poc_type                    :[ValPocType],
+			log2_max_poc_lsb            :[ValSzMaxPocLsb],
+			pic_order_present           :[ValPicOrderPresent],
+			delta_pic_order_always_zero :[ValDeltaPic],
+			redundant_pic_cnt_present   :[ValRedPicCnt]
+				==>
+		do
+			println("\t\tframe_num:        "+ValueOfVLD);
+			frame_mbs_only_flag              := ValFrameMbsOnly;
+			pic_order_cnt_type               := ValPocType;
+			SzMaxPocLsb                      := ValSzMaxPocLsb;
+			pic_order_present_flag           := ValPicOrderPresent;
+			delta_pic_order_always_zero_flag := ValDeltaPic;
+			redundant_pic_cnt_present_flag   := ValRedPicCnt;
+		end
+
+
+	FrameMbsOnly.IsEqualToFalse: action
+				==>
+			//           field_pic_flag
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			frame_mbs_only_flag = false
+		end
+
+
+	ReadFieldPicFlag.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
 		do
-			println("\t\tFrame num:"+ValueOfVLD);
+			field_pic_flag := 
+				if(ValueOfVLD = 0) then
+					false
+				else
+					true
+				end;
+			println("\t\tfield_pic_flag:   "+field_pic_flag);
+		end
+
+
+	FieldPicFlag.IsEqualToTrue: action
+				==>
+			//           bottom_field_flag
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			field_pic_flag = true
+		end
+
+
+	ReadBottomField.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			bottom_field_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+			println("\t\tbottom_field_flag: "+bottom_field_flag);
+		end
+
+
+	IdrFlag.IsEqualToTrue: action
+				==>
+			//            idr_pic_id
+			SkipNal      :[  false ],//Keep synchro
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			Idr_flag = true
+		end
+
+
+	ReadIdrPicId.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			idr_pic_id := ValueOfVLD;
+			println("\t\tidr_pic_id:       "+idr_pic_id);
+		end
+
+
+	PocType.IsEqualTo0: action
+				==>
+			//           pic_order_cnt_lsb
+			SkipNal      :[    false    ],//Keep synchro
+			TypeOfVLD    :[  READ_BITS  ],
+			NbBitsToRead :[ SzMaxPocLsb ]
+		guard
+			pic_order_cnt_type = 0
+		end
+
+	ReadPocLsb.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			pic_order_cnt_lsb := ValueOfVLD;
+			println("\t\tpic_order_cnt_lsb: "+ValueOfVLD);
+		end
+
+
+
+	Check_PicOrPres_FieldPic: action
+				==>
+			//     delta_pic_order_cnt_bottom
+			//                or
+			//      delta_pic_order_cnt[ 1 ]
+			SkipNal      :[  false ],//Keep synchro
+			TypeOfVLD    :[ VLD_SE ]
+		guard
+			pic_order_present_flag = true,
+			field_pic_flag         = false
+		end
+
+
+	ReadDeltaPicOrderCntBottom.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			delta_pic_order_cnt_bottom := ValueOfVLD;
+			println("\t\tdelta_pic_order_cnt_bottom: "+delta_pic_order_cnt_bottom);
+		end
+
+
+	ReadDeltaPicOrCnt0.Asked: action
+				==>
+			//      delta_pic_order_cnt[ 0 ]
+			SkipNal      :[  false ],//Keep synchro
+			TypeOfVLD    :[ VLD_SE ]
+		guard
+			pic_order_cnt_type               = 1,
+			delta_pic_order_always_zero_flag = false
+		end
+
+	ReadDeltaPicOrCnt0.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			delta_pic_order_cnt[0] := ValueOfVLD;
+			println("\t\tdelta_pic_order_cnt[0]: "+delta_pic_order_cnt[0]);
+		end
+
+
+	ReadDeltaPicOrCnt1.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			delta_pic_order_cnt[1] := ValueOfVLD;
+			println("\t\tdelta_pic_order_cnt[1]: "+delta_pic_order_cnt[1]);
+		end
+
+	CalcPOC: action
+			==>
+/*		POC        :[POC_val],
+		SizeDPBMax :[MaxDPBSz[sps_id]]
+	guard
+		first_mb_in_slice=0
+	var 
+		int PicOrderCntMsb,
+		int TopFieldOrderCnt,
+		int BottomFieldOrderCnt,
+		int POC_val,
+		int MaxPicOrderCntLsb = lshift(1, log2_max_pic_order_cnt_lsb_minus4[sps_id]+4),
+		int frame_num_offset, 
+		int abs_frame_num, 
+		int expected_delta_per_poc_cycle := 0, 
+		int expectedpoc := 0
+*/	do
+		//println("CalcPOC");
+/*		if nal_unit_type = 5 then 
+			frame_num_offset := 0;
+		else 
+			if frame_num < prev_frame_num then
+				frame_num_offset := prev_frame_num_offset + lshift(1, 4+log2_max_frame_num_minus4[sps_id]);
+			else
+				frame_num_offset := prev_frame_num_offset;
+			end
+		end
+		if pic_order_cnt_type[sps_id] = 0 then 
+			if nal_unit_type = 5 then
+				prevPicOrderCntMsb := 0;
+				prevPicOrderCntLsb := 0;
+			end
+			if  (pic_order_cnt_lsb < prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) >= rshift(MaxPicOrderCntLsb, 1)) then
+				PicOrderCntMsb :=  prevPicOrderCntMsb + MaxPicOrderCntLsb;
+				prevPicOrderCntMsb := PicOrderCntMsb;
+				prevPicOrderCntLsb := 0;
+			else 
+				if (pic_order_cnt_lsb > prevPicOrderCntLsb) and ((prevPicOrderCntLsb - pic_order_cnt_lsb) > rshift(MaxPicOrderCntLsb, 1)) then 
+					PicOrderCntMsb := prevPicOrderCntMsb - MaxPicOrderCntLsb;
+					prevPicOrderCntMsb := PicOrderCntMsb;
+				else
+					PicOrderCntMsb :=  prevPicOrderCntMsb;
+				end
+			end
+			BottomFieldOrderCnt := PicOrderCntMsb + pic_order_cnt_lsb;
+			TopFieldOrderCnt := BottomFieldOrderCnt;
+		else
+			if pic_order_cnt_type[sps_id] = 1 then
+				abs_frame_num := if num_ref_frames_in_pic_order_cnt_cycle[sps_id] != 0 then frame_num_offset + frame_num else 0 end ;
+				if nal_ref_idc = 0 and abs_frame_num > 0 then abs_frame_num := abs_frame_num -1; end
+				foreach int i in 0 .. num_ref_frames_in_pic_order_cnt_cycle[sps_id]-1 do
+					expected_delta_per_poc_cycle := expected_delta_per_poc_cycle + offset_for_ref_frame[sps_id][ i ];
+				end
+				if abs_frame_num > 0 then
+					expectedpoc := expected_delta_per_poc_cycle * ((abs_frame_num - 1) / num_ref_frames_in_pic_order_cnt_cycle[sps_id]);
+					foreach int i in 0 .. ((abs_frame_num - 1) mod num_ref_frames_in_pic_order_cnt_cycle[sps_id]) do
+						expectedpoc := expectedpoc + offset_for_ref_frame[sps_id][ i ];
+					end
+				else
+					expectedpoc :=0;
+				end
+				if nal_ref_idc = 0 then expectedpoc := expectedpoc + offset_for_non_ref_pic[sps_id]; end
+				TopFieldOrderCnt := expectedpoc + delta_pic_order_cnt[0];
+				BottomFieldOrderCnt := TopFieldOrderCnt + offset_for_top_to_bottom_field[sps_id] + delta_pic_order_cnt[1];
+				if field_pic_flag = 1 then BottomFieldOrderCnt := BottomFieldOrderCnt +delta_pic_order_cnt[1]; end
+			else // pic_order_cnt_type[sps_id] = 2
+				TopFieldOrderCnt := if nal_unit_type = 5 then 0 else if nal_ref_idc > 0 then lshift(frame_num_offset + frame_num, 1) else lshift(frame_num_offset + frame_num, 1) - 1 end end;
+				BottomFieldOrderCnt := TopFieldOrderCnt; 
+			end 
+		end
+		POC_val := if TopFieldOrderCnt < BottomFieldOrderCnt then TopFieldOrderCnt else BottomFieldOrderCnt end ;
+		prev_frame_num_offset := frame_num_offset;
+		prev_frame_num := frame_num;
+		prevPicOrderCntLsb := pic_order_cnt_lsb;
+*/	end
+
+
+	RedundPicCntPres.IsEqualToTrue: action
+				==>
+			//         redundant_pic_cnt
+			SkipNal      :[  false ],//Keep synchro
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			redundant_pic_cnt_present_flag = true
+		end
+
+	ReadRedunPicCnt.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			redundant_pic_cnt := ValueOfVLD;
+			println("\t\tredundant_pic_cnt: "+redundant_pic_cnt);
+		end
+
+	RefPicList.GetVLDVal: action
+			ValVLD           :[VLDecoding]
+				==>
+			RefPicListValVLD :[VLDecoding]
+		end
+
+
+	RefPicList.AskVLD: action
+			RefPicListTypeOfVLD :[ValTypeOfVLD],
+			RefPicListSkipNal   :[EndOfDecoding]
+				==>
+			TypeOfVLD           :[ValTypeOfVLD],
+			SkipNal             :[false]
+		guard
+			ValTypeOfVLD  != READ_BITS,
+			EndOfDecoding  = false
+		end
+
+
+	RefPicList.AskReadBits: action
+			RefPicListTypeOfVLD    :[ValTypeOfVLD],
+			RefPicListNbBitsToRead :[NbBits],
+			RefPicListSkipNal      :[EndOfDecoding]
+				==>
+			TypeOfVLD              :[READ_BITS],
+			NbBitsToRead           :[NbBits],
+			SkipNal                :[false]
+		guard
+			ValTypeOfVLD  = READ_BITS,
+			EndOfDecoding = false
+		end
+
+
+	RefPicList.Done: action
+			RefPicListSkipNal :[EndOfDecoding]
+				==>
+		guard
+			EndOfDecoding = true
+		end
+
+	DecRefPicMarking.GetVLDVal: action
+			ValVLD           :[VLDecoding]
+				==>
+			DecRefPicMarkingValVLD :[VLDecoding]
+		end
+
+
+	DecRefPicMarking.AskVLD: action
+			DecRefPicMarkingTypeOfVLD :[ValTypeOfVLD],
+			DecRefPicMarkingSkipNal   :[EndOfDecoding]
+				==>
+			TypeOfVLD           :[ValTypeOfVLD],
+			SkipNal             :[false]
+		guard
+			ValTypeOfVLD  != READ_BITS,
+			EndOfDecoding  = false
+		end
+
+
+	DecRefPicMarking.AskReadBits: action
+			DecRefPicMarkingTypeOfVLD    :[ValTypeOfVLD],
+			DecRefPicMarkingNbBitsToRead :[NbBits],
+			DecRefPicMarkingSkipNal      :[EndOfDecoding]
+				==>
+			TypeOfVLD              :[READ_BITS],
+			NbBitsToRead           :[NbBits],
+			SkipNal                :[false]
+		guard
+			ValTypeOfVLD  = READ_BITS,
+			EndOfDecoding = false
+		end
+
+
+	DecRefPicMarking.Done: action
+			DecRefPicMarkingSkipNal :[EndOfDecoding]
+				==>
+		guard
+			EndOfDecoding = true
 		end
 
 	SendEndSliceHeader: action
@@ -114,22 +483,118 @@ actor Algo_DecodeSliceHeader()
 			SkipNal :[true]
 		end
 
-	
+/*   
+*
+* Scheduler
+*
+*/	
 
 	schedule fsm ReadSliceTypeAsked:
-		ReadSliceTypeAsked (ReadSliceType.Asked )--> ReadSliceTypeDone;
+		ReadSliceTypeAsked             (ReadSliceType.Asked               )--> ReadSliceTypeDone;
 
-		ReadSliceTypeDone  (ReadSliceType.Done  )--> CheckSeparateColourPlane;
+		ReadSliceTypeDone              (ReadSliceType.Done                )--> CheckSeparateColourPlane;
 
-		CheckSeparateColourPlane (SeparateColourPlane.IsEqualToTrue )--> undefined; //Not implemented yet
-		CheckSeparateColourPlane (ReadFrameNum.Asked )-->ReadFrameNumDone;
+		CheckSeparateColourPlane       (SeparateColourPlane.IsEqualToTrue )--> undefined; //Not implemented yet
+		CheckSeparateColourPlane       (ReadFrameNum.Asked                )--> ReadFrameNumDone;
 
-		ReadFrameNumDone  (ReadFrameNum.Done )-->EndSliceHeader;
+		ReadFrameNumDone               (ReadFrameNum.Done                 )--> CheckFrameMbsOnly;
 
-		EndSliceHeader           (SendEndSliceHeader )--> ReadSliceTypeAsked;
+		CheckFrameMbsOnly              (FrameMbsOnly.IsEqualToFalse       )--> ReadFieldPicFlagDone;
+		CheckFrameMbsOnly              (IdrFlag.IsEqualToTrue             )--> ReadIdrPicIdDone;
+		CheckFrameMbsOnly              (PocType.IsEqualTo0                )--> ReadPocLsbDone;
+		CheckFrameMbsOnly              (ReadDeltaPicOrCnt0.Asked          )--> ReadDeltaPicOrCnt0Done;
+		CheckFrameMbsOnly              (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
+		CheckFrameMbsOnly              (RefPicList.AskVLD                 )--> DecodeRefPicList;
+		CheckFrameMbsOnly              (RefPicList.AskReadBits            )--> DecodeRefPicList;
+		CheckFrameMbsOnly              (RefPicList.Done                   )-->                        DecodeDecRefPicMarking;//DecodeWeightedPred;
+	
+
+		ReadFieldPicFlagDone           (ReadFieldPicFlag.Done             )-->CheckFieldPicFlag;
+
+		CheckFieldPicFlag              (FieldPicFlag.IsEqualToTrue        )--> ReadBottomFieldDone;
+		CheckFieldPicFlag              (IdrFlag.IsEqualToTrue             )--> ReadIdrPicIdDone;
+		CheckFieldPicFlag              (PocType.IsEqualTo0                )--> ReadPocLsbDone;
+		CheckFieldPicFlag              (ReadDeltaPicOrCnt0.Asked          )--> ReadDeltaPicOrCnt0Done;
+		CheckFieldPicFlag              (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
+		CheckFieldPicFlag              (RefPicList.AskVLD                 )--> DecodeRefPicList;
+		CheckFieldPicFlag              (RefPicList.AskReadBits            )--> DecodeRefPicList;
+		CheckFieldPicFlag              (RefPicList.Done                   )-->                            DecodeDecRefPicMarking;//DecodeWeightedPred;
+
+		ReadBottomFieldDone            (ReadBottomField.Done              )-->CheckIdrFlag;
+
+		CheckIdrFlag                   (IdrFlag.IsEqualToTrue             )--> ReadIdrPicIdDone;
+		CheckIdrFlag                   (PocType.IsEqualTo0                )--> ReadPocLsbDone;
+		CheckIdrFlag                   (ReadDeltaPicOrCnt0.Asked          )--> ReadDeltaPicOrCnt0Done;
+		CheckIdrFlag                   (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
+		CheckIdrFlag                   (RefPicList.AskVLD                 )--> DecodeRefPicList;
+		CheckIdrFlag                   (RefPicList.AskReadBits            )--> DecodeRefPicList;
+		CheckIdrFlag                   (RefPicList.Done                   )-->                             DecodeDecRefPicMarking;//DecodeWeightedPred;
+
+		ReadIdrPicIdDone               (ReadIdrPicId.Done                 )--> CheckPocType;
+
+		CheckPocType                   (PocType.IsEqualTo0                )--> ReadPocLsbDone;
+		CheckPocType                   (ReadDeltaPicOrCnt0.Asked          )--> ReadDeltaPicOrCnt0Done;
+		CheckPocType                   (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
+		CheckPocType                   (RefPicList.AskVLD                 )--> DecodeRefPicList;
+		CheckPocType                   (RefPicList.AskReadBits            )--> DecodeRefPicList;
+		CheckPocType                   (RefPicList.Done                   )-->                            DecodeDecRefPicMarking;//DecodeWeightedPred;
+
+		ReadPocLsbDone                 (ReadPocLsb.Done                   )--> Check4DeltPicOrdCntBot;
+
+		Check4DeltPicOrdCntBot         (Check_PicOrPres_FieldPic          )--> ReadDeltaPicOrderCntBottomDone;
+		Check4DeltPicOrdCntBot         (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
+		Check4DeltPicOrdCntBot         (RefPicList.AskVLD                 )--> DecodeRefPicList;
+		Check4DeltPicOrdCntBot         (RefPicList.AskReadBits            )--> DecodeRefPicList;
+		Check4DeltPicOrdCntBot         (RefPicList.Done                   )-->                            DecodeDecRefPicMarking;//DecodeWeightedPred;
+
+		ReadDeltaPicOrderCntBottomDone (ReadDeltaPicOrderCntBottom.Done   )--> CheckRedundPicCntPres;
+
+		ReadDeltaPicOrCnt0Done         (ReadDeltaPicOrCnt0.Done           )--> Check4DeltaPicOrCnt1;
+
+		Check4DeltaPicOrCnt1           (Check_PicOrPres_FieldPic          )--> ReadDeltaPicOrCnt1Done;
+		Check4DeltaPicOrCnt1           (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
+		Check4DeltaPicOrCnt1           (RefPicList.AskVLD                 )--> DecodeRefPicList;
+		Check4DeltaPicOrCnt1           (RefPicList.AskReadBits            )--> DecodeRefPicList;
+		Check4DeltaPicOrCnt1           (RefPicList.Done                   )-->                            DecodeDecRefPicMarking;//DecodeWeightedPred;
+
+		ReadDeltaPicOrCnt1Done         (ReadDeltaPicOrCnt1.Done           )--> CheckRedundPicCntPres;
+
+		CheckRedundPicCntPres          (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
+		CheckRedundPicCntPres          (RefPicList.AskVLD                 )--> DecodeRefPicList;
+		CheckRedundPicCntPres          (RefPicList.AskReadBits            )--> DecodeRefPicList;
+		CheckRedundPicCntPres          (RefPicList.Done                   )-->                           DecodeDecRefPicMarking;//DecodeWeightedPred;
+
+		ReadRedunPicCntDone            (ReadRedunPicCnt.Done              )--> DecodeRefPicList;
+
+		DecodeRefPicList               (RefPicList.GetVLDVal              )--> DecodeRefPicList;
+		DecodeRefPicList               (RefPicList.AskVLD                 )--> DecodeRefPicList;
+		DecodeRefPicList               (RefPicList.AskReadBits            )--> DecodeRefPicList;
+		DecodeRefPicList               (RefPicList.Done                   )-->                            DecodeDecRefPicMarking;//DecodeWeightedPred;
+
+
+		//DecodeWeightedPred           (WeightedPred.GetVLDVal            )--> DecodeWeightedPred;
+		//DecodeWeightedPred           (WeightedPred.AskVLD               )--> DecodeWeightedPred;
+		//DecodeWeightedPred           (WeightedPred.AskReadBits          )--> DecodeWeightedPred;
+		//DecodeWeightedPred           (WeightedPred.Done                 )--> DecodeDecRefPicMarking;
+
+
+		DecodeDecRefPicMarking         (DecRefPicMarking.GetVLDVal        )--> DecodeDecRefPicMarking;
+		DecodeDecRefPicMarking         (DecRefPicMarking.AskVLD           )--> DecodeDecRefPicMarking;
+		DecodeDecRefPicMarking         (DecRefPicMarking.AskReadBits      )--> DecodeDecRefPicMarking;
+		DecodeDecRefPicMarking         (DecRefPicMarking.Done             )-->                           EndSliceHeader;
+
+		EndSliceHeader                 (SendEndSliceHeader                )--> ReadSliceTypeAsked;
 	end
 
 	priority
-		SeparateColourPlane > ReadFrameNum;
+		SeparateColourPlane            > ReadFrameNum;
+		FrameMbsOnly.IsEqualToFalse    > IdrFlag.IsEqualToTrue;
+		FieldPicFlag.IsEqualToTrue     > IdrFlag.IsEqualToTrue;
+		IdrFlag.IsEqualToTrue          > PocType.IsEqualTo0;
+		PocType.IsEqualTo0             > ReadDeltaPicOrCnt0.Asked;
+		ReadDeltaPicOrCnt0.Asked       > RedundPicCntPres.IsEqualToTrue;
+		Check_PicOrPres_FieldPic       > RedundPicCntPres.IsEqualToTrue;
+		RedundPicCntPres.IsEqualToTrue > RefPicList.AskVLD;
+		RefPicList.GetVLDVal           > RefPicList.AskVLD              > RefPicList.AskReadBits > RefPicList.Done;
 	end
 end

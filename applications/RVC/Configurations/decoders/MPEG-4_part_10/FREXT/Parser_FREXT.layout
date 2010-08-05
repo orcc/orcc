@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="573" y="70"/>
-      <vertex id="Algo_NALU" x="834" y="86"/>
-      <vertex id="CheckNaluType" x="1089" y="264"/>
-      <vertex id="DecodeSps" x="573" y="167"/>
-      <vertex id="SpsVLDecoding" x="834" y="227"/>
-      <vertex id="PpsVLDecoding" x="573" y="330"/>
-      <vertex id="DecodePps" x="262" y="309"/>
-      <vertex id="PicVLDecoding" x="573" y="515"/>
-      <vertex id="DecodePic" x="263" y="514"/>
-      <vertex id="DecodeSliceHeader" x="57" y="525"/>
+      <vertex id="bits8" x="643" y="60"/>
+      <vertex id="Algo_NALU" x="761" y="40"/>
+      <vertex id="CheckNaluType" x="991" y="13"/>
+      <vertex id="DecodeSps" x="726" y="454"/>
+      <vertex id="SpsVLDecoding" x="720" y="283"/>
+      <vertex id="PpsVLDecoding" x="357" y="295"/>
+      <vertex id="DecodePps" x="396" y="474"/>
+      <vertex id="PicVLDecoding" x="1353" y="296"/>
+      <vertex id="DecodePic" x="1330" y="463"/>
+      <vertex id="DecodeSliceHeader" x="1007" y="814"/>
+      <vertex id="DecodeRefPicList" x="594" y="1144"/>
+      <vertex id="DecodeDecRefPicMarking" x="1021" y="1270"/>
    </vertices>
 </layout>
