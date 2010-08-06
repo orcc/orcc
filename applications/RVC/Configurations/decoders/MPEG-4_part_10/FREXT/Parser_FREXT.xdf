@@ -139,6 +139,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="DecodeSliceData_Cavlc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSliceData_CAVLC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -152,8 +161,6 @@
     <Connection dst="CheckNaluType" dst-port="SpsSkipNal"
         src="SpsVLDecoding" src-port="SkipNal"/>
     <Connection dst="DecodeSps" dst-port="ValVLD" src="SpsVLDecoding" src-port="ValDecoded"/>
-    <Connection dst="CheckNaluType" dst-port="SpsReadNextByte"
-        src="SpsVLDecoding" src-port="ReadNextByte"/>
     <Connection dst="SpsVLDecoding" dst-port="NbBitsToRead"
         src="DecodeSps" src-port="NbBitsToRead"/>
     <Connection dst="DecodePps" dst-port="ValVLD" src="PpsVLDecoding" src-port="ValDecoded"/>
@@ -163,12 +170,8 @@
     <Connection dst="PpsVLDecoding" dst-port="TypeOfVLD" src="DecodePps" src-port="TypeOfVLD"/>
     <Connection dst="PpsVLDecoding" dst-port="RbspByte"
         src="CheckNaluType" src-port="PpsRbsp"/>
-    <Connection dst="CheckNaluType" dst-port="PpsReadNextByte"
-        src="PpsVLDecoding" src-port="ReadNextByte"/>
     <Connection dst="CheckNaluType" dst-port="PpsSkipNal"
         src="PpsVLDecoding" src-port="SkipNal"/>
-    <Connection dst="CheckNaluType" dst-port="PicReadNextByte"
-        src="PicVLDecoding" src-port="ReadNextByte"/>
     <Connection dst="CheckNaluType" dst-port="PicSkipNal"
         src="PicVLDecoding" src-port="SkipNal"/>
     <Connection dst="PicVLDecoding" dst-port="RbspByte"
@@ -188,8 +191,6 @@
         src="DecodeSliceHeader" src-port="SkipNal"/>
     <Connection dst="DecodePps" dst-port="PpsAsked"
         src="DecodeSliceHeader" src-port="GetPps"/>
-    <Connection dst="DecodeSliceHeader" dst-port="log2_max_frame_num"
-        src="DecodeSps" src-port="log2_max_frame_num"/>
     <Connection dst="DecodeSliceHeader" dst-port="frame_mbs_only"
         src="DecodeSps" src-port="frame_mbs_only"/>
     <Connection dst="DecodeSliceHeader" dst-port="log2_max_poc_lsb"
@@ -247,4 +248,42 @@
         src="DecodePps" src-port="NumSliceGroups"/>
     <Connection dst="DecodeSliceHeader" dst-port="SliceGroupMapType"
         src="DecodePps" src-port="SliceGroupMapType"/>
+    <Connection dst="DecodeSliceHeader" dst-port="Log2MaxFrameNum"
+        src="DecodeSps" src-port="log2_max_frame_num"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="NumRefFramesInPocCycle" src="DecodeSps" src-port="NumRefFramesInPocCycle"/>
+    <Connection dst="DecodeSliceHeader" dst-port="NalRefIdc"
+        src="CheckNaluType" src-port="PicNalRefIdc"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="ExpectedDeltaPerPocCycle" src="DecodeSps" src-port="ExpectedDeltaPerPocCycle"/>
+    <Connection dst="DecodeSliceHeader" dst-port="OffsetForNonRefPic"
+        src="DecodeSps" src-port="OffsetForNonRefPic"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="OffsetForRefFrameAccumul" src="DecodeSps" src-port="OffsetForRefFrameAccumul"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="OffsetForTopToBottomField" src="DecodeSps" src-port="OffsetForTopToBottomField"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="ValVLD"
+        src="DecodePic" src-port="DataValVLD"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="FirstMbInSlice"
+        src="DecodeSliceHeader" src-port="FirstMbInSlice"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="EntropyCodingMode"
+        src="DecodePps" src-port="entropy_coding_mode"/>
+    <Connection dst="DecodePic" dst-port="DataTypeOfVLD"
+        src="DecodeSliceData_Cavlc" src-port="TypeOfVLD"/>
+    <Connection dst="DecodePic" dst-port="DataNbBitsToRead"
+        src="DecodeSliceData_Cavlc" src-port="NbBitsToRead"/>
+    <Connection dst="DecodePic" dst-port="DataSkipNal"
+        src="DecodeSliceData_Cavlc" src-port="SkipNal"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="SliceType"
+        src="DecodeSliceHeader" src-port="SliceType"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="PicSzInMbs"
+        src="DecodeSps" src-port="PicSzInMbs"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="PicWdtInMbs"
+        src="DecodeSps" src-port="PicWdtInMbs"/>
+    <Connection dst="PicVLDecoding" dst-port="NewNal"
+        src="CheckNaluType" src-port="PicNewNal"/>
+    <Connection dst="PpsVLDecoding" dst-port="NewNal"
+        src="CheckNaluType" src-port="PpsNewNal"/>
+    <Connection dst="SpsVLDecoding" dst-port="NewNal"
+        src="CheckNaluType" src-port="SpsNewNal"/>
 </XDF>

@@ -1,0 +1,150 @@
+/***********************************************************************
+
+This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+//Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
+actor Algo_DecodeSliceData_CAVLC()
+	int (size=32) ValVLD,
+	//PpsParameters
+	bool          EntropyCodingMode,
+	//Sps Parameters
+	uint(size=32) PicSzInMbs,
+	uint(size=32) PicWdtInMbs,
+	//Slice Header Parameters
+	uint(size=32) FirstMbInSlice,
+	uint(size=4)  SliceType
+		==>
+	uint(size=3)  TypeOfVLD,
+	uint(size=5)  NbBitsToRead,
+	bool          SkipNal
+		:
+
+
+/*
+*
+* Constants
+*
+*/
+
+	uint(size=3) READ_BITS             = 0;
+	uint(size=3) VLD_UE                = 1;
+	uint(size=3) VLD_SE                = 2;
+	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
+
+//	uint(size=4) SLICE_TYPE_P  = 0;
+//	uint(size=4) SLICE_TYPE_B  = 1;
+	uint(size=4) SLICE_TYPE_I  = 2;
+//	uint(size=4) SLICE_TYPE_SP = 3;
+	uint(size=4) SLICE_TYPE_SI = 4;
+
+  	// FIXME! Maximum size of a line in macroclock
+  	uint(size=7) PICWIDTH =1280/16;
+	uint(size=7) PICHEIGHT=720/16;
+
+
+/*
+*
+* State Variables
+*
+*/
+
+	//Pps Parameters
+	bool entropy_coding_mode_flag;
+	//Sps Parameters
+//	uint(size=32) PicSizeInMbs;
+//	uint(size=32) PicWidthInMbs;
+	//Slice Header Parameters
+	uint(size=32) val_CurrMbAddr;
+	uint(size=4)  slice_type;
+
+	bool          moreDataFlag;
+	bool          prevMbSkipped;
+	uint(size=32) mb_skip_run;
+//	uint(size=32) Mb_x;
+//	uint(size=32) Mb_y;
+	// ???
+/*	List ( type: List(type: uint(size=4), size=16), size = PICHEIGHT*PICWIDTH) NonZeroCount; // FIXME those numbers should be independent of the size
+	List ( type: List(type: uint(size=4), size=4),  size = PICHEIGHT*PICWIDTH) NonZeroCountCb; // FIXME those numbers should be independent of the size
+	List ( type: List(type: uint(size=4), size=4),  size = PICHEIGHT*PICWIDTH) NonZeroCountCr; // FIXME those numbers should be independent of the size
+*/
+
+	GetSpsAndPpsParameters: action
+			EntropyCodingMode :[ValEntropyCodingMode],
+			FirstMbInSlice    :[ValFirstMbInSlice],
+			PicSzInMbs        :[ValPicSizeInMbs],
+			PicWdtInMbs       :[ValPicWdtInMbs],
+			SliceType         :[ValSliceType]
+				==>
+		do
+			entropy_coding_mode_flag := ValEntropyCodingMode;
+			slice_type               := ValSliceType;
+
+			val_CurrMbAddr := ValFirstMbInSlice; //  ?? => CurrMbAddr = first_mb_in_slice * ( 1 + MbaffFrameFlag )
+			moreDataFlag   := true;
+			prevMbSkipped  := false;
+
+/*			PicSizeInMbs             := ValPicSizeInMbs;
+			PicWidthInMbs            := ValPicWdtInMbs;
+			NonZeroCount   := [[ 0 : for int j in 0 .. 16-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
+			NonZeroCountCb := [[ 0 : for int j in 0 ..  4-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
+			NonZeroCountCr := [[ 0 : for int j in 0 ..  4-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
+			Mb_x := val_CurrMbAddr mod PicWidthInMbs;
+			Mb_y := val_CurrMbAddr  /  PicWidthInMbs;
+			// ...
+*/
+		end
+
+	/* It's a CABAC Sequence ! */
+	EntropyCodingModeFlag.IsEqualToTrue: action
+			==>
+		guard
+			entropy_coding_mode_flag = true
+		end
+
+	IsSliceIorSI: action
+				==>
+			//         mb_skip_run
+			SkipNal   :[  false ],//Keep synchro
+			TypeOfVLD :[ VLD_UE ]
+		guard
+			   slice_type = SLICE_TYPE_I
+			or slice_type = SLICE_TYPE_SI
+		end
+
+	ReadMbSkipRun.Done: action
+			ValVLD     :[ValueOfVLD]
+				==>
+		do
+			mb_skip_run   := ValueOfVLD;
+			prevMbSkipped := (mb_skip_run > 0);
+		end
+
+	SendEndSliceHeader: action
+				==>
+			SkipNal :[true]
+		end
+
+	schedule fsm GetSpsAndPpsParameters:
+		GetSpsAndPpsParameters     (GetSpsAndPpsParameters              )--> CheckEntropyCodingModeFlag;
+
+		CheckEntropyCodingModeFlag (EntropyCodingModeFlag.IsEqualToTrue )--> GetSpsAndPpsParameters;
+				CheckEntropyCodingModeFlag (SendEndSliceHeader )--> GetSpsAndPpsParameters;
+
+		EndDecodeSliceData         (SendEndSliceHeader                  )--> GetSpsAndPpsParameters;
+	end
+
+	priority
+
+	end
+end

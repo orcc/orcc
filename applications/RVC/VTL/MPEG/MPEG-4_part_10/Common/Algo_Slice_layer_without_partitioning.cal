@@ -18,13 +18,19 @@ actor Algo_Slice_layer_without_partitioning()
 
 	uint(size=3)  HeaderTypeOfVLD,
 	uint(size=5)  HeaderNbBitsToRead,
-	bool          HeaderSkipNal
+	bool          HeaderSkipNal,
+
+	uint(size=3)  DataTypeOfVLD,
+	uint(size=5)  DataNbBitsToRead,
+	bool          DataSkipNal
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
 	bool          SkipNal,
 
-	int (size=32) HeaderValVLD
+	int (size=32) HeaderValVLD,
+
+	int (size=32) DataValVLD
 		:
 
 
@@ -77,9 +83,45 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
+	SliceData.GetVLDVal: action
+			ValVLD       :[VLDecoding]
+				==>
+			DataValVLD :[VLDecoding]
+		end
+
+
+	SliceData.AskVLD: action
+			DataTypeOfVLD :[ValTypeOfVLD],
+			DataSkipNal   :[EndOfDecoding]
+				==>
+			TypeOfVLD       :[ValTypeOfVLD],
+			SkipNal         :[false]
+		guard
+			ValTypeOfVLD  != READ_BITS,
+			EndOfDecoding  = false
+		end
+
+
+	SliceData.AskReadBits: action
+			DataTypeOfVLD    :[ValTypeOfVLD],
+			DataNbBitsToRead :[NbBits],
+			DataSkipNal      :[EndOfDecoding]
+				==>
+			TypeOfVLD          :[READ_BITS],
+			NbBitsToRead       :[NbBits],
+			SkipNal            :[false]
+		guard
+			ValTypeOfVLD  = READ_BITS,
+			EndOfDecoding = false
+		end
+
+
 	SliceData.Done: action
+			DataSkipNal :[EndOfDecoding]
 				==>
 			SkipNal : [true]
+		guard
+			EndOfDecoding = true
 		end
 
 
@@ -89,14 +131,14 @@ actor Algo_Slice_layer_without_partitioning()
 		LaunchSliceHeader (SliceHeader.GetVLDVal   )--> LaunchSliceHeader;
 		LaunchSliceHeader (SliceHeader.Done        )--> LaunchSliceData;
 
-/*		LaunchSliceData   (SliceData.AskVLD        )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.AskVLD        )--> LaunchSliceData;
 		LaunchSliceData   (SliceData.AskReadBits   )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.GetVLDVal     )--> LaunchSliceData;*/
+		LaunchSliceData   (SliceData.GetVLDVal     )--> LaunchSliceData;
 		LaunchSliceData   (SliceData.Done          )--> LaunchSliceHeader;
 	end
 
 	priority
 		SliceHeader.GetVLDVal > SliceHeader.AskVLD > SliceHeader.AskReadBits > SliceHeader.Done;
-//		SliceData.GetVLDVal   > SliceData.AskVLD   > SliceData.AskReadBits   > SliceData.Done;
+		SliceData.GetVLDVal   > SliceData.AskVLD   > SliceData.AskReadBits   > SliceData.Done;
 	end
 end

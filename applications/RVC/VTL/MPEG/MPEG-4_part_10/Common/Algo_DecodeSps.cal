@@ -27,6 +27,13 @@ actor Algo_DecodeSps()
 	uint(size=2)  poc_type,
 	uint(size=6)  SzMaxPocLsb,
 	bool          delta_pic_order_always_zero,
+	uint(size=8)  NumRefFramesInPocCycle,
+	int (size=32) ExpectedDeltaPerPocCycle,
+	int (size=32) OffsetForRefFrameAccumul,
+	int (size=32) OffsetForNonRefPic,
+	int (size=32) OffsetForTopToBottomField,
+	uint(size=32) PicSzInMbs,
+	uint(size=32) PicWdtInMbs,
 
 	uint(size=32) Pps_PicWidthInMbs,
 	uint(size=32) Pps_PicHeightInMapUnits
@@ -74,7 +81,8 @@ actor Algo_DecodeSps()
 *
 */
 
-	List (type: List( type: int(size=32), size=255), size=32) offset_for_ref_frame := [[ 0 : for int i in 0 .. 254 ]: for int j in 0 .. 31 ];
+	List (type: List( type: int(size=32), size=255), size=32) offset_for_ref_frame         := [[ 0 : for int i in 0 .. 254 ]: for int j in 0 .. 31 ];
+	List (type: List( type: int(size=32), size=255), size=32) offset_for_ref_frame_accumul := [[ 0 : for int i in 0 .. 254 ]: for int j in 0 .. 31 ];
 //Compute the real values !!!!
 	List (type: uint(size=8) , size=32) level_idc                             := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=4) , size=32) constraint_set_flag                   := [ 0 : for int i in 0 .. 31 ];
@@ -100,9 +108,12 @@ actor Algo_DecodeSps()
 	List (type: uint(size=32), size=32) frame_crop_bottom_offset              := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=1) , size=32) vui_parameters_present_flag           := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=5) , size=32) MaxDPBSz                              := [16 : for int i in 0 .. 31 ];
+	List (type: int (size=32), size=32) expected_delta_per_poc_cycle          := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) pic_size_in_mbs                       := [ 0 : for int i in 0 .. 31 ];
 
 	uint(size=5)  sps_id ;
 	int (size=32) LoopVal;
+	int (size=32) PrevOffForRefFramAccum;
 
 
 /*
@@ -117,6 +128,8 @@ actor Algo_DecodeSps()
 			SkipNal      :[   false   ,   false   ,   false   ,   false   ,  false ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , READ_BITS , READ_BITS , READ_BITS , VLD_UE ],
 			NbBitsToRead :[     8     ,     4     ,     4     ,     8     ]
+		do
+		println("ReadSpsId.Asked");
 		end
 
 	SpsParam.AskedFromPic: action
@@ -126,7 +139,13 @@ actor Algo_DecodeSps()
 			frame_mbs_only              :[val_frame_mbs_only],
 			poc_type                    :[pic_order_cnt_type[ValSps]],
 			SzMaxPocLsb                 :[log2_max_pic_order_cnt_lsb_minus4[ValSps] + 4],
-			delta_pic_order_always_zero :[ValDeltaPic]
+			delta_pic_order_always_zero :[ValDeltaPic],
+			NumRefFramesInPocCycle      :[num_ref_frames_in_pic_order_cnt_cycle[ValSps]],
+			ExpectedDeltaPerPocCycle    :[expected_delta_per_poc_cycle[ValSps]],
+			OffsetForNonRefPic          :[offset_for_non_ref_pic[ValSps]],
+			OffsetForTopToBottomField   :[offset_for_top_to_bottom_field[ValSps]],
+			PicSzInMbs                  :[pic_size_in_mbs[ValSps]],
+			PicWdtInMbs                 :[pic_width_in_mbs_minus1[ValSps] + 1]
 		var
 			bool val_frame_mbs_only,
 			bool ValDeltaPic
@@ -143,6 +162,23 @@ actor Algo_DecodeSps()
 				else
 					true
 				end;
+			sps_id  := ValSps;
+			LoopVal := 0;
+		end
+
+	SendOff4RefFrameAcc.Launch: action
+				==>
+			OffsetForRefFrameAccumul:[offset_for_ref_frame_accumul[sps_id][LoopVal]]
+		guard
+			LoopVal < num_ref_frames_in_pic_order_cnt_cycle[sps_id]
+		do
+			LoopVal := LoopVal + 1;
+		end
+
+	SendOff4RefFrameAcc.Done: action
+			==>
+		guard
+			LoopVal >= num_ref_frames_in_pic_order_cnt_cycle[sps_id]
 		end
 
 	SpsParam.AskedFromPps: action
@@ -162,10 +198,13 @@ actor Algo_DecodeSps()
 			println("level_idc:"+ValueOfVLD[3]);
 			println("sps_id:"+ValueOfVLD[4]);
 
-			sps_id                      := ValueOfVLD[4];
-			profile_idc[sps_id]         := ValueOfVLD[0];
-			constraint_set_flag[sps_id] := ValueOfVLD[1];
-			level_idc[sps_id]           := ValueOfVLD[3];
+			sps_id                                        := ValueOfVLD[4];
+			profile_idc[sps_id]                           := ValueOfVLD[0];
+			constraint_set_flag[sps_id]                   := ValueOfVLD[1];
+			level_idc[sps_id]                             := ValueOfVLD[3];
+			expected_delta_per_poc_cycle[sps_id]          := 0;
+			PrevOffForRefFramAccum                        := 0;
+			num_ref_frames_in_pic_order_cnt_cycle[sps_id] := 0;
 		end
 
 
@@ -260,7 +299,7 @@ actor Algo_DecodeSps()
 			delta_pic_order_always_zero_flag[sps_id]      := ValueOfVLD[0];
 			offset_for_non_ref_pic[sps_id]                := ValueOfVLD[1];
 			offset_for_top_to_bottom_field[sps_id]        := ValueOfVLD[2];
-			num_ref_frames_in_pic_order_cnt_cycle[sps_id] := ValueOfVLD[3];
+			num_ref_frames_in_pic_order_cnt_cycle[sps_id] := bitand(ValueOfVLD[3], 0xFF);
 //			println("ReadPocType1Param");
 		end
 
@@ -287,7 +326,10 @@ actor Algo_DecodeSps()
 		guard
 			LoopVal < num_ref_frames_in_pic_order_cnt_cycle[sps_id] - 1
 		do
-			offset_for_ref_frame[sps_id][LoopVal] := ValueOfVLD;
+			offset_for_ref_frame[sps_id][LoopVal]         := ValueOfVLD;
+			expected_delta_per_poc_cycle[sps_id]          := expected_delta_per_poc_cycle[sps_id] + ValueOfVLD;
+			offset_for_ref_frame_accumul[sps_id][LoopVal] := PrevOffForRefFramAccum + ValueOfVLD;
+			PrevOffForRefFramAccum                        := PrevOffForRefFramAccum + ValueOfVLD;
 //			println("ReadOffset4RefFrame.Launch");
 			LoopVal := LoopVal + 1;
 		end
@@ -297,7 +339,9 @@ actor Algo_DecodeSps()
 			ValVLD :[ValueOfVLD]
 				==>
 		do
-			offset_for_ref_frame[sps_id][LoopVal] := ValueOfVLD;
+			offset_for_ref_frame[sps_id][LoopVal]         := ValueOfVLD;
+			offset_for_ref_frame_accumul[sps_id][LoopVal] := PrevOffForRefFramAccum + ValueOfVLD;
+			expected_delta_per_poc_cycle[sps_id]          := expected_delta_per_poc_cycle[sps_id] + ValueOfVLD;
 //			println("ReadOffset4RefFrame.Done");
 		end
 
@@ -428,6 +472,7 @@ actor Algo_DecodeSps()
 			SkipNal :[true]
 		do
 			vui_parameters_present_flag[sps_id] := ValueOfVLD;
+			pic_size_in_mbs[sps_id] := (pic_width_in_mbs_minus1[sps_id] +1) * (pic_height_in_map_units_minus1[sps_id] +1);
 		end
 
 		
@@ -440,9 +485,12 @@ actor Algo_DecodeSps()
 	schedule fsm AskReadSpsId:
 		AskReadSpsId                 (ReadSpsId.Asked                )--> ReadSpsIdDone;
 
-		ReadSpsIdDone                (SpsParam.AskedFromPic           )--> ReadSpsIdDone;
-		ReadSpsIdDone                (SpsParam.AskedFromPps           )--> ReadSpsIdDone;
+		ReadSpsIdDone                (SpsParam.AskedFromPic          )--> SendOff4RefFrameAcc;
+		ReadSpsIdDone                (SpsParam.AskedFromPps          )--> ReadSpsIdDone;
 		ReadSpsIdDone                (ReadSpsId.Done                 )--> CheckChromaFormatIdc;
+
+		SendOff4RefFrameAcc          (SendOff4RefFrameAcc.Launch     )--> SendOff4RefFrameAcc;
+		SendOff4RefFrameAcc          (SendOff4RefFrameAcc.Done       )--> ReadSpsIdDone;
 
 		CheckChromaFormatIdc         (ReadChromaFormatIdc.Asked      )--> ReadChormaFormatIdcDone;
 		CheckChromaFormatIdc         (Read_MaxFrameNum_PocType.Asked )--> Read_MaxFrameNum_PocTypeDone;

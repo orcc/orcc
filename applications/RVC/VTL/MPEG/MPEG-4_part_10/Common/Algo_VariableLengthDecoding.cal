@@ -15,12 +15,12 @@ This copyright notice must be included in all copies or derivative works. Copyri
 ***********************************************************************/
 actor Algo_VariableLengthDecoding()
 	uint(size=8)  RbspByte,
+	bool          NewNal,
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
 	bool          EndOfNal
 		==>
 	int (size=32) ValDecoded,
-	bool          ReadNextByte,
 	bool          SkipNal
 		:
 
@@ -31,9 +31,10 @@ actor Algo_VariableLengthDecoding()
 *
 */
 
-	uint(size=3) READ_BITS = 0;
-	uint(size=3) VLD_UE    = 1;
-	uint(size=3) VLD_SE    = 2;
+	uint(size=3) READ_BITS             = 0;
+	uint(size=3) VLD_UE                = 1;
+	uint(size=3) VLD_SE                = 2;
+	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
 
 
 /*
@@ -82,6 +83,24 @@ actor Algo_VariableLengthDecoding()
 //			println("EndOfNal");
 		end
 
+	WaitForNewNal: action
+			NewNal       :[IsNewNal],
+			RbspByte     :[ValRbsp]
+				==>
+		guard
+			IsNewNal = false
+		do
+//			println("Skip : "+ValRbsp);	
+		end
+
+
+	NewNalDetected: action
+			NewNal :[IsNewNal]
+				==>
+		do
+//			println("NewNalDetected");	
+		end
+
 
 	IsVldUe: action
 			TypeOfVLD :[ValTypeOfVLD],
@@ -127,31 +146,34 @@ actor Algo_VariableLengthDecoding()
 			ReadValue := 0;
 		end
 
+	IsByteAligned: action
+			TypeOfVLD    :[ValTypeOfVLD],
+			EndOfNal     :[ValEndOfNal]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = BYTE_ALIGNED_REQUIRED
+		do
+			CountBufferRbsp := 0;
+//			println("IsByteAligned");
+		end
+
 
 	Buffer.IsEmpty: action
+			RbspByte :[ValRbspByte],
+			NewNal   :[ValNewNal]
 				==>
-			ReadNextByte :[true],
-			SkipNal      :[false]
 		guard
 			CountBufferRbsp = 0
 		do
-//			println("Buffer.IsEmpty");
+			CountBufferRbsp := 8;
+			BufferRbsp      := ValRbspByte;
 		end
 
 
 	Buffer.IsNotEmpty: action ==>
-		do
-//			println("Buffer.IsNotEmpty");
-		end
-
-
-	GetNextByte: action
-			RbspByte :[ValRbspByte]
-				==>
-		do
-//			println("GetNextByte");
-			CountBufferRbsp := 8;
-			BufferRbsp      := ValRbspByte;
+		guard
+			CountBufferRbsp > 0
 		end
 
 
@@ -277,17 +299,17 @@ actor Algo_VariableLengthDecoding()
 */
 
 	schedule fsm CheckVLDType:
-		CheckVLDType    (IsEndOfNal             )--> CheckVLDType;
+		CheckVLDType    (IsEndOfNal             )--> WaitForNewNal;
+		CheckVLDType    (IsByteAligned          )--> CheckVLDType;
 		CheckVLDType    (IsVldUe                )--> VLDecoding_Ue;
 		CheckVLDType    (IsVldSe                )--> VLDecoding_Se;
 		CheckVLDType    (IsReadBits             )--> Decode_u;
 
+		WaitForNewNal   (WaitForNewNal          )--> WaitForNewNal;
+		WaitForNewNal   (NewNalDetected         )--> CheckVLDType;
 
 		/* ue(v) decoding process */
-		VLDecoding_Ue   (Buffer.IsEmpty         )--> GetNextByte4ue;
-		VLDecoding_Ue   (Buffer.IsNotEmpty      )--> GetCodeNum4ue;
-
-		GetNextByte4ue  (GetNextByte            )--> GetCodeNum4ue;
+		VLDecoding_Ue   (Buffer                 )--> GetCodeNum4ue;
 
 		GetCodeNum4ue   (GetCodeNum.Launch      )--> CheckCodeNum4ue;
 
@@ -298,10 +320,7 @@ actor Algo_VariableLengthDecoding()
 
 
 		/* se(v) decoding process */
-		VLDecoding_Se   (Buffer.IsEmpty         )--> GetNextByte4se;
-		VLDecoding_Se   (Buffer.IsNotEmpty      )--> GetCodeNum4se;
-
-		GetNextByte4se  (GetNextByte            )--> GetCodeNum4se;
+		VLDecoding_Se   (Buffer                 )--> GetCodeNum4se;
 
 		GetCodeNum4se   (GetCodeNum.Launch      )--> CheckCodeNum4se;
 
@@ -312,10 +331,7 @@ actor Algo_VariableLengthDecoding()
 
 
 		/* u(n) decoding process */
-		Decode_u        (Buffer.IsEmpty         )--> GetNextByte4u;
-		Decode_u        (Buffer.IsNotEmpty      )--> Get_u;
-
-		GetNextByte4u   (GetNextByte             )--> Get_u;
+		Decode_u        (Buffer                 )--> Get_u;
 
 		Get_u           (Get_u.Launch           )--> Check_u_Val;
 
@@ -326,6 +342,8 @@ actor Algo_VariableLengthDecoding()
 	end
 	
 	priority
+		WaitForNewNal          > NewNalDetected;
+		IsVldUe                > IsReadBits           > IsVldSe > IsByteAligned > IsEndOfNal;
 		GetCodeNum.NotFinished > GetCodeNum.Finished;
 		Buffer.IsEmpty         > Buffer.IsNotEmpty;
 	end

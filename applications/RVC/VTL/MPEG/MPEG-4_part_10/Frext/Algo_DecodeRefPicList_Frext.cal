@@ -99,7 +99,7 @@ actor Algo_DecodeRefPicList_Frext()
 			ValVLD :[ValueOfVLD]
 				==>
 		do
-			println("\t\tnum_ref_idx_l0_active: "+ValueOfVLD);
+			println("\t\tnum_ref_idx_l0_active_minus1: "+ValueOfVLD);
 			num_ref_idx_l0_active := ValueOfVLD + 1;
 		end
 

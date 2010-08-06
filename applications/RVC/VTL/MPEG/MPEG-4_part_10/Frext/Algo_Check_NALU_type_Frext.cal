@@ -62,12 +62,16 @@ actor Algo_Check_NALU_type_Frext()
 	bool         PpsReadNextByte,
 	bool         PpsSkipNal,
 
-	bool         PicReadNextByte,
 	bool         PicSkipNal
 		==>
 	uint(size=8) SpsRbsp,
+	bool         SpsNewNal,
+
 	uint(size=8) PpsRbsp,
+	bool         PpsNewNal,
+
 	uint(size=8) PicRbsp,
+	bool         PicNewNal,
 	bool         PicIsAnIdr,
 	uint(size=2) PicNalRefIdc	
 	
@@ -115,8 +119,6 @@ actor Algo_Check_NALU_type_Frext()
 	NewNalDetected: action
 			NewNal :[IsNewNal]
 				==>
-		do
-			println("NewNalDetected");	
 		end
 
 
@@ -174,97 +176,123 @@ actor Algo_Check_NALU_type_Frext()
 		end
 
 
-	ReadData.Sps: action
-			NewNal          :[IsNewNal],
-			RbspByte        :[ValRbsp],
-			SpsReadNextByte :[ReadAsked],
-			SpsSkipNal      :[ValSkipNal]
+	Sps.ReadData: action
+			NewNal    :[IsNewNal],
+			RbspByte  :[ValRbsp]
 				==>
-			SpsRbsp         :[ValRbsp]
+			SpsNewNal :[false],
+			SpsRbsp   :[ValRbsp]
 		guard
-			ReadAsked  = true,
-			ValSkipNal = false,
 			IsNewNal   = false
 		end
 
 
-	ReadData.Pps: action
-			NewNal          :[IsNewNal],
-			RbspByte        :[ValRbsp],
-			PpsReadNextByte :[ReadAsked],
-			PpsSkipNal      :[ValSkipNal]
+	Sps.EndOfNal: action
+			NewNal    :[IsNewNal]
 				==>
-			PpsRbsp         :[ValRbsp]
+			SpsNewNal :[true]
 		guard
-			ReadAsked  = true,
-			ValSkipNal = false,
+			IsNewNal = true
+		end
+
+
+	Sps.EndOfProcess: action
+			SpsSkipNal:[EndOfProcessing]
+				==>
+		guard
+			EndOfProcessing = true
+		end	
+
+
+	Pps.ReadData: action
+			NewNal    :[IsNewNal],
+			RbspByte  :[ValRbsp]
+				==>
+			PpsNewNal :[false],
+			PpsRbsp   :[ValRbsp]
+		guard
 			IsNewNal   = false
 		end
 
 
-	ReadData.SliceIdr: action
-			NewNal             :[IsNewNal],
-			RbspByte           :[ValRbsp],
-			PicReadNextByte :[ReadAsked],
-			PicSkipNal      :[ValSkipNal]
+	Pps.EndOfNal: action
+			NewNal    :[IsNewNal]
 				==>
-			PicRbsp         :[ValRbsp]
+			PpsNewNal :[true]
 		guard
-			ReadAsked  = true,
-			ValSkipNal = false,
+			IsNewNal = true
+		end
+
+
+	Pps.EndOfProcess: action
+			PpsSkipNal:[EndOfProcessing]
+				==>
+		guard
+			EndOfProcessing = true
+		end
+
+
+	SliceHAndS.ReadData: action
+			NewNal    :[IsNewNal],
+			RbspByte  :[ValRbsp]
+				==>
+			PicNewNal :[false],
+			PicRbsp   :[ValRbsp]
+		guard
 			IsNewNal   = false
 		end
 
 
-	SkipNalAsked.Sps: action
-			SpsSkipNal :[ValSkipNal]
+	SliceHAndS.EndOfNal: action
+			NewNal    :[IsNewNal]
 				==>
+			PicNewNal :[true]
 		guard
-			ValSkipNal = true
+			IsNewNal = true
 		end
 
 
-	SkipNalAsked.Pps: action
-			PpsSkipNal :[ValSkipNal]
+	SliceHAndS.EndOfProcess: action
+			PicSkipNal:[EndOfProcessing]
 				==>
 		guard
-			ValSkipNal = true
-		end
-
-
-	SkipNalAsked.SliceIdr: action
-			PicSkipNal :[ValSkipNal]
-				==>
-		guard
-			ValSkipNal = true
+			EndOfProcessing = true
 		end
 
 
 	schedule fsm WaitForNewNal:
-		WaitForNewNal  (WaitForNewNal         )--> WaitForNewNal;
-		WaitForNewNal  (NewNalDetected        )--> ReadNaluType;
+		WaitForNewNal        (WaitForNewNal            )--> WaitForNewNal;
+		WaitForNewNal        (NewNalDetected           )--> ReadNaluType;
 
-		ReadNaluType   (ReadNaluType          )--> CheckNaluType;
+		ReadNaluType         (ReadNaluType             )--> CheckNaluType;
 
-		CheckNaluType  (IsSliceIdr            )--> ReadData4Slice;
-		CheckNaluType  (IsSliceNonIdr         )--> ReadData4Slice;	
-		CheckNaluType  (IsSps                 )--> ReadData4Sps;
-		CheckNaluType  (IsPps                 )--> ReadData4Pps;
-		CheckNaluType  (NalUnitType_Unknown   )--> undefined;
+		CheckNaluType        (IsSliceIdr               )--> ReadData4Slice;
+		CheckNaluType        (IsSliceNonIdr            )--> ReadData4Slice;	
+		CheckNaluType        (IsSps                    )--> ReadData4Sps;
+		CheckNaluType        (IsPps                    )--> ReadData4Pps;
+		CheckNaluType        (NalUnitType_Unknown      )--> undefined;
 
-		ReadData4Sps   (ReadData.Sps          )--> ReadData4Sps;
-		ReadData4Sps   (SkipNalAsked.Sps      )--> WaitForNewNal;
+		ReadData4Sps         (Sps.ReadData             )--> ReadData4Sps;
+		ReadData4Sps         (Sps.EndOfNal             )--> SpsWaitEndOfProcess;
 
-		ReadData4Pps   (ReadData.Pps          )--> ReadData4Pps;
-		ReadData4Pps   (SkipNalAsked.Pps      )--> WaitForNewNal;
+		SpsWaitEndOfProcess  (Sps.EndOfProcess         )--> ReadNaluType;
 
-		ReadData4Slice (ReadData.SliceIdr     )--> ReadData4Slice;
-		ReadData4Slice (SkipNalAsked.SliceIdr )--> WaitForNewNal;	
+		ReadData4Pps         (Pps.ReadData             )--> ReadData4Pps;
+		ReadData4Pps         (Pps.EndOfNal             )--> PpsWaitEndOfProcess;
+
+		PpsWaitEndOfProcess  (Pps.EndOfProcess         )--> ReadNaluType;
+
+		ReadData4Slice       (SliceHAndS.ReadData      )--> ReadData4Slice;
+		ReadData4Slice       (SliceHAndS.EndOfNal      )--> SliceWaitEndOfProcess;
+
+		SliceWaitEndOfProcess( SliceHAndS.EndOfProcess )--> ReadNaluType;
 	end
 
 	priority
-		IsSliceNonIdr > IsSliceIdr     > IsPps > IsSps > NalUnitType_Unknown;
-		ReadData      > SkipNalAsked;
-		WaitForNewNal > NewNalDetected;
+		WaitForNewNal       > NewNalDetected;	
+		IsSliceNonIdr       > IsSliceIdr           > IsPps  >  IsSps  >  NalUnitType_Unknown;
+		Sps.ReadData        > Sps.EndOfNal;
+		Pps.ReadData        > Pps.EndOfNal;
+		SliceHAndS.ReadData > SliceHAndS.EndOfNal;
 	end
 end
