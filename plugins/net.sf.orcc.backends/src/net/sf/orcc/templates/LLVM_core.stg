@@ -201,12 +201,17 @@ endif$
 >>
 
 PrintInstr(parameters) ::= <<
-call i32 (i8*, ...)* @printf( $parameters: PrintParameter()$ )
+call i32 (i8*, ...)* @printf($parameters: PrintParameter(); separator=", "$)
 
 >>
 
 PrintParameter(parameter) ::= <<
-i8* bitcast ($parameter.type$* @$parameter$ to i8*)
+$if (parameter.type.string)
+$ i8* noalias getelementptr inbounds ($parameter.type$* @$parameter$, i64 0, i64 0) $
+else
+$$parameter.type$ %$parameter$$
+endif$
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////

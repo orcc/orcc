@@ -108,22 +108,32 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 					if (!strExprVal.equals("\\n")) {
 						value += strExprVal;
 					}
-
+				} else {
+					if (expr.getType().isBool()) {
+						value+="%i";
+					} else if(expr.getType().isUint()||expr.getType().isInt()){
+						value+="%d";
+					}
 				}
 			}
 
 			// Create state variable that contains println arguments
 			TypeString type = IrFactory.eINSTANCE.createTypeString();
-			type.setSize(value.length() + 1);
+			type.setSize(value.length() + 2);
 
 			StateVariable variable = new StateVariable(call.getLocation(),
-					type, name, false, value + "\\00");
+					type, name, false, value + "\\0A\\00");
 			Use use = new Use(variable);
 
 			// Set the created state variable into call argument
 			stateVars.put(name, variable);
 			parameters.add(new VarExpr(use));
 
+			for (Expression expr : call.getParameters()) {
+				if (!expr.isStringExpr()) {
+					parameters.add(expr);
+				}
+			}
 			call.setParameters(parameters);
 		}
 
