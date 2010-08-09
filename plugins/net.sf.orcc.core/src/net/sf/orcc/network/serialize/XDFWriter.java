@@ -117,20 +117,18 @@ public class XDFWriter {
 		@Override
 		public void visit(BoolExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
-			String value = Boolean.toString(expr.getValue());
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Boolean");
-			exprElt.setAttribute("value", value);
+			exprElt.setAttribute("value", expr.toString());
 			((Element) args[0]).appendChild(exprElt);
 		}
 
 		@Override
 		public void visit(IntExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
-			String value = Integer.toString(expr.getValue());
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Integer");
-			exprElt.setAttribute("value", value);
+			exprElt.setAttribute("value", expr.toString());
 			((Element) args[0]).appendChild(exprElt);
 		}
 
@@ -146,10 +144,9 @@ public class XDFWriter {
 		@Override
 		public void visit(StringExpr expr, Object... args) {
 			Element exprElt = document.createElement("Expr");
-			String value = expr.getValue();
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "String");
-			exprElt.setAttribute("value", value);
+			exprElt.setAttribute("value", expr.toString());
 			((Element) args[0]).appendChild(exprElt);
 		}
 

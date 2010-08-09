@@ -724,8 +724,8 @@ public class IRWriter {
 	}
 
 	private Object writeConstant(Object obj) {
-		if (obj instanceof Boolean || obj instanceof Integer
-				|| obj instanceof String) {
+		if (obj instanceof Boolean || obj instanceof Float
+				|| obj instanceof Long || obj instanceof String) {
 			return obj;
 		} else if (obj instanceof List<?>) {
 			List<?> list = (List<?>) obj;

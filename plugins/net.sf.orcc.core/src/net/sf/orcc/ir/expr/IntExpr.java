@@ -36,12 +36,12 @@ import net.sf.orcc.ir.Type;
  * This class defines an integer expression.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author JÃ©rÃ´me Gorin
  * 
  */
 public class IntExpr extends AbstractExpression {
 
-	private int value;
+	private long value;
 
 	/**
 	 * Creates a new integer expression with a dummy location.
@@ -49,7 +49,7 @@ public class IntExpr extends AbstractExpression {
 	 * @param value
 	 *            an integer value.
 	 */
-	public IntExpr(int value) {
+	public IntExpr(long value) {
 		this(new Location(), value);
 	}
 
@@ -61,7 +61,7 @@ public class IntExpr extends AbstractExpression {
 	 * @param value
 	 *            an integer value.
 	 */
-	public IntExpr(Location location, int value) {
+	public IntExpr(Location location, long value) {
 		super(location);
 		this.value = value;
 	}
@@ -101,7 +101,7 @@ public class IntExpr extends AbstractExpression {
 		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
 
-	public int getValue() {
+	public long getValue() {
 		return value;
 	}
 
@@ -110,7 +110,7 @@ public class IntExpr extends AbstractExpression {
 		return true;
 	}
 
-	public void setValue(int value) {
+	public void setValue(long value) {
 		this.value = value;
 	}
 

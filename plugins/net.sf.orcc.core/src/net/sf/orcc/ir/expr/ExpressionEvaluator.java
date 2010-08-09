@@ -51,9 +51,9 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	 *             if the expression cannot be evaluated as an integer
 	 */
 	public int evaluateAsInteger(Expression expr) {
-		Object value = expr.accept(this, Integer.MIN_VALUE);
-		if (value instanceof Integer) {
-			return ((Integer) value).intValue();
+		Object value = expr.accept(this, Long.MIN_VALUE);
+		if (value instanceof Long) {
+			return ((Long) value).intValue();
 		}
 
 		// evaluated ok, but not as an integer
@@ -97,7 +97,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 
 	@Override
 	public Object interpret(UnaryExpr expr, Object... args) {
-		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
+		Object value = expr.getExpr().accept(this, Long.MIN_VALUE);
 		return interpretUnaryExpr(expr, value);
 	}
 
@@ -111,44 +111,44 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 		/* Evaluation */
 		switch (expr.getOp()) {
 		case BITAND:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 & i2;
 			}
 			break;
 		case BITOR:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 | i2;
 			}
 			break;
 		case BITXOR:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 ^ i2;
 			}
 			break;
 		case DIV:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 / i2;
 			}
 			break;
 		case DIV_INT:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 / i2;
 			}
 			break;
 		case EQ:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 == i2;
 			} else if (val1 instanceof Boolean && val2 instanceof Boolean) {
 				boolean b1 = (Boolean) val1;
@@ -159,16 +159,16 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 		case EXP:
 			break;
 		case GE:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 >= i2;
 			}
 			break;
 		case GT:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 > i2;
 			}
 			break;
@@ -180,9 +180,9 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case LE:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 <= i2;
 			}
 			break;
@@ -194,23 +194,23 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case LT:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 < i2;
 			}
 			break;
 		case MINUS:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 - i2;
 			}
 			break;
 		case MOD:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 % i2;
 			}
 			break;
@@ -219,37 +219,37 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 				boolean b1 = (Boolean) val1;
 				boolean b2 = (Boolean) val2;
 				return b1 != b2;
-			}else if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			}else if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 != i2;
 			}
 			break;
 		case PLUS:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 + i2;
 			}
 			break;
 		case SHIFT_LEFT:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 << i2;
 			}
 			break;
 		case SHIFT_RIGHT:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 >> i2;
 			}
 			break;
 		case TIMES:
-			if (val1 instanceof Integer && val2 instanceof Integer) {
-				int i1 = (Integer) val1;
-				int i2 = (Integer) val2;
+			if (val1 instanceof Long && val2 instanceof Long) {
+				long i1 = (Long) val1;
+				long i2 = (Long) val2;
 				return i1 * i2;
 			}
 			break;
@@ -265,8 +265,8 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	protected Object interpretUnaryExpr(UnaryExpr expr, Object value) {
 		switch (expr.getOp()) {
 		case BITNOT:
-			if (value instanceof Integer) {
-				int i = (Integer) value;
+			if (value instanceof Long) {
+				long i = (Long) value;
 				return ~i;
 			}
 			break;
@@ -277,8 +277,8 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case MINUS:
-			if (value instanceof Integer) {
-				int i = (Integer) value;
+			if (value instanceof Long) {
+				long i = (Long) value;
 				return -i;
 			}
 			break;

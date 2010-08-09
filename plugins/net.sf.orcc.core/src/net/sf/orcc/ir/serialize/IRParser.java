@@ -413,7 +413,7 @@ public class IRParser {
 	private Object parseConstant(Object obj) throws JSONException,
 			OrccException {
 		if (obj instanceof Boolean || obj instanceof Integer
-				|| obj instanceof String) {
+				|| obj instanceof Long || obj instanceof String) {
 			return obj;
 		} else if (obj instanceof JSONArray) {
 			JSONArray array = (JSONArray) obj;
@@ -438,6 +438,8 @@ public class IRParser {
 			expr = new BoolExpr(location, (Boolean) obj);
 		} else if (obj instanceof Integer) {
 			expr = new IntExpr(location, (Integer) obj);
+		} else if (obj instanceof Long) {
+			expr = new IntExpr(location, (Long) obj);
 		} else if (obj instanceof String) {
 			expr = new StringExpr(location, (String) obj);
 		} else if (obj instanceof JSONArray) {
