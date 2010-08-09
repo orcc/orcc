@@ -28,8 +28,10 @@
  */
 package net.sf.orcc.cal.validation;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
@@ -39,6 +41,7 @@ import net.sf.orcc.cal.cal.AstExpressionIndex;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
+import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstPriority;
@@ -68,6 +71,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.validation.Check;
+import org.jgrapht.DirectedGraph;
+import org.jgrapht.alg.CycleDetector;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 
 import com.google.inject.Inject;
 
@@ -145,17 +152,39 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
 	public void checkActor(AstActor actor) {
-		checker = new TypeChecker();
+		// check actor name matches file name
+		String path = actor.eResource().getURI().path();
+		String fileName = new File(path).getName();
+		if (!fileName.equals(actor.getName() + ".cal")) {
+			error("Actor " + actor.getName()
+					+ " must be defined in a file named \"" + actor.getName()
+					+ ".cal\"", actor, CalPackage.AST_ACTOR__NAME);
+		}
 
+		// fill the name provider's cache
 		((CalQualifiedNameProvider) nameProvider).resetUntaggedCount();
 		getNames(actor);
 
+		// evaluate state variables
+		checker = new TypeChecker();
 		evaluateStateVariables(actor.getStateVariables());
 
 		// transforms AST types to IR types
 		// this is a prerequisite for type checking
 		TypeTransformer typeTransformer = new TypeTransformer();
 		typeTransformer.transformTypes(actor);
+
+		// build action list
+		CalActionList actionList = new CalActionList();
+		actionList.addActions(actor.getActions());
+
+		// check FSM and priorities
+		AstSchedule schedule = actor.getSchedule();
+		if (schedule != null) {
+			validateFsm(actionList, schedule);
+		}
+
+		validatePriorities(actor, actionList);
 	}
 
 	@Check
@@ -224,26 +253,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				error("Type mismatch: cannot convert from " + actualType
 						+ " to " + formalType, expression,
 						CalPackage.AST_EXPRESSION);
-			}
-		}
-	}
-
-	@Check
-	public void checkFsm(AstSchedule schedule) {
-		AstActor actor = (AstActor) schedule.eContainer();
-		CalActionList actionList = new CalActionList();
-		actionList.addActions(actor.getActions());
-
-		for (AstTransition transition : schedule.getTransitions()) {
-			AstTag tag = transition.getTag();
-			if (tag != null) {
-				List<AstAction> actions = actionList.getActions(tag
-						.getIdentifiers());
-				if (actions == null || actions.isEmpty()) {
-					error("tag " + nameProvider.getQualifiedName(tag)
-							+ " does not refer to any action", transition,
-							CalPackage.AST_TRANSITION__TAG);
-				}
 			}
 		}
 	}
@@ -379,10 +388,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	@Check
-	public void checkPriorities(AstPriority priority) {
-	}
-
 	@Override
 	public void error(String string, EObject source, Integer feature) {
 		super.error(string, source, feature);
@@ -415,6 +420,13 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
+	/**
+	 * Fills the name provider's cache by getting names for every action,
+	 * function, generator, foreach.
+	 * 
+	 * @param actor
+	 *            the actor
+	 */
 	private void getNames(AstActor actor) {
 		new VoidSwitch() {
 
@@ -454,6 +466,93 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}
 
 		}.doSwitch(actor);
+	}
+
+	private void validateFsm(CalActionList actionList, AstSchedule schedule) {
+		for (AstTransition transition : schedule.getTransitions()) {
+			AstTag tag = transition.getTag();
+			if (tag != null) {
+				List<AstAction> actions = actionList.getTaggedActions(tag
+						.getIdentifiers());
+				if (actions == null || actions.isEmpty()) {
+					error("tag " + nameProvider.getQualifiedName(tag)
+							+ " does not refer to any action", transition,
+							CalPackage.AST_TRANSITION__TAG);
+				}
+			}
+		}
+	}
+
+	private void validatePriorities(AstActor actor, CalActionList actionList) {
+		List<AstPriority> priorities = actor.getPriorities();
+		DirectedGraph<AstAction, DefaultEdge> graph = new DefaultDirectedGraph<AstAction, DefaultEdge>(
+				DefaultEdge.class);
+
+		// add one vertex per tagged action
+		for (AstAction action : actionList) {
+			AstTag tag = action.getTag();
+			if (tag != null) {
+				graph.addVertex(action);
+			}
+		}
+
+		for (AstPriority priority : priorities) {
+			for (AstInequality inequality : priority.getInequalities()) {
+				// the grammar requires there be at least two tags
+				Iterator<AstTag> it = inequality.getTags().iterator();
+				AstTag previousTag = it.next();
+
+				List<AstAction> sources = actionList
+						.getTaggedActions(previousTag.getIdentifiers());
+				if (sources == null || sources.isEmpty()) {
+					error("tag " + nameProvider.getQualifiedName(previousTag)
+							+ " does not refer to any action", inequality,
+							CalPackage.AST_INEQUALITY);
+				}
+
+				while (it.hasNext()) {
+					AstTag tag = it.next();
+					sources = actionList.getTaggedActions(previousTag
+							.getIdentifiers());
+					List<AstAction> targets = actionList.getTaggedActions(tag
+							.getIdentifiers());
+
+					if (targets == null || targets.isEmpty()) {
+						error("tag " + nameProvider.getQualifiedName(tag)
+								+ " does not refer to any action", inequality,
+								CalPackage.AST_INEQUALITY);
+					}
+
+					if (sources != null && targets != null) {
+						for (AstAction source : sources) {
+							for (AstAction target : targets) {
+								graph.addEdge(source, target);
+							}
+						}
+					}
+
+					previousTag = tag;
+				}
+			}
+		}
+
+		CycleDetector<AstAction, DefaultEdge> cycleDetector = new CycleDetector<AstAction, DefaultEdge>(
+				graph);
+		Set<AstAction> cycle = cycleDetector.findCycles();
+		if (!cycle.isEmpty()) {
+			StringBuilder builder = new StringBuilder();
+			for (AstAction action : cycle) {
+				builder.append(nameProvider.getQualifiedName(action.getTag()));
+				builder.append(", ");
+			}
+
+			Iterator<AstAction> it = cycle.iterator();
+			builder.append(nameProvider.getQualifiedName(it.next().getTag()));
+
+			error("priorities of actor " + actor.getName()
+					+ " contain a cycle: " + builder.toString(), actor,
+					CalPackage.AST_ACTOR__PRIORITIES);
+		}
 	}
 
 }

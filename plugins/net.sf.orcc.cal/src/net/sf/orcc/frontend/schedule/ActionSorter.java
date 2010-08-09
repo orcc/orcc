@@ -32,9 +32,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstTag;
@@ -43,7 +41,6 @@ import net.sf.orcc.ir.Tag;
 import net.sf.orcc.util.ActionList;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.ext.DOTExporter;
 import org.jgrapht.ext.VertexNameProvider;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -98,26 +95,22 @@ public class ActionSorter {
 	 */
 	public ActionList applyPriority(List<AstPriority> priorities) {
 		buildGraph(priorities);
-		CycleDetector<Action, DefaultEdge> cycleDetector = new CycleDetector<Action, DefaultEdge>(
-				graph);
-		Set<Action> cycle = cycleDetector.findCycles();
-		if (!cycle.isEmpty()) {
-			throw new OrccRuntimeException("cycle detected in priorities: "
-					+ cycle);
-		}
 
 		ActionList actions = new ActionList();
 
-		// untagged actions first, by document order
+		// adds untagged actions by document order
 		for (Action action : actionList) {
 			if (action.getTag().isEmpty()) {
 				actions.add(action);
 			}
 		}
 
-		// tagged actions then, by priority order
+		// topological sort only work for graphs with no cycles
+		// cycle detection is done in the validator
 		TopologicalOrderIterator<Action, DefaultEdge> it = new TopologicalOrderIterator<Action, DefaultEdge>(
 				graph);
+
+		// adds tagged actions by priority order
 		while (it.hasNext()) {
 			actions.add(it.next());
 		}

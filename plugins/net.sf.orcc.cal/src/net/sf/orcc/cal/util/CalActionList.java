@@ -47,9 +47,11 @@ import net.sf.orcc.cal.cal.CalFactory;
  */
 public class CalActionList implements Iterable<AstAction> {
 
-	private List<AstAction> actionList;
+	final private List<AstAction> actionList;
 
-	private Map<List<String>, List<AstAction>> tagMap;
+	final private Map<List<String>, List<AstAction>> tagMap;
+
+	final private List<AstAction> untaggedList;
 
 	/**
 	 * Creates an empty action list.
@@ -57,15 +59,7 @@ public class CalActionList implements Iterable<AstAction> {
 	public CalActionList() {
 		actionList = new ArrayList<AstAction>();
 		tagMap = new HashMap<List<String>, List<AstAction>>();
-	}
-
-	/**
-	 * Creates an action list.
-	 */
-	public void addActions(List<AstAction> actions) {
-		for (AstAction action : actions) {
-			add(action);
-		}
+		untaggedList = new ArrayList<AstAction>();
 	}
 
 	/**
@@ -78,12 +72,15 @@ public class CalActionList implements Iterable<AstAction> {
 		actionList.add(action);
 
 		AstTag tag = action.getTag();
-		if (tag != null && !tag.getIdentifiers().isEmpty()) {
+		if (tag == null || tag.getIdentifiers().isEmpty()) {
+			untaggedList.add(action);
+		} else {
 			// a tag has the form a.b.c
 			// we add the action to the tagMap for entries:
 			// [a]; [a, b]; [a, b, c]
 
-			List<String> identifiers = new ArrayList<String>();
+			int size = tag.getIdentifiers().size();
+			List<String> identifiers = new ArrayList<String>(size);
 			for (String id : tag.getIdentifiers()) {
 				identifiers.add(id);
 
@@ -102,23 +99,32 @@ public class CalActionList implements Iterable<AstAction> {
 	}
 
 	/**
+	 * Creates an action list.
+	 */
+	public void addActions(List<AstAction> actions) {
+		for (AstAction action : actions) {
+			add(action);
+		}
+	}
+
+	/**
+	 * Returns the list of actions (tagged or untagged)
+	 * 
+	 * @return the list of actions (tagged or untagged)
+	 */
+	public List<AstAction> getAllActions() {
+		return actionList;
+	}
+
+	/**
 	 * Returns the list of actions that match the given list of identifiers.
 	 * 
 	 * @param identifiers
 	 *            a list of identifiers
 	 * @return the list of actions that match the given list of identifiers
 	 */
-	public List<AstAction> getActions(List<String> identifiers) {
+	public List<AstAction> getTaggedActions(List<String> identifiers) {
 		return tagMap.get(identifiers);
-	}
-
-	/**
-	 * Returns the list of objects of this scope
-	 * 
-	 * @return the list of objects of this scope
-	 */
-	public List<AstAction> getList() {
-		return actionList;
 	}
 
 	/**
@@ -156,6 +162,15 @@ public class CalActionList implements Iterable<AstAction> {
 
 			return tags;
 		}
+	}
+
+	/**
+	 * Returns the list of untagged actions.
+	 * 
+	 * @return the list of untagged actions
+	 */
+	public List<AstAction> getUntaggedActions() {
+		return untaggedList;
 	}
 
 	@Override

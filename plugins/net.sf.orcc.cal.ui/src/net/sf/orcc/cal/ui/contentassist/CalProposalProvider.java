@@ -154,7 +154,7 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 
 		CalActionList actionList = new CalActionList();
 		actionList.addActions(actor.getActions());
-		List<AstAction> actions = actionList.getActions(identifiers);
+		List<AstAction> actions = actionList.getTaggedActions(identifiers);
 		for (AstAction action : actions) {
 			identifiers = action.getTag().getIdentifiers();
 			if (n < identifiers.size()) {

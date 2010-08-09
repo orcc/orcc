@@ -1,0 +1,20 @@
+actor PriorityError2 () ==> :
+
+	a: action ==>
+	end
+
+	b: action ==>
+	end
+
+	c: action ==>
+	end
+
+	priority
+		a > b > b;
+	end
+
+	priority
+		b > a;
+	end
+
+end
