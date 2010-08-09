@@ -106,7 +106,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				true);
+				false);
 
 		if (partition) {
 			partitioning = true;
@@ -176,6 +176,7 @@ public class CppBackendImpl extends AbstractBackend {
 
 			List<Network> networks = (partitioning) ? network.getNetworks()
 					: Arrays.asList(network);
+			CppCMakePrinter cmakePrinter = new CppCMakePrinter();
 			for (Network subnetwork : networks) {
 				if (partitioning) {
 					new SerDesAdder().transform(subnetwork);
@@ -196,7 +197,7 @@ public class CppBackendImpl extends AbstractBackend {
 				outputName = path + File.separator + name + ".cpp";
 				networkImplPrinter.printNetwork(outputName, subnetwork, false,
 						fifoSize);
-				new CppCMakePrinter().printCMake(path, subnetwork);
+				cmakePrinter.printCMake(path, subnetwork);
 			}
 
 		} catch (IOException e) {

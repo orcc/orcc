@@ -48,6 +48,8 @@ import org.stringtemplate.v4.STGroup;
  */
 public class CppCMakePrinter {
 
+	private boolean alreadyExists = false;
+
 	private STGroup group;
 
 	/**
@@ -76,12 +78,18 @@ public class CppCMakePrinter {
 		ST template = group.getInstanceOf("Cpp_CMakeLists");
 		template.add("network", network);
 
-		String fileName = path + File.separator + network.getName()+".cmake";
+		String fileName = path + File.separator + "CMakeLists.txt";
+		
+		if(alreadyExists) {
+			fileName += "."+network.getName();
+		}
 
 		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();
+		
+		alreadyExists = true;
 	}
 
 }

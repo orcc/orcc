@@ -41,7 +41,9 @@ AdaptorConfig(network) ::= <<
 #define ADAPTOR_TYPE ADP_ETHERNET
 #include <vector>
 #define ADP_STR_IP_ADDRESS "localhost\0"
-extern "C"{#include "ethernet.h"}
+extern "C"{
+#include "ethernet.h"
+}
 
 typedef struct _AdaptorCfg
 {
@@ -56,12 +58,10 @@ typedef struct _AdaptorCfg
 \\
    char poIp[]=ADP_STR_IP_ADDRESS;\\
    memcpy(m_oCfg.pcIpAddress, poIp, sizeof(ADP_STR_IP_ADDRESS));\\
-   Socket sock;\\
-   sock.socket=0;\\
-   sock.port=5001;\\
-   m_oCfg.oSockets.push_back(sock);\\
-   sock.port=5002;\\
-   m_oCfg.oSockets.push_back(sock);\\
+   Socket sock0 = {0,5001};\
+   m_oCfg.oSockets.push_back(sock0);\
+   Socket sock1 = {0,5002};\
+   m_oCfg.oSockets.push_back(sock1);\
    m_oCfg.bServer=true;\\
 };
 

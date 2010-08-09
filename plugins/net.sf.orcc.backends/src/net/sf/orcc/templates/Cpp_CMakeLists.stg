@@ -30,6 +30,10 @@ Cpp_CMakeLists(network) ::= <<
 cmake_minimum_required (VERSION 2.8)
 project ($network.name$)
 
+if(MSVC)
+set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /ZI /Ob0 /Od /RTC1")
+set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
+endif(MSVC)
 
 
 # Common include directories
