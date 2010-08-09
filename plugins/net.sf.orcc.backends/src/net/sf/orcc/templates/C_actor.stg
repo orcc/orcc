@@ -52,6 +52,10 @@ Integer(constant) ::= <<
 $constant$
 >>
 
+Long(constant) ::= <<
+$constant$
+>>
+
 // the values of a list: {val1, val2, ..., valn}
 List(constant) ::= <<
 {$constant: Constant(); wrap, separator=", "$}
