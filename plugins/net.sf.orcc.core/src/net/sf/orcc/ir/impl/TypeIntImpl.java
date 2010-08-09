@@ -41,10 +41,20 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * This class defines an integer type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class TypeIntImpl extends TypeImpl implements TypeInt {
+
+	/**
+	 * The default value of the '{@link #isLong() <em>Long</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isLong()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean LONG_EDEFAULT = false;
 
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
@@ -84,6 +94,8 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 		switch (featureID) {
 			case IrPackage.TYPE_INT__SIZE:
 				return getSize();
+			case IrPackage.TYPE_INT__LONG:
+				return isLong();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -97,6 +109,8 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 		switch (featureID) {
 			case IrPackage.TYPE_INT__SIZE:
 				return size != SIZE_EDEFAULT;
+			case IrPackage.TYPE_INT__LONG:
+				return isLong() != LONG_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -160,6 +174,11 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 	@Override
 	public boolean isInt() {
 		return true;
+	}
+
+	@Override
+	public boolean isLong() {
+		return (size > 32);
 	}
 
 	/**

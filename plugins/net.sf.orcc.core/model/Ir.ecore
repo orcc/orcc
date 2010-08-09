@@ -27,6 +27,8 @@
   <eClassifiers xsi:type="ecore:EClass" name="TypeInt" eSuperTypes="#//Type">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="size" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"
         defaultValueLiteral="32"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="long" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"
+        changeable="false" volatile="true" derived="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TypeList" eSuperTypes="#//Type">
     <eStructuralFeatures xsi:type="ecore:EReference" name="elementType" eType="#//Type"

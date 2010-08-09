@@ -32,6 +32,7 @@ import java.util.List;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IntegerNumber;
 
 /**
  * This class defines an expression evaluator.
@@ -51,9 +52,9 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	 *             if the expression cannot be evaluated as an integer
 	 */
 	public int evaluateAsInteger(Expression expr) {
-		Object value = expr.accept(this, Long.MIN_VALUE);
-		if (value instanceof Long) {
-			return ((Long) value).intValue();
+		Object value = expr.accept(this);
+		if (value instanceof IntegerNumber) {
+			return ((IntegerNumber) value).getIntValue();
 		}
 
 		// evaluated ok, but not as an integer
@@ -74,7 +75,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 
 	@Override
 	public Object interpret(IntExpr expr, Object... args) {
-		return expr.getValue();
+		return new IntegerNumber(expr.getValue());
 	}
 
 	@Override
@@ -97,7 +98,7 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 
 	@Override
 	public Object interpret(UnaryExpr expr, Object... args) {
-		Object value = expr.getExpr().accept(this, Long.MIN_VALUE);
+		Object value = expr.getExpr().accept(this);
 		return interpretUnaryExpr(expr, value);
 	}
 
@@ -111,44 +112,44 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 		/* Evaluation */
 		switch (expr.getOp()) {
 		case BITAND:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 & i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 & i2);
 			}
 			break;
 		case BITOR:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 | i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 | i2);
 			}
 			break;
 		case BITXOR:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 ^ i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 ^ i2);
 			}
 			break;
 		case DIV:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 / i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 / i2);
 			}
 			break;
 		case DIV_INT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 / i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 / i2);
 			}
 			break;
 		case EQ:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
 				return i1 == i2;
 			} else if (val1 instanceof Boolean && val2 instanceof Boolean) {
 				boolean b1 = (Boolean) val1;
@@ -159,16 +160,16 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 		case EXP:
 			break;
 		case GE:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
 				return i1 >= i2;
 			}
 			break;
 		case GT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
 				return i1 > i2;
 			}
 			break;
@@ -180,9 +181,9 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case LE:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
 				return i1 <= i2;
 			}
 			break;
@@ -194,24 +195,24 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case LT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
 				return i1 < i2;
 			}
 			break;
 		case MINUS:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 - i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 - i2);
 			}
 			break;
 		case MOD:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 % i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 % i2);
 			}
 			break;
 		case NE:
@@ -219,38 +220,39 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 				boolean b1 = (Boolean) val1;
 				boolean b2 = (Boolean) val2;
 				return b1 != b2;
-			}else if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
+			} else if (val1 instanceof IntegerNumber
+					&& val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
 				return i1 != i2;
 			}
 			break;
 		case PLUS:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 + i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 + i2);
 			}
 			break;
 		case SHIFT_LEFT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 << i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 << i2);
 			}
 			break;
 		case SHIFT_RIGHT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 >> i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 >> i2);
 			}
 			break;
 		case TIMES:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 * i2;
+			if (val1 instanceof IntegerNumber && val2 instanceof IntegerNumber) {
+				long i1 = ((IntegerNumber) val1).getLongValue();
+				long i2 = ((IntegerNumber) val2).getLongValue();
+				return new IntegerNumber(i1 * i2);
 			}
 			break;
 		}
@@ -265,9 +267,9 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 	protected Object interpretUnaryExpr(UnaryExpr expr, Object value) {
 		switch (expr.getOp()) {
 		case BITNOT:
-			if (value instanceof Long) {
-				long i = (Long) value;
-				return ~i;
+			if (value instanceof IntegerNumber) {
+				long i = ((IntegerNumber) value).getLongValue();
+				return new IntegerNumber(~i);
 			}
 			break;
 		case LOGIC_NOT:
@@ -277,9 +279,9 @@ public class ExpressionEvaluator implements ExpressionInterpreter {
 			}
 			break;
 		case MINUS:
-			if (value instanceof Long) {
-				long i = (Long) value;
-				return -i;
+			if (value instanceof IntegerNumber) {
+				long i = ((IntegerNumber) value).getLongValue();
+				return new IntegerNumber(-i);
 			}
 			break;
 		case NUM_ELTS:

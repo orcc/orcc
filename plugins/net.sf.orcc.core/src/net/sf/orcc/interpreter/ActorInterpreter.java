@@ -241,7 +241,7 @@ public class ActorInterpreter {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Initialize interpreted actor. That is to say constant parameters,
 	 * initialized state variables, allocation and initialization of state

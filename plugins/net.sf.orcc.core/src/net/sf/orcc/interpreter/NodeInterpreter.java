@@ -38,6 +38,7 @@ import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IntegerNumber;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -228,8 +229,8 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 			try {
 				Object obj = source.getValue();
 				for (Expression index : instr.getIndexes()) {
-					obj = Array.get(obj,
-							(Integer) index.accept(exprInterpreter));
+					obj = Array.get(obj, ((IntegerNumber) index
+							.accept(exprInterpreter)).getIntValue());
 				}
 				target.setValue(obj);
 			} catch (ArrayIndexOutOfBoundsException e) {
@@ -251,12 +252,12 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 		// System.arraycopy(((Fifo_Object) fifo).getReadArray(numTokens),
 		// fifo.getReadIndex(numTokens), target, 0, numTokens);
 		if (fifo instanceof Fifo_int) {
-			Integer[] target = (Integer[]) (instr.getTarget().getValue());
+			IntegerNumber[] target = (IntegerNumber[]) (instr.getTarget().getValue());
 			int[] int_target = new int[target.length];
 			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), int_target, 0, numTokens);
 			for (int i = 0; i < int_target.length; i++) {
-				target[i] = (Integer) int_target[i];
+				target[i] = new IntegerNumber(int_target[i]);
 			}
 		} else if (fifo instanceof Fifo_boolean) {
 			Boolean[] target = (Boolean[]) (instr.getTarget().getValue());
@@ -299,18 +300,18 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 		// System.arraycopy(((Fifo_Object) fifo).getReadArray(numTokens),
 		// fifo.getReadIndex(numTokens), target, 0, numTokens);
 		if (fifo instanceof Fifo_int) {
-			Integer[] target;
+			IntegerNumber[] target;
 			if (instr.getTarget() == null) {
 				// "get" needs a target
-				target = new Integer[instr.getNumTokens()];
+				target = new IntegerNumber[instr.getNumTokens()];
 			} else {
-				target = (Integer[]) instr.getTarget().getValue();
+				target = (IntegerNumber[]) instr.getTarget().getValue();
 			}
 			int[] int_target = new int[target.length];
 			System.arraycopy(((Fifo_int) fifo).getReadArray(numTokens),
 					fifo.getReadIndex(numTokens), int_target, 0, numTokens);
 			for (int i = 0; i < int_target.length; i++) {
-				target[i] = (Integer) int_target[i];
+				target[i] = new IntegerNumber(int_target[i]);
 			}
 		} else if (fifo instanceof Fifo_boolean) {
 			Boolean[] target;
@@ -363,10 +364,11 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 			try {
 				Object obj = variable.getValue();
 				Object objPrev = obj;
-				Integer lastIndex = 0;
+				int lastIndex = 0;
 				for (Expression index : instr.getIndexes()) {
 					objPrev = obj;
-					lastIndex = (Integer) index.accept(exprInterpreter);
+					lastIndex = ((IntegerNumber) index.accept(exprInterpreter))
+							.getIntValue();
 					obj = Array.get(objPrev, lastIndex);
 				}
 				Array.set(objPrev, lastIndex,
@@ -412,11 +414,11 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 		// numTokens);
 		// ((Fifo_Object) fifo).writeEnd(numTokens, fifoArray);
 		if (fifo instanceof Fifo_int) {
-			Integer[] target = (Integer[]) instr.getTarget().getValue();
+			IntegerNumber[] target = (IntegerNumber[]) instr.getTarget().getValue();
 			int[] fifoArray = ((Fifo_int) fifo).getWriteArray(numTokens);
 			int index = fifo.getWriteIndex(numTokens);
-			for (Integer obj_elem : target) {
-				fifoArray[index++] = (int) obj_elem;
+			for (IntegerNumber obj_elem : target) {
+				fifoArray[index++] = obj_elem.getIntValue();
 			}
 			((Fifo_int) fifo).writeEnd(numTokens, fifoArray);
 		} else if (fifo instanceof Fifo_boolean) {

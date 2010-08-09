@@ -263,6 +263,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getTypeInt_Long() {
+		return (EAttribute)typeIntEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getTypeList() {
 		return typeListEClass;
 	}
@@ -392,6 +401,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		typeIntEClass = createEClass(TYPE_INT);
 		createEAttribute(typeIntEClass, TYPE_INT__SIZE);
+		createEAttribute(typeIntEClass, TYPE_INT__LONG);
 
 		typeListEClass = createEClass(TYPE_LIST);
 		createEReference(typeListEClass, TYPE_LIST__ELEMENT_TYPE);
@@ -461,6 +471,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(typeIntEClass, TypeInt.class, "TypeInt", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTypeInt_Size(), ecorePackage.getEInt(), "size", "32", 0, 1, TypeInt.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTypeInt_Long(), ecorePackage.getEBoolean(), "long", null, 0, 1, TypeInt.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(typeListEClass, TypeList.class, "TypeList", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getTypeList_ElementType(), this.getType(), null, "elementType", null, 0, 1, TypeList.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);

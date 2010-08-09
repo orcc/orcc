@@ -31,6 +31,7 @@ package net.sf.orcc.interpreter;
 import java.lang.reflect.Array;
 import java.util.List;
 
+import net.sf.orcc.ir.IntegerNumber;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.type.AbstractTypeVisitor;
@@ -60,7 +61,7 @@ public class ListAllocator extends AbstractTypeVisitor {
 		} else if (((TypeList) type).getElementType().isString()) {
 			return Array.newInstance(String.class, dimensions);
 		} else {
-			return Array.newInstance(Integer.class, dimensions);
+			return Array.newInstance(IntegerNumber.class, dimensions);
 		}
 	}
 

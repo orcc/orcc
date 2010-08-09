@@ -71,6 +71,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IntegerNumber;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -412,9 +413,12 @@ public class IRParser {
 	 */
 	private Object parseConstant(Object obj) throws JSONException,
 			OrccException {
-		if (obj instanceof Boolean || obj instanceof Integer
-				|| obj instanceof Long || obj instanceof String) {
+		if (obj instanceof Boolean || obj instanceof String) {
 			return obj;
+		} else if (obj instanceof Integer) {
+			return new IntegerNumber((Integer) obj);
+		} else if (obj instanceof Long) {
+			return new IntegerNumber((Long) obj);
 		} else if (obj instanceof JSONArray) {
 			JSONArray array = (JSONArray) obj;
 			List<Object> cstList = new ArrayList<Object>();
