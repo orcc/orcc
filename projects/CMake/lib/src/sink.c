@@ -30,7 +30,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fifo.h"
+#include "orcc.h"
+#include "orcc_fifo.h"
 
 extern struct fifo_char_s *sink_I;
 

@@ -26,78 +26,45 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef FIFO_H
-#define FIFO_H
+#ifndef TRACE_H
+#define TRACE_H
 
-enum reasons {
-	starved,
-	full
-};
+#define DECLARE_TRACE(name) FILE* trace_##name = NULL; 
 
-struct schedinfo_s {
-	int num_firings;
-	enum reasons reason;
-	int ports; /** contains a mask that indicate the ports affected */
-};
+#define FIFO_TRACE(T) FIFO_TRACE_EXPAND(T)
+#define FIFO_TRACE_EXPAND(T) fifo_ ## T ## _trace
 
-typedef unsigned char u_char;
-typedef unsigned short u_short;
-typedef unsigned int u_int;
+#define SIGNED_PRINT "%d\n"
+#define UNSIGNED_PRINT "%d\n"
 
-// declare FIFO with a size equal to (size)
-#define DECLARE_FIFO(type, size, count) static type array_##count[(size)]; \
-static type array2_##count[(size)]; \
-static struct FIFO_S(type) fifo_##count = { (size), array_##count, array2_##count, 0, 0 };
-
-#define FIFO_S(T) FIFO_S_EXPAND(T)
-#define FIFO_S_EXPAND(T) fifo_##T##_s
-
-#define FIFO_GET_ROOM(T) FIFO_GET_ROOM_EXPAND(T)
-#define FIFO_GET_ROOM_EXPAND(T) fifo_ ## T ## _get_room
-
-#define FIFO_HAS_ROOM(T) FIFO_HAS_ROOM_EXPAND(T)
-#define FIFO_HAS_ROOM_EXPAND(T) fifo_ ## T ## _has_room
-
-#define FIFO_HAS_TOKENS(T) FIFO_HAS_TOKENS_EXPAND(T)
-#define FIFO_HAS_TOKENS_EXPAND(T) fifo_ ## T ## _has_tokens
-
-#define FIFO_PEEK(T) FIFO_PEEK_EXPAND(T)
-#define FIFO_PEEK_EXPAND(T) fifo_ ## T ## _peek
-
-#define FIFO_READ(T) FIFO_READ_EXPAND(T)
-#define FIFO_READ_EXPAND(T) fifo_ ## T ## _read
-
-#define FIFO_READ_END(T) FIFO_READ_END_EXPAND(T)
-#define FIFO_READ_END_EXPAND(T) fifo_ ## T ## _read_end
-
-#define FIFO_WRITE(T) FIFO_WRITE_EXPAND(T)
-#define FIFO_WRITE_EXPAND(T) fifo_ ## T ## _write
-
-#define FIFO_WRITE_END(T) FIFO_WRITE_END_EXPAND(T)
-#define FIFO_WRITE_END_EXPAND(T) fifo_ ## T ## _write_end
+#define PRINT_FORMAT SIGNED_PRINT
 
 #define T char
-#include "fifo_generic.h"
-#undef T
-
-#define T u_char
-#include "fifo_generic.h"
+#include "orcc_trace.inl"
 #undef T
 
 #define T short
-#include "fifo_generic.h"
-#undef T
-
-#define T u_short
-#include "fifo_generic.h"
+#include "orcc_trace.inl"
 #undef T
 
 #define T int
-#include "fifo_generic.h"
+#include "orcc_trace.inl"
+#undef T
+#undef PRINT_FORMAT
+
+#define PRINT_FORMAT UNSIGNED_PRINT
+#define T u_char
+#include "orcc_trace.inl"
+#undef T
+
+#define T u_short
+#include "orcc_trace.inl"
 #undef T
 
 #define T u_int
-#include "fifo_generic.h"
+#include "orcc_trace.inl"
 #undef T
+#undef PRINT_FORMAT
+
 
 #endif

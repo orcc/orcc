@@ -28,7 +28,8 @@
 */
 #include "SDL.h"
 
-#include "fifo.h"
+#include "orcc.h"
+#include "orcc_fifo.h"
 
 #ifdef BENCHMARK
 #include <locale.h>

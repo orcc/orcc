@@ -31,7 +31,8 @@
 #include "SDL.h"
 #include "SDL_image.h"
 
-#include "fifo.h"
+#include "orcc.h"
+#include "orcc_fifo.h"
 #include "orcc_util.h"
 
 extern struct fifo_short_s *img_read_WIDTH;

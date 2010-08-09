@@ -1,5 +1,6 @@
-#include "fifo.h"
-#include "scheduler.h"
+#include "orcc.h"
+#include "orcc_fifo.h"
+#include "orcc_scheduler.h"
 
 #include <stdio.h>
 

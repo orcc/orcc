@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,36 +26,16 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#ifndef SCHEDULER_H
-#define SCHEDULER_H
 
-struct conn_s {
-	struct fifo_s *fifo;
-	struct actor_s *source;
-	struct actor_s *target;
+/** lock free fifo ring buffer structure */
+struct FIFO_S(T) {
+	int size; /** size of the ringbuffer */
+	T *contents; /** the memory containing the ringbuffer */
+	T *fifo_buffer;
+	
+	int read_ind; /** the current position of the reader */
+	int write_ind; /** the current position of the writer */
+	int fill_count; /** the fill count */
 };
 
-struct actor_s {
-	char *name;
-	void (*sched_func)(struct schedinfo_s *);
-	int num_inputs; /** number of input ports */
-	int num_outputs; /** number of output ports */
-	struct actor_s **predecessors; /** predecessors: one pointer to an actor per port. */
-	struct actor_s **successors; /** successors: one pointer to an actor per port. */
-
-	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
-};
-
-struct scheduler_s {
-	int num_actors;
-	struct actor_s **actors;
-};
-
-#include "scheduler.inl"
-
-/**
- * Initializes the given scheduler.
- */
-void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors);
-
-#endif
+#include "orcc_generic_fifo.inl"
