@@ -277,7 +277,7 @@ Boolean(constant) ::= <<
 $if (constant)$'1'$else$'0'$endif$
 >>
 
-Integer(constant) ::= <<
+IntegerNumber(constant) ::= <<
 $constant$
 >>
 

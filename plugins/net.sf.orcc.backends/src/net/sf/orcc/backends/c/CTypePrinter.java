@@ -52,7 +52,7 @@ public class CTypePrinter extends TypePrinter {
 		} else if (size <= 32) {
 			builder.append("int");
 		} else if (size <= 64) {
-			builder.append("long long");
+			builder.append("i64");
 		}
 	}
 

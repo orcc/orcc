@@ -86,8 +86,9 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fifo.h"
-#include "scheduler.h"
+#include "orcc.h"
+#include "orcc_fifo.h"
+#include "orcc_scheduler.h"
 #include "orcc_util.h"
 
 #define SIZE $fifoSize$

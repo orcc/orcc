@@ -29,7 +29,7 @@ Boolean(constant) ::= <<
 $if(constant)$true$else$false$endif$
 >>
 
-Integer(constant) ::= <<
+IntegerNumber(constant) ::= <<
 $constant$
 >>
 

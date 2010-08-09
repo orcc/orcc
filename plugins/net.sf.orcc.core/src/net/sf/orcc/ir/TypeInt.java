@@ -28,12 +28,11 @@
  */
 package net.sf.orcc.ir;
 
-
 /**
  * This class defines an integer type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * @model extends="net.sf.orcc.ir.Type"
  * 
  */
@@ -48,6 +47,13 @@ public interface TypeInt extends Type {
 	 * @model default="32"
 	 */
 	public int getSize();
+
+	/**
+	 * Returns true if this type must be represented with a "long".
+	 * 
+	 * @model changeable="false" volatile="true" derived="true"
+	 */
+	boolean isLong();
 
 	/**
 	 * Sets the size of this integer type.

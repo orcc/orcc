@@ -48,12 +48,8 @@ Boolean(constant) ::= <<
 $if (constant)$1$else$0$endif$
 >>
 
-Integer(constant) ::= <<
-$constant$
->>
-
-Long(constant) ::= <<
-$constant$
+IntegerNumber(number) ::= <<
+$number$$if (number.long)$L$endif$
 >>
 
 // the values of a list: {val1, val2, ..., valn}
@@ -101,7 +97,7 @@ $i$
 elseif (type.float)
 $f$
 elseif (type.int)
-$i$
+$$if (type.long)$lli$else$i$endif$$
 elseif (type.list)
 $p$
 elseif (type.string)
@@ -443,10 +439,11 @@ instance(instance, options) ::= <<
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fifo.h"
+#include "orcc.h"
+#include "orcc_fifo.h"
 #include "orcc_util.h"
 $if(options.("net.sf.orcc.backends.enableTrace"))$
-#include "trace.h"
+#include "orcc_trace.h"
 $endif$
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -478,12 +475,14 @@ $if(instance.actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
 $instance.actor.initializes: action()$
-void $instance.id$_initialize() {
+void $instance.id$_initialize(struct schedinfo_s *si) {
 	int res = 1;
 	int i = 0;
 
 	$if(instance.actor.initializes)$
-	$schedulingTest(instance.actor.initializes)$
+	do {
+		$schedulingTest(instance.actor.initializes)$
+	} while (0);
 	$endif$
 }
 

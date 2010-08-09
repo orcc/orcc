@@ -33,6 +33,7 @@ import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionPrinter;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 
 /**
@@ -69,6 +70,15 @@ public class CExpressionPrinter extends ExpressionPrinter {
 	@Override
 	public void visit(BoolExpr expr, Object... args) {
 		builder.append(expr.getValue() ? '1' : '0');
+	}
+
+	@Override
+	public void visit(IntExpr expr, Object... args) {
+		long value = expr.getValue();
+		builder.append(value);
+		if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
+			builder.append("L");
+		}
 	}
 
 	@Override

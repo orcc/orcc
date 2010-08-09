@@ -220,11 +220,12 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #include "SDL.h"
 #endif
 
-#include "fifo.h"
+#include "orcc.h"
+#include "orcc_fifo.h"
 #include "orcc_util.h"
 
 $if(options.("net.sf.orcc.backends.enableTrace"))$
-#include "trace.h"
+#include "orcc_trace.h"
 $endif$
 
 #define SIZE $fifoSize$

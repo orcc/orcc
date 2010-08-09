@@ -97,7 +97,7 @@ Boolean(constant, type, iterator) ::= <<
 $if (constant)$1$else$0$endif$
 >>
 
-Integer(constant, type, iterator) ::= <<
+IntegerNumber(constant, type, iterator) ::= <<
 $constant$
 >>
 
