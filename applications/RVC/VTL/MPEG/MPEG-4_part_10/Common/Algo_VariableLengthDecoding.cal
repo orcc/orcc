@@ -16,6 +16,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 actor Algo_VariableLengthDecoding()
 	uint(size=8)  RbspByte,
 	bool          NewNal,
+
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
 	bool          EndOfNal
@@ -35,6 +36,7 @@ actor Algo_VariableLengthDecoding()
 	uint(size=3) VLD_UE                = 1;
 	uint(size=3) VLD_SE                = 2;
 	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
+	uint(size=3) MORE_RBSP_DATA        = 4;
 
 
 /*
@@ -43,21 +45,26 @@ actor Algo_VariableLengthDecoding()
 *
 */
 
-	uint(size=8)  BufferRbsp      := 0;
-	uint(size=3)  CountBufferRbsp := 0;
+	uint(size=16) WorkingByte      := 0;
+	uint(size=3)  CountBufferRbsp  := 0;
+	uint(size=3)  SizeBufferRbsp   := 0;
 
+	List(type: uint(size=8), size=4) BufferRbsp := [0: for int s in 0 .. 3];
 	/* ue(v) */
 	bool          Bit1Found       := false;
-	uint(size=5)  leadingZeroBits := -1;
+	uint(size=5)  leadingZeroBits := 0;
 	int (size=31) CodeNum         := 0;
 
 	/* u(n) */
 	uint(size=5)  BitsCount       := 0;
 	uint(size=31) ReadValue       := 0;
 
+	/* more_rbsp_data() */
+	bool          NewNalAlreadyDetected  := false;
+
 /*
 *
-* State variables
+* Function
 *
 */
 
@@ -83,6 +90,7 @@ actor Algo_VariableLengthDecoding()
 //			println("EndOfNal");
 		end
 
+
 	WaitForNewNal: action
 			NewNal       :[IsNewNal],
 			RbspByte     :[ValRbsp]
@@ -97,8 +105,101 @@ actor Algo_VariableLengthDecoding()
 	NewNalDetected: action
 			NewNal :[IsNewNal]
 				==>
+		guard
+			IsNewNal = true
 		do
+			SizeBufferRbsp := 0;
 //			println("NewNalDetected");	
+		end
+
+
+	NewNalHasBeenSent: action ==>
+		guard
+			NewNalAlreadyDetected = true
+		end
+
+	ResetNewNalAlreadyDetected: action ==>
+		do
+			NewNalAlreadyDetected := false;
+		end
+
+
+	IsMoreRbspData: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = MORE_RBSP_DATA
+		end
+
+
+	CheckSizeBufferRbsp.IsEqualOrSupTo2: action
+				==>
+			ValDecoded :[1]
+		guard
+			SizeBufferRbsp >= 2
+		end
+
+
+	CheckSizeBufferRbsp.IsEqualTo1: action
+				==>
+			ValDecoded :[IsMoreDataInRbsp]
+		guard
+			SizeBufferRbsp = 1
+		var
+			uint(size=1) IsMoreDataInRbsp
+		do
+			if( (WorkingByte = 0) and (BufferRbsp[0] = 3) and (CountBufferRbsp = 0) )then
+				IsMoreDataInRbsp := 0;
+			else
+				IsMoreDataInRbsp := 1;
+			end
+		end
+
+
+	CheckSizeBufferRbsp.IsEqualTo0: action
+				==>
+			ValDecoded :[IsMoreDataInRbsp]
+		guard
+			SizeBufferRbsp = 0
+		var
+			uint(size=1) IsMoreDataInRbsp
+		do
+			if( bitand(WorkingByte,0xFF) = 0x80 )then
+				IsMoreDataInRbsp := 0;
+			else
+				IsMoreDataInRbsp := 1;
+			end
+		end
+
+
+	FillBufferRbsp: action
+			RbspByte :[ValRbspByte],
+			NewNal   :[ValNewNal]
+				==>
+		guard
+			SizeBufferRbsp        < 4,
+			ValNewNal             = false,
+			NewNalAlreadyDetected = false
+		do
+//			println("FillBuffer:"+ValRbspByte);
+			BufferRbsp[3]  := BufferRbsp[2];
+			BufferRbsp[2]  := BufferRbsp[1];
+			BufferRbsp[1]  := BufferRbsp[0];
+			BufferRbsp[0]  := ValRbspByte;
+			SizeBufferRbsp := SizeBufferRbsp + 1;
+		end
+
+
+	FutureNewNalDetected: action
+			NewNal :[IsNewNal]
+				==>
+		guard
+			IsNewNal              = true,
+			NewNalAlreadyDetected = false
+		do
+			NewNalAlreadyDetected := true;
 		end
 
 
@@ -146,6 +247,7 @@ actor Algo_VariableLengthDecoding()
 			ReadValue := 0;
 		end
 
+
 	IsByteAligned: action
 			TypeOfVLD    :[ValTypeOfVLD],
 			EndOfNal     :[ValEndOfNal]
@@ -160,14 +262,15 @@ actor Algo_VariableLengthDecoding()
 
 
 	Buffer.IsEmpty: action
-			RbspByte :[ValRbspByte],
-			NewNal   :[ValNewNal]
 				==>
 		guard
-			CountBufferRbsp = 0
+			CountBufferRbsp = 0,
+			SizeBufferRbsp  > 0// and ValNewNal = false
 		do
 			CountBufferRbsp := 8;
-			BufferRbsp      := ValRbspByte;
+			SizeBufferRbsp  := SizeBufferRbsp - 1;
+			WorkingByte     := BufferRbsp[SizeBufferRbsp];
+//			println("WorkingByte:"+WorkingByte);
 		end
 
 
@@ -183,10 +286,10 @@ actor Algo_VariableLengthDecoding()
 		do
 //			println("GetCodeNum.Launch");
 			if(not Bit1Found)then
-				while( (bitand(BufferRbsp,0x80) = 0) and (CountBufferRbsp > 0))
+				while( (bitand(WorkingByte,0x80) = 0) and (CountBufferRbsp > 0))
 				do
 					CountBufferRbsp := CountBufferRbsp - 1;
-					BufferRbsp      := lshift(BufferRbsp,1);
+					WorkingByte     := lshift(WorkingByte,1);
 					leadingZeroBits := leadingZeroBits + 1;
 				end
 				if(CountBufferRbsp > 0)then
@@ -202,9 +305,9 @@ actor Algo_VariableLengthDecoding()
 						leadingZeroBits
 					end;
 				CodeNum         := lshift(CodeNum,NbBitsToAdd);
-				CodeNum         := CodeNum + mask_bits( rshift(BufferRbsp,8-NbBitsToAdd) , NbBitsToAdd);
+				CodeNum         := CodeNum + mask_bits( rshift(WorkingByte,8-NbBitsToAdd) , NbBitsToAdd);
 				leadingZeroBits := leadingZeroBits - NbBitsToAdd;
-				BufferRbsp      := lshift(BufferRbsp,NbBitsToAdd);
+				WorkingByte     := lshift(WorkingByte,NbBitsToAdd);
 				CountBufferRbsp := CountBufferRbsp - NbBitsToAdd;
 			end
 		end
@@ -248,6 +351,7 @@ actor Algo_VariableLengthDecoding()
 			println("\tSeValue:"+CodeNum);
 		end
 
+
 	Get_u.Launch: action ==>
 		var
 			uint(size=5) NbBitsToAdd
@@ -260,9 +364,9 @@ actor Algo_VariableLengthDecoding()
 					BitsCount
 				end;
 			ReadValue       := lshift(ReadValue,NbBitsToAdd);
-			ReadValue       := ReadValue + mask_bits( rshift(BufferRbsp,8-NbBitsToAdd) , NbBitsToAdd);
+			ReadValue       := ReadValue + mask_bits( rshift(WorkingByte,8-NbBitsToAdd) , NbBitsToAdd);
 			BitsCount       := BitsCount - NbBitsToAdd;
-			BufferRbsp      := lshift(BufferRbsp,NbBitsToAdd);
+			WorkingByte     := lshift(WorkingByte,NbBitsToAdd);
 			CountBufferRbsp := CountBufferRbsp - NbBitsToAdd;
 		end
 
@@ -299,17 +403,35 @@ actor Algo_VariableLengthDecoding()
 */
 
 	schedule fsm CheckVLDType:
-		CheckVLDType    (IsEndOfNal             )--> WaitForNewNal;
-		CheckVLDType    (IsByteAligned          )--> CheckVLDType;
-		CheckVLDType    (IsVldUe                )--> VLDecoding_Ue;
-		CheckVLDType    (IsVldSe                )--> VLDecoding_Se;
-		CheckVLDType    (IsReadBits             )--> Decode_u;
+		CheckVLDType    (IsEndOfNal                          )--> WaitForNewNal;
+		CheckVLDType    (IsByteAligned                       )--> CheckVLDType;
+		CheckVLDType    (IsVldUe                             )--> VLDecoding_Ue;
+		CheckVLDType    (IsVldSe                             )--> VLDecoding_Se;
+		CheckVLDType    (IsReadBits                          )--> Decode_u;
+		CheckVLDType    (IsMoreRbspData                      )--> FillBuffer;
+		CheckVLDType    (FillBufferRbsp                      )--> CheckVLDType;
 
-		WaitForNewNal   (WaitForNewNal          )--> WaitForNewNal;
+		/* more_rbsp_data() */
+		FillBuffer      (FillBufferRbsp                      )--> FillBuffer;
+		FillBuffer      (FutureNewNalDetected                )--> CheckBuffer;
+		FillBuffer      (CheckSizeBufferRbsp.IsEqualOrSupTo2 )--> CheckVLDType;
+		FillBuffer      (NewNalHasBeenSent                   )--> CheckBuffer;
+
+		CheckBuffer     (CheckSizeBufferRbsp                 )--> CheckVLDType;
+
+		/* Skip the others values of the Rbsp */
+		WaitForNewNal   (NewNalHasBeenSent      )--> ResetNewNal;
+		WaitForNewNal   (WaitForNewNal          )--> WaitForNewNal2;
 		WaitForNewNal   (NewNalDetected         )--> CheckVLDType;
+
+		ResetNewNal     (ResetNewNalAlreadyDetected )--> CheckVLDType;
+
+		WaitForNewNal2  (WaitForNewNal          )--> WaitForNewNal2;
+		WaitForNewNal2  (NewNalDetected         )--> CheckVLDType;
 
 		/* ue(v) decoding process */
 		VLDecoding_Ue   (Buffer                 )--> GetCodeNum4ue;
+		VLDecoding_Ue   (FillBufferRbsp         )--> VLDecoding_Ue;
 
 		GetCodeNum4ue   (GetCodeNum.Launch      )--> CheckCodeNum4ue;
 
@@ -321,6 +443,7 @@ actor Algo_VariableLengthDecoding()
 
 		/* se(v) decoding process */
 		VLDecoding_Se   (Buffer                 )--> GetCodeNum4se;
+		VLDecoding_Se   (FillBufferRbsp         )--> VLDecoding_Se;
 
 		GetCodeNum4se   (GetCodeNum.Launch      )--> CheckCodeNum4se;
 
@@ -332,6 +455,7 @@ actor Algo_VariableLengthDecoding()
 
 		/* u(n) decoding process */
 		Decode_u        (Buffer                 )--> Get_u;
+		Decode_u        (FillBufferRbsp         )--> Decode_u;
 
 		Get_u           (Get_u.Launch           )--> Check_u_Val;
 
@@ -342,9 +466,10 @@ actor Algo_VariableLengthDecoding()
 	end
 	
 	priority
-		WaitForNewNal          > NewNalDetected;
-		IsVldUe                > IsReadBits           > IsVldSe > IsByteAligned > IsEndOfNal;
+		NewNalHasBeenSent      > WaitForNewNal        > NewNalDetected;
+		IsVldUe                > IsReadBits           > IsVldSe              > FillBufferRbsp > IsMoreRbspData > IsByteAligned > IsEndOfNal;
+		CheckSizeBufferRbsp    > FillBufferRbsp       > FutureNewNalDetected > NewNalHasBeenSent;
 		GetCodeNum.NotFinished > GetCodeNum.Finished;
-		Buffer.IsEmpty         > Buffer.IsNotEmpty;
+		Buffer.IsNotEmpty      > FillBufferRbsp       > Buffer.IsEmpty;
 	end
 end

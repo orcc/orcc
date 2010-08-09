@@ -34,6 +34,7 @@ actor Algo_DecodeSps()
 	int (size=32) OffsetForTopToBottomField,
 	uint(size=32) PicSzInMbs,
 	uint(size=32) PicWdtInMbs,
+	bool          MbAdaptFrameField,
 
 	uint(size=32) Pps_PicWidthInMbs,
 	uint(size=32) Pps_PicHeightInMapUnits
@@ -145,10 +146,12 @@ actor Algo_DecodeSps()
 			OffsetForNonRefPic          :[offset_for_non_ref_pic[ValSps]],
 			OffsetForTopToBottomField   :[offset_for_top_to_bottom_field[ValSps]],
 			PicSzInMbs                  :[pic_size_in_mbs[ValSps]],
-			PicWdtInMbs                 :[pic_width_in_mbs_minus1[ValSps] + 1]
+			PicWdtInMbs                 :[pic_width_in_mbs_minus1[ValSps] + 1],
+			MbAdaptFrameField           :[ValMbAdaptFrameField]
 		var
 			bool val_frame_mbs_only,
-			bool ValDeltaPic
+			bool ValDeltaPic,
+			bool ValMbAdaptFrameField
 		do
 			val_frame_mbs_only :=
 				if(frame_mbs_only_flag[ValSps] = 0)then
@@ -158,6 +161,12 @@ actor Algo_DecodeSps()
 				end;
 			ValDeltaPic :=
 				if(delta_pic_order_always_zero_flag[ValSps] = 0)then
+					false
+				else
+					true
+				end;
+			ValMbAdaptFrameField:=
+				if(mb_adaptive_frame_field_flag[ValSps] = 0)then
 					false
 				else
 					true

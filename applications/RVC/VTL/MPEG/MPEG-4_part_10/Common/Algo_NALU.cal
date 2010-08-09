@@ -71,7 +71,7 @@ actor Algo_NALU ()
 			RbspByte :[ValRbsp],
 			NewNal   :[false]
 		guard
-			not( (fifo_msb = 0) and (fifo_lsb = 0)  and  ((b = 3) or (b = 1)) )
+			not( (fifo_msb = 0) and (fifo_lsb = 0)  and  ((b = 3) or (b = 1) or (b = 0)) )
 		var
 			uint(size=8) ValRbsp
 		do
@@ -80,7 +80,46 @@ actor Algo_NALU ()
 			fifo_lsb := b;
 		end
 
+	Pattern.Is000Bytes: action
+			bits8:[b]
+				==>
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 0)
+		end
 
+
+	PatternFor000.Is0001Bytes: action
+			bits8:[b]
+				==>
+			NewNal     :[true]
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 1)
+		end
+
+
+	PatternFor000.Is0000Bytes: action
+			bits8:[b]
+				==>
+			RbspByte :[0],
+			NewNal   :[false]
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 0)
+		end
+
+	NoPatternFor000: action
+			bits8:[b]
+				==>
+			RbspByte :[0,0],
+			NewNal   :[false,false]
+		guard
+			not( (fifo_msb = 0) and (fifo_lsb = 0)  and  ((b = 3) or (b = 1) or (b = 0)) )
+		var
+			uint(size=8) ValRbsp
+		do
+			ValRbsp  := fifo_msb;
+			fifo_msb := fifo_lsb;
+			fifo_lsb := b;
+		end
 /*
 *
 * Scheduler
@@ -88,16 +127,23 @@ actor Algo_NALU ()
 */
 
 	schedule fsm fill_fifo1:
-		fill_fifo1 (fill_fifo )--> fill_fifo2;
+		fill_fifo1 (fill_fifo                 )--> fill_fifo2;
 
-		fill_fifo2 (fill_fifo )--> fifo_full;
+		fill_fifo2 (fill_fifo                 )--> fifo_full;
 	
-		fifo_full  (NoPattern )--> fifo_full;
-		fifo_full  (Pattern   )--> fill_fifo1;
+		fifo_full  (NoPattern                 )--> fifo_full;
+		fifo_full  (Pattern.Is003Bytes        )--> fill_fifo1;
+		fifo_full  (Pattern.Is001Bytes        )--> fill_fifo1;
+		fifo_full  (Pattern.Is000Bytes        )--> fifo_full2;
+
+		fifo_full2 (PatternFor000.Is0001Bytes )--> fill_fifo1;
+		fifo_full2 (PatternFor000.Is0000Bytes )--> fifo_full2;
+		fifo_full2 (NoPatternFor000           )--> fifo_full;
 	end
 
 	priority
-		NoPattern > Pattern.Is001Bytes > Pattern.Is003Bytes;
+		NoPattern                 > Pattern.Is001Bytes        > Pattern.Is003Bytes;
+		PatternFor000.Is0001Bytes > PatternFor000.Is0000Bytes > NoPatternFor000;
 	end /* priority */
 
 end /* actor */

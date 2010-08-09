@@ -28,6 +28,7 @@ actor Algo_DecodeSliceHeader()
 	int (size=32) OffsetForRefFrameAccumul,
 	int (size=32) OffsetForNonRefPic,
 	int (size=32) OffsetForTopToBottomField,
+	bool          MbAdaptFrameField,
 
 	bool          pic_order_present,
 	bool          redundant_pic_cnt_present,
@@ -57,7 +58,8 @@ actor Algo_DecodeSliceHeader()
 
 	int (size=32) DecRefPicMarkingValVLD,
 
-	uint(size=32) FirstMbInSlice
+	uint(size=32) FirstMbInSlice,
+	bool          MbaffFrame
 		:
 
 
@@ -94,31 +96,32 @@ actor Algo_DecodeSliceHeader()
 	bool          Idr_flag;
 	uint(size=32) first_mb_in_slice;
 	uint(size=4)  slice_type;
-	bool          separate_colour_plane_flag := false;
+	bool          separate_colour_plane_flag    := false;
 	bool          field_pic_flag;
 	bool          bottom_field_flag;
-	uint(size=16) idr_pic_id := 0;
-	int (size=32) pic_order_cnt_lsb := 0;
-	int (size=32) delta_pic_order_cnt_bottom := 0;
-	uint(size=7)  redundant_pic_cnt := 0;
-	uint(size=2)  cabac_init_idc := 0;
+	uint(size=16) idr_pic_id                    := 0;
+	int (size=32) pic_order_cnt_lsb             := 0;
+	int (size=32) delta_pic_order_cnt_bottom    := 0;
+	uint(size=7)  redundant_pic_cnt             := 0;
+	uint(size=2)  cabac_init_idc                := 0;
 	int (size=32) slice_qp_delta;
 	bool          sp_for_switch_flag;
 	uint(size=6)  slice_qs_delta;
 	uint(size=2)  disable_deblocking_filter_idc := 0;
 	int(size=6)   slice_alpha_c0_offset;
-	int(size=6)   slice_beta_offset := 0;
-	uint(size=32) slice_group_change_cycle := 0;
+	int(size=6)   slice_beta_offset             := 0;
+	uint(size=32) slice_group_change_cycle      := 0;
 	//Sps Parameters
 	uint(size=6)  log2_max_frame_num;
 	bool          frame_mbs_only_flag;
 	uint(size=2)  pic_order_cnt_type;
 	uint(size=6)  SzMaxPocLsb;
 	bool          delta_pic_order_always_zero_flag;
-	uint(size=8)  num_ref_frames_in_pic_order_cnt_cycle;
-	int (size=32) expected_delta_per_poc_cycle;
-	int (size=32) offset_for_non_ref_pic;
-	int (size=32) offset_for_top_to_bottom_field;
+	uint(size=8)  num_ref_frames_in_pic_order_cnt_cycle := 0;
+	int (size=32) expected_delta_per_poc_cycle          := 0;
+	int (size=32) offset_for_non_ref_pic                := 0;
+	int (size=32) offset_for_top_to_bottom_field        := 0;
+	bool          mb_adaptive_frame_field_flag          := false;
 	//PpsParameters
 	bool          pic_order_present_flag;
 	bool          redundant_pic_cnt_present_flag;
@@ -130,10 +133,12 @@ actor Algo_DecodeSliceHeader()
 	//Poc parameters
 	int (size=32) prev_frame_num         := 0;
 	int (size=32) frame_num_offset       := 0;
-	int (size=32) PicOrderCntMsb := 0;
-	int (size=32) prevPicOrderCntLsb := 0;
-	uint(size=2)  nal_ref_idc   := 0;
-	int (size=32) expectedpoc := 0;
+	int (size=32) PicOrderCntMsb         := 0;
+	int (size=32) prevPicOrderCntLsb     := 0;
+	uint(size=2)  nal_ref_idc            := 0;
+	int (size=32) expectedpoc            := 0;
+	//Slice Data Parameters
+	bool          MbaffFrameFlag := false;
 
 	int (size=32) LoopVal;
 
@@ -218,7 +223,8 @@ actor Algo_DecodeSliceHeader()
 			NumRefFramesInPocCycle            :[ValNumRefFramesInPocCycle],
 			ExpectedDeltaPerPocCycle          :[ValExpectedDeltaPerPocCycle],
 			OffsetForNonRefPic                :[ValOffsetForNonRefPic],
-			OffsetForTopToBottomField         :[ValOffsetForTopToBottomField]
+			OffsetForTopToBottomField         :[ValOffsetForTopToBottomField],
+			MbAdaptFrameField                 :[ValMbAdaptFrameField]
 				==>
 		do
 			prev_frame_num                         := frame_num;
@@ -239,6 +245,7 @@ actor Algo_DecodeSliceHeader()
 			expected_delta_per_poc_cycle           := ValExpectedDeltaPerPocCycle;
 			offset_for_non_ref_pic                 := ValOffsetForNonRefPic;
 			offset_for_top_to_bottom_field         := ValOffsetForTopToBottomField;
+			mb_adaptive_frame_field_flag           := ValMbAdaptFrameField;
 			LoopVal := 0;
 		end
 
@@ -280,6 +287,7 @@ actor Algo_DecodeSliceHeader()
 				else
 					true
 				end;
+			MbaffFrameFlag := (field_pic_flag and mb_adaptive_frame_field_flag);
 			println("\t\tfield_pic_flag:   "+field_pic_flag);
 		end
 
@@ -569,6 +577,10 @@ actor Algo_DecodeSliceHeader()
 			EndOfDecoding = true
 		end
 
+	SendSliceDataParameters: action
+				==>
+			MbaffFrame :[MbaffFrameFlag]
+		end
 
 	DecRefPicMarking.GetVLDVal: action
 			ValVLD           :[VLDecoding]
@@ -809,7 +821,7 @@ actor Algo_DecodeSliceHeader()
 		Check4DeltPicOrdCntBot         (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
 		Check4DeltPicOrdCntBot         (RefPicList.AskVLD                 )--> DecodeRefPicList;
 		Check4DeltPicOrdCntBot         (RefPicList.AskReadBits            )--> DecodeRefPicList;
-		Check4DeltPicOrdCntBot         (RefPicList.Done                   )-->                            DecodeDecRefPicMarking;//DecodeWeightedPred;
+		Check4DeltPicOrdCntBot         (RefPicList.Done                   )--> SendSliceDataParameters;
 
 		ReadDeltaPicOrderCntBottomDone (ReadDeltaPicOrderCntBottom.Done   )--> CheckRedundPicCntPres;
 
@@ -828,16 +840,16 @@ actor Algo_DecodeSliceHeader()
 		CheckRedundPicCntPres          (RedundPicCntPres.IsEqualToTrue    )--> ReadRedunPicCntDone;
 		CheckRedundPicCntPres          (RefPicList.AskVLD                 )--> DecodeRefPicList;
 		CheckRedundPicCntPres          (RefPicList.AskReadBits            )--> DecodeRefPicList;
-		CheckRedundPicCntPres          (RefPicList.Done                   )-->                           DecodeDecRefPicMarking;//DecodeWeightedPred;
+		CheckRedundPicCntPres          (RefPicList.Done                   )--> SendSliceDataParameters;
 
 		ReadRedunPicCntDone            (ReadRedunPicCnt.Done              )--> DecodeRefPicList;
 
 		DecodeRefPicList               (RefPicList.GetVLDVal              )--> DecodeRefPicList;
 		DecodeRefPicList               (RefPicList.AskVLD                 )--> DecodeRefPicList;
 		DecodeRefPicList               (RefPicList.AskReadBits            )--> DecodeRefPicList;
-		DecodeRefPicList               (RefPicList.Done                   )-->                            DecodeDecRefPicMarking;//DecodeWeightedPred;
+		DecodeRefPicList               (RefPicList.Done                   )--> SendSliceDataParameters;
 
-
+		SendSliceDataParameters        (SendSliceDataParameters           )-->                             DecodeDecRefPicMarking;//DecodeWeightedPred;
 		//DecodeWeightedPred           (WeightedPred.GetVLDVal            )--> DecodeWeightedPred;
 		//DecodeWeightedPred           (WeightedPred.AskVLD               )--> DecodeWeightedPred;
 		//DecodeWeightedPred           (WeightedPred.AskReadBits          )--> DecodeWeightedPred;

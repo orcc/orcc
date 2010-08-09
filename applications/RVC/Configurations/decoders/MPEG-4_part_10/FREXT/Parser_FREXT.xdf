@@ -286,4 +286,8 @@
         src="CheckNaluType" src-port="PpsNewNal"/>
     <Connection dst="SpsVLDecoding" dst-port="NewNal"
         src="CheckNaluType" src-port="SpsNewNal"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="MbaffFrame"
+        src="DecodeSliceHeader" src-port="MbaffFrame"/>
+    <Connection dst="DecodeSliceHeader" dst-port="MbAdaptFrameField"
+        src="DecodeSps" src-port="MbAdaptFrameField"/>
 </XDF>

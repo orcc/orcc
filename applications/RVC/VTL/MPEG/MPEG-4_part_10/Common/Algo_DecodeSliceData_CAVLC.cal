@@ -23,7 +23,8 @@ actor Algo_DecodeSliceData_CAVLC()
 	uint(size=32) PicWdtInMbs,
 	//Slice Header Parameters
 	uint(size=32) FirstMbInSlice,
-	uint(size=4)  SliceType
+	uint(size=4)  SliceType,
+	bool          MbaffFrame
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
@@ -41,16 +42,13 @@ actor Algo_DecodeSliceData_CAVLC()
 	uint(size=3) VLD_UE                = 1;
 	uint(size=3) VLD_SE                = 2;
 	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
+	uint(size=3) MORE_RBSP_DATA        = 4;
 
 //	uint(size=4) SLICE_TYPE_P  = 0;
 //	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_I  = 2;
 //	uint(size=4) SLICE_TYPE_SP = 3;
 	uint(size=4) SLICE_TYPE_SI = 4;
-
-  	// FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =1280/16;
-	uint(size=7) PICHEIGHT=720/16;
 
 
 /*
@@ -60,37 +58,43 @@ actor Algo_DecodeSliceData_CAVLC()
 */
 
 	//Pps Parameters
-	bool entropy_coding_mode_flag;
-	//Sps Parameters
-//	uint(size=32) PicSizeInMbs;
-//	uint(size=32) PicWidthInMbs;
+	bool          entropy_coding_mode_flag;
 	//Slice Header Parameters
 	uint(size=32) val_CurrMbAddr;
 	uint(size=4)  slice_type;
+	bool          MbaffFrameFlag;
 
 	bool          moreDataFlag;
 	bool          prevMbSkipped;
 	uint(size=32) mb_skip_run;
-//	uint(size=32) Mb_x;
-//	uint(size=32) Mb_y;
-	// ???
-/*	List ( type: List(type: uint(size=4), size=16), size = PICHEIGHT*PICWIDTH) NonZeroCount; // FIXME those numbers should be independent of the size
-	List ( type: List(type: uint(size=4), size=4),  size = PICHEIGHT*PICWIDTH) NonZeroCountCb; // FIXME those numbers should be independent of the size
-	List ( type: List(type: uint(size=4), size=4),  size = PICHEIGHT*PICWIDTH) NonZeroCountCr; // FIXME those numbers should be independent of the size
-*/
+	bool          mb_field_decoding_flag;
+
+	procedure NextMbAddress()
+	begin
+		val_CurrMbAddr := val_CurrMbAddr + 1;
+//		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
+//		Mb_y := val_CurrMbAddr / PicWidthInMbs;
+	end
 
 	GetSpsAndPpsParameters: action
 			EntropyCodingMode :[ValEntropyCodingMode],
 			FirstMbInSlice    :[ValFirstMbInSlice],
 			PicSzInMbs        :[ValPicSizeInMbs],
 			PicWdtInMbs       :[ValPicWdtInMbs],
-			SliceType         :[ValSliceType]
+			SliceType         :[ValSliceType],
+			MbaffFrame        :[ValMbaffFrame]
 				==>
 		do
 			entropy_coding_mode_flag := ValEntropyCodingMode;
 			slice_type               := ValSliceType;
+			MbaffFrameFlag           := ValMbaffFrame;
 
-			val_CurrMbAddr := ValFirstMbInSlice; //  ?? => CurrMbAddr = first_mb_in_slice * ( 1 + MbaffFrameFlag )
+			val_CurrMbAddr :=
+				if(MbaffFrameFlag = false)then
+					ValFirstMbInSlice * (1 + 0)
+				else
+					ValFirstMbInSlice * (1 + 1)
+				end;
 			moreDataFlag   := true;
 			prevMbSkipped  := false;
 
@@ -128,6 +132,67 @@ actor Algo_DecodeSliceData_CAVLC()
 		do
 			mb_skip_run   := ValueOfVLD;
 			prevMbSkipped := (mb_skip_run > 0);
+		end
+
+	//for( i=0; i<mb_skip_run; i++ )
+	CheckMbSkipRun.IsNotEqualTo0: action
+				==>
+		guard
+			mb_skip_run > 0
+		do
+			NextMbAddress();
+			mb_skip_run := mb_skip_run - 1;
+		end
+
+	CheckMbSkipRun.IsEqualTo0: action
+				==>
+			//          more_rbsp_data()
+			SkipNal   :[     false      ],//Keep synchro
+			TypeOfVLD :[ MORE_RBSP_DATA ]
+		guard
+			mb_skip_run = 0
+		end
+
+	ReadMoreDataFlag: action
+			ValVLD     :[ValueOfVLD]
+				==>
+		do
+			moreDataFlag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+		end
+
+	CheckMoreDataFlag.IsEqualToTrue: action
+				==>
+		guard
+			moreDataFlag = true
+		end
+
+	ReadMbFieldDecod.Asked: action
+				==>
+			//        mb_field_decoding_flag
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			MbaffFrameFlag = true,
+			    (val_CurrMbAddr mod 2 = 0)
+			or ((val_CurrMbAddr mod 2 = 1) and prevMbSkipped)
+		end
+
+	ReadMbFieldDecod.Done: action
+			ValVLD     :[ValueOfVLD]
+				==>
+		do
+			mb_field_decoding_flag :=
+				if(ValueOfVLD = 0) then
+					false
+				else
+					true
+				end;
 		end
 
 	SendEndSliceHeader: action
