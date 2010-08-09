@@ -15,49 +15,48 @@ actor Multiple_variables () uint(size=8) DB_I, uint(size=6) BS
 	// State Variables //
 	/////////////////////
 	List(type: List(type: uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX), size=MB_BLOCK_SIZE_MAX) curr_mb
-	:= [ [ 0 : for int i in Integers(0, MB_BLOCK_SIZE_MAX - 1) ] : for int j in
-	Integers(0, MB_BLOCK_SIZE_MAX - 1) ];
+	:= [ [ 0 : for int i in 0 .. MB_BLOCK_SIZE_MAX - 1 ] : for int j in
+	0 .. MB_BLOCK_SIZE_MAX - 1 ];
 
 	List(type: List(type: uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX), size=MB_BLOCK_SIZE_MAX) up_mb
-	:= [ [ 0 : for int i in Integers(0, MB_BLOCK_SIZE_MAX - 1) ] : for int j in
-	Integers(0, MB_BLOCK_SIZE_MAX - 1) ];
+	:= [ [ 0 : for int i in 0 .. MB_BLOCK_SIZE_MAX - 1 ] : for int j in
+	0 .. MB_BLOCK_SIZE_MAX - 1 ];
 
 	List(type: List(type: uint(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_MAX), size=MB_BLOCK_SIZE_MAX) left_mb
-	:= [ [ 0 : for int i in Integers(0, MB_BLOCK_SIZE_MAX - 1) ] : for int j in
-	Integers(0, MB_BLOCK_SIZE_MAX - 1) ];
+	:= [ [ 0 : for int i in 0 .. MB_BLOCK_SIZE_MAX - 1 ] : for int j in
+	0 .. MB_BLOCK_SIZE_MAX - 1 ];
 
 	// option to disable filtering for image or across slices
 	// Macroblock parameters
-	List(type: uint(size=6), size=3) Alist := [ 0 : for int i in Integers(0, 3 - 1)
+	List(type: uint(size=6), size=3) Alist := [ 0 : for int i in 0 .. 3 - 1
 	];
 
 	//curr,left,up
-	List(type: uint(size=6), size=3) Blist := [ 0 : for int i in Integers(0, 3 - 1)
+	List(type: uint(size=6), size=3) Blist := [ 0 : for int i in 0 .. 3 - 1
 	];
 
 	//curr,left,up 
 	uint(size=1) StrengthNotZero := 0;
 
-	List(type: uint(size=3), size=32) Strength := [ 0 : for int i in Integers(0,
-	32 - 1) ];
+	List(type: uint(size=3), size=32) Strength := [ 0 : for int i in 0 .. 32 - 1 ];
 
 	// Read Macroblock data
 	StartMB_LUMA: action DB_I:[ v ] repeat (MB_BLOCK_SIZE_LUMA + 4) * (
 		MB_BLOCK_SIZE_LUMA + 4), BS:[ u ] repeat 38 ==>
 	var
 		List(type: int(size=SAMPLE_SZ), size=4 * MB_BLOCK_SIZE_LUMA) upbuf :=
-		[ 0 : for int i in Integers(0, 4 * MB_BLOCK_SIZE_LUMA - 1) ],
+		[ 0 : for int i in 0 .. 4 * MB_BLOCK_SIZE_LUMA - 1 ],
 		
 		List(type: int(size=SAMPLE_SZ), size=4 * MB_BLOCK_SIZE_LUMA) leftbuf :=
-		[ 0 : for int i in Integers(0, 4 * MB_BLOCK_SIZE_LUMA - 1) ],
+		[ 0 : for int i in 0 .. 4 * MB_BLOCK_SIZE_LUMA - 1 ],
 		
 		List(type: int(size=SAMPLE_SZ), size=MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA)
 			currbuf :=
-			[ 0 : for int i in Integers(0, MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA - 1) ],
+			[ 0 : for int i in 0 .. MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA - 1 ],
 		
 		int uc := 0, int lc := 0, int cc := 0
 	do
-		foreach int i in Integers(0, (MB_BLOCK_SIZE_LUMA + 4) * (MB_BLOCK_SIZE_LUMA +
+		foreach int i in 0 .. (MB_BLOCK_SIZE_LUMA + 4 * (MB_BLOCK_SIZE_LUMA +
 		4) - 1) do
 			if (i < 4 * (MB_BLOCK_SIZE_LUMA + 4)) then
 				if ((i mod (MB_BLOCK_SIZE_LUMA + 4)) > 3) then
@@ -74,30 +73,30 @@ actor Multiple_variables () uint(size=8) DB_I, uint(size=6) BS
 				end
 			end
 		end
-		foreach int y in Integers(0, MB_BLOCK_SIZE_LUMA - 1) do
-			foreach int x in Integers(0, MB_BLOCK_SIZE_LUMA - 1) do
-				curr_mb[y, x] := currbuf[x + y * MB_BLOCK_SIZE_LUMA];
+		foreach int y in 0 .. MB_BLOCK_SIZE_LUMA - 1 do
+			foreach int x in 0 .. MB_BLOCK_SIZE_LUMA - 1 do
+				curr_mb[y][x] := currbuf[x + y * MB_BLOCK_SIZE_LUMA];
 			end
 		end
-		foreach int y in Integers(0, MB_BLOCK_SIZE_LUMA - 1) do
-			foreach int x in Integers(MB_BLOCK_SIZE_LUMA - 4, MB_BLOCK_SIZE_LUMA - 1) do
-				left_mb[y, x] := leftbuf[(x mod 4) + y * 4];
+		foreach int y in 0 .. MB_BLOCK_SIZE_LUMA - 1 do
+			foreach int x in MB_BLOCK_SIZE_LUMA - 4 .. MB_BLOCK_SIZE_LUMA - 1 do
+				left_mb[y][x] := leftbuf[(x mod 4) + y * 4];
 			end
 		end
-		foreach int y in Integers(MB_BLOCK_SIZE_LUMA - 4, MB_BLOCK_SIZE_LUMA - 1) do
-			foreach int x in Integers(0, MB_BLOCK_SIZE_LUMA - 1) do
-				up_mb[y, x] := upbuf[x + ((y mod 4) * MB_BLOCK_SIZE_LUMA)];
+		foreach int y in MB_BLOCK_SIZE_LUMA - 4 .. MB_BLOCK_SIZE_LUMA - 1 do
+			foreach int x in 0 .. MB_BLOCK_SIZE_LUMA - 1 do
+				up_mb[y][x] := upbuf[x + ((y mod 4) * MB_BLOCK_SIZE_LUMA)];
 			end
 		end
 		StrengthNotZero := 0;
-		foreach int i in Integers(0, 31) do
+		foreach int i in 0 .. 31 do
 			Strength[i] := u[i];
 			if (Strength[i] != 0) then
 				StrengthNotZero := 1;
 			end
 		end
-		Alist := [ u[i] : for int i in Integers(32, 34) ];
-		Blist := [ u[i] : for int i in Integers(35, 37) ];
+		Alist := [ u[i] : for int i in 32 .. 34 ];
+		Blist := [ u[i] : for int i in 35 .. 37 ];
 	end
 
 end

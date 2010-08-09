@@ -40,7 +40,6 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 // Deinterleave row, col streams
-import all caltrop.lib.BitOps;
 actor Xilinx_separate () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3,
 bool ROW ==> int(size=rsz) R0 , int(size=rsz) R1 , int(size=rsz) R2 , int(size=rsz) R3 ,
 int(size=csz) C0 , int(size=csz) C1 , int(size=csz) C2 , int(size=csz) C3 :

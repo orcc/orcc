@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="idct_high_level" x="145" y="84"/>
+      <vertex id="test_big" x="94" y="116"/>
+      <vertex id="sink_big" x="314" y="136"/>
    </vertices>
 </layout>

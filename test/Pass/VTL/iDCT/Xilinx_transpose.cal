@@ -39,14 +39,13 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
-import all caltrop.lib.BitOps;
 actor Xilinx_transpose () int(size=sz) X0, int(size=sz) X1, int(size=sz) X2, int(size=sz) X3 ==>
 int(size=sz) Y0 , int(size=sz) Y1 :
 
 	int sz = 16;
 
 	List(type: List(type: List(type: int(size=sz), size=8), size=8), size=2) mem := [ [ [ 0 : for
-	int k in Integers(1, 8) ] : for int j in Integers(1, 8) ] : for int i in Integers(1, 2) ];
+	int k in 1 .. 8 ] : for int j in 1 .. 8 ] : for int i in 1 .. 2 ];
 
 	int rcount := 0;
 
@@ -101,15 +100,15 @@ int(size=sz) Y0 , int(size=sz) Y1 :
 	// { 0, 7, 3, 4 }
 		// { 1, 6, 2, 5 }
 		if quad = 0 then
-			mem[select, row, 0] := a;
-			mem[select, row, 7] := b;
-			mem[select, row, 3] := c;
-			mem[select, row, 4] := d;
+			mem[select][row][0] := a;
+			mem[select][row][7] := b;
+			mem[select][row][3] := c;
+			mem[select][row][4] := d;
 		else
-			mem[select, row, 1] := a;
-			mem[select, row, 6] := b;
-			mem[select, row, 2] := c;
-			mem[select, row, 5] := d;
+			mem[select][row][1] := a;
+			mem[select][row][6] := b;
+			mem[select][row][2] := c;
+			mem[select][row][5] := d;
 		end
 		rcount := rcount + 4;
 	end

@@ -1,0 +1,15 @@
+actor DuplicatedVariables () ==> :
+
+	int x := 0;
+	
+	int x;
+
+	action ==>
+	var
+		int z, bool z
+	do
+		x := z;
+		z := z;
+	end
+
+end

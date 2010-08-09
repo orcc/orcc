@@ -12,19 +12,26 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="idct_high_level">
+    <Instance id="test_big">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../VTL/GEN_124_algo_Idct1d"/>
+        <Class name="../VTL/BigNumbers"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="ROW">
-            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
-        </Parameter>
+    </Instance>
+    <Instance id="sink_big">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../VTL/BigSink"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
+    <Connection dst="sink_big" dst-port="I" src="test_big" src-port="O"/>
 </XDF>

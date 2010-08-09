@@ -1,0 +1,17 @@
+actor BigNumbers () ==> int(size=64) O :
+
+	int(size=48) x := 0x800000000000;
+	
+	// an empty action so this actor is not considered system, but that never executes
+	// because we want to fire the other actor, too.
+	action ==>
+	guard
+		x = 0
+	end
+
+	initialize ==> O:[ x ]
+	do
+		x := x + 1;
+	end
+
+end
