@@ -28,64 +28,61 @@
  */
 package net.sf.orcc.cal;
 
+import net.sf.orcc.cal.conversion.BOOLValueConverter;
+import net.sf.orcc.cal.conversion.DECIMALValueConverter;
+import net.sf.orcc.cal.conversion.HEXValueConverter;
+import net.sf.orcc.cal.conversion.OCTALValueConverter;
+import net.sf.orcc.cal.conversion.REALValueConverter;
+
 import org.eclipse.xtext.common.services.DefaultTerminalConverters;
 import org.eclipse.xtext.conversion.IValueConverter;
 import org.eclipse.xtext.conversion.ValueConverter;
-import org.eclipse.xtext.conversion.ValueConverterException;
-import org.eclipse.xtext.parsetree.AbstractNode;
-import org.eclipse.xtext.util.Strings;
+
+import com.google.inject.Inject;
 
 /**
  * Converts "true" and "false" to booleans, and hexadecimal to integer.
  */
 public class CalValueConverter extends DefaultTerminalConverters {
 
+	@Inject
+	private BOOLValueConverter boolValueConverter;
+
+	@Inject
+	private DECIMALValueConverter decimalValueConverter;
+
+	@Inject
+	private HEXValueConverter hexValueConverter;
+
+	@Inject
+	private OCTALValueConverter octalValueConverter;
+
+	@Inject
+	private REALValueConverter realValueConverter;
+
 	@ValueConverter(rule = "BOOL")
 	public IValueConverter<Boolean> BOOL() {
-		return new IValueConverter<Boolean>() {
+		return boolValueConverter;
+	}
 
-			public String toString(Boolean value) {
-				return value.toString();
-			}
-
-			public Boolean toValue(String string, AbstractNode node) {
-				if (Strings.isEmpty(string)) {
-					throw new ValueConverterException(
-							"Couldn't convert empty string to boolean", node,
-							null);
-				}
-
-				if ("true".equals(string)) {
-					return true;
-				} else {
-					return false;
-				}
-			}
-
-		};
+	@ValueConverter(rule = "DECIMAL")
+	public IValueConverter<Long> DECIMAL() {
+		return decimalValueConverter;
 	}
 
 	@ValueConverter(rule = "HEX")
-	public IValueConverter<Integer> HEX() {
-		return new IValueConverter<Integer>() {
+	public IValueConverter<Long> HEX() {
+		return hexValueConverter;
+	}
 
-			public String toString(Integer value) {
-				return value.toString();
-			}
+	@ValueConverter(rule = "OCTAL")
+	public IValueConverter<Long> OCTAL() {
+		return octalValueConverter;
+	}
 
-			public Integer toValue(String string, AbstractNode node) {
-				if (Strings.isEmpty(string))
-					throw new ValueConverterException(
-							"Couldn't convert empty string to int", node, null);
-				try {
-					return Integer.valueOf(string.substring(2), 16);
-				} catch (NumberFormatException e) {
-					throw new ValueConverterException("Couldn't convert '"
-							+ string + "' to int", node, e);
-				}
-			}
-
-		};
+	@ValueConverter(rule = "REAL")
+	public IValueConverter<Float> REAL() {
+		return realValueConverter;
 	}
 
 }

@@ -36,6 +36,7 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
 import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionFloat;
 import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
 import net.sf.orcc.cal.cal.AstExpressionInteger;
@@ -154,6 +155,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 			doSwitch(parameter);
 		}
 
+		return null;
+	}
+
+	@Override
+	public Void caseAstExpressionFloat(AstExpressionFloat expression) {
 		return null;
 	}
 

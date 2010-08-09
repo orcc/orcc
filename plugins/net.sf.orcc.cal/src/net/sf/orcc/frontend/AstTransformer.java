@@ -245,7 +245,7 @@ public class AstTransformer {
 		public Expression caseAstExpressionInteger(
 				AstExpressionInteger expression) {
 			Location location = Util.getLocation(expression);
-			int value = expression.getValue();
+			long value = expression.getValue();
 			return new IntExpr(location, value);
 		}
 

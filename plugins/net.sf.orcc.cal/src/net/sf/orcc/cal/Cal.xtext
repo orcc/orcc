@@ -229,6 +229,7 @@ AstExpressionVariable: value=AstVariableReference;
 
 AstExpressionLiteral:
 	AstExpressionBoolean
+	| AstExpressionFloat
 	| AstExpressionInteger
 	| AstExpressionString;
 
@@ -236,9 +237,20 @@ AstExpressionBoolean: value=BOOL;
 
 terminal BOOL returns ecore::EBoolean: 'true' | 'false';
 
-AstExpressionInteger: value=(INT | HEX);
+AstExpressionFloat: value=REAL;
 
-terminal HEX returns ecore::EInt: '0' ('x'|'X') ('0'..'9'|'a'..'f'|'A'..'F')+ ;
+terminal REAL returns ecore::EFloat :
+	('0'..'9')+ '.' ('0'..'9')* (('e'|'E') ('+' | '-')? ('0'..'9')+)?
+|	'.' ('0'..'9')+ (('e'|'E') ('+' | '-')? ('0'..'9')+)?
+|	('0'..'9')+ ('e'|'E') ('+' | '-')? ('0'..'9')+;
+
+AstExpressionInteger: value=(DECIMAL | OCTAL | HEX);
+
+terminal DECIMAL returns ecore::ELong : ('1'..'9') ('0'..'9')*;
+
+terminal OCTAL returns ecore::ELong : '0' ('0'..'7')*;
+
+terminal HEX returns ecore::ELong : '0' ('x'|'X') ('0'..'9' | 'a'..'f' | 'A'..'F')+ ;
 
 AstExpressionString: value=STRING;
 

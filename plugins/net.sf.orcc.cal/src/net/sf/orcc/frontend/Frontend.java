@@ -74,7 +74,7 @@ public class Frontend {
 				new SSATransformation().transform(actor);
 				new IRWriter(actor).write(outputFolder.toString(), prettyPrint);
 			} catch (OrccRuntimeException e) {
-				throw new OrccException(e.getMessage(), e);
+				e.printStackTrace();
 			}
 		}
 	}

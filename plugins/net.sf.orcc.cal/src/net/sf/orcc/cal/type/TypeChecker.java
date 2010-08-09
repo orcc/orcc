@@ -463,8 +463,8 @@ public class TypeChecker extends CalSwitch<Type> {
 	 *            a number
 	 * @return the size in bits needed to store the given number as an int
 	 */
-	private int getSize(int number) {
-		int v;
+	private int getSize(long number) {
+		long v;
 		if (number >= 0) {
 			v = number + 1;
 		} else {

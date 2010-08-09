@@ -36,6 +36,7 @@ import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
 import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionFloat;
 import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
 import net.sf.orcc.cal.cal.AstExpressionInteger;
@@ -185,6 +186,11 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 			}
 		}
 
+		return false;
+	}
+
+	@Override
+	public Boolean caseAstExpressionFloat(AstExpressionFloat expression) {
 		return false;
 	}
 
