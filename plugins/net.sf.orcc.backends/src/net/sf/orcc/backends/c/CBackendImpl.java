@@ -39,6 +39,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
+import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
@@ -84,8 +85,9 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
+		ActorTransformation[] transformations = { new TypeSizeTransformation(),
+				new DeadGlobalElimination(), new DeadCodeElimination(),
+				new DeadVariableRemoval(),
 				new RenameTransformation(this.transformations),
 				new PhiRemoval(), new MoveReadsWritesTransformation() };
 
@@ -131,7 +133,7 @@ public class CBackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(CExpressionPrinter.class);
 		printer.setTypePrinter(CTypePrinter.class);
 		printer.setOptions(getAttributes());
-		
+
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printInstances(network);

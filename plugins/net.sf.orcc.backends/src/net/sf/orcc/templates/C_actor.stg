@@ -97,13 +97,13 @@ $i$
 elseif (type.float)
 $f$
 elseif (type.int)
-$$if (type.long)$lli$else$i$endif$$
+$$if (type.long)$ll$endif$i$
 elseif (type.list)
 $p$
 elseif (type.string)
 $s$
 elseif (type.uint)
-$u$
+$$if (type.long)$ll$endif$u$
 elseif (type.void)
 $p$
 endif$

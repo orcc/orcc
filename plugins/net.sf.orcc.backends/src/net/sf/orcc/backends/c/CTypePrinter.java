@@ -44,27 +44,16 @@ import net.sf.orcc.ir.type.TypePrinter;
  */
 public class CTypePrinter extends TypePrinter {
 
-	public void printInt(int size) {
-		if (size <= 8) {
-			builder.append("char");
-		} else if (size <= 16) {
-			builder.append("short");
-		} else if (size <= 32) {
-			builder.append("int");
-		} else if (size <= 64) {
-			builder.append("i64");
-		}
-	}
-
 	@Override
 	public void visit(TypeBool type) {
 		// boolean is a C int.
-		builder.append("int");
+		builder.append("i32");
 	}
 
 	@Override
 	public void visit(TypeInt type) {
-		printInt(type.getSize());
+		builder.append("i");
+		builder.append(type.getSize());
 	}
 
 	@Override
@@ -80,8 +69,8 @@ public class CTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(TypeUint type) {
-		builder.append("u_");
-		printInt(type.getSize());
+		builder.append("u");
+		builder.append(type.getSize());
 	}
 
 	@Override

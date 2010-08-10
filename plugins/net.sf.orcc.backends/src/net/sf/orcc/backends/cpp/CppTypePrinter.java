@@ -30,6 +30,7 @@ package net.sf.orcc.backends.cpp;
 
 import net.sf.orcc.backends.c.CTypePrinter;
 import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeUint;
 
 /**
@@ -41,11 +42,28 @@ import net.sf.orcc.ir.TypeUint;
  */
 public class CppTypePrinter extends CTypePrinter {
 
+	private void printInt(int size) {
+		if (size <= 8) {
+			builder.append("char");
+		} else if (size <= 16) {
+			builder.append("short");
+		} else if (size <= 32) {
+			builder.append("int");
+		} else if (size <= 64) {
+			builder.append("long long");
+		}
+	}
+
 	@Override
 	public void visit(TypeBool type) {
 		builder.append("bool");
 	}
-	
+
+	@Override
+	public void visit(TypeInt type) {
+		printInt(type.getSize());
+	}
+
 	@Override
 	public void visit(TypeUint type) {
 		builder.append("unsigned ");
