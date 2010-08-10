@@ -68,7 +68,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 /**
  * Split expression and effective node.
  * 
- * @author Jï¿½rï¿½me GORIN
+ * @author JŽr™me GORIN
  * @author Matthieu Wipliez
  * 
  */
@@ -122,7 +122,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				previousType = IrFactory.eINSTANCE.createTypeBool();
 			}
 
-			// Make the final asssignment
+			// Make the final assignment
 			LocalVariable target = newVariable(type);
 			target.setType(type);
 			Assign assign = new Assign(location, target, new BinaryExpr(
@@ -193,7 +193,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 					}
 				}
 
-				// Make the final asssignment
+				// Make the final assignment
 				LocalVariable target = newVariable(type);
 				Use use = new Use(target);
 				Location location = expr.getLocation();
@@ -224,9 +224,10 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		 */
 		private LocalVariable newVariable(Type type) {
 			String procName = procedure.getName();
-
-			return new LocalVariable(true, tempVarCount++, new Location(),
-					procName + "_" + "expr", type);
+			LocalVariable local = new LocalVariable(true, tempVarCount++,
+					new Location(), procName + "_" + "expr", type);
+			procedure.getLocals().put(local.getName(), local);
+			return local;
 		}
 
 	}
@@ -269,15 +270,19 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void visit(Assign assign, Object... args) {
+		Type type;
 		block = assign.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		// Type type = assign.getTarget().getType();
-		Type type = assign.getValue().getType();
+		if (assign.getTarget().getType().isBool()) {
+			type = IrFactory.eINSTANCE.createTypeBool();
+		} else {
+			type = IrFactory.eINSTANCE.createTypeInt(32);
+		}
 		it.previous();
 		assign.setValue(visitExpression(assign.getValue(), it, type));
 		it.next();
 
-		// 3AC does not support direct assignement
+		// 3AC does not support direct assignment
 		if (!(assign.getValue() instanceof BinaryExpr)) {
 			Expression expr = assign.getValue();
 			Location location = expr.getLocation();
@@ -343,7 +348,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = store.getValue();
 		Variable target = store.getTarget();
-		Type targetType = target.getType(); 
+		Type targetType = target.getType();
 
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
@@ -357,11 +362,21 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		if (targetType.isBool()) {
 			store.setValue(visitExpression(value, it,
 					IrFactory.eINSTANCE.createTypeBool()));
+		} else if (targetType.isList()) {
+			TypeList exprtype = (TypeList) targetType;
+			if (exprtype.getElementType().isBool()) {
+				store.setValue(visitExpression(value, it,
+						IrFactory.eINSTANCE.createTypeBool()));
+			} else {
+				store.setValue(visitExpression(value, it,
+						IrFactory.eINSTANCE.createTypeInt(32)));
+
+			}
 		} else {
 			store.setValue(visitExpression(value, it,
 					IrFactory.eINSTANCE.createTypeInt(32)));
 		}
-		
+
 		it.next();
 	}
 
