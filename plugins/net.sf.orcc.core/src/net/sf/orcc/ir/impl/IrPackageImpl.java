@@ -353,6 +353,15 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EAttribute getTypeUint_Long() {
+		return (EAttribute)typeUintEClass.getEStructuralFeatures().get(1);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	public EClass getTypeVoid() {
 		return typeVoidEClass;
 	}
@@ -414,6 +423,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		typeUintEClass = createEClass(TYPE_UINT);
 		createEAttribute(typeUintEClass, TYPE_UINT__SIZE);
+		createEAttribute(typeUintEClass, TYPE_UINT__LONG);
 
 		typeVoidEClass = createEClass(TYPE_VOID);
 	}
@@ -484,6 +494,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(typeUintEClass, TypeUint.class, "TypeUint", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTypeUint_Size(), ecorePackage.getEInt(), "size", "32", 0, 1, TypeUint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTypeUint_Long(), ecorePackage.getEBoolean(), "long", null, 0, 1, TypeUint.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(typeVoidEClass, TypeVoid.class, "TypeVoid", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 

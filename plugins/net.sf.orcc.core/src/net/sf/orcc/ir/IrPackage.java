@@ -761,13 +761,22 @@ public interface IrPackage extends EPackage {
 	int TYPE_UINT__SIZE = TYPE_FEATURE_COUNT + 0;
 
 	/**
+	 * The feature id for the '<em><b>Long</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TYPE_UINT__LONG = TYPE_FEATURE_COUNT + 1;
+
+	/**
 	 * The number of structural features of the '<em>Type Uint</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TYPE_UINT_FEATURE_COUNT = TYPE_FEATURE_COUNT + 1;
+	int TYPE_UINT_FEATURE_COUNT = TYPE_FEATURE_COUNT + 2;
 
 	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeVoidImpl <em>Type Void</em>}' class.
@@ -1108,6 +1117,17 @@ public interface IrPackage extends EPackage {
 	EAttribute getTypeUint_Size();
 
 	/**
+	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeUint#isLong <em>Long</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Long</em>'.
+	 * @see net.sf.orcc.ir.TypeUint#isLong()
+	 * @see #getTypeUint()
+	 * @generated
+	 */
+	EAttribute getTypeUint_Long();
+
+	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.TypeVoid <em>Type Void</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1336,6 +1356,14 @@ public interface IrPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute TYPE_UINT__SIZE = eINSTANCE.getTypeUint_Size();
+
+		/**
+		 * The meta object literal for the '<em><b>Long</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute TYPE_UINT__LONG = eINSTANCE.getTypeUint_Long();
 
 		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeVoidImpl <em>Type Void</em>}' class.

@@ -32,7 +32,7 @@ package net.sf.orcc.ir;
  * This class defines an integer type.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jérôme Gorin
  * @model extends="net.sf.orcc.ir.Type"
  * 
  */
@@ -51,6 +51,7 @@ public interface TypeInt extends Type {
 	/**
 	 * Returns true if this type must be represented with a "long".
 	 * 
+	 * @return true if this type must be represented with a "long"
 	 * @model changeable="false" volatile="true" derived="true"
 	 */
 	boolean isLong();

@@ -176,7 +176,7 @@ public class Procedure extends AbstractLocalizable {
 
 	/**
 	 * Returns the CFG of this procedure. The CFG must be set by calling
-	 * {@link #buildCFG()} transformation.
+	 * {@link #setGraph(CFG)}.
 	 * 
 	 * @return the CFG of this procedure
 	 */

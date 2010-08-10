@@ -41,14 +41,25 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * This class defines an unsigned integer type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author JÃ©rÃ´me Gorin
  * 
  */
 public class TypeUintImpl extends TypeImpl implements TypeUint {
 
 	/**
+	 * The default value of the '{@link #isLong() <em>Long</em>}' attribute.
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @see #isLong()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final boolean LONG_EDEFAULT = false;
+
+	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSize()
 	 * @generated
 	 * @ordered
@@ -59,6 +70,7 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected TypeUintImpl() {
@@ -77,26 +89,32 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.TYPE_UINT__SIZE:
-				return getSize();
+		case IrPackage.TYPE_UINT__SIZE:
+			return getSize();
+		case IrPackage.TYPE_UINT__LONG:
+			return isLong();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.TYPE_UINT__SIZE:
-				return size != SIZE_EDEFAULT;
+		case IrPackage.TYPE_UINT__SIZE:
+			return size != SIZE_EDEFAULT;
+		case IrPackage.TYPE_UINT__LONG:
+			return isLong() != LONG_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -112,20 +130,22 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.TYPE_UINT__SIZE:
-				setSize((Integer)newValue);
-				return;
+		case IrPackage.TYPE_UINT__SIZE:
+			setSize((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -135,14 +155,15 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.TYPE_UINT__SIZE:
-				setSize(SIZE_EDEFAULT);
-				return;
+		case IrPackage.TYPE_UINT__SIZE:
+			setSize(SIZE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -155,6 +176,11 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 	 */
 	public int getSize() {
 		return size;
+	}
+
+	@Override
+	public boolean isLong() {
+		return (size > 32);
 	}
 
 	@Override
@@ -173,7 +199,8 @@ public class TypeUintImpl extends TypeImpl implements TypeUint {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_UINT__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.TYPE_UINT__SIZE, oldSize, size));
 	}
 
 	@Override

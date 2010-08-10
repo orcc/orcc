@@ -41,15 +41,15 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * This class defines an integer type.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jérôme Gorin
  * 
  */
 public class TypeIntImpl extends TypeImpl implements TypeInt {
 
 	/**
 	 * The default value of the '{@link #isLong() <em>Long</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #isLong()
 	 * @generated
 	 * @ordered
@@ -59,6 +59,7 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSize()
 	 * @generated
 	 * @ordered
@@ -69,6 +70,7 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected TypeIntImpl() {
@@ -87,30 +89,32 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.TYPE_INT__SIZE:
-				return getSize();
-			case IrPackage.TYPE_INT__LONG:
-				return isLong();
+		case IrPackage.TYPE_INT__SIZE:
+			return getSize();
+		case IrPackage.TYPE_INT__LONG:
+			return isLong();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.TYPE_INT__SIZE:
-				return size != SIZE_EDEFAULT;
-			case IrPackage.TYPE_INT__LONG:
-				return isLong() != LONG_EDEFAULT;
+		case IrPackage.TYPE_INT__SIZE:
+			return size != SIZE_EDEFAULT;
+		case IrPackage.TYPE_INT__LONG:
+			return isLong() != LONG_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -126,20 +130,22 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.TYPE_INT__SIZE:
-				setSize((Integer)newValue);
-				return;
+		case IrPackage.TYPE_INT__SIZE:
+			setSize((Integer) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -149,14 +155,15 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.TYPE_INT__SIZE:
-				setSize(SIZE_EDEFAULT);
-				return;
+		case IrPackage.TYPE_INT__SIZE:
+			setSize(SIZE_EDEFAULT);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -192,7 +199,8 @@ public class TypeIntImpl extends TypeImpl implements TypeInt {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_INT__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.TYPE_INT__SIZE, oldSize, size));
 	}
 
 	@Override
