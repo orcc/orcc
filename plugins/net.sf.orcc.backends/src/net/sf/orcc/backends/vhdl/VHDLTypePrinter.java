@@ -29,8 +29,6 @@
  */
 package net.sf.orcc.backends.vhdl;
 
-import java.math.BigInteger;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.TypeBool;
 import net.sf.orcc.ir.TypeInt;
@@ -60,9 +58,9 @@ public class VHDLTypePrinter extends TypePrinter {
 			size = 31;
 		}
 
-		BigInteger bound = new BigInteger("1").shiftLeft(size - 1);
+		long bound = 1 << (size - 1);
 		builder.append("integer range ");
-		builder.append(bound.subtract(BigInteger.ONE));
+		builder.append(bound - 1);
 		builder.append(" downto -");
 		builder.append(bound);
 	}

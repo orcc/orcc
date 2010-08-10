@@ -28,32 +28,15 @@
  */
 package net.sf.orcc.backends.vhdl.transforms;
 
-import java.util.List;
-import java.util.ListIterator;
-
-import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
-import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
-import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.nodes.AbstractNode;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
- * Split expression and effective node.
+ * This class defines a transformation that sets the type of expressions to the
+ * type of their target.
  * 
  * @author Matthieu Wipliez
  * @author Nicolas Siret
@@ -61,7 +44,8 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class SizeRedimension extends AbstractActorTransformation {
 
-	private class ExpressionRedimension implements ExpressionInterpreter {
+	private static class ExpressionRedimension extends
+			AbstractExpressionVisitor {
 
 		/**
 		 * type of the target variable
@@ -69,99 +53,31 @@ public class SizeRedimension extends AbstractActorTransformation {
 		private Type type;
 
 		/**
-		 * Creates a Expression redimension with the given target size.
+		 * Creates a Expression redimension with the given target type.
 		 * 
-		 * @param size
-		 *            The size of the target
+		 * @param type
+		 *            the type of the target
 		 */
-		public ExpressionRedimension(Type syze) {
-			this.type = syze;
+		public ExpressionRedimension(Type type) {
+			this.type = type;
 		}
 
 		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
-			Type newType = type;
-			expr.setType(newType);
-			return expr;
+		public void visit(BinaryExpr expr, Object... args) {
+			// visits sub-expressions
+			expr.getE1().accept(this);
+			expr.getE2().accept(this);
+
+			// updates the type of this expression
+			expr.setType(type);
 		}
 
-		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
-		public Object interpret(IntExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
-		public Object interpret(ListExpr expr, Object... args) {
-			throw new OrccRuntimeException("list expression not supported");
-		}
-
-		@Override
-		public Object interpret(StringExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
-		public Object interpret(VarExpr expr, Object... args) {
-			return expr;
-		}
-	}
-
-	@SuppressWarnings("unused")
-	private BlockNode block;
-
-	@Override
-	public void transform(Actor actor) {
-		// Visit procedure
-		for (Procedure proc : actor.getProcs()) {
-			visitProcedure(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
-		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void visit(Assign assign, Object... args) {
-		block = assign.getBlock();
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		Type size = assign.getTarget().getType();
-		it.previous(); 
-		assign.setValue(visitExpression(assign.getValue(), size));
-		it.next();
-	}
-
-	private Expression visitExpression(Expression value, Type syze) {
-		return (Expression) value.accept(new ExpressionRedimension(syze));
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		// set the label counter to prevent new nodes from having the same label
-		// as existing nodes
-		List<CFGNode> nodes = procedure.getNodes();
-		if (nodes.size() > 0) {
-			CFGNode lastNode = nodes.get(nodes.size() - 1);
-			AbstractNode.setLabelCount(lastNode.getLabel() + 1);
-		}
-		super.visitProcedure(procedure);
+		Type targetType = assign.getTarget().getType();
+		assign.getValue().accept(new ExpressionRedimension(targetType));
 	}
 
 }

@@ -37,7 +37,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * @author Nicolas Siret
  * 
  */
-public class SupressInit extends AbstractActorTransformation {
+public class SuppressInit extends AbstractActorTransformation {
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
@@ -45,4 +45,5 @@ public class SupressInit extends AbstractActorTransformation {
 			procedure.setExternal(true);
 		}
 	}
+
 }
