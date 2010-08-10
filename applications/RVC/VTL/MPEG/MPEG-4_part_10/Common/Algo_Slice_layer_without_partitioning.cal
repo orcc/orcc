@@ -106,17 +106,21 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 	SliceHeader.LaunchRefPicMark: action
+			HeaderSkipNal     :[EndOfDecoding],
 			HeaderLaunchActor :[ValLaunch]
 				==>
 		guard
-			ValLaunch = DEC_REF_PIC_MARKING
+			ValLaunch     = DEC_REF_PIC_MARKING,
+			EndOfDecoding = false
 		end
 
 	SliceHeader.LaunchRefPicList: action
+			HeaderSkipNal     :[EndOfDecoding],
 			HeaderLaunchActor :[ValLaunch]
 				==>
 		guard
-			ValLaunch = REF_PIC_LIST
+			ValLaunch = REF_PIC_LIST,
+			EndOfDecoding = false
 		end
 
 	SliceHeader.Done: action
@@ -244,10 +248,12 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 	SliceData.LaunchMbLayer: action
+			DataSkipNal     :[EndOfDecoding],
 			DataLaunchActor :[ValLaunch]
 				==>
 		guard
-			ValLaunch = MB_LAYER
+			ValLaunch     = MB_LAYER,
+			EndOfDecoding = false
 		end
 
 	SliceData.Done: action

@@ -91,6 +91,7 @@ actor Algo_DecodeMacroblockLayer()
 			transform_8x8_mode_flag   := ValTransform8x8Mode;
 
 			noSubMbPartSizeLessThan8x8Flag := true;
+			println("\t\tmb_type : "+ValueOfVLD);
 		end
 
 	CheckMbType.IsIPCM: action
@@ -119,6 +120,10 @@ actor Algo_DecodeMacroblockLayer()
 				==>
 		do
 			/* Forward to the output for the pcm decoding */
+			foreach int a in 0 .. 255
+			do
+				println("\t\tpcm_sample_luma[" + a + "] : " + ValueOfVLD[a]);
+			end
 		end
 
 	ReadPcmSampleLuma.Asked: action
@@ -139,6 +144,10 @@ actor Algo_DecodeMacroblockLayer()
 				==>
 		do
 			/* Forward to the output for the pcm decoding */
+			foreach int a in 0 .. 255
+			do
+				println("\t\tpcm_sample_chroma1[" + a + "] : " + ValueOfVLD[a]);
+			end
 		end
 
 	ReadPcmSampleChroma.VComponent: action
@@ -146,6 +155,10 @@ actor Algo_DecodeMacroblockLayer()
 				==>
 		do
 			/* Forward to the output for the pcm decoding */
+			foreach int a in 0 .. 255
+			do
+				println("\t\tpcm_sample_chroma2[" + a + "] : " + ValueOfVLD[a]);
+			end
 		end
 
 	LaunchSubMbPred: action	==>

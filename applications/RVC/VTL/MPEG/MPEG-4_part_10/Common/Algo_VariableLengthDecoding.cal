@@ -184,7 +184,6 @@ actor Algo_VariableLengthDecoding()
 			ValNewNal             = false,
 			NewNalAlreadyDetected = false
 		do
-//			println("FillBuffer:"+ValRbspByte);
 			BufferRbsp[3]  := BufferRbsp[2];
 			BufferRbsp[2]  := BufferRbsp[1];
 			BufferRbsp[1]  := BufferRbsp[0];
@@ -212,7 +211,6 @@ actor Algo_VariableLengthDecoding()
 			ValEndOfNal  = false,
 			ValTypeOfVLD = VLD_UE
 		do
-//			println("IsVldUe");
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
@@ -227,7 +225,6 @@ actor Algo_VariableLengthDecoding()
 			ValEndOfNal  = false,
 			ValTypeOfVLD = VLD_SE
 		do
-//			println("IsVldSe");
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
@@ -243,7 +240,6 @@ actor Algo_VariableLengthDecoding()
 			ValEndOfNal  = false,
 			ValTypeOfVLD = READ_BITS
 		do
-//			println("IsReadBits");
 			BitsCount := ValNbBits;
 			ReadValue := 0;
 		end
@@ -266,12 +262,11 @@ actor Algo_VariableLengthDecoding()
 				==>
 		guard
 			CountBufferRbsp = 0,
-			SizeBufferRbsp  > 0// and ValNewNal = false
+			SizeBufferRbsp  > 0
 		do
 			CountBufferRbsp := 8;
 			SizeBufferRbsp  := SizeBufferRbsp - 1;
 			WorkingByte     := BufferRbsp[SizeBufferRbsp];
-//			println("WorkingByte:"+WorkingByte);
 		end
 
 
@@ -285,7 +280,6 @@ actor Algo_VariableLengthDecoding()
 		var
 			uint(size=5) NbBitsToAdd
 		do
-//			println("GetCodeNum.Launch");
 			if(not Bit1Found)then
 				while( (bitand(WorkingByte,0x80) = 0) and (CountBufferRbsp > 0))
 				do
@@ -317,7 +311,6 @@ actor Algo_VariableLengthDecoding()
 	GetCodeNum.Finished: action ==>
 		guard
 			leadingZeroBits = 0
-//			println("GetCodeNum.Finished");
 		end
 
 
@@ -325,7 +318,6 @@ actor Algo_VariableLengthDecoding()
 		guard
 			leadingZeroBits != 0
 		do
-//			println("GetCodeNum.NotFinished");
 		end
 
 
@@ -334,7 +326,7 @@ actor Algo_VariableLengthDecoding()
 			ValDecoded :[CodeNum]
 		do
 			CodeNum := CodeNum - 1;
-			println("\tUeValue:"+CodeNum);
+//			println("\tUeValue:"+CodeNum);
 		end
 
 
@@ -348,8 +340,7 @@ actor Algo_VariableLengthDecoding()
 			else
 				CodeNum := -CodeNum / 2;
 			end
-//			println("SendSeValue");
-			println("\tSeValue:"+CodeNum);
+//			println("\tSeValue:"+CodeNum);
 		end
 
 
@@ -357,7 +348,6 @@ actor Algo_VariableLengthDecoding()
 		var
 			uint(size=5) NbBitsToAdd
 		do
-//			println("Get_u.Launch");
 			NbBitsToAdd :=
 				if(CountBufferRbsp < BitsCount)then
 					CountBufferRbsp
@@ -375,16 +365,12 @@ actor Algo_VariableLengthDecoding()
 	Get_u.Finished: action ==>
 		guard
 			BitsCount = 0
-		do
-//			println("Get_u.Finished");
 		end
 
 
 	Get_u.NotFinished: action ==>
 		guard
 			BitsCount != 0
-		do
-//			println("Get_u.NotFinished");
 		end
 
 
@@ -392,8 +378,7 @@ actor Algo_VariableLengthDecoding()
 				==>
 			ValDecoded :[ReadValue]
 		do
-//			println("SendUValue");
-			println("\tUValue:"+ReadValue);
+//			println("\tUValue:"+ReadValue);
 		end
 
 

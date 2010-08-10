@@ -169,7 +169,7 @@ actor Algo_DecodeSliceHeader()
 					ValueOfVLD[1] - 5
 				end;
 			println("\t\tfirst_mb_in_slice:"+first_mb_in_slice);
-			println("\t\tslice_type:       "+slice_type);
+			println("\t\tslice_type:       "+ValueOfVLD[1]);
 			println("\t\tpps_id:           "+ValueOfVLD[2]);
 			//pps_id            := ValueOfVLD[2]; ==> don't need
 			//Ask sps_id
@@ -542,6 +542,7 @@ actor Algo_DecodeSliceHeader()
 
 	RefPicList.Launch: action
 				==>
+			SkipNal      :[  false ],//Keep synchro
 			LaunchActor  :[ REF_PIC_LIST ]
 		end
 
@@ -553,6 +554,7 @@ actor Algo_DecodeSliceHeader()
 
 	DecRefPicMarking.Launch: action
 				==>
+			SkipNal      :[  false ],//Keep synchro
 			LaunchActor  :[ DEC_REF_PIC_MARKING ]
 		end
 
@@ -602,7 +604,7 @@ actor Algo_DecodeSliceHeader()
 			//              sp_for_sw , slice_q
 			SkipNal      :[   false   ,  false ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , VLD_SE ],
-			LaunchActor  :[ SLICE_HEADER  ],
+			LaunchActor  :[ SLICE_HEADER, SLICE_HEADER ],
 			NbBitsToRead :[     1              ]
 		guard
 			slice_type = SLICE_TYPE_SP
@@ -669,7 +671,7 @@ actor Algo_DecodeSliceHeader()
 				==>
 			//              slice_ , slice_
 			SkipNal      :[  false ,  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
+			LaunchActor  :[ SLICE_HEADER, SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_SE , VLD_SE ]
 		guard
 			disable_deblocking_filter_idc != 1

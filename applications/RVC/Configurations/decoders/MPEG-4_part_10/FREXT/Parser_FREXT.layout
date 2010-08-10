@@ -13,7 +13,7 @@
       <vertex id="DecodeSliceHeader" x="1038" y="1277"/>
       <vertex id="DecodeRefPicList" x="1218" y="755"/>
       <vertex id="DecodeDecRefPicMarking" x="1116" y="434"/>
-      <vertex id="DecodeSliceData_Cavlc" x="1454" y="1130"/>
-      <vertex id="DecodeMacroBlockLayer" x="1740" y="941"/>
+      <vertex id="DecodeSliceData_Cavlc" x="1404" y="1120"/>
+      <vertex id="DecodeMacroBlockLayer" x="1793" y="971"/>
    </vertices>
 </layout>

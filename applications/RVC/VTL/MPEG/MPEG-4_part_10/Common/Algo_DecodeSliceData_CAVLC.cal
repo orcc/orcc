@@ -169,6 +169,7 @@ actor Algo_DecodeSliceData_CAVLC()
 		do
 			mb_skip_run   := ValueOfVLD;
 			prevMbSkipped := (mb_skip_run > 0);
+			println("\t\tmb_skip_run : "+ValueOfVLD);
 		end
 
 	//for( i=0; i<mb_skip_run; i++ )
@@ -201,6 +202,7 @@ actor Algo_DecodeSliceData_CAVLC()
 				else
 					true
 				end;
+			println("\t\tmore_rbsp_data() : "+ValueOfVLD);
 		end
 
 	CheckMoreDataFlag.IsEqualToTrue: action
@@ -232,6 +234,7 @@ actor Algo_DecodeSliceData_CAVLC()
 				else
 					true
 				end;
+			println("\t\tmb_field_decoding_flag : "+ValueOfVLD);
 		end
 
 	//macroblock_layer()
@@ -248,7 +251,7 @@ actor Algo_DecodeSliceData_CAVLC()
 	DecMacroBlockLayer.Launch: action
 				==>
 			//          more_rbsp_data()
-			SkipNal   :[     false      ],//Keep synchro
+			SkipNal   :[   false,  false      ],//Keep synchro
 			LaunchActor :[MB_LAYER, SLICE_DATA],
 			TypeOfVLD :[ MORE_RBSP_DATA ]
 		end
