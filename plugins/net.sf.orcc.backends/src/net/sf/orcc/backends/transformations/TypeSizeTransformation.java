@@ -96,6 +96,7 @@ public class TypeSizeTransformation extends AbstractActorTransformation {
 	public void visitProcedure(Procedure procedure) {
 		checkVariables(procedure.getParameters());
 		checkVariables(procedure.getLocals());
+		checkType(procedure.getReturnType());
 	}
 
 }
