@@ -41,17 +41,26 @@ import net.sf.orcc.ir.Type;
  */
 public class IntExpr extends AbstractExpression {
 
-	private long value;
-
 	/**
-	 * Creates a new integer expression with a dummy location.
+	 * Returns the size in bits needed to store the given number as an int.
 	 * 
-	 * @param value
-	 *            an integer value.
+	 * @param number
+	 *            a number
+	 * @return the size in bits needed to store the given number as an int
 	 */
-	public IntExpr(long value) {
-		this(new Location(), value);
+	public static int getSize(long number) {
+		long v;
+		if (number >= 0) {
+			v = number + 1;
+		} else {
+			v = -number;
+		}
+
+		int size = (int) Math.ceil(Math.log(v) / Math.log(2)) + 1;
+		return size;
 	}
+
+	private long value;
 
 	/**
 	 * Creates a new integer expression with a location.
@@ -64,6 +73,16 @@ public class IntExpr extends AbstractExpression {
 	public IntExpr(Location location, long value) {
 		super(location);
 		this.value = value;
+	}
+
+	/**
+	 * Creates a new integer expression with a dummy location.
+	 * 
+	 * @param value
+	 *            an integer value.
+	 */
+	public IntExpr(long value) {
+		this(new Location(), value);
 	}
 
 	@Override
@@ -87,20 +106,14 @@ public class IntExpr extends AbstractExpression {
 
 	@Override
 	public Type getType() {
-		// we return a signed type
-
-		int size;
-		if (value == 0) {
-			size = 1;
-		} else if (value > 0) {
-			size = (int) (Math.log(value) / Math.log(2.0)) + 2;
-		} else {
-			size = (int) Math.ceil(Math.log(-value) / Math.log(2.0)) + 1;
-		}
-
-		return IrFactory.eINSTANCE.createTypeInt(size);
+		return IrFactory.eINSTANCE.createTypeInt(getSize(value));
 	}
 
+	/**
+	 * Returns the value of this integer expression.
+	 * 
+	 * @return the value of this integer expression
+	 */
 	public long getValue() {
 		return value;
 	}

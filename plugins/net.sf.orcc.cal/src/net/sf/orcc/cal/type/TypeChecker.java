@@ -55,6 +55,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 
 /**
@@ -306,8 +307,8 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionInteger(AstExpressionInteger expression) {
-		return IrFactory.eINSTANCE
-				.createTypeInt(getSize(expression.getValue()));
+		return IrFactory.eINSTANCE.createTypeInt(IntExpr.getSize(expression
+				.getValue()));
 	}
 
 	@Override
@@ -454,25 +455,6 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Returns the size in bits needed to store the given number as an int.
-	 * 
-	 * @param number
-	 *            a number
-	 * @return the size in bits needed to store the given number as an int
-	 */
-	private int getSize(long number) {
-		long v;
-		if (number >= 0) {
-			v = number + 1;
-		} else {
-			v = -number;
-		}
-
-		int size = (int) Math.ceil(Math.log(v) / Math.log(2)) + 1;
-		return size;
 	}
 
 	/**
