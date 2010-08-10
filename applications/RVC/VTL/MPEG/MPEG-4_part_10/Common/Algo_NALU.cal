@@ -137,8 +137,8 @@ actor Algo_NALU ()
 		fifo_full  (Pattern.Is000Bytes        )--> fifo_full2;
 
 		fifo_full2 (PatternFor000.Is0001Bytes )--> fill_fifo1;
-		fifo_full2 (PatternFor000.Is0000Bytes )--> fifo_full2;
-		fifo_full2 (NoPatternFor000           )--> fifo_full;
+		fifo_full2 (PatternFor000.Is0000Bytes )--> fifo_full2; //Impossible state (but impossible isn't a french word ;))
+		fifo_full2 (NoPatternFor000           )--> fifo_full;  //Impossible state
 	end
 
 	priority

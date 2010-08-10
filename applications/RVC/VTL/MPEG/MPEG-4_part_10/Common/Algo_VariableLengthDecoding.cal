@@ -37,6 +37,7 @@ actor Algo_VariableLengthDecoding()
 	uint(size=3) VLD_SE                = 2;
 	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
 	uint(size=3) MORE_RBSP_DATA        = 4;
+	uint(size=3) VLD_ME                = 5;
 
 
 /*

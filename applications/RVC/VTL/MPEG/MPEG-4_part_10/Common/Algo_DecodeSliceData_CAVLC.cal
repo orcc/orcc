@@ -1,16 +1,26 @@
 /***********************************************************************
 
-This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
-ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
-Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference
+ purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or 
+modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software 
+module or modifications thereof.
 Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
-Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the 
+MPEG-C part 4:
 
-IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the 
+<standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use 
+in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module 
+or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure 
+the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
 
 ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
 
-IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third 
+parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
@@ -18,9 +28,13 @@ actor Algo_DecodeSliceData_CAVLC()
 	int (size=32) ValVLD,
 	//PpsParameters
 	bool          EntropyCodingMode,
+	bool          Transform8x8Mode,
 	//Sps Parameters
 	uint(size=32) PicSzInMbs,
 	uint(size=32) PicWdtInMbs,
+	uint(size=4)  BitDepthLuma,
+	uint(size=4)  BitDepthChroma,
+	bool          Direct8x8Inference,
 	//Slice Header Parameters
 	uint(size=32) FirstMbInSlice,
 	uint(size=4)  SliceType,
@@ -28,7 +42,14 @@ actor Algo_DecodeSliceData_CAVLC()
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
-	bool          SkipNal
+	bool          SkipNal,
+	uint(size=4)  LaunchActor,
+
+	uint(size=4)  DecMbLayerSliceType,
+	uint(size=4)  DecMbLayerBitDepthLuma,
+	uint(size=4)  DecMbLayerBitDepthChroma,
+	bool          DecMbLayerDirect8x8Inference,
+	bool          DecMbLayerTransform8x8Mode
 		:
 
 
@@ -44,6 +65,9 @@ actor Algo_DecodeSliceData_CAVLC()
 	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
 	uint(size=3) MORE_RBSP_DATA        = 4;
 
+	uint(size=4) SLICE_DATA          = 3;
+	uint(size=4) MB_LAYER            = 4;
+
 //	uint(size=4) SLICE_TYPE_P  = 0;
 //	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_I  = 2;
@@ -56,9 +80,12 @@ actor Algo_DecodeSliceData_CAVLC()
 * State Variables
 *
 */
-
+	//Sps Parameters
+	uint(size=4)  bit_depth_luma;
+	uint(size=4)  bit_depth_chroma;
 	//Pps Parameters
 	bool          entropy_coding_mode_flag;
+	bool          transform_8x8_mode_flag;
 	//Slice Header Parameters
 	uint(size=32) val_CurrMbAddr;
 	uint(size=4)  slice_type;
@@ -68,6 +95,7 @@ actor Algo_DecodeSliceData_CAVLC()
 	bool          prevMbSkipped;
 	uint(size=32) mb_skip_run;
 	bool          mb_field_decoding_flag;
+	bool          direct_8x8_inference_flag;
 
 	procedure NextMbAddress()
 	begin
@@ -77,17 +105,25 @@ actor Algo_DecodeSliceData_CAVLC()
 	end
 
 	GetSpsAndPpsParameters: action
-			EntropyCodingMode :[ValEntropyCodingMode],
-			FirstMbInSlice    :[ValFirstMbInSlice],
-			PicSzInMbs        :[ValPicSizeInMbs],
-			PicWdtInMbs       :[ValPicWdtInMbs],
-			SliceType         :[ValSliceType],
-			MbaffFrame        :[ValMbaffFrame]
+			EntropyCodingMode  :[ValEntropyCodingMode],
+			FirstMbInSlice     :[ValFirstMbInSlice],
+			PicSzInMbs         :[ValPicSizeInMbs],
+			PicWdtInMbs        :[ValPicWdtInMbs],
+			SliceType          :[ValSliceType],
+			MbaffFrame         :[ValMbaffFrame],
+			BitDepthLuma       :[ValBitDepthLuma],
+			BitDepthChroma     :[ValBitDepthChroma],
+			Direct8x8Inference :[ValDirect8x8Inference],
+			Transform8x8Mode   :[ValTransform8x8Mode]
 				==>
 		do
-			entropy_coding_mode_flag := ValEntropyCodingMode;
-			slice_type               := ValSliceType;
-			MbaffFrameFlag           := ValMbaffFrame;
+			entropy_coding_mode_flag  := ValEntropyCodingMode;
+			slice_type                := ValSliceType;
+			MbaffFrameFlag            := ValMbaffFrame;
+			bit_depth_luma            := ValBitDepthLuma;
+			bit_depth_chroma          := ValBitDepthChroma;
+			direct_8x8_inference_flag := ValDirect8x8Inference;
+			transform_8x8_mode_flag   := ValTransform8x8Mode;
 
 			val_CurrMbAddr :=
 				if(MbaffFrameFlag = false)then
@@ -120,6 +156,7 @@ actor Algo_DecodeSliceData_CAVLC()
 				==>
 			//         mb_skip_run
 			SkipNal   :[  false ],//Keep synchro
+			LaunchActor :[SLICE_DATA],
 			TypeOfVLD :[ VLD_UE ]
 		guard
 			   slice_type = SLICE_TYPE_I
@@ -148,6 +185,7 @@ actor Algo_DecodeSliceData_CAVLC()
 				==>
 			//          more_rbsp_data()
 			SkipNal   :[     false      ],//Keep synchro
+			LaunchActor :[SLICE_DATA],
 			TypeOfVLD :[ MORE_RBSP_DATA ]
 		guard
 			mb_skip_run = 0
@@ -175,6 +213,7 @@ actor Algo_DecodeSliceData_CAVLC()
 				==>
 			//        mb_field_decoding_flag
 			SkipNal      :[   false   ],//Keep synchro
+			LaunchActor :[SLICE_DATA],
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[     1     ]
 		guard
@@ -195,6 +234,31 @@ actor Algo_DecodeSliceData_CAVLC()
 				end;
 		end
 
+	//macroblock_layer()
+	SendMbLayerParameters: action
+				==>
+			DecMbLayerSliceType          :[slice_type],
+			DecMbLayerBitDepthLuma       :[bit_depth_luma],
+			DecMbLayerBitDepthChroma     :[bit_depth_chroma],
+			DecMbLayerDirect8x8Inference :[direct_8x8_inference_flag],
+			DecMbLayerTransform8x8Mode   :[transform_8x8_mode_flag]
+		end
+
+
+	DecMacroBlockLayer.Launch: action
+				==>
+			//          more_rbsp_data()
+			SkipNal   :[     false      ],//Keep synchro
+			LaunchActor :[MB_LAYER, SLICE_DATA],
+			TypeOfVLD :[ MORE_RBSP_DATA ]
+		end
+
+	LaunchNextMbAddr: action
+				==>
+		do
+			NextMbAddress();
+		end
+
 	SendEndSliceHeader: action
 				==>
 			SkipNal :[true]
@@ -204,12 +268,47 @@ actor Algo_DecodeSliceData_CAVLC()
 		GetSpsAndPpsParameters     (GetSpsAndPpsParameters              )--> CheckEntropyCodingModeFlag;
 
 		CheckEntropyCodingModeFlag (EntropyCodingModeFlag.IsEqualToTrue )--> GetSpsAndPpsParameters;
-				CheckEntropyCodingModeFlag (SendEndSliceHeader )--> GetSpsAndPpsParameters;
+		CheckEntropyCodingModeFlag (IsSliceIorSI                        )--> ReadMbSkipRun;
+		CheckEntropyCodingModeFlag (CheckMoreDataFlag.IsEqualToTrue     )--> CheckMbAffFrame;
+
+		CheckSliceType             (IsSliceIorSI                        )--> ReadMbSkipRun;
+		CheckSliceType             (CheckMoreDataFlag.IsEqualToTrue     )--> CheckMbAffFrame;
+
+		ReadMbSkipRun              (ReadMbSkipRun.Done                  )--> CheckMbSkipRun;
+
+		CheckMbSkipRun             (CheckMbSkipRun.IsNotEqualTo0        )--> CheckMbSkipRun;
+		CheckMbSkipRun             (CheckMbSkipRun.IsEqualTo0           )--> ReadMoreDataFlag;
+
+		ReadMoreDataFlag           (ReadMoreDataFlag                    )--> CheckMoreDataFlag;
+
+		CheckMoreDataFlag          (CheckMoreDataFlag.IsEqualToTrue     )--> CheckMbAffFrame;
+		CheckMoreDataFlag          (LaunchNextMbAddr                    )--> EndDecodeSliceData;
+
+		CheckMbAffFrame            (ReadMbFieldDecod.Asked              )--> ReadMbFieldDecod;
+		CheckMbAffFrame            (SendMbLayerParameters               )--> DecodeMacroBlockLayer;
+
+		ReadMbFieldDecod           (ReadMbFieldDecod.Done               )--> SendMbLayerParameters;
+
+		SendMbLayerParameters      (SendMbLayerParameters               )--> DecodeMacroBlockLayer;
+
+		DecodeMacroBlockLayer      (DecMacroBlockLayer.Launch           )--> ReadMoreDataFlag2;
+
+		ReadMoreDataFlag2          (ReadMoreDataFlag                    )--> LaunchNextMbAddr;
+
+		LaunchNextMbAddr           (LaunchNextMbAddr                    )--> CheckMoreDataFlag2;
+
+		CheckMoreDataFlag2         (CheckMoreDataFlag.IsEqualToTrue     )--> CheckSliceType;
+		CheckMoreDataFlag2         (SendEndSliceHeader                  )--> GetSpsAndPpsParameters;
 
 		EndDecodeSliceData         (SendEndSliceHeader                  )--> GetSpsAndPpsParameters;
 	end
 
 	priority
-
+		EntropyCodingModeFlag.IsEqualToTrue > IsSliceIorSI;
+		IsSliceIorSI                        > CheckMoreDataFlag.IsEqualToTrue;
+		CheckMbSkipRun.IsNotEqualTo0        > CheckMbSkipRun.IsEqualTo0;
+		CheckMoreDataFlag.IsEqualToTrue     > LaunchNextMbAddr;
+		ReadMbFieldDecod.Asked              > SendMbLayerParameters;
+		CheckMoreDataFlag.IsEqualToTrue     > SendEndSliceHeader;
 	end
 end

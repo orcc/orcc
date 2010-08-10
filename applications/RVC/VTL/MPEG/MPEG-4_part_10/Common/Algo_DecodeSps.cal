@@ -35,6 +35,9 @@ actor Algo_DecodeSps()
 	uint(size=32) PicSzInMbs,
 	uint(size=32) PicWdtInMbs,
 	bool          MbAdaptFrameField,
+	uint(size=4)  BitDepthLuma,
+	uint(size=4)  BitDepthChroma,
+	bool          Direct8x8Inference,
 
 	uint(size=32) Pps_PicWidthInMbs,
 	uint(size=32) Pps_PicHeightInMapUnits
@@ -101,7 +104,7 @@ actor Algo_DecodeSps()
 	List (type: uint(size=32), size=32) pic_height_in_map_units_minus1        := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=1) , size=32) frame_mbs_only_flag                   := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=1) , size=32) mb_adaptive_frame_field_flag          := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=1) , size=32) direct_8x8_interference_flag          := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=1) , size=32) direct_8x8_inference_flag             := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=1) , size=32) frame_cropping_flag                   := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=32), size=32) frame_crop_left_offset                := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=32), size=32) frame_crop_right_offset               := [ 0 : for int i in 0 .. 31 ];
@@ -111,6 +114,9 @@ actor Algo_DecodeSps()
 	List (type: uint(size=5) , size=32) MaxDPBSz                              := [16 : for int i in 0 .. 31 ];
 	List (type: int (size=32), size=32) expected_delta_per_poc_cycle          := [ 0 : for int i in 0 .. 31 ];
 	List (type: uint(size=32), size=32) pic_size_in_mbs                       := [ 0 : for int i in 0 .. 31 ];
+	//High Profile
+	List (type:uint(size=4), size=32 ) bit_depth_luma_minus8                  := [ 0 : for int i in 0 .. 31 ];
+	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8                := [ 0 : for int i in 0 .. 31 ];
 
 	uint(size=5)  sps_id ;
 	int (size=32) LoopVal;
@@ -147,11 +153,15 @@ actor Algo_DecodeSps()
 			OffsetForTopToBottomField   :[offset_for_top_to_bottom_field[ValSps]],
 			PicSzInMbs                  :[pic_size_in_mbs[ValSps]],
 			PicWdtInMbs                 :[pic_width_in_mbs_minus1[ValSps] + 1],
-			MbAdaptFrameField           :[ValMbAdaptFrameField]
+			MbAdaptFrameField           :[ValMbAdaptFrameField],
+			BitDepthLuma                :[bit_depth_luma_minus8[ValSps]+8],
+			BitDepthChroma              :[bit_depth_chroma_minus8[ValSps]+8],
+			Direct8x8Inference          :[ValDirect8x8Inference]
 		var
 			bool val_frame_mbs_only,
 			bool ValDeltaPic,
-			bool ValMbAdaptFrameField
+			bool ValMbAdaptFrameField,
+			bool ValDirect8x8Inference
 		do
 			val_frame_mbs_only :=
 				if(frame_mbs_only_flag[ValSps] = 0)then
@@ -165,8 +175,14 @@ actor Algo_DecodeSps()
 				else
 					true
 				end;
-			ValMbAdaptFrameField:=
+			ValMbAdaptFrameField :=
 				if(mb_adaptive_frame_field_flag[ValSps] = 0)then
+					false
+				else
+					true
+				end;
+			ValDirect8x8Inference :=
+				if(direct_8x8_inference_flag[ValSps] = 0) then
 					false
 				else
 					true
@@ -440,7 +456,7 @@ actor Algo_DecodeSps()
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
 		do
-			direct_8x8_interference_flag[sps_id] := ValueOfVLD[0];
+			direct_8x8_inference_flag[sps_id] := ValueOfVLD[0];
 			frame_cropping_flag[sps_id]          := ValueOfVLD[1];
 		end
 

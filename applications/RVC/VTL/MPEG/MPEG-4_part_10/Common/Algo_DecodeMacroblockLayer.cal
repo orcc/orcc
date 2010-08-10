@@ -1,0 +1,244 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+actor Algo_DecodeMacroblockLayer()
+	int (size=32) ValVLD,
+	uint(size=4)  SliceType,
+	//Pps Parameters
+	bool          Transform8x8Mode,
+	//Sps Parameters
+	uint(size=4)  BitDepthLuma,
+	uint(size=4)  BitDepthChroma,
+	bool          Direct8x8Inference//,
+
+//	uint(size=32) SubMbType
+		==>
+	uint(size=3)  TypeOfVLD,
+	uint(size=5)  NbBitsToRead,
+	bool          SkipNal
+		:
+
+
+/*
+*
+* Constants
+*
+*/
+
+	uint(size=3) READ_BITS             = 0;
+	uint(size=3) VLD_UE                = 1;
+	uint(size=3) VLD_SE                = 2;
+	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
+	uint(size=3) MORE_RBSP_DATA        = 4;
+	uint(size=3) VLD_ME                = 5;
+
+	uint(size=4) SLICE_TYPE_P  = 0;
+	uint(size=4) SLICE_TYPE_B  = 1;
+	uint(size=4) SLICE_TYPE_I  = 2;
+	uint(size=4) SLICE_TYPE_SP = 3;
+	uint(size=4) SLICE_TYPE_SI = 4;
+
+
+	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
+	uint(size=6) BLOCK_TYPE_INTA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTA_16x16_MAX = 24;
+	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
+
+
+	uint(size=6) mb_type                        := 0;
+	bool         noSubMbPartSizeLessThan8x8Flag := true;
+	//SliceData Parameters
+	uint(size=4) slice_type;
+	uint(size=4) bit_depth_luma;
+	uint(size=4) bit_depth_chroma;
+	bool         direct_8x8_inference_flag;
+	bool         transform_8x8_mode_flag;
+
+
+	ReadMbType.Asked: action
+				==>
+			//              mb_type
+			SkipNal      :[  false ],//Keep synchro
+			TypeOfVLD    :[ VLD_UE ]
+		end
+
+	ReadMbType.Done: action
+			ValVLD             :[ValueOfVLD],
+			SliceType          :[ValSliceType],
+			BitDepthLuma       :[ValBitDepthLuma],
+			BitDepthChroma     :[ValBitDepthChroma],
+			Direct8x8Inference :[ValDirect8x8Inference],
+			Transform8x8Mode   :[ValTransform8x8Mode]
+				==>
+		do
+			mb_type                   := ValueOfVLD;
+			slice_type                := ValSliceType;
+			bit_depth_luma            := ValBitDepthLuma;
+			bit_depth_chroma          := ValBitDepthChroma;
+			direct_8x8_inference_flag := ValDirect8x8Inference;
+			transform_8x8_mode_flag   := ValTransform8x8Mode;
+
+			noSubMbPartSizeLessThan8x8Flag := true;
+		end
+
+	CheckMbType.IsIPCM: action
+				==>
+			//    pcm_alignment_zero_bit , pcm_sample_luma[ i ]
+			SkipNal      :[     FalseTab      ] repeat 257,//Keep synchro
+			TypeOfVLD    :[   ValTypeOfVLD    ] repeat 257,
+			//Orcc doesn't support it yet :
+			//TypeOfVLD    :[ [BYTE_ALIGNED_REQUIRED] +  [ValTypeOfVLDecod]repeat 256 ],
+			NbBitsToRead :[ BitDepthChromaTab ] repeat 257
+			
+		guard
+			    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
+			and (mb_type = BLOCK_TYPE_I_PCM)
+		var
+			List(type: bool        , size=256) FalseTab           = [false            : for int s in 0 .. 256],
+			List(type: uint(size=3), size=257) ValTypeOfVLD      := [READ_BITS        : for int s in 0 .. 256],
+			//List(type: uint(size=3), size=256) ValTypeOfVLDecod   = [READ_BITS        : for int s in 0 .. 255],
+			List(type: uint(size=5), size=256) BitDepthChromaTab  = [bit_depth_chroma : for int s in 0 .. 255]
+		do
+			ValTypeOfVLD[0] := BYTE_ALIGNED_REQUIRED;
+		end
+
+	ReadPcmSampleLuma.Done: action
+			ValVLD       :[ValueOfVLD] repeat 256
+				==>
+		do
+			/* Forward to the output for the pcm decoding */
+		end
+
+	ReadPcmSampleLuma.Asked: action
+				==>
+			//            pcm_sample_chroma[ i ]
+			SkipNal      :[     FalseTab      ] repeat 256,//Keep synchro
+			TypeOfVLD    :[    ReadBitsTab    ] repeat 256,
+			NbBitsToRead :[ BitDepthChromaTab ] repeat 256
+			// Size is not always 256. Should be corrected and the value should be compute in Pps or Sps actor
+		var
+			List(type: bool        , size=256) FalseTab          = [false            : for int s in 0 .. 255],
+			List(type: uint(size=3), size=256) ReadBitsTab       = [READ_BITS        : for int s in 0 .. 255],
+			List(type: uint(size=5), size=256) BitDepthChromaTab = [bit_depth_chroma : for int s in 0 .. 255]
+		end
+
+	ReadPcmSampleChroma.UComponent: action
+			ValVLD       :[ValueOfVLD] repeat 256
+				==>
+		do
+			/* Forward to the output for the pcm decoding */
+		end
+
+	ReadPcmSampleChroma.VComponent: action
+			ValVLD       :[ValueOfVLD] repeat 256
+				==>
+		do
+			/* Forward to the output for the pcm decoding */
+		end
+
+	LaunchSubMbPred: action	==>
+		guard
+			(slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) and (mb_type = 3 or mb_type = 4)
+			// slice_type = SLICE_TYPE_B ...
+		end
+
+/*	CheckSubMbType: action
+			SubMbType :[sub_mb_type] repeat 4
+				==>
+		do
+			if(slice_type = SLICE_TYPE_B) then
+				foreach int mbPartIdx in 0 .. 3
+				do
+					if(sub_mb_type[mbPartIdx] > 3)then
+						noSubMbPartSizeLessThan8x8Flag := false;
+					else
+						if((sub_mb_type[mbPartIdx] = 0) and (not direct_8x8_inference_flag))then
+							noSubMbPartSizeLessThan8x8Flag := false;
+						end
+					end
+				end
+			else
+				if((slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP))then
+					foreach int mbPartIdx in 0 .. 3
+					do
+						if(sub_mb_type[mbPartIdx] != 0)then
+							noSubMbPartSizeLessThan8x8Flag := false;
+						end
+					end
+				end
+			end
+		end
+*/
+	ReadTransformSize.Asked: action
+			==>
+			//        transform_size_8x8_flag
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			transform_8x8_mode_flag = true,
+			(slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI) and mb_type = 0
+		do
+			println("ReadTransformSize.Asked not implemented yet");
+		end
+
+	ReadCodedBlockPattern.Asked: action
+			==>
+			//        coded_block_pattern
+			SkipNal      :[ false  ],//Keep synchro
+			TypeOfVLD    :[ VLD_ME ]
+		guard
+			not(
+				    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
+				and (mb_type >= BLOCK_TYPE_INTA_16x16_MIN)
+				and (mb_type <= BLOCK_TYPE_INTA_16x16_MAX)
+			)
+		end
+
+	SendEndSliceHeader: action
+				==>
+			SkipNal :[true]
+		end
+
+	a: action ==>
+	do
+		println("Decode Mb Layer not finished yet");
+	end
+
+	schedule fsm ReadMbType_Asked:
+		ReadMbType_Asked          (ReadMbType.Asked )--> ReadMbType;
+
+		ReadMbType                (ReadMbType.Done )--> CheckMbType;
+
+		CheckMbType               (CheckMbType.IsIPCM )--> ReadPcmSampleLuma;
+		CheckMbType (a)-->undefined;
+
+		ReadPcmSampleLuma         (ReadPcmSampleLuma.Done )--> ReadPcmSampleChroma1Asked;
+
+		ReadPcmSampleChroma1Asked (ReadPcmSampleLuma.Asked )--> ReadPcmSampleChroma1;
+
+		ReadPcmSampleChroma1      (ReadPcmSampleChroma.UComponent )-->ReadPcmSampleChroma2Asked;
+
+		ReadPcmSampleChroma2Asked (ReadPcmSampleLuma.Asked )--> ReadPcmSampleChroma2;
+
+		ReadPcmSampleChroma2      (ReadPcmSampleChroma.VComponent )--> SendEndSliceHeader;
+
+
+		SendEndSliceHeader        (SendEndSliceHeader )-->ReadMbType_Asked;
+	end
+	priority
+		CheckMbType.IsIPCM > a;
+	end
+end

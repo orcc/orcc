@@ -19,10 +19,24 @@ actor Algo_Slice_layer_without_partitioning()
 	uint(size=3)  HeaderTypeOfVLD,
 	uint(size=5)  HeaderNbBitsToRead,
 	bool          HeaderSkipNal,
+	uint(size=4)  HeaderLaunchActor,
+
+	uint(size=3)  DecRefPicMarkingTypeOfVLD,
+	uint(size=5)  DecRefPicMarkingNbBitsToRead,
+	bool          DecRefPicMarkingSkipNal,
+
+	uint(size=3)  RefPicListTypeOfVLD,
+	uint(size=5)  RefPicListNbBitsToRead,
+	bool          RefPicListSkipNal,
 
 	uint(size=3)  DataTypeOfVLD,
 	uint(size=5)  DataNbBitsToRead,
-	bool          DataSkipNal
+	bool          DataSkipNal,
+	uint(size=4)  DataLaunchActor,
+
+	uint(size=3)  MbLayerTypeOfVLD,
+	uint(size=5)  MbLayerNbBitsToRead,
+	bool          MbLayerSkipNal
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
@@ -30,7 +44,13 @@ actor Algo_Slice_layer_without_partitioning()
 
 	int (size=32) HeaderValVLD,
 
-	int (size=32) DataValVLD
+	int (size=32) DecRefPicMarkingValVLD,
+
+	int (size=32) RefPicListValVLD,
+
+	int (size=32) DataValVLD,
+
+	int (size=32) MbLayerValVLD
 		:
 
 
@@ -42,6 +62,13 @@ actor Algo_Slice_layer_without_partitioning()
 
 	uint(size=3) READ_BITS = 0;
 
+	uint(size=4) SLICE_HEADER        = 0;
+	uint(size=4) DEC_REF_PIC_MARKING = 1;
+	uint(size=4) REF_PIC_LIST        = 2;
+	uint(size=4) SLICE_DATA          = 3;
+	uint(size=4) MB_LAYER            = 4;
+
+
 	SliceHeader.GetVLDVal: action
 			ValVLD       :[VLDecoding]
 				==>
@@ -50,8 +77,66 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	SliceHeader.AskVLD: action
-			HeaderTypeOfVLD :[ValTypeOfVLD],
-			HeaderSkipNal   :[EndOfDecoding]
+			HeaderTypeOfVLD   :[ValTypeOfVLD],
+			HeaderSkipNal     :[EndOfDecoding],
+			HeaderLaunchActor :[ValLaunch]
+				==>
+			TypeOfVLD       :[ValTypeOfVLD],
+			SkipNal         :[false]
+		guard
+			ValTypeOfVLD  != READ_BITS,
+			EndOfDecoding  = false,
+			ValLaunch      = SLICE_HEADER
+		end
+
+
+	SliceHeader.AskReadBits: action
+			HeaderTypeOfVLD    :[ValTypeOfVLD],
+			HeaderNbBitsToRead :[NbBits],
+			HeaderSkipNal      :[EndOfDecoding],
+			HeaderLaunchActor  :[ValLaunch]
+				==>
+			TypeOfVLD          :[READ_BITS],
+			NbBitsToRead       :[NbBits],
+			SkipNal            :[false]
+		guard
+			ValTypeOfVLD  = READ_BITS,
+			EndOfDecoding = false,
+			ValLaunch      = SLICE_HEADER
+		end
+
+	SliceHeader.LaunchRefPicMark: action
+			HeaderLaunchActor :[ValLaunch]
+				==>
+		guard
+			ValLaunch = DEC_REF_PIC_MARKING
+		end
+
+	SliceHeader.LaunchRefPicList: action
+			HeaderLaunchActor :[ValLaunch]
+				==>
+		guard
+			ValLaunch = REF_PIC_LIST
+		end
+
+	SliceHeader.Done: action
+			HeaderSkipNal :[EndOfDecoding]
+				==>
+		guard
+			EndOfDecoding = true
+		end
+
+
+	RefPicMark.GetVLDVal: action
+			ValVLD                 :[VLDecoding]
+				==>
+			DecRefPicMarkingValVLD :[VLDecoding]
+		end
+
+
+	RefPicMark.AskVLD: action
+			DecRefPicMarkingTypeOfVLD   :[ValTypeOfVLD],
+			DecRefPicMarkingSkipNal     :[EndOfDecoding]
 				==>
 			TypeOfVLD       :[ValTypeOfVLD],
 			SkipNal         :[false]
@@ -61,10 +146,10 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	SliceHeader.AskReadBits: action
-			HeaderTypeOfVLD    :[ValTypeOfVLD],
-			HeaderNbBitsToRead :[NbBits],
-			HeaderSkipNal      :[EndOfDecoding]
+	RefPicMark.AskReadBits: action
+			DecRefPicMarkingTypeOfVLD    :[ValTypeOfVLD],
+			DecRefPicMarkingNbBitsToRead :[NbBits],
+			DecRefPicMarkingSkipNal      :[EndOfDecoding]
 				==>
 			TypeOfVLD          :[READ_BITS],
 			NbBitsToRead       :[NbBits],
@@ -74,9 +159,48 @@ actor Algo_Slice_layer_without_partitioning()
 			EndOfDecoding = false
 		end
 
+	RefPicMark.Done: action
+			DecRefPicMarkingSkipNal :[EndOfDecoding]
+				==>
+		guard
+			EndOfDecoding = true
+		end
 
-	SliceHeader.Done: action
-			HeaderSkipNal :[EndOfDecoding]
+
+	RefPicList.GetVLDVal: action
+			ValVLD                 :[VLDecoding]
+				==>
+			RefPicListValVLD :[VLDecoding]
+		end
+
+
+	RefPicList.AskVLD: action
+			RefPicListTypeOfVLD   :[ValTypeOfVLD],
+			RefPicListSkipNal     :[EndOfDecoding]
+				==>
+			TypeOfVLD       :[ValTypeOfVLD],
+			SkipNal         :[false]
+		guard
+			ValTypeOfVLD  != READ_BITS,
+			EndOfDecoding  = false
+		end
+
+
+	RefPicList.AskReadBits: action
+			RefPicListTypeOfVLD    :[ValTypeOfVLD],
+			RefPicListNbBitsToRead :[NbBits],
+			RefPicListSkipNal      :[EndOfDecoding]
+				==>
+			TypeOfVLD          :[READ_BITS],
+			NbBitsToRead       :[NbBits],
+			SkipNal            :[false]
+		guard
+			ValTypeOfVLD  = READ_BITS,
+			EndOfDecoding = false
+		end
+
+	RefPicList.Done: action
+			RefPicListSkipNal :[EndOfDecoding]
 				==>
 		guard
 			EndOfDecoding = true
@@ -91,30 +215,40 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	SliceData.AskVLD: action
-			DataTypeOfVLD :[ValTypeOfVLD],
-			DataSkipNal   :[EndOfDecoding]
+			DataTypeOfVLD   :[ValTypeOfVLD],
+			DataSkipNal     :[EndOfDecoding],
+			DataLaunchActor :[ValLaunch]
 				==>
 			TypeOfVLD       :[ValTypeOfVLD],
 			SkipNal         :[false]
 		guard
 			ValTypeOfVLD  != READ_BITS,
-			EndOfDecoding  = false
+			EndOfDecoding  = false,
+			ValLaunch      = SLICE_DATA
 		end
 
 
 	SliceData.AskReadBits: action
 			DataTypeOfVLD    :[ValTypeOfVLD],
 			DataNbBitsToRead :[NbBits],
-			DataSkipNal      :[EndOfDecoding]
+			DataSkipNal      :[EndOfDecoding],
+			DataLaunchActor :[ValLaunch]
 				==>
 			TypeOfVLD          :[READ_BITS],
 			NbBitsToRead       :[NbBits],
 			SkipNal            :[false]
 		guard
 			ValTypeOfVLD  = READ_BITS,
-			EndOfDecoding = false
+			EndOfDecoding = false,
+			ValLaunch     = SLICE_DATA
 		end
 
+	SliceData.LaunchMbLayer: action
+			DataLaunchActor :[ValLaunch]
+				==>
+		guard
+			ValLaunch = MB_LAYER
+		end
 
 	SliceData.Done: action
 			DataSkipNal :[EndOfDecoding]
@@ -125,20 +259,81 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	schedule fsm LaunchSliceHeader:
-		LaunchSliceHeader (SliceHeader.AskVLD      )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.AskReadBits )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.GetVLDVal   )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.Done        )--> LaunchSliceData;
+	MbLayer.GetVLDVal: action
+			ValVLD                 :[VLDecoding]
+				==>
+			MbLayerValVLD :[VLDecoding]
+		end
 
-		LaunchSliceData   (SliceData.AskVLD        )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.AskReadBits   )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.GetVLDVal     )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.Done          )--> LaunchSliceHeader;
+
+	MbLayer.AskVLD: action
+			MbLayerTypeOfVLD   :[ValTypeOfVLD],
+			MbLayerSkipNal     :[EndOfDecoding]
+				==>
+			TypeOfVLD       :[ValTypeOfVLD],
+			SkipNal         :[false]
+		guard
+			ValTypeOfVLD  != READ_BITS,
+			EndOfDecoding  = false
+		end
+
+
+	MbLayer.AskReadBits: action
+			MbLayerTypeOfVLD    :[ValTypeOfVLD],
+			MbLayerNbBitsToRead :[NbBits],
+			MbLayerSkipNal      :[EndOfDecoding]
+				==>
+			TypeOfVLD          :[READ_BITS],
+			NbBitsToRead       :[NbBits],
+			SkipNal            :[false]
+		guard
+			ValTypeOfVLD  = READ_BITS,
+			EndOfDecoding = false
+		end
+
+	MbLayer.Done: action
+			MbLayerSkipNal :[EndOfDecoding]
+				==>
+		guard
+			EndOfDecoding = true
+		end
+
+
+	schedule fsm LaunchSliceHeader:
+		LaunchSliceHeader (SliceHeader.AskVLD           )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.AskReadBits      )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.GetVLDVal        )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.LaunchRefPicMark )--> LaunchRefPicMark;
+		LaunchSliceHeader (SliceHeader.LaunchRefPicList )--> LaunchRefPicList;
+		LaunchSliceHeader (SliceHeader.Done             )--> LaunchSliceData;
+
+			LaunchRefPicMark (RefPicMark.AskVLD      )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.AskReadBits )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.GetVLDVal   )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.Done        )--> LaunchSliceHeader;
+	
+			LaunchRefPicList (RefPicList.AskVLD      )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.AskReadBits )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.GetVLDVal   )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.Done        )--> LaunchSliceHeader;
+
+		LaunchSliceData   (SliceData.AskVLD             )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.AskReadBits        )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.GetVLDVal          )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.LaunchMbLayer      )--> LaunchMbLayer;
+		LaunchSliceData   (SliceData.Done               )--> LaunchSliceHeader;
+	
+			LaunchMbLayer    (MbLayer.AskVLD         )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.AskReadBits    )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.GetVLDVal      )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.Done           )--> LaunchSliceData;
 	end
 
 	priority
-		SliceHeader.GetVLDVal > SliceHeader.AskVLD > SliceHeader.AskReadBits > SliceHeader.Done;
-		SliceData.GetVLDVal   > SliceData.AskVLD   > SliceData.AskReadBits   > SliceData.Done;
+		SliceHeader.GetVLDVal > SliceHeader.AskVLD > SliceHeader.AskReadBits > SliceHeader.LaunchRefPicMark > SliceHeader.LaunchRefPicList > SliceHeader.Done;
+		RefPicMark.GetVLDVal  > RefPicMark.AskVLD  > RefPicMark.AskReadBits  > RefPicMark.Done;
+		RefPicList.GetVLDVal  > RefPicList.AskVLD  > RefPicList.AskReadBits  > RefPicList.Done;
+		SliceData.GetVLDVal   > SliceData.AskVLD   > SliceData.AskReadBits   > SliceData.LaunchMbLayer      > SliceData.Done;
+		MbLayer.GetVLDVal     > MbLayer.AskVLD     > MbLayer.AskReadBits     > MbLayer.Done;
 	end
 end
