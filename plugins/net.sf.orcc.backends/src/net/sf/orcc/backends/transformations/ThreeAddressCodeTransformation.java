@@ -34,8 +34,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -266,24 +264,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		it.next();
 
 		return block.lastListIterator();
-	}
-
-	@Override
-	public void transform(Actor actor) {
-		// Visit procedure
-		for (Procedure proc : actor.getProcs()) {
-			visitProcedure(proc);
-		}
-
-		for (Action action : actor.getActions()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
-		}
-
-		for (Action action : actor.getInitializes()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
-		}
 	}
 
 	@Override
