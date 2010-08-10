@@ -48,9 +48,9 @@
 #endif
 
 
-extern struct fifo_char_s *Compare_B;
-extern struct fifo_short_s *Compare_WIDTH;
-extern struct fifo_short_s *Compare_HEIGHT;
+extern struct fifo_i8_s *Compare_B;
+extern struct fifo_i16_s *Compare_WIDTH;
+extern struct fifo_i16_s *Compare_HEIGHT;
 
 #define MAX_WIDTH 704
 #define MAX_HEIGHT 576
@@ -207,16 +207,16 @@ void Compare_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	while (1) {
-		if (fifo_short_has_tokens(Compare_WIDTH, 1) && fifo_short_has_tokens(Compare_HEIGHT, 1)) {
+		if (fifo_i16_has_tokens(Compare_WIDTH, 1) && fifo_i16_has_tokens(Compare_HEIGHT, 1)) {
 			short *ptr, width, height;
 
-			ptr = fifo_short_read(Compare_WIDTH, 1);
+			ptr = fifo_i16_read(Compare_WIDTH, 1);
 			width = ptr[0] * 16;
-			fifo_short_read_end(Compare_WIDTH, 1);
+			fifo_i16_read_end(Compare_WIDTH, 1);
 
-			ptr = fifo_short_read(Compare_HEIGHT, 1);
+			ptr = fifo_i16_read(Compare_HEIGHT, 1);
 			height = ptr[0] * 16;
-			fifo_short_read_end(Compare_HEIGHT, 1);
+			fifo_i16_read_end(Compare_HEIGHT, 1);
 
 			if (init == 1) {
 				Compare_init(width, height);
@@ -226,9 +226,9 @@ void Compare_scheduler(struct schedinfo_s *si) {
 			i++;
 		}
 
-		if (fifo_char_has_tokens(Compare_B, 384)) {
-			Compare_write_mb(fifo_char_read(Compare_B, 384));
-			fifo_char_read_end(Compare_B, 384);
+		if (fifo_i8_has_tokens(Compare_B, 384)) {
+			Compare_write_mb(fifo_i8_read(Compare_B, 384));
+			fifo_i8_read_end(Compare_B, 384);
 			i++;
 		} else {
 			break;

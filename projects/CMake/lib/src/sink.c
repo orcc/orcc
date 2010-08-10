@@ -33,14 +33,14 @@
 #include "orcc.h"
 #include "orcc_fifo.h"
 
-extern struct fifo_char_s *sink_I;
+extern struct fifo_i8_s *sink_I;
 
 void sink_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	while (fifo_char_has_tokens(sink_I, 1)) {
-		fifo_char_read(sink_I, 1);
+	while (fifo_i8_has_tokens(sink_I, 1)) {
+		fifo_i8_read(sink_I, 1);
 		i++;
-		fifo_char_read_end(sink_I, 1);
+		fifo_i8_read_end(sink_I, 1);
 	}
 
 	si->num_firings = i;

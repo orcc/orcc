@@ -33,11 +33,11 @@
 #include "orcc_fifo.h"
 #include "orcc_util.h"
 
-extern struct fifo_short_s *img_display_WIDTH;
-extern struct fifo_short_s *img_display_HEIGHT;
-extern struct fifo_char_s *img_display_RED;
-extern struct fifo_char_s *img_display_GREEN;
-extern struct fifo_char_s *img_display_BLUE;
+extern struct fifo_i16_s *img_display_WIDTH;
+extern struct fifo_i16_s *img_display_HEIGHT;
+extern struct fifo_i8_s *img_display_RED;
+extern struct fifo_i8_s *img_display_GREEN;
+extern struct fifo_i8_s *img_display_BLUE;
 
 static SDL_Surface *m_screen;
 
@@ -86,17 +86,17 @@ static void read_pixel() {
 		SDL_LockSurface(m_image);
 	}
 
-	ptr = fifo_char_read(img_display_RED, 1);
+	ptr = fifo_i8_read(img_display_RED, 1);
 	red = ptr[0];
-	fifo_char_read_end(img_display_RED, 1);
+	fifo_i8_read_end(img_display_RED, 1);
 
-	ptr = fifo_char_read(img_display_GREEN, 1);
+	ptr = fifo_i8_read(img_display_GREEN, 1);
 	green = ptr[0];
-	fifo_char_read_end(img_display_GREEN, 1);
+	fifo_i8_read_end(img_display_GREEN, 1);
 
-	ptr = fifo_char_read(img_display_BLUE, 1);
+	ptr = fifo_i8_read(img_display_BLUE, 1);
 	blue = ptr[0];
-	fifo_char_read_end(img_display_BLUE, 1);
+	fifo_i8_read_end(img_display_BLUE, 1);
 
 	pixel = (red << format->Rshift) & format->Rmask
 		| (green << format->Gshift) & format->Gmask
@@ -115,20 +115,20 @@ void img_display_scheduler(struct schedinfo_s *si) {
 	int ports = 0x1f; // FIFOs connected to first five input ports are empty
 
 	int i = 0;
-	if (fifo_short_has_tokens(img_display_WIDTH, 1) && fifo_short_has_tokens(img_display_HEIGHT, 1)) {
-		short *ptr = fifo_short_read(img_display_HEIGHT, 1);
+	if (fifo_i16_has_tokens(img_display_WIDTH, 1) && fifo_i16_has_tokens(img_display_HEIGHT, 1)) {
+		short *ptr = fifo_i16_read(img_display_HEIGHT, 1);
 		m_height = ptr[0];
-		fifo_short_read_end(img_display_HEIGHT, 1);
+		fifo_i16_read_end(img_display_HEIGHT, 1);
 
-		ptr = fifo_short_read(img_display_WIDTH, 1);
+		ptr = fifo_i16_read(img_display_WIDTH, 1);
 		m_width = ptr[0];
-		fifo_short_read_end(img_display_WIDTH, 1);
+		fifo_i16_read_end(img_display_WIDTH, 1);
 
 		img_display_init();
 	}
 
 	while (idx_pixel < m_count) {
-		if (fifo_char_has_tokens(img_display_RED, 1) && fifo_char_has_tokens(img_display_GREEN, 1) && fifo_char_has_tokens(img_display_BLUE, 1)) {
+		if (fifo_i8_has_tokens(img_display_RED, 1) && fifo_i8_has_tokens(img_display_GREEN, 1) && fifo_i8_has_tokens(img_display_BLUE, 1)) {
 			read_pixel();
 			i++;
 		} else {

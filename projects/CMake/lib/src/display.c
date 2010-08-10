@@ -39,9 +39,9 @@ static Uint32 tInit = 0;
 #endif
 
 
-extern struct fifo_char_s *display_B;
-extern struct fifo_short_s *display_WIDTH;
-extern struct fifo_short_s *display_HEIGHT;
+extern struct fifo_i8_s *display_B;
+extern struct fifo_i16_s *display_WIDTH;
+extern struct fifo_i16_s *display_HEIGHT;
 
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
@@ -256,28 +256,28 @@ void display_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	while (1) {
-		if (fifo_short_has_tokens(display_WIDTH, 1) && fifo_short_has_tokens(display_HEIGHT, 1)) {
+		if (fifo_i16_has_tokens(display_WIDTH, 1) && fifo_i16_has_tokens(display_HEIGHT, 1)) {
 			short *ptr, width, height;
 
-			ptr = fifo_short_read(display_WIDTH, 1);
+			ptr = fifo_i16_read(display_WIDTH, 1);
 			width = ptr[0] * 16;
-			fifo_short_read_end(display_WIDTH, 1);
+			fifo_i16_read_end(display_WIDTH, 1);
 
-			ptr = fifo_short_read(display_HEIGHT, 1);
+			ptr = fifo_i16_read(display_HEIGHT, 1);
 			height = ptr[0] * 16;
-			fifo_short_read_end(display_HEIGHT, 1);
+			fifo_i16_read_end(display_HEIGHT, 1);
 
 			display_set_video(width, height);
 			i++;
 		}
 
-		if (fifo_char_has_tokens(display_B, 384)) {
+		if (fifo_i8_has_tokens(display_B, 384)) {
 			if (!init) {
 				display_init();
 			}
 
-			display_write_mb(fifo_char_read(display_B, 384));
-			fifo_char_read_end(display_B, 384);
+			display_write_mb(fifo_i8_read(display_B, 384));
+			fifo_i8_read_end(display_B, 384);
 			i++;
 		} else {
 			break;

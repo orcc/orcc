@@ -72,27 +72,15 @@ static struct FIFO_S(type) fifo_##count = { (size), array_##count, array2_##coun
 #define FIFO_WRITE_END(T) FIFO_WRITE_END_EXPAND(T)
 #define FIFO_WRITE_END_EXPAND(T) fifo_ ## T ## _write_end
 
-#define T char
+#define T i8
 #include "orcc_generic_fifo.h"
 #undef T
 
-#define T u_char
+#define T i16
 #include "orcc_generic_fifo.h"
 #undef T
 
-#define T short
-#include "orcc_generic_fifo.h"
-#undef T
-
-#define T u_short
-#include "orcc_generic_fifo.h"
-#undef T
-
-#define T int
-#include "orcc_generic_fifo.h"
-#undef T
-
-#define T u_int
+#define T i32
 #include "orcc_generic_fifo.h"
 #undef T
 
@@ -100,7 +88,19 @@ static struct FIFO_S(type) fifo_##count = { (size), array_##count, array2_##coun
 #include "orcc_generic_fifo.h"
 #undef T
 
-#define T u_i64
+#define T u8
+#include "orcc_generic_fifo.h"
+#undef T
+
+#define T u16
+#include "orcc_generic_fifo.h"
+#undef T
+
+#define T u32
+#include "orcc_generic_fifo.h"
+#undef T
+
+#define T u64
 #include "orcc_generic_fifo.h"
 #undef T
 

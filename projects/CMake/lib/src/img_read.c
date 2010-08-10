@@ -35,11 +35,11 @@
 #include "orcc_fifo.h"
 #include "orcc_util.h"
 
-extern struct fifo_short_s *img_read_WIDTH;
-extern struct fifo_short_s *img_read_HEIGHT;
-extern struct fifo_char_s *img_read_RED;
-extern struct fifo_char_s *img_read_GREEN;
-extern struct fifo_char_s *img_read_BLUE;
+extern struct fifo_i16_s *img_read_WIDTH;
+extern struct fifo_i16_s *img_read_HEIGHT;
+extern struct fifo_i8_s *img_read_RED;
+extern struct fifo_i8_s *img_read_GREEN;
+extern struct fifo_i8_s *img_read_BLUE;
 
 static SDL_Surface *image;
 static SDL_PixelFormat *format;
@@ -66,13 +66,13 @@ void img_read_initialize() {
 	format = image->format;
 	count = image->w * image->h;
 
-	ptr = fifo_short_write(img_read_WIDTH, 1);
+	ptr = fifo_i16_write(img_read_WIDTH, 1);
 	ptr[0] = image->w;
-	fifo_short_write_end(img_read_WIDTH, 1);
+	fifo_i16_write_end(img_read_WIDTH, 1);
 
-	ptr = fifo_short_write(img_read_HEIGHT, 1);
+	ptr = fifo_i16_write(img_read_HEIGHT, 1);
 	ptr[0] = image->h;
-	fifo_short_write_end(img_read_HEIGHT, 1);
+	fifo_i16_write_end(img_read_HEIGHT, 1);
 }
 
 static int idx_pixel = 0;
@@ -80,15 +80,15 @@ static int idx_pixel = 0;
 static void write_pixels(struct schedinfo_s *si) {
 	int ports = 0;
 
-	int num_red = fifo_char_get_room(img_read_RED);
-	int num_green = fifo_char_get_room(img_read_GREEN);
-	int num_blue = fifo_char_get_room(img_read_BLUE);
+	int num_red = fifo_i8_get_room(img_read_RED);
+	int num_green = fifo_i8_get_room(img_read_GREEN);
+	int num_blue = fifo_i8_get_room(img_read_BLUE);
 
 	int num_colors = min(min(min(num_red, num_green), num_blue), count - idx_pixel);
 
-	unsigned char *ptr_red = fifo_char_write(img_read_RED, num_colors);
-	unsigned char *ptr_green = fifo_char_write(img_read_GREEN, num_colors);
-	unsigned char *ptr_blue = fifo_char_write(img_read_BLUE, num_colors);
+	unsigned char *ptr_red = fifo_i8_write(img_read_RED, num_colors);
+	unsigned char *ptr_green = fifo_i8_write(img_read_GREEN, num_colors);
+	unsigned char *ptr_blue = fifo_i8_write(img_read_BLUE, num_colors);
 
 	int i;
 	for (i = 0; i < num_colors; i++) {
@@ -105,9 +105,9 @@ static void write_pixels(struct schedinfo_s *si) {
 		idx_pixel++;
 	}
 
-	fifo_char_write_end(img_read_RED, num_colors);
-	fifo_char_write_end(img_read_GREEN, num_colors);
-	fifo_char_write_end(img_read_BLUE, num_colors);
+	fifo_i8_write_end(img_read_RED, num_colors);
+	fifo_i8_write_end(img_read_GREEN, num_colors);
+	fifo_i8_write_end(img_read_BLUE, num_colors);
 
 	if (num_red <= num_colors) {
 		ports |= 0x01;
