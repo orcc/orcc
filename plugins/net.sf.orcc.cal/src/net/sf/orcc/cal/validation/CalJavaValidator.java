@@ -29,6 +29,8 @@
 package net.sf.orcc.cal.validation;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +45,7 @@ import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstInputPattern;
+import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
@@ -65,6 +68,7 @@ import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -112,12 +116,72 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		CalJavaValidator.instance = this;
 	}
 
-	/**
-	 * Check action tag coherence. Tag's name must be different to port and
-	 * state variable name.
-	 */
 	@Check
-	public void checkActionTag(final AstAction action) {
+	public void checkAction(AstAction action) {
+		checkActionTag(action);
+		checkActionInputs(action.getInputs());
+		checkActionOutputs(action.getOutputs());
+	}
+
+	/**
+	 * Checks the token names are unique among all input patterns.
+	 * 
+	 * @param inputs
+	 *            the input patterns of an action
+	 */
+	private void checkActionInputs(List<AstInputPattern> inputs) {
+		List<AstVariable> tokens = new ArrayList<AstVariable>();
+		for (AstInputPattern pattern : inputs) {
+			tokens.addAll(pattern.getTokens());
+		}
+
+		checkUniqueNames(tokens);
+	}
+
+	/**
+	 * Checks the token expressions are correctly typed.
+	 * 
+	 * @param outputs
+	 *            the output patterns of an action
+	 */
+	private void checkActionOutputs(List<AstOutputPattern> outputs) {
+		for (AstOutputPattern pattern : outputs) {
+			AstExpression astRepeat = pattern.getRepeat();
+			if (astRepeat != null) {
+				int repeat = new AstExpressionEvaluator()
+						.evaluateAsInteger(astRepeat);
+				if (repeat != 1) {
+					// each value is supposed to be a list
+					List<AstExpression> values = pattern.getValues();
+					for (AstExpression value : values) {
+						Type type = checker.getType(value);
+						if (type.isList()) {
+							TypeList typeList = (TypeList) type;
+							Type lub = checker.getLub(pattern.getPort()
+									.getIrType(), typeList.getType());
+							if (lub != null && typeList.getSize() == repeat) {
+								continue;
+							}
+						}
+
+						error("this expression must be of type List(type:"
+								+ pattern.getPort().getIrType().toString()
+								+ ", size=" + repeat + ")", value,
+								CalPackage.AST_EXPRESSION);
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check that the action tag is different from port and state variable
+	 * names.
+	 * 
+	 * @param action
+	 *            the action
+	 */
+	private void checkActionTag(AstAction action) {
 		AstActor actor = EcoreUtil2.getContainerOfType(action, AstActor.class);
 		String name = nameProvider.getQualifiedName(action);
 
@@ -152,15 +216,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check
 	public void checkActor(AstActor actor) {
-		// check actor name matches file name
-		String path = actor.eResource().getURI().path();
-		String fileName = new File(path).getName();
-		if (!fileName.equals(actor.getName() + ".cal")) {
-			error("Actor " + actor.getName()
-					+ " must be defined in a file named \"" + actor.getName()
-					+ ".cal\"", actor, CalPackage.AST_ACTOR__NAME);
-		}
-
 		// fill the name provider's cache
 		((CalQualifiedNameProvider) nameProvider).resetUntaggedCount();
 		getNames(actor);
@@ -174,6 +229,30 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		TypeTransformer typeTransformer = new TypeTransformer();
 		typeTransformer.transformTypes(actor);
 
+		checkActorStructure(actor);
+	}
+
+	/**
+	 * Checks the actor structural information is correct. Checks name,
+	 * priorities and FSM.
+	 * 
+	 * @param actor
+	 *            the actor
+	 */
+	private void checkActorStructure(AstActor actor) {
+		// check actor name matches file name
+		String path = actor.eResource().getURI().path();
+		String fileName = new File(path).getName();
+		if (!fileName.equals(actor.getName() + ".cal")) {
+			error("Actor " + actor.getName()
+					+ " must be defined in a file named \"" + actor.getName()
+					+ ".cal\"", actor, CalPackage.AST_ACTOR__NAME);
+		}
+
+		// check unique names
+		checkUniqueNames(actor.getParameters());
+		checkUniqueNames(actor.getStateVariables());
+
 		// build action list
 		CalActionList actionList = new CalActionList();
 		actionList.addActions(actor.getActions());
@@ -181,10 +260,10 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		// check FSM and priorities
 		AstSchedule schedule = actor.getSchedule();
 		if (schedule != null) {
-			validateFsm(actionList, schedule);
+			checkFsm(actionList, schedule);
 		}
 
-		validatePriorities(actor, actionList);
+		checkPriorities(actor, actionList);
 	}
 
 	@Check
@@ -257,6 +336,55 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
+	/**
+	 * Checks the given FSM using the given action list. This check is not
+	 * annotated because we need to build the action list, which is also useful
+	 * for checking the priorities, and we do not want to build that twice.
+	 * 
+	 * @param actionList
+	 *            the action list of the actor
+	 * @param schedule
+	 *            the FSM of the actor
+	 */
+	private void checkFsm(CalActionList actionList, AstSchedule schedule) {
+		for (AstTransition transition : schedule.getTransitions()) {
+			AstTag tag = transition.getTag();
+			if (tag != null) {
+				List<AstAction> actions = actionList.getTaggedActions(tag
+						.getIdentifiers());
+				if (actions == null || actions.isEmpty()) {
+					error("tag " + nameProvider.getQualifiedName(tag)
+							+ " does not refer to any action", transition,
+							CalPackage.AST_TRANSITION__TAG);
+				}
+			}
+		}
+	}
+
+	@Check
+	public void checkFunction(final AstFunction function) {
+		checkUniqueNames(function.getParameters());
+		checkUniqueNames(function.getVariables());
+
+		boolean used = new BooleanSwitch() {
+
+			@Override
+			public Boolean caseAstExpressionCall(AstExpressionCall expression) {
+				if (expression.getFunction().equals(function)) {
+					return true;
+				}
+
+				return super.caseAstExpressionCall(expression);
+			}
+
+		}.doSwitch(Util.getActor(function));
+
+		if (!used) {
+			warning("The function " + function.getName() + " is never called",
+					CalPackage.AST_FUNCTION__NAME);
+		}
+	}
+
 	@Check
 	public void checkGenerator(AstGenerator generator) {
 		AstExpression astValue = generator.getLower();
@@ -288,57 +416,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	@Check
-	public void checkIsFunctionUsed(final AstFunction function) {
-		try {
-			boolean used = new BooleanSwitch() {
-
-				@Override
-				public Boolean caseAstExpressionCall(
-						AstExpressionCall expression) {
-					if (expression.getFunction().equals(function)) {
-						return true;
-					}
-
-					return super.caseAstExpressionCall(expression);
-				}
-
-			}.doSwitch(Util.getActor(function));
-
-			if (!used) {
-				warning("The function " + function.getName()
-						+ " is never called", CalPackage.AST_FUNCTION__NAME);
-			}
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-	}
-
-	@Check
-	public void checkIsProcedureUsed(final AstProcedure procedure) {
-		try {
-			boolean used = new BooleanSwitch() {
-
-				@Override
-				public Boolean caseAstStatementCall(AstStatementCall call) {
-					if (call.getProcedure().equals(procedure)) {
-						return true;
-					}
-
-					return false;
-				}
-
-			}.doSwitch(Util.getActor(procedure));
-
-			if (!used) {
-				warning("The procedure " + procedure.getName()
-						+ " is never called", CalPackage.AST_PROCEDURE__NAME);
-			}
-		} catch (Throwable t) {
-			t.printStackTrace();
-		}
-	}
-
-	@Check
 	public void checkIsVariabledUsed(final AstVariable variable) {
 		// do not take variables declared by input patterns and
 		// generator/foreach
@@ -349,42 +426,156 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
-		try {
-			boolean used = new BooleanSwitch() {
+		boolean used = new BooleanSwitch() {
 
-				@Override
-				public Boolean caseAstExpressionIndex(
-						AstExpressionIndex expression) {
-					if (expression.getSource().getVariable().equals(variable)) {
-						return true;
+			@Override
+			public Boolean caseAstExpressionIndex(AstExpressionIndex expression) {
+				if (expression.getSource().getVariable().equals(variable)) {
+					return true;
+				}
+
+				return super.caseAstExpressionIndex(expression);
+			}
+
+			@Override
+			public Boolean caseAstExpressionVariable(
+					AstExpressionVariable expression) {
+				return expression.getValue().getVariable().equals(variable);
+			}
+
+			@Override
+			public Boolean caseAstStatementAssign(AstStatementAssign assign) {
+				if (assign.getTarget().getVariable().equals(variable)) {
+					return true;
+				}
+
+				return super.caseAstStatementAssign(assign);
+			}
+
+		}.doSwitch(Util.getActor(variable));
+
+		if (!used) {
+			warning("The variable " + variable.getName() + " is never read",
+					CalPackage.AST_VARIABLE__NAME);
+		}
+	}
+
+	/**
+	 * Checks the priorities of the given actor using the given action list.
+	 * This check is not annotated because we need to build the action list,
+	 * which is also useful for checking the FSM, and we do not want to build
+	 * that twice.
+	 * 
+	 * @param actor
+	 *            the actor
+	 * @param actionList
+	 *            the action list of the actor
+	 */
+	private void checkPriorities(AstActor actor, CalActionList actionList) {
+		List<AstPriority> priorities = actor.getPriorities();
+		DirectedGraph<AstAction, DefaultEdge> graph = new DefaultDirectedGraph<AstAction, DefaultEdge>(
+				DefaultEdge.class);
+
+		// add one vertex per tagged action
+		for (AstAction action : actionList) {
+			AstTag tag = action.getTag();
+			if (tag != null) {
+				graph.addVertex(action);
+			}
+		}
+
+		for (AstPriority priority : priorities) {
+			for (AstInequality inequality : priority.getInequalities()) {
+				// the grammar requires there be at least two tags
+				Iterator<AstTag> it = inequality.getTags().iterator();
+				AstTag previousTag = it.next();
+
+				List<AstAction> sources = actionList
+						.getTaggedActions(previousTag.getIdentifiers());
+				if (sources == null || sources.isEmpty()) {
+					error("tag " + nameProvider.getQualifiedName(previousTag)
+							+ " does not refer to any action", inequality,
+							CalPackage.AST_INEQUALITY);
+				}
+
+				while (it.hasNext()) {
+					AstTag tag = it.next();
+					sources = actionList.getTaggedActions(previousTag
+							.getIdentifiers());
+					List<AstAction> targets = actionList.getTaggedActions(tag
+							.getIdentifiers());
+
+					if (targets == null || targets.isEmpty()) {
+						error("tag " + nameProvider.getQualifiedName(tag)
+								+ " does not refer to any action", inequality,
+								CalPackage.AST_INEQUALITY);
 					}
 
-					return super.caseAstExpressionIndex(expression);
-				}
-
-				@Override
-				public Boolean caseAstExpressionVariable(
-						AstExpressionVariable expression) {
-					return expression.getValue().getVariable().equals(variable);
-				}
-
-				@Override
-				public Boolean caseAstStatementAssign(AstStatementAssign assign) {
-					if (assign.getTarget().getVariable().equals(variable)) {
-						return true;
+					if (sources != null && targets != null) {
+						for (AstAction source : sources) {
+							for (AstAction target : targets) {
+								graph.addEdge(source, target);
+							}
+						}
 					}
 
-					return super.caseAstStatementAssign(assign);
+					previousTag = tag;
+				}
+			}
+		}
+
+		CycleDetector<AstAction, DefaultEdge> cycleDetector = new CycleDetector<AstAction, DefaultEdge>(
+				graph);
+		Set<AstAction> cycle = cycleDetector.findCycles();
+		if (!cycle.isEmpty()) {
+			StringBuilder builder = new StringBuilder();
+			for (AstAction action : cycle) {
+				builder.append(nameProvider.getQualifiedName(action.getTag()));
+				builder.append(", ");
+			}
+
+			Iterator<AstAction> it = cycle.iterator();
+			builder.append(nameProvider.getQualifiedName(it.next().getTag()));
+
+			error("priorities of actor " + actor.getName()
+					+ " contain a cycle: " + builder.toString(), actor,
+					CalPackage.AST_ACTOR__PRIORITIES);
+		}
+	}
+
+	@Check
+	public void checkProcedure(final AstProcedure procedure) {
+		checkUniqueNames(procedure.getParameters());
+		checkUniqueNames(procedure.getVariables());
+
+		boolean used = new BooleanSwitch() {
+
+			@Override
+			public Boolean caseAstStatementCall(AstStatementCall call) {
+				if (call.getProcedure().equals(procedure)) {
+					return true;
 				}
 
-			}.doSwitch(Util.getActor(variable));
+				return false;
+			}
 
-			if (!used) {
-				warning("The variable " + variable.getName() + " is never read",
+		}.doSwitch(Util.getActor(procedure));
+
+		if (!used) {
+			warning("The procedure " + procedure.getName() + " is never called",
+					CalPackage.AST_PROCEDURE__NAME);
+		}
+	}
+
+	private void checkUniqueNames(List<AstVariable> variables) {
+		Set<String> names = new HashSet<String>();
+		for (AstVariable variable : variables) {
+			String name = nameProvider.getQualifiedName(variable);
+			if (names.contains(name)) {
+				error("Duplicate variable " + variable.getName(), variable,
 						CalPackage.AST_VARIABLE__NAME);
 			}
-		} catch (Throwable t) {
-			t.printStackTrace();
+			names.add(name);
 		}
 	}
 
@@ -466,93 +657,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}
 
 		}.doSwitch(actor);
-	}
-
-	private void validateFsm(CalActionList actionList, AstSchedule schedule) {
-		for (AstTransition transition : schedule.getTransitions()) {
-			AstTag tag = transition.getTag();
-			if (tag != null) {
-				List<AstAction> actions = actionList.getTaggedActions(tag
-						.getIdentifiers());
-				if (actions == null || actions.isEmpty()) {
-					error("tag " + nameProvider.getQualifiedName(tag)
-							+ " does not refer to any action", transition,
-							CalPackage.AST_TRANSITION__TAG);
-				}
-			}
-		}
-	}
-
-	private void validatePriorities(AstActor actor, CalActionList actionList) {
-		List<AstPriority> priorities = actor.getPriorities();
-		DirectedGraph<AstAction, DefaultEdge> graph = new DefaultDirectedGraph<AstAction, DefaultEdge>(
-				DefaultEdge.class);
-
-		// add one vertex per tagged action
-		for (AstAction action : actionList) {
-			AstTag tag = action.getTag();
-			if (tag != null) {
-				graph.addVertex(action);
-			}
-		}
-
-		for (AstPriority priority : priorities) {
-			for (AstInequality inequality : priority.getInequalities()) {
-				// the grammar requires there be at least two tags
-				Iterator<AstTag> it = inequality.getTags().iterator();
-				AstTag previousTag = it.next();
-
-				List<AstAction> sources = actionList
-						.getTaggedActions(previousTag.getIdentifiers());
-				if (sources == null || sources.isEmpty()) {
-					error("tag " + nameProvider.getQualifiedName(previousTag)
-							+ " does not refer to any action", inequality,
-							CalPackage.AST_INEQUALITY);
-				}
-
-				while (it.hasNext()) {
-					AstTag tag = it.next();
-					sources = actionList.getTaggedActions(previousTag
-							.getIdentifiers());
-					List<AstAction> targets = actionList.getTaggedActions(tag
-							.getIdentifiers());
-
-					if (targets == null || targets.isEmpty()) {
-						error("tag " + nameProvider.getQualifiedName(tag)
-								+ " does not refer to any action", inequality,
-								CalPackage.AST_INEQUALITY);
-					}
-
-					if (sources != null && targets != null) {
-						for (AstAction source : sources) {
-							for (AstAction target : targets) {
-								graph.addEdge(source, target);
-							}
-						}
-					}
-
-					previousTag = tag;
-				}
-			}
-		}
-
-		CycleDetector<AstAction, DefaultEdge> cycleDetector = new CycleDetector<AstAction, DefaultEdge>(
-				graph);
-		Set<AstAction> cycle = cycleDetector.findCycles();
-		if (!cycle.isEmpty()) {
-			StringBuilder builder = new StringBuilder();
-			for (AstAction action : cycle) {
-				builder.append(nameProvider.getQualifiedName(action.getTag()));
-				builder.append(", ");
-			}
-
-			Iterator<AstAction> it = cycle.iterator();
-			builder.append(nameProvider.getQualifiedName(it.next().getTag()));
-
-			error("priorities of actor " + actor.getName()
-					+ " contain a cycle: " + builder.toString(), actor,
-					CalPackage.AST_ACTOR__PRIORITIES);
-		}
 	}
 
 }

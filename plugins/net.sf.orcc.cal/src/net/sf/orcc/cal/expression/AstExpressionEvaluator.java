@@ -544,7 +544,8 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		}
 
 		// evaluated ok, but not as an integer
-		CalJavaValidator.getInstance().error("expected integer expression",
+		CalJavaValidator.getInstance().error(
+				"expected compile-time constant integer expression",
 				expression, CalPackage.AST_EXPRESSION);
 		return 0;
 	}
