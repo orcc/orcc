@@ -1,12 +1,13 @@
-actor DuplicatedVariables (int a, int a) int P, int P ==> int O, int O:
+actor DuplicatedVariables (int a,
+	int a) int P, int P ==> int O, int O :
 
 	int x := 0;
-	
+
 	int x;
 
-	action ==>
+	action P:[ x ] ==>
 	var
-		int z, bool z, List(type:int, size=8) L
+		int x , int z , bool z , List(type: int, size=8) L
 	do
 		x := z;
 		z := z;

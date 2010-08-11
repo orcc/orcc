@@ -119,23 +119,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	@Check
 	public void checkAction(AstAction action) {
 		checkActionTag(action);
-		checkActionInputs(action.getInputs());
+		checkActionVariables(action);
 		checkActionOutputs(action.getOutputs());
-	}
-
-	/**
-	 * Checks the token names are unique among all input patterns.
-	 * 
-	 * @param inputs
-	 *            the input patterns of an action
-	 */
-	private void checkActionInputs(List<AstInputPattern> inputs) {
-		List<AstVariable> tokens = new ArrayList<AstVariable>();
-		for (AstInputPattern pattern : inputs) {
-			tokens.addAll(pattern.getTokens());
-		}
-
-		checkUniqueNames(tokens);
 	}
 
 	/**
@@ -212,6 +197,23 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 						CalPackage.AST_ACTION__TAG);
 			}
 		}
+	}
+
+	/**
+	 * Checks the tokens and variables declared in the action are unique.
+	 * 
+	 * @param action
+	 *            the action to check
+	 */
+	private void checkActionVariables(AstAction action) {
+		List<AstInputPattern> inputs = action.getInputs();
+		List<AstVariable> variables = new ArrayList<AstVariable>();
+		for (AstInputPattern pattern : inputs) {
+			variables.addAll(pattern.getTokens());
+		}
+
+		variables.addAll(action.getVariables());
+		checkUniqueNames(variables);
 	}
 
 	@Check
