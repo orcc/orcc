@@ -1,0 +1,13 @@
+actor OutputPattern () int(size=3) I ==> int(size=3) O :
+
+	a: action ==> O:[ 1 ] repeat 50
+	do
+	end
+	
+	b: action I:[ a, b, c] repeat 2 ==> O:[ [4, 5, 6], 3, z ] repeat 2
+	var
+		int z := 0
+	do
+	end
+
+end

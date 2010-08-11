@@ -1,4 +1,4 @@
-actor DuplicatedVariables () ==> :
+actor DuplicatedVariables (int a, int a) int P, int P ==> int O, int O:
 
 	int x := 0;
 	
@@ -6,10 +6,11 @@ actor DuplicatedVariables () ==> :
 
 	action ==>
 	var
-		int z, bool z
+		int z, bool z, List(type:int, size=8) L
 	do
 		x := z;
 		z := z;
+		L := [ 0 : for int i in 1 .. 8, for int i in 1 .. 8 ];
 	end
 
 end
