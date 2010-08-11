@@ -326,4 +326,10 @@
         src="DecodeMacroBlockLayer" src-port="SkipNal"/>
     <Connection dst="DecodePic" dst-port="DataLaunchActor"
         src="DecodeSliceData_Cavlc" src-port="LaunchActor"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="ChromaArrayType"
+        src="DecodeSps" src-port="ChromaArrayType"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="ChromaArrayType"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerChromaArrayType"/>
+    <Connection dst="DecodePic" dst-port="MbLayerLaunchActor"
+        src="DecodeMacroBlockLayer" src-port="LaunchActor"/>
 </XDF>

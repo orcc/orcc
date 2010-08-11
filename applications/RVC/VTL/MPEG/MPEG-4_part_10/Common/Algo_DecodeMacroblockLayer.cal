@@ -21,13 +21,15 @@ actor Algo_DecodeMacroblockLayer()
 	//Sps Parameters
 	uint(size=4)  BitDepthLuma,
 	uint(size=4)  BitDepthChroma,
-	bool          Direct8x8Inference//,
+	bool          Direct8x8Inference,
 
-//	uint(size=32) SubMbType
+//	uint(size=32) SubMbType,,
+	uint(size=2)  ChromaArrayType
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
-	bool          SkipNal
+	bool          SkipNal,
+	uint(size=4)  LaunchActor
 		:
 
 
@@ -41,8 +43,12 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=3) VLD_UE                = 1;
 	uint(size=3) VLD_SE                = 2;
 	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
-	uint(size=3) MORE_RBSP_DATA        = 4;
-	uint(size=3) VLD_ME                = 5;
+//	uint(size=3) MORE_RBSP_DATA        = 4;
+
+	uint(size=4) MB_LAYER            = 4;
+	uint(size=4) SUB_MB_PRED         = 5;
+	uint(size=4) MB_PRED             = 6;
+	uint(size=4) RESIDUAL            = 7;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -51,27 +57,55 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=4) SLICE_TYPE_SI = 4;
 
 
-	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
+//	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
 	uint(size=6) BLOCK_TYPE_INTA_16x16_MIN = 1;
 	uint(size=6) BLOCK_TYPE_INTA_16x16_MAX = 24;
 	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
 
+	List ( type: List ( type: List ( type: uint(size=6), size=2), size=48 ), size=4) VLD_ME_TABLE =
+		[
+			[[15, 0], [ 0, 1], [ 7, 2], [11, 4], [13, 8], [14, 3], [ 3, 5], [ 5,10], [10,12], [12,15],
+			 [ 1, 7], [ 2,11], [ 4,13], [ 8,14], [ 6, 6], [ 9, 9]
+			],
+			[[47, 0], [31,16], [15, 1], [ 0, 2], [23, 4], [27, 8], [29,32], [30, 3], [ 7, 5], [11, 10],
+			 [13,12], [14,15], [39,47], [43, 7], [45,11], [46,13], [16,14], [ 3, 6], [ 5, 9], [10,31],
+			 [12,35], [19,37], [21,42], [26,44], [28,33], [35,34], [37,36], [42,40], [44,39], [ 1,43],
+			 [ 2,45], [ 4,46], [ 8,17], [17,18], [18,20], [20,24], [24,19], [ 6,21], [ 9,26], [22,28],
+			 [25,23], [32,27], [33,29], [34,30], [36,22], [40,25], [38,38], [41,41]
+			],
+			[[47, 0], [31,16], [15, 1], [ 0, 2], [23, 4], [27, 8], [29,32], [30, 3], [ 7, 5], [11, 10],
+			 [13,12], [14,15], [39,47], [43, 7], [45,11], [46,13], [16,14], [ 3, 6], [ 5, 9], [10,31],
+			 [12,35], [19,37], [21,42], [26,44], [28,33], [35,34], [37,36], [42,40], [44,39], [ 1,43],
+			 [ 2,45], [ 4,46], [ 8,17], [17,18], [18,20], [20,24], [24,19], [ 6,21], [ 9,26], [22,28],
+			 [25,23], [32,27], [33,29], [34,30], [36,22], [40,25], [38,38], [41,41]
+			],
+			[[15, 0], [ 0, 1], [ 7, 2], [11, 4], [13, 8], [14, 3], [ 3, 5], [ 5,10], [10,12], [12,15],
+			 [ 1, 7], [ 2,11], [ 4,13], [ 8,14], [ 6, 6], [ 9, 9]
+			]
+		];
 
-	uint(size=6) mb_type                        := 0;
-	bool         noSubMbPartSizeLessThan8x8Flag := true;
+
+	uint(size=6)  mb_type                        := 0;
+	bool          noSubMbPartSizeLessThan8x8Flag := true;
+	bool          transform_size_8x8_flag        := true;
+	uint(size=6)  CodedBlockPatternLuma          := 0;
+	uint(size=6)  CodedBlockPatternChroma        := 0;
+	int (size=32) mb_qp_delta                    := 0;
 	//SliceData Parameters
-	uint(size=4) slice_type;
-	uint(size=4) bit_depth_luma;
-	uint(size=4) bit_depth_chroma;
-	bool         direct_8x8_inference_flag;
-	bool         transform_8x8_mode_flag;
+	uint(size=4)  slice_type;
+	uint(size=4)  bit_depth_luma;
+	uint(size=4)  bit_depth_chroma;
+	bool          direct_8x8_inference_flag;
+	bool          transform_8x8_mode_flag;
+	uint(size=2)  Chroma_Array_Type;
 
 
 	ReadMbType.Asked: action
 				==>
 			//              mb_type
-			SkipNal      :[  false ],//Keep synchro
-			TypeOfVLD    :[ VLD_UE ]
+			SkipNal      :[   false  ],//Keep synchro
+			TypeOfVLD    :[  VLD_UE  ],
+			LaunchActor  :[ MB_LAYER ]
 		end
 
 	ReadMbType.Done: action
@@ -80,7 +114,8 @@ actor Algo_DecodeMacroblockLayer()
 			BitDepthLuma       :[ValBitDepthLuma],
 			BitDepthChroma     :[ValBitDepthChroma],
 			Direct8x8Inference :[ValDirect8x8Inference],
-			Transform8x8Mode   :[ValTransform8x8Mode]
+			Transform8x8Mode   :[ValTransform8x8Mode],
+			ChromaArrayType    :[ValChromaArrayType]
 				==>
 		do
 			mb_type                   := ValueOfVLD;
@@ -89,6 +124,7 @@ actor Algo_DecodeMacroblockLayer()
 			bit_depth_chroma          := ValBitDepthChroma;
 			direct_8x8_inference_flag := ValDirect8x8Inference;
 			transform_8x8_mode_flag   := ValTransform8x8Mode;
+			Chroma_Array_Type         := ValChromaArrayType;
 
 			noSubMbPartSizeLessThan8x8Flag := true;
 			println("\t\tmb_type : "+ValueOfVLD);
@@ -98,6 +134,7 @@ actor Algo_DecodeMacroblockLayer()
 				==>
 			//    pcm_alignment_zero_bit , pcm_sample_luma[ i ]
 			SkipNal      :[     FalseTab      ] repeat 257,//Keep synchro
+			LaunchActor  :[     LaunchTab     ] repeat 257,
 			TypeOfVLD    :[   ValTypeOfVLD    ] repeat 257,
 			//Orcc doesn't support it yet :
 			//TypeOfVLD    :[ [BYTE_ALIGNED_REQUIRED] +  [ValTypeOfVLDecod]repeat 256 ],
@@ -108,6 +145,7 @@ actor Algo_DecodeMacroblockLayer()
 			and (mb_type = BLOCK_TYPE_I_PCM)
 		var
 			List(type: bool        , size=256) FalseTab           = [false            : for int s in 0 .. 256],
+			List(type: uint(size=4), size=256) LaunchTab          = [MB_LAYER         : for int s in 0 .. 256],
 			List(type: uint(size=3), size=257) ValTypeOfVLD      := [READ_BITS        : for int s in 0 .. 256],
 			//List(type: uint(size=3), size=256) ValTypeOfVLDecod   = [READ_BITS        : for int s in 0 .. 255],
 			List(type: uint(size=5), size=256) BitDepthChromaTab  = [bit_depth_chroma : for int s in 0 .. 255]
@@ -130,11 +168,13 @@ actor Algo_DecodeMacroblockLayer()
 				==>
 			//            pcm_sample_chroma[ i ]
 			SkipNal      :[     FalseTab      ] repeat 256,//Keep synchro
+			LaunchActor  :[     LaunchTab     ] repeat 256,
 			TypeOfVLD    :[    ReadBitsTab    ] repeat 256,
 			NbBitsToRead :[ BitDepthChromaTab ] repeat 256
 			// Size is not always 256. Should be corrected and the value should be compute in Pps or Sps actor
 		var
 			List(type: bool        , size=256) FalseTab          = [false            : for int s in 0 .. 255],
+			List(type: uint(size=4), size=256) LaunchTab         = [MB_LAYER         : for int s in 0 .. 255],
 			List(type: uint(size=3), size=256) ReadBitsTab       = [READ_BITS        : for int s in 0 .. 255],
 			List(type: uint(size=5), size=256) BitDepthChromaTab = [bit_depth_chroma : for int s in 0 .. 255]
 		end
@@ -161,16 +201,19 @@ actor Algo_DecodeMacroblockLayer()
 			end
 		end
 
-	LaunchSubMbPred: action	==>
+	LaunchSubMbPred: action
+				==>
+			SkipNal     :[   false   ],
+			LaunchActor :[SUB_MB_PRED]
 		guard
 			(slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) and (mb_type = 3 or mb_type = 4)
 			// slice_type = SLICE_TYPE_B ...
 		end
 
-/*	CheckSubMbType: action
-			SubMbType :[sub_mb_type] repeat 4
+	CheckSubMbType: action
+//			SubMbType :[sub_mb_type] repeat 4
 				==>
-		do
+/*		do
 			if(slice_type = SLICE_TYPE_B) then
 				foreach int mbPartIdx in 0 .. 3
 				do
@@ -192,12 +235,13 @@ actor Algo_DecodeMacroblockLayer()
 					end
 				end
 			end
-		end
-*/
+*/		end
+
 	ReadTransformSize.Asked: action
 			==>
 			//        transform_size_8x8_flag
 			SkipNal      :[   false   ],//Keep synchro
+			LaunchActor  :[ MB_LAYER  ],
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[     1     ]
 		guard
@@ -207,12 +251,20 @@ actor Algo_DecodeMacroblockLayer()
 			println("ReadTransformSize.Asked not implemented yet");
 		end
 
+	LaunchMbPred: action
+				==>
+			SkipNal     :[  false  ],
+			LaunchActor :[ MB_PRED ]
+		end
+
 	ReadCodedBlockPattern.Asked: action
-			==>
+				==>
 			//        coded_block_pattern
-			SkipNal      :[ false  ],//Keep synchro
-			TypeOfVLD    :[ VLD_ME ]
+			SkipNal      :[  false   ],//Keep synchro
+			LaunchActor  :[ MB_LAYER ],
+			TypeOfVLD    :[  VLD_UE  ] //VLD_ME
 		guard
+			//Mb_type != Intra16x16
 			not(
 				    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
 				and (mb_type >= BLOCK_TYPE_INTA_16x16_MIN)
@@ -220,38 +272,136 @@ actor Algo_DecodeMacroblockLayer()
 			)
 		end
 
+	ReadCodedBlockPattern.Done: action
+			ValVLD :[CodeNum]
+				==>
+		var
+			uint(size=6) coded_block_pattern
+		do
+			coded_block_pattern :=
+				if(slice_type = SLICE_TYPE_I)then //Mb_type = Intra4x4 or Intra8x8
+					VLD_ME_TABLE[Chroma_Array_Type][CodeNum][0]
+				else
+					VLD_ME_TABLE[Chroma_Array_Type][CodeNum][1]
+				end;
+		
+			CodedBlockPatternLuma   := coded_block_pattern mod 16;
+			CodedBlockPatternChroma := coded_block_pattern  /  16;
+		end
+
+	ReadTransformSize8x8.Asked: action
+				==>
+			//        transform_size_8x8_flag
+			SkipNal      :[   false   ],//Keep synchro
+			LaunchActor  :[ MB_LAYER  ],
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			CodedBlockPatternLuma > 0,
+			transform_8x8_mode_flag = true,
+			not( (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI) and mb_type = 0 ),
+			noSubMbPartSizeLessThan8x8Flag = true,
+			not( (slice_type = SLICE_TYPE_B) and (mb_type = 0) ) or (direct_8x8_inference_flag = true)
+		end
+
+	ReadTransformSize8x8.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			transform_size_8x8_flag :=
+				if(ValueOfVLD = 0) then
+					false
+				else
+					true
+				end;
+		end
+
+	ReadMbQpDelta.Asked: action
+				==>
+			//            mb_qp_delta
+			SkipNal      :[  false   ],//Keep synchro
+			LaunchActor  :[ MB_LAYER ],
+			TypeOfVLD    :[  VLD_SE  ]
+		guard
+			   (CodedBlockPatternLuma   > 0)
+			or (CodedBlockPatternChroma > 0)
+			or (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
+				and (mb_type >= BLOCK_TYPE_INTA_16x16_MIN)
+				and (mb_type <= BLOCK_TYPE_INTA_16x16_MAX)
+		end
+
+	ReadMbQpDelta.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			mb_qp_delta := ValueOfVLD;
+		end
+
+	LaunchResidual: action
+				==>
+			SkipNal     :[  false   ],
+			LaunchActor :[ RESIDUAL ]
+		end
+
 	SendEndSliceHeader: action
 				==>
 			SkipNal :[true]
 		end
 
-	a: action ==>
-	do
-		println("Decode Mb Layer not finished yet");
-	end
-
 	schedule fsm ReadMbType_Asked:
-		ReadMbType_Asked          (ReadMbType.Asked )--> ReadMbType;
+		ReadMbType_Asked          (ReadMbType.Asked               )--> ReadMbType;
 
-		ReadMbType                (ReadMbType.Done )--> CheckMbType;
+		ReadMbType                (ReadMbType.Done                )--> CheckMbType;
 
-		CheckMbType               (CheckMbType.IsIPCM )--> ReadPcmSampleLuma;
-		CheckMbType (a)-->undefined;
+		CheckMbType               (CheckMbType.IsIPCM             )--> ReadPcmSampleLuma;
+		CheckMbType               (LaunchSubMbPred                )--> CheckSubMbType;
+		CheckMbType               (ReadTransformSize.Asked        )--> ReadTransformSize8x8_1;
+		CheckMbType               (LaunchMbPred                   )--> Check4CodedBlockPattern;
 
-		ReadPcmSampleLuma         (ReadPcmSampleLuma.Done )--> ReadPcmSampleChroma1Asked;
+		/* PCM Macroblock */
+		ReadPcmSampleLuma         (ReadPcmSampleLuma.Done         )--> ReadPcmSampleChroma1Asked;
 
-		ReadPcmSampleChroma1Asked (ReadPcmSampleLuma.Asked )--> ReadPcmSampleChroma1;
+		ReadPcmSampleChroma1Asked (ReadPcmSampleLuma.Asked        )--> ReadPcmSampleChroma1;
 
-		ReadPcmSampleChroma1      (ReadPcmSampleChroma.UComponent )-->ReadPcmSampleChroma2Asked;
+		ReadPcmSampleChroma1      (ReadPcmSampleChroma.UComponent )--> ReadPcmSampleChroma2Asked;
 
-		ReadPcmSampleChroma2Asked (ReadPcmSampleLuma.Asked )--> ReadPcmSampleChroma2;
+		ReadPcmSampleChroma2Asked (ReadPcmSampleLuma.Asked        )--> ReadPcmSampleChroma2;
 
 		ReadPcmSampleChroma2      (ReadPcmSampleChroma.VComponent )--> SendEndSliceHeader;
 
+		/* Other Macroblock */
+		CheckSubMbType            (CheckSubMbType                 )--> Check4CodedBlockPattern;
+
+		ReadTransformSize8x8_1    (ReadTransformSize8x8.Done      )--> LaunchMbPred;
+
+		LaunchMbPred              (LaunchMbPred                   )--> Check4CodedBlockPattern;
+
+		Check4CodedBlockPattern   (ReadCodedBlockPattern.Asked    )--> ReadCodedBlockPattern;
+		Check4CodedBlockPattern   (ReadMbQpDelta.Asked            )--> ReadMbQpDelta;
+		Check4CodedBlockPattern   (SendEndSliceHeader             )--> ReadMbType_Asked;
+	
+		ReadCodedBlockPattern     (ReadCodedBlockPattern.Done     )--> Check4TransformSize8x8;
+
+		Check4TransformSize8x8    (ReadTransformSize8x8.Asked     )--> ReadTransformSize8x8_2;
+		Check4TransformSize8x8    (ReadMbQpDelta.Asked            )--> ReadMbQpDelta;
+		Check4TransformSize8x8    (SendEndSliceHeader             )--> ReadMbType_Asked;
+
+		ReadTransformSize8x8_2 (ReadTransformSize8x8.Done         )--> Check4MbQpDelta;
+
+		Check4MbQpDelta (ReadMbQpDelta.Asked                      )--> ReadMbQpDelta;
+		Check4MbQpDelta (SendEndSliceHeader                       )--> ReadMbType_Asked;
+
+		ReadMbQpDelta (ReadMbQpDelta.Done )--> LaunchResidual;
+
+		LaunchResidual (LaunchResidual)--> SendEndSliceHeader;
 
 		SendEndSliceHeader        (SendEndSliceHeader )-->ReadMbType_Asked;
 	end
+
 	priority
-		CheckMbType.IsIPCM > a;
+		CheckMbType.IsIPCM > LaunchSubMbPred > ReadTransformSize.Asked > LaunchMbPred;
+		ReadCodedBlockPattern.Asked > ReadMbQpDelta.Asked;
+		ReadTransformSize8x8.Asked > ReadMbQpDelta.Asked;
+		ReadMbQpDelta.Asked > SendEndSliceHeader;
 	end
 end

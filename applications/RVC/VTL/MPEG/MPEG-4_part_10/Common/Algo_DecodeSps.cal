@@ -38,6 +38,7 @@ actor Algo_DecodeSps()
 	uint(size=4)  BitDepthLuma,
 	uint(size=4)  BitDepthChroma,
 	bool          Direct8x8Inference,
+	uint(size=2)  ChromaArrayType,
 
 	uint(size=32) Pps_PicWidthInMbs,
 	uint(size=32) Pps_PicHeightInMapUnits
@@ -88,35 +89,36 @@ actor Algo_DecodeSps()
 	List (type: List( type: int(size=32), size=255), size=32) offset_for_ref_frame         := [[ 0 : for int i in 0 .. 254 ]: for int j in 0 .. 31 ];
 	List (type: List( type: int(size=32), size=255), size=32) offset_for_ref_frame_accumul := [[ 0 : for int i in 0 .. 254 ]: for int j in 0 .. 31 ];
 //Compute the real values !!!!
-	List (type: uint(size=8) , size=32) level_idc                             := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=4) , size=32) constraint_set_flag                   := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=8) , size=32) profile_idc                           := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=4) , size=32) log2_max_frame_num_minus4             := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=2) , size=32) pic_order_cnt_type                    := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=4) , size=32) log2_max_pic_order_cnt_lsb_minus4     := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=1) , size=32) delta_pic_order_always_zero_flag      := [ 0 : for int i in 0 .. 31 ];
-	List (type: int (size=32), size=32) offset_for_non_ref_pic                := [ 0 : for int i in 0 .. 31 ];
-	List (type: int (size=32), size=32) offset_for_top_to_bottom_field        := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=8) , size=32) num_ref_frames_in_pic_order_cnt_cycle := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=32) num_ref_frames                        := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=1) , size=32) gaps_in_frame_num_value_allowed_flag  := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=32) pic_width_in_mbs_minus1               := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=32) pic_height_in_map_units_minus1        := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=1) , size=32) frame_mbs_only_flag                   := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=1) , size=32) mb_adaptive_frame_field_flag          := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=1) , size=32) direct_8x8_inference_flag             := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=1) , size=32) frame_cropping_flag                   := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=32) frame_crop_left_offset                := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=32) frame_crop_right_offset               := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=32) frame_crop_top_offset                 := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=32) frame_crop_bottom_offset              := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=1) , size=32) vui_parameters_present_flag           := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=5) , size=32) MaxDPBSz                              := [16 : for int i in 0 .. 31 ];
-	List (type: int (size=32), size=32) expected_delta_per_poc_cycle          := [ 0 : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=32) pic_size_in_mbs                       := [ 0 : for int i in 0 .. 31 ];
+	List (type: uint(size=8) , size=32) level_idc                             := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=4) , size=32) constraint_set_flag                   := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=8) , size=32) profile_idc                           := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=4) , size=32) log2_max_frame_num_minus4             := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=2) , size=32) pic_order_cnt_type                    := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=4) , size=32) log2_max_pic_order_cnt_lsb_minus4     := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=1) , size=32) delta_pic_order_always_zero_flag      := [ 0     : for int i in 0 .. 31 ];
+	List (type: int (size=32), size=32) offset_for_non_ref_pic                := [ 0     : for int i in 0 .. 31 ];
+	List (type: int (size=32), size=32) offset_for_top_to_bottom_field        := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=8) , size=32) num_ref_frames_in_pic_order_cnt_cycle := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) num_ref_frames                        := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=1) , size=32) gaps_in_frame_num_value_allowed_flag  := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) pic_width_in_mbs_minus1               := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) pic_height_in_map_units_minus1        := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=1) , size=32) frame_mbs_only_flag                   := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=1) , size=32) mb_adaptive_frame_field_flag          := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=1) , size=32) direct_8x8_inference_flag             := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=1) , size=32) frame_cropping_flag                   := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) frame_crop_left_offset                := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) frame_crop_right_offset               := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) frame_crop_top_offset                 := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) frame_crop_bottom_offset              := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=1) , size=32) vui_parameters_present_flag           := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=5) , size=32) MaxDPBSz                              := [16     : for int i in 0 .. 31 ];
+	List (type: int (size=32), size=32) expected_delta_per_poc_cycle          := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) pic_size_in_mbs                       := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=2) , size=32) Chroma_Array_Type                     := [ 0     : for int i in 0 .. 31 ];
 	//High Profile
-	List (type:uint(size=4), size=32 ) bit_depth_luma_minus8                  := [ 0 : for int i in 0 .. 31 ];
-	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8                := [ 0 : for int i in 0 .. 31 ];
+	List (type:uint(size=4), size=32 ) bit_depth_luma_minus8                  := [ 0     : for int i in 0 .. 31 ];
+	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8                := [ 0     : for int i in 0 .. 31 ];
 
 	uint(size=5)  sps_id ;
 	int (size=32) LoopVal;
@@ -154,7 +156,8 @@ actor Algo_DecodeSps()
 			MbAdaptFrameField           :[ValMbAdaptFrameField],
 			BitDepthLuma                :[bit_depth_luma_minus8[ValSps]+8],
 			BitDepthChroma              :[bit_depth_chroma_minus8[ValSps]+8],
-			Direct8x8Inference          :[ValDirect8x8Inference]
+			Direct8x8Inference          :[ValDirect8x8Inference],
+			ChromaArrayType             :[Chroma_Array_Type[ValSps]]
 		var
 			bool val_frame_mbs_only,
 			bool ValDeltaPic,
@@ -256,9 +259,28 @@ actor Algo_DecodeSps()
 			ValVLD :[ValueOfVLD]
 				==>
 		do
+			Chroma_Array_Type[sps_id] := ValueOfVLD;
 			println("read Sps chroma_format_idc not implemented yet");
 		end
 
+	ChromaFomtIdc.IsEqualTo3: action
+				==>
+			//         separate_colour_plane_flag
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			Chroma_Array_Type[sps_id] = 3
+		end
+
+	ReadSeparColourPlane.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			if(ValueOfVLD = 1)then
+				Chroma_Array_Type[sps_id] := 0;
+			end
+		end
 
 	Read_MaxFrameNum_PocType.Asked: action
 				==>
@@ -532,10 +554,14 @@ actor Algo_DecodeSps()
 		SendOff4RefFrameAcc          (SendOff4RefFrameAcc.Launch     )--> SendOff4RefFrameAcc;
 		SendOff4RefFrameAcc          (SendOff4RefFrameAcc.Done       )--> ReadSpsIdDone;
 
-		CheckChromaFormatIdc         (ReadChromaFormatIdc.Asked      )--> ReadChormaFormatIdcDone;
+		CheckChromaFormatIdc         (ReadChromaFormatIdc.Asked      )--> ReadChromaFormatIdcDone;
 		CheckChromaFormatIdc         (Read_MaxFrameNum_PocType.Asked )--> Read_MaxFrameNum_PocTypeDone;
 
-		ReadChormaFormatIdcDone      (ReadChromaFormatIdc.Done       )-->                                      undefined;//Not implemented yet
+		ReadChromaFormatIdcDone      (ReadChromaFormatIdc.Done       )--> CheckChromaFormatIdc;
+
+		CheckChromaFormatIdc         (ChromaFomtIdc.IsEqualTo3       )--> ReadSeparColourPlane;
+
+		ReadSeparColourPlane         (ReadSeparColourPlane.Done      )-->                             undefined;//Not implemented yet
 
 		Read_MaxFrameNum_PocTypeDone (Read_MaxFrameNum_PocType.Done  )--> CheckValPocType;
 

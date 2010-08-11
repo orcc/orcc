@@ -35,6 +35,7 @@ actor Algo_DecodeSliceData_CAVLC()
 	uint(size=4)  BitDepthLuma,
 	uint(size=4)  BitDepthChroma,
 	bool          Direct8x8Inference,
+	uint(size=2)  ChromaArrayType,
 	//Slice Header Parameters
 	uint(size=32) FirstMbInSlice,
 	uint(size=4)  SliceType,
@@ -49,7 +50,8 @@ actor Algo_DecodeSliceData_CAVLC()
 	uint(size=4)  DecMbLayerBitDepthLuma,
 	uint(size=4)  DecMbLayerBitDepthChroma,
 	bool          DecMbLayerDirect8x8Inference,
-	bool          DecMbLayerTransform8x8Mode
+	bool          DecMbLayerTransform8x8Mode,
+	uint(size=2)  DecMbLayerChromaArrayType
 		:
 
 
@@ -83,6 +85,7 @@ actor Algo_DecodeSliceData_CAVLC()
 	//Sps Parameters
 	uint(size=4)  bit_depth_luma;
 	uint(size=4)  bit_depth_chroma;
+	uint(size=2)  Chroma_Array_Type;
 	//Pps Parameters
 	bool          entropy_coding_mode_flag;
 	bool          transform_8x8_mode_flag;
@@ -114,7 +117,8 @@ actor Algo_DecodeSliceData_CAVLC()
 			BitDepthLuma       :[ValBitDepthLuma],
 			BitDepthChroma     :[ValBitDepthChroma],
 			Direct8x8Inference :[ValDirect8x8Inference],
-			Transform8x8Mode   :[ValTransform8x8Mode]
+			Transform8x8Mode   :[ValTransform8x8Mode],
+			ChromaArrayType    :[ValChromaArrayType]
 				==>
 		do
 			entropy_coding_mode_flag  := ValEntropyCodingMode;
@@ -124,6 +128,7 @@ actor Algo_DecodeSliceData_CAVLC()
 			bit_depth_chroma          := ValBitDepthChroma;
 			direct_8x8_inference_flag := ValDirect8x8Inference;
 			transform_8x8_mode_flag   := ValTransform8x8Mode;
+			Chroma_Array_Type         := ValChromaArrayType;
 
 			val_CurrMbAddr :=
 				if(MbaffFrameFlag = false)then
@@ -244,7 +249,8 @@ actor Algo_DecodeSliceData_CAVLC()
 			DecMbLayerBitDepthLuma       :[bit_depth_luma],
 			DecMbLayerBitDepthChroma     :[bit_depth_chroma],
 			DecMbLayerDirect8x8Inference :[direct_8x8_inference_flag],
-			DecMbLayerTransform8x8Mode   :[transform_8x8_mode_flag]
+			DecMbLayerTransform8x8Mode   :[transform_8x8_mode_flag],
+			DecMbLayerChromaArrayType    :[Chroma_Array_Type]
 		end
 
 
