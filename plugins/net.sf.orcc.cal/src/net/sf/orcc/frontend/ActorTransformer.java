@@ -560,18 +560,20 @@ public class ActorTransformer {
 
 			// sort actions by priority
 			ActionSorter sorter = new ActionSorter(actions);
-			actions = sorter.applyPriority(astActor.getPriorities());
+			ActionList sortedActions = sorter.applyPriority(astActor
+					.getPriorities());
 
 			// transform FSM
 			AstSchedule schedule = astActor.getSchedule();
 			ActionScheduler scheduler;
 			if (schedule == null) {
-				scheduler = new ActionScheduler(actions.getAllActions(), null);
+				scheduler = new ActionScheduler(sortedActions.getAllActions(),
+						null);
 			} else {
 				FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
-				FSM fsm = builder.buildFSM(actions);
-				scheduler = new ActionScheduler(actions.getUntaggedActions(),
-						fsm);
+				FSM fsm = builder.buildFSM(sortedActions);
+				scheduler = new ActionScheduler(
+						sortedActions.getUntaggedActions(), fsm);
 			}
 
 			context.restoreScope();

@@ -112,7 +112,8 @@ public class ActionSorter {
 
 		// adds tagged actions by priority order
 		while (it.hasNext()) {
-			actions.add(it.next());
+			Action action = it.next();
+			actions.add(action);
 		}
 
 		return actions;
