@@ -1,0 +1,513 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+actor Algo_DecodeMbPred()
+	int (size=32) ValVLD,
+
+	uint(size=4)  SliceType,
+	uint(size=6)  MbType,
+	bool          TransfSz8x8,
+	uint(size=2)  ChromaArrayType,
+	uint(size=5)  NumRefIdxLXActive,
+	bool          MbFieldDecoding
+		==>
+	uint(size=3)  TypeOfVLD,
+	uint(size=5)  NbBitsToRead,
+	bool          SkipNal
+		:
+
+
+	uint(size=3) READ_BITS             = 0;
+	uint(size=3) VLD_UE                = 1;
+	uint(size=3) VLD_SE                = 2;
+//	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
+//	uint(size=3) MORE_RBSP_DATA        = 4;
+
+	uint(size=4) SLICE_TYPE_P  = 0;
+//	uint(size=4) SLICE_TYPE_B  = 1;
+	uint(size=4) SLICE_TYPE_I  = 2;
+	uint(size=4) SLICE_TYPE_SP = 3;
+	uint(size=4) SLICE_TYPE_SI = 4;
+
+
+	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
+//	uint(size=6) BLOCK_TYPE_INTA_16x16_MIN = 1;
+//	uint(size=6) BLOCK_TYPE_INTA_16x16_MAX = 24;
+//	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
+
+	uint(size=5) NA      = 0;
+	uint(size=5) PRED_L0 = 1;
+	uint(size=5) PRED_L1 = 2;
+
+	List(type: List(type:uint(size=5), size=2), size=5) MB_PART_PRED_MODE_P = [[PRED_L0,NA] , [PRED_L0,PRED_L0] , [PRED_L0,PRED_L0]
+	                                                                          ,[NA     ,NA] , [NA     ,NA     ]];
+
+	List(type:uint(size=5), size=5) NUM_MB_PART_P = [1,2,2,4,4];
+
+
+
+	List (type:uint(size=3),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
+
+	uint(size=5)  lumaYxYBlkIdx := 0;
+	uint(size=2)  BitMissed     := 0;
+	int (size=5)  CountBit      := 0;
+	uint(size=2)  intra_chroma_pred_mode;
+	uint(size=5)  mbPartIdx     := 0;
+	uint(size=5)  mbPartIdxMax  := 0;
+	//MbLayer Parameters
+	uint(size=4)  slice_type;
+	uint(size=6)  mb_type;
+	bool          transform_size_8x8_flag;
+	uint(size=2)  Chroma_Array_Type;
+	uint(size=5)  num_ref_idx_l0_active;
+	uint(size=5)  num_ref_idx_l1_active;
+	bool          mb_field_decoding_flag;
+
+
+	function IS_MbPred_L0_P(uint(size=6) MbType, uint(size=1) x)
+				-->
+			bool
+		:
+			if(MbType > 4 or MbType = 0) then
+				MB_PART_PRED_MODE_P[0][bitand(x,1)] = PRED_L0
+			else
+				if(MbType < 3)then
+					true
+				else
+					false
+				end
+			end
+		end
+
+	function IS_MbPred_NA_P(uint(size=6) MbType, uint(size=1) x)
+				-->
+			bool
+		:
+			if(MbType = 3 or MbType = 4) then
+				true
+			else
+				if(MbType = 0 or MbType > 4)then
+					MB_PART_PRED_MODE_P[0][bitand(x,1)] = NA
+				else
+					false
+				end
+			end
+		end
+
+	ReadParameters: action
+			SliceType         :[ValSliceType],
+			MbType            :[ValMbType],
+			TransfSz8x8       :[ValTransfSz8x8],
+			ChromaArrayType   :[ValChromaArrayType],
+			NumRefIdxLXActive :[ValNumRefIdxLXActive] repeat 2,
+			MbFieldDecoding   :[ValMbFieldDecoding]
+				==>
+		do
+			slice_type              := ValSliceType;
+			mb_type                 := ValMbType;
+			transform_size_8x8_flag := ValTransfSz8x8;
+			Chroma_Array_Type       := ValChromaArrayType;
+			num_ref_idx_l0_active   := ValNumRefIdxLXActive[0];
+			num_ref_idx_l1_active   := ValNumRefIdxLXActive[1];
+			mb_field_decoding_flag  := ValMbFieldDecoding;
+			lumaYxYBlkIdx           := 0;
+			BitMissed               := 0;
+		end
+
+	MbType.IsIntra_YxY: action
+				==>
+		guard
+			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI)
+			//, mb_type != BLOCK_TYPE_I_PCM // ==> useless because this actor isn't used with this kind of Mb
+		end
+
+//We read 15 bits for limiting communication with others actors and improving performance
+	MbType.IsIntra_4x4: action
+				==>
+			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
+			SkipNal      :[     false      ],//Keep synchro
+			TypeOfVLD    :[    READ_BITS     ],
+			NbBitsToRead :[        15 ]// The type of ValVLD is int_16bits !
+		guard
+			mb_type                 = BLOCK_TYPE_I_8x8_or_4x4,
+			transform_size_8x8_flag = false
+		do
+			CountBit := 15;
+		end
+
+/*for( luma4x4BlkIdx=0; luma4x4BlkIdx<16; luma4x4BlkIdx++ ) {
+   prev_intra4x4_pred_mode_flag[ luma4x4BlkIdx ]
+   if( !prev_intra4x4_pred_mode_flag[ luma4x4BlkIdx ] )
+       rem_intra4x4_pred_mode[ luma4x4BlkIdx ]
+}*/
+
+
+	ReadPrevAndRemIntraYxY: action
+			ValVLD :[ValueOfVLD]
+				==>
+		var
+			uint(size=16) Buff
+		do
+			Buff := ValueOfVLD;
+			Buff := lshift(Buff, 16-CountBit);
+
+			if(BitMissed > 0)then
+				rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] := rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] + rshift(Buff,16-BitMissed);
+				CountBit := CountBit - BitMissed;
+				Buff := lshift(Buff,BitMissed);
+			end
+			while(CountBit > 0)
+			do
+				if(bitand(Buff,0x8000) = 0) then
+					CountBit := CountBit - 1;
+					Buff     := lshift(Buff,1);
+					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := rshift(Buff,13);
+					CountBit := CountBit - 3;
+					Buff     := lshift(Buff,3);
+				else
+					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := 15;
+					CountBit := CountBit - 1;
+					Buff     := lshift(Buff,1);
+				end
+				lumaYxYBlkIdx := lumaYxYBlkIdx + 1;
+			end
+			BitMissed := -CountBit;
+		end
+
+	ReadPrevAndRemIntra4x4.NotFinished: action
+				==>
+			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
+			SkipNal      :[     false      ],//Keep synchro
+			TypeOfVLD    :[    READ_BITS     ],
+			NbBitsToRead :[      CountBit ]// The type of ValVLD is int_16bits !
+		guard
+			(lumaYxYBlkIdx < 16) or (BitMissed > 0)
+		do
+			//Compute the minimal remaining bits
+			CountBit := BitMissed + 16 - lumaYxYBlkIdx;
+		end
+	
+
+	MbType.IsIntra_8x8: action
+				==>
+			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
+			SkipNal      :[     false      ],//Keep synchro
+			TypeOfVLD    :[    READ_BITS     ],
+			NbBitsToRead :[        4 ]// The type of ValVLD is int_16bits !
+		guard
+			mb_type                 = BLOCK_TYPE_I_8x8_or_4x4,
+			transform_size_8x8_flag = true
+		do
+			CountBit := 4;
+		end
+
+	ReadPrevAndRemIntra8x8.NotFinished: action
+				==>
+			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
+			SkipNal      :[     false      ],//Keep synchro
+			TypeOfVLD    :[    READ_BITS     ],
+			NbBitsToRead :[      CountBit ]// The type of ValVLD is int_16bits !
+		guard
+			(lumaYxYBlkIdx < 4) or (BitMissed > 0)
+		do
+			//Compute the minimal remaining bits
+			CountBit := BitMissed + 4 - lumaYxYBlkIdx;
+		end
+
+	ChromaArrayTp.IsEqualTo1or2: action
+				==>
+			//          intra_chroma_pred_mode
+			SkipNal      :[     false      ],//Keep synchro
+			TypeOfVLD    :[    VLD_UE     ]
+		guard
+			   Chroma_Array_Type = 1
+			or Chroma_Array_Type = 2
+		end
+
+	ReadIntraChroma: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			intra_chroma_pred_mode := ValueOfVLD;
+		end
+
+	Mb_Type.IsNotEqualToDirect: action
+				==>
+		guard
+			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP)
+			//slice_type = SLICE_TYPE_B and ...
+		do
+			mbPartIdxMax:=
+				if(mb_type < 4)then
+					NUM_MB_PART_P[mb_type]
+				else
+					NUM_MB_PART_P[0]
+				end;
+			mbPartIdx := 0;
+		end
+
+/*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
+   if( ( num_ref_idx_l0_active_minus1 > 0 | |
+          mb_field_decoding_flag ) &&
+       MbPartPredMode( mb_type, mbPartIdx ) != Pred_L1 )
+       ref_idx_l0[ mbPartIdx ]
+*/
+	ReadRefIdxl0.Ue_Asked: action
+				==>
+			//             ref_idx_l0
+			SkipNal      :[   false  ],//Keep synchro
+			TypeOfVLD    :[  VLD_UE  ]
+		guard
+			mbPartIdx < mbPartIdxMax,
+			num_ref_idx_l0_active > 1,
+			//not IS_MbPred_L1_P(mb_type,mbPartIdx), // There isn't any Pred_L1 in P MacroBlock
+			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+		end
+
+	ReadRefIdxl0.u1Asked: action
+				==>
+			//             ref_idx_l0
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			mbPartIdx < mbPartIdxMax,
+			mb_field_decoding_flag = true,
+			//not IS_MbPred_L1_P(mb_type,mbPartIdx), // There isn't any Pred_L1 in P MacroBlock
+			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+		end
+
+/*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
+   if( ( num_ref_idx_l1_active_minus1 > 0 | |
+          mb_field_decoding_flag ) &&
+       MbPartPredMode( mb_type, mbPartIdx ) != Pred_L0 )
+       ref_idx_l1[ mbPartIdx ]
+*/
+	/*Not used with I and P Blocks*/
+	ReadRefIdxl1.Ue_Asked: action
+				==>
+			//             ref_idx_l1
+			SkipNal      :[   false  ],//Keep synchro
+			TypeOfVLD    :[  VLD_UE  ]
+		guard
+			mbPartIdx < mbPartIdxMax,
+			num_ref_idx_l1_active > 1,
+			not IS_MbPred_L0_P(mb_type,mbPartIdx),
+			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+	ReadRefIdxl1.u1Asked: action
+				==>
+			//             ref_idx_l1
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			mbPartIdx < mbPartIdxMax,
+			mb_field_decoding_flag = true,
+			not IS_MbPred_L0_P(mb_type,mbPartIdx),
+			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+	ReadParam.Skip1Parameter: action
+				==>
+			//            We read nothing
+			SkipNal      :[   false   ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     0     ]
+		guard
+			mbPartIdx < mbPartIdxMax
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+/*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
+   if( MbPartPredMode ( mb_type, mbPartIdx ) != Pred_L1 )
+       for( compIdx = 0; compIdx < 2; compIdx++ )
+          mvd_l0[ mbPartIdx ][ 0 ][ compIdx ]
+*/
+	ReadMvdL0.Asked: action
+				==>
+			//             mvd_l0
+			SkipNal      :[   false , false   ],//Keep synchro
+			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
+		guard
+			mbPartIdx < mbPartIdxMax,
+			//not IS_MbPred_L1_P(mb_type,mbPartIdx), // There isn't any Pred_L1 in P MacroBlock
+			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+/*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
+   if( MbPartPredMode( mb_type, mbPartIdx ) != Pred_L0 )
+       for( compIdx = 0; compIdx < 2; compIdx++ )
+          mvd_l1[ mbPartIdx ][ 0 ][ compIdx ]
+*/
+	/*Not used with I and P Blocks*/
+	ReadMvdL1.Asked: action
+				==>
+			//             mvd_l1
+			SkipNal      :[   false , false   ],//Keep synchro
+			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
+		guard
+			mbPartIdx < mbPartIdxMax,
+			not IS_MbPred_L0_P(mb_type,mbPartIdx),
+			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+
+	ReadParam.Skip2Parameters: action
+				==>
+			//            We read nothing
+			SkipNal      :[   false, false    ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS , READ_BITS  ],
+			NbBitsToRead :[     0     ,  0  ]
+		guard
+			mbPartIdx < mbPartIdxMax
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+	SendOrReadDone: action
+				==>
+		do
+			mbPartIdx := 0;
+		end
+
+	ReadRefIdxL0.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		guard
+			mbPartIdx < mbPartIdxMax
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+	ReadRefIdxL1.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		guard
+			mbPartIdx < mbPartIdxMax
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+	ReadMvdL0.Done: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+		guard
+			mbPartIdx < mbPartIdxMax
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+	ReadMvdL1.Done: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+		guard
+			mbPartIdx < mbPartIdxMax
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+
+	SendEndMbPred: action
+				==>
+			SkipNal :[true]
+		end
+
+	schedule fsm ReadParameters:
+		ReadParameters (ReadParameters )--> CheckMbType;
+
+		CheckMbType   (MbType.IsIntra_YxY )--> CheckMbTypeYxY;
+		CheckMbType   (Mb_Type.IsNotEqualToDirect )-->ReadRefIdxl0Asked;
+		CheckMbType   (SendEndMbPred)--> ReadParameters;
+
+		CheckMbTypeYxY (MbType.IsIntra_4x4 )--> ReadPrevAndRemIntra4x4;
+		CheckMbTypeYxY (MbType.IsIntra_8x8 )--> ReadPrevAndRemIntra8x8;
+		CheckMbTypeYxY (ChromaArrayTp.IsEqualTo1or2 )--> ReadIntraChroma;
+		CheckMbTypeYxY (SendEndMbPred )--> ReadParameters;
+
+		ReadPrevAndRemIntra4x4 ( ReadPrevAndRemIntraYxY)-->CheckEndOfReadPrev4x4;
+
+		CheckEndOfReadPrev4x4( ReadPrevAndRemIntra4x4.NotFinished )--> ReadPrevAndRemIntra4x4;
+		CheckEndOfReadPrev4x4(ChromaArrayTp.IsEqualTo1or2  )--> ReadIntraChroma;
+		CheckEndOfReadPrev4x4(SendEndMbPred  )--> ReadParameters;
+
+		ReadPrevAndRemIntra8x8 ( ReadPrevAndRemIntraYxY)-->CheckEndOfReadPrev8x8;
+
+		CheckEndOfReadPrev8x8( ReadPrevAndRemIntra8x8.NotFinished )--> ReadPrevAndRemIntra8x8;
+		CheckEndOfReadPrev8x8(ChromaArrayTp.IsEqualTo1or2  )--> ReadIntraChroma;
+		CheckEndOfReadPrev8x8(SendEndMbPred  )--> ReadParameters;
+
+		ReadIntraChroma   (ReadIntraChroma)--> SendEndMbPred;
+
+		ReadRefIdxl0Asked (ReadRefIdxl0.Ue_Asked )--> ReadRefIdxl0Asked;
+		ReadRefIdxl0Asked (ReadRefIdxl0.u1Asked )--> ReadRefIdxl0Asked;
+		ReadRefIdxl0Asked (ReadParam.Skip1Parameter )--> ReadRefIdxl0Asked;
+		ReadRefIdxl0Asked (SendOrReadDone )--> ReadRefIdxl1Asked;
+
+		ReadRefIdxl1Asked (ReadRefIdxl1.Ue_Asked )--> ReadRefIdxl1Asked;
+		ReadRefIdxl1Asked (ReadRefIdxl1.u1Asked )--> ReadRefIdxl1Asked;
+		ReadRefIdxl1Asked (ReadParam.Skip1Parameter )--> ReadRefIdxl1Asked;
+		ReadRefIdxl1Asked (SendOrReadDone )--> ReadMvdL0Asked;
+
+		ReadMvdL0Asked (ReadMvdL0.Asked )--> ReadMvdL0Asked;
+		ReadMvdL0Asked (ReadParam.Skip2Parameters )--> ReadMvdL0Asked;
+		ReadMvdL0Asked (SendOrReadDone )--> ReadMvdL1Asked;
+
+		ReadMvdL1Asked (ReadMvdL1.Asked )--> ReadMvdL1Asked;
+		ReadMvdL1Asked (ReadParam.Skip2Parameters )--> ReadMvdL1Asked;
+		ReadMvdL1Asked (SendOrReadDone )--> ReadRefIdxL0Done;
+
+		ReadRefIdxL0Done ( ReadRefIdxL0.Done)--> ReadRefIdxL0Done;
+		ReadRefIdxL0Done ( SendOrReadDone)--> ReadRefIdxL1Done;
+
+		ReadRefIdxL1Done ( ReadRefIdxL1.Done)--> ReadRefIdxL1Done;
+		ReadRefIdxL1Done ( SendOrReadDone)--> ReadMvdL0Done;
+
+		ReadMvdL0Done (ReadMvdL0.Done)--> ReadMvdL0Done;
+		ReadMvdL0Done (SendOrReadDone)--> ReadMvdL1Done;
+
+		ReadMvdL1Done (ReadMvdL1.Done)--> ReadMvdL1Done;
+		ReadMvdL1Done (SendEndMbPred)--> ReadParameters;
+
+		SendEndMbPred (SendEndMbPred )--> ReadParameters;
+	end
+
+	priority
+		MbType.IsIntra_YxY          > Mb_Type.IsNotEqualToDirect  > SendEndMbPred;
+		MbType.IsIntra_4x4          > MbType.IsIntra_8x8          > ChromaArrayTp.IsEqualTo1or2;
+		ChromaArrayTp.IsEqualTo1or2 > SendEndMbPred;
+		ReadPrevAndRemIntra4x4      > ChromaArrayTp.IsEqualTo1or2;
+		ReadRefIdxl0.Ue_Asked       > ReadRefIdxl0.u1Asked        > ReadParam.Skip1Parameter;
+		ReadRefIdxl1.Ue_Asked       > ReadRefIdxl1.u1Asked        > ReadParam.Skip1Parameter;
+		ReadParam.Skip1Parameter    > SendOrReadDone;
+		ReadMvdL0                   > ReadParam.Skip2Parameters;
+		ReadMvdL1                   > ReadParam.Skip2Parameters;
+		ReadParam.Skip2Parameters   > SendOrReadDone;
+		ReadRefIdxL0.Done           > SendOrReadDone;
+		ReadRefIdxL1.Done           > SendOrReadDone;
+		ReadMvdL0.Done              > SendOrReadDone;
+		ReadMvdL1.Done              > SendEndMbPred;
+	end
+end

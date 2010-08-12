@@ -158,7 +158,7 @@ actor Algo_DecodeMacroblockLayer()
 			TypeOfVLD    :[   ValTypeOfVLD    ] repeat 257,
 			//Orcc doesn't support it yet :
 			//TypeOfVLD    :[ [BYTE_ALIGNED_REQUIRED] +  [ValTypeOfVLDecod]repeat 256 ],
-			NbBitsToRead :[ BitDepthChromaTab ] repeat 257
+			NbBitsToRead :[ BitDepthChromaTab ] repeat 256
 			
 		guard
 			    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
@@ -168,7 +168,7 @@ actor Algo_DecodeMacroblockLayer()
 			List(type: uint(size=4), size=257) LaunchTab          = [MB_LAYER         : for int s in 0 .. 256],
 			List(type: uint(size=3), size=257) ValTypeOfVLD      := [READ_BITS        : for int s in 0 .. 256],
 			//List(type: uint(size=3), size=256) ValTypeOfVLDecod   = [READ_BITS        : for int s in 0 .. 255],
-			List(type: uint(size=5), size=257) BitDepthChromaTab  = [bit_depth_chroma : for int s in 0 .. 255]
+			List(type: uint(size=5), size=256) BitDepthChromaTab  = [bit_depth_chroma : for int s in 0 .. 255]
 		do
 			ValTypeOfVLD[0] := BYTE_ALIGNED_REQUIRED;
 		end

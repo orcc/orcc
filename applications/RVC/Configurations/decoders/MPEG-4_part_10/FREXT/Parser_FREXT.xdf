@@ -365,4 +365,8 @@
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumRefIdxLXActive"/>
     <Connection dst="DecodeMbPred" dst-port="NumRefIdxLXActive"
         src="DecodeMacroBlockLayer" src-port="MbPredNumRefIdxLXActive"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="MbFieldDecoding"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerMbFieldDecoding"/>
+    <Connection dst="DecodeMbPred" dst-port="MbFieldDecoding"
+        src="DecodeMacroBlockLayer" src-port="MbPredMbFieldDecoding"/>
 </XDF>
