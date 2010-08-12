@@ -219,7 +219,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end 
 
 	//Left neighbour from 16x16 edge
-	Reset.AvailLeft_CHROMA:action ==> Y_Left:[left_16x16_edge]repeat MB_WIDTH_CHROMA
+	Reset.AvailLeft_CHROMA:action ==> Y_Left:[[left_16x16_edge[s]: for int s in 0 .. MB_WIDTH_CHROMA-1]]repeat MB_WIDTH_CHROMA
 	guard 
 		avail[0] = 1,
 		MB_WIDTH = MB_WIDTH_CHROMA
@@ -236,7 +236,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end 
   
 	//Top and right neighbour from 16x16 edge
-	Reset.AvailTop_CHROMA:action ==> Y_Up:[top_16x16_edge]repeat MB_WIDTH_CHROMA
+	Reset.AvailTop_CHROMA:action ==> Y_Up:[[top_16x16_edge[s]: for int s in 0 .. MB_WIDTH_CHROMA-1]]repeat MB_WIDTH_CHROMA
 	guard 
 		avail[1] = 1,
 		MB_WIDTH = MB_WIDTH_CHROMA
@@ -245,7 +245,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end
   
 	//Top and right neighbour from 16x16 edge
-	Reset.AvailTop_LUMA:action ==> Y_Up:[top_16x16_edge]repeat MB_WIDTH_LUMA
+	Reset.AvailTop_LUMA:action ==> Y_Up:[[top_16x16_edge[s]: for int s in 0 .. MB_WIDTH_LUMA-1]]repeat MB_WIDTH_LUMA
 	guard 
 		avail[1] = 1,
 		MB_WIDTH = MB_WIDTH_LUMA

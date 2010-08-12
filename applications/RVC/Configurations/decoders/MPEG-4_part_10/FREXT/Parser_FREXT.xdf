@@ -147,12 +147,24 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="Is_CBP">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
     </Instance>
     <Instance id="DecodeMacroBlockLayer">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
         <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeMacroblockLayer"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeMbPred">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeMbPred"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -332,4 +344,25 @@
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerChromaArrayType"/>
     <Connection dst="DecodePic" dst-port="MbLayerLaunchActor"
         src="DecodeMacroBlockLayer" src-port="LaunchActor"/>
+    <Connection dst="DecodeMbPred" dst-port="SliceType"
+        src="DecodeMacroBlockLayer" src-port="MbPredSliceType"/>
+    <Connection dst="DecodeMbPred" dst-port="MbType"
+        src="DecodeMacroBlockLayer" src-port="MbPredMbType"/>
+    <Connection dst="DecodeMbPred" dst-port="TransfSz8x8"
+        src="DecodeMacroBlockLayer" src-port="MbPredTransfSz8x8"/>
+    <Connection dst="DecodeMbPred" dst-port="ValVLD" src="DecodePic" src-port="MbPredValVLD"/>
+    <Connection dst="DecodePic" dst-port="MbPredTypeOfVLD"
+        src="DecodeMbPred" src-port="TypeOfVLD"/>
+    <Connection dst="DecodePic" dst-port="MbPredNbBitsToRead"
+        src="DecodeMbPred" src-port="NbBitsToRead"/>
+    <Connection dst="DecodePic" dst-port="MbPredSkipNal"
+        src="DecodeMbPred" src-port="SkipNal"/>
+    <Connection dst="DecodeMbPred" dst-port="ChromaArrayType"
+        src="DecodeMacroBlockLayer" src-port="MbPredChromaArrayType"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="NumRefIdxLXActive"
+        src="DecodePps" src-port="NumRefIdxLXActive"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="NumRefIdxLXActive"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumRefIdxLXActive"/>
+    <Connection dst="DecodeMbPred" dst-port="NumRefIdxLXActive"
+        src="DecodeMacroBlockLayer" src-port="MbPredNumRefIdxLXActive"/>
 </XDF>

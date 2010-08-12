@@ -212,7 +212,7 @@ actor Mgnt_Intra_4x4 ()
 	//******************************* Processing ********************************************
  
 	//**** Select and send available edge ****
-	AvailEdge:action ==> Avail:[ avail ] repeat 3
+	AvailEdge:action ==> Avail:[ [avail[s]: for int s in 0 .. 2] ] repeat 3
 	guard
 		mb_counter< 16
 	do
@@ -270,7 +270,7 @@ actor Mgnt_Intra_4x4 ()
 	end
   
 	//Only top neighbour from 16x16 edge
-	SendEdge.TopEdge16:action ==> Y_Up4:[buff] repeat 8
+	SendEdge.TopEdge16:action ==> Y_Up4:[[buff[s]: for int s in 0 .. 7]] repeat 8
 	guard 
 	  	avail[1] = 1,
 	  	avail[3] = 0,
@@ -289,7 +289,7 @@ actor Mgnt_Intra_4x4 ()
 	end
      
 	//Only top neighbour from 4x4 edge
-	SendEdge.TopEdge4:action ==> Y_Up4:[buff]repeat 8
+	SendEdge.TopEdge4:action ==> Y_Up4:[[buff[s]: for int s in 0 .. 7]]repeat 8
 	guard 
 		avail[1] = 1,
 		avail[3] = 0,

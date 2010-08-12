@@ -37,7 +37,11 @@ actor Algo_Slice_layer_without_partitioning()
 	uint(size=3)  MbLayerTypeOfVLD,
 	uint(size=5)  MbLayerNbBitsToRead,
 	bool          MbLayerSkipNal,
-	uint(size=4)  MbLayerLaunchActor
+	uint(size=4)  MbLayerLaunchActor,
+
+	uint(size=3)  MbPredTypeOfVLD,
+	uint(size=5)  MbPredNbBitsToRead,
+	bool          MbPredSkipNal
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
@@ -51,7 +55,9 @@ actor Algo_Slice_layer_without_partitioning()
 
 	int (size=32) DataValVLD,
 
-	int (size=32) MbLayerValVLD
+	int (size=32) MbLayerValVLD,
+
+	int (size=32) MbPredValVLD
 		:
 
 
@@ -337,6 +343,46 @@ actor Algo_Slice_layer_without_partitioning()
 		guard
 			ValLaunch     = RESIDUAL,
 			EndOfDecoding = false
+		end///
+
+
+	MbPred.GetVLDVal: action
+			ValVLD                 :[VLDecoding]
+				==>
+			MbPredValVLD :[VLDecoding]
+		end
+
+
+	MbPred.AskVLD: action
+			MbPredTypeOfVLD   :[ValTypeOfVLD],
+			MbPredSkipNal     :[EndOfDecoding]
+				==>
+			TypeOfVLD       :[ValTypeOfVLD],
+			SkipNal         :[false]
+		guard
+			ValTypeOfVLD  != READ_BITS,
+			EndOfDecoding  = false
+		end
+
+
+	MbPred.AskReadBits: action
+			MbPredTypeOfVLD    :[ValTypeOfVLD],
+			MbPredNbBitsToRead :[NbBits],
+			MbPredSkipNal      :[EndOfDecoding]
+				==>
+			TypeOfVLD          :[READ_BITS],
+			NbBitsToRead       :[NbBits],
+			SkipNal            :[false]
+		guard
+			ValTypeOfVLD  = READ_BITS,
+			EndOfDecoding = false
+		end
+
+	MbPred.Done: action
+			MbPredSkipNal :[EndOfDecoding]
+				==>
+		guard
+			EndOfDecoding = true
 		end
 
 
@@ -371,13 +417,21 @@ actor Algo_Slice_layer_without_partitioning()
 			LaunchMbLayer    (MbLayer.LaunchSubMbPred )--> LaunchSubMbPred;
 			LaunchMbLayer    (MbLayer.LaunchMbPred    )--> LaunchMbPred;
 			LaunchMbLayer    (MbLayer.LaunchResidual  )--> LaunchResidual;
+	
+				LaunchMbPred (MbPred.AskVLD       )--> LaunchMbPred;
+				LaunchMbPred (MbPred.AskReadBits  )--> LaunchMbPred;
+				LaunchMbPred (MbPred.GetVLDVal    )--> LaunchMbPred;
+				LaunchMbPred (MbPred.Done         )--> LaunchMbLayer;
 	end
 
 	priority
-		SliceHeader.GetVLDVal > SliceHeader.AskVLD > SliceHeader.AskReadBits > SliceHeader.LaunchRefPicMark > SliceHeader.LaunchRefPicList > SliceHeader.Done;
-		RefPicMark.GetVLDVal  > RefPicMark.AskVLD  > RefPicMark.AskReadBits  > RefPicMark.Done;
-		RefPicList.GetVLDVal  > RefPicList.AskVLD  > RefPicList.AskReadBits  > RefPicList.Done;
-		SliceData.GetVLDVal   > SliceData.AskVLD   > SliceData.AskReadBits   > SliceData.LaunchMbLayer      > SliceData.Done;
-		MbLayer.GetVLDVal     > MbLayer.AskVLD     > MbLayer.AskReadBits     > MbLayer.Done;
+		SliceHeader.GetVLDVal        > SliceHeader.AskVLD           > SliceHeader.AskReadBits > SliceHeader.LaunchRefPicMark;
+		SliceHeader.LaunchRefPicMark > SliceHeader.LaunchRefPicList > SliceHeader.Done;
+		RefPicMark.GetVLDVal         > RefPicMark.AskVLD            > RefPicMark.AskReadBits  > RefPicMark.Done;
+		RefPicList.GetVLDVal         > RefPicList.AskVLD            > RefPicList.AskReadBits  > RefPicList.Done;
+		SliceData.GetVLDVal          > SliceData.AskVLD             > SliceData.AskReadBits   > SliceData.LaunchMbLayer       > SliceData.Done;
+		MbLayer.GetVLDVal            > MbLayer.AskVLD               > MbLayer.AskReadBits     > MbLayer.LaunchMbPred;
+		MbLayer.LaunchMbPred         > MbLayer.LaunchSubMbPred      > MbLayer.LaunchResidual  > MbLayer.Done;
+		MbPred.GetVLDVal             > MbPred.AskVLD                > MbPred.AskReadBits      > MbPred.Done;
 	end
 end

@@ -259,7 +259,7 @@ actor Algo_BlockExpand_AVC ()
 
 	SendChromaDC: action
 				==>
-			Coeff :[ValCoeff] repeat SZ_CHROMA_DC
+			Coeff :[[ValCoeff[s] : for int s in 0 .. SZ_CHROMA_DC-1]] repeat SZ_CHROMA_DC
 		do	
 			if(Component = U_COMPONENT) then
 				Component := V_COMPONENT;

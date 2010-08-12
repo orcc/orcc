@@ -65,7 +65,7 @@ uint(size=16) EDGE
   	end
   
   	//Send the edge needed to process the intra prediction of the current macroblock
-  	CALCEDGE1:action ==> EDGE:[ result	] repeat 2*16+5
+  	CALCEDGE1:action ==> EDGE:[ [ result[s] : for int s in 0 .. 2*16+5 -1]	] repeat 2*16+5
   	guard 
 		mb_type_ok = 0,
   		mb_Index < PICWIDTH-1
@@ -83,7 +83,7 @@ uint(size=16) EDGE
   		end
   	end
   	
-  	CALCEDGE2:action ==> EDGE:[ result	] repeat 2*16+5
+  	CALCEDGE2:action ==> EDGE:[ [ result[s] : for int s in 0 .. 2*16+5 -1]	] repeat 2*16+5
   	guard 
 		mb_type_ok = 0,
 		mb_Index = PICWIDTH-1

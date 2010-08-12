@@ -86,7 +86,7 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   		left_edge :=  [v[s*MB_WIDTH-1]:for int s in 1 .. MB_WIDTH_CHROMA];
   	end
   
-  	EDGE_CALC_LUMA: action ==> EDGE:[ result	] repeat 2*MB_WIDTH_LUMA+1
+  	EDGE_CALC_LUMA: action ==> EDGE:[ [ result[s] : for int s in 0 .. 2*MB_WIDTH_LUMA]	] repeat 2*MB_WIDTH_LUMA+1
   	guard
   		mb_type_ok = 1,
   		MB_WIDTH = MB_WIDTH_LUMA
@@ -105,7 +105,7 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
 
   	end
   
-  	EDGE_CALC_CHROMA: action ==> EDGE:[ result	] repeat 2*MB_WIDTH_CHROMA+1
+  	EDGE_CALC_CHROMA: action ==> EDGE:[ [ result[s] : for int s in 0 .. 2*MB_WIDTH_CHROMA]	] repeat 2*MB_WIDTH_CHROMA+1
   	guard
   		mb_type_ok = 1,
   		MB_WIDTH = MB_WIDTH_CHROMA

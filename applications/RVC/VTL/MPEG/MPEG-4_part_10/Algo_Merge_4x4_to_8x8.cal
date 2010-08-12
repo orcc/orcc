@@ -23,7 +23,7 @@ actor Algo_Merge_4x4_to_8x8 () int(size=16) X ==> int(size=16) Y :
   //Tab containing the 8x8 macroblock
   List( type:int(size=16), size=64 ) buff := [ 0 : for int i in 0 .. 63 ];
   
-  action X:[ x ] repeat 4*8 ==> Y:[ buff ] repeat 4*8
+  action X:[ x ] repeat 4*8 ==> Y:[ [buff[s]:for int s in 0 .. 4*8-1] ] repeat 4*8
   var
     int addr_Mbx
   do  
