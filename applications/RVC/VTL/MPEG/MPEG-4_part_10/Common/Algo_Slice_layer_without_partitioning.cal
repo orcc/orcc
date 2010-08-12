@@ -41,7 +41,10 @@ actor Algo_Slice_layer_without_partitioning()
 
 	uint(size=3)  MbPredTypeOfVLD,
 	uint(size=5)  MbPredNbBitsToRead,
-	bool          MbPredSkipNal
+	bool          MbPredSkipNal,
+
+	bool          ResSkipNal,
+	uint(size=4)  ResLaunchActor
 		==>
 	uint(size=3)  TypeOfVLD,
 	uint(size=5)  NbBitsToRead,
@@ -69,14 +72,16 @@ actor Algo_Slice_layer_without_partitioning()
 
 	uint(size=3) READ_BITS = 0;
 
-	uint(size=4) SLICE_HEADER        = 0;
-	uint(size=4) DEC_REF_PIC_MARKING = 1;
-	uint(size=4) REF_PIC_LIST        = 2;
-	uint(size=4) SLICE_DATA          = 3;
-	uint(size=4) MB_LAYER            = 4;
-	uint(size=4) SUB_MB_PRED         = 5;
-	uint(size=4) MB_PRED             = 6;
-	uint(size=4) RESIDUAL            = 7;
+	uint(size=4) SLICE_HEADER         = 0;
+	uint(size=4) DEC_REF_PIC_MARKING  = 1;
+	uint(size=4) REF_PIC_LIST         = 2;
+	uint(size=4) SLICE_DATA           = 3;
+	uint(size=4) MB_LAYER             = 4;
+	uint(size=4) SUB_MB_PRED          = 5;
+	uint(size=4) MB_PRED              = 6;
+	uint(size=4) RESIDUAL             = 7;
+	uint(size=4) RESIDUAL_BLOCK_CAVLC = 8;
+	uint(size=4) RESIDUAL_BLOCK_CABAC = 9;
 
 
 	SliceHeader.GetVLDVal: action
@@ -129,7 +134,7 @@ actor Algo_Slice_layer_without_partitioning()
 			HeaderLaunchActor :[ValLaunch]
 				==>
 		guard
-			ValLaunch = REF_PIC_LIST,
+			ValLaunch     = REF_PIC_LIST,
 			EndOfDecoding = false
 		end
 
@@ -343,7 +348,7 @@ actor Algo_Slice_layer_without_partitioning()
 		guard
 			ValLaunch     = RESIDUAL,
 			EndOfDecoding = false
-		end///
+		end
 
 
 	MbPred.GetVLDVal: action
@@ -385,6 +390,22 @@ actor Algo_Slice_layer_without_partitioning()
 			EndOfDecoding = true
 		end
 
+	Residual.Done: action
+			ResSkipNal :[EndOfDecoding]
+				==>
+		guard
+			EndOfDecoding = true
+		end
+
+	Residual.LaunchResBlkCavlc: action
+			ResSkipNal     :[EndOfDecoding],
+			ResLaunchActor :[ValLaunch]
+				==>
+		guard
+			ValLaunch     = RESIDUAL_BLOCK_CAVLC,
+			EndOfDecoding = false
+		end
+
 
 	schedule fsm LaunchSliceHeader:
 		LaunchSliceHeader (SliceHeader.AskVLD           )--> LaunchSliceHeader;
@@ -418,10 +439,13 @@ actor Algo_Slice_layer_without_partitioning()
 			LaunchMbLayer    (MbLayer.LaunchMbPred    )--> LaunchMbPred;
 			LaunchMbLayer    (MbLayer.LaunchResidual  )--> LaunchResidual;
 	
-				LaunchMbPred (MbPred.AskVLD       )--> LaunchMbPred;
-				LaunchMbPred (MbPred.AskReadBits  )--> LaunchMbPred;
-				LaunchMbPred (MbPred.GetVLDVal    )--> LaunchMbPred;
-				LaunchMbPred (MbPred.Done         )--> LaunchMbLayer;
+				LaunchMbPred   (MbPred.AskVLD       )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.AskReadBits  )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.GetVLDVal    )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.Done         )--> LaunchMbLayer;
+
+				LaunchResidual (Residual.Done              )--> LaunchMbLayer;
+				LaunchMbLayer  (Residual.LaunchResBlkCavlc )--> LaunchResBlkCavlc;
 	end
 
 	priority

@@ -54,7 +54,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool          DecMbLayerTransform8x8Mode,
 	uint(size=2)  DecMbLayerChromaArrayType,
 	uint(size=5)  DecMbLayerNumRefIdxLXActive,
-	bool          DecMbLayerMbFieldDecoding
+	bool          DecMbLayerMbFieldDecoding,
+	bool          DecMbLayerEntropyCodingMode
 		:
 
 
@@ -66,8 +67,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 	uint(size=3) READ_BITS             = 0;
 	uint(size=3) VLD_UE                = 1;
-	uint(size=3) VLD_SE                = 2;
-	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
+//	uint(size=3) VLD_SE                = 2;
+//	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
 	uint(size=3) MORE_RBSP_DATA        = 4;
 
 	uint(size=4) SLICE_DATA          = 3;
@@ -79,6 +80,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 //	uint(size=4) SLICE_TYPE_SP = 3;
 	uint(size=4) SLICE_TYPE_SI = 4;
 
+	//FixMe : it should be a constant !!
+	bool         CABAC_ENTROPY := true;
 
 /*
 *
@@ -164,7 +167,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	EntropyCodingModeFlag.IsEqualToTrue: action
 			==>
 		guard
-			entropy_coding_mode_flag = true
+			entropy_coding_mode_flag = CABAC_ENTROPY
 		end
 
 	IsSliceIorSI: action
@@ -262,7 +265,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			DecMbLayerTransform8x8Mode   :[transform_8x8_mode_flag],
 			DecMbLayerChromaArrayType    :[Chroma_Array_Type],
 			DecMbLayerNumRefIdxLXActive  :[num_ref_idx_l0_active , num_ref_idx_l1_active],
-			DecMbLayerMbFieldDecoding    :[mb_field_decoding_flag]
+			DecMbLayerMbFieldDecoding    :[mb_field_decoding_flag],
+			DecMbLayerEntropyCodingMode  :[entropy_coding_mode_flag]
 		end
 
 

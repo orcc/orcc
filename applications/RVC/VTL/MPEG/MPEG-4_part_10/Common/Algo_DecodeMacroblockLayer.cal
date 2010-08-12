@@ -19,6 +19,7 @@ actor Algo_DecodeMacroblockLayer()
 	//Pps parameters
 	bool          Transform8x8Mode,
 	uint(size=5)  NumRefIdxLXActive,
+	bool          EntropyCodingMode,
 	//Sps parameters
 	uint(size=4)  BitDepthLuma,
 	uint(size=4)  BitDepthChroma,
@@ -40,7 +41,17 @@ actor Algo_DecodeMacroblockLayer()
 	bool          MbPredTransfSz8x8,
 	uint(size=2)  MbPredChromaArrayType,
 	uint(size=5)  MbPredNumRefIdxLXActive,
-	bool          MbPredMbFieldDecoding
+	bool          MbPredMbFieldDecoding,
+
+	//Residual Parameters
+	bool          ResEntropyCodingMode,
+	uint(size=4)  ResSliceType,
+	uint(size=6)  ResMbType,
+	bool          ResTransfSz8x8,
+	bool          ResBmFlag,
+	uint(size=4)  ResStartIdx,
+	uint(size=4)  ResEndIdx,
+	uint(size=6)  ResCodBlkPatnLm
 		:
 
 
@@ -102,6 +113,7 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=6)  CodedBlockPatternLuma          := 0;
 	uint(size=6)  CodedBlockPatternChroma        := 0;
 	int (size=32) mb_qp_delta                    := 0;
+	bool          entropy_coding_mode_flag;
 	//SliceData Parameters
 	uint(size=4)  slice_type;
 	uint(size=4)  bit_depth_luma;
@@ -131,7 +143,8 @@ actor Algo_DecodeMacroblockLayer()
 			Transform8x8Mode   :[ValTransform8x8Mode],
 			ChromaArrayType    :[ValChromaArrayType],
 			NumRefIdxLXActive  :[ValNumRefIdxLXActive] repeat 2,
-			MbFieldDecoding    :[ValMbFieldDecoding]
+			MbFieldDecoding    :[ValMbFieldDecoding],
+			EntropyCodingMode  :[ValEntropyCodingMode]
 				==>
 		do
 			mb_type                   := ValueOfVLD;
@@ -144,6 +157,7 @@ actor Algo_DecodeMacroblockLayer()
 			num_ref_idx_l0_active     := ValNumRefIdxLXActive[0];
 			num_ref_idx_l1_active     := ValNumRefIdxLXActive[1];
 			mb_field_decoding         := ValMbFieldDecoding;
+			entropy_coding_mode_flag  := ValEntropyCodingMode;
 
 			transform_size_8x8_flag        := false;
 			noSubMbPartSizeLessThan8x8Flag := true;
@@ -177,11 +191,13 @@ actor Algo_DecodeMacroblockLayer()
 			ValVLD       :[ValueOfVLD] repeat 256
 				==>
 		do
+			println("");
 			/* Forward to the output for the pcm decoding */
 			foreach int a in 0 .. 255
 			do
 				println("\t\tpcm_sample_luma[" + a + "] : " + ValueOfVLD[a]);
 			end
+			println("");
 		end
 
 	ReadPcmSampleLuma.Asked: action
@@ -208,6 +224,7 @@ actor Algo_DecodeMacroblockLayer()
 			do
 				println("\t\tpcm_sample_chroma1[" + a + "] : " + ValueOfVLD[a]);
 			end
+			println("");
 		end
 
 	ReadPcmSampleChroma.VComponent: action
@@ -219,6 +236,7 @@ actor Algo_DecodeMacroblockLayer()
 			do
 				println("\t\tpcm_sample_chroma2[" + a + "] : " + ValueOfVLD[a]);
 			end
+			println("");
 		end
 
 	LaunchSubMbPred: action
@@ -366,8 +384,17 @@ actor Algo_DecodeMacroblockLayer()
 
 	LaunchResidual: action
 				==>
-			SkipNal     :[  false   ],
-			LaunchActor :[ RESIDUAL ]
+			SkipNal              :[  false   ],
+			LaunchActor          :[ RESIDUAL ],
+
+			ResEntropyCodingMode :[entropy_coding_mode_flag],
+			ResSliceType         :[slice_type],
+			ResMbType            :[mb_type],
+			ResTransfSz8x8       :[transform_size_8x8_flag],
+			ResBmFlag            :[false],
+			ResStartIdx          :[0],
+			ResEndIdx            :[15],
+			ResCodBlkPatnLm      :[CodedBlockPatternLuma]
 		end
 
 	SendEndSliceHeader: action

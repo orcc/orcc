@@ -169,6 +169,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="DecodeResidual">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeResidual"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -369,4 +378,24 @@
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerMbFieldDecoding"/>
     <Connection dst="DecodeMbPred" dst-port="MbFieldDecoding"
         src="DecodeMacroBlockLayer" src-port="MbPredMbFieldDecoding"/>
+    <Connection dst="DecodePic" dst-port="ResSkipNal"
+        src="DecodeResidual" src-port="SkipNal"/>
+    <Connection dst="DecodePic" dst-port="ResLaunchActor"
+        src="DecodeResidual" src-port="LaunchActor"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="EntropyCodingMode"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerEntropyCodingMode"/>
+    <Connection dst="DecodeResidual" dst-port="EntropyCodingMode"
+        src="DecodeMacroBlockLayer" src-port="ResEntropyCodingMode"/>
+    <Connection dst="DecodeResidual" dst-port="SliceType"
+        src="DecodeMacroBlockLayer" src-port="ResSliceType"/>
+    <Connection dst="DecodeResidual" dst-port="MbType"
+        src="DecodeMacroBlockLayer" src-port="ResMbType"/>
+    <Connection dst="DecodeResidual" dst-port="TransfSz8x8"
+        src="DecodeMacroBlockLayer" src-port="ResTransfSz8x8"/>
+    <Connection dst="DecodeResidual" dst-port="BmFlag"
+        src="DecodeMacroBlockLayer" src-port="ResBmFlag"/>
+    <Connection dst="DecodeResidual" dst-port="StartIdx"
+        src="DecodeMacroBlockLayer" src-port="ResStartIdx"/>
+    <Connection dst="DecodeResidual" dst-port="EndIdx"
+        src="DecodeMacroBlockLayer" src-port="ResEndIdx"/>
 </XDF>

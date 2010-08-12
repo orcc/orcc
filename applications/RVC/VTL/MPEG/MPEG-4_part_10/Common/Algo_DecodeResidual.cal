@@ -1,0 +1,167 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+actor Algo_DecodeResidual()
+	bool          EntropyCodingMode,
+	uint(size=4)  SliceType,
+	uint(size=6)  MbType,
+	bool          TransfSz8x8,
+	uint(size=6)  CodBlkPatnLm,
+
+	bool         BmFlag,
+	uint(size=4) StartIdx,
+	uint(size=4) EndIdx
+		==>
+	bool         SkipNal,
+	uint(size=4) LaunchActor
+		:
+
+	//FixMe : it should be a constant !!
+	bool         CAVLC_ENTROPY := false;
+//	bool         CABAC_ENTROPY = true;
+
+	uint(size=4) RESIDUAL_BLOCK_CAVLC = 8;
+	uint(size=4) RESIDUAL_BLOCK_CABAC = 9;
+
+//	uint(size=4) SLICE_TYPE_P  = 0;
+//	uint(size=4) SLICE_TYPE_B  = 1;
+	uint(size=4) SLICE_TYPE_I  = 2;
+//	uint(size=4) SLICE_TYPE_SP = 3;
+	uint(size=4) SLICE_TYPE_SI = 4;
+
+
+//	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
+	uint(size=6) BLOCK_TYPE_INTA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTA_16x16_MAX = 24;
+//	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
+
+
+	bool         bmFlag;
+	uint(size=4) startIdx;
+	uint(size=4) endIdx;
+
+	bool         entropy_coding_mode_flag;
+	uint(size=4) slice_type;
+	uint(size=6) mb_type;
+	bool         transform_size_8x8_flag;
+	uint(size=6) CodedBlockPatternLuma;
+
+	uint(size=3) i8x8Loop;
+	uint(size=3) i4x4Loop;
+	uint(size=3) iLoop;
+
+	GetParameters: action
+			EntropyCodingMode :[TypeOfEntropy],
+			BmFlag            :[ValBmFlag],
+			StartIdx          :[ValStartIdx],
+			EndIdx            :[ValEndIdx],
+			SliceType         :[ValSliceType],
+			MbType            :[ValMbType],
+			TransfSz8x8       :[ValTransfSz8x8],
+			CodBlkPatnLm      :[ValCodBlkPatnLm]
+				==>
+		do
+			bmFlag                   := ValBmFlag;
+			entropy_coding_mode_flag := TypeOfEntropy;
+			startIdx                 := ValStartIdx;
+			endIdx                   := ValEndIdx;
+			slice_type               := ValSliceType;
+			mb_type                  := ValMbType;
+			transform_size_8x8_flag  := ValTransfSz8x8;
+			CodedBlockPatternLuma    := ValCodBlkPatnLm;
+		end
+	ResLuma_Launch16x16DCResBlockCavlc: action
+				==>
+			LaunchActor :[ActorSelected],
+			SkipNal     :[    false    ]
+		guard
+			bmFlag   = false,
+			startIdx = 0,
+			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI),
+			mb_type <= BLOCK_TYPE_INTA_16x16_MAX,
+			mb_type >= BLOCK_TYPE_INTA_16x16_MIN
+		var
+			uint(size=4) ActorSelected
+		do
+			ActorSelected :=
+				if(entropy_coding_mode_flag = CAVLC_ENTROPY)then
+					RESIDUAL_BLOCK_CAVLC
+				else
+					RESIDUAL_BLOCK_CABAC
+				end;
+		end
+
+	ResLuma_InitLoopVar: action
+				==>
+		do
+			i8x8Loop := 0;
+			i4x4Loop := 0;
+			iLoop    := 0;
+		end
+
+	ResLuma_CheckTransfSzAndCavlc: action ==>
+		guard
+			   transform_size_8x8_flag  = false
+			or entropy_coding_mode_flag = CAVLC_ENTROPY
+		end
+
+	ResLuma_CheckCodedBlockPattern: action ==>
+		guard
+			bitand(CodedBlockPatternLuma,1)
+		end
+
+	ResLuma_CheckBmFlagAndEndIdxAndMbType: action ==>
+		guard
+			bmFlag = false,
+			endIdx > 0,
+			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI),
+			mb_type <= BLOCK_TYPE_INTA_16x16_MAX,
+			mb_type >= BLOCK_TYPE_INTA_16x16_MIN
+		end
+
+	ResLuma_CheckBmFlagAndMbType: action ==>
+		guard
+			bmFlag = false,
+			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI),
+			mb_type <= BLOCK_TYPE_INTA_16x16_MAX,
+			mb_type >= BLOCK_TYPE_INTA_16x16_MIN
+		end
+
+	ResLuma_CheckCavlc8x8: action ==>
+		guard
+			entropy_coding_mode_flag = CAVLC_ENTROPY,
+			transform_size_8x8_flag  = true
+		end
+
+	/*Not implemented yet: CABAC
+	else
+		for(i8x8=0;i8x8<4;i8x8++)
+			if(CodeBlockPatternLuma & (1<<i8x8)) // ==> action CheckCodedBlockPattern
+				residual_block(...);
+			else
+				for(i=0;i<64;i++)
+					level8x8[i8x8][i]=0;
+*/
+
+	a:action ==>
+	do
+		println("DecodeResidual not finished yet !");
+	end
+
+	schedule fsm GetParameters:
+		GetParameters (GetParameters )--> a;
+	a(a)-->undefined;
+	end
+end
