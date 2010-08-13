@@ -80,7 +80,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_IS"/>
+        <Class name="../../../VTL/Proprietary/E__/E___Algo_IS"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
