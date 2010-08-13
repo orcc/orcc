@@ -144,15 +144,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 							TypeList typeList = (TypeList) type;
 							Type lub = checker.getLub(pattern.getPort()
 									.getIrType(), typeList.getType());
-							if (lub != null && typeList.getSize() == repeat) {
+							if (lub != null && typeList.getSize() >= repeat) {
 								continue;
 							}
 						}
 
-						error("this expression must be of type List(type:"
+						error("this expression must be of type List of "
 								+ pattern.getPort().getIrType().toString()
-								+ ", size=" + repeat + ")", value,
-								CalPackage.AST_EXPRESSION);
+								+ " with a size greater than or equal to "
+								+ repeat, value, CalPackage.AST_EXPRESSION);
 					}
 				}
 			}
