@@ -95,13 +95,13 @@ import org.jgrapht.graph.DirectedSubgraph;
  */
 public class ActorMerger implements INetworkTransformation {
 
-	private class ModifyAccess extends AbstractActorTransformation {
+	private class ModifyAccessAsRingBuffer extends AbstractActorTransformation {
 
 		private OrderedMap<String, StateVariable> stateVars;
 
 		private String id;
 
-		public ModifyAccess(String id) {
+		public ModifyAccessAsRingBuffer(String id) {
 			this.id = id;
 		}
 
@@ -120,8 +120,10 @@ public class ActorMerger implements INetworkTransformation {
 
 			indexes = new ArrayList<Expression>(0);
 			use = new Use(varCount);
-			Store store = new Store(varCount, indexes, getExpr(varCount, 1,
-					((TypeList) var.getType()).getSize()));
+			Store store = new Store(varCount, indexes, new BinaryExpr(
+					new BinaryExpr(new VarExpr(new Use(varCount)),
+							BinaryOp.PLUS, new IntExpr(1), null), BinaryOp.MOD,
+					new IntExpr(((TypeList) var.getType()).getSize()), null));
 			use.setNode(store);
 
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
@@ -179,21 +181,6 @@ public class ActorMerger implements INetworkTransformation {
 	private Actor actor;
 
 	/**
-	 * Converts a given action into a procedure
-	 * 
-	 * @param action
-	 */
-	private Procedure convertAction(String id, Action action) {
-		OrderedMap<String, Variable> parameters = new OrderedMap<String, Variable>();
-		OrderedMap<String, Variable> locals = action.getBody().getLocals();
-		List<CFGNode> nodes = action.getBody().getNodes();
-
-		return new Procedure(id + "_" + action.getName(), false,
-				new Location(), IrFactory.eINSTANCE.createTypeVoid(),
-				parameters, locals, nodes);
-	}
-
-	/**
 	 * Creates the static action for this actor.
 	 * 
 	 * @return a static action
@@ -201,22 +188,17 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private Action createAction() throws OrccException {
 		Pattern inputPattern = new Pattern();
-		Pattern outputPattern = new Pattern();
-
 		for (Port port : actor.getInputs()) {
 			inputPattern.put(port, port.getNumTokensConsumed());
 		}
 
+		Pattern outputPattern = new Pattern();
 		for (Port port : actor.getOutputs()) {
 			outputPattern.put(port, port.getNumTokensProduced());
 		}
 
-		Procedure scheduler = createScheduler();
-
-		Procedure body = createBody();
-
 		return new Action(new Location(), new Tag(), inputPattern,
-				outputPattern, scheduler, body);
+				outputPattern, createScheduler(), createBody());
 	}
 
 	/**
@@ -429,13 +411,20 @@ public class ActorMerger implements INetworkTransformation {
 				Procedure proc;
 				if (instance.getActor().getActions().size() == 1) {
 					Action action = instance.getActor().getActions().get(0);
-					proc = convertAction(instance.getId(), action);
+
+					proc = new Procedure(instance.getId() + "_"
+							+ action.getName(), false, new Location(),
+							IrFactory.eINSTANCE.createTypeVoid(),
+							new OrderedMap<String, Variable>(), action
+									.getBody().getLocals(), action.getBody()
+									.getNodes());
+
 					actor.getProcs().put(proc.getName(), proc);
 				} else {
 					throw new OrccException(
 							"SDF actor with multiple actions is not yet supported!");
 				}
-				new ModifyAccess(instance.getId()).transform(actor);
+				new ModifyAccessAsRingBuffer(instance.getId()).transform(actor);
 
 				BlockNode blkNode = BlockNode.getLast(procedure, nodes);
 
@@ -444,15 +433,14 @@ public class ActorMerger implements INetworkTransformation {
 			} else {
 				Schedule sched = iterand.getSchedule();
 
-				LocalVariable loopVar = null;
-				if (indexes.size() <= depth) {
+				OrderedMap<String, Variable> locals = procedure.getLocals();
+				LocalVariable loopVar = (LocalVariable) locals.get("idx_"
+						+ depth);
+				if (loopVar == null) {
 					loopVar = new LocalVariable(true, 0, new Location(), "idx_"
 							+ depth, IrFactory.eINSTANCE.createTypeInt(32));
 					indexes.add(loopVar);
-					procedure.getLocals().put(loopVar.getName(), loopVar);
-				} else {
-					loopVar = (LocalVariable) procedure.getLocals().get(
-							"idx_" + depth);
+					locals.put(loopVar.getName(), loopVar);
 				}
 
 				// Reset loop counter
@@ -482,13 +470,6 @@ public class ActorMerger implements INetworkTransformation {
 
 			}
 		}
-	}
-
-	private Expression getExpr(Variable data, int offset, int modulo) {
-		Expression expr = new BinaryExpr(new BinaryExpr(new VarExpr(new Use(
-				data)), BinaryOp.PLUS, new IntExpr(offset), null),
-				BinaryOp.MOD, new IntExpr(modulo), null);
-		return expr;
 	}
 
 	/**
@@ -551,10 +532,11 @@ public class ActorMerger implements INetworkTransformation {
 				Port port = new Port(tgtPort);
 				port.setName("_input_" + index);
 				port.increaseTokenConsumption(tgtPort.getNumTokensConsumed());
-				inputPorts.put(connection, port);
-
 				actor.getInputs().put(port.getName(), port);
 				index++;
+
+				// fill the map for the later update of connections
+				inputPorts.put(connection, port);
 			}
 		}
 	}
@@ -572,10 +554,12 @@ public class ActorMerger implements INetworkTransformation {
 				Port port = new Port(srcPort);
 				port.setName("_output_" + index);
 				port.increaseTokenProduction(srcPort.getNumTokensProduced());
-				outputPorts.put(connection, port);
-
 				actor.getOutputs().put(port.getName(), port);
 				index++;
+
+				// fill the map for the later update of connections
+				outputPorts.put(connection, port);
+
 			}
 		}
 	}
@@ -583,13 +567,15 @@ public class ActorMerger implements INetworkTransformation {
 	/**
 	 * Tries to merge actors.
 	 * 
-	 * @return <code>true</code> if actors were merged, <code>false</code>
-	 *         otherwise
 	 * @throws OrccException
 	 */
 	private void mergeActors(Set<Vertex> vertices) throws OrccException {
 		createActor(vertices);
-		Vertex mergeVertex = new Vertex(new Instance(actor.getName(), actor));
+		Instance instance = new Instance(actor.getName(), actor);
+		Object[] v = vertices.toArray();
+		instance.getAttributes().putAll(
+				((Vertex) v[0]).getInstance().getAttributes());
+		Vertex mergeVertex = new Vertex(instance);
 		graph.addVertex(mergeVertex);
 		updateConnection(mergeVertex, vertices);
 		graph.removeAllVertices(vertices);
@@ -606,6 +592,8 @@ public class ActorMerger implements INetworkTransformation {
 
 			scheduler = new FlatSASScheduler(subgraph);
 
+			new MatrixChainTransformation(subgraph).transform(scheduler
+					.getSchedule());
 			for (Vertex vertex : vertices) {
 				Actor actor = vertex.getInstance().getActor();
 				new RemoveReadWrites().transform(actor);

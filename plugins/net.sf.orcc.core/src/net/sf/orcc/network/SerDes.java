@@ -63,4 +63,12 @@ public class SerDes {
 		return numOutputs;
 	}
 
+	public void setNumInputs(int numInputs) {
+		this.numInputs = numInputs;
+	}
+
+	public void setNumOutputs(int numOutputs) {
+		this.numOutputs = numOutputs;
+	}
+
 }

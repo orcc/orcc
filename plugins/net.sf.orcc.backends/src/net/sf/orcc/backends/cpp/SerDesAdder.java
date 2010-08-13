@@ -38,6 +38,7 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.network.Broadcast;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
@@ -45,6 +46,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.SerDes;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
+import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -62,6 +64,12 @@ public class SerDesAdder {
 	private DirectedGraph<Vertex, Connection> graph;
 
 	private Set<Connection> toBeRemoved = new HashSet<Connection>();
+
+	private Map<IAttribute, Integer> numInputs = new HashMap<IAttribute, Integer>();
+
+	private Map<IAttribute, Integer> numOutputs = new HashMap<IAttribute, Integer>();
+
+	private Map<IAttribute, Vertex> serdesMap = new HashMap<IAttribute, Vertex>();
 
 	private void createIncomingConnection(Connection connection, Vertex vertex,
 			Vertex vertexBCast) {
@@ -173,16 +181,50 @@ public class SerDesAdder {
 		OrderedMap<String, Port> outputs = network.getOutputs();
 
 		if (inputs.getLength() > 0 || outputs.getLength() > 0) {
-			Vertex serdes = new Vertex(new Instance("SerDes", new SerDes(
-					inputs.getLength(), outputs.getLength())));
+			// Vertex serdes = new Vertex(new Instance("SerDes", new SerDes(
+			// inputs.getLength(), outputs.getLength())));
 
-			graph.addVertex(serdes);
+			for (Connection conn : graph.edgeSet()) {
+				if (graph.getEdgeSource(conn).isPort()) {
+					IAttribute attr = conn.getAttribute("busRef");
+					if (numOutputs.containsKey(attr)) {
+						Vertex v = serdesMap.get(attr);
+						SerDes serdes = v.getInstance().getWrapper();
+						int out = serdes.getNumOutputs();
+						serdes.setNumOutputs(out++);
+					} else {
+						IValueAttribute valAttr = (IValueAttribute) attr;
+						StringExpr expr = (StringExpr) valAttr.getValue();
+						Vertex serdes = new Vertex(new Instance("SerDes"
+								+ expr.getValue(), new SerDes(0, 1)));
+						serdesMap.put(attr, serdes);
+					}
+				}
+
+				if (graph.getEdgeTarget(conn).isPort()) {
+					IAttribute attr = conn.getAttribute("busRef");
+					if (numInputs.containsKey(attr)) {
+						Vertex v = serdesMap.get(attr);
+						SerDes serdes = v.getInstance().getWrapper();
+						int in = serdes.getNumInputs();
+						serdes.setNumOutputs(in++);
+					} else {
+						IValueAttribute valAttr = (IValueAttribute) attr;
+						StringExpr expr = (StringExpr) valAttr.getValue();
+						Vertex serdes = new Vertex(new Instance("SerDes"
+								+ expr.getValue(), new SerDes(1, 0)));
+						serdesMap.put(attr, serdes);
+					}
+				}
+			}
+			// graph.addVertex(serdes);
 
 			Set<Vertex> vertexToRemove = new HashSet<Vertex>();
 
 			for (Vertex vertex : graph.vertexSet()) {
 				if (vertex.isPort()) {
 					Port port = vertex.getPort();
+
 					if (outputs.contains(port.getName())) {
 						Set<Connection> conns = graph.incomingEdgesOf(vertex);
 
@@ -197,7 +239,8 @@ public class SerDesAdder {
 							Connection incoming = new Connection(srcPort,
 									tgtPort, connection.getAttributes());
 							Vertex vSrc = graph.getEdgeSource(connection);
-							graph.addEdge(vSrc, serdes, incoming);
+							graph.addEdge(vSrc, serdesMap.get(connection
+									.getAttribute("busRef")), incoming);
 
 							vertexToRemove.add(vertex);
 							outputs.remove(port.getName());
@@ -213,7 +256,8 @@ public class SerDesAdder {
 						Vertex vTgt = graph.getEdgeTarget(connection);
 						Connection outgoing = new Connection(srcPort, tgtPort,
 								connection.getAttributes());
-						graph.addEdge(serdes, vTgt, outgoing);
+						graph.addEdge(serdesMap.get(connection
+								.getAttribute("busRef")), vTgt, outgoing);
 						vertexToRemove.add(vertex);
 						inputs.remove(port.getName());
 
@@ -224,13 +268,16 @@ public class SerDesAdder {
 							vTgt = graph.getEdgeTarget(connection);
 							Connection newOutgoing = new Connection(srcPort,
 									tgtPort, connection.getAttributes());
-							graph.addEdge(serdes, vTgt, newOutgoing);
+							graph.addEdge(serdesMap.get(connection
+									.getAttribute("busRef")), vTgt, newOutgoing);
 						}
 					}
 				}
 			}
 
-			examineVertex(serdes);
+			for (Vertex serdes : serdesMap.values()) {
+				examineVertex(serdes);
+			}
 			graph.removeAllVertices(vertexToRemove);
 			graph.removeAllEdges(toBeRemoved);
 		}
