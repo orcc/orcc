@@ -42,8 +42,8 @@ actor Algo_DecodeRefPicList_Frext()
 
 
 
-	bool direct_spatial_mv_pred_flag := 0;
-	bool num_ref_idx_active_override_flag := 0;
+	bool direct_spatial_mv_pred_flag := false;
+	bool num_ref_idx_active_override_flag := false;
 	uint(size=5) num_ref_idx_l0_active := 0;
 	uint(size=5) num_ref_idx_l1_active := 0;
 	bool         ref_pic_list_reordering_flag;

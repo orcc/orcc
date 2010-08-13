@@ -119,7 +119,7 @@ actor Algo_DecodeResidual()
 
 	ResLuma_CheckCodedBlockPattern: action ==>
 		guard
-			bitand(CodedBlockPatternLuma,1)
+			bitand(CodedBlockPatternLuma,1) = 1
 		end
 
 	ResLuma_CheckBmFlagAndEndIdxAndMbType: action ==>
