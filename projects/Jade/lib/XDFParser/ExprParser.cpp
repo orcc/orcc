@@ -111,8 +111,7 @@ ConstantInt* ExprParser::parseExprLiteral(xmlNode* element){
 	ConstantInt* expression = NULL;
 	
 	if (xmlStrcmp(kind, (const xmlChar *)"Boolean")==0) {
-		fprintf(stderr,"Booleans not supPorted yet");
-		exit(0);
+		return parseBoolean(value);	
 	} else if (xmlStrcmp(kind, (const xmlChar *)"Character")==0) {
 		fprintf(stderr,"Characters not supported yet");
 		exit(0);
@@ -154,6 +153,17 @@ Constant* ExprParser::parseExprBinOpSeq(xmlNode* element){
 	exprs.push_back(expression);
 	
 	return ConstantExpr::getMul(exprs.front(), exprs.back());
+}
+
+ConstantInt* ExprParser::parseBoolean(const xmlChar* value){
+	if (xmlStrcmp(value, (const xmlChar *)"true")==0) {
+		return ConstantInt::get(IntegerType::get(Context,1),1);
+	}else if (xmlStrcmp(value, (const xmlChar *)"false")==0) {
+		return ConstantInt::get(IntegerType::get(Context,1), 0);
+	}
+	
+	fprintf(stderr,"Expected a boolean value");
+	exit(0);
 }
 
 BinaryOp* ExprParser::parseExprBinaryOp(xmlNode* element){

@@ -137,6 +137,18 @@ private:
      */
 	BinaryOp* parseExprBinaryOp(xmlNode* element);
 
+	/*!
+     *  @brief Parses the given xmlChar as a boolean constant.
+     *
+	 * Parses the given xmlChar as a boolean constant and returns the corresponding 
+	 *  llvm::constantInt value.
+	 *
+	 *  @param value : xmlChar to parse.
+	 *
+	 *  @return  the corresponding llvm::constantInt value.
+     */
+	llvm::ConstantInt* parseBoolean(const xmlChar* value);
+
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 };
