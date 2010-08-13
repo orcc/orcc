@@ -244,8 +244,8 @@ actor Algo_Synp_MPEG_4 (
 
   // The vol width and height in units of macroblocks, ie. the pixel w/h divided by 16.
   // Note: there is no provision in the model for pixel sizes that are no multiples of 16.
-  int(size=MB_COORD_SZ) vol_width;
-  int(size=MB_COORD_SZ) vol_height;
+  int(size=16) vol_width;
+  int(size=16) vol_height;
 
   set_vol_width: action ==>
   guard
