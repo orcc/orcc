@@ -347,8 +347,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		block = store.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = store.getValue();
-		Variable target = store.getTarget();
-		Type targetType = target.getType();
 
 		// Check indexes
 		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
@@ -358,25 +356,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		visitExpressions(store.getIndexes(), it, types);
 		it.previous();
 
-		// Check store value
-		if (targetType.isBool()) {
-			store.setValue(visitExpression(value, it,
-					IrFactory.eINSTANCE.createTypeBool()));
-		} else if (targetType.isList()) {
-			TypeList exprtype = (TypeList) targetType;
-			if (exprtype.getElementType().isBool()) {
-				store.setValue(visitExpression(value, it,
-						IrFactory.eINSTANCE.createTypeBool()));
-			} else {
-				store.setValue(visitExpression(value, it,
-						IrFactory.eINSTANCE.createTypeInt(32)));
 
-			}
-		} else {
-			store.setValue(visitExpression(value, it,
-					IrFactory.eINSTANCE.createTypeInt(32)));
-		}
-
+		store.setValue(visitExpression(value, it, value.getType()));
 		it.next();
 	}
 
