@@ -195,9 +195,10 @@ public class SerDesAdder {
 					} else {
 						IValueAttribute valAttr = (IValueAttribute) attr;
 						StringExpr expr = (StringExpr) valAttr.getValue();
-						Vertex serdes = new Vertex(new Instance("SerDes"
+						Vertex serdes = new Vertex(new Instance("SerDes_"
 								+ expr.getValue(), new SerDes(0, 1)));
 						serdesMap.put(attr, serdes);
+						graph.addVertex(serdes);
 					}
 				}
 
@@ -211,13 +212,13 @@ public class SerDesAdder {
 					} else {
 						IValueAttribute valAttr = (IValueAttribute) attr;
 						StringExpr expr = (StringExpr) valAttr.getValue();
-						Vertex serdes = new Vertex(new Instance("SerDes"
+						Vertex serdes = new Vertex(new Instance("SerDes_"
 								+ expr.getValue(), new SerDes(1, 0)));
 						serdesMap.put(attr, serdes);
+						graph.addVertex(serdes);
 					}
 				}
 			}
-			// graph.addVertex(serdes);
 
 			Set<Vertex> vertexToRemove = new HashSet<Vertex>();
 
