@@ -7,7 +7,7 @@ fifoName(port) ::= <<
 >>
 
 fifo(port) ::= <<
-@$port.name$ = constant $fifoName(port)$ null
+@$port.name$ = global $fifoName(port)$ null
 
 >>
 
