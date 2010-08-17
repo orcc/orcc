@@ -80,11 +80,16 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 					stimulusFile, process);
 		} else if ("Display".equals(actorIR.getName())) {
 			simuActorInstance = new InterpreterSimuDisplay(instanceId, process);
+		} else if ("ReadImage".equals(actorIR.getName())) {
+			simuActorInstance = new InterpreterSimuReadImage(instanceId, stimulusFile, process);
+		} else if ("DisplayImage".equals(actorIR.getName())) {
+			simuActorInstance = new InterpreterSimuDisplayImage(instanceId, process);
 		} else {
 			// Generic simulator actor
 			simuActorInstance = new InterpreterSimuActor(instanceId,
 					actorParameters, actorIR, vtlFolder, process);
 		}
+		
 		return simuActorInstance;
 	}
 

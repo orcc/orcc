@@ -12,20 +12,20 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="img_read">
+    <Instance id="ReadImage">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../VTL/System/ImgRead"/>
+        <Class name="../../VTL/System/ReadImage"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="img_display">
+    <Instance id="DisplayImage">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../VTL/System/ImgDisplay"/>
+        <Class name="../../VTL/System/DisplayImage"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -60,24 +60,15 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="img_display" dst-port="WIDTH" src="img_read" src-port="WIDTH">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="1"/>
-        </Attribute>
-    </Connection>
-    <Connection dst="img_display" dst-port="HEIGHT" src="img_read" src-port="HEIGHT">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="1"/>
-        </Attribute>
-    </Connection>
-    <Connection dst="rgb2y" dst-port="RED" src="img_read" src-port="RED"/>
-    <Connection dst="rgb2y" dst-port="GREEN" src="img_read" src-port="GREEN"/>
-    <Connection dst="rgb2y" dst-port="BLUE" src="img_read" src-port="BLUE"/>
-    <Connection dst="img_display" dst-port="RED" src="y2rgb" src-port="RED"/>
-    <Connection dst="img_display" dst-port="GREEN" src="y2rgb" src-port="GREEN"/>
-    <Connection dst="img_display" dst-port="BLUE" src="y2rgb" src-port="BLUE"/>
-    <Connection dst="sobel" dst-port="WIDTH" src="img_read" src-port="WIDTH"/>
-    <Connection dst="sobel" dst-port="HEIGHT" src="img_read" src-port="HEIGHT"/>
+    <Connection dst="DisplayImage" dst-port="SizeOfImage"
+        src="ReadImage" src-port="SizeOfImage"/>
+    <Connection dst="rgb2y" dst-port="RED" src="ReadImage" src-port="R"/>
+    <Connection dst="rgb2y" dst-port="GREEN" src="ReadImage" src-port="G"/>
+    <Connection dst="rgb2y" dst-port="BLUE" src="ReadImage" src-port="B"/>
     <Connection dst="sobel" dst-port="Y" src="rgb2y" src-port="Y"/>
+    <Connection dst="DisplayImage" dst-port="R" src="y2rgb" src-port="RED"/>
+    <Connection dst="DisplayImage" dst-port="G" src="y2rgb" src-port="GREEN"/>
+    <Connection dst="DisplayImage" dst-port="B" src="y2rgb" src-port="BLUE"/>
+    <Connection dst="sobel" dst-port="SizeOfImage" src="ReadImage" src-port="SizeOfImage"/>
     <Connection dst="y2rgb" dst-port="Y" src="sobel" src-port="GRADIENT"/>
 </XDF>
