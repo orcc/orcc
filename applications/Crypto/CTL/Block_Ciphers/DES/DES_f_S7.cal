@@ -43,7 +43,7 @@
 	];
 
 	DES_f_S7:
-	// Orcc has a bug to handle 2-D list, so that the following code does not work.
+	// Orcc has a bug to handle list of lists, so that the following code does not work.
 	// action IP:[bits] repeat 6 ==> OP:[ S[v] ] repeat 4
 	action IP:[bits] repeat 6 ==> OP:[ [S[v][i]: for int i in 0 .. 3] ] repeat 4 
 	var 
