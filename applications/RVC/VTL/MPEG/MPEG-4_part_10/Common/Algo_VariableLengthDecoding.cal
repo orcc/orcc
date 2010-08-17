@@ -2178,25 +2178,31 @@ actor Algo_VariableLengthDecoding()
 //			println("\tUValue:"+ReadValue);
 		end
 
+
 	GetCavlcCoeffToken.Launch: action ==>
+		var
+			//delete me!
+			bool titi
 		do
 			coeff_token     := lshift(coeff_token, 1);
 			coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
-			println("Cavlc bit1:"+mask_bits(rshift(WorkingByte,7),1));
+//			println("Cavlc bit1:"+mask_bits(rshift(WorkingByte,7),1));
 			WorkingByte     := lshift(WorkingByte,1);
 			CountBufferRbsp := CountBufferRbsp - 1;
 			NbBitsRead      := NbBitsRead + 1;
-			while((TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)] = false) and (CountBufferRbsp > 0))
+			titi := TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)];
+			while((titi = false) and (CountBufferRbsp > 0))
 			do
 				coeff_token     := lshift(coeff_token, 1);
 				coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
-			println("Cavlc bit:"+mask_bits(rshift(WorkingByte,7),1));
+//			println("Cavlc bit:"+mask_bits(rshift(WorkingByte,7),1));
 				WorkingByte     := lshift(WorkingByte,1);
 				CountBufferRbsp := CountBufferRbsp - 1;
 				NbBitsRead      := NbBitsRead + 1;
-				if(TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)] = true)then
+/*				if(TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)] = true)then
 					println("youpi!");
-				end
+				end*/
+				titi := TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)];
 			end
 		end
 
