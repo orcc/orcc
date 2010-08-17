@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="ARC4" x="278" y="126"/>
-      <vertex id="Source_ARC4" x="86" y="160"/>
-      <vertex id="Validator_ARC4" x="495" y="160"/>
-   </vertices>
-</layout>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="Source" x="112" y="111"/>
-      <vertex id="Validator" x="513" y="151"/>
-      <vertex id="AES_CFB128_Decipher" x="278" y="111"/>
-   </vertices>
-</layout>
