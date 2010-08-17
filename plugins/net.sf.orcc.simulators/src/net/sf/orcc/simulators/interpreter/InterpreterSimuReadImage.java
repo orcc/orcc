@@ -45,12 +45,12 @@ import net.sf.orcc.simulators.SimuActor;
 public class InterpreterSimuReadImage extends AbstractInterpreterSimuActor
 		implements SimuActor {
 
-	private Actor_ReadImage source;
+	private Actor_ReadImage readImage;
 	private String instanceId;
 
 	public InterpreterSimuReadImage(String instanceId, String intputFile,
 			OrccProcess process) {
-		this.source = new Actor_ReadImage(intputFile);
+		this.readImage = new Actor_ReadImage(intputFile);
 		this.instanceId = instanceId;
 	}
 
@@ -91,19 +91,19 @@ public class InterpreterSimuReadImage extends AbstractInterpreterSimuActor
 
 	@Override
 	public void initialize() {
-		source.initialize();
+		readImage.initialize();
 	}
 
 	@Override
 	public int runAllSchedulableAction() {
-		int status = source.schedule();
+		int status = readImage.schedule();
 		nbOfFirings += status;
 		return status;
 	}
 
 	@Override
 	public int runNextSchedulableAction() {
-		int status = source.schedule();
+		int status = readImage.schedule();
 		nbOfFirings += status;
 		return status;
 	}
@@ -115,6 +115,6 @@ public class InterpreterSimuReadImage extends AbstractInterpreterSimuActor
 
 	@Override
 	public void setFifo(Port port, Fifo fifo) {
-		source.setFifo(port.getName(), fifo);
+		readImage.setFifo(port.getName(), fifo);
 	}
 }

@@ -47,7 +47,7 @@ import net.sf.orcc.simulators.SimuActor;
 public class InterpreterSimuDisplayImage extends AbstractInterpreterSimuActor
 		implements SimuActor {
 
-	private Actor_DisplayImage display;
+	private Actor_DisplayImage displayImage;
 	private String instanceId;
 	
 	public class DisplayOutputStreamProxy implements OutputStreamProxy {
@@ -68,8 +68,8 @@ public class InterpreterSimuDisplayImage extends AbstractInterpreterSimuActor
 	}
 	
 	public InterpreterSimuDisplayImage(String instanceId, OrccProcess process) {
-		this.display = new Actor_DisplayImage();
-		Actor_Display.setOutputStreamProxy(new DisplayOutputStreamProxy(process));
+		this.displayImage = new Actor_DisplayImage();
+		Actor_DisplayImage.setOutputStreamProxy(new DisplayOutputStreamProxy(process));
 		this.instanceId = instanceId;
 	}
 
@@ -115,14 +115,14 @@ public class InterpreterSimuDisplayImage extends AbstractInterpreterSimuActor
 
 	@Override
 	public int runAllSchedulableAction() {
-		int status = display.schedule();
+		int status = displayImage.schedule();
 		nbOfFirings += status;
 		return status;
 	}
 
 	@Override
 	public int runNextSchedulableAction() {
-		int status = display.schedule();
+		int status = displayImage.schedule();
 		nbOfFirings += status;
 		return status;
 	}
@@ -134,7 +134,7 @@ public class InterpreterSimuDisplayImage extends AbstractInterpreterSimuActor
 
 	@Override
 	public void setFifo(Port port, Fifo fifo) {
-		display.setFifo(port.getName(), fifo);
+		displayImage.setFifo(port.getName(), fifo);
 	}
 
 }
