@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="DES_Decipher_testbed">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Source_DES_Decipher"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Decipher">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../CTL/Block_Ciphers/DES/DES_Decipher"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Validator">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../System/Validator_8B"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP3_GR"/>
+    <Connection dst="Validator" dst-port="IP1_Data" src="Decipher" src-port="Plaintext"/>
+    <Connection dst="Decipher" dst-port="Ciphertext" src="Source" src-port="OP1_CT"/>
+    <Connection dst="Decipher" dst-port="Key" src="Source" src-port="OP2_Key"/>
+</XDF>

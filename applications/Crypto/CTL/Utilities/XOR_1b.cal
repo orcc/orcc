@@ -1,0 +1,28 @@
+/**
+ * This FU is part of the testbed of the Cryptographic Tool Library (CTL) utilities.
+ * It performs XOR of two input sequences of byte tokens.
+ * 
+ * FU ID: XOR_1b
+ * One constant
+ *   1) NUM_TOKENS: number of tokens processed at one time (default: 32)
+ * Three input ports:
+ *   1) uint(size=1) IP1: the first input
+ *   2) uint(size=1) IP2: the second input
+ * One output port:
+ *   1) uint(size=1) OP: the output
+ * 
+ * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
+ */
+
+actor XOR_1b () uint(size=TOKEN_SIZE) IP1, uint(size=TOKEN_SIZE) IP2 ==> uint(size=TOKEN_SIZE) OP:
+
+	int TOKEN_SIZE = 1;
+	int NUM_TOKENS = 32;
+	
+	int NUM_TOKENS_1 = NUM_TOKENS - 1;
+	
+	// Processing multiple bit tokens in a single actor seems to enhance efficiency. 
+	action IP1:[x1] repeat NUM_TOKENS, IP2:[x2] repeat NUM_TOKENS
+		==> OP:[ [x1[i] ^ x2[i] : for int i in 0 .. NUM_TOKENS_1] ] repeat NUM_TOKENS end
+
+end

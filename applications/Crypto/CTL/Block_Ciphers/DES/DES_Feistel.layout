@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Input" x="34" y="119"/>
+      <vertex id="Keys" x="483" y="236"/>
+      <vertex id="Output" x="674" y="119"/>
+      <vertex id="Demux" x="137" y="99"/>
+      <vertex id="Mux" x="484" y="99"/>
+      <vertex id="Manager" x="263" y="99"/>
+      <vertex id="f" x="540" y="285"/>
+      <vertex id="XOR" x="656" y="161"/>
+   </vertices>
+</layout>

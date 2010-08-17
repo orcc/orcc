@@ -1,0 +1,39 @@
+/**
+ * This FU is part of a CAL implementation of DES (FIPS 46-3).
+ * It serves as permutation function P inside DES cipher function 'f'.
+ * 
+ * FU ID: DES_f_P
+ * One input port:
+ * 	 1) uint(size=1) IP 
+ * One output port:
+ * 	 1) uint(size=1) OP
+ *
+ * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
+ */
+ 
+actor DES_f_P () uint(size=1) IP ==> uint(size=1) OP:
+	// P Permutation table.
+	List(type:uint(size=8), size=32) P_Box =
+	[
+		15, 6,19,20,
+		28,11,27,16,
+		 0,14,22,25,
+		 4,17,30, 9,
+		 1, 7,23,13,
+		31,26, 2, 8,
+		18,12,29, 5,
+		21,10, 3,24
+	];
+/*	= [ 16, 7,20,21,
+		29,12,28,17,
+		 1,15,23,26,
+		 5,18,31,10,
+		 2, 8,24,14,
+		32,27, 3, 9,
+		19,13,30,6,
+		22,11, 4,25 ] - 1; */
+	
+	DES_f_P:
+	action IP:[bits] repeat 32 ==> OP:[ [bits[P_Box[i]]: for int i in 0 .. 31] ] repeat 32 end
+	
+ end

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Key1" x="64" y="51"/>
+      <vertex id="Plaintext" x="6" y="71"/>
+      <vertex id="Key2" x="185" y="162"/>
+      <vertex id="Key3" x="334" y="61"/>
+      <vertex id="Ciphertext" x="545" y="61"/>
+      <vertex id="DES1" x="139" y="31"/>
+      <vertex id="DES2" x="267" y="122"/>
+      <vertex id="DES3" x="420" y="41"/>
+   </vertices>
+</layout>

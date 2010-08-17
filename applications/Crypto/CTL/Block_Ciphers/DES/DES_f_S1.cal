@@ -1,0 +1,75 @@
+/**
+ * This FU is part of a CAL implementation of DES (FIPS 46-3).
+ * It serves as selection function (S-Box) S1 inside DES cipher function 'f'.
+ * 
+ * FU ID: DES_f_S1
+ * One input port:
+ * 	 1) uint(size=1) IP: the input (block size: 6 bit tokens)
+ * One output port:
+ * 	 1) uint(size=1) OP: the output (block size: 4 bit tokens)
+ *
+ * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
+ */
+
+ actor DES_f_S1 () uint(size=1) IP ==> uint(size=1) OP:
+	
+	// S-Box S1.
+/*	List(type:uint(size=4), size=64) S =
+	[
+		14, 4,13,1, 2,15,11, 8, 3,10, 6,12, 5, 9,0, 7,
+		 0,15, 7,4,14, 2,13, 1,10, 6,12,11, 9, 5,3, 8,
+		 4, 1,14,8,13, 6, 2,11,15,12, 9, 7, 3,10,5, 0,
+		15,12, 8,2, 4, 9, 1, 7, 5,11, 3,14,10, 0,6,13
+	]; */
+	// Use 2-D list to avoid complicated num2bits conversion.
+	List(type:List(type:uint(size=1), size=4), size=64) S :=
+	[
+		// 14         4        13         1         2        15        11         8
+		[1,1,1,0],[0,1,0,0],[1,1,0,1],[0,0,0,1],[0,0,1,0],[1,1,1,1],[1,0,1,1],[1,0,0,0],
+		//  3        10         6        12         5         9         0         7
+		[0,0,1,1],[1,0,1,0],[0,1,1,0],[1,1,0,0],[0,1,0,1],[1,0,0,1],[0,0,0,0],[0,1,1,1],
+		//  0        15         7         4        14         2        13         1
+		[0,0,0,0],[1,1,1,1],[0,1,1,1],[0,1,0,0],[1,1,1,0],[0,0,1,0],[1,1,0,1],[0,0,0,1],
+		// 10         6        12        11         9         5         3         8
+		[1,0,1,0],[0,1,1,0],[1,1,0,0],[1,0,1,1],[1,0,0,1],[0,1,0,1],[0,0,1,1],[1,0,0,0],
+		//  4         1        14         8        13         6         2        11
+		[0,1,0,0],[0,0,0,1],[1,1,1,0],[1,0,0,0],[1,1,0,1],[0,1,1,0],[0,0,1,0],[1,0,1,1],
+		// 15        12         9         7         3        10         5         0
+		[1,1,1,1],[1,1,0,0],[1,0,0,1],[0,1,1,1],[0,0,1,1],[1,0,1,0],[0,1,0,1],[0,0,0,0],
+		// 15        12         8         2         4         9         1         7
+		[1,1,1,1],[1,1,0,0],[1,0,0,0],[0,0,1,0],[0,1,0,0],[1,0,0,1],[0,0,0,1],[0,1,1,1],
+		//  5        11         3        14        10         0         6        13
+		[0,1,0,1],[1,0,1,1],[0,0,1,1],[1,1,1,0],[1,0,1,0],[0,0,0,0],[0,1,1,0],[1,1,0,1]
+	];
+
+	DES_f_S1:
+	// Orcc has a bug to handle 2-D list, so that the following code does not work.
+	// action IP:[bits] repeat 6 ==> OP:[ S[v] ] repeat 4
+	action IP:[bits] repeat 6 ==> OP:[ [S[v][i]: for int i in 0 .. 3] ] repeat 4 
+	var 
+		int v
+	do
+		// Avoid using foreach and multiplfications to enhance efficiency.
+		if bits[0]>0 then
+			v := 32;
+		else
+			v := 0;
+		end
+		if bits[5]>0 then
+			v := v + 16;
+		end
+		if bits[1]>0 then
+			v := v + 8;
+		end
+		if bits[2]>0 then
+			v := v + 4;
+		end
+		if bits[3]>0 then
+			v := v + 2;
+		end
+		if bits[4]>0 then
+			v := v + 1;
+		end
+	end
+
+end

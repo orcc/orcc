@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Plaintext" x="88" y="190"/>
+      <vertex id="Key" x="41" y="282"/>
+      <vertex id="Ciphertext" x="554" y="190"/>
+      <vertex id="B2b_PT" x="178" y="170"/>
+      <vertex id="Core" x="305" y="170"/>
+      <vertex id="b2B" x="469" y="170"/>
+      <vertex id="B2b_Key" x="117" y="262"/>
+      <vertex id="KS" x="224" y="262"/>
+   </vertices>
+</layout>

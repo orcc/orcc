@@ -1,0 +1,53 @@
+/**
+ * This FU is part of a CAL implementation of DES Feistel Network (Cipher).
+ * It manages the round number for each data block:
+ *	a. Initialize round number for very first data block and start Feistel iteration for that block.
+ *	b. Increment/decrement round number after each Feistel iteration and based on the value of 
+ *	   round number, it either redirects each block to next Feistel iteration or to the output.
+ * 
+ * FU ID: DES_FeistelManager
+ * Five input ports:
+ * 	 1) uint(size=1) IP1_L0: initial left sub-block
+ *   2) uint(size=1) IP2_R0: initial right sub-block
+ * 	 3) uint(size=1) IP3_L: intermediate left sub-block
+ *   4) uint(size=1) IP4_R: intermediate right sub-block
+ * 	 5) uint(size=8) IP5_RN: round number associated to left and right subblocks
+ * Five output ports:
+ * 	 1) uint(size=1) OP1_FL: finalized left sub-block for output
+ *   2) uint(size=1) OP2_FR: finalized right sub-block for output
+ * 	 3) uint(size=1) OP3_L: intermediate left sub-block
+ *   4) uint(size=1) OP4_R: intermediate right sub-block
+ * 	 5) uint(size=8) OP5_RN: round number associated to left and right subblocks
+ *
+ * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
+ */
+
+actor DES_FeistelManager ()
+	uint(size=1) IP1_L0, uint(size=1) IP2_R0, uint(size=1) IP3_L, uint(size=1) IP4_R, uint(size=8) IP5_RN
+	==> uint(size=1) OP1_FL, uint(size=1) OP2_FR, uint(size=1) OP3_L, uint(size=1) OP4_R, uint(size=8)OP5_RN :
+
+	// Initialize round number and output left/right subblocks.
+	firstRound:
+	action IP1_L0:[L] repeat 32, IP2_R0:[R] repeat 32 ==> OP3_L:[L] repeat 32, OP4_R:[R] repeat 32, OP5_RN:[0] end
+
+	// Normal round: Increment round number and output left/right subblocks.
+	normalRound:
+	action IP3_L:[L] repeat 32, IP4_R:[R] repeat 32, IP5_RN:[roundNumber]
+		==> OP3_L:[L] repeat 32, OP4_R:[R] repeat 32, OP5_RN:[roundNumber]
+	guard roundNumber < 15 // not the last round
+	do
+		roundNumber := roundNumber + 1;	
+	end
+
+	// Final round: Swap left/right subblocks for final output.
+	finalRound:
+	action IP3_L:[L] repeat 32, IP4_R:[R] repeat 32, IP5_RN:[roundNumber]
+		==> OP1_FL:[R] repeat 32, OP2_FR:[L] repeat 32
+	guard roundNumber = 15 // the last round
+	end
+	
+	priority
+		finalRound > normalRound > firstRound;
+	end
+
+end

@@ -1,0 +1,30 @@
+/**
+ * This FU is part of the testbed of a CAL implementation of AES (Rijndael).
+ * It sends a key to the AES encipher and decipher for testing purpose.
+ * 
+ * FU ID: KeyGenerator_AES
+ * One output port:
+ * 1) uint(size=8) Key: the key (the first byte is the key size)
+ *
+ * Developer: Shujun Li @ Uni-Konstanz 2010
+ */
+
+actor KeyGenerator_AES () ==> uint(size=8) Key :
+
+	int KEY_SIZE = 16;
+	List(type:uint(size=8), size=KEY_SIZE+1) k = [ // Key
+		KEY_SIZE,
+		0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f
+	];
+	
+	bool keySent := false;
+
+	// Orcc does not allow a list sent out as a single token.
+	// So we have to send a number of bytes instead.
+	action ==> Key:[k] repeat KEY_SIZE+1
+	guard not keySent
+	do
+		keySent := true;
+	end
+	
+end

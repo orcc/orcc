@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="IP2_R" x="24" y="207"/>
+      <vertex id="IP1_Keys" x="23" y="171"/>
+      <vertex id="IP3_RN" x="124" y="240"/>
+      <vertex id="OP" x="602" y="171"/>
+      <vertex id="E" x="128" y="187"/>
+      <vertex id="XOR" x="230" y="151"/>
+      <vertex id="P" x="497" y="151"/>
+      <vertex id="S" x="387" y="151"/>
+   </vertices>
+</layout>

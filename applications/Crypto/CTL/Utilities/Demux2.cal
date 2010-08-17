@@ -1,0 +1,45 @@
+ /**
+ * This FU is part of a CAL Cryptographic Tool Library (CTL) Utilities.
+ * It sequentially splits (or demultiplexes) one sequence of tokens into two separate sequences.
+ * The split is done by first sending n1 tokens to the first output port, 
+ *   and then send n2 tokens to the second output port.
+ * The process is repeated blockwise, where the block size is n=(n1+n2).  
+ * 
+ * FU ID: Demux2
+ * Three constants:
+ *	 1) int PORT_SIZE: port size in bits (default: 1) 
+ *	 2) int IP_NUM_TOKENS: number of tokens to be read from the input port at one time (default: 64) 
+ *	 3) int OP1_NUM_TOKENS: number of tokens to be sent to the 1st output port at one time  (default: IP_NUM_TOKENS/2) 
+ * One input port:
+ * 	 1) uint(size=PORT_SIZE) IP
+ * Two output ports:
+ * 	 1) uint(size=PORT_SIZE) OP1
+ * 	 2) uint(size=PORT_SIZE) OP2
+ *
+ * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
+ */
+ 
+actor Demux2 () uint(size=PORT_SIZE) IP ==> uint(size=PORT_SIZE) OP1, uint(size=PORT_SIZE) OP2:
+ 		    
+ 	// Constants to reconfigure this FU.
+ 	int PORT_SIZE = 1; 
+ 	int IP_NUM_TOKENS = 64;
+ 	int OP1_NUM_TOKENS = IP_NUM_TOKENS / 2;
+ 
+ 	int OP2_NUM_TOKENS = IP_NUM_TOKENS - OP1_NUM_TOKENS;
+ 	// A potential bug of Orcc to be further tested:
+ 	// If we use the following variables in the output expressions of the action,
+ 	//  Orcc cannot generate the json file and thus report an error.
+ 	// This bug happens when with DES networks, which include a Demux2 instance.  
+ 	// However, we have tested this with some other simpler networks, and everything is fine.
+ 	// So far, we haven't found any clue how to reproduce the bug with a simple example network.
+ 	// int OP1_NUM_TOKENS_1 = OP1_NUM_TOKENS - 1; 
+ 	// int IP_NUM_TOKENS_1 = IP_NUM_TOKENS - 1;
+
+ 	Demux2:
+	action IP:[bits] repeat IP_NUM_TOKENS ==> 
+		   OP1:[ [bits[i]: for int i in 0 .. OP1_NUM_TOKENS - 1] ] repeat OP1_NUM_TOKENS,
+		   OP2:[ [bits[i]: for int i in OP1_NUM_TOKENS .. IP_NUM_TOKENS - 1] ] repeat OP2_NUM_TOKENS
+	end
+
+end

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="DES_f_SBoxes">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="IP">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="1"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="OP">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="1"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Demux">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../Utilities/Demux8"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Mux">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../Utilities/Mux8"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="1">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DES_f_S1"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="2">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DES_f_S2"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="3">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DES_f_S3"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="4">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DES_f_S4"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="5">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DES_f_S5"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="6">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DES_f_S6"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="7">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DES_f_S7"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="8">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="DES_f_S8"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Mux" dst-port="IP1" src="1" src-port="OP"/>
+    <Connection dst="Mux" dst-port="IP2" src="2" src-port="OP"/>
+    <Connection dst="Mux" dst-port="IP3" src="3" src-port="OP"/>
+    <Connection dst="Mux" dst-port="IP4" src="4" src-port="OP"/>
+    <Connection dst="Mux" dst-port="IP5" src="5" src-port="OP"/>
+    <Connection dst="Mux" dst-port="IP6" src="6" src-port="OP"/>
+    <Connection dst="Mux" dst-port="IP7" src="7" src-port="OP"/>
+    <Connection dst="Mux" dst-port="IP8" src="8" src-port="OP"/>
+    <Connection dst="Demux" dst-port="IP" src="" src-port="IP"/>
+    <Connection dst="" dst-port="OP" src="Mux" src-port="OP"/>
+    <Connection dst="1" dst-port="IP" src="Demux" src-port="OP1"/>
+    <Connection dst="2" dst-port="IP" src="Demux" src-port="OP2"/>
+    <Connection dst="3" dst-port="IP" src="Demux" src-port="OP3"/>
+    <Connection dst="4" dst-port="IP" src="Demux" src-port="OP4"/>
+    <Connection dst="5" dst-port="IP" src="Demux" src-port="OP5"/>
+    <Connection dst="6" dst-port="IP" src="Demux" src-port="OP6"/>
+    <Connection dst="7" dst-port="IP" src="Demux" src-port="OP7"/>
+    <Connection dst="8" dst-port="IP" src="Demux" src-port="OP8"/>
+</XDF>

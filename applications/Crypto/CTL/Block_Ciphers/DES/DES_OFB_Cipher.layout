@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="IP3_Text" x="84" y="219"/>
+      <vertex id="IP1_IV" x="101" y="157"/>
+      <vertex id="IP2_Key" x="397" y="182"/>
+      <vertex id="OP" x="411" y="130"/>
+      <vertex id="DES_Cipher" x="501" y="199"/>
+      <vertex id="OFB" x="216" y="179"/>
+   </vertices>
+</layout>

@@ -1,0 +1,65 @@
+/**
+ * This FU is part of a CAL implementation of AES (Rijndael).
+ * It performs MixColumns process in each round of the AES encipher.
+ * 
+ * FU ID: MixColumns
+ * One input port:
+ *   1) uint(size=8) IP: the input
+ * One output port:
+ *   1) uint(size=8) OP: the output
+ *
+ * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
+ */
+
+actor MixColumns () uint(size=8) IP1_PT, uint(size=8) IP0_Key ==> uint(size=8) OP:
+	
+	int Nr := 10;
+	
+	getNr:
+	action IP0_Key:[x] ==>
+	do
+		Nr := 6 + (x >> 2);
+	end
+
+	lastRound: // If it is the last round, simply forward tokens to the next FU.
+	action IP1_PT:[x] repeat 17 ==> OP:[x] repeat 17 guard x[0]>=Nr end
+	
+	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
+	List(type:uint(size=8), size=4) b := [0, 0, 0, 0];
+
+	// MixColumn based on simplified multiplifications.
+	procedure MixColumn (List(type:uint(size=8),size=4) a, int i)
+	begin
+		foreach int j in 0 .. 3 do
+			b[j] := (a[j] << 1) mod 256;
+			if (a[j] & 0x80)=0x80 then
+				b[j] := (b[j] ^ 0x1b);
+			end
+		end
+		y[i] := (b[0] ^ a[3] ^ a[2] ^ b[1] ^ a[1]);
+		y[i+1] := (b[1] ^ a[0] ^ a[3] ^ b[2] ^ a[2]);
+		y[i+2] := (b[2] ^ a[1] ^ a[0] ^ b[3] ^ a[3]);
+		y[i+3] := (b[3] ^ a[2] ^ a[1] ^ b[0] ^ a[0]);
+	end
+	
+	normalRound: // If it is not the last round, do MixColumns.
+	action IP1_PT:[x] repeat 17 ==> OP:[y] repeat 17
+	guard x[0]<Nr
+	var
+		int index := 1 // Start from the second byte.
+	do
+		y[0] := x[0];
+		foreach int i in 0 .. 3
+		do
+			MixColumn([x[index],x[index+1],x[index+2],x[index+3]], index);
+			index := index + 4;
+		end
+	end
+	
+	schedule fsm initial:
+		initial        (getNr) --> working;
+		working  (normalRound) --> working;
+		working    (lastRound) --> working;
+	end
+
+end

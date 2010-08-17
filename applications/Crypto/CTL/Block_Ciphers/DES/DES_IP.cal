@@ -1,0 +1,39 @@
+/**
+ * This FU is part of a CAL implementation of DES (FIPS 46-3).
+ * It performs initial permutation (IP) in DES.
+ * 
+ * FU ID: DES_IP
+ * One input port:
+ * 	 1) uint(size=1) IP
+ * One output port:
+ * 	 1) uint(size=1) OP
+ *
+* Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
+ */
+ 
+actor DES_IP () uint(size=1) IP ==> uint(size=1) OP:
+	// Initial permutation table.
+	List(type:uint(size=8), size=64) IPTable =
+	[
+		57,49,41,33,25,17, 9,1,
+		59,51,43,35,27,19,11,3,
+		61,53,45,37,29,21,13,5,
+		63,55,47,39,31,23,15,7,
+		56,48,40,32,24,16, 8,0,
+		58,50,42,34,26,18,10,2,
+		60,52,44,36,28,20,12,4,
+		62,54,46,38,30,22,14,6
+	];
+/*	= [ 58,50,42,34,26,18,10,2,
+		60,52,44,36,28,20,12,4,
+		62,54,46,38,30,22,14,6,
+		64,56,48,40,32,24,16,8,
+		57,49,41,33,25,17, 9,1,
+		59,51,43,35,27,19,11,3,
+		61,53,45,37,29,21,13,5,
+		63,55,47,39,31,23,15,7 ] - 1; */
+
+	DES_IP:
+	action IP:[bits] repeat 64 ==> OP:[ [bits[IPTable[i]]: for int i in 0 .. 63] ] repeat 64 end
+ 
+ end

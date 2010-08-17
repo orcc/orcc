@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Plaintext" x="48" y="178"/>
+      <vertex id="IV" x="63" y="120"/>
+      <vertex id="Key" x="246" y="96"/>
+      <vertex id="Ciphertext" x="492" y="178"/>
+      <vertex id="CBC" x="181" y="138"/>
+      <vertex id="TDES_Encipher" x="351" y="158"/>
+   </vertices>
+</layout>

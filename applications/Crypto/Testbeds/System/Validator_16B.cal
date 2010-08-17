@@ -1,0 +1,72 @@
+/**
+ * This FU is part of the testbed of the Cryptographic Tool Library (CTL).
+ * It validates if the outputs of a 128-bit cipher matches the golden responses.
+ * It compares the actual responses with the golden responses block by block.
+ * 
+ * FU ID: Validator_16B
+ * Two input ports:
+ * 1) uint(size=8) IP1_Data: the output of the AES encipher/decipher
+ * 2) uint(size=8) IP2_GR: the golden response
+ *
+ * Developer: Shujun Li @ Uni-Konstanz 2010
+ */
+
+actor Validator_16B () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = Golden response
+
+	int BLOCK_SIZE = 16;
+	
+	List(type:String, size=16) hexDigits = [
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"
+	];
+	// The following procedure is for Orcc simulation.
+	// Print a list of numbers with or without a line break at the end.
+	procedure printList(List(type:uint(size=8), size=BLOCK_SIZE) x, bool bLineBreak)
+	begin
+		print("[ ");
+		foreach int i in 0 .. BLOCK_SIZE-1
+		do
+			print("0x"+hexDigits[x[i]>>4]+hexDigits[x[i] & 0x0f]+" ");
+		end
+		print("]");
+		if bLineBreak then
+			print("\n");
+		end
+	end
+	// Uncomment the following two functions if you want to simulate with OpenDF.
+/*	function byte2hex (uint(size=8) x) --> String:
+		"0x"+hexDigits[x>>4]+hexDigits[x & 0x0f]
+	end
+	function list2hex (List(type:uint(size=8), size=BLOCK_SIZE) x) --> List(type:String, size=BLOCK_SIZE):
+		[byte2hex(x[i]) : for int i in 0 .. BLOCK_SIZE-1]
+	end */
+	
+	int blockCounter := 0;
+	int errorCounter := 0;
+
+	action IP1_Data:[x] repeat BLOCK_SIZE, IP2_GR:[gr] repeat BLOCK_SIZE ==>
+	do
+		blockCounter := blockCounter + 1;
+		println("Block #" + blockCounter);
+		// The following lines are for Orcc simulation.
+		print("Actual Response = ");
+		printList(x, true);
+		print("Golden Response = ");
+		printList(gr, true);
+		// Uncomment the following lines if you want to simulate with OpenDF.
+		// println("Actual Response = " + list2hex(x));
+		// println("Golden Response = " + list2hex(gr));
+		foreach int i in 0 .. BLOCK_SIZE-1
+		do
+			if x[i]!=gr[i] then
+				errorCounter := errorCounter + 1;
+			end
+		end
+		if errorCounter>0 then
+			println("The received response does not match the golden response!");
+			println("Total number of errorneous bytes: " + errorCounter + " / " + BLOCK_SIZE*blockCounter);
+		else
+			println("Congratulations! The received response matches the golden response!");
+		end
+	end
+
+end

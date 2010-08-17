@@ -1,0 +1,68 @@
+/**
+ * This FU is part of the testbed of a CAL implementation of DES (FIPS 46-3).
+ * It sends a key, a sequence of plaintext and the golden response (ciphertext) to the DES encipher for testing purpose.
+ * 
+ * FU ID: Source_DES_Encipher
+ * Three output ports:
+ * 		1) uint(size=8) OP1_Key: the key
+ * 		2) uint(size=8) OP2_PT: the plaintext
+ * 		3) uint(size=8) OP3_GR: the golden response
+ *
+ * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
+ */
+
+actor Source_DES_Encipher () ==> uint(size=8) OP1_Key, uint(size=8) OP2_PT, uint(size=8) OP3_GR :
+
+/*	int KEY_SIZE = 8;
+	List(type:uint(size=8), size=KEY_SIZE) k = [ // Key
+		0x3b,0x38,0x98,0x37,0x15,0x20,0xf7,0x5e
+	];
+	int TEXT_SIZE = 8;
+	List(type:uint(size=8), size=TEXT_SIZE) p = [ // Plaintext: Single block
+		0x16,0xbd,0x40,0x94,0xb4,0x53,0x8a,0x7b
+	];
+	List(type:uint(size=8), size=TEXT_SIZE) gr = [ // Golden response (Ciphertext)
+		0x4a,0xe9,0xdf,0x93,0x11,0x23,0xce,0x2a
+	];*/
+
+	// Test vectors for DES (taken from FIPS 81).
+	int KEY_SIZE = 8;
+	List(type:uint(size=8), size=KEY_SIZE) k = [ // Key
+		0x01,0x23,0x45,0x67,0x89,0xab,0xcd,0xef
+	];
+	int TEXT_SIZE = 24;
+	List(type:uint(size=8), size=TEXT_SIZE) p = [ // Plaintext: Multiple blocks
+		0x4e,0x6f,0x77,0x20,0x69,0x73,0x20,0x74,
+		0x68,0x65,0x20,0x74,0x69,0x6d,0x65,0x20, 
+		0x66,0x6f,0x72,0x20,0x61,0x6c,0x6c,0x20
+	];
+	List(type:uint(size=8), size=TEXT_SIZE) gr = [ // Golden response (Ciphertext)
+		0x3f,0xa4,0x0e,0x8a,0x98,0x4d,0x48,0x15,
+		0x6a,0x27,0x17,0x87,0xab,0x88,0x83,0xf9,
+		0x89,0x3d,0x51,0xec,0x4b,0x56,0x3b,0x53
+	];
+ 
+	bool keySent := false;
+	sendKey:
+	action ==> OP1_Key:[k] repeat KEY_SIZE
+	guard not keySent 
+	do
+		keySent := true;
+	end
+	
+	bool ptSent := false;
+	sendPT:
+	action ==> OP2_PT:[p] repeat TEXT_SIZE
+	guard not ptSent 
+	do
+		ptSent := true;
+	end
+
+	bool grSent := false;
+	sendGR:
+	action ==> OP3_GR:[gr] repeat TEXT_SIZE
+	guard not grSent 
+	do
+		grSent := true;
+	end
+end

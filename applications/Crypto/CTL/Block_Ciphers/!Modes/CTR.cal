@@ -1,0 +1,147 @@
+/**
+ * This FU gives implementation of CTR (Counter Mode) mode of block ciphers in RVC-CAL.
+ * To ease implementation, we separately implement byte-based and bit-based CTR mode.
+ * This FU implements the byte-based CTR mode.
+ *
+ * Due to the diversity of ways of handling counters, this implementation follows 
+ *  the Standard Incrementing Function defined in Annex B.1 of NIST SP800-38A (2001),
+ *  but we allow the increment to be customized as a value in {1,...,2^{BLOCK_SIZE_COUNTER}-1}.
+ * (See below for the meaning of the parameter BLOCK_SIZE_COUNTER.)
+ * 
+ * FU ID: CTR
+ * Two FU parameters:
+ *   1) uint BLOCK_SIZE_CIPHER: Block size of the underlying block cipher in bytes (default: 16 = 128 bits)
+ *   2) uint BLOCK_SIZE_MODE: Size of the input plaintext/ciphertext in bytes (default: BLOCK_SIZE_CIPHER = full-size CTR)
+ *   3) uint BLOCK_SIZE_COUNTER: Size of updated part of the counter block in bytes (default: BLOCK_SIZE_CIPHER/2)
+ *   4) uint COUNTER_INCREMENT: Value to be incremented in counter to produce the next counter (default: 1) 
+ * Three inputs ports:
+ *   1) uint(size=8) IP1_IV: Initialization Vector (Initial Counter Block)
+ *   2) uint(size=8) IP2_IT: Input plaintext/ciphertext
+ *   3) uint(size=64) IP3_IDX: 0-based index of input plaintext/ciphertext block (important for parallelism!) 
+ *   4) uint(size=8) IP4_OB: Output block of the block cipher
+ * Two output ports:
+ *   1) uint(size=8) OP1_OT: Output ciphertext/plaintext
+ *   2) uint(size=8) OP2_IB: Input block sent to the block cipher for encryption
+ * 
+ * How this FU should be connected with a block encipher to form a stream cipher:
+ * CTR.OP2_IB ==> BlockEncipher.Plaintext
+ * BlockEncipher.Ciphertext ==> CTR.IP3_OB 
+ * Plaintext/Ciphertext (Text to be encrypted/decrypted) ==> CTR.IP2_IT 
+ * CTR.OP1_OT ==> Ciphertext/Plaintext (Text encrypted/decrypted)
+ * 
+ * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010 
+ */
+
+actor CTR(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=BLOCK_SIZE_CIPHER, uint BLOCK_SIZE_COUNTER=BLOCK_SIZE_CIPHER/2, uint COUNTER_INCREMENT=1)
+	uint(size=8) IP1_IV, uint(size=8) IP2_IT, uint(size=64) IP3_IDX, uint(size=8) IP4_OB
+		==> uint(size=8) OP1_OT, uint(size=8) OP2_IB:
+
+	uint BLOCK_SIZE_MAX = 32; // Maximum block size in bytes
+	
+	// An index to indicate the current step running.
+	// The scheduling of the steps are as follows: 0 --> 1; 1 --> 2 --> 3 --> 4 --> 1.
+	int step_index := 0; // 0 = readIV, 1 = readIDX, 2 = sendIB, 3 = readOB, 4 = handleIT
+
+	List(type:uint(size=8), size=BLOCK_SIZE_MAX) iniCounter := [0: for int i in 1 .. BLOCK_SIZE_MAX];
+
+	// Read the initial vector and store it in inputBlock.
+	int ivCounter := 0;
+	readIV: // Step 0 (initialization)
+	action IP1_IV:[byte] ==>
+	guard step_index=0
+	do
+		iniCounter[ivCounter] := byte;
+		ivCounter := ivCounter + 1;
+		if (ivCounter = BLOCK_SIZE_CIPHER) then
+			step_index := 1;
+		end
+	end
+
+	List(type:uint(size=8), size=BLOCK_SIZE_MAX) inputBlock := [0: for int i in 1 .. BLOCK_SIZE_MAX];
+	
+	// counter_increment is stored as follows: LSB, ..., MSB, ...
+	// This order differs from inputBlock, but can ease the calculation process.  
+	List(type:uint(size=8), size=BLOCK_SIZE_MAX) counter_increment := [0: for int i in 1 .. BLOCK_SIZE_MAX];
+	readIDX: // Step 1
+	action IP3_IDX:[index] ==>
+	guard step_index=1
+	var
+		uint temp,
+		uint b_m,
+		uint(size=16) sum16,
+		int j
+	do
+		if index>0 then
+			foreach int i in 0 .. BLOCK_SIZE_CIPHER-BLOCK_SIZE_COUNTER-1 do
+				inputBlock[i] := iniCounter[i];
+			end
+			// Get the proper increment of the current block.
+			temp := COUNTER_INCREMENT * index;
+			foreach int i in 0 .. BLOCK_SIZE_COUNTER-1 do
+				counter_increment[i] := bitand(temp, 0xff);
+				temp := (temp >> 8);
+			end
+			// Increase the lower part of inputBlock (counter block) by COUNTER_INCREMENT * index
+			b_m := BLOCK_SIZE_CIPHER - BLOCK_SIZE_COUNTER; // = b - m (see Annex B.2 of NIST SP800-38A)
+			sum16 := 0;
+			foreach int i in 0 .. BLOCK_SIZE_COUNTER-1 do
+				j := BLOCK_SIZE_CIPHER-1 - i;
+				// Use a 16-int to avoid missing the possible carry bit (= sum16 >> 8).
+				sum16 := iniCounter[j] + counter_increment[i] + (sum16 >> 8);					
+				inputBlock[j] := sum16 & 0xff;
+			end
+		else // index=0: use the initial counter block
+			foreach int i in 0 .. BLOCK_SIZE_CIPHER-1 do
+				inputBlock[i] := iniCounter[i];
+			end
+		end
+		step_index := step_index + 1;
+	end
+
+	// Send the input block to the block cipher for encryption. 
+	int ibCounter := 0;
+	sendIB: // Step 2
+	action ==> OP2_IB:[byte]
+	guard step_index=2
+	var
+		uint(size=8) byte
+	do
+		byte := inputBlock[ibCounter];
+		ibCounter := ibCounter + 1;
+		if (ibCounter = BLOCK_SIZE_CIPHER) then
+			ibCounter := 0;
+			step_index := step_index + 1;
+		end
+	end
+
+	List(type:uint(size=8), size=BLOCK_SIZE_MAX) outputBlock := [0: for int i in 1 .. BLOCK_SIZE_MAX];
+
+	// Read the output block from the block encipher and save it in the state variable outputBlock.
+	int obCounter := 0;
+	readOB: // Step 3
+	action IP4_OB:[byte] ==>
+	guard step_index=3
+	do
+		outputBlock[obCounter] := byte;
+		obCounter := obCounter + 1;
+		if (obCounter = BLOCK_SIZE_CIPHER) then
+			obCounter := 0;
+			step_index := step_index + 1;
+		end
+	end
+
+	// Read the next plaintext/ciphertext block and encrypt/decrypt it by XORing it with MSB of outputBlock.
+	int itCounter := 0;
+	handleIT: // Step 4
+	action IP2_IT:[byte] ==> OP1_OT:[byte]
+	guard step_index=4
+	do
+		byte := bitxor(byte, outputBlock[itCounter]);
+		itCounter := itCounter + 1;
+		if (itCounter = BLOCK_SIZE_MODE) then
+			itCounter := 0;
+			step_index := 1;
+		end
+	end
+	
+end

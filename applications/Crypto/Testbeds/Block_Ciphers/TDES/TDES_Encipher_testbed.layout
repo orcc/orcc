@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Source" x="89" y="151"/>
+      <vertex id="Encipher" x="255" y="151"/>
+      <vertex id="Validator" x="456" y="211"/>
+   </vertices>
+</layout>

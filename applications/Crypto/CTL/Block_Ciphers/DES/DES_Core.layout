@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Input" x="44" y="184"/>
+      <vertex id="Keys" x="135" y="212"/>
+      <vertex id="Output" x="467" y="184"/>
+      <vertex id="InvIP" x="388" y="164"/>
+      <vertex id="IP" x="133" y="164"/>
+      <vertex id="Feistel" x="221" y="164"/>
+   </vertices>
+</layout>

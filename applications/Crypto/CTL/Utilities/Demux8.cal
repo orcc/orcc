@@ -1,0 +1,63 @@
+/**
+ * This FU is part of a CAL Cryptographic Tool Library (CTL) Utilities.
+ * It sequentially splits (or demultiplexes) a sequence of tokenss into eight separate sequences.
+ * The split is done by first sending n tokens to the first output port, 
+ *   then send n tokens to the second output port, ..., finally send n tokens to the 8th output port.
+ * The process is repeated blockwise, where the block size is 8*n.  
+ * 
+ * FU ID: Demux8
+ * Two constants:
+ * Note: Constants are being used instead of FU parameters because FU parameters are currently not fully 
+ *       supported by Orcc. These constants will become FU parameters later.
+ *	 1) int PORT_SIZE: port size in bits (default: 1) 
+ *	 2) int IP_NUM_TOKENS: number of tokens to be read from the input port flow at one time 
+ * One input port:
+ * 	 1) uint(size=PORT_SIZE) IP: the input
+ * Eight output ports:
+ * 	 1), ..., 8) uint(size=PORT_SIZE) OP1, ..., OP8: the eight outputs
+ *
+ * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
+ */
+ 
+actor Demux8 () uint(size=PORT_SIZE) IP ==> 
+	uint(size=PORT_SIZE) OP1, uint(size=PORT_SIZE) OP2, uint(size=PORT_SIZE) OP3, uint(size=PORT_SIZE) OP4, 
+ 	uint(size=PORT_SIZE) OP5, uint(size=PORT_SIZE) OP6, uint(size=PORT_SIZE) OP7, uint(size=PORT_SIZE) OP8:
+ 		    
+ 	// Constants to reconfigure this FU.
+ 	int PORT_SIZE = 1; 
+ 	int IP_NUM_TOKENS = 48;
+ 
+ 	int OP_NUM_TOKENS = IP_NUM_TOKENS / 8;
+ 	
+ 	// Constants to index starting and ending locations input list 
+ 	// for token to be multiplexed on each output port.
+	int op1Start := 0; 
+ 	int op2Start := op1Start + OP_NUM_TOKENS;
+ 	int op3Start := op2Start + OP_NUM_TOKENS;
+ 	int op4Start := op3Start + OP_NUM_TOKENS;
+ 	int op5Start := op4Start + OP_NUM_TOKENS;
+ 	int op6Start := op5Start + OP_NUM_TOKENS;
+ 	int op7Start := op6Start + OP_NUM_TOKENS;
+ 	int op8Start := op7Start + OP_NUM_TOKENS;
+
+ 	int op1End := op2Start - 1;
+ 	int op2End := op3Start - 1;
+ 	int op3End := op4Start - 1;
+ 	int op4End := op5Start - 1;
+ 	int op5End := op6Start - 1;
+ 	int op6End := op7Start - 1;
+ 	int op7End := op8Start - 1;
+ 	int op8End := IP_NUM_TOKENS - 1; 	
+
+ 	Demux8:
+	action IP:[bits] repeat IP_NUM_TOKENS ==> 
+		   OP1:[ [bits[i]: for int i in op1Start .. op1End] ] repeat OP_NUM_TOKENS,
+		   OP2:[ [bits[i]: for int i in op2Start .. op2End] ] repeat OP_NUM_TOKENS,
+		   OP3:[ [bits[i]: for int i in op3Start .. op3End] ] repeat OP_NUM_TOKENS,
+		   OP4:[ [bits[i]: for int i in op4Start .. op4End] ] repeat OP_NUM_TOKENS,
+		   OP5:[ [bits[i]: for int i in op5Start .. op5End] ] repeat OP_NUM_TOKENS,
+		   OP6:[ [bits[i]: for int i in op6Start .. op6End] ] repeat OP_NUM_TOKENS,
+		   OP7:[ [bits[i]: for int i in op7Start .. op7End] ] repeat OP_NUM_TOKENS,
+		   OP8:[ [bits[i]: for int i in op8Start .. op8End] ] repeat OP_NUM_TOKENS
+	end
+end	
