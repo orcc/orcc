@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="57" y="177"/>
-      <vertex id="Algo_NALU" x="373" y="155"/>
-      <vertex id="CheckNaluType" x="711" y="173"/>
-      <vertex id="DecodeSps" x="57" y="610"/>
-      <vertex id="SpsVLDecoding" x="1125" y="1372"/>
-      <vertex id="PpsVLDecoding" x="1125" y="206"/>
-      <vertex id="DecodePps" x="373" y="296"/>
-      <vertex id="PicVLDecoding" x="2235" y="80"/>
-      <vertex id="DecodePic" x="1795" y="641"/>
-      <vertex id="DecodeSliceHeader" x="1125" y="413"/>
-      <vertex id="DecodeRefPicList" x="1502" y="549"/>
-      <vertex id="DecodeDecRefPicMarking" x="1502" y="386"/>
-      <vertex id="DecodeSliceData_Cavlc" x="711" y="932"/>
-      <vertex id="DecodeMacroBlockLayer" x="1125" y="972"/>
-      <vertex id="DecodeMbPred" x="1502" y="817"/>
-      <vertex id="DecodeResidual" x="1577" y="1230"/>
+      <vertex id="bits8" x="57" y="172"/>
+      <vertex id="Algo_NALU" x="379" y="106"/>
+      <vertex id="CheckNaluType" x="711" y="84"/>
+      <vertex id="DecodeSps" x="57" y="911"/>
+      <vertex id="SpsVLDecoding" x="1131" y="1203"/>
+      <vertex id="PpsVLDecoding" x="1131" y="231"/>
+      <vertex id="DecodePps" x="373" y="597"/>
+      <vertex id="PicVLDecoding" x="2255" y="84"/>
+      <vertex id="Mgnt_DecodePic" x="1807" y="657"/>
+      <vertex id="DecodeSliceHeader" x="1131" y="644"/>
+      <vertex id="DecodeRefPicList" x="1514" y="745"/>
+      <vertex id="DecodeDecRefPicMarking" x="1514" y="498"/>
+      <vertex id="DecodeSliceData_Cavlc" x="711" y="1465"/>
+      <vertex id="DecodeMacroBlockLayer" x="1131" y="1410"/>
+      <vertex id="DecodeMbPred" x="1514" y="1418"/>
+      <vertex id="DecodeResidual" x="1514" y="1013"/>
+      <vertex id="DecodeResidualBlock_Cavlc" x="1131" y="438"/>
    </vertices>
 </layout>

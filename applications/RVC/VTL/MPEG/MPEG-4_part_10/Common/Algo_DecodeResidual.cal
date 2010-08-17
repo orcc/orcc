@@ -22,14 +22,23 @@ actor Algo_DecodeResidual()
 
 	bool         BmFlag,
 	uint(size=4) StartIdx,
-	uint(size=4) EndIdx
+	uint(size=4) EndIdx,
+	uint(size=5) NATab,
+	uint(size=5) NBTab,
+	bool         LeftMbExists,
+	bool         AboveMbExists,
+
+	uint(size=5) Total_Coeff,
+
+	bool         EndOfResBlock
 		==>
 	bool         SkipNal,
-	uint(size=4) LaunchActor
+	uint(size=4) LaunchActor,
+
+	int (size=8) ResBlknC
 		:
 
-	//FixMe : it should be a constant !!
-	bool         CAVLC_ENTROPY := false;
+	bool         CAVLC_ENTROPY = false;
 //	bool         CABAC_ENTROPY = true;
 
 	uint(size=4) RESIDUAL_BLOCK_CAVLC = 8;
@@ -47,20 +56,27 @@ actor Algo_DecodeResidual()
 	uint(size=6) BLOCK_TYPE_INTA_16x16_MAX = 24;
 //	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
 
+	uint(size=2) Y_COMPONENT = 0;
 
-	bool         bmFlag;
-	uint(size=4) startIdx;
-	uint(size=4) endIdx;
 
-	bool         entropy_coding_mode_flag;
-	uint(size=4) slice_type;
-	uint(size=6) mb_type;
-	bool         transform_size_8x8_flag;
-	uint(size=6) CodedBlockPatternLuma;
+	bool          bmFlag;
+	uint(size=4)  startIdx;
+	uint(size=4)  endIdx;
 
+	bool          entropy_coding_mode_flag;
+	uint(size=4)  slice_type;
+	uint(size=6)  mb_type;
+	bool          transform_size_8x8_flag;
+	uint(size=6)  CodedBlockPatternLuma;
+	uint(size=4)  ActorSelected;
+	uint(size=16) CountResBlock := 0;
+	List(type: uint(size=5), size = 24 ) TotalCoeffTab;
+	List(type: bool        , size = 24 ) MbExists := [true : for int s in 0 .. 23];
+	List(type: uint(size=5), size = 16 ) IdxLeftNeighbour  = [16, 0,17, 2, 1, 4, 3, 6,18, 8,19,10, 9,12,11,14];
+	List(type: uint(size=5), size = 16 ) IdxAboveNeighbour = [20,21, 0, 1,22,23, 4, 5, 2, 3, 6, 7, 8, 9,12,13];
+	uint(size=4) IdxCurrMb := 0;
 	uint(size=3) i8x8Loop;
-	uint(size=3) i4x4Loop;
-	uint(size=3) iLoop;
+	uint(size=2) Component_type := 0;
 
 	GetParameters: action
 			EntropyCodingMode :[TypeOfEntropy],
@@ -70,7 +86,11 @@ actor Algo_DecodeResidual()
 			SliceType         :[ValSliceType],
 			MbType            :[ValMbType],
 			TransfSz8x8       :[ValTransfSz8x8],
-			CodBlkPatnLm      :[ValCodBlkPatnLm]
+			CodBlkPatnLm      :[ValCodBlkPatnLm],
+			NATab             :[ValNATab] repeat 4,
+			NBTab             :[ValNBTab] repeat 4,
+			LeftMbExists      :[ValLeftMbExists],
+			AboveMbExists     :[ValAboveMbExists]
 				==>
 		do
 			bmFlag                   := ValBmFlag;
@@ -81,8 +101,27 @@ actor Algo_DecodeResidual()
 			mb_type                  := ValMbType;
 			transform_size_8x8_flag  := ValTransfSz8x8;
 			CodedBlockPatternLuma    := ValCodBlkPatnLm;
+
+			ActorSelected :=
+				if(entropy_coding_mode_flag = CAVLC_ENTROPY)then
+					RESIDUAL_BLOCK_CAVLC
+				else
+					RESIDUAL_BLOCK_CABAC
+				end;
+			foreach int i in 0 .. 3
+			do
+				TotalCoeffTab[16+i] := ValNATab[i];
+				MbExists     [16+i] := ValLeftMbExists;
+				TotalCoeffTab[20+i] := ValNBTab[i];
+				MbExists     [20+i] := ValAboveMbExists;
+			end
+			
+			i8x8Loop      := 0;
+			CountResBlock := 0;
+			IdxCurrMb     := 0;
 		end
-	ResLuma_Launch16x16DCResBlockCavlc: action
+
+	ResLuma_Launch16x16DCResBlock: action
 				==>
 			LaunchActor :[ActorSelected],
 			SkipNal     :[    false    ]
@@ -92,29 +131,17 @@ actor Algo_DecodeResidual()
 			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI),
 			mb_type <= BLOCK_TYPE_INTA_16x16_MAX,
 			mb_type >= BLOCK_TYPE_INTA_16x16_MIN
-		var
-			uint(size=4) ActorSelected
 		do
-			ActorSelected :=
-				if(entropy_coding_mode_flag = CAVLC_ENTROPY)then
-					RESIDUAL_BLOCK_CAVLC
-				else
-					RESIDUAL_BLOCK_CABAC
-				end;
-		end
-
-	ResLuma_InitLoopVar: action
-				==>
-		do
-			i8x8Loop := 0;
-			i4x4Loop := 0;
-			iLoop    := 0;
+			Component_type := Y_COMPONENT;
+			CountResBlock  := CountResBlock + 1;
 		end
 
 	ResLuma_CheckTransfSzAndCavlc: action ==>
 		guard
 			   transform_size_8x8_flag  = false
 			or entropy_coding_mode_flag = CAVLC_ENTROPY
+		do
+			IdxCurrMb      := 0;
 		end
 
 	ResLuma_CheckCodedBlockPattern: action ==>
@@ -122,13 +149,28 @@ actor Algo_DecodeResidual()
 			bitand(CodedBlockPatternLuma,1) = 1
 		end
 
-	ResLuma_CheckBmFlagAndEndIdxAndMbType: action ==>
+	ResLuma_CheckBmFlagAndEndIdxAndMbType: action
+				==>
+			LaunchActor :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ],
+			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
 		guard
 			bmFlag = false,
 			endIdx > 0,
 			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI),
 			mb_type <= BLOCK_TYPE_INTA_16x16_MAX,
 			mb_type >= BLOCK_TYPE_INTA_16x16_MIN
+		do
+			Component_type := Y_COMPONENT;
+			CountResBlock := CountResBlock + 4;
+		end
+
+	ResLuma_LaunchResBlk_1: action
+				==>
+			LaunchActor :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ],
+			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
+		do
+			Component_type := Y_COMPONENT;
+			CountResBlock  := CountResBlock + 4;
 		end
 
 	ResLuma_CheckBmFlagAndMbType: action ==>
@@ -137,31 +179,166 @@ actor Algo_DecodeResidual()
 			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI),
 			mb_type <= BLOCK_TYPE_INTA_16x16_MAX,
 			mb_type >= BLOCK_TYPE_INTA_16x16_MIN
+		do
+			/*
+			foreach int i4x4 in 0 .. 3
+			do
+				foreach int i in 0 .. 14
+				do
+					i16x16ACLevel[i8x8Loop*4 + i4x4][i] := 0:
+				end
+			end
+			*/
+		end
+
+	ResetLevelTab: action ==>
+		do
+			/*
+			foreach int i4x4 in 0 .. 3
+			do
+				foreach int i in 0 .. 15
+				do
+					level[i8x8Loop*4 + i4x4][i] := 0:
+				end
+			end
+			*/
+		end
+
+	EndLoop8x8.IsEqualToFalse: action ==>
+		guard
+			i8x8Loop < 4
+		do
+			i8x8Loop := i8x8Loop + 1;
+			CodedBlockPatternLuma := rshift(CodedBlockPatternLuma, 1);
 		end
 
 	ResLuma_CheckCavlc8x8: action ==>
 		guard
 			entropy_coding_mode_flag = CAVLC_ENTROPY,
 			transform_size_8x8_flag  = true
+		do
+			/*
+			foreach int i8x8 in 0 .. 3
+			do
+				foreach int i4x4 in 0 .. 3
+				do
+					foreach int i in 0 .. 15
+					do
+						level[i8x8*4 + i4x4][i] := 0:
+					end
+				end
+			end
+			*/
 		end
+
+
+
 
 	/*Not implemented yet: CABAC
 	else
 		for(i8x8=0;i8x8<4;i8x8++)
+		{
 			if(CodeBlockPatternLuma & (1<<i8x8)) // ==> action CheckCodedBlockPattern
 				residual_block(...);
 			else
 				for(i=0;i<64;i++)
 					level8x8[i8x8][i]=0;
+		}
 */
 
+	ResBlock.HasFinished: action
+			EndOfResBlock:[End]
+				==>
+		guard
+			End = true,
+			CountResBlock != 0
+		do
+			CountResBlock := CountResBlock - 1;
+		end
+
+	SendEndResidual: action
+				==>
+			SkipNal :[true]
+		end
+
+	SendResBlockParameters: action
+				==>
+			ResBlknC:[nC]
+		var
+			int(size=8) nC
+		do
+			if(Component_type = Y_COMPONENT)then
+				nC :=
+					if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
+						rshift(TotalCoeffTab[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTab[IdxAboveNeighbour[IdxCurrMb]] +1, 1)
+					else
+						TotalCoeffTab[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTab[IdxAboveNeighbour[IdxCurrMb]]
+					end;
+				IdxCurrMb := IdxCurrMb + 1;
+			end
+		end
+
+	GetTotalCoeff: action
+			Total_Coeff:[ValTotal_Coeff]
+				==>
+		do
+			TotalCoeffTab[IdxCurrMb] := ValTotal_Coeff;
+		end
+
 	a:action ==>
+	guard
+			CountResBlock = 0
 	do
 		println("DecodeResidual not finished yet !");
 	end
 
 	schedule fsm GetParameters:
-		GetParameters (GetParameters )--> a;
+		GetParameters (GetParameters )--> ResLumaCheckIntra16x16;
+
+			/* residual_luma()*/
+			ResLumaCheckIntra16x16 (ResLuma_Launch16x16DCResBlock )--> ResLumaSendResBlkPar1;
+			ResLumaCheckIntra16x16 (ResLuma_CheckTransfSzAndCavlc )--> CheckCodeBlockBmFlag;
+			ResLumaCheckIntra16x16 (a)--> undefined;//Cabac stuff not implemented yet
+
+			ResLumaSendResBlkPar1 (SendResBlockParameters )--> ResLumaGetTotalCoeff1;
+
+			ResLumaGetTotalCoeff1 ( GetTotalCoeff )--> ResLumaCheckTrnsSzAndEntropy;
+
+			ResLumaCheckTrnsSzAndEntropy (ResLuma_CheckTransfSzAndCavlc)-->CheckCodeBlockBmFlag;
+			ResLumaCheckTrnsSzAndEntropy (a)--> undefined;//Cabac stuff not implemented yet
+	
+			CheckCodeBlockBmFlag (ResLuma_CheckCodedBlockPattern )--> CheckBmFlagEndIx;
+			CheckCodeBlockBmFlag (ResLuma_CheckBmFlagAndMbType )--> CheckEndLoop8x8;
+			CheckCodeBlockBmFlag (ResetLevelTab )--> CheckEndLoop8x8;
+	
+			CheckBmFlagEndIx (ResLuma_CheckBmFlagAndEndIdxAndMbType )--> ResLumaSendResBlkPar2_0;
+			CheckBmFlagEndIx (ResLuma_LaunchResBlk_1 )--> ResLumaSendResBlkPar2_0;
+
+			ResLumaSendResBlkPar2_0 (SendResBlockParameters )--> ResLumaGetTotalCoeff2_0;
+
+			ResLumaGetTotalCoeff2_0 (GetTotalCoeff )--> ResLumaSendResBlkPar2_1;
+
+			ResLumaSendResBlkPar2_1 (SendResBlockParameters )--> ResLumaGetTotalCoeff2_1;
+
+			ResLumaGetTotalCoeff2_1 (GetTotalCoeff )--> ResLumaSendResBlkPar2_2;
+
+			ResLumaSendResBlkPar2_2 (SendResBlockParameters )--> ResLumaGetTotalCoeff2_2;
+
+			ResLumaGetTotalCoeff2_2 (GetTotalCoeff )--> ResLumaSendResBlkPar2_3;
+
+			ResLumaSendResBlkPar2_3 (SendResBlockParameters )--> ResLumaGetTotalCoeff2_3;
+
+			ResLumaGetTotalCoeff2_3 (GetTotalCoeff )--> CheckEndLoop8x8;
+	
+			CheckEndLoop8x8 (EndLoop8x8.IsEqualToFalse )--> CheckCodeBlockBmFlag;
+			CheckEndLoop8x8 (ResLuma_CheckCavlc8x8 )--> a;
+			CheckEndLoop8x8 (ResBlock.HasFinished )-->WaitForEndOfDecoding;
+			CheckEndLoop8x8 (a )--> undefined;
+
+		WaitForEndOfDecoding (ResBlock.HasFinished )-->WaitForEndOfDecoding;
+		WaitForEndOfDecoding (a )--> undefined;
+
+		SendEndResidual(SendEndResidual )-->GetParameters;
 	a(a)-->undefined;
 	end
 end

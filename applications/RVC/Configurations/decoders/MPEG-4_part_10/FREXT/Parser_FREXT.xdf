@@ -103,7 +103,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="DecodePic">
+    <Instance id="Mgnt_DecodePic">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -178,6 +178,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="DecodeResidualBlock_Cavlc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeResidualBlock_Cavlc"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -191,11 +200,7 @@
     <Connection dst="CheckNaluType" dst-port="SpsSkipNal"
         src="SpsVLDecoding" src-port="SkipNal"/>
     <Connection dst="DecodeSps" dst-port="ValVLD" src="SpsVLDecoding" src-port="ValDecoded"/>
-    <Connection dst="SpsVLDecoding" dst-port="NbBitsToRead"
-        src="DecodeSps" src-port="NbBitsToRead"/>
     <Connection dst="DecodePps" dst-port="ValVLD" src="PpsVLDecoding" src-port="ValDecoded"/>
-    <Connection dst="PpsVLDecoding" dst-port="NbBitsToRead"
-        src="DecodePps" src-port="NbBitsToRead"/>
     <Connection dst="PpsVLDecoding" dst-port="EndOfNal" src="DecodePps" src-port="SkipNal"/>
     <Connection dst="PpsVLDecoding" dst-port="TypeOfVLD" src="DecodePps" src-port="TypeOfVLD"/>
     <Connection dst="PpsVLDecoding" dst-port="RbspByte"
@@ -206,18 +211,19 @@
         src="PicVLDecoding" src-port="SkipNal"/>
     <Connection dst="PicVLDecoding" dst-port="RbspByte"
         src="CheckNaluType" src-port="PicRbsp"/>
-    <Connection dst="PicVLDecoding" dst-port="EndOfNal" src="DecodePic" src-port="SkipNal"/>
-    <Connection dst="PicVLDecoding" dst-port="NbBitsToRead"
-        src="DecodePic" src-port="NbBitsToRead"/>
-    <Connection dst="PicVLDecoding" dst-port="TypeOfVLD" src="DecodePic" src-port="TypeOfVLD"/>
-    <Connection dst="DecodePic" dst-port="ValVLD" src="PicVLDecoding" src-port="ValDecoded"/>
+    <Connection dst="PicVLDecoding" dst-port="EndOfNal"
+        src="Mgnt_DecodePic" src-port="SkipNal"/>
+    <Connection dst="PicVLDecoding" dst-port="TypeOfVLD"
+        src="Mgnt_DecodePic" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ValVLD"
+        src="PicVLDecoding" src-port="ValDecoded"/>
     <Connection dst="DecodeSliceHeader" dst-port="ValVLD"
-        src="DecodePic" src-port="HeaderValVLD"/>
-    <Connection dst="DecodePic" dst-port="HeaderTypeOfVLD"
+        src="Mgnt_DecodePic" src-port="HeaderValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="HeaderTypeOfVLD"
         src="DecodeSliceHeader" src-port="TypeOfVLD"/>
-    <Connection dst="DecodePic" dst-port="HeaderNbBitsToRead"
+    <Connection dst="Mgnt_DecodePic" dst-port="HeaderNbBitsToRead"
         src="DecodeSliceHeader" src-port="NbBitsToRead"/>
-    <Connection dst="DecodePic" dst-port="HeaderSkipNal"
+    <Connection dst="Mgnt_DecodePic" dst-port="HeaderSkipNal"
         src="DecodeSliceHeader" src-port="SkipNal"/>
     <Connection dst="DecodePps" dst-port="PpsAsked"
         src="DecodeSliceHeader" src-port="GetPps"/>
@@ -275,16 +281,16 @@
     <Connection dst="DecodeSliceHeader"
         dst-port="OffsetForTopToBottomField" src="DecodeSps" src-port="OffsetForTopToBottomField"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="ValVLD"
-        src="DecodePic" src-port="DataValVLD"/>
+        src="Mgnt_DecodePic" src-port="DataValVLD"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="FirstMbInSlice"
         src="DecodeSliceHeader" src-port="FirstMbInSlice"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="EntropyCodingMode"
         src="DecodePps" src-port="entropy_coding_mode"/>
-    <Connection dst="DecodePic" dst-port="DataTypeOfVLD"
+    <Connection dst="Mgnt_DecodePic" dst-port="DataTypeOfVLD"
         src="DecodeSliceData_Cavlc" src-port="TypeOfVLD"/>
-    <Connection dst="DecodePic" dst-port="DataNbBitsToRead"
+    <Connection dst="Mgnt_DecodePic" dst-port="DataNbBitsToRead"
         src="DecodeSliceData_Cavlc" src-port="NbBitsToRead"/>
-    <Connection dst="DecodePic" dst-port="DataSkipNal"
+    <Connection dst="Mgnt_DecodePic" dst-port="DataSkipNal"
         src="DecodeSliceData_Cavlc" src-port="SkipNal"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="SliceType"
         src="DecodeSliceHeader" src-port="SliceType"/>
@@ -321,37 +327,40 @@
     <Connection dst="DecodeMacroBlockLayer" dst-port="Transform8x8Mode"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerTransform8x8Mode"/>
     <Connection dst="DecodeDecRefPicMarking" dst-port="ValVLD"
-        src="DecodePic" src-port="DecRefPicMarkingValVLD"/>
-    <Connection dst="DecodePic" dst-port="DecRefPicMarkingTypeOfVLD"
+        src="Mgnt_DecodePic" src-port="DecRefPicMarkingValVLD"/>
+    <Connection dst="Mgnt_DecodePic"
+        dst-port="DecRefPicMarkingTypeOfVLD"
         src="DecodeDecRefPicMarking" src-port="TypeOfVLD"/>
-    <Connection dst="DecodePic" dst-port="DecRefPicMarkingNbBitsToRead"
+    <Connection dst="Mgnt_DecodePic"
+        dst-port="DecRefPicMarkingNbBitsToRead"
         src="DecodeDecRefPicMarking" src-port="NbBitsToRead"/>
-    <Connection dst="DecodePic" dst-port="DecRefPicMarkingSkipNal"
+    <Connection dst="Mgnt_DecodePic" dst-port="DecRefPicMarkingSkipNal"
         src="DecodeDecRefPicMarking" src-port="SkipNal"/>
-    <Connection dst="DecodePic" dst-port="HeaderLaunchActor"
+    <Connection dst="Mgnt_DecodePic" dst-port="HeaderLaunchActor"
         src="DecodeSliceHeader" src-port="LaunchActor"/>
-    <Connection dst="DecodeRefPicList" dst-port="ValVLD" src="DecodePic" src-port="RefPicListValVLD"/>
-    <Connection dst="DecodePic" dst-port="RefPicListTypeOfVLD"
+    <Connection dst="DecodeRefPicList" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="RefPicListValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="RefPicListTypeOfVLD"
         src="DecodeRefPicList" src-port="TypeOfVLD"/>
-    <Connection dst="DecodePic" dst-port="RefPicListNbBitsToRead"
+    <Connection dst="Mgnt_DecodePic" dst-port="RefPicListNbBitsToRead"
         src="DecodeRefPicList" src-port="NbBitsToRead"/>
-    <Connection dst="DecodePic" dst-port="RefPicListSkipNal"
+    <Connection dst="Mgnt_DecodePic" dst-port="RefPicListSkipNal"
         src="DecodeRefPicList" src-port="SkipNal"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="ValVLD"
-        src="DecodePic" src-port="MbLayerValVLD"/>
-    <Connection dst="DecodePic" dst-port="MbLayerTypeOfVLD"
+        src="Mgnt_DecodePic" src-port="MbLayerValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="MbLayerTypeOfVLD"
         src="DecodeMacroBlockLayer" src-port="TypeOfVLD"/>
-    <Connection dst="DecodePic" dst-port="MbLayerNbBitsToRead"
+    <Connection dst="Mgnt_DecodePic" dst-port="MbLayerNbBitsToRead"
         src="DecodeMacroBlockLayer" src-port="NbBitsToRead"/>
-    <Connection dst="DecodePic" dst-port="MbLayerSkipNal"
+    <Connection dst="Mgnt_DecodePic" dst-port="MbLayerSkipNal"
         src="DecodeMacroBlockLayer" src-port="SkipNal"/>
-    <Connection dst="DecodePic" dst-port="DataLaunchActor"
+    <Connection dst="Mgnt_DecodePic" dst-port="DataLaunchActor"
         src="DecodeSliceData_Cavlc" src-port="LaunchActor"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="ChromaArrayType"
         src="DecodeSps" src-port="ChromaArrayType"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="ChromaArrayType"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerChromaArrayType"/>
-    <Connection dst="DecodePic" dst-port="MbLayerLaunchActor"
+    <Connection dst="Mgnt_DecodePic" dst-port="MbLayerLaunchActor"
         src="DecodeMacroBlockLayer" src-port="LaunchActor"/>
     <Connection dst="DecodeMbPred" dst-port="SliceType"
         src="DecodeMacroBlockLayer" src-port="MbPredSliceType"/>
@@ -359,12 +368,13 @@
         src="DecodeMacroBlockLayer" src-port="MbPredMbType"/>
     <Connection dst="DecodeMbPred" dst-port="TransfSz8x8"
         src="DecodeMacroBlockLayer" src-port="MbPredTransfSz8x8"/>
-    <Connection dst="DecodeMbPred" dst-port="ValVLD" src="DecodePic" src-port="MbPredValVLD"/>
-    <Connection dst="DecodePic" dst-port="MbPredTypeOfVLD"
+    <Connection dst="DecodeMbPred" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="MbPredValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="MbPredTypeOfVLD"
         src="DecodeMbPred" src-port="TypeOfVLD"/>
-    <Connection dst="DecodePic" dst-port="MbPredNbBitsToRead"
+    <Connection dst="Mgnt_DecodePic" dst-port="MbPredNbBitsToRead"
         src="DecodeMbPred" src-port="NbBitsToRead"/>
-    <Connection dst="DecodePic" dst-port="MbPredSkipNal"
+    <Connection dst="Mgnt_DecodePic" dst-port="MbPredSkipNal"
         src="DecodeMbPred" src-port="SkipNal"/>
     <Connection dst="DecodeMbPred" dst-port="ChromaArrayType"
         src="DecodeMacroBlockLayer" src-port="MbPredChromaArrayType"/>
@@ -378,9 +388,9 @@
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerMbFieldDecoding"/>
     <Connection dst="DecodeMbPred" dst-port="MbFieldDecoding"
         src="DecodeMacroBlockLayer" src-port="MbPredMbFieldDecoding"/>
-    <Connection dst="DecodePic" dst-port="ResSkipNal"
+    <Connection dst="Mgnt_DecodePic" dst-port="ResSkipNal"
         src="DecodeResidual" src-port="SkipNal"/>
-    <Connection dst="DecodePic" dst-port="ResLaunchActor"
+    <Connection dst="Mgnt_DecodePic" dst-port="ResLaunchActor"
         src="DecodeResidual" src-port="LaunchActor"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="EntropyCodingMode"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerEntropyCodingMode"/>
@@ -398,4 +408,40 @@
         src="DecodeMacroBlockLayer" src-port="ResStartIdx"/>
     <Connection dst="DecodeResidual" dst-port="EndIdx"
         src="DecodeMacroBlockLayer" src-port="ResEndIdx"/>
+    <Connection dst="DecodeResidual" dst-port="CodBlkPatnLm"
+        src="DecodeMacroBlockLayer" src-port="ResCodBlkPatnLm"/>
+    <Connection dst="DecodeResidual" dst-port="EndOfResBlock"
+        src="Mgnt_DecodePic" src-port="ResResidualBlockDecoded"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="NATab"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerNATab"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="NBTab"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerNBTab"/>
+    <Connection dst="DecodeResidual" dst-port="NATab"
+        src="DecodeMacroBlockLayer" src-port="ResNATab"/>
+    <Connection dst="DecodeResidual" dst-port="NBTab"
+        src="DecodeMacroBlockLayer" src-port="ResNBTab"/>
+    <Connection dst="DecodeResidual" dst-port="LeftMbExists"
+        src="DecodeMacroBlockLayer" src-port="ResLeftMbExists"/>
+    <Connection dst="DecodeResidual" dst-port="AboveMbExists"
+        src="DecodeMacroBlockLayer" src-port="ResAboveMbExists"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="LeftMbExists"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerLeftMbExists"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="AboveMbExists"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerAboveMbExists"/>
+    <Connection dst="DecodeResidual" dst-port="Total_Coeff"
+        src="DecodeResidualBlock_Cavlc" src-port="Total_Coeff"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcTypeOfVLD"
+        src="DecodeResidualBlock_Cavlc" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcSkipNal"
+        src="DecodeResidualBlock_Cavlc" src-port="SkipNal"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="nC"
+        src="DecodeResidual" src-port="ResBlknC"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcVLD_Param"
+        src="DecodeResidualBlock_Cavlc" src-port="VLD_Param"/>
+    <Connection dst="PicVLDecoding" dst-port="VLD_Param"
+        src="Mgnt_DecodePic" src-port="VLD_Param"/>
+    <Connection dst="SpsVLDecoding" dst-port="VLD_Param" src="DecodeSps" src-port="NbBitsToRead"/>
+    <Connection dst="PpsVLDecoding" dst-port="VLD_Param" src="DecodePps" src-port="NbBitsToRead"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="ResBlkCavlcValVLD"/>
 </XDF>

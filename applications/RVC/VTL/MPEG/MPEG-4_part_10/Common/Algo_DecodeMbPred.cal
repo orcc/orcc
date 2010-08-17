@@ -56,8 +56,6 @@ actor Algo_DecodeMbPred()
 
 	List(type:uint(size=5), size=5) NUM_MB_PART_P = [1,2,2,4,4];
 
-
-
 	List (type:uint(size=3),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
 
 	uint(size=5)  lumaYxYBlkIdx := 0;

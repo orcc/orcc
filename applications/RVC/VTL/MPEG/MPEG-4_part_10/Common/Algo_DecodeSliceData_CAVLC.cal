@@ -55,7 +55,11 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=2)  DecMbLayerChromaArrayType,
 	uint(size=5)  DecMbLayerNumRefIdxLXActive,
 	bool          DecMbLayerMbFieldDecoding,
-	bool          DecMbLayerEntropyCodingMode
+	bool          DecMbLayerEntropyCodingMode,
+	uint(size=5)  DecMbLayerNATab,
+	bool          DecMbLayerLeftMbExists,
+	uint(size=5)  DecMbLayerNBTab,
+	bool          DecMbLayerAboveMbExists
 		:
 
 
@@ -80,9 +84,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 //	uint(size=4) SLICE_TYPE_SP = 3;
 	uint(size=4) SLICE_TYPE_SI = 4;
 
-	//FixMe : it should be a constant !!
-	bool         CABAC_ENTROPY := true;
+	bool         CABAC_ENTROPY = true;
 
+	int SZ_TOTALCOEFF          = 128;
+	int MASK_TOTALCOEFF        = 127;
 /*
 *
 * State Variables
@@ -92,13 +97,15 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=4)  bit_depth_luma;
 	uint(size=4)  bit_depth_chroma;
 	uint(size=2)  Chroma_Array_Type;
+	uint(size=32) PicSizeInMbs;
+	uint(size=32) PicWidthInMbs;
 	//Pps Parameters
 	bool          entropy_coding_mode_flag;
 	bool          transform_8x8_mode_flag;
 	uint(size=5)  num_ref_idx_l0_active;
 	uint(size=5)  num_ref_idx_l1_active;
 	//Slice Header Parameters
-	uint(size=32) val_CurrMbAddr;
+	uint(size=32) CurrMbAddr;
 	uint(size=4)  slice_type;
 	bool          MbaffFrameFlag;
 
@@ -108,9 +115,12 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool          mb_field_decoding_flag;
 	bool          direct_8x8_inference_flag;
 
+	//Size of TotalCoeffTab must be >= PicWidthInMb + 1 and must be equal to pow(2,n) for masking bits easily.
+	List( type: List(type: uint(size=5), size=16),size= SZ_TOTALCOEFF) TotalCoeffTab := [[0:for int s in 0 .. 15]: for int s in 0 .. SZ_TOTALCOEFF-1];
+
 	procedure NextMbAddress()
 	begin
-		val_CurrMbAddr := val_CurrMbAddr + 1;
+		CurrMbAddr := CurrMbAddr + 1;
 //		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 //		Mb_y := val_CurrMbAddr / PicWidthInMbs;
 	end
@@ -143,7 +153,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			num_ref_idx_l1_active     := ValNumRefIdxLXActive[1];
 			Chroma_Array_Type         := ValChromaArrayType;
 
-			val_CurrMbAddr :=
+			CurrMbAddr :=
 				if(MbaffFrameFlag = false)then
 					ValFirstMbInSlice * (1 + 0)
 				else
@@ -152,9 +162,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			moreDataFlag   := true;
 			prevMbSkipped  := false;
 
-/*			PicSizeInMbs             := ValPicSizeInMbs;
+			PicSizeInMbs             := ValPicSizeInMbs;
 			PicWidthInMbs            := ValPicWdtInMbs;
-			NonZeroCount   := [[ 0 : for int j in 0 .. 16-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
+/*			NonZeroCount   := [[ 0 : for int j in 0 .. 16-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
 			NonZeroCountCb := [[ 0 : for int j in 0 ..  4-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
 			NonZeroCountCr := [[ 0 : for int j in 0 ..  4-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
 			Mb_x := val_CurrMbAddr mod PicWidthInMbs;
@@ -238,8 +248,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			NbBitsToRead :[     1     ]
 		guard
 			MbaffFrameFlag = true,
-			    (val_CurrMbAddr mod 2 = 0)
-			or ((val_CurrMbAddr mod 2 = 1) and prevMbSkipped)
+			    (CurrMbAddr mod 2 = 0)
+			or ((CurrMbAddr mod 2 = 1) and prevMbSkipped)
 		end
 
 	ReadMbFieldDecod.Done: action
@@ -266,16 +276,46 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			DecMbLayerChromaArrayType    :[Chroma_Array_Type],
 			DecMbLayerNumRefIdxLXActive  :[num_ref_idx_l0_active , num_ref_idx_l1_active],
 			DecMbLayerMbFieldDecoding    :[mb_field_decoding_flag],
-			DecMbLayerEntropyCodingMode  :[entropy_coding_mode_flag]
+			DecMbLayerEntropyCodingMode  :[entropy_coding_mode_flag],
+			DecMbLayerNATab              :[NaTab] repeat 4,
+			DecMbLayerLeftMbExists       :[LMbExists],
+			DecMbLayerNBTab              :[NbTab] repeat 4,
+			DecMbLayerAboveMbExists      :[AMbExists]
+		var
+			List(type: uint(size=5), size=4) NaTab,
+			List(type: uint(size=5), size=4) NbTab,
+			bool LMbExists,
+			bool AMbExists
+		do
+				if((CurrMbAddr mod PicWidthInMbs) != 0) then
+					NaTab := [ TotalCoeffTab[ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 5],
+					           TotalCoeffTab[ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 7],
+					           TotalCoeffTab[ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][13],
+					           TotalCoeffTab[ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][15]  ];
+					LMbExists := true;
+				else
+					NaTab     := [0:for int i in 0 ..4];
+					LMbExists := false;
+				end
+				if(CurrMbAddr / PicWidthInMbs != 0)then
+					AMbExists := true;
+					NbTab := [ TotalCoeffTab[ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
+					           TotalCoeffTab[ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
+					           TotalCoeffTab[ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
+					           TotalCoeffTab[ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][15]  ];
+				else
+					AMbExists := false;
+					NbTab := [0:for int i in 0 ..4];
+				end
 		end
 
 
 	DecMacroBlockLayer.Launch: action
 				==>
 			//          more_rbsp_data()
-			SkipNal   :[   false,  false      ],//Keep synchro
-			LaunchActor :[MB_LAYER, SLICE_DATA],
-			TypeOfVLD :[ MORE_RBSP_DATA ]
+			SkipNal     :[   false ,  false      ],//Keep synchro
+			LaunchActor :[ MB_LAYER , SLICE_DATA],
+			TypeOfVLD   :[         MORE_RBSP_DATA ]
 		end
 
 	LaunchNextMbAddr: action

@@ -18,7 +18,7 @@ actor Algo_VariableLengthDecoding()
 	bool          NewNal,
 
 	uint(size=3)  TypeOfVLD,
-	uint(size=5)  NbBitsToRead,
+	uint(size=5)  VLD_Param,
 	bool          EndOfNal
 		==>
 	int (size=32) ValDecoded,
@@ -37,7 +37,1769 @@ actor Algo_VariableLengthDecoding()
 	uint(size=3) VLD_SE                = 2;
 	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
 	uint(size=3) MORE_RBSP_DATA        = 4;
+	uint(size=3) CAVLC_COEFF_TOKEN     = 5;
 
+	List(type: List(type: List(type: bool, size=64), size=16), size=6) TotalCoeffValid = 
+		[
+			[
+				// 0 <= nC < 2 ; nbBitRead = 1
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 2
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 3
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 4
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 5
+				[ false , false , false , true  , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 6
+				[ false , false , false , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 7
+				[ false , false , false , false , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 8
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 9
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 10
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 11
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 12
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 13
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 14
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 15
+				[ false , true  , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 0 <= nC < 2 ; nbBitRead = 16
+				[ false , false , false , false , true  , true  , true  , true  , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				]
+			],
+			[
+				// 2 <= nC < 4 ; nbBitRead = 1
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 2
+				[ false , false , true  , true  , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 3
+				[ false , false , false , true  , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 4
+				[ false , false , false , false , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 5
+				[ false , false , false , false , false , false , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 6
+				[ false , false , false , false , true  , true  , true  , true  , true  , true ,
+				  true  , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 7
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 8
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 9
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 10
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 11
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 12
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 13
+				[ false , true  , false , false , false , false , true  , true  , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 14
+				[ false , false , false , false , true  , true  , true  , true  , true  , true ,
+				  true  , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 15
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 2 <= nC < 4 ; nbBitRead = 16
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				]
+			],
+			[
+				// 4 <= nC < 8 ; nbBitRead = 1
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 2
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 3
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 4
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 5
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 6
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 7
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 8
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 9
+				[ false , false , false , false , false , false , false , true  , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 10
+				[ false , true  , true  , true  , true  , true  , true  , true  , true  , true ,
+				  true  , true  , true  , true  , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 11
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 12
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 13
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 14
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 15
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 4 <= nC < 8 ; nbBitRead = 16
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				]
+			],
+			[
+				// 8 <= nC ; nbBitRead = 1
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 2
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 3
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 4
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 5
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 6
+				[ true  , true  , false , true  , true  , true  , true  , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , true  , true  , true  , true ,
+				  true  , true  , true  , true  , true  , true  , true  , true  , true  , true ,
+				  true  , true  , true  , true  , true  , true  , true  , true  , true  , true ,
+				  true  , true  , true  , true  , true  , true  , true  , true  , true  , true ,
+				  true  , true  , true  , true  , true  , true  , true  , true  , true  , true ,
+				  true  , true  , true  , true
+				],
+				// 8 <= nC ; nbBitRead = 7
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 8
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 9
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 10
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 11
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 12
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 13
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 14
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 15
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// 8 <= nC ; nbBitRead = 16
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				]
+			],
+			[
+				// nC == -1 ; nbBitRead = 1
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 2
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 3
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 4
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 5
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 6
+				[ false , false , true  , true  , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 7
+				[ true  , false , true  , true  , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 8
+				[ false , false , true  , true  , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 9
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 10
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 11
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 12
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 13
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 14
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 15
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -1 ; nbBitRead = 16
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				]
+			],
+			[
+				// nC == -2 ; nbBitRead = 1
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 2
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 3
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 4
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 5
+				[ false , true  , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 6
+				[ false , true  , false , false , false , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 7
+				[ false , false , false , false , false , false , false , false , true  , true ,
+				  true  , true  , true  , true  , true  , true  , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 8
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 9
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 10
+				[ false , false , false , false , true  , false , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 11
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 12
+				[ false , false , false , false , true  , true  , true  , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 13
+				[ false , false , false , false , false , false , false , true  , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 14
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 15
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				],
+				// nC == -2 ; nbBitRead = 16
+				[ false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false , false , false , false , false , false , false,
+				  false , false , false , false
+				]
+			]
+		];
+
+
+	//The first byte is TrailingOnes(coeff_token), the second byte isTotalCoeff(coeff_token)
+	List(type: List(type: List(type: uint(size=16), size=64), size=16), size=6) TotalCoeffValue =
+		[
+			[
+				// 0 <= nC < 2 ; nbBitRead = 1
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 2
+				[ 0x0000 , 0x0101 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 3
+				[ 0x0000 , 0x0202 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 4
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 5
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0303 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 6
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0304 , 0x0102 , 0x0001 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 7
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0305 , 0x0203 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 8
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0306 , 0x0204 , 0x0103 , 0x0002 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 9
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0307 , 0x0205 , 0x0104 , 0x0003 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 10
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0308 , 0x0206 , 0x0105 , 0x0004 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 11
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0309 , 0x0207 , 0x0106 , 0x0005 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 12
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 13
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0008 , 0x0209 ,
+				  0x0108 ,  0x007 , 0x030A , 0x0208 , 0x0107 , 0x0006 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 14
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x030C , 0x020B ,
+				  0x010A , 0x000A , 0x030B , 0x020A , 0x0109 , 0x0009 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 15
+				[ 0x0000 , 0x010D , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x030E , 0x020D ,
+				  0x010C , 0x000C , 0x030D , 0x020C , 0x010B , 0x000B , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 0 <= nC < 2 ; nbBitRead = 16
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0010 , 0x0210 , 0x0110 , 0x000F , 0x0310 , 0x020F ,
+				  0x010F , 0x000E , 0x030F , 0x020E , 0x010E , 0x000D , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				]
+			],
+			[
+				// 2 <= nC < 4 ; nbBitRead = 1
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 2
+				[ 0x0000 , 0x0000 , 0x0101 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 3
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0202 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 4
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0304 , 0x0303 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 5
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0305 , 0x0102 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 6
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0307 , 0x0204 , 0x0104 , 0x0002 , 0x0306 , 0x0203 ,
+				  0x0103 , 0x0001 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 7
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0308 , 0x0205 , 0x0105 , 0x0003 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 8
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0005 , 0x0206 , 0x0106 , 0x0004 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 9
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0309 , 0x0207 , 0x0107 , 0x0006 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 10
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 11
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x030B , 0x0209 ,
+				  0x0109 , 0x0008 , 0x030A , 0x0208 , 0x0108 ,  0x007 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 12
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x000B , 0x020B ,
+				  0x010B , 0x000A , 0x030C , 0x020A , 0x010A , 0x0009 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 13
+				[ 0x0000 , 0x030F , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x020E , 0x000E , 0x030E , 0x020D ,
+				  0x010D , 0x000D , 0x030D , 0x020C , 0x010C , 0x000C , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 14
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0310 , 0x0210 , 0x0110 , 0x0010 , 0x010F , 0x000F ,
+				  0x020F , 0x010E , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 15
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 2 <= nC < 4 ; nbBitRead = 16
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				]
+			],
+			[
+				// 4 <= nC < 8 ; nbBitRead = 1
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 2
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 3
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 4
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0307 , 0x0306 ,
+				  0x0305 , 0x0304 , 0x0303 , 0x0202 , 0x0101 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 5
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0105 , 0x0205 ,
+				  0x0104 , 0x0204 , 0x0103 , 0x0308 , 0x0203 , 0x0102 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 6
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0003 , 0x0207 ,
+				  0x0107 , 0x0002 , 0x0309 , 0x0206 , 0x0106 , 0x0001 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 7
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,  0x007 , 0x0006 ,
+				  0x0209 , 0x0005 , 0x030A , 0x0208 , 0x0108 , 0x0004 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 8
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x030C , 0x0000 , 0x020B ,
+				  0x010A , 0x0009 , 0x030B , 0x020A , 0x0109 , 0x0008 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 9
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x010D , 0x000C , 0x020D ,
+				  0x010C , 0x000B , 0x030D , 0x020C , 0x010B , 0x000A , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 10
+				[ 0x0000 , 0x0010 , 0x0310 , 0x0210 , 0x0110 , 0x000F , 0x030F , 0x020F , 0x010F , 0x000E ,
+				  0x030E , 0x020E , 0x010E , 0x000D , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 11
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 12
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 13
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 14
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 15
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 4 <= nC < 8 ; nbBitRead = 16
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				]
+			],
+			[
+				// 8 <= nC ; nbBitRead = 1
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 2
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 3
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 4
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 5
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 6
+				[ 0x0001 , 0x0101 , 0x0000 , 0x0000 , 0x0002 , 0x0102 , 0x0202 , 0x0000 , 0x0003 , 0x0103 ,
+				  0x0203 , 0x0303 , 0x0004 , 0x0104 , 0x0204 , 0x0304 , 0x0005 , 0x0105 , 0x0205 , 0x0305 ,
+				  0x0006 , 0x0106 , 0x0206 , 0x0306 ,  0x007 , 0x0107 , 0x0207 , 0x0307 , 0x0008 , 0x0108 ,
+				  0x0208 , 0x0308 , 0x0009 , 0x0109 , 0x0209 , 0x0309 , 0x000A , 0x010A , 0x020A , 0x030A ,
+				  0x000B , 0x010B , 0x020B , 0x030B , 0x000C , 0x010C , 0x020C , 0x030C , 0x000D , 0x010D ,
+				  0x020D , 0x030D , 0x000E , 0x010E , 0x020E , 0x030E , 0x000F , 0x010F , 0x020F , 0x030F ,
+				  0x0010 , 0x0110 , 0x0210 , 0x0310
+				],
+				// 8 <= nC ; nbBitRead = 7
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 8
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 9
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 10
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 11
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 12
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 13
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 14
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 15
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// 8 <= nC ; nbBitRead = 16
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				]
+			],
+			[
+				// nC == -1 ; nbBitRead = 1
+				[ 0x0000 , 0x0101 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 2
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 3
+				[ 0x0000 , 0x0202 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 4
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 5
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 6
+				[ 0x0000 , 0x0000 , 0x0004 , 0x0003 , 0x0002 , 0x0303 , 0x0102 , 0x0001 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 7
+				[ 0x0304 , 0x0000 , 0x0203 , 0x0103 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 8
+				[ 0x0000 , 0x0000 , 0x0204 , 0x0104 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 9
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 10
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 11
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 12
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 13
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 14
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 15
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -1 ; nbBitRead = 16
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				]
+			],
+			[
+				// nC == -2 ; nbBitRead = 1
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 2
+				[ 0x0000 , 0x0101 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 3
+				[ 0x0000 , 0x0202 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 4
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 5
+				[ 0x0000 , 0x0303 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 6
+				[ 0x0000 , 0x0304 , 0x0000 , 0x0000 , 0x0000 , 0x0206 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 7
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0306 , 0x0305 ,
+				  0x0204 , 0x0203 , 0x0103 , 0x0102 , 0x0002 , 0x0001 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 8
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 9
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0205 , 0x0104 , 0x0004 , 0x0003 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 10
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0307 , 0x0000 , 0x0105 , 0x0005 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 11
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0308 , 0x0207 , 0x0106 , 0x0006 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 12
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0208 , 0x0108 , 0x0107 ,  0x007 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 13
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0008 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 14
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 15
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				],
+				// nC == -2 ; nbBitRead = 16
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
+				  0x0000 , 0x0000 , 0x0000 , 0x0000
+				]
+			]
+		];
 
 /*
 *
@@ -61,6 +1823,11 @@ actor Algo_VariableLengthDecoding()
 
 	/* more_rbsp_data() */
 	bool          NewNalAlreadyDetected  := false;
+
+	/* Cavlc coeff_token */
+	uint(size=3) Idx_nC;
+	uint(size=5) NbBitsRead;
+	uint(size=6) coeff_token;
 
 /*
 *
@@ -231,9 +1998,9 @@ actor Algo_VariableLengthDecoding()
 
 
 	IsReadBits: action
-			TypeOfVLD    :[ValTypeOfVLD],
-			EndOfNal     :[ValEndOfNal],
-			NbBitsToRead :[ValNbBits]
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal],
+			VLD_Param :[ValNbBits]
 				==>
 		guard
 			ValEndOfNal  = false,
@@ -241,6 +2008,37 @@ actor Algo_VariableLengthDecoding()
 		do
 			BitsCount := ValNbBits;
 			ReadValue := 0;
+		end
+
+
+	IsCavlcCoeffToken: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal],
+			VLD_Param :[nC]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = CAVLC_COEFF_TOKEN
+		do
+			if(nC < 0)then
+				if(nC = -1)then
+					Idx_nC := 4;
+				else
+					Idx_nC := 5;
+				end
+			else
+				if(nC >=8)then
+					Idx_nC := 3;
+				else
+					if(nC >=4)then
+						Idx_nC := 2;
+					else
+						Idx_nC := rshift(nC,1);
+					end
+				end
+			end
+			coeff_token := 0;
+			NbBitsRead := 0;
 		end
 
 
@@ -380,6 +2178,39 @@ actor Algo_VariableLengthDecoding()
 //			println("\tUValue:"+ReadValue);
 		end
 
+	GetCavlcCoeffToken.Launch: action ==>
+		do
+			coeff_token     := lshift(coeff_token, 1);
+			coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
+			println("Cavlc bit1:"+mask_bits(rshift(WorkingByte,7),1));
+			WorkingByte     := lshift(WorkingByte,1);
+			CountBufferRbsp := CountBufferRbsp - 1;
+			NbBitsRead      := NbBitsRead + 1;
+			while((TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)] = false) and (CountBufferRbsp > 0))
+			do
+				coeff_token     := lshift(coeff_token, 1);
+				coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
+			println("Cavlc bit:"+mask_bits(rshift(WorkingByte,7),1));
+				WorkingByte     := lshift(WorkingByte,1);
+				CountBufferRbsp := CountBufferRbsp - 1;
+				NbBitsRead      := NbBitsRead + 1;
+				if(TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)] = true)then
+					println("youpi!");
+				end
+			end
+		end
+
+	GetCavlcCoeffToken.NotFinished: action ==>
+		guard
+			TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)] = false
+		end
+
+	GetCavlcCoeffToken.Finished: action
+			==>
+			ValDecoded :[TotalCoeffValue[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)]]
+		do
+			println("Cavlc; Idx_nc :" + Idx_nC + " ; NbBitsRead : "+NbBitsRead+ " ; coeff_token : "+coeff_token);
+		end
 
 /*
 *
@@ -394,6 +2225,7 @@ actor Algo_VariableLengthDecoding()
 		CheckVLDType    (IsVldSe                             )--> VLDecoding_Se;
 		CheckVLDType    (IsReadBits                          )--> Decode_u;
 		CheckVLDType    (IsMoreRbspData                      )--> FillBuffer;
+		CheckVLDType    (IsCavlcCoeffToken                   )--> DecCavlcCofTkn;
 		CheckVLDType    (FillBufferRbsp                      )--> CheckVLDType;
 
 		/* more_rbsp_data() */
@@ -405,56 +2237,68 @@ actor Algo_VariableLengthDecoding()
 		CheckBuffer     (CheckSizeBufferRbsp                 )--> CheckVLDType;
 
 		/* Skip the others values of the Rbsp */
-		WaitForNewNal   (NewNalHasBeenSent      )--> ResetNewNal;
-		WaitForNewNal   (WaitForNewNal          )--> WaitForNewNal2;
-		WaitForNewNal   (NewNalDetected         )--> CheckVLDType;
+		WaitForNewNal   (NewNalHasBeenSent                   )--> ResetNewNal;
+		WaitForNewNal   (WaitForNewNal                       )--> WaitForNewNal2;
+		WaitForNewNal   (NewNalDetected                      )--> CheckVLDType;
 
-		ResetNewNal     (ResetNewNalAlreadyDetected )--> CheckVLDType;
+		ResetNewNal     (ResetNewNalAlreadyDetected          )--> CheckVLDType;
 
-		WaitForNewNal2  (WaitForNewNal          )--> WaitForNewNal2;
-		WaitForNewNal2  (NewNalDetected         )--> CheckVLDType;
+		WaitForNewNal2  (WaitForNewNal                       )--> WaitForNewNal2;
+		WaitForNewNal2  (NewNalDetected                      )--> CheckVLDType;
 
 		/* ue(v) decoding process */
-		VLDecoding_Ue   (Buffer                 )--> GetCodeNum4ue;
-		VLDecoding_Ue   (FillBufferRbsp         )--> VLDecoding_Ue;
+		VLDecoding_Ue   (Buffer                              )--> GetCodeNum4ue;
+		VLDecoding_Ue   (FillBufferRbsp                      )--> VLDecoding_Ue;
 
-		GetCodeNum4ue   (GetCodeNum.Launch      )--> CheckCodeNum4ue;
+		GetCodeNum4ue   (GetCodeNum.Launch                   )--> CheckCodeNum4ue;
 
-		CheckCodeNum4ue (GetCodeNum.NotFinished )--> VLDecoding_Ue;
-		CheckCodeNum4ue (GetCodeNum.Finished    )--> SendUeValue;
+		CheckCodeNum4ue (GetCodeNum.NotFinished              )--> VLDecoding_Ue;
+		CheckCodeNum4ue (GetCodeNum.Finished                 )--> SendUeValue;
 
-		SendUeValue     (SendUeValue            )--> CheckVLDType;
+		SendUeValue     (SendUeValue                         )--> CheckVLDType;
 
 
 		/* se(v) decoding process */
-		VLDecoding_Se   (Buffer                 )--> GetCodeNum4se;
-		VLDecoding_Se   (FillBufferRbsp         )--> VLDecoding_Se;
+		VLDecoding_Se   (Buffer                              )--> GetCodeNum4se;
+		VLDecoding_Se   (FillBufferRbsp                      )--> VLDecoding_Se;
 
-		GetCodeNum4se   (GetCodeNum.Launch      )--> CheckCodeNum4se;
+		GetCodeNum4se   (GetCodeNum.Launch                   )--> CheckCodeNum4se;
 
-		CheckCodeNum4se (GetCodeNum.NotFinished )--> VLDecoding_Se;
-		CheckCodeNum4se (GetCodeNum.Finished    )--> SendUeValse;
+		CheckCodeNum4se (GetCodeNum.NotFinished              )--> VLDecoding_Se;
+		CheckCodeNum4se (GetCodeNum.Finished                 )--> SendUeValse;
 
-		SendUeValse     (SendSeValue            )--> CheckVLDType;
+		SendUeValse     (SendSeValue                         )--> CheckVLDType;
 
 
 		/* u(n) decoding process */
-		Decode_u        (Buffer                 )--> Get_u;
-		Decode_u        (FillBufferRbsp         )--> Decode_u;
+		Decode_u        (Buffer                              )--> Get_u;
+		Decode_u        (FillBufferRbsp                      )--> Decode_u;
 
-		Get_u           (Get_u.Launch           )--> Check_u_Val;
+		Get_u           (Get_u.Launch                        )--> Check_u_Val;
 
-		Check_u_Val     (Get_u.NotFinished      )--> Decode_u;
-		Check_u_Val     (Get_u.Finished         )--> SendUValue;
+		Check_u_Val     (Get_u.NotFinished                   )--> Decode_u;
+		Check_u_Val     (Get_u.Finished                      )--> SendUValue;
 
-		SendUValue      (SendUValue             )--> CheckVLDType;
+		SendUValue      (SendUValue                          )--> CheckVLDType;
+
+
+		/* Cavlc coeff_token() decoding process */
+		DecCavlcCofTkn  (Buffer                              )--> GetCavlcCofTkn;
+		DecCavlcCofTkn  (FillBufferRbsp                      )--> DecCavlcCofTkn;
+
+		GetCavlcCofTkn   (GetCavlcCoeffToken.Launch          )--> ChckCavlcCofTkn;
+
+		ChckCavlcCofTkn (GetCavlcCoeffToken.NotFinished      )--> DecCavlcCofTkn;
+		ChckCavlcCofTkn (GetCavlcCoeffToken.Finished         )--> CheckVLDType;
 	end
 	
 	priority
-		NewNalHasBeenSent      > WaitForNewNal        > NewNalDetected;
-		IsVldUe                > IsReadBits           > IsVldSe              > FillBufferRbsp > IsMoreRbspData > IsByteAligned > IsEndOfNal;
-		CheckSizeBufferRbsp    > FillBufferRbsp       > FutureNewNalDetected > NewNalHasBeenSent;
-		GetCodeNum.NotFinished > GetCodeNum.Finished;
-		Buffer.IsNotEmpty      > FillBufferRbsp       > Buffer.IsEmpty;
+		NewNalHasBeenSent              > WaitForNewNal                   > NewNalDetected;
+		IsVldUe                        > IsReadBits                      > IsCavlcCoeffToken    > IsVldSe;
+		IsVldSe                        > FillBufferRbsp > IsMoreRbspData > IsByteAligned        > IsEndOfNal;
+		CheckSizeBufferRbsp            > FillBufferRbsp                  > FutureNewNalDetected > NewNalHasBeenSent;
+		GetCodeNum.NotFinished         > GetCodeNum.Finished;
+		Buffer.IsNotEmpty              > FillBufferRbsp                  > Buffer.IsEmpty;
+		GetCavlcCoeffToken.NotFinished > GetCavlcCoeffToken.Finished;
 	end
 end
