@@ -247,7 +247,7 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 actorParameter(parameter) ::= <<
-@$parameter$ = constant $parameter.type$ undef
+@$parameter$ = global $parameter.type$ undef
 
 >>
 
