@@ -284,6 +284,9 @@ void FifoTrace::setFiles(Decoder* decoder){
 	// Create entry basic block
 	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", init);
 
+	// Create the return instruction and add it to the basic block.
+	ReturnInst::Create(Context, BBEntry);
+
 
 	// Set opening Files
 	Network* network = decoder->getNetwork();
