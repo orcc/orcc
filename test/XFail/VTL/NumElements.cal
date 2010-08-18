@@ -1,0 +1,19 @@
+actor NumElements () ==> :
+
+	List(type: int, size=2) x;
+
+	int sz = # x;
+
+	List(type: int, size=#b) a;
+
+	List(type: int, size=#a) b;
+
+	// these type definitions are fine because the type definitions are not cyclic
+	List(type: int, size=2) c = [ 0, #d ];
+	List(type: int, size=# c) d = [ #c, 2 ];
+
+	int bad_sz = # 3;
+
+	int bad_sz2 = # bad_sz;
+
+end

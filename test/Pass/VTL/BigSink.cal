@@ -1,5 +1,6 @@
 actor BigSink () int(size=64) I ==> :
 
+
 	action I:[ i ] ==>
 	do
 		println("x = " + i);

@@ -1,0 +1,20 @@
+actor ListList () ==> int(size=64) O :
+
+	List(type: int, size = #list + 3) y;
+
+	List(type: List(type:int, size=4), size=18) list =
+		[ [ 4 * i + j : for int j in 0 .. 3 ] : for int i in 0 .. 17 ];
+
+	int count := 0;
+	
+	initialize ==>
+	do
+		println("size of y should be 21, is " + #y);
+	end
+
+	action ==> O:[ list[0] ] repeat 4
+	do
+		count := (count + 1) mod #list;
+	end
+
+end

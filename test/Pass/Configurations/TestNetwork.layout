@@ -3,5 +3,7 @@
    <vertices>
       <vertex id="test_big" x="94" y="116"/>
       <vertex id="sink_big" x="314" y="136"/>
+      <vertex id="list_list" x="72" y="261"/>
+      <vertex id="sink_big_2" x="330" y="293"/>
    </vertices>
 </layout>
