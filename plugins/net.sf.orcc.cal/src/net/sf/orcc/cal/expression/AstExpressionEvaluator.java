@@ -48,8 +48,11 @@ import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
+import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.frontend.Util;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.util.StringUtil;
@@ -442,10 +445,10 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	@Override
 	public Object caseAstExpressionUnary(AstExpressionUnary expression) {
 		UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
-		Object value = evaluate(expression.getExpression());
 
 		switch (op) {
-		case BITNOT:
+		case BITNOT: {
+			Object value = evaluate(expression.getExpression());
 			if (value instanceof Long) {
 				long i = (Long) value;
 				return ~i;
@@ -455,7 +458,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					"bitnot expects an integer expression", expression,
 					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
 			return null;
-		case LOGIC_NOT:
+		}
+		case LOGIC_NOT: {
+			Object value = evaluate(expression.getExpression());
 			if (value instanceof Boolean) {
 				boolean b = (Boolean) value;
 				return !b;
@@ -465,7 +470,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					"not expects a boolean expression", expression,
 					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
 			return null;
-		case MINUS:
+		}
+		case MINUS: {
+			Object value = evaluate(expression.getExpression());
 			if (value instanceof Long) {
 				long i = (Long) value;
 				return -i;
@@ -475,10 +482,17 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					"minus expects an integer expression", expression,
 					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
 			return null;
+		}
 		case NUM_ELTS:
-			CalJavaValidator.getInstance()
-					.error("# is not yet supported", expression,
-							CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
+			TypeChecker typeChecker = new TypeChecker();
+			Type type = typeChecker.getType(expression.getExpression());
+			if (type != null && type.isList()) {
+				return (long) ((TypeList) type).getSize();
+			}
+
+			CalJavaValidator.getInstance().error(
+					"operator # expects a list expression", expression,
+					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
 			return null;
 		}
 

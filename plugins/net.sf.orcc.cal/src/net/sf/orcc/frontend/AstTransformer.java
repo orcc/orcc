@@ -283,11 +283,16 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
+			Location location = Util.getLocation(expression);
 			UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
 			Expression expr = doSwitch(expression.getExpression());
 
-			return new UnaryExpr(Util.getLocation(expression), op, expr,
-					expression.getIrType());
+			if (UnaryOp.NUM_ELTS == op) {
+				TypeList typeList = (TypeList) expr.getType();
+				return new IntExpr(location, typeList.getSize());
+			}
+
+			return new UnaryExpr(location, op, expr, expression.getIrType());
 		}
 
 		@Override

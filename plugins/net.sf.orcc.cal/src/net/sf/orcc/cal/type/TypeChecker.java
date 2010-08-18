@@ -384,8 +384,17 @@ public class TypeChecker extends CalSwitch<Type> {
 			}
 			return type;
 		case NUM_ELTS:
+			if (!type.isList()) {
+				CalJavaValidator.getInstance().error(
+						"Cannot convert " + type + " to List", expression,
+						CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
+				return null;
+			}
+			TypeList listType = (TypeList) type;
+			return IrFactory.eINSTANCE.createTypeInt(IntExpr.getSize(listType
+					.getSize()));
 		default:
-			CalJavaValidator.getInstance().error("Not implemented yet",
+			CalJavaValidator.getInstance().error("Unknown unary operator",
 					expression, CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
 			return null;
 		}
@@ -394,7 +403,13 @@ public class TypeChecker extends CalSwitch<Type> {
 	@Override
 	public Type caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		return variable.getIrType();
+		Type type = variable.getIrType();
+		if (type == null) {
+			type = new TypeConverter().doSwitch(variable.getType());
+			variable.setIrType(type);
+		}
+
+		return type;
 	}
 
 	@Override

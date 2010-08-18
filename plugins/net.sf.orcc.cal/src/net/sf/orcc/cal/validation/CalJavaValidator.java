@@ -62,6 +62,7 @@ import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 import net.sf.orcc.cal.type.TypeChecker;
+import net.sf.orcc.cal.type.TypeCycleDetector;
 import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
@@ -222,14 +223,17 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		((CalQualifiedNameProvider) nameProvider).resetUntaggedCount();
 		getNames(actor);
 
+		// check there are no cycles in type definitions
+		if (!new TypeCycleDetector().detectCycles(actor)) {
+			// transforms AST types to IR types
+			// this is a prerequisite for type checking
+			TypeTransformer typeTransformer = new TypeTransformer();
+			typeTransformer.transformTypes(actor);
+		}
+
 		// evaluate state variables
 		checker = new TypeChecker();
 		evaluateStateVariables(actor.getStateVariables());
-
-		// transforms AST types to IR types
-		// this is a prerequisite for type checking
-		TypeTransformer typeTransformer = new TypeTransformer();
-		typeTransformer.transformTypes(actor);
 
 		checkActorStructure(actor);
 	}
