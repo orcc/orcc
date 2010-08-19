@@ -2,7 +2,7 @@
 <layout>
    <vertices>
       <vertex id="source" x="57" y="70"/>
-      <vertex id="Display_0" x="432" y="70"/>
+      <vertex id="display" x="432" y="70"/>
       <vertex id="Extract_yuv" x="173" y="154"/>
       <vertex id="Merger" x="314" y="154"/>
       <vertex id="SPS" x="57" y="181"/>

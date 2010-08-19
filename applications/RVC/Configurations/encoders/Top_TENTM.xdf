@@ -21,7 +21,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Display_0">
+    <Instance id="display">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -64,9 +64,9 @@
     <Connection dst="Merger" dst-port="Y" src="Extract_yuv" src-port="Y"/>
     <Connection dst="Merger" dst-port="U" src="Extract_yuv" src-port="U"/>
     <Connection dst="Merger" dst-port="V" src="Extract_yuv" src-port="V"/>
-    <Connection dst="Display_0" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="display" dst-port="B" src="Merger" src-port="YUV"/>
     <Connection dst="Extract_yuv" dst-port="Width" src="SPS" src-port="Width"/>
     <Connection dst="Extract_yuv" dst-port="Height" src="SPS" src-port="Height"/>
-    <Connection dst="Display_0" dst-port="WIDTH" src="SPS" src-port="Width"/>
-    <Connection dst="Display_0" dst-port="HEIGHT" src="SPS" src-port="Height"/>
+    <Connection dst="display" dst-port="WIDTH" src="SPS" src-port="Width"/>
+    <Connection dst="display" dst-port="HEIGHT" src="SPS" src-port="Height"/>
 </XDF>
