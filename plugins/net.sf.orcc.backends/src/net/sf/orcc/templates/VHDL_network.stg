@@ -14,15 +14,39 @@ $
 $instance.actor.inputs.list: printSigInput()$
 $instance.actor.outputs.list: printSigOutput()$
 $
-else
+elseif(instance.network)
 $
                                              -- Network : $instance.id$
 $instance.network.inputs.list: printSigInput()$
 $instance.network.outputs.list: printSigOutput()$
 $
+else
+$
+                                             -- Broadcast : $instance.id$
+$instance.broadcast.outputList: printBroadOutput(); separator="\n"$
+$
 endif
 $
 >>
+
+
+
+printBroadOutput(num) ::= <<
+$
+if(instance.broadcast.type.bool)
+$
+signal $instance.id$_output_$num$_data_out   : std_logic;
+$
+else
+$
+signal $instance.id$_output_$num$_data_out   : std_logic_vector($instance.broadcast.type.size$ - 1 downto 0);
+$
+endif
+$
+signal $instance.id$_output_$num$_write       : std_logic;
+signal $instance.id$_output_$num$_full        : std_logic;
+>> 
+
 
 printSigInput(port) ::= <<
 $
@@ -181,7 +205,7 @@ $port.name$_full       : in  std_logic;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// print IOs of actors and networks
+// print IOs of actors, networks and broadcasts
 
 printActorPorts(instance) ::= <<
 $instance.actor.inputs.list: printPortsInput(); separator="\n"$
@@ -203,6 +227,21 @@ printPortsOutput(port) ::= <<
 $port.name$_data   => $instance.id$_$port.name$_data_out,
 $port.name$_full   => $instance.id$_$port.name$_full,
 $port.name$_write  => $instance.id$_$port.name$_write,
+>> 
+
+printBroadcastPorts(instance) ::= <<
+-- Print Broadcast: $instance.id$
+$instance.broadcast.outputList: printBroadcastOutput(); separator="\n"$
+$instance.id$_full       <= ($instance.broadcast.outputList: printBroadcastFull(); separator=" or "$
+>>
+
+printBroadcastOutput(num) ::= <<
+$instance.id$_output_$num$_data_out <= $instance.id$_data_out;
+$instance.id$_output_$num$_write    <= $instance.id$_write;
+>> 
+
+printBroadcastFull(num) ::= <<
+$instance.id$_output_$num$_full
 >> 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -229,7 +268,9 @@ $
 printNetwork(instance) ::= <<
 $
 if (!instance.actor)
-$
+$$
+  if (!instance.broadcast)
+  $
 $instance.id$ : entity work.$instance.network$
   generic map (
     SIZE             => SIZE) 
@@ -237,7 +278,12 @@ $instance.id$ : entity work.$instance.network$
     $printNetworksPorts(instance)$
     clock            => clock, 
     reset_n          => reset_n);
-$
+  $
+  else
+  $$printBroadcastPorts(instance)$);
+  $
+  endif
+  $$
 endif
 $
 >>
@@ -290,5 +336,5 @@ begin
   ---------------------------------------------------------------------------
 
 end architecture rtl_$network.name$;
->>
 
+>>

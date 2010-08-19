@@ -48,6 +48,7 @@ import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.SizeRedimension;
 import net.sf.orcc.backends.vhdl.transforms.SuppressInit;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
+import net.sf.orcc.backends.vhdl.transforms.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
@@ -203,6 +204,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 		try {
 			printer.loadGroups("VHDL_network");
 
+			// Add broadcasts before printing
+			new VHDLBroadcastAdder().transform(network);			
+			
 			String outputName = path + File.separator + "Design"
 					+ File.separator + network.getName() + ".vhd";
 			printer.printNetwork(outputName, network, false, fifoSize);
