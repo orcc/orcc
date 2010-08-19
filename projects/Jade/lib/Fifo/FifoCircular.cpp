@@ -178,7 +178,7 @@ void FifoCircular::setConnection(Connection* connection){
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArray =
         new GlobalVariable(*module, arrayType,
-		true, GlobalVariable::InternalLinkage, arrayContent, arrayName.str());
+		false, GlobalVariable::InternalLinkage, arrayContent, arrayName.str());
 	
 	// Initialize fifo elements
 	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize());
@@ -201,7 +201,7 @@ void FifoCircular::setConnection(Connection* connection){
 	// Create fifo 
 	GlobalVariable *NewFifo =
         new GlobalVariable(*module, structType,
-		true, GlobalVariable::InternalLinkage, fifoStruct, fifoName.str());
+		false, GlobalVariable::InternalLinkage, fifoStruct, fifoName.str());
 
 	// Set initialize to instance port 
 	srcVar->setInitializer(NewFifo);

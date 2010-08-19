@@ -149,11 +149,11 @@ map<string, Type*>* IRParser::parseFifos(Module* module){
 Type* IRParser::parseFifo(std::string name, Module* module){
 	Type* type = (Type*)module->getTypeByName(name);
 
-	if (type == NULL){
+/*	if (type == NULL){
 		fprintf(stderr,"Structure %s hasn't been found in a parsed actor.", name.c_str());
 		exit(0);
 	}
-
+*/
 	return type;
 }
 
