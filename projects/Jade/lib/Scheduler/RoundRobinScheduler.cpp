@@ -88,7 +88,7 @@ void RoundRobinScheduler::createScheduler(){
 
 	// create scheduler
 	map<Instance*, InstancedActor*>* InstancedActors = decoder->getInstancedActors();
-	scheduler = cast<Function>(module->getOrInsertFunction("scheduler", Type::getVoidTy(Context),
+	scheduler = cast<Function>(module->getOrInsertFunction("main", Type::getVoidTy(Context),
                                           (Type *)0));
 										  
 
@@ -127,7 +127,7 @@ void RoundRobinScheduler::execute(){
 
 	//Run decoder
 	Module* module = decoder->getModule();
-	Function* main = module->getFunction("scheduler");
+	Function* main = module->getFunction("main");
 	jit->run(main);
 }
 
