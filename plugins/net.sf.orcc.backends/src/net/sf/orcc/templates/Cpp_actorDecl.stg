@@ -233,7 +233,7 @@ enum
 };
 
 
-class actor_$actor.name$ : public ActorGen 
+class actor_$actor.name$ : public ActorAKA 
 {
 
 public:

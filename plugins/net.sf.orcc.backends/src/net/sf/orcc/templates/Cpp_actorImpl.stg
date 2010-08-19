@@ -406,7 +406,7 @@ $if(actor.actionScheduler.fsm)$
 _FSM_state(state_$actor.actionScheduler.fsm.initialState$),
 $endif$
 $stateVars : StateVar()$
-ActorGen($length(actor.inputs.list)$, $length(actor.outputs.list)$)
+ActorAKA($length(actor.inputs.list)$, $length(actor.outputs.list)$)
 {
 $stateVars : ListStateVarInitialization()$
 }
