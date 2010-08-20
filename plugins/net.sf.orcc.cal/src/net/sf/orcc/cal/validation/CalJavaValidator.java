@@ -225,15 +225,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		// check there are no cycles in type definitions
 		if (!new TypeCycleDetector().detectCycles(actor)) {
+			// evaluate state variables
+			checker = new TypeChecker();
+			evaluateStateVariables(actor.getStateVariables());
+
 			// transforms AST types to IR types
 			// this is a prerequisite for type checking
 			TypeTransformer typeTransformer = new TypeTransformer();
 			typeTransformer.transformTypes(actor);
 		}
-
-		// evaluate state variables
-		checker = new TypeChecker();
-		evaluateStateVariables(actor.getStateVariables());
 
 		checkActorStructure(actor);
 	}
