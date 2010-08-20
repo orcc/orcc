@@ -143,7 +143,7 @@ actor Algo_DecodeMbPred()
 			transform_size_8x8_flag = false
 		do
 			println("Intra 4x4");
-			CountBit := 15;
+			CountBit := 16;
 		end
 
 /*for( luma4x4BlkIdx=0; luma4x4BlkIdx<16; luma4x4BlkIdx++ ) {
