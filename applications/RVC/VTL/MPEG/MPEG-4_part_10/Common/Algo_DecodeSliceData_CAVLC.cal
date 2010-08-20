@@ -43,7 +43,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool          MbaffFrame
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=5)  NbBitsToRead,
+	uint(size=8)  NbBitsToRead,
 	bool          SkipNal,
 	uint(size=4)  LaunchActor,
 

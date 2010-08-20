@@ -19,7 +19,7 @@ actor Algo_DecodeSps()
 	uint(size=5)  SpsAskedFromPps
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=5)  NbBitsToRead,
+	uint(size=8)  NbBitsToRead,
 	bool          SkipNal,
 
 	uint(size=6)  log2_max_frame_num,

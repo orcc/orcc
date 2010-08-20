@@ -35,7 +35,10 @@ actor Algo_DecodeResidual()
 	bool         SkipNal,
 	uint(size=4) LaunchActor,
 
-	int (size=8) ResBlknC
+	int (size=8) ResBlknC,
+	uint(size=5) ResBlkMaxNumCoeff,
+	uint(size=5) ResBlkStartIdx,
+	uint(size=5) ResBlkEndIdx
 		:
 
 	bool         CAVLC_ENTROPY = false;
@@ -60,8 +63,11 @@ actor Algo_DecodeResidual()
 
 
 	bool          bmFlag;
-	uint(size=4)  startIdx;
+	int (size=5)  startIdx;
 	uint(size=4)  endIdx;
+	uint(size=4)  StartIdxSent;
+	uint(size=4)  EndIdxSent;
+	
 
 	bool          entropy_coding_mode_flag;
 	uint(size=4)  slice_type;
@@ -77,6 +83,7 @@ actor Algo_DecodeResidual()
 	uint(size=4) IdxCurrMb := 0;
 	uint(size=3) i8x8Loop;
 	uint(size=2) Component_type := 0;
+	uint(size=5) maxNumCoeff;
 
 	GetParameters: action
 			EntropyCodingMode :[TypeOfEntropy],
@@ -134,6 +141,9 @@ actor Algo_DecodeResidual()
 		do
 			Component_type := Y_COMPONENT;
 			CountResBlock  := CountResBlock + 1;
+			maxNumCoeff    := 16;
+			StartIdxSent   :=  0;
+			EndIdxSent     :=  15;
 		end
 
 	ResLuma_CheckTransfSzAndCavlc: action ==>
@@ -154,14 +164,22 @@ actor Algo_DecodeResidual()
 			LaunchActor :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ],
 			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
 		guard
-			bmFlag = false,
+			not bmFlag,
 			endIdx > 0,
 			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI),
 			mb_type <= BLOCK_TYPE_INTA_16x16_MAX,
 			mb_type >= BLOCK_TYPE_INTA_16x16_MIN
 		do
 			Component_type := Y_COMPONENT;
-			CountResBlock := CountResBlock + 4;
+			CountResBlock  := CountResBlock + 4;
+			maxNumCoeff    := 15;
+			StartIdxSent   :=
+				if(0 > startIdx - 1) then
+					0
+				else
+					startIdx - 1
+				end;
+			EndIdxSent     :=  endIdx - 1;
 		end
 
 	ResLuma_LaunchResBlk_1: action
@@ -171,6 +189,9 @@ actor Algo_DecodeResidual()
 		do
 			Component_type := Y_COMPONENT;
 			CountResBlock  := CountResBlock + 4;
+			maxNumCoeff    := 16;
+			StartIdxSent   := startIdx;
+			EndIdxSent     := endIdx;
 		end
 
 	ResLuma_CheckBmFlagAndMbType: action ==>
@@ -263,7 +284,10 @@ actor Algo_DecodeResidual()
 
 	SendResBlockParameters: action
 				==>
-			ResBlknC:[nC]
+			ResBlknC          :[nC],
+			ResBlkMaxNumCoeff :[maxNumCoeff],
+			ResBlkStartIdx    :[StartIdxSent],
+			ResBlkEndIdx      :[EndIdxSent]
 		var
 			int(size=8) nC
 		do

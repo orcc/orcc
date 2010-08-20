@@ -17,20 +17,55 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 actor Algo_DecodeResidualBlock_Cavlc()
 	int (size=32) ValVLD,
-	int (size=8)  nC
+	int (size=8)  nC,
+	uint(size=5)  MaxNumCoeff,
+	uint(size=5)  StartIdx,
+	uint(size=5)  EndIdx
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=5)  VLD_Param,
+	uint(size=8)  VLD_Param,
 	bool          SkipNal,
 	uint(size=5)  Total_Coeff
 		:
 
-	int (size=8) nC_Val;
 
+	uint(size=3) READ_BITS             = 0;
 	uint(size=3) CAVLC_COEFF_TOKEN     = 5;
+	uint(size=3) CAVLC_LEVEL_PREFIX    = 6;
+	uint(size=3) CAVLC_TOTAL_ZEROS     = 7;
+
+	int (size=8)  nC_Val;
+	uint(size=8)  TotalCoeff   := 0;
+	uint(size=8)  TrailingOnes := 0;
+	uint(size=5)  suffixLength := 0;
+	uint(size=32) level_prefix := 0;
+	uint(size=32) level_suffix := 0;
+	uint(size=32) levelCode    := 0;
+	uint(size=5)  iLoop        := 0;
+	uint(size=4)  zerosLeft    := 0;
+	uint(size=5)  maxNumCoeff  := 0;
+	uint(size=5)  startIdx     := 0;
+	uint(size=5)  endIdx     := 0;
+
+	List(type: uint(size=8) , size=16) CoeffLevel;
+	List(type: int (size=16), size=16) level        := [ 0 : for int i in 1 .. 16];
+
+	function Abs(int(size=32) x)
+				-->
+			uint(size=32)
+		:
+			if(x > 0)then
+				x
+			else
+				-x
+			end
+		end
 
 	ReadCoeffToken.Asked: action
-			nC :[ValnC]
+			nC          :[ValnC],
+			MaxNumCoeff :[ValMaxNumCoeff],
+			StartIdx    :[ValStartIdx],
+			EndIdx      :[ValEndIdx]
 				==>
 			//        mb_field_decoding_flag
 			SkipNal   :[       false       ],//Keep synchro
@@ -38,14 +73,159 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			VLD_Param :[       ValnC       ]
 		do
 			nC_Val := ValnC;
+			foreach int i in 0 .. 15
+			do
+				CoeffLevel[i] := 0;
+			end
+			startIdx := ValStartIdx;
+			endIdx   := ValEndIdx;
+
+			zerosLeft := 0;
 		end
 
 	ReadCoeffToken.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
 		do
+			TotalCoeff   := bitand(ValueOfVLD,0xFF);
+			TrailingOnes := rshift(ValueOfVLD,8);
 			println("Trailing Ones : "+rshift(ValueOfVLD,8));
 			println("TotalCoeff : "+bitand(ValueOfVLD,0xFF));
+			//if(i==TrailingOnes and TrailingOnes < 3) then
+			//  levelCode := levelCode + 2;
+			//end
+			if(TrailingOnes < 3) then
+				levelCode := 2;
+			else
+				levelCode := 0;
+			end
+		end
+
+	CheckTotalCoeff.IsEqualTo0: action ==>
+		guard
+			TotalCoeff > 0
+		do
+			if((TotalCoeff > 10) and (TrailingOnes < 3)) then
+				suffixLength := 1;
+			else
+				suffixLength := 0;
+			end
+			iLoop     := 0;
+		end
+
+	ReadTrailingOnesSign.Asked: action
+				==>
+			//     trailing_ones_sign_flag
+			SkipNal   :[   false   ],//Keep synchro
+			TypeOfVLD :[ READ_BITS ],
+			VLD_Param :[     1     ]
+		guard
+			iLoop < TrailingOnes
+		end
+
+	ReadTrailingOnesSign.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			level[iLoop] := 1 - 2 * ValueOfVLD;
+			iLoop        := iLoop + 1;
+		end
+
+	ReadLevelPrefix.Asked: action
+				==>
+			//              level_prefix
+			SkipNal   :[       false        ],//Keep synchro
+			TypeOfVLD :[ CAVLC_LEVEL_PREFIX ]
+		guard
+			iLoop < TotalCoeff
+		end
+
+	ReadLevelPrefix.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			level_prefix := ValueOfVLD;
+			level_suffix := 0;
+		end
+
+	ReadLevelSuffix.Asked: action
+				==>
+			//            level_suffix
+			SkipNal   :[      false      ],//Keep synchro
+			TypeOfVLD :[    READ_BITS    ],
+			VLD_Param :[ levelSuffixSize ]
+		guard
+			   level_prefix >= 14
+			or suffixLength  > 0
+		var
+			int levelSuffixSize
+		do
+			if((level_prefix = 14) and (suffixLength = 0) )then
+				levelSuffixSize := 4;
+			else
+				if(level_prefix >= 15) then
+					levelSuffixSize := level_prefix - 3;
+				else
+					levelSuffixSize := suffixLength;
+				end
+			end
+		end
+
+	ReadLevelSuffix.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			level_suffix := ValueOfVLD;
+		end
+
+	ComputeLevel: action ==>
+		do
+			levelCode :=
+				if(level_prefix < 15) then
+					levelCode + lshift(level_prefix, suffixLength)
+				else
+					levelCode + lshift(15, suffixLength)
+				end;
+			levelCode := levelCode + level_suffix;
+			if((level_prefix >= 15) and (suffixLength = 0)) then
+				levelCode := levelCode + 15;
+			end
+			if(level_prefix >= 16) then
+				levelCode := levelCode + lshift(1, level_prefix - 3) - 4096;
+			end
+			if((levelCode mod 2) = 0) then
+				level[iLoop] := rshift(levelCode + 2, 1);
+			else
+				level[iLoop] := rshift( -levelCode - 1, 1);
+			end
+
+			if(suffixLength = 0)then
+				suffixLength := 1;
+			end
+			if( (Abs(level[iLoop]) > lshift(3, suffixLength - 1)) and (suffixLength < 6) ) then
+				suffixLength := suffixLength - 1;
+			end
+			
+			levelCode := 0;
+			iLoop     := iLoop + 1;
+		end
+
+	ReadTotalZeros.Asked: action
+				==>
+			//               total_zeros
+			SkipNal   :[       false       ],//Keep synchro
+			TypeOfVLD :[ CAVLC_TOTAL_ZEROS ],
+			VLD_Param :[ maxNumCoeff , TotalCoeff ]
+		guard
+			TotalCoeff < endIdx - startIdx + 1
+		end
+
+	ReaadTotalZeros.Done: action
+			ValVLD :[total_zeros]
+				==>
+		do
+			zerosLeft := total_zeros;
+			println("total_zeros : "+total_zeros);
 		end
 
 	SendEndResidualBlock: action
@@ -63,8 +243,36 @@ actor Algo_DecodeResidualBlock_Cavlc()
 
 		ReadCoeffTokenDone (ReadCoeffToken.Done )--> a;
 
+		CheckTotalCoeff (CheckTotalCoeff.IsEqualTo0 )--> CheckiLoop;
+		CheckTotalCoeff (a )-->undefined;
+
+		CheckiLoop (ReadTrailingOnesSign.Asked )--> ReadTrailingOnesSign;
+		CheckiLoop (ReadLevelPrefix.Asked )--> ReadLevelPrefix;
+		CheckiLoop (ReadTotalZeros.Asked )--> ReadTotalZerosDone;
+		CheckiLoop (a )--> undefined;
+
+		ReadTrailingOnesSign (ReadTrailingOnesSign.Done )--> CheckiLoop;
+
+		ReadLevelPrefix (ReadLevelPrefix.Done )--> ReadLevelSuffixAsked;
+
+		ReadLevelSuffixAsked (ReadLevelSuffix.Asked )--> ReadLevelSuffixDone;
+		ReadLevelSuffixAsked (ComputeLevel )--> CheckiLoop2;
+
+		ReadLevelSuffixDone (ReadLevelSuffix.Done )--> ComputeLevel;
+
+		ComputeLevel (ComputeLevel )--> CheckiLoop2;
+
+		CheckiLoop2 (ReadLevelPrefix.Asked )--> ReadLevelPrefix;
+		CheckiLoop2 (ReadTotalZeros.Asked )--> ReadTotalZerosDone;
+		CheckiLoop2 (a )--> undefined;
+
 a(a)-->undefined;
 	end
 	priority
+		CheckTotalCoeff.IsEqualTo0 > a;
+		ReadTrailingOnesSign.Asked > ReadLevelPrefix.Asked;
+		ReadLevelSuffix.Asked > ComputeLevel;
+		ReadLevelPrefix.Asked > ReadTotalZeros.Asked;
+		ReadTotalZeros.Asked  > a;
 	end
 end

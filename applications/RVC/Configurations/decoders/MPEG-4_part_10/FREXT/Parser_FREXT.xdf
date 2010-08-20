@@ -444,4 +444,10 @@
     <Connection dst="PpsVLDecoding" dst-port="VLD_Param" src="DecodePps" src-port="NbBitsToRead"/>
     <Connection dst="DecodeResidualBlock_Cavlc" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="ResBlkCavlcValVLD"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="MaxNumCoeff"
+        src="DecodeResidual" src-port="ResBlkMaxNumCoeff"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="StartIdx"
+        src="DecodeResidual" src-port="ResBlkStartIdx"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="EndIdx"
+        src="DecodeResidual" src-port="ResBlkEndIdx"/>
 </XDF>

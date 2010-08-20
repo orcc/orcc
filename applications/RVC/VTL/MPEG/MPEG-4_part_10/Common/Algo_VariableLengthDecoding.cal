@@ -18,7 +18,7 @@ actor Algo_VariableLengthDecoding()
 	bool          NewNal,
 
 	uint(size=3)  TypeOfVLD,
-	uint(size=5)  VLD_Param,
+	uint(size=8)  VLD_Param,
 	bool          EndOfNal
 		==>
 	int (size=32) ValDecoded,
@@ -38,6 +38,8 @@ actor Algo_VariableLengthDecoding()
 	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
 	uint(size=3) MORE_RBSP_DATA        = 4;
 	uint(size=3) CAVLC_COEFF_TOKEN     = 5;
+	uint(size=3) CAVLC_LEVEL_PREFIX    = 6;
+	uint(size=3) CAVLC_TOTAL_ZEROS     = 7;
 
 	List(type: List(type: List(type: bool, size=64), size=16), size=6) TotalCoeffValid = 
 		[
@@ -1801,6 +1803,762 @@ actor Algo_VariableLengthDecoding()
 			]
 		];
 
+	List(type: List(type: List(type: List(type: bool        , size=8), size=16), size=16), size=3) TotalZerosValid =
+		[
+			[
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 0 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				],
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 1
+					[ false, true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 2
+					[ false, true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 3
+					[ true , true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 4 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 1
+					[ false, true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 2
+					[ true , true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 3 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 3 .. 15
+				],
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 3 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 3 ; nbBitRead = 1
+					[ true , true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 3 ; nbBitRead = 2 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 2 .. 15
+				],
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 4 .. 15 ; nbBitRead = 0 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				]: for int i in 4 .. 15
+			],
+			[
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 0 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 1
+					[ false, true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 3
+					[ false, false , true  , true  , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 4
+					[ false, true  , true  , true  , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 5
+					[ true , true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 6 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 6 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 2
+					[ false, true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 3
+					[ true , true  , false , false , true  , true  , true  , true  ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 4 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 2
+					[ false, true  , true  , false , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 3
+					[ true , true  , false , false , false , false , true  , true  ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 4 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 2
+					[ true , true  , true  , false , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 3
+					[ false, false , false , false , false , false , true  , true  ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 4 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 5 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 5 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 5 ; nbBitRead = 2
+					[ true , true  , true  , true  , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 5 ; nbBitRead = 3 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 3 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 6 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 6 ; nbBitRead = 1
+					[ false, true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 6 ; nbBitRead = 2
+					[ true , true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 6 ; nbBitRead = 3 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 3 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 7 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 7 ; nbBitRead = 1
+					[ true , true  , false , false , false , false , false , false ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 7 ; nbBitRead = 2 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 2 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 .. 15 ; nbBitRead = 0 .. 7
+					[ false: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				]: for int i in 8 .. 15
+			],
+			[
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 0 ; nbBitRead = 0 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 1
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 3
+					[ false , false , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 4
+					[ false , false , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 5
+					[ false , false , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 6
+					[ false , false , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 7
+					[ false , false , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 8
+					[ false , false , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 9
+					[ false , true  , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 10 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 10 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 3
+					[ false , false , false  , true  , true  , true  , true  , true  ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 4
+					[ false , false , true   , true  , true  , true  , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 5
+					[ false , false , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 6
+					[ true  , true  , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 7 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 3
+					[ false , false , false  , true  , true  , true  , true  , true  ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 4
+					[ false , false , true   , true  , true  , true  , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 5
+					[ false , true  , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 6
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 7 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 3
+					[ false , false , false  , true  , true  , true  , true  , true  ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 4
+					[ false , false , true   , true  , true  , true  , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 5
+					[ true  , true  , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 6 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 6 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 3
+					[ false , false , false  , true  , true  , true  , true  , true  ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 4
+					[ false , true  , true   , true  , true  , true  , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 5
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 6 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 6 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 3
+					[ false , true  , true   , true  , true  , true  , true  , true  ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 4
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 5
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 6
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 7 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 2
+					[ false , false , false  , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 3
+					[ false , true  , true   , true  , true  , true  , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 4
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 5
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 6
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 7 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 2
+					[ false , false , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 3
+					[ false , true  , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 4
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 5
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 6
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 7 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 2
+					[ false , true  , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 3
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 4
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 5
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 6
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 7 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 1
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 2
+					[ false , true  , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 3
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 4
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 5
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 6 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 6 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 1
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 3
+					[ false , true  , true   , true  , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 4
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 5 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 5 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 1
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 2
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 3
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 4
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 5 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 5 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 1
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 2
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 3
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 4 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 14 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 14 ; nbBitRead = 1
+					[ false , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 14 ; nbBitRead = 2
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 14 ; nbBitRead = 3 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 3 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 15 ; nbBitRead = 0
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 15 ; nbBitRead = 1
+					[ true  , true  , false  , false , false , false , false , false ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 15 ; nbBitRead = 2 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 2 .. 15
+				]
+			]
+		];
+
+	List(type: List(type: List(type: List(type: uint(size=4), size=8), size=16), size=16), size=3) TotalZerosValue=
+		[
+			[
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 0 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				],
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 1
+					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 2
+					[  0,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 3
+					[  3,  2 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 1 ; nbBitRead = 4 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 1
+					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 2
+					[  0,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 3 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 3 .. 15
+				],
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 3 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 3 ; nbBitRead = 1
+					[  0,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 4 ; TotalCoeff = 3 ; nbBitRead = 2 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 2 .. 15
+				],
+				[
+					// MaxNumCoeff = 4 ; TotalCoeff = 4 .. 15 ; nbBitRead = 0 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				]: for int i in 4 .. 15
+			],
+			[
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 0 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 1
+					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 2
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 3
+					[  0,  0 ,  1 ,  2 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 4
+					[  0,  5 ,  3 ,  4 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 5
+					[  7,  6 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 1 ; nbBitRead = 6 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 6 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 2
+					[  0,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 3
+					[  0,  2 ,  0 ,  0 ,  3 ,  4 ,  5 ,  6 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 2 ; nbBitRead = 4 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 2
+					[  0,  2 ,  3 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 3
+					[  0,  1 ,  0 ,  0 ,  0 ,  0 ,  4 ,  5 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 3 ; nbBitRead = 4 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 2
+					[  1,  2 ,  3 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 3
+					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  4 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 4 ; nbBitRead = 4 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 5 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 5 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 5 ; nbBitRead = 2
+					[  0,  1 ,  2 ,  3 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 5 ; nbBitRead = 3 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 3 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 6 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 6 ; nbBitRead = 1
+					[  0,  2 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 6 ; nbBitRead = 2
+					[  0,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 6 ; nbBitRead = 3 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 3 .. 15
+				],
+				[
+					// MaxNumCoeff = 8 ; TotalCoeff = 7 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 7 ; nbBitRead = 1
+					[  0,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff = 8 ; TotalCoeff = 7 ; nbBitRead = 2 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 2 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 .. 15 ; nbBitRead = 0 .. 7
+					[  0: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				]: for int i in 8 .. 15
+			],
+			[
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 0 ; nbBitRead = 0 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 0 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 1
+					[  0 ,  0 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 2
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 3
+					[  0 ,  0 ,  2  ,  1 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 4
+					[  0 ,  0 ,  2  ,  3 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 5
+					[  0 ,  0 ,  6  ,  5 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 6
+					[  0 ,  0 ,  8  ,  7 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 7
+					[  0 ,  0 , 10  ,  9 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 8
+					[  0 ,  0 , 12  , 11 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 9
+					[  0 , 15 , 14  , 13 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 10 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 10 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 2
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 3
+					[  0 ,  0 ,  0  ,  4 ,  3 ,  2 ,  1 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 4
+					[  0 ,  0 ,  8  ,  7 ,  6 ,  5 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 5
+					[  0 ,  0 , 10  ,  9 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 6
+					[ 14 , 13 , 12  , 11 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 2 ; nbBitRead = 7 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 2
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 3
+					[  0 ,  0 ,  0  ,  7 ,  6 ,  3 ,  2 ,  1 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 4
+					[  0 ,  0 ,  8  ,  5 ,  4 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 5
+					[  0 , 12 , 10  ,  9 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 6
+					[ 13 , 11 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 3 ; nbBitRead = 7 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 2
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 3
+					[  0 ,  0 ,  0  ,  3 ,  6 ,  5 ,  4 ,  1 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 4
+					[  0 ,  0 ,  9  ,  7 ,  3 ,  2 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 5
+					[ 12 , 11 , 10  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 6 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 6 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 2
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 3
+					[  0 ,  0 ,  0  ,  7 ,  6 ,  5 ,  4 ,  3 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 4
+					[  0 , 10 ,  8  ,  2 ,  1 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 5
+					[ 11 ,  9 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 5 ; nbBitRead = 6 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 6 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 2
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 3
+					[  0 ,  9 ,  7  ,  6 ,  5 ,  4 ,  3 ,  2 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 4
+					[  0 ,  8 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 5
+					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 6
+					[ 10 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 7 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 2
+					[  0 ,  0 ,  0  ,  5 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 3
+					[  0 ,  8 ,  6  ,  4 ,  3 ,  2 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 4
+					[  0 ,  7 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 5
+					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 6
+					[  9 ,  0 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 7 ; nbBitRead = 7 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 2
+					[  0 ,  0 ,  5  ,  4 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 3
+					[  0 ,  7 ,  6  ,  3 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 4
+					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 5
+					[  0 ,  2 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 6
+					[  8 ,  0 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 8 ; nbBitRead = 7 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 2
+					[  0 ,  6 ,  4  ,  3 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 3
+					[  0 ,  5 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 4
+					[  0 ,  2 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 5
+					[  0 ,  7 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 6
+					[  1 ,  0 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 9 ; nbBitRead = 7 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 7 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 1
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 2
+					[  0 ,  5 ,  4  ,  3 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 3
+					[  0 ,  2 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 4
+					[  0 ,  6 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 5
+					[  1,  0,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 10 ; nbBitRead = 6 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 6 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 0
+					[ 0 : for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 1
+					[  0 ,  4 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 2
+					[ false: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 3
+					[  0 ,  2 ,  3  ,  5 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 4
+					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 11 ; nbBitRead = 5 .. 15
+					[ false: for int i in 0 .. 7 ]: for int i in 5 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 1
+					[  0 ,  3 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 2
+					[  0 ,  2 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 3
+					[  0 ,  4 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 4
+					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 12 ; nbBitRead = 5 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 5 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 1
+					[  0 ,  2 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 2
+					[  0 ,  3 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 3
+					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 13 ; nbBitRead = 4 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 4 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 14 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 14 ; nbBitRead = 1
+					[  0 ,  2 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 14 ; nbBitRead = 2
+					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 14 ; nbBitRead = 3 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 3 .. 15
+				],
+				[
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 15 ; nbBitRead = 0
+					[  0: for int i in 0 .. 7 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 15 ; nbBitRead = 1
+					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 15 ; nbBitRead = 2 .. 15
+					[  0: for int i in 0 .. 7 ]: for int i in 2 .. 15
+				]
+			]
+		];
+
 /*
 *
 * State variables
@@ -1812,9 +2570,10 @@ actor Algo_VariableLengthDecoding()
 	uint(size=3)  SizeBufferRbsp   := 0;
 
 	List(type: uint(size=8), size=4) BufferRbsp := [0: for int s in 0 .. 3];
-	/* ue(v) */
+	/* ue(v) and Cavlc coeff_token()*/
 	bool          Bit1Found       := false;
 	uint(size=5)  leadingZeroBits := 0;
+	/* ue(v) only */
 	int (size=31) CodeNum         := 0;
 
 	/* u(n) */
@@ -1824,10 +2583,17 @@ actor Algo_VariableLengthDecoding()
 	/* more_rbsp_data() */
 	bool          NewNalAlreadyDetected  := false;
 
+	/* Cavlc */
+	uint(size=5) NbBitsRead;
+
 	/* Cavlc coeff_token */
 	uint(size=3) Idx_nC;
-	uint(size=5) NbBitsRead;
 	uint(size=6) coeff_token;
+
+	/* Cavlc total_zeros */
+	uint(size=2) IdxmaxNumCoeff  := 0;
+	uint(size=3) ValRead         := 0;
+	uint(size=4) TotalCoeffParam := 0;
 
 /*
 *
@@ -2042,6 +2808,44 @@ actor Algo_VariableLengthDecoding()
 		end
 
 
+	IsCavlcTotalZeros: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal],
+			VLD_Param :[maxNumCoeff , TotalCoeff]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = CAVLC_TOTAL_ZEROS
+		do
+			IdxmaxNumCoeff :=
+				if(maxNumCoeff = 4) then
+					0
+				else
+					if(maxNumCoeff=8) then
+						1
+					else
+						2
+					end
+				end;
+			NbBitsRead      := 0;
+			ValRead         := 0;
+			TotalCoeffParam := bitand(TotalCoeff,0x0F);
+		end
+
+
+	IsCavlcLevelPrefix: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = CAVLC_LEVEL_PREFIX
+		do
+			Bit1Found       := false;
+			leadingZeroBits := 0;
+		end
+
+
 	IsByteAligned: action
 			TypeOfVLD    :[ValTypeOfVLD],
 			EndOfNal     :[ValEndOfNal]
@@ -2114,7 +2918,6 @@ actor Algo_VariableLengthDecoding()
 	GetCodeNum.NotFinished: action ==>
 		guard
 			leadingZeroBits != 0
-		do
 		end
 
 
@@ -2186,23 +2989,23 @@ actor Algo_VariableLengthDecoding()
 		do
 			coeff_token     := lshift(coeff_token, 1);
 			coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
-//			println("Cavlc bit1:"+mask_bits(rshift(WorkingByte,7),1));
+			println("Cavlc bit1:"+mask_bits(rshift(WorkingByte,7),1));
 			WorkingByte     := lshift(WorkingByte,1);
 			CountBufferRbsp := CountBufferRbsp - 1;
 			NbBitsRead      := NbBitsRead + 1;
 			titi := TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)];
-			while((titi = false) and (CountBufferRbsp > 0))
+			while((not titi) and (CountBufferRbsp > 0))
 			do
 				coeff_token     := lshift(coeff_token, 1);
 				coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
-//			println("Cavlc bit:"+mask_bits(rshift(WorkingByte,7),1));
+			println("Cavlc bit:"+mask_bits(rshift(WorkingByte,7),1));
 				WorkingByte     := lshift(WorkingByte,1);
 				CountBufferRbsp := CountBufferRbsp - 1;
 				NbBitsRead      := NbBitsRead + 1;
-/*				if(TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)] = true)then
-					println("youpi!");
-				end*/
 				titi := TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)];
+			if(TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)])then
+				println("youpi!");
+			end
 			end
 		end
 
@@ -2218,6 +3021,70 @@ actor Algo_VariableLengthDecoding()
 			println("Cavlc; Idx_nc :" + Idx_nC + " ; NbBitsRead : "+NbBitsRead+ " ; coeff_token : "+coeff_token);
 		end
 
+
+	GetCavlcLevelPrefix.Launch: action ==>
+		do
+			while( (bitand(WorkingByte,0x80) = 0) and (CountBufferRbsp > 0))
+			do
+				CountBufferRbsp := CountBufferRbsp - 1;
+				WorkingByte     := lshift(WorkingByte,1);
+				leadingZeroBits := leadingZeroBits + 1;
+			end
+			if(CountBufferRbsp > 0)then
+				Bit1Found       := true;
+				/* We read the one bit value */
+				CountBufferRbsp := CountBufferRbsp - 1;
+				WorkingByte     := lshift(WorkingByte,1);
+			end
+		end
+
+
+	GetCavlcLevelPrefix.NotFinished: action ==>
+		guard
+			not Bit1Found
+		end
+
+
+	GetCavlcLevelPrefix.Finished: action
+				==>
+			ValDecoded :[leadingZeroBits]
+		guard
+			Bit1Found
+		end
+
+
+	GetCavlcTotalZeros.Launch: action ==>
+		var
+			//delete me!
+			bool titi
+		do
+			ValRead         := lshift(ValRead, 1);
+			ValRead         := ValRead + mask_bits(rshift(WorkingByte,7),1);
+			WorkingByte     := lshift(WorkingByte,1);
+			CountBufferRbsp := CountBufferRbsp - 1;
+			NbBitsRead      := NbBitsRead + 1;
+			titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)];
+			while((not titi) and (CountBufferRbsp > 0))
+			do
+				ValRead         := lshift(ValRead, 1);
+				ValRead         := ValRead + mask_bits(rshift(WorkingByte,7),1);
+				WorkingByte     := lshift(WorkingByte,1);
+				CountBufferRbsp := CountBufferRbsp - 1;
+				NbBitsRead      := NbBitsRead + 1;
+				titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)];
+			end
+		end
+
+	GetCavlcTotalZeros.NotFinished: action ==>
+		guard
+			not TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]
+		end
+
+	GetCavlcTotalZeros.Finished: action
+			==>
+			ValDecoded :[TotalZerosValue[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]]
+		end
+
 /*
 *
 * Scheduler
@@ -2231,7 +3098,9 @@ actor Algo_VariableLengthDecoding()
 		CheckVLDType    (IsVldSe                             )--> VLDecoding_Se;
 		CheckVLDType    (IsReadBits                          )--> Decode_u;
 		CheckVLDType    (IsMoreRbspData                      )--> FillBuffer;
+		CheckVLDType    (IsCavlcLevelPrefix                  )--> DecCavlcLevPre;
 		CheckVLDType    (IsCavlcCoeffToken                   )--> DecCavlcCofTkn;
+		CheckVLDType    (IsCavlcTotalZeros                   )--> DecCavlcTotZer;
 		CheckVLDType    (FillBufferRbsp                      )--> CheckVLDType;
 
 		/* more_rbsp_data() */
@@ -2296,11 +3165,30 @@ actor Algo_VariableLengthDecoding()
 
 		ChckCavlcCofTkn (GetCavlcCoeffToken.NotFinished      )--> DecCavlcCofTkn;
 		ChckCavlcCofTkn (GetCavlcCoeffToken.Finished         )--> CheckVLDType;
+
+		/* Cavlc level_prefix decoding process */
+		DecCavlcLevPre  (Buffer                              )--> GetCavlcLevPre;
+		DecCavlcLevPre  (FillBufferRbsp                      )--> DecCavlcLevPre;
+
+		GetCavlcLevPre  (GetCavlcLevelPrefix.Launch          )--> ChckCavlcLevPre;
+
+		ChckCavlcLevPre (GetCavlcLevelPrefix.NotFinished     )--> DecCavlcLevPre;
+		ChckCavlcLevPre (GetCavlcLevelPrefix.Finished        )--> CheckVLDType;
+
+		/* Cavlc level_prefix decoding process */
+		DecCavlcTotZer  (Buffer                              )--> GetCavlcTotZer;
+		DecCavlcTotZer  (FillBufferRbsp                      )--> DecCavlcTotZer;
+
+		GetCavlcTotZer  (GetCavlcTotalZeros.Launch          )--> ChckCavlcTotZer;
+
+		ChckCavlcTotZer (GetCavlcTotalZeros.NotFinished     )--> DecCavlcTotZer;
+		ChckCavlcTotZer (GetCavlcTotalZeros.Finished        )--> CheckVLDType;
+
 	end
 	
 	priority
 		NewNalHasBeenSent              > WaitForNewNal                   > NewNalDetected;
-		IsVldUe                        > IsReadBits                      > IsCavlcCoeffToken    > IsVldSe;
+		IsVldUe                        > IsReadBits                      > IsCavlcLevelPrefix   > IsCavlcCoeffToken  > IsVldSe;
 		IsVldSe                        > FillBufferRbsp > IsMoreRbspData > IsByteAligned        > IsEndOfNal;
 		CheckSizeBufferRbsp            > FillBufferRbsp                  > FutureNewNalDetected > NewNalHasBeenSent;
 		GetCodeNum.NotFinished         > GetCodeNum.Finished;

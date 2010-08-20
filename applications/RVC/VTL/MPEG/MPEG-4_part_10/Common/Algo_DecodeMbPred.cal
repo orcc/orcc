@@ -24,7 +24,7 @@ actor Algo_DecodeMbPred()
 	bool          MbFieldDecoding
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=5)  NbBitsToRead,
+	uint(size=8)  NbBitsToRead,
 	bool          SkipNal
 		:
 
@@ -131,13 +131,13 @@ actor Algo_DecodeMbPred()
 			//, mb_type != BLOCK_TYPE_I_PCM // ==> useless because this actor isn't used with this kind of Mb
 		end
 
-//We read 15 bits for limiting communication with others actors and improving performance
+//We read 16 bits for limiting communication with others actors and improving performance
 	MbType.IsIntra_4x4: action
 				==>
 			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
-			SkipNal      :[     false      ],//Keep synchro
-			TypeOfVLD    :[    READ_BITS     ],
-			NbBitsToRead :[        15 ]// The type of ValVLD is int_16bits !
+			SkipNal      :[  false    ],//Keep synchro
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[    16     ]
 		guard
 			mb_type                 = BLOCK_TYPE_I_8x8_or_4x4,
 			transform_size_8x8_flag = false

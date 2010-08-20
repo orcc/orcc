@@ -35,7 +35,7 @@ actor Algo_DecodeMacroblockLayer()
 	bool          AboveMbExists
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=5)  NbBitsToRead,
+	uint(size=8)  NbBitsToRead,
 	bool          SkipNal,
 	uint(size=4)  LaunchActor,
 

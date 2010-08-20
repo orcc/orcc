@@ -17,41 +17,41 @@ actor Algo_Slice_layer_without_partitioning()
 	int (size=32) ValVLD,
 
 	uint(size=3)  HeaderTypeOfVLD,
-	uint(size=5)  HeaderNbBitsToRead,
+	uint(size=8)  HeaderNbBitsToRead,
 	bool          HeaderSkipNal,
 	uint(size=4)  HeaderLaunchActor,
 
 	uint(size=3)  DecRefPicMarkingTypeOfVLD,
-	uint(size=5)  DecRefPicMarkingNbBitsToRead,
+	uint(size=8)  DecRefPicMarkingNbBitsToRead,
 	bool          DecRefPicMarkingSkipNal,
 
 	uint(size=3)  RefPicListTypeOfVLD,
-	uint(size=5)  RefPicListNbBitsToRead,
+	uint(size=8)  RefPicListNbBitsToRead,
 	bool          RefPicListSkipNal,
 
 	uint(size=3)  DataTypeOfVLD,
-	uint(size=5)  DataNbBitsToRead,
+	uint(size=8)  DataNbBitsToRead,
 	bool          DataSkipNal,
 	uint(size=4)  DataLaunchActor,
 
 	uint(size=3)  MbLayerTypeOfVLD,
-	uint(size=5)  MbLayerNbBitsToRead,
+	uint(size=8)  MbLayerNbBitsToRead,
 	bool          MbLayerSkipNal,
 	uint(size=4)  MbLayerLaunchActor,
 
 	uint(size=3)  MbPredTypeOfVLD,
-	uint(size=5)  MbPredNbBitsToRead,
+	uint(size=8)  MbPredNbBitsToRead,
 	bool          MbPredSkipNal,
 
 	bool          ResSkipNal,
 	uint(size=4)  ResLaunchActor,
 
 	uint(size=3)  ResBlkCavlcTypeOfVLD,
-	uint(size=5)  ResBlkCavlcVLD_Param,
+	uint(size=8)  ResBlkCavlcVLD_Param,
 	bool          ResBlkCavlcSkipNal
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=5)  VLD_Param,
+	uint(size=8)  VLD_Param,
 	bool          SkipNal,
 
 	int (size=32) HeaderValVLD,
@@ -80,6 +80,7 @@ actor Algo_Slice_layer_without_partitioning()
 
 	uint(size=3) READ_BITS            = 0;
 	uint(size=3) CAVLC_COEFF_TOKEN    = 5;
+	uint(size=3) CAVLC_TOTAL_ZEROS    = 7;
 
 	uint(size=4) SLICE_HEADER         = 0;
 	uint(size=4) DEC_REF_PIC_MARKING  = 1;
@@ -453,6 +454,22 @@ actor Algo_Slice_layer_without_partitioning()
 			EndOfDecoding = false
 		end
 
+
+	ResBlkCavlc.AskCavlcTotalZeros: action
+			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
+			ResBlkCavlcVLD_Param :[maxNumCoeff , TotalCoeff],
+			ResBlkCavlcSkipNal   :[EndOfDecoding]
+				==>
+			TypeOfVLD            :[CAVLC_TOTAL_ZEROS],
+			VLD_Param            :[maxNumCoeff , TotalCoeff],
+			SkipNal              :[false]
+		guard
+			ValTypeOfVLD = CAVLC_TOTAL_ZEROS,
+			EndOfDecoding = false
+		do
+			println("ResBlkCavlc.AskCavlcTotalZeros");
+		end
+
 	ResBlkCavlc.Done: action
 			ResBlkCavlcSkipNal :[EndOfDecoding]
 				==>
@@ -503,6 +520,7 @@ actor Algo_Slice_layer_without_partitioning()
 	
 					LaunchResBlkCavlc (ResBlkCavlc.AskVLD             )--> LaunchResBlkCavlc;
 					LaunchResBlkCavlc (ResBlkCavlc.AskReadBitsOrCavlc )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.AskCavlcTotalZeros )--> LaunchResBlkCavlc;
 					LaunchResBlkCavlc (ResBlkCavlc.GetVLDVal          )--> LaunchResBlkCavlc;
 					LaunchResBlkCavlc (ResBlkCavlc.Done               )--> SendResBlockDecoded;
 
