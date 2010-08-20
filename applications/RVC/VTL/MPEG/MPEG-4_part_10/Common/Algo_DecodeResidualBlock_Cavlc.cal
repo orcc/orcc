@@ -79,7 +79,8 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			end
 			startIdx := ValStartIdx;
 			endIdx   := ValEndIdx;
-
+	println("startIdx"+startIdx);
+	println("endIdx"+endIdx);
 			zerosLeft := 0;
 		end
 
@@ -225,7 +226,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			TypeOfVLD :[ CAVLC_TOTAL_ZEROS ],
 			VLD_Param :[ maxNumCoeff , TotalCoeff ]
 		guard
-			TotalCoeff < endIdx - startIdx + 1
+			TotalCoeff < (endIdx - startIdx + 1)
 		end
 
 	ReaadTotalZeros.Done: action
@@ -273,6 +274,8 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		ReadLevelSuffixDone (ReadLevelSuffix.Done )--> ComputeLevel;
 
 		ComputeLevel (ComputeLevel )--> CheckiLoop2;
+
+		ReadTotalZerosDone (ReaadTotalZeros.Done )-->a;
 
 a(a)-->undefined;
 	end
