@@ -101,7 +101,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			end
 		end
 
-	CheckTotalCoeff.IsEqualTo0: action ==>
+	CheckTotalCoeff.IsGreaterThan0: action ==>
 		guard
 			TotalCoeff > 0
 		do
@@ -118,17 +118,24 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			//     trailing_ones_sign_flag
 			SkipNal   :[   false   ],//Keep synchro
 			TypeOfVLD :[ READ_BITS ],
-			VLD_Param :[     1     ]
+			VLD_Param :[ TrailingOnes ]
 		guard
-			iLoop < TrailingOnes
+			TrailingOnes > 0
 		end
 
 	ReadTrailingOnesSign.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
+		var
+			uint(size=1) trailing_ones_sign_flag
 		do
-			level[iLoop] := 1 - 2 * ValueOfVLD;
-			iLoop        := iLoop + 1;
+			foreach int i in 0 .. TrailingOnes - 1
+			do
+				trailing_ones_sign_flag := bitand(rshift(ValueOfVLD,TrailingOnes - 1 - i) ,1);
+				level[iLoop] := 1 - 2 * trailing_ones_sign_flag;
+				println("levelT1 : "+level[iLoop]);
+				iLoop        := iLoop + 1;
+			end
 		end
 
 	ReadLevelPrefix.Asked: action
@@ -203,8 +210,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 				suffixLength := 1;
 			end
 			if( (Abs(level[iLoop]) > lshift(3, suffixLength - 1)) and (suffixLength < 6) ) then
-				suffixLength := suffixLength - 1;
+				suffixLength := suffixLength + 1;
 			end
+			println("level : "+level[iLoop]);
 			
 			levelCode := 0;
 			iLoop     := iLoop + 1;
@@ -241,9 +249,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	schedule fsm ReadCoeffToken_Asked:
 		ReadCoeffToken_Asked (ReadCoeffToken.Asked )--> ReadCoeffTokenDone;
 
-		ReadCoeffTokenDone (ReadCoeffToken.Done )--> a;
+		ReadCoeffTokenDone (ReadCoeffToken.Done )--> CheckTotalCoeff;
 
-		CheckTotalCoeff (CheckTotalCoeff.IsEqualTo0 )--> CheckiLoop;
+		CheckTotalCoeff (CheckTotalCoeff.IsGreaterThan0 )--> CheckiLoop;
 		CheckTotalCoeff (a )-->undefined;
 
 		CheckiLoop (ReadTrailingOnesSign.Asked )--> ReadTrailingOnesSign;
@@ -251,7 +259,11 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		CheckiLoop (ReadTotalZeros.Asked )--> ReadTotalZerosDone;
 		CheckiLoop (a )--> undefined;
 
-		ReadTrailingOnesSign (ReadTrailingOnesSign.Done )--> CheckiLoop;
+		CheckiLoop2 (ReadLevelPrefix.Asked )--> ReadLevelPrefix;
+		CheckiLoop2 (ReadTotalZeros.Asked )--> ReadTotalZerosDone;
+		CheckiLoop2 (a )--> undefined;
+
+		ReadTrailingOnesSign (ReadTrailingOnesSign.Done )--> CheckiLoop2;
 
 		ReadLevelPrefix (ReadLevelPrefix.Done )--> ReadLevelSuffixAsked;
 
@@ -262,14 +274,10 @@ actor Algo_DecodeResidualBlock_Cavlc()
 
 		ComputeLevel (ComputeLevel )--> CheckiLoop2;
 
-		CheckiLoop2 (ReadLevelPrefix.Asked )--> ReadLevelPrefix;
-		CheckiLoop2 (ReadTotalZeros.Asked )--> ReadTotalZerosDone;
-		CheckiLoop2 (a )--> undefined;
-
 a(a)-->undefined;
 	end
 	priority
-		CheckTotalCoeff.IsEqualTo0 > a;
+		CheckTotalCoeff.IsGreaterThan0 > a;
 		ReadTrailingOnesSign.Asked > ReadLevelPrefix.Asked;
 		ReadLevelSuffix.Asked > ComputeLevel;
 		ReadLevelPrefix.Asked > ReadTotalZeros.Asked;
