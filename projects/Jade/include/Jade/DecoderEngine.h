@@ -80,6 +80,9 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Fifo of Jade */
+	AbstractFifo* fifo;
 };
 
 #endif

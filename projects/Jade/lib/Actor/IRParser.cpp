@@ -57,6 +57,7 @@
 #include "Jade/Actor/Port.h"
 #include "Jade/Actor/StateVariable.h"
 #include "Jade/Decoder/Procedure.h"
+#include "Jade/Fifo/AbstractFifo.h"
 
 
 #include "IRConstant.h"
@@ -68,8 +69,9 @@ using namespace llvm;
 extern cl::opt<std::string> VTLDir;
 
 
-IRParser::IRParser(llvm::LLVMContext& C, JIT* jit) : Context(C){
+IRParser::IRParser(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo) : Context(C){
 	this->jit = jit;
+	this->fifo = fifo;
 }
 
 
@@ -132,31 +134,14 @@ map<string, Port*>* IRParser::parsePorts(string key, Module* module){
 
 map<string, Type*>* IRParser::parseFifos(Module* module){
 	map<string,Type*>* fifos = new map<string,Type*>();
-	std::string structName;
+	std::map<std::string, llvm::Type*>::iterator it;
 
-	structName = "struct.fifo_i8_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_i16_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_i32_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_i64_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_u8_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_u16_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_u32_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-
-	structName = "struct.fifo_u64_s";
-	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));	
+	std::map<std::string, llvm::Type*>* abstractFifoTypes = fifo->getFifoTypes();
+	
+	for (it = abstractFifoTypes->begin(); it != abstractFifoTypes->end(); it++){
+		string structName = it->first;
+		fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+	}	
 
 	return fifos;
 }

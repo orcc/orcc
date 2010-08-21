@@ -74,8 +74,14 @@ public:
      *
 	 * Creates an IRParser.
 	 *
+	 * @param C : llvm::LLVMContext of environnement
+	 * 
+	 * @param jit : JIT used to parse actor
+	 *
+	 * @param fifo : AbstractFifo used in actors of the VTL
+	 *
      */
-	IRParser(llvm::LLVMContext& C, JIT* jit);
+	IRParser(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo);
 
 	~IRParser();
 
@@ -297,6 +303,9 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Abstract fifos of actors */
+	AbstractFifo* fifo;
 };
 
 #endif

@@ -59,12 +59,19 @@ using namespace std;
 using namespace llvm;
 
 DecoderEngine::DecoderEngine(llvm::LLVMContext& C): Context(C) {
+	// Set Jade options
+	setOptions();
+	
+	//Create JIT
 	jit = new JIT(C);
-	irParser = new IRParser(C, jit);
+	
+	//Set type of fifos
+	this->fifo = getFifo();
+	
+	//Load IR Parser
+	irParser = new IRParser(C, jit, fifo);
 
 	fus = new map<string, FuncUnit*>();
-
-	setOptions();
 	
 }
 
@@ -76,9 +83,6 @@ int DecoderEngine::load(Network* network) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 	XDFnetwork = network;
-	
-	//Set type of fifos
-	AbstractFifo* fifo = getFifo();
 
 	//Create decoder
 	decoder = new Decoder(Context, jit, network, fifo);
