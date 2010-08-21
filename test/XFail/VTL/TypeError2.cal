@@ -1,0 +1,10 @@
+actor TypeError2 () ==> :
+	
+	bool x := true + 1;
+	
+	action ==>
+	do
+		println("x = " + x);
+	end
+	
+end

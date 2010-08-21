@@ -1,5 +1,4 @@
-actor MPEG4_algo_DCRinvpred (int DCVAL,
-	int NEWVOP,
+actor MPEG4_algo_DCRinvpred (int NEWVOP,
 	int INTRA,
 	int INTER,
 	int ACCODED,
@@ -19,6 +18,8 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 	int MB_COORD_SZ = 8;
 
 	int QUANT_SZ = 6;
+
+	int DCVAL = 128*8;
 
 	// Bitwidth needed for 'dc_scalar' - see ISO/IEC 14496-2
 	int(size=QUANT_SZ) s_QP;

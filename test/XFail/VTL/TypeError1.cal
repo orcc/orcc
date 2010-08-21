@@ -1,0 +1,12 @@
+actor TypeError1 () ==> :
+
+	int x := false;
+	
+	bool x := 7;
+
+	action ==>
+	do
+		println("x = " + x);
+	end
+
+end

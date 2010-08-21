@@ -1,0 +1,5 @@
+actor ListConcat () ==> int(size=64) O :
+
+	List(type: int, size=4) fib := [0, 1] + [ 2, 3 ];
+
+end
