@@ -610,18 +610,21 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		for (AstVariable astVariable : stateVariables) {
 			// evaluate initial value (if any)
 			AstExpression astValue = astVariable.getValue();
-			Object initialValue;
 			if (astValue != null) {
-				initialValue = new AstExpressionEvaluator(this)
-						.evaluate(astValue);
+				Object initialValue = astVariable.getInitialValue();
 				if (initialValue == null) {
-					error("variable "
-							+ astVariable.getName()
-							+ " does not have a compile-time constant initial value",
-							astVariable, CalPackage.AST_VARIABLE);
-				} else {
-					// register the value
-					astVariable.setInitialValue(initialValue);
+					// only evaluates the initial value once (when validating)
+					initialValue = new AstExpressionEvaluator(this)
+							.evaluate(astValue);
+					if (initialValue == null) {
+						error("variable "
+								+ astVariable.getName()
+								+ " does not have a compile-time constant initial value",
+								astVariable, CalPackage.AST_VARIABLE);
+					} else {
+						// register the value
+						astVariable.setInitialValue(initialValue);
+					}
 				}
 			}
 		}

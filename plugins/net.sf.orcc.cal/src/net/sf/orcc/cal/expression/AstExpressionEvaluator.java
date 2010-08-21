@@ -31,8 +31,6 @@ package net.sf.orcc.cal.expression;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
-
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
@@ -58,6 +56,8 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.util.StringUtil;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an expression evaluator.
@@ -449,11 +449,14 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			for (AstGenerator generator : generators) {
 				int lower = evaluateAsInteger(generator.getLower());
 				int higher = evaluateAsInteger(generator.getHigher());
+				AstVariable variable = generator.getVariable();
 				for (int i = lower; i <= higher; i++) {
+					variable.setInitialValue((long) i);
 					for (AstExpression subExpression : expressions) {
 						list.add(evaluate(subExpression));
 					}
 				}
+				variable.setInitialValue(null);
 			}
 		}
 
