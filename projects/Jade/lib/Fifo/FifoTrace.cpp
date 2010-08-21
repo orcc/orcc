@@ -215,7 +215,7 @@ void FifoTrace::setConnection(Connection* connection){
 		false, GlobalVariable::InternalLinkage, fifoStruct, fifoName.str());
 
 	// Set initialize to instance port 
-	srcVar->setInitializer(NewFifo);
+	//srcVar->setInitializer(NewFifo);
 	dstVar->setInitializer(NewFifo);
 
 	// Increment fifo counter 

@@ -1,11 +1,13 @@
 header() ::= <<
 
 %struct.fifo_i8_s = type opaque
-%struct.fifo_i32_s = type opaque
 %struct.fifo_i16_s = type opaque
+%struct.fifo_i32_s = type opaque
+%struct.fifo_i64_s = type opaque
 %struct.fifo_u8_s = type opaque
-%struct.fifo_u32_s = type opaque
 %struct.fifo_u16_s = type opaque
+%struct.fifo_u32_s = type opaque
+%struct.fifo_u64_s = type opaque
 
 declare i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n)
 declare i32 @fifo_i8_has_room(%struct.fifo_i8_s* %fifo, i32 %n)
@@ -49,5 +51,20 @@ declare i32* @fifo_u32_read(%struct.fifo_u32_s* %fifo, i32 %n)
 declare void @fifo_u32_read_end(%struct.fifo_u32_s* %fifo, i32 %n)
 declare i32* @fifo_u32_write(%struct.fifo_u32_s* %fifo, i32 %n)
 declare void @fifo_u32_write_end(%struct.fifo_u32_s* %fifo, i32 %n) 
+declare i32 @fifo_i64_has_tokens(%struct.fifo_i64_s* %fifo, i32 %n)
+declare i32 @fifo_i64_get_room(%struct.fifo_i64_s* %fifo)
+declare i64* @fifo_i64_peek(%struct.fifo_i64_s* %fifo, i32 %n)
+declare i64* @fifo_i64_read(%struct.fifo_i64_s* %fifo, i32 %n)
+declare void @fifo_i64_read_end(%struct.fifo_i64_s* %fifo, i32 %n)
+declare i64* @fifo_i64_write(%struct.fifo_i64_s* %fifo, i32 %n)
+declare void @fifo_i64_write_end(%struct.fifo_i64_s* %fifo, i32 %n)
+declare i32 @fifo_u64_has_tokens(%struct.fifo_i64_s* %fifo, i32 %n)
+declare i32 @fifo_u64_has_room(%struct.fifo_i64_s* %fifo, i32 %n)
+declare i32 @fifo_u64_get_room(%struct.fifo_i64_s* %fifo)
+declare i64* @fifo_u64_peek(%struct.fifo_i64_s* %fifo, i32 %n)
+declare i64* @fifo_u64_read(%struct.fifo_i64_s* %fifo, i32 %n)
+declare void @fifo_u64_read_end(%struct.fifo_i64_s* %fifo, i32 %n)
+declare i64* @fifo_u64_write(%struct.fifo_i64_s* %fifo, i32 %n)
+declare void @fifo_u64_write_end(%struct.fifo_i64_s* %fifo, i32 %n)
 
 >>

@@ -7,7 +7,7 @@
 @.str2 = private constant [3 x i8] c"rb\00", align 1 ; <[3 x i8]*> [#uses=1]
 @.str3 = private constant [7 x i8] c"<null>\00", align 1 ; <[7 x i8]*> [#uses=1]
 @.str4 = private constant [26 x i8] c"could not open file \22%s\22\0A\00", align 1 ; <[26 x i8]*> [#uses=1]
-@O = constant %struct.fifo_i8_s* null ; <%struct.fifo_i8_s**> [#uses=3]
+@O = global %struct.fifo_i8_s* null ; <%struct.fifo_i8_s**> [#uses=3]
 
 define i32 @initialize() nounwind {
 entry:
@@ -155,6 +155,9 @@ declare i32 @fread(i8*, i32, i32, %struct.FILE*) nounwind
 %struct.fifo_i8_s = type opaque
 %struct.fifo_i32_s = type opaque
 %struct.fifo_i16_s = type opaque
+%struct.fifo_u8_s = type opaque
+%struct.fifo_u32_s = type opaque
+%struct.fifo_u16_s = type opaque
 
 declare i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n)
 declare i32 @fifo_i8_has_room(%struct.fifo_i8_s* %fifo, i32 %n)
@@ -163,13 +166,13 @@ declare i8* @fifo_i8_read(%struct.fifo_i8_s* %fifo, i32 %n)
 declare void @fifo_i8_read_end(%struct.fifo_i8_s* %fifo, i32 %n)
 declare i8* @fifo_i8_write(%struct.fifo_i8_s* %fifo, i32 %n)
 declare void @fifo_i8_write_end(%struct.fifo_i8_s* %fifo, i32 %n)
-declare i32 @fifo_u_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n)
-declare i32 @fifo_u_i8_has_room(%struct.fifo_i8_s* %fifo, i32 %n)
-declare i8* @fifo_u_i8_peek(%struct.fifo_i8_s* %fifo, i32 %n)
-declare i8* @fifo_u_i8_read(%struct.fifo_i8_s* %fifo, i32 %n)
-declare void @fifo_u_i8_read_end(%struct.fifo_i8_s* %fifo, i32 %n)
-declare i8* @fifo_u_i8_write(%struct.fifo_i8_s* %fifo, i32 %n)
-declare void @fifo_u_i8_write_end(%struct.fifo_i8_s* %fifo, i32 %n)
+declare i32 @fifo_u8_has_tokens(%struct.fifo_u8_s* %fifo, i32 %n)
+declare i32 @fifo_u8_has_room(%struct.fifo_u8_s* %fifo, i32 %n)
+declare i8* @fifo_u8_peek(%struct.fifo_u8_s* %fifo, i32 %n)
+declare i8* @fifo_u8_read(%struct.fifo_u8_s* %fifo, i32 %n)
+declare void @fifo_u8_read_end(%struct.fifo_u8_s* %fifo, i32 %n)
+declare i8* @fifo_u8_write(%struct.fifo_u8_s* %fifo, i32 %n)
+declare void @fifo_u8_write_end(%struct.fifo_u8_s* %fifo, i32 %n)
 declare i32 @fifo_i16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n)
 declare i32 @fifo_i16_has_room(%struct.fifo_i16_s* %fifo, i32 %n)
 declare i16* @fifo_i16_peek(%struct.fifo_i16_s* %fifo, i32 %n)
@@ -177,13 +180,13 @@ declare i16* @fifo_i16_read(%struct.fifo_i16_s* %fifo, i32 %n)
 declare void @fifo_i16_read_end(%struct.fifo_i16_s* %fifo, i32 %n)
 declare i16* @fifo_i16_write(%struct.fifo_i16_s* %fifo, i32 %n)
 declare void @fifo_i16_write_end(%struct.fifo_i16_s* %fifo, i32 %n)
-declare i32 @fifo_u_i16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n)
-declare i32 @fifo_u_i16_has_room(%struct.fifo_i16_s* %fifo, i32 %n)
-declare i16* @fifo_u_i16_peek(%struct.fifo_i16_s* %fifo, i32 %n)
-declare i16* @fifo_u_i16_read(%struct.fifo_i16_s* %fifo, i32 %n) 
-declare void @fifo_u_i16_read_end(%struct.fifo_i16_s* %fifo, i32 %n)
-declare i16* @fifo_u_i16_write(%struct.fifo_i16_s* %fifo, i32 %n)
-declare void @fifo_u_i16_write_end(%struct.fifo_i16_s* %fifo, i32 %n)
+declare i32 @fifo_i16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n)
+declare i32 @fifo_u16_has_room(%struct.fifo_u16_s* %fifo, i32 %n)
+declare i16* @fifo_u16_peek(%struct.fifo_u16_s* %fifo, i32 %n)
+declare i16* @fifo_u16_read(%struct.fifo_u16_s* %fifo, i32 %n) 
+declare void @fifo_u16_read_end(%struct.fifo_u16_s* %fifo, i32 %n)
+declare i16* @fifo_u16_write(%struct.fifo_u16_s* %fifo, i32 %n)
+declare void @fifo_u16_write_end(%struct.fifo_u16_s* %fifo, i32 %n)
 declare i32 @fifo_i32_has_tokens(%struct.fifo_i32_s* %fifo, i32 %n)
 declare i32 @fifo_i32_has_room(%struct.fifo_i32_s* %fifo, i32 %n)
 declare i32* @fifo_i32_peek(%struct.fifo_i32_s* %fifo, i32 %n)
@@ -191,10 +194,10 @@ declare i32* @fifo_i32_read(%struct.fifo_i32_s* %fifo, i32 %n)
 declare void @fifo_i32_read_end(%struct.fifo_i32_s* %fifo, i32 %n)
 declare i32* @fifo_i32_write(%struct.fifo_i32_s* %fifo, i32 %n)
 declare void @fifo_i32_write_end(%struct.fifo_i32_s* %fifo, i32 %n)
-declare i32 @fifo_u_i32_has_tokens(%struct.fifo_i32_s* %fifo, i32 %n)
-declare i32 @fifo_u_i32_has_room(%struct.fifo_i32_s* %fifo, i32 %n)
-declare i32* @fifo_u_i32_peek(%struct.fifo_i32_s* %fifo, i32 %n)
-declare i32* @fifo_u_i32_read(%struct.fifo_i32_s* %fifo, i32 %n)
-declare void @fifo_u_i32_read_end(%struct.fifo_i32_s* %fifo, i32 %n)
-declare i32* @fifo_u_i32_write(%struct.fifo_i32_s* %fifo, i32 %n)
-declare void @fifo_u_i32_write_end(%struct.fifo_i32_s* %fifo, i32 %n) 
+declare i32 @fifo_u32_has_tokens(%struct.fifo_u32_s* %fifo, i32 %n)
+declare i32 @fifo_u32_has_room(%struct.fifo_u32_s* %fifo, i32 %n)
+declare i32* @fifo_u32_peek(%struct.fifo_u32_s* %fifo, i32 %n)
+declare i32* @fifo_u32_read(%struct.fifo_u32_s* %fifo, i32 %n)
+declare void @fifo_u32_read_end(%struct.fifo_u32_s* %fifo, i32 %n)
+declare i32* @fifo_u32_write(%struct.fifo_u32_s* %fifo, i32 %n)
+declare void @fifo_u32_write_end(%struct.fifo_u32_s* %fifo, i32 %n) 

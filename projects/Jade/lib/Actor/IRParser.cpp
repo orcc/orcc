@@ -137,11 +137,26 @@ map<string, Type*>* IRParser::parseFifos(Module* module){
 	structName = "struct.fifo_i8_s";
 	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
 
+	structName = "struct.fifo_i16_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
 	structName = "struct.fifo_i32_s";
 	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
 
-	structName = "struct.fifo_i16_s";
+	structName = "struct.fifo_i64_s";
 	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_u8_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_u16_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_u32_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
+
+	structName = "struct.fifo_u64_s";
+	fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));	
 
 	return fifos;
 }

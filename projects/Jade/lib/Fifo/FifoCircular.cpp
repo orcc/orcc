@@ -158,9 +158,11 @@ void FifoCircular::setConnection(Connection* connection){
 	
 	// fifo name 
 	ostringstream arrayName;
+	ostringstream bufName;
 	ostringstream fifoName;
 
 	arrayName << "array_" << fifoCnt;
+	bufName << "buffer_" << fifoCnt;
 	fifoName << "fifo_" << fifoCnt;
 
 	// Get vertex of the connection
@@ -172,30 +174,38 @@ void FifoCircular::setConnection(Connection* connection){
 	//Get fifo structure
 	StructType* structType = getFifoType(connection->getIntegerType());
 
-	// Initialize array 
+	//Get fifo array structure
 	PATypeHolder EltTy(connection->getIntegerType());
 	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize()+1);
+
+	// Initialize array for content
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
-	GlobalVariable *NewArray =
+	GlobalVariable *NewArrayContents =
         new GlobalVariable(*module, arrayType,
 		false, GlobalVariable::InternalLinkage, arrayContent, arrayName.str());
+
+	// Initialize array for fifo buffer
+	Constant* arrayFifoBuffer = ConstantArray::get(arrayType, NULL,0);
+	GlobalVariable *NewArrayFifoBuffer =
+        new GlobalVariable(*module, arrayType,
+		false, GlobalVariable::InternalLinkage, arrayFifoBuffer, bufName.str());
 	
 	// Initialize fifo elements
 	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize());
 	Constant* read_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* write_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* fill_count = ConstantInt::get(Type::getInt32Ty(Context), 0);
-	Constant* expr = ConstantExpr::getBitCast(NewArray, structType->getElementType(1));
-	Constant* arrConst = ConstantAggregateZero::get(structType->getElementType(5));
+	Constant* contents = ConstantExpr::getBitCast(NewArrayContents, structType->getElementType(1));
+	Constant* fifo_buffer = ConstantExpr::getBitCast(NewArrayFifoBuffer, structType->getElementType(2));
 	
 	// Add initialization vector 
 	vector<Constant*> Elts;
 	Elts.push_back(size);
-	Elts.push_back(expr);
+	Elts.push_back(contents);
+	Elts.push_back(fifo_buffer);
 	Elts.push_back(read_ind);
 	Elts.push_back(write_ind);
 	Elts.push_back(fill_count);
-	Elts.push_back(arrConst);
 	Constant* fifoStruct =  ConstantStruct::get(structType, Elts);
 
 	// Create fifo 
