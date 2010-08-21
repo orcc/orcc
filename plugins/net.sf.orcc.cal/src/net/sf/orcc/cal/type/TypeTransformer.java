@@ -36,6 +36,7 @@ import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.util.VoidSwitch;
+import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
@@ -47,22 +48,25 @@ import net.sf.orcc.ir.Type;
  */
 public class TypeTransformer extends VoidSwitch {
 
+	private CalJavaValidator validator;
+
 	/**
 	 * Creates a new AST type to IR type transformation.
 	 */
-	public TypeTransformer() {
+	public TypeTransformer(CalJavaValidator validator) {
+		this.validator = validator;
 	}
 
 	@Override
 	public Void caseAstExpression(AstExpression expression) {
-		TypeChecker checker = new TypeChecker();
+		TypeChecker checker = new TypeChecker(validator);
 		checker.getType(expression);
 		return null;
 	}
 
 	@Override
 	public Void caseAstFunction(AstFunction function) {
-		TypeConverter converter = new TypeConverter();
+		TypeConverter converter = new TypeConverter(validator);
 		Type type = converter.transformType(function.getType());
 		function.setIrType(type);
 		return super.caseAstFunction(function);
@@ -79,7 +83,7 @@ public class TypeTransformer extends VoidSwitch {
 		// repeat equals to 1 when absent
 		AstExpression astRepeat = input.getRepeat();
 		if (astRepeat != null) {
-			int repeat = new AstExpressionEvaluator()
+			int repeat = new AstExpressionEvaluator(validator)
 					.evaluateAsInteger(astRepeat);
 			type = IrFactory.eINSTANCE.createTypeList(repeat, type);
 		}
@@ -94,7 +98,7 @@ public class TypeTransformer extends VoidSwitch {
 	@Override
 	public Void caseAstPort(AstPort port) {
 		if (port.getIrType() == null) {
-			TypeConverter converter = new TypeConverter();
+			TypeConverter converter = new TypeConverter(validator);
 			Type type = converter.transformType(port.getType());
 			port.setIrType(type);
 		}
@@ -104,7 +108,7 @@ public class TypeTransformer extends VoidSwitch {
 
 	@Override
 	public Void caseAstVariable(AstVariable variable) {
-		TypeConverter converter = new TypeConverter();
+		TypeConverter converter = new TypeConverter(validator);
 		Type type = converter.transformType(variable.getType());
 		variable.setIrType(type);
 

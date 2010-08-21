@@ -454,7 +454,7 @@ public class ActorTransformer {
 			int repeat = 1;
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator()
+				repeat = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}
@@ -481,7 +481,7 @@ public class ActorTransformer {
 			int repeat = 1;
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator()
+				repeat = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}
@@ -748,7 +748,7 @@ public class ActorTransformer {
 			int repeat = 1;
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator()
+				repeat = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}
@@ -841,7 +841,7 @@ public class ActorTransformer {
 			int repeat = 1;
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator()
+				repeat = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astRepeat);
 				totalConsumption *= repeat;
 			}

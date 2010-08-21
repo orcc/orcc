@@ -31,6 +31,8 @@ package net.sf.orcc.cal.expression;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
@@ -65,10 +67,13 @@ import net.sf.orcc.util.StringUtil;
  */
 public class AstExpressionEvaluator extends CalSwitch<Object> {
 
+	private CalJavaValidator validator;
+
 	/**
 	 * Creates a new AST expression evaluator.
 	 */
-	public AstExpressionEvaluator() {
+	public AstExpressionEvaluator(CalJavaValidator validator) {
+		this.validator = validator;
 	}
 
 	@Override
@@ -195,6 +200,15 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				long i2 = (Long) val2;
 				return i1 + i2;
 			}
+
+			if (val1 instanceof List<?> && val2 instanceof List<?>) {
+				List<?> l1 = (List<?>) val1;
+				List<?> l2 = (List<?>) val2;
+				List<Object> list = new ArrayList<Object>(l1.size() + l2.size());
+				list.addAll(l1);
+				list.addAll(l2);
+				return list;
+			}
 			break;
 		case SHIFT_LEFT:
 			if (val1 instanceof Long && val2 instanceof Long) {
@@ -246,8 +260,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					}
 				}
 
-				CalJavaValidator.getInstance().error(
-						"bitnot expects one integer expression", expression,
+				error("bitnot expects one integer expression", expression,
 						CalPackage.AST_EXPRESSION_CALL);
 				return null;
 			}
@@ -267,8 +280,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					}
 				}
 
-				CalJavaValidator.getInstance().error(
-						"bitand expects two integer expressions", expression,
+				error("bitand expects two integer expressions", expression,
 						CalPackage.AST_EXPRESSION_CALL);
 				return null;
 			case BITOR:
@@ -280,8 +292,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					}
 				}
 
-				CalJavaValidator.getInstance().error(
-						"bitor expects two integer expressions", expression,
+				error("bitor expects two integer expressions", expression,
 						CalPackage.AST_EXPRESSION_CALL);
 				return null;
 			case BITXOR:
@@ -293,8 +304,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					}
 				}
 
-				CalJavaValidator.getInstance().error(
-						"bitxor expects two integer expressions", expression,
+				error("bitxor expects two integer expressions", expression,
 						CalPackage.AST_EXPRESSION_CALL);
 				return null;
 			case SHIFT_LEFT:
@@ -306,8 +316,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					}
 				}
 
-				CalJavaValidator.getInstance().error(
-						"lshift expects two integer expressions", expression,
+				error("lshift expects two integer expressions", expression,
 						CalPackage.AST_EXPRESSION_CALL);
 				return null;
 			case SHIFT_RIGHT:
@@ -319,8 +328,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 					}
 				}
 
-				CalJavaValidator.getInstance().error(
-						"rshift expects two integer expressions", expression,
+				error("rshift expects two integer expressions", expression,
 						CalPackage.AST_EXPRESSION_CALL);
 				return null;
 			default:
@@ -328,8 +336,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			}
 		}
 
-		CalJavaValidator.getInstance().error(
-				"unknown function \"" + name + "\"", expression,
+		error("unknown function \"" + name + "\"", expression,
 				CalPackage.AST_EXPRESSION_CALL__FUNCTION);
 
 		return null;
@@ -355,8 +362,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return oElse;
 			}
 		} else {
-			CalJavaValidator.getInstance().error(
-					"expected condition of type bool", expression,
+			error("expected condition of type bool", expression,
 					CalPackage.AST_EXPRESSION_IF__CONDITION);
 			return null;
 		}
@@ -367,10 +373,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		AstVariable variable = expression.getSource().getVariable();
 		Object value = variable.getInitialValue();
 		if (value == null) {
-			CalJavaValidator.getInstance().error(
-					"variable \"" + variable.getName() + "\" ("
-							+ Util.getLocation(variable)
-							+ ") does not have a compile-time constant value",
+			error("variable \"" + variable.getName() + "\" ("
+					+ Util.getLocation(variable)
+					+ ") does not have a compile-time constant value",
 					expression, CalPackage.AST_EXPRESSION_INDEX__SOURCE);
 			return null;
 		}
@@ -388,27 +393,22 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 						try {
 							value = list.get(intValue);
 						} catch (IndexOutOfBoundsException e) {
-							CalJavaValidator.getInstance().error(
-									"index out of bounds", expression,
+							error("index out of bounds", expression,
 									CalPackage.AST_EXPRESSION_INDEX__INDEXES);
 						}
 					} else {
-						CalJavaValidator.getInstance().error(
-								"index must be a int(size=32) integer",
+						error("index must be a int(size=32) integer",
 								expression,
 								CalPackage.AST_EXPRESSION_INDEX__INDEXES);
 					}
 				} else {
-					CalJavaValidator.getInstance().error(
-							"index must be an integer", expression,
+					error("index must be an integer", expression,
 							CalPackage.AST_EXPRESSION_INDEX__INDEXES);
 				}
 			} else {
-				CalJavaValidator.getInstance().error(
-						"variable \"" + variable.getName() + "\" ("
-								+ Util.getLocation(variable)
-								+ ") must be of type List", expression,
-						CalPackage.AST_EXPRESSION_INDEX__SOURCE);
+				error("variable \"" + variable.getName() + "\" ("
+						+ Util.getLocation(variable) + ") must be of type List",
+						expression, CalPackage.AST_EXPRESSION_INDEX__SOURCE);
 			}
 		}
 
@@ -422,18 +422,41 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 
 	@Override
 	public Object caseAstExpressionList(AstExpressionList expression) {
+		List<AstExpression> expressions = expression.getExpressions();
 		List<AstGenerator> generators = expression.getGenerators();
+		List<Object> list;
+
+		int size = expressions.size();
 		if (!generators.isEmpty()) {
-			// generators will be translated to statements in initialize
-			// meanwhile we return an empty list
-			return new ArrayList<Object>(0);
+			// size of generators
+			for (AstGenerator generator : expression.getGenerators()) {
+				int lower = evaluateAsInteger(generator.getLower());
+				int higher = evaluateAsInteger(generator.getHigher());
+				size *= (higher - lower) + 1;
+			}
 		}
 
-		List<AstExpression> expressions = expression.getExpressions();
-		List<Object> list = new ArrayList<Object>(expressions.size());
-		for (AstExpression subExpression : expressions) {
-			list.add(evaluate(subExpression));
+		if (generators.isEmpty()) {
+			list = new ArrayList<Object>(size);
+			for (AstExpression subExpression : expressions) {
+				list.add(evaluate(subExpression));
+			}
+		} else {
+			// generators will be translated to statements in initialize
+			// list = new ArrayList<Object>(0);
+
+			list = new ArrayList<Object>(size);
+			for (AstGenerator generator : generators) {
+				int lower = evaluateAsInteger(generator.getLower());
+				int higher = evaluateAsInteger(generator.getHigher());
+				for (int i = lower; i <= higher; i++) {
+					for (AstExpression subExpression : expressions) {
+						list.add(evaluate(subExpression));
+					}
+				}
+			}
 		}
+
 		return list;
 	}
 
@@ -454,8 +477,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return ~i;
 			}
 
-			CalJavaValidator.getInstance().error(
-					"bitnot expects an integer expression", expression,
+			error("bitnot expects an integer expression", expression,
 					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
 			return null;
 		}
@@ -466,8 +488,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return !b;
 			}
 
-			CalJavaValidator.getInstance().error(
-					"not expects a boolean expression", expression,
+			error("not expects a boolean expression", expression,
 					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
 			return null;
 		}
@@ -478,20 +499,18 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return -i;
 			}
 
-			CalJavaValidator.getInstance().error(
-					"minus expects an integer expression", expression,
+			error("minus expects an integer expression", expression,
 					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
 			return null;
 		}
 		case NUM_ELTS:
-			TypeChecker typeChecker = new TypeChecker();
+			TypeChecker typeChecker = new TypeChecker(validator);
 			Type type = typeChecker.getType(expression.getExpression());
 			if (type != null && type.isList()) {
 				return (long) ((TypeList) type).getSize();
 			}
 
-			CalJavaValidator.getInstance().error(
-					"operator # expects a list expression", expression,
+			error("operator # expects a list expression", expression,
 					CalPackage.AST_EXPRESSION_UNARY__UNARY_OPERATOR);
 			return null;
 		}
@@ -504,15 +523,20 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		AstVariable variable = expression.getValue().getVariable();
 		Object value = variable.getInitialValue();
 		if (value == null) {
-			CalJavaValidator.getInstance().error(
-					"variable \"" + variable.getName() + "\" ("
-							+ Util.getLocation(variable)
-							+ ") does not have a compile-time constant value",
+			error("variable \"" + variable.getName() + "\" ("
+					+ Util.getLocation(variable)
+					+ ") does not have a compile-time constant value",
 					expression, CalPackage.AST_EXPRESSION_VARIABLE);
 			return null;
 		}
 
 		return value;
+	}
+
+	private void error(String string, EObject source, int feature) {
+		if (validator != null) {
+			validator.error(string, source, feature);
+		}
 	}
 
 	/**
@@ -551,16 +575,14 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return longValue.intValue();
 			}
 
-			CalJavaValidator.getInstance().error(
-					"integer expression too large", expression,
+			error("integer expression too large", expression,
 					CalPackage.AST_EXPRESSION);
 			return 0;
 		}
 
 		// evaluated ok, but not as an integer
-		CalJavaValidator.getInstance().error(
-				"expected compile-time constant integer expression",
-				expression, CalPackage.AST_EXPRESSION);
+		error("expected compile-time constant integer expression", expression,
+				CalPackage.AST_EXPRESSION);
 		return 0;
 	}
 

@@ -38,6 +38,7 @@ import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeUint;
@@ -52,10 +53,13 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class TypeConverter extends CalSwitch<Type> {
 
+	private CalJavaValidator validator;
+
 	/**
 	 * Creates a new AST type to IR type conversion.
 	 */
-	public TypeConverter() {
+	public TypeConverter(CalJavaValidator validator) {
+		this.validator = validator;
 	}
 
 	@Override
@@ -75,7 +79,8 @@ public class TypeConverter extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
+			size = new AstExpressionEvaluator(validator)
+					.evaluateAsInteger(astSize);
 		}
 		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
@@ -84,7 +89,8 @@ public class TypeConverter extends CalSwitch<Type> {
 	public Type caseAstTypeList(AstTypeList listType) {
 		Type type = transformType(listType.getType());
 		AstExpression expression = listType.getSize();
-		int size = new AstExpressionEvaluator().evaluateAsInteger(expression);
+		int size = new AstExpressionEvaluator(validator)
+				.evaluateAsInteger(expression);
 		return IrFactory.eINSTANCE.createTypeList(size, type);
 	}
 
@@ -100,7 +106,8 @@ public class TypeConverter extends CalSwitch<Type> {
 		if (astSize == null) {
 			size = 32;
 		} else {
-			size = new AstExpressionEvaluator().evaluateAsInteger(astSize);
+			size = new AstExpressionEvaluator(validator)
+					.evaluateAsInteger(astSize);
 		}
 
 		TypeUint uintType = IrFactory.eINSTANCE.createTypeUint();

@@ -31,10 +31,13 @@ package net.sf.orcc.cal.type;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.emf.ecore.EObject;
+
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
 import net.sf.orcc.cal.cal.AstExpressionCall;
+import net.sf.orcc.cal.cal.AstExpressionFloat;
 import net.sf.orcc.cal.cal.AstExpressionIf;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
 import net.sf.orcc.cal.cal.AstExpressionInteger;
@@ -67,10 +70,19 @@ import net.sf.orcc.ir.expr.UnaryOp;
  */
 public class TypeChecker extends CalSwitch<Type> {
 
+	private CalJavaValidator validator;
+
 	/**
 	 * Creates a new type checker.
 	 */
-	public TypeChecker() {
+	public TypeChecker(CalJavaValidator validator) {
+		this.validator = validator;
+	}
+
+	private void error(String string, EObject source, int feature) {
+		if (validator != null) {
+			validator.error(string, source, feature);
+		}
 	}
 
 	/**
@@ -105,14 +117,12 @@ public class TypeChecker extends CalSwitch<Type> {
 		case MOD:
 		case SHIFT_RIGHT:
 			if (!t1.isInt() && !t1.isUint()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t1 + " to int/uint", expression,
+				error("Cannot convert " + t1 + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_BINARY__LEFT);
 				return null;
 			}
 			if (!t2.isInt() && !t2.isUint()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t2 + " to int/uint", expression,
+				error("Cannot convert " + t2 + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 				return null;
 			}
@@ -123,14 +133,12 @@ public class TypeChecker extends CalSwitch<Type> {
 		case MINUS:
 		case TIMES:
 			if (!t1.isInt() && !t1.isUint()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t1 + " to int/uint", expression,
+				error("Cannot convert " + t1 + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_BINARY__LEFT);
 				return null;
 			}
 			if (!t2.isInt() && !t2.isUint()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t2 + " to int/uint", expression,
+				error("Cannot convert " + t2 + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 				return null;
 			}
@@ -139,8 +147,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		case PLUS:
 			if (t1.isString()) {
 				if (t2.isList()) {
-					CalJavaValidator.getInstance().error(
-							"Cannot convert " + t2 + " to String", expression,
+					error("Cannot convert " + t2 + " to String", expression,
 							CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 					return null;
 				} else {
@@ -149,24 +156,16 @@ public class TypeChecker extends CalSwitch<Type> {
 			}
 			if (t2.isString()) {
 				if (t1.isList()) {
-					CalJavaValidator.getInstance().error(
-							"Cannot convert " + t1 + " to String", expression,
+					error("Cannot convert " + t1 + " to String", expression,
 							CalPackage.AST_EXPRESSION_BINARY__LEFT);
 					return null;
 				} else {
 					return t1;
 				}
 			}
-			if (t1.isList()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t1 + " to scalar", expression,
-						CalPackage.AST_EXPRESSION_BINARY__LEFT);
-				return null;
-			}
-			if (t2.isList()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t2 + " to scalar", expression,
-						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
+			if (t1.isBool() || t2.isBool()) {
+				error("Addition is not defined for booleans", expression,
+						CalPackage.AST_EXPRESSION);
 				return null;
 			}
 			return getLub(t1, t2);
@@ -175,14 +174,12 @@ public class TypeChecker extends CalSwitch<Type> {
 		case DIV_INT:
 		case SHIFT_LEFT:
 			if (!t1.isInt() && !t1.isUint()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t1 + " to int/uint", expression,
+				error("Cannot convert " + t1 + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_BINARY__LEFT);
 				return null;
 			}
 			if (!t2.isInt() && !t2.isUint()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t2 + " to int/uint", expression,
+				error("Cannot convert " + t2 + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 				return null;
 			}
@@ -196,29 +193,26 @@ public class TypeChecker extends CalSwitch<Type> {
 		case NE:
 			Type type = getLub(t1, t2);
 			if (type == null) {
-				CalJavaValidator.getInstance().error(
-						"Incompatible operand types " + t1 + " and " + t2,
+				error("Incompatible operand types " + t1 + " and " + t2,
 						expression, CalPackage.AST_EXPRESSION_BINARY);
 				return null;
 			}
 			return IrFactory.eINSTANCE.createTypeBool();
 
 		case EXP:
-			CalJavaValidator.getInstance().error("Operator ^ not implemented",
-					expression, CalPackage.AST_EXPRESSION_BINARY__OPERATOR);
+			error("Operator ^ not implemented", expression,
+					CalPackage.AST_EXPRESSION_BINARY__OPERATOR);
 			return null;
 
 		case LOGIC_AND:
 		case LOGIC_OR:
 			if (!t1.isBool()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t1 + " to bool", expression,
+				error("Cannot convert " + t1 + " to bool", expression,
 						CalPackage.AST_EXPRESSION_BINARY__LEFT);
 				return null;
 			}
 			if (!t2.isBool()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + t2 + " to bool", expression,
+				error("Cannot convert " + t2 + " to bool", expression,
 						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 				return null;
 			}
@@ -243,6 +237,11 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	@Override
+	public Type caseAstExpressionFloat(AstExpressionFloat expression) {
+		return IrFactory.eINSTANCE.createTypeFloat();
+	}
+
+	@Override
 	public Type caseAstExpressionIf(AstExpressionIf expression) {
 		Type type = getType(expression.getCondition());
 		if (type == null) {
@@ -250,8 +249,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		if (!type.isBool()) {
-			CalJavaValidator.getInstance().error(
-					"Cannot convert " + type + " to bool", expression,
+			error("Cannot convert " + type + " to bool", expression,
 					CalPackage.AST_EXPRESSION_IF__CONDITION);
 			return null;
 		}
@@ -264,8 +262,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		type = getLub(t1, t2);
 		if (type == null) {
-			CalJavaValidator.getInstance().error(
-					"Incompatible operand types " + t1 + " and " + t2,
+			error("Incompatible operand types " + t1 + " and " + t2,
 					expression, CalPackage.AST_EXPRESSION_IF);
 			return null;
 		}
@@ -290,13 +287,11 @@ public class TypeChecker extends CalSwitch<Type> {
 				if (subType != null && (subType.isInt() || subType.isUint())) {
 					type = ((TypeList) type).getType();
 				} else {
-					CalJavaValidator.getInstance().error(
-							"index must be an integer", index,
+					error("index must be an integer", index,
 							CalPackage.AST_EXPRESSION);
 				}
 			} else {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + type + " to List", expression,
+				error("Cannot convert " + type + " to List", expression,
 						CalPackage.AST_EXPRESSION_INDEX__SOURCE);
 				return null;
 			}
@@ -323,11 +318,11 @@ public class TypeChecker extends CalSwitch<Type> {
 			getType(generator.getHigher());
 
 			AstExpression astValue = generator.getLower();
-			int lower = new AstExpressionEvaluator()
+			int lower = new AstExpressionEvaluator(validator)
 					.evaluateAsInteger(astValue);
 
 			astValue = generator.getHigher();
-			int higher = new AstExpressionEvaluator()
+			int higher = new AstExpressionEvaluator(validator)
 					.evaluateAsInteger(astValue);
 			size *= (higher - lower) + 1;
 		}
@@ -357,16 +352,14 @@ public class TypeChecker extends CalSwitch<Type> {
 		switch (op) {
 		case BITNOT:
 			if (!(type.isInt() || type.isUint())) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + type + " to int/uint", expression,
+				error("Cannot convert " + type + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
 				return null;
 			}
 			return type;
 		case LOGIC_NOT:
 			if (!type.isBool()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + type + " to boolean", expression,
+				error("Cannot convert " + type + " to boolean", expression,
 						CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
 				return null;
 			}
@@ -377,16 +370,14 @@ public class TypeChecker extends CalSwitch<Type> {
 						.getSize());
 			}
 			if (!type.isInt()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + type + " to int", expression,
+				error("Cannot convert " + type + " to int", expression,
 						CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
 				return null;
 			}
 			return type;
 		case NUM_ELTS:
 			if (!type.isList()) {
-				CalJavaValidator.getInstance().error(
-						"Cannot convert " + type + " to List", expression,
+				error("Cannot convert " + type + " to List", expression,
 						CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
 				return null;
 			}
@@ -394,8 +385,8 @@ public class TypeChecker extends CalSwitch<Type> {
 			return IrFactory.eINSTANCE.createTypeInt(IntExpr.getSize(listType
 					.getSize()));
 		default:
-			CalJavaValidator.getInstance().error("Unknown unary operator",
-					expression, CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
+			error("Unknown unary operator", expression,
+					CalPackage.AST_EXPRESSION_UNARY__EXPRESSION);
 			return null;
 		}
 	}
@@ -405,7 +396,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		AstVariable variable = expression.getValue().getVariable();
 		Type type = variable.getIrType();
 		if (type == null) {
-			type = new TypeConverter().doSwitch(variable.getType());
+			type = new TypeConverter(validator).doSwitch(variable.getType());
 			variable.setIrType(type);
 		}
 
@@ -414,8 +405,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstGenerator(AstGenerator expression) {
-		CalJavaValidator.getInstance().error("cannot evaluate generator",
-				expression, CalPackage.AST_GENERATOR);
+		error("cannot evaluate generator", expression, CalPackage.AST_GENERATOR);
 		return null;
 	}
 
@@ -522,8 +512,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		List<AstExpression> parameters = astCall.getParameters();
 		if ("bitnot".equals(name)) {
 			if (parameters.size() != 1) {
-				CalJavaValidator.getInstance().error(
-						"bitnot function takes exactly one parameter", astCall,
+				error("bitnot function takes exactly one parameter", astCall,
 						CalPackage.AST_EXPRESSION_CALL__FUNCTION);
 				return null;
 			}
@@ -538,8 +527,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		if (parameters.size() != 2) {
-			CalJavaValidator.getInstance().error(
-					name + "function takes exactly two parameters", astCall,
+			error(name + "function takes exactly two parameters", astCall,
 					CalPackage.AST_EXPRESSION_CALL__FUNCTION);
 			return null;
 		}

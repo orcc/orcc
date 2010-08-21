@@ -93,17 +93,6 @@ import com.google.inject.Inject;
  */
 public class CalJavaValidator extends AbstractCalJavaValidator {
 
-	private static CalJavaValidator instance;
-
-	/**
-	 * Returns the instance of this validator.
-	 * 
-	 * @return the instance of this validator
-	 */
-	public static CalJavaValidator getInstance() {
-		return instance;
-	}
-
 	private TypeChecker checker;
 
 	@Inject
@@ -113,8 +102,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	 * Creates a new CAL validator written in Java.
 	 */
 	public CalJavaValidator() {
-		// set this validator as the instance
-		CalJavaValidator.instance = this;
 	}
 
 	@Check
@@ -134,7 +121,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		for (AstOutputPattern pattern : outputs) {
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
-				int repeat = new AstExpressionEvaluator()
+				int repeat = new AstExpressionEvaluator(this)
 						.evaluateAsInteger(astRepeat);
 				if (repeat != 1) {
 					// each value is supposed to be a list
@@ -224,14 +211,14 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		getNames(actor);
 
 		// check there are no cycles in type definitions
-		if (!new TypeCycleDetector().detectCycles(actor)) {
+		if (!new TypeCycleDetector(this).detectCycles(actor)) {
 			// evaluate state variables
-			checker = new TypeChecker();
+			checker = new TypeChecker(this);
 			evaluateStateVariables(actor.getStateVariables());
 
 			// transforms AST types to IR types
 			// this is a prerequisite for type checking
-			TypeTransformer typeTransformer = new TypeTransformer();
+			TypeTransformer typeTransformer = new TypeTransformer(this);
 			typeTransformer.transformTypes(actor);
 		}
 
@@ -298,7 +285,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		Type type = checker.getType(assign.getValue());
 		if (!checker.areTypeCompatible(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
-					+ targetType, CalPackage.AST_STATEMENT_ASSIGN__VALUE);
+					+ targetType, assign,
+					CalPackage.AST_STATEMENT_ASSIGN__VALUE);
 		}
 	}
 
@@ -394,7 +382,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	@Check
 	public void checkGenerator(AstGenerator generator) {
 		AstExpression astValue = generator.getLower();
-		Object initialValue = new AstExpressionEvaluator().evaluate(astValue);
+		Object initialValue = new AstExpressionEvaluator(this)
+				.evaluate(astValue);
 		Long lower = null;
 		if (initialValue instanceof Long) {
 			lower = (Long) initialValue;
@@ -404,7 +393,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 
 		astValue = generator.getHigher();
-		initialValue = new AstExpressionEvaluator().evaluate(astValue);
+		initialValue = new AstExpressionEvaluator(this).evaluate(astValue);
 		Long higher = null;
 		if (initialValue instanceof Long) {
 			higher = (Long) initialValue;
@@ -421,8 +410,13 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	@Check
-	public void checkIsVariabledUsed(final AstVariable variable) {
+	/**
+	 * Checks that the given variable is used. If it is not, issue a warning.
+	 * 
+	 * @param variable
+	 *            a variable
+	 */
+	private void checkIsVariableUsed(final AstVariable variable) {
 		// do not take variables declared by input patterns and
 		// generator/foreach
 		EObject container = variable.eContainer();
@@ -585,6 +579,21 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
+	@Check
+	public void checkVariable(AstVariable variable) {
+		checkIsVariableUsed(variable);
+		AstExpression value = variable.getValue();
+		if (value != null) {
+			// check types
+			Type targetType = variable.getIrType();
+			Type type = checker.getType(value);
+			if (!checker.areTypeCompatible(type, targetType)) {
+				error("Type mismatch: cannot convert from " + type + " to "
+						+ targetType, variable, CalPackage.AST_VARIABLE);
+			}
+		}
+	}
+
 	@Override
 	public void error(String string, EObject source, Integer feature) {
 		super.error(string, source, feature);
@@ -603,7 +612,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			AstExpression astValue = astVariable.getValue();
 			Object initialValue;
 			if (astValue != null) {
-				initialValue = new AstExpressionEvaluator().evaluate(astValue);
+				initialValue = new AstExpressionEvaluator(this)
+						.evaluate(astValue);
 				if (initialValue == null) {
 					error("variable "
 							+ astVariable.getName()

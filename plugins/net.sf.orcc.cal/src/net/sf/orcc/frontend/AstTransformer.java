@@ -56,6 +56,7 @@ import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
@@ -340,17 +341,17 @@ public class AstTransformer {
 			// size of generators
 			for (AstGenerator generator : generators) {
 				AstExpression astValue = generator.getLower();
-				int lower = new AstExpressionEvaluator()
+				int lower = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astValue);
 
 				astValue = generator.getHigher();
-				int higher = new AstExpressionEvaluator()
+				int higher = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astValue);
 				size *= (higher - lower) + 1;
 			}
 
 			// size of expressions
-			TypeChecker checker = new TypeChecker();
+			TypeChecker checker = new TypeChecker(null);
 			Type type = checker.getType(expressions);
 			size *= expressions.size();
 
@@ -470,7 +471,7 @@ public class AstTransformer {
 			Expression e1 = transformExpression(astCall.getParameters().get(0));
 			Expression e2 = transformExpression(astCall.getParameters().get(1));
 			return new BinaryExpr(location, e1, op, e2,
-					new TypeChecker().getLub(e1.getType(), e2.getType()));
+					new TypeChecker(null).getLub(e1.getType(), e2.getType()));
 		}
 
 		/**
@@ -499,7 +500,7 @@ public class AstTransformer {
 						loopVar.getName(), loopVar);
 
 				AstExpression astLower = generator.getLower();
-				int lower = new AstExpressionEvaluator()
+				int lower = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astLower);
 				Expression thisIndex = new VarExpr(new Use(loopVar));
 				if (lower != 0) {
@@ -508,7 +509,7 @@ public class AstTransformer {
 				}
 
 				AstExpression astHigher = generator.getHigher();
-				int higher = new AstExpressionEvaluator()
+				int higher = new AstExpressionEvaluator(null)
 						.evaluateAsInteger(astHigher);
 
 				if (index == null) {
@@ -1244,10 +1245,15 @@ public class AstTransformer {
 		// this is true when the variable is initialized by a generator
 		boolean mustInitialize = false;
 		if (type.isList() && initialValue != null) {
-			AstExpressionList list = (AstExpressionList) astVariable.getValue();
-			if (!list.getGenerators().isEmpty()) {
-				initialValue = null;
-				mustInitialize = true;
+			AstExpression value = astVariable.getValue();
+			if (value.eClass().isSuperTypeOf(
+					CalPackage.eINSTANCE.getAstExpressionList())) {
+				AstExpressionList list = (AstExpressionList) astVariable
+						.getValue();
+				if (!list.getGenerators().isEmpty()) {
+					initialValue = null;
+					mustInitialize = true;
+				}
 			}
 		}
 
