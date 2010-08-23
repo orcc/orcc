@@ -136,7 +136,7 @@ stateVar(variable) ::= <<
 @$variable$ = $if(variable.assignable)$ global $
 else$ constant $endif$ $variable.type$ $
 if(variable.constantValue)$ $ConstantValue(type=variable.type, const=variable.constantValue)$
-$else$ zeroinitializer 
+$else$ zeroinitializer, align 32 
 $endif$
 
 >>
