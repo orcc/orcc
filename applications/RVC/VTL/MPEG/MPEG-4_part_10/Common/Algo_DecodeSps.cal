@@ -39,6 +39,7 @@ actor Algo_DecodeSps()
 	uint(size=4)  BitDepthChroma,
 	bool          Direct8x8Inference,
 	uint(size=2)  ChromaArrayType,
+	uint(size=2)  Num_C8x8,
 
 	uint(size=32) Pps_PicWidthInMbs,
 	uint(size=32) Pps_PicHeightInMapUnits
@@ -116,9 +117,11 @@ actor Algo_DecodeSps()
 	List (type: int (size=32), size=32) expected_delta_per_poc_cycle          := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=32), size=32) pic_size_in_mbs                       := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=2) , size=32) Chroma_Array_Type                     := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=2) , size=32) NumC8x8                               := [ 0     : for int i in 0 .. 31 ];
 	//High Profile
 	List (type:uint(size=4), size=32 ) bit_depth_luma_minus8                  := [ 0     : for int i in 0 .. 31 ];
 	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8                := [ 0     : for int i in 0 .. 31 ];
+	List (type:uint(size=2), size=32 ) chroma_format_idc                      := [ 1 : for int i in 0 .. 31 ];
 
 	uint(size=5)  sps_id ;
 	int (size=32) LoopVal;
@@ -157,7 +160,8 @@ actor Algo_DecodeSps()
 			BitDepthLuma                :[bit_depth_luma_minus8[ValSps]+8],
 			BitDepthChroma              :[bit_depth_chroma_minus8[ValSps]+8],
 			Direct8x8Inference          :[ValDirect8x8Inference],
-			ChromaArrayType             :[Chroma_Array_Type[ValSps]]
+			ChromaArrayType             :[Chroma_Array_Type[ValSps]],
+			Num_C8x8                    :[NumC8x8[ValSps]]
 		var
 			bool val_frame_mbs_only,
 			bool ValDeltaPic,
@@ -534,6 +538,16 @@ actor Algo_DecodeSps()
 		do
 			vui_parameters_present_flag[sps_id] := ValueOfVLD;
 			pic_size_in_mbs[sps_id] := (pic_width_in_mbs_minus1[sps_id] +1) * (pic_height_in_map_units_minus1[sps_id] +1);
+			NumC8x8[sps_id] :=
+				if(chroma_format_idc[sps_id] = 1)then
+					1
+				else
+					if(chroma_format_idc[sps_id] = 2)then
+						2
+					else
+						4
+					end
+				end;
 			println("\t\tvui_parameters_present_flag : "+ValueOfVLD);
 		end
 

@@ -410,8 +410,6 @@
         src="DecodeMacroBlockLayer" src-port="ResEndIdx"/>
     <Connection dst="DecodeResidual" dst-port="CodBlkPatnLm"
         src="DecodeMacroBlockLayer" src-port="ResCodBlkPatnLm"/>
-    <Connection dst="DecodeResidual" dst-port="EndOfResBlock"
-        src="Mgnt_DecodePic" src-port="ResResidualBlockDecoded"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="NATab"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerNATab"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="NBTab"
@@ -450,4 +448,12 @@
         src="DecodeResidual" src-port="ResBlkStartIdx"/>
     <Connection dst="DecodeResidualBlock_Cavlc" dst-port="EndIdx"
         src="DecodeResidual" src-port="ResBlkEndIdx"/>
+    <Connection dst="DecodeResidual" dst-port="ChromaArrayType"
+        src="DecodeMacroBlockLayer" src-port="ResChromaArrayType"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="Num_C8x8"
+        src="DecodeSps" src-port="Num_C8x8"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="Num_C8x8"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumC8x8"/>
+    <Connection dst="DecodeResidual" dst-port="Num_C8x8"
+        src="DecodeMacroBlockLayer" src-port="ResNumC8x8"/>
 </XDF>

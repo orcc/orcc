@@ -32,14 +32,15 @@ actor Algo_VariableLengthDecoding()
 *
 */
 
-	uint(size=3) READ_BITS             = 0;
-	uint(size=3) VLD_UE                = 1;
-	uint(size=3) VLD_SE                = 2;
-	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
-	uint(size=3) MORE_RBSP_DATA        = 4;
-	uint(size=3) CAVLC_COEFF_TOKEN     = 5;
-	uint(size=3) CAVLC_LEVEL_PREFIX    = 6;
-	uint(size=3) CAVLC_TOTAL_ZEROS     = 7;
+	uint(size=4) READ_BITS             = 0;
+	uint(size=4) VLD_UE                = 1;
+	uint(size=4) VLD_SE                = 2;
+	uint(size=4) BYTE_ALIGNED_REQUIRED = 3;
+	uint(size=4) MORE_RBSP_DATA        = 4;
+	uint(size=4) CAVLC_COEFF_TOKEN     = 5;
+	uint(size=4) CAVLC_LEVEL_PREFIX    = 6;
+	uint(size=4) CAVLC_TOTAL_ZEROS     = 7;
+	uint(size=4) CAVLC_RUN_BEFORE      = 8;
 
 	List(type: List(type: List(type: bool, size=64), size=16), size=6) TotalCoeffValid = 
 		[
@@ -5031,6 +5032,267 @@ actor Algo_VariableLengthDecoding()
 			]
 		];
 
+
+	List(type: List(type: List(type: bool, size=8), size=16), size=7) RunBeforeValid = 
+		[
+			[	//zerosLeft = 1 ; nbBitRead = 0 .. 15
+				[ false , false , false , false , false , false , false , false ],
+				[ true  , true  , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ]
+			],
+			[	//zerosLeft = 2 ; nbBitRead = 0 .. 15
+				[ false , false , false , false , false , false , false , false ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ true  , true  , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ]
+			],
+			[	//zerosLeft = 3 ; nbBitRead = 0 .. 15
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ true  , true  , true  , true  , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ]
+			],
+			[	//zerosLeft = 4 ; nbBitRead = 0 .. 15
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , true  , true  , true  , false , false , false , false ],
+				[ true  , true  , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ]
+			],
+			[	//zerosLeft = 5 ; nbBitRead = 0 .. 15
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , true  , true  , false , false , false , false ],
+				[ true  , true  , true  , true  , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ]
+			],
+			[	//zerosLeft = 6 ; nbBitRead = 0 .. 15
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , true  , false , false , false , false ],
+				[ true  , true  , true  , true  , true  , true  , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ]
+			],
+			[	//zerosLeft > 6 ; nbBitRead = 0 .. 15
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , true  , true  , true  , true  , true  , true  , true  ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ false , true  , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ],
+				[ false , false , false , false , false , false , false , false ]
+			]
+		];
+
+	List(type: List(type: List(type: bool, size=8), size=16), size=7) RunBeforeValue = 
+		[
+			[	//zerosLeft = 1 ; nbBitRead = 0 .. 15
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ]
+			],
+			[	//zerosLeft = 2 ; nbBitRead = 0 .. 15
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  2 ,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ]
+			],
+			[	//zerosLeft = 3 ; nbBitRead = 0 .. 15
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  3 ,  2 ,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ]
+			],
+			[	//zerosLeft = 4 ; nbBitRead = 0 .. 15
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  2 ,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  4 ,  3 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ]
+			],
+			[	//zerosLeft = 5 ; nbBitRead = 0 .. 15
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  5 ,  4 ,  3 ,  2 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ]
+			],
+			[	//zerosLeft = 6 ; nbBitRead = 0 .. 15
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  1 ,  2 ,  4 ,  3 ,  6 ,  5 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ]
+			],
+			[	//zerosLeft > 6 ; nbBitRead = 0 .. 15
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  6 ,  5 ,  4 ,  3 ,  2 ,  1 ,  0 ],
+				[  0 ,  7 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  8 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  9 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 , 10 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 , 11 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 , 12 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 , 13 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 , 14 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ]
+			]
+		];
+
 /*
 *
 * State variables
@@ -5042,6 +5304,7 @@ actor Algo_VariableLengthDecoding()
 	uint(size=3)  SizeBufferRbsp   := 0;
 
 	List(type: uint(size=8), size=4) BufferRbsp := [0: for int s in 0 .. 3];
+
 	/* ue(v) and Cavlc coeff_token()*/
 	bool          Bit1Found       := false;
 	uint(size=5)  leadingZeroBits := 0;
@@ -5062,10 +5325,15 @@ actor Algo_VariableLengthDecoding()
 	uint(size=3) Idx_nC;
 	uint(size=6) coeff_token;
 
+	/* Cavlc total_zeros and run_before */
+	uint(size=3) ValRead         := 0;
+
 	/* Cavlc total_zeros */
 	uint(size=2) IdxmaxNumCoeff  := 0;
-	uint(size=3) ValRead         := 0;
 	uint(size=4) TotalCoeffParam := 0;
+
+	/* Cavlc run_before */
+	uint(size=8) IdxzerosLeft    := 0;
 
 /*
 *
@@ -5302,6 +5570,27 @@ actor Algo_VariableLengthDecoding()
 			NbBitsRead      := 0;
 			ValRead         := 0;
 			TotalCoeffParam := bitand(TotalCoeff,0x0F);
+		end
+
+
+	IsCavlcRunBefore: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal],
+			VLD_Param :[zerosLeft]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = CAVLC_RUN_BEFORE
+		do
+			IdxzerosLeft :=
+				if(zerosLeft <= 6 and zerosLeft > 0) then
+					zerosLeft - 1
+				else
+					6
+				end;
+			NbBitsRead      := 0;
+			ValRead         := 0;
+			println("RunBefore Laundch");
 		end
 
 
@@ -5557,6 +5846,39 @@ actor Algo_VariableLengthDecoding()
 			ValDecoded :[TotalZerosValue[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]]
 		end
 
+
+	GetCavlcRunBefore.Launch: action ==>
+		var
+			//delete me!
+			bool titi
+		do
+			ValRead         := lshift(ValRead, 1);
+			ValRead         := ValRead + mask_bits(rshift(WorkingByte,7),1);
+			WorkingByte     := lshift(WorkingByte,1);
+			CountBufferRbsp := CountBufferRbsp - 1;
+			NbBitsRead      := NbBitsRead + 1;
+			titi := RunBeforeValid[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)];
+			while((not titi) and (CountBufferRbsp > 0))
+			do
+				ValRead         := lshift(ValRead, 1);
+				ValRead         := ValRead + mask_bits(rshift(WorkingByte,7),1);
+				WorkingByte     := lshift(WorkingByte,1);
+				CountBufferRbsp := CountBufferRbsp - 1;
+				NbBitsRead      := NbBitsRead + 1;
+				titi := RunBeforeValid[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)];
+			end
+		end
+
+	GetCavlcRunBefore.NotFinished: action ==>
+		guard
+			not RunBeforeValid[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]
+		end
+
+	GetCavlcRunBefore.Finished: action
+				==>
+			ValDecoded :[RunBeforeValue[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]]
+		end
+
 /*
 *
 * Scheduler
@@ -5573,6 +5895,7 @@ actor Algo_VariableLengthDecoding()
 		CheckVLDType    (IsCavlcLevelPrefix                  )--> DecCavlcLevPre;
 		CheckVLDType    (IsCavlcCoeffToken                   )--> DecCavlcCofTkn;
 		CheckVLDType    (IsCavlcTotalZeros                   )--> DecCavlcTotZer;
+		CheckVLDType    (IsCavlcRunBefore                    )--> DecCavlcRunBef;
 		CheckVLDType    (FillBufferRbsp                      )--> CheckVLDType;
 
 		/* more_rbsp_data() */
@@ -5656,15 +5979,28 @@ actor Algo_VariableLengthDecoding()
 		ChckCavlcTotZer (GetCavlcTotalZeros.NotFinished     )--> DecCavlcTotZer;
 		ChckCavlcTotZer (GetCavlcTotalZeros.Finished        )--> CheckVLDType;
 
+		/* Cavlc run_before decoding process */
+		DecCavlcRunBef  (Buffer                              )--> GetCavlcRunBef;
+		DecCavlcRunBef  (FillBufferRbsp                      )--> DecCavlcRunBef;
+
+		GetCavlcRunBef  (GetCavlcRunBefore.Launch            )--> ChckCavlcRunBef;
+
+		ChckCavlcRunBef (GetCavlcRunBefore.NotFinished     )--> DecCavlcRunBef;
+		ChckCavlcRunBef (GetCavlcRunBefore.Finished        )--> CheckVLDType;
+
 	end
 	
 	priority
 		NewNalHasBeenSent              > WaitForNewNal                   > NewNalDetected;
-		IsVldUe                        > IsReadBits                      > IsCavlcLevelPrefix   > IsCavlcCoeffToken  > IsVldSe;
+		IsVldUe                        > IsReadBits                      > IsCavlcLevelPrefix;  
+		IsCavlcLevelPrefix             > IsCavlcRunBefore > IsCavlcCoeffToken  > IsVldSe;
 		IsVldSe                        > FillBufferRbsp > IsMoreRbspData > IsByteAligned        > IsEndOfNal;
 		CheckSizeBufferRbsp            > FillBufferRbsp                  > FutureNewNalDetected > NewNalHasBeenSent;
 		GetCodeNum.NotFinished         > GetCodeNum.Finished;
 		Buffer.IsNotEmpty              > FillBufferRbsp                  > Buffer.IsEmpty;
 		GetCavlcCoeffToken.NotFinished > GetCavlcCoeffToken.Finished;
+		GetCavlcLevelPrefix.NotFinished > GetCavlcLevelPrefix.Finished;
+		GetCavlcTotalZeros.NotFinished  > GetCavlcTotalZeros.Finished;
+		GetCavlcRunBefore.NotFinished   > GetCavlcRunBefore.Finished;
 	end
 end

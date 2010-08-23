@@ -37,6 +37,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=4)  BitDepthChroma,
 	bool          Direct8x8Inference,
 	uint(size=2)  ChromaArrayType,
+	uint(size=2)  Num_C8x8,
 	//Slice Header Parameters
 	uint(size=32) FirstMbInSlice,
 	uint(size=4)  SliceType,
@@ -59,7 +60,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=5)  DecMbLayerNATab,
 	bool          DecMbLayerLeftMbExists,
 	uint(size=5)  DecMbLayerNBTab,
-	bool          DecMbLayerAboveMbExists
+	bool          DecMbLayerAboveMbExists,
+	uint(size=2)  DecMbLayerNumC8x8
 		:
 
 
@@ -97,6 +99,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=4)  bit_depth_luma;
 	uint(size=4)  bit_depth_chroma;
 	uint(size=2)  Chroma_Array_Type;
+	uint(size=2)  NumC8x8;
 	uint(size=32) PicSizeInMbs;
 	uint(size=32) PicWidthInMbs;
 	//Pps Parameters
@@ -137,7 +140,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			Direct8x8Inference :[ValDirect8x8Inference],
 			Transform8x8Mode   :[ValTransform8x8Mode],
 			NumRefIdxLXActive  :[ValNumRefIdxLXActive] repeat 2,
-			ChromaArrayType    :[ValChromaArrayType]
+			ChromaArrayType    :[ValChromaArrayType],
+			Num_C8x8           :[ValNum_C8x8]
 				==>
 		guard
 			Is_CBP = false
@@ -152,6 +156,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			num_ref_idx_l0_active     := ValNumRefIdxLXActive[0];
 			num_ref_idx_l1_active     := ValNumRefIdxLXActive[1];
 			Chroma_Array_Type         := ValChromaArrayType;
+			NumC8x8                   := ValNum_C8x8;
 
 			CurrMbAddr :=
 				if(MbaffFrameFlag = false)then
@@ -280,7 +285,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			DecMbLayerNATab              :[NaTab] repeat 4,
 			DecMbLayerLeftMbExists       :[LMbExists],
 			DecMbLayerNBTab              :[NbTab] repeat 4,
-			DecMbLayerAboveMbExists      :[AMbExists]
+			DecMbLayerAboveMbExists      :[AMbExists],
+			DecMbLayerNumC8x8            :[NumC8x8]
 		var
 			List(type: uint(size=5), size=4) NaTab,
 			List(type: uint(size=5), size=4) NbTab,

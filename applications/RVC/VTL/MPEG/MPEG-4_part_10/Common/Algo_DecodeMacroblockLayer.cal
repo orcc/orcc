@@ -24,6 +24,7 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=4)  BitDepthLuma,
 	uint(size=4)  BitDepthChroma,
 	bool          Direct8x8Inference,
+	uint(size=2)  Num_C8x8,
 
 //	uint(size=32) SubMbType,
 
@@ -59,7 +60,9 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  ResNATab,
 	uint(size=5)  ResNBTab,
 	bool          ResLeftMbExists,
-	bool          ResAboveMbExists
+	bool          ResAboveMbExists,
+	uint(size=2)  ResChromaArrayType,
+	uint(size=2)  ResNumC8x8
 		:
 
 
@@ -136,6 +139,7 @@ actor Algo_DecodeMacroblockLayer()
 	List(type: uint(size=5), size=4) nBTab;
 	bool          LeftMb_Exists;
 	bool          AboveMb_Exists;
+	uint(size=2)  NumC8x8;
 
 
 	ReadMbType.Asked: action
@@ -160,7 +164,8 @@ actor Algo_DecodeMacroblockLayer()
 			NATab              :[ValNATab] repeat 4,
 			NBTab              :[ValNBTab] repeat 4,
 			LeftMbExists       :[ValLeftMbExists],
-			AboveMbExists      :[ValAboveMbExists]
+			AboveMbExists      :[ValAboveMbExists],
+			Num_C8x8           :[ValNum_C8x8]
 				==>
 		do
 			mb_type                   := ValueOfVLD;
@@ -178,6 +183,7 @@ actor Algo_DecodeMacroblockLayer()
 			nBTab                     := ValNBTab;
 			LeftMb_Exists             := ValLeftMbExists;
 			AboveMb_Exists            := ValAboveMbExists;
+			NumC8x8                   := ValNum_C8x8;
 
 			transform_size_8x8_flag        := false;
 			noSubMbPartSizeLessThan8x8Flag := true;
@@ -418,7 +424,9 @@ actor Algo_DecodeMacroblockLayer()
 			ResNATab             :[nATab] repeat 4,
 			ResNBTab             :[nBTab] repeat 4,
 			ResLeftMbExists      :[LeftMb_Exists],
-			ResAboveMbExists     :[AboveMb_Exists]
+			ResAboveMbExists     :[AboveMb_Exists],
+			ResChromaArrayType   :[Chroma_Array_Type],
+			ResNumC8x8           :[NumC8x8]
 		end
 
 	SendEndSliceHeader: action

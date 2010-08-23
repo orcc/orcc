@@ -9419,6 +9419,7 @@ end
 		CAVLC_end(),
 		TotalCoeff() >0
 	do
+		println("TotalCoeff : "+TotalCoeff());
 		//println("Residual_block_read_suffixLength");
 		if leveltype = 1 then //luma
     			val_cbp_blk:=(1<<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;

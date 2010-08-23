@@ -66,8 +66,6 @@ actor Algo_Slice_layer_without_partitioning()
 
 	int (size=32) MbPredValVLD,
 
-	bool          ResResidualBlockDecoded,
-
 	int (size=32) ResBlkCavlcValVLD
 		:
 
@@ -81,6 +79,7 @@ actor Algo_Slice_layer_without_partitioning()
 	uint(size=3) READ_BITS            = 0;
 	uint(size=3) CAVLC_COEFF_TOKEN    = 5;
 	uint(size=3) CAVLC_TOTAL_ZEROS    = 7;
+	uint(size=4) CAVLC_RUN_BEFORE      = 8;
 
 	uint(size=4) SLICE_HEADER         = 0;
 	uint(size=4) DEC_REF_PIC_MARKING  = 1;
@@ -416,11 +415,6 @@ actor Algo_Slice_layer_without_partitioning()
 			EndOfDecoding = false
 		end
 
-	SendResBlockDecoded: action
-				==>
-			ResResidualBlockDecoded:[true]
-		end
-
 
 	ResBlkCavlc.GetVLDVal: action
 			ValVLD                 :[VLDecoding]
@@ -436,7 +430,7 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD       :[ValTypeOfVLD],
 			SkipNal         :[false]
 		guard
-			(ValTypeOfVLD != READ_BITS) and (ValTypeOfVLD != CAVLC_COEFF_TOKEN) and (ValTypeOfVLD != CAVLC_TOTAL_ZEROS),
+			(ValTypeOfVLD != READ_BITS) and (ValTypeOfVLD != CAVLC_COEFF_TOKEN) and (ValTypeOfVLD != CAVLC_TOTAL_ZEROS) and ( ValTypeOfVLD != CAVLC_RUN_BEFORE),
 			EndOfDecoding  = false
 		end
 
@@ -450,7 +444,7 @@ actor Algo_Slice_layer_without_partitioning()
 			VLD_Param            :[NbBits],
 			SkipNal              :[false]
 		guard
-			(ValTypeOfVLD = READ_BITS) or (ValTypeOfVLD = CAVLC_COEFF_TOKEN),
+			(ValTypeOfVLD = READ_BITS) or (ValTypeOfVLD = CAVLC_COEFF_TOKEN) or (ValTypeOfVLD = CAVLC_RUN_BEFORE),
 			EndOfDecoding = false
 		end
 
@@ -475,6 +469,8 @@ actor Algo_Slice_layer_without_partitioning()
 				==>
 		guard
 			EndOfDecoding = true
+		do
+			println("ResBlkCavlc.Done");
 		end
 
 	schedule fsm LaunchSliceHeader:
@@ -522,9 +518,7 @@ actor Algo_Slice_layer_without_partitioning()
 					LaunchResBlkCavlc (ResBlkCavlc.AskReadBitsOrCavlc )--> LaunchResBlkCavlc;
 					LaunchResBlkCavlc (ResBlkCavlc.AskCavlcTotalZeros )--> LaunchResBlkCavlc;
 					LaunchResBlkCavlc (ResBlkCavlc.GetVLDVal          )--> LaunchResBlkCavlc;
-					LaunchResBlkCavlc (ResBlkCavlc.Done               )--> SendResBlockDecoded;
-
-					SendResBlockDecoded (SendResBlockDecoded )--> LaunchResidual;
+					LaunchResBlkCavlc (ResBlkCavlc.Done               )--> LaunchResidual;
 	end
 
 	priority
