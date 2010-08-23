@@ -145,7 +145,7 @@ void FifoTrace::addFunctions(Decoder* decoder){
 	std::list<llvm::Function*>::iterator itList;
 
 	for(itList = otherFunctions.begin(); itList != otherFunctions.end(); ++itList){
-		Function* function = (Function*)jit->addFunctionProtos("", *itList);
+		Function* function = (Function*)jit->addFunctionProtosExternal("", *itList);
 		jit->LinkProcedureBody(*itList);
 		*itList = function;
 	}
@@ -153,7 +153,7 @@ void FifoTrace::addFunctions(Decoder* decoder){
 	std::map<std::string,llvm::Function*>::iterator itMap;
 
 	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
-		Function* function = (Function*)jit->addFunctionProtos("", (*itMap).second);
+		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
 		jit->LinkProcedureBody((*itMap).second);
 		(*itMap).second = function;
 	}
@@ -182,7 +182,7 @@ void FifoTrace::setConnection(Connection* connection){
 
 	// Initialize array 
 	PATypeHolder EltTy(connection->getIntegerType());
-	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize()+1);
+	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize());
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArray =
         new GlobalVariable(*module, arrayType,

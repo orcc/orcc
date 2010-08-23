@@ -119,6 +119,7 @@ private:
 		fifo["u64_writeEnd"] = "fifo_u64_write_end";
 		fifo["u64_readEnd"] = "fifo_u64_read_end";
 
+		fifo["\01_clock"] = "\01_clock";
 		fifo["printf"] = "printf";
 		fifo["fseek"] = "fseek";
 		fifo["fread"] = "fread";

@@ -119,7 +119,7 @@ Function* BroadcastActor::createActionScheduler(){
 
 	// Creating action scheduler 
 	FunctionType *FTy = FunctionType::get(Type::getVoidTy(Context),false);
-	Function *NewF = Function::Create(FTy, Function::ExternalLinkage , name+"_scheduler", module);
+	Function *NewF = Function::Create(FTy, Function::InternalLinkage , name+"_scheduler", module);
 	
 	// Add the first basic block entry into the function.
 	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", NewF);

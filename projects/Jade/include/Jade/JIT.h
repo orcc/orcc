@@ -139,7 +139,7 @@ public:
 	/**
      *  @brief Add a new llvm::Function in the given decoder
      *
-	 *  Insert the given function into the decoder. This function
+	 *  Insert the given function as external into the decoder. This function
 	 *   can either represent an action, an action scheduler or a procedure.
 	 *
 	 * @param variable : llvm::Function to add
@@ -148,7 +148,21 @@ public:
 	 *
 	 * @return True if successfull, otherwise false
      */
-	llvm::GlobalValue* addFunctionProtos(std::string prefix, const llvm::Function* function);
+	llvm::GlobalValue* addFunctionProtosExternal(std::string prefix, const llvm::Function* function);
+
+	/**
+     *  @brief Add a new llvm::Function in the given decoder
+     *
+	 *  Insert the given function as internal into the decoder. This function
+	 *   can either represent an action, an action scheduler or a procedure.
+	 *
+	 * @param variable : llvm::Function to add
+	 *
+	 * @param decoder : decoder to had the function
+	 *
+	 * @return True if successfull, otherwise false
+     */
+	llvm::GlobalValue* addFunctionProtosInternal(std::string prefix, const llvm::Function* function);
 
 	/**
      *  @brief Create a new Functional Unit with the given actor and module

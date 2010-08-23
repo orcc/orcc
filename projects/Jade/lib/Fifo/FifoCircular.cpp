@@ -139,7 +139,7 @@ void FifoCircular::addFunctions(Decoder* decoder){
 	std::list<llvm::Function*>::iterator itList;
 
 	for(itList = otherFunctions.begin(); itList != otherFunctions.end(); ++itList){
-		Function* function = (Function*)jit->addFunctionProtos("", *itList);
+		Function* function = (Function*)jit->addFunctionProtosExternal("", *itList);
 		jit->LinkProcedureBody(*itList);
 		*itList = function;
 	}
@@ -147,7 +147,7 @@ void FifoCircular::addFunctions(Decoder* decoder){
 	std::map<std::string,llvm::Function*>::iterator itMap;
 
 	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
-		Function* function = (Function*)jit->addFunctionProtos("", (*itMap).second);
+		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
 		jit->LinkProcedureBody((*itMap).second);
 		(*itMap).second = function;
 	}
@@ -176,20 +176,22 @@ void FifoCircular::setConnection(Connection* connection){
 
 	//Get fifo array structure
 	PATypeHolder EltTy(connection->getIntegerType());
-	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize()+1);
+	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize());
 
 	// Initialize array for content
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArrayContents =
         new GlobalVariable(*module, arrayType,
 		false, GlobalVariable::InternalLinkage, arrayContent, arrayName.str());
-
+	NewArrayContents->setAlignment(32);
+	
 	// Initialize array for fifo buffer
 	Constant* arrayFifoBuffer = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArrayFifoBuffer =
         new GlobalVariable(*module, arrayType,
 		false, GlobalVariable::InternalLinkage, arrayFifoBuffer, bufName.str());
-	
+	NewArrayFifoBuffer->setAlignment(32);
+
 	// Initialize fifo elements
 	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize());
 	Constant* read_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
@@ -212,7 +214,8 @@ void FifoCircular::setConnection(Connection* connection){
 	GlobalVariable *NewFifo =
         new GlobalVariable(*module, structType,
 		false, GlobalVariable::InternalLinkage, fifoStruct, fifoName.str());
-
+	NewFifo->setAlignment(32);
+	
 	// Set initialize to instance port 
 	srcVar->setInitializer(NewFifo);
 	dstVar->setInitializer(NewFifo);

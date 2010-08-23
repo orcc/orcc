@@ -202,7 +202,7 @@ GlobalVariable* JIT::addVariable(string prefix, llvm::GlobalVariable* variable){
       return NewDGV;
 }
 
-GlobalValue* JIT::addFunctionProtos(string prefix, const Function* function){
+GlobalValue* JIT::addFunctionProtosInternal(string prefix, const Function* function){
     const Function *SF = function;   // SrcFunction
 	Module* Dest = module;
 	std::string Err;
@@ -211,13 +211,28 @@ GlobalValue* JIT::addFunctionProtos(string prefix, const Function* function){
 
 	Function *NF =
       Function::Create(cast<FunctionType>(SF->getType()->getElementType()),
-                       GlobalValue::ExternalLinkage,  prefix + SF->getName(), Dest);
+                       GlobalValue::InternalLinkage,  prefix + SF->getName(), Dest);
     NF->copyAttributesFrom(SF);
 	ValueMap[SF] = NF;
 
       return NF;
   }
 
+GlobalValue* JIT::addFunctionProtosExternal(string prefix, const Function* function){
+    const Function *SF = function;   // SrcFunction
+	Module* Dest = module;
+	std::string Err;
+	
+	GlobalValue *DGV = 0;
+	
+	Function *NF =
+	Function::Create(cast<FunctionType>(SF->getType()->getElementType()),
+					 GlobalValue::ExternalLinkage,  prefix + SF->getName(), Dest);
+    NF->copyAttributesFrom(SF);
+	ValueMap[SF] = NF;
+	
+	return NF;
+}
 
 
 /// CopyGVAttributes - copy additional attributes (those not needed to construct
@@ -249,7 +264,7 @@ map<Procedure*, Function*>* JIT::createProcedures(Instance* instance, map<string
 	//Creates function declaration
 	for (it = procs->begin(); it != procs->end(); ++it){
 		Procedure* proc = (*it).second;
-		Function* newFunction = (Function*)addFunctionProtos(instance->getId()+"_", proc->getFunction());
+		Function* newFunction = (Function*)addFunctionProtosInternal(instance->getId()+"_", proc->getFunction());
 		newProcs->insert(pair<Procedure*, Function*>(proc, newFunction));
 	}
 
@@ -323,7 +338,7 @@ Procedure* JIT::CreateProcedure(Instance* instance, Procedure* procedure){
 }
 
 Function* JIT::CreateFunction(Instance* instance, Function* function){
-	Function* newFunction = (Function*)addFunctionProtos(instance->getId()+"_", function);
+	Function* newFunction = (Function*)addFunctionProtosInternal(instance->getId()+"_", function);
 	LinkProcedureBody(function);
 
 	return newFunction;

@@ -139,7 +139,7 @@ void UnprotectedFifo::addFunctions(Decoder* decoder){
 	std::list<llvm::Function*>::iterator itList;
 
 	for(itList = otherFunctions.begin(); itList != otherFunctions.end(); ++itList){
-		Function* function = (Function*)jit->addFunctionProtos("", *itList);
+		Function* function = (Function*)jit->addFunctionProtosExternal("", *itList);
 		jit->LinkProcedureBody(*itList);
 		*itList = function;
 	}
@@ -147,7 +147,7 @@ void UnprotectedFifo::addFunctions(Decoder* decoder){
 	std::map<std::string,llvm::Function*>::iterator itMap;
 
 	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
-		Function* function = (Function*)jit->addFunctionProtos("", (*itMap).second);
+		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
 		jit->LinkProcedureBody((*itMap).second);
 		(*itMap).second = function;
 	}
@@ -174,7 +174,7 @@ void UnprotectedFifo::setConnection(Connection* connection){
 
 	// Initialize array 
 	PATypeHolder EltTy(connection->getIntegerType());
-	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize()+1);
+	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize());
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArray =
         new GlobalVariable(*module, arrayType,
@@ -183,7 +183,7 @@ void UnprotectedFifo::setConnection(Connection* connection){
 	
 	// Initialize fifo elements
 	Constant* elt_size = ConstantInt::get(Type::getInt32Ty(Context), connection->getType());
-	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize()+1);
+	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize());
 	Constant* read_ptr = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* write_ptr = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* expr = ConstantExpr::getBitCast(NewArray,Type::getInt8PtrTy(Context));
