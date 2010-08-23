@@ -18,6 +18,7 @@ declare i32 @puts(i8*)
 declare void @exit(i32) noreturn nounwind
 declare %struct.FILE* @fopen(i8*, i8*) nounwind
 declare i32 @printf(i8*, ...) nounwind 
+declare i64 @"\01_clock"()
 
 define internal i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:

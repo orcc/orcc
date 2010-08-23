@@ -130,7 +130,7 @@ return:                                           ; preds = %bb6
 !name = !{!1}
 !action_scheduler = !{!2}
 !outputs = !{!3}
-!state_variables = !{!5, !8, !11, !14, !17}
+!state_variables = !{!5, !8, !11, !14, !17, !20, !23}
 
 !0 = metadata !{metadata !"tools/Source.bc"}
 !1 = metadata !{metadata !"Source"}
@@ -148,13 +148,20 @@ return:                                           ; preds = %bb6
 !13 = metadata  !{ i32 32 ,  null }
 
 !14 = metadata !{metadata !15, metadata !16, [3 x i8]* @.str2}
-!15 = metadata !{metadata !"str2", i1 0, i32 0,  i32 0}
+!15 = metadata !{metadata !".str2", i1 0, i32 0,  i32 0}
 !16 = metadata  !{ i32 8 ,  null }
 
 !17 = metadata !{metadata !18, metadata !19, [26 x i8]* @.str4}
-!18 = metadata !{metadata !"str4", i1 0, i32 0,  i32 0}
+!18 = metadata !{metadata !".str4", i1 0, i32 0,  i32 0}
 !19 = metadata  !{ i32 8 ,  null }
 
+!20 = metadata !{metadata !21, metadata !22, [21 x i8]* @.str1}
+!21 = metadata !{metadata !".str1", i1 0, i32 0,  i32 0}
+!22 = metadata  !{ i32 8 ,  null }
+
+!23 = metadata !{metadata !24, metadata !25, [7 x i8]* @.str3}
+!24 = metadata !{metadata !".str3", i1 0, i32 0,  i32 0}
+!25 = metadata  !{ i32 8 ,  null }
 
 
 declare i32 @fseek(%struct.FILE*, i32, i32) nounwind
