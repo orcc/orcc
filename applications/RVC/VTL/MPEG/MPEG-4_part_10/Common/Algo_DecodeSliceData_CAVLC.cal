@@ -192,8 +192,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			LaunchActor :[SLICE_DATA],
 			TypeOfVLD :[ VLD_UE ]
 		guard
-			   slice_type = SLICE_TYPE_I
-			or slice_type = SLICE_TYPE_SI
+			slice_type != SLICE_TYPE_I,
+			slice_type != SLICE_TYPE_SI
 		end
 
 	ReadMbSkipRun.Done: action
