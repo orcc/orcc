@@ -42,7 +42,12 @@ import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -51,16 +56,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
-import org.eclipse.xtext.resource.XtextResource;
-import org.eclipse.xtext.util.CancelIndicator;
-import org.eclipse.xtext.validation.CheckMode;
-import org.eclipse.xtext.validation.IResourceValidator;
-import org.eclipse.xtext.validation.Issue;
-import org.eclipse.xtext.validation.Issue.Severity;
 
 import com.google.inject.Injector;
 
@@ -138,32 +137,26 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 *             if something goes wrong
 	 */
 	private void build(Resource resource, AstActor actor) throws CoreException {
-		// contains linking errors
-		List<Diagnostic> errors = actor.eResource().getErrors();
-		if (!errors.isEmpty()) {
-			return;
-		}
-
-		// validates (unique names and CAL validator)
-		IResourceValidator v = ((XtextResource) resource)
-				.getResourceServiceProvider().getResourceValidator();
-		List<Issue> issues = v.validate(resource, CheckMode.ALL,
-				new CancelIndicator.NullImpl());
-
-		for (Issue issue : issues) {
-			if (issue.getSeverity() == Severity.ERROR) {
-				return;
-			}
-		}
-
-		// only compile if there are no errors
 		try {
 			URL resourceUrl = new URL(resource.getURI().toString());
 			URL url = FileLocator.toFileURL(resourceUrl);
 			IPath path = new Path(url.getPath());
-			String file = path.toOSString();
 
-			frontend.compile(file, actor);
+			// get markers to check for errors
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			IFile file = root.getFileForLocation(path);
+			IMarker[] markers = file.findMarkers(EValidator.MARKER, true,
+					IResource.DEPTH_INFINITE);
+			for (IMarker marker : markers) {
+				if (IMarker.SEVERITY_ERROR == marker.getAttribute(
+						IMarker.SEVERITY, IMarker.SEVERITY_INFO)) {
+					return;
+				}
+			}
+
+			// only compile if there are no errors
+			String fileName = path.toOSString();
+			frontend.compile(fileName, actor);
 		} catch (IOException e) {
 			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
 					"could not generate code for " + actor.getName(), e);

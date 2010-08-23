@@ -29,15 +29,12 @@
 package net.sf.orcc.frontend;
 
 import java.io.File;
-import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
-
-import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 
 import com.google.inject.Inject;
 
@@ -56,7 +53,7 @@ public class Frontend {
 	 * output folder
 	 */
 	private File outputFolder;
-	
+
 	/**
 	 * Pretty-print the IR
 	 */
@@ -65,17 +62,27 @@ public class Frontend {
 	public Frontend() {
 	}
 
+	/**
+	 * Compiles the given actor which is defined in the given file, and writes
+	 * IR to the output folder defined by {@link #setOutputFolder(String)}.
+	 * <p>
+	 * Note that callers of this method must ensure that the actor has no errors
+	 * for it to be properly compiled.
+	 * </p>
+	 * 
+	 * @param file
+	 *            name of the file where the actor is defined
+	 * @param astActor
+	 *            AST of the actor
+	 * @throws OrccException
+	 */
 	public void compile(String file, AstActor astActor) throws OrccException {
-		// only compile if actor has no errors
-		List<Diagnostic> errors = astActor.eResource().getErrors();
-		if (errors.isEmpty()) {
-			try {
-				Actor actor = actorTransformer.transform(file, astActor);
-				new SSATransformation().transform(actor);
-				new IRWriter(actor).write(outputFolder.toString(), prettyPrint);
-			} catch (OrccRuntimeException e) {
-				e.printStackTrace();
-			}
+		try {
+			Actor actor = actorTransformer.transform(file, astActor);
+			new SSATransformation().transform(actor);
+			new IRWriter(actor).write(outputFolder.toString(), prettyPrint);
+		} catch (OrccRuntimeException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -85,7 +92,7 @@ public class Frontend {
 			this.outputFolder.mkdir();
 		}
 	}
-	
+
 	public void setPrettyPrint(boolean prettyPrint) {
 		this.prettyPrint = prettyPrint;
 	}

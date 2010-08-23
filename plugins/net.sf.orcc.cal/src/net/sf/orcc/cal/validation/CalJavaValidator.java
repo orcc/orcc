@@ -76,6 +76,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
 import org.eclipse.xtext.validation.Check;
+import org.eclipse.xtext.validation.CheckType;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -104,7 +105,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public CalJavaValidator() {
 	}
 
-	@Check
+	@Check(CheckType.NORMAL)
 	public void checkAction(AstAction action) {
 		checkActionTag(action);
 		checkActionVariables(action);
@@ -204,7 +205,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		checkUniqueNames(variables);
 	}
 
-	@Check
+	@Check(CheckType.NORMAL)
 	public void checkActor(AstActor actor) {
 		// fill the name provider's cache
 		((CalQualifiedNameProvider) nameProvider).resetUntaggedCount();
@@ -259,7 +260,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		checkPriorities(actor, actionList);
 	}
 
-	@Check
+	@Check(CheckType.NORMAL)
 	public void checkAssign(AstStatementAssign assign) {
 		AstVariable variable = assign.getTarget().getVariable();
 		if (variable.isConstant()) {
@@ -290,7 +291,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	@Check
+	@Check(CheckType.NORMAL)
 	public void checkAstStatementCall(AstStatementCall astCall) {
 		AstProcedure procedure = astCall.getProcedure();
 		String name = procedure.getName();
@@ -355,7 +356,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	@Check
+	@Check(CheckType.NORMAL)
 	public void checkFunction(final AstFunction function) {
 		checkUniqueNames(function.getParameters());
 		checkUniqueNames(function.getVariables());
@@ -379,7 +380,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	@Check
+	@Check(CheckType.NORMAL)
 	public void checkGenerator(AstGenerator generator) {
 		AstExpression astValue = generator.getLower();
 		Object initialValue = new AstExpressionEvaluator(this)
@@ -543,7 +544,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	@Check
+	@Check(CheckType.NORMAL)
 	public void checkProcedure(final AstProcedure procedure) {
 		checkUniqueNames(procedure.getParameters());
 		checkUniqueNames(procedure.getVariables());
@@ -579,7 +580,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	@Check
+	@Check(CheckType.NORMAL)
 	public void checkVariable(AstVariable variable) {
 		checkIsVariableUsed(variable);
 		AstExpression value = variable.getValue();

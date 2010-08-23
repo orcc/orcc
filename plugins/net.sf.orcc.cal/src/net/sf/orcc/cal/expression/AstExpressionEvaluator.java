@@ -424,40 +424,21 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	public Object caseAstExpressionList(AstExpressionList expression) {
 		List<AstExpression> expressions = expression.getExpressions();
 		List<AstGenerator> generators = expression.getGenerators();
+
 		List<Object> list;
-
-		int size = expressions.size();
-		if (!generators.isEmpty()) {
-			// size of generators
-			for (AstGenerator generator : expression.getGenerators()) {
-				int lower = evaluateAsInteger(generator.getLower());
-				int higher = evaluateAsInteger(generator.getHigher());
-				size *= (higher - lower) + 1;
-			}
-		}
-
 		if (generators.isEmpty()) {
+			int size = expressions.size();
 			list = new ArrayList<Object>(size);
 			for (AstExpression subExpression : expressions) {
 				list.add(evaluate(subExpression));
 			}
 		} else {
 			// generators will be translated to statements in initialize
-			// list = new ArrayList<Object>(0);
+			list = new ArrayList<Object>(0);
 
-			list = new ArrayList<Object>(size);
-			for (AstGenerator generator : generators) {
-				int lower = evaluateAsInteger(generator.getLower());
-				int higher = evaluateAsInteger(generator.getHigher());
-				AstVariable variable = generator.getVariable();
-				for (int i = lower; i <= higher; i++) {
-					variable.setInitialValue((long) i);
-					for (AstExpression subExpression : expressions) {
-						list.add(evaluate(subExpression));
-					}
-				}
-				variable.setInitialValue(null);
-			}
+			// for some weird reason the evaluation of generators slows down *a
+			// lot* everything (even code generation, although I have no idea
+			// why), so we will not use it
 		}
 
 		return list;
