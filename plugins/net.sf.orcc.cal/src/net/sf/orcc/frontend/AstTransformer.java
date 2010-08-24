@@ -470,8 +470,7 @@ public class AstTransformer {
 
 			Expression e1 = transformExpression(astCall.getParameters().get(0));
 			Expression e2 = transformExpression(astCall.getParameters().get(1));
-			return new BinaryExpr(location, e1, op, e2,
-					new TypeChecker(null).getLub(e1.getType(), e2.getType()));
+			return new BinaryExpr(location, e1, op, e2, astCall.getIrType());
 		}
 
 		/**
