@@ -264,7 +264,12 @@ map<Procedure*, Function*>* JIT::createProcedures(Instance* instance, map<string
 	//Creates function declaration
 	for (it = procs->begin(); it != procs->end(); ++it){
 		Procedure* proc = (*it).second;
-		Function* newFunction = (Function*)addFunctionProtosInternal(instance->getId()+"_", proc->getFunction());
+		Function* newFunction = NULL;
+		if (proc->isExternal()){
+			newFunction = (Function*)addFunctionProtosExternal(instance->getId()+"_", proc->getFunction());
+		}else{
+			newFunction = (Function*)addFunctionProtosInternal(instance->getId()+"_", proc->getFunction());
+		}
 		newProcs->insert(pair<Procedure*, Function*>(proc, newFunction));
 	}
 

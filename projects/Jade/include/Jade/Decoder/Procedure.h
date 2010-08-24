@@ -99,6 +99,13 @@ public:
      */
 	llvm::ConstantInt* getExternal(){return external;};
 
+	/**
+     *  @brief Return true if procedure external
+	 *
+	 *	@return true if procedure is external otherwise false
+     */
+	bool isExternal(){return external->isOne();};
+
 private:
 	std::string name;
 	llvm::ConstantInt* external;
