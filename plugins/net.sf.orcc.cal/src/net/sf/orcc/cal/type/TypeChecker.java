@@ -31,8 +31,6 @@ package net.sf.orcc.cal.type;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
-
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -61,6 +59,8 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 
+import org.eclipse.emf.ecore.EObject;
+
 /**
  * This class defines a type checker for RVC-CAL AST. Note that types must have
  * been transformed to IR types first.
@@ -77,12 +77,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	 */
 	public TypeChecker(CalJavaValidator validator) {
 		this.validator = validator;
-	}
-
-	private void error(String string, EObject source, int feature) {
-		if (validator != null) {
-			validator.error(string, source, feature);
-		}
 	}
 
 	/**
@@ -115,7 +109,6 @@ public class TypeChecker extends CalSwitch<Type> {
 		switch (op) {
 		case BITAND:
 		case MOD:
-		case SHIFT_RIGHT:
 			if (!t1.isInt() && !t1.isUint()) {
 				error("Cannot convert " + t1 + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_BINARY__LEFT);
@@ -126,7 +119,7 @@ public class TypeChecker extends CalSwitch<Type> {
 						CalPackage.AST_EXPRESSION_BINARY__RIGHT);
 				return null;
 			}
-			return t2;
+			return getGlb(t1, t2);
 
 		case BITOR:
 		case BITXOR:
@@ -172,7 +165,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		case DIV:
 		case DIV_INT:
-		case SHIFT_LEFT:
+		case SHIFT_RIGHT:
 			if (!t1.isInt() && !t1.isUint()) {
 				error("Cannot convert " + t1 + " to int/uint", expression,
 						CalPackage.AST_EXPRESSION_BINARY__LEFT);
@@ -184,6 +177,9 @@ public class TypeChecker extends CalSwitch<Type> {
 				return null;
 			}
 			return t1;
+
+		case SHIFT_LEFT:
+			return getTypeShiftLeft(expression, t1, t2);
 
 		case EQ:
 		case GE:
@@ -409,6 +405,49 @@ public class TypeChecker extends CalSwitch<Type> {
 		return null;
 	}
 
+	private void error(String string, EObject source, int feature) {
+		if (validator != null) {
+			validator.error(string, source, feature);
+		}
+	}
+
+	/**
+	 * Returns the Greatest Lower Bound of the given types.
+	 * 
+	 * @param t1
+	 *            a type
+	 * @param t2
+	 *            another type
+	 * @return the Greatest Lower Bound of the given types
+	 */
+	private Type getGlb(Type t1, Type t2) {
+		if (t1.isInt() && t2.isInt()) {
+			return IrFactory.eINSTANCE.createTypeInt(Math.min(
+					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
+		} else if (t1.isUint() && t2.isUint()) {
+			return IrFactory.eINSTANCE.createTypeUint(Math.min(
+					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
+		} else if (t1.isInt() && t2.isUint()) {
+			int si = ((TypeInt) t1).getSize();
+			int su = ((TypeUint) t2).getSize();
+			if (si > su) {
+				return IrFactory.eINSTANCE.createTypeInt(su + 1);
+			} else {
+				return IrFactory.eINSTANCE.createTypeInt(si);
+			}
+		} else if (t1.isUint() && t2.isInt()) {
+			int su = ((TypeUint) t1).getSize();
+			int si = ((TypeInt) t2).getSize();
+			if (si > su) {
+				return IrFactory.eINSTANCE.createTypeInt(su + 1);
+			} else {
+				return IrFactory.eINSTANCE.createTypeInt(si);
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * Returns the Least Upper Bound of the given types.
 	 * 
@@ -535,5 +574,38 @@ public class TypeChecker extends CalSwitch<Type> {
 		Type t1 = getType(astCall.getParameters().get(0));
 		Type t2 = getType(astCall.getParameters().get(1));
 		return getLub(t1, t2);
+	}
+
+	private Type getTypeShiftLeft(AstExpressionBinary expression, Type t1,
+			Type t2) {
+		int s1;
+		if (t1.isInt()) {
+			s1 = ((TypeInt) t1).getSize();
+		} else if (t2.isUint()) {
+			s1 = ((TypeUint) t1).getSize();
+		} else {
+			error("Cannot convert " + t1 + " to int/uint", expression,
+					CalPackage.AST_EXPRESSION_BINARY__LEFT);
+			return null;
+		}
+
+		int s2;
+		if (t2.isInt()) {
+			s2 = ((TypeInt) t2).getSize();
+		} else if (t2.isUint()) {
+			s2 = ((TypeUint) t2).getSize();
+		} else {
+			error("Cannot convert " + t2 + " to int/uint", expression,
+					CalPackage.AST_EXPRESSION_BINARY__RIGHT);
+
+			return null;
+		}
+
+		int size = s1 + s2;
+		if (size > 32) {
+			size = 32;
+		}
+
+		return IrFactory.eINSTANCE.createTypeInt(size);
 	}
 }
