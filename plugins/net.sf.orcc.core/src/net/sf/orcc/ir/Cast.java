@@ -36,21 +36,12 @@ package net.sf.orcc.ir;
  */
 public class Cast {
 
-	private Type source;
-
-	private Type target;
-
-	public Cast(Type source, Type target) {
-		this.source = source;
-		this.target = target;
-	}
-
 	/**
 	 * Determine the size of a type.
 	 * 
 	 * @return integer corresponding to the size of the selected type
 	 */
-	private int getSizeOf(Type type) {
+	public static int getSizeOfType(Type type) {
 		// Select a particular size according to type
 		if (type.isBool()) {
 			return 1;
@@ -62,10 +53,19 @@ public class Cast {
 			return uintType.getSize();
 		} else if (type.isList()) {
 			TypeList listType = (TypeList) type;
-			return getSizeOf(listType.getType());
+			return getSizeOfType(listType.getType());
 		}
 
 		return 0;
+	}
+
+	private Type source;
+
+	private Type target;
+
+	public Cast(Type source, Type target) {
+		this.source = source;
+		this.target = target;
 	}
 
 	/**
@@ -100,7 +100,7 @@ public class Cast {
 			}
 		}
 
-		return getSizeOf(source) < getSizeOf(target);
+		return getSizeOfType(source) < getSizeOfType(target);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class Cast {
 			}
 		}
 
-		return getSizeOf(source) > getSizeOf(target);
+		return getSizeOfType(source) > getSizeOfType(target);
 	}
 
 }

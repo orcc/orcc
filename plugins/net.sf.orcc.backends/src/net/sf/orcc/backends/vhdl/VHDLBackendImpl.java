@@ -45,8 +45,6 @@ import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
-import net.sf.orcc.backends.vhdl.transforms.SizeRedimension;
-import net.sf.orcc.backends.vhdl.transforms.SuppressInit;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
@@ -54,6 +52,7 @@ import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
@@ -108,8 +107,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// replaces adjacent underscores by a single underscore
 				new RenameTransformation(adjacentUnderscores, "_"),
 
-				new TransformConditionals(), new SizeRedimension(),
-				new SuppressInit() };
+				new TransformConditionals() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -120,6 +118,12 @@ public class VHDLBackendImpl extends AbstractBackend {
 		actor.setTemplateData(templateData.getVariablesList());
 
 		evaluateInitializeActions(actor);
+
+		// remove initialization procedure (we could do better)
+		Procedure initProc = actor.getProcs().get("_initialize");
+		if (initProc != null) {
+			initProc.setExternal(true);
+		}
 	}
 
 	private void evaluateInitializeActions(Actor actor) {
@@ -205,8 +209,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 			printer.loadGroups("VHDL_network");
 
 			// Add broadcasts before printing
-			new VHDLBroadcastAdder().transform(network);			
-			
+			new VHDLBroadcastAdder().transform(network);
+
 			String outputName = path + File.separator + "Design"
 					+ File.separator + network.getName() + ".vhd";
 			printer.printNetwork(outputName, network, false, fifoSize);

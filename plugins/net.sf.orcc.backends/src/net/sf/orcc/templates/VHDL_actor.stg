@@ -298,10 +298,10 @@ String(constant) ::= <<
 // Cast
 ///////////////////////////////////////////////////////////////////////////////
 
-CastStore(value, target, cast)::= <<
+CastStore(target, value, cast)::= <<
 $
 if(cast.extended)
-  $$store.target$ := $store.value$$
+  $$target$ := $value$$
 else
 $
 $target$ := cast($value$, $value.type.size$, $target.type.size$)$
@@ -313,7 +313,7 @@ $
 CastLoad(target, source, cast)::= <<
 $
 if(cast.extended)
-  $$load.target$ := $load.source$$
+  $$target$ := $source$$
 else
 $
 -- cast not extended
@@ -329,7 +329,12 @@ $
 
 Assign(assign) ::= <<
 
-$assign.target$ := $assign.value$;
+$if (assign.cast)
+$$CastStore(target=assign.target, value=assign.value, cast=assign.cast)$;$
+else
+$$assign.target$ := $assign.value$;$
+endif
+$
 >>
 
 Call(call) ::= <<

@@ -30,10 +30,9 @@
 package net.sf.orcc.backends.vhdl;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -50,24 +49,6 @@ import net.sf.orcc.ir.expr.UnaryOp;
  */
 public class VHDLExpressionPrinter extends ExpressionPrinter {
 
-	private int getSizeOfType(Expression expr) {
-		Type type = expr.getType();
-		if (type == null) {
-			return 32;
-		} else {
-			if (type.isBool()) {
-				return 1;
-			} else if (type.isInt()) {
-				return ((TypeInt) type).getSize();
-			} else if (type.isUint()) {
-				return ((TypeUint) type).getSize();
-			} else {
-				throw new OrccRuntimeException("cannot get size of type: "
-						+ type);
-			}
-		}
-	}
-
 	/**
 	 * Prints a function call to the function with the given name, whose
 	 * arguments are the expressions e1 and e2.
@@ -79,35 +60,13 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	 * @param e2
 	 *            second expression
 	 */
-	private void printCall(String function, Expression e1, Expression e2, Type size) {
+	private void printCall(String function, Expression e1, Expression e2,
+			Type size) {
 		// parent precedence is the highest possible to prevent top-level binary
 		// expression from being parenthesized
 		int nextPrec = Integer.MAX_VALUE;
 
-		int s_op;
-		if (size == null) {
-			s_op = 32;
-		} else {
-			if (size.isBool()) {
-				s_op = 1;
-			} else if (size.isInt()) {
-				s_op = ((TypeInt) size).getSize();
-			} else if (size.isUint()) {
-				s_op = ((TypeUint) size).getSize();
-			} else {
-				throw new OrccRuntimeException("cannot get size of type: "
-						+ size);
-			}
-		}
-		
-		// Shift right requires an additional test. If the size(result) != size (operation),
-		// both sizes must be printed to avoid data loss.
-		if (function == "shift_right") {
-			int sizeop1 = getSizeOfType(e1);
-			if (sizeop1 > s_op){
-				function = "shift_cast_right";	
-			}
-		}
+		int s_op = Cast.getSizeOfType(size);
 
 		builder.append(function);
 		builder.append("(");
@@ -115,13 +74,6 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		builder.append(", ");
 		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
 		builder.append(", ");
-
-		if (function == "shift_cast_right") {
-			int sizeop1 = getSizeOfType(e1);
-			builder.append(sizeop1);
-			builder.append(", ");			
-		}			
-
 		builder.append(s_op);
 		builder.append(")");
 	}
@@ -158,7 +110,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		Expression e1 = expr.getE1();
 		Expression e2 = expr.getE2();
 		Type size = expr.getType();
-		
+
 		switch (op) {
 		case BITAND:
 			printCall("bitand", e1, e2, size);
@@ -176,7 +128,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		case MOD:
 			printCall("get_mod", e1, e2, size);
 			break;
-		case SHIFT_LEFT:		
+		case SHIFT_LEFT:
 			printCall("shift_left", e1, e2, size);
 			break;
 		case SHIFT_RIGHT:
@@ -222,7 +174,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 			builder.append("bitnot");
 			builder.append("(");
 			expr.getExpr().accept(this, Integer.MIN_VALUE);
-			builder.append(getSizeOfType(expr.getExpr()));
+			builder.append(Cast.getSizeOfType(expr.getExpr().getType()));
 			builder.append(")");
 			break;
 		default:
