@@ -456,4 +456,6 @@
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumC8x8"/>
     <Connection dst="DecodeResidual" dst-port="Num_C8x8"
         src="DecodeMacroBlockLayer" src-port="ResNumC8x8"/>
+    <Connection dst="DecodeResidual" dst-port="CodBlkPatnChm"
+        src="DecodeMacroBlockLayer" src-port="ResCodBlkPatnChm"/>
 </XDF>

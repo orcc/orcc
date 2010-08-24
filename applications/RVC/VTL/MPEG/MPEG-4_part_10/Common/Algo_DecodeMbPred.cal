@@ -24,7 +24,7 @@ actor Algo_DecodeMbPred()
 	bool          MbFieldDecoding
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=8)  NbBitsToRead,
+	int (size=32) NbBitsToRead,
 	bool          SkipNal
 		:
 

@@ -21,7 +21,7 @@ actor Algo_DecodeRefPicList_Frext()
 	uint(size=5)  NumRefIdxLXActive
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=8)  NbBitsToRead,
+	int (size=32) NbBitsToRead,
 	bool          SkipNal
 		:
 

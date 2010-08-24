@@ -36,7 +36,7 @@ actor Algo_DecodeMacroblockLayer()
 	bool          AboveMbExists
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=8)  NbBitsToRead,
+	int (size=32) NbBitsToRead,
 	bool          SkipNal,
 	uint(size=4)  LaunchActor,
 
@@ -57,6 +57,7 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=4)  ResStartIdx,
 	uint(size=4)  ResEndIdx,
 	uint(size=6)  ResCodBlkPatnLm,
+	uint(size=6)  ResCodBlkPatnChm,
 	uint(size=5)  ResNATab,
 	uint(size=5)  ResNBTab,
 	bool          ResLeftMbExists,
@@ -358,6 +359,7 @@ actor Algo_DecodeMacroblockLayer()
 		
 			CodedBlockPatternLuma   := coded_block_pattern mod 16;
 			CodedBlockPatternChroma := coded_block_pattern  /  16;
+			println("coded_block_pattern : "+coded_block_pattern);
 		end
 
 	ReadTransformSize8x8.Asked: action
@@ -405,6 +407,7 @@ actor Algo_DecodeMacroblockLayer()
 			ValVLD :[ValueOfVLD]
 				==>
 		do
+			println("mb_qp_delta : "+mb_qp_delta);
 			mb_qp_delta := ValueOfVLD;
 		end
 
@@ -421,6 +424,7 @@ actor Algo_DecodeMacroblockLayer()
 			ResStartIdx          :[0],
 			ResEndIdx            :[15],
 			ResCodBlkPatnLm      :[CodedBlockPatternLuma],
+			ResCodBlkPatnChm     :[CodedBlockPatternChroma],
 			ResNATab             :[nATab] repeat 4,
 			ResNBTab             :[nBTab] repeat 4,
 			ResLeftMbExists      :[LeftMb_Exists],

@@ -23,7 +23,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	uint(size=5)  EndIdx
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=8)  VLD_Param,
+	int (size=32) VLD_Param,
 	bool          SkipNal,
 	uint(size=5)  Total_Coeff
 		:
@@ -79,9 +79,11 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			do
 				CoeffLevel[i] := 0;
 			end
-			startIdx := ValStartIdx;
-			endIdx   := ValEndIdx;
+			startIdx    := ValStartIdx;
+			endIdx      := ValEndIdx;
+			maxNumCoeff := ValMaxNumCoeff;
 			println("******************** New Block Cavlc***************************");
+	println("nC : "+nC_Val);
 	println("startIdx"+startIdx);
 	println("endIdx"+endIdx);
 			zerosLeft := 0;
@@ -156,6 +158,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			ValVLD :[ValueOfVLD]
 				==>
 		do
+			//println("\t\tlevel_prefix : "+ValueOfVLD);
 			level_prefix := ValueOfVLD;
 			level_suffix := 0;
 		end
@@ -181,15 +184,14 @@ actor Algo_DecodeResidualBlock_Cavlc()
 					levelSuffixSize := suffixLength;
 				end
 			end
-			println("SzSuffix : "+levelSuffixSize);
 		end
 
 	ReadLevelSuffix.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
 		do
+			//println("\t\tlevel_suffix : "+ValueOfVLD);
 			level_suffix := ValueOfVLD;
-			println("levelsuffix : "+ValueOfVLD);
 		end
 
 	ComputeLevel: action ==>
@@ -257,8 +259,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		guard
 			iLoop     < TotalCoeff - 1,
 			zerosLeft > 0
-		do
-			println("run_before asked");
 		end
 
 	ReadRunBefore: action

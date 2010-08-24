@@ -39,7 +39,7 @@ actor Algo_DecodeSliceHeader()
 	int (size=32) SizeSliceGroupChgCycle
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=8)  NbBitsToRead,
+	int (size=32) NbBitsToRead,
 	bool          SkipNal,
 	uint(size=4)  LaunchActor,
 

@@ -17,12 +17,12 @@ actor Algo_VariableLengthDecoding()
 	uint(size=8)  RbspByte,
 	bool          NewNal,
 
-	uint(size=3)  TypeOfVLD,
-	uint(size=8)  VLD_Param,
-	bool          EndOfNal
+	uint(size=3)   TypeOfVLD,
+	int (size=32)  VLD_Param,
+	bool           EndOfNal
 		==>
-	int (size=32) ValDecoded,
-	bool          SkipNal
+	int (size=32)  ValDecoded,
+	bool           SkipNal
 		:
 
 
@@ -3450,37 +3450,37 @@ actor Algo_VariableLengthDecoding()
 		[
 			[
 				[
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 0
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 0
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 1
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 1
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 2
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 2
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 3
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 3
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 4
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 4
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 5
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 5
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 6
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 6
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 7
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 7
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 8
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 8
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 9
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 9
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 10
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 10
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 11
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 11
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 12
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 12
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 13
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 13
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 14
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 14
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
-					// MaxNumCoeff = 8 ; TotalCoeff = 0 ; nbBitRead = 15
+					// MaxNumCoeff = 4 ; TotalCoeff = 0 ; nbBitRead = 15
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ]
 				],
 				[
@@ -4585,7 +4585,7 @@ actor Algo_VariableLengthDecoding()
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 3
 					[  0 ,  0 ,  2  ,  1 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 4
-					[  0 ,  0 ,  2  ,  3 ,  0 ,  0 ,  0 ,  0 ],
+					[  0 ,  0 ,  4  ,  3 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 5
 					[  0 ,  0 ,  6  ,  5 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 6
@@ -5590,7 +5590,6 @@ actor Algo_VariableLengthDecoding()
 				end;
 			NbBitsRead      := 0;
 			ValRead         := 0;
-			println("RunBefore Laundch");
 		end
 
 
@@ -5970,7 +5969,7 @@ actor Algo_VariableLengthDecoding()
 		ChckCavlcLevPre (GetCavlcLevelPrefix.NotFinished     )--> DecCavlcLevPre;
 		ChckCavlcLevPre (GetCavlcLevelPrefix.Finished        )--> CheckVLDType;
 
-		/* Cavlc level_prefix decoding process */
+		/* Cavlc total_zeros decoding process */
 		DecCavlcTotZer  (Buffer                              )--> GetCavlcTotZer;
 		DecCavlcTotZer  (FillBufferRbsp                      )--> DecCavlcTotZer;
 

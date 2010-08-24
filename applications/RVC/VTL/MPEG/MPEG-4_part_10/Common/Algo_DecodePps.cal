@@ -21,7 +21,7 @@ actor Algo_DecodePps(bool IsCBP)
 	uint(size=32) PicHeightInMapUnits
 		==>
 	uint(size=3)  TypeOfVLD,
-	uint(size=8)  NbBitsToRead,
+	int (size=32) NbBitsToRead,
 	bool          SkipNal,
 
 	uint(size=5)  GetSps4Pic,
