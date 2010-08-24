@@ -43,12 +43,18 @@ import net.sf.orcc.cal.cal.AstExpressionList;
 import net.sf.orcc.cal.cal.AstExpressionString;
 import net.sf.orcc.cal.cal.AstExpressionUnary;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
+import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstGenerator;
+import net.sf.orcc.cal.cal.AstOutputPattern;
+import net.sf.orcc.cal.cal.AstStatementAssign;
+import net.sf.orcc.cal.cal.AstStatementCall;
+import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.validation.CalJavaValidator;
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -69,6 +75,8 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public class TypeChecker extends CalSwitch<Type> {
+
+	private int maxSize;
 
 	private CalJavaValidator validator;
 
@@ -298,6 +306,56 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
+	 * Finds the type of the formal parameter that corresponds to the given
+	 * expression in the actual parameters.
+	 * 
+	 * @param formalParameters
+	 *            formal parameters
+	 * @param actualParameters
+	 *            actual parameters
+	 * @param expression
+	 *            an expression
+	 * @return the type of the formal parameter, or <code>null</code>
+	 */
+	private Type findParameter(List<AstVariable> formalParameters,
+			List<AstExpression> actualParameters, AstExpression expression) {
+		Iterator<AstVariable> itF = formalParameters.iterator();
+		Iterator<AstExpression> itA = actualParameters.iterator();
+		while (itF.hasNext() && itA.hasNext()) {
+			AstVariable formal = itF.next();
+			AstExpression actual = itA.next();
+			if (actual == expression) {
+				return formal.getIrType();
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the container of the given expression. The container is either
+	 * the first non-expression container, or the first call to a non-built-in
+	 * function up the containment hierarchy.
+	 * 
+	 * @param object
+	 *            an expression
+	 * @return the container
+	 */
+	private EObject getContainer(EObject object) {
+		EObject container = object.eContainer();
+
+		// if the container is an expression continue up the hierarchy
+		// except if the container is a call to a non-built-in function
+		if (container instanceof AstExpression
+				&& !(container instanceof AstExpressionCall && ((AstExpressionCall) container)
+						.getFunction().eContainer() != null)) {
+			return getContainer(container);
+		}
+
+		return container;
+	}
+
+	/**
 	 * Returns the Greatest Lower Bound of the given types.
 	 * 
 	 * @param t1
@@ -401,6 +459,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		Type type = expression.getIrType();
 		if (type == null) {
+			setTargetType(expression);
 			type = doSwitch(expression);
 			expression.setIrType(type);
 		}
@@ -632,12 +691,89 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		int size = s1 + s2;
-		if (size > 32) {
-			size = 32;
+		// shift is unsigned, so we do not take the bit sign into account
+		int shift = s2 - 1;
+
+		int size;
+		// 1 << 6 = 64
+		if (shift >= 6) {
+			size = maxSize;
+		} else {
+			size = s1 + (1 << shift) - 1;
+			if (size > maxSize) {
+				size = maxSize;
+			}
 		}
 
 		return IrFactory.eINSTANCE.createTypeInt(size);
+	}
+
+	/**
+	 * Finds the target type of the container of the given expression, and sets
+	 * the maxSize field from it. If no target is found, set maxSize to 32.
+	 * 
+	 * @param expression
+	 *            an expression
+	 */
+	private void setTargetType(AstExpression expression) {
+		EObject cter = getContainer(expression);
+		Type targetType = null;
+
+		switch (cter.eClass().getClassifierID()) {
+		case CalPackage.AST_EXPRESSION_CALL: {
+			AstExpressionCall call = (AstExpressionCall) cter;
+			List<AstVariable> formal = call.getFunction().getParameters();
+			List<AstExpression> actual = call.getParameters();
+			targetType = findParameter(formal, actual, expression);
+			break;
+		}
+
+		case CalPackage.AST_FUNCTION:
+			AstFunction func = (AstFunction) cter;
+			targetType = func.getIrType();
+			break;
+
+		case CalPackage.AST_GENERATOR:
+			AstGenerator generator = (AstGenerator) cter;
+			targetType = generator.getVariable().getIrType();
+			break;
+
+		case CalPackage.AST_OUTPUT_PATTERN:
+			AstOutputPattern pattern = (AstOutputPattern) cter;
+			targetType = pattern.getPort().getIrType();
+			break;
+
+		case CalPackage.AST_STATEMENT_ASSIGN:
+			AstStatementAssign assign = (AstStatementAssign) cter;
+			targetType = assign.getTarget().getVariable().getIrType();
+			break;
+
+		case CalPackage.AST_STATEMENT_CALL: {
+			AstStatementCall call = (AstStatementCall) cter;
+			List<AstVariable> formal = call.getProcedure().getParameters();
+			List<AstExpression> actual = call.getParameters();
+			targetType = findParameter(formal, actual, expression);
+			break;
+		}
+
+		case CalPackage.AST_STATEMENT_FOREACH:
+			AstStatementForeach foreach = (AstStatementForeach) cter;
+			targetType = foreach.getVariable().getIrType();
+			break;
+
+		case CalPackage.AST_VARIABLE:
+			AstVariable variable = (AstVariable) cter;
+			targetType = variable.getIrType();
+			break;
+		}
+
+		if (targetType == null) {
+			// in if & while conditions, guard expressions, calls to built-in
+			// functions
+			maxSize = 32;
+		} else {
+			maxSize = Cast.getSizeOfType(targetType);
+		}
 	}
 
 }
