@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-07
+-- Last update: 2010-08-24
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -50,16 +50,17 @@ use IEEE.numeric_std.all;
 
 package orcc_package is
 
-  function bitand (op1      : integer; op2 : integer; size : integer) return integer;
-  function bitor (op1       : integer; op2 : integer; size : integer) return integer;
-  function bitxor (op1      : integer; op2 : integer; size : integer) return integer;
-  function bitnot (op1      : integer; size : integer) return integer;
-  function div (op1         : integer; op2 : integer; size : integer) return integer;
-  function get_mod (ARG0    : integer; ARG1 : integer) return integer;
-  function shift_left (op1  : integer; op2 : integer; size : integer) return integer;
-  function shift_right (op1 : integer; op2 : integer; size : integer) return integer;
-  function cast (op1        : integer; sizeop1 : integer; sizeresult : integer) return integer;
-  function bit_width (op1   : integer) return integer;
+  function bitand (op1          : integer; op2 : integer; size : integer) return integer;
+  function bitor (op1           : integer; op2 : integer; size : integer) return integer;
+  function bitxor (op1          : integer; op2 : integer; size : integer) return integer;
+  function bitnot (op1          : integer; size : integer) return integer;
+  function div (op1             : integer; op2 : integer; size : integer) return integer;
+  function get_mod (ARG0        : integer; ARG1 : integer) return integer;
+  function shift_left (op1      : integer; op2 : integer; size : integer) return integer;
+  function shift_right (op1     : integer; op2 : integer; size : integer) return integer;
+  function shift_cast_right(op1 : integer; op2 : integer; sizeop : integer; sizeresult : integer) return integer;
+  function cast (op1      : integer; sizeop1 : integer; sizeresult : integer) return integer;
+  function bit_width (op1 : integer) return integer;
 
 end;
 
@@ -133,7 +134,6 @@ package body orcc_package is
 
   -----------------------------------------------------------------------------
   -- logical left shift
-  -- result type is the same as the type of the first operand
   function shift_left(op1 : integer; op2 : integer; size : integer) return integer is
   begin
     return to_integer(to_signed(op1, size) sll op2);
@@ -141,10 +141,16 @@ package body orcc_package is
 
   -----------------------------------------------------------------------------
   -- logical right shift
-  -- result type is the same as the type of the first operand
   function shift_right(op1 : integer; op2 : integer; size : integer) return integer is
   begin
     return to_integer(to_signed(op1, size) srl op2);
+  end function;
+
+  function shift_cast_right(op1 : integer; op2 : integer; sizeop : integer; sizeresult : integer) return integer is
+    variable result : std_logic_vector(sizeop -1 downto 0);
+  begin
+    result := std_logic_vector((to_signed(op1, sizeop) srl op2));
+    return to_integer(signed(result(sizeresult - 1 downto 0)));
   end function;
 
   -----------------------------------------------------------------------------

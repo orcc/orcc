@@ -84,13 +84,6 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		// expression from being parenthesized
 		int nextPrec = Integer.MAX_VALUE;
 
-		builder.append(function);
-		builder.append("(");
-		e1.accept(this, nextPrec, BinaryExpr.LEFT);
-		builder.append(", ");
-		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
-		builder.append(", ");
-		
 		int s_op;
 		if (size == null) {
 			s_op = 32;
@@ -106,6 +99,28 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 						+ size);
 			}
 		}
+		
+		// Shift right requires an additional test. If the size(result) != size (operation),
+		// both sizes must be printed to avoid data loss.
+		if (function == "shift_right") {
+			int sizeop1 = getSizeOfType(e1);
+			if (sizeop1 > s_op){
+				function = "shift_cast_right";	
+			}
+		}
+
+		builder.append(function);
+		builder.append("(");
+		e1.accept(this, nextPrec, BinaryExpr.LEFT);
+		builder.append(", ");
+		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
+		builder.append(", ");
+
+		if (function == "shift_cast_right") {
+			int sizeop1 = getSizeOfType(e1);
+			builder.append(sizeop1);
+			builder.append(", ");			
+		}			
 
 		builder.append(s_op);
 		builder.append(")");
@@ -161,7 +176,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		case MOD:
 			printCall("get_mod", e1, e2, size);
 			break;
-		case SHIFT_LEFT:
+		case SHIFT_LEFT:		
 			printCall("shift_left", e1, e2, size);
 			break;
 		case SHIFT_RIGHT:
