@@ -119,13 +119,6 @@ private:
 		fifo["u64_writeEnd"] = "fifo_u64_write_end";
 		fifo["u64_readEnd"] = "fifo_u64_read_end";
 
-		fifo["\01_clock"] = "\01_clock";
-		fifo["printf"] = "printf";
-		fifo["fseek"] = "fseek";
-		fifo["fread"] = "fread";
-		fifo["puts"] = "puts";
-		fifo["exit"] = "exit";
-		fifo["fopen"] = "fopen";
 		return fifo;
 	}
 
@@ -170,11 +163,11 @@ public:
 
 private:
 
+	/** module for extern functions */
+	llvm::Module* externMod;
+
 	/** Counter of fifo */
 	int fifoCnt;
-
-	/** Other functions declared in the header */
-	std::list<llvm::Function*> otherFunctions;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
@@ -185,11 +178,15 @@ private:
 	void parseHeader();
 
 	/**
-    * @brief add fifo functions into the given decoder
-	*
-	* @param decoder : Decoder to had fifo functions
+    * @brief Parse fifo functions into the header module
     */
 	void parseFifoFunctions();
+
+	/**
+    * @brief Parse extern functions in the extern module
+	*
+    */
+	void parseExternFunctions();
 
 	void parseFifoStructs();
 

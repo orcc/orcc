@@ -190,6 +190,32 @@ public:
 		return fifoAccess[name];
 	};
 
+	/**
+     *  @brief return true if the given name correspong to a extern function name
+     *
+	 *  @param name : std::string of function to look for
+	 *
+	 *	@Return true if the given name correspond to a extern function, otherwise false.
+     */
+	bool isExternFunction(std::string name){
+		if (externFunct.find(name)==externFunct.end())
+			return false;
+		
+		return true;
+	};
+
+
+	/**
+     *  @brief get the llvm::function from the given extern function
+     *
+	 *  @param name : std::string of the fifo function name
+	 *
+	 *  @return function : llvm::function corresponding to the extern function name
+     */
+	llvm::Function* getExternFunction(std::string name){
+		return externFunct[name];
+	};
+
 
 	/**
      *  @brief Getter of fifo access
@@ -242,6 +268,12 @@ protected:
 
 	/** a map relying fifo function and their llvm::function equivalent in the header */
 	std::map<std::string,llvm::Function*> fifoAccess;
+
+	/** Extern functions */
+	std::map<std::string,llvm::Function*> externFunct;
+
+	/** Extern structs */
+	std::list<llvm::Function*> externStruct;
 
 	/** Decoder engine's jit */
 	JIT* jit;

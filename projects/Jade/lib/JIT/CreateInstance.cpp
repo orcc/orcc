@@ -148,7 +148,11 @@ void JIT::LinkFunctionBody(Function *NewFunc, Function *OldFunc,
 	     for (Instruction::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
 			 Value *V;
 			 if (fifo->isFifoFunction((*op)->getName())){
+				 //If this function is a fifo function, this function already exist in the module
 				V = fifo->getFifoFunction((*op)->getName());
+			 } else if(fifo->isExternFunction((*op)->getName())){
+				 //Same for external function
+				V = fifo->getExternFunction((*op)->getName());
 			 } else {
 				V = MapValue(*op, ValueMap);
 				if (V == NULL){

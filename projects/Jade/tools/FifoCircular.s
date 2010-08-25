@@ -10,15 +10,6 @@ target triple = "i386-mingw32"
 %struct.fifo_u32_s = type { i32, i32*, i32*, i32, i32, i32 }
 %struct.fifo_u64_s = type { i32, i64*, i64*, i32, i32, i32 }
 %struct.fifo_u8_s = type { i32, i8*, i8*, i32, i32, i32 }
-%struct.FILE = type { i8*, i32, i8*, i32, i32, i32, i32, i8* }
-
-declare i32 @fseek(%struct.FILE*, i32, i32) nounwind
-declare i32 @fread(i8*, i32, i32, %struct.FILE*) nounwind
-declare i32 @puts(i8*)
-declare void @exit(i32) noreturn nounwind
-declare %struct.FILE* @fopen(i8*, i8*) nounwind
-declare i32 @printf(i8*, ...) nounwind 
-declare i64 @"\01_clock"()
 
 define internal i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:

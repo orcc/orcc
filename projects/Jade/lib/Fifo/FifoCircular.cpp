@@ -88,6 +88,7 @@ FifoCircular::~FifoCircular (){
 void FifoCircular::declareFifoHeader (){
 	parseHeader();
 	parseFifoStructs();
+	parseExternFunctions();
 	parseFifoFunctions();
 }
 
@@ -97,6 +98,21 @@ void FifoCircular::parseHeader (){
 	if (header == NULL){
 		fprintf(stderr,"Unable to parse fifo header file");
 		exit(0);
+	}
+
+	externMod = jit->LoadBitcode("extern", ToolsDir);
+
+	if (externMod == NULL){
+		fprintf(stderr,"Unable to parse extern functions file");
+		exit(0);
+	}
+}
+
+void FifoCircular::parseExternFunctions(){
+	
+	// Iterate though functions of extern module 
+	for (Module::iterator I = externMod->begin(), E = externMod->end(); I != E; ++I) {
+		externFunct.insert(pair<std::string,llvm::Function*>(I->getName(), I));
 	}
 }
 
@@ -108,10 +124,7 @@ void FifoCircular::parseFifoFunctions(){
 		
 		if (isFifoFunction(name)){
 			setFifoFunction(name, I);
-			continue;
 		}
-
-		otherFunctions.push_back(I);
 	}
 }
 
@@ -136,18 +149,15 @@ void FifoCircular::parseFifoStructs(){
 
 void FifoCircular::addFunctions(Decoder* decoder){
 	
-	std::list<llvm::Function*>::iterator itList;
-
-	for(itList = otherFunctions.begin(); itList != otherFunctions.end(); ++itList){
-		Function* function = (Function*)jit->addFunctionProtosExternal("", *itList);
-		jit->LinkProcedureBody(*itList);
-		*itList = function;
-	}
-
 	std::map<std::string,llvm::Function*>::iterator itMap;
 
-	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
+	for(itMap = externFunct.begin(); itMap != externFunct.end(); ++itMap){
 		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
+		(*itMap).second = function;
+	}
+
+	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
+		Function* function = (Function*)jit->addFunctionProtosInternal("", (*itMap).second);
 		jit->LinkProcedureBody((*itMap).second);
 		(*itMap).second = function;
 	}
