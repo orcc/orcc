@@ -55,6 +55,9 @@
     <Decl kind="Param" name="ACPRED">
         <Type name="int"/>
     </Decl>
+    <Decl kind="Param" name="DCVAL">
+        <Type name="int"/>
+    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -82,11 +85,7 @@
             <Expr kind="Var" name="ACPRED"/>
         </Parameter>
         <Parameter name="DCVAL">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="128"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Expr>
+            <Expr kind="Var" name="DCVAL"/>
         </Parameter>
         <Parameter name="INTER">
             <Expr kind="Var" name="INTER"/>

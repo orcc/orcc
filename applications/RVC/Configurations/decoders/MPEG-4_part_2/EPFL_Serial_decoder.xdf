@@ -45,6 +45,14 @@
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="1"/>
     </Decl>
+    <Decl kind="Variable" name="DCVAL">
+        <Type name="int"/>
+        <Expr kind="BinOpSeq">
+            <Expr kind="Literal" literal-kind="Integer" value="128"/>
+            <Op name="*"/>
+            <Expr kind="Literal" literal-kind="Integer" value="8"/>
+        </Expr>
+    </Decl>
     <Decl kind="Variable" name="FCODE_MASK">
         <Type name="int"/>
         <Expr kind="Literal" literal-kind="Integer" value="448"/>
@@ -152,6 +160,9 @@
         </Parameter>
         <Parameter name="ACPRED">
             <Expr kind="Var" name="ACPRED"/>
+        </Parameter>
+        <Parameter name="DCVAL">
+            <Expr kind="Var" name="DCVAL"/>
         </Parameter>
         <Parameter name="INTER">
             <Expr kind="Var" name="INTER"/>
