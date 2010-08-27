@@ -35,36 +35,44 @@
 #define FIFO_TRACE_EXPAND(T) fifo_ ## T ## _trace
 
 #define SIGNED_PRINT "%d\n"
-#define UNSIGNED_PRINT "%d\n"
+#define UNSIGNED_PRINT "%u\n"
 
 #define PRINT_FORMAT SIGNED_PRINT
 
-#define T char
+#define T i8
 #include "orcc_trace.inl"
 #undef T
 
-#define T short
+#define T i16
 #include "orcc_trace.inl"
 #undef T
 
-#define T int
+#define T i32
+#include "orcc_trace.inl"
+#undef T
+
+#define T i64
 #include "orcc_trace.inl"
 #undef T
 #undef PRINT_FORMAT
 
 #define PRINT_FORMAT UNSIGNED_PRINT
-#define T u_char
+#define T u8
 #include "orcc_trace.inl"
 #undef T
 
-#define T u_short
+#define T u16
 #include "orcc_trace.inl"
 #undef T
 
-#define T u_int
+#define T u32
 #include "orcc_trace.inl"
 #undef T
+
+#define T u64
+#include "orcc_trace.inl"
+#undef T
+
 #undef PRINT_FORMAT
-
 
 #endif
