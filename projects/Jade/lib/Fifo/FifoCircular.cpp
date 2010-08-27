@@ -230,6 +230,9 @@ void FifoCircular::setConnection(Connection* connection){
 	srcVar->setInitializer(NewFifo);
 	dstVar->setInitializer(NewFifo);
 
+	//Store fifo variable in connection
+	connection->setFifo(NewFifo);
+
 	// Increment fifo counter 
 	fifoCnt++;
 	

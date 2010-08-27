@@ -55,6 +55,7 @@ Connection::Connection(Port* source, Port* target, std::map<std::string, Attribu
 {	this->attributes = attributes; 
 	this->source = source;	
 	this->target = target;
+	this->fifo = NULL;
 }
 
 

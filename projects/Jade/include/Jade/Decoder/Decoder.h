@@ -135,6 +135,15 @@ public:
 	Procedure* getInitialization(){return initialization;};
 
 	/**
+     *  @brief return true if decoder has an initialization procedure
+	 * 
+	 *
+	 *  @return true if decoder has an initialization procedure otherwise false
+	 *
+     */
+	bool hasInitialization(){return initialization != NULL;};
+
+	/**
      *  @brief Setter of initialization
 	 * 
 	 *

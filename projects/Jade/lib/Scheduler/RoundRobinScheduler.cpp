@@ -54,6 +54,7 @@
 #include "Jade/Actor/Actor.h"
 #include "Jade/Actor/ActionScheduler.h"
 #include "Jade/Decoder/InstancedActor.h"
+#include "Jade/Decoder/Procedure.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Network/Instance.h"
 
@@ -106,6 +107,10 @@ void RoundRobinScheduler::createScheduler(){
 		if (scheduler->hasInitializeScheduler()){
 			CallInst *Add1CallRes = CallInst::Create(scheduler->getInitializeFunction(), "", BBEntry);
 		}
+	}
+
+	if(decoder->hasInitialization()){
+		CallInst *Add1CallRes = CallInst::Create(decoder->getInitialization()->getFunction(), "", BBEntry);
 	}
 
 	// Create a branch to bb

@@ -215,7 +215,7 @@ private:
 
 	llvm::StructType* getFifoType(llvm::IntegerType* type);
 
-	void setFile(Connection* connection, llvm::BasicBlock* bb, llvm::Function* fOpenFunc);
+	void setFile(Decoder* decoder, Connection* connection, llvm::BasicBlock* bb, llvm::Function* fOpenFunc, llvm::Constant* wStr);
 
 	void setFiles(Decoder* decoder);
 

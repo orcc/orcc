@@ -47,6 +47,7 @@
 
 namespace llvm{
 	class IntegerType;
+	class GlobalVariable;
 }
 
 class Port;
@@ -138,6 +139,22 @@ public:
 	int getFifoSize();
 
 	/*!
+     *  @brief Get fifo bound to the connection
+     *
+	 *  @return a llvm::GlobalVariable representing the fifo of the connection
+     *
+     */
+	llvm::GlobalVariable* getFifo(){return fifo;};
+
+	/*!
+     *  @brief set the fifo bound to the connection
+     *
+	 *  @param fifo: a llvm::GlobalVariable representing the fifo of the connection
+     *
+     */
+	 void setFifo(llvm::GlobalVariable* fifo){this->fifo = fifo;};
+
+	/*!
      *  @brief Get integer size of the token carried by this connection
      *
 	 *  @return an integer representing the size of token.
@@ -153,7 +170,8 @@ private:
 	std::map<std::string, Attribute*>* attributes;	/** Map of attributes */
 	Port* source;						/** Source Port */
 	Port* target;						/** Destination Port */
-	llvm::IntegerType* type;
+	llvm::IntegerType* type;			/** Type of the connection */
+	llvm::GlobalVariable* fifo;			/** Fifo of the connection */
 };
 
 #endif
