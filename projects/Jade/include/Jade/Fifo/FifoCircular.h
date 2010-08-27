@@ -188,6 +188,10 @@ private:
     */
 	void parseExternFunctions();
 
+	/**
+    * @brief Parse fifo structure
+	*
+    */
 	void parseFifoStructs();
 
 	/**
