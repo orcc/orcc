@@ -540,16 +540,10 @@ public class TypeChecker extends CalSwitch<Type> {
 		if (type.isInt()) {
 			TypeInt typeInt = (TypeInt) type;
 			int size = typeInt.getSize() + 1;
-			if (size > maxSize) {
-				size = maxSize;
-			}
 			typeInt.setSize(size);
 		} else if (type.isUint()) {
 			TypeUint typeUint = (TypeUint) type;
 			int size = typeUint.getSize() + 1;
-			if (size > maxSize) {
-				size = maxSize;
-			}
 			typeUint.setSize(size);
 		}
 
@@ -735,16 +729,10 @@ public class TypeChecker extends CalSwitch<Type> {
 		if (type.isInt()) {
 			TypeInt typeInt = (TypeInt) type;
 			int size = typeInt.getSize() + 1;
-			if (size > maxSize) {
-				size = maxSize;
-			}
 			typeInt.setSize(size);
 		} else if (type.isUint()) {
 			TypeUint typeUint = (TypeUint) type;
 			int size = typeUint.getSize() + 1;
-			if (size > maxSize) {
-				size = maxSize;
-			}
 			typeUint.setSize(size);
 		}
 
@@ -842,10 +830,6 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		int size = s1 + s2;
-		if (size > maxSize) {
-			size = maxSize;
-		}
-
 		if (type.isInt()) {
 			((TypeInt) type).setSize(size);
 		} else if (type.isUint()) {
