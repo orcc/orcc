@@ -1,0 +1,13 @@
+actor TypeError3 () ==> :
+	
+	action ==>
+	var
+		List(type:List(type:int, size=2), size=3) list2,
+		int val
+	do
+		if true then
+			list2[0] := val;
+		end
+	end
+	
+end

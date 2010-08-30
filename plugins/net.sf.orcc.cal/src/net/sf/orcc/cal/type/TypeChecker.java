@@ -419,9 +419,12 @@ public class TypeChecker extends CalSwitch<Type> {
 		} else if (t1.isList() && t2.isList()) {
 			TypeList listType1 = (TypeList) t1;
 			TypeList listType2 = (TypeList) t2;
-			int size = Math.max(listType1.getSize(), listType2.getSize());
 			Type type = getLub(listType1.getType(), listType2.getType());
-			return IrFactory.eINSTANCE.createTypeList(size, type);
+			if (type != null) {
+				// only return a list when the underlying type is valid
+				int size = Math.max(listType1.getSize(), listType2.getSize());
+				return IrFactory.eINSTANCE.createTypeList(size, type);
+			}
 		} else if (t1.isUint() && t2.isUint()) {
 			return IrFactory.eINSTANCE.createTypeUint(Math.max(
 					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
@@ -850,52 +853,54 @@ public class TypeChecker extends CalSwitch<Type> {
 		EObject cter = getContainer(expression);
 		Type targetType = null;
 
-		switch (cter.eClass().getClassifierID()) {
-		case CalPackage.AST_EXPRESSION_CALL: {
-			AstExpressionCall call = (AstExpressionCall) cter;
-			List<AstVariable> formal = call.getFunction().getParameters();
-			List<AstExpression> actual = call.getParameters();
-			targetType = findParameter(formal, actual, expression);
-			break;
-		}
+		if (cter != null) {
+			switch (cter.eClass().getClassifierID()) {
+			case CalPackage.AST_EXPRESSION_CALL: {
+				AstExpressionCall call = (AstExpressionCall) cter;
+				List<AstVariable> formal = call.getFunction().getParameters();
+				List<AstExpression> actual = call.getParameters();
+				targetType = findParameter(formal, actual, expression);
+				break;
+			}
 
-		case CalPackage.AST_FUNCTION:
-			AstFunction func = (AstFunction) cter;
-			targetType = func.getIrType();
-			break;
+			case CalPackage.AST_FUNCTION:
+				AstFunction func = (AstFunction) cter;
+				targetType = func.getIrType();
+				break;
 
-		case CalPackage.AST_GENERATOR:
-			AstGenerator generator = (AstGenerator) cter;
-			targetType = generator.getVariable().getIrType();
-			break;
+			case CalPackage.AST_GENERATOR:
+				AstGenerator generator = (AstGenerator) cter;
+				targetType = generator.getVariable().getIrType();
+				break;
 
-		case CalPackage.AST_OUTPUT_PATTERN:
-			AstOutputPattern pattern = (AstOutputPattern) cter;
-			targetType = pattern.getPort().getIrType();
-			break;
+			case CalPackage.AST_OUTPUT_PATTERN:
+				AstOutputPattern pattern = (AstOutputPattern) cter;
+				targetType = pattern.getPort().getIrType();
+				break;
 
-		case CalPackage.AST_STATEMENT_ASSIGN:
-			AstStatementAssign assign = (AstStatementAssign) cter;
-			targetType = assign.getTarget().getVariable().getIrType();
-			break;
+			case CalPackage.AST_STATEMENT_ASSIGN:
+				AstStatementAssign assign = (AstStatementAssign) cter;
+				targetType = assign.getTarget().getVariable().getIrType();
+				break;
 
-		case CalPackage.AST_STATEMENT_CALL: {
-			AstStatementCall call = (AstStatementCall) cter;
-			List<AstVariable> formal = call.getProcedure().getParameters();
-			List<AstExpression> actual = call.getParameters();
-			targetType = findParameter(formal, actual, expression);
-			break;
-		}
+			case CalPackage.AST_STATEMENT_CALL: {
+				AstStatementCall call = (AstStatementCall) cter;
+				List<AstVariable> formal = call.getProcedure().getParameters();
+				List<AstExpression> actual = call.getParameters();
+				targetType = findParameter(formal, actual, expression);
+				break;
+			}
 
-		case CalPackage.AST_STATEMENT_FOREACH:
-			AstStatementForeach foreach = (AstStatementForeach) cter;
-			targetType = foreach.getVariable().getIrType();
-			break;
+			case CalPackage.AST_STATEMENT_FOREACH:
+				AstStatementForeach foreach = (AstStatementForeach) cter;
+				targetType = foreach.getVariable().getIrType();
+				break;
 
-		case CalPackage.AST_VARIABLE:
-			AstVariable variable = (AstVariable) cter;
-			targetType = variable.getIrType();
-			break;
+			case CalPackage.AST_VARIABLE:
+				AstVariable variable = (AstVariable) cter;
+				targetType = variable.getIrType();
+				break;
+			}
 		}
 
 		if (targetType == null) {
