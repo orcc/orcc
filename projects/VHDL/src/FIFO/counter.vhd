@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-07
+-- Last update: 2010-08-30
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -45,7 +45,9 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
+
 library work;
 use work.orcc_package.all;
 -------------------------------------------------------------------------------
@@ -54,15 +56,15 @@ entity counter is
   generic (
     depth : integer := 32);
   port (
-    reset_n     : in    std_logic;
-    reset_rd    : in    std_logic;
-    reset_wr    : in    std_logic;
-    rd_clk      : in    std_logic;
-    rd_ack      : in    std_logic;
-    wr_clk      : in    std_logic;
-    wr_data     : in    std_logic;
-    rd_add_gray : inout std_logic_vector(bit_width(depth) -1 downto 0);
-    wr_add_gray : inout std_logic_vector(bit_width(depth) -1 downto 0));
+    reset_n  : in    std_logic;
+    reset_rd : in    std_logic;
+    reset_wr : in    std_logic;
+    rd_clk   : in    std_logic;
+    rd_ack   : in    std_logic;
+    wr_clk   : in    std_logic;
+    wr_data  : in    std_logic;
+    rd_add   : inout std_logic_vector(bit_width(depth) -1 downto 0);
+    wr_add   : inout std_logic_vector(bit_width(depth) -1 downto 0));
 end counter;
 
 -------------------------------------------------------------------------------
@@ -71,29 +73,32 @@ architecture archcounter of counter is
 
   signal ireset_rd : std_logic;
   signal ireset_wr : std_logic;
-  
 begin
   
   ireset_rd <= reset_n and reset_rd;
   ireset_wr <= reset_n and reset_wr;
 
-  rd_cur_add_gray : entity work.gray_cnt_n
-    generic map (
-      width => bit_width(depth))
-    port map (
-      reset_n => ireset_rd,
-      clk     => rd_clk,
-      en      => rd_ack,
-      q       => rd_add_gray);
+  rd_count : process (rd_clk, reset_n) is
+  begin
+    if ireset_rd = '0' then
+      rd_add <= (others => '0');
+    elsif rising_edge(rd_clk) then
+      if rd_ack = '1' then
+        rd_add <= rd_add +'1';
+      end if;
+    end if;
+  end process rd_count;
 
-  wr_cur_add_gray : entity work.gray_cnt_n
-    generic map (
-      width => bit_width(depth))
-    port map (
-      reset_n => ireset_wr,
-      clk     => wr_clk,
-      en      => wr_data,
-      q       => wr_add_gray);
+  wr_count : process (wr_clk, reset_n) is
+  begin
+    if ireset_wr = '0' then
+      wr_add <= (others => '0');
+    elsif rising_edge(wr_clk) then
+      if wr_data = '1' then
+        wr_add <= wr_add +'1';
+      end if;
+    end if;
+  end process wr_count;
 
 end archcounter;
 

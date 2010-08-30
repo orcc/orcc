@@ -13,9 +13,6 @@ vcom -93 -reportprogress 30 -work work \$SRC/orcc_package.vhd
 vcom -93 -reportprogress 30 -work work \$SRC/sim_package.vhd
 # Compile FIFO
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/ram_generic.vhd 
-vcom -93 -reportprogress 30 -work work \$SRC/FIFO/gray_cnt.vhd 
-vcom -93 -reportprogress 30 -work work \$SRC/FIFO/gray_cnt_n.vhd
-vcom -93 -reportprogress 30 -work work \$SRC/FIFO/gray2bin.vhd 
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/counter.vhd 
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/arbiter.vhd 
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/control.vhd 
@@ -28,6 +25,6 @@ vcom -93 -reportprogress 30 -work work \$Testbench/$name$_tb.vhd
 # Simulate
 vsim $name$_testbench
 do wave.do
-run 1 us
+run 10 us
 
 >>

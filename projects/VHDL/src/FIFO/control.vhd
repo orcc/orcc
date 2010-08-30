@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-07
+-- Last update: 2010-08-30
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -45,7 +45,9 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
+
 library work;
 use work.orcc_package.all;
 -------------------------------------------------------------------------------
@@ -78,20 +80,20 @@ architecture archcontroler of controler is
   -- Internal signals and constants declaration
   -----------------------------------------------------------------------------
   --
-  constant depth_bin : std_logic_vector(bit_width(depth)-1 downto 0)
+  constant depth_std : std_logic_vector(bit_width(depth)-1 downto 0)
     := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
   --
-  signal wr_add_bin : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal rd_add_bin : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal wr_add : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal rd_add : std_logic_vector(bit_width(depth)-1 downto 0);
   signal reset_rd   : std_logic;
   signal reset_wr   : std_logic;
   --
   
 begin
 
-  reset_wr <= '0' when wr_add_bin = depth_bin else
+  reset_wr <= '0' when wr_add = depth_std else
               '1';
-  reset_rd <= '0' when rd_add_bin = depth_bin else
+  reset_rd <= '0' when rd_add = depth_std else
               '1';
 
   -- Counter
@@ -106,42 +108,31 @@ begin
       rd_ack      => rd_ack,
       wr_clk      => wr_clk,
       wr_data     => wr_data,
-      rd_add_gray => rd_add_gray,
-      wr_add_gray => wr_add_gray);
+      rd_add => rd_add,
+      wr_add => wr_add);
 
-
-
-  -- Address Gray and Bin
-  Gray2bin_1 : entity work.Gray2bin
-    generic map (
-      depth => depth)
-    port map (
-      rd_add_gray => rd_add_gray,
-      wr_add_gray => wr_add_gray,
-      rd_add_bin  => rd_add_bin,
-      wr_add_bin  => wr_add_bin);
 
 
   -- Flags
-  Flag_full : process (rd_add_bin, reset_n, wr_add_bin) is
-    variable wr_add_bin_f : std_logic_vector(bit_width(depth)-1 downto 0);
+  Flag_full : process (rd_add, reset_n, wr_add) is
+    variable wr_add_f : std_logic_vector(bit_width(depth)-1 downto 0);
   begin
-    wr_add_bin_f := std_logic_vector(to_unsigned(to_integer(unsigned(wr_add_bin)) +1, bit_width(depth)));
+    wr_add_f := wr_add +'1';
     if reset_n = '0' then
       full <= '0';
-    elsif wr_add_bin_f = rd_add_bin then
+    elsif wr_add_f = rd_add then
       full <= '1';
     else
       full <= '0';
     end if;
   end process Flag_full;
 
-  Flag_empty : process (rd_add_bin, reset_n, wr_add_bin) is
+  Flag_empty : process (rd_add, reset_n, wr_add) is
   begin
     if reset_n = '0' then
       empty   <= '1';
       rd_send <= '0';
-    elsif rd_add_bin = wr_add_bin then
+    elsif rd_add = wr_add then
       empty   <= '1';
       rd_send <= '0';
     else

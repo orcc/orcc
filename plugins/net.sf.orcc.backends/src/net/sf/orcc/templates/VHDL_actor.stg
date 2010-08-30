@@ -755,7 +755,7 @@ schedulerAckFSM(actions, fsm) ::= <<
 $
 if(actions)
 $
-$schedulingTestAck(actions)$
+$schedulingTest(actions)$
 else
   case FSM is
   $switchAck(fsm.transitions)$
