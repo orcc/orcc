@@ -356,7 +356,8 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Returns the Greatest Lower Bound of the given types.
+	 * Returns the Greatest Lower Bound of the given types. The GLB is the
+	 * smallest type of (t1, t2).
 	 * 
 	 * @param t1
 	 *            a type
@@ -492,6 +493,70 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
+	 * Returns the type for an addition whose left operand has type t1 and right
+	 * operand has type t2. Result has type String if t1 or t2 is a String,
+	 * lub(t1, t2) + 1 for integers (signed or not), and lub(t1, t2) for other
+	 * types.
+	 * 
+	 * @param t1
+	 *            type of left operand
+	 * @param t2
+	 *            type of right operand
+	 * @param source
+	 *            source object
+	 * @param feature
+	 *            feature
+	 * @return type of the addition
+	 */
+	private Type getTypeAdd(Type t1, Type t2, EObject source, int feature) {
+		if (t1.isString()) {
+			if (t2.isList()) {
+				error("Cannot convert " + t2 + " to String", source, feature);
+				return null;
+			} else {
+				return t1;
+			}
+		}
+
+		if (t2.isString()) {
+			if (t1.isList()) {
+				error("Cannot convert " + t1 + " to String", source, feature);
+				return null;
+			} else {
+				return t1;
+			}
+		}
+
+		if (t1.isBool() || t2.isBool()) {
+			error("Addition is not defined for booleans", source, feature);
+			return null;
+		}
+
+		Type type = getLub(t1, t2);
+		if (type == null) {
+			return null;
+		}
+
+		if (type.isInt()) {
+			TypeInt typeInt = (TypeInt) type;
+			int size = typeInt.getSize() + 1;
+			if (size > maxSize) {
+				size = maxSize;
+			}
+			typeInt.setSize(size);
+		} else if (type.isUint()) {
+			TypeUint typeUint = (TypeUint) type;
+			int size = typeUint.getSize() + 1;
+			if (size > maxSize) {
+				size = maxSize;
+			}
+			typeUint.setSize(size);
+		}
+
+		return type;
+	}
+
+	/**
 	 * Returns the type of a binary expression whose left operand has type t1
 	 * and right operand has type t2, and whose operator is given.
 	 * 
@@ -528,8 +593,6 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		case BITOR:
 		case BITXOR:
-		case MINUS:
-		case TIMES:
 			if (!t1.isInt() && !t1.isUint()) {
 				error("Cannot convert " + t1 + " to int/uint", source, feature);
 				return null;
@@ -540,30 +603,14 @@ public class TypeChecker extends CalSwitch<Type> {
 			}
 			return getLub(t1, t2);
 
+		case TIMES:
+			return getTypeTimes(t1, t2, source, feature);
+
+		case MINUS:
+			return getTypeMinus(t1, t2, source, feature);
+
 		case PLUS:
-			if (t1.isString()) {
-				if (t2.isList()) {
-					error("Cannot convert " + t2 + " to String", source,
-							feature);
-					return null;
-				} else {
-					return t1;
-				}
-			}
-			if (t2.isString()) {
-				if (t1.isList()) {
-					error("Cannot convert " + t1 + " to String", source,
-							feature);
-					return null;
-				} else {
-					return t1;
-				}
-			}
-			if (t1.isBool() || t2.isBool()) {
-				error("Addition is not defined for booleans", source, feature);
-				return null;
-			}
-			return getLub(t1, t2);
+			return getTypeAdd(t1, t2, source, feature);
 
 		case DIV:
 		case DIV_INT:
@@ -657,6 +704,54 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
+	 * Returns the type for a subtraction whose left operand has type t1 and
+	 * right operand has type t2. Result has lub(t1, t2) + 1 for integers.
+	 * 
+	 * @param t1
+	 *            type of left operand
+	 * @param t2
+	 *            type of right operand
+	 * @param source
+	 *            source object
+	 * @param feature
+	 *            feature
+	 * @return type of the subtraction
+	 */
+	private Type getTypeMinus(Type t1, Type t2, EObject source, int feature) {
+		if (!t1.isInt() && !t1.isUint()) {
+			error("Cannot convert " + t1 + " to int/uint", source, feature);
+			return null;
+		}
+		if (!t2.isInt() && !t2.isUint()) {
+			error("Cannot convert " + t2 + " to int/uint", source, feature);
+			return null;
+		}
+
+		Type type = getLub(t1, t2);
+		if (type == null) {
+			return null;
+		}
+
+		if (type.isInt()) {
+			TypeInt typeInt = (TypeInt) type;
+			int size = typeInt.getSize() + 1;
+			if (size > maxSize) {
+				size = maxSize;
+			}
+			typeInt.setSize(size);
+		} else if (type.isUint()) {
+			TypeUint typeUint = (TypeUint) type;
+			int size = typeUint.getSize() + 1;
+			if (size > maxSize) {
+				size = maxSize;
+			}
+			typeUint.setSize(size);
+		}
+
+		return type;
+	}
+
+	/**
 	 * Returns the type for a left shift whose left operand has type t1 and
 	 * right operand has type t2.
 	 * 
@@ -681,18 +776,16 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		int s2;
+		int shift;
 		if (t2.isInt()) {
-			s2 = ((TypeInt) t2).getSize();
+			// shift is unsigned, so we do not take the bit sign into account
+			shift = ((TypeInt) t2).getSize() - 1;
 		} else if (t2.isUint()) {
-			s2 = ((TypeUint) t2).getSize();
+			shift = ((TypeUint) t2).getSize();
 		} else {
 			error("Cannot convert " + t2 + " to int/uint", source, feature);
 			return null;
 		}
-
-		// shift is unsigned, so we do not take the bit sign into account
-		int shift = s2 - 1;
 
 		int size;
 		// 1 << 6 = 64
@@ -706,6 +799,60 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		return IrFactory.eINSTANCE.createTypeInt(size);
+	}
+
+	/**
+	 * Returns the type for a multiplication whose left operand has type t1 and
+	 * right operand has type t2. Result has size(t1) + size(t2) for integers.
+	 * 
+	 * @param t1
+	 *            type of left operand
+	 * @param t2
+	 *            type of right operand
+	 * @param source
+	 *            source object
+	 * @param feature
+	 *            feature
+	 * @return type of the multiplication
+	 */
+	private Type getTypeTimes(Type t1, Type t2, EObject source, int feature) {
+		int s1;
+		if (t1.isInt()) {
+			s1 = ((TypeInt) t1).getSize();
+		} else if (t1.isUint()) {
+			s1 = ((TypeUint) t1).getSize();
+		} else {
+			error("Cannot convert " + t1 + " to int/uint", source, feature);
+			return null;
+		}
+
+		int s2;
+		if (t2.isInt()) {
+			s2 = ((TypeInt) t2).getSize();
+		} else if (t2.isUint()) {
+			s2 = ((TypeUint) t2).getSize();
+		} else {
+			error("Cannot convert " + t2 + " to int/uint", source, feature);
+			return null;
+		}
+
+		Type type = getLub(t1, t2);
+		if (type == null) {
+			return null;
+		}
+
+		int size = s1 + s2;
+		if (size > maxSize) {
+			size = maxSize;
+		}
+
+		if (type.isInt()) {
+			((TypeInt) type).setSize(size);
+		} else if (type.isUint()) {
+			((TypeUint) type).setSize(size);
+		}
+
+		return type;
 	}
 
 	/**
