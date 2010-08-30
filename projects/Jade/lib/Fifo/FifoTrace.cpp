@@ -96,6 +96,11 @@ void FifoTrace::declareFifoHeader (){
 	parseFifoStructs();
 	parseExternFunctions();
 	parseFifoFunctions();
+	parseFifoVars();
+}
+
+void FifoTrace::parseFifoVars (){
+
 }
 
 void FifoTrace::parseHeader (){

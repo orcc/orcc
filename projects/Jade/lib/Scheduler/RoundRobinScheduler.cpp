@@ -66,6 +66,7 @@ using namespace llvm;
 
 
 extern cl::opt<std::string> VidFile;
+extern cl::opt<bool> nodisplay;
 
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder* decoder): Context(C) {
 	this->jit = jit;
@@ -74,7 +75,10 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder
 	
 	//Connect decoder to input and output of Jade
 	setSource();
-	setDisplay();
+
+	if(!nodisplay){
+		setDisplay();
+	}
 }
 
 RoundRobinScheduler::~RoundRobinScheduler (){

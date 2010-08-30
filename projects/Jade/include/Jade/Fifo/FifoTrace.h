@@ -178,6 +178,9 @@ private:
     */
 	void parseHeader();
 
+	/** Extern variables */
+	std::map<std::string,llvm::Function*> externVar;
+
 	/**
     * @brief add fifo functions into the given decoder
 	*
@@ -196,6 +199,12 @@ private:
 	*
     */
 	void parseFifoStructs();
+
+	/**
+    * @brief Parse fifo variables
+	*
+    */
+	void parseFifoVars();
 
 	/**
     * @brief add fifo function corresponding to the given name into the given decoder

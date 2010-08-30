@@ -28,6 +28,10 @@ llvm::cl::opt<bool> ForceInterpreter("force-interpreter",
                                  llvm::cl::desc("Force interpretation: disable JIT"),
                                  llvm::cl::init(false));
 
+llvm::cl::opt<bool> nodisplay("nodisplay",
+                                 llvm::cl::desc("Deactivate display"),
+                                 llvm::cl::init(false));
+
 llvm::cl::opt<std::string> MArch("march",
         llvm::cl::desc("Architecture to generate assembly for (see --version)"));
 

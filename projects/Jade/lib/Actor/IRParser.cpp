@@ -67,6 +67,7 @@ using namespace std;
 using namespace llvm;
 
 extern cl::opt<std::string> VTLDir;
+extern cl::opt<bool> nodisplay;
 
 
 IRParser::IRParser(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo) : Context(C){
@@ -83,6 +84,13 @@ Actor* IRParser::parseActor(string classz){
 		file = classz.substr(found + 1);
 	}else {
 		file = classz;
+	}
+
+	//Don't load actor display if option nodisplay is selected
+	if(nodisplay){
+		if (classz.compare("Display")==0){
+			file = "nodisplay";
+		}
 	}
 	
 	Module* module = jit->LoadBitcode(file, VTLDir);

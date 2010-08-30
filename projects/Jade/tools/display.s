@@ -120,12 +120,6 @@ return:                                           ; preds = %bb8
 !13 = metadata !{metadata !"set_init", i1 1 , void(...)* @set_init}
 !14 = metadata !{metadata !"write_mb", i1 1 , void(i8*)* @write_mb}
 
-declare void @set_video(i32, i32)
-
-declare void @set_init()
-
-declare void @write_mb(i8*)
-
 %struct.FILE = type { i8*, i32, i8*, i32, i32, i32, i32, i8* }
 
 %struct.fifo_i8_s = type opaque
