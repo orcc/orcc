@@ -119,7 +119,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool          direct_8x8_inference_flag;
 
 	//Size of TotalCoeffTab must be >= PicWidthInMb + 1 and must be equal to pow(2,n) for masking bits easily.
-	List( type: List(type: uint(size=5), size=16),size= SZ_TOTALCOEFF) TotalCoeffTab := [[0:for int s in 0 .. 15]: for int s in 0 .. SZ_TOTALCOEFF-1];
+	List( type: List(type: uint(size=5), size=16),size= SZ_TOTALCOEFF) TotalCoeffTabLuma   := [[0:for int s in 0 .. 15]: for int s in 0 .. SZ_TOTALCOEFF-1];
+	List( type: List( type: List(type: uint(size=5), size=16),size= SZ_TOTALCOEFF), size=2) TotalCoeffTabChroma := [[[0:for int s in 0 .. 15]: for int s in 0 .. SZ_TOTALCOEFF-1]: for int i in 0 .. 1];
 
 	procedure NextMbAddress()
 	begin
@@ -282,36 +283,54 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			DecMbLayerNumRefIdxLXActive  :[num_ref_idx_l0_active , num_ref_idx_l1_active],
 			DecMbLayerMbFieldDecoding    :[mb_field_decoding_flag],
 			DecMbLayerEntropyCodingMode  :[entropy_coding_mode_flag],
-			DecMbLayerNATab              :[NaTab] repeat 4,
+			DecMbLayerNATab              :[NaTab] repeat 12,
 			DecMbLayerLeftMbExists       :[LMbExists],
-			DecMbLayerNBTab              :[NbTab] repeat 4,
+			DecMbLayerNBTab              :[NbTab] repeat 12,
 			DecMbLayerAboveMbExists      :[AMbExists],
 			DecMbLayerNumC8x8            :[NumC8x8]
 		var
-			List(type: uint(size=5), size=4) NaTab,
-			List(type: uint(size=5), size=4) NbTab,
+			List(type: uint(size=5), size=12) NaTab,
+			List(type: uint(size=5), size=12) NbTab,
 			bool LMbExists,
 			bool AMbExists
 		do
 				if((CurrMbAddr mod PicWidthInMbs) != 0) then
-					NaTab := [ TotalCoeffTab[ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 5],
-					           TotalCoeffTab[ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 7],
-					           TotalCoeffTab[ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][13],
-					           TotalCoeffTab[ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][15]  ];
+					NaTab := [ TotalCoeffTabLuma  [ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 5],
+					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 7],
+					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][13],
+					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][15],
+					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 5],
+					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 7],
+					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][13],
+					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][15],
+					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 5],
+					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 7],
+					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][13],
+					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][15]
+					         ];
 					LMbExists := true;
 				else
-					NaTab     := [0:for int i in 0 ..4];
+					NaTab     := [0:for int i in 0 .. 11];
 					LMbExists := false;
 				end
 				if(CurrMbAddr / PicWidthInMbs != 0)then
 					AMbExists := true;
-					NbTab := [ TotalCoeffTab[ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
-					           TotalCoeffTab[ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
-					           TotalCoeffTab[ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
-					           TotalCoeffTab[ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][15]  ];
+					NbTab := [ TotalCoeffTabLuma  [ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
+					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
+					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
+					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][15],
+					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
+					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
+					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
+					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][15],
+					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
+					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
+					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
+					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][15]
+					         ];
 				else
 					AMbExists := false;
-					NbTab := [0:for int i in 0 ..4];
+					NbTab := [0:for int i in 0 .. 11];
 				end
 		end
 

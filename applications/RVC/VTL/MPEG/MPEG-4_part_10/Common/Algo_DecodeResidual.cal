@@ -62,7 +62,10 @@ actor Algo_DecodeResidual()
 
 	uint(size=2) LUMA_COMPONENT      = 0;
 	uint(size=2) CHROMA_DC_COMPONENT = 1;
-	uint(size=2) CHROMA_AC_COMPONENT = 1;
+	uint(size=2) CHROMA_AC_COMPONENT = 2;
+
+	uint(size=1) iCb = 0;
+	uint(size=1) iCr = 1;
 
 	uint(size=2) RESIDUAL_LUMA_LUMA_OUTPUT := 0;
 	uint(size=2) RESIDUAL_LUMA_CHROMA1_OUTPUT := 0;
@@ -84,7 +87,8 @@ actor Algo_DecodeResidual()
 	uint(size=6)  CodedBlockPatternLuma;
 	uint(size=6)  CodedBlockPatternChroma;
 	uint(size=4)  ActorSelected;
-	List(type: uint(size=5), size = 24 ) TotalCoeffTab;
+	List(type: uint(size=5), size = 24 ) TotalCoeffTabLuma;
+	List(type: List(type: uint(size=5), size = 24 ), size=2) TotalCoeffTabChroma;
 	List(type: bool        , size = 24 ) MbExists := [true : for int s in 0 .. 23];
 	List(type: uint(size=5), size = 16 ) IdxLeftNeighbour  = [16, 0,17, 2, 1, 4, 3, 6,18, 8,19,10, 9,12,11,14];
 	List(type: uint(size=5), size = 16 ) IdxAboveNeighbour = [20,21, 0, 1,22,23, 4, 5, 2, 3, 6, 7, 8, 9,12,13];
@@ -106,8 +110,8 @@ actor Algo_DecodeResidual()
 			TransfSz8x8       :[ValTransfSz8x8],
 			CodBlkPatnLm      :[ValCodBlkPatnLm],
 			CodBlkPatnChm     :[ValCodBlkPatnChm],
-			NATab             :[ValNATab] repeat 4,
-			NBTab             :[ValNBTab] repeat 4,
+			NATab             :[ValNATab] repeat 12,
+			NBTab             :[ValNBTab] repeat 12,
 			LeftMbExists      :[ValLeftMbExists],
 			AboveMbExists     :[ValAboveMbExists],
 			ChromaArrayType   :[ValChromaArrayType],
@@ -125,7 +129,6 @@ actor Algo_DecodeResidual()
 			CodedBlockPatternChroma  := ValCodBlkPatnChm;
 			chroma_array_type        := ValChromaArrayType;
 			NumC8x8                  := ValNum_C8x8;
-
 			ActorSelected :=
 				if(entropy_coding_mode_flag = CAVLC_ENTROPY)then
 					RESIDUAL_BLOCK_CAVLC
@@ -134,12 +137,16 @@ actor Algo_DecodeResidual()
 				end;
 			foreach int i in 0 .. 3
 			do
-				TotalCoeffTab[16+i] := ValNATab[i];
-				MbExists     [16+i] := ValLeftMbExists;
-				TotalCoeffTab[20+i] := ValNBTab[i];
-				MbExists     [20+i] := ValAboveMbExists;
-			end
+				TotalCoeffTabLuma  [16+i]      := ValNATab[i];
+				TotalCoeffTabChroma[iCb][16+i] := ValNATab[4+i];
+				TotalCoeffTabChroma[iCr][16+i] := ValNATab[8+i];
+				MbExists           [16+i]      := ValLeftMbExists;
 
+				TotalCoeffTabLuma  [20+i]      := ValNBTab[i];
+				TotalCoeffTabChroma[iCb][20+i] := ValNBTab[4+i];
+				TotalCoeffTabChroma[iCr][20+i] := ValNBTab[8+i];
+				MbExists           [20+i]      := ValAboveMbExists;
+			end
 			ResidualLumaOutput := RESIDUAL_LUMA_LUMA_OUTPUT;
 
 			i8x8Loop      := 0;
@@ -297,12 +304,12 @@ actor Algo_DecodeResidual()
 			int(size=8) nC
 		do
 			if(Component_type = LUMA_COMPONENT)then
-				println("\t\t Idx : "+IdxCurrMb+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTab[IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTab[IdxAboveNeighbour[IdxCurrMb]]);
+				println("\t\t Idx : "+IdxCurrMb+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]]);
 				nC :=
 					if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
-						rshift(TotalCoeffTab[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTab[IdxAboveNeighbour[IdxCurrMb]] +1, 1)
+						rshift(TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]] +1, 1)
 					else
-						TotalCoeffTab[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTab[IdxAboveNeighbour[IdxCurrMb]]
+						TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]]
 					end;
 			else
 				if(Component_type = CHROMA_DC_COMPONENT) then
@@ -313,8 +320,13 @@ actor Algo_DecodeResidual()
 							-2
 						end;
 				else
-					println("Component_type != LUMA_COMPONENT ... not implemented yet !!! ");
-					while true do end
+					println("\t\t Idx : "+IdxCurrMb+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]]);
+					nC :=
+						if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
+							rshift(TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]] + 1, 1)
+						else
+							TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]]
+						end;
 				end
 			end
 			IdxCurrMb := IdxCurrMb + 1;
@@ -324,7 +336,11 @@ actor Algo_DecodeResidual()
 			Total_Coeff:[ValTotal_Coeff]
 				==>
 		do
-			TotalCoeffTab[IdxCurrMb - 1] := ValTotal_Coeff;
+			if(Component_type = LUMA_COMPONENT)then
+				TotalCoeffTabLuma[IdxCurrMb - 1]   := ValTotal_Coeff;
+			else
+				TotalCoeffTabChroma[iCbCrLoop - 1][IdxCurrMb - 1] := ValTotal_Coeff;
+			end
 		end
 
 	ChromaArrayTypeVal.IsEqualTo1or2: action
@@ -375,9 +391,13 @@ actor Algo_DecodeResidual()
 		do
 			iCbCrLoop := iCbCrLoop + 1;
 			i8x8Loop  := 0;
+			IdxCurrMb := 0;
 		end
 
-	ChromaAcLoopi8x8: action ==>
+	ChromaAcLoopi8x8: action
+			==>
+			LaunchActor :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ],
+			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
 		guard
 			i8x8Loop < NumC8x8
 		do
@@ -531,7 +551,6 @@ actor Algo_DecodeResidual()
 		ChromaArrayTypeVal.IsEqualTo1or2 > ChromaArrayTypeVal.IsEqualTo3 > SendEndResidual;
 		ChromaDCResBlk > ChromaAcComponentPresent;
 		ChromaAcComponentPresent > ChromaAcComponentNotPresent;
-		ChromaAcLoopiCbCr  > SendEndResidual;
-		ChromaAcLoopi8x8 > SendEndResidual;
+		ChromaAcLoopi8x8 > ChromaAcLoopiCbCr > SendEndResidual;
 	end
 end

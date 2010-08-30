@@ -84,8 +84,8 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			maxNumCoeff := ValMaxNumCoeff;
 			println("******************** New Block Cavlc***************************");
 	println("nC : "+nC_Val);
-	println("startIdx"+startIdx);
-	println("endIdx"+endIdx);
+	println("startIdx : "+startIdx);
+	println("endIdx : "+endIdx);
 			zerosLeft := 0;
 		end
 
@@ -96,8 +96,8 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		do
 			TotalCoeff   := bitand(ValueOfVLD,0xFF);
 			TrailingOnes := rshift(ValueOfVLD,8);
-			println("Trailing Ones : "+rshift(ValueOfVLD,8));
 			println("TotalCoeff : "+bitand(ValueOfVLD,0xFF));
+			println("Trailing Ones : "+rshift(ValueOfVLD,8));
 			//if(i==TrailingOnes and TrailingOnes < 3) then
 			//  levelCode := levelCode + 2;
 			//end

@@ -136,8 +136,8 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  num_ref_idx_l0_active;
 	uint(size=5)  num_ref_idx_l1_active;
 	bool          mb_field_decoding;
-	List(type: uint(size=5), size=4) nATab;
-	List(type: uint(size=5), size=4) nBTab;
+	List(type: uint(size=5), size=12) nATab;
+	List(type: uint(size=5), size=12) nBTab;
 	bool          LeftMb_Exists;
 	bool          AboveMb_Exists;
 	uint(size=2)  NumC8x8;
@@ -162,8 +162,8 @@ actor Algo_DecodeMacroblockLayer()
 			NumRefIdxLXActive  :[ValNumRefIdxLXActive] repeat 2,
 			MbFieldDecoding    :[ValMbFieldDecoding],
 			EntropyCodingMode  :[ValEntropyCodingMode],
-			NATab              :[ValNATab] repeat 4,
-			NBTab              :[ValNBTab] repeat 4,
+			NATab              :[ValNATab] repeat 12,
+			NBTab              :[ValNBTab] repeat 12,
 			LeftMbExists       :[ValLeftMbExists],
 			AboveMbExists      :[ValAboveMbExists],
 			Num_C8x8           :[ValNum_C8x8]
@@ -425,8 +425,8 @@ actor Algo_DecodeMacroblockLayer()
 			ResEndIdx            :[15],
 			ResCodBlkPatnLm      :[CodedBlockPatternLuma],
 			ResCodBlkPatnChm     :[CodedBlockPatternChroma],
-			ResNATab             :[nATab] repeat 4,
-			ResNBTab             :[nBTab] repeat 4,
+			ResNATab             :[nATab] repeat 12,
+			ResNBTab             :[nBTab] repeat 12,
 			ResLeftMbExists      :[LeftMb_Exists],
 			ResAboveMbExists     :[AboveMb_Exists],
 			ResChromaArrayType   :[Chroma_Array_Type],
