@@ -20,8 +20,6 @@ int(size=3) MODE , bool SIGNED , int(size=QUANT_SZ) QUANT :
 
 	int QUANT_SZ = 6;
 
-	int DCVAL = 128*8;
-
 	// Bitwidth needed for 'dc_scalar' - see ISO/IEC 14496-2
 	int(size=QUANT_SZ) s_QP;
 
