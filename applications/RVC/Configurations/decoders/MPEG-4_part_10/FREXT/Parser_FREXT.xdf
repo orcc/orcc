@@ -458,4 +458,8 @@
         src="DecodeMacroBlockLayer" src-port="ResNumC8x8"/>
     <Connection dst="DecodeResidual" dst-port="CodBlkPatnChm"
         src="DecodeMacroBlockLayer" src-port="ResCodBlkPatnChm"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="Total_CoeffLuma"
+        src="DecodeResidual" src-port="DecMbLayerTotal_CoeffLuma"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffLuma"
+        src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffLuma"/>
 </XDF>

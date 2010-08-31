@@ -33,7 +33,9 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  NATab,
 	uint(size=5)  NBTab,
 	bool          LeftMbExists,
-	bool          AboveMbExists
+	bool          AboveMbExists,
+
+	uint(size=5)  Total_CoeffLuma
 		==>
 	uint(size=3)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
@@ -63,7 +65,9 @@ actor Algo_DecodeMacroblockLayer()
 	bool          ResLeftMbExists,
 	bool          ResAboveMbExists,
 	uint(size=2)  ResChromaArrayType,
-	uint(size=2)  ResNumC8x8
+	uint(size=2)  ResNumC8x8,
+
+	uint(size=5)  SData_Total_CoeffLuma
 		:
 
 
@@ -180,8 +184,11 @@ actor Algo_DecodeMacroblockLayer()
 			num_ref_idx_l1_active     := ValNumRefIdxLXActive[1];
 			mb_field_decoding         := ValMbFieldDecoding;
 			entropy_coding_mode_flag  := ValEntropyCodingMode;
-			nATab                     := ValNATab;
-			nBTab                     := ValNBTab;
+			foreach int i in 0 .. 11
+			do
+				nATab[i] := ValNATab[i];
+				nBTab[i] := ValNBTab[i];
+			end
 			LeftMb_Exists             := ValLeftMbExists;
 			AboveMb_Exists            := ValAboveMbExists;
 			NumC8x8                   := ValNum_C8x8;
@@ -199,8 +206,9 @@ actor Algo_DecodeMacroblockLayer()
 			TypeOfVLD    :[   ValTypeOfVLD    ] repeat 257,
 			//Orcc doesn't support it yet :
 			//TypeOfVLD    :[ [BYTE_ALIGNED_REQUIRED] +  [ValTypeOfVLDecod]repeat 256 ],
-			NbBitsToRead :[ BitDepthChromaTab ] repeat 256
-			
+			NbBitsToRead :[ BitDepthChromaTab ] repeat 256,
+
+			SData_Total_CoeffLuma:[[16: for int s in 0 .. 15]] repeat 16			
 		guard
 			    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
 			and (mb_type = BLOCK_TYPE_I_PCM)
@@ -433,6 +441,17 @@ actor Algo_DecodeMacroblockLayer()
 			ResNumC8x8           :[NumC8x8]
 		end
 
+	GetResidualCoeffToken: action
+			Total_CoeffLuma:[CoLu] repeat 16
+				==>
+			SData_Total_CoeffLuma:[CoLu] repeat 16
+		end
+
+	NoResidual: action
+				==>
+			SData_Total_CoeffLuma:[[0: for int s in 0 .. 15]] repeat 16
+		end
+
 	SendEndSliceHeader: action
 				==>
 			SkipNal :[true]
@@ -468,30 +487,32 @@ actor Algo_DecodeMacroblockLayer()
 
 		Check4CodedBlockPattern   (ReadCodedBlockPattern.Asked    )--> ReadCodedBlockPattern;
 		Check4CodedBlockPattern   (ReadMbQpDelta.Asked            )--> ReadMbQpDelta;
-		Check4CodedBlockPattern   (SendEndSliceHeader             )--> ReadMbType_Asked;
+		Check4CodedBlockPattern   (NoResidual                     )--> SendEndSliceHeader;
 	
 		ReadCodedBlockPattern     (ReadCodedBlockPattern.Done     )--> Check4TransformSize8x8;
 
 		Check4TransformSize8x8    (ReadTransformSize8x8.Asked     )--> ReadTransformSize8x8_2;
 		Check4TransformSize8x8    (ReadMbQpDelta.Asked            )--> ReadMbQpDelta;
-		Check4TransformSize8x8    (SendEndSliceHeader             )--> ReadMbType_Asked;
+		Check4TransformSize8x8    (NoResidual                     )--> SendEndSliceHeader;
 
 		ReadTransformSize8x8_2    (ReadTransformSize8x8.Done      )--> Check4MbQpDelta;
 
 		Check4MbQpDelta           (ReadMbQpDelta.Asked            )--> ReadMbQpDelta;
-		Check4MbQpDelta           (SendEndSliceHeader             )--> ReadMbType_Asked;
+		Check4MbQpDelta           (NoResidual                     )--> SendEndSliceHeader;
 
 		ReadMbQpDelta             (ReadMbQpDelta.Done             )--> LaunchResidual;
 
-		LaunchResidual            (LaunchResidual                 )--> SendEndSliceHeader;
+		LaunchResidual            (LaunchResidual                 )--> GetResidualCoeffToken;
+
+		GetResidualCoeffToken     (GetResidualCoeffToken          )--> SendEndSliceHeader;
 
 		SendEndSliceHeader        (SendEndSliceHeader             )--> ReadMbType_Asked;
 	end
 
 	priority
-		CheckMbType.IsIPCM > LaunchSubMbPred > ReadTransformSize.Asked > LaunchMbPred;
+		CheckMbType.IsIPCM          > LaunchSubMbPred     > ReadTransformSize.Asked > LaunchMbPred;
 		ReadCodedBlockPattern.Asked > ReadMbQpDelta.Asked;
-		ReadTransformSize8x8.Asked > ReadMbQpDelta.Asked;
-		ReadMbQpDelta.Asked > SendEndSliceHeader;
+		ReadTransformSize8x8.Asked  > ReadMbQpDelta.Asked;
+		ReadMbQpDelta.Asked         > NoResidual;
 	end
 end

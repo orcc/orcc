@@ -39,7 +39,9 @@ actor Algo_DecodeResidual()
 	int (size=8) ResBlknC,
 	uint(size=5) ResBlkMaxNumCoeff,
 	uint(size=5) ResBlkStartIdx,
-	uint(size=5) ResBlkEndIdx
+	uint(size=5) ResBlkEndIdx,
+
+	uint(size=5) DecMbLayerTotal_CoeffLuma
 		:
 
 	bool         CAVLC_ENTROPY = false;
@@ -135,6 +137,7 @@ actor Algo_DecodeResidual()
 				else
 					RESIDUAL_BLOCK_CABAC
 				end;
+			TotalCoeffTabLuma := [0: for int i in 0 .. 23];
 			foreach int i in 0 .. 3
 			do
 				TotalCoeffTabLuma  [16+i]      := ValNATab[i];
@@ -148,12 +151,13 @@ actor Algo_DecodeResidual()
 				MbExists           [20+i]      := ValAboveMbExists;
 			end
 			ResidualLumaOutput := RESIDUAL_LUMA_LUMA_OUTPUT;
-
 			i8x8Loop      := 0;
 			IdxCurrMb     := 0;
 		end
 
-	ResLumaOutput.IsLuma: action ==>
+	ResLumaOutput.IsLuma: action
+				==>
+			DecMbLayerTotal_CoeffLuma:[TotalCoeffTabLuma] repeat 16
 		guard
 			ResidualLumaOutput = RESIDUAL_LUMA_LUMA_OUTPUT
 		end
@@ -541,6 +545,7 @@ actor Algo_DecodeResidual()
 		SendEndResidual(SendEndResidual )--> GetParameters;
 	a(a)-->undefined;
 	end
+
 	priority
 		ResLuma_Launch16x16DCResBlock  > ResLuma_CheckTransfSzAndCavlc;
 		ResLuma_CheckTransfSzAndCavlc  > a;

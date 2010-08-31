@@ -41,7 +41,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	//Slice Header Parameters
 	uint(size=32) FirstMbInSlice,
 	uint(size=4)  SliceType,
-	bool          MbaffFrame
+	bool          MbaffFrame,
+
+	uint(size=5)  Total_CoeffLuma
 		==>
 	uint(size=3)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
@@ -108,7 +110,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=5)  num_ref_idx_l0_active;
 	uint(size=5)  num_ref_idx_l1_active;
 	//Slice Header Parameters
-	uint(size=32) CurrMbAddr;
+	uint(size=32) CurrMbAddr := 0;
 	uint(size=4)  slice_type;
 	bool          MbaffFrameFlag;
 
@@ -124,7 +126,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 	procedure NextMbAddress()
 	begin
-		CurrMbAddr := CurrMbAddr + 1;
+		CurrMbAddr        := CurrMbAddr + 1;
+		TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
 //		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 //		Mb_y := val_CurrMbAddr / PicWidthInMbs;
 	end
@@ -343,6 +346,17 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			TypeOfVLD   :[         MORE_RBSP_DATA ]
 		end
 
+
+	GetTotalCoeffLuma: action
+		Total_CoeffLuma:[CoLu] repeat 16
+				==>
+		do
+			foreach int i in 0 .. 15
+			do
+				TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)][i] := CoLu[i];
+			end
+		end
+
 	LaunchNextMbAddr: action
 				==>
 		do
@@ -381,7 +395,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 		SendMbLayerParameters      (SendMbLayerParameters               )--> DecodeMacroBlockLayer;
 
-		DecodeMacroBlockLayer      (DecMacroBlockLayer.Launch           )--> ReadMoreDataFlag2;
+		DecodeMacroBlockLayer      (DecMacroBlockLayer.Launch           )--> GetTotalCoeffLuma;
+
+		GetTotalCoeffLuma          (GetTotalCoeffLuma                   )--> ReadMoreDataFlag2;
 
 		ReadMoreDataFlag2          (ReadMoreDataFlag                    )--> LaunchNextMbAddr;
 
