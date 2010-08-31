@@ -43,7 +43,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=4)  SliceType,
 	bool          MbaffFrame,
 
-	uint(size=5)  Total_CoeffLuma
+	uint(size=5)  Total_CoeffLuma,
+	uint(size=5)  Total_CoeffChroma
 		==>
 	uint(size=3)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
@@ -128,6 +129,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	begin
 		CurrMbAddr        := CurrMbAddr + 1;
 		TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
+		println("\n\n\n*** New Mb *** Val = "+CurrMbAddr);
 //		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 //		Mb_y := val_CurrMbAddr / PicWidthInMbs;
 	end
@@ -348,12 +350,15 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 
 	GetTotalCoeffLuma: action
-		Total_CoeffLuma:[CoLu] repeat 16
+		Total_CoeffLuma  :[CoLu]    repeat 16,
+		Total_CoeffChroma:[CoLuChe] repeat 32
 				==>
 		do
 			foreach int i in 0 .. 15
 			do
-				TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)][i] := CoLu[i];
+				TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)][i]      := CoLu[i];
+				TotalCoeffTabChroma[0][bitand(CurrMbAddr ,MASK_TOTALCOEFF)][i] := CoLuChe[i];
+				TotalCoeffTabChroma[1][bitand(CurrMbAddr ,MASK_TOTALCOEFF)][i] := CoLuChe[16+i];
 			end
 		end
 

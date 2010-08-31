@@ -462,4 +462,8 @@
         src="DecodeResidual" src-port="DecMbLayerTotal_CoeffLuma"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffLuma"
         src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffLuma"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="Total_CoeffChroma"
+        src="DecodeResidual" src-port="DecMbLayerTotal_CoeffChroma"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffChroma"
+        src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffChroma"/>
 </XDF>
