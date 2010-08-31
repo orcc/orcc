@@ -168,7 +168,7 @@ actor Algo_DecodeMbPred()
 			Buff := lshift(Buff, 16-CountBit);
 
 			if(BitMissed > 0)then
-				rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] := rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] + mask_bits(rshift(Buff,16-BitMissed),BitMissed);
+				rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] := rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] + rshift(Buff,16-BitMissed);
 				CountBit := CountBit - BitMissed;
 				Buff := lshift(Buff,BitMissed);
 				println("rem_intraYxY_pred_mode["+(lumaYxYBlkIdx - 1)+"] : "+rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1]);
@@ -178,7 +178,7 @@ actor Algo_DecodeMbPred()
 				if(bitand(Buff,0x8000) = 0) then
 					CountBit := CountBit - 1;
 					Buff     := lshift(Buff,1);
-					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := bitand(rshift(Buff,13),0x07);
+					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := rshift(Buff,13);
 					CountBit := CountBit - 3;
 					Buff     := lshift(Buff,3);
 					if(CountBit >= 0)then
