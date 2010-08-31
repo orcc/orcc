@@ -28,13 +28,6 @@
 */
 #include "SDL.h"
 
-#ifdef BENCHMARK
-#include <locale.h>
-#include <time.h>
-FILE * pFile;
-static Uint32 tInit = 0;
-#endif
-
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay;
 
@@ -79,21 +72,17 @@ void display_show_image(void) {
 	SDL_Event event;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
-#ifndef NO_DISPLAY
 	if (SDL_LockYUVOverlay(m_overlay) < 0) {
 		fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
 		press_a_key(-1);
 	}
-#endif
 
 	memcpy(m_overlay->pixels[0], img_buf_y, m_width * m_height );
 	memcpy(m_overlay->pixels[1], img_buf_u, m_width * m_height / 4 );
 	memcpy(m_overlay->pixels[2], img_buf_v, m_width * m_height / 4 );
 
-#ifndef NO_DISPLAY
 	SDL_UnlockYUVOverlay(m_overlay);
 	SDL_DisplayYUVOverlay(m_overlay, &rect);
-#endif
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	num_images_end++;
@@ -102,13 +91,6 @@ void display_show_image(void) {
 		printf("%f images/sec\n",
 			1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
 
-#ifdef BENCHMARK
-		if (tInit == 0)
-			tInit = t2;
-
-		fprintf (pFile, "%d \t %f \n",(t2-tInit),1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
-
-#endif
 		t = t2;
 		num_images_start = num_images_end;
 	}
@@ -187,28 +169,6 @@ static void display_init() {
 
 	start_time = SDL_GetTicks();
 	t = start_time;
-
-#ifdef BENCHMARK
-	{
-		char sFile [80];	
-		time_t rawtime;
-		struct tm * timeinfo;
-
-		time ( &rawtime );
-		timeinfo = localtime ( &rawtime );
-
-		strftime (sFile,80,".//Bench/bench_%d-%m-%y_%H-%M-%S.log",timeinfo);
-
-		pFile = fopen (sFile,"w");
-		if (pFile== NULL)
-		{
-			fprintf(stderr, "Can't create log file, try to disable BENCHMARK preprocessor\n");
-			exit(1);
-		}
-		setlocale(LC_NUMERIC, "");
-		fprintf (pFile, "Time (in ms) \t fps \n");
-	}
-#endif
 
 	atexit(SDL_Quit);
 	atexit(print_fps_avg);
