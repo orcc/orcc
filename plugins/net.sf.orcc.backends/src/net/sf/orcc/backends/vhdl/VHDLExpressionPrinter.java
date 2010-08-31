@@ -32,7 +32,11 @@ package net.sf.orcc.backends.vhdl;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -74,8 +78,69 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		builder.append(", ");
 		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
 		builder.append(", ");
+		if (function == "bitand") {
+			Type sizee = getLub(e1.getType(), e2.getType());
+			int s_e = Cast.getSizeOfType(sizee);	
+			builder.append(s_e + ", ");
+		}
 		builder.append(s_op);
 		builder.append(")");
+	}
+	
+	/**
+	 * Returns the Least Upper Bound of the given types.
+	 * 
+	 * @param t1
+	 *            a type
+	 * @param t2
+	 *            another type
+	 * @return the Least Upper Bound of the given types
+	 */
+	public Type getLub(Type t1, Type t2) {
+		if (t1 == null || t2 == null) {
+			return null;
+		}
+
+		if (t1.isBool() && t2.isBool()) {
+			return t1;
+		} else if (t1.isFloat() && t2.isFloat()) {
+			return t1;
+		} else if (t1.isString() && t2.isString()) {
+			return t1;
+		} else if (t1.isInt() && t2.isInt()) {
+			return IrFactory.eINSTANCE.createTypeInt(Math.max(
+					((TypeInt) t1).getSize(), ((TypeInt) t2).getSize()));
+		} else if (t1.isList() && t2.isList()) {
+			TypeList listType1 = (TypeList) t1;
+			TypeList listType2 = (TypeList) t2;
+			Type type = getLub(listType1.getType(), listType2.getType());
+			if (type != null) {
+				// only return a list when the underlying type is valid
+				int size = Math.max(listType1.getSize(), listType2.getSize());
+				return IrFactory.eINSTANCE.createTypeList(size, type);
+			}
+		} else if (t1.isUint() && t2.isUint()) {
+			return IrFactory.eINSTANCE.createTypeUint(Math.max(
+					((TypeUint) t1).getSize(), ((TypeUint) t2).getSize()));
+		} else if (t1.isInt() && t2.isUint()) {
+			int si = ((TypeInt) t1).getSize();
+			int su = ((TypeUint) t2).getSize();
+			if (si > su) {
+				return IrFactory.eINSTANCE.createTypeInt(si);
+			} else {
+				return IrFactory.eINSTANCE.createTypeInt(su + 1);
+			}
+		} else if (t1.isUint() && t2.isInt()) {
+			int su = ((TypeUint) t1).getSize();
+			int si = ((TypeInt) t2).getSize();
+			if (si > su) {
+				return IrFactory.eINSTANCE.createTypeInt(si);
+			} else {
+				return IrFactory.eINSTANCE.createTypeInt(su + 1);
+			}
+		}
+
+		return null;
 	}
 
 	@Override

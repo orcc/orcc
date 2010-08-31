@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-08-25
+-- Last update: 2010-08-31
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ use IEEE.numeric_std.all;
 
 package orcc_package is
 
-  function bitand (op1      : integer; op2 : integer; size : integer) return integer;
+  function bitand (op1      : integer; op2 : integer; size : integer; sizeresult : integer) return integer;
   function bitor (op1       : integer; op2 : integer; size : integer) return integer;
   function bitxor (op1      : integer; op2 : integer; size : integer) return integer;
   function bitnot (op1      : integer; size : integer) return integer;
@@ -67,41 +67,29 @@ package body orcc_package is
 
   -----------------------------------------------------------------------------
   -- Logical and between op1 and op2
-  function bitand(op1 : integer; op2 : integer; size : integer) return integer is
-    variable arg1 : std_logic_vector(size downto 0);
-    variable arg2 : std_logic_vector(size downto 0);
-    variable arg3 : std_logic_vector(size downto 0);
+  function bitand(op1 : integer; op2 : integer; size : integer; sizeresult : integer) return integer is
+    variable result : std_logic_vector(size downto 0);
   begin
-    arg1 := std_logic_vector(to_signed(op1, size +1));
-    arg2 := std_logic_vector(to_signed(op2, size +1));
-    arg3 := arg1 and arg2;
-    return to_integer(signed(arg3(size -1 downto 0)));
+    result := std_logic_vector(to_signed(op1, size +1)) and std_logic_vector(to_signed(op2, size +1));
+    return to_integer(signed(result(sizeresult -1 downto 0)));
   end function;
 
   -----------------------------------------------------------------------------
   -- Logical or between op1 and op2
   function bitor(op1 : integer; op2 : integer; size : integer) return integer is
-    variable arg1 : std_logic_vector(size downto 0);
-    variable arg2 : std_logic_vector(size downto 0);
-    variable arg3 : std_logic_vector(size downto 0);
+    variable result : std_logic_vector(size downto 0);
   begin
-    arg1 := std_logic_vector(to_signed(op1, size +1));
-    arg2 := std_logic_vector(to_signed(op2, size +1));
-    arg3 := arg1 or arg2;
-    return to_integer(signed(arg3(size -1 downto 0)));
+    result := std_logic_vector(to_signed(op1, size +1)) or std_logic_vector(to_signed(op2, size +1));
+    return to_integer(signed(result(size -1 downto 0)));
   end function;
 
   -----------------------------------------------------------------------------
   -- Logical xor between op1 and op2
   function bitxor(op1 : integer; op2 : integer; size : integer) return integer is
-    variable arg1 : std_logic_vector(size downto 0);
-    variable arg2 : std_logic_vector(size downto 0);
-    variable arg3 : std_logic_vector(size downto 0);
+    variable result : std_logic_vector(size downto 0);
   begin
-    arg1 := std_logic_vector(to_signed(op1, size +1));
-    arg2 := std_logic_vector(to_signed(op2, size +1));
-    arg3 := arg1 xor arg2;
-    return to_integer(signed(arg3(size -1 downto 0)));
+    result := std_logic_vector(to_signed(op1, size +1)) xor std_logic_vector(to_signed(op2, size +1));
+    return to_integer(signed(result(size -1 downto 0)));
   end function;
 
   -----------------------------------------------------------------------------
