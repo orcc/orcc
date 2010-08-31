@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-01
+-- Last update: 2010-08-31
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -75,7 +75,6 @@ architecture arch_fifo_generic of fifo_generic is
 
   signal rd_address : std_logic_vector(bit_width(depth)-1 downto 0);
   signal wr_address : std_logic_vector(bit_width(depth)-1 downto 0);
-
 begin
   
   controler_1 : entity work.controler
@@ -83,16 +82,16 @@ begin
       depth => depth,
       width => width)
     port map (
-      reset_n     => reset_n,
-      rd_clk      => rd_clk,
-      rd_add_gray => rd_address,
-      rd_send     => send,
-      wr_clk      => wr_clk,
-      wr_add_gray => wr_address,
-      empty       => empty,
-      full        => full,
-      wr_data     => wr_data,
-      rd_ack      => rd_ack);
+      reset_n => reset_n,
+      rd_clk  => rd_clk,
+      rd_add  => rd_address,
+      rd_send => send,
+      wr_clk  => wr_clk,
+      wr_add  => wr_address,
+      empty   => empty,
+      full    => full,
+      wr_data => wr_data,
+      rd_ack  => rd_ack);
 
   ram_generic_1 : entity work.ram_generic
     generic map (

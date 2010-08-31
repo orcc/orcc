@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-08-30
+-- Last update: 2010-08-31
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -57,17 +57,17 @@ entity controler is
     depth : integer := 32;
     width : integer := 32);
   port (
-    reset_n     : in    std_logic;
-    rd_clk      : in    std_logic;
-    rd_ack      : in    std_logic;
-    rd_send     : out   std_logic;
-    rd_add_gray : inout std_logic_vector(bit_width(depth)-1 downto 0);
-    wr_clk      : in    std_logic;
-    wr_data     : in    std_logic;
-    wr_add_gray : inout std_logic_vector(bit_width(depth)-1 downto 0);
+    reset_n : in    std_logic;
+    rd_clk  : in    std_logic;
+    rd_ack  : in    std_logic;
+    rd_send : out   std_logic;
+    rd_add  : inout std_logic_vector(bit_width(depth)-1 downto 0);
+    wr_clk  : in    std_logic;
+    wr_data : in    std_logic;
+    wr_add  : inout std_logic_vector(bit_width(depth)-1 downto 0);
     --
-    empty       : out   std_logic;
-    full        : out   std_logic
+    empty   : out   std_logic;
+    full    : out   std_logic
     );
 end controler;
 
@@ -83,10 +83,8 @@ architecture archcontroler of controler is
   constant depth_std : std_logic_vector(bit_width(depth)-1 downto 0)
     := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
   --
-  signal wr_add : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal rd_add : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal reset_rd   : std_logic;
-  signal reset_wr   : std_logic;
+  signal reset_rd : std_logic;
+  signal reset_wr : std_logic;
   --
   
 begin
@@ -101,15 +99,15 @@ begin
     generic map (
       depth => depth)
     port map (
-      reset_n     => reset_n,
-      reset_rd    => reset_rd,
-      reset_wr    => reset_wr,
-      rd_clk      => rd_clk,
-      rd_ack      => rd_ack,
-      wr_clk      => wr_clk,
-      wr_data     => wr_data,
-      rd_add => rd_add,
-      wr_add => wr_add);
+      reset_n  => reset_n,
+      reset_rd => reset_rd,
+      reset_wr => reset_wr,
+      rd_clk   => rd_clk,
+      rd_ack   => rd_ack,
+      wr_clk   => wr_clk,
+      wr_data  => wr_data,
+      rd_add   => rd_add,
+      wr_add   => wr_add);
 
 
 
