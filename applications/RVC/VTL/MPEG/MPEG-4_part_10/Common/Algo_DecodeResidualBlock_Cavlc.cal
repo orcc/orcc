@@ -86,6 +86,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	println("nC : "+nC_Val);
 	println("startIdx : "+startIdx);
 	println("endIdx : "+endIdx);
+	println("maxNumCoeff : "+ValMaxNumCoeff);
 			zerosLeft := 0;
 		end
 
