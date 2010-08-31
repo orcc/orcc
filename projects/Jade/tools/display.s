@@ -73,6 +73,7 @@ bb4:                                              ; preds = %bb3
 
 bb5:                                              ; preds = %bb4
   call void (...)* @set_init() nounwind
+  store i32 1, i32* @init, align 4
   br label %bb6
 
 bb6:                                              ; preds = %bb5, %bb4

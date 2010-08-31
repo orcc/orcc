@@ -156,8 +156,6 @@ void display_write_mb(unsigned char tokens[384]) {
 	}
 }
 
-static int init = 0;
-
 static void display_init() {
 	// First, initialize SDL's video subsystem.
 	if (SDL_Init( SDL_INIT_VIDEO ) < 0) {
@@ -172,8 +170,6 @@ static void display_init() {
 
 	atexit(SDL_Quit);
 	atexit(print_fps_avg);
-
-	init = 1;
 }
 
 static void display_set_video(int width, int height) {
