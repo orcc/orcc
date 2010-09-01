@@ -241,7 +241,6 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				else
 					true
 				end;
-			println("\t\tmore_rbsp_data() : "+ValueOfVLD);
 		end
 
 	CheckMoreDataFlag.IsEqualToTrue: action

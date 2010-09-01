@@ -4685,7 +4685,7 @@ actor Algo_VariableLengthDecoding()
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 2
 					[  0 ,  0 ,  0 ,  0 ,   0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 3
-					[  0 ,  0 ,  0  ,  3 ,  6 ,  5 ,  4 ,  1 ],
+					[  0 ,  0 ,  0  ,  8 ,  6 ,  5 ,  4 ,  1 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 4
 					[  0 ,  0 ,  9  ,  7 ,  3 ,  2 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 4 ; nbBitRead = 5

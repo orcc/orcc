@@ -9474,7 +9474,6 @@ end
 		if(DEBUG_NEW_PARSER) then
 			println("TotalCoeff : "+TotalCoeff());
 			println("Trailing Ones : "+TrailingOnes());
-			println("\t\t Idx : "+luma4x4BlkIdx);
 		end
 		//println("Residual_block_read_suffixLength");
 		if leveltype = 1 then //luma
@@ -9601,11 +9600,15 @@ end
 	do
 		//println("Residual_block_read_total_zeros_done");
 		//if( TotalCoeff( coeff_token ) < endIdx startIdx + 1 )
-		if TotalCoeff() < block_endIdx - block_startIdx +1 then zerosLeft := total_zeros; else zerosLeft := 0; end
-		inc_nb_coeff := 0;
-		if(DEBUG_NEW_PARSER) then
-			println("total_zeros : "+total_zeros);
+		if TotalCoeff() < block_endIdx - block_startIdx +1 then
+			zerosLeft := total_zeros;
+			if(DEBUG_NEW_PARSER) then
+				println("total_zeros : "+total_zeros);
+			end
+		else
+			zerosLeft := 0;
 		end
+		inc_nb_coeff := 0;
 	end
 
 	//for( i = 0; i < TotalCoeff( coeff_token ) 1; i++ )
@@ -9678,7 +9681,6 @@ end
 		if(DEBUG_NEW_PARSER) then
 			println("TotalCoeff : "+TotalCoeff());
 			println("Trailing Ones : "+TrailingOnes());
-			println("\t\t Idx : "+luma4x4BlkIdx);
 		end
 		if leveltype < 2 then //luma
 			NonZeroCount[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]] := 0;
