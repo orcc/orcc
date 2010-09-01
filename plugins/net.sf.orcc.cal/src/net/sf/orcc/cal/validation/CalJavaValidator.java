@@ -109,7 +109,28 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public void checkAction(AstAction action) {
 		checkActionTag(action);
 		checkActionVariables(action);
+		checkActionInputs(action.getInputs());
 		checkActionOutputs(action.getOutputs());
+	}
+
+	/**
+	 * Checks the input pattern.
+	 * 
+	 * @param inputs
+	 *            the input patterns of an action
+	 */
+	private void checkActionInputs(List<AstInputPattern> inputs) {
+		Set<String> names = new HashSet<String>();
+
+		for (AstInputPattern pattern : inputs) {
+			// check duplicate ports in output pattern
+			String name = pattern.getPort().getName();
+			if (names.contains(name)) {
+				error("Duplicate port " + name + " in input pattern", pattern,
+						CalPackage.AST_INPUT_PATTERN__PORT);
+			}
+			names.add(name);
+		}
 	}
 
 	/**
@@ -119,7 +140,17 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	 *            the output patterns of an action
 	 */
 	private void checkActionOutputs(List<AstOutputPattern> outputs) {
+		Set<String> names = new HashSet<String>();
+
 		for (AstOutputPattern pattern : outputs) {
+			// check duplicate ports in output pattern
+			String name = pattern.getPort().getName();
+			if (names.contains(name)) {
+				error("Duplicate port " + name + " in output pattern", pattern,
+						CalPackage.AST_OUTPUT_PATTERN__PORT);
+			}
+			names.add(name);
+
 			AstExpression astRepeat = pattern.getRepeat();
 			if (astRepeat != null) {
 				int repeat = new AstExpressionEvaluator(this)

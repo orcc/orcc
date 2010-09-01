@@ -1,0 +1,7 @@
+actor DuplicatePort1 () int(size=3) I ==> int(size=3) O :
+
+	action I:[ a ], I:[ b ] ==>
+	do
+	end
+
+end
