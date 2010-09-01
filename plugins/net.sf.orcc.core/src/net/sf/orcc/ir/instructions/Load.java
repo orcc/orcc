@@ -130,12 +130,13 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 
 	/**
 	 * Sets the indexes of this load instruction. Uses are updated to point to
-	 * this instruction.
+	 * this instruction. This method is internal. Indexes should be modified
+	 * solely using the {@link #getIndexes()} method.
 	 * 
 	 * @param indexes
 	 *            a list of expressions
 	 */
-	public void setIndexes(List<Expression> indexes) {
+	private void setIndexes(List<Expression> indexes) {
 		if (this.indexes != null) {
 			Use.removeUses(this, this.indexes);
 		}
