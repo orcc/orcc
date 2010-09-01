@@ -138,8 +138,6 @@ actor Algo_DecodeResidual()
 				else
 					RESIDUAL_BLOCK_CABAC
 				end;
-			println("CodedBlockPatternChroma : "+CodedBlockPatternChroma);
-			println("CodedBlockPatternLuma : "+CodedBlockPatternLuma);
 			TotalCoeffTabLuma   := [0: for int i in 0 .. 23];
 			TotalCoeffTabChroma := [[0: for int i in 0 .. 23]: for int j in 0 .. 1];
 			foreach int i in 0 .. 3

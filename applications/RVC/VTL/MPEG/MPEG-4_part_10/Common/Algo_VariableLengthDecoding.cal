@@ -3523,7 +3523,7 @@ actor Algo_VariableLengthDecoding()
 					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 1
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 2
-					[  0,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					[  2,  1 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 3
 					[  0,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff = 4 ; TotalCoeff = 2 ; nbBitRead = 4
@@ -5778,7 +5778,7 @@ actor Algo_VariableLengthDecoding()
 			==>
 			ValDecoded :[TotalCoeffValue[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)]]
 		do
-			println("Cavlc; Idx_nc :" + Idx_nC + " ; NbBitsRead : "+NbBitsRead+ " ; coeff_token : "+coeff_token);
+			println("Cavlc CoeffToken; Idx_nc :" + Idx_nC + " ; NbBitsRead : "+NbBitsRead+ " ; coeff_token : "+coeff_token);
 		end
 
 
@@ -5843,6 +5843,8 @@ actor Algo_VariableLengthDecoding()
 	GetCavlcTotalZeros.Finished: action
 				==>
 			ValDecoded :[TotalZerosValue[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]]
+		do
+			println("Cavlc TotalZeros; Idx :" + IdxmaxNumCoeff +" ; TotalCoeff :"+TotalCoeffParam+ " ; NbBitsRead : "+NbBitsRead+ " ; Codeword : "+ValRead);
 		end
 
 

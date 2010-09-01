@@ -1627,7 +1627,7 @@ actor Algo_Synp_AVC_FREXT()
 						coeff_token := VLC_nC_0to2[i][2];
 						NewCoeff := false;
 						if(DEBUG_NEW_PARSER) then
-							println("Cavlc; Idx_nc :" + 0 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+							println("Cavlc CoeffToken; Idx_nc :" + 0 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 						end
 					end
 				else
@@ -1636,7 +1636,7 @@ actor Algo_Synp_AVC_FREXT()
 							coeff_token := VLC_nC_2to4[i][2];
 							NewCoeff := false;
 							if(DEBUG_NEW_PARSER) then
-								println("Cavlc; Idx_nc :" + 1 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+								println("Cavlc CoeffToken; Idx_nc :" + 1 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 							end
 						end
 					else
@@ -1645,7 +1645,7 @@ actor Algo_Synp_AVC_FREXT()
 								coeff_token := VLC_nC_4to8[i][2];
 								NewCoeff := false;
 								if(DEBUG_NEW_PARSER) then
-									println("Cavlc; Idx_nc :" + 2 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+									println("Cavlc CoeffToken; Idx_nc :" + 2 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 								end
 							end
 						else
@@ -1654,7 +1654,7 @@ actor Algo_Synp_AVC_FREXT()
 									coeff_token := VLC_nC_8[i][2];
 									NewCoeff := false;
 									if(DEBUG_NEW_PARSER) then
-										println("Cavlc; Idx_nc :" + 3 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+										println("Cavlc CoeffToken; Idx_nc :" + 3 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 									end
 								end 
 							else
@@ -1663,7 +1663,7 @@ actor Algo_Synp_AVC_FREXT()
 										coeff_token := VLC_nC_1[i][2];
 										NewCoeff := false;
 										if(DEBUG_NEW_PARSER) then
-											println("Cavlc; Idx_nc :" + 4 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+											println("Cavlc CoeffToken; Idx_nc :" + 4 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 										end
 									end
 								else
@@ -1672,7 +1672,7 @@ actor Algo_Synp_AVC_FREXT()
 											coeff_token := VLC_nC_2[i][2];
 											NewCoeff := false;
 											if(DEBUG_NEW_PARSER) then
-													println("Cavlc; Idx_nc :" + 5 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+													println("Cavlc CoeffToken; Idx_nc :" + 5 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 											end
 										end  
 									end
@@ -1688,14 +1688,23 @@ actor Algo_Synp_AVC_FREXT()
 					if maxNumCoeff != 4 and maxNumCoeff !=8 then 
 						if VLD_Counter = VLC_total0[TotalCoeff()-1][i][0] and Codeword = VLC_total0[TotalCoeff()-1][i][1] then 
 							total_zeros := VLC_total0[TotalCoeff()-1][i][2]; NewCoeff := false; 
+							if(DEBUG_NEW_PARSER) then
+									println("Cavlc TotalZeros; Idx :" + 2 +" ; TotalCoeff :"+TotalCoeff()+ " ; NbBitsRead : "+VLD_Counter+ " ; Codeword : "+Codeword);
+							end
 						end
 					else 
 						if maxNumCoeff = 4 then
 							if VLD_Counter = VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][0] and Codeword = VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][1] then 
 								total_zeros := VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][2]; NewCoeff := false; 
+								if(DEBUG_NEW_PARSER) then
+										println("Cavlc TotalZeros; Idx :" + 0 +" ; TotalCoeff :"+TotalCoeff()+ " ; NbBitsRead : "+VLD_Counter+ " ; Codeword : "+Codeword);
+								end
 							end
 						else //maxNumCoeff = 8
 							////println("Chroma DC 2x4 block not implemented");
+								if(DEBUG_NEW_PARSER) then
+										println("Cavlc TotalZeros; Idx :" + 1 +" ; TotalCoeff :"+TotalCoeff()+ " ; NbBitsRead : "+VLD_Counter+ " ; Codeword : "+Codeword);
+								end
 						end
 					end
 				end
