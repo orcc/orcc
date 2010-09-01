@@ -117,7 +117,7 @@ void FifoTrace::parseHeader (){
 		exit(0);
 	}
 
-	externMod = jit->LoadBitcode("extern", ToolsDir);
+	externMod = jit->LoadBitcode("Extern", ToolsDir);
 
 	if (externMod == NULL){
 		fprintf(stderr,"Unable to parse extern functions file");

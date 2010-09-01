@@ -89,7 +89,7 @@ Actor* IRParser::parseActor(string classz){
 	//Don't load actor display if option nodisplay is selected
 	if(nodisplay){
 		if (classz.compare("Display")==0){
-			file = "nodisplay";
+			file = "Nodisplay";
 		}
 	}
 	
