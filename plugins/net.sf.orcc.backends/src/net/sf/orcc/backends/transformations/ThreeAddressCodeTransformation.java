@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -68,7 +69,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 /**
  * Split expression and effective node.
  * 
- * @author JŽr™me GORIN
+ * @author Jï¿½rï¿½me GORIN
  * @author Matthieu Wipliez
  * 
  */
@@ -123,7 +124,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			}
 
 			// Make the final assignment
-			LocalVariable target = newVariable(type);
+			LocalVariable target = procedure.newTempLocalVariable(file, type,
+					procedure.getName() + "_" + "expr");
 			target.setType(type);
 			Assign assign = new Assign(location, target, new BinaryExpr(
 					location, e1, op, e2, previousType));
@@ -194,7 +196,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 				}
 
 				// Make the final assignment
-				LocalVariable target = newVariable(type);
+				LocalVariable target = procedure.newTempLocalVariable(file,
+						type, procedure.getName() + "_" + "expr");
 				Use use = new Use(target);
 				Location location = expr.getLocation();
 				target.setType(type);
@@ -217,24 +220,11 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			return expr;
 		}
 
-		/**
-		 * Creates a new local variable with type
-		 * 
-		 * @return a new local variable with type
-		 */
-		private LocalVariable newVariable(Type type) {
-			String procName = procedure.getName();
-			LocalVariable local = new LocalVariable(true, tempVarCount++,
-					new Location(), procName + "_" + "expr", type);
-			procedure.getLocals().put(local.getName(), local);
-			return local;
-		}
-
 	}
 
 	private BlockNode block;
 
-	private int tempVarCount;
+	private String file;
 
 	/**
 	 * Returns an iterator over the last instruction of the previous block. A
@@ -265,6 +255,12 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		it.next();
 
 		return block.lastListIterator();
+	}
+
+	@Override
+	public void transform(Actor actor) {
+		this.file = actor.getFile();
+		super.transform(actor);
 	}
 
 	@Override
@@ -356,7 +352,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		visitExpressions(store.getIndexes(), it, types);
 		it.previous();
 
-
 		store.setValue(visitExpression(value, it, value.getType()));
 		it.next();
 	}
@@ -400,8 +395,6 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
-		tempVarCount = 1;
-
 		// set the label counter to prevent new nodes from having the same label
 		// as existing nodes
 		List<CFGNode> nodes = procedure.getNodes();

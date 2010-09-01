@@ -48,7 +48,6 @@ import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
-import net.sf.orcc.backends.vhdl.transforms.NDimArrayTransform;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;

@@ -31,13 +31,12 @@ package net.sf.orcc.backends.vhdl.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -47,9 +46,9 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
- * This class defines an actor transformation that transforms indexes assignments
- * from array(index_0, index_1, index_2) to array array(index) with index = 
- * index_0 & index_1 & index_2.
+ * This class defines an actor transformation that transforms indexes
+ * assignments from array(index_0, index_1, index_2) to array array(index) with
+ * index = index_0 & index_1 & index_2.
  * 
  * @author Matthieu Wipliez
  * @author Nicolas Siret
@@ -57,17 +56,17 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class NDimArrayTransform extends AbstractActorTransformation {
 
+	private String file;
+
 	/**
 	 * an iterator on the current node. Initiated by
 	 * {@link #visit(BlockNode, Object...)}.
 	 */
 	private ListIterator<CFGNode> nodeIt;
 
-	private int tempVarCount;
-
 	/**
-	 * Creates an "Assign" node that assign the index of a 1D array
-	 * to index_0, index_1, ..., index_N of a ND array.
+	 * Creates an "Assign" node that assign the index of a 1D array to index_0,
+	 * index_1, ..., index_N of a ND array.
 	 * 
 	 * @param target
 	 *            target local variable
@@ -75,21 +74,20 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 	 *            an expression
 	 */
 	private void createAssignNode(LocalVariable target, Expression expr) {
-		
 		Assign inst = new Assign(expr.getLocation(), target, expr);
-	
+
 		// add assign node
 		BlockNode block = new BlockNode(procedure);
 		Assign assign = new Assign(target, expr);
 		block.add(assign);
-		
+
 		nodeIt.add((CFGNode) inst);
-		
 	}
 
 	/**
 	 * Creates a new block node that will contain the remaining instructions of
-	 * the block that is being visited. The new block is added after the Assignnode.
+	 * the block that is being visited. The new block is added after the
+	 * Assignnode.
 	 * 
 	 * @param iit
 	 *            list iterator
@@ -106,17 +104,13 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 		nodeIt.add(block);
 
 		// moves the iterator back so the new block will be visited next
-		//nodeIt.previous();
+		// nodeIt.previous();
 	}
 
-	/**
-	 * Returns a new boolean local variable.
-	 * 
-	 * @return a new boolean local variable
-	 */
-	private LocalVariable newVariable() {
-		return new LocalVariable(true, tempVarCount++, new Location(),
-				"index", IrFactory.eINSTANCE.createTypeBool());
+	@Override
+	public void transform(Actor actor) {
+		this.file = actor.getFile();
+		super.transform(actor);
 	}
 
 	@Override
@@ -131,57 +125,59 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 
 	@Override
 	@SuppressWarnings("unchecked")
+	public void visit(Load load, Object... args) {
+		Expression exprtype = (Expression) load.getSource();
+		if (exprtype.isBinaryExpr() || exprtype.isUnaryExpr()) {
+			List<Expression> indexes = load.getIndexes();
+			if (load.getTarget().isGlobal()) {
+				int size = indexes.size();
+				// while (size != 0) {
+				size--;
+				LocalVariable local = procedure.newTempLocalVariable(file,
+						IrFactory.eINSTANCE.createTypeBool(), "index");
+				procedure.getLocals().put(local.getName(), local);
+				createAssignNode(local, indexes.get(size));
+
+				// remove uses of the given indexes
+				Use.removeUses(load, indexes);
+
+				// remove indexes from load
+				indexes.clear();
+
+				// add index to indexes
+				indexes.add(new VarExpr(new Use(local, load)));
+
+				// }
+				// moves this store and remaining instructions to a new block
+				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
+				iit.previous();
+				createNewBlock(iit);
+			}
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public void visit(Store store, Object... args) {
 		Expression exprtype = store.getValue();
 		if (exprtype.isBinaryExpr() || exprtype.isUnaryExpr()) {
 			List<Expression> expr = store.getIndexes();
 			if (store.getTarget().isGlobal()) {
 				int size = expr.size();
-				//while (size != 0) {
+				// while (size != 0) {
 				size--;
-				LocalVariable local = newVariable();
+				LocalVariable local = procedure.newTempLocalVariable(file,
+						IrFactory.eINSTANCE.createTypeBool(), "index");
 				procedure.getLocals().put(local.getName(), local);
 				store.setValue(new VarExpr(new Use(local)));
 				createAssignNode(local, expr.get(size));
-				//}
+				// }
 				// moves this store and remaining instructions to a new block
 				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
 				iit.previous();
 				createNewBlock(iit);
 			}
 		}
-	}
-	
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Load load, Object... args) {
-		Expression exprtype = (Expression) load.getSource();
-		if (exprtype.isBinaryExpr() || exprtype.isUnaryExpr()) {
-			List<Expression> expr = load.getIndexes();
-			if (load.getTarget().isGlobal()) {
-				int size = expr.size();
-				List<Expression> index = null;
-				//while (size != 0) {
-				size--;
-				LocalVariable local = newVariable();
-				procedure.getLocals().put(local.getName(), local);
-				load.setIndexes(index);
-				createAssignNode(local, expr.get(size));
-				//}
-				// moves this store and remaining instructions to a new block
-				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
-				iit.previous();
-				createNewBlock(iit);
-			}
-		}
-	}
-		
-	
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		tempVarCount = 1;
-		super.visitProcedure(procedure);
 	}
 
 }
