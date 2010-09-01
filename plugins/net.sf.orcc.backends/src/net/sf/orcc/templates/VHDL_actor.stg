@@ -470,6 +470,17 @@ endif
 $
 >>
 
+PrintIndexes(indexes) ::= <<
+$
+if(indexes.type.int)
+$
+-- nop $store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
+else
+$$store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
+endif
+$
+>>
+
 Write(write) ::= <<
 
 $

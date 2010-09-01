@@ -135,7 +135,7 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 	 * @param indexes
 	 *            a list of expressions
 	 */
-	private void setIndexes(List<Expression> indexes) {
+	public void setIndexes(List<Expression> indexes) {
 		if (this.indexes != null) {
 			Use.removeUses(this, this.indexes);
 		}

@@ -48,6 +48,7 @@ import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
+import net.sf.orcc.backends.vhdl.transforms.NDimArrayTransform;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -107,7 +108,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// replaces adjacent underscores by a single underscore
 				new RenameTransformation(adjacentUnderscores, "_"),
 
-				new TransformConditionals() };
+				new TransformConditionals(),
+				
+				/*new NDimArrayTransform()*/ };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
