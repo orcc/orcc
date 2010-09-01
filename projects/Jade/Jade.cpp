@@ -85,7 +85,7 @@ ToolsDir("T", desc("Jade tools directory"),
 			  init(""));
 
 opt<std::string> 
-OutputDir("O", desc("Output folder for trace/Module/Error files"), 
+OutputDir("o", desc("Output folder for trace/Module/Error files"), 
 			  value_desc("Trace folder"), 
 			  init(""));
 
