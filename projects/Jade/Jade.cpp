@@ -59,61 +59,71 @@
 #endif
 
 using namespace llvm;
+using namespace llvm::cl;
 
 
 // Jade options
+opt<std::string>
+XDFFile("xdf", Required, ValueRequired, desc("XDF network file"), value_desc("XDF filename"));
 
-cl::opt<std::string>
-XDFFile("xdf", cl::Required, cl::ValueRequired, cl::desc("XDF network file"), cl::value_desc("XDF filename"));
-cl::opt<std::string>
-BSDLFile("bsdl", cl::desc("Bitstream description file"), cl::value_desc("BSDL filename"));
-cl::opt<std::string>
-VidFile("i", cl::Required, cl::ValueRequired, cl::desc("Encoded video file"), cl::value_desc("Video filename"));
+opt<std::string> 
+BSDLFile("bsdl", desc("Bitstream description file"), value_desc("BSDL filename"));
 
-llvm::cl::opt<std::string>
-VTLDir("L", llvm::cl::desc("Video Tools Library directory"), 
-	   llvm::cl::ValueRequired,
-	   llvm::cl::value_desc("VTL Folder"), 
-	   llvm::cl::init(""));
+opt<std::string> 
+VidFile("i", Required, ValueRequired, desc("Encoded video file"), value_desc("Video filename"));
 
-llvm::cl::opt<std::string> ToolsDir("T", llvm::cl::desc("Jade tools directory"), 
-									llvm::cl::ValueRequired,
-									llvm::cl::value_desc("Tools Folder"), 
-									llvm::cl::init(""));
+opt<std::string>
+VTLDir("L", desc("Video Tools Library directory"), 
+	   ValueRequired,
+	   value_desc("VTL Folder"), 
+	   init(""));
 
-llvm::cl::opt<bool> ForceInterpreter("force-interpreter",
-                                 llvm::cl::desc("Force interpretation: disable JIT"),
-                                 llvm::cl::init(false));
+opt<std::string> 
+ToolsDir("T", desc("Jade tools directory"), 
+			  ValueRequired,
+			  value_desc("Tools Folder"), 
+			  init(""));
 
-llvm::cl::opt<bool> nodisplay("nodisplay",
-                                 llvm::cl::desc("Deactivate display"),
-                                 llvm::cl::init(false));
+opt<std::string> 
+OutputDir("O", desc("Output folder for trace"), 
+			  value_desc("Trace folder"), 
+			  init(""));
 
-llvm::cl::opt<std::string> MArch("march",
-        llvm::cl::desc("Architecture to generate assembly for (see --version)"));
+opt<bool> 
+ForceInterpreter("force-interpreter", desc("Force interpretation: disable JIT"),
+									  init(false));
 
-llvm::cl::opt<bool> DisableCoreFiles("disable-core-files", llvm::cl::Hidden,
-                   llvm::cl::desc("Disable emission of core files if possible"));
+opt<bool> 
+nodisplay("nodisplay", desc("Deactivate display"),
+					   init(false));
 
-llvm::cl::opt<bool> NoLazyCompilation("disable-lazy-compilation",
-                  llvm::cl::desc("Disable JIT lazy compilation"),
-                  llvm::cl::init(false));
+opt<std::string> 
+MArch("march", desc("Architecture to generate assembly for (see --version)"));
 
-llvm::cl::list<std::string> MAttrs("mattr",
-         llvm::cl::CommaSeparated,
-         llvm::cl::desc("Target specific attributes (-mattr=help for details)"),
-         llvm::cl::value_desc("a1,+a2,-a3,..."));
+opt<bool> 
+DisableCoreFiles("disable-core-files", Hidden,
+                   desc("Disable emission of core files if possible"));
 
-llvm::cl::opt<std::string> MCPU("mcpu",
-       llvm::cl::desc("Target a specific cpu type (-mcpu=help for details)"),
-       llvm::cl::value_desc("cpu-name"),
-       llvm::cl::init(""));
+opt<bool> 
+NoLazyCompilation("disable-lazy-compilation",
+                  desc("Disable JIT lazy compilation"),
+                  init(false));
 
-llvm::cl::opt<std::string> Fifo("fifo",
-         llvm::cl::CommaSeparated,
-         llvm::cl::desc("Specify fifo to be used in the decoder"),
-         llvm::cl::value_desc("trace, circular, fast"),
-		 llvm::cl::init("circular"));
+list<std::string> 
+MAttrs("mattr", CommaSeparated,
+         desc("Target specific attributes (-mattr=help for details)"),
+         value_desc("a1,+a2,-a3,..."));
+
+opt<std::string> 
+MCPU("mcpu", desc("Target a specific cpu type (-mcpu=help for details)"),
+       value_desc("cpu-name"),
+       init(""));
+
+opt<std::string> 
+Fifo("fifo", CommaSeparated,
+			 desc("Specify fifo to be used in the decoder"),
+			 value_desc("trace, circular, fast"),
+			 init("circular"));
 
 void clean_exit(int sig){
 	exit(0);

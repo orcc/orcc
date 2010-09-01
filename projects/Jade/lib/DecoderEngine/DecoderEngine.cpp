@@ -39,6 +39,7 @@
 #include <time.h>
 
 #include "llvm/Constants.h"
+#include "llvm/Support/CommandLine.h"
 
 #include "Jade/DecoderEngine.h"
 #include "Jade/JIT.h"
@@ -51,12 +52,31 @@
 #include "Jade/Network/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
-#include "Options.h"
-
 //------------------------------
 
 using namespace std;
 using namespace llvm;
+
+//Options of Jade
+extern cl::opt<std::string> VTLDir;
+extern cl::opt<std::string> ToolsDir;
+extern cl::opt<std::string> Fifo;
+
+
+//Verify if directory is well formed
+void setDirectory(std::string* dir){
+	size_t found = dir->find_last_of("/\\");
+	if(found != dir->length()-1){
+		dir->insert(dir->length(),"/");
+	}
+}
+
+
+//Check options of the decoder engine
+void setOptions(){
+	setDirectory(&VTLDir);
+	setDirectory(&ToolsDir);
+}	
 
 DecoderEngine::DecoderEngine(llvm::LLVMContext& C): Context(C) {
 	// Set Jade options
