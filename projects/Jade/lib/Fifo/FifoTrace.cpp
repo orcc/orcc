@@ -111,7 +111,7 @@ void FifoTrace::parseFifoVars (){
 }
 
 void FifoTrace::parseHeader (){
-	header = jit->LoadBitcode("fifoTrace", ToolsDir);
+	header = jit->LoadBitcode("FifoTrace", ToolsDir);
 
 	if (header == NULL){
 		fprintf(stderr,"Unable to parse fifo header file");
