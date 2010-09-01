@@ -61,7 +61,7 @@
 using namespace llvm;
 
 
-// options
+// Jade options
 
 cl::opt<std::string>
 XDFFile("xdf", cl::Required, cl::ValueRequired, cl::desc("XDF network file"), cl::value_desc("XDF filename"));
@@ -70,9 +70,50 @@ BSDLFile("bsdl", cl::desc("Bitstream description file"), cl::value_desc("BSDL fi
 cl::opt<std::string>
 VidFile("i", cl::Required, cl::ValueRequired, cl::desc("Encoded video file"), cl::value_desc("Video filename"));
 
-extern "C"{
-char *input_file;
-}
+llvm::cl::opt<std::string>
+VTLDir("L", llvm::cl::desc("Video Tools Library directory"), 
+	   llvm::cl::ValueRequired,
+	   llvm::cl::value_desc("VTL Folder"), 
+	   llvm::cl::init(""));
+
+llvm::cl::opt<std::string> ToolsDir("T", llvm::cl::desc("Jade tools directory"), 
+									llvm::cl::ValueRequired,
+									llvm::cl::value_desc("Tools Folder"), 
+									llvm::cl::init(""));
+
+llvm::cl::opt<bool> ForceInterpreter("force-interpreter",
+                                 llvm::cl::desc("Force interpretation: disable JIT"),
+                                 llvm::cl::init(false));
+
+llvm::cl::opt<bool> nodisplay("nodisplay",
+                                 llvm::cl::desc("Deactivate display"),
+                                 llvm::cl::init(false));
+
+llvm::cl::opt<std::string> MArch("march",
+        llvm::cl::desc("Architecture to generate assembly for (see --version)"));
+
+llvm::cl::opt<bool> DisableCoreFiles("disable-core-files", llvm::cl::Hidden,
+                   llvm::cl::desc("Disable emission of core files if possible"));
+
+llvm::cl::opt<bool> NoLazyCompilation("disable-lazy-compilation",
+                  llvm::cl::desc("Disable JIT lazy compilation"),
+                  llvm::cl::init(false));
+
+llvm::cl::list<std::string> MAttrs("mattr",
+         llvm::cl::CommaSeparated,
+         llvm::cl::desc("Target specific attributes (-mattr=help for details)"),
+         llvm::cl::value_desc("a1,+a2,-a3,..."));
+
+llvm::cl::opt<std::string> MCPU("mcpu",
+       llvm::cl::desc("Target a specific cpu type (-mcpu=help for details)"),
+       llvm::cl::value_desc("cpu-name"),
+       llvm::cl::init(""));
+
+llvm::cl::opt<std::string> Fifo("fifo",
+         llvm::cl::CommaSeparated,
+         llvm::cl::desc("Specify fifo to be used in the decoder"),
+         llvm::cl::value_desc("trace, circular, fast"),
+		 llvm::cl::init("circular"));
 
 void clean_exit(int sig){
 	exit(0);
@@ -90,7 +131,6 @@ int main(int argc, char **argv) {
 	LLVMContext &Context = getGlobalContext();
 
 	clock_t timer = clock ();
-	input_file = (char*)VidFile.c_str();
 
 	#ifdef BSDL
 	if (!BSDLFile.empty()){
