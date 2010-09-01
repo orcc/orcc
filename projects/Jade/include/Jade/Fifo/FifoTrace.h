@@ -179,7 +179,7 @@ private:
 	void parseHeader();
 
 	/** Extern variables */
-	std::map<std::string,llvm::Function*> externVar;
+	std::map<std::string,llvm::GlobalVariable*> externVar;
 
 	/**
     * @brief add fifo functions into the given decoder

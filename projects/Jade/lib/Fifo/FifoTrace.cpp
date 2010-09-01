@@ -100,7 +100,13 @@ void FifoTrace::declareFifoHeader (){
 }
 
 void FifoTrace::parseFifoVars (){
+	//Get str var from fifo trace
+	GlobalVariable* str = header->getGlobalVariable(".str", true);
+	GlobalVariable* str1 = header->getGlobalVariable(".str1", true);
 
+	// Store into externVar
+	externVar.insert(pair<string,GlobalVariable*>("str", str));
+	externVar.insert(pair<string,GlobalVariable*>("str1", str1));
 }
 
 void FifoTrace::parseHeader (){
@@ -163,15 +169,25 @@ void FifoTrace::addFunctions(Decoder* decoder){
 	
 	std::map<std::string,llvm::Function*>::iterator itMap;
 
+	//Add external function
 	for(itMap = externFunct.begin(); itMap != externFunct.end(); ++itMap){
 		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
 		(*itMap).second = function;
 	}
 
+	//Add fifo function
 	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
 		Function* function = (Function*)jit->addFunctionProtosInternal("", (*itMap).second);
 		jit->LinkProcedureBody((*itMap).second);
 		(*itMap).second = function;
+	}
+
+	//Add fifo vars
+	map<string,GlobalVariable*>::iterator itVar;
+	for(itVar = externVar.begin(); itVar != externVar.end(); ++itVar){
+		GlobalVariable* var = jit->addVariable("", itVar->second);
+		jit->LinkGlobalInits(itVar->second);
+		(*itVar).second = var;
 	}
 }
 
