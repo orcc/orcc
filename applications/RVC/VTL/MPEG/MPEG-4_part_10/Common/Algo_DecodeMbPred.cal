@@ -251,7 +251,7 @@ actor Algo_DecodeMbPred()
 				==>
 		do
 			intra_chroma_pred_mode := ValueOfVLD;
-			println("intra_chroma_pred_mode"+ValueOfVLD);
+			println("intra_chroma_pred_mode : "+ValueOfVLD);
 		end
 
 	Mb_Type.IsNotEqualToDirect: action

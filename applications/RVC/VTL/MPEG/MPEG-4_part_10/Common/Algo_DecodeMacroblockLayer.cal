@@ -186,15 +186,18 @@ actor Algo_DecodeMacroblockLayer()
 			num_ref_idx_l1_active     := ValNumRefIdxLXActive[1];
 			mb_field_decoding         := ValMbFieldDecoding;
 			entropy_coding_mode_flag  := ValEntropyCodingMode;
+			LeftMb_Exists             := ValLeftMbExists;
+			AboveMb_Exists            := ValAboveMbExists;
+			NumC8x8                   := ValNum_C8x8;
 			foreach int i in 0 .. 11
 			do
 				nATab[i] := ValNATab[i];
 				nBTab[i] := ValNBTab[i];
 			end
-			LeftMb_Exists             := ValLeftMbExists;
-			AboveMb_Exists            := ValAboveMbExists;
-			NumC8x8                   := ValNum_C8x8;
+			
 
+			CodedBlockPatternLuma          := 0;
+			CodedBlockPatternChroma        := 0;
 			transform_size_8x8_flag        := false;
 			noSubMbPartSizeLessThan8x8Flag := true;
 			println("\t\tmb_type : "+ValueOfVLD);
@@ -446,7 +449,7 @@ actor Algo_DecodeMacroblockLayer()
 
 	GetResidualCoeffToken: action
 			Total_CoeffLuma  :[CoLu]    repeat 16,
-			Total_CoeffChroma:[CoLuChe] repeat 32
+			Total_CoeffChroma:[CoLuChe] repeat 32//It's the story of a guy, a normal guy ...
 				==>
 			SData_Total_CoeffLuma  :[CoLu]    repeat 16,
 			SData_Total_CoeffChroma:[CoLuChe] repeat 32
@@ -454,8 +457,8 @@ actor Algo_DecodeMacroblockLayer()
 
 	NoResidual: action
 				==>
-			SData_Total_CoeffLuma:[[0: for int s in 0 .. 15]] repeat 16,
-			SData_Total_CoeffLuma:[[0: for int s in 0 .. 31]] repeat 32
+			SData_Total_CoeffLuma   :[[0: for int s in 0 .. 15]] repeat 16,
+			SData_Total_CoeffChroma :[[0: for int s in 0 .. 31]] repeat 32
 		end
 
 	SendEndSliceHeader: action

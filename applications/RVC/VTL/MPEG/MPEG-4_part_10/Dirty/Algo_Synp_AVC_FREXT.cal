@@ -7836,6 +7836,9 @@ end
 		
 		if  IS_CAVLC() then
 			coded_block_pattern := vld_me();
+			if(DEBUG_NEW_PARSER) then
+				println("coded_block_pattern : "+coded_block_pattern);
+			end
 		else 
 			if IS_CABAC() then
 				coded_block_pattern := cbp_cabac;
@@ -7930,6 +7933,9 @@ end
 		//println("read_MB_layer_mb_qp_delta_done");
 		if IS_CAVLC() then
 			mb_qp_delta := vld_se();
+			if(DEBUG_NEW_PARSER) then
+				println("mb_qp_delta : "+mb_qp_delta);
+			end
 		else 
 			if IS_CABAC() then
 				mb_qp_delta := cabac_value();
@@ -8577,6 +8583,9 @@ end
 	do
 		if IS_CAVLC() then
 			intra_chroma_pred_mode := vld_ue();
+			if(DEBUG_NEW_PARSER) then
+				println("intra_chroma_pred_mode : "+intra_chroma_pred_mode);
+			end
 		else
 			if IS_CABAC() then
 			intra_chroma_pred_mode := cabac_value();
