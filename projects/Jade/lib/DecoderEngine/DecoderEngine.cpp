@@ -61,6 +61,7 @@ using namespace llvm;
 extern cl::opt<std::string> VTLDir;
 extern cl::opt<std::string> ToolsDir;
 extern cl::opt<std::string> Fifo;
+extern cl::opt<std::string> OutputDir;
 
 
 //Verify if directory is well formed
@@ -76,6 +77,7 @@ void setDirectory(std::string* dir){
 void setOptions(){
 	setDirectory(&VTLDir);
 	setDirectory(&ToolsDir);
+	setDirectory(&OutputDir);
 }	
 
 DecoderEngine::DecoderEngine(llvm::LLVMContext& C): Context(C) {

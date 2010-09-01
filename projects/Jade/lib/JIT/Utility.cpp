@@ -43,6 +43,7 @@
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/ManagedStatic.h"
+#include "llvm/Support/CommandLine.h"
 
 #include "Jade/JIT.h"
 #include "Jade/Actor/Port.h"
@@ -54,6 +55,7 @@
 using namespace llvm;
 using namespace std;
 
+extern cl::opt<std::string> OutputDir;
 
 JIT::JIT(llvm::LLVMContext& C): Context(C){
 	module = NULL;
@@ -79,7 +81,12 @@ void JIT::printModule(string file, Decoder* decoder){
 	std::string ErrorInfo;
 	Module* module = decoder->getModule();
 
-	std::auto_ptr<raw_fd_ostream> Out(new raw_fd_ostream(file.c_str(), ErrorInfo, raw_fd_ostream::F_Binary));
+	//Preparing output file
+	string OutFile = file;
+	OutFile.insert(0,OutputDir);
+
+	//Preparing output
+	std::auto_ptr<raw_fd_ostream> Out(new raw_fd_ostream(OutFile.c_str(), ErrorInfo, raw_fd_ostream::F_Binary));
 
 	if (!ErrorInfo.empty()) {
 		std::cout << ErrorInfo << '\n';
@@ -96,9 +103,15 @@ void JIT::verify(string file, Decoder* decoder){
 
 	if (verifyModule(*module, ReturnStatusAction, &Err)) {
 		ofstream output;
-		output.open(file.c_str());
+
+		//Preparing output file
+		string OutFile = file;
+		OutFile.insert(0,OutputDir);
+
+		//Preparing output
+		output.open(OutFile.c_str());
         output << Err;
-		cout << "Error found in the current decoder, output " << file << " error file \n";
+		cout << "Error found in the current decoder, output " << OutFile << " error file \n";
 	} else {
 		cout << "Generated decoder is ok. \n";
 	}

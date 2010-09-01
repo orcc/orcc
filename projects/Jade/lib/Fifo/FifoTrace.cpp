@@ -64,6 +64,7 @@ using namespace std;
 
 
 extern cl::opt<string> ToolsDir;
+extern cl::opt<std::string> OutputDir;
 
 FifoTrace::FifoTrace(llvm::LLVMContext& C, JIT* jit): Context(C), AbstractFifo(jit)
 {
@@ -301,7 +302,7 @@ void FifoTrace::setFile(Decoder* decoder, Connection* connection, BasicBlock* bb
 	Vertex* dstInstance = (Vertex*)connection->getSink();
 
 	//Creating file string
-	fileName << dstInstance->getName() << dst->getName() << ".txt";
+	fileName << OutputDir << dstInstance->getName() << dst->getName() << ".txt";
 	fileVar << dstInstance->getName() << dst->getName() << "_file";
 	strFile = fileName.str();
 	strVar = fileVar.str();
