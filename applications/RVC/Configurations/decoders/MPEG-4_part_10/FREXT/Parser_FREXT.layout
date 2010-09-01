@@ -16,7 +16,7 @@
       <vertex id="DecodeSliceData_Cavlc" x="711" y="1269"/>
       <vertex id="DecodeMacroBlockLayer" x="1131" y="1181"/>
       <vertex id="DecodeMbPred" x="1514" y="965"/>
-      <vertex id="DecodeResidual" x="1514" y="1216"/>
+      <vertex id="DecodeResidual" x="1540" y="1227"/>
       <vertex id="DecodeResidualBlock_Cavlc" x="1911" y="1202"/>
    </vertices>
 </layout>

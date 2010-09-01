@@ -248,6 +248,11 @@ actor Algo_DecodeResidual()
 			mb_type <= BLOCK_TYPE_INTA_16x16_MAX,
 			mb_type >= BLOCK_TYPE_INTA_16x16_MIN
 		do
+			TotalCoeffTabLuma[IdxCurrMb - 1]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb    ]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb + 1]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb + 2]   := 0;
+			IdxCurrMb := IdxCurrMb + 4;
 			/*
 			foreach int i4x4 in 0 .. 3
 			do
@@ -261,6 +266,11 @@ actor Algo_DecodeResidual()
 
 	ResetLevelTab: action ==>
 		do
+			TotalCoeffTabLuma[IdxCurrMb - 1]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb    ]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb + 1]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb + 2]   := 0;
+			IdxCurrMb := IdxCurrMb + 4;
 			/*
 			foreach int i4x4 in 0 .. 3
 			do
@@ -323,8 +333,9 @@ actor Algo_DecodeResidual()
 		var
 			int(size=8) nC
 		do
+			println("\t\t Idx : "+(IdxCurrMb-1));
 			if(Component_type = LUMA_COMPONENT)then
-				println("\t\t Idx : "+IdxCurrMb+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]]);
+				//println("\t\t Idx : "+(IdxCurrMb-1)+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]]);
 				nC :=
 					if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
 						rshift(TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]] +1, 1)
@@ -340,7 +351,7 @@ actor Algo_DecodeResidual()
 							-2
 						end;
 				else
-					println("\t\t Idx : "+IdxCurrMb+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]]);
+					//println("\t\t Idx : "+(IdxCurrMb-1)+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]]);
 					nC :=
 						if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
 							rshift(TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]] + 1, 1)

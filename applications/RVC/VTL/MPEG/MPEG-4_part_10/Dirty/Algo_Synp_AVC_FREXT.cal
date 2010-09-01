@@ -1446,7 +1446,7 @@ actor Algo_Synp_AVC_FREXT()
 	********       		Residual		    	    *********
 	*************************************************************
 	*************************************************************/
-
+	bool DEBUG_NEW_PARSER = true;
 	uint(size=1) bmFlag;
 	uint(size=4) startIdx;
 	uint(size=4) endIdx;
@@ -1623,22 +1623,58 @@ actor Algo_Synp_AVC_FREXT()
 		if CAVLC_type =0 then // coeff_token
 			foreach int i in 0 .. 61 do
 				if nc >=0 and nc < 2 then
-					if VLD_Counter = VLC_nC_0to2[i][0] and Codeword = VLC_nC_0to2[i][1] then coeff_token := VLC_nC_0to2[i][2]; NewCoeff := false; end
+					if VLD_Counter = VLC_nC_0to2[i][0] and Codeword = VLC_nC_0to2[i][1] then
+						coeff_token := VLC_nC_0to2[i][2];
+						NewCoeff := false;
+						if(DEBUG_NEW_PARSER) then
+							println("Cavlc; Idx_nc :" + 0 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+						end
+					end
 				else
 					if nc >=2 and nc < 4 then
-						if VLD_Counter = VLC_nC_2to4[i][0] and Codeword = VLC_nC_2to4[i][1] then coeff_token := VLC_nC_2to4[i][2]; NewCoeff := false; end
+						if VLD_Counter = VLC_nC_2to4[i][0] and Codeword = VLC_nC_2to4[i][1] then
+							coeff_token := VLC_nC_2to4[i][2];
+							NewCoeff := false;
+							if(DEBUG_NEW_PARSER) then
+								println("Cavlc; Idx_nc :" + 1 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+							end
+						end
 					else
 						if nc >=4 and nc < 8 then
-							if VLD_Counter = VLC_nC_4to8[i][0] and Codeword = VLC_nC_4to8[i][1] then coeff_token := VLC_nC_4to8[i][2]; NewCoeff := false; end
+							if VLD_Counter = VLC_nC_4to8[i][0] and Codeword = VLC_nC_4to8[i][1] then
+								coeff_token := VLC_nC_4to8[i][2];
+								NewCoeff := false;
+								if(DEBUG_NEW_PARSER) then
+									println("Cavlc; Idx_nc :" + 2 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+								end
+							end
 						else
 							if nc >=8 then
-								if VLD_Counter = VLC_nC_8[i][0] and Codeword = VLC_nC_8[i][1] then coeff_token := VLC_nC_8[i][2]; NewCoeff := false; end 
+								if VLD_Counter = VLC_nC_8[i][0] and Codeword = VLC_nC_8[i][1] then
+									coeff_token := VLC_nC_8[i][2];
+									NewCoeff := false;
+									if(DEBUG_NEW_PARSER) then
+										println("Cavlc; Idx_nc :" + 3 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+									end
+								end 
 							else
 								if nc = -1 and i <14 then
-									if VLD_Counter = VLC_nC_1[i][0] and Codeword = VLC_nC_1[i][1] then coeff_token := VLC_nC_1[i][2]; NewCoeff := false; end
+									if VLD_Counter = VLC_nC_1[i][0] and Codeword = VLC_nC_1[i][1] then
+										coeff_token := VLC_nC_1[i][2];
+										NewCoeff := false;
+										if(DEBUG_NEW_PARSER) then
+											println("Cavlc; Idx_nc :" + 4 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+										end
+									end
 								else
 									if nc = -2 and i <30 then
-										if VLD_Counter = VLC_nC_2[i][0] and Codeword = VLC_nC_2[i][1] then coeff_token := VLC_nC_2[i][2]; NewCoeff := false; end  
+										if VLD_Counter = VLC_nC_2[i][0] and Codeword = VLC_nC_2[i][1] then
+											coeff_token := VLC_nC_2[i][2];
+											NewCoeff := false;
+											if(DEBUG_NEW_PARSER) then
+													println("Cavlc; Idx_nc :" + 5 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
+											end
+										end  
 									end
 								end
 							end
@@ -6766,6 +6802,9 @@ end
 		val_CurrMbAddr := val_CurrMbAddr + 1;
 		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 		Mb_y := val_CurrMbAddr / PicWidthInMbs;
+		if(DEBUG_NEW_PARSER) then
+			println("\n\n\n*** New Mb *** Val = "+val_CurrMbAddr);
+		end
 	end
 
 
@@ -9346,7 +9385,12 @@ end
 		uint(size=5) nA, 
 		uint(size=5) nB
 	do
-		//println("Residual_block_init_coeff_token");
+		/*println("\nResidual_block_init_coeff_token");
+					println("val_CurrMbAddr : "+val_CurrMbAddr);
+					println("first_mb_in_slice : "+first_mb_in_slice);
+					println("PicWidthInMbs : "+PicWidthInMbs);
+					println("luma4x4BlkIdx : "+luma4x4BlkIdx);
+					println("InverseScan4x4Tab[luma4x4BlkIdx] : "+InverseScan4x4Tab[luma4x4BlkIdx]);*/
 		if leveltype = 2 then //chromaDC
 			nc := -1;
 		else
@@ -9407,7 +9451,15 @@ end
 					end;
 				end
 			end
-			if top = 1 and left = 1 then nc := rshift(nA + nB +1, 1); else nc := nA + nB ; end
+			if top = 1 and left = 1 then
+				nc := rshift(nA + nB +1, 1);
+			else 
+				nc := nA + nB ;
+			end
+		end
+		if(DEBUG_NEW_PARSER) then
+			println("******************** New Block Cavlc***************************");
+			println("nC : "+nc);
 		end
 		start_CAVLC(0);
 		level := [0 : for int i in 0 .. 15];
@@ -9419,7 +9471,11 @@ end
 		CAVLC_end(),
 		TotalCoeff() >0
 	do
-		println("TotalCoeff : "+TotalCoeff());
+		if(DEBUG_NEW_PARSER) then
+			println("TotalCoeff : "+TotalCoeff());
+			println("Trailing Ones : "+TrailingOnes());
+			println("\t\t Idx : "+luma4x4BlkIdx);
+		end
 		//println("Residual_block_read_suffixLength");
 		if leveltype = 1 then //luma
     			val_cbp_blk:=(1<<InverseScan4x4Tab[luma4x4BlkIdx])+val_cbp_blk;
@@ -9452,6 +9508,9 @@ end
 	do
 		//println("Residual_block_read_trailing_ones_sign_flag_done");
 		level[ inc_nb_coeff ] := 1 - 2 * read_result();
+		if(DEBUG_NEW_PARSER) then
+			println("levelT1 : "+level[ inc_nb_coeff ]);
+		end
 		inc_nb_coeff := inc_nb_coeff +1 ;
 	end
 
@@ -9512,6 +9571,9 @@ end
 		if (levelCode mod 2) = 0 then level[ inc_nb_coeff ] := rshift( levelCode + 2, 1);
 		else	level[ inc_nb_coeff ] := rshift( -levelCode - 1, 1); end
 
+		if(DEBUG_NEW_PARSER) then
+			println("level : "+level[ inc_nb_coeff ]);
+		end
 		// if( suffixLength = = 0 )
 		if suffixLength = 0 then suffixLength := 1; end
 
@@ -9541,6 +9603,9 @@ end
 		//if( TotalCoeff( coeff_token ) < endIdx startIdx + 1 )
 		if TotalCoeff() < block_endIdx - block_startIdx +1 then zerosLeft := total_zeros; else zerosLeft := 0; end
 		inc_nb_coeff := 0;
+		if(DEBUG_NEW_PARSER) then
+			println("total_zeros : "+total_zeros);
+		end
 	end
 
 	//for( i = 0; i < TotalCoeff( coeff_token ) 1; i++ )
@@ -9561,6 +9626,9 @@ end
 		run[inc_nb_coeff] := run_before;
 		zerosLeft := zerosLeft - run_before;
 		inc_nb_coeff := inc_nb_coeff+1;
+		if(DEBUG_NEW_PARSER) then
+			println("run_before : "+run_before);
+		end
 	end
 
 	Residual_block_skip_read_run_before: action ==>
@@ -9607,6 +9675,11 @@ end
 		CAVLC_end(),
 		TotalCoeff() = 0
 	do
+		if(DEBUG_NEW_PARSER) then
+			println("TotalCoeff : "+TotalCoeff());
+			println("Trailing Ones : "+TrailingOnes());
+			println("\t\t Idx : "+luma4x4BlkIdx);
+		end
 		if leveltype < 2 then //luma
 			NonZeroCount[val_CurrMbAddr][InverseScan4x4Tab[luma4x4BlkIdx]] := 0;
 		else //chroma
