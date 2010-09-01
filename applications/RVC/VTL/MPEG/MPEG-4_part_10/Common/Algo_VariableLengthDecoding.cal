@@ -5163,7 +5163,7 @@ actor Algo_VariableLengthDecoding()
 			]
 		];
 
-	List(type: List(type: List(type: bool, size=8), size=16), size=7) RunBeforeValue = 
+	List(type: List(type: List(type: uint(size=4), size=8), size=16), size=7) RunBeforeValue = 
 		[
 			[	//zerosLeft = 1 ; nbBitRead = 0 .. 15
 				[  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ,  0 ],
