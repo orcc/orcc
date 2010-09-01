@@ -103,4 +103,4 @@ add_executable(Jade Jade.cpp)
 ENDIF(APPLE)
 
 # Library requiered
-target_link_libraries(Jade XDFParser Fifo DecoderEngine Network Actor JIT Scheduler HDAGGraph Decoder ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(Jade XDFParser DecoderEngine Fifo Actor Network JIT Scheduler HDAGGraph Decoder ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
