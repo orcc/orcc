@@ -475,8 +475,8 @@ return:                                           ; preds = %bb7
 !name = !{!1}
 !action_scheduler = !{!2}
 !inputs = !{!3, !5, !7}
-!state_variables = !{!9, !12, !15, !18, !21, !24, !27, !30, !33, !36, !39, !42}
-!procedures = !{!45, !46, !47, !48}
+!state_variables = !{!9, !12, !15, !18, !21, !24, !27, !30, !33, !36, !39, !42, !45, !48, !51, !54}
+!procedures = !{!57, !58, !59, !60}
 
 !0 = metadata !{metadata !"tools/Display.bc"}
 !1 = metadata !{metadata !"Display"}
@@ -523,10 +523,22 @@ return:                                           ; preds = %bb7
 !42 = metadata !{metadata !43, metadata !44, i32* @num_images_start}
 !43 = metadata !{metadata !"num_images_start", i1 0, i32 0,  i32 0}
 !44 = metadata  !{ i32 32 ,  null }
-!45 = metadata !{metadata !"set_video", i1 0 , void(i32, i32)* @set_video}
-!46 = metadata !{metadata !"set_init", i1 0 , void()* @set_init}
-!47 = metadata !{metadata !"write_mb", i1 0 , void(i8*)* @write_mb}
-!48 = metadata !{metadata !"show_image", i1 0 , void()* @show_image}
+!45 = metadata !{metadata !46, metadata !47, [24 x i8]* @.str}
+!46 = metadata !{metadata !".str", i1 0, i32 0,  i32 0}
+!47 = metadata  !{ i32 8 ,  i32 24 }
+!48 = metadata !{metadata !49, metadata !50, [15 x i8]* @.str1}
+!49 = metadata !{metadata !".str1", i1 0, i32 0,  i32 0}
+!50 = metadata  !{ i32 8 ,  i32 15 }
+!51 = metadata !{metadata !52, metadata !53, [22 x i8]* @.str2}
+!52 = metadata !{metadata !".str2", i1 0, i32 0,  i32 0}
+!53 = metadata  !{ i32 8 ,  i32 22 }
+!54 = metadata !{metadata !55, metadata !56, [3 x [414720 x i8]]* @m_overlay}
+!55 = metadata !{metadata !"m_overlay", i1 0, i32 0,  i32 0}
+!56 = metadata  !{ i32 8 ,  i32 414720, i32 3 }
+!57 = metadata !{metadata !"set_video", i1 0 , void(i32, i32)* @set_video}
+!58 = metadata !{metadata !"set_init", i1 0 , void()* @set_init}
+!59 = metadata !{metadata !"write_mb", i1 0 , void(i8*)* @write_mb}
+!60 = metadata !{metadata !"show_image", i1 0 , void()* @show_image}
 
 %struct.FILE = type { i8*, i32, i8*, i32, i32, i32, i32, i8* }
 
