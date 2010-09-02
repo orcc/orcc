@@ -33,7 +33,7 @@ import java.util.List;
 import net.sf.orcc.plugins.ComboBoxOption;
 import net.sf.orcc.plugins.backends.BackendFactory;
 import net.sf.orcc.ui.launching.OptionWidget;
-import net.sf.orcc.ui.launching.OrccAbstractSettingsTab;
+import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;

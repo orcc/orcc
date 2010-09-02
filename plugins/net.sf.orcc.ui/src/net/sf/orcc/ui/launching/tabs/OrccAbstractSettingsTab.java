@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui.launching;
+package net.sf.orcc.ui.launching.tabs;
 
 import static net.sf.orcc.OrccLaunchConstants.ACTIVATE_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
 import org.eclipse.core.resources.IProject;

@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui.launching;
+package net.sf.orcc.ui.launching.tabs;
 
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
@@ -38,6 +38,7 @@ import java.util.List;
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.plugins.backends.BackendFactory;
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.impl.OptionWidgetManager;
 
 import org.eclipse.core.runtime.CoreException;

@@ -33,7 +33,7 @@ import java.io.File;
 import net.sf.orcc.plugins.BrowseFileOption;
 import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.ui.launching.OptionWidget;
-import net.sf.orcc.ui.launching.OrccAbstractSettingsTab;
+import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -72,7 +72,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * 
  * Class that create input file interface into plugin options.
  * 
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * @author Matthieu Wipliez
  * 
  */

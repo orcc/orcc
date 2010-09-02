@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.ui.launching;
 
+import net.sf.orcc.ui.launching.tabs.SimuOptionsTab;
+import net.sf.orcc.ui.launching.tabs.SimuSettingsTab;
+
 import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
