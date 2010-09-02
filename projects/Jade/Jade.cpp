@@ -73,13 +73,15 @@ opt<std::string>
 VidFile("i", Required, ValueRequired, desc("Encoded video file"), value_desc("Video filename"));
 
 opt<std::string>
-VTLDir("L", desc("Video Tools Library directory"), 
+VTLDir("L", desc("Video Tools Library directory"),
+	   Required,
 	   ValueRequired,
 	   value_desc("VTL Folder"), 
 	   init(""));
 
 opt<std::string> 
-ToolsDir("T", desc("Jade tools directory"), 
+ToolsDir("T", desc("Jade tools directory"),
+			  Required,
 			  ValueRequired,
 			  value_desc("Tools Folder"), 
 			  init(""));
