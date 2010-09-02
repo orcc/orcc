@@ -88,7 +88,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 		List<Actor> actors = parseActors(files);
 
-		boolean classify = getAttribute("net.sf.orcc.plugins.backends.classify", false);
+		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
 			// TODO classify actors
 		}
