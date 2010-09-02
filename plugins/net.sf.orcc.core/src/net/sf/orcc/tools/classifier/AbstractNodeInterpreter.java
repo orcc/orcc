@@ -35,6 +35,7 @@ import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IntegerNumber;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.HasTokens;
@@ -143,9 +144,9 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 		} else {
 			Object obj = source.getValue();
 			for (Expression index : instr.getIndexes()) {
-				Integer lastIndex = (Integer) index.accept(exprInterpreter);
+				IntegerNumber lastIndex = (IntegerNumber) index.accept(exprInterpreter);
 				if (obj != null && lastIndex != null) {
-					obj = Array.get(obj, lastIndex);
+					obj = Array.get(obj, lastIndex.getIntValue());
 				} else {
 					obj = null;
 				}
@@ -159,7 +160,7 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 		if (peek.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
 			int value = analyzer.getConfigurationValue(action);
 			Object[] target = (Object[]) peek.getTarget().getValue();
-			target[0] = value;
+			target[0] = new IntegerNumber(value);
 		}
 	}
 
@@ -170,7 +171,7 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 			if (variable != null) {
 				Object[] target = (Object[]) variable.getValue();
 				int value = analyzer.getConfigurationValue(action);
-				target[0] = value;
+				target[0] = new IntegerNumber(value);
 			}
 
 			portRead = true;
@@ -187,17 +188,17 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 		} else {
 			Object obj = variable.getValue();
 			Object objPrev = obj;
-			Integer lastIndex = 0;
+			IntegerNumber lastIndex = new IntegerNumber(0);
 			for (Expression index : instr.getIndexes()) {
 				objPrev = obj;
-				lastIndex = (Integer) index.accept(exprInterpreter);
+				lastIndex = (IntegerNumber) index.accept(exprInterpreter);
 				if (objPrev != null && lastIndex != null) {
-					obj = Array.get(objPrev, lastIndex);
+					obj = Array.get(objPrev, lastIndex.getIntValue());
 				}
 			}
 
 			if (objPrev != null && lastIndex != null) {
-				Array.set(objPrev, lastIndex,
+				Array.set(objPrev, lastIndex.getIntValue(),
 						instr.getValue().accept(exprInterpreter));
 			}
 		}

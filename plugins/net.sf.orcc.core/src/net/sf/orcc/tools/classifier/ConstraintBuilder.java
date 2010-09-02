@@ -39,6 +39,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IntegerNumber;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Procedure;
@@ -179,7 +180,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 
 		@Override
 		public Object interpret(IntExpr expr, Object... args) {
-			return expr.getValue();
+			// explicit cast to int because expr.getValue() is a long
+			return (int) expr.getValue();
 		}
 
 		@Override
@@ -200,7 +202,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				if (obj instanceof IntVariable) {
 					return ((IntVariable) obj).negate();
 				} else if (obj instanceof Integer) {
-					return -((Integer) obj);
+					return -(Integer) obj;
 				}
 			}
 
@@ -281,8 +283,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		}
 
 		if (type.isInt()) {
-			if (value instanceof Integer) {
-				lo = (Integer) value;
+			if (value instanceof IntegerNumber) {
+				lo = ((IntegerNumber) value).getIntValue();
 				hi = lo;
 			} else {
 				int size = ((TypeInt) type).getSize();
@@ -290,8 +292,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				hi = (1 << (size - 1)) - 1;
 			}
 		} else if (type.isUint()) {
-			if (value instanceof Integer) {
-				lo = (Integer) value;
+			if (value instanceof IntegerNumber) {
+				lo = ((IntegerNumber) value).getIntValue();
 				hi = lo;
 			} else {
 				int size = ((TypeUint) type).getSize();

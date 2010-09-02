@@ -30,13 +30,9 @@ package net.sf.orcc.tools.classifier;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
-import net.sf.orcc.ir.expr.VarExpr;
 
 /**
  * This class defines a partial expression evaluator.
@@ -61,39 +57,19 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	}
 
 	@Override
-	public Object interpret(BoolExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
-	public Object interpret(IntExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
 	public Object interpret(ListExpr expr, Object... args) {
 		throw new OrccRuntimeException("can not evaluate List expression");
 	}
 
 	@Override
-	public Object interpret(StringExpr expr, Object... args) {
-		return expr.getValue();
-	}
-
-	@Override
 	public Object interpret(UnaryExpr expr, Object... args) {
-		Object value = expr.getExpr().accept(this, Integer.MIN_VALUE);
+		Object value = expr.getExpr().accept(this);
 
 		if (!schedulableMode && value == null) {
 			return null;
 		} else {
 			return super.interpretUnaryExpr(expr, value);
 		}
-	}
-
-	@Override
-	public Object interpret(VarExpr expr, Object... args) {
-		return expr.getVar().getVariable().getValue();
 	}
 
 	/**
@@ -105,4 +81,5 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	public void setSchedulableMode(boolean schedulableMode) {
 		this.schedulableMode = schedulableMode;
 	}
+
 }

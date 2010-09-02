@@ -45,6 +45,24 @@ public class IntegerNumber {
 	}
 
 	/**
+	 * Compares this object to the specified object. The result is
+	 * <code>true</code> if and only if the argument is not <code>null</code>
+	 * and is a <code>IntegerNumber</code> object that contains the same
+	 * <code>long</code> value as this object.
+	 * 
+	 * @param obj
+	 *            the object to compare with.
+	 * @return <code>true</code> if the objects are the same; <code>false</code>
+	 *         otherwise.
+	 */
+	public boolean equals(Object obj) {
+		if (obj instanceof IntegerNumber) {
+			return number == ((IntegerNumber) obj).getLongValue();
+		}
+		return false;
+	}
+
+	/**
 	 * Returns the value of this integer number truncated as an <code>int</code>
 	 * .
 	 * 
@@ -61,6 +79,24 @@ public class IntegerNumber {
 	 */
 	public long getLongValue() {
 		return number;
+	}
+
+	/**
+	 * Returns a hash code for this <code>IntegerNumber</code>. The result is
+	 * the exclusive OR of the two halves of the primitive <code>long</code>
+	 * value held by this <code>IntegerNumber</code> object. That is, the
+	 * hashcode is the value of the expression: <blockquote>
+	 * 
+	 * <pre>
+	 * (int) (this.getLongValue() &circ; (this.getLongValue() &gt;&gt;&gt; 32))
+	 * </pre>
+	 * 
+	 * </blockquote>
+	 * 
+	 * @return a hash code value for this object.
+	 */
+	public int hashCode() {
+		return (int) (number ^ (number >>> 32));
 	}
 
 	/**
