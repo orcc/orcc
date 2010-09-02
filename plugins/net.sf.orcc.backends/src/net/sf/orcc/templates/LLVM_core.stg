@@ -321,8 +321,7 @@ endif$
 >>
 
 LoadPortWithIndex(result, pty, pointer, indexes, cast) ::= <<
-%$result$_L = load $pty$** $Var(pointer)$
-%$result$_$pointer$$indexesName(indexes)$_ptr = $GetElementPtrOp(pty=pty, ptrval={%$result$_L}, idx=indexes)$
+%$result$_$pointer$$indexesName(indexes)$_ptr = $GetElementPtrOp(pty=pty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
 $CastLoad(result=result, ty=pty, ptr={$result$_$pointer$$indexesName(indexes)$_ptr}, cast = cast)$
 $else$
@@ -501,9 +500,9 @@ endif$
 
 Load(load) ::= <<
 $if (load.source.variable.port)$$
-if (!load.indexes.empty)
-$$LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source.variable, cast= load.cast)$$
-endif$$
+if (!load.indexes.empty)$
+$LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source.variable, cast= load.cast)$
+$endif$$
 else$$
 if(load.indexes.empty)
 $$LoadWithoutIndex(result={%$load.target$}, ty=VarType(load.source.variable), pointer=load.source.variable, cast= load.cast)$$
