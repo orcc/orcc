@@ -583,9 +583,15 @@ public class IRWriter {
 
 	public void write(String outputDir, boolean prettyPrint)
 			throws OrccException {
+		OutputStream os;
 		try {
-			OutputStream os = new FileOutputStream(outputDir + File.separator
+			os = new FileOutputStream(outputDir + File.separator
 					+ actor.getName() + ".json");
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
+
+		try {
 			JSONObject obj = writeActor();
 
 			if (prettyPrint) {
@@ -595,12 +601,16 @@ public class IRWriter {
 				// use compact form
 				os.write(obj.toString().getBytes("UTF-8"));
 			}
-
-			os.close();
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		} catch (JSONException e) {
 			throw new OrccException("JSON error", e);
+		} finally {
+			try {
+				os.close();
+			} catch (IOException e) {
+				throw new OrccException("I/O error", e);
+			}
 		}
 	}
 

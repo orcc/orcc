@@ -213,12 +213,21 @@ public class XDFWriter {
 		writeXDF(document.getDocumentElement(), network);
 
 		File file = new File(path, network.getName() + ".xdf");
+		OutputStream os;
 		try {
-			OutputStream os = new FileOutputStream(file);
-			DomUtil.writeDocument(os, document);
-			os.close();
+			os = new FileOutputStream(file);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
+		}
+
+		try {
+			DomUtil.writeDocument(os, document);
+		} finally {
+			try {
+				os.close();
+			} catch (IOException e) {
+				throw new OrccException("I/O error", e);
+			}
 		}
 
 		writeChildren(path);

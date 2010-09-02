@@ -812,17 +812,27 @@ public class XDFParser {
 	 *             if the file could not be parsed
 	 */
 	public Network parseNetwork() throws OrccException {
+		InputStream is;
+
+		try {
+			is = new FileInputStream(file);
+		} catch (IOException e) {
+			throw new OrccException("I/O error when parsing network", e);
+		}
+
 		try {
 			// input
-			InputStream is = new FileInputStream(file);
 			Document document = DomUtil.parseDocument(is);
 
 			// parse the input, close the stream, return the network
 			Network network = parseXDF(document);
-			is.close();
 			return network;
-		} catch (IOException e) {
-			throw new OrccException("I/O error when parsing network", e);
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				throw new OrccException("I/O error when parsing network", e);
+			}
 		}
 	}
 
