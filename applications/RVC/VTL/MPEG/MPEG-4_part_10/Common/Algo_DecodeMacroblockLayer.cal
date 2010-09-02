@@ -102,8 +102,8 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=6) BLOCK_TYPE_INTA_16x16_MAX = 24;
 	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
 
-	List(type: uint(size=4), size=8) TabCodedBlockPatternChroma = [  0,  0,  1,  2,  0,  1,  2,  0];
-	List(type: uint(size=4), size=8) TabCodedBlockPatternLuma   = [  0,  0,  0,  0, 15, 15, 15,  0];
+	List(type: uint(size=4), size=8) TabCodedBlockPatternChroma = [  0,  1,  2,  0,  1,  2,  0,  0];
+	List(type: uint(size=4), size=8) TabCodedBlockPatternLuma   = [  0,  0,  0, 15, 15, 15,  0,  0];
 
 	List ( type: List ( type: List ( type: uint(size=6), size=2), size=48 ), size=4) VLD_ME_TABLE =
 		[
@@ -203,8 +203,8 @@ actor Algo_DecodeMacroblockLayer()
 			noSubMbPartSizeLessThan8x8Flag := true;
 			println("mb_type : "+ValueOfVLD);
 			if(slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)then
-				CodedBlockPatternLuma          := TabCodedBlockPatternLuma[bitand(mb_type/4,7)];
-				CodedBlockPatternChroma        := TabCodedBlockPatternChroma[bitand(mb_type/4,7)];
+				CodedBlockPatternLuma          := TabCodedBlockPatternLuma[bitand((mb_type-1)/4,7)];
+				CodedBlockPatternChroma        := TabCodedBlockPatternChroma[bitand((mb_type-1)/4,7)];
 			else
 				//Fix me !!
 				println("That's Balo !!!!");
