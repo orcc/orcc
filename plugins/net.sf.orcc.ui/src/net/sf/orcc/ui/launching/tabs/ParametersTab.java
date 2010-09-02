@@ -216,10 +216,11 @@ public class ParametersTab extends AbstractLaunchConfigurationTab {
 	public void createControl(Composite parent) {
 		// Create main composite
 		Composite mainComposite = new Composite(parent, SWT.NONE);
+		setControl(mainComposite);
+
 		mainComposite.setLayout(new GridLayout());
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		mainComposite.setLayoutData(data);
-		setControl(mainComposite);
 
 		createEnvironmentTable(mainComposite);
 

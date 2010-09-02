@@ -83,16 +83,17 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 
 	@Override
 	public void createControl(Composite parent) {
-		Font font = parent.getFont();
-
 		Composite composite = new Composite(parent, SWT.NONE);
+		setControl(composite);
+
+		Font font = parent.getFont();
 		composite.setFont(font);
+
 		GridLayout layout = new GridLayout();
 		layout.verticalSpacing = 0;
 		composite.setLayout(layout);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(data);
-		setControl(composite);
 
 		createGroup(font, composite);
 	}
@@ -126,8 +127,7 @@ public class OptionsTab extends AbstractLaunchConfigurationTab {
 
 		debugMode = new Button(group, SWT.CHECK);
 		createButton(font, debugMode, "Debug mode",
-				"Activates debug mode: IR is pretty-printed, "
-						+ "and actors are not cached.");
+				"Activates debug mode: actors are not cached.");
 		createFifoSize(font, group);
 	}
 

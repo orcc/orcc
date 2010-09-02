@@ -132,16 +132,17 @@ public abstract class OrccAbstractSettingsTab extends
 
 	@Override
 	public void createControl(Composite parent) {
-		Font font = parent.getFont();
-
 		Composite composite = new Composite(parent, SWT.NONE);
+		setControl(composite);
+
+		Font font = parent.getFont();
 		composite.setFont(font);
+
 		GridLayout layout = new GridLayout();
 		layout.verticalSpacing = 0;
 		composite.setLayout(layout);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		composite.setLayoutData(data);
-		setControl(composite);
 
 		createControlProject(font, composite);
 		createControlPlugin(font, composite);
