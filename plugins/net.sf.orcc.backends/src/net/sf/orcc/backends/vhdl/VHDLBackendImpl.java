@@ -45,6 +45,7 @@ import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
+import net.sf.orcc.backends.vhdl.transforms.NDimArrayTransform;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
@@ -109,7 +110,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 				new TransformConditionals(),
 				
-				/*new NDimArrayTransform()*/ };
+				new NDimArrayTransform() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
