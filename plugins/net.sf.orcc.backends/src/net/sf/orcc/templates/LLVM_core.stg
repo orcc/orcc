@@ -47,9 +47,7 @@ $list.type.elementType$
 >>
 
 variableDeclaration(variable) ::= <<
-$if(variable.port)
-$$AllocaOp(result={%$variable$}, type={$variable.type.elementType$*})$$
-else
+$if(!variable.port)
 $$if(variable.type.list)
 $$AllocaOp(result={%$variable$}, type=variable.type)$$
 endif$$
@@ -300,8 +298,7 @@ $endif$
 >>
 
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-%$pointer$_$location$_Loadport$indexesName(indexes)$ = $LoadOp(ty={$pty$*}, pointer=Var(pointer))$
-%$pointer$_$location$_L$indexesName(indexes)$ptr = $GetElementPtrOp(pty=pty, ptrval={%$pointer$_$location$_Loadport$indexesName(indexes)$}, idx=indexes)$
+%$pointer$_$location$_L$indexesName(indexes)$ptr = $GetElementPtrOp(pty=pty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
 $CastStore(ty=ty, value=value, pty=pty, ptr={%$pointer$_$location$_L$indexesName(indexes)$ptr}, cast=cast, location=location)$
 $else$
@@ -324,7 +321,6 @@ endif$
 >>
 
 LoadPortWithIndex(result, pty, pointer, indexes, cast) ::= <<
-
 %$result$_L = load $pty$** $Var(pointer)$
 %$result$_$pointer$$indexesName(indexes)$_ptr = $GetElementPtrOp(pty=pty, ptrval={%$result$_L}, idx=indexes)$
 $if(cast)$
@@ -436,23 +432,20 @@ PhiAssignment(phi) ::= <<
 Read(read) ::= <<
 
 $LoadLocalPort(read)$
-%$read.target$_$read.block.label$ = $CallOp(ty ={$read.port.type$*}, fnptrval={fifo_$fifoType(read.port)$_read}, function_args={$fifoName(read.port)$ %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
-store $ExprType(read.port)$* %$read.target$_$read.block.label$, $ExprType(read.port)$** %$read.port$
+%$read.port$ = $CallOp(ty ={$read.port.type$*}, fnptrval={fifo_$fifoType(read.port)$_read}, function_args={$fifoName(read.port)$ %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
 >>
 
 
 Peek(peek) ::= <<
 
 $LoadLocalPort(peek)$
-%$peek.target$_$peek.block.label$ = $CallOp(ty ={$peek.port.type$*}, fnptrval={fifo_$fifoType(peek.port)$_peek}, function_args={$fifoName(peek.port)$ %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
-store $ExprType(peek.port)$* %$peek.target$_$peek.block.label$, $ExprType(peek.port)$** %$peek.port$
+%$peek.port$ = $CallOp(ty ={$peek.port.type$*}, fnptrval={fifo_$fifoType(peek.port)$_peek}, function_args={$fifoName(peek.port)$ %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
 >>
 
 Write(write) ::= <<
 
 $LoadLocalPort(write)$
-%$write.target$_$write.block.label$ = $CallOp(ty ={$write.port.type$*}, fnptrval={fifo_$fifoType(write.port)$_write}, function_args={$fifoName(write.port)$ %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
-store $ExprType(write.port)$* %$write.target$_$write.block.label$, $ExprType(write.port)$** %$write.port$
+%$write.port$ = $CallOp(ty ={$write.port.type$*}, fnptrval={fifo_$fifoType(write.port)$_write}, function_args={$fifoName(write.port)$ %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
 >>
 
 HasRoom(result, action, port, numToken) ::= <<
