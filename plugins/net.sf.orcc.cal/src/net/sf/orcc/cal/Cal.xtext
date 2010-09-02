@@ -173,7 +173,9 @@ AstExpression:
 AstExpressionAnd returns AstExpression:
 	AstExpressionBitor ({AstExpressionBinary.left=current} operator=('&&' | 'and') right=AstExpressionBitor)*;
 AstExpressionBitor returns AstExpression:
-	AstExpressionBitand ({AstExpressionBinary.left=current} operator='|' right=AstExpressionBitand)*;
+	AstExpressionBitxor ({AstExpressionBinary.left=current} operator='|' right=AstExpressionBitxor)*;
+AstExpressionBitxor returns AstExpression:
+	AstExpressionBitand ({AstExpressionBinary.left=current} operator='^' right=AstExpressionBitand)*;
 AstExpressionBitand returns AstExpression:
 	AstExpressionEq ({AstExpressionBinary.left=current} operator='&' right=AstExpressionEq)*;
 AstExpressionEq returns AstExpression:
@@ -187,10 +189,10 @@ AstExpressionAdditive returns AstExpression:
 AstExpressionMultiplicative returns AstExpression:
 	AstExpressionExp ({AstExpressionBinary.left=current} operator=('*' | '/' | 'div' | 'mod') right=AstExpressionExp)*;
 AstExpressionExp returns AstExpression:
-	AstExpressionUnary ({AstExpressionBinary.left=current} operator='^' right=AstExpressionUnary)*;
+	AstExpressionUnary ({AstExpressionBinary.left=current} operator='**' right=AstExpressionUnary)*;
 
 AstExpressionUnary returns AstExpression:
-	{AstExpressionUnary} unaryOperator=('-' | 'not' | '#') expression=AstExpressionPostfix
+	{AstExpressionUnary} unaryOperator=('~' | '-' | 'not' | '#') expression=AstExpressionPostfix
 	| AstExpressionPostfix;
 
 AstExpressionPostfix returns AstExpression:

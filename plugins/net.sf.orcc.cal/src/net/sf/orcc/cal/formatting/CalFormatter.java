@@ -247,7 +247,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 
 		c.setNoSpace().after(
 				f.getAstExpressionUnaryAccess()
-						.getUnaryOperatorHyphenMinusKeyword_0_1_0_0());
+						.getUnaryOperatorAssignment_0_1());
 	}
 
 	@Override
