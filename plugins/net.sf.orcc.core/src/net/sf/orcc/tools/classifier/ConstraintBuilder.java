@@ -219,10 +219,13 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 			Type type = variable.getType();
 			Object value = variable.getValue();
 			if (value != null && (type.isInt() || type.isUint())) {
-				return value;
+				if (value instanceof IntegerNumber) {
+					return ((IntegerNumber) value).getIntValue();
+				}
 			} else {
 				return getIntVariable(variable);
 			}
+			return null;
 		}
 
 	}
