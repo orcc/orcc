@@ -4868,6 +4868,9 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		nal_unit_type := mask_bits(read_result(), 5);
 		nal_ref_idc := mask_bits(rshift(read_result(), 5), 2);
+		if(DEBUG_NEW_PARSER) then
+			println("nal_unit_type:"+nal_unit_type+"; nal_ref_idc:"+nal_ref_idc);
+		end
 		//println("look_for_which_Header");
 		//println("nal_unit_type "+ nal_unit_type +" nal_ref_idc "+ nal_ref_idc);
 		bit_count := 0;
@@ -4884,6 +4887,9 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		nal_unit_type = 7
 	do
+		if(DEBUG_NEW_PARSER) then
+			println("Is Sps");
+		end
 		//println("look_for_Sps_header");
 		set_bits_to_read(24); //8 + 1+1+1+1 + 4 + 8
 	end
@@ -4892,6 +4898,9 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		nal_unit_type = 8
 	do
+		if(DEBUG_NEW_PARSER) then
+			println("Is Pps");
+		end
 		//println("look_for_Pps_header");
 		start_vld();
 	end
@@ -4900,6 +4909,14 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		nal_unit_type = 5 or nal_unit_type = 1
 	do
+		
+		if(DEBUG_NEW_PARSER) then
+			if(nal_unit_type = 5) then
+				println("Is SliceIdr");
+			else
+				println("Is SliceNonIdr");
+			end
+		end
 		//println("look_for_Slice_header");
 		start_vld();
 		//Initialisation process for the arithmetic decoding engine //FIXME
@@ -5646,6 +5663,9 @@ actor Algo_Synp_AVC_FREXT()
 		//println("read_SliceH_slice_type");
 		//println("read_SliceH_slice_type");
 		first_mb_in_slice := vld_ue();
+		if(DEBUG_NEW_PARSER) then
+			println("\t\tfirst_mb_in_slice:"+first_mb_in_slice);
+		end
 		start_vld();
 	end
 
@@ -5655,6 +5675,9 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_pps_id");
 		slice_type := vld_ue();
+		if(DEBUG_NEW_PARSER) then
+			println("\t\tslice_type:       "+slice_type);
+		end
 		slice_type := slice_type mod 5;
 		start_vld();
 	end
@@ -5665,6 +5688,9 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_check_separate_colour_plane_flag");
 		pps_id := vld_ue();
+		if(DEBUG_NEW_PARSER) then
+			println("\t\tpps_id:           "+pps_id);
+		end
 		sps_id := sequence_parameter_set_id[pps_id];
 	end
 
@@ -5704,6 +5730,9 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_frame_num");
 		frame_num      := read_result();
+		if(DEBUG_NEW_PARSER) then
+			println("\t\tframe_num:        "+frame_num);
+		end
 		ValMaxFrameNum := 1 << (log2_max_frame_num_minus4[sps_id] + 4);
 	end
 
@@ -5813,6 +5842,9 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_pic_order_cnt_lsb_done");
 		pic_order_cnt_lsb := read_result();
+		if(DEBUG_NEW_PARSER) then
+			println("\t\tpic_order_cnt_lsb: "+pic_order_cnt_lsb);
+		end
 	end
 
 	read_SliceH_delta_pic_order_cnt_bottom:action ==>
@@ -6045,6 +6077,9 @@ end
 	do
 		//println("read_SliceH_num_ref_idx_l0_active_minus1");
 		num_ref_idx_active_override_flag := 1;
+		if(DEBUG_NEW_PARSER) then
+			println("\t\tnum_ref_idx_active_override_flag: 1");
+		end
 		start_vld();
 	end
 
@@ -6086,6 +6121,9 @@ end
 	do
 		//println("read_SliceH_skip_num_ref_idx_l0_active_minus1");
 		num_ref_idx_active_override_flag := 0;
+		if(DEBUG_NEW_PARSER) then
+			println("\t\tnum_ref_idx_active_override_flag: 0");
+		end
 		slice_num_ref_idx_l0_active_minus1 := num_ref_idx_l0_active_minus1[pps_id];
 		slice_num_ref_idx_l1_active_minus1 := num_ref_idx_l1_active_minus1[pps_id];
 	end
@@ -7610,7 +7648,7 @@ end
 		if IS_CAVLC() then
 			mb_type := vld_ue();
 			if(DEBUG_NEW_PARSER) then
-			println("mb_type : "+mb_type);
+				println("mb_type : "+mb_type);
 			end
 		
 		else 

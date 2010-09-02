@@ -41,6 +41,7 @@ actor Algo_VariableLengthDecoding()
 	uint(size=4) CAVLC_LEVEL_PREFIX    = 6;
 	uint(size=4) CAVLC_TOTAL_ZEROS     = 7;
 	uint(size=4) CAVLC_RUN_BEFORE      = 8;
+	uint(size=4) VLD_TE                = 9;
 
 	List(type: List(type: List(type: bool, size=64), size=16), size=6) TotalCoeffValid = 
 		[
@@ -5314,6 +5315,7 @@ actor Algo_VariableLengthDecoding()
 	/* u(n) */
 	uint(size=5)  BitsCount       := 0;
 	uint(size=31) ReadValue       := 0;
+	uint(size=1)  TeVal           := 0;
 
 	/* more_rbsp_data() */
 	bool          NewNalAlreadyDetected  := false;
@@ -5514,6 +5516,39 @@ actor Algo_VariableLengthDecoding()
 		do
 			BitsCount := ValNbBits;
 			ReadValue := 0;
+			TeVal     := 0;
+		end
+
+
+	IsVldTe.u: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal],
+			VLD_Param :[TypeOfVld]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = VLD_TE,
+			TypeOfVld    = 1
+		do
+			BitsCount := 1;
+			ReadValue := 0;
+			TeVal     := 1;
+		end
+
+
+	IsVldTe.ue: action
+			TypeOfVLD :[ValTypeOfVLD],
+			EndOfNal  :[ValEndOfNal],
+			VLD_Param :[TypeOfVld]
+				==>
+		guard
+			ValEndOfNal  = false,
+			ValTypeOfVLD = VLD_TE,
+			TypeOfVld    > 1
+		do
+			Bit1Found       := false;
+			leadingZeroBits := 0;
+			CodeNum         := 0;
 		end
 
 
@@ -5737,8 +5772,10 @@ actor Algo_VariableLengthDecoding()
 	SendUValue: action
 				==>
 			ValDecoded :[ReadValue]
+		var
+			uint(size=31) ValueDec
 		do
-//			println("\tUValue:"+ReadValue);
+			ValueDec := bitxor(ReadValue,TeVal);
 		end
 
 
@@ -5891,6 +5928,8 @@ actor Algo_VariableLengthDecoding()
 		CheckVLDType    (IsByteAligned                       )--> CheckVLDType;
 		CheckVLDType    (IsVldUe                             )--> VLDecoding_Ue;
 		CheckVLDType    (IsVldSe                             )--> VLDecoding_Se;
+		CheckVLDType    (IsVldTe.ue                          )--> VLDecoding_Ue;
+		CheckVLDType    (IsVldTe.u                           )--> Decode_u;
 		CheckVLDType    (IsReadBits                          )--> Decode_u;
 		CheckVLDType    (IsMoreRbspData                      )--> FillBuffer;
 		CheckVLDType    (IsCavlcLevelPrefix                  )--> DecCavlcLevPre;

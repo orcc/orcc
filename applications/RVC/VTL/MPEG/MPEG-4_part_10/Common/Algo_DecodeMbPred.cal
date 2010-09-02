@@ -34,6 +34,7 @@ actor Algo_DecodeMbPred()
 	uint(size=3) VLD_SE                = 2;
 //	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
 //	uint(size=3) MORE_RBSP_DATA        = 4;
+	uint(size=4) VLD_TE                = 9;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 //	uint(size=4) SLICE_TYPE_B  = 1;
@@ -219,7 +220,7 @@ actor Algo_DecodeMbPred()
 			mb_type                 = BLOCK_TYPE_I_8x8_or_4x4,
 			transform_size_8x8_flag = true
 		do
-			println("Intra 8x8");
+			//println("Intra 8x8");
 			CountBit := 4;
 		end
 
@@ -267,6 +268,9 @@ actor Algo_DecodeMbPred()
 					NUM_MB_PART_P[0]
 				end;
 			mbPartIdx := 0;
+			println("Mb_Type.IsNotEqualToDirect");
+			println("mPartIdxMax : "+mbPartIdxMax);
+			println("num_ref_idx_l0_active : "+num_ref_idx_l0_active);
 		end
 
 /*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
@@ -275,29 +279,20 @@ actor Algo_DecodeMbPred()
        MbPartPredMode( mb_type, mbPartIdx ) != Pred_L1 )
        ref_idx_l0[ mbPartIdx ]
 */
-	ReadRefIdxl0.Ue_Asked: action
-				==>
-			//             ref_idx_l0
-			SkipNal      :[   false  ],//Keep synchro
-			TypeOfVLD    :[  VLD_UE  ]
-		guard
-			mbPartIdx < mbPartIdxMax,
-			num_ref_idx_l0_active > 1,
-			//not IS_MbPred_L1_P(mb_type,mbPartIdx), // There isn't any Pred_L1 in P MacroBlock
-			not IS_MbPred_NA_P(mb_type,mbPartIdx)
-		end
 
-	ReadRefIdxl0.u1Asked: action
+	ReadRefIdxl0: action
 				==>
 			//             ref_idx_l0
 			SkipNal      :[   false   ],//Keep synchro
-			TypeOfVLD    :[ READ_BITS ],
-			NbBitsToRead :[     1     ]
+			TypeOfVLD    :[ VLD_TE ],
+			NbBitsToRead :[ num_ref_idx_l0_active ]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			mb_field_decoding_flag = true,
+			(num_ref_idx_l0_active > 1) or (mb_field_decoding_flag = true),
 			//not IS_MbPred_L1_P(mb_type,mbPartIdx), // There isn't any Pred_L1 in P MacroBlock
 			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+		do
+			mbPartIdx := mbPartIdx + 1;
 		end
 
 /*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
@@ -307,29 +302,15 @@ actor Algo_DecodeMbPred()
        ref_idx_l1[ mbPartIdx ]
 */
 	/*Not used with I and P Blocks*/
-	ReadRefIdxl1.Ue_Asked: action
-				==>
-			//             ref_idx_l1
-			SkipNal      :[   false  ],//Keep synchro
-			TypeOfVLD    :[  VLD_UE  ]
-		guard
-			mbPartIdx < mbPartIdxMax,
-			num_ref_idx_l1_active > 1,
-			not IS_MbPred_L0_P(mb_type,mbPartIdx),
-			not IS_MbPred_NA_P(mb_type,mbPartIdx)
-		do
-			mbPartIdx := mbPartIdx + 1;
-		end
-
-	ReadRefIdxl1.u1Asked: action
+	ReadRefIdxl1: action
 				==>
 			//             ref_idx_l1
 			SkipNal      :[   false   ],//Keep synchro
-			TypeOfVLD    :[ READ_BITS ],
-			NbBitsToRead :[     1     ]
+			TypeOfVLD    :[ VLD_TE ],
+			NbBitsToRead :[ num_ref_idx_l1_active ]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			mb_field_decoding_flag = true,
+			(num_ref_idx_l1_active > 1) or (mb_field_decoding_flag = true),
 			not IS_MbPred_L0_P(mb_type,mbPartIdx),
 			not IS_MbPred_NA_P(mb_type,mbPartIdx)
 		do
@@ -476,13 +457,11 @@ actor Algo_DecodeMbPred()
 
 		ReadIntraChroma   (ReadIntraChroma)--> SendEndMbPred;
 
-		ReadRefIdxl0Asked (ReadRefIdxl0.Ue_Asked )--> ReadRefIdxl0Asked;
-		ReadRefIdxl0Asked (ReadRefIdxl0.u1Asked )--> ReadRefIdxl0Asked;
+		ReadRefIdxl0Asked (ReadRefIdxl0 )--> ReadRefIdxl0Asked;
 		ReadRefIdxl0Asked (ReadParam.Skip1Parameter )--> ReadRefIdxl0Asked;
 		ReadRefIdxl0Asked (SendOrReadDone )--> ReadRefIdxl1Asked;
 
-		ReadRefIdxl1Asked (ReadRefIdxl1.Ue_Asked )--> ReadRefIdxl1Asked;
-		ReadRefIdxl1Asked (ReadRefIdxl1.u1Asked )--> ReadRefIdxl1Asked;
+		ReadRefIdxl1Asked (ReadRefIdxl1 )--> ReadRefIdxl1Asked;
 		ReadRefIdxl1Asked (ReadParam.Skip1Parameter )--> ReadRefIdxl1Asked;
 		ReadRefIdxl1Asked (SendOrReadDone )--> ReadMvdL0Asked;
 
@@ -514,8 +493,8 @@ actor Algo_DecodeMbPred()
 		MbType.IsIntra_4x4          > MbType.IsIntra_8x8          > ChromaArrayTp.IsEqualTo1or2;
 		ChromaArrayTp.IsEqualTo1or2 > SendEndMbPred;
 		ReadPrevAndRemIntra4x4      > ChromaArrayTp.IsEqualTo1or2;
-		ReadRefIdxl0.Ue_Asked       > ReadRefIdxl0.u1Asked        > ReadParam.Skip1Parameter;
-		ReadRefIdxl1.Ue_Asked       > ReadRefIdxl1.u1Asked        > ReadParam.Skip1Parameter;
+		ReadRefIdxl0                > ReadParam.Skip1Parameter;
+		ReadRefIdxl1                > ReadParam.Skip1Parameter;
 		ReadParam.Skip1Parameter    > SendOrReadDone;
 		ReadMvdL0                   > ReadParam.Skip2Parameters;
 		ReadMvdL1                   > ReadParam.Skip2Parameters;
