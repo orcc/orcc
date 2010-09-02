@@ -302,8 +302,8 @@ void FifoTrace::setFile(Decoder* decoder, Connection* connection, BasicBlock* bb
 	Vertex* dstInstance = (Vertex*)connection->getSink();
 
 	//Creating file string
-	fileName << OutputDir << dstInstance->getName() << dst->getName() << ".txt";
-	fileVar << dstInstance->getName() << dst->getName() << "_file";
+	fileName << OutputDir << dstInstance->getName() <<"_" <<dst->getName() << ".txt";
+	fileVar << dstInstance->getName() << "_" << dst->getName() << "_file";
 	strFile = fileName.str();
 	strVar = fileVar.str();
 	
