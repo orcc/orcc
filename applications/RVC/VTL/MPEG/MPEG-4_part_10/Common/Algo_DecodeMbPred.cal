@@ -268,9 +268,6 @@ actor Algo_DecodeMbPred()
 					NUM_MB_PART_P[0]
 				end;
 			mbPartIdx := 0;
-			println("Mb_Type.IsNotEqualToDirect");
-			println("mPartIdxMax : "+mbPartIdxMax);
-			println("num_ref_idx_l0_active : "+num_ref_idx_l0_active);
 		end
 
 /*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
@@ -381,6 +378,8 @@ actor Algo_DecodeMbPred()
 
 	SendOrReadDone: action
 				==>
+		guard
+			mbPartIdx = mbPartIdxMax
 		do
 			mbPartIdx := 0;
 		end
@@ -391,8 +390,8 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
-			mbPartIdx := mbPartIdx + 1;
 			println("ReadRefIdxL0["+mbPartIdx+"] : "+ValueOfVLD);
+			mbPartIdx := mbPartIdx + 1;
 		end
 
 	ReadRefIdxL1.Done: action
@@ -483,7 +482,7 @@ actor Algo_DecodeMbPred()
 		ReadMvdL0Done (SendOrReadDone)--> ReadMvdL1Done;
 
 		ReadMvdL1Done (ReadMvdL1.Done)--> ReadMvdL1Done;
-		ReadMvdL1Done (SendEndMbPred)--> ReadParameters;
+		ReadMvdL1Done (SendOrReadDone)--> SendEndMbPred;
 
 		SendEndMbPred (SendEndMbPred )--> ReadParameters;
 	end
@@ -502,6 +501,6 @@ actor Algo_DecodeMbPred()
 		ReadRefIdxL0.Done           > SendOrReadDone;
 		ReadRefIdxL1.Done           > SendOrReadDone;
 		ReadMvdL0.Done              > SendOrReadDone;
-		ReadMvdL1.Done              > SendEndMbPred;
+		ReadMvdL1.Done              > SendOrReadDone;
 	end
 end

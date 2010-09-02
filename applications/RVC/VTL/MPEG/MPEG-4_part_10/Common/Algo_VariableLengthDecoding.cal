@@ -5488,6 +5488,7 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
+		//	println("IsVldUe");
 		end
 
 
@@ -5502,6 +5503,7 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
+		//	println("IsVldSe");
 		end
 
 
@@ -5517,6 +5519,7 @@ actor Algo_VariableLengthDecoding()
 			BitsCount := ValNbBits;
 			ReadValue := 0;
 			TeVal     := 0;
+		//	println("IsReadBits");
 		end
 
 
@@ -5533,6 +5536,7 @@ actor Algo_VariableLengthDecoding()
 			BitsCount := 1;
 			ReadValue := 0;
 			TeVal     := 1;
+		//	println("IsVldTeu");
 		end
 
 
@@ -5549,6 +5553,7 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
+		//	println("IsVldTeue");
 		end
 
 
@@ -5721,7 +5726,7 @@ actor Algo_VariableLengthDecoding()
 			ValDecoded :[CodeNum]
 		do
 			CodeNum := CodeNum - 1;
-//			println("\tUeValue:"+CodeNum);
+		//	println("\tUeValue:"+CodeNum);
 		end
 
 
@@ -5776,6 +5781,7 @@ actor Algo_VariableLengthDecoding()
 			uint(size=31) ValueDec
 		do
 			ValueDec := bitxor(ReadValue,TeVal);
+		//	println("\t\tRead Value u(n):+ValueDec");
 		end
 
 
@@ -6031,14 +6037,15 @@ actor Algo_VariableLengthDecoding()
 	end
 	
 	priority
-		NewNalHasBeenSent              > WaitForNewNal                   > NewNalDetected;
-		IsVldUe                        > IsReadBits                      > IsCavlcLevelPrefix;  
-		IsCavlcLevelPrefix             > IsCavlcRunBefore > IsCavlcCoeffToken  > IsVldSe;
-		IsVldSe                        > FillBufferRbsp > IsMoreRbspData > IsByteAligned        > IsEndOfNal;
-		CheckSizeBufferRbsp            > FillBufferRbsp                  > FutureNewNalDetected > NewNalHasBeenSent;
-		GetCodeNum.NotFinished         > GetCodeNum.Finished;
-		Buffer.IsNotEmpty              > FillBufferRbsp                  > Buffer.IsEmpty;
-		GetCavlcCoeffToken.NotFinished > GetCavlcCoeffToken.Finished;
+		NewNalHasBeenSent               > WaitForNewNal                        > NewNalDetected;
+		IsVldUe                         > IsReadBits                           > IsCavlcLevelPrefix;  
+		IsCavlcLevelPrefix              > IsCavlcRunBefore > IsCavlcCoeffToken > IsVldSe;
+		IsVldSe                         > IsVldTe.ue       > IsVldTe.u         > FillBufferRbsp;
+		FillBufferRbsp                  > IsMoreRbspData   > IsByteAligned     > IsEndOfNal;
+		CheckSizeBufferRbsp             > FillBufferRbsp                       > FutureNewNalDetected > NewNalHasBeenSent;
+		GetCodeNum.NotFinished          > GetCodeNum.Finished;
+		Buffer.IsNotEmpty               > FillBufferRbsp                       > Buffer.IsEmpty;
+		GetCavlcCoeffToken.NotFinished  > GetCavlcCoeffToken.Finished;
 		GetCavlcLevelPrefix.NotFinished > GetCavlcLevelPrefix.Finished;
 		GetCavlcTotalZeros.NotFinished  > GetCavlcTotalZeros.Finished;
 		GetCavlcRunBefore.NotFinished   > GetCavlcRunBefore.Finished;

@@ -369,14 +369,12 @@ actor Algo_DecodeMacroblockLayer()
 		var
 			uint(size=6) coded_block_pattern
 		do
-			println("ReadCodedBlockPattern.Done");
 			coded_block_pattern :=
 				if(slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)then //Mb_type = Intra4x4 or Intra8x8
 					VLD_ME_TABLE[Chroma_Array_Type][CodeNum][0]
 				else
 					VLD_ME_TABLE[Chroma_Array_Type][CodeNum][1]
 				end;
-		
 			CodedBlockPatternLuma   := coded_block_pattern mod 16;
 			CodedBlockPatternChroma := coded_block_pattern  /  16;
 			println("coded_block_pattern : "+coded_block_pattern);

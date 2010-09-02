@@ -90,7 +90,7 @@ actor Algo_Slice_layer_without_partitioning()
 	uint(size=4) MB_PRED              = 6;
 	uint(size=4) RESIDUAL             = 7;
 	uint(size=4) RESIDUAL_BLOCK_CAVLC = 8;
-	uint(size=4) RESIDUAL_BLOCK_CABAC = 9;
+	uint(size=4) VLD_TE               = 9;
 
 
 	SliceHeader.GetVLDVal: action
@@ -375,6 +375,7 @@ actor Algo_Slice_layer_without_partitioning()
 			SkipNal           :[false]
 		guard
 			ValTypeOfVLD  != READ_BITS,
+			ValTypeOfVLD  != VLD_TE,
 			EndOfDecoding  = false
 		end
 
@@ -388,7 +389,7 @@ actor Algo_Slice_layer_without_partitioning()
 			VLD_Param       :[NbBits],
 			SkipNal            :[false]
 		guard
-			ValTypeOfVLD  = READ_BITS,
+			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE,
 			EndOfDecoding = false
 		end
 
