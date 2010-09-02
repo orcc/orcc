@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ui.launching;
 
+import net.sf.orcc.ui.launching.tabs.MappingTab;
 import net.sf.orcc.ui.launching.tabs.OptionsTab;
 import net.sf.orcc.ui.launching.tabs.ParametersTab;
 import net.sf.orcc.ui.launching.tabs.RunSettingsTab;
@@ -50,7 +51,7 @@ public class OrccRunLaunchConfigurationTabGroup extends
 	public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
 		ILaunchConfigurationTab[] tabs = new ILaunchConfigurationTab[] {
 				new RunSettingsTab(), new ParametersTab(), new OptionsTab(),
-				new CommonTab() };
+				new MappingTab(), new CommonTab() };
 		setTabs(tabs);
 	}
 

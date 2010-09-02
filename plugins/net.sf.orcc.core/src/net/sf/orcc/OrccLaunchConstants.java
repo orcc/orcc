@@ -91,6 +91,11 @@ public interface OrccLaunchConstants {
 	public static final String INPUT_STIMULUS = "net.sf.orcc.simulators.inputStimulus";
 
 	/**
+	 * Mapping associated with an Orcc configuration.
+	 */
+	public static final String MAPPING = "net.sf.orcc.plugins.mapping";
+
+	/**
 	 * Output folder associated with an Orcc configuration.
 	 */
 	public static final String OUTPUT_FOLDER = "net.sf.orcc.outputFolder";

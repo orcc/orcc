@@ -172,6 +172,20 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	}
 
 	/**
+	 * Creates a new instance of the given serializer/deserializer with the
+	 * given identifier.
+	 * 
+	 * @param id
+	 *            the instance identifier
+	 * @param serdes
+	 *            a wrapper
+	 */
+	public Instance(String id, SerDes serdes) {
+		this(id, "SerDes");
+		this.serdes = serdes;
+	}
+
+	/**
 	 * Creates a new instance with the given id and empty parameters and
 	 * attributes.
 	 * 
@@ -210,20 +224,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		this(id, clasz);
 		this.parameters.putAll(parameters);
 		this.attributes.putAll(attributes);
-	}
-
-	/**
-	 * Creates a new instance of the given serializer/deserializer with the
-	 * given identifier.
-	 * 
-	 * @param id
-	 *            the instance identifier
-	 * @param serdes
-	 *            a wrapper
-	 */
-	public Instance(String id, SerDes serdes) {
-		this(id, "SerDes");
-		this.serdes = serdes;
 	}
 
 	@Override
@@ -313,6 +313,23 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	public List<String> getHierarchicalId() {
 		return hierarchicalId;
+	}
+
+	/**
+	 * Returns the path of identifiers from the top-level to this instance as a
+	 * path of the form /top/network/.../instance.
+	 * 
+	 * @return the path of identifiers from the top-level to this instance as a
+	 *         path of the form /top/network/.../instance
+	 */
+	public String getHierarchicalIdAsPath() {
+		StringBuilder builder = new StringBuilder();
+		for (String id : hierarchicalId) {
+			builder.append('/');
+			builder.append(id);
+		}
+
+		return builder.toString();
 	}
 
 	/**
