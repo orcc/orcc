@@ -378,8 +378,6 @@
         src="DecodeMbPred" src-port="SkipNal"/>
     <Connection dst="DecodeMbPred" dst-port="ChromaArrayType"
         src="DecodeMacroBlockLayer" src-port="MbPredChromaArrayType"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="NumRefIdxLXActive"
-        src="DecodePps" src-port="NumRefIdxLXActive"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="NumRefIdxLXActive"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumRefIdxLXActive"/>
     <Connection dst="DecodeMbPred" dst-port="NumRefIdxLXActive"
@@ -466,4 +464,6 @@
         src="DecodeResidual" src-port="DecMbLayerTotal_CoeffChroma"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffChroma"
         src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffChroma"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="NumRefIdxLXActive"
+        src="DecodeRefPicList" src-port="SDataNumRefIdxLXActive"/>
 </XDF>

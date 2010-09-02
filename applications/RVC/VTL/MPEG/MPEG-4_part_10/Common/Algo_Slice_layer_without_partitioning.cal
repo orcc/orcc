@@ -380,13 +380,13 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	MbPred.AskReadBits: action
+	MbPred.AskReadBitsOrTeV: action
 			MbPredTypeOfVLD    :[ValTypeOfVLD],
-			MbPredNbBitsToRead :[NbBits],
+			MbPredNbBitsToRead :[VldParam],
 			MbPredSkipNal      :[EndOfDecoding]
 				==>
-			TypeOfVLD          :[READ_BITS],
-			VLD_Param       :[NbBits],
+			TypeOfVLD          :[ValTypeOfVLD],
+			VLD_Param       :[VldParam],
 			SkipNal            :[false]
 		guard
 			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE,
@@ -503,7 +503,7 @@ actor Algo_Slice_layer_without_partitioning()
 			LaunchMbLayer    (MbLayer.LaunchResidual  )--> LaunchResidual;
 	
 				LaunchMbPred   (MbPred.AskVLD       )--> LaunchMbPred;
-				LaunchMbPred   (MbPred.AskReadBits  )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.AskReadBitsOrTeV  )--> LaunchMbPred;
 				LaunchMbPred   (MbPred.GetVLDVal    )--> LaunchMbPred;
 				LaunchMbPred   (MbPred.Done         )--> LaunchMbLayer;
 
@@ -526,6 +526,6 @@ actor Algo_Slice_layer_without_partitioning()
 		SliceData.GetVLDVal          > SliceData.AskVLD             > SliceData.AskReadBits   > SliceData.LaunchMbLayer       > SliceData.Done;
 		MbLayer.GetVLDVal            > MbLayer.AskVLD               > MbLayer.AskReadBits     > MbLayer.LaunchMbPred;
 		MbLayer.LaunchMbPred         > MbLayer.LaunchSubMbPred      > MbLayer.LaunchResidual  > MbLayer.Done;
-		MbPred.GetVLDVal             > MbPred.AskVLD                > MbPred.AskReadBits      > MbPred.Done;
+		MbPred.GetVLDVal             > MbPred.AskVLD                > MbPred.AskReadBitsOrTeV > MbPred.Done;
 	end
 end

@@ -22,7 +22,8 @@ actor Algo_DecodeRefPicList_Frext()
 		==>
 	uint(size=3)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
-	bool          SkipNal
+	bool          SkipNal,
+	uint(size=5)  SDataNumRefIdxLXActive
 		:
 
 /*   
@@ -225,7 +226,8 @@ actor Algo_DecodeRefPicList_Frext()
 
 	SendEndSliceHeader: action
 				==>
-			SkipNal :[true]
+			SkipNal :[true],
+			SDataNumRefIdxLXActive :[num_ref_idx_l0_active , num_ref_idx_l1_active]
 		end
 
 

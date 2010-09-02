@@ -124,6 +124,7 @@ actor Algo_DecodeMbPred()
 			transform_size_8x8_flag := ValTransfSz8x8;
 			Chroma_Array_Type       := ValChromaArrayType;
 			num_ref_idx_l0_active   := ValNumRefIdxLXActive[0];
+			println("numrefjdsmql:"+num_ref_idx_l0_active);
 			num_ref_idx_l1_active   := ValNumRefIdxLXActive[1];
 			mb_field_decoding_flag  := ValMbFieldDecoding;
 			lumaYxYBlkIdx           := 0;
