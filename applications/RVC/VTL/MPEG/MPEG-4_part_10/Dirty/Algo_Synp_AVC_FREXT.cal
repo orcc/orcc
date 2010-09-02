@@ -7609,6 +7609,9 @@ end
 		//println("read_MB_layer_mb_type_done");
 		if IS_CAVLC() then
 			mb_type := vld_ue();
+			if(DEBUG_NEW_PARSER) then
+			println("mb_type : "+mb_type);
+			end
 		
 		else 
 			if IS_CABAC() then
@@ -8394,6 +8397,10 @@ end
 			
 			if prev_intra4x4_pred_mode_flag = 0 then 
 				set_bits_to_read(3); 
+			else
+				if(DEBUG_NEW_PARSER) then
+					println("rem_intraYxY_pred_mode["+luma4x4BlkIdx+"] : -1");
+				end
 			end
 		else 
 			if IS_CABAC() then
@@ -8415,6 +8422,9 @@ end
 	do
 		if IS_CAVLC() then
 			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
+			if(DEBUG_NEW_PARSER) then
+						println("rem_intraYxY_pred_mode["+luma4x4BlkIdx+"] : "+rem_intra4x4_pred_mode[luma4x4BlkIdx]);
+			end
 			luma4x4BlkIdx := luma4x4BlkIdx +1;
 			if luma4x4BlkIdx < 16 then set_bits_to_read(1); end
 		else 
@@ -8492,6 +8502,10 @@ end
 			
 			if prev_intra4x4_pred_mode_flag = 0 then 
 				set_bits_to_read(3); 
+			else
+				if(DEBUG_NEW_PARSER) then
+							println("rem_intraYxY_pred_mode["+luma4x4BlkIdx+"] : -1");
+				end
 			end
 		else 
 			if IS_CABAC() then
@@ -8513,6 +8527,9 @@ end
 	do
 		if IS_CAVLC() then
 			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
+				if(DEBUG_NEW_PARSER) then
+							println("rem_intraYxY_pred_mode["+luma4x4BlkIdx+"] : "+rem_intra4x4_pred_mode[ luma4x4BlkIdx ]);
+				end
 			luma4x4BlkIdx := luma4x4BlkIdx +1;
 			if luma4x4BlkIdx < 4 then set_bits_to_read(1); end
 		else 

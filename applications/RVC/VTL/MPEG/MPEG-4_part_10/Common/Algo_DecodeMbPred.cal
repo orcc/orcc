@@ -147,7 +147,7 @@ actor Algo_DecodeMbPred()
 			mb_type                 = BLOCK_TYPE_I_8x8_or_4x4,
 			transform_size_8x8_flag = false
 		do
-			println("Intra 4x4");
+			//println("Intra 4x4");
 			CountBit := 16;
 		end
 
