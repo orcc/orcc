@@ -286,7 +286,7 @@ public class ActorInterpreter {
 			}
 		} catch (OrccRuntimeException ex) {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "
-					+ actor.getName() + " :\n" + ex.getMessage());
+					+ actor.getName(), ex);
 		}
 	}
 
@@ -350,7 +350,7 @@ public class ActorInterpreter {
 			}
 		} catch (OrccRuntimeException ex) {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "
-					+ actor.getName() + " :\n" + ex.getMessage());
+					+ actor.getName(), ex);
 		}
 	}
 
