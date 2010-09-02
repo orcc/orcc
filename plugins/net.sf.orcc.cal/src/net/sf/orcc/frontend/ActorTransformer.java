@@ -809,7 +809,9 @@ public class ActorTransformer {
 			addInstruction(assign);
 		} else {
 			transformInputPattern(astAction, Peek.class);
-			astTransformer.transformLocalVariables(astAction.getVariables());
+			// local variables are not transformed because they are not
+			// supposed to be available for guards
+			// astTransformer.transformLocalVariables(astAction.getVariables());
 			transformGuards(astAction.getGuards(), result);
 		}
 
