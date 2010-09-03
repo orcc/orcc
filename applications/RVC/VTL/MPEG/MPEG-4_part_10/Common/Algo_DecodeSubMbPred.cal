@@ -192,7 +192,7 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 		do
 			subMbPartIdx := 0;
 			if( (slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP) )then
-				subMbPartIdxMax := NumSubMbPart_P[ (sub_mb_type[subMbPartIdx]) & 0x03 ];
+				subMbPartIdxMax := NumSubMbPart_P[ (sub_mb_type[mbPartIdx]) & 0x03 ];
 			else
 				println("Lot of stuff are not implemented for slice B !!!!");
 				while true do end
