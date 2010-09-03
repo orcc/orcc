@@ -32,8 +32,6 @@ actor Algo_DecodeMbPred()
 	uint(size=3) READ_BITS             = 0;
 	uint(size=3) VLD_UE                = 1;
 	uint(size=3) VLD_SE                = 2;
-//	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
-//	uint(size=3) MORE_RBSP_DATA        = 4;
 	uint(size=4) VLD_TE                = 9;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
@@ -74,11 +72,6 @@ actor Algo_DecodeMbPred()
 	uint(size=5)  num_ref_idx_l1_active;
 	bool          mb_field_decoding_flag;
 
-
-
-	function mask_bits( int(size=32)v, int(size=32)n ) --> int :
-		bitand( v, lshift(1,n)-1 )
-	end
 
 	function IS_MbPred_L0_P(uint(size=6) MbType, uint(size=1) x)
 				-->
@@ -124,7 +117,6 @@ actor Algo_DecodeMbPred()
 			transform_size_8x8_flag := ValTransfSz8x8;
 			Chroma_Array_Type       := ValChromaArrayType;
 			num_ref_idx_l0_active   := ValNumRefIdxLXActive[0];
-			println("numrefjdsmql:"+num_ref_idx_l0_active);
 			num_ref_idx_l1_active   := ValNumRefIdxLXActive[1];
 			mb_field_decoding_flag  := ValMbFieldDecoding;
 			lumaYxYBlkIdx           := 0;

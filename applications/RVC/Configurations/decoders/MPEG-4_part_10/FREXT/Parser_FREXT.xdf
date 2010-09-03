@@ -187,6 +187,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="DecodeSubMbPred">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSubMbPred"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -466,4 +475,22 @@
         src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffChroma"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="NumRefIdxLXActive"
         src="DecodeRefPicList" src-port="SDataNumRefIdxLXActive"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="SubMbPredTypeOfVLD"
+        src="DecodeSubMbPred" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="SubMbPredNbBitsToRead"
+        src="DecodeSubMbPred" src-port="VldParam"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="SubMbPredSkipNal"
+        src="DecodeSubMbPred" src-port="SkipNal"/>
+    <Connection dst="DecodeSubMbPred" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="SubMbPredValVLD"/>
+    <Connection dst="DecodeSubMbPred" dst-port="SliceType"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredSliceType"/>
+    <Connection dst="DecodeSubMbPred" dst-port="MbType"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredMbType"/>
+    <Connection dst="DecodeSubMbPred" dst-port="NumRefIdxLXActive"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredNumRefIdxLXActive"/>
+    <Connection dst="DecodeSubMbPred" dst-port="MbFieldDecoding"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredMbFieldDecoding"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="SubMbType"
+        src="DecodeSubMbPred" src-port="MBLayerSubMbType"/>
 </XDF>

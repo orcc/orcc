@@ -43,6 +43,10 @@ actor Algo_Slice_layer_without_partitioning()
 	int (size=32) MbPredNbBitsToRead,
 	bool          MbPredSkipNal,
 
+	uint(size=3)  SubMbPredTypeOfVLD,
+	int (size=32) SubMbPredNbBitsToRead,
+	bool          SubMbPredSkipNal,
+
 	bool          ResSkipNal,
 	uint(size=4)  ResLaunchActor,
 
@@ -65,6 +69,8 @@ actor Algo_Slice_layer_without_partitioning()
 	int (size=32) MbLayerValVLD,
 
 	int (size=32) MbPredValVLD,
+
+	int (size=32) SubMbPredValVLD,
 
 	int (size=32) ResBlkCavlcValVLD
 		:
@@ -398,6 +404,47 @@ actor Algo_Slice_layer_without_partitioning()
 				==>
 		guard
 			EndOfDecoding = true
+		end/******/
+
+
+	SubMbPred.GetVLDVal: action
+			ValVLD                 :[VLDecoding]
+				==>
+			SubMbPredValVLD :[VLDecoding]
+		end
+
+
+	SubMbPred.AskVLD: action
+			SubMbPredTypeOfVLD   :[ValTypeOfVLD],
+			SubMbPredSkipNal     :[EndOfDecoding]
+				==>
+			TypeOfVLD         :[ValTypeOfVLD],
+			SkipNal           :[false]
+		guard
+			ValTypeOfVLD  != READ_BITS,
+			ValTypeOfVLD  != VLD_TE,
+			EndOfDecoding  = false
+		end
+
+
+	SubMbPred.AskReadBitsOrTeV: action
+			SubMbPredTypeOfVLD    :[ValTypeOfVLD],
+			SubMbPredNbBitsToRead :[VldParam],
+			SubMbPredSkipNal      :[EndOfDecoding]
+				==>
+			TypeOfVLD          :[ValTypeOfVLD],
+			VLD_Param       :[VldParam],
+			SkipNal            :[false]
+		guard
+			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE,
+			EndOfDecoding = false
+		end
+
+	SubMbPred.Done: action
+			SubMbPredSkipNal :[EndOfDecoding]
+				==>
+		guard
+			EndOfDecoding = true
 		end
 
 	Residual.Done: action
@@ -506,6 +553,11 @@ actor Algo_Slice_layer_without_partitioning()
 				LaunchMbPred   (MbPred.AskReadBitsOrTeV  )--> LaunchMbPred;
 				LaunchMbPred   (MbPred.GetVLDVal    )--> LaunchMbPred;
 				LaunchMbPred   (MbPred.Done         )--> LaunchMbLayer;
+	
+				LaunchSubMbPred   (SubMbPred.AskVLD       )--> LaunchSubMbPred;
+				LaunchSubMbPred   (SubMbPred.AskReadBitsOrTeV  )--> LaunchSubMbPred;
+				LaunchSubMbPred   (SubMbPred.GetVLDVal    )--> LaunchSubMbPred;
+				LaunchSubMbPred   (SubMbPred.Done         )--> LaunchMbLayer;
 
 				LaunchResidual (Residual.Done              )--> LaunchMbLayer;
 				LaunchResidual (Residual.LaunchResBlkCavlc )--> LaunchResBlkCavlc;
