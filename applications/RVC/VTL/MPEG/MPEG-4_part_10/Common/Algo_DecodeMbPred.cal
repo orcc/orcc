@@ -35,15 +35,15 @@ actor Algo_DecodeMbPred()
 	uint(size=4) VLD_TE                = 9;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
-//	uint(size=4) SLICE_TYPE_B  = 1;
+	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_I  = 2;
 	uint(size=4) SLICE_TYPE_SP = 3;
 	uint(size=4) SLICE_TYPE_SI = 4;
 
 
 	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
-//	uint(size=6) BLOCK_TYPE_INTA_16x16_MIN = 1;
-//	uint(size=6) BLOCK_TYPE_INTA_16x16_MAX = 24;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 //	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
 
 	uint(size=5) NA      = 0;
@@ -103,6 +103,87 @@ actor Algo_DecodeMbPred()
 			end
 		end
 
+	function Is_Intra_16x16(uint MbType)
+				-->
+			bool
+		:
+			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
+				if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+					true
+				else
+					false
+				end
+			else
+				if(slice_type != SLICE_TYPE_B) then
+					if( ((MbType-5) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+						true
+					else
+						false
+					end
+				else
+					if( ((MbType-5-22) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5-22) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+						true
+					else
+						false
+					end
+				end
+			end
+		end
+
+	function Is_Intra_8x8(uint MbType)
+				-->
+			bool
+		:
+			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
+				if( (MbType = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
+					true
+				else
+					false
+				end
+			else
+				if(slice_type != SLICE_TYPE_B) then
+					if( ((MbType-5) = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
+						true
+					else
+						false
+					end
+				else
+					if( ((MbType-5-22) = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
+						true
+					else
+						false
+					end
+				end
+			end
+		end
+
+	function Is_Intra_4x4(uint MbType)
+				-->
+			bool
+		:
+			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
+				if( (MbType = BLOCK_TYPE_I_8x8_or_4x4) and  (not transform_size_8x8_flag) ) then
+					true
+				else
+					false
+				end
+			else
+				if(slice_type != SLICE_TYPE_B) then
+					if( ((MbType-5) = BLOCK_TYPE_I_8x8_or_4x4) and (not transform_size_8x8_flag) ) then
+						true
+					else
+						false
+					end
+				else
+					if( ((MbType-5-22) = BLOCK_TYPE_I_8x8_or_4x4) and (not transform_size_8x8_flag) ) then
+						true
+					else
+						false
+					end
+				end
+			end
+		end
+
 	ReadParameters: action
 			SliceType         :[ValSliceType],
 			MbType            :[ValMbType],
@@ -126,8 +207,7 @@ actor Algo_DecodeMbPred()
 	MbType.IsIntra_YxY: action
 				==>
 		guard
-			(slice_type = SLICE_TYPE_I) or (slice_type = SLICE_TYPE_SI)
-			//, mb_type != BLOCK_TYPE_I_PCM // ==> useless because this actor isn't used with this kind of Mb
+			Is_Intra_16x16(mb_type) or Is_Intra_8x8(mb_type) or Is_Intra_4x4(mb_type)
 		end
 
 //We read 16 bits for limiting communication with others actors and improving performance
@@ -138,8 +218,7 @@ actor Algo_DecodeMbPred()
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[    16     ]
 		guard
-			mb_type                 = BLOCK_TYPE_I_8x8_or_4x4,
-			transform_size_8x8_flag = false
+			Is_Intra_4x4(mb_type)
 		do
 			//println("Intra 4x4");
 			CountBit := 16;
@@ -210,8 +289,7 @@ actor Algo_DecodeMbPred()
 			TypeOfVLD    :[    READ_BITS     ],
 			NbBitsToRead :[        4 ]
 		guard
-			mb_type                 = BLOCK_TYPE_I_8x8_or_4x4,
-			transform_size_8x8_flag = true
+			Is_Intra_8x8(mb_type)
 		do
 			//println("Intra 8x8");
 			CountBit := 4;

@@ -158,6 +158,33 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=2)  NumC8x8;
 
 
+	function Is_Intra_16x16(uint MbType)
+				-->
+			bool
+		:
+			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
+				if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+					true
+				else
+					false
+				end
+			else
+				if(slice_type != SLICE_TYPE_B) then
+					if( ((MbType-5) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+						true
+					else
+						false
+					end
+				else
+					if( ((MbType-5-22) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5-22) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+						true
+					else
+						false
+					end
+				end
+			end
+		end
+
 	ReadMbType.Asked: action
 				==>
 			//              mb_type
@@ -366,12 +393,7 @@ actor Algo_DecodeMacroblockLayer()
 			LaunchActor  :[ MB_LAYER ],
 			TypeOfVLD    :[  VLD_UE  ] //VLD_ME
 		guard
-			//Mb_type != Intra16x16
-			not(
-				    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
-				and (mb_type >= BLOCK_TYPE_INTRA_16x16_MIN)
-				and (mb_type <= BLOCK_TYPE_INTRA_16x16_MAX)
-			)
+			not(Is_Intra_16x16(mb_type))
 		end
 
 	ReadCodedBlockPattern.Done: action
@@ -427,9 +449,7 @@ actor Algo_DecodeMacroblockLayer()
 		guard
 			   (CodedBlockPatternLuma   > 0)
 			or (CodedBlockPatternChroma > 0)
-			or (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
-				and (mb_type >= BLOCK_TYPE_INTRA_16x16_MIN)
-				and (mb_type <= BLOCK_TYPE_INTRA_16x16_MAX)
+			or Is_Intra_16x16(mb_type)
 		end
 
 	ReadMbQpDelta.Done: action
