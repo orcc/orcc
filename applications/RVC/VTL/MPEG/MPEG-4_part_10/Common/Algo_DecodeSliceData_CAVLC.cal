@@ -217,6 +217,12 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 		guard
 			mb_skip_run > 0
 		do
+			foreach int i in 0 .. 15
+			do
+				TotalCoeffTabLuma     [CurrMbAddr & MASK_TOTALCOEFF][i] := 0;
+				TotalCoeffTabChroma[0][CurrMbAddr & MASK_TOTALCOEFF][i] := 0;
+				TotalCoeffTabChroma[1][CurrMbAddr & MASK_TOTALCOEFF][i] := 0;
+			end
 			NextMbAddress();
 			mb_skip_run := mb_skip_run - 1;
 		end

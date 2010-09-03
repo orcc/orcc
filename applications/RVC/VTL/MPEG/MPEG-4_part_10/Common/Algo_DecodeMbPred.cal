@@ -121,7 +121,7 @@ actor Algo_DecodeMbPred()
 						false
 					end
 				else
-					if( ((MbType-5-22) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5-22) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+					if( ((MbType-5-23) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5-23) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
 						true
 					else
 						false
@@ -461,7 +461,7 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
-			println("ReadRefIdxL0["+mbPartIdx+"] : "+ValueOfVLD);
+			//println("ReadRefIdxL0["+mbPartIdx+"] : "+ValueOfVLD);
 			mbPartIdx := mbPartIdx + 1;
 		end
 
@@ -471,7 +471,7 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
-			println("ReadRefIdxL1["+mbPartIdx+"] : "+ValueOfVLD);
+			//println("ReadRefIdxL1["+mbPartIdx+"] : "+ValueOfVLD);
 			mbPartIdx := mbPartIdx + 1;
 		end
 
@@ -481,7 +481,7 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
-			println("ReadMvdL0["+mbPartIdx+"] : "+ValueOfVLD[0]+" ; "+ValueOfVLD[1]);
+			//println("ReadMvdL0["+mbPartIdx+"] : "+ValueOfVLD[0]+" ; "+ValueOfVLD[1]);
 			mbPartIdx := mbPartIdx + 1;
 		end
 
@@ -491,7 +491,7 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
-			println("ReadMvdL1["+mbPartIdx+"] : "+ValueOfVLD[0]+" ; "+ValueOfVLD[1]);
+			//println("ReadMvdL1["+mbPartIdx+"] : "+ValueOfVLD[0]+" ; "+ValueOfVLD[1]);
 			mbPartIdx := mbPartIdx + 1;
 		end
 
