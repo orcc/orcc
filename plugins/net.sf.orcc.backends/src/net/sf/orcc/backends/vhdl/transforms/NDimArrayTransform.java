@@ -28,18 +28,18 @@
  */
 package net.sf.orcc.backends.vhdl.transforms;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -53,73 +53,53 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class NDimArrayTransform extends AbstractActorTransformation {
 
-	/**
-	 * an iterator on the current node. Initiated by
-	 * {@link #visit(BlockNode, Object...)}.
-	 */
-	private BlockNode block;
-
-	/**
-	 * Creates an "Assign" node that assign the index of a 1D array to index_0,
-	 * index_1, ..., index_N of a ND array.
-	 * 
-	 * @param target
-	 *            target local variable
-	 * @param expr
-	 *            an expression
-	 */
-	private void createAssignNode(LocalVariable target, Expression expr) {
-		Assign assign = new Assign(expr.getLocation(), target, expr);
-		block.add(assign);
-	}
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Load load, Object... args) {
 		List<Expression> indexes = load.getIndexes();
-		int size = indexes.size();	
-		while (size != 0) {
-			size--;
-			if (!indexes.get(size).isIntExpr() /*&& store.getSource().isGlobal()*/) {
-				Type type = indexes.get(size).getType();
-				LocalVariable local = new LocalVariable(true, size, new Location(),
-						"index_"+size,type);
-				procedure.getLocals().put(local.getName(), local);
-				createAssignNode(local, indexes.get(size));
+		if (!indexes.isEmpty()) {
+			Iterator<Expression> it = indexes.iterator();
+			Expression index = null;
 
-				// remove uses of the given indexes
-				Use.removeUses(load, indexes);
+			while (it.hasNext()) {
+				Expression expr = it.next();
 
-				// remove indexes from load
-				indexes.clear();
+				Type type = expr.getType();
+				LocalVariable indexVar = procedure.newTempLocalVariable("", type,
+						"index");
 
-				// add index to indexes
-				indexes.add(new VarExpr(new Use(local, load)));
+				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
+				iit.previous();
+				Assign assign = new Assign(expr.getLocation(), indexVar, expr);
+				iit.add(assign);
+				iit.next();
+
+				// Add index to indexes
+				index = new VarExpr(new Use(indexVar));
 			}
+
+			Use.removeUses(load, indexes);
+			indexes.clear();
+			indexes.add(index);
 		}
 	}
 
-	@Override
-	public void visit(Store store, Object... args) {
-		List<Expression> indexes = store.getIndexes();
-		int size = indexes.size();	
-		while (size != 0) {
-			size--;
-			if (!indexes.get(size).isIntExpr() /*&& store.getSource().isGlobal()*/) {
-				Type type = indexes.get(size).getType();
-				LocalVariable local = new LocalVariable(true, size, new Location(),
-						"index_"+size,type);
-				procedure.getLocals().put(local.getName(), local);
-				createAssignNode(local, indexes.get(size));
-				// remove uses of the given indexes
-				Use.removeUses(store, indexes);
-
-				// remove indexes from load
-				indexes.clear();
-
-				// add index to indexes
-				indexes.add(new VarExpr(new Use(local, store)));			
-			}
-		}
-	}
-
+	/*
+	 * @SuppressWarnings("unchecked")
+	 * 
+	 * @Override public void visit(Store store, Object... args) {
+	 * List<Expression> indexes = store.getIndexes(); int size = indexes.size();
+	 * Type typemax = null; while (size != 0) { size--; if
+	 * (!indexes.get(size).isIntExpr()) { Type type =
+	 * indexes.get(size).getType(); //if (Cast.getSizeOfType(type) >
+	 * Cast.getSizeOfType(typemax)) { typemax = type; //} LocalVariable local =
+	 * new LocalVariable(true, size, new Location(),
+	 * "index_"+IndexCount++,type); procedure.getLocals().put(local.getName(),
+	 * local); block = store.getBlock(); ListIterator<Instruction> iit =
+	 * (ListIterator<Instruction>) args[0]; iit.previous();
+	 * createAssignNode(local, indexes.get(size)); indexes.remove(size); } } //
+	 * Add index to indexes LocalVariable local = new LocalVariable(true, 0, new
+	 * Location(), "index", typemax); indexes.add(new VarExpr(new Use(local)));
+	 * }
+	 */
 }

@@ -103,14 +103,16 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new RenameTransformation(this.transformations),
 
 				new Inline(), new PhiRemoval(), new VariableRedimension(),
-				new BoolExprTransform(), new VariableRenamer(),
-
-				// replaces adjacent underscores by a single underscore
-				new RenameTransformation(adjacentUnderscores, "_"),
+				new BoolExprTransform(),
 
 				new TransformConditionals(),
-				
-				new NDimArrayTransform() };
+
+				new NDimArrayTransform(),
+
+				new VariableRenamer(),
+
+				// replaces adjacent underscores by a single underscore
+				new RenameTransformation(adjacentUnderscores, "_") };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
