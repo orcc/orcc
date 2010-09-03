@@ -6948,6 +6948,9 @@ end
 	do
 		//println("read_SliceD_mb_skip_run_done0");
 		mb_skip_run := vld_ue();
+				if(DEBUG_NEW_PARSER) then
+					println("\t\tmb_skip_run : "+mb_skip_run);
+				end
 		if mb_skip_run >0 then 
 			prevMbSkipped := 1; 
 		else 

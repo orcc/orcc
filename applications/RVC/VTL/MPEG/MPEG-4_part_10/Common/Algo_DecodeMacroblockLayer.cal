@@ -103,7 +103,7 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=4) SLICE_TYPE_SI = 4;
 
 
-//	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
+	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
@@ -177,6 +177,60 @@ actor Algo_DecodeMacroblockLayer()
 					end
 				else
 					if( ((MbType-5-23) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5-23) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+						true
+					else
+						false
+					end
+				end
+			end
+		end
+
+	function Is_Intra_8x8(uint MbType)
+				-->
+			bool
+		:
+			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
+				if( (MbType = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
+					true
+				else
+					false
+				end
+			else
+				if(slice_type != SLICE_TYPE_B) then
+					if( ((MbType-5) = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
+						true
+					else
+						false
+					end
+				else
+					if( ((MbType-5-23) = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
+						true
+					else
+						false
+					end
+				end
+			end
+		end
+
+	function Is_Intra_4x4(uint MbType)
+				-->
+			bool
+		:
+			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
+				if( (MbType = BLOCK_TYPE_I_8x8_or_4x4) and  (not transform_size_8x8_flag) ) then
+					true
+				else
+					false
+				end
+			else
+				if(slice_type != SLICE_TYPE_B) then
+					if( ((MbType-5) = BLOCK_TYPE_I_8x8_or_4x4) and (not transform_size_8x8_flag) ) then
+						true
+					else
+						false
+					end
+				else
+					if( ((MbType-5-23) = BLOCK_TYPE_I_8x8_or_4x4) and (not transform_size_8x8_flag) ) then
 						true
 					else
 						false
@@ -413,7 +467,7 @@ actor Algo_DecodeMacroblockLayer()
 			uint(size=6) coded_block_pattern
 		do
 			coded_block_pattern :=
-				if(slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)then //Mb_type = Intra4x4 or Intra8x8
+				if( Is_Intra_4x4(mb_type) or Is_Intra_8x8(mb_type) )then
 					VLD_ME_TABLE[Chroma_Array_Type][CodeNum][0]
 				else
 					VLD_ME_TABLE[Chroma_Array_Type][CodeNum][1]
