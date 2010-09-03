@@ -28,6 +28,7 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) MBLayerSubMbType
 		:
 
+	bool DEBUG_MV = false;
 
 	uint(size=3) READ_BITS             = 0;
 	uint(size=3) VLD_UE                = 1;
@@ -92,7 +93,9 @@ actor Algo_DecodeSubMbPred()
 			foreach int i in 0 .. 3
 			do
 				sub_mb_type[i] := ValueOfVLD[i];
-				//println("sub_mb_type[ "+i+" ] : "+ValueOfVLD[i]);
+				if(DEBUG_MV)then
+					println("sub_mb_type[ "+i+" ] : "+ValueOfVLD[i]);
+				end
 			end
 		end
 
@@ -121,7 +124,7 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 	AskRefIdxL0.Launch: action
 				==>
 			TypeOfVLD :[ VLD_TE ],
-			VldParam  :[ num_ref_idx_l0_active ],
+			VldParam  :[ num_ref_idx_l0_active - 1 ],
 			SkipNal   :[ false ]
 		guard
 			/* ( num_ref_idx_l0_active_minus1 > 0 || mb_field_decoding_flag ) */
@@ -168,7 +171,7 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 	AskRefIdxL1.Launch: action
 				==>
 			TypeOfVLD :[ VLD_TE ],
-			VldParam  :[ num_ref_idx_l0_active ],
+			VldParam  :[ num_ref_idx_l0_active - 1 ],
 			SkipNal   :[ false ]
 		guard
 			/* ( num_ref_idx_l1_active_minus1 > 0 | | mb_field_decoding_flag ) */
@@ -194,7 +197,7 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 			if( (slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP) )then
 				subMbPartIdxMax := NumSubMbPart_P[ (sub_mb_type[mbPartIdx]) & 0x03 ];
 			else
-				//println("Lot of stuff are not implemented for slice B !!!!");
+				println("Lot of stuff are not implemented for slice B !!!!");
 				while true do end
 			end
 			mbPartIdx    := mbPartIdx + 1;
@@ -238,10 +241,12 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			ValVLD :[ValueOfVLD] repeat 8
 				==>
 		do
-			foreach int i in 0 .. 3
-			do
-				//println("refidxl0["+i+"] :"+ValueOfVLD[i]);
-				//println("refidxl1["+i+"] :"+ValueOfVLD[i+4]);
+			if(DEBUG_MV)then
+				foreach int i in 0 .. 3
+				do
+					println("refidxl1["+i+"] :"+ValueOfVLD[i+4]);
+					println("refidxl0["+i+"] :"+ValueOfVLD[i]);
+				end
 			end
 		end
 
@@ -253,8 +258,10 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1,
 			subMbPartIdx < subMbPartIdxMax
 		do
-			//println("mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
-			//println("mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
+			if(DEBUG_MV)then
+				println("mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
+				println("mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
+			end
 			subMbPartIdx := subMbPartIdx +1;
 		end
 
@@ -266,8 +273,10 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L0,
 			subMbPartIdx < subMbPartIdxMax
 		do
-			//println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
-			//println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
+			if(DEBUG_MV)then
+				println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
+				println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
+			end
 			subMbPartIdx := subMbPartIdx +1;
 		end
 
