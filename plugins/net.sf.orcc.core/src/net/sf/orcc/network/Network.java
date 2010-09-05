@@ -49,8 +49,10 @@ import net.sf.orcc.network.transforms.SolveParametersTransform;
 import net.sf.orcc.tools.merger.ActorMerger;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.Scope;
 
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * This class defines a hierarchical XDF network. It contains several maps so
@@ -115,7 +117,7 @@ public class Network {
 
 	private OrderedMap<String, Port> outputs;
 
-	private OrderedMap<String, GlobalVariable> parameters;
+	private Scope<String, GlobalVariable> parameters;
 
 	private Map<Instance, Map<Port, Instance>> predecessorsMap;
 
@@ -128,28 +130,14 @@ public class Network {
 	private OrderedMap<String, GlobalVariable> variables;
 
 	/**
-	 * Creates a new network with the given name, inputs, outputs, and graph.
-	 * 
-	 * @param name
-	 *            network name
-	 * @param inputs
-	 *            list of input ports
-	 * @param outputs
-	 *            list of output ports
-	 * @param graph
-	 *            graph representing the network's contents
+	 * Creates a new network.
 	 */
-	public Network(String name, OrderedMap<String, Port> inputs,
-			OrderedMap<String, Port> outputs,
-			OrderedMap<String, GlobalVariable> parameters,
-			OrderedMap<String, GlobalVariable> variables,
-			DirectedGraph<Vertex, Connection> graph) {
-		this.name = name;
-		this.inputs = inputs;
-		this.outputs = outputs;
-		this.parameters = parameters;
-		this.variables = variables;
-		this.graph = graph;
+	public Network() {
+		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
+		inputs = new OrderedMap<String, Port>();
+		outputs = new OrderedMap<String, Port>();
+		parameters = new Scope<String, GlobalVariable>();
+		variables = new Scope<String, GlobalVariable>(parameters, false);
 	}
 
 	/**
@@ -528,6 +516,16 @@ public class Network {
 	 */
 	public void normalizeActors() throws OrccException {
 		new ActorNormalizer().transform(this);
+	}
+
+	/**
+	 * Sets the name of this network
+	 * 
+	 * @param name
+	 *            the new name of this network
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public void setNetworkClass(IClass networkClass) {

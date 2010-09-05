@@ -50,11 +50,8 @@ import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.transforms.INetworkTransformation;
-import net.sf.orcc.util.OrderedMap;
-import net.sf.orcc.util.Scope;
 
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 
 /**
  * This class defines a transformation that partition a given network into a
@@ -63,11 +60,7 @@ import org.jgrapht.graph.DirectedMultigraph;
  * @author Ghislain Roquier
  * 
  */
-
 public class NetworkPartitioner implements INetworkTransformation {
-	/**
-	 * 
-	 */
 
 	private DirectedGraph<Vertex, Connection> graph;
 
@@ -89,18 +82,12 @@ public class NetworkPartitioner implements INetworkTransformation {
 	 * Copies connections between instances on the same partition.
 	 * 
 	 */
-
 	private void addInternalConnection(Vertex src, Vertex tgt,
 			Connection connection, Network network) {
 		Connection newConnection = new Connection(connection.getSource(),
 				connection.getTarget(), connection.getAttributes());
 		network.getGraph().addEdge(src, tgt, newConnection);
-
 	}
-
-	/**
-	 *
-	 */
 
 	private void createConnections(Set<Vertex> vertices, Network network)
 			throws OrccException {
@@ -112,20 +99,17 @@ public class NetworkPartitioner implements INetworkTransformation {
 
 				if (vertices.contains(src)) {
 					addInternalConnection(src, tgt, connection, network);
-
 				} else {
 					createIncomingConnection(src, tgt, connection, network);
 				}
 			}
 
 			for (Connection connection : graph.outgoingEdgesOf(vertex)) {
-
 				Vertex src = graph.getEdgeSource(connection);
 				Vertex tgt = graph.getEdgeTarget(connection);
 
 				if (!vertices.contains(tgt)) {
 					createOutgoingConnection(src, tgt, connection, network);
-
 				}
 			}
 		}
@@ -136,7 +120,6 @@ public class NetworkPartitioner implements INetworkTransformation {
 	 * connection is on a different partition.
 	 * 
 	 */
-
 	private void createIncomingConnection(Vertex src, Vertex tgt,
 			Connection connection, Network network) throws OrccException {
 		Port srcPort = connection.getSource();
@@ -155,7 +138,6 @@ public class NetworkPartitioner implements INetworkTransformation {
 				connection.getAttributes());
 
 		network.getGraph().addEdge(vertex, tgt, incoming);
-
 	}
 
 	/**
@@ -184,34 +166,28 @@ public class NetworkPartitioner implements INetworkTransformation {
 				connection.getAttributes());
 
 		network.getGraph().addEdge(src, vertex, outgoing);
-
 	}
 
 	/**
-	 *
+	 * 
+	 * @param entry
+	 * @param network
+	 * @return
+	 * @throws OrccException
 	 */
-
 	private Network createPartition(Map.Entry<String, Set<Vertex>> entry,
 			Network network) throws OrccException {
-
 		String name = entry.getKey();
 
-		DirectedGraph<Vertex, Connection> graph = new DirectedMultigraph<Vertex, Connection>(
-				Connection.class);
-		OrderedMap<String, Port> inputs = new OrderedMap<String, Port>();
 		Map<String, Instance> instances = new HashMap<String, Instance>();
-		OrderedMap<String, Port> outputs = new OrderedMap<String, Port>();
-		Scope<String, GlobalVariable> parameters = new Scope<String, GlobalVariable>();
-		Scope<String, GlobalVariable> variables = new Scope<String, GlobalVariable>(
-				parameters, false);
 
-		Network subNetwork = new Network(name, inputs, outputs, parameters,
-				variables, graph);
+		Network subNetwork = new Network();
+		subNetwork.setName(name);
 
 		for (Vertex vertex : entry.getValue()) {
 			Instance instance = vertex.getInstance();
 			instances.put(instance.getId(), instance);
-			graph.addVertex(new Vertex(instance));
+			network.getGraph().addVertex(new Vertex(instance));
 		}
 
 		// adds variables of the previous flatten network to the sub-network
@@ -219,7 +195,7 @@ public class NetworkPartitioner implements INetworkTransformation {
 			GlobalVariable newVar = new GlobalVariable(new Location(),
 					var.getType(), var.getName(), var.getExpression());
 
-			variables.put(newVar.getName(), newVar);
+			subNetwork.getVariables().put(newVar.getName(), newVar);
 		}
 
 		createConnections(entry.getValue(), subNetwork);
@@ -288,12 +264,8 @@ public class NetworkPartitioner implements INetworkTransformation {
 		return subNetworks;
 	}
 
-	/**
-	 *
-	 */
-
+	@Override
 	public void transform(Network network) throws OrccException {
-
 		if (partNames == null) {
 			initPartNames(network);
 		}
@@ -318,7 +290,6 @@ public class NetworkPartitioner implements INetworkTransformation {
 			graph.addVertex(vertex);
 
 			topHierNetworkVertices.put(entry.getKey(), vertex);
-
 		}
 
 		// Creates connections of the top level graph

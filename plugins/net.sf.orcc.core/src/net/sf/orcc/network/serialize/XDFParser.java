@@ -79,10 +79,7 @@ import net.sf.orcc.network.attributes.ValueAttribute;
 import net.sf.orcc.util.BinOpSeqParser;
 import net.sf.orcc.util.DomUtil;
 import net.sf.orcc.util.OrderedMap;
-import net.sf.orcc.util.Scope;
 
-import org.jgrapht.DirectedGraph;
-import org.jgrapht.graph.DirectedMultigraph;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -234,7 +231,7 @@ public class XDFParser {
 						String name = elt.getAttribute("name");
 						// look up variable, in variables scope, and if not
 						// found in parameters scope
-						Variable variable = variables.get(name);
+						Variable variable = network.getVariables().get(name);
 						Use use = new Use(variable);
 						expr = new VarExpr(new Location(), use);
 						break;
@@ -506,30 +503,9 @@ public class XDFParser {
 	 */
 	private final File file;
 
-	/**
-	 * the graph representing the network we are parsing
-	 */
-	private DirectedGraph<Vertex, Connection> graph;
-
-	/**
-	 * list of input ports
-	 */
-	private OrderedMap<String, Port> inputs;
-
-	/**
-	 * map of string -> instances
-	 */
 	private Map<String, Instance> instances;
 
-	/**
-	 * list of output ports
-	 */
-	private OrderedMap<String, Port> outputs;
-
-	/**
-	 * list of parameters
-	 */
-	private Scope<String, GlobalVariable> parameters;
+	private Network network;
 
 	/**
 	 * parent path of {@link #file}
@@ -540,11 +516,6 @@ public class XDFParser {
 	 * XDF type parser.
 	 */
 	private final TypeParser typeParser;
-
-	/**
-	 * list of variables
-	 */
-	private Scope<String, GlobalVariable> variables;
 
 	/**
 	 * Creates a new network parser.
@@ -685,7 +656,7 @@ public class XDFParser {
 				} else if (name.equals("Instance")) {
 					Instance instance = parseInstance(element);
 					instances.put(instance.getId(), instance);
-					graph.addVertex(new Vertex(instance));
+					network.getGraph().addVertex(new Vertex(instance));
 				} else if (name.equals("Package")) {
 					throw new OrccException(
 							"Package elements are not supported by Orcc yet");
@@ -714,15 +685,15 @@ public class XDFParser {
 		String dst = connection.getAttribute("dst");
 		String dst_port = connection.getAttribute("dst-port");
 
-		Vertex source = getVertex(src, src_port, "Input", inputs);
+		Vertex source = getVertex(src, src_port, "Input", network.getInputs());
 		Port srcPort = getPort(src, src_port);
-		Vertex target = getVertex(dst, dst_port, "Output", outputs);
+		Vertex target = getVertex(dst, dst_port, "Output", network.getOutputs());
 		Port dstPort = getPort(dst, dst_port);
 
 		Node child = connection.getFirstChild();
 		Map<String, IAttribute> attributes = parseAttributes(child);
 		Connection conn = new Connection(srcPort, dstPort, attributes);
-		graph.addEdge(source, target, conn);
+		network.getGraph().addEdge(source, target, conn);
 	}
 
 	private void parseDecl(Element decl) throws OrccException {
@@ -738,14 +709,16 @@ public class XDFParser {
 					.getFirstChild());
 			Type type = cont.getResult();
 			GlobalVariable var = new GlobalVariable(location, type, name);
-			parameters.put(file.getAbsolutePath(), location, name, var);
+			network.getParameters().put(file.getAbsolutePath(), location, name,
+					var);
 		} else if (kind.equals("Variable")) {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
 			Expression expr = exprParser.parseExpr(cont.getNode());
 			GlobalVariable var = new GlobalVariable(location, type, name, expr);
-			variables.put(file.getAbsolutePath(), location, name, var);
+			network.getVariables().put(file.getAbsolutePath(), location, name,
+					var);
 		} else {
 			throw new OrccException("unsupported Decl kind: \"" + kind + "\"");
 		}
@@ -824,8 +797,8 @@ public class XDFParser {
 			// input
 			Document document = DomUtil.parseDocument(is);
 
-			// parse the input, close the stream, return the network
-			Network network = parseXDF(document);
+			// parse the input, return the network
+			parseXDF(document);
 			return network;
 		} finally {
 			try {
@@ -879,15 +852,15 @@ public class XDFParser {
 		// adds the port to inputs or outputs depending on its kind
 		String kind = eltPort.getAttribute("kind");
 		if (kind.equals("Input")) {
-			inputs.put(file.toString(), location, name, port);
+			network.getInputs().put(file.toString(), location, name, port);
 		} else if (kind.equals("Output")) {
-			outputs.put(file.toString(), location, name, port);
+			network.getOutputs().put(file.toString(), location, name, port);
 		} else {
 			throw new OrccException("Port \"" + name + "\", invalid kind: \""
 					+ kind + "\"");
 		}
 
-		graph.addVertex(new Vertex(kind, port));
+		network.getGraph().addVertex(new Vertex(kind, port));
 	}
 
 	/**
@@ -895,11 +868,10 @@ public class XDFParser {
 	 * 
 	 * @param doc
 	 *            a DOM document that supposedly represent an XDF network
-	 * @return a Network
 	 * @throws OrccException
 	 *             if the DOM document is not a well-formed XDF network
 	 */
-	private Network parseXDF(Document doc) throws OrccException {
+	private void parseXDF(Document doc) throws OrccException {
 		Element root = doc.getDocumentElement();
 		if (!root.getNodeName().equals("XDF")) {
 			throw new OrccException("Expected \"XDF\" start element");
@@ -910,21 +882,16 @@ public class XDFParser {
 			throw new OrccException("Expected a \"name\" attribute");
 		}
 
-		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
-		inputs = new OrderedMap<String, Port>();
+		this.network = new Network();
 		instances = new HashMap<String, Instance>();
-		outputs = new OrderedMap<String, Port>();
-		parameters = new Scope<String, GlobalVariable>();
-		variables = new Scope<String, GlobalVariable>(parameters, false);
+		network.setName(name);
 
 		parseBody(root);
 
-		if (instances.isEmpty()) {
+		if (network.getInstances().isEmpty()) {
 			throw new OrccException(
 					"A valid network must contain at least one instance");
 		}
-
-		return new Network(name, inputs, outputs, parameters, variables, graph);
 	}
 
 }
