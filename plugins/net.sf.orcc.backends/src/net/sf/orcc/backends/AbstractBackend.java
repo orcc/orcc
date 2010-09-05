@@ -174,6 +174,7 @@ public abstract class AbstractBackend implements Backend {
 		// parses top network
 		write("Parsing XDF network...\n");
 		Network network = new XDFParser(inputFile).parseNetwork();
+		network.updateIdentifiers();
 
 		write("Instantiating actors...\n");
 		network.instantiate(vtlFolder);

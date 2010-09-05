@@ -374,6 +374,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		if (!xdfFile.isEmpty()) {
 			try {
 				network = new XDFParser(xdfFile).parseNetwork();
+				network.updateIdentifiers();
 			} catch (OrccException e) {
 				e.printStackTrace();
 			}
