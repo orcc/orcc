@@ -68,7 +68,7 @@ public class BroadcastAdder implements INetworkTransformation {
 	 * @param vertexBCast
 	 *            the vertex that contains the broadcast
 	 */
-	private void createIncomingConnection(Connection connection, Vertex vertex,
+	protected void createIncomingConnection(Connection connection, Vertex vertex,
 			Vertex vertexBCast) {
 		Broadcast bcast = vertexBCast.getInstance().getBroadcast();
 		Port bcastInput = bcast.getInput();
