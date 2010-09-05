@@ -159,7 +159,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			if (element instanceof Instance) {
 				Instance instance = (Instance) element;
 				String component = mapping.get(instance
-						.getHierarchicalIdAsPath());
+						.getHierarchicalPath());
 				if (component != null) {
 					return component;
 				}
@@ -169,7 +169,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		}
 
 		private void setMapping(Instance instance, String component) {
-			mapping.put(instance.getHierarchicalIdAsPath(), (String) component);
+			mapping.put(instance.getHierarchicalPath(), (String) component);
 			if (instance.isNetwork()) {
 				Network network = instance.getNetwork();
 				for (Instance subInstance : network.getInstances()) {
@@ -221,7 +221,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			} else {
 				if (element instanceof Instance) {
 					Instance instance = (Instance) element;
-					return mapping.get(instance.getHierarchicalIdAsPath());
+					return mapping.get(instance.getHierarchicalPath());
 				}
 			}
 

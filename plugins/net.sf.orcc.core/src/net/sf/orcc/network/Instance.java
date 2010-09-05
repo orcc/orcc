@@ -322,7 +322,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * @return the path of identifiers from the top-level to this instance as a
 	 *         path of the form /top/network/.../instance
 	 */
-	public String getHierarchicalIdAsPath() {
+	public String getHierarchicalPath() {
 		StringBuilder builder = new StringBuilder();
 		for (String id : hierarchicalId) {
 			builder.append('/');

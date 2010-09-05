@@ -28,11 +28,15 @@
  */
 package net.sf.orcc.backends.c;
 
+import static net.sf.orcc.OrccLaunchConstants.MAPPING;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -46,8 +50,10 @@ import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transforms.BroadcastAdder;
 
 /**
@@ -68,6 +74,8 @@ public class CBackendImpl extends AbstractBackend {
 		main(CBackendImpl.class, args);
 	}
 
+	private boolean needPthreads;
+
 	/**
 	 * printer is protected in order to be visible to CQuasiBackendImpl
 	 */
@@ -75,12 +83,58 @@ public class CBackendImpl extends AbstractBackend {
 
 	private final Map<String, String> transformations;
 
+	/**
+	 * Creates a new instance of the C back-end. Initializes the transformation
+	 * hash map.
+	 */
 	public CBackendImpl() {
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_");
 		transformations.put("index", "index_");
 		transformations.put("getw", "getw_");
 		transformations.put("select", "select_");
+	}
+
+	private void computeMapping(Network network) throws OrccException {
+		Map<String, String> mapping = getAttribute(MAPPING,
+				new HashMap<String, String>());
+
+		// compute the different threads
+		Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
+		for (Instance instance : network.getInstances()) {
+			String path = null;
+			if (instance.isActor()) {
+				path = instance.getHierarchicalPath();
+			} else if (instance.isBroadcast()) {
+				// use source instance for broadcasts
+				Set<Connection> edges = network.getGraph().incomingEdgesOf(
+						new Vertex(instance));
+				if (!edges.isEmpty()) {
+					Connection incoming = edges.iterator().next();
+					Vertex source = network.getGraph().getEdgeSource(incoming);
+					if (source.isInstance()) {
+						path = source.getInstance().getHierarchicalPath();
+					}
+				}
+			}
+
+			// get component
+			String component = mapping.get(path);
+			if (component != null) {
+				List<Instance> list = threads.get(component);
+				if (list == null) {
+					list = new ArrayList<Instance>();
+					threads.put(component, list);
+				}
+
+				list.add(instance);
+			}
+		}
+
+		printer.getOptions().put("threads", threads);
+
+		needPthreads = (threads.keySet().size() > 1);
+		printer.getOptions().put("needPthreads", needPthreads);
 	}
 
 	@Override
@@ -174,16 +228,18 @@ public class CBackendImpl extends AbstractBackend {
 				networkTemplates[0] = "C_network";
 			}
 
-			printer.loadGroups(networkTemplates);
-
 			// Add broadcasts before printing
 			new BroadcastAdder().transform(network);
 
+			// mapping
+			computeMapping(network);
+
 			String outputName = path + File.separator + network.getName()
 					+ ".c";
+			printer.loadGroups(networkTemplates);
 			printer.printNetwork(outputName, network, false, fifoSize);
 
-			new CMakePrinter().printCMake(path, network);
+			new CMakePrinter().printCMake(path, network, needPthreads);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

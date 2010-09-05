@@ -71,9 +71,11 @@ public class CMakePrinter {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public void printCMake(String path, Network network) throws IOException {
+	public void printCMake(String path, Network network, boolean needPthreads)
+			throws IOException {
 		ST template = group.getInstanceOf("CMakeLists");
 		template.add("network", network);
+		template.add("needPthreads", needPthreads);
 
 		String fileName = path + File.separator + "CMakeLists.txt";
 
