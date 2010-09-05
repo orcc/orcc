@@ -95,9 +95,9 @@ public final class STPrinter {
 
 	private STGroup group;
 
-	private Class<? extends TypePrinter> typePrinter;
-
 	private Map<String, Object> options;
+
+	private Class<? extends TypePrinter> typePrinter;
 
 	/**
 	 * Creates a new printer.
@@ -117,8 +117,7 @@ public final class STPrinter {
 	}
 
 	/**
-	 * Returns a map of options corresponding to attribute of the selected
-	 * backend.
+	 * Returns a map of options associated with the selected back-end.
 	 * 
 	 * @return a map of options
 	 */
@@ -189,7 +188,7 @@ public final class STPrinter {
 				ST template = group.getInstanceOf("actor");
 				template.add("actor", actor);
 				template.add("options", options);
-				
+
 				byte[] b = template.render(80).getBytes();
 				OutputStream os = new FileOutputStream(fileName);
 				os.write(b);
@@ -265,7 +264,7 @@ public final class STPrinter {
 	 * Set the map of options for the selected backend.
 	 * 
 	 * @param options
-	 *            : a map of options
+	 *            a map of options
 	 */
 	public void setOptions(Map<String, Object> options) {
 		this.options = options;

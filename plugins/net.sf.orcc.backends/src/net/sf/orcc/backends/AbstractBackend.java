@@ -285,6 +285,31 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	/**
+	 * Returns the map-valued attribute with the given name. Returns the given
+	 * default value if the attribute is undefined.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @param defaultValue
+	 *            the value to use if no value is found
+	 * @return the value or the default value if no value was found.
+	 * @throws OrccException
+	 */
+	@SuppressWarnings("unchecked")
+	final public Map<String, String> getAttribute(String attributeName,
+			Map<String, String> defaultValue) throws OrccException {
+		if (configuration == null) {
+			return defaultValue;
+		}
+
+		try {
+			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
+	}
+
+	/**
 	 * Returns the integer-valued attribute with the given name. Returns the
 	 * given default value if the attribute is undefined.
 	 * 

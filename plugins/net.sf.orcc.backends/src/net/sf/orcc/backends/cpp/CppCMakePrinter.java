@@ -79,16 +79,16 @@ public class CppCMakePrinter {
 		template.add("network", network);
 
 		String fileName = path + File.separator + "CMakeLists.txt";
-		
-		if(alreadyExists) {
-			fileName += "."+network.getName();
+
+		if (alreadyExists) {
+			fileName += "." + network.getName();
 		}
 
 		byte[] b = template.render(80).getBytes();
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();
-		
+
 		alreadyExists = true;
 	}
 
