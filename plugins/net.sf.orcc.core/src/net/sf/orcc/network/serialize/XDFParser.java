@@ -477,23 +477,6 @@ public class XDFParser {
 	}
 
 	/**
-	 * Calls the parser with args[0] as the file name.
-	 * 
-	 * @param args
-	 *            arguments
-	 * @throws OrccException
-	 *             if the file could not be parsed
-	 */
-	public static void main(String[] args) throws OrccException {
-		if (args.length == 1) {
-			new XDFParser(args[0]).parseNetwork();
-		} else {
-			System.err.println("Usage: XDFParser "
-					+ "<absolute path of top-level XDF network>");
-		}
-	}
-
-	/**
 	 * XDF expression parser.
 	 */
 	private final ExprParser exprParser;

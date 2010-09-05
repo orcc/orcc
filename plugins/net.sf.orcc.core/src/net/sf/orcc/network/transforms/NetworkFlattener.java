@@ -79,9 +79,6 @@ public class NetworkFlattener implements INetworkTransformation {
 			if (vertex.isInstance()) {
 				Instance subInstance = vertex.getInstance();
 
-				// set hierarchical identifier
-				subInstance.getHierarchicalId().add(0, instance.getId());
-
 				// get a unique identifier
 				String id = getUniqueIdentifier(instance.getId(), subInstance);
 				subInstance.setId(id);

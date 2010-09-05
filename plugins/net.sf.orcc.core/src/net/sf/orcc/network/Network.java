@@ -537,4 +537,24 @@ public class Network {
 		return name;
 	}
 
+	/**
+	 * Computes the hierarchical identifier of each instance.
+	 */
+	public void updateIdentifiers() {
+		List<String> identifiers = new ArrayList<String>(1);
+		identifiers.add(name);
+		updateIdentifiers(identifiers);
+	}
+
+	private void updateIdentifiers(List<String> identifiers) {
+		for (Instance instance : getInstances()) {
+			instance.getHierarchicalId().addAll(0, identifiers);
+			if (instance.isNetwork()) {
+				List<String> subNetworkId = new ArrayList<String>(identifiers);
+				subNetworkId.add(instance.getId());
+				instance.getNetwork().updateIdentifiers(subNetworkId);
+			}
+		}
+	}
+
 }
