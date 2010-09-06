@@ -34,8 +34,10 @@ import java.util.ListIterator;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -53,21 +55,45 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class NDimArrayTransform extends AbstractActorTransformation {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	@Override
 	public void visit(Load load, Object... args) {
 		List<Expression> indexes = load.getIndexes();
-		if (!indexes.isEmpty()) {
+		// An VHDL memory is always global
+		if (!indexes.isEmpty() && load.getSource().getVariable().isGlobal()) {
 			Iterator<Expression> it = indexes.iterator();
 			Expression index = null;
-
+			LocalVariable indexVar;
+			Type type = load.getSource().getVariable().getType();
+			Iterator<Integer> typeit = null;
+			Integer size = null;
+			
+			if (!type.getDimensions().isEmpty()) {
+				typeit = type.getDimensions().iterator();
+			}		
+			
+			// Print a new assignment made up of index_i = expression for each
+			// indexes.
 			while (it.hasNext()) {
 				Expression expr = it.next();
 
-				Type type = expr.getType();
-				LocalVariable indexVar = procedure.newTempLocalVariable("", type,
-						"index");
+				// Index size must be similar to the list size
+				if (!type.getDimensions().isEmpty()) {
+					size = typeit.next();
+				} else {
+					size = ((TypeInt) type).getSize();
+				}	
+				
+				// A type is printed with a size of 2^size so the size must be recompute
+				int i;
+				for (i=0 ;Math.pow(2, i ) < size; i++){
+				}
+				size = i;
+				
+				indexVar = procedure.newTempLocalVariable("",
+						IrFactory.eINSTANCE.createTypeUint(size), "index");
 
+				// Add the assign instruction
 				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
 				iit.previous();
 				Assign assign = new Assign(expr.getLocation(), indexVar, expr);
@@ -83,23 +109,4 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 			indexes.add(index);
 		}
 	}
-
-	/*
-	 * @SuppressWarnings("unchecked")
-	 * 
-	 * @Override public void visit(Store store, Object... args) {
-	 * List<Expression> indexes = store.getIndexes(); int size = indexes.size();
-	 * Type typemax = null; while (size != 0) { size--; if
-	 * (!indexes.get(size).isIntExpr()) { Type type =
-	 * indexes.get(size).getType(); //if (Cast.getSizeOfType(type) >
-	 * Cast.getSizeOfType(typemax)) { typemax = type; //} LocalVariable local =
-	 * new LocalVariable(true, size, new Location(),
-	 * "index_"+IndexCount++,type); procedure.getLocals().put(local.getName(),
-	 * local); block = store.getBlock(); ListIterator<Instruction> iit =
-	 * (ListIterator<Instruction>) args[0]; iit.previous();
-	 * createAssignNode(local, indexes.get(size)); indexes.remove(size); } } //
-	 * Add index to indexes LocalVariable local = new LocalVariable(true, 0, new
-	 * Location(), "index", typemax); indexes.add(new VarExpr(new Use(local)));
-	 * }
-	 */
 }
