@@ -81,7 +81,8 @@ void source_scheduler(struct schedinfo_s *si) {
 	}
 
 	while (fifo_i8_has_room(source_O, 1)) {
-		ptr = fifo_i8_write(source_O, 1);
+		i8 source_O_buf[1];
+		ptr = fifo_i8_write(source_O, source_O_buf, 1);
 		n = fread(ptr, 1, 1, F);
 		if (n < 1) {
 			fseek(F, 0, 0);
@@ -90,7 +91,7 @@ void source_scheduler(struct schedinfo_s *si) {
 		}
 		i++;
 		cnt++;
-		fifo_i8_write_end(source_O, 1);
+		fifo_i8_write_end(source_O, source_O_buf, 1);
 	}
 
 	si->num_firings = i;

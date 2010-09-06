@@ -41,9 +41,8 @@ struct schedinfo_s {
 };
 
 // declare FIFO with a size equal to (size)
-#define DECLARE_FIFO(type, size, count) static type array_##count[(size)]; \
-static type array2_##count[(size)]; \
-static struct FIFO_S(type) fifo_##count = { (size), array_##count, array2_##count, 0, 0 };
+#define DECLARE_FIFO(type, size, count) static type array_##count[(size) + 1]; \
+static struct FIFO_S(type) fifo_##count = { (size) + 1, array_##count, 0, 0 };
 
 #define FIFO_S(T) FIFO_S_EXPAND(T)
 #define FIFO_S_EXPAND(T) fifo_##T##_s

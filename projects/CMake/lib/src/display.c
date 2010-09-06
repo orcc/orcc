@@ -258,12 +258,13 @@ void display_scheduler(struct schedinfo_s *si) {
 	while (1) {
 		if (fifo_i16_has_tokens(display_WIDTH, 1) && fifo_i16_has_tokens(display_HEIGHT, 1)) {
 			short *ptr, width, height;
+			i16 display_WIDTH_buf[1], display_HEIGHT_buf[1];
 
-			ptr = fifo_i16_read(display_WIDTH, 1);
+			ptr = fifo_i16_read(display_WIDTH, display_WIDTH_buf, 1);
 			width = ptr[0] * 16;
 			fifo_i16_read_end(display_WIDTH, 1);
 
-			ptr = fifo_i16_read(display_HEIGHT, 1);
+			ptr = fifo_i16_read(display_HEIGHT, display_HEIGHT_buf, 1);
 			height = ptr[0] * 16;
 			fifo_i16_read_end(display_HEIGHT, 1);
 
@@ -272,11 +273,12 @@ void display_scheduler(struct schedinfo_s *si) {
 		}
 
 		if (fifo_i8_has_tokens(display_B, 384)) {
+			i8 display_B_buf[384];
 			if (!init) {
 				display_init();
 			}
 
-			display_write_mb(fifo_i8_read(display_B, 384));
+			display_write_mb(fifo_i8_read(display_B, display_B_buf, 384));
 			fifo_i8_read_end(display_B, 384);
 			i++;
 		} else {

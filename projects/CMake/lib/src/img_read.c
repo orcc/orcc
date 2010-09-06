@@ -48,6 +48,7 @@ static int count;
 // Called before any *_scheduler function.
 void img_read_initialize() {
 	unsigned short *ptr;
+	i16 img_read_WIDTH_buf[1], img_read_HEIGHT_buf[1];
 
 	if (input_file == NULL) {
 		print_usage();
@@ -66,13 +67,13 @@ void img_read_initialize() {
 	format = image->format;
 	count = image->w * image->h;
 
-	ptr = fifo_i16_write(img_read_WIDTH, 1);
+	ptr = fifo_i16_write(img_read_WIDTH, img_read_WIDTH_buf, 1);
 	ptr[0] = image->w;
-	fifo_i16_write_end(img_read_WIDTH, 1);
+	fifo_i16_write_end(img_read_WIDTH, img_read_WIDTH_buf, 1);
 
-	ptr = fifo_i16_write(img_read_HEIGHT, 1);
+	ptr = fifo_i16_write(img_read_HEIGHT, img_read_HEIGHT_buf, 1);
 	ptr[0] = image->h;
-	fifo_i16_write_end(img_read_HEIGHT, 1);
+	fifo_i16_write_end(img_read_HEIGHT, img_read_HEIGHT_buf, 1);
 }
 
 static int idx_pixel = 0;
@@ -86,9 +87,15 @@ static void write_pixels(struct schedinfo_s *si) {
 
 	int num_colors = min(min(min(num_red, num_green), num_blue), count - idx_pixel);
 
-	unsigned char *ptr_red = fifo_i8_write(img_read_RED, num_colors);
-	unsigned char *ptr_green = fifo_i8_write(img_read_GREEN, num_colors);
-	unsigned char *ptr_blue = fifo_i8_write(img_read_BLUE, num_colors);
+	i8 *img_read_RED_buf = (i8 *) malloc(num_colors);
+	i8 *img_read_GREEN_buf = (i8 *) malloc(num_colors);
+	i8 *img_read_BLUE_buf = (i8 *) malloc(num_colors);
+
+	unsigned char *ptr_red, *ptr_green, *ptr_blue;
+
+	ptr_red = fifo_i8_write(img_read_RED, img_read_RED_buf, num_colors);
+	ptr_green = fifo_i8_write(img_read_GREEN, img_read_GREEN_buf, num_colors);
+	ptr_blue = fifo_i8_write(img_read_BLUE, img_read_BLUE_buf, num_colors);
 
 	int i;
 	for (i = 0; i < num_colors; i++) {
@@ -105,9 +112,13 @@ static void write_pixels(struct schedinfo_s *si) {
 		idx_pixel++;
 	}
 
-	fifo_i8_write_end(img_read_RED, num_colors);
-	fifo_i8_write_end(img_read_GREEN, num_colors);
-	fifo_i8_write_end(img_read_BLUE, num_colors);
+	fifo_i8_write_end(img_read_RED, img_read_RED_buf, num_colors);
+	fifo_i8_write_end(img_read_GREEN, img_read_GREEN_buf, num_colors);
+	fifo_i8_write_end(img_read_BLUE, img_read_BLUE_buf, num_colors);
+
+	free(img_read_RED_buf);
+	free(img_read_GREEN_buf);
+	free(img_read_BLUE_buf);
 
 	if (num_red <= num_colors) {
 		ports |= 0x01;

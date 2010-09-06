@@ -78,6 +78,7 @@ static int idx_pixel = 0;
 
 static void read_pixel() {
 	unsigned char *ptr, red, green, blue;
+	i8 img_display_RED_buf[1], img_display_GREEN_buf[1], img_display_BLUE_buf[1];
 	int pixel;
 
 	SDL_PixelFormat *format = m_image->format;
@@ -86,15 +87,15 @@ static void read_pixel() {
 		SDL_LockSurface(m_image);
 	}
 
-	ptr = fifo_i8_read(img_display_RED, 1);
+	ptr = fifo_i8_read(img_display_RED, img_display_RED_buf, 1);
 	red = ptr[0];
 	fifo_i8_read_end(img_display_RED, 1);
 
-	ptr = fifo_i8_read(img_display_GREEN, 1);
+	ptr = fifo_i8_read(img_display_GREEN, img_display_GREEN_buf, 1);
 	green = ptr[0];
 	fifo_i8_read_end(img_display_GREEN, 1);
 
-	ptr = fifo_i8_read(img_display_BLUE, 1);
+	ptr = fifo_i8_read(img_display_BLUE, img_display_BLUE_buf, 1);
 	blue = ptr[0];
 	fifo_i8_read_end(img_display_BLUE, 1);
 
@@ -116,11 +117,12 @@ void img_display_scheduler(struct schedinfo_s *si) {
 
 	int i = 0;
 	if (fifo_i16_has_tokens(img_display_WIDTH, 1) && fifo_i16_has_tokens(img_display_HEIGHT, 1)) {
-		short *ptr = fifo_i16_read(img_display_HEIGHT, 1);
+		i16 img_display_HEIGHT_buf[1], img_display_WIDTH_buf[1];
+		short *ptr = fifo_i16_read(img_display_HEIGHT, img_display_HEIGHT_buf, 1);
 		m_height = ptr[0];
 		fifo_i16_read_end(img_display_HEIGHT, 1);
 
-		ptr = fifo_i16_read(img_display_WIDTH, 1);
+		ptr = fifo_i16_read(img_display_WIDTH, img_display_WIDTH_buf, 1);
 		m_width = ptr[0];
 		fifo_i16_read_end(img_display_WIDTH, 1);
 

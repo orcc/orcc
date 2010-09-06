@@ -32,18 +32,33 @@
 #include <stdlib.h>
 
 DECL int FIFO_HAS_TOKENS(T)(struct FIFO_S(T) *fifo, int n) {
-	return fifo->fill_count >= n;
+	// return fifo->fill_count >= n;
+	if (fifo->write_ind >= fifo->read_ind) {
+		return fifo->write_ind - fifo->read_ind >= n;
+	} else {
+		return fifo->size - fifo->read_ind + fifo->write_ind >= n;
+	}
 }
 
 DECL int FIFO_HAS_ROOM(T)(struct FIFO_S(T) *fifo, int n) {
-	return (fifo->size - fifo->fill_count) >= n;
+	// return (fifo->size - fifo->fill_count) >= n;
+	if (fifo->read_ind > fifo->write_ind) {
+		return (fifo->read_ind - fifo->write_ind) > n;
+	} else {
+		return (fifo->size - fifo->write_ind + fifo->read_ind) > n;
+	}
 }
 
 DECL int FIFO_GET_ROOM(T)(struct FIFO_S(T) *fifo) {
-	return fifo->size - fifo->fill_count;
+	// return fifo->size - fifo->fill_count;
+	if (fifo->read_ind > fifo->write_ind) {
+		return fifo->read_ind - fifo->write_ind;
+	} else {
+		return fifo->size - fifo->write_ind + fifo->read_ind;
+	}
 }
 
-DECL T *FIFO_PEEK(T)(struct FIFO_S(T) *fifo, int n) {
+DECL T *FIFO_PEEK(T)(struct FIFO_S(T) *fifo, T *buffer, int n) {
 	if (fifo->read_ind + n <= fifo->size) {
 		return &fifo->contents[fifo->read_ind];
 	} else {
@@ -52,44 +67,46 @@ DECL T *FIFO_PEEK(T)(struct FIFO_S(T) *fifo, int n) {
 
 		// Copy the end of the fifo
 		if (num_end != 0) {
-			memcpy(fifo->fifo_buffer, &fifo->contents[fifo->read_ind], num_end * sizeof(T));
+			memcpy(buffer, &fifo->contents[fifo->read_ind], num_end * sizeof(T));
 		}
 
 		// Copy the rest of the data at the beginning of the FIFO
 		if (num_beginning != 0) {
-			memcpy(&fifo->fifo_buffer[num_end], fifo->contents, num_beginning * sizeof(T));
+			memcpy(&buffer[num_end], fifo->contents, num_beginning * sizeof(T));
 		}
 
-		return fifo->fifo_buffer;
+		// returns supplied buffer
+		return buffer;
 	}
 }
 
-DECL T *FIFO_READ(T)(struct FIFO_S(T) *fifo, int n) {
-	return FIFO_PEEK(T)(fifo, n);
+DECL T *FIFO_READ(T)(struct FIFO_S(T) *fifo, T *buffer, int n) {
+	return FIFO_PEEK(T)(fifo, buffer, n);
 }
 
 DECL void FIFO_READ_END(T)(struct FIFO_S(T) *fifo, int n) {
-	fifo->fill_count -= n;
-	if (fifo->read_ind + n < fifo->size) {
+	int read_pos = fifo->read_ind + n;
+	if (read_pos < fifo->size) {
 		fifo->read_ind += n;
-	} else if (fifo->read_ind + n == fifo->size) {
+	} else if (read_pos == fifo->size) {
 		fifo->read_ind = 0;
 	} else {
-		int num_beginning = fifo->read_ind + n - fifo->size;
-		fifo->read_ind = num_beginning;
+		fifo->read_ind = read_pos - fifo->size;
 	}
+
+	// fifo->fill_count -= n;
 }
 
-DECL T *FIFO_WRITE(T)(struct FIFO_S(T) *fifo, int n) {
+DECL T *FIFO_WRITE(T)(struct FIFO_S(T) *fifo, T *buffer, int n) {
 	if (fifo->write_ind + n <= fifo->size) {
 		return &fifo->contents[fifo->write_ind];
 	} else {
-		return fifo->fifo_buffer;
+		// returns supplied buffer, we will copy its contents in write_end
+		return buffer;
 	}
 }
 
-DECL void FIFO_WRITE_END(T)(struct FIFO_S(T) *fifo, int n) {
-	fifo->fill_count += n;
+DECL void FIFO_WRITE_END(T)(struct FIFO_S(T) *fifo, T *buffer, int n) {
 	if (fifo->write_ind + n < fifo->size) {
 		fifo->write_ind += n;
 	} else if (fifo->write_ind + n == fifo->size) {
@@ -100,14 +117,16 @@ DECL void FIFO_WRITE_END(T)(struct FIFO_S(T) *fifo, int n) {
 
 		// Copy data at the end of the FIFO
 		if (num_end != 0) {
-			memcpy(&fifo->contents[fifo->write_ind], fifo->fifo_buffer, num_end * sizeof(T));
+			memcpy(&fifo->contents[fifo->write_ind], buffer, num_end * sizeof(T));
 		}
 
 		// Copy the rest of data at the beginning of the FIFO
 		if (num_beginning) {
-			memcpy(fifo->contents, &fifo->fifo_buffer[num_end], num_beginning * sizeof(T));
+			memcpy(fifo->contents, &buffer[num_end], num_beginning * sizeof(T));
 		}
 
 		fifo->write_ind = num_beginning;
 	}
+
+	// fifo->fill_count += n;
 }
