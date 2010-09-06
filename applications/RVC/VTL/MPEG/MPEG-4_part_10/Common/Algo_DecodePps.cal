@@ -50,6 +50,7 @@ actor Algo_DecodePps(bool IsCBP)
 	uint(size=3) VLD_UE    = 1;
 	uint(size=3) VLD_SE    = 2;
 
+	bool DEBUG_FLAG_DECODED = false;
 
 /*   
 *
@@ -161,11 +162,13 @@ actor Algo_DecodePps(bool IsCBP)
 			entropy_coding_mode_flag[pps_id]  := ValueOfVLD[2];
 			pic_order_present_flag[pps_id]    := ValueOfVLD[3];
 			num_slice_groups_minus1[pps_id]   := ValueOfVLD[4];
-			println("\t\tpps_id : "+ValueOfVLD[0]);
-			println("\t\tsequence_parameter_set_id : "+ValueOfVLD[1]);
-			println("\t\tentropy_coding_mode_flag : "+ValueOfVLD[2]);
-			println("\t\tpic_order_present_flag : "+ValueOfVLD[3]);
-			println("\t\tnum_slice_groups_minus1 : "+ValueOfVLD[4]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tpps_id : "+ValueOfVLD[0]);
+				println("\t\tsequence_parameter_set_id : "+ValueOfVLD[1]);
+				println("\t\tentropy_coding_mode_flag : "+ValueOfVLD[2]);
+				println("\t\tpic_order_present_flag : "+ValueOfVLD[3]);
+				println("\t\tnum_slice_groups_minus1 : "+ValueOfVLD[4]);
+			end
 		end
 
 	ReadSliceGroupMapType.IsAsked: action
@@ -175,8 +178,6 @@ actor Algo_DecodePps(bool IsCBP)
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			num_slice_groups_minus1[pps_id] > 0
-		do
-			println("ReadSliceGroupMapType.IsAsked");
 		end
 
 
@@ -185,7 +186,9 @@ actor Algo_DecodePps(bool IsCBP)
 				==>
 		do
 			slice_group_map_type[pps_id] := ValueOfVLD;
-			println("\t\tslice_group_map_type : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tslice_group_map_type : "+ValueOfVLD);
+			end
 		end
 
 	CheckSliceGroupMapType.IsEqualTo0: action
@@ -215,7 +218,9 @@ actor Algo_DecodePps(bool IsCBP)
 			LoopVal < num_slice_groups_minus1[pps_id] - 1
 		do
 			run_length_minus1[pps_id][LoopVal] := ValueOfVLD;
-			println("\t\trun_length_minus1["+LoopVal+"] : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\trun_length_minus1["+LoopVal+"] : "+ValueOfVLD);
+			end
 			LoopVal := LoopVal + 1;
 		end
 
@@ -224,7 +229,9 @@ actor Algo_DecodePps(bool IsCBP)
 				==>
 		do
 			run_length_minus1[pps_id][LoopVal] := ValueOfVLD;
-			println("\t\trun_length_minus1["+LoopVal+"] : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\trun_length_minus1["+LoopVal+"] : "+ValueOfVLD);
+			end
 		end
 
 	CheckSliceGroupMapType.IsEqualTo2: action
@@ -256,8 +263,10 @@ actor Algo_DecodePps(bool IsCBP)
 		do
 			top_left[pps_id][LoopVal]     := ValueOfVLD[0];
 			bottom_right[pps_id][LoopVal] := ValueOfVLD[1];
-			println("\t\ttop_left["+LoopVal+"] : "+ValueOfVLD[0]);
-			println("\t\tbottom_right["+LoopVal+"] : "+ValueOfVLD[1]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\ttop_left["+LoopVal+"] : "+ValueOfVLD[0]);
+				println("\t\tbottom_right["+LoopVal+"] : "+ValueOfVLD[1]);
+			end
 			LoopVal := LoopVal + 1;
 		end
 
@@ -267,8 +276,10 @@ actor Algo_DecodePps(bool IsCBP)
 		do
 			top_left[pps_id][LoopVal]     := ValueOfVLD[0];
 			bottom_right[pps_id][LoopVal] := ValueOfVLD[1];
-			println("\t\ttop_left["+LoopVal+"] : "+ValueOfVLD[0]);
-			println("\t\tbottom_right["+LoopVal+"] : "+ValueOfVLD[1]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\ttop_left["+LoopVal+"] : "+ValueOfVLD[0]);
+				println("\t\tbottom_right["+LoopVal+"] : "+ValueOfVLD[1]);
+			end
 		end
 
 	CheckSliceGroupMapType.IsBetween3and5: action
@@ -289,8 +300,10 @@ actor Algo_DecodePps(bool IsCBP)
 		do
 			slice_group_change_direction_flag[pps_id] := ValueOfVLD[0];
 			slice_group_change_rate_minus1[pps_id] := ValueOfVLD[1];
-			println("\t\tslice_group_change_direction_flag : "+ValueOfVLD[0]);
-			println("\t\tslice_group_change_rate_minus1 : "+ValueOfVLD[1]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tslice_group_change_direction_flag : "+ValueOfVLD[0]);
+				println("\t\tslice_group_change_rate_minus1 : "+ValueOfVLD[1]);
+			end
 		end
 		
 
@@ -333,16 +346,18 @@ actor Algo_DecodePps(bool IsCBP)
 					true
 				end;
 			redundant_pic_cnt_present_flag[pps_id] := ValueOfVLD[9];
-			println("\t\tnum_ref_idx_l0_active_minus1 : "+ValueOfVLD[0]);
-			println("\t\tnum_ref_idx_l1_active_minus1 : "+ValueOfVLD[1]);
-			println("\t\tweighted_pred_flag : "+ValueOfVLD[2]);
-			println("\t\tweighted_bipred_idc : "+ValueOfVLD[3]);
-			println("\t\tpic_init_qp_minus26 : "+ValueOfVLD[4]);
-			println("\t\tpic_init_qs_minus26 : "+ValueOfVLD[5]);
-			println("\t\tchroma_qp_index_offset : "+ValueOfVLD[6]);
-			println("\t\tdeblocking_filter_control_present_flag : "+ValueOfVLD[7]);
-			println("\t\tconstrained_intra_pred_flag : "+ValueOfVLD[8]);
-			println("\t\tredundant_pic_cnt_present_flag : "+ValueOfVLD[9]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tnum_ref_idx_l0_active_minus1 : "+ValueOfVLD[0]);
+				println("\t\tnum_ref_idx_l1_active_minus1 : "+ValueOfVLD[1]);
+				println("\t\tweighted_pred_flag : "+ValueOfVLD[2]);
+				println("\t\tweighted_bipred_idc : "+ValueOfVLD[3]);
+				println("\t\tpic_init_qp_minus26 : "+ValueOfVLD[4]);
+				println("\t\tpic_init_qs_minus26 : "+ValueOfVLD[5]);
+				println("\t\tchroma_qp_index_offset : "+ValueOfVLD[6]);
+				println("\t\tdeblocking_filter_control_present_flag : "+ValueOfVLD[7]);
+				println("\t\tconstrained_intra_pred_flag : "+ValueOfVLD[8]);
+				println("\t\tredundant_pic_cnt_present_flag : "+ValueOfVLD[9]);
+			end
 		end
 
 	AskMoreRbspData: action

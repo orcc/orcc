@@ -1446,7 +1446,8 @@ actor Algo_Synp_AVC_FREXT()
 	********       		Residual		    	    *********
 	*************************************************************
 	*************************************************************/
-	bool DEBUG_NEW_PARSER = true;
+	bool DEBUG_FLAG_NEW_PARSER = false;
+	bool DEBUG_OUTPUT_NEW_PARSER = true;
 	uint(size=1) bmFlag;
 	uint(size=4) startIdx;
 	uint(size=4) endIdx;
@@ -1626,7 +1627,7 @@ actor Algo_Synp_AVC_FREXT()
 					if VLD_Counter = VLC_nC_0to2[i][0] and Codeword = VLC_nC_0to2[i][1] then
 						coeff_token := VLC_nC_0to2[i][2];
 						NewCoeff := false;
-						if(DEBUG_NEW_PARSER) then
+						if(DEBUG_FLAG_NEW_PARSER) then
 							println("Cavlc CoeffToken; Idx_nc :" + 0 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 						end
 					end
@@ -1635,7 +1636,7 @@ actor Algo_Synp_AVC_FREXT()
 						if VLD_Counter = VLC_nC_2to4[i][0] and Codeword = VLC_nC_2to4[i][1] then
 							coeff_token := VLC_nC_2to4[i][2];
 							NewCoeff := false;
-							if(DEBUG_NEW_PARSER) then
+							if(DEBUG_FLAG_NEW_PARSER) then
 								println("Cavlc CoeffToken; Idx_nc :" + 1 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 							end
 						end
@@ -1644,7 +1645,7 @@ actor Algo_Synp_AVC_FREXT()
 							if VLD_Counter = VLC_nC_4to8[i][0] and Codeword = VLC_nC_4to8[i][1] then
 								coeff_token := VLC_nC_4to8[i][2];
 								NewCoeff := false;
-								if(DEBUG_NEW_PARSER) then
+								if(DEBUG_FLAG_NEW_PARSER) then
 									println("Cavlc CoeffToken; Idx_nc :" + 2 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 								end
 							end
@@ -1653,7 +1654,7 @@ actor Algo_Synp_AVC_FREXT()
 								if VLD_Counter = VLC_nC_8[i][0] and Codeword = VLC_nC_8[i][1] then
 									coeff_token := VLC_nC_8[i][2];
 									NewCoeff := false;
-									if(DEBUG_NEW_PARSER) then
+									if(DEBUG_FLAG_NEW_PARSER) then
 										println("Cavlc CoeffToken; Idx_nc :" + 3 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 									end
 								end 
@@ -1662,7 +1663,7 @@ actor Algo_Synp_AVC_FREXT()
 									if VLD_Counter = VLC_nC_1[i][0] and Codeword = VLC_nC_1[i][1] then
 										coeff_token := VLC_nC_1[i][2];
 										NewCoeff := false;
-										if(DEBUG_NEW_PARSER) then
+										if(DEBUG_FLAG_NEW_PARSER) then
 											println("Cavlc CoeffToken; Idx_nc :" + 4 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 										end
 									end
@@ -1671,7 +1672,7 @@ actor Algo_Synp_AVC_FREXT()
 										if VLD_Counter = VLC_nC_2[i][0] and Codeword = VLC_nC_2[i][1] then
 											coeff_token := VLC_nC_2[i][2];
 											NewCoeff := false;
-											if(DEBUG_NEW_PARSER) then
+											if(DEBUG_FLAG_NEW_PARSER) then
 													println("Cavlc CoeffToken; Idx_nc :" + 5 + " ; NbBitsRead : "+VLD_Counter+ " ; coeff_token : "+Codeword);
 											end
 										end  
@@ -1688,7 +1689,7 @@ actor Algo_Synp_AVC_FREXT()
 					if maxNumCoeff != 4 and maxNumCoeff !=8 then 
 						if VLD_Counter = VLC_total0[TotalCoeff()-1][i][0] and Codeword = VLC_total0[TotalCoeff()-1][i][1] then 
 							total_zeros := VLC_total0[TotalCoeff()-1][i][2]; NewCoeff := false; 
-							if(DEBUG_NEW_PARSER) then
+							if(DEBUG_FLAG_NEW_PARSER) then
 									println("Cavlc TotalZeros; Idx :" + 2 +" ; TotalCoeff :"+TotalCoeff()+ " ; NbBitsRead : "+VLD_Counter+ " ; Codeword : "+Codeword);
 							end
 						end
@@ -1696,13 +1697,13 @@ actor Algo_Synp_AVC_FREXT()
 						if maxNumCoeff = 4 then
 							if VLD_Counter = VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][0] and Codeword = VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][1] then 
 								total_zeros := VLC_total0_Cr_DC2x2[TotalCoeff()-1][i][2]; NewCoeff := false; 
-								if(DEBUG_NEW_PARSER) then
+								if(DEBUG_FLAG_NEW_PARSER) then
 										println("Cavlc TotalZeros; Idx :" + 0 +" ; TotalCoeff :"+TotalCoeff()+ " ; NbBitsRead : "+VLD_Counter+ " ; Codeword : "+Codeword);
 								end
 							end
 						else //maxNumCoeff = 8
 							////println("Chroma DC 2x4 block not implemented");
-								if(DEBUG_NEW_PARSER) then
+								if(DEBUG_FLAG_NEW_PARSER) then
 										println("Cavlc TotalZeros; Idx :" + 1 +" ; TotalCoeff :"+TotalCoeff()+ " ; NbBitsRead : "+VLD_Counter+ " ; Codeword : "+Codeword);
 								end
 						end
@@ -4868,7 +4869,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		nal_unit_type := mask_bits(read_result(), 5);
 		nal_ref_idc := mask_bits(rshift(read_result(), 5), 2);
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("nal_unit_type:"+nal_unit_type+"; nal_ref_idc:"+nal_ref_idc);
 		end
 		//println("look_for_which_Header");
@@ -4887,7 +4888,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		nal_unit_type = 7
 	do
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("Is Sps");
 		end
 		//println("look_for_Sps_header");
@@ -4898,7 +4899,7 @@ actor Algo_Synp_AVC_FREXT()
 	guard
 		nal_unit_type = 8
 	do
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("Is Pps");
 		end
 		//println("look_for_Pps_header");
@@ -4910,7 +4911,7 @@ actor Algo_Synp_AVC_FREXT()
 		nal_unit_type = 5 or nal_unit_type = 1
 	do
 		
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			if(nal_unit_type = 5) then
 				println("Is SliceIdr");
 			else
@@ -5663,7 +5664,7 @@ actor Algo_Synp_AVC_FREXT()
 		//println("read_SliceH_slice_type");
 		//println("read_SliceH_slice_type");
 		first_mb_in_slice := vld_ue();
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("\t\tfirst_mb_in_slice:"+first_mb_in_slice);
 		end
 		start_vld();
@@ -5675,7 +5676,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_pps_id");
 		slice_type := vld_ue();
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("\t\tslice_type:       "+slice_type);
 		end
 		slice_type := slice_type mod 5;
@@ -5688,7 +5689,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_check_separate_colour_plane_flag");
 		pps_id := vld_ue();
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("\t\tpps_id:           "+pps_id);
 		end
 		sps_id := sequence_parameter_set_id[pps_id];
@@ -5730,7 +5731,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_frame_num");
 		frame_num      := read_result();
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("\t\tframe_num:        "+frame_num);
 		end
 		ValMaxFrameNum := 1 << (log2_max_frame_num_minus4[sps_id] + 4);
@@ -5842,7 +5843,7 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_pic_order_cnt_lsb_done");
 		pic_order_cnt_lsb := read_result();
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("\t\tpic_order_cnt_lsb: "+pic_order_cnt_lsb);
 		end
 	end
@@ -6006,6 +6007,9 @@ actor Algo_Synp_AVC_FREXT()
 if TRACE_POC then
 println("POC "+ POC_val);
 end
+		if(DEBUG_OUTPUT_NEW_PARSER) then
+				println("PocVal: "+POC_val);
+		end
 	end
 
 	//if (redundant_pic_cnt_present_flag)
@@ -6077,7 +6081,7 @@ end
 	do
 		//println("read_SliceH_num_ref_idx_l0_active_minus1");
 		num_ref_idx_active_override_flag := 1;
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("\t\tnum_ref_idx_active_override_flag: 1");
 		end
 		start_vld();
@@ -6121,7 +6125,7 @@ end
 	do
 		//println("read_SliceH_skip_num_ref_idx_l0_active_minus1");
 		num_ref_idx_active_override_flag := 0;
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("\t\tnum_ref_idx_active_override_flag: 0");
 		end
 		slice_num_ref_idx_l0_active_minus1 := num_ref_idx_l0_active_minus1[pps_id];
@@ -6849,7 +6853,7 @@ end
 		val_CurrMbAddr := val_CurrMbAddr + 1;
 		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 		Mb_y := val_CurrMbAddr / PicWidthInMbs;
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("\n\n\n*** New Mb *** Val = "+val_CurrMbAddr);
 		end
 	end
@@ -6948,7 +6952,7 @@ end
 	do
 		//println("read_SliceD_mb_skip_run_done0");
 		mb_skip_run := vld_ue();
-				if(DEBUG_NEW_PARSER) then
+				if(DEBUG_FLAG_NEW_PARSER) then
 					println("\t\tmb_skip_run : "+mb_skip_run);
 				end
 		if mb_skip_run >0 then 
@@ -7650,7 +7654,7 @@ end
 		//println("read_MB_layer_mb_type_done");
 		if IS_CAVLC() then
 			mb_type := vld_ue();
-			if(DEBUG_NEW_PARSER) then
+			if(DEBUG_FLAG_NEW_PARSER) then
 				println("mb_type : "+mb_type);
 			end
 		
@@ -7889,7 +7893,7 @@ end
 		
 		if  IS_CAVLC() then
 			coded_block_pattern := vld_me();
-			if(DEBUG_NEW_PARSER) then
+			if(DEBUG_FLAG_NEW_PARSER) then
 				println("coded_block_pattern : "+coded_block_pattern);
 			end
 		else 
@@ -7986,7 +7990,7 @@ end
 		//println("read_MB_layer_mb_qp_delta_done");
 		if IS_CAVLC() then
 			mb_qp_delta := vld_se();
-			if(DEBUG_NEW_PARSER) then
+			if(DEBUG_FLAG_NEW_PARSER) then
 				println("mb_qp_delta : "+mb_qp_delta);
 			end
 		else 
@@ -8439,7 +8443,7 @@ end
 			if prev_intra4x4_pred_mode_flag = 0 then 
 				set_bits_to_read(3); 
 			else
-				if(DEBUG_NEW_PARSER) then
+				if(DEBUG_FLAG_NEW_PARSER) then
 					println("rem_intraYxY_pred_mode["+luma4x4BlkIdx+"] : -1");
 				end
 			end
@@ -8463,7 +8467,7 @@ end
 	do
 		if IS_CAVLC() then
 			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
-			if(DEBUG_NEW_PARSER) then
+			if(DEBUG_FLAG_NEW_PARSER) then
 						println("rem_intraYxY_pred_mode["+luma4x4BlkIdx+"] : "+rem_intra4x4_pred_mode[luma4x4BlkIdx]);
 			end
 			luma4x4BlkIdx := luma4x4BlkIdx +1;
@@ -8544,7 +8548,7 @@ end
 			if prev_intra4x4_pred_mode_flag = 0 then 
 				set_bits_to_read(3); 
 			else
-				if(DEBUG_NEW_PARSER) then
+				if(DEBUG_FLAG_NEW_PARSER) then
 							println("rem_intraYxY_pred_mode["+luma4x4BlkIdx+"] : -1");
 				end
 			end
@@ -8568,7 +8572,7 @@ end
 	do
 		if IS_CAVLC() then
 			rem_intra4x4_pred_mode[ luma4x4BlkIdx ] := read_result();
-				if(DEBUG_NEW_PARSER) then
+				if(DEBUG_FLAG_NEW_PARSER) then
 							println("rem_intraYxY_pred_mode["+luma4x4BlkIdx+"] : "+rem_intra4x4_pred_mode[ luma4x4BlkIdx ]);
 				end
 			luma4x4BlkIdx := luma4x4BlkIdx +1;
@@ -8650,7 +8654,7 @@ end
 	do
 		if IS_CAVLC() then
 			intra_chroma_pred_mode := vld_ue();
-			if(DEBUG_NEW_PARSER) then
+			if(DEBUG_FLAG_NEW_PARSER) then
 				println("intra_chroma_pred_mode : "+intra_chroma_pred_mode);
 			end
 		else
@@ -9533,7 +9537,7 @@ end
 				nc := nA + nB ;
 			end
 		end
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("******************** New Block Cavlc***************************");
 			println("nC : "+nc);
 		end
@@ -9547,7 +9551,7 @@ end
 		CAVLC_end(),
 		TotalCoeff() >0
 	do
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("TotalCoeff : "+TotalCoeff());
 			println("Trailing Ones : "+TrailingOnes());
 		end
@@ -9583,7 +9587,7 @@ end
 	do
 		//println("Residual_block_read_trailing_ones_sign_flag_done");
 		level[ inc_nb_coeff ] := 1 - 2 * read_result();
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("levelT1 : "+level[ inc_nb_coeff ]);
 		end
 		inc_nb_coeff := inc_nb_coeff +1 ;
@@ -9646,7 +9650,7 @@ end
 		if (levelCode mod 2) = 0 then level[ inc_nb_coeff ] := rshift( levelCode + 2, 1);
 		else	level[ inc_nb_coeff ] := rshift( -levelCode - 1, 1); end
 
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("level : "+level[ inc_nb_coeff ]);
 		end
 		// if( suffixLength = = 0 )
@@ -9678,7 +9682,7 @@ end
 		//if( TotalCoeff( coeff_token ) < endIdx startIdx + 1 )
 		if TotalCoeff() < block_endIdx - block_startIdx +1 then
 			zerosLeft := total_zeros;
-			if(DEBUG_NEW_PARSER) then
+			if(DEBUG_FLAG_NEW_PARSER) then
 				println("total_zeros : "+total_zeros);
 			end
 		else
@@ -9705,7 +9709,7 @@ end
 		run[inc_nb_coeff] := run_before;
 		zerosLeft := zerosLeft - run_before;
 		inc_nb_coeff := inc_nb_coeff+1;
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("run_before : "+run_before);
 		end
 	end
@@ -9754,7 +9758,7 @@ end
 		CAVLC_end(),
 		TotalCoeff() = 0
 	do
-		if(DEBUG_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 			println("TotalCoeff : "+TotalCoeff());
 			println("Trailing Ones : "+TrailingOnes());
 		end

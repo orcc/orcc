@@ -88,6 +88,7 @@ actor Algo_Check_NALU_type_Frext()
 	uint(size=5) NAL_SPS           = 7;
 	uint(size=5) NAL_PPS           = 8;
 
+	bool DEBUG_FLAG_DECODED = false;
 
 /*
 * 
@@ -111,8 +112,6 @@ actor Algo_Check_NALU_type_Frext()
 				==>
 		guard
 			IsNewNal = false
-		do
-	//		println("Skip : "+ValRbsp);	
 		end
 
 
@@ -129,14 +128,18 @@ actor Algo_Check_NALU_type_Frext()
 		do
 			nal_unit_type := bitand( ValRbsp           , 0x1F );
 			nal_ref_idc   := bitand( rshift(ValRbsp,5) , 0x03 );
-			println("nal_unit_type:"+nal_unit_type+"; nal_ref_idc:"+nal_ref_idc);
+			if(DEBUG_FLAG_DECODED)then
+				println("nal_unit_type:"+nal_unit_type+"; nal_ref_idc:"+nal_ref_idc);
+			end
 		end
 
 	IsSps: action ==>
 		guard
 			nal_unit_type = NAL_SPS
 		do
-			println("Is Sps");
+			if(DEBUG_FLAG_DECODED)then
+				println("Is Sps");
+			end	
 		end
 
 
@@ -144,7 +147,9 @@ actor Algo_Check_NALU_type_Frext()
 		guard
 			nal_unit_type = NAL_PPS
 		do
-			println("Is Pps");
+			if(DEBUG_FLAG_DECODED)then
+				println("Is Pps");
+			end	
 		end
 
 
@@ -155,7 +160,9 @@ actor Algo_Check_NALU_type_Frext()
 		guard
 			nal_unit_type = NAL_SLICE_IDR
 		do
-			println("Is SliceIdr");
+			if(DEBUG_FLAG_DECODED)then
+				println("Is SliceIdr");
+			end	
 		end	
 
 
@@ -166,7 +173,9 @@ actor Algo_Check_NALU_type_Frext()
 		guard
 			nal_unit_type = NAL_SLICE_NON_IDR
 		do
-			println("Is SliceNonIdr");
+			if(DEBUG_FLAG_DECODED)then
+				println("Is SliceNonIdr");
+			end	
 		end	
 
 

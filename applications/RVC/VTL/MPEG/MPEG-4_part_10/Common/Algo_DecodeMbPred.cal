@@ -28,7 +28,8 @@ actor Algo_DecodeMbPred()
 	bool          SkipNal
 		:
 
-	bool DEBUG_MV = true;
+	bool DEBUG_MV = false;
+	bool DEBUG_FLAG_DECODED = false;
 
 	uint(size=3) READ_BITS             = 0;
 	uint(size=3) VLD_UE                = 1;
@@ -50,6 +51,8 @@ actor Algo_DecodeMbPred()
 	uint(size=5) NA      = 0;
 	uint(size=5) PRED_L0 = 1;
 //	uint(size=5) PRED_L1 = 2;
+
+
 
 	List(type: List(type:uint(size=5), size=2), size=5) MB_PART_PRED_MODE_P = [[PRED_L0,NA] , [PRED_L0,PRED_L0] , [PRED_L0,PRED_L0]
 	                                                                          ,[NA     ,NA] , [NA     ,NA     ]];
@@ -221,7 +224,6 @@ actor Algo_DecodeMbPred()
 		guard
 			Is_Intra_4x4(mb_type)
 		do
-			//println("Intra 4x4");
 			CountBit := 16;
 		end
 
@@ -245,7 +247,9 @@ actor Algo_DecodeMbPred()
 				rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] := rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1] + rshift(Buff,16-BitMissed);
 				CountBit := CountBit - BitMissed;
 				Buff := lshift(Buff,BitMissed);
-				println("rem_intraYxY_pred_mode["+(lumaYxYBlkIdx - 1)+"] : "+rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1]);
+				if(DEBUG_FLAG_DECODED)then
+					println("rem_intraYxY_pred_mode["+(lumaYxYBlkIdx - 1)+"] : "+rem_intraYxY_pred_mode[lumaYxYBlkIdx - 1]);
+				end
 			end
 			while(CountBit > 0)
 			do
@@ -255,14 +259,16 @@ actor Algo_DecodeMbPred()
 					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := rshift(Buff,13);
 					CountBit := CountBit - 3;
 					Buff     := lshift(Buff,3);
-					if(CountBit >= 0)then
+					if(CountBit >= 0 and DEBUG_FLAG_DECODED)then
 						println("rem_intraYxY_pred_mode["+lumaYxYBlkIdx+"] : "+rem_intraYxY_pred_mode[lumaYxYBlkIdx]);
 					end
 				else
 					rem_intraYxY_pred_mode[lumaYxYBlkIdx] := 15;
 					CountBit := CountBit - 1;
 					Buff     := lshift(Buff,1);
-					println("rem_intraYxY_pred_mode["+lumaYxYBlkIdx+"] : -1");
+					if(DEBUG_FLAG_DECODED)then
+						println("rem_intraYxY_pred_mode["+lumaYxYBlkIdx+"] : -1");
+					end
 				end
 				lumaYxYBlkIdx := lumaYxYBlkIdx + 1;
 			end
@@ -292,7 +298,6 @@ actor Algo_DecodeMbPred()
 		guard
 			Is_Intra_8x8(mb_type)
 		do
-			//println("Intra 8x8");
 			CountBit := 4;
 		end
 
@@ -324,7 +329,9 @@ actor Algo_DecodeMbPred()
 				==>
 		do
 			intra_chroma_pred_mode := ValueOfVLD;
-			println("intra_chroma_pred_mode : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("intra_chroma_pred_mode : "+ValueOfVLD);
+			end
 		end
 
 	Mb_Type.IsNotEqualToDirect: action

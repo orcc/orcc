@@ -72,8 +72,9 @@ actor Algo_DecodeSliceHeader()
 	uint(size=4) SLICE_TYPE_SP = 3;
 	uint(size=4) SLICE_TYPE_SI = 4;
 
-
-/*   
+	bool DEBUG_FLAG_DECODED = false;
+	bool DEBUG_OUTUPUT      = true;
+/*
 *
 * State variables
 *
@@ -168,9 +169,11 @@ actor Algo_DecodeSliceHeader()
 				else
 					ValueOfVLD[1] - 5
 				end;
-			println("\t\tfirst_mb_in_slice:"+first_mb_in_slice);
-			println("\t\tslice_type:       "+ValueOfVLD[1]);
-			println("\t\tpps_id:           "+ValueOfVLD[2]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tfirst_mb_in_slice:"+first_mb_in_slice);
+				println("\t\tslice_type:       "+ValueOfVLD[1]);
+				println("\t\tpps_id:           "+ValueOfVLD[2]);
+			end
 			//pps_id            := ValueOfVLD[2]; ==> don't need
 			//Ask sps_id
 			//Ask and get separate_colour_plane_flag ==> not implemented in decodeSpsHeader yet !!
@@ -225,7 +228,9 @@ actor Algo_DecodeSliceHeader()
 		do
 			prev_frame_num                         := frame_num;
 			frame_num                              := ValueOfVLD;
-			println("\t\tframe_num:        "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tframe_num:        "+ValueOfVLD);
+			end
 			frame_mbs_only_flag                    := ValFrameMbsOnly;
 			pic_order_cnt_type                     := ValPocType;
 			SzMaxPocLsb                            := ValSzMaxPocLsb;
@@ -285,7 +290,9 @@ actor Algo_DecodeSliceHeader()
 					true
 				end;
 			MbaffFrameFlag := (field_pic_flag and mb_adaptive_frame_field_flag);
-			println("\t\tfield_pic_flag:   "+field_pic_flag);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tfield_pic_flag:   "+field_pic_flag);
+			end
 		end
 
 
@@ -311,7 +318,9 @@ actor Algo_DecodeSliceHeader()
 				else
 					true
 				end;
-			println("\t\tbottom_field_flag: "+bottom_field_flag);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tbottom_field_flag: "+bottom_field_flag);
+			end
 		end
 
 
@@ -343,7 +352,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			idr_pic_id := ValueOfVLD;
-			println("\t\tidr_pic_id:       "+idr_pic_id);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tidr_pic_id:       "+idr_pic_id);
+			end
 		end
 
 
@@ -383,8 +394,12 @@ actor Algo_DecodeSliceHeader()
 				end
 			end
 			POC_val := PicOrderCntMsb + pic_order_cnt_lsb;
-			println("\t\tpic_order_cnt_lsb: "+ValueOfVLD);
-			println("PocVal: "+POC_val);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tpic_order_cnt_lsb: "+ValueOfVLD);
+			end
+			if(DEBUG_OUTUPUT)then
+				println("PocVal: "+POC_val);
+			end
 		end
 
 
@@ -407,7 +422,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			delta_pic_order_cnt_bottom := ValueOfVLD;
-			println("\t\tdelta_pic_order_cnt_bottom: "+delta_pic_order_cnt_bottom);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tdelta_pic_order_cnt_bottom: "+delta_pic_order_cnt_bottom);
+			end
 		end
 
 
@@ -426,7 +443,9 @@ actor Algo_DecodeSliceHeader()
 						((frame_num_offset + frame_num) * 2) - 1
 					end
 				end;
-			println("PocVal: "+POC_val);
+			if(DEBUG_OUTUPUT)then
+				println("PocVal: "+POC_val);
+			end
 		end
 
 
@@ -479,7 +498,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			delta_pic_order_cnt[0] := ValueOfVLD;
-			println("\t\tdelta_pic_order_cnt[0]: "+delta_pic_order_cnt[0]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tdelta_pic_order_cnt[0]: "+delta_pic_order_cnt[0]);
+			end
 		end
 
 
@@ -488,7 +509,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			delta_pic_order_cnt[1] := ValueOfVLD;
-			println("\t\tdelta_pic_order_cnt[1]: "+delta_pic_order_cnt[1]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tdelta_pic_order_cnt[1]: "+delta_pic_order_cnt[1]);
+			end
 		end
 
 
@@ -536,7 +559,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			redundant_pic_cnt := ValueOfVLD;
-			println("\t\tredundant_pic_cnt: "+redundant_pic_cnt);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tredundant_pic_cnt: "+redundant_pic_cnt);
+			end
 		end
 
 
@@ -577,7 +602,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			cabac_init_idc := VLDecoding;
-			println("\t\tcabac_init_idc: "+cabac_init_idc);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tcabac_init_idc: "+cabac_init_idc);
+			end
 		end
 
 
@@ -595,7 +622,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			slice_qp_delta := VLDecoding;
-			println("\t\tslice_qp_delta: "+slice_qp_delta);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tslice_qp_delta: "+slice_qp_delta);
+			end
 		end
 
 
@@ -622,8 +651,10 @@ actor Algo_DecodeSliceHeader()
 					true
 				end;
 			slice_qs_delta := VLDecoding[1];
-			println("\t\tsp_for_switch_flag: "+sp_for_switch_flag);
-			println("\t\tslice_qs_delta: "+slice_qs_delta);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tsp_for_switch_flag: "+sp_for_switch_flag);
+				println("\t\tslice_qs_delta: "+slice_qs_delta);
+			end
 		end
 
 
@@ -643,7 +674,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			slice_qs_delta := VLDecoding;
-			println("\t\tslice_qs_delta: "+slice_qs_delta);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tslice_qs_delta: "+slice_qs_delta);
+			end
 		end
 
 
@@ -663,7 +696,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			disable_deblocking_filter_idc := VLDecoding;
-			println("\t\tdisable_deblocking_filter_idc: "+disable_deblocking_filter_idc);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tdisable_deblocking_filter_idc: "+disable_deblocking_filter_idc);
+			end
 		end
 
 
@@ -684,8 +719,10 @@ actor Algo_DecodeSliceHeader()
 		do
 			slice_alpha_c0_offset := VLDecoding[0];
 			slice_beta_offset     := VLDecoding[1];
-			println("\t\tslice_alpha_c0_offset: "+slice_alpha_c0_offset);
-			println("\t\tslice_beta_offset: "+slice_beta_offset);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tslice_alpha_c0_offset: "+slice_alpha_c0_offset);
+				println("\t\tslice_beta_offset: "+slice_beta_offset);
+			end
 		end
 
 
@@ -708,7 +745,9 @@ actor Algo_DecodeSliceHeader()
 				==>
 		do
 			slice_group_change_cycle := VLDecoding;
-			println("\t\tslice_group_change_cycle: "+slice_group_change_cycle);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tslice_group_change_cycle: "+slice_group_change_cycle);
+			end
 		end
 
 

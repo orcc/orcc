@@ -43,6 +43,9 @@ actor Algo_VariableLengthDecoding()
 	uint(size=4) CAVLC_RUN_BEFORE      = 8;
 	uint(size=4) VLD_TE                = 9;
 
+	bool DEBUG_VAL_DECODED = false;
+	bool DEBUG_FLAG_DECODED = false;
+
 	List(type: List(type: List(type: bool, size=64), size=16), size=6) TotalCoeffValid = 
 		[
 			[
@@ -5363,7 +5366,6 @@ actor Algo_VariableLengthDecoding()
 		do
 			CountBufferRbsp := 0;
 			SizeBufferRbsp  := 0;
-//			println("EndOfNal");
 		end
 
 
@@ -5373,8 +5375,6 @@ actor Algo_VariableLengthDecoding()
 				==>
 		guard
 			IsNewNal = false
-		do
-//			println("Skip : "+ValRbsp);	
 		end
 
 
@@ -5385,7 +5385,9 @@ actor Algo_VariableLengthDecoding()
 			IsNewNal = true
 		do
 			SizeBufferRbsp := 0;
-//			println("NewNalDetected");	
+			if(DEBUG_VAL_DECODED)then
+				println("NewNalDetected");	
+			end
 		end
 
 
@@ -5489,7 +5491,9 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
-			//println("IsVldUe");
+			if(DEBUG_VAL_DECODED)then
+				println("IsVldUe");
+			end
 		end
 
 
@@ -5504,7 +5508,9 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
-			//println("IsVldSe");
+			if(DEBUG_VAL_DECODED)then
+				println("IsVldSe");
+			end
 		end
 
 
@@ -5520,7 +5526,9 @@ actor Algo_VariableLengthDecoding()
 			BitsCount := ValNbBits;
 			ReadValue := 0;
 			TeVal     := 0;
-			//println("IsReadBits");
+			if(DEBUG_VAL_DECODED)then
+				println("IsReadBits");
+			end
 		end
 
 
@@ -5537,7 +5545,9 @@ actor Algo_VariableLengthDecoding()
 			BitsCount := 1;
 			ReadValue := 0;
 			TeVal     := 1;
-			//println("IsVldTeu");
+			if(DEBUG_VAL_DECODED)then
+				println("IsVldTeu");
+			end
 		end
 
 
@@ -5554,7 +5564,9 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
-			//println("IsVldTeue");
+			if(DEBUG_VAL_DECODED)then
+				println("IsVldTeue");
+			end
 		end
 
 
@@ -5656,7 +5668,9 @@ actor Algo_VariableLengthDecoding()
 			ValTypeOfVLD = BYTE_ALIGNED_REQUIRED
 		do
 			CountBufferRbsp := 0;
-//			println("IsByteAligned");
+			if(DEBUG_VAL_DECODED)then
+				println("IsByteAligned");
+			end
 		end
 
 
@@ -5727,7 +5741,9 @@ actor Algo_VariableLengthDecoding()
 			ValDecoded :[CodeNum]
 		do
 			CodeNum := CodeNum - 1;
-			//println("\tUeValue:"+CodeNum);
+			if(DEBUG_VAL_DECODED)then
+				println("\tUeValue:"+CodeNum);
+			end
 		end
 
 
@@ -5741,7 +5757,9 @@ actor Algo_VariableLengthDecoding()
 			else
 				CodeNum := -CodeNum / 2;
 			end
-			//println("\tSeValue:"+CodeNum);
+			if(DEBUG_VAL_DECODED)then
+				println("\tSeValue:"+CodeNum);
+			end
 		end
 
 
@@ -5782,7 +5800,9 @@ actor Algo_VariableLengthDecoding()
 			uint(size=31) ValueDec
 		do
 			ValueDec := bitxor(ReadValue,TeVal);
-			//println("\t\tRead Value u(n):"+ValueDec+" Te:"+TeVal);
+			if(DEBUG_VAL_DECODED)then
+				println("\t\tRead Value u(n):"+ValueDec+" IsTe:"+TeVal);
+			end
 		end
 
 
@@ -5793,7 +5813,6 @@ actor Algo_VariableLengthDecoding()
 		do
 			coeff_token     := lshift(coeff_token, 1);
 			coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
-//			println("Cavlc bit1:"+mask_bits(rshift(WorkingByte,7),1));
 			WorkingByte     := lshift(WorkingByte,1);
 			CountBufferRbsp := CountBufferRbsp - 1;
 			NbBitsRead      := NbBitsRead + 1;
@@ -5802,14 +5821,10 @@ actor Algo_VariableLengthDecoding()
 			do
 				coeff_token     := lshift(coeff_token, 1);
 				coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
-//			println("Cavlc bit:"+mask_bits(rshift(WorkingByte,7),1));
 				WorkingByte     := lshift(WorkingByte,1);
 				CountBufferRbsp := CountBufferRbsp - 1;
 				NbBitsRead      := NbBitsRead + 1;
 				titi := TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)];
-//			if(TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)])then
-//				println("youpi!");
-//			end
 			end
 		end
 
@@ -5822,7 +5837,9 @@ actor Algo_VariableLengthDecoding()
 			==>
 			ValDecoded :[TotalCoeffValue[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)]]
 		do
-			println("Cavlc CoeffToken; Idx_nc :" + Idx_nC + " ; NbBitsRead : "+NbBitsRead+ " ; coeff_token : "+coeff_token);
+			if(DEBUG_FLAG_DECODED)then
+				println("Cavlc CoeffToken; Idx_nc :" + Idx_nC + " ; NbBitsRead : "+NbBitsRead+ " ; coeff_token : "+coeff_token);
+			end
 		end
 
 
@@ -5888,7 +5905,9 @@ actor Algo_VariableLengthDecoding()
 				==>
 			ValDecoded :[TotalZerosValue[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]]
 		do
-			println("Cavlc TotalZeros; Idx :" + IdxmaxNumCoeff +" ; TotalCoeff :"+TotalCoeffParam+ " ; NbBitsRead : "+NbBitsRead+ " ; Codeword : "+ValRead);
+			if(DEBUG_FLAG_DECODED)then
+				println("Cavlc TotalZeros; Idx :" + IdxmaxNumCoeff +" ; TotalCoeff :"+TotalCoeffParam+ " ; NbBitsRead : "+NbBitsRead+ " ; Codeword : "+ValRead);
+			end
 		end
 
 

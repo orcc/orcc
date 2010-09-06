@@ -36,6 +36,8 @@ actor Algo_DecodeDecRefPicMarking()
 //	uint(size=3) VLD_SE    = 2;
 
 
+	bool DEBUG_FLAG_DECODED = false;
+
 	bool no_output_of_prior_pics_flag;
 	bool long_term_reference_flag;
 	bool adaptive_ref_pic_marking_mode_flag;
@@ -94,8 +96,10 @@ actor Algo_DecodeDecRefPicMarking()
 				else
 					true
 				end;
-			println("\t\tno_output_of_prior_pics_flag: "+no_output_of_prior_pics_flag);
-			println("\t\tlong_term_reference_flag: "+long_term_reference_flag);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tno_output_of_prior_pics_flag: "+no_output_of_prior_pics_flag);
+				println("\t\tlong_term_reference_flag: "+long_term_reference_flag);
+			end
 		end
 
 	ReadAdaptRefPicMarkMode.Done: action
@@ -108,7 +112,9 @@ actor Algo_DecodeDecRefPicMarking()
 				else
 					true
 				end;
-			println("\t\tadaptive_ref_pic_marking_mode_flag: "+adaptive_ref_pic_marking_mode_flag);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tadaptive_ref_pic_marking_mode_flag: "+adaptive_ref_pic_marking_mode_flag);
+			end
 		end
 
 	AdaptRefPicMarkMode.IsEqualToTrue: action
@@ -131,7 +137,9 @@ actor Algo_DecodeDecRefPicMarking()
 			or ValueOfVLD = 4
 			or ValueOfVLD = 6
 		do
-			println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
 		end
 
 	MMCO.IsEqualTo3: action
@@ -143,7 +151,9 @@ actor Algo_DecodeDecRefPicMarking()
 		guard
 			ValueOfVLD = 3
 		do
-			println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
 		end
 
 	MMCO.IsEqualTo5: action
@@ -155,7 +165,9 @@ actor Algo_DecodeDecRefPicMarking()
 		guard
 			ValueOfVLD = 5
 		do
-			println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
 		end
 
 	MMCO.IsEqualTo0: action
@@ -164,7 +176,9 @@ actor Algo_DecodeDecRefPicMarking()
 		guard
 			ValueOfVLD = 0
 		do
-			println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
 		end
 
 	ReadMMCOParam.Byte1: action
@@ -174,7 +188,9 @@ actor Algo_DecodeDecRefPicMarking()
 			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ]
 		do
-			println("\t\tmemory_management_control_operation Param: "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD);
+			end
 		end
 
 	ReadMMCOParam.Byte2: action
@@ -184,8 +200,10 @@ actor Algo_DecodeDecRefPicMarking()
 			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ]
 		do
-			println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[0]);
-			println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[1]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[0]);
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[1]);
+			end
 		end
 
 	SendEndSliceHeader: action

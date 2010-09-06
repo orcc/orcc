@@ -35,6 +35,8 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	uint(size=4) CAVLC_TOTAL_ZEROS     = 7;
 	uint(size=4) CAVLC_RUN_BEFORE      = 8;
 
+	bool DEBUG_FLAG_DECODED = false;
+
 	int (size=8)  nC_Val;
 	uint(size=8)  TotalCoeff   := 0;
 	uint(size=8)  TrailingOnes := 0;
@@ -82,11 +84,13 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			startIdx    := ValStartIdx;
 			endIdx      := ValEndIdx;
 			maxNumCoeff := ValMaxNumCoeff;
-			println("******************** New Block Cavlc***************************");
-	println("nC : "+nC_Val);
-//	println("startIdx : "+startIdx);
-//	println("endIdx : "+endIdx);
-//	println("maxNumCoeff : "+ValMaxNumCoeff);
+			if(DEBUG_FLAG_DECODED)then
+				println("******************** New Block Cavlc***************************");
+				println("nC : "+nC_Val);
+			//	println("startIdx : "+startIdx);
+			//	println("endIdx : "+endIdx);
+			//	println("maxNumCoeff : "+ValMaxNumCoeff);
+			end
 			zerosLeft := 0;
 		end
 
@@ -97,11 +101,10 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		do
 			TotalCoeff   := bitand(ValueOfVLD,0xFF);
 			TrailingOnes := rshift(ValueOfVLD,8);
-			println("TotalCoeff : "+bitand(ValueOfVLD,0xFF));
-			println("Trailing Ones : "+rshift(ValueOfVLD,8));
-			//if(i==TrailingOnes and TrailingOnes < 3) then
-			//  levelCode := levelCode + 2;
-			//end
+			if(DEBUG_FLAG_DECODED)then
+				println("TotalCoeff : "+bitand(ValueOfVLD,0xFF));
+				println("Trailing Ones : "+rshift(ValueOfVLD,8));
+			end
 			if(TrailingOnes < 3) then
 				levelCode := 2;
 			else
@@ -141,7 +144,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			do
 				trailing_ones_sign_flag := bitand(rshift(ValueOfVLD,TrailingOnes - 1 - i) ,1);
 				level[iLoop] := 1 - 2 * trailing_ones_sign_flag;
-				println("levelT1 : "+level[iLoop]);
+				if(DEBUG_FLAG_DECODED)then
+					println("levelT1 : "+level[iLoop]);
+				end
 				iLoop        := iLoop + 1;
 			end
 		end
@@ -222,7 +227,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			if( (Abs(level[iLoop]) > lshift(3, suffixLength - 1)) and (suffixLength < 6) ) then
 				suffixLength := suffixLength + 1;
 			end
-			println("level : "+level[iLoop]);
+			if(DEBUG_FLAG_DECODED)then
+				println("level : "+level[iLoop]);
+			end
 			
 			levelCode := 0;
 			iLoop     := iLoop + 1;
@@ -243,7 +250,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 				==>
 		do
 			zerosLeft := total_zeros;
-			println("total_zeros : "+total_zeros);
+			if(DEBUG_FLAG_DECODED)then
+				println("total_zeros : "+total_zeros);
+			end
 		end
 
 	InitiLoop: action ==>
@@ -267,7 +276,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 				==>
 		do
 			run[iLoop] := run_before;
-			println("run_before : "+run_before);
+			if(DEBUG_FLAG_DECODED)then
+				println("run_before : "+run_before);
+			end
 			zerosLeft  := zerosLeft - run_before;
 			iLoop      := iLoop + 1;
 		end

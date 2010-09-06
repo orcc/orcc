@@ -28,7 +28,7 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) MBLayerSubMbType
 		:
 
-	bool DEBUG_MV = true;
+	bool DEBUG_MV = false;
 
 	uint(size=3) READ_BITS             = 0;
 	uint(size=3) VLD_UE                = 1;

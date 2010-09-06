@@ -81,6 +81,7 @@ actor Algo_DecodeSps()
 	uint(size=3) VLD_SE    = 2;
 
 
+	bool DEBUG_FLAG_DECODED = false;
 /*
 *
 * State Variables
@@ -223,10 +224,12 @@ actor Algo_DecodeSps()
 			ValVLD :[ValueOfVLD] repeat 5
 				==>
 		do
-			println("\t\tprofile_idc : "+ValueOfVLD[0]);
-			println("\t\tconstrained_set_flag : "+ValueOfVLD[1]);
-			println("\t\tlevel_idc : "+ValueOfVLD[3]);
-			println("\t\tsps_id : "+ValueOfVLD[4]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tprofile_idc : "+ValueOfVLD[0]);
+				println("\t\tconstrained_set_flag : "+ValueOfVLD[1]);
+				println("\t\tlevel_idc : "+ValueOfVLD[3]);
+				println("\t\tsps_id : "+ValueOfVLD[4]);
+			end
 
 			sps_id                                        := ValueOfVLD[4];
 			profile_idc[sps_id]                           := ValueOfVLD[0];
@@ -300,8 +303,10 @@ actor Algo_DecodeSps()
 		do
 			log2_max_frame_num_minus4[sps_id] := ValueOfVLD[0];
 			pic_order_cnt_type[sps_id]        := ValueOfVLD[1];
-			println("\t\tlog2_max_frame_num_minus4 : "+ValueOfVLD[0]);
-			println("\t\tpic_order_cnt_type : "+ValueOfVLD[1]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tlog2_max_frame_num_minus4 : "+ValueOfVLD[0]);
+				println("\t\tpic_order_cnt_type : "+ValueOfVLD[1]);
+			end
 		end
 
 
@@ -313,8 +318,6 @@ actor Algo_DecodeSps()
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			pic_order_cnt_type[sps_id] = 0
-		do
-//			println("ReadPocType.IsEqualTo0");
 		end
 
 
@@ -323,7 +326,9 @@ actor Algo_DecodeSps()
 				==>
 		do
 			log2_max_pic_order_cnt_lsb_minus4[sps_id] := ValueOfVLD;
-			println("\t\tlog2_max_pic_order_cnt_lsb_minus4 : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tlog2_max_pic_order_cnt_lsb_minus4 : "+ValueOfVLD);
+			end
 		end
 
 
@@ -336,8 +341,6 @@ actor Algo_DecodeSps()
 			NbBitsToRead :[     1                                ]
 		guard
 			pic_order_cnt_type[sps_id] = 1
-		do
-//			println("ReadPocType.IsEqualTo1");
 		end
 
 
@@ -349,11 +352,12 @@ actor Algo_DecodeSps()
 			offset_for_non_ref_pic[sps_id]                := ValueOfVLD[1];
 			offset_for_top_to_bottom_field[sps_id]        := ValueOfVLD[2];
 			num_ref_frames_in_pic_order_cnt_cycle[sps_id] := bitand(ValueOfVLD[3], 0xFF);
-			println("\t\tdelta_pic_order_always_zero_flag : "+ValueOfVLD[0]);
-			println("\t\toffset_for_non_ref_pic : "+ValueOfVLD[1]);
-			println("\t\toffset_for_top_to_bottom_field : "+ValueOfVLD[2]);
-			println("\t\tnum_ref_frames_in_pic_order_cnt_cycle : "+ValueOfVLD[3]);
-//			println("ReadPocType1Param");
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tdelta_pic_order_always_zero_flag : "+ValueOfVLD[0]);
+				println("\t\toffset_for_non_ref_pic : "+ValueOfVLD[1]);
+				println("\t\toffset_for_top_to_bottom_field : "+ValueOfVLD[2]);
+				println("\t\tnum_ref_frames_in_pic_order_cnt_cycle : "+ValueOfVLD[3]);
+			end
 		end
 
 	CheckNumRefInPocCycle.IsEqualTo0: action
@@ -383,7 +387,9 @@ actor Algo_DecodeSps()
 			expected_delta_per_poc_cycle[sps_id]          := expected_delta_per_poc_cycle[sps_id] + ValueOfVLD;
 			offset_for_ref_frame_accumul[sps_id][LoopVal] := PrevOffForRefFramAccum + ValueOfVLD;
 			PrevOffForRefFramAccum                        := PrevOffForRefFramAccum + ValueOfVLD;
-			println("\t\toffset_for_ref_frame["+LoopVal+"] : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\toffset_for_ref_frame["+LoopVal+"] : "+ValueOfVLD);
+			end
 			LoopVal := LoopVal + 1;
 		end
 
@@ -395,7 +401,9 @@ actor Algo_DecodeSps()
 			offset_for_ref_frame[sps_id][LoopVal]         := ValueOfVLD;
 			offset_for_ref_frame_accumul[sps_id][LoopVal] := PrevOffForRefFramAccum + ValueOfVLD;
 			expected_delta_per_poc_cycle[sps_id]          := expected_delta_per_poc_cycle[sps_id] + ValueOfVLD;
-			println("\t\toffset_for_ref_frame["+LoopVal+"] : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\toffset_for_ref_frame["+LoopVal+"] : "+ValueOfVLD);
+			end
 		end
 
 
@@ -425,11 +433,13 @@ actor Algo_DecodeSps()
 			pic_width_in_mbs_minus1[sps_id]              := ValueOfVLD[2];
 			pic_height_in_map_units_minus1[sps_id]       := ValueOfVLD[3];
 			frame_mbs_only_flag[sps_id]                  := ValueOfVLD[4];
-			println("\t\tnum_ref_frames : "+ValueOfVLD[0]);
-			println("\t\tgaps_in_frame_num_value_allowed_flag : "+ValueOfVLD[1]);
-			println("\t\tpic_width_in_mbs_minus1 : "+ValueOfVLD[2]);
-			println("\t\tpic_height_in_map_units_minus1 : "+ValueOfVLD[3]);
-			println("\t\tframe_mbs_only_flag : "+ValueOfVLD[4]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tnum_ref_frames : "+ValueOfVLD[0]);
+				println("\t\tgaps_in_frame_num_value_allowed_flag : "+ValueOfVLD[1]);
+				println("\t\tpic_width_in_mbs_minus1 : "+ValueOfVLD[2]);
+				println("\t\tpic_height_in_map_units_minus1 : "+ValueOfVLD[3]);
+				println("\t\tframe_mbs_only_flag : "+ValueOfVLD[4]);
+			end
 
 			MaxFS       := MaxFS_LookUpTable       [bitand(level_idc[sps_id],0x2F)];
 			Sqrt_8MaxFS := Sqrt_8MaxFS_LookUpTable [bitand(level_idc[sps_id],0x2F)];
@@ -473,7 +483,9 @@ actor Algo_DecodeSps()
 				==>
 		do
 			mb_adaptive_frame_field_flag[sps_id] := ValueOfVLD;
-			println("\t\tmb_adaptive_frame_field_flag : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmb_adaptive_frame_field_flag : "+ValueOfVLD);
+			end
 		end
 
 
@@ -492,8 +504,10 @@ actor Algo_DecodeSps()
 		do
 			direct_8x8_inference_flag[sps_id] := ValueOfVLD[0];
 			frame_cropping_flag[sps_id]          := ValueOfVLD[1];
-			println("\t\tdirect_8x8_inference_flag : "+ValueOfVLD[0]);
-			println("\t\tframe_cropping_flag : "+ValueOfVLD[1]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tdirect_8x8_inference_flag : "+ValueOfVLD[0]);
+				println("\t\tframe_cropping_flag : "+ValueOfVLD[1]);
+			end
 		end
 
 
@@ -515,10 +529,12 @@ actor Algo_DecodeSps()
 			frame_crop_right_offset[sps_id]  := ValueOfVLD[1];
 			frame_crop_top_offset[sps_id]    := ValueOfVLD[2];
 			frame_crop_bottom_offset[sps_id] := ValueOfVLD[3];
-			println("\t\tframe_crop_left_offset : "+ValueOfVLD[0]);
-			println("\t\tframe_crop_right_offset : "+ValueOfVLD[1]);
-			println("\t\tframe_crop_top_offset : "+ValueOfVLD[2]);
-			println("\t\tframe_crop_bottom_offset : "+ValueOfVLD[3]);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tframe_crop_left_offset : "+ValueOfVLD[0]);
+				println("\t\tframe_crop_right_offset : "+ValueOfVLD[1]);
+				println("\t\tframe_crop_top_offset : "+ValueOfVLD[2]);
+				println("\t\tframe_crop_bottom_offset : "+ValueOfVLD[3]);
+			end
 		end
 
 
@@ -548,7 +564,9 @@ actor Algo_DecodeSps()
 						4
 					end
 				end;
-			println("\t\tvui_parameters_present_flag : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tvui_parameters_present_flag : "+ValueOfVLD);
+			end
 		end
 
 		

@@ -93,6 +93,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 	int SZ_TOTALCOEFF          = 128;
 	int MASK_TOTALCOEFF        = 127;
+
+	bool DEBUG_FLAG_DECODED = false;
 /*
 *
 * State Variables
@@ -126,13 +128,15 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	List( type: List( type: List(type: uint(size=5), size=16),size= SZ_TOTALCOEFF), size=2) TotalCoeffTabChroma := [[[0:for int s in 0 .. 15]: for int s in 0 .. SZ_TOTALCOEFF-1]: for int i in 0 .. 1];
 
 	procedure NextMbAddress()
-	begin
-		CurrMbAddr        := CurrMbAddr + 1;
-		TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
-		println("\n\n\n*** New Mb *** Val = "+CurrMbAddr);
-//		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
-//		Mb_y := val_CurrMbAddr / PicWidthInMbs;
-	end
+		begin
+			CurrMbAddr        := CurrMbAddr + 1;
+			TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
+			if(DEBUG_FLAG_DECODED)then
+				println("\n\n\n*** New Mb *** Val = "+CurrMbAddr);
+			end
+	//		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
+	//		Mb_y := val_CurrMbAddr / PicWidthInMbs;
+		end
 
 	GetSpsAndPpsParameters: action
 			EntropyCodingMode  :[ValEntropyCodingMode],
@@ -208,7 +212,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 		do
 			mb_skip_run   := ValueOfVLD;
 			prevMbSkipped := (mb_skip_run > 0);
-			println("\t\tmb_skip_run : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmb_skip_run : "+ValueOfVLD);
+			end
 		end
 
 	//for( i=0; i<mb_skip_run; i++ )
@@ -278,7 +284,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				else
 					true
 				end;
-			println("\t\tmb_field_decoding_flag : "+ValueOfVLD);
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmb_field_decoding_flag : "+ValueOfVLD);
+			end
 		end
 
 	//macroblock_layer()
