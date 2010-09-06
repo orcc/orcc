@@ -1447,7 +1447,7 @@ actor Algo_Synp_AVC_FREXT()
 	*************************************************************
 	*************************************************************/
 	bool DEBUG_FLAG_NEW_PARSER = false;
-	bool DEBUG_OUTPUT_NEW_PARSER = true;
+	bool DEBUG_OUTPUT_NEW_PARSER = false;
 	uint(size=1) bmFlag;
 	uint(size=4) startIdx;
 	uint(size=4) endIdx;

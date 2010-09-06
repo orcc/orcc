@@ -1,0 +1,35 @@
+actor Black_Hole_4_Mmco()
+	int (size=32) DelList,
+	uint(size=31) LongTermList,
+	uint(size=31) ShortTermList,
+	uint(size=4)  SzShortTermList,
+	bool          IsIDR
+		==>
+		:
+		
+	a:action
+			DelList:[azerty]
+				==>
+		end
+		
+	b:action
+			LongTermList:[azerty]
+				==>
+		end
+		
+	c:action
+			ShortTermList:[azerty]
+				==>
+		end
+		
+	d:action
+			SzShortTermList:[azerty]
+				==>
+		end
+		
+	 e:action
+			IsIDR:[azerty]
+				==>
+		end
+
+end

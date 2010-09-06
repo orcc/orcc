@@ -196,6 +196,24 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="MMCO">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MMCO"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="BlackHole4Mmco">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/Black_Hole_4_Mmco"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -493,4 +511,15 @@
         src="DecodeMacroBlockLayer" src-port="SubMbPredMbFieldDecoding"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="SubMbType"
         src="DecodeSubMbPred" src-port="MBLayerSubMbType"/>
+    <Connection dst="MMCO" dst-port="FraNum" src="DecodeSliceHeader" src-port="FramNumCurrPic"/>
+    <Connection dst="MMCO" dst-port="POC" src="DecodeSliceHeader" src-port="Poc"/>
+    <Connection dst="MMCO" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
+    <Connection dst="MMCO" dst-port="NumReferenceFrame" src="DecodeSps" src-port="MMCO_NumRefFrame"/>
+    <Connection dst="BlackHole4Mmco" dst-port="DelList" src="MMCO" src-port="DelList"/>
+    <Connection dst="BlackHole4Mmco" dst-port="LongTermList" src="MMCO" src-port="LongTermList"/>
+    <Connection dst="BlackHole4Mmco" dst-port="ShortTermList" src="MMCO" src-port="ShortTermList"/>
+    <Connection dst="BlackHole4Mmco" dst-port="SzShortTermList"
+        src="MMCO" src-port="SzShortTermList"/>
+    <Connection dst="BlackHole4Mmco" dst-port="IsIDR" src="MMCO" src-port="IsIDR"/>
+    <Connection dst="MMCO" dst-port="MMCO" src="DecodeDecRefPicMarking" src-port="Mmco"/>
 </XDF>

@@ -41,6 +41,9 @@ actor Algo_DecodeSps()
 	uint(size=2)  ChromaArrayType,
 	uint(size=2)  Num_C8x8,
 
+	uint(size=31) MMCO_MaxFrameNum,
+	uint(size=5)  MMCO_NumRefFrame,
+
 	uint(size=32) Pps_PicWidthInMbs,
 	uint(size=32) Pps_PicHeightInMapUnits
 		:
@@ -95,6 +98,7 @@ actor Algo_DecodeSps()
 	List (type: uint(size=4) , size=32) constraint_set_flag                   := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=8) , size=32) profile_idc                           := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=4) , size=32) log2_max_frame_num_minus4             := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=31) max_frame_num                         := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=2) , size=32) pic_order_cnt_type                    := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=4) , size=32) log2_max_pic_order_cnt_lsb_minus4     := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=1) , size=32) delta_pic_order_always_zero_flag      := [ 0     : for int i in 0 .. 31 ];
@@ -162,7 +166,10 @@ actor Algo_DecodeSps()
 			BitDepthChroma              :[bit_depth_chroma_minus8[ValSps]+8],
 			Direct8x8Inference          :[ValDirect8x8Inference],
 			ChromaArrayType             :[Chroma_Array_Type[ValSps]],
-			Num_C8x8                    :[NumC8x8[ValSps]]
+			Num_C8x8                    :[NumC8x8[ValSps]],
+
+			MMCO_MaxFrameNum            :[max_frame_num[ValSps]],
+			MMCO_NumRefFrame            :[num_ref_frames[ValSps]]
 		var
 			bool val_frame_mbs_only,
 			bool ValDeltaPic,
@@ -302,6 +309,7 @@ actor Algo_DecodeSps()
 				==>
 		do
 			log2_max_frame_num_minus4[sps_id] := ValueOfVLD[0];
+			max_frame_num[sps_id]             := 1 << (ValueOfVLD[0] + 4);
 			pic_order_cnt_type[sps_id]        := ValueOfVLD[1];
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tlog2_max_frame_num_minus4 : "+ValueOfVLD[0]);

@@ -38,6 +38,8 @@ actor Algo_DecodeSliceHeader()
 	uint(size=3)  SliceGroupMapType,
 	int (size=32) SizeSliceGroupChgCycle
 		==>
+	uint(size=31) FramNumCurrPic,
+
 	uint(size=3)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
 	bool          SkipNal,
@@ -48,7 +50,9 @@ actor Algo_DecodeSliceHeader()
 	uint(size=4)  SliceType,
 
 	uint(size=32) FirstMbInSlice,
-	bool          MbaffFrame
+	bool          MbaffFrame,
+
+	uint(size=32) Poc
 		:
 
 
@@ -225,6 +229,7 @@ actor Algo_DecodeSliceHeader()
 			OffsetForTopToBottomField         :[ValOffsetForTopToBottomField],
 			MbAdaptFrameField                 :[ValMbAdaptFrameField]
 				==>
+			FramNumCurrPic                    :[ValueOfVLD]
 		do
 			prev_frame_num                         := frame_num;
 			frame_num                              := ValueOfVLD;
@@ -373,6 +378,7 @@ actor Algo_DecodeSliceHeader()
 	ReadPocLsb.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
+			Poc    :[POC_val]
 		var
 			int MaxPicOrderCntLsb,
 			int POC_val
@@ -430,6 +436,7 @@ actor Algo_DecodeSliceHeader()
 
 	PocType.IsEqualTo2: action
 				==>
+			Poc    :[POC_val]
 		var
 			int POC_val
 		do
@@ -517,6 +524,7 @@ actor Algo_DecodeSliceHeader()
 
 	CalcPOC4PocType1: action
 			==>
+		Poc :[POC_val]
 	guard
 		first_mb_in_slice=0
 	var 
@@ -540,6 +548,7 @@ actor Algo_DecodeSliceHeader()
 
 		// TopField is always inferior !!!!!
 		POC_val := expectedpoc + delta_pic_order_cnt[0];
+		println("PocVal: "+POC_val);
 	end
 
 

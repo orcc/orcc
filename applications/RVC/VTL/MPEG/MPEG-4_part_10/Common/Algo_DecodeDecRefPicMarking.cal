@@ -21,7 +21,9 @@ actor Algo_DecodeDecRefPicMarking()
 		==>
 	uint(size=3)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
-	bool          SkipNal
+	bool          SkipNal,
+
+	uint(size=31) Mmco
 		:
 
 
@@ -38,8 +40,6 @@ actor Algo_DecodeDecRefPicMarking()
 
 	bool DEBUG_FLAG_DECODED = false;
 
-	bool no_output_of_prior_pics_flag;
-	bool long_term_reference_flag;
 	bool adaptive_ref_pic_marking_mode_flag;
 	//CheckNaluType Parameters
 	uint(size=2) nal_ref_idc;
@@ -49,9 +49,18 @@ actor Algo_DecodeDecRefPicMarking()
 			PicNalRefIdc :[ValNalRefIdc],
 			IdrPic       :[IsAnIdr]
 				==>
+			Mmco         :[ValIdr]
+		var
+			uint(size=31) ValIdr
 		do
 			nal_ref_idc := ValNalRefIdc;
 			IdrPicFlag  := IsAnIdr;
+			ValIdr :=
+				if(not IsAnIdr )then
+					0
+				else
+					1
+				end;
 		end
 
 	NalRefIdc.IsEqualTo0: action
@@ -81,21 +90,10 @@ actor Algo_DecodeDecRefPicMarking()
 		end
 
 	ReadIdrParam.Done: action
-			ValVLD     :[ValueOfVLD] repeat 2
+			ValVLD     :[no_output_of_prior_pics_flag, long_term_reference_flag]
 				==>
+			Mmco         :[long_term_reference_flag]
 		do
-			no_output_of_prior_pics_flag :=
-				if(ValueOfVLD[0] = 0)then
-					false
-				else
-					true
-				end;
-			long_term_reference_flag :=
-				if(ValueOfVLD[1] = 0)then
-					false
-				else
-					true
-				end;
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tno_output_of_prior_pics_flag: "+no_output_of_prior_pics_flag);
 				println("\t\tlong_term_reference_flag: "+long_term_reference_flag);
@@ -105,6 +103,7 @@ actor Algo_DecodeDecRefPicMarking()
 	ReadAdaptRefPicMarkMode.Done: action
 			ValVLD     :[ValueOfVLD]
 				==>
+			Mmco         :[ValueOfVLD]
 		do
 			adaptive_ref_pic_marking_mode_flag :=
 				if(ValueOfVLD = 0)then
@@ -130,7 +129,9 @@ actor Algo_DecodeDecRefPicMarking()
 			ValVLD :[ValueOfVLD]
 				==>
 			SkipNal      :[ false  ],
-			TypeOfVLD    :[ VLD_UE ]
+			TypeOfVLD    :[ VLD_UE ],
+
+			Mmco         :[ValueOfVLD]
 		guard
 			   ValueOfVLD = 1
 			or ValueOfVLD = 2
@@ -147,7 +148,9 @@ actor Algo_DecodeDecRefPicMarking()
 				==>
 			//              differ , long_te
 			SkipNal      :[ false  , false  ],
-			TypeOfVLD    :[ VLD_UE , VLD_UE ]
+			TypeOfVLD    :[ VLD_UE , VLD_UE ],
+
+			Mmco         :[ValueOfVLD]
 		guard
 			ValueOfVLD = 3
 		do
@@ -161,7 +164,9 @@ actor Algo_DecodeDecRefPicMarking()
 				==>
 			//   memory_management_control_operation
 			SkipNal      :[ false  ],
-			TypeOfVLD    :[ VLD_UE ]
+			TypeOfVLD    :[ VLD_UE ],
+
+			Mmco         :[ValueOfVLD]
 		guard
 			ValueOfVLD = 5
 		do
@@ -173,6 +178,7 @@ actor Algo_DecodeDecRefPicMarking()
 	MMCO.IsEqualTo0: action
 			ValVLD :[ValueOfVLD]
 				==>
+			Mmco         :[ValueOfVLD]
 		guard
 			ValueOfVLD = 0
 		do
@@ -186,7 +192,9 @@ actor Algo_DecodeDecRefPicMarking()
 				==>
 			//      reordering_of_pic_nums_idc
 			SkipNal      :[ false  ],
-			TypeOfVLD    :[ VLD_UE ]
+			TypeOfVLD    :[ VLD_UE ],
+
+			Mmco         :[ValueOfVLD]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD);
@@ -198,7 +206,9 @@ actor Algo_DecodeDecRefPicMarking()
 				==>
 			//      reordering_of_pic_nums_idc
 			SkipNal      :[ false  ],
-			TypeOfVLD    :[ VLD_UE ]
+			TypeOfVLD    :[ VLD_UE ],
+
+			Mmco         :[ValueOfVLD] repeat 2
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[0]);

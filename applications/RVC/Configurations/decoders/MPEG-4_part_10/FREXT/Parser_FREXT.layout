@@ -2,8 +2,8 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="57" y="172"/>
-      <vertex id="Algo_NALU" x="565" y="365"/>
-      <vertex id="CheckNaluType" x="205" y="52"/>
+      <vertex id="Algo_NALU" x="168" y="150"/>
+      <vertex id="CheckNaluType" x="484" y="84"/>
       <vertex id="DecodeSps" x="168" y="860"/>
       <vertex id="SpsVLDecoding" x="822" y="1839"/>
       <vertex id="PpsVLDecoding" x="822" y="231"/>
@@ -19,5 +19,7 @@
       <vertex id="DecodeResidual" x="1205" y="772"/>
       <vertex id="DecodeResidualBlock_Cavlc" x="1617" y="758"/>
       <vertex id="DecodeSubMbPred" x="1205" y="1221"/>
+      <vertex id="MMCO" x="1158" y="1939"/>
+      <vertex id="BlackHole4Mmco" x="1446" y="1993"/>
    </vertices>
 </layout>
