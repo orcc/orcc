@@ -1284,7 +1284,7 @@ actor Algo_VariableLengthDecoding()
 				  0x0000 , 0x0000 , 0x0000 , 0x0000
 				],
 				// 4 <= nC < 8 ; nbBitRead = 8
-				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x030C , 0x0000 , 0x020B ,
+				[ 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x030C , 0x030C , 0x020B ,
 				  0x010A , 0x0009 , 0x030B , 0x020A , 0x0109 , 0x0008 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
 				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
 				  0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 , 0x0000 ,
@@ -4760,7 +4760,7 @@ actor Algo_VariableLengthDecoding()
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 5
 					[  0 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 6
-					[ 10 ,  1 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
+					[ 10 ,  0 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 7
 					[  0 ,  0 ,  0 ,  0 ,   0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 6 ; nbBitRead = 8
@@ -5362,6 +5362,7 @@ actor Algo_VariableLengthDecoding()
 			ValEndOfNal = true
 		do
 			CountBufferRbsp := 0;
+			SizeBufferRbsp  := 0;
 //			println("EndOfNal");
 		end
 
@@ -5425,7 +5426,7 @@ actor Algo_VariableLengthDecoding()
 		var
 			uint(size=1) IsMoreDataInRbsp
 		do
-			if( (WorkingByte = 0) and (BufferRbsp[0] = 3) and (CountBufferRbsp = 0) )then
+			if( ((WorkingByte = 0 and BufferRbsp[0] = 3) or (BufferRbsp[0] = 0x80)) and (CountBufferRbsp = 0) )then
 				IsMoreDataInRbsp := 0;
 			else
 				IsMoreDataInRbsp := 1;
