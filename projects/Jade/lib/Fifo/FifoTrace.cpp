@@ -298,8 +298,8 @@ void FifoTrace::setFile(Decoder* decoder, Connection* connection, BasicBlock* bb
 	Module* module = decoder->getModule();
 
 	// Get vertex of the connection
-	Port* dst = connection->getDestinationPort();
-	Vertex* dstInstance = (Vertex*)connection->getSink();
+	Port* dst = connection->getSourcePort();
+	Vertex* dstInstance = (Vertex*)connection->getSource();
 
 	//Creating file string
 	fileName << OutputDir << dstInstance->getName() <<"_" <<dst->getName() << ".txt";
