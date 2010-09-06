@@ -28,7 +28,7 @@ actor Algo_DecodeMbPred()
 	bool          SkipNal
 		:
 
-	bool DEBUG_MV = false;
+	bool DEBUG_MV = true;
 
 	uint(size=3) READ_BITS             = 0;
 	uint(size=3) VLD_UE                = 1;
