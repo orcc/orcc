@@ -1,10 +1,10 @@
 BroadcastWrite(n) ::= <<
-tok_output_$n$ = fifo_$instance.broadcast.type$_write($instance.id$_output_$n$, 1);
+tok_output_$n$ = fifo_$instance.broadcast.type$_write($instance.id$_output_$n$, output_$n$_buf, 1);
 *tok_output_$n$ = *tok_input;
 >>
 
 BroadcastWriteEnd(n) ::= <<
-fifo_$instance.broadcast.type$_write_end($instance.id$_output_$n$, 1);
+fifo_$instance.broadcast.type$_write_end($instance.id$_output_$n$, output_$n$_buf, 1);
 >>
 
 outputPatternPort(num) ::= <<
@@ -24,9 +24,9 @@ $if (instance.broadcast)
 $
 void $instance.id$_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	$instance.broadcast.type$ *tok_input;
-	$instance.broadcast.outputList: { n | $instance.broadcast.type$ *tok_output_$n$;
-}$
+	$instance.broadcast.type$ *tok_input, input_buf[1],
+	$instance.broadcast.outputList: { n | output_$n$_buf[1], *tok_output_$n$}; separator=",\n"$;
+
 	while (fifo_$instance.broadcast.type$_has_tokens($instance.id$_input, 1)) {
 		$outputPattern(instance.broadcast.outputList)$
 			si->num_firings = i;
@@ -35,7 +35,7 @@ void $instance.id$_scheduler(struct schedinfo_s *si) {
 			return;
 		}
 
-		tok_input = fifo_$instance.broadcast.type$_read($instance.id$_input, 1);
+		tok_input = fifo_$instance.broadcast.type$_read($instance.id$_input, input_buf, 1);
 		$instance.broadcast.outputList: BroadcastWrite(); separator="\n"$
 		fifo_$instance.broadcast.type$_read_end($instance.id$_input, 1);
 		$instance.broadcast.outputList: BroadcastWriteEnd(); separator="\n"$

@@ -29,7 +29,8 @@ $value : {[$it$]} $
 variableDeclaration(variable) ::= <<
 $
 if(variable.port)
-$$variable.type$ *$variable$$
+$$variable.type$ $variable$_buf$listSize(variable.type.dimensions)$;
+$variable.type$ *$variable$$
 else
 $$variable.type$ $variable$$listSize(variable.type.dimensions)$$
 endif
@@ -147,15 +148,14 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 
 Peek(peek) ::= <<
 
-$peek.target$ = fifo_$peek.port.type$_peek($instance.id$_$peek.port$, $peek.numTokens$);
+$peek.target$ = fifo_$peek.port.type$_peek($instance.id$_$peek.port$, $peek.target$_buf, $peek.numTokens$);
 >>
 
 Read(read) ::= <<
 
 $if (read.target)
-$$read.target$ = fifo_$read.port.type$_read($instance.id$_$read.port$, $read.numTokens$);$
-else
-$fifo_$read.port.type$_read($instance.id$_$read.port$, $read.numTokens$);$endif$
+$$read.target$ = fifo_$read.port.type$_read($instance.id$_$read.port$, $read.target$_buf, $read.numTokens$);$
+endif$
 >>
 
 ReadEnd(readEnd) ::= <<
@@ -181,14 +181,14 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 
 Write(write) ::= <<
 
-$write.target$ = fifo_$write.port.type$_write($instance.id$_$write.port$, $write.numTokens$);
+$write.target$ = fifo_$write.port.type$_write($instance.id$_$write.port$, $write.target$_buf, $write.numTokens$);
 >>
 
 WriteEnd(writeEnd) ::= <<
 $if(options.("net.sf.orcc.backends.enableTrace"))$
-fifo_$writeEnd.port.type$_trace($instance.id$_$writeEnd.port$, trace_$instance.id$_$writeEnd.port$, $writeEnd.numTokens$);
+fifo_$writeEnd.port.type$_trace($instance.id$_$writeEnd.port$, trace_$instance.id$_$writeEnd.port$, $writeEnd.target$_buf, $writeEnd.numTokens$);
 $endif$
-fifo_$writeEnd.port.type$_write_end($instance.id$_$writeEnd.port$, $writeEnd.numTokens$);
+fifo_$writeEnd.port.type$_write_end($instance.id$_$writeEnd.port$, $writeEnd.target$_buf, $writeEnd.numTokens$);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
