@@ -23,7 +23,11 @@ actor Algo_DecodeRefPicList_Frext()
 	uint(size=3)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
 	bool          SkipNal,
-	uint(size=5)  SDataNumRefIdxLXActive
+	uint(size=5)  SDataNumRefIdxLXActive,
+
+	uint(size=2)  RefList0Type,
+	uint(size=5)  NbRefFrame_l0,
+	uint(size=31) RefReordering_l0
 		:
 
 /*   
@@ -41,6 +45,9 @@ actor Algo_DecodeRefPicList_Frext()
 	uint(size=4) SLICE_TYPE_SP = 3;
 //	uint(size=4) SLICE_TYPE_SI = 4;
 
+	uint(size=2) REFLIST0_PRED    = 0;
+	uint(size=2) REFLIST0_BI_PRED = 1;
+	uint(size=2) REFLIST1_BI_PRED = 2;
 
 	bool DEBUG_FLAG_DECODED = false;
 
@@ -68,9 +75,18 @@ actor Algo_DecodeRefPicList_Frext()
 			//  num_ref_idx_active_override_flag   
 			SkipNal      :[  false  ],
 			TypeOfVLD    :[READ_BITS],
-			NbBitsToRead :[    1    ]
+			NbBitsToRead :[    1    ],
+
+			RefList0Type  :[REFLIST0_PRED]
 		guard
 			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP)
+		end
+
+	SliceType.IsEqualToI: action
+				==>
+			RefList0Type     :[0],
+			NbRefFrame_l0    :[0],
+			RefReordering_l0 :[0]
 		end
 
 	ReadNumRefIdxAct.Done: action
@@ -115,9 +131,16 @@ actor Algo_DecodeRefPicList_Frext()
 			//              direct_sp , num_ref_i   
 			SkipNal      :[   false   ,   false   ],
 			TypeOfVLD    :[ READ_BITS , READ_BITS ],
-			NbBitsToRead :[     1     ,     1     ]
+			NbBitsToRead :[     1     ,     1     ],
+
+			RefList0Type  :[Type]
 		guard
 			slice_type = SLICE_TYPE_B
+		var
+			uint(size=2) Type
+		do
+			println("RefPicList for B Pic not implemented !");
+			while true do end
 		end
 
 	Read_DirecSpat_NumRefIdxAct.Done: action
@@ -169,15 +192,18 @@ actor Algo_DecodeRefPicList_Frext()
 	ReadRefPicList0Reord.Asked: action
 			==>
 			//   ref_pic_list_reordering_flag_l0   
-			SkipNal      :[  false  ],
-			TypeOfVLD    :[READ_BITS],
-			NbBitsToRead :[    1    ]
+			SkipNal       :[  false  ],
+			TypeOfVLD     :[READ_BITS],
+			NbBitsToRead  :[    1    ],
+
+			NbRefFrame_l0 :[num_ref_idx_l0_active]
 		end
 
 
 	ReadRefPicList0Reord.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
+			RefReordering_l0 :[ref_pic_list_reordering_flag]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
@@ -208,7 +234,9 @@ actor Algo_DecodeRefPicList_Frext()
 			//                or
 			//        long_term_pic_num
 			SkipNal      :[ false  ],
-			TypeOfVLD    :[ VLD_UE ]
+			TypeOfVLD    :[ VLD_UE ],
+
+			RefReordering_l0 :[ValueOfVLD]
 		guard
 			ValueOfVLD != 3
 		do
@@ -221,6 +249,7 @@ actor Algo_DecodeRefPicList_Frext()
 	ReordPicNumIdc.IsEqualTo3: action
 			ValVLD :[ValueOfVLD]
 				==>
+			RefReordering_l0 :[ValueOfVLD]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
@@ -233,7 +262,9 @@ actor Algo_DecodeRefPicList_Frext()
 				==>
 			//      reordering_of_pic_nums_idc
 			SkipNal      :[ false  ],
-			TypeOfVLD    :[ VLD_UE ]
+			TypeOfVLD    :[ VLD_UE ],
+
+			RefReordering_l0 :[ValueOfVLD]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
@@ -253,7 +284,7 @@ actor Algo_DecodeRefPicList_Frext()
 
 		CheckSliceType    (SliceType.IsEqualToP )--> ReadNumRefIdxActDone;
 		CheckSliceType    (SliceType.IsEqualToB )--> Read_DirecSpat_NumRefIdxActDone;
-		CheckSliceType    (SendEndSliceHeader   )--> ReadSliceTypeDone;
+		CheckSliceType    (SliceType.IsEqualToI )--> EndRefPicList;
 
 		/* slice_type = P */
 		ReadNumRefIdxActDone (ReadNumRefIdxAct.Done )--> CheckNumRefIdxActOverRide4P;
@@ -292,7 +323,7 @@ actor Algo_DecodeRefPicList_Frext()
 	end
 
 	priority
-		SliceType.IsEqualToP             > SliceType.IsEqualToB        > SendEndSliceHeader;
+		SliceType.IsEqualToP             > SliceType.IsEqualToB        > SliceType.IsEqualToI;
 		CheckNumRefIdxActOverRide        > ReadRefPicList0Reord.Asked;
 		CheckRefPicL0Reord.IsEqualToTrue > SendEndSliceHeader;
 		ReordPicNumIdc.IsNotEqualTo3     > ReordPicNumIdc.IsEqualTo3;

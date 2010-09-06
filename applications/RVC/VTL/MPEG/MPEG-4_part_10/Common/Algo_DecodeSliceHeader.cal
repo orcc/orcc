@@ -77,7 +77,7 @@ actor Algo_DecodeSliceHeader()
 	uint(size=4) SLICE_TYPE_SI = 4;
 
 	bool DEBUG_FLAG_DECODED = false;
-	bool DEBUG_OUTUPUT      = true;
+	bool DEBUG_OUTUPUT      = false;
 /*
 *
 * State variables
