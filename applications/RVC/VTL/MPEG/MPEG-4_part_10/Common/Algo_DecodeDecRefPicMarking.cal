@@ -57,9 +57,9 @@ actor Algo_DecodeDecRefPicMarking()
 			IdrPicFlag  := IsAnIdr;
 			ValIdr :=
 				if(not IsAnIdr )then
-					0
-				else
 					1
+				else
+					0
 				end;
 		end
 
