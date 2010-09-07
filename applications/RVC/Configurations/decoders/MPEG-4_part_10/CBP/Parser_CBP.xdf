@@ -435,9 +435,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="a">
-            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
-        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
@@ -538,8 +535,6 @@
     <Connection dst="Algo_RefList0" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="" dst-port="RefList" src="Algo_RefList0" src-port="RefList"/>
     <Connection dst="" dst-port="SizeDPBMax" src="Algo_Synp_AVC" src-port="SizeDPBMax"/>
-    <Connection dst="" dst-port="IsIDR" src="Algo_MMCO" src-port="IsIDR"/>
-    <Connection dst="Algo_RefList0" dst-port="IsIDR" src="Algo_MMCO" src-port="IsIDR"/>
     <Connection dst="Algo_RefList0" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
     <Connection dst="Algo_RefList0" dst-port="ShortTermList"
@@ -568,4 +563,6 @@
     <Connection dst="Algo_MMCO" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="Algo_RefList0" dst-port="RefListType"
         src="Algo_Synp_AVC" src-port="RefList0Type"/>
+    <Connection dst="" dst-port="IsIDR" src="Algo_MMCO" src-port="EmptyDPB"/>
+    <Connection dst="Algo_RefList0" dst-port="EmptyDPB" src="Algo_MMCO" src-port="EmptyDPB"/>
 </XDF>
