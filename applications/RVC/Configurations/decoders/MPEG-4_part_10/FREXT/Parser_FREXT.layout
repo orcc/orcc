@@ -23,8 +23,10 @@
       <vertex id="BlackHole4Mmco" x="1617" y="169"/>
       <vertex id="RefList0" x="1617" y="376"/>
       <vertex id="BlackHole4RefList0" x="2037" y="475"/>
-      <vertex id="IntraPredSplit" x="2274" y="2058"/>
-      <vertex id="BlackHole4IntraPred" x="2615" y="2066"/>
-      <vertex id="MergeDataFromSDataAndMbLayer" x="2024" y="1832"/>
+      <vertex id="IntraPredSplit" x="2361" y="1944"/>
+      <vertex id="BlackHole4IntraPred" x="2647" y="1960"/>
+      <vertex id="MergeDataFromSDataAndMbLayer" x="1974" y="1831"/>
+      <vertex id="Parser_IPCM" x="1096" y="2417"/>
+      <vertex id="BlackHole4IPCM" x="1285" y="2427"/>
    </vertices>
 </layout>

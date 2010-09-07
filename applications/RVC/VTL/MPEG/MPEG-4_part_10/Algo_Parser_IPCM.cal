@@ -58,14 +58,37 @@ actor Algo_Parser_IPCM ( )
 				int ( size = 9 ) I_PCM_Y,
 				int ( size = 9 ) I_PCM_U,
 				int ( size = 9 ) I_PCM_V :
-								 	 
+
+	bool DEBUG_INPUT = true;
+		 	 
  split_Y: action I_PCM : [ x ] repeat 256 ==> I_PCM_Y : [ x ] repeat 256
-		  end							 	 
+ 		do
+ 			if(DEBUG_INPUT)then
+ 				foreach int i in 0 .. 255
+ 				do
+ 					println("Input Parser_IPCM I_PCM : "+x[i]);
+ 				end
+ 			end
+		end							 	 
 		
  split_U: action I_PCM : [ x ] repeat 64  ==> I_PCM_U : [ x ] repeat 64
+ 		do
+ 			if(DEBUG_INPUT)then
+ 				foreach int i in 0 .. 63
+ 				do
+ 					println("Input Parser_IPCM I_PCM : "+x[i]);
+ 				end
+ 			end
 		  end
 		 
  split_V: action I_PCM : [ x ] repeat 64  ==> I_PCM_V : [ x ] repeat 64
+ 		do
+ 			if(DEBUG_INPUT)then
+ 				foreach int i in 0 .. 63
+ 				do
+ 					println("Input Parser_IPCM I_PCM : "+x[i]);
+ 				end
+ 			end
 		  end
 		 						 	   
  schedule fsm splitY:

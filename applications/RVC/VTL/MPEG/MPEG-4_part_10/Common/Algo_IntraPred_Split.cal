@@ -83,7 +83,7 @@ actor Algo_IntraPred_Split()
 //	uint(size=2) BLOCK_8x8   = 1;
 	uint(size=2) BLOCK_16x16 = 2;
 	
-	bool DEBUG_INPUT = true;	
+	bool DEBUG_INPUT = false;	
 
 //FIXME! number of MB per line of picture
 	int PICWIDTH = 1280 / 16;
@@ -127,9 +127,9 @@ actor Algo_IntraPred_Split()
 			FirstMBInSlice   :[ First_MB_In_Slice ],
 			ConstrainedIFlag :[ Constrained_I_Flag ]
 				==>
-			MbType      :[MB_TYPE_INTER],
+			MbType           :[MB_TYPE_INTER],
 			BlocksSize_Luma  :[BLOCK_4x4],
-			MbTypeC     :[2]
+			MbTypeC          :[2]
 		guard
 			mb_intra_flag = 0
 		do

@@ -78,7 +78,8 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  SData_Total_CoeffChroma,
 
 	uint(size=6) MbType,
-	bool         MergeTransfSz8x8
+	bool         MergeTransfSz8x8,
+	int(size=9)  pix_I_PCM
 		:
 
 
@@ -368,6 +369,7 @@ actor Algo_DecodeMacroblockLayer()
 	ReadPcmSampleLuma.Done: action
 			ValVLD       :[ValueOfVLD] repeat 256
 				==>
+			pix_I_PCM    :[ValueOfVLD] repeat 256
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("");
@@ -398,6 +400,7 @@ actor Algo_DecodeMacroblockLayer()
 	ReadPcmSampleChroma.UComponent: action
 			ValVLD       :[ValueOfVLD] repeat 256
 				==>
+			pix_I_PCM    :[ValueOfVLD] repeat 256
 		do
 			if(DEBUG_FLAG_DECODED)then
 				/* Forward to the output for the pcm decoding */
@@ -412,6 +415,7 @@ actor Algo_DecodeMacroblockLayer()
 	ReadPcmSampleChroma.VComponent: action
 			ValVLD       :[ValueOfVLD] repeat 256
 				==>
+			pix_I_PCM    :[ValueOfVLD] repeat 256
 		do
 			if(DEBUG_FLAG_DECODED)then
 				/* Forward to the output for the pcm decoding */
