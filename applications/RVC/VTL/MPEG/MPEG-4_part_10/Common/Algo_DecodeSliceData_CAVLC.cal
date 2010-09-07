@@ -1,6 +1,6 @@
 /***********************************************************************
 
-This software module was originally developed by Florian Decologne IETR/INSA of Rennes (France), in the course of development of the <standard> for reference
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference
  purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
 ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or 
 modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
@@ -23,13 +23,13 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
-//Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
 actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int (size=32) ValVLD,
 	//PpsParameters
 	bool          EntropyCodingMode,
 	bool          Transform8x8Mode,
 	uint(size=5)  NumRefIdxLXActive,
+	bool          ConstraindedIntraPred,
 	//Sps Parameters
 	uint(size=32) PicSzInMbs,
 	uint(size=32) PicWdtInMbs,
@@ -39,7 +39,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=2)  ChromaArrayType,
 	uint(size=2)  Num_C8x8,
 	//Slice Header Parameters
-	uint(size=32) FirstMbInSlice,
+	uint(size=13) FstMbInSlc,
 	uint(size=4)  SliceType,
 	bool          MbaffFrame,
 
@@ -64,7 +64,14 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool          DecMbLayerLeftMbExists,
 	uint(size=5)  DecMbLayerNBTab,
 	bool          DecMbLayerAboveMbExists,
-	uint(size=2)  DecMbLayerNumC8x8
+	uint(size=2)  DecMbLayerNumC8x8,
+
+	bool          SkipMbLayer,
+
+	bool          ConstraindedIntraPredFlag,
+	uint(size=13) CurrMbAddr,
+	uint(size=7)  PicWidthInMb,
+	uint(size=13) FirstMbInSlice
 		:
 
 
@@ -95,11 +102,14 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int MASK_TOTALCOEFF        = 127;
 
 	bool DEBUG_FLAG_DECODED = false;
+
+
 /*
 *
 * State Variables
 *
 */
+
 	//Sps Parameters
 	uint(size=4)  bit_depth_luma;
 	uint(size=4)  bit_depth_chroma;
@@ -113,15 +123,17 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=5)  num_ref_idx_l0_active;
 	uint(size=5)  num_ref_idx_l1_active;
 	//Slice Header Parameters
-	uint(size=32) CurrMbAddr := 0;
+	uint(size=32) curr_mb_addr := 0;
 	uint(size=4)  slice_type;
 	bool          MbaffFrameFlag;
+	uint(size=13) first_mb_in_slice;
 
 	bool          moreDataFlag;
 	bool          prevMbSkipped;
 	uint(size=32) mb_skip_run;
 	bool          mb_field_decoding_flag;
 	bool          direct_8x8_inference_flag;
+	bool          constrained_intra_pred_flag;
 
 	//Size of TotalCoeffTab must be >= PicWidthInMb + 1 and must be equal to pow(2,n) for masking bits easily.
 	List( type: List(type: uint(size=5), size=16),size= SZ_TOTALCOEFF) TotalCoeffTabLuma   := [[0:for int s in 0 .. 15]: for int s in 0 .. SZ_TOTALCOEFF-1];
@@ -129,46 +141,49 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 	procedure NextMbAddress()
 		begin
-			CurrMbAddr        := CurrMbAddr + 1;
-			TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
+			curr_mb_addr        := curr_mb_addr + 1;
+			TotalCoeffTabLuma[bitand(curr_mb_addr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
 			if(DEBUG_FLAG_DECODED)then
-				println("\n\n\n*** New Mb *** Val = "+CurrMbAddr);
+				println("\n\n\n*** New Mb *** Val = "+curr_mb_addr);
 			end
 	//		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 	//		Mb_y := val_CurrMbAddr / PicWidthInMbs;
 		end
 
 	GetSpsAndPpsParameters: action
-			EntropyCodingMode  :[ValEntropyCodingMode],
-			FirstMbInSlice     :[ValFirstMbInSlice],
-			PicSzInMbs         :[ValPicSizeInMbs],
-			PicWdtInMbs        :[ValPicWdtInMbs],
-			SliceType          :[ValSliceType],
-			MbaffFrame         :[ValMbaffFrame],
-			BitDepthLuma       :[ValBitDepthLuma],
-			BitDepthChroma     :[ValBitDepthChroma],
-			Direct8x8Inference :[ValDirect8x8Inference],
-			Transform8x8Mode   :[ValTransform8x8Mode],
-			NumRefIdxLXActive  :[ValNumRefIdxLXActive] repeat 2,
-			ChromaArrayType    :[ValChromaArrayType],
-			Num_C8x8           :[ValNum_C8x8]
+			EntropyCodingMode     :[ValEntropyCodingMode],
+			FstMbInSlc            :[ValFirstMbInSlice],
+			PicSzInMbs            :[ValPicSizeInMbs],
+			PicWdtInMbs           :[ValPicWdtInMbs],
+			SliceType             :[ValSliceType],
+			MbaffFrame            :[ValMbaffFrame],
+			BitDepthLuma          :[ValBitDepthLuma],
+			BitDepthChroma        :[ValBitDepthChroma],
+			Direct8x8Inference    :[ValDirect8x8Inference],
+			Transform8x8Mode      :[ValTransform8x8Mode],
+			NumRefIdxLXActive     :[ValNumRefIdxLXActive] repeat 2,
+			ChromaArrayType       :[ValChromaArrayType],
+			Num_C8x8              :[ValNum_C8x8],
+			ConstraindedIntraPred :[ValConstrIntrPred]
 				==>
 		guard
 			Is_CBP = false
 		do
-			entropy_coding_mode_flag  := ValEntropyCodingMode;
-			slice_type                := ValSliceType;
-			MbaffFrameFlag            := ValMbaffFrame;
-			bit_depth_luma            := ValBitDepthLuma;
-			bit_depth_chroma          := ValBitDepthChroma;
-			direct_8x8_inference_flag := ValDirect8x8Inference;
-			transform_8x8_mode_flag   := ValTransform8x8Mode;
-			num_ref_idx_l0_active     := ValNumRefIdxLXActive[0];
-			num_ref_idx_l1_active     := ValNumRefIdxLXActive[1];
-			Chroma_Array_Type         := ValChromaArrayType;
-			NumC8x8                   := ValNum_C8x8;
+			entropy_coding_mode_flag    := ValEntropyCodingMode;
+			slice_type                  := ValSliceType;
+			MbaffFrameFlag              := ValMbaffFrame;
+			bit_depth_luma              := ValBitDepthLuma;
+			bit_depth_chroma            := ValBitDepthChroma;
+			direct_8x8_inference_flag   := ValDirect8x8Inference;
+			transform_8x8_mode_flag     := ValTransform8x8Mode;
+			num_ref_idx_l0_active       := ValNumRefIdxLXActive[0];
+			num_ref_idx_l1_active       := ValNumRefIdxLXActive[1];
+			Chroma_Array_Type           := ValChromaArrayType;
+			NumC8x8                     := ValNum_C8x8;
+			constrained_intra_pred_flag := ValConstrIntrPred;
+			first_mb_in_slice           := ValFirstMbInSlice;
 
-			CurrMbAddr :=
+			curr_mb_addr :=
 				if(MbaffFrameFlag = false)then
 					ValFirstMbInSlice * (1 + 0)
 				else
@@ -220,14 +235,19 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	//for( i=0; i<mb_skip_run; i++ )
 	CheckMbSkipRun.IsNotEqualTo0: action
 				==>
+			ConstraindedIntraPredFlag :[constrained_intra_pred_flag],
+			CurrMbAddr                :[curr_mb_addr - 1],
+			PicWidthInMb              :[PicWidthInMbs],
+			FirstMbInSlice            :[first_mb_in_slice],
+			SkipMbLayer               :[true]
 		guard
 			mb_skip_run > 0
 		do
 			foreach int i in 0 .. 15
 			do
-				TotalCoeffTabLuma     [CurrMbAddr & MASK_TOTALCOEFF][i] := 0;
-				TotalCoeffTabChroma[0][CurrMbAddr & MASK_TOTALCOEFF][i] := 0;
-				TotalCoeffTabChroma[1][CurrMbAddr & MASK_TOTALCOEFF][i] := 0;
+				TotalCoeffTabLuma     [curr_mb_addr & MASK_TOTALCOEFF][i] := 0;
+				TotalCoeffTabChroma[0][curr_mb_addr & MASK_TOTALCOEFF][i] := 0;
+				TotalCoeffTabChroma[1][curr_mb_addr & MASK_TOTALCOEFF][i] := 0;
 			end
 			NextMbAddress();
 			mb_skip_run := mb_skip_run - 1;
@@ -270,8 +290,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			NbBitsToRead :[     1     ]
 		guard
 			MbaffFrameFlag = true,
-			    (CurrMbAddr mod 2 = 0)
-			or ((CurrMbAddr mod 2 = 1) and prevMbSkipped)
+			    (curr_mb_addr mod 2 = 0)
+			or ((curr_mb_addr mod 2 = 1) and prevMbSkipped)
 		end
 
 	ReadMbFieldDecod.Done: action
@@ -312,39 +332,39 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			bool LMbExists,
 			bool AMbExists
 		do
-				if((CurrMbAddr mod PicWidthInMbs) != 0) then
-					NaTab := [ TotalCoeffTabLuma  [ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 5],
-					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 7],
-					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][13],
-					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][15],
-					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 5],
-					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 7],
-					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][13],
-					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][15],
-					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 5],
-					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][ 7],
-					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][13],
-					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - 1 ,MASK_TOTALCOEFF)][15]
+				if((curr_mb_addr mod PicWidthInMbs) != 0) then
+					NaTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 5],
+					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 7],
+					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][13],
+					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][15],
+					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 5],
+					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 7],
+					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][13],
+					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][15],
+					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 5],
+					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 7],
+					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][13],
+					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][15]
 					         ];
 					LMbExists := true;
 				else
 					NaTab     := [0:for int i in 0 .. 11];
 					LMbExists := false;
 				end
-				if(CurrMbAddr / PicWidthInMbs != 0)then
+				if(curr_mb_addr / PicWidthInMbs != 0)then
 					AMbExists := true;
-					NbTab := [ TotalCoeffTabLuma  [ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
-					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
-					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
-					           TotalCoeffTabLuma  [ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][15],
-					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
-					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
-					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
-					           TotalCoeffTabChroma[0][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][15],
-					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
-					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
-					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
-					           TotalCoeffTabChroma[1][ bitand(CurrMbAddr - PicWidthInMbs,MASK_TOTALCOEFF)][15]
+					NbTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
+					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
+					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
+					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][15],
+					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
+					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
+					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
+					           TotalCoeffTabChroma[0][ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][15],
+					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
+					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][11],
+					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][14],
+					           TotalCoeffTabChroma[1][ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][15]
 					         ];
 				else
 					AMbExists := false;
@@ -358,7 +378,13 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			//          more_rbsp_data()
 			SkipNal     :[   false ,  false      ],//Keep synchro
 			LaunchActor :[ MB_LAYER , SLICE_DATA],
-			TypeOfVLD   :[         MORE_RBSP_DATA ]
+			TypeOfVLD   :[         MORE_RBSP_DATA ],
+
+			ConstraindedIntraPredFlag :[constrained_intra_pred_flag],
+			CurrMbAddr                :[curr_mb_addr],
+			PicWidthInMb              :[PicWidthInMbs],
+			FirstMbInSlice            :[first_mb_in_slice],
+			SkipMbLayer               :[false]
 		end
 
 
@@ -369,9 +395,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 		do
 			foreach int i in 0 .. 15
 			do
-				TotalCoeffTabLuma[bitand(CurrMbAddr ,MASK_TOTALCOEFF)][i]      := CoLu[i];
-				TotalCoeffTabChroma[0][bitand(CurrMbAddr ,MASK_TOTALCOEFF)][i] := CoLuChe[i];
-				TotalCoeffTabChroma[1][bitand(CurrMbAddr ,MASK_TOTALCOEFF)][i] := CoLuChe[16+i];
+				TotalCoeffTabLuma[bitand(curr_mb_addr ,MASK_TOTALCOEFF)][i]      := CoLu[i];
+				TotalCoeffTabChroma[0][bitand(curr_mb_addr ,MASK_TOTALCOEFF)][i] := CoLuChe[i];
+				TotalCoeffTabChroma[1][bitand(curr_mb_addr ,MASK_TOTALCOEFF)][i] := CoLuChe[16+i];
 			end
 		end
 

@@ -232,6 +232,33 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="IntraPredSplit">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_IntraPred_Split"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="BlackHole4IntraPred">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/Black_Hole_4_IntraPredSplit"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="MergeDataFromSDataAndMbLayer">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MergeDataFromSlcDataAndMbLayer"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -327,8 +354,6 @@
         dst-port="OffsetForTopToBottomField" src="DecodeSps" src-port="OffsetForTopToBottomField"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="DataValVLD"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="FirstMbInSlice"
-        src="DecodeSliceHeader" src-port="FirstMbInSlice"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="EntropyCodingMode"
         src="DecodePps" src-port="entropy_coding_mode"/>
     <Connection dst="Mgnt_DecodePic" dst-port="DataTypeOfVLD"
@@ -554,4 +579,36 @@
         src="DecodeRefPicList" src-port="RefReordering_l0"/>
     <Connection dst="BlackHole4Mmco" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="RefList0" dst-port="LongTermList" src="MMCO" src-port="LongTermList"/>
+    <Connection dst="BlackHole4IntraPred" dst-port="PredMode"
+        src="IntraPredSplit" src-port="PredMode"/>
+    <Connection dst="BlackHole4IntraPred" dst-port="MbType"
+        src="IntraPredSplit" src-port="MbType"/>
+    <Connection dst="BlackHole4IntraPred" dst-port="BlocksSize_Luma"
+        src="IntraPredSplit" src-port="BlocksSize_Luma"/>
+    <Connection dst="BlackHole4IntraPred" dst-port="MbTypeC"
+        src="IntraPredSplit" src-port="MbTypeC"/>
+    <Connection dst="IntraPredSplit" dst-port="ConstrainedIFlag"
+        src="DecodeSliceData_Cavlc" src-port="ConstraindedIntraPredFlag"/>
+    <Connection dst="IntraPredSplit" dst-port="CurrMbAddr"
+        src="DecodeSliceData_Cavlc" src-port="CurrMbAddr"/>
+    <Connection dst="IntraPredSplit" dst-port="PicWidthInMb"
+        src="DecodeSliceData_Cavlc" src-port="PicWidthInMb"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="FstMbInSlc"
+        src="DecodeSliceHeader" src-port="FirstMbInSlice"/>
+    <Connection dst="IntraPredSplit" dst-port="FirstMBInSlice"
+        src="DecodeSliceData_Cavlc" src-port="FirstMbInSlice"/>
+    <Connection dst="IntraPredSplit" dst-port="MbIntraFlag"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbIntraFlag"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SkipMbLayer" src="DecodeSliceData_Cavlc" src-port="SkipMbLayer"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="MbType"
+        src="DecodeMacroBlockLayer" src-port="MbType"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="TransfSz8x8Flag" src="DecodeMacroBlockLayer" src-port="MergeTransfSz8x8"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="RemIntraYxYPredMode" src="DecodeMbPred" src-port="RemIntraYxYPredMode"/>
+    <Connection dst="DecodeSliceData_Cavlc"
+        dst-port="ConstraindedIntraPred" src="DecodePps" src-port="ConstraindedIntraPred"/>
+    <Connection dst="IntraPredSplit" dst-port="IntraPredMode"
+        src="MergeDataFromSDataAndMbLayer" src-port="IntraPredMode"/>
 </XDF>

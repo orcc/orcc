@@ -86,7 +86,7 @@ actor Algo_RefList ()
 	uint(size=2) REFLIST0_BI_PRED = 1;
 //	uint(size=2) REFLIST1_BI_PRED = 2;
 
-	bool DEBUG_INPUT  = true;
+	bool DEBUG_INPUT  = false;
 	bool DEBUG_OUTPUT = false;
 
 /*

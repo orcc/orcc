@@ -25,7 +25,9 @@ actor Algo_DecodeMbPred()
 		==>
 	uint(size=3)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
-	bool          SkipNal
+	bool          SkipNal,
+
+	uint(size=4) RemIntraYxYPredMode
 		:
 
 	bool DEBUG_MV = false;
@@ -287,7 +289,11 @@ actor Algo_DecodeMbPred()
 			//Compute the minimal remaining bits
 			CountBit := BitMissed + 16 - lumaYxYBlkIdx;
 		end
-	
+
+	ReadPrevAndRemIntra4x4.Finished: action
+				==>
+			RemIntraYxYPredMode:[rem_intraYxY_pred_mode] repeat 16
+		end
 
 	MbType.IsIntra_8x8: action
 				==>
@@ -312,6 +318,11 @@ actor Algo_DecodeMbPred()
 		do
 			//Compute the minimal remaining bits
 			CountBit := BitMissed + 4 - lumaYxYBlkIdx;
+		end
+
+	ReadPrevAndRemIntra8x8.Finished: action
+				==>
+			RemIntraYxYPredMode:[rem_intraYxY_pred_mode] repeat 4
 		end
 
 	ChromaArrayTp.IsEqualTo1or2: action
@@ -526,20 +537,21 @@ actor Algo_DecodeMbPred()
 
 		CheckMbTypeYxY (MbType.IsIntra_4x4 )--> ReadPrevAndRemIntra4x4;
 		CheckMbTypeYxY (MbType.IsIntra_8x8 )--> ReadPrevAndRemIntra8x8;
-		CheckMbTypeYxY (ChromaArrayTp.IsEqualTo1or2 )--> ReadIntraChroma;
-		CheckMbTypeYxY (SendEndMbPred )--> ReadParameters;
+		CheckMbTypeYxY (ChromaArrayTp.IsEqualTo1or2  )--> ReadIntraChroma;
+		CheckMbTypeYxY (SendEndMbPred  )--> ReadParameters;
 
 		ReadPrevAndRemIntra4x4 ( ReadPrevAndRemIntraYxY)-->CheckEndOfReadPrev4x4;
 
 		CheckEndOfReadPrev4x4( ReadPrevAndRemIntra4x4.NotFinished )--> ReadPrevAndRemIntra4x4;
-		CheckEndOfReadPrev4x4(ChromaArrayTp.IsEqualTo1or2  )--> ReadIntraChroma;
-		CheckEndOfReadPrev4x4(SendEndMbPred  )--> ReadParameters;
+		CheckEndOfReadPrev4x4( ReadPrevAndRemIntra4x4.Finished    )--> CheckChromaArrayTp;
 
 		ReadPrevAndRemIntra8x8 ( ReadPrevAndRemIntraYxY)-->CheckEndOfReadPrev8x8;
 
 		CheckEndOfReadPrev8x8( ReadPrevAndRemIntra8x8.NotFinished )--> ReadPrevAndRemIntra8x8;
-		CheckEndOfReadPrev8x8(ChromaArrayTp.IsEqualTo1or2  )--> ReadIntraChroma;
-		CheckEndOfReadPrev8x8(SendEndMbPred  )--> ReadParameters;
+		CheckEndOfReadPrev8x8( ReadPrevAndRemIntra8x8.Finished    )--> CheckChromaArrayTp;
+
+		CheckChromaArrayTp (ChromaArrayTp.IsEqualTo1or2  )--> ReadIntraChroma;
+		CheckChromaArrayTp (SendEndMbPred  )--> ReadParameters;
 
 		ReadIntraChroma   (ReadIntraChroma)--> SendEndMbPred;
 
@@ -575,19 +587,20 @@ actor Algo_DecodeMbPred()
 	end
 
 	priority
-		MbType.IsIntra_YxY          > Mb_Type.IsNotEqualToDirect  > SendEndMbPred;
-		MbType.IsIntra_4x4          > MbType.IsIntra_8x8          > ChromaArrayTp.IsEqualTo1or2;
-		ChromaArrayTp.IsEqualTo1or2 > SendEndMbPred;
-		ReadPrevAndRemIntra4x4      > ChromaArrayTp.IsEqualTo1or2;
-		ReadRefIdxl0                > ReadParam.Skip1Parameter;
-		ReadRefIdxl1                > ReadParam.Skip1Parameter;
-		ReadParam.Skip1Parameter    > SendOrReadDone;
-		ReadMvdL0                   > ReadParam.Skip2Parameters;
-		ReadMvdL1                   > ReadParam.Skip2Parameters;
-		ReadParam.Skip2Parameters   > SendOrReadDone;
-		ReadRefIdxL0.Done           > SendOrReadDone;
-		ReadRefIdxL1.Done           > SendOrReadDone;
-		ReadMvdL0.Done              > SendOrReadDone;
-		ReadMvdL1.Done              > SendOrReadDone;
+		MbType.IsIntra_YxY                 > Mb_Type.IsNotEqualToDirect       > SendEndMbPred;
+		MbType.IsIntra_4x4                 > MbType.IsIntra_8x8               > ChromaArrayTp.IsEqualTo1or2;
+		ChromaArrayTp.IsEqualTo1or2        > SendEndMbPred;
+		ReadPrevAndRemIntra4x4.NotFinished > ReadPrevAndRemIntra4x4.Finished;
+		ReadPrevAndRemIntra8x8.NotFinished > ReadPrevAndRemIntra8x8.Finished;
+		ReadRefIdxl0                       > ReadParam.Skip1Parameter;
+		ReadRefIdxl1                       > ReadParam.Skip1Parameter;
+		ReadParam.Skip1Parameter           > SendOrReadDone;
+		ReadMvdL0                          > ReadParam.Skip2Parameters;
+		ReadMvdL1                          > ReadParam.Skip2Parameters;
+		ReadParam.Skip2Parameters          > SendOrReadDone;
+		ReadRefIdxL0.Done                  > SendOrReadDone;
+		ReadRefIdxL1.Done                  > SendOrReadDone;
+		ReadMvdL0.Done                     > SendOrReadDone;
+		ReadMvdL1.Done                     > SendOrReadDone;
 	end
 end

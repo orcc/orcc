@@ -1,27 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="57" y="424"/>
-      <vertex id="Algo_NALU" x="168" y="402"/>
-      <vertex id="CheckNaluType" x="484" y="336"/>
-      <vertex id="DecodeSps" x="168" y="890"/>
-      <vertex id="SpsVLDecoding" x="822" y="1215"/>
-      <vertex id="PpsVLDecoding" x="822" y="386"/>
-      <vertex id="DecodePps" x="484" y="609"/>
-      <vertex id="PicVLDecoding" x="2477" y="83"/>
-      <vertex id="Mgnt_DecodePic" x="2037" y="579"/>
-      <vertex id="DecodeSliceHeader" x="822" y="614"/>
-      <vertex id="DecodeRefPicList" x="1205" y="458"/>
-      <vertex id="DecodeDecRefPicMarking" x="822" y="201"/>
-      <vertex id="DecodeSliceData_Cavlc" x="1617" y="1844"/>
-      <vertex id="DecodeMacroBlockLayer" x="822" y="1422"/>
-      <vertex id="DecodeMbPred" x="1205" y="811"/>
-      <vertex id="DecodeResidual" x="1205" y="1062"/>
-      <vertex id="DecodeResidualBlock_Cavlc" x="1617" y="1048"/>
-      <vertex id="DecodeSubMbPred" x="1205" y="1511"/>
-      <vertex id="MMCO" x="1205" y="167"/>
-      <vertex id="BlackHole4Mmco" x="1617" y="167"/>
-      <vertex id="RefList0" x="1307" y="-84"/>
-      <vertex id="BlackHole4RefList0" x="1662" y="57"/>
+      <vertex id="bits8" x="57" y="624"/>
+      <vertex id="Algo_NALU" x="168" y="602"/>
+      <vertex id="CheckNaluType" x="484" y="536"/>
+      <vertex id="DecodeSps" x="73" y="1158"/>
+      <vertex id="SpsVLDecoding" x="822" y="1433"/>
+      <vertex id="PpsVLDecoding" x="822" y="587"/>
+      <vertex id="DecodePps" x="247" y="791"/>
+      <vertex id="PicVLDecoding" x="2477" y="85"/>
+      <vertex id="Mgnt_DecodePic" x="2037" y="797"/>
+      <vertex id="DecodeSliceHeader" x="715" y="808"/>
+      <vertex id="DecodeRefPicList" x="1205" y="610"/>
+      <vertex id="DecodeDecRefPicMarking" x="822" y="402"/>
+      <vertex id="DecodeSliceData_Cavlc" x="1539" y="2052"/>
+      <vertex id="DecodeMacroBlockLayer" x="655" y="1666"/>
+      <vertex id="DecodeMbPred" x="1205" y="1029"/>
+      <vertex id="DecodeResidual" x="1337" y="1271"/>
+      <vertex id="DecodeResidualBlock_Cavlc" x="1754" y="1255"/>
+      <vertex id="DecodeSubMbPred" x="1205" y="1729"/>
+      <vertex id="MMCO" x="1205" y="169"/>
+      <vertex id="BlackHole4Mmco" x="1617" y="169"/>
+      <vertex id="RefList0" x="1617" y="376"/>
+      <vertex id="BlackHole4RefList0" x="2037" y="475"/>
+      <vertex id="IntraPredSplit" x="2274" y="2058"/>
+      <vertex id="BlackHole4IntraPred" x="2615" y="2066"/>
+      <vertex id="MergeDataFromSDataAndMbLayer" x="2024" y="1832"/>
    </vertices>
 </layout>

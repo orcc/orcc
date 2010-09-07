@@ -1,0 +1,28 @@
+actor Black_Hole_4_IntraPredSplit()
+	uint(size=4)  PredMode,
+	uint(size=8)  MbType,
+	uint(size=2)  BlocksSize_Luma,
+	uint(size=8)  MbTypeC
+		==>
+	:
+		
+	a:action
+			PredMode:[azerty]
+				==>
+		end
+		
+	b:action
+			MbType:[azerty]
+				==>
+		end
+		
+	c:action
+			BlocksSize_Luma:[azerty]
+				==>
+		end
+		
+	d:action
+			MbTypeC:[azerty]
+				==>
+		end
+end

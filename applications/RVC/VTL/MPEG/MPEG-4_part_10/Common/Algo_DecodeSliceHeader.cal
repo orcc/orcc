@@ -49,7 +49,7 @@ actor Algo_DecodeSliceHeader()
 
 	uint(size=4)  SliceType,
 
-	uint(size=32) FirstMbInSlice,
+	uint(size=13) FirstMbInSlice,
 	bool          MbaffFrame,
 
 	uint(size=32) Poc
@@ -349,6 +349,12 @@ actor Algo_DecodeSliceHeader()
 			Idr_flag = true
 		do
 			frame_num_offset := 0;
+			frame_num        := 0;
+			prev_frame_num   := 0;
+			PicOrderCntMsb         := 0;
+			prevPicOrderCntLsb     := 0;
+			expectedpoc            := 0;
+			
 		end
 
 

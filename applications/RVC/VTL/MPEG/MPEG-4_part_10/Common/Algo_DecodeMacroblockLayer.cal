@@ -75,7 +75,10 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=2)  ResNumC8x8,
 
 	uint(size=5)  SData_Total_CoeffLuma,
-	uint(size=5)  SData_Total_CoeffChroma
+	uint(size=5)  SData_Total_CoeffChroma,
+
+	uint(size=6) MbType,
+	bool         MergeTransfSz8x8
 		:
 
 
@@ -266,8 +269,11 @@ actor Algo_DecodeMacroblockLayer()
 			AboveMbExists      :[ValAboveMbExists],
 			Num_C8x8           :[ValNum_C8x8]
 				==>
+			MbType             :[ValMbType],
+			MergeTransfSz8x8   :[ValTransform8x8Mode]
 		var
-			uint Idx
+			uint         Idx,
+			uint(size=6) ValMbType
 		do
 			mb_type                   := ValueOfVLD;
 			slice_type                := ValSliceType;
@@ -288,7 +294,29 @@ actor Algo_DecodeMacroblockLayer()
 				nATab[i] := ValNATab[i];
 				nBTab[i] := ValNBTab[i];
 			end
-			
+			//mb_type should have the same value in order to simplify : if(slice_type=stuff)then if(mb_type > other_stuff)then ...
+			ValMbType :=
+				if(slice_type=SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)then
+					mb_type
+				else
+					if(slice_type != SLICE_TYPE_B)then
+						if(mb_type > 4)then
+							mb_type - 5
+						else
+							mb_type + 26
+						end
+					else
+						if(mb_type <= 22)then
+							mb_type + 26 + 5
+						else
+							if(mb_type <= (22+5))then
+								mb_type - 23 + 26
+							else
+								mb_type - 23 - 5
+							end
+						end
+					end
+				end;
 
 			transform_size_8x8_flag        := false;
 			noSubMbPartSizeLessThan8x8Flag := true;
