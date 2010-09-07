@@ -11,3 +11,4 @@ declare void @llvm.memcpy.i32(i8* nocapture, i8* nocapture, i32, i32) nounwind
 declare i32 @fprintf(%struct.FILE*, i8*, ...) nounwind
 declare %struct.FILE* @fopen(i8*, i8*) nounwind
 declare i32 @clock() nounwind
+declare i32 @fflush(%struct.FILE*) nounwind
