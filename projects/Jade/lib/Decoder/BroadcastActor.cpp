@@ -124,6 +124,11 @@ Function* BroadcastActor::createActionScheduler(){
 	// Add the first basic block entry into the function.
 	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", NewF);
 
+	// Add the basic block input to test input status of the broadcast.
+	BasicBlock* BBFirst = BasicBlock::Create(Context, "bb", NewF);
+
+	//Branch entry to input basic bloc
+	BranchInst::Create( BBFirst, BBEntry);
 
 	// Add a basic block to bb to the scheduler.
 	BasicBlock* Bret = BasicBlock::Create(Context, "ret", NewF);
@@ -131,8 +136,8 @@ Function* BroadcastActor::createActionScheduler(){
 
 	//Create a test for input port
 	Port* input = getInput();
-	LoadInst* inputStruct = new LoadInst(input->getGlobalVariable(), "l"+input->getName(), BBEntry);
-	BasicBlock* bbInput = createHasTokenTest(NewF, inputStruct, getInput(),BBEntry, Bret);
+	LoadInst* inputStruct = new LoadInst(input->getGlobalVariable(), "l"+input->getName(), BBFirst);
+	BasicBlock* bbInput = createHasTokenTest(NewF, inputStruct, getInput(),BBFirst, Bret);
 
 	//Create a test for output port
 	BasicBlock* bbFifo = bbInput;
@@ -168,7 +173,7 @@ Function* BroadcastActor::createActionScheduler(){
 	}
 
 	//Branch to return basic bloc
-	BranchInst::Create( Bret, bbFifo);
+	BranchInst::Create( BBFirst, bbFifo);
 
 	// Create the return instruction and add it to the basic block.
 	ReturnInst::Create(Context, Bret);
