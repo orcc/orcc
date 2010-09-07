@@ -30,7 +30,7 @@ public class CppConfigPrinter {
 		OutputStream os = new FileOutputStream(fileName);
 		os.write(b);
 		os.close();
-		
+
 		template = group.getInstanceOf("AdaptorConfig");
 		template.add("network", network);
 
