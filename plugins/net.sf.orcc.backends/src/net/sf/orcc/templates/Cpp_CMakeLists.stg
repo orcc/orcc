@@ -5,26 +5,10 @@ $endif$
 >>
 
 
-addLibraries(instance) ::= <<
-$if(instance.serdes)$
-add_library(LibAdaptorConfig STATIC \${LIBCAL2CPP_ROOT_PATH}/src/LibAdaptorConfig.cpp)
-add_library(LibWrapper STATIC \${LIBCAL2CPP_ROOT_PATH}/src/wrapperaka.cpp)
-$endif$
->>
+///////////////////////////////////////////////////////////////////////////////
+// Cpp_CMakeLists
 
-addDependencies(instance) ::= <<
-$if(instance.serdes)$
-add_dependencies($network.name$ LibWrapper LibAdaptorConfig)
-$endif$
->>
-targetLinkWrapper(instance) ::= <<
-$if(instance.serdes)$
-LibAdaptorFactory LibWrapper LibAdaptorConfig
-$endif$
->>
-
-
-Cpp_CMakeLists(network) ::= <<
+Cpp_CMakeLists(network, needSerDes) ::= <<
 # Generated from $network.name$
 
 cmake_minimum_required (VERSION 2.8)
@@ -46,22 +30,27 @@ link_directories(
 \${LIBCAL2CPP_ROOT_PATH}/lib
 )
 
-$!$network.networks : addLibraries()$!$
-
-$network.instances: addLibraries()$
+$if(needSerDes)$
+add_library(LibAdaptorConfig STATIC \${LIBCAL2CPP_ROOT_PATH}/src/LibAdaptorConfig.cpp)
+add_library(LibWrapper STATIC \${LIBCAL2CPP_ROOT_PATH}/src/wrapperaka.cpp)
+$endif$
 
 add_executable ($network.name$
 $network.name$.cpp
 $network.actors : addActor()$
 )
 
-$network.instances: addDependencies()$
+$if(needSerDes)$
+add_dependencies($network.name$ LibWrapper LibAdaptorConfig)
+$endif$
 
 target_link_libraries($network.name$
 LibOrcc
 LibCALaka
 LibThread
-$network.instances: targetLinkWrapper()$
+$if(needSerDes)$
+LibAdaptorFactory LibWrapper LibAdaptorConfig
+$endif$
 )
 
 >>

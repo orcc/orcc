@@ -35,11 +35,7 @@ FifoAPI * fifo_$network.connectionMap.(edge)$ = FifoFactory<$edge.source.type$>:
 >>
 
 declareFifo(edge) ::= <<
-$if (network.sourceMap.(edge).instance.serdes || network.targetMap.(edge).instance.serdes)
-$$doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind="1")$$
-else
-$$doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind=options.fifoKind.(edge))$$
-endif$
+$doDeclareFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge), kind=options.fifoKind.(edge))$
 >>
 
 declareFifos(connections) ::= <<
@@ -51,9 +47,17 @@ $network.connections: declareFifo()$
 // assigns FIFOs
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
-$source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, fifo_$count$);
-$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, fifo_$count$);
+$if (source.actor)$$
+source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, fifo_$count$);$
+else
+$$source.id$.connect(ACTOR_PORT_OUT, $network.name$_$sourcePort.name$, fifo_$count$);$
+endif$
 
+$if (target.actor)
+$$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, fifo_$count$);$
+else
+$$target.id$.connect(ACTOR_PORT_IN, $network.name$_$targetPort.name$, fifo_$count$);$
+endif$
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
@@ -68,7 +72,7 @@ $tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(e
 >>
 
 assignFifos(edges) ::= <<
-$edges: assignFifo()$
+$edges: assignFifo(); separator="\n"$
 >>
 
 
@@ -200,13 +204,18 @@ $threads.keys: stopNetwork(); separator="\n"$
 
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// network
 
 network(debugFifos, fifoSize, network, options) ::= <<
 // Generated from "$network.name$"
 
 #include "FifoFactory.h"
 #include "Threadaka.h"
-//#include "WrapperAka.h"
+
+$if (options.needSerDes)$
+#include "WrapperAka.h"
+$endif$
 
 extern "C" {
 #include "orcc_util.h"

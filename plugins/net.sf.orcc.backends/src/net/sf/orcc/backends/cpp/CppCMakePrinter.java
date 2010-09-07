@@ -74,9 +74,10 @@ public class CppCMakePrinter {
 	 * @throws IOException
 	 *             if there is an I/O error
 	 */
-	public void printCMake(String path, Network network) throws IOException {
+	public void printCMake(String path, Network network, boolean needSerDes) throws IOException {
 		ST template = group.getInstanceOf("Cpp_CMakeLists");
 		template.add("network", network);
+		template.add("needSerDes", needSerDes);
 
 		String fileName = path + File.separator + "CMakeLists.txt";
 

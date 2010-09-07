@@ -64,6 +64,8 @@ public class CppBackendImpl extends AbstractBackend {
 
 	public static Boolean partitioning = false;
 
+	private boolean needSerDes = false;
+
 	/**
 	 * 
 	 * @param args
@@ -95,7 +97,6 @@ public class CppBackendImpl extends AbstractBackend {
 		// crappy hack!
 		Map<Connection, Integer> fifoKind = new HashMap<Connection, Integer>();
 		for (Connection connection : network.getConnections()) {
-
 			int kind = 0;
 
 			Instance src = network.getGraph().getEdgeSource(connection)
@@ -103,7 +104,12 @@ public class CppBackendImpl extends AbstractBackend {
 			Instance tgt = network.getGraph().getEdgeTarget(connection)
 					.getInstance();
 
-			if (!getPartNameAttribute(src).equals(getPartNameAttribute(tgt))) {
+			if (src.isSerdes() || tgt.isSerdes()) {
+				needSerDes = true;
+				printer.getOptions().put("needSerDes", needSerDes);
+				kind = 1;
+			} else if (!getPartNameAttribute(src).equals(
+					getPartNameAttribute(tgt))) {
 				kind = 2;
 			}
 
@@ -149,7 +155,8 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 		}
 
-		boolean partition = getAttribute("net.sf.orcc.backends.partition", true);
+		boolean partition = getAttribute("net.sf.orcc.backends.partition",
+				false);
 
 		if (partition) {
 			partitioning = true;
@@ -224,7 +231,9 @@ public class CppBackendImpl extends AbstractBackend {
 					: Arrays.asList(network);
 			CppCMakePrinter cmakePrinter = new CppCMakePrinter();
 			for (Network subnetwork : networks) {
+
 				if (partitioning) {
+					new SerDesAdder().transform(subnetwork);
 					computeMapping(subnetwork);
 				}
 				String outputName = path + File.separator
@@ -232,7 +241,7 @@ public class CppBackendImpl extends AbstractBackend {
 				printer.loadGroups("Cpp_network");
 				printer.printNetwork(outputName, subnetwork, false, fifoSize);
 
-				cmakePrinter.printCMake(path, subnetwork);
+				cmakePrinter.printCMake(path, subnetwork, needSerDes);
 			}
 
 		} catch (IOException e) {
