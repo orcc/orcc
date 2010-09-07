@@ -222,10 +222,9 @@ Value* BroadcastActor::createReadFifo(Port* port, LoadInst* fifoStruct, BasicBlo
 	vector.push_back(fifoStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getReadFunction(port->getType()), vector.begin(), vector.end(), "tokenPtri8", current);
-	BitCastInst* bitCastInst = new BitCastInst(retVal, Type::getInt32PtrTy(Context), "tokenPtr",current);
+	CallInst* retVal = CallInst::Create(fifo->getReadFunction(port->getType()), vector.begin(), vector.end(), "tokenPtr", current);
 	
-	return new LoadInst(bitCastInst,"token", current);
+	return new LoadInst(retVal,"token", current);
 
 }
 
@@ -238,9 +237,7 @@ void BroadcastActor::createWriteFifo(Port* port, LoadInst* fifoStruct, Value* to
 
 	CallInst* retVal = CallInst::Create(fifo->getWriteFunction(port->getType()), vector.begin(), vector.end(), "w"+port->getName(), current);
 	
-	BitCastInst* bitCastInst = new BitCastInst(retVal, Type::getInt32PtrTy(Context), "wb"+port->getName(),current);
-	
-	new StoreInst (token, bitCastInst, current);
+	new StoreInst (token, retVal, current);
 
 }
 
