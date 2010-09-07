@@ -259,15 +259,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Parser_IPCM">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Parser_IPCM"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="BlackHole4IPCM">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -629,12 +620,10 @@
         dst-port="ConstraindedIntraPred" src="DecodePps" src-port="ConstraindedIntraPred"/>
     <Connection dst="IntraPredSplit" dst-port="IntraPredMode"
         src="MergeDataFromSDataAndMbLayer" src-port="IntraPredMode"/>
-    <Connection dst="Parser_IPCM" dst-port="I_PCM"
-        src="DecodeMacroBlockLayer" src-port="pix_I_PCM"/>
     <Connection dst="BlackHole4IPCM" dst-port="I_PCM_Y"
-        src="Parser_IPCM" src-port="I_PCM_Y"/>
+        src="DecodeMacroBlockLayer" src-port="pix_I_PCM_Y"/>
     <Connection dst="BlackHole4IPCM" dst-port="I_PCM_U"
-        src="Parser_IPCM" src-port="I_PCM_U"/>
+        src="DecodeMacroBlockLayer" src-port="pix_I_PCM_U"/>
     <Connection dst="BlackHole4IPCM" dst-port="I_PCM_V"
-        src="Parser_IPCM" src-port="I_PCM_V"/>
+        src="DecodeMacroBlockLayer" src-port="pix_I_PCM_V"/>
 </XDF>

@@ -26,7 +26,6 @@
       <vertex id="IntraPredSplit" x="2361" y="1944"/>
       <vertex id="BlackHole4IntraPred" x="2647" y="1960"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="1974" y="1831"/>
-      <vertex id="Parser_IPCM" x="1096" y="2417"/>
       <vertex id="BlackHole4IPCM" x="1285" y="2427"/>
    </vertices>
 </layout>
