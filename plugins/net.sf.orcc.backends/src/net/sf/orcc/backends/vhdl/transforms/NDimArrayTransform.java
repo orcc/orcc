@@ -62,51 +62,66 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 		// An VHDL memory is always global
 		if (!indexes.isEmpty() && load.getSource().getVariable().isGlobal()) {
 			Iterator<Expression> it = indexes.iterator();
-			Expression index = null;
-			LocalVariable indexVar;
+			LocalVariable indexVar = null;
 			Type type = load.getSource().getVariable().getType();
 			Iterator<Integer> typeit = null;
-			Integer size = null;
-			
-			if (!type.getDimensions().isEmpty()) {
+			Integer sizeindex = 0;
+			VarExpr index = null;				
+
+			if (!type.getDimensions().isEmpty())
 				typeit = type.getDimensions().iterator();
-			}		
-			
+
 			// Print a new assignment made up of index_i = expression for each
 			// indexes.
 			while (it.hasNext()) {
 				Expression expr = it.next();
+				Integer size;
 
 				// Index size must be similar to the list size
-				if (!type.getDimensions().isEmpty()) {
+				if (!type.getDimensions().isEmpty()) 
 					size = typeit.next();
-				} else {
+				else 
 					size = ((TypeInt) type).getSize();
-				}	
-				
+
 				// A type is printed with a size of 2^size so the size must be recompute
 				int i;
-				for (i=0 ;Math.pow(2, i ) < size; i++){
+				for (i=0; Math.pow(2, i) < size; i++){
 				}
 				size = i;
-				
-				indexVar = procedure.newTempLocalVariable("",
-						IrFactory.eINSTANCE.createTypeUint(size), "index");
+				sizeindex += size;
 
 				// Add the assign instruction
+				indexVar = procedure.newTempLocalVariable("",
+						IrFactory.eINSTANCE.createTypeUint(size), "index");
 				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
 				iit.previous();
 				Assign assign = new Assign(expr.getLocation(), indexVar, expr);
 				iit.add(assign);
 				iit.next();
 
-				// Add index to indexes
 				index = new VarExpr(new Use(indexVar));
 			}
 
+			// Removes indexes (Ndim)
 			Use.removeUses(load, indexes);
 			indexes.clear();
-			indexes.add(index);
+
+			// Create a new assignment (index = index1 & index2 & indexn)		
+			/*if (indexes.size() > 1) {		
+				indexVar = procedure.newTempLocalVariable("",
+						IrFactory.eINSTANCE.createTypeUint(sizeindex), "index");
+				index = new VarExpr(new Use(indexVar));				
+				BinaryOp op = null;
+				BinaryExpr assignment = new BinaryExpr(index, op.PLUS, null, null);
+				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
+				iit.previous();			
+				Assign assign = new Assign(load.getLocation(), indexVar, index);
+				iit.add(assign);							
+				iit.next();
+				indexes.add(assignment);
+			} else {*/
+				indexes.add(index);
+			//}
 		}
 	}
 }
