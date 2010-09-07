@@ -54,11 +54,19 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			RemIntraYxYPredMode :[rem_intra_4x4_pred_mode] repeat 16
 				==>
 			MbIntraFlag   :[1],
-			IntraPredMode :[rem_intra_4x4_pred_mode] repeat 16
+			IntraPredMode :[intra_pred_mode] repeat 17
 		guard
 			skip    =  false,
 			mb_type = BLOCK_TYPE_I_8x8_or_4x4,
 			Is8x8   = false
+		var
+			List(type: uint(size=4), size=17) intra_pred_mode
+		do
+			intra_pred_mode[0] := 1;
+			foreach int i in 0 .. 15
+			do
+				intra_pred_mode[i+1] := rem_intra_4x4_pred_mode[i];
+			end
 		end
 
 	MbLayer.IsIntra8x8: action
@@ -68,11 +76,19 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			RemIntraYxYPredMode :[rem_intra_8x8_pred_mode] repeat 4
 				==>
 			MbIntraFlag   :[1],
-			IntraPredMode :[rem_intra_8x8_pred_mode] repeat 4
+			IntraPredMode :[intra_pred_mode] repeat 4
 		guard
 			skip    =  false,
 			mb_type = BLOCK_TYPE_I_8x8_or_4x4,
 			Is8x8   = true
+		var
+			List(type: uint(size=4), size=5) intra_pred_mode
+		do
+			intra_pred_mode[0] := 2;
+			foreach int i in 0 .. 4
+			do
+				intra_pred_mode[i+1] := rem_intra_8x8_pred_mode[i];
+			end
 		end
 
 	MbLayer.IsIntra16x16: action

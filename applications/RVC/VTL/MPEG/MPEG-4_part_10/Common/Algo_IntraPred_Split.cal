@@ -83,7 +83,7 @@ actor Algo_IntraPred_Split()
 //	uint(size=2) BLOCK_8x8   = 1;
 	uint(size=2) BLOCK_16x16 = 2;
 	
-	
+	bool DEBUG_INPUT = true;	
 
 //FIXME! number of MB per line of picture
 	int PICWIDTH = 1280 / 16;
@@ -114,6 +114,9 @@ actor Algo_IntraPred_Split()
 			MbIntraFlag :[ Mb_Intra_Flag ]
 				==>
 		do
+			if(DEBUG_INPUT)then
+				println("Input IntraPred_Split MbIntraFlag : "+Mb_Intra_Flag);
+			end
 			mb_intra_flag := Mb_Intra_Flag;
 		end
 
@@ -130,6 +133,12 @@ actor Algo_IntraPred_Split()
 		guard
 			mb_intra_flag = 0
 		do
+			if(DEBUG_INPUT)then
+				println("Input IntraPred_Split CurrMbAddr : "+Curr_Mb_Addr);	
+				println("Input IntraPred_Split PicWidthInMb : "+Pic_Width_In_Mb);		
+				println("Input IntraPred_Split FirstMBInSlice : "+First_MB_In_Slice);		
+				println("Input IntraPred_Split ConstrainedIFlag : "+Constrained_I_Flag);	
+			end	
 			pic_width_in_mb    := Pic_Width_In_Mb;
 			curr_mb_addr       := Curr_Mb_Addr;
 			first_mb_in_slice  := First_MB_In_Slice;
@@ -148,6 +157,12 @@ actor Algo_IntraPred_Split()
 		guard
 			mb_intra_flag = 1
 		do
+			if(DEBUG_INPUT)then
+				println("Input IntraPred_Split IntraPredMode : "+Mb_Type);	
+				println("Input IntraPred_Split CurrMbAddr : "+Curr_Mb_Addr);	
+				println("Input IntraPred_Split PicWidthInMb : "+Pic_Width_In_Mb);	
+				println("Input IntraPred_Split FirstMBInSlice : "+First_MB_In_Slice);	
+			end	
 			mb_intra_type     := Mb_Type;
 			pic_width_in_mb   := Pic_Width_In_Mb;
 			first_mb_in_slice := First_MB_In_Slice;
@@ -166,6 +181,9 @@ actor Algo_IntraPred_Split()
 			int(size=5) top , int(size=5) left , int(size=5) predicted ,
 			int(size=5) pred_mode
 		do
+			if(DEBUG_INPUT)then
+				println("Input IntraPred_Split IntraPredMode : "+Intra_Pred_Mode);
+			end	
 			if curr_mb_addr < first_mb_in_slice + pic_width_in_mb and
 			InverseScan4x4Tab[count] < 4 then
 			// MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
@@ -227,6 +245,9 @@ actor Algo_IntraPred_Split()
 		guard
 			mb_intra_type = INTRA_4x4 and count = 16
 		do
+			if(DEBUG_INPUT)then		
+				println("Input IntraPred_Split ConstrainedIFlag : "+Constrained_I_Flag);	
+			end	
 			count := 0;
 			is_constrained_i_flag[mb_x] := true;
 		end
@@ -277,6 +298,10 @@ actor Algo_IntraPred_Split()
 		guard
 			mb_intra_type = INTRA_16x16
 		do
+			if(DEBUG_INPUT)then
+				println("Input IntraPred_Split ConstrainedIFlag : "+Constrained_I_Flag);	
+				println("Input IntraPred_Split IntraPredMode : "+Mode_16x16);	
+			end	
 			intra4x4predmode[mb_x] := [ 2 : for int j in 0 .. 15 ];
 			is_constrained_i_flag[mb_x] := true;
 		end
@@ -290,6 +315,9 @@ actor Algo_IntraPred_Split()
 		guard
 			mb_intra_type = I_PCM
 		do
+			if(DEBUG_INPUT)then		
+				println("Input IntraPred_Split ConstrainedIFlag : "+cflag);	
+			end	
 			intra4x4predmode[mb_x] := [ 2 : for int j in 0 .. 15 ];
 			is_constrained_i_flag[mb_x] := true;
 		end
