@@ -53,7 +53,7 @@
  */
 actor Algo_Add_AVC () int(size=16) X, int(size=16) Y	==> int(size=16) Z:
 
-bool DEBUG_INPUT = false;
+bool DEBUG_INPUT = true;
 
   action X:[x], Y:[y] ==> Z:[ x+ y]
   do

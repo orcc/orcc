@@ -2,7 +2,7 @@
 <layout>
    <vertices>
       <vertex id="CurrMbAddr" x="57" y="70"/>
-      <vertex id="MbPartIdx" x="57" y="749"/>
+      <vertex id="MbPartIdx" x="51" y="719"/>
       <vertex id="RefIdx" x="57" y="652"/>
       <vertex id="MbPartWidth" x="57" y="167"/>
       <vertex id="MbPartHeigth" x="57" y="264"/>

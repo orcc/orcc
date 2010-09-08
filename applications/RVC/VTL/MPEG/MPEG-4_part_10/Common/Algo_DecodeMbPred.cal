@@ -241,6 +241,7 @@ actor Algo_DecodeMbPred()
 			mb_field_decoding_flag  := ValMbFieldDecoding;
 			lumaYxYBlkIdx           := 0;
 			BitMissed               := 0;
+
 		end
 
 	MbType.IsIntra_YxY: action
@@ -390,7 +391,7 @@ actor Algo_DecodeMbPred()
 				else
 					NUM_MB_PART_P[0]
 				end;
-			mbPartIdx := 0;
+			mbPartIdx    := 0;
 		end
 
 /*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
@@ -504,13 +505,13 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx = mbPartIdxMax
 		do
-			mbPartIdx := 0;
+			mbPartIdx    := 0;
 		end
 
 	ReadRefIdxL0.Done: action
-			ValVLD   :[ValueOfVLD]
+			ValVLD   :[val_ref_idx]
 				==>
-			RefIdxL0     :[ValueOfVLD],
+			RefIdxL0     :[val_ref_idx],
 			MbPartHeight :[MbPartWidthHeight(1)],
 			MbPartWidth  :[MbPartWidthHeight(0)],
 			MbPartIdx    :[mbPartIdx - 1],
@@ -519,7 +520,7 @@ actor Algo_DecodeMbPred()
 			mbPartIdx < mbPartIdxMax
 		do
 			if(DEBUG_MV)then
-				println("ReadRefIdxL0["+mbPartIdx+"] : "+ValueOfVLD);
+				println("ReadRefIdxL0["+mbPartIdx+"] : "+val_ref_idx);
 			end
 			mbPartIdx := mbPartIdx + 1;
 		end

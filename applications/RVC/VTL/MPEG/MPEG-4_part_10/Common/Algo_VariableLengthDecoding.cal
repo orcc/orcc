@@ -5795,7 +5795,7 @@ actor Algo_VariableLengthDecoding()
 
 	SendUValue: action
 				==>
-			ValDecoded :[ReadValue]
+			ValDecoded :[ValueDec]
 		var
 			uint(size=31) ValueDec
 		do

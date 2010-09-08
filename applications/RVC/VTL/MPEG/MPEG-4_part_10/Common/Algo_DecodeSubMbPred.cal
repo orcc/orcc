@@ -274,12 +274,13 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			ValVLD :[ValueOfVLD] repeat 8
 				==>
 		do
-			
-			if(DEBUG_MV)then
-				foreach int i in 0 .. 3
-				do
-					println("refidxl1["+i+"] :"+ValueOfVLD[i+4]);
-					println("refidxl0["+i+"] :"+ValueOfVLD[i]);
+			foreach int i in 0 .. 3
+			do
+				ref_idx_l0[i] := ValueOfVLD[i];
+				ref_idx_l1[i] := ValueOfVLD[i+4];
+				if(DEBUG_MV)then
+						println("refidxl1["+i+"] :"+ValueOfVLD[i+4]);
+						println("refidxl0["+i+"] :"+ValueOfVLD[i]);
 				end
 			end
 		end
@@ -287,7 +288,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 	ReadMvdl0Done: action
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
-			RefIdxL0     :[ref_idx_l0[mbPartIdx - 1]],
+			RefIdxL0     :[ref_idx_l0[mbPartIdx-1]],
 			MvRes        :[ValueOfVLD] repeat 2,
 			MbPartHeight :[SubMbPartWidthHeight(1)],
 			MbPartWidth  :[SubMbPartWidthHeight(0)],
