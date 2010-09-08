@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.vhdl.transforms;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -39,6 +40,9 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
@@ -59,69 +63,53 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 	@Override
 	public void visit(Load load, Object... args) {
 		List<Expression> indexes = load.getIndexes();
+		
 		// An VHDL memory is always global
 		if (!indexes.isEmpty() && load.getSource().getVariable().isGlobal()) {
-			Iterator<Expression> it = indexes.iterator();
-			LocalVariable indexVar = null;
 			Type type = load.getSource().getVariable().getType();
-			Iterator<Integer> typeit = null;
-			Integer sizeindex = 0;
-			VarExpr index = null;				
-
-			if (!type.getDimensions().isEmpty())
-				typeit = type.getDimensions().iterator();
-
+			Iterator<Integer> iit = type.getDimensions().iterator();
+			VarExpr index = null;
+			List<Expression> listIndex = new ArrayList<Expression>();
+			int sizeIndex = 0;
+			
 			// Print a new assignment made up of index_i = expression for each
 			// indexes.
-			while (it.hasNext()) {
-				Expression expr = it.next();
+			for (Expression expr : indexes) {
 				Integer size;
-
-				// Index size must be similar to the list size
-				if (!type.getDimensions().isEmpty()) 
-					size = typeit.next();
-				else 
+				// Indexes must have the same size as the lists
+				if (!type.getDimensions().isEmpty()) {
+					size = iit.next();
+				} else {
 					size = ((TypeInt) type).getSize();
-
-				// A type is printed with a size of 2^size so the size must be recompute
-				int i;
-				for (i=0; Math.pow(2, i) < size; i++){
 				}
-				size = i;
-				sizeindex += size;
-
+				size = IntExpr.getSize(size - 1) - 1;
+				sizeIndex += size;
 				// Add the assign instruction
-				indexVar = procedure.newTempLocalVariable("",
+				LocalVariable indexVar = procedure.newTempLocalVariable("",
 						IrFactory.eINSTANCE.createTypeUint(size), "index");
-				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
-				iit.previous();
+				ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];			
+				it.previous();
 				Assign assign = new Assign(expr.getLocation(), indexVar, expr);
-				iit.add(assign);
-				iit.next();
-
+				it.add(assign);
+				it.next();
 				index = new VarExpr(new Use(indexVar));
+				listIndex.add(index);
 			}
-
-			// Removes indexes (Ndim)
+			// Add index or assignment to indexes
 			Use.removeUses(load, indexes);
 			indexes.clear();
-
-			// Create a new assignment (index = index1 & index2 & indexn)		
-			/*if (indexes.size() > 1) {		
-				indexVar = procedure.newTempLocalVariable("",
-						IrFactory.eINSTANCE.createTypeUint(sizeindex), "index");
-				index = new VarExpr(new Use(indexVar));				
-				BinaryOp op = null;
-				BinaryExpr assignment = new BinaryExpr(index, op.PLUS, null, null);
-				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
-				iit.previous();			
-				Assign assign = new Assign(load.getLocation(), indexVar, index);
-				iit.add(assign);							
-				iit.next();
+			Iterator<Expression> it = listIndex.iterator();
+			if (listIndex.size() > 1) {
+				BinaryExpr assignment = new BinaryExpr(it.next(),
+						BinaryOp.PLUS, it.next(), index.getType());
+				while (it.hasNext()) {
+					assignment = new BinaryExpr(it.next(),
+							BinaryOp.PLUS, assignment, index.getType());
+				}				
 				indexes.add(assignment);
-			} else {*/
+			} else {
 				indexes.add(index);
-			//}
+			}
 		}
 	}
 }
