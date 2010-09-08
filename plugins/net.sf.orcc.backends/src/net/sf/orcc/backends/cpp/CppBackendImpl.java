@@ -156,7 +156,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				false);
+				true);
 
 		if (partition) {
 			partitioning = true;
