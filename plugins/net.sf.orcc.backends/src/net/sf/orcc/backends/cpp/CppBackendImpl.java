@@ -93,8 +93,9 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 		printer.getOptions().put("threads", threads);
 		printer.getOptions().put("needThreads", (threads.keySet().size() > 1));
+	}
 
-		// crappy hack!
+	private void computeFifoKind(Network network) throws OrccException {
 		Map<Connection, Integer> fifoKind = new HashMap<Connection, Integer>();
 		for (Connection connection : network.getConnections()) {
 			int kind = 0;
@@ -156,7 +157,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				true);
+				false);
 
 		if (partition) {
 			partitioning = true;
@@ -236,6 +237,8 @@ public class CppBackendImpl extends AbstractBackend {
 					new SerDesAdder().transform(subnetwork);
 					computeMapping(subnetwork);
 				}
+				computeFifoKind(subnetwork);
+
 				String outputName = path + File.separator
 						+ subnetwork.getName() + ".cpp";
 				printer.loadGroups("Cpp_network");
