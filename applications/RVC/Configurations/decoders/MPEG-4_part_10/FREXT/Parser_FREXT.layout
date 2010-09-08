@@ -27,7 +27,7 @@
       <vertex id="BlackHole4IntraPred" x="2768" y="242"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="2026" y="1089"/>
       <vertex id="BlackHole4IPCM" x="1591" y="1053"/>
-      <vertex id="MVReconstruct" x="2328" y="637"/>
+      <vertex id="MVReconstruct" x="2492" y="961"/>
       <vertex id="BlackHole4MVRec" x="2768" y="648"/>
    </vertices>
 </layout>

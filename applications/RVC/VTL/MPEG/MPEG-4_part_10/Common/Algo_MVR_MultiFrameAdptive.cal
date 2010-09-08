@@ -64,6 +64,7 @@ actor Algo_MVR_MultiFrameAdptive ()
 		int(size=16) mvpLX 
 		:
 
+	bool DEGUG_INPUT = false;
 
   int(size=3) mbPartIdxt;
   int(size=6) MbPartWidth;
@@ -88,54 +89,84 @@ actor Algo_MVR_MultiFrameAdptive ()
 
   start: action mbPartIdx:[idx] ==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive mbPartIdx :"+idx);
+  	end
      mbPartIdxt:=idx;
   end
 
   readrefIdx0: action refIdxLX:[idx] ==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive refIdxLX :"+idx);
+  	end
     refIdxL0t:=idx;
   end
   
   
   readwidth: action PartSZ:[w] ==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive PartSZ :"+w);
+  	end
     MbPartWidth:=w;
   end
 
   readheight: action PartSZ:[h] ==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive PartSZ :"+h);
+  	end
     MbPartHeight:=h;
   end  
   
   readrefIdxA0: action refIdxLXN:[idx]==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive refIdxLXN :"+idx);
+  	end
     refIdxL0At:=idx;
   end
   
   readrefIdxB0: action refIdxLXN:[idx]==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive refIdxLXN :"+idx);
+  	end
     refIdxL0Bt:=idx;
   end
 
   readrefIdxC0: action refIdxLXN:[idx]==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive refIdxLXN :"+idx);
+  	end
     refIdxL0Ct:=idx;
   end
 
   readmvLA0: action mvLX:[mvx, mvy]==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive mvLX :"+mvx+" ; "+mvy);
+  	end
     mvL0tA[0]:=mvx;
     mvL0tA[1]:=mvy;
   end
 
   readmvLB0: action mvLX:[mvx, mvy]==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive mvLX :"+mvx+" ; "+mvy);
+  	end
     mvL0tB[0]:=mvx;
     mvL0tB[1]:=mvy;
   end
   
   readmvLC0: action mvLX:[mvx, mvy]==>
   do
+  	if(DEGUG_INPUT)then
+  		println("Input MVR_MulltiFrameAdaptive mvLX :"+mvx+" ; "+mvy);
+  	end
     mvL0tC[0]:=mvx;
     mvL0tC[1]:=mvy;
   end  

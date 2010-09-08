@@ -8726,6 +8726,7 @@ end
 	guard
 		mbPartIdx < NumMbPart()
 	do
+		println("MP:"+(mbPartIdx - 1));
 		ref_idx_l0[mbPartIdx] := 0;
 		Ref_Idx_L0[CabacCurrMbAddr()][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;

@@ -51,10 +51,16 @@
  * This copyright notice must be included in all copies or derivative works. 
  * Copyright (c) ISO/IEC 2008-2010.
  */
-
 actor Algo_Add_AVC () int(size=16) X, int(size=16) Y	==> int(size=16) Z:
 
+bool DEBUG_INPUT = false;
+
   action X:[x], Y:[y] ==> Z:[ x+ y]
+  do
+  	if(DEBUG_INPUT)then
+	  	println("Input Add_AVC X:"+x);
+	  	println("Input Add_AVC Y:"+y);
+	end
   end
 
 end

@@ -74,6 +74,7 @@ actor Mgnt_MVR ()
 	int PICWIDTH=1280/16; //number of MB per lines
 	int PICHEIGHT=720/16; //number of MB per columns
  
+ 	bool DEBUG_INPUT = true;
 	    
 	uint(size=5) count := 16;
 	uint(size=13) currmb:= 0;
@@ -91,7 +92,7 @@ actor Mgnt_MVR ()
 	List(type: List(type:int(size=5), size=16), size=PICWIDTH*PICHEIGHT) refidx;
   
 	List(type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
-  
+ 
   
 	// initialize mv to a huge list of [0, 0]s, and refidx to a huge list of -2's
 
@@ -106,6 +107,12 @@ actor Mgnt_MVR ()
 		count >= 16,
     	c !=0
   	do
+  		if(DEBUG_INPUT) then
+  			println("Input Mgnt_MVR CurrMbAddr:"+a);
+  			println("Input Mgnt_MVR PicWidthInMb:"+b);
+  			println("Input Mgnt_MVR MbIntraFlag:"+c);
+  			println("Input Mgnt_MVR FirstMbInSlice:"+d);
+  		end
   	    refidx[a]:=[-1 : for int i in 0 .. 15];
   	    mv[a] := [ [0, 0] : for int i in 0 .. 15];
 	end
@@ -115,6 +122,12 @@ actor Mgnt_MVR ()
 		count >= 16,
 		c = 0
 	do
+  		if(DEBUG_INPUT) then
+  			println("Input Mgnt_MVR CurrMbAddr:"+a);
+  			println("Input Mgnt_MVR PicWidthInMb:"+b);
+  			println("Input Mgnt_MVR MbIntraFlag:"+c);
+  			println("Input Mgnt_MVR FirstMbInSlice:"+d);
+  		end	
 		first_mb_in_slice:=d;
 		picW := b; 
 		currmb := a;
@@ -131,6 +144,12 @@ actor Mgnt_MVR ()
 	var
 		uint(size=11) locx, uint(size=11) locy
 	do
+  		if(DEBUG_INPUT) then
+  			println("Input Mgnt_MVR MbPartIdx:"+a);
+  			println("Input Mgnt_MVR RefIdx:"+b);
+  			println("Input Mgnt_MVR MbPartWidth:"+c);
+  			println("Input Mgnt_MVR MbPartHeigth:"+d);
+  		end	
 		mbpart_idx:= a;
 		ref_idx := b;
 		mbpart_w:= c;
@@ -307,6 +326,9 @@ actor Mgnt_MVR ()
   guard
     mbpart_w = 4 and mbpart_h = 8 
   do
+  		if(DEBUG_INPUT) then
+  			println("Input Mgnt_MVR MV:"+a+" ; "+b);
+  		end	
       mv[currmb][InverseScan4x4Tab[count]][0] := a;
       mv[currmb][InverseScan4x4Tab[count]][1] := b;
       refidx[currmb][InverseScan4x4Tab[count]]:=ref_idx;
@@ -320,6 +342,9 @@ actor Mgnt_MVR ()
   guard
     mbpart_w = 8 and mbpart_h = 16  
   do
+	if(DEBUG_INPUT) then
+		println("Input Mgnt_MVR MV:"+a+" ; "+b);
+	end	
     foreach int i in 0 .. 3 do
       mv[currmb][InverseScan4x4Tab[count]] := [a,b];
       refidx[currmb][InverseScan4x4Tab[count]]:=ref_idx;
@@ -332,6 +357,9 @@ actor Mgnt_MVR ()
   
   get_mv.others: action MV:[a,b] ==> 
   do
+	if(DEBUG_INPUT) then
+		println("Input Mgnt_MVR MV:"+a+" ; "+b);
+	end	
     foreach int i in 0 .. rshift(mbpart_w,2)*rshift(mbpart_h,2)-1 do
       mv[currmb][InverseScan4x4Tab[count]] := [a,b];
       refidx[currmb][InverseScan4x4Tab[count]]:=ref_idx;

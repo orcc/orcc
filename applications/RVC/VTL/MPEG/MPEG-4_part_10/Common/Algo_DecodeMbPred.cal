@@ -27,7 +27,16 @@ actor Algo_DecodeMbPred()
 	int (size=32) NbBitsToRead,
 	bool          SkipNal,
 
-	uint(size=4) RemIntraYxYPredMode
+	uint(size=4) RemIntraYxYPredMode,
+
+	uint(size=3) RefIdxL0,
+	uint(size=5) MbPartHeight,
+	uint(size=5) MbPartWidth,
+	uint(size=3) MbPartIdx,
+	bool         EndRefIdxL0,
+
+	int(size=16) MvRes,
+	bool         EndMvRes
 		:
 
 	bool DEBUG_MV = false;
@@ -54,6 +63,18 @@ actor Algo_DecodeMbPred()
 	uint(size=5) PRED_L0 = 1;
 //	uint(size=5) PRED_L1 = 2;
 
+	List ( type: List ( type: uint(size=5), size=5), size=6 ) P_tab = //[mb_type][NumMbPart / MbPartWidth / MbPartHeight /MbPartPredMode,0 / MbPartPredMode,1]
+		[ [1,16,16,0,7], [2,16,8,0,0], [2,8,16,0,0], [4,8,8,7,7], [4,8,8,7,7], [1,16,16,0,7] ];
+
+	List ( type: List ( type: uint(size=5), size=5), size=24 ) B_tab = //[mb_type][NumMbPart / MbPartWidth / MbPartHeight /MbPartPredMode,0 / MbPartPredMode,1]
+		[ 
+			[0,8,8,3,0], [1,16,16,0,7], [1,16,16,1,7], [1,16,16,2,7], 
+			[2,16,8,0,0], [2,8,16,0,0], [2,16,8,1,1], [2,8,16,1,1],
+			[2,16,8,0,1], [2,8,16,0,1], [2,16,8,1,0], [2,8,16,1,0],
+			[2,16,8,0,2], [2,8,16,0,2], [2,16,8,1,2], [2,8,16,1,2],
+			[2,16,8,2,0], [2,8,16,2,0], [2,16,8,2,1], [2,8,16,2,1], 
+			[2,16,8,2,2], [2,8,16,2,2], [4,8,8,7,7],[0,8,8,3,7] 
+		];
 
 
 	List(type: List(type:uint(size=5), size=2), size=5) MB_PART_PRED_MODE_P = [[PRED_L0,NA] , [PRED_L0,PRED_L0] , [PRED_L0,PRED_L0]
@@ -78,6 +99,18 @@ actor Algo_DecodeMbPred()
 	uint(size=5)  num_ref_idx_l1_active;
 	bool          mb_field_decoding_flag;
 
+
+	function MbPartWidthHeight(uint(size=1) x) --> uint(size=5) : 
+		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then 
+			P_tab[mb_type][1+x] 
+		else 
+			if slice_type = SLICE_TYPE_B then
+				B_tab[mb_type][1+x]
+			else
+				1
+			end 
+		end 
+	end
 
 	function IS_MbPred_L0_P(uint(size=6) MbType, uint(size=1) x)
 				-->
@@ -475,8 +508,13 @@ actor Algo_DecodeMbPred()
 		end
 
 	ReadRefIdxL0.Done: action
-			ValVLD :[ValueOfVLD]
+			ValVLD   :[ValueOfVLD]
 				==>
+			RefIdxL0     :[ValueOfVLD],
+			MbPartHeight :[MbPartWidthHeight(1)],
+			MbPartWidth  :[MbPartWidthHeight(0)],
+			MbPartIdx    :[mbPartIdx - 1],
+			EndRefIdxL0  :[false]
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
@@ -499,8 +537,10 @@ actor Algo_DecodeMbPred()
 		end
 
 	ReadMvdL0.Done: action
-			ValVLD :[ValueOfVLD] repeat 2
+			ValVLD   :[ValueOfVLD] repeat 2
 				==>
+			MvRes    :[ValueOfVLD] repeat 2,
+			EndMvRes :[false]
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
@@ -525,7 +565,9 @@ actor Algo_DecodeMbPred()
 
 	SendEndMbPred: action
 				==>
-			SkipNal :[true]
+			SkipNal     :[true],
+			EndRefIdxL0 :[true],
+			EndMvRes    :[true]
 		end
 
 	schedule fsm ReadParameters:

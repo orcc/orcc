@@ -1,0 +1,29 @@
+actor BlackHole4MVReconstruct()
+	int(size=16) Z,
+	uint(size=11)Location, 
+	uint(size=6) PartSZ,
+	int(size=16) mv_out,
+	uint(size=3) refidx_out
+		==>
+		:
+	action 
+			Z:[a]
+				==>
+		end
+	action 
+			Location:[a]
+				==>
+		end
+	action 
+			PartSZ:[a]
+				==>
+		end
+	action 
+			mv_out:[a]
+				==>
+		end
+	action 
+			refidx_out:[a]
+				==>
+		end
+end

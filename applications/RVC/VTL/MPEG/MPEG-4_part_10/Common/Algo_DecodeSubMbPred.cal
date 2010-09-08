@@ -25,7 +25,14 @@ actor Algo_DecodeSubMbPred()
 	int (size=32) VldParam,
 	bool          SkipNal,
 
-	uint(size=4) MBLayerSubMbType
+	uint(size=4) MBLayerSubMbType,
+
+	uint(size=3) RefIdxL0,
+	int(size=16) MvRes,
+	uint(size=5) MbPartHeight,
+	uint(size=5) MbPartWidth,
+	uint(size=3) MbPartIdx,
+	bool         EndRefIdxL0
 		:
 
 	bool DEBUG_MV = false;
@@ -54,6 +61,12 @@ actor Algo_DecodeSubMbPred()
 
 	List(type: uint(size=3), size=4)  NumSubMbPart_P = [1,2,2,4];
 
+	List ( type: List ( type: uint(size=5), size=4), size=4 ) P_tab_sub = //[sub_mb_type[mbPartIdx]][NumSubMbPart / MbPartWidth / MbPartHeight / SubMbPredMode]
+		[ [1,8,8,0], [2,8,4,0], [2,4,8,0], [4,4,4,0] ];
+
+	List ( type: List ( type: uint(size=5), size=4), size=13 ) B_tab_sub = //[sub_mb_type[mbPartIdx]][NumSubMbPart / MbPartWidth / MbPartHeight / SubMbPredMode]
+		[ [4,4,4,3], [1,8,8,0], [1,8,8,1], [1,8,8,2], [2,8,4,0], [2,4,8,0], [2,8,4,1], [2,4,8,1], [2,8,4,2], [2,4,8,2], [4,4,4,0], [4,4,4,1], [4,4,4,2] ];
+
 
 	uint(size=5)  num_ref_idx_l0_active;
 	uint(size=5)  num_ref_idx_l1_active;
@@ -66,6 +79,8 @@ actor Algo_DecodeSubMbPred()
 	uint(size=3) subMbPartIdxMax;
 
 	List(type: uint(size=4), size=4) sub_mb_type;
+	List (type:int,size=4) ref_idx_l0 := [ 0 : for int i in 0 .. 3];
+	List (type:int,size=4) ref_idx_l1 := [ 0 : for int i in 0 .. 3];
 
 	function SubMbPredMode( uint(size=4) ValSubMbType) --> uint(size=2) :
 			if(slice_type = SLICE_TYPE_B)then
@@ -79,6 +94,20 @@ actor Algo_DecodeSubMbPred()
 			end
 		end
 
+	function SubMbPartWidthHeight(uint(size=1) x)
+				-->
+			uint(size=5)
+		:
+			if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then
+				P_tab_sub[sub_mb_type[mbPartIdx - 1]][1+x]
+			else
+				if slice_type = SLICE_TYPE_B then
+					B_tab_sub[sub_mb_type[mbPartIdx - 1]][1+x]
+				else
+					1 
+				end
+			end
+		end
 
 
 	ReadSubMbType.Asked: action
@@ -245,6 +274,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			ValVLD :[ValueOfVLD] repeat 8
 				==>
 		do
+			
 			if(DEBUG_MV)then
 				foreach int i in 0 .. 3
 				do
@@ -255,8 +285,14 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 		end
 
 	ReadMvdl0Done: action
-			ValVLD :[ValueOfVLD] repeat 2
+			ValVLD   :[ValueOfVLD] repeat 2
 				==>
+			RefIdxL0     :[ref_idx_l0[mbPartIdx - 1]],
+			MvRes        :[ValueOfVLD] repeat 2,
+			MbPartHeight :[SubMbPartWidthHeight(1)],
+			MbPartWidth  :[SubMbPartWidthHeight(0)],
+			MbPartIdx    :[subMbPartIdx - 1],
+			EndRefIdxL0  :[false]
 		guard
 			/* SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L1 )*/
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1,
@@ -286,7 +322,8 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 
 	SendEndSubMbPred: action
 				==>
-			SkipNal :[true]
+			SkipNal     :[true],
+			EndRefIdxL0 :[true]
 		end
 
 	schedule fsm ReadSubMbTypeAsked:
