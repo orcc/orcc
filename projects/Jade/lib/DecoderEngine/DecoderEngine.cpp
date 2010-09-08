@@ -169,10 +169,13 @@ void DecoderEngine::parseActors(Network* network) {
 		}else{
 			actor = (*itActor).second;
 		}
-	
-		instance->setActor(actor);
+
+		//Bound actor and instance
+		actor->addInstance(instance);
 
 	}
+
+	decoder->setActorList(&actors);
 }
 
 AbstractFifo* DecoderEngine::getFifo(){

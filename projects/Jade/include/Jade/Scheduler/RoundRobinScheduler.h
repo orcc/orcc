@@ -78,6 +78,8 @@ private:
 
 	void setDisplay();
 
+	void setCompare();
+
 	/** JIT accessor */
 	JIT* jit;
 

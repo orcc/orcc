@@ -26,6 +26,8 @@
 * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 * SUCH DAMAGE.
 */
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "SDL.h"
 
 static SDL_Surface *m_screen;
@@ -33,8 +35,14 @@ static SDL_Overlay *m_overlay;
 
 #define MAX_WIDTH 720
 #define MAX_HEIGHT 576
-
-
+/*
+#if defined(__LP64__) || defined(_LP64)
+#define fstat(op1, op2) fstat64(op1, op2)
+#define teststat stat64
+#else
+#define teststat stat
+#endif
+*/
 static int m_x;
 static int m_y;
 static int m_width;

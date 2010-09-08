@@ -113,6 +113,19 @@ void Decoder::createActorInstances(){
 	}
 }
 
+Actor* Decoder::getActor(std::string name){
+	map<string, Actor*>::iterator it;
+
+	it = actors->find(name);
+
+	if(it != actors->end()){
+		return it->second;
+	}
+
+	return NULL;
+}
+
+
 InstancedActor* Decoder::createInstance(Instance* instance){
 	Actor* actor = instance->getActor();
 

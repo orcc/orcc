@@ -1,4 +1,5 @@
 %struct.FILE = type { i8*, i32, i8*, i32, i32, i32, i32, i8* }
+%struct.stat = type { i32, i16, i16, i16, i16, i16, i32, i32, i32, i32, i32 }
 
 declare i32 @fseek(%struct.FILE*, i32, i32) nounwind
 declare i32 @fread(i8*, i32, i32, %struct.FILE*) nounwind

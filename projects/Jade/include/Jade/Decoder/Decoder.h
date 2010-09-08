@@ -116,6 +116,19 @@ public:
 	std::map<std::string, Instance*>* getInstances(){return instances;};
 
 	/**
+     *  @brief return the actor corresponding to the given name
+	 * 
+	 *	Return an actor corresponding to the given name if the current decoder is contained in the decoder,
+	 *   return NULL if the actor is not contained in the decoder
+	 *
+	 *	@param name : std::string name of the actor 
+	 *
+	 *  @return the actor if contained in the decoder otherwise NULL
+	 *
+     */
+	Actor* getActor(std::string name);
+
+	/**
      *  @brief Getter of an instance
 	 * 
 	 *	Return the instance with the given name
@@ -133,6 +146,16 @@ public:
 	 *
      */
 	Procedure* getInitialization(){return initialization;};
+
+	/**
+     *  @brief Set actors contained in the decoder
+	 * 
+	 *	Set a map of actor that are contained in the decoder
+	 *
+	 *	@param actors : a map of actor 
+	 *
+     */
+	void setActorList(std::map<std::string, Actor*>* actors){this->actors = actors;};
 
 	/**
      *  @brief return true if decoder has an initialization procedure
@@ -177,7 +200,7 @@ private:
 	/** Input network */
 	Network* network;
 
-	/** List of actors in the decoder */
+	/** List of actors contained in the decoder */
 	std::map<std::string, Actor*>* actors;
 
 	/** List of instances in the decoder */

@@ -39,6 +39,7 @@
 #include "Jade/Actor/Actor.h"
 #include "Jade/Actor/Action.h"
 #include "Jade/Actor/Variable.h"
+#include "Jade/Network/Instance.h"
 //------------------------------
 
 using namespace std;
@@ -66,6 +67,7 @@ Actor::~Actor (){
 }
 
 void Actor::addInstance(Instance* instance){
+	instance->setActor(this);
 	instances.push_back(instance);
 }
 

@@ -297,6 +297,15 @@ public:
 	Procedure* getProcedure(std::string name);
 
 	/**
+	 * @brief Get instances of the actor
+	 *
+	 * Returns a list of instances of this actor in decoders
+	 * 
+	 * @return a list of Instance
+	 */
+	std::list<Instance*>* getInstances(){return &instances;};
+
+	/**
      *  @brief Create a port
 	 *
 	 *  Create a port inside the actor similar to the given Port

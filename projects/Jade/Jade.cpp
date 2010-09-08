@@ -87,7 +87,12 @@ ToolsDir("T", desc("Jade tools directory"),
 			  init(""));
 
 opt<std::string> 
-OutputDir("o", desc("Output folder for trace/Module/Error files"), 
+YuvFile("o", desc("Decoded YUV video file for compare mode"), 
+			  value_desc("YUV filename"), 
+			  init(""));
+
+opt<std::string> 
+OutputDir("w", desc("Output folder for writing trace/Module/Error files"), 
 			  value_desc("Trace folder"), 
 			  init(""));
 
