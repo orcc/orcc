@@ -268,6 +268,24 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="MVReconstruct">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../Common/MVReconstruct"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="BlackHole4MVRec">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/BlackHole4MVReconstruct"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -626,4 +644,57 @@
         src="DecodeMacroBlockLayer" src-port="pix_I_PCM_U"/>
     <Connection dst="BlackHole4IPCM" dst-port="I_PCM_V"
         src="DecodeMacroBlockLayer" src-port="pix_I_PCM_V"/>
+    <Connection dst="BlackHole4MVRec" dst-port="Z" src="MVReconstruct" src-port="MV"/>
+    <Connection dst="BlackHole4MVRec" dst-port="Location"
+        src="MVReconstruct" src-port="LOCATION"/>
+    <Connection dst="BlackHole4MVRec" dst-port="PartSZ"
+        src="MVReconstruct" src-port="PartSZ"/>
+    <Connection dst="BlackHole4MVRec" dst-port="mv_out"
+        src="MVReconstruct" src-port="mv_out"/>
+    <Connection dst="BlackHole4MVRec" dst-port="refidx_out"
+        src="MVReconstruct" src-port="ref_idx"/>
+    <Connection dst="MVReconstruct" dst-port="CurrMbAddr"
+        src="DecodeSliceData_Cavlc" src-port="CurrMbAddr"/>
+    <Connection dst="MVReconstruct" dst-port="FirstMbInSlice"
+        src="DecodeSliceData_Cavlc" src-port="FirstMbInSlice"/>
+    <Connection dst="MVReconstruct" dst-port="MbIntraFlag"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbIntraFlag"/>
+    <Connection dst="MVReconstruct" dst-port="PicWidthInMb"
+        src="DecodeSliceData_Cavlc" src-port="PicWidthInMb"/>
+    <Connection dst="MVReconstruct" dst-port="RefIdx"
+        src="MergeDataFromSDataAndMbLayer" src-port="RefIdx"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredRefIdxL0" src="DecodeSubMbPred" src-port="RefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredMvRes" src="DecodeSubMbPred" src-port="MvRes"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredEndRefIdxL0" src="DecodeSubMbPred" src-port="EndRefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredEndRefIdxL0" src="DecodeMbPred" src-port="EndRefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredMvRes" src="DecodeMbPred" src-port="MvRes"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredEndMvRes" src="DecodeMbPred" src-port="EndMvRes"/>
+    <Connection dst="MVReconstruct" dst-port="MvRes"
+        src="MergeDataFromSDataAndMbLayer" src-port="MvRes"/>
+    <Connection dst="MVReconstruct" dst-port="MbPartHeigth"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbPartHeight"/>
+    <Connection dst="MVReconstruct" dst-port="MbPartWidth"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbPartWidth"/>
+    <Connection dst="MVReconstruct" dst-port="MbPartIdx"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbPartIdx"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredMbPartHeight" src="DecodeSubMbPred" src-port="MbPartHeight"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredMbPartWidth" src="DecodeSubMbPred" src-port="MbPartWidth"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredMbPartIdx" src="DecodeSubMbPred" src-port="MbPartIdx"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredRefIdxL0" src="DecodeMbPred" src-port="RefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredMbPartHeight" src="DecodeMbPred" src-port="MbPartHeight"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredMbPartWidth" src="DecodeMbPred" src-port="MbPartWidth"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredMbPartIdx" src="DecodeMbPred" src-port="MbPartIdx"/>
 </XDF>

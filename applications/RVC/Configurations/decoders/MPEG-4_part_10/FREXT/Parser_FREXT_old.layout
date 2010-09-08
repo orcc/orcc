@@ -41,23 +41,23 @@
       <vertex id="I_PCM_U" x="1278" y="3906"/>
       <vertex id="I_PCM_V" x="1278" y="4003"/>
       <vertex id="ConstrainedIFlag" x="955" y="2131"/>
-      <vertex id="DelList" x="1751" y="2540"/>
-      <vertex id="RefList" x="1903" y="1951"/>
+      <vertex id="DelList" x="1278" y="2587"/>
+      <vertex id="RefList" x="1568" y="2380"/>
       <vertex id="SizeDPBMax" x="955" y="2228"/>
-      <vertex id="IsIDR" x="1779" y="2455"/>
+      <vertex id="IsIDR" x="1278" y="2684"/>
       <vertex id="BlocksSize_Luma" x="1278" y="2173"/>
       <vertex id="byte2bit" x="539" y="2519"/>
       <vertex id="Algo_NALU" x="168" y="2599"/>
       <vertex id="Algo_Synp_AVC" x="671" y="2149"/>
       <vertex id="Algo_BlockExpand_AVC" x="1568" y="3118"/>
       <vertex id="Algo_BlockSplit_AVC" x="1993" y="1757"/>
-      <vertex id="Algo_IntraPred_Split" x="1209" y="1691"/>
+      <vertex id="Algo_IntraPred_Split" x="955" y="2325"/>
       <vertex id="MVReconstruct" x="955" y="3324"/>
-      <vertex id="Algo_MMCO" x="1300" y="2436"/>
+      <vertex id="Algo_MMCO" x="955" y="2680"/>
       <vertex id="Algo_Parser_IPCM" x="955" y="3776"/>
-      <vertex id="Algo_RefList0" x="1731" y="1793"/>
-      <vertex id="Algo_RefList1" x="1773" y="2652"/>
-      <vertex id="Black_Hole" x="2000" y="2658"/>
+      <vertex id="Algo_RefList0" x="1278" y="2270"/>
+      <vertex id="Algo_RefList1" x="1278" y="2781"/>
+      <vertex id="Black_Hole" x="1568" y="2880"/>
       <vertex id="Demux_Cavlc_Cabac" x="1278" y="3098"/>
       <vertex id="Mux_Cavlc_Cabac" x="1797" y="3026"/>
       <vertex id="CheckNaluType" x="350" y="2518"/>
