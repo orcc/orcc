@@ -243,6 +243,9 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #endif
 
 $if (options.needPthreads)$
+#ifndef _WIN32
+#define __USE_GNU
+#endif
 #include <pthread.h>
 $endif$
 
@@ -284,11 +287,40 @@ $///////////////////////////////////////////////////////////////////////////////
 
 $printThreads(options.threads)$
 
+#ifdef _WIN32
+typedef long cpu_set_t;
+#endif
+
+void clear_cpu_set(cpu_set_t *cpuset) {
+#ifdef _WIN32
+	*cpuset = 0;
+#else
+	CPU_ZERO(cpuset);
+#endif
+}
+
+void orcc_set_affinity(cpu_set_t *cpuset, int proc_num, pthread_t tid) {
+#ifdef _WIN32
+	*cpuset = 1 << proc_num;
+	// need to get the handle
+	// SetThreadAffinityMask(tid, cpuset);
+#else
+	CPU_SET(proc_num, cpuset);
+	if (pthread_setaffinity_np(tid, sizeof(cpu_set_t), cpuset) < 0) {
+		perror("pthread_setaffinity_np");
+	}
+#endif
+}
+
 static void scheduler() {
 	pthread_t $options.threads.keys: {thread_$it$}; separator=", "$;
+	cpu_set_t cpuset;
 
 	$printInitializes(network.instances)$
 	$options.threads.keys: {pthread_create(&thread_$it$, NULL, $it$, NULL);}; separator="\n"$
+
+	clear_cpu_set(&cpuset);
+	$options.threads.keys: {orcc_set_affinity(&cpuset, $i0$, thread_$it$);}; separator="\n"$
 
 	$options.threads.keys: {pthread_join(thread_$it$, NULL);}; separator="\n"$
 }
