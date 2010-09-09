@@ -37,14 +37,12 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
@@ -97,21 +95,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 				copyVars.put(target, expr);
 				removedInstrs.add(assign);
 		}
-	}
-	
-	@Override
-	public void visit(PhiAssignment phi, Object... args) {
-		
-		List<Use> uses = phi.getVars();
-		
-		for (Use use : uses){
-			if (copyVars.containsKey(use)){
-				uses.set(uses.indexOf(use), copyVars.get(use));
-			}
-			
-		}
-	}
-	
+	}	
 	
 	@Override
 	public void visit(Return returnInstr, Object... args) {
