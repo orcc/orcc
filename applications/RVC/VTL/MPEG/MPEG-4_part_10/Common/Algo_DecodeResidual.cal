@@ -42,7 +42,9 @@ actor Algo_DecodeResidual()
 	uint(size=5) ResBlkEndIdx,
 
 	uint(size=5) DecMbLayerTotal_CoeffLuma,
-	uint(size=5) DecMbLayerTotal_CoeffChroma
+	uint(size=5) DecMbLayerTotal_CoeffChroma,
+
+	bool         Skip_Block
 		:
 
 	bool         CAVLC_ENTROPY = false;
@@ -182,7 +184,7 @@ actor Algo_DecodeResidual()
 				MbExists           [20+i]      := ValAboveMbExists;
 			end
 			ResidualLumaOutput := RESIDUAL_LUMA_LUMA_OUTPUT;
-			i8x8Loop      := 0;
+			i8x8Loop      := 1;
 			IdxCurrMb     := 0;
 		end
 
@@ -192,7 +194,7 @@ actor Algo_DecodeResidual()
 		guard
 			ResidualLumaOutput = RESIDUAL_LUMA_LUMA_OUTPUT
 		do
-		 i8x8Loop := 0;
+			i8x8Loop := 0;
 		end
 
 	ResLuma_Launch16x16DCResBlock: action
@@ -254,28 +256,9 @@ actor Algo_DecodeResidual()
 			EndIdxSent     := endIdx;
 		end
 
-	ResLuma_CheckBmFlagAndMbType: action ==>
-		guard
-			bmFlag = false,
-			Is_Intra_16x16(mb_type)
-		do
-			TotalCoeffTabLuma[IdxCurrMb    ]   := 0;
-			TotalCoeffTabLuma[IdxCurrMb + 1]   := 0;
-			TotalCoeffTabLuma[IdxCurrMb + 2]   := 0;
-			TotalCoeffTabLuma[IdxCurrMb + 3]   := 0;
-			IdxCurrMb := IdxCurrMb + 4;
-			/*
-			foreach int i4x4 in 0 .. 3
-			do
-				foreach int i in 0 .. 14
-				do
-					i16x16ACLevel[i8x8Loop*4 + i4x4][i] := 0:
-				end
-			end
-			*/
-		end
-
-	ResetLevelTab: action ==>
+	ResetLevelTab: action
+				==>
+			Skip_Block :[ true , true , true , true ]
 		do
 			TotalCoeffTabLuma[IdxCurrMb    ]   := 0;
 			TotalCoeffTabLuma[IdxCurrMb + 1]   := 0;
@@ -340,7 +323,9 @@ actor Algo_DecodeResidual()
 			ResBlknC          :[nC],
 			ResBlkMaxNumCoeff :[maxNumCoeff],
 			ResBlkStartIdx    :[StartIdxSent],
-			ResBlkEndIdx      :[EndIdxSent]
+			ResBlkEndIdx      :[EndIdxSent],
+
+			Skip_Block        :[false]
 		var
 			int(size=8) nC
 		do
@@ -473,7 +458,8 @@ actor Algo_DecodeResidual()
 
 	ChromaAcComponentNotPresent: action
 				==>
-			DecMbLayerTotal_CoeffChroma:[[0: for int i in 0 .. 31]]repeat 32
+			DecMbLayerTotal_CoeffChroma:[[0: for int i in 0 .. 31]]repeat 32,
+			Skip_Block :[ true , true , true , true ]
 		guard
 			i8x8Loop < NumC8x8
 		do
@@ -515,7 +501,6 @@ actor Algo_DecodeResidual()
 				ResLumaCheckTrnsSzAndEntropy (a)--> undefined;//Cabac stuff not implemented yet
 	
 				CheckCodeBlockBmFlag         (ResLuma_CheckCodedBlockPattern        )--> CheckBmFlagEndIx;
-				CheckCodeBlockBmFlag         (ResLuma_CheckBmFlagAndMbType          )--> CheckEndLoop8x8;
 				CheckCodeBlockBmFlag         (ResetLevelTab                         )--> CheckEndLoop8x8;
 	
 				CheckBmFlagEndIx             (ResLuma_CheckBmFlagAndEndIdxAndMbType )--> ResLumaSendResBlkPar2_0;
@@ -564,14 +549,13 @@ actor Algo_DecodeResidual()
 		ChromaDCGetTotalCoeff_2     (GetTotalCoeff                        )--> CheckChromaAC;
 
 		CheckChromaAC (ChromaAcComponentPresent )--> CheckLoopiCbCr;
-		CheckChromaAC (ChromaAcComponentNotPresent )--> SendEndResidual;
+		CheckChromaAC (ChromaAcComponentNotPresent )--> ChromaAcComponentNotPresent;
 
 		CheckLoopiCbCr (ChromaAcLoopiCbCr )--> CheckLoopi8x8;
 		CheckLoopiCbCr (SendEndResidual )--> GetParameters;
 
 		CheckLoopi8x8 (ChromaAcLoopi8x8 )--> ChromaAcSendResBlockPar_1;
 		CheckLoopi8x8 (SendChromaCoeffToken )--> CheckLoopiCbCr;
-
 
 	
 		ChromaAcSendResBlockPar_1      (SendResBlockParameters                )--> ChromaAcGetTotalCoeff_1;
@@ -600,7 +584,7 @@ actor Algo_DecodeResidual()
 	priority
 		ResLuma_Launch16x16DCResBlock  > ResLuma_CheckTransfSzAndCavlc;
 		ResLuma_CheckTransfSzAndCavlc  > a;
-		ResLuma_CheckCodedBlockPattern > ResLuma_CheckBmFlagAndMbType  > ResetLevelTab;
+		ResLuma_CheckCodedBlockPattern > ResetLevelTab;
 		ResLuma_CheckBmFlagAndEndIdxAndMbType > ResLuma_LaunchResBlk_1;
 		EndLoop8x8.IsEqualToFalse             > ResLuma_CheckCavlc8x8 > ResLumaOutput.IsLuma;
 		ResLumaOutput.IsLuma       > a;

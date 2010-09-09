@@ -5941,6 +5941,8 @@ actor Algo_VariableLengthDecoding()
 	GetCavlcRunBefore.Finished: action
 				==>
 			ValDecoded :[RunBeforeValue[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]]
+		do
+		//	println("run:"+IdxzerosLeft+";"+NbBitsRead+";"+ValRead);
 		end
 
 /*

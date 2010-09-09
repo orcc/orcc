@@ -1,0 +1,7 @@
+actor BlackHole4BlockExpand()
+	int(size=12) Coeff
+		==>
+		:
+	action Coeff:[a] ==>
+		end
+end

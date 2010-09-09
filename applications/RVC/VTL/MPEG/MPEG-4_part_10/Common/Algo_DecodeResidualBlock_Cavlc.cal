@@ -25,7 +25,11 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	uint(size=3)  TypeOfVLD,
 	int (size=32) VLD_Param,
 	bool          SkipNal,
-	uint(size=5)  Total_Coeff
+	uint(size=5)  Total_Coeff,
+
+	int (size=12) Value,
+	uint(size=4)  Run,
+	bool          Last
 		:
 
 
@@ -51,7 +55,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	uint(size=5)  endIdx       := 0;
 
 	List(type: uint(size=8) , size=16) CoeffLevel;
-	List(type: int (size=16), size=16) level        := [ 0 : for int i in 1 .. 16];
+	List(type: int (size=16), size=3)  level        := [ 0 : for int i in 1 .. 2];
 	List(type: int (size=4) , size=16) run          := [ 0 : for int i in 1 .. 16];
 
 	function Abs(int(size=32) x)
@@ -149,6 +153,17 @@ actor Algo_DecodeResidualBlock_Cavlc()
 				end
 				iLoop        := iLoop + 1;
 			end
+			iLoop := 0;
+		end
+
+	SendTrailingOnes: action
+				==>
+			Value :[level[iLoop-1]],
+			Last  :[false]
+		guard
+			iLoop < TrailingOnes
+		do
+			iLoop := iLoop + 1;
 		end
 
 	ReadLevelPrefix.Asked: action
@@ -200,7 +215,12 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			level_suffix := ValueOfVLD;
 		end
 
-	ComputeLevel: action ==>
+	ComputeLevel: action
+			==>
+			Value:[ValLevel],
+			Last  :[false]
+		var
+			int(size=16) ValLevel
 		do
 			levelCode :=
 				if(level_prefix < 15) then
@@ -216,19 +236,19 @@ actor Algo_DecodeResidualBlock_Cavlc()
 				levelCode := levelCode + lshift(1, level_prefix - 3) - 4096;
 			end
 			if((levelCode mod 2) = 0) then
-				level[iLoop] := rshift(levelCode + 2, 1);
+				ValLevel     := rshift(levelCode + 2, 1);
 			else
-				level[iLoop] := rshift( -levelCode - 1, 1);
+				ValLevel     := rshift( -levelCode - 1, 1);
 			end
 
 			if(suffixLength = 0)then
 				suffixLength := 1;
 			end
-			if( (Abs(level[iLoop]) > lshift(3, suffixLength - 1)) and (suffixLength < 6) ) then
+			if( (Abs(ValLevel) > lshift(3, suffixLength - 1)) and (suffixLength < 6) ) then
 				suffixLength := suffixLength + 1;
 			end
 			if(DEBUG_FLAG_DECODED)then
-				println("level : "+level[iLoop]);
+				println("level : "+ValLevel);
 			end
 			
 			levelCode := 0;
@@ -245,7 +265,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			TotalCoeff < (endIdx - startIdx + 1)
 		end
 
-	ReaadTotalZeros.Done: action
+	ReadTotalZeros.Done: action
 			ValVLD :[total_zeros]
 				==>
 		do
@@ -274,6 +294,7 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	ReadRunBefore: action
 			ValVLD :[run_before]
 				==>
+			Run    :[run_before]
 		do
 			run[iLoop] := run_before;
 			if(DEBUG_FLAG_DECODED)then
@@ -283,19 +304,26 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			iLoop      := iLoop + 1;
 		end
 
-	ZerosLeft.IsEqualTo0: action ==>
+	SendOthersRun: action
+				==>
+			Run :[ValRun]
 		guard
-			iLoop < TotalCoeff - 1
+			iLoop < TotalCoeff
+		var
+			int(size=16) ValRun
 		do
-			foreach int i in iLoop .. TotalCoeff - 2
-			do
-				run[i] := 0;
+			ValRun    := zerosLeft;
+			zerosLeft := 0;
+			if( (maxNumCoeff = 15) and (iLoop = TotalCoeff - 1) )then // The first coeffAC will be replaced by coeffDC
+				ValRun := ValRun + 1;
 			end
+			iLoop     := iLoop + 1;
 		end
 
 	SendEndResidualBlock: action
 				==>
-			SkipNal :[true]
+			SkipNal :[true],
+			Last    :[true]
 		do
 			run[TotalCoeff - 1] := zerosLeft;
 			/*
@@ -321,11 +349,17 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		CheckiLoop (ReadTotalZeros.Asked )--> ReadTotalZerosDone;
 		CheckiLoop (InitiLoop )--> Loop4run;
 
+		ReadTrailingOnesSign (ReadTrailingOnesSign.Done )--> SendTrailingOnes;
+
+		SendTrailingOnes (SendTrailingOnes )--> SendTrailingOnes;
+		SendTrailingOnes (ReadLevelPrefix.Asked )--> ReadLevelPrefix;
+		SendTrailingOnes (ReadTotalZeros.Asked )--> ReadTotalZerosDone;
+		SendTrailingOnes (InitiLoop )--> Loop4run;
+
 		CheckiLoop2 (ReadLevelPrefix.Asked )--> ReadLevelPrefix;
 		CheckiLoop2 (ReadTotalZeros.Asked )--> ReadTotalZerosDone;
 		CheckiLoop2 (InitiLoop )--> Loop4run;
 
-		ReadTrailingOnesSign (ReadTrailingOnesSign.Done )--> CheckiLoop2;
 
 		ReadLevelPrefix (ReadLevelPrefix.Done )--> ReadLevelSuffixAsked;
 
@@ -336,13 +370,16 @@ actor Algo_DecodeResidualBlock_Cavlc()
 
 		ComputeLevel (ComputeLevel )--> CheckiLoop2;
 
-		ReadTotalZerosDone (ReaadTotalZeros.Done )--> InitiLoop;
+		ReadTotalZerosDone (ReadTotalZeros.Done )--> InitiLoop;
 
 		InitiLoop (InitiLoop )--> Loop4run;
 
 		Loop4run (ZerosLeft.GreaterThan0 )--> ReadRunBefore;
-		Loop4run (ZerosLeft.IsEqualTo0 )--> SendEndResidualBlock;
+		Loop4run (SendOthersRun )--> SendOthersRun;
 		Loop4run (SendEndResidualBlock )--> ReadCoeffToken_Asked;
+
+		SendOthersRun (SendOthersRun )--> SendOthersRun;
+		SendOthersRun (SendEndResidualBlock )--> ReadCoeffToken_Asked;
 
 		ReadRunBefore (ReadRunBefore )--> Loop4run;
 
@@ -352,8 +389,9 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		CheckTotalCoeff.IsGreaterThan0 > SendEndResidualBlock;
 		ReadTrailingOnesSign.Asked > ReadLevelPrefix.Asked;
 		ReadLevelSuffix.Asked  > ComputeLevel;
+		SendTrailingOnes       > ReadLevelPrefix.Asked;
 		ReadLevelPrefix.Asked  > ReadTotalZeros.Asked;
 		ReadTotalZeros.Asked   > InitiLoop;
-		ZerosLeft.GreaterThan0 > ZerosLeft.IsEqualTo0  > SendEndResidualBlock;
+		ZerosLeft.GreaterThan0 > SendOthersRun  > SendEndResidualBlock;
 	end
 end

@@ -8712,8 +8712,6 @@ end
 		((slice_num_ref_idx_l0_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l0_active_minus1 > 1 and vld_end()) and IS_CAVLC() ) or
 		( cabac_end() and IS_CABAC() ) 
 	do
-			println("Mb1:"+(mbPartIdx));
-			println("Mb2:"+ref_idx_l0[mbPartIdx]);
 		if IS_CAVLC() then
 			ref_idx_l0[mbPartIdx] := if slice_num_ref_idx_l0_active_minus1 = 1 then 1 - read_result() else vld_ue() end;
 		else
@@ -8730,10 +8728,7 @@ end
 	guard
 		mbPartIdx < NumMbPart()
 	do
-			println("Mb1:"+(mbPartIdx - 1));
-			println("Mb2:"+ref_idx_l0[mbPartIdx-1]);
 		ref_idx_l0[mbPartIdx] := 0;
-			println("ref_idx_l0"+ref_idx_l0[mbPartIdx]);
 		Ref_Idx_L0[CabacCurrMbAddr()][mbPartIdx] := 0;
 		mbPartIdx := mbPartIdx +1;
 	end

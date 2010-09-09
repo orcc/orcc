@@ -56,7 +56,7 @@ Copyright (c) ISO/IEC 2008.
 actor Algo_BlockExpand_AVC ()
 	uint(size=2)  BlocksSize_Luma,
 	int (size=12) Value,
-	uint(size=4)  Run,  
+	uint(size=4)  Run,
 	bool          Last
 		==> 
 	int(size=12) Coeff
@@ -76,6 +76,8 @@ actor Algo_BlockExpand_AVC ()
 	int (size=5) SZ_LUMA_AC_4X4   = 16;
 	int (size=5) SZ_CHROMA_DC     = 4;
 	int (size=5) SZ_CHROMA_AC     = 16;
+
+	bool DEBUG_INPUT = true;
 
 	/* State Variable */
 	List(type:int(size=12), size=16) ValCoeff := [ 0 : for int i in 0 .. 15];
@@ -97,6 +99,9 @@ actor Algo_BlockExpand_AVC ()
 			LumaMBSize       := Size;
 			NbBlocksSent     := 0;
 			DC_ComponentSent := false;
+			if(DEBUG_INPUT)then
+				println("Input BlockExpand_AVC BlockSize_Luma:"+Size);
+			end
 		end
 
 
@@ -111,6 +116,12 @@ actor Algo_BlockExpand_AVC ()
 		do
 			ValCoeff[IdxValCoeff] := Val;
 			IdxValCoeff           := IdxValCoeff + 1;
+			if(DEBUG_INPUT)then
+				println("Input BlockExpand_AVC Last:"+ValLast);
+				println("Input BlockExpand_AVC Run:"+ValRun);
+				println("Input BlockExpand_AVC Value:"+Val);
+				println("");
+			end	
 		end
 
 
@@ -130,6 +141,12 @@ actor Algo_BlockExpand_AVC ()
 				ValCoeff[IdxValCoeff + j] := 0;
 			end
 			IdxValCoeff           := IdxValCoeff + ValRun;
+			if(DEBUG_INPUT)then
+				println("Input BlockExpand_AVC Last:"+ValLast);
+				println("Input BlockExpand_AVC Run:"+ValRun);
+				println("Input BlockExpand_AVC Value:"+Val);
+				println("");
+			end	
 		end
 
 
@@ -149,6 +166,10 @@ actor Algo_BlockExpand_AVC ()
 					ValCoeff[IdxValCoeff - 1 - j] := buff;
 				end
 			end
+			if(DEBUG_INPUT)then
+				println("Input BlockExpand_AVC Last:"+ValLast);
+				println("");
+			end	
 		end
 
 

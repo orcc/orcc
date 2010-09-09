@@ -286,6 +286,33 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="BlockExpand">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_BlockExpand_AVC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="BH4BE">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/BlackHole4BlockExpand"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="GenerateSkipBlockInformation">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_GenerateSkipBlockInformation"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -697,4 +724,17 @@
         dst-port="MbPredMbPartWidth" src="DecodeMbPred" src-port="MbPartWidth"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredMbPartIdx" src="DecodeMbPred" src-port="MbPartIdx"/>
+    <Connection dst="BlockExpand" dst-port="Value"
+        src="DecodeResidualBlock_Cavlc" src-port="Value"/>
+    <Connection dst="BlockExpand" dst-port="Run"
+        src="DecodeResidualBlock_Cavlc" src-port="Run"/>
+    <Connection dst="BH4BE" dst-port="Coeff" src="BlockExpand" src-port="Coeff"/>
+    <Connection dst="BlockExpand" dst-port="BlocksSize_Luma"
+        src="IntraPredSplit" src-port="BlocksSize_Luma"/>
+    <Connection dst="BlockExpand" dst-port="Last"
+        src="GenerateSkipBlockInformation" src-port="Last"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="Res_Last"
+        src="DecodeResidualBlock_Cavlc" src-port="Last"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="Skip_Block"
+        src="DecodeResidual" src-port="Skip_Block"/>
 </XDF>

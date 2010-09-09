@@ -48,18 +48,18 @@
       <vertex id="BlocksSize_Luma" x="1278" y="2173"/>
       <vertex id="byte2bit" x="539" y="2519"/>
       <vertex id="Algo_NALU" x="168" y="2599"/>
-      <vertex id="Algo_Synp_AVC" x="671" y="2149"/>
-      <vertex id="Algo_BlockExpand_AVC" x="1568" y="3118"/>
-      <vertex id="Algo_BlockSplit_AVC" x="1993" y="1757"/>
-      <vertex id="Algo_IntraPred_Split" x="955" y="2325"/>
-      <vertex id="MVReconstruct" x="955" y="3324"/>
-      <vertex id="Algo_MMCO" x="955" y="2680"/>
-      <vertex id="Algo_Parser_IPCM" x="955" y="3776"/>
-      <vertex id="Algo_RefList0" x="1278" y="2270"/>
-      <vertex id="Algo_RefList1" x="1278" y="2781"/>
-      <vertex id="Black_Hole" x="1568" y="2880"/>
-      <vertex id="Demux_Cavlc_Cabac" x="1278" y="3098"/>
-      <vertex id="Mux_Cavlc_Cabac" x="1797" y="3026"/>
+      <vertex id="Algo_Synp_AVC" x="455" y="2107"/>
+      <vertex id="Algo_BlockExpand_AVC" x="1271" y="2903"/>
+      <vertex id="Algo_BlockSplit_AVC" x="2050" y="1826"/>
+      <vertex id="Algo_IntraPred_Split" x="1239" y="2344"/>
+      <vertex id="MVReconstruct" x="1380" y="3828"/>
+      <vertex id="Algo_MMCO" x="1679" y="2627"/>
+      <vertex id="Algo_Parser_IPCM" x="1062" y="3911"/>
+      <vertex id="Algo_RefList0" x="1884" y="2276"/>
+      <vertex id="Algo_RefList1" x="1987" y="2658"/>
+      <vertex id="Black_Hole" x="2034" y="2875"/>
+      <vertex id="Demux_Cavlc_Cabac" x="982" y="2972"/>
+      <vertex id="Mux_Cavlc_Cabac" x="1548" y="3132"/>
       <vertex id="CheckNaluType" x="350" y="2518"/>
    </vertices>
 </layout>
