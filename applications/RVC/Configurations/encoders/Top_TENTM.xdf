@@ -57,15 +57,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Compare">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../VTL/System/Compare"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -78,7 +69,4 @@
     <Connection dst="Extract_yuv" dst-port="Height" src="SPS" src-port="Height"/>
     <Connection dst="display" dst-port="WIDTH" src="SPS" src-port="Width"/>
     <Connection dst="display" dst-port="HEIGHT" src="SPS" src-port="Height"/>
-    <Connection dst="Compare" dst-port="B" src="Merger" src-port="YUV"/>
-    <Connection dst="Compare" dst-port="WIDTH" src="SPS" src-port="Width"/>
-    <Connection dst="Compare" dst-port="HEIGHT" src="SPS" src-port="Height"/>
 </XDF>
