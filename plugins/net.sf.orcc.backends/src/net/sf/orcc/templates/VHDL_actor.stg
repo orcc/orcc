@@ -337,6 +337,11 @@ endif
 $
 >>
 
+AssignIndex(AssignIndex) ::= <<
+
+$AssignIndex$
+>>
+
 Call(call) ::= <<
 
 $

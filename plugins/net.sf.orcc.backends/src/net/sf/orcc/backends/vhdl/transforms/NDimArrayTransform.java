@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.backends.vhdl.instructions.AssignIndex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -40,8 +41,6 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
@@ -50,8 +49,8 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
  * This class defines an actor transformation that transforms indexes
- * assignments from array(index_0, index_1, index_2) to array array(index) with
- * index = index_0 & index_1 & index_2.
+ * assignments from a N dimension array(index_0, index_1, index_2) to an one
+ * dimension array(index) with index = index_0 & index_1 & index_2.
  * 
  * @author Matthieu Wipliez
  * @author Nicolas Siret
@@ -63,31 +62,33 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 	@Override
 	public void visit(Load load, Object... args) {
 		List<Expression> indexes = load.getIndexes();
-		
+
 		// An VHDL memory is always global
 		if (!indexes.isEmpty() && load.getSource().getVariable().isGlobal()) {
 			Type type = load.getSource().getVariable().getType();
 			Iterator<Integer> iit = type.getDimensions().iterator();
 			VarExpr index = null;
 			List<Expression> listIndex = new ArrayList<Expression>();
-			int sizeIndex = 0;
-			
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+
 			// Print a new assignment made up of index_i = expression for each
 			// indexes.
 			for (Expression expr : indexes) {
-				Integer size;
+				int size;
+
 				// Indexes must have the same size as the lists
-				if (!type.getDimensions().isEmpty()) {
+				if (iit.hasNext()) {
 					size = iit.next();
 				} else {
 					size = ((TypeInt) type).getSize();
 				}
+				// The VHDL require an index from 0 to size -1 so the signed bit
+				// is remove (-1) and it subtracts 1 to the size of the list
 				size = IntExpr.getSize(size - 1) - 1;
-				sizeIndex += size;
+
 				// Add the assign instruction
 				LocalVariable indexVar = procedure.newTempLocalVariable("",
 						IrFactory.eINSTANCE.createTypeUint(size), "index");
-				ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];			
 				it.previous();
 				Assign assign = new Assign(expr.getLocation(), indexVar, expr);
 				it.add(assign);
@@ -95,21 +96,14 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 				index = new VarExpr(new Use(indexVar));
 				listIndex.add(index);
 			}
-			// Add index or assignment to indexes
+			// Assign index to memory
 			Use.removeUses(load, indexes);
 			indexes.clear();
-			Iterator<Expression> it = listIndex.iterator();
-			if (listIndex.size() > 1) {
-				BinaryExpr assignment = new BinaryExpr(it.next(),
-						BinaryOp.PLUS, it.next(), index.getType());
-				while (it.hasNext()) {
-					assignment = new BinaryExpr(it.next(),
-							BinaryOp.PLUS, assignment, index.getType());
-				}				
-				indexes.add(assignment);
-			} else {
-				indexes.add(index);
-			}
+			AssignIndex assignIndex = new AssignIndex(load.getTarget(), listIndex);
+			it.previous();
+			it.add(assignIndex);
+			it.next();
+			it.remove();
 		}
 	}
 }
