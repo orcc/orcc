@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.backends.vhdl.instructions;
 
-import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
@@ -46,6 +45,7 @@ import net.sf.orcc.ir.instructions.SpecificInstruction;
 public class AssignIndex extends SpecificInstruction {
 
 	private List<Expression> indexes;
+
 	private LocalVariable target;
 
 	/**
@@ -63,24 +63,21 @@ public class AssignIndex extends SpecificInstruction {
 	}
 
 	/**
-	 * Returns the expression required by this AssignIndex.
+	 * Returns the expressions that are used by this AssignIndex.
 	 * 
-	 * @param indexes
-	 *            a list of indexes
-	 * @return the expression required by this AssignIndex
+	 * @return the expressions that are used by this AssignIndex
 	 */
-	public String setIndex(List<Expression> indexes) {
-		Iterator<Expression> it = indexes.iterator();
-		String index = "to_std(" + it.next().toString() + ")";
-		while (it.hasNext()) {
-				index = index + " & " + "to_std(" + it.next().toString() + ")";		
-		}
-		return index;
+	public List<Expression> getIndexes() {
+		return indexes;
 	}
 
-	@Override
-	public String toString() {
-		return target + " = to_integer(signed(" + setIndex(indexes) + "))";
+	/**
+	 * Returns the target of this AssignIndex.
+	 * 
+	 * @return the target of this AssignIndex
+	 */
+	public LocalVariable getTarget() {
+		return target;
 	}
 
 }
