@@ -169,6 +169,8 @@ actor Algo_BlockExpand_AVC ()
 			if(DEBUG_INPUT)then
 				println("Input BlockExpand_AVC Last:"+ValLast);
 				println("");
+				println("");
+				println("");
 			end	
 		end
 

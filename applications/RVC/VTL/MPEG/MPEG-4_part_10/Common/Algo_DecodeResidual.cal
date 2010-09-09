@@ -379,6 +379,7 @@ actor Algo_DecodeResidual()
 //				for( i = 0; i < 4 * NumC8x8; i++ )
 //					ChromaDCLevel[ iCbCr ][ i ] = 0;
 			iCbCrLoop := 0;
+			i8x8Loop  := 0;
 		end
 
 	ChromaDCResBlk: action
@@ -456,10 +457,15 @@ actor Algo_DecodeResidual()
 			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
 		end
 
+	SendSkip4ChromaDc: action
+				==>
+			Skip_Block :[ true , true ]
+		end
+
 	ChromaAcComponentNotPresent: action
 				==>
-			DecMbLayerTotal_CoeffChroma:[[0: for int i in 0 .. 31]]repeat 32,
-			Skip_Block :[ true , true , true , true ]
+			DecMbLayerTotal_CoeffChroma :[[0: for int i in 0 .. 31]]repeat 32,
+			Skip_Block :[[true: for int i in 0 .. 7]] repeat 8
 		guard
 			i8x8Loop < NumC8x8
 		do
@@ -537,8 +543,10 @@ actor Algo_DecodeResidual()
 		CheckChromaArrayType (SendEndResidual                  )--> GetParameters;
 
 		CheckChromaDc (ChromaDCResBlk )--> ChromaDCSendResBlockParam_1;
-		CheckChromaDc (ChromaAcComponentPresent )--> undefined;
-		CheckChromaDc (ChromaAcComponentNotPresent )--> ChromaAcComponentNotPresent;
+		CheckChromaDc (SendSkip4ChromaDc )--> CheckChromaAc;
+
+		CheckChromaAc (ChromaAcComponentPresent )--> undefined;
+		CheckChromaAc (ChromaAcComponentNotPresent )--> ChromaAcComponentNotPresent;
 	
 		ChromaDCSendResBlockParam_1 (SendResBlockParameters                )--> ChromaDCGetTotalCoeff_1;
 
@@ -589,7 +597,7 @@ actor Algo_DecodeResidual()
 		EndLoop8x8.IsEqualToFalse             > ResLuma_CheckCavlc8x8 > ResLumaOutput.IsLuma;
 		ResLumaOutput.IsLuma       > a;
 		ChromaArrayTypeVal.IsEqualTo1or2 > ChromaArrayTypeVal.IsEqualTo3 > SendEndResidual;
-		ChromaDCResBlk > ChromaAcComponentPresent;
+		ChromaDCResBlk > SendSkip4ChromaDc;
 		ChromaAcComponentPresent > ChromaAcComponentNotPresent;
 		ChromaAcLoopi8x8 > SendChromaCoeffToken;
 		ChromaAcLoopiCbCr > SendEndResidual;

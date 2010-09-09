@@ -8240,8 +8240,6 @@ end
 	guard
 		subMbPartIdx < NumSubMbPart()
 	do
-			println("SubMb1:"+(mbPartIdx ));
-			println("SubMb2:"+ref_idx_l0[mbPartIdx]);
 		if IS_CAVLC() then
 			start_vld();
 		else
