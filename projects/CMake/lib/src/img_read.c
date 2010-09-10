@@ -91,11 +91,9 @@ static void write_pixels(struct schedinfo_s *si) {
 	i8 *img_read_GREEN_buf = (i8 *) malloc(num_colors);
 	i8 *img_read_BLUE_buf = (i8 *) malloc(num_colors);
 
-	unsigned char *ptr_red, *ptr_green, *ptr_blue;
-
-	ptr_red = fifo_i8_write(img_read_RED, img_read_RED_buf, num_colors);
-	ptr_green = fifo_i8_write(img_read_GREEN, img_read_GREEN_buf, num_colors);
-	ptr_blue = fifo_i8_write(img_read_BLUE, img_read_BLUE_buf, num_colors);
+	u8* ptr_red = fifo_i8_write(img_read_RED, img_read_RED_buf, num_colors);
+	u8* ptr_green = fifo_i8_write(img_read_GREEN, img_read_GREEN_buf, num_colors);
+	u8* ptr_blue = fifo_i8_write(img_read_BLUE, img_read_BLUE_buf, num_colors);
 
 	int i;
 	for (i = 0; i < num_colors; i++) {
