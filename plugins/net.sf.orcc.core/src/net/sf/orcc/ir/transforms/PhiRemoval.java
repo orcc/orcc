@@ -112,7 +112,8 @@ public class PhiRemoval extends AbstractActorTransformation {
 		int phiIndex = (Integer) args[1];
 
 		LocalVariable target = phi.getTarget();
-		LocalVariable source = (LocalVariable) phi.getVars().get(phiIndex)
+		VarExpr sourceExpr = (VarExpr) phi.getValues().get(phiIndex);
+		LocalVariable source = (LocalVariable) sourceExpr.getVar()
 				.getVariable();
 
 		// if source is a local variable with index = 0, we remove it from the

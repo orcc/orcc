@@ -30,10 +30,10 @@ package net.sf.orcc.ir.instructions;
 
 import java.util.List;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
@@ -46,14 +46,14 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
 public class PhiAssignment extends AbstractInstruction implements
 		LocalTargetContainer {
 
-	private List<Use> localUses;
-
 	/**
 	 * Only used when translating to SSA form.
 	 */
 	private LocalVariable oldVariable;
 
 	private LocalVariable target;
+
+	private List<Expression> values;
 
 	/**
 	 * Creates a new <code>phi</code> assignment with the given target and list
@@ -64,10 +64,11 @@ public class PhiAssignment extends AbstractInstruction implements
 	 * @param vars
 	 *            a list of uses
 	 */
-	public PhiAssignment(Location location, LocalVariable target, List<Use> vars) {
+	public PhiAssignment(Location location, LocalVariable target,
+			List<Expression> values) {
 		super(location);
 		setTarget(target);
-		this.localUses = vars;
+		this.values = values;
 	}
 
 	@Override
@@ -95,8 +96,8 @@ public class PhiAssignment extends AbstractInstruction implements
 		return target;
 	}
 
-	public List<Use> getVars() {
-		return localUses;
+	public List<Expression> getValues() {
+		return values;
 	}
 
 	@Override
@@ -127,7 +128,7 @@ public class PhiAssignment extends AbstractInstruction implements
 
 	@Override
 	public String toString() {
-		return getTarget() + " = phi(" + localUses + ")";
+		return getTarget() + " = phi(" + values + ")";
 	}
 
 }

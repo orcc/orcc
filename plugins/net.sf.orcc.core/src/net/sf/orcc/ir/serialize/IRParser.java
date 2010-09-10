@@ -681,13 +681,14 @@ public class IRParser {
 			throws JSONException, OrccException {
 		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
-		List<Use> vars = new ArrayList<Use>(2);
+		List<Expression> values = new ArrayList<Expression>(2);
 		array = array.getJSONArray(1);
 		for (int i = 0; i < array.length(); i++) {
-			vars.add(parseVarUse(array.getJSONArray(i)));
+			Use use = parseVarUse(array.getJSONArray(i));
+			values.add(new VarExpr(use));
 		}
 
-		PhiAssignment phi = new PhiAssignment(loc, target, vars);
+		PhiAssignment phi = new PhiAssignment(loc, target, values);
 		target.setInstruction(phi);
 		return phi;
 	}

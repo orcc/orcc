@@ -80,7 +80,6 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
-import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -300,8 +299,8 @@ public class IRWriter {
 			// sources
 			JSONArray sources = new JSONArray();
 			instr.put(sources);
-			for (Use use : phi.getVars()) {
-				sources.put(writeVariable(use.getVariable()));
+			for (Expression value : phi.getValues()) {
+				sources.put(writeExpression(value));
 			}
 		}
 

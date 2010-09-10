@@ -29,13 +29,16 @@
 package net.sf.orcc.ir.transforms;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
@@ -136,7 +139,12 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 		if (!variable.isUsed()) {
 			// clean up uses
 			phi.setTarget(null);
-			Use.removeUses(phi.getVars());
+			List<Expression> values = phi.getValues();
+
+			for (Expression value : values) {
+				VarExpr varExpr = (VarExpr) value;
+				varExpr.getVar().remove();
+			}
 
 			// remove instruction
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];

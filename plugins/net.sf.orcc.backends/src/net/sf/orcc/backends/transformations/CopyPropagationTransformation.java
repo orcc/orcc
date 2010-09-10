@@ -48,70 +48,70 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
- * Split expression and effective node.
+ * Remove instructions that directly assign a value or a variable to a target
  * 
  * @author Jérôme GORIN
  * 
  */
 public class CopyPropagationTransformation extends AbstractActorTransformation {
-	
+
 	private class ExpressionCopy extends AbstractExpressionInterpreter {
-		private Map<Variable ,Expression> copyVars;
-		
-		public ExpressionCopy(Map<Variable ,Expression> copyVars) {
+		private Map<Variable, Expression> copyVars;
+
+		public ExpressionCopy(Map<Variable, Expression> copyVars) {
 			this.copyVars = copyVars;
 		}
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
 			Variable var = expr.getVar().getVariable();
-			if (copyVars.containsKey(var)){
-				return copyVars.get(var);	
+			if (copyVars.containsKey(var)) {
+				return copyVars.get(var);
 			}
-			
+
 			return expr;
 		}
 	}
-	
-	private Map<Variable ,Expression> copyVars;
+
+	private Map<Variable, Expression> copyVars;
 	private ExpressionCopy expressionCopy;
 	private List<Instruction> removedInstrs;
-	
-	public CopyPropagationTransformation(){
-		copyVars = new HashMap<Variable , Expression>();
+
+	public CopyPropagationTransformation() {
+		copyVars = new HashMap<Variable, Expression>();
 		expressionCopy = new ExpressionCopy(copyVars);
 		removedInstrs = new ArrayList<Instruction>();
-		
+
 	}
-	
+
 	@Override
 	public void visit(Assign assign, Object... args) {
 		Expression value = assign.getValue();
-		
-		if ((!(value instanceof BinaryExpr))&&(!(value instanceof UnaryExpr))){
-				LocalVariable target = assign.getTarget();
-				Expression expr = assign.getValue();
-				
-				copyVars.put(target, expr);
-				removedInstrs.add(assign);
+
+		if ((!(value instanceof BinaryExpr)) && (!(value instanceof UnaryExpr))) {
+			LocalVariable target = assign.getTarget();
+			Expression expr = assign.getValue();
+
+			copyVars.put(target, expr);
+			removedInstrs.add(assign);
 		}
-	}	
-	
+	}
+
 	@Override
 	public void visit(Return returnInstr, Object... args) {
 		Expression expr = returnInstr.getValue();
-		if (expr != null){
-			Expression newExpr = (Expression)expr.accept(expressionCopy);
+		if (expr != null) {
+			Expression newExpr = (Expression) expr.accept(expressionCopy);
 			returnInstr.setValue(newExpr);
 		}
 	}
-	
+
 	@Override
 	public void visitProcedure(Procedure procedure) {
 		copyVars.clear();
 		super.visitProcedure(procedure);
-		BlockNode.getFirst(procedure).getInstructions().removeAll(removedInstrs);
+		BlockNode.getFirst(procedure).getInstructions()
+				.removeAll(removedInstrs);
 	}
-
 
 }

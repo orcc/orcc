@@ -148,6 +148,36 @@ public class SSATransformation extends AbstractActorTransformation {
 	}
 
 	/**
+	 * Find all the CFG nodes in the given node, and puts them in the given set.
+	 * 
+	 * @param nodes
+	 *            resultant set of nodes
+	 * @param node
+	 *            a CFG node
+	 */
+	private void findNodes(Set<CFGNode> nodes, CFGNode node) {
+		nodes.add(node);
+		if (node.isIfNode()) {
+			IfNode ifNode = (IfNode) node;
+			for (CFGNode subNode : ifNode.getThenNodes()) {
+				findNodes(nodes, subNode);
+			}
+
+			for (CFGNode subNode : ifNode.getElseNodes()) {
+				findNodes(nodes, subNode);
+			}
+
+			nodes.add(ifNode.getJoinNode());
+		} else if (node.isWhileNode()) {
+			WhileNode whileNode = (WhileNode) node;
+			for (CFGNode subNode : whileNode.getNodes()) {
+				findNodes(nodes, subNode);
+			}
+			nodes.add(whileNode.getJoinNode());
+		}
+	}
+
+	/**
 	 * Inserts a phi in the (current) join node.
 	 * 
 	 * @param oldVar
@@ -170,15 +200,15 @@ public class SSATransformation extends AbstractActorTransformation {
 
 		if (phi == null) {
 			LocalVariable target = newDefinition(oldVar);
-			List<Use> uses = new ArrayList<Use>(2);
-			phi = new PhiAssignment(new Location(), target, uses);
+			List<Expression> values = new ArrayList<Expression>(2);
+			phi = new PhiAssignment(new Location(), target, values);
 			phi.setOldVariable(oldVar);
 			join.add(phi);
 
 			Use use = new Use(oldVar, phi);
-			uses.add(use);
+			values.add(new VarExpr(use));
 			use = new Use(oldVar, phi);
-			uses.add(use);
+			values.add(new VarExpr(use));
 
 			if (loop != null) {
 				replaceUsesInLoop(oldVar, target);
@@ -186,9 +216,10 @@ public class SSATransformation extends AbstractActorTransformation {
 		}
 
 		// replace use
-		phi.getVars().get(branch - 1).remove();
+		VarExpr varExpr = (VarExpr) phi.getValues().get(branch - 1);
+		varExpr.getVar().remove();
 		Use use = new Use(newVar, phi);
-		phi.getVars().set(branch - 1, use);
+		phi.getValues().set(branch - 1, new VarExpr(use));
 	}
 
 	/**
@@ -306,36 +337,6 @@ public class SSATransformation extends AbstractActorTransformation {
 			if (node != join && nodes.contains(node)) {
 				use.setVariable(newVar);
 			}
-		}
-	}
-
-	/**
-	 * Find all the CFG nodes in the given node, and puts them in the given set.
-	 * 
-	 * @param nodes
-	 *            resultant set of nodes
-	 * @param node
-	 *            a CFG node
-	 */
-	private void findNodes(Set<CFGNode> nodes, CFGNode node) {
-		nodes.add(node);
-		if (node.isIfNode()) {
-			IfNode ifNode = (IfNode) node;
-			for (CFGNode subNode : ifNode.getThenNodes()) {
-				findNodes(nodes, subNode);
-			}
-
-			for (CFGNode subNode : ifNode.getElseNodes()) {
-				findNodes(nodes, subNode);
-			}
-
-			nodes.add(ifNode.getJoinNode());
-		} else if (node.isWhileNode()) {
-			WhileNode whileNode = (WhileNode) node;
-			for (CFGNode subNode : whileNode.getNodes()) {
-				findNodes(nodes, subNode);
-			}
-			nodes.add(whileNode.getJoinNode());
 		}
 	}
 
