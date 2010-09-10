@@ -167,7 +167,11 @@ public:
 			int res = 0;
 			$printSchedulers(instances)$
 			if(res == 0)
+#ifdef _WIN32
 				Sleep(0);
+#else
+				sched_yield();
+#endif
 		}
 	}	
 };
@@ -233,8 +237,8 @@ $threads.keys: stopNetwork(); separator="\n"$
 network(debugFifos, fifoSize, network, options) ::= <<
 // Generated from "$network.name$"
 
-#include "FifoFactory.h"
-#include "Threadaka.h"
+#include "fifofactory.h"
+#include "threadaka.h"
 
 $if (options.needSerDes)$
 #include "WrapperAka.h"
