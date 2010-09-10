@@ -468,8 +468,9 @@ public class IRParser {
 
 	private List<Expression> parseExprs(JSONArray array) throws JSONException,
 			OrccException {
-		List<Expression> exprs = new ArrayList<Expression>(0);
-		for (int i = 0; i < array.length(); i++) {
+		int length = array.length();
+		List<Expression> exprs = new ArrayList<Expression>(length);
+		for (int i = 0; i < length; i++) {
 			exprs.add(parseExpr(array.getJSONArray(i)));
 		}
 
@@ -681,12 +682,7 @@ public class IRParser {
 			throws JSONException, OrccException {
 		LocalVariable target = (LocalVariable) getVariable(array
 				.getJSONArray(0));
-		List<Expression> values = new ArrayList<Expression>(2);
-		array = array.getJSONArray(1);
-		for (int i = 0; i < array.length(); i++) {
-			Use use = parseVarUse(array.getJSONArray(i));
-			values.add(new VarExpr(use));
-		}
+		List<Expression> values = parseExprs(array.getJSONArray(1));
 
 		PhiAssignment phi = new PhiAssignment(loc, target, values);
 		target.setInstruction(phi);

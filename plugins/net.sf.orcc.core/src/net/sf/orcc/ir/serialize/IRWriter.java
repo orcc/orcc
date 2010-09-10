@@ -297,11 +297,7 @@ public class IRWriter {
 			instr.put(writeVariable(phi.getTarget()));
 
 			// sources
-			JSONArray sources = new JSONArray();
-			instr.put(sources);
-			for (Expression value : phi.getValues()) {
-				sources.put(writeExpression(value));
-			}
+			instr.put(writeExpressions(phi.getValues()));
 		}
 
 		@Override
