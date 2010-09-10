@@ -313,6 +313,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="BH">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/BlackHole4Output"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -737,4 +746,16 @@
         src="DecodeResidualBlock_Cavlc" src-port="Last"/>
     <Connection dst="GenerateSkipBlockInformation" dst-port="Skip_Block"
         src="DecodeResidual" src-port="Skip_Block"/>
+    <Connection dst="GenerateSkipBlockInformation"
+        dst-port="NbCoeffInMB" src="DecodeMacroBlockLayer" src-port="NbCoeffInMB"/>
+    <Connection dst="GenerateSkipBlockInformation"
+        dst-port="MbLay_SkipMb" src="DecodeMacroBlockLayer" src-port="SkipMacroBlk"/>
+    <Connection dst="GenerateSkipBlockInformation"
+        dst-port="SData_SkipMb" src="DecodeSliceData_Cavlc" src-port="SkipMbLayer"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="SData_SzMb"
+        src="DecodeSliceData_Cavlc" src-port="SzMbSkipped"/>
+    <Connection dst="BH" dst-port="PicSizeInMb"
+        src="DecodeSliceData_Cavlc" src-port="PicSizeInMb"/>
+    <Connection dst="BH" dst-port="HEIGHT" src="DecodeSps" src-port="Height"/>
+    <Connection dst="BH" dst-port="WIDTH" src="DecodeSps" src-port="Width"/>
 </XDF>

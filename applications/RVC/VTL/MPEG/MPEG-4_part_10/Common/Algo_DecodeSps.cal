@@ -45,7 +45,10 @@ actor Algo_DecodeSps()
 	uint(size=5)  MMCO_NumRefFrame,
 
 	uint(size=32) Pps_PicWidthInMbs,
-	uint(size=32) Pps_PicHeightInMapUnits
+	uint(size=32) Pps_PicHeightInMapUnits, 
+
+	int(size=16) Height,
+	int(size=16) Width
 		:
 
 
@@ -427,6 +430,8 @@ actor Algo_DecodeSps()
 	ReadNumRefFrame.Done: action
 			ValVLD :[ValueOfVLD] repeat 5
 				==>
+			Height :[pic_height_in_map_units_minus1[sps_id] + 1],
+			Width  :[pic_width_in_mbs_minus1[sps_id] + 1]
 	var
 		uint(size=32) PicWidthInMacroBs,
 		uint(size=32) FrameHeightInMacroBs,

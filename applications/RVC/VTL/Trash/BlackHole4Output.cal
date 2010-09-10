@@ -1,0 +1,19 @@
+actor BlackHole4Output()
+			uint(size=13) PicSizeInMb,
+			int(size=16) HEIGHT,
+			int(size=16) WIDTH
+	==>
+	:
+
+	action PicSizeInMb:[a]
+		==>
+	end
+
+	action HEIGHT:[a]
+		==>
+	end
+
+	action WIDTH:[a]
+		==>
+	end
+end

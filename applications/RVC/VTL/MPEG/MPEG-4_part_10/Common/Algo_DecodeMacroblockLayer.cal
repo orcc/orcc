@@ -81,7 +81,10 @@ actor Algo_DecodeMacroblockLayer()
 	bool         MergeTransfSz8x8,
 	int(size=9)  pix_I_PCM_Y,
 	int(size=9)  pix_I_PCM_U,
-	int(size=9)  pix_I_PCM_V
+	int(size=9)  pix_I_PCM_V,
+
+	uint(size=5)  NbCoeffInMB,
+	bool          SkipMacroBlk
 		:
 
 
@@ -429,6 +432,18 @@ actor Algo_DecodeMacroblockLayer()
 			end
 		end
 
+	CheckMbType.IsNotIPCM: action
+				==>
+			NbCoeffInMB :[NbCoeff]
+		var
+			uint(size=5) NbCoeff
+		do
+			NbCoeff := 16 + 1 + 1 + 4 + 4; // 16 Luma AC + 1 * 2 Chroma DC + 4 * 2 Chroma AC
+			if(Is_Intra_16x16(mb_type))then
+				NbCoeff := NbCoeff + 1;// 1 Luma DC
+			end
+		end
+
 	LaunchSubMbPred: action
 				==>
 			SkipNal     :[   false   ],
@@ -594,7 +609,9 @@ actor Algo_DecodeMacroblockLayer()
 			ResLeftMbExists      :[LeftMb_Exists],
 			ResAboveMbExists     :[AboveMb_Exists],
 			ResChromaArrayType   :[Chroma_Array_Type],
-			ResNumC8x8           :[NumC8x8]
+			ResNumC8x8           :[NumC8x8],
+
+			SkipMacroBlk         :[false]
 		end
 
 	GetResidualCoeffToken: action
@@ -608,7 +625,8 @@ actor Algo_DecodeMacroblockLayer()
 	NoResidual: action
 				==>
 			SData_Total_CoeffLuma   :[[0: for int s in 0 .. 15]] repeat 16,
-			SData_Total_CoeffChroma :[[0: for int s in 0 .. 31]] repeat 32
+			SData_Total_CoeffChroma :[[0: for int s in 0 .. 31]] repeat 32,
+			SkipMacroBlk            :[ true ]
 		end
 
 	SendEndSliceHeader: action
@@ -622,9 +640,11 @@ actor Algo_DecodeMacroblockLayer()
 		ReadMbType                (ReadMbType.Done                )--> CheckMbType;
 
 		CheckMbType               (CheckMbType.IsIPCM             )--> ReadPcmSampleLuma;
-		CheckMbType               (LaunchSubMbPred                )--> CheckSubMbType;
-		CheckMbType               (ReadTransformSize.Asked        )--> ReadTransformSize8x8_1;
-		CheckMbType               (LaunchMbPred                   )--> Check4CodedBlockPattern;
+		CheckMbType               (CheckMbType.IsNotIPCM          )--> CheckMbPred;
+
+		CheckMbPred               (LaunchSubMbPred                )--> CheckSubMbType;
+		CheckMbPred               (ReadTransformSize.Asked        )--> ReadTransformSize8x8_1;
+		CheckMbPred               (LaunchMbPred                   )--> Check4CodedBlockPattern;
 
 		/* PCM Macroblock */
 		ReadPcmSampleLuma         (ReadPcmSampleLuma.Done         )--> ReadPcmSampleChroma1Asked;
@@ -669,7 +689,8 @@ actor Algo_DecodeMacroblockLayer()
 	end
 
 	priority
-		CheckMbType.IsIPCM          > LaunchSubMbPred     > ReadTransformSize.Asked > LaunchMbPred;
+		CheckMbType.IsIPCM          > CheckMbType.IsNotIPCM;
+		LaunchSubMbPred             > ReadTransformSize.Asked > LaunchMbPred;
 		ReadCodedBlockPattern.Asked > ReadMbQpDelta.Asked;
 		ReadTransformSize8x8.Asked  > ReadMbQpDelta.Asked;
 		ReadMbQpDelta.Asked         > NoResidual;

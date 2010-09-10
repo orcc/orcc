@@ -67,10 +67,12 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=2)  DecMbLayerNumC8x8,
 
 	bool          SkipMbLayer,
+	uint(size=5)  SzMbSkipped,
 
 	bool          ConstraindedIntraPredFlag,
 	uint(size=13) CurrMbAddr,
-	uint(size=7)  PicWidthInMb,
+	uint(size=7)  PicWidthInMb, 
+	uint(size=13) PicSizeInMb,
 	uint(size=13) FirstMbInSlice
 		:
 
@@ -238,8 +240,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			ConstraindedIntraPredFlag :[constrained_intra_pred_flag],
 			CurrMbAddr                :[curr_mb_addr - 1],
 			PicWidthInMb              :[PicWidthInMbs],
+			PicSizeInMb               :[PicSizeInMbs],
 			FirstMbInSlice            :[first_mb_in_slice],
-			SkipMbLayer               :[true]
+			SkipMbLayer               :[true],
+			SzMbSkipped               :[16+1+1+4+4]
 		guard
 			mb_skip_run > 0
 		do
@@ -383,6 +387,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			ConstraindedIntraPredFlag :[constrained_intra_pred_flag],
 			CurrMbAddr                :[curr_mb_addr],
 			PicWidthInMb              :[PicWidthInMbs],
+			PicSizeInMb               :[PicSizeInMbs],
 			FirstMbInSlice            :[first_mb_in_slice],
 			SkipMbLayer               :[false]
 		end
