@@ -379,11 +379,20 @@ LoadLocalPort(instr) ::= <<
 label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
 
 phiPairs(phi) ::= <<
-$phiVars(vars=first(phi.vars), node = first(phi.block.predecessors))$, $phiVars(vars=first(rest(phi.vars)), node = rest(phi.block.predecessors))$
+$phiExpr(expr=first(phi.values), node = first(phi.block.predecessors))$, $phiExpr(expr=first(rest(phi.values)), node = rest(phi.block.predecessors))$
 >>
 
-phiVars(vars, node) ::= <<
-[$if(vars.variable.indexed)$ %$vars$ $else$ 0 $endif$, %b$label(node)$ ]
+phiExpr(expr, node) ::= <<
+[$if(expr.varExpr)
+	$$if(expr.var.variable.indexed)
+		$ %$expr$ $
+	else
+		$ 0 $
+	endif
+	$$
+else
+	$ Expr(expr) $
+endif$ , %b$label(node)$ ]
 >>
 
 
