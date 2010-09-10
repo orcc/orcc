@@ -61,6 +61,5 @@
       <vertex id="Demux_Cavlc_Cabac" x="1278" y="3098"/>
       <vertex id="Mux_Cavlc_Cabac" x="1797" y="3026"/>
       <vertex id="CheckNaluType" x="350" y="2518"/>
-      <vertex id="BlackHole" x="1599" y="2541"/>
    </vertices>
 </layout>

@@ -42,6 +42,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=13) FstMbInSlc,
 	uint(size=4)  SliceType,
 	bool          MbaffFrame,
+	uint(size=2)  DisDeblocFilterIdc,
+	int(size=6)   SliceBetaOffset,
+	int (size=6)  SliceAlphaC0Offset,
 
 	uint(size=5)  Total_CoeffLuma,
 	uint(size=5)  Total_CoeffChroma
@@ -73,7 +76,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=13) CurrMbAddr,
 	uint(size=7)  PicWidthInMb, 
 	uint(size=13) PicSizeInMb,
-	uint(size=13) FirstMbInSlice
+	uint(size=13) FirstMbInSlice,
+	uint(size=2)  LFDisable,
+	int(size=6)   Slice_Beta_Offset,
+	int(size=6)   Slice_Alpha_C0_Offset
 		:
 
 
@@ -129,6 +135,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=4)  slice_type;
 	bool          MbaffFrameFlag;
 	uint(size=13) first_mb_in_slice;
+	uint(size=2)  disable_deblocking_filter_idc;
+	int(size=6)   slice_beta_offset;
+	int(size=6)   slice_alpha_c0_offset;
 
 	bool          moreDataFlag;
 	bool          prevMbSkipped;
@@ -166,24 +175,30 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			NumRefIdxLXActive     :[ValNumRefIdxLXActive] repeat 2,
 			ChromaArrayType       :[ValChromaArrayType],
 			Num_C8x8              :[ValNum_C8x8],
-			ConstraindedIntraPred :[ValConstrIntrPred]
+			ConstraindedIntraPred :[ValConstrIntrPred],
+			DisDeblocFilterIdc    :[ValDisDebFil],
+			SliceBetaOffset       :[ValSliceBetaOffset],
+			SliceAlphaC0Offset    :[ValSliceAlphaC0Offset]
 				==>
 		guard
 			Is_CBP = false
 		do
-			entropy_coding_mode_flag    := ValEntropyCodingMode;
-			slice_type                  := ValSliceType;
-			MbaffFrameFlag              := ValMbaffFrame;
-			bit_depth_luma              := ValBitDepthLuma;
-			bit_depth_chroma            := ValBitDepthChroma;
-			direct_8x8_inference_flag   := ValDirect8x8Inference;
-			transform_8x8_mode_flag     := ValTransform8x8Mode;
-			num_ref_idx_l0_active       := ValNumRefIdxLXActive[0];
-			num_ref_idx_l1_active       := ValNumRefIdxLXActive[1];
-			Chroma_Array_Type           := ValChromaArrayType;
-			NumC8x8                     := ValNum_C8x8;
-			constrained_intra_pred_flag := ValConstrIntrPred;
-			first_mb_in_slice           := ValFirstMbInSlice;
+			entropy_coding_mode_flag      := ValEntropyCodingMode;
+			slice_type                    := ValSliceType;
+			MbaffFrameFlag                := ValMbaffFrame;
+			bit_depth_luma                := ValBitDepthLuma;
+			bit_depth_chroma              := ValBitDepthChroma;
+			direct_8x8_inference_flag     := ValDirect8x8Inference;
+			transform_8x8_mode_flag       := ValTransform8x8Mode;
+			num_ref_idx_l0_active         := ValNumRefIdxLXActive[0];
+			num_ref_idx_l1_active         := ValNumRefIdxLXActive[1];
+			Chroma_Array_Type             := ValChromaArrayType;
+			NumC8x8                       := ValNum_C8x8;
+			constrained_intra_pred_flag   := ValConstrIntrPred;
+			first_mb_in_slice             := ValFirstMbInSlice;
+			disable_deblocking_filter_idc := ValDisDebFil;
+			slice_beta_offset             := ValSliceBetaOffset;
+			slice_alpha_c0_offset         := ValSliceAlphaC0Offset;
 
 			curr_mb_addr :=
 				if(MbaffFrameFlag = false)then
@@ -243,7 +258,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			PicSizeInMb               :[PicSizeInMbs],
 			FirstMbInSlice            :[first_mb_in_slice],
 			SkipMbLayer               :[true],
-			SzMbSkipped               :[16+1+1+4+4]
+			SzMbSkipped               :[16+1+1+4+4],
+			LFDisable                 :[disable_deblocking_filter_idc],
+			Slice_Beta_Offset         :[slice_beta_offset],
+			Slice_Alpha_C0_Offset     :[slice_alpha_c0_offset]
 		guard
 			mb_skip_run > 0
 		do
@@ -389,7 +407,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			PicWidthInMb              :[PicWidthInMbs],
 			PicSizeInMb               :[PicSizeInMbs],
 			FirstMbInSlice            :[first_mb_in_slice],
-			SkipMbLayer               :[false]
+			SkipMbLayer               :[false],
+			LFDisable                 :[disable_deblocking_filter_idc],
+			Slice_Beta_Offset         :[slice_beta_offset],
+			Slice_Alpha_C0_Offset     :[slice_alpha_c0_offset]
 		end
 
 

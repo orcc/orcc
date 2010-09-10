@@ -51,7 +51,8 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	int (size=16) MvRes,
 	uint(size=5)  MbPartHeight,
 	uint(size=5)  MbPartWidth,
-	uint(size=3)  MbPartIdx
+	uint(size=3)  MbPartIdx,
+	int(size=8)   ScalingList
 		:
 
 	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
@@ -73,7 +74,8 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			MvRes        :[0,0],
 			MbPartHeight :[16],
 			MbPartWidth  :[16],
-			MbPartIdx    :[1]
+			MbPartIdx    :[1],
+			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16
 		guard
 			skip = true
 		end
@@ -82,6 +84,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			SkipMbLayer :[skip],
 			MbType      :[mb_type]
 				==>
+			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16
 		guard
 			skip    =  false,
 			mb_type = BLOCK_TYPE_I_8x8_or_4x4
@@ -129,7 +132,8 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			TransfSz8x8Flag :[Is8x8]
 				==>
 			MbIntraFlag   :[1],
-			IntraPredMode :[ 3 , (mb_type-1) mod 4]
+			IntraPredMode :[ 3 , (mb_type-1) mod 4],
+			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16
 		guard
 			skip     =  false,
 			mb_type >= BLOCK_TYPE_INTRA_16x16_MIN,
@@ -153,7 +157,8 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			MbType          :[Mb_type],
 			TransfSz8x8Flag :[Is8x8]
 				==>
-			MbIntraFlag :[0]
+			MbIntraFlag :[0],
+			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16
 		guard
 			skip    = false,
 			Mb_type > MB_TYPE_INTRA_MAX

@@ -766,4 +766,18 @@
         src="DecodeMacroBlockLayer" src-port="cbp_blk"/>
     <Connection dst="BH" dst-port="cbp_blk"
         src="GenerateSkipBlockInformation" src-port="cbp_blk"/>
+    <Connection dst="BH" dst-port="ScalingList"
+        src="MergeDataFromSDataAndMbLayer" src-port="ScalingList"/>
+    <Connection dst="BH" dst-port="LFDisable"
+        src="DecodeSliceData_Cavlc" src-port="LFDisable"/>
+    <Connection dst="DecodeSliceData_Cavlc"
+        dst-port="DisDeblocFilterIdc" src="DecodeSliceHeader" src-port="DisDeblockingFilterIdc"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="SliceBetaOffset"
+        src="DecodeSliceHeader" src-port="SliceBetaOffset"/>
+    <Connection dst="BH" dst-port="size_beta_offset"
+        src="DecodeSliceData_Cavlc" src-port="Slice_Beta_Offset"/>
+    <Connection dst="BH" dst-port="slice_alpha_c0_offset"
+        src="DecodeSliceData_Cavlc" src-port="Slice_Alpha_C0_Offset"/>
+    <Connection dst="DecodeSliceData_Cavlc"
+        dst-port="SliceAlphaC0Offset" src="DecodeSliceHeader" src-port="SliceAlphaC0Offset"/>
 </XDF>

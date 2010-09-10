@@ -52,7 +52,10 @@ actor Algo_DecodeSliceHeader()
 	uint(size=13) FirstMbInSlice,
 	bool          MbaffFrame,
 
-	uint(size=32) Poc
+	uint(size=32) Poc,
+	uint(size=2)  DisDeblockingFilterIdc,
+	int (size=6)  SliceBetaOffset,
+	int (size=6)  SliceAlphaC0Offset
 		:
 
 
@@ -106,7 +109,7 @@ actor Algo_DecodeSliceHeader()
 	bool          sp_for_switch_flag;
 	uint(size=6)  slice_qs_delta;
 	uint(size=2)  disable_deblocking_filter_idc := 0;
-	int(size=6)   slice_alpha_c0_offset;
+	int(size=6)   slice_alpha_c0_offset         := 0;
 	int(size=6)   slice_beta_offset             := 0;
 	uint(size=32) slice_group_change_cycle      := 0;
 	//Sps Parameters
@@ -152,6 +155,10 @@ actor Algo_DecodeSliceHeader()
 			SkipNal      :[  false ,  false ,  false ],//Keep synchro
 			LaunchActor  :[ SLICE_HEADER , SLICE_HEADER , SLICE_HEADER ],
 			TypeOfVLD    :[ VLD_UE , VLD_UE , VLD_UE ]
+	do
+		disable_deblocking_filter_idc := 0;
+		slice_alpha_c0_offset         := 0;
+		slice_beta_offset             := 0;
 	end
 
 
@@ -732,11 +739,11 @@ actor Algo_DecodeSliceHeader()
 			ValVLD :[VLDecoding] repeat 2
 				==>
 		do
-			slice_alpha_c0_offset := VLDecoding[0];
-			slice_beta_offset     := VLDecoding[1];
+			slice_alpha_c0_offset := VLDecoding[0] * 2;
+			slice_beta_offset     := VLDecoding[1] * 2;
 			if(DEBUG_FLAG_DECODED)then
-				println("\t\tslice_alpha_c0_offset: "+slice_alpha_c0_offset);
-				println("\t\tslice_beta_offset: "+slice_beta_offset);
+				println("\t\tslice_alpha_c0_offset_div2: "+VLDecoding[0]);
+				println("\t\tslice_beta_offset_div2: "+VLDecoding[1]);
 			end
 		end
 
@@ -756,7 +763,7 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadSlcGrpChgCycl.Done: action
-			ValVLD :[VLDecoding]
+			ValVLD             :[VLDecoding]
 				==>
 		do
 			slice_group_change_cycle := VLDecoding;
@@ -768,7 +775,10 @@ actor Algo_DecodeSliceHeader()
 
 	SendEndSliceHeader: action
 				==>
-			SkipNal :[true]
+			DisDeblockingFilterIdc :[disable_deblocking_filter_idc],
+			SliceBetaOffset        :[slice_beta_offset],
+			SliceAlphaC0Offset     :[slice_alpha_c0_offset],
+			SkipNal                :[true]
 		end
 
 /*   
