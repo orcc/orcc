@@ -40,6 +40,7 @@ actor Algo_DecodeSps()
 	bool          Direct8x8Inference,
 	uint(size=2)  ChromaArrayType,
 	uint(size=2)  Num_C8x8,
+	uint(size=5)  SizeDPBMax,
 
 	uint(size=31) MMCO_MaxFrameNum,
 	uint(size=5)  MMCO_NumRefFrame,
@@ -47,8 +48,8 @@ actor Algo_DecodeSps()
 	uint(size=32) Pps_PicWidthInMbs,
 	uint(size=32) Pps_PicHeightInMapUnits, 
 
-	int(size=16) Height,
-	int(size=16) Width
+	int (size=16) Height,
+	int (size=16) Width
 		:
 
 
@@ -170,6 +171,7 @@ actor Algo_DecodeSps()
 			Direct8x8Inference          :[ValDirect8x8Inference],
 			ChromaArrayType             :[Chroma_Array_Type[ValSps]],
 			Num_C8x8                    :[NumC8x8[ValSps]],
+			SizeDPBMax                  :[MaxDPBSz[ValSps]],
 
 			MMCO_MaxFrameNum            :[max_frame_num[ValSps]],
 			MMCO_NumRefFrame            :[num_ref_frames[ValSps]]

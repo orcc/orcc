@@ -1,19 +1,46 @@
 actor BlackHole4Output()
-			uint(size=13) PicSizeInMb,
-			int(size=16) HEIGHT,
-			int(size=16) WIDTH
-	==>
-	:
+	uint(size=4) IntraPredModeC, 
+	uint(size=13) PicSizeInMb,
+	int(size=16) HEIGHT,
+	int(size=16) WIDTH,
+	uint(size=5)  SizeDPBMax,
+	uint(size=16) cbp_blk
+		==>
+		:
 
 	action PicSizeInMb:[a]
 		==>
+	do
+//		println("PicSizeInMb:"+a);
 	end
 
 	action HEIGHT:[a]
 		==>
+	do
+		println("HEIGHT:"+a);
 	end
 
 	action WIDTH:[a]
 		==>
+	do
+		println("WIDTH:"+a);
+	end
+
+	action SizeDPBMax:[a]
+		==>
+	do
+//	println("SizeDPBMax:"+a);
+	end
+
+	action IntraPredModeC:[a]
+		==>
+	do
+//		println("IntraPredModeC:"+a);
+	end
+
+	action cbp_blk:[a]
+		==>
+	do
+		println("cbp_blk:"+a);
 	end
 end

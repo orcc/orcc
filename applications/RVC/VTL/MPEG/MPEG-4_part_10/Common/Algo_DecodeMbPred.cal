@@ -35,6 +35,7 @@ actor Algo_DecodeMbPred()
 	uint(size=3) MbPartIdx,
 	bool         EndRefIdxL0,
 
+	uint(size=4) IntraPredModeC, 
 	int(size=16) MvRes,
 	bool         EndMvRes
 		:
@@ -87,7 +88,7 @@ actor Algo_DecodeMbPred()
 	uint(size=5)  lumaYxYBlkIdx := 0;
 	uint(size=2)  BitMissed     := 0;
 	int (size=5)  CountBit      := 0;
-	uint(size=2)  intra_chroma_pred_mode;
+	//uint(size=2)  intra_chroma_pred_mode;
 	uint(size=5)  mbPartIdx     := 0;
 	uint(size=5)  mbPartIdxMax  := 0;
 	//MbLayer Parameters
@@ -370,10 +371,11 @@ actor Algo_DecodeMbPred()
 		end
 
 	ReadIntraChroma: action
-			ValVLD :[ValueOfVLD]
+			ValVLD         :[ValueOfVLD]
 				==>
+			IntraPredModeC :[ValueOfVLD]
 		do
-			intra_chroma_pred_mode := ValueOfVLD;
+			//intra_chroma_pred_mode := ValueOfVLD;
 			if(DEBUG_FLAG_DECODED)then
 				println("intra_chroma_pred_mode : "+ValueOfVLD);
 			end

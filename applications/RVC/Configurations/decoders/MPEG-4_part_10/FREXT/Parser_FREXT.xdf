@@ -758,4 +758,12 @@
         src="DecodeSliceData_Cavlc" src-port="PicSizeInMb"/>
     <Connection dst="BH" dst-port="HEIGHT" src="DecodeSps" src-port="Height"/>
     <Connection dst="BH" dst-port="WIDTH" src="DecodeSps" src-port="Width"/>
+    <Connection dst="BH" dst-port="SizeDPBMax" src="DecodeSps" src-port="SizeDPBMax"/>
+    <Connection dst="BH" dst-port="IntraPredModeC" src="DecodeMbPred" src-port="IntraPredModeC"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="IsIPCM"
+        src="DecodeMacroBlockLayer" src-port="IsIPCM"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="CbpBlk"
+        src="DecodeMacroBlockLayer" src-port="cbp_blk"/>
+    <Connection dst="BH" dst-port="cbp_blk"
+        src="GenerateSkipBlockInformation" src-port="cbp_blk"/>
 </XDF>

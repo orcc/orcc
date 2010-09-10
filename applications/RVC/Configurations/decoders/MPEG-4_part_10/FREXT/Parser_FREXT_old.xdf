@@ -472,6 +472,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="BlackHole">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/BlackHole4Output"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -632,4 +641,13 @@
     <Connection dst="Algo_RefList0" dst-port="EmptyDPB" src="Algo_MMCO" src-port="EmptyDPB"/>
     <Connection dst="Algo_RefList1" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
+    <Connection dst="BlackHole" dst-port="PicSizeInMb"
+        src="Algo_Synp_AVC" src-port="PicSizeInMb"/>
+    <Connection dst="BlackHole" dst-port="IntraPredModeC"
+        src="Algo_Synp_AVC" src-port="IntraPredModeC"/>
+    <Connection dst="BlackHole" dst-port="HEIGHT" src="Algo_Synp_AVC" src-port="HEIGHT"/>
+    <Connection dst="BlackHole" dst-port="WIDTH" src="Algo_Synp_AVC" src-port="WIDTH"/>
+    <Connection dst="BlackHole" dst-port="SizeDPBMax"
+        src="Algo_Synp_AVC" src-port="SizeDPBMax"/>
+    <Connection dst="BlackHole" dst-port="cbp_blk" src="Algo_Synp_AVC" src-port="cbp_blk"/>
 </XDF>

@@ -84,7 +84,9 @@ actor Algo_DecodeMacroblockLayer()
 	int(size=9)  pix_I_PCM_V,
 
 	uint(size=5)  NbCoeffInMB,
-	bool          SkipMacroBlk
+	bool          SkipMacroBlk,
+	bool          IsIPCM,
+	uint(size=16) cbp_blk
 		:
 
 
@@ -119,6 +121,7 @@ actor Algo_DecodeMacroblockLayer()
 
 	List(type: uint(size=4), size=8) TabCodedBlockPatternChroma = [  0,  1,  2,  0,  1,  2,  0,  0];
 	List(type: uint(size=4), size=8) TabCodedBlockPatternLuma   = [  0,  0,  0, 15, 15, 15,  0,  0];
+	List(type: uint(size=4), size=16) InverseScan4x4Tab         = [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
 
 	List ( type: List ( type: List ( type: uint(size=6), size=2), size=48 ), size=4) VLD_ME_TABLE =
 		[
@@ -148,6 +151,7 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=6)  mb_type                        := 0;
 	bool          noSubMbPartSizeLessThan8x8Flag := true;
 	bool          transform_size_8x8_flag        := true;
+	uint(size=6)  coded_block_pattern            := 0;
 	uint(size=6)  CodedBlockPatternLuma          := 0;
 	uint(size=6)  CodedBlockPatternChroma        := 0;
 	int (size=32) mb_qp_delta                    := 0;
@@ -341,6 +345,7 @@ actor Algo_DecodeMacroblockLayer()
 				end;
 			CodedBlockPatternLuma   := TabCodedBlockPatternLuma[Idx & 7];
 			CodedBlockPatternChroma := TabCodedBlockPatternChroma[Idx & 7];
+			coded_block_pattern     := CodedBlockPatternLuma + CodedBlockPatternChroma * 16;
 		end
 
 	CheckMbType.IsIPCM: action
@@ -354,7 +359,9 @@ actor Algo_DecodeMacroblockLayer()
 			NbBitsToRead :[ BitDepthChromaTab ] repeat 256,
 
 			SData_Total_CoeffLuma  :[[16: for int s in 0 .. 15]] repeat 16,	
-			SData_Total_CoeffChroma:[[16: for int s in 0 .. 31]] repeat 32
+			SData_Total_CoeffChroma:[[16: for int s in 0 .. 31]] repeat 32,
+
+			IsIPCM :[true]
 		guard
 			    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
 			and (mb_type = BLOCK_TYPE_I_PCM)
@@ -434,7 +441,8 @@ actor Algo_DecodeMacroblockLayer()
 
 	CheckMbType.IsNotIPCM: action
 				==>
-			NbCoeffInMB :[NbCoeff]
+			NbCoeffInMB :[NbCoeff],
+			IsIPCM      :[false]
 		var
 			uint(size=5) NbCoeff
 		do
@@ -525,8 +533,6 @@ actor Algo_DecodeMacroblockLayer()
 	ReadCodedBlockPattern.Done: action
 			ValVLD :[CodeNum]
 				==>
-		var
-			uint(size=6) coded_block_pattern
 		do
 			coded_block_pattern :=
 				if( Is_Intra_4x4(mb_type) or Is_Intra_8x8(mb_type) )then
@@ -619,7 +625,19 @@ actor Algo_DecodeMacroblockLayer()
 			Total_CoeffChroma:[CoLuChe] repeat 32//It's the story of a guy, a normal guy ...
 				==>
 			SData_Total_CoeffLuma  :[CoLu]    repeat 16,
-			SData_Total_CoeffChroma:[CoLuChe] repeat 32
+			SData_Total_CoeffChroma:[CoLuChe] repeat 32,
+
+			cbp_blk :[CbpBlk]
+		var
+			uint(size=16) CbpBlk := 0
+		do
+			foreach int i in 0 .. 15
+			do
+				CbpBlk := CbpBlk << 1;
+				if(CoLu[InverseScan4x4Tab[15 - i]] > 0)then
+					CbpBlk := CbpBlk + 1;
+				end
+			end
 		end
 
 	NoResidual: action

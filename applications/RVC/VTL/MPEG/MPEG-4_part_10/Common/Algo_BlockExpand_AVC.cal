@@ -77,7 +77,7 @@ actor Algo_BlockExpand_AVC ()
 	int (size=5) SZ_CHROMA_DC     = 4;
 	int (size=5) SZ_CHROMA_AC     = 16;
 
-	bool DEBUG_INPUT = true;
+	bool DEBUG_INPUT = false;
 
 	/* State Variable */
 	List(type:int(size=12), size=16) ValCoeff := [ 0 : for int i in 0 .. 15];
