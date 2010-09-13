@@ -339,7 +339,7 @@ $
 
 AssignIndex(AssignIndex) ::= <<
 
-$AssignIndex$
+$AssignIndex.target$ = to_integer(unsigned($AssignIndex.indexes: { std_logic_vector(to_signed($it$, $it$'length))}; separator=" & "$);
 >>
 
 Call(call) ::= <<
