@@ -30,7 +30,6 @@ package net.sf.orcc.backends.transformations;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +45,6 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
@@ -81,21 +79,22 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	}
 
 	/**
-	 * Removes the given list of instructions that store to an unused state variable.
+	 * Removes the given list of instructions that store to an unused state
+	 * variable.
 	 * 
 	 * @param instructions
 	 *            a list of instructions
 	 */
 	private void removeInstructions(List<Instruction> instructions) {
 		if (instructions != null) {
-			for (Instruction instr : instructions){
+			for (Instruction instr : instructions) {
 				instr.getBlock().getInstructions().remove(instr);
 			}
 		}
 	}
-	
+
 	/**
-	 * Removes the given instructions that store to an unused state variable.
+	 * Removes the given list of variables from the procedure
 	 * 
 	 * @param variables
 	 *            a map of variable
@@ -103,26 +102,35 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	private void removeVariables(Map<Variable, Expression> variables) {
 		OrderedMap<String, Variable> lovalVars = procedure.getLocals();
 
-		for (Map.Entry<Variable, Expression> entry : copyVars.entrySet()){
-			Variable var =  entry.getKey();
+		for (Map.Entry<Variable, Expression> entry : copyVars.entrySet()) {
+			Variable var = entry.getKey();
 			lovalVars.remove(var.getName());
-		 }
-		
+		}
+
 	}
-	
+
+	/**
+	 * Detect if the assign instructions can be removed
+	 * 
+	 * @param assign
+	 *            assign instruction
+	 */
 	@Override
 	public void visit(Assign assign, Object... args) {
 		Expression value = assign.getValue();
 
 		if ((!(value instanceof BinaryExpr)) && (!(value instanceof UnaryExpr))) {
+			// Assign instruction can be remove
 			LocalVariable target = assign.getTarget();
 			Expression expr = assign.getValue();
 
+			// Set instruction and variable as to be remove
 			copyVars.put(target, expr);
 			removedInstrs.add(assign);
 		}
 	}
 
+	//
 	@Override
 	public void visit(PhiAssignment phi, Object... args) {
 		List<Expression> values = phi.getValues();
@@ -145,6 +153,8 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	public void visitProcedure(Procedure procedure) {
 		copyVars.clear();
 		super.visitProcedure(procedure);
+
+		// Remove useless instructions and variables
 		removeInstructions(removedInstrs);
 		removeVariables(copyVars);
 	}
