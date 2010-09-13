@@ -19,22 +19,32 @@ set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /ZI /Ob0 /Od /RTC1")
 set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
 endif(MSVC)
 
+# Common packages required
+find_library(CALaka_LIBRARY CALaka)
+find_library(Orcc_LIBRARY Orcc)
+find_library(Thread_LIBRARY Thread)
+
+find_file(CALaka_INCLUDE_DIR CALaka)
+find_file(Orcc_INCLUDE_DIR Orcc)
+find_file(Thread_INCLUDE_DIR Thread)
+
+
 find_package(SDL REQUIRED)
 
-# Common include directories
-find_path(LIBCAL2CPP_ROOT_PATH include/actoraka.h)
-
-include_directories(\${CMAKE_SOURCE_DIR} \${LIBCAL2CPP_ROOT_PATH}/include \${SDL_INCLUDE_DIR})
-
-# Common link directories
-link_directories(
-\${LIBCAL2CPP_ROOT_PATH}/lib
+include_directories(
+	\${CMAKE_SOURCE_DIR}
+	\${CALaka_INCLUDE_DIR}
+	\${Orcc_INCLUDE_DIR}
+	\${Thread_INCLUDE_DIR}
+	\${SDL_INCLUDE_DIR}
 )
 
 $if(needSerDes)$
 add_library(LibAdaptorConfig STATIC \${LIBCAL2CPP_ROOT_PATH}/src/LibAdaptorConfig.cpp)
 add_library(LibWrapper STATIC \${LIBCAL2CPP_ROOT_PATH}/src/wrapperaka.cpp)
 $endif$
+
+
 
 add_executable ($network.name$
 $network.name$.cpp
@@ -46,10 +56,10 @@ add_dependencies($network.name$ LibWrapper LibAdaptorConfig)
 $endif$
 
 target_link_libraries($network.name$
-Orcc
-CALaka
-Thread
-SDL
+\${CALaka_LIBRARY}
+\${Orcc_LIBRARY}
+\${Thread_LIBRARY}
+\${SDL_LIBRARY}
 $if(needSerDes)$
 AdaptorFactory Wrapper AdaptorConfig
 $endif$
