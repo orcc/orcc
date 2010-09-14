@@ -58,10 +58,18 @@ import static net.sf.orcc.ir.serialize.IRConstants.VAR_EXPR;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
@@ -116,11 +124,6 @@ import net.sf.orcc.ir.transforms.BlockCombine;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
 /**
  * This class defines a parser that loads an actor in IR form serialized in JSON
  * in memory.
@@ -172,14 +175,14 @@ public class IRParser {
 	 * @throws JSONException
 	 *             if a JSON syntax error occurs
 	 */
-	private Action getAction(JSONArray array) throws JSONException {
-		if (array.length() == 0) {
+	private Action getAction(JsonArray array) {
+		if (array.size() == 0) {
 			// removes the first untagged action found
 			return untaggedActions.remove(0);
 		} else {
 			Tag tag = new Tag();
-			for (int i = 0; i < array.length(); i++) {
-				tag.add(array.getString(i));
+			for (int i = 0; i < array.size(); i++) {
+				tag.add(array.get(i).getAsString());
 			}
 
 			return actions.get(tag);
@@ -198,10 +201,9 @@ public class IRParser {
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
-	private Variable getVariable(JSONArray array) throws JSONException,
-			OrccException {
-		String name = array.getString(0);
-		int index = array.getInt(1);
+	private Variable getVariable(JsonArray array) throws OrccException {
+		String name = array.get(0).getAsString();
+		int index = array.get(1).getAsInt();
 
 		// retrieve the variable definition
 		String indexStr = (index == 0) ? "" : "_" + index;
@@ -224,19 +226,18 @@ public class IRParser {
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
-	private Action parseAction(JSONArray array) throws JSONException,
-			OrccException {
-		JSONArray tagArray = array.getJSONArray(0);
+	private Action parseAction(JsonArray array) throws OrccException {
+		JsonArray tagArray = array.get(0).getAsJsonArray();
 		Tag tag = new Tag();
-		for (int i = 0; i < tagArray.length(); i++) {
-			tag.add(tagArray.getString(i));
+		for (int i = 0; i < tagArray.size(); i++) {
+			tag.add(tagArray.get(i).getAsString());
 		}
 
-		Pattern ip = parsePattern(inputs, array.getJSONArray(1));
-		Pattern op = parsePattern(outputs, array.getJSONArray(2));
+		Pattern ip = parsePattern(inputs, array.get(1).getAsJsonArray());
+		Pattern op = parsePattern(outputs, array.get(2).getAsJsonArray());
 
-		Procedure scheduler = parseProc(array.getJSONArray(3));
-		Procedure body = parseProc(array.getJSONArray(4));
+		Procedure scheduler = parseProc(array.get(3).getAsJsonArray());
+		Procedure body = parseProc(array.get(4).getAsJsonArray());
 
 		Action action = new Action(body.getLocation(), tag, ip, op, scheduler,
 				body);
@@ -255,11 +256,10 @@ public class IRParser {
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
-	private List<Action> parseActions(JSONArray array) throws JSONException,
-			OrccException {
+	private List<Action> parseActions(JsonArray array) throws OrccException {
 		List<Action> actions = new ArrayList<Action>();
-		for (int i = 0; i < array.length(); i++) {
-			actions.add(parseAction(array.getJSONArray(i)));
+		for (int i = 0; i < array.size(); i++) {
+			actions.add(parseAction(array.get(i).getAsJsonArray()));
 		}
 
 		return actions;
@@ -277,17 +277,18 @@ public class IRParser {
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
-	private ActionScheduler parseActionScheduler(JSONArray array)
-			throws JSONException, OrccException {
-		JSONArray actionArray = array.getJSONArray(0);
+	private ActionScheduler parseActionScheduler(JsonArray array)
+			throws OrccException {
+		JsonArray actionArray = array.get(0).getAsJsonArray();
 		List<Action> actions = new ArrayList<Action>();
-		for (int i = 0; i < actionArray.length(); i++) {
-			actions.add(getAction(actionArray.getJSONArray(i)));
+		for (JsonElement element : actionArray) {
+			actions.add(getAction(element.getAsJsonArray()));
 		}
 
 		FSM fsm = null;
-		if (!array.isNull(1)) {
-			fsm = parseFSM(array.getJSONArray(1));
+		JsonElement fsmElement = array.get(1);
+		if (fsmElement.isJsonArray()) {
+			fsm = parseFSM(fsmElement.getAsJsonArray());
 		}
 		return new ActionScheduler(actions, fsm);
 	}
@@ -304,38 +305,39 @@ public class IRParser {
 	 */
 	public Actor parseActor(InputStream in) throws OrccException {
 		try {
-			JSONTokener tokener = new JSONTokener(new InputStreamReader(in));
-			JSONObject obj = new JSONObject(tokener);
+			JsonParser parser = new JsonParser();
+			JsonObject obj = parser.parse(new InputStreamReader(in))
+					.getAsJsonObject();
 
-			file = obj.getString(KEY_SOURCE_FILE);
-			String name = obj.getString(KEY_NAME);
+			file = obj.get(KEY_SOURCE_FILE).getAsString();
+			String name = obj.get(KEY_NAME).getAsString();
 
 			OrderedMap<String, Variable> parameters = variables;
-			parseParameters(obj.getJSONArray(KEY_PARAMETERS));
+			parseParameters(obj.get(KEY_PARAMETERS).getAsJsonArray());
 			variables = new Scope<String, Variable>(variables, true);
 
-			inputs = parsePorts(obj.getJSONArray(KEY_INPUTS));
-			outputs = parsePorts(obj.getJSONArray(KEY_OUTPUTS));
+			inputs = parsePorts(obj.get(KEY_INPUTS).getAsJsonArray());
+			outputs = parsePorts(obj.get(KEY_OUTPUTS).getAsJsonArray());
 
-			JSONArray array = obj.getJSONArray(KEY_STATE_VARS);
+			JsonArray array = obj.get(KEY_STATE_VARS).getAsJsonArray();
 			OrderedMap<String, StateVariable> stateVars = parseStateVars(array);
 
-			array = obj.getJSONArray(KEY_PROCEDURES);
-			for (int i = 0; i < array.length(); i++) {
-				Procedure proc = parseProc(array.getJSONArray(i));
+			array = obj.get(KEY_PROCEDURES).getAsJsonArray();
+			for (JsonElement element : array) {
+				Procedure proc = parseProc(element.getAsJsonArray());
 				procs.put(file, proc.getLocation(), proc.getName(), proc);
 			}
 
-			array = obj.getJSONArray(KEY_ACTIONS);
+			array = obj.get(KEY_ACTIONS).getAsJsonArray();
 			List<Action> actions = parseActions(array);
 
 			// a bit dirty, this one...
 			// when isInitialize is true, don't put actions in hash tables.
 			isInitialize = true;
-			array = obj.getJSONArray(KEY_INITIALIZES);
+			array = obj.get(KEY_INITIALIZES).getAsJsonArray();
 			List<Action> initializes = parseActions(array);
 
-			array = obj.getJSONArray(KEY_ACTION_SCHED);
+			array = obj.get(KEY_ACTION_SCHED).getAsJsonArray();
 			ActionScheduler sched = parseActionScheduler(array);
 
 			Actor actor = new Actor(name, file, parameters, inputs, outputs,
@@ -345,8 +347,6 @@ public class IRParser {
 			new BlockCombine().transform(actor);
 
 			return actor;
-		} catch (JSONException e) {
-			throw new OrccException("JSON error", e);
 		} finally {
 			try {
 				// closes the input stream
@@ -357,35 +357,34 @@ public class IRParser {
 		}
 	}
 
-	private Assign parseAssign(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		Variable var = getVariable(array.getJSONArray(0));
-		Expression value = parseExpr(array.getJSONArray(1));
+	private Assign parseAssign(Location loc, JsonArray array)
+			throws OrccException {
+		Variable var = getVariable(array.get(0).getAsJsonArray());
+		Expression value = parseExpr(array.get(1).getAsJsonArray());
 		LocalVariable local = (LocalVariable) var;
 		Assign assign = new Assign(loc, local, value);
 		local.setInstruction(assign);
 		return assign;
 	}
 
-	private BinaryExpr parseBinaryExpr(Location location, JSONArray array)
-			throws JSONException, OrccException {
-		String name = array.getString(0);
-		Expression e1 = parseExpr(array.getJSONArray(1));
-		Expression e2 = parseExpr(array.getJSONArray(2));
+	private BinaryExpr parseBinaryExpr(Location location, JsonArray array)
+			throws OrccException {
+		String name = array.get(0).getAsString();
+		Expression e1 = parseExpr(array.get(1).getAsJsonArray());
+		Expression e2 = parseExpr(array.get(2).getAsJsonArray());
 		Type type = parseType(array.get(3));
 		BinaryOp op = BinaryOp.getOperator(name);
 		return new BinaryExpr(location, e1, op, e2, type);
 	}
 
-	private Call parseCall(Location loc, JSONArray array) throws JSONException,
-			OrccException {
+	private Call parseCall(Location loc, JsonArray array) throws OrccException {
 		LocalVariable res = null;
-		String procName = array.getString(0);
-		if (!array.isNull(1)) {
-			res = (LocalVariable) getVariable(array.getJSONArray(1));
+		String procName = array.get(0).getAsString();
+		if (!array.get(1).isJsonNull()) {
+			res = (LocalVariable) getVariable(array.get(1).getAsJsonArray());
 		}
 
-		List<Expression> parameters = parseExprs(array.getJSONArray(2));
+		List<Expression> parameters = parseExprs(array.get(2).getAsJsonArray());
 		Procedure proc = procs.get(procName);
 		if (proc == null) {
 			throw new OrccException(file, loc, "unknown procedure: \""
@@ -411,93 +410,100 @@ public class IRParser {
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
-	private Object parseConstant(Object obj) throws JSONException,
-			OrccException {
-		if (obj instanceof Boolean || obj instanceof String) {
-			return obj;
-		} else if (obj instanceof Integer) {
-			return new IntegerNumber((Integer) obj);
-		} else if (obj instanceof Long) {
-			return new IntegerNumber((Long) obj);
-		} else if (obj instanceof JSONArray) {
-			JSONArray array = (JSONArray) obj;
-			List<Object> cstList = new ArrayList<Object>();
-			for (int i = 0; i < array.length(); i++) {
-				cstList.add(parseConstant(array.get(i)));
+	private Object parseConstant(JsonElement element) throws OrccException {
+		if (element.isJsonPrimitive()) {
+			JsonPrimitive primitive = element.getAsJsonPrimitive();
+			if (primitive.isBoolean()) {
+				return primitive.getAsBoolean();
+			} else if (primitive.isNumber()) {
+				Number number = primitive.getAsNumber();
+				if (number instanceof BigInteger) {
+					return new IntegerNumber(((BigInteger) number).longValue());
+				}
+			} else if (primitive.isString()) {
+				return primitive.getAsString();
 			}
-
+		} else if (element.isJsonArray()) {
+			JsonArray array = element.getAsJsonArray();
+			List<Object> cstList = new ArrayList<Object>(array.size());
+			for (JsonElement subElement : array) {
+				cstList.add(parseConstant(subElement));
+			}
 			return cstList;
-		} else {
-			throw new OrccException("Unknown constant: " + obj);
 		}
+
+		throw new OrccException("Unknown constant: " + element);
 	}
 
-	private Expression parseExpr(JSONArray array) throws JSONException,
-			OrccException {
-		Location location = parseLocation(array.getJSONArray(0));
-		Object obj = array.get(1);
-		Expression expr = null;
+	private Expression parseExpr(JsonArray array) throws OrccException {
+		Location location = parseLocation(array.get(0).getAsJsonArray());
+		JsonElement element = array.get(1);
 
-		if (obj instanceof Boolean) {
-			expr = new BoolExpr(location, (Boolean) obj);
-		} else if (obj instanceof Integer) {
-			expr = new IntExpr(location, (Integer) obj);
-		} else if (obj instanceof Long) {
-			expr = new IntExpr(location, (Long) obj);
-		} else if (obj instanceof String) {
-			expr = new StringExpr(location, (String) obj);
-		} else if (obj instanceof JSONArray) {
-			array = (JSONArray) obj;
-			String name = array.getString(0);
+		if (element.isJsonPrimitive()) {
+			JsonPrimitive primitive = element.getAsJsonPrimitive();
+			if (primitive.isBoolean()) {
+				return new BoolExpr(location, primitive.getAsBoolean());
+			} else if (primitive.isNumber()) {
+				Number number = primitive.getAsNumber();
+				if (number instanceof BigInteger) {
+					return new IntExpr(location,
+							((BigInteger) number).longValue());
+				} else if (number instanceof BigDecimal) {
+					throw new OrccException(
+							"float expressions not implemented yet");
+				}
+			} else if (primitive.isString()) {
+				return new StringExpr(location, element.getAsString());
+			}
+		} else if (element.isJsonArray()) {
+			array = element.getAsJsonArray();
+			String name = array.get(0).getAsString();
 			if (name.equals(VAR_EXPR)) {
-				Use var = parseVarUse(array.getJSONArray(1));
-				expr = new VarExpr(location, var);
+				Use var = parseVarUse(array.get(1).getAsJsonArray());
+				return new VarExpr(location, var);
 			} else if (name.equals(UNARY_EXPR)) {
-				return parseUnaryExpr(location, array.getJSONArray(1));
+				return parseUnaryExpr(location, array.get(1).getAsJsonArray());
 			} else if (name.equals(BINARY_EXPR)) {
-				return parseBinaryExpr(location, array.getJSONArray(1));
+				return parseBinaryExpr(location, array.get(1).getAsJsonArray());
 			} else {
 				throw new OrccException("Invalid expression kind: " + name);
 			}
-		} else {
-			throw new OrccException("Invalid expression: " + obj);
 		}
 
-		return expr;
+		throw new OrccException("Invalid expression: " + array);
 	}
 
-	private List<Expression> parseExprs(JSONArray array) throws JSONException,
-			OrccException {
-		int length = array.length();
+	private List<Expression> parseExprs(JsonArray array) throws OrccException {
+		int length = array.size();
 		List<Expression> exprs = new ArrayList<Expression>(length);
-		for (int i = 0; i < length; i++) {
-			exprs.add(parseExpr(array.getJSONArray(i)));
+		for (JsonElement element : array) {
+			exprs.add(parseExpr(element.getAsJsonArray()));
 		}
 
 		return exprs;
 	}
 
-	private FSM parseFSM(JSONArray array) throws JSONException, OrccException {
-		String initialState = array.getString(0);
+	private FSM parseFSM(JsonArray array) throws OrccException {
+		String initialState = array.get(0).getAsString();
 		FSM fsm = new FSM();
-		JSONArray stateArray = array.getJSONArray(1);
-		for (int i = 0; i < stateArray.length(); i++) {
-			fsm.addState(stateArray.getString(i));
+		JsonArray stateArray = array.get(1).getAsJsonArray();
+		for (int i = 0; i < stateArray.size(); i++) {
+			fsm.addState(stateArray.get(i).getAsString());
 		}
 
 		// set the initial state *after* initializing the states to get a
 		// prettier order
 		fsm.setInitialState(initialState);
 
-		JSONArray transitionsArray = array.getJSONArray(2);
-		for (int i = 0; i < transitionsArray.length(); i++) {
-			JSONArray transitionArray = transitionsArray.getJSONArray(i);
-			String source = transitionArray.getString(0);
-			JSONArray targetsArray = transitionArray.getJSONArray(1);
-			for (int j = 0; j < targetsArray.length(); j++) {
-				JSONArray targetArray = targetsArray.getJSONArray(j);
-				Action action = getAction(targetArray.getJSONArray(0));
-				String target = targetArray.getString(1);
+		JsonArray transitionsArray = array.get(2).getAsJsonArray();
+		for (JsonElement element : transitionsArray) {
+			JsonArray transitionArray = element.getAsJsonArray();
+			String source = transitionArray.get(0).getAsString();
+			JsonArray targetsArray = transitionArray.get(1).getAsJsonArray();
+			for (JsonElement targetElement : targetsArray) {
+				JsonArray targetArray = targetElement.getAsJsonArray();
+				Action action = getAction(targetArray.get(0).getAsJsonArray());
+				String target = targetArray.get(1).getAsString();
 				fsm.addTransition(source, target, action);
 			}
 		}
@@ -505,12 +511,12 @@ public class IRParser {
 		return fsm;
 	}
 
-	private HasTokens parseHasTokens(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		Variable target = getVariable(array.getJSONArray(0));
-		String fifoName = array.getString(1);
+	private HasTokens parseHasTokens(Location loc, JsonArray array)
+			throws OrccException {
+		Variable target = getVariable(array.get(0).getAsJsonArray());
+		String fifoName = array.get(1).getAsString();
 		Port port = inputs.get(fifoName);
-		int numTokens = array.getInt(2);
+		int numTokens = array.get(2).getAsInt();
 
 		LocalVariable local = (LocalVariable) target;
 		HasTokens hasTokens = new HasTokens(loc, port, numTokens, local);
@@ -518,43 +524,42 @@ public class IRParser {
 		return hasTokens;
 	}
 
-	private IfNode parseIfNode(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		Expression condition = parseExpr(array.getJSONArray(0));
-		List<CFGNode> thenNodes = parseNodes(array.getJSONArray(1));
-		List<CFGNode> elseNodes = parseNodes(array.getJSONArray(2));
+	private IfNode parseIfNode(Location loc, JsonArray array)
+			throws OrccException {
+		Expression condition = parseExpr(array.get(0).getAsJsonArray());
+		List<CFGNode> thenNodes = parseNodes(array.get(1).getAsJsonArray());
+		List<CFGNode> elseNodes = parseNodes(array.get(2).getAsJsonArray());
 
 		return new IfNode(loc, procedure, condition, thenNodes, elseNodes, null);
 	}
 
-	private BlockNode parseJoinNode(Location loc, JSONArray array)
-			throws JSONException, OrccException {
+	private BlockNode parseJoinNode(Location loc, JsonArray array)
+			throws OrccException {
 		BlockNode join = new BlockNode(loc, procedure);
 		block = join;
-		for (int i = 0; i < array.length(); i++) {
-			join.add(parsePhi(loc, array.getJSONArray(i)));
+		for (JsonElement element : array) {
+			join.add(parsePhi(loc, element.getAsJsonArray()));
 		}
 
 		return join;
 	}
 
-	private Load parseLoad(Location loc, JSONArray array) throws JSONException,
-			OrccException {
-		LocalVariable target = (LocalVariable) getVariable(array
-				.getJSONArray(0));
-		Use source = parseVarUse(array.getJSONArray(1));
-		List<Expression> indexes = parseExprs(array.getJSONArray(2));
+	private Load parseLoad(Location loc, JsonArray array) throws OrccException {
+		LocalVariable target = (LocalVariable) getVariable(array.get(0)
+				.getAsJsonArray());
+		Use source = parseVarUse(array.get(1).getAsJsonArray());
+		List<Expression> indexes = parseExprs(array.get(2).getAsJsonArray());
 
 		Load load = new Load(loc, target, source, indexes);
 		target.setInstruction(load);
 		return load;
 	}
 
-	private Location parseLocation(JSONArray array) throws JSONException {
-		if (array.length() == 3) {
-			int startLine = array.getInt(0);
-			int startCol = array.getInt(1);
-			int endCol = array.getInt(2);
+	private Location parseLocation(JsonArray array) {
+		if (array.size() == 3) {
+			int startLine = array.get(0).getAsInt();
+			int startCol = array.get(1).getAsInt();
+			int endCol = array.get(2).getAsInt();
 
 			return new Location(startLine, startCol, endCol);
 		} else {
@@ -562,16 +567,15 @@ public class IRParser {
 		}
 	}
 
-	private CFGNode parseNode(JSONArray array) throws JSONException,
-			OrccException {
-		String name = array.getString(0);
-		Location loc = parseLocation(array.getJSONArray(1));
+	private CFGNode parseNode(JsonArray array) throws OrccException {
+		String name = array.get(0).getAsString();
+		Location loc = parseLocation(array.get(1).getAsJsonArray());
 		CFGNode node = null;
 
 		if (name.equals(NAME_IF)) {
-			node = parseIfNode(loc, array.getJSONArray(2));
+			node = parseIfNode(loc, array.get(2).getAsJsonArray());
 		} else if (name.equals(NAME_JOIN)) {
-			node = parseJoinNode(loc, array.getJSONArray(2));
+			node = parseJoinNode(loc, array.get(2).getAsJsonArray());
 
 			// if the previous node is an If, then the join node we just parsed
 			// is the If's join node.
@@ -583,31 +587,31 @@ public class IRParser {
 				node = null;
 			}
 		} else if (name.equals(NAME_WHILE)) {
-			node = parseWhileNode(loc, array.getJSONArray(2));
+			node = parseWhileNode(loc, array.get(2).getAsJsonArray());
 		} else {
 			block = new BlockNode(loc, procedure);
 			Instruction instr = null;
 
 			if (name.equals(NAME_ASSIGN)) {
-				instr = parseAssign(loc, array.getJSONArray(2));
+				instr = parseAssign(loc, array.get(2).getAsJsonArray());
 			} else if (name.equals(NAME_CALL)) {
-				instr = parseCall(loc, array.getJSONArray(2));
+				instr = parseCall(loc, array.get(2).getAsJsonArray());
 			} else if (name.equals(NAME_EMPTY)) {
 				// nothing to do
 			} else if (name.equals(NAME_HAS_TOKENS)) {
-				instr = parseHasTokens(loc, array.getJSONArray(2));
+				instr = parseHasTokens(loc, array.get(2).getAsJsonArray());
 			} else if (name.equals(NAME_LOAD)) {
-				instr = parseLoad(loc, array.getJSONArray(2));
+				instr = parseLoad(loc, array.get(2).getAsJsonArray());
 			} else if (name.equals(NAME_PEEK)) {
-				instr = parsePeek(loc, array.getJSONArray(2));
+				instr = parsePeek(loc, array.get(2).getAsJsonArray());
 			} else if (name.equals(NAME_READ)) {
-				instr = parseRead(loc, array.getJSONArray(2));
+				instr = parseRead(loc, array.get(2).getAsJsonArray());
 			} else if (name.equals(NAME_RETURN)) {
-				instr = parseReturn(loc, array.optJSONArray(2));
+				instr = parseReturn(loc, array.get(2));
 			} else if (name.equals(NAME_STORE)) {
-				instr = parseStore(loc, array.getJSONArray(2));
+				instr = parseStore(loc, array.get(2).getAsJsonArray());
 			} else if (name.equals(NAME_WRITE)) {
-				instr = parseWrite(loc, array.getJSONArray(2));
+				instr = parseWrite(loc, array.get(2).getAsJsonArray());
 			} else {
 				throw new OrccException("Invalid node definition: " + name);
 			}
@@ -622,11 +626,10 @@ public class IRParser {
 		return node;
 	}
 
-	private List<CFGNode> parseNodes(JSONArray array) throws JSONException,
-			OrccException {
+	private List<CFGNode> parseNodes(JsonArray array) throws OrccException {
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
-		for (int i = 0; i < array.length(); i++) {
-			CFGNode node = parseNode(array.getJSONArray(i));
+		for (JsonElement element : array) {
+			CFGNode node = parseNode(element.getAsJsonArray());
 			if (node != null) {
 				nodes.add(node);
 			}
@@ -635,15 +638,15 @@ public class IRParser {
 		return nodes;
 	}
 
-	private void parseParameters(JSONArray array) throws JSONException,
-			OrccException {
-		for (int i = 0; i < array.length(); i++) {
-			JSONArray varDefArray = array.getJSONArray(i);
+	private void parseParameters(JsonArray array) throws OrccException {
+		for (JsonElement element : array) {
+			JsonArray varDefArray = element.getAsJsonArray();
 
-			JSONArray details = varDefArray.getJSONArray(0);
-			String name = details.getString(0);
+			JsonArray details = varDefArray.get(0).getAsJsonArray();
+			String name = details.get(0).getAsString();
 
-			Location location = parseLocation(varDefArray.getJSONArray(1));
+			Location location = parseLocation(varDefArray.get(1)
+					.getAsJsonArray());
 			Type type = parseType(varDefArray.get(2));
 
 			StateVariable parameter = new StateVariable(location, type, name,
@@ -654,35 +657,34 @@ public class IRParser {
 		}
 	}
 
-	private Pattern parsePattern(OrderedMap<String, Port> ports, JSONArray array)
-			throws JSONException, OrccException {
+	private Pattern parsePattern(OrderedMap<String, Port> ports, JsonArray array)
+			throws OrccException {
 		Pattern pattern = new Pattern();
-		for (int i = 0; i < array.length(); i++) {
-			JSONArray patternArray = array.getJSONArray(i);
-			Port port = ports.get(patternArray.getString(0));
-			int numTokens = patternArray.getInt(1);
+		for (int i = 0; i < array.size(); i++) {
+			JsonArray patternArray = array.get(i).getAsJsonArray();
+			Port port = ports.get(patternArray.get(0).getAsString());
+			int numTokens = patternArray.get(1).getAsInt();
 			pattern.put(port, numTokens);
 		}
 
 		return pattern;
 	}
 
-	private Peek parsePeek(Location loc, JSONArray array) throws JSONException,
-			OrccException {
-		Variable target = getVariable(array.getJSONArray(0));
-		String fifoName = array.getString(1);
+	private Peek parsePeek(Location loc, JsonArray array) throws OrccException {
+		Variable target = getVariable(array.get(0).getAsJsonArray());
+		String fifoName = array.get(1).getAsString();
 		Port port = inputs.get(fifoName);
-		int numTokens = array.getInt(2);
+		int numTokens = array.get(2).getAsInt();
 		Peek peek = new Peek(loc, port, numTokens, target);
 		target.setInstruction(peek);
 		return peek;
 	}
 
-	private PhiAssignment parsePhi(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		LocalVariable target = (LocalVariable) getVariable(array
-				.getJSONArray(0));
-		List<Expression> values = parseExprs(array.getJSONArray(1));
+	private PhiAssignment parsePhi(Location loc, JsonArray array)
+			throws OrccException {
+		LocalVariable target = (LocalVariable) getVariable(array.get(0)
+				.getAsJsonArray());
+		List<Expression> values = parseExprs(array.get(1).getAsJsonArray());
 
 		PhiAssignment phi = new PhiAssignment(loc, target, values);
 		target.setInstruction(phi);
@@ -700,15 +702,15 @@ public class IRParser {
 	 * @throws OrccException
 	 *             if a semantic error occurs
 	 */
-	private OrderedMap<String, Port> parsePorts(JSONArray array)
-			throws JSONException, OrccException {
+	private OrderedMap<String, Port> parsePorts(JsonArray array)
+			throws OrccException {
 		OrderedMap<String, Port> ports = new OrderedMap<String, Port>();
-		for (int i = 0; i < array.length(); i++) {
-			JSONArray port = array.getJSONArray(i);
+		for (JsonElement element : array) {
+			JsonArray port = element.getAsJsonArray();
 
-			Location location = parseLocation(port.getJSONArray(0));
+			Location location = parseLocation(port.get(0).getAsJsonArray());
 			Type type = parseType(port.get(1));
-			String name = port.getString(2);
+			String name = port.get(2).getAsString();
 
 			Port po = new Port(location, type, name);
 			ports.put(file, location, name, po);
@@ -726,24 +728,23 @@ public class IRParser {
 	 * @throws JSONException
 	 * @throws OrccException
 	 */
-	private Procedure parseProc(JSONArray array) throws JSONException,
-			OrccException {
-		String name = array.getString(0);
-		boolean external = array.getBoolean(1);
+	private Procedure parseProc(JsonArray array) throws OrccException {
+		String name = array.get(0).getAsString();
+		boolean external = array.get(1).getAsBoolean();
 
-		Location location = parseLocation(array.getJSONArray(2));
+		Location location = parseLocation(array.get(2).getAsJsonArray());
 		Type returnType = parseType(array.get(3));
 		variables = new Scope<String, Variable>(variables, true);
 		OrderedMap<String, Variable> parameters = variables;
-		parseVarDefs(array.getJSONArray(4));
+		parseVarDefs(array.get(4).getAsJsonArray());
 		variables = new Scope<String, Variable>(variables, false);
 		OrderedMap<String, Variable> locals = variables;
-		parseVarDefs(array.getJSONArray(5));
+		parseVarDefs(array.get(5).getAsJsonArray());
 
 		procedure = new Procedure(name, external, location, returnType,
 				parameters, locals, null);
 
-		List<CFGNode> nodes = parseNodes(array.getJSONArray(6));
+		List<CFGNode> nodes = parseNodes(array.get(6).getAsJsonArray());
 		procedure.setNodes(nodes);
 
 		// go back to previous scope
@@ -754,24 +755,23 @@ public class IRParser {
 		return procedure;
 	}
 
-	private Read parseRead(Location loc, JSONArray array) throws JSONException,
-			OrccException {
-		Variable target = getVariable(array.getJSONArray(0));
-		String fifoName = array.getString(1);
+	private Read parseRead(Location loc, JsonArray array) throws OrccException {
+		Variable target = getVariable(array.get(0).getAsJsonArray());
+		String fifoName = array.get(1).getAsString();
 		Port port = inputs.get(fifoName);
-		int numTokens = array.getInt(2);
+		int numTokens = array.get(2).getAsInt();
 		Read read = new Read(loc, port, numTokens, target);
 		target.setInstruction(read);
 		return read;
 	}
 
-	private Return parseReturn(Location loc, JSONArray array)
-			throws JSONException, OrccException {
+	private Return parseReturn(Location loc, JsonElement element)
+			throws OrccException {
 		Expression expr = null;
-		if (array == null) {
+		if (element.isJsonNull()) {
 			expr = null;
 		} else {
-			expr = parseExpr(array);
+			expr = parseExpr(element.getAsJsonArray());
 		}
 		return new Return(loc, expr);
 	}
@@ -786,22 +786,23 @@ public class IRParser {
 	 * @return A {@link List}&lt;{@link StateVariable}&gt;.
 	 * @throws JSONException
 	 */
-	private OrderedMap<String, StateVariable> parseStateVars(JSONArray array)
-			throws JSONException, OrccException {
+	private OrderedMap<String, StateVariable> parseStateVars(JsonArray array)
+			throws OrccException {
 		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
-		for (int i = 0; i < array.length(); i++) {
-			JSONArray stateArray = array.getJSONArray(i);
+		for (JsonElement element : array) {
+			JsonArray stateArray = element.getAsJsonArray();
 
-			JSONArray varDefArray = stateArray.getJSONArray(0);
-			JSONArray details = varDefArray.getJSONArray(0);
-			String name = details.getString(0);
-			boolean assignable = details.getBoolean(1);
+			JsonArray varDefArray = stateArray.get(0).getAsJsonArray();
+			JsonArray details = varDefArray.get(0).getAsJsonArray();
+			String name = details.get(0).getAsString();
+			boolean assignable = details.get(1).getAsBoolean();
 
-			Location location = parseLocation(varDefArray.getJSONArray(1));
+			Location location = parseLocation(varDefArray.get(1)
+					.getAsJsonArray());
 			Type type = parseType(varDefArray.get(2));
 
 			Object init = null;
-			if (!stateArray.isNull(1)) {
+			if (!stateArray.get(1).isJsonNull()) {
 				init = parseConstant(stateArray.get(1));
 			}
 
@@ -816,11 +817,11 @@ public class IRParser {
 		return stateVars;
 	}
 
-	private Store parseStore(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		Variable target = getVariable(array.getJSONArray(0));
-		List<Expression> indexes = parseExprs(array.getJSONArray(1));
-		Expression value = parseExpr(array.getJSONArray(2));
+	private Store parseStore(Location loc, JsonArray array)
+			throws OrccException {
+		Variable target = getVariable(array.get(0).getAsJsonArray());
+		List<Expression> indexes = parseExprs(array.get(1).getAsJsonArray());
+		Expression value = parseExpr(array.get(2).getAsJsonArray());
 
 		return new Store(loc, target, indexes, value);
 	}
@@ -835,11 +836,11 @@ public class IRParser {
 	 * @return An {@link Type}.
 	 * @throws JSONException
 	 */
-	private Type parseType(Object obj) throws JSONException, OrccException {
+	private Type parseType(JsonElement element) throws OrccException {
 		Type type = null;
 
-		if (obj instanceof String) {
-			String name = (String) obj;
+		if (element.isJsonPrimitive()) {
+			String name = element.getAsString();
 			if (name.equals(TypeBool.NAME)) {
 				type = IrFactory.eINSTANCE.createTypeBool();
 			} else if (name.equals(TypeString.NAME)) {
@@ -849,25 +850,25 @@ public class IRParser {
 			} else {
 				throw new OrccException("Unknown type: " + name);
 			}
-		} else if (obj instanceof JSONArray) {
-			JSONArray array = (JSONArray) obj;
-			String name = array.getString(0);
+		} else if (element.isJsonArray()) {
+			JsonArray array = element.getAsJsonArray();
+			String name = array.get(0).getAsString();
 			if (name.equals(TypeInt.NAME)) {
 				// FIXME change JSON format back to using integer size
-				Expression expr = parseExpr(array.getJSONArray(1));
+				Expression expr = parseExpr(array.get(1).getAsJsonArray());
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
 				type = IrFactory.eINSTANCE.createTypeInt(size);
 			} else if (name.equals(TypeUint.NAME)) {
 				// FIXME change JSON format back to using integer size
-				Expression expr = parseExpr(array.getJSONArray(1));
+				Expression expr = parseExpr(array.get(1).getAsJsonArray());
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 
 				type = IrFactory.eINSTANCE.createTypeUint();
 				((TypeUint) type).setSize(size);
 			} else if (name.equals(TypeList.NAME)) {
 				// FIXME change JSON format back to using integer size
-				Expression expr = parseExpr(array.getJSONArray(1));
+				Expression expr = parseExpr(array.get(1).getAsJsonArray());
 				int size = new ExpressionEvaluator().evaluateAsInteger(expr);
 				Type subType = parseType(array.get(2));
 
@@ -876,17 +877,16 @@ public class IRParser {
 				throw new OrccException("Unknown type: " + name);
 			}
 		} else {
-			throw new OrccException("Invalid type definition: "
-					+ obj.toString());
+			throw new OrccException("Invalid type definition: " + element);
 		}
 
 		return type;
 	}
 
-	private UnaryExpr parseUnaryExpr(Location location, JSONArray array)
-			throws JSONException, OrccException {
-		String name = array.getString(0);
-		Expression expr = parseExpr(array.getJSONArray(1));
+	private UnaryExpr parseUnaryExpr(Location location, JsonArray array)
+			throws OrccException {
+		String name = array.get(0).getAsString();
+		Expression expr = parseExpr(array.get(1).getAsJsonArray());
 		Type type = parseType(array.get(2));
 		UnaryOp op = UnaryOp.getOperator(name);
 		return new UnaryExpr(location, op, expr, type);
@@ -901,14 +901,13 @@ public class IRParser {
 	 * @return A {@link LocalVariable}
 	 * @throws JSONException
 	 */
-	private LocalVariable parseVarDef(JSONArray array) throws JSONException,
-			OrccException {
-		JSONArray details = array.getJSONArray(0);
-		String name = details.getString(0);
-		boolean assignable = details.getBoolean(1);
-		int index = details.getInt(2);
+	private LocalVariable parseVarDef(JsonArray array) throws OrccException {
+		JsonArray details = array.get(0).getAsJsonArray();
+		String name = details.get(0).getAsString();
+		boolean assignable = details.get(1).getAsBoolean();
+		int index = details.get(2).getAsInt();
 
-		Location loc = parseLocation(array.getJSONArray(1));
+		Location loc = parseLocation(array.get(1).getAsJsonArray());
 		Type type = parseType(array.get(2));
 
 		LocalVariable varDef = new LocalVariable(assignable, index, loc, name,
@@ -920,33 +919,31 @@ public class IRParser {
 		return varDef;
 	}
 
-	private void parseVarDefs(JSONArray array) throws JSONException,
-			OrccException {
-		for (int i = 0; i < array.length(); i++) {
-			parseVarDef(array.getJSONArray(i));
+	private void parseVarDefs(JsonArray array) throws OrccException {
+		for (JsonElement element : array) {
+			parseVarDef(element.getAsJsonArray());
 		}
 	}
 
-	private Use parseVarUse(JSONArray array) throws JSONException,
-			OrccException {
+	private Use parseVarUse(JsonArray array) throws OrccException {
 		Variable varDef = getVariable(array);
 		return new Use(varDef);
 	}
 
-	private WhileNode parseWhileNode(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		Expression condition = parseExpr(array.getJSONArray(0));
-		List<CFGNode> nodes = parseNodes(array.getJSONArray(1));
+	private WhileNode parseWhileNode(Location loc, JsonArray array)
+			throws OrccException {
+		Expression condition = parseExpr(array.get(0).getAsJsonArray());
+		List<CFGNode> nodes = parseNodes(array.get(1).getAsJsonArray());
 		BlockNode joinNode = (BlockNode) nodes.remove(0);
 		return new WhileNode(loc, procedure, condition, nodes, joinNode);
 	}
 
-	private Write parseWrite(Location loc, JSONArray array)
-			throws JSONException, OrccException {
-		Variable target = getVariable(array.getJSONArray(0));
-		String fifoName = array.getString(1);
+	private Write parseWrite(Location loc, JsonArray array)
+			throws OrccException {
+		Variable target = getVariable(array.get(0).getAsJsonArray());
+		String fifoName = array.get(1).getAsString();
 		Port port = outputs.get(fifoName);
-		int numTokens = array.getInt(2);
+		int numTokens = array.get(2).getAsInt();
 		Write write = new Write(loc, port, numTokens, target);
 		target.setInstruction(write);
 		return write;

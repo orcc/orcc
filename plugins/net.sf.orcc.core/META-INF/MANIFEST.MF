@@ -48,5 +48,4 @@ Export-Package: net.sf.orcc,
  org.jgrapht.alg,
  org.jgrapht.ext,
  org.jgrapht.graph,
- org.jgrapht.traverse,
- org.json
+ org.jgrapht.traverse
