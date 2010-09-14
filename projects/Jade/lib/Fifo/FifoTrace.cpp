@@ -38,6 +38,7 @@
 //------------------------------
 #include <sstream>
 #include <string>
+#include <iostream>
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
@@ -114,14 +115,14 @@ void FifoTrace::parseHeader (){
 	header = jit->LoadBitcode("FifoTrace", ToolsDir);
 
 	if (header == NULL){
-		fprintf(stderr,"Unable to parse fifo header file");
+		cerr << "Unable to parse fifo header file";
 		exit(0);
 	}
 
 	externMod = jit->LoadBitcode("Extern", ToolsDir);
 
 	if (externMod == NULL){
-		fprintf(stderr,"Unable to parse extern functions file");
+		cerr << "Unable to parse extern functions file";
 		exit(0);
 	}
 }
@@ -148,7 +149,7 @@ void FifoTrace::parseFifoStructs(){
 		Type* type = (Type*)header->getTypeByName(name);
 
 		if (type == NULL){
-			fprintf(stderr,"Error when parsing fifo, structure %s has not beend found", name.c_str());
+			cerr << "Error when parsing fifo, structure " << name << " has not beend found";
 			exit(0);
 		}
 

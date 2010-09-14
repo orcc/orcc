@@ -38,6 +38,7 @@
 //------------------------------
 #include <sstream>
 #include <string>
+#include <iostream>
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
@@ -95,7 +96,7 @@ void UnprotectedFifo::parseHeader (){
 	header = jit->LoadBitcode("UnprotectedFifo", ToolsDir);
 
 	if (header == NULL){
-		fprintf(stderr,"Unable to parse fifo header file");
+		cerr << "Unable to parse fifo header file";
 		exit(0);
 	}
 }
@@ -125,7 +126,7 @@ void UnprotectedFifo::parseFifoStructs(){
 		Type* type = (Type*)header->getTypeByName(name);
 
 		if (type == NULL){
-			fprintf(stderr,"Error when parsing fifo, structure %s has not beend found", name.c_str());
+			cerr << "Error when parsing fifo, structure " << name << " has not beend found";
 			exit(0);
 		}
 

@@ -44,7 +44,7 @@
 #include "Jade/Attribute/ValueAttribute.h"
 #include "Jade/Attribute/TypeAttribute.h"
 #include "Jade/Attribute/TypeAttribute.h"
-
+#include <iostream>
 #include "ExpressionEvaluator.h"
 //------------------------------
 
@@ -68,7 +68,8 @@ int Connection::getFifoSize(){
 		Attribute* attr = (*it).second;
 			
 		if (!attr->isValue()){
-			fprintf(stderr,"Error when parsing type of a connection");
+			cerr<<"Error when parsing type of a connection";
+//			fprintf(stderr,"Error when parsing type of a connection");
 			exit(0);
 		}
 			

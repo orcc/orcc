@@ -37,6 +37,7 @@
 
 //------------------------------
 #include <map>
+#include <iostream>
 
 #include "llvm/Constants.h"
 #include "llvm/ValueSymbolTable.h"
@@ -44,7 +45,6 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/Support/CommandLine.h"
-
 #include "llvm/Module.h"
 
 #include "Jade/JIT.h"
@@ -96,7 +96,7 @@ Actor* IRParser::parseActor(string classz){
 	Module* module = jit->LoadBitcode(file, VTLDir);
 
 	if (module == 0){
-		fprintf(stderr,"Error when parsing bytecode");
+		cerr << "Error when parsing bytecode";
 		exit(0);
 	}
 

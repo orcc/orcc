@@ -37,6 +37,7 @@
 
 //------------------------------
 #include <sstream>
+#include <iostream>
 
 #include "llvm/Module.h"
 #include "llvm/DerivedTypes.h"
@@ -80,7 +81,7 @@ void AbstractFifo::setFifoFunction(std::string name, llvm::Function* function){
 		it = fifoAccess.find(name);
 
 		if (it == fifoAccess.end()){
-			fprintf(stderr,"Error when setting circular fifo");
+			cerr << "Error when setting circular fifo";
 			exit(0);
 		}
 	
@@ -117,7 +118,7 @@ void AbstractFifo::setFifoStruct(std::string name, llvm::Type* type){
 		it = structAcces.find(name);
 
 		if (it == structAcces.end()){
-			fprintf(stderr,"Error when setting structure of fifo");
+			cerr << "Error when setting structure of fifo";
 			exit(0);
 		}
 	

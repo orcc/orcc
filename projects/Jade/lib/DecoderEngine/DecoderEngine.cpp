@@ -37,6 +37,7 @@
 
 //------------------------------
 #include <time.h>
+#include <iostream>
 
 #include "llvm/Constants.h"
 #include "llvm/Support/CommandLine.h"
@@ -137,14 +138,14 @@ int DecoderEngine::load(Network* network) {
 	scheduler.execute();
 
 
-	printf("--> Modules parsed in : %d ms.\n", (clock () - timer) * 1000 / CLOCKS_PER_SEC);
+	cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 
-	printf("--> ExecutionEngine initialized in : %d ms.\n", (clock () - timer) * 1000 / CLOCKS_PER_SEC);
+	cout << "--> ExecutionEngine initialized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 
-	printf("--> Creating decoder : \n");
-	printf("--> Decoder created in : %d ms.\n", (clock () - timer) * 1000 / CLOCKS_PER_SEC);
+	cout << "--> Creating decoder : \n";
+	cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 
 	system("pause");
@@ -186,7 +187,7 @@ AbstractFifo* DecoderEngine::getFifo(){
 	}else if(Fifo.compare("fast")==0){
 		return new UnprotectedFifo(Context, jit);
 	}else{
-		printf("Fifo selection error: type undefined.\n");
+		cout <<"Fifo selection error: type undefined.\n";
 		exit(0);
 	}
 }

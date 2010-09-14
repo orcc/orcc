@@ -38,6 +38,7 @@
 //------------------------------
 #include <time.h>
 #include <signal.h>
+#include <iostream>
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Target/TargetSelect.h"
@@ -157,14 +158,14 @@ int main(int argc, char **argv) {
 	}
 	#endif
 
-	printf("Jade started, parsing file %s. \n", XDFFile.getValue().c_str());
+	std::cout << "Jade started, parsing file " << XDFFile.getValue() << ". \n";
 	XDFParser *xdfParser = new XDFParser(XDFFile);
 	Network* network = xdfParser->ParseXDF(Context);
 	//delete xdfParser;
-	printf("Network parsed in : %d ms, start engine :\n", (clock () - timer) * 1000 / CLOCKS_PER_SEC);
+	std::cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 
 	DecoderEngine engine(Context);
 	engine.load(network);
 	
-	printf("Engine created in : %d ms , start decoding.\n", (clock () - timer) * 1000 / CLOCKS_PER_SEC);
+	std::cout << "Engine created in : " << (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms , start decoding.\n";
 }
