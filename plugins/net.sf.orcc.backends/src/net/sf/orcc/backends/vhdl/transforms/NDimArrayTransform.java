@@ -33,7 +33,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.backends.vhdl.instructions.AssignIndex;
+import net.sf.orcc.backends.vhdl.instructions.AssignLoadIndex;
+import net.sf.orcc.backends.vhdl.instructions.AssignStoreIndex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
@@ -122,8 +123,8 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 			// Assign index to memory
 			Use.removeUses(load, indexes);
 			indexes.clear();
-			AssignIndex assignIndex = new AssignIndex(load.getTarget(),
-					listIndex);
+			AssignLoadIndex assignIndex = new AssignLoadIndex(load.getTarget(),
+					load.getSource().getVariable(), listIndex);
 			it.previous();
 			it.add(assignIndex);
 			it.next();
@@ -147,12 +148,13 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 			// Assign index to memory
 			Use.removeUses(store, indexes);
 			indexes.clear();
-			AssignIndex assignIndex = new AssignIndex(
-					(LocalVariable) store.getValue(), listIndex);
+			AssignStoreIndex assignIndex = new AssignStoreIndex(
+					store.getTarget(), listIndex);
 			it.previous();
 			it.add(assignIndex);
 			it.next();
 			it.remove();
+
 		}
 	}
 }
