@@ -33,8 +33,8 @@ actor Algo_DecodeResidual()
 
 	uint(size=5) Total_Coeff
 		==>
-	bool         SkipNal,
-	uint(size=4) LaunchActor,
+	int (size=6)  TypeOfVLD,
+	int (size=32) ActorLaunched,
 
 	int (size=8) ResBlknC,
 	uint(size=5) ResBlkMaxNumCoeff,
@@ -47,11 +47,14 @@ actor Algo_DecodeResidual()
 	bool         Skip_Block
 		:
 
+	int (size=6) LAUNCH_ACTOR      = -1;
+	uint(size=5) SKIP_NAL          = 10;
+
+	uint(size=4) RESIDUAL_BLOCK_CAVLC = 6;
+	uint(size=4) RESIDUAL_BLOCK_CABAC = 7;
+
 	bool         CAVLC_ENTROPY = false;
 //	bool         CABAC_ENTROPY = true;
-
-	uint(size=4) RESIDUAL_BLOCK_CAVLC = 8;
-	uint(size=4) RESIDUAL_BLOCK_CABAC = 9;
 
 //	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -199,8 +202,8 @@ actor Algo_DecodeResidual()
 
 	ResLuma_Launch16x16DCResBlock: action
 				==>
-			LaunchActor :[ActorSelected],
-			SkipNal     :[    false    ]
+			TypeOfVLD     :[LAUNCH_ACTOR],
+			ActorLaunched :[RESIDUAL_BLOCK_CAVLC]
 		guard
 			bmFlag   = false,
 			startIdx = 0,
@@ -227,8 +230,8 @@ actor Algo_DecodeResidual()
 
 	ResLuma_CheckBmFlagAndEndIdxAndMbType: action
 				==>
-			LaunchActor :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ],
-			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ]
 		guard
 			not bmFlag,
 			endIdx > 0,
@@ -247,8 +250,8 @@ actor Algo_DecodeResidual()
 
 	ResLuma_LaunchResBlk_1: action
 				==>
-			LaunchActor :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ],
-			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ]
 		do
 			Component_type := LUMA_COMPONENT;
 			maxNumCoeff    := 16;
@@ -384,8 +387,8 @@ actor Algo_DecodeResidual()
 
 	ChromaDCResBlk: action
 				==>
-			LaunchActor :[ ActorSelected , ActorSelected ],
-			SkipNal     :[     false     ,     false     ]
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected ]
 		guard
 			bitand(CodedBlockPatternChroma, 3) != 0,
 			startIdx = 0
@@ -443,8 +446,8 @@ actor Algo_DecodeResidual()
 
 	ChromaAcLoopi8x8: action
 			==>
-			LaunchActor :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ],
-			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ]
 		guard
 			i8x8Loop < NumC8x8
 		do
@@ -453,8 +456,8 @@ actor Algo_DecodeResidual()
 
 	ChromaAcLoopi4x4: action
 				==>
-			LaunchActor :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ],
-			SkipNal     :[     false     ,     false     ,     false     ,     false     ]
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ]
 		end
 
 	SendSkipChromaDc: action
@@ -488,7 +491,7 @@ actor Algo_DecodeResidual()
 
 	SendEndResidual: action
 				==>
-			SkipNal :[true]
+			TypeOfVLD :[SKIP_NAL]
 		end
 
 	schedule fsm GetParameters:

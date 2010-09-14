@@ -17,12 +17,10 @@ actor Algo_VariableLengthDecoding()
 	uint(size=8)  RbspByte,
 	bool          NewNal,
 
-	uint(size=3)   TypeOfVLD,
-	int (size=32)  VLD_Param,
-	bool           EndOfNal
+	uint(size=5)   TypeOfVLD,
+	int (size=32)  VLD_Param
 		==>
-	int (size=32)  ValDecoded,
-	bool           SkipNal
+	int (size=32)  ValDecoded
 		:
 
 
@@ -32,16 +30,17 @@ actor Algo_VariableLengthDecoding()
 *
 */
 
-	uint(size=4) READ_BITS             = 0;
-	uint(size=4) VLD_UE                = 1;
-	uint(size=4) VLD_SE                = 2;
-	uint(size=4) BYTE_ALIGNED_REQUIRED = 3;
-	uint(size=4) MORE_RBSP_DATA        = 4;
-	uint(size=4) CAVLC_COEFF_TOKEN     = 5;
-	uint(size=4) CAVLC_LEVEL_PREFIX    = 6;
-	uint(size=4) CAVLC_TOTAL_ZEROS     = 7;
-	uint(size=4) CAVLC_RUN_BEFORE      = 8;
-	uint(size=4) VLD_TE                = 9;
+	uint(size=5) READ_BITS             = 0;
+	uint(size=5) VLD_UE                = 1;
+	uint(size=5) VLD_SE                = 2;
+	uint(size=5) BYTE_ALIGNED_REQUIRED = 3;
+	uint(size=5) MORE_RBSP_DATA        = 4;
+	uint(size=5) CAVLC_COEFF_TOKEN     = 5;
+	uint(size=5) CAVLC_LEVEL_PREFIX    = 6;
+	uint(size=5) CAVLC_TOTAL_ZEROS     = 7;
+	uint(size=5) CAVLC_RUN_BEFORE      = 8;
+	uint(size=5) VLD_TE                = 9;
+	uint(size=5) SKIP_NAL              = 10;
 
 	bool DEBUG_VAL_DECODED = false;
 	bool DEBUG_FLAG_DECODED = false;
@@ -5358,11 +5357,10 @@ actor Algo_VariableLengthDecoding()
 */
 
 	IsEndOfNal: action
-			EndOfNal :[ValEndOfNal]
+			TypeOfVLD :[Func]
 				==>
-			SkipNal  :[true]
 		guard
-			ValEndOfNal = true
+			Func    = SKIP_NAL
 		do
 			CountBufferRbsp := 0;
 			SizeBufferRbsp  := 0;
@@ -5403,11 +5401,9 @@ actor Algo_VariableLengthDecoding()
 
 
 	IsMoreRbspData: action
-			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal]
+			TypeOfVLD :[ValTypeOfVLD]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = MORE_RBSP_DATA
 		end
 
@@ -5481,11 +5477,9 @@ actor Algo_VariableLengthDecoding()
 
 
 	IsVldUe: action
-			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal]
+			TypeOfVLD :[ValTypeOfVLD]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = VLD_UE
 		do
 			Bit1Found       := false;
@@ -5498,11 +5492,9 @@ actor Algo_VariableLengthDecoding()
 
 
 	IsVldSe: action
-			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal]
+			TypeOfVLD :[ValTypeOfVLD]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = VLD_SE
 		do
 			Bit1Found       := false;
@@ -5516,11 +5508,9 @@ actor Algo_VariableLengthDecoding()
 
 	IsReadBits: action
 			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal],
 			VLD_Param :[ValNbBits]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = READ_BITS
 		do
 			BitsCount := ValNbBits;
@@ -5534,11 +5524,9 @@ actor Algo_VariableLengthDecoding()
 
 	IsVldTe.u: action
 			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal],
 			VLD_Param :[TypeOfVld]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = VLD_TE,
 			TypeOfVld    = 1
 		do
@@ -5553,11 +5541,9 @@ actor Algo_VariableLengthDecoding()
 
 	IsVldTe.ue: action
 			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal],
 			VLD_Param :[TypeOfVld]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = VLD_TE,
 			TypeOfVld    > 1
 		do
@@ -5572,11 +5558,9 @@ actor Algo_VariableLengthDecoding()
 
 	IsCavlcCoeffToken: action
 			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal],
 			VLD_Param :[nC]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = CAVLC_COEFF_TOKEN
 		do
 			if(nC < 0)then
@@ -5603,11 +5587,9 @@ actor Algo_VariableLengthDecoding()
 
 	IsCavlcTotalZeros: action
 			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal],
 			VLD_Param :[maxNumCoeff , TotalCoeff]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = CAVLC_TOTAL_ZEROS
 		do
 			IdxmaxNumCoeff :=
@@ -5628,11 +5610,9 @@ actor Algo_VariableLengthDecoding()
 
 	IsCavlcRunBefore: action
 			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal],
 			VLD_Param :[zerosLeft]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = CAVLC_RUN_BEFORE
 		do
 			IdxzerosLeft :=
@@ -5647,11 +5627,9 @@ actor Algo_VariableLengthDecoding()
 
 
 	IsCavlcLevelPrefix: action
-			TypeOfVLD :[ValTypeOfVLD],
-			EndOfNal  :[ValEndOfNal]
+			TypeOfVLD :[ValTypeOfVLD]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = CAVLC_LEVEL_PREFIX
 		do
 			Bit1Found       := false;
@@ -5660,11 +5638,9 @@ actor Algo_VariableLengthDecoding()
 
 
 	IsByteAligned: action
-			TypeOfVLD    :[ValTypeOfVLD],
-			EndOfNal     :[ValEndOfNal]
+			TypeOfVLD    :[ValTypeOfVLD]
 				==>
 		guard
-			ValEndOfNal  = false,
 			ValTypeOfVLD = BYTE_ALIGNED_REQUIRED
 		do
 			CountBufferRbsp := 0;

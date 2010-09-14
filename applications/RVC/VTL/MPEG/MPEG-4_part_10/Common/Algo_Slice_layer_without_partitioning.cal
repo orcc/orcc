@@ -16,47 +16,35 @@ This copyright notice must be included in all copies or derivative works. Copyri
 actor Algo_Slice_layer_without_partitioning()
 	int (size=32) ValVLD,
 
-	uint(size=3)  HeaderTypeOfVLD,
-	int (size=32) HeaderNbBitsToRead,
-	bool          HeaderSkipNal,
-	uint(size=4)  HeaderLaunchActor,
+	int (size=6)  HeaderTypeOfVLD,
+	int (size=32) HeaderVLDParam,
 
-	uint(size=3)  DecRefPicMarkingTypeOfVLD,
+	uint(size=5)  DecRefPicMarkingTypeOfVLD,
 	int (size=32) DecRefPicMarkingNbBitsToRead,
-	bool          DecRefPicMarkingSkipNal,
 
-	uint(size=3)  RefPicListTypeOfVLD,
+	uint(size=5)  RefPicListTypeOfVLD,
 	int (size=32) RefPicListNbBitsToRead,
-	bool          RefPicListSkipNal,
 
-	uint(size=3)  DataTypeOfVLD,
-	int (size=32) DataNbBitsToRead,
-	bool          DataSkipNal,
-	uint(size=4)  DataLaunchActor,
+	int (size=6)  DataTypeOfVLD,
+	int (size=32) DataVLDParam,
 
-	uint(size=3)  MbLayerTypeOfVLD,
-	int (size=32) MbLayerNbBitsToRead,
-	bool          MbLayerSkipNal,
-	uint(size=4)  MbLayerLaunchActor,
+	int (size=6)  MbLayerTypeOfVLD,
+	int (size=32) MbLayerVLDParam,
 
-	uint(size=3)  MbPredTypeOfVLD,
+	uint(size=5)  MbPredTypeOfVLD,
 	int (size=32) MbPredNbBitsToRead,
-	bool          MbPredSkipNal,
 
-	uint(size=3)  SubMbPredTypeOfVLD,
+	uint(size=5)  SubMbPredTypeOfVLD,
 	int (size=32) SubMbPredNbBitsToRead,
-	bool          SubMbPredSkipNal,
 
-	bool          ResSkipNal,
-	uint(size=4)  ResLaunchActor,
+	int (size=6)  ResTypeOfVLD,
+	int (size=32) ResActorLaunched,
 
-	uint(size=3)  ResBlkCavlcTypeOfVLD,
-	int (size=32) ResBlkCavlcVLD_Param,
-	bool          ResBlkCavlcSkipNal
+	uint(size=5)  ResBlkCavlcTypeOfVLD,
+	int (size=32) ResBlkCavlcVLD_Param
 		==>
-	uint(size=3)  TypeOfVLD,
+	uint(size=5)  TypeOfVLD,
 	int (size=32) VLD_Param,
-	bool          SkipNal,
 
 	int (size=32) HeaderValVLD,
 
@@ -82,21 +70,22 @@ actor Algo_Slice_layer_without_partitioning()
 *
 */
 
-	uint(size=3) READ_BITS            = 0;
-	uint(size=3) CAVLC_COEFF_TOKEN    = 5;
-	uint(size=3) CAVLC_TOTAL_ZEROS    = 7;
-	uint(size=4) CAVLC_RUN_BEFORE      = 8;
+	int (size=6) LAUNCH_ACTOR      = -1;
+	uint(size=5) READ_BITS         =  0;
+	uint(size=5) CAVLC_COEFF_TOKEN =  5;
+	uint(size=5) CAVLC_TOTAL_ZEROS =  7;
+	uint(size=5) CAVLC_RUN_BEFORE  =  8;
+	uint(size=5) VLD_TE            = 9;
+	uint(size=5) SKIP_NAL          = 10;
 
-	uint(size=4) SLICE_HEADER         = 0;
-	uint(size=4) DEC_REF_PIC_MARKING  = 1;
-	uint(size=4) REF_PIC_LIST         = 2;
-	uint(size=4) SLICE_DATA           = 3;
-	uint(size=4) MB_LAYER             = 4;
-	uint(size=4) SUB_MB_PRED          = 5;
-	uint(size=4) MB_PRED              = 6;
-	uint(size=4) RESIDUAL             = 7;
-	uint(size=4) RESIDUAL_BLOCK_CAVLC = 8;
-	uint(size=4) VLD_TE               = 9;
+	uint(size=4) DEC_REF_PIC_MARKING  = 0;
+	uint(size=4) REF_PIC_LIST         = 1;
+	uint(size=4) MB_LAYER             = 2;
+	uint(size=4) SUB_MB_PRED          = 3;
+	uint(size=4) MB_PRED              = 4;
+	uint(size=4) RESIDUAL             = 5;
+	uint(size=4) RESIDUAL_BLOCK_CAVLC = 6;
+	uint(size=4) RESIDUAL_BLOCK_CABAC = 7;
 
 
 	SliceHeader.GetVLDVal: action
@@ -107,57 +96,49 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	SliceHeader.AskVLD: action
-			HeaderTypeOfVLD   :[ValTypeOfVLD],
-			HeaderSkipNal     :[EndOfDecoding],
-			HeaderLaunchActor :[ValLaunch]
+			HeaderTypeOfVLD   :[ValTypeOfVLD]
 				==>
-			TypeOfVLD       :[ValTypeOfVLD],
-			SkipNal         :[false]
+			TypeOfVLD       :[ValTypeOfVLD]
 		guard
 			ValTypeOfVLD  != READ_BITS,
-			EndOfDecoding  = false,
-			ValLaunch      = SLICE_HEADER
+			ValTypeOfVLD  != SKIP_NAL,
+			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
 
 
 	SliceHeader.AskReadBits: action
-			HeaderTypeOfVLD    :[ValTypeOfVLD],
-			HeaderNbBitsToRead :[NbBits],
-			HeaderSkipNal      :[EndOfDecoding],
-			HeaderLaunchActor  :[ValLaunch]
+			HeaderTypeOfVLD :[ValTypeOfVLD],
+			HeaderVLDParam  :[NbBits]
 				==>
-			TypeOfVLD          :[READ_BITS],
-			VLD_Param       :[NbBits],
-			SkipNal            :[false]
+			TypeOfVLD       :[READ_BITS],
+			VLD_Param       :[NbBits]
 		guard
-			ValTypeOfVLD  = READ_BITS,
-			EndOfDecoding = false,
-			ValLaunch      = SLICE_HEADER
+			ValTypeOfVLD  = READ_BITS
 		end
 
 	SliceHeader.LaunchRefPicMark: action
-			HeaderSkipNal     :[EndOfDecoding],
-			HeaderLaunchActor :[ValLaunch]
+			HeaderTypeOfVLD :[Function],
+			HeaderVLDParam  :[Actor]
 				==>
 		guard
-			ValLaunch     = DEC_REF_PIC_MARKING,
-			EndOfDecoding = false
+			Function = LAUNCH_ACTOR,
+			Actor    = DEC_REF_PIC_MARKING
 		end
 
 	SliceHeader.LaunchRefPicList: action
-			HeaderSkipNal     :[EndOfDecoding],
-			HeaderLaunchActor :[ValLaunch]
+			HeaderTypeOfVLD :[Function],
+			HeaderVLDParam  :[Actor]
 				==>
 		guard
-			ValLaunch     = REF_PIC_LIST,
-			EndOfDecoding = false
+			Function = LAUNCH_ACTOR,
+			Actor    = REF_PIC_LIST
 		end
 
 	SliceHeader.Done: action
-			HeaderSkipNal :[EndOfDecoding]
+			HeaderTypeOfVLD :[Function]
 				==>
 		guard
-			EndOfDecoding = true
+			Function = SKIP_NAL
 		end
 
 
@@ -169,35 +150,30 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	RefPicMark.AskVLD: action
-			DecRefPicMarkingTypeOfVLD   :[ValTypeOfVLD],
-			DecRefPicMarkingSkipNal     :[EndOfDecoding]
+			DecRefPicMarkingTypeOfVLD   :[ValTypeOfVLD]
 				==>
-			TypeOfVLD       :[ValTypeOfVLD],
-			SkipNal         :[false]
+			TypeOfVLD       :[ValTypeOfVLD]
 		guard
 			ValTypeOfVLD  != READ_BITS,
-			EndOfDecoding  = false
+			ValTypeOfVLD  != SKIP_NAL
 		end
 
 
 	RefPicMark.AskReadBits: action
 			DecRefPicMarkingTypeOfVLD    :[ValTypeOfVLD],
-			DecRefPicMarkingNbBitsToRead :[NbBits],
-			DecRefPicMarkingSkipNal      :[EndOfDecoding]
+			DecRefPicMarkingNbBitsToRead :[NbBits]
 				==>
-			TypeOfVLD          :[READ_BITS],
-			VLD_Param       :[NbBits],
-			SkipNal            :[false]
+			TypeOfVLD :[READ_BITS],
+			VLD_Param :[NbBits]
 		guard
-			ValTypeOfVLD  = READ_BITS,
-			EndOfDecoding = false
+			ValTypeOfVLD  = READ_BITS
 		end
 
 	RefPicMark.Done: action
-			DecRefPicMarkingSkipNal :[EndOfDecoding]
+			DecRefPicMarkingTypeOfVLD    :[Function]
 				==>
 		guard
-			EndOfDecoding = true
+			Function = SKIP_NAL
 		end
 
 
@@ -209,89 +185,76 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	RefPicList.AskVLD: action
-			RefPicListTypeOfVLD   :[ValTypeOfVLD],
-			RefPicListSkipNal     :[EndOfDecoding]
+			RefPicListTypeOfVLD   :[ValTypeOfVLD]
 				==>
-			TypeOfVLD       :[ValTypeOfVLD],
-			SkipNal         :[false]
+			TypeOfVLD       :[ValTypeOfVLD]
 		guard
 			ValTypeOfVLD  != READ_BITS,
-			EndOfDecoding  = false
+			ValTypeOfVLD  != SKIP_NAL
 		end
 
 
 	RefPicList.AskReadBits: action
 			RefPicListTypeOfVLD    :[ValTypeOfVLD],
-			RefPicListNbBitsToRead :[NbBits],
-			RefPicListSkipNal      :[EndOfDecoding]
+			RefPicListNbBitsToRead :[NbBits]
 				==>
-			TypeOfVLD          :[READ_BITS],
-			VLD_Param       :[NbBits],
-			SkipNal            :[false]
+			TypeOfVLD              :[READ_BITS],
+			VLD_Param              :[NbBits]
 		guard
-			ValTypeOfVLD  = READ_BITS,
-			EndOfDecoding = false
+			ValTypeOfVLD  = READ_BITS
 		end
 
 	RefPicList.Done: action
-			RefPicListSkipNal :[EndOfDecoding]
+			RefPicListTypeOfVLD :[Function]
 				==>
 		guard
-			EndOfDecoding = true
+			Function = SKIP_NAL
 		end
 
 
 	SliceData.GetVLDVal: action
-			ValVLD       :[VLDecoding]
+			ValVLD     :[VLDecoding]
 				==>
 			DataValVLD :[VLDecoding]
 		end
 
 
 	SliceData.AskVLD: action
-			DataTypeOfVLD   :[ValTypeOfVLD],
-			DataSkipNal     :[EndOfDecoding],
-			DataLaunchActor :[ValLaunch]
+			DataTypeOfVLD :[ValTypeOfVLD]
 				==>
-			TypeOfVLD       :[ValTypeOfVLD],
-			SkipNal         :[false]
+			TypeOfVLD     :[ValTypeOfVLD]
 		guard
 			ValTypeOfVLD  != READ_BITS,
-			EndOfDecoding  = false,
-			ValLaunch      = SLICE_DATA
+			ValTypeOfVLD  != SKIP_NAL,
+			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
 
 
 	SliceData.AskReadBits: action
-			DataTypeOfVLD    :[ValTypeOfVLD],
-			DataNbBitsToRead :[NbBits],
-			DataSkipNal      :[EndOfDecoding],
-			DataLaunchActor :[ValLaunch]
+			DataTypeOfVLD :[ValTypeOfVLD],
+			DataVLDParam  :[NbBits]
 				==>
-			TypeOfVLD          :[READ_BITS],
-			VLD_Param       :[NbBits],
-			SkipNal            :[false]
+			TypeOfVLD        :[READ_BITS],
+			VLD_Param        :[NbBits]
 		guard
-			ValTypeOfVLD  = READ_BITS,
-			EndOfDecoding = false,
-			ValLaunch     = SLICE_DATA
+			ValTypeOfVLD  = READ_BITS
 		end
 
 	SliceData.LaunchMbLayer: action
-			DataSkipNal     :[EndOfDecoding],
-			DataLaunchActor :[ValLaunch]
+			DataTypeOfVLD :[Function],
+			DataVLDParam  :[Actor]
 				==>
 		guard
-			ValLaunch     = MB_LAYER,
-			EndOfDecoding = false
+			Function = LAUNCH_ACTOR,
+			Actor    = MB_LAYER
 		end
 
 	SliceData.Done: action
-			DataSkipNal :[EndOfDecoding]
+			DataTypeOfVLD :[Function]
 				==>
-			SkipNal : [true]
+			TypeOfVLD     :[SKIP_NAL]
 		guard
-			EndOfDecoding = true
+			Function = SKIP_NAL
 		end
 
 
@@ -303,66 +266,58 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	MbLayer.AskVLD: action
-			MbLayerTypeOfVLD   :[ValTypeOfVLD],
-			MbLayerSkipNal     :[EndOfDecoding],
-			MbLayerLaunchActor :[ValLaunchActor]
+			MbLayerTypeOfVLD   :[ValTypeOfVLD]
 				==>
-			TypeOfVLD          :[ValTypeOfVLD],
-			SkipNal            :[false]
+			TypeOfVLD          :[ValTypeOfVLD]
 		guard
 			ValTypeOfVLD  != READ_BITS,
-			EndOfDecoding  = false,
-			ValLaunchActor = MB_LAYER
+			ValTypeOfVLD  != SKIP_NAL,
+			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
 
 
 	MbLayer.AskReadBits: action
-			MbLayerTypeOfVLD    :[ValTypeOfVLD],
-			MbLayerNbBitsToRead :[NbBits],
-			MbLayerSkipNal      :[EndOfDecoding],
-			MbLayerLaunchActor  :[ValLaunchActor]
+			MbLayerTypeOfVLD :[ValTypeOfVLD],
+			MbLayerVLDParam  :[NbBits]
 				==>
 			TypeOfVLD           :[READ_BITS],
-			VLD_Param        :[NbBits],
-			SkipNal             :[false]
+			VLD_Param           :[NbBits]
 		guard
-			ValTypeOfVLD   = READ_BITS,
-			EndOfDecoding  = false,
-			ValLaunchActor = MB_LAYER
+			ValTypeOfVLD   = READ_BITS
 		end
 
 	MbLayer.Done: action
-			MbLayerSkipNal :[EndOfDecoding]
+			MbLayerTypeOfVLD :[Function]
 				==>
 		guard
-			EndOfDecoding = true
+			Function = SKIP_NAL
 		end
 
 	MbLayer.LaunchSubMbPred: action
-			MbLayerSkipNal     :[EndOfDecoding],
-			MbLayerLaunchActor :[ValLaunch]
+			MbLayerTypeOfVLD :[Function],
+			MbLayerVLDParam  :[Actor]
 				==>
 		guard
-			ValLaunch     = SUB_MB_PRED,
-			EndOfDecoding = false
+			Function = LAUNCH_ACTOR,
+			Actor    = SUB_MB_PRED
 		end
 
 	MbLayer.LaunchMbPred: action
-			MbLayerSkipNal     :[EndOfDecoding],
-			MbLayerLaunchActor :[ValLaunch]
+			MbLayerTypeOfVLD :[Function],
+			MbLayerVLDParam  :[Actor]
 				==>
 		guard
-			ValLaunch     = MB_PRED,
-			EndOfDecoding = false
+			Function = LAUNCH_ACTOR,
+			Actor    = MB_PRED
 		end
 
 	MbLayer.LaunchResidual: action
-			MbLayerSkipNal     :[EndOfDecoding],
-			MbLayerLaunchActor :[ValLaunch]
+			MbLayerTypeOfVLD :[Function],
+			MbLayerVLDParam  :[Actor]
 				==>
 		guard
-			ValLaunch     = RESIDUAL,
-			EndOfDecoding = false
+			Function = LAUNCH_ACTOR,
+			Actor    = RESIDUAL
 		end
 
 
@@ -374,37 +329,32 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	MbPred.AskVLD: action
-			MbPredTypeOfVLD   :[ValTypeOfVLD],
-			MbPredSkipNal     :[EndOfDecoding]
+			MbPredTypeOfVLD   :[ValTypeOfVLD]
 				==>
-			TypeOfVLD         :[ValTypeOfVLD],
-			SkipNal           :[false]
+			TypeOfVLD         :[ValTypeOfVLD]
 		guard
 			ValTypeOfVLD  != READ_BITS,
-			ValTypeOfVLD  != VLD_TE,
-			EndOfDecoding  = false
+			ValTypeOfVLD  != SKIP_NAL,
+			ValTypeOfVLD  != VLD_TE
 		end
 
 
 	MbPred.AskReadBitsOrTeV: action
 			MbPredTypeOfVLD    :[ValTypeOfVLD],
-			MbPredNbBitsToRead :[VldParam],
-			MbPredSkipNal      :[EndOfDecoding]
+			MbPredNbBitsToRead :[VldParam]
 				==>
 			TypeOfVLD          :[ValTypeOfVLD],
-			VLD_Param       :[VldParam],
-			SkipNal            :[false]
+			VLD_Param          :[VldParam]
 		guard
-			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE,
-			EndOfDecoding = false
+			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE
 		end
 
 	MbPred.Done: action
-			MbPredSkipNal :[EndOfDecoding]
+			MbPredTypeOfVLD   :[Function]
 				==>
 		guard
-			EndOfDecoding = true
-		end/******/
+			Function = SKIP_NAL
+		end
 
 
 	SubMbPred.GetVLDVal: action
@@ -415,52 +365,47 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	SubMbPred.AskVLD: action
-			SubMbPredTypeOfVLD   :[ValTypeOfVLD],
-			SubMbPredSkipNal     :[EndOfDecoding]
+			SubMbPredTypeOfVLD   :[ValTypeOfVLD]
 				==>
-			TypeOfVLD         :[ValTypeOfVLD],
-			SkipNal           :[false]
+			TypeOfVLD         :[ValTypeOfVLD]
 		guard
 			ValTypeOfVLD  != READ_BITS,
-			ValTypeOfVLD  != VLD_TE,
-			EndOfDecoding  = false
+			ValTypeOfVLD  != SKIP_NAL,
+			ValTypeOfVLD  != VLD_TE
 		end
 
 
 	SubMbPred.AskReadBitsOrTeV: action
 			SubMbPredTypeOfVLD    :[ValTypeOfVLD],
-			SubMbPredNbBitsToRead :[VldParam],
-			SubMbPredSkipNal      :[EndOfDecoding]
+			SubMbPredNbBitsToRead :[VldParam]
 				==>
-			TypeOfVLD          :[ValTypeOfVLD],
-			VLD_Param       :[VldParam],
-			SkipNal            :[false]
+			TypeOfVLD             :[ValTypeOfVLD],
+			VLD_Param             :[VldParam]
 		guard
-			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE,
-			EndOfDecoding = false
+			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE
 		end
 
 	SubMbPred.Done: action
-			SubMbPredSkipNal :[EndOfDecoding]
+			SubMbPredTypeOfVLD :[Function]
 				==>
 		guard
-			EndOfDecoding = true
+			Function = SKIP_NAL
 		end
 
 	Residual.Done: action
-			ResSkipNal :[EndOfDecoding]
+			ResTypeOfVLD :[Function]
 				==>
 		guard
-			EndOfDecoding = true
+			Function = SKIP_NAL
 		end
 
 	Residual.LaunchResBlkCavlc: action
-			ResSkipNal     :[EndOfDecoding],
-			ResLaunchActor :[ValLaunch]
+			ResTypeOfVLD     :[Function],
+			ResActorLaunched :[Actor]
 				==>
 		guard
-			ValLaunch     = RESIDUAL_BLOCK_CAVLC,
-			EndOfDecoding = false
+			Function = LAUNCH_ACTOR,
+			Actor    = RESIDUAL_BLOCK_CAVLC
 		end
 
 
@@ -472,49 +417,44 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	ResBlkCavlc.AskVLD: action
-			ResBlkCavlcTypeOfVLD   :[ValTypeOfVLD],
-			ResBlkCavlcSkipNal     :[EndOfDecoding]
+			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD]
 				==>
-			TypeOfVLD       :[ValTypeOfVLD],
-			SkipNal         :[false]
+			TypeOfVLD       :[ValTypeOfVLD]
 		guard
-			(ValTypeOfVLD != READ_BITS) and (ValTypeOfVLD != CAVLC_COEFF_TOKEN) and (ValTypeOfVLD != CAVLC_TOTAL_ZEROS) and ( ValTypeOfVLD != CAVLC_RUN_BEFORE),
-			EndOfDecoding  = false
+			ValTypeOfVLD != READ_BITS,
+			ValTypeOfVLD != CAVLC_COEFF_TOKEN,
+			ValTypeOfVLD != CAVLC_TOTAL_ZEROS,
+			ValTypeOfVLD != CAVLC_RUN_BEFORE,
+			ValTypeOfVLD != SKIP_NAL
 		end
 
 
 	ResBlkCavlc.AskReadBitsOrCavlc: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
-			ResBlkCavlcVLD_Param :[NbBits],
-			ResBlkCavlcSkipNal   :[EndOfDecoding]
+			ResBlkCavlcVLD_Param :[NbBits]
 				==>
 			TypeOfVLD            :[ValTypeOfVLD],
-			VLD_Param            :[NbBits],
-			SkipNal              :[false]
+			VLD_Param            :[NbBits]
 		guard
-			(ValTypeOfVLD = READ_BITS) or (ValTypeOfVLD = CAVLC_COEFF_TOKEN) or (ValTypeOfVLD = CAVLC_RUN_BEFORE),
-			EndOfDecoding = false
+			(ValTypeOfVLD = READ_BITS) or (ValTypeOfVLD = CAVLC_COEFF_TOKEN) or (ValTypeOfVLD = CAVLC_RUN_BEFORE)
 		end
 
 
 	ResBlkCavlc.AskCavlcTotalZeros: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
-			ResBlkCavlcVLD_Param :[maxNumCoeff , TotalCoeff],
-			ResBlkCavlcSkipNal   :[EndOfDecoding]
+			ResBlkCavlcVLD_Param :[maxNumCoeff , TotalCoeff]
 				==>
 			TypeOfVLD            :[CAVLC_TOTAL_ZEROS],
-			VLD_Param            :[maxNumCoeff , TotalCoeff],
-			SkipNal              :[false]
+			VLD_Param            :[maxNumCoeff , TotalCoeff]
 		guard
-			ValTypeOfVLD = CAVLC_TOTAL_ZEROS,
-			EndOfDecoding = false
+			ValTypeOfVLD = CAVLC_TOTAL_ZEROS
 		end
 
 	ResBlkCavlc.Done: action
-			ResBlkCavlcSkipNal :[EndOfDecoding]
+			ResBlkCavlcTypeOfVLD :[Function]
 				==>
 		guard
-			EndOfDecoding = true
+			Function = SKIP_NAL
 		end
 
 	schedule fsm LaunchSliceHeader:

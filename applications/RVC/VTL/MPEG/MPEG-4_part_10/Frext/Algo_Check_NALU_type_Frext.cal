@@ -56,10 +56,8 @@ actor Algo_Check_NALU_type_Frext()
 	uint(size=8) RbspByte,
 	bool         NewNal,
 
-	bool         SpsReadNextByte,
 	bool         SpsSkipNal,
 
-	bool         PpsReadNextByte,
 	bool         PpsSkipNal,
 
 	bool         PicSkipNal

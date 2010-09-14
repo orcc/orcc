@@ -19,9 +19,8 @@ actor Algo_DecodeDecRefPicMarking()
 	uint(size=2) PicNalRefIdc,
 	bool         IdrPic
 		==>
-	uint(size=3)  TypeOfVLD,
+	uint(size=5)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
-	bool          SkipNal,
 
 	uint(size=31) Mmco
 		:
@@ -35,7 +34,7 @@ actor Algo_DecodeDecRefPicMarking()
 
 	uint(size=3) READ_BITS = 0;
 	uint(size=3) VLD_UE    = 1;
-//	uint(size=3) VLD_SE    = 2;
+	uint(size=4) SKIP_NAL  = 10;
 
 
 	bool DEBUG_FLAG_DECODED = false;
@@ -72,7 +71,6 @@ actor Algo_DecodeDecRefPicMarking()
 	IsAnIdrPic.IsEqualToFalse: action
 				==>
 			//     adaptive_ref_pic_marking_mode_flag
-			SkipNal      :[   false   ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[     1     ]
 		guard
@@ -82,7 +80,6 @@ actor Algo_DecodeDecRefPicMarking()
 	IsAnIdrPic.IsEqualToTrue: action
 				==>
 			//              no_output , long_term
-			SkipNal      :[   false   ,   false   ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , READ_BITS ],
 			NbBitsToRead :[     1     ,     1     ]
 		guard
@@ -119,7 +116,6 @@ actor Algo_DecodeDecRefPicMarking()
 	AdaptRefPicMarkMode.IsEqualToTrue: action
 				==>
 			//  memory_management_control_operation
-			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			adaptive_ref_pic_marking_mode_flag = true
@@ -128,7 +124,6 @@ actor Algo_DecodeDecRefPicMarking()
 	MMCO.IsEqualTo1_2_4_6: action
 			ValVLD :[ValueOfVLD]
 				==>
-			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ],
 
 			Mmco         :[ValueOfVLD]
@@ -147,7 +142,6 @@ actor Algo_DecodeDecRefPicMarking()
 			ValVLD :[ValueOfVLD]
 				==>
 			//              differ , long_te
-			SkipNal      :[ false  , false  ],
 			TypeOfVLD    :[ VLD_UE , VLD_UE ],
 
 			Mmco         :[ValueOfVLD]
@@ -163,7 +157,6 @@ actor Algo_DecodeDecRefPicMarking()
 			ValVLD :[ValueOfVLD]
 				==>
 			//   memory_management_control_operation
-			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ],
 
 			Mmco         :[ValueOfVLD]
@@ -191,7 +184,6 @@ actor Algo_DecodeDecRefPicMarking()
 			ValVLD :[ValueOfVLD]
 				==>
 			//      reordering_of_pic_nums_idc
-			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ],
 
 			Mmco         :[ValueOfVLD]
@@ -205,7 +197,6 @@ actor Algo_DecodeDecRefPicMarking()
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
 			//      reordering_of_pic_nums_idc
-			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ],
 
 			Mmco         :[ValueOfVLD] repeat 2
@@ -218,7 +209,7 @@ actor Algo_DecodeDecRefPicMarking()
 
 	SendEndSliceHeader: action
 				==>
-			SkipNal :[true]
+			TypeOfVLD :[SKIP_NAL]
 		end
 
 	schedule fsm ReadNalRefIdc:

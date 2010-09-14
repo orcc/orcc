@@ -41,10 +41,9 @@ actor Algo_DecodeSliceHeader()
 		==>
 	uint(size=31) FramNumCurrPic,
 
-	uint(size=3)  TypeOfVLD,
-	int (size=32) NbBitsToRead,
-	bool          SkipNal,
-	uint(size=4)  LaunchActor,
+	int (size=6)  TypeOfVLD,
+	int (size=32) VLDParam,
+	bool          DecodeNextNal,
 
 	uint(size=8)  GetPps,
 
@@ -67,13 +66,15 @@ actor Algo_DecodeSliceHeader()
 *
 */
 
-	uint(size=3) READ_BITS = 0;
-	uint(size=3) VLD_UE    = 1;
-	uint(size=3) VLD_SE    = 2;
 
-	uint(size=4) SLICE_HEADER        = 0;
-	uint(size=4) DEC_REF_PIC_MARKING = 1;
-	uint(size=4) REF_PIC_LIST        = 2;
+	int (size=6) LAUNCH_ACTOR = -1;
+	uint(size=3) READ_BITS    =  0;
+	uint(size=3) VLD_UE       =  1;
+	uint(size=3) VLD_SE       =  2;
+	uint(size=4) SKIP_NAL     = 10;
+
+	uint(size=4) DEC_REF_PIC_MARKING  = 0;
+	uint(size=4) REF_PIC_LIST         = 1;
 
 //	uint(size=4) SLICE_TYPE_P  = 0;
 //	uint(size=4) SLICE_TYPE_B  = 1;
@@ -154,8 +155,6 @@ actor Algo_DecodeSliceHeader()
 	ReadSliceType.Asked: action
 			==>
 			//              first_ , slice_ , pic_par
-			SkipNal      :[  false ,  false ,  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER , SLICE_HEADER , SLICE_HEADER ],
 			TypeOfVLD    :[ VLD_UE , VLD_UE , VLD_UE ]
 	do
 		disable_deblocking_filter_idc := 0;
@@ -196,10 +195,8 @@ actor Algo_DecodeSliceHeader()
 	SeparateColourPlane.IsEqualToTrue: action
 				==>
 			//           colour_plane_id
-			SkipNal      :[   false   ],//Keep synchro
-			TypeOfVLD    :[ READ_BITS ],
-			LaunchActor  :[ SLICE_HEADER ],
-			NbBitsToRead :[     2     ]
+			TypeOfVLD :[ READ_BITS ],
+			VLDParam  :[     2     ]
 		guard
 			separate_colour_plane_flag = true
 		end
@@ -209,10 +206,8 @@ actor Algo_DecodeSliceHeader()
 			Log2MaxFrameNum :[SzMaxFrameNum]
 				==>
 			//                frame_num
-			SkipNal      :[     false     ],//Keep synchro
-			TypeOfVLD    :[   READ_BITS   ],
-			LaunchActor  :[ SLICE_HEADER  ],
-			NbBitsToRead :[ SzMaxFrameNum ]
+			TypeOfVLD :[   READ_BITS   ],
+			VLDParam  :[ SzMaxFrameNum ]
 		do
 			log2_max_frame_num := SzMaxFrameNum;
 		end
@@ -284,10 +279,8 @@ actor Algo_DecodeSliceHeader()
 	FrameMbsOnly.IsEqualToFalse: action
 				==>
 			//           field_pic_flag
-			SkipNal      :[   false   ],//Keep synchro
-			TypeOfVLD    :[ READ_BITS ],
-			LaunchActor  :[ SLICE_HEADER  ],
-			NbBitsToRead :[     1     ]
+			TypeOfVLD :[ READ_BITS ],
+			VLDParam  :[     1     ]
 		guard
 			frame_mbs_only_flag = false
 		end
@@ -313,10 +306,8 @@ actor Algo_DecodeSliceHeader()
 	FieldPicFlag.IsEqualToTrue: action
 				==>
 			//           bottom_field_flag
-			SkipNal      :[   false   ],//Keep synchro
-			TypeOfVLD    :[ READ_BITS ],
-			LaunchActor  :[ SLICE_HEADER  ],
-			NbBitsToRead :[     1     ]
+			TypeOfVLD :[ READ_BITS ],
+			VLDParam  :[     1     ]
 		guard
 			field_pic_flag = true
 		end
@@ -351,8 +342,6 @@ actor Algo_DecodeSliceHeader()
 	IdrFlag.IsEqualToTrue: action
 				==>
 			//            idr_pic_id
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			Idr_flag = true
@@ -381,10 +370,8 @@ actor Algo_DecodeSliceHeader()
 	PocType.IsEqualTo0: action
 				==>
 			//           pic_order_cnt_lsb
-			SkipNal      :[    false    ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
-			TypeOfVLD    :[  READ_BITS  ],
-			NbBitsToRead :[ SzMaxPocLsb ]
+			TypeOfVLD :[  READ_BITS  ],
+			VLDParam  :[ SzMaxPocLsb ]
 		guard
 			pic_order_cnt_type = 0
 		end
@@ -429,8 +416,6 @@ actor Algo_DecodeSliceHeader()
 			//     delta_pic_order_cnt_bottom
 			//                or
 			//      delta_pic_order_cnt[ 1 ]
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_SE ]
 		guard
 			pic_order_present_flag = true,
@@ -506,8 +491,6 @@ actor Algo_DecodeSliceHeader()
 	ReadDeltaPicOrCnt0.Asked: action
 				==>
 			//      delta_pic_order_cnt[ 0 ]
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_SE ]
 		guard
 			pic_order_cnt_type               = 1,
@@ -572,8 +555,6 @@ actor Algo_DecodeSliceHeader()
 	RedundPicCntPres.IsEqualToTrue: action
 				==>
 			//         redundant_pic_cnt
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			redundant_pic_cnt_present_flag = true
@@ -593,8 +574,8 @@ actor Algo_DecodeSliceHeader()
 
 	RefPicList.Launch: action
 				==>
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ REF_PIC_LIST ]
+			TypeOfVLD :[LAUNCH_ACTOR],
+			VLDParam  :[REF_PIC_LIST]
 		end
 
 	SendSliceDataParameters: action
@@ -605,16 +586,14 @@ actor Algo_DecodeSliceHeader()
 
 	DecRefPicMarking.Launch: action
 				==>
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ DEC_REF_PIC_MARKING ]
+			TypeOfVLD :[LAUNCH_ACTOR],
+			VLDParam  :[DEC_REF_PIC_MARKING]
 		end
 
 
 	ReadCabacInitDc.Asked: action
 				==>
 			//           cabac_init_idc
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			entropy_coding_mode_flag  = true,
@@ -637,8 +616,6 @@ actor Algo_DecodeSliceHeader()
 	ReadSliceQpDelta.Asked: action
 				==>
 			//          slice_qp_delta
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_SE ]
 		end
 
@@ -662,10 +639,8 @@ actor Algo_DecodeSliceHeader()
 	Slice_Type.IsEqualToSP: action
 				==>
 			//              sp_for_sw , slice_q
-			SkipNal      :[   false   ,  false ],//Keep synchro
-			TypeOfVLD    :[ READ_BITS , VLD_SE ],
-			LaunchActor  :[ SLICE_HEADER, SLICE_HEADER ],
-			NbBitsToRead :[     1              ]
+			TypeOfVLD :[ READ_BITS , VLD_SE ],
+			VLDParam  :[     1              ]
 		guard
 			slice_type = SLICE_TYPE_SP
 		end
@@ -692,8 +667,6 @@ actor Algo_DecodeSliceHeader()
 	Slice_Type.IsEqualToSI: action
 				==>
 			//          slice_qs_delta
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_SE ]
 		guard
 			slice_type = SLICE_TYPE_SP
@@ -714,8 +687,6 @@ actor Algo_DecodeSliceHeader()
 	DeblocFilterPresent: action
 				==>
 			//          slice_qs_delta
-			SkipNal      :[  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			deblocking_filter_control_present_flag = true
@@ -736,8 +707,6 @@ actor Algo_DecodeSliceHeader()
 	DisDeblocFilterIdc.IsNotEqualTo1: action
 				==>
 			//              slice_ , slice_
-			SkipNal      :[  false ,  false ],//Keep synchro
-			LaunchActor  :[ SLICE_HEADER, SLICE_HEADER  ],
 			TypeOfVLD    :[ VLD_SE , VLD_SE ]
 		guard
 			disable_deblocking_filter_idc != 1
@@ -760,10 +729,8 @@ actor Algo_DecodeSliceHeader()
 	ReadSlcGrpChgCycl.Asked: action
 				==>
 			//            slice_group_change_cycle
-			SkipNal      :[         false        ],//Keep synchro
-			TypeOfVLD    :[       READ_BITS      ],
-			LaunchActor  :[ SLICE_HEADER  ],
-			NbBitsToRead :[ SzSliceGroupChgCycle ]
+			TypeOfVLD :[       READ_BITS      ],
+			VLDParam  :[ SzSliceGroupChgCycle ]
 		guard
 			num_slice_groups     >  1,
 			slice_group_map_type >= 3,
@@ -787,7 +754,8 @@ actor Algo_DecodeSliceHeader()
 			DisDeblockingFilterIdc :[disable_deblocking_filter_idc],
 			SliceBetaOffset        :[slice_beta_offset],
 			SliceAlphaC0Offset     :[slice_alpha_c0_offset],
-			SkipNal                :[true]
+			TypeOfVLD              :[SKIP_NAL],
+			DecodeNextNal          :[true]
 		end
 
 /*   

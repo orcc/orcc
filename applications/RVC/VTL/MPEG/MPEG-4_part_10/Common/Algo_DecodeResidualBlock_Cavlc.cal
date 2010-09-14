@@ -22,9 +22,8 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	uint(size=5)  StartIdx,
 	uint(size=5)  EndIdx
 		==>
-	uint(size=3)  TypeOfVLD,
+	uint(size=5)  TypeOfVLD,
 	int (size=32) VLD_Param,
-	bool          SkipNal,
 	uint(size=5)  Total_Coeff,
 
 	int (size=12) Value,
@@ -33,11 +32,12 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		:
 
 
-	uint(size=4) READ_BITS             = 0;
-	uint(size=4) CAVLC_COEFF_TOKEN     = 5;
-	uint(size=4) CAVLC_LEVEL_PREFIX    = 6;
-	uint(size=4) CAVLC_TOTAL_ZEROS     = 7;
-	uint(size=4) CAVLC_RUN_BEFORE      = 8;
+	uint(size=4) READ_BITS          = 0;
+	uint(size=4) CAVLC_COEFF_TOKEN  = 5;
+	uint(size=4) CAVLC_LEVEL_PREFIX = 6;
+	uint(size=4) CAVLC_TOTAL_ZEROS  = 7;
+	uint(size=4) CAVLC_RUN_BEFORE   = 8;
+	uint(size=4) SKIP_NAL           = 10;
 
 	bool DEBUG_FLAG_DECODED = false;
 
@@ -76,7 +76,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 			EndIdx      :[ValEndIdx]
 				==>
 			//        mb_field_decoding_flag
-			SkipNal   :[       false       ],//Keep synchro
 			TypeOfVLD :[ CAVLC_COEFF_TOKEN ],
 			VLD_Param :[       ValnC       ]
 		do
@@ -131,7 +130,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	ReadTrailingOnesSign.Asked: action
 				==>
 			//     trailing_ones_sign_flag
-			SkipNal   :[   false   ],//Keep synchro
 			TypeOfVLD :[ READ_BITS ],
 			VLD_Param :[ TrailingOnes ]
 		guard
@@ -169,7 +167,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	ReadLevelPrefix.Asked: action
 				==>
 			//              level_prefix
-			SkipNal   :[       false        ],//Keep synchro
 			TypeOfVLD :[ CAVLC_LEVEL_PREFIX ]
 		guard
 			iLoop < TotalCoeff
@@ -187,7 +184,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	ReadLevelSuffix.Asked: action
 				==>
 			//            level_suffix
-			SkipNal   :[      false      ],//Keep synchro
 			TypeOfVLD :[    READ_BITS    ],
 			VLD_Param :[ levelSuffixSize ]
 		guard
@@ -258,7 +254,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	ReadTotalZeros.Asked: action
 				==>
 			//               total_zeros
-			SkipNal   :[       false       ],//Keep synchro
 			TypeOfVLD :[ CAVLC_TOTAL_ZEROS ],
 			VLD_Param :[ maxNumCoeff , TotalCoeff ]
 		guard
@@ -283,7 +278,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	ZerosLeft.GreaterThan0: action
 				==>
 			//            run_before
-			SkipNal   :[      false      ],//Keep synchro
 			TypeOfVLD :[ CAVLC_RUN_BEFORE ],
 			VLD_Param :[ zerosLeft ]
 		guard
@@ -322,8 +316,8 @@ actor Algo_DecodeResidualBlock_Cavlc()
 
 	SendEndResidualBlock: action
 				==>
-			SkipNal :[true],
-			Last    :[true]
+			TypeOfVLD :[ SKIP_NAL ],
+			Last      :[   true   ]
 		do
 			run[TotalCoeff - 1] := zerosLeft;
 			/*

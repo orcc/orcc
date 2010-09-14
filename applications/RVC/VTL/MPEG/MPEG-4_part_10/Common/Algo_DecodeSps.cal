@@ -18,9 +18,9 @@ actor Algo_DecodeSps()
 	uint(size=5)  SpsAskedFromPic,
 	uint(size=5)  SpsAskedFromPps
 		==>
-	uint(size=3)  TypeOfVLD,
+	uint(size=5)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
-	bool          SkipNal,
+	bool          DecodeNextNal,
 
 	uint(size=6)  log2_max_frame_num,
 	bool          frame_mbs_only,
@@ -86,6 +86,7 @@ actor Algo_DecodeSps()
 	uint(size=3) READ_BITS = 0;
 	uint(size=3) VLD_UE    = 1;
 	uint(size=3) VLD_SE    = 2;
+	uint(size=4) SKIP_NAL  = 10;
 
 
 	bool DEBUG_FLAG_DECODED = false;
@@ -146,7 +147,6 @@ actor Algo_DecodeSps()
 	ReadSpsId.Asked: action
 				==>
 			//             profile_idc, constrain , reserved  , level_idc , sps_id
-			SkipNal      :[   false   ,   false   ,   false   ,   false   ,  false ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , READ_BITS , READ_BITS , READ_BITS , VLD_UE ],
 			NbBitsToRead :[     8     ,     4     ,     4     ,     8     ]
 		end
@@ -235,6 +235,7 @@ actor Algo_DecodeSps()
 	ReadSpsId.Done: action
 			ValVLD :[ValueOfVLD] repeat 5
 				==>
+			DecodeNextNal :[true]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tprofile_idc : "+ValueOfVLD[0]);
@@ -259,7 +260,6 @@ actor Algo_DecodeSps()
 	ReadChromaFormatIdc.Asked: action
 				==>
 			//   chroma_format_idc
-			SkipNal   :[false],//Keep synchro
 			TypeOfVLD :[VLD_UE]
 		guard
 			(  profile_idc[sps_id] = 100 
@@ -285,7 +285,6 @@ actor Algo_DecodeSps()
 	ChromaFomtIdc.IsEqualTo3: action
 				==>
 			//         separate_colour_plane_flag
-			SkipNal      :[   false   ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[     1     ]
 		guard
@@ -304,7 +303,6 @@ actor Algo_DecodeSps()
 	Read_MaxFrameNum_PocType.Asked: action
 				==>
 			//          log2_ma , poc_type
-			SkipNal   :[  false ,  false ],//Keep synchro
 			TypeOfVLD :[ VLD_UE , VLD_UE ]
 		end
 
@@ -327,7 +325,6 @@ actor Algo_DecodeSps()
 	ReadPocType.IsEqualTo0: action
 				==>
 			//       log2_max_pic_order_cnt_lsb_minus4
-			SkipNal      :[  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			pic_order_cnt_type[sps_id] = 0
@@ -349,7 +346,6 @@ actor Algo_DecodeSps()
 	ReadPocType.IsEqualTo1: action
 				==>
 			//              delta_pic , offset , offset , num_ref
-			SkipNal      :[  false    ,  false ,  false ,  false ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , VLD_SE , VLD_SE , VLD_UE ],
 			NbBitsToRead :[     1                                ]
 		guard
@@ -376,7 +372,6 @@ actor Algo_DecodeSps()
 	CheckNumRefInPocCycle.IsEqualTo0: action
 				==>
 			//         offset_for_ref_frame[i]
-			SkipNal      :[  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_SE ]
 		guard
 			num_ref_frames_in_pic_order_cnt_cycle[sps_id] > 0
@@ -391,7 +386,6 @@ actor Algo_DecodeSps()
 			ValVLD :[ValueOfVLD]
 				==>
 			//         offset_for_ref_frame[i]
-			SkipNal      :[  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_SE ]
 		guard
 			LoopVal < num_ref_frames_in_pic_order_cnt_cycle[sps_id] - 1
@@ -423,7 +417,6 @@ actor Algo_DecodeSps()
 	ReadNumRefFrame.Asked: action
 				==>
 			//               num_r. , gaps_in_. ; pic_wi , pic_he , frame_mbs
-			SkipNal      :[  false ,   false   ,  false ,  false ,   false   ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE , READ_BITS , VLD_UE , VLD_UE , READ_BITS ],
 			NbBitsToRead :[              1     ,                       1     ]
 		end
@@ -485,7 +478,6 @@ actor Algo_DecodeSps()
 	FrameMbsOnlyFlag.IsEqualTo0: action
 				==>
 			//    mb_adaptive_frame_field_flag
-			SkipNal      :[   false   ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[     1     ]
 		guard
@@ -507,7 +499,6 @@ actor Algo_DecodeSps()
 	ReadDirect8x8.Asked: action
 				==>
 			//              Direct8x8 , frame_crop
-			SkipNal      :[   false   ,   false   ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , READ_BITS ],
 			NbBitsToRead :[     1     ,      1    ]
 		end
@@ -529,7 +520,6 @@ actor Algo_DecodeSps()
 	FrameCroppingFlag.IsEqualTo1: action
 				==>
 			//              frame_ , frame_ , frame_ , frame_ 
-			SkipNal      :[  false ,  false ,  false ,  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE , VLD_UE , VLD_UE , VLD_UE ]
 		guard
 			frame_cropping_flag[sps_id] = 1
@@ -556,7 +546,6 @@ actor Algo_DecodeSps()
 	ReadVuiParameters.Asked: action
 				==>
 			//        vui_parameters_present_flag
-			SkipNal      :[   false   ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[     1     ]
 		end
@@ -565,7 +554,7 @@ actor Algo_DecodeSps()
 	ReadVuiParameters.Done: action
 			ValVLD  :[ValueOfVLD]
 				==>
-			SkipNal :[true]
+			TypeOfVLD :[SKIP_NAL]
 		do
 			vui_parameters_present_flag[sps_id] := ValueOfVLD;
 			pic_size_in_mbs[sps_id] := (pic_width_in_mbs_minus1[sps_id] +1) * (pic_height_in_map_units_minus1[sps_id] +1);

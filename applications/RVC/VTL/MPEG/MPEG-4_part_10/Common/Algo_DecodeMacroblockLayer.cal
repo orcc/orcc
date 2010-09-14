@@ -40,10 +40,8 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  Total_CoeffLuma,
 	uint(size=5)  Total_CoeffChroma
 		==>
-	uint(size=3)  TypeOfVLD,
-	int (size=32) NbBitsToRead,
-	bool          SkipNal,
-	uint(size=4)  LaunchActor,
+	int (size=6)  TypeOfVLD,
+	int (size=32) VLDParam,
 
 	//MbPred parameters
 	uint(size=4)  MbPredSliceType,
@@ -99,16 +97,16 @@ actor Algo_DecodeMacroblockLayer()
 *
 */
 
-	uint(size=3) READ_BITS             = 0;
-	uint(size=3) VLD_UE                = 1;
-	uint(size=3) VLD_SE                = 2;
-	uint(size=3) BYTE_ALIGNED_REQUIRED = 3;
-//	uint(size=3) MORE_RBSP_DATA        = 4;
+	int (size=6) LAUNCH_ACTOR          = -1;
+	uint(size=3) READ_BITS             =  0;
+	uint(size=3) VLD_UE                =  1;
+	uint(size=3) VLD_SE                =  2;
+	uint(size=3) BYTE_ALIGNED_REQUIRED =  3;
+	uint(size=5) SKIP_NAL              = 10;
 
-	uint(size=4) MB_LAYER            = 4;
-	uint(size=4) SUB_MB_PRED         = 5;
-	uint(size=4) MB_PRED             = 6;
-	uint(size=4) RESIDUAL            = 7;
+	uint(size=4) SUB_MB_PRED          = 3;
+	uint(size=4) MB_PRED              = 4;
+	uint(size=4) RESIDUAL             = 5;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -276,9 +274,7 @@ actor Algo_DecodeMacroblockLayer()
 	ReadMbType.Asked: action
 				==>
 			//              mb_type
-			SkipNal      :[   false  ],//Keep synchro
-			TypeOfVLD    :[  VLD_UE  ],
-			LaunchActor  :[ MB_LAYER ]
+			TypeOfVLD    :[  VLD_UE  ]
 		end
 
 	ReadMbType.Done: action
@@ -377,12 +373,10 @@ actor Algo_DecodeMacroblockLayer()
 	CheckMbType.IsIPCM: action
 				==>
 			//    pcm_alignment_zero_bit , pcm_sample_luma[ i ]
-			SkipNal      :[     FalseTab      ] repeat 257,//Keep synchro
-			LaunchActor  :[     LaunchTab     ] repeat 257,
-			TypeOfVLD    :[   ValTypeOfVLD    ] repeat 257,
+			TypeOfVLD :[   ValTypeOfVLD    ] repeat 257,
 			//Orcc doesn't support it yet :
 			//TypeOfVLD    :[ [BYTE_ALIGNED_REQUIRED] +  [ValTypeOfVLDecod]repeat 256 ],
-			NbBitsToRead :[ BitDepthChromaTab ] repeat 256,
+			VLDParam  :[ BitDepthChromaTab ] repeat 256,
 
 			SData_Total_CoeffLuma  :[[16: for int s in 0 .. 15]] repeat 16,	
 			SData_Total_CoeffChroma:[[16: for int s in 0 .. 31]] repeat 32,
@@ -392,8 +386,6 @@ actor Algo_DecodeMacroblockLayer()
 			    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
 			and (mb_type = BLOCK_TYPE_I_PCM)
 		var
-			List(type: bool        , size=257) FalseTab           = [false            : for int s in 0 .. 256],
-			List(type: uint(size=4), size=257) LaunchTab          = [MB_LAYER         : for int s in 0 .. 256],
 			List(type: uint(size=3), size=257) ValTypeOfVLD      := [READ_BITS        : for int s in 0 .. 256],
 			//List(type: uint(size=3), size=256) ValTypeOfVLDecod   = [READ_BITS        : for int s in 0 .. 255],
 			List(type: uint(size=5), size=256) BitDepthChromaTab  = [bit_depth_chroma : for int s in 0 .. 255]
@@ -423,14 +415,10 @@ actor Algo_DecodeMacroblockLayer()
 	ReadPcmSampleLuma.Asked: action
 				==>
 			//            pcm_sample_chroma[ i ]
-			SkipNal      :[     FalseTab      ] repeat 256,//Keep synchro
-			LaunchActor  :[     LaunchTab     ] repeat 256,
-			TypeOfVLD    :[    ReadBitsTab    ] repeat 256,
-			NbBitsToRead :[ BitDepthChromaTab ] repeat 256
+			TypeOfVLD :[    ReadBitsTab    ] repeat 256,
+			VLDParam  :[ BitDepthChromaTab ] repeat 256
 			// Size is not always 256. Should be corrected and the value should be compute in Pps or Sps actor
 		var
-			List(type: bool        , size=256) FalseTab          = [false            : for int s in 0 .. 255],
-			List(type: uint(size=4), size=256) LaunchTab         = [MB_LAYER         : for int s in 0 .. 255],
 			List(type: uint(size=3), size=256) ReadBitsTab       = [READ_BITS        : for int s in 0 .. 255],
 			List(type: uint(size=5), size=256) BitDepthChromaTab = [bit_depth_chroma : for int s in 0 .. 255]
 		end
@@ -480,8 +468,8 @@ actor Algo_DecodeMacroblockLayer()
 
 	LaunchSubMbPred: action
 				==>
-			SkipNal     :[   false   ],
-			LaunchActor :[SUB_MB_PRED],
+			TypeOfVLD :[LAUNCH_ACTOR],
+			VLDParam  :[SUB_MB_PRED],
 
 			SubMbPredSliceType         :[slice_type],
 			SubMbPredMbType            :[mb_type],
@@ -522,10 +510,8 @@ actor Algo_DecodeMacroblockLayer()
 	ReadTransformSize.Asked: action
 			==>
 			//        transform_size_8x8_flag
-			SkipNal      :[   false   ],//Keep synchro
-			LaunchActor  :[ MB_LAYER  ],
-			TypeOfVLD    :[ READ_BITS ],
-			NbBitsToRead :[     1     ]
+			TypeOfVLD :[ READ_BITS ],
+			VLDParam  :[     1     ]
 		guard
 			transform_8x8_mode_flag = true,
 			(slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI) and mb_type = 0
@@ -535,8 +521,8 @@ actor Algo_DecodeMacroblockLayer()
 
 	LaunchMbPred: action
 				==>
-			SkipNal                 :[  false  ],
-			LaunchActor             :[ MB_PRED ],
+			TypeOfVLD               :[LAUNCH_ACTOR],
+			VLDParam                :[MB_PRED],
 
 			MbPredSliceType         :[slice_type],
 			MbPredMbType            :[mb_type],
@@ -549,8 +535,6 @@ actor Algo_DecodeMacroblockLayer()
 	ReadCodedBlockPattern.Asked: action
 				==>
 			//        coded_block_pattern
-			SkipNal      :[  false   ],//Keep synchro
-			LaunchActor  :[ MB_LAYER ],
 			TypeOfVLD    :[  VLD_UE  ] //VLD_ME
 		guard
 			not(Is_Intra_16x16(mb_type))
@@ -576,10 +560,8 @@ actor Algo_DecodeMacroblockLayer()
 	ReadTransformSize8x8.Asked: action
 				==>
 			//        transform_size_8x8_flag
-			SkipNal      :[   false   ],//Keep synchro
-			LaunchActor  :[ MB_LAYER  ],
-			TypeOfVLD    :[ READ_BITS ],
-			NbBitsToRead :[     1     ]
+			TypeOfVLD :[ READ_BITS ],
+			VLDParam  :[     1     ]
 		guard
 			CodedBlockPatternLuma > 0,
 			transform_8x8_mode_flag = true,
@@ -603,8 +585,6 @@ actor Algo_DecodeMacroblockLayer()
 	ReadMbQpDelta.Asked: action
 				==>
 			//            mb_qp_delta
-			SkipNal      :[  false   ],//Keep synchro
-			LaunchActor  :[ MB_LAYER ],
 			TypeOfVLD    :[  VLD_SE  ]
 		guard
 			   (CodedBlockPatternLuma   > 0)
@@ -628,8 +608,8 @@ actor Algo_DecodeMacroblockLayer()
 
 	LaunchResidual: action
 				==>
-			SkipNal              :[  false   ],
-			LaunchActor          :[ RESIDUAL ],
+			TypeOfVLD            :[LAUNCH_ACTOR],
+			VLDParam             :[RESIDUAL],
 
 			ResEntropyCodingMode :[entropy_coding_mode_flag],
 			ResSliceType         :[slice_type],
@@ -680,7 +660,7 @@ actor Algo_DecodeMacroblockLayer()
 
 	SendEndSliceHeader: action
 				==>
-			SkipNal :[true]
+			TypeOfVLD :[SKIP_NAL]
 		end
 
 	schedule fsm ReadMbType_Asked:

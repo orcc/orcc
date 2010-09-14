@@ -20,9 +20,9 @@ actor Algo_DecodePps(bool IsCBP)
 	uint(size=32) PicWidthInMbs,
 	uint(size=32) PicHeightInMapUnits
 		==>
-	uint(size=3)  TypeOfVLD,
+	uint(size=5)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
-	bool          SkipNal,
+	bool          DecodeNextNal,
 
 	uint(size=5)  GetSps4Pic,
 	uint(size=5)  GetSps,
@@ -52,12 +52,13 @@ actor Algo_DecodePps(bool IsCBP)
 	uint(size=3) READ_BITS = 0;
 	uint(size=3) VLD_UE    = 1;
 	uint(size=3) VLD_SE    = 2;
+	uint(size=4) SKIP_NAL  = 10;
 
 	bool DEBUG_FLAG_DECODED = false;
 
 /*   
 *
-* Constants
+* State variables
 *
 */
 
@@ -88,6 +89,7 @@ actor Algo_DecodePps(bool IsCBP)
 
 	uint(size=8)  pps_id;
 	int (size=32) LoopVal;
+	uint(size=32) ValPicWidthInMbs;
 
 
 /*   
@@ -99,7 +101,6 @@ actor Algo_DecodePps(bool IsCBP)
 	ReadPpsId.Asked: action
 				==>
 			//             pps_id  , sps_id , entropy_c , pic_order , num_sli
-			SkipNal      :[  false ,  false ,   false   ,   false   ,  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE , VLD_UE , READ_BITS , READ_BITS , VLD_UE ],
 			NbBitsToRead :[                       1     ,     1              ]
 		end
@@ -181,7 +182,6 @@ actor Algo_DecodePps(bool IsCBP)
 	ReadSliceGroupMapType.IsAsked: action
 				==>
 			//      slice_group_map_type
-			SkipNal      :[  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			num_slice_groups_minus1[pps_id] > 0
@@ -207,7 +207,6 @@ actor Algo_DecodePps(bool IsCBP)
 	CheckNumSliceGroup.SliceGroupMapEqualTo0: action
 				==>
 			//          run_length_minus1
-			SkipNal      :[  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			num_slice_groups_minus1[pps_id] > 0
@@ -219,7 +218,6 @@ actor Algo_DecodePps(bool IsCBP)
 			ValVLD :[ValueOfVLD]
 				==>
 			//          run_length_minus1
-			SkipNal      :[  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			LoopVal < num_slice_groups_minus1[pps_id] - 1
@@ -251,7 +249,6 @@ actor Algo_DecodePps(bool IsCBP)
 	CheckNumSliceGroup.SliceGroupMapEqualTo2: action
 				==>
 			//              top_le , bottom
-			SkipNal      :[  false , false  ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE , VLD_UE ]
 		guard
 			num_slice_groups_minus1[pps_id] > 0
@@ -263,7 +260,6 @@ actor Algo_DecodePps(bool IsCBP)
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
 			//              top_le , bottom
-			SkipNal      :[  false , false  ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE , VLD_UE ]
 		guard
 			LoopVal < num_slice_groups_minus1[pps_id] - 1
@@ -292,7 +288,6 @@ actor Algo_DecodePps(bool IsCBP)
 	CheckSliceGroupMapType.IsBetween3and5: action
 				==>
 			//              slice_gro , slice_
-			SkipNal      :[   false   ,  false ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , VLD_UE ],
 			NbBitsToRead :[     1              ]
 		guard
@@ -317,7 +312,6 @@ actor Algo_DecodePps(bool IsCBP)
 	CheckSliceGroupMapType.IsEqualTo6: action
 			==>
 			//     pic_size_in_map_units_minus1
-			SkipNal      :[  false ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			slice_group_map_type[pps_id] = 6
@@ -329,14 +323,15 @@ actor Algo_DecodePps(bool IsCBP)
 	ReadNumRefIdx.Asked: action
 				==>
 			//              num_re , num_re , weighted_ , weighted_ , pic_in , pic_in , chroma , deblockin , constrain , redundant
-			SkipNal      :[  false ,  false ,   false   ,   false   ,  false ,  false ,  false ,   false   ,   false   ,   false   ],//Keep synchro
 			TypeOfVLD    :[ VLD_UE , VLD_UE , READ_BITS , READ_BITS , VLD_SE , VLD_SE , VLD_SE , READ_BITS , READ_BITS , READ_BITS ],
 			NbBitsToRead :[                       1     ,     2     ,                                1     ,     1     ,     1     ]
 		end
 
 	ReadNumRefIdx.Done: action
-			ValVLD :[ValueOfVLD] repeat 10
+			ValVLD        :[ValueOfVLD] repeat 10,
+			PicWidthInMbs :[ValPcWdthInMbs]
 				==>
+			DecodeNextNal :[true]
 		do
 			num_ref_idx_l0_active_minus1[pps_id] := ValueOfVLD[0];
 			num_ref_idx_l1_active_minus1[pps_id] := ValueOfVLD[1];
@@ -353,6 +348,7 @@ actor Algo_DecodePps(bool IsCBP)
 					true
 				end;
 			redundant_pic_cnt_present_flag[pps_id] := ValueOfVLD[9];
+			ValPicWidthInMbs := ValPcWdthInMbs;
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tnum_ref_idx_l0_active_minus1 : "+ValueOfVLD[0]);
 				println("\t\tnum_ref_idx_l1_active_minus1 : "+ValueOfVLD[1]);
@@ -374,10 +370,9 @@ actor Algo_DecodePps(bool IsCBP)
 		end
 
 	SendEndPps: action
-			PicWidthInMbs       :[ValPicWidthInMbs],
 			PicHeightInMapUnits :[ValPicHeightInMapUnits]
 				==>
-			SkipNal :[true]
+			TypeOfVLD :[SKIP_NAL]
 		var
 			int ValMaxSliceGroupChgCycle
 		do

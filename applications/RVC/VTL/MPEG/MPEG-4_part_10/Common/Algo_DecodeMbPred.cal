@@ -23,9 +23,8 @@ actor Algo_DecodeMbPred()
 	uint(size=5)  NumRefIdxLXActive,
 	bool          MbFieldDecoding
 		==>
-	uint(size=3)  TypeOfVLD,
+	uint(size=5)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
-	bool          SkipNal,
 
 	uint(size=4) RemIntraYxYPredMode,
 
@@ -43,10 +42,11 @@ actor Algo_DecodeMbPred()
 	bool DEBUG_MV = false;
 	bool DEBUG_FLAG_DECODED = false;
 
-	uint(size=3) READ_BITS             = 0;
-	uint(size=3) VLD_UE                = 1;
-	uint(size=3) VLD_SE                = 2;
-	uint(size=4) VLD_TE                = 9;
+	uint(size=3) READ_BITS = 0;
+	uint(size=3) VLD_UE    = 1;
+	uint(size=3) VLD_SE    = 2;
+	uint(size=4) VLD_TE    = 9;
+	uint(size=4) SKIP_NAL  = 10;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -255,7 +255,6 @@ actor Algo_DecodeMbPred()
 	MbType.IsIntra_4x4: action
 				==>
 			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
-			SkipNal      :[  false    ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[    16     ]
 		guard
@@ -315,7 +314,6 @@ actor Algo_DecodeMbPred()
 	ReadPrevAndRemIntra4x4.NotFinished: action
 				==>
 			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
-			SkipNal      :[     false      ],//Keep synchro
 			TypeOfVLD    :[    READ_BITS     ],
 			NbBitsToRead :[      CountBit ]
 		guard
@@ -333,7 +331,6 @@ actor Algo_DecodeMbPred()
 	MbType.IsIntra_8x8: action
 				==>
 			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
-			SkipNal      :[     false      ],//Keep synchro
 			TypeOfVLD    :[    READ_BITS     ],
 			NbBitsToRead :[        4 ]
 		guard
@@ -345,7 +342,6 @@ actor Algo_DecodeMbPred()
 	ReadPrevAndRemIntra8x8.NotFinished: action
 				==>
 			//  prev_intra4x4_pred_mode_flag and rem_intra4x4_pred_mode
-			SkipNal      :[     false      ],//Keep synchro
 			TypeOfVLD    :[    READ_BITS     ],
 			NbBitsToRead :[      CountBit ]
 		guard
@@ -363,7 +359,6 @@ actor Algo_DecodeMbPred()
 	ChromaArrayTp.IsEqualTo1or2: action
 				==>
 			//          intra_chroma_pred_mode
-			SkipNal      :[     false      ],//Keep synchro
 			TypeOfVLD    :[    VLD_UE     ]
 		guard
 			   Chroma_Array_Type = 1
@@ -406,7 +401,6 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxl0: action
 				==>
 			//             ref_idx_l0
-			SkipNal      :[   false   ],//Keep synchro
 			TypeOfVLD    :[ VLD_TE ],
 			NbBitsToRead :[ num_ref_idx_l0_active - 1 ]
 		guard
@@ -428,7 +422,6 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxl1: action
 				==>
 			//             ref_idx_l1
-			SkipNal      :[   false   ],//Keep synchro
 			TypeOfVLD    :[ VLD_TE ],
 			NbBitsToRead :[ num_ref_idx_l1_active - 1 ]
 		guard
@@ -443,7 +436,6 @@ actor Algo_DecodeMbPred()
 	ReadParam.Skip1Parameter: action
 				==>
 			//            We read nothing
-			SkipNal      :[   false   ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS ],
 			NbBitsToRead :[     0     ]
 		guard
@@ -460,7 +452,6 @@ actor Algo_DecodeMbPred()
 	ReadMvdL0.Asked: action
 				==>
 			//             mvd_l0
-			SkipNal      :[   false , false   ],//Keep synchro
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
 			mbPartIdx < mbPartIdxMax,
@@ -479,7 +470,6 @@ actor Algo_DecodeMbPred()
 	ReadMvdL1.Asked: action
 				==>
 			//             mvd_l1
-			SkipNal      :[   false , false   ],//Keep synchro
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
 			mbPartIdx < mbPartIdxMax,
@@ -493,7 +483,6 @@ actor Algo_DecodeMbPred()
 	ReadParam.Skip2Parameters: action
 				==>
 			//            We read nothing
-			SkipNal      :[   false, false    ],//Keep synchro
 			TypeOfVLD    :[ READ_BITS , READ_BITS  ],
 			NbBitsToRead :[     0     ,  0  ]
 		guard
@@ -568,9 +557,9 @@ actor Algo_DecodeMbPred()
 
 	SendEndMbPred: action
 				==>
-			SkipNal     :[true],
-			EndRefIdxL0 :[true],
-			EndMvRes    :[true]
+			TypeOfVLD   :[ SKIP_NAL ],
+			EndRefIdxL0 :[   true   ],
+			EndMvRes    :[   true   ]
 		end
 
 	schedule fsm ReadParameters:

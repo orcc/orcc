@@ -20,9 +20,8 @@ actor Algo_DecodeRefPicList_Frext()
 
 	uint(size=5)  NumRefIdxLXActive
 		==>
-	uint(size=3)  TypeOfVLD,
+	uint(size=5)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
-	bool          SkipNal,
 	uint(size=5)  SDataNumRefIdxLXActive,
 
 	uint(size=2)  RefList0Type,
@@ -38,6 +37,7 @@ actor Algo_DecodeRefPicList_Frext()
 
 	uint(size=3) READ_BITS = 0;
 	uint(size=3) VLD_UE    = 1;
+	uint(size=4) SKIP_NAL  = 10;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -73,7 +73,6 @@ actor Algo_DecodeRefPicList_Frext()
 	SliceType.IsEqualToP: action
 				==>
 			//  num_ref_idx_active_override_flag   
-			SkipNal      :[  false  ],
 			TypeOfVLD    :[READ_BITS],
 			NbBitsToRead :[    1    ],
 
@@ -107,8 +106,7 @@ actor Algo_DecodeRefPicList_Frext()
 
 	CheckNumRefIdxActOverRide.SliceTypeP: action
 				==>
-			//    num_ref_idx_l0_active_minus1   
-			SkipNal      :[ false ],
+			//    num_ref_idx_l0_active_minus1
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			num_ref_idx_active_override_flag = true
@@ -128,8 +126,7 @@ actor Algo_DecodeRefPicList_Frext()
 
 	SliceType.IsEqualToB: action
 			==>
-			//              direct_sp , num_ref_i   
-			SkipNal      :[   false   ,   false   ],
+			//              direct_sp , num_ref_i
 			TypeOfVLD    :[ READ_BITS , READ_BITS ],
 			NbBitsToRead :[     1     ,     1     ],
 
@@ -168,8 +165,7 @@ actor Algo_DecodeRefPicList_Frext()
 
 	CheckNumRefIdxActOverRide.SliceTypeB: action
 				==>
-			//              num_re  num_ref   
-			SkipNal      :[ false  , false  ],
+			//              num_re  num_ref
 			TypeOfVLD    :[ VLD_UE , VLD_UE ]
 		guard
 			num_ref_idx_active_override_flag = true
@@ -191,8 +187,7 @@ actor Algo_DecodeRefPicList_Frext()
 
 	ReadRefPicList0Reord.Asked: action
 			==>
-			//   ref_pic_list_reordering_flag_l0   
-			SkipNal       :[  false  ],
+			//   ref_pic_list_reordering_flag_l0
 			TypeOfVLD     :[READ_BITS],
 			NbBitsToRead  :[    1    ],
 
@@ -220,7 +215,6 @@ actor Algo_DecodeRefPicList_Frext()
 	CheckRefPicL0Reord.IsEqualToTrue: action
 				==>
 			//      reordering_of_pic_nums_idc
-			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ]
 		guard
 			ref_pic_list_reordering_flag = true
@@ -233,7 +227,6 @@ actor Algo_DecodeRefPicList_Frext()
 			//      abs_diff_pic_num_minus1
 			//                or
 			//        long_term_pic_num
-			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ],
 
 			RefReordering_l0 :[ValueOfVLD]
@@ -261,7 +254,6 @@ actor Algo_DecodeRefPicList_Frext()
 			ValVLD :[ValueOfVLD]
 				==>
 			//      reordering_of_pic_nums_idc
-			SkipNal      :[ false  ],
 			TypeOfVLD    :[ VLD_UE ],
 
 			RefReordering_l0 :[ValueOfVLD]
@@ -274,7 +266,7 @@ actor Algo_DecodeRefPicList_Frext()
 
 	SendEndSliceHeader: action
 				==>
-			SkipNal :[true],
+			TypeOfVLD              :[SKIP_NAL],
 			SDataNumRefIdxLXActive :[num_ref_idx_l0_active , num_ref_idx_l1_active]
 		end
 
