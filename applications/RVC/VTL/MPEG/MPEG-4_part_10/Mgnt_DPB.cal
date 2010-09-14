@@ -167,7 +167,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		var
 			bool found := false
 		do
-			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+			if(DEBUG_INPUT)then
 				println("Input Mgnt_DPB RA:"+ra);
 				println("Input Mgnt_DPB RA_Width:"+RAWidth);
 				println("Input Mgnt_DPB RA_Height:"+RAHeight);
@@ -209,7 +209,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		var 
 			uint(size=16) rd
 		do
-			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_OUTPUT)then
+			if(DEBUG_OUTPUT)then
 				println("Input Mgnt_DPB RD:"+rd);
 			end
 			rd   := pic[Ref_idx][ra_offset + ra_x + ra_y * PicWidthInMacroB * MB_WIDTH];
@@ -233,7 +233,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			write_done = true,
 			currmbaddr = PicSizeInMacroB - 1
 		do
-			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_OUTPUT)then
+			if(DEBUG_OUTPUT)then
 				println("Input Mgnt_DPB Write_Done:"+true);
 			end
 			PictureReady[pic_curr_idx] := true;
@@ -253,7 +253,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			bool         idx_selected := false,
 			int(size=32) i            := 0
 		do
-			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+			if(DEBUG_INPUT)then
 				println("Input Mgnt_DPB POC:"+Valpoc);
 				println("Input Mgnt_DPB IsIDR:"+IsIDRPic);
 			end
@@ -365,7 +365,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard
 			DelVal != SENT_DONE
 		do
-			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+			if(DEBUG_INPUT)then
 				println("Input Mgnt_DPB DelList:"+DelVal);
 			end
 			foreach int i in 0 .. NB_PIC - 1
@@ -381,7 +381,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			DelList:[DelVal]
 				==>
 		do
-			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+			if(DEBUG_INPUT)then
 				println("Input Mgnt_DPB DelList:"+DelVal);
 			end
 			if(ValIsIDR)then
@@ -404,7 +404,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			poc2disp         != -1,
 			NextPOCtoDisplay = -1
 		do
-			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+			if(DEBUG_INPUT)then
 				println("Input Mgnt_DPB POCtoDisplay:"+poc2disp);
 			end
 			NextPOCtoDisplay := poc2disp;
@@ -417,7 +417,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard
 			poc2disp         = -1
 		do
-			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+			if(DEBUG_INPUT)then
 				println("Input Mgnt_DPB POCtoDisplay:"+poc2disp);
 			end
 		end

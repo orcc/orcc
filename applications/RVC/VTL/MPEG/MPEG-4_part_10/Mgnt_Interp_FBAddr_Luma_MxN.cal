@@ -10,7 +10,7 @@
 //Modified by Endri Bezati <endri.bezati@insa-rennes.fr>
 //Modified the "size" correctly to work with orcc
 
-actor Mgnt_Interp_FBAddr_Luma_MxN (bool a)
+actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		uint(size=13) CurrMbAddr,
 		uint(size=3) MbPartIdx,
 		uint (size=8) Mb_Type,

@@ -103,9 +103,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="a">
-            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_Merge_4x4_to_16x16_norasterscan">
         <!-- ************************* -->

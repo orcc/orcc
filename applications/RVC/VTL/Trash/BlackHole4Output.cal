@@ -72,7 +72,7 @@ actor BlackHole4Output()
 	action ScalingList:[a]
 		==>
 	do
-		println("ScalingList:"+a);
+//		println("ScalingList:"+a);
 	end
 
 	action LFDisable:[a]

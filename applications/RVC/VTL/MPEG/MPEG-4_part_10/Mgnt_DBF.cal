@@ -253,7 +253,7 @@ read_pic_parameters: action  ==>
 ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g] repeat 32,LFDisable:[j]==> 
   guard a=2
   do   
-  	if(DEBUG_INPUT and MB_BLOCK_SIZE = MB_BLOCK_SIZE_LUMA)then
+  	if(DEBUG_INPUT)then
 		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
 		println("Input Mgnt_DBF PicWidthInMb:"+width);	
 		println("Input Mgnt_DBF PicSizeInMb:"+height);	
@@ -296,7 +296,7 @@ ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[hei
 ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
   guard a=0 or a=1 
   do   
-  	if(DEBUG_INPUT and MB_BLOCK_SIZE = MB_BLOCK_SIZE_LUMA)then
+  	if(DEBUG_INPUT)then
 		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
 		println("Input Mgnt_DBF PicWidthInMb:"+width);	
 		println("Input Mgnt_DBF PicSizeInMb:"+height);	
@@ -329,7 +329,7 @@ ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[he
 ReadMB.IPCM: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a], Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
   guard a=4 
   do       
-  	if(DEBUG_INPUT and MB_BLOCK_SIZE = MB_BLOCK_SIZE_LUMA)then
+  	if(DEBUG_INPUT)then
 		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
 		println("Input Mgnt_DBF PicWidthInMb:"+width);	
 		println("Input Mgnt_DBF PicSizeInMb:"+height);	
@@ -358,7 +358,7 @@ StartMB_CHROMA: action Z:[v] repeat MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA ==
   guard
   	MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
   do   
-  	if(DEBUG_INPUT and MB_BLOCK_SIZE = MB_BLOCK_SIZE_LUMA)then  
+  	if(DEBUG_INPUT)then  
 	  	foreach int i in 0 ..MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA -1
 	  	do
 	  		println("Input Mgnt_DBF Z:"+v[i]);
@@ -425,7 +425,7 @@ StartMB_CHROMA: action Z:[v] repeat MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA ==
   
 StartMB_LUMA: action Z:[v] repeat MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA ==>  
   do    
-  	if(DEBUG_INPUT and MB_BLOCK_SIZE = MB_BLOCK_SIZE_LUMA)then  
+  	if(DEBUG_INPUT)then  
 	  	foreach int i in 0 ..MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA -1
 	  	do
 	  		println("Input Mgnt_DBF Z:"+v[i]);
@@ -694,7 +694,7 @@ var
     List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int m in 0 .. MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1 ],
     int uc:=0, int lc:=0, int cc:=0     
 do    
-  	if(DEBUG_INPUT and MB_BLOCK_SIZE = MB_BLOCK_SIZE_LUMA)then  
+  	if(DEBUG_INPUT)then  
 	  	foreach int i in 0 ..(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)  -1
 	  	do
 	  		println("Input Mgnt_DBF DB_O:"+v[i]);

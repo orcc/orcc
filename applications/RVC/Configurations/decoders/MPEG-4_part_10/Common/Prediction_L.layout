@@ -37,6 +37,6 @@
       <vertex id="Intra_4x4" x="243" y="825"/>
       <vertex id="Deblocking_Filter" x="729" y="683"/>
       <vertex id="Mgnt_Display" x="729" y="1341"/>
-      <vertex id="RefIdxtoPOC" x="540" y="1468"/>
+      <vertex id="RefIdxtoPOC" x="514" y="1473"/>
    </vertices>
 </layout>

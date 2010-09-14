@@ -18,7 +18,7 @@ Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 
-actor Algo_IntraPred_Add (bool a) 
+actor Algo_IntraPred_Add () 
 		int(size=16) X, 
 		int(size=16) Y 
 				==> 
@@ -33,7 +33,7 @@ actor Algo_IntraPred_Add (bool a)
   
   Add:action X:[x], Y:[y] ==> Z:[clip(x + y)]
   do
-  	if(DEBUG_INPUT and a)then
+  	if(DEBUG_INPUT)then
 		println("Input IntraPredAdd: X=>"+x+" ; Y=>"+y);
   	end
   end
