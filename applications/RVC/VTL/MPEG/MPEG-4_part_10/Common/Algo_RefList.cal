@@ -62,7 +62,7 @@ Copyright (c) ISO/IEC 2008.
 //        delete NbPOC2
 //        delete IdxFalsePic
 //        delete IdxNotFound42
-actor Algo_RefList ()
+actor Algo_RefList (bool a)
 	uint(size=31) RefReordering,
 	uint(size=31) FraNum,
 	uint(size=31) MaxFrameNum,
@@ -238,7 +238,7 @@ actor Algo_RefList ()
 			NbSTRead       := 0;
 			NbSTCount      := ValSzSTList;
 			ValMovedFrame  := frame_num;
-			if(DEBUG_INPUT)then 
+			if(DEBUG_INPUT and a)then 
 				println("Input RefList FraNum: "+frame_num);
 				println("Input RefList POC: "+ValPOC);
 				println("Input RefList MaxFrameNum: "+MaxFrNu);
@@ -283,7 +283,7 @@ actor Algo_RefList ()
 				end
 			end
 			NbLTRead     := NbLTRead + 1;
-			if(DEBUG_INPUT)then 
+			if(DEBUG_INPUT and a)then 
 				println("Input RefList LongTermList: "+ValLongTerm);
 			end
 		end
@@ -324,7 +324,7 @@ actor Algo_RefList ()
 				end
 			end
 			NbSTRead     := NbSTRead + 1;
-			if(DEBUG_INPUT)then 
+			if(DEBUG_INPUT and a)then 
 				println("Input RefList ShortTermList: "+ValShortTerm);
 			end
 		end
@@ -427,10 +427,10 @@ ValidxRefList := 0;//////
 				ValidxRefList := IdxRefList2;
 			end
 		end
-		if(DEBUG_INPUT)then 
+		if(DEBUG_INPUT and a)then 
 			println("Input RefList ShortTermList: "+ValIDxMax);
 		end
-		if(DEBUG_OUTPUT)then 
+		if(DEBUG_OUTPUT and a)then 
 			println("Output RefList RefList: "+NumMaxListRefFrame);
 		end
 		//Indicates that nothing in RefList has been sent
@@ -451,7 +451,7 @@ ValidxRefList := 0;//////
 			int (size=32)                    RefBuffer,
 			uint(size=4)                     IdxLastPocInf := -1
 	do
-		if(DEBUG_INPUT)then 
+		if(DEBUG_INPUT and a)then 
 			println("Input RefList ShortTermList: "+ValIDxMax);
 		end
 		//IdxCurrentPic = Nb short term and long term ref
@@ -525,7 +525,7 @@ ValidxRefList := 0;//////
 			end
 			j := j + 1;
 		end
-		if(DEBUG_OUTPUT)then 
+		if(DEBUG_OUTPUT and a)then 
 			println("Output RefList RefList: "+NumMaxListRefFrame);
 		end
 		//Indicates that nothing in RefList has been sent
@@ -538,7 +538,7 @@ ValidxRefList := 0;//////
 		guard
 			reordering_flag = 0
 		do
-			if(DEBUG_INPUT)then 
+			if(DEBUG_INPUT and a)then 
 				println("Input RefList RefReordering: "+reordering_flag);
 			end
 		end
@@ -551,7 +551,7 @@ ValidxRefList := 0;//////
 		guard
 			reordering_flag = 1
 		do
-			if(DEBUG_INPUT)then 
+			if(DEBUG_INPUT and a)then 
 				println("Input RefList RefReordering: "+reordering_flag);
 			end
 		end
@@ -568,7 +568,7 @@ ValidxRefList := 0;//////
 			bool IsInRefList := false,
 			int (size = 32) poc
 		do
-			if(DEBUG_INPUT)then 
+			if(DEBUG_INPUT and a)then 
 				println("Input RefList RefReordering: "+reordering_of_pic_nums_idc+" ; "+abs_diff_pic_num_minus1);
 			end
 			//Compute the value of the re-mapped reference picture
@@ -618,7 +618,7 @@ ValidxRefList := 0;//////
 				NumMaxListRefFrame := NumMaxListRefFrame - 1;
 			//	println("RefListSent:"+FrameNumList[ValMovedIdx]+" Poc:"+POCList[ValMovedIdx]);
 			end
-			if(DEBUG_OUTPUT)then 
+			if(DEBUG_OUTPUT and a)then 
 				println("Output RefList RefList: "+poc);
 			end
 
@@ -635,7 +635,7 @@ ValidxRefList := 0;//////
 		var
 			int (size = 32) poc
 		do
-			if(DEBUG_INPUT)then 
+			if(DEBUG_INPUT and a)then 
 				println("Input RefList RefReordering: "+reordering_of_pic_nums_idc+" ; "+idx_LTList);
 			end
 			ValidxRefList := 0;
@@ -660,7 +660,7 @@ ValidxRefList := 0;//////
 			poc := POCList[ValLTList[idx_LTList]];
 		//	println("RefListSent; FrNu:"+FrameNumList[ValLTList[idx_LTList]]+" Poc:"+POCList[ValLTList[idx_LTList]]);
 			CounterRefListTab := CounterRefListTab + 1;
-			if(DEBUG_OUTPUT)then 
+			if(DEBUG_OUTPUT and a)then 
 				println("Output RefList RefList: "+poc);
 			end
 		end
@@ -673,7 +673,7 @@ ValidxRefList := 0;//////
 		guard 
 			reordering_of_pic_nums_idc = 3
 		do
-			if(DEBUG_INPUT)then 
+			if(DEBUG_INPUT and a)then 
 				println("Input RefList RefReordering: "+reordering_of_pic_nums_idc);
 			end
 		end

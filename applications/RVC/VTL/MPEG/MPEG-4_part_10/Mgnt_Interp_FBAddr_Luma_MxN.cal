@@ -10,7 +10,7 @@
 //Modified by Endri Bezati <endri.bezati@insa-rennes.fr>
 //Modified the "size" correctly to work with orcc
 
-actor Mgnt_Interp_FBAddr_Luma_MxN ()
+actor Mgnt_Interp_FBAddr_Luma_MxN (bool a)
 		uint(size=13) CurrMbAddr,
 		uint(size=3) MbPartIdx,
 		uint (size=8) Mb_Type,
@@ -182,14 +182,19 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   schedule fsm get_MB:
     get_MB      		( Mb_Type_NOK_and_IPCM 	) --> get_pic_done;
     get_MB      		( Mb_Type_NOK       	) --> get_pic_done;
+    get_MB      		( Mb_Type_OK        	) --> get_pos;
+
     get_pic_done   		( PIC_done       		) --> get_MB;
     get_pic_done   		( PIC_Ndone       		) --> get_MB;
-    get_MB      		( Mb_Type_OK        	) --> get_pos;
+ 
     get_pos        		( get_pos        		) --> get_mv_send_frac;
+ 
     get_mv_send_frac    ( get_mv_send_frac 		) --> address;
+ 
     address      		( RA_border				) --> address;
     address      		( RA_not_border			) --> MB_done;
     address      		( done         			) --> MB_done;
+ 
     MB_done      		( MB_done         		) --> get_pic_done;
     MB_done      		( MB_Ndone         		) --> get_pos;
    end

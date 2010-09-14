@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="PicWidthInMb_inter" x="18" y="464"/>
-      <vertex id="PicSizeInMb" x="26" y="433"/>
-      <vertex id="MbPartIdx" x="45" y="189"/>
-      <vertex id="RefIdx" x="41" y="498"/>
-      <vertex id="MbPartWidth" x="739" y="371"/>
-      <vertex id="MbPartHeigth" x="689" y="263"/>
-      <vertex id="RD_L" x="403" y="386"/>
-      <vertex id="Coef_ACR" x="35" y="290"/>
-      <vertex id="LOCATION" x="33" y="343"/>
-      <vertex id="MV" x="51" y="372"/>
-      <vertex id="PartSZ" x="41" y="245"/>
-      <vertex id="Mb_Type" x="32" y="402"/>
-      <vertex id="currMBaddr" x="35" y="318"/>
-      <vertex id="Write_done" x="29" y="531"/>
-      <vertex id="RA_L" x="400" y="357"/>
-      <vertex id="RA_Width_L" x="395" y="448"/>
-      <vertex id="RA_Height_L" x="389" y="417"/>
-      <vertex id="MB4x4Pred_L" x="1108" y="179"/>
-      <vertex id="RefIdx_L" x="386" y="489"/>
-      <vertex id="PicID" x="397" y="301"/>
-      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="179" y="313"/>
-      <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="485" y="329"/>
-      <vertex id="Algo_Interp_split_MB" x="849" y="247"/>
-      <vertex id="Algo_Add_4x4" x="1002" y="159"/>
+      <vertex id="PicWidthInMb_inter" x="57" y="358"/>
+      <vertex id="PicSizeInMb" x="57" y="455"/>
+      <vertex id="MbPartIdx" x="57" y="164"/>
+      <vertex id="RefIdx" x="57" y="552"/>
+      <vertex id="MbPartWidth" x="543" y="72"/>
+      <vertex id="MbPartHeigth" x="543" y="169"/>
+      <vertex id="RD_L" x="256" y="320"/>
+      <vertex id="Coef_ACR" x="57" y="649"/>
+      <vertex id="LOCATION" x="57" y="746"/>
+      <vertex id="MV" x="57" y="843"/>
+      <vertex id="PartSZ" x="57" y="261"/>
+      <vertex id="Mb_Type" x="57" y="940"/>
+      <vertex id="currMBaddr" x="57" y="1037"/>
+      <vertex id="Write_done" x="57" y="1134"/>
+      <vertex id="RA_L" x="543" y="450"/>
+      <vertex id="RA_Width_L" x="543" y="568"/>
+      <vertex id="RA_Height_L" x="543" y="665"/>
+      <vertex id="MB4x4Pred_L" x="1283" y="509"/>
+      <vertex id="RefIdx_L" x="543" y="762"/>
+      <vertex id="PicID" x="543" y="859"/>
+      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="277" y="441"/>
+      <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="543" y="287"/>
+      <vertex id="Algo_Interp_split_MB" x="901" y="184"/>
+      <vertex id="Algo_Add_4x4" x="1113" y="487"/>
    </vertices>
 </layout>

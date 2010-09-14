@@ -7,8 +7,11 @@ actor BlackHole4Output()
 	int(size=8)   ScalingList,
 	uint(size=16) cbp_blk,
 	uint(size=2)  LFDisable,
-	int(size=6)   size_beta_offset,
-	int(size=6)   slice_alpha_c0_offset
+	int(size=6)   slice_beta_offset,
+	int(size=6)   slice_alpha_c0_offset,
+	int(size=8)   Qp,
+	int(size=8)   Qp_Cb,
+	int(size=8)   Qp_Cr
 		==>
 		:
 
@@ -16,6 +19,24 @@ actor BlackHole4Output()
 		==>
 	do
 //		println("PicSizeInMb:"+a);
+	end
+
+	action Qp_Cr:[a]
+		==>
+	do
+	//	println("Qp_Cr:"+a);
+	end
+
+	action Qp_Cb:[a]
+		==>
+	do
+//		println("Qp_Cb:"+a);
+	end
+
+	action Qp:[a]
+		==>
+	do
+//		println("Qp:"+a);
 	end
 
 	action HEIGHT:[a]
@@ -51,7 +72,7 @@ actor BlackHole4Output()
 	action ScalingList:[a]
 		==>
 	do
-//		println("ScalingList:"+a);
+		println("ScalingList:"+a);
 	end
 
 	action LFDisable:[a]
@@ -60,10 +81,10 @@ actor BlackHole4Output()
 //		println("LFDisable:"+a);
 	end
 
-	action size_beta_offset:[a]
+	action slice_beta_offset:[a]
 		==>
 	do
-//		println("size_beta_offset:"+a);
+//		println("slice_beta_offset:"+a);
 	end
 
 	action slice_alpha_c0_offset:[a]

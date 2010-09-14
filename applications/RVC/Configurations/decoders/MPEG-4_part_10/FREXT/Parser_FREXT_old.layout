@@ -42,7 +42,7 @@
       <vertex id="I_PCM_V" x="1278" y="4003"/>
       <vertex id="ConstrainedIFlag" x="955" y="2131"/>
       <vertex id="DelList" x="1278" y="2587"/>
-      <vertex id="RefList" x="1568" y="2380"/>
+      <vertex id="RefList" x="2023" y="2265"/>
       <vertex id="SizeDPBMax" x="955" y="2228"/>
       <vertex id="IsIDR" x="1278" y="2684"/>
       <vertex id="BlocksSize_Luma" x="1278" y="2173"/>
@@ -53,9 +53,9 @@
       <vertex id="Algo_BlockSplit_AVC" x="1993" y="1757"/>
       <vertex id="Algo_IntraPred_Split" x="955" y="2325"/>
       <vertex id="MVReconstruct" x="955" y="3324"/>
-      <vertex id="Algo_MMCO" x="955" y="2680"/>
+      <vertex id="Algo_MMCO" x="943" y="2620"/>
       <vertex id="Algo_Parser_IPCM" x="955" y="3776"/>
-      <vertex id="Algo_RefList0" x="1278" y="2270"/>
+      <vertex id="Algo_RefList0" x="1721" y="2393"/>
       <vertex id="Algo_RefList1" x="1278" y="2781"/>
       <vertex id="Black_Hole" x="1568" y="2880"/>
       <vertex id="Demux_Cavlc_Cabac" x="1278" y="3098"/>

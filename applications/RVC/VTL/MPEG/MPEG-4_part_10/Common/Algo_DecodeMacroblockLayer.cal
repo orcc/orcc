@@ -20,6 +20,7 @@ actor Algo_DecodeMacroblockLayer()
 	bool          Transform8x8Mode,
 	uint(size=5)  NumRefIdxLXActive,
 	bool          EntropyCodingMode,
+	int (size=5)  ChromaQpIdxOffset,
 	//Sps parameters
 	uint(size=4)  BitDepthLuma,
 	uint(size=4)  BitDepthChroma,
@@ -34,6 +35,7 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  NBTab,
 	bool          LeftMbExists,
 	bool          AboveMbExists,
+	int (size=8)  ValQp,
 
 	uint(size=5)  Total_CoeffLuma,
 	uint(size=5)  Total_CoeffChroma
@@ -86,7 +88,8 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  NbCoeffInMB,
 	bool          SkipMacroBlk,
 	bool          IsIPCM,
-	uint(size=16) cbp_blk
+	uint(size=16) cbp_blk,
+	int (size=8)  Qp_Y_Cb_Cr
 		:
 
 
@@ -145,6 +148,17 @@ actor Algo_DecodeMacroblockLayer()
 			]
 		];
 
+	List (type:uint(size=6),size=64) QP_TAB := 
+		[
+			 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+			10,11,12,13,14,15,16,17,18,19,
+			20,21,22,23,24,25,26,27,28,29,
+			29,30,31,32,32,33,34,34,35,35,
+			36,36,37,37,37,38,38,38,39,39,
+			39,39,39,39,39,39,39,39,42,42,
+			42,42,42,42
+		];
+
 	bool DEBUG_FLAG_DECODED = false;
 
 
@@ -154,7 +168,7 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=6)  coded_block_pattern            := 0;
 	uint(size=6)  CodedBlockPatternLuma          := 0;
 	uint(size=6)  CodedBlockPatternChroma        := 0;
-	int (size=32) mb_qp_delta                    := 0;
+	//int (size=32) mb_qp_delta                    := 0;
 	bool          entropy_coding_mode_flag;
 	//SliceData Parameters
 	uint(size=4)  slice_type;
@@ -171,6 +185,11 @@ actor Algo_DecodeMacroblockLayer()
 	bool          LeftMb_Exists;
 	bool          AboveMb_Exists;
 	uint(size=2)  NumC8x8;
+	int (size=8)  QpValue;
+	int (size=8)  Qp_CbValue;
+	int (size=8)  Qp_CrValue;
+	int (size=5)  chroma_qp_index_offset;
+	int (size=5)  second_chroma_qp_index_offset;
 
 
 	function Is_Intra_16x16(uint MbType)
@@ -277,7 +296,9 @@ actor Algo_DecodeMacroblockLayer()
 			NBTab              :[ValNBTab] repeat 12,
 			LeftMbExists       :[ValLeftMbExists],
 			AboveMbExists      :[ValAboveMbExists],
-			Num_C8x8           :[ValNum_C8x8]
+			Num_C8x8           :[ValNum_C8x8],
+			ValQp              :[Val_Qp],
+			ChromaQpIdxOffset  :[ ValChrmQpIdxOff , Val2ndChrmQpIdxOff ]
 				==>
 			MbType             :[ValMbType],
 			MergeTransfSz8x8   :[ValTransform8x8Mode]
@@ -285,20 +306,25 @@ actor Algo_DecodeMacroblockLayer()
 			uint         Idx,
 			uint(size=6) ValMbType
 		do
-			mb_type                   := ValueOfVLD;
-			slice_type                := ValSliceType;
-			bit_depth_luma            := ValBitDepthLuma;
-			bit_depth_chroma          := ValBitDepthChroma;
-			direct_8x8_inference_flag := ValDirect8x8Inference;
-			transform_8x8_mode_flag   := ValTransform8x8Mode;
-			Chroma_Array_Type         := ValChromaArrayType;
-			num_ref_idx_l0_active     := ValNumRefIdxLXActive[0];
-			num_ref_idx_l1_active     := ValNumRefIdxLXActive[1];
-			mb_field_decoding         := ValMbFieldDecoding;
-			entropy_coding_mode_flag  := ValEntropyCodingMode;
-			LeftMb_Exists             := ValLeftMbExists;
-			AboveMb_Exists            := ValAboveMbExists;
-			NumC8x8                   := ValNum_C8x8;
+			mb_type                       := ValueOfVLD;
+			slice_type                    := ValSliceType;
+			bit_depth_luma                := ValBitDepthLuma;
+			bit_depth_chroma              := ValBitDepthChroma;
+			direct_8x8_inference_flag     := ValDirect8x8Inference;
+			transform_8x8_mode_flag       := ValTransform8x8Mode;
+			Chroma_Array_Type             := ValChromaArrayType;
+			num_ref_idx_l0_active         := ValNumRefIdxLXActive[0];
+			num_ref_idx_l1_active         := ValNumRefIdxLXActive[1];
+			mb_field_decoding             := ValMbFieldDecoding;
+			entropy_coding_mode_flag      := ValEntropyCodingMode;
+			LeftMb_Exists                 := ValLeftMbExists;
+			AboveMb_Exists                := ValAboveMbExists;
+			NumC8x8                       := ValNum_C8x8;
+			QpValue                       := Val_Qp;
+			chroma_qp_index_offset        := ValChrmQpIdxOff;
+			second_chroma_qp_index_offset := Val2ndChrmQpIdxOff;
+			Qp_CbValue                    := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
+			Qp_CrValue                    := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
 			foreach int i in 0 .. 11
 			do
 				nATab[i] := ValNATab[i];
@@ -589,11 +615,15 @@ actor Algo_DecodeMacroblockLayer()
 	ReadMbQpDelta.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
+			Qp_Y_Cb_Cr :[QpValue , Qp_CbValue , Qp_CrValue]
 		do
 			if(DEBUG_FLAG_DECODED)then
-				println("mb_qp_delta : "+mb_qp_delta);
+				println("mb_qp_delta : "+ValueOfVLD);
 			end
-			mb_qp_delta := ValueOfVLD;
+			//mb_qp_delta := ValueOfVLD;
+			QpValue    := (QpValue + ValueOfVLD + 52) mod 52;
+			Qp_CbValue := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
+			Qp_CrValue := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
 		end
 
 	LaunchResidual: action
@@ -644,7 +674,8 @@ actor Algo_DecodeMacroblockLayer()
 				==>
 			SData_Total_CoeffLuma   :[[0: for int s in 0 .. 15]] repeat 16,
 			SData_Total_CoeffChroma :[[0: for int s in 0 .. 31]] repeat 32,
-			SkipMacroBlk            :[ true ]
+			SkipMacroBlk            :[true],
+			Qp_Y_Cb_Cr              :[QpValue , Qp_CbValue , Qp_CrValue]
 		end
 
 	SendEndSliceHeader: action

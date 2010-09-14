@@ -1,5 +1,5 @@
 actor BlackHole4MVReconstruct()
-	int(size=16) Z,
+	int(size=16) MV,
 	uint(size=11)Location, 
 	uint(size=6) PartSZ,
 	int(size=16) mv_out,
@@ -7,7 +7,7 @@ actor BlackHole4MVReconstruct()
 		==>
 		:
 	action 
-			Z:[a]
+			MV:[a]
 				==>
 		end
 	action 

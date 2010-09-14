@@ -36,7 +36,8 @@ actor Algo_DecodeSliceHeader()
 	bool          deblocking_filter_control_present,
 	uint(size=4)  NumSliceGroups,
 	uint(size=3)  SliceGroupMapType,
-	int (size=32) SizeSliceGroupChgCycle
+	int (size=32) SizeSliceGroupChgCycle,
+	int (size=8)  PicInitQP
 		==>
 	uint(size=31) FramNumCurrPic,
 
@@ -55,7 +56,8 @@ actor Algo_DecodeSliceHeader()
 	uint(size=32) Poc,
 	uint(size=2)  DisDeblockingFilterIdc,
 	int (size=6)  SliceBetaOffset,
-	int (size=6)  SliceAlphaC0Offset
+	int (size=6)  SliceAlphaC0Offset,
+	int (size=8)  ValQp
 		:
 
 
@@ -105,7 +107,7 @@ actor Algo_DecodeSliceHeader()
 	int (size=32) delta_pic_order_cnt_bottom    := 0;
 	uint(size=7)  redundant_pic_cnt             := 0;
 	uint(size=2)  cabac_init_idc                := 0;
-	int (size=32) slice_qp_delta;
+	//int (size=32) slice_qp_delta;
 	bool          sp_for_switch_flag;
 	uint(size=6)  slice_qs_delta;
 	uint(size=2)  disable_deblocking_filter_idc := 0;
@@ -561,7 +563,9 @@ actor Algo_DecodeSliceHeader()
 
 		// TopField is always inferior !!!!!
 		POC_val := expectedpoc + delta_pic_order_cnt[0];
-		println("PocVal: "+POC_val);
+		if(DEBUG_FLAG_DECODED)then
+			println("PocVal: "+POC_val);
+		end
 	end
 
 
@@ -640,12 +644,17 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadSliceQpDelta.Done: action
-			ValVLD :[VLDecoding]
+			ValVLD    :[VLDecoding],
+			PicInitQP :[ValInitQp]
 				==>
+			ValQp     :[ValueOfQp]
+		var
+			int(size=8) ValueOfQp
 		do
-			slice_qp_delta := VLDecoding;
+			//slice_qp_delta := VLDecoding;
+			ValueOfQp      := VLDecoding + ValInitQp;
 			if(DEBUG_FLAG_DECODED)then
-				println("\t\tslice_qp_delta: "+slice_qp_delta);
+				println("\t\tslice_qp_delta: "+VLDecoding);
 			end
 		end
 

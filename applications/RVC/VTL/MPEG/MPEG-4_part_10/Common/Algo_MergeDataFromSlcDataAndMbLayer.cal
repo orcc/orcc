@@ -29,6 +29,10 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	uint(size=6)  MbType,
 	uint(size=4)  RemIntraYxYPredMode,
 
+	int (size=8)  SDataQp_Y_Cb_Cr,
+
+	int (size=8)  MbLayerQp_Y_Cb_Cr,
+
 	uint(size=3)  SubMbPredRefIdxL0,
 	uint(size=5)  SubMbPredMbPartHeight,
 	uint(size=5)  SubMbPredMbPartWidth,
@@ -52,7 +56,10 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	uint(size=5)  MbPartHeight,
 	uint(size=5)  MbPartWidth,
 	uint(size=3)  MbPartIdx,
-	int(size=8)   ScalingList
+	int (size=8)  ScalingList,
+	int (size=8)  Qp,
+	int (size=8)  Qp_Cb,
+	int (size=8)  Qp_Cr
 		:
 
 	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
@@ -66,25 +73,34 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 
 	uint(size=6) mb_type;
 
+
 	MbLayerSkipped: action
-			SkipMbLayer :[skip]
+			SkipMbLayer     :[skip],
+			SDataQp_Y_Cb_Cr :[ ValQp , ValQpCb , ValQpCr ]
 				==>
-			MbIntraFlag  :[0],
-			RefIdx       :[0],
-			MvRes        :[0,0],
-			MbPartHeight :[16],
-			MbPartWidth  :[16],
-			MbPartIdx    :[1],
-			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16
+			MbIntraFlag     :[0],
+			RefIdx          :[0],
+			MvRes           :[0,0],
+			MbPartHeight    :[16],
+			MbPartWidth     :[16],
+			MbPartIdx       :[1],
+			ScalingList     :[[16 : for int i in 0 .. 15]] repeat 16,
+			Qp              :[ValQp],
+			Qp_Cb           :[ValQpCb],
+			Qp_Cr           :[ValQpCr]
 		guard
 			skip = true
 		end
 
 	MbLayer.IsIntra4x4or8x8: action
-			SkipMbLayer :[skip],
-			MbType      :[mb_type]
+			SkipMbLayer       :[skip],
+			MbType            :[mb_type],
+			MbLayerQp_Y_Cb_Cr :[ValQp , ValQpCb , ValQpCr]
 				==>
-			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16
+			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16,
+			Qp          :[ValQp],
+			Qp_Cb       :[ValQpCb],
+			Qp_Cr       :[ValQpCr]
 		guard
 			skip    =  false,
 			mb_type = BLOCK_TYPE_I_8x8_or_4x4
@@ -127,13 +143,17 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		end
 
 	MbLayer.IsIntra16x16: action
-			SkipMbLayer     :[skip],
-			MbType          :[mb_type],
-			TransfSz8x8Flag :[Is8x8]
+			SkipMbLayer       :[skip],
+			MbType            :[mb_type],
+			TransfSz8x8Flag   :[Is8x8],
+			MbLayerQp_Y_Cb_Cr :[ValQp , ValQpCb , ValQpCr]
 				==>
-			MbIntraFlag   :[1],
-			IntraPredMode :[ 3 , (mb_type-1) mod 4],
-			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16
+			MbIntraFlag     :[1],
+			IntraPredMode   :[ 3 , (mb_type-1) mod 4],
+			ScalingList     :[[16 : for int i in 0 .. 15]] repeat 16,
+			Qp              :[ValQp],
+			Qp_Cb           :[ValQpCb],
+			Qp_Cr           :[ValQpCr]
 		guard
 			skip     =  false,
 			mb_type >= BLOCK_TYPE_INTRA_16x16_MIN,
@@ -155,10 +175,14 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	MbLayer.IsNotIntra: action
 			SkipMbLayer     :[skip],
 			MbType          :[Mb_type],
-			TransfSz8x8Flag :[Is8x8]
+			TransfSz8x8Flag :[Is8x8],
+			MbLayerQp_Y_Cb_Cr :[ValQp , ValQpCb , ValQpCr]
 				==>
 			MbIntraFlag :[0],
-			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16
+			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16,
+			Qp          :[ValQp],
+			Qp_Cb       :[ValQpCb],
+			Qp_Cr       :[ValQpCr]
 		guard
 			skip    = false,
 			Mb_type > MB_TYPE_INTRA_MAX

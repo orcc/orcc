@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="73" y="955"/>
-      <vertex id="FUN_Parser" x="168" y="927"/>
+      <vertex id="bits8" x="57" y="81"/>
+      <vertex id="FUN_Parser" x="168" y="70"/>
    </vertices>
 </layout>

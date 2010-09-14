@@ -70,6 +70,8 @@ actor Algo_BlockSplit_AVC()
 //	uint(size=2) BLOCK_8x8   = 1;
 	uint(size=2) BLOCK_16x16 = 2;
 
+	bool DEBUG_INPUT = false;
+
 
 	Block_16x16_Luma.Send_Y_DC: action
 			BlocksSize_Luma :[MBSize],
@@ -78,6 +80,14 @@ actor Algo_BlockSplit_AVC()
 			Coeff_Y_DC      :[ x ] repeat 16
 		guard
 			MBSize = BLOCK_16x16
+		do
+			if(DEBUG_INPUT)then
+				println("Input BlockSplit BlocksSize_Luma:"+MBSize);
+				foreach int i in 0 .. 15
+				do
+					println("Input BlockSplit Coeff:"+x[i]);
+				end
+			end
 		end
 
 
@@ -85,6 +95,13 @@ actor Algo_BlockSplit_AVC()
 			Coeff      :[ x ] repeat 16 * 16
 				==>
 			Coeff_Y_AC :[ x ] repeat 16 * 16
+		do
+			if(DEBUG_INPUT)then
+				foreach int i in 0 .. 16*16 - 1
+				do
+					println("Input BlockSplit Coeff:"+x[i]);
+				end
+			end	
 		end
 
 
@@ -93,6 +110,14 @@ actor Algo_BlockSplit_AVC()
 			Coeff           :[ x ] repeat 16 * 16
 				==>
 			Coeff_Y_AC      :[ x ] repeat 16 * 16
+		do
+			if(DEBUG_INPUT)then
+				println("Input BlockSplit BlockSize_Luma:"+MBSize);
+				foreach int i in 0 .. 16*16 - 1
+				do
+					println("Input BlockSplit Coeff:"+x[i]);
+				end
+			end	
 		end
 
 
@@ -100,6 +125,13 @@ actor Algo_BlockSplit_AVC()
 			Coeff      :[ x ] repeat 4
 				==>
 			Coeff_U_DC :[ x ] repeat 4
+		do
+			if(DEBUG_INPUT)then
+				foreach int i in 0 .. 3
+				do
+					println("Input BlockSplit Coeff:"+x[i]);
+				end
+			end	
 		end
 
 
@@ -107,6 +139,13 @@ actor Algo_BlockSplit_AVC()
 			Coeff      :[ x ] repeat 4
 				==>
 			Coeff_V_DC :[ x ] repeat 4
+		do
+			if(DEBUG_INPUT)then
+				foreach int i in 0 .. 3
+				do
+					println("Input BlockSplit Coeff:"+x[i]);
+				end
+			end	
 		end
 
 
@@ -114,6 +153,13 @@ actor Algo_BlockSplit_AVC()
 			Coeff      :[ x ] repeat 8 * 8
 				==>
 			Coeff_U_AC :[ x ] repeat 8 * 8
+		do
+			if(DEBUG_INPUT)then
+				foreach int i in 0 .. 63
+				do
+					println("Input BlockSplit Coeff:"+x[i]);
+				end
+			end	
 		end
 
 
@@ -121,6 +167,13 @@ actor Algo_BlockSplit_AVC()
 			Coeff      :[ x ] repeat 8 * 8
 				==>
 			Coeff_V_AC :[ x ] repeat 8 * 8
+		do
+			if(DEBUG_INPUT)then
+				foreach int i in 0 .. 63
+				do
+					println("Input BlockSplit Coeff:"+x[i]);
+				end
+			end	
 		end
 
 

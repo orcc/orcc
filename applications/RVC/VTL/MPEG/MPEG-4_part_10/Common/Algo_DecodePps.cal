@@ -36,6 +36,8 @@ actor Algo_DecodePps(bool IsCBP)
 	int (size=32) SizeSliceGroupChgCycle,
 	bool          Transform8x8Mode,
 	bool          ConstraindedIntraPred,
+	int(size=8)   PicInitQp,
+	int(size=5)   ChromaQpIdxOffset,
 
 	uint(size=5)  NumRefIdxLXActive
 		:
@@ -77,6 +79,7 @@ actor Algo_DecodePps(bool IsCBP)
 	List (type:int (size=6) ,size=255) pic_init_qp_minus26                    := [ 0     : for int i in 0 .. 254];
 	List (type:int (size=6) ,size=255) pic_init_qs_minus26                    := [ 0     : for int i in 0 .. 254];
 	List (type:int (size=5) ,size=255) chroma_qp_index_offset                 := [ 0     : for int i in 0 .. 254];
+	List (type:int (size=5) ,size=255) second_chroma_qp_index_offset          := [ 0     : for int i in 0 .. 254];
 	List (type:uint(size=1) ,size=255) deblocking_filter_control_present_flag := [ 0     : for int i in 0 .. 254];
 	List (type:bool         ,size=255) constrained_intra_pred_flag            := [ false : for int i in 0 .. 254];
 	List (type:uint(size=1) ,size=255) redundant_pic_cnt_present_flag         := [ 0     : for int i in 0 .. 254];
@@ -115,7 +118,9 @@ actor Algo_DecodePps(bool IsCBP)
 			SliceGroupMapType                 :[slice_group_map_type[ValPps]],
 			SizeSliceGroupChgCycle            :[SzSliceGroupChgCycle[ValPps]],
 			Transform8x8Mode                  :[transform_8x8_mode_flag[ValPps]],
-			ConstraindedIntraPred             :[constrained_intra_pred_flag[ValPps]]
+			ConstraindedIntraPred             :[constrained_intra_pred_flag[ValPps]],
+			PicInitQp                         :[pic_init_qp_minus26[ValPps] + 26],
+			ChromaQpIdxOffset                 :[chroma_qp_index_offset[ValPps],second_chroma_qp_index_offset[ValPps]]
 		guard
 			not IsCBP
 		var
@@ -364,9 +369,6 @@ actor Algo_DecodePps(bool IsCBP)
 
 	AskMoreRbspData: action
 				==>
-			//Must be implemented in Algo_Check_NALU_type_Frext
-			//It must check that the 3 next Bytes are not in a new Nal
-//			AskMoreRbspData :[true]
 		do
 			println("AskMoreRbspData not implemented yet");
 		end
@@ -380,7 +382,7 @@ actor Algo_DecodePps(bool IsCBP)
 			int ValMaxSliceGroupChgCycle
 		do
 			ValMaxSliceGroupChgCycle     := (ValPicWidthInMbs * ValPicHeightInMapUnits) / (slice_group_change_rate_minus1[pps_id] + 1);
-			//SzSliceGroupChgCycle := log_base2( ValMaxSliceGroupChgCycle )
+			//SzSliceGroupChgCycle := log_base2( ValMaxSliceGroupChgCycle ) :
 			ValMaxSliceGroupChgCycle     := ValMaxSliceGroupChgCycle -1;
 			SzSliceGroupChgCycle[pps_id] := 0;
 			while(ValMaxSliceGroupChgCycle != 0)

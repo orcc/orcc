@@ -11,6 +11,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				==>
 				int(size=16) INTERP:
 
+	bool DEBUG_INPUT  = false;
+	bool DEBUG_OUTPUT = false;
+
   int(size=32) x ;
   int(size=32) y ;
   int(size=32) o_x ;
@@ -276,21 +279,33 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
     o_y := 0;
     buf_done := 0;
     x_index := f;
+  	if(DEBUG_INPUT) then
+		println("Input Interp_SeparableSixTap... Frac:"+f);
+  	end
   end
 
   get_fract_y: action Frac:[ f ] ==>
   do
     y_index := f;   
+  	if(DEBUG_INPUT) then
+		println("Input Interp_SeparableSixTap... Frac:"+f);
+  	end
   end
 
   getwidth: action PartSZ:[ f ] ==>
   do
     width :=f;
+  	if(DEBUG_INPUT) then
+		println("Input Interp_SeparableSixTap... PartSZ:"+f);
+  	end
   end
 
   getheight: action PartSZ:[ f ] ==>
   do
     height :=f;
+  	if(DEBUG_INPUT) then
+		println("Input Interp_SeparableSixTap... PartSZ:"+f);
+  	end
   end
 
   // fetch (width+5)x(height+5) pixels
@@ -308,6 +323,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       	buf_done := 1 ;
       	end
     end
+  	if(DEBUG_INPUT) then
+		println("Input Interp_SeparableSixTap... RD:"+d);
+  	end
   end
   
   done: action ==>
@@ -324,6 +342,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
   var 
 	int p
   do
+  if(DEBUG_OUTPUT)then
+		println("Input interp_Sepa... INTERP:"+p);
+  end
    compensate();
    p := temp;
    o_x := o_x + 1;

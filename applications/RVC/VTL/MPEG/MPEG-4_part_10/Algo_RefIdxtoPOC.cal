@@ -14,7 +14,7 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-actor Algo_RefIdxtoPOC()
+actor Algo_RefIdxtoPOC(bool a)
 	int (size=32) RefList,
 	uint(size=4)  RefIdx,
 	uint(size=1)  PicID
@@ -22,6 +22,8 @@ actor Algo_RefIdxtoPOC()
 	uint(size=32) POCtoRead
 		:
 
+
+	bool DEBUG_INPUT = false;
 
 	List(type:uint(size=32), size=16) RefPoc;
 
@@ -35,6 +37,9 @@ actor Algo_RefIdxtoPOC()
 		do
 			SizeList  := SizeRefList;
 			CountRead := 0;
+			if(DEBUG_INPUT and a)then
+				println("Input RefIdxtoPOC RefList:"+SizeRefList);
+			end
 		end
 
 
@@ -46,20 +51,30 @@ actor Algo_RefIdxtoPOC()
 		do
 			RefPoc[CountRead] := PocList;
 			CountRead         := CountRead + 1;
+			if(DEBUG_INPUT and a)then
+				println("Input RefIdxtoPOC RefList:"+PocList);
+			end
 		end
 
 
 	ReadRefListDone: action ==>
+		guard
+			CountRead = SizeList
 		end
 
 
 	GetReadAddr: action
 			RefIdx    :[ ListIdx ],
-			PicID :[ValPicID]
+			PicID     :[ValPicID]
 				==>
 			POCtoRead :[ RefPoc[ListIdx] ]
 		guard
 			ValPicID = LastPicID
+		do
+			if(DEBUG_INPUT and a)then
+				println("Input RefIdxtoPOC RefIdx:"+ListIdx);
+				println("Input RefIdxtoPOC PicID:"+ValPicID);
+			end
 		end
 
 
@@ -70,11 +85,15 @@ actor Algo_RefIdxtoPOC()
 			ValPicID != LastPicID
 		do
 			LastPicID := ValPicID;
+			if(DEBUG_INPUT and a)then
+				println("Input RefIdxtoPOC PicID:"+ValPicID);
+			end
 		end
 
 	schedule fsm ReadSizeList:
 
 		ReadSizeList  (ReadSizeList      )-->ReadRefList;
+
 		ReadRefList   (ReadRefList       )-->ReadRefList;
 		ReadRefList   (ReadRefListDone   )-->GetReadAddr;
 

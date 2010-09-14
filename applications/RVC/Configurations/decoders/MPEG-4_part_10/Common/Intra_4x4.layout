@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="17" y="297"/>
-      <vertex id="PicWidthInMb" x="14" y="500"/>
-      <vertex id="PredMode" x="248" y="486"/>
-      <vertex id="FirstMbInSlice" x="248" y="381"/>
-      <vertex id="Coef_ACR" x="230" y="220"/>
-      <vertex id="MB_IN" x="29" y="374"/>
-      <vertex id="Mb_Type" x="13" y="468"/>
-      <vertex id="ConstrainedIFlag" x="217" y="261"/>
-      <vertex id="MBPred_intra_4x4" x="1237" y="339"/>
-      <vertex id="Mgnt_Intra4x4" x="391" y="289"/>
-      <vertex id="Algo_IntraPred_LUMA_4x4" x="632" y="325"/>
-      <vertex id="Algo_Add_4x4" x="870" y="325"/>
-      <vertex id="Algo_Merge_4x4_to_16x16_norasterscan" x="993" y="324"/>
-      <vertex id="Algo_Split_16x16_to_4x4_norasterscan" x="622" y="275"/>
-      <vertex id="Buffer_Neighbour_4x4" x="101" y="336"/>
+      <vertex id="CurrMbAddr" x="57" y="228"/>
+      <vertex id="PicWidthInMb" x="57" y="443"/>
+      <vertex id="PredMode" x="220" y="72"/>
+      <vertex id="FirstMbInSlice" x="220" y="169"/>
+      <vertex id="Coef_ACR" x="220" y="287"/>
+      <vertex id="MB_IN" x="57" y="540"/>
+      <vertex id="Mb_Type" x="57" y="637"/>
+      <vertex id="ConstrainedIFlag" x="220" y="384"/>
+      <vertex id="MBPred_intra_4x4" x="1567" y="547"/>
+      <vertex id="Mgnt_Intra4x4" x="441" y="285"/>
+      <vertex id="Algo_IntraPred_LUMA_4x4" x="725" y="329"/>
+      <vertex id="Algo_Add_4x4" x="1055" y="525"/>
+      <vertex id="Algo_Merge_4x4_to_16x16_norasterscan" x="1225" y="536"/>
+      <vertex id="Algo_Split_16x16_to_4x4_norasterscan" x="725" y="536"/>
+      <vertex id="Buffer_Neighbour_4x4" x="220" y="502"/>
    </vertices>
 </layout>

@@ -53,6 +53,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	int (size=32) PICWIDTH        = 1280/16; //number of MB per lines
 	int (size=32) PICHEIGHT       = 720/16; //number of MB per columns
 
+	bool DEBUG_INPUT  = false;
+	bool DEBUG_OUTPUT = false;
+
 	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
 	List(type:uint,size=NB_PIC)            ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];
 	List(type:bool        ,size=NB_PIC)    PictureReady  := [false :for int s in 0 .. NB_PIC-1];
@@ -111,7 +114,12 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			uint(size=16) XinMb,
 			uint(size=16) YinMb
 		do
-			PicWidthInMacroB := PICwidthInMb;
+		/*	if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+				println("Input Mgnt_DPB PicWidthInMb:"+PICwidthInMb);
+				println("Input Mgnt_DPB PicSizeInMb:"+PICSizeInMb);
+				println("Input Mgnt_DPB CurrMbAddr:"+CurrMacroBAddr);
+			end
+		*/	PicWidthInMacroB := PICwidthInMb;
 			PicSizeInMacroB  := PICSizeInMb;
 			currmbaddr       := CurrMacroBAddr;
 			XinMb      := CurrMacroBAddr mod PicWidthInMacroB;
@@ -132,7 +140,10 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard 
 			write_done = false
 		do
-			pic[pic_curr_idx][wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
+		/*	if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+				println("Input Mgnt_DPB WD:"+wd);
+			end
+		*/	pic[pic_curr_idx][wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
 			wa_x := wa_x +1;
 			if(wa_x = wa_W) then
 				wa_y := wa_y +1;
@@ -156,6 +167,12 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		var
 			bool found := false
 		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+				println("Input Mgnt_DPB RA:"+ra);
+				println("Input Mgnt_DPB RA_Width:"+RAWidth);
+				println("Input Mgnt_DPB RA_Height:"+RAHeight);
+				println("Input Mgnt_DPB POCtoRead:"+poc2read);
+			end
 			ra_offset := ra;
 			ra_W      := RAWidth;
 			ra_H      := RAHeight;
@@ -192,6 +209,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		var 
 			uint(size=16) rd
 		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_OUTPUT)then
+				println("Input Mgnt_DPB RD:"+rd);
+			end
 			rd   := pic[Ref_idx][ra_offset + ra_x + ra_y * PicWidthInMacroB * MB_WIDTH];
 			ra_x := ra_x +1;
 			if(ra_x = ra_W) then
@@ -213,6 +233,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			write_done = true,
 			currmbaddr = PicSizeInMacroB - 1
 		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_OUTPUT)then
+				println("Input Mgnt_DPB Write_Done:"+true);
+			end
 			PictureReady[pic_curr_idx] := true;
 			wa_x        := 0;
 			wa_y        := 0;
@@ -230,6 +253,10 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			bool         idx_selected := false,
 			int(size=32) i            := 0
 		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+				println("Input Mgnt_DPB POC:"+Valpoc);
+				println("Input Mgnt_DPB IsIDR:"+IsIDRPic);
+			end
 			pic_curr_idx := -1;
 			while((not idx_selected) and (i < NB_PIC))
 			do
@@ -338,6 +365,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard
 			DelVal != SENT_DONE
 		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+				println("Input Mgnt_DPB DelList:"+DelVal);
+			end
 			foreach int i in 0 .. NB_PIC - 1
 			do
 				if(ListPOC[i]   = DelVal) then
@@ -351,6 +381,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			DelList:[DelVal]
 				==>
 		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+				println("Input Mgnt_DPB DelList:"+DelVal);
+			end
 			if(ValIsIDR)then
 				foreach int i in 0 .. NB_PIC - 1
 				do
@@ -371,6 +404,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			poc2disp         != -1,
 			NextPOCtoDisplay = -1
 		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+				println("Input Mgnt_DPB POCtoDisplay:"+poc2disp);
+			end
 			NextPOCtoDisplay := poc2disp;
 			ListScanned      := false;
 		end
@@ -380,6 +416,10 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				==>
 		guard
 			poc2disp         = -1
+		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+				println("Input Mgnt_DPB POCtoDisplay:"+poc2disp);
+			end
 		end
 	
 	getNextPOCtoDisplay.skip: action

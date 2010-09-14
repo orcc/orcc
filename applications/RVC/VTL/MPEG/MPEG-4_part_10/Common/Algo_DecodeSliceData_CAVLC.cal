@@ -30,6 +30,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool          Transform8x8Mode,
 	uint(size=5)  NumRefIdxLXActive,
 	bool          ConstraindedIntraPred,
+	int(size=5)   ChromaQpIdxOffset,
 	//Sps Parameters
 	uint(size=32) PicSzInMbs,
 	uint(size=32) PicWdtInMbs,
@@ -45,6 +46,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=2)  DisDeblocFilterIdc,
 	int(size=6)   SliceBetaOffset,
 	int (size=6)  SliceAlphaC0Offset,
+	int (size=8)  ValQp,
 
 	uint(size=5)  Total_CoeffLuma,
 	uint(size=5)  Total_CoeffChroma
@@ -68,6 +70,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=5)  DecMbLayerNBTab,
 	bool          DecMbLayerAboveMbExists,
 	uint(size=2)  DecMbLayerNumC8x8,
+	int (size=8)  DecMbLayerValQp,
+	int (size=5)  DecMbLayerValChrmQpIdxOff,
 
 	bool          SkipMbLayer,
 	uint(size=5)  SzMbSkipped,
@@ -79,7 +83,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=13) FirstMbInSlice,
 	uint(size=2)  LFDisable,
 	int(size=6)   Slice_Beta_Offset,
-	int(size=6)   Slice_Alpha_C0_Offset
+	int(size=6)   Slice_Alpha_C0_Offset,
+	int(size=8)   SkipValQp_Y_Cb_Cr
 		:
 
 
@@ -112,6 +117,16 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool DEBUG_FLAG_DECODED = false;
 
 
+	List (type:uint(size=6),size=64) QP_TAB := 
+		[
+			 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+			10,11,12,13,14,15,16,17,18,19,
+			20,21,22,23,24,25,26,27,28,29,
+			29,30,31,32,32,33,34,34,35,35,
+			36,36,37,37,37,38,38,38,39,39,
+			39,39,39,39,39,39,39,39,42,42,
+			42,42,42,42
+		];
 /*
 *
 * State Variables
@@ -130,6 +145,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool          transform_8x8_mode_flag;
 	uint(size=5)  num_ref_idx_l0_active;
 	uint(size=5)  num_ref_idx_l1_active;
+	int (size=5)  chroma_qp_index_offset;
+	int (size=5)  second_chroma_qp_index_offset;
 	//Slice Header Parameters
 	uint(size=32) curr_mb_addr := 0;
 	uint(size=4)  slice_type;
@@ -145,6 +162,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool          mb_field_decoding_flag;
 	bool          direct_8x8_inference_flag;
 	bool          constrained_intra_pred_flag;
+	int (size=8)  QpValue;
+	int (size=8)  Qp_CbValue;
+	int (size=8)  Qp_CrValue;
 
 	//Size of TotalCoeffTab must be >= PicWidthInMb + 1 and must be equal to pow(2,n) for masking bits easily.
 	List( type: List(type: uint(size=5), size=16),size= SZ_TOTALCOEFF) TotalCoeffTabLuma   := [[0:for int s in 0 .. 15]: for int s in 0 .. SZ_TOTALCOEFF-1];
@@ -178,7 +198,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			ConstraindedIntraPred :[ValConstrIntrPred],
 			DisDeblocFilterIdc    :[ValDisDebFil],
 			SliceBetaOffset       :[ValSliceBetaOffset],
-			SliceAlphaC0Offset    :[ValSliceAlphaC0Offset]
+			SliceAlphaC0Offset    :[ValSliceAlphaC0Offset],
+			ValQp                 :[Val_Qp],
+			ChromaQpIdxOffset     :[ValChromaQpIdxOffset,ValSecondChromaQpIdxOffset]
 				==>
 		guard
 			Is_CBP = false
@@ -199,6 +221,11 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			disable_deblocking_filter_idc := ValDisDebFil;
 			slice_beta_offset             := ValSliceBetaOffset;
 			slice_alpha_c0_offset         := ValSliceAlphaC0Offset;
+			chroma_qp_index_offset        := ValChromaQpIdxOffset;
+			second_chroma_qp_index_offset := ValSecondChromaQpIdxOffset;
+			QpValue                       := Val_Qp;
+			Qp_CbValue                    := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
+			Qp_CrValue                    := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
 
 			curr_mb_addr :=
 				if(MbaffFrameFlag = false)then
@@ -261,7 +288,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			SzMbSkipped               :[16+1+1+4+4],
 			LFDisable                 :[disable_deblocking_filter_idc],
 			Slice_Beta_Offset         :[slice_beta_offset],
-			Slice_Alpha_C0_Offset     :[slice_alpha_c0_offset]
+			Slice_Alpha_C0_Offset     :[slice_alpha_c0_offset],
+			SkipValQp_Y_Cb_Cr         :[ QpValue , Qp_CbValue , Qp_CrValue]
 		guard
 			mb_skip_run > 0
 		do
@@ -347,7 +375,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			DecMbLayerLeftMbExists       :[LMbExists],
 			DecMbLayerNBTab              :[NbTab] repeat 12,
 			DecMbLayerAboveMbExists      :[AMbExists],
-			DecMbLayerNumC8x8            :[NumC8x8]
+			DecMbLayerNumC8x8            :[NumC8x8],
+			DecMbLayerValQp              :[QpValue],
+			DecMbLayerValChrmQpIdxOff    :[ chroma_qp_index_offset , second_chroma_qp_index_offset ]
 		var
 			List(type: uint(size=5), size=12) NaTab,
 			List(type: uint(size=5), size=12) NbTab,

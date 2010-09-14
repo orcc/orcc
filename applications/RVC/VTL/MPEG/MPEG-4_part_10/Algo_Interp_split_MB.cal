@@ -33,6 +33,9 @@ actor Algo_Interp_split_MB ()
   List ( type:int(size=16), size=256) MB := [ 0 : for int i in 0 .. 255];
   List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];  
   
+  bool DEBUG_INPUT = false;
+  bool DEBUG_OUTPUT = false;
+  
   get_part: action MbPartIdx:[a], MbPartWidth:[b], MbPartHeigth:[c] ==> 
   guard
     count < 16
@@ -40,6 +43,11 @@ actor Algo_Interp_split_MB ()
     mbpart_idx:= a;
     mbpart_w:= b;
     mbpart_h:= c;
+    if(DEBUG_INPUT)then
+	    println("Input Interp_split_MB MbPartIdx:"+a);
+	    println("Input Interp_split_MB MbPartWidth:"+b);	
+	    println("Input Interp_split_MB MbPartHeigth:"+c);	
+	end
   end
  
   
@@ -55,6 +63,13 @@ actor Algo_Interp_split_MB ()
       end
     end
     
+    if(DEBUG_INPUT)then
+    	foreach int i in 0 .. 16*16-1
+    	do
+		    println("Input Interp_split_MB INTERP:"+v[i]);
+
+		end
+	end
     count := count+rshift(mbpart_w,2)*rshift(mbpart_h,2);
     
   end
@@ -70,6 +85,13 @@ actor Algo_Interp_split_MB ()
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
+    if(DEBUG_INPUT)then
+    	foreach int i in 0 .. 16*8-1
+    	do
+		    println("Input Interp_split_MB INTERP:"+v[i]);
+
+		end
+	end
      count := if mbpart_idx = 0 then 4 else 16 end;
   end
   
@@ -84,6 +106,13 @@ actor Algo_Interp_split_MB ()
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
+    if(DEBUG_INPUT)then
+    	foreach int i in 0 .. 16*8-1
+    	do
+		    println("Input Interp_split_MB INTERP:"+v[i]);
+
+		end
+	end
     count := count+rshift(mbpart_w,2)*rshift(mbpart_h,2);
   end
   
@@ -98,6 +127,13 @@ actor Algo_Interp_split_MB ()
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
+    if(DEBUG_INPUT)then
+    	foreach int i in 0 .. 8*8-1
+    	do
+		    println("Input Interp_split_MB INTERP:"+v[i]);
+
+		end
+	end
     count := count+rshift(mbpart_w,2)*rshift(mbpart_h,2);
   end
   
@@ -112,6 +148,13 @@ actor Algo_Interp_split_MB ()
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
       end
     end
+    if(DEBUG_INPUT)then
+    	foreach int i in 0 .. 4*8-1
+    	do
+		    println("Input Interp_split_MB INTERP:"+v[i]);
+
+		end
+	end
     count := count+1+lshift(mbpart_idx,1);
   end
   
@@ -121,6 +164,13 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
+    if(DEBUG_INPUT)then
+    	foreach int i in 0 .. 4*8-1
+    	do
+		    println("Input Interp_split_MB INTERP:"+v[i]);
+
+		end
+	end
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
@@ -135,6 +185,13 @@ actor Algo_Interp_split_MB ()
   var 
     uint pixAddr := lshift(InverseScan4x4Tab[count] /4, 6) + lshift(InverseScan4x4Tab[count] mod 4, 2) 
   do
+    if(DEBUG_INPUT)then
+    	foreach int i in 0 .. 4*4-1
+    	do
+		    println("Input Interp_split_MB INTERP:"+v[i]);
+
+		end
+	end
     foreach int j in 0 .. mbpart_h-1 do
       foreach int i in 0 .. mbpart_w-1 do
         MB[pixAddr+i+lshift(j,4)] := v[i+j*mbpart_w];
@@ -148,6 +205,12 @@ actor Algo_Interp_split_MB ()
     count = 16
   do
     count := 0;
+    if(DEBUG_OUTPUT) then
+    	foreach int i in 0 .. 255
+    	do
+			println("Output InterpSplitMb MBPred:"+MB[i]);
+		end
+    end
   end
   
   schedule fsm get_send_part :
