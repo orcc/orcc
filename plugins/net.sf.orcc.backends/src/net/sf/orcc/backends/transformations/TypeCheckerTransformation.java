@@ -42,6 +42,7 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
@@ -73,10 +74,17 @@ public class TypeCheckerTransformation extends AbstractActorTransformation {
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
 			Type type = expr.getType();
+			BinaryOp op = expr.getOp();
+			Expression e1 = expr.getE1();
+			Expression e2 = expr.getE2();
 		
-			Expression e1 = (Expression) expr.getE1().accept(this, type);
-			Expression e2 = (Expression) expr.getE2().accept(this, type);
-		
+			if (op.isComparison()){
+				e2 = (Expression) e2.accept(this, e1.getType());
+			}else{
+				e1 = (Expression) e1.accept(this, type);
+				e2 = (Expression) e2.accept(this, type);
+			}
+			
 			expr.setE1(e1);
 			expr.setE2(e2);
 
