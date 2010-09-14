@@ -229,6 +229,17 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 CastAssign(target, value, cast)::= <<
+$if(value.varExpr)$
+$if(cast.extended)$
+$if(cast.signed)
+$%$target$ = sext $value.type$ %$value$ to $target.type$$
+else
+$%$target$ = zext $value.type$ %$value$ to $target.type$$
+endif$
+$else$
+%$target$ = trunc $value.type$ %$value$ to $target.type$
+$endif$
+$else$
 $if(cast.extended)$
 %$target$_ext = $value$
 $if(cast.signed)
@@ -240,7 +251,7 @@ $else$
 %$target$_trunc = $value$
 %$target$ = trunc $value.type$ %$target$_trunc to $target.type$
 $endif$
-
+$endif$
 >>
 
 CastParameter(casts, args, params, location )::= <<
@@ -391,7 +402,7 @@ phiExpr(expr, node) ::= <<
 	endif
 	$$
 else
-	$ Expr(expr) $
+	$ $Expr(expr)$ $
 endif$ , %b$label(node)$ ]
 >>
 

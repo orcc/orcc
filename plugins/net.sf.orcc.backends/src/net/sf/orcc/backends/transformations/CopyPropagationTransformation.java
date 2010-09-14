@@ -45,6 +45,7 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
@@ -147,6 +148,13 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 			Expression newExpr = (Expression) expr.accept(new ExpressionCopy());
 			returnInstr.setValue(newExpr);
 		}
+	}
+	
+	@Override
+	public void visit(Store store, Object... args) {
+		Expression value = store.getValue();
+		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
+		store.setValue(newExpr);
 	}
 
 	@Override

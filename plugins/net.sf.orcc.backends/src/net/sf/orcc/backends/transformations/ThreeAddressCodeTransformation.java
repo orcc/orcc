@@ -29,36 +29,26 @@
 package net.sf.orcc.backends.transformations;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
-import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -69,162 +59,43 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 /**
  * Split expression and effective node.
  * 
- * @author J�r�me GORIN
+ * @author Jérôme GORIN
  * @author Matthieu Wipliez
  * 
  */
 public class ThreeAddressCodeTransformation extends AbstractActorTransformation {
-
-	private class ExpressionSplitter implements ExpressionInterpreter {
-
-		private ListIterator<Instruction> it;
-
-		/**
-		 * type of the target variable
-		 */
-		private Type type;
-
-		/**
-		 * Creates a new expression splitter with the given list iterator. The
-		 * iterator must be placed immediately before the expression to be
-		 * translated is used.
-		 * 
-		 * @param it
-		 *            iterator on a list of instructions
-		 */
-		public ExpressionSplitter(ListIterator<Instruction> it, Type type) {
-			this.it = it;
-			this.type = type;
-		}
+	private class ExpressionSplitter extends AbstractExpressionInterpreter {
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
-			// Get expr information
-			Type previousType = type;
-			BinaryOp op = expr.getOp();
-
 			Location location = expr.getLocation();
-			Expression e1 = expr.getE1();
-			Expression e2 = expr.getE2();
+			Type type = expr.getType();
+			BinaryOp op = expr.getOp();
+			Expression e1 = (Expression) expr.getE1().accept(this, args);
+			Expression e2 = (Expression) expr.getE2().accept(this, args);
 
-			// Correct binaryExpr type if expr is a comparison
-			if (op.isComparison()) {
-				type = e1.getType();
-			}
+			expr.setE1(e1);
+			expr.setE2(e2);
 
-			// Transform e1 and e2
-			e1 = (Expression) e1.accept(this, args);
-			e2 = (Expression) e2.accept(this, args);
+			// Create a new binary expression
+			Expression binExpr = new BinaryExpr(location, e1, op, e2, type);
 
-			type = previousType;
-
-			// Assign the correct type to the current expression
-			if (op.isComparison()) {
-				previousType = IrFactory.eINSTANCE.createTypeBool();
-			}
-
-			// Make the final assignment
+			// Make a new assignment to the binary expression
 			LocalVariable target = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "expr");
-			target.setType(type);
-			Assign assign = new Assign(location, target, new BinaryExpr(
-					location, e1, op, e2, previousType));
-			assign.setBlock(block);
-			it.add(assign);
+			Assign assign = new Assign(location, target, binExpr);
+
+			// Add assignement to instruction's list
+			instrs.add(assign);
 
 			return new VarExpr(location, new Use(target));
 		}
 
-		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
-		public Object interpret(IntExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
-		public Object interpret(ListExpr expr, Object... args) {
-			throw new OrccRuntimeException("list expression not supported");
-		}
-
-		@Override
-		public Object interpret(StringExpr expr, Object... args) {
-			return expr;
-		}
-
-		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
-			Expression constExpr;
-			Expression binary;
-			Expression exprE1 = expr.getExpr();
-			Location loc = expr.getLocation();
-			Type type = expr.getType();
-
-			switch (expr.getOp()) {
-			case MINUS:
-				constExpr = new IntExpr(0);
-				binary = new BinaryExpr(loc, constExpr, BinaryOp.MINUS, exprE1,
-						type);
-				return binary.accept(this, args);
-			case LOGIC_NOT:
-				constExpr = new BoolExpr(new Location(), false);
-				binary = new BinaryExpr(loc, exprE1, BinaryOp.EQ, constExpr,
-						type);
-				return binary.accept(this, args);
-			case BITNOT:
-				binary = new BinaryExpr(loc, exprE1, BinaryOp.BITXOR, exprE1,
-						type);
-				return binary.accept(this, args);
-			default:
-				throw new OrccRuntimeException("unsupported operator");
-			}
-		}
-
-		@Override
-		public Object interpret(VarExpr expr, Object... args) {
-			if (!expr.getType().equals(type)) {
-				if (expr.getType().isList() && type.isList()) {
-					// compare type of two arrays
-					TypeList exprtype = (TypeList) expr.getType();
-					TypeList refType = (TypeList) type;
-					if (exprtype.getType().equals(refType.getType())) {
-						return expr;
-					}
-				}
-
-				// Make the final assignment
-				LocalVariable target = procedure.newTempLocalVariable(file,
-						type, procedure.getName() + "_" + "expr");
-				Use use = new Use(target);
-				Location location = expr.getLocation();
-				target.setType(type);
-				if (expr.getType().isBool()) {
-
-					Assign assign = new Assign(location, target,
-							new BinaryExpr(location, expr, BinaryOp.LOGIC_OR,
-									new BoolExpr(false), expr.getType()));
-					assign.setBlock(block);
-					it.add(assign);
-				} else {
-					Assign assign = new Assign(location, target,
-							new BinaryExpr(location, expr, BinaryOp.PLUS,
-									new IntExpr(0), expr.getType()));
-					assign.setBlock(block);
-					it.add(assign);
-				}
-				return new VarExpr(use);
-			}
-			return expr;
-		}
-
 	}
 
-	private BlockNode block;
-
 	private String file;
+
+	private List<Instruction> instrs;
 
 	/**
 	 * Returns an iterator over the last instruction of the previous block. A
@@ -234,6 +105,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	 * @return
 	 */
 	private ListIterator<Instruction> getItr(ListIterator<CFGNode> it) {
+		BlockNode block;
+
 		it.previous();
 		if (it.hasPrevious()) {
 			// get previous and restore iterator's position
@@ -263,97 +136,105 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		super.transform(actor);
 	}
 
-	@Override
 	@SuppressWarnings("unchecked")
+	@Override
 	public void visit(Assign assign, Object... args) {
-		Type type;
-		block = assign.getBlock();
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		if (assign.getTarget().getType().isBool()) {
-			type = IrFactory.eINSTANCE.createTypeBool();
-		} else {
-			type = IrFactory.eINSTANCE.createTypeInt(32);
-		}
-		it.previous();
-		assign.setValue(visitExpression(assign.getValue(), it, type));
-		it.next();
+		Expression value = assign.getValue();
 
-		// 3AC does not support direct assignment
-		if (!(assign.getValue() instanceof BinaryExpr)) {
-			Expression expr = assign.getValue();
-			Location location = expr.getLocation();
-			if (expr.getType().isBool()) {
-				BinaryOp op = BinaryOp.LOGIC_OR;
-				assign.setValue(new BinaryExpr(location, expr, op,
-						new BoolExpr(false), expr.getType()));
-			} else {
-				BinaryOp op = BinaryOp.PLUS;
-				assign.setValue(new BinaryExpr(location, expr, op, new IntExpr(
-						0), expr.getType()));
+		if (value instanceof BinaryExpr) {
+			BinaryExpr binExpr = (BinaryExpr) value;
+			Expression e1 = binExpr.getE1();
+			Expression e2 = binExpr.getE2();
+
+			if ((e1 instanceof BinaryExpr) || (e1 instanceof UnaryExpr)) {
+				it.previous();
+				binExpr.setE1(visitExpression(e1, it));
+				it.next();
+
 			}
-		}
-	}
 
-	@Override
-	public void visit(Call call, Object... args) {
-		block = call.getBlock();
-		List<Variable> params = call.getProcedure().getParameters().getList();
-		List<Type> types = new ArrayList<Type>(params.size());
-		for (Variable variable : params) {
-			types.add(variable.getType());
-		}
-		visitExpressions(call.getParameters(), args[0], types);
-	}
+			if ((e2 instanceof BinaryExpr) || (e2 instanceof UnaryExpr)) {
+				it.previous();
+				binExpr.setE2(visitExpression(e2, it));
+				it.next();
+			}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(IfNode ifNode, Object... args) {
-		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
-		ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it),
-				IrFactory.eINSTANCE.createTypeBool()));
-		super.visit(ifNode, args);
-	}
-
-	@Override
-	public void visit(Load load, Object... args) {
-		block = load.getBlock();
-		List<Type> types = new ArrayList<Type>(load.getIndexes().size());
-		for (int i = 0; i < load.getIndexes().size(); i++) {
-			types.add(IrFactory.eINSTANCE.createTypeInt(32));
-		}
-		visitExpressions(load.getIndexes(), args[0], types);
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Return returnInstr, Object... args) {
-		block = returnInstr.getBlock();
-		if (returnInstr.getValue() != null) {
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		} else if (value instanceof UnaryExpr) {
+			UnaryExpr unaryExpr = (UnaryExpr) value;
 			it.previous();
-			returnInstr.setValue(visitExpression(returnInstr.getValue(), it,
-					procedure.getReturnType()));
+
+			unaryExpr.setExpr(visitExpression(unaryExpr.getExpr(), it));
+
 			it.next();
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Store store, Object... args) {
-		block = store.getBlock();
+	public void visit(Call call, Object... args) {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-		Expression value = store.getValue();
-
-		// Check indexes
-		List<Type> types = new ArrayList<Type>(store.getIndexes().size());
-		for (int i = 0; i < store.getIndexes().size(); i++) {
-			types.add(IrFactory.eINSTANCE.createTypeInt(32));
+		List<Expression> parameters = call.getParameters();
+		for (Expression parameter : parameters) {
+			if ((parameter instanceof BinaryExpr)
+					|| (parameter instanceof UnaryExpr)) {
+				it.previous();
+				Expression newParameter = visitExpression(parameter, it);
+				parameters.set(parameters.indexOf(parameter), newParameter);
+				it.next();
+			}
 		}
-		visitExpressions(store.getIndexes(), it, types);
-		it.previous();
+	}
 
-		store.setValue(visitExpression(value, it, value.getType()));
-		it.next();
+	@SuppressWarnings("unchecked")
+	@Override
+	public void visit(IfNode ifNode, Object... args) {
+		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
+		Expression value = ifNode.getValue();
+		if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+			ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it)));
+		}
+		super.visit(ifNode, args);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void visit(Load load, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		List<Expression> indexes = load.getIndexes();
+
+		for (Expression value : load.getIndexes()) {
+			if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+				it.previous();
+				Expression newValue = visitExpression(value, it);
+				load.getIndexes().set(indexes.indexOf(value), newValue);
+				it.next();
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void visit(Store store, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		List<Expression> indexes = store.getIndexes();
+
+		for (Expression value : store.getIndexes()) {
+			if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+				it.previous();
+				Expression newValue = visitExpression(value, it);
+				store.getIndexes().set(indexes.indexOf(value), newValue);
+				it.next();
+			}
+		}
+
+		Expression value = store.getValue();
+		if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+			it.previous();
+			Expression newValue = visitExpression(value, it);
+			store.setValue(newValue);
+			it.next();
+		}
 	}
 
 	@Override
@@ -364,33 +245,26 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		while (it.hasNext()) {
 			it.next();
 		}
-		whileNode.setValue(visitExpression(whileNode.getValue(), it,
-				IrFactory.eINSTANCE.createTypeBool()));
+
+		Expression value = whileNode.getValue();
+		if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+			Expression expr = visitExpression(whileNode.getValue(), it);
+			whileNode.setValue(expr);
+		}
 
 		super.visit(whileNode, args);
 	}
 
 	private Expression visitExpression(Expression value,
-			ListIterator<Instruction> it, Type type) {
-		return (Expression) value.accept(new ExpressionSplitter(it, type));
-	}
+			ListIterator<Instruction> it) {
+		instrs = new ArrayList<Instruction>();
+		Expression expr = (Expression) value.accept(new ExpressionSplitter());
 
-	@SuppressWarnings("unchecked")
-	private void visitExpressions(List<Expression> expressions, Object arg,
-			List<Type> types) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) arg;
-		it.previous();
-		ListIterator<Expression> pit = expressions.listIterator();
-		Iterator<Type> itt = types.iterator();
-		while (pit.hasNext()) {
-			Expression value = pit.next();
-			if (itt.hasNext()) {
-				Expression expr = (Expression) value
-						.accept(new ExpressionSplitter(it, itt.next()));
-				pit.set(expr);
-			}
+		for (Instruction instr : instrs) {
+			it.add(instr);
 		}
-		it.next();
+
+		return expr;
 	}
 
 	@Override
@@ -404,5 +278,4 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		}
 		super.visitProcedure(procedure);
 	}
-
 }

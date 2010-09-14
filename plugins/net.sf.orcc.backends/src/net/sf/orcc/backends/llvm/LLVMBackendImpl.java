@@ -40,8 +40,10 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.llvm.transforms.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transforms.PrintlnTransformation;
+import net.sf.orcc.backends.transformations.CopyPropagationTransformation;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
 import net.sf.orcc.backends.transformations.ThreeAddressCodeTransformation;
+import net.sf.orcc.backends.transformations.TypeCheckerTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -72,7 +74,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 		ActorTransformation[] transformations = { new TypeSizeTransformation(),
 				new BoolToIntTransformation(),
 				new PrintlnTransformation(),
+				new CopyPropagationTransformation(),
 				new ThreeAddressCodeTransformation(),
+				new TypeCheckerTransformation(),
 				new MoveReadsWritesTransformation(), new BuildCFG() };
 
 		for (ActorTransformation transformation : transformations) {
