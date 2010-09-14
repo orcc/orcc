@@ -109,9 +109,10 @@ import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.util.OrderedMap;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * This class defines a writer that serializes an actor in IR form to JSON.
@@ -132,36 +133,36 @@ public class IRWriter {
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
-			JSONArray array = new JSONArray();
-			array.put(writeLocation(expr.getLocation()));
-			JSONArray body = new JSONArray();
-			array.put(body);
+			JsonArray array = new JsonArray();
+			array.add(writeLocation(expr.getLocation()));
+			JsonArray body = new JsonArray();
+			array.add(body);
 
-			body.put(IRConstants.BINARY_EXPR);
-			JSONArray body2 = new JSONArray();
-			body.put(body2);
+			body.add(new JsonPrimitive(IRConstants.BINARY_EXPR));
+			JsonArray body2 = new JsonArray();
+			body.add(body2);
 
-			body2.put(expr.getOp().getText());
-			body2.put(expr.getE1().accept(this));
-			body2.put(expr.getE2().accept(this));
-			body2.put(writeType(expr.getType()));
+			body2.add(new JsonPrimitive(expr.getOp().getText()));
+			body2.add(writeExpression(expr.getE1()));
+			body2.add(writeExpression(expr.getE2()));
+			body2.add(writeType(expr.getType()));
 
 			return array;
 		}
 
 		@Override
 		public Object interpret(BoolExpr expr, Object... args) {
-			JSONArray array = new JSONArray();
-			array.put(writeLocation(expr.getLocation()));
-			array.put(expr.getValue());
+			JsonArray array = new JsonArray();
+			array.add(writeLocation(expr.getLocation()));
+			array.add(new JsonPrimitive(expr.getValue()));
 			return array;
 		}
 
 		@Override
 		public Object interpret(IntExpr expr, Object... args) {
-			JSONArray array = new JSONArray();
-			array.put(writeLocation(expr.getLocation()));
-			array.put(expr.getValue());
+			JsonArray array = new JsonArray();
+			array.add(writeLocation(expr.getLocation()));
+			array.add(new JsonPrimitive(expr.getValue()));
 			return array;
 		}
 
@@ -172,39 +173,39 @@ public class IRWriter {
 
 		@Override
 		public Object interpret(StringExpr expr, Object... args) {
-			JSONArray array = new JSONArray();
-			array.put(writeLocation(expr.getLocation()));
-			array.put(expr.getValue());
+			JsonArray array = new JsonArray();
+			array.add(writeLocation(expr.getLocation()));
+			array.add(new JsonPrimitive(expr.getValue()));
 			return array;
 		}
 
 		@Override
 		public Object interpret(UnaryExpr expr, Object... args) {
-			JSONArray array = new JSONArray();
-			array.put(writeLocation(expr.getLocation()));
-			JSONArray body = new JSONArray();
-			array.put(body);
+			JsonArray array = new JsonArray();
+			array.add(writeLocation(expr.getLocation()));
+			JsonArray body = new JsonArray();
+			array.add(body);
 
-			body.put(IRConstants.UNARY_EXPR);
-			JSONArray body2 = new JSONArray();
-			body.put(body2);
+			body.add(new JsonPrimitive(IRConstants.UNARY_EXPR));
+			JsonArray body2 = new JsonArray();
+			body.add(body2);
 
-			body2.put(expr.getOp().getText());
-			body2.put(expr.getExpr().accept(this));
-			body2.put(writeType(expr.getType()));
+			body2.add(new JsonPrimitive(expr.getOp().getText()));
+			body2.add(writeExpression(expr.getExpr()));
+			body2.add(writeType(expr.getType()));
 
 			return array;
 		}
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-			JSONArray array = new JSONArray();
-			array.put(writeLocation(expr.getLocation()));
-			JSONArray body = new JSONArray();
-			array.put(body);
+			JsonArray array = new JsonArray();
+			array.add(writeLocation(expr.getLocation()));
+			JsonArray body = new JsonArray();
+			array.add(body);
 
-			body.put(IRConstants.VAR_EXPR);
-			body.put(writeVariable(expr.getVar().getVariable()));
+			body.add(new JsonPrimitive(IRConstants.VAR_EXPR));
+			body.add(writeVariable(expr.getVar().getVariable()));
 
 			return array;
 		}
@@ -222,64 +223,64 @@ public class IRWriter {
 
 		@Override
 		public void visit(Assign assign, Object... args) {
-			JSONArray array = (JSONArray) args[0];
-			JSONArray instr = new JSONArray();
-			array.put(instr);
+			JsonArray array = (JsonArray) args[0];
+			JsonArray instr = new JsonArray();
+			array.add(instr);
 
-			instr.put(NAME_ASSIGN);
-			instr.put(writeLocation(assign.getLocation()));
+			instr.add(new JsonPrimitive(NAME_ASSIGN));
+			instr.add(writeLocation(assign.getLocation()));
 
-			JSONArray body = new JSONArray();
-			instr.put(body);
+			JsonArray body = new JsonArray();
+			instr.add(body);
 
-			body.put(writeVariable(assign.getTarget()));
-			body.put(writeExpression(assign.getValue()));
+			body.add(writeVariable(assign.getTarget()));
+			body.add(writeExpression(assign.getValue()));
 		}
 
 		@Override
 		public void visit(Call call, Object... args) {
-			JSONArray array = (JSONArray) args[0];
-			JSONArray instr = new JSONArray();
-			array.put(instr);
+			JsonArray array = (JsonArray) args[0];
+			JsonArray instr = new JsonArray();
+			array.add(instr);
 
-			instr.put(NAME_CALL);
-			instr.put(writeLocation(call.getLocation()));
+			instr.add(new JsonPrimitive(NAME_CALL));
+			instr.add(writeLocation(call.getLocation()));
 
-			JSONArray body = new JSONArray();
-			instr.put(body);
+			JsonArray body = new JsonArray();
+			instr.add(body);
 
-			body.put(call.getProcedure().getName());
+			body.add(new JsonPrimitive(call.getProcedure().getName()));
 			if (call.hasResult()) {
-				body.put(writeVariable(call.getTarget()));
+				body.add(writeVariable(call.getTarget()));
 			} else {
-				body.put(JSONObject.NULL);
+				body.add(null);
 			}
 
-			body.put(writeExpressions(call.getParameters()));
+			body.add(writeExpressions(call.getParameters()));
 		}
 
 		@Override
 		public void visit(HasTokens hasTokens, Object... args) {
 			visitFifoOperation(NAME_HAS_TOKENS, hasTokens.getLocation(),
 					hasTokens.getTarget(), hasTokens.getPort(),
-					hasTokens.getNumTokens(), (JSONArray) args[0]);
+					hasTokens.getNumTokens(), (JsonArray) args[0]);
 		}
 
 		@Override
 		public void visit(Load load, Object... args) {
-			JSONArray array = (JSONArray) args[0];
-			JSONArray instr = new JSONArray();
-			array.put(instr);
+			JsonArray array = (JsonArray) args[0];
+			JsonArray instr = new JsonArray();
+			array.add(instr);
 
-			instr.put(NAME_LOAD);
-			instr.put(writeLocation(load.getLocation()));
+			instr.add(new JsonPrimitive(NAME_LOAD));
+			instr.add(writeLocation(load.getLocation()));
 
-			JSONArray body = new JSONArray();
-			instr.put(body);
+			JsonArray body = new JsonArray();
+			instr.add(body);
 
-			body.put(writeVariable(load.getTarget()));
-			body.put(writeVariable(load.getSource().getVariable()));
-			body.put(writeExpressions(load.getIndexes()));
+			body.add(writeVariable(load.getTarget()));
+			body.add(writeVariable(load.getSource().getVariable()));
+			body.add(writeExpressions(load.getIndexes()));
 		}
 
 		@Override
@@ -289,15 +290,15 @@ public class IRWriter {
 
 		@Override
 		public void visit(PhiAssignment phi, Object... args) {
-			JSONArray array = (JSONArray) args[0];
-			JSONArray instr = new JSONArray();
-			array.put(instr);
+			JsonArray array = (JsonArray) args[0];
+			JsonArray instr = new JsonArray();
+			array.add(instr);
 
 			// target
-			instr.put(writeVariable(phi.getTarget()));
+			instr.add(writeVariable(phi.getTarget()));
 
 			// sources
-			instr.put(writeExpressions(phi.getValues()));
+			instr.add(writeExpressions(phi.getValues()));
 		}
 
 		@Override
@@ -307,18 +308,18 @@ public class IRWriter {
 
 		@Override
 		public void visit(Return returnInst, Object... args) {
-			JSONArray array = (JSONArray) args[0];
-			JSONArray instr = new JSONArray();
-			array.put(instr);
+			JsonArray array = (JsonArray) args[0];
+			JsonArray instr = new JsonArray();
+			array.add(instr);
 
-			instr.put(NAME_RETURN);
-			instr.put(writeLocation(returnInst.getLocation()));
+			instr.add(new JsonPrimitive(NAME_RETURN));
+			instr.add(writeLocation(returnInst.getLocation()));
 
 			Expression value = returnInst.getValue();
 			if (value == null) {
-				instr.put(JSONObject.NULL);
+				instr.add(null);
 			} else {
-				instr.put(writeExpression(value));
+				instr.add(writeExpression(value));
 			}
 		}
 
@@ -330,19 +331,19 @@ public class IRWriter {
 
 		@Override
 		public void visit(Store store, Object... args) {
-			JSONArray array = (JSONArray) args[0];
-			JSONArray instr = new JSONArray();
-			array.put(instr);
+			JsonArray array = (JsonArray) args[0];
+			JsonArray instr = new JsonArray();
+			array.add(instr);
 
-			instr.put(NAME_STORE);
-			instr.put(writeLocation(store.getLocation()));
+			instr.add(new JsonPrimitive(NAME_STORE));
+			instr.add(writeLocation(store.getLocation()));
 
-			JSONArray body = new JSONArray();
-			instr.put(body);
+			JsonArray body = new JsonArray();
+			instr.add(body);
 
-			body.put(writeVariable(store.getTarget()));
-			body.put(writeExpressions(store.getIndexes()));
-			body.put(writeExpression(store.getValue()));
+			body.add(writeVariable(store.getTarget()));
+			body.add(writeExpressions(store.getIndexes()));
+			body.add(writeExpression(store.getValue()));
 		}
 
 		@Override
@@ -366,7 +367,7 @@ public class IRWriter {
 		private void visitFifoInstruction(String name,
 				AbstractFifoInstruction instr, Object object) {
 			visitFifoOperation(name, instr.getLocation(), instr.getTarget(),
-					instr.getPort(), instr.getNumTokens(), (JSONArray) object);
+					instr.getPort(), instr.getNumTokens(), (JsonArray) object);
 		}
 
 		/**
@@ -388,19 +389,19 @@ public class IRWriter {
 		 *            the target JSON array
 		 */
 		private void visitFifoOperation(String name, Location location,
-				Variable target, Port port, int numTokens, JSONArray array) {
-			JSONArray instr = new JSONArray();
-			array.put(instr);
+				Variable target, Port port, int numTokens, JsonArray array) {
+			JsonArray instr = new JsonArray();
+			array.add(instr);
 
-			instr.put(name);
-			instr.put(writeLocation(location));
+			instr.add(new JsonPrimitive(name));
+			instr.add(writeLocation(location));
 
-			JSONArray body = new JSONArray();
-			instr.put(body);
+			JsonArray body = new JsonArray();
+			instr.add(body);
 
-			body.put(writeVariable(target));
-			body.put(port.getName());
-			body.put(numTokens);
+			body.add(writeVariable(target));
+			body.add(new JsonPrimitive(port.getName()));
+			body.add(new JsonPrimitive(numTokens));
 		}
 
 	}
@@ -415,7 +416,7 @@ public class IRWriter {
 
 		@Override
 		public void visit(BlockNode node, Object... args) {
-			JSONArray array = (JSONArray) args[0];
+			JsonArray array = (JsonArray) args[0];
 			for (Instruction instruction : node) {
 				instruction.accept(instrWriter, array);
 			}
@@ -423,70 +424,70 @@ public class IRWriter {
 
 		@Override
 		public void visit(IfNode node, Object... args) {
-			JSONArray array = (JSONArray) args[0];
+			JsonArray array = (JsonArray) args[0];
 
-			JSONArray ifArray = new JSONArray();
-			array.put(ifArray);
+			JsonArray ifArray = new JsonArray();
+			array.add(ifArray);
 
-			ifArray.put(IRConstants.NAME_IF);
-			ifArray.put(writeLocation(node.getLocation()));
+			ifArray.add(new JsonPrimitive(IRConstants.NAME_IF));
+			ifArray.add(writeLocation(node.getLocation()));
 
-			JSONArray body = new JSONArray();
-			ifArray.put(body);
+			JsonArray body = new JsonArray();
+			ifArray.add(body);
 
-			body.put(writeExpression(node.getValue()));
-			body.put(writeNodes(node.getThenNodes()));
-			body.put(writeNodes(node.getElseNodes()));
+			body.add(writeExpression(node.getValue()));
+			body.add(writeNodes(node.getThenNodes()));
+			body.add(writeNodes(node.getElseNodes()));
 
 			// FIXME need to modify this weird stuff in JSON format
-			JSONArray joinArray = new JSONArray();
-			array.put(joinArray);
+			JsonArray joinArray = new JsonArray();
+			array.add(joinArray);
 
-			joinArray.put(IRConstants.NAME_JOIN);
-			joinArray.put(writeLocation(node.getLocation()));
+			joinArray.add(new JsonPrimitive(IRConstants.NAME_JOIN));
+			joinArray.add(writeLocation(node.getLocation()));
 
-			JSONArray phiArray = new JSONArray();
-			joinArray.put(phiArray);
+			JsonArray phiArray = new JsonArray();
+			joinArray.add(phiArray);
 			node.getJoinNode().accept(this, phiArray);
 		}
 
 		@Override
 		public void visit(WhileNode node, Object... args) {
-			JSONArray array = (JSONArray) args[0];
+			JsonArray array = (JsonArray) args[0];
 
 			// header
-			JSONArray whileArray = new JSONArray();
-			array.put(whileArray);
+			JsonArray whileArray = new JsonArray();
+			array.add(whileArray);
 
-			whileArray.put(IRConstants.NAME_WHILE);
-			whileArray.put(writeLocation(node.getLocation()));
+			whileArray.add(new JsonPrimitive(IRConstants.NAME_WHILE));
+			whileArray.add(writeLocation(node.getLocation()));
 
-			JSONArray body = new JSONArray();
-			whileArray.put(body);
+			JsonArray body = new JsonArray();
+			whileArray.add(body);
 
-			body.put(writeExpression(node.getValue()));
+			body.add(writeExpression(node.getValue()));
 
 			// creates the join instruction
-			JSONArray joinArray = new JSONArray();
+			JsonArray joinArray = new JsonArray();
 
-			joinArray.put(IRConstants.NAME_JOIN);
-			joinArray.put(writeLocation(node.getLocation()));
+			joinArray.add(new JsonPrimitive(IRConstants.NAME_JOIN));
+			joinArray.add(writeLocation(node.getLocation()));
 
 			// with all the phis
-			JSONArray phiArray = new JSONArray();
-			joinArray.put(phiArray);
+			JsonArray phiArray = new JsonArray();
+			joinArray.add(phiArray);
 			node.getJoinNode().accept(this, phiArray);
 
 			// transforms all the other nodes
-			JSONArray nodesArray = writeNodes(node.getNodes());
+			JsonArray nodesArray = writeNodes(node.getNodes());
 
 			// FIXME in the IR the join node of a while is its first node...
-			JSONArray bodyArray = new JSONArray();
-			bodyArray.put(joinArray);
-			for (int i = 0; i < nodesArray.length(); i++) {
-				bodyArray.put(nodesArray.opt(i));
+			JsonArray bodyArray = new JsonArray();
+			bodyArray.add(joinArray);
+			for (int i = 0; i < nodesArray.size(); i++) {
+				bodyArray.add(nodesArray.get(i));
 			}
-			body.put(bodyArray);
+			body.add(bodyArray);
 		}
 	}
 
@@ -500,53 +501,53 @@ public class IRWriter {
 
 		@Override
 		public Object interpret(TypeBool type) {
-			return TypeBool.NAME;
+			return new JsonPrimitive(TypeBool.NAME);
 		}
 
 		@Override
 		public Object interpret(TypeFloat type) {
-			return TypeFloat.NAME;
+			return new JsonPrimitive(TypeFloat.NAME);
 		}
 
 		@Override
 		public Object interpret(TypeInt type) {
-			JSONArray array = new JSONArray();
-			array.put(TypeInt.NAME);
+			JsonArray array = new JsonArray();
+			array.add(new JsonPrimitive(TypeInt.NAME));
 			// FIXME change JSON format back to using integer size
 			Expression expr = new IntExpr(type.getSize());
-			array.put(writeExpression(expr));
+			array.add(writeExpression(expr));
 			return array;
 		}
 
 		@Override
 		public Object interpret(TypeList type) {
-			JSONArray array = new JSONArray();
-			array.put(TypeList.NAME);
+			JsonArray array = new JsonArray();
+			array.add(new JsonPrimitive(TypeList.NAME));
 			// FIXME change JSON format back to using integer size
 			Expression expr = new IntExpr(type.getSize());
-			array.put(writeExpression(expr));
-			array.put(writeType(type.getType()));
+			array.add(writeExpression(expr));
+			array.add(writeType(type.getType()));
 			return array;
 		}
 
 		@Override
 		public Object interpret(TypeString type) {
-			return TypeString.NAME;
+			return new JsonPrimitive(TypeString.NAME);
 		}
 
 		@Override
 		public Object interpret(TypeUint type) {
-			JSONArray array = new JSONArray();
-			array.put(TypeUint.NAME);
+			JsonArray array = new JsonArray();
+			array.add(new JsonPrimitive(TypeUint.NAME));
 			// FIXME change JSON format back to using integer size
 			Expression expr = new IntExpr(type.getSize());
-			array.put(writeExpression(expr));
+			array.add(writeExpression(expr));
 			return array;
 		}
 
 		@Override
 		public Object interpret(TypeVoid type) {
-			return TypeVoid.NAME;
+			return new JsonPrimitive(TypeVoid.NAME);
 		}
 
 	}
@@ -587,19 +588,16 @@ public class IRWriter {
 		}
 
 		try {
-			JSONObject obj = writeActor();
-
+			JsonObject obj = writeActor();
 			if (prettyPrint) {
 				// use readeable form
-				os.write(obj.toString(2).getBytes("UTF-8"));
+				// os.write(obj.toString(2).getBytes("UTF-8"));
 			} else {
 				// use compact form
 				os.write(obj.toString().getBytes("UTF-8"));
 			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
-		} catch (JSONException e) {
-			throw new OrccException("JSON error", e);
 		} finally {
 			try {
 				os.close();
@@ -616,13 +614,13 @@ public class IRWriter {
 	 *            an action
 	 * @return a JSON array
 	 */
-	private JSONArray writeAction(Action action) {
-		JSONArray array = new JSONArray();
-		array.put(writeActionTag(action.getTag()));
-		array.put(writeActionPattern(action.getInputPattern()));
-		array.put(writeActionPattern(action.getOutputPattern()));
-		array.put(writeProcedure(action.getScheduler()));
-		array.put(writeProcedure(action.getBody()));
+	private JsonArray writeAction(Action action) {
+		JsonArray array = new JsonArray();
+		array.add(writeActionTag(action.getTag()));
+		array.add(writeActionPattern(action.getInputPattern()));
+		array.add(writeActionPattern(action.getOutputPattern()));
+		array.add(writeProcedure(action.getScheduler()));
+		array.add(writeProcedure(action.getBody()));
 
 		return array;
 	}
@@ -635,14 +633,14 @@ public class IRWriter {
 	 *            integer&gt;
 	 * @return a JSON array
 	 */
-	private JSONArray writeActionPattern(Pattern pattern) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeActionPattern(Pattern pattern) {
+		JsonArray array = new JsonArray();
 		for (Entry<Port, Integer> entry : pattern.entrySet()) {
-			JSONArray patternArray = new JSONArray();
-			array.put(patternArray);
+			JsonArray patternArray = new JsonArray();
+			array.add(patternArray);
 
-			patternArray.put(entry.getKey().getName());
-			patternArray.put(entry.getValue().intValue());
+			patternArray.add(new JsonPrimitive(entry.getKey().getName()));
+			patternArray.add(new JsonPrimitive(entry.getValue().intValue()));
 		}
 
 		return array;
@@ -655,10 +653,10 @@ public class IRWriter {
 	 *            a list of actions
 	 * @return the action list encoded in JSON
 	 */
-	private JSONArray writeActions(List<Action> actions) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeActions(List<Action> actions) {
+		JsonArray array = new JsonArray();
 		for (Action action : actions) {
-			array.put(writeAction(action));
+			array.add(writeAction(action));
 		}
 
 		return array;
@@ -673,19 +671,19 @@ public class IRWriter {
 	 *            the action scheduler of the actor this writer was built with
 	 * @return the action scheduler encoded in JSON
 	 */
-	private JSONArray writeActionScheduler(ActionScheduler scheduler) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeActionScheduler(ActionScheduler scheduler) {
+		JsonArray array = new JsonArray();
 
-		JSONArray actions = new JSONArray();
-		array.put(actions);
+		JsonArray actions = new JsonArray();
+		array.add(actions);
 		for (Action action : scheduler.getActions()) {
-			actions.put(writeActionTag(action.getTag()));
+			actions.add(writeActionTag(action.getTag()));
 		}
 
 		if (scheduler.hasFsm()) {
-			array.put(writeFSM(scheduler.getFsm()));
+			array.add(writeFSM(scheduler.getFsm()));
 		} else {
-			array.put(JSONObject.NULL);
+			array.add(null);
 		}
 
 		return array;
@@ -699,44 +697,49 @@ public class IRWriter {
 	 *            an action tag
 	 * @return the tag encoded in JSON
 	 */
-	private JSONArray writeActionTag(Tag tag) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeActionTag(Tag tag) {
+		JsonArray array = new JsonArray();
 		for (String identifier : tag) {
-			array.put(identifier);
+			array.add(new JsonPrimitive(identifier));
 		}
 
 		return array;
 	}
 
-	private JSONObject writeActor() throws JSONException {
-		JSONObject obj = new JSONObject();
-		JSONArray array;
+	private JsonObject writeActor() {
+		JsonObject obj = new JsonObject();
+		JsonArray array;
 
-		obj.put(KEY_SOURCE_FILE, actor.getFile());
-		obj.put(KEY_NAME, actor.getName());
-		obj.put(KEY_PARAMETERS, writeParameters(actor.getParameters()));
-		obj.put(KEY_INPUTS, writePorts(actor.getInputs()));
-		obj.put(KEY_OUTPUTS, writePorts(actor.getOutputs()));
-		obj.put(KEY_STATE_VARS, writeStateVariables(actor.getStateVars()));
-		obj.put(KEY_PROCEDURES, writeProcedures(actor.getProcs()));
+		obj.addProperty(KEY_SOURCE_FILE, actor.getFile());
+		obj.addProperty(KEY_NAME, actor.getName());
+		obj.add(KEY_PARAMETERS, writeParameters(actor.getParameters()));
+		obj.add(KEY_INPUTS, writePorts(actor.getInputs()));
+		obj.add(KEY_OUTPUTS, writePorts(actor.getOutputs()));
+		obj.add(KEY_STATE_VARS, writeStateVariables(actor.getStateVars()));
+		obj.add(KEY_PROCEDURES, writeProcedures(actor.getProcs()));
 
-		obj.put(KEY_ACTIONS, writeActions(actor.getActions()));
-		obj.put(KEY_INITIALIZES, writeActions(actor.getInitializes()));
+		obj.add(KEY_ACTIONS, writeActions(actor.getActions()));
+		obj.add(KEY_INITIALIZES, writeActions(actor.getInitializes()));
 
 		array = writeActionScheduler(actor.getActionScheduler());
-		obj.put(IRConstants.KEY_ACTION_SCHED, array);
+		obj.add(IRConstants.KEY_ACTION_SCHED, array);
 		return obj;
 	}
 
-	private Object writeConstant(Object obj) {
-		if (obj instanceof Boolean || obj instanceof Float
-				|| obj instanceof Long || obj instanceof String) {
-			return obj;
+	private JsonElement writeConstant(Object obj) {
+		if (obj instanceof Boolean) {
+			return new JsonPrimitive((Boolean) obj);
+		} else if (obj instanceof Long) {
+			return new JsonPrimitive((Long) obj);
+		} else if (obj instanceof Float) {
+			return new JsonPrimitive((Float) obj);
+		} else if (obj instanceof String) {
+			return new JsonPrimitive((String) obj);
 		} else if (obj instanceof List<?>) {
 			List<?> list = (List<?>) obj;
-			JSONArray array = new JSONArray();
+			JsonArray array = new JsonArray();
 			for (Object o : list) {
-				array.put(writeConstant(o));
+				array.add(writeConstant(o));
 			}
 			return array;
 		} else {
@@ -751,8 +754,8 @@ public class IRWriter {
 	 *            an expression
 	 * @return a JSON array
 	 */
-	private JSONArray writeExpression(Expression expression) {
-		return (JSONArray) expression.accept(exprWriter);
+	private JsonArray writeExpression(Expression expression) {
+		return (JsonArray) expression.accept(exprWriter);
 	}
 
 	/**
@@ -763,10 +766,10 @@ public class IRWriter {
 	 *            a list of expressions
 	 * @return a JSON array
 	 */
-	private JSONArray writeExpressions(List<Expression> expressions) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeExpressions(List<Expression> expressions) {
+		JsonArray array = new JsonArray();
 		for (Expression expression : expressions) {
-			array.put(writeExpression(expression));
+			array.add(writeExpression(expression));
 		}
 
 		return array;
@@ -779,33 +782,35 @@ public class IRWriter {
 	 *            an FSM (must not be <code>null</code>)
 	 * @return a JSON array
 	 */
-	private JSONArray writeFSM(FSM fsm) {
-		JSONArray array = new JSONArray();
-		array.put(fsm.getInitialState().getName());
+	private JsonArray writeFSM(FSM fsm) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(fsm.getInitialState().getName()));
 
-		JSONArray stateArray = new JSONArray();
-		array.put(stateArray);
+		JsonArray stateArray = new JsonArray();
+		array.add(stateArray);
 		for (String stateName : fsm.getStates()) {
-			stateArray.put(stateName);
+			stateArray.add(new JsonPrimitive(stateName));
 		}
 
-		JSONArray transitionsArray = new JSONArray();
-		array.put(transitionsArray);
+		JsonArray transitionsArray = new JsonArray();
+		array.add(transitionsArray);
 		for (Transition transition : fsm.getTransitions()) {
-			JSONArray transitionArray = new JSONArray();
-			transitionsArray.put(transitionArray);
+			JsonArray transitionArray = new JsonArray();
+			transitionsArray.add(transitionArray);
 
-			transitionArray.put(transition.getSourceState().getName());
+			transitionArray.add(new JsonPrimitive(transition.getSourceState()
+					.getName()));
 
-			JSONArray actionsArray = new JSONArray();
-			transitionArray.put(actionsArray);
+			JsonArray actionsArray = new JsonArray();
+			transitionArray.add(actionsArray);
 
 			for (NextStateInfo info : transition.getNextStateInfo()) {
-				JSONArray actionArray = new JSONArray();
-				actionsArray.put(actionArray);
+				JsonArray actionArray = new JsonArray();
+				actionsArray.add(actionArray);
 
-				actionArray.put(writeActionTag(info.getAction().getTag()));
-				actionArray.put(info.getTargetState().getName());
+				actionArray.add(writeActionTag(info.getAction().getTag()));
+				actionArray.add(new JsonPrimitive(info.getTargetState()
+						.getName()));
 			}
 		}
 
@@ -819,17 +824,17 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JSONArray writeLocalVariable(LocalVariable variable) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeLocalVariable(LocalVariable variable) {
+		JsonArray array = new JsonArray();
 
-		JSONArray details = new JSONArray();
-		array.put(details);
-		details.put(variable.getBaseName());
-		details.put(variable.isAssignable());
-		details.put(variable.getIndex());
+		JsonArray details = new JsonArray();
+		array.add(details);
+		details.add(new JsonPrimitive(variable.getBaseName()));
+		details.add(new JsonPrimitive(variable.isAssignable()));
+		details.add(new JsonPrimitive(variable.getIndex()));
 
-		array.put(writeLocation(variable.getLocation()));
-		array.put(writeType(variable.getType()));
+		array.add(writeLocation(variable.getLocation()));
+		array.add(writeType(variable.getType()));
 
 		return array;
 	}
@@ -841,19 +846,19 @@ public class IRWriter {
 	 *            an ordered map of variables
 	 * @return a JSON array
 	 */
-	private JSONArray writeLocalVariables(OrderedMap<String, Variable> variables) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeLocalVariables(OrderedMap<String, Variable> variables) {
+		JsonArray array = new JsonArray();
 		for (Variable variable : variables) {
-			array.put(writeLocalVariable((LocalVariable) variable));
+			array.add(writeLocalVariable((LocalVariable) variable));
 		}
 		return array;
 	}
 
-	private JSONArray writeLocation(Location location) {
-		JSONArray array = new JSONArray();
-		array.put(location.getStartLine());
-		array.put(location.getStartColumn());
-		array.put(location.getEndColumn());
+	private JsonArray writeLocation(Location location) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(location.getStartLine()));
+		array.add(new JsonPrimitive(location.getStartColumn()));
+		array.add(new JsonPrimitive(location.getEndColumn()));
 
 		return array;
 	}
@@ -865,8 +870,8 @@ public class IRWriter {
 	 *            a list of nodes
 	 * @return a JSON array
 	 */
-	private JSONArray writeNodes(List<CFGNode> nodes) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeNodes(List<CFGNode> nodes) {
+		JsonArray array = new JsonArray();
 		for (CFGNode node : nodes) {
 			node.accept(nodeWriter, array);
 		}
@@ -881,17 +886,17 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JSONArray writeParameter(StateVariable variable) {
-		JSONArray variableArray = new JSONArray();
+	private JsonArray writeParameter(StateVariable variable) {
+		JsonArray variableArray = new JsonArray();
 
-		JSONArray details = new JSONArray();
-		variableArray.put(details);
+		JsonArray details = new JsonArray();
+		variableArray.add(details);
 
-		details.put(variable.getName());
-		details.put(variable.isAssignable());
+		details.add(new JsonPrimitive(variable.getName()));
+		details.add(new JsonPrimitive(variable.isAssignable()));
 
-		variableArray.put(writeLocation(variable.getLocation()));
-		variableArray.put(writeType(variable.getType()));
+		variableArray.add(writeLocation(variable.getLocation()));
+		variableArray.add(writeType(variable.getType()));
 
 		return variableArray;
 	}
@@ -903,11 +908,11 @@ public class IRWriter {
 	 *            an ordered map of variables
 	 * @return a JSON array
 	 */
-	private JSONArray writeParameters(
+	private JsonArray writeParameters(
 			OrderedMap<String, ? extends Variable> variables) {
-		JSONArray array = new JSONArray();
+		JsonArray array = new JsonArray();
 		for (Variable variable : variables) {
-			array.put(writeParameter((StateVariable) variable));
+			array.add(writeParameter((StateVariable) variable));
 		}
 		return array;
 	}
@@ -919,18 +924,18 @@ public class IRWriter {
 	 *            a port
 	 * @return a JSON array
 	 */
-	private JSONArray writePort(Port port) {
-		JSONArray array = new JSONArray();
-		array.put(writeLocation(port.getLocation()));
-		array.put(writeType(port.getType()));
-		array.put(port.getName());
+	private JsonArray writePort(Port port) {
+		JsonArray array = new JsonArray();
+		array.add(writeLocation(port.getLocation()));
+		array.add(writeType(port.getType()));
+		array.add(new JsonPrimitive(port.getName()));
 		return array;
 	}
 
-	private JSONArray writePorts(OrderedMap<String, Port> ports) {
-		JSONArray array = new JSONArray();
+	private JsonArray writePorts(OrderedMap<String, Port> ports) {
+		JsonArray array = new JsonArray();
 		for (Port port : ports) {
-			array.put(writePort(port));
+			array.add(writePort(port));
 		}
 
 		return array;
@@ -943,16 +948,16 @@ public class IRWriter {
 	 *            a procedure
 	 * @return a JSON array
 	 */
-	private JSONArray writeProcedure(Procedure procedure) {
-		JSONArray array = new JSONArray();
-		array.put(procedure.getName());
-		array.put(procedure.isExternal());
-		array.put(writeLocation(procedure.getLocation()));
-		array.put(writeType(procedure.getReturnType()));
+	private JsonArray writeProcedure(Procedure procedure) {
+		JsonArray array = new JsonArray();
+		array.add(new JsonPrimitive(procedure.getName()));
+		array.add(new JsonPrimitive(procedure.isExternal()));
+		array.add(writeLocation(procedure.getLocation()));
+		array.add(writeType(procedure.getReturnType()));
 
-		array.put(writeLocalVariables(procedure.getParameters()));
-		array.put(writeLocalVariables(procedure.getLocals()));
-		array.put(writeNodes(procedure.getNodes())); // nodes
+		array.add(writeLocalVariables(procedure.getParameters()));
+		array.add(writeLocalVariables(procedure.getLocals()));
+		array.add(writeNodes(procedure.getNodes())); // nodes
 
 		return array;
 	}
@@ -964,10 +969,10 @@ public class IRWriter {
 	 *            an ordered map of procedures
 	 * @return a JSON array
 	 */
-	private JSONArray writeProcedures(OrderedMap<String, Procedure> procedures) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeProcedures(OrderedMap<String, Procedure> procedures) {
+		JsonArray array = new JsonArray();
 		for (Procedure procedure : procedures) {
-			array.put(writeProcedure(procedure));
+			array.add(writeProcedure(procedure));
 		}
 		return array;
 	}
@@ -979,28 +984,28 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JSONArray writeStateVariable(StateVariable variable) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeStateVariable(StateVariable variable) {
+		JsonArray array = new JsonArray();
 
 		// variable
-		JSONArray variableArray = new JSONArray();
-		array.put(variableArray);
+		JsonArray variableArray = new JsonArray();
+		array.add(variableArray);
 
-		JSONArray details = new JSONArray();
-		variableArray.put(details);
+		JsonArray details = new JsonArray();
+		variableArray.add(details);
 
-		details.put(variable.getName());
-		details.put(variable.isAssignable());
+		details.add(new JsonPrimitive(variable.getName()));
+		details.add(new JsonPrimitive(variable.isAssignable()));
 
-		variableArray.put(writeLocation(variable.getLocation()));
-		variableArray.put(writeType(variable.getType()));
+		variableArray.add(writeLocation(variable.getLocation()));
+		variableArray.add(writeType(variable.getType()));
 
 		Object constant = variable.getConstantValue();
 		if (constant == null) {
-			array.put(JSONObject.NULL);
+			array.add(null);
 		} else {
-			Object constantValue = writeConstant(constant);
-			array.put(constantValue);
+			JsonElement constantValue = writeConstant(constant);
+			array.add(constantValue);
 		}
 
 		return array;
@@ -1013,11 +1018,11 @@ public class IRWriter {
 	 *            an ordered map of variables
 	 * @return a JSON array
 	 */
-	private JSONArray writeStateVariables(
+	private JsonArray writeStateVariables(
 			OrderedMap<String, StateVariable> variables) {
-		JSONArray array = new JSONArray();
+		JsonArray array = new JsonArray();
 		for (StateVariable variable : variables) {
-			array.put(writeStateVariable(variable));
+			array.add(writeStateVariable(variable));
 		}
 		return array;
 	}
@@ -1029,8 +1034,8 @@ public class IRWriter {
 	 *            a type
 	 * @return JSON content, as a string or an array
 	 */
-	private Object writeType(Type type) {
-		return type.accept(typeWriter);
+	private JsonElement writeType(Type type) {
+		return (JsonElement) type.accept(typeWriter);
 	}
 
 	/**
@@ -1040,15 +1045,15 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JSONArray writeVariable(Variable variable) {
-		JSONArray array = new JSONArray();
+	private JsonArray writeVariable(Variable variable) {
+		JsonArray array = new JsonArray();
 		if (variable.isGlobal()) {
-			array.put(variable.getName());
-			array.put(0);
+			array.add(new JsonPrimitive(variable.getName()));
+			array.add(new JsonPrimitive(0));
 		} else {
 			LocalVariable local = (LocalVariable) variable;
-			array.put(local.getBaseName());
-			array.put(local.getIndex());
+			array.add(new JsonPrimitive(local.getBaseName()));
+			array.add(new JsonPrimitive(local.getIndex()));
 		}
 
 		return array;
