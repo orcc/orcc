@@ -36,7 +36,31 @@ package net.sf.orcc.ir.serialize;
  */
 public interface IRConstants {
 
-	public static final String BINARY_EXPR = "2 op";
+	public static final String EXPR_BINARY = "2 op";
+
+	public static final String EXPR_UNARY = "1 op";
+
+	public static final String EXPR_VAR = "var";
+
+	public static final String INSTR_ASSIGN = "assign";
+
+	public static final String INSTR_CALL = "call";
+
+	public static final String INSTR_HAS_TOKENS = "hasTokens";
+
+	public static final String INSTR_LOAD = "load";
+
+	public static final String INSTR_PEEK = "peek";
+
+	public static final String INSTR_PHI = "phi";
+
+	public static final String INSTR_READ = "read";
+
+	public static final String INSTR_RETURN = "return";
+
+	public static final String INSTR_STORE = "store";
+
+	public static final String INSTR_WRITE = "write";
 
 	public static final String KEY_ACTION_SCHED = "action scheduler";
 
@@ -58,34 +82,10 @@ public interface IRConstants {
 
 	public final static String KEY_STATE_VARS = "state variables";
 
-	public static final String NAME_ASSIGN = "assign";
+	public static final String NODE_BLOCK = "block";
 
-	public static final String NAME_CALL = "call";
+	public static final String NODE_IF = "if";
 
-	public static final String NAME_EMPTY = "empty";
-
-	public static final String NAME_HAS_TOKENS = "hasTokens";
-
-	public static final String NAME_IF = "if";
-
-	public static final String NAME_JOIN = "join";
-
-	public static final String NAME_LOAD = "load";
-
-	public static final String NAME_PEEK = "peek";
-
-	public static final String NAME_READ = "read";
-
-	public static final String NAME_RETURN = "return";
-
-	public static final String NAME_STORE = "store";
-
-	public static final String NAME_WHILE = "while";
-
-	public static final String NAME_WRITE = "write";
-
-	public static final String UNARY_EXPR = "1 op";
-
-	public static final String VAR_EXPR = "var";
+	public static final String NODE_WHILE = "while";
 
 }
