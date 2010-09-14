@@ -45,6 +45,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -58,6 +59,53 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class NDimArrayTransform extends AbstractActorTransformation {
 
+	/**
+	 * Prints the indexes of an NDim array, each index is print separately and
+	 * cast to the correct size Arguments of the function are the indexes, the
+	 * indexes iterator, the instruction iterator and the instruction type.
+	 * 
+	 * @param indexes
+	 *            a list of indexes
+	 * @param iit
+	 *            an indexes iterator
+	 * @param it
+	 *            an instruction iterator
+	 * @param type
+	 *            the instruction type
+	 * 
+	 * @return listIndex a list of the new indexes printed
+	 */
+	private List<Expression> printAssignement(List<Expression> indexes,
+			Iterator<Integer> iit, ListIterator<Instruction> it, Type type) {
+		List<Expression> listIndex = new ArrayList<Expression>();
+
+		for (Expression expr : indexes) {
+			int size;
+			VarExpr index;
+
+			// Indexes must have the same size as the lists
+			if (iit.hasNext()) {
+				size = iit.next();
+			} else {
+				size = ((TypeInt) type).getSize();
+			}
+			// The VHDL require an index from 0 to size -1 so the signed bit
+			// is remove (-1) and it subtracts 1 to the size of the list
+			size = IntExpr.getSize(size - 1) - 1;
+
+			// Add the assign instruction
+			LocalVariable indexVar = procedure.newTempLocalVariable("",
+					IrFactory.eINSTANCE.createTypeUint(size), "index");
+			it.previous();
+			Assign assign = new Assign(expr.getLocation(), indexVar, expr);
+			it.add(assign);
+			it.next();
+			index = new VarExpr(new Use(indexVar));
+			listIndex.add(index);
+		}
+		return listIndex;
+	}
+
 	@SuppressWarnings({ "unchecked" })
 	@Override
 	public void visit(Load load, Object... args) {
@@ -67,39 +115,40 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 		if (!indexes.isEmpty() && load.getSource().getVariable().isGlobal()) {
 			Type type = load.getSource().getVariable().getType();
 			Iterator<Integer> iit = type.getDimensions().iterator();
-			VarExpr index = null;
-			List<Expression> listIndex = new ArrayList<Expression>();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			List<Expression> listIndex = printAssignement(indexes, iit, it,
+					type);
 
-			// Print a new assignment made up of index_i = expression for each
-			// indexes.
-			for (Expression expr : indexes) {
-				int size;
-
-				// Indexes must have the same size as the lists
-				if (iit.hasNext()) {
-					size = iit.next();
-				} else {
-					size = ((TypeInt) type).getSize();
-				}
-				// The VHDL require an index from 0 to size -1 so the signed bit
-				// is remove (-1) and it subtracts 1 to the size of the list
-				size = IntExpr.getSize(size - 1) - 1;
-
-				// Add the assign instruction
-				LocalVariable indexVar = procedure.newTempLocalVariable("",
-						IrFactory.eINSTANCE.createTypeUint(size), "index");
-				it.previous();
-				Assign assign = new Assign(expr.getLocation(), indexVar, expr);
-				it.add(assign);
-				it.next();
-				index = new VarExpr(new Use(indexVar));
-				listIndex.add(index);
-			}
 			// Assign index to memory
 			Use.removeUses(load, indexes);
 			indexes.clear();
-			AssignIndex assignIndex = new AssignIndex(load.getTarget(), listIndex);
+			AssignIndex assignIndex = new AssignIndex(load.getTarget(),
+					listIndex);
+			it.previous();
+			it.add(assignIndex);
+			it.next();
+			it.remove();
+		}
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	@Override
+	public void visit(Store store, Object... args) {
+		List<Expression> indexes = store.getIndexes();
+
+		// An VHDL memory is always global
+		if (!indexes.isEmpty() && store.getTarget().isGlobal()) {
+			Type type = store.getTarget().getType();
+			Iterator<Integer> iit = type.getDimensions().iterator();
+			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+			List<Expression> listIndex = printAssignement(indexes, iit, it,
+					type);
+
+			// Assign index to memory
+			Use.removeUses(store, indexes);
+			indexes.clear();
+			AssignIndex assignIndex = new AssignIndex(
+					(LocalVariable) store.getValue(), listIndex);
 			it.previous();
 			it.add(assignIndex);
 			it.next();
