@@ -55,10 +55,13 @@ import static net.sf.orcc.ir.serialize.IRConstants.NODE_BLOCK;
 import static net.sf.orcc.ir.serialize.IRConstants.NODE_IF;
 import static net.sf.orcc.ir.serialize.IRConstants.NODE_WHILE;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -117,6 +120,8 @@ import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.util.OrderedMap;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -617,28 +622,30 @@ public class IRWriter {
 
 	public void write(String outputDir, boolean prettyPrint)
 			throws OrccException {
-		OutputStream os;
+		Writer writer;
 		try {
-			os = new FileOutputStream(outputDir + File.separator
+			OutputStream os = new FileOutputStream(outputDir + File.separator
 					+ actor.getName() + ".json");
+			// write output as UTF-8
+			writer = new BufferedWriter(new OutputStreamWriter(os));
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
 
 		try {
 			JsonObject obj = writeActor();
+			GsonBuilder builder = new GsonBuilder();
+			builder.disableHtmlEscaping();
 			if (prettyPrint) {
-				// use readeable form
-				// os.write(obj.toString(2).getBytes("UTF-8"));
-			} else {
-				// use compact form
-				os.write(obj.toString().getBytes("UTF-8"));
+				builder.setPrettyPrinting();
 			}
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
+
+			Gson gson = builder.create();
+			gson.toJson(obj, writer);
 		} finally {
+			// because some GSON methods may throw a RuntimeException
 			try {
-				os.close();
+				writer.close();
 			} catch (IOException e) {
 				throw new OrccException("I/O error", e);
 			}

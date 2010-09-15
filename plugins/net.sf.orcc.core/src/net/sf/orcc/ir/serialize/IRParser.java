@@ -55,6 +55,7 @@ import static net.sf.orcc.ir.serialize.IRConstants.NODE_BLOCK;
 import static net.sf.orcc.ir.serialize.IRConstants.NODE_IF;
 import static net.sf.orcc.ir.serialize.IRConstants.NODE_WHILE;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -289,8 +290,10 @@ public class IRParser {
 	 */
 	public Actor parseActor(InputStream in) throws OrccException {
 		try {
+			// parse input as UTF-8 JSON
 			JsonParser parser = new JsonParser();
-			JsonObject obj = parser.parse(new InputStreamReader(in))
+			JsonObject obj = parser.parse(
+					new BufferedReader(new InputStreamReader(in)))
 					.getAsJsonObject();
 
 			file = obj.get(KEY_SOURCE_FILE).getAsString();
