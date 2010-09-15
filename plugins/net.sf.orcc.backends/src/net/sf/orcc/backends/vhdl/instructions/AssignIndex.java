@@ -31,8 +31,11 @@ package net.sf.orcc.backends.vhdl.instructions;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
  * This class defines an AssignIndex instruction. This node is used in code
@@ -42,7 +45,8 @@ import net.sf.orcc.ir.instructions.SpecificInstruction;
  * @author Matthieu Wipliez
  * 
  */
-public class AssignIndex extends SpecificInstruction {
+public class AssignIndex extends SpecificInstruction implements
+		LocalTargetContainer {
 
 	private List<Expression> indexes;
 
@@ -58,8 +62,8 @@ public class AssignIndex extends SpecificInstruction {
 	 */
 	public AssignIndex(LocalVariable target, List<Expression> indexes) {
 		super(target.getLocation());
-		this.target = target;
-		this.indexes = indexes;
+		setIndexes(indexes);
+		setTarget(target);
 	}
 
 	/**
@@ -71,12 +75,35 @@ public class AssignIndex extends SpecificInstruction {
 		return indexes;
 	}
 
-	/**
-	 * Returns the target of this AssignIndex.
-	 * 
-	 * @return the target of this AssignIndex
-	 */
+	@Override
 	public LocalVariable getTarget() {
 		return target;
 	}
+
+	@Override
+	public void internalSetTarget(LocalVariable target) {
+		this.target = target;
+	}
+
+	/**
+	 * Sets the indexes of this assign index instruction. Uses are updated to
+	 * point to this instruction. This method is internal. Indexes should be
+	 * modified solely using the {@link #getIndexes()} method.
+	 * 
+	 * @param indexes
+	 *            a list of expressions
+	 */
+	private void setIndexes(List<Expression> indexes) {
+		if (this.indexes != null) {
+			Use.removeUses(this, this.indexes);
+		}
+		this.indexes = indexes;
+		Use.addUses(this, indexes);
+	}
+
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
+	}
+
 }

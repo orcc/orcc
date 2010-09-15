@@ -98,11 +98,20 @@ public class VHDLBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new PhiRemoval() };
+
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
+
+		evaluateInitializeActions(actor);
+
+		ActorTransformation[] transformationsCodegen = {
 
 				// renames reserved keywords
 				new RenameTransformation(this.transformations),
 
-				new Inline(), new PhiRemoval(), new VariableRedimension(),
+				new Inline(), new VariableRedimension(),
 				new BoolExprTransform(),
 
 				new TransformConditionals(),
@@ -114,15 +123,13 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// replaces adjacent underscores by a single underscore
 				new RenameTransformation(adjacentUnderscores, "_") };
 
-		for (ActorTransformation transformation : transformations) {
+		for (ActorTransformation transformation : transformationsCodegen) {
 			transformation.transform(actor);
 		}
 
 		VHDLTemplateData templateData = new VHDLTemplateData();
 		templateData.transform(actor);
 		actor.setTemplateData(templateData.getVariablesList());
-
-		evaluateInitializeActions(actor);
 
 		// remove initialization procedure (we could do better)
 		Procedure initProc = actor.getProcs().get("_initialize");

@@ -38,7 +38,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
@@ -73,14 +72,16 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 	 *            an instruction iterator
 	 * @param type
 	 *            the instruction type
-	 * 
-	 * @return index the local variable index
 	 */
-	private LocalVariable printAssignement(List<Expression> indexes,
-			Iterator<Integer> iit, ListIterator<Instruction> it, Type type) {
-		List<Expression> listIndex = new ArrayList<Expression>();
-		int sizeIndex = 0;
-		Location location = null;
+	private void printAssignment(List<Expression> indexes,
+			ListIterator<Instruction> it, Type type) {
+		List<Expression> listIndex = new ArrayList<Expression>(indexes.size());
+		int concatenatedSize = 0;
+		Iterator<Integer> iit = type.getDimensions().iterator();
+
+		// returns the load or store, and has the effect that instructions will
+		// be inserted before it
+		Instruction instruction = it.previous();
 
 		for (Expression expr : indexes) {
 			int size;
@@ -91,31 +92,40 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 			} else {
 				size = ((TypeInt) type).getSize();
 			}
-			// The VHDL require an index from 0 to size -1 so the signed bit
-			// is remove (-1) and it subtracts 1 to the size of the list
-			size = IntExpr.getSize(size - 1) - 1;
-			sizeIndex += size;
 
-			// Add the assign instruction for each index
+			// index goes from 0 to size - 1, and we remove the sign bit
+			int indexSize = IntExpr.getSize(size - 1) - 1;
+
+			// new index variable
 			LocalVariable indexVar = procedure.newTempLocalVariable("",
-					IrFactory.eINSTANCE.createTypeUint(size), "index");
-			it.previous();
-			location = expr.getLocation();
-			Assign assign = new Assign(location, indexVar, expr);
-			it.add(assign);
-			it.next();
+					IrFactory.eINSTANCE.createTypeUint(indexSize), "index");
 			listIndex.add(new VarExpr(new Use(indexVar)));
+
+			// add the assign instruction for each index
+			Assign assign = new Assign(indexVar, expr);
+			it.add(assign);
+
+			// size of the concatenated index
+			concatenatedSize += indexSize;
 		}
 
-		// performs the indexes concatenation
+		// creates the variable that will hold the concatenation of indexes
 		LocalVariable indexVar = procedure.newTempLocalVariable("",
-				IrFactory.eINSTANCE.createTypeUint(sizeIndex), "index");
-		indexVar.setLocation(location);
+				IrFactory.eINSTANCE.createTypeUint(concatenatedSize),
+				"concat_index");
+
+		// sets indexVar as memory index
+		Use.removeUses(instruction, indexes);
+		indexes.clear();
+		indexes.add(new VarExpr(new Use(indexVar)));
+
+		// add a special assign instruction that assigns the index variable the
+		// concatenation of index expressions
 		AssignIndex assignIndex = new AssignIndex(indexVar, listIndex);
-		it.previous();
 		it.add(assignIndex);
+
+		// so the load (or store) is not endlessly revisited
 		it.next();
-		return indexVar;
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -123,17 +133,12 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 	public void visit(Load load, Object... args) {
 		List<Expression> indexes = load.getIndexes();
 
-		// An VHDL memory is always global
+		// a VHDL memory is always global
 		if (!indexes.isEmpty() && load.getSource().getVariable().isGlobal()) {
 			Type type = load.getSource().getVariable().getType();
-			Iterator<Integer> iit = type.getDimensions().iterator();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			LocalVariable index = printAssignement(indexes, iit, it, type);
 
-			// Set local variable index as default memory index
-			Use.removeUses(load, indexes);
-			indexes.clear();
-			indexes.add(new VarExpr(new Use(index)));
+			printAssignment(indexes, it, type);
 		}
 	}
 
@@ -142,17 +147,13 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 	public void visit(Store store, Object... args) {
 		List<Expression> indexes = store.getIndexes();
 
-		// An VHDL memory is always global
+		// a VHDL memory is always global
 		if (!indexes.isEmpty() && store.getTarget().isGlobal()) {
 			Type type = store.getTarget().getType();
-			Iterator<Integer> iit = type.getDimensions().iterator();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			/*
-			 * LocalVariable index = printAssignement(indexes, iit, it, type);
-			 * 
-			 * // Assign index to memory Use.removeUses(store, indexes);
-			 * indexes.clear(); indexes.add(new VarExpr(new Use(index)));
-			 */
+
+			printAssignment(indexes, it, type);
 		}
 	}
+
 }
