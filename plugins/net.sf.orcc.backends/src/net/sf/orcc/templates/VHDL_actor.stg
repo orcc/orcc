@@ -337,15 +337,12 @@ endif
 $
 >>
 
-AssignLoadIndex(AssignLoadIndex) ::= <<
+AssignIndex(AssignIndex) ::= <<
 
-$AssignLoadIndex.target$ = $AssignLoadIndex.source$(to_integer(unsigned($AssignLoadIndex.indexes: { std_logic_vector(to_signed($it$, $it$'length))}; separator=" & "$));
+$AssignIndex.target$ = $AssignIndex.source$(to_integer(unsigned($AssignIndex.indexes: { std_logic_vector(to_signed($it$, $it$'length))}; separator=" & "$));
 >>
 
-AssignStoreIndex(AssignStoreIndex) ::= <<
 
-$AssignStoreIndex.source$(to_integer(unsigned($AssignStoreIndex.indexes: { std_logic_vector(to_signed($it$, $it$'length))}; separator=" & "$));
->>
 
 Call(call) ::= <<
 

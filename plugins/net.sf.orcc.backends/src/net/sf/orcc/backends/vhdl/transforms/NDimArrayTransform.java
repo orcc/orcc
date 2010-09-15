@@ -33,12 +33,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.backends.vhdl.instructions.AssignLoadIndex;
-import net.sf.orcc.backends.vhdl.instructions.AssignStoreIndex;
+import net.sf.orcc.backends.vhdl.instructions.AssignIndex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
@@ -74,15 +74,16 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 	 * @param type
 	 *            the instruction type
 	 * 
-	 * @return listIndex a list of the new indexes printed
+	 * @return index the local variable index
 	 */
-	private List<Expression> printAssignement(List<Expression> indexes,
+	private LocalVariable printAssignement(List<Expression> indexes,
 			Iterator<Integer> iit, ListIterator<Instruction> it, Type type) {
 		List<Expression> listIndex = new ArrayList<Expression>();
+		int sizeIndex = 0;
+		Location location = null;
 
 		for (Expression expr : indexes) {
 			int size;
-			VarExpr index;
 
 			// Indexes must have the same size as the lists
 			if (iit.hasNext()) {
@@ -93,18 +94,28 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 			// The VHDL require an index from 0 to size -1 so the signed bit
 			// is remove (-1) and it subtracts 1 to the size of the list
 			size = IntExpr.getSize(size - 1) - 1;
+			sizeIndex += size;
 
-			// Add the assign instruction
+			// Add the assign instruction for each index
 			LocalVariable indexVar = procedure.newTempLocalVariable("",
 					IrFactory.eINSTANCE.createTypeUint(size), "index");
 			it.previous();
-			Assign assign = new Assign(expr.getLocation(), indexVar, expr);
+			location = expr.getLocation();
+			Assign assign = new Assign(location, indexVar, expr);
 			it.add(assign);
 			it.next();
-			index = new VarExpr(new Use(indexVar));
-			listIndex.add(index);
+			listIndex.add(new VarExpr(new Use(indexVar)));
 		}
-		return listIndex;
+
+		// performs the indexes concatenation
+		LocalVariable indexVar = procedure.newTempLocalVariable("",
+				IrFactory.eINSTANCE.createTypeUint(sizeIndex), "index");
+		indexVar.setLocation(location);
+		AssignIndex assignIndex = new AssignIndex(indexVar, listIndex);
+		it.previous();
+		it.add(assignIndex);
+		it.next();
+		return indexVar;
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -117,18 +128,12 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 			Type type = load.getSource().getVariable().getType();
 			Iterator<Integer> iit = type.getDimensions().iterator();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			List<Expression> listIndex = printAssignement(indexes, iit, it,
-					type);
+			LocalVariable index = printAssignement(indexes, iit, it, type);
 
-			// Assign index to memory
+			// Set local variable index as default memory index
 			Use.removeUses(load, indexes);
 			indexes.clear();
-			AssignLoadIndex assignIndex = new AssignLoadIndex(load.getTarget(),
-					load.getSource().getVariable(), listIndex);
-			it.previous();
-			it.add(assignIndex);
-			it.next();
-			it.remove();
+			indexes.add(new VarExpr(new Use(index)));
 		}
 	}
 
@@ -142,19 +147,12 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 			Type type = store.getTarget().getType();
 			Iterator<Integer> iit = type.getDimensions().iterator();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			List<Expression> listIndex = printAssignement(indexes, iit, it,
-					type);
-
-			// Assign index to memory
-			Use.removeUses(store, indexes);
-			indexes.clear();
-			AssignStoreIndex assignIndex = new AssignStoreIndex(
-					store.getTarget(), listIndex);
-			it.previous();
-			it.add(assignIndex);
-			it.next();
-			it.remove();
-
+			/*
+			 * LocalVariable index = printAssignement(indexes, iit, it, type);
+			 * 
+			 * // Assign index to memory Use.removeUses(store, indexes);
+			 * indexes.clear(); indexes.add(new VarExpr(new Use(index)));
+			 */
 		}
 	}
 }

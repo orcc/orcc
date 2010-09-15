@@ -32,7 +32,6 @@ import java.util.List;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 
 /**
@@ -43,13 +42,11 @@ import net.sf.orcc.ir.instructions.SpecificInstruction;
  * @author Matthieu Wipliez
  * 
  */
-public class AssignLoadIndex extends SpecificInstruction {
+public class AssignIndex extends SpecificInstruction {
 
 	private List<Expression> indexes;
 
 	private LocalVariable target;
-
-	private Variable source;
 
 	/**
 	 * Creates a new AssignIndex from the given indexes and target.
@@ -59,11 +56,9 @@ public class AssignLoadIndex extends SpecificInstruction {
 	 * @param indexes
 	 *            a list of indexes
 	 */
-	public AssignLoadIndex(LocalVariable target, Variable variable,
-			List<Expression> indexes) {
+	public AssignIndex(LocalVariable target, List<Expression> indexes) {
 		super(target.getLocation());
 		this.target = target;
-		this.source = variable;
 		this.indexes = indexes;
 	}
 
@@ -84,14 +79,4 @@ public class AssignLoadIndex extends SpecificInstruction {
 	public LocalVariable getTarget() {
 		return target;
 	}
-
-	/**
-	 * Returns the source of this AssignIndex.
-	 * 
-	 * @return the source of this AssignIndex
-	 */
-	public Variable getSource() {
-		return source;
-	}
-
 }
