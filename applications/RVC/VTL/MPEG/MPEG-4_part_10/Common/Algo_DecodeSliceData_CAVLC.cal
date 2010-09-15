@@ -111,7 +111,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int SZ_TOTALCOEFF          = 128;
 	int MASK_TOTALCOEFF        = 127;
 
-	bool DEBUG_FLAG_DECODED = false;
+	bool DEBUG_FLAG_DECODED = true;
 
 
 	List (type:uint(size=6),size=64) QP_TAB := 
@@ -375,7 +375,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			bool LMbExists,
 			bool AMbExists
 		do
-				if((curr_mb_addr mod PicWidthInMbs) != 0) then
+				if(((curr_mb_addr - first_mb_in_slice) mod PicWidthInMbs) != 0) then
 					NaTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 5],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 7],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][13],
@@ -394,7 +394,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 					NaTab     := [0:for int i in 0 .. 11];
 					LMbExists := false;
 				end
-				if(curr_mb_addr / PicWidthInMbs != 0)then
+				if((curr_mb_addr - first_mb_in_slice) / PicWidthInMbs != 0)then
 					AMbExists := true;
 					NbTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][10],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_TOTALCOEFF)][11],

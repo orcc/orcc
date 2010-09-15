@@ -157,7 +157,7 @@ actor Algo_DecodeMacroblockLayer()
 			42,42,42,42
 		];
 
-	bool DEBUG_FLAG_DECODED = false;
+	bool DEBUG_FLAG_DECODED = true;
 
 
 	uint(size=6)  mb_type                        := 0;

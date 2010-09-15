@@ -1,0 +1,909 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Parser_Picture">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="ValDecoded">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="IsAnIdr">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="NalRefIdc">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="Log2MaxFrameNum">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="frame_mbs_only">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="poc_type">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="log2_max_poc_lsb">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="delta_pic_order_always_zero">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="NumRefFramesInPocCycle">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ExpectedDeltaPerPocCycle">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="OffsetForRefFrameAccumul">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="OffsetForNonRefPic">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="OffsetForTopToBottomField">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MbAdaptFrameField">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="pic_order_present">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="redundant_pic_cnt_present">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="entropy_coding_mode">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="deblocking_filter_control_present">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="NumSliceGroups">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SliceGroupMapType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SizeSliceGroupChgCycle">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="PicInitQP">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="BitDepthChroma">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="BitDepthLuma">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ChromaArrayType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="Direct8x8Inference">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="Num_C8x8">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="PicSzInMbs">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="PicWdtInMbs">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ChromaQpIdxOffset">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ConstraindedIntraPred">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="Transform8x8Mode">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="NumRefIdxLXActive">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="IntraPredModeC">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QP_Cb">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QP_Cr">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="ScalingList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="QP">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CurrMbAddr">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="slice_alpha_c0_offset">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="slice_beta_offset">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="LFDisable">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbPartIdx">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefIdx">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbPartWidth">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbPartHeigth">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CodedBlockPattern">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="ConstrainedIFlag">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="MvRes">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="PicWidthInMb">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="PicSizeInMb">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="FirstMbInSlice">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="POC">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="I_PCM_Y">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="I_PCM_U">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="I_PCM_V">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="DecodeNextNal">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="TypeOfVLD">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="VLDParam">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="GetPps">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="FrameNum">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Mmco">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="NbRefFrame_l0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefList0Type">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefReordering_l0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="IntraPredMode">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbIntraFlag">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="1"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Run">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Value">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Last">
+        <Type name="bool"/>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Mgnt_DecodePic">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_Slice_layer_without_partitioning"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeSliceHeader">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSliceHeader"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeRefPicList">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_DecodeRefPicList_Frext"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeDecRefPicMarking">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeDecRefPicMarking"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeSliceData_Cavlc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSliceData_CAVLC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="Is_CBP">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
+    </Instance>
+    <Instance id="DecodeMacroBlockLayer">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeMacroblockLayer"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeMbPred">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeMbPred"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeResidual">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeResidual"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeResidualBlock_Cavlc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeResidualBlock_Cavlc"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="DecodeSubMbPred">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSubMbPred"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="MergeDataFromSDataAndMbLayer">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MergeDataFromSlcDataAndMbLayer"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="GenerateSkipBlockInformation">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_GenerateSkipBlockInformation"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="DecodeSliceHeader" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="HeaderValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="HeaderTypeOfVLD"
+        src="DecodeSliceHeader" src-port="TypeOfVLD"/>
+    <Connection dst="DecodeRefPicList" dst-port="Slice_Type"
+        src="DecodeSliceHeader" src-port="SliceType"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="DataValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="DataTypeOfVLD"
+        src="DecodeSliceData_Cavlc" src-port="TypeOfVLD"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="SliceType"
+        src="DecodeSliceHeader" src-port="SliceType"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="MbaffFrame"
+        src="DecodeSliceHeader" src-port="MbaffFrame"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="SliceType"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerSliceType"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="BitDepthLuma"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerBitDepthLuma"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="BitDepthChroma"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerBitDepthChroma"/>
+    <Connection dst="DecodeMacroBlockLayer"
+        dst-port="Direct8x8Inference" src="DecodeSliceData_Cavlc" src-port="DecMbLayerDirect8x8Inference"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="Transform8x8Mode"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerTransform8x8Mode"/>
+    <Connection dst="DecodeDecRefPicMarking" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="DecRefPicMarkingValVLD"/>
+    <Connection dst="Mgnt_DecodePic"
+        dst-port="DecRefPicMarkingTypeOfVLD"
+        src="DecodeDecRefPicMarking" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_DecodePic"
+        dst-port="DecRefPicMarkingNbBitsToRead"
+        src="DecodeDecRefPicMarking" src-port="NbBitsToRead"/>
+    <Connection dst="DecodeRefPicList" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="RefPicListValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="RefPicListTypeOfVLD"
+        src="DecodeRefPicList" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="RefPicListNbBitsToRead"
+        src="DecodeRefPicList" src-port="NbBitsToRead"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="MbLayerValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="MbLayerTypeOfVLD"
+        src="DecodeMacroBlockLayer" src-port="TypeOfVLD"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="ChromaArrayType"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerChromaArrayType"/>
+    <Connection dst="DecodeMbPred" dst-port="SliceType"
+        src="DecodeMacroBlockLayer" src-port="MbPredSliceType"/>
+    <Connection dst="DecodeMbPred" dst-port="MbType"
+        src="DecodeMacroBlockLayer" src-port="MbPredMbType"/>
+    <Connection dst="DecodeMbPred" dst-port="TransfSz8x8"
+        src="DecodeMacroBlockLayer" src-port="MbPredTransfSz8x8"/>
+    <Connection dst="DecodeMbPred" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="MbPredValVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="MbPredTypeOfVLD"
+        src="DecodeMbPred" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="MbPredNbBitsToRead"
+        src="DecodeMbPred" src-port="NbBitsToRead"/>
+    <Connection dst="DecodeMbPred" dst-port="ChromaArrayType"
+        src="DecodeMacroBlockLayer" src-port="MbPredChromaArrayType"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="NumRefIdxLXActive"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumRefIdxLXActive"/>
+    <Connection dst="DecodeMbPred" dst-port="NumRefIdxLXActive"
+        src="DecodeMacroBlockLayer" src-port="MbPredNumRefIdxLXActive"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="MbFieldDecoding"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerMbFieldDecoding"/>
+    <Connection dst="DecodeMbPred" dst-port="MbFieldDecoding"
+        src="DecodeMacroBlockLayer" src-port="MbPredMbFieldDecoding"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="EntropyCodingMode"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerEntropyCodingMode"/>
+    <Connection dst="DecodeResidual" dst-port="EntropyCodingMode"
+        src="DecodeMacroBlockLayer" src-port="ResEntropyCodingMode"/>
+    <Connection dst="DecodeResidual" dst-port="SliceType"
+        src="DecodeMacroBlockLayer" src-port="ResSliceType"/>
+    <Connection dst="DecodeResidual" dst-port="MbType"
+        src="DecodeMacroBlockLayer" src-port="ResMbType"/>
+    <Connection dst="DecodeResidual" dst-port="TransfSz8x8"
+        src="DecodeMacroBlockLayer" src-port="ResTransfSz8x8"/>
+    <Connection dst="DecodeResidual" dst-port="BmFlag"
+        src="DecodeMacroBlockLayer" src-port="ResBmFlag"/>
+    <Connection dst="DecodeResidual" dst-port="StartIdx"
+        src="DecodeMacroBlockLayer" src-port="ResStartIdx"/>
+    <Connection dst="DecodeResidual" dst-port="EndIdx"
+        src="DecodeMacroBlockLayer" src-port="ResEndIdx"/>
+    <Connection dst="DecodeResidual" dst-port="CodBlkPatnLm"
+        src="DecodeMacroBlockLayer" src-port="ResCodBlkPatnLm"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="NATab"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerNATab"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="NBTab"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerNBTab"/>
+    <Connection dst="DecodeResidual" dst-port="NATab"
+        src="DecodeMacroBlockLayer" src-port="ResNATab"/>
+    <Connection dst="DecodeResidual" dst-port="NBTab"
+        src="DecodeMacroBlockLayer" src-port="ResNBTab"/>
+    <Connection dst="DecodeResidual" dst-port="LeftMbExists"
+        src="DecodeMacroBlockLayer" src-port="ResLeftMbExists"/>
+    <Connection dst="DecodeResidual" dst-port="AboveMbExists"
+        src="DecodeMacroBlockLayer" src-port="ResAboveMbExists"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="LeftMbExists"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerLeftMbExists"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="AboveMbExists"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerAboveMbExists"/>
+    <Connection dst="DecodeResidual" dst-port="Total_Coeff"
+        src="DecodeResidualBlock_Cavlc" src-port="Total_Coeff"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcTypeOfVLD"
+        src="DecodeResidualBlock_Cavlc" src-port="TypeOfVLD"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="nC"
+        src="DecodeResidual" src-port="ResBlknC"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcVLD_Param"
+        src="DecodeResidualBlock_Cavlc" src-port="VLD_Param"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="ResBlkCavlcValVLD"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="MaxNumCoeff"
+        src="DecodeResidual" src-port="ResBlkMaxNumCoeff"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="StartIdx"
+        src="DecodeResidual" src-port="ResBlkStartIdx"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="EndIdx"
+        src="DecodeResidual" src-port="ResBlkEndIdx"/>
+    <Connection dst="DecodeResidual" dst-port="ChromaArrayType"
+        src="DecodeMacroBlockLayer" src-port="ResChromaArrayType"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="Num_C8x8"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumC8x8"/>
+    <Connection dst="DecodeResidual" dst-port="Num_C8x8"
+        src="DecodeMacroBlockLayer" src-port="ResNumC8x8"/>
+    <Connection dst="DecodeResidual" dst-port="CodBlkPatnChm"
+        src="DecodeMacroBlockLayer" src-port="ResCodBlkPatnChm"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="Total_CoeffLuma"
+        src="DecodeResidual" src-port="DecMbLayerTotal_CoeffLuma"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffLuma"
+        src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffLuma"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="Total_CoeffChroma"
+        src="DecodeResidual" src-port="DecMbLayerTotal_CoeffChroma"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffChroma"
+        src="DecodeMacroBlockLayer" src-port="SData_Total_CoeffChroma"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="NumRefIdxLXActive"
+        src="DecodeRefPicList" src-port="SDataNumRefIdxLXActive"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="SubMbPredTypeOfVLD"
+        src="DecodeSubMbPred" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="SubMbPredNbBitsToRead"
+        src="DecodeSubMbPred" src-port="VldParam"/>
+    <Connection dst="DecodeSubMbPred" dst-port="ValVLD"
+        src="Mgnt_DecodePic" src-port="SubMbPredValVLD"/>
+    <Connection dst="DecodeSubMbPred" dst-port="SliceType"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredSliceType"/>
+    <Connection dst="DecodeSubMbPred" dst-port="MbType"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredMbType"/>
+    <Connection dst="DecodeSubMbPred" dst-port="NumRefIdxLXActive"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredNumRefIdxLXActive"/>
+    <Connection dst="DecodeSubMbPred" dst-port="MbFieldDecoding"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredMbFieldDecoding"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="SubMbType"
+        src="DecodeSubMbPred" src-port="MBLayerSubMbType"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="FstMbInSlc"
+        src="DecodeSliceHeader" src-port="FirstMbInSlice"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SkipMbLayer" src="DecodeSliceData_Cavlc" src-port="SkipMbLayer"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="MbType"
+        src="DecodeMacroBlockLayer" src-port="MbType"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="TransfSz8x8Flag" src="DecodeMacroBlockLayer" src-port="MergeTransfSz8x8"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="RemIntraYxYPredMode" src="DecodeMbPred" src-port="RemIntraYxYPredMode"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredRefIdxL0" src="DecodeSubMbPred" src-port="RefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredMvRes" src="DecodeSubMbPred" src-port="MvRes"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredEndRefIdxL0" src="DecodeSubMbPred" src-port="EndRefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredEndRefIdxL0" src="DecodeMbPred" src-port="EndRefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredMvRes" src="DecodeMbPred" src-port="MvRes"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredEndMvRes" src="DecodeMbPred" src-port="EndMvRes"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredMbPartHeight" src="DecodeSubMbPred" src-port="MbPartHeight"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredMbPartWidth" src="DecodeSubMbPred" src-port="MbPartWidth"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredMbPartIdx" src="DecodeSubMbPred" src-port="MbPartIdx"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredRefIdxL0" src="DecodeMbPred" src-port="RefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredMbPartHeight" src="DecodeMbPred" src-port="MbPartHeight"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredMbPartWidth" src="DecodeMbPred" src-port="MbPartWidth"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredMbPartIdx" src="DecodeMbPred" src-port="MbPartIdx"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="Res_Last"
+        src="DecodeResidualBlock_Cavlc" src-port="Last"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="Skip_Block"
+        src="DecodeResidual" src-port="Skip_Block"/>
+    <Connection dst="GenerateSkipBlockInformation"
+        dst-port="NbCoeffInMB" src="DecodeMacroBlockLayer" src-port="NbCoeffInMB"/>
+    <Connection dst="GenerateSkipBlockInformation"
+        dst-port="MbLay_SkipMb" src="DecodeMacroBlockLayer" src-port="SkipMacroBlk"/>
+    <Connection dst="GenerateSkipBlockInformation"
+        dst-port="SData_SkipMb" src="DecodeSliceData_Cavlc" src-port="SkipMbLayer"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="SData_SzMb"
+        src="DecodeSliceData_Cavlc" src-port="SzMbSkipped"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="IsIPCM"
+        src="DecodeMacroBlockLayer" src-port="IsIPCM"/>
+    <Connection dst="GenerateSkipBlockInformation" dst-port="CbpBlk"
+        src="DecodeMacroBlockLayer" src-port="cbp_blk"/>
+    <Connection dst="DecodeSliceData_Cavlc"
+        dst-port="DisDeblocFilterIdc" src="DecodeSliceHeader" src-port="DisDeblockingFilterIdc"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="SliceBetaOffset"
+        src="DecodeSliceHeader" src-port="SliceBetaOffset"/>
+    <Connection dst="DecodeSliceData_Cavlc"
+        dst-port="SliceAlphaC0Offset" src="DecodeSliceHeader" src-port="SliceAlphaC0Offset"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="ValQp"
+        src="DecodeSliceHeader" src-port="ValQp"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="ValQp"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerValQp"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="ChromaQpIdxOffset"
+        src="DecodeSliceData_Cavlc" src-port="DecMbLayerValChrmQpIdxOff"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SDataQp_Y_Cb_Cr" src="DecodeSliceData_Cavlc" src-port="SkipValQp_Y_Cb_Cr"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbLayerQp_Y_Cb_Cr" src="DecodeMacroBlockLayer" src-port="Qp_Y_Cb_Cr"/>
+    <Connection dst="" dst-port="IntraPredModeC" src="DecodeMbPred" src-port="IntraPredModeC"/>
+    <Connection dst="" dst-port="QP_Cb"
+        src="MergeDataFromSDataAndMbLayer" src-port="Qp_Cb"/>
+    <Connection dst="" dst-port="QP_Cr"
+        src="MergeDataFromSDataAndMbLayer" src-port="Qp_Cr"/>
+    <Connection dst="" dst-port="ScalingList"
+        src="MergeDataFromSDataAndMbLayer" src-port="ScalingList"/>
+    <Connection dst="" dst-port="QP" src="MergeDataFromSDataAndMbLayer" src-port="Qp"/>
+    <Connection dst="" dst-port="CurrMbAddr" src="DecodeSliceData_Cavlc" src-port="CurrMbAddr"/>
+    <Connection dst="" dst-port="slice_alpha_c0_offset"
+        src="DecodeSliceData_Cavlc" src-port="Slice_Alpha_C0_Offset"/>
+    <Connection dst="" dst-port="slice_beta_offset"
+        src="DecodeSliceData_Cavlc" src-port="Slice_Beta_Offset"/>
+    <Connection dst="" dst-port="LFDisable" src="DecodeSliceData_Cavlc" src-port="LFDisable"/>
+    <Connection dst="" dst-port="MbPartIdx"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbPartIdx"/>
+    <Connection dst="" dst-port="MbPartWidth"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbPartWidth"/>
+    <Connection dst="" dst-port="MbPartHeigth"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbPartHeight"/>
+    <Connection dst="" dst-port="CodedBlockPattern"
+        src="GenerateSkipBlockInformation" src-port="cbp_blk"/>
+    <Connection dst="" dst-port="ConstrainedIFlag"
+        src="DecodeSliceData_Cavlc" src-port="ConstraindedIntraPredFlag"/>
+    <Connection dst="" dst-port="MvRes"
+        src="MergeDataFromSDataAndMbLayer" src-port="MvRes"/>
+    <Connection dst="" dst-port="PicWidthInMb"
+        src="DecodeSliceData_Cavlc" src-port="PicWidthInMb"/>
+    <Connection dst="" dst-port="PicSizeInMb"
+        src="DecodeSliceData_Cavlc" src-port="PicSizeInMb"/>
+    <Connection dst="" dst-port="FirstMbInSlice"
+        src="DecodeSliceData_Cavlc" src-port="FirstMbInSlice"/>
+    <Connection dst="" dst-port="POC" src="DecodeSliceHeader" src-port="Poc"/>
+    <Connection dst="" dst-port="I_PCM_Y" src="DecodeMacroBlockLayer" src-port="pix_I_PCM_Y"/>
+    <Connection dst="" dst-port="I_PCM_U" src="DecodeMacroBlockLayer" src-port="pix_I_PCM_U"/>
+    <Connection dst="" dst-port="I_PCM_V" src="DecodeMacroBlockLayer" src-port="pix_I_PCM_V"/>
+    <Connection dst="" dst-port="RefIdx"
+        src="MergeDataFromSDataAndMbLayer" src-port="RefIdx"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="HeaderVLDParam"
+        src="DecodeSliceHeader" src-port="VLDParam"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="DataVLDParam"
+        src="DecodeSliceData_Cavlc" src-port="VLDParam"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="MbLayerVLDParam"
+        src="DecodeMacroBlockLayer" src-port="VLDParam"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ResTypeOfVLD"
+        src="DecodeResidual" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ResActorLaunched"
+        src="DecodeResidual" src-port="ActorLaunched"/>
+    <Connection dst="Mgnt_DecodePic" dst-port="ValVLD" src="" src-port="ValDecoded"/>
+    <Connection dst="DecodeSliceHeader" dst-port="IsAnIdrPic" src="" src-port="IsAnIdr"/>
+    <Connection dst="DecodeDecRefPicMarking" dst-port="PicNalRefIdc"
+        src="" src-port="NalRefIdc"/>
+    <Connection dst="DecodeDecRefPicMarking" dst-port="IdrPic" src="" src-port="IsAnIdr"/>
+    <Connection dst="" dst-port="DecodeNextNal" src="DecodeSliceHeader" src-port="DecodeNextNal"/>
+    <Connection dst="" dst-port="TypeOfVLD" src="Mgnt_DecodePic" src-port="TypeOfVLD"/>
+    <Connection dst="" dst-port="VLDParam" src="Mgnt_DecodePic" src-port="VLD_Param"/>
+    <Connection dst="DecodeSliceHeader" dst-port="NalRefIdc" src="" src-port="NalRefIdc"/>
+    <Connection dst="DecodeSliceHeader" dst-port="Log2MaxFrameNum"
+        src="" src-port="Log2MaxFrameNum"/>
+    <Connection dst="DecodeSliceHeader" dst-port="frame_mbs_only" src="" src-port="frame_mbs_only"/>
+    <Connection dst="DecodeSliceHeader" dst-port="poc_type" src="" src-port="poc_type"/>
+    <Connection dst="DecodeSliceHeader" dst-port="log2_max_poc_lsb"
+        src="" src-port="log2_max_poc_lsb"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="delta_pic_order_always_zero" src="" src-port="delta_pic_order_always_zero"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="NumRefFramesInPocCycle" src="" src-port="NumRefFramesInPocCycle"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="ExpectedDeltaPerPocCycle" src="" src-port="ExpectedDeltaPerPocCycle"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="OffsetForRefFrameAccumul" src="" src-port="OffsetForRefFrameAccumul"/>
+    <Connection dst="DecodeSliceHeader" dst-port="OffsetForNonRefPic"
+        src="" src-port="OffsetForNonRefPic"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="OffsetForTopToBottomField" src="" src-port="OffsetForTopToBottomField"/>
+    <Connection dst="DecodeSliceHeader" dst-port="MbAdaptFrameField"
+        src="" src-port="MbAdaptFrameField"/>
+    <Connection dst="DecodeSliceHeader" dst-port="pic_order_present"
+        src="" src-port="pic_order_present"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="redundant_pic_cnt_present" src="" src-port="redundant_pic_cnt_present"/>
+    <Connection dst="DecodeSliceHeader" dst-port="entropy_coding_mode"
+        src="" src-port="entropy_coding_mode"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="deblocking_filter_control_present" src="" src-port="deblocking_filter_control_present"/>
+    <Connection dst="DecodeSliceHeader" dst-port="NumSliceGroups" src="" src-port="NumSliceGroups"/>
+    <Connection dst="DecodeSliceHeader" dst-port="SliceGroupMapType"
+        src="" src-port="SliceGroupMapType"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="SizeSliceGroupChgCycle" src="" src-port="SizeSliceGroupChgCycle"/>
+    <Connection dst="DecodeSliceHeader" dst-port="PicInitQP" src="" src-port="PicInitQP"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="EntropyCodingMode"
+        src="" src-port="entropy_coding_mode"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="BitDepthChroma"
+        src="" src-port="BitDepthChroma"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="BitDepthLuma"
+        src="" src-port="BitDepthLuma"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="ChromaArrayType"
+        src="" src-port="ChromaArrayType"/>
+    <Connection dst="DecodeSliceData_Cavlc"
+        dst-port="Direct8x8Inference" src="" src-port="Direct8x8Inference"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="Num_C8x8" src="" src-port="Num_C8x8"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="PicSzInMbs" src="" src-port="PicSzInMbs"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="PicWdtInMbs"
+        src="" src-port="PicWdtInMbs"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="ChromaQpIdxOffset"
+        src="" src-port="ChromaQpIdxOffset"/>
+    <Connection dst="DecodeSliceData_Cavlc"
+        dst-port="ConstraindedIntraPred" src="" src-port="ConstraindedIntraPred"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="Transform8x8Mode"
+        src="" src-port="Transform8x8Mode"/>
+    <Connection dst="DecodeRefPicList" dst-port="NumRefIdxLXActive"
+        src="" src-port="NumRefIdxLXActive"/>
+    <Connection dst="" dst-port="GetPps" src="DecodeSliceHeader" src-port="GetPps"/>
+    <Connection dst="" dst-port="FrameNum" src="DecodeSliceHeader" src-port="FramNumCurrPic"/>
+    <Connection dst="" dst-port="Mmco" src="DecodeDecRefPicMarking" src-port="Mmco"/>
+    <Connection dst="" dst-port="NbRefFrame_l0" src="DecodeRefPicList" src-port="NbRefFrame_l0"/>
+    <Connection dst="" dst-port="RefList0Type" src="DecodeRefPicList" src-port="RefList0Type"/>
+    <Connection dst="" dst-port="RefReordering_l0"
+        src="DecodeRefPicList" src-port="RefReordering_l0"/>
+    <Connection dst="" dst-port="MbIntraFlag"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbIntraFlag"/>
+    <Connection dst="" dst-port="IntraPredMode"
+        src="MergeDataFromSDataAndMbLayer" src-port="IntraPredMode"/>
+    <Connection dst="" dst-port="Run" src="DecodeResidualBlock_Cavlc" src-port="Run"/>
+    <Connection dst="" dst-port="Value" src="DecodeResidualBlock_Cavlc" src-port="Value"/>
+    <Connection dst="" dst-port="Last"
+        src="GenerateSkipBlockInformation" src-port="Last"/>
+</XDF>

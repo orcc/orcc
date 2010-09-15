@@ -86,7 +86,7 @@ actor Algo_Check_NALU_type_Frext()
 	uint(size=5) NAL_SPS           = 7;
 	uint(size=5) NAL_PPS           = 8;
 
-	bool DEBUG_FLAG_DECODED = false;
+	bool DEBUG_FLAG_DECODED = true;
 
 /*
 * 

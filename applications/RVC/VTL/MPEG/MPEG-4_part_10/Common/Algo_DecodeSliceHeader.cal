@@ -82,7 +82,7 @@ actor Algo_DecodeSliceHeader()
 	uint(size=4) SLICE_TYPE_SP = 3;
 	uint(size=4) SLICE_TYPE_SI = 4;
 
-	bool DEBUG_FLAG_DECODED = false;
+	bool DEBUG_FLAG_DECODED = true;
 	bool DEBUG_OUTUPUT      = false;
 /*
 *
@@ -464,7 +464,6 @@ actor Algo_DecodeSliceHeader()
 			int abs_frame_num,
 			int idx
 		do
-		
 				abs_frame_num :=
 					if(num_ref_frames_in_pic_order_cnt_cycle != 0) then
 						frame_num_offset + frame_num
@@ -494,7 +493,7 @@ actor Algo_DecodeSliceHeader()
 			TypeOfVLD    :[ VLD_SE ]
 		guard
 			pic_order_cnt_type               = 1,
-			delta_pic_order_always_zero_flag = false
+			not delta_pic_order_always_zero_flag
 		end
 
 
@@ -523,8 +522,6 @@ actor Algo_DecodeSliceHeader()
 	CalcPOC4PocType1: action
 			==>
 		Poc :[POC_val]
-	guard
-		first_mb_in_slice=0
 	var 
 /*		int TopFieldOrderCnt,
 		int BottomFieldOrderCnt,*/
@@ -827,10 +824,8 @@ actor Algo_DecodeSliceHeader()
 		DecodeRefPicList               (RefPicList.Launch                 )--> SendSliceDataParameters;
 
 		SendSliceDataParameters        (SendSliceDataParameters           )-->                             DecodeDecRefPicMarking;//DecodeWeightedPred;
-		//DecodeWeightedPred           (WeightedPred.GetVLDVal            )--> DecodeWeightedPred;
-		//DecodeWeightedPred           (WeightedPred.AskVLD               )--> DecodeWeightedPred;
-		//DecodeWeightedPred           (WeightedPred.AskReadBits          )--> DecodeWeightedPred;
-		//DecodeWeightedPred           (WeightedPred.Done                 )--> DecodeDecRefPicMarking;
+		//DecodeWeightedPred           (LaunchWeightedPred                )--> ...;
+
 
 		DecodeDecRefPicMarking         (DecRefPicMarking.Launch           )--> CheckEntropyCodingMode;
 
