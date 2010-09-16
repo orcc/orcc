@@ -97,6 +97,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="a">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
     </Instance>
     <Instance id="Algo_DC_Transpose4x4_1">
         <!-- ************************* -->

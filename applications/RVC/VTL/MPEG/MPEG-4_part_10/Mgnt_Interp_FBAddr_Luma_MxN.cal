@@ -31,6 +31,9 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		int(size=16) Coef_ACR_P,
 		uint(size=1) PicID
 	:
+
+	bool DEBUG_INPUT = false;
+
   int(size=32) x_index ;
   int(size=32) y_index ;
   uint(size=11) Picheight_l := 1;
@@ -54,6 +57,12 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   guard
   	a = 4
   do
+	if(DEBUG_INPUT)then
+		println("Input InterpFBAddrLuma Mb_Type:"+a);	
+		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
+		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
+		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);	
+	end
   	currMB:=valCurrMbAddr;
   	pic_size:=c;
   end
@@ -63,6 +72,16 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   guard
   	a = 0 or a = 1
   do
+	if(DEBUG_INPUT)then
+		println("Input InterpFBAddrLuma Mb_Type:"+a);	
+		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
+		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
+		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);
+		foreach int i in 0 .. 255
+		do
+			println("Input InterpFBAddrLuma Coef_ACR["+i+"]:"+d[i]);	
+		end
+	end
   	currMB:=valCurrMbAddr;
   	pic_size:=c;
   end
@@ -72,6 +91,16 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   guard
   	a = 2
   do 
+	if(DEBUG_INPUT)then
+		println("Input InterpFBAddrLuma Mb_Type:"+a);	
+		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
+		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
+		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);
+		foreach int i in 0 .. 255
+		do
+			println("Input InterpFBAddrLuma Coef_ACR["+i+"]:"+d[i]);	
+		end
+	end
     Picwidth_l := lshift(b,4);
     Picheight_l := lshift(c/b,4);
   	currMB:=valCurrMbAddr;
@@ -80,6 +109,12 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   
   get_pos: action MbPartIdx:[idx], Location:[ a, b ], PartSZ:[ c, d ], RefIdx:[ e ] ==>
   do
+	if(DEBUG_INPUT)then
+		println("Input InterpFBAddrLuma MbPartIdx:"+idx);	
+		println("Input InterpFBAddrLuma Location:"+a+" ; "+b);	
+		println("Input InterpFBAddrLuma PartSZ:"+c+" ; "+d);	
+		println("Input InterpFBAddrLuma RefIdx:"+e);
+	end
     x := a;
     y := b;
     width := c;
@@ -113,6 +148,9 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   var
     uint(size=16) frac_x, uint(size=16) frac_y
   do
+	if(DEBUG_INPUT)then
+		println("Input InterpFBAddrLuma MV:"+mx+" ; "+my);
+	end
     x_index :=rshift (mx, 2);        
     y_index :=rshift (my, 2);
     o_x := x + x_index-2;
@@ -172,6 +210,9 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   PIC_done: action Write_Done:[w_done]==> PicID     : [ValPicID]
   guard currMB=pic_size-1
   do
+	if(DEBUG_INPUT)then
+		println("Input InterpFBAddrLuma Write_Done:"+w_done);
+	end
   	ValPicID := ValPicID + 1;
   end
 

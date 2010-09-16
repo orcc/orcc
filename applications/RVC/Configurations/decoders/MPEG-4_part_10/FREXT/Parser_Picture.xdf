@@ -911,4 +911,6 @@
         src="GenerateSkipBlockInformation" src-port="Last"/>
     <Connection dst="DecodeSliceHeader" dst-port="RstPrevFrameNum"
         src="" src-port="ResetPrevFrameNum"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="ValQpFeedback"
+        src="DecodeMacroBlockLayer" src-port="QpFeedback"/>
 </XDF>

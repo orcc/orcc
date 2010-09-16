@@ -192,6 +192,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="a">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

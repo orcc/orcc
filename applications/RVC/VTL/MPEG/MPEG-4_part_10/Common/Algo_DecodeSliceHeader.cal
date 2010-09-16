@@ -84,7 +84,6 @@ actor Algo_DecodeSliceHeader()
 	uint(size=4) SLICE_TYPE_SI = 4;
 
 	bool DEBUG_FLAG_DECODED = false;
-	bool DEBUG_OUTUPUT      = false;
 /*
 *
 * State variables
@@ -414,7 +413,7 @@ actor Algo_DecodeSliceHeader()
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tpic_order_cnt_lsb: "+ValueOfVLD);
 			end
-			if(DEBUG_OUTUPUT)then
+			if(DEBUG_FLAG_DECODED)then
 				println("PocVal: "+POC_val);
 			end
 		end
@@ -459,7 +458,7 @@ actor Algo_DecodeSliceHeader()
 						((frame_num_offset + frame_num) * 2) - 1
 					end
 				end;
-			if(DEBUG_OUTUPUT)then
+			if(DEBUG_FLAG_DECODED)then
 				println("PocVal: "+POC_val);
 			end
 		end

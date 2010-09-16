@@ -1446,7 +1446,7 @@ actor Algo_Synp_AVC_FREXT()
 	********       		Residual		    	    *********
 	*************************************************************
 	*************************************************************/
-	bool DEBUG_FLAG_NEW_PARSER = true;
+	bool DEBUG_FLAG_NEW_PARSER = false;
 	bool DEBUG_OUTPUT_NEW_PARSER = false;
 	uint(size=1) bmFlag;
 	uint(size=4) startIdx;
@@ -5952,8 +5952,6 @@ actor Algo_Synp_AVC_FREXT()
 		int expected_delta_per_poc_cycle := 0, 
 		int expectedpoc := 0
 	do
-		println("prev_frame_num_offset:"+prev_frame_num_offset);
-		println("log2_max_frame_num:"+(log2_max_frame_num_minus4[sps_id]+4));
 		//println("CalcPOC");
 		if nal_unit_type = 5 then 
 			frame_num_offset := 0;
@@ -5964,7 +5962,6 @@ actor Algo_Synp_AVC_FREXT()
 				frame_num_offset := prev_frame_num_offset;
 			end
 		end
-		println("frame_num_offset:"+frame_num_offset);
 		if pic_order_cnt_type[sps_id] = 0 then 
 			if nal_unit_type = 5 then
 				prevPicOrderCntMsb := 0;
