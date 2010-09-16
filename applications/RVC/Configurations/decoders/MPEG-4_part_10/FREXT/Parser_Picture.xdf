@@ -190,6 +190,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="ResetPrevFrameNum">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -906,4 +909,6 @@
     <Connection dst="" dst-port="Value" src="DecodeResidualBlock_Cavlc" src-port="Value"/>
     <Connection dst="" dst-port="Last"
         src="GenerateSkipBlockInformation" src-port="Last"/>
+    <Connection dst="DecodeSliceHeader" dst-port="RstPrevFrameNum"
+        src="" src-port="ResetPrevFrameNum"/>
 </XDF>

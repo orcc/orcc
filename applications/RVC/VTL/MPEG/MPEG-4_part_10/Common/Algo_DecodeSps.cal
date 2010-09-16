@@ -89,7 +89,7 @@ actor Algo_DecodeSps()
 	uint(size=4) SKIP_NAL  = 10;
 
 
-	bool DEBUG_FLAG_DECODED = true;
+	bool DEBUG_FLAG_DECODED = false;
 /*
 *
 * State Variables
@@ -213,7 +213,7 @@ actor Algo_DecodeSps()
 				==>
 			OffsetForRefFrameAccumul:[offset_for_ref_frame_accumul[sps_id][LoopVal]]
 		guard
-			LoopVal < num_ref_frames_in_pic_order_cnt_cycle[sps_id]
+			LoopVal <= num_ref_frames_in_pic_order_cnt_cycle[sps_id]
 		do
 			LoopVal := LoopVal + 1;
 		end
@@ -390,10 +390,10 @@ actor Algo_DecodeSps()
 		guard
 			LoopVal < num_ref_frames_in_pic_order_cnt_cycle[sps_id] - 1
 		do
-			offset_for_ref_frame[sps_id][LoopVal]         := ValueOfVLD;
-			expected_delta_per_poc_cycle[sps_id]          := expected_delta_per_poc_cycle[sps_id] + ValueOfVLD;
-			offset_for_ref_frame_accumul[sps_id][LoopVal] := PrevOffForRefFramAccum + ValueOfVLD;
-			PrevOffForRefFramAccum                        := PrevOffForRefFramAccum + ValueOfVLD;
+			offset_for_ref_frame[sps_id][LoopVal]           := ValueOfVLD;
+			expected_delta_per_poc_cycle[sps_id]            := expected_delta_per_poc_cycle[sps_id] + ValueOfVLD;
+			offset_for_ref_frame_accumul[sps_id][LoopVal+1] := PrevOffForRefFramAccum + ValueOfVLD;
+			PrevOffForRefFramAccum                          := PrevOffForRefFramAccum + ValueOfVLD;
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\toffset_for_ref_frame["+LoopVal+"] : "+ValueOfVLD);
 			end
@@ -405,11 +405,11 @@ actor Algo_DecodeSps()
 			ValVLD :[ValueOfVLD]
 				==>
 		do
-			offset_for_ref_frame[sps_id][LoopVal]         := ValueOfVLD;
-			offset_for_ref_frame_accumul[sps_id][LoopVal] := PrevOffForRefFramAccum + ValueOfVLD;
-			expected_delta_per_poc_cycle[sps_id]          := expected_delta_per_poc_cycle[sps_id] + ValueOfVLD;
+			offset_for_ref_frame[sps_id][LoopVal]           := ValueOfVLD;
+			offset_for_ref_frame_accumul[sps_id][LoopVal+1] := PrevOffForRefFramAccum + ValueOfVLD;
+			expected_delta_per_poc_cycle[sps_id]            := expected_delta_per_poc_cycle[sps_id] + ValueOfVLD;
 			if(DEBUG_FLAG_DECODED)then
-				println("\t\toffset_for_ref_frame["+LoopVal+"] : "+ValueOfVLD);
+				println("\t\toffset_for_ref_frame["+(LoopVal+1)+"] : "+ValueOfVLD);
 			end
 		end
 

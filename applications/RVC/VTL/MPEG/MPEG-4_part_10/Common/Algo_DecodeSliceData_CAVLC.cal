@@ -111,7 +111,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int SZ_TOTALCOEFF          = 128;
 	int MASK_TOTALCOEFF        = 127;
 
-	bool DEBUG_FLAG_DECODED = true;
+	bool DEBUG_FLAG_DECODED = false;
 
 
 	List (type:uint(size=6),size=64) QP_TAB := 

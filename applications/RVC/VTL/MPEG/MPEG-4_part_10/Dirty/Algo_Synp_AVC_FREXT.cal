@@ -1446,7 +1446,7 @@ actor Algo_Synp_AVC_FREXT()
 	********       		Residual		    	    *********
 	*************************************************************
 	*************************************************************/
-	bool DEBUG_FLAG_NEW_PARSER = false;
+	bool DEBUG_FLAG_NEW_PARSER = true;
 	bool DEBUG_OUTPUT_NEW_PARSER = false;
 	uint(size=1) bmFlag;
 	uint(size=4) startIdx;
@@ -5898,6 +5898,9 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_delta_pic_order_cnt0_done");
 		delta_pic_order_cnt[0] := vld_se();
+		if(DEBUG_FLAG_NEW_PARSER)then
+			println("\t\tdelta_pic_order_cnt[0]: "+delta_pic_order_cnt[0]);
+		end	
 	end
 
 	read_SliceH_delta_pic_order_cnt1: action ==>
@@ -5916,6 +5919,9 @@ actor Algo_Synp_AVC_FREXT()
 	do
 		//println("read_SliceH_delta_pic_order_cnt1_done");
 		delta_pic_order_cnt[1] := vld_se();
+		if(DEBUG_FLAG_NEW_PARSER)then
+			println("\t\tdelta_pic_order_cnt[1]: "+delta_pic_order_cnt[1]);
+		end
 	end
 
 	//else (!pic_order_present_flag || field_pic_flag )
@@ -5946,6 +5952,8 @@ actor Algo_Synp_AVC_FREXT()
 		int expected_delta_per_poc_cycle := 0, 
 		int expectedpoc := 0
 	do
+		println("prev_frame_num_offset:"+prev_frame_num_offset);
+		println("log2_max_frame_num:"+(log2_max_frame_num_minus4[sps_id]+4));
 		//println("CalcPOC");
 		if nal_unit_type = 5 then 
 			frame_num_offset := 0;
@@ -5956,6 +5964,7 @@ actor Algo_Synp_AVC_FREXT()
 				frame_num_offset := prev_frame_num_offset;
 			end
 		end
+		println("frame_num_offset:"+frame_num_offset);
 		if pic_order_cnt_type[sps_id] = 0 then 
 			if nal_unit_type = 5 then
 				prevPicOrderCntMsb := 0;
@@ -6007,7 +6016,7 @@ actor Algo_Synp_AVC_FREXT()
 if TRACE_POC then
 println("POC "+ POC_val);
 end
-		if(DEBUG_OUTPUT_NEW_PARSER) then
+		if(DEBUG_FLAG_NEW_PARSER) then
 				println("PocVal: "+POC_val);
 		end
 	end

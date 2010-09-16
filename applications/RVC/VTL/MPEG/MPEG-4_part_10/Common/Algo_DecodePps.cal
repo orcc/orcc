@@ -54,7 +54,7 @@ actor Algo_DecodePps(bool IsCBP)
 	uint(size=3) VLD_SE    = 2;
 	uint(size=4) SKIP_NAL  = 10;
 
-	bool DEBUG_FLAG_DECODED = true;
+	bool DEBUG_FLAG_DECODED = false;
 
 /*   
 *

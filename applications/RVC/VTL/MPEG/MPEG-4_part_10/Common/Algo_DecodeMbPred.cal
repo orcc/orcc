@@ -40,7 +40,7 @@ actor Algo_DecodeMbPred()
 		:
 
 	bool DEBUG_MV = false;
-	bool DEBUG_FLAG_DECODED = true;
+	bool DEBUG_FLAG_DECODED = false;
 
 	uint(size=3) READ_BITS = 0;
 	uint(size=3) VLD_UE    = 1;
