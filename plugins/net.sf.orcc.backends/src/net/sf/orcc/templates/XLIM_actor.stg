@@ -324,6 +324,7 @@ $procedure.nodes: {$(it.class.simpleName)(it)$}$
 ///////////////////////////////////////////////////////////////////////////////
 
 action(action) ::= <<
+<!--Action $action.name$ -->
 <module autostart="false" kind="action" name="$action.name$">
 	$action.body.nodes: nodes(); separator="\n"$
 </module> 
