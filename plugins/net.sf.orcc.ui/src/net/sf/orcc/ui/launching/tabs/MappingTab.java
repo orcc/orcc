@@ -34,12 +34,15 @@ import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.util.CollectionsUtil;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -48,7 +51,6 @@ import org.eclipse.debug.ui.AbstractLaunchConfigurationTab;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -157,19 +159,16 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 
 		@Override
 		protected Object getValue(Object element) {
-			if (element instanceof Instance) {
-				Instance instance = (Instance) element;
-				String component = mapping.get(instance.getHierarchicalPath());
-				if (component != null) {
-					return component;
-				}
+			String component = labelProvider.getColumnText(element, 1);
+			if (component != null) {
+				return component;
 			}
 
 			return "";
 		}
 
 		private void setMapping(Instance instance, String component) {
-			mapping.put(instance.getHierarchicalPath(), (String) component);
+			mapping.put(instance.getHierarchicalPath(), component);
 			if (instance.isNetwork()) {
 				Network network = instance.getNetwork();
 				for (Instance subInstance : network.getInstances()) {
@@ -183,6 +182,9 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			if (element instanceof Instance) {
 				Instance instance = (Instance) element;
 				String component = (String) value;
+				if (component == null || component.contains(",")) {
+					return;
+				}
 				setMapping(instance, component);
 			}
 
@@ -221,33 +223,53 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 			} else {
 				if (element instanceof Instance) {
 					Instance instance = (Instance) element;
-					return mapping.get(instance.getHierarchicalPath());
+					if (instance.isNetwork()) {
+						Set<String> subComponents = new TreeSet<String>();
+						getComponents(subComponents, instance);
+						return CollectionsUtil.toString(subComponents, ", ");
+					} else {
+						return mapping.get(instance.getHierarchicalPath());
+					}
 				}
 			}
 
 			return null;
 		}
 
+		/**
+		 * Fills the components set with all the components that instance and if
+		 * instance is a network, its sub-instances too, are mapped to.
+		 * 
+		 * @param components
+		 *            a set of components
+		 * @param instance
+		 *            an instance
+		 */
+		private void getComponents(Set<String> components, Instance instance) {
+			String component = mapping.get(instance.getHierarchicalPath());
+			if (component != null) {
+				components.add(component);
+			}
+
+			if (instance.isNetwork()) {
+				Network network = instance.getNetwork();
+				for (Instance subInstance : network.getInstances()) {
+					getComponents(components, subInstance);
+				}
+			}
+		}
+
 		@Override
 		public String getText(Object element) {
-			if (element instanceof Network) {
-				Network network = (Network) element;
-				return network.getName();
-			}
-
-			if (element instanceof Instance) {
-				Instance instance = (Instance) element;
-				return instance.getId();
-			}
-
-			return null;
+			// only getColumnText should be called
+			return "";
 		}
 
 	}
 
 	private IContentProvider contentProvider;
 
-	private ILabelProvider labelProvider;
+	private ITableLabelProvider labelProvider;
 
 	private Map<String, String> mapping;
 
