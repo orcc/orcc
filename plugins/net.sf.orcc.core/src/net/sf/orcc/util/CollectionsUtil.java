@@ -80,7 +80,7 @@ public class CollectionsUtil {
 		if (it.hasNext()) {
 			builder.append(it.next());
 			while (it.hasNext()) {
-				builder.append(", ");
+				builder.append(sep);
 				builder.append(it.next());
 			}
 		}
