@@ -30,6 +30,7 @@ package net.sf.orcc.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -60,6 +61,31 @@ public class CollectionsUtil {
 		}
 
 		return list;
+	}
+
+	/**
+	 * Returns a string that contains all objects separated with the given
+	 * separator.
+	 * 
+	 * @param objects
+	 *            an iterable of objects
+	 * @param sep
+	 *            a separator string
+	 * @return a string that contains all objects separated with the given
+	 *         separator
+	 */
+	public static String toString(Iterable<? extends Object> objects, String sep) {
+		StringBuilder builder = new StringBuilder();
+		Iterator<? extends Object> it = objects.iterator();
+		if (it.hasNext()) {
+			builder.append(it.next());
+			while (it.hasNext()) {
+				builder.append(", ");
+				builder.append(it.next());
+			}
+		}
+
+		return builder.toString();
 	}
 
 }

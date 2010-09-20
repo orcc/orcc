@@ -29,13 +29,13 @@
 package net.sf.orcc.cal.naming;
 
 import java.util.Collections;
-import java.util.Iterator;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.util.CollectionsUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
@@ -149,17 +149,7 @@ public class CalQualifiedNameProvider extends
 	}
 
 	public String qualifiedName(AstTag tag) {
-		Iterator<String> it = tag.getIdentifiers().iterator();
-		StringBuilder builder = new StringBuilder();
-		if (it.hasNext()) {
-			builder.append(it.next());
-			while (it.hasNext()) {
-				builder.append('.');
-				builder.append(it.next());
-			}
-		}
-
-		return builder.toString();
+		return CollectionsUtil.toString(tag.getIdentifiers(), ".");
 	}
 
 	/**
