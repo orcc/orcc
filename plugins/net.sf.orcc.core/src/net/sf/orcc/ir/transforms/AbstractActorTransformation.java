@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -67,7 +68,7 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	protected Procedure procedure;
 
 	@Override
-	public void transform(Actor actor) {
+	public void transform(Actor actor) throws OrccException {
 		for (Procedure proc : actor.getProcs()) {
 			visitProcedure(proc);
 		}

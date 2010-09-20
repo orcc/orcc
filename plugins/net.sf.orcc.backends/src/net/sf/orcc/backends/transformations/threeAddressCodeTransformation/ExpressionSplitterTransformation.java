@@ -26,12 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations;
+package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -44,11 +46,15 @@ import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.AbstractNode;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -57,13 +63,15 @@ import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
- * Split expression and effective node.
+ * Split expression and effective node that contains more than one fundamental
+ * operation into a series of simple expressions.
  * 
  * @author Jérôme GORIN
  * @author Matthieu Wipliez
  * 
  */
-public class ThreeAddressCodeTransformation extends AbstractActorTransformation {
+public class ExpressionSplitterTransformation extends
+		AbstractActorTransformation {
 	private class ExpressionSplitter extends AbstractExpressionInterpreter {
 
 		@Override
@@ -91,11 +99,59 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			return new VarExpr(location, new Use(target));
 		}
 
+		@Override
+		public Object interpret(UnaryExpr expr, Object... args) {
+			Location location = expr.getLocation();
+			Expression varExpr = expr.getExpr();
+			Type type = expr.getType();
+
+			varExpr = (Expression) varExpr.accept(this, args);
+
+			BinaryExpr binaryExpr = transformUnaryExpr(expr.getOp(), varExpr);
+
+			// Make a new assignment to the binary expression
+			LocalVariable target = procedure.newTempLocalVariable(file, type,
+					procedure.getName() + "_" + "expr");
+			Assign assign = new Assign(location, target, binaryExpr);
+
+			// Add assignement to instruction's list
+			instrs.add(assign);
+
+			return new VarExpr(location, new Use(target));
+		}
+
+		public BinaryExpr transformUnaryExpr(UnaryOp op, Expression expr) {
+			Location loc = expr.getLocation();
+			Expression constExpr;
+			Type type = expr.getType();
+
+			switch (op) {
+			case MINUS:
+				constExpr = new IntExpr(0);
+				return new BinaryExpr(loc, constExpr, BinaryOp.MINUS, expr,
+						type);
+			case LOGIC_NOT:
+				constExpr = new BoolExpr(new Location(), false);
+				return new BinaryExpr(loc, expr, BinaryOp.EQ, constExpr, type);
+			case BITNOT:
+				return new BinaryExpr(loc, expr, BinaryOp.BITXOR, expr, type);
+			default:
+				throw new OrccRuntimeException("unsupported operator");
+
+			}
+		}
+
 	}
 
+	ExpressionSplitter expressionSplitter;
 	private String file;
 
 	private List<Instruction> instrs;
+
+	public ExpressionSplitterTransformation() {
+		expressionSplitter = new ExpressionSplitter();
+		instrs = new ArrayList<Instruction>();
+	}
 
 	/**
 	 * Returns an iterator over the last instruction of the previous block. A
@@ -113,9 +169,9 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 			CFGNode previous = it.previous();
 			it.next();
 
-			if (previous instanceof BlockNode) {
+			if (previous.isBlockNode()) {
 				block = ((BlockNode) previous);
-			} else if (previous instanceof IfNode) {
+			} else if (previous.isIfNode()) {
 				block = ((IfNode) previous).getJoinNode();
 			} else {
 				block = ((WhileNode) previous).getJoinNode();
@@ -131,7 +187,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void transform(Actor actor) throws OrccException {
 		this.file = actor.getFile();
 		super.transform(actor);
 	}
@@ -142,29 +198,32 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = assign.getValue();
 
-		if (value instanceof BinaryExpr) {
+		if (value.isBinaryExpr()) {
 			BinaryExpr binExpr = (BinaryExpr) value;
 			Expression e1 = binExpr.getE1();
 			Expression e2 = binExpr.getE2();
 
-			if ((e1 instanceof BinaryExpr) || (e1 instanceof UnaryExpr)) {
+			if (e1.isBinaryExpr() || e1.isUnaryExpr()) {
+				// Split expression e1
 				it.previous();
 				binExpr.setE1(visitExpression(e1, it));
 				it.next();
-
 			}
 
-			if ((e2 instanceof BinaryExpr) || (e2 instanceof UnaryExpr)) {
+			if (e2.isBinaryExpr() || e2.isUnaryExpr()) {
+				// Split expression e2
 				it.previous();
 				binExpr.setE2(visitExpression(e2, it));
 				it.next();
 			}
-
-		} else if (value instanceof UnaryExpr) {
+		} else if (value.isUnaryExpr()) {
 			UnaryExpr unaryExpr = (UnaryExpr) value;
 			it.previous();
 
-			unaryExpr.setExpr(visitExpression(unaryExpr.getExpr(), it));
+			// Transform unary expression into binary expression
+			Expression newExpr = visitExpression(unaryExpr.getExpr(), it);
+			assign.setValue(expressionSplitter.transformUnaryExpr(
+					unaryExpr.getOp(), newExpr));
 
 			it.next();
 		}
@@ -176,8 +235,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		List<Expression> parameters = call.getParameters();
 		for (Expression parameter : parameters) {
-			if ((parameter instanceof BinaryExpr)
-					|| (parameter instanceof UnaryExpr)) {
+			if (parameter.isBinaryExpr() || parameter.isUnaryExpr()) {
 				it.previous();
 				Expression newParameter = visitExpression(parameter, it);
 				parameters.set(parameters.indexOf(parameter), newParameter);
@@ -191,7 +249,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 	public void visit(IfNode ifNode, Object... args) {
 		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
 		Expression value = ifNode.getValue();
-		if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 			ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it)));
 		}
 		super.visit(ifNode, args);
@@ -204,12 +262,24 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		List<Expression> indexes = load.getIndexes();
 
 		for (Expression value : load.getIndexes()) {
-			if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+			if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 				it.previous();
 				Expression newValue = visitExpression(value, it);
 				load.getIndexes().set(indexes.indexOf(value), newValue);
 				it.next();
 			}
+		}
+
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void visit(Return returnInstr, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		if (returnInstr.getValue() != null) {
+			it.previous();
+			returnInstr.setValue(visitExpression(returnInstr.getValue(), it));
+			it.next();
 		}
 	}
 
@@ -220,7 +290,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		List<Expression> indexes = store.getIndexes();
 
 		for (Expression value : store.getIndexes()) {
-			if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+			if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 				it.previous();
 				Expression newValue = visitExpression(value, it);
 				store.getIndexes().set(indexes.indexOf(value), newValue);
@@ -229,7 +299,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		}
 
 		Expression value = store.getValue();
-		if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 			it.previous();
 			Expression newValue = visitExpression(value, it);
 			store.setValue(newValue);
@@ -247,7 +317,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		}
 
 		Expression value = whileNode.getValue();
-		if ((value instanceof BinaryExpr) || (value instanceof UnaryExpr)) {
+		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 			Expression expr = visitExpression(whileNode.getValue(), it);
 			whileNode.setValue(expr);
 		}
@@ -257,8 +327,8 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 
 	private Expression visitExpression(Expression value,
 			ListIterator<Instruction> it) {
-		instrs = new ArrayList<Instruction>();
-		Expression expr = (Expression) value.accept(new ExpressionSplitter());
+		instrs.clear();
+		Expression expr = (Expression) value.accept(expressionSplitter);
 
 		for (Instruction instr : instrs) {
 			it.add(instr);

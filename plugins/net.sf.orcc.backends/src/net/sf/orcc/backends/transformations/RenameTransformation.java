@@ -31,6 +31,7 @@ package net.sf.orcc.backends.transformations;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
@@ -92,7 +93,7 @@ public class RenameTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void transform(Actor actor) throws OrccException {
 		checkVariables(actor.getParameters());
 		checkVariables(actor.getStateVars());
 

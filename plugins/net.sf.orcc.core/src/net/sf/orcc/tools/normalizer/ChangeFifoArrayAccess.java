@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -61,7 +62,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 	private OrderedMap<String, StateVariable> stateVars;
 
 	@Override
-	public void transform(Actor actor) {
+	public void transform(Actor actor) throws OrccException {
 		stateVars = actor.getStateVars();
 		super.transform(actor);
 	}

@@ -31,6 +31,7 @@ package net.sf.orcc.ir.transforms;
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -95,7 +96,7 @@ public class DeadCodeElimination extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) {
+	public void transform(Actor actor) throws OrccException {
 		// remove dead ifs and whiles
 		super.transform(actor);
 

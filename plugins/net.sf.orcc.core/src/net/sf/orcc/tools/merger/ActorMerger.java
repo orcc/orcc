@@ -97,16 +97,16 @@ public class ActorMerger implements INetworkTransformation {
 
 	private class ModifyAccessAsRingBuffer extends AbstractActorTransformation {
 
-		private OrderedMap<String, StateVariable> stateVars;
-
 		private String id;
+
+		private OrderedMap<String, StateVariable> stateVars;
 
 		public ModifyAccessAsRingBuffer(String id) {
 			this.id = id;
 		}
 
 		@Override
-		public void transform(Actor actor) {
+		public void transform(Actor actor) throws OrccException {
 			stateVars = actor.getStateVars();
 			super.transform(actor);
 		}
@@ -158,27 +158,64 @@ public class ActorMerger implements INetworkTransformation {
 
 	private static final String SCHEDULER_NAME = "isSchedulable_" + ACTION_NAME;
 
+	private Actor actor;
+
+	private Map<Connection, Variable> buffersMap;
+
 	private int clusterIdx = 0;
 
+	private int depth = 0;
+
 	private DirectedGraph<Vertex, Connection> graph;
+
+	private List<LocalVariable> indexes;
+
+	private Map<Connection, Port> inputPorts;
+
+	private Map<Connection, Port> outputPorts;
+
+	private Map<String, Variable> portsMap;
 
 	private IScheduler scheduler;
 
 	private OrderedMap<String, Variable> variables;
 
-	private List<LocalVariable> indexes;
+	/**
+	 * @throws OrccException
+	 * 
+	 */
+	private void addProceduresAndStateVars() throws OrccException {
+		for (Vertex vertex : scheduler.getSchedule().getActors()) {
+			Instance instance = vertex.getInstance();
 
-	private int depth = 0;
+			for (StateVariable var : instance.getActor().getStateVars()) {
+				var.setName(instance.getId() + "_" + var.getName());
+				actor.getStateVars().put(var.getName(), var);
+			}
 
-	private Map<Connection, Port> outputPorts;
+			for (Procedure proc : instance.getActor().getProcs()) {
+				proc.setName(instance.getId() + "_" + proc.getName());
+				actor.getProcs().put(proc.getName(), proc);
+			}
+		}
+	}
 
-	private Map<Connection, Port> inputPorts;
+	private void addStateVariables() {
+		OrderedMap<String, StateVariable> stateVars = actor.getStateVars();
 
-	private Map<String, Variable> portsMap;
+		for (Variable var : buffersMap.values()) {
+			stateVars.put(var.getName(), (StateVariable) var);
 
-	private Map<Connection, Variable> buffersMap;
-
-	private Actor actor;
+			StateVariable rCount = new StateVariable(new Location(),
+					IrFactory.eINSTANCE.createTypeUint(32), var.getName()
+							+ "_r", true, 0);
+			stateVars.put(rCount.getName(), rCount);
+			StateVariable wCount = new StateVariable(new Location(),
+					IrFactory.eINSTANCE.createTypeUint(32), var.getName()
+							+ "_w", true, 0);
+			stateVars.put(wCount.getName(), wCount);
+		}
+	}
 
 	/**
 	 * Creates the static action for this actor.
@@ -229,26 +266,6 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	/**
-	 * @throws OrccException
-	 * 
-	 */
-	private void addProceduresAndStateVars() throws OrccException {
-		for (Vertex vertex : scheduler.getSchedule().getActors()) {
-			Instance instance = vertex.getInstance();
-
-			for (StateVariable var : instance.getActor().getStateVars()) {
-				var.setName(instance.getId() + "_" + var.getName());
-				actor.getStateVars().put(var.getName(), var);
-			}
-
-			for (Procedure proc : instance.getActor().getProcs()) {
-				proc.setName(instance.getId() + "_" + proc.getName());
-				actor.getProcs().put(proc.getName(), proc);
-			}
-		}
-	}
-
-	/**
 	 * Creates the body of the static action.
 	 * 
 	 * @return the body of the static action
@@ -268,23 +285,6 @@ public class ActorMerger implements INetworkTransformation {
 		createLoopedSchedule(procedure, scheduler.getSchedule(), nodes);
 		createWrites(procedure);
 		return procedure;
-	}
-
-	private void addStateVariables() {
-		OrderedMap<String, StateVariable> stateVars = actor.getStateVars();
-
-		for (Variable var : buffersMap.values()) {
-			stateVars.put(var.getName(), (StateVariable) var);
-
-			StateVariable rCount = new StateVariable(new Location(),
-					IrFactory.eINSTANCE.createTypeUint(32), var.getName()
-							+ "_r", true, 0);
-			stateVars.put(rCount.getName(), rCount);
-			StateVariable wCount = new StateVariable(new Location(),
-					IrFactory.eINSTANCE.createTypeUint(32), var.getName()
-							+ "_w", true, 0);
-			stateVars.put(wCount.getName(), wCount);
-		}
 	}
 
 	/**

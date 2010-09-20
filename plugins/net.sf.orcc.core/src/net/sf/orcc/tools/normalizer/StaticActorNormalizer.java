@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.classes.CSDFActorClass;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -264,7 +265,7 @@ public class StaticActorNormalizer {
 	 * 
 	 * @return a static action
 	 */
-	private Action createAction() {
+	private Action createAction() throws OrccException {
 		Procedure scheduler = createScheduler();
 		Procedure body = createBody();
 
@@ -281,7 +282,7 @@ public class StaticActorNormalizer {
 	 * 
 	 * @return the body of the static action
 	 */
-	private Procedure createBody() {
+	private Procedure createBody() throws OrccException {
 		Location location = new Location();
 		variables = new OrderedMap<String, Variable>();
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
@@ -437,7 +438,7 @@ public class StaticActorNormalizer {
 	 * @param staticCls
 	 *            a static class
 	 */
-	public void normalize() {
+	public void normalize() throws OrccException {
 		Action staticAction = createAction();
 		cleanupActor();
 		addStaticAction(staticAction);

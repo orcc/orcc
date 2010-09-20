@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations;
+package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,17 +40,24 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
- * Remove instructions that directly assign a value or a variable to a target
+ * Replace occurrences with direct assignments to their corresponding values. A
+ * direct assignment is an assign instruction of form x = y, which simply
+ * assigns the value of y to x.
  * 
  * @author Jérôme GORIN
  * 
@@ -60,10 +67,36 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	private class ExpressionCopy extends AbstractExpressionInterpreter {
 
 		@Override
+		public Object interpret(BinaryExpr expr, Object... args) {
+			expr.setE1((Expression) expr.getE1().accept(this, args));
+			expr.setE2((Expression) expr.getE2().accept(this, args));
+			return expr;
+		}
+
+		@Override
+		public Object interpret(ListExpr expr, Object... args) {
+			List<Expression> values = expr.getValue();
+			for (Expression subExpr : values) {
+				Expression newSubExpr = (Expression) subExpr.accept(this, args);
+				if (subExpr != newSubExpr) {
+					values.set(values.indexOf(subExpr), newSubExpr);
+				}
+			}
+			return expr;
+		}
+
+		@Override
+		public Object interpret(UnaryExpr expr, Object... args) {
+			expr.setExpr((Expression) expr.getExpr().accept(this, args));
+			return expr;
+		}
+
+		@Override
 		public Object interpret(VarExpr expr, Object... args) {
 			Variable var = expr.getVar().getVariable();
+
 			if (copyVars.containsKey(var)) {
-				return copyVars.get(var);
+				return copyVars.get(var).accept(this, args);
 			}
 
 			return expr;
@@ -120,7 +153,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	public void visit(Assign assign, Object... args) {
 		Expression value = assign.getValue();
 
-		if ((!(value instanceof BinaryExpr)) && (!(value instanceof UnaryExpr))) {
+		if ((!value.isBinaryExpr()) && (!value.isUnaryExpr())) {
 			// Assign instruction can be remove
 			LocalVariable target = assign.getTarget();
 			Expression expr = assign.getValue();
@@ -128,17 +161,41 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 			// Set instruction and variable as to be remove
 			copyVars.put(target, expr);
 			removedInstrs.add(assign);
+		} else {
+
+			// Check if the expression can be propagate
+			Expression newExpr = (Expression) value
+					.accept(new ExpressionCopy());
+			assign.setValue(newExpr);
 		}
+	}
+
+	@Override
+	public void visit(Call call, Object... args) {
+		visitExpressions(call.getParameters());
+	}
+
+	@Override
+	public void visit(IfNode ifNode, Object... args) {
+		// Visit value of store
+		Expression value = ifNode.getValue();
+		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
+		ifNode.setValue(newExpr);
+
+		super.visit(ifNode, args);
+	}
+
+	@Override
+	public void visit(Load load, Object... args) {
+		// Visit indexes of load
+		visitExpressions(load.getIndexes());
 	}
 
 	//
 	@Override
 	public void visit(PhiAssignment phi, Object... args) {
-		List<Expression> values = phi.getValues();
-		for (Expression expr : phi.getValues()) {
-			Expression newExpr = (Expression) expr.accept(new ExpressionCopy());
-			values.set(values.indexOf(expr), newExpr);
-		}
+		visitExpressions(phi.getValues());
+
 	}
 
 	@Override
@@ -149,12 +206,34 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 			returnInstr.setValue(newExpr);
 		}
 	}
-	
+
 	@Override
 	public void visit(Store store, Object... args) {
+		// Visit value of store
 		Expression value = store.getValue();
 		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
 		store.setValue(newExpr);
+
+		// Visit indexes of store
+		visitExpressions(store.getIndexes());
+	}
+
+	@Override
+	public void visit(WhileNode whileNode, Object... args) {
+		Expression value = whileNode.getValue();
+		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
+		whileNode.setValue(newExpr);
+
+		super.visit(whileNode);
+	}
+
+	private void visitExpressions(List<Expression> expressions) {
+		for (Expression expr : expressions) {
+			Expression newExpr = (Expression) expr.accept(new ExpressionCopy());
+			if (expr != newExpr) {
+				expressions.set(expressions.indexOf(expr), newExpr);
+			}
+		}
 	}
 
 	@Override
@@ -166,5 +245,4 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 		removeInstructions(removedInstrs);
 		removeVariables(copyVars);
 	}
-
 }

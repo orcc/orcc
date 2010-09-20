@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,78 +26,44 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations;
+package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.TypeUint;
-import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.ir.transforms.BuildCFG;
 
 /**
- * This class defines a transformation that changes size of variable to fit
- * types of general-purpose programming language such as C, C++ or Java.
+ * Main transformation for applying three-address code form to actor IR.
+ * <p>
+ * This transformation is composed of 4 atomic transformation :
+ * <ul>
  * 
- * @author J�r�me Gorin
+ * <li>{@link #CopyPropagationTransformation()} that propagates copy of
+ * variables.</li>
+ * <li>{@link #ExpressionSplitterTransformation()} that splits complex
+ * expressions into fundamental operations.</li>
+ * <li>{@link #BuildCFG()} that builds a CFG of the actor IR.</li>
+ * <li>
+ * {@link #CastAdderTransformation()} that Add cast in the IR when necessary.</li>
+ * </ul>
+ * </p>
+ * 
+ * @author Jérôme GORIN
  * 
  */
-public class TypeSizeTransformation extends AbstractActorTransformation {
-
-	private void checkType(Type type) {
-		int size;
-
-		if (type.isInt()) {
-			TypeInt intType = (TypeInt) type;
-			size = getIntSize(intType.getSize());
-			intType.setSize(size);
-		} else if (type.isUint()) {
-			TypeUint uintType = (TypeUint) type;
-			size = getIntSize(uintType.getSize());
-			uintType.setSize(size);
-		} else if (type.isList()) {
-			TypeList listType = (TypeList) type;
-			checkType(listType.getType());
-		}
-	}
-
-	private void checkVariables(OrderedMap<String, ? extends Variable> variables) {
-		for (Variable variable : variables) {
-			checkType(variable.getType());
-		}
-	}
-
-	private int getIntSize(int size) {
-		if (size <= 8) {
-			return 8;
-		} else if (size <= 16) {
-			return 16;
-		} else if (size <= 32) {
-			return 32;
-		} else {
-			return 64;
-		}
-	}
-
+public class ThreeAddressCodeTransformation extends AbstractActorTransformation {
 	@Override
 	public void transform(Actor actor) throws OrccException {
-		checkVariables(actor.getParameters());
-		checkVariables(actor.getStateVars());
-		checkVariables(actor.getInputs());
-		checkVariables(actor.getOutputs());
+		ActorTransformation[] transformations = {
+				new CopyPropagationTransformation(),
+				new ExpressionSplitterTransformation(), new BuildCFG(),
+				new CastAdderTransformation() };
 
-		super.transform(actor);
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		checkVariables(procedure.getParameters());
-		checkVariables(procedure.getLocals());
-		checkType(procedure.getReturnType());
+		for (ActorTransformation transformation : transformations) {
+			transformation.transform(actor);
+		}
 	}
 
 }

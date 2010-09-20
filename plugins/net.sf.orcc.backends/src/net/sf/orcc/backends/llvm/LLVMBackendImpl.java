@@ -40,14 +40,11 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.llvm.transforms.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transforms.PrintlnTransformation;
-import net.sf.orcc.backends.transformations.CopyPropagationTransformation;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
-import net.sf.orcc.backends.transformations.ThreeAddressCodeTransformation;
-import net.sf.orcc.backends.transformations.TypeCheckerTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
+import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.transforms.BuildCFG;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
 
@@ -72,18 +69,15 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new TypeSizeTransformation(),
-				new BoolToIntTransformation(),
-				new PrintlnTransformation(),
-				new CopyPropagationTransformation(),
+				new BoolToIntTransformation(), new PrintlnTransformation(),
 				new ThreeAddressCodeTransformation(),
-				new TypeCheckerTransformation(),
-				new MoveReadsWritesTransformation(), new BuildCFG() };
+				new MoveReadsWritesTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
 
-		//Organize medata information for the current actor
+		// Organize medata information for the current actor
 		LLVMTemplateData templateData = new LLVMTemplateData(actor);
 		actor.setTemplateData(templateData.getTemplateData());
 	}
@@ -126,7 +120,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 			boolean llvmBitcode = getAttribute(
 					"net.sf.orcc.backends.llvmBitcode", false);
-					
+
 			if (llvmBitcode) {
 				String llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
 				if (!llvmAs.isEmpty()) {

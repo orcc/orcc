@@ -26,12 +26,15 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.transformations;
+package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
 import java.util.List;
 import java.util.ListIterator;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -46,15 +49,19 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
- * Check and correct type of expressions
+ * Add cast in IR in the form of assign instruction where target's type differs
+ * from source type.
  * 
  * @author Jérôme GORIN
  * 
  */
-public class TypeCheckerTransformation extends AbstractActorTransformation {
+public class CastAdderTransformation extends AbstractActorTransformation {
 
 	private class ExpressionTypeChecker extends AbstractExpressionInterpreter {
 		private ListIterator<Instruction> it;
@@ -77,14 +84,14 @@ public class TypeCheckerTransformation extends AbstractActorTransformation {
 			BinaryOp op = expr.getOp();
 			Expression e1 = expr.getE1();
 			Expression e2 = expr.getE2();
-		
-			if (op.isComparison()){
+
+			if (op.isComparison()) {
 				e2 = (Expression) e2.accept(this, e1.getType());
-			}else{
+			} else {
 				e1 = (Expression) e1.accept(this, type);
 				e2 = (Expression) e2.accept(this, type);
 			}
-			
+
 			expr.setE1(e1);
 			expr.setE2(e2);
 
@@ -95,12 +102,16 @@ public class TypeCheckerTransformation extends AbstractActorTransformation {
 		public Object interpret(VarExpr expr, Object... args) {
 			Type type = (Type) args[0];
 
-			if (!expr.getType().equals(type)) {
+			Cast cast = new Cast(expr.getType(), type);
+
+			if (cast.isExtended() || cast.isTrunced()) {
 				Location location = expr.getLocation();
 
 				// Make a new assignment to the binary expression
 				LocalVariable target = procedure.newTempLocalVariable(file,
 						type, procedure.getName() + "_" + "expr");
+
+				target.setIndex(1);
 
 				VarExpr varExpr = new VarExpr(location, new Use(target));
 
@@ -120,7 +131,7 @@ public class TypeCheckerTransformation extends AbstractActorTransformation {
 	private String file;
 
 	@Override
-	public void transform(Actor actor) {
+	public void transform(Actor actor) throws OrccException {
 		this.file = actor.getFile();
 		super.transform(actor);
 	}
@@ -130,32 +141,72 @@ public class TypeCheckerTransformation extends AbstractActorTransformation {
 	public void visit(Assign assign, Object... args) {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = assign.getValue();
-		if (value instanceof BinaryExpr) {
+		if (value.isBinaryExpr()) {
 			it.previous();
-			
+
 			assign.getValue().accept(new ExpressionTypeChecker(it),
 					value.getType());
-			
+
 			it.next();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void visit(Call call, Object... args) {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		List<Expression> parameters = call.getParameters();
 		Procedure procedure = call.getProcedure();
-		if (! procedure.isExternal()){
-			List<Variable> variables = call.getProcedure().getParameters().getList();
-		
+		if (!procedure.isExternal()) {
+			List<Variable> variables = call.getProcedure().getParameters()
+					.getList();
+
 			for (Expression parameter : parameters) {
-				Variable variable = variables.get(parameters.indexOf(parameter));
+				Variable variable = variables
+						.get(parameters.indexOf(parameter));
 				it.previous();
-				Expression newParam = (Expression)parameter.accept(new ExpressionTypeChecker(it), variable.getType());
+				Expression newParam = (Expression) parameter.accept(
+						new ExpressionTypeChecker(it), variable.getType());
 				parameters.set(parameters.indexOf(parameter), newParam);
 				it.next();
 			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void visit(PhiAssignment phi, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		List<Expression> values = phi.getValues();
+		Type type = phi.getTarget().getType();
+
+		for (Expression value : values) {
+			int indexValue = values.indexOf(value);
+			CFGNode node = phi.getBlock().getPredecessors().get(indexValue);
+
+			if (node.isBlockNode()) {
+				it = ((BlockNode) node).lastListIterator();
+			}
+			Expression newValue = (Expression) value.accept(
+					new ExpressionTypeChecker(it), type);
+			values.set(indexValue, newValue);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void visit(Return returnInstr, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		Type returnType = procedure.getReturnType();
+
+		if ((returnType != null) && (!returnType.isVoid())) {
+
+			it.previous();
+			Expression value = returnInstr.getValue();
+			Expression newValue = (Expression) value.accept(
+					new ExpressionTypeChecker(it), returnType);
+			returnInstr.setValue(newValue);
+			it.next();
 		}
 	}
 }
