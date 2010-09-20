@@ -987,7 +987,7 @@ public class AstTransformer {
 				VarExpr value = new VarExpr(new Use(local));
 
 				List<Expression> indexes = new ArrayList<Expression>(0);
-				Store store = new Store(global, indexes, value);
+				Store store = new Store(location, global, indexes, value);
 				addInstruction(store);
 			}
 		}
@@ -1152,9 +1152,10 @@ public class AstTransformer {
 		for (Variable global : context.getSetGlobalsToStore()) {
 			LocalVariable local = context.getMapGlobals().get(global);
 			VarExpr value = new VarExpr(new Use(local));
+			Location location = global.getLocation();
 
 			List<Expression> indexes = new ArrayList<Expression>(0);
-			Store store = new Store(global, indexes, value);
+			Store store = new Store(location, global, indexes, value);
 			addInstruction(store);
 		}
 

@@ -170,11 +170,12 @@ public class ActorTransformer {
 			for (AstVariable token : tokens) {
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new IntExpr(i));
+				Location location = portVariable.getLocation();
 
 				LocalVariable irToken = (LocalVariable) context
 						.getVariable(token);
-				Load load = new Load(portVariable.getLocation(), irToken,
-						new Use(portVariable), indexes);
+				Load load = new Load(location, irToken, new Use(portVariable),
+						indexes);
 				addInstruction(load);
 
 				i++;
@@ -194,6 +195,7 @@ public class ActorTransformer {
 			int numTokens = tokens.size();
 			Type type = ((TypeList) portVariable.getType()).getType();
 			for (AstVariable token : tokens) {
+				Location location = portVariable.getLocation();
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new BinaryExpr(new BinaryExpr(
 						new IntExpr(numTokens), BinaryOp.TIMES, new VarExpr(
@@ -203,8 +205,8 @@ public class ActorTransformer {
 
 				LocalVariable tmpVar = procedure.newTempLocalVariable(file,
 						type, "token");
-				Load load = new Load(portVariable.getLocation(), tmpVar,
-						new Use(portVariable), indexes);
+				Load load = new Load(location, tmpVar, new Use(portVariable),
+						indexes);
 				block.add(load);
 
 				LocalVariable irToken = (LocalVariable) context
@@ -212,8 +214,8 @@ public class ActorTransformer {
 
 				indexes = new ArrayList<Expression>(1);
 				indexes.add(new VarExpr(new Use(loopVar)));
-				Store store = new Store(irToken, indexes, new VarExpr(new Use(
-						tmpVar)));
+				Store store = new Store(location, irToken, indexes,
+						new VarExpr(new Use(tmpVar)));
 				block.add(store);
 
 				i++;
@@ -254,12 +256,13 @@ public class ActorTransformer {
 			int i = 0;
 
 			for (AstExpression expression : values) {
+				Location location = portVariable.getLocation();
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new IntExpr(i));
 
 				Expression value = astTransformer
 						.transformExpression(expression);
-				Store store = new Store(portVariable, indexes, value);
+				Store store = new Store(location, portVariable, indexes, value);
 				addInstruction(store);
 
 				i++;
@@ -280,6 +283,7 @@ public class ActorTransformer {
 			int numTokens = values.size();
 			Type type = ((TypeList) portVariable.getType()).getType();
 			for (AstExpression value : values) {
+				Location location = portVariable.getLocation();
 				List<Expression> indexes = new ArrayList<Expression>(1);
 				indexes.add(new VarExpr(new Use(loopVar)));
 
@@ -301,8 +305,8 @@ public class ActorTransformer {
 								new Use(loopVar)), IrFactory.eINSTANCE
 								.createTypeInt(32)), BinaryOp.PLUS,
 						new IntExpr(i), IrFactory.eINSTANCE.createTypeInt(32)));
-				Store store = new Store(portVariable, indexes, new VarExpr(
-						new Use(tmpVar)));
+				Store store = new Store(location, portVariable, indexes,
+						new VarExpr(new Use(tmpVar)));
 				block.add(store);
 
 				i++;
