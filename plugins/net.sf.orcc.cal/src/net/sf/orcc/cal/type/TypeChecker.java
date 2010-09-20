@@ -450,6 +450,26 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
+	 * Returns the size of the given type if this type is a int or an uint, and
+	 * zero otherwise.
+	 * 
+	 * @param type
+	 *            a type
+	 * @return the size of the given type
+	 */
+	private int getSize(Type type) {
+		if (type.isInt()) {
+			TypeInt typeInt = (TypeInt) type;
+			return typeInt.getSize();
+		} else if (type.isUint()) {
+			TypeUint typeUint = (TypeUint) type;
+			return typeUint.getSize();
+		} else {
+			return 0;
+		}
+	}
+
+	/**
 	 * Computes and returns the type of the given expression.
 	 * 
 	 * @param expression
@@ -540,15 +560,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		if (type.isInt()) {
-			TypeInt typeInt = (TypeInt) type;
-			int size = typeInt.getSize() + 1;
-			typeInt.setSize(size);
-		} else if (type.isUint()) {
-			TypeUint typeUint = (TypeUint) type;
-			int size = typeUint.getSize() + 1;
-			typeUint.setSize(size);
-		}
+		setSize(type, getSize(type) + 1);
 
 		return type;
 	}
@@ -729,15 +741,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		if (type.isInt()) {
-			TypeInt typeInt = (TypeInt) type;
-			int size = typeInt.getSize() + 1;
-			typeInt.setSize(size);
-		} else if (type.isUint()) {
-			TypeUint typeUint = (TypeUint) type;
-			int size = typeUint.getSize() + 1;
-			typeUint.setSize(size);
-		}
+		setSize(type, getSize(type) + 1);
 
 		return type;
 	}
@@ -832,14 +836,33 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		int size = s1 + s2;
-		if (type.isInt()) {
-			((TypeInt) type).setSize(size);
-		} else if (type.isUint()) {
-			((TypeUint) type).setSize(size);
-		}
+		setSize(type, s1 + s2);
 
 		return type;
+	}
+
+	/**
+	 * Sets the size of the given type (if it is an int or an uint) to min(size,
+	 * maxSize).
+	 * 
+	 * @param type
+	 *            a type
+	 * @param size
+	 *            the size in bits that the type should have
+	 */
+	private void setSize(Type type, int size) {
+		// clips the size
+		if (size > maxSize) {
+			size = maxSize;
+		}
+
+		if (type.isInt()) {
+			TypeInt typeInt = (TypeInt) type;
+			typeInt.setSize(size);
+		} else if (type.isUint()) {
+			TypeUint typeUint = (TypeUint) type;
+			typeUint.setSize(size);
+		}
 	}
 
 	/**
