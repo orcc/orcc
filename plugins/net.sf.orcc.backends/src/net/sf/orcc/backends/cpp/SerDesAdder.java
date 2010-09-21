@@ -65,10 +65,6 @@ public class SerDesAdder {
 
 	private Set<Connection> toBeRemoved = new HashSet<Connection>();
 
-	private Map<IAttribute, Integer> numInputs = new HashMap<IAttribute, Integer>();
-
-	private Map<IAttribute, Integer> numOutputs = new HashMap<IAttribute, Integer>();
-
 	private Map<String, Vertex> serdesMap = new HashMap<String, Vertex>();
 
 	private void createIncomingConnection(Connection connection, Vertex vertex,
