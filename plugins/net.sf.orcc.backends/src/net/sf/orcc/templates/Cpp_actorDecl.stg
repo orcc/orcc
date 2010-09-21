@@ -166,7 +166,7 @@ $pattern.keys:{port|hasRoom($actor.name$_$port$, $pattern.(port)$)}; separator="
 // Scheduler without FSM
 
 scheduler(actions) ::= <<
-int scheduler();
+int schedule();
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -192,7 +192,7 @@ bool outside_FSM_scheduler();
 
 $endif$
 $fsm.transitions: stateScheduler(); separator="\n"$
-int scheduler();
+int schedule();
 
 >>
 

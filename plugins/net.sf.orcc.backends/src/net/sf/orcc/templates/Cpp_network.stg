@@ -108,7 +108,7 @@ $instances: printInitialize()$
 >>
 
 printScheduler(instance) ::= <<
-$if (!instance.serdes)$res += $instance.id$.scheduler();$endif$
+$if (!instance.serdes)$res += $instance.id$.schedule();$endif$
 >>
 
 printSchedulers(instances) ::= <<
@@ -274,7 +274,6 @@ $else$
 	// create threads
 	$defineNetwork(network.name)$
 
-	// connect fifos	
 	$assignFifos(network.connections)$
 
 $if (options.needSerDes)$

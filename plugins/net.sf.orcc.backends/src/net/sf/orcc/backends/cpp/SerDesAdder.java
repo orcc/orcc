@@ -69,7 +69,7 @@ public class SerDesAdder {
 
 	private Map<IAttribute, Integer> numOutputs = new HashMap<IAttribute, Integer>();
 
-	private Map<IAttribute, Vertex> serdesMap = new HashMap<IAttribute, Vertex>();
+	private Map<String, Vertex> serdesMap = new HashMap<String, Vertex>();
 
 	private void createIncomingConnection(Connection connection, Vertex vertex,
 			Vertex vertexBCast) {
@@ -187,34 +187,38 @@ public class SerDesAdder {
 			for (Connection conn : graph.edgeSet()) {
 				if (graph.getEdgeSource(conn).isPort()) {
 					IAttribute attr = conn.getAttribute("busRef");
-					if (numOutputs.containsKey(attr)) {
+					IValueAttribute valAttr = (IValueAttribute) attr;
+					String attrName = ((StringExpr) valAttr.getValue())
+							.getValue();
+
+					if (serdesMap.containsKey(attrName)) {
 						Vertex v = serdesMap.get(attr);
 						SerDes serdes = v.getInstance().getWrapper();
 						int out = serdes.getNumOutputs();
 						serdes.setNumOutputs(out++);
 					} else {
-						IValueAttribute valAttr = (IValueAttribute) attr;
-						StringExpr expr = (StringExpr) valAttr.getValue();
 						Vertex serdes = new Vertex(new Instance("SerDes_"
-								+ expr.getValue(), new SerDes(0, 1)));
-						serdesMap.put(attr, serdes);
+								+ attrName, new SerDes(0, 1)));
+						serdesMap.put(attrName, serdes);
 						graph.addVertex(serdes);
 					}
 				}
 
 				if (graph.getEdgeTarget(conn).isPort()) {
 					IAttribute attr = conn.getAttribute("busRef");
-					if (numInputs.containsKey(attr)) {
-						Vertex v = serdesMap.get(attr);
+					IValueAttribute valAttr = (IValueAttribute) attr;
+					String attrName = ((StringExpr) valAttr.getValue())
+							.getValue();
+
+					if (serdesMap.containsKey(attrName)) {
+						Vertex v = serdesMap.get(attrName);
 						SerDes serdes = v.getInstance().getWrapper();
 						int in = serdes.getNumInputs();
 						serdes.setNumOutputs(in++);
 					} else {
-						IValueAttribute valAttr = (IValueAttribute) attr;
-						StringExpr expr = (StringExpr) valAttr.getValue();
 						Vertex serdes = new Vertex(new Instance("SerDes_"
-								+ expr.getValue(), new SerDes(1, 0)));
-						serdesMap.put(attr, serdes);
+								+ attrName, new SerDes(1, 0)));
+						serdesMap.put(attrName, serdes);
 						graph.addVertex(serdes);
 					}
 				}
@@ -240,8 +244,14 @@ public class SerDesAdder {
 							Connection incoming = new Connection(srcPort,
 									tgtPort, connection.getAttributes());
 							Vertex vSrc = graph.getEdgeSource(connection);
-							graph.addEdge(vSrc, serdesMap.get(connection
-									.getAttribute("busRef")), incoming);
+
+							IAttribute attr = connection.getAttribute("busRef");
+							IValueAttribute valAttr = (IValueAttribute) attr;
+							String attrName = ((StringExpr) valAttr.getValue())
+									.getValue();
+
+							graph.addEdge(vSrc, serdesMap.get(attrName),
+									incoming);
 
 							vertexToRemove.add(vertex);
 							outputs.remove(port.getName());
@@ -257,8 +267,13 @@ public class SerDesAdder {
 						Vertex vTgt = graph.getEdgeTarget(connection);
 						Connection outgoing = new Connection(srcPort, tgtPort,
 								connection.getAttributes());
-						graph.addEdge(serdesMap.get(connection
-								.getAttribute("busRef")), vTgt, outgoing);
+
+						IAttribute attr = connection.getAttribute("busRef");
+						IValueAttribute valAttr = (IValueAttribute) attr;
+						String attrName = ((StringExpr) valAttr.getValue())
+								.getValue();
+
+						graph.addEdge(serdesMap.get(attrName), vTgt, outgoing);
 						vertexToRemove.add(vertex);
 						inputs.remove(port.getName());
 
@@ -269,8 +284,14 @@ public class SerDesAdder {
 							vTgt = graph.getEdgeTarget(connection);
 							Connection newOutgoing = new Connection(srcPort,
 									tgtPort, connection.getAttributes());
-							graph.addEdge(serdesMap.get(connection
-									.getAttribute("busRef")), vTgt, newOutgoing);
+
+							attr = connection.getAttribute("busRef");
+							valAttr = (IValueAttribute) attr;
+							attrName = ((StringExpr) valAttr.getValue())
+									.getValue();
+
+							graph.addEdge(serdesMap.get(attrName), vTgt,
+									newOutgoing);
 						}
 					}
 				}
@@ -283,5 +304,4 @@ public class SerDesAdder {
 			graph.removeAllEdges(toBeRemoved);
 		}
 	}
-
 }

@@ -292,7 +292,7 @@ $actions: actionTest(); separator="\nelse "$
 >>
 
 scheduler(actions) ::= <<
-int actor_$actor.name$::scheduler()
+int actor_$actor.name$::schedule()
 {
 	bool res = true;
 	int i = 0;
@@ -371,7 +371,7 @@ bool actor_$actor.name$::outside_FSM_scheduler()
 
 $endif$
 $fsm.transitions: stateScheduler(); separator="\n"$
-int actor_$actor.name$::scheduler()
+int actor_$actor.name$::schedule()
 {
 	bool res = true;
 	int i = 0;
