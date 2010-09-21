@@ -36,10 +36,12 @@ import java.util.Map;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -194,8 +196,27 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	//
 	@Override
 	public void visit(PhiAssignment phi, Object... args) {
-		visitExpressions(phi.getValues());
+		List<Expression> values = phi.getValues();
+		OrderedMap<String, Variable> parameters = procedure.getParameters();
 
+		// Visit expressions of value of phi
+		visitExpressions(values);
+
+		// Remove local variable with index = 0 from value
+		for (Expression value : values) {
+			if (value.isVarExpr()) {
+				VarExpr sourceExpr = (VarExpr) value;
+				LocalVariable source = (LocalVariable) sourceExpr.getVar()
+						.getVariable();
+
+				// Local variable must not be a parameter of the procedure
+				if (source.getIndex() == 0
+						&& !parameters.contains(source.getName())) {
+					values.set(values.indexOf(value), new IntExpr(
+							new Location(), 0));
+				}
+			}
+		}
 	}
 
 	@Override

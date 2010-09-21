@@ -394,16 +394,7 @@ $phiExpr(expr=first(phi.values), node = first(phi.block.predecessors))$, $phiExp
 >>
 
 phiExpr(expr, node) ::= <<
-[$if(expr.varExpr)
-	$$if(expr.var.variable.indexed)
-		$ %$expr$ $
-	else
-		$ 0 $
-	endif
-	$$
-else
-	$ $Expr(expr)$ $
-endif$ , %b$label(node)$ ]
+[$Expr(expr)$ , %b$label(node)$ ]
 >>
 
 

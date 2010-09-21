@@ -37,7 +37,7 @@ import net.sf.orcc.ir.transforms.BuildCFG;
 /**
  * Main transformation for applying three-address code form to actor IR.
  * <p>
- * This transformation is composed of 4 atomic transformation :
+ * This transformation is composed of 4 atomic transformations :
  * <ul>
  * 
  * <li>{@link #CopyPropagationTransformation()} that propagates copy of
@@ -46,7 +46,7 @@ import net.sf.orcc.ir.transforms.BuildCFG;
  * expressions into fundamental operations.</li>
  * <li>{@link #BuildCFG()} that builds a CFG of the actor IR.</li>
  * <li>
- * {@link #CastAdderTransformation()} that Add cast in the IR when necessary.</li>
+ * {@link #CastAdderTransformation()} that add cast in the IR when necessary.</li>
  * </ul>
  * </p>
  * 
