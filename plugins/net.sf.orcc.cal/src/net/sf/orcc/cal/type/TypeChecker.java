@@ -50,6 +50,7 @@ import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
@@ -66,6 +67,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * This class defines a type checker for RVC-CAL AST. Note that types must have
@@ -306,6 +308,50 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
+	 * Returns the type necessary to hold the index that contains (directly or
+	 * indirectly) the given expression. For instance suppose a list L with a
+	 * type List(type:List(type:int, size=4), size=150), then in L[a * 3][b],
+	 * the expression "a" will be constrained to uint(size=8), and "b" will be
+	 * constrained to uint(size=2) (the index goes from 0 to 3 at most).
+	 * 
+	 * @param reference
+	 *            a reference to a variable whose type is supposed to be a list
+	 * @param indexes
+	 *            a list of indexes as expressions
+	 * @param expression
+	 *            the expression that is a child of one of the indexes
+	 * @return the type that is necessary to store the index t
+	 */
+	private Type findIndexType(AstVariableReference reference,
+			List<AstExpression> indexes, AstExpression expression) {
+		AstVariable variable = reference.getVariable();
+		if (variable == null) {
+			return null;
+		}
+
+		Type type = variable.getIrType();
+		if (type == null) {
+			return null;
+		}
+
+		List<Integer> dimensions = type.getDimensions();
+
+		Iterator<Integer> itD = dimensions.iterator();
+		Iterator<AstExpression> itI = indexes.iterator();
+		while (itD.hasNext() && itI.hasNext()) {
+			int dim = itD.next();
+			AstExpression index = itI.next();
+			if (EcoreUtil.isAncestor(index, expression)) {
+				// index goes from 0 to dim - 1, and we remove the sign bit
+				int indexSize = IntExpr.getSize(dim - 1) - 1;
+				return IrFactory.eINSTANCE.createTypeUint(indexSize);
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Finds the type of the formal parameter that corresponds to the given
 	 * expression in the actual parameters.
 	 * 
@@ -346,9 +392,17 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		// if the container is an expression continue up the hierarchy
 		// except if the container is a call to a non-built-in function
-		if (container instanceof AstExpression
-				&& !(container instanceof AstExpressionCall && ((AstExpressionCall) container)
-						.getFunction().eContainer() != null)) {
+		if (container instanceof AstExpression) {
+			if (container instanceof AstExpressionCall
+					&& ((AstExpressionCall) container).getFunction()
+							.eContainer() != null) {
+				return container;
+			} else if (container instanceof AstExpressionIndex) {
+				// the only expressions contained in an ExpressionIndex are the
+				// indexes
+				return container;
+			}
+
 			return getContainer(container);
 		}
 
@@ -886,6 +940,13 @@ public class TypeChecker extends CalSwitch<Type> {
 				break;
 			}
 
+			case CalPackage.AST_EXPRESSION_INDEX: {
+				AstExpressionIndex index = (AstExpressionIndex) cter;
+				targetType = findIndexType(index.getSource(),
+						index.getIndexes(), expression);
+				break;
+			}
+
 			case CalPackage.AST_FUNCTION:
 				AstFunction func = (AstFunction) cter;
 				targetType = func.getIrType();
@@ -901,10 +962,18 @@ public class TypeChecker extends CalSwitch<Type> {
 				targetType = pattern.getPort().getIrType();
 				break;
 
-			case CalPackage.AST_STATEMENT_ASSIGN:
+			case CalPackage.AST_STATEMENT_ASSIGN: {
 				AstStatementAssign assign = (AstStatementAssign) cter;
-				targetType = assign.getTarget().getVariable().getIrType();
+				if (EcoreUtil.isAncestor(assign.getValue(), expression)) {
+					// expression is located in the value
+					targetType = assign.getTarget().getVariable().getIrType();
+				} else {
+					// expression is located in the indexes
+					targetType = findIndexType(assign.getTarget(),
+							assign.getIndexes(), expression);
+				}
 				break;
+			}
 
 			case CalPackage.AST_STATEMENT_CALL: {
 				AstStatementCall call = (AstStatementCall) cter;
@@ -934,5 +1003,4 @@ public class TypeChecker extends CalSwitch<Type> {
 			maxSize = Cast.getSizeOfType(targetType);
 		}
 	}
-
 }
