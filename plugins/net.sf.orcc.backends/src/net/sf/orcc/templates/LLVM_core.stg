@@ -219,7 +219,7 @@ PrintParameter(parameter) ::= <<
 $if (parameter.type.string)
 $ i8* noalias getelementptr inbounds ($parameter.type$* @$parameter$, i64 0, i64 0) $
 else
-$$parameter.type$ %$parameter$$
+$$parameter.type$ $Expr(parameter)$$
 endif$
 
 >>
@@ -605,4 +605,5 @@ BlockNode(blockNode) ::= <<
 
 b$label(blockNode)$:
 	$Instructions(blockNode.instructions)$
+	
 >>

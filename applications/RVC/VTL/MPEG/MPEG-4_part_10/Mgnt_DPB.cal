@@ -209,9 +209,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		var 
 			uint(size=16) rd
 		do
-			if(DEBUG_OUTPUT)then
-				println("Input Mgnt_DPB RD:"+rd);
-			end
 			rd   := pic[Ref_idx][ra_offset + ra_x + ra_y * PicWidthInMacroB * MB_WIDTH];
 			ra_x := ra_x +1;
 			if(ra_x = ra_W) then
