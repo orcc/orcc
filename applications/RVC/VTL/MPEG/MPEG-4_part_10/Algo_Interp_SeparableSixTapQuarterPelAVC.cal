@@ -342,9 +342,6 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
   var 
 	int p
   do
-  if(DEBUG_OUTPUT)then
-		println("Input interp_Sepa... INTERP:"+p);
-  end
    compensate();
    p := temp;
    o_x := o_x + 1;
