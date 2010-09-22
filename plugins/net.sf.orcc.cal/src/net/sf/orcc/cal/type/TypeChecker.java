@@ -342,9 +342,9 @@ public class TypeChecker extends CalSwitch<Type> {
 			int dim = itD.next();
 			AstExpression index = itI.next();
 			if (EcoreUtil.isAncestor(index, expression)) {
-				// index goes from 0 to dim - 1, and we remove the sign bit
-				int indexSize = IntExpr.getSize(dim - 1) - 1;
-				return IrFactory.eINSTANCE.createTypeUint(indexSize);
+				// index goes from 0 to dim - 1
+				int indexSize = IntExpr.getSize(dim - 1);
+				return IrFactory.eINSTANCE.createTypeInt(indexSize);
 			}
 		}
 
@@ -1003,4 +1003,5 @@ public class TypeChecker extends CalSwitch<Type> {
 			maxSize = Cast.getSizeOfType(targetType);
 		}
 	}
+
 }
