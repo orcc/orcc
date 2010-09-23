@@ -1,0 +1,157 @@
+actor GzipParser() int(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(size=8) BDATA, bool END:
+
+	procedure fail(String reason)
+	begin
+		println(reason);
+	end
+
+	bool ftext;
+	bool fhcrc;
+	bool fextra;
+	bool fname;
+	bool fcomment;
+	
+	List(type:String, size=14) os_strings =
+		[ "FAT filesystem (MS-DOS, OS/2, NT/Win32)",
+		"Amiga", "VMS (or OpenVMS)", "Unix", "VM/CMS", "Atari TOS", "HPFS filesystem (OS/2, NT)",
+		"Macintosh", "Z-System", "CP/M", "TOPS-20", "NTFS filesystem (NT)", "QDOS", "Acorn RISCOS" ];
+
+	function get_flag(int(size=8) flg, int(size=8) mask) --> bool :
+		(flg & mask) = mask
+	end
+
+	fixed_header: action I:[ header ] repeat 10 ==> HDATA:[ header ] repeat 10
+	var
+		uint(size=8) id1 = header[0], uint(size=8) id2 = header[1],
+		int(size=8) cm = header[2], int(size=8) flg = header[3],
+		// ignoring mtime (header[4] to header[7])
+		// ignoring xfl = header[8]
+		uint(size=8) os = header[9]
+	do
+		// check id
+		if id1 != 0x1f || id2 != 0x8b then
+			fail("bad magic number");
+		end
+
+		// check deflate method
+		if cm != 8 then
+			fail("unknown compression method");
+		end
+
+		ftext := get_flag(flg, 0x01);
+		fhcrc := get_flag(flg, 0x02);
+		fextra := get_flag(flg, 0x04);
+		fname := get_flag(flg, 0x08);
+		fcomment := get_flag(flg, 0x10);
+		
+		if os > 13 then
+			println("OS unknown");
+		else
+			println(os_strings[os]);
+		end
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// common flag actions
+	flag_not_set: action ==>
+	end
+
+	int(size=17) count;
+	int(size=17) max_count;
+
+	read_zero: action I:[c] ==> HDATA:[ c ]
+	guard c = 0
+	end
+
+	read_not_zero: action I:[c] ==> HDATA:[ c ]
+	end
+	
+	read_done: action ==>
+	guard
+		count = max_count
+	end
+	
+	read_not_done: action I:[c] ==> HDATA:[ c ]
+	do
+		count := count + 1;
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// flags
+	flag_test.extra: action ==> guard fextra end
+	
+	flag.extra: action I:[si1, si2, len1, len2] ==>
+	do
+		max_count := (len1 << 8) | len2;
+		count := 0;
+	end
+
+	flag_test.name: action ==> guard fname end
+
+	flag_test.comment: action ==> guard fcomment end
+
+	flag_test.hcrc: action ==> guard fhcrc end	
+
+	// request CRC
+	request_crc: action ==> END:[true]
+	end
+
+	// read CRC
+	uint(size=32) crc;
+
+	read_crc: action CRC:[crc_read] ==>
+	do
+		crc := crc_read;
+	end
+
+	// check CRC
+	flag.hcrc: action I:[crc1, crc2] ==>
+	do
+		if (crc & 0xFFFF) != ((crc1 << 8) | crc2) then
+			fail("bad header CRC");
+		end
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	read_data: action I:[data] ==> BDATA:[data]
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// FSM
+
+	schedule fsm start:
+		start (fixed_header) --> flags;
+		flags (flag_test.extra) --> flag_extra;
+		flags (flag_not_set) --> flag_name;
+
+		flag_extra (flag.extra) --> flag_extra_loop;
+		flag_extra_loop (read_not_done) --> flag_extra_loop;
+		flag_extra_loop (read_done) --> flag_name;
+
+		flag_name (flag_not_set) --> flag_comment;
+		flag_name (flag_test.name) --> flag_name_loop;
+		flag_name_loop (read_not_zero) --> flag_name_loop;
+		flag_name_loop (read_zero) --> flag_comment;
+
+		flag_comment (flag_not_set) --> read_crc;
+		flag_comment (flag_test.comment) --> flag_comment_loop;
+		flag_comment_loop (read_not_zero) --> flag_comment_loop;
+		flag_comment_loop (read_zero) --> request_crc;
+
+		request_crc (request_crc) --> read_crc;
+		read_crc (read_crc) --> flag_hcrc;
+
+		flag_hcrc (flag_not_set) --> data;
+		flag_hcrc (flag_test.hcrc) --> check_header;
+		check_header (flag.hcrc) --> data;
+
+		data (read_data) --> data;
+	end
+
+	priority
+		flag_test > flag_not_set;
+		read_zero > read_not_zero;
+		read_done > read_not_done;	
+	end
+
+end

@@ -1,0 +1,37 @@
+actor CRC32() int(size=8) I, bool END ==> uint(size=32) CRC :
+
+	List(type:uint(size=32), size=256) crc_table;
+
+	initialize ==>
+	var
+		uint(size=32) c
+	do
+		foreach int n in 0 .. 255 do
+			c := n;
+			foreach int k in 0 .. 7 do
+				if (c & 1) != 0 then
+					c := 0xedb88320 ^ (c >> 1);
+				else
+					c := c >> 1;
+				end
+			end
+			crc_table[n] := c;
+		end
+	end
+	
+	uint(size=32) crc := 0;
+	
+	action I:[buf] ==>
+	var
+		uint(size=32) c := crc ^ 0xffffffff
+	do
+        c := crc_table[(c ^ buf) & 0xff] ^ (c >> 8);
+        crc := c ^ 0xffffffff;
+	end
+
+	action END:[ _ ] ==> CRC:[crc]
+	do
+		crc := 0;
+	end
+
+end

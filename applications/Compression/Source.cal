@@ -1,0 +1,6 @@
+actor Source() ==> int(size=8) O :
+
+  initialize ==>
+  end
+
+end

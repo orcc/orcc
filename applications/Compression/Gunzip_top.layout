@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="source" x="81" y="104"/>
+      <vertex id="parser" x="252" y="117"/>
+      <vertex id="crc32" x="258" y="255"/>
+      <vertex id="decompressor" x="491" y="133"/>
+   </vertices>
+</layout>
