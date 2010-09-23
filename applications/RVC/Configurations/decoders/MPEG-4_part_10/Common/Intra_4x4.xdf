@@ -55,6 +55,23 @@
     <Port kind="Input" name="ConstrainedIFlag">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="IsIntraFlag">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="pic_width_in_mb">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="curr_mb_addr">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="13"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -137,8 +154,6 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Mgnt_Intra4x4" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Mgnt_Intra4x4" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="PredMode" src="" src-port="PredMode"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Algo_IntraPred_LUMA_4x4" dst-port="Y_LEFT"
@@ -159,16 +174,18 @@
         src="Algo_Split_16x16_to_4x4_norasterscan" src-port="Y"/>
     <Connection dst="Algo_IntraPred_LUMA_4x4" dst-port="PredMode"
         src="Mgnt_Intra4x4" src-port="PredMode4x4"/>
-    <Connection dst="Mgnt_Intra4x4" dst-port="Mb_Type" src="" src-port="Mb_Type"/>
     <Connection dst="Buffer_Neighbour_4x4" dst-port="Mb_Type" src="" src-port="Mb_Type"/>
     <Connection dst="Buffer_Neighbour_4x4" dst-port="MB_IN" src="" src-port="MB_IN"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="EDGE"
         src="Buffer_Neighbour_4x4" src-port="EDGE"/>
-    <Connection dst="Buffer_Neighbour_4x4" dst-port="PicWidthInMb"
-        src="" src-port="PicWidthInMb"/>
-    <Connection dst="Buffer_Neighbour_4x4" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="MB_4X4" src="Algo_Add_4x4" src-port="Z"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Algo_Split_16x16_to_4x4_norasterscan" dst-port="X"
         src="" src-port="Coef_ACR"/>
+    <Connection dst="Mgnt_Intra4x4" dst-port="IsIntraFlag" src="" src-port="IsIntraFlag"/>
+    <Connection dst="Buffer_Neighbour_4x4" dst-port="PicWidthInMb"
+        src="" src-port="pic_width_in_mb"/>
+    <Connection dst="Buffer_Neighbour_4x4" dst-port="CurrMbAddr" src="" src-port="curr_mb_addr"/>
+    <Connection dst="Mgnt_Intra4x4" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="Mgnt_Intra4x4" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
 </XDF>

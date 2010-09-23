@@ -347,8 +347,6 @@
     <Connection dst="Buffer_inter" dst-port="RA_Width" src="Inter" src-port="RA_Width_C"/>
     <Connection dst="Intra8x8" dst-port="Mb_Type" src="" src-port="Mb_TypeC"/>
     <Connection dst="Inter" dst-port="Mb_Type" src="" src-port="Mb_TypeC"/>
-    <Connection dst="Intra8x8" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Intra8x8" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Inter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Inter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Select_chroma" dst-port="X1" src="Intra8x8" src-port="MB4x4Pred_C"/>
@@ -397,4 +395,14 @@
         src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Intra8x8" dst-port="ConstrainedIFlag"
         src="DemuxParserInfos" src-port="ConstrI_Intra"/>
+    <Connection dst="Intra8x8" dst-port="IsIntraFlag"
+        src="DemuxParserInfos" src-port="IsIntraFlag"/>
+    <Connection dst="DemuxParserInfos" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="DemuxParserInfos" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
+    <Connection dst="Intra8x8" dst-port="CurrMbAddr"
+        src="DemuxParserInfos" src-port="CurrMbAddr_Intra"/>
+    <Connection dst="Intra8x8" dst-port="PicWidthInMb"
+        src="DemuxParserInfos" src-port="PicWidthInMb_Intra"/>
+    <Connection dst="Intra8x8" dst-port="PicWidth_InMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="Intra8x8" dst-port="CurrMb_Addr" src="" src-port="CurrMbAddr"/>
 </XDF>
