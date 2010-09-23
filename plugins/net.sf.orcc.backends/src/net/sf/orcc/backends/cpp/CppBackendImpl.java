@@ -105,12 +105,14 @@ public class CppBackendImpl extends AbstractBackend {
 			Instance tgt = network.getGraph().getEdgeTarget(connection)
 					.getInstance();
 
+			String srcName = getPartNameAttribute(src);
+			String tgtName = getPartNameAttribute(tgt);
+
 			if (src.isSerdes() || tgt.isSerdes()) {
 				needSerDes = true;
 				printer.getOptions().put("needSerDes", needSerDes);
 				kind = 1;
-			} else if (!getPartNameAttribute(src).equals(
-					getPartNameAttribute(tgt))) {
+			} else if (!srcName.equals(tgtName) && !srcName.isEmpty()) {
 				kind = 2;
 			}
 
@@ -162,6 +164,7 @@ public class CppBackendImpl extends AbstractBackend {
 		if (partition) {
 			partitioning = true;
 			partitioner.transform(network);
+
 			if (network.getNetworks().size() > 1) {
 				try {
 					network.computeTemplateMaps();
@@ -203,15 +206,13 @@ public class CppBackendImpl extends AbstractBackend {
 	protected boolean printActor(Actor actor) throws OrccException {
 		boolean res = false;
 		try {
-			String name = actor.getName();
+			String name = path + File.separator + actor.getName();
 
 			printer.loadGroups("C_actor", "Cpp_actorDecl");
-			String outputName = path + File.separator + name + ".h";
-			printer.printActor(outputName, actor);
+			printer.printActor(name + ".h", actor);
 
-			outputName = path + File.separator + name + ".cpp";
 			printer.loadGroups("C_actor", "Cpp_actorImpl");
-			printer.printActor(outputName, actor);
+			printer.printActor(name + ".cpp", actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
