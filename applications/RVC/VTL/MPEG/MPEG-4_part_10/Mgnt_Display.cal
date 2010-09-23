@@ -15,7 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Mgnt_Display ()
+actor Mgnt_Display (bool Debug)
 	uint(size=32) POC,
 	uint(size=5)  MaxDPBSize,
 	bool          IsIDR
@@ -23,6 +23,8 @@ actor Mgnt_Display ()
 		==>
   	int(size=32) POCtoDisplay
 		:
+
+	bool DEBUG_INPUT = false;
 
 
 	List(type:int (size=32),size=16) ListPOC    := [-1    :for int s in 0 .. 15];
@@ -43,6 +45,11 @@ actor Mgnt_Display ()
 		var
 			bool         idx_selected := false
 		do
+			if(DEBUG_INPUT and Debug)then
+				println("Input Mgnt_Display POC:"+ValPOC);
+				println("Input Mgnt_Display MaxDPBSize:"+ValMaxDPBSize);
+				println("Input Mgnt_Display IsIDR:"+IsIDR_Picture);
+			end
 			CurrentIdx := 0;
 			while( (CurrentIdx < 16) and (not idx_selected) )
 			do

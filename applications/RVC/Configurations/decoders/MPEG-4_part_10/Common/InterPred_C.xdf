@@ -230,12 +230,8 @@
         src="" src-port="PartSZ"/>
     <Connection dst="" dst-port="MB4x4Pred_C" src="Algo_Add" src-port="Z"/>
     <Connection dst="Algo_Add" dst-port="X" src="Algo_Interp_split_MB_C" src-port="MBPred"/>
-    <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN" dst-port="Coef_ACR"
-        src="" src-port="Coef_ACR"/>
     <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN" dst-port="Mb_Type"
         src="" src-port="Mb_Type"/>
-    <Connection dst="Algo_Add" dst-port="Y"
-        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="Coef_ACR_P"/>
     <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN"
         dst-port="Write_Done" src="" src-port="Write_Done"/>
     <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN" dst-port="MbPartIdx"
@@ -246,4 +242,5 @@
         src="" src-port="RefIdx"/>
     <Connection dst="" dst-port="PicID"
         src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="PicID"/>
+    <Connection dst="Algo_Add" dst-port="Y" src="" src-port="Coef_ACR"/>
 </XDF>

@@ -42,7 +42,7 @@ actor Algo_VariableLengthDecoding()
 	uint(size=5) VLD_TE                = 9;
 	uint(size=5) SKIP_NAL              = 10;
 
-	bool DEBUG_VAL_DECODED = false;
+	bool DEBUG_VAL_DECODED  = false;
 	bool DEBUG_FLAG_DECODED = false;
 
 	List(type: List(type: List(type: bool, size=64), size=16), size=6) TotalCoeffValid = 

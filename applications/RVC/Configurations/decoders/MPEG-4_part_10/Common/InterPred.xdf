@@ -238,10 +238,6 @@
         src="Algo_Interp_split_MB" src-port="MBPred"/>
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="Mb_Type"
         src="" src-port="Mb_Type"/>
-    <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="Coef_ACR"
-        src="" src-port="Coef_ACR"/>
-    <Connection dst="Algo_Add_4x4" dst-port="Y"
-        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="Coef_ACR_P"/>
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN"
         dst-port="PicWidthInMb" src="" src-port="PicWidthInMb_inter"/>
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="CurrMbAddr"
@@ -252,4 +248,5 @@
         src="" src-port="Write_done"/>
     <Connection dst="" dst-port="PicID"
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="PicID"/>
+    <Connection dst="Algo_Add_4x4" dst-port="Y" src="" src-port="Coef_ACR"/>
 </XDF>

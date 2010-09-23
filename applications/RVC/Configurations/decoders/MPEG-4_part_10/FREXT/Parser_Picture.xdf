@@ -443,6 +443,16 @@
     <Port kind="Output" name="Last">
         <Type name="bool"/>
     </Port>
+    <Port kind="Output" name="MacroBlockType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="TransformSize8x8">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -913,4 +923,8 @@
         src="" src-port="ResetPrevFrameNum"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="ValQpFeedback"
         src="DecodeMacroBlockLayer" src-port="QpFeedback"/>
+    <Connection dst="" dst-port="MacroBlockType"
+        src="MergeDataFromSDataAndMbLayer" src-port="MacroBlockType"/>
+    <Connection dst="" dst-port="TransformSize8x8"
+        src="MergeDataFromSDataAndMbLayer" src-port="TransformSize8x8"/>
 </XDF>

@@ -150,7 +150,6 @@
     <Connection dst="Mgnt_Intra_8x8" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Algo_Add" dst-port="X" src="Algo_IntraPred_CHROMA" src-port="MPR"/>
-    <Connection dst="Mgnt_Intra_8x8" dst-port="Coef_ACR" src="" src-port="Coef_ACR"/>
-    <Connection dst="Algo_Add" dst-port="Y" src="Mgnt_Intra_8x8" src-port="Coef_ACR_I"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
+    <Connection dst="Algo_Add" dst-port="Y" src="" src-port="Coef_ACR"/>
 </XDF>

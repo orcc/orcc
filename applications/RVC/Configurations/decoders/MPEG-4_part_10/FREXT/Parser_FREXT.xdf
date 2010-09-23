@@ -313,6 +313,16 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="MacroBlockType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="TransformSize8x8">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -659,4 +669,6 @@
     <Connection dst="MVReconstruct" dst-port="MvRes" src="DecodePic" src-port="MvRes"/>
     <Connection dst="MVReconstruct" dst-port="RefIdx" src="DecodePic" src-port="RefIdx"/>
     <Connection dst="DecodePic" dst-port="ResetPrevFrameNum" src="MMCO" src-port="EmptyDPB"/>
+    <Connection dst="" dst-port="MacroBlockType" src="DecodePic" src-port="MacroBlockType"/>
+    <Connection dst="" dst-port="TransformSize8x8" src="DecodePic" src-port="TransformSize8x8"/>
 </XDF>

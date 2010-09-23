@@ -18,7 +18,7 @@ Manager for a full macroblock intra Prediction
 Jérôme GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
-
+//Modeified by Damien de Saint Jorre IETR/INSA of Rennes (France)
 actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	uint(size=13) FirstMbInSlice,
 	uint (size=8) Mb_Type,
@@ -26,12 +26,12 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	uint(size=13) CurrMbAddr,
 	uint(size=4) PredMode,
 	uint(size=16) EDGE, 
-	int(size=16) Coef_ACR,
+//	int(size=16) Coef_ACR,
 	bool ConstrainedIFlag 
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode_I,
-		int(size=16) Coef_ACR_I,
+//		int(size=16) Coef_ACR_I,
 		int(size=16) Y_Left,
 		int(size=16) Y_Up,
 		int(size=16) Y_UpLeft
@@ -62,7 +62,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
   
   
 	//Mb_Type_NOK : Consume the token from prediction 4x4 
-	MbTypeNOK_intra4x4_CHROMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA, PredMode:[f] repeat MB_WIDTH_CHROMA==>
+	MbTypeNOK_intra4x4_CHROMA:action Mb_Type:[a]/*, FirstMbInSlice:[b]*/, PicWidthInMb:[c]/*, ConstrainedIFlag:[c_intra_flag]*/, CurrMbAddr:[d]/*,/* Coef_ACR:[e] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA,*//* PredMode:[f] repeat MB_WIDTH_CHROMA*/==>
 	guard
 		a        = 0,
 		MB_WIDTH = MB_WIDTH_CHROMA
@@ -73,7 +73,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end
 
 	//Mb_Type_NOK : Consume the token from prediction 4x4 
-	MbTypeNOK_intra4x4_LUMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA, PredMode:[f] repeat MB_WIDTH_LUMA==>
+	MbTypeNOK_intra4x4_LUMA:action Mb_Type:[a]/*, FirstMbInSlice:[b]*/, PicWidthInMb:[c]/*, ConstrainedIFlag:[c_intra_flag]*/, CurrMbAddr:[d]/*, Coef_ACR:[e] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA, PredMode:[f] repeat MB_WIDTH_LUMA*/==>
 	guard
 		a = 0
 	do
@@ -83,7 +83,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end
   
 	//Mb_Type_NOK : Consume the token from inter prediction 
-	MbTypeNOK_inter_CHROMA:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ==>
+	MbTypeNOK_inter_CHROMA:action Mb_Type:[a]/*, FirstMbInSlice:[f]*/, PicWidthInMb:[c]/*, ConstrainedIFlag:[c_intra_flag]*/, CurrMbAddr:[d]/*, Coef_ACR:[e] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA*/ ==>
 	guard
 		a        = 2,
 		MB_WIDTH = MB_WIDTH_CHROMA
@@ -94,7 +94,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end
   
 	//Mb_Type_NOK : Consume the token from inter prediction 
-	MbTypeNOK_inter_LUMA:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], Coef_ACR:[e] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA ==>
+	MbTypeNOK_inter_LUMA:action Mb_Type:[a]/*, FirstMbInSlice:[f]*/, PicWidthInMb:[c]/*, ConstrainedIFlag:[c_intra_flag]*/, CurrMbAddr:[d]/*, Coef_ACR:[e] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA*/ ==>
 	guard
 		a = 2
 	do
@@ -104,7 +104,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end
 	
 	//Mb_Type_NOK : Consume the token from inter prediction 
-	MbTypeNOK_I_PCM:action Mb_Type:[a], FirstMbInSlice:[f], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d]==>
+	MbTypeNOK_I_PCM:action Mb_Type:[a]/*, FirstMbInSlice:[f]*/, PicWidthInMb:[c]/*, ConstrainedIFlag:[c_intra_flag]*/, CurrMbAddr:[d]==>
 	guard
 		a = 4
 	do
@@ -114,7 +114,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end
   
 	//Mb_Type_OK : Enable the prediction 
-	MbTypeOK_CHROMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA
+	MbTypeOK_CHROMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], PredMode:[v]/*, Coef_ACR:[val] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA*/ ==> PredMode_I:[v]/*, Coef_ACR_I:[val] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA*/
 	guard
 		a        = 1,
 		MB_WIDTH = MB_WIDTH_CHROMA
@@ -145,7 +145,7 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	end
   
 	//Mb_Type_OK : Enable the prediction 
-	MbTypeOK_LUMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], PredMode:[v], Coef_ACR:[val] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA ==> PredMode_I:[v], Coef_ACR_I:[val] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA
+	MbTypeOK_LUMA:action Mb_Type:[a], FirstMbInSlice:[b], PicWidthInMb:[c], ConstrainedIFlag:[c_intra_flag], CurrMbAddr:[d], PredMode:[v]/*, Coef_ACR:[val] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA */==> PredMode_I:[v]/*, Coef_ACR_I:[val] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA*/
 	guard
 		a = 1
 	var

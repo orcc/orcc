@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="57" y="227"/>
+      <vertex id="CurrMbAddr" x="36" y="384"/>
       <vertex id="PicWidthInMb" x="57" y="442"/>
       <vertex id="PredMode" x="220" y="71"/>
       <vertex id="FirstMbInSlice" x="220" y="168"/>
       <vertex id="MB_IN" x="57" y="539"/>
-      <vertex id="Coef_ACR" x="220" y="286"/>
+      <vertex id="Coef_ACR" x="660" y="556"/>
       <vertex id="Mb_Type" x="57" y="636"/>
-      <vertex id="ConstrainedIFlag" x="220" y="383"/>
+      <vertex id="ConstrainedIFlag" x="193" y="236"/>
       <vertex id="MB_intraPred16x16" x="1170" y="497"/>
       <vertex id="Mgnt_Intra_16x16" x="457" y="295"/>
       <vertex id="Algo_IntraPred_LUMA_16x16" x="722" y="328"/>

@@ -129,7 +129,6 @@
     <Connection dst="Mgnt_Intra_16x16" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="PredMode" src="" src-port="PredMode"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
-    <Connection dst="Mgnt_Intra_16x16" dst-port="Coef_ACR" src="" src-port="Coef_ACR"/>
     <Connection dst="" dst-port="MB_intraPred16x16" src="Algo_Add_16x16" src-port="Z"/>
     <Connection dst="Algo_Add_16x16" dst-port="X"
         src="Algo_IntraPred_LUMA_16x16" src-port="MPR"/>
@@ -152,7 +151,7 @@
         src="" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="EDGE"
         src="Buffer_Neighbour_FullMb" src-port="EDGE"/>
-    <Connection dst="Algo_Add_16x16" dst-port="Y" src="Mgnt_Intra_16x16" src-port="Coef_ACR_I"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="ConstrainedIFlag"
         src="" src-port="ConstrainedIFlag"/>
+    <Connection dst="Algo_Add_16x16" dst-port="Y" src="" src-port="Coef_ACR"/>
 </XDF>

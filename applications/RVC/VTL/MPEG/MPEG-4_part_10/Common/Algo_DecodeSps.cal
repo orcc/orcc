@@ -449,10 +449,9 @@ actor Algo_DecodeSps()
 				println("\t\tframe_mbs_only_flag : "+ValueOfVLD[4]);
 			end
 
-			MaxFS       := MaxFS_LookUpTable       [bitand(level_idc[sps_id],0x2F)];
-			Sqrt_8MaxFS := Sqrt_8MaxFS_LookUpTable [bitand(level_idc[sps_id],0x2F)];
-			MaxDPB_x_2  := MaxDPB_x_2_LookUpTable  [bitand(level_idc[sps_id],0x2F)];
-
+			MaxFS       := MaxFS_LookUpTable       [bitand(level_idc[sps_id],0x3F)];
+			Sqrt_8MaxFS := Sqrt_8MaxFS_LookUpTable [bitand(level_idc[sps_id],0x3F)];
+			MaxDPB_x_2  := MaxDPB_x_2_LookUpTable  [bitand(level_idc[sps_id],0x3F)];
 			PicWidthInMacroBs    := pic_width_in_mbs_minus1[sps_id] + 1;
 			FrameHeightInMacroBs := (2 - 0) * (pic_height_in_map_units_minus1[sps_id] + 1);
 			if(PicWidthInMacroBs > Sqrt_8MaxFS) then

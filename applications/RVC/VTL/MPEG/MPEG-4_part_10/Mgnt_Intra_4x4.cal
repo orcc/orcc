@@ -27,12 +27,12 @@ actor Mgnt_Intra_4x4 ()
 	uint(size=4) PredMode,
 	uint(size=16) EDGE,
 	int(size=9) MB_4X4,
-	int(size=16) Coef_ACR,
+//	int(size=16) Coef_ACR,
 	bool ConstrainedIFlag 
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode4x4,
-		int(size=16) Coef_ACR_4X4,
+//		int(size=16) Coef_ACR_4X4,
 		int(size=16) Y_Left4,
 		int(size=16) Y_Up4,
 		int(size=16) Y_UpLeft4
@@ -77,12 +77,13 @@ actor Mgnt_Intra_4x4 ()
 	//Mb_Type_NOK : Consume the token from full mb intra-prediction
 	MbTypeIntra:action 
 		Mb_Type:[a], 
-		FirstMbInSlice:[b], 
+//		FirstMbInSlice:[b], 
 		PicWidthInMb:[c], 
-		CurrMbAddr:[d], 
-		Coef_ACR:[e] repeat 16*16,
-		ConstrainedIFlag:[c_intra_flag],
-		PredMode:[f]==>
+		CurrMbAddr:[d]//, 
+//		Coef_ACR:[e] repeat 16*16,
+//		ConstrainedIFlag:[c_intra_flag],
+//		PredMode:[f]
+			==>
 	guard
 		a = 1
 	do
@@ -95,10 +96,10 @@ actor Mgnt_Intra_4x4 ()
 	MbTypeInter:action 
 		Mb_Type:[a], 
 		PicWidthInMb:[c], 
-		CurrMbAddr:[d], 
+		CurrMbAddr:[d]/*, 
 		Coef_ACR:[e] repeat 16*16,
 		ConstrainedIFlag:[c_intra_flag],
-		FirstMbInSlice:[f] ==>
+		FirstMbInSlice:[f]*/ ==>
 	guard
 		a = 2
 	do
@@ -111,9 +112,9 @@ actor Mgnt_Intra_4x4 ()
   	MbTypeI_PCM: action
   		Mb_Type:[a], 
 		PicWidthInMb:[c], 
-		CurrMbAddr:[d], 
+		CurrMbAddr:[d]/*,
 		ConstrainedIFlag:[c_intra_flag],
-		FirstMbInSlice:[f] ==>
+		FirstMbInSlice:[f]*/ ==>
 	guard
 		a = 4
 	do
@@ -129,10 +130,10 @@ actor Mgnt_Intra_4x4 ()
 	  	PicWidthInMb:[c], 
 	  	CurrMbAddr:[d], 
 		ConstrainedIFlag:[c_intra_flag],
-		Coef_ACR:[coef_ac] repeat 16 * 16, 
+//		Coef_ACR:[coef_ac] repeat 16 * 16, 
 	  	PredMode:[v] repeat 16 
 	  		==>
-		  	Coef_ACR_4X4:[coef_ac] repeat 16 * 16,
+//		  	Coef_ACR_4X4:[coef_ac] repeat 16 * 16,
 		  	PredMode4x4:[[v[t_scan2_Index[s]]:for int s in 0 .. 15] ] repeat 16
 	guard
 		a = 0

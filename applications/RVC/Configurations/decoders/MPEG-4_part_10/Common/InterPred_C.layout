@@ -11,7 +11,7 @@
       <vertex id="LOCATION" x="57" y="649"/>
       <vertex id="MV" x="57" y="746"/>
       <vertex id="PartSZ" x="57" y="261"/>
-      <vertex id="Coef_ACR" x="57" y="843"/>
+      <vertex id="Coef_ACR" x="756" y="648"/>
       <vertex id="Mb_Type" x="57" y="940"/>
       <vertex id="Write_Done" x="57" y="1037"/>
       <vertex id="CurrMbAddr" x="57" y="1134"/>

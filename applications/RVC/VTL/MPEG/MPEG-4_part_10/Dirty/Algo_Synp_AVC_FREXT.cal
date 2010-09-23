@@ -5192,6 +5192,9 @@ actor Algo_Synp_AVC_FREXT()
 				end
 			end
 		end
+println("\t\tMaxFS:"+MaxFS);
+println("\t\tSqrt_8MaxFS:"+Sqrt_8MaxFS);
+println("\t\tMaxDPB_x_2:"+MaxDPB_x_2);
 		PicWidthInMacroBs    := pic_width_in_mbs_minus1[sps_id] + 1;
 		FrameHeightInMacroBs := (2 - 0) * (pic_height_in_map_units_minus1[sps_id] + 1);
 		if(PicWidthInMacroBs > Sqrt_8MaxFS) then

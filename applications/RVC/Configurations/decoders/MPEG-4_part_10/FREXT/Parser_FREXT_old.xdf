@@ -463,15 +463,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="CheckNaluType">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_Check_NALU_type_Frext_old"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -623,13 +614,10 @@
         src="Algo_Synp_AVC" src-port="RefList1Type"/>
     <Connection dst="Algo_RefList0" dst-port="RefListType"
         src="Algo_Synp_AVC" src-port="RefList0Type"/>
-    <Connection dst="CheckNaluType" dst-port="RbspByte" src="Algo_NALU" src-port="bits_rbsp8"/>
-    <Connection dst="byte2bit" dst-port="in8" src="CheckNaluType" src-port="Nalu_1"/>
-    <Connection dst="CheckNaluType" dst-port="ReadNextByte"
-        src="Algo_Synp_AVC" src-port="ReadNextByte"/>
     <Connection dst="" dst-port="IsIDR" src="Algo_MMCO" src-port="EmptyDPB"/>
     <Connection dst="Algo_RefList1" dst-port="EmptyDPB" src="Algo_MMCO" src-port="EmptyDPB"/>
     <Connection dst="Algo_RefList0" dst-port="EmptyDPB" src="Algo_MMCO" src-port="EmptyDPB"/>
     <Connection dst="Algo_RefList1" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
+    <Connection dst="byte2bit" dst-port="in8" src="Algo_NALU" src-port="bits_rbsp8"/>
 </XDF>

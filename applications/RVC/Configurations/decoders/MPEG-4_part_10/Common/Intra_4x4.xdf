@@ -147,7 +147,6 @@
         src="Mgnt_Intra4x4" src-port="Y_Up4"/>
     <Connection dst="Algo_IntraPred_LUMA_4x4" dst-port="Y_UP_LEFT"
         src="Mgnt_Intra4x4" src-port="Y_UpLeft4"/>
-    <Connection dst="Mgnt_Intra4x4" dst-port="Coef_ACR" src="" src-port="Coef_ACR"/>
     <Connection dst="Algo_Add_4x4" dst-port="X"
         src="Algo_IntraPred_LUMA_4x4" src-port="MPR"/>
     <Connection dst="Algo_IntraPred_LUMA_4x4" dst-port="AVAIL"
@@ -156,8 +155,6 @@
         src="Algo_Add_4x4" src-port="Z"/>
     <Connection dst="" dst-port="MBPred_intra_4x4"
         src="Algo_Merge_4x4_to_16x16_norasterscan" src-port="Y"/>
-    <Connection dst="Algo_Split_16x16_to_4x4_norasterscan" dst-port="X"
-        src="Mgnt_Intra4x4" src-port="Coef_ACR_4X4"/>
     <Connection dst="Algo_Add_4x4" dst-port="Y"
         src="Algo_Split_16x16_to_4x4_norasterscan" src-port="Y"/>
     <Connection dst="Algo_IntraPred_LUMA_4x4" dst-port="PredMode"
@@ -172,4 +169,6 @@
     <Connection dst="Buffer_Neighbour_4x4" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="MB_4X4" src="Algo_Add_4x4" src-port="Z"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
+    <Connection dst="Algo_Split_16x16_to_4x4_norasterscan" dst-port="X"
+        src="" src-port="Coef_ACR"/>
 </XDF>

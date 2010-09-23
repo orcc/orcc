@@ -14,7 +14,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		uint(size=13) CurrMbAddr,
 		uint(size=3) MbPartIdx,
 		uint (size=8) Mb_Type,
-		int(size=16)  Coef_ACR,
+//		int(size=16)  Coef_ACR,
 		uint(size=7) PicWidthInMb,
 		uint(size=13) PicSizeInMb,
 		int(size=16) MV,
@@ -28,7 +28,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		uint(size=11) RA_Height,
 		uint(size=16) Frac,
 		uint(size=4) refIdx,
-		int(size=16) Coef_ACR_P,
+//		int(size=16) Coef_ACR_P,
 		uint(size=1) PicID
 	:
 
@@ -68,7 +68,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   end
 
   //Mb_Type_NOK : Consume the token, nothing else to do 
-  Mb_Type_NOK :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ], Coef_ACR:[d] repeat 16*16, CurrMbAddr:[valCurrMbAddr] ==> 
+  Mb_Type_NOK :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ], /*Coef_ACR:[d] repeat 16*16,*/ CurrMbAddr:[valCurrMbAddr] ==> 
   guard
   	a = 0 or a = 1
   do
@@ -77,17 +77,17 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
 		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
 		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);
-		foreach int i in 0 .. 255
+/*		foreach int i in 0 .. 255
 		do
 			println("Input InterpFBAddrLuma Coef_ACR["+i+"]:"+d[i]);	
-		end
+		end*/
 	end
   	currMB:=valCurrMbAddr;
   	pic_size:=c;
   end
   
   //Mb_Type_OK : Enable the prediction 
-  Mb_Type_OK :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ], Coef_ACR:[d] repeat 16*16, CurrMbAddr:[valCurrMbAddr] ==> Coef_ACR_P:[d] repeat 16*16
+  Mb_Type_OK :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ]/*, Coef_ACR:[d] repeat 16*16*/, CurrMbAddr:[valCurrMbAddr] ==> /*Coef_ACR_P:[d] repeat 16*16*/
   guard
   	a = 2
   do 
@@ -96,10 +96,10 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
 		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
 		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);
-		foreach int i in 0 .. 255
+/*		foreach int i in 0 .. 255
 		do
 			println("Input InterpFBAddrLuma Coef_ACR["+i+"]:"+d[i]);	
-		end
+		end*/
 	end
     Picwidth_l := lshift(b,4);
     Picheight_l := lshift(c/b,4);

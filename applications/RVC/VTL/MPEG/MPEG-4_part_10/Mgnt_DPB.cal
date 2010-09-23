@@ -114,12 +114,12 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			uint(size=16) XinMb,
 			uint(size=16) YinMb
 		do
-		/*	if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+			/*if(MB_WIDTH != MB_WIDTH_CHROMA and MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
 				println("Input Mgnt_DPB PicWidthInMb:"+PICwidthInMb);
 				println("Input Mgnt_DPB PicSizeInMb:"+PICSizeInMb);
 				println("Input Mgnt_DPB CurrMbAddr:"+CurrMacroBAddr);
-			end
-		*/	PicWidthInMacroB := PICwidthInMb;
+			end//*/
+			PicWidthInMacroB := PICwidthInMb;
 			PicSizeInMacroB  := PICSizeInMb;
 			currmbaddr       := CurrMacroBAddr;
 			XinMb      := CurrMacroBAddr mod PicWidthInMacroB;
@@ -140,10 +140,10 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard 
 			write_done = false
 		do
-		/*	if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
+			if(MB_WIDTH != MB_WIDTH_CHROMA and MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
 				println("Input Mgnt_DPB WD:"+wd);
 			end
-		*/	pic[pic_curr_idx][wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
+			pic[pic_curr_idx][wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
 			wa_x := wa_x +1;
 			if(wa_x = wa_W) then
 				wa_y := wa_y +1;
@@ -167,12 +167,12 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		var
 			bool found := false
 		do
-			if(DEBUG_INPUT)then
+/*			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
 				println("Input Mgnt_DPB RA:"+ra);
 				println("Input Mgnt_DPB RA_Width:"+RAWidth);
 				println("Input Mgnt_DPB RA_Height:"+RAHeight);
 				println("Input Mgnt_DPB POCtoRead:"+poc2read);
-			end
+			end//*/
 			ra_offset := ra;
 			ra_W      := RAWidth;
 			ra_H      := RAHeight;
@@ -209,6 +209,12 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		var 
 			uint(size=16) rd
 		do
+<<<<<<< .mine
+			/*if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_OUTPUT)then
+				println("Input Mgnt_DPB RD:"+rd);
+			end//*/
+=======
+>>>>>>> .r2324
 			rd   := pic[Ref_idx][ra_offset + ra_x + ra_y * PicWidthInMacroB * MB_WIDTH];
 			ra_x := ra_x +1;
 			if(ra_x = ra_W) then
@@ -230,7 +236,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			write_done = true,
 			currmbaddr = PicSizeInMacroB - 1
 		do
-			if(DEBUG_OUTPUT)then
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_OUTPUT)then
 				println("Input Mgnt_DPB Write_Done:"+true);
 			end
 			PictureReady[pic_curr_idx] := true;
@@ -250,10 +256,10 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			bool         idx_selected := false,
 			int(size=32) i            := 0
 		do
-			if(DEBUG_INPUT)then
+/*			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
 				println("Input Mgnt_DPB POC:"+Valpoc);
 				println("Input Mgnt_DPB IsIDR:"+IsIDRPic);
-			end
+			end//*/
 			pic_curr_idx := -1;
 			while((not idx_selected) and (i < NB_PIC))
 			do
@@ -362,9 +368,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard
 			DelVal != SENT_DONE
 		do
-			if(DEBUG_INPUT)then
+/*			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
 				println("Input Mgnt_DPB DelList:"+DelVal);
-			end
+			end//*/
 			foreach int i in 0 .. NB_PIC - 1
 			do
 				if(ListPOC[i]   = DelVal) then
@@ -378,9 +384,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			DelList:[DelVal]
 				==>
 		do
-			if(DEBUG_INPUT)then
+/*			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
 				println("Input Mgnt_DPB DelList:"+DelVal);
-			end
+			end//*/
 			if(ValIsIDR)then
 				foreach int i in 0 .. NB_PIC - 1
 				do
@@ -401,9 +407,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			poc2disp         != -1,
 			NextPOCtoDisplay = -1
 		do
-			if(DEBUG_INPUT)then
+/*			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
 				println("Input Mgnt_DPB POCtoDisplay:"+poc2disp);
-			end
+			end//*/
 			NextPOCtoDisplay := poc2disp;
 			ListScanned      := false;
 		end
@@ -413,10 +419,10 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				==>
 		guard
 			poc2disp         = -1
-		do
-			if(DEBUG_INPUT)then
+/*		do
+			if(MB_WIDTH != MB_WIDTH_CHROMA and DEBUG_INPUT)then
 				println("Input Mgnt_DPB POCtoDisplay:"+poc2disp);
-			end
+			end//*/
 		end
 	
 	getNextPOCtoDisplay.skip: action
@@ -447,7 +453,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	schedule fsm  read_ref_parameters:
 
 		read_ref_parameters (read_ref_parameters      )--> getNextPOCtoDisplay;
+
 		getNextPOCtoDisplay (getNextPOCtoDisplay      )--> getidxdisplay;
+
 		getidxdisplay       (getidxdisplay.launch     )--> Display;
 		getidxdisplay       (getidxdisplay.skip       )--> read_write;
 

@@ -5,7 +5,7 @@
       <vertex id="PicWidthInMb" x="57" y="443"/>
       <vertex id="PredMode" x="220" y="72"/>
       <vertex id="FirstMbInSlice" x="220" y="169"/>
-      <vertex id="Coef_ACR" x="220" y="287"/>
+      <vertex id="Coef_ACR" x="528" y="574"/>
       <vertex id="MB_IN" x="57" y="540"/>
       <vertex id="Mb_Type" x="57" y="637"/>
       <vertex id="ConstrainedIFlag" x="220" y="384"/>

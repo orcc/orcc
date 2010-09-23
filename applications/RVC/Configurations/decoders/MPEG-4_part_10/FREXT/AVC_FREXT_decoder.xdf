@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="AVC_FREXT_decoder_old">
+<XDF name="AVC_FREXT_decoder">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -298,4 +298,12 @@
     <Connection dst="Decode_U" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decode_V" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decoding_Y" dst-port="BlocksSize" src="FUN_Parser" src-port="BlocksSize_Luma"/>
+    <Connection dst="Decoding_Y" dst-port="MacroBlockType"
+        src="FUN_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decoding_Y" dst-port="TransformSize8x8"
+        src="FUN_Parser" src-port="TransformSize8x8"/>
+    <Connection dst="Decode_U" dst-port="MacroBlockType"
+        src="FUN_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decode_V" dst-port="MacroBlockType"
+        src="FUN_Parser" src-port="MacroBlockType"/>
 </XDF>

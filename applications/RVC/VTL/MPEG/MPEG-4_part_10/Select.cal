@@ -14,32 +14,35 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+//Modified by Damien de Saint Jorre IETR/INSA of Rennes (France)
 
 actor Select () 
-	int(size=16) X0,
-	int(size=9) X1 ,
-	int(size=9) X2,
-	int(size=9) X3,
-	uint(size=8) Mb_Type
+	int (size=16) X0,
+	int (size=9)  X1,
+	int (size=9)  X2,
+	int (size=9)  X3,
+	uint(size=6)  Mb_Type
 		==>
-		int(size=9) X
+	int (size=9)  X
 		:
-  
-	uint(size=3) sel;
+
+	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
+	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
+	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
+
   
   	bool DEBUG_INPUT = false;
   
-	GetMbType:action Mb_Type:[a]==> 
-	do
-		sel:= a;
-		if(DEBUG_INPUT)then
-			println("Input Select Mb_Type:"+a);
-		end
-	end
   
-	GetIntra4x4:action X0:[x] repeat 16*16 ==> X:[x] repeat 16*16
+	GetIntra4x4:action
+		Mb_Type :[MbType],
+		X0      :[x] repeat 16*16
+			==>
+		X          :[x] repeat 256
 	guard
-    	sel = 0
+    	MbType = BLOCK_TYPE_I_8x8_or_4x4
     do
 		if(DEBUG_INPUT)then
 			foreach int i in 0 .. 16*16 - 1
@@ -49,9 +52,14 @@ actor Select ()
 		end
 	end
   
-	GetIntra16x16:action X1:[x] repeat 16*16 ==> X:[x] repeat 16*16 
+	GetIntra16x16:action 
+		Mb_Type :[MbType],
+		X1      :[x] repeat 16*16
+			==>
+		X :[x] repeat 16*16 
 	guard
-		sel = 1
+    	MbType >= BLOCK_TYPE_INTRA_16x16_MIN,
+    	MbType <= BLOCK_TYPE_INTRA_16x16_MAX
     do
 		if(DEBUG_INPUT)then
 			foreach int i in 0 .. 16*16 - 1
@@ -61,9 +69,13 @@ actor Select ()
 		end
 	end
   
-	GetInter:action X2:[x] repeat 16*16 ==> X:[x] repeat 16*16
+	GetInter:action
+		Mb_Type :[MbType],
+		X2      :[x] repeat 16*16
+			==>
+		X :[x] repeat 16*16
 	guard
-    	sel = 2
+    	MbType > MB_TYPE_INTRA_MAX
     do
 		if(DEBUG_INPUT)then
 			foreach int i in 0 .. 16*16 - 1
@@ -73,9 +85,13 @@ actor Select ()
 		end
 	end
 	
-	GetPCM: action X3:[x] repeat 16*16 ==> X:[x] repeat 16*16
+	GetPCM: action
+		Mb_Type :[MbType],
+		X3      :[x] repeat 16*16
+			==>
+		X:[x] repeat 16*16
 	guard
-    	sel = 4
+    	MbType = BLOCK_TYPE_I_PCM
     do
 		if(DEBUG_INPUT)then
 			foreach int i in 0 .. 16*16 - 1
@@ -85,11 +101,4 @@ actor Select ()
 		end
 	end
 	
-	schedule fsm GetMbType:
-		GetMbType   (GetMbType)     --> Get;
-		Get   		(GetIntra4x4)	--> GetMbType;
-		Get   		(GetIntra16x16)	--> GetMbType;
-		Get			(GetPCM)		--> GetMbType;
-		Get   		(GetInter)    	--> GetMbType;
-	end 
 end

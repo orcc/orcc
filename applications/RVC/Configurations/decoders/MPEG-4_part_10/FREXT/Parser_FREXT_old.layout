@@ -47,7 +47,7 @@
       <vertex id="IsIDR" x="1278" y="2684"/>
       <vertex id="BlocksSize_Luma" x="1278" y="2173"/>
       <vertex id="byte2bit" x="539" y="2519"/>
-      <vertex id="Algo_NALU" x="168" y="2599"/>
+      <vertex id="Algo_NALU" x="159" y="2512"/>
       <vertex id="Algo_Synp_AVC" x="671" y="2149"/>
       <vertex id="Algo_BlockExpand_AVC" x="1568" y="3118"/>
       <vertex id="Algo_BlockSplit_AVC" x="1993" y="1757"/>
@@ -60,6 +60,5 @@
       <vertex id="Black_Hole" x="1568" y="2880"/>
       <vertex id="Demux_Cavlc_Cabac" x="1278" y="3098"/>
       <vertex id="Mux_Cavlc_Cabac" x="1797" y="3026"/>
-      <vertex id="CheckNaluType" x="350" y="2518"/>
    </vertices>
 </layout>

@@ -6,7 +6,7 @@
       <vertex id="PredMode" x="220" y="71"/>
       <vertex id="FirstMbInSlice" x="220" y="168"/>
       <vertex id="MB_IN" x="57" y="539"/>
-      <vertex id="Coef_ACR" x="220" y="286"/>
+      <vertex id="Coef_ACR" x="747" y="581"/>
       <vertex id="Mb_Type" x="57" y="636"/>
       <vertex id="ConstrainedIFlag" x="220" y="383"/>
       <vertex id="MB4x4Pred_C" x="1099" y="497"/>

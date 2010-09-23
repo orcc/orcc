@@ -56,12 +56,6 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Mickael Raulet IETR/INSA of Rennes
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes
 
-//To do : 
-//        delete ValidxRefList
-//        delete ValidxRefList2
-//        delete NbPOC2
-//        delete IdxFalsePic
-//        delete IdxNotFound42
 actor Algo_RefList ()
 	uint(size=31) RefReordering,
 	uint(size=31) FraNum,
@@ -107,7 +101,6 @@ actor Algo_RefList ()
 	int (size=32) ValMovedFrame            := 0;
 	uint(size=31) ValMaxFrameNum           := 0;
 	uint(size=5)  CounterRefListTab        := 0; /* Contains the number of RefList's element which are sent                   */
-	uint(size=5)  NbLTRead                 := 0; /* Contains the number of Long Term List's' element which are read           */
 	uint(size=5)  NbSTRead                 := 0; /* Contains the number of Long Term List's' element which are read           */
 	uint(size=5)  NbSTCount                := 0; /* Contains the number of Long Term List's' element which are read           */
 	uint(size=5)  NumMaxListRefFrame       := 0; /* Frame Number of all pictures must be between 0 and NumMaxListRefFrame - 1 */
@@ -115,12 +108,6 @@ actor Algo_RefList ()
 	uint(size=6)  NbPOC                    := 0;
 	int (size=32) LastFrameNum             := 0;
 	uint(size=2)  ListType                 := REFLIST0_PRED;
-
-	/*Delete this variables !!!*/
-	int(size=5)  ValidxRefList             := 0;
-	bool         idx_found                 := false;
-	bool         frame_found := false;
-	int(size=32) ValMovedIdx                 := 0;
 
 
 /*
@@ -234,7 +221,6 @@ actor Algo_RefList ()
 				IdxLTList[i] := -1;
 				PicIsUsed[i] := false;
 			end
-			NbLTRead       := 0;
 			NbSTRead       := 0;
 			NbSTCount      := ValSzSTList;
 			ValMovedFrame  := frame_num;
@@ -251,40 +237,39 @@ actor Algo_RefList ()
 
 	//Fill the Long Term List
 	ReadLists.LongTerm: action
-			LongTermList :[ValLongTerm]
+			LongTermList :[ValLongTerm] repeat 16
 				==>
-		guard
-			NbLTRead < 16
 		var
-			bool idx_found2
+			bool idx_found,
+			bool frame_found
 		do
-			frame_found := false;
-			foreach int i in 0 .. NbPOC - 1
+			foreach int j in 0 .. 15
 			do
-				if(FrameNumList[i] = ValLongTerm) then
-					IdxLTList[i] := NbLTRead;
-					PicIsUsed[i] := true;
-					frame_found  := true;
-				end
-			end
-			idx_found := false;
-			if(not frame_found) then
+				frame_found := false;
 				foreach int i in 0 .. NbPOC - 1
 				do
-					idx_found2 :=idx_found;
-					if(FrameNumList[i] > ValLongTerm and idx_found = false) then
-						idx_found2 := true;
-						InsertPoc(i, -42, ValLongTerm, NbLTRead);
-						if(i<= IdxCurrentPic and IdxCurrentPic<31) then
-							IdxCurrentPic := IdxCurrentPic + 1;
+					if(FrameNumList[i] = ValLongTerm[j]) then
+						IdxLTList[i] := j;
+						PicIsUsed[i] := true;
+						frame_found  := true;
+					end
+				end
+				idx_found := false;
+				if(not frame_found) then
+					foreach int i in 0 .. NbPOC - 1
+					do
+						if(FrameNumList[i] > ValLongTerm[j] and idx_found = false) then
+							idx_found := true;
+							InsertPoc(i, -42, ValLongTerm[j], j);
+							if(i<= IdxCurrentPic and IdxCurrentPic<31) then
+								IdxCurrentPic := IdxCurrentPic + 1;
+							end
 						end
 					end
-					idx_found :=idx_found2;
 				end
-			end
-			NbLTRead     := NbLTRead + 1;
-			if(DEBUG_INPUT)then 
-				println("Input RefList LongTermList: "+ValLongTerm);
+				if(DEBUG_INPUT)then 
+					println("Input RefList LongTermList: "+ValLongTerm[j]);
+				end
 			end
 		end
 
@@ -296,9 +281,9 @@ actor Algo_RefList ()
 		guard
 			NbSTRead < NbSTCount
 		var
-			bool idx_found2
+			bool idx_found,
+			bool frame_found
 		do
-	//	println("ShortTermFrame:"+ValShortTerm);
 			frame_found := false;
 			foreach int i in 0 .. NbPOC - 1
 			do
@@ -312,15 +297,13 @@ actor Algo_RefList ()
 			if(not frame_found) then
 				foreach int i in 0 .. NbPOC - 1
 				do
-					idx_found2 :=idx_found;
 					if(FrameNumList[i] > ValShortTerm and idx_found = false) then
-						idx_found2 := true;
+						idx_found := true;
 						InsertPoc(i, -42, ValShortTerm, -1);
 						if(i<= IdxCurrentPic and IdxCurrentPic<31) then
 							IdxCurrentPic := IdxCurrentPic + 1;
 						end
 					end
-					idx_found :=idx_found2;
 				end
 			end
 			NbSTRead     := NbSTRead + 1;
@@ -343,7 +326,6 @@ actor Algo_RefList ()
 			do
 				idx := NbSTRead;
 				if((PicIsUsed[idx] = false) and (idx != IdxCurrentPic))then
-	//	println("DelFrame:"+FrameNumList[idx]);
 					DelFrame(FrameNumList[idx]);
 				else
 					idx := idx + 1;
@@ -351,7 +333,6 @@ actor Algo_RefList ()
 				NbSTRead  := idx;
 				NbPOCtemp := NbPOC;
 			end
-	//println("");
 end
 
 
@@ -364,7 +345,7 @@ end
 	guard
 		ListType = REFLIST0_PRED
 	var
-			uint(size=4) IdxRefList2,
+			uint(size=4) ValidxRefList := 0,
 			uint(size=5) IdxBuffer,
 			int (size=32) FrameNumBuffer
 	do
@@ -379,24 +360,21 @@ end
 		do
 			ValLTList[i] := -1;
 		end
-ValidxRefList := 0;//////
 		foreach int i in 0 .. NbPOC - 1
 		do
-			IdxRefList2 := ValidxRefList; 
 			if(i != IdxCurrentPic)then
 				if(IdxLTList[i] = -1)then
-					RefIdx[IdxRefList2] := i;
+					RefIdx[ValidxRefList] := i;
 					if(FrameNumList[i] > FrameNumList[IdxCurrentPic]) then
-						FrameNumWrap[IdxRefList2] := FrameNumList[i] - ValMaxFrameNum;
+						FrameNumWrap[ValidxRefList] := FrameNumList[i] - ValMaxFrameNum;
 					else
-						FrameNumWrap[IdxRefList2] := FrameNumList[i];
+						FrameNumWrap[ValidxRefList] := FrameNumList[i];
 					end
-					IdxRefList2         := IdxRefList2 + 1;
+					ValidxRefList         := ValidxRefList + 1;
 				else
 					ValLTList[IdxLTList[i]] := i;
 				end
 			end
-			ValidxRefList := IdxRefList2;
 		end
 		if(ValidxRefList>0) then
 			foreach int i in 0 .. ValidxRefList - 1
@@ -418,13 +396,10 @@ ValidxRefList := 0;//////
 		if(ValidxRefList < NumMaxListRefFrame)then
 			foreach int i in 0 .. 15
 			do
-				IdxRefList2 := ValidxRefList; 
-				if ( (ValLTList[i] != -1) and (IdxRefList2 < NumMaxListRefFrame) ) then 
-					//println("ValFrameNum:"+ValLTList[i]);
-					RefIdx[IdxRefList2] := ValLTList[i]; 
-					IdxRefList2         := IdxRefList2 + 1 ;
+				if ( (ValLTList[i] != -1) and (ValidxRefList < NumMaxListRefFrame) ) then 
+					RefIdx[ValidxRefList] := ValLTList[i]; 
+					ValidxRefList         := ValidxRefList + 1 ;
 				end
-				ValidxRefList := IdxRefList2;
 			end
 		end
 		if(DEBUG_INPUT)then 
@@ -565,8 +540,10 @@ ValidxRefList := 0;//////
 		guard 
 			(reordering_of_pic_nums_idc = 0 or reordering_of_pic_nums_idc = 1) 
 		var
-			bool IsInRefList := false,
-			int (size = 32) poc
+			uint(size=4)  ValidxRefList := 0,
+			bool          IsInRefList := false,
+			int (size=32) poc,
+			int (size=32) ValMovedIdx  
 		do
 			if(DEBUG_INPUT)then 
 				println("Input RefList RefReordering: "+reordering_of_pic_nums_idc+" ; "+abs_diff_pic_num_minus1);
@@ -633,12 +610,12 @@ ValidxRefList := 0;//////
 		guard 
 			reordering_of_pic_nums_idc = 2
 		var
-			int (size = 32) poc
+			uint(size=4)  ValidxRefList := 0,
+			int (size=32) poc
 		do
 			if(DEBUG_INPUT)then 
 				println("Input RefList RefReordering: "+reordering_of_pic_nums_idc+" ; "+idx_LTList);
 			end
-			ValidxRefList := 0;
 			//Search the location of the reference picture in the RefList
 			foreach int i in 0 .. NumMaxListRefFrame-1
 			do
@@ -705,11 +682,12 @@ ValidxRefList := 0;//////
 */
 	schedule fsm  read_num_ref_frames:
 
-		read_num_ref_frames               (read_num_ref_frames                  )--> ReadLists;
+		read_num_ref_frames               (read_num_ref_frames                  )--> ReadLTLists;
 
-		ReadLists                         (ReadLists.ShortTerm                  )--> ReadLists;
-		ReadLists                         (ReadLists.LongTerm                   )--> ReadLists;
-		ReadLists                         (ReadLists.done                       )--> InitRefList;
+		ReadLTLists                       (ReadLists.LongTerm                 )--> ReadSTLists;
+
+		ReadSTLists                       (ReadLists.ShortTerm                  )--> ReadSTLists;
+		ReadSTLists                       (ReadLists.done                       )--> InitRefList;
 
 		InitRefList                       (InitRefList                          )--> read_ref_pic_list_reordering_flag;
 

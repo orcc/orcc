@@ -74,7 +74,7 @@ int MAX_QP               = 51;
 int FRAME                = 0;   // image structures
 uint(size=1) mixedModeEdgeFlag = 0; // mixed mode currently not supported
 
-	bool DEBUG_INPUT = false;
+//bool DEBUG_INPUT = true;
 
 /////////////////////
 // State Variables //
@@ -253,25 +253,25 @@ read_pic_parameters: action  ==>
 ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g] repeat 32,LFDisable:[j]==> 
   guard a=2
   do   
-  	if(DEBUG_INPUT)then
-		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
-		println("Input Mgnt_DBF PicWidthInMb:"+width);	
-		println("Input Mgnt_DBF PicSizeInMb:"+height);	
-		println("Input Mgnt_DBF MbIntraFlag:"+a);	
+/*	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
+//		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
+//		println("Input Mgnt_DBF PicWidthInMb:"+width);	
+//		println("Input Mgnt_DBF PicSizeInMb:"+height);	
+//		println("Input Mgnt_DBF MbIntraFlag:"+a);	
 		println("Input Mgnt_DBF QP:"+b);	
-		println("Input Mgnt_DBF Cbp_blk:"+c);	
-		println("Input Mgnt_DBF Alpha_offset:"+d);	
-		println("Input Mgnt_DBF Beta_offset:"+e);	
-		foreach int i in 0 .. 15
-		do
-			println("Input Mgnt_DBF RefIdx:"+f[i]);	
-		end	
-		foreach int i in 0 .. 31
-		do
-			println("Input Mgnt_DBF MV:"+g[i]);	
-		end
-		println("Input Mgnt_DBF LFDisable:"+j);	
-  	end   	
+//		println("Input Mgnt_DBF Cbp_blk:"+c);	
+//		println("Input Mgnt_DBF Alpha_offset:"+d);	
+//		println("Input Mgnt_DBF Beta_offset:"+e);	
+//		foreach int i in 0 .. 15
+//		do
+//			println("Input Mgnt_DBF RefIdx:"+f[i]);	
+//		end	
+//		foreach int i in 0 .. 31
+//		do
+//			println("Input Mgnt_DBF MV:"+g[i]);	
+//		end
+//		println("Input Mgnt_DBF LFDisable:"+j);	
+  	end //*/  	
     MB_Width := width;          
     MB_Height:= height / width;
     mb_type:=a;
@@ -296,17 +296,17 @@ ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[hei
 ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
   guard a=0 or a=1 
   do   
-  	if(DEBUG_INPUT)then
-		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
-		println("Input Mgnt_DBF PicWidthInMb:"+width);	
-		println("Input Mgnt_DBF PicSizeInMb:"+height);	
-		println("Input Mgnt_DBF MbIntraFlag:"+a);	
-		println("Input Mgnt_DBF QP:"+b);	
-		println("Input Mgnt_DBF Cbp_blk:"+c);	
-		println("Input Mgnt_DBF Alpha_offset:"+d);	
-		println("Input Mgnt_DBF Beta_offset:"+e);
-		println("Input Mgnt_DBF LFDisable:"+j);	
-  	end        
+/*	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
+//		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
+//		println("Input Mgnt_DBF PicWidthInMb:"+width);	
+//		println("Input Mgnt_DBF PicSizeInMb:"+height);	
+//		println("Input Mgnt_DBF MbIntraFlag:"+a);	
+//		println("Input Mgnt_DBF QP:"+b);	
+//		println("Input Mgnt_DBF Cbp_blk:"+c);	
+//		println("Input Mgnt_DBF Alpha_offset:"+d);	
+//		println("Input Mgnt_DBF Beta_offset:"+e);
+//		println("Input Mgnt_DBF LFDisable:"+j);	
+  	end   //*/     
     MB_Width := width;          
     MB_Height:= height / width;
     mb_type:=a;     
@@ -329,16 +329,16 @@ ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[he
 ReadMB.IPCM: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a], Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
   guard a=4 
   do       
-  	if(DEBUG_INPUT)then
-		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
-		println("Input Mgnt_DBF PicWidthInMb:"+width);	
-		println("Input Mgnt_DBF PicSizeInMb:"+height);	
-		println("Input Mgnt_DBF MbIntraFlag:"+a);
-		println("Input Mgnt_DBF Cbp_blk:"+c);	
-		println("Input Mgnt_DBF Alpha_offset:"+d);	
-		println("Input Mgnt_DBF Beta_offset:"+e);
-		println("Input Mgnt_DBF LFDisable:"+j);	
-  	end    
+/*  	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
+//		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
+//		println("Input Mgnt_DBF PicWidthInMb:"+width);	
+//		println("Input Mgnt_DBF PicSizeInMb:"+height);	
+//		println("Input Mgnt_DBF MbIntraFlag:"+a);
+//		println("Input Mgnt_DBF Cbp_blk:"+c);	
+//		println("Input Mgnt_DBF Alpha_offset:"+d);	
+//		println("Input Mgnt_DBF Beta_offset:"+e);
+//		println("Input Mgnt_DBF LFDisable:"+j);	
+  	end    //*/
     MB_Width := width;          
     MB_Height:= height / width;
     mb_type:=a;     
@@ -358,12 +358,12 @@ StartMB_CHROMA: action Z:[v] repeat MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA ==
   guard
   	MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
   do   
-  	if(DEBUG_INPUT)then  
+/*  	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then  
 	  	foreach int i in 0 ..MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA -1
 	  	do
 	  		println("Input Mgnt_DBF Z:"+v[i]);
 	  	end   
-	end
+	end//*/
     foreach int y in 0 .. MB_BLOCK_SIZE_CHROMA-1 do   
       foreach int x in 0 .. MB_BLOCK_SIZE_CHROMA-1 do 
         curr_mb[y][x]:=v[y*MB_BLOCK_SIZE_CHROMA+x]; 
@@ -425,12 +425,12 @@ StartMB_CHROMA: action Z:[v] repeat MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA ==
   
 StartMB_LUMA: action Z:[v] repeat MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA ==>  
   do    
-  	if(DEBUG_INPUT)then  
+/*  	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then  
 	  	foreach int i in 0 ..MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA -1
 	  	do
 	  		println("Input Mgnt_DBF Z:"+v[i]);
 	  	end   
-	end    
+	end //*/   
     foreach int y in 0 .. MB_BLOCK_SIZE_LUMA-1 do   
       foreach int x in 0 .. MB_BLOCK_SIZE_LUMA-1 do 
         curr_mb[y][x]:=v[y*MB_BLOCK_SIZE_LUMA+x]; 
@@ -694,12 +694,12 @@ var
     List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int m in 0 .. MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1 ],
     int uc:=0, int lc:=0, int cc:=0     
 do    
-  	if(DEBUG_INPUT)then  
+  /*	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then  
 	  	foreach int i in 0 ..(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)  -1
 	  	do
 	  		println("Input Mgnt_DBF DB_O:"+v[i]);
 	  	end   
-	end   
+	end  //*/ 
   
     foreach int i in 0 .. (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1 do
       if (i<4*(MB_BLOCK_SIZE_LUMA+4)) then  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end

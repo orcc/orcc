@@ -59,7 +59,9 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	int (size=8)  ScalingList,
 	int (size=8)  Qp,
 	int (size=8)  Qp_Cb,
-	int (size=8)  Qp_Cr
+	int (size=8)  Qp_Cr,
+	uint(size=6)  MacroBlockType,
+	bool          TransformSize8x8
 		:
 
 	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
@@ -87,7 +89,8 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			ScalingList     :[[16 : for int i in 0 .. 15]] repeat 16,
 			Qp              :[ValQp],
 			Qp_Cb           :[ValQpCb],
-			Qp_Cr           :[ValQpCr]
+			Qp_Cr           :[ValQpCr],
+			MacroBlockType  :[MB_TYPE_P_8X8]
 		guard
 			skip = true
 		end
@@ -97,10 +100,11 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			MbType            :[mb_type],
 			MbLayerQp_Y_Cb_Cr :[ValQp , ValQpCb , ValQpCr]
 				==>
-			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16,
-			Qp          :[ValQp],
-			Qp_Cb       :[ValQpCb],
-			Qp_Cr       :[ValQpCr]
+			ScalingList    :[[16 : for int i in 0 .. 15]] repeat 16,
+			Qp             :[ValQp],
+			Qp_Cb          :[ValQpCb],
+			Qp_Cr          :[ValQpCr],
+			MacroBlockType :[mb_type]
 		guard
 			skip    =  false,
 			mb_type = BLOCK_TYPE_I_8x8_or_4x4
@@ -110,8 +114,9 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			TransfSz8x8Flag     :[Is8x8],
 			RemIntraYxYPredMode :[rem_intra_4x4_pred_mode] repeat 16
 				==>
-			MbIntraFlag   :[1],
-			IntraPredMode :[intra_pred_mode] repeat 17
+			MbIntraFlag      :[1],
+			TransformSize8x8 :[Is8x8],
+			IntraPredMode    :[intra_pred_mode] repeat 17
 		guard
 			Is8x8   = false
 		var
@@ -128,8 +133,9 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			TransfSz8x8Flag     :[Is8x8],
 			RemIntraYxYPredMode :[rem_intra_8x8_pred_mode] repeat 4
 				==>
-			MbIntraFlag   :[1],
-			IntraPredMode :[intra_pred_mode] repeat 4
+			MbIntraFlag      :[1],
+			TransformSize8x8 :[Is8x8],
+			IntraPredMode    :[intra_pred_mode] repeat 4
 		guard
 			Is8x8   = true
 		var
@@ -148,12 +154,13 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			TransfSz8x8Flag   :[Is8x8],
 			MbLayerQp_Y_Cb_Cr :[ValQp , ValQpCb , ValQpCr]
 				==>
-			MbIntraFlag     :[1],
-			IntraPredMode   :[ 3 , (mb_type-1) mod 4],
-			ScalingList     :[[16 : for int i in 0 .. 15]] repeat 16,
-			Qp              :[ValQp],
-			Qp_Cb           :[ValQpCb],
-			Qp_Cr           :[ValQpCr]
+			MbIntraFlag    :[1],
+			IntraPredMode  :[ 3 , (mb_type-1) mod 4],
+			ScalingList    :[[16 : for int i in 0 .. 15]] repeat 16,
+			Qp             :[ValQp],
+			Qp_Cb          :[ValQpCb],
+			Qp_Cr          :[ValQpCr],
+			MacroBlockType :[mb_type]
 		guard
 			skip     =  false,
 			mb_type >= BLOCK_TYPE_INTRA_16x16_MIN,
@@ -165,8 +172,9 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			MbType          :[mb_type],
 			TransfSz8x8Flag :[Is8x8]
 				==>
-			MbIntraFlag   :[1],
-			IntraPredMode :[4]
+			MbIntraFlag    :[1],
+			IntraPredMode  :[4],
+			MacroBlockType :[mb_type]
 		guard
 			skip    =  false,
 			mb_type = BLOCK_TYPE_I_PCM
@@ -178,11 +186,12 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			TransfSz8x8Flag :[Is8x8],
 			MbLayerQp_Y_Cb_Cr :[ValQp , ValQpCb , ValQpCr]
 				==>
-			MbIntraFlag :[0],
-			ScalingList :[[16 : for int i in 0 .. 15]] repeat 16,
-			Qp          :[ValQp],
-			Qp_Cb       :[ValQpCb],
-			Qp_Cr       :[ValQpCr]
+			MbIntraFlag    :[0],
+			ScalingList    :[[16 : for int i in 0 .. 15]] repeat 16,
+			Qp             :[ValQp],
+			Qp_Cb          :[ValQpCb],
+			Qp_Cr          :[ValQpCr],
+			MacroBlockType :[mb_type]
 		guard
 			skip    = false,
 			Mb_type > MB_TYPE_INTRA_MAX

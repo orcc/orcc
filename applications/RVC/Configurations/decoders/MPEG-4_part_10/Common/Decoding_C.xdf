@@ -201,6 +201,13 @@
     <Port kind="Input" name="IsIDR">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="MacroBlockType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -308,4 +315,5 @@
     <Connection dst="PRED_C" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="PRED_C" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="PRED_C" dst-port="IsIDR" src="" src-port="IsIDR"/>
+    <Connection dst="PRED_C" dst-port="MacroBlockType" src="" src-port="MacroBlockType"/>
 </XDF>

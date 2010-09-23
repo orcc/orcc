@@ -15,41 +15,51 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Select2 ()/* int(size=16) X0,*/ int(size=9) X1 , int(size=9) X2, int(size=9) X3, uint(size=8) Mb_Type  ==> int(size=9) X :
-  uint(size=3) sel;
-  
-	GetMbType:action Mb_Type:[a]==> 
-	do
-		sel:= a;
-	end
+actor Select2 ()
+	/* int(size=16) X0,*/
+	int (size=9) X1,
+	int (size=9) X2,
+	int (size=9) X3,
+	uint(size=6) Mb_Type
+		==>
+	int(size=9) X :
+
+	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
+	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
+	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
   /*
 	GetIntra4x4:action X0:[x] repeat 8*8 ==> X:[x] repeat 8*8
 	guard
     	sel = 0
 	end
   */
-	GetIntra16x16:action X1:[x] repeat 8*8 ==> X:[x] repeat 8*8 
+	GetIntra16x16:action
+		Mb_Type :[MbType],
+		X1      :[x] repeat 8*8
+			==>
+		X :[x] repeat 8*8 
 	guard
-		sel = 1
+		MbType <= MB_TYPE_INTRA_MAX,
+		MbType != BLOCK_TYPE_I_PCM
 	end
   
-	GetInter:action X2:[x] repeat 8*8 ==> X:[x] repeat 8*8
+	GetInter:action
+		Mb_Type :[MbType],
+		X2      :[x] repeat 8*8
+			==>
+		X :[x] repeat 8*8
 	guard
-    	sel = 2
+    	MbType > MB_TYPE_INTRA_MAX
 	end
 	
-	GetPCM: action X3:[x] repeat 8*8 ==> X:[x] repeat 8*8
+	GetPCM: action
+		Mb_Type :[MbType],
+		X3      :[x] repeat 8*8
+			==>
+		X:[x] repeat 8*8
 	guard
-    	sel = 4
+		MbType = BLOCK_TYPE_I_PCM
 	end
-	
-	schedule fsm GetMbType:
-		GetMbType   (GetMbType)     --> Get;
-		//Get   		(GetIntra4x4)	--> GetMbType;
-		Get   		(GetIntra16x16)	--> GetMbType;
-		Get			(GetPCM)		--> GetMbType;
-		Get   		(GetInter)    	--> GetMbType;
-	end 
-  
-  
 end

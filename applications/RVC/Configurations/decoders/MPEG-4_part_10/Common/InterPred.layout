@@ -8,7 +8,7 @@
       <vertex id="MbPartWidth" x="543" y="72"/>
       <vertex id="MbPartHeigth" x="543" y="169"/>
       <vertex id="RD_L" x="256" y="320"/>
-      <vertex id="Coef_ACR" x="57" y="649"/>
+      <vertex id="Coef_ACR" x="780" y="571"/>
       <vertex id="LOCATION" x="57" y="746"/>
       <vertex id="MV" x="57" y="843"/>
       <vertex id="PartSZ" x="57" y="261"/>
