@@ -1,8 +1,113 @@
-actor GzipDecompressor() int(size=8) DATA ==> :
+actor GzipDecompressor() int(size=8) C ==> int(size=8) D:
 
-	done: action DATA:[d] ==>
+	// the bits of the byte read
+	uint(size=16) bits;
+	
+	// number of bits remaining in value
+	uint(size=4) num_bits := 0;
+	
+	// true when this block is the last block
+	bool bfinal := false;
+	
+	// compression type
+	uint(size=2) btype;
+	
+	///////////////////////////////////////////////////////////////////////////
+	procedure bits_read(int(size=5) n)
+	begin
+		num_bits := num_bits - n;
+		bits := bits >> n;
+	end
+	
+	function need_bits(int n) --> bool :
+		num_bits >= n
+	end
+	
+	///////////////////////////////////////////////////////////////////////////
+	// test final block
+	is_final: action ==> guard bfinal end
+	other: action ==> end
+	
+	///////////////////////////////////////////////////////////////////////////
+	load: action C:[ byte ] ==>
+	do
+		bits := (byte << num_bits) | bits;
+		num_bits := num_bits + 8;
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// block header
+	block_header: action ==>
 	guard
-		d & 0x01
+		need_bits(3)
+	do
+		bfinal := (bits & 1) = 1;
+		btype := (bits >> 1) & 0x03;
+		bits_read(3);
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// uncompressed data
+	uncompressed: action ==>
+	guard
+		btype = 0
+	end
+
+	uint(size=16) len;
+	uint(size=16) count;
+	uint(size=16) nlen;
+
+	read_uc_len: action C:[ len1, len2, nlen1, nlen2 ] ==>
+	do
+		len := (len2 << 8) | len1;
+		nlen := (nlen2 << 8) | nlen1;
+		count := 0;
+	end
+
+	loop.uc: action C:[ byte ] ==> D:[ byte ]
+	do
+		count := count + 1;
+	end
+	
+	done.uc: action ==>
+	guard
+		count = len
+	end
+	
+	///////////////////////////////////////////////////////////////////////////
+	// fixed Huffman coding
+	fixed_huffman: action ==>
+	guard
+		btype = 0x01
+	end
+	
+	decode_literal: action ==>
+	end
+
+	///////////////////////////////////////////////////////////////////////////
+	// FSM
+
+	schedule fsm start:
+		start (is_final) --> done;
+		start (other) --> new_block;
+
+		new_block (load) --> new_block;
+		new_block (block_header) --> body;
+		
+		body (uncompressed) --> uncompressed;
+		body (fixed_huffman) --> fixed;
+
+		uncompressed (read_uc_len) --> uncompressed_loop;
+		uncompressed_loop (loop.uc) --> uncompressed_loop;
+		uncompressed_loop (done.uc) --> start;
+		
+		fixed (decode_literal) --> start;
+	end
+	
+	priority
+		is_final > other;
+		done > loop;
+		block_header > load;
 	end
 
 end

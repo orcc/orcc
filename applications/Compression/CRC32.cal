@@ -18,9 +18,9 @@ actor CRC32() int(size=8) I, bool END ==> uint(size=32) CRC :
 			crc_table[n] := c;
 		end
 	end
-	
+
 	uint(size=32) crc := 0;
-	
+
 	action I:[buf] ==>
 	var
 		uint(size=32) c := crc ^ 0xffffffff
@@ -29,6 +29,7 @@ actor CRC32() int(size=8) I, bool END ==> uint(size=32) CRC :
         crc := c ^ 0xffffffff;
 	end
 
+	// send the crc when there is no more data and we receive a token on END
 	action END:[ _ ] ==> CRC:[crc]
 	do
 		crc := 0;

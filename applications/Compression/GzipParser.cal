@@ -82,7 +82,7 @@ actor GzipParser() int(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(s
 	
 	flag.extra: action I:[si1, si2, len1, len2] ==>
 	do
-		max_count := (len1 << 8) | len2;
+		max_count := (len2 << 8) | len1;
 		count := 0;
 	end
 
@@ -107,7 +107,7 @@ actor GzipParser() int(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(s
 	// check CRC
 	flag.hcrc: action I:[crc1, crc2] ==>
 	do
-		if (crc & 0xFFFF) != ((crc1 << 8) | crc2) then
+		if (crc & 0xFFFF) != ((crc2 << 8) | crc1) then
 			fail("bad header CRC");
 		end
 	end
@@ -133,7 +133,7 @@ actor GzipParser() int(size=8) I, uint(size=32) CRC ==> int(size=8) HDATA, int(s
 		flag_name_loop (read_not_zero) --> flag_name_loop;
 		flag_name_loop (read_zero) --> flag_comment;
 
-		flag_comment (flag_not_set) --> read_crc;
+		flag_comment (flag_not_set) --> request_crc;
 		flag_comment (flag_test.comment) --> flag_comment_loop;
 		flag_comment_loop (read_not_zero) --> flag_comment_loop;
 		flag_comment_loop (read_zero) --> request_crc;

@@ -48,6 +48,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="print_data">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="PrintData"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -55,5 +64,6 @@
     <Connection dst="crc32" dst-port="END" src="parser" src-port="END"/>
     <Connection dst="parser" dst-port="CRC" src="crc32" src-port="CRC"/>
     <Connection dst="crc32" dst-port="I" src="parser" src-port="HDATA"/>
-    <Connection dst="decompressor" dst-port="DATA" src="parser" src-port="BDATA"/>
+    <Connection dst="decompressor" dst-port="C" src="parser" src-port="BDATA"/>
+    <Connection dst="print_data" dst-port="I" src="decompressor" src-port="D"/>
 </XDF>

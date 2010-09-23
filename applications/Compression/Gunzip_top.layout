@@ -5,5 +5,6 @@
       <vertex id="parser" x="252" y="117"/>
       <vertex id="crc32" x="258" y="255"/>
       <vertex id="decompressor" x="491" y="133"/>
+      <vertex id="print_data" x="673" y="138"/>
    </vertices>
 </layout>
