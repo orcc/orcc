@@ -64,6 +64,8 @@ public class CppBackendImpl extends AbstractBackend {
 
 	public static Boolean partitioning = false;
 
+	public static Boolean printHeader = false;
+
 	private boolean needSerDes = false;
 
 	/**
@@ -79,20 +81,22 @@ public class CppBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	private void computeMapping(Network network) throws OrccException {
-		Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
-		for (Instance instance : network.getInstances()) {
-			String component = getPartNameAttribute(instance);
-			if (component != null) {
-				List<Instance> list = threads.get(component);
-				if (list == null) {
-					list = new ArrayList<Instance>();
-					threads.put(component, list);
+		if(partitioning) {
+			Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
+			for (Instance instance : network.getInstances()) {
+				String component = getPartNameAttribute(instance);
+				if (component != null) {
+					List<Instance> list = threads.get(component);
+					if (list == null) {
+						list = new ArrayList<Instance>();
+						threads.put(component, list);
+					}
+					list.add(instance);
 				}
-				list.add(instance);
 			}
+			printer.getOptions().put("threads", threads);
+			printer.getOptions().put("needThreads", (threads.keySet().size() > 1));			
 		}
-		printer.getOptions().put("threads", threads);
-		printer.getOptions().put("needThreads", (threads.keySet().size() > 1));
 	}
 
 	private void computeFifoKind(Network network) throws OrccException {
@@ -112,7 +116,7 @@ public class CppBackendImpl extends AbstractBackend {
 				needSerDes = true;
 				printer.getOptions().put("needSerDes", needSerDes);
 				kind = 1;
-			} else if (!srcName.equals(tgtName) && !srcName.isEmpty()) {
+			} else if (!srcName.equals(tgtName) && partitioning) {
 				kind = 2;
 			}
 
@@ -159,7 +163,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		boolean partition = getAttribute("net.sf.orcc.backends.partition",
-				false);
+				true);
 
 		if (partition) {
 			partitioning = true;
@@ -182,8 +186,13 @@ public class CppBackendImpl extends AbstractBackend {
 
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
+		
+		printHeader = true;
 		printActors(actors);
-
+		
+		printHeader = false;
+		printActors(actors);
+		
 		// print network
 		write("Printing network...\n");
 		printNetwork(network);
@@ -208,11 +217,14 @@ public class CppBackendImpl extends AbstractBackend {
 		try {
 			String name = path + File.separator + actor.getName();
 
-			printer.loadGroups("C_actor", "Cpp_actorDecl");
-			printer.printActor(name + ".h", actor);
+			if(printHeader) {
+				printer.loadGroups("Cpp_actorDecl");
+				printer.printActor(name + ".h", actor);				
+			} else {				
+				printer.loadGroups("Cpp_actorImpl");
+				printer.printActor(name + ".cpp", actor);
+			}
 
-			printer.loadGroups("C_actor", "Cpp_actorImpl");
-			printer.printActor(name + ".cpp", actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
@@ -234,10 +246,11 @@ public class CppBackendImpl extends AbstractBackend {
 			CppCMakePrinter cmakePrinter = new CppCMakePrinter();
 			for (Network subnetwork : networks) {
 
-				if (partitioning) {
-					new SerDesAdder().transform(subnetwork);
-					computeMapping(subnetwork);
-				}
+				// compute thread lists if need
+				computeMapping(subnetwork);
+				// add wrapper if needed
+				new SerDesAdder().transform(subnetwork);
+				// compute kind of fifos
 				computeFifoKind(subnetwork);
 
 				String outputName = path + File.separator
