@@ -37,6 +37,7 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -86,7 +87,12 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			Expression e2 = expr.getE2();
 
 			if (op.isComparison()) {
-				e2 = (Expression) e2.accept(this, e1.getType());
+				Cast cast = new Cast(e1.getType(), e2.getType());
+				if (cast.isExtended()) {
+					e1 = (Expression) e1.accept(this, e2.getType());
+				} else if (cast.isTrunced()) {
+					e2 = (Expression) e2.accept(this, e1.getType());
+				}
 			} else {
 				e1 = (Expression) e1.accept(this, type);
 				e2 = (Expression) e2.accept(this, type);
@@ -142,6 +148,13 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = assign.getValue();
 		if (value.isBinaryExpr()) {
+			BinaryExpr binExpr = (BinaryExpr) value;
+			if (binExpr.getOp() == BinaryOp.BITAND) {
+				//Todo : Force i32 operation on AND expression (to be removed)			
+				Type type = IrFactory.eINSTANCE.createTypeInt(32);
+				binExpr.setType(type);
+			}
+
 			it.previous();
 
 			assign.getValue().accept(new ExpressionTypeChecker(it),
@@ -209,4 +222,5 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			it.next();
 		}
 	}
+
 }
