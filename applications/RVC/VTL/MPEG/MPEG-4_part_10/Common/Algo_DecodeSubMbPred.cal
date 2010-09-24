@@ -46,16 +46,17 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_SP = 3;
 
-	uint(size=2) P_8x8REF0     = 4;
+	uint(size=2) MB_TYPE_P_8x8REF0     = 30;
 
 	uint(size=2) B_DIRECT_8x8  = 0;
 
-	uint(size=2) DIRECT  = 0;
-	uint(size=2) PRED_L0 = 1;
-	uint(size=2) PRED_L1 = 2;
-	uint(size=2) BIPRED  = 3;
+	uint(size=3) DIRECT  = 0;
+	uint(size=3) PRED_L0 = 1;
+	uint(size=3) PRED_L1 = 2;
+	uint(size=3) BIPRED  = 3;
+	uint(size=3) NA      = 4;
 
-	List(type: uint(size=2), size=13) SubMbPredMode_P 
+	List(type: uint(size=2), size=13) SubMbPredMode_B
 		=	[ DIRECT , PRED_L0 , PRED_L1 , BIPRED , PRED_L0 , PRED_L0 , PRED_L1 , PRED_L1 , BIPRED , BIPRED 
 			, PRED_L0 , PRED_L1 , BIPRED];
 
@@ -87,10 +88,14 @@ actor Algo_DecodeSubMbPred()
 				if(ValSubMbType >12) then
 					DIRECT
 				else
-					SubMbPredMode_P[ValSubMbType]
+					SubMbPredMode_B[ValSubMbType]
 				end
 			else
-				PRED_L0
+				if(ValSubMbType < 4)then
+					PRED_L0
+				else
+					DIRECT
+				end
 			end
 		end
 
@@ -161,8 +166,7 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 			/* ( num_ref_idx_l0_active_minus1 > 0 || mb_field_decoding_flag ) */
 			num_ref_idx_l0_active > 1 or mb_field_decoding_flag,
 			/* mb_type != P_8x8ref0 */
-			   ((slice_type != SLICE_TYPE_P) and (slice_type != SLICE_TYPE_SP))
-			or ( mb_type != P_8x8REF0 ),
+			   mb_type != MB_TYPE_P_8x8REF0,
 			/* sub_mb_type[ mbPartIdx ] != B_Direct_8x8 */
 			(slice_type != SLICE_TYPE_B) or (sub_mb_type[mbPartIdx] != B_DIRECT_8x8),
 			/* SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L1 )*/

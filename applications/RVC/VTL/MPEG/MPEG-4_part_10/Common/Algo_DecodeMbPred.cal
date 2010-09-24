@@ -39,7 +39,7 @@ actor Algo_DecodeMbPred()
 	bool         EndMvRes
 		:
 
-	bool DEBUG_MV = false;
+	bool DEBUG_MV           = false;
 	bool DEBUG_FLAG_DECODED = false;
 
 	uint(size=3) READ_BITS = 0;
@@ -50,19 +50,50 @@ actor Algo_DecodeMbPred()
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
-	uint(size=4) SLICE_TYPE_I  = 2;
+//	uint(size=4) SLICE_TYPE_I  = 2;
 	uint(size=4) SLICE_TYPE_SP = 3;
-	uint(size=4) SLICE_TYPE_SI = 4;
+//	uint(size=4) SLICE_TYPE_SI = 4;
 
 
-	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
+	uint(size=6) BLOCK_TYPE_INTRA_MIN       = 0;
+	uint(size=6) BLOCK_TYPE_I_NxN           = 0;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
-//	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
+//	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
+	uint(size=6) BLOCK_TYPE_INTRA_MAX       = 25;
 
-	uint(size=5) NA      = 0;
-	uint(size=5) PRED_L0 = 1;
-//	uint(size=5) PRED_L1 = 2;
+	uint(size=6) BLOCK_TYPE_P_MIN           = 26;
+	uint(size=6) BLOCK_TYPE_P_L0_16x16      = 26;
+	uint(size=6) BLOCK_TYPE_P_L0_L0_16x8    = 27;
+	uint(size=6) BLOCK_TYPE_P_L0_L0_8x16    = 28;
+	uint(size=6) BLOCK_TYPE_P_8x8           = 29;
+	uint(size=6) BLOCK_TYPE_P_8x8ref0       = 30;
+	uint(size=6) BLOCK_TYPE_P_MAX           = 30;
+
+	uint(size=6) BLOCK_TYPE_B_MIN           = 31;
+	uint(size=6) BLOCK_TYPE_B_DIRECT_16x16  = 31;
+	uint(size=6) BLOCK_TYPE_B_L0_16x16      = 32;
+	uint(size=6) BLOCK_TYPE_B_L1_16x16      = 33;
+	uint(size=6) BLOCK_TYPE_B_Bi_16x16      = 34;
+	uint(size=6) BLOCK_TYPE_B_L0_L0_16x8    = 35;
+	uint(size=6) BLOCK_TYPE_B_L0_L0_8x16    = 36;
+	uint(size=6) BLOCK_TYPE_B_L1_L1_16x8    = 37;
+	uint(size=6) BLOCK_TYPE_B_L1_L1_8x16    = 38;
+	uint(size=6) BLOCK_TYPE_B_L0_L1_16x8    = 39;
+	uint(size=6) BLOCK_TYPE_B_L0_L1_8x16    = 40;
+	uint(size=6) BLOCK_TYPE_B_L1_L0_16x8    = 41;
+	uint(size=6) BLOCK_TYPE_B_L1_L0_8x16    = 42;
+	uint(size=6) BLOCK_TYPE_B_L0_Bi_16x8    = 43;
+	uint(size=6) BLOCK_TYPE_B_L0_Bi_8x16    = 44;
+	uint(size=6) BLOCK_TYPE_B_L1_Bi_16x8    = 45;
+	uint(size=6) BLOCK_TYPE_B_L1_Bi_8x16    = 46;
+	uint(size=6) BLOCK_TYPE_B_Bi_L0_16x8    = 47;
+	uint(size=6) BLOCK_TYPE_B_Bi_L0_8x16    = 48;
+	uint(size=6) BLOCK_TYPE_B_Bi_L1_16x8    = 49;
+	uint(size=6) BLOCK_TYPE_B_Bi_L1_8x16    = 50;
+	uint(size=6) BLOCK_TYPE_B_8x8           = 53;
+	uint(size=6) BLOCK_TYPE_B_MAX           = 53;
+
 
 	List ( type: List ( type: uint(size=5), size=5), size=6 ) P_tab = //[mb_type][NumMbPart / MbPartWidth / MbPartHeight /MbPartPredMode,0 / MbPartPredMode,1]
 		[ [1,16,16,0,7], [2,16,8,0,0], [2,8,16,0,0], [4,8,8,7,7], [4,8,8,7,7], [1,16,16,0,7] ];
@@ -78,10 +109,14 @@ actor Algo_DecodeMbPred()
 		];
 
 
-	List(type: List(type:uint(size=5), size=2), size=5) MB_PART_PRED_MODE_P = [[PRED_L0,NA] , [PRED_L0,PRED_L0] , [PRED_L0,PRED_L0]
-	                                                                          ,[NA     ,NA] , [NA     ,NA     ]];
+	List(type:uint(size=5), size=5)  NUM_MB_PART_P = [1,2,2,4,4];
 
-	List(type:uint(size=5), size=5) NUM_MB_PART_P = [1,2,2,4,4];
+	List(type:uint(size=5), size=23) NUM_MB_PART_B =
+		[
+			1,1,1,1,2,2,2,2,2,2,
+			2,2,2,2,2,2,2,2,2,2,
+			2,2,4
+		];
 
 	List (type:uint(size=3),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
 
@@ -102,25 +137,52 @@ actor Algo_DecodeMbPred()
 
 
 	function MbPartWidthHeight(uint(size=1) x) --> uint(size=5) : 
-		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then 
-			P_tab[mb_type][1+x] 
-		else 
-			if slice_type = SLICE_TYPE_B then
-				B_tab[mb_type][1+x]
+		if (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) then 
+			if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
+				P_tab[mb_type-BLOCK_TYPE_P_MIN][1+x]
 			else
-				1
-			end 
-		end 
+				P_tab[5][1+x]
+			end
+		else
+			if mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX then
+				B_tab[mb_type - BLOCK_TYPE_B_MIN][1+x]
+			else
+				B_tab[23][1+x]
+			end
+		end
 	end
 
-	function IS_MbPred_L0_P(uint(size=6) MbType, uint(size=1) x)
+	function IS_MbPred_L0(uint(size=6) MbType, uint(size=1) x)
 				-->
 			bool
 		:
-			if(MbType > 4 or MbType = 0) then
-				MB_PART_PRED_MODE_P[0][bitand(x,1)] = PRED_L0
+			if((x&1) = 0) then
+				if(    MbType = BLOCK_TYPE_P_L0_16x16
+				    or MbType = BLOCK_TYPE_P_L0_L0_16x8
+				    or MbType = BLOCK_TYPE_P_L0_L0_8x16
+				    or     MbType   >= BLOCK_TYPE_INTRA_MIN 
+				       and MbType   <= BLOCK_TYPE_INTRA_MAX
+				       and (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP)
+				    or MbType = BLOCK_TYPE_B_L0_16x16
+				    or MbType = BLOCK_TYPE_B_L0_L0_16x8
+				    or MbType = BLOCK_TYPE_B_L0_L0_8x16
+				    or MbType = BLOCK_TYPE_B_L0_L1_16x8
+				    or MbType = BLOCK_TYPE_B_L0_L1_8x16
+				    or MbType = BLOCK_TYPE_B_L0_Bi_16x8
+				    or MbType = BLOCK_TYPE_B_L0_Bi_8x16) then
+					true
+				else
+					false
+				end
 			else
-				if(MbType < 3)then
+				if(    MbType = BLOCK_TYPE_P_L0_L0_16x8
+				    or MbType = BLOCK_TYPE_P_L0_L0_8x16
+				    or MbType = BLOCK_TYPE_B_L0_L0_16x8
+				    or MbType = BLOCK_TYPE_B_L0_L0_8x16
+				    or MbType = BLOCK_TYPE_B_L1_L0_16x8
+				    or MbType = BLOCK_TYPE_B_L1_L0_8x16
+				    or MbType = BLOCK_TYPE_B_Bi_L0_16x8
+				    or MbType = BLOCK_TYPE_B_Bi_L0_8x16)then
 					true
 				else
 					false
@@ -128,15 +190,59 @@ actor Algo_DecodeMbPred()
 			end
 		end
 
-	function IS_MbPred_NA_P(uint(size=6) MbType, uint(size=1) x)
+	function IS_MbPred_L1(uint(size=6) MbType, uint(size=1) x)
 				-->
 			bool
 		:
-			if(MbType = 3 or MbType = 4) then
-				true
+			if((x&1) = 0) then
+				if(
+				       MbType = BLOCK_TYPE_B_L1_16x16
+				    or MbType = BLOCK_TYPE_B_L1_L0_16x8
+				    or MbType = BLOCK_TYPE_B_L1_L0_8x16
+				    or MbType = BLOCK_TYPE_B_L1_L1_16x8
+				    or MbType = BLOCK_TYPE_B_L1_L1_8x16
+				    or MbType = BLOCK_TYPE_B_L1_Bi_16x8
+				    or MbType = BLOCK_TYPE_B_L1_Bi_8x16) then
+					true
+				else
+					false
+				end
 			else
-				if(MbType = 0 or MbType > 4)then
-					MB_PART_PRED_MODE_P[0][bitand(x,1)] = NA
+				if(    MbType = BLOCK_TYPE_B_L1_L1_16x8
+				    or MbType = BLOCK_TYPE_B_L1_L1_8x16
+				    or MbType = BLOCK_TYPE_B_L0_L1_16x8
+				    or MbType = BLOCK_TYPE_B_L0_L1_8x16
+				    or MbType = BLOCK_TYPE_B_Bi_L1_16x8
+				    or MbType = BLOCK_TYPE_B_Bi_L1_8x16)then
+					true
+				else
+					false
+				end
+			end
+		end
+
+	function IS_MbPred_NA(uint(size=6) MbType, uint(size=1) x)
+				-->
+			bool
+		:
+			if((x&1) = 0)then
+				if(    MbType = BLOCK_TYPE_P_8x8
+				    or MbType = BLOCK_TYPE_P_8x8ref0
+				    or MbType = BLOCK_TYPE_B_8x8) then
+					true
+				else
+					false
+				end
+			else
+				if(    MbType  = BLOCK_TYPE_P_L0_16x16
+				    or MbType  = BLOCK_TYPE_P_8x8
+				    or MbType  = BLOCK_TYPE_B_DIRECT_16x16
+				    or MbType  = BLOCK_TYPE_B_L0_16x16
+				    or MbType  = BLOCK_TYPE_B_L1_16x16
+				    or MbType  = BLOCK_TYPE_B_Bi_16x16
+				    or MbType  = BLOCK_TYPE_B_8x8
+				    or (MbType >= BLOCK_TYPE_INTRA_MIN and MbType <= BLOCK_TYPE_INTRA_MAX)) then
+					true
 				else
 					false
 				end
@@ -147,26 +253,10 @@ actor Algo_DecodeMbPred()
 				-->
 			bool
 		:
-			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
-				if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
-					true
-				else
-					false
-				end
+			if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+				true
 			else
-				if(slice_type != SLICE_TYPE_B) then
-					if( ((MbType-5) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
-						true
-					else
-						false
-					end
-				else
-					if( ((MbType-5-23) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5-23) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
-						true
-					else
-						false
-					end
-				end
+				false
 			end
 		end
 
@@ -174,26 +264,10 @@ actor Algo_DecodeMbPred()
 				-->
 			bool
 		:
-			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
-				if( (MbType = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
-					true
-				else
-					false
-				end
+			if( (MbType = BLOCK_TYPE_I_NxN) and transform_size_8x8_flag ) then
+				true
 			else
-				if(slice_type != SLICE_TYPE_B) then
-					if( ((MbType-5) = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
-						true
-					else
-						false
-					end
-				else
-					if( ((MbType-5-23) = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
-						true
-					else
-						false
-					end
-				end
+				false
 			end
 		end
 
@@ -201,26 +275,10 @@ actor Algo_DecodeMbPred()
 				-->
 			bool
 		:
-			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
-				if( (MbType = BLOCK_TYPE_I_8x8_or_4x4) and  (not transform_size_8x8_flag) ) then
-					true
-				else
-					false
-				end
+			if( (MbType = BLOCK_TYPE_I_NxN) and  (not transform_size_8x8_flag) ) then
+				true
 			else
-				if(slice_type != SLICE_TYPE_B) then
-					if( ((MbType-5) = BLOCK_TYPE_I_8x8_or_4x4) and (not transform_size_8x8_flag) ) then
-						true
-					else
-						false
-					end
-				else
-					if( ((MbType-5-23) = BLOCK_TYPE_I_8x8_or_4x4) and (not transform_size_8x8_flag) ) then
-						true
-					else
-						false
-					end
-				end
+				false
 			end
 		end
 
@@ -379,14 +437,21 @@ actor Algo_DecodeMbPred()
 	Mb_Type.IsNotEqualToDirect: action
 				==>
 		guard
-			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP)
-			//slice_type = SLICE_TYPE_B and ...
+			   (slice_type = SLICE_TYPE_P)
+			or (slice_type = SLICE_TYPE_SP) 
+			or     (slice_type = SLICE_TYPE_B)
+			   and (mb_type  > BLOCK_TYPE_P_MAX)
+			   and (mb_type != BLOCK_TYPE_B_DIRECT_16x16)
 		do
 			mbPartIdxMax:=
-				if(mb_type < 4)then
-					NUM_MB_PART_P[mb_type]
-				else
-					NUM_MB_PART_P[0]
+				if(slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP)then
+					if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
+						NUM_MB_PART_P[mb_type - BLOCK_TYPE_P_MIN]
+					else
+						NUM_MB_PART_P[0]
+					end
+				else				
+					NUM_MB_PART_B[mb_type - BLOCK_TYPE_B_MIN]
 				end;
 			mbPartIdx    := 0;
 		end
@@ -406,8 +471,8 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax,
 			(num_ref_idx_l0_active > 1) or (mb_field_decoding_flag = true),
-			//not IS_MbPred_L1_P(mb_type,mbPartIdx), // There isn't any Pred_L1 in P MacroBlock
-			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+			not IS_MbPred_L1(mb_type,mbPartIdx),
+			not IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -427,8 +492,8 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax,
 			(num_ref_idx_l1_active > 1) or (mb_field_decoding_flag = true),
-			not IS_MbPred_L0_P(mb_type,mbPartIdx),
-			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+			not IS_MbPred_L0(mb_type,mbPartIdx),
+			not IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -455,8 +520,8 @@ actor Algo_DecodeMbPred()
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			//not IS_MbPred_L1_P(mb_type,mbPartIdx), // There isn't any Pred_L1 in P MacroBlock
-			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+			not IS_MbPred_L1(mb_type,mbPartIdx),
+			not IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -473,8 +538,8 @@ actor Algo_DecodeMbPred()
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			not IS_MbPred_L0_P(mb_type,mbPartIdx),
-			not IS_MbPred_NA_P(mb_type,mbPartIdx)
+			not IS_MbPred_L0(mb_type,mbPartIdx),
+			not IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="source" x="57" y="70"/>
-      <vertex id="AVCDecoder" x="180" y="70"/>
-   </vertices>
-</layout>

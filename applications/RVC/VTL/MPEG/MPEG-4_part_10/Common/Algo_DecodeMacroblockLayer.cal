@@ -59,7 +59,6 @@ actor Algo_DecodeMacroblockLayer()
 
 	//Residual Parameters
 	bool          ResEntropyCodingMode,
-	uint(size=4)  ResSliceType,
 	uint(size=6)  ResMbType,
 	bool          ResTransfSz8x8,
 	bool          ResBmFlag,
@@ -116,14 +115,26 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=4) SLICE_TYPE_SI = 4;
 
 
-	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4   = 0;
+	uint(size=6) BLOCK_TYPE_I_NxN    = 0;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
-	uint(size=6) BLOCK_TYPE_I_PCM          = 25;
+	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
+	uint(size=6) BLOCK_TYPE_B_DIRECT_16x16  = 31;
 
 	List(type: uint(size=4), size=8) TabCodedBlockPatternChroma = [  0,  1,  2,  0,  1,  2,  0,  0];
 	List(type: uint(size=4), size=8) TabCodedBlockPatternLuma   = [  0,  0,  0, 15, 15, 15,  0,  0];
 	List(type: uint(size=4), size=16) InverseScan4x4Tab         = [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
+
+	List(type: int (size=4), size=64) NumMbPart =
+		[
+		  1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
+		  1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
+		  1 , 1 , 1 , 1 , 1 , 1 , 1 , 2 , 2 , 4 ,
+		  4 ,-1 , 1 , 1 , 1 , 2 , 2 , 2 , 2 , 2 ,
+		  2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,
+		  2 , 2 , 2 , 4 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,
+		 -1 ,-1 ,-1 ,-1
+		];
 
 	List ( type: List ( type: List ( type: uint(size=6), size=2), size=48 ), size=4) VLD_ME_TABLE =
 		[
@@ -162,6 +173,7 @@ actor Algo_DecodeMacroblockLayer()
 
 
 	uint(size=6)  mb_type                        := 0;
+	uint(size=6)  mb_typeqsdflm                  := 0;
 	bool          noSubMbPartSizeLessThan8x8Flag := true;
 	bool          transform_size_8x8_flag        := true;
 	uint(size=6)  coded_block_pattern            := 0;
@@ -195,26 +207,10 @@ actor Algo_DecodeMacroblockLayer()
 				-->
 			bool
 		:
-			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
-				if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
-					true
-				else
-					false
-				end
+			if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+				true
 			else
-				if(slice_type != SLICE_TYPE_B) then
-					if( ((MbType-5) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
-						true
-					else
-						false
-					end
-				else
-					if( ((MbType-5-23) >= BLOCK_TYPE_INTRA_16x16_MIN) and ((MbType-5-23) <= BLOCK_TYPE_INTRA_16x16_MAX)) then
-						true
-					else
-						false
-					end
-				end
+				false
 			end
 		end
 
@@ -222,26 +218,10 @@ actor Algo_DecodeMacroblockLayer()
 				-->
 			bool
 		:
-			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
-				if( (MbType = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
-					true
-				else
-					false
-				end
+			if( (MbType = BLOCK_TYPE_I_NxN) and transform_size_8x8_flag ) then
+				true
 			else
-				if(slice_type != SLICE_TYPE_B) then
-					if( ((MbType-5) = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
-						true
-					else
-						false
-					end
-				else
-					if( ((MbType-5-23) = BLOCK_TYPE_I_8x8_or_4x4) and transform_size_8x8_flag ) then
-						true
-					else
-						false
-					end
-				end
+				false
 			end
 		end
 
@@ -249,26 +229,10 @@ actor Algo_DecodeMacroblockLayer()
 				-->
 			bool
 		:
-			if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I)) then
-				if( (MbType = BLOCK_TYPE_I_8x8_or_4x4) and  (not transform_size_8x8_flag) ) then
-					true
-				else
-					false
-				end
+			if( (MbType = BLOCK_TYPE_I_NxN) and  (not transform_size_8x8_flag) ) then
+				true
 			else
-				if(slice_type != SLICE_TYPE_B) then
-					if( ((MbType-5) = BLOCK_TYPE_I_8x8_or_4x4) and (not transform_size_8x8_flag) ) then
-						true
-					else
-						false
-					end
-				else
-					if( ((MbType-5-23) = BLOCK_TYPE_I_8x8_or_4x4) and (not transform_size_8x8_flag) ) then
-						true
-					else
-						false
-					end
-				end
+				false
 			end
 		end
 
@@ -303,8 +267,34 @@ actor Algo_DecodeMacroblockLayer()
 			uint         Idx,
 			uint(size=6) ValMbType
 		do
-			mb_type                       := ValueOfVLD;
 			slice_type                    := ValSliceType;
+			mb_typeqsdflm := ValueOfVLD;
+			mb_type                       :=
+				if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I))then
+					ValueOfVLD
+				else
+					if((slice_type = SLICE_TYPE_SP) or (slice_type = SLICE_TYPE_P))then
+						if(ValueOfVLD >= 5) then
+							if(ValueOfVLD < 31)then
+								ValueOfVLD - 5
+							else
+								0
+							end
+						else
+							ValueOfVLD + 26
+						end
+					else
+						if(ValueOfVLD < 23) then
+							ValueOfVLD + 26 + 5
+						else
+							if(ValueOfVLD < 49) then
+								ValueOfVLD - 23
+							else
+								0
+							end
+						end
+					end
+				end;
 			bit_depth_luma                := ValBitDepthLuma;
 			bit_depth_chroma              := ValBitDepthChroma;
 			direct_8x8_inference_flag     := ValDirect8x8Inference;
@@ -328,8 +318,8 @@ actor Algo_DecodeMacroblockLayer()
 				nBTab[i] := ValNBTab[i];
 			end
 			//mb_type should have the same value in order to simplify : if(slice_type=stuff)then if(mb_type > other_stuff)then ...
-			ValMbType :=
-				if(slice_type=SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)then
+			ValMbType := mb_type;
+/*				if(slice_type=SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)then
 					mb_type
 				else
 					if(slice_type != SLICE_TYPE_B)then
@@ -349,7 +339,7 @@ actor Algo_DecodeMacroblockLayer()
 							end
 						end
 					end
-				end;
+				end;*/
 
 			transform_size_8x8_flag        := false;
 			noSubMbPartSizeLessThan8x8Flag := true;
@@ -358,12 +348,12 @@ actor Algo_DecodeMacroblockLayer()
 			end
 			Idx := 
 				if(slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)then
-					(mb_type-1)/4
+					(ValueOfVLD-1)/4
 				else
 					if(slice_type != SLICE_TYPE_B)then
-						(mb_type-1-5)/4
+						(ValueOfVLD-1-5)/4
 					else
-						(mb_type-1 - 5 - 23)/4
+						(ValueOfVLD-1 - 5 - 23)/4
 					end
 				end;
 			CodedBlockPatternLuma   := TabCodedBlockPatternLuma[Idx & 7];
@@ -384,8 +374,7 @@ actor Algo_DecodeMacroblockLayer()
 
 			IsIPCM :[true]
 		guard
-			    (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)
-			and (mb_type = BLOCK_TYPE_I_PCM)
+			mb_type = BLOCK_TYPE_I_PCM
 		var
 			List(type: uint(size=3), size=257) ValTypeOfVLD      := [READ_BITS        : for int s in 0 .. 256],
 			//List(type: uint(size=3), size=256) ValTypeOfVLDecod   = [READ_BITS        : for int s in 0 .. 255],
@@ -477,8 +466,7 @@ actor Algo_DecodeMacroblockLayer()
 			SubMbPredNumRefIdxLXActive :[num_ref_idx_l0_active , num_ref_idx_l1_active],
 			SubMbPredMbFieldDecoding   :[mb_field_decoding]
 		guard
-			(slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) and (mb_type = 3 or mb_type = 4)
-			// slice_type = SLICE_TYPE_B ...
+			NumMbPart[mb_type & 0x3F] = 4
 		end
 
 	CheckSubMbType: action
@@ -515,7 +503,7 @@ actor Algo_DecodeMacroblockLayer()
 			VLDParam  :[     1     ]
 		guard
 			transform_8x8_mode_flag = true,
-			(slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI) and mb_type = 0
+			mb_type = BLOCK_TYPE_I_NxN
 		do
 			println("ReadTransformSize.Asked not implemented yet");
 		end
@@ -564,11 +552,11 @@ actor Algo_DecodeMacroblockLayer()
 			TypeOfVLD :[ READ_BITS ],
 			VLDParam  :[     1     ]
 		guard
-			CodedBlockPatternLuma > 0,
-			transform_8x8_mode_flag = true,
-			not( (slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI) and mb_type = 0 ),
-			noSubMbPartSizeLessThan8x8Flag = true,
-			not( (slice_type = SLICE_TYPE_B) and (mb_type = 0) ) or (direct_8x8_inference_flag = true)
+			CodedBlockPatternLuma  > 0,
+			mb_type               != BLOCK_TYPE_I_NxN,
+			transform_8x8_mode_flag,
+			noSubMbPartSizeLessThan8x8Flag,
+			(mb_type != BLOCK_TYPE_B_DIRECT_16x16) or direct_8x8_inference_flag
 		end
 
 	ReadTransformSize8x8.Done: action
@@ -614,7 +602,6 @@ actor Algo_DecodeMacroblockLayer()
 			VLDParam             :[RESIDUAL],
 
 			ResEntropyCodingMode :[entropy_coding_mode_flag],
-			ResSliceType         :[slice_type],
 			ResMbType            :[mb_type],
 			ResTransfSz8x8       :[transform_size_8x8_flag],
 			ResBmFlag            :[false],

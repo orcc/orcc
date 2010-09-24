@@ -643,8 +643,6 @@
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerEntropyCodingMode"/>
     <Connection dst="DecodeResidual" dst-port="EntropyCodingMode"
         src="DecodeMacroBlockLayer" src-port="ResEntropyCodingMode"/>
-    <Connection dst="DecodeResidual" dst-port="SliceType"
-        src="DecodeMacroBlockLayer" src-port="ResSliceType"/>
     <Connection dst="DecodeResidual" dst-port="MbType"
         src="DecodeMacroBlockLayer" src-port="ResMbType"/>
     <Connection dst="DecodeResidual" dst-port="TransfSz8x8"
