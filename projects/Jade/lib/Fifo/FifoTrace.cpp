@@ -54,10 +54,9 @@
 #include "Jade/Decoder/Procedure.h"
 #include "Jade/Fifo/FifoTrace.h"
 #include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Network/Network.h"
 #include "Jade/Network/Connection.h"
+#include "Jade/Network/Network.h"
 #include "Jade/Network/Vertex.h"
-
 //------------------------------
 
 using namespace llvm;
@@ -98,17 +97,6 @@ void FifoTrace::declareFifoHeader (){
 	parseFifoStructs();
 	parseExternFunctions();
 	parseFifoFunctions();
-	parseFifoVars();
-}
-
-void FifoTrace::parseFifoVars (){
-	//Get str var from fifo trace
-	GlobalVariable* str = header->getGlobalVariable(".str", true);
-	GlobalVariable* str1 = header->getGlobalVariable(".str1", true);
-
-	// Store into externVar
-	externVar.insert(pair<string,GlobalVariable*>("str", str));
-	externVar.insert(pair<string,GlobalVariable*>("str1", str1));
 }
 
 void FifoTrace::parseHeader (){
@@ -124,6 +112,14 @@ void FifoTrace::parseHeader (){
 	if (externMod == NULL){
 		cerr << "Unable to parse extern functions file";
 		exit(0);
+	}
+}
+
+void FifoTrace::parseExternFunctions(){
+	
+	// Iterate though functions of extern module 
+	for (Module::iterator I = externMod->begin(), E = externMod->end(); I != E; ++I) {
+		externFunct.insert(pair<std::string,llvm::Function*>(I->getName(), I));
 	}
 }
 
@@ -149,7 +145,7 @@ void FifoTrace::parseFifoStructs(){
 		Type* type = (Type*)header->getTypeByName(name);
 
 		if (type == NULL){
-			cerr << "Error when parsing fifo, structure " << name << " has not beend found";
+			cerr << "Error when parsing fifo, structure "<< name << " has not beend found";
 			exit(0);
 		}
 
@@ -158,38 +154,19 @@ void FifoTrace::parseFifoStructs(){
 	}
 }
 
-void FifoTrace::parseExternFunctions(){
-	
-	// Iterate though functions of extern module 
-	for (Module::iterator I = externMod->begin(), E = externMod->end(); I != E; ++I) {
-		externFunct.insert(pair<std::string,llvm::Function*>(I->getName(), I));
-	}
-}
-
-
 void FifoTrace::addFunctions(Decoder* decoder){
 	
 	std::map<std::string,llvm::Function*>::iterator itMap;
 
-	//Add external function
 	for(itMap = externFunct.begin(); itMap != externFunct.end(); ++itMap){
 		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
 		(*itMap).second = function;
 	}
 
-	//Add fifo function
 	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
 		Function* function = (Function*)jit->addFunctionProtosInternal("", (*itMap).second);
 		jit->LinkProcedureBody((*itMap).second);
 		(*itMap).second = function;
-	}
-
-	//Add fifo vars
-	map<string,GlobalVariable*>::iterator itVar;
-	for(itVar = externVar.begin(); itVar != externVar.end(); ++itVar){
-		GlobalVariable* var = jit->addVariable("", itVar->second);
-		jit->LinkGlobalInits(itVar->second);
-		(*itVar).second = var;
 	}
 }
 
@@ -198,45 +175,54 @@ void FifoTrace::setConnection(Connection* connection){
 	
 	// fifo name 
 	ostringstream arrayName;
+	ostringstream bufName;
 	ostringstream fifoName;
 
 	arrayName << "array_" << fifoCnt;
+	bufName << "buffer_" << fifoCnt;
 	fifoName << "fifo_" << fifoCnt;
 
 	// Get vertex of the connection
 	Port* src = connection->getSourcePort();
 	Port* dst = connection->getDestinationPort();
-	Vertex* srcInstance = (Vertex*)connection->getSource();
-	Vertex* dstInstance = (Vertex*)connection->getSink();
 	GlobalVariable* srcVar = src->getGlobalVariable();
 	GlobalVariable* dstVar = dst->getGlobalVariable();
 
 	//Get fifo structure
 	StructType* structType = getFifoType(connection->getIntegerType());
 
-	// Initialize array 
+	//Get fifo array structure
 	PATypeHolder EltTy(connection->getIntegerType());
 	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize());
+
+	// Initialize array for content
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
-	GlobalVariable *NewArray =
+	GlobalVariable *NewArrayContents =
         new GlobalVariable(*module, arrayType,
 		false, GlobalVariable::InternalLinkage, arrayContent, arrayName.str());
+	NewArrayContents->setAlignment(32);
 	
+	// Initialize array for fifo buffer
+	Constant* arrayFifoBuffer = ConstantArray::get(arrayType, NULL,0);
+	GlobalVariable *NewArrayFifoBuffer =
+        new GlobalVariable(*module, arrayType,
+		false, GlobalVariable::InternalLinkage, arrayFifoBuffer, bufName.str());
+	NewArrayFifoBuffer->setAlignment(32);
+
 	// Initialize fifo elements
 	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize());
 	Constant* read_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* write_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* fill_count = ConstantInt::get(Type::getInt32Ty(Context), 0);
-	Constant* expr = ConstantExpr::getBitCast(NewArray, structType->getElementType(1));
-	
+	Constant* contents = ConstantExpr::getBitCast(NewArrayContents, structType->getElementType(1));
+	Constant* fifo_buffer = ConstantExpr::getBitCast(NewArrayFifoBuffer, structType->getElementType(2));
 	Constant* file =  ConstantPointerNull::get(cast<PointerType>(structType->getElementType(3)));
-	Constant* arrConst = ConstantPointerNull::get(cast<PointerType>(structType->getElementType(2)));
 	
 	// Add initialization vector 
 	vector<Constant*> Elts;
 	Elts.push_back(size);
-	Elts.push_back(expr);
-	Elts.push_back(arrConst);
+	Elts.push_back(contents);
+	Elts.push_back(fifo_buffer);
 	Elts.push_back(file);
 	Elts.push_back(read_ind);
 	Elts.push_back(write_ind);
@@ -247,8 +233,8 @@ void FifoTrace::setConnection(Connection* connection){
 	GlobalVariable *NewFifo =
         new GlobalVariable(*module, structType,
 		false, GlobalVariable::InternalLinkage, fifoStruct, fifoName.str());
-
-
+	NewFifo->setAlignment(32);
+	
 	// Set initialize to instance port 
 	srcVar->setInitializer(NewFifo);
 	dstVar->setInitializer(NewFifo);
@@ -259,18 +245,6 @@ void FifoTrace::setConnection(Connection* connection){
 	// Increment fifo counter 
 	fifoCnt++;
 	
-}
-
-StructType* FifoTrace::getFifoType(IntegerType* type){
-	map<string,Type*>::iterator it;
-
-	// Struct name 
-	ostringstream structName;
-	structName << "struct.fifo_i" << type->getBitWidth() << "_s";
-
-	it = structAcces.find(structName.str());
-		
-	return cast<StructType>(it->second);
 }
 
 void FifoTrace::setConnections(Decoder* decoder){
@@ -288,6 +262,55 @@ void FifoTrace::setConnections(Decoder* decoder){
 	setFiles(decoder);
 }
 
+StructType* FifoTrace::getFifoType(IntegerType* type){
+	map<string,Type*>::iterator it;
+
+	// Struct name 
+	ostringstream structName;
+	structName << "struct.fifo_i" << type->getBitWidth() << "_s";
+
+	it = structAcces.find(structName.str());
+		
+	return cast<StructType>(it->second);
+}
+
+void FifoTrace::setFiles(Decoder* decoder){
+	
+	// Create initialization procedure
+	Module* module = decoder->getModule();
+	string initName = "assignTrace";
+	ConstantInt* isExtern = ConstantInt::get(IntegerType::get(Context,1),0);
+	
+	Function* init = cast<Function>(module->getOrInsertFunction(initName, Type::getVoidTy(Context),
+                                          (Type *)0));
+	Procedure* initialize = new Procedure(initName, isExtern, init);
+	decoder->setInitialization(initialize);
+
+	// Create entry basic block
+	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", init);
+
+	// Set opening Files
+	Network* network = decoder->getNetwork();
+	HDAGGraph* graph = network->getGraph();
+	int edges = graph->getNbEdges();
+
+	// Get fopen function
+	map<string,Function*>::iterator it;
+	it = externFunct.find("fopen");
+
+	//Set a variable containing "w" string for fopen 
+	string wStr = "w";
+	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context), wStr.size()+1); 
+	GlobalVariable *wGV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, wStr), wStr.c_str(), 0, false, 0);
+
+	//Associate connections to a file
+	for (int i = 0; i < edges; i++){
+		setFile(decoder, (Connection*)graph->getEdge(i), BBEntry, it->second, wGV);
+	}
+
+	// Create the return instruction and add it to the entry block.
+	ReturnInst::Create(Context, BBEntry);
+}
 
 void FifoTrace::setFile(Decoder* decoder, Connection* connection, BasicBlock* bb, Function* fOpenFunc, Constant* wStr){
 	ostringstream fileName;
@@ -346,43 +369,4 @@ void FifoTrace::setFile(Decoder* decoder, Connection* connection, BasicBlock* bb
                          array_lengthof(three_array));
 
 	new StoreInst(fopenInstr, fileElt, bb);
-}
-
-
-void FifoTrace::setFiles(Decoder* decoder){
-	
-	// Create initialization procedure
-	Module* module = decoder->getModule();
-	string initName = "assignTrace";
-	ConstantInt* isExtern = ConstantInt::get(IntegerType::get(Context,1),0);
-	
-	Function* init = cast<Function>(module->getOrInsertFunction(initName, Type::getVoidTy(Context),
-                                          (Type *)0));
-	Procedure* initialize = new Procedure(initName, isExtern, init);
-	decoder->setInitialization(initialize);
-
-	// Create entry basic block
-	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", init);
-
-	// Set opening Files
-	Network* network = decoder->getNetwork();
-	HDAGGraph* graph = network->getGraph();
-	int edges = graph->getNbEdges();
-
-	// Get fopen function
-	map<string,Function*>::iterator it;
-	it = externFunct.find("fopen");
-
-	//Set a variable containing "w" string for fopen 
-	string wStr = "w";
-	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context), wStr.size()+1); 
-	GlobalVariable *wGV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, wStr), wStr.c_str(), 0, false, 0);
-
-	//Associate connections to a file
-	for (int i = 0; i < edges; i++){
-		setFile(decoder, (Connection*)graph->getEdge(i), BBEntry, it->second, wGV);
-	}
-
-	// Create the return instruction and add it to the entry block.
-	ReturnInst::Create(Context, BBEntry);
 }

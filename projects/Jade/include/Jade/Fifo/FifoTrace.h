@@ -43,7 +43,7 @@
 //------------------------------
 
 /**
- * @brief  This class defines FifoCircular.
+ * @brief  This class defines FifoTrace.
  * 
  * @author Jerome Gorin
  * 
@@ -118,6 +118,7 @@ private:
 		fifo["u64_hasRoom"] = "fifo_u64_has_room";
 		fifo["u64_writeEnd"] = "fifo_u64_write_end";
 		fifo["u64_readEnd"] = "fifo_u64_read_end";
+
 		return fifo;
 	}
 
@@ -125,7 +126,6 @@ private:
 	std::map<std::string,std::string> structMap()
 	{
 		std::map<std::string,std::string> fifoStruct;	
-		fifoStruct["file"] = "struct.FILE";
 		fifoStruct["char_s"] = "struct.fifo_i8_s";
 		fifoStruct["short_s"] = "struct.fifo_i16_s";
 		fifoStruct["int_s"] = "struct.fifo_i32_s";
@@ -162,13 +162,17 @@ public:
 	
 	void setConnections(Decoder* decoder);
 
-private:
+	void setFiles(Decoder* decoder);
 
-	/** Counter of fifo */
-	int fifoCnt;
+	void setFile(Decoder* decoder, Connection* connection, llvm::BasicBlock* bb, llvm::Function* fOpenFunc, llvm::Constant* wStr);
+
+private:
 
 	/** module for extern functions */
 	llvm::Module* externMod;
+
+	/** Counter of fifo */
+	int fifoCnt;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
@@ -178,16 +182,11 @@ private:
     */
 	void parseHeader();
 
-	/** Extern variables */
-	std::map<std::string,llvm::GlobalVariable*> externVar;
-
 	/**
-    * @brief add fifo functions into the given decoder
-	*
-	* @param decoder : Decoder to had fifo functions
+    * @brief Parse fifo functions into the header module
     */
 	void parseFifoFunctions();
-	
+
 	/**
     * @brief Parse extern functions in the extern module
 	*
@@ -199,12 +198,6 @@ private:
 	*
     */
 	void parseFifoStructs();
-
-	/**
-    * @brief Parse fifo variables
-	*
-    */
-	void parseFifoVars();
 
 	/**
     * @brief add fifo function corresponding to the given name into the given decoder
@@ -223,11 +216,6 @@ private:
 	void declareFifoHeader();
 
 	llvm::StructType* getFifoType(llvm::IntegerType* type);
-
-	void setFile(Decoder* decoder, Connection* connection, llvm::BasicBlock* bb, llvm::Function* fOpenFunc, llvm::Constant* wStr);
-
-	void setFiles(Decoder* decoder);
-
 
 };
 
