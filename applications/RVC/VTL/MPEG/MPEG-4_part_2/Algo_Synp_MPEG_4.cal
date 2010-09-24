@@ -361,11 +361,29 @@ actor Algo_Synp_MPEG_4 (
     done_reading_bits()
   var
     bool round := false,
-    int(size=BTYPE_SZ) cmd := bitor( NEWVOP, if prediction_is_IVOP then INTRA else INTER end )
+    int(size=BTYPE_SZ) cmd,
+    int tmp,
+    int tmp2,
+    int tmp3,
+    int tmp4,
+    int tmp5
   do
-    if not prediction_is_IVOP then
-      round := bitand( rshift( read_result(), INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 1 ) = 1;
-	  intra_dc_vlc_thr := intra_dc_threshold_table[ bitand( rshift( read_result(), BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 7 ) ];
+    cmd:= bitor( NEWVOP, if prediction_is_IVOP then INTRA else INTER end );
+   if not prediction_is_IVOP then
+      //round := bitand( rshift( read_result(), INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 1 ) = 1;
+	  //Todo: Patch for LLVM backend
+	  tmp:= rshift( read_result(), INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH );
+	  tmp2 := bitand(tmp, 1 );
+	  round := tmp2 = 1;
+	 
+	  
+	  //intra_dc_vlc_thr := intra_dc_threshold_table[ bitand( rshift( read_result(), BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 7 ) ];
+	  //Todo: Patch for LLVM backend
+      tmp3 := rshift( read_result(), BITS_QUANT + VOP_FCODE_FOR_LENGTH );
+      tmp4 := bitand( tmp3, 7 );
+      intra_dc_vlc_thr := intra_dc_threshold_table[tmp4];
+      
+      
       vop_quant := bitand( rshift( read_result(), VOP_FCODE_FOR_LENGTH ), BITS_QUANT_MASK );
       fcode := bitand( read_result(), VOP_FCODE_FOR_MASK );
       // resync_marker_length := 16 + fcode;
@@ -377,7 +395,11 @@ actor Algo_Synp_MPEG_4 (
     end
 	prev_quant:=vop_quant;
     cmd := bitor( cmd, if round then ROUND_TYPE else 0 end );
-    cmd := bitor( cmd, bitand( lshift( fcode, FCODE_SHIFT), FCODE_MASK) );
+    
+    //cmd := bitor( cmd, bitand( lshift( fcode, FCODE_SHIFT), FCODE_MASK) );
+     //Todo: Patch for LLVM backend
+    tmp5 := bitand( lshift( fcode, FCODE_SHIFT), FCODE_MASK);
+    cmd := bitor( cmd, tmp5 );
 end
 
 send_new_vop_width: action ==> BTYPE: [ vol_width ], WIDTH: [ vol_width ] end
@@ -540,9 +562,14 @@ send_new_vop_height: action ==> BTYPE: [ vol_height ], HEIGHT: [ vol_height ] en
   guard
     btype_is_INTRA
   var
-    int(size=BTYPE_SZ) cmd := INTRA
+    int(size=BTYPE_SZ) cmd := INTRA,
+    int tmp1
   do
-    ac_coded := bitand( cbp, lshift( 1,  5 - comp)) != 0;
+  	//ac_coded := bitand( cbp, lshift( 1,  5 - comp)) != 0;
+  	//Todo: Patch for LLVM backend
+  	tmp1 := bitand( cbp, lshift( 1,  5 - comp));
+    ac_coded := tmp1 != 0;
+    
     cmd := bitor( cmd, if ac_coded then ACCODED else 0 end );
     cmd := bitor( cmd, if acpredflag then ACPRED else 0 end );
   end
