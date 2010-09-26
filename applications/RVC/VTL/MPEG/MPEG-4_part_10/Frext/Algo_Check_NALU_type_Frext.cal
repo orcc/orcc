@@ -277,7 +277,7 @@ actor Algo_Check_NALU_type_Frext()
 		CheckNaluType        (IsSliceNonIdr            )--> ReadData4Slice;	
 		CheckNaluType        (IsSps                    )--> ReadData4Sps;
 		CheckNaluType        (IsPps                    )--> ReadData4Pps;
-		CheckNaluType        (NalUnitType_Unknown      )--> undefined;
+		CheckNaluType        (NalUnitType_Unknown      )--> WaitForNewNal;
 
 		ReadData4Sps         (Sps.ReadData             )--> ReadData4Sps;
 		ReadData4Sps         (Sps.EndOfNal             )--> SpsWaitEndOfProcess;
