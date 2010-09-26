@@ -46,7 +46,8 @@
       <vertex id="I_PCM_Y" x="1381" y="2945"/>
       <vertex id="I_PCM_U" x="1381" y="3042"/>
       <vertex id="I_PCM_V" x="1381" y="3139"/>
-      <vertex id="MacroBlockType" x="1381" y="3531"/>
+      <vertex id="MacroBlockType" x="1216" y="3353"/>
+      <vertex id="TransformSize8x8" x="930" y="362"/>
       <vertex id="Algo_NALU" x="373" y="1131"/>
       <vertex id="CheckNaluType" x="732" y="1155"/>
       <vertex id="DecodeSps" x="57" y="1481"/>
@@ -61,6 +62,5 @@
       <vertex id="BlockExpand" x="1704" y="2412"/>
       <vertex id="BlockSplit" x="1933" y="1430"/>
       <vertex id="DecodePic" x="965" y="1300"/>
-      <vertex id="TransformSize8x8" x="930" y="362"/>
    </vertices>
 </layout>

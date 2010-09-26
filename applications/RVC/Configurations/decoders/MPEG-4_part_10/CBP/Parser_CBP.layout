@@ -45,7 +45,9 @@
       <vertex id="RefList" x="1318" y="2984"/>
       <vertex id="SizeDPBMax" x="766" y="2462"/>
       <vertex id="IsIDR" x="1089" y="3288"/>
-      <vertex id="BlockSize_L" x="1089" y="2107"/>
+      <vertex id="BlocksSize_Luma" x="1089" y="2107"/>
+      <vertex id="TransformSize8x8" x="1022" y="2421"/>
+      <vertex id="MacroBlockType" x="821" y="2186"/>
       <vertex id="byte2bit" x="350" y="2440"/>
       <vertex id="Algo_NALU" x="146" y="2499"/>
       <vertex id="Algo_Synp_AVC" x="482" y="2125"/>

@@ -134,7 +134,7 @@ actor Algo_DecodeRefPicList_Frext()
 		guard
 			slice_type = SLICE_TYPE_B
 		var
-			uint(size=2) Type
+			uint(size=2) Type=0 //TODO
 		do
 			println("RefPicList for B Pic not implemented !");
 			while true do end

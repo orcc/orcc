@@ -306,34 +306,26 @@
     <Port kind="Output" name="IsIDR">
         <Type name="bool"/>
     </Port>
-    <Port kind="Output" name="BlockSize_L">
+    <Port kind="Output" name="BlocksSize_Luma">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="2"/>
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="TransformSize8x8">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="MacroBlockType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="SAMPLE_SIZE">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="DPBMAXSIZE">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="PREDTYPE_SIZE">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MV_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="Idx_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MODE_SZ">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
@@ -550,10 +542,13 @@
         src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
     <Connection dst="Algo_BlockSplit_AVC" dst-port="BlocksSize_Luma"
         src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
-    <Connection dst="" dst-port="BlockSize_L" src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
+    <Connection dst="" dst-port="BlocksSize_Luma"
+        src="Algo_IntraPred_Split" src-port="BlocksSize_Luma"/>
     <Connection dst="Algo_MMCO" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="Algo_RefList0" dst-port="RefListType"
         src="Algo_Synp_AVC" src-port="RefList0Type"/>
     <Connection dst="" dst-port="IsIDR" src="Algo_MMCO" src-port="EmptyDPB"/>
     <Connection dst="Algo_RefList0" dst-port="EmptyDPB" src="Algo_MMCO" src-port="EmptyDPB"/>
+    <Connection dst="" dst-port="TransformSize8x8" src="Algo_Synp_AVC" src-port="TransformSize8x8"/>
+    <Connection dst="" dst-port="MacroBlockType" src="Algo_Synp_AVC" src-port="MacroBlockType"/>
 </XDF>

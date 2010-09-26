@@ -326,24 +326,6 @@
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
-    <Decl kind="Param" name="SAMPLE_SIZE">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="DPBMAXSIZE">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="PREDTYPE_SIZE">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MV_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="Idx_SZ">
-        <Type name="int"/>
-    </Decl>
-    <Decl kind="Param" name="MODE_SZ">
-        <Type name="int"/>
-    </Decl>
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
