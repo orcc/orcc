@@ -28,7 +28,6 @@ find_file(CALaka_INCLUDE_DIR CALaka)
 find_file(Orcc_INCLUDE_DIR Orcc)
 find_file(Thread_INCLUDE_DIR Thread)
 
-
 find_package(SDL REQUIRED)
 
 include_directories(
@@ -40,8 +39,9 @@ include_directories(
 )
 
 $if(needSerDes)$
-add_library(LibAdaptorConfig STATIC \${LIBCAL2CPP_ROOT_PATH}/src/LibAdaptorConfig.cpp)
-add_library(LibWrapper STATIC \${LIBCAL2CPP_ROOT_PATH}/src/wrapperaka.cpp)
+$! todo: change this hack! !$
+add_library(AdaptorConfig STATIC "\${Thread_INCLUDE_DIR}/../../../LibAdaptorConfig/src/LibAdaptorConfig.cpp")
+add_library(Wrapper STATIC "\${Thread_INCLUDE_DIR}/../../../LibWrapper/src/wrapperaka.cpp")
 $endif$
 
 
@@ -52,7 +52,7 @@ $network.actors : addActor()$
 )
 
 $if(needSerDes)$
-add_dependencies($network.name$ LibWrapper LibAdaptorConfig)
+add_dependencies($network.name$ Wrapper AdaptorConfig)
 $endif$
 
 target_link_libraries($network.name$
