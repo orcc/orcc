@@ -99,9 +99,6 @@
         <Parameter name="MODE_SZ">
             <Expr kind="Var" name="MODE_SIZE"/>
         </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SIZE"/>
-        </Parameter>
         <Parameter name="PREDTYPE_SIZE">
             <Expr kind="Var" name="PREDTYPE_SIZE"/>
         </Parameter>

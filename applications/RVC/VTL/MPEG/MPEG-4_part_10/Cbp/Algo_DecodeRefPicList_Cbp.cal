@@ -13,7 +13,7 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
-actor Algo_DecodeRefPicList_Frext()
+actor Algo_DecodeRefPicList_Cbp()
 	int (size=32) ValVLD,
 
 	uint(size=4)  Slice_Type,
@@ -112,6 +112,7 @@ actor Algo_DecodeRefPicList_Frext()
 			num_ref_idx_active_override_flag = true
 		end
 
+
 	ReadNumRefIdxOverRide.L0: action
 			ValVLD :[ValueOfVLD]
 				==>
@@ -129,10 +130,14 @@ actor Algo_DecodeRefPicList_Frext()
 			TypeOfVLD    :[ READ_BITS , READ_BITS ],
 			NbBitsToRead :[     1     ,     1     ],
 
-			RefList0Type  :[REFLIST0_BI_PRED]/*,
-			RefList1Type  :[REFLIST1_BI_PRED]*/
+			RefList0Type  :[Type]
 		guard
 			slice_type = SLICE_TYPE_B
+		var
+			uint(size=2) Type=0 //TODO
+		do
+			println("RefPicList for B Pic not implemented !");
+			while true do end
 		end
 
 	Read_DirecSpat_NumRefIdxAct.Done: action
@@ -179,17 +184,14 @@ actor Algo_DecodeRefPicList_Frext()
 			num_ref_idx_l1_active := ValueOfVLD[1] + 1;
 		end
 
-	SendNumRefIdxlXActive: action
-				==>
-			NbRefFrame_l0 :[num_ref_idx_l0_active]
-		end
 
-
-	ReadRefPicListXReord.Asked: action
-				==>
-			//   ref_pic_list_reordering_flag_lX
+	ReadRefPicList0Reord.Asked: action
+			==>
+			//   ref_pic_list_reordering_flag_l0
 			TypeOfVLD     :[READ_BITS],
-			NbBitsToRead  :[    1    ]
+			NbBitsToRead  :[    1    ],
+
+			NbRefFrame_l0 :[num_ref_idx_l0_active]
 		end
 
 
@@ -210,33 +212,16 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReadRefPicList1Reord.Done: action
-			ValVLD :[ValueOfVLD]
-				==>
-//			RefReordering_l1 :[ref_pic_list_reordering_flag]
-		do
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
-			end
-			ref_pic_list_reordering_flag :=
-				if(ValueOfVLD = 0)then
-					false
-				else
-					true
-				end;
-		end
-
-
-	CheckRefPicLXReord.IsEqualToTrue: action
+	CheckRefPicL0Reord.IsEqualToTrue: action
 				==>
 			//      reordering_of_pic_nums_idc
 			TypeOfVLD    :[ VLD_UE ]
 		guard
-			ref_pic_list_reordering_flag
+			ref_pic_list_reordering_flag = true
 		end
 
 
-	ReordPicNumIdcL0.IsNotEqualTo3: action
+	ReordPicNumIdc.IsNotEqualTo3: action
 			ValVLD :[ValueOfVLD]
 				==>
 			//      abs_diff_pic_num_minus1
@@ -254,26 +239,8 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReordPicNumIdcL1.IsNotEqualTo3: action
+	ReordPicNumIdc.IsEqualTo3: action
 			ValVLD :[ValueOfVLD]
-				==>
-			//      abs_diff_pic_num_minus1
-			//                or
-			//        long_term_pic_num
-			TypeOfVLD    :[ VLD_UE ]/*,
-
-			RefReordering_l1 :[ValueOfVLD]*/
-		guard
-			ValueOfVLD != 3
-		do
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
-			end
-		end
-
-
-	ReordPicNumIdcL0.IsEqualTo3: action
-			ValVLD           :[ValueOfVLD]
 				==>
 			RefReordering_l0 :[ValueOfVLD]
 		do
@@ -283,38 +250,13 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReordPicNumIdcL1.IsEqualTo3: action
-			ValVLD           :[ValueOfVLD]
-				==>
-//			RefReordering_l1 :[ValueOfVLD]
-		do
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
-			end
-		end
-
-
-	ReadPicNumIdcParamL0.Done: action
+	ReadPicNumIdcParam.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
 			//      reordering_of_pic_nums_idc
 			TypeOfVLD    :[ VLD_UE ],
 
 			RefReordering_l0 :[ValueOfVLD]
-		do
-			if(DEBUG_FLAG_DECODED)then
-				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
-			end
-		end
-
-
-	ReadPicNumIdcParamL1.Done: action
-			ValVLD           :[ValueOfVLD]
-				==>
-			//      reordering_of_pic_nums_idc
-			TypeOfVLD        :[ VLD_UE ]/*,
-
-			RefReordering_l1 :[ValueOfVLD]*/
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
@@ -330,76 +272,52 @@ actor Algo_DecodeRefPicList_Frext()
 
 
 	schedule fsm ReadSliceTypeDone:
-		ReadSliceTypeDone               (ReadSliceType                        )--> CheckSliceType;
+		ReadSliceTypeDone (ReadSliceType        )--> CheckSliceType;
 
-		CheckSliceType                  (SliceType.IsEqualToP                 )--> ReadNumRefIdxActDone;
-		CheckSliceType                  (SliceType.IsEqualToB                 )--> Read_DirecSpat_NumRefIdxActDone;
-		CheckSliceType                  (SliceType.IsEqualToI                 )--> EndRefPicList;
+		CheckSliceType    (SliceType.IsEqualToP )--> ReadNumRefIdxActDone;
+		CheckSliceType    (SliceType.IsEqualToB )--> Read_DirecSpat_NumRefIdxActDone;
+		CheckSliceType    (SliceType.IsEqualToI )--> EndRefPicList;
 
 		/* slice_type = P */
-		ReadNumRefIdxActDone            (ReadNumRefIdxAct.Done                )--> CheckNumRefIdxActOverRide4P;
+		ReadNumRefIdxActDone (ReadNumRefIdxAct.Done )--> CheckNumRefIdxActOverRide4P;
 
-		CheckNumRefIdxActOverRide4P     (CheckNumRefIdxActOverRide.SliceTypeP )--> ReadNumRefIdxOverRideL0;
-		CheckNumRefIdxActOverRide4P     (SendNumRefIdxlXActive                )--> ReadRefPicL0ReordAsked4P;
+		CheckNumRefIdxActOverRide4P (CheckNumRefIdxActOverRide.SliceTypeP )--> ReadNumRefIdxOverRideL0;
+		CheckNumRefIdxActOverRide4P (ReadRefPicList0Reord.Asked )--> ReadRefPicL0ReordDone4P;
 
-		ReadNumRefIdxOverRideL0         (ReadNumRefIdxOverRide.L0             )--> SendNumRefIdxl0Active4P;
+		ReadNumRefIdxOverRideL0 (ReadNumRefIdxOverRide.L0 )--> ReadRefPicL0ReordAsked4P;
 
-		SendNumRefIdxl0Active4P         (SendNumRefIdxlXActive                )--> ReadRefPicL0ReordAsked4P;
+		ReadRefPicL0ReordAsked4P (ReadRefPicList0Reord.Asked )--> ReadRefPicL0ReordDone4P;
 
-		ReadRefPicL0ReordAsked4P        (ReadRefPicListXReord.Asked           )--> ReadRefPicL0ReordDone4P;
+		ReadRefPicL0ReordDone4P (ReadRefPicList0Reord.Done )--> CheckRefPicL0Reord4P;
 
-		ReadRefPicL0ReordDone4P         (ReadRefPicList0Reord.Done            )--> CheckRefPicL0Reord4P;
+		CheckRefPicL0Reord4P (CheckRefPicL0Reord.IsEqualToTrue )--> CheckReordPicNumIdc4P;
+		CheckRefPicL0Reord4P ( SendEndSliceHeader              )--> ReadSliceTypeDone;
 
-		CheckRefPicL0Reord4P            (CheckRefPicLXReord.IsEqualToTrue     )--> CheckReordPicNumIdc4P;
-		CheckRefPicL0Reord4P            (SendEndSliceHeader                   )--> ReadSliceTypeDone;
+		CheckReordPicNumIdc4P (ReordPicNumIdc.IsNotEqualTo3 )--> ReadPicNumIdcParamDone4P;
+		CheckReordPicNumIdc4P (ReordPicNumIdc.IsEqualTo3 )--> EndRefPicList;
 
-		CheckReordPicNumIdc4P           (ReordPicNumIdcL0.IsNotEqualTo3       )--> ReadPicNumIdcParamDone4P;
-		CheckReordPicNumIdc4P           (ReordPicNumIdcL0.IsEqualTo3          )--> EndRefPicList;
-
-		ReadPicNumIdcParamDone4P        (ReadPicNumIdcParamL0.Done              )--> CheckReordPicNumIdc4P;
+		ReadPicNumIdcParamDone4P (ReadPicNumIdcParam.Done )--> CheckReordPicNumIdc4P;
 
 		/* slice_type = B */
-		Read_DirecSpat_NumRefIdxActDone (Read_DirecSpat_NumRefIdxAct.Done     )--> CheckNumRefIdxActOverRide4B;
+		Read_DirecSpat_NumRefIdxActDone (Read_DirecSpat_NumRefIdxAct.Done )--> CheckNumRefIdxActOverRide4B;
 
-		CheckNumRefIdxActOverRide4B     (CheckNumRefIdxActOverRide.SliceTypeB )--> ReadNumRefIdxOverRideL0_L1;
-		CheckNumRefIdxActOverRide4B     (SendNumRefIdxlXActive                )--> ReadRefPicL0ReordAsked4B;
+		CheckNumRefIdxActOverRide4B (CheckNumRefIdxActOverRide.SliceTypeB )--> ReadNumRefIdxOverRideL0_L1;
+		CheckNumRefIdxActOverRide4B (ReadRefPicList0Reord.Asked )--> ReadRefPicL0ReordDone4B;
 
-		ReadNumRefIdxOverRideL0_L1      (ReadNumRefIdxOverRide.L0_L1          )--> SendNumRefIdxl0Active4B;
+		ReadNumRefIdxOverRideL0_L1 (ReadNumRefIdxOverRide.L0_L1 )--> ReadRefPicList0ReordAsked;
 
-		SendNumRefIdxl0Active4B         (SendNumRefIdxlXActive                )--> ReadRefPicL0ReordAsked4B;
-			/* List 0 */
-		ReadRefPicL0ReordAsked4B        (ReadRefPicListXReord.Asked           )--> ReadRefPicL0ReordDone4B;
+		ReadRefPicL0ReordAsked4B (ReadRefPicList0Reord.Asked )--> ReadRefPicL0ReordDone4B;
 
-		ReadRefPicL0ReordDone4B         (ReadRefPicList0Reord.Done            )--> CheckRefPicL0Reord4B;
+		ReadRefPicL0ReordDone4B (ReadRefPicList0Reord.Done )--> undefined;// Not implemented yet !!
 
-		CheckRefPicL0Reord4B            (CheckRefPicLXReord.IsEqualToTrue     )--> CheckReordPicNumIdcL04B;
-		CheckRefPicL0Reord4B            (ReadRefPicListXReord.Asked           )--> ReadRefPicL1ReordDone4B;
-
-		CheckReordPicNumIdcL04B         (ReordPicNumIdcL0.IsNotEqualTo3       )--> ReadPicNumIdcParamDoneL04B;
-		CheckReordPicNumIdcL04B         (ReordPicNumIdcL0.IsEqualTo3          )--> ReadRefPicL1ReordAsked4B;
-
-		ReadPicNumIdcParamDoneL04B      (ReadPicNumIdcParamL0.Done            )--> CheckReordPicNumIdcL04B;
-			/* List 1 */
-		ReadRefPicL1ReordAsked4B        (ReadRefPicListXReord.Asked           )--> ReadRefPicL1ReordDone4B;
-
-		ReadRefPicL1ReordDone4B         (ReadRefPicList1Reord.Done            )--> CheckRefPicL1Reord4B;
-
-		CheckRefPicL1Reord4B            (CheckRefPicLXReord.IsEqualToTrue     )--> CheckReordPicNumIdcL14B;
-		CheckRefPicL1Reord4B            (SendEndSliceHeader                   )--> ReadSliceTypeDone;
-
-		CheckReordPicNumIdcL14B         (ReordPicNumIdcL1.IsNotEqualTo3       )--> ReadPicNumIdcParamDoneL14B;
-		CheckReordPicNumIdcL14B         (ReordPicNumIdcL1.IsEqualTo3          )--> EndRefPicList;
-
-		ReadPicNumIdcParamDoneL14B      (ReadPicNumIdcParamL1.Done            )--> CheckReordPicNumIdcL14B;
-
-		EndRefPicList                   (SendEndSliceHeader                   )--> ReadSliceTypeDone;
+		EndRefPicList     (SendEndSliceHeader   )--> ReadSliceTypeDone;
 	end
 
 	priority
 		SliceType.IsEqualToP             > SliceType.IsEqualToB        > SliceType.IsEqualToI;
-		CheckNumRefIdxActOverRide        > SendNumRefIdxlXActive;
-		CheckRefPicLXReord.IsEqualToTrue > SendEndSliceHeader;
-		ReordPicNumIdcL0.IsNotEqualTo3   > ReordPicNumIdcL0.IsEqualTo3;
+		CheckNumRefIdxActOverRide        > ReadRefPicList0Reord.Asked;
+		CheckRefPicL0Reord.IsEqualToTrue > SendEndSliceHeader;
+		ReordPicNumIdc.IsNotEqualTo3     > ReordPicNumIdc.IsEqualTo3;
 	end
 
 end

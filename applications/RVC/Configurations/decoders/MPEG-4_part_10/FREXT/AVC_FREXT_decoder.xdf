@@ -90,24 +90,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="DPBMAXSIZE">
-            <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
-        <Parameter name="MODE_SZ">
-            <Expr kind="Var" name="MODE_SIZE"/>
-        </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SIZE"/>
-        </Parameter>
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SIZE">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Decoding_Y">
         <!-- ************************* -->
