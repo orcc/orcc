@@ -78,7 +78,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			this.it = it;
 		}
 
-		private LocalVariable addCast(Expression expr, Type type) {
+		private LocalVariable addExprCast(Expression expr, Type type) {
 			Location location = expr.getLocation();
 
 			// Make a new assignment to the binary expression
@@ -98,7 +98,6 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
-			Type type = (Type) args[0];
 			BinaryOp op = expr.getOp();
 			Expression e1 = expr.getE1();
 			Expression e2 = expr.getE2();
@@ -125,27 +124,6 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 			if (!op.isComparison()) {
 				expr.setType(transitionType);
-
-				Cast castTarget = new Cast(transitionType, type);
-
-				if (castTarget.isExtended() || castTarget.isTrunced()) {
-					Location location = expr.getLocation();
-
-					// Make a new assignment to the binary expression
-					LocalVariable transitionVar = procedure
-							.newTempLocalVariable(file, transitionType,
-									procedure.getName() + "_" + "expr");
-
-					transitionVar.setIndex(1);
-
-					Assign assign = new Assign(location, transitionVar, expr);
-
-					// Add assignement to instruction's list
-					it.add(assign);
-
-					return new VarExpr(location, new Use(transitionVar));
-
-				}
 			}
 
 			return expr;
@@ -160,7 +138,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			if (cast.isExtended() || cast.isTrunced()) {
 
 				// Add assignement to instruction's list
-				LocalVariable var = addCast(expr, type);
+				LocalVariable var = addExprCast(expr, type);
 
 				return new VarExpr(var.getLocation(), new Use(var));
 			}
@@ -186,36 +164,41 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 		if (value.isBinaryExpr()) {
 			BinaryExpr binExpr = (BinaryExpr) value;
-			Type type = binExpr.getType();
 			LocalVariable target = assign.getTarget();
-			ExpressionTypeChecker typeChecker = new ExpressionTypeChecker(it);
+			
 			it.previous();
-
-			Expression expr = (Expression) binExpr.accept(typeChecker, type);
+			
+			ExpressionTypeChecker typeChecker = new ExpressionTypeChecker(it);
+			Expression expr = (Expression) binExpr.accept(typeChecker, binExpr.getType());
 
 			if (expr != binExpr) {
 				assign.setValue(expr);
 			}
+			
+			it.next();
+			
+			if (!binExpr.getOp().isComparison()){
+				Cast castTarget = new Cast(target.getType(), binExpr.getType());
 
-			Cast cast = new Cast(type, target.getType());
+				if (castTarget.isExtended() || castTarget.isTrunced()) {
+					Location location = target.getLocation();
 
-			if (cast.isExtended() || cast.isTrunced()) {
-				Location location = binExpr.getLocation();
+					// Make a new assignment to the binary expression
+					LocalVariable transitionVar = procedure
+							.newTempLocalVariable(file, binExpr.getType(),
+									procedure.getName() + "_" + "expr");
 
-				// Make a new assignment to the binary expression
-				LocalVariable newTmp = procedure.newTempLocalVariable(file,
-						type, procedure.getName() + "_" + "expr");
+					transitionVar.setIndex(1);
+					
+					assign.setTarget(transitionVar);
+					VarExpr varExpr = new VarExpr(location, new Use(transitionVar));
+					
+					Assign newAssign = new Assign(location, target, varExpr);
 
-				VarExpr newExpr = new VarExpr(location, new Use(newTmp));
-
-				newTmp.setIndex(1);
-
-				assign.setTarget(newTmp);
-
-				Assign newAssign = new Assign(location, target, newExpr);
-
-				// Add assignement to instruction's list
-				it.add(newAssign);
+					// Add assignement to instruction's list
+					it.add(newAssign);
+				}
+				
 			}
 		}
 	}
