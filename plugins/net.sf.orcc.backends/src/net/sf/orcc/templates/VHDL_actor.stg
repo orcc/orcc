@@ -187,7 +187,7 @@ Actor_Exec_FSM(actor) ::= <<
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
 listSize(value) ::= <<
-$value : {0 to $it$ -1}; separator=", "$
+$value : {$it$}; separator=" * "$
 >>
 
 signalDeclaration(variable) ::= <<
@@ -213,13 +213,14 @@ signal $variable$ : $variable.type$;$
     $$
       if(variable.initialized)
       $
-type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
+          
+type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
 constant $variable$ : memory_type_$variable$ := $Constant(variable.constantValue)$;$ 
       endif
     $$
     else
     $
-type memory_type_$variable$ is array ($listSize(variable.type.dimensions)$) of $variable.type$;
+type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
 signal $variable$ : memory_type_$variable$;$
     endif
   $$
@@ -232,13 +233,11 @@ $
 
 variableDeclaration(variable) ::= <<
 $
-if(variable.port)
-$variable $variable$ : $variable.type$$
-elseif(!variable.type.list)
-$variable $variable$ : $variable.type$ $listSize(variable.type.dimensions)$$
-else
+if(variable.type.list)
 $-- error !!!!! type memory_type
--- variable $variable$ : $variable.type$ $listSize(variable.type.dimensions)$$
+-- variable $variable$ : $variable.type$ (0 to $listSize(variable.type.dimensions)$ -1)$
+else
+$variable $variable$ : $variable.type$$
 endif
 $
 >>
@@ -339,7 +338,7 @@ $
 
 AssignIndex(AssignIndex) ::= <<
 
-$AssignIndex.target$ = to_integer(unsigned($AssignIndex.indexes: {std_logic_vector(to_signed($it$, $it$'length))}; separator=" & "$));
+$AssignIndex.target$ = to_integer(unsigned($AssignIndex.indexes: {std_logic_vector(to_signed($it$, $it.type.size$))}; separator=" & "$));
 >>
 
 
