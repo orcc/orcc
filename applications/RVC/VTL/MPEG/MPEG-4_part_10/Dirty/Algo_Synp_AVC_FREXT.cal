@@ -100,7 +100,10 @@ actor Algo_Synp_AVC_FREXT()
 			int(size=16) WIDTH, 
 			int(size=16) HEIGHT,
 			uint(size=5) SizeDPBMax,
-			bool ReadNextByte
+			bool ReadNextByte,
+			bool          TransformSize8x8,
+			uint(size=6)  MacroBlockType	
+
 		:
   	// FIXME! Maximum size of a line in macroclock
   	uint(size=7) PICWIDTH =1280/16;
@@ -531,7 +534,19 @@ actor Algo_Synp_AVC_FREXT()
 	********       		Macroblock layer    	    *********
 	*************************************************************
 	*************************************************************/
-	uint(size=6) mb_type;
+	uint(size=6) mb_type;	
+	uint(size=6) mb_type_tmp;
+	
+	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
+	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
+	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
+	uint(size=6) MB_TYPE_P_8X8              = 29;
+	uint(size=6) MB_TYPE_P_8X8_REF0         = 30;
+	uint(size=6) MB_TYPE_B_8X8              = 53;
+	
+
 	uint(size=1) mb_intra_flag; // INTER 0, INTRA 1
 	uint MB_inc;
 	uint(size=1) noSubMbPartSizeLessThan8x8Flag;
@@ -1446,7 +1461,7 @@ actor Algo_Synp_AVC_FREXT()
 	********       		Residual		    	    *********
 	*************************************************************
 	*************************************************************/
-	bool DEBUG_FLAG_NEW_PARSER = false;
+	bool DEBUG_FLAG_NEW_PARSER = true;
 	bool DEBUG_OUTPUT_NEW_PARSER = false;
 	uint(size=1) bmFlag;
 	uint(size=4) startIdx;
@@ -6992,7 +7007,9 @@ end
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
-			LAST:[[true: for int t in 0 .. 26 ]] repeat 27
+			LAST:[[true: for int t in 0 .. 26 ]] repeat 27,
+			MacroBlockType:[MB_TYPE_P_8X8]
+
 			
 	guard
 		prevMbSkipped = 1 and IS_CAVLC(),
@@ -7046,7 +7063,9 @@ end
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
-			LAST:[[true: for int t in 0 .. 25 ]] repeat 26
+			LAST:[[true: for int t in 0 .. 25 ]] repeat 26,
+			MacroBlockType:[MB_TYPE_P_8X8]
+
 			
 	guard
 		prevMbSkipped = 1 and IS_CAVLC(),
@@ -7273,7 +7292,9 @@ end
 			LFDisable:[disable_deblocking_filter_idc],
 			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
 			cbp_blk:[cbp_blk_tmp],
-			MbIntraFlag:[mb_intra_flag]
+			MbIntraFlag:[mb_intra_flag],
+			MacroBlockType:[BLOCK_TYPE_I_PCM]
+
 	guard 
 		IS_I_PCM()
 	var 
@@ -7304,7 +7325,7 @@ end
 		val_cbp_blk:=0;
 	end
 
-	send_data_position_information: action 
+	send_data_position_information_I4x4orI8x8: action 
 		==> 
 			CurrMbAddr:[mb_addr],
 			PicWidthInMb:[PicWidthInMbs],
@@ -7319,33 +7340,43 @@ end
 			QP_Cb:[val_QP_Cb], 
 			QP_Cr:[val_QP_Cr], 
 			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16,
-			MbIntraFlag:[mb_intra_flag]
+			MbIntraFlag:[mb_intra_flag],
+			TransformSize8x8:[false],
+			MacroBlockType:[mb_type_tmp]
 	guard
-		mb_skip_flag = 0
+		IS_Intra_4x4() or IS_Intra_8x8()
 	var 
 		int mb_addr,
 		int cbp_blk_tmp=val_cbp_blk
 	do
-		//println("send_data_position_information");
-if TRACE_MRL then 
-println("CurrMbAddr "+ val_CurrMbAddr);
-println("MbIntraFlag "+ mb_intra_flag);
-println("QP "+val_QP);
-println("QP_Cb "+ val_QP_Cb);
-println("QP_Cr "+ val_QP_Cr);
-println("ConstrainedIFlag "+constrained_intra_pred_flag[pps_id]);
-println("PicWidthInMb "+PicWidthInMbs);
-println("PicSizeInMb "+ PicSizeInMbs);
-println("FirstMbInSlice "+ first_mb_in_slice);
-println("slice_alpha_c0_offset "+val_slice_alpha_c0_offset);
-println("slice_beta_offset "+val_slice_beta_offset);
-println("LFDisable "+disable_deblocking_filter_idc);
-println("cbp_blk "+ cbp_blk_tmp);		
-end
 		mb_addr:=val_CurrMbAddr;
 		NextMbAddress();
-		/* Save Memory procedure, cycle copy*/
-		CabacCycleCopy();
+		val_cbp_blk:=0;
+	end
+	
+	send_data_position_information_Not_I4x4orI8x8: action 
+		==> 
+			CurrMbAddr:[mb_addr],
+			PicWidthInMb:[PicWidthInMbs],
+			PicSizeInMb:[PicSizeInMbs],
+			FirstMbInSlice:[first_mb_in_slice],
+			slice_alpha_c0_offset:[val_slice_alpha_c0_offset],
+			slice_beta_offset:[val_slice_beta_offset],
+			LFDisable:[disable_deblocking_filter_idc],
+			ConstrainedIFlag:[constrained_intra_pred_flag[pps_id]],
+			cbp_blk:[cbp_blk_tmp],
+			QP:[val_QP], 
+			QP_Cb:[val_QP_Cb], 
+			QP_Cr:[val_QP_Cr], 
+			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16,
+			MbIntraFlag:[mb_intra_flag],
+			MacroBlockType:[mb_type_tmp]
+	var 
+		int mb_addr,
+		int cbp_blk_tmp=val_cbp_blk
+	do
+		mb_addr:=val_CurrMbAddr;
+		NextMbAddress();
 		val_cbp_blk:=0;
 	end
 	
@@ -7674,10 +7705,11 @@ end
 			end
 		end
 		
+		mb_type_tmp := mb_type;
 		if slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI then mb_intra_flag := 1; end
-		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then if mb_type < 5 then mb_intra_flag := 0; else mb_type:= mb_type - 5; mb_intra_flag := 1; end end
-		if slice_type = SLICE_TYPE_B then if mb_type < 23 then mb_intra_flag := 0; else mb_type:= mb_type -23; mb_intra_flag := 1; end end
-		
+		if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then if mb_type < 5 then mb_type_tmp := mb_type + 26; mb_intra_flag := 0; else mb_type:= mb_type - 5; mb_intra_flag := 1; mb_type_tmp:=mb_type;  end end
+		if slice_type = SLICE_TYPE_B then if mb_type < 23 then mb_type_tmp := mb_type + 26 + 5; mb_intra_flag := 0; else mb_type:= mb_type -23; mb_intra_flag := 1; mb_type_tmp:=mb_type; end end
+
 		//Update mbTab with the current type of mb and slice_type
 		mbTab[CabacCurrMbAddr()][mbSliceType] := slice_type;
 		mbTab[CabacCurrMbAddr()][mbTabMbtype] := mb_type;
@@ -10401,12 +10433,14 @@ end
 		SliceD_moredata                                     ( SliceD_moredata_1                                 ) --> SliceD_moredata_1_done;
 		SliceD_moredata(read_next_byte)-->SliceD_moredata;
 		SliceD_moredata_1_done								( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
-		SliceD_moredata_1_done								( send_data_position_information	                ) --> syncSliceD_endwhile;
+		SliceD_moredata_1_done								( send_data_position_information_I4x4orI8x8	                ) --> syncSliceD_endwhile;
+		SliceD_moredata_1_done								( send_data_position_information_Not_I4x4orI8x8	                ) --> syncSliceD_endwhile;
 		SliceD_moredata_1_done								( send_data_position_information_mb_skip_flag       ) --> syncSliceD_endwhile;
 		SliceD_moredata_1_done(read_next_byte)-->SliceD_moredata_1_done;
 		SliceD_moredata 									( SliceD_moredata_0									) --> SliceD_stop_byte_align_done;
 		SliceD_stop_byte_align_done							( send_data_position_information_is_ipcm            ) --> syncSliceD_endwhile;
-		SliceD_stop_byte_align_done							( send_data_position_information	                ) --> syncSliceD_endwhile;
+		SliceD_stop_byte_align_done							( send_data_position_information_I4x4orI8x8	                ) --> syncSliceD_endwhile;
+		SliceD_stop_byte_align_done							( send_data_position_information_Not_I4x4orI8x8		                ) --> syncSliceD_endwhile;
 		SliceD_stop_byte_align_done							( send_data_position_information_mb_skip_flag       ) --> syncSliceD_endwhile;
 		SliceD_stop_byte_align_done(read_next_byte)-->SliceD_stop_byte_align_done;
 		syncSliceD_endwhile									( syncSliceD_endwhile								) --> SliceD_while_moreDataFlag;
@@ -10700,7 +10734,7 @@ end
 		read_SliceD_mb_skip_flag_done > read_SliceD_mb_skip_flag;
 		test_zero_byte > generic_done;
 		test_one_byte  > generic_done;
-		send_data_position_information_is_ipcm>send_data_position_information;
+		send_data_position_information_is_ipcm>send_data_position_information_I4x4orI8x8>send_data_position_information_Not_I4x4orI8x8;
 	end
 
 end

@@ -90,21 +90,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="DPBMAXSIZE">
-            <Expr kind="Var" name="DPBMAXSIZE"/>
-        </Parameter>
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
-        <Parameter name="MODE_SZ">
-            <Expr kind="Var" name="MODE_SIZE"/>
-        </Parameter>
-        <Parameter name="PREDTYPE_SIZE">
-            <Expr kind="Var" name="PREDTYPE_SIZE"/>
-        </Parameter>
-        <Parameter name="SAMPLE_SIZE">
-            <Expr kind="Var" name="SAMPLE_SIZE"/>
-        </Parameter>
     </Instance>
     <Instance id="Decoding_Y">
         <!-- ************************* -->
@@ -295,4 +280,12 @@
     <Connection dst="Decode_U" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decode_V" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decoding_Y" dst-port="BlocksSize" src="FUN_Parser" src-port="BlocksSize_Luma"/>
+    <Connection dst="Decoding_Y" dst-port="MacroBlockType"
+        src="FUN_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decoding_Y" dst-port="TransformSize8x8"
+        src="FUN_Parser" src-port="TransformSize8x8"/>
+    <Connection dst="Decode_U" dst-port="MacroBlockType"
+        src="FUN_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decode_V" dst-port="MacroBlockType"
+        src="FUN_Parser" src-port="MacroBlockType"/>
 </XDF>
