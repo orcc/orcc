@@ -300,10 +300,17 @@ String(constant) ::= <<
 CastStore(target, value, cast)::= <<
 $
 if(cast.extended)
-  $$target$ := $value$$
+$$target$ := $value$$
 else
+$$
+  if(target.type.uint)
 $
-$target$ := cast($value$, $value.type.size$, $target.type.size$)$
+$target$ := ucast($value$, $value.type.size$, $target.type.size$)$  
+  else
+$
+$target$ := cast($value$, $value.type.size$, $target.type.size$)$  
+  endif
+$$
 endif
 $
 
@@ -312,11 +319,17 @@ $
 CastLoad(target, source, cast)::= <<
 $
 if(cast.extended)
-  $$target$ := $source$$
+$$target$ := $source$$
 else
+$$
+  if(target.type.uint)
 $
--- cast not extended
+$target$ := ucast($source$, $source.type.size$, $target.variable.type.size$)$
+  else
+$
 $target$ := cast($source$, $source.type.size$, $target.variable.type.size$)$
+  endif
+$$
 endif
 $
 
@@ -338,7 +351,7 @@ $
 
 AssignIndex(AssignIndex) ::= <<
 
-$AssignIndex.target$ = to_integer(unsigned($AssignIndex.indexes: {std_logic_vector(to_signed($it$, $it.type.size$))}; separator=" & "$));
+$AssignIndex.target$ := to_integer(unsigned($AssignIndex.indexes: {std_logic_vector(to_unsigned($it$, $it.type.size$))}; separator=" & "$));
 >>
 
 
