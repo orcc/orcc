@@ -106,6 +106,10 @@ public class Rational implements Comparable<Rational> {
 				* d.denominator);
 	}
 
+	public double toDouble() {
+		return (double) numerator / denominator;
+	}
+
 	public String toString() {
 		if (denominator == 1)
 			return numerator + "";

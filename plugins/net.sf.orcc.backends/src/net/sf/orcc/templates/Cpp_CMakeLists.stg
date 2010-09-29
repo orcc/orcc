@@ -30,20 +30,25 @@ find_file(Thread_INCLUDE_DIR Thread)
 
 find_package(SDL REQUIRED)
 
+$if(needSerDes)$
+find_library(AdaptorFactory_LIBRARY AdaptorFactory)
+find_file(AdaptorFactory_INCLUDE_DIR AdaptorFactory)
+
+$! todo: change this hack! !$
+add_library(AdaptorConfig STATIC "\${Thread_INCLUDE_DIR}/../../../LibAdaptorConfig/src/LibAdaptorConfig.cpp")
+add_library(Wrapper STATIC "\${Thread_INCLUDE_DIR}/../../../LibWrapper/src/wrapperaka.cpp")
+$endif$
+
 include_directories(
 	\${CMAKE_SOURCE_DIR}
 	\${CALaka_INCLUDE_DIR}
 	\${Orcc_INCLUDE_DIR}
 	\${Thread_INCLUDE_DIR}
 	\${SDL_INCLUDE_DIR}
-)
-
 $if(needSerDes)$
-$! todo: change this hack! !$
-add_library(AdaptorConfig STATIC "\${Thread_INCLUDE_DIR}/../../../LibAdaptorConfig/src/LibAdaptorConfig.cpp")
-add_library(Wrapper STATIC "\${Thread_INCLUDE_DIR}/../../../LibWrapper/src/wrapperaka.cpp")
+	\${AdaptorFactory_INCLUDE_DIR}
 $endif$
-
+)
 
 
 add_executable ($network.name$
@@ -61,7 +66,8 @@ target_link_libraries($network.name$
 \${Thread_LIBRARY}
 \${SDL_LIBRARY}
 $if(needSerDes)$
-AdaptorFactory Wrapper AdaptorConfig
+\${AdaptorFactory_LIBRARY}
+Wrapper AdaptorConfig
 $endif$
 )
 
