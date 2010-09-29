@@ -379,37 +379,6 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	/**
-	 * Returns the container of the given expression. The container is either
-	 * the first non-expression container, or the first call to a non-built-in
-	 * function up the containment hierarchy.
-	 * 
-	 * @param object
-	 *            an expression
-	 * @return the container
-	 */
-	private EObject getContainer(EObject object) {
-		EObject container = object.eContainer();
-
-		// if the container is an expression continue up the hierarchy
-		// except if the container is a call to a non-built-in function
-		if (container instanceof AstExpression) {
-			if (container instanceof AstExpressionCall
-					&& ((AstExpressionCall) container).getFunction()
-							.eContainer() != null) {
-				return container;
-			} else if (container instanceof AstExpressionIndex) {
-				// the only expressions contained in an ExpressionIndex are the
-				// indexes
-				return container;
-			}
-
-			return getContainer(container);
-		}
-
-		return container;
-	}
-
-	/**
 	 * Returns the Greatest Lower Bound of the given types. The GLB is the
 	 * smallest type of (t1, t2).
 	 * 
@@ -921,13 +890,14 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	/**
 	 * Finds the target type of the container of the given expression, and sets
-	 * the maxSize field from it. If no target is found, set maxSize to 32.
+	 * the maxSize field from it. If no target is found, set maxSize to 32. The
+	 * container is the direct container of the expression.
 	 * 
 	 * @param expression
 	 *            an expression
 	 */
 	private void setTargetType(AstExpression expression) {
-		EObject cter = getContainer(expression);
+		EObject cter = expression.eContainer();
 		Type targetType = null;
 
 		if (cter != null) {
@@ -964,7 +934,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 			case CalPackage.AST_STATEMENT_ASSIGN: {
 				AstStatementAssign assign = (AstStatementAssign) cter;
-				if (EcoreUtil.isAncestor(assign.getValue(), expression)) {
+				if (expression.eContainer() == assign.getValue()) {
 					// expression is located in the value
 					targetType = assign.getTarget().getVariable().getIrType();
 				} else {
@@ -996,8 +966,8 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		if (targetType == null) {
-			// in if & while conditions, guard expressions, calls to built-in
-			// functions
+			// in expressions contained in other expressions, and in if & while
+			// conditions, guard expressions, calls to built-in functions
 			maxSize = 32;
 		} else {
 			maxSize = Cast.getSizeOfType(targetType);
