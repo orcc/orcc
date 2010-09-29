@@ -34,7 +34,7 @@ actor Algo_DecodeSubMbPred()
 	bool         EndRefIdxL0
 		:
 
-	bool DEBUG_MV = false;
+	bool DEBUG_MV = true;
 
 	uint(size=3) READ_BITS = 0;
 	uint(size=3) VLD_UE    = 1;
@@ -61,6 +61,8 @@ actor Algo_DecodeSubMbPred()
 			, PRED_L0 , PRED_L1 , BIPRED];
 
 	List(type: uint(size=3), size=4)  NumSubMbPart_P = [1,2,2,4];
+
+	List(type: uint(size=3), size=11)  NumSubMbPart_B = [4,1,1,1,2,2,2,2,2,2,4];
 
 	List ( type: List ( type: uint(size=5), size=4), size=4 ) P_tab_sub = //[sub_mb_type[mbPartIdx]][NumSubMbPart / MbPartWidth / MbPartHeight / SubMbPredMode]
 		[ [1,8,8,0], [2,8,4,0], [2,4,8,0], [4,4,4,0] ];
@@ -146,7 +148,7 @@ actor Algo_DecodeSubMbPred()
 			mb_field_decoding_flag := ValMbFieldDecoding;
 			mb_type                := MacroBType;
 			slice_type             := ValSliceType;
-
+println("ReadParameters");
 			mbPartIdx    := 0;
 		end
 
@@ -222,16 +224,17 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 
 	CheckmbPartIdx: action ==>
 		guard
-			/* sub_mb_type[ mbPartIdx ] != B_Direct_8x8 */
-			(slice_type != SLICE_TYPE_B) or (sub_mb_type[mbPartIdx] != B_DIRECT_8x8),
 			mbPartIdx < 4
 		do
 			subMbPartIdx := 0;
 			if( (slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP) )then
 				subMbPartIdxMax := NumSubMbPart_P[ (sub_mb_type[mbPartIdx]) & 0x03 ];
 			else
-				println("Lot of stuff are not implemented for slice B !!!!");
-				while true do end
+				if(sub_mb_type[mbPartIdx] > 10) then
+					subMbPartIdxMax := 4;
+				else
+					subMbPartIdxMax :=  NumSubMbPart_B[ sub_mb_type[mbPartIdx] ];
+				end
 			end
 			mbPartIdx    := mbPartIdx + 1;
 		end
@@ -240,13 +243,24 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
     SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L1 )
 */
-	ReadMvdl0Asked: action
+	ReadMvdl0Asked.Launch: action
 				==>
 			//             mvd_l0
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
-			/* SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L1 )*/
+			(slice_type != SLICE_TYPE_B) or (sub_mb_type[mbPartIdx] != B_DIRECT_8x8),
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1,
+			subMbPartIdx < subMbPartIdxMax
+		do
+			subMbPartIdx := subMbPartIdx +1;
+		end
+
+	ReadMvdl0Asked.Skip: action
+				==>
+			//             mvd_l0
+			TypeOfVLD :[  READ_BITS ,  READ_BITS  ],
+			VldParam  :[      0     ,      0      ]
+		guard
 			subMbPartIdx < subMbPartIdxMax
 		do
 			subMbPartIdx := subMbPartIdx +1;
@@ -256,13 +270,24 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
     SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L0 )
 */
-	ReadMvdl1Asked: action
+	ReadMvdl1Asked.Launch: action
 				==>
 			//             mvd_l0
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
-			/* SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L0 )*/
+			(slice_type != SLICE_TYPE_B) or (sub_mb_type[mbPartIdx] != B_DIRECT_8x8),
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L0,
+			subMbPartIdx < subMbPartIdxMax
+		do
+			subMbPartIdx := subMbPartIdx +1;
+		end
+
+	ReadMvdl1Asked.Skip: action
+				==>
+			//             mvd_l0
+			TypeOfVLD :[  READ_BITS ,  READ_BITS  ],
+			VldParam  :[      0     ,      0      ]
+		guard
 			subMbPartIdx < subMbPartIdxMax
 		do
 			subMbPartIdx := subMbPartIdx +1;
@@ -293,8 +318,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			MbPartIdx    :[subMbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard
-			/* SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L1 )*/
-			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1,
 			subMbPartIdx < subMbPartIdxMax
 		do
 			if(DEBUG_MV)then
@@ -308,8 +331,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
 		guard
-			/* SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L0 )*/
-			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L0,
 			subMbPartIdx < subMbPartIdxMax
 		do
 			if(DEBUG_MV)then
@@ -328,45 +349,45 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 	schedule fsm ReadSubMbTypeAsked:
 		ReadSubMbTypeAsked (ReadSubMbType.Asked )--> ReadSubMbTypeDone;
 
-		ReadSubMbTypeDone (ReadSubMbType.Done )--> ReadParameters;
+		ReadSubMbTypeDone  (ReadSubMbType.Done  )--> ReadParameters;
 
-		ReadParameters (ReadParameters )--> AskRefIdxL0;
+		ReadParameters     (ReadParameters      )--> AskRefIdxL0;
 
-		AskRefIdxL0 (AskRefIdxL0.Launch )--> AskRefIdxL0;
-		AskRefIdxL0 (AskRefIdxLX.Skip )--> AskRefIdxL0;
-		AskRefIdxL0 (SendOrReadDone )--> AskRefIdxL1;
+		AskRefIdxL0        (AskRefIdxL0.Launch  )--> AskRefIdxL0;
+		AskRefIdxL0        (AskRefIdxLX.Skip    )--> AskRefIdxL0;
+		AskRefIdxL0        (SendOrReadDone      )--> AskRefIdxL1;
 
-		AskRefIdxL1 (AskRefIdxL1.Launch )--> AskRefIdxL1;
-		AskRefIdxL1 (AskRefIdxLX.Skip )--> AskRefIdxL1;
-		AskRefIdxL1 (SendOrReadDone )--> CheckmbPartIdx0;
+		AskRefIdxL1        (AskRefIdxL1.Launch  )--> AskRefIdxL1;
+		AskRefIdxL1        (AskRefIdxLX.Skip    )--> AskRefIdxL1;
+		AskRefIdxL1        (SendOrReadDone      )--> CheckmbPartIdx0;
 
-		CheckmbPartIdx0 (CheckmbPartIdx )--> ReadMvdl0Asked;
+		CheckmbPartIdx0    (CheckmbPartIdx      )--> ReadMvdl0Asked;
 
-		ReadMvdl0Asked ( ReadMvdl0Asked)--> ReadMvdl0Asked;
-		ReadMvdl0Asked ( CheckmbPartIdx)--> ReadMvdl0Asked;
-		ReadMvdl0Asked ( SendOrReadDone)--> CheckmbPartIdx1;
+		ReadMvdl0Asked     (ReadMvdl0Asked      )--> ReadMvdl0Asked;
+		ReadMvdl0Asked     (CheckmbPartIdx      )--> ReadMvdl0Asked;
+		ReadMvdl0Asked     (SendOrReadDone      )--> CheckmbPartIdx1;
 
-		CheckmbPartIdx1 (CheckmbPartIdx )--> ReadMvdl1Asked;
+		CheckmbPartIdx1    (CheckmbPartIdx      )--> ReadMvdl1Asked;
 
-		ReadMvdl1Asked ( ReadMvdl1Asked)--> ReadMvdl1Asked;
-		ReadMvdl1Asked ( CheckmbPartIdx)--> ReadMvdl1Asked;
-		ReadMvdl1Asked ( SendOrReadDone)--> ReadRefIdxLX;
+		ReadMvdl1Asked     (ReadMvdl1Asked      )--> ReadMvdl1Asked;
+		ReadMvdl1Asked     (CheckmbPartIdx      )--> ReadMvdl1Asked;
+		ReadMvdl1Asked     (SendOrReadDone      )--> ReadRefIdxLX;
 
-		ReadRefIdxLX (ReadRefIdxLX )--> CheckmbPartIdx2;
+		ReadRefIdxLX       (ReadRefIdxLX        )--> CheckmbPartIdx2;
 
-		CheckmbPartIdx2 (CheckmbPartIdx )--> ReadMvdl0Done;
+		CheckmbPartIdx2    (CheckmbPartIdx      )--> ReadMvdl0Done;
 
-		ReadMvdl0Done ( ReadMvdl0Done)--> ReadMvdl0Done;
-		ReadMvdl0Done ( CheckmbPartIdx)--> ReadMvdl0Done;
-		ReadMvdl0Done ( SendOrReadDone)--> CheckmbPartIdx3;
+		ReadMvdl0Done      (ReadMvdl0Done       )--> ReadMvdl0Done;
+		ReadMvdl0Done      (CheckmbPartIdx      )--> ReadMvdl0Done;
+		ReadMvdl0Done      (SendOrReadDone      )--> CheckmbPartIdx3;
 
-		CheckmbPartIdx3 (CheckmbPartIdx )--> ReadMvdl1Done;
+		CheckmbPartIdx3    (CheckmbPartIdx      )--> ReadMvdl1Done;
 
-		ReadMvdl1Done ( ReadMvdl1Done)--> ReadMvdl1Done;
-		ReadMvdl1Done ( CheckmbPartIdx)--> ReadMvdl1Done;
-		ReadMvdl1Done ( SendOrReadDone)--> SendEndSubMbPred;
+		ReadMvdl1Done      (ReadMvdl1Done       )--> ReadMvdl1Done;
+		ReadMvdl1Done      (CheckmbPartIdx      )--> ReadMvdl1Done;
+		ReadMvdl1Done      (SendOrReadDone      )--> SendEndSubMbPred;
 
-		SendEndSubMbPred (SendEndSubMbPred )--> ReadSubMbTypeAsked;
+		SendEndSubMbPred   (SendEndSubMbPred    )--> ReadSubMbTypeAsked;
 	end
 	priority
 		AskRefIdxL0.Launch > AskRefIdxLX.Skip;
