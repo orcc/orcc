@@ -29,13 +29,7 @@
 package net.sf.orcc.cal.ui;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.eclipse.xtext.builder.clustering.CurrentDescriptions;
 import org.eclipse.xtext.resource.ILocationInFileProvider;
-import org.eclipse.xtext.resource.IResourceDescriptions;
-import org.eclipse.xtext.scoping.impl.AbstractGlobalScopeProvider;
-
-import com.google.inject.Binder;
-import com.google.inject.name.Names;
 
 /**
  * Use this class to register components to be used within the IDE.
@@ -50,12 +44,15 @@ public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
 		return CalLocationProvider.class;
 	}
 
-	@Override
-	public void configureIResourceDescriptionsBuilderScope(Binder binder) {
-		binder.bind(IResourceDescriptions.class)
-				.annotatedWith(
-						Names.named(AbstractGlobalScopeProvider.NAMED_BUILDER_SCOPE))
-				.to(CurrentDescriptions.ResourceSetAware.class);
-	}
+	// TODO uncomment this when IR types and initialization values are not
+	// transient anymore, and we can enable clustering
+
+	// @Override
+	// public void configureIResourceDescriptionsBuilderScope(Binder binder) {
+	// binder.bind(IResourceDescriptions.class)
+	// .annotatedWith(
+	// Names.named(AbstractGlobalScopeProvider.NAMED_BUILDER_SCOPE))
+	// .to(CurrentDescriptions.ResourceSetAware.class);
+	// }
 
 }
