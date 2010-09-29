@@ -30,6 +30,12 @@ package net.sf.orcc.cal.ui.outline;
 
 import org.eclipse.xtext.ui.editor.outline.actions.DefaultContentOutlineNodeAdapterFactory;
 
+/**
+ * This class is deprecated but we do not have a choice.
+ * 
+ * @author mwipliez
+ * 
+ */
 public class CalOutlineNodeAdapterFactory extends
 		DefaultContentOutlineNodeAdapterFactory {
 

@@ -187,5 +187,11 @@
             class="net.sf.orcc.cal.ui.builder.ActorBuilder">
       </participant>
    </extension>
+   <extension
+         point="org.eclipse.xtext.ui.shared.overridingGuiceModule">
+      <module
+            class="org.eclipse.xtext.builder.clustering.ClusteringModule">
+      </module>
+   </extension>
 
 </plugin>
