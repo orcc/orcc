@@ -453,6 +453,27 @@
     <Port kind="Output" name="TransformSize8x8">
         <Type name="bool"/>
     </Port>
+    <Port kind="Output" name="NbRefFrame_l1">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefList1Type">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefReordering_l1">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -925,4 +946,8 @@
         src="MergeDataFromSDataAndMbLayer" src-port="MacroBlockType"/>
     <Connection dst="" dst-port="TransformSize8x8"
         src="MergeDataFromSDataAndMbLayer" src-port="TransformSize8x8"/>
+    <Connection dst="" dst-port="NbRefFrame_l1" src="DecodeRefPicList" src-port="NbRefFrame_l1"/>
+    <Connection dst="" dst-port="RefList1Type" src="DecodeRefPicList" src-port="RefList1Type"/>
+    <Connection dst="" dst-port="RefReordering_l1"
+        src="DecodeRefPicList" src-port="RefReordering_l1"/>
 </XDF>

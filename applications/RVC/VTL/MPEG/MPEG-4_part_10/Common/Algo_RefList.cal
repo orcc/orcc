@@ -684,7 +684,7 @@ end
 
 		read_num_ref_frames               (read_num_ref_frames                  )--> ReadLTLists;
 
-		ReadLTLists                       (ReadLists.LongTerm                 )--> ReadSTLists;
+		ReadLTLists                       (ReadLists.LongTerm                   )--> ReadSTLists;
 
 		ReadSTLists                       (ReadLists.ShortTerm                  )--> ReadSTLists;
 		ReadSTLists                       (ReadLists.done                       )--> InitRefList;

@@ -34,7 +34,7 @@ actor Algo_DecodeSubMbPred()
 	bool         EndRefIdxL0
 		:
 
-	bool DEBUG_MV = true;
+	bool DEBUG_MV = false;
 
 	uint(size=3) READ_BITS = 0;
 	uint(size=3) VLD_UE    = 1;
@@ -148,7 +148,7 @@ actor Algo_DecodeSubMbPred()
 			mb_field_decoding_flag := ValMbFieldDecoding;
 			mb_type                := MacroBType;
 			slice_type             := ValSliceType;
-println("ReadParameters");
+
 			mbPartIdx    := 0;
 		end
 

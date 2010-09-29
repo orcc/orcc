@@ -458,6 +458,24 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="RefList1">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_RefList"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Black_Hole_4_RefList">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/Dave_Null"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -492,7 +510,6 @@
     <Connection dst="MMCO" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
     <Connection dst="MMCO" dst-port="NumReferenceFrame" src="DecodeSps" src-port="MMCO_NumRefFrame"/>
     <Connection dst="RefList0" dst-port="EmptyDPB" src="MMCO" src-port="EmptyDPB"/>
-    <Connection dst="RefList0" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
     <Connection dst="RefList0" dst-port="ShortTermList" src="MMCO" src-port="ShortTermList"/>
     <Connection dst="RefList0" dst-port="SzShortTermList" src="MMCO" src-port="SzShortTermList"/>
     <Connection dst="RefList0" dst-port="LongTermList" src="MMCO" src-port="LongTermList"/>
@@ -653,4 +670,17 @@
     <Connection dst="DecodePic" dst-port="ResetPrevFrameNum" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="MacroBlockType" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="" dst-port="TransformSize8x8" src="DecodePic" src-port="TransformSize8x8"/>
+    <Connection dst="RefList1" dst-port="EmptyDPB" src="MMCO" src-port="EmptyDPB"/>
+    <Connection dst="RefList1" dst-port="LongTermList" src="MMCO" src-port="LongTermList"/>
+    <Connection dst="RefList1" dst-port="ShortTermList" src="MMCO" src-port="ShortTermList"/>
+    <Connection dst="RefList1" dst-port="SzShortTermList" src="MMCO" src-port="SzShortTermList"/>
+    <Connection dst="RefList1" dst-port="FraNum" src="DecodePic" src-port="FrameNum"/>
+    <Connection dst="RefList0" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
+    <Connection dst="RefList1" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
+    <Connection dst="RefList1" dst-port="POC" src="DecodePic" src-port="POC"/>
+    <Connection dst="RefList1" dst-port="NbRefFrame" src="DecodePic" src-port="NbRefFrame_l1"/>
+    <Connection dst="RefList1" dst-port="RefListType" src="DecodePic" src-port="RefList1Type"/>
+    <Connection dst="RefList1" dst-port="RefReordering" src="DecodePic" src-port="RefReordering_l1"/>
+    <Connection dst="Black_Hole_4_RefList" dst-port="Token"
+        src="RefList1" src-port="RefList"/>
 </XDF>

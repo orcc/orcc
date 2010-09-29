@@ -2,7 +2,7 @@ actor Dave_Null ()
 	int(size=32) Token
 	==>
     :
-	action 
+	action
 			Token:[b]
 				==>
 	end
