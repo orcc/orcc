@@ -51,6 +51,7 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
@@ -123,7 +124,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 				// Make a new assignment to the binary expression
 				LocalVariable newVar = procedure.newTempLocalVariable(file,
-						type, procedure.getName() + "_" + "expr");
+						cast.getTarget(), procedure.getName() + "_" + "expr");
 
 				newVar.setIndex(1);
 
@@ -258,5 +259,24 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			returnInstr.setValue(newValue);
 			it.next();
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void visit(Store store, Object... args) {
+		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+		Expression value = store.getValue();
+		Variable target = store.getTarget();
+		
+		it.previous();
+		
+		Expression newValue = (Expression) value.accept(
+				new CastExprInterpreter(it), target.getType());
+
+		if (value != newValue){
+			store.setValue(newValue);
+		}
+		
+		it.next();
 	}
 }

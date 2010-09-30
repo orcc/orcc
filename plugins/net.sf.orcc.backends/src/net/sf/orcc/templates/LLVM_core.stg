@@ -488,7 +488,7 @@ $$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.ty
 endif$$
 else
 $$if(store.indexes.empty)
-$$StoreWithoutIndex(ty=store.value.type, value=store.value, pty=VarType(store.target), pointer=store.target, cast=store.cast, location=Location(store.location))$$
+$$StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target), ptr=Var(store.target))$$
 else
 $$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
 endif$$

@@ -58,6 +58,20 @@ public class Cast {
 
 		return 0;
 	}
+	
+	/**
+	 * Determine the size of a type.
+	 * 
+	 * @return integer corresponding to the size of the selected type
+	 */
+	private Type getType(Type type) {
+		if (type.isList()) {
+			TypeList listType = (TypeList) type;
+			return getType(listType.getType());
+		}
+
+		return type;
+	}
 
 	private Type source;
 
@@ -74,7 +88,7 @@ public class Cast {
 	 * @return Type of the source
 	 */
 	public Type getSource() {
-		return source;
+		return getType(source);
 	}
 
 	/**
@@ -83,7 +97,7 @@ public class Cast {
 	 * @return Type of the target
 	 */
 	public Type getTarget() {
-		return target;
+		return getType(target);
 	}
 
 	/**
