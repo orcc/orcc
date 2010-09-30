@@ -1,4 +1,3 @@
-
 ///////////////////////////////////////////////////////////////////////////////
 // FIFO declaration
 ///////////////////////////////////////////////////////////////////////////////
@@ -230,7 +229,6 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 CastAssign(target, value, cast)::= <<
-$if(value.varExpr)$
 $if(cast.extended)$
 $if(cast.signed)
 $%$target$ = sext $value.type$ %$value$ to $target.type$$
@@ -239,19 +237,6 @@ $%$target$ = zext $value.type$ %$value$ to $target.type$$
 endif$
 $else$
 %$target$ = trunc $value.type$ %$value$ to $target.type$
-$endif$
-$else$
-$if(cast.extended)$
-%$target$_ext = $value$
-$if(cast.signed)
-$%$target$ = sext $value.type$ %$target$_ext to $target.type$$
-else
-$%$target$ = zext $value.type$ %$target$_ext to $target.type$$
-endif$
-$else$
-%$target$_trunc = $value$
-%$target$ = trunc $value.type$ %$target$_trunc to $target.type$
-$endif$
 $endif$
 >>
 

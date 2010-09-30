@@ -37,7 +37,6 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -53,18 +52,20 @@ import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
  * Add cast in IR in the form of assign instruction where target's type differs
  * from source type.
  * 
- * @author Jerome GORIN
+ * @author Jérôme GORIN
  * 
  */
 public class CastAdderTransformation extends AbstractActorTransformation {
 
-	private class ExpressionTypeChecker extends AbstractExpressionInterpreter {
+	private class CastExprInterpreter extends AbstractExpressionInterpreter {
 		private ListIterator<Instruction> it;
 
 		/**
@@ -75,29 +76,34 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		 * @param it
 		 *            iterator on a list of instructions
 		 */
-		public ExpressionTypeChecker(ListIterator<Instruction> it) {
+		public CastExprInterpreter(ListIterator<Instruction> it) {
 			this.it = it;
 		}
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
-			Type type = expr.getType();
 			BinaryOp op = expr.getOp();
 			Expression e1 = expr.getE1();
 			Expression e2 = expr.getE2();
 
 			if (op.isComparison()) {
-				Cast cast = new Cast(e1.getType(), e2.getType());
-				if (cast.isExtended()) {
+				// Check coherence between e1 and e2
+				Cast castExprs = new Cast(e1.getType(), e2.getType());
+
+				if (castExprs.isExtended()) {
+					// Take e2 as the reference type
 					e1 = (Expression) e1.accept(this, e2.getType());
-				} else if (cast.isTrunced()) {
+				} else if (castExprs.isTrunced()) {
+					// Take e1 as the reference type
 					e2 = (Expression) e2.accept(this, e1.getType());
 				}
 			} else {
-				e1 = (Expression) e1.accept(this, type);
-				e2 = (Expression) e2.accept(this, type);
+				// Check coherence of the overall expression
+				e1 = (Expression) e1.accept(this, expr.getType());
+				e2 = (Expression) e2.accept(this, expr.getType());
 			}
 
+			// Set expressions
 			expr.setE1(e1);
 			expr.setE2(e2);
 
@@ -108,25 +114,25 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		public Object interpret(VarExpr expr, Object... args) {
 			Type type = (Type) args[0];
 
+			// Check coherence between expression and type
 			Cast cast = new Cast(expr.getType(), type);
 
 			if (cast.isExtended() || cast.isTrunced()) {
+
 				Location location = expr.getLocation();
 
 				// Make a new assignment to the binary expression
-				LocalVariable target = procedure.newTempLocalVariable(file,
+				LocalVariable newVar = procedure.newTempLocalVariable(file,
 						type, procedure.getName() + "_" + "expr");
 
-				target.setIndex(1);
+				newVar.setIndex(1);
 
-				VarExpr varExpr = new VarExpr(location, new Use(target));
-
-				Assign assign = new Assign(location, target, expr);
+				Assign assign = new Assign(location, newVar, expr);
 
 				// Add assignement to instruction's list
 				it.add(assign);
 
-				return varExpr;
+				return new VarExpr(newVar.getLocation(), new Use(newVar));
 			}
 
 			return expr;
@@ -147,20 +153,46 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 	public void visit(Assign assign, Object... args) {
 		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 		Expression value = assign.getValue();
+
 		if (value.isBinaryExpr()) {
 			BinaryExpr binExpr = (BinaryExpr) value;
-			if (binExpr.getOp() == BinaryOp.BITAND) {
-				//Todo : Force i32 operation on AND expression (to be removed)			
-				Type type = IrFactory.eINSTANCE.createTypeInt(32);
-				binExpr.setType(type);
-			}
+			LocalVariable target = assign.getTarget();
 
 			it.previous();
 
-			assign.getValue().accept(new ExpressionTypeChecker(it),
-					value.getType());
+			Expression expr = (Expression) binExpr.accept(
+					new CastExprInterpreter(it), binExpr.getType());
+
+			if (expr != binExpr) {
+				assign.setValue(expr);
+			}
 
 			it.next();
+
+			if (!binExpr.getOp().isComparison()) {
+				Cast castTarget = new Cast(target.getType(), binExpr.getType());
+
+				if (castTarget.isExtended() || castTarget.isTrunced()) {
+					Location location = target.getLocation();
+
+					// Make a new assignment to the binary expression
+					LocalVariable transitionVar = procedure
+							.newTempLocalVariable(file, binExpr.getType(),
+									procedure.getName() + "_" + "expr");
+
+					transitionVar.setIndex(1);
+
+					assign.setTarget(transitionVar);
+					VarExpr varExpr = new VarExpr(location, new Use(
+							transitionVar));
+
+					Assign newAssign = new Assign(location, target, varExpr);
+
+					// Add assignement to instruction's list
+					it.add(newAssign);
+				}
+
+			}
 		}
 	}
 
@@ -179,7 +211,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 						.get(parameters.indexOf(parameter));
 				it.previous();
 				Expression newParam = (Expression) parameter.accept(
-						new ExpressionTypeChecker(it), variable.getType());
+						new CastExprInterpreter(it), variable.getType());
 				parameters.set(parameters.indexOf(parameter), newParam);
 				it.next();
 			}
@@ -199,9 +231,14 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 			if (node.isBlockNode()) {
 				it = ((BlockNode) node).lastListIterator();
+			} else if (node.isIfNode()) {
+				it = ((IfNode) node).getJoinNode().lastListIterator();
+			} else {
+				it = ((WhileNode) node).getJoinNode().lastListIterator();
 			}
+
 			Expression newValue = (Expression) value.accept(
-					new ExpressionTypeChecker(it), type);
+					new CastExprInterpreter(it), type);
 			values.set(indexValue, newValue);
 		}
 	}
@@ -217,10 +254,9 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			it.previous();
 			Expression value = returnInstr.getValue();
 			Expression newValue = (Expression) value.accept(
-					new ExpressionTypeChecker(it), returnType);
+					new CastExprInterpreter(it), returnType);
 			returnInstr.setValue(newValue);
 			it.next();
 		}
 	}
-
 }
