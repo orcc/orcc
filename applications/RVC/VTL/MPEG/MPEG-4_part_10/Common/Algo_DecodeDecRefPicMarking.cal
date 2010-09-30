@@ -37,7 +37,7 @@ actor Algo_DecodeDecRefPicMarking()
 	uint(size=4) SKIP_NAL  = 10;
 
 
-	bool DEBUG_FLAG_DECODED = false;
+	bool DEBUG_FLAG_DECODED = true;
 
 	bool adaptive_ref_pic_marking_mode_flag;
 	//CheckNaluType Parameters
@@ -64,8 +64,12 @@ actor Algo_DecodeDecRefPicMarking()
 
 	NalRefIdc.IsEqualTo0: action
 				==>
+			Mmco :[NotIdr , adaptive_ref_pic_marking_mode_flag]
 		guard
 			nal_ref_idc = 0
+		var
+			uint(size=31) NotIdr = 1,
+			uint(size=31) adaptive_ref_pic_marking_mode_flag = 0
 		end
 
 	IsAnIdrPic.IsEqualToFalse: action
