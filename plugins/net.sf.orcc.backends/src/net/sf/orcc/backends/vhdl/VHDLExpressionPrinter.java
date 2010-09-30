@@ -79,7 +79,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
 		builder.append(", ");
 		if (function == "bitand") {
-			Type sizee = getLub(e1.getType(), e2.getType());
+			Type sizee = getLub(e1.getType(), e2.getType());					
 			int s_e = Cast.getSizeOfType(sizee);	
 			builder.append(s_e + ", ");
 		}

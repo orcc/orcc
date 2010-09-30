@@ -33,6 +33,7 @@ import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -138,27 +139,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void evaluateInitializeActions(Actor actor) {
-		// initializes the actor
-		Map<String, Expression> parameters = Collections.emptyMap();
-		ActorInterpreter interpreter = new ActorInterpreter(parameters, actor,
-				null);
-		try {
-			interpreter.initialize();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// Prints all stateVars
-		for (StateVariable stateVar : actor.getStateVars()) {
-			if (stateVar.getType().isList() && !stateVar.isInitialized()) {
-				Object value = stateVar.getValue();
-				List<?> list = CollectionsUtil.toList((Object[]) value);
-				stateVar.setConstantValue(list);
-			}
-		}
-	}
-
 	@Override
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 		// do not generate a VHDL VTL
@@ -186,6 +166,29 @@ public class VHDLBackendImpl extends AbstractBackend {
 		printNetwork(network);
 	}
 
+	private void evaluateInitializeActions(Actor actor) {
+		// initializes the actor
+		Map<String, Expression> parameters = Collections.emptyMap();
+		ActorInterpreter interpreter = new ActorInterpreter(parameters, actor,
+				null);
+		try {
+			interpreter.initialize();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// Prints all stateVars
+		for (StateVariable stateVar : actor.getStateVars()) {
+			if (stateVar.getType().isList() && !stateVar.isInitialized()) {
+				Object value = stateVar.getValue();
+				List<?> list = CollectionsUtil.toList((Object[]) value);
+				List<Object> returnList = new ArrayList<Object>();
+				// VHDL synthesizers don't support multi-dimensions memory yet
+				stateVar.setConstantValue(printListVars(list, returnList));
+			}
+		}
+	}
+
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
 		String id = actor.getName();
@@ -196,6 +199,25 @@ public class VHDLBackendImpl extends AbstractBackend {
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
+	}
+
+	/**
+	 * Convert a multis dimension list to a single dimension list
+	 * 
+	 * @param List
+	 *            a list of stateVars
+	 * @param returnList
+	 *            a list of stateVars
+	 */
+	private List<?> printListVars(List<?> list, List<Object> returnList) {
+		for (Object content : list) {
+			if (content instanceof List<?>) {
+				printListVars((List<?>) content, returnList);
+			} else {
+				returnList.add(content);
+			}
+		}
+		return returnList;
 	}
 
 	/**
