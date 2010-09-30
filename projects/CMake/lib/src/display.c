@@ -183,6 +183,7 @@ void display_write_mb(unsigned char tokens[384]) {
 }
 
 static int init = 0;
+static int sizeinit = 0;
 
 static void display_init() {
 	// First, initialize SDL's video subsystem.
@@ -250,6 +251,8 @@ static void display_set_video(int width, int height) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
 	}
+
+	sizeinit = 1;
 }
 
 void display_scheduler(struct schedinfo_s *si) {
@@ -272,7 +275,7 @@ void display_scheduler(struct schedinfo_s *si) {
 			i++;
 		}
 
-		if (fifo_i8_has_tokens(display_B, 384)) {
+		if (fifo_i8_has_tokens(display_B, 384)&& sizeinit) {
 			i8 display_B_buf[384];
 			if (!init) {
 				display_init();
