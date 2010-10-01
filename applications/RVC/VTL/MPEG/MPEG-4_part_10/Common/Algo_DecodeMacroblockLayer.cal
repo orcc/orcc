@@ -115,7 +115,7 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=4) SLICE_TYPE_SI = 4;
 
 
-	uint(size=6) BLOCK_TYPE_I_NxN    = 0;
+	uint(size=6) BLOCK_TYPE_I_NxN           = 0;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 	uint(size=6) BLOCK_TYPE_I_PCM           = 25;

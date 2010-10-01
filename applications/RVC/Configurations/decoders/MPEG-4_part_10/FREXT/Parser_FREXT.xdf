@@ -412,6 +412,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="DEBUG">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
     </Instance>
     <Instance id="IntraPredSplit">
         <!-- ************************* -->
@@ -466,6 +469,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="DEBUG">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
     </Instance>
     <Instance id="Black_Hole_4_RefList">
         <!-- ************************* -->

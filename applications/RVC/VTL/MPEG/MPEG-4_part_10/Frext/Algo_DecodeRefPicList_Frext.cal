@@ -151,8 +151,8 @@ actor Algo_DecodeRefPicList_Frext()
 				==>
 		do
 			if(DEBUG_FLAG_DECODED)then
-				println("\t\tdirect_spatial_mv_pred_flag: "+direct_spatial_mv_pred_flag);
-				println("\t\tnum_ref_idx_active_override_flag: "+num_ref_idx_active_override_flag);
+				println("\t\tdirect_spatial_mv_pred_flag: "+ValueOfVLD[0]);
+				println("\t\tnum_ref_idx_active_override_flag: "+ValueOfVLD[1]);
 			end
 			direct_spatial_mv_pred_flag :=
 				if(ValueOfVLD[0] = 0)then
