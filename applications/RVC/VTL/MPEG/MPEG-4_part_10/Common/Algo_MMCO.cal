@@ -88,8 +88,8 @@ actor Algo_MMCO ()
 *
 */
 
-	List(type:uint(size=31), size=16) STList              := [  0    : for int s in 0 .. 15];
-	List(type:bool         , size=16) ShortTermFalseFrame := [ false : for int s in 0 .. 15];
+	List(type:uint(size=31), size=17) STList              := [  0    : for int s in 0 .. 16];
+	List(type:bool         , size=17) ShortTermFalseFrame := [ false : for int s in 0 .. 16];
 	List(type:int (size=32), size=16) LTList              := [ -1    : for int s in 0 .. 15];
 	List(type:uint(size=31), size=16) DelListTab          := [  0    : for int s in 0 .. 15];
 
@@ -112,6 +112,14 @@ actor Algo_MMCO ()
 	int (size=32) ValDelPoc        := 0;
 
 
+	function min(uint a, uint b) --> uint:
+			if(a > b)then
+				b
+			else
+				a
+			end
+		end
+
 /*
 *
 * Actions
@@ -125,6 +133,9 @@ actor Algo_MMCO ()
 			MaxFrameNum       :[MaxFrNu],
 			POC               :[PicOrderCnt]
 				==>
+		var
+			int (size=6) NbFrameToDel,
+			uint(size=5) Idx
 		do
 			NumRefFrame     := ValNumRefFrame;
 			ValMaxFrameNum  := MaxFrNu;
@@ -142,6 +153,25 @@ actor Algo_MMCO ()
 				end
 			else
 				ValIsIDR := false;
+			end
+			NbFrameToDel := LongTermCount + ShortTermCount - NumRefFrame - 1;
+			Idx := NumRefFrame + 1 - LongTermCount;
+			if(NbFrameToDel >= 0)then
+				foreach int i in Idx .. ShortTermCount - 1
+				do
+					ShortTermCount := ShortTermCount - 1;
+					if( (ShortTermFalseFrame[i] = false) and (NbFrameDel < 16) ) then
+						DelListTab[i] := STList[i];
+						NbFrameDel    := NbFrameDel + 1;
+					end
+				end
+			end
+			if ((LongTermCount + ShortTermCount > NumRefFrame) and (LastFrameNum != FrameNum)) then
+				ShortTermCount := ShortTermCount - 1;
+				if( (ShortTermFalseFrame[ShortTermCount] = false) and (NbFrameDel < 16) ) then
+					DelListTab[NbFrameDel] := STList[ShortTermCount];
+					NbFrameDel             := NbFrameDel + 1;
+				end
 			end
 			if(DEBUG_INPUT)then
 				println("input Mmco FraNum:"+ValFrame_Num);
@@ -187,10 +217,23 @@ actor Algo_MMCO ()
 
 	FillFalseRefFrame.skip : action
 				==>
-			SzShortTermList :[ShortTermCount]
+			SzShortTermList :[SizeShortTermList]
 		guard
 			(FrameNum = (LastFrameNum + 1) mod ValMaxFrameNum) or (FrameNum = LastFrameNum)
+		var
+			uint(size=4) SizeShortTermList
 		do
+			if(FrameNum = LastFrameNum) then
+				SizeShortTermList := ShortTermCount;
+				foreach int i in 0 .. ShortTermCount - 1
+				do
+					if(STList[i] = FrameNum)then
+						SizeShortTermList := ShortTermCount - 1;
+					end
+				end
+			else
+				SizeShortTermList := ShortTermCount;
+			end
 			if(DEBUG_OUTPUT)then
 				println("Output Mmco SzShortTermList: "+ShortTermCount);
 			end
@@ -201,7 +244,8 @@ actor Algo_MMCO ()
 				==>
 			ShortTermList :[ValShortTermList]
 		guard
-			NbShortTermSent < ShortTermCount
+			NbShortTermSent < ShortTermCount,
+			STList[min(NbShortTermSent,16)] != FrameNum
 		var
 			uint(size=31) ValShortTermList
 		do
@@ -210,6 +254,15 @@ actor Algo_MMCO ()
 			if(DEBUG_OUTPUT)then
 				println("Output Mmco ShortTermList: "+ValShortTermList);
 			end
+		end
+
+
+	SendLists.ShortTermSkipVal: action
+				==>
+		guard
+			NbShortTermSent < ShortTermCount
+		do
+			NbShortTermSent := NbShortTermSent + 1;
 		end
 
 
@@ -419,7 +472,7 @@ actor Algo_MMCO ()
 		do
 			FrameNum        := 0;
 			ShortTermCount  := 0;
-			STList          := [-1 :for int s in 0 .. 16-1];
+			STList          := [-1 :for int s in 0 .. 17-1];
 			LongTermCount   := 0;
 			LTList          := [-1 :for int s in 0 .. 16-1];
 			NbFrameDel      := 0;
@@ -482,13 +535,6 @@ actor Algo_MMCO ()
 				NbFrameDel             := NbFrameDel + 1;
 			end
 
-			if (LongTermCount + ShortTermCount = NumRefFrame) then
-				ShortTermCount := ShortTermCount - 1;
-				if((ShortTermFalseFrame[ShortTermCount] = false) and (NbFrameDel < 16)) then
-					DelListTab[NbFrameDel] := STList[ShortTermCount];
-					NbFrameDel             := NbFrameDel + 1;
-				end
-			end
 			foreach int i in 0 .. ShortTermCount - 1
 			do
 				STList             [ShortTermCount - i] := STList             [ShortTermCount - i - 1];
@@ -544,13 +590,6 @@ actor Algo_MMCO ()
 			end
 			LTList[LongTermFrameIdx] := FrameNum;
 
-			if (LongTermCount + ShortTermCount > NumRefFrame) then
-				ShortTermCount := ShortTermCount - 1;
-				if( (ShortTermFalseFrame[ShortTermCount] = false) and (NbFrameDel < 16) ) then
-					DelListTab[NbFrameDel] := STList[ShortTermCount];
-					NbFrameDel             := NbFrameDel + 1;
-				end
-			end
 			IdxPocList := 0;
 			if(DEBUG_OUTPUT)then
 				println("Output Mmco IsIDR: "+ValIsIDR);
@@ -635,8 +674,9 @@ actor Algo_MMCO ()
 
 		FillFalseRefFrame    (FillFalseRefFrame      )--> SendLists;
 
-		SendLists            (SendLists.ShortTerm    )--> SendLists;
-		SendLists            (SendLists.LongTerm     )--> check_IDR;
+		SendLists            (SendLists.ShortTerm        )--> SendLists;
+		SendLists            (SendLists.ShortTermSkipVal )--> SendLists;
+		SendLists            (SendLists.LongTerm         )--> check_IDR;
 
 		/* Get values about memory_management_control_operation */
 		check_IDR            (read_IDR               )--> AddFrameInList;
@@ -666,8 +706,8 @@ actor Algo_MMCO ()
 	end
 
 	priority
-		SendDelList.PocValue     > SendDelList.done         > SendDelList.skip;
-		SendLists.ShortTerm      > SendLists.LongTerm;
+		SendDelList.PocValue     > SendDelList.done           > SendDelList.skip;
+		SendLists.ShortTerm      > SendLists.ShortTermSkipVal > SendLists.LongTerm;
 		FillFalseRefFrame.skip   > FillFalseRefFrame.launch;
 		AddFrame.InSTList        > AddFrame.InLTList;
 	end
