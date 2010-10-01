@@ -80,8 +80,9 @@ actor Algo_DecodeRefPicList_Frext()
 			TypeOfVLD    :[READ_BITS],
 			NbBitsToRead :[    1    ],
 
-			RefList0Type :[REFLIST0_PRED],
-			RefList1Type :[0]
+			RefList0Type     :[REFLIST0_PRED],
+			RefList1Type     :[0],
+			RefReordering_l1 :[0]
 		guard
 			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP)
 		do
