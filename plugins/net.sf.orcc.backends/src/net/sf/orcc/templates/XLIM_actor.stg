@@ -120,6 +120,12 @@ BoolExpr(expr) ::= <<
 </operation>
 >>
 
+VarExpr(expr) ::= <<
+<operation kind="noop">
+	<port dir="in" source="$expr$"/>
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
@@ -214,6 +220,7 @@ $<operation kind="noop">
 >>
 
 Assign(op) ::= <<
+<!-- $op$ -->
 $expression(op.value)$
 >>
 

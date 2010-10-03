@@ -34,9 +34,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -75,25 +76,35 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object interpret(BoolExpr expr, Object... args) {
+			Location location = expr.getLocation();
+			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			LocalVariable var = procedure.newTempLocalVariable(file, IrFactory.eINSTANCE.createTypeBool(),
+			LocalVariable var = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "litteral_integer");
+			Assign assign = new Assign(location, var, expr);
+
+			// Add assignment to instruction's list
 			it.previous();
-			it.add(new Assign(var, expr));
+			it.add(assign);
 			it.next();
-			return new VarExpr(new Use(var));
+			return new VarExpr(location, new Use(var));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object interpret(IntExpr expr, Object... args) {
+			Location location = expr.getLocation();
+			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			LocalVariable var = procedure.newTempLocalVariable(file, IrFactory.eINSTANCE.createTypeInt(32),
+			LocalVariable var = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "litteral_integer");
+			Assign assign = new Assign(location, var, expr);
+
+			// Add assignment to instruction's list
 			it.previous();
-			it.add(new Assign(var, expr));
+			it.add(assign);
 			it.next();
-			return new VarExpr(new Use(var));
+			return new VarExpr(location, new Use(var));
 		}
 
 		@Override

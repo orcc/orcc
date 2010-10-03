@@ -307,7 +307,7 @@ public class ExpressionSplitterTransformation extends
 		}
 	}
 
-	@Override
+	/*	@Override
 	public void visit(WhileNode whileNode, Object... args) {
 		ListIterator<Instruction> it = whileNode.getJoinNode().listIterator();
 
@@ -324,7 +324,7 @@ public class ExpressionSplitterTransformation extends
 
 		super.visit(whileNode, args);
 	}
-
+*/
 	private Expression visitExpression(Expression value,
 			ListIterator<Instruction> it) {
 		instrs.clear();
