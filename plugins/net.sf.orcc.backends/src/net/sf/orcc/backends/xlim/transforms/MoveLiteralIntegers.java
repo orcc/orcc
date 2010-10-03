@@ -28,18 +28,16 @@
  */
 package net.sf.orcc.backends.xlim.transforms;
 
-import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.OrccException;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -51,7 +49,6 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * 
@@ -64,9 +61,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class MoveLiteralIntegers extends AbstractActorTransformation {
 
-	private int index;
-
-	private OrderedMap<String, Variable> locals;
+	private String file;
 
 	private ExpressionInterpreter exprInterpreter = new AbstractExpressionInterpreter() {
 
@@ -81,10 +76,8 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		@Override
 		public Object interpret(BoolExpr expr, Object... args) {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			String name = "lit_bool_" + index++;
-			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, IrFactory.eINSTANCE.createTypeBool());
-			locals.put(var.getName(), var);
+			LocalVariable var = procedure.newTempLocalVariable(file, IrFactory.eINSTANCE.createTypeBool(),
+					procedure.getName() + "_" + "litteral_integer");
 			it.previous();
 			it.add(new Assign(var, expr));
 			it.next();
@@ -95,10 +88,8 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		@Override
 		public Object interpret(IntExpr expr, Object... args) {
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			String name = "lit_int_" + index++;
-			LocalVariable var = new LocalVariable(true, 0, new Location(),
-					name, IrFactory.eINSTANCE.createTypeInt(32));
-			locals.put(var.getName(), var);
+			LocalVariable var = procedure.newTempLocalVariable(file, IrFactory.eINSTANCE.createTypeInt(32),
+					procedure.getName() + "_" + "litteral_integer");
 			it.previous();
 			it.add(new Assign(var, expr));
 			it.next();
@@ -111,6 +102,12 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			return new UnaryExpr(expr.getOp(), e, expr.getType());
 		}
 	};
+
+	@Override
+	public void transform(Actor actor) throws OrccException {
+		this.file = actor.getFile();
+		super.transform(actor);
+	}
 
 	@Override
 	public void visit(Assign assign, Object... args) {
@@ -138,10 +135,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
-		index = 0;
-		locals = procedure.getLocals();
-		List<CFGNode> nodes = procedure.getNodes();
-		visit(nodes);
+		super.visitProcedure(procedure);
 	}
 
 }

@@ -36,7 +36,8 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.VariableRenamer;
-import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
+import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
+import net.sf.orcc.backends.xlim.transforms.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
@@ -67,8 +68,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new ThreeAddressCodeTransformation(),
-				/*new MoveLiteralIntegers(),*/ new VariableRenamer() };
+				new MoveLiteralIntegers(),
+				new ExpressionSplitterTransformation(), new VariableRenamer() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

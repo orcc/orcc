@@ -66,7 +66,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * Split expression and effective node that contains more than one fundamental
  * operation into a series of simple expressions.
  * 
- * @author Jérôme GORIN
+ * @author Jerome GORIN
  * @author Matthieu Wipliez
  * 
  */
@@ -93,7 +93,7 @@ public class ExpressionSplitterTransformation extends
 					procedure.getName() + "_" + "expr");
 			Assign assign = new Assign(location, target, binExpr);
 
-			// Add assignement to instruction's list
+			// Add assignment to instruction's list
 			instrs.add(assign);
 
 			return new VarExpr(location, new Use(target));
@@ -114,7 +114,7 @@ public class ExpressionSplitterTransformation extends
 					procedure.getName() + "_" + "expr");
 			Assign assign = new Assign(location, target, binaryExpr);
 
-			// Add assignement to instruction's list
+			// Add assignment to instruction's list
 			instrs.add(assign);
 
 			return new VarExpr(location, new Use(target));
