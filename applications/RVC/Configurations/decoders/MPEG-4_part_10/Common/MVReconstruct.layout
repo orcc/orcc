@@ -14,7 +14,7 @@
       <vertex id="LOCATION" x="457" y="205"/>
       <vertex id="PartSZ" x="457" y="302"/>
       <vertex id="mv_out" x="457" y="399"/>
-      <vertex id="ref_idx" x="457" y="821"/>
+      <vertex id="ref_idx" x="500" y="482"/>
       <vertex id="Mgnt_MVR" x="223" y="359"/>
       <vertex id="Algo_MVR_MultiFrameAdptive" x="457" y="517"/>
       <vertex id="Algo_Add" x="725" y="531"/>

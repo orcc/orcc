@@ -35,7 +35,7 @@ actor Algo_DecodeMbPred()
 	bool         EndRefIdxL0,
 
 	uint(size=4) IntraPredModeC, 
-	int(size=16) MvRes,
+	int(size=16) MvResl0,
 	bool         EndMvRes
 		:
 
@@ -549,7 +549,7 @@ actor Algo_DecodeMbPred()
 				==>
 			//            We read nothing
 			TypeOfVLD    :[ READ_BITS , READ_BITS  ],
-			NbBitsToRead :[     0     ,  0  ]
+			NbBitsToRead :[     0     ,     0      ]
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
@@ -596,7 +596,7 @@ actor Algo_DecodeMbPred()
 	ReadMvdL0.Done: action
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
-			MvRes    :[ValueOfVLD] repeat 2,
+			MvResl0  :[ValueOfVLD] repeat 2,
 			EndMvRes :[false]
 		guard
 			mbPartIdx < mbPartIdxMax

@@ -163,7 +163,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			POCtoRead :[poc2read]
 				==>
 		guard
-			read_done = true
+			read_done  = true,
+			poc2read  != ListPOC[pic_curr_idx]
 		var
 			bool found := false
 		do
@@ -223,9 +224,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			end
 		end
 
-	write_picture_done: action
-				==>
-			Write_Done:[true]
+	write_picture_done: action ==>
 		guard 
 			write_done = true,
 			currmbaddr = PicSizeInMacroB - 1

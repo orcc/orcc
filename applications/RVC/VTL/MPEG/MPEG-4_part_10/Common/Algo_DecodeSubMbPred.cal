@@ -27,14 +27,14 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) MBLayerSubMbType,
 
 	uint(size=3) RefIdxL0,
-	int(size=16) MvRes,
+	int(size=16) MvResl0,
 	uint(size=5) MbPartHeight,
 	uint(size=5) MbPartWidth,
 	uint(size=3) MbPartIdx,
 	bool         EndRefIdxL0
 		:
 
-	bool DEBUG_MV = true;
+	bool DEBUG_MV = false;
 
 	uint(size=3) READ_BITS = 0;
 	uint(size=3) VLD_UE    = 1;
@@ -312,7 +312,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
 			RefIdxL0     :[ref_idx_l0[mbPartIdx-1]],
-			MvRes        :[ValueOfVLD] repeat 2,
+			MvResl0      :[ValueOfVLD] repeat 2,
 			MbPartHeight :[SubMbPartWidthHeight(1)],
 			MbPartWidth  :[SubMbPartWidthHeight(0)],
 			MbPartIdx    :[subMbPartIdx - 1],
@@ -321,8 +321,8 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			subMbPartIdx < subMbPartIdxMax
 		do
 			if(DEBUG_MV)then
-				println("mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
-				println("mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
+				println("sub_mb_pred mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
+				println("sub_mb_pred mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
 			end
 			subMbPartIdx := subMbPartIdx +1;
 		end

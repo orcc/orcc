@@ -398,7 +398,6 @@
     <Connection dst="Intra_4x4" dst-port="Mb_Type" src="" src-port="Mb_Type"/>
     <Connection dst="Select" dst-port="X0" src="Intra_4x4" src-port="MBPred_intra_4x4"/>
     <Connection dst="Inter" dst-port="currMBaddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Inter" dst-port="Write_done" src="Buffer_inter" src-port="Write_Done"/>
     <Connection dst="Deblocking_Filter" dst-port="Z" src="Select" src-port="X"/>
     <Connection dst="Deblocking_Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>

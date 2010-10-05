@@ -11,8 +11,7 @@
 // BTYPE
 // refID  MB position (x,y)
 actor Mgnt_FBAddr_Chroma_MxN () 
-   							
-//   							 int (size=16) Coef_ACR, 
+
    							 uint(size=8)         Mb_Type, 
    							 int (size=16)     MV, 
    							 uint(size=3)    RefIdx, 
@@ -21,10 +20,8 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   							 uint(size=13)   PicSizeInMb, 
   							 uint(size=7)   PicWidthInMb,
   							 uint(size=3)         MbPartIdx,
-  							 uint(size=13)        CurrMbAddr,
-   							 bool                 Write_Done
+  							 uint(size=13)        CurrMbAddr
   															   ==> 
-//  												 				  int (size=16) Coef_ACR_P, 
    																  uint(size=21) 	   RA, 
    																  uint(size=11)        RA_Width, 
    																  uint(size=11)        RA_Height, 
@@ -35,14 +32,9 @@ actor Mgnt_FBAddr_Chroma_MxN ()
 	/* ***
 		Global Variables
 							*** */
-							
-   //_CAL_tokenMonitor := true;
+
   int x_index ;
   int y_index ;
- // int x_frac ;
- // int y_frac ;
- // int MV_x ;
-  //int MV_y ;
   int x;
   int y;
   int o_x;
@@ -175,7 +167,7 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   MB_Ndone: action ==>
   end
   
-  PIC_done: action Write_Done:[ w_done ] ==> PicID     : [ValPicID]
+  PIC_done: action ==> PicID     : [ValPicID]
   guard
   	currMB = pic_size - 1
   do

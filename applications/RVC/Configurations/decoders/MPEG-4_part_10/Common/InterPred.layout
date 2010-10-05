@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="PicWidthInMb_inter" x="57" y="358"/>
-      <vertex id="PicSizeInMb" x="57" y="455"/>
+      <vertex id="PicWidthInMb_inter" x="16" y="615"/>
+      <vertex id="PicSizeInMb" x="20" y="571"/>
       <vertex id="MbPartIdx" x="57" y="164"/>
-      <vertex id="RefIdx" x="57" y="552"/>
-      <vertex id="MbPartWidth" x="543" y="72"/>
+      <vertex id="RefIdx" x="46" y="661"/>
+      <vertex id="MbPartWidth" x="560" y="244"/>
       <vertex id="MbPartHeigth" x="543" y="169"/>
       <vertex id="RD_L" x="256" y="320"/>
       <vertex id="Coef_ACR" x="903" y="557"/>
-      <vertex id="LOCATION" x="57" y="746"/>
-      <vertex id="MV" x="57" y="843"/>
+      <vertex id="LOCATION" x="19" y="462"/>
+      <vertex id="MV" x="43" y="505"/>
       <vertex id="PartSZ" x="57" y="261"/>
-      <vertex id="Mb_Type" x="57" y="940"/>
-      <vertex id="currMBaddr" x="57" y="1037"/>
-      <vertex id="Write_done" x="57" y="1134"/>
-      <vertex id="RA_L" x="543" y="450"/>
-      <vertex id="RA_Width_L" x="543" y="568"/>
-      <vertex id="RA_Height_L" x="543" y="665"/>
+      <vertex id="Mb_Type" x="31" y="540"/>
+      <vertex id="currMBaddr" x="16" y="428"/>
+      <vertex id="RA_L" x="550" y="510"/>
+      <vertex id="RA_Width_L" x="540" y="593"/>
+      <vertex id="RA_Height_L" x="536" y="551"/>
       <vertex id="MB4x4Pred_L" x="1283" y="509"/>
-      <vertex id="RefIdx_L" x="543" y="762"/>
-      <vertex id="PicID" x="543" y="859"/>
+      <vertex id="RefIdx_L" x="547" y="636"/>
+      <vertex id="PicID" x="550" y="471"/>
       <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="256" y="447"/>
       <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="543" y="287"/>
       <vertex id="Algo_Interp_split_MB" x="901" y="184"/>

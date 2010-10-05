@@ -13,7 +13,6 @@
       <vertex id="PartSZ" x="57" y="261"/>
       <vertex id="Coef_ACR" x="756" y="648"/>
       <vertex id="Mb_Type" x="57" y="940"/>
-      <vertex id="Write_Done" x="57" y="1037"/>
       <vertex id="CurrMbAddr" x="57" y="1134"/>
       <vertex id="RA_C" x="522" y="450"/>
       <vertex id="MB4x4Pred_C" x="1155" y="509"/>

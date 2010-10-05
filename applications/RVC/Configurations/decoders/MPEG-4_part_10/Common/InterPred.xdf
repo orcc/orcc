@@ -94,9 +94,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="Write_done">
-        <Type name="bool"/>
-    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -244,8 +241,6 @@
         src="" src-port="currMBaddr"/>
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="MbPartIdx"
         src="" src-port="MbPartIdx"/>
-    <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="Write_Done"
-        src="" src-port="Write_done"/>
     <Connection dst="" dst-port="PicID"
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="PicID"/>
     <Connection dst="Algo_Add_4x4" dst-port="Y" src="" src-port="Coef_ACR"/>

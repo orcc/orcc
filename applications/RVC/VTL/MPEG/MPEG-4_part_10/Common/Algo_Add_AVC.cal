@@ -53,13 +53,17 @@
  */
 actor Algo_Add_AVC () int(size=16) X, int(size=16) Y	==> int(size=16) Z:
 
-bool DEBUG_INPUT = false;
+bool DEBUG_INPUT  = false;
+bool DEBUG_OUTPUT = false;
 
   action X:[x], Y:[y] ==> Z:[ x+ y]
   do
   	if(DEBUG_INPUT)then
 	  	println("Input Add_AVC X:"+x);
 	  	println("Input Add_AVC Y:"+y);
+	end
+	if(DEBUG_OUTPUT) then
+		println("Output Add_AVC Z : "+(x+y));
 	end
   end
 

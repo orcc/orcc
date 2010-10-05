@@ -35,25 +35,25 @@
       <vertex id="Transform8x8Mode" x="742" y="3033"/>
       <vertex id="NumRefIdxLXActive" x="347" y="234"/>
       <vertex id="ResetPrevFrameNum" x="57" y="2586"/>
-      <vertex id="IntraPredModeC" x="1560" y="2172"/>
-      <vertex id="QP_Cb" x="1907" y="1478"/>
-      <vertex id="QP_Cr" x="1907" y="1575"/>
-      <vertex id="ScalingList" x="1907" y="1672"/>
-      <vertex id="QP" x="1907" y="1769"/>
-      <vertex id="CurrMbAddr" x="1560" y="2374"/>
-      <vertex id="slice_alpha_c0_offset" x="1560" y="2471"/>
-      <vertex id="slice_beta_offset" x="1560" y="2568"/>
-      <vertex id="LFDisable" x="1560" y="2665"/>
-      <vertex id="MbPartIdx" x="1907" y="1866"/>
-      <vertex id="RefIdx" x="1907" y="1963"/>
-      <vertex id="MbPartWidth" x="1907" y="2060"/>
-      <vertex id="MbPartHeigth" x="1907" y="2157"/>
+      <vertex id="IntraPredModeC" x="1576" y="2136"/>
+      <vertex id="QP_Cb" x="1966" y="1860"/>
+      <vertex id="QP_Cr" x="1978" y="1898"/>
+      <vertex id="ScalingList" x="1964" y="1960"/>
+      <vertex id="QP" x="1983" y="1824"/>
+      <vertex id="CurrMbAddr" x="1668" y="2208"/>
+      <vertex id="slice_alpha_c0_offset" x="1670" y="2692"/>
+      <vertex id="slice_beta_offset" x="1682" y="2737"/>
+      <vertex id="LFDisable" x="1701" y="2571"/>
+      <vertex id="MbPartIdx" x="1975" y="1733"/>
+      <vertex id="RefIdx" x="1981" y="1930"/>
+      <vertex id="MbPartWidth" x="1961" y="1762"/>
+      <vertex id="MbPartHeigth" x="1957" y="1705"/>
       <vertex id="CodedBlockPattern" x="2347" y="1244"/>
-      <vertex id="ConstrainedIFlag" x="1560" y="2762"/>
-      <vertex id="MvRes" x="1907" y="2254"/>
-      <vertex id="PicWidthInMb" x="1560" y="2859"/>
-      <vertex id="PicSizeInMb" x="1560" y="2956"/>
-      <vertex id="FirstMbInSlice" x="1560" y="3053"/>
+      <vertex id="ConstrainedIFlag" x="1656" y="2181"/>
+      <vertex id="MvResl0" x="1969" y="1795"/>
+      <vertex id="PicWidthInMb" x="1681" y="2638"/>
+      <vertex id="PicSizeInMb" x="1691" y="2599"/>
+      <vertex id="FirstMbInSlice" x="1684" y="2544"/>
       <vertex id="POC" x="742" y="397"/>
       <vertex id="I_PCM_Y" x="1125" y="606"/>
       <vertex id="I_PCM_U" x="1125" y="745"/>
@@ -64,16 +64,19 @@
       <vertex id="GetPps" x="742" y="591"/>
       <vertex id="FrameNum" x="742" y="688"/>
       <vertex id="Mmco" x="1907" y="121"/>
-      <vertex id="NbRefFrame_l0" x="1125" y="168"/>
-      <vertex id="RefList0Type" x="1125" y="265"/>
-      <vertex id="RefReordering_l0" x="1125" y="383"/>
-      <vertex id="IntraPredMode" x="1907" y="2351"/>
-      <vertex id="MbIntraFlag" x="1907" y="2448"/>
+      <vertex id="NbRefFrame_l0" x="1258" y="175"/>
+      <vertex id="RefList0Type" x="1262" y="275"/>
+      <vertex id="RefReordering_l0" x="1260" y="402"/>
+      <vertex id="IntraPredMode" x="1956" y="1605"/>
+      <vertex id="MbIntraFlag" x="1966" y="1678"/>
       <vertex id="Run" x="1907" y="1011"/>
       <vertex id="Value" x="1907" y="1108"/>
       <vertex id="Last" x="2347" y="1341"/>
-      <vertex id="MacroBlockType" x="1907" y="2545"/>
-      <vertex id="TransformSize8x8" x="1907" y="2642"/>
+      <vertex id="MacroBlockType" x="1955" y="1647"/>
+      <vertex id="TransformSize8x8" x="1946" y="1993"/>
+      <vertex id="NbRefFrame_l1" x="1264" y="231"/>
+      <vertex id="RefList1Type" x="1267" y="331"/>
+      <vertex id="RefReordering_l1" x="1260" y="449"/>
       <vertex id="Mgnt_DecodePic" x="1907" y="496"/>
       <vertex id="DecodeSliceHeader" x="347" y="1557"/>
       <vertex id="DecodeRefPicList" x="742" y="168"/>
@@ -84,10 +87,7 @@
       <vertex id="DecodeResidual" x="1125" y="939"/>
       <vertex id="DecodeResidualBlock_Cavlc" x="1560" y="1038"/>
       <vertex id="DecodeSubMbPred" x="1125" y="1450"/>
-      <vertex id="MergeDataFromSDataAndMbLayer" x="1560" y="1657"/>
+      <vertex id="MergeDataFromSDataAndMbLayer" x="1570" y="1602"/>
       <vertex id="GenerateSkipBlockInformation" x="1907" y="1205"/>
-      <vertex id="NbRefFrame_l1" x="1326" y="256"/>
-      <vertex id="RefList1Type" x="1360" y="336"/>
-      <vertex id="RefReordering_l1" x="1339" y="461"/>
    </vertices>
 </layout>
