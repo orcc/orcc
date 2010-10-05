@@ -228,81 +228,10 @@ endif$
 // Conversion instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-CastAssign(target, value, cast)::= <<
-$if(cast.extended)$
-$if(cast.signed)
-$%$target$ = sext $value.type$ %$value$ to $target.type$$
-else
-$%$target$ = zext $value.type$ %$value$ to $target.type$$
-endif$
-$else$
-%$target$ = trunc $value.type$ %$value$ to $target.type$
-$endif$
->>
-
 CastParameter(casts, args, params, location )::= <<
 $casts, args, params: { cast, arg, param | $if(cast)$ 
 $BitcastOp(result={%$param$$location$_cast}, ty={$param.type$*}, value=Expr(param), ty2={$arg.type$*})$
 $endif$}$
->>
-
-CastCall(result, ty, fnptrval, function_args, cast)::= <<
-$if(cast.extended)$
-%$result$_ext = $CallOp(ty=ty, fnptrval=fnptrval, function_args=function_args)$
-$if(cast.signed)
-$%$result$ = sext $ty$ %$result$_ext to $result.type$$
-else
-$%$result$ = zext $ty$ %$result$_ext to $result.type$$
-endif$
-$else$
-%$result$_trunc = $CallOp(ty=ty, fnptrval=fnptrval, function_args=function_args)$
-%$result$ = trunc $ty$ %$result$_trunc to $result.type$
-$endif$
-
->>
-
-
-CastStore(ty, value, pty, ptr, cast, location)::= <<
-$if(cast.extended)$
-$if(cast.signed)
-$%$value$_$location$_ext = sext $ty$ $Expr(value)$ to $pty$$
-else
-$%$value$_$location$_ext = zext $ty$ $Expr(value)$ to $pty$$
-endif$
-$StoreInstr(ty=pty, value=value, pty=pty, ptr=ptr, cast={_$location$_ext})$
-$else$
-%$value$_$location$_trunc = trunc $ty$ $Expr(value)$ to $pty$
-$StoreInstr(ty=pty, value=value, pty=pty, ptr=ptr, cast={_$location$_trunc})$$
-endif$
-
->>
-
-StorePortWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-%$pointer$_$location$_L$indexesName(indexes)$ptr = $GetElementPtrOp(pty=pty, ptrval=Var(pointer), idx=indexes)$
-$if(cast)$
-$CastStore(ty=ty, value=value, pty=pty, ptr={%$pointer$_$location$_L$indexesName(indexes)$ptr}, cast=cast, location=location)$
-$else$
-$StoreInstr(ty=ty, value=value, pty=pty, ptr={%$pointer$_$location$_L$indexesName(indexes)$ptr})$
-$endif$
->>
-
-CastLoad(result, ty, ptr, cast)::= <<
-$if(cast.extended)$
-%$result$_ext = load $ty$* $ptr$
-$if(cast.signed)
-$%$result$ = sext $ty$ %$result$_ext to $result.type$$
-else
-$%$result$ = zext $ty$ %$result$_ext to $result.type$$
-endif
-$$else
-$%$result$_trunc = load $ty$* %$ptr$
-%$result$ = trunc $ty$ %$result$_trunc to $result.type$ $
-endif$
->>
-
-LoadPortWithIndex(result, pty, pointer, indexes, cast) ::= <<
-%$result$_$pointer$$indexesName(indexes)$_ptr = $GetElementPtrOp(pty=pty, ptrval=Var(pointer), idx=indexes)$
-%$result$ = load $pty$* %$result$_$pointer$$indexesName(indexes)$_ptr
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
@@ -356,30 +285,34 @@ $if(call.print)$
 $PrintInstr(call.parameters)$ 
 $else$
 $CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=Location(call.location))$
-$if(call.target)$$
-if(call.cast)
-$$CastCall(result=call.target,
-ty=call.procedure.returnType,
+$if(call.target)$
+%$call.target$ = $CallOp(ty=call.procedure.returnType,
 fnptrval=call.procedure,
-function_args=parametersDeclaration(arguments=call.procedure.parameters.list, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)),
-cast=call.cast)$$
+function_args=parametersDeclaration(arguments=call.procedure.parameters.list, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
+$else$
+$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
+$endif$
+$endif$
+>>
+
+Cast(target, value, cast)::= <<
+$if(cast.extended)$
+$if(cast.signed)
+$%$target$ = sext $value.type$ %$value$ to $target.type$$
 else
-$%$call.target$ = $CallOp(ty=call.procedure.returnType,
-fnptrval=call.procedure,
-function_args=parametersDeclaration(arguments=call.procedure.parameters.list, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$$
-endif
-$$else
-$$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$$
-endif$$endif$
+$%$target$ = zext $value.type$ %$value$ to $target.type$$
+endif$
+$else$
+%$target$ = trunc $value.type$ %$value$ to $target.type$
+$endif$
 >>
 
 Assign(assign) ::= <<
-
-$if(assign.cast)
-$$CastAssign(target = assign.target, value = assign.value, cast = assign.cast)$$
-else
-$%$assign.target$ = $assign.value$$
-endif$
+$if(assign.cast)$
+$Cast(target = assign.target, value = assign.value, cast = assign.cast)$
+$else$ 
+%$assign.target$ = $assign.value$
+$endif$
 >>
 
 PhiAssignment(phi) ::= <<
@@ -450,19 +383,12 @@ endif$
 
 Store(store) ::= <<
 
-$if(store.target.port)$
-$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$
-$else$
 $StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target), ptr=Var(store.target))$
-$endif$
+
 >>
 
 Load(load) ::= <<
-$if (load.source.variable.port)$
-$LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source.variable, cast= load.cast)$
-$else$
 $Var(load.target)$ = $LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))$
-$endif$
 
 >>
 
@@ -482,10 +408,6 @@ $if(ifNode.elseNodes)$
 $IfWithThenElseNodes(ifNode)$
 $else$
 $IfWithThenNode(ifNode)$	
-	$endif$
-$else$
-	$if(ifNode.elseNodes)$
-3
 $endif$
 $endif$
 $Nodes_cond(first(ifNode.joinNode))$
