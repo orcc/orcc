@@ -45,7 +45,7 @@
       <vertex id="slice_beta_offset" x="1682" y="2737"/>
       <vertex id="LFDisable" x="1701" y="2571"/>
       <vertex id="MbPartIdx" x="1975" y="1733"/>
-      <vertex id="RefIdx" x="1981" y="1930"/>
+      <vertex id="RefIdx_l0" x="1981" y="1930"/>
       <vertex id="MbPartWidth" x="1961" y="1762"/>
       <vertex id="MbPartHeigth" x="1957" y="1705"/>
       <vertex id="CodedBlockPattern" x="2347" y="1244"/>

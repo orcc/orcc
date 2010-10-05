@@ -59,10 +59,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="RefIdx">
+    <Port kind="Input" name="RefIdx_l0">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
@@ -97,7 +97,7 @@
     <Port kind="Input" name="POC">
         <Type name="uint"/>
     </Port>
-    <Port kind="Input" name="RefList">
+    <Port kind="Input" name="RefList0">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -372,7 +372,7 @@
         src="Mgnt_Display" src-port="POCtoDisplay"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead"
         src="RefIdxtoPOC" src-port="POCtoRead"/>
-    <Connection dst="RefIdxtoPOC" dst-port="RefList" src="" src-port="RefList"/>
+    <Connection dst="RefIdxtoPOC" dst-port="RefList" src="" src-port="RefList0"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="Mgnt_Display" dst-port="IsIDR" src="" src-port="IsIDR"/>
@@ -402,5 +402,5 @@
     <Connection dst="Intra8x8" dst-port="PicWidth_InMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Intra8x8" dst-port="CurrMb_Addr" src="" src-port="CurrMbAddr"/>
     <Connection dst="RefIdxtoPOC" dst-port="RemoteControl" src="Inter" src-port="RefIdx2PocControl"/>
-    <Connection dst="RefIdxtoPOC" dst-port="RefIdx" src="" src-port="RefIdx"/>
+    <Connection dst="RefIdxtoPOC" dst-port="RefIdx" src="" src-port="RefIdx_l0"/>
 </XDF>

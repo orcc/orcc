@@ -18,22 +18,22 @@
       <vertex id="MbPartIdx" x="205" y="1090"/>
       <vertex id="MbPartWidth" x="205" y="1187"/>
       <vertex id="PartSZ" x="205" y="1284"/>
-      <vertex id="RefList" x="205" y="1381"/>
-      <vertex id="RefIdx" x="205" y="1478"/>
+      <vertex id="RefList0" x="205" y="1381"/>
+      <vertex id="RefIdx_l0" x="205" y="1478"/>
       <vertex id="slice_alpha_c0_offset" x="205" y="1575"/>
       <vertex id="LFDisable" x="205" y="1672"/>
-      <vertex id="CodedBlockPattern" x="205" y="1769"/>
+      <vertex id="CodedBlockPattern" x="407" y="781"/>
       <vertex id="ref_idx_in" x="205" y="1866"/>
       <vertex id="mv_in" x="205" y="1963"/>
       <vertex id="slice_beta_offset" x="205" y="2245"/>
       <vertex id="I_PCM_C" x="205" y="2342"/>
-      <vertex id="ConstrainedIFlag" x="205" y="2439"/>
+      <vertex id="ConstrainedIFlag" x="414" y="844"/>
       <vertex id="DelList" x="205" y="2536"/>
       <vertex id="MaxDPBSize" x="205" y="2633"/>
       <vertex id="IsIDR" x="205" y="2730"/>
-      <vertex id="Display" x="688" y="1284"/>
-      <vertex id="PRED_C" x="420" y="976"/>
+      <vertex id="MacroBlockType" x="188" y="663"/>
+      <vertex id="Display" x="906" y="998"/>
+      <vertex id="PRED_C" x="660" y="958"/>
       <vertex id="RES_C" x="205" y="2060"/>
-      <vertex id="MacroBlockType" x="406" y="698"/>
    </vertices>
 </layout>

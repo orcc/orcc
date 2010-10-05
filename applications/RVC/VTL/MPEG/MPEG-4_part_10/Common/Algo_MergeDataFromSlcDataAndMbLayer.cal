@@ -33,14 +33,14 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 
 	int (size=8)  MbLayerQp_Y_Cb_Cr,
 
-	uint(size=3)  SubMbPredRefIdxL0,
+	uint(size=4)  SubMbPredRefIdxL0,
 	uint(size=5)  SubMbPredMbPartHeight,
 	uint(size=5)  SubMbPredMbPartWidth,
 	uint(size=3)  SubMbPredMbPartIdx,
 	bool          SubMbPredEndRefIdxL0,
 	int(size=16)  SubMbPredMvResl0,
 
-	uint(size=3)  MbPredRefIdxL0,
+	uint(size=4)  MbPredRefIdxL0,
 	uint(size=5)  MbPredMbPartHeight,
 	uint(size=5)  MbPredMbPartWidth,
 	uint(size=3)  MbPredMbPartIdx,
@@ -51,7 +51,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		==>
 	uint(size=1)  MbIntraFlag,
 	uint(size=4)  IntraPredMode,
-	uint(size=3)  RefIdx,
+	uint(size=4)  RefIdxl0,
 	int (size=16) MvResl0,
 	uint(size=5)  MbPartHeight,
 	uint(size=5)  MbPartWidth,
@@ -81,7 +81,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			SDataQp_Y_Cb_Cr :[ ValQp , ValQpCb , ValQpCr ]
 				==>
 			MbIntraFlag     :[0],
-			RefIdx          :[0],
+			RefIdxl0        :[0],
 			MvResl0         :[0,0],
 			MbPartHeight    :[16],
 			MbPartWidth     :[16],
@@ -218,7 +218,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			MbPredMbPartIdx    :[mb_part_idx],
 			MbPredEndRefIdxL0  :[Finished]
 				==>
-			RefIdx       :[ref_idx],
+			RefIdxl0     :[ref_idx],
 			MbPartHeight :[mb_part_height],
 			MbPartWidth  :[mb_part_width],
 			MbPartIdx    :[mb_part_idx]
@@ -257,7 +257,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			SubMbPredMbPartIdx    :[mb_part_idx],
 			SubMbPredEndRefIdxL0  :[Finished]
 				==>
-			RefIdx       :[ref_idx],
+			RefIdxl0     :[ref_idx],
 			MvResl0      :[mv_res] repeat 2,
 			MbPartHeight :[mb_part_height],
 			MbPartWidth  :[mb_part_width],

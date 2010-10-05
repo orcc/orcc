@@ -20,7 +20,7 @@
     <Port kind="Input" name="RefIdx">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>

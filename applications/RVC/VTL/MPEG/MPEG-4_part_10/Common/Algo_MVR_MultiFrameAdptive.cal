@@ -57,7 +57,7 @@ Copyright (c) ISO/IEC 2008.
 actor Algo_MVR_MultiFrameAdptive () 
 		uint(size=3) mbPartIdx,
 		uint(size=6) PartSZ,
-		uint(size=3) refIdxLX,
+		uint(size=4) refIdxLX,
 		uint(size=3) refIdxLXN,
 		int(size=16) mvLX 
 		==> 

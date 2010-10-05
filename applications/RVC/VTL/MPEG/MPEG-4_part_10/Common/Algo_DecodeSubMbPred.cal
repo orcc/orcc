@@ -26,7 +26,7 @@ actor Algo_DecodeSubMbPred()
 
 	uint(size=4) MBLayerSubMbType,
 
-	uint(size=3) RefIdxL0,
+	uint(size=4) RefIdxL0,
 	int(size=16) MvResl0,
 	uint(size=5) MbPartHeight,
 	uint(size=5) MbPartWidth,

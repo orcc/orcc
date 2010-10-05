@@ -115,17 +115,17 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="RefIdx">
+    <Port kind="Input" name="RefIdx_l0">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Input" name="POC">
         <Type name="uint"/>
     </Port>
-    <Port kind="Input" name="RefList">
+    <Port kind="Input" name="RefList0">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -327,9 +327,7 @@
     <Connection dst="TEX_L" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
     <Connection dst="TEX_L" dst-port="PartSZ" src="" src-port="PartSZ"/>
     <Connection dst="TEX_L" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
-    <Connection dst="TEX_L" dst-port="RefIdx" src="" src-port="RefIdx"/>
     <Connection dst="TEX_L" dst-port="POC" src="" src-port="POC"/>
-    <Connection dst="TEX_L" dst-port="RefList" src="" src-port="RefList"/>
     <Connection dst="TEX_L" dst-port="QP" src="" src-port="QP"/>
     <Connection dst="TEX_L" dst-port="CodedBlockPattern" src="" src-port="CodedBlockPattern"/>
     <Connection dst="TEX_L" dst-port="LFDisable" src="" src-port="LFDisable"/>
@@ -345,4 +343,6 @@
     <Connection dst="RES_L" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
     <Connection dst="TEX_L" dst-port="MacroBlockType" src="" src-port="MacroBlockType"/>
     <Connection dst="TEX_L" dst-port="TransformSize8x8" src="" src-port="TransformSize8x8"/>
+    <Connection dst="TEX_L" dst-port="RefIdx_l0" src="" src-port="RefIdx_l0"/>
+    <Connection dst="TEX_L" dst-port="RefList0" src="" src-port="RefList0"/>
 </XDF>

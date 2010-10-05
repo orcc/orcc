@@ -97,10 +97,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx">
+    <Port kind="Output" name="RefIdx_l0">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
@@ -250,7 +250,7 @@
     <Port kind="Output" name="IsIDR">
         <Type name="bool"/>
     </Port>
-    <Port kind="Output" name="RefList">
+    <Port kind="Output" name="Ref_List0">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -539,7 +539,7 @@
     <Connection dst="" dst-port="PredMode" src="IntraPredSplit" src-port="PredMode"/>
     <Connection dst="" dst-port="DelList" src="MMCO" src-port="DelList"/>
     <Connection dst="" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
-    <Connection dst="" dst-port="RefList" src="RefList0" src-port="RefList"/>
+    <Connection dst="" dst-port="Ref_List0" src="RefList0" src-port="RefList"/>
     <Connection dst="" dst-port="MV" src="MVReconstruct" src-port="MV"/>
     <Connection dst="" dst-port="LOCATION" src="MVReconstruct" src-port="LOCATION"/>
     <Connection dst="" dst-port="PART_SZ" src="MVReconstruct" src-port="PartSZ"/>
@@ -550,7 +550,6 @@
     <Connection dst="CheckNaluType" dst-port="SpsSkipNal"
         src="DecodeSps" src-port="DecodeNextNal"/>
     <Connection dst="" dst-port="CodedBlockPattern" src="DecodePic" src-port="CodedBlockPattern"/>
-    <Connection dst="" dst-port="RefIdx" src="DecodePic" src-port="RefIdx"/>
     <Connection dst="" dst-port="MbPartIdx" src="DecodePic" src-port="MbPartIdx"/>
     <Connection dst="" dst-port="ScalingList" src="DecodePic" src-port="ScalingList"/>
     <Connection dst="" dst-port="MbPartHeigth" src="DecodePic" src-port="MbPartHeigth"/>
@@ -670,7 +669,6 @@
     <Connection dst="MVReconstruct" dst-port="MbPartIdx" src="DecodePic" src-port="MbPartIdx"/>
     <Connection dst="MVReconstruct" dst-port="MbPartWidth"
         src="DecodePic" src-port="MbPartWidth"/>
-    <Connection dst="MVReconstruct" dst-port="RefIdx" src="DecodePic" src-port="RefIdx"/>
     <Connection dst="DecodePic" dst-port="ResetPrevFrameNum" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="MacroBlockType" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="" dst-port="TransformSize8x8" src="DecodePic" src-port="TransformSize8x8"/>
@@ -689,4 +687,6 @@
         src="RefList1" src-port="RefList"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
     <Connection dst="" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
+    <Connection dst="" dst-port="RefIdx_l0" src="DecodePic" src-port="RefIdx_l0"/>
+    <Connection dst="MVReconstruct" dst-port="RefIdx" src="DecodePic" src-port="RefIdx_l0"/>
 </XDF>

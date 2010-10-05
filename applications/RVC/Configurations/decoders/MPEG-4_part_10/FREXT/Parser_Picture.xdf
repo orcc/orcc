@@ -266,10 +266,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx">
+    <Port kind="Output" name="RefIdx_l0">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
@@ -840,8 +840,6 @@
     <Connection dst="" dst-port="I_PCM_Y" src="DecodeMacroBlockLayer" src-port="pix_I_PCM_Y"/>
     <Connection dst="" dst-port="I_PCM_U" src="DecodeMacroBlockLayer" src-port="pix_I_PCM_U"/>
     <Connection dst="" dst-port="I_PCM_V" src="DecodeMacroBlockLayer" src-port="pix_I_PCM_V"/>
-    <Connection dst="" dst-port="RefIdx"
-        src="MergeDataFromSDataAndMbLayer" src-port="RefIdx"/>
     <Connection dst="Mgnt_DecodePic" dst-port="HeaderVLDParam"
         src="DecodeSliceHeader" src-port="VLDParam"/>
     <Connection dst="Mgnt_DecodePic" dst-port="DataVLDParam"
@@ -950,4 +948,6 @@
         src="MergeDataFromSDataAndMbLayer" src-port="MvResl0"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="SubMbPredMvResl0" src="DecodeSubMbPred" src-port="MvResl0"/>
+    <Connection dst="" dst-port="RefIdx_l0"
+        src="MergeDataFromSDataAndMbLayer" src-port="RefIdxl0"/>
 </XDF>

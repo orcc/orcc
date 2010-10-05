@@ -184,7 +184,6 @@
     <Connection dst="" dst-port="Width" src="FUN_Parser" src-port="Width"/>
     <Connection dst="" dst-port="Height" src="FUN_Parser" src-port="Height"/>
     <Connection dst="Decoding_Y" dst-port="POC" src="FUN_Parser" src-port="POC"/>
-    <Connection dst="Decoding_Y" dst-port="RefList" src="FUN_Parser" src-port="RefList"/>
     <Connection dst="Decoding_Y" dst-port="PartSZ" src="FUN_Parser" src-port="PART_SZ"/>
     <Connection dst="Decoding_Y" dst-port="MbPartHeigth"
         src="FUN_Parser" src-port="MbPartHeigth"/>
@@ -193,7 +192,6 @@
     <Connection dst="Decoding_Y" dst-port="PicSizeInMb" src="FUN_Parser" src-port="PicSizeInMb"/>
     <Connection dst="Decoding_Y" dst-port="MV" src="FUN_Parser" src-port="MV"/>
     <Connection dst="Decoding_Y" dst-port="LOCATION" src="FUN_Parser" src-port="LOCATION"/>
-    <Connection dst="Decoding_Y" dst-port="RefIdx" src="FUN_Parser" src-port="RefIdx"/>
     <Connection dst="Decode_U" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
     <Connection dst="Decode_U" dst-port="PicWidthInMB" src="FUN_Parser" src-port="PicWidthInMb"/>
     <Connection dst="Decode_U" dst-port="FirstMbInSlice"
@@ -220,10 +218,6 @@
     <Connection dst="Decode_V" dst-port="MbPartIdx" src="FUN_Parser" src-port="MbPartIdx"/>
     <Connection dst="Decode_U" dst-port="MbPartWidth" src="FUN_Parser" src-port="MbPartWidth"/>
     <Connection dst="Decode_V" dst-port="MbPartWidth" src="FUN_Parser" src-port="MbPartWidth"/>
-    <Connection dst="Decode_U" dst-port="RefIdx" src="FUN_Parser" src-port="RefIdx"/>
-    <Connection dst="Decode_V" dst-port="RefIdx" src="FUN_Parser" src-port="RefIdx"/>
-    <Connection dst="Decode_U" dst-port="RefList" src="FUN_Parser" src-port="RefList"/>
-    <Connection dst="Decode_V" dst-port="RefList" src="FUN_Parser" src-port="RefList"/>
     <Connection dst="Decode_U" dst-port="POC" src="FUN_Parser" src-port="POC"/>
     <Connection dst="Decode_V" dst-port="POC" src="FUN_Parser" src-port="POC"/>
     <Connection dst="Decode_U" dst-port="PartSZ" src="FUN_Parser" src-port="PART_SZ"/>
@@ -288,4 +282,10 @@
         src="FUN_Parser" src-port="MacroBlockType"/>
     <Connection dst="Decode_V" dst-port="MacroBlockType"
         src="FUN_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decoding_Y" dst-port="RefIdx_l0" src="FUN_Parser" src-port="RefIdx_l0"/>
+    <Connection dst="Decode_U" dst-port="RefIdx_l0" src="FUN_Parser" src-port="RefIdx_l0"/>
+    <Connection dst="Decode_V" dst-port="RefIdx_l0" src="FUN_Parser" src-port="RefIdx_l0"/>
+    <Connection dst="Decoding_Y" dst-port="RefList0" src="FUN_Parser" src-port="Ref_List0"/>
+    <Connection dst="Decode_U" dst-port="RefList0" src="FUN_Parser" src-port="Ref_List0"/>
+    <Connection dst="Decode_V" dst-port="RefList0" src="FUN_Parser" src-port="Ref_List0"/>
 </XDF>

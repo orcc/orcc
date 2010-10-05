@@ -53,7 +53,7 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 actor Mgnt_MVR () 
 	uint(size=3) MbPartIdx,
-	uint(size=3) RefIdx,
+	uint(size=4) RefIdx,
 	uint(size=5) MbPartWidth,
 	uint(size=5) MbPartHeigth,
 	uint(size=13) CurrMbAddr,

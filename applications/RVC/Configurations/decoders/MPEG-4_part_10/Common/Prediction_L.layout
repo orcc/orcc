@@ -6,7 +6,7 @@
       <vertex id="PredMode" x="57" y="986"/>
       <vertex id="FirstMbInSlice" x="57" y="677"/>
       <vertex id="MbPartIdx" x="250" y="1433"/>
-      <vertex id="RefIdx" x="901" y="1847"/>
+      <vertex id="RefIdx_l0" x="878" y="1721"/>
       <vertex id="MbPartWidth" x="250" y="1627"/>
       <vertex id="MbPartHeigth" x="250" y="1724"/>
       <vertex id="PicSizeInMb" x="250" y="294"/>
@@ -15,7 +15,7 @@
       <vertex id="MV" x="250" y="1918"/>
       <vertex id="PartSZ" x="250" y="2015"/>
       <vertex id="POC" x="880" y="1205"/>
-      <vertex id="RefList" x="879" y="1683"/>
+      <vertex id="RefList0" x="879" y="1683"/>
       <vertex id="Mb_Type" x="250" y="869"/>
       <vertex id="QP" x="880" y="235"/>
       <vertex id="LFDisable" x="880" y="353"/>
