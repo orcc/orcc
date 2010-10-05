@@ -26,69 +26,130 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.instructions;
+package net.sf.orcc.backends.llvm.instructions;
 
 import java.util.List;
 
+import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.LocalTargetContainer;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.TargetContainer;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.ValueContainer;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
 /**
- * This class defines an AssignIndex instruction. This node is used in code
- * generation to assign the index of one dimension memory.
+ * This class defines an 'getelementptr' instruction. This node is used to get
+ * the address of a subelement of an expression.
  * 
- * @author Nicolas Siret
- * @author Matthieu Wipliez
+ * @author Jérôme Gorin
  * 
  */
-public class AssignIndex extends SpecificInstruction implements
-		LocalTargetContainer {
+public class GEP extends SpecificInstruction implements TargetContainer,
+		ValueContainer {
 
 	private List<Expression> indexes;
 
-	private LocalVariable target;
+	private Variable target;
+
+	private Expression value;
 
 	/**
-	 * Creates a new AssignIndex from the given indexes and target.
+	 * Creates a new GEP instruction from the given value, its indexes and a
+	 * target.
 	 * 
 	 * @param target
 	 *            the target
+	 * @param source
+	 *            the source
 	 * @param indexes
 	 *            a list of indexes
 	 */
-	public AssignIndex(LocalVariable target, List<Expression> indexes) {
-		super(target.getLocation());
+	public GEP(Location location, Variable target, Expression value,
+			List<Expression> indexes) {
+		super(location);
 		setIndexes(indexes);
+		setValue(value);
 		setTarget(target);
 	}
 
 	/**
-	 * Returns the expressions that are used by this AssignIndex.
+	 * Creates a new GEP instruction from the given value, its indexes, a target
+	 * and a location.
 	 * 
-	 * @return the expressions that are used by this AssignIndex
+	 * @param target
+	 *            the target
+	 * @param source
+	 *            the source
+	 * @param indexes
+	 *            a list of indexes
+	 */
+	public GEP(Variable target, Expression value, List<Expression> indexes) {
+		this(new Location(), target, value, indexes);
+	}
+
+	@Override
+	public Cast getCast() {
+		Type expr = value.getType();
+		Type val = target.getType();
+
+		if (expr == null) {
+			return null;
+		}
+
+		if (value.isIntExpr() || value.isBooleanExpr()) {
+			return null;
+		}
+
+		Cast cast = new Cast(expr, val);
+
+		if (cast.isExtended() || cast.isTrunced()) {
+			return cast;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the (possibly empty) list of indexes of this store.
+	 * 
+	 * @return the (possibly empty) list of indexes of this store
 	 */
 	public List<Expression> getIndexes() {
 		return indexes;
 	}
 
+	/**
+	 * Returns the target of this Store. The target is a {@link Use}.
+	 * 
+	 * @return the target of this Store
+	 */
 	@Override
-	public LocalVariable getTarget() {
+	public Variable getTarget() {
 		return target;
 	}
 
 	@Override
-	public void internalSetTarget(LocalVariable target) {
+	public Expression getValue() {
+		return value;
+	}
+
+	@Override
+	public void internalSetTarget(Variable target) {
 		this.target = target;
 	}
 
+	@Override
+	public void internalSetValue(Expression value) {
+		this.value = value;
+	}
+
 	/**
-	 * Sets the indexes of this assign index instruction. Uses are updated to
-	 * point to this instruction. This method is internal. Indexes should be
-	 * modified solely using the {@link #getIndexes()} method.
+	 * Sets the indexes of this store instruction. Uses are updated to point to
+	 * this instruction.
 	 * 
 	 * @param indexes
 	 *            a list of expressions
@@ -102,8 +163,19 @@ public class AssignIndex extends SpecificInstruction implements
 	}
 
 	@Override
-	public void setTarget(LocalVariable target) {
+	public void setTarget(Variable target) {
 		CommonNodeOperations.setTarget(this, target);
+	}
+
+	@Override
+	public void setValue(Expression value) {
+		CommonNodeOperations.setValue(this, value);
+	}
+
+	@Override
+	public String toString() {
+		return target.toString() + " = getelementptr " + getValue() + ", "
+				+ indexes;
 	}
 
 }

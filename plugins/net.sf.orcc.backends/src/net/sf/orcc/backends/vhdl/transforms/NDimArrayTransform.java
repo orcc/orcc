@@ -33,7 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.backends.instructions.AssignIndex;
+import net.sf.orcc.backends.vhdl.instructions.AssignIndex;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
