@@ -333,7 +333,6 @@
     <Connection dst="Inter" dst-port="MbPartHeigth" src="" src-port="MbPartHeigth"/>
     <Connection dst="Inter" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
     <Connection dst="Inter" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
-    <Connection dst="Inter" dst-port="RefIdx" src="" src-port="RefIdx"/>
     <Connection dst="Intra8x8" dst-port="PredMode" src="" src-port="PredMode"/>
     <Connection dst="Inter" dst-port="LOCATION" src="" src-port="LOCATION"/>
     <Connection dst="Inter" dst-port="MV" src="" src-port="MV"/>
@@ -371,10 +370,8 @@
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay"
         src="Mgnt_Display" src-port="POCtoDisplay"/>
-    <Connection dst="RefIdxtoPOC" dst-port="RefIdx" src="Inter" src-port="RefIdx_C"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead"
         src="RefIdxtoPOC" src-port="POCtoRead"/>
-    <Connection dst="RefIdxtoPOC" dst-port="PicID" src="Inter" src-port="PicID"/>
     <Connection dst="RefIdxtoPOC" dst-port="RefList" src="" src-port="RefList"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
@@ -404,4 +401,6 @@
         src="DemuxParserInfos" src-port="PicWidthInMb_Intra"/>
     <Connection dst="Intra8x8" dst-port="PicWidth_InMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Intra8x8" dst-port="CurrMb_Addr" src="" src-port="CurrMbAddr"/>
+    <Connection dst="RefIdxtoPOC" dst-port="RemoteControl" src="Inter" src-port="RefIdx2PocControl"/>
+    <Connection dst="RefIdxtoPOC" dst-port="RefIdx" src="" src-port="RefIdx"/>
 </XDF>

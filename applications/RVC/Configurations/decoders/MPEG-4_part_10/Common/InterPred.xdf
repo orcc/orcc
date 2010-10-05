@@ -24,13 +24,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="RefIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MbPartWidth">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -125,17 +118,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx_L">
+    <Port kind="Output" name="RefIdx2PocControl">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="PicID">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="1"/>
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
             </Entry>
         </Type>
     </Port>
@@ -204,8 +190,6 @@
     <!-- ************************************** -->
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="PicSizeInMb"
         src="" src-port="PicSizeInMb"/>
-    <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="RefIdx"
-        src="" src-port="RefIdx"/>
     <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC"
         dst-port="RD" src="" src-port="RD_L"/>
     <Connection dst="" dst-port="RA_L" src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="RA"/>
@@ -213,8 +197,6 @@
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="RA_Width"/>
     <Connection dst="" dst-port="RA_Height_L"
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="RA_Height"/>
-    <Connection dst="" dst-port="RefIdx_L"
-        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="refIdx"/>
     <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC"
         dst-port="Frac" src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="Frac"/>
     <Connection dst="Algo_Interp_split_MB" dst-port="INTERP"
@@ -241,7 +223,7 @@
         src="" src-port="currMBaddr"/>
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="MbPartIdx"
         src="" src-port="MbPartIdx"/>
-    <Connection dst="" dst-port="PicID"
-        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="PicID"/>
     <Connection dst="Algo_Add_4x4" dst-port="Y" src="" src-port="Coef_ACR"/>
+    <Connection dst="" dst-port="RefIdx2PocControl"
+        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="RefIdx2PocControl"/>
 </XDF>

@@ -4,7 +4,6 @@
       <vertex id="PicWidthInMb" x="16" y="615"/>
       <vertex id="PicSizeInMb" x="20" y="571"/>
       <vertex id="MbPartIdx" x="57" y="164"/>
-      <vertex id="RefIdx" x="46" y="661"/>
       <vertex id="MbPartWidth" x="560" y="244"/>
       <vertex id="MbPartHeigth" x="543" y="169"/>
       <vertex id="RD_L" x="256" y="320"/>
@@ -18,8 +17,7 @@
       <vertex id="RA_Width_L" x="540" y="593"/>
       <vertex id="RA_Height_L" x="536" y="551"/>
       <vertex id="MB4x4Pred_L" x="1283" y="509"/>
-      <vertex id="RefIdx_L" x="547" y="636"/>
-      <vertex id="PicID" x="550" y="471"/>
+      <vertex id="RefIdx2PocControl" x="550" y="471"/>
       <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="256" y="447"/>
       <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="543" y="287"/>
       <vertex id="Algo_Interp_split_MB" x="901" y="184"/>

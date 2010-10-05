@@ -16,8 +16,8 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 actor Algo_RefIdxtoPOC()
 	int (size=32) RefList,
-	uint(size=4)  RefIdx,
-	uint(size=1)  PicID
+	uint(size=3)  RefIdx,
+	uint(size=2)  RemoteControl
 		==>
 	uint(size=32) POCtoRead
 		:
@@ -25,11 +25,15 @@ actor Algo_RefIdxtoPOC()
 
 	bool DEBUG_INPUT = false;
 
+	uint(size=2) GETNEWLIST  = 0;
+	uint(size=2) GETNEWIDX   = 1;
+	uint(size=2) SENDLASTIDX = 2;
+
 	List(type:uint(size=32), size=16) RefPoc;
 
 	uint(size=5)  SizeList;
 	uint(size=5)  CountRead;
-	uint(size=1)  LastPicID:=0;
+	uint(size=32) ValPoc;
 
 	ReadSizeList: action 
 			RefList :[ SizeRefList ]
@@ -63,42 +67,53 @@ actor Algo_RefIdxtoPOC()
 		end
 
 
-	GetReadAddr: action
-			RefIdx    :[ ListIdx ],
-			PicID     :[ValPicID]
+	GetRefIdx: action
+			RefIdx        :[  ListIdx  ]
 				==>
-			POCtoRead :[ RefPoc[ListIdx] ]
-		guard
-			ValPicID = LastPicID
 		do
 			if(DEBUG_INPUT)then
 				println("Input RefIdxtoPOC RefIdx:"+ListIdx);
-				println("Input RefIdxtoPOC PicID:"+ValPicID);
 			end
+			ValPoc := RefPoc[ListIdx & 15];
 		end
 
 
-	NewPic: action
-			PicID :[ValPicID]
+	NewListAsked: action
+			RemoteControl :[ WorkAsked ]
 				==>
 		guard
-			ValPicID != LastPicID
-		do
-			LastPicID := ValPicID;
-			if(DEBUG_INPUT)then
-				println("Input RefIdxtoPOC PicID:"+ValPicID);
-			end
+			WorkAsked = GETNEWLIST
+		end
+
+
+	NewIdxAsked: action
+			RemoteControl :[ WorkAsked ]
+				==>
+		guard
+			WorkAsked = GETNEWIDX
+		end
+
+
+	SendIdxAsked: action
+			RemoteControl :[ WorkAsked ]
+				==>
+			POCtoRead     :[  ValPoc   ]
+		guard
+			WorkAsked = SENDLASTIDX
 		end
 
 	schedule fsm ReadSizeList:
 
-		ReadSizeList  (ReadSizeList      )-->ReadRefList;
+		GetCommand   ( NewListAsked    )--> ReadSizeList;
+		GetCommand   ( NewIdxAsked     )--> GetRefIdx;
+		GetCommand   ( SendIdxAsked    )--> GetCommand;
 
-		ReadRefList   (ReadRefList       )-->ReadRefList;
-		ReadRefList   (ReadRefListDone   )-->GetReadAddr;
+		ReadSizeList ( ReadSizeList    )--> ReadRefList;
 
-		GetReadAddr   (GetReadAddr       )-->GetReadAddr;
-		GetReadAddr   (NewPic            )-->ReadSizeList;
+		ReadRefList  ( ReadRefList     )--> ReadRefList;
+		ReadRefList  ( ReadRefListDone )--> GetCommand;
+
+		GetRefIdx    ( GetRefIdx       )--> GetCommand;
 	end
 
 	priority

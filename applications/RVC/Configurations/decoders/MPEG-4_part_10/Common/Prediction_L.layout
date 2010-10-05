@@ -6,7 +6,7 @@
       <vertex id="PredMode" x="57" y="986"/>
       <vertex id="FirstMbInSlice" x="57" y="677"/>
       <vertex id="MbPartIdx" x="250" y="1433"/>
-      <vertex id="RefIdx" x="250" y="1530"/>
+      <vertex id="RefIdx" x="901" y="1847"/>
       <vertex id="MbPartWidth" x="250" y="1627"/>
       <vertex id="MbPartHeigth" x="250" y="1724"/>
       <vertex id="PicSizeInMb" x="250" y="294"/>

@@ -18,16 +18,18 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		uint(size=13) PicSizeInMb,
 		int(size=16) MV,
 		uint(size=11) Location,
-		uint(size=6) PartSZ,
-		uint(size=3) RefIdx
+		uint(size=6) PartSZ
 		==>
 		uint(size=21) RA,
 		uint(size=11) RA_Width,
 		uint(size=11) RA_Height,
 		uint(size=16) Frac,
-		uint(size=4) refIdx,
-		uint(size=1) PicID
+		uint(size=2)  RefIdx2PocControl	
 	:
+
+	uint(size=2) GETNEWLIST  = 0;
+	uint(size=2) GETNEWIDX   = 1;
+	uint(size=2) SENDLASTIDX = 2;
 
 	bool DEBUG_INPUT = false;
 
@@ -43,11 +45,9 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   int addr_x;
   int addr_y;
   int height;
-  uint(size=5) ref;
   int count:=0;
   int currMB                := 0;
   int pic_size              := 0;
-  uint(size=1) ValPicID     := 0;
   
   //Mb_Type_NOK : Consume the token, nothing else to do 
   Mb_Type_NOK_and_IPCM :action Mb_Type:[a], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
@@ -78,7 +78,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   end
   
   //Mb_Type_OK : Enable the prediction 
-  Mb_Type_OK :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==>
+  Mb_Type_OK :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr]  ==>
   guard
   	a = 2
   do 
@@ -94,19 +94,17 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   	pic_size:=c;
   end
   
-  get_pos: action MbPartIdx:[idx], Location:[ a, b ], PartSZ:[ c, d ], RefIdx:[ e ] ==>
+  get_pos: action MbPartIdx:[idx], Location:[ a, b ], PartSZ:[ c, d ] ==> RefIdx2PocControl :[GETNEWIDX]
   do
 	if(DEBUG_INPUT)then
 		println("Input InterpFBAddrLuma MbPartIdx:"+idx);	
 		println("Input InterpFBAddrLuma Location:"+a+" ; "+b);	
-		println("Input InterpFBAddrLuma PartSZ:"+c+" ; "+d);	
-		println("Input InterpFBAddrLuma RefIdx:"+e);
+		println("Input InterpFBAddrLuma PartSZ:"+c+" ; "+d);
 	end
     x := a;
     y := b;
     width := c;
     height :=d;
-    ref := e;
     count := if width=16 and height=16 then
        count+rshift(width,2)*rshift(height,2)
     else 
@@ -146,14 +144,14 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
     frac_y := (my - lshift (y_index, 2));
   end
   
-  RA_not_border: action ==>  RA:[ o_x + Picwidth_l * o_y ], RA_Width:[ width + 5 ], RA_Height:[ height + 5 ], refIdx:[ ref ], PicID :[ValPicID]
+  RA_not_border: action ==>  RA:[ o_x + Picwidth_l * o_y ], RA_Width:[ width + 5 ], RA_Height:[ height + 5 ], RefIdx2PocControl :[ SENDLASTIDX ]
   guard
     x + x_index-2 >= 0 and (x + x_index + width + 3) <= (Picwidth_l-1) and
     y + y_index-2 >= 0 and (y + y_index + height + 3) <= (Picheight_l-1)
   end
   
   // read_address
-  RA_border: action ==>  RA:[ r_addr ], RA_Width:[ 1 ], RA_Height:[ 1 ], refIdx:[ ref ], PicID :[ValPicID]
+  RA_border: action ==>  RA:[ r_addr ], RA_Width:[ 1 ], RA_Height:[ 1 ], RefIdx2PocControl :[ SENDLASTIDX ]
   var uint r_addr
   do
    addr_x := o_x;
@@ -194,11 +192,11 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   MB_Ndone: action ==>
   end
 
-  PIC_done: action ==> PicID     : [ValPicID]
+  PIC_done: action
+  		==>
+  	RefIdx2PocControl :[ GETNEWLIST ]
   guard
   	currMB = pic_size-1
-  do
-  	ValPicID := ValPicID + 1;
   end
 
   PIC_Ndone: action ==>

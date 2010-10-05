@@ -17,13 +17,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="RefIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MbPartWidth">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -111,13 +104,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx_C">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="RA_Width_C">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -132,10 +118,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="PicID">
+    <Port kind="Output" name="RefIdx2PocControl">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="1"/>
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
             </Entry>
         </Type>
     </Port>
@@ -201,8 +187,6 @@
         src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="RA"/>
     <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="Frac"
         src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="Frac"/>
-    <Connection dst="" dst-port="RefIdx_C"
-        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="refbuf"/>
     <Connection dst="" dst-port="RA_Width_C"
         src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="RA_Width"/>
     <Connection dst="" dst-port="RA_Height_C"
@@ -233,9 +217,7 @@
         src="" src-port="MbPartIdx"/>
     <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN"
         dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN" dst-port="RefIdx"
-        src="" src-port="RefIdx"/>
-    <Connection dst="" dst-port="PicID"
-        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="PicID"/>
     <Connection dst="Algo_Add" dst-port="Y" src="" src-port="Coef_ACR"/>
+    <Connection dst="" dst-port="RefIdx2PocControl"
+        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="RefIdx2PocControl"/>
 </XDF>
