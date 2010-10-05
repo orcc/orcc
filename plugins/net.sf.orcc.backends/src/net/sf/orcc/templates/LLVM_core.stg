@@ -277,15 +277,6 @@ endif$
 
 >>
 
-StoreWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
-%$pointer$_$location$_L$indexesName(indexes)$ptr = $GetElementPtrOp(idx0="0", pty=pty, ptrval=Var(pointer), idx=indexes)$ 
-$if(cast)$
-$CastStore(ty=ty, value=value, pty=pty.elementType, ptr={%$pointer$_$location$_L$indexesName(indexes)$ptr}, cast=cast, location=location)$ 
-$else$
-$StoreInstr(ty=ty, value=value, pty=pty.elementType, ptr={%$pointer$_$location$_L$indexesName(indexes)$ptr})$
-$endif$
->>
-
 StorePortWithIndex(ty, value, pty, pointer, cast, indexes, location) ::= <<
 %$pointer$_$location$_L$indexesName(indexes)$ptr = $GetElementPtrOp(pty=pty, ptrval=Var(pointer), idx=indexes)$
 $if(cast)$
@@ -312,19 +303,6 @@ endif$
 LoadPortWithIndex(result, pty, pointer, indexes, cast) ::= <<
 %$result$_$pointer$$indexesName(indexes)$_ptr = $GetElementPtrOp(pty=pty, ptrval=Var(pointer), idx=indexes)$
 %$result$ = load $pty$* %$result$_$pointer$$indexesName(indexes)$_ptr
->>
-
-LoadWithIndex(result, ty, pointer, indexes, cast) ::= <<
-%$result$_$pointer$L$indexesName(indexes)$_ptr = $GetElementPtrOp(idx0="0",  pty=ty, ptrval=Var(pointer), idx=indexes)$
-%$result$ = load $ty.elementType$* %$result$_$pointer$L$indexesName(indexes)$_ptr
->>
-
-LoadWithoutIndex(result, ty, pointer, cast) ::= <<
-$if(cast)$
-$CastLoad(result=result, ty=ty, ptr=Var(pointer), cast=cast)$ 
-$else$
-$result$ = $LoadOp(ty=ty, pointer=Var(pointer))$
-$endif$
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
@@ -473,30 +451,19 @@ endif$
 Store(store) ::= <<
 
 $if(store.target.port)$
-$if(!store.indexes.empty)
-$$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
-endif$$
-else
-$$if(store.indexes.empty)
-$$StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target), ptr=Var(store.target))$$
-else
-$$StoreWithIndex(ty=store.value.type, value=store.value, pty=store.target.type, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$$
-endif$$
-endif$
+$StorePortWithIndex(ty=store.value.type, value=store.value, pty=store.target.type.elementType, pointer=store.target, cast=store.cast, indexes=store.indexes, location=Location(store.location))$
+$else$
+$StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target), ptr=Var(store.target))$
+$endif$
 >>
 
 Load(load) ::= <<
-$if (load.source.variable.port)$$
-if (!load.indexes.empty)$
+$if (load.source.variable.port)$
 $LoadPortWithIndex(result=load.target, pty=load.source.variable.type.elementType, indexes=load.indexes, pointer=load.source.variable, cast= load.cast)$
-$endif$$
-else$$
-if(load.indexes.empty)
-$$Var(load.target)$ = $LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))$$
-else
-$$LoadWithIndex(result=load.target, ty=load.source.variable.type, pointer=load.source.variable, indexes=load.indexes, cast= load.cast)$$
-endif$$
-endif$
+$else$
+$Var(load.target)$ = $LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))$
+$endif$
+
 >>
 
 GEP(gep) ::= <<
