@@ -35,6 +35,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.SourceContainer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.util.CommonNodeOperations;
@@ -46,7 +47,8 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Matthieu Wipliez
  * 
  */
-public class Load extends AbstractInstruction implements LocalTargetContainer {
+public class Load extends AbstractInstruction implements LocalTargetContainer,
+		SourceContainer {
 
 	private List<Expression> indexes;
 
@@ -109,6 +111,7 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 	 * 
 	 * @return the source of this Load
 	 */
+	@Override
 	public Use getSource() {
 		return source;
 	}
@@ -116,6 +119,11 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 	@Override
 	public LocalVariable getTarget() {
 		return target;
+	}
+
+	@Override
+	public void internalSetSource(Use source) {
+		this.source = source;
 	}
 
 	@Override
@@ -144,6 +152,7 @@ public class Load extends AbstractInstruction implements LocalTargetContainer {
 		Use.addUses(this, indexes);
 	}
 
+	@Override
 	public void setSource(Use source) {
 		if (this.source != null) {
 			this.source.remove();

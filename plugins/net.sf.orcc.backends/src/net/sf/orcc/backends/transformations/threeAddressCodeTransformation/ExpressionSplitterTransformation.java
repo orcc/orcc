@@ -43,7 +43,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -327,20 +326,15 @@ public class ExpressionSplitterTransformation extends
 		return expr;
 	}
 
-	private Variable visitIndexes(List<Expression> indexes,
+	private void visitIndexes(List<Expression> indexes,
 			ListIterator<Instruction> it) {
-		List<Expression> assignIndexes = new ArrayList<Expression>();
-		
-		for (Expression index : indexes) {
-			
-			if ((index.isBinaryExpr()) || (index.isUnaryExpr())) {
-				index = visitExpression(index, it);
+
+		for (Expression value : indexes) {
+			if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
+				Expression newValue = visitExpression(value, it);
+				indexes.set(indexes.indexOf(value), newValue);
 			}
-
-			assignIndexes.add(index);
 		}
-
-		return null;
 	}
 
 	@Override

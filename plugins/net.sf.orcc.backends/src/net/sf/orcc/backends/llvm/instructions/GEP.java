@@ -32,12 +32,12 @@ import java.util.List;
 
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.LocalTargetContainer;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
-import net.sf.orcc.ir.TargetContainer;
+import net.sf.orcc.ir.SourceContainer;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.ValueContainer;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.util.CommonNodeOperations;
 
@@ -48,33 +48,14 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * @author Jérôme Gorin
  * 
  */
-public class GEP extends SpecificInstruction implements TargetContainer,
-		ValueContainer {
+public class GEP extends SpecificInstruction implements LocalTargetContainer,
+		SourceContainer {
 
 	private List<Expression> indexes;
 
-	private Variable target;
+	private Use source;
 
-	private Expression value;
-
-	/**
-	 * Creates a new GEP instruction from the given value, its indexes and a
-	 * target.
-	 * 
-	 * @param target
-	 *            the target
-	 * @param source
-	 *            the source
-	 * @param indexes
-	 *            a list of indexes
-	 */
-	public GEP(Location location, Variable target, Expression value,
-			List<Expression> indexes) {
-		super(location);
-		setIndexes(indexes);
-		setValue(value);
-		setTarget(target);
-	}
+	private LocalVariable target;
 
 	/**
 	 * Creates a new GEP instruction from the given value, its indexes, a target
@@ -87,24 +68,39 @@ public class GEP extends SpecificInstruction implements TargetContainer,
 	 * @param indexes
 	 *            a list of indexes
 	 */
-	public GEP(Variable target, Expression value, List<Expression> indexes) {
-		this(new Location(), target, value, indexes);
+	public GEP(LocalVariable target, Use source, List<Expression> indexes) {
+		this(new Location(), target, source, indexes);
+	}
+
+	/**
+	 * Creates a new GEP instruction from the given value, its indexes and a
+	 * target.
+	 * 
+	 * @param target
+	 *            the target
+	 * @param source
+	 *            the source
+	 * @param indexes
+	 *            a list of indexes
+	 */
+	public GEP(Location location, LocalVariable target, Use source,
+			List<Expression> indexes) {
+		super(location);
+		setIndexes(indexes);
+		setSource(source);
+		setTarget(target);
 	}
 
 	@Override
 	public Cast getCast() {
-		Type expr = value.getType();
-		Type val = target.getType();
+		Type tgt = target.getType();
+		Type src = source.getVariable().getType();
 
-		if (expr == null) {
+		if (src == null) {
 			return null;
 		}
 
-		if (value.isIntExpr() || value.isBooleanExpr()) {
-			return null;
-		}
-
-		Cast cast = new Cast(expr, val);
+		Cast cast = new Cast(src, tgt);
 
 		if (cast.isExtended() || cast.isTrunced()) {
 			return cast;
@@ -114,42 +110,49 @@ public class GEP extends SpecificInstruction implements TargetContainer,
 	}
 
 	/**
-	 * Returns the (possibly empty) list of indexes of this store.
+	 * Returns the (possibly empty) list of indexes of this load.
 	 * 
-	 * @return the (possibly empty) list of indexes of this store
+	 * @return the (possibly empty) list of indexes of this load
 	 */
 	public List<Expression> getIndexes() {
 		return indexes;
 	}
 
 	/**
-	 * Returns the target of this Store. The target is a {@link Use}.
+	 * Returns the source of this Load. The source is a Use because it may be a
+	 * local.
 	 * 
-	 * @return the target of this Store
+	 * @return the source of this Load
 	 */
 	@Override
-	public Variable getTarget() {
+	public Use getSource() {
+		return source;
+	}
+
+	@Override
+	public LocalVariable getTarget() {
 		return target;
 	}
 
 	@Override
-	public Expression getValue() {
-		return value;
+	public void internalSetSource(Use source) {
+		this.source = source;
 	}
 
 	@Override
-	public void internalSetTarget(Variable target) {
+	public void internalSetTarget(LocalVariable target) {
 		this.target = target;
 	}
 
 	@Override
-	public void internalSetValue(Expression value) {
-		this.value = value;
+	public boolean isLoad() {
+		return true;
 	}
 
 	/**
-	 * Sets the indexes of this store instruction. Uses are updated to point to
-	 * this instruction.
+	 * Sets the indexes of this load instruction. Uses are updated to point to
+	 * this instruction. This method is internal. Indexes should be modified
+	 * solely using the {@link #getIndexes()} method.
 	 * 
 	 * @param indexes
 	 *            a list of expressions
@@ -163,19 +166,24 @@ public class GEP extends SpecificInstruction implements TargetContainer,
 	}
 
 	@Override
-	public void setTarget(Variable target) {
+	public void setSource(Use source) {
+		if (this.source != null) {
+			this.source.remove();
+		}
+		this.source = source;
+		if (source != null) {
+			source.setNode(this);
+		}
+	}
+
+	@Override
+	public void setTarget(LocalVariable target) {
 		CommonNodeOperations.setTarget(this, target);
 	}
 
 	@Override
-	public void setValue(Expression value) {
-		CommonNodeOperations.setValue(this, value);
-	}
-
-	@Override
 	public String toString() {
-		return target.toString() + " = getelementptr " + getValue() + ", "
-				+ indexes;
+		return target + " = getelementptr " + source + ", " + indexes;
 	}
 
 }

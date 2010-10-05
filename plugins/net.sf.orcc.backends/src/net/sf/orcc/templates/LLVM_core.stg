@@ -412,20 +412,26 @@ PhiAssignment(phi) ::= <<
 Read(read) ::= <<
 
 $LoadLocalPort(read)$
-%$read.port$ = $CallOp(ty ={$read.port.type$*}, fnptrval={fifo_$fifoType(read.port)$_read}, function_args={$fifoName(read.port)$ %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
+%$read.port$_ptr = $CallOp(ty ={$read.port.type$*}, fnptrval={fifo_$fifoType(read.port)$_read}, function_args={$fifoName(read.port)$ %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
+$BitcastOp(result=Var(read.target) , ty={$read.port.type$*}, value={%$read.port$_ptr}, ty2={$VarType(read.target)$*})$
+
 >>
 
 
 Peek(peek) ::= <<
 
 $LoadLocalPort(peek)$
-%$peek.port$ = $CallOp(ty ={$peek.port.type$*}, fnptrval={fifo_$fifoType(peek.port)$_peek}, function_args={$fifoName(peek.port)$ %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
+%$peek.port$_ptr = $CallOp(ty ={$peek.port.type$*}, fnptrval={fifo_$fifoType(peek.port)$_peek}, function_args={$fifoName(peek.port)$ %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
+$BitcastOp(result=Var(peek.target) , ty={$peek.port.type$*}, value={%$peek.port$_ptr}, ty2={$VarType(peek.target)$*})$
+
 >>
 
 Write(write) ::= <<
 
 $LoadLocalPort(write)$
-%$write.port$ = $CallOp(ty ={$write.port.type$*}, fnptrval={fifo_$fifoType(write.port)$_write}, function_args={$fifoName(write.port)$ %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
+%$write.port$_ptr = $CallOp(ty ={$write.port.type$*}, fnptrval={fifo_$fifoType(write.port)$_write}, function_args={$fifoName(write.port)$ %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
+$BitcastOp(result=Var(write.target) , ty={$write.port.type$*}, value={%$write.port$_ptr}, ty2={$VarType(write.target)$*})$
+
 >>
 
 HasRoom(result, action, port, numToken) ::= <<
@@ -491,6 +497,11 @@ else
 $$LoadWithIndex(result=load.target, ty=load.source.variable.type, pointer=load.source.variable, indexes=load.indexes, cast= load.cast)$$
 endif$$
 endif$
+>>
+
+GEP(gep) ::= <<
+$Var(gep.target)$ = $GetElementPtrOp(idx0="0",  pty=VarType(gep.source.variable), ptrval=Var(gep.source.variable), idx=gep.indexes)$
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
