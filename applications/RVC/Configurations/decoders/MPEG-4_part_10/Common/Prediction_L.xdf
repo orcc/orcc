@@ -388,7 +388,6 @@
     <Connection dst="Buffer_inter" dst-port="RA_Height" src="Inter" src-port="RA_Height_L"/>
     <Connection dst="Inter" dst-port="RD_L" src="Buffer_inter" src-port="RD"/>
     <Connection dst="Buffer_inter" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Inter" dst-port="PicWidthInMb_inter" src="" src-port="PicWidthInMb"/>
     <Connection dst="Inter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Inter" dst-port="Mb_Type" src="" src-port="Mb_Type"/>
     <Connection dst="Select" dst-port="X2" src="Inter" src-port="MB4x4Pred_L"/>
@@ -470,4 +469,6 @@
         src="DemuxParserInfos" src-port="CurrMbAddr_16x16"/>
     <Connection dst="Intra_16x16" dst-port="Pic_WidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Intra_16x16" dst-port="CurrMb_Addr" src="" src-port="CurrMbAddr"/>
+    <Connection dst="Inter" dst-port="PicWidthInMb"
+        src="DemuxParserInfos" src-port="PicWidthInMbInter"/>
 </XDF>

@@ -42,7 +42,8 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 	uint(size=7)  PicWidthInMb_16x16,
 	uint(size=13) CurrMbAddr_16x16,
 
-	int(size=16)  Coef_ACR_Inter
+	int(size=16)  Coef_ACR_Inter,
+	uint(size=7)  PicWidthInMbInter
 		:
 
 
@@ -297,6 +298,18 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			ConstrISent := true;
 		end
 
+	SendPicWidthCurrMbInter: action
+			PicWidthInMb      :[PicWidth],
+			CurrMbAddr        :[CurrMb]
+				==>
+			PicWidthInMbInter :[PicWidth]
+		guard
+			not IsIntraSent
+		do
+			curr_pos    := CurrMb mod PicWidth;
+			IsIntraSent := true;
+		end	
+
 	UpdateIsIntra: action
 			PicWidthInMb :[PicWidth],
 			CurrMbAddr   :[CurrMb]
@@ -309,32 +322,32 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 		end	
 
 	schedule fsm CheckMbType:
-		CheckMbType         (MBTypeIsPCM            )--> SendPCMInfos;
-		CheckMbType         (MBTypeIsIntra4x4       )--> SendIntra4x4Infos;
-		CheckMbType         (MBTypeIsIntra8x8       )--> undefined;
-		CheckMbType         (MBTypeIsIntra16x16     )--> SendIntra16x16Infos;
-		CheckMbType         (MBTypeIsInter          )--> SendInterInfos;
+		CheckMbType         (MBTypeIsPCM             )--> SendPCMInfos;
+		CheckMbType         (MBTypeIsIntra4x4        )--> SendIntra4x4Infos;
+		CheckMbType         (MBTypeIsIntra8x8        )--> undefined;
+		CheckMbType         (MBTypeIsIntra16x16      )--> SendIntra16x16Infos;
+		CheckMbType         (MBTypeIsInter           )--> SendInterInfos;
 
-		SendIntra4x4Infos   (SendAcr4x4             )--> SendIntra4x4Infos;
-		SendIntra4x4Infos   (SendFstMb4x4           )--> SendIntra4x4Infos;
-		SendIntra4x4Infos   (SendCnstrI4x4          )--> SendIntra4x4Infos;
-		SendIntra4x4Infos   (SendPredMode4x4        )--> SendIntra4x4Infos;
-		SendIntra4x4Infos   (SendIsIntra4x4         )--> SendIntra4x4Infos;	
-		SendIntra4x4Infos   (SendInfosDone          )--> CheckMbType;
+		SendIntra4x4Infos   (SendAcr4x4              )--> SendIntra4x4Infos;
+		SendIntra4x4Infos   (SendFstMb4x4            )--> SendIntra4x4Infos;
+		SendIntra4x4Infos   (SendCnstrI4x4           )--> SendIntra4x4Infos;
+		SendIntra4x4Infos   (SendPredMode4x4         )--> SendIntra4x4Infos;
+		SendIntra4x4Infos   (SendIsIntra4x4          )--> SendIntra4x4Infos;	
+		SendIntra4x4Infos   (SendInfosDone           )--> CheckMbType;
 
-		SendIntra16x16Infos (SendAcr16x16           )--> SendIntra16x16Infos;
-		SendIntra16x16Infos (SendFstMb16x16         )--> SendIntra16x16Infos;
-		SendIntra16x16Infos (SendCnstrI16x16        )--> SendIntra16x16Infos;
-		SendIntra16x16Infos (SendPredMode16x16      )--> SendIntra16x16Infos;	
-		SendIntra16x16Infos (SendIsIntra16x16       )--> SendIntra16x16Infos;	
-		SendIntra16x16Infos (SendInfosDone          )--> CheckMbType;
+		SendIntra16x16Infos (SendAcr16x16            )--> SendIntra16x16Infos;
+		SendIntra16x16Infos (SendFstMb16x16          )--> SendIntra16x16Infos;
+		SendIntra16x16Infos (SendCnstrI16x16         )--> SendIntra16x16Infos;
+		SendIntra16x16Infos (SendPredMode16x16       )--> SendIntra16x16Infos;	
+		SendIntra16x16Infos (SendIsIntra16x16        )--> SendIntra16x16Infos;	
+		SendIntra16x16Infos (SendInfosDone           )--> CheckMbType;
 
-		SendInterInfos      (SendAcrInter           )--> SendInterInfos;
-		SendInterInfos      (GetCnstrIAndFstMbInter )--> SendInterInfos;
-		SendInterInfos      (UpdateIsIntra          )--> SendInterInfos;
-		SendInterInfos      (SendInfosDone          )--> CheckMbType;
+		SendInterInfos      (SendAcrInter            )--> SendInterInfos;
+		SendInterInfos      (GetCnstrIAndFstMbInter  )--> SendInterInfos;
+		SendInterInfos      (SendPicWidthCurrMbInter )--> SendInterInfos;
+		SendInterInfos      (SendInfosDone           )--> CheckMbType;
 
-		SendPCMInfos        (UpdateIsIntra          )--> SendPCMInfos;
-		SendPCMInfos        (SendInfosDone          )--> CheckMbType;
+		SendPCMInfos        (UpdateIsIntra           )--> SendPCMInfos;
+		SendPCMInfos        (SendInfosDone           )--> CheckMbType;
 	end
 end

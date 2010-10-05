@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="PicWidthInMb_inter" x="16" y="615"/>
+      <vertex id="PicWidthInMb" x="16" y="615"/>
       <vertex id="PicSizeInMb" x="20" y="571"/>
       <vertex id="MbPartIdx" x="57" y="164"/>
       <vertex id="RefIdx" x="46" y="661"/>

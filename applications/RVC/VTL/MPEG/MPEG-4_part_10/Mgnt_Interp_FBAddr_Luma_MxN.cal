@@ -50,13 +50,12 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   uint(size=1) ValPicID     := 0;
   
   //Mb_Type_NOK : Consume the token, nothing else to do 
-  Mb_Type_NOK_and_IPCM :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
+  Mb_Type_NOK_and_IPCM :action Mb_Type:[a], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
   guard
   	a = 4
   do
 	if(DEBUG_INPUT)then
 		println("Input InterpFBAddrLuma Mb_Type:"+a);	
-		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
 		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
 		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);	
 	end
@@ -65,19 +64,14 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   end
 
   //Mb_Type_NOK : Consume the token, nothing else to do 
-  Mb_Type_NOK :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
+  Mb_Type_NOK :action Mb_Type:[a], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
   guard
   	a = 0 or a = 1
   do
 	if(DEBUG_INPUT)then
-		println("Input InterpFBAddrLuma Mb_Type:"+a);	
-		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
+		println("Input InterpFBAddrLuma Mb_Type:"+a);
 		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
 		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);
-/*		foreach int i in 0 .. 255
-		do
-			println("Input InterpFBAddrLuma Coef_ACR["+i+"]:"+d[i]);	
-		end*/
 	end
   	currMB:=valCurrMbAddr;
   	pic_size:=c;
@@ -93,10 +87,6 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
 		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
 		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);
-/*		foreach int i in 0 .. 255
-		do
-			println("Input InterpFBAddrLuma Coef_ACR["+i+"]:"+d[i]);	
-		end*/
 	end
     Picwidth_l := lshift(b,4);
     Picheight_l := lshift(c/b,4);
