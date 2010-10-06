@@ -49,7 +49,6 @@ import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -265,15 +264,15 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		int lo;
 		int hi;
 
-		Object value = variable.getValue();
+		Expression value = variable.getValue();
 		Type type = variable.getType();
 		if (type.isList()) {
 			type = ((TypeList) type).getElementType();
 		}
 
 		if (type.isInt()) {
-			if (value instanceof IntegerNumber) {
-				lo = ((IntegerNumber) value).getIntValue();
+			if (value.isIntExpr()) {
+				lo = ((IntExpr) value).getIntValue();
 				hi = lo;
 			} else {
 				int size = ((TypeInt) type).getSize();
@@ -281,8 +280,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				hi = (1 << (size - 1)) - 1;
 			}
 		} else if (type.isUint()) {
-			if (value instanceof IntegerNumber) {
-				lo = ((IntegerNumber) value).getIntValue();
+			if (value.isIntExpr()) {
+				lo = ((IntExpr) value).getIntValue();
 				hi = lo;
 			} else {
 				int size = ((TypeUint) type).getSize();
@@ -290,8 +289,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				hi = 1 << size - 1;
 			}
 		} else if (type.isBool()) {
-			if (value instanceof Boolean) {
-				lo = ((Boolean) value) ? 1 : 0;
+			if (value.isBooleanExpr()) {
+				lo = ((BoolExpr) value).getValue() ? 1 : 0;
 				hi = lo;
 			} else {
 				lo = 0;

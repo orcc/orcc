@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.interpreter;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -46,6 +45,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.runtime.Fifo;
 
@@ -60,21 +60,12 @@ import net.sf.orcc.runtime.Fifo;
 public class ActorInterpreter {
 
 	/**
-	 * Communication fifos map : key = related I/O port name; value =
-	 * Fifo_int/boolean/String
-	 */
-	private Map<String, Fifo> ioFifos;
-
-	/**
 	 * Actor's Intermediate Representation duplication for "inline" visiting
 	 * interpretation
 	 */
 	private Actor actor;
 
-	/**
-	 * Actor's constant parameters to be set at initialization time
-	 */
-	private Map<String, Expression> parameters;
+	protected ExpressionEvaluator exprInterpreter;
 
 	/**
 	 * Actor's FSM current state
@@ -82,21 +73,32 @@ public class ActorInterpreter {
 	protected String fsmState;
 
 	/**
-	 * Actor's action scheduler
+	 * Communication fifos map : key = related I/O port name; value =
+	 * Fifo_int/boolean/String
 	 */
-	protected ActionScheduler sched;
+	private Map<String, Fifo> ioFifos;
+
+	private ListAllocator listAllocator;
 
 	/**
 	 * Interpretation and evaluation tools
 	 */
 	protected NodeInterpreter nodeInterpreter;
-	private ListAllocator listAllocator;
-	protected ExpressionEvaluator exprInterpreter;
+
+	/**
+	 * Actor's constant parameters to be set at initialization time
+	 */
+	private Map<String, Expression> parameters;
 
 	/**
 	 * Possible parent OrccProcess for OrccExceptions I/O printing management.
 	 */
 	private OrccProcess process;
+
+	/**
+	 * Actor's action scheduler
+	 */
+	protected ActionScheduler sched;
 
 	/**
 	 * Creates a new interpreted actor instance for simulation or debug
@@ -179,27 +181,6 @@ public class ActorInterpreter {
 	}
 
 	/**
-	 * Converts the value to a format that the interpreter knows how to handle.
-	 * More specifically, converts lists to arrays.
-	 * 
-	 * @param value
-	 *            an object
-	 * @return the same object if value is a scalar, an array otherwise
-	 */
-	private Object getInterpretableValue(Object value) {
-		if (value instanceof List<?>) {
-			List<?> list = (List<?>) value;
-			Object[] array = list.toArray();
-			for (int i = 0; i < array.length; i++) {
-				array[i] = getInterpretableValue(array[i]);
-			}
-			return array;
-		} else {
-			return value;
-		}
-	}
-
-	/**
 	 * Get the next schedulable action to be executed for this actor
 	 * 
 	 * @return the schedulable action or null
@@ -253,7 +234,7 @@ public class ActorInterpreter {
 			for (Variable param : actor.getParameters()) {
 				Expression value = parameters.get(param.getName());
 				if (value != null) {
-					param.setValue(value.accept(exprInterpreter));
+					param.setValue((Expression) value.accept(exprInterpreter));
 				}
 			}
 
@@ -262,26 +243,25 @@ public class ActorInterpreter {
 			for (Variable stateVar : actor.getStateVars()) {
 				Type type = stateVar.getType();
 				// Initialize variables with constant values
-				Object initConst = ((StateVariable) stateVar)
+				Expression initConst = ((StateVariable) stateVar)
 						.getConstantValue();
 				if (initConst == null) {
 					if (type.isList()) {
 						// Allocate empty array variable
-						stateVar.setValue(listAllocator.allocate(type));
+						stateVar.setValue((Expression) type
+								.accept(listAllocator));
 					}
 				} else {
 					// initialize
-					stateVar.setValue(getInterpretableValue(initConst));
+					stateVar.setValue(initConst);
 				}
 			}
 
 			// Get initializing procedure if any
 			for (Action action : actor.getInitializes()) {
-				Object isSchedulable = interpretProc(action.getScheduler());
-				if (isSchedulable instanceof Boolean) {
-					if ((Boolean) isSchedulable) {
-						interpretProc(action.getBody());
-					}
+				if (isSchedulable(action)) {
+					interpretProc(action.getBody());
+					continue;
 				}
 			}
 		} catch (OrccRuntimeException ex) {
@@ -298,14 +278,14 @@ public class ActorInterpreter {
 	 * 
 	 * @return an object which contains procedure returned value
 	 */
-	protected Object interpretProc(Procedure procedure) {
+	protected Expression interpretProc(Procedure procedure) {
 		// Don't mind about procedure parameters (already set)
 
 		// Allocate local List variables
 		for (Variable local : procedure.getLocals()) {
 			Type type = local.getType();
 			if (type.isList()) {
-				local.setValue(listAllocator.allocate(type));
+				local.setValue((Expression) type.accept(listAllocator));
 			}
 		}
 
@@ -314,11 +294,7 @@ public class ActorInterpreter {
 			node.accept(nodeInterpreter, ioFifos, process);
 		}
 
-		// Procedure return value
-		Object result = nodeInterpreter.getReturnValue();
-
-		// Return the result object
-		return result;
+		return nodeInterpreter.getReturnValue();
 	}
 
 	/**
@@ -329,8 +305,12 @@ public class ActorInterpreter {
 	 * @return true if the given action is schedulable
 	 */
 	protected boolean isSchedulable(Action action) {
-		Object isSchedulable = interpretProc(action.getScheduler());
-		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
+		Expression isSchedulable = interpretProc(action.getScheduler());
+		if (isSchedulable != null && isSchedulable.isBooleanExpr()) {
+			return ((BoolExpr) isSchedulable).getValue();
+		} else {
+			return false;
+		}
 	}
 
 	/**
@@ -373,4 +353,5 @@ public class ActorInterpreter {
 	public void setFsmState(String newState) {
 		fsmState = newState;
 	}
+
 }

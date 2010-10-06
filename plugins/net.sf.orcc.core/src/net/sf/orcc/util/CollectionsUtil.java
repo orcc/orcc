@@ -28,10 +28,7 @@
  */
 package net.sf.orcc.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * This class defines various utility functions that deal with collections.
@@ -40,28 +37,6 @@ import java.util.List;
  * 
  */
 public class CollectionsUtil {
-
-	/**
-	 * Converts the given array to a list. The function performs a deep
-	 * conversion (as opposed to the shallow conversion performed by
-	 * {@link Arrays#asList(Object...)}).
-	 * 
-	 * @param values
-	 *            an array of objects
-	 * @return a list
-	 */
-	public static List<?> toList(Object[] values) {
-		List<Object> list = new ArrayList<Object>(values.length);
-		for (Object value : values) {
-			if (value.getClass().isArray()) {
-				list.add(toList((Object[]) value));
-			} else {
-				list.add(value);
-			}
-		}
-
-		return list;
-	}
 
 	/**
 	 * Returns a string that contains all objects separated with the given

@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.type;
 
 import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
@@ -36,6 +37,8 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 
 /**
+ * This class defines an abstract type interpreter.
+ * 
  * @author Pierre-Laurent Lagalaye
  * 
  */
@@ -43,6 +46,11 @@ public abstract class AbstractTypeInterpreter implements TypeInterpreter {
 
 	@Override
 	public Object interpret(TypeBool type) {
+		return null;
+	}
+
+	@Override
+	public Object interpret(TypeFloat type) {
 		return null;
 	}
 

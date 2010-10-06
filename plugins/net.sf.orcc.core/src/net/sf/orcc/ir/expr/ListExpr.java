@@ -45,16 +45,17 @@ import net.sf.orcc.ir.Type;
  */
 public class ListExpr extends AbstractExpression {
 
-	private List<Expression> value;
+	private List<Expression> expressions;
 
 	public ListExpr(List<Expression> value) {
-		this.value = value;
+		this.expressions = value;
 	}
 
 	public ListExpr(ListExpr l1, ListExpr l2) {
-		value = new ArrayList<Expression>(l1.value.size() + l2.value.size());
-		value.addAll(l1.value);
-		value.addAll(l2.value);
+		expressions = new ArrayList<Expression>(l1.expressions.size()
+				+ l2.expressions.size());
+		expressions.addAll(l1.expressions);
+		expressions.addAll(l2.expressions);
 	}
 
 	@Override
@@ -67,27 +68,39 @@ public class ListExpr extends AbstractExpression {
 		visitor.visit(this, args);
 	}
 
+	public Expression get(int index) {
+		return expressions.get(index);
+	}
+
+	public Expression get(IntExpr index) {
+		return expressions.get(index.getIntValue());
+	}
+
+	public int getSize() {
+		return expressions.size();
+	}
+
 	@Override
 	public Type getType() {
-		if (value.size() == 0) {
+		if (expressions.size() == 0) {
 			return null;
 		}
 
 		// Verify if every expressions on the list are getting the same type
-		Expression firstExpr = value.get(0);
+		Expression firstExpr = expressions.get(0);
 		Type refType = firstExpr.getType();
-		for (Expression expr : value) {
+		for (Expression expr : expressions) {
 			Type type = expr.getType();
 			if (!refType.equals(type)) {
 				return null;
 			}
 		}
 
-		return IrFactory.eINSTANCE.createTypeList(value.size(), refType);
+		return IrFactory.eINSTANCE.createTypeList(expressions.size(), refType);
 	}
 
 	public List<Expression> getValue() {
-		return value;
+		return expressions;
 	}
 
 	@Override
@@ -95,8 +108,12 @@ public class ListExpr extends AbstractExpression {
 		return true;
 	}
 
-	public Expression get(int index) {
-		return value.get(index);
+	public void set(int index, Expression value) {
+		expressions.set(index, value);
+	}
+
+	public void set(IntExpr index, Expression value) {
+		expressions.set(index.getIntValue(), value);
 	}
 
 }

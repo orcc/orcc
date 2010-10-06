@@ -79,6 +79,10 @@ public class BoolExpr extends AbstractExpression {
 		return true;
 	}
 
+	public BoolExpr not() {
+		return new BoolExpr(!value);
+	}
+
 	public void setValue(boolean value) {
 		this.value = value;
 	}

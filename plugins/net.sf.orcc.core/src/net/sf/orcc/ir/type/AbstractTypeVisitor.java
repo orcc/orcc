@@ -37,6 +37,8 @@ import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.TypeVoid;
 
 /**
+ * This class defines an abstract type visitor.
+ * 
  * @author Matthieu Wipliez
  * 
  */

@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.tools.classifier;
 
-import java.lang.reflect.Array;
+import java.util.Iterator;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.NodeInterpreter;
@@ -37,6 +37,9 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -108,7 +111,7 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 	@Override
 	public void visit(HasTokens instr, Object... args) {
-		instr.getTarget().setValue(true);
+		instr.getTarget().setValue(new BoolExpr(true));
 	}
 
 	@Override
@@ -141,16 +144,19 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 		if (instr.getIndexes().isEmpty()) {
 			target.setValue(source.getValue());
 		} else {
-			Object obj = source.getValue();
+			Expression value = source.getValue();
 			for (Expression index : instr.getIndexes()) {
-				IntegerNumber lastIndex = (IntegerNumber) index.accept(exprInterpreter);
-				if (obj != null && lastIndex != null) {
-					obj = Array.get(obj, lastIndex.getIntValue());
-				} else {
-					obj = null;
+				if (value != null && value.isListExpr()) {
+					index = (Expression) index.accept(exprInterpreter);
+					if (index == null) {
+						value = null;
+						break;
+					} else {
+						value = ((ListExpr) value).get((IntExpr) index);
+					}
 				}
 			}
-			target.setValue(obj);
+			target.setValue(value);
 		}
 	}
 
@@ -158,8 +164,8 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	public void visit(Peek peek, Object... args) {
 		if (peek.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
 			int value = analyzer.getConfigurationValue(action);
-			Object[] target = (Object[]) peek.getTarget().getValue();
-			target[0] = new IntegerNumber(value);
+			ListExpr target = (ListExpr) peek.getTarget().getValue();
+			target.set(0, new IntExpr(value));
 		}
 	}
 
@@ -168,9 +174,9 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 		if (read.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
 			Variable variable = read.getTarget();
 			if (variable != null) {
-				Object[] target = (Object[]) variable.getValue();
 				int value = analyzer.getConfigurationValue(action);
-				target[0] = new IntegerNumber(value);
+				ListExpr target = (ListExpr) variable.getValue();
+				target.set(0, new IntExpr(value));
 			}
 
 			portRead = true;
@@ -183,22 +189,24 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	public void visit(Store instr, Object... args) {
 		Variable variable = instr.getTarget();
 		if (instr.getIndexes().isEmpty()) {
-			variable.setValue(instr.getValue().accept(exprInterpreter));
+			variable.setValue((Expression) instr.getValue().accept(
+					exprInterpreter));
 		} else {
-			Object obj = variable.getValue();
-			Object objPrev = obj;
-			IntegerNumber lastIndex = new IntegerNumber(0);
-			for (Expression index : instr.getIndexes()) {
-				objPrev = obj;
-				lastIndex = (IntegerNumber) index.accept(exprInterpreter);
-				if (objPrev != null && lastIndex != null) {
-					obj = Array.get(objPrev, lastIndex.getIntValue());
+			Expression target = variable.getValue();
+			Iterator<Expression> it = instr.getIndexes().iterator();
+			IntExpr index = (IntExpr) it.next().accept(exprInterpreter);
+
+			while (it.hasNext()) {
+				if (target != null && target.isListExpr() && index != null) {
+					target = ((ListExpr) target).get(index);
 				}
+				index = (IntExpr) it.next().accept(exprInterpreter);
 			}
 
-			if (objPrev != null && lastIndex != null) {
-				Array.set(objPrev, lastIndex.getIntValue(),
-						instr.getValue().accept(exprInterpreter));
+			Expression value = (Expression) instr.getValue().accept(
+					exprInterpreter);
+			if (target != null && target.isListExpr() && index != null) {
+				((ListExpr) target).set(index, value);
 			}
 		}
 	}

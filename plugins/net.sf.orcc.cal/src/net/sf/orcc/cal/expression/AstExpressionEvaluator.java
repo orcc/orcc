@@ -338,8 +338,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		case LOGIC_NOT: {
 			Expression value = evaluate(expression.getExpression());
 			if (value != null && value.isBooleanExpr()) {
-				BoolExpr b = (BoolExpr) value;
-				return new BoolExpr(!b.getValue());
+				return ((BoolExpr) value).not();
 			}
 
 			error("not expects a boolean expression", expression,

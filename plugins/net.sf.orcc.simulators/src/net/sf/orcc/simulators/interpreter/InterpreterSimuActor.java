@@ -58,11 +58,6 @@ import net.sf.orcc.simulators.SimuActor;
 public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		implements SimuActor {
 
-	protected OrccProcess process;
-	protected String instanceId;
-	protected Actor actorIR;
-	protected Map<String, Fifo> fifos;
-
 	/**
 	 * Debugger utils
 	 */
@@ -76,10 +71,6 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			this.lineNb = lineNb;
 		}
 	}
-
-	protected List<Breakpoint> breakpoints;
-	protected boolean isStepping = false;
-	protected Action breakAction = null;
 
 	private class NodeInfo {
 		public Expression condition;
@@ -98,17 +89,36 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		}
 	}
 
-	private Action currentAction = null;
-	private List<Instruction> instrStack;
-	private List<NodeInfo> nodeStack;
-	private int nodeStackLevel;
-
 	/**
 	 * Interpretation and evaluation tools
 	 */
 	protected ActorInterpreter actorInterpreter;
+
+	protected Actor actorIR;
+
+	protected Action breakAction = null;
+
+	protected List<Breakpoint> breakpoints;
+
+	private Action currentAction = null;
+
 	protected ExpressionEvaluator exprEvaluator;
+
+	protected Map<String, Fifo> fifos;
+
+	protected String instanceId;
+
+	private List<Instruction> instrStack;
+
+	protected boolean isStepping = false;
+
 	private ListAllocator listAllocator;
+
+	private List<NodeInfo> nodeStack;
+
+	private int nodeStackLevel;
+
+	protected OrccProcess process;
 
 	/**
 	 * Constructor
@@ -155,7 +165,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 
 	@Override
 	public void clearBreakpoint(int breakpoint) {
-		Breakpoint rm_bkpt=null;
+		Breakpoint rm_bkpt = null;
 		// Remove breakpoint from the list
 		for (Breakpoint bkpt : breakpoints) {
 			if ((breakpoint == bkpt.lineNb)) {
@@ -234,7 +244,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	public boolean isStepping() {
 		return isStepping;
 	}
-	
+
 	/**
 	 * Manages the stack of nodes to be interpreted by the debugger
 	 */
@@ -301,8 +311,9 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			if (instrStack.size() > 0) {
 				Instruction instr = instrStack.remove(0);
 				instr.accept(new NodeInterpreter(), fifos, process);
-				if ((instr.getLocation().getStartLine() != lastVisitedLocation.getStartLine()) &&
-						(instr.getLocation().getStartLine() != 0)) {
+				if ((instr.getLocation().getStartLine() != lastVisitedLocation
+						.getStartLine())
+						&& (instr.getLocation().getStartLine() != 0)) {
 					lastVisitedLocation = instr.getLocation();
 					exeStmt = true;
 				}
@@ -342,7 +353,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			return 0;
 		} catch (OrccRuntimeException ex) {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "
-					+ actorIR.getName() + " :\n" + ex.getMessage());
+					+ actorIR.getName(), ex);
 		}
 	}
 
@@ -411,7 +422,8 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 					for (Variable local : currentAction.getBody().getLocals()) {
 						Type type = local.getType();
 						if (type.isList()) {
-							local.setValue(listAllocator.allocate(type));
+							local.setValue((Expression) type
+									.accept(listAllocator));
 						}
 					}
 					// Initialize stack frame

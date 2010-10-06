@@ -108,8 +108,8 @@ public class IntExpr extends AbstractExpression {
 		}
 	}
 
-	public boolean ge(IntExpr expr) {
-		return value.compareTo(expr.value) >= 0;
+	public BoolExpr ge(IntExpr expr) {
+		return new BoolExpr(value.compareTo(expr.value) >= 0);
 	}
 
 	/**
@@ -146,8 +146,8 @@ public class IntExpr extends AbstractExpression {
 		return value.longValue();
 	}
 
-	public boolean gt(IntExpr expr) {
-		return value.compareTo(expr.value) > 0;
+	public BoolExpr gt(IntExpr expr) {
+		return new BoolExpr(value.compareTo(expr.value) > 0);
 	}
 
 	@Override
@@ -164,12 +164,12 @@ public class IntExpr extends AbstractExpression {
 		return getIntValue() != getLongValue();
 	}
 
-	public boolean le(IntExpr expr) {
-		return value.compareTo(expr.value) <= 0;
+	public BoolExpr le(IntExpr expr) {
+		return new BoolExpr(value.compareTo(expr.value) <= 0);
 	}
 
-	public boolean lt(IntExpr expr) {
-		return value.compareTo(expr.value) < 0;
+	public BoolExpr lt(IntExpr expr) {
+		return new BoolExpr(value.compareTo(expr.value) < 0);
 	}
 
 	public IntExpr mod(IntExpr expr) {

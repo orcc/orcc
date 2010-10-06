@@ -28,40 +28,32 @@
  */
 package net.sf.orcc.interpreter;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.type.AbstractTypeVisitor;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.type.AbstractTypeInterpreter;
 
 /**
- * Allocates a List of any dimension
+ * This class defines an allocator that allocates a List from a type.
  * 
  * @author Pierre-Laurent Lagalaye
+ * @author Matthieu Wipliez
  * 
  */
-public class ListAllocator extends AbstractTypeVisitor {
+public class ListAllocator extends AbstractTypeInterpreter {
 
-	public ListAllocator() {
-	}
-
-	public Object allocate(Type type) {
-		type.accept(this);
-		List<Integer> sizeList = type.getDimensions();
-		int[] dimensions = new int[sizeList.size()];
-		for (int i = 0; i < sizeList.size(); i++) {
-			dimensions[i] = sizeList.get(i);
+	@Override
+	public Object interpret(TypeList type) {
+		int size = type.getSize();
+		List<Expression> values = new ArrayList<Expression>(size);
+		for (int i = 0; i < size; i++) {
+			values.add((Expression) type.getType().accept(this));
 		}
-		sizeList.clear();
 
-		if (((TypeList) type).getElementType().isBool()) {
-			return Array.newInstance(Boolean.class, dimensions);
-		} else if (((TypeList) type).getElementType().isString()) {
-			return Array.newInstance(String.class, dimensions);
-		} else {
-			return Array.newInstance(IntegerNumber.class, dimensions);
-		}
+		return new ListExpr(values);
 	}
 
 }

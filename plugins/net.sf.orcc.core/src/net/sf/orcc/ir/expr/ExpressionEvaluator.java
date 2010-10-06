@@ -161,7 +161,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 					&& val2.isIntExpr()) {
 				IntExpr i1 = (IntExpr) val1;
 				IntExpr i2 = (IntExpr) val2;
-				return new BoolExpr(i1.ge(i2));
+				return i1.ge(i2);
 			}
 			break;
 		case GT:
@@ -169,7 +169,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 					&& val2.isIntExpr()) {
 				IntExpr i1 = (IntExpr) val1;
 				IntExpr i2 = (IntExpr) val2;
-				return new BoolExpr(i1.gt(i2));
+				return i1.gt(i2);
 			}
 			break;
 		case LOGIC_AND:
@@ -185,7 +185,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 					&& val2.isIntExpr()) {
 				IntExpr i1 = (IntExpr) val1;
 				IntExpr i2 = (IntExpr) val2;
-				return new BoolExpr(i1.le(i2));
+				return i1.le(i2);
 			}
 			break;
 		case LOGIC_OR:
@@ -201,7 +201,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 					&& val2.isIntExpr()) {
 				IntExpr i1 = (IntExpr) val1;
 				IntExpr i2 = (IntExpr) val2;
-				return new BoolExpr(i1.lt(i2));
+				return i1.lt(i2);
 			}
 			break;
 		case MINUS:
@@ -281,7 +281,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 			break;
 		case LOGIC_NOT:
 			if (value != null && value.isBooleanExpr()) {
-				return !((BoolExpr) value).getValue();
+				return ((BoolExpr) value).not();
 			}
 			break;
 		case MINUS:
