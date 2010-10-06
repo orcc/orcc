@@ -100,10 +100,8 @@ Actor* IRParser::parseActor(string classz){
 		exit(0);
 	}
 
-	symbolTable = &module->getMDSymbolTable();
-
-	// Parse name
-	NamedMDNode* nameNMD =  symbolTable->lookup(IRConstant::KEY_NAME);
+		// Parse name
+	NamedMDNode* nameNMD =  module->getNamedMetadata(IRConstant::KEY_NAME);
 	MDNode* nameMD =cast<MDNode>(nameNMD->getOperand(0));
 	MDString* name = cast<MDString>(nameMD->getOperand(0));
 
@@ -125,7 +123,7 @@ Actor* IRParser::parseActor(string classz){
 map<string, Port*>* IRParser::parsePorts(string key, Module* module){
 	map<string, Port*>* ports = new map<string, Port*>();
 	
-	NamedMDNode* inputsMD =  symbolTable->lookup(key);
+	NamedMDNode* inputsMD =  module->getNamedMetadata(key);
 
 	if (inputsMD == NULL) {
 		return ports;
@@ -169,7 +167,7 @@ Type* IRParser::parseFifo(std::string name, Module* module){
 map<string, Procedure*>* IRParser::parseProcs(Module* module){
 	map<string, Procedure*>* procedures = new map<string, Procedure*>();
 
-	NamedMDNode* inputsMD =  symbolTable->lookup(IRConstant::KEY_PROCEDURES);
+	NamedMDNode* inputsMD =  module->getNamedMetadata(IRConstant::KEY_PROCEDURES);
 
 	if (inputsMD != NULL){
 		for (unsigned i = 0, e = inputsMD->getNumOperands(); i != e; ++i) {
@@ -185,7 +183,7 @@ map<string, Procedure*>* IRParser::parseProcs(Module* module){
 }
 
 ActionScheduler* IRParser::parseActionScheduler(Module* module){
-	NamedMDNode* inputsMD =  symbolTable->lookup(IRConstant::KEY_ACTION_SCHED);
+	NamedMDNode* inputsMD =  module->getNamedMetadata(IRConstant::KEY_ACTION_SCHED);
 	MDNode* actionSchedulerMD = cast<MDNode>(inputsMD->getOperand(0));
 	Function* schedulerFunction = NULL;
 	Function* initializeFunction = NULL;
@@ -212,7 +210,7 @@ ActionScheduler* IRParser::parseActionScheduler(Module* module){
 map<string, Variable*>* IRParser::parseParameters(Module* module){
 	map<string, Variable*>* parameters = new map<string, Variable*>();
 	
-	NamedMDNode* inputsMD =  symbolTable->lookup(IRConstant::KEY_PARAMETERS);
+	NamedMDNode* inputsMD =  module->getNamedMetadata(IRConstant::KEY_PARAMETERS);
 	if (inputsMD != NULL){
 		for (unsigned i = 0, e = inputsMD->getNumOperands(); i != e; ++i) {
 			
@@ -239,7 +237,7 @@ map<string, Variable*>* IRParser::parseParameters(Module* module){
 map<string, Variable*>*  IRParser::parseStateVars(Module* module){
 	map<string, Variable*>* stateVars = new map<string, Variable*>();
 
-	NamedMDNode* stateVarsMD =  symbolTable->lookup(IRConstant::KEY_STATE_VARS);
+	NamedMDNode* stateVarsMD =  module->getNamedMetadata(IRConstant::KEY_STATE_VARS);
 	
 	if (stateVarsMD == NULL) {
 		return stateVars;
@@ -271,7 +269,7 @@ Variable* IRParser::parseStateVar(MDNode* node){
 list<Action*>* IRParser::parseActions(string key, Module* module){
 	list<Action*>* actions = new list<Action*>();
 	
-	NamedMDNode* inputsMD =  symbolTable->lookup(key);
+	NamedMDNode* inputsMD =  module->getNamedMetadata(key);
 
 	if (inputsMD == NULL) {
 		return actions;

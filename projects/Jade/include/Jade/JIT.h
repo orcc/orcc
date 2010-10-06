@@ -50,6 +50,7 @@
 #include "llvm/ExecutionEngine/JIT.h"
 #include "llvm/System/Signals.h"
 #include "llvm/Transforms/Utils/Cloning.h"
+#include "llvm/Transforms/Utils/ValueMapper.h"
 
 class AbstractFifo;
 class Action;
@@ -265,11 +266,13 @@ public:
 
 	bool LinkProcedureBody(llvm::Function* function);
 
-	void LinkFunctionBody(llvm::Function *NewFunc, llvm::Function *OldFunc,
-                       llvm::DenseMap<const llvm::Value*, llvm::Value*> &ValueMap,
-                       llvm::SmallVectorImpl<llvm::ReturnInst*> &Returns, AbstractFifo* fifo,
+	void LinkFunctionBody(llvm::Function *NewFunc, const llvm::Function *OldFunc,
+		llvm::ValueMap<const llvm::Value*, llvm::Value*> &VMap,
+                       bool ModuleLevelChanges,
+					   llvm::SmallVectorImpl<llvm::ReturnInst*> &Returns,
+					   AbstractFifo* fifo,
                        const char *NameSuffix = "", 
-                      llvm::ClonedCodeInfo *CodeInfo = 0);
+					   llvm::ClonedCodeInfo *CodeInfo = 0);
 
 	
 	std::map<Port*, llvm::GlobalVariable*>* createPorts(Instance* instance, std::map<std::string, Port*>* ports);
@@ -302,7 +305,7 @@ private:
 
 	/** Help for linker */
 
-	llvm::DenseMap<const llvm::Value*, llvm::Value*> ValueMap;
+	llvm::ValueToValueMapTy ValueMap;
 	std::multimap<std::string, llvm::GlobalVariable *> AppendingVars;
 	
 	/** Help for opt */

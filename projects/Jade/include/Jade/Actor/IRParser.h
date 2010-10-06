@@ -290,9 +290,6 @@ private:
 	/** JIT used to load bitcode */
 	JIT* jit;
 
-	/** Symbol table of LLVM metadata */	
-	llvm::MDSymbolTable* symbolTable;
-
 private:
 
 	/** list of actions of the current actor */

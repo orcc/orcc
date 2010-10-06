@@ -89,27 +89,29 @@ bool JIT::LinkProcedureBody(Function* function){
 	
 		SmallVector<ReturnInst*, 8> Returns;  // Ignore returns cloned.
 
-		this->LinkFunctionBody(F, function, ValueMap, Returns, decoder->getFifo());
-		return true;
+		this->LinkFunctionBody(F, function, ValueMap, /*ModuleLevelChanges=*/true, Returns,  decoder->getFifo());
+
 	}
 
-	return false;
+	F->setLinkage(function->getLinkage());
+
+	return true;
 		
 }
 
-void JIT::LinkFunctionBody(Function *NewFunc, Function *OldFunc,
-                             DenseMap<const Value*, Value*> &ValueMap,
+ void JIT::LinkFunctionBody(Function *NewFunc, const Function *OldFunc,
+                             ValueToValueMapTy &VMap,
+                             bool ModuleLevelChanges,
                              SmallVectorImpl<ReturnInst*> &Returns, AbstractFifo* fifo,
                              const char *NameSuffix, ClonedCodeInfo *CodeInfo) {
-
-  // Clone any attributes. 
+   // Clone any attributes.
   if (NewFunc->arg_size() == OldFunc->arg_size())
     NewFunc->copyAttributesFrom(OldFunc);
   else {
-    // Some arguments were deleted with the ValueMap. Copy arguments one by one 
-    for (Function::arg_iterator I = OldFunc->arg_begin(), 
+    //Some arguments were deleted with the VMap. Copy arguments one by one
+    for (Function::const_arg_iterator I = OldFunc->arg_begin(), 
            E = OldFunc->arg_end(); I != E; ++I)
-      if (Argument* Anew = dyn_cast<Argument>(ValueMap[I]))
+      if (Argument* Anew = dyn_cast<Argument>(VMap[I]))
         Anew->addAttr( OldFunc->getAttributes()
                        .getParamAttributes(I->getArgNo() + 1));
     NewFunc->setAttributes(NewFunc->getAttributes()
@@ -120,49 +122,59 @@ void JIT::LinkFunctionBody(Function *NewFunc, Function *OldFunc,
                                      .getFnAttributes()));
 
   }
-
-  // Loop over all of the basic blocks in the function, cloning them as
+  
+    // Loop over all of the basic blocks in the function, cloning them as
   // appropriate.  Note that we save BE this way in order to handle cloning of
   // recursive functions into themselves.
   //
-  for (Function::iterator BI = OldFunc->begin(), BE = OldFunc->end();
+  for (Function::const_iterator BI = OldFunc->begin(), BE = OldFunc->end();
        BI != BE; ++BI) {
     const BasicBlock &BB = *BI;
 
     // Create a new basic block and copy instructions into it!
-    BasicBlock *CBB = CloneBasicBlock(&BB, ValueMap, NameSuffix, NewFunc,
+    BasicBlock *CBB = CloneBasicBlock(&BB, VMap, NameSuffix, NewFunc,
                                       CodeInfo);
-    ValueMap[&BB] = CBB;                       // Add basic block mapping.
+    VMap[&BB] = CBB;                       // Add basic block mapping.
 
     if (ReturnInst *RI = dyn_cast<ReturnInst>(CBB->getTerminator()))
       Returns.push_back(RI);
   }
-  
-  // Loop over all of the instructions in the function, fixing up operand
-  // references as we go.  This uses ValueMap to do all the hard work.
+
+   // Loop over all of the instructions in the function, fixing up operand
+  // references as we go.  This uses VMap to do all the hard work.
   //
-  for (Function::iterator BB = cast<BasicBlock>(ValueMap[OldFunc->begin()]),
+  for (Function::iterator BB = cast<BasicBlock>(VMap[OldFunc->begin()]),
          BE = NewFunc->end(); BB != BE; ++BB)
     // Loop over all instructions, fixing each one as we find it...
-	for (BasicBlock::iterator II = BB->begin(); II != BB->end(); ++II){
-	     for (Instruction::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
-			 Value *V;
-			 if (fifo->isFifoFunction((*op)->getName())){
-				 //If this function is a fifo function, this function already exist in the module
-				V = fifo->getFifoFunction((*op)->getName());
-			 } else if(fifo->isExternFunction((*op)->getName())){
-				 //Same for external function
-				V = fifo->getExternFunction((*op)->getName());
-			 } else {
-				V = MapValue(*op, ValueMap);
-				if (V == NULL){
-					int i = 0;
-				}
-			}
-			 
-			*op = V;
+	for (BasicBlock::iterator II = BB->begin(); II != BB->end(); ++II){ 
+	  // Remap operands.
+	  for (User::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
+		Value *V;
+		
+		if (fifo->isFifoFunction((*op)->getName())){
+			//If this function is a fifo function, this function already exist in the module
+			V = fifo->getFifoFunction((*op)->getName());
+		} else if(fifo->isExternFunction((*op)->getName())){
+			//Same for external function
+			V = fifo->getExternFunction((*op)->getName());
+		} else {
+			V= MapValue(*op, VMap, ModuleLevelChanges);
+			assert(V && "Referenced value not in value map!");
 		}
-	}
+		*op = V;
+	  }
+
+	  // Remap attached metadata.
+	  SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
+	  II->getAllMetadata(MDs);
+	  for (SmallVectorImpl<std::pair<unsigned, MDNode *> >::iterator
+		   MI = MDs.begin(), ME = MDs.end(); MI != ME; ++MI) {
+		Value *Old = MI->second;
+		Value *New = MapValue(Old, VMap, ModuleLevelChanges);
+		if (New != Old)
+		  II->setMetadata(MI->first, cast<MDNode>(New));
+	  }
+  }
 }
 
 bool JIT::LinkGlobalInits(llvm::GlobalVariable* variable){
@@ -174,11 +186,12 @@ bool JIT::LinkGlobalInits(llvm::GlobalVariable* variable){
     
 	if (variable->hasInitializer())
       GV->setInitializer(cast<Constant>(MapValue(variable->getInitializer(),
-                                                 ValueMap)));
+                                                 ValueMap,
+												 true)));
     GV->setLinkage(variable->getLinkage());
     GV->setThreadLocal(variable->isThreadLocal());
     GV->setConstant(variable->isConstant());
-      
+
 	return true;
 
   }
