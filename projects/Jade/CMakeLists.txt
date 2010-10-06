@@ -27,6 +27,7 @@ IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 						   ${LLVM_LIBRARY}/LLVMLinker.lib;
 						   ${LLVM_LIBRARY}/LLVMBitWriter.lib;
 						   ${LLVM_LIBRARY}/LLVMArchive.lib;
+						   ${LLVM_LIBRARY}/LLVMAsmParser.lib;
 						   ${LLVM_LIBRARY}/LLVMBitReader.lib;
 						   ${LLVM_LIBRARY}/LLVMExecutionEngine.lib;
 						   ${LLVM_LIBRARY}/LLVMSelectionDAG.lib;
