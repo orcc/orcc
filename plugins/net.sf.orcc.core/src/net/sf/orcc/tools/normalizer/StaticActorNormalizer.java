@@ -211,7 +211,7 @@ public class StaticActorNormalizer {
 
 			StateVariable varCount = new StateVariable(new Location(),
 					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
-							+ "_count", true, 0);
+							+ "_count", true, new IntExpr(0));
 			stateVars.put(actor.getFile(), varCount.getLocation(),
 					varCount.getName(), varCount);
 

@@ -120,7 +120,12 @@ public class ExpressionPrinter implements ExpressionVisitor {
 
 	@Override
 	public void visit(IntExpr expr, Object... args) {
-		builder.append(expr.getValue());
+		builder.append(expr.toString());
+	}
+
+	@Override
+	public void visit(FloatExpr expr, Object... args) {
+		builder.append(expr.toString());
 	}
 
 	@Override

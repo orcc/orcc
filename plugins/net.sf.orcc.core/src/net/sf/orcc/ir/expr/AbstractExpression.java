@@ -28,9 +28,7 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.ir.AbstractLocalizable;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
 
 /**
  * This interface defines an expression.
@@ -38,18 +36,7 @@ import net.sf.orcc.ir.Location;
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractExpression extends AbstractLocalizable implements
-		Expression {
-
-	/**
-	 * Creates an abstract expression with the given location.
-	 * 
-	 * @param location
-	 *            the location of this abstract expression
-	 */
-	public AbstractExpression(Location location) {
-		super(location);
-	}
+public abstract class AbstractExpression implements Expression {
 
 	@Override
 	public abstract Object accept(ExpressionInterpreter interpreter,
@@ -65,6 +52,11 @@ public abstract class AbstractExpression extends AbstractLocalizable implements
 
 	@Override
 	public boolean isBooleanExpr() {
+		return false;
+	}
+
+	@Override
+	public boolean isFloatExpr() {
 		return false;
 	}
 

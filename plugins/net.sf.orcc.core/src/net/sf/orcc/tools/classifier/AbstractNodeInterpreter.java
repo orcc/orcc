@@ -35,7 +35,6 @@ import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IntegerNumber;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.HasTokens;

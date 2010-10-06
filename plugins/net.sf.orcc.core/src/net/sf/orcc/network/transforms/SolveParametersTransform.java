@@ -36,12 +36,8 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BoolExpr;
-import net.sf.orcc.ir.expr.ExpressionInterpreter;
-import net.sf.orcc.ir.expr.IntExpr;
-import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.network.Instance;
@@ -57,8 +53,8 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class SolveParametersTransform implements ExpressionInterpreter,
-		INetworkTransformation {
+public class SolveParametersTransform extends AbstractExpressionInterpreter
+		implements INetworkTransformation {
 
 	private Network network;
 
@@ -67,26 +63,6 @@ public class SolveParametersTransform implements ExpressionInterpreter,
 		Expression e1 = (Expression) expr.getE1().accept(this);
 		Expression e2 = (Expression) expr.getE2().accept(this);
 		return new BinaryExpr(e1, expr.getOp(), e2, expr.getType());
-	}
-
-	@Override
-	public Object interpret(BoolExpr expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(IntExpr expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(ListExpr expr, Object... args) {
-		return expr;
-	}
-
-	@Override
-	public Object interpret(StringExpr expr, Object... args) {
-		return expr;
 	}
 
 	@Override

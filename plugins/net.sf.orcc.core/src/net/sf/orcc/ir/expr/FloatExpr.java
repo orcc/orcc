@@ -28,41 +28,34 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.ir.Expression;
+import java.math.BigDecimal;
+
+import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
 /**
- * This class defines a binary expression.
+ * This class defines an integer expression.
  * 
  * @author Matthieu Wipliez
  * @author Jérôme Gorin
  * 
  */
-public class BinaryExpr extends AbstractExpression {
+public class FloatExpr extends AbstractExpression {
+
+	private BigDecimal value;
+
+	private FloatExpr(BigDecimal value) {
+		this.value = value;
+	}
 
 	/**
-	 * Constant indicating left branch of a binary expression.
+	 * Creates a new integer expression.
+	 * 
+	 * @param value
+	 *            an integer value.
 	 */
-	public static final Object LEFT = new Object();
-
-	/**
-	 * Constant indicating right branch of a binary expression.
-	 */
-	public static final Object RIGHT = new Object();
-
-	private Expression e1;
-
-	private Expression e2;
-
-	private BinaryOp op;
-
-	private Type type;
-
-	public BinaryExpr(Expression e1, BinaryOp op, Expression e2, Type type) {
-		this.e1 = e1;
-		this.e2 = e2;
-		this.op = op;
-		this.type = type;
+	public FloatExpr(float value) {
+		this.value = BigDecimal.valueOf(value);
 	}
 
 	@Override
@@ -75,57 +68,61 @@ public class BinaryExpr extends AbstractExpression {
 		visitor.visit(this, args);
 	}
 
-	/**
-	 * Returns the first operand of this binary expression as an expression.
-	 * 
-	 * @return the first operand of this binary expression
-	 */
-	public Expression getE1() {
-		return e1;
+	public FloatExpr add(FloatExpr expr) {
+		return new FloatExpr(value.add(expr.value));
 	}
 
-	/**
-	 * Returns the second operand of this binary expression as an expression.
-	 * 
-	 * @return the second operand of this binary expression
-	 */
-	public Expression getE2() {
-		return e2;
+	public int compareTo(FloatExpr expr) {
+		return value.compareTo(expr.value);
 	}
 
-	/**
-	 * Returns the operator of this binary expression.
-	 * 
-	 * @return the operator of this binary expression
-	 */
-	public BinaryOp getOp() {
-		return op;
+	public FloatExpr divide(FloatExpr expr) {
+		return new FloatExpr(value.divide(expr.value));
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof FloatExpr) {
+			return value.equals(((FloatExpr) obj).value);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public Type getType() {
-		return type;
+		return IrFactory.eINSTANCE.createTypeFloat();
+	}
+
+	/**
+	 * Returns the value of this integer expression.
+	 * 
+	 * @return the value of this integer expression
+	 */
+	public float getValue() {
+		return value.floatValue();
 	}
 
 	@Override
-	public boolean isBinaryExpr() {
+	public boolean isIntExpr() {
 		return true;
 	}
 
-	public void setE1(Expression e1) {
-		this.e1 = e1;
+	public FloatExpr multiply(FloatExpr expr) {
+		return new FloatExpr(value.multiply(expr.value));
 	}
 
-	public void setE2(Expression e2) {
-		this.e2 = e2;
+	public void setValue(float value) {
+		this.value = BigDecimal.valueOf(value);
 	}
 
-	public void setOp(BinaryOp op) {
-		this.op = op;
+	public FloatExpr subtract(FloatExpr expr) {
+		return new FloatExpr(value.subtract(expr.value));
 	}
 
-	public void setType(Type type) {
-		this.type = type;
+	@Override
+	public String toString() {
+		return value.toString();
 	}
 
 }

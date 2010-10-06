@@ -36,7 +36,6 @@ import java.util.Map;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
@@ -212,8 +211,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 				// Local variable must not be a parameter of the procedure
 				if (source.getIndex() == 0
 						&& !parameters.contains(source.getName())) {
-					values.set(values.indexOf(value), new IntExpr(
-							new Location(), 0));
+					values.set(values.indexOf(value), new IntExpr(0));
 				}
 			}
 		}

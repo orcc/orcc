@@ -125,16 +125,14 @@ public class AstTransformer {
 			Expression e1 = doSwitch(expression.getLeft());
 			Expression e2 = doSwitch(expression.getRight());
 
-			return new BinaryExpr(Util.getLocation(expression), e1, op, e2,
-					expression.getIrType());
+			return new BinaryExpr(e1, op, e2, expression.getIrType());
 		}
 
 		@Override
 		public Expression caseAstExpressionBoolean(
 				AstExpressionBoolean expression) {
-			Location location = Util.getLocation(expression);
 			boolean value = expression.isValue();
-			return new BoolExpr(location, value);
+			return new BoolExpr(value);
 		}
 
 		@Override
@@ -166,7 +164,7 @@ public class AstTransformer {
 
 			// return local variable
 			Use use = new Use(target);
-			Expression varExpr = new VarExpr(location, use);
+			Expression varExpr = new VarExpr(use);
 			return varExpr;
 		}
 
@@ -209,7 +207,7 @@ public class AstTransformer {
 			context.getProcedure().getNodes().add(node);
 
 			Use use = new Use(target);
-			Expression varExpr = new VarExpr(location, use);
+			Expression varExpr = new VarExpr(use);
 
 			// restores target and indexes
 			target = currentTarget;
@@ -238,16 +236,15 @@ public class AstTransformer {
 			addInstruction(load);
 
 			Use use = new Use(target);
-			Expression varExpr = new VarExpr(location, use);
+			Expression varExpr = new VarExpr(use);
 			return varExpr;
 		}
 
 		@Override
 		public Expression caseAstExpressionInteger(
 				AstExpressionInteger expression) {
-			Location location = Util.getLocation(expression);
 			long value = expression.getValue();
-			return new IntExpr(location, value);
+			return new IntExpr(value);
 		}
 
 		@Override
@@ -284,23 +281,21 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
-			Location location = Util.getLocation(expression);
 			UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
 			Expression expr = doSwitch(expression.getExpression());
 
 			if (UnaryOp.NUM_ELTS == op) {
 				TypeList typeList = (TypeList) expr.getType();
-				return new IntExpr(location, typeList.getSize());
+				return new IntExpr(typeList.getSize());
 			}
 
-			return new UnaryExpr(location, op, expr, expression.getIrType());
+			return new UnaryExpr(op, expr, expression.getIrType());
 		}
 
 		@Override
 		public Expression caseAstExpressionVariable(
 				AstExpressionVariable expression) {
 			AstVariable astVariable = expression.getValue().getVariable();
-			Location location = Util.getLocation(expression);
 
 			Variable variable = context.getVariable(astVariable);
 			if (variable == null
@@ -310,12 +305,12 @@ public class AstTransformer {
 
 			if (variable.getType().isList()) {
 				Use use = new Use(variable);
-				Expression varExpr = new VarExpr(location, use);
+				Expression varExpr = new VarExpr(use);
 				return varExpr;
 			} else {
 				LocalVariable local = getLocalVariable(variable, false);
 				Use use = new Use(local);
-				Expression varExpr = new VarExpr(location, use);
+				Expression varExpr = new VarExpr(use);
 				return varExpr;
 			}
 		}
@@ -454,13 +449,11 @@ public class AstTransformer {
 		 * @return an IR expression
 		 */
 		private Expression transformBuiltinFunction(AstExpressionCall astCall) {
-			Location location = Util.getLocation(astCall);
 			String name = astCall.getFunction().getName();
 			if ("bitnot".equals(name)) {
 				Expression expr = transformExpression(astCall.getParameters()
 						.get(0));
-				return new UnaryExpr(location, UnaryOp.BITNOT, expr,
-						expr.getType());
+				return new UnaryExpr(UnaryOp.BITNOT, expr, expr.getType());
 			}
 
 			BinaryOp op = BinaryOp.getOperator(name);
@@ -470,7 +463,7 @@ public class AstTransformer {
 
 			Expression e1 = transformExpression(astCall.getParameters().get(0));
 			Expression e2 = transformExpression(astCall.getParameters().get(1));
-			return new BinaryExpr(location, e1, op, e2, astCall.getIrType());
+			return new BinaryExpr(e1, op, e2, astCall.getIrType());
 		}
 
 		/**
@@ -541,8 +534,8 @@ public class AstTransformer {
 				// condition
 				AstExpression astHigher = generator.getHigher();
 				Expression higher = transformExpression(astHigher);
-				Expression condition = new BinaryExpr(higher.getLocation(),
-						new VarExpr(new Use(loopVar)), BinaryOp.LE, higher,
+				Expression condition = new BinaryExpr(new VarExpr(new Use(
+						loopVar)), BinaryOp.LE, higher,
 						IrFactory.eINSTANCE.createTypeBool());
 
 				// add increment to body
@@ -727,7 +720,7 @@ public class AstTransformer {
 			// condition
 			AstExpression astHigher = foreach.getHigher();
 			Expression higher = transformExpression(astHigher);
-			Expression condition = new BinaryExpr(higher.getLocation(),
+			Expression condition = new BinaryExpr(
 					new VarExpr(new Use(loopVar)), BinaryOp.LE, higher,
 					IrFactory.eINSTANCE.createTypeBool());
 
@@ -1240,7 +1233,7 @@ public class AstTransformer {
 		boolean assignable = !astVariable.isConstant();
 
 		// initial value (if any) has been computed by validator
-		Object initialValue = astVariable.getInitialValue();
+		Expression initialValue = (Expression) astVariable.getInitialValue();
 
 		// this is true when the variable is initialized by a generator
 		boolean mustInitialize = false;

@@ -37,7 +37,7 @@ package net.sf.orcc.ir;
  */
 public class StateVariable extends Variable {
 
-	private Object initialValue;
+	private Expression initialValue;
 
 	/**
 	 * Creates a new state variable with the given location, type, name and
@@ -71,7 +71,7 @@ public class StateVariable extends Variable {
 	 *            initial value
 	 */
 	public StateVariable(Location location, Type type, String name,
-			boolean assignable, Object initialValue) {
+			boolean assignable, Expression initialValue) {
 		super(location, type, name, true, assignable);
 		this.initialValue = initialValue;
 	}
@@ -84,7 +84,7 @@ public class StateVariable extends Variable {
 	 * @return an object, or <code>null</code> if this variable has no constant
 	 *         value
 	 */
-	public Object getConstantValue() {
+	public Expression getConstantValue() {
 		return initialValue;
 	}
 
@@ -105,7 +105,7 @@ public class StateVariable extends Variable {
 	 *            an object, or <code>null</code> if this variable has no
 	 *            constant value
 	 */
-	public void setConstantValue(Object initialValue) {
+	public void setConstantValue(Expression initialValue) {
 		this.initialValue = initialValue;
 	}
 

@@ -29,6 +29,7 @@
 package net.sf.orcc.tools.classifier;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.ListExpr;
@@ -46,14 +47,14 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 
 	@Override
 	public Object interpret(BinaryExpr expr, Object... args) {
-		Object val1 = expr.getE1().accept(this);
-		Object val2 = expr.getE2().accept(this);
+		Expression val1 = (Expression) expr.getE1().accept(this);
+		Expression val2 = (Expression) expr.getE2().accept(this);
 
 		if (!schedulableMode && (val1 == null || val2 == null)) {
 			return null;
 		}
 
-		return super.interpretBinaryExpr(expr, val1, val2);
+		return super.interpretBinaryExpr(val1, expr.getOp(), val2);
 	}
 
 	@Override
@@ -63,7 +64,7 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 
 	@Override
 	public Object interpret(UnaryExpr expr, Object... args) {
-		Object value = expr.getExpr().accept(this);
+		Expression value = (Expression) expr.getExpr().accept(this);
 
 		if (!schedulableMode && value == null) {
 			return null;

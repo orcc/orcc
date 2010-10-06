@@ -38,6 +38,8 @@ public interface IRConstants {
 
 	public static final String EXPR_BINARY = "2 op";
 
+	public static final String EXPR_LIST = "list";
+
 	public static final String EXPR_UNARY = "1 op";
 
 	public static final String EXPR_VAR = "var";

@@ -35,7 +35,6 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -76,35 +75,33 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object interpret(BoolExpr expr, Object... args) {
-			Location location = expr.getLocation();
 			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			LocalVariable var = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "litteral_integer");
-			Assign assign = new Assign(location, var, expr);
+			Assign assign = new Assign(var, expr);
 
 			// Add assignment to instruction's list
 			it.previous();
 			it.add(assign);
 			it.next();
-			return new VarExpr(location, new Use(var));
+			return new VarExpr(new Use(var));
 		}
 
 		@SuppressWarnings("unchecked")
 		@Override
 		public Object interpret(IntExpr expr, Object... args) {
-			Location location = expr.getLocation();
 			Type type = expr.getType();
 			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
 			LocalVariable var = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "litteral_integer");
-			Assign assign = new Assign(location, var, expr);
+			Assign assign = new Assign(var, expr);
 
 			// Add assignment to instruction's list
 			it.previous();
 			it.add(assign);
 			it.next();
-			return new VarExpr(location, new Use(var));
+			return new VarExpr(new Use(var));
 		}
 
 		@Override

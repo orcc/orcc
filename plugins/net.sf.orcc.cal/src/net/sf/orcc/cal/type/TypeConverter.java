@@ -41,7 +41,6 @@ import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeUint;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -110,10 +109,7 @@ public class TypeConverter extends CalSwitch<Type> {
 					.evaluateAsInteger(astSize);
 		}
 
-		TypeUint uintType = IrFactory.eINSTANCE.createTypeUint();
-		uintType.setSize(size);
-
-		return uintType;
+		return IrFactory.eINSTANCE.createTypeUint(size);
 	}
 
 	@Override

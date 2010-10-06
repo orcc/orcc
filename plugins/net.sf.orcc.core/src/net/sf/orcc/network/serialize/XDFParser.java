@@ -54,6 +54,7 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.expr.FloatExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -217,15 +218,14 @@ public class XDFParser {
 					} else if (kind.equals("List")) {
 						List<Expression> exprs = parseExprs(node
 								.getFirstChild());
-						expr = new ListExpr(new Location(), exprs);
+						expr = new ListExpr(exprs);
 						break;
 					} else if (kind.equals("UnaryOp")) {
 						ParseContinuation<UnaryOp> cont = parseExprUnaryOp(node
 								.getFirstChild());
 						UnaryOp op = cont.getResult();
 						Expression unaryExpr = parseExpr(cont.getNode());
-						expr = new UnaryExpr(new Location(), op, unaryExpr,
-								null);
+						expr = new UnaryExpr(op, unaryExpr, null);
 						break;
 					} else if (kind.equals("Var")) {
 						String name = elt.getAttribute("name");
@@ -233,7 +233,7 @@ public class XDFParser {
 						// found in parameters scope
 						Variable variable = network.getVariables().get(name);
 						Use use = new Use(variable);
-						expr = new VarExpr(new Location(), use);
+						expr = new VarExpr(use);
 						break;
 					} else {
 						throw new OrccException("Unsupported Expr kind: \""
@@ -265,11 +265,11 @@ public class XDFParser {
 			} else if (kind.equals("Character")) {
 				throw new OrccException("Characters not supported yet");
 			} else if (kind.equals("Integer")) {
-				return new IntExpr(Integer.parseInt(value));
+				return new IntExpr(Long.parseLong(value));
 			} else if (kind.equals("Real")) {
-				throw new OrccException("Reals not supported yet");
+				return new FloatExpr(Float.parseFloat(value));
 			} else if (kind.equals("String")) {
-				return new StringExpr(new Location(), value);
+				return new StringExpr(value);
 			} else {
 				throw new OrccException("Unsupported Expr "
 						+ "literal kind: \"" + kind + "\"");

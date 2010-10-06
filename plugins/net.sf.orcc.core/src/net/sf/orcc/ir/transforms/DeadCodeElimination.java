@@ -71,7 +71,7 @@ public class DeadCodeElimination extends AbstractActorTransformation {
 		ListIterator<Instruction> it = joinNode.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
-			if (instruction instanceof PhiAssignment) {
+			if (instruction.isPhi()) {
 				PhiAssignment phi = (PhiAssignment) instruction;
 
 				LocalVariable target = phi.getTarget();

@@ -29,14 +29,13 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 
 /**
  * This class defines a unary expression.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class UnaryExpr extends AbstractExpression {
@@ -47,15 +46,10 @@ public class UnaryExpr extends AbstractExpression {
 
 	private Type type;
 
-	public UnaryExpr(Location location, UnaryOp op, Expression expr, Type type) {
-		super(location);
+	public UnaryExpr(UnaryOp op, Expression expr, Type type) {
 		this.expr = expr;
 		this.op = op;
 		this.type = type;
-	}
-
-	public UnaryExpr(UnaryOp op, Expression expr, Type type) {
-		this(new Location(), op, expr, type);
 	}
 
 	@Override

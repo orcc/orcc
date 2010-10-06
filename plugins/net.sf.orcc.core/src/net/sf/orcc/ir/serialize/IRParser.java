@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.serialize;
 
 import static net.sf.orcc.ir.serialize.IRConstants.EXPR_BINARY;
+import static net.sf.orcc.ir.serialize.IRConstants.EXPR_LIST;
 import static net.sf.orcc.ir.serialize.IRConstants.EXPR_UNARY;
 import static net.sf.orcc.ir.serialize.IRConstants.EXPR_VAR;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_ASSIGN;
@@ -74,7 +75,6 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IntegerNumber;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
@@ -95,7 +95,9 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.FloatExpr;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
@@ -341,106 +343,75 @@ public class IRParser {
 		}
 	}
 
-	/**
-	 * Parses the given object as a constant.
-	 * 
-	 * @param obj
-	 *            a {@link Boolean}, an {@link Integer}, a {@link List} or a
-	 *            {@link String}
-	 * @return a constant created from the given object
-	 * @throws OrccException
-	 *             if a semantic error occurs
-	 */
-	private Object parseConstant(JsonElement element) throws OrccException {
+	private Expression parseExpr(JsonElement element) throws OrccException {
 		if (element.isJsonPrimitive()) {
 			JsonPrimitive primitive = element.getAsJsonPrimitive();
 			if (primitive.isBoolean()) {
-				return primitive.getAsBoolean();
+				return new BoolExpr(primitive.getAsBoolean());
 			} else if (primitive.isNumber()) {
 				Number number = primitive.getAsNumber();
 				if (number instanceof BigInteger) {
-					return new IntegerNumber(((BigInteger) number).longValue());
+					return new IntExpr(primitive.getAsBigInteger());
+				} else if (number instanceof BigDecimal) {
+					return new FloatExpr(primitive.getAsFloat());
 				}
 			} else if (primitive.isString()) {
-				return primitive.getAsString();
+				return new StringExpr(element.getAsString());
 			}
 		} else if (element.isJsonArray()) {
 			JsonArray array = element.getAsJsonArray();
-			List<Object> cstList = new ArrayList<Object>(array.size());
-			for (JsonElement subElement : array) {
-				cstList.add(parseConstant(subElement));
-			}
-			return cstList;
-		}
-
-		throw new OrccException("Unknown constant: " + element);
-	}
-
-	private Expression parseExpr(JsonArray array) throws OrccException {
-		Location location = parseLocation(array.get(0).getAsJsonArray());
-		JsonElement element = array.get(1);
-
-		if (element.isJsonPrimitive()) {
-			JsonPrimitive primitive = element.getAsJsonPrimitive();
-			if (primitive.isBoolean()) {
-				return new BoolExpr(location, primitive.getAsBoolean());
-			} else if (primitive.isNumber()) {
-				Number number = primitive.getAsNumber();
-				if (number instanceof BigInteger) {
-					return new IntExpr(location,
-							((BigInteger) number).longValue());
-				} else if (number instanceof BigDecimal) {
-					throw new OrccException(
-							"float expressions not implemented yet");
-				}
-			} else if (primitive.isString()) {
-				return new StringExpr(location, element.getAsString());
-			}
-		} else if (element.isJsonArray()) {
-			array = element.getAsJsonArray();
 			String name = array.get(0).getAsString();
 			if (name.equals(EXPR_VAR)) {
 				Use var = parseVarUse(array.get(1).getAsJsonArray());
-				return new VarExpr(location, var);
+				return new VarExpr(var);
 			} else if (name.equals(EXPR_UNARY)) {
-				return parseExprUnary(location, array.get(1).getAsJsonArray());
+				return parseExprUnary(array);
 			} else if (name.equals(EXPR_BINARY)) {
-				return parseExprBinary(location, array.get(1).getAsJsonArray());
+				return parseExprBinary(array);
+			} else if (name.equals(EXPR_LIST)) {
+				return parseExprList(array);
 			} else {
 				throw new OrccException("Invalid expression kind: " + name);
 			}
 		}
 
-		throw new OrccException("Invalid expression: " + array);
+		throw new OrccException("Invalid expression: " + element);
 	}
 
-	private BinaryExpr parseExprBinary(Location location, JsonArray array)
-			throws OrccException {
-		String name = array.get(0).getAsString();
-		Expression e1 = parseExpr(array.get(1).getAsJsonArray());
-		Expression e2 = parseExpr(array.get(2).getAsJsonArray());
-		Type type = parseType(array.get(3));
+	private BinaryExpr parseExprBinary(JsonArray array) throws OrccException {
+		String name = array.get(1).getAsString();
+		Expression e1 = parseExpr(array.get(2));
+		Expression e2 = parseExpr(array.get(3));
+		Type type = parseType(array.get(4));
 		BinaryOp op = BinaryOp.getOperator(name);
-		return new BinaryExpr(location, e1, op, e2, type);
+		return new BinaryExpr(e1, op, e2, type);
+	}
+
+	private ListExpr parseExprList(JsonArray array) throws OrccException {
+		int size = array.size();
+		List<Expression> exprs = new ArrayList<Expression>(size - 1);
+		for (int i = 1; i < size; i++) {
+			exprs.add(parseExpr(array.get(i)));
+		}
+		return new ListExpr(exprs);
 	}
 
 	private List<Expression> parseExprs(JsonArray array) throws OrccException {
 		int length = array.size();
 		List<Expression> exprs = new ArrayList<Expression>(length);
 		for (JsonElement element : array) {
-			exprs.add(parseExpr(element.getAsJsonArray()));
+			exprs.add(parseExpr(element));
 		}
 
 		return exprs;
 	}
 
-	private UnaryExpr parseExprUnary(Location location, JsonArray array)
-			throws OrccException {
-		String name = array.get(0).getAsString();
-		Expression expr = parseExpr(array.get(1).getAsJsonArray());
-		Type type = parseType(array.get(2));
+	private UnaryExpr parseExprUnary(JsonArray array) throws OrccException {
+		String name = array.get(1).getAsString();
+		Expression expr = parseExpr(array.get(2));
+		Type type = parseType(array.get(3));
 		UnaryOp op = UnaryOp.getOperator(name);
-		return new UnaryExpr(location, op, expr, type);
+		return new UnaryExpr(op, expr, type);
 	}
 
 	private FSM parseFSM(JsonArray array) throws OrccException {
@@ -484,7 +455,7 @@ public class IRParser {
 	private Assign parseInstrAssign(Location loc, JsonArray array)
 			throws OrccException {
 		Variable var = getVariable(array.get(2).getAsJsonArray());
-		Expression value = parseExpr(array.get(3).getAsJsonArray());
+		Expression value = parseExpr(array.get(3));
 		LocalVariable local = (LocalVariable) var;
 		Assign assign = new Assign(loc, local, value);
 		local.setInstruction(assign);
@@ -645,8 +616,8 @@ public class IRParser {
 	private Return parseInstrReturn(Location loc, JsonArray array)
 			throws OrccException {
 		Expression expr = null;
-		if (array.get(2).isJsonArray()) {
-			expr = parseExpr(array.get(2).getAsJsonArray());
+		if (!array.get(2).isJsonNull()) {
+			expr = parseExpr(array.get(2));
 		}
 		return new Return(loc, expr);
 	}
@@ -665,7 +636,7 @@ public class IRParser {
 			throws OrccException {
 		Variable target = getVariable(array.get(2).getAsJsonArray());
 		List<Expression> indexes = parseExprs(array.get(3).getAsJsonArray());
-		Expression value = parseExpr(array.get(4).getAsJsonArray());
+		Expression value = parseExpr(array.get(4));
 
 		return new Store(loc, target, indexes, value);
 	}
@@ -806,7 +777,7 @@ public class IRParser {
 	 */
 	private IfNode parseNodeIf(Location loc, JsonArray array)
 			throws OrccException {
-		Expression condition = parseExpr(array.get(2).getAsJsonArray());
+		Expression condition = parseExpr(array.get(2));
 		List<CFGNode> thenNodes = parseNodes(array.get(3).getAsJsonArray());
 		List<CFGNode> elseNodes = parseNodes(array.get(4).getAsJsonArray());
 		BlockNode joinNode = (BlockNode) parseNode(array.get(5)
@@ -846,7 +817,7 @@ public class IRParser {
 	 */
 	private WhileNode parseNodeWhile(Location loc, JsonArray array)
 			throws OrccException {
-		Expression condition = parseExpr(array.get(2).getAsJsonArray());
+		Expression condition = parseExpr(array.get(2));
 		List<CFGNode> nodes = parseNodes(array.get(3).getAsJsonArray());
 		BlockNode joinNode = (BlockNode) parseNode(array.get(4)
 				.getAsJsonArray());
@@ -970,9 +941,9 @@ public class IRParser {
 					.getAsJsonArray());
 			Type type = parseType(varDefArray.get(2));
 
-			Object init = null;
+			Expression init = null;
 			if (!stateArray.get(1).isJsonNull()) {
-				init = parseConstant(stateArray.get(1));
+				init = parseExpr(stateArray.get(1));
 			}
 
 			StateVariable stateVar = new StateVariable(location, type, name,

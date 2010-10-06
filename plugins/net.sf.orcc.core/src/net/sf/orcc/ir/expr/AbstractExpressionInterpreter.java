@@ -52,6 +52,11 @@ public abstract class AbstractExpressionInterpreter implements
 	}
 
 	@Override
+	public Object interpret(FloatExpr expr, Object... args) {
+		return expr;
+	}
+
+	@Override
 	public Object interpret(IntExpr expr, Object... args) {
 		return expr;
 	}

@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ir.expr;
 
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 
@@ -37,20 +36,15 @@ import net.sf.orcc.ir.Use;
  * referenced by an instance of the {@link Use} class.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class VarExpr extends AbstractExpression {
 
 	private Use use;
 
-	public VarExpr(Location location, Use use) {
-		super(location);
-		this.use = use;
-	}
-
 	public VarExpr(Use use) {
-		this(new Location(), use);
+		this.use = use;
 	}
 
 	@Override

@@ -51,9 +51,16 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.frontend.Util;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
+import net.sf.orcc.ir.expr.FloatExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.util.StringUtil;
 
@@ -65,7 +72,7 @@ import org.eclipse.emf.ecore.EObject;
  * @author Matthieu Wipliez
  * 
  */
-public class AstExpressionEvaluator extends CalSwitch<Object> {
+public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 	private CalJavaValidator validator;
 
@@ -77,175 +84,23 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	@Override
-	public Object caseAstExpressionBinary(AstExpressionBinary expression) {
+	public Expression caseAstExpressionBinary(AstExpressionBinary expression) {
 		BinaryOp op = BinaryOp.getOperator(expression.getOperator());
-		Object val1 = evaluate(expression.getLeft());
-		Object val2 = evaluate(expression.getRight());
-
-		switch (op) {
-		case BITAND:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 & i2;
-			}
-			break;
-		case BITOR:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 | i2;
-			}
-			break;
-		case BITXOR:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 ^ i2;
-			}
-			break;
-		case DIV:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 / i2;
-			}
-			break;
-		case DIV_INT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 / i2;
-			}
-			break;
-		case EQ:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 == i2;
-			} else if (val1 instanceof Boolean && val2 instanceof Boolean) {
-				boolean b1 = (Boolean) val1;
-				boolean b2 = (Boolean) val2;
-				return b1 == b2;
-			}
-			break;
-		case EXP:
-			break;
-		case GE:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 >= i2;
-			}
-			break;
-		case GT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 > i2;
-			}
-			break;
-		case LOGIC_AND:
-			if (val1 instanceof Boolean && val2 instanceof Boolean) {
-				boolean b1 = (Boolean) val1;
-				boolean b2 = (Boolean) val2;
-				return b1 && b2;
-			}
-			break;
-		case LE:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 <= i2;
-			}
-			break;
-		case LOGIC_OR:
-			if (val1 instanceof Boolean && val2 instanceof Boolean) {
-				boolean b1 = (Boolean) val1;
-				boolean b2 = (Boolean) val2;
-				return b1 || b2;
-			}
-			break;
-		case LT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 < i2;
-			}
-			break;
-		case MINUS:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 - i2;
-			}
-			break;
-		case MOD:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 % i2;
-			}
-			break;
-		case NE:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 != i2;
-			}
-			break;
-		case PLUS:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 + i2;
-			}
-
-			if (val1 instanceof List<?> && val2 instanceof List<?>) {
-				List<?> l1 = (List<?>) val1;
-				List<?> l2 = (List<?>) val2;
-				List<Object> list = new ArrayList<Object>(l1.size() + l2.size());
-				list.addAll(l1);
-				list.addAll(l2);
-				return list;
-			}
-			break;
-		case SHIFT_LEFT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 << i2;
-			}
-			break;
-		case SHIFT_RIGHT:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 >> i2;
-			}
-			break;
-		case TIMES:
-			if (val1 instanceof Long && val2 instanceof Long) {
-				long i1 = (Long) val1;
-				long i2 = (Long) val2;
-				return i1 * i2;
-			}
-			break;
-		}
-
-		return null;
+		Expression val1 = evaluate(expression.getLeft());
+		Expression val2 = evaluate(expression.getRight());
+		return new ExpressionEvaluator().interpretBinaryExpr(val1, op, val2);
 	}
 
 	@Override
-	public Object caseAstExpressionBoolean(AstExpressionBoolean expression) {
-		return expression.isValue();
+	public Expression caseAstExpressionBoolean(AstExpressionBoolean expression) {
+		return new BoolExpr(expression.isValue());
 	}
 
 	@Override
-	public Object caseAstExpressionCall(AstExpressionCall expression) {
+	public Expression caseAstExpressionCall(AstExpressionCall expression) {
 		String name = expression.getFunction().getName();
 		List<AstExpression> parameters = expression.getParameters();
-		List<Object> values = new ArrayList<Object>(parameters.size());
+		List<Expression> values = new ArrayList<Expression>(parameters.size());
 		for (AstExpression parameter : parameters) {
 			values.add(evaluate(parameter));
 		}
@@ -253,10 +108,10 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		if (expression.getFunction().eContainer() == null) {
 			if ("bitnot".equals(name)) {
 				if (values.size() == 1) {
-					Object obj = values.get(0);
-					if (obj instanceof Long) {
-						long value = (Long) obj;
-						return ~value;
+					Expression expr = values.get(0);
+					if (expr != null && expr.isIntExpr()) {
+						IntExpr value = (IntExpr) expr;
+						return value.not();
 					}
 				}
 
@@ -273,10 +128,13 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			switch (op) {
 			case BITAND:
 				if (values.size() == 2) {
-					Object obj1 = values.get(0);
-					Object obj2 = values.get(1);
-					if (obj1 instanceof Long && obj2 instanceof Long) {
-						return (Long) obj1 & (Long) obj2;
+					Expression val1 = values.get(0);
+					Expression val2 = values.get(1);
+					if (val1 != null && val1.isIntExpr() && val2 != null
+							&& val2.isIntExpr()) {
+						IntExpr i1 = (IntExpr) val1;
+						IntExpr i2 = (IntExpr) val2;
+						return i1.and(i2);
 					}
 				}
 
@@ -285,10 +143,13 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return null;
 			case BITOR:
 				if (values.size() == 2) {
-					Object obj1 = values.get(0);
-					Object obj2 = values.get(1);
-					if (obj1 instanceof Long && obj2 instanceof Long) {
-						return (Long) obj1 | (Long) obj2;
+					Expression val1 = values.get(0);
+					Expression val2 = values.get(1);
+					if (val1 != null && val1.isIntExpr() && val2 != null
+							&& val2.isIntExpr()) {
+						IntExpr i1 = (IntExpr) val1;
+						IntExpr i2 = (IntExpr) val2;
+						return i1.or(i2);
 					}
 				}
 
@@ -297,10 +158,13 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return null;
 			case BITXOR:
 				if (values.size() == 2) {
-					Object obj1 = values.get(0);
-					Object obj2 = values.get(1);
-					if (obj1 instanceof Long && obj2 instanceof Long) {
-						return (Long) obj1 ^ (Long) obj2;
+					Expression val1 = values.get(0);
+					Expression val2 = values.get(1);
+					if (val1 != null && val1.isIntExpr() && val2 != null
+							&& val2.isIntExpr()) {
+						IntExpr i1 = (IntExpr) val1;
+						IntExpr i2 = (IntExpr) val2;
+						return i1.xor(i2);
 					}
 				}
 
@@ -309,10 +173,13 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return null;
 			case SHIFT_LEFT:
 				if (values.size() == 2) {
-					Object obj1 = values.get(0);
-					Object obj2 = values.get(1);
-					if (obj1 instanceof Long && obj2 instanceof Long) {
-						return (Long) obj1 << (Long) obj2;
+					Expression val1 = values.get(0);
+					Expression val2 = values.get(1);
+					if (val1 != null && val1.isIntExpr() && val2 != null
+							&& val2.isIntExpr()) {
+						IntExpr i1 = (IntExpr) val1;
+						IntExpr i2 = (IntExpr) val2;
+						return i1.shiftLeft(i2);
 					}
 				}
 
@@ -321,10 +188,13 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 				return null;
 			case SHIFT_RIGHT:
 				if (values.size() == 2) {
-					Object obj1 = values.get(0);
-					Object obj2 = values.get(1);
-					if (obj1 instanceof Long && obj2 instanceof Long) {
-						return (Long) obj1 >> (Long) obj2;
+					Expression val1 = values.get(0);
+					Expression val2 = values.get(1);
+					if (val1 != null && val1.isIntExpr() && val2 != null
+							&& val2.isIntExpr()) {
+						IntExpr i1 = (IntExpr) val1;
+						IntExpr i2 = (IntExpr) val2;
+						return i1.shiftRight(i2);
 					}
 				}
 
@@ -343,20 +213,20 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	@Override
-	public Object caseAstExpressionFloat(AstExpressionFloat expression) {
-		return expression.getValue();
+	public Expression caseAstExpressionFloat(AstExpressionFloat expression) {
+		return new FloatExpr(expression.getValue());
 	}
 
 	@Override
-	public Object caseAstExpressionIf(AstExpressionIf expression) {
-		Object condition = evaluate(expression.getCondition());
+	public Expression caseAstExpressionIf(AstExpressionIf expression) {
+		Expression condition = evaluate(expression.getCondition());
 
 		// evaluates both branches so errors are caught early
-		Object oThen = evaluate(expression.getThen());
-		Object oElse = evaluate(expression.getElse());
+		Expression oThen = evaluate(expression.getThen());
+		Expression oElse = evaluate(expression.getElse());
 
-		if (condition instanceof Boolean) {
-			if ((Boolean) condition) {
+		if (condition != null && condition.isBooleanExpr()) {
+			if (((BoolExpr) condition).getValue()) {
 				return oThen;
 			} else {
 				return oElse;
@@ -369,9 +239,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	@Override
-	public Object caseAstExpressionIndex(AstExpressionIndex expression) {
+	public Expression caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
-		Object value = variable.getInitialValue();
+		Expression value = (Expression) variable.getInitialValue();
 		if (value == null) {
 			error("variable \"" + variable.getName() + "\" ("
 					+ Util.getLocation(variable)
@@ -383,23 +253,22 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 		List<AstExpression> indexes = expression.getIndexes();
 
 		for (AstExpression index : indexes) {
-			Object indexValue = evaluate(index);
-			if (value instanceof List<?>) {
-				List<?> list = (List<?>) value;
-				if (indexValue instanceof Long) {
-					int intValue = ((Long) indexValue).intValue();
-					long longValue = ((Long) indexValue).longValue();
-					if (intValue == longValue) {
+			Expression indexValue = evaluate(index);
+			if (value != null && value.isListExpr()) {
+				ListExpr list = (ListExpr) value;
+				if (indexValue != null && indexValue.isIntExpr()) {
+					IntExpr intExpr = (IntExpr) indexValue;
+					if (intExpr.isLong()) {
+						error("index must be a int(size=32) integer",
+								expression,
+								CalPackage.AST_EXPRESSION_INDEX__INDEXES);
+					} else {
 						try {
-							value = list.get(intValue);
+							value = list.get(intExpr.getIntValue());
 						} catch (IndexOutOfBoundsException e) {
 							error("index out of bounds", expression,
 									CalPackage.AST_EXPRESSION_INDEX__INDEXES);
 						}
-					} else {
-						error("index must be a int(size=32) integer",
-								expression,
-								CalPackage.AST_EXPRESSION_INDEX__INDEXES);
 					}
 				} else {
 					error("index must be an integer", expression,
@@ -416,49 +285,50 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	@Override
-	public Object caseAstExpressionInteger(AstExpressionInteger expression) {
-		return expression.getValue();
+	public Expression caseAstExpressionInteger(AstExpressionInteger expression) {
+		return new IntExpr(expression.getValue());
 	}
 
 	@Override
-	public Object caseAstExpressionList(AstExpressionList expression) {
+	public Expression caseAstExpressionList(AstExpressionList expression) {
 		List<AstExpression> expressions = expression.getExpressions();
 		List<AstGenerator> generators = expression.getGenerators();
 
-		List<Object> list;
+		List<Expression> list;
 		if (generators.isEmpty()) {
 			int size = expressions.size();
-			list = new ArrayList<Object>(size);
+			list = new ArrayList<Expression>(size);
 			for (AstExpression subExpression : expressions) {
 				list.add(evaluate(subExpression));
 			}
 		} else {
 			// generators will be translated to statements in initialize
-			list = new ArrayList<Object>(0);
+			list = new ArrayList<Expression>(0);
 
 			// for some weird reason the evaluation of generators slows down *a
 			// lot* everything (even code generation, although I have no idea
 			// why), so we will not use it
 		}
 
-		return list;
+		return new ListExpr(list);
 	}
 
 	@Override
-	public Object caseAstExpressionString(AstExpressionString expression) {
-		return StringUtil.getEscapedString(expression.getValue());
+	public Expression caseAstExpressionString(AstExpressionString expression) {
+		return new StringExpr(
+				StringUtil.getEscapedString(expression.getValue()));
 	}
 
 	@Override
-	public Object caseAstExpressionUnary(AstExpressionUnary expression) {
+	public Expression caseAstExpressionUnary(AstExpressionUnary expression) {
 		UnaryOp op = UnaryOp.getOperator(expression.getUnaryOperator());
 
 		switch (op) {
 		case BITNOT: {
-			Object value = evaluate(expression.getExpression());
-			if (value instanceof Long) {
-				long i = (Long) value;
-				return ~i;
+			Expression value = evaluate(expression.getExpression());
+			if (value != null && value.isIntExpr()) {
+				IntExpr i = (IntExpr) value;
+				return i.not();
 			}
 
 			error("bitnot expects an integer expression", expression,
@@ -466,10 +336,10 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			return null;
 		}
 		case LOGIC_NOT: {
-			Object value = evaluate(expression.getExpression());
-			if (value instanceof Boolean) {
-				boolean b = (Boolean) value;
-				return !b;
+			Expression value = evaluate(expression.getExpression());
+			if (value != null && value.isBooleanExpr()) {
+				BoolExpr b = (BoolExpr) value;
+				return new BoolExpr(!b.getValue());
 			}
 
 			error("not expects a boolean expression", expression,
@@ -477,10 +347,10 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			return null;
 		}
 		case MINUS: {
-			Object value = evaluate(expression.getExpression());
-			if (value instanceof Long) {
-				long i = (Long) value;
-				return -i;
+			Expression value = evaluate(expression.getExpression());
+			if (value != null && value.isIntExpr()) {
+				IntExpr i = (IntExpr) value;
+				return i.negate();
 			}
 
 			error("minus expects an integer expression", expression,
@@ -491,7 +361,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 			TypeChecker typeChecker = new TypeChecker(validator);
 			Type type = typeChecker.getType(expression.getExpression());
 			if (type != null && type.isList()) {
-				return (long) ((TypeList) type).getSize();
+				return new IntExpr(((TypeList) type).getSize());
 			}
 
 			error("operator # expects a list expression", expression,
@@ -503,9 +373,9 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	}
 
 	@Override
-	public Object caseAstExpressionVariable(AstExpressionVariable expression) {
+	public Expression caseAstExpressionVariable(AstExpressionVariable expression) {
 		AstVariable variable = expression.getValue().getVariable();
-		Object value = variable.getInitialValue();
+		Expression value = (Expression) variable.getInitialValue();
 		if (value == null) {
 			error("variable \"" + variable.getName() + "\" ("
 					+ Util.getLocation(variable)
@@ -533,7 +403,7 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	 * @throws OrccRuntimeException
 	 *             if the given expression cannot be evaluated.
 	 */
-	public Object evaluate(AstExpression expression) {
+	public Expression evaluate(AstExpression expression) {
 		if (expression == null) {
 			return null;
 		}
@@ -552,16 +422,15 @@ public class AstExpressionEvaluator extends CalSwitch<Object> {
 	 *             if the given expression cannot be evaluated.
 	 */
 	public int evaluateAsInteger(AstExpression expression) {
-		Object value = evaluate(expression);
-		if (value instanceof Long) {
-			Long longValue = (Long) value;
-			if (longValue.intValue() == longValue.longValue()) {
-				return longValue.intValue();
+		Expression value = evaluate(expression);
+		if (value != null && value.isIntExpr()) {
+			IntExpr intExpr = (IntExpr) value;
+			if (intExpr.isLong()) {
+				error("integer expression too large", expression,
+						CalPackage.AST_EXPRESSION);
+			} else {
+				return intExpr.getIntValue();
 			}
-
-			error("integer expression too large", expression,
-					CalPackage.AST_EXPRESSION);
-			return 0;
 		}
 
 		// evaluated ok, but not as an integer

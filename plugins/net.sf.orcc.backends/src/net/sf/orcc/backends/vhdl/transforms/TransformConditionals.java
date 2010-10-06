@@ -35,6 +35,7 @@ import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
+import net.sf.orcc.ir.expr.FloatExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -68,6 +69,11 @@ public class TransformConditionals extends AbstractActorTransformation
 
 	@Override
 	public Object interpret(BoolExpr expr, Object... args) {
+		return expr;
+	}
+
+	@Override
+	public Object interpret(FloatExpr expr, Object... args) {
 		return expr;
 	}
 
@@ -106,7 +112,7 @@ public class TransformConditionals extends AbstractActorTransformation
 		} else {
 			subExpr = (Expression) subExpr.accept(this);
 			Type type = expr.getType();
-			return new UnaryExpr(expr.getLocation(), op, subExpr, type);
+			return new UnaryExpr(op, subExpr, type);
 		}
 	}
 

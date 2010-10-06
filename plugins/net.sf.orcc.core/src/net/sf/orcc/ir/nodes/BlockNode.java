@@ -77,7 +77,7 @@ public final class BlockNode extends AbstractNode implements
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(0);
-			if (node instanceof BlockNode) {
+			if (node.isBlockNode()) {
 				block = (BlockNode) node;
 			} else {
 				block = new BlockNode(procedure);
@@ -118,7 +118,7 @@ public final class BlockNode extends AbstractNode implements
 			nodes.add(block);
 		} else {
 			CFGNode node = nodes.get(nodes.size() - 1);
-			if (node instanceof BlockNode) {
+			if (node.isBlockNode()) {
 				block = (BlockNode) node;
 			} else {
 				block = new BlockNode(procedure);

@@ -39,7 +39,6 @@ import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -76,7 +75,6 @@ public class ExpressionSplitterTransformation extends
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
-			Location location = expr.getLocation();
 			Type type = expr.getType();
 			BinaryOp op = expr.getOp();
 			Expression e1 = (Expression) expr.getE1().accept(this, args);
@@ -86,22 +84,21 @@ public class ExpressionSplitterTransformation extends
 			expr.setE2(e2);
 
 			// Create a new binary expression
-			Expression binExpr = new BinaryExpr(location, e1, op, e2, type);
+			Expression binExpr = new BinaryExpr(e1, op, e2, type);
 
 			// Make a new assignment to the binary expression
 			LocalVariable target = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "expr");
-			Assign assign = new Assign(location, target, binExpr);
+			Assign assign = new Assign(target, binExpr);
 
 			// Add assignment to instruction's list
 			instrs.add(assign);
 
-			return new VarExpr(location, new Use(target));
+			return new VarExpr(new Use(target));
 		}
 
 		@Override
 		public Object interpret(UnaryExpr expr, Object... args) {
-			Location location = expr.getLocation();
 			Expression varExpr = expr.getExpr();
 			Type type = expr.getType();
 
@@ -112,32 +109,29 @@ public class ExpressionSplitterTransformation extends
 			// Make a new assignment to the binary expression
 			LocalVariable target = procedure.newTempLocalVariable(file, type,
 					procedure.getName() + "_" + "expr");
-			Assign assign = new Assign(location, target, binaryExpr);
+			Assign assign = new Assign(target, binaryExpr);
 
 			// Add assignment to instruction's list
 			instrs.add(assign);
 
-			return new VarExpr(location, new Use(target));
+			return new VarExpr(new Use(target));
 		}
 
 		public BinaryExpr transformUnaryExpr(UnaryOp op, Expression expr) {
-			Location loc = expr.getLocation();
 			Expression constExpr;
 			Type type = expr.getType();
 
 			switch (op) {
 			case MINUS:
 				constExpr = new IntExpr(0);
-				return new BinaryExpr(loc, constExpr, BinaryOp.MINUS, expr,
-						type);
+				return new BinaryExpr(constExpr, BinaryOp.MINUS, expr, type);
 			case LOGIC_NOT:
-				constExpr = new BoolExpr(new Location(), false);
-				return new BinaryExpr(loc, expr, BinaryOp.EQ, constExpr, type);
+				constExpr = new BoolExpr(false);
+				return new BinaryExpr(expr, BinaryOp.EQ, constExpr, type);
 			case BITNOT:
-				return new BinaryExpr(loc, expr, BinaryOp.BITXOR, expr, type);
+				return new BinaryExpr(expr, BinaryOp.BITXOR, expr, type);
 			default:
 				throw new OrccRuntimeException("unsupported operator");
-
 			}
 		}
 

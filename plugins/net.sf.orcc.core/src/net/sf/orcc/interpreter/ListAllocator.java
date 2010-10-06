@@ -31,7 +31,6 @@ package net.sf.orcc.interpreter;
 import java.lang.reflect.Array;
 import java.util.List;
 
-import net.sf.orcc.ir.IntegerNumber;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.type.AbstractTypeVisitor;

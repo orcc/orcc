@@ -39,13 +39,13 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.IntegerNumber;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -68,7 +68,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	 * @author Matthieu Wipliez
 	 * 
 	 */
-	private class ConstraintExpressionVisitor implements ExpressionInterpreter {
+	private class ConstraintExpressionVisitor extends
+			AbstractExpressionInterpreter {
 
 		/**
 		 * Creates a new constraint expression visitor.
@@ -174,17 +175,6 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		}
 
 		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
-			return expr.getValue();
-		}
-
-		@Override
-		public Object interpret(IntExpr expr, Object... args) {
-			// explicit cast to int because expr.getValue() is a long
-			return (int) expr.getValue();
-		}
-
-		@Override
 		public Object interpret(ListExpr expr, Object... args) {
 			throw new OrccRuntimeException("unsupported list expression");
 		}
@@ -216,16 +206,12 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				throw new OrccRuntimeException("unknown variable");
 			}
 
-			Type type = variable.getType();
-			Object value = variable.getValue();
-			if (value != null && (type.isInt() || type.isUint())) {
-				if (value instanceof IntegerNumber) {
-					return ((IntegerNumber) value).getIntValue();
-				}
+			Expression value = variable.getValue();
+			if (value != null && value.isIntExpr()) {
+				return value;
 			} else {
 				return getIntVariable(variable);
 			}
-			return null;
 		}
 
 	}

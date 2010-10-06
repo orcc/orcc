@@ -40,6 +40,8 @@ public interface ExpressionInterpreter {
 
 	public Object interpret(BoolExpr expr, Object... args);
 
+	public Object interpret(FloatExpr expr, Object... args);
+
 	public Object interpret(IntExpr expr, Object... args);
 
 	public Object interpret(ListExpr expr, Object... args);

@@ -208,11 +208,11 @@ public class ActorMerger implements INetworkTransformation {
 
 			StateVariable rCount = new StateVariable(new Location(),
 					IrFactory.eINSTANCE.createTypeUint(32), var.getName()
-							+ "_r", true, 0);
+							+ "_r", true, new IntExpr(0));
 			stateVars.put(rCount.getName(), rCount);
 			StateVariable wCount = new StateVariable(new Location(),
 					IrFactory.eINSTANCE.createTypeUint(32), var.getName()
-							+ "_w", true, 0);
+							+ "_w", true, new IntExpr(0));
 			stateVars.put(wCount.getName(), wCount);
 		}
 	}

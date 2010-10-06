@@ -110,9 +110,10 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 					}
 				} else {
 					if (expr.getType().isBool()) {
-						value+="%i";
-					} else if(expr.getType().isUint()||expr.getType().isInt()){
-						value+="%d";
+						value += "%i";
+					} else if (expr.getType().isUint()
+							|| expr.getType().isInt()) {
+						value += "%d";
 					}
 				}
 			}
@@ -122,7 +123,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 			type.setSize(value.length() + 2);
 
 			StateVariable variable = new StateVariable(call.getLocation(),
-					type, name, false, value + "\\0A\\00");
+					type, name, false, new StringExpr(value + "\\0A\\00"));
 			Use use = new Use(variable);
 
 			// Set the created state variable into call argument

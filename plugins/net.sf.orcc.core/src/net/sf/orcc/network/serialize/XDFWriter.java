@@ -49,6 +49,7 @@ import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
+import net.sf.orcc.ir.expr.FloatExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -119,6 +120,15 @@ public class XDFWriter {
 			Element exprElt = document.createElement("Expr");
 			exprElt.setAttribute("kind", "Literal");
 			exprElt.setAttribute("literal-kind", "Boolean");
+			exprElt.setAttribute("value", expr.toString());
+			((Element) args[0]).appendChild(exprElt);
+		}
+
+		@Override
+		public void visit(FloatExpr expr, Object... args) {
+			Element exprElt = document.createElement("Expr");
+			exprElt.setAttribute("kind", "Literal");
+			exprElt.setAttribute("literal-kind", "Real");
 			exprElt.setAttribute("value", expr.toString());
 			((Element) args[0]).appendChild(exprElt);
 		}

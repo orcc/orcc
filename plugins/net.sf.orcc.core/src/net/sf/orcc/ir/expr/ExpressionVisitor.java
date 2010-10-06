@@ -40,6 +40,8 @@ public interface ExpressionVisitor {
 
 	public void visit(BoolExpr expr, Object... args);
 
+	public void visit(FloatExpr expr, Object... args);
+
 	public void visit(IntExpr expr, Object... args);
 
 	public void visit(ListExpr expr, Object... args);

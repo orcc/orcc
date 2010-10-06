@@ -28,8 +28,9 @@
  */
 package net.sf.orcc.ir.expr;
 
+import java.math.BigInteger;
+
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 
 /**
@@ -60,29 +61,20 @@ public class IntExpr extends AbstractExpression {
 		return size;
 	}
 
-	private long value;
+	private BigInteger value;
 
-	/**
-	 * Creates a new integer expression with a location.
-	 * 
-	 * @param location
-	 *            a location
-	 * @param value
-	 *            an integer value.
-	 */
-	public IntExpr(Location location, long value) {
-		super(location);
+	public IntExpr(BigInteger value) {
 		this.value = value;
 	}
 
 	/**
-	 * Creates a new integer expression with a dummy location.
+	 * Creates a new integer expression.
 	 * 
 	 * @param value
 	 *            an integer value.
 	 */
 	public IntExpr(long value) {
-		this(new Location(), value);
+		this.value = BigInteger.valueOf(value);
 	}
 
 	@Override
@@ -95,18 +87,54 @@ public class IntExpr extends AbstractExpression {
 		visitor.visit(this, args);
 	}
 
+	public IntExpr add(IntExpr expr) {
+		return new IntExpr(value.add(expr.value));
+	}
+
+	public IntExpr and(IntExpr expr) {
+		return new IntExpr(value.and(expr.value));
+	}
+
+	public IntExpr divide(IntExpr expr) {
+		return new IntExpr(value.divide(expr.value));
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof IntExpr) {
-			return (value == ((IntExpr) obj).value);
+			return value.equals(((IntExpr) obj).value);
 		} else {
 			return false;
 		}
 	}
 
+	public boolean ge(IntExpr expr) {
+		return value.compareTo(expr.value) >= 0;
+	}
+
+	/**
+	 * Returns the value of this integer expression truncated as an
+	 * <code>int</code> .
+	 * 
+	 * @return the value of this integer expression truncated as an
+	 *         <code>int</code>
+	 */
+	public int getIntValue() {
+		return value.intValue();
+	}
+
+	/**
+	 * Returns the value of this integer expression as a <code>long</code>.
+	 * 
+	 * @return the value of this integer expression as a <code>long</code>
+	 */
+	public long getLongValue() {
+		return value.longValue();
+	}
+
 	@Override
 	public Type getType() {
-		return IrFactory.eINSTANCE.createTypeInt(getSize(value));
+		return IrFactory.eINSTANCE.createTypeInt(getSize(value.longValue()));
 	}
 
 	/**
@@ -115,7 +143,11 @@ public class IntExpr extends AbstractExpression {
 	 * @return the value of this integer expression
 	 */
 	public long getValue() {
-		return value;
+		return value.longValue();
+	}
+
+	public boolean gt(IntExpr expr) {
+		return value.compareTo(expr.value) > 0;
 	}
 
 	@Override
@@ -123,8 +155,66 @@ public class IntExpr extends AbstractExpression {
 		return true;
 	}
 
+	/**
+	 * Returns true if this integer number needs the "long" storage type.
+	 * 
+	 * @return true if this integer number needs the "long" storage type
+	 */
+	public boolean isLong() {
+		return getIntValue() != getLongValue();
+	}
+
+	public boolean le(IntExpr expr) {
+		return value.compareTo(expr.value) <= 0;
+	}
+
+	public boolean lt(IntExpr expr) {
+		return value.compareTo(expr.value) < 0;
+	}
+
+	public IntExpr mod(IntExpr expr) {
+		return new IntExpr(value.mod(expr.value));
+	}
+
+	public IntExpr multiply(IntExpr expr) {
+		return new IntExpr(value.multiply(expr.value));
+	}
+
+	public IntExpr negate() {
+		return new IntExpr(value.negate());
+	}
+
+	public IntExpr not() {
+		return new IntExpr(value.not());
+	}
+
+	public IntExpr or(IntExpr expr) {
+		return new IntExpr(value.or(expr.value));
+	}
+
 	public void setValue(long value) {
-		this.value = value;
+		this.value = BigInteger.valueOf(value);
+	}
+
+	public IntExpr shiftLeft(IntExpr expr) {
+		return new IntExpr(value.shiftLeft(expr.value.intValue()));
+	}
+
+	public IntExpr shiftRight(IntExpr expr) {
+		return new IntExpr(value.shiftRight(expr.value.intValue()));
+	}
+
+	public IntExpr subtract(IntExpr expr) {
+		return new IntExpr(value.subtract(expr.value));
+	}
+
+	@Override
+	public String toString() {
+		return value.toString();
+	}
+
+	public IntExpr xor(IntExpr expr) {
+		return new IntExpr(value.xor(expr.value));
 	}
 
 }

@@ -28,11 +28,11 @@
  */
 package net.sf.orcc.ir.expr;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 
 /**
@@ -40,16 +40,21 @@ import net.sf.orcc.ir.Type;
  * at the network level.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class ListExpr extends AbstractExpression {
 
 	private List<Expression> value;
 
-	public ListExpr(Location location, List<Expression> value) {
-		super(location);
+	public ListExpr(List<Expression> value) {
 		this.value = value;
+	}
+
+	public ListExpr(ListExpr l1, ListExpr l2) {
+		value = new ArrayList<Expression>(l1.value.size() + l2.value.size());
+		value.addAll(l1.value);
+		value.addAll(l2.value);
 	}
 
 	@Override
@@ -88,6 +93,10 @@ public class ListExpr extends AbstractExpression {
 	@Override
 	public boolean isListExpr() {
 		return true;
+	}
+
+	public Expression get(int index) {
+		return value.get(index);
 	}
 
 }

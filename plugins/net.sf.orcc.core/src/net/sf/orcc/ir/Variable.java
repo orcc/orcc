@@ -89,7 +89,7 @@ public class Variable {
 	/**
 	 * variable value
 	 */
-	private Object value;
+	private Expression value;
 
 	/**
 	 * Creates a new variable with the given location, type, and name. The
@@ -229,10 +229,11 @@ public class Variable {
 	}
 
 	/**
-	 * Gets the current value of this variable.
+	 * Returns the current value of this variable.
 	 * 
+	 * @return the current value of this variable
 	 */
-	public Object getValue() {
+	public Expression getValue() {
 		return value;
 	}
 
@@ -370,7 +371,7 @@ public class Variable {
 	 * @param value
 	 *            the typed value of this variable
 	 */
-	public void setValue(Object value) {
+	public void setValue(Expression value) {
 		this.value = value;
 	}
 

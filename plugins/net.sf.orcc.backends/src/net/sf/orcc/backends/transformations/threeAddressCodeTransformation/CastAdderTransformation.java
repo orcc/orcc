@@ -120,21 +120,18 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			Cast cast = new Cast(expr.getType(), type);
 
 			if (cast.isExtended() || cast.isTrunced()) {
-
-				Location location = expr.getLocation();
-
 				// Make a new assignment to the binary expression
 				LocalVariable newVar = procedure.newTempLocalVariable(file,
 						cast.getTarget(), procedure.getName() + "_" + "expr");
 
 				newVar.setIndex(1);
 
-				Assign assign = new Assign(location, newVar, expr);
+				Assign assign = new Assign(newVar, expr);
 
 				// Add assignement to instruction's list
 				it.add(assign);
 
-				return new VarExpr(newVar.getLocation(), new Use(newVar));
+				return new VarExpr(new Use(newVar));
 			}
 
 			return expr;
@@ -160,7 +157,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 			transitionVar.setIndex(1);
 
-			VarExpr varExpr = new VarExpr(location, new Use(transitionVar));
+			VarExpr varExpr = new VarExpr(new Use(transitionVar));
 
 			Assign newAssign = new Assign(location, target, varExpr);
 

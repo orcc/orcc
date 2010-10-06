@@ -29,6 +29,7 @@
 package net.sf.orcc.ir.serialize;
 
 import static net.sf.orcc.ir.serialize.IRConstants.EXPR_BINARY;
+import static net.sf.orcc.ir.serialize.IRConstants.EXPR_LIST;
 import static net.sf.orcc.ir.serialize.IRConstants.EXPR_UNARY;
 import static net.sf.orcc.ir.serialize.IRConstants.EXPR_VAR;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_ASSIGN;
@@ -95,6 +96,7 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
+import net.sf.orcc.ir.expr.FloatExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -147,79 +149,59 @@ public class IRWriter {
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
 			JsonArray array = new JsonArray();
-			array.add(writeLocation(expr.getLocation()));
-			JsonArray body = new JsonArray();
-			array.add(body);
-
-			body.add(new JsonPrimitive(EXPR_BINARY));
-			JsonArray body2 = new JsonArray();
-			body.add(body2);
-
-			body2.add(new JsonPrimitive(expr.getOp().getText()));
-			body2.add(writeExpression(expr.getE1()));
-			body2.add(writeExpression(expr.getE2()));
-			body2.add(writeType(expr.getType()));
-
+			array.add(new JsonPrimitive(EXPR_BINARY));
+			array.add(new JsonPrimitive(expr.getOp().getText()));
+			array.add(writeExpression(expr.getE1()));
+			array.add(writeExpression(expr.getE2()));
+			array.add(writeType(expr.getType()));
 			return array;
 		}
 
 		@Override
 		public Object interpret(BoolExpr expr, Object... args) {
-			JsonArray array = new JsonArray();
-			array.add(writeLocation(expr.getLocation()));
-			array.add(new JsonPrimitive(expr.getValue()));
-			return array;
+			return new JsonPrimitive(expr.getValue());
+		}
+
+		@Override
+		public Object interpret(FloatExpr expr, Object... args) {
+			return new JsonPrimitive(expr.getValue());
 		}
 
 		@Override
 		public Object interpret(IntExpr expr, Object... args) {
-			JsonArray array = new JsonArray();
-			array.add(writeLocation(expr.getLocation()));
-			array.add(new JsonPrimitive(expr.getValue()));
-			return array;
+			return new JsonPrimitive(expr.getValue());
 		}
 
 		@Override
 		public Object interpret(ListExpr expr, Object... args) {
-			throw new OrccRuntimeException("unsupported expression: List");
+			JsonArray array = new JsonArray();
+			array.add(new JsonPrimitive(EXPR_LIST));
+			for (Expression expression : expr.getValue()) {
+				array.add(writeExpression(expression));
+			}
+			return array;
 		}
 
 		@Override
 		public Object interpret(StringExpr expr, Object... args) {
-			JsonArray array = new JsonArray();
-			array.add(writeLocation(expr.getLocation()));
-			array.add(new JsonPrimitive(expr.getValue()));
-			return array;
+			return new JsonPrimitive(expr.getValue());
 		}
 
 		@Override
 		public Object interpret(UnaryExpr expr, Object... args) {
 			JsonArray array = new JsonArray();
-			array.add(writeLocation(expr.getLocation()));
-			JsonArray body = new JsonArray();
-			array.add(body);
-
-			body.add(new JsonPrimitive(EXPR_UNARY));
-			JsonArray body2 = new JsonArray();
-			body.add(body2);
-
-			body2.add(new JsonPrimitive(expr.getOp().getText()));
-			body2.add(writeExpression(expr.getExpr()));
-			body2.add(writeType(expr.getType()));
-
+			array.add(new JsonPrimitive(EXPR_UNARY));
+			array.add(new JsonPrimitive(expr.getOp().getText()));
+			array.add(writeExpression(expr.getExpr()));
+			array.add(writeType(expr.getType()));
 			return array;
 		}
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
 			JsonArray array = new JsonArray();
-			array.add(writeLocation(expr.getLocation()));
-			JsonArray body = new JsonArray();
-			array.add(body);
-
-			body.add(new JsonPrimitive(EXPR_VAR));
-			body.add(writeVariable(expr.getVar().getVariable()));
-
+			array.add(new JsonPrimitive(EXPR_VAR));
+			array.add(writeVariable(expr.getVar().getVariable()));
 			return array;
 		}
 
@@ -514,8 +496,8 @@ public class IRWriter {
 	 *            an expression
 	 * @return a JSON array
 	 */
-	private static JsonArray writeExpression(Expression expression) {
-		return (JsonArray) expression.accept(new ExpressionWriter());
+	private static JsonElement writeExpression(Expression expression) {
+		return (JsonElement) expression.accept(new ExpressionWriter());
 	}
 
 	/**
@@ -771,27 +753,6 @@ public class IRWriter {
 		return obj;
 	}
 
-	private JsonElement writeConstant(Object obj) {
-		if (obj instanceof Boolean) {
-			return new JsonPrimitive((Boolean) obj);
-		} else if (obj instanceof Long) {
-			return new JsonPrimitive((Long) obj);
-		} else if (obj instanceof Float) {
-			return new JsonPrimitive((Float) obj);
-		} else if (obj instanceof String) {
-			return new JsonPrimitive((String) obj);
-		} else if (obj instanceof List<?>) {
-			List<?> list = (List<?>) obj;
-			JsonArray array = new JsonArray();
-			for (Object o : list) {
-				array.add(writeConstant(o));
-			}
-			return array;
-		} else {
-			throw new OrccRuntimeException("Unknown constant: " + obj);
-		}
-	}
-
 	/**
 	 * Writes a Finite State Machine as JSON.
 	 * 
@@ -992,11 +953,11 @@ public class IRWriter {
 		variableArray.add(writeLocation(variable.getLocation()));
 		variableArray.add(writeType(variable.getType()));
 
-		Object constant = variable.getConstantValue();
+		Expression constant = variable.getConstantValue();
 		if (constant == null) {
 			array.add(null);
 		} else {
-			JsonElement constantValue = writeConstant(constant);
+			JsonElement constantValue = writeExpression(constant);
 			array.add(constantValue);
 		}
 

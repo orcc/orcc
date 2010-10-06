@@ -38,7 +38,7 @@ package net.sf.orcc.ir;
 public class GlobalVariable extends Variable {
 
 	/**
-	 * variable possible assign expression
+	 * initial value, if present, <code>null</code> otherwise
 	 */
 	private Expression expression;
 

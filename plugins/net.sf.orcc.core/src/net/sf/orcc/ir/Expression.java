@@ -35,45 +35,10 @@ import net.sf.orcc.ir.expr.ExpressionVisitor;
  * This interface defines an expression.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
-public interface Expression extends Localizable {
-
-	/**
-	 * binary expression
-	 */
-	public static final int BINARY = 1;
-
-	/**
-	 * boolean expression
-	 */
-	public static final int BOOLEAN = 2;
-
-	/**
-	 * integer expression
-	 */
-	public static final int INT = 3;
-
-	/**
-	 * list expression
-	 */
-	public static final int LIST = 4;
-
-	/**
-	 * string expression
-	 */
-	public static final int STRING = 5;
-
-	/**
-	 * unary expression
-	 */
-	public static final int UNARY = 6;
-
-	/**
-	 * variable reference expression
-	 */
-	public static final int VAR = 7;
+public interface Expression {
 
 	/**
 	 * Accepts an interpreter.
@@ -116,6 +81,13 @@ public interface Expression extends Localizable {
 	 * @return True if the expression is an instance of BooleanExpr
 	 */
 	public boolean isBooleanExpr();
+
+	/**
+	 * Returns true if the expression is an instance of FloatExpr
+	 * 
+	 * @return True if the expression is an instance of FloatExpr
+	 */
+	public boolean isFloatExpr();
 
 	/**
 	 * Returns true if the expression is an instance of IntExpr

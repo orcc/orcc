@@ -68,6 +68,7 @@ import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.cal.util.VoidSwitch;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 
@@ -414,31 +415,16 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	@Check(CheckType.NORMAL)
 	public void checkGenerator(AstGenerator generator) {
 		AstExpression astValue = generator.getLower();
-		Object initialValue = new AstExpressionEvaluator(this)
-				.evaluate(astValue);
-		Long lower = null;
-		if (initialValue instanceof Long) {
-			lower = (Long) initialValue;
-		} else {
-			error("lower bound must be a compile-time constant", generator,
-					CalPackage.AST_GENERATOR__LOWER);
-		}
+		int lower = new AstExpressionEvaluator(this)
+				.evaluateAsInteger(astValue);
 
 		astValue = generator.getHigher();
-		initialValue = new AstExpressionEvaluator(this).evaluate(astValue);
-		Long higher = null;
-		if (initialValue instanceof Long) {
-			higher = (Long) initialValue;
-		} else {
-			error("higher bound must be a compile-time constant", generator,
-					CalPackage.AST_GENERATOR__HIGHER);
-		}
+		int higher = new AstExpressionEvaluator(this)
+				.evaluateAsInteger(astValue);
 
-		if (lower != null && higher != null) {
-			if (higher < lower) {
-				error("higher bound must be greater than lower bound",
-						generator, CalPackage.AST_GENERATOR);
-			}
+		if (higher < lower) {
+			error("higher bound must be greater than lower bound", generator,
+					CalPackage.AST_GENERATOR);
 		}
 	}
 
@@ -643,7 +629,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			// evaluate initial value (if any)
 			AstExpression astValue = astVariable.getValue();
 			if (astValue != null) {
-				Object initialValue = astVariable.getInitialValue();
+				Expression initialValue = (Expression) astVariable
+						.getInitialValue();
 				if (initialValue == null) {
 					// only evaluates the initial value once (when validating)
 					initialValue = new AstExpressionEvaluator(this)

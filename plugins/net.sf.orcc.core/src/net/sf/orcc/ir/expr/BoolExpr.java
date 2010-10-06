@@ -29,14 +29,13 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 
 /**
  * This class defines a boolean expression.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class BoolExpr extends AbstractExpression {
@@ -44,11 +43,6 @@ public class BoolExpr extends AbstractExpression {
 	private boolean value;
 
 	public BoolExpr(boolean value) {
-		this(new Location(), value);
-	}
-
-	public BoolExpr(Location location, boolean value) {
-		super(location);
 		this.value = value;
 	}
 
@@ -60,6 +54,15 @@ public class BoolExpr extends AbstractExpression {
 	@Override
 	public void accept(ExpressionVisitor visitor, Object... args) {
 		visitor.visit(this, args);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof BoolExpr) {
+			return value == ((BoolExpr) obj).value;
+		} else {
+			return false;
+		}
 	}
 
 	@Override

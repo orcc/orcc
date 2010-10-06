@@ -29,27 +29,21 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Type;
 
 /**
  * This class defines a String expression.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class StringExpr extends AbstractExpression {
 
 	private String value;
 
-	public StringExpr(Location location, String value) {
-		super(location);
-		this.value = value;
-	}
-
 	public StringExpr(String value) {
-		this(new Location(), value);
+		this.value = value;
 	}
 
 	@Override
