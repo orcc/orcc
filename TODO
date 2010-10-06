@@ -1,0 +1,10 @@
+replace constants by expressions in the interpreter
+update the classifier to use expressions
+correct bugs in the normalizer
+
+check to see how to use build path with Xtext
+add qualified names to actors
+how do use qualified names in Graphiti?
+
+implement I/O actors
+re-write FIFOs
