@@ -29,7 +29,7 @@
 
 #include <stdio.h>
 
- DECL void FIFO_TRACE(T)(struct FIFO_S(T) *fifo, FILE* file, int n) {
+ DECL void FIFO_TRACE(T)(struct FIFO_S(T) *fifo, T *buffer, FILE* file, int n) {
 	int i;
 	if (fifo->write_ind + n <= fifo->size) {
 		for (i = 0; i<n; i++){
@@ -37,7 +37,7 @@
 		}
 	} else {
 		for (i = 0; i < n; i++){
-			fprintf(file, PRINT_FORMAT, fifo->fifo_buffer[i]);
+			fprintf(file, PRINT_FORMAT, buffer[i]);
 		}
 	}
 }

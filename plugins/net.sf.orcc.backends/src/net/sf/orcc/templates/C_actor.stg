@@ -186,7 +186,7 @@ $write.target$ = fifo_$write.port.type$_write($instance.id$_$write.port$, $write
 
 WriteEnd(writeEnd) ::= <<
 $if(options.("net.sf.orcc.backends.enableTrace"))$
-fifo_$writeEnd.port.type$_trace($instance.id$_$writeEnd.port$, trace_$instance.id$_$writeEnd.port$, $writeEnd.target$_buf, $writeEnd.numTokens$);
+fifo_$writeEnd.port.type$_trace($instance.id$_$writeEnd.port$, $writeEnd.target$_buf, trace_$instance.id$_$writeEnd.port$, $writeEnd.numTokens$);
 $endif$
 fifo_$writeEnd.port.type$_write_end($instance.id$_$writeEnd.port$, $writeEnd.target$_buf, $writeEnd.numTokens$);
 >>
