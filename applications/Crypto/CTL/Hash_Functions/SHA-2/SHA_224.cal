@@ -1,0 +1,152 @@
+/**
+ * This FU is part of a CAL implementation of Secure Hash Algorithms (SHA-224) specified in FIPS-180-3.
+ * It performs the SHA-224 hash computation. 
+ * 
+ * FU ID: SHA_256 (This FU is not named as 'SHA-224' because '-' cannot be used the CAL actor names)
+ * Two input port:
+ * 		1) uint(size=32) IP1_N: the number of input message blocks
+ * 		2) uint(size=32) IP2_M: the input message (as double word stream)
+ * One output port:
+ * 		2) uint(size=32) OP2_M: the output (message digest)
+ *
+ * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
+ */
+
+actor SHA_224() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
+	// Receive the number of 16 dword (512 bit) messages.
+	int N := -1; // Number of messages.
+	receiveN:
+	action IP1_N:[n] ==>
+	do
+		N := n;
+	end
+	
+	// State variables:
+	List(type:uint(size=32),size=64) K := [ // SHA-224 constants K.
+		0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+		0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+		0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+		0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+		0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+		0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+		0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+		0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+	];
+	List(type:uint(size=32),size=64) W := [0: for int i in 0 .. 63]; // Message schedule.
+	List(type:uint(size=32),size=8) H := [  // Initial hash values.
+		0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,	0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+	];
+	int messageCounter := 0; // count the number of messaged processed.
+
+	// Rotate right shift of 32 bit numbers.
+	function ROTR32(uint(size=32) x, int n ) --> uint(size=32):
+		((x >> n) | (x << (32-n))) & 0xffffffff // Orcc bug: We should not manually truncate the experssion value.
+	end 
+
+	// SHA-224 and SHA-224 function 'Ch'.
+	function Ch(uint(size=32) x, uint(size=32) y, uint(size=32) z) --> uint(size=32):
+		(x & y) ^ ( (bitnot(x) & 0xffffffff) & z) // Orcc bug: We should not manually truncate the experssion value.
+	end
+
+	// SHA-224 and SHA-224 function 'Maj'.
+	function Maj(uint(size=32) x, uint(size=32) y, uint(size=32) z) --> uint(size=32):
+		(x & y) ^ (x & z) ^ (y & z)
+	end
+	
+	// SHA-224 and SHA-224 function 'BigSigma0'.
+	function BigSigma0(uint(size=32) x) --> uint(size=32):
+		(ROTR32(x,2) ^ ROTR32(x,13) ^ ROTR32(x,22)) & 0xffffffff 
+	end
+	
+	// SHA-224 and SHA-224 function 'BigSigma1'.
+	function BigSigma1(uint(size=32) x) --> uint(size=32):
+		(ROTR32(x,6) ^ ROTR32(x,11) ^ ROTR32(x,25)) & 0xffffffff
+	end
+
+	// SHA-224 and SHA-224 function 'SmallSigma0'.
+	function SmallSigma0(uint(size=32) x) --> uint(size=32):
+		(ROTR32(x,7) ^ ROTR32(x,18) ^ (x >> 3)) & 0xffffffff
+	end
+
+	// SHA-224 and SHA-224 function 'SmallSigma1'.
+	function SmallSigma1(uint(size=32) x) --> uint(size=32):
+		(ROTR32(x,17) ^ ROTR32(x,19) ^ (x >> 10)) & 0xffffffff
+	end
+	
+	// Hash input messages.
+	hashMessage:
+	action IP2_M:[M] repeat 16 ==>
+	guard messageCounter < N
+	var
+		// Working variables:
+		uint(size=32) a,
+		uint(size=32) b,
+		uint(size=32) c,
+		uint(size=32) d,
+		uint(size=32) e,
+		uint(size=32) f,
+		uint(size=32) g,
+		uint(size=32) h,
+		// Temporary variables:
+		uint(size=32) T1,
+		uint(size=32) T2
+	do
+		// Prepare Message schedule.		
+		foreach int t in 0 .. 63 do
+			if t <=15 then
+				// Orcc bug: It should be W[t] := M[t]. 
+				// At the moment, orcc interpretator does not allow tokens greater than 2^31 to flow
+				// correctly through the network.
+				W[t] := M[t] & 0xffffffff;			
+			else
+				W[t] := (SmallSigma1(W[t-2]) + W[t-7] + SmallSigma0(W[t-15]) + W[t-16]) & 0xffffffff;
+			end
+		end
+		
+		// Initialize working variables.
+		a := H[0];
+		b := H[1];
+		c := H[2];
+		d := H[3];
+		e := H[4];
+		f := H[5];
+		g := H[6];
+		h := H[7];
+
+		// 64 Computation cycles.
+		foreach int t in 0 .. 63 do
+			// Orcc bug: We should not manually truncate the experssion value.
+			T1 := (h + BigSigma1(e) + Ch(e,f,g) + K[t] + W[t]) & 0xffffffff;
+			T2 := (BigSigma0(a) + Maj(a,b,c)) & 0xffffffff;
+			h := g;
+			g := f;
+			f := e;
+			e := (d + T1) & 0xffffffff; // Orcc bug: We should not manually truncate the experssion value.
+			d := c;
+			c := b;
+			b := a;
+			a := (T1 + T2) & 0xffffffff; // Orcc bug: We should not manually truncate the experssion value.		
+		end
+		
+		// Compute intermediate hash values.
+		H[0] := (a + H[0]) & 0xffffffff; // Orcc bug: We should not manually truncate the experssion value.
+		H[1] := (b + H[1]) & 0xffffffff;
+		H[2] := (c + H[2]) & 0xffffffff;
+		H[3] := (d + H[3]) & 0xffffffff;
+		H[4] := (e + H[4]) & 0xffffffff;
+		H[5] := (f + H[5]) & 0xffffffff;
+		H[6] := (g + H[6]) & 0xffffffff;
+		H[7] := (h + H[7]) & 0xffffffff;
+
+		// Increment message counter.
+		messageCounter := messageCounter + 1;
+	end
+	
+	// Output the final generated hash (message digest).
+	outputHash:
+	action ==> OP:[H[0], H[1], H[2], H[3], H[4], H[5], H[6], H[7]]
+	guard messageCounter = N
+	do
+		messageCounter := 0; // Reset message counter.
+	end
+end

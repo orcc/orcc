@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="IP3_TextSize" x="24" y="225"/>
+      <vertex id="IP4_Text" x="312" y="260"/>
+      <vertex id="IP1_Key" x="145" y="157"/>
+      <vertex id="IP2_IV" x="145" y="205"/>
+      <vertex id="OP_Text" x="573" y="240"/>
+      <vertex id="XOR" x="449" y="220"/>
+      <vertex id="KeyStreamGenerator" x="253" y="165"/>
+   </vertices>
+</layout>

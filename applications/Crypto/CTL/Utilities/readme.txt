@@ -19,6 +19,8 @@ XOR_8b.cal (token size: 1 byte)
 
 Any2Bits.cal
 Bits2Any.cal
+Smaller2Bigger.cal
+Bigger2Smaller.cal
 
 -- Merge (multiplex) / split (demultiplex) --
 

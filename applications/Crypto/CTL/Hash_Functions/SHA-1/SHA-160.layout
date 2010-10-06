@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="IP2_Message" x="51" y="197"/>
+      <vertex id="IP1_MessageSize" x="45" y="158"/>
+      <vertex id="MessageDigest" x="611" y="169"/>
+      <vertex id="Preprocessor" x="185" y="149"/>
+      <vertex id="Bytes2DWords" x="335" y="169"/>
+      <vertex id="SHA_160" x="484" y="149"/>
+   </vertices>
+</layout>

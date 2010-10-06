@@ -3,10 +3,10 @@
  * It validates if the outputs of a 64-bit cipher matches the golden responses.
  * It compares the actual responses with the golden responses byte by byte.
  * 
- * FU ID: Validator_DES
+ * FU ID: Validator_8B
  * Two input ports:
- * 		1) uint(size=8) IP1_Data: the output of the DES encipher/decipher
- * 		2) uint(size=8) IP2_GR: the golden response
+ *   1) uint(size=8) IP1_Data: the output of the encipher/decipher
+ *   2) uint(size=8) IP2_GR: the golden response
  *
  * Developer: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */

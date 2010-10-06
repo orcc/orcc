@@ -1,0 +1,55 @@
+/**
+ * This FU generates test vectors of input message and their golden responses for SHA-256. 
+ * Test vectors are taken from [1].
+ * [1] http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/SHA256.pdf  
+ * 
+ * FU ID: Source_SHA_256
+ * Three output port
+ *   1) uint(size=64) OP1_MessageSize: the size of input message. 
+ *   2) uint(size=8) OP2_Message: the input message to be hashed.
+ *	 3) uint OP3_HashSize: the size of output hash (message digest). 
+ *   4) uint(size=32) OP4_GR: the golden response hash (message digest).
+ * 
+ * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
+ */
+ 
+actor Source_SHA_256() ==> uint(size=64) OP1_MessageSize, uint(size=8) OP2_Message, uint OP3_HashSize, uint(size=32) OP4_GR:
+	
+/*	// Test parameters for SHA-1 taken from [1].
+	uint(size=64) MESSAGE_SIZE = 3; // 3 bytes.
+	List(type:uint(size=8),size=MESSAGE_SIZE) M := [ // Input message.
+			0x61,0x62,0x63
+		];
+	uint HASH_SIZE = 8; // 8 QWords or 256 bits
+	List(type:uint(size=32),size=HASH_SIZE) gr := [ // Golden response (Message Digest) taken from [1].
+			0xBA7816BF, 0x8F01CFEA, 0x414140DE, 0x5DAE2223, 0xB00361A3, 0x96177A9C, 0xB410FF61, 0xF20015AD
+		];*/
+
+	// Test parameters for SHA-1 taken from [1].
+	uint(size=64) MESSAGE_SIZE = 56; // 56 bytes.
+	List(type:uint(size=8),size=MESSAGE_SIZE) M := [ // Input message (multiple blocks)
+			0x61,0x62,0x63,0x64, 0x62,0x63,0x64,0x65, 0x63,0x64,0x65,0x66, 0x64,0x65,0x66,0x67, 0x65,0x66,0x67,0x68, 
+			0x66,0x67,0x68,0x69, 0x67,0x68,0x69,0x6A, 0x68,0x69,0x6A,0x6B, 0x69,0x6A,0x6B,0x6C, 0x6A,0x6B,0x6C,0x6D,
+			0x6B,0x6C,0x6D,0x6E, 0x6C,0x6D,0x6E,0x6F, 0x6D,0x6E,0x6F,0x70, 0x6E,0x6F,0x70,0x71 
+		];
+	uint HASH_SIZE = 8; // 8 QWords or 256 bits
+	List(type:uint(size=32),size=HASH_SIZE) gr := [ // Golden response (Message Digest) taken from [1].
+			0x248D6A61, 0xD20638B8, 0xE5C02693, 0x0C3E6039, 0xA33CE459, 0x64FF2167, 0xF6ECEDD4, 0x19DB06C1
+		];
+	
+	bool messageSent := false;
+	sendMessage:
+	action ==> OP1_MessageSize:[MESSAGE_SIZE], OP2_Message:[M] repeat MESSAGE_SIZE 
+	guard not messageSent
+	do
+		messageSent := true;
+	end
+
+	bool grSent := false;
+	sendGR:
+	action ==> OP3_HashSize:[HASH_SIZE], OP4_GR:[gr] repeat HASH_SIZE
+	guard not grSent
+	do
+		grSent := true;
+	end
+end

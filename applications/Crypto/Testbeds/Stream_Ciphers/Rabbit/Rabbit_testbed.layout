@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="Rabbit" x="252" y="132"/>
+      <vertex id="Source" x="86" y="160"/>
+      <vertex id="XOR" x="390" y="200"/>
+      <vertex id="Validator" x="498" y="220"/>
+   </vertices>
+</layout>

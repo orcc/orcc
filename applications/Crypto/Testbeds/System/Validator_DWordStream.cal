@@ -1,0 +1,66 @@
+/**
+ * This FU is part of the testbed of the Cryptographic Tool Library (CTL).
+ * It validates if a double word number stream matches the golden response.
+ * 
+ * FU ID: Validator_DWordStream
+ * Three input ports:
+ *   1) uint(size=32) IP1_Data: the output of the PRNG
+ *   2) uint IP2_StreamSize: the number of tokens in stream
+ *   3) uint(size=32) IP3_GR: the golden response
+ *
+ * Developer: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
+ */
+
+actor Validator_DWordStream () uint(size=32) IP1_Data, uint IP2_StreamSize, uint(size=32) IP3_GR ==> :
+
+	int streamSize := 8;
+	bool streamSizeReceived := false;
+	action IP2_StreamSize:[sSize] ==>
+	guard not streamSizeReceived
+	do
+		streamSize := sSize;
+		streamSizeReceived := true;
+	end
+	
+	List(type:String, size=16) hexDigits = [
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"
+	];
+	// The following procedure is for Orcc simulation.
+	// Print a double word without a line break.
+	procedure printByte (uint(size=8) x)
+	begin
+		print(hexDigits[x>>4]+hexDigits[x & 0x0f]);
+	end
+	// Print a byte without a line break.
+	procedure printDWord(uint(size=32) x)
+	begin
+		print("0x");
+		printByte((x >> 24) & 0xff); // Most significant byte.
+		printByte((x >> 16) & 0xff); 
+		printByte((x >> 8) & 0xff);
+		printByte(x & 0xff); // Least significant byte.
+	end
+
+	int counter := 0;
+	int errorCounter := 0;
+
+	action IP1_Data:[x], IP3_GR:[gr] ==>
+	guard streamSizeReceived and counter < streamSize
+	do
+		counter := counter + 1;
+		// The following lines are for Orcc simulation.
+		print("Actual Response vs. Golden Response = ");
+		printDWord(x); print(" vs. "); printDWord(gr); print("\n");
+		if x!=gr then
+			errorCounter := errorCounter + 1;
+		end
+		
+		if counter = streamSize then
+			if errorCounter = 0 then			
+				println("Congratulations, the received stream matches the golden stream!");
+			else
+				println(errorCounter+" tokens of received stream do not match the golden stream!");
+			end		
+		end		
+	end
+end

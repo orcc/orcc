@@ -1,0 +1,193 @@
+/**
+ * This FU gives implementation of Rabbit (stream cipher) in RVC-CAL. Rabbit was part of 
+ * the eStream project [1]. The terms and names of variables used in this FU follow the
+ * Rabbit specification given in [2], [3].
+ * [1] http://www.ecrypt.eu.org/stream/rabbitpf.html 
+ * [2] http://www.ecrypt.eu.org/stream/p3ciphers/rabbit/rabbit_p3.pdf
+ * [3] http://www.cryptico.com/Files/Filer/WP_Rabbit_Specification.pdf
+ * 
+ * FU ID: Rabbit
+ * Two input ports:
+ *   1) uint(size=32) IP1_Key: the key
+ *   2) uint(size=32) IP2_IV: the IV
+ *   3) uint(size=8) IP3_KeyStreamSize: the size of the required key stream (in double words)
+ * One output port:
+ *   1) uint(size=32) OP: output key stream (double words)
+ * 
+ * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010 
+ */
+
+actor Rabbit() uint(size=32) IP1_Key, uint(size=32) IP2_IV, uint(size=8) IP3_KeyStreamSize ==> uint(size=32) OP:
+
+	// Rabbit state variables.
+	List(type:uint(size=32), size=8) x := [0: for int a in 0 .. 7]; // x state variables
+	List(type:uint(size=32), size=8) c := [0: for int a in 0 .. 7]; // counter variables corresponding to each x.
+	uint(size=32) carry := 0;
+
+	// Flag controlling firings of different actions.
+	bool keySetup := false;
+
+	// Rotate left shift of 32 bit numbers.
+	function ROTL32(uint(size=32) x, int n ) --> uint(size=32):
+		((x << n) | (x >> (32-n))) & 0xffffffff // Orcc bug: We should not manually truncate the experssion value.
+	end 
+	// Return carry bit based on if x < y.
+	function carryOnLT(uint(size=32) x, uint(size=32) y ) --> int:
+		if x < y then 1	else 0 end
+	end
+	// Rabbit function 'g'.
+	function g(uint(size=32) x ) --> uint(size=32)
+	var
+		// Construct high and low argument for squaring.
+		uint(size=32) a := x & 0x0000ffff,
+		uint(size=32) b := (x >> 16),
+		// Calculate high and low result of squaring.
+		uint(size=32) h := (((((a*a)>>17) + (a*b))>>15) + b*b) & 0xffffffff,
+		uint(size=32) l := ((x*x)&0xffffffff)	
+	:
+		// Return high XOR low.
+		h ^ l
+	end	
+	
+	procedure nextState()
+	var
+		List(type:uint(size=32), size=8) g := [0: for int a in 0 .. 7], // Hold output of Rabbit function 'g'.
+		List(type:uint(size=32), size=8) cOld := [0: for int a in 0 .. 7] // Backup counter values.
+	begin
+	   // Save old counter values.
+		foreach int i in 0 .. 7 do
+			cOld[i] := c[i] & 0xffffffff; // Short term fix for Orcc interpreter bug: Garbles tokens with 32nd bit is '1'.
+		end
+   		// Calculate new counter values.
+		c[0] := (c[0] + 0x4D34D34D + carry) & 0xffffffff;
+   		c[1] := (c[1] + 0xD34D34D3 + carryOnLT(c[0], cOld[0])) & 0xffffffff;
+   		c[2] := (c[2] + 0x34D34D34 + carryOnLT(c[1], cOld[1])) & 0xffffffff;
+   		c[3] := (c[3] + 0x4D34D34D + carryOnLT(c[2], cOld[2])) & 0xffffffff;
+   		c[4] := (c[4] + 0xD34D34D3 + carryOnLT(c[3], cOld[3])) & 0xffffffff;
+   		c[5] := (c[5] + 0x34D34D34 + carryOnLT(c[4], cOld[4])) & 0xffffffff;
+   		c[6] := (c[6] + 0x4D34D34D + carryOnLT(c[5], cOld[5])) & 0xffffffff;
+   		c[7] := (c[7] + 0xD34D34D3 + carryOnLT(c[6], cOld[6])) & 0xffffffff;
+		carry := carryOnLT(c[7], cOld[7]);
+		// Calculate the g-values.
+		foreach int i in 0 .. 7 do
+			g[i] := g((x[i] + c[i]) & 0xffffffff);
+		end
+   		// Calculate new state values.
+		x[0] := (g[0] + ROTL32(g[7],16) + ROTL32(g[6], 16)) & 0xffffffff; 
+		x[1] := (g[1] + ROTL32(g[0], 8) + g[7]) & 0xffffffff; 
+		x[2] := (g[2] + ROTL32(g[1],16) + ROTL32(g[0], 16)) & 0xffffffff; 
+		x[3] := (g[3] + ROTL32(g[2], 8) + g[1]) & 0xffffffff; 
+		x[4] := (g[4] + ROTL32(g[3],16) + ROTL32(g[2], 16)) & 0xffffffff; 
+		x[5] := (g[5] + ROTL32(g[4], 8) + g[3]) & 0xffffffff; 
+		x[6] := (g[6] + ROTL32(g[5],16) + ROTL32(g[4], 16)) & 0xffffffff; 
+		x[7] := (g[7] + ROTL32(g[6], 8) + g[5]) & 0xffffffff;		
+   end
+	
+	// Key-scheduling action, which also reads the key from the input port.
+	//uint(size=8) counter := 0;
+	//List(type:uint(size=32), size=4) key := [0: for int a in 1 .. 4];	
+	setupKey:
+	action IP1_Key:[key] repeat 4 ==>
+	guard not keySetup
+	do
+		foreach int i in 0 .. 3 do
+			key[i] := key[i] & 0xffffffff;
+		end	
+		// Initialize state variables.
+		x[0] := key[0]; 
+		x[2] := key[1];
+		x[4] := key[2]; 
+		x[6] := key[3];
+		x[1] := ((key[3] << 16) | (key[2] >> 16)) & 0xffffffff;
+		x[3] := ((key[0] << 16) | (key[3] >> 16)) & 0xffffffff;
+		x[5] := ((key[1] << 16) | (key[0] >> 16)) & 0xffffffff;
+		x[7] := ((key[2] << 16) | (key[1] >> 16)) & 0xffffffff;
+		// Initialize counter variables.
+		c[0] := ROTL32(key[2],16); 
+		c[2] := ROTL32(key[3],16);
+		c[4] := ROTL32(key[0],16); 
+		c[6] := ROTL32(key[1],16);
+		c[1] := (key[0] & 0xffff0000) | (key[1]&0x0000ffff);
+		c[3] := (key[1] & 0xffff0000) | (key[2]&0x0000ffff);
+		c[5] := (key[2] & 0xffff0000) | (key[3]&0x0000ffff);
+		c[7] := (key[3] & 0xffff0000) | (key[0]&0x0000ffff);
+		// Initialize carry.
+		carry := 0;
+
+		// Iterate the system four times.
+		foreach int i in 0 .. 3 do
+			nextState();
+		end
+
+		// Modify the counters.
+		foreach int i in 0 .. 7 do
+			c[i] := c[i] ^ x[(i+4)&0x7];
+		end
+
+		keySetup := true;
+	end
+	
+	//List(type:uint(size=32), size=4) IV := [0: for int a in 1 .. 2];
+	setupIV:	
+	action IP2_IV:[iv] repeat 2 ==>
+	guard keySetup// and not ivSetup
+	var
+		uint(size=32) a,
+		uint(size=32) b
+	do
+		// Short term fix for Orcc interpreter bug: Garbles tokens with 32nd bit is '1'.
+		iv[0] := iv[0] & 0xffffffff;
+		iv[1] := iv[1] & 0xffffffff;
+		a := (iv[0] >> 16) | (iv[1] & 0xffff0000);
+		b := (iv[1] << 16) | (iv[0] & 0x0000ffff);
+		// Modify counter values.
+		c[0] := c[0] ^ iv[0];
+		c[1] := c[1] ^ a;
+		c[2] := c[2] ^ iv[1];
+		c[3] := c[3] ^ b;
+		c[4] := c[4] ^ iv[0];
+		c[5] := c[5] ^ a;
+		c[6] := c[6] ^ iv[1];
+		c[7] := c[7] ^ b;
+
+		// Iterate the system four times.
+		foreach int i in 0 .. 3 do
+			nextState();
+		end
+	end	
+
+	uint(size=32) ksSize := 0;
+	receiveKSSize:
+	action IP3_KeyStreamSize:[sz] ==>
+	guard keySetup and ksSize = 0
+	do
+		if (sz mod 16) = 0 then
+			ksSize := sz / 16;
+		else
+			ksSize := (sz / 16) + 1;
+		end		
+	end
+	
+	// Rabbit PRNG (keystream) generator.
+	keystreamGenerator:
+	action ==> OP:[keyStream] repeat 4
+	guard keySetup and ksSize > 0
+	var
+		List(type:uint(size=32), size=4) keyStream := [0,0,0,0]
+	do 
+		// Iterate the system.
+		nextState();
+		
+		// Generate 16 bytes of pseudo-random data.
+		keyStream[0] := x[0] ^ ((x[5]>>16) & 0xffffffff) ^ ((x[3]<<16) & 0xffffffff);
+		keyStream[1] := x[2] ^ ((x[7]>>16) & 0xffffffff) ^ ((x[5]<<16) & 0xffffffff);
+		keyStream[2] := x[4] ^ ((x[1]>>16) & 0xffffffff) ^ ((x[7]<<16) & 0xffffffff);
+		keyStream[3] := x[6] ^ ((x[3]>>16) & 0xffffffff) ^ ((x[1]<<16) & 0xffffffff);
+
+		ksSize := ksSize - 1;
+	end
+	
+	priority
+		 setupIV > receiveKSSize > keystreamGenerator;
+	end
+end

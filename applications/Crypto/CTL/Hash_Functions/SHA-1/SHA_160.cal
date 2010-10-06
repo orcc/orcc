@@ -1,0 +1,123 @@
+/**
+ * This FU is part of a CAL implementation of Secure Hash Algorithms (SHA-1) specified in FIPS-180-3.
+ * It performs the SHA-1 hash computation. 
+ * 
+ * FU ID: SHA_160
+ * Two input port:
+ * 		1) uint(size=32) IP1_N: the number of input message blocks
+ * 		2) uint(size=32) IP2_M: the input message (as double word stream)
+ * One output port:
+ * 		2) uint(size=32) OP2_M: the output (message digest)
+ *
+ * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
+ */
+
+actor SHA_160() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
+	
+	// Receive the number of messages to be processed.
+	int N := -1; // Number of messages.
+	receiveN:
+	action IP1_N:[n] ==>
+	do
+		N := n;
+	end
+	
+	// State variables:
+	List(type:uint(size=32),size=80) K := [ // SHA-1 constants K.
+	// 0 <= t <= 19
+	0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 
+	0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999, 0x5a827999,
+	// 20 <= t <= 39
+	0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 
+	0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1, 0x6ed9eba1,
+	// 40 <= t <= 59
+	0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 
+	0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc, 0x8f1bbcdc,
+	// 60 <= t <= 79
+	0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 
+	0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6, 0xca62c1d6
+	];
+	List(type:uint(size=32),size=80) W := [0: for int i in 0 .. 79]; // Message schedule.
+	List(type:uint(size=32),size=5) H := [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0]; // Initial hash values.
+	int messageCounter := 0; // count the number of messaged processed.
+
+	// Rotate left shift of 32 bit numbers.
+	function ROTL32(uint(size=32) x, int n ) --> uint(size=32):
+		((x << n) | (x >> (32-n))) & 0xffffffff // Orcc bug: We should not manually truncate the experssion value.
+	end 
+
+	// SHA-1 function 'f'.
+	function f(uint(size=32) x, uint(size=32) y, uint(size=32) z, uint t) --> uint(size=32):
+		if t <= 19 then
+			(x & y) ^ ( (bitnot(x) & 0xffffffff) & z) // Orcc bug: We should not manually truncate the experssion value.
+		else if t >= 40 and t <= 59 then
+				(x & y) ^ (x & z) ^ (y & z)
+			else
+				(x ^ y ^ z)
+			end	
+		end
+	end 
+	
+	// Hash input messages.
+	hashMessage:
+	action IP2_M:[M] repeat 16 ==>
+	guard messageCounter < N
+	var
+		// Working variables:
+		uint(size=32) a,
+		uint(size=32) b,
+		uint(size=32) c,
+		uint(size=32) d,
+		uint(size=32) e,
+		// Temporary variable:
+		uint(size=32) T
+	do
+		// Prepare Message schedule.		
+		foreach int t in 0 .. 79 do
+			if t <=15 then
+				// Orcc bug: It should be W[t] := M[t]. 
+				// At the moment, orcc interpretator does not allow tokens greater than 2^31 to flow
+				// correctly through the network.
+				W[t] := M[t] & 0xffffffff;			
+			else
+				W[t] := ROTL32(W[t-3] ^ W[t-8] ^ W[t-14] ^ W[t-16],1);
+			end
+		end
+		
+		// Initialize working variables.
+		a := H[0];
+		b := H[1];
+		c := H[2];
+		d := H[3];
+		e := H[4];
+			
+		// 80 Computation cycles.
+		foreach int t in 0 .. 79 do
+			// Orcc bug: We should not manually truncate the experssion value.
+			T := (ROTL32(a,5) + f(b,c,d,t) + e + K[t] + W [t]) & 0xffffffff;
+			e := d;
+			d := c;
+			c := ROTL32(b,30);
+			b := a;
+			a := T;
+		end
+		
+		// Compute intermediate hash values.
+		H[0] := (a + H[0]) & 0xffffffff; // Orcc bug: We should not manually truncate the experssion value.
+		H[1] := (b + H[1]) & 0xffffffff;
+		H[2] := (c + H[2]) & 0xffffffff;
+		H[3] := (d + H[3]) & 0xffffffff;
+		H[4] := (e + H[4]) & 0xffffffff;
+
+		// Increment message counter.
+		messageCounter := messageCounter + 1;	
+	end
+	
+	// Output the final generated hash (message digest).
+	outputHash:
+	action ==> OP:[H[0], H[1], H[2], H[3], H[4]]
+	guard messageCounter = N
+	do
+		messageCounter := 0; // Reset message counter.
+	end
+end

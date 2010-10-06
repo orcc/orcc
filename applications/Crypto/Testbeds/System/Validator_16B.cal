@@ -5,7 +5,7 @@
  * 
  * FU ID: Validator_16B
  * Two input ports:
- * 1) uint(size=8) IP1_Data: the output of the AES encipher/decipher
+ * 1) uint(size=8) IP1_Data: the output of the encipher/decipher
  * 2) uint(size=8) IP2_GR: the golden response
  *
  * Developer: Shujun Li @ Uni-Konstanz 2010

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="IP1_Key" x="112" y="157"/>
+      <vertex id="IP2_IV" x="112" y="205"/>
+      <vertex id="IP3_KeyStreamSize" x="24" y="225"/>
+      <vertex id="keyStream" x="637" y="185"/>
+      <vertex id="Bytes2DWords1" x="180" y="137"/>
+      <vertex id="Bytes2DWords2" x="180" y="185"/>
+      <vertex id="DWords2Bytes" x="513" y="165"/>
+      <vertex id="Rabbit" x="369" y="165"/>
+   </vertices>
+</layout>

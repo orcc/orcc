@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="LFSR_testbed">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Source_LFSR"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="LFSR">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../CTL/PRNGs/LFSR/LFSR"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Validator">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../System/Validator_BitStream"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Validator" dst-port="IP1_Data" src="LFSR" src-port="Bit"/>
+    <Connection dst="Validator" dst-port="IP2_StreamSize" src="Source" src-port="OP2_StreamSize"/>
+    <Connection dst="Validator" dst-port="IP3_GR" src="Source" src-port="OP3_GR"/>
+    <Connection dst="LFSR" dst-port="IP" src="Source" src-port="OP1_Params"/>
+</XDF>

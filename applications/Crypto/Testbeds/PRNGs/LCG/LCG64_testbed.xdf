@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="LCG64_testbed">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Source_LCG64"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="LCG64">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../CTL/PRNGs/LCG/LCG64"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Validator">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../System/Validator_QWordStream"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="LCG64" dst-port="IP" src="Source" src-port="OP1_Params"/>
+    <Connection dst="Validator" dst-port="IP1_Data" src="LCG64" src-port="Xn"/>
+    <Connection dst="Validator" dst-port="IP2_StreamSize" src="Source" src-port="OP2_StreamSize"/>
+    <Connection dst="Validator" dst-port="IP3_GR" src="Source" src-port="OP3_GR"/>
+</XDF>
