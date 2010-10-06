@@ -612,7 +612,6 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		switch (op) {
 		case BITAND:
-		case MOD:
 			if (!t1.isInt() && !t1.isUint()) {
 				error("Cannot convert " + t1 + " to int/uint", source, feature);
 				return null;
@@ -657,6 +656,17 @@ public class TypeChecker extends CalSwitch<Type> {
 			}
 			return t1;
 
+		case MOD:
+			if (!t1.isInt() && !t1.isUint()) {
+				error("Cannot convert " + t1 + " to int/uint", source, feature);
+				return null;
+			}
+			if (!t2.isInt() && !t2.isUint()) {
+				error("Cannot convert " + t2 + " to int/uint", source, feature);
+				return null;
+			}
+			return t2;
+
 		case SHIFT_LEFT:
 			return getTypeShiftLeft(t1, t2, source, feature);
 
@@ -675,7 +685,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return IrFactory.eINSTANCE.createTypeBool();
 
 		case EXP:
-			error("Operator ^ not implemented", source, feature);
+			error("Operator ** not implemented", source, feature);
 			return null;
 
 		case LOGIC_AND:
@@ -834,22 +844,11 @@ public class TypeChecker extends CalSwitch<Type> {
 	 * @return type of the multiplication
 	 */
 	private Type getTypeTimes(Type t1, Type t2, EObject source, int feature) {
-		int s1;
-		if (t1.isInt()) {
-			s1 = ((TypeInt) t1).getSize();
-		} else if (t1.isUint()) {
-			s1 = ((TypeUint) t1).getSize();
-		} else {
+		if (!t1.isInt() && !t1.isUint()) {
 			error("Cannot convert " + t1 + " to int/uint", source, feature);
 			return null;
 		}
-
-		int s2;
-		if (t2.isInt()) {
-			s2 = ((TypeInt) t2).getSize();
-		} else if (t2.isUint()) {
-			s2 = ((TypeUint) t2).getSize();
-		} else {
+		if (!t2.isInt() && !t2.isUint()) {
 			error("Cannot convert " + t2 + " to int/uint", source, feature);
 			return null;
 		}
@@ -859,7 +858,7 @@ public class TypeChecker extends CalSwitch<Type> {
 			return null;
 		}
 
-		setSize(type, s1 + s2);
+		setSize(type, getSize(t1) + getSize(t2));
 
 		return type;
 	}
