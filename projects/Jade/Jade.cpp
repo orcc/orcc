@@ -122,6 +122,9 @@ MAttrs("mattr", CommaSeparated,
          desc("Target specific attributes (-mattr=help for details)"),
          value_desc("a1,+a2,-a3,..."));
 
+ cl::opt<std::string>
+  TargetTriple("mtriple", cl::desc("Override target triple for module"));
+
 opt<std::string> 
 MCPU("mcpu", desc("Target a specific cpu type (-mcpu=help for details)"),
        value_desc("cpu-name"),

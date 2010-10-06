@@ -309,12 +309,15 @@ private:
 	std::multimap<std::string, llvm::GlobalVariable *> AppendingVars;
 	
 	/** Help for opt */
-	void AddStandardCompilePasses(llvm::PassManager &PM);
-	void AddOptimizationPasses(llvm::PassManager &MPM, llvm::FunctionPassManager &FPM,
-                           unsigned OptLevel);
-	void AddStandardLinkPasses(llvm::PassManager &PM);
-	void addPass(llvm::PassManager &PM, llvm::Pass *P);
+	void AddOptimizationPasses(llvm::PassManagerBase &MPM, llvm::PassManagerBase &FPM,
+                           unsigned OptLevel) ;
+	void AddStandardLinkPasses(llvm::PassManagerBase &PM);
+	void AddStandardCompilePasses(llvm::PassManagerBase &PM);
+	void addPass(llvm::PassManagerBase &PM, llvm::Pass *P);
 	void do_shutdown();
+	
+	//Exit function
+	llvm::Constant *Exit;
 
 };
 

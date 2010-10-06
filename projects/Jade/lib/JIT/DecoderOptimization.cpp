@@ -88,13 +88,33 @@ DisableInternalize("disable-internalize",
 static cl::opt<bool>
 DisableInline("disable-inlining", cl::desc("Do not run the inliner pass"));
 
+static cl::opt<std::string>
+DefaultDataLayout("default-data-layout", 
+          cl::desc("data layout string to use if not specified by module"),
+          cl::value_desc("layout-string"), cl::init(""));
+
+static cl::opt<bool>
+AnalyzeOnly("analyze", cl::desc("Only perform analysis, no optimization"));
+
+static cl::opt<bool>
+VerifyEach("verify-each", cl::desc("Verify after each transform"));
+
+
+void JIT::addPass(PassManagerBase &PM, Pass *P) {
+  // Add the pass to the pass manager...
+  PM.add(P);
+
+  // If we are verifying all of the intermediate steps, add the verifier...
+  if (VerifyEach) PM.add(createVerifierPass());
+}
+
 void JIT::optimize(Decoder* decoder){
 
   SMDiagnostic Err;
 
   module = decoder->getModule();
 
-  // Create a PassManager to hold and optimize the collection of passes we are
+   // Create a PassManager to hold and optimize the collection of passes we are
   // about to build...
   //
   PassManager Passes;
@@ -104,22 +124,19 @@ void JIT::optimize(Decoder* decoder){
   const std::string &ModuleDataLayout = module->getDataLayout();
   if (!ModuleDataLayout.empty())
     TD = new TargetData(ModuleDataLayout);
+  else if (!DefaultDataLayout.empty())
+    TD = new TargetData(DefaultDataLayout);
 
   if (TD)
     Passes.add(TD);
 
-  FunctionPassManager *FPasses = NULL;
+  OwningPtr<PassManager> FPasses;
   if (OptLevelO1 || OptLevelO2 || OptLevelO3) {
-    FPasses = new FunctionPassManager(module);
+    FPasses.reset(new PassManager());
     if (TD)
       FPasses->add(new TargetData(*TD));
   }
-/*
-  // If the -strip-debug command line option was specified, add it.  If
-  // -std-compile-opts was also specified, it will handle StripDebug.
-  if (StripDebug && !StandardCompileOpts)
-    addPass(Passes, createStripSymbolsPass(true));
-*/
+
   // Create a new optimization pass for each one specified on the command line
   for (unsigned i = 0; i < PassList.size(); ++i) {
     // Check to see if -std-compile-opts was specified before this option.  If
@@ -156,7 +173,7 @@ void JIT::optimize(Decoder* decoder){
     if (PassInf->getNormalCtor())
       P = PassInf->getNormalCtor()();
     else
-      cout << ": cannot create pass: "
+      cout << "cannot create pass: "
              << PassInf->getPassName() << "\n";
     if (P) {
       PassKind Kind = P->getPassKind();
@@ -184,26 +201,21 @@ void JIT::optimize(Decoder* decoder){
   if (OptLevelO3)
     AddOptimizationPasses(Passes, *FPasses, 3);
 
-  if (OptLevelO1 || OptLevelO2 || OptLevelO3) {
-    FPasses->doInitialization();
-    for (Module::iterator I = module->begin(), E = module->end();
-         I != E; ++I)
-      FPasses->run(*I);
-  }
+  if (OptLevelO1 || OptLevelO2 || OptLevelO3)
+    FPasses->run(*module);
+
 
   // Now that we have all of the passes ready, run them.
   Passes.run(*module);
 
 }
 
-void JIT::AddStandardCompilePasses(PassManager &PM) {
+void JIT::AddStandardCompilePasses(PassManagerBase &PM) {
   PM.add(createVerifierPass());                  // Verify that input is correct
 
   addPass(PM, createLowerSetJmpPass());          // Lower llvm.setjmp/.longjmp
 
-  // If the -strip-debug command line option was specified, do it.
-  //if (StripDebug)
-    //addPass(PM, createStripSymbolsPass(true));
+  llvm::Pass *InliningPass = !DisableInline ? createFunctionInliningPass() : 0;
 
   // -std-compile-opts adds the same module passes as -O3.
   createStandardModulePasses(&PM, 3,
@@ -212,20 +224,23 @@ void JIT::AddStandardCompilePasses(PassManager &PM) {
                              /*UnrollLoops=*/ true,
                              /*SimplifyLibCalls=*/ true,
                              /*HaveExceptions=*/ true,
-                             createFunctionInliningPass());
+                             InliningPass);
 }
+
 
 /// AddOptimizationPasses - This routine adds optimization passes
 /// based on selected optimization level, OptLevel. This routine
 /// duplicates llvm-gcc behaviour.
 ///
 /// OptLevel - Optimization Level
-void JIT::AddOptimizationPasses(PassManager &MPM, FunctionPassManager &FPM,
+void JIT::AddOptimizationPasses(PassManagerBase &MPM, PassManagerBase &FPM,
                            unsigned OptLevel) {
   createStandardFunctionPasses(&FPM, OptLevel);
 
   llvm::Pass *InliningPass = 0;
-  if (OptLevel) {
+  if (DisableInline) {
+    // No inlining pass
+  } else if (OptLevel) {
     unsigned Threshold = 200;
     if (OptLevel > 2)
       Threshold = 250;
@@ -243,19 +258,11 @@ void JIT::AddOptimizationPasses(PassManager &MPM, FunctionPassManager &FPM,
 }
 
 
-void JIT::AddStandardLinkPasses(PassManager &PM) {
+void JIT::AddStandardLinkPasses(PassManagerBase &PM) {
   PM.add(createVerifierPass());                  // Verify that input is correct
 
   createStandardLTOPasses(&PM, /*Internalize=*/ !DisableInternalize,
                           /*RunInliner=*/ !DisableInline,
-                          /*VerifyEach=*/ false);
-}
-
-void JIT::addPass(PassManager &PM, Pass *P) {
-  // Add the pass to the pass manager...
-  PM.add(P);
-
-  // If we are verifying all of the intermediate steps, add the verifier...
-  //if (VerifyEach) PM.add(createVerifierPass());
+                          /*VerifyEach=*/ VerifyEach);
 }
 

@@ -40,6 +40,7 @@
 #include <errno.h>
 
 #include "llvm/Type.h"
+#include "llvm/ADT/Triple.h"
 #include "llvm/ExecutionEngine/GenericValue.h"
 #include "llvm/ExecutionEngine/JITEventListener.h"
 #include "llvm/Support/CommandLine.h"
@@ -62,6 +63,7 @@ extern cl::opt<bool> DisableCoreFiles;
 extern cl::opt<bool> NoLazyCompilation;
 extern cl::list<std::string> MAttrs;
 extern cl::opt<std::string> MCPU;
+extern cl::opt<std::string> TargetTriple;
 
 
 //===----------------------------------------------------------------------===//
@@ -84,6 +86,15 @@ int JIT::initEngine(Decoder* decoder) {
   if (DisableCoreFiles)
     sys::Process::PreventCoreFiles();
   
+   // If not jitting lazily, load the whole bitcode file eagerly too.
+  if (NoLazyCompilation) {
+    if (module->MaterializeAllPermanently(&ErrorMsg)) {
+      cout << "bitcode didn't read correctly.\n";
+      cout << "Reason: " << ErrorMsg << "\n";
+      exit(1);
+    }
+  }
+
   EngineBuilder builder(module);
   builder.setMArch(MArch);
   builder.setMCPU(MCPU);
@@ -93,6 +104,9 @@ int JIT::initEngine(Decoder* decoder) {
                         ? EngineKind::Interpreter
                         : EngineKind::JIT);
 
+  // If we are supposed to override the target triple, do so now.
+  if (!TargetTriple.empty())
+    module->setTargetTriple(Triple::normalize(TargetTriple));
 
   EE = builder.create();
   if (!EE) {
@@ -109,7 +123,7 @@ int JIT::initEngine(Decoder* decoder) {
   
   // If the program doesn't explicitly call exit, we will need the Exit 
   // function later on to make an explicit call, so get the function now. 
-  Constant *Exit = module->getOrInsertFunction("exit", Type::getVoidTy(Context),
+  Exit = module->getOrInsertFunction("exit", Type::getVoidTy(Context),
                                                     Type::getInt32Ty(Context),
                                                     NULL);
   
@@ -118,6 +132,14 @@ int JIT::initEngine(Decoder* decoder) {
 
   // Run static constructors.
   EE->runStaticConstructorsDestructors(false);
+
+   if (NoLazyCompilation) {
+    for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
+      Function *Fn = &*I;
+      if (!Fn->isDeclaration())
+        EE->getPointerToFunction(Fn);
+    }
+  }
 }
 
 void JIT::MapFunction(Function* function, void *Addr) {
@@ -126,5 +148,21 @@ void JIT::MapFunction(Function* function, void *Addr) {
 
 void JIT::run(Function* func) {
 	std::vector<GenericValue> noargs;
-	EE->runFunction(func, noargs);
+	 GenericValue Result = EE->runFunction(func, noargs);
+
+	// Run static destructors.
+	EE->runStaticConstructorsDestructors(true);
+
+	// If the program didn't call exit explicitly, we should call it now. 
+	// This ensures that any atexit handlers get called correctly.
+	if (Function *ExitF = dyn_cast<Function>(Exit)) {
+		std::vector<GenericValue> Args;
+		Args.push_back(Result);
+		EE->runFunction(ExitF, Args);
+		cout << "ERROR: bad exit returned!\n";
+		abort();
+	} else {
+		cout << "ERROR: exit defined with wrong prototype!\n";
+		abort();
+	}
 }
