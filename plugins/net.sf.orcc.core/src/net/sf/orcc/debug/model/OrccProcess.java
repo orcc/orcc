@@ -240,9 +240,18 @@ public class OrccProcess extends PlatformObject implements IProcess {
 			// clear actor pool because it might not have been done if we got an
 			// error too soon
 			Network.clearActorPool();
+			e.printStackTrace();
+
+			Throwable throwable = e;
+			StringBuilder builder = new StringBuilder();
+			while (throwable != null && throwable.getCause() != throwable) {
+				builder.append(throwable.getLocalizedMessage());
+				builder.append('\n');
+				throwable = throwable.getCause();
+			}
 
 			IStatus status = new Status(IStatus.ERROR, OrccActivator.PLUGIN_ID,
-					simulator + " simulation error", e);
+					simulator + " simulation error: " + builder.toString());
 			throw new CoreException(status);
 		}
 	}
