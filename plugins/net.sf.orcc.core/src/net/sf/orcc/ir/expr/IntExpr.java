@@ -43,22 +43,29 @@ import net.sf.orcc.ir.Type;
 public class IntExpr extends AbstractExpression {
 
 	/**
-	 * Returns the size in bits needed to store the given number as an int.
+	 * Returns the number of bits in the two's-complement representation of the
+	 * given number, <i>including</i> a sign bit.
 	 * 
 	 * @param number
 	 *            a number
-	 * @return the size in bits needed to store the given number as an int
+	 * @return the number of bits in the two's-complement representation of the
+	 *         given number, <i>including</i> a sign bit
+	 */
+	public static int getSize(BigInteger number) {
+		return number.bitLength() + 1;
+	}
+
+	/**
+	 * Returns the number of bits in the two's-complement representation of the
+	 * given number, <i>including</i> a sign bit.
+	 * 
+	 * @param number
+	 *            a number
+	 * @return the number of bits in the two's-complement representation of the
+	 *         given number, <i>including</i> a sign bit
 	 */
 	public static int getSize(long number) {
-		long v;
-		if (number >= 0) {
-			v = number + 1;
-		} else {
-			v = -number;
-		}
-
-		int size = (int) Math.ceil(Math.log(v) / Math.log(2)) + 1;
-		return size;
+		return getSize(BigInteger.valueOf(number));
 	}
 
 	private BigInteger value;
@@ -134,7 +141,7 @@ public class IntExpr extends AbstractExpression {
 
 	@Override
 	public Type getType() {
-		return IrFactory.eINSTANCE.createTypeInt(getSize(value.longValue()));
+		return IrFactory.eINSTANCE.createTypeInt(getSize(value));
 	}
 
 	/**
