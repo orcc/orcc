@@ -103,21 +103,21 @@ Constant(constant, type, iterator) ::= <<
 $(constant.class.simpleName)(constant = constant, type = type, iterator = iterator)$
 >>
 
-Boolean(constant, type, iterator) ::= <<
-$if (constant)$1$else$0$endif$
+BoolExpr(constant, type, iterator) ::= <<
+$if (constant.value)$1$else$0$endif$
 >>
 
-IntegerNumber(constant, type, iterator) ::= <<
+IntExpr(constant, type, iterator) ::= <<
 $constant$
 >>
 
 // the values of a list: {val1, val2, ..., valn}
-List(constant, type, iterator) ::= <<
-[$iterator, constant: {iterator, value | $type.type$ $if(value)$ $Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)$ $else$ zeroinitializer $endif$ }; wrap, separator=", "$]
+ListExpr(constant, type, iterator) ::= <<
+[$iterator, constant.value: {iterator, value | $type.type$ $if(value)$ $Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)$ $else$ zeroinitializer $endif$ }; wrap, separator=", "$]
 >>
 
-String(constant, type, iterator) ::= <<
-c"$constant$"
+StringExpr(constant, type, iterator) ::= <<
+c$constant$
 >>
 
 ArrayList(constant, type, iterator) ::= <<$List(constant = constant, type = type, iterator=iterator)$>>
