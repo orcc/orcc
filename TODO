@@ -1,6 +1,4 @@
-replace constants by expressions in the interpreter
-update the classifier to use expressions
-correct bugs in the normalizer
+correct bugs in classifier and normalizer
 
 check to see how to use build path with Xtext
 add qualified names to actors
