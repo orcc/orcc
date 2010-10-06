@@ -29,6 +29,8 @@ actor Algo_DecodeMbPred()
 	uint(size=4) RemIntraYxYPredMode,
 
 	uint(size=4) RefIdxL0,
+	uint(size=4) RefIdxL1,
+	uint(size=3) SelectList,
 	uint(size=5) MbPartHeight,
 	uint(size=5) MbPartWidth,
 	uint(size=3) MbPartIdx,
@@ -47,6 +49,12 @@ actor Algo_DecodeMbPred()
 	uint(size=3) VLD_SE    = 2;
 	uint(size=4) VLD_TE    = 9;
 	uint(size=4) SKIP_NAL  = 10;
+
+	uint(size=3) PRED_L0 = 0;
+	uint(size=3) PRED_L1 = 1;
+	uint(size=3) BIPRED  = 2;
+	uint(size=3) DIRECT  = 3;
+	uint(size=3) NA      = 4;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -118,6 +126,18 @@ actor Algo_DecodeMbPred()
 			2,2,4
 		];
 
+	List(type: List(type: uint(size=3), size=2), size=6) P_MbPartPredMode =
+		[
+			[PRED_L0,NA],[PRED_L0,PRED_L0],[PRED_L0,PRED_L0],[NA,NA],[NA,NA],[PRED_L0,NA]
+		];
+
+	List(type: List(type: uint(size=3), size=2), size=24) B_MbPartPredMode =
+		[
+			[DIRECT,NA], [PRED_L0,NA], [PRED_L1,NA], [BIPRED,NA], [PRED_L0,PRED_L0], [PRED_L0,PRED_L0], [PRED_L1,PRED_L1], [PRED_L1,PRED_L1], [PRED_L0,PRED_L1], [PRED_L0,PRED_L1],
+			[PRED_L1,PRED_L0], [PRED_L1,PRED_L0], [PRED_L0,BIPRED], [PRED_L0,BIPRED], [PRED_L1,BIPRED], [PRED_L1,BIPRED], [BIPRED,PRED_L0], [BIPRED,PRED_L0], [BIPRED,PRED_L1], [BIPRED,PRED_L1],
+			[BIPRED,BIPRED], [BIPRED,BIPRED], [NA,NA], [DIRECT,NA]
+		];
+
 	List (type:uint(size=3),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
 
 	uint(size=5)  lumaYxYBlkIdx := 0;
@@ -136,21 +156,39 @@ actor Algo_DecodeMbPred()
 	bool          mb_field_decoding_flag;
 
 
-	function MbPartWidthHeight(uint(size=1) x) --> uint(size=5) : 
-		if (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) then 
-			if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
-				P_tab[mb_type-BLOCK_TYPE_P_MIN][1+x]
+	function MbPartWidthHeight(uint(size=1) x) --> uint(size=5)
+		: 
+			if (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) then 
+				if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
+					P_tab[mb_type-BLOCK_TYPE_P_MIN][1+x]
+				else
+					P_tab[5][1+x]
+				end
 			else
-				P_tab[5][1+x]
-			end
-		else
-			if mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX then
-				B_tab[mb_type - BLOCK_TYPE_B_MIN][1+x]
-			else
-				B_tab[23][1+x]
+				if mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX then
+					B_tab[mb_type - BLOCK_TYPE_B_MIN][1+x]
+				else
+					B_tab[23][1+x]
+				end
 			end
 		end
-	end
+
+	function MbPartPredMode(uint(size=1) Mb_Part_Idx) --> uint(size=3)
+		:
+			if (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) then 
+				if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
+					P_MbPartPredMode[mb_type-BLOCK_TYPE_P_MIN][Mb_Part_Idx & 1]
+				else
+					P_MbPartPredMode[5][Mb_Part_Idx & 1]
+				end
+			else
+				if mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX then
+					B_MbPartPredMode[mb_type - BLOCK_TYPE_B_MIN][Mb_Part_Idx & 1]
+				else
+					B_MbPartPredMode[23][Mb_Part_Idx & 1]
+				end
+			end
+		end
 
 	function IS_MbPred_L0(uint(size=6) MbType, uint(size=1) x)
 				-->
@@ -556,6 +594,15 @@ actor Algo_DecodeMbPred()
 			mbPartIdx := mbPartIdx + 1;
 		end
 
+	SendSelectList: action
+				==>
+			SelectList :[MbPartPredMode(mbPartIdx - 1)]
+		guard
+			mbPartIdx < mbPartIdxMax
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
 	SendOrReadDone: action
 				==>
 		guard
@@ -582,13 +629,14 @@ actor Algo_DecodeMbPred()
 		end
 
 	ReadRefIdxL1.Done: action
-			ValVLD :[ValueOfVLD]
+			ValVLD :[val_ref_idx]
 				==>
+			RefIdxL1 :[val_ref_idx]
 		guard
 			mbPartIdx < mbPartIdxMax
 		do
 			if(DEBUG_MV)then
-				println("ReadRefIdxL1["+mbPartIdx+"] : "+ValueOfVLD);
+				println("ReadRefIdxL1["+mbPartIdx+"] : "+val_ref_idx);
 			end
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -631,7 +679,7 @@ actor Algo_DecodeMbPred()
 		ReadParameters (ReadParameters )--> CheckMbType;
 
 		CheckMbType   (MbType.IsIntra_YxY )--> CheckMbTypeYxY;
-		CheckMbType   (Mb_Type.IsNotEqualToDirect )-->ReadRefIdxl0Asked;
+		CheckMbType   (Mb_Type.IsNotEqualToDirect )-->SendSelectList;
 		CheckMbType   (SendEndMbPred)--> ReadParameters;
 
 		CheckMbTypeYxY (MbType.IsIntra_4x4 )--> ReadPrevAndRemIntra4x4;
@@ -653,6 +701,9 @@ actor Algo_DecodeMbPred()
 		CheckChromaArrayTp (SendEndMbPred  )--> ReadParameters;
 
 		ReadIntraChroma   (ReadIntraChroma)--> SendEndMbPred;
+
+		SendSelectList    (SendSelectList )--> SendSelectList;
+		SendSelectList    (SendOrReadDone )--> ReadRefIdxl0Asked;
 
 		ReadRefIdxl0Asked (ReadRefIdxl0 )--> ReadRefIdxl0Asked;
 		ReadRefIdxl0Asked (ReadParam.Skip1Parameter )--> ReadRefIdxl0Asked;

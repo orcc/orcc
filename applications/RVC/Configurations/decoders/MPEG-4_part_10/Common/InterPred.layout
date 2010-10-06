@@ -13,11 +13,11 @@
       <vertex id="PartSZ" x="57" y="261"/>
       <vertex id="Mb_Type" x="31" y="540"/>
       <vertex id="currMBaddr" x="16" y="428"/>
-      <vertex id="RA_L" x="550" y="510"/>
-      <vertex id="RA_Width_L" x="540" y="593"/>
-      <vertex id="RA_Height_L" x="536" y="551"/>
+      <vertex id="RA_L" x="586" y="487"/>
+      <vertex id="RA_Width_L" x="565" y="557"/>
+      <vertex id="RA_Height_L" x="564" y="523"/>
       <vertex id="MB4x4Pred_L" x="1283" y="509"/>
-      <vertex id="RefIdx2PocControl" x="550" y="471"/>
+      <vertex id="RefIdx2PocControl" x="546" y="596"/>
       <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="256" y="447"/>
       <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="543" y="287"/>
       <vertex id="Algo_Interp_split_MB" x="901" y="184"/>

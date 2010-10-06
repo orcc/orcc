@@ -35,10 +35,10 @@
       <vertex id="Transform8x8Mode" x="742" y="3033"/>
       <vertex id="NumRefIdxLXActive" x="347" y="234"/>
       <vertex id="ResetPrevFrameNum" x="57" y="2586"/>
-      <vertex id="IntraPredModeC" x="1576" y="2136"/>
+      <vertex id="IntraPredModeC" x="1475" y="1384"/>
       <vertex id="QP_Cb" x="1966" y="1860"/>
       <vertex id="QP_Cr" x="1978" y="1898"/>
-      <vertex id="ScalingList" x="1964" y="1960"/>
+      <vertex id="ScalingList" x="1974" y="1994"/>
       <vertex id="QP" x="1983" y="1824"/>
       <vertex id="CurrMbAddr" x="1668" y="2208"/>
       <vertex id="slice_alpha_c0_offset" x="1670" y="2692"/>
@@ -73,21 +73,22 @@
       <vertex id="Value" x="1907" y="1108"/>
       <vertex id="Last" x="2347" y="1341"/>
       <vertex id="MacroBlockType" x="1955" y="1647"/>
-      <vertex id="TransformSize8x8" x="1946" y="1993"/>
+      <vertex id="TransformSize8x8" x="1950" y="2024"/>
       <vertex id="NbRefFrame_l1" x="1264" y="231"/>
       <vertex id="RefList1Type" x="1267" y="331"/>
       <vertex id="RefReordering_l1" x="1260" y="449"/>
+      <vertex id="RefIdx_l1" x="1975" y="1959"/>
       <vertex id="Mgnt_DecodePic" x="1907" y="496"/>
       <vertex id="DecodeSliceHeader" x="347" y="1557"/>
       <vertex id="DecodeRefPicList" x="742" y="168"/>
       <vertex id="DecodeDecRefPicMarking" x="1560" y="88"/>
-      <vertex id="DecodeSliceData_Cavlc" x="1125" y="2147"/>
+      <vertex id="DecodeSliceData_Cavlc" x="1025" y="2167"/>
       <vertex id="DecodeMacroBlockLayer" x="742" y="1037"/>
-      <vertex id="DecodeMbPred" x="1125" y="1745"/>
+      <vertex id="DecodeMbPred" x="1148" y="1398"/>
       <vertex id="DecodeResidual" x="1125" y="939"/>
       <vertex id="DecodeResidualBlock_Cavlc" x="1560" y="1038"/>
-      <vertex id="DecodeSubMbPred" x="1125" y="1450"/>
-      <vertex id="MergeDataFromSDataAndMbLayer" x="1570" y="1602"/>
+      <vertex id="DecodeSubMbPred" x="1135" y="1806"/>
+      <vertex id="MergeDataFromSDataAndMbLayer" x="1617" y="1551"/>
       <vertex id="GenerateSkipBlockInformation" x="1907" y="1205"/>
    </vertices>
 </layout>

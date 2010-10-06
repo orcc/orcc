@@ -6,7 +6,7 @@
       <vertex id="PredMode" x="57" y="986"/>
       <vertex id="FirstMbInSlice" x="57" y="677"/>
       <vertex id="MbPartIdx" x="250" y="1433"/>
-      <vertex id="RefIdx_l0" x="878" y="1721"/>
+      <vertex id="RefIdx_l0" x="911" y="1602"/>
       <vertex id="MbPartWidth" x="250" y="1627"/>
       <vertex id="MbPartHeigth" x="250" y="1724"/>
       <vertex id="PicSizeInMb" x="250" y="294"/>
@@ -15,7 +15,7 @@
       <vertex id="MV" x="250" y="1918"/>
       <vertex id="PartSZ" x="250" y="2015"/>
       <vertex id="POC" x="880" y="1205"/>
-      <vertex id="RefList0" x="879" y="1683"/>
+      <vertex id="RefList0" x="912" y="1640"/>
       <vertex id="Mb_Type" x="250" y="869"/>
       <vertex id="QP" x="880" y="235"/>
       <vertex id="LFDisable" x="880" y="353"/>
@@ -31,6 +31,8 @@
       <vertex id="IsIDR" x="880" y="1399"/>
       <vertex id="MacroBlockType" x="57" y="1374"/>
       <vertex id="TransformSize8x8" x="57" y="1277"/>
+      <vertex id="RefList1" x="900" y="1850"/>
+      <vertex id="RefIdx_l1" x="899" y="1798"/>
       <vertex id="Display_L" x="1530" y="1399"/>
       <vertex id="Inter" x="609" y="1530"/>
       <vertex id="Buffer_inter" x="1297" y="1267"/>
@@ -39,7 +41,9 @@
       <vertex id="Intra_4x4" x="676" y="1148"/>
       <vertex id="Deblocking_Filter" x="1095" y="533"/>
       <vertex id="Mgnt_Display" x="1095" y="1274"/>
-      <vertex id="RefIdxtoPOC" x="1017" y="1615"/>
+      <vertex id="RefIdxl0_to_POC" x="1017" y="1615"/>
       <vertex id="DemuxParserInfos" x="235" y="1039"/>
+      <vertex id="RefIdxl1_to_POC" x="1051" y="1784"/>
+      <vertex id="Black_Hole" x="1485" y="1743"/>
    </vertices>
 </layout>

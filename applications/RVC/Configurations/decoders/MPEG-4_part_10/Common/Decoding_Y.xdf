@@ -218,6 +218,20 @@
     <Port kind="Input" name="TransformSize8x8">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="RefList1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="RefIdx_l1">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -345,4 +359,6 @@
     <Connection dst="TEX_L" dst-port="TransformSize8x8" src="" src-port="TransformSize8x8"/>
     <Connection dst="TEX_L" dst-port="RefIdx_l0" src="" src-port="RefIdx_l0"/>
     <Connection dst="TEX_L" dst-port="RefList0" src="" src-port="RefList0"/>
+    <Connection dst="TEX_L" dst-port="RefList1" src="" src-port="RefList1"/>
+    <Connection dst="TEX_L" dst-port="RefIdx_l1" src="" src-port="RefIdx_l1"/>
 </XDF>

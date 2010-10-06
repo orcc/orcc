@@ -52,7 +52,6 @@ actor Algo_DecodeMacroblockLayer()
 	bool          MbPredMbFieldDecoding,
 
 	//SubMbPred parameters
-	uint(size=4)  SubMbPredSliceType,
 	uint(size=6)  SubMbPredMbType,
 	uint(size=5)  SubMbPredNumRefIdxLXActive,
 	bool          SubMbPredMbFieldDecoding,
@@ -437,7 +436,6 @@ actor Algo_DecodeMacroblockLayer()
 			TypeOfVLD :[LAUNCH_ACTOR],
 			VLDParam  :[SUB_MB_PRED],
 
-			SubMbPredSliceType         :[slice_type],
 			SubMbPredMbType            :[mb_type],
 			SubMbPredNumRefIdxLXActive :[num_ref_idx_l0_active , num_ref_idx_l1_active],
 			SubMbPredMbFieldDecoding   :[mb_field_decoding]

@@ -24,7 +24,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		uint(size=11) RA_Width,
 		uint(size=11) RA_Height,
 		uint(size=16) Frac,
-		uint(size=2)  RefIdx2PocControl	
+		uint(size=2)  RefIdx2PocControl
 	:
 
 	uint(size=2) GETNEWLIST  = 0;

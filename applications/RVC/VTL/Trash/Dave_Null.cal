@@ -1,8 +1,8 @@
 actor Dave_Null () 
-	int(size=32) Token
+	uint(size=32) Token
 	==>
     :
-	action
+	a: action
 			Token:[b]
 				==>
 	end

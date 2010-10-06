@@ -32,8 +32,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 	uint(size=7)  PicWidthInMb4x4,
 	uint(size=13) CurrMbAddr4x4,
 
-//	int(size=16)  Coef_ACR_Intra_8x8,
-
 	int (size=16) Coef_ACR_Intra_16x16,
 	uint(size=13) FstMbInSlice_Intra_16x16,
 	bool          ConstrI_Intra_16x16,
@@ -263,7 +261,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 
 
 	MBTypeIsInter: action
-			MBType           :[ValMBType]
+			MBType      :[ValMBType]
 				==>
 		guard
 			ValMBType > MB_TYPE_INTRA_MAX

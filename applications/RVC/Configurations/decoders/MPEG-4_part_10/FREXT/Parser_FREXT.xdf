@@ -323,6 +323,20 @@
     <Port kind="Output" name="TransformSize8x8">
         <Type name="bool"/>
     </Port>
+    <Port kind="Output" name="Ref_List1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="RefIdx_l1">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -472,15 +486,6 @@
         <Parameter name="DEBUG">
             <Expr kind="Literal" literal-kind="Boolean" value="true"/>
         </Parameter>
-    </Instance>
-    <Instance id="Black_Hole_4_RefList">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/Trash/Dave_Null"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
@@ -683,10 +688,10 @@
     <Connection dst="RefList1" dst-port="NbRefFrame" src="DecodePic" src-port="NbRefFrame_l1"/>
     <Connection dst="RefList1" dst-port="RefListType" src="DecodePic" src-port="RefList1Type"/>
     <Connection dst="RefList1" dst-port="RefReordering" src="DecodePic" src-port="RefReordering_l1"/>
-    <Connection dst="Black_Hole_4_RefList" dst-port="Token"
-        src="RefList1" src-port="RefList"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
     <Connection dst="" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
     <Connection dst="" dst-port="RefIdx_l0" src="DecodePic" src-port="RefIdx_l0"/>
     <Connection dst="MVReconstruct" dst-port="RefIdx" src="DecodePic" src-port="RefIdx_l0"/>
+    <Connection dst="" dst-port="Ref_List1" src="RefList1" src-port="RefList"/>
+    <Connection dst="" dst-port="RefIdx_l1" src="DecodePic" src-port="RefIdx_l1"/>
 </XDF>

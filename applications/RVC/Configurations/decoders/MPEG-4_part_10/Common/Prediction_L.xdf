@@ -197,6 +197,20 @@
     <Port kind="Input" name="TransformSize8x8">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="RefList1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="RefIdx_l1">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -352,7 +366,7 @@
             <Expr kind="Literal" literal-kind="Boolean" value="true"/>
         </Parameter>
     </Instance>
-    <Instance id="RefIdxtoPOC">
+    <Instance id="RefIdxl0_to_POC">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -366,6 +380,24 @@
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
         <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DemuxParserInfoForBlocks_Luma"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="RefIdxl1_to_POC">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Black_Hole">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/Dave_Null"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -415,8 +447,8 @@
         src="Mgnt_Display" src-port="POCtoDisplay"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead"
-        src="RefIdxtoPOC" src-port="POCtoRead"/>
-    <Connection dst="RefIdxtoPOC" dst-port="RefList" src="" src-port="RefList0"/>
+        src="RefIdxl0_to_POC" src-port="POCtoRead"/>
+    <Connection dst="RefIdxl0_to_POC" dst-port="RefList" src="" src-port="RefList0"/>
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="Mgnt_Display" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="Buffer_inter" dst-port="IsIDR" src="" src-port="IsIDR"/>
@@ -468,6 +500,12 @@
     <Connection dst="Intra_16x16" dst-port="CurrMb_Addr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Inter" dst-port="PicWidthInMb"
         src="DemuxParserInfos" src-port="PicWidthInMbInter"/>
-    <Connection dst="RefIdxtoPOC" dst-port="RemoteControl" src="Inter" src-port="RefIdx2PocControl"/>
-    <Connection dst="RefIdxtoPOC" dst-port="RefIdx" src="" src-port="RefIdx_l0"/>
+    <Connection dst="RefIdxl0_to_POC" dst-port="RemoteControl"
+        src="Inter" src-port="RefIdx2PocControl"/>
+    <Connection dst="RefIdxl0_to_POC" dst-port="RefIdx" src="" src-port="RefIdx_l0"/>
+    <Connection dst="RefIdxl1_to_POC" dst-port="RemoteControl"
+        src="Inter" src-port="RefIdx2PocControl"/>
+    <Connection dst="RefIdxl1_to_POC" dst-port="RefList" src="" src-port="RefList1"/>
+    <Connection dst="RefIdxl1_to_POC" dst-port="RefIdx" src="" src-port="RefIdx_l1"/>
+    <Connection dst="Black_Hole" dst-port="Token" src="RefIdxl1_to_POC" src-port="POCtoRead"/>
 </XDF>

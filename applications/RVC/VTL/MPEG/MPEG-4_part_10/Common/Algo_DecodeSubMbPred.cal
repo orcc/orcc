@@ -18,7 +18,6 @@ actor Algo_DecodeSubMbPred()
 
 	uint(size=5)  NumRefIdxLXActive,
 	bool          MbFieldDecoding,
-	uint(size=4)  SliceType,
 	uint(size=6)  MbType
 		==>
 	uint(size=5)  TypeOfVLD,
@@ -27,6 +26,8 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) MBLayerSubMbType,
 
 	uint(size=4) RefIdxL0,
+	uint(size=4) RefIdxL1,
+	uint(size=3) SelectList,
 	int(size=16) MvResl0,
 	uint(size=5) MbPartHeight,
 	uint(size=5) MbPartWidth,
@@ -42,23 +43,24 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) VLD_TE    = 9;
 	uint(size=4) SKIP_NAL  = 10;
 
-	uint(size=4) SLICE_TYPE_P  = 0;
-	uint(size=4) SLICE_TYPE_B  = 1;
-	uint(size=4) SLICE_TYPE_SP = 3;
+	uint(size=6) BLOCK_TYPE_P_MIN           = 26;
+	uint(size=6) BLOCK_TYPE_P_8x8ref0       = 30;
+	uint(size=6) BLOCK_TYPE_P_MAX           = 30;
 
-	uint(size=2) MB_TYPE_P_8x8REF0     = 30;
+	uint(size=6) BLOCK_TYPE_B_MIN           = 31;
+	uint(size=6) BLOCK_TYPE_B_MAX           = 53;
 
 	uint(size=2) B_DIRECT_8x8  = 0;
 
-	uint(size=3) DIRECT  = 0;
-	uint(size=3) PRED_L0 = 1;
-	uint(size=3) PRED_L1 = 2;
-	uint(size=3) BIPRED  = 3;
+	uint(size=3) PRED_L0 = 0;
+	uint(size=3) PRED_L1 = 1;
+	uint(size=3) BIPRED  = 2;
+	uint(size=3) DIRECT  = 3;
 	uint(size=3) NA      = 4;
 
-	List(type: uint(size=2), size=13) SubMbPredMode_B
-		=	[ DIRECT , PRED_L0 , PRED_L1 , BIPRED , PRED_L0 , PRED_L0 , PRED_L1 , PRED_L1 , BIPRED , BIPRED 
-			, PRED_L0 , PRED_L1 , BIPRED];
+	List(type: uint(size=2), size=16) SubMbPredMode_B
+		=	[  DIRECT , PRED_L0 , PRED_L1 , BIPRED , PRED_L0 , PRED_L0 , PRED_L1 , PRED_L1 , BIPRED , BIPRED 
+			, PRED_L0 , PRED_L1 , BIPRED  ,   NA   ,   NA    ,   NA    ];
 
 	List(type: uint(size=3), size=4)  NumSubMbPart_P = [1,2,2,4];
 
@@ -74,7 +76,6 @@ actor Algo_DecodeSubMbPred()
 	uint(size=5)  num_ref_idx_l0_active;
 	uint(size=5)  num_ref_idx_l1_active;
 	bool          mb_field_decoding_flag;
-	uint(size=4)  slice_type;
 	uint(size=6)  mb_type;
 
 	uint(size=2) mbPartIdx;
@@ -86,7 +87,7 @@ actor Algo_DecodeSubMbPred()
 	List (type:int,size=4) ref_idx_l1 := [ 0 : for int i in 0 .. 3];
 
 	function SubMbPredMode( uint(size=4) ValSubMbType) --> uint(size=2) :
-			if(slice_type = SLICE_TYPE_B)then
+			if(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX)then
 				if(ValSubMbType >12) then
 					DIRECT
 				else
@@ -105,14 +106,10 @@ actor Algo_DecodeSubMbPred()
 				-->
 			uint(size=5)
 		:
-			if slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP then
+			if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
 				P_tab_sub[sub_mb_type[mbPartIdx - 1]][1+x]
 			else
-				if slice_type = SLICE_TYPE_B then
-					B_tab_sub[sub_mb_type[mbPartIdx - 1]][1+x]
-				else
-					1 
-				end
+				B_tab_sub[sub_mb_type[mbPartIdx - 1]][1+x]
 			end
 		end
 
@@ -126,6 +123,8 @@ actor Algo_DecodeSubMbPred()
 			ValVLD           :[ValueOfVLD] repeat 4
 				==>
 			MBLayerSubMbType :[ValueOfVLD] repeat 4
+		var
+			List(type: uint(size=3), size=4) SelList
 		do
 			foreach int i in 0 .. 3
 			do
@@ -139,15 +138,13 @@ actor Algo_DecodeSubMbPred()
 	ReadParameters: action
 			NumRefIdxLXActive :[ValNumRefIdxLXAct] repeat 2,
 			MbFieldDecoding   :[ValMbFieldDecoding],
-			MbType            :[MacroBType],
-			SliceType         :[ValSliceType]
+			MbType            :[MacroBType]
 				==>
 		do
 			num_ref_idx_l0_active  := ValNumRefIdxLXAct[0];
 			num_ref_idx_l1_active  := ValNumRefIdxLXAct[1];
 			mb_field_decoding_flag := ValMbFieldDecoding;
 			mb_type                := MacroBType;
-			slice_type             := ValSliceType;
 
 			mbPartIdx    := 0;
 		end
@@ -168,9 +165,9 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 			/* ( num_ref_idx_l0_active_minus1 > 0 || mb_field_decoding_flag ) */
 			num_ref_idx_l0_active > 1 or mb_field_decoding_flag,
 			/* mb_type != P_8x8ref0 */
-			   mb_type != MB_TYPE_P_8x8REF0,
+			   mb_type != BLOCK_TYPE_P_8x8ref0,
 			/* sub_mb_type[ mbPartIdx ] != B_Direct_8x8 */
-			(slice_type != SLICE_TYPE_B) or (sub_mb_type[mbPartIdx] != B_DIRECT_8x8),
+			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx] != B_DIRECT_8x8),
 			/* SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L1 )*/
 			SubMbPredMode(sub_mb_type[mbPartIdx]) != PRED_L1,
 
@@ -212,7 +209,7 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 			/* ( num_ref_idx_l1_active_minus1 > 0 | | mb_field_decoding_flag ) */
 			num_ref_idx_l1_active > 1 or mb_field_decoding_flag,
 			/* sub_mb_type[ mbPartIdx ] != B_Direct_8x8 */
-			(slice_type != SLICE_TYPE_B) or (sub_mb_type[mbPartIdx] != B_DIRECT_8x8),
+			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx] != B_DIRECT_8x8),
 			/* SubMbPredMode( sub_mb_type[ mbPartIdx ] ) != Pred_L0 )*/
 			SubMbPredMode(sub_mb_type[mbPartIdx]) != PRED_L0,
 
@@ -222,12 +219,13 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 		end
 
 
-	CheckmbPartIdx: action ==>
+	CheckmbPartIdx: action
+				==>
 		guard
 			mbPartIdx < 4
 		do
 			subMbPartIdx := 0;
-			if( (slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP) )then
+			if( (mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX) )then
 				subMbPartIdxMax := NumSubMbPart_P[ (sub_mb_type[mbPartIdx]) & 0x03 ];
 			else
 				if(sub_mb_type[mbPartIdx] > 10) then
@@ -248,7 +246,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			//             mvd_l0
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
-			(slice_type != SLICE_TYPE_B) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
+			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1,
 			subMbPartIdx < subMbPartIdxMax
 		do
@@ -275,7 +273,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			//             mvd_l0
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
-			(slice_type != SLICE_TYPE_B) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
+			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L0,
 			subMbPartIdx < subMbPartIdxMax
 		do
@@ -312,6 +310,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
 			RefIdxL0     :[ref_idx_l0[mbPartIdx-1]],
+			SelectList   :[SubMbPredMode(sub_mb_type[mbPartIdx - 1])],
 			MvResl0      :[ValueOfVLD] repeat 2,
 			MbPartHeight :[SubMbPartWidthHeight(1)],
 			MbPartWidth  :[SubMbPartWidthHeight(0)],
@@ -330,6 +329,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 	ReadMvdl1Done: action
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
+			RefIdxL1 :[ref_idx_l1[mbPartIdx-1]]
 		guard
 			subMbPartIdx < subMbPartIdxMax
 		do
