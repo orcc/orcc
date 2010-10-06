@@ -103,7 +103,7 @@ actor Algo_DecodeSps()
 	List (type: uint(size=4) , size=32) constraint_set_flag                   := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=8) , size=32) profile_idc                           := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=4) , size=32) log2_max_frame_num_minus4             := [ 0     : for int i in 0 .. 31 ];
-	List (type: uint(size=32), size=31) max_frame_num                         := [ 0     : for int i in 0 .. 31 ];
+	List (type: uint(size=32), size=32) max_frame_num                         := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=2) , size=32) pic_order_cnt_type                    := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=4) , size=32) log2_max_pic_order_cnt_lsb_minus4     := [ 0     : for int i in 0 .. 31 ];
 	List (type: uint(size=1) , size=32) delta_pic_order_always_zero_flag      := [ 0     : for int i in 0 .. 31 ];
