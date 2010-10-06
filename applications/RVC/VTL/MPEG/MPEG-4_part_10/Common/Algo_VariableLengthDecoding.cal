@@ -4580,11 +4580,11 @@ actor Algo_VariableLengthDecoding()
 				],
 				[
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 0
-					[  0: for int i in 0 .. 7 ],
+					[  0, 0, 0, 0, 0, 0, 0, 0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 1
 					[  0 ,  0 ,  0  ,  0 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 2
-					[  0: for int i in 0 .. 7 ],
+					[  0, 0, 0, 0, 0, 0, 0, 0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 3
 					[  0 ,  0 ,  2  ,  1 ,  0 ,  0 ,  0 ,  0 ],
 					// MaxNumCoeff != 4 and MaxNumCoeff != 8 ; TotalCoeff = 1 ; nbBitRead = 4
