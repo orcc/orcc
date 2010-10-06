@@ -16,19 +16,61 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 actor SelectRefIdx()
 	uint(size=3)  SelectList,
+	uint(size=32) POCtoRead_l0,
 	uint(size=32) POCtoRead_l1,
-	uint(size=32) POCtoRead_l0
+	bool          NewMb//Delete me !
 		==>
-	uint(size=32) POCtoRead
+	uint(size=32) PocToRead
 		:
+	uint(size=3) PRED_L0 = 0;
+	uint(size=3) PRED_L1 = 1;
+	uint(size=3) BIPRED  = 2;
+	uint(size=3) DIRECT  = 3;
+	uint(size=3) NA      = 4;
 
+	uint(size=3) ListSelected;
 
-	schedule fsm GetMbType:
-/*		GetMbType (GetMbType )--> SendPocToRead;
+	GetSelectList: action
+			SelectList :[list_selected]
+				==>
+		do
+			ListSelected := list_selected;
+		end
+
+	SendPocToRead.L0: action
+			POCtoRead_l0 :[Poc0],
+			POCtoRead_l1 :[Poc1],
+			NewMb        :[IsNewMb]
+				==>
+			PocToRead    :[Poc0]
+		guard
+			not IsNewMb,
+			ListSelected = PRED_L0 or ListSelected = BIPRED or ListSelected = DIRECT//FixMe!!
+		end
+
+	SendPocToRead.L1: action
+			POCtoRead_l0 :[Poc0],
+			POCtoRead_l1 :[Poc1],
+			NewMb        :[IsNewMb]
+				==>
+			PocToRead    :[Poc1]
+		guard
+			not IsNewMb,
+			ListSelected = PRED_L1
+		end	
+
+	NewMacroBlock: action
+			NewMb        :[IsNewMb]
+				==>
+		guard
+			IsNewMb
+		end	
+
+	schedule fsm GetSelectList:
+		GetSelectList (GetSelectList )--> SendPocToRead;
 
 		SendPocToRead (SendPocToRead.L0 )--> SendPocToRead;
 		SendPocToRead (SendPocToRead.L1 )--> SendPocToRead;
-		SendPocToRead (NewMacroBlock    )--> GetMbType;
-*/
+		SendPocToRead (NewMacroBlock    )--> GetSelectList;
 	end
 end

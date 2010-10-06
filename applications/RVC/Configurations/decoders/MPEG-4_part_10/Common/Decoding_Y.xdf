@@ -232,6 +232,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -361,4 +368,5 @@
     <Connection dst="TEX_L" dst-port="RefList0" src="" src-port="RefList0"/>
     <Connection dst="TEX_L" dst-port="RefList1" src="" src-port="RefList1"/>
     <Connection dst="TEX_L" dst-port="RefIdx_l1" src="" src-port="RefIdx_l1"/>
+    <Connection dst="TEX_L" dst-port="SelectList" src="" src-port="SelectList"/>
 </XDF>

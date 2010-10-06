@@ -337,6 +337,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -694,4 +701,5 @@
     <Connection dst="MVReconstruct" dst-port="RefIdx" src="DecodePic" src-port="RefIdx_l0"/>
     <Connection dst="" dst-port="Ref_List1" src="RefList1" src-port="RefList"/>
     <Connection dst="" dst-port="RefIdx_l1" src="DecodePic" src-port="RefIdx_l1"/>
+    <Connection dst="" dst-port="SelectList" src="DecodePic" src-port="SelectList"/>
 </XDF>

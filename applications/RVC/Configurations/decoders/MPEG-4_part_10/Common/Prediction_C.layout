@@ -37,7 +37,12 @@
       <vertex id="Select_chroma" x="808" y="1790"/>
       <vertex id="Deblocking_Filter" x="1023" y="507"/>
       <vertex id="Mgnt_Display" x="1023" y="1130"/>
-      <vertex id="RefIdxtoPOC" x="837" y="1200"/>
+      <vertex id="RefIdxl0toPOC" x="837" y="1200"/>
       <vertex id="DemuxParserInfos" x="243" y="1908"/>
+      <vertex id="RefIdxl1toPOC" x="846" y="1489"/>
+      <vertex id="RefIdx_l1" x="754" y="1433"/>
+      <vertex id="RefList1" x="761" y="1554"/>
+      <vertex id="SelectRefIdx" x="1031" y="1492"/>
+      <vertex id="SelectList" x="840" y="1641"/>
    </vertices>
 </layout>

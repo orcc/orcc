@@ -66,7 +66,8 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	int (size=8)  Qp_Cb,
 	int (size=8)  Qp_Cr,
 	uint(size=6)  MacroBlockType,
-	bool          TransformSize8x8
+	bool          TransformSize8x8,
+	uint(size=3)  SelectList
 		:
 
 	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
@@ -87,6 +88,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			MbIntraFlag     :[0],
 			RefIdxl0        :[0],
 			RefIdxl1        :[0],
+			SelectList      :[0],
 			MvResl0         :[0,0],
 			MbPartHeight    :[16],
 			MbPartWidth     :[16],
@@ -227,7 +229,8 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			RefIdxl1     :[ref_idx_l1],
 			MbPartHeight :[mb_part_height],
 			MbPartWidth  :[mb_part_width],
-			MbPartIdx    :[mb_part_idx]
+			MbPartIdx    :[mb_part_idx],
+			SelectList   :[selectlist]
 		guard
 			Finished = false
 		end
@@ -267,6 +270,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 				==>
 			RefIdxl0     :[ref_idx_l0],
 			RefIdxl1     :[ref_idx_l1],
+			SelectList   :[selectlist],
 			MvResl0      :[mv_res] repeat 2,
 			MbPartHeight :[mb_part_height],
 			MbPartWidth  :[mb_part_width],

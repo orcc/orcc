@@ -125,6 +125,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="NewMb">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -226,4 +229,6 @@
     <Connection dst="Algo_Add_4x4" dst-port="Y" src="" src-port="Coef_ACR"/>
     <Connection dst="" dst-port="RefIdx2PocControl"
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="RefIdx2PocControl"/>
+    <Connection dst="" dst-port="NewMb"
+        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="NewMb"/>
 </XDF>

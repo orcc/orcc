@@ -481,6 +481,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -965,4 +972,6 @@
         dst-port="SubMbPredSelectList" src="DecodeSubMbPred" src-port="SelectList"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredSelectList" src="DecodeMbPred" src-port="SelectList"/>
+    <Connection dst="" dst-port="SelectList"
+        src="MergeDataFromSDataAndMbLayer" src-port="SelectList"/>
 </XDF>

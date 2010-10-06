@@ -34,10 +34,11 @@
       <vertex id="BlocksSize" x="48" y="1502"/>
       <vertex id="MacroBlockType" x="514" y="1492"/>
       <vertex id="TransformSize8x8" x="39" y="1278"/>
+      <vertex id="RefList1" x="425" y="1857"/>
+      <vertex id="RefIdx_l1" x="408" y="1727"/>
       <vertex id="Display_L" x="988" y="1287"/>
       <vertex id="TEX_L" x="733" y="1298"/>
       <vertex id="RES_L" x="205" y="1554"/>
-      <vertex id="RefList1" x="425" y="1857"/>
-      <vertex id="RefIdx_l1" x="408" y="1727"/>
+      <vertex id="SelectList" x="442" y="1915"/>
    </vertices>
 </layout>

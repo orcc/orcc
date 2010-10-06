@@ -26,7 +26,8 @@ actor Mgnt_FBAddr_Chroma_MxN ()
    																  uint(size=11)        RA_Width, 
    																  uint(size=11)        RA_Height,
    																  int (size=4)   Frac,
-																  uint(size=2)  RefIdx2PocControl	 :
+																  uint(size=2)  RefIdx2PocControl,
+																  bool 	        NewMb :
 
 	uint(size=2) GETNEWLIST  = 0;
 	uint(size=2) GETNEWIDX   = 1;
@@ -110,7 +111,8 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   			      Location  : [ a, b ], 
   			      PartSZ    : [ c, d ]
   			      	==>
-		      	RefIdx2PocControl :[GETNEWIDX]	      
+		      	RefIdx2PocControl :[GETNEWIDX],
+		      	NewMb             :[true]      
   do
   	x      := a/2;
     y      := b/2;
@@ -181,7 +183,8 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   read_address: action ==> RA        : [ r_addr ], 
   						   RA_Width  : [ 1 ], 
   						   RA_Height : [ 1 ],
-  						   RefIdx2PocControl :[SENDLASTIDX]
+  						   RefIdx2PocControl :[SENDLASTIDX],
+  						   NewMb             :[false]
   
   var int r_addr
   do

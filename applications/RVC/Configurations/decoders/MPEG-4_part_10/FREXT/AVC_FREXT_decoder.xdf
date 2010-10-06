@@ -290,4 +290,11 @@
     <Connection dst="Decode_V" dst-port="RefList0" src="FUN_Parser" src-port="Ref_List0"/>
     <Connection dst="Decoding_Y" dst-port="RefList1" src="FUN_Parser" src-port="Ref_List1"/>
     <Connection dst="Decoding_Y" dst-port="RefIdx_l1" src="FUN_Parser" src-port="RefIdx_l1"/>
+    <Connection dst="Decoding_Y" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
+    <Connection dst="Decode_U" dst-port="RefList1" src="FUN_Parser" src-port="Ref_List1"/>
+    <Connection dst="Decode_V" dst-port="RefList1" src="FUN_Parser" src-port="Ref_List1"/>
+    <Connection dst="Decode_U" dst-port="RefIdx_l1" src="FUN_Parser" src-port="RefIdx_l1"/>
+    <Connection dst="Decode_V" dst-port="RefIdx_l1" src="FUN_Parser" src-port="RefIdx_l1"/>
+    <Connection dst="Decode_U" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
+    <Connection dst="Decode_V" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
 </XDF>

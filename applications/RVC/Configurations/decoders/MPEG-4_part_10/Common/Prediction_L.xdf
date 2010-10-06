@@ -211,6 +211,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -393,11 +400,11 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Black_Hole">
+    <Instance id="SelectRefIdx">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/Trash/Dave_Null"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/SelectRefIdx"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -446,8 +453,6 @@
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay"
         src="Mgnt_Display" src-port="POCtoDisplay"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="" src-port="POC"/>
-    <Connection dst="Buffer_inter" dst-port="POCtoRead"
-        src="RefIdxl0_to_POC" src-port="POCtoRead"/>
     <Connection dst="RefIdxl0_to_POC" dst-port="RefList" src="" src-port="RefList0"/>
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="Mgnt_Display" dst-port="IsIDR" src="" src-port="IsIDR"/>
@@ -507,5 +512,12 @@
         src="Inter" src-port="RefIdx2PocControl"/>
     <Connection dst="RefIdxl1_to_POC" dst-port="RefList" src="" src-port="RefList1"/>
     <Connection dst="RefIdxl1_to_POC" dst-port="RefIdx" src="" src-port="RefIdx_l1"/>
-    <Connection dst="Black_Hole" dst-port="Token" src="RefIdxl1_to_POC" src-port="POCtoRead"/>
+    <Connection dst="SelectRefIdx" dst-port="NewMb" src="Inter" src-port="NewMb"/>
+    <Connection dst="SelectRefIdx" dst-port="POCtoRead_l1"
+        src="RefIdxl1_to_POC" src-port="POCtoRead"/>
+    <Connection dst="SelectRefIdx" dst-port="POCtoRead_l0"
+        src="RefIdxl0_to_POC" src-port="POCtoRead"/>
+    <Connection dst="SelectRefIdx" dst-port="SelectList" src="" src-port="SelectList"/>
+    <Connection dst="Buffer_inter" dst-port="POCtoRead"
+        src="SelectRefIdx" src-port="PocToRead"/>
 </XDF>
