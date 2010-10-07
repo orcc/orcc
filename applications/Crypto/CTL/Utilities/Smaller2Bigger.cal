@@ -37,11 +37,11 @@ actor Smaller2Bigger (bool IS_BIG_ENDIAN) uint(size=IP_PORT_SIZE) IP ==> uint(si
 	do
 		if IS_BIG_ENDIAN then
 			foreach int i in 0 .. IN_NUM_TOKENS_1 do
-				v := (v << IP_PORT_SIZE) + tokens[i];
+				v := (v << IP_PORT_SIZE) | tokens[i];
 			end		
 		else
 			foreach int i in 0 .. IN_NUM_TOKENS_1 do
-				v := v + (tokens[i] << (i*IP_PORT_SIZE));
+				v := v | (tokens[i] << (i*IP_PORT_SIZE));
 			end
 		end	
 	end

@@ -34,22 +34,17 @@ actor Bigger2Smaller (bool IS_BIG_ENDIAN) uint(size=IP_PORT_SIZE) IP ==> uint(si
 	action IP:[v] ==> OP:[tokens] repeat OP_NUM_TOKENS
 	guard OP_NUM_TOKENS > 0
 	var
-		int counter,
 		List(type:uint(size=OP_PORT_SIZE), size=OP_NUM_TOKENS) tokens := [0: for int i in 1 .. OP_NUM_TOKENS]
 	do
 		if IS_BIG_ENDIAN then // big-endian
-			counter := OP_NUM_TOKENS - 1;
-			while v > 0 do
-				tokens[counter] := v & OP_MASK_VALUE;
+			foreach int i in 1 .. OP_NUM_TOKENS do
+				tokens[OP_NUM_TOKENS-i] := v & OP_MASK_VALUE;
 				v := v >> OP_PORT_SIZE;
-				counter := counter - 1;
 			end
 		else // little-endian
-			counter := 0;
-			while v > 0 do
-				tokens[counter] := v & OP_MASK_VALUE;
+			foreach int i in 0 .. OP_NUM_TOKENS-1 do
+				tokens[i] := v & OP_MASK_VALUE;
 				v := v >> OP_PORT_SIZE;
-				counter := counter + 1;
 			end
 		end		
 	end
