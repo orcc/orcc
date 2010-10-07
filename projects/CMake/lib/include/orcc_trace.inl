@@ -29,15 +29,18 @@
 
 #include <stdio.h>
 
- DECL void FIFO_TRACE(T)(struct FIFO_S(T) *fifo, T *buffer, FILE* file, int n) {
+ DECL void FIFO_TRACE(T)(struct FIFO_S(T) *fifo, T *buffer, char* file, int n) {
 	int i;
+	FILE* pFile = fopen (file,"a");
+
 	if (fifo->write_ind + n <= fifo->size) {
 		for (i = 0; i<n; i++){
-			fprintf(file, PRINT_FORMAT, fifo->contents[fifo->write_ind+i]);
+			fprintf(pFile, PRINT_FORMAT, fifo->contents[fifo->write_ind+i]);
 		}
 	} else {
 		for (i = 0; i < n; i++){
-			fprintf(file, PRINT_FORMAT, buffer[i]);
+			fprintf(pFile, PRINT_FORMAT, buffer[i]);
 		}
 	}
+	fclose (pFile);
 }

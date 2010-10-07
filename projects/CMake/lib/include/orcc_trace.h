@@ -29,8 +29,6 @@
 #ifndef TRACE_H
 #define TRACE_H
 
-#define DECLARE_TRACE(name) FILE* trace_##name = NULL; 
-
 #define FIFO_TRACE(T) FIFO_TRACE_EXPAND(T)
 #define FIFO_TRACE_EXPAND(T) fifo_ ## T ## _trace
 
