@@ -4,25 +4,26 @@
  * 
  * FU ID: MixColumns
  * One input port:
- *   1) uint(size=8) IP: the input
+ *   1) uint(size=8) IP1_KeySize: the key size
+ *   2) uint(size=8) IP2_IT: the input text.
  * One output port:
  *   1) uint(size=8) OP: the output
  *
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor MixColumns () uint(size=8) IP1_PT, uint(size=8) IP0_Key ==> uint(size=8) OP:
+actor MixColumns () uint(size=8) IP1_KeySize, uint(size=8) IP2_IT ==> uint(size=8) OP:
 	
 	int Nr := 10;
 	
 	getNr:
-	action IP0_Key:[x] ==>
+	action IP1_KeySize:[x] ==>
 	do
 		Nr := 6 + (x >> 2);
 	end
 
 	lastRound: // If it is the last round, simply forward tokens to the next FU.
-	action IP1_PT:[x] repeat 17 ==> OP:[x] repeat 17 guard x[0]>=Nr end
+	action IP2_IT:[x] repeat 17 ==> OP:[x] repeat 17 guard x[0]>=Nr end
 	
 	List(type:uint(size=8), size=17) y := [0 : for int i in 1 .. 17];
 	List(type:uint(size=8), size=4) b := [0, 0, 0, 0];
@@ -43,7 +44,7 @@ actor MixColumns () uint(size=8) IP1_PT, uint(size=8) IP0_Key ==> uint(size=8) O
 	end
 	
 	normalRound: // If it is not the last round, do MixColumns.
-	action IP1_PT:[x] repeat 17 ==> OP:[y] repeat 17
+	action IP2_IT:[x] repeat 17 ==> OP:[y] repeat 17
 	guard x[0]<Nr
 	var
 		int index := 1 // Start from the second byte.

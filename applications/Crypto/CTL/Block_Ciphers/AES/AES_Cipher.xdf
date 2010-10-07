@@ -77,10 +77,10 @@
     <!-- ************************************** -->
     <Connection dst="SubBytes" dst-port="IP" src="AddRoundKey" src-port="OP2_FD"/>
     <Connection dst="ShiftRows" dst-port="IP" src="SubBytes" src-port="OP"/>
-    <Connection dst="MixColumns" dst-port="IP1_PT" src="ShiftRows" src-port="OP"/>
     <Connection dst="AddRoundKey" dst-port="IP3_FD" src="MixColumns" src-port="OP"/>
     <Connection dst="AddRoundKey" dst-port="IP2_Key" src="" src-port="Key"/>
-    <Connection dst="MixColumns" dst-port="IP0_Key" src="" src-port="Key"/>
     <Connection dst="AddRoundKey" dst-port="IP1_Text" src="" src-port="Plaintext"/>
     <Connection dst="" dst-port="Ciphertext" src="AddRoundKey" src-port="OP1_Text"/>
+    <Connection dst="MixColumns" dst-port="IP2_IT" src="ShiftRows" src-port="OP"/>
+    <Connection dst="MixColumns" dst-port="IP1_KeySize" src="" src-port="Key"/>
 </XDF>
