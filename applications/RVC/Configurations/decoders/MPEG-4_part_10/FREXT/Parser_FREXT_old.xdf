@@ -90,10 +90,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx">
+    <Port kind="Output" name="RefIdx_l0">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
@@ -289,7 +289,7 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefList">
+    <Port kind="Output" name="Ref_List0">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -418,6 +418,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="DEBUG">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
     </Instance>
     <Instance id="Algo_RefList1">
         <!-- ************************* -->
@@ -427,15 +430,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-    </Instance>
-    <Instance id="Black_Hole">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/Trash/Dave_Null"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
+        <Parameter name="DEBUG">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
     </Instance>
     <Instance id="Demux_Cavlc_Cabac">
         <!-- ************************* -->
@@ -464,6 +461,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Black_Hole_4_RefList">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/Dave_Null"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -476,7 +482,6 @@
     <Connection dst="" dst-port="FirstMbInSlice" src="Algo_Synp_AVC" src-port="FirstMbInSlice"/>
     <Connection dst="" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="" dst-port="MbPartIdx" src="Algo_Synp_AVC" src-port="MbPartIdx"/>
-    <Connection dst="" dst-port="RefIdx" src="Algo_Synp_AVC" src-port="RefIdx"/>
     <Connection dst="" dst-port="MbPartWidth" src="Algo_Synp_AVC" src-port="MbPartWidth"/>
     <Connection dst="" dst-port="MbPartHeigth" src="Algo_Synp_AVC" src-port="MbPartHeigth"/>
     <Connection dst="" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
@@ -513,8 +518,6 @@
         src="Algo_Synp_AVC" src-port="CurrMbAddr"/>
     <Connection dst="MVReconstruct" dst-port="MbPartIdx"
         src="Algo_Synp_AVC" src-port="MbPartIdx"/>
-    <Connection dst="MVReconstruct" dst-port="RefIdx"
-        src="Algo_Synp_AVC" src-port="RefIdx"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="Algo_Synp_AVC" src-port="MvRes"/>
     <Connection dst="Algo_MMCO" dst-port="MMCO" src="Algo_Synp_AVC" src-port="MMCO"/>
     <Connection dst="" dst-port="QP_Cb" src="Algo_Synp_AVC" src-port="QP_Cb"/>
@@ -554,7 +557,7 @@
     <Connection dst="Algo_RefList0" dst-port="NbRefFrame"
         src="Algo_Synp_AVC" src-port="Nb_RefFrame_l0"/>
     <Connection dst="Algo_RefList0" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
-    <Connection dst="" dst-port="RefList" src="Algo_RefList0" src-port="RefList"/>
+    <Connection dst="" dst-port="Ref_List0" src="Algo_RefList0" src-port="RefList"/>
     <Connection dst="" dst-port="SizeDPBMax" src="Algo_Synp_AVC" src-port="SizeDPBMax"/>
     <Connection dst="Algo_RefList0" dst-port="LongTermList"
         src="Algo_MMCO" src-port="LongTermList"/>
@@ -577,7 +580,6 @@
     <Connection dst="Algo_RefList1" dst-port="POC" src="Algo_Synp_AVC" src-port="POC"/>
     <Connection dst="Algo_RefList1" dst-port="RefReordering"
         src="Algo_Synp_AVC" src-port="RefReordering_l1"/>
-    <Connection dst="Black_Hole" dst-port="Token" src="Algo_RefList1" src-port="RefList"/>
     <Connection dst="Demux_Cavlc_Cabac" dst-port="EntropyType"
         src="Algo_Synp_AVC" src-port="ENTROPY_TYPE"/>
     <Connection dst="Demux_Cavlc_Cabac" dst-port="Value"
@@ -626,4 +628,9 @@
     <Connection dst="byte2bit" dst-port="in8" src="CheckNalu" src-port="Nalu_1"/>
     <Connection dst="CheckNalu" dst-port="ReadNextByte"
         src="Algo_Synp_AVC" src-port="ReadNextByte"/>
+    <Connection dst="MVReconstruct" dst-port="RefIdx"
+        src="Algo_Synp_AVC" src-port="RefIdx_l0"/>
+    <Connection dst="Black_Hole_4_RefList" dst-port="Token"
+        src="Algo_RefList1" src-port="RefList"/>
+    <Connection dst="" dst-port="RefIdx_l0" src="Algo_Synp_AVC" src-port="RefIdx_l0"/>
 </XDF>

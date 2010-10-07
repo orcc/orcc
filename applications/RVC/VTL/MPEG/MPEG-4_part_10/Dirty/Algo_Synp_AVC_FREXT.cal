@@ -77,7 +77,7 @@ actor Algo_Synp_AVC_FREXT()
 			uint(size=13) FirstMbInSlice, 
 			uint POC, 
 			uint(size=3) MbPartIdx, 
-			uint(size=3) RefIdx, 
+			uint(size=4) RefIdx_l0, 
 			uint(size=5) MbPartWidth, 
 			uint(size=5) MbPartHeigth, 
 			int(size=16) MvRes, 
@@ -537,14 +537,8 @@ actor Algo_Synp_AVC_FREXT()
 	uint(size=6) mb_type;	
 	uint(size=6) mb_type_tmp;
 	
-	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
-	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
 	uint(size=6) MB_TYPE_P_8X8              = 29;
-	uint(size=6) MB_TYPE_P_8X8_REF0         = 30;
-	uint(size=6) MB_TYPE_B_8X8              = 53;
 	
 
 	uint(size=1) mb_intra_flag; // INTER 0, INTRA 1
@@ -642,7 +636,7 @@ actor Algo_Synp_AVC_FREXT()
 	uint(size=4) zerosLeft;
 	int(size=16) coeff_sent := 0;
 
-	List (type:int(size=16),size=16) level := [ 0 : for int i in 1 .. 16];
+	List (type:int(size=12),size=16) level := [ 0 : for int i in 1 .. 16];
 	List (type:uint(size=4),size=16) run := [ 0 : for int i in 1 .. 16];
 	List ( type: uint(size=4), size=16) InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
 
@@ -1461,8 +1455,7 @@ actor Algo_Synp_AVC_FREXT()
 	********       		Residual		    	    *********
 	*************************************************************
 	*************************************************************/
-	bool DEBUG_FLAG_NEW_PARSER = true;
-	bool DEBUG_OUTPUT_NEW_PARSER = false;
+	bool DEBUG_FLAG_NEW_PARSER = false;
 	uint(size=1) bmFlag;
 	uint(size=4) startIdx;
 	uint(size=4) endIdx;
@@ -7003,7 +6996,7 @@ end
 			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
-			RefIdx:[0], 
+			RefIdx_l0:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
@@ -7059,7 +7052,7 @@ end
 			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
-			RefIdx:[0], 
+			RefIdx_l0:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
@@ -7397,7 +7390,7 @@ end
 			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
-			RefIdx:[0], 
+			RefIdx_l0:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
@@ -7450,7 +7443,7 @@ end
 			ScalingList:[[16: for int s in 0 .. 15 ]] repeat 16, 
 			MbIntraFlag:[0], 
 			MbPartIdx:[1], 
-			RefIdx:[0], 
+			RefIdx_l0:[0], 
 			MbPartWidth:[16], 
 			MbPartHeigth:[16], 
 			MvRes:[0,0],
@@ -7824,7 +7817,7 @@ end
 	end
 
 	//if( mb_type != I_NxN && MbPartPredMode( mb_type, 0 ) != Intra_16x16 && NumMbPart( mb_type ) = = 4 )
-	read_MB_layer_sub_mb_pred: action ==>
+	read_MB_layer_sub_mb_pred: action ==> 
 	guard
 		NumMbPart() = 4 // NumMbPart() tests the slice_type and return 0 if slice_type is I or SI
 	do
@@ -7832,7 +7825,7 @@ end
 	end
 	// --> sub_mb_pred( mb_type )
 
-	read_MB_layer_sub_mb_pred_done: action ==>
+	read_MB_layer_sub_mb_pred_done: action ==> 
 	do
 		//println("read_MB_layer_sub_mb_pred_done");
 	//for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
@@ -8277,7 +8270,7 @@ end
 	end
 	//   for( subMbPartIdx = 0; subMbPartIdx < NumSubMbPart( sub_mb_type[ mbPartIdx ] ); subMbPartIdx++)
 	//     for( compIdx = 0; compIdx < 2; compIdx++ )
-	read_sub_MB_pred_mvd_l0_done0: action ==> MbPartIdx:[subMbPartIdx], RefIdx:[ref_idx_l0[mbPartIdx]], MbPartWidth:[SubMbPartWidthHeigth(0)], MbPartHeigth:[SubMbPartWidthHeigth(1)]
+	read_sub_MB_pred_mvd_l0_done0: action ==> MbPartIdx:[subMbPartIdx], RefIdx_l0:[ref_idx_l0[mbPartIdx]], MbPartWidth:[SubMbPartWidthHeigth(0)], MbPartHeigth:[SubMbPartWidthHeigth(1)]
 	guard
 		subMbPartIdx < NumSubMbPart()
 	do
@@ -8746,7 +8739,7 @@ end
 		IS_L0 := true;
 	end
 
-	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	read_MB_pred_ref_idx_l0_done: action ==> MbPartIdx:[mbPartIdx-1], RefIdx_l0:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
 	guard
 		((slice_num_ref_idx_l0_active_minus1 = 1 and done_reading_bits()) or (slice_num_ref_idx_l0_active_minus1 > 1 and vld_end()) and IS_CAVLC() ) or
 		( cabac_end() and IS_CABAC() ) 
@@ -8763,7 +8756,7 @@ end
 	end
 
 	//else
-	read_MB_pred_skip_ref_idx_l0: action ==> MbPartIdx:[mbPartIdx-1], RefIdx:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
+	read_MB_pred_skip_ref_idx_l0: action ==> MbPartIdx:[mbPartIdx-1], RefIdx_l0:[ref_idx_l0[mbPartIdx-1]], MbPartWidth:[MbPartWidthHeigth(0)], MbPartHeigth:[MbPartWidthHeigth(1)]
 	guard
 		mbPartIdx < NumMbPart()
 	do
@@ -9139,7 +9132,7 @@ end
 	guard
 		leveltype = 1 and maxNumCoeff = 15 and IS_CABAC()
 	var
-		List (type:int(size=16),size=16) level_temp
+		List (type:int(size=12),size=16) level_temp
 	do
 		//println("Residual_return_luma_AC_CABAC_15_Coeff");
 		if TRACE then
