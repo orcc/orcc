@@ -106,7 +106,7 @@ endif$
 
 PrintFormat(parameter) ::= <<
 $if (parameter.stringExpr)
-$$parameter$$
+$"$parameter$"$
 else
 $ "%$PrintFormatType(parameter.type)$" $
 endif$
