@@ -33,7 +33,9 @@ import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
@@ -42,6 +44,7 @@ import net.sf.orcc.backends.llvm.transforms.AddGEPTransformation;
 import net.sf.orcc.backends.llvm.transforms.BoolToIntTransformation;
 import net.sf.orcc.backends.llvm.transforms.PrintlnTransformation;
 import net.sf.orcc.backends.transformations.MoveReadsWritesTransformation;
+import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.TypeSizeTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ThreeAddressCodeTransformation;
 import net.sf.orcc.ir.Actor;
@@ -67,13 +70,28 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	private STPrinter printer;
 
+	private final Map<String, String> transformations;
+
+	/**
+	 * Creates a new instance of the LLVM back-end. Initializes the
+	 * transformation hash map.
+	 */
+	public LLVMBackendImpl() {
+		transformations = new HashMap<String, String>();
+		transformations.put("abs", "abs_");
+		transformations.put("index", "index_");
+		transformations.put("getw", "getw_");
+		transformations.put("select", "select_");
+		transformations.put("min", "min_");
+	}
+
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new TypeSizeTransformation(),
 				new BoolToIntTransformation(), new PrintlnTransformation(),
+				new RenameTransformation(this.transformations),
 				new ThreeAddressCodeTransformation(),
-				new MoveReadsWritesTransformation(),
-				new AddGEPTransformation()};
+				new MoveReadsWritesTransformation(), new AddGEPTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

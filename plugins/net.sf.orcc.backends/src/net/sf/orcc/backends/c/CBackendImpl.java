@@ -93,6 +93,7 @@ public class CBackendImpl extends AbstractBackend {
 		transformations.put("index", "index_");
 		transformations.put("getw", "getw_");
 		transformations.put("select", "select_");
+		transformations.put("min", "min_");
 	}
 
 	private void computeMapping(Network network) throws OrccException {
