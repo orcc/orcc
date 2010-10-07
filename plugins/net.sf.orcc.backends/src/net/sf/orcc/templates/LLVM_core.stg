@@ -117,7 +117,7 @@ ListExpr(constant, type, iterator) ::= <<
 >>
 
 StringExpr(constant, type, iterator) ::= <<
-c$constant$
+c"$constant$"
 >>
 
 ArrayList(constant, type, iterator) ::= <<$List(constant = constant, type = type, iterator=iterator)$>>
