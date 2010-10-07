@@ -13,3 +13,4 @@ declare i32 @fprintf(%struct.FILE*, i8*, ...) nounwind
 declare %struct.FILE* @fopen(i8*, i8*) nounwind
 declare i32 @clock() nounwind
 declare i32 @fflush(%struct.FILE*) nounwind
+declare i32 @fclose(%struct.FILE*) nounwind

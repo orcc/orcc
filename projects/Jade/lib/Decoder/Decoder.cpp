@@ -71,7 +71,6 @@ Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo*
 	jit->setDecoder(this);
 	//instancedFus = new map<std::string, InstancedActor*>();
 	instances = network->getInstances();
-	initialization = NULL;
 }
 
 Decoder::~Decoder (){

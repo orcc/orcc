@@ -139,15 +139,6 @@ public:
 	Instance* getInstance(std::string name);
 
 	/**
-     *  @brief Getter of initialization
-	 * 
-	 *
-	 *  @return initialization procedure of the decoder
-	 *
-     */
-	Procedure* getInitialization(){return initialization;};
-
-	/**
      *  @brief Set actors contained in the decoder
 	 * 
 	 *	Set a map of actor that are contained in the decoder
@@ -156,24 +147,6 @@ public:
 	 *
      */
 	void setActorList(std::map<std::string, Actor*>* actors){this->actors = actors;};
-
-	/**
-     *  @brief return true if decoder has an initialization procedure
-	 * 
-	 *
-	 *  @return true if decoder has an initialization procedure otherwise false
-	 *
-     */
-	bool hasInitialization(){return initialization != NULL;};
-
-	/**
-     *  @brief Setter of initialization
-	 * 
-	 *
-	 *  @param initialization : initialization procedure of the decoder
-	 *
-     */
-	void setInitialization(Procedure* initialization){this->initialization = initialization;};
 
 	/**
      *  @brief Getter of a network
@@ -220,9 +193,6 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
-
-	/** Initialization procedure */
-	Procedure* initialization;
 
 	/**
      *  @brief Create instance of actors

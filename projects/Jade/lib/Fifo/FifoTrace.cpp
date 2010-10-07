@@ -185,6 +185,7 @@ void FifoTrace::setConnection(Connection* connection){
 	// Get vertex of the connection
 	Port* src = connection->getSourcePort();
 	Port* dst = connection->getDestinationPort();
+	Vertex* dstInstance = (Vertex*)connection->getSource();
 	GlobalVariable* srcVar = src->getGlobalVariable();
 	GlobalVariable* dstVar = dst->getGlobalVariable();
 
@@ -209,6 +210,22 @@ void FifoTrace::setConnection(Connection* connection){
 		false, GlobalVariable::InternalLinkage, arrayFifoBuffer, bufName.str());
 	NewArrayFifoBuffer->setAlignment(32);
 
+	
+	//Creating file string
+	ostringstream fileName;
+	ostringstream fileVar;
+	string strFile;
+	string strVar;
+	
+	fileName << OutputDir << dstInstance->getName() <<"_" <<dst->getName() << ".txt";
+	fileVar << dstInstance->getName() << "_" << dst->getName() << "_file";
+	strFile = fileName.str();
+	strVar = fileVar.str();
+	
+	//Insert trace file string
+	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context), strFile.size()+1); 
+	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, strFile), strVar.c_str(), 0, false, 0);
+
 	// Initialize fifo elements
 	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize());
 	Constant* read_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
@@ -216,7 +233,7 @@ void FifoTrace::setConnection(Connection* connection){
 	Constant* fill_count = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* contents = ConstantExpr::getBitCast(NewArrayContents, structType->getElementType(1));
 	Constant* fifo_buffer = ConstantExpr::getBitCast(NewArrayFifoBuffer, structType->getElementType(2));
-	Constant* file =  ConstantPointerNull::get(cast<PointerType>(structType->getElementType(3)));
+	Constant* file =  ConstantExpr::getBitCast(GV, structType->getElementType(3));
 	
 	// Add initialization vector 
 	vector<Constant*> Elts;
@@ -258,8 +275,6 @@ void FifoTrace::setConnections(Decoder* decoder){
 	for (int i = 0; i < edges; i++){
 		setConnection((Connection*)graph->getEdge(i));
 	}
-
-	setFiles(decoder);
 }
 
 StructType* FifoTrace::getFifoType(IntegerType* type){
@@ -272,101 +287,4 @@ StructType* FifoTrace::getFifoType(IntegerType* type){
 	it = structAcces.find(structName.str());
 		
 	return cast<StructType>(it->second);
-}
-
-void FifoTrace::setFiles(Decoder* decoder){
-	
-	// Create initialization procedure
-	Module* module = decoder->getModule();
-	string initName = "assignTrace";
-	ConstantInt* isExtern = ConstantInt::get(IntegerType::get(Context,1),0);
-	
-	Function* init = cast<Function>(module->getOrInsertFunction(initName, Type::getVoidTy(Context),
-                                          (Type *)0));
-	Procedure* initialize = new Procedure(initName, isExtern, init);
-	decoder->setInitialization(initialize);
-
-	// Create entry basic block
-	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", init);
-
-	// Set opening Files
-	Network* network = decoder->getNetwork();
-	HDAGGraph* graph = network->getGraph();
-	int edges = graph->getNbEdges();
-
-	// Get fopen function
-	map<string,Function*>::iterator it;
-	it = externFunct.find("fopen");
-
-	//Set a variable containing "w" string for fopen 
-	string wStr = "w";
-	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context), wStr.size()+1); 
-	GlobalVariable *wGV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, wStr), wStr.c_str(), 0, false, 0);
-
-	//Associate connections to a file
-	for (int i = 0; i < edges; i++){
-		setFile(decoder, (Connection*)graph->getEdge(i), BBEntry, it->second, wGV);
-	}
-
-	// Create the return instruction and add it to the entry block.
-	ReturnInst::Create(Context, BBEntry);
-}
-
-void FifoTrace::setFile(Decoder* decoder, Connection* connection, BasicBlock* bb, Function* fOpenFunc, Constant* wStr){
-	ostringstream fileName;
-	ostringstream fileVar;
-	string strFile;
-	string strVar;
-
-	//Get module of the decoder
-	Module* module = decoder->getModule();
-
-	// Get vertex of the connection
-	Port* dst = connection->getSourcePort();
-	Vertex* dstInstance = (Vertex*)connection->getSource();
-
-	//Creating file string
-	fileName << OutputDir << dstInstance->getName() <<"_" <<dst->getName() << ".txt";
-	fileVar << dstInstance->getName() << "_" << dst->getName() << "_file";
-	strFile = fileName.str();
-	strVar = fileVar.str();
-	
-	//Insert trace file string
-	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context), strFile.size()+1); 
-	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, strFile), strVar.c_str(), 0, false, 0);
-
-	//Parameter of file of fopen
-	Constant *zero_32 = Constant::getNullValue(IntegerType::getInt32Ty(Context));
-    Constant *zero_array[] = {
-        zero_32,
-        zero_32
-      };
-
-	Constant *fileEltPtr = ConstantExpr::getGetElementPtr(GV, zero_array,
-                         array_lengthof(zero_array));
-
-	Constant *wEltPtr = ConstantExpr::getGetElementPtr(wStr, zero_array,
-                         array_lengthof(zero_array));
-
-	//Parameter "w" of fopen
-	Value *params[] = {
-        fileEltPtr,
-		wEltPtr
-      };
-
-
-	//Create fopen instr
-	CallInst* fopenInstr = CallInst::Create(fOpenFunc, params, array_endof(params), "", bb);
-
-	//Get file from fifo structure
-	Constant *three_32 = Constant::getIntegerValue(IntegerType::getInt32Ty(Context), APInt(32, 3));
-    Value *three_array[] = {
-        zero_32,
-        three_32
-      };
-
-	Constant *fileElt = ConstantExpr::getGetElementPtr(connection->getFifo(), three_array,
-                         array_lengthof(three_array));
-
-	new StoreInst(fopenInstr, fileElt, bb);
 }

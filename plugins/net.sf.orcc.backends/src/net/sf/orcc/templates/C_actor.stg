@@ -8,15 +8,6 @@ extern struct fifo_$port.type$_s *$instance.id$_$port.name$;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// FIFO trace
-///////////////////////////////////////////////////////////////////////////////
-
-trace(port) ::= <<
-extern FILE* trace_$instance.id$_$port.name$;
-
->>
-
-///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -184,7 +175,7 @@ $write.target$ = fifo_$write.port.type$_write($instance.id$_$write.port$, $write
 
 WriteEnd(writeEnd) ::= <<
 $if(options.("net.sf.orcc.backends.enableTrace"))$
-fifo_$writeEnd.port.type$_trace($instance.id$_$writeEnd.port$, $writeEnd.target$_buf, trace_$instance.id$_$writeEnd.port$, $writeEnd.numTokens$);
+fifo_$writeEnd.port.type$_trace($instance.id$_$writeEnd.port$, $writeEnd.target$_buf, "$instance.id$_$writeEnd.port$.txt", $writeEnd.numTokens$);
 $endif$
 fifo_$writeEnd.port.type$_write_end($instance.id$_$writeEnd.port$, $writeEnd.target$_buf, $writeEnd.numTokens$);
 >>
@@ -442,12 +433,6 @@ $instance.actor.inputs.list: fifo()$
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
 $instance.actor.outputs.list: fifo()$
-
-$if(options.("net.sf.orcc.backends.enableTrace"))$
-////////////////////////////////////////////////////////////////////////////////
-// File for fifo Trace 
-$instance.actor.outputs.list: trace()$
-$endif$
 
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance

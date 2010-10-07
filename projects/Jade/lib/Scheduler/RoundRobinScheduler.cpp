@@ -127,10 +127,6 @@ void RoundRobinScheduler::createScheduler(){
 		}
 	}
 
-	if(decoder->hasInitialization()){
-		CallInst *Add1CallRes = CallInst::Create(decoder->getInitialization()->getFunction(), "", BBEntry);
-	}
-
 	// Create a branch to bb
 	Instruction* brEntryInst = BranchInst::Create(BB, BBEntry);
  

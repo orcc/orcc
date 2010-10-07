@@ -87,48 +87,6 @@ $edges: allocateFifo()$
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// assigns Traces
-doDeclareTrace(source, sourcePort) ::= <<
-DECLARE_TRACE($source.id$_$sourcePort.name$)
->>
-
-
-tryDeclareTrace(edge, src, tgt) ::= <<
-$if (src.instance)$
-$doDeclareTrace(
-  source=src.instance, sourcePort=edge.source
-  )$$endif$
->>
-
-declareTrace(edge) ::= <<
-$tryDeclareTrace(edge=edge, src=network.sourceMap.(edge))$
->>
-
-doAssignTrace(source, sourcePort) ::= <<
-trace_$source.id$_$sourcePort.name$= fopen("$source.id$_$sourcePort.name$_trace.txt", "w");
->>
-
-tryAssignTrace(edge, src, tgt) ::= <<
-$if (src.instance)$
-$doAssignTrace(
-  source=src.instance, sourcePort=edge.source
-  )$$endif$
->>
-
-assignTrace(edge) ::= <<
-$tryAssignTrace(edge=edge, src=network.sourceMap.(edge))$
->>
-
-declareTraces(edges) ::= <<
-$edges: declareTrace()$
-
-void assignTrace(){
-	$edges: assignTrace()$
-}
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
@@ -219,18 +177,6 @@ $threads.keys: printThread(); separator="\n\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// traces
-
-openTrace(edge, srcPort) ::= <<
-$edge.instance.id$_$srcPort$->pFile = fopen ("$edge.instance.id$_$srcPort$_trace.txt","w");
->>
-
-setTraceFile(connection) ::= <<
-$openTrace(edge=network.sourceMap.(connection), srcPort=connection.source)$
-
->>
-
-///////////////////////////////////////////////////////////////////////////////
 // print network
 network(debugFifos, fifoSize, network, options) ::= <<
 // Generated from "$network.name$"
@@ -253,10 +199,6 @@ $endif$
 #include "orcc_fifo.h"
 #include "orcc_util.h"
 
-$if(options.("net.sf.orcc.backends.enableTrace"))$
-#include "orcc_trace.h"
-$endif$
-
 #define SIZE $fifoSize$
 // #define PRINT_FIRINGS
 
@@ -269,12 +211,6 @@ $assignFifos(network.connections)$
 
 ////////////////////////////////////////////////////////////////////////////////
 $declareBroadcasts(network.instances)$
-
-$if(options.("net.sf.orcc.backends.enableTrace"))$
-////////////////////////////////////////////////////////////////////////////////
-// Trace allocation
-$declareTraces(network.connections)$
-$endif$
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
@@ -342,10 +278,6 @@ $endif$
 ////////////////////////////////////////////////////////////////////////////////
 int main(int argc, char *argv[]) {
 	init_orcc(argc, argv);
-	
-	$if(options.("net.sf.orcc.backends.enableTrace"))$
-	assignTrace();
-	$endif$
 	
 	scheduler();
 

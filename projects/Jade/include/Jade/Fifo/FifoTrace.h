@@ -162,10 +162,6 @@ public:
 	
 	void setConnections(Decoder* decoder);
 
-	void setFiles(Decoder* decoder);
-
-	void setFile(Decoder* decoder, Connection* connection, llvm::BasicBlock* bb, llvm::Function* fOpenFunc, llvm::Constant* wStr);
-
 private:
 
 	/** module for extern functions */
