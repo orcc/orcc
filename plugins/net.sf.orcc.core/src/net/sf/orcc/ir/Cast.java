@@ -126,16 +126,23 @@ public class Cast {
 		if (source.isUint()) {
 			return false;
 		}
+		
+		if (source.isBool()) {
+			return false;
+		}
 
 		if (source.isList()) {
 			TypeList type = (TypeList) source;
-			if (type.getElementType().isUint()) {
+			Type elementType = type.getElementType();
+			if (elementType.isUint() || elementType.isBool()) {
 				return false;
 			}
 		}
 
 		return true;
 	}
+	
+
 
 	/**
 	 * Return true if the target type is trunced from the source type.
