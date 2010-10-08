@@ -66,7 +66,7 @@ actor SelectRefIdx()
 			IsNewMb
 		end	
 
-	schedule fsm GetSelectList:
+	schedule fsm SendPocToRead:
 		GetSelectList (GetSelectList )--> SendPocToRead;
 
 		SendPocToRead (SendPocToRead.L0 )--> SendPocToRead;
