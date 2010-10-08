@@ -217,8 +217,8 @@ void FifoTrace::setConnection(Connection* connection){
 	string strFile;
 	string strVar;
 	
-	fileName << OutputDir << dstInstance->getName() <<"_" <<dst->getName() << ".txt";
-	fileVar << dstInstance->getName() << "_" << dst->getName() << "_file";
+	fileName << OutputDir << dstInstance->getName() <<"_" <<src->getName() << ".txt";
+	fileVar << dstInstance->getName() << "_" << src->getName() << "_file";
 	strFile = fileName.str();
 	strVar = fileVar.str();
 	
