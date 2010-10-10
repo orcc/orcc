@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="data_src" x="85" y="103"/>
+      <vertex id="compute" x="246" y="117"/>
+   </vertices>
+</layout>

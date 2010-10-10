@@ -1,0 +1,25 @@
+actor DataSource (int NUM) ==> int O :
+
+	int count := 0;
+
+	done: action ==> O:[ -1 ]
+	guard count = NUM
+	end
+
+	loop: action ==> O:[ current ]
+	var
+		int current = count
+	do
+		count := count + 1;
+	end
+	
+	schedule fsm s0:
+		s0 (done) --> s1;
+		s0 (loop) --> s0;
+	end
+
+	priority
+		done > loop;
+	end
+
+end
