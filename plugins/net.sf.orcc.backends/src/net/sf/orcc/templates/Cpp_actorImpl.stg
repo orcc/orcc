@@ -99,9 +99,18 @@ Assign(assign) ::= <<
 $assign.target$ = $assign.value$;
 >>
 
+PrintParameter(parameter)::= <<
+$if (parameter.stringExpr)
+$"$parameter$"$
+else
+$$parameter$$
+endif$
+>>
+
 Call(call) ::= <<
 
-$if(call.print)$std::cout << $trunc(call.parameters); separator="<<"$ << std::endl;$
+
+$if(call.print)$std::cout << $trunc(call.parameters): PrintParameter(); separator=" << "$ << std::endl;$
 else
 $$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
 endif$
