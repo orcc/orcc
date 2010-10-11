@@ -57,6 +57,7 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
@@ -64,7 +65,6 @@ import net.sf.orcc.ir.transforms.Inline;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.util.CollectionsUtil;
 
 /**
  * VHDL back-end.
@@ -119,7 +119,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new TransformConditionals(),
 
 				new NDimArrayTransform(),
-				
+
 				new ProcedureInline(),
 
 				new VariableRenamer(),
@@ -183,11 +183,10 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// Prints all stateVars
 		for (StateVariable stateVar : actor.getStateVars()) {
 			if (stateVar.getType().isList() && !stateVar.isInitialized()) {
-				Object value = stateVar.getValue();
-				List<?> list = CollectionsUtil.toList((Object[]) value);
-				List<Object> returnList = new ArrayList<Object>();
+				List<Expression> newValues = new ArrayList<Expression>();
 				// VHDL synthesizers don't support multi-dimensions memory yet
-				stateVar.setConstantValue(printListVars(list, returnList));
+				printListVars(stateVar.getValue(), newValues);
+				stateVar.setConstantValue(new ListExpr(newValues));
 			}
 		}
 	}
@@ -212,15 +211,15 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 * @param returnList
 	 *            a list of stateVars
 	 */
-	private List<?> printListVars(List<?> list, List<Object> returnList) {
-		for (Object content : list) {
-			if (content instanceof List<?>) {
-				printListVars((List<?>) content, returnList);
-			} else {
-				returnList.add(content);
+	private void printListVars(Expression expression, List<Expression> values) {
+		if (expression.isListExpr()) {
+			List<Expression> expressions = ((ListExpr) expression).getValue();
+			for (Expression subExpr : expressions) {
+				printListVars(subExpr, values);
 			}
+		} else {
+			values.add(expression);
 		}
-		return returnList;
 	}
 
 	/**
