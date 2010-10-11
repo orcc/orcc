@@ -129,14 +129,6 @@ $threads.keys: declareThread(); separator="\n\n"$
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// start instance
-startIntance(instance) ::= <<
-$if (!instance.serdes)$
-$instance.id$.startActorExecution();
-$endif$
->>
-
-///////////////////////////////////////////////////////////////////////////////
 // scheduler
 
 declareNetwork(id, instances) ::= <<
@@ -144,21 +136,6 @@ declareNetwork(id, instances) ::= <<
 class network_$id$ : public Threadaka
 {
 public:
-	network_$id$(){}
-	
-	~network_$id$(){}
-
-	void start()
-	{
-		$instances: startIntance()$
-		Threadaka::init();
-		Threadaka::start();
-	}
-	void stop()
-	{
-		Threadaka::stop();
-	}
-	
 	void process(void * args)
 	{
 		$printInitializes(instances)$
@@ -167,11 +144,7 @@ public:
 			int res = 0;
 			$printSchedulers(instances)$
 			if(res == 0)
-#ifdef _WIN32
-				Sleep(0);
-#else
-				sched_yield();
-#endif
+			yield();
 		}
 	}	
 };
