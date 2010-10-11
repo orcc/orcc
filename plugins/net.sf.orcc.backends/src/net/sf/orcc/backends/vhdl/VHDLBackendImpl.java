@@ -47,6 +47,7 @@ import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.NDimArrayTransform;
+import net.sf.orcc.backends.vhdl.transforms.ProcedureInline;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
@@ -56,7 +57,6 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
-import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
@@ -64,6 +64,7 @@ import net.sf.orcc.ir.transforms.Inline;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.util.CollectionsUtil;
 
 /**
  * VHDL back-end.
@@ -118,6 +119,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new TransformConditionals(),
 
 				new NDimArrayTransform(),
+				
+				new ProcedureInline(),
 
 				new VariableRenamer(),
 
@@ -180,10 +183,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 		// Prints all stateVars
 		for (StateVariable stateVar : actor.getStateVars()) {
 			if (stateVar.getType().isList() && !stateVar.isInitialized()) {
-				List<Expression> newValues = new ArrayList<Expression>();
+				Object value = stateVar.getValue();
+				List<?> list = CollectionsUtil.toList((Object[]) value);
+				List<Object> returnList = new ArrayList<Object>();
 				// VHDL synthesizers don't support multi-dimensions memory yet
-				printListVars(stateVar.getValue(), newValues);
-				stateVar.setConstantValue(new ListExpr(newValues));
+				stateVar.setConstantValue(printListVars(list, returnList));
 			}
 		}
 	}
@@ -208,15 +212,15 @@ public class VHDLBackendImpl extends AbstractBackend {
 	 * @param returnList
 	 *            a list of stateVars
 	 */
-	private void printListVars(Expression expression, List<Expression> values) {
-		if (expression.isListExpr()) {
-			List<Expression> expressions = ((ListExpr) expression).getValue();
-			for (Expression subExpr : expressions) {
-				printListVars(subExpr, values);
+	private List<?> printListVars(List<?> list, List<Object> returnList) {
+		for (Object content : list) {
+			if (content instanceof List<?>) {
+				printListVars((List<?>) content, returnList);
+			} else {
+				returnList.add(content);
 			}
-		} else {
-			values.add(expression);
 		}
+		return returnList;
 	}
 
 	/**
