@@ -109,11 +109,10 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 						value += strExprVal;
 					}
 				} else {
-					if (expr.getType().isBool()) {
+					if (expr.getType().isBool()|| expr.getType().isInt()) {
 						value += "%i";
-					} else if (expr.getType().isUint()
-							|| expr.getType().isInt()) {
-						value += "%d";
+					} else if (expr.getType().isUint()){
+						value += "%u";
 					}
 				}
 			}
