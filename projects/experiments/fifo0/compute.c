@@ -27,16 +27,16 @@ static i64 sum = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
 
-static void do_sum(int *contents, int *ind) {
-	i32 I[1];
+static void do_sum() {
+	i32 I_buf[1];
+	i32 *I;
 	i64 local_sum_1;
 	i32 i_1;
 	i64 local_sum_2;
 
 	local_sum_1 = sum;
-	I[0] = contents[*ind];
+	I = fifo_i32_read(compute_I, I_buf, 1);
 	i_1 = I[0];
-	(*ind)++;
 	local_sum_2 = local_sum_1 + i_1;
 	sum = local_sum_2;
 	fifo_i32_read_end(compute_I, 1);
@@ -44,13 +44,13 @@ static void do_sum(int *contents, int *ind) {
 
 
 
-static i32 isSchedulable_do_sum(int ind, int max_ind) {
+static i32 isSchedulable_do_sum() {
 	i32 _tmp_hasTokens_1;
 	i32 result_1;
 	i32 result_2;
 	i32 result_3;
 
-	_tmp_hasTokens_1 = ind < max_ind;
+	_tmp_hasTokens_1 = fifo_i32_has_tokens(compute_I, 1);
 	if (_tmp_hasTokens_1) {
 		result_1 = 1;
 		result_2 = result_1;
@@ -73,17 +73,18 @@ static void print_sum() {
 
 
 
-static i32 isSchedulable_print_sum(int *contents, int ind, int max_ind) {
-	i32 I[1];
+static i32 isSchedulable_print_sum() {
+	i32 I_buf[1];
+	i32 *I;
 	i32 _tmp_hasTokens_1;
 	i32 i_1;
 	i32 result_1;
 	i32 result_2;
 	i32 result_3;
 
-	_tmp_hasTokens_1 = ind < max_ind;
+	_tmp_hasTokens_1 = fifo_i32_has_tokens(compute_I, 1);
 	if (_tmp_hasTokens_1) {
-		I[0] = contents[ind];
+		I = fifo_i32_peek(compute_I, I_buf, 1);
 		i_1 = I[0];
 		result_1 = i_1 < 0;
 		result_2 = result_1;
@@ -112,22 +113,6 @@ static enum states _FSM_state = s_s0;
 void compute_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
-	int min_ind;
-	int max_ind;
-
-	int read_ind_I = compute_I->read_ind;
-	int write_ind_I = compute_I->write_ind;
-	i32 *contents = compute_I->contents;
-	int size = compute_I->size;
-
-	if (read_ind_I < write_ind_I) {
-		min_ind = read_ind_I;
-		max_ind = write_ind_I;
-	} else {
-		min_ind = write_ind_I % size;
-		max_ind = size;
-	}
-
 	// jump to FSM state 
 	switch (_FSM_state) {
 	case s_s0:
@@ -137,24 +122,23 @@ void compute_scheduler(struct schedinfo_s *si) {
 	default:
 		printf("unknown state: %s\n", stateNames[_FSM_state]);
 		return;
+		//wait_for_key();
+		//exit(1);
 	}
 
 	// FSM transitions
 
 l_s0:
-	if (isSchedulable_print_sum(contents, min_ind, max_ind)) {
-		print_sum(contents, &min_ind);
+	if (isSchedulable_print_sum()) {
+		print_sum();
 		i++;
 		goto l_s1;
-	} else if (isSchedulable_do_sum(min_ind, max_ind)) {
-		do_sum(contents, &min_ind);
+	} else if (isSchedulable_do_sum()) {
+		do_sum();
 		i++;
 		goto l_s0;
 	} else {
 		_FSM_state = s_s0;
-
-		compute_I->read_ind = min_ind;
-
 		si->num_firings = i;
 		si->reason = starved;
 		si->ports = 0x01;
@@ -163,5 +147,8 @@ l_s0:
 
 l_s1:
 	printf("stuck in state \"s1\"\n");
+	//wait_for_key();
+	//exit(1);
+
 }
 

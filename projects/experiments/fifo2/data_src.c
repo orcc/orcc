@@ -27,12 +27,12 @@ static i32 count = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
 
-static void done(int *contents, int *ind) {
+static void done(struct fifo_i32_s *fifo) {
 	i32 O[1];
 
 	O[0] = -1;
-	contents[*ind] = O[0];
-	(*ind)++;
+	fifo->contents[fifo->write_ind] = O[0];
+	fifo->write_ind++;
 }
 
 
@@ -50,7 +50,7 @@ static i32 isSchedulable_done() {
 
 
 
-static void loop(int *contents, int *ind) {
+static void loop(struct fifo_i32_s *fifo) {
 	i32 O[1];
 	i32 local_count_1;
 	i32 current_1;
@@ -60,8 +60,8 @@ static void loop(int *contents, int *ind) {
 	current_1 = local_count_1;
 	local_count_2 = local_count_1 + 1;
 	O[0] = current_1;
-	contents[*ind] = O[0];
-	(*ind)++;
+	fifo->contents[fifo->write_ind] = O[0];
+	fifo->write_ind++;
 	count = local_count_2;
 }
 
@@ -92,23 +92,21 @@ static enum states _FSM_state = s_s0;
 void data_src_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
-	int min_ind;
 	int max_ind;
 
 	int read_ind_I = data_src_O->read_ind;
 	int write_ind_I = data_src_O->write_ind;
-	i32 *contents = data_src_O->contents;
 	int size = data_src_O->size;
 
 	if (read_ind_I < write_ind_I) {
-		min_ind = read_ind_I;
+		data_src_O->write_ind = read_ind_I;
 		max_ind = write_ind_I;
 	} else {
 		if (write_ind_I == size) {
-			min_ind = 0;
+			data_src_O->write_ind = 0;
 			data_src_O->read_ind = 0;
 		} else {
-			min_ind = write_ind_I;
+			data_src_O->write_ind = write_ind_I;
 		}
 		max_ind = size;
 	}
@@ -124,7 +122,6 @@ void data_src_scheduler(struct schedinfo_s *si) {
 		goto l_s1;
 	default:
 		printf("unknown state: %s\n", stateNames[_FSM_state]);
-		return;
 	}
 
 	// FSM transitions
@@ -132,7 +129,7 @@ void data_src_scheduler(struct schedinfo_s *si) {
 l_s0:
 	if (isSchedulable_done()) {
 		int ports = 0;
-		if (!(min_ind < max_ind)) {
+		if (!(data_src_O->write_ind < max_ind)) {
 			ports |= 0x01;
 		}
 		if (ports != 0) {
@@ -141,16 +138,14 @@ l_s0:
 			si->reason = full;
 			si->ports = ports;
 
-			data_src_O->write_ind = min_ind;
-
 			return;
 		}
-		done(contents, &min_ind);
+		done(data_src_O);
 		i++;
 		goto l_s1;
 	} else if (isSchedulable_loop()) {
 		int ports = 0;
-		if (!(min_ind < max_ind)) {
+		if (!(data_src_O->write_ind < max_ind)) {
 			ports |= 0x01;
 		}
 		if (ports != 0) {
@@ -159,11 +154,9 @@ l_s0:
 			si->reason = full;
 			si->ports = ports;
 
-			data_src_O->write_ind = min_ind;
-
 			return;
 		}
-		loop(contents, &min_ind);
+		loop(data_src_O);
 		i++;
 		goto l_s0;
 	} else {

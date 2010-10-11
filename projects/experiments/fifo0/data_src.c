@@ -27,12 +27,12 @@ static i32 count = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
 
-static void done(int *contents, int *ind) {
-	i32 O[1];
+static void done() {
+	i32 O_buf[1];
+	i32 *O;
 
-	O[0] = -1;
-	contents[*ind] = O[0];
-	(*ind)++;
+	O = fifo_i32_write(data_src_O, O_buf, 1);
+	O[0] = -1;fifo_i32_write_end(data_src_O, O_buf, 1);
 }
 
 
@@ -50,18 +50,18 @@ static i32 isSchedulable_done() {
 
 
 
-static void loop(int *contents, int *ind) {
-	i32 O[1];
+static void loop() {
+	i32 O_buf[1];
+	i32 *O;
 	i32 local_count_1;
 	i32 current_1;
 	i32 local_count_2;
 
+	O = fifo_i32_write(data_src_O, O_buf, 1);
 	local_count_1 = count;
 	current_1 = local_count_1;
 	local_count_2 = local_count_1 + 1;
-	O[0] = current_1;
-	contents[*ind] = O[0];
-	(*ind)++;
+	O[0] = current_1;fifo_i32_write_end(data_src_O, O_buf, 1);
 	count = local_count_2;
 }
 
@@ -92,30 +92,6 @@ static enum states _FSM_state = s_s0;
 void data_src_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
-	int min_ind;
-	int max_ind;
-
-	int read_ind_I = data_src_O->read_ind;
-	int write_ind_I = data_src_O->write_ind;
-	i32 *contents = data_src_O->contents;
-	int size = data_src_O->size;
-
-	if (read_ind_I < write_ind_I) {
-		min_ind = read_ind_I;
-		max_ind = write_ind_I;
-	} else {
-		if (write_ind_I == size) {
-			min_ind = 0;
-			data_src_O->read_ind = 0;
-		} else {
-			min_ind = write_ind_I;
-		}
-		max_ind = size;
-	}
-
-	// Visual: _mm_prefetch(&contents[min_ind], _MM_HINT_NTA);
-	// __builtin_prefetch(&contents[min_ind], 1, 3);
-
 	// jump to FSM state 
 	switch (_FSM_state) {
 	case s_s0:
@@ -124,6 +100,8 @@ void data_src_scheduler(struct schedinfo_s *si) {
 		goto l_s1;
 	default:
 		printf("unknown state: %s\n", stateNames[_FSM_state]);
+		//wait_for_key();
+		//exit(1);
 		return;
 	}
 
@@ -132,7 +110,7 @@ void data_src_scheduler(struct schedinfo_s *si) {
 l_s0:
 	if (isSchedulable_done()) {
 		int ports = 0;
-		if (!(min_ind < max_ind)) {
+		if (!fifo_i32_has_room(data_src_O, 1)) {
 			ports |= 0x01;
 		}
 		if (ports != 0) {
@@ -140,17 +118,14 @@ l_s0:
 			si->num_firings = i;
 			si->reason = full;
 			si->ports = ports;
-
-			data_src_O->write_ind = min_ind;
-
 			return;
 		}
-		done(contents, &min_ind);
+		done();
 		i++;
 		goto l_s1;
 	} else if (isSchedulable_loop()) {
 		int ports = 0;
-		if (!(min_ind < max_ind)) {
+		if (!fifo_i32_has_room(data_src_O, 1)) {
 			ports |= 0x01;
 		}
 		if (ports != 0) {
@@ -158,12 +133,9 @@ l_s0:
 			si->num_firings = i;
 			si->reason = full;
 			si->ports = ports;
-
-			data_src_O->write_ind = min_ind;
-
 			return;
 		}
-		loop(contents, &min_ind);
+		loop();
 		i++;
 		goto l_s0;
 	} else {
@@ -176,5 +148,8 @@ l_s0:
 
 l_s1:
 	printf("stuck in state \"s1\"\n");
+	//wait_for_key();
+	//exit(1);
+
 }
 

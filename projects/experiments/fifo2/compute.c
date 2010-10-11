@@ -27,30 +27,29 @@ static i64 sum = 0;
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
 
-static void do_sum(int *contents, int *ind) {
+static void do_sum(struct fifo_i32_s *fifo) {
 	i32 I[1];
 	i64 local_sum_1;
 	i32 i_1;
 	i64 local_sum_2;
 
 	local_sum_1 = sum;
-	I[0] = contents[*ind];
+	I[0] = fifo->contents[fifo->read_ind];
 	i_1 = I[0];
-	(*ind)++;
+	fifo->read_ind++;
 	local_sum_2 = local_sum_1 + i_1;
 	sum = local_sum_2;
-	fifo_i32_read_end(compute_I, 1);
 }
 
 
 
-static i32 isSchedulable_do_sum(int ind, int max_ind) {
+static i32 isSchedulable_do_sum(struct fifo_i32_s *fifo, int max_ind) {
 	i32 _tmp_hasTokens_1;
 	i32 result_1;
 	i32 result_2;
 	i32 result_3;
 
-	_tmp_hasTokens_1 = ind < max_ind;
+	_tmp_hasTokens_1 = fifo->read_ind < max_ind;
 	if (_tmp_hasTokens_1) {
 		result_1 = 1;
 		result_2 = result_1;
@@ -63,17 +62,17 @@ static i32 isSchedulable_do_sum(int ind, int max_ind) {
 
 
 
-static void print_sum() {
+static void print_sum(struct fifo_i32_s *fifo) {
 	i64 local_sum_1;
 
 	local_sum_1 = sum;
 	printf("sum = " "%lli" "\n", local_sum_1);
-	fifo_i32_read_end(compute_I, 1);
+	fifo->read_ind++;
 }
 
 
 
-static i32 isSchedulable_print_sum(int *contents, int ind, int max_ind) {
+static i32 isSchedulable_print_sum(struct fifo_i32_s *fifo, int max_ind) {
 	i32 I[1];
 	i32 _tmp_hasTokens_1;
 	i32 i_1;
@@ -81,9 +80,9 @@ static i32 isSchedulable_print_sum(int *contents, int ind, int max_ind) {
 	i32 result_2;
 	i32 result_3;
 
-	_tmp_hasTokens_1 = ind < max_ind;
+	_tmp_hasTokens_1 = fifo->read_ind < max_ind;
 	if (_tmp_hasTokens_1) {
-		I[0] = contents[ind];
+		I[0] = fifo->contents[fifo->read_ind];
 		i_1 = I[0];
 		result_1 = i_1 < 0;
 		result_2 = result_1;
@@ -112,19 +111,17 @@ static enum states _FSM_state = s_s0;
 void compute_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
-	int min_ind;
 	int max_ind;
 
 	int read_ind_I = compute_I->read_ind;
 	int write_ind_I = compute_I->write_ind;
-	i32 *contents = compute_I->contents;
 	int size = compute_I->size;
 
 	if (read_ind_I < write_ind_I) {
-		min_ind = read_ind_I;
+		compute_I->read_ind = read_ind_I;
 		max_ind = write_ind_I;
 	} else {
-		min_ind = write_ind_I % size;
+		compute_I->read_ind = write_ind_I % size;
 		max_ind = size;
 	}
 
@@ -136,24 +133,21 @@ void compute_scheduler(struct schedinfo_s *si) {
 		goto l_s1;
 	default:
 		printf("unknown state: %s\n", stateNames[_FSM_state]);
-		return;
 	}
 
 	// FSM transitions
 
 l_s0:
-	if (isSchedulable_print_sum(contents, min_ind, max_ind)) {
-		print_sum(contents, &min_ind);
+	if (isSchedulable_print_sum(compute_I, max_ind)) {
+		print_sum(compute_I);
 		i++;
 		goto l_s1;
-	} else if (isSchedulable_do_sum(min_ind, max_ind)) {
-		do_sum(contents, &min_ind);
+	} else if (isSchedulable_do_sum(compute_I, max_ind)) {
+		do_sum(compute_I);
 		i++;
 		goto l_s0;
 	} else {
 		_FSM_state = s_s0;
-
-		compute_I->read_ind = min_ind;
 
 		si->num_firings = i;
 		si->reason = starved;
