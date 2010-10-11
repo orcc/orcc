@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ui;
 
-
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -59,7 +58,8 @@ public class OrccPropertyTester extends PropertyTester {
 			if (receiver instanceof IProject) {
 				IProject project = (IProject) receiver;
 				try {
-					return project.hasNature(OrccProjectNature.NATURE_ID);
+					return project.exists() && project.isOpen()
+							&& project.hasNature(OrccProjectNature.NATURE_ID);
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
