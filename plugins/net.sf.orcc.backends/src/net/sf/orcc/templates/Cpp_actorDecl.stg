@@ -215,8 +215,6 @@ actor(actor, options) ::= <<
 #ifndef __ACTOR_$actor.name$_H__
 #define __ACTOR_$actor.name$_H__
 
-#include <iostream>
-
 #include "actoraka.h"
 
 ////////////////////////////////////////////////////////////////////////////////
