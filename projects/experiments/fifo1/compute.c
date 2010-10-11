@@ -39,7 +39,6 @@ static void do_sum(int *contents, int *ind) {
 	(*ind)++;
 	local_sum_2 = local_sum_1 + i_1;
 	sum = local_sum_2;
-	fifo_i32_read_end(compute_I, 1);
 }
 
 
@@ -63,12 +62,12 @@ static i32 isSchedulable_do_sum(int ind, int max_ind) {
 
 
 
-static void print_sum() {
+static void print_sum(int *ind) {
 	i64 local_sum_1;
 
 	local_sum_1 = sum;
 	printf("sum = " "%lli" "\n", local_sum_1);
-	fifo_i32_read_end(compute_I, 1);
+	(*ind)++;
 }
 
 
@@ -143,7 +142,7 @@ void compute_scheduler(struct schedinfo_s *si) {
 
 l_s0:
 	if (isSchedulable_print_sum(contents, min_ind, max_ind)) {
-		print_sum(contents, &min_ind);
+		print_sum(&min_ind);
 		i++;
 		goto l_s1;
 	} else if (isSchedulable_do_sum(min_ind, max_ind)) {
