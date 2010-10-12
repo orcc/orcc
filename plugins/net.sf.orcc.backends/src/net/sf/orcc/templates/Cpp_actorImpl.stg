@@ -27,7 +27,7 @@ $(constant.class.simpleName)(constant)$
 
 
 BoolExpr(constant) ::= <<
-$if (constant.value)$1$else$0$endif$
+$if (constant.value)$true$else$false$endif$
 >>
 
 IntExpr(number) ::= <<
@@ -109,8 +109,7 @@ endif$
 
 Call(call) ::= <<
 
-
-$if(call.print)$std::cout << $trunc(call.parameters): PrintParameter(); separator=" << "$ << std::endl;$
+$if(call.print)$std::cout <<$call.parameters: PrintParameter(); separator=" << "$;$
 else
 $$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
 endif$

@@ -24,30 +24,21 @@ find_library(CALaka_LIBRARY CALaka)
 find_library(Orcc_LIBRARY Orcc)
 find_library(Thread_LIBRARY Thread)
 
-find_file(CALaka_INCLUDE_DIR CALaka)
-find_file(Orcc_INCLUDE_DIR Orcc)
-find_file(Thread_INCLUDE_DIR Thread)
+find_file(CAL_INCLUDE_DIR CALaka)
 
 find_package(SDL REQUIRED)
 
 $if(needSerDes)$
+find_file(CAL_SOURCE_DIR wrapperaka.cpp)
 find_library(AdaptorFactory_LIBRARY AdaptorFactory)
-find_file(AdaptorFactory_INCLUDE_DIR AdaptorFactory)
-
-$! todo: change this hack! !$
-add_library(AdaptorConfig STATIC "\${Thread_INCLUDE_DIR}/../../../LibAdaptorConfig/src/LibAdaptorConfig.cpp")
-add_library(Wrapper STATIC "\${Thread_INCLUDE_DIR}/../../../LibWrapper/src/wrapperaka.cpp")
+add_library(AdaptorConfig STATIC "\${CAL_SOURCE_DIR}/LibAdaptorConfig.cpp")
+add_library(Wrapper STATIC "\${CAL_SOURCE_DIR}wrapperaka.cpp")
 $endif$
 
 include_directories(
 	\${CMAKE_SOURCE_DIR}
-	\${CALaka_INCLUDE_DIR}
-	\${Orcc_INCLUDE_DIR}
-	\${Thread_INCLUDE_DIR}
+	\${CAL_INCLUDE_DIR}
 	\${SDL_INCLUDE_DIR}
-$if(needSerDes)$
-	\${AdaptorFactory_INCLUDE_DIR}
-$endif$
 )
 
 
