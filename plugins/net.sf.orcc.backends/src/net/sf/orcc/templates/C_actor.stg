@@ -405,7 +405,7 @@ $Transitions(actions=actions, transitions=fsm.transitions)$
 >>
 
 parameters(parameters) ::= <<
-$parameters.keys: { k | #define $k$ $parameters.(k)$
+$parameters.keys: { k | #define $k$ $Constant(parameters.(k))$
 }$
 >>
 

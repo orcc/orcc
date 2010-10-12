@@ -395,7 +395,7 @@ int actor_$actor.name$::schedule()
 >>
 
 constructor(parameters, stateVars) ::= <<
-actor_$actor.name$::actor_$actor.name$($parameters: {int $it$}; separator=", "$)
+actor_$actor.name$::actor_$actor.name$($parameters: {$it.type$ $it$}; separator=", "$)
 :
 $parameters: {$it$($it$),}; wrap, separator="\n"$
 $if(actor.actionScheduler.fsm)$

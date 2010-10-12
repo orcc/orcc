@@ -198,11 +198,11 @@ int schedule();
 
 
 constructor(parameters) ::= <<
-	actor_$actor.name$($parameters: {int}; separator=", "$);
+	actor_$actor.name$($parameters: {$it.type$}; separator=", "$);
 >>
 
 parameters(parameters) ::= <<
-$parameters: { k | int $k$;}; separator="\n"$
+$parameters: { $it.type$ $it$;}; separator="\n"$
 
 >>
 
