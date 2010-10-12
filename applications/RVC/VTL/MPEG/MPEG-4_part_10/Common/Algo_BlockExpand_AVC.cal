@@ -86,7 +86,7 @@ actor Algo_BlockExpand_AVC ()
 	uint(size=8) LumaMBSize;
 	uint(size=2) Component        := Y_COMPONENT;
 	bool         DC_ComponentSent := false;
-	uint(size=2) NbBlocksSent     := 0;
+	uint(size=5) NbBlocksSent     := 0;
 
 
 

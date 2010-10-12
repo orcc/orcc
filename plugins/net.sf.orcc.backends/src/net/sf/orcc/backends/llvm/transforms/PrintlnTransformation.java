@@ -59,14 +59,14 @@ import net.sf.orcc.util.OrderedMap;
 public class PrintlnTransformation extends AbstractActorTransformation {
 
 	/**
-	 * String counter
-	 */
-	private int strCnt;
-
-	/**
 	 * State variables of the actor
 	 */
 	private OrderedMap<String, StateVariable> stateVars;
+
+	/**
+	 * String counter
+	 */
+	private int strCnt;
 
 	@Override
 	public void transform(Actor actor) {
@@ -113,29 +113,29 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 					}
 				} else {
 					Type type = expr.getType();
-					if (type.isBool()){
+					if (type.isBool()) {
 						value += "%i";
-					} else if (type.isFloat()){
+					} else if (type.isFloat()) {
 						value += "%f";
-					} else if (type.isInt()){
-						TypeInt intType = (TypeInt)type;
-						if (intType.isLong()){
+					} else if (type.isInt()) {
+						TypeInt intType = (TypeInt) type;
+						if (intType.isLong()) {
 							value += "%ll";
-						}else{
+						} else {
 							value += "%i";
 						}
-					} else if (type.isList()){
+					} else if (type.isList()) {
 						value += "%p";
-					} else if (type.isString()){
+					} else if (type.isString()) {
 						value += "%s";
-					} else if (type.isUint()){
-						TypeUint uintType = (TypeUint)type;
-						if (uintType.isLong()){
+					} else if (type.isUint()) {
+						TypeUint uintType = (TypeUint) type;
+						if (uintType.isLong()) {
 							value += "%ll";
-						}else{
+						} else {
 							value += "%u";
 						}
-					} else if (type.isVoid()){
+					} else if (type.isVoid()) {
 						value += "%p";
 					}
 				}
