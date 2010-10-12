@@ -232,12 +232,19 @@ public class XDFParser {
 						// look up variable, in variables scope, and if not
 						// found in parameters scope
 						Variable variable = network.getVariables().get(name);
+						if (variable == null) {
+							throw new OrccException("In network \""
+									+ network.getName() + "\" defined in \""
+									+ file + "\": unknown variable: \"" + name
+									+ "\"");
+						}
 						Use use = new Use(variable);
 						expr = new VarExpr(use);
 						break;
 					} else {
-						throw new OrccException("Unsupported Expr kind: \""
-								+ kind + "\"");
+						throw new OrccException("In network \""
+								+ network.getName() + "\" defined in \"" + file
+								+ "\": Unsupported Expr kind: \"" + kind + "\"");
 					}
 				}
 
