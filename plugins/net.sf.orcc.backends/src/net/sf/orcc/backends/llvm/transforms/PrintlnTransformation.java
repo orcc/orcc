@@ -37,7 +37,10 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.VarExpr;
@@ -109,10 +112,31 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 						value += strExprVal;
 					}
 				} else {
-					if (expr.getType().isBool()|| expr.getType().isInt()) {
+					Type type = expr.getType();
+					if (type.isBool()){
 						value += "%i";
-					} else if (expr.getType().isUint()){
-						value += "%u";
+					} else if (type.isFloat()){
+						value += "%f";
+					} else if (type.isInt()){
+						TypeInt intType = (TypeInt)type;
+						if (intType.isLong()){
+							value += "%ll";
+						}else{
+							value += "%i";
+						}
+					} else if (type.isList()){
+						value += "%p";
+					} else if (type.isString()){
+						value += "%s";
+					} else if (type.isUint()){
+						TypeUint uintType = (TypeUint)type;
+						if (uintType.isLong()){
+							value += "%ll";
+						}else{
+							value += "%u";
+						}
+					} else if (type.isVoid()){
+						value += "%p";
 					}
 				}
 			}
