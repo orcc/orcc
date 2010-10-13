@@ -70,7 +70,8 @@ public class XlimBackendImpl extends AbstractBackend {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
 				new MoveLiteralIntegers(),
-				new ExpressionSplitterTransformation(), new VariableRenamer(), new ChangeActionSchedulerFormTransformation() };
+				new ExpressionSplitterTransformation(), new VariableRenamer(),
+				new ChangeActionSchedulerFormTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

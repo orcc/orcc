@@ -29,9 +29,7 @@
 package net.sf.orcc.backends.xlim.transforms;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
@@ -50,56 +48,50 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
  * 
- * This class defines a transformation that transforms the 'ActionScheduler' function
- * in order to use XLIM back-end with Ericsson OpenDF runtime
+ * This class defines a transformation that transforms the 'ActionScheduler'
+ * function in order to use XLIM back-end with Ericsson OpenDF runtime
  * 
  * @author Hervé Yviquel
  * 
  */
-public class ChangeActionSchedulerFormTransformation extends AbstractActorTransformation {
-	
-	Map<Action,List<IfNode>> actionToNodesMap;
-	
-	
+public class ChangeActionSchedulerFormTransformation extends
+		AbstractActorTransformation {
+
 	@Override
 	public void transform(Actor actor) throws OrccException {
-		
-		for(Action action : actor.getActions()){
+
+		for (Action action : actor.getActions()) {
 			List<CFGNode> schedulerNodes = action.getScheduler().getNodes();
 			List<IfNode> ifNodes = new ArrayList<IfNode>();
-			
+
 			// Search for guard computing
-			for(CFGNode node : schedulerNodes){
-				if(node instanceof IfNode){
-					ifNodes.add((IfNode)node);
+			for (CFGNode node : schedulerNodes) {
+				if (node instanceof IfNode) {
+					ifNodes.add((IfNode) node);
 				}
 			}
-			
-			for(IfNode ifNode : ifNodes){
+
+			for (IfNode ifNode : ifNodes) {
 				schedulerNodes.remove(ifNode);
-				
-				PhiAssignment phi = (PhiAssignment)ifNode.getJoinNode().getInstructions().get(0);
-				
-				// Creation of instruction 'result=hasToken(input) AND guard'  
+
+				PhiAssignment phi = (PhiAssignment) ifNode.getJoinNode()
+						.getInstructions().get(0);
+
+				// Creation of instruction 'result=hasToken(input) AND guard'
 				Expression guard = phi.getValues().get(0);
-				Expression and = new BinaryExpr(ifNode.getValue(), BinaryOp.LOGIC_AND, guard, IrFactory.eINSTANCE.createTypeBool());	
+				Expression and = new BinaryExpr(ifNode.getValue(),
+						BinaryOp.LOGIC_AND, guard,
+						IrFactory.eINSTANCE.createTypeBool());
 				Instruction assignment = new Assign(phi.getTarget(), and);
-				
+
 				schedulerNodes.addAll(ifNode.getThenNodes());
-				
+
 				BlockNode blockNode = new BlockNode(action.getScheduler());
-				blockNode.add(assignment);				
-				blockNode.add(ifNode.getJoinNode().getInstructions().get(1));	
+				blockNode.add(assignment);
+				blockNode.add(ifNode.getJoinNode().getInstructions().get(1));
 				schedulerNodes.add(blockNode);
-			}			
+			}
 		}
 	}
-	
-	
-	
-	
-	
-	
-
 
 }
