@@ -20,17 +20,17 @@ set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
 endif(MSVC)
 
 # Common packages required
-find_library(CALaka_LIBRARY CALaka PATH_SUFFIXES CAL)
-find_library(Orcc_LIBRARY Orcc PATH_SUFFIXES CAL)
-find_library(Thread_LIBRARY Thread PATH_SUFFIXES CAL)
+find_library(CALaka_LIBRARY CALaka)
+find_library(Orcc_LIBRARY Orcc)
+find_library(Thread_LIBRARY Thread)
 
-find_file(CAL_INCLUDE_DIR actoraka.h CALaka PATH_SUFFIXES include/CAL)
+find_path(CAL_INCLUDE_DIR actoraka.h CALaka PATH_SUFFIXES include/CAL)
 
 find_package(SDL REQUIRED)
 
 $if(needSerDes)$
-find_file(CAL_SOURCE_DIR wrapperaka.cpp CALaka PATH_SUFFIXES src/CAL)
-find_library(AdaptorFactory_LIBRARY AdaptorFactory PATH_SUFFIXES CAL)
+find_path(CAL_SOURCE_DIR wrapperaka.cpp CALaka PATH_SUFFIXES src/CAL)
+find_library(AdaptorFactory_LIBRARY AdaptorFactory)
 add_library(AdaptorConfig STATIC "\${CAL_SOURCE_DIR}/LibAdaptorConfig.cpp")
 add_library(Wrapper STATIC "\${CAL_SOURCE_DIR}/wrapperaka.cpp")
 $endif$
@@ -52,14 +52,14 @@ add_dependencies($network.name$ Wrapper AdaptorConfig)
 $endif$
 
 target_link_libraries($network.name$
+$if(needSerDes)$
+Wrapper AdaptorConfig
+\${AdaptorFactory_LIBRARY}
+$endif$
 \${CALaka_LIBRARY}
 \${Orcc_LIBRARY}
 \${Thread_LIBRARY}
 \${SDL_LIBRARY}
-$if(needSerDes)$
-\${AdaptorFactory_LIBRARY}
-Wrapper AdaptorConfig
-$endif$
 )
 
 >>

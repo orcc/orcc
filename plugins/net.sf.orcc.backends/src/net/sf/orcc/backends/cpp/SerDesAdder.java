@@ -188,7 +188,7 @@ public class SerDesAdder {
 							.getValue();
 
 					if (serdesMap.containsKey(attrName)) {
-						Vertex v = serdesMap.get(attr);
+						Vertex v = serdesMap.get(attrName);
 						SerDes serdes = v.getInstance().getWrapper();
 						int out = serdes.getNumOutputs();
 						serdes.setNumOutputs(out++);
