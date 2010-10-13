@@ -59,6 +59,45 @@ import net.sf.orcc.util.OrderedMap;
 public class PrintlnTransformation extends AbstractActorTransformation {
 
 	/**
+	 * Change characters in strings to fit LLVM constraints
+	 * 
+	 * 
+	 * @author J�r�me GORIN
+	 * 
+	 */
+	private class LLVMString {
+		StringBuffer llvmStr;
+		int size;
+
+		LLVMString(String str) {
+			// Replace characters unsupported by llvm
+			size = str.length() + 1;
+			llvmStr = new StringBuffer(str + "\\00");
+			replace("\\n", "\\0A");
+			replace("\\t", "\\09");
+		}
+
+		int getSize() {
+			return size;
+		}
+
+		String getStr() {
+			return llvmStr.toString();
+		}
+
+		void replace(String car, String newCar) {
+			int index = llvmStr.indexOf(car);
+			while (index != -1) {
+				llvmStr.delete(index, index + car.length());
+				llvmStr.insert(index, newCar);
+				index = llvmStr.indexOf(car);
+				size -= 1;
+			}
+
+		}
+	}
+
+	/**
 	 * State variables of the actor
 	 */
 	private OrderedMap<String, StateVariable> stateVars;
@@ -107,10 +146,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 			for (Expression expr : call.getParameters()) {
 				if (expr.isStringExpr()) {
 					String strExprVal = (((StringExpr) expr).getValue());
-
-					if (!strExprVal.equals("\\n")) {
-						value += strExprVal;
-					}
+					value += strExprVal;
 				} else {
 					Type type = expr.getType();
 					if (type.isBool()) {
@@ -141,12 +177,14 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 				}
 			}
 
+			LLVMString llvmStr = new LLVMString(value);
+
 			// Create state variable that contains println arguments
 			TypeString type = IrFactory.eINSTANCE.createTypeString();
-			type.setSize(value.length() + 2);
+			type.setSize(llvmStr.getSize());
 
 			StateVariable variable = new StateVariable(call.getLocation(),
-					type, name, false, new StringExpr(value + "\\0A\\00"));
+					type, name, false, new StringExpr(llvmStr.getStr()));
 			Use use = new Use(variable);
 
 			// Set the created state variable into call argument
