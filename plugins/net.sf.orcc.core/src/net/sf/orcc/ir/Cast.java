@@ -123,16 +123,24 @@ public class Cast {
 	 * @return a boolean indicating if source is signed type
 	 */
 	public boolean isSigned() {
-		if (source.isUint()) {
+		if (source.isUint() || target.isUint()) {
 			return false;
 		}
 		
-		if (source.isBool()) {
+		if (source.isBool()|| target.isBool()) {
 			return false;
 		}
 
 		if (source.isList()) {
 			TypeList type = (TypeList) source;
+			Type elementType = type.getElementType();
+			if (elementType.isUint() || elementType.isBool()) {
+				return false;
+			}
+		}
+		
+		if (target.isList()) {
+			TypeList type = (TypeList) target;
 			Type elementType = type.getElementType();
 			if (elementType.isUint() || elementType.isBool()) {
 				return false;
