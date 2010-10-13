@@ -20,17 +20,17 @@ set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /D NDEBUG")
 endif(MSVC)
 
 # Common packages required
-find_library(CALaka_LIBRARY CALaka HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
-find_library(Orcc_LIBRARY Orcc HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
-find_library(Thread_LIBRARY Thread HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
+find_library(CALaka_LIBRARY CALaka HINTS \$ENV{CALDIR} PATH_SUFFIXES lib)
+find_library(Orcc_LIBRARY Orcc HINTS \$ENV{CALDIR} PATH_SUFFIXES lib)
+find_library(Thread_LIBRARY Thread HINTS \$ENV{CALDIR} PATH_SUFFIXES lib)
 
-find_path(CAL_INCLUDE_DIR actoraka.h HINTS $ENV{CALDIR} PATH_SUFFIXES include include/CAL)
+find_path(CAL_INCLUDE_DIR actoraka.h HINTS \$ENV{CALDIR} PATH_SUFFIXES include include/CAL)
 
 find_package(SDL REQUIRED)
 
 $if(needSerDes)$
-find_path(CAL_SOURCE_DIR wrapperaka.cpp HINTS $ENV{CALDIR} PATH_SUFFIXES src/CAL)
-find_library(AdaptorFactory_LIBRARY AdaptorFactory HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
+find_path(CAL_SOURCE_DIR wrapperaka.cpp HINTS \$ENV{CALDIR} PATH_SUFFIXES src/CAL)
+find_library(AdaptorFactory_LIBRARY AdaptorFactory HINTS \$ENV{CALDIR} PATH_SUFFIXES lib)
 add_library(AdaptorConfig STATIC "\${CAL_SOURCE_DIR}/LibAdaptorConfig.cpp")
 add_library(Wrapper STATIC "\${CAL_SOURCE_DIR}/wrapperaka.cpp")
 $endif$
