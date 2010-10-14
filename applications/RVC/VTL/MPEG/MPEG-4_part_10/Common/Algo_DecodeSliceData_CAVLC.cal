@@ -179,6 +179,17 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	//		Mb_y := val_CurrMbAddr / PicWidthInMbs;
 		end
 
+	function SetFlag(bool ValFlag, uint(size=5)Idx, int(size=32) Val)
+				-->
+			int(size=32)
+		:
+			if(ValFlag) then
+				Val | (1<<Idx)
+			else
+				Val & (-1 ^ (1<<Idx))
+			end
+		end
+
 	GetSpsAndPpsParameters: action
 			EntropyCodingMode     :[ValEntropyCodingMode],
 			FstMbInSlc            :[ValFirstMbInSlice],

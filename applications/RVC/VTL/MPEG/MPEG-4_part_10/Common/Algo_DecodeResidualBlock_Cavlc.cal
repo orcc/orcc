@@ -17,10 +17,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 actor Algo_DecodeResidualBlock_Cavlc()
 	int (size=32) ValVLD,
-	int (size=8)  nC,
-	uint(size=5)  MaxNumCoeff,
-	uint(size=5)  StartIdx,
-	uint(size=5)  EndIdx
+	int (size=8)  Parameters
 		==>
 	uint(size=5)  TypeOfVLD,
 	int (size=32) VLD_Param,
@@ -70,23 +67,20 @@ actor Algo_DecodeResidualBlock_Cavlc()
 		end
 
 	ReadCoeffToken.Asked: action
-			nC          :[ValnC],
-			MaxNumCoeff :[ValMaxNumCoeff],
-			StartIdx    :[ValStartIdx],
-			EndIdx      :[ValEndIdx]
+			Parameters  :[nC , MaxNumCoeff , StartIdx , EndIdx]
 				==>
 			//        mb_field_decoding_flag
 			TypeOfVLD :[ CAVLC_COEFF_TOKEN ],
-			VLD_Param :[       ValnC       ]
+			VLD_Param :[       nC       ]
 		do
-			nC_Val := ValnC;
+			nC_Val := nC;
 			foreach int i in 0 .. 15
 			do
 				CoeffLevel[i] := 0;
 			end
-			startIdx    := ValStartIdx;
-			endIdx      := ValEndIdx;
-			maxNumCoeff := ValMaxNumCoeff;
+			startIdx    := StartIdx;
+			endIdx      := EndIdx;
+			maxNumCoeff := MaxNumCoeff;
 			if(DEBUG_FLAG_DECODED)then
 				println("******************** New Block Cavlc***************************");
 				println("nC : "+nC_Val);

@@ -659,56 +659,22 @@
         src="DecodeMacroBlockLayer" src-port="TypeOfVLD"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="ChromaArrayType"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerChromaArrayType"/>
-    <Connection dst="DecodeMbPred" dst-port="SliceType"
-        src="DecodeMacroBlockLayer" src-port="MbPredSliceType"/>
-    <Connection dst="DecodeMbPred" dst-port="MbType"
-        src="DecodeMacroBlockLayer" src-port="MbPredMbType"/>
-    <Connection dst="DecodeMbPred" dst-port="TransfSz8x8"
-        src="DecodeMacroBlockLayer" src-port="MbPredTransfSz8x8"/>
     <Connection dst="DecodeMbPred" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="MbPredValVLD"/>
     <Connection dst="Mgnt_DecodePic" dst-port="MbPredTypeOfVLD"
         src="DecodeMbPred" src-port="TypeOfVLD"/>
     <Connection dst="Mgnt_DecodePic" dst-port="MbPredNbBitsToRead"
         src="DecodeMbPred" src-port="NbBitsToRead"/>
-    <Connection dst="DecodeMbPred" dst-port="ChromaArrayType"
-        src="DecodeMacroBlockLayer" src-port="MbPredChromaArrayType"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="NumRefIdxLXActive"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumRefIdxLXActive"/>
-    <Connection dst="DecodeMbPred" dst-port="NumRefIdxLXActive"
-        src="DecodeMacroBlockLayer" src-port="MbPredNumRefIdxLXActive"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="MbFieldDecoding"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerMbFieldDecoding"/>
-    <Connection dst="DecodeMbPred" dst-port="MbFieldDecoding"
-        src="DecodeMacroBlockLayer" src-port="MbPredMbFieldDecoding"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="EntropyCodingMode"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerEntropyCodingMode"/>
-    <Connection dst="DecodeResidual" dst-port="EntropyCodingMode"
-        src="DecodeMacroBlockLayer" src-port="ResEntropyCodingMode"/>
-    <Connection dst="DecodeResidual" dst-port="MbType"
-        src="DecodeMacroBlockLayer" src-port="ResMbType"/>
-    <Connection dst="DecodeResidual" dst-port="TransfSz8x8"
-        src="DecodeMacroBlockLayer" src-port="ResTransfSz8x8"/>
-    <Connection dst="DecodeResidual" dst-port="BmFlag"
-        src="DecodeMacroBlockLayer" src-port="ResBmFlag"/>
-    <Connection dst="DecodeResidual" dst-port="StartIdx"
-        src="DecodeMacroBlockLayer" src-port="ResStartIdx"/>
-    <Connection dst="DecodeResidual" dst-port="EndIdx"
-        src="DecodeMacroBlockLayer" src-port="ResEndIdx"/>
-    <Connection dst="DecodeResidual" dst-port="CodBlkPatnLm"
-        src="DecodeMacroBlockLayer" src-port="ResCodBlkPatnLm"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="NATab"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerNATab"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="NBTab"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerNBTab"/>
-    <Connection dst="DecodeResidual" dst-port="NATab"
-        src="DecodeMacroBlockLayer" src-port="ResNATab"/>
-    <Connection dst="DecodeResidual" dst-port="NBTab"
-        src="DecodeMacroBlockLayer" src-port="ResNBTab"/>
-    <Connection dst="DecodeResidual" dst-port="LeftMbExists"
-        src="DecodeMacroBlockLayer" src-port="ResLeftMbExists"/>
-    <Connection dst="DecodeResidual" dst-port="AboveMbExists"
-        src="DecodeMacroBlockLayer" src-port="ResAboveMbExists"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="LeftMbExists"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerLeftMbExists"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="AboveMbExists"
@@ -717,26 +683,12 @@
         src="DecodeResidualBlock_Cavlc" src-port="Total_Coeff"/>
     <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcTypeOfVLD"
         src="DecodeResidualBlock_Cavlc" src-port="TypeOfVLD"/>
-    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="nC"
-        src="DecodeResidual" src-port="ResBlknC"/>
     <Connection dst="Mgnt_DecodePic" dst-port="ResBlkCavlcVLD_Param"
         src="DecodeResidualBlock_Cavlc" src-port="VLD_Param"/>
     <Connection dst="DecodeResidualBlock_Cavlc" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="ResBlkCavlcValVLD"/>
-    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="MaxNumCoeff"
-        src="DecodeResidual" src-port="ResBlkMaxNumCoeff"/>
-    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="StartIdx"
-        src="DecodeResidual" src-port="ResBlkStartIdx"/>
-    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="EndIdx"
-        src="DecodeResidual" src-port="ResBlkEndIdx"/>
-    <Connection dst="DecodeResidual" dst-port="ChromaArrayType"
-        src="DecodeMacroBlockLayer" src-port="ResChromaArrayType"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="Num_C8x8"
         src="DecodeSliceData_Cavlc" src-port="DecMbLayerNumC8x8"/>
-    <Connection dst="DecodeResidual" dst-port="Num_C8x8"
-        src="DecodeMacroBlockLayer" src-port="ResNumC8x8"/>
-    <Connection dst="DecodeResidual" dst-port="CodBlkPatnChm"
-        src="DecodeMacroBlockLayer" src-port="ResCodBlkPatnChm"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="Total_CoeffLuma"
         src="DecodeResidual" src-port="DecMbLayerTotal_CoeffLuma"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="Total_CoeffLuma"
@@ -753,12 +705,6 @@
         src="DecodeSubMbPred" src-port="VldParam"/>
     <Connection dst="DecodeSubMbPred" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="SubMbPredValVLD"/>
-    <Connection dst="DecodeSubMbPred" dst-port="MbType"
-        src="DecodeMacroBlockLayer" src-port="SubMbPredMbType"/>
-    <Connection dst="DecodeSubMbPred" dst-port="NumRefIdxLXActive"
-        src="DecodeMacroBlockLayer" src-port="SubMbPredNumRefIdxLXActive"/>
-    <Connection dst="DecodeSubMbPred" dst-port="MbFieldDecoding"
-        src="DecodeMacroBlockLayer" src-port="SubMbPredMbFieldDecoding"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="SubMbType"
         src="DecodeSubMbPred" src-port="MBLayerSubMbType"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="FstMbInSlc"
@@ -985,4 +931,12 @@
         src="MergeDataFromSDataAndMbLayer" src-port="slice_type"/>
     <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="SliceType"
         src="DecodeMacroBlockLayer" src-port="Slice_Type"/>
+    <Connection dst="DecodeResidualBlock_Cavlc" dst-port="Parameters"
+        src="DecodeResidual" src-port="ResBlkParameters"/>
+    <Connection dst="DecodeResidual" dst-port="Parameters"
+        src="DecodeMacroBlockLayer" src-port="ResParameters"/>
+    <Connection dst="DecodeMbPred" dst-port="Parameters"
+        src="DecodeMacroBlockLayer" src-port="MbPredParameters"/>
+    <Connection dst="DecodeSubMbPred" dst-port="Parameters"
+        src="DecodeMacroBlockLayer" src-port="SubMbPredParameters"/>
 </XDF>

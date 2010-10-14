@@ -14,31 +14,14 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
 actor Algo_DecodeResidual()
-	bool          EntropyCodingMode,
-	uint(size=6)  MbType,
-	bool          TransfSz8x8,
-	uint(size=6)  CodBlkPatnLm,
-	uint(size=6)  CodBlkPatnChm,
-	uint(size=2)  ChromaArrayType,
-	uint(size=2)  Num_C8x8,
-
-	bool         BmFlag,
-	uint(size=4) StartIdx,
-	uint(size=4) EndIdx,
-	uint(size=5) NATab,
-	uint(size=5) NBTab,
-	bool         LeftMbExists,
-	bool         AboveMbExists,
+	uint(size=6)  Parameters,
 
 	uint(size=5) Total_Coeff
 		==>
 	int (size=6)  TypeOfVLD,
 	int (size=32) ActorLaunched,
 
-	int (size=8) ResBlknC,
-	uint(size=5) ResBlkMaxNumCoeff,
-	uint(size=5) ResBlkStartIdx,
-	uint(size=5) ResBlkEndIdx,
+	int (size=8) ResBlkParameters,
 
 	uint(size=5) DecMbLayerTotal_CoeffLuma,
 	uint(size=5) DecMbLayerTotal_CoeffChroma,
@@ -113,52 +96,51 @@ actor Algo_DecodeResidual()
 			end
 		end
 
+	function GetFlag(int(size=32) Val, uint(size=5) Idx)
+				-->
+			bool
+		:
+			(Val & (1 << Idx)) != 0
+		end
+
 	GetParameters: action
-			EntropyCodingMode :[TypeOfEntropy],
-			BmFlag            :[ValBmFlag],
-			StartIdx          :[ValStartIdx],
-			EndIdx            :[ValEndIdx],
-			MbType            :[ValMbType],
-			TransfSz8x8       :[ValTransfSz8x8],
-			CodBlkPatnLm      :[ValCodBlkPatnLm],
-			CodBlkPatnChm     :[ValCodBlkPatnChm],
-			NATab             :[ValNATab] repeat 12,
-			NBTab             :[ValNBTab] repeat 12,
-			LeftMbExists      :[ValLeftMbExists],
-			AboveMbExists     :[ValAboveMbExists],
-			ChromaArrayType   :[ValChromaArrayType],
-			Num_C8x8          :[ValNum_C8x8]
+			Parameters        :[Param] repeat 32
 				==>
+		var
+			bool LeftMbExists,
+			bool AboveMbExists
 		do
-			bmFlag                   := ValBmFlag;
-			entropy_coding_mode_flag := TypeOfEntropy;
-			startIdx                 := ValStartIdx;
-			endIdx                   := ValEndIdx;
-			mb_type                  := ValMbType;
-			transform_size_8x8_flag  := ValTransfSz8x8;
-			CodedBlockPatternLuma    := ValCodBlkPatnLm;
-			CodedBlockPatternChroma  := ValCodBlkPatnChm;
-			chroma_array_type        := ValChromaArrayType;
-			NumC8x8                  := ValNum_C8x8;
+			entropy_coding_mode_flag := GetFlag(Param[0],0);
+			transform_size_8x8_flag  := GetFlag(Param[0],1);
+			bmFlag                   := GetFlag(Param[0],2);
+			LeftMbExists             := GetFlag(Param[0],3);
+			AboveMbExists            := GetFlag(Param[0],4);
+			mb_type                  := Param[1];
+			startIdx                 := Param[2];
+			endIdx                   := Param[3];
+			CodedBlockPatternLuma    := Param[4];
+			CodedBlockPatternChroma  := Param[5];
+			chroma_array_type        := Param[6];
+			NumC8x8                  := Param[7];
 			ActorSelected :=
 				if(entropy_coding_mode_flag = CAVLC_ENTROPY)then
 					RESIDUAL_BLOCK_CAVLC
 				else
 					RESIDUAL_BLOCK_CABAC
 				end;
-			TotalCoeffTabLuma   := [0: for int i in 0 .. 23];
+			TotalCoeffTabLuma   :=  [0: for int i in 0 .. 23];
 			TotalCoeffTabChroma := [[0: for int i in 0 .. 23]: for int j in 0 .. 1];
 			foreach int i in 0 .. 3
 			do
-				TotalCoeffTabLuma  [16+i]      := ValNATab[i];
-				TotalCoeffTabChroma[iCb][16+i] := ValNATab[4+i];
-				TotalCoeffTabChroma[iCr][16+i] := ValNATab[8+i];
-				MbExists           [16+i]      := ValLeftMbExists;
+				TotalCoeffTabLuma  [16+i]      := Param[8 + i];
+				TotalCoeffTabChroma[iCb][16+i] := Param[8 + 4 + i];
+				TotalCoeffTabChroma[iCr][16+i] := Param[8 + 8 + i];
+				MbExists           [16+i]      := LeftMbExists;
 
-				TotalCoeffTabLuma  [20+i]      := ValNBTab[i];
-				TotalCoeffTabChroma[iCb][20+i] := ValNBTab[4+i];
-				TotalCoeffTabChroma[iCr][20+i] := ValNBTab[8+i];
-				MbExists           [20+i]      := ValAboveMbExists;
+				TotalCoeffTabLuma  [20+i]      := Param[20 + i];
+				TotalCoeffTabChroma[iCb][20+i] := Param[20 + 4 + i];
+				TotalCoeffTabChroma[iCr][20+i] := Param[20 + 8 + i];
+				MbExists           [20+i]      := AboveMbExists;
 			end
 			ResidualLumaOutput := RESIDUAL_LUMA_LUMA_OUTPUT;
 			i8x8Loop      := 1;
@@ -297,10 +279,7 @@ actor Algo_DecodeResidual()
 
 	SendResBlockParameters: action
 				==>
-			ResBlknC          :[nC],
-			ResBlkMaxNumCoeff :[maxNumCoeff],
-			ResBlkStartIdx    :[StartIdxSent],
-			ResBlkEndIdx      :[EndIdxSent],
+			ResBlkParameters  :[nC , maxNumCoeff , StartIdxSent , EndIdxSent],
 
 			Skip_Block        :[false]
 		var

@@ -16,29 +16,24 @@ This copyright notice must be included in all copies or derivative works. Copyri
 actor Algo_DecodeMbPred()
 	int (size=32) ValVLD,
 
-	uint(size=4)  SliceType,
-	uint(size=6)  MbType,
-	bool          TransfSz8x8,
-	uint(size=2)  ChromaArrayType,
-	uint(size=5)  NumRefIdxLXActive,
-	bool          MbFieldDecoding
+	uint(size=6)  Parameters
 		==>
 	uint(size=5)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
 
-	uint(size=4) RemIntraYxYPredMode,
+	uint(size=4)  RemIntraYxYPredMode,
 
-	uint(size=4) RefIdxL0,
-	uint(size=4) RefIdxL1,
-	uint(size=3) SelectList,
-	uint(size=5) MbPartHeight,
-	uint(size=5) MbPartWidth,
-	uint(size=3) MbPartIdx,
-	bool         EndRefIdxL0,
+	uint(size=4)  RefIdxL0,
+	uint(size=4)  RefIdxL1,
+	uint(size=3)  SelectList,
+	uint(size=5)  MbPartHeight,
+	uint(size=5)  MbPartWidth,
+	uint(size=3)  MbPartIdx,
+	bool          EndRefIdxL0,
 
-	uint(size=4) IntraPredModeC, 
-	int(size=16) MvResl0,
-	bool         EndMvRes
+	uint(size=4)  IntraPredModeC, 
+	int(size=16)  MvResl0,
+	bool          EndMvRes
 		:
 
 	bool DEBUG_MV           = false;
@@ -320,22 +315,26 @@ actor Algo_DecodeMbPred()
 			end
 		end
 
+	function GetFlag(int(size=32) Val, uint(size=5) Idx)
+				-->
+			bool
+		:
+			(Val & (1 << Idx)) != 0
+		end
+
 	ReadParameters: action
-			SliceType         :[ValSliceType],
-			MbType            :[ValMbType],
-			TransfSz8x8       :[ValTransfSz8x8],
-			ChromaArrayType   :[ValChromaArrayType],
-			NumRefIdxLXActive :[ValNumRefIdxLXActive] repeat 2,
-			MbFieldDecoding   :[ValMbFieldDecoding]
+			Parameters :[SliceType , MbType , ChromaArrayType , 
+			                   NumRefIdxL0Active , NumRefIdxL1Active ,
+			                   Flags]
 				==>
 		do
-			slice_type              := ValSliceType;
-			mb_type                 := ValMbType;
-			transform_size_8x8_flag := ValTransfSz8x8;
-			Chroma_Array_Type       := ValChromaArrayType;
-			num_ref_idx_l0_active   := ValNumRefIdxLXActive[0];
-			num_ref_idx_l1_active   := ValNumRefIdxLXActive[1];
-			mb_field_decoding_flag  := ValMbFieldDecoding;
+			slice_type              := SliceType;
+			mb_type                 := MbType;
+			Chroma_Array_Type       := ChromaArrayType;
+			num_ref_idx_l0_active   := NumRefIdxL0Active;
+			num_ref_idx_l1_active   := NumRefIdxL1Active;
+			transform_size_8x8_flag := GetFlag(Flags,1);
+			mb_field_decoding_flag  := GetFlag(Flags,0);
 			lumaYxYBlkIdx           := 0;
 			BitMissed               := 0;
 

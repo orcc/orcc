@@ -16,9 +16,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 actor Algo_DecodeSubMbPred()
 	int (size=32) ValVLD,
 
-	uint(size=5)  NumRefIdxLXActive,
-	bool          MbFieldDecoding,
-	uint(size=6)  MbType
+	uint(size=6)  Parameters
 		==>
 	uint(size=5)  TypeOfVLD,
 	int (size=32) VldParam,
@@ -113,6 +111,13 @@ actor Algo_DecodeSubMbPred()
 			end
 		end
 
+	function GetFlag(int(size=32) Val, uint(size=5) Idx)
+				-->
+			bool
+		:
+			(Val & (1 << Idx)) != 0
+		end
+
 
 	ReadSubMbType.Asked: action
 				==>
@@ -123,8 +128,6 @@ actor Algo_DecodeSubMbPred()
 			ValVLD           :[ValueOfVLD] repeat 4
 				==>
 			MBLayerSubMbType :[ValueOfVLD] repeat 4
-		var
-			List(type: uint(size=3), size=4) SelList
 		do
 			foreach int i in 0 .. 3
 			do
@@ -136,15 +139,13 @@ actor Algo_DecodeSubMbPred()
 		end
 
 	ReadParameters: action
-			NumRefIdxLXActive :[ValNumRefIdxLXAct] repeat 2,
-			MbFieldDecoding   :[ValMbFieldDecoding],
-			MbType            :[MacroBType]
+			Parameters :[MacroBType,NumRefIdxL0Act,NumRefIdxL1Act,Flag]
 				==>
 		do
-			num_ref_idx_l0_active  := ValNumRefIdxLXAct[0];
-			num_ref_idx_l1_active  := ValNumRefIdxLXAct[1];
-			mb_field_decoding_flag := ValMbFieldDecoding;
+			num_ref_idx_l0_active  := NumRefIdxL0Act;
+			num_ref_idx_l1_active  := NumRefIdxL1Act;
 			mb_type                := MacroBType;
+			mb_field_decoding_flag := GetFlag(Flag,0);
 
 			mbPartIdx    := 0;
 		end
