@@ -4,24 +4,24 @@
       <vertex id="PicWidthInMb" x="16" y="615"/>
       <vertex id="PicSizeInMb" x="20" y="571"/>
       <vertex id="MbPartIdx" x="57" y="164"/>
-      <vertex id="MbPartWidth" x="560" y="244"/>
-      <vertex id="MbPartHeigth" x="543" y="169"/>
+      <vertex id="MbPartWidth" x="506" y="251"/>
+      <vertex id="MbPartHeigth" x="489" y="176"/>
       <vertex id="RD_L" x="256" y="320"/>
-      <vertex id="Coef_ACR" x="903" y="557"/>
+      <vertex id="Coef_ACR" x="849" y="564"/>
       <vertex id="LOCATION" x="19" y="462"/>
       <vertex id="MV" x="43" y="505"/>
       <vertex id="PartSZ" x="57" y="261"/>
       <vertex id="Mb_Type" x="31" y="540"/>
       <vertex id="currMBaddr" x="16" y="428"/>
-      <vertex id="RA_L" x="586" y="487"/>
-      <vertex id="RA_Width_L" x="565" y="557"/>
-      <vertex id="RA_Height_L" x="564" y="523"/>
-      <vertex id="MB4x4Pred_L" x="1283" y="509"/>
-      <vertex id="RefIdx2PocControl" x="546" y="596"/>
-      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="256" y="447"/>
-      <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="543" y="287"/>
-      <vertex id="Algo_Interp_split_MB" x="901" y="184"/>
-      <vertex id="Algo_Add_4x4" x="1113" y="487"/>
-      <vertex id="NewMb" x="621" y="686"/>
+      <vertex id="RA_L" x="532" y="494"/>
+      <vertex id="RA_Width_L" x="511" y="564"/>
+      <vertex id="RA_Height_L" x="510" y="530"/>
+      <vertex id="MB4x4Pred_L" x="1121" y="459"/>
+      <vertex id="RefIdx2PocControl" x="492" y="603"/>
+      <vertex id="NewMb" x="527" y="464"/>
+      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="197" y="446"/>
+      <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="458" y="291"/>
+      <vertex id="Algo_Interp_split_MB" x="797" y="182"/>
+      <vertex id="Algo_Add_4x4" x="991" y="442"/>
    </vertices>
 </layout>

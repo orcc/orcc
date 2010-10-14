@@ -488,6 +488,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="slice_type">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -897,8 +904,6 @@
         dst-port="redundant_pic_cnt_present" src="" src-port="redundant_pic_cnt_present"/>
     <Connection dst="DecodeSliceHeader" dst-port="entropy_coding_mode"
         src="" src-port="entropy_coding_mode"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="deblocking_filter_control_present" src="" src-port="deblocking_filter_control_present"/>
     <Connection dst="DecodeSliceHeader" dst-port="NumSliceGroups" src="" src-port="NumSliceGroups"/>
     <Connection dst="DecodeSliceHeader" dst-port="SliceGroupMapType"
         src="" src-port="SliceGroupMapType"/>
@@ -974,4 +979,10 @@
         dst-port="MbPredSelectList" src="DecodeMbPred" src-port="SelectList"/>
     <Connection dst="" dst-port="SelectList"
         src="MergeDataFromSDataAndMbLayer" src-port="SelectList"/>
+    <Connection dst="DecodeSliceHeader"
+        dst-port="deblocking_filter_control_present" src="" src-port="deblocking_filter_control_present"/>
+    <Connection dst="" dst-port="slice_type"
+        src="MergeDataFromSDataAndMbLayer" src-port="slice_type"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="SliceType"
+        src="DecodeMacroBlockLayer" src-port="Slice_Type"/>
 </XDF>

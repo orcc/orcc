@@ -66,6 +66,20 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="slice_type">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="mb_type">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -137,6 +151,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="MvpL0_Reconstr">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_Mvpl0Reconstr"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -167,4 +190,9 @@
     <Connection dst="" dst-port="mv_out" src="Mgnt_MVR" src-port="mv_out"/>
     <Connection dst="" dst-port="ref_idx" src="Mgnt_MVR" src-port="refidx_out"/>
     <Connection dst="Mgnt_MVR" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="slice_type" src="" src-port="slice_type"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="mb_type" src="" src-port="mb_type"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
 </XDF>

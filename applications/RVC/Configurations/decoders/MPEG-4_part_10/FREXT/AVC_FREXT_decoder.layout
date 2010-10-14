@@ -2,9 +2,9 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="-441" y="964"/>
-      <vertex id="Display_L" x="647" y="656"/>
-      <vertex id="Display_Cb" x="647" y="1457"/>
-      <vertex id="Display_Cr" x="647" y="2236"/>
+      <vertex id="Display_L" x="610" y="324"/>
+      <vertex id="Display_Cb" x="631" y="1159"/>
+      <vertex id="Display_Cr" x="618" y="1980"/>
       <vertex id="Width" x="395" y="99"/>
       <vertex id="Height" x="395" y="196"/>
       <vertex id="FUN_Parser" x="-332" y="949"/>

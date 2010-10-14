@@ -1,0 +1,339 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+actor Algo_Mvpl0Reconstr()
+	uint(size=6)  mb_type,
+	uint(size=4)  slice_type,
+
+	uint(size=13) CurrMbAddr,
+	uint(size=13) FirstMbInSlice,
+	uint(size=7)  PicWidthInMb
+		==>
+		:
+
+	uint(size=2) NA = 0;
+	uint(size=2) PRED_L0 = 1;
+	uint(size=2) PRED_L1 = 2;
+	uint(size=2) BIPRED  = 3;
+	uint(size=2) DIRECT  = 4;
+
+	uint(size=4) SLICE_TYPE_P  = 0;
+	uint(size=4) SLICE_TYPE_B  = 1;
+	uint(size=4) SLICE_TYPE_I  = 2;
+	uint(size=4) SLICE_TYPE_SP = 3;
+	uint(size=4) SLICE_TYPE_SI = 4;
+
+	uint(size=6) BLOCK_TYPE_INTRA_MIN = 0;
+	uint(size=6) BLOCK_TYPE_INTRA_MAX = 25;
+	uint(size=6) BLOCK_TYPE_P_MIN     = 26;
+	uint(size=6) BLOCK_TYPE_B_MIN     = 31;
+	uint(size=6) BLOCK_TYPE_B_MAX     = 53;
+	uint(size=6) BLOCK_TYPE_P_SKIP    = 54;
+
+	int           SZ_TAB      = 128;
+	int           MASK_TAB    = 127;
+	uint(size=32) LOG2_SZ_TAB = 7;
+
+	uint(size=3) SZ_16x16 = 0;
+	uint(size=3) SZ_16x8  = 1;
+	uint(size=3) SZ_8x16  = 2;
+	uint(size=3) SZ_8x8   = 3;
+	uint(size=3) SZ_8x4   = 4;
+	uint(size=3) SZ_4x8   = 5;
+	uint(size=3) SZ_4x4   = 6;
+
+	List(type: List(type: uint(size=3),size=2),size=8) MbPartPredMode_P =
+		[
+			[PRED_L0,NA],[PRED_L0,PRED_L0],[PRED_L0,PRED_L0],[NA,NA],[NA,NA],[PRED_L0,NA],[NA,NA],[NA,NA]
+		];
+
+	List(type: List(type: uint(size=3),size=2),size=32) MbPartPredMode_B =
+		[
+			[DIRECT,NA], [PRED_L0,NA], [PRED_L1,NA], [BIPRED,NA], [PRED_L0,PRED_L0], [PRED_L0,PRED_L0], [PRED_L1,PRED_L1], [PRED_L1,PRED_L1], [PRED_L0,PRED_L1], [PRED_L0,PRED_L1],
+			[PRED_L1,PRED_L0], [PRED_L1,PRED_L0], [PRED_L0,BIPRED], [PRED_L0,BIPRED], [PRED_L1,BIPRED], [PRED_L1,BIPRED], [BIPRED,PRED_L0], [BIPRED,PRED_L0], [BIPRED,PRED_L1], [BIPRED,PRED_L1],
+			[BIPRED,BIPRED], [BIPRED,BIPRED], [NA,NA], [DIRECT,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA],
+			[NA,NA], [NA,NA]
+		];
+
+	List(type: uint(size=3),size=8) SizeMb_P =
+		[
+			SZ_16x16, SZ_16x8, SZ_8x16, SZ_8x8, SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16
+		];
+
+	List(type: uint(size=3),size=32) SizeMb_B =
+		[
+			 SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
+			SZ_16x8,  SZ_8x16,  SZ_16x8,  SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
+			SZ_16x8,  SZ_8x16,   SZ_8x8,   SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,
+			 SZ_8x8,  SZ_8x8
+		];
+
+	List(type: uint(size=3),size=8) NumMbPart_P =
+		[
+			1,2,2,4,4,1,1,1
+		];
+
+	List(type: uint(size=3),size=32) NumMbPart_B =
+		[
+			1,1,1,1,2,2,2,2,2,2,
+			2,2,2,2,2,2,2,2,2,2,
+			2,2,4,1,1,1,1,1,1,1,
+			1,1
+		];	
+
+	//Size of MvTab must be >= PicWidthInMb + 1 and must be equal to pow(2,n) for masking bits easily.
+	List(type: List(type: List(type: int(size=16),size=2), size=16),size= SZ_TAB) MvTab;
+	List(type: List(type: uint(size=4), size=16),size= SZ_TAB) RefIdx;
+
+	
+
+	uint(size=3) MbPartIdxMax;
+	uint(size=3) MbPartIdx;
+	uint(size=3) SizeMbMv;
+	uint(size=6) MbType;
+
+	function Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
+				-->
+			bool
+		:
+			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
+				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) &  7][mb_part_idx & 1] & PRED_L0) != 0
+			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
+				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
+			end
+		end
+
+	function min(int a, int b)
+				-->
+			int
+		:
+			if(a < b)then
+				a
+			else
+				b
+			end
+		end
+
+	function max(int a, int b)
+				-->
+			int
+		:
+			if(a > b)then
+				a
+			else
+				b
+			end
+		end
+
+	GetMbType.MacroBlkIorSI: action
+			mb_type    :[MacroBlkType],
+			slice_type :[SlcTyp]
+				==>
+		guard
+			MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX
+		end
+
+	GetMbType.P_Skip: action
+			mb_type    :[MacroBlkType],
+			slice_type :[SlcTyp]
+				==>
+		guard
+			SlcTyp = SLICE_TYPE_P or SlcTyp = SLICE_TYPE_SP,
+			MacroBlkType = BLOCK_TYPE_P_SKIP
+		end
+
+	GetMbType.Others: action
+			mb_type    :[MacroBlkType],
+			slice_type :[SlcTyp]
+				==>
+		do
+			MbType        := MacroBlkType;
+			MbPartIdx     := 0;
+			MbPartIdxMax  :=
+				if(SlcTyp = SLICE_TYPE_B) then
+					NumMbPart_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]	
+				else
+					NumMbPart_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
+				end;	
+			SizeMbMv  :=
+				if(SlcTyp = SLICE_TYPE_B) then
+					SizeMb_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]	
+				else
+					SizeMb_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
+				end;
+		end
+
+	EatTokens: action
+			CurrMbAddr     :[a],
+			FirstMbInSlice :[b],
+			PicWidthInMb   :[c]
+				==>
+		end
+
+	GetMbInfos.P_Skip: action
+			CurrMbAddr     :[Curr_Mb_Addr],
+			FirstMbInSlice :[Fst_Mb],
+			PicWidthInMb   :[pic_width_in_mb]
+				==>
+		var
+			uint(size=LOG2_SZ_TAB) Idx         =  Curr_Mb_Addr      & MASK_TAB,
+			uint(size=LOG2_SZ_TAB) Idx_mbAddrA = (Curr_Mb_Addr - 1) & MASK_TAB,
+			uint(size=LOG2_SZ_TAB) Idx_mbAddrB = (Curr_Mb_Addr - pic_width_in_mb) & MASK_TAB,
+			uint(size=LOG2_SZ_TAB) Idx_mbAddrC,
+
+			List(type: int (size=16),size=2) MvA,
+			List(type: int (size=16),size=2) MvB,
+			List(type: int (size=16),size=2) MvC,
+			uint(size=4)  RefIdxA,
+			uint(size=4)  RefIdxB,
+			uint(size=4)  RefIdxC,
+
+			List(type: int(size=16), size=2)  MvPred
+		do
+			RefIdx[Idx] := [0: for int i in 0 .. 15];
+			//if mbAddrB is not available
+			if( (Curr_Mb_Addr - Fst_Mb) < pic_width_in_mb) then
+				MvTab[Idx] := [[0,0]: for int i in 0 .. 15];
+			else
+				//if mbAddrA is not available	
+				if( (Curr_Mb_Addr mod pic_width_in_mb) = 0) then
+					MvTab[Idx] := [[0,0]: for int i in 0 .. 15];
+				else
+					//if refIdxL0A is equal to 0 and both components of mvL0A are equal to 0
+					if(RefIdx[Idx_mbAddrA][5] = 0 and MvTab[Idx_mbAddrA][5][0] = 0 and MvTab[Idx_mbAddrA][5][1] = 0) then
+						MvTab[Idx] := [[0,0]: for int i in 0 .. 15];
+					else
+						//if refIdxL0B is equal to 0 and both components of mvL0B are equal to 0	
+						if(RefIdx[Idx_mbAddrB][10] = 0 and MvTab[Idx_mbAddrB][10][0] = 0 and MvTab[Idx_mbAddrB][10][1] = 0) then
+							MvTab[Idx] := [[0,0]: for int i in 0 .. 15];	
+						else
+							MvA     := MvTab [Idx_mbAddrA][5];
+							RefIdxA := RefIdx[Idx_mbAddrA][5];
+							MvB     := MvTab [Idx_mbAddrB][10];
+							RefIdxB := RefIdx[Idx_mbAddrB][10];
+							if((Curr_Mb_Addr - pic_width_in_mb + 1) mod pic_width_in_mb != 0)then
+								Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_TAB;
+								MvC     := MvTab [Idx_mbAddrC][10];
+								RefIdxC := RefIdx[Idx_mbAddrA][10];
+							else
+								Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_TAB;
+								MvC     := MvTab [Idx_mbAddrC][15];
+								RefIdxC := RefIdx[Idx_mbAddrA][15];	
+							end
+							if(    RefIdxA  = 0 and RefIdxB != 0 and RefIdxC != 0
+							    or RefIdxA != 0 and RefIdxB  = 0 and RefIdxC != 0
+							    or RefIdxA != 0 and RefIdxB != 0 and RefIdxC  = 0) then
+								MvPred := [0,0];
+							else
+								MvPred[0] := min(max(MvA[0],MvB[0]),MvC[0]);
+								MvPred[1] := min(max(MvA[1],MvB[1]),MvC[1]);
+							end
+						end
+					end
+				end
+			end
+		end
+
+	GetMbInfos.Others: action
+			CurrMbAddr     :[Curr_Mb_Addr],
+			FirstMbInSlice :[Fst_Mb],
+			PicWidthInMb   :[pic_width_in_mb]	
+				==>
+		end
+
+	ComputeMvpL0.Launch: action
+			==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			Is_PredL0(MbType, MbPartIdx)
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	ComputeMvpL0.Skip: action
+			==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			not Is_PredL0(MbType, MbPartIdx)
+		do
+			MbPartIdx := MbPartIdx + 1;	
+		end
+
+	ComputeMvpL0.Done: action
+			==>
+		guard
+			MbPartIdx = MbPartIdxMax
+		end
+
+	schedule fsm GetMbType:
+		GetMbType         (GetMbType.MacroBlkIorSI )--> EatTokens;
+		GetMbType         (GetMbType.P_Skip        )--> GetMbInfos4P_Skip;
+		GetMbType         (GetMbType.Others        )--> GetMbInfos4Others;
+
+		EatTokens         (EatTokens               )--> GetMbType;
+
+		GetMbInfos4P_Skip (GetMbInfos.P_Skip       )--> GetMbType;
+
+		GetMbInfos4Others (GetMbInfos.P_Skip       )--> ComputeMvpL0;
+
+		ComputeMvpL0      (ComputeMvpL0.Launch     )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvpL0.Skip       )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvpL0.Done       )--> GetMbType;
+
+	end
+
+	priority
+		GetMbType.MacroBlkIorSI > GetMbType.Others;
+		GetMbType.P_Skip        > GetMbType.Others;
+	end
+end

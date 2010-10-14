@@ -75,11 +75,12 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  SData_Total_CoeffLuma,
 	uint(size=5)  SData_Total_CoeffChroma,
 
-	uint(size=6) MbType,
-	bool         MergeTransfSz8x8,
-	int(size=9)  pix_I_PCM_Y,
-	int(size=9)  pix_I_PCM_U,
-	int(size=9)  pix_I_PCM_V,
+	uint(size=6)  MbType,
+	uint(size=4)  Slice_Type,
+	bool          MergeTransfSz8x8,
+	int(size=9)   pix_I_PCM_Y,
+	int(size=9)   pix_I_PCM_U,
+	int(size=9)   pix_I_PCM_V,
 
 	uint(size=5)  NbCoeffInMB,
 	bool          SkipMacroBlk,
@@ -261,6 +262,7 @@ actor Algo_DecodeMacroblockLayer()
 			ChromaQpIdxOffset  :[ ValChrmQpIdxOff , Val2ndChrmQpIdxOff ]
 				==>
 			MbType             :[mb_type],
+			Slice_Type         :[ValSliceType],
 			MergeTransfSz8x8   :[ValTransform8x8Mode]
 		var
 			uint         Idx

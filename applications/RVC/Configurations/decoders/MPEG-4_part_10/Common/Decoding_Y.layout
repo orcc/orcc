@@ -17,15 +17,15 @@
       <vertex id="MV" x="551" y="1452"/>
       <vertex id="PartSZ" x="205" y="1069"/>
       <vertex id="LOCATION" x="530" y="1417"/>
-      <vertex id="RefIdx_l0" x="421" y="1371"/>
+      <vertex id="RefIdx_l0" x="543" y="1712"/>
       <vertex id="POC" x="205" y="1360"/>
-      <vertex id="RefList0" x="495" y="1777"/>
+      <vertex id="RefList0" x="543" y="1835"/>
       <vertex id="CodedBlockPattern" x="479" y="1062"/>
       <vertex id="LFDisable" x="530" y="1375"/>
-      <vertex id="slice_alpha_c0_offset" x="205" y="1955"/>
-      <vertex id="slice_beta_offset" x="205" y="2052"/>
-      <vertex id="ref_idx_in" x="205" y="2149"/>
-      <vertex id="mv_in" x="205" y="2246"/>
+      <vertex id="slice_alpha_c0_offset" x="497" y="2025"/>
+      <vertex id="slice_beta_offset" x="506" y="2060"/>
+      <vertex id="ref_idx_in" x="535" y="1989"/>
+      <vertex id="mv_in" x="548" y="1949"/>
       <vertex id="I_PCM_Y" x="525" y="1297"/>
       <vertex id="ConstrainedIFlag" x="477" y="1113"/>
       <vertex id="DelList" x="519" y="1206"/>
@@ -34,11 +34,11 @@
       <vertex id="BlocksSize" x="48" y="1502"/>
       <vertex id="MacroBlockType" x="514" y="1492"/>
       <vertex id="TransformSize8x8" x="39" y="1278"/>
-      <vertex id="RefList1" x="425" y="1857"/>
-      <vertex id="RefIdx_l1" x="408" y="1727"/>
+      <vertex id="RefList1" x="541" y="1874"/>
+      <vertex id="RefIdx_l1" x="536" y="1792"/>
+      <vertex id="SelectList" x="539" y="1915"/>
       <vertex id="Display_L" x="988" y="1287"/>
       <vertex id="TEX_L" x="733" y="1298"/>
       <vertex id="RES_L" x="205" y="1554"/>
-      <vertex id="SelectList" x="442" y="1915"/>
    </vertices>
 </layout>
