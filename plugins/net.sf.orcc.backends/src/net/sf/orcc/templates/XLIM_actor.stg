@@ -72,8 +72,7 @@ $endif$
 
 stateVar(var) ::= <<
 <stateVar name="$var.name$" sourceName="$var.name$">
-	$initValue(type=var.type, value=var.constantValue)$
-</stateVar>
+	$initValue(type=var.type, value=var.constantValue)$</stateVar>
 >>
 
 stateVars() ::= <<
@@ -490,11 +489,6 @@ Transition(transition) ::= <<
 			<port dir="out" size="1" source="s_$transition.sourceState$_enabled" typeName="bool"/>
 		</operation>
 	</module>
-	$if (actions)$
-	while (outside_FSM_scheduler()) {
-		i++;
-	}
-	$endif$
 	<module kind="then">
 		$schedulingTestState(nextStates=transition.nextStateInfo)$
 	</module>
@@ -536,15 +530,6 @@ schedulerFSM(actions, fsm) ::= <<
 				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
 			</operation>
 		</module>
-			$if(actions)$
-			static int outside_FSM_scheduler() {
-				int i = 0;
-				$schedulingTest(actions)$ else {
-					return 0;
-				}
-				return 1;
-			}
-			$endif$
 		<module kind="body">
 			<!-- All Schedulable expressions -->
 			$instance.actor.actions: isSchedulableTest()$
@@ -584,14 +569,9 @@ design() ::= <<
 	$instance.actor.actions: action(); separator="\n"$
 	$if(instance.actor.initializes)$
 	$instance.actor.initializes: action()$
-	void $instance.id$_initialize() {
-		int res = 1;
-		int i = 0;
-
-		$if(instance.actor.initializes)$
-		$schedulingTest(instance.actor.initializes)$
-		$endif$
-	}
+	$if(instance.actor.initializes)$
+	$schedulingTest(instance.actor.initializes)$
+	$endif$
 
 	$endif$
 	$if(instance.actor.actionScheduler.fsm)$
