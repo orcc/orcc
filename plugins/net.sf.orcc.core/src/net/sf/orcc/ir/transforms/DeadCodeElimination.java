@@ -54,16 +54,15 @@ import net.sf.orcc.ir.nodes.IfNode;
  */
 public class DeadCodeElimination extends AbstractActorTransformation {
 
-	private void addNodes(ListIterator<CFGNode> it, List<CFGNode> nodes,
-			BlockNode join, int index) {
-		it.previous();
-		it.remove();
+	private void addNodes(List<CFGNode> nodes, BlockNode join, int index) {
+		nodeIterator.previous();
+		nodeIterator.remove();
 
 		for (CFGNode node : nodes) {
-			it.add(node);
+			nodeIterator.add(node);
 		}
 
-		it.add(join);
+		nodeIterator.add(join);
 		replacePhis(join, index);
 	}
 
@@ -105,15 +104,13 @@ public class DeadCodeElimination extends AbstractActorTransformation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(IfNode node, Object... args) {
-		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
+	public void visit(IfNode node) {
 		Expression condition = node.getValue();
 		if (condition.isBooleanExpr()) {
 			if (((BoolExpr) condition).getValue()) {
-				addNodes(it, node.getThenNodes(), node.getJoinNode(), 0);
+				addNodes(node.getThenNodes(), node.getJoinNode(), 0);
 			} else {
-				addNodes(it, node.getElseNodes(), node.getJoinNode(), 1);
+				addNodes(node.getElseNodes(), node.getJoinNode(), 1);
 			}
 		}
 	}

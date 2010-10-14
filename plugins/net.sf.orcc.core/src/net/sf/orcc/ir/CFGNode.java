@@ -60,7 +60,7 @@ public interface CFGNode extends User {
 	 * @param args
 	 *            arguments
 	 */
-	public void accept(NodeVisitor visitor, Object... args);
+	public void accept(NodeVisitor visitor);
 
 	/**
 	 * Returns the label of this node as an integer.

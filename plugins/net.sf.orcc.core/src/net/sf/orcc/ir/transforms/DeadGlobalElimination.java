@@ -79,7 +79,7 @@ public class DeadGlobalElimination extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Store store, Object... args) {
+	public void visit(Store store) {
 		// clean up uses
 		Use.removeUses(store, store.getIndexes());
 		store.setValue(null);

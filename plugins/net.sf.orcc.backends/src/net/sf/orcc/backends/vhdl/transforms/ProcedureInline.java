@@ -30,7 +30,6 @@ package net.sf.orcc.backends.vhdl.transforms;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Variable;
@@ -46,12 +45,8 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class ProcedureInline extends AbstractActorTransformation {
 
-	private ListIterator<CFGNode> nodeIt;
-
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Call call, Object... args) {
-		nodeIt = (ListIterator<CFGNode>) args[0];
+	public void visit(Call call) {
 		// Test if it is a VHDL procedure (a procedure with a return of type
 		// void)
 		if (call.getProcedure().getReturnType().isVoid()) {
@@ -68,9 +63,9 @@ public class ProcedureInline extends AbstractActorTransformation {
 			}
 
 			// Remove the procedure call and prints the nodes
-			nodeIt.remove();
+			nodeIterator.remove();
 			while (it.hasNext()) {
-				nodeIt.add(it.next());
+				nodeIterator.add(it.next());
 			}
 		}
 	}

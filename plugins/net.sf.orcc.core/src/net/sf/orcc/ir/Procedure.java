@@ -72,7 +72,7 @@ public class Procedure extends AbstractLocalizable {
 		}
 
 		@Override
-		public void visit(Load node, Object... args) {
+		public void visit(Load node) {
 			Variable var = node.getSource().getVariable();
 			if (!var.getType().isList()) {
 				loadedVariables.add((StateVariable) var);
@@ -80,7 +80,7 @@ public class Procedure extends AbstractLocalizable {
 		}
 
 		@Override
-		public void visit(Store store, Object... args) {
+		public void visit(Store store) {
 			Variable var = store.getTarget();
 			if (!var.getType().isList()) {
 				storedVariables.add((StateVariable) var);

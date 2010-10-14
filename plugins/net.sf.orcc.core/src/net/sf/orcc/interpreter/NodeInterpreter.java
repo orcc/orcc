@@ -80,7 +80,11 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 
 	protected ExpressionEvaluator exprInterpreter;
 
+	private Map<String, Fifo> fifos;
+
 	protected ListAllocator listAllocator;
+
+	private OrccProcess process;
 
 	private Expression returnValue;
 
@@ -107,149 +111,6 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 			return returnValue;
 		} else {
 			return null;
-		}
-	}
-
-	@Override
-	public void visit(Assign instr, Object... args) {
-		LocalVariable target = instr.getTarget();
-		target.setValue((Expression) instr.getValue().accept(exprInterpreter));
-	}
-
-	@Override
-	public void visit(BlockNode node, Object... args) {
-		Iterator<Instruction> it = node.iterator();
-
-		while (it.hasNext()) {
-			Instruction instr = it.next();
-			instr.accept(this, args);
-		}
-	}
-
-	@Override
-	public void visit(Call call, Object... args) {
-		// Get called procedure
-		Procedure proc = call.getProcedure();
-
-		// Set the input parameters of the called procedure if any
-		List<Expression> callParams = call.getParameters();
-
-		// Special "print" case
-		if (call.isPrint()) {
-			if (args.length > 1) {
-				OrccProcess process = (OrccProcess) args[1];
-				if (process != null) {
-					for (int i = 0; i < callParams.size(); i++) {
-						if (callParams.get(i).isStringExpr()) {
-							// String characters rework for escaped control
-							// management
-							String str = ((StringExpr) callParams.get(i))
-									.getValue();
-							String unescaped = StringUtil
-									.getUnescapedString(str);
-							process.write(unescaped);
-						} else {
-							Object value = callParams.get(i).accept(
-									exprInterpreter);
-							process.write(String.valueOf(value));
-						}
-					}
-				}
-			}
-		} else {
-			List<Variable> procParams = proc.getParameters().getList();
-			for (int i = 0; i < callParams.size(); i++) {
-				Variable procVar = procParams.get(i);
-				procVar.setValue((Expression) callParams.get(i).accept(
-						exprInterpreter));
-			}
-
-			// Allocate procedure local List variables
-			for (Variable local : proc.getLocals()) {
-				Type type = local.getType();
-				if (type.isList()) {
-					local.setValue((Expression) type.accept(listAllocator));
-				}
-			}
-
-			// Interpret procedure body
-			for (CFGNode node : proc.getNodes()) {
-				node.accept(this, args);
-			}
-
-			// Get procedure result if any
-			if (call.hasResult()) {
-				call.getTarget().setValue(returnValue);
-			}
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void visit(HasTokens instr, Object... args) {
-		Fifo fifo = ((Map<String, Fifo>) args[0])
-				.get(instr.getPort().getName());
-		boolean hasTok = fifo.hasTokens(instr.getNumTokens());
-		instr.getTarget().setValue(new BoolExpr(hasTok));
-	}
-
-	@Override
-	public void visit(IfNode node, Object... args) {
-		// Interpret first expression ("if" condition)
-		Expression condition = (Expression) node.getValue().accept(
-				exprInterpreter);
-
-		// if (condition is true)
-		if (condition != null && condition.isBooleanExpr()) {
-			List<CFGNode> nodes;
-			if (((BoolExpr) condition).getValue()) {
-				nodes = node.getThenNodes();
-			} else {
-				nodes = node.getElseNodes();
-			}
-
-			for (CFGNode subNode : nodes) {
-				subNode.accept(this, args);
-			}
-			node.getJoinNode().accept(this, args);
-		} else {
-			throw new OrccRuntimeException("Condition not boolean at line "
-					+ node.getLocation().getStartLine() + "\n");
-		}
-	}
-
-	@Override
-	public void visit(Load instr, Object... args) {
-		LocalVariable target = instr.getTarget();
-		Variable source = instr.getSource().getVariable();
-		if (instr.getIndexes().isEmpty()) {
-			target.setValue(source.getValue());
-		} else {
-			try {
-				Expression value = source.getValue();
-				for (Expression index : instr.getIndexes()) {
-					if (value.isListExpr()) {
-						value = ((ListExpr) value).get((IntExpr) index
-								.accept(exprInterpreter));
-					}
-				}
-				target.setValue(value);
-			} catch (IndexOutOfBoundsException e) {
-				throw new OrccRuntimeException(
-						"Array index out of bounds at line "
-								+ instr.getLocation().getStartLine());
-			}
-		}
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Peek peek, Object... args) {
-		int numTokens = peek.getNumTokens();
-		Fifo fifo = ((Map<String, Fifo>) args[0]).get(peek.getPort().getName());
-
-		if (peek.getTarget() != null) {
-			peekFifo(peek.getTarget().getValue(), fifo, numTokens);
 		}
 	}
 
@@ -281,16 +142,156 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 		}
 	}
 
+	public void setFifos(Map<String, Fifo> fifos) {
+		this.fifos = fifos;
+	}
+
+	public void setProcess(OrccProcess process) {
+		this.process = process;
+	}
+
 	@Override
-	public void visit(PhiAssignment phi, Object... args) {
+	public void visit(Assign instr) {
+		LocalVariable target = instr.getTarget();
+		target.setValue((Expression) instr.getValue().accept(exprInterpreter));
+	}
+
+	@Override
+	public void visit(BlockNode block) {
+		for (Instruction instruction : block) {
+			instruction.accept(this);
+		}
+	}
+
+	@Override
+	public void visit(Call call) {
+		// Get called procedure
+		Procedure proc = call.getProcedure();
+
+		// Set the input parameters of the called procedure if any
+		List<Expression> callParams = call.getParameters();
+
+		// Special "print" case
+		if (call.isPrint()) {
+			if (process != null) {
+				for (int i = 0; i < callParams.size(); i++) {
+					if (callParams.get(i).isStringExpr()) {
+						// String characters rework for escaped control
+						// management
+						String str = ((StringExpr) callParams.get(i))
+								.getValue();
+						String unescaped = StringUtil.getUnescapedString(str);
+						process.write(unescaped);
+					} else {
+						Object value = callParams.get(i)
+								.accept(exprInterpreter);
+						process.write(String.valueOf(value));
+					}
+				}
+			}
+		} else {
+			List<Variable> procParams = proc.getParameters().getList();
+			for (int i = 0; i < callParams.size(); i++) {
+				Variable procVar = procParams.get(i);
+				procVar.setValue((Expression) callParams.get(i).accept(
+						exprInterpreter));
+			}
+
+			// Allocate procedure local List variables
+			for (Variable local : proc.getLocals()) {
+				Type type = local.getType();
+				if (type.isList()) {
+					local.setValue((Expression) type.accept(listAllocator));
+				}
+			}
+
+			// Interpret procedure body
+			for (CFGNode node : proc.getNodes()) {
+				node.accept(this);
+			}
+
+			// Get procedure result if any
+			if (call.hasResult()) {
+				call.getTarget().setValue(returnValue);
+			}
+		}
+	}
+
+	@Override
+	public void visit(HasTokens instr) {
+		Fifo fifo = fifos.get(instr.getPort().getName());
+		boolean hasTok = fifo.hasTokens(instr.getNumTokens());
+		instr.getTarget().setValue(new BoolExpr(hasTok));
+	}
+
+	@Override
+	public void visit(IfNode node) {
+		// Interpret first expression ("if" condition)
+		Expression condition = (Expression) node.getValue().accept(
+				exprInterpreter);
+
+		// if (condition is true)
+		if (condition != null && condition.isBooleanExpr()) {
+			List<CFGNode> nodes;
+			if (((BoolExpr) condition).getValue()) {
+				nodes = node.getThenNodes();
+			} else {
+				nodes = node.getElseNodes();
+			}
+
+			for (CFGNode subNode : nodes) {
+				subNode.accept(this);
+			}
+			node.getJoinNode().accept(this);
+		} else {
+			throw new OrccRuntimeException("Condition not boolean at line "
+					+ node.getLocation().getStartLine() + "\n");
+		}
+	}
+
+	@Override
+	public void visit(Load instr) {
+		LocalVariable target = instr.getTarget();
+		Variable source = instr.getSource().getVariable();
+		if (instr.getIndexes().isEmpty()) {
+			target.setValue(source.getValue());
+		} else {
+			try {
+				Expression value = source.getValue();
+				for (Expression index : instr.getIndexes()) {
+					if (value.isListExpr()) {
+						value = ((ListExpr) value).get((IntExpr) index
+								.accept(exprInterpreter));
+					}
+				}
+				target.setValue(value);
+			} catch (IndexOutOfBoundsException e) {
+				throw new OrccRuntimeException(
+						"Array index out of bounds at line "
+								+ instr.getLocation().getStartLine());
+			}
+		}
+	}
+
+	@Override
+	public void visit(Peek peek) {
+		int numTokens = peek.getNumTokens();
+		Fifo fifo = fifos.get(peek.getPort().getName());
+
+		if (peek.getTarget() != null) {
+			peekFifo(peek.getTarget().getValue(), fifo, numTokens);
+		}
+	}
+
+	@Override
+	public void visit(PhiAssignment phi) {
 
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Read read, Object... args) {
+	public void visit(Read read) {
 		int numTokens = read.getNumTokens();
-		Fifo fifo = ((Map<String, Fifo>) args[0]).get(read.getPort().getName());
+		Fifo fifo = fifos.get(read.getPort().getName());
 
 		if (read.getTarget() != null) {
 			peekFifo(read.getTarget().getValue(), fifo, numTokens);
@@ -299,7 +300,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 	}
 
 	@Override
-	public void visit(Return instr, Object... args) {
+	public void visit(Return instr) {
 		if (instr.getValue() != null) {
 			this.returnValue = (Expression) instr.getValue().accept(
 					exprInterpreter);
@@ -308,13 +309,13 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 	}
 
 	@Override
-	public void visit(SpecificInstruction instr, Object... args) {
+	public void visit(SpecificInstruction instr) {
 		throw new OrccRuntimeException("does not know how to interpret a "
 				+ "specific instruction");
 	}
 
 	@Override
-	public void visit(Store instr, Object... args) {
+	public void visit(Store instr) {
 		Variable variable = instr.getTarget();
 		if (instr.getIndexes().isEmpty()) {
 			variable.setValue((Expression) instr.getValue().accept(
@@ -345,7 +346,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node) {
 		// Interpret first expression ("while" condition)
 		Expression condition = (Expression) node.getValue().accept(
 				exprInterpreter);
@@ -354,7 +355,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 		if (condition != null && condition.isBooleanExpr()) {
 			while (((BoolExpr) condition).getValue()) {
 				for (CFGNode subNode : node.getNodes()) {
-					subNode.accept(this, args);
+					subNode.accept(this);
 				}
 
 				condition = (Expression) node.getValue()
@@ -372,11 +373,9 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Write instr, Object... args) {
+	public void visit(Write instr) {
 		int numTokens = instr.getNumTokens();
-		Fifo fifo = ((Map<String, Fifo>) args[0])
-				.get(instr.getPort().getName());
+		Fifo fifo = fifos.get(instr.getPort().getName());
 
 		ListExpr target = (ListExpr) instr.getTarget().getValue();
 		if (fifo instanceof Fifo_int) {

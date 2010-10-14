@@ -71,8 +71,8 @@ public class WhileNode extends AbstractNode implements ValueContainer {
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public void accept(NodeVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	public BlockNode getJoinNode() {

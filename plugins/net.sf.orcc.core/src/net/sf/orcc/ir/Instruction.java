@@ -59,7 +59,7 @@ public interface Instruction extends User {
 	 * @param args
 	 *            arguments
 	 */
-	void accept(InstructionVisitor visitor, Object... args);
+	void accept(InstructionVisitor visitor);
 
 	/**
 	 * Returns the block that contains this instruction.

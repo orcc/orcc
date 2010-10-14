@@ -74,8 +74,8 @@ public class Store extends AbstractInstruction implements TargetContainer,
 	}
 
 	@Override
-	public void accept(InstructionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public void accept(InstructionVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override

@@ -91,11 +91,6 @@ public class ActorInterpreter {
 	private Map<String, Expression> parameters;
 
 	/**
-	 * Possible parent OrccProcess for OrccExceptions I/O printing management.
-	 */
-	private OrccProcess process;
-
-	/**
 	 * Actor's action scheduler
 	 */
 	protected ActionScheduler sched;
@@ -115,11 +110,10 @@ public class ActorInterpreter {
 		// Set instance name and actor class definition at parent level
 		this.actor = actor;
 
-		// Register master process (used for console I/O access)
-		this.process = process;
-
 		// Build a node interpreter for visiting CFG and instructions
 		nodeInterpreter = new NodeInterpreter();
+		nodeInterpreter.setProcess(process);
+
 		// Create the List allocator for state and procedure local vars
 		this.listAllocator = new ListAllocator();
 
@@ -291,7 +285,7 @@ public class ActorInterpreter {
 
 		// Interpret procedure body
 		for (CFGNode node : procedure.getNodes()) {
-			node.accept(nodeInterpreter, ioFifos, process);
+			node.accept(nodeInterpreter);
 		}
 
 		return nodeInterpreter.getReturnValue();
@@ -342,6 +336,7 @@ public class ActorInterpreter {
 	 */
 	public void setFifos(Map<String, Fifo> fifos) {
 		ioFifos = fifos;
+		nodeInterpreter.setFifos(ioFifos);
 	}
 
 	/**

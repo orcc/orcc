@@ -186,10 +186,8 @@ public class ExpressionSplitterTransformation extends
 		super.transform(actor);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Assign assign, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Assign assign) {
 		Expression value = assign.getValue();
 
 		if (value.isBinaryExpr()) {
@@ -199,99 +197,90 @@ public class ExpressionSplitterTransformation extends
 
 			if (e1.isBinaryExpr() || e1.isUnaryExpr()) {
 				// Split expression e1
-				it.previous();
-				binExpr.setE1(visitExpression(e1, it));
-				it.next();
+				instructionIterator.previous();
+				binExpr.setE1(visitExpression(e1, instructionIterator));
+				instructionIterator.next();
 			}
 
 			if (e2.isBinaryExpr() || e2.isUnaryExpr()) {
 				// Split expression e2
-				it.previous();
-				binExpr.setE2(visitExpression(e2, it));
-				it.next();
+				instructionIterator.previous();
+				binExpr.setE2(visitExpression(e2, instructionIterator));
+				instructionIterator.next();
 			}
 		} else if (value.isUnaryExpr()) {
 			UnaryExpr unaryExpr = (UnaryExpr) value;
-			it.previous();
+			instructionIterator.previous();
 
 			// Transform unary expression into binary expression
-			Expression newExpr = visitExpression(unaryExpr.getExpr(), it);
+			Expression newExpr = visitExpression(unaryExpr.getExpr(),
+					instructionIterator);
 			assign.setValue(expressionSplitter.transformUnaryExpr(
 					unaryExpr.getOp(), newExpr));
 
-			it.next();
+			instructionIterator.next();
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Call call, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Call call) {
 		List<Expression> parameters = call.getParameters();
 		for (Expression parameter : parameters) {
 			if (parameter.isBinaryExpr() || parameter.isUnaryExpr()) {
-				it.previous();
-				Expression newParameter = visitExpression(parameter, it);
+				instructionIterator.previous();
+				Expression newParameter = visitExpression(parameter,
+						instructionIterator);
 				parameters.set(parameters.indexOf(parameter), newParameter);
-				it.next();
+				instructionIterator.next();
 			}
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(IfNode ifNode, Object... args) {
-		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
+	public void visit(IfNode ifNode) {
 		Expression value = ifNode.getValue();
 		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-			ifNode.setValue(visitExpression(ifNode.getValue(), getItr(it)));
+			ifNode.setValue(visitExpression(ifNode.getValue(),
+					getItr(nodeIterator)));
 		}
-		super.visit(ifNode, args);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void visit(Load load, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-
-		it.previous();
-
-		visitIndexes(load.getIndexes(), it);
-
-		it.next();
+		super.visit(ifNode);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Return returnInstr, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Load load) {
+		instructionIterator.previous();
+		visitIndexes(load.getIndexes(), instructionIterator);
+		instructionIterator.next();
+	}
+
+	@Override
+	public void visit(Return returnInstr) {
 		if (returnInstr.getValue() != null) {
-			it.previous();
-			returnInstr.setValue(visitExpression(returnInstr.getValue(), it));
-			it.next();
+			instructionIterator.previous();
+			returnInstr.setValue(visitExpression(returnInstr.getValue(),
+					instructionIterator));
+			instructionIterator.next();
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Store store, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Store store) {
 		Expression value = store.getValue();
 
-		it.previous();
+		instructionIterator.previous();
 
-		visitIndexes(store.getIndexes(), it);
+		visitIndexes(store.getIndexes(), instructionIterator);
 
 		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-			Expression newValue = visitExpression(value, it);
+			Expression newValue = visitExpression(value, instructionIterator);
 			store.setValue(newValue);
 		}
 
-		it.next();
+		instructionIterator.next();
 	}
 
 	@Override
-	public void visit(WhileNode whileNode, Object... args) {
+	public void visit(WhileNode whileNode) {
 		ListIterator<Instruction> it = whileNode.getJoinNode().listIterator();
 
 		// Go to the end of joinNode
@@ -305,7 +294,7 @@ public class ExpressionSplitterTransformation extends
 			whileNode.setValue(expr);
 		}
 
-		super.visit(whileNode, args);
+		super.visit(whileNode);
 	}
 
 	private Expression visitExpression(Expression value,
@@ -322,7 +311,6 @@ public class ExpressionSplitterTransformation extends
 
 	private void visitIndexes(List<Expression> indexes,
 			ListIterator<Instruction> it) {
-
 		for (Expression value : indexes) {
 			if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 				Expression newValue = visitExpression(value, it);

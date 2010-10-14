@@ -352,24 +352,24 @@ public class SSATransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Assign assign, Object... args) {
+	public void visit(Assign assign) {
 		replaceUses(assign.getValue());
 		replaceDef(assign);
 	}
 
 	@Override
-	public void visit(Call call, Object... args) {
+	public void visit(Call call) {
 		replaceUses(call.getParameters());
 		replaceDef(call);
 	}
 
 	@Override
-	public void visit(HasTokens hasTokens, Object... args) {
+	public void visit(HasTokens hasTokens) {
 		replaceDef(hasTokens);
 	}
 
 	@Override
-	public void visit(IfNode ifNode, Object... args) {
+	public void visit(IfNode ifNode) {
 		int outerBranch = branch;
 		BlockNode outerJoin = join;
 		WhileNode outerLoop = loop;
@@ -397,24 +397,24 @@ public class SSATransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Load load, Object... args) {
+	public void visit(Load load) {
 		replaceUses(load.getIndexes());
 		replaceDef(load);
 	}
 
 	@Override
-	public void visit(Return returnInstr, Object... args) {
+	public void visit(Return returnInstr) {
 		replaceUses(returnInstr.getValue());
 	}
 
 	@Override
-	public void visit(Store store, Object... args) {
+	public void visit(Store store) {
 		replaceUses(store.getIndexes());
 		replaceUses(store.getValue());
 	}
 
 	@Override
-	public void visit(WhileNode whileNode, Object... args) {
+	public void visit(WhileNode whileNode) {
 		int outerBranch = branch;
 		BlockNode outerJoin = join;
 		WhileNode outerLoop = loop;

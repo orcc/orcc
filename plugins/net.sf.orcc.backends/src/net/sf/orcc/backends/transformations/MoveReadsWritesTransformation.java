@@ -30,7 +30,6 @@ package net.sf.orcc.backends.transformations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sf.orcc.backends.instructions.ReadEnd;
 import net.sf.orcc.backends.instructions.WriteEnd;
@@ -64,16 +63,14 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Read read, Object... args) {
+	public void visit(Read read) {
 		readEnds.add(new ReadEnd(read));
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Write write, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Write write) {
 		writes.add(write);
-		it.set(new WriteEnd(write));
+		instructionIterator.set(new WriteEnd(write));
 	}
 
 	@Override

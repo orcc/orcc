@@ -110,23 +110,23 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	}
 
 	@Override
-	public void visit(HasTokens instr, Object... args) {
+	public void visit(HasTokens instr) {
 		instr.getTarget().setValue(new BoolExpr(true));
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
+	public void visit(IfNode node) {
 		// Interpret first expression ("if" condition)
 		Object condition = node.getValue().accept(exprInterpreter);
 
 		if (condition instanceof Boolean) {
 			if ((Boolean) condition) {
 				for (CFGNode subNode : node.getThenNodes()) {
-					subNode.accept(this, args);
+					subNode.accept(this);
 				}
 			} else {
 				for (CFGNode subNode : node.getElseNodes()) {
-					subNode.accept(this, args);
+					subNode.accept(this);
 				}
 			}
 		} else if (schedulableMode) {
@@ -134,11 +134,11 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 			throw new OrccRuntimeException("null condition");
 		}
 
-		node.getJoinNode().accept(this, args);
+		node.getJoinNode().accept(this);
 	}
 
 	@Override
-	public void visit(Load instr, Object... args) {
+	public void visit(Load instr) {
 		LocalVariable target = instr.getTarget();
 		Variable source = instr.getSource().getVariable();
 		if (instr.getIndexes().isEmpty()) {
@@ -161,7 +161,7 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	}
 
 	@Override
-	public void visit(Peek peek, Object... args) {
+	public void visit(Peek peek) {
 		if (peek.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
 			int value = analyzer.getConfigurationValue(action);
 			ListExpr target = (ListExpr) peek.getTarget().getValue();
@@ -170,7 +170,7 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	}
 
 	@Override
-	public void visit(Read read, Object... args) {
+	public void visit(Read read) {
 		if (read.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
 			Variable variable = read.getTarget();
 			if (variable != null) {
@@ -186,7 +186,7 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	}
 
 	@Override
-	public void visit(Store instr, Object... args) {
+	public void visit(Store instr) {
 		Variable variable = instr.getTarget();
 		if (instr.getIndexes().isEmpty()) {
 			variable.setValue((Expression) instr.getValue().accept(
@@ -212,14 +212,14 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node) {
 		// Interpret first expression ("while" condition)
 		Object condition = node.getValue().accept(exprInterpreter);
 
 		if (condition instanceof Boolean) {
 			while ((Boolean) condition) {
 				for (CFGNode subNode : node.getNodes()) {
-					subNode.accept(this, args);
+					subNode.accept(this);
 				}
 
 				// Interpret next value of "while" condition
@@ -234,11 +234,11 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 			throw new OrccRuntimeException("null condition");
 		}
 
-		node.getJoinNode().accept(this, args);
+		node.getJoinNode().accept(this);
 	}
 
 	@Override
-	public void visit(Write write, Object... args) {
+	public void visit(Write write) {
 		write.getPort().increaseTokenProduction(write.getNumTokens());
 	}
 

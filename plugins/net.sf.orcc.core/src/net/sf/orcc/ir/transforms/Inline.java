@@ -42,7 +42,7 @@ import net.sf.orcc.ir.instructions.Call;
 public class Inline extends AbstractActorTransformation {
 
 	@Override
-	public void visit(Call call, Object... args) {
+	public void visit(Call call) {
 	}
 
 }

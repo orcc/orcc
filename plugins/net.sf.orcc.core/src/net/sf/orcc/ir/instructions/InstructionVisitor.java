@@ -41,109 +41,87 @@ public interface InstructionVisitor {
 	 * 
 	 * @param assign
 	 *            an assign instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(Assign assign, Object... args);
+	public void visit(Assign assign);
 
 	/**
 	 * Visits a call instruction.
 	 * 
 	 * @param call
 	 *            a call instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(Call call, Object... args);
+	public void visit(Call call);
 
 	/**
 	 * Visits a hasTokens instruction.
 	 * 
 	 * @param hasTokens
 	 *            an hasTokens instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(HasTokens hasTokens, Object... args);
+	public void visit(HasTokens hasTokens);
 
 	/**
 	 * Visits a load instruction.
 	 * 
 	 * @param load
 	 *            a load instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(Load load, Object... args);
+	public void visit(Load load);
 
 	/**
 	 * Visits a peek instruction.
 	 * 
 	 * @param peek
 	 *            a peek instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(Peek peek, Object... args);
+	public void visit(Peek peek);
 
 	/**
 	 * Visits a phi assignment instruction.
 	 * 
 	 * @param phi
 	 *            a phi assignment instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(PhiAssignment phi, Object... args);
+	public void visit(PhiAssignment phi);
 
 	/**
 	 * Visits a read instruction.
 	 * 
 	 * @param read
 	 *            a read instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(Read read, Object... args);
+	public void visit(Read read);
 
 	/**
 	 * Visits a return instruction.
 	 * 
 	 * @param returnInst
 	 *            a return instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(Return returnInst, Object... args);
+	public void visit(Return returnInst);
 
 	/**
 	 * Visits a specific instruction.
 	 * 
 	 * @param specific
 	 *            a specific instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(SpecificInstruction specific, Object... args);
+	public void visit(SpecificInstruction specific);
 
 	/**
 	 * Visits a store instruction.
 	 * 
 	 * @param store
 	 *            a store instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(Store store, Object... args);
+	public void visit(Store store);
 
 	/**
 	 * Visits a write instruction.
 	 * 
 	 * @param write
 	 *            a write instruction
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(Write write, Object... args);
+	public void visit(Write write);
 
 }

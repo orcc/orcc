@@ -352,13 +352,13 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	}
 
 	@Override
-	public void visit(Assign assign, Object... args) {
+	public void visit(Assign assign) {
 		ConstraintExpressionVisitor visitor = new ConstraintExpressionVisitor();
 		assign.getValue().accept(visitor);
 	}
 
 	@Override
-	public void visit(Load load, Object... args) {
+	public void visit(Load load) {
 		// execute the load
 		super.visit(load);
 
@@ -379,7 +379,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 	}
 
 	@Override
-	public void visit(Peek peek, Object... args) {
+	public void visit(Peek peek) {
 		associateVariable(peek.getTarget(), peek.getPort());
 	}
 

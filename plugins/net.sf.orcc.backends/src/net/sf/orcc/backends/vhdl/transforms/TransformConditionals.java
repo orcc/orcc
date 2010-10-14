@@ -127,15 +127,15 @@ public class TransformConditionals extends AbstractActorTransformation
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
+	public void visit(IfNode node) {
 		node.setValue((Expression) node.getValue().accept(this));
-		super.visit(node, args);
+		super.visit(node);
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node) {
 		node.setValue((Expression) node.getValue().accept(this));
-		super.visit(node, args);
+		super.visit(node);
 	}
 
 }

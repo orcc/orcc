@@ -310,7 +310,12 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 			// Instructions
 			if (instrStack.size() > 0) {
 				Instruction instr = instrStack.remove(0);
-				instr.accept(new NodeInterpreter(), fifos, process);
+
+				NodeInterpreter interp = new NodeInterpreter();
+				interp.setFifos(fifos);
+				interp.setProcess(process);
+				instr.accept(interp);
+
 				if ((instr.getLocation().getStartLine() != lastVisitedLocation
 						.getStartLine())
 						&& (instr.getLocation().getStartLine() != 0)) {

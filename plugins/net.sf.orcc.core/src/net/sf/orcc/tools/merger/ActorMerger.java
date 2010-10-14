@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -111,9 +110,8 @@ public class ActorMerger implements INetworkTransformation {
 			super.transform(actor);
 		}
 
-		@SuppressWarnings("unchecked")
 		private void updateIndex(Variable var, Instruction instr,
-				List<Expression> indexes, String mode, Object... args) {
+				List<Expression> indexes, String mode) {
 			Variable varCount = stateVars.get(var.getName() + mode);
 			Use use = new Use(varCount, instr);
 			indexes.set(0, new VarExpr(use));
@@ -126,29 +124,28 @@ public class ActorMerger implements INetworkTransformation {
 					new IntExpr(((TypeList) var.getType()).getSize()), null));
 			use.setNode(store);
 
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			it.add(store);
+			instructionIterator.add(store);
 		}
 
 		@Override
-		public void visit(Load load, Object... args) {
+		public void visit(Load load) {
 			Use use = load.getSource();
 			Variable var = use.getVariable();
 			if (!var.isGlobal() && var.isPort()) {
 				var = portsMap.get(id + var.getName());
 				load.setSource(new Use(stateVars.get(var.getName()), load));
-				updateIndex(var, load, load.getIndexes(), "_r", args);
+				updateIndex(var, load, load.getIndexes(), "_r");
 			}
 		}
 
 		@Override
-		public void visit(Store store, Object... args) {
+		public void visit(Store store) {
 			Variable var = store.getTarget();
 			if (!var.isGlobal() && var.isPort()) {
 				var = portsMap.get(id + var.getName());
 				store.setTarget(var);
 				new Use(var, store);
-				updateIndex(var, store, store.getIndexes(), "_w", args);
+				updateIndex(var, store, store.getIndexes(), "_w");
 			}
 		}
 

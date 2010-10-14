@@ -65,6 +65,10 @@ import net.sf.orcc.ir.nodes.WhileNode;
 public abstract class AbstractActorTransformation implements NodeVisitor,
 		InstructionVisitor, ActorTransformation {
 
+	protected ListIterator<Instruction> instructionIterator;
+
+	protected ListIterator<CFGNode> nodeIterator;
+
 	protected Procedure procedure;
 
 	@Override
@@ -85,31 +89,32 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	}
 
 	@Override
-	public void visit(Assign assign, Object... args) {
+	public void visit(Assign assign) {
 	}
 
 	@Override
-	public void visit(BlockNode blockNode, Object... args) {
+	public void visit(BlockNode blockNode) {
 		ListIterator<Instruction> it = blockNode.listIterator();
 		while (it.hasNext()) {
 			Instruction instruction = it.next();
-			instruction.accept(this, it);
+			instructionIterator = it;
+			instruction.accept(this);
 		}
 	}
 
 	@Override
-	public void visit(Call call, Object... args) {
+	public void visit(Call call) {
 	}
 
 	@Override
-	public void visit(HasTokens hasTokens, Object... args) {
+	public void visit(HasTokens hasTokens) {
 	}
 
 	@Override
-	public void visit(IfNode ifNode, Object... args) {
+	public void visit(IfNode ifNode) {
 		visit(ifNode.getThenNodes());
 		visit(ifNode.getElseNodes());
-		visit(ifNode.getJoinNode(), args);
+		visit(ifNode.getJoinNode());
 	}
 
 	/**
@@ -120,51 +125,52 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	 * @param args
 	 *            arguments
 	 */
-	public void visit(List<CFGNode> nodes, Object... args) {
+	public void visit(List<CFGNode> nodes) {
 		ListIterator<CFGNode> it = nodes.listIterator();
 		while (it.hasNext()) {
 			CFGNode node = it.next();
-			node.accept(this, it);
+			nodeIterator = it;
+			node.accept(this);
 		}
 	}
 
 	@Override
-	public void visit(Load load, Object... args) {
+	public void visit(Load load) {
 	}
 
 	@Override
-	public void visit(Peek peek, Object... args) {
+	public void visit(Peek peek) {
 	}
 
 	@Override
-	public void visit(PhiAssignment phi, Object... args) {
+	public void visit(PhiAssignment phi) {
 	}
 
 	@Override
-	public void visit(Read read, Object... args) {
+	public void visit(Read read) {
 	}
 
 	@Override
-	public void visit(Return returnInstr, Object... args) {
+	public void visit(Return returnInstr) {
 	}
 
 	@Override
-	public void visit(SpecificInstruction node, Object... args) {
+	public void visit(SpecificInstruction node) {
 		// default implementation does nothing
 	}
 
 	@Override
-	public void visit(Store store, Object... args) {
+	public void visit(Store store) {
 	}
 
 	@Override
-	public void visit(WhileNode whileNode, Object... args) {
+	public void visit(WhileNode whileNode) {
 		visit(whileNode.getNodes());
-		visit(whileNode.getJoinNode(), args);
+		visit(whileNode.getJoinNode());
 	}
 
 	@Override
-	public void visit(Write write, Object... args) {
+	public void visit(Write write) {
 	}
 
 	/**

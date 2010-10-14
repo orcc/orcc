@@ -155,8 +155,8 @@ public final class BlockNode extends AbstractNode implements
 	}
 
 	@Override
-	public void accept(NodeVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public void accept(NodeVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	/**

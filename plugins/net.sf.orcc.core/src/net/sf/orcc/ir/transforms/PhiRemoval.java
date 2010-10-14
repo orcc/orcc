@@ -60,45 +60,39 @@ public class PhiRemoval extends AbstractActorTransformation {
 	private class PhiRemover extends AbstractInstructionVisitor {
 
 		@Override
-		public void visit(PhiAssignment instruction, Object... args) {
-			((ListIterator<?>) args[0]).remove();
+		public void visit(PhiAssignment instruction) {
+			instructionIterator.remove();
 		}
 
 		@Override
-		public void visit(SpecificInstruction node, Object... args) {
+		public void visit(SpecificInstruction node) {
 			// nothing to do here
 		}
 
 	}
 
-	private PhiRemover visitor;
-
-	/**
-	 * Creates a new phi removal pass.
-	 */
-	public PhiRemoval() {
-		visitor = new PhiRemover();
-	}
-
 	private void removePhis(BlockNode join) {
 		ListIterator<Instruction> it = join.listIterator();
 		while (it.hasNext()) {
-			it.next().accept(visitor, it);
+			instructionIterator = it;
+			it.next().accept(new PhiRemover());
 		}
 	}
 
-	@Override
-	public void visit(BlockNode node, Object... args) {
-		for (Instruction instruction : node) {
-			instruction.accept(this, args);
-		}
-	}
+	private BlockNode targetBlock;
+
+	private int phiIndex;
 
 	@Override
-	public void visit(IfNode node, Object... args) {
+	public void visit(IfNode node) {
 		BlockNode join = node.getJoinNode();
-		join.accept(this, BlockNode.getLast(procedure, node.getThenNodes()), 0);
-		join.accept(this, BlockNode.getLast(procedure, node.getElseNodes()), 1);
+		targetBlock = BlockNode.getLast(procedure, node.getThenNodes());
+		phiIndex = 0;
+		join.accept(this);
+
+		targetBlock = BlockNode.getLast(procedure, node.getElseNodes());
+		phiIndex = 1;
+		join.accept(this);
 		removePhis(join);
 
 		visit(node.getThenNodes());
@@ -106,11 +100,7 @@ public class PhiRemoval extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(PhiAssignment phi, Object... args) {
-		BlockNode targetBlock = (BlockNode) args[0];
-
-		int phiIndex = (Integer) args[1];
-
+	public void visit(PhiAssignment phi) {
 		LocalVariable target = phi.getTarget();
 		VarExpr sourceExpr = (VarExpr) phi.getValues().get(phiIndex);
 		LocalVariable source = (LocalVariable) sourceExpr.getVar()
@@ -140,34 +130,32 @@ public class PhiRemoval extends AbstractActorTransformation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(WhileNode node, Object... args) {
-		ListIterator<CFGNode> it = (ListIterator<CFGNode>) args[0];
-
+	public void visit(WhileNode node) {
 		// the node before the while.
-		BlockNode block;
-		if (it.hasPrevious()) {
-			CFGNode previousNode = it.previous();
+		if (nodeIterator.hasPrevious()) {
+			CFGNode previousNode = nodeIterator.previous();
 			if (previousNode.isBlockNode()) {
-				block = (BlockNode) previousNode;
+				targetBlock = (BlockNode) previousNode;
 			} else {
-				block = new BlockNode(procedure);
-				it.add(block);
+				targetBlock = new BlockNode(procedure);
+				nodeIterator.add(targetBlock);
 			}
 		} else {
-			block = new BlockNode(procedure);
-			it.add(block);
+			targetBlock = new BlockNode(procedure);
+			nodeIterator.add(targetBlock);
 		}
 
 		BlockNode join = node.getJoinNode();
-		join.accept(this, block, 0);
+		phiIndex = 0;
+		join.accept(this);
 
 		// go back to the while
-		it.next();
+		nodeIterator.next();
 
 		// last node of the while
-		block = BlockNode.getLast(procedure, node.getNodes());
-		join.accept(this, block, 1);
+		targetBlock = BlockNode.getLast(procedure, node.getNodes());
+		phiIndex = 1;
+		join.accept(this);
 		removePhis(join);
 		visit(node.getNodes());
 	}

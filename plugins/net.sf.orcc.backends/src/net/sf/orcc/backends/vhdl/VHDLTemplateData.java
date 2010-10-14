@@ -73,7 +73,7 @@ public class VHDLTemplateData extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Load node, Object... args) {
+	public void visit(Load node) {
 		Variable var = node.getSource().getVariable();
 		if (!var.isPort() && !var.getType().isList() && var.isAssignable()) {
 			strings.add(var.getName());
@@ -81,9 +81,10 @@ public class VHDLTemplateData extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Peek node, Object... args) {
+	public void visit(Peek node) {
 		Variable port = node.getPort();
 		String name = port.getName() + "_data";
 		strings.add(name);
 	}
+
 }

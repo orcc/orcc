@@ -77,8 +77,8 @@ public class PhiAssignment extends AbstractInstruction implements
 	}
 
 	@Override
-	public void accept(InstructionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public void accept(InstructionVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	/**

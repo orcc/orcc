@@ -39,43 +39,43 @@ package net.sf.orcc.ir.instructions;
 public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 
 	@Override
-	public void visit(Assign node, Object... args) {
+	public void visit(Assign node) {
 	}
 
 	@Override
-	public void visit(Call node, Object... args) {
+	public void visit(Call node) {
 	}
 
 	@Override
-	public void visit(HasTokens node, Object... args) {
+	public void visit(HasTokens node) {
 	}
 
 	@Override
-	public void visit(Load node, Object... args) {
+	public void visit(Load node) {
 	}
 
 	@Override
-	public void visit(Peek node, Object... args) {
+	public void visit(Peek node) {
 	}
 
 	@Override
-	public void visit(PhiAssignment node, Object... args) {
+	public void visit(PhiAssignment node) {
 	}
 
 	@Override
-	public void visit(Read node, Object... args) {
+	public void visit(Read node) {
 	}
 
 	@Override
-	public void visit(Return node, Object... args) {
+	public void visit(Return node) {
 	}
 
 	@Override
-	public void visit(Store node, Object... args) {
+	public void visit(Store node) {
 	}
 
 	@Override
-	public void visit(Write node, Object... args) {
+	public void visit(Write node) {
 	}
 
 }

@@ -31,7 +31,6 @@ package net.sf.orcc.backends.vhdl.transforms;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sf.orcc.backends.vhdl.instructions.AssignIndex;
 import net.sf.orcc.ir.Expression;
@@ -73,15 +72,14 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 	 * @param type
 	 *            the instruction type
 	 */
-	private void printAssignment(List<Expression> indexes,
-			ListIterator<Instruction> it, Type type) {
+	private void printAssignment(List<Expression> indexes, Type type) {
 		List<Expression> listIndex = new ArrayList<Expression>(indexes.size());
 		int concatenatedSize = 0;
 		Iterator<Integer> iit = type.getDimensions().iterator();
 
 		// returns the load or store, and has the effect that instructions will
 		// be inserted before it
-		Instruction instruction = it.previous();
+		Instruction instruction = instructionIterator.previous();
 
 		for (Expression expr : indexes) {
 			int size;
@@ -103,7 +101,7 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 
 			// add the assign instruction for each index
 			Assign assign = new Assign(indexVar, expr);
-			it.add(assign);
+			instructionIterator.add(assign);
 
 			// size of the concatenated index
 			concatenatedSize += indexSize;
@@ -122,37 +120,31 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 		// add a special assign instruction that assigns the index variable the
 		// concatenation of index expressions
 		AssignIndex assignIndex = new AssignIndex(indexVar, listIndex);
-		it.add(assignIndex);
+		instructionIterator.add(assignIndex);
 
 		// so the load (or store) is not endlessly revisited
-		it.next();
+		instructionIterator.next();
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	@Override
-	public void visit(Load load, Object... args) {
+	public void visit(Load load) {
 		List<Expression> indexes = load.getIndexes();
 
 		// a VHDL memory is always global
 		if (!indexes.isEmpty() && load.getSource().getVariable().isGlobal()) {
 			Type type = load.getSource().getVariable().getType();
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-
-			printAssignment(indexes, it, type);
+			printAssignment(indexes, type);
 		}
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	@Override
-	public void visit(Store store, Object... args) {
+	public void visit(Store store) {
 		List<Expression> indexes = store.getIndexes();
 
 		// a VHDL memory is always global
 		if (!indexes.isEmpty() && store.getTarget().isGlobal()) {
 			Type type = store.getTarget().getType();
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-
-			printAssignment(indexes, it, type);
+			printAssignment(indexes, type);
 		}
 	}
 

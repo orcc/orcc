@@ -53,6 +53,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * 
  */
 public class AddGEPTransformation extends AbstractActorTransformation {
+
 	private String file;
 
 	private Variable addGEP(Variable array, List<Expression> indexes,
@@ -82,42 +83,39 @@ public class AddGEPTransformation extends AbstractActorTransformation {
 		super.transform(actor);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Load load, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Load load) {
 		Use source = load.getSource();
 		List<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			it.previous();
+			instructionIterator.previous();
 
-			Variable newSource = addGEP(source.getVariable(), indexes, it);
+			Variable newSource = addGEP(source.getVariable(), indexes,
+					instructionIterator);
 
 			load.setSource(new Use(newSource));
 			removeIndexes(load, indexes);
 
-			it.next();
+			instructionIterator.next();
 		}
 
 	}
 
 	@Override
-	public void visit(Store store, Object... args) {
-		@SuppressWarnings("unchecked")
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Store store) {
 		Variable target = store.getTarget();
 		List<Expression> indexes = store.getIndexes();
 
 		if (!indexes.isEmpty()) {
-			it.previous();
+			instructionIterator.previous();
 
-			Variable newTarget = addGEP(target, indexes, it);
+			Variable newTarget = addGEP(target, indexes, instructionIterator);
 
 			store.setTarget(newTarget);
 			removeIndexes(store, indexes);
 
-			it.next();
+			instructionIterator.next();
 		}
 	}
 

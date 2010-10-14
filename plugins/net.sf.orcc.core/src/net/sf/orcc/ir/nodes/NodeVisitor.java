@@ -41,29 +41,23 @@ public interface NodeVisitor {
 	 * 
 	 * @param node
 	 *            a block node
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(BlockNode node, Object... args);
+	public void visit(BlockNode node);
 
 	/**
 	 * Visits an if node.
 	 * 
 	 * @param node
 	 *            an if node
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(IfNode node, Object... args);
+	public void visit(IfNode node);
 
 	/**
 	 * Visits a while node.
 	 * 
 	 * @param node
 	 *            a while node
-	 * @param args
-	 *            arguments
 	 */
-	public void visit(WhileNode node, Object... args);
+	public void visit(WhileNode node);
 
 }

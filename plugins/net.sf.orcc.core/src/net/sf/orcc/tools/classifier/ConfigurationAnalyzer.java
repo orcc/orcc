@@ -86,7 +86,7 @@ public class ConfigurationAnalyzer {
 		}
 
 		@Override
-		public void visit(Peek peek, Object... args) {
+		public void visit(Peek peek) {
 			candidates.add(peek.getPort());
 		}
 

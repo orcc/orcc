@@ -29,9 +29,7 @@
 package net.sf.orcc.tools.transforms;
 
 import java.util.Iterator;
-import java.util.ListIterator;
 
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
@@ -49,23 +47,19 @@ import net.sf.orcc.util.OrderedMap;
 public class RemoveReadWrites extends AbstractActorTransformation {
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Read read, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Read read) {
 		if(read.getTarget() != null) {			
 			read.getTarget().removeUse(read);
 		}
 		read.getPort().removeUse(read);
-		it.remove();
+		instructionIterator.remove();
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Write write, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Write write) {
 		write.getTarget().removeUse(write);
 		write.getPort().removeUse(write);
-		it.remove();
+		instructionIterator.remove();
 	}
 
 	@Override

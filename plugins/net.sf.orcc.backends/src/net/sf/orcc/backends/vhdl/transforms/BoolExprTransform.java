@@ -77,12 +77,6 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class BoolExprTransform extends AbstractActorTransformation {
 
-	/**
-	 * an iterator on the current node. Initiated by
-	 * {@link #visit(BlockNode, Object...)}.
-	 */
-	private ListIterator<CFGNode> nodeIt;
-
 	private int tempVarCount;
 
 	/**
@@ -113,7 +107,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 		assign = new Assign(target, new BoolExpr(false));
 		block.add(assign);
 
-		nodeIt.add(node);
+		nodeIterator.add(node);
 	}
 
 	/**
@@ -132,10 +126,10 @@ public class BoolExprTransform extends AbstractActorTransformation {
 		}
 
 		// adds this block after the IfNode
-		nodeIt.add(block);
+		nodeIterator.add(block);
 
 		// moves the iterator back so the new block will be visited next
-		nodeIt.previous();
+		nodeIterator.previous();
 	}
 
 	/**
@@ -149,8 +143,7 @@ public class BoolExprTransform extends AbstractActorTransformation {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Assign assign, Object... args) {
+	public void visit(Assign assign) {
 		LocalVariable target = assign.getTarget();
 		if (target.getType().isBool()) {
 			Expression expr = assign.getValue();
@@ -159,27 +152,15 @@ public class BoolExprTransform extends AbstractActorTransformation {
 
 				// removes this assign and moves remaining instructions to a new
 				// block
-				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
-				iit.previous();
-				iit.remove();
-				createNewBlock(iit);
+				instructionIterator.previous();
+				instructionIterator.remove();
+				createNewBlock(instructionIterator);
 			}
 		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(BlockNode node, Object... args) {
-		nodeIt = (ListIterator<CFGNode>) args[0];
-		ListIterator<Instruction> it = node.listIterator();
-		while (it.hasNext()) {
-			it.next().accept(this, it);
-		}
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Return returnInstr, Object... args) {
+	public void visit(Return returnInstr) {
 		if (procedure.getReturnType().isBool()) {
 			Expression expr = returnInstr.getValue();
 			if (expr.isBinaryExpr() || expr.isUnaryExpr()) {
@@ -189,16 +170,14 @@ public class BoolExprTransform extends AbstractActorTransformation {
 				createIfNode(local, expr);
 
 				// moves this return and remaining instructions to a new block
-				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
-				iit.previous();
-				createNewBlock(iit);
+				instructionIterator.previous();
+				createNewBlock(instructionIterator);
 			}
 		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public void visit(Store store, Object... args) {
+	public void visit(Store store) {
 		Variable target = store.getTarget();
 		if (target.getType().isBool()) {
 			Expression expr = store.getValue();
@@ -209,9 +188,8 @@ public class BoolExprTransform extends AbstractActorTransformation {
 				createIfNode(local, expr);
 
 				// moves this store and remaining instructions to a new block
-				ListIterator<Instruction> iit = (ListIterator<Instruction>) args[0];
-				iit.previous();
-				createNewBlock(iit);
+				instructionIterator.previous();
+				createNewBlock(instructionIterator);
 			}
 		}
 	}

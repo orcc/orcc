@@ -68,6 +68,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 public class CastAdderTransformation extends AbstractActorTransformation {
 
 	private class CastExprInterpreter extends AbstractExpressionInterpreter {
+
 		private ListIterator<Instruction> it;
 
 		/**
@@ -141,11 +142,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 	private String file;
 
-	@SuppressWarnings("unchecked")
-	private LocalVariable CastTarget(LocalVariable target, Type type,
-			Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-
+	private LocalVariable castTarget(LocalVariable target, Type type) {
 		Cast castTarget = new Cast(target.getType(), type);
 
 		if (castTarget.isExtended() || castTarget.isTrunced()) {
@@ -162,7 +159,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			Assign newAssign = new Assign(location, target, varExpr);
 
 			// Add assignement to instruction's list
-			it.add(newAssign);
+			instructionIterator.add(newAssign);
 
 			return transitionVar;
 		}
@@ -176,38 +173,35 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		super.transform(actor);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Assign assign, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Assign assign) {
 		Expression value = assign.getValue();
 
 		if (value.isBinaryExpr()) {
 			BinaryExpr binExpr = (BinaryExpr) value;
 
-			it.previous();
+			instructionIterator.previous();
 
 			Expression expr = (Expression) binExpr.accept(
-					new CastExprInterpreter(it), binExpr.getType());
+					new CastExprInterpreter(instructionIterator),
+					binExpr.getType());
 
 			if (expr != binExpr) {
 				assign.setValue(expr);
 			}
 
-			it.next();
+			instructionIterator.next();
 
 			if (!binExpr.getOp().isComparison()) {
-				LocalVariable newVar = CastTarget(assign.getTarget(),
-						binExpr.getType(), args);
+				LocalVariable newVar = castTarget(assign.getTarget(),
+						binExpr.getType());
 				assign.setTarget(newVar);
 			}
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Call call, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Call call) {
 		List<Expression> parameters = call.getParameters();
 		Procedure procedure = call.getProcedure();
 		if (!procedure.isExternal()) {
@@ -217,30 +211,28 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			for (Expression parameter : parameters) {
 				Variable variable = variables
 						.get(parameters.indexOf(parameter));
-				it.previous();
+				instructionIterator.previous();
 				Expression newParam = (Expression) parameter.accept(
-						new CastExprInterpreter(it), variable.getType());
+						new CastExprInterpreter(instructionIterator),
+						variable.getType());
 				parameters.set(parameters.indexOf(parameter), newParam);
-				it.next();
+				instructionIterator.next();
 			}
 		}
 	}
 
 	@Override
-	public void visit(Load load, Object... args) {
+	public void visit(Load load) {
 		LocalVariable target = load.getTarget();
 		Use use = load.getSource();
 
-		LocalVariable newVar = CastTarget(target, use.getVariable().getType(),
-				args);
+		LocalVariable newVar = castTarget(target, use.getVariable().getType());
 
 		load.setTarget(newVar);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(PhiAssignment phi, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(PhiAssignment phi) {
 		List<Expression> values = phi.getValues();
 		Type type = phi.getTarget().getType();
 
@@ -249,52 +241,49 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			CFGNode node = phi.getBlock().getPredecessors().get(indexValue);
 
 			if (node.isBlockNode()) {
-				it = ((BlockNode) node).lastListIterator();
+				instructionIterator = ((BlockNode) node).lastListIterator();
 			} else if (node.isIfNode()) {
-				it = ((IfNode) node).getJoinNode().lastListIterator();
+				instructionIterator = ((IfNode) node).getJoinNode()
+						.lastListIterator();
 			} else {
-				it = ((WhileNode) node).getJoinNode().lastListIterator();
+				instructionIterator = ((WhileNode) node).getJoinNode()
+						.lastListIterator();
 			}
 
 			Expression newValue = (Expression) value.accept(
-					new CastExprInterpreter(it), type);
+					new CastExprInterpreter(instructionIterator), type);
 			values.set(indexValue, newValue);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Return returnInstr, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Return returnInstr) {
 		Type returnType = procedure.getReturnType();
 
 		if ((returnType != null) && (!returnType.isVoid())) {
-
-			it.previous();
+			instructionIterator.previous();
 			Expression value = returnInstr.getValue();
 			Expression newValue = (Expression) value.accept(
-					new CastExprInterpreter(it), returnType);
+					new CastExprInterpreter(instructionIterator), returnType);
 			returnInstr.setValue(newValue);
-			it.next();
+			instructionIterator.next();
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void visit(Store store, Object... args) {
-		ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
+	public void visit(Store store) {
 		Expression value = store.getValue();
 		Variable target = store.getTarget();
 
-		it.previous();
+		instructionIterator.previous();
 
 		Expression newValue = (Expression) value.accept(
-				new CastExprInterpreter(it), target.getType());
+				new CastExprInterpreter(instructionIterator), target.getType());
 
 		if (value != newValue) {
 			store.setValue(newValue);
 		}
 
-		it.next();
+		instructionIterator.next();
 	}
 }

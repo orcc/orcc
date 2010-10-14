@@ -71,8 +71,8 @@ public class Call extends AbstractInstruction implements LocalTargetContainer {
 	}
 
 	@Override
-	public void accept(InstructionVisitor visitor, Object... args) {
-		visitor.visit(this, args);
+	public void accept(InstructionVisitor visitor) {
+		visitor.visit(this);
 	}
 
 	@Override

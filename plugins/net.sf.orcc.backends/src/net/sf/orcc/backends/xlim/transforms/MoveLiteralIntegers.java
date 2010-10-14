@@ -47,7 +47,6 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -118,27 +117,17 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Assign assign, Object... args) {
-		assign.setValue((Expression) assign.getValue().accept(exprInterpreter,
-				args));
+	public void visit(Assign assign) {
+		assign.setValue((Expression) assign.getValue().accept(exprInterpreter));
 	}
 
 	@Override
-	public void visit(BlockNode node, Object... args) {
-		ListIterator<Instruction> it = node.getInstructions().listIterator();
-		while (it.hasNext()) {
-			it.next().accept(this, it);
-		}
-	}
-
-	@Override
-	public void visit(Store store, Object... args) {
+	public void visit(Store store) {
 		ListIterator<Expression> it = store.getIndexes().listIterator();
 		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(exprInterpreter, args));
+			it.set((Expression) it.next().accept(exprInterpreter));
 		}
-		store.setValue((Expression) store.getValue().accept(exprInterpreter,
-				args));
+		store.setValue((Expression) store.getValue().accept(exprInterpreter));
 	}
 
 	@Override

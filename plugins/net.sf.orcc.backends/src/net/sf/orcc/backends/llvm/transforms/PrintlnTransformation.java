@@ -53,7 +53,7 @@ import net.sf.orcc.util.OrderedMap;
  * println becomes state variables into the current actor
  * 
  * 
- * @author J�r�me GORIN
+ * @author Jerome GORIN
  * 
  */
 public class PrintlnTransformation extends AbstractActorTransformation {
@@ -62,7 +62,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 	 * Change characters in strings to fit LLVM constraints
 	 * 
 	 * 
-	 * @author J�r�me GORIN
+	 * @author Jerome GORIN
 	 * 
 	 */
 	private class LLVMString {
@@ -135,7 +135,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Call call, Object... args) {
+	public void visit(Call call) {
 		if (call.isPrint()) {
 			String value = "";
 			List<Expression> parameters = new ArrayList<Expression>();

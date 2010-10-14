@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.ir.transforms;
 
-import java.util.ListIterator;
-
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -47,7 +45,7 @@ public class BlockCombine extends AbstractActorTransformation {
 	private BlockNode previous;
 
 	@Override
-	public void visit(BlockNode node, Object... args) {
+	public void visit(BlockNode node) {
 		if (previous == null) {
 			previous = node;
 		} else {
@@ -56,13 +54,12 @@ public class BlockCombine extends AbstractActorTransformation {
 			previous.add(node);
 
 			// remove this block
-			ListIterator<?> it = (ListIterator<?>) args[0];
-			it.remove();
+			nodeIterator.remove();
 		}
 	}
 
 	@Override
-	public void visit(IfNode node, Object... args) {
+	public void visit(IfNode node) {
 		// so that previous blocks are not linked to then branch
 		previous = null;
 		visit(node.getThenNodes());
@@ -74,14 +71,14 @@ public class BlockCombine extends AbstractActorTransformation {
 		// so that neither then nor else branch are linked to this join
 		// as a matter of fact, this also ensures correctness in nested ifs
 		previous = null;
-		visit(node.getJoinNode(), args);
+		visit(node.getJoinNode());
 
 		// we do not set previous to null again, because join may be combined
 		// with next blocks (actually it needs to be).
 	}
 
 	@Override
-	public void visit(WhileNode node, Object... args) {
+	public void visit(WhileNode node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
 		visit(node.getNodes());

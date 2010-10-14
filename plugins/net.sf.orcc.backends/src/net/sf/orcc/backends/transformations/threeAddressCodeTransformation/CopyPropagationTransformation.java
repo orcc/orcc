@@ -151,7 +151,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	 *            assign instruction
 	 */
 	@Override
-	public void visit(Assign assign, Object... args) {
+	public void visit(Assign assign) {
 		Expression value = assign.getValue();
 
 		if ((!value.isBinaryExpr()) && (!value.isUnaryExpr())) {
@@ -172,29 +172,29 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Call call, Object... args) {
+	public void visit(Call call) {
 		visitExpressions(call.getParameters());
 	}
 
 	@Override
-	public void visit(IfNode ifNode, Object... args) {
+	public void visit(IfNode ifNode) {
 		// Visit value of store
 		Expression value = ifNode.getValue();
 		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
 		ifNode.setValue(newExpr);
 
-		super.visit(ifNode, args);
+		super.visit(ifNode);
 	}
 
 	@Override
-	public void visit(Load load, Object... args) {
+	public void visit(Load load) {
 		// Visit indexes of load
 		visitExpressions(load.getIndexes());
 	}
 
 	//
 	@Override
-	public void visit(PhiAssignment phi, Object... args) {
+	public void visit(PhiAssignment phi) {
 		List<Expression> values = phi.getValues();
 		OrderedMap<String, Variable> parameters = procedure.getParameters();
 
@@ -218,7 +218,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Return returnInstr, Object... args) {
+	public void visit(Return returnInstr) {
 		Expression expr = returnInstr.getValue();
 		if (expr != null) {
 			Expression newExpr = (Expression) expr.accept(new ExpressionCopy());
@@ -227,7 +227,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Store store, Object... args) {
+	public void visit(Store store) {
 		// Visit value of store
 		Expression value = store.getValue();
 		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
@@ -238,7 +238,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(WhileNode whileNode, Object... args) {
+	public void visit(WhileNode whileNode) {
 		Expression value = whileNode.getValue();
 		Expression newExpr = (Expression) value.accept(new ExpressionCopy());
 		whileNode.setValue(newExpr);

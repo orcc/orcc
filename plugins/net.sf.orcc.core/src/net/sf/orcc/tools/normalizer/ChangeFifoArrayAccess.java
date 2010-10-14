@@ -30,7 +30,6 @@ package net.sf.orcc.tools.normalizer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
@@ -67,9 +66,8 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 		super.transform(actor);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void updateIndex(Variable var, Instruction instr,
-			List<Expression> indexes, Object... args) {
+			List<Expression> indexes) {
 		Expression index = indexes.get(0);
 
 		if (index.equals(new IntExpr(0))) {
@@ -84,29 +82,28 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 					IrFactory.eINSTANCE.createTypeInt(32)));
 			use.setNode(store);
 
-			ListIterator<Instruction> it = (ListIterator<Instruction>) args[0];
-			it.add(store);
+			instructionIterator.add(store);
 		} else {
 			System.err.println("TODO index");
 		}
 	}
 
 	@Override
-	public void visit(Load load, Object... args) {
+	public void visit(Load load) {
 		Use use = load.getSource();
 		Variable var = use.getVariable();
 		if (!var.isGlobal() && ((LocalVariable) var).isPort()) {
 			load.setSource(new Use(stateVars.get(var.getName()), load));
-			updateIndex(var, load, load.getIndexes(), args);
+			updateIndex(var, load, load.getIndexes());
 		}
 	}
 
 	@Override
-	public void visit(Store store, Object... args) {
+	public void visit(Store store) {
 		Variable var = store.getTarget();
 		if (!var.isGlobal() && var.isPort()) {
 			store.setTarget(stateVars.get(var.getName()));
-			updateIndex(var, store, store.getIndexes(), args);
+			updateIndex(var, store, store.getIndexes());
 		}
 	}
 
