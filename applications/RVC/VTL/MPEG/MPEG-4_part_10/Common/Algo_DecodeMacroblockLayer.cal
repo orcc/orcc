@@ -560,18 +560,12 @@ actor Algo_DecodeMacroblockLayer()
 				==>
 			Qp_Y_Cb_Cr :[QpValue , Qp_CbValue , Qp_CrValue],
 			QpFeedback :[QpValue]
-		var
-			uint(size=8) QpVal
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("mb_qp_delta : "+ValueOfVLD);
 			end
 			//mb_qp_delta := ValueOfVLD;
-			
-			/**Todo : Patch for LLVM backend*/
-			QpVal := QpValue + ValueOfVLD + 52;
-			QpValue := QpVal mod 52;
-			//QpValue    := (QpValue + ValueOfVLD + 52) mod 52;
+			QpValue      := (QpValue + ValueOfVLD + 52) mod 52;
 			Qp_CbValue := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
 			Qp_CrValue := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
 		end

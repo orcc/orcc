@@ -89,6 +89,16 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			Expression e1 = expr.getE1();
 			Expression e2 = expr.getE2();
 
+			if (isSpecificOperation(op)) {
+				Cast specificCast = new Cast(e1.getType(), e2.getType());
+
+				if (specificCast.isExtended()) {
+					expr.setType(e2.getType());
+				} else if (specificCast.isTrunced()) {
+					expr.setType(e1.getType());
+				}
+			}
+
 			if (op.isComparison()) {
 				// Check coherence between e1 and e2
 				Cast castExprs = new Cast(e1.getType(), e2.getType());
@@ -136,6 +146,14 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			}
 
 			return expr;
+		}
+
+		private boolean isSpecificOperation(BinaryOp op) {
+			if (op == BinaryOp.MOD) {
+				return true;
+			}
+
+			return false;
 		}
 
 	}
