@@ -55,22 +55,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int (size=6)  TypeOfVLD,
 	int (size=32) VLDParam,
 
-	uint(size=4)  DecMbLayerSliceType,
-	uint(size=4)  DecMbLayerBitDepthLuma,
-	uint(size=4)  DecMbLayerBitDepthChroma,
-	bool          DecMbLayerDirect8x8Inference,
-	bool          DecMbLayerTransform8x8Mode,
-	uint(size=2)  DecMbLayerChromaArrayType,
-	uint(size=5)  DecMbLayerNumRefIdxLXActive,
-	bool          DecMbLayerMbFieldDecoding,
-	bool          DecMbLayerEntropyCodingMode,
-	uint(size=5)  DecMbLayerNATab,
-	bool          DecMbLayerLeftMbExists,
-	uint(size=5)  DecMbLayerNBTab,
-	bool          DecMbLayerAboveMbExists,
-	uint(size=2)  DecMbLayerNumC8x8,
-	int (size=8)  DecMbLayerValQp,
-	int (size=5)  DecMbLayerValChrmQpIdxOff,
+	int (size=8)  MbLayerParameters,
 
 	bool          SkipMbLayer,
 	uint(size=5)  SzMbSkipped,
@@ -365,27 +350,14 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	//macroblock_layer()
 	SendMbLayerParameters: action
 				==>
-			DecMbLayerSliceType          :[slice_type],
-			DecMbLayerBitDepthLuma       :[bit_depth_luma],
-			DecMbLayerBitDepthChroma     :[bit_depth_chroma],
-			DecMbLayerDirect8x8Inference :[direct_8x8_inference_flag],
-			DecMbLayerTransform8x8Mode   :[transform_8x8_mode_flag],
-			DecMbLayerChromaArrayType    :[Chroma_Array_Type],
-			DecMbLayerNumRefIdxLXActive  :[num_ref_idx_l0_active , num_ref_idx_l1_active],
-			DecMbLayerMbFieldDecoding    :[mb_field_decoding_flag],
-			DecMbLayerEntropyCodingMode  :[entropy_coding_mode_flag],
-			DecMbLayerNATab              :[NaTab] repeat 12,
-			DecMbLayerLeftMbExists       :[LMbExists],
-			DecMbLayerNBTab              :[NbTab] repeat 12,
-			DecMbLayerAboveMbExists      :[AMbExists],
-			DecMbLayerNumC8x8            :[NumC8x8],
-			DecMbLayerValQp              :[QpValue],
-			DecMbLayerValChrmQpIdxOff    :[ chroma_qp_index_offset , second_chroma_qp_index_offset ]
+			MbLayerParameters :[Parameters] repeat 35
 		var
+			List(type: int(size=8), size=35) Parameters,
 			List(type: uint(size=5), size=12) NaTab,
 			List(type: uint(size=5), size=12) NbTab,
-			bool LMbExists,
-			bool AMbExists
+			bool        LMbExists,
+			bool        AMbExists,
+			int(size=8) Flags
 		do
 				if(((curr_mb_addr - first_mb_in_slice) mod PicWidthInMbs) != 0) then
 					NaTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 5],
@@ -425,6 +397,25 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 					AMbExists := false;
 					NbTab := [0:for int i in 0 .. 11];
 				end
+
+			Flags := SetFlag(direct_8x8_inference_flag, 0, SetFlag(transform_8x8_mode_flag, 1,SetFlag(mb_field_decoding_flag,2 ,0 ) ));
+			Flags := SetFlag( entropy_coding_mode_flag, 3, SetFlag(              LMbExists, 4,SetFlag(             AMbExists,5 ,0 ) ));
+			Parameters[0]  := Flags;
+			Parameters[1]  := slice_type;
+			Parameters[2]  := bit_depth_luma;
+			Parameters[3]  := bit_depth_chroma;
+			Parameters[4]  := Chroma_Array_Type;
+			Parameters[5]  := num_ref_idx_l0_active;
+			Parameters[6]  := num_ref_idx_l1_active;
+			Parameters[7]  := NumC8x8;
+			Parameters[8]  := QpValue;
+			Parameters[9]  := chroma_qp_index_offset;
+			Parameters[10] := second_chroma_qp_index_offset;
+			foreach int i in 0 .. 11
+			do
+				Parameters[11 + i] := NaTab[i];
+				Parameters[23 + i] := NbTab[i];
+			end
 		end
 
 

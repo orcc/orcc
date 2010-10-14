@@ -15,27 +15,9 @@ This copyright notice must be included in all copies or derivative works. Copyri
 ***********************************************************************/
 actor Algo_DecodeMacroblockLayer()
 	int (size=32) ValVLD,
-	uint(size=4)  SliceType,
-	//Pps parameters
-	bool          Transform8x8Mode,
-	uint(size=5)  NumRefIdxLXActive,
-	bool          EntropyCodingMode,
-	int (size=5)  ChromaQpIdxOffset,
-	//Sps parameters
-	uint(size=4)  BitDepthLuma,
-	uint(size=4)  BitDepthChroma,
-	bool          Direct8x8Inference,
-	uint(size=2)  Num_C8x8,
+	int (size=8)  Parameters,
 
 	uint(size=4) SubMbType,
-
-	uint(size=2)  ChromaArrayType,
-	bool          MbFieldDecoding,
-	uint(size=5)  NATab,
-	uint(size=5)  NBTab,
-	bool          LeftMbExists,
-	bool          AboveMbExists,
-	int (size=8)  ValQp,
 
 	uint(size=5)  Total_CoeffLuma,
 	uint(size=5)  Total_CoeffChroma
@@ -153,7 +135,6 @@ actor Algo_DecodeMacroblockLayer()
 
 
 	uint(size=6)  mb_type                        := 0;
-	uint(size=6)  mb_typeqsdflm                  := 0;
 	bool          noSubMbPartSizeLessThan8x8Flag := true;
 	bool          transform_size_8x8_flag        := true;
 	uint(size=6)  coded_block_pattern            := 0;
@@ -227,39 +208,58 @@ actor Algo_DecodeMacroblockLayer()
 			end
 		end
 
+	function GetFlag(int(size=32) Val, uint(size=5) Idx)
+				-->
+			bool
+		:
+			(Val & (1 << Idx)) != 0
+		end
+
 	ReadMbType.Asked: action
 				==>
 			//              mb_type
 			TypeOfVLD    :[  VLD_UE  ]
 		end
 
-	ReadMbType.Done: action
-			ValVLD             :[ValueOfVLD],
-			SliceType          :[ValSliceType],
-			BitDepthLuma       :[ValBitDepthLuma],
-			BitDepthChroma     :[ValBitDepthChroma],
-			Direct8x8Inference :[ValDirect8x8Inference],
-			Transform8x8Mode   :[ValTransform8x8Mode],
-			ChromaArrayType    :[ValChromaArrayType],
-			NumRefIdxLXActive  :[ValNumRefIdxLXActive] repeat 2,
-			MbFieldDecoding    :[ValMbFieldDecoding],
-			EntropyCodingMode  :[ValEntropyCodingMode],
-			NATab              :[ValNATab] repeat 12,
-			NBTab              :[ValNBTab] repeat 12,
-			LeftMbExists       :[ValLeftMbExists],
-			AboveMbExists      :[ValAboveMbExists],
-			Num_C8x8           :[ValNum_C8x8],
-			ValQp              :[Val_Qp],
-			ChromaQpIdxOffset  :[ ValChrmQpIdxOff , Val2ndChrmQpIdxOff ]
+	ReadParameters: action
+			Parameters         :[Param] repeat 35
 				==>
-			MbType             :[mb_type],
-			Slice_Type         :[ValSliceType],
-			MergeTransfSz8x8   :[ValTransform8x8Mode]
+			Slice_Type         :[slice_type],
+			MergeTransfSz8x8   :[transform_8x8_mode_flag]
+		do
+			direct_8x8_inference_flag     := GetFlag(Param[0], 0);
+			transform_8x8_mode_flag       := GetFlag(Param[0], 1);
+			mb_field_decoding             := GetFlag(Param[0], 2);
+			entropy_coding_mode_flag      := GetFlag(Param[0], 3);
+			LeftMb_Exists                 := GetFlag(Param[0], 4);
+			AboveMb_Exists                := GetFlag(Param[0], 5);
+
+			slice_type                    := Param[1];
+			bit_depth_luma                := Param[2];
+			bit_depth_chroma              := Param[3];
+			Chroma_Array_Type             := Param[4];
+			num_ref_idx_l0_active         := Param[5];
+			num_ref_idx_l1_active         := Param[6];
+			NumC8x8                       := Param[7];
+			QpValue                       := Param[8];
+			chroma_qp_index_offset        := Param[9];
+			second_chroma_qp_index_offset := Param[10];
+			Qp_CbValue                    := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
+			Qp_CrValue                    := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
+			foreach int i in 0 .. 11
+			do
+				nATab[i] := Param[11 + i];
+				nBTab[i] := Param[23 + i];
+			end
+		end
+
+	ReadMbType.Done: action
+			ValVLD             :[ValueOfVLD]
+				==>
+			MbType             :[mb_type]
 		var
 			uint         Idx
 		do
-			slice_type                    := ValSliceType;
-			mb_typeqsdflm := ValueOfVLD;
 			mb_type                       :=
 				if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I))then
 					ValueOfVLD
@@ -286,28 +286,6 @@ actor Algo_DecodeMacroblockLayer()
 						end
 					end
 				end;
-			bit_depth_luma                := ValBitDepthLuma;
-			bit_depth_chroma              := ValBitDepthChroma;
-			direct_8x8_inference_flag     := ValDirect8x8Inference;
-			transform_8x8_mode_flag       := ValTransform8x8Mode;
-			Chroma_Array_Type             := ValChromaArrayType;
-			num_ref_idx_l0_active         := ValNumRefIdxLXActive[0];
-			num_ref_idx_l1_active         := ValNumRefIdxLXActive[1];
-			mb_field_decoding             := ValMbFieldDecoding;
-			entropy_coding_mode_flag      := ValEntropyCodingMode;
-			LeftMb_Exists                 := ValLeftMbExists;
-			AboveMb_Exists                := ValAboveMbExists;
-			NumC8x8                       := ValNum_C8x8;
-			QpValue                       := Val_Qp;
-			chroma_qp_index_offset        := ValChrmQpIdxOff;
-			second_chroma_qp_index_offset := Val2ndChrmQpIdxOff;
-			Qp_CbValue                    := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
-			Qp_CrValue                    := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
-			foreach int i in 0 .. 11
-			do
-				nATab[i] := ValNATab[i];
-				nBTab[i] := ValNBTab[i];
-			end
 
 			transform_size_8x8_flag        := false;
 			noSubMbPartSizeLessThan8x8Flag := true;
@@ -624,7 +602,9 @@ actor Algo_DecodeMacroblockLayer()
 		end
 
 	schedule fsm ReadMbType_Asked:
-		ReadMbType_Asked          (ReadMbType.Asked               )--> ReadMbType;
+		ReadMbType_Asked          (ReadMbType.Asked               )--> ReadParameters;
+
+		ReadParameters            (ReadParameters                 )--> ReadMbType;
 
 		ReadMbType                (ReadMbType.Done                )--> CheckMbType;
 
