@@ -29,7 +29,6 @@
  */
 package net.sf.orcc.backends.vhdl;
 
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
@@ -42,8 +41,10 @@ import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionPrinter;
 import net.sf.orcc.ir.expr.ListExpr;
+import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
+import net.sf.orcc.util.CollectionsUtil;
 
 /**
  * This class defines a VHDL expression printer.
@@ -79,14 +80,14 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 		e2.accept(this, nextPrec, BinaryExpr.RIGHT);
 		builder.append(", ");
 		if (function == "bitand") {
-			Type sizee = getLub(e1.getType(), e2.getType());					
-			int s_e = Cast.getSizeOfType(sizee);	
+			Type sizee = getLub(e1.getType(), e2.getType());
+			int s_e = Cast.getSizeOfType(sizee);
 			builder.append(s_e + ", ");
 		}
 		builder.append(s_op);
 		builder.append(")");
 	}
-	
+
 	/**
 	 * Returns the Least Upper Bound of the given types.
 	 * 
@@ -228,7 +229,16 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 
 	@Override
 	public void visit(ListExpr expr, Object... args) {
-		throw new OrccRuntimeException("List expression not supported");
+		builder.append('(');
+		builder.append(CollectionsUtil.toString(expr.getValue(), ", "));
+		builder.append(')');
+	}
+
+	@Override
+	public void visit(StringExpr expr, Object... args) {
+		builder.append('"');
+		builder.append(expr.getValue());
+		builder.append('"');
 	}
 
 	@Override
