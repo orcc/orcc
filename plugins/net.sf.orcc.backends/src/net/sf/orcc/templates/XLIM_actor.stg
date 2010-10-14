@@ -64,18 +64,15 @@ internalPorts() ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 initValue(type, value) ::= <<
-<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/>
+$if (value.listExpr)$<initValue typeName="List"> 
+    $value.value: {value | $initValue(type=type, value=value)$}; separator=""$</initValue>
+$else$<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/>
+$endif$
 >>
 
 stateVar(var) ::= <<
 <stateVar name="$var.name$" sourceName="$var.name$">
-$if (var.type.list)$
-	<initValue typeName="List">
-		$var.constantValue: {value | $initValue(type=var.type.elementType, value=value)$}; separator="\n"$
-	</initValue>
-$else$
 	$initValue(type=var.type, value=var.constantValue)$
-$endif$
 </stateVar>
 >>
 
