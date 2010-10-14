@@ -272,27 +272,27 @@ Constant(constant) ::= <<
 $(constant.class.simpleName)(constant)$
 >>
 
-Boolean(constant) ::= <<
-$if (constant)$'1'$else$'0'$endif$
+BoolExpr(constant) ::= <<
+$if (constant.value)$'1'$else$'0'$endif$
 >>
 
-IntegerNumber(constant) ::= <<
-$constant$
+IntExpr(number) ::= <<
+$number$$if (number.long)$L$endif$
 >>
 
 // the values of a list: {val1, val2, ..., valn}
-List(constant) ::= <<
-($constant: Constant(); wrap, separator=", "$)
+ListExpr(constant) ::= <<
+($constant.value: Constant(); wrap, separator=", "$)
 >>
 
-ArrayList(constant) ::= <<$List(constant)$>>
-
-String(constant) ::= <<
+StringExpr(constant) ::= <<
 "$constant$"
 >>
 
-
-
+actorParameters(parameters) ::= <<
+$parameters.keys: { k | #define $k$ $Constant(parameters.(k))$
+}$
+>>
 ///////////////////////////////////////////////////////////////////////////////
 // Cast
 ///////////////////////////////////////////////////////////////////////////////
@@ -879,6 +879,7 @@ architecture rtl_$actor.name$ of $actor.name$ is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
+  $actorParameters(actor.parameters)$
   $actor.actions: {action| signal $action$_go : std_logic;}; separator="\n"$  
   $actor.stateVars.list: signalDeclaration()$
 
