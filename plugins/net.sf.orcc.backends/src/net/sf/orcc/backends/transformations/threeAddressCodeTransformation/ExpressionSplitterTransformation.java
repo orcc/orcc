@@ -208,6 +208,8 @@ public class ExpressionSplitterTransformation extends
 				binExpr.setE2(visitExpression(e2, instructionIterator));
 				instructionIterator.next();
 			}
+			
+			Use.addUses(assign, value);
 		} else if (value.isUnaryExpr()) {
 			UnaryExpr unaryExpr = (UnaryExpr) value;
 			instructionIterator.previous();
