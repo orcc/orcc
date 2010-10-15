@@ -28,10 +28,12 @@
  */
 package net.sf.orcc.backends.xlim.transforms;
 
+import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
@@ -47,6 +49,9 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
@@ -56,6 +61,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * cannot contain literals.
  * 
  * @author Ghislain Roquier
+ * @author Herve Yviquel
  * 
  */
 public class MoveLiteralIntegers extends AbstractActorTransformation {
@@ -81,9 +87,13 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			Assign assign = new Assign(var, expr);
 
 			// Add assignment to instruction's list
-			it.previous();
+			if (it.hasPrevious()) {
+				it.previous();
+			}
 			it.add(assign);
-			it.next();
+			if (it.hasNext()) {
+				it.next();
+			}
 			return new VarExpr(new Use(var));
 		}
 
@@ -97,9 +107,13 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			Assign assign = new Assign(var, expr);
 
 			// Add assignment to instruction's list
-			it.previous();
+			if (it.hasPrevious()) {
+				it.previous();
+			}
 			it.add(assign);
-			it.next();
+			if (it.hasNext()) {
+				it.next();
+			}
 			return new VarExpr(new Use(var));
 		}
 
@@ -118,21 +132,75 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Assign assign) {
-		assign.setValue((Expression) assign.getValue().accept(exprInterpreter));
+		assign.setValue((Expression) assign.getValue().accept(exprInterpreter,
+				instructionIterator));
 	}
 
 	@Override
 	public void visit(Store store) {
 		ListIterator<Expression> it = store.getIndexes().listIterator();
 		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(exprInterpreter));
+			it.set((Expression) it.next().accept(exprInterpreter,
+					instructionIterator));
 		}
-		store.setValue((Expression) store.getValue().accept(exprInterpreter));
+		store.setValue((Expression) store.getValue().accept(exprInterpreter,
+				instructionIterator));
 	}
 
 	@Override
 	public void visitProcedure(Procedure procedure) {
 		super.visitProcedure(procedure);
+	}
+
+	@Override
+	public void visit(IfNode ifNode) {
+		if (instructionIterator == null) {
+			Procedure procedure = ifNode.getProcedure();
+			int index = procedure.getNodes().indexOf(ifNode);
+			BlockNode newBlock = new BlockNode(procedure);
+			procedure.getNodes().add(index, newBlock);
+			instructionIterator = newBlock.getInstructions().listIterator();
+			ifNode.setValue((Expression) ifNode.getValue().accept(
+					exprInterpreter, instructionIterator));
+			visit(ifNode.getThenNodes());
+			visit(ifNode.getElseNodes());
+			instructionIterator = null;
+		} else {
+			ifNode.setValue((Expression) ifNode.getValue().accept(
+					exprInterpreter, instructionIterator));
+			visit(ifNode.getThenNodes());
+			visit(ifNode.getElseNodes());
+		}
+		visit(ifNode.getJoinNode());
+	}
+
+	@Override
+	public void visit(WhileNode whileNode) {
+		if (instructionIterator == null) {
+			Procedure procedure = whileNode.getProcedure();
+			int index = procedure.getNodes().indexOf(whileNode);
+			BlockNode newBlock = new BlockNode(procedure);
+			procedure.getNodes().add(index, newBlock);
+			instructionIterator = newBlock.getInstructions().listIterator();
+			whileNode.setValue((Expression) whileNode.getValue().accept(
+					exprInterpreter, instructionIterator));
+			visit(whileNode.getNodes());
+		} else {
+			whileNode.setValue((Expression) whileNode.getValue().accept(
+					exprInterpreter, instructionIterator));
+			visit(whileNode.getNodes());
+		}
+
+		visit(whileNode.getJoinNode());
+	}
+
+	@Override
+	public void visit(List<CFGNode> nodes) {
+		for (int i = 0; i < nodes.size(); i++) {
+			CFGNode node = nodes.get(i);
+			node.accept(this);
+			i = nodes.indexOf(node);
+		}
 	}
 
 }

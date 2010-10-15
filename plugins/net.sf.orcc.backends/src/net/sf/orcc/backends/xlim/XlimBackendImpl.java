@@ -69,8 +69,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
-				new MoveLiteralIntegers(),
-				new ExpressionSplitterTransformation(), new VariableRenamer(),
+				new ExpressionSplitterTransformation(),
+				new MoveLiteralIntegers(), new VariableRenamer(),
 				new ChangeActionSchedulerFormTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
