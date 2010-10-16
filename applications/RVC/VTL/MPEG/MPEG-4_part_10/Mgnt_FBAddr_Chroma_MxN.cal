@@ -14,7 +14,6 @@ actor Mgnt_FBAddr_Chroma_MxN ()
 
    							 uint(size=8)         Mb_Type, 
    							 int (size=16)     MV, 
-   							 uint(size=3)    RefIdx, 
   							 uint(size=11)   Location , 
   							 uint(size=6) PartSZ, 
   							 uint(size=13)   PicSizeInMb, 

@@ -31,8 +31,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	bool          IsIDR
 		==> 
 	int(size=16) RD, 
-	int(size=9)  Display,
-	bool         Write_Done
+	int(size=9)  Display
 		:
 
 
