@@ -157,14 +157,14 @@ public class Network {
 			if (vertex.isInstance()) {
 				// incoming edges
 				Set<Connection> connections = graph.incomingEdgesOf(vertex);
-				List<Connection> incoming = Arrays.asList(connections
-						.toArray(new Connection[0]));
+				List<Connection> incoming = new ArrayList<Connection>(
+						connections);
 				incomingMap.put(vertex.getInstance(), incoming);
 
 				// outgoing edges
 				connections = graph.outgoingEdgesOf(vertex);
-				List<Connection> outgoing = Arrays.asList(connections
-						.toArray(new Connection[0]));
+				List<Connection> outgoing = new ArrayList<Connection>(
+						connections);
 				outgoingMap.put(vertex.getInstance(), outgoing);
 			}
 		}

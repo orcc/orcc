@@ -219,7 +219,7 @@ public class CBackendImpl extends AbstractBackend {
 		try {
 			String[] networkTemplates;
 			boolean useNewScheduler = getAttribute(
-					"net.sf.orcc.plugins.backends.newScheduler", false);
+					"net.sf.orcc.backends.newScheduler", false);
 			if (useNewScheduler) {
 				networkTemplates = new String[2];
 				networkTemplates[0] = "C_network";
