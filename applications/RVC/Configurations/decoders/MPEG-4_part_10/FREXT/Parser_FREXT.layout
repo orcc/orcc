@@ -19,7 +19,6 @@
       <vertex id="MbPartHeigth" x="1758" y="895"/>
       <vertex id="CodedBlockPattern" x="1711" y="529"/>
       <vertex id="ConstrainedIFlag" x="1716" y="562"/>
-      <vertex id="MvRes" x="1782" y="1043"/>
       <vertex id="SizeDPBMax" x="622" y="1568"/>
       <vertex id="PicWidthInMb" x="1760" y="1170"/>
       <vertex id="PicSizeInMb" x="1767" y="1127"/>

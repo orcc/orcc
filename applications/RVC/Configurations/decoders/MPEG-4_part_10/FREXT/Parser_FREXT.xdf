@@ -128,13 +128,6 @@
     <Port kind="Output" name="ConstrainedIFlag">
         <Type name="bool"/>
     </Port>
-    <Port kind="Output" name="MvRes">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="SizeDPBMax">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -696,7 +689,6 @@
     <Connection dst="RefList1" dst-port="RefListType" src="DecodePic" src-port="RefList1Type"/>
     <Connection dst="RefList1" dst-port="RefReordering" src="DecodePic" src-port="RefReordering_l1"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
-    <Connection dst="" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
     <Connection dst="MVReconstruct" dst-port="RefIdx" src="DecodePic" src-port="RefIdx_l0"/>
     <Connection dst="" dst-port="Ref_List1" src="RefList1" src-port="RefList"/>
     <Connection dst="" dst-port="RefIdx_l1" src="DecodePic" src-port="RefIdx_l1"/>

@@ -29,9 +29,11 @@
 package net.sf.orcc.network.transforms;
 
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
@@ -111,6 +113,50 @@ public class Instantiator implements INetworkTransformation {
 		}
 	}
 
+	private void checkPorts(String id, Set<Connection> connections,
+			OrderedMap<String, Port> ports) throws OrccException {
+		for (Port port : ports) {
+			boolean portUsed = false;
+			for (Connection connection : connections) {
+				if (connection.getSource() == port
+						|| connection.getTarget() == port) {
+					portUsed = true;
+					break;
+				}
+			}
+
+			if (!portUsed) {
+				throw new OrccException("In network \"" + network.getName()
+						+ "\": port \"" + port.getName() + "\" of instance \""
+						+ id + "\" is not used!");
+			}
+		}
+	}
+
+	private void checkPortsAreConnected() throws OrccException {
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isInstance()) {
+				Instance instance = vertex.getInstance();
+				String id = instance.getId();
+				if (instance.isNetwork()) {
+					Network network = instance.getNetwork();
+
+					Set<Connection> connections = graph.incomingEdgesOf(vertex);
+					checkPorts(id, connections, network.getInputs());
+					connections = graph.outgoingEdgesOf(vertex);
+					checkPorts(id, connections, network.getOutputs());
+				} else {
+					Actor actor = instance.getActor();
+
+					Set<Connection> connections = graph.incomingEdgesOf(vertex);
+					checkPorts(id, connections, actor.getInputs());
+					connections = graph.outgoingEdgesOf(vertex);
+					checkPorts(id, connections, actor.getOutputs());
+				}
+			}
+		}
+	}
+
 	/**
 	 * Walks through the hierarchy, instantiate actors, and checks that
 	 * connections actually point to ports defined in actors. Instantiating an
@@ -140,6 +186,7 @@ public class Instantiator implements INetworkTransformation {
 
 		checkParameters(network);
 		updateConnections();
+		checkPortsAreConnected();
 	}
 
 	/**
