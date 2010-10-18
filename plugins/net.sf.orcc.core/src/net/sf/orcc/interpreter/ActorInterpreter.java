@@ -206,9 +206,11 @@ public class ActorInterpreter {
 		} else {
 			// Check next schedulable action in respect of the priority order
 			for (Action action : sched.getActions()) {
-				if (isSchedulable(action)
-						&& checkOutputPattern(action.getOutputPattern())) {
-					return action;
+				if (isSchedulable(action)) {
+					if (checkOutputPattern(action.getOutputPattern())) {
+						return action;
+					}
+					break;
 				}
 			}
 		}
