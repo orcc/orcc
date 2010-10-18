@@ -23,6 +23,8 @@ ${orcc_SOURCE_DIR}/src/img_display.c
 ${orcc_SOURCE_DIR}/src/img_read.c
 ${orcc_SOURCE_DIR}/src/scheduler.c
 ${orcc_SOURCE_DIR}/src/source.c
+${orcc_SOURCE_DIR}/src/writer.c
+${orcc_SOURCE_DIR}/src/source_no_loop.c
 ${orcc_SOURCE_DIR}/src/orcc_util.c
 )
 

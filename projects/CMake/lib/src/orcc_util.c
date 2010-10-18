@@ -57,6 +57,9 @@ char *input_file;
 // output YUV file
 char *yuv_file;
 
+// write file
+char *write_file;
+
 // Pause function
 void wait_for_key() {
 #ifdef _WIN32
@@ -94,7 +97,7 @@ void print_and_exit(const char *msg) {
 	exit(1);
 }
 
-static const char *usage = "%s: -i <file> [-o <file>]...\n";
+static const char *usage = "%s: -i <file> [-o <file>] [-w <file>]...\n";
 static char *program;
 
 void print_usage() {
@@ -104,7 +107,7 @@ void print_usage() {
 ///////////////////////////////////////////////////////////////////////////////
 // initializes APR and parses options
 void init_orcc(int argc, char *argv[]) {
-	const char *ostr = "i:o:";
+	const char *ostr = "i:o:w:";
 	int c;
 
 	program = argv[0];
@@ -123,6 +126,9 @@ void init_orcc(int argc, char *argv[]) {
 			break;
 		case 'o':
 			yuv_file = strdup(optarg);
+			break;
+		case 'w':
+			write_file = strdup(optarg);
 			break;
 		default:
 			fprintf(stderr, "skipping option -%c\n", c);
