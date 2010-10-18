@@ -495,6 +495,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="RefIdxL0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -704,8 +711,6 @@
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="SubMbPredMbPartIdx" src="DecodeSubMbPred" src-port="MbPartIdx"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="MbPredRefIdxL0" src="DecodeMbPred" src-port="RefIdxL0"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredMbPartHeight" src="DecodeMbPred" src-port="MbPartHeight"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredMbPartWidth" src="DecodeMbPred" src-port="MbPartWidth"/>
@@ -909,4 +914,7 @@
         src="DecodeMacroBlockLayer" src-port="SubMbPredParameters"/>
     <Connection dst="DecodeMacroBlockLayer" dst-port="Parameters"
         src="DecodeSliceData_Cavlc" src-port="MbLayerParameters"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredRefIdxL0" src="DecodeMbPred" src-port="RefIdxl0"/>
+    <Connection dst="" dst-port="RefIdxL0" src="DecodeMbPred" src-port="RefIdxL0"/>
 </XDF>

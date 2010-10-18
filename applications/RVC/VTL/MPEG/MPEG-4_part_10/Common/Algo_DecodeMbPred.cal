@@ -23,6 +23,7 @@ actor Algo_DecodeMbPred()
 
 	uint(size=4)  RemIntraYxYPredMode,
 
+	uint(size=4)  RefIdxl0,
 	uint(size=4)  RefIdxL0,
 	uint(size=4)  RefIdxL1,
 	uint(size=3)  SelectList,
@@ -613,13 +614,35 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxL0.Done: action
 			ValVLD   :[val_ref_idx]
 				==>
+			RefIdxl0     :[val_ref_idx],
 			RefIdxL0     :[val_ref_idx],
 			MbPartHeight :[MbPartWidthHeight(1)],
 			MbPartWidth  :[MbPartWidthHeight(0)],
 			MbPartIdx    :[mbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard
-			mbPartIdx < mbPartIdxMax
+			mbPartIdx < mbPartIdxMax,
+			not IS_MbPred_L1(mb_type,mbPartIdx),
+			not IS_MbPred_NA(mb_type,mbPartIdx)
+		do
+			if(DEBUG_MV)then
+				println("ReadRefIdxL0["+mbPartIdx+"] : "+val_ref_idx);
+			end
+			mbPartIdx := mbPartIdx + 1;
+		end
+
+	ReadRefIdxL0.DoneSkip: action
+			ValVLD   :[val_ref_idx]
+				==>
+			RefIdxl0     :[val_ref_idx],
+			MbPartHeight :[MbPartWidthHeight(1)],
+			MbPartWidth  :[MbPartWidthHeight(0)],
+			MbPartIdx    :[mbPartIdx - 1],
+			EndRefIdxL0  :[false]
+		guard
+			mbPartIdx < mbPartIdxMax,
+			   IS_MbPred_L1(mb_type,mbPartIdx)
+			or IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadRefIdxL0["+mbPartIdx+"] : "+val_ref_idx);

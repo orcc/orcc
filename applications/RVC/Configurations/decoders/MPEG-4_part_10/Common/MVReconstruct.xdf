@@ -80,6 +80,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="RefIdxL0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -160,6 +167,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="a">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/a"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -195,4 +211,6 @@
     <Connection dst="MvpL0_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="MvpL0_Reconstr" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="MvpL0_Reconstr" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="a" dst-port="RefIdx" src="" src-port="RefIdxL0"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="RefIdx" src="" src-port="RefIdxL0"/>
 </XDF>

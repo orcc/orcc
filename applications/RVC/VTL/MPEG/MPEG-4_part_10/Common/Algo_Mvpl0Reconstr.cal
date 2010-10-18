@@ -57,7 +57,9 @@ actor Algo_Mvpl0Reconstr()
 
 	uint(size=13) CurrMbAddr,
 	uint(size=13) FirstMbInSlice,
-	uint(size=7)  PicWidthInMb
+	uint(size=7)  PicWidthInMb,
+
+	uint(size=4)  RefIdx
 		==>
 		:
 
@@ -133,23 +135,29 @@ actor Algo_Mvpl0Reconstr()
 
 	//Size of MvTab must be >= PicWidthInMb + 1 and must be equal to pow(2,n) for masking bits easily.
 	List(type: List(type: List(type: int(size=16),size=2), size=16),size= SZ_TAB) MvTab;
-	List(type: List(type: uint(size=4), size=16),size= SZ_TAB) RefIdx;
+	List(type: List(type: uint(size=4), size=16),size= SZ_TAB) RefIdxTab;
+	List(type: int (size=16),size=2) MvB;
+	List(type: int (size=16),size=2) MvC;
 
-	
+	List(type: List(type: int (size=16),size=2),size=2) ListMvA;
 
 	uint(size=3) MbPartIdxMax;
 	uint(size=3) MbPartIdx;
 	uint(size=3) SizeMbMv;
 	uint(size=6) MbType;
+	List(type: int (size=5), size=2) ListRefIdxA;
+	int (size=5) RefIdxB;
+	int (size=5) RefIdxC;
+	uint(size=LOG2_SZ_TAB) Idx;
 
 	function Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
 				-->
 			bool
 		:
 			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
-				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) &  7][mb_part_idx & 1] & PRED_L0) != 0
+				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) &  7][mb_part_idx & 1] & PRED_L0) != 0
 			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
+				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
 			end
 		end
 
@@ -231,16 +239,12 @@ actor Algo_Mvpl0Reconstr()
 			uint(size=LOG2_SZ_TAB) Idx_mbAddrB = (Curr_Mb_Addr - pic_width_in_mb) & MASK_TAB,
 			uint(size=LOG2_SZ_TAB) Idx_mbAddrC,
 
+			int (size=5)           RefIdxA,
 			List(type: int (size=16),size=2) MvA,
-			List(type: int (size=16),size=2) MvB,
-			List(type: int (size=16),size=2) MvC,
-			uint(size=4)  RefIdxA,
-			uint(size=4)  RefIdxB,
-			uint(size=4)  RefIdxC,
 
 			List(type: int(size=16), size=2)  MvPred
 		do
-			RefIdx[Idx] := [0: for int i in 0 .. 15];
+			RefIdxTab[Idx] := [0: for int i in 0 .. 15];
 			//if mbAddrB is not available
 			if( (Curr_Mb_Addr - Fst_Mb) < pic_width_in_mb) then
 				MvTab[Idx] := [[0,0]: for int i in 0 .. 15];
@@ -250,25 +254,25 @@ actor Algo_Mvpl0Reconstr()
 					MvTab[Idx] := [[0,0]: for int i in 0 .. 15];
 				else
 					//if refIdxL0A is equal to 0 and both components of mvL0A are equal to 0
-					if(RefIdx[Idx_mbAddrA][5] = 0 and MvTab[Idx_mbAddrA][5][0] = 0 and MvTab[Idx_mbAddrA][5][1] = 0) then
+					if(RefIdxTab[Idx_mbAddrA][5] = 0 and MvTab[Idx_mbAddrA][5][0] = 0 and MvTab[Idx_mbAddrA][5][1] = 0) then
 						MvTab[Idx] := [[0,0]: for int i in 0 .. 15];
 					else
 						//if refIdxL0B is equal to 0 and both components of mvL0B are equal to 0	
-						if(RefIdx[Idx_mbAddrB][10] = 0 and MvTab[Idx_mbAddrB][10][0] = 0 and MvTab[Idx_mbAddrB][10][1] = 0) then
+						if(RefIdxTab[Idx_mbAddrB][10] = 0 and MvTab[Idx_mbAddrB][10][0] = 0 and MvTab[Idx_mbAddrB][10][1] = 0) then
 							MvTab[Idx] := [[0,0]: for int i in 0 .. 15];	
 						else
 							MvA     := MvTab [Idx_mbAddrA][5];
-							RefIdxA := RefIdx[Idx_mbAddrA][5];
+							RefIdxA := RefIdxTab[Idx_mbAddrA][5];
 							MvB     := MvTab [Idx_mbAddrB][10];
-							RefIdxB := RefIdx[Idx_mbAddrB][10];
+							RefIdxB := RefIdxTab[Idx_mbAddrB][10];
 							if((Curr_Mb_Addr - pic_width_in_mb + 1) mod pic_width_in_mb != 0)then
 								Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_TAB;
 								MvC     := MvTab [Idx_mbAddrC][10];
-								RefIdxC := RefIdx[Idx_mbAddrA][10];
+								RefIdxC := RefIdxTab[Idx_mbAddrA][10];
 							else
 								Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_TAB;
 								MvC     := MvTab [Idx_mbAddrC][15];
-								RefIdxC := RefIdx[Idx_mbAddrA][15];	
+								RefIdxC := RefIdxTab[Idx_mbAddrA][15];	
 							end
 							if(    RefIdxA  = 0 and RefIdxB != 0 and RefIdxC != 0
 							    or RefIdxA != 0 and RefIdxB  = 0 and RefIdxC != 0
@@ -289,46 +293,175 @@ actor Algo_Mvpl0Reconstr()
 			FirstMbInSlice :[Fst_Mb],
 			PicWidthInMb   :[pic_width_in_mb]	
 				==>
+		var
+			uint(size=LOG2_SZ_TAB) Idx_mbAddrA = (Curr_Mb_Addr - 1) & MASK_TAB,
+			uint(size=LOG2_SZ_TAB) Idx_mbAddrB = (Curr_Mb_Addr - pic_width_in_mb) & MASK_TAB,
+			uint(size=LOG2_SZ_TAB) Idx_mbAddrC
+		do
+			Idx := Curr_Mb_Addr & MASK_TAB;
+			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0) then
+				ListRefIdxA := [-1,-1];
+				ListMvA     := [[0,0],[0,0]];
+			else
+				ListRefIdxA := [RefIdxTab[Idx_mbAddrA][5] , RefIdxTab[Idx_mbAddrA][13]];
+				ListMvA     := [MvTab [Idx_mbAddrA][5] , MvTab [Idx_mbAddrA][13]];
+			end
+			if( (Curr_Mb_Addr - Fst_Mb) < pic_width_in_mb) then
+				RefIdxB := -1;
+				MvB     := [0,0];
+			else
+				RefIdxB := RefIdxTab[Idx_mbAddrB][10];	
+				MvB     := MvTab[Idx_mbAddrB][10];	
+			end
+			if((Curr_Mb_Addr - pic_width_in_mb + 1) mod pic_width_in_mb != 0)then
+				Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_TAB;
+				MvC     := MvTab [Idx_mbAddrC][10];
+				RefIdxC := RefIdxTab[Idx_mbAddrA][10];
+			else
+				if((Curr_Mb_Addr - pic_width_in_mb - 1) != 0)then
+					Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_TAB;
+					MvC     := MvTab [Idx_mbAddrC][15];
+					RefIdxC := RefIdxTab[Idx_mbAddrA][15];	
+				else
+					RefIdxC := 0;
+					MvC :=[0,0];
+				end
+			end
 		end
 
-	ComputeMvpL0.Launch: action
-			==>
+	ComputeMvpL0.Launch16x8: action
+			RefIdx :[RefIdxCurr]
+				==>
 		guard
 			MbPartIdx < MbPartIdxMax,
-			Is_PredL0(MbType, MbPartIdx)
+			Is_PredL0(MbType, MbPartIdx),
+			SizeMbMv = SZ_16x8
+		var
+			List(type: int(size=16), size=2) MvpL0
 		do
+			if(MbPartIdx = 0)then
+				foreach int i in 0 .. 7
+				do
+					RefIdxTab[Idx][i] := RefIdxCurr;
+				end
+				MvpL0 := MvB;
+			else
+				foreach int i in 8 .. 15
+				do
+					RefIdxTab[Idx][i] := RefIdxCurr;
+				end
+				MvpL0 := ListMvA[1];
+			end
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	ComputeMvpL0.Launch8x16: action
+			RefIdx :[RefIdxCurr]
+				==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			Is_PredL0(MbType, MbPartIdx),
+			SizeMbMv = SZ_8x16
+		var
+			List(type: int(size=16), size=2) MvpL0
+		do
+			if(MbPartIdx = 0)then
+				foreach int i in 0 .. 3
+				do
+					RefIdxTab[Idx][i] := RefIdxCurr;
+				end
+				foreach int i in 8 .. 11
+				do
+					RefIdxTab[Idx][i] := RefIdxCurr;
+				end
+				MvpL0 := ListMvA[0];
+			else
+				foreach int i in 4 .. 7
+				do
+					RefIdxTab[Idx][i] := RefIdxCurr;
+				end
+				foreach int i in 12 .. 15
+				do
+					RefIdxTab[Idx][i] := RefIdxCurr;
+				end
+				MvpL0 := MvC;
+			end
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	ComputeMvpL0.Launch8x8: action
+				==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			Is_PredL0(MbType, MbPartIdx),
+			SizeMbMv = SZ_8x8
+		var
+			List(type: int(size=16), size=2) MvpL0
+		do
+		/*	if(RefIdxB = -1 and RefIdxC = -1)then
+				foreach int i in 0 .. 3
+				do
+					RefIdxTab[Idx][(MbPartIdx & 3) *4 + i] := RefIdxCurr;
+				end
+				MvpL0 := ListMvA[0];
+			else
+			end	*/
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	ComputeMvpL0.Launch16x16: action
+			RefIdx :[RefIdxCurr]
+				==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			Is_PredL0(MbType, MbPartIdx),
+			SizeMbMv = SZ_16x16
+		var
+			List(type: int(size=16), size=2) MvpL0
+		do
+			if(RefIdxB = -1 and RefIdxC = -1)then
+				foreach int i in 0 .. 15
+				do
+					RefIdxTab[Idx][i] := RefIdxCurr;
+				end
+				MvpL0 := ListMvA[0];
+			else
+				
+			end
 			MbPartIdx := MbPartIdx + 1;
 		end
 
 	ComputeMvpL0.Skip: action
-			==>
+				==>
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is_PredL0(MbType, MbPartIdx)
 		do
-			MbPartIdx := MbPartIdx + 1;	
+			MbPartIdx := MbPartIdx + 1;
 		end
 
-	ComputeMvpL0.Done: action
-			==>
+	ComputeMvpL0.Done: action ==>
 		guard
 			MbPartIdx = MbPartIdxMax
 		end
 
 	schedule fsm GetMbType:
-		GetMbType         (GetMbType.MacroBlkIorSI )--> EatTokens;
-		GetMbType         (GetMbType.P_Skip        )--> GetMbInfos4P_Skip;
-		GetMbType         (GetMbType.Others        )--> GetMbInfos4Others;
+		GetMbType         (GetMbType.MacroBlkIorSI  )--> EatTokens;
+		GetMbType         (GetMbType.P_Skip         )--> GetMbInfos4P_Skip;
+		GetMbType         (GetMbType.Others         )--> GetMbInfos4Others;
 
-		EatTokens         (EatTokens               )--> GetMbType;
+		EatTokens         (EatTokens                )--> GetMbType;
 
-		GetMbInfos4P_Skip (GetMbInfos.P_Skip       )--> GetMbType;
+		GetMbInfos4P_Skip (GetMbInfos.P_Skip        )--> GetMbType;
 
-		GetMbInfos4Others (GetMbInfos.P_Skip       )--> ComputeMvpL0;
+		GetMbInfos4Others (GetMbInfos.Others        )--> ComputeMvpL0;
 
-		ComputeMvpL0      (ComputeMvpL0.Launch     )--> ComputeMvpL0;
-		ComputeMvpL0      (ComputeMvpL0.Skip       )--> ComputeMvpL0;
-		ComputeMvpL0      (ComputeMvpL0.Done       )--> GetMbType;
+		ComputeMvpL0      (ComputeMvpL0.Launch16x8  )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvpL0.Launch8x16  )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvpL0.Launch8x8   )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvpL0.Launch16x16 )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvpL0.Skip        )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvpL0.Done        )--> GetMbType;
 
 	end
 

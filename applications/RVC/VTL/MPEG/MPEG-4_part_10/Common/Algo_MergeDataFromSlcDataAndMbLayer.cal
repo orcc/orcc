@@ -72,14 +72,16 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	uint(size=3)  SelectList
 		:
 
+	uint(size=6) BLOCK_TYPE_INTRA_MIN       = 0;
 	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
 	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
-	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
-	uint(size=6) MB_TYPE_P_8X8              = 29;
-	uint(size=6) MB_TYPE_P_8X8_REF0         = 30;
-	uint(size=6) MB_TYPE_B_8X8              = 53;
+	uint(size=6) BLOCK_TYPE_INTRA_MAX       = 25;
+	uint(size=6) BLOCK_TYPE_P_8X8           = 29;
+	uint(size=6) BLOCK_TYPE_P_8X8_REF0      = 30;
+	uint(size=6) BLOCK_TYPE_B_8X8           = 53;
+	uint(size=6) BLOCK_TYPE_P_SKIP          = 54;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -105,7 +107,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			Qp              :[ValQp],
 			Qp_Cb           :[ValQpCb],
 			Qp_Cr           :[ValQpCr],
-			MacroBlockType  :[MB_TYPE_P_8X8],
+			MacroBlockType  :[BLOCK_TYPE_P_SKIP],
 			slice_type      :[SLICE_TYPE_P]
 		guard
 			skip = true
@@ -217,22 +219,43 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			slice_type     :[ValSliceType]
 		guard
 			skip    = false,
-			Mb_type > MB_TYPE_INTRA_MAX
+			Mb_type > BLOCK_TYPE_INTRA_MAX
 		do
 			mb_type := Mb_type;
 		end
 
 	LaunchSubMbPred: action ==>
 		guard
-			   (mb_type = MB_TYPE_P_8X8)
-			or (mb_type = MB_TYPE_P_8X8_REF0)
-			or (mb_type = MB_TYPE_B_8X8)
+			   (mb_type = BLOCK_TYPE_P_8X8)
+			or (mb_type = BLOCK_TYPE_P_8X8_REF0)
+			or (mb_type = BLOCK_TYPE_B_8X8)
 		end
 
 	LaunchMbPred: action ==>
 		end
 
-	ReadMbPredParam1: action
+	ReadMbPredParam1.MbIntra: action
+			MbPredRefIdxL0     :[ref_idx_l0],
+			MbPredRefIdxL1     :[ref_idx_l1],
+			MbPredSelectList   :[selectlist],
+			MbPredMbPartHeight :[mb_part_height],
+			MbPredMbPartWidth  :[mb_part_width],
+			MbPredMbPartIdx    :[mb_part_idx],
+			MbPredEndRefIdxL0  :[Finished]
+				==>
+			RefIdxl0     :[ref_idx_l0],
+			RefIdxl1     :[ref_idx_l1],
+			MbPartHeight :[mb_part_height],
+			MbPartWidth  :[mb_part_width],
+			MbPartIdx    :[mb_part_idx],
+			SelectList   :[selectlist]
+		guard
+			Finished = false,
+			mb_type >= BLOCK_TYPE_INTRA_MIN,
+			mb_type <= BLOCK_TYPE_INTRA_MAX
+		end
+
+	ReadMbPredParam1.MbInter: action
 			MbPredRefIdxL0     :[ref_idx_l0],
 			MbPredRefIdxL1     :[ref_idx_l1],
 			MbPredSelectList   :[selectlist],
@@ -332,5 +355,6 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		ReadMbPredParam1   > ReadMbPredParam1Finished;
 		ReadMbPredParam2   > ReadMbPredParam2Finished;
 		ReadSubMbPredParam > ReadSubMbPredParamFinished;
+		ReadMbPredParam1.MbIntra > ReadMbPredParam1.MbInter;
 	end
 end

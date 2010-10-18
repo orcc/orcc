@@ -60,7 +60,7 @@
       <vertex id="MMCO" x="1619" y="1577"/>
       <vertex id="RefList0" x="2022" y="1192"/>
       <vertex id="IntraPredSplit" x="1536" y="351"/>
-      <vertex id="MVReconstruct" x="1986" y="903"/>
+      <vertex id="MVReconstruct" x="1994" y="854"/>
       <vertex id="BlockExpand" x="1997" y="527"/>
       <vertex id="BlockSplit" x="2209" y="289"/>
       <vertex id="DecodePic" x="980" y="618"/>

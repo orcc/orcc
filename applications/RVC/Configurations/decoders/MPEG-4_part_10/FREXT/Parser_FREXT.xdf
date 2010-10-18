@@ -697,4 +697,5 @@
     <Connection dst="MVReconstruct" dst-port="slice_type"
         src="DecodePic" src-port="slice_type"/>
     <Connection dst="MVReconstruct" dst-port="mb_type" src="DecodePic" src-port="MacroBlockType"/>
+    <Connection dst="MVReconstruct" dst-port="RefIdxL0" src="DecodePic" src-port="RefIdxL0"/>
 </XDF>
