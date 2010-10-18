@@ -1,0 +1,24 @@
+actor Demux2() ==> uint Out1, uint Out2:
+
+	// Send data on two channels.
+	uint max1 := 520; // Should be more than the default FIFO size
+	uint max2 := 520;
+	uint count1 := 0;
+	uint count2 := 0;
+	
+	// send on first channel
+	action ==> Out1:[count1]
+	guard (count1 < max1)
+	do
+		count1 := count1 + 1;
+	end
+	
+	// send on second channel
+	action ==> Out2:[count2]
+	guard (count2 < max2)
+	do
+		count2 := count2 + 1;
+	end
+	
+
+end
