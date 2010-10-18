@@ -1,7 +1,0 @@
-actor DownShifter () int In0, int In1, int In2, int In3 ==> int Out0, int Out1, int Out2, int Out3:
-
-	Shift: action In0:[in0], In1:[in1], In2:[in2], In3:[in3] ==>
-		Out0:[(in0+32)>>6], Out1:[(in1+32)>>6], Out2:[(in2+32)>>6], Out3:[(in3+32)>>6]
-	end
-	
-end
