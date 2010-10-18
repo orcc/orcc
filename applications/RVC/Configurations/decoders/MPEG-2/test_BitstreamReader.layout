@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<layout>
-   <vertices>
-      <vertex id="BitstreamReader_UT" x="126" y="184"/>
-      <vertex id="BitstreamReader" x="334" y="184"/>
-      <vertex id="ResultPrinter" x="319" y="85"/>
-   </vertices>
-</layout>
