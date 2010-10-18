@@ -1,0 +1,16 @@
+actor TypeError6 () ==> :
+	
+	// Check assignement from a larger list to a smaller list.
+	
+	action ==>
+	var
+		List(type:uint, size=8) l1 := [1, 2, 3, 4, 5, 6, 7, 8], // Fine
+		List(type:uint, size=2) l2 := [2, 4, 6], // Error
+		List(type:uint, size=5) l3
+	do
+		l3 := l1; // Error
+	end
+	
+end
+
+

@@ -1,0 +1,20 @@
+actor TypeError7 () ==> :
+	
+	// Check return type of a function.
+	
+	function map_succ(List(type:uint, size=5) list) --> List(type:uint, size=5):
+		// Ooops, wrong index used.
+		[list[i] + 1 : for int i in 0 .. 5] // Error
+	end
+	
+	action ==>
+	var
+		List(type:uint, size=5) l1 := [1, 2, 3, 4, 5],
+		List(type:uint, size=5) l2
+	do
+		l2 := map_succ(l1); // This assignement should be valid though.
+	end
+	
+end
+
+

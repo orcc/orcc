@@ -7,7 +7,7 @@ actor DuplicatedVariables (int a,
 
 	action P:[ x ] ==>
 	var
-		int x , int z , bool z , List(type: int, size=8) L
+		int x , int z , bool z , List(type: int, size=64) L
 	do
 		x := z;
 		z := z;

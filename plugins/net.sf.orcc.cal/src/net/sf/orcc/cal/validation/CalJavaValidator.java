@@ -316,7 +316,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		// check types
 		Type targetType = checker.getType(expression);
 		Type type = checker.getType(assign.getValue());
-		if (!checker.areTypeCompatible(type, targetType)) {
+		if (!checker.isConvertibleTo(type, targetType)) {
 			error("Type mismatch: cannot convert from " + type + " to "
 					+ targetType, assign,
 					CalPackage.AST_STATEMENT_ASSIGN__VALUE);
@@ -355,7 +355,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			Type actualType = checker.getType(expression);
 
 			// check types
-			if (!checker.areTypeCompatible(formalType, actualType)) {
+			if (!checker.isConvertibleTo(actualType, formalType)) {
 				error("Type mismatch: cannot convert from " + actualType
 						+ " to " + formalType, expression,
 						CalPackage.AST_EXPRESSION);
@@ -392,6 +392,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public void checkFunction(final AstFunction function) {
 		checkUniqueNames(function.getParameters());
 		checkUniqueNames(function.getVariables());
+		checkReturnType(function);
 
 		boolean used = new BooleanSwitch() {
 
@@ -596,6 +597,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			names.add(name);
 		}
 	}
+	
+	private void checkReturnType(AstFunction function) {
+		Type returnType = function.getIrType();
+		Type expressionType = function.getExpression().getIrType();
+		if (!checker.isConvertibleTo(expressionType, returnType)) {
+			error("Type mismatch: cannot convert from " + expressionType + " to "
+					+ returnType, function.getExpression(), CalPackage.AST_EXPRESSION);
+		}
+	}
 
 	@Check(CheckType.NORMAL)
 	public void checkVariable(AstVariable variable) {
@@ -605,7 +615,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			// check types
 			Type targetType = variable.getIrType();
 			Type type = checker.getType(value);
-			if (!checker.areTypeCompatible(type, targetType)) {
+			if (!checker.isConvertibleTo(type, targetType)) {
 				error("Type mismatch: cannot convert from " + type + " to "
 						+ targetType, variable, CalPackage.AST_VARIABLE);
 			}

@@ -105,6 +105,44 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		return getLub(t1, t2) != null;
 	}
+	
+	/**
+	 * Returns <code>true</code> if type src can be converted to type dst.
+	 * 
+	 * @param src
+	 *            a type
+	 * @param dst
+	 *            the type src should be converted to
+	 * @return <code>true</code> if type src can be converted to type dst
+	 */
+	public boolean isConvertibleTo(Type src, Type dst) {
+		if (src == null || dst == null) {
+			return false;
+		}
+
+		if (src.isBool() && src.isBool()) {
+			return true;
+		} else if (src.isFloat() && dst.isFloat()) {
+			return true;
+		} else if (src.isString() && dst.isString()) {
+			return true;
+		} else if (src.isInt() && dst.isInt()) {
+			return true;
+		} else if (src.isUint() && dst.isUint()) {
+			return true;
+		} else if (src.isInt() && dst.isUint()) {
+			return true;
+		} else if (src.isUint() && dst.isInt()) {
+			return true;
+		} else if (src.isList() && dst.isList()) {
+			TypeList typeSrc = (TypeList) src;
+			TypeList typeDst = (TypeList) dst;
+			// Recursively check type convertibility
+			return (isConvertibleTo(typeSrc.getType(), typeDst.getType())
+					&& typeSrc.getSize() <= typeDst.getSize());
+		}
+		return false;
+	}
 
 	@Override
 	public Type caseAstExpressionBinary(AstExpressionBinary expression) {
@@ -120,12 +158,38 @@ public class TypeChecker extends CalSwitch<Type> {
 	}
 
 	@Override
-	public Type caseAstExpressionCall(AstExpressionCall expression) {
-		if (expression.getFunction().eContainer() == null) {
-			return getTypeBuiltin(expression);
+	public Type caseAstExpressionCall(AstExpressionCall astCall) {
+		if (astCall.getFunction().eContainer() == null) {
+			return getTypeBuiltin(astCall);
+		}
+		
+		// user-defined function
+		AstFunction function = astCall.getFunction();
+		String name = function.getName();
+		List<AstExpression> parameters = astCall.getParameters();
+		if (function.getParameters().size() != parameters.size()) {
+			error("function " + name + " takes "
+					+ function.getParameters().size() + " arguments.",
+					astCall, CalPackage.AST_STATEMENT_CALL);
+			return null;
 		}
 
-		return expression.getFunction().getIrType();
+		Iterator<AstVariable> itFormal = function.getParameters().iterator();
+		Iterator<AstExpression> itActual = parameters.iterator();
+		while (itFormal.hasNext() && itActual.hasNext()) {
+			Type formalType = itFormal.next().getIrType();
+			AstExpression expression = itActual.next();
+			Type actualType = getType(expression);
+
+			// check types
+			if (!isConvertibleTo(actualType, formalType)) {
+				error("Type mismatch: cannot convert from " + actualType
+						+ " to " + formalType, expression,
+						CalPackage.AST_EXPRESSION);
+			}
+		}
+
+		return function.getIrType();
 	}
 
 	@Override
@@ -735,7 +799,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		}
 
 		if (parameters.size() != 2) {
-			error(name + "function takes exactly two parameters", astCall,
+			error(name + " function takes exactly two parameters", astCall,
 					CalPackage.AST_EXPRESSION_CALL__FUNCTION);
 			return null;
 		}

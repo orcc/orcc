@@ -1,0 +1,22 @@
+actor TypeError5 () ==> :
+	
+	// Type checking of the arguments of a procedure.
+	
+	procedure print5(List(type:uint, size=5) list)
+	begin
+		foreach int i in 0 .. 4
+		do
+			println(list[i]);
+		end
+	end
+	
+	action ==>
+	var
+		List(type:uint, size=8) l := [1, 2, 3, 4, 5, 6, 7, 8]
+	do
+		print5(l); // Error
+	end
+	
+end
+
+

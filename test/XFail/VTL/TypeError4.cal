@@ -1,0 +1,18 @@
+actor TypeError4 () ==> :
+	
+	// Type checking of the arguments of a function.
+	
+	function map_succ(List(type:uint, size=5) list) --> List(type:uint, size=5):
+		[list[i] + 1 : for int i in 0 .. 4]
+	end
+	
+	action ==>
+	var
+		List(type:uint, size=8) l := [1, 2, 3, 4, 5, 6, 7, 8]
+	do
+		l := map_succ(l); // Error
+	end
+	
+end
+
+
