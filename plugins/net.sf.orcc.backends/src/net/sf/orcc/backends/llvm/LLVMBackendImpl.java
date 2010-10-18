@@ -79,10 +79,11 @@ public class LLVMBackendImpl extends AbstractBackend {
 	public LLVMBackendImpl() {
 		transformations = new HashMap<String, String>();
 		transformations.put("abs", "abs_");
-		transformations.put("index", "index_");
 		transformations.put("getw", "getw_");
-		transformations.put("select", "select_");
+		transformations.put("index", "index_");
 		transformations.put("min", "min_");
+		transformations.put("max", "max_");
+		transformations.put("select", "select_");
 	}
 
 	@Override
