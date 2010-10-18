@@ -37,11 +37,11 @@
       <vertex id="DelList" x="2046" y="1580"/>
       <vertex id="IsIDR" x="2049" y="1612"/>
       <vertex id="Ref_List0" x="2194" y="1206"/>
-      <vertex id="MV" x="2218" y="939"/>
-      <vertex id="LOCATION" x="2200" y="903"/>
-      <vertex id="PART_SZ" x="2203" y="979"/>
-      <vertex id="mv_out" x="2208" y="1015"/>
-      <vertex id="ref_idx" x="2209" y="1057"/>
+      <vertex id="MV" x="2227" y="844"/>
+      <vertex id="LOCATION" x="2209" y="808"/>
+      <vertex id="PART_SZ" x="2212" y="884"/>
+      <vertex id="mv_out" x="2217" y="920"/>
+      <vertex id="ref_idx" x="2218" y="962"/>
       <vertex id="I_PCM_Y" x="1755" y="733"/>
       <vertex id="I_PCM_U" x="1749" y="664"/>
       <vertex id="I_PCM_V" x="1749" y="694"/>
@@ -60,7 +60,7 @@
       <vertex id="MMCO" x="1619" y="1577"/>
       <vertex id="RefList0" x="2022" y="1192"/>
       <vertex id="IntraPredSplit" x="1536" y="351"/>
-      <vertex id="MVReconstruct" x="1994" y="854"/>
+      <vertex id="MVReconstruct" x="1992" y="819"/>
       <vertex id="BlockExpand" x="1997" y="527"/>
       <vertex id="BlockSplit" x="2209" y="289"/>
       <vertex id="DecodePic" x="980" y="618"/>

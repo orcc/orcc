@@ -10,9 +10,9 @@
       <vertex id="PicWidthInMb" x="38" y="362"/>
       <vertex id="MbIntraFlag" x="47" y="260"/>
       <vertex id="FirstMbInSlice" x="49" y="221"/>
-      <vertex id="slice_type" x="236" y="615"/>
-      <vertex id="mb_type" x="248" y="586"/>
-      <vertex id="RefIdxL0" x="114" y="657"/>
+      <vertex id="slice_type" x="325" y="738"/>
+      <vertex id="mb_type" x="328" y="707"/>
+      <vertex id="MbPredRefIdxL0" x="309" y="643"/>
       <vertex id="MV" x="855" y="355"/>
       <vertex id="LOCATION" x="461" y="178"/>
       <vertex id="PartSZ" x="470" y="222"/>
@@ -22,6 +22,7 @@
       <vertex id="Algo_MVR_MultiFrameAdptive" x="447" y="319"/>
       <vertex id="Algo_Add" x="744" y="318"/>
       <vertex id="MvpL0_Reconstr" x="631" y="578"/>
-      <vertex id="a" x="289" y="738"/>
+      <vertex id="SubMbPredRefIdxL0" x="299" y="677"/>
+      <vertex id="sub_mb_type" x="315" y="767"/>
    </vertices>
 </layout>

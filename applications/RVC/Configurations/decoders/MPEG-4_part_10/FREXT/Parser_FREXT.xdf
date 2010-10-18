@@ -697,5 +697,10 @@
     <Connection dst="MVReconstruct" dst-port="slice_type"
         src="DecodePic" src-port="slice_type"/>
     <Connection dst="MVReconstruct" dst-port="mb_type" src="DecodePic" src-port="MacroBlockType"/>
-    <Connection dst="MVReconstruct" dst-port="RefIdxL0" src="DecodePic" src-port="RefIdxL0"/>
+    <Connection dst="MVReconstruct" dst-port="MbPredRefIdxL0"
+        src="DecodePic" src-port="MbPredRefIdxL0"/>
+    <Connection dst="MVReconstruct" dst-port="SubMbPredRefIdxL0"
+        src="DecodePic" src-port="SubMbPredRefIdxL0"/>
+    <Connection dst="MVReconstruct" dst-port="sub_mb_type"
+        src="DecodePic" src-port="SubMbType"/>
 </XDF>

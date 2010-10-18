@@ -80,7 +80,7 @@
       <vertex id="RefIdx_l1" x="2617" y="1786"/>
       <vertex id="SelectList" x="2616" y="1855"/>
       <vertex id="slice_type" x="2600" y="1927"/>
-      <vertex id="RefIdxL0" x="2183" y="1430"/>
+      <vertex id="MbPredRefIdxL0" x="2183" y="1430"/>
       <vertex id="Mgnt_DecodePic" x="1515" y="-132"/>
       <vertex id="DecodeSliceHeader" x="329" y="460"/>
       <vertex id="DecodeRefPicList" x="950" y="644"/>
@@ -90,8 +90,10 @@
       <vertex id="DecodeMbPred" x="1757" y="1321"/>
       <vertex id="DecodeResidual" x="1732" y="891"/>
       <vertex id="DecodeResidualBlock_Cavlc" x="2318" y="959"/>
-      <vertex id="DecodeSubMbPred" x="1756" y="1691"/>
+      <vertex id="DecodeSubMbPred" x="1742" y="1736"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="2238" y="1461"/>
       <vertex id="GenerateSkipBlockInformation" x="2299" y="1210"/>
+      <vertex id="SubMbPredRefIdxL0" x="1967" y="1693"/>
+      <vertex id="SubMbType" x="1980" y="1977"/>
    </vertices>
 </layout>

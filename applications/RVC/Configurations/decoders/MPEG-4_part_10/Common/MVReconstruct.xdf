@@ -80,7 +80,21 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="RefIdxL0">
+    <Port kind="Input" name="MbPredRefIdxL0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SubMbPredRefIdxL0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="sub_mb_type">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="4"/>
@@ -167,15 +181,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="a">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/Trash/a"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -211,6 +216,8 @@
     <Connection dst="MvpL0_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="MvpL0_Reconstr" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="MvpL0_Reconstr" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="a" dst-port="RefIdx" src="" src-port="RefIdxL0"/>
-    <Connection dst="MvpL0_Reconstr" dst-port="RefIdx" src="" src-port="RefIdxL0"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="Mv" src="Algo_Add" src-port="Z"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="MbPredRefIdx" src="" src-port="MbPredRefIdxL0"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL0"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
 </XDF>

@@ -495,7 +495,21 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdxL0">
+    <Port kind="Output" name="MbPredRefIdxL0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SubMbPredRefIdxL0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SubMbType">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="4"/>
@@ -684,8 +698,6 @@
         src="DecodeSubMbPred" src-port="VldParam"/>
     <Connection dst="DecodeSubMbPred" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="SubMbPredValVLD"/>
-    <Connection dst="DecodeMacroBlockLayer" dst-port="SubMbType"
-        src="DecodeSubMbPred" src-port="MBLayerSubMbType"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="FstMbInSlc"
         src="DecodeSliceHeader" src-port="FirstMbInSlice"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
@@ -696,8 +708,6 @@
         dst-port="TransfSz8x8Flag" src="DecodeMacroBlockLayer" src-port="MergeTransfSz8x8"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="RemIntraYxYPredMode" src="DecodeMbPred" src-port="RemIntraYxYPredMode"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="SubMbPredRefIdxL0" src="DecodeSubMbPred" src-port="RefIdxL0"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="SubMbPredEndRefIdxL0" src="DecodeSubMbPred" src-port="EndRefIdxL0"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
@@ -889,8 +899,6 @@
     <Connection dst="" dst-port="RefIdx_l1"
         src="MergeDataFromSDataAndMbLayer" src-port="RefIdxl1"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="SubMbPredRefIdxL1" src="DecodeSubMbPred" src-port="RefIdxL1"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredRefIdxL1" src="DecodeMbPred" src-port="RefIdxL1"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="SubMbPredSelectList" src="DecodeSubMbPred" src-port="SelectList"/>
@@ -916,5 +924,14 @@
         src="DecodeSliceData_Cavlc" src-port="MbLayerParameters"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredRefIdxL0" src="DecodeMbPred" src-port="RefIdxl0"/>
-    <Connection dst="" dst-port="RefIdxL0" src="DecodeMbPred" src-port="RefIdxL0"/>
+    <Connection dst="" dst-port="MbPredRefIdxL0" src="DecodeMbPred" src-port="RefIdxL0"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredRefIdxL1" src="DecodeSubMbPred" src-port="RefIdxl1"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="SubMbPredRefIdxL0" src="DecodeSubMbPred" src-port="RefIdxl0"/>
+    <Connection dst="" dst-port="SubMbPredRefIdxL0"
+        src="DecodeSubMbPred" src-port="RefIdxL0"/>
+    <Connection dst="DecodeMacroBlockLayer" dst-port="SubMbType"
+        src="DecodeSubMbPred" src-port="SubMbType"/>
+    <Connection dst="" dst-port="SubMbType" src="DecodeSubMbPred" src-port="SubMbType"/>
 </XDF>
