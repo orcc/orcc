@@ -271,17 +271,11 @@ i++;
 >>
 
 actionTest(action) ::= <<
-if(isSchedulable_$action$())
+if(isSchedulable_$action$()$if(action.outputPattern)$ && $outputPattern(pattern=action.outputPattern)$$endif$)
 {
-	$if(action.outputPattern)$
-	if($outputPattern(pattern=action.outputPattern)$)
-	{
-		$actionCall(action)$
-	}
-	$else$
 	$actionCall(action)$
-	$endif$
-}>>
+}
+>>
 
 schedulingTest(actions) ::= <<
 $actions: actionTest(); separator="\nelse "$
