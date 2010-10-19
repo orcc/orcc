@@ -342,6 +342,7 @@ actor Mgnt_MVR ()
   guard
     mbpart_w = 8 and mbpart_h = 16  
   do
+  		println("GetMv");
 	if(DEBUG_INPUT) then
 		println("Input Mgnt_MVR MV:"+a+" ; "+b);
 	end	
@@ -357,6 +358,7 @@ actor Mgnt_MVR ()
   
   get_mv.others: action MV:[a,b] ==> 
   do
+  		println("GetMv");
 	if(DEBUG_INPUT) then
 		println("Input Mgnt_MVR MV:"+a+" ; "+b);
 	end	
