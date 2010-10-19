@@ -57,7 +57,7 @@ void writer_initialize() {
 		exit(1);
 	}
 
-	F = fopen(write_file, "w");
+	F = fopen(write_file, "wb");
 	if (F == NULL) {
 		if (write_file == NULL) {
 			write_file = "<null>";
@@ -67,44 +67,92 @@ void writer_initialize() {
 		wait_for_key();
 		exit(1);
 	}else{
-		fseek(F,0,SEEK_SET);
-		cnt++;	
+		fseek(F,0,SEEK_SET);	
 	}
 }
 
 extern struct fifo_u8_s *writer_In;
+extern struct fifo_i32_s *writer_EOF;
 
+enum states {
+	s_Test = 0,
+	s_Write
+};
+
+static char *stateNames[] = {
+	"s_Test",
+	"s_Write"
+};
+
+static enum states _FSM_state = s_Test;
 
 void writer_scheduler(struct schedinfo_s *si) {
 	int i = 0;
+	i32 EOF_buf[1];
+	i32 *pEOF;
+	i32 eof_1;
 	u8 In_buf[1];
 	u8 *In;
 	u8 wr;
+	
 
-	while (1) {
-		if (fifo_u8_has_tokens(writer_In, 1)) {
-			In = fifo_u8_read(writer_In, In_buf, 1);
-			wr = In[0];
-	
-			if (cnt != 0){
-				F = fopen(write_file,"a+");
-			}
-	
-			
-			fseek(F,sizeof(u8)*cnt,SEEK_SET);
-			fwrite(&wr,sizeof(u8),1,F);
-			
-			
-			i++;
-			fclose(F);
-			fifo_u8_read_end(writer_In, 1);
-			
-		} else {
-			si->num_firings = i;
-			si->reason = starved;
-			si->ports = 0x01;
-			break;
-		}
+	// jump to FSM state 
+	switch (_FSM_state) {
+	case s_Test:
+		goto l_Test;
+	case s_Write:
+		goto l_Write;
+	default:
+		printf("unknown state: %s\n", stateNames[_FSM_state]);
+		wait_for_key();
+		exit(1);
 	}
+
+	// FSM transitions
+
+l_Test:
+	if ( fifo_i32_has_tokens(writer_EOF, 1) ) {
+		pEOF = fifo_i32_read(writer_EOF, EOF_buf, 1);
+		eof_1 = pEOF[0];
+		if (eof_1 == 0) {				
+			i++;
+			fifo_i32_read_end(writer_EOF, 1);
+			goto l_Write;
+		}else{
+			//Exit the program, EOF is reached
+			fclose(F);
+			fifo_i32_read_end(writer_EOF, 1);
+			exit(666);
+		}
+	} else {
+		_FSM_state = s_Test;
+		si->num_firings = i;
+		si->reason = starved;
+		si->ports = 0x02;
+		return;
+	}
+
+l_Write:
+	if (fifo_u8_has_tokens(writer_In, 1)) {
+		In = fifo_u8_read(writer_In, In_buf, 1);
+		wr = In[0];
+	
+		fseek(F,sizeof(u8)*cnt,SEEK_SET);
+		fwrite(&wr,sizeof(u8),1,F);
+		cnt++;	
+		
+		fifo_u8_read_end(writer_In, 1);
+		
+		i++;
+		goto l_Test;
+	} else {
+		_FSM_state = s_Write;
+		si->num_firings = i;
+		si->reason = starved;
+		si->ports = 0x01;
+		return;
+	}
+
 }
+
 

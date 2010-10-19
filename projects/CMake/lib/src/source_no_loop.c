@@ -70,27 +70,74 @@ void source_no_loop_initialize() {
 }
 
 extern struct fifo_i8_s *source_no_loop_O;
+extern struct fifo_i32_s *source_no_loop_EOF;
 
 void source_no_loop_scheduler(struct schedinfo_s *si) {
+	i32 *pEOF;
+	i32 EOF_buf[1];	
 	unsigned char *ptr;
 	int i = 0;
 	int n;
+	int stop = 0;
+	while (1){
+		
+		if (!stop){
+			int ports = 0;			
+			if (!fifo_i8_has_room(source_no_loop_O, 1)) {
+				ports |= 0x01;
+			}
+			if (!fifo_i32_has_room(source_no_loop_EOF, 1)) {
+				ports |= 0x02;
+			}
+			if (ports != 0) {
+				si->num_firings = i;
+				si->reason = full;
+				si->ports = ports;
+				break;
+			}	
 	
-	
-	while (fifo_i8_has_room(source_no_loop_O, 1)) {
-		i8 source_no_loop_O_buf[1];
-		ptr = fifo_i8_write(source_no_loop_O, source_no_loop_O_buf, 1);
-		n = fread(ptr, 1, 1, F);
-		if (n < 1) {
-			exit(666);
+		
+			i8 source_no_loop_O_buf[1];
+			ptr = fifo_i8_write(source_no_loop_O, source_no_loop_O_buf, 1);
+			n = fread(ptr, 1, 1, F);
+			if (n < 1) {
+				// See if we have the end of the file			
+				if (feof(F)) {
+					stop = 1;
+				} 
+			}else{
+				// Sent "FALSE" EOF token			
+				pEOF = fifo_i32_write(source_no_loop_EOF, EOF_buf, 1);
+				pEOF[0] = 0;
+				fifo_i32_write_end(source_no_loop_EOF, EOF_buf, 1);
+				// Sent read data
+				fifo_i8_write_end(source_no_loop_O, source_no_loop_O_buf, 1);
+				i++;
+				cnt++;	
+			}
+		}else{
+			int ports = 0;
+			if (!fifo_i32_has_room(source_no_loop_EOF, 1)) {
+				ports |= 0x02;
+			}
+			if (ports != 0) {
+				si->num_firings = i;
+				si->reason = full;
+				si->ports = ports;
+				break;
+			}							
+									
+			//Sent "TRUE" EOF token
+			pEOF = fifo_i32_write(source_no_loop_EOF, EOF_buf, 1);
+			pEOF[0] = 1;
+			fifo_i32_write_end(source_no_loop_EOF, EOF_buf, 1);
+			//Stop source				
+			break;
 		}
-
-		i++;
-		cnt++;
-		fifo_i8_write_end(source_no_loop_O, source_no_loop_O_buf, 1);
 	}
-
+		
 	si->num_firings = i;
 	si->reason = full;
-	si->ports = 0x01; // FIFO connected to first output port is empty
+	si->ports = 0x00; // FIFO connected to first output port is empty
 }
+
