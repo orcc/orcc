@@ -37,6 +37,8 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -196,6 +198,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	@Override
 	public void visit(PhiAssignment phi) {
 		List<Expression> values = phi.getValues();
+		LocalVariable target = phi.getTarget();
 		OrderedMap<String, Variable> parameters = procedure.getParameters();
 
 		// Visit expressions of value of phi
@@ -211,7 +214,24 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 				// Local variable must not be a parameter of the procedure
 				if (source.getIndex() == 0
 						&& !parameters.contains(source.getName())) {
-					values.set(values.indexOf(value), new IntExpr(0));
+					Expression constExpr;
+					Type type = target.getType();
+
+					// Creating constants value
+					if (type.isList()) {
+						TypeList typeList = (TypeList) type;
+						List<Expression> constants = new ArrayList<Expression>();
+
+						for (int i = 0; i < typeList.getSize(); i++) {
+							constants.add(new IntExpr(0));
+						}
+
+						constExpr = new ListExpr(constants);
+					} else {
+						constExpr = new IntExpr(0);
+					}
+
+					values.set(values.indexOf(value), constExpr);
 				}
 			}
 		}

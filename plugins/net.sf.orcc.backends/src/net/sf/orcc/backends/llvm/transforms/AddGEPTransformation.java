@@ -38,6 +38,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
@@ -56,14 +57,13 @@ public class AddGEPTransformation extends AbstractActorTransformation {
 
 	private String file;
 
-	private Variable addGEP(Variable array, List<Expression> indexes,
-			ListIterator<Instruction> it) {
+	private Variable addGEP(Variable array, Type type,
+			List<Expression> indexes, ListIterator<Instruction> it) {
 		List<Expression> GepIndexes = new ArrayList<Expression>(indexes);
-		TypeList type = (TypeList) array.getType();
 
 		// Make a new localVariable that will contains the elt to access
-		LocalVariable eltVar = procedure.newTempLocalVariable(file,
-				type.getElementType(), array.getName() + "_" + "elt");
+		LocalVariable eltVar = procedure.newTempLocalVariable(file, type,
+				array.getName() + "_" + "elt");
 
 		GEP gepInstr = new GEP(eltVar, new Use(array), GepIndexes);
 
@@ -86,13 +86,14 @@ public class AddGEPTransformation extends AbstractActorTransformation {
 	@Override
 	public void visit(Load load) {
 		Use source = load.getSource();
+		LocalVariable target = load.getTarget();
 		List<Expression> indexes = load.getIndexes();
 
 		if (!indexes.isEmpty()) {
 			instructionIterator.previous();
 
-			Variable newSource = addGEP(source.getVariable(), indexes,
-					instructionIterator);
+			Variable newSource = addGEP(source.getVariable(), target.getType(),
+					indexes, instructionIterator);
 
 			load.setSource(new Use(newSource));
 			removeIndexes(load, indexes);
@@ -109,8 +110,10 @@ public class AddGEPTransformation extends AbstractActorTransformation {
 
 		if (!indexes.isEmpty()) {
 			instructionIterator.previous();
+			TypeList typeList = (TypeList) target.getType();
 
-			Variable newTarget = addGEP(target, indexes, instructionIterator);
+			Variable newTarget = addGEP(target, typeList.getElementType(),
+					indexes, instructionIterator);
 
 			store.setTarget(newTarget);
 			removeIndexes(store, indexes);

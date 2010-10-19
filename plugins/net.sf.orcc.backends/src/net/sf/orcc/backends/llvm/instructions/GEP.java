@@ -144,6 +144,17 @@ public class GEP extends SpecificInstruction implements LocalTargetContainer,
 		this.target = target;
 	}
 
+	/**
+	 * Returns true if the current instruction is GEP (which is always true for
+	 * the current instruction). This method is only useable to detect this
+	 * specific instruction in template document.
+	 * 
+	 * @return true if current instruction is GEP
+	 */
+	public boolean isGep() {
+		return true;
+	}
+
 	@Override
 	public boolean isLoad() {
 		return true;

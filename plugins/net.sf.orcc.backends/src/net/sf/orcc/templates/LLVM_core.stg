@@ -30,8 +30,8 @@ Var(var) ::= <<
 $if(var.global)$@$else$%$endif$$var$
 >>
 
-Expr(expr) ::= <<
-$if(expr.varExpr)$$Var(expr.var.variable)$$else$$expr$$endif$
+Expr(expr, type) ::= <<
+$if(expr.varExpr)$$Var(expr.var.variable)$$else$$ConstantValue(const=expr, type=type)$$endif$
 >>
 
 ExprType(expr) ::= <<
@@ -49,13 +49,15 @@ $list.type.elementType$
 variableDeclaration(variable) ::= <<
 $if(!variable.port)
 $$if(variable.type.list)
-$$AllocaOp(result={%$variable$}, type=variable.type)$$
-endif$$
+$$if(variable.instruction.store || !variable.instruction)$
+$AllocaOp(result={%$variable$}, type=variable.type)$
+$endif$
+$endif$$
 endif$
 >>
 
 indexes(indexes) ::= <<
-$indexes: { index | $if(index.type)$$index.type$$else$i32$endif$ $Expr(index)$ }; separator=", "$
+$indexes: { index | $if(index.type)$$index.type$$else$i32$endif$ $Expr(expr=index, type=index.type)$ }; separator=", "$
 >>
 
 indexesName(indexes) ::= <<
@@ -67,7 +69,7 @@ $arguments, parameters, casts: { arg, param, cast | $parameters(type = arg.type,
 >>
 
 parameters(type, variable, cast, location) ::= <<
-$if(variable.intExpr)$$type$ $elseif(type.list)$$type$* $elseif(variable.booleanExpr)$i1 $else$$variable.type$ $endif$$if(cast)$%$variable$$location$_cast$else$$Expr(variable)$$endif$
+$if(variable.intExpr)$$type$ $elseif(type.list)$$type$* $elseif(variable.booleanExpr)$i1 $else$$variable.type$ $endif$$if(cast)$%$variable$$location$_cast$else$$Expr(expr=variable, type=variable.type)$$endif$
 >>
 
 argumentDeclaration(variable) ::= <<
@@ -206,7 +208,7 @@ StoreInstr(ty, value, pty, ptr, cast) ::= <<
 $if(value.intExpr || value.booleanExpr)
 $store $pty$ $value$$cast$, $pty$* $ptr$$
 else
-$store $ty$ $Expr(value)$$cast$, $pty$* $ptr$$
+$store $ty$ $Expr(expr=value, type=ty)$$cast$, $pty$* $ptr$$
 endif$
 >>
 
@@ -219,7 +221,7 @@ PrintParameter(parameter) ::= <<
 $if (parameter.type.string)
 $ i8* noalias getelementptr inbounds ($parameter.type$* @$parameter$, i64 0, i64 0) $
 else
-$$parameter.type$ $Expr(parameter)$$
+$$parameter.type$ $Expr(expr=parameter, type=parameter.type)$$
 endif$
 
 >>
@@ -230,12 +232,12 @@ endif$
 
 CastParameter(casts, args, params, location )::= <<
 $casts, args, params: { cast, arg, param | $if(cast)$ 
-$BitcastOp(result={%$param$$location$_cast}, ty={$param.type$*}, value=Expr(param), ty2={$arg.type$*})$
+$BitcastOp(result={%$param$$location$_cast}, ty={$param.type$*}, value=Expr(expr=param, type=param.type), ty2={$arg.type$*})$
 $endif$}$
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
-	$BrOp(cond=Expr(ifNode.value), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.elseNodes)$})$
+	$BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.elseNodes)$})$
 
 b$label(ifNode.thenNodes)$: 
 $Nodes_cond(first(ifNode.thenNodes))$ $Nodes(rest(ifNode.thenNodes))$
@@ -250,7 +252,7 @@ b$label(ifNode.joinNode)$:
 >>
 
 IfWithThenNode(ifNode) ::= <<
-	$BrOp(cond=Expr(ifNode.value), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.joinNode)$})$
+	$BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.joinNode)$})$
 
 b$label(ifNode.thenNodes)$: 
 $Nodes_cond(first(ifNode.thenNodes))$ $Nodes(rest(ifNode.thenNodes))$
@@ -267,11 +269,11 @@ LoadLocalPort(instr) ::= <<
 label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
 
 phiPairs(phi) ::= <<
-$phiExpr(expr=first(phi.values), node = first(phi.block.predecessors))$, $phiExpr(expr=first(rest(phi.values)), node = rest(phi.block.predecessors))$
+$phiExpr(expr=first(phi.values), type=phi.target.type , node = first(phi.block.predecessors))$, $phiExpr(expr=first(rest(phi.values)), type=phi.target.type, node = rest(phi.block.predecessors))$
 >>
 
-phiExpr(expr, node) ::= <<
-[$Expr(expr)$ , %b$label(node)$ ]
+phiExpr(expr, type, node) ::= <<
+[$Expr(expr=expr, type=type)$ , %b$label(node)$ ]
 >>
 
 
@@ -375,7 +377,7 @@ $CallOp(ty ="void", fnptrval={fifo_$fifoType(readEnd.port)$_read_end}, function_
 Return(return) ::= <<
 
 $if(return.value)$$
-RetOp(type=return.value.type, value=Expr(return.value))$$
+RetOp(type=return.value.type, value=Expr(expr=return.value, type=return.value.type))$$
 else
 $$RetOp()$$
 endif$
@@ -418,7 +420,7 @@ $Nodes(rest(ifNode.joinNode))$
 // while node
 WhileNode(whileNode) ::= <<
 $BlockNode(whileNode.joinNode)$
-	$BrOp(cond=Expr(whileNode.value), iftrue={%b$label(whileNode.Nodes)$}, iffalse={%b$label(whileNode.joinNode.successors)$})$
+	$BrOp(cond=Expr(expr=whileNode.value, type=whileNode.value.type), iftrue={%b$label(whileNode.Nodes)$}, iffalse={%b$label(whileNode.joinNode.successors)$})$
 
 b$label(whileNode.nodes)$:
 $Nodes_cond(first(whileNode.nodes))$
