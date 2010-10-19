@@ -79,6 +79,7 @@ void source_no_loop_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 	int n;
 	int stop = 0;
+	i8 source_no_loop_O_buf[1];
 	while (1){
 		
 		if (!stop){
@@ -97,7 +98,7 @@ void source_no_loop_scheduler(struct schedinfo_s *si) {
 			}	
 	
 		
-			i8 source_no_loop_O_buf[1];
+			
 			ptr = fifo_i8_write(source_no_loop_O, source_no_loop_O_buf, 1);
 			n = fread(ptr, 1, 1, F);
 			if (n < 1) {
