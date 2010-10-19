@@ -328,7 +328,7 @@ public class ExpressionSplitterTransformation extends
 		List<CFGNode> nodes = procedure.getNodes();
 		if (nodes.size() > 0) {
 			CFGNode lastNode = nodes.get(nodes.size() - 1);
-			AbstractNode.setLabelCount(lastNode.getLabel() + 1);
+			AbstractNode.setLabelCount(lastNode.getLabel() + 2);
 		}
 		super.visitProcedure(procedure);
 	}
