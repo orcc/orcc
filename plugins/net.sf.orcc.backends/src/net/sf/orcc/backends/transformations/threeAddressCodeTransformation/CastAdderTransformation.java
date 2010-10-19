@@ -149,11 +149,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		}
 
 		private boolean isSpecificOperation(BinaryOp op) {
-			if (op == BinaryOp.MOD) {
-				return true;
-			}
-
-			return false;
+			return op == BinaryOp.MOD;
 		}
 
 	}

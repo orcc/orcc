@@ -184,27 +184,39 @@ map<string, Procedure*>* IRParser::parseProcs(Module* module){
 
 ActionScheduler* IRParser::parseActionScheduler(Module* module){
 	NamedMDNode* inputsMD =  module->getNamedMetadata(IRConstant::KEY_ACTION_SCHED);
+	
 	MDNode* actionSchedulerMD = cast<MDNode>(inputsMD->getOperand(0));
+	list<Action*>* actions = new list<Action*>();
 	Function* schedulerFunction = NULL;
 	Function* initializeFunction = NULL;
 	FSM* fsm = NULL;
-	
-	//Get fsm if present
-	Value* fsmNode = actionSchedulerMD->getOperand(0);
 
-	if (fsmNode != NULL){
-		fsm = parseFSM(cast<MDNode>(fsmNode));
+	//Get actions outside fsm if present
+	Value* actionsValue = actionSchedulerMD->getOperand(0);
+
+	if (actionsValue != NULL){
+		MDNode* actionsNode =  cast<MDNode>(actionsValue);
+		for (unsigned i = 0, e = actionsNode->getNumOperands(); i != e; ++i) {
+			actions->push_back(getAction(cast<MDNode>(actionsNode->getOperand(i))));
+		}
+	}
+
+	//Get fsm if present
+	Value* fsmValue = actionSchedulerMD->getOperand(1);
+
+	if (fsmValue != NULL){
+		fsm = parseFSM(cast<MDNode>(fsmValue));
 	}
 
 	//Get function corresponding to the action scheduler
-	schedulerFunction = cast<Function>(actionSchedulerMD->getOperand(1));
+	schedulerFunction = cast<Function>(actionSchedulerMD->getOperand(2));
 
 	//Get fsm if present
-	if (actionSchedulerMD->getNumOperands() > 2){
-		initializeFunction = cast<Function>(actionSchedulerMD->getOperand(2));
+	if (actionSchedulerMD->getNumOperands() > 3){
+		initializeFunction = cast<Function>(actionSchedulerMD->getOperand(3));
 	}
 
-	return new ActionScheduler(schedulerFunction, initializeFunction, fsm);
+	return new ActionScheduler(actions, schedulerFunction, initializeFunction, fsm);
 }
 
 map<string, Variable*>* IRParser::parseParameters(Module* module){
@@ -423,24 +435,23 @@ FSM* IRParser::parseFSM(llvm::MDNode* node){
 }
 
 Action* IRParser::getAction(llvm::MDNode* node) {
-	//Get identifier of the action
-	node = cast<MDNode>(node->getOperand(0));
-
-	if (node->getNumOperands() == 0){
+	Value* idValue = node->getOperand(0);
+	
+	if (idValue == NULL){
 		// removes the first untagged action found
-		list<Action*>::iterator it;
+		Action* action = untaggedActions.front();
+		untaggedActions.remove(action);
 		
-		it = untaggedActions.begin();
-		untaggedActions.erase(it);
-		return *it;
+		return action;
 	}
 	
 	//Get identifiers of action tag
 	map<std::string, Action*>::iterator it;
 	ActionTag tag;
+	MDNode* idNode = cast<MDNode>(idValue);
 	
-	for (unsigned i = 0, e = node->getNumOperands(); i != e; ++i){
-		MDString* tagMD = cast<MDString>(node->getOperand(i));
+	for (unsigned i = 0, e = idNode->getNumOperands(); i != e; ++i){
+		MDString* tagMD = cast<MDString>(idNode->getOperand(i));
 		tag.add(tagMD->getString());
 	}
 	

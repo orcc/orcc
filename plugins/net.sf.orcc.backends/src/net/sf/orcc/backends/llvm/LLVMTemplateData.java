@@ -30,6 +30,7 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -37,6 +38,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
@@ -83,12 +85,23 @@ public class LLVMTemplateData {
 		if (!action.getTag().getIdentifiers().isEmpty()) {
 			templateDataMap.put(action.getTag(), id++);
 		}
+
+		// Write port pattern
+		computePattern(action.getInputPattern());
+		computePattern(action.getOutputPattern());
+
+		// Write action elements
 		templateDataMap.put(action.getScheduler(), id++);
 		templateDataMap.put(action.getBody(), id++);
 	}
 
 	private void computeActionScheduler(ActionScheduler actSched) {
 		templateDataMap.put(actor.getActionScheduler(), id++);
+
+		if (!actSched.getActions().isEmpty()) {
+			templateDataMap.put(actSched.getActions(), id++);
+		}
+
 		if (actSched.hasFsm()) {
 			FSM fsm = actSched.getFsm();
 			templateDataMap.put(fsm, id++);
@@ -102,6 +115,16 @@ public class LLVMTemplateData {
 					templateDataMap.put(nextState, id++);
 				}
 
+			}
+		}
+	}
+
+	private void computePattern(Pattern pattern) {
+		if (!pattern.isEmpty()) {
+			templateDataMap.put(pattern, id++);
+
+			for (Entry<Port, Integer> entry : pattern.entrySet()) {
+				templateDataMap.put(entry, id++);
 			}
 		}
 	}

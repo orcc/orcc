@@ -412,5 +412,5 @@ ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler*
 	//Create action scheduler
 	Function* schedulerFunction = CreateFunction(instance, actionScheduler->getSchedulerFunction());
 
-	return new ActionScheduler(schedulerFunction, initializeFunction, fsm);
+	return new ActionScheduler(new list<Action*>(), schedulerFunction, initializeFunction, fsm);
 }

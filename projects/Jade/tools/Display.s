@@ -109,7 +109,7 @@ declare void @write_mb(i8*)
 
 !0 = metadata !{metadata !"tools/Display.bc"}
 !1 = metadata !{metadata !"Display"}
-!2 = metadata !{null, void()* @scheduler}
+!2 = metadata !{null, null, void()* @scheduler}
 !3 = metadata !{metadata !4, metadata !"B", %struct.fifo_u8_s** @B}
 !4 = metadata  !{ i32 8 ,  null }
 !5 = metadata !{metadata !6, metadata !"WIDTH", %struct.fifo_i16_s** @WIDTH}

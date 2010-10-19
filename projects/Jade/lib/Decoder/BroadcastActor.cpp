@@ -91,7 +91,7 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 		outputs->insert(pair<string, Port*>(outputName.str(), outputPort));
 	}
 
-	this->actionScheduler = new ActionScheduler(createActionScheduler(), NULL, NULL);
+	this->actionScheduler = new ActionScheduler(new list<Action*>(), createActionScheduler(), NULL, NULL);
 }
 
 InstancedActor* BroadcastActor::instanciate(Instance* instance){

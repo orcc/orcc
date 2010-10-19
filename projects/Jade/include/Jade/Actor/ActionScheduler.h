@@ -40,6 +40,7 @@
 #define ACTIONSCHEDULER_H
 
 #include <string>
+#include <list>
 
 namespace llvm {
 	class Function;
@@ -65,9 +66,17 @@ public:
 	 *
 	 *	@param function : llvm::Function corresponding to the action scheduler
      */
-	ActionScheduler(llvm::Function* schedulerFunction, llvm::Function* initializeFunction, FSM* fsm){
+	ActionScheduler(std::list<Action*>* actions, llvm::Function* schedulerFunction, llvm::Function* initializeFunction, FSM* fsm){
 		this->fsm = fsm;
+		this->actions = actions;
 		this->schedulerFunction = schedulerFunction;
+		this->initializeFunction = initializeFunction;
+	};
+
+	ActionScheduler(std::list<Action*>* actions, llvm::Function* initializeFunction, FSM* fsm){
+		this->fsm = fsm;
+		this->actions = actions;
+		this->schedulerFunction = NULL;
 		this->initializeFunction = initializeFunction;
 	};
 
@@ -79,6 +88,15 @@ public:
 	 *	@return corresponding llvm::Function  of action scheduler
      */
 	llvm::Function* getSchedulerFunction(){ return schedulerFunction;};
+
+	/**
+     *  @brief Setter of scheduler function
+     *
+	 *	Set the corresponding llvm::function of the action scheduler
+	 *
+	 *	@param corresponding llvm::Function  of action scheduler
+     */
+	 void setSchedulerFunction(llvm::Function* schedulerFunction){ this->schedulerFunction = schedulerFunction;};
 
 	/**
      *  @brief Getter of initialize scheduler function
@@ -106,6 +124,18 @@ public:
      */
 	bool hasFsm(){ return fsm != NULL;};
 
+	/**
+	 *  @brief Returns actions of ActionScheduler.
+	 *
+	 * Returns the actions that are outside of an FSM. If this action scheduler
+	 * has no FSM, all actions of the actor are returned. The actions are sorted
+	 * by decreasing priority.
+	 * 
+	 * @return a list of actions
+	 */
+	std::list<Action*>* getActions() {
+		return actions;
+	}
 
 	/**
      *  @brief Returns true if this action scheduler has a scheduler function.
@@ -126,6 +156,8 @@ private:
 
 	/** FSM controled by the action scheduler */
 	FSM* fsm;
+
+	std::list<Action*>* actions;
 };
 
 #endif

@@ -134,7 +134,7 @@ return:                                           ; preds = %bb6
 
 !0 = metadata !{metadata !"tools/Source.bc"}
 !1 = metadata !{metadata !"Source"}
-!2 = metadata !{null, i32()* @scheduler , i32()* @initialize }
+!2 = metadata !{null, null, i32()* @scheduler , i32()* @initialize }
 !3 = metadata !{metadata !4, metadata !"O", %struct.fifo_u8_s** @O}
 !4 = metadata  !{ i32 8 ,  null }
 !5 = metadata !{metadata !6, metadata !7, i8** @input_file}

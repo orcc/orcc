@@ -80,6 +80,10 @@ proc_decl_MD(actor, proc) ::= <<
 !$actor.templateData.(proc)$
 >>
 
+actions_decl_MD(actor) ::= <<
+!$actor.templateData.(actor.actionScheduler.actions)$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor MD body
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,26 +99,36 @@ $name_decl_MD(actor)$ = metadata !{$varName_MD(actor)$}
 
 
 actionScheduler_MD(actor) ::= <<
+$actionScheduler_decl_MD(actor)$ = metadata !{$
+if(!actor.actionScheduler.actions.empty)$ metadata $actions_decl_MD(actor)$ $else$ null $endif$, $
+if(actor.actionScheduler.fsm)$ metadata $FSM_decl_MD(actor)$ $else$ null $endif$, i32()* @scheduler $
+if(actor.initializes)$ , i32()* @initialize_actor $endif$}
+
+$if(!actor.actionScheduler.actions.empty)$
+$actions_MD(actor)$
+$endif$
+
 $if(actor.actionScheduler.fsm)$
-$actionScheduler_decl_MD(actor)$ = metadata !{metadata $FSM_decl_MD(actor)$, i32()* @scheduler $
-if(actor.initializes)$, i32()* @initialize_actor $endif$}
 $FSM_MD(actor)$
-$else$
-$actionScheduler_decl_MD(actor)$ = metadata !{null, i32()* @scheduler$
-if(actor.initializes)$, i32()* @initialize_actor $endif$}
 $endif$
 >>
 
+actions_MD(actor) ::= <<
+$actions_decl_MD(actor)$ = metadata !{$actor.actionScheduler.actions: {metadata $action_decl_MD(actor=actor, action=it)$}; separator=", "$}
+>>
+
 action_MD(actor, action) ::= <<
-$if(action.tag.identifiers.empty)$
-$action_decl_MD(actor=actor, action=action)$ = metadata !{null, metadata $Sched_decl_MD(actor=actor, action=action)$, metadata $Body_decl_MD(actor=actor, action=action)$}
-$else$
-$action_decl_MD(actor=actor, action=action)$ = metadata !{metadata $Tag_decl_MD(actor=actor, tag=action.tag)$, metadata $Sched_decl_MD(actor=actor, action=action)$, metadata $Body_decl_MD(actor=actor, action=action)$}
+$action_decl_MD(actor=actor, action=action)$ = metadata !{$
+if(action.tag.identifiers.empty)$ null $else$ metadata $Tag_decl_MD(actor=actor, tag=action.tag)$ $endif
+$, metadata $Sched_decl_MD(actor=actor, action=action)$, metadata $Body_decl_MD(actor=actor, action=action)$}
+
+$if(!action.tag.identifiers.empty)$
 $Tag_MD(actor=actor, tag=action.tag)$
 $endif$
 $Sched_MD(actor=actor, action=action)$
 $Body_MD(actor=actor, action=action)$
 >>
+
 
 fifo_MD(actor, port) ::= <<
 $fifo_decl_MD(actor=actor, port=port)$ = metadata !{metadata $Type_decl_MD(actor=actor, var=port)$, $varName_MD(port)$, $fifoName(port)$* @$port.name$}
@@ -213,7 +227,7 @@ $actor.actionScheduler.fsm.transitions: { $Transition_MD(actor=actor, transition
 
 Transition_MD(actor, transition) ::= <<
 $if(transition.nextStateInfo.empty)$
-$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, null , i1()* @$transition.sourceState$_state_scheduler}
+$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, null, i1()* @$transition.sourceState$_state_scheduler}
 $else$
 $Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, metadata $NextStates_decl_MD(actor=actor, nextStates=transition.nextStateInfo)$ , i1()* @$transition.sourceState$_state_scheduler}
 $NextStates_MD(actor= actor, nextStates=transition.nextStateInfo)$
