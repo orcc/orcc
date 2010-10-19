@@ -1,0 +1,11 @@
+actor BlackHole4Mvpl0() 
+	int (size=16) Bon,
+	int (size=16) Mauvais	
+	==>
+	:
+	
+	z: action Bon:[b],Mauvais:[m] ==>
+	do
+		println("Mvpl0 : Bon : "+b+" ; Mauvais : "+m);
+	end
+end

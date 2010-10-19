@@ -181,6 +181,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="BlackHole">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/BlackHole4Mvpl0"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -220,4 +229,7 @@
     <Connection dst="MvpL0_Reconstr" dst-port="MbPredRefIdx" src="" src-port="MbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
+    <Connection dst="BlackHole" dst-port="Bon"
+        src="Algo_MVR_MultiFrameAdptive" src-port="mvpLX"/>
+    <Connection dst="BlackHole" dst-port="Mauvais" src="MvpL0_Reconstr" src-port="Mvpl0"/>
 </XDF>

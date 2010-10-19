@@ -13,6 +13,8 @@
       <vertex id="slice_type" x="325" y="738"/>
       <vertex id="mb_type" x="328" y="707"/>
       <vertex id="MbPredRefIdxL0" x="309" y="643"/>
+      <vertex id="SubMbPredRefIdxL0" x="299" y="677"/>
+      <vertex id="sub_mb_type" x="315" y="767"/>
       <vertex id="MV" x="855" y="355"/>
       <vertex id="LOCATION" x="461" y="178"/>
       <vertex id="PartSZ" x="470" y="222"/>
@@ -21,8 +23,7 @@
       <vertex id="Mgnt_MVR" x="189" y="163"/>
       <vertex id="Algo_MVR_MultiFrameAdptive" x="447" y="319"/>
       <vertex id="Algo_Add" x="744" y="318"/>
-      <vertex id="MvpL0_Reconstr" x="631" y="578"/>
-      <vertex id="SubMbPredRefIdxL0" x="299" y="677"/>
-      <vertex id="sub_mb_type" x="315" y="767"/>
+      <vertex id="MvpL0_Reconstr" x="615" y="592"/>
+      <vertex id="BlackHole" x="802" y="607"/>
    </vertices>
 </layout>
