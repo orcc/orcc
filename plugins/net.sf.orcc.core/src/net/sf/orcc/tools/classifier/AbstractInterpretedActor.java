@@ -35,6 +35,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.expr.BoolExpr;
 
 /**
  * This class defines an actor on which we can do abstract interpretation by
@@ -56,8 +57,7 @@ public class AbstractInterpretedActor extends ActorInterpreter {
 	 * @param actor
 	 *            an actor
 	 */
-	public AbstractInterpretedActor(Actor actor,
-			ConfigurationAnalyzer analyzer) {
+	public AbstractInterpretedActor(Actor actor, ConfigurationAnalyzer analyzer) {
 		super(new HashMap<String, Expression>(), actor, null);
 
 		// Build a node interpreter for visiting CFG and instructions
@@ -90,7 +90,8 @@ public class AbstractInterpretedActor extends ActorInterpreter {
 	protected boolean isSchedulable(Action action) {
 		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(true);
 		Object isSchedulable = interpretProc(action.getScheduler());
-		return ((isSchedulable instanceof Boolean) && ((Boolean) isSchedulable));
+		return ((isSchedulable instanceof BoolExpr) && (((BoolExpr) isSchedulable)
+				.getValue()));
 	}
 
 	/**

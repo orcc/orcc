@@ -264,7 +264,9 @@ public class NetworkPartitioner implements INetworkTransformation {
 	private void initPartNames(Network network) throws OrccException {
 		partNames = new HashMap<Vertex, String>();
 		for (Vertex vertex : network.getGraph().vertexSet()) {
-			partNames.put(vertex, getPartNameAttribute(vertex.getInstance()));
+			if(vertex.isInstance()) {
+				partNames.put(vertex, getPartNameAttribute(vertex.getInstance()));
+			}
 		}
 	}
 

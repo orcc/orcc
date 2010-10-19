@@ -118,9 +118,9 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	public void visit(IfNode node) {
 		// Interpret first expression ("if" condition)
 		Object condition = node.getValue().accept(exprInterpreter);
-
-		if (condition instanceof Boolean) {
-			if ((Boolean) condition) {
+		
+		if (condition instanceof BoolExpr) {
+			if (((BoolExpr) condition).getValue()) {
 				for (CFGNode subNode : node.getThenNodes()) {
 					subNode.accept(this);
 				}

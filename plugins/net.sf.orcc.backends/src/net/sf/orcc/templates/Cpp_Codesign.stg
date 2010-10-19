@@ -49,7 +49,7 @@ typedef struct
 {\\
    m_eType = ADP_ETHERNET;\
    m_oCfg.pcIpAddress = "127.0.0.1";\\
-   m_oCfg.port = 7;\
+   m_oCfg.port = 1024;\
    m_oCfg.bServer=true;\\
 };
 
