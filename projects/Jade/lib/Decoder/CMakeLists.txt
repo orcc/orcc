@@ -13,4 +13,5 @@ add_library (Decoder
   Decoder.cpp
   Instanciator.cpp
   Instanciator.h
+  Procedure.cpp
  )

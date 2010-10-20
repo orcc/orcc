@@ -28,88 +28,70 @@
  */
 
 /**
-@brief Description of the Procedure class interface
+@brief Description of the ActionSchedulerAdder interface
 @author Jerome Gorin
-@file Procedure.h
+@file ActionSchedulerAdder.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef PROCEDURE_H
-#define PROCEDURE_H
+#ifndef ACTIONSCHEDULERADDER_H
+#define ACTIONSCHEDULERADDER_H
 
-#include <string>
+#include <list>
 
-namespace llvm {
-	class Function;
+namespace llvm{
+	class BasicBlock;
 	class ConstantInt;
+	class Function;
+	class LLVMContext;
 }
+
+class Action;
+class ActionScheduler;
+class Actor;
+class InstancedActor;
+class Instance;
+class Decoder;
+class Port;
 //------------------------------
 
 /**
- * @brief  This class defines a Procedure for the Functional Unit.
+ * @brief  This class defines a robin robin scheduler of a decoder.
  * 
  * @author Jerome Gorin
  * 
  */
-class Procedure {
+class ActionSchedulerAdder {
 public:
 	/**
-	 *
-	 * @brief constructor
-	 *
-	 * Construcs a new procedure.
-	 * 
-	 * @param name		: name of the procedure.
-	 *
-	 * @param external	: whether it is external or not.
-	 *
-	 * @param function : the llvm::Function of this procedure.
-	 */
-	Procedure(std::string name, llvm::ConstantInt* external,
-		llvm::Function* function) {
-		this->external = external;
-		this->name = name;
-		this->function = function;
-	}
-
-	~Procedure();
-
-	/**
-     *  @brief Getter of function
+     *  @brief Constructor
      *
-	 *	Return the llvm::function bound to this procedure
+	 *	Create a new round robin scheduler for the given decoder
 	 *
-	 *	@return llvm::Function corresponding to the procedure
-     */
-	llvm::Function* getFunction(){return function;};
-
-	/**
-     *  @brief Getter of the function's name
+	 *	@param jit : JIT for including instructions
 	 *
-	 *	@return name of the function
+	 *	@param decoder : the Decoder to insert the round robin scheduler into
      */
-	std::string getName(){return name;};
-
-	/**
-     *  @brief Getter of external
-	 *
-	 *	@return llvm::ConstantInt about external function
-     */
-	llvm::ConstantInt* getExternal(){return external;};
-
-	/**
-     *  @brief Return true if procedure external
-	 *
-	 *	@return true if procedure is external otherwise false
-     */
-	bool isExternal();
+	ActionSchedulerAdder(Instance* instance, Decoder* decoder, llvm::LLVMContext& C);
+	~ActionSchedulerAdder(){};
 
 private:
-	std::string name;
-	llvm::ConstantInt* external;
-	llvm::Function* function;
+	void createScheduler(ActionScheduler* actionScheduler);
+	llvm::Function* createSchedulerFn(ActionScheduler* actionScheduler);
+	llvm::BasicBlock* createSchedulerNoFSM(std::list<Action*>* actions, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, llvm::BasicBlock* incBB, llvm::Function* function);
+	llvm::BasicBlock* createSchedulerFSM(ActionScheduler* actionScheduler, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB);
+	llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::Function* function);
+	llvm::BasicBlock* createOutputPattern(Action* action, llvm::BasicBlock* BB, llvm::Function* function);
+	llvm::BasicBlock* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
+	Decoder* decoder;
+	InstancedActor* instancedActor;
+	Instance* instance;
+	Actor* actor;
 };
 
 #endif

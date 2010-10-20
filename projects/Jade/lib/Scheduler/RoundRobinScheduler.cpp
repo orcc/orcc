@@ -39,6 +39,7 @@
 
 #include <map>
 
+#include "ActionSchedulerAdder.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
 #include "llvm/LLVMContext.h"
@@ -79,6 +80,16 @@ static int Filesize(){
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder* decoder): Context(C) {
 	this->jit = jit;
 	this->decoder = decoder;
+	
+	//Create action schedulers
+	map<string, Instance*>::iterator it;
+	map<string, Instance*>* instances = decoder->getInstances();
+	
+	for (it = instances->begin(); it != instances->end(); ++it){
+		ActionSchedulerAdder(it->second, decoder, Context);
+	}
+	
+	
 	createScheduler();
 	
 	//Connect decoder to source

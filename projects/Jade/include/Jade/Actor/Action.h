@@ -121,6 +121,20 @@ public:
 	void setScheduler(Procedure* scheduler){this->scheduler = scheduler;};
 
 	/**
+     *  @brief return input pattern of the action
+   	 *
+	 *  @param a map of input pattern
+     */
+	std::map<Port*, llvm::ConstantInt*>* getInputPattern(){return inputPattern;};
+
+	/**
+     *  @brief return outpur pattern of the action
+   	 *
+	 *  @param a map of output pattern
+     */
+	std::map<Port*, llvm::ConstantInt*>* getOutputPattern(){return outputPattern;};
+
+	/**
 	 * @brief Returns action name (tag or body name)
 	 * 
 	 * @return action string name

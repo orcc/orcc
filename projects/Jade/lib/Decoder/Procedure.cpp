@@ -28,88 +28,19 @@
  */
 
 /**
-@brief Description of the Procedure class interface
+@brief Implementation of class Procedure
 @author Jerome Gorin
-@file Procedure.h
+@file Procedure.cpp
 @version 0.1
-@date 22/03/2010
+@date 2010/04/12
 */
 
 //------------------------------
-#ifndef PROCEDURE_H
-#define PROCEDURE_H
+#include "Jade/Decoder/Procedure.h"
 
-#include <string>
-
-namespace llvm {
-	class Function;
-	class ConstantInt;
-}
+#include "llvm/Constants.h"
 //------------------------------
 
-/**
- * @brief  This class defines a Procedure for the Functional Unit.
- * 
- * @author Jerome Gorin
- * 
- */
-class Procedure {
-public:
-	/**
-	 *
-	 * @brief constructor
-	 *
-	 * Construcs a new procedure.
-	 * 
-	 * @param name		: name of the procedure.
-	 *
-	 * @param external	: whether it is external or not.
-	 *
-	 * @param function : the llvm::Function of this procedure.
-	 */
-	Procedure(std::string name, llvm::ConstantInt* external,
-		llvm::Function* function) {
-		this->external = external;
-		this->name = name;
-		this->function = function;
-	}
-
-	~Procedure();
-
-	/**
-     *  @brief Getter of function
-     *
-	 *	Return the llvm::function bound to this procedure
-	 *
-	 *	@return llvm::Function corresponding to the procedure
-     */
-	llvm::Function* getFunction(){return function;};
-
-	/**
-     *  @brief Getter of the function's name
-	 *
-	 *	@return name of the function
-     */
-	std::string getName(){return name;};
-
-	/**
-     *  @brief Getter of external
-	 *
-	 *	@return llvm::ConstantInt about external function
-     */
-	llvm::ConstantInt* getExternal(){return external;};
-
-	/**
-     *  @brief Return true if procedure external
-	 *
-	 *	@return true if procedure is external otherwise false
-     */
-	bool isExternal();
-
-private:
-	std::string name;
-	llvm::ConstantInt* external;
-	llvm::Function* function;
+bool Procedure::isExternal(){
+	return external->isOne();
 };
-
-#endif

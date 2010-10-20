@@ -44,8 +44,9 @@
 
 namespace llvm{
 	class Function;
-	class LLVMContext;
 	class IntegerType;
+	class LLVMContext;
+	class Module;
 	class Type;
 }
 

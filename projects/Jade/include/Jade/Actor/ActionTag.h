@@ -115,6 +115,14 @@ public:
 	bool isEmpty() {
 		return identifiers.empty();
 	}
+
+	/**
+	 * @brief Returns the number of identifiers in this tag.
+	 * 
+	 * @return the number of identifiers in this tag
+	 */
+	int size(){ return identifiers.size();};
+
 private:
 	std::list<std::string> identifiers;
 };

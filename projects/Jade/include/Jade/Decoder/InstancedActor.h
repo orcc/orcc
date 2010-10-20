@@ -213,6 +213,24 @@ public:
      */
 	Port* getOutput(std::string portName);
 
+	/**
+     *  @brief get the instance corresponding to the InstancedActor
+	 *
+	 *
+	 *  @return the corresponding Instance
+	 *
+     */
+	Instance* getInstance(){return instance;};
+
+	/**
+     *  @brief get actions of the InstancedActor
+	 *
+	 *
+	 *  @return a list of actions
+	 *
+     */
+	std::list<Action*>* getActions(){return actions;};
+
 	llvm::GlobalVariable* getStateVar(Variable* stateVar);
 
 
