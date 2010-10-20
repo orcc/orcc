@@ -73,6 +73,8 @@ extern cl::opt<bool> nodisplay;
 IRParser::IRParser(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo) : Context(C){
 	this->jit = jit;
 	this->fifo = fifo;
+	this->inputs = NULL;
+	this->outputs = NULL;
 }
 
 
@@ -107,8 +109,8 @@ Actor* IRParser::parseActor(string classz){
 
 	// Parse actor elements
 	map<string, Type*>* fifos = parseFifos(module);
-	map<string, Port*>* inputs = parsePorts(IRConstant::KEY_INPUTS, module);
-	map<string, Port*>* outputs = parsePorts(IRConstant::KEY_OUTPUTS, module);
+	inputs = parsePorts(IRConstant::KEY_INPUTS, module);
+	outputs = parsePorts(IRConstant::KEY_OUTPUTS, module);
 	map<string, Variable*>* parameters =  parseParameters(module);
 	map<string, Variable*>* stateVars = parseStateVars(module);
 	map<string, Procedure*>* procs = parseProcs(module);
@@ -118,6 +120,29 @@ Actor* IRParser::parseActor(string classz){
 
 	return new Actor(name->getString(), classz, fifos, inputs, outputs, stateVars, 
 						parameters, procs, initializes, actions, actionScheduler);
+}
+
+map<Port*, ConstantInt*>* IRParser::parsePattern(map<std::string, Port*>* ports, Value* value){
+	map<Port*, ConstantInt*>* pattern = new map<Port*, ConstantInt*>();
+	
+	if (value != NULL){
+		MDNode* patternNode = cast<MDNode>(value);
+		map<std::string, Port*>::iterator it;
+
+		for (unsigned i = 0, e = patternNode->getNumOperands(); i != e;) {
+			//Find port of the pattern
+			MDNode* portNode = cast<MDNode>(patternNode->getOperand(i));
+			MDString* name = cast<MDString>(portNode->getOperand(1));
+			it = ports->find(name->getString());
+			
+			//Get number of token consummed by this port
+			ConstantInt* numTokens = cast<ConstantInt>(patternNode->getOperand(++i));
+			pattern->insert(pair<Port*, ConstantInt*>(it->second, numTokens));
+			i++;
+		}
+	}
+
+	return pattern;
 }
 
 map<string, Port*>* IRParser::parsePorts(string key, Module* module){
@@ -299,7 +324,7 @@ list<Action*>* IRParser::parseActions(string key, Module* module){
 Action* IRParser::parseAction(MDNode* node){
 	Value* tagValue = node->getOperand(0);
 	ActionTag* tag = new ActionTag();
-
+	
 	if (tagValue != NULL){
 		MDNode* tagArray = cast<MDNode>(tagValue);
 		for (unsigned i = 0, e = tagArray->getNumOperands(); i != e; ++i) {
@@ -308,9 +333,12 @@ Action* IRParser::parseAction(MDNode* node){
 		}
 	}
 
-	Procedure* scheduler = parseProc(cast<MDNode>(node->getOperand(1)));
-	Procedure* body = parseProc(cast<MDNode>(node->getOperand(2)));
-	Action* action = new Action(tag, scheduler, body);
+	map<Port*, ConstantInt*>* ip = parsePattern(inputs, node->getOperand(1));
+	map<Port*, ConstantInt*>* op = parsePattern(outputs, node->getOperand(2));
+
+	Procedure* scheduler = parseProc(cast<MDNode>(node->getOperand(3)));
+	Procedure* body = parseProc(cast<MDNode>(node->getOperand(4)));
+	Action* action = new Action(tag, ip, op, scheduler, body);
 
 	putAction(tag, action);
 

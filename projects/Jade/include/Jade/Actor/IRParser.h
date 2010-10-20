@@ -40,6 +40,7 @@
 #define IRPARSER_H
 
 namespace llvm{
+	class ConstantInt;
 	class Module;
 	class MDNode;
 	class Type;
@@ -144,6 +145,8 @@ private:
 	 */
 	std::map<std::string, Variable*>* parseParameters(llvm::Module* module);
 
+
+	std::map<Port*, llvm::ConstantInt*>* parsePattern(std::map<std::string, Port*>* ports, llvm::Value* value);
 
 	/**
      * @brief parse procedures of a module
@@ -297,6 +300,10 @@ private:
 
 	/** list of untagged actions of the current actor */
 	std::list<Action*> untaggedActions;
+
+	/** list of ports of the current actor */
+	std::map<std::string, Port*>* inputs;
+	std::map<std::string, Port*>* outputs;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

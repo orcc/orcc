@@ -79,7 +79,7 @@ public class LLVMTemplateData {
 	/**
 	 * Medata container of patterns
 	 */
-	private Map<Object, Integer> patternsMap;
+	private Map<Object, Integer> patterns;
 
 	/**
 	 * Medata container of ports
@@ -101,13 +101,9 @@ public class LLVMTemplateData {
 	 */
 	private Map<Object, Integer> vars;
 
-	/**
-	 * Computes a map of metadata for LLVM template
-	 * 
-	 */
 	public LLVMTemplateData(Actor actor) {
 		ports = new HashMap<Object, Integer>();
-		patternsMap = new HashMap<Object, Integer>();
+		patterns = new HashMap<Object, Integer>();
 		actions = new HashMap<Object, Integer>();
 		actionScheduler = new HashMap<Object, Integer>();
 		procs = new HashMap<Object, Integer>();
@@ -160,6 +156,10 @@ public class LLVMTemplateData {
 		}
 	}
 
+	/**
+	 * Computes metadata of actors.
+	 * 
+	 */
 	private void computeActor() {
 		// Insert source file info
 		names.put(actor.getFile(), id++);
@@ -208,7 +208,7 @@ public class LLVMTemplateData {
 
 	private void computePattern(Pattern pattern) {
 		if (!pattern.isEmpty()) {
-			patternsMap.put(pattern, id++);
+			patterns.put(pattern, id++);
 			/*
 			 * for (Entry<Port, Integer> entry : pattern.entrySet()) {
 			 * templateDataMap.put(entry, id++); }
@@ -263,8 +263,8 @@ public class LLVMTemplateData {
 	 * 
 	 * @return a map of pattern information.
 	 */
-	public Map<Object, Integer> getPatternsMap() {
-		return patternsMap;
+	public Map<Object, Integer> getPatterns() {
+		return patterns;
 	}
 
 	/**

@@ -39,8 +39,16 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-class Procedure;
+#include <map>
+#include <string>
+
+namespace llvm{
+	class ConstantInt;
+}
+
 class ActionTag;
+class Port;
+class Procedure;
 //------------------------------
 
 /**
@@ -66,10 +74,13 @@ public:
 	 *
 	 * @param body : Procedure that holds the body of the action
 	 */
-	Action(ActionTag* tag, Procedure* scheduler, Procedure* body) {
+	Action(ActionTag* tag, std::map<Port*, llvm::ConstantInt*>* inputPattern, 
+		std::map<Port*, llvm::ConstantInt*>* outputPattern, Procedure* scheduler, Procedure* body) {
 		this->tag = tag;
 		this->body = body;
 		this->scheduler = scheduler;
+		this->inputPattern = inputPattern;
+		this->outputPattern = outputPattern;
 	}
 
 	~Action();
@@ -109,10 +120,19 @@ public:
      */
 	void setScheduler(Procedure* scheduler){this->scheduler = scheduler;};
 
+	/**
+	 * @brief Returns action name (tag or body name)
+	 * 
+	 * @return action string name
+	 */
+	std::string getName();
+
 private:
 	ActionTag* tag;
 	Procedure* body;
 	Procedure* scheduler;
+	std::map<Port*, llvm::ConstantInt*>* inputPattern;
+	std::map<Port*, llvm::ConstantInt*>* outputPattern;
 };
 
 #endif

@@ -34,6 +34,7 @@ $actor.stateVars.list: {$var_MD(actor=actor, var=it)$}$
 $actor.procs.list: {$proc_MD(actor=actor, proc=it)$}$
 $actor.initializes: {$action_MD(actor=actor, action=it)$}$
 $actor.actions: {$action_MD(actor=actor, action=it)$}$
+$actor.templateData.patterns.keys: {$patterns_MD(actor=actor, patterns=it)$}$
 
 >>
 
@@ -120,8 +121,8 @@ VarDef_decl_MD(actor, var) ::= <<
 !$actor.templateData.names.(var.name)$
 >>
 
-Patterns_decl_MD(actor, patterns) ::= <<
-!$actor.templateData.templateData.(patterns)$
+patterns_decl_MD(actor, patterns) ::= <<
+!$actor.templateData.patterns.(patterns)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -157,24 +158,29 @@ actions_MD(actor) ::= <<
 $actions_decl_MD(actor)$ = metadata !{$actor.actionScheduler.actions: {metadata $action_decl_MD(actor=actor, action=it)$}; separator=", "$}
 >>
 
+patterns_MD(actor, patterns) ::= <<
+$patterns_decl_MD(actor=actor, patterns=patterns)$ = metadata !{$patterns.keys: {metadata $port_decl_MD(actor=actor, port=it)$, i32 $patterns.(it)$}; separator=", "$}
+
+>>
+
 action_MD(actor, action) ::= <<
 $action_decl_MD(actor=actor, action=action)$ = metadata !{$
 	if(action.tag.identifiers.empty)
 		$ null $
 	else
 		$ metadata $Tag_decl_MD(actor=actor, tag=action.tag)
-	$$endif$
-	$! $,$if(first(action.inputPattern.keys))
-		$ metadata $Patterns_decl_MD(actor=actor, patterns=action.inputPattern)$$
+	$$endif
+	$,$if(first(action.inputPattern.keys))
+		$ metadata $patterns_decl_MD(actor=actor, patterns=action.inputPattern)$$
 	else
 		$ null $
 	endif$,$
 	if(first(action.outputPattern.keys))
-		$ metadata $Patterns_decl_MD(actor=actor, patterns=action.outputPattern)$$
+		$ metadata $patterns_decl_MD(actor=actor, patterns=action.outputPattern)$$
 	else
 		$ null$
-	endif!$
-	, metadata $Sched_decl_MD(actor=actor, action=action)
+	endif
+	$, metadata $Sched_decl_MD(actor=actor, action=action)
 	$, metadata $Body_decl_MD(actor=actor, action=action)$}
 
 $if(!action.tag.identifiers.empty)$
@@ -225,11 +231,6 @@ $State_decl_MD(actor)$ = metadata  !{$actor.actionScheduler.fsm.states: varState
 Transitions_MD(actor) ::= <<
 $Transitions_decl_MD(actor)$ = metadata  !{$actor.actionScheduler.fsm.transitions: {metadata $Transition_decl_MD(actor=actor, transition=it)$}; separator=", "$}
 $actor.actionScheduler.fsm.transitions: { $Transition_MD(actor=actor, transition = it)$}$
->>
-
-Patterns_MD(actor, patterns) ::= <<
-$patterns.hashCode$$Patterns_decl_MD(actor=actor, patterns=patterns)$ = metadata  !{$patterns.keys: {$it.hascode$metadata $port_decl_MD(actor=actor, port=it)$, i32 $patterns.(it)$}; separator=", "$}
-
 >>
 
 Transition_MD(actor, transition) ::= <<

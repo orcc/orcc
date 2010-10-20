@@ -350,7 +350,7 @@ Action* JIT::createAction(Instance* instance, Action* action){
 		Procedure* newScheduler = CreateProcedure(instance, scheduler);
 		Procedure* newBody = CreateProcedure(instance, body);
 
-		return new Action(NULL, newScheduler, newBody);
+		return new Action(NULL, new map<Port*, ConstantInt*>(), new map<Port*, ConstantInt*>(), newScheduler, newBody);
 }
 
 Procedure* JIT::CreateProcedure(Instance* instance, Procedure* procedure){
