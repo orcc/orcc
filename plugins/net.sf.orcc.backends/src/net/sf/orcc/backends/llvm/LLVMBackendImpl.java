@@ -99,8 +99,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 
 		// Organize medata information for the current actor
-		LLVMTemplateData templateData = new LLVMTemplateData(actor);
-		actor.setTemplateData(templateData.getTemplateData());
+		actor.setTemplateData(new LLVMTemplateData(actor));
 	}
 
 	@Override

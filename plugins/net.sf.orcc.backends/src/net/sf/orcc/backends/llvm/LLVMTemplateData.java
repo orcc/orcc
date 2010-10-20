@@ -30,7 +30,6 @@ package net.sf.orcc.backends.llvm;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -53,6 +52,16 @@ import net.sf.orcc.ir.Variable;
 public class LLVMTemplateData {
 
 	/**
+	 * Medata container of actions
+	 */
+	private Map<Object, Integer> actions;
+
+	/**
+	 * Medata container of action scheduler
+	 */
+	private Map<Object, Integer> actionScheduler;
+
+	/**
 	 * Actor to compute
 	 */
 	private Actor actor;
@@ -63,27 +72,59 @@ public class LLVMTemplateData {
 	private int id;
 
 	/**
-	 * Medata container
+	 * Medata container of names
 	 */
-	private HashMap<Object, Integer> templateDataMap;
+	private Map<Object, Integer> names;
+
+	/**
+	 * Medata container of patterns
+	 */
+	private Map<Object, Integer> patternsMap;
+
+	/**
+	 * Medata container of ports
+	 */
+	private Map<Object, Integer> ports;
+
+	/**
+	 * Medata container of procedures
+	 */
+	private Map<Object, Integer> procs;
+
+	/**
+	 * Medata container of types
+	 */
+	private Map<Object, Integer> types;
+
+	/**
+	 * Medata container of variables
+	 */
+	private Map<Object, Integer> vars;
 
 	/**
 	 * Computes a map of metadata for LLVM template
 	 * 
 	 */
 	public LLVMTemplateData(Actor actor) {
-		templateDataMap = new HashMap<Object, Integer>();
+		ports = new HashMap<Object, Integer>();
+		patternsMap = new HashMap<Object, Integer>();
+		actions = new HashMap<Object, Integer>();
+		actionScheduler = new HashMap<Object, Integer>();
+		procs = new HashMap<Object, Integer>();
+		vars = new HashMap<Object, Integer>();
+		types = new HashMap<Object, Integer>();
+		names = new HashMap<Object, Integer>();
 		this.actor = actor;
 		this.id = 0;
 
-		computeTemplateMaps();
+		computeActor();
 	}
 
 	private void computeAction(Action action) {
-		templateDataMap.put(action, id++);
+		actions.put(action, id++);
 		// Avoid to add null id in map
 		if (!action.getTag().getIdentifiers().isEmpty()) {
-			templateDataMap.put(action.getTag(), id++);
+			actions.put(action.getTag(), id++);
 		}
 
 		// Write port pattern
@@ -91,59 +132,40 @@ public class LLVMTemplateData {
 		computePattern(action.getOutputPattern());
 
 		// Write action elements
-		templateDataMap.put(action.getScheduler(), id++);
-		templateDataMap.put(action.getBody(), id++);
+		actions.put(action.getScheduler(), id++);
+		actions.put(action.getBody(), id++);
 	}
 
 	private void computeActionScheduler(ActionScheduler actSched) {
-		templateDataMap.put(actor.getActionScheduler(), id++);
+		actionScheduler.put(actor.getActionScheduler(), id++);
 
 		if (!actSched.getActions().isEmpty()) {
-			templateDataMap.put(actSched.getActions(), id++);
+			actionScheduler.put(actSched.getActions(), id++);
 		}
 
 		if (actSched.hasFsm()) {
 			FSM fsm = actSched.getFsm();
-			templateDataMap.put(fsm, id++);
-			templateDataMap.put(fsm.getStates(), id++);
-			templateDataMap.put(fsm.getTransitions(), id++);
+			actionScheduler.put(fsm, id++);
+			actionScheduler.put(fsm.getStates(), id++);
+			actionScheduler.put(fsm.getTransitions(), id++);
 
 			for (Transition transition : fsm.getTransitions()) {
-				templateDataMap.put(transition, id++);
-				templateDataMap.put(transition.getNextStateInfo(), id++);
+				actionScheduler.put(transition, id++);
+				actionScheduler.put(transition.getNextStateInfo(), id++);
 				for (NextStateInfo nextState : transition.getNextStateInfo()) {
-					templateDataMap.put(nextState, id++);
+					actionScheduler.put(nextState, id++);
 				}
 
 			}
 		}
 	}
 
-	private void computePattern(Pattern pattern) {
-		if (!pattern.isEmpty()) {
-			templateDataMap.put(pattern, id++);
-
-			for (Entry<Port, Integer> entry : pattern.entrySet()) {
-				templateDataMap.put(entry, id++);
-			}
-		}
-	}
-
-	private void computePort(Port port) {
-		templateDataMap.put(port, id++);
-		templateDataMap.put(port.getType(), id++);
-	}
-
-	private void computeProc(Procedure proc) {
-		templateDataMap.put(proc, id++);
-	}
-
-	private void computeTemplateMaps() {
+	private void computeActor() {
 		// Insert source file info
-		templateDataMap.put(actor.getFile(), id++);
+		names.put(actor.getFile(), id++);
 
 		// Insert name
-		templateDataMap.put(actor.getName(), id++);
+		names.put(actor.getName(), id++);
 
 		// Insert action scheduler
 		computeActionScheduler(actor.getActionScheduler());
@@ -184,19 +206,101 @@ public class LLVMTemplateData {
 		}
 	}
 
+	private void computePattern(Pattern pattern) {
+		if (!pattern.isEmpty()) {
+			patternsMap.put(pattern, id++);
+			/*
+			 * for (Entry<Port, Integer> entry : pattern.entrySet()) {
+			 * templateDataMap.put(entry, id++); }
+			 */
+		}
+	}
+
+	private void computePort(Port port) {
+		ports.put(port, id++);
+		types.put(port.getType(), id++);
+	}
+
+	private void computeProc(Procedure proc) {
+		procs.put(proc, id++);
+	}
+
 	private void computeVar(Variable var) {
-		templateDataMap.put(var, id++);
-		templateDataMap.put(var.getName(), id++);
-		templateDataMap.put(var.getType(), id++);
+		vars.put(var, id++);
+		names.put(var.getName(), id++);
+		types.put(var.getType(), id++);
 	}
 
 	/**
-	 * get the template map computed
+	 * get actions map
 	 * 
-	 * @return a map of metadata information associated with their id.
+	 * @return a map of action information.
 	 */
-	public Map<Object, Integer> getTemplateData() {
-		return templateDataMap;
+	public Map<Object, Integer> getActions() {
+		return actions;
+	}
+
+	/**
+	 * get action scheduler map
+	 * 
+	 * @return a map of action scheduler information.
+	 */
+	public Map<Object, Integer> getActionScheduler() {
+		return actionScheduler;
+	}
+
+	/**
+	 * get names map
+	 * 
+	 * @return a map of variable information.
+	 */
+	public Map<Object, Integer> getNames() {
+		return names;
+	}
+
+	/**
+	 * get patterns map
+	 * 
+	 * @return a map of pattern information.
+	 */
+	public Map<Object, Integer> getPatternsMap() {
+		return patternsMap;
+	}
+
+	/**
+	 * get port map
+	 * 
+	 * @return a map of port information.
+	 */
+	public Map<Object, Integer> getPorts() {
+		return ports;
+	}
+
+	/**
+	 * get procedures map
+	 * 
+	 * @return a map of procedure information.
+	 */
+	public Map<Object, Integer> getProcs() {
+		return procs;
+	}
+
+	/**
+	 * get types map
+	 * 
+	 * @return a map of type information.
+	 */
+	public Map<Object, Integer> getTypes() {
+		return types;
+	}
+
+	/**
+	 * get variables map
+	 * 
+	 * @return a map of variable information.
+	 */
+	public Map<Object, Integer> getVars() {
+		return vars;
 	}
 
 }
