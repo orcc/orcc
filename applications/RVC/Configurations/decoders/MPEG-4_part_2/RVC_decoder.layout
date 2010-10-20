@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits" x="57" y="477"/>
-      <vertex id="VID" x="844" y="561"/>
-      <vertex id="WIDTH" x="436" y="75"/>
-      <vertex id="HEIGHT" x="436" y="168"/>
-      <vertex id="serialize" x="157" y="468"/>
-      <vertex id="parser" x="282" y="351"/>
-      <vertex id="texture_Y" x="436" y="261"/>
-      <vertex id="texture_U" x="436" y="450"/>
-      <vertex id="texture_V" x="436" y="639"/>
-      <vertex id="motion_Y" x="568" y="366"/>
-      <vertex id="motion_U" x="568" y="534"/>
-      <vertex id="motion_V" x="568" y="681"/>
-      <vertex id="Merger420" x="705" y="534"/>
+      <vertex id="bits" x="4" y="100"/>
+      <vertex id="VID" x="748" y="167"/>
+      <vertex id="WIDTH" x="355" y="331"/>
+      <vertex id="HEIGHT" x="422" y="209"/>
+      <vertex id="serialize" x="78" y="88"/>
+      <vertex id="parser" x="191" y="78"/>
+      <vertex id="texture_Y" x="405" y="14"/>
+      <vertex id="texture_U" x="423" y="128"/>
+      <vertex id="texture_V" x="404" y="249"/>
+      <vertex id="motion_Y" x="520" y="33"/>
+      <vertex id="motion_U" x="523" y="149"/>
+      <vertex id="motion_V" x="506" y="258"/>
+      <vertex id="Merger420" x="648" y="130"/>
    </vertices>
 </layout>
