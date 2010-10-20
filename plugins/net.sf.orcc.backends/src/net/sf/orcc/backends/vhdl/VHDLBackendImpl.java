@@ -47,7 +47,6 @@ import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
 import net.sf.orcc.backends.vhdl.transforms.NDimArrayTransform;
-import net.sf.orcc.backends.vhdl.transforms.ProcedureInline;
 import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transforms.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
@@ -119,8 +118,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new TransformConditionals(),
 
 				new NDimArrayTransform(),
-
-				new ProcedureInline(),
 
 				new VariableRenamer(),
 
