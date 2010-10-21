@@ -40,6 +40,8 @@
 #define ACTIONSCHEDULERADDER_H
 
 #include <list>
+#include <map>
+#include "Jade/Actor/FSM.h"
 
 namespace llvm{
 	class BasicBlock;
@@ -86,6 +88,11 @@ private:
 	llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::Function* function);
 	llvm::BasicBlock* createOutputPattern(Action* action, llvm::BasicBlock* BB, llvm::Function* function);
 	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	void createSwitchTransitions(std::map<std::string, FSM::Transition*>* transitions);
+	void createSwitchTransition(FSM::Transition* transition);
+	void createTransitions(std::map<std::string, FSM::Transition*>* transitions);
+	void createTransition(FSM::Transition* transition);
+	void createSchedulingTestState(std::list<FSM::NextStateInfo*>* nextStates);
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

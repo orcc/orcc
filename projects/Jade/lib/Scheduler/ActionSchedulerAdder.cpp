@@ -42,7 +42,6 @@
 #include "Jade/Actor/ActionScheduler.h"
 #include "Jade/Actor/ActionTag.h"
 #include "Jade/Actor/Actor.h"
-#include "Jade/Actor/FSM.h"
 #include "Jade/Actor/Port.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Decoder/Decoder.h"
@@ -139,6 +138,10 @@ BasicBlock* ActionSchedulerAdder::createSchedulerFSM(ActionScheduler* actionSche
 
 	//Create branch from skip to return
 	BranchInst::Create(returnBB, BB);
+
+	//Create switch
+	createSwitchTransitions(fsm->getTransitions());
+	createTransitions(fsm->getTransitions());
 
 	return BB;
 }
@@ -237,4 +240,32 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 	CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs, hasRoomArgs+2,"",  BB);
 
 	return callInst;
+}
+
+void ActionSchedulerAdder::createSwitchTransitions(map<string, FSM::Transition*>* transitions){
+	map<string, FSM::Transition*>::iterator it;
+
+	for (it = transitions->begin(); it != transitions->end(); it++){
+		createSwitchTransition(it->second);
+	}
+}
+
+void ActionSchedulerAdder::createSwitchTransition(FSM::Transition* transition){
+
+}
+
+void ActionSchedulerAdder::createTransitions(map<string, FSM::Transition*>* transitions){
+	map<string, FSM::Transition*>::iterator it;
+
+	for (it = transitions->begin(); it != transitions->end(); it++){
+		createTransition(it->second);
+	}
+}
+
+void ActionSchedulerAdder::createTransition(FSM::Transition* transition){
+	createSchedulingTestState(transition->getNextStateInfo());
+}
+
+void ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateInfo*>* nextStates){
+
 }

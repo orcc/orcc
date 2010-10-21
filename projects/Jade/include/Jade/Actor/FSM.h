@@ -279,6 +279,17 @@ public:
 	}
 
 	/**
+	 * Returns the list of transitions of this FSM as a list of
+	 * {@link Transition}.
+	 * 
+	 * @return the list of transitions of this FSM as a list of
+	 *         {@link Transition}
+	 */
+	std::map<std::string, Transition*>* getTransitions() {
+		return &transitions;
+	}
+
+	/**
 	 * @brief Get the initial state
 	 *
 	 * Gets the initial state of this FSM.
