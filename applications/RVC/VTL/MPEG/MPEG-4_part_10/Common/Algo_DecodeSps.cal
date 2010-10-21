@@ -22,25 +22,15 @@ actor Algo_DecodeSps()
 	int (size=32) NbBitsToRead,
 	bool          DecodeNextNal,
 
-	uint(size=6)  log2_max_frame_num,
-	bool          frame_mbs_only,
-	uint(size=2)  poc_type,
-	uint(size=6)  SzMaxPocLsb,
-	bool          delta_pic_order_always_zero,
-	uint(size=8)  NumRefFramesInPocCycle,
-	int (size=32) ExpectedDeltaPerPocCycle,
-	int (size=32) OffsetForRefFrameAccumul,
-	int (size=32) OffsetForNonRefPic,
-	int (size=32) OffsetForTopToBottomField,
 	uint(size=32) PicSzInMbs,
 	uint(size=32) PicWdtInMbs,
-	bool          MbAdaptFrameField,
 	uint(size=4)  BitDepthLuma,
 	uint(size=4)  BitDepthChroma,
 	bool          Direct8x8Inference,
 	uint(size=2)  ChromaArrayType,
 	uint(size=2)  Num_C8x8,
 	uint(size=5)  SizeDPBMax,
+	int (size=32) SliceHeaderParameters,
 
 	uint(size=31) MMCO_MaxFrameNum,
 	uint(size=5)  MMCO_NumRefFrame,
@@ -143,6 +133,16 @@ actor Algo_DecodeSps()
 * Actions
 *
 */
+	function SetFlag(bool ValFlag, uint(size=5)Idx, int(size=32) Val)
+				-->
+			int(size=32)
+		:
+			if(ValFlag) then
+				Val | (1<<Idx)
+			else
+				Val & (-1 ^ (1<<Idx))
+			end
+		end
 
 	ReadSpsId.Asked: action
 				==>
@@ -154,24 +154,15 @@ actor Algo_DecodeSps()
 	SpsParam.AskedFromPic: action
 			SpsAskedFromPic :[ValSps]
 				==>
-			log2_max_frame_num          :[log2_max_frame_num_minus4[ValSps] + 4],
-			frame_mbs_only              :[val_frame_mbs_only],
-			poc_type                    :[pic_order_cnt_type[ValSps]],
-			SzMaxPocLsb                 :[log2_max_pic_order_cnt_lsb_minus4[ValSps] + 4],
-			delta_pic_order_always_zero :[ValDeltaPic],
-			NumRefFramesInPocCycle      :[num_ref_frames_in_pic_order_cnt_cycle[ValSps]],
-			ExpectedDeltaPerPocCycle    :[expected_delta_per_poc_cycle[ValSps]],
-			OffsetForNonRefPic          :[offset_for_non_ref_pic[ValSps]],
-			OffsetForTopToBottomField   :[offset_for_top_to_bottom_field[ValSps]],
 			PicSzInMbs                  :[pic_size_in_mbs[ValSps]],
 			PicWdtInMbs                 :[pic_width_in_mbs_minus1[ValSps] + 1],
-			MbAdaptFrameField           :[ValMbAdaptFrameField],
 			BitDepthLuma                :[bit_depth_luma_minus8[ValSps]+8],
 			BitDepthChroma              :[bit_depth_chroma_minus8[ValSps]+8],
 			Direct8x8Inference          :[ValDirect8x8Inference],
 			ChromaArrayType             :[Chroma_Array_Type[ValSps]],
 			Num_C8x8                    :[NumC8x8[ValSps]],
 			SizeDPBMax                  :[MaxDPBSz[ValSps]],
+			SliceHeaderParameters       :[SliceHeaderParam]repeat 8,
 
 			MMCO_MaxFrameNum            :[max_frame_num[ValSps]],
 			MMCO_NumRefFrame            :[num_ref_frames[ValSps]]
@@ -179,8 +170,10 @@ actor Algo_DecodeSps()
 			bool val_frame_mbs_only,
 			bool ValDeltaPic,
 			bool ValMbAdaptFrameField,
-			bool ValDirect8x8Inference
+			bool ValDirect8x8Inference,
+			List(type: int(size=32), size=8) SliceHeaderParam
 		do
+
 			val_frame_mbs_only :=
 				if(frame_mbs_only_flag[ValSps] = 0)then
 					false
@@ -205,13 +198,22 @@ actor Algo_DecodeSps()
 				else
 					true
 				end;
+			SliceHeaderParam[0] := expected_delta_per_poc_cycle[ValSps];
+			SliceHeaderParam[1] := log2_max_frame_num_minus4[ValSps] + 4;
+			SliceHeaderParam[2] := num_ref_frames_in_pic_order_cnt_cycle[ValSps];
+			SliceHeaderParam[3] := offset_for_top_to_bottom_field[ValSps];
+			SliceHeaderParam[4] := offset_for_non_ref_pic[ValSps];
+			SliceHeaderParam[5] := log2_max_pic_order_cnt_lsb_minus4[ValSps] + 4;
+			SliceHeaderParam[6] := pic_order_cnt_type[ValSps];
+			SliceHeaderParam[7] := SetFlag(val_frame_mbs_only,2,SetFlag(ValDeltaPic,1,SetFlag(ValMbAdaptFrameField,0,0)));
+
 			sps_id  := ValSps;
 			LoopVal := 0;
 		end
 
 	SendOff4RefFrameAcc.Launch: action
 				==>
-			OffsetForRefFrameAccumul:[offset_for_ref_frame_accumul[sps_id][LoopVal]]
+			SliceHeaderParameters:[offset_for_ref_frame_accumul[sps_id][LoopVal]]
 		guard
 			LoopVal <= num_ref_frames_in_pic_order_cnt_cycle[sps_id]
 		do

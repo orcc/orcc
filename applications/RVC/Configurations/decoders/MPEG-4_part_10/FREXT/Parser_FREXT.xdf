@@ -583,40 +583,8 @@
         src="DecodePic" src-port="DecodeNextNal"/>
     <Connection dst="PicVLDecoding" dst-port="TypeOfVLD" src="DecodePic" src-port="TypeOfVLD"/>
     <Connection dst="PicVLDecoding" dst-port="VLD_Param" src="DecodePic" src-port="VLDParam"/>
-    <Connection dst="DecodePic" dst-port="ExpectedDeltaPerPocCycle"
-        src="DecodeSps" src-port="ExpectedDeltaPerPocCycle"/>
-    <Connection dst="DecodePic" dst-port="Log2MaxFrameNum"
-        src="DecodeSps" src-port="log2_max_frame_num"/>
-    <Connection dst="DecodePic" dst-port="MbAdaptFrameField"
-        src="DecodeSps" src-port="MbAdaptFrameField"/>
-    <Connection dst="DecodePic" dst-port="NumRefFramesInPocCycle"
-        src="DecodeSps" src-port="NumRefFramesInPocCycle"/>
-    <Connection dst="DecodePic" dst-port="OffsetForNonRefPic"
-        src="DecodeSps" src-port="OffsetForNonRefPic"/>
-    <Connection dst="DecodePic" dst-port="OffsetForRefFrameAccumul"
-        src="DecodeSps" src-port="OffsetForRefFrameAccumul"/>
-    <Connection dst="DecodePic" dst-port="OffsetForTopToBottomField"
-        src="DecodeSps" src-port="OffsetForTopToBottomField"/>
-    <Connection dst="DecodePic" dst-port="delta_pic_order_always_zero"
-        src="DecodeSps" src-port="delta_pic_order_always_zero"/>
-    <Connection dst="DecodePic" dst-port="frame_mbs_only"
-        src="DecodeSps" src-port="frame_mbs_only"/>
-    <Connection dst="DecodePic" dst-port="poc_type" src="DecodeSps" src-port="poc_type"/>
-    <Connection dst="DecodePic" dst-port="NumSliceGroups"
-        src="DecodePps" src-port="NumSliceGroups"/>
-    <Connection dst="DecodePic" dst-port="PicInitQP" src="DecodePps" src-port="PicInitQp"/>
-    <Connection dst="DecodePic" dst-port="SizeSliceGroupChgCycle"
-        src="DecodePps" src-port="SizeSliceGroupChgCycle"/>
-    <Connection dst="DecodePic" dst-port="SliceGroupMapType"
-        src="DecodePps" src-port="SliceGroupMapType"/>
-    <Connection dst="DecodePic"
-        dst-port="deblocking_filter_control_present" src="DecodePps" src-port="deblocking_filter_control_present"/>
     <Connection dst="DecodePic" dst-port="entropy_coding_mode"
         src="DecodePps" src-port="entropy_coding_mode"/>
-    <Connection dst="DecodePic" dst-port="pic_order_present"
-        src="DecodePps" src-port="pic_order_present"/>
-    <Connection dst="DecodePic" dst-port="redundant_pic_cnt_present"
-        src="DecodePps" src-port="redundant_pic_cnt_present"/>
     <Connection dst="DecodePic" dst-port="BitDepthChroma"
         src="DecodeSps" src-port="BitDepthChroma"/>
     <Connection dst="DecodePic" dst-port="BitDepthLuma" src="DecodeSps" src-port="BitDepthLuma"/>
@@ -635,8 +603,6 @@
         src="DecodePps" src-port="Transform8x8Mode"/>
     <Connection dst="DecodePic" dst-port="NumRefIdxLXActive"
         src="DecodePps" src-port="NumRefIdxLXActive"/>
-    <Connection dst="DecodePic" dst-port="log2_max_poc_lsb"
-        src="DecodeSps" src-port="SzMaxPocLsb"/>
     <Connection dst="DecodePps" dst-port="PpsAsked" src="DecodePic" src-port="GetPps"/>
     <Connection dst="MMCO" dst-port="FraNum" src="DecodePic" src-port="FrameNum"/>
     <Connection dst="MMCO" dst-port="POC" src="DecodePic" src-port="POC"/>
@@ -703,4 +669,8 @@
         src="DecodePic" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="MVReconstruct" dst-port="sub_mb_type"
         src="DecodePic" src-port="SubMbType"/>
+    <Connection dst="DecodePic" dst-port="PpsParam4SliceHeader"
+        src="DecodePps" src-port="SliceHeaderParameters"/>
+    <Connection dst="DecodePic" dst-port="SpsParam4SliceHeader"
+        src="DecodeSps" src-port="SliceHeaderParameters"/>
 </XDF>

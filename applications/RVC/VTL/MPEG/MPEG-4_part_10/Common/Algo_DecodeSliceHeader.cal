@@ -18,27 +18,9 @@ actor Algo_DecodeSliceHeader()
 	bool          IsAnIdrPic,
 	uint(size=2)  NalRefIdc,
 	bool          RstPrevFrameNum,
-	
-	uint(size=6)  Log2MaxFrameNum,
-	bool          frame_mbs_only,
-	uint(size=2)  poc_type,
-	uint(size=6)  log2_max_poc_lsb,
-	bool          delta_pic_order_always_zero,
-	uint(size=8)  NumRefFramesInPocCycle,
-	int (size=32) ExpectedDeltaPerPocCycle,
-	int (size=32) OffsetForRefFrameAccumul,
-	int (size=32) OffsetForNonRefPic,
-	int (size=32) OffsetForTopToBottomField,
-	bool          MbAdaptFrameField,
 
-	bool          pic_order_present,
-	bool          redundant_pic_cnt_present,
-	bool          entropy_coding_mode,
-	bool          deblocking_filter_control_present,
-	uint(size=4)  NumSliceGroups,
-	uint(size=3)  SliceGroupMapType,
-	int (size=32) SizeSliceGroupChgCycle,
-	int (size=8)  PicInitQP
+	int (size=32) PpsParameters,
+	int (size=32) SpsParameters
 		==>
 	uint(size=31) FramNumCurrPic,
 
@@ -134,6 +116,7 @@ actor Algo_DecodeSliceHeader()
 	uint(size=4)  num_slice_groups;
 	uint(size=3)  slice_group_map_type;
 	int (size=32) SzSliceGroupChgCycle;
+	int (size=8)  ValPicInitQp;
 	//Poc parameters
 	int (size=32) prev_frame_num         := 0;
 	int (size=32) frame_num_offset       := 0;
@@ -146,6 +129,12 @@ actor Algo_DecodeSliceHeader()
 
 	int (size=32) LoopVal;
 
+	function GetFlag(int(size=32) Val, uint(size=5) Idx)
+				-->
+			bool
+		:
+			(Val & (1 << Idx)) != 0
+		end
 /*   
 *
 * Actions
@@ -172,16 +161,12 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadSliceType.Done: action
-			ValVLD     :[ValueOfVLD] repeat 3,
-			IsAnIdrPic :[IdrPic],
-			NalRefIdc  :[ValNalRefIdc]
+			ValVLD         :[ValueOfVLD] repeat 3
 				==>
 			FirstMbInSlice :[ValueOfVLD[0]],
 			GetPps         :[ValueOfVLD[2]],
 			SliceType      :[slice_type]
 		do
-			Idr_flag          := IdrPic;
-			nal_ref_idc       := ValNalRefIdc;
 			first_mb_in_slice := ValueOfVLD[0];
 			slice_type        :=
 				if( ValueOfVLD[1] < 5) then
@@ -211,65 +196,55 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadFrameNum.Asked: action
-			Log2MaxFrameNum :[SzMaxFrameNum]
+			SpsParameters :[SpsParam] repeat 8
 				==>
 			//                frame_num
 			TypeOfVLD :[   READ_BITS   ],
-			VLDParam  :[ SzMaxFrameNum ]
+			VLDParam  :[ log2_max_frame_num ]
 		do
-			log2_max_frame_num := SzMaxFrameNum;
+			expected_delta_per_poc_cycle           := SpsParam[0];
+			log2_max_frame_num                     := SpsParam[1];
+			num_ref_frames_in_pic_order_cnt_cycle  := SpsParam[2];
+			offset_for_top_to_bottom_field         := SpsParam[3];
+			offset_for_non_ref_pic                 := SpsParam[4];
+			SzMaxPocLsb                            := SpsParam[5];
+			pic_order_cnt_type                     := SpsParam[6];
+			mb_adaptive_frame_field_flag           := GetFlag(SpsParam[7],0);
+			delta_pic_order_always_zero_flag       := GetFlag(SpsParam[7],1);
+			frame_mbs_only_flag                    := GetFlag(SpsParam[7],2);
 		end
 
 
 	ReadFrameNum.Done: action
-			ValVLD                            :[ValueOfVLD],
+			ValVLD        :[ValueOfVLD],
 
-			frame_mbs_only                    :[ValFrameMbsOnly],
-			poc_type                          :[ValPocType],
-			log2_max_poc_lsb                  :[ValSzMaxPocLsb],
-			pic_order_present                 :[ValPicOrderPresent],
-			delta_pic_order_always_zero       :[ValDeltaPic],
-			redundant_pic_cnt_present         :[ValRedPicCnt],
-			entropy_coding_mode               :[ValEntropyCodingMode],
-			deblocking_filter_control_present :[ValDebFilContPres],
-			NumSliceGroups                    :[ValNumSliceGroups],
-			SliceGroupMapType                 :[ValSliceGroupMapType],
-			SizeSliceGroupChgCycle            :[ValSzSliceGroupChgCycle],
-			NumRefFramesInPocCycle            :[ValNumRefFramesInPocCycle],
-			ExpectedDeltaPerPocCycle          :[ValExpectedDeltaPerPocCycle],
-			OffsetForNonRefPic                :[ValOffsetForNonRefPic],
-			OffsetForTopToBottomField         :[ValOffsetForTopToBottomField],
-			MbAdaptFrameField                 :[ValMbAdaptFrameField]
+			PpsParameters :[PpsParam] repeat 5,
+			IsAnIdrPic    :[IdrPic],
+			NalRefIdc     :[ValNalRefIdc]
 				==>
 			FramNumCurrPic                    :[ValueOfVLD]
 		do
+			num_slice_groups                       := PpsParam[0];
+			ValPicInitQp                           := PpsParam[1];
+			SzSliceGroupChgCycle                   := PpsParam[2];
+			slice_group_map_type                   := PpsParam[3];
+			deblocking_filter_control_present_flag := GetFlag(PpsParam[4],0);
+			pic_order_present_flag                 := GetFlag(PpsParam[4],1);
+			redundant_pic_cnt_present_flag         := GetFlag(PpsParam[4],2);
+			entropy_coding_mode_flag               := GetFlag(PpsParam[4],3);
 			prev_frame_num                         := frame_num;
+			Idr_flag                               := IdrPic;
+			nal_ref_idc                            := ValNalRefIdc;
 			frame_num                              := ValueOfVLD;
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tframe_num:        "+ValueOfVLD);
 			end
-			frame_mbs_only_flag                    := ValFrameMbsOnly;
-			pic_order_cnt_type                     := ValPocType;
-			SzMaxPocLsb                            := ValSzMaxPocLsb;
-			pic_order_present_flag                 := ValPicOrderPresent;
-			delta_pic_order_always_zero_flag       := ValDeltaPic;
-			redundant_pic_cnt_present_flag         := ValRedPicCnt;
-			entropy_coding_mode_flag               := ValEntropyCodingMode;
-			deblocking_filter_control_present_flag := ValDebFilContPres;
-			num_slice_groups                       := ValNumSliceGroups;
-			slice_group_map_type                   := ValSliceGroupMapType;
-			SzSliceGroupChgCycle                   := ValSzSliceGroupChgCycle;
-			num_ref_frames_in_pic_order_cnt_cycle  := ValNumRefFramesInPocCycle;
-			expected_delta_per_poc_cycle           := ValExpectedDeltaPerPocCycle;
-			offset_for_non_ref_pic                 := ValOffsetForNonRefPic;
-			offset_for_top_to_bottom_field         := ValOffsetForTopToBottomField;
-			mb_adaptive_frame_field_flag           := ValMbAdaptFrameField;
 			LoopVal := 0;
 		end
 
 
 	GetOff4RefFrameAcc.Launch: action
-			OffsetForRefFrameAccumul:[ValOffAccumul]
+			SpsParameters:[ValOffAccumul]
 				==>
 		guard
 			LoopVal <= num_ref_frames_in_pic_order_cnt_cycle
@@ -626,15 +601,14 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadSliceQpDelta.Done: action
-			ValVLD    :[VLDecoding],
-			PicInitQP :[ValInitQp]
+			ValVLD    :[VLDecoding]
 				==>
 			ValQp     :[ValueOfQp]
 		var
 			int(size=8) ValueOfQp
 		do
 			//slice_qp_delta := VLDecoding;
-			ValueOfQp      := VLDecoding + ValInitQp;
+			ValueOfQp      := VLDecoding + ValPicInitQp;
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tslice_qp_delta: "+VLDecoding);
 			end

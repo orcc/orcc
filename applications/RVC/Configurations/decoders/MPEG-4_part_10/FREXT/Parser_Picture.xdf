@@ -20,110 +20,8 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="Log2MaxFrameNum">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="frame_mbs_only">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="poc_type">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="log2_max_poc_lsb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="delta_pic_order_always_zero">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="NumRefFramesInPocCycle">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="ExpectedDeltaPerPocCycle">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="OffsetForRefFrameAccumul">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="OffsetForNonRefPic">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="OffsetForTopToBottomField">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbAdaptFrameField">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="pic_order_present">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="redundant_pic_cnt_present">
-        <Type name="bool"/>
-    </Port>
     <Port kind="Input" name="entropy_coding_mode">
         <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="deblocking_filter_control_present">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="NumSliceGroups">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="SliceGroupMapType">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="SizeSliceGroupChgCycle">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicInitQP">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
     </Port>
     <Port kind="Input" name="BitDepthChroma">
         <Type name="uint">
@@ -192,6 +90,20 @@
     </Port>
     <Port kind="Input" name="ResetPrevFrameNum">
         <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="PpsParam4SliceHeader">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SpsParam4SliceHeader">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
     </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
@@ -807,38 +719,6 @@
     <Connection dst="" dst-port="TypeOfVLD" src="Mgnt_DecodePic" src-port="TypeOfVLD"/>
     <Connection dst="" dst-port="VLDParam" src="Mgnt_DecodePic" src-port="VLD_Param"/>
     <Connection dst="DecodeSliceHeader" dst-port="NalRefIdc" src="" src-port="NalRefIdc"/>
-    <Connection dst="DecodeSliceHeader" dst-port="Log2MaxFrameNum"
-        src="" src-port="Log2MaxFrameNum"/>
-    <Connection dst="DecodeSliceHeader" dst-port="frame_mbs_only" src="" src-port="frame_mbs_only"/>
-    <Connection dst="DecodeSliceHeader" dst-port="poc_type" src="" src-port="poc_type"/>
-    <Connection dst="DecodeSliceHeader" dst-port="log2_max_poc_lsb"
-        src="" src-port="log2_max_poc_lsb"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="delta_pic_order_always_zero" src="" src-port="delta_pic_order_always_zero"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="NumRefFramesInPocCycle" src="" src-port="NumRefFramesInPocCycle"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="ExpectedDeltaPerPocCycle" src="" src-port="ExpectedDeltaPerPocCycle"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="OffsetForRefFrameAccumul" src="" src-port="OffsetForRefFrameAccumul"/>
-    <Connection dst="DecodeSliceHeader" dst-port="OffsetForNonRefPic"
-        src="" src-port="OffsetForNonRefPic"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="OffsetForTopToBottomField" src="" src-port="OffsetForTopToBottomField"/>
-    <Connection dst="DecodeSliceHeader" dst-port="MbAdaptFrameField"
-        src="" src-port="MbAdaptFrameField"/>
-    <Connection dst="DecodeSliceHeader" dst-port="pic_order_present"
-        src="" src-port="pic_order_present"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="redundant_pic_cnt_present" src="" src-port="redundant_pic_cnt_present"/>
-    <Connection dst="DecodeSliceHeader" dst-port="entropy_coding_mode"
-        src="" src-port="entropy_coding_mode"/>
-    <Connection dst="DecodeSliceHeader" dst-port="NumSliceGroups" src="" src-port="NumSliceGroups"/>
-    <Connection dst="DecodeSliceHeader" dst-port="SliceGroupMapType"
-        src="" src-port="SliceGroupMapType"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="SizeSliceGroupChgCycle" src="" src-port="SizeSliceGroupChgCycle"/>
-    <Connection dst="DecodeSliceHeader" dst-port="PicInitQP" src="" src-port="PicInitQP"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="EntropyCodingMode"
         src="" src-port="entropy_coding_mode"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="BitDepthChroma"
@@ -906,8 +786,6 @@
         dst-port="MbPredSelectList" src="DecodeMbPred" src-port="SelectList"/>
     <Connection dst="" dst-port="SelectList"
         src="MergeDataFromSDataAndMbLayer" src-port="SelectList"/>
-    <Connection dst="DecodeSliceHeader"
-        dst-port="deblocking_filter_control_present" src="" src-port="deblocking_filter_control_present"/>
     <Connection dst="" dst-port="slice_type"
         src="MergeDataFromSDataAndMbLayer" src-port="slice_type"/>
     <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="SliceType"
@@ -934,4 +812,6 @@
     <Connection dst="DecodeMacroBlockLayer" dst-port="SubMbType"
         src="DecodeSubMbPred" src-port="SubMbType"/>
     <Connection dst="" dst-port="SubMbType" src="DecodeSubMbPred" src-port="SubMbType"/>
+    <Connection dst="DecodeSliceHeader" dst-port="PpsParameters" src="" src-port="PpsParam4SliceHeader"/>
+    <Connection dst="DecodeSliceHeader" dst-port="SpsParameters" src="" src-port="SpsParam4SliceHeader"/>
 </XDF>
