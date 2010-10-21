@@ -398,7 +398,8 @@ FSM* JIT::createFSM(Instance* instance, FSM* fsm){
 ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler* actionScheduler){
 	FSM* fsm = NULL;
 	Function* initializeFunction = NULL;
-	
+	InstancedActor* instancedActor = instance->getInstancedActor();
+
 	//Create FSM if present
 	if (actionScheduler->hasFsm()){
 		fsm = createFSM(instance, actionScheduler->getFsm());

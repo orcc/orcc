@@ -46,6 +46,7 @@ namespace llvm{
 	class ConstantInt;
 	class Function;
 	class LLVMContext;
+	class CallInst;
 }
 
 class Action;
@@ -84,7 +85,7 @@ private:
 	llvm::BasicBlock* createSchedulerFSM(ActionScheduler* actionScheduler, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB);
 	llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::Function* function);
 	llvm::BasicBlock* createOutputPattern(Action* action, llvm::BasicBlock* BB, llvm::Function* function);
-	llvm::BasicBlock* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

@@ -71,9 +71,7 @@ ActionSchedulerAdder::ActionSchedulerAdder(Instance* instance, Decoder* decoder,
 }
 
 void ActionSchedulerAdder::createScheduler(ActionScheduler* actionScheduler){
-	
 		Function* scheduler = createSchedulerFn(actionScheduler);
-		actionScheduler->setSchedulerFunction(scheduler);
 }
 
 Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionScheduler){
@@ -119,6 +117,7 @@ Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionSchedul
 			BB = createSchedulerFSM(actionScheduler, BB, returnBB);
 		}else{
 			BB = createSchedulerNoFSM(instancedActor->getActions(), BB, returnBB, incBB, scheduler);
+			instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);
 		}
 
 		return scheduler;
@@ -170,20 +169,47 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
 	
 	if (!outputPattern->empty()){
-		for ( it=outputPattern->begin() ; it != outputPattern->end(); it++ ){
-			createOutputTest(it->first, it->second, fireBB);
-		}
-	}
+		std::list<Value*>::iterator itValue;
+		std::list<Value*> values;
 
-	//Branch fire basic block to BB basic block
-	BranchInst::Create(incBB, fireBB);
+		for ( it=outputPattern->begin() ; it != outputPattern->end(); it++ ){
+			Value* hasRoomValue = createOutputTest(it->first, it->second, fireBB);
+			TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", fireBB);
+			values.push_back(truncRoomInst);
+		}
+
+		itValue=values.begin();
+		Value* value1 = *itValue;
+		for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
+			Value* value2 = *itValue;
+			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", fireBB);
+		}
+		
+		// Add a basic block hasRoom that fires the action
+		Procedure* body = action->getBody();
+		string hasRoomBrName = "hasRoom_";
+		hasRoomBrName.append(name);
+		BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
+		CallInst* callInst = CallInst::Create(body->getFunction(), "",  roomBB);
+
+		//Branch hasRoom block to inc i block
+		BranchInst::Create(incBB, roomBB);
+
+
+		//Finally branch fire to hasRoom block if all outputs have free room
+		BranchInst* brInst = BranchInst::Create(roomBB, skipBB, value1, fireBB);
+		
+	}else{
+		//Branch fire basic block to BB basic block
+		BranchInst::Create(incBB, fireBB);
+	}
 
 
 	return skipBB;
 }
 
 
-callInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	//Load selected port
 	Port* instPort = instancedActor->getPort(port->getName());
 	LoadInst* loadPort = new LoadInst(instPort->getGlobalVariable(), "", BB);
