@@ -137,9 +137,9 @@ InstancedActor* Decoder::createInstance(Instance* instance){
 	map<Variable*, GlobalVariable*>* stateVars = jit->createVariables(instance, actor->getStateVars());
 	map<Variable*, GlobalVariable*>* parameters = jit->createVariables(instance, actor->getParameters());
 	map<Procedure*, Function*>* procs = jit->createProcedures(instance, actor->getProcs());
-	list<Action*>* initializes = jit->createActions(instance, actor->getInitializes());
-	list<Action*>* actions = jit->createActions(instance, actor->getActions());
-	ActionScheduler* actionScheduler = jit->createActionScheduler(instance, actor->getActionScheduler());
+	map<string, Action*>* initializes = jit->createActions(instance, actor->getInitializes());
+	map<string, Action*>* actions = jit->createActions(instance, actor->getActions());
+	ActionScheduler* actionScheduler = jit->createActionScheduler(instance, actor->getActionScheduler(), actions);
 
 	return new InstancedActor(this, instance, inputs, outputs, stateVars, parameters, procs, actions, actionScheduler);
 }

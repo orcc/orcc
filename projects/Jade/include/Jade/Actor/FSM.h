@@ -150,6 +150,24 @@ public:
 			this->name = name;
 		}
 
+		/**
+		 * @brief Returns the index of this state.
+		 * 
+		 * @return the index of this state
+		 */
+		int getIndex() {
+			return index;
+		}
+
+		/**
+		 * @brief Returns the name of this state.
+		 * 
+		 * @return the name of this state
+		 */
+		std::string getName() {
+			return name;
+		}
+		
 	private:
 		/** index of the state */
 		int index;
@@ -259,6 +277,15 @@ public:
 	void setInitialState(std::string state) {
 		initialState = addState(state);
 	}
+
+	/**
+	 * @brief Get the initial state
+	 *
+	 * Gets the initial state of this FSM.
+	 * 
+	 * @return the initial state
+	 */
+	State* getInitialState() {return initialState;};
 
 
 private:

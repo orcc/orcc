@@ -51,7 +51,7 @@ InstancedActor::InstancedActor(Decoder* decoder, Instance* instance,
 								map<Variable*, GlobalVariable*>* stateVars,
 								map<Variable*, GlobalVariable*>* parameters,
 								map<Procedure*, Function*>* procedures,
-								list<Action*>* actions,
+								std::map<std::string, Action*>* actions,
 								ActionScheduler* scheduler){
 		this->instance = instance;
 		this->decoder = decoder;

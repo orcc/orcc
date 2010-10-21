@@ -74,7 +74,7 @@ public:
 				std::map<Variable*, llvm::GlobalVariable*>* stateVars,
 				std::map<Variable*, llvm::GlobalVariable*>* parameters,
 				std::map<Procedure*, llvm::Function*>* procedures,
-				std::list<Action*>* actions,
+				std::map<std::string, Action*>* actions,
 				ActionScheduler* scheduler);
 
 	~InstancedActor();
@@ -229,7 +229,25 @@ public:
 	 *  @return a list of actions
 	 *
      */
-	std::list<Action*>* getActions(){return actions;};
+	std::map<std::string, Action*>* getActions(){return actions;};
+
+	/**
+     *  @brief get action corresponding to the given name
+	 *
+	 *
+	 *  @return Action corresponding to the given name
+	 *
+     */
+	Action* getAction(std::string name){
+		std::map<std::string, Action*>::iterator it;
+		it = actions->find(name);
+		
+		if (it != actions->end()){
+			return it->second;
+		}
+
+		return NULL;
+	};
 
 	llvm::GlobalVariable* getStateVar(Variable* stateVar);
 
@@ -271,8 +289,8 @@ private:
 	/** Fifo bounds to the instanced FU */
 	FifoCircular* fifo;
 
-	/** Action list of the instanced Functional Unit */
-	std::list<Action*>* actions;
+	/** Action map of the instanced Functional Unit */
+	std::map<std::string, Action*>* actions;
 };
 
 #endif

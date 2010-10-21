@@ -82,7 +82,7 @@ private:
 	void createScheduler(ActionScheduler* actionScheduler);
 	llvm::Function* createSchedulerFn(ActionScheduler* actionScheduler);
 	llvm::BasicBlock* createSchedulerNoFSM(std::list<Action*>* actions, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, llvm::BasicBlock* incBB, llvm::Function* function);
-	llvm::BasicBlock* createSchedulerFSM(ActionScheduler* actionScheduler, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB);
+	llvm::BasicBlock* createSchedulerFSM(ActionScheduler* actionScheduler, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, llvm::BasicBlock* incBB, llvm::Function* function);
 	llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::Function* function);
 	llvm::BasicBlock* createOutputPattern(Action* action, llvm::BasicBlock* BB, llvm::Function* function);
 	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);

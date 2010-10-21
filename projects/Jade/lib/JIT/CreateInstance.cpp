@@ -329,13 +329,14 @@ GlobalVariable* JIT::CreateVariable(Instance* instance, GlobalVariable* variable
 }
 
 
-list<Action*>* JIT::createActions(Instance* instance, list<Action*>* actions){
-	list<Action*>* newActions = new list<Action*>();
+map<string, Action*>* JIT::createActions(Instance* instance, list<Action*>* actions){
+	map<string, Action*>* newActions = new map<string, Action*>();
 	
 	list<Action*>::iterator it;
 
 	for (it = actions->begin(); it != actions->end(); ++it){
-		newActions->push_back(createAction(instance, *it));
+		Action* action = createAction(instance, *it);
+		newActions->insert(pair<string, Action*>(action->getName(),action));
 	}
 
 	return newActions;
@@ -392,13 +393,28 @@ FSM* JIT::createFSM(Instance* instance, FSM* fsm){
 
 	newFSM->setFunctions(newFunctions);
 
+	//Set initiale state of the FSM
+	newFSM->setInitialState(fsm->getInitialState()->getName());
+
 	return newFSM;
 }
 
-ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler* actionScheduler){
+ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler* actionScheduler, map<string, Action*>* instActions){
 	FSM* fsm = NULL;
 	Function* initializeFunction = NULL;
-	InstancedActor* instancedActor = instance->getInstancedActor();
+	list<Action*>* instancedActions = new list<Action*>();
+
+	//Get actions of action scheduler
+	list<Action*>::iterator it;
+	map<string, Action*>::iterator itActionsMap;
+	list<Action*>* actions = actionScheduler->getActions();
+
+	for (it = actions->begin(); it != actions->end(); it++){
+		itActionsMap = instActions->find((*it)->getName());
+		if (itActionsMap != instActions->end()){
+			instancedActions->push_back(itActionsMap->second);
+		}
+	}
 
 	//Create FSM if present
 	if (actionScheduler->hasFsm()){
@@ -413,5 +429,5 @@ ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler*
 	//Create action scheduler
 	Function* schedulerFunction = CreateFunction(instance, actionScheduler->getSchedulerFunction());
 
-	return new ActionScheduler(new list<Action*>(), schedulerFunction, initializeFunction, fsm);
+	return new ActionScheduler(instancedActions, schedulerFunction, initializeFunction, fsm);
 }

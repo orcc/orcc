@@ -108,7 +108,7 @@ InstancedActor* BroadcastActor::instanciate(Instance* instance){
 	}
 
 
-	return new InstancedActor(decoder, instance, instancedInputs, instancedOutputs, new map<Variable*, GlobalVariable*>(), new map<Variable*, GlobalVariable*>(), new map<Procedure*, Function*>(), new list<Action*>(),  actionScheduler);
+	return new InstancedActor(decoder, instance, instancedInputs, instancedOutputs, new map<Variable*, GlobalVariable*>(), new map<Variable*, GlobalVariable*>(), new map<Procedure*, Function*>(), new map<std::string, Action*>(),  actionScheduler);
 
 }
 

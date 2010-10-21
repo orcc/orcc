@@ -237,14 +237,14 @@ public:
 
 	InstancedFU* instanciate(Instance* instance, Decoder* decoder);
 	void createParameters(Instance* instance, Decoder* decoder);
-	std::list<Action*>* createActions(Instance* instance, std::list<Action*>* actions);
+	std::map<std::string, Action*>* createActions(Instance* instance, std::list<Action*>* actions);
 	Action* createAction(Instance* instance, Action* action);
 	Procedure* CreateProcedure(Instance* instance, Procedure* procedure);
 	llvm::Function* CreateFunction(Instance* instance, llvm::Function* function);
 	llvm::GlobalVariable* CreateVariable(Instance* instance, llvm::GlobalVariable* variable);
 	std::map<Variable*, llvm::GlobalVariable*>* createVariables(Instance* instance, std::map<std::string, Variable*>* vars);
 	std::list<Procedure*>* createProcedures(Instance* instance, Decoder* decoder);
-	ActionScheduler* createActionScheduler(Instance* instance, ActionScheduler* actionScheduler);
+	ActionScheduler* createActionScheduler(Instance* instance, ActionScheduler* actionScheduler, std::map<std::string, Action*>* instActions);
 	FSM* createFSM(Instance* instance, FSM* fsm);
 	std::map<Procedure*, llvm::Function*>* createProcedures(Instance* instance, std::map<std::string, Procedure*>* procs);
 

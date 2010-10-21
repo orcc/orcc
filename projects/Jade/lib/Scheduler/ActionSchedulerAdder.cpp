@@ -42,6 +42,7 @@
 #include "Jade/Actor/ActionScheduler.h"
 #include "Jade/Actor/ActionTag.h"
 #include "Jade/Actor/Actor.h"
+#include "Jade/Actor/FSM.h"
 #include "Jade/Actor/Port.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Decoder/Decoder.h"
@@ -63,10 +64,8 @@ ActionSchedulerAdder::ActionSchedulerAdder(Instance* instance, Decoder* decoder,
 	this->decoder = decoder;
 	this->instance = instance;
 	this->instancedActor = instance->getInstancedActor();
-
-	ActionScheduler* scheduler = actor->getActionScheduler();
 	
-	createScheduler(scheduler);
+	createScheduler(instancedActor->getActionScheduler());
 
 }
 
@@ -82,7 +81,6 @@ Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionSchedul
 
 		Function* scheduler = cast<Function>(module->getOrInsertFunction(name, Type::getInt32Ty(Context),
 											  (Type *)0));
-		
 		//Create values
 		Value *Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
 		Value *One = ConstantInt::get(Type::getInt32Ty(Context), 1);
@@ -114,16 +112,30 @@ Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionSchedul
 		
 
 		if (actionScheduler->hasFsm()){
-			BB = createSchedulerFSM(actionScheduler, BB, returnBB);
+			BB = createSchedulerFSM(actionScheduler, BB, returnBB, incBB, scheduler);
 		}else{
-			BB = createSchedulerNoFSM(instancedActor->getActions(), BB, returnBB, incBB, scheduler);
+			BB = createSchedulerNoFSM(actionScheduler->getActions(), BB, returnBB, incBB, scheduler);
 			instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);
 		}
 
 		return scheduler;
 }
 
-BasicBlock* ActionSchedulerAdder::createSchedulerFSM(ActionScheduler* actionScheduler, BasicBlock* BB, BasicBlock* returnBB){
+BasicBlock* ActionSchedulerAdder::createSchedulerFSM(ActionScheduler* actionScheduler, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+	FSM* fsm = actionScheduler->getFsm();
+
+	//Create a variable that store the current state of the FSM
+	Module* module = decoder->getModule();
+	string name = instance->getId();
+	name.append("_FSM_state2");
+	GlobalVariable* stateVar = cast<GlobalVariable>(module->getOrInsertGlobal(name, Type::getInt32Ty(Context)));
+	
+	//Set initial state to the state variable
+	FSM::State* state = fsm->getInitialState();
+	stateVar->setInitializer(ConstantInt::get(Type::getInt32Ty(Context), state->getIndex()));
+
+	//Load state variable
+	LoadInst* loadStateVar = new LoadInst(stateVar, "", BB);
 
 	//Create branch from skip to return
 	BranchInst::Create(returnBB, BB);
@@ -146,12 +158,14 @@ BasicBlock* ActionSchedulerAdder::createSchedulerNoFSM(list<Action*>* actions, B
 
 BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, Function* function){
 	string name = action->getName();
+	name.append(instance->getId());
 	string skipBrName = "skip_";
 	string hasRoomBrName = "hasroom_";
 	string fireBrName = "fire_";
 	skipBrName.append(name);
 	hasRoomBrName.append(name);
 	fireBrName.append(name);
+	Procedure* body = action->getBody();
 
 	// Add a basic block to bb for firing instructions
 	BasicBlock* fireBB = BasicBlock::Create(Context, fireBrName, function);
@@ -186,7 +200,6 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 		}
 		
 		// Add a basic block hasRoom that fires the action
-		Procedure* body = action->getBody();
 		string hasRoomBrName = "hasRoom_";
 		hasRoomBrName.append(name);
 		BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
@@ -200,6 +213,9 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 		BranchInst* brInst = BranchInst::Create(roomBB, skipBB, value1, fireBB);
 		
 	}else{
+		//Launch action body
+		CallInst* callInst = CallInst::Create(body->getFunction(), "",  fireBB);
+
 		//Branch fire basic block to BB basic block
 		BranchInst::Create(incBB, fireBB);
 	}
