@@ -31,7 +31,6 @@ package net.sf.orcc.backends.cpp;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,19 +162,6 @@ public class CppBackendImpl extends AbstractBackend {
 
 		partition = getAttribute("net.sf.orcc.backends.partition", false);
 
-		if (partition) {
-			new NetworkPartitioner().transform(network);
-
-			if (network.getNetworks().size() > 1) {
-				try {
-					network.computeTemplateMaps();
-					new CppConfigPrinter().print(path, network);
-				} catch (IOException e) {
-					throw new OrccException("I/O error", e);
-				}
-			}
-		}
-
 		printer = new STPrinter();
 		printer.setExpressionPrinter(CppExprPrinter.class);
 		printer.setTypePrinter(CppTypePrinter.class);
@@ -200,10 +186,7 @@ public class CppBackendImpl extends AbstractBackend {
 		IAttribute attr = instance.getAttribute("partName");
 		if (attr != null) {
 			Expression expr = ((IValueAttribute) attr).getValue();
-			String[] partNames = ((StringExpr) expr).getValue().split("/");
-			if (partNames.length > 1) {
-				partName = partNames[1];
-			}
+			partName = ((StringExpr) expr).getValue();
 		}
 		return partName;
 	}
@@ -238,26 +221,22 @@ public class CppBackendImpl extends AbstractBackend {
 	 */
 	private void printNetwork(Network network) throws OrccException {
 		try {
-			List<Network> networks = (partition) ? network.getNetworks()
-					: Arrays.asList(network);
+
 			CppCMakePrinter cmakePrinter = new CppCMakePrinter();
-			for (Network subnetwork : networks) {
+			// compute thread lists if need
+			computeMapping(network);
+			// add wrapper if needed
+			new SerDesAdder().transform(network);
+			// compute kind of fifos
+			computeFifoKind(network);
 
-				// compute thread lists if need
-				computeMapping(subnetwork);
-				// add wrapper if needed
-				new SerDesAdder().transform(subnetwork);
-				// compute kind of fifos
-				computeFifoKind(subnetwork);
+			String outputName = path + File.separator + network.getName()
+					+ ".cpp";
 
-				String outputName = path + File.separator
-						+ subnetwork.getName() + ".cpp";
+			printer.loadGroups("Cpp_network");
+			printer.printNetwork(outputName, network, false, fifoSize);
 
-				printer.loadGroups("Cpp_network");
-				printer.printNetwork(outputName, subnetwork, false, fifoSize);
-
-				cmakePrinter.printCMake(path, subnetwork, needSerDes);
-			}
+			cmakePrinter.printCMake(path, network, needSerDes);
 
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
