@@ -35,12 +35,14 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transforms.ChangeActionSchedulerFormTransformation;
 import net.sf.orcc.backends.xlim.transforms.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.transforms.BlockCombine;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
@@ -67,8 +69,11 @@ public class XlimBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
+		ActorTransformation[] transformations = {
+				new InlineTransformation(false, true),
+				new BlockCombine(),
+				new DeadGlobalElimination(), new DeadCodeElimination(),
+				new DeadVariableRemoval(),
 				new ExpressionSplitterTransformation(),
 				new MoveLiteralIntegers(), new VariableRenamer(),
 				new ChangeActionSchedulerFormTransformation() };

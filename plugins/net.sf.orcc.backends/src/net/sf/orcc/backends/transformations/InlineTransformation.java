@@ -128,8 +128,9 @@ public class InlineTransformation extends AbstractActorTransformation {
 	public void visit(List<CFGNode> nodes) {
 		List<CFGNode> oldCurrentNodes = currentNodes;
 		currentNodes = nodes;
-		for (currentIndex = 0; currentIndex < nodes.size(); currentIndex++) {
-			nodes.get(currentIndex).accept(this);
+		for (int i = 0; i < nodes.size(); i++) {
+			currentIndex = i;
+			nodes.get(i).accept(this);
 		}
 		currentNodes = oldCurrentNodes;
 	}
