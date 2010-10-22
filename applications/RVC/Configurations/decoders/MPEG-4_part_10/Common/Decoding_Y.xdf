@@ -191,10 +191,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MaxDPBSize">
-        <Type name="uint">
+    <Port kind="Input" name="PocToDisplay">
+        <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
         </Type>
     </Port>
@@ -359,7 +359,6 @@
     <Connection dst="TEX_L" dst-port="slice_alpha_c0_offset" src="" src-port="slice_alpha_c0_offset"/>
     <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_beta_offset"/>
     <Connection dst="TEX_L" dst-port="DelList" src="" src-port="DelList"/>
-    <Connection dst="TEX_L" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
     <Connection dst="TEX_L" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="RES_L" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
     <Connection dst="TEX_L" dst-port="MacroBlockType" src="" src-port="MacroBlockType"/>
@@ -369,4 +368,5 @@
     <Connection dst="TEX_L" dst-port="RefList1" src="" src-port="RefList1"/>
     <Connection dst="TEX_L" dst-port="RefIdx_l1" src="" src-port="RefIdx_l1"/>
     <Connection dst="TEX_L" dst-port="SelectList" src="" src-port="SelectList"/>
+    <Connection dst="TEX_L" dst-port="PocToDisplay" src="" src-port="PocToDisplay"/>
 </XDF>

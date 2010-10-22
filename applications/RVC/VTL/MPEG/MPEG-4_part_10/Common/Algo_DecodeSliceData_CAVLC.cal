@@ -25,20 +25,10 @@ This copyright notice must be included in all copies or derivative works. Copyri
 ***********************************************************************/
 actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int (size=32) ValVLD,
-	//PpsParameters
-	bool          EntropyCodingMode,
-	bool          Transform8x8Mode,
+
+	int(size=5)   PpsParameters,
+	uint(size=32) SpsParameters,
 	uint(size=5)  NumRefIdxLXActive,
-	bool          ConstraindedIntraPred,
-	int(size=5)   ChromaQpIdxOffset,
-	//Sps Parameters
-	uint(size=32) PicSzInMbs,
-	uint(size=32) PicWdtInMbs,
-	uint(size=4)  BitDepthLuma,
-	uint(size=4)  BitDepthChroma,
-	bool          Direct8x8Inference,
-	uint(size=2)  ChromaArrayType,
-	uint(size=2)  Num_C8x8,
 	//Slice Header Parameters
 	uint(size=13) FstMbInSlc,
 	uint(size=4)  SliceType,
@@ -163,6 +153,12 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	//		Mb_x := val_CurrMbAddr mod PicWidthInMbs;
 	//		Mb_y := val_CurrMbAddr / PicWidthInMbs;
 		end
+	function GetFlag(int(size=32) Val, uint(size=5) Idx)
+				-->
+			bool
+		:
+			(Val & (1 << Idx)) != 0
+		end
 
 	function SetFlag(bool ValFlag, uint(size=5)Idx, int(size=32) Val)
 				-->
@@ -176,47 +172,42 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 		end
 
 	GetSpsAndPpsParameters: action
-			EntropyCodingMode     :[ValEntropyCodingMode],
+			PpsParameters         :[PpsParam] repeat 3,
+			SpsParameters         :[SpsParam] repeat 7,
 			FstMbInSlc            :[ValFirstMbInSlice],
-			PicSzInMbs            :[ValPicSizeInMbs],
-			PicWdtInMbs           :[ValPicWdtInMbs],
 			SliceType             :[ValSliceType],
 			MbaffFrame            :[ValMbaffFrame],
-			BitDepthLuma          :[ValBitDepthLuma],
-			BitDepthChroma        :[ValBitDepthChroma],
-			Direct8x8Inference    :[ValDirect8x8Inference],
-			Transform8x8Mode      :[ValTransform8x8Mode],
 			NumRefIdxLXActive     :[ValNumRefIdxLXActive] repeat 2,
-			ChromaArrayType       :[ValChromaArrayType],
-			Num_C8x8              :[ValNum_C8x8],
-			ConstraindedIntraPred :[ValConstrIntrPred],
 			DisDeblocFilterIdc    :[ValDisDebFil],
 			SliceBetaOffset       :[ValSliceBetaOffset],
 			SliceAlphaC0Offset    :[ValSliceAlphaC0Offset],
-			ValQp                 :[Val_Qp],
-			ChromaQpIdxOffset     :[ValChromaQpIdxOffset,ValSecondChromaQpIdxOffset]
+			ValQp                 :[Val_Qp]
 				==>
 		guard
 			Is_CBP = false
 		do
-			entropy_coding_mode_flag      := ValEntropyCodingMode;
+			bit_depth_chroma              := SpsParam[0];
+			bit_depth_luma                := SpsParam[1];
+			Chroma_Array_Type             := SpsParam[2];
+			NumC8x8                       := SpsParam[3];
+			PicSizeInMbs                  := SpsParam[4];
+			PicWidthInMbs                 := SpsParam[5];
+			direct_8x8_inference_flag     := GetFlag(SpsParam[6],0);
+
+			chroma_qp_index_offset        := PpsParam[0];
+			second_chroma_qp_index_offset := PpsParam[1];
+			constrained_intra_pred_flag   := GetFlag(PpsParam[2],0);
+			entropy_coding_mode_flag      := GetFlag(PpsParam[2],1);
+			transform_8x8_mode_flag       := GetFlag(PpsParam[2],2);
+
 			slice_type                    := ValSliceType;
 			MbaffFrameFlag                := ValMbaffFrame;
-			bit_depth_luma                := ValBitDepthLuma;
-			bit_depth_chroma              := ValBitDepthChroma;
-			direct_8x8_inference_flag     := ValDirect8x8Inference;
-			transform_8x8_mode_flag       := ValTransform8x8Mode;
 			num_ref_idx_l0_active         := ValNumRefIdxLXActive[0];
 			num_ref_idx_l1_active         := ValNumRefIdxLXActive[1];
-			Chroma_Array_Type             := ValChromaArrayType;
-			NumC8x8                       := ValNum_C8x8;
-			constrained_intra_pred_flag   := ValConstrIntrPred;
 			first_mb_in_slice             := ValFirstMbInSlice;
 			disable_deblocking_filter_idc := ValDisDebFil;
 			slice_beta_offset             := ValSliceBetaOffset;
 			slice_alpha_c0_offset         := ValSliceAlphaC0Offset;
-			chroma_qp_index_offset        := ValChromaQpIdxOffset;
-			second_chroma_qp_index_offset := ValSecondChromaQpIdxOffset;
 			QpValue                       := Val_Qp;
 			Qp_CbValue                    := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
 			Qp_CrValue                    := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
@@ -230,8 +221,6 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			moreDataFlag   := true;
 			prevMbSkipped  := false;
 
-			PicSizeInMbs             := ValPicSizeInMbs;
-			PicWidthInMbs            := ValPicWdtInMbs;
 /*			NonZeroCount   := [[ 0 : for int j in 0 .. 16-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
 			NonZeroCountCb := [[ 0 : for int j in 0 ..  4-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right
 			NonZeroCountCr := [[ 0 : for int j in 0 ..  4-1] : for int i in 0 .. PICHEIGHT*PICWIDTH-1]; //FIXME ! size is not right

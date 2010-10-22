@@ -22,15 +22,9 @@ actor Algo_DecodeSps()
 	int (size=32) NbBitsToRead,
 	bool          DecodeNextNal,
 
-	uint(size=32) PicSzInMbs,
-	uint(size=32) PicWdtInMbs,
-	uint(size=4)  BitDepthLuma,
-	uint(size=4)  BitDepthChroma,
-	bool          Direct8x8Inference,
-	uint(size=2)  ChromaArrayType,
-	uint(size=2)  Num_C8x8,
 	uint(size=5)  SizeDPBMax,
 	int (size=32) SliceHeaderParameters,
+	uint(size=32) SliceDataParameters,
 
 	uint(size=31) MMCO_MaxFrameNum,
 	uint(size=5)  MMCO_NumRefFrame,
@@ -154,26 +148,20 @@ actor Algo_DecodeSps()
 	SpsParam.AskedFromPic: action
 			SpsAskedFromPic :[ValSps]
 				==>
-			PicSzInMbs                  :[pic_size_in_mbs[ValSps]],
-			PicWdtInMbs                 :[pic_width_in_mbs_minus1[ValSps] + 1],
-			BitDepthLuma                :[bit_depth_luma_minus8[ValSps]+8],
-			BitDepthChroma              :[bit_depth_chroma_minus8[ValSps]+8],
-			Direct8x8Inference          :[ValDirect8x8Inference],
-			ChromaArrayType             :[Chroma_Array_Type[ValSps]],
-			Num_C8x8                    :[NumC8x8[ValSps]],
-			SizeDPBMax                  :[MaxDPBSz[ValSps]],
-			SliceHeaderParameters       :[SliceHeaderParam]repeat 8,
+			SliceDataParameters   :[SliceDataParam] repeat 7,
+			SliceHeaderParameters :[SliceHeaderParam]repeat 8,
+			SizeDPBMax            :[MaxDPBSz[ValSps]],
 
-			MMCO_MaxFrameNum            :[max_frame_num[ValSps]],
-			MMCO_NumRefFrame            :[num_ref_frames[ValSps]]
+			MMCO_MaxFrameNum      :[max_frame_num[ValSps]],
+			MMCO_NumRefFrame      :[num_ref_frames[ValSps]]
 		var
 			bool val_frame_mbs_only,
 			bool ValDeltaPic,
 			bool ValMbAdaptFrameField,
 			bool ValDirect8x8Inference,
-			List(type: int(size=32), size=8) SliceHeaderParam
+			List(type: int(size=32), size=8) SliceHeaderParam,
+			List(type: int(size=32), size=7) SliceDataParam
 		do
-
 			val_frame_mbs_only :=
 				if(frame_mbs_only_flag[ValSps] = 0)then
 					false
@@ -198,6 +186,15 @@ actor Algo_DecodeSps()
 				else
 					true
 				end;
+
+			SliceDataParam[0] := bit_depth_chroma_minus8[ValSps]+8;
+			SliceDataParam[1] := bit_depth_luma_minus8[ValSps]+8;
+			SliceDataParam[2] := Chroma_Array_Type[ValSps];
+			SliceDataParam[3] := NumC8x8[ValSps];
+			SliceDataParam[4] := pic_size_in_mbs[ValSps];
+			SliceDataParam[5] := pic_width_in_mbs_minus1[ValSps] + 1;
+			SliceDataParam[6] := SetFlag(ValDirect8x8Inference,0,0);
+
 			SliceHeaderParam[0] := expected_delta_per_poc_cycle[ValSps];
 			SliceHeaderParam[1] := log2_max_frame_num_minus4[ValSps] + 4;
 			SliceHeaderParam[2] := num_ref_frames_in_pic_order_cnt_cycle[ValSps];

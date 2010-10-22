@@ -20,67 +20,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="entropy_coding_mode">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="BitDepthChroma">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="BitDepthLuma">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="ChromaArrayType">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="Direct8x8Inference">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="Num_C8x8">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicSzInMbs">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicWdtInMbs">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="ChromaQpIdxOffset">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="ConstraindedIntraPred">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Input" name="Transform8x8Mode">
-        <Type name="bool"/>
-    </Port>
     <Port kind="Input" name="NumRefIdxLXActive">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -100,6 +39,20 @@
     </Port>
     <Port kind="Input" name="SpsParam4SliceHeader">
         <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="PpsParam4SliceData">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SpsParam4SliceData">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
@@ -719,26 +672,6 @@
     <Connection dst="" dst-port="TypeOfVLD" src="Mgnt_DecodePic" src-port="TypeOfVLD"/>
     <Connection dst="" dst-port="VLDParam" src="Mgnt_DecodePic" src-port="VLD_Param"/>
     <Connection dst="DecodeSliceHeader" dst-port="NalRefIdc" src="" src-port="NalRefIdc"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="EntropyCodingMode"
-        src="" src-port="entropy_coding_mode"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="BitDepthChroma"
-        src="" src-port="BitDepthChroma"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="BitDepthLuma"
-        src="" src-port="BitDepthLuma"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="ChromaArrayType"
-        src="" src-port="ChromaArrayType"/>
-    <Connection dst="DecodeSliceData_Cavlc"
-        dst-port="Direct8x8Inference" src="" src-port="Direct8x8Inference"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="Num_C8x8" src="" src-port="Num_C8x8"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="PicSzInMbs" src="" src-port="PicSzInMbs"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="PicWdtInMbs"
-        src="" src-port="PicWdtInMbs"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="ChromaQpIdxOffset"
-        src="" src-port="ChromaQpIdxOffset"/>
-    <Connection dst="DecodeSliceData_Cavlc"
-        dst-port="ConstraindedIntraPred" src="" src-port="ConstraindedIntraPred"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="Transform8x8Mode"
-        src="" src-port="Transform8x8Mode"/>
     <Connection dst="DecodeRefPicList" dst-port="NumRefIdxLXActive"
         src="" src-port="NumRefIdxLXActive"/>
     <Connection dst="" dst-port="GetPps" src="DecodeSliceHeader" src-port="GetPps"/>
@@ -814,4 +747,8 @@
     <Connection dst="" dst-port="SubMbType" src="DecodeSubMbPred" src-port="SubMbType"/>
     <Connection dst="DecodeSliceHeader" dst-port="PpsParameters" src="" src-port="PpsParam4SliceHeader"/>
     <Connection dst="DecodeSliceHeader" dst-port="SpsParameters" src="" src-port="SpsParam4SliceHeader"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="PpsParameters"
+        src="" src-port="PpsParam4SliceData"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="SpsParameters"
+        src="" src-port="SpsParam4SliceData"/>
 </XDF>

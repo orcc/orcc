@@ -177,10 +177,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MaxDPBSize">
-        <Type name="uint">
+    <Port kind="Input" name="PocToDisplay">
+        <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
         </Type>
     </Port>
@@ -361,18 +361,6 @@
             <Expr kind="Var" name="QUANT_SIZE"/>
         </Parameter>
     </Instance>
-    <Instance id="Mgnt_Display">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Display"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-        <Parameter name="Debug">
-            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
-        </Parameter>
-    </Instance>
     <Instance id="RefIdxl0_to_POC">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -450,12 +438,7 @@
     <Connection dst="Select" dst-port="X3" src="" src-port="I_PCM_Y"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
-    <Connection dst="Buffer_inter" dst-port="POCtoDisplay"
-        src="Mgnt_Display" src-port="POCtoDisplay"/>
-    <Connection dst="Mgnt_Display" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="RefIdxl0_to_POC" dst-port="RefList" src="" src-port="RefList0"/>
-    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="" src-port="MaxDPBSize"/>
-    <Connection dst="Mgnt_Display" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="Buffer_inter" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="" dst-port="Display_L" src="Buffer_inter" src-port="Display"/>
     <Connection dst="DemuxParserInfos" dst-port="MBType" src="" src-port="MacroBlockType"/>
@@ -520,4 +503,5 @@
     <Connection dst="SelectRefIdx" dst-port="SelectList" src="" src-port="SelectList"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead"
         src="SelectRefIdx" src-port="PocToRead"/>
+    <Connection dst="Buffer_inter" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
 </XDF>

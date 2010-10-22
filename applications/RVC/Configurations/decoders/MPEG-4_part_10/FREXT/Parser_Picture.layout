@@ -4,19 +4,10 @@
       <vertex id="ValDecoded" x="1358" y="275"/>
       <vertex id="IsAnIdr" x="57" y="88"/>
       <vertex id="NalRefIdc" x="57" y="185"/>
-      <vertex id="entropy_coding_mode" x="85" y="1673"/>
-      <vertex id="BitDepthChroma" x="115" y="1426"/>
-      <vertex id="BitDepthLuma" x="126" y="1466"/>
-      <vertex id="ChromaArrayType" x="116" y="1509"/>
-      <vertex id="Direct8x8Inference" x="100" y="1620"/>
-      <vertex id="Num_C8x8" x="118" y="1756"/>
-      <vertex id="PicSzInMbs" x="119" y="1805"/>
-      <vertex id="PicWdtInMbs" x="118" y="1846"/>
-      <vertex id="ChromaQpIdxOffset" x="106" y="1552"/>
-      <vertex id="ConstraindedIntraPred" x="89" y="1582"/>
-      <vertex id="Transform8x8Mode" x="106" y="1960"/>
       <vertex id="NumRefIdxLXActive" x="708" y="647"/>
       <vertex id="ResetPrevFrameNum" x="18" y="558"/>
+      <vertex id="PpsParam4SliceHeader" x="20" y="524"/>
+      <vertex id="SpsParam4SliceHeader" x="18" y="590"/>
       <vertex id="IntraPredModeC" x="2128" y="1390"/>
       <vertex id="QP_Cb" x="2598" y="1679"/>
       <vertex id="QP_Cr" x="2610" y="1717"/>
@@ -77,7 +68,7 @@
       <vertex id="DecodeSubMbPred" x="1742" y="1736"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="2238" y="1461"/>
       <vertex id="GenerateSkipBlockInformation" x="2299" y="1210"/>
-      <vertex id="PpsParam4SliceHeader" x="20" y="524"/>
-      <vertex id="SpsParam4SliceHeader" x="18" y="590"/>
+      <vertex id="PpsParam4SliceData" x="56" y="1543"/>
+      <vertex id="SpsParam4SliceData" x="90" y="1616"/>
    </vertices>
 </layout>

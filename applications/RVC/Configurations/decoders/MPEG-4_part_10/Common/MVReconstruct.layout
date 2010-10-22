@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="54" y="182"/>
-      <vertex id="MbPartIdx" x="41" y="521"/>
-      <vertex id="RefIdx" x="47" y="454"/>
-      <vertex id="MbPartWidth" x="45" y="330"/>
-      <vertex id="MbPartHeigth" x="43" y="294"/>
-      <vertex id="MvRes" x="660" y="363"/>
-      <vertex id="PicWidthInMb" x="38" y="362"/>
-      <vertex id="MbIntraFlag" x="47" y="260"/>
-      <vertex id="FirstMbInSlice" x="49" y="221"/>
-      <vertex id="slice_type" x="325" y="738"/>
-      <vertex id="mb_type" x="328" y="707"/>
-      <vertex id="MbPredRefIdxL0" x="309" y="643"/>
-      <vertex id="SubMbPredRefIdxL0" x="299" y="677"/>
-      <vertex id="sub_mb_type" x="315" y="767"/>
-      <vertex id="MV" x="855" y="355"/>
-      <vertex id="LOCATION" x="461" y="178"/>
-      <vertex id="PartSZ" x="470" y="222"/>
-      <vertex id="mv_out" x="469" y="255"/>
-      <vertex id="ref_idx" x="470" y="287"/>
-      <vertex id="Mgnt_MVR" x="189" y="163"/>
-      <vertex id="Algo_MVR_MultiFrameAdptive" x="447" y="319"/>
-      <vertex id="Algo_Add" x="744" y="318"/>
-      <vertex id="MvpL0_Reconstr" x="615" y="592"/>
-      <vertex id="BlackHole" x="802" y="607"/>
+      <vertex id="CurrMbAddr" x="33" y="35"/>
+      <vertex id="MbPartIdx" x="20" y="374"/>
+      <vertex id="RefIdx" x="26" y="307"/>
+      <vertex id="MbPartWidth" x="24" y="183"/>
+      <vertex id="MbPartHeigth" x="22" y="147"/>
+      <vertex id="MvRes" x="639" y="216"/>
+      <vertex id="PicWidthInMb" x="17" y="215"/>
+      <vertex id="MbIntraFlag" x="26" y="113"/>
+      <vertex id="FirstMbInSlice" x="28" y="74"/>
+      <vertex id="slice_type" x="304" y="591"/>
+      <vertex id="mb_type" x="307" y="560"/>
+      <vertex id="MbPredRefIdxL0" x="288" y="496"/>
+      <vertex id="SubMbPredRefIdxL0" x="278" y="530"/>
+      <vertex id="sub_mb_type" x="294" y="620"/>
+      <vertex id="MV" x="834" y="208"/>
+      <vertex id="LOCATION" x="440" y="31"/>
+      <vertex id="PartSZ" x="449" y="75"/>
+      <vertex id="mv_out" x="448" y="108"/>
+      <vertex id="ref_idx" x="449" y="140"/>
+      <vertex id="Mgnt_MVR" x="168" y="16"/>
+      <vertex id="Algo_MVR_MultiFrameAdptive" x="426" y="172"/>
+      <vertex id="Algo_Add" x="723" y="171"/>
+      <vertex id="MvpL0_Reconstr" x="594" y="445"/>
+      <vertex id="BlackHole" x="781" y="460"/>
    </vertices>
 </layout>

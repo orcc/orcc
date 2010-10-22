@@ -128,13 +128,6 @@
     <Port kind="Output" name="ConstrainedIFlag">
         <Type name="bool"/>
     </Port>
-    <Port kind="Output" name="SizeDPBMax">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="PicWidthInMb">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -337,6 +330,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="PocToDisplay">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -487,6 +487,18 @@
             <Expr kind="Literal" literal-kind="Boolean" value="true"/>
         </Parameter>
     </Instance>
+    <Instance id="Mgnt_Display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_Display"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="Debug">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -528,7 +540,6 @@
         src="IntraPredSplit" src-port="BlocksSize_Luma"/>
     <Connection dst="" dst-port="Height" src="DecodeSps" src-port="Height"/>
     <Connection dst="" dst-port="Width" src="DecodeSps" src-port="Width"/>
-    <Connection dst="" dst-port="SizeDPBMax" src="DecodeSps" src-port="SizeDPBMax"/>
     <Connection dst="BlockSplit" dst-port="Coeff" src="BlockExpand" src-port="Coeff"/>
     <Connection dst="BlockSplit" dst-port="BlocksSize_Luma"
         src="IntraPredSplit" src-port="BlocksSize_Luma"/>
@@ -583,24 +594,6 @@
         src="DecodePic" src-port="DecodeNextNal"/>
     <Connection dst="PicVLDecoding" dst-port="TypeOfVLD" src="DecodePic" src-port="TypeOfVLD"/>
     <Connection dst="PicVLDecoding" dst-port="VLD_Param" src="DecodePic" src-port="VLDParam"/>
-    <Connection dst="DecodePic" dst-port="entropy_coding_mode"
-        src="DecodePps" src-port="entropy_coding_mode"/>
-    <Connection dst="DecodePic" dst-port="BitDepthChroma"
-        src="DecodeSps" src-port="BitDepthChroma"/>
-    <Connection dst="DecodePic" dst-port="BitDepthLuma" src="DecodeSps" src-port="BitDepthLuma"/>
-    <Connection dst="DecodePic" dst-port="ChromaArrayType"
-        src="DecodeSps" src-port="ChromaArrayType"/>
-    <Connection dst="DecodePic" dst-port="Direct8x8Inference"
-        src="DecodeSps" src-port="Direct8x8Inference"/>
-    <Connection dst="DecodePic" dst-port="Num_C8x8" src="DecodeSps" src-port="Num_C8x8"/>
-    <Connection dst="DecodePic" dst-port="PicSzInMbs" src="DecodeSps" src-port="PicSzInMbs"/>
-    <Connection dst="DecodePic" dst-port="PicWdtInMbs" src="DecodeSps" src-port="PicWdtInMbs"/>
-    <Connection dst="DecodePic" dst-port="ChromaQpIdxOffset"
-        src="DecodePps" src-port="ChromaQpIdxOffset"/>
-    <Connection dst="DecodePic" dst-port="ConstraindedIntraPred"
-        src="DecodePps" src-port="ConstraindedIntraPred"/>
-    <Connection dst="DecodePic" dst-port="Transform8x8Mode"
-        src="DecodePps" src-port="Transform8x8Mode"/>
     <Connection dst="DecodePic" dst-port="NumRefIdxLXActive"
         src="DecodePps" src-port="NumRefIdxLXActive"/>
     <Connection dst="DecodePps" dst-port="PpsAsked" src="DecodePic" src-port="GetPps"/>
@@ -673,4 +666,12 @@
         src="DecodePps" src-port="SliceHeaderParameters"/>
     <Connection dst="DecodePic" dst-port="SpsParam4SliceHeader"
         src="DecodeSps" src-port="SliceHeaderParameters"/>
+    <Connection dst="DecodePic" dst-port="PpsParam4SliceData"
+        src="DecodePps" src-port="SliceDataParameters"/>
+    <Connection dst="DecodePic" dst-port="SpsParam4SliceData"
+        src="DecodeSps" src-port="SliceDataParameters"/>
+    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="DecodeSps" src-port="SizeDPBMax"/>
+    <Connection dst="Mgnt_Display" dst-port="POC" src="DecodePic" src-port="POC"/>
+    <Connection dst="Mgnt_Display" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
+    <Connection dst="" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
 </XDF>

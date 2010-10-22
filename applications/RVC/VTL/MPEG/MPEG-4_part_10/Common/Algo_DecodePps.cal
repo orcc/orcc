@@ -28,10 +28,7 @@ actor Algo_DecodePps(bool IsCBP)
 	uint(size=5)  GetSps,
 
 	int (size=32) SliceHeaderParameters,
-	bool          entropy_coding_mode,
-	bool          Transform8x8Mode,
-	bool          ConstraindedIntraPred,
-	int(size=5)   ChromaQpIdxOffset,
+	int (size=5)  SliceDataParameters,
 
 	uint(size=5)  NumRefIdxLXActive
 		:
@@ -110,16 +107,13 @@ actor Algo_DecodePps(bool IsCBP)
 		end
 
 	PpsParamAsked.Frext: action
-			PpsAsked: [ValPps]
+			PpsAsked              :[ValPps]
 				==>
-			GetSps4Pic                        :[sequence_parameter_set_id[ValPps]],
+			GetSps4Pic            :[sequence_parameter_set_id[ValPps]],
 
-			SliceHeaderParameters             :[Param] repeat 5,
-			NumRefIdxLXActive                 :[ValNumRefIdxAct] repeat 2,
-			entropy_coding_mode               :[ValEntropyCodingMode],
-			Transform8x8Mode                  :[transform_8x8_mode_flag[ValPps]],
-			ConstraindedIntraPred             :[constrained_intra_pred_flag[ValPps]],
-			ChromaQpIdxOffset                 :[chroma_qp_index_offset[ValPps],second_chroma_qp_index_offset[ValPps]]
+			SliceHeaderParameters :[HeaderParam]     repeat 5,
+			SliceDataParameters   :[DataParam]       repeat 3,
+			NumRefIdxLXActive     :[ValNumRefIdxAct] repeat 2
 		guard
 			not IsCBP
 		var
@@ -128,7 +122,8 @@ actor Algo_DecodePps(bool IsCBP)
 			bool ValEntropyCodingMode,
 			bool ValDebFiltContPres,
 			List(type:uint(size=5), size=2) ValNumRefIdxAct,
-			List(type: int(size=32), size=5) Param
+			List(type: int(size=32), size=5) HeaderParam,
+			List(type: int(size=32), size=3) DataParam
 		do
 			ValPicOrderPresent :=
 				if(pic_order_present_flag[ValPps] = 0)then
@@ -156,12 +151,16 @@ actor Algo_DecodePps(bool IsCBP)
 				else
 					true
 				end;
-			Param[0] := num_slice_groups_minus1[ValPps] + 1;
-			Param[1] := pic_init_qp_minus26[ValPps] + 26;
-			Param[2] := SzSliceGroupChgCycle[ValPps];
-			Param[3] := slice_group_map_type[ValPps];
-			Param[4] := SetFlag(ValPicOrderPresent,1,SetFlag(ValDebFiltContPres,0,0));
-			Param[4] := SetFlag(ValEntropyCodingMode,3,SetFlag(ValRedPicCntPres,2,Param[4]));
+			DataParam[0]   := chroma_qp_index_offset[ValPps];
+			DataParam[1]   := second_chroma_qp_index_offset[ValPps];
+			DataParam[2]   := SetFlag(ValEntropyCodingMode,1,SetFlag(constrained_intra_pred_flag[ValPps],0,0));
+			DataParam[2]   := SetFlag(transform_8x8_mode_flag[ValPps],2,DataParam[2]);
+			HeaderParam[0] := num_slice_groups_minus1[ValPps] + 1;
+			HeaderParam[1] := pic_init_qp_minus26[ValPps] + 26;
+			HeaderParam[2] := SzSliceGroupChgCycle[ValPps];
+			HeaderParam[3] := slice_group_map_type[ValPps];
+			HeaderParam[4] := SetFlag(ValPicOrderPresent,1,SetFlag(ValDebFiltContPres,0,0));
+			HeaderParam[4] := SetFlag(ValEntropyCodingMode,3,SetFlag(ValRedPicCntPres,2,HeaderParam[4]));
 		end
 
 

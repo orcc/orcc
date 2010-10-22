@@ -267,9 +267,6 @@
     <Connection dst="Decoding_Y" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
     <Connection dst="Decode_U" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
     <Connection dst="Decode_V" dst-port="DelList" src="FUN_Parser" src-port="DelList"/>
-    <Connection dst="Decoding_Y" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
-    <Connection dst="Decode_U" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
-    <Connection dst="Decode_V" dst-port="MaxDPBSize" src="FUN_Parser" src-port="SizeDPBMax"/>
     <Connection dst="Decoding_Y" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decode_U" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decode_V" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
@@ -297,4 +294,8 @@
     <Connection dst="Decode_V" dst-port="RefIdx_l1" src="FUN_Parser" src-port="RefIdx_l1"/>
     <Connection dst="Decode_U" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
     <Connection dst="Decode_V" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
+    <Connection dst="Decoding_Y" dst-port="PocToDisplay"
+        src="FUN_Parser" src-port="PocToDisplay"/>
+    <Connection dst="Decode_U" dst-port="PocToDisplay" src="FUN_Parser" src-port="PocToDisplay"/>
+    <Connection dst="Decode_V" dst-port="PocToDisplay" src="FUN_Parser" src-port="PocToDisplay"/>
 </XDF>

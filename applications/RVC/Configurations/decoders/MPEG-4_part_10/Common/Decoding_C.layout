@@ -29,14 +29,14 @@
       <vertex id="I_PCM_C" x="205" y="2342"/>
       <vertex id="ConstrainedIFlag" x="414" y="844"/>
       <vertex id="DelList" x="205" y="2536"/>
-      <vertex id="MaxDPBSize" x="205" y="2633"/>
+      <vertex id="PocToDisplay" x="232" y="1153"/>
       <vertex id="IsIDR" x="205" y="2730"/>
       <vertex id="MacroBlockType" x="188" y="663"/>
-      <vertex id="Display" x="906" y="998"/>
-      <vertex id="PRED_C" x="660" y="958"/>
-      <vertex id="RES_C" x="205" y="2060"/>
       <vertex id="RefList1" x="274" y="1418"/>
       <vertex id="RefIdx_l1" x="280" y="1515"/>
       <vertex id="SelectList" x="237" y="1747"/>
+      <vertex id="Display" x="906" y="998"/>
+      <vertex id="PRED_C" x="660" y="958"/>
+      <vertex id="RES_C" x="205" y="2060"/>
    </vertices>
 </layout>

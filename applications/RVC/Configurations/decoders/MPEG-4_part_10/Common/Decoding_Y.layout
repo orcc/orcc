@@ -29,7 +29,7 @@
       <vertex id="I_PCM_Y" x="525" y="1297"/>
       <vertex id="ConstrainedIFlag" x="477" y="1113"/>
       <vertex id="DelList" x="519" y="1206"/>
-      <vertex id="MaxDPBSize" x="528" y="1532"/>
+      <vertex id="PocToDisplay" x="528" y="1532"/>
       <vertex id="IsIDR" x="539" y="1331"/>
       <vertex id="BlocksSize" x="48" y="1502"/>
       <vertex id="MacroBlockType" x="514" y="1492"/>
