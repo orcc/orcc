@@ -367,11 +367,44 @@ Function* JIT::CreateFunction(Instance* instance, Function* function){
 	return newFunction;
 }
 
-FSM* JIT::createFSM(Instance* instance, FSM* fsm){
+FSM* JIT::createFSM(Instance* instance, FSM* fsm, map<string, Action*>* instActions){
 	list<llvm::Function*>::iterator it;
 	
 	FSM* newFSM = new FSM();
 	
+	//Copy states of the source fsm
+	std::map<std::string, FSM::State*>::iterator itState;
+	std::map<std::string, FSM::State*>* states = fsm->getStates();
+
+	for (itState = states->begin(); itState != states->end(); itState++){
+		newFSM->addState(itState->first);
+	}
+
+	//Copy transitions of the source fsm
+	map<string, Action*>::iterator itActionsMap;
+	std::map<std::string, FSM::Transition*>::iterator itTransition;
+	std::map<std::string, FSM::Transition*>* transitions = fsm->getTransitions();
+	for (itTransition = transitions->begin(); itTransition != transitions->end(); itTransition++){
+		FSM::Transition* transition = itTransition->second;
+		FSM::State* sourceState = transition->getSourceState();
+		list<FSM::NextStateInfo*>::iterator itNextStateInfo;
+		list<FSM::NextStateInfo*>* nextStateInfos = transition->getNextStateInfo();
+
+		for (itNextStateInfo = nextStateInfos->begin(); itNextStateInfo != nextStateInfos->end(); itNextStateInfo++){
+			Action* actionState = NULL;
+			FSM::State* targetState = (*itNextStateInfo)->getTargetState();
+			Action* targetAction = (*itNextStateInfo)->getAction();
+
+			itActionsMap = instActions->find(targetAction->getName());
+			
+			if (itActionsMap != instActions->end()){
+				actionState = itActionsMap->second;
+			}
+
+			newFSM->addTransition(sourceState->getName(), targetState->getName(), actionState);
+		}
+	}
+
 	//Create a new fsm_state
 	GlobalVariable* fsmState = CreateVariable(instance, fsm->getFsmState());
 	newFSM->setFsmState(fsmState);
@@ -418,7 +451,7 @@ ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler*
 
 	//Create FSM if present
 	if (actionScheduler->hasFsm()){
-		fsm = createFSM(instance, actionScheduler->getFsm());
+		fsm = createFSM(instance, actionScheduler->getFsm(), instActions);
 	}
 
 	//Create intialize scheduler if present

@@ -62,9 +62,7 @@ public:
 	/**
      *  @brief Constructor
      *
-	 *	Create a new Action Scheduler without fsm
-	 *
-	 *	@param function : llvm::Function corresponding to the action scheduler
+	 *	Creates a new FSM.
      */
 	FSM(){
 		index = 0;
@@ -184,38 +182,48 @@ public:
 			this->targetState = state;
 
 		};
+
+		Action* getAction(){return action;};
+
+		State* getTargetState(){return targetState;};
 	private:
 		Action* action;
 
 		State* targetState;
 	};
 
-	class Transition {
 	public:
-		/**
-		 * @brief Create a transition
-		 *
-		 * Creates a transition from a source state.
-		 * 
-		 * @param sourceState : source State
-		 */
-		Transition(State* state)
-		{
-			this->sourceState = state;
+	
+		class Transition {
+		public:
+			/**
+			 * @brief Create a transition
+			 *
+			 * Creates a transition from a source state.
+			 * 
+			 * @param sourceState : source State
+			 */
+			Transition(State* state)
+			{
+				this->sourceState = state;
+			};
+
+			State* getSourceState() {
+				return sourceState;
+			}
+
+			std::list<NextStateInfo*>* getNextStateInfo() {
+				return &nextStateInfo;
+			}
+
+		private:
+			/** next state of the transition */
+			std::list<NextStateInfo*> nextStateInfo;
+
+			/** source state */
+			State* sourceState;
+
 		};
-
-		std::list<NextStateInfo*>* getNextStateInfo() {
-			return &nextStateInfo;
-		}
-
-	private:
-		/** next state of the transition */
-		std::list<NextStateInfo*> nextStateInfo;
-
-		/** source state */
-		State* sourceState;
-
-	};
 
 public:
 	/**
@@ -297,6 +305,15 @@ public:
 	 * @return the initial state
 	 */
 	State* getInitialState() {return initialState;};
+
+	/**
+	 * @breif Returns the map of states.
+	 * 
+	 * @return a map of State
+	 */
+	std::map<std::string, State*>* getStates(){
+		return &states;
+	}
 
 
 private:

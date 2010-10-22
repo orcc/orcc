@@ -245,7 +245,7 @@ public:
 	std::map<Variable*, llvm::GlobalVariable*>* createVariables(Instance* instance, std::map<std::string, Variable*>* vars);
 	std::list<Procedure*>* createProcedures(Instance* instance, Decoder* decoder);
 	ActionScheduler* createActionScheduler(Instance* instance, ActionScheduler* actionScheduler, std::map<std::string, Action*>* instActions);
-	FSM* createFSM(Instance* instance, FSM* fsm);
+	FSM* createFSM(Instance* instance, FSM* fsm, std::map<std::string, Action*>* instActions);
 	std::map<Procedure*, llvm::Function*>* createProcedures(Instance* instance, std::map<std::string, Procedure*>* procs);
 
 	void addPrintf(std::string text, Decoder* decoder, llvm::Function* function, llvm::BasicBlock* bb);

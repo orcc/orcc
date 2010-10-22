@@ -231,7 +231,7 @@ public class FSM {
 	private LinkedHashMap<String, Transition> transitions;
 
 	/**
-	 * Creates an FSM with the given state as an initial state.
+	 * Creates an FSM.
 	 * 
 	 */
 	public FSM() {

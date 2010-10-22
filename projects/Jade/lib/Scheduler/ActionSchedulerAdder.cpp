@@ -111,9 +111,9 @@ Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionSchedul
 		
 
 		if (actionScheduler->hasFsm()){
-			BB = createSchedulerFSM(actionScheduler, BB, returnBB, incBB, scheduler);
+			BB = createSchedulerFSM(actionScheduler, BB, incBB, returnBB , scheduler);
 		}else{
-			BB = createSchedulerNoFSM(actionScheduler->getActions(), BB, returnBB, incBB, scheduler);
+			BB = createSchedulerNoFSM(actionScheduler->getActions(), BB, incBB, returnBB, scheduler);
 			instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);
 		}
 
@@ -140,13 +140,15 @@ BasicBlock* ActionSchedulerAdder::createSchedulerFSM(ActionScheduler* actionSche
 	BranchInst::Create(returnBB, BB);
 
 	//Create switch
-	createSwitchTransitions(fsm->getTransitions());
-	createTransitions(fsm->getTransitions());
+	createStates(fsm->getStates(), function);
+	createTransitions(fsm->getTransitions(), incBB, returnBB, function);
+	createSwitchTransition(loadStateVar, BB, returnBB);
+	
 
 	return BB;
 }
 
-BasicBlock* ActionSchedulerAdder::createSchedulerNoFSM(list<Action*>* actions, BasicBlock* BB, BasicBlock* returnBB, BasicBlock* incBB, Function* function){
+BasicBlock* ActionSchedulerAdder::createSchedulerNoFSM(list<Action*>* actions, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
 	list<Action*>::iterator it;
 
 	for ( it=actions->begin() ; it != actions->end(); it++ ){
@@ -227,6 +229,13 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 	return skipBB;
 }
 
+void ActionSchedulerAdder::createStates(map<string, FSM::State*>* states, Function* function){
+	map<string, FSM::State*>::iterator it;
+
+	for (it = states->begin(); it != states->end(); it++){
+
+	}
+}
 
 CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	//Load selected port
@@ -242,30 +251,126 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 	return callInst;
 }
 
-void ActionSchedulerAdder::createSwitchTransitions(map<string, FSM::Transition*>* transitions){
+void ActionSchedulerAdder::createSwitchTransition(Value* stateVar, BasicBlock* BB, BasicBlock* returnBB){
+	map<FSM::State*, BasicBlock*>::iterator it;
+
+	 SwitchInst* stateSwitch =
+      SwitchInst::Create(stateVar, returnBB, BBTransitions.size(),
+                         BB);
+
+	 for (it = BBTransitions.begin(); it != BBTransitions.end(); it++){
+		 FSM::State* state = it->first;
+		 BasicBlock* stateBB = it->second;
+		 ConstantInt* stateIndex = ConstantInt::get(Type::getInt32Ty(Context),state->getIndex());
+
+		 stateSwitch->addCase(stateIndex, stateBB);
+	 }
+}
+
+void ActionSchedulerAdder::createTransitions(map<string, FSM::Transition*>* transitions, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
 	map<string, FSM::Transition*>::iterator it;
 
 	for (it = transitions->begin(); it != transitions->end(); it++){
-		createSwitchTransition(it->second);
+		createTransition(it->second, incBB, returnBB, function);
 	}
 }
 
-void ActionSchedulerAdder::createSwitchTransition(FSM::Transition* transition){
+void ActionSchedulerAdder::createTransition(FSM::Transition* transition, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+	FSM::State* sourceState = transition->getSourceState();
+	
+	// Add a basic block for the current state
+	BasicBlock* stateBB = BasicBlock::Create(Context, sourceState->getName(), function);
 
+	createSchedulingTestState(transition->getNextStateInfo(), stateBB, incBB, returnBB, function);
+
+	BBTransitions.insert(pair<FSM::State*, BasicBlock*>(sourceState, stateBB));
 }
 
-void ActionSchedulerAdder::createTransitions(map<string, FSM::Transition*>* transitions){
-	map<string, FSM::Transition*>::iterator it;
-
-	for (it = transitions->begin(); it != transitions->end(); it++){
-		createTransition(it->second);
+BasicBlock* ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateInfo*>* nextStates, BasicBlock* stateBB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+	list<FSM::NextStateInfo*>::iterator it;
+	
+	for (it = nextStates->begin(); it != nextStates->end(); it++){
+		createActionTestState(*it, stateBB, incBB, returnBB, function);
 	}
+
+	return NULL;
 }
 
-void ActionSchedulerAdder::createTransition(FSM::Transition* transition){
-	createSchedulingTestState(transition->getNextStateInfo());
+BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* nextStateInfo, BasicBlock* stateBB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+	//Get information about next state
+	Action* action = nextStateInfo->getAction();
+	FSM::State* targetState = nextStateInfo->getTargetState();
+
+	//Create a branch for firing next state
+	string fireStateBrName = "fire_";
+	fireStateBrName.append(action->getName());
+	fireStateBrName.append(instance->getId());
+	BasicBlock* fireStateBB = BasicBlock::Create(Context, fireStateBrName, function);
+
+	//Create a branch for skip next state
+	string skipStateBrName = "skip_";
+	skipStateBrName.append(action->getName());
+	skipStateBrName.append(instance->getId());
+	BasicBlock* skipStateBB = BasicBlock::Create(Context, skipStateBrName, function);
+
+	//Test firing condition of an action
+	Procedure* scheduler = action->getScheduler();
+	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  stateBB);
+	BranchInst* branchInst	= BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);
+
+	map<Port*, ConstantInt*>::iterator it;
+	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
+	
+	if (!outputPattern->empty()){
+		std::list<Value*>::iterator itValue;
+		std::list<Value*> values;
+
+		for ( it=outputPattern->begin() ; it != outputPattern->end(); it++ ){
+			Value* hasRoomValue = createOutputTest(it->first, it->second, fireStateBB);
+			TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", fireStateBB);
+			values.push_back(truncRoomInst);
+		}
+
+		itValue=values.begin();
+		Value* value1 = *itValue;
+		for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
+			Value* value2 = *itValue;
+			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", fireStateBB);
+		}
+
+		// Add a basic block hasRoom that fires the action
+		string hasRoomBrName = "hasRoom_";
+		hasRoomBrName.append(action->getName());
+		hasRoomBrName.append(instance->getId());
+		BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
+
+		//Finally branch fire to hasRoom block if all outputs have free room
+		BranchInst* brInst = BranchInst::Create(roomBB, skipStateBB, value1, fireStateBB);
+
+		fireStateBB = roomBB;
+	}
+
+	createActionCallState(nextStateInfo, fireStateBB);
+
+	//Branch skip basic block to return basic block
+	BranchInst::Create(returnBB, skipStateBB);
+
+	return skipStateBB;
 }
 
-void ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateInfo*>* nextStates){
+void ActionSchedulerAdder::createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB){
+	std::map<FSM::State*, llvm::BasicBlock*>::iterator it;
+	
+	//Get next state information
+	Action* action = nextStateInfo->getAction();
+	FSM::State* nextState = nextStateInfo->getTargetState();
+
+	//Call body of the action
+	Procedure* body = action->getBody();
+	CallInst* callInst = CallInst::Create(body->getFunction(), "",  BB);
+
+	//Create a branch to the next state
+	it = BBTransitions.find(nextState);
+	BranchInst* brInst = BranchInst::Create(it->second, BB);
 
 }
