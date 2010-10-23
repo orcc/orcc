@@ -140,7 +140,7 @@ declareNetwork(id, instances) ::= <<
 class network_$id$ : public Threadaka
 {
 public:
-	void process(void * args)
+	void run(void * args)
 	{
 		$printInitializes(instances)$
 		while (1) 
