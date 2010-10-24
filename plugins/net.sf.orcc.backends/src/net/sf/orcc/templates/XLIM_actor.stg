@@ -50,10 +50,10 @@ endif$
 
 actorPorts() ::= <<
 <!-- Ports -->
-	<!-- Input Ports -->
-	$instance.actor.inputs.list: {port|$actorPort(port=port, dir="in")$}; separator="\n"$
-	<!-- Output Ports -->
-	$instance.actor.outputs.list: {port|$actorPort(port=port, dir="out")$}; separator="\n"$
+<!-- Input Ports -->
+$instance.actor.inputs.list: {port|$actorPort(port=port, dir="in")$}; separator="\n"$
+<!-- Output Ports -->
+$instance.actor.outputs.list: {port|$actorPort(port=port, dir="out")$}; separator="\n"$
 >>
 
 internalPorts() ::= <<
@@ -507,23 +507,24 @@ $transitions:{transition | $Transition(transition=transition)$}; separator="\n"$
 $transitions:{</module></module>}; separator="\n"$
 >>
 
-enumStates(state,id)::= <<
-<operation kind="\$literal_Integer" value="$id$">
-	<port dir="out" size="32" source="s_$state$" typeName="int"/>
+enumStates(transition)::= <<
+<operation kind="\$literal_Integer" value="$transition.sourceState.index$">
+	<port dir="out" size="32" source="s_$transition.sourceState$" typeName="int"/>
 </operation>
 >>
 
 schedulerFSM(actions, fsm) ::= <<
+
+<!-- Initializing with the initial state "s_$fsm.initialState$" -->
 <stateVar name="currentState">
-	<initValue size="32" typeName="int" value="1"/>
+	<initValue size="32" typeName="int" value="$fsm.initialState.index$"/>
 </stateVar>
 <module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
 	<operation kind="\$literal_Integer" value="1">
 		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
 	</operation>
 	<!-- enumerate states -->
-	$fsm.states : {$enumStates(state=it, id=i)$}; separator="\n"$
-	<!-- TODO initializing with the initial state "s_$fsm.initialState$" -->
+	$fsm.transitions : {transition | $enumStates(transition=transition)$}; separator="\n"$
 	<!-- infinite loop -->
 	<module kind="loop">
 		<module decision="var_$instance.id$_sched" kind="test">
@@ -547,7 +548,10 @@ schedulerFSM(actions, fsm) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 parameters(parameters) ::= <<
-$parameters.keys: { k | #define $k$ $parameters.(k)$
+$parameters.keys: { k | 
+<stateVar name="$k$" sourceName="$k$">
+	<initValue size="$parameters.(k).type.size$" typeName="$parameters.(k).type$" value="$parameters.(k)$"/>
+</stateVar>
 }$
 >>
 
