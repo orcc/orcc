@@ -65,7 +65,7 @@ internalPorts() ::= <<
 
 initValue(type, value) ::= <<
 $if (value.listExpr)$<initValue typeName="List"> 
-    $value.value: {value | $initValue(type=type, value=value)$}; separator=""$</initValue>
+    $value.value: {value | $initValue(type=type.type, value=value)$}; separator=""$</initValue>
 $else$<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/>
 $endif$
 >>
@@ -189,12 +189,12 @@ Write(op) ::= <<
 >>
 
 Load(op) ::= <<
-$if (op.target.variable.type.list)$
-<operation kind="var_ref" name="$op.source$">
+<!-- Load $op$ -->
+$if(op.source.variable.type.list && !op.source.variable.port)
+$<operation kind="var_ref" name="$op.source$">
 	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
 	$port(dir="out", type=op.target.type, source=op.target)$
-</operation>
-$
+</operation>$
 else
 $<operation kind="noop">
 	$port(dir="in", source=op.source)$
