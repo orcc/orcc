@@ -543,6 +543,10 @@ actor Algo_Mvpl0Reconstr()
 		var
 			List(type: int(size=16), size=2) MvpL0
 		do
+			foreach int i in 0 .. 3
+			do
+				RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + i] := RefIdxCurr;
+			end	
 			GetNeighbourBlockParametres (4*(MbPartIdx&3),8);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 			MvpL0 := [OMv[0],OMv[1]];
@@ -559,6 +563,8 @@ actor Algo_Mvpl0Reconstr()
 		var
 			List(type: int(size=16), size=2) MvpL0
 		do
+			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + 2 * (SubMbPartIdx&1)]     := RefIdxCurr;
+			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + 2 * (SubMbPartIdx&1) + 1] := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 2*(SubMbPartIdx&1),8);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 			MvpL0 := [OMv[0],OMv[1]];	
@@ -591,6 +597,8 @@ actor Algo_Mvpl0Reconstr()
 		var
 			List(type: int(size=16), size=2) MvpL0
 		do
+			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&1)]     := RefIdxCurr;
+			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&1) + 2] := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 1*(SubMbPartIdx&1),4);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 			MvpL0 := [OMv[0],OMv[1]];
@@ -718,6 +726,7 @@ actor Algo_Mvpl0Reconstr()
 		var
 			List(type: int(size=16), size=2) MvpL0
 		do
+			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&3)]     := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 1*(SubMbPartIdx&3),4);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 			MvpL0 := [OMv[0],OMv[1]];	
