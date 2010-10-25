@@ -38,6 +38,7 @@ import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
+import net.sf.orcc.backends.xlim.transforms.ArrayInitializeTransformation;
 import net.sf.orcc.backends.xlim.transforms.ChangeActionSchedulerFormTransformation;
 import net.sf.orcc.backends.xlim.transforms.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
@@ -53,6 +54,7 @@ import net.sf.orcc.network.Network;
  * This class defines a template-based XLIM back-end.
  * 
  * @author Ghislain Roquier
+ * @author Herve Yviquel
  * 
  */
 public class XlimBackendImpl extends AbstractBackend {
@@ -70,8 +72,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = {
-				new InlineTransformation(false, true),
-				new BlockCombine(),
+				new ArrayInitializeTransformation(),
+				new InlineTransformation(false, true), new BlockCombine(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new DeadVariableRemoval(),
 				new ExpressionSplitterTransformation(),
@@ -81,6 +83,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
+
 	}
 
 	@Override
