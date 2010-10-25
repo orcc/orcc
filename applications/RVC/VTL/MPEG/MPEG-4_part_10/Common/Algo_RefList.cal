@@ -315,6 +315,8 @@ actor Algo_RefList (bool DEBUG)
 
 	//Long Term and Short Term are read
 	ReadLists.done: action ==>
+		guard
+			NbSTRead = NbSTCount
 		var
 			uint(size=5) idx       := 0,
 			uint(size=6) NbPOCtemp := 0
@@ -583,7 +585,6 @@ actor Algo_RefList (bool DEBUG)
 				//We send the Poc value of the next element
 				poc := POCList[ValMovedIdx];
 				CounterRefListTab := CounterRefListTab + 1;
-		//		println("RefListSent; FrNu:"+FrameNumList[ValMovedIdx]+" Poc:"+POCList[ValMovedIdx]);
 			else
 				foreach int i in 0 .. NbPOC - 1
 				do
