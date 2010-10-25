@@ -35,6 +35,8 @@
 #include "orcc_fifo.h"
 #include "orcc_util.h"
 
+#define MIN(a,b) ((a)>(b)?(b):(a))
+
 extern struct fifo_i16_s *img_read_WIDTH;
 extern struct fifo_i16_s *img_read_HEIGHT;
 extern struct fifo_i8_s *img_read_RED;
@@ -85,7 +87,7 @@ static void write_pixels(struct schedinfo_s *si) {
 	int num_green = fifo_i8_get_room(img_read_GREEN);
 	int num_blue = fifo_i8_get_room(img_read_BLUE);
 
-	int num_colors = min(min(min(num_red, num_green), num_blue), count - idx_pixel);
+	int num_colors = MIN(MIN(MIN(num_red, num_green), num_blue), count - idx_pixel);
 
 	i8 *img_read_RED_buf = (i8 *) malloc(num_colors);
 	i8 *img_read_GREEN_buf = (i8 *) malloc(num_colors);

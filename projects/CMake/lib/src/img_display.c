@@ -47,7 +47,7 @@ static SDL_Surface *m_screen;
 static SDL_Surface *m_image;
 static int m_count;
 
-static void img_display_init() {
+void img_display_initialize() {
 	m_count = m_width * m_height;
 
 	/* First, initialize SDL's video subsystem. */
@@ -126,7 +126,7 @@ void img_display_scheduler(struct schedinfo_s *si) {
 		m_width = ptr[0];
 		fifo_i16_read_end(img_display_WIDTH, 1);
 
-		img_display_init();
+		img_display_initialize();
 	}
 
 	while (idx_pixel < m_count) {
