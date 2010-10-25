@@ -52,7 +52,7 @@ actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size
 // Frame buffer organization:
 
 	//int MEMSIZE         = lshift( 1, MEMBITS );
-	int MEMSIZE = 524268;
+	int MEMSIZE = lshift(1, 22);
 
 	//int BURSTSIZE       = COMPONENTS * BLOCKSIZE / PIXELS_PER_WORD;
 	int BURSTSIZE = 96;

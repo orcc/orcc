@@ -71,10 +71,10 @@ actor MemoryManager () int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA , int(size=3
 	int COMPBITS = 3;
 
 	//int YBITS           = log2_ceil( MAXH_IN_MB );
-	int YBITS = 5;
+	int YBITS = 7;
 
 	//int XBITS           = log2_ceil( MAXW_IN_MB );
-	int XBITS = 6;
+	int XBITS = 7;
 
 	// int BLOCKBITS       = log2_ceil( BLOCKSIZE / PIXELS_PER_WORD ) ;
 	int BLOCKBITS = 4;
