@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="img_read" x="57" y="70"/>
+      <vertex id="img_display" x="516" y="178"/>
+      <vertex id="RGB_RGGB" x="186" y="70"/>
+      <vertex id="RGGB_RGB" x="323" y="178"/>
+   </vertices>
+</layout>

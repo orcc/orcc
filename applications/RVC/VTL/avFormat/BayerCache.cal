@@ -1,0 +1,138 @@
+/*
+*	author:			alhadi.abrahman@epfl.ch
+*	description: 	Cache for Bayer filter that stores an image, 
+*					and outputs in the relevant filter order of 13 data output			
+*	input: 			inData - input RGGB data from memory/source
+*					imgSize - size of image with first LSB 16 bit as width and MSB 16 bit as height
+*	output: 		outData - 13 parallel outputs for one stage filter
+*/
+
+actor BayerCache() 
+	int (size = 8) inData, 
+	int(size=16) WIDTH,
+    int(size=16) HEIGHT
+		==> 
+			int (size = 8) outData0, 
+			int (size = 8) outData1,
+			int (size = 8) outData2, 
+			int (size = 8) outData3, 
+			int (size = 8) outData4, 
+			int (size = 8) outData5,
+			int (size = 8) outData6, 
+			int (size = 8) outData7, 
+			int (size = 8) outData8, 
+			int (size = 8) outData9, 
+			int (size = 8) outData10, 
+			int (size = 8) outData11, 
+			int (size = 8) outData12 :
+
+	int k := 0;
+	bool getSz := true;
+	bool startFilter := false;
+	bool storeControl := false;
+	//int cachePtr := 0;
+	int m := 0;
+	//int outd := 0;
+	int width := 0;
+	int height := 0;
+	
+	int outd0 := 0;
+	int outd1 := 0;
+	int outd2 := 0;
+	int outd3 := 0;
+	int outd4 := 0;
+	int outd5 := 0;
+	int outd6 := 0;
+	int outd7 := 0;
+	int outd8 := 0;
+	int outd9 := 0;
+	int outd10 := 0;
+	int outd11 := 0;
+	int outd12 := 0;
+	
+	int c1 := 0;
+	int c2 := 0;
+	int c3 := 0;
+	int c4 := 0;
+	
+	//problem: parameter not allowed, therefore, define list size as constant (i.e. x number of BRAM instantiation)
+	List(type:int(size=8), size = 1024*1024) cache := [0 : for int i in 1 .. 1024*1024]; //cache memory
+	
+	//function getWidth(int(size=32) sizeOfImage) --> int(size=16): bitand(sizeOfImage ,65535) end
+    //function getHeight(int(size=32) sizeOfImage) --> int(size=16): rshift(sizeOfImage ,16) end
+	
+	getSZ : action WIDTH:[w],HEIGHT:[h] ==>
+    guard getSz = true
+    do
+    	width := w;
+		height := h;
+		getSz := false;
+		storeControl := true;
+    end
+	
+	store: action inData: [ind] ==> //store whole image in the cache 
+	guard storeControl = true
+	do
+		cache[k] := ind;
+		k := k + 1;
+		if (k >= width*height) then
+			startFilter := true;
+			storeControl := false;
+			k := 0;
+		end
+	end
+
+	//output correctly from cache for each cycle
+	filterOut: action ==> outData0: [outd0], outData1: [outd1], outData2: [outd2], outData3: [outd3], outData4: [outd4], 
+							outData5: [outd5], outData6: [outd6], outData7: [outd7], outData8: [outd8], outData9: [outd9],
+							outData10: [outd10], outData11: [outd11], outData12: [outd12] //output from cache 13 pixels at once
+	guard startFilter = true
+	do
+		c1 := k*width + m;
+		c2 := c1+width;
+		c3 := c2+width;
+		c4 := c3+width;
+		
+		outd0 := cache[c1 + 2];
+		outd1 := cache[c2 + 1];
+		outd2 := cache[c2 + 2];
+		outd3 := cache[c2 + 3];
+		outd4 := cache[c3];
+		outd5 := cache[c3 + 1];
+		outd6 := cache[c3 + 2];
+		outd7 := cache[c3 + 3];
+		outd8 := cache[c3 + 4];
+		outd9 := cache[c4 + 1];
+		outd10 := cache[c4 + 2];
+		outd11 := cache[c4 + 3];
+		outd12 := cache[c4+width + 2]; 
+		/*
+		//if (k = 1 and m = 0)then
+			println("outd0 "+outd0);
+			println("outd1 "+outd1);
+			println("outd2 "+outd2);
+			println("outd3 "+outd3);
+			println("outd4 "+outd4);
+			println("outd5 "+outd5);
+			println("outd6 "+outd6);
+			println("outd7 "+outd7);
+			println("outd8 "+outd8);
+			println("outd9 "+outd9);
+			println("outd10 "+outd10);
+			println("outd11 "+outd11);
+			println("outd12 "+outd12);
+		//end
+		*/
+		
+		m := m + 1;
+		if (m >= width - 4) then //end of line reached
+			m := 0;
+			k := k + 1;
+			if (k >= height - 4) then //finish all image
+				k := 0;
+				startFilter := false;
+			end
+		end
+	end
+	
+end

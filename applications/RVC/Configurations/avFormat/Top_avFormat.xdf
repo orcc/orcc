@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Top_avFormat">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="img_read">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/System/Img_Read"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="img_display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/System/Img_Display"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="rgb_ycbcr">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/avFormat/RGBtoYCrCb"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="YCrCb_rgb">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/avFormat/YCrCbtoRGB"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="ycrcb444_422">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/avFormat/YCrCb444to422"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="ycrcb422_420">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/avFormat/YCrCb422to420"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="raster_mb">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/avFormat/RasterToMacroblock"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="ycrcb420_422">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/avFormat/YCrCb420to422"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="ycrcb422_444">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/avFormat/YCrCb422to444"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="mb_raster">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../VTL/avFormat/MacroblockToRaster"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="rgb_ycbcr" dst-port="R" src="img_read" src-port="RED"/>
+    <Connection dst="rgb_ycbcr" dst-port="G" src="img_read" src-port="GREEN"/>
+    <Connection dst="rgb_ycbcr" dst-port="B" src="img_read" src-port="BLUE"/>
+    <Connection dst="img_display" dst-port="RED" src="YCrCb_rgb" src-port="R"/>
+    <Connection dst="img_display" dst-port="GREEN" src="YCrCb_rgb" src-port="G"/>
+    <Connection dst="img_display" dst-port="BLUE" src="YCrCb_rgb" src-port="B"/>
+    <Connection dst="img_display" dst-port="WIDTH" src="img_read" src-port="WIDTH"/>
+    <Connection dst="img_display" dst-port="HEIGHT" src="img_read" src-port="HEIGHT"/>
+    <Connection dst="ycrcb444_422" dst-port="Cr" src="rgb_ycbcr" src-port="Cr"/>
+    <Connection dst="ycrcb444_422" dst-port="Cb" src="rgb_ycbcr" src-port="Cb"/>
+    <Connection dst="ycrcb444_422" dst-port="WIDTH" src="img_read" src-port="WIDTH"/>
+    <Connection dst="ycrcb444_422" dst-port="HEIGHT" src="img_read" src-port="HEIGHT"/>
+    <Connection dst="ycrcb422_420" dst-port="CrCb422" src="ycrcb444_422" src-port="CrCb422"/>
+    <Connection dst="ycrcb422_420" dst-port="WIDTH" src="img_read" src-port="WIDTH"/>
+    <Connection dst="ycrcb422_420" dst-port="HEIGHT" src="img_read" src-port="HEIGHT"/>
+    <Connection dst="raster_mb" dst-port="CrCb420" src="ycrcb422_420" src-port="CrCb420"/>
+    <Connection dst="raster_mb" dst-port="Y420" src="rgb_ycbcr" src-port="Y"/>
+    <Connection dst="ycrcb420_422" dst-port="WIDTH" src="img_read" src-port="WIDTH"/>
+    <Connection dst="ycrcb420_422" dst-port="HEIGHT" src="img_read" src-port="HEIGHT"/>
+    <Connection dst="ycrcb422_444" dst-port="CrCb422" src="ycrcb420_422" src-port="CrCb422"/>
+    <Connection dst="ycrcb422_444" dst-port="WIDTH" src="img_read" src-port="WIDTH"/>
+    <Connection dst="ycrcb422_444" dst-port="HEIGHT" src="img_read" src-port="HEIGHT"/>
+    <Connection dst="YCrCb_rgb" dst-port="Cr" src="ycrcb422_444" src-port="Cr"/>
+    <Connection dst="YCrCb_rgb" dst-port="Cb" src="ycrcb422_444" src-port="Cb"/>
+    <Connection dst="mb_raster" dst-port="YCrCb420mb" src="raster_mb" src-port="YCrCb420mb"/>
+    <Connection dst="ycrcb420_422" dst-port="CrCb420" src="mb_raster" src-port="CrCb420"/>
+    <Connection dst="YCrCb_rgb" dst-port="Y" src="mb_raster" src-port="Y420"/>
+</XDF>

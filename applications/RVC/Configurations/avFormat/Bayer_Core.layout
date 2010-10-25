@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="rggb" x="57" y="250"/>
+      <vertex id="WIDTH" x="57" y="364"/>
+      <vertex id="HEIGHT" x="57" y="459"/>
+      <vertex id="r" x="559" y="79"/>
+      <vertex id="g" x="559" y="174"/>
+      <vertex id="b" x="559" y="269"/>
+      <vertex id="WIDTH_OUT" x="559" y="364"/>
+      <vertex id="HEIGHT_OUT" x="559" y="459"/>
+      <vertex id="bayer_cache" x="177" y="120"/>
+      <vertex id="bayer_filter" x="358" y="100"/>
+   </vertices>
+</layout>
