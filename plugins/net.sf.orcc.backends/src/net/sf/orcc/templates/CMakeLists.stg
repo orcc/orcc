@@ -33,11 +33,7 @@ set(filenames
 $network.name$.c
 $network.instances: printInstance()$)
 
-IF(APPLE)
-add_executable($network.name$ \${filenames} /Library/Frameworks/SDL.framework/Resources/SDLMain.m)
-ELSE(APPLE)
 add_executable($network.name$ \${filenames})
-ENDIF(APPLE)
 
 target_link_libraries($network.name$ \${orcc_LIBRARY} \${SDL_LIBRARY} \${SDLIMAGE_LIBRARY}$if (needPthreads)$ \${CMAKE_THREAD_LIBS_INIT}$endif$)
 
