@@ -573,13 +573,6 @@ design() ::= <<
 	$stateVars()$
 	$instance.actor.procs.list: procedure()$
 	$instance.actor.actions: action(); separator="\n"$
-	$if(instance.actor.initializes)$
-	$instance.actor.initializes: action()$
-	$if(instance.actor.initializes)$
-	$schedulingTest(instance.actor.initializes)$
-	$endif$
-
-	$endif$
 	$if(instance.actor.actionScheduler.fsm)$
 	$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
 	$else$
