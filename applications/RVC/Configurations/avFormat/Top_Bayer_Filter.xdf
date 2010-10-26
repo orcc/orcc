@@ -16,7 +16,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../VTL/System/Img_Read"/>
+        <Class name="../../VTL/System/Img_Reader"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
