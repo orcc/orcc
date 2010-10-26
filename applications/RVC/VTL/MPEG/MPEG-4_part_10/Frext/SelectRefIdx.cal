@@ -45,7 +45,7 @@ actor SelectRefIdx()
 			PocToRead    :[Poc0]
 		guard
 			not IsNewMb,
-			ListSelected = PRED_L0 or ListSelected = BIPRED or ListSelected = DIRECT//FixMe!!
+			ListSelected != PRED_L1//PRED_L0 or ListSelected = BIPRED or ListSelected = DIRECT//FixMe!!
 		end
 
 	SendPocToRead.L1: action
@@ -53,7 +53,7 @@ actor SelectRefIdx()
 			POCtoRead_l1 :[Poc1],
 			NewMb        :[IsNewMb]
 				==>
-			PocToRead    :[Poc1]
+			PocToRead    :[Poc0]
 		guard
 			not IsNewMb,
 			ListSelected = PRED_L1
