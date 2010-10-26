@@ -154,15 +154,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_MVR_MultiFrameAdptive">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MVR_MultiFrameAdptive"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="Algo_Add">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -181,15 +172,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="BlackHole">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/Trash/BlackHole4Mvpl0"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -198,25 +180,12 @@
     <Connection dst="Mgnt_MVR" dst-port="RefIdx" src="" src-port="RefIdx"/>
     <Connection dst="Mgnt_MVR" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
     <Connection dst="Mgnt_MVR" dst-port="MbPartHeigth" src="" src-port="MbPartHeigth"/>
-    <Connection dst="Algo_MVR_MultiFrameAdptive" dst-port="mbPartIdx"
-        src="" src-port="MbPartIdx"/>
-    <Connection dst="Algo_MVR_MultiFrameAdptive" dst-port="refIdxLX"
-        src="" src-port="RefIdx"/>
     <Connection dst="Algo_Add" dst-port="Y" src="" src-port="MvRes"/>
-    <Connection dst="Algo_MVR_MultiFrameAdptive" dst-port="PartSZ"
-        src="Mgnt_MVR" src-port="PartSZ"/>
-    <Connection dst="Algo_MVR_MultiFrameAdptive" dst-port="refIdxLXN"
-        src="Mgnt_MVR" src-port="refIdxLXN"/>
-    <Connection dst="Algo_MVR_MultiFrameAdptive" dst-port="mvLX"
-        src="Mgnt_MVR" src-port="mvLX"/>
     <Connection dst="Mgnt_MVR" dst-port="MV" src="Algo_Add" src-port="Z"/>
     <Connection dst="" dst-port="MV" src="Algo_Add" src-port="Z"/>
     <Connection dst="" dst-port="LOCATION" src="Mgnt_MVR" src-port="Location"/>
-    <Connection dst="" dst-port="PartSZ" src="Mgnt_MVR" src-port="PartSZ"/>
     <Connection dst="Mgnt_MVR" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Mgnt_MVR" dst-port="MbIntraFlag" src="" src-port="MbIntraFlag"/>
-    <Connection dst="" dst-port="mv_out" src="Mgnt_MVR" src-port="mv_out"/>
-    <Connection dst="" dst-port="ref_idx" src="Mgnt_MVR" src-port="refidx_out"/>
     <Connection dst="Mgnt_MVR" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="MvpL0_Reconstr" dst-port="slice_type" src="" src-port="slice_type"/>
     <Connection dst="MvpL0_Reconstr" dst-port="mb_type" src="" src-port="mb_type"/>
@@ -227,9 +196,8 @@
     <Connection dst="MvpL0_Reconstr" dst-port="MbPredRefIdx" src="" src-port="MbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
-    <Connection dst="BlackHole" dst-port="Bon"
-        src="Algo_MVR_MultiFrameAdptive" src-port="mvpLX"/>
-    <Connection dst="BlackHole" dst-port="Mauvais" src="MvpL0_Reconstr" src-port="Mvpl0"/>
-    <Connection dst="Algo_Add" dst-port="X"
-        src="Algo_MVR_MultiFrameAdptive" src-port="mvpLX"/>
+    <Connection dst="Algo_Add" dst-port="X" src="MvpL0_Reconstr" src-port="Mvpl0"/>
+    <Connection dst="" dst-port="PartSZ" src="Mgnt_MVR" src-port="PartSZ"/>
+    <Connection dst="" dst-port="ref_idx" src="Mgnt_MVR" src-port="refidx_out"/>
+    <Connection dst="" dst-port="mv_out" src="Mgnt_MVR" src-port="mv_out"/>
 </XDF>

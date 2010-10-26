@@ -752,7 +752,7 @@ actor Algo_Mvpl0Reconstr()
 
 	ComputeSubMvpL0.Skip: action
 				==>
-Mvpl0 :[0,0]
+			Mvpl0 :[0,0]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			not IsPred4SubMb
@@ -887,7 +887,6 @@ Mvpl0 :[0,0]
 		GetSubMvSkip      (GetSubMv.Skip        )--> ComputeSubMvpL0;
 
 		GetMvSkip (GetMv.Skip )--> GetMbType;
-
 	end
 
 	priority

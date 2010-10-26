@@ -1,29 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="33" y="35"/>
-      <vertex id="MbPartIdx" x="20" y="374"/>
-      <vertex id="RefIdx" x="26" y="307"/>
-      <vertex id="MbPartWidth" x="24" y="183"/>
+      <vertex id="CurrMbAddr" x="108" y="406"/>
+      <vertex id="MbPartIdx" x="32" y="180"/>
+      <vertex id="RefIdx" x="39" y="275"/>
+      <vertex id="MbPartWidth" x="24" y="209"/>
       <vertex id="MbPartHeigth" x="22" y="147"/>
-      <vertex id="MvRes" x="639" y="216"/>
-      <vertex id="PicWidthInMb" x="17" y="215"/>
+      <vertex id="MvRes" x="574" y="460"/>
+      <vertex id="PicWidthInMb" x="101" y="504"/>
       <vertex id="MbIntraFlag" x="26" y="113"/>
-      <vertex id="FirstMbInSlice" x="28" y="74"/>
-      <vertex id="slice_type" x="304" y="591"/>
-      <vertex id="mb_type" x="307" y="560"/>
-      <vertex id="MbPredRefIdxL0" x="288" y="496"/>
-      <vertex id="SubMbPredRefIdxL0" x="278" y="530"/>
-      <vertex id="sub_mb_type" x="294" y="620"/>
-      <vertex id="MV" x="834" y="208"/>
-      <vertex id="LOCATION" x="440" y="31"/>
-      <vertex id="PartSZ" x="449" y="75"/>
-      <vertex id="mv_out" x="448" y="108"/>
-      <vertex id="ref_idx" x="449" y="140"/>
-      <vertex id="Mgnt_MVR" x="168" y="16"/>
-      <vertex id="Algo_MVR_MultiFrameAdptive" x="426" y="172"/>
-      <vertex id="Algo_Add" x="723" y="171"/>
-      <vertex id="MvpL0_Reconstr" x="594" y="445"/>
-      <vertex id="BlackHole" x="781" y="460"/>
+      <vertex id="FirstMbInSlice" x="99" y="436"/>
+      <vertex id="slice_type" x="107" y="601"/>
+      <vertex id="mb_type" x="110" y="570"/>
+      <vertex id="MbPredRefIdxL0" x="93" y="470"/>
+      <vertex id="SubMbPredRefIdxL0" x="81" y="540"/>
+      <vertex id="sub_mb_type" x="97" y="630"/>
+      <vertex id="MV" x="807" y="444"/>
+      <vertex id="LOCATION" x="968" y="72"/>
+      <vertex id="PartSZ" x="980" y="102"/>
+      <vertex id="mv_out" x="980" y="130"/>
+      <vertex id="ref_idx" x="982" y="162"/>
+      <vertex id="Mgnt_MVR" x="750" y="65"/>
+      <vertex id="Algo_Add" x="659" y="420"/>
+      <vertex id="MvpL0_Reconstr" x="336" y="399"/>
    </vertices>
 </layout>
