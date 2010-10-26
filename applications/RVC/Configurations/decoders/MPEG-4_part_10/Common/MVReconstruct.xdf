@@ -209,8 +209,6 @@
         src="Mgnt_MVR" src-port="refIdxLXN"/>
     <Connection dst="Algo_MVR_MultiFrameAdptive" dst-port="mvLX"
         src="Mgnt_MVR" src-port="mvLX"/>
-    <Connection dst="Algo_Add" dst-port="X"
-        src="Algo_MVR_MultiFrameAdptive" src-port="mvpLX"/>
     <Connection dst="Mgnt_MVR" dst-port="MV" src="Algo_Add" src-port="Z"/>
     <Connection dst="" dst-port="MV" src="Algo_Add" src-port="Z"/>
     <Connection dst="" dst-port="LOCATION" src="Mgnt_MVR" src-port="Location"/>
@@ -232,4 +230,6 @@
     <Connection dst="BlackHole" dst-port="Bon"
         src="Algo_MVR_MultiFrameAdptive" src-port="mvpLX"/>
     <Connection dst="BlackHole" dst-port="Mauvais" src="MvpL0_Reconstr" src-port="Mvpl0"/>
+    <Connection dst="Algo_Add" dst-port="X"
+        src="Algo_MVR_MultiFrameAdptive" src-port="mvpLX"/>
 </XDF>

@@ -314,7 +314,7 @@ actor Algo_Mvpl0Reconstr()
 			Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_TAB;
 			RefIdxTab[Idx_CurrBlk] := [0: for int i in 0 .. 15];
 			//if mbAddrB is not available
-			if( (Curr_Mb_Addr - Fst_Mb) < pic_width_in_mb) then
+			if( Curr_Mb_Addr < Fst_Mb + pic_width_in_mb) then
 				MvpL0 := [0,0];
 			else
 				//if mbAddrA is not available	
@@ -341,7 +341,7 @@ actor Algo_Mvpl0Reconstr()
 										Idx_C       := 15;
 										Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_TAB;
 										MvC         := [MvTab [Idx_mbAddrD][15][0],MvTab [Idx_mbAddrD][15][1]];
-										RefIdxC     := RefIdxTab[Idx_mbAddrA][15];
+										RefIdxC     := RefIdxTab[Idx_mbAddrD][15];
 									else
 										Idx_C   := -1;
 										MvC     := [0,0];
