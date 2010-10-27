@@ -278,7 +278,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 					.getTarget());
 			Expression value = (Expression) assign.getValue()
 					.accept(this, args);
-			Assign a = new Assign(target, value);
+			Assign a = new Assign(assign.getLocation(), target, value);
 			Use.addUses(a, value);
 			return a;
 		}
@@ -291,7 +291,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 			for (Expression parameter : call.getParameters()) {
 				parameters.add((Expression) parameter.accept(this, args));
 			}
-			Call c = new Call(new Location(), target, call.getProcedure(),
+			Call c = new Call(call.getLocation(), target, call.getProcedure(),
 					parameters);
 			Use.addUses(c, parameters);
 			return c;
@@ -314,9 +314,10 @@ public class InlineTransformation extends AbstractActorTransformation {
 			Load l;
 			Variable sourceVariable = load.getSource().getVariable();
 			if (sourceVariable.isGlobal()) {
-				l = new Load(target, load.getSource(), indexes);
+				l = new Load(load.getLocation(), target, load.getSource(),
+						indexes);
 			} else {
-				l = new Load(target, new Use(
+				l = new Load(load.getLocation(), target, new Use(
 						variableToLocalVariableMap.get(sourceVariable)),
 						indexes);
 			}
@@ -338,7 +339,8 @@ public class InlineTransformation extends AbstractActorTransformation {
 			for (Expression value : phi.getValues()) {
 				values.add((Expression) value.accept(this, args));
 			}
-			PhiAssignment p = new PhiAssignment(new Location(), target, values);
+			PhiAssignment p = new PhiAssignment(phi.getLocation(), target,
+					values);
 			Use.addUses(p, values);
 			return p;
 		}
@@ -381,7 +383,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 				indexes.add((Expression) index.accept(this, args));
 			}
 			Expression value = (Expression) store.getValue().accept(this, args);
-			Store s = new Store(target, indexes, value);
+			Store s = new Store(store.getLocation(), target, indexes, value);
 			Use.addUses(s, indexes);
 			Use.addUses(s, value);
 			return s;
@@ -395,7 +397,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 		@Override
 		public Object interpret(BlockNode node, Object... args) {
-			BlockNode blockNode = new BlockNode(procedure);
+			BlockNode blockNode = new BlockNode(node.getLocation(), procedure);
 			for (Instruction instruction : node.getInstructions()) {
 				Instruction i = (Instruction) instruction.accept(this, args);
 				if (i != null) {
@@ -419,8 +421,8 @@ public class InlineTransformation extends AbstractActorTransformation {
 			}
 			BlockNode joinNode = (BlockNode) node.getJoinNode().accept(this,
 					args);
-			IfNode ifNode = new IfNode(procedure, condition, thenNodes,
-					elseNodes, joinNode);
+			IfNode ifNode = new IfNode(node.getLocation(), procedure,
+					condition, thenNodes, elseNodes, joinNode);
 			Use.addUses(ifNode, condition);
 			return ifNode;
 		}
@@ -435,8 +437,8 @@ public class InlineTransformation extends AbstractActorTransformation {
 			}
 			BlockNode joinNode = (BlockNode) node.getJoinNode().accept(this,
 					args);
-			WhileNode whileNode = new WhileNode(procedure, condition, nodes,
-					joinNode);
+			WhileNode whileNode = new WhileNode(node.getLocation(), procedure,
+					condition, nodes, joinNode);
 			Use.addUses(whileNode, condition);
 			return whileNode;
 		}
