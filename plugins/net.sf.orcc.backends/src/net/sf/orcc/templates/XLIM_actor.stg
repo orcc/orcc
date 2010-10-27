@@ -281,10 +281,10 @@ $NotphiNodes.instructions: PrintNotPhi()$
 IfNode(ifNode) ::= <<
 
 <module kind="if">
-	<module decision="decision_$ifNode.value$" kind="test">
+	<module decision="decision_$ifNode.value$_$ifNode.location.startLine$_$ifNode.location.startColumn$" kind="test">
 		<operation kind="noop">
 			$port(dir="in", source=ifNode.value)$
-			<port dir="out" size="1" source="decision_$ifNode.value$" typeName="bool"/>
+			<port dir="out" size="1" source="decision_$ifNode.value$_$ifNode.location.startLine$_$ifNode.location.startColumn$" typeName="bool"/>
 		</operation>		
 	</module>
 	<module kind="then">
