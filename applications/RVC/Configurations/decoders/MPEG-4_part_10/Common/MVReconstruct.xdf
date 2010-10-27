@@ -66,6 +66,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="MbType4Prediction">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -128,6 +135,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="MvComponentReord">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MvComponentReorder"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -143,8 +159,13 @@
     <Connection dst="MvpL0_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
     <Connection dst="Algo_Add" dst-port="X" src="MvpL0_Reconstr" src-port="Mvpl0"/>
-    <Connection dst="" dst-port="ref_idx" src="MvpL0_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="" dst-port="PartSZ" src="MvpL0_Reconstr" src-port="PartSZ"/>
     <Connection dst="" dst-port="LOCATION" src="MvpL0_Reconstr" src-port="Location"/>
-    <Connection dst="" dst-port="mv_out" src="MvpL0_Reconstr" src-port="MvOut"/>
+    <Connection dst="MvComponentReord" dst-port="MbType" src="" src-port="MbType4Prediction"/>
+    <Connection dst="MvComponentReord" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
+    <Connection dst="MvComponentReord" dst-port="Mv" src="Algo_Add" src-port="Z"/>
+    <Connection dst="" dst-port="mv_out" src="MvComponentReord" src-port="MvOut"/>
+    <Connection dst="MvComponentReord" dst-port="RefIdx"
+        src="MvpL0_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="" dst-port="ref_idx" src="MvComponentReord" src-port="RefIdxOut"/>
 </XDF>

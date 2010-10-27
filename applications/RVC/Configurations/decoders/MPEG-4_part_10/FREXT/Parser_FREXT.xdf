@@ -666,4 +666,6 @@
     <Connection dst="Mgnt_Display" dst-port="POC" src="DecodePic" src-port="POC"/>
     <Connection dst="Mgnt_Display" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="MVReconstruct" dst-port="MbType4Prediction"
+        src="DecodePic" src-port="MbType4Pred"/>
 </XDF>

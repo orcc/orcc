@@ -381,6 +381,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="MbType4Pred">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -751,4 +758,6 @@
         src="" src-port="PpsParam4SliceData"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="SpsParameters"
         src="" src-port="SpsParam4SliceData"/>
+    <Connection dst="" dst-port="MbType4Pred"
+        src="MergeDataFromSDataAndMbLayer" src-port="MBType4Pred"/>
 </XDF>

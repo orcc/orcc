@@ -188,8 +188,6 @@
     <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="RD" src="" src-port="RD_C"/>
     <Connection dst="" dst-port="RA_C"
         src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="RA"/>
-    <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="Frac"
-        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="Frac"/>
     <Connection dst="" dst-port="RA_Width_C"
         src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="RA_Width"/>
     <Connection dst="" dst-port="RA_Height_C"
@@ -225,4 +223,5 @@
         src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="RefIdx2PocControl"/>
     <Connection dst="" dst-port="NewMb"
         src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="NewMb"/>
+    <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="Mv" src="" src-port="MV"/>
 </XDF>

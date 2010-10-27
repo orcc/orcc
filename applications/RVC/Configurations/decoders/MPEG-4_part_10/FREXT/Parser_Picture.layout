@@ -42,7 +42,7 @@
       <vertex id="NbRefFrame_l0" x="1231" y="559"/>
       <vertex id="RefList0Type" x="1247" y="662"/>
       <vertex id="RefReordering_l0" x="1244" y="800"/>
-      <vertex id="IntraPredMode" x="2588" y="1424"/>
+      <vertex id="IntraPredMode" x="2587" y="1393"/>
       <vertex id="MbIntraFlag" x="2598" y="1497"/>
       <vertex id="Run" x="2617" y="997"/>
       <vertex id="Value" x="2609" y="1089"/>
@@ -70,5 +70,6 @@
       <vertex id="DecodeSubMbPred" x="1742" y="1736"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="2238" y="1461"/>
       <vertex id="GenerateSkipBlockInformation" x="2299" y="1210"/>
+      <vertex id="MbType4Pred" x="2598" y="1434"/>
    </vertices>
 </layout>

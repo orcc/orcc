@@ -200,8 +200,6 @@
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="RA_Width"/>
     <Connection dst="" dst-port="RA_Height_L"
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="RA_Height"/>
-    <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC"
-        dst-port="Frac" src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="Frac"/>
     <Connection dst="Algo_Interp_split_MB" dst-port="INTERP"
         src="Algo_Interp_SeparableSixTapQuarterPelAVC" src-port="INTERP"/>
     <Connection dst="Algo_Interp_split_MB" dst-port="MbPartHeigth"
@@ -231,4 +229,6 @@
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="RefIdx2PocControl"/>
     <Connection dst="" dst-port="NewMb"
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="NewMb"/>
+    <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC"
+        dst-port="Mv" src="" src-port="MV"/>
 </XDF>

@@ -7,7 +7,7 @@
 
 
 actor Algo_Interp_EighthPelBilinear() 
-		int(size=4) Frac, 
+		int(size=16) Mv, 
 		int(size=16) RD, 
 		uint(size=6) PartSZ 
 				==> 
@@ -32,18 +32,18 @@ actor Algo_Interp_EighthPelBilinear()
       temp := rshift (temp,6);
   end
 
-  get_fract_x: action Frac:[ f ] ==>
+  get_fract_x: action Mv:[ MovementVector ] ==>
   do
     x := 0;
     y := 0;
     o_x := 0;
     o_y := 0;
-    x_index := f;
+    x_index := MovementVector & 7;
   end
 
-  get_fract_y: action Frac:[ f ] ==>
+  get_fract_y: action Mv:[ MovementVector ] ==>
   do
-    y_index := f;
+    y_index := MovementVector & 7;
   end
 
   getwidth: action PartSZ:[ f ] ==>

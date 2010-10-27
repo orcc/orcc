@@ -6,8 +6,9 @@
 
 
 actor Algo_Interp_SeparableSixTapQuarterPelAVC () 
-		uint(size=16) Frac, int(size=16) RD,
-		uint(size=6) PartSZ
+		int (size=16) Mv,
+		int (size=16) RD,
+		uint(size=6)  PartSZ
 				==>
 				int(size=16) INTERP:
 
@@ -270,24 +271,24 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
     end
   end
 
-  get_fract_x: action Frac:[ f ] ==>
+  get_fract_x: action Mv:[ MovementVector ] ==>
   do
     x := 0;
     y := 0;
     o_x := 0;
     o_y := 0;
     buf_done := 0;
-    x_index := f;
+    x_index := MovementVector & 3;
   	if(DEBUG_INPUT) then
-		println("Input Interp_SeparableSixTap... Frac:"+f);
+		println("Input Interp_SeparableSixTap... Frac:"+MovementVector);
   	end
   end
 
-  get_fract_y: action Frac:[ f ] ==>
+  get_fract_y: action Mv:[ MovementVector ] ==>
   do
-    y_index := f;   
+    y_index := MovementVector & 3;   
   	if(DEBUG_INPUT) then
-		println("Input Interp_SeparableSixTap... Frac:"+f);
+		println("Input Interp_SeparableSixTap... Frac:"+MovementVector);
   	end
   end
 

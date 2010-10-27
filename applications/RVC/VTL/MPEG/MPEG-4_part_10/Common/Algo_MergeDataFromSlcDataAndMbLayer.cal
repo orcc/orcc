@@ -67,6 +67,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	int (size=8)  Qp_Cb,
 	int (size=8)  Qp_Cr,
 	uint(size=6)  MacroBlockType,
+	uint(size=6)  MBType4Pred,
 	uint(size=4)  slice_type,
 	bool          TransformSize8x8,
 	uint(size=3)  SelectList
@@ -108,6 +109,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			Qp_Cb           :[ValQpCb],
 			Qp_Cr           :[ValQpCr],
 			MacroBlockType  :[BLOCK_TYPE_P_SKIP],
+			MBType4Pred     :[BLOCK_TYPE_P_SKIP],
 			slice_type      :[SLICE_TYPE_P]
 		guard
 			skip = true
@@ -216,6 +218,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			Qp_Cb          :[ValQpCb],
 			Qp_Cr          :[ValQpCr],
 			MacroBlockType :[mb_type],
+			MBType4Pred    :[mb_type],
 			slice_type     :[ValSliceType]
 		guard
 			skip    = false,
