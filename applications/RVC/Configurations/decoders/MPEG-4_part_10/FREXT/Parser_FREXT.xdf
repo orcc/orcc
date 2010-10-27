@@ -626,13 +626,6 @@
     <Connection dst="BlockExpand" dst-port="Run" src="DecodePic" src-port="Run"/>
     <Connection dst="BlockExpand" dst-port="Value" src="DecodePic" src-port="Value"/>
     <Connection dst="BlockExpand" dst-port="Last" src="DecodePic" src-port="Last"/>
-    <Connection dst="MVReconstruct" dst-port="MbIntraFlag"
-        src="DecodePic" src-port="MbIntraFlag"/>
-    <Connection dst="MVReconstruct" dst-port="MbPartHeigth"
-        src="DecodePic" src-port="MbPartHeigth"/>
-    <Connection dst="MVReconstruct" dst-port="MbPartIdx" src="DecodePic" src-port="MbPartIdx"/>
-    <Connection dst="MVReconstruct" dst-port="MbPartWidth"
-        src="DecodePic" src-port="MbPartWidth"/>
     <Connection dst="DecodePic" dst-port="ResetPrevFrameNum" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="MacroBlockType" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="" dst-port="TransformSize8x8" src="DecodePic" src-port="TransformSize8x8"/>
@@ -648,7 +641,6 @@
     <Connection dst="RefList1" dst-port="RefListType" src="DecodePic" src-port="RefList1Type"/>
     <Connection dst="RefList1" dst-port="RefReordering" src="DecodePic" src-port="RefReordering_l1"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
-    <Connection dst="MVReconstruct" dst-port="RefIdx" src="DecodePic" src-port="RefIdx_l0"/>
     <Connection dst="" dst-port="Ref_List1" src="RefList1" src-port="RefList"/>
     <Connection dst="" dst-port="RefIdx_l1" src="DecodePic" src-port="RefIdx_l1"/>
     <Connection dst="" dst-port="SelectList" src="DecodePic" src-port="SelectList"/>

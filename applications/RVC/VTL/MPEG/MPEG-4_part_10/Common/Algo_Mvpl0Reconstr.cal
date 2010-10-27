@@ -65,7 +65,11 @@ actor Algo_Mvpl0Reconstr()
 
 	int (size=16) Mv
 		==>
-	int (size=16) Mvpl0
+	int (size=16) Mvpl0, 
+	uint(size=6)  PartSZ,
+	uint(size=11) Location,
+	uint(size=3)  RefIdxOut,
+	int (size=16) MvOut
 		:
 
 	uint(size=2) NA = 0;
@@ -83,6 +87,7 @@ actor Algo_Mvpl0Reconstr()
 	uint(size=6) BLOCK_TYPE_P_MIN     = 26;
 	uint(size=6) P_L0_16x16           = 26;
 	uint(size=6) BLOCK_TYPE_B_MIN     = 31;
+	uint(size=6) BLOCK_TYPE_B_8x8     = 53;
 	uint(size=6) BLOCK_TYPE_B_MAX     = 53;
 	uint(size=6) BLOCK_TYPE_P_SKIP    = 54;
 
@@ -179,6 +184,9 @@ actor Algo_Mvpl0Reconstr()
 	int (size=LOG2_SZ_TAB+1) Idx_mbAddrC;
 	int (size=LOG2_SZ_TAB+1) Idx_mbAddrD;
 
+	uint(size=11) Mbx_in_pix;
+	uint(size=11) Mby_in_pix;
+
 	function Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
 				-->
 			bool
@@ -248,6 +256,7 @@ actor Algo_Mvpl0Reconstr()
 			mb_type    :[MacroBlkType],
 			slice_type :[SlcTyp]
 				==>
+			PartSZ :[16,16]
 		guard
 			SlcTyp = SLICE_TYPE_P or SlcTyp = SLICE_TYPE_SP,
 			MacroBlkType = BLOCK_TYPE_P_SKIP
@@ -301,7 +310,8 @@ actor Algo_Mvpl0Reconstr()
 			FirstMbInSlice :[Fst_Mb],
 			PicWidthInMb   :[pic_width_in_mb]
 				==>
-			Mvpl0 :[MvpL0] repeat 2
+			Mvpl0 :[MvpL0] repeat 2,
+			Location       :[Mbx_in_pix,Mby_in_pix]
 		var
 			int (size=5) RefIdxA,
 			int (size=5) RefIdxB,
@@ -309,6 +319,8 @@ actor Algo_Mvpl0Reconstr()
 
 			List(type: int(size=16), size=2)  MvpL0
 		do
+			Mbx_in_pix := (Curr_Mb_Addr mod pic_width_in_mb)*16;
+			Mby_in_pix := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
 			Idx_CurrBlk :=  Curr_Mb_Addr      & MASK_TAB;
 			Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_TAB;
 			Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_TAB;
@@ -378,6 +390,8 @@ actor Algo_Mvpl0Reconstr()
 			PicWidthInMb   :[pic_width_in_mb]	
 				==>
 		do
+			Mbx_in_pix := (Curr_Mb_Addr mod pic_width_in_mb)*16;
+			Mby_in_pix := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
 			Idx_CurrBlk := Curr_Mb_Addr & MASK_TAB;
 			MvTab[Idx_CurrBlk] := [[0,0]: for int i in 0 .. 15];
 			RefIdxTab[Idx_CurrBlk] := [-1: for int i in 0 .. 15];
@@ -414,6 +428,8 @@ actor Algo_Mvpl0Reconstr()
 	ComputeMvpL0.Launch16x16: action
 			MbPredRefIdx :[RefIdxCurr]
 				==>
+			PartSZ :[16,16],
+			Location :[Mbx_in_pix,Mby_in_pix],
 			Mvpl0 :[MvpL0] repeat 2
 		guard
 			MbPartIdx < MbPartIdxMax,
@@ -434,13 +450,17 @@ actor Algo_Mvpl0Reconstr()
 	ComputeMvpL0.Launch16x8: action
 			MbPredRefIdx :[RefIdxCurr]
 				==>
+			PartSZ :[16,8],
+			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0] repeat 2
 		guard
 			MbPartIdx < MbPartIdxMax,
 			Is_PredL0(MbType, MbPartIdx),
 			SizeMbMv = SZ_16x8
 		var
-			List(type: int(size=16), size=2) MvpL0
+			List(type: int(size=16), size=2) MvpL0,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
 			foreach int i in 0 .. 7
 			do
@@ -455,6 +475,7 @@ actor Algo_Mvpl0Reconstr()
 					MvpL0 := [OMv[0],OMv[1]];	
 				end
 			else
+				Blk_y_in_pix := Blk_y_in_pix + 8;
 				if(RefIdxCurr = RefIdxA)then
 					MvpL0 := [MvA[0],MvA[1]];
 				else
@@ -467,13 +488,17 @@ actor Algo_Mvpl0Reconstr()
 	ComputeMvpL0.Launch8x16: action
 			MbPredRefIdx :[RefIdxCurr]
 				==>
+			PartSZ :[8,16],
+			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0] repeat 2
 		guard
 			MbPartIdx < MbPartIdxMax,
 			Is_PredL0(MbType, MbPartIdx),
 			SizeMbMv = SZ_8x16
 		var
-			List(type: int(size=16), size=2) MvpL0
+			List(type: int(size=16), size=2) MvpL0,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
 			foreach int i in 0 .. 3
 			do
@@ -492,6 +517,7 @@ actor Algo_Mvpl0Reconstr()
 					MvpL0 := [OMv[0],OMv[1]];
 				end
 			else
+				Blk_x_in_pix := Blk_x_in_pix + 8;
 				if(RefIdxCurr = RefIdxC)then
 					MvpL0 := [MvC[0],MvC[1]];
 				else
@@ -516,12 +542,33 @@ actor Algo_Mvpl0Reconstr()
 
 	ComputeMvpL0.Skip: action
 				==>
+			PartSZ :[Width,Height],
+			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[0,0]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is_PredL0(MbType, MbPartIdx),
 			SizeMbMv != SZ_8x8
+		var
+			uint(size=6) Width,
+			uint(size=6) Height,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
+			if(SizeMbMv = SZ_16x16)then
+				Width  := 16;
+				Height := 16;
+			else
+				if(SizeSubMbMv = SZ_16x8)then
+					Blk_y_in_pix := Blk_y_in_pix + (MbPartIdx&1) * 8;	
+					Width  := 16;
+					Height := 8;
+				else
+					Blk_x_in_pix := Blk_x_in_pix + (MbPartIdx&1) * 8;
+					Width  := 8;
+					Height := 16;
+				end
+			end
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -539,18 +586,24 @@ actor Algo_Mvpl0Reconstr()
 	ComputeSubMvpL0.Launch8x8: action
 			SubMbPredRefIdx :[RefIdxCurr]
 				==>
+			PartSZ :[8,8],
+			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0]repeat 2
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsPred4SubMb,
 			SizeSubMbMv = SZ_8x8
 		var
-			List(type: int(size=16), size=2) MvpL0
+			List(type: int(size=16), size=2) MvpL0,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
+			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
+			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
 			foreach int i in 0 .. 3
 			do
 				RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + i] := RefIdxCurr;
-			end	
+			end
 			GetNeighbourBlockParametres (4*(MbPartIdx&3),8);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 			MvpL0 := [OMv[0],OMv[1]];
@@ -559,14 +612,20 @@ actor Algo_Mvpl0Reconstr()
 	ComputeSubMvpL0.Launch8x4: action
 			SubMbPredRefIdx :[RefIdxCurr]
 				==>
+			PartSZ :[8,4],
+			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0] repeat 2
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsPred4SubMb,
 			SizeSubMbMv = SZ_8x4
 		var
-			List(type: int(size=16), size=2) MvpL0
+			List(type: int(size=16), size=2) MvpL0,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
+			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
+			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1) + 4 * (SubMbPartIdx&1);
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + 2 * (SubMbPartIdx&1)]     := RefIdxCurr;
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + 2 * (SubMbPartIdx&1) + 1] := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 2*(SubMbPartIdx&1),8);
@@ -593,14 +652,20 @@ actor Algo_Mvpl0Reconstr()
 	ComputeSubMvpL0.Launch4x8: action
 			SubMbPredRefIdx :[RefIdxCurr]
 				==>
+			PartSZ :[4,8],
+			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0]repeat 2
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsPred4SubMb,
 			SizeSubMbMv = SZ_4x8
 		var
-			List(type: int(size=16), size=2) MvpL0
+			List(type: int(size=16), size=2) MvpL0,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
+			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1) + 4 * (SubMbPartIdx&1);
+			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&1)]     := RefIdxCurr;
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&1) + 2] := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 1*(SubMbPartIdx&1),4);
@@ -736,14 +801,20 @@ actor Algo_Mvpl0Reconstr()
 	ComputeSubMvpL0.Launch4x4: action
 			SubMbPredRefIdx :[RefIdxCurr]
 				==>
+			PartSZ :[4,4],
+			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0]repeat 2
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsPred4SubMb,
 			SizeSubMbMv = SZ_4x4
 		var
-			List(type: int(size=16), size=2) MvpL0
+			List(type: int(size=16), size=2) MvpL0,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
+			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1) + 4 * (SubMbPartIdx&1);
+			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1) + 4 * ((SubMbPartIdx>>1)&1);
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&3)]     := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 1*(SubMbPartIdx&3),4);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
@@ -752,10 +823,43 @@ actor Algo_Mvpl0Reconstr()
 
 	ComputeSubMvpL0.Skip: action
 				==>
+			PartSZ :[Width,Height],
+			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[0,0]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			not IsPred4SubMb
+		var
+			uint(size=6) Width,
+			uint(size=6) Height,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
+		do
+			if(SizeSubMbMv = SZ_8x8)then
+				Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
+				Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
+				Width  := 8;
+				Height := 8;
+			else
+				if(SizeSubMbMv = SZ_8x4)then
+					Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
+					Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1) + 4 * (SubMbPartIdx&1);	
+					Width  := 8;
+					Height := 4;
+				else
+					if(SizeSubMbMv = SZ_4x8)then
+						Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1) + 4 * (SubMbPartIdx&1);
+						Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);	
+						Width  := 4;
+						Height := 8;
+					else
+						Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1) + 4 * (SubMbPartIdx&1);
+						Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1) + 4 * ((SubMbPartIdx>>1)&1);	
+						Width  := 4;
+						Height := 4;
+					end
+				end
+			end
 		end
 
 	ComputeSubMvpL0.Done: action ==>
@@ -850,6 +954,23 @@ actor Algo_Mvpl0Reconstr()
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
+	SendParameters: action
+				==>
+			RefIdxOut :[refidx_out] repeat 16,
+			MvOut     :[mv_out]     repeat 32
+		var
+			List(type: uint(size=5),  size=16) refidx_out,
+			List(type: int (size=16), size=32) mv_out,
+			List(type: uint(size=4),  size=16) InverseScan4x4Tab = [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ]	
+		do
+			foreach int i in 0 .. 15
+			do
+				refidx_out[i] := RefIdxTab[Idx_CurrBlk][InverseScan4x4Tab[i]];
+				mv_out[2*i]     := MvTab[Idx_CurrBlk][InverseScan4x4Tab[i]][0];
+				mv_out[2*i+1]     := MvTab[Idx_CurrBlk][InverseScan4x4Tab[i]][1];
+			end
+		end
+
 	schedule fsm GetMbType:
 		GetMbType         (GetMbType.MacroBlkIorSI  )--> EatTokens;
 		GetMbType         (GetMbType.P_Skip         )--> GetMbInfos4P_Skip;
@@ -866,7 +987,7 @@ actor Algo_Mvpl0Reconstr()
 		ComputeMvpL0      (ComputeMvpL0.Launch8x8   )--> ComputeSubMvpL0;
 		ComputeMvpL0      (ComputeMvpL0.Launch16x16 )--> GetMv16x16;
 		ComputeMvpL0      (ComputeMvpL0.Skip        )--> GetMvSkip;
-		ComputeMvpL0      (ComputeMvpL0.Done        )--> GetMbType;
+		ComputeMvpL0      (ComputeMvpL0.Done        )--> SendParameters;
 
 		ComputeSubMvpL0      (ComputeSubMvpL0.Launch8x8 )--> GetSubMv8x8;
 		ComputeSubMvpL0      (ComputeSubMvpL0.Launch8x4 )--> GetSubMv8x4;
@@ -886,7 +1007,9 @@ actor Algo_Mvpl0Reconstr()
 		GetSubMv4x4      (GetSubMv.Launch4x4 )--> ComputeSubMvpL0;
 		GetSubMvSkip      (GetSubMv.Skip        )--> ComputeSubMvpL0;
 
-		GetMvSkip (GetMv.Skip )--> GetMbType;
+		GetMvSkip (GetMv.Skip )--> SendParameters;
+
+		SendParameters (SendParameters )-->GetMbType;
 	end
 
 	priority

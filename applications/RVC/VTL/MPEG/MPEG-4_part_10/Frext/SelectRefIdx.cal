@@ -53,7 +53,7 @@ actor SelectRefIdx()
 			POCtoRead_l1 :[Poc1],
 			NewMb        :[IsNewMb]
 				==>
-			PocToRead    :[Poc0]
+			PocToRead    :[Poc1]
 		guard
 			not IsNewMb,
 			ListSelected = PRED_L1

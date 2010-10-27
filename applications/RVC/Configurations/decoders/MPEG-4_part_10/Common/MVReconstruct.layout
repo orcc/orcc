@@ -1,27 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="108" y="406"/>
-      <vertex id="MbPartIdx" x="32" y="180"/>
-      <vertex id="RefIdx" x="39" y="275"/>
-      <vertex id="MbPartWidth" x="24" y="209"/>
-      <vertex id="MbPartHeigth" x="22" y="147"/>
-      <vertex id="MvRes" x="574" y="460"/>
-      <vertex id="PicWidthInMb" x="101" y="504"/>
-      <vertex id="MbIntraFlag" x="26" y="113"/>
-      <vertex id="FirstMbInSlice" x="99" y="436"/>
-      <vertex id="slice_type" x="107" y="601"/>
-      <vertex id="mb_type" x="110" y="570"/>
-      <vertex id="MbPredRefIdxL0" x="93" y="470"/>
-      <vertex id="SubMbPredRefIdxL0" x="81" y="540"/>
-      <vertex id="sub_mb_type" x="97" y="630"/>
-      <vertex id="MV" x="807" y="444"/>
-      <vertex id="LOCATION" x="968" y="72"/>
-      <vertex id="PartSZ" x="980" y="102"/>
-      <vertex id="mv_out" x="980" y="130"/>
-      <vertex id="ref_idx" x="982" y="162"/>
-      <vertex id="Mgnt_MVR" x="750" y="65"/>
-      <vertex id="Algo_Add" x="659" y="420"/>
-      <vertex id="MvpL0_Reconstr" x="336" y="399"/>
+      <vertex id="CurrMbAddr" x="253" y="19"/>
+      <vertex id="MvRes" x="294" y="331"/>
+      <vertex id="PicWidthInMb" x="246" y="117"/>
+      <vertex id="FirstMbInSlice" x="244" y="49"/>
+      <vertex id="slice_type" x="252" y="214"/>
+      <vertex id="mb_type" x="255" y="183"/>
+      <vertex id="MbPredRefIdxL0" x="238" y="83"/>
+      <vertex id="SubMbPredRefIdxL0" x="226" y="153"/>
+      <vertex id="sub_mb_type" x="242" y="243"/>
+      <vertex id="MV" x="707" y="321"/>
+      <vertex id="LOCATION" x="684" y="43"/>
+      <vertex id="PartSZ" x="691" y="104"/>
+      <vertex id="mv_out" x="690" y="73"/>
+      <vertex id="ref_idx" x="690" y="137"/>
+      <vertex id="Algo_Add" x="505" y="301"/>
+      <vertex id="MvpL0_Reconstr" x="462" y="32"/>
    </vertices>
 </layout>

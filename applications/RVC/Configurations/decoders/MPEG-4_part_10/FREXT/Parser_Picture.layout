@@ -8,6 +8,8 @@
       <vertex id="ResetPrevFrameNum" x="18" y="558"/>
       <vertex id="PpsParam4SliceHeader" x="20" y="524"/>
       <vertex id="SpsParam4SliceHeader" x="18" y="590"/>
+      <vertex id="PpsParam4SliceData" x="56" y="1543"/>
+      <vertex id="SpsParam4SliceData" x="90" y="1616"/>
       <vertex id="IntraPredModeC" x="2128" y="1390"/>
       <vertex id="QP_Cb" x="2598" y="1679"/>
       <vertex id="QP_Cr" x="2610" y="1717"/>
@@ -53,7 +55,7 @@
       <vertex id="RefIdx_l1" x="2617" y="1786"/>
       <vertex id="SelectList" x="2616" y="1855"/>
       <vertex id="slice_type" x="2600" y="1927"/>
-      <vertex id="MbPredRefIdxL0" x="2183" y="1430"/>
+      <vertex id="MbPredRefIdxL0" x="2018" y="1550"/>
       <vertex id="SubMbPredRefIdxL0" x="1967" y="1693"/>
       <vertex id="SubMbType" x="1980" y="1977"/>
       <vertex id="Mgnt_DecodePic" x="1515" y="-132"/>
@@ -68,7 +70,5 @@
       <vertex id="DecodeSubMbPred" x="1742" y="1736"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="2238" y="1461"/>
       <vertex id="GenerateSkipBlockInformation" x="2299" y="1210"/>
-      <vertex id="PpsParam4SliceData" x="56" y="1543"/>
-      <vertex id="SpsParam4SliceData" x="90" y="1616"/>
    </vertices>
 </layout>

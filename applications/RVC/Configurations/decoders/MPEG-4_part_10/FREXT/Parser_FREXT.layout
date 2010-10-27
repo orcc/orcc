@@ -29,7 +29,7 @@
       <vertex id="CoefDC_Cr" x="2447" y="388"/>
       <vertex id="CoefAC_L" x="2450" y="423"/>
       <vertex id="CoefDC_L" x="2451" y="454"/>
-      <vertex id="BlocksSize_Luma" x="1848" y="316"/>
+      <vertex id="BlocksSize_Luma" x="1850" y="323"/>
       <vertex id="Mb_Type" x="1883" y="359"/>
       <vertex id="Mb_TypeC" x="1872" y="393"/>
       <vertex id="PredMode" x="1874" y="429"/>
@@ -49,7 +49,7 @@
       <vertex id="Ref_List1" x="2240" y="1491"/>
       <vertex id="RefIdx_l1" x="1799" y="1323"/>
       <vertex id="SelectList" x="1788" y="1406"/>
-      <vertex id="PocToDisplay" x="2046" y="1804"/>
+      <vertex id="PocToDisplay" x="1995" y="1834"/>
       <vertex id="Algo_NALU" x="355" y="5"/>
       <vertex id="CheckNaluType" x="663" y="-58"/>
       <vertex id="DecodeSps" x="29" y="1279"/>

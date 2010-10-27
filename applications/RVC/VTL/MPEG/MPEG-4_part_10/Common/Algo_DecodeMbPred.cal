@@ -744,6 +744,7 @@ actor Algo_DecodeMbPred()
 		ReadMvdL1Asked (SendOrReadDone )--> ReadRefIdxL0Done;
 
 		ReadRefIdxL0Done ( ReadRefIdxL0.Done)--> ReadRefIdxL0Done;
+		ReadRefIdxL0Done ( ReadRefIdxL0.DoneSkip)--> ReadRefIdxL0Done;
 		ReadRefIdxL0Done ( SendOrReadDone)--> ReadRefIdxL1Done;
 
 		ReadRefIdxL1Done ( ReadRefIdxL1.Done)--> ReadRefIdxL1Done;
@@ -770,6 +771,7 @@ actor Algo_DecodeMbPred()
 		ReadMvdL0                          > ReadParam.Skip2Parameters;
 		ReadMvdL1                          > ReadParam.Skip2Parameters;
 		ReadParam.Skip2Parameters          > SendOrReadDone;
+		ReadRefIdxL0.DoneSkip              > SendOrReadDone;
 		ReadRefIdxL0.Done                  > SendOrReadDone;
 		ReadRefIdxL1.Done                  > SendOrReadDone;
 		ReadMvdL0.Done                     > SendOrReadDone;

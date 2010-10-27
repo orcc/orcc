@@ -10,34 +10,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MbPartIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="RefIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbPartWidth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbPartHeigth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MvRes">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -49,13 +21,6 @@
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="7"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbIntraFlag">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="1"/>
             </Entry>
         </Type>
     </Port>
@@ -145,15 +110,6 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="Mgnt_MVR">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Mgnt_MVR"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="Algo_Add">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -175,18 +131,8 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Mgnt_MVR" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Mgnt_MVR" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
-    <Connection dst="Mgnt_MVR" dst-port="RefIdx" src="" src-port="RefIdx"/>
-    <Connection dst="Mgnt_MVR" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
-    <Connection dst="Mgnt_MVR" dst-port="MbPartHeigth" src="" src-port="MbPartHeigth"/>
     <Connection dst="Algo_Add" dst-port="Y" src="" src-port="MvRes"/>
-    <Connection dst="Mgnt_MVR" dst-port="MV" src="Algo_Add" src-port="Z"/>
     <Connection dst="" dst-port="MV" src="Algo_Add" src-port="Z"/>
-    <Connection dst="" dst-port="LOCATION" src="Mgnt_MVR" src-port="Location"/>
-    <Connection dst="Mgnt_MVR" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="Mgnt_MVR" dst-port="MbIntraFlag" src="" src-port="MbIntraFlag"/>
-    <Connection dst="Mgnt_MVR" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="MvpL0_Reconstr" dst-port="slice_type" src="" src-port="slice_type"/>
     <Connection dst="MvpL0_Reconstr" dst-port="mb_type" src="" src-port="mb_type"/>
     <Connection dst="MvpL0_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
@@ -197,7 +143,8 @@
     <Connection dst="MvpL0_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
     <Connection dst="Algo_Add" dst-port="X" src="MvpL0_Reconstr" src-port="Mvpl0"/>
-    <Connection dst="" dst-port="PartSZ" src="Mgnt_MVR" src-port="PartSZ"/>
-    <Connection dst="" dst-port="ref_idx" src="Mgnt_MVR" src-port="refidx_out"/>
-    <Connection dst="" dst-port="mv_out" src="Mgnt_MVR" src-port="mv_out"/>
+    <Connection dst="" dst-port="ref_idx" src="MvpL0_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="" dst-port="PartSZ" src="MvpL0_Reconstr" src-port="PartSZ"/>
+    <Connection dst="" dst-port="LOCATION" src="MvpL0_Reconstr" src-port="Location"/>
+    <Connection dst="" dst-port="mv_out" src="MvpL0_Reconstr" src-port="MvOut"/>
 </XDF>
