@@ -333,6 +333,42 @@ $endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// TypeDef
+///////////////////////////////////////////////////////////////////////////////
+
+typeDef(action) ::= <<
+$action.body.locals.list: typeDefLocal()$
+>>
+
+typeDefLocal(local) ::= <<
+$if(local.type.list)$
+<typeDef name="$local$_typedef">
+  <type name="List">
+    <valuePar name="size" value="$local.type.size$"/>
+    <typePar name="type">
+      $typeDefListElements(local.type.list.elementType)$
+    </typePar>
+  </type>
+</typeDef>
+$endif$
+>>
+
+typeDefListElements(type) ::= <<
+$if(type.list)$
+<type name="List">
+  <valuePar name="size" value="$type.size$"/>
+  <typePar name="type">
+    $typeDefListElements(type.elementType)$
+  </typePar>
+</type>
+$else$
+<type name="int">
+  <valuePar name="size" value="9"/>
+</type>
+$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -571,6 +607,7 @@ design() ::= <<
 	$actorPorts()$
 	$parameters(instance.parameters)$
 	$stateVars()$
+	$instance.actor.actions: typeDef()$
 	$instance.actor.procs.list: procedure()$
 	$instance.actor.actions: action(); separator="\n"$
 	$if(instance.actor.actionScheduler.fsm)$
