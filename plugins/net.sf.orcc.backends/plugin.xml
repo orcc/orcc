@@ -65,6 +65,9 @@
          <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
+         <option
+               id="net.sf.orcc.backends.xlimHard">
+         </option>
       </backend>
    </extension>
    <extension
@@ -145,6 +148,13 @@
                name="Enable trace">
             <checkBox>
             </checkBox>
+         </option>
+         <option
+               defaultValue="false"
+               description="XLIM Code Generation for Hardware Implementation"
+               id="net.sf.orcc.backends.xlimHard"
+               name="Hardware XLIM Code Generation">
+            <checkBox></checkBox>
          </option>
    </extension>
 

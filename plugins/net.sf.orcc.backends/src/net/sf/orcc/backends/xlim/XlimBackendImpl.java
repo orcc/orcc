@@ -96,9 +96,18 @@ public class XlimBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
-
+		
+		// check if "XLiM Hardware Generation" is selected
+		boolean hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", false);
+		
 		printer = new STPrinter();
-		printer.loadGroups("XLIM_actor");
+		
+		if (hardwareGen){
+			printer.loadGroups("XLIM_actor","XLIM_actor_hard");
+		}else{
+			printer.loadGroups("XLIM_actor");
+		}
+
 		printer.setExpressionPrinter(XlimExprPrinter.class);
 		printer.setTypePrinter(XlimTypePrinter.class);
 
