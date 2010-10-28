@@ -92,10 +92,11 @@ private:
 	void createSwitchTransition(llvm::Value* stateVar, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB);
 	void createTransitions(std::map<std::string, FSM::Transition*>* transitions, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
 	void createTransition(FSM::Transition* transition, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
-	llvm::BasicBlock* createSchedulingTestState(std::list<FSM::NextStateInfo*>* nextStates, llvm::BasicBlock* stateBB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
+	llvm::BasicBlock* createSchedulingTestState(std::list<FSM::NextStateInfo*>* nextStates, FSM::State* sourceState, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
 	llvm::BasicBlock* createActionTestState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* stateBB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
 	void createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB);
 	void createStates(std::map<std::string, FSM::State*>* states, llvm::Function* function);
+	llvm::Function* createSchedulerOutsideFSM(std::list<Action*>* actions);
 	
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
@@ -104,7 +105,9 @@ private:
 	Instance* instance;
 	Actor* actor;
 
+	llvm::GlobalVariable* stateVar;
 	std::map<FSM::State*, llvm::BasicBlock*> BBTransitions;
+	llvm::Function* outsideSchedulerFn;
 };
 
 #endif

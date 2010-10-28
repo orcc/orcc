@@ -52,6 +52,7 @@
 #include "Jade/JIT.h"
 #include "Jade/Actor/Action.h"
 #include "Jade/Actor/ActionScheduler.h"
+#include "Jade/Actor/ActionTag.h"
 #include "Jade/Actor/Actor.h"
 #include "Jade/Actor/FSM.h"
 #include "Jade/Actor/Port.h"
@@ -68,13 +69,13 @@ using namespace std;
 
 void JIT::setDecoder(Decoder* decoder){
 	this->decoder = decoder;
-	this->module = decoder->getModule(); 
-	
+	this->module = decoder->getModule();
 }
 
 void JIT::setNewInstance(){
 	ValueMap.clear();
-	
+	instTaggedActions.clear();
+	instUntaggedActions.clear();
 }
 
 bool JIT::LinkProcedureBody(Function* function){
@@ -336,7 +337,11 @@ map<string, Action*>* JIT::createActions(Instance* instance, list<Action*>* acti
 
 	for (it = actions->begin(); it != actions->end(); ++it){
 		Action* action = createAction(instance, *it);
-		newActions->insert(pair<string, Action*>(action->getName(),action));
+		if (action->getTag()->isEmpty()){
+			instUntaggedActions.push_back(action);
+		}else{
+			instTaggedActions.insert(pair<string, Action*>(action->getName(),action));
+		}
 	}
 
 	return newActions;
@@ -367,7 +372,7 @@ Function* JIT::CreateFunction(Instance* instance, Function* function){
 	return newFunction;
 }
 
-FSM* JIT::createFSM(Instance* instance, FSM* fsm, map<string, Action*>* instActions){
+FSM* JIT::createFSM(Instance* instance, FSM* fsm){
 	list<llvm::Function*>::iterator it;
 	
 	FSM* newFSM = new FSM();
@@ -395,11 +400,8 @@ FSM* JIT::createFSM(Instance* instance, FSM* fsm, map<string, Action*>* instActi
 			FSM::State* targetState = (*itNextStateInfo)->getTargetState();
 			Action* targetAction = (*itNextStateInfo)->getAction();
 
-			itActionsMap = instActions->find(targetAction->getName());
-			
-			if (itActionsMap != instActions->end()){
-				actionState = itActionsMap->second;
-			}
+			itActionsMap = instTaggedActions.find(targetAction->getName());
+			actionState = itActionsMap->second;
 
 			newFSM->addTransition(sourceState->getName(), targetState->getName(), actionState);
 		}
@@ -432,7 +434,7 @@ FSM* JIT::createFSM(Instance* instance, FSM* fsm, map<string, Action*>* instActi
 	return newFSM;
 }
 
-ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler* actionScheduler, map<string, Action*>* instActions){
+ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler* actionScheduler){
 	FSM* fsm = NULL;
 	Function* initializeFunction = NULL;
 	list<Action*>* instancedActions = new list<Action*>();
@@ -442,16 +444,13 @@ ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler*
 	map<string, Action*>::iterator itActionsMap;
 	list<Action*>* actions = actionScheduler->getActions();
 
-	for (it = actions->begin(); it != actions->end(); it++){
-		itActionsMap = instActions->find((*it)->getName());
-		if (itActionsMap != instActions->end()){
-			instancedActions->push_back(itActionsMap->second);
-		}
+	for (it = instUntaggedActions.begin(); it != instUntaggedActions.end(); it++){
+		instancedActions->push_back(*it);
 	}
 
 	//Create FSM if present
 	if (actionScheduler->hasFsm()){
-		fsm = createFSM(instance, actionScheduler->getFsm(), instActions);
+		fsm = createFSM(instance, actionScheduler->getFsm());
 	}
 
 	//Create intialize scheduler if present

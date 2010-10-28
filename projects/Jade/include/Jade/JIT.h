@@ -244,8 +244,8 @@ public:
 	llvm::GlobalVariable* CreateVariable(Instance* instance, llvm::GlobalVariable* variable);
 	std::map<Variable*, llvm::GlobalVariable*>* createVariables(Instance* instance, std::map<std::string, Variable*>* vars);
 	std::list<Procedure*>* createProcedures(Instance* instance, Decoder* decoder);
-	ActionScheduler* createActionScheduler(Instance* instance, ActionScheduler* actionScheduler, std::map<std::string, Action*>* instActions);
-	FSM* createFSM(Instance* instance, FSM* fsm, std::map<std::string, Action*>* instActions);
+	ActionScheduler* createActionScheduler(Instance* instance, ActionScheduler* actionScheduler);
+	FSM* createFSM(Instance* instance, FSM* fsm);
 	std::map<Procedure*, llvm::Function*>* createProcedures(Instance* instance, std::map<std::string, Procedure*>* procs);
 
 	void addPrintf(std::string text, Decoder* decoder, llvm::Function* function, llvm::BasicBlock* bb);
@@ -316,6 +316,9 @@ private:
 	void addPass(llvm::PassManagerBase &PM, llvm::Pass *P);
 	void do_shutdown();
 	
+	std::map<std::string, Action*> instTaggedActions;
+	std::list<Action*> instUntaggedActions;
+
 	//Exit function
 	llvm::Constant *Exit;
 
