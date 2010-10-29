@@ -132,13 +132,13 @@ InstancedActor* Decoder::createInstance(Instance* instance){
 	jit->setNewInstance();
 
 	// Instanciate actor
-	map<Port*, GlobalVariable*>* inputs = jit->createPorts(instance, actor->getInputs());
-	map<Port*, GlobalVariable*>* outputs = jit->createPorts(instance, actor->getOutputs());
+	map<string, Port*>* inputs = jit->createPorts(instance, actor->getInputs());
+	map<string, Port*>* outputs = jit->createPorts(instance, actor->getOutputs());
 	map<Variable*, GlobalVariable*>* stateVars = jit->createVariables(instance, actor->getStateVars());
 	map<Variable*, GlobalVariable*>* parameters = jit->createVariables(instance, actor->getParameters());
 	map<Procedure*, Function*>* procs = jit->createProcedures(instance, actor->getProcs());
-	map<string, Action*>* initializes = jit->createActions(instance, actor->getInitializes());
-	map<string, Action*>* actions = jit->createActions(instance, actor->getActions());
+	list<Action*>* initializes = jit->createActions(instance, actor->getInitializes(), inputs, outputs);
+	list<Action*>* actions = jit->createActions(instance, actor->getActions(), inputs, outputs);
 	ActionScheduler* actionScheduler = jit->createActionScheduler(instance, actor->getActionScheduler());
 
 	return new InstancedActor(this, instance, inputs, outputs, stateVars, parameters, procs, actions, actionScheduler);

@@ -120,6 +120,13 @@ public:
      */
 	void setDestinationPort(Port* target){this->target = target;};
 
+	/*!
+     *  @brief Setter of the source port
+     *
+	 *  @param source: the source Port.
+     */
+	void setSourcePort(Port* source){this->source = source;};
+
 
 
 	/*!

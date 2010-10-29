@@ -96,19 +96,19 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 
 InstancedActor* BroadcastActor::instanciate(Instance* instance){
 	map<string, Port*>::iterator it;
-	map<Port*, GlobalVariable*>* instancedInputs = new map<Port*, GlobalVariable*>();
-	map<Port*, GlobalVariable*>* instancedOutputs = new map<Port*, GlobalVariable*>();
+	map<string, Port*>* instancedInputs = new map<string, Port*>();
+	map<string, Port*>* instancedOutputs = new map<string, Port*>();
 	
 	for (it = inputs->begin(); it != inputs->end(); it++){
-		instancedInputs->insert(pair<Port*, GlobalVariable*>((*it).second, (*it).second->getGlobalVariable()));
+		instancedInputs->insert(pair<string, Port*>((*it).second->getName(), (*it).second));
 	}
 	
 	for (it = outputs->begin(); it != outputs->end(); it++){
-		instancedOutputs->insert(pair<Port*, GlobalVariable*>((*it).second, (*it).second->getGlobalVariable()));
+		instancedOutputs->insert(pair<string, Port*>((*it).second->getName(), (*it).second));
 	}
 
 
-	return new InstancedActor(decoder, instance, instancedInputs, instancedOutputs, new map<Variable*, GlobalVariable*>(), new map<Variable*, GlobalVariable*>(), new map<Procedure*, Function*>(), new map<std::string, Action*>(),  actionScheduler);
+	return new InstancedActor(decoder, instance, instancedInputs, instancedOutputs, new map<Variable*, GlobalVariable*>(), new map<Variable*, GlobalVariable*>(), new map<Procedure*, Function*>(), new list<Action*>(),  actionScheduler);
 
 }
 

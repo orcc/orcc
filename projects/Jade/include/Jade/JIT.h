@@ -43,6 +43,7 @@
 #include <list>
 #include <map>
 
+#include "llvm/Constants.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
 #include "llvm/DerivedTypes.h"
@@ -54,6 +55,7 @@
 
 class AbstractFifo;
 class Action;
+class ActionTag;
 class ActionScheduler;
 class Actor;
 class Decoder;
@@ -237,8 +239,8 @@ public:
 
 	InstancedFU* instanciate(Instance* instance, Decoder* decoder);
 	void createParameters(Instance* instance, Decoder* decoder);
-	std::map<std::string, Action*>* createActions(Instance* instance, std::list<Action*>* actions);
-	Action* createAction(Instance* instance, Action* action);
+	std::list<Action*>* createActions(Instance* instance, std::list<Action*>* actions, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs);
+	Action* createAction(Instance* instance, Action* action, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs);
 	Procedure* CreateProcedure(Instance* instance, Procedure* procedure);
 	llvm::Function* CreateFunction(Instance* instance, llvm::Function* function);
 	llvm::GlobalVariable* CreateVariable(Instance* instance, llvm::GlobalVariable* variable);
@@ -275,8 +277,8 @@ public:
 					   llvm::ClonedCodeInfo *CodeInfo = 0);
 
 	
-	std::map<Port*, llvm::GlobalVariable*>* createPorts(Instance* instance, std::map<std::string, Port*>* ports);
-	std::pair<Port*, llvm::GlobalVariable*> createPort(Instance* instance, Port* port);
+	std::map<std::string, Port*>* createPorts(Instance* instance, std::map<std::string, Port*>* ports);
+	Port* createPort(Instance* instance, Port* port);
 
 	void setDecoder(Decoder* decoder);
 	llvm::Module* getModule(){return module;};
@@ -295,7 +297,9 @@ private:
 	void getMetadataInformation(llvm::Module* module);
 
 	void CopyGVAttributes(llvm::GlobalValue *DestGV, const llvm::GlobalValue *SrcGV);
-	
+	std::map<Port*, llvm::ConstantInt*>* createPattern(std::map<Port*, llvm::ConstantInt*>* pattern, std::map<std::string, Port*>* ports);
+	void putAction(ActionTag* tag, Action* action);
+	Action* getAction(Action* action);
 
 	llvm::Module* module;
 	Decoder* decoder;
@@ -316,8 +320,11 @@ private:
 	void addPass(llvm::PassManagerBase &PM, llvm::Pass *P);
 	void do_shutdown();
 	
-	std::map<std::string, Action*> instTaggedActions;
-	std::list<Action*> instUntaggedActions;
+	/** list of actions of the current instance */
+	std::map<std::string, Action*> actions;
+
+	/** list of untagged actions of the current instance */
+	std::list<Action*> untaggedActions;
 
 	//Exit function
 	llvm::Constant *Exit;

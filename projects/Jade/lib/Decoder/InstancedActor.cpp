@@ -46,12 +46,12 @@ using namespace std;
 using namespace llvm;
 
 InstancedActor::InstancedActor(Decoder* decoder, Instance* instance,
-								map<Port*, GlobalVariable*>* inputs,
-								map<Port*, GlobalVariable*>* outputs,
+								map<string, Port*>* inputs,
+								map<string, Port*>* outputs,
 								map<Variable*, GlobalVariable*>* stateVars,
 								map<Variable*, GlobalVariable*>* parameters,
 								map<Procedure*, Function*>* procedures,
-								std::map<std::string, Action*>* actions,
+								list<Action*>* actions,
 								ActionScheduler* scheduler){
 		this->instance = instance;
 		this->decoder = decoder;
@@ -67,45 +67,6 @@ InstancedActor::InstancedActor(Decoder* decoder, Instance* instance,
 }
 
 
-
-GlobalVariable* InstancedActor::getInputVar(Port* port){
-	map<Port*, llvm::GlobalVariable*>::iterator it;
-	
-	it = inputs->find(port);
-
-	if(it == inputs->end()){
-		// This port has not be found in the instanced actor
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-GlobalVariable* InstancedActor::getOutputVar(Port* port){
-	map<Port*, llvm::GlobalVariable*>::iterator it;
-	
-	it = outputs->find(port);
-
-	if(it == outputs->end()){
-		// This port has not be found in the instanced actor
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-void InstancedActor::addOutputConnection(Port* port, GlobalVariable* variable){
-	inputsName.insert(pair<string,Port*>(port->getName(), port));
-	outputConnection.insert(pair<Port*, GlobalVariable*>(port, variable));
-	port->setGlobalVariable(variable);
-}
-
-void InstancedActor::addInputConnection(Port* port, GlobalVariable* variable){
-	outputsName.insert(pair<string,Port*>(port->getName(), port));
-	inputConnection.insert(pair<Port*, GlobalVariable*>(port, variable));
-	port->setGlobalVariable(variable);
-}
-
 GlobalVariable* InstancedActor::getParameterVar(Variable* parameter){
 	map<Variable*, llvm::GlobalVariable*>::iterator it;
 	
@@ -118,18 +79,6 @@ GlobalVariable* InstancedActor::getParameterVar(Variable* parameter){
 
 	return (*it).second;
 
-}
-
-GlobalVariable* InstancedActor::getVar(Port* port){
-	GlobalVariable* var = getInputVar(port);
-
-	// Search inside input ports 
-	if (var!= NULL){
-		return var;
-	}
-
-	// Search inside output ports 
-	return getOutputVar(port);
 }
 
 GlobalVariable* InstancedActor::getStateVar(Variable* stateVar){
@@ -161,9 +110,9 @@ Port* InstancedActor::getPort(string portName){
 Port* InstancedActor::getInput(string portName){
 	std::map<std::string, Port*>::iterator it;
 	
-	it = inputsName.find(portName);
+	it = inputs->find(portName);
 
-	if(it == inputsName.end()){
+	if(it == inputs->end()){
 		return NULL;
 	}
 
@@ -173,9 +122,9 @@ Port* InstancedActor::getInput(string portName){
 Port* InstancedActor::getOutput(string portName){
 	std::map<std::string, Port*>::iterator it;
 	
-	it = outputsName.find(portName);
+	it = outputs->find(portName);
 
-	if(it == outputsName.end()){
+	if(it == outputs->end()){
 		return NULL;
 	}
 

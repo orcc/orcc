@@ -102,7 +102,11 @@ Actor* IRParser::parseActor(string classz){
 		exit(0);
 	}
 
-		// Parse name
+	//Empty action list
+	actions.clear();
+	untaggedActions.clear();
+	
+	// Parse name
 	NamedMDNode* nameNMD =  module->getNamedMetadata(IRConstant::KEY_NAME);
 	MDNode* nameMD =cast<MDNode>(nameNMD->getOperand(0));
 	MDString* name = cast<MDString>(nameMD->getOperand(0));

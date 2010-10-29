@@ -112,7 +112,8 @@ Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionSchedul
 		
 		if (actionScheduler->hasFsm()){
 			BB = createSchedulerFSM(actionScheduler, BB, incBB, returnBB , scheduler);
-			//instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);		
+			//if (instance->getId().compare("decoder_parser_parseheaders")!=0)
+			instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);		
 		}else{
 			BB = createSchedulerNoFSM(actionScheduler->getActions(), BB, incBB, returnBB, scheduler);
 			instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);
@@ -277,8 +278,7 @@ void ActionSchedulerAdder::createStates(map<string, FSM::State*>* states, Functi
 
 CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
 	//Load selected port
-	Port* instPort = instancedActor->getPort(port->getName());
-	LoadInst* loadPort = new LoadInst(instPort->getGlobalVariable(), "", BB);
+	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
 	
 	//Call hasRoom function
 	AbstractFifo* fifo = decoder->getFifo();

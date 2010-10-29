@@ -69,12 +69,12 @@ class FifoCircular;
 class InstancedActor {
 public:
 	InstancedActor(Decoder* decoder, Instance* instance,
-				std::map<Port*, llvm::GlobalVariable*>* inputs,
-				std::map<Port*, llvm::GlobalVariable*>* outputs,
+		std::map<std::string, Port*>* inputs,
+				std::map<std::string, Port*>* outputs,
 				std::map<Variable*, llvm::GlobalVariable*>* stateVars,
 				std::map<Variable*, llvm::GlobalVariable*>* parameters,
 				std::map<Procedure*, llvm::Function*>* procedures,
-				std::map<std::string, Action*>* actions,
+				std::list<Action*>* actions,
 				ActionScheduler* scheduler);
 
 	~InstancedActor();
@@ -104,17 +104,17 @@ public:
 	 *  @return the corresponding llvm::GlobalVariable 
 	 *
      */
-	llvm::GlobalVariable* getOutputVar(Port* port);
+	Port* getOutputVar(std::string name);
 
 	/**
      *  @brief get the input Port llvm::GlobalVariable corresponding to the port
 	 *
-	 *  @param port : Port to look for
+	 *  @param name : string name of the port
 	 *
-	 *  @return the corresponding llvm::GlobalVariable  
+	 *  @return the corresponding Port  
 	 *
      */
-	llvm::GlobalVariable* getInputVar(Port* port);
+	Port* getInputVar(std::string name);
 
 	/**
      *  @brief get the llvm::Function corresponding to the procedure
@@ -229,25 +229,7 @@ public:
 	 *  @return a list of actions
 	 *
      */
-	std::map<std::string, Action*>* getActions(){return actions;};
-
-	/**
-     *  @brief get action corresponding to the given name
-	 *
-	 *
-	 *  @return Action corresponding to the given name
-	 *
-     */
-	Action* getAction(std::string name){
-		std::map<std::string, Action*>::iterator it;
-		it = actions->find(name);
-		
-		if (it != actions->end()){
-			return it->second;
-		}
-
-		return NULL;
-	};
+	std::list<Action*>* getActions(){return actions;};
 
 	llvm::GlobalVariable* getStateVar(Variable* stateVar);
 
@@ -274,10 +256,8 @@ private:
 	Decoder* decoder;
 
 	/** List of port from the actor */
-	std::map<std::string, Port*> inputsName;
-	std::map<std::string, Port*> outputsName;
-	std::map<Port*, llvm::GlobalVariable*>* inputs;
-	std::map<Port*, llvm::GlobalVariable*>* outputs;
+	std::map<std::string, Port*>* inputs;
+	std::map<std::string, Port*>* outputs;
 
 	/** List of connected port of the instance */
 	std::map<Port*, llvm::GlobalVariable*> inputConnection;
@@ -290,7 +270,7 @@ private:
 	FifoCircular* fifo;
 
 	/** Action map of the instanced Functional Unit */
-	std::map<std::string, Action*>* actions;
+	std::list<Action*>* actions;
 };
 
 #endif

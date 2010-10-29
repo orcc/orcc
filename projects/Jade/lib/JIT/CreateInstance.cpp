@@ -38,7 +38,6 @@
 //------------------------------
 #include <iostream>
 
-#include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/ValueSymbolTable.h"
 #include "llvm/Instructions.h"
@@ -74,8 +73,8 @@ void JIT::setDecoder(Decoder* decoder){
 
 void JIT::setNewInstance(){
 	ValueMap.clear();
-	instTaggedActions.clear();
-	instUntaggedActions.clear();
+	untaggedActions.clear();
+	actions.clear();
 }
 
 bool JIT::LinkProcedureBody(Function* function){
@@ -262,12 +261,13 @@ void JIT::CopyGVAttributes(GlobalValue *DestGV, const GlobalValue *SrcGV) {
   DestGV->setAlignment(Alignment);
 }
 
-std::map<Port*, llvm::GlobalVariable*>* JIT::createPorts(Instance* instance, map<string, Port*>* ports){
-	map<Port*, llvm::GlobalVariable*>* newPorts = new map<Port*, llvm::GlobalVariable*>();
+map<string, Port*>* JIT::createPorts(Instance* instance, map<string, Port*>* ports){
+	map<string, Port*>* newPorts = new map<string, Port*>();
 	map<string, Port*>::iterator it;
 
 	for (it = ports->begin(); it != ports->end(); ++it){
-		newPorts->insert(createPort(instance, (*it).second));
+		Port* newPort = createPort(instance, (*it).second);
+		newPorts->insert(pair<string, Port*>(newPort->getName(), newPort));
 	}
 
 	return newPorts;
@@ -300,10 +300,10 @@ map<Procedure*, Function*>* JIT::createProcedures(Instance* instance, map<string
 	return newProcs;
 }
 
-pair<Port*, llvm::GlobalVariable*> JIT::createPort(Instance* instance, Port* port){
+Port* JIT::createPort(Instance* instance, Port* port){
 	GlobalVariable* portVar = port->getGlobalVariable();
 	GlobalVariable* var = CreateVariable(instance, portVar);
-	return pair<Port*, llvm::GlobalVariable*>(port, var);
+	return new Port(port->getLocation(), port->getName(), port->getType(), var);
 }
 
 
@@ -330,33 +330,46 @@ GlobalVariable* JIT::CreateVariable(Instance* instance, GlobalVariable* variable
 }
 
 
-map<string, Action*>* JIT::createActions(Instance* instance, list<Action*>* actions){
-	map<string, Action*>* newActions = new map<string, Action*>();
+std::list<Action*>* JIT::createActions(Instance* instance, list<Action*>* actions, map<string, Port*>* inputs, map<string, Port*>* outputs){
+	list<Action*>* newActions = new list<Action*>();
 	
 	list<Action*>::iterator it;
 
 	for (it = actions->begin(); it != actions->end(); ++it){
-		Action* action = createAction(instance, *it);
-		if (action->getTag()->isEmpty()){
-			instUntaggedActions.push_back(action);
-		}else{
-			instTaggedActions.insert(pair<string, Action*>(action->getName(),action));
-		}
+		Action* action = createAction(instance, *it, inputs, outputs);
+		putAction(action->getTag(), action);
+		newActions->push_back(action);
 	}
 
 	return newActions;
 }
 
 
-Action* JIT::createAction(Instance* instance, Action* action){
+Action* JIT::createAction(Instance* instance, Action* action, map<string, Port*>* inputs, map<string, Port*>* outputs){
 		
 		Procedure* scheduler = action->getScheduler();
 		Procedure* body = action->getBody();
 	
 		Procedure* newScheduler = CreateProcedure(instance, scheduler);
 		Procedure* newBody = CreateProcedure(instance, body);
+		
+		map<Port*, ConstantInt*>* inputPattern = createPattern(action->getInputPattern(), inputs);
+		map<Port*, ConstantInt*>* outputPattern = createPattern(action->getOutputPattern(), outputs);
 
-		return new Action(action->getTag(), action->getInputPattern(), action->getOutputPattern(), newScheduler, newBody);
+		return new Action(action->getTag(), inputPattern, outputPattern, newScheduler, newBody);
+}
+
+map<Port*, ConstantInt*>* JIT::createPattern(map<Port*, ConstantInt*>* pattern, map<string, Port*>* ports){
+	map<Port*, ConstantInt*>::iterator itPattern;
+	map<string, Port*>::iterator itPort;
+	map<Port*, ConstantInt*>* newPattern = new map<Port*, ConstantInt*>();
+
+	for (itPattern = pattern->begin(); itPattern != pattern->end(); itPattern++) {
+		itPort = ports->find(itPattern->first->getName());
+		newPattern->insert(pair<Port*, ConstantInt*>(itPort->second, itPattern->second));
+	}
+
+	return newPattern;
 }
 
 Procedure* JIT::CreateProcedure(Instance* instance, Procedure* procedure){
@@ -400,10 +413,7 @@ FSM* JIT::createFSM(Instance* instance, FSM* fsm){
 			FSM::State* targetState = (*itNextStateInfo)->getTargetState();
 			Action* targetAction = (*itNextStateInfo)->getAction();
 
-			itActionsMap = instTaggedActions.find(targetAction->getName());
-			actionState = itActionsMap->second;
-
-			newFSM->addTransition(sourceState->getName(), targetState->getName(), actionState);
+			newFSM->addTransition(sourceState->getName(), targetState->getName(), getAction(targetAction));
 		}
 	}
 
@@ -444,8 +454,9 @@ ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler*
 	map<string, Action*>::iterator itActionsMap;
 	list<Action*>* actions = actionScheduler->getActions();
 
-	for (it = instUntaggedActions.begin(); it != instUntaggedActions.end(); it++){
-		instancedActions->push_back(*it);
+	for (it = actions->begin(); it != actions->end(); it++){
+		Action* action = getAction(*it);
+		instancedActions->push_back(action);
 	}
 
 	//Create FSM if present
@@ -462,4 +473,29 @@ ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler*
 	Function* schedulerFunction = CreateFunction(instance, actionScheduler->getSchedulerFunction());
 
 	return new ActionScheduler(instancedActions, schedulerFunction, initializeFunction, fsm);
+}
+
+void JIT::putAction(ActionTag* tag, Action* action){
+	if (tag->isEmpty()){
+		untaggedActions.push_back(action);
+	} else {
+		actions.insert(pair<std::string, Action*>(tag->getIdentifier(), action));
+	}
+}
+
+Action* JIT::getAction(Action* action) {
+	ActionTag* actionTag = action->getTag();
+	map<string, Action*>::iterator it;
+
+	if (actionTag->isEmpty()){
+		// removes the first untagged action found
+		Action* action = untaggedActions.front();
+		untaggedActions.remove(action);
+		
+		return action;
+	}
+	
+	it = actions.find(actionTag->getIdentifier());
+	
+	return it->second;
 }
