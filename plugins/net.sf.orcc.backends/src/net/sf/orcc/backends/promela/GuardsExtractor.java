@@ -29,35 +29,15 @@
 package net.sf.orcc.backends.promela;
 
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
-import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
-import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.instructions.Read;
-import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.SpecificInstruction;
-import net.sf.orcc.ir.instructions.Store;
-import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * 
