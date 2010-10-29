@@ -89,6 +89,9 @@ public class CppBackendImpl extends AbstractBackend {
 						threads.put(component, list);
 					}
 					list.add(instance);
+				} else {
+					throw new OrccException(
+							"instance " + instance.getId() + " has no partName attribute!");
 				}
 			}
 			printer.getOptions().put("threads", threads);
@@ -182,7 +185,7 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	private String getPartNameAttribute(Instance instance) throws OrccException {
-		String partName = "";
+		String partName = null;
 		IAttribute attr = instance.getAttribute("partName");
 		if (attr != null) {
 			Expression expr = ((IValueAttribute) attr).getValue();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, Ecole Polytechnique Fédérale de Lausanne
+ * Copyright (c) 2009, EPFL
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the Ecole Polytechnique Fédérale de Lausanne nor the names of its
+ *   * Neither the name of the EPFL nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -28,72 +28,63 @@
  */
 package net.sf.orcc.backends.promela;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.AbstractBackend;
-import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.network.Network;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.HasTokens;
+import net.sf.orcc.ir.instructions.InstructionVisitor;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Return;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
+import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.instructions.Write;
+import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
+import net.sf.orcc.ir.nodes.NodeVisitor;
+import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.util.OrderedMap;
 
 /**
- * This class defines a template-based PROMELA back-end.
  * 
  * @author Ghislain Roquier
  * 
  */
-public class PromelaBackendImpl extends AbstractBackend {
+public class GuardsExtractor extends AbstractActorTransformation {
 
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		main(PromelaBackendImpl.class, args);
-	}
-
-	private STPrinter printer;
-
+	Map<Action, List<Instruction>> guards;
+	
+	Action currAction;
+	
 	@Override
-	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new GuardsExtractor() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
+	public void transform(Actor actor) throws OrccException {
+		for (Action action : actor.getActions()) {
+			currAction = action;
+			visitProcedure(action.getScheduler());
 		}
 	}
 
 	@Override
-	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
-		// do not generate a PROMELA VTL
+	public void visit(Load load) {
 	}
 
 	@Override
-	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		network.flatten();
-
-		printer = new STPrinter();
-		printer.loadGroups("PROMELA_actor");
-		printer.setExpressionPrinter(PromelaExprPrinter.class);
-		printer.setTypePrinter(PromelaTypePrinter.class);
-
-		List<Actor> actors = network.getActors();
-		transformActors(actors);
-		printActors(actors);
+	public void visit(Peek peek) {
 	}
-
-	@Override
-	protected boolean printActor(Actor actor) throws OrccException {
-		String name = actor.getName();
-		String outputName = path + File.separator + name + ".pml";
-		try {
-			printer.printActor(outputName, actor);
-		} catch (IOException e) {
-			throw new OrccException("I/O error", e);
-		}
-		return false;
-	}
+	
+	
 }
