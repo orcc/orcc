@@ -183,6 +183,7 @@ Read(op) ::= <<
 >>
 
 Write(op) ::= <<
+<!-- Write $op$ -->
 <operation kind="pinWrite" portName="$op.port.name$" removable="no" style="simple">
 	$port(dir="in", type=op.port.type, source=op.target)$
 </operation>
@@ -203,6 +204,7 @@ $<operation kind="noop">
 >>
 
 Store(op) ::= <<
+<!-- Store $op$ -->
 $if (op.target.global)
 $<operation kind="assign" target="$op.target$">
 	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
@@ -455,7 +457,6 @@ actionTest(action) ::= <<
 schedulingTest(actions) ::= <<
 <!-- All Schedulable expressions -->
 $actions: actionTest(); separator="\n"$
-$actions:{</module></module>}; separator="\n"$
 >>
 
 scheduler(actions) ::= <<
@@ -473,6 +474,10 @@ scheduler(actions) ::= <<
 		<module kind="body">
 			$instance.actor.actions: isSchedulableTest(); separator="\n"$
 			$if(actions)$$schedulingTest(actions)$$endif$
+			<!--Close modules -->
+			$if(actions)$  	 	 
+			$actions:{</module></module>}; separator="\n"$
+			$endif$
 		</module>
 	</module>
 </module>
@@ -572,8 +577,16 @@ schedulerFSM(actions, fsm) ::= <<
 		<module kind="body">
 			<!-- All Schedulable expressions -->
 			$instance.actor.actions: isSchedulableTest()$
+			<!--untagged actions -->
+			$if(actions)$  	 	 
+			$schedulingTest(actions)$  	 	 
+			$endif$ 
 			<!-- FSM transitions -->
 			$Transitions(actions=actions, transitions=fsm.transitions)$
+			<!--Close modules for untagged actions -->
+			$if(actions)$  	 	 
+			$actions:{</module></module>}; separator="\n"$
+			$endif$ 			
 		</module>
 	</module>
 </module>
@@ -608,7 +621,6 @@ design() ::= <<
 	$parameters(instance.parameters)$
 	$stateVars()$
 	$instance.actor.actions: typeDef()$
-	$instance.actor.procs.list: procedure()$
 	$instance.actor.actions: action(); separator="\n"$
 	$if(instance.actor.actionScheduler.fsm)$
 	$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
