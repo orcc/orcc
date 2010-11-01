@@ -5,16 +5,6 @@ $Peek(hasTokens)$
 </operation>
 >>
 
-Peek(peek) ::= <<
-<operation kind="\$literal_Integer" value="0">
-	<port dir="out" size="32" source="peek_$instance.id$_$procedure$_0" typeName="int"/>
-</operation>
-<operation kind="pinPeek" portName="$peek.port.name$">
-	<port dir="in" source="peek_$instance.id$_$procedure$_0"/>
-	$port(dir="out", type=peek.port.type, source=[action.name,"_",peek.port.name])$
-</operation>
->>
-
 outputPatternPort(port, index, index0, state) ::= <<
 <!--  OutputPattern -->
 <operation kind="pinStatus" portName="$port$" removable="no">
