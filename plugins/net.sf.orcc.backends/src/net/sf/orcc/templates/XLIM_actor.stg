@@ -465,7 +465,7 @@ scheduler(actions) ::= <<
 		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
 	</operation>
 	<module kind="loop">
-		<module decision="var_$instance.id$_sched" kind="test">
+		<module decision="var_$instance.id$_loop" kind="test">
 			<operation kind="noop">
 				<port dir="in" source="var_$instance.id$_sched"/>
 				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
@@ -568,7 +568,7 @@ schedulerFSM(actions, fsm) ::= <<
 	$fsm.transitions : {transition | $enumStates(transition=transition)$}; separator="\n"$
 	<!-- infinite loop -->
 	<module kind="loop">
-		<module decision="var_$instance.id$_sched" kind="test">
+		<module decision="var_$instance.id$_loop" kind="test">
 			<operation kind="noop">
 				<port dir="in" source="var_$instance.id$_sched"/>
 				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>

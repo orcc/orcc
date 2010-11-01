@@ -14,3 +14,15 @@ Peek(peek) ::= <<
 	$port(dir="out", type=peek.port.type, source=[action.name,"_",peek.port.name])$
 </operation>
 >>
+
+outputPatternPort(port, index, index0, state) ::= <<
+<!--  OutputPattern -->
+<operation kind="pinStatus" portName="$port$" removable="no">
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
+</operation>
+<operation kind="\$and">
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index0$"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$" typeName="bool"/>
+</operation>
+>>
