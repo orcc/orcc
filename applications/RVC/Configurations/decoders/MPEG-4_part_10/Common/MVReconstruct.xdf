@@ -170,15 +170,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="sqmdl">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/Trash/b"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="MvpL1_Reconstr">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -228,9 +219,6 @@
     <Connection dst="MvpL1_Reconstr" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="MvpL1_Reconstr" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="MvpL1_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="sqmdl" dst-port="RefIdxOut" src="MvpL1_Reconstr" src-port="RefIdxOut"/>
-    <Connection dst="sqmdl" dst-port="Location" src="MvpL1_Reconstr" src-port="Location"/>
-    <Connection dst="sqmdl" dst-port="Mvpl0" src="MvpL1_Reconstr" src-port="Mvpl0"/>
     <Connection dst="SelectMvpLX" dst-port="MvpL1" src="MvpL1_Reconstr" src-port="Mvpl0"/>
     <Connection dst="SelectMvpLX" dst-port="RefIdxL1"
         src="MvpL1_Reconstr" src-port="RefIdxOut"/>
