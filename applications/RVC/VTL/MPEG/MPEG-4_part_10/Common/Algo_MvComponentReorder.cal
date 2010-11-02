@@ -58,6 +58,7 @@ actor Algo_MvComponentReorder()
 	uint(size=3)  RefIdx
 		==>
 	int (size=16) MvOut,
+	uint(size=6)  PartSZ,
 	uint(size=3)  RefIdxOut
 		:
 
@@ -178,6 +179,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
+			PartSZ :[16,16]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_16x16
@@ -194,6 +196,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
+			PartSZ :[16,8]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_16x8
@@ -210,6 +213,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
+			PartSZ :[8,16]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_8x16
@@ -259,6 +263,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
+			PartSZ :[8,8]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv = SZ_8x8
@@ -275,6 +280,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
+			PartSZ :[8,4]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv = SZ_8x4
@@ -290,6 +296,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
+			PartSZ :[4,8]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv = SZ_4x8
@@ -305,6 +312,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
+			PartSZ :[4,4]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv = SZ_4x4

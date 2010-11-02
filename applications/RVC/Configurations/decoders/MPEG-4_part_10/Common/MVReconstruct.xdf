@@ -134,12 +134,24 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="IsPredL0">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
     </Instance>
     <Instance id="MvComponentReord">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
         <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MvComponentReorder"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="SelectMvpLX">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/SelectMvpLX"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -158,14 +170,19 @@
     <Connection dst="MvpL0_Reconstr" dst-port="MbPredRefIdx" src="" src-port="MbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
-    <Connection dst="Algo_Add" dst-port="X" src="MvpL0_Reconstr" src-port="Mvpl0"/>
-    <Connection dst="" dst-port="PartSZ" src="MvpL0_Reconstr" src-port="PartSZ"/>
     <Connection dst="" dst-port="LOCATION" src="MvpL0_Reconstr" src-port="Location"/>
     <Connection dst="MvComponentReord" dst-port="MbType" src="" src-port="MbType4Prediction"/>
     <Connection dst="MvComponentReord" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
     <Connection dst="MvComponentReord" dst-port="Mv" src="Algo_Add" src-port="Z"/>
     <Connection dst="" dst-port="mv_out" src="MvComponentReord" src-port="MvOut"/>
-    <Connection dst="MvComponentReord" dst-port="RefIdx"
-        src="MvpL0_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="" dst-port="ref_idx" src="MvComponentReord" src-port="RefIdxOut"/>
+    <Connection dst="SelectMvpLX" dst-port="RefIdxL0"
+        src="MvpL0_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="SelectMvpLX" dst-port="MvpL0" src="MvpL0_Reconstr" src-port="Mvpl0"/>
+    <Connection dst="SelectMvpLX" dst-port="MbType" src="" src-port="MbType4Prediction"/>
+    <Connection dst="SelectMvpLX" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
+    <Connection dst="Algo_Add" dst-port="X" src="SelectMvpLX" src-port="MvOut"/>
+    <Connection dst="MvComponentReord" dst-port="RefIdx"
+        src="SelectMvpLX" src-port="RefIdxOut"/>
+    <Connection dst="" dst-port="PartSZ" src="MvComponentReord" src-port="PartSZ"/>
 </XDF>

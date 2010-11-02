@@ -51,7 +51,7 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-actor Algo_Mvpl0Reconstr()
+actor Algo_Mvpl0Reconstr(bool IsPredL0)
 	uint(size=6)  mb_type,
 	uint(size=4)  sub_mb_type,
 	uint(size=4)  slice_type,
@@ -65,8 +65,7 @@ actor Algo_Mvpl0Reconstr()
 
 	int (size=16) Mv
 		==>
-	int (size=16) Mvpl0, 
-	uint(size=6)  PartSZ,
+	int (size=16) Mvpl0,
 	uint(size=11) Location,
 	uint(size=3)  RefIdxOut
 		:
@@ -77,6 +76,7 @@ actor Algo_Mvpl0Reconstr()
 	uint(size=2) BIPRED  = 3;
 	uint(size=2) DIRECT  = 4;
 
+
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_SP = 3;
@@ -86,7 +86,6 @@ actor Algo_Mvpl0Reconstr()
 	uint(size=6) BLOCK_TYPE_P_MIN     = 26;
 	uint(size=6) P_L0_16x16           = 26;
 	uint(size=6) BLOCK_TYPE_B_MIN     = 31;
-	uint(size=6) BLOCK_TYPE_B_8x8     = 53;
 	uint(size=6) BLOCK_TYPE_B_MAX     = 53;
 	uint(size=6) BLOCK_TYPE_P_SKIP    = 54;
 
@@ -163,6 +162,21 @@ actor Algo_Mvpl0Reconstr()
 			[4, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
 			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		];
+	List(type: uint(size=2), size=16) TabIdxToX =
+		[ 0, 1, 0, 1, 2, 3, 2, 3, 0, 1,
+		  0, 1, 2, 3, 2, 3];
+
+	List(type: uint(size=2), size=16)TabIdxToY =
+		[ 0, 0, 1, 1, 0, 0, 1, 1, 2, 2,
+		  3, 3, 2, 2, 3, 3];
+
+	List(type: List(type: uint(size=4),size=4),size=4) Loc_xyToTabIdx =
+	[
+		[0,2,8,10],
+		[1,3,9,11],
+		[4,6,12,14],
+		[5,7,13,15]
+	];
 
 	//Size of MvTab must be >= PicWidthInMb + 1 and must be equal to pow(2,n) for masking bits easily.
 	List(type: List(type: List(type: int(size=16),size=2), size=16),size= SZ_TAB) MvTab;
@@ -194,6 +208,17 @@ actor Algo_Mvpl0Reconstr()
 				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) &  7][mb_part_idx & 1] & PRED_L0) != 0
 			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
 				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
+			end
+		end
+
+	function Is_PredL1(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
+				-->
+			bool
+		:
+			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
+				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) &  7][mb_part_idx & 1] & PRED_L1) != 0
+			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
+				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 31][mb_part_idx & 1] & PRED_L1) != 0
 			end
 		end
 
@@ -375,20 +400,31 @@ actor Algo_Mvpl0Reconstr()
 			MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX
 		end
 
-	GetMbType.P_Skip: action
+	GetMbType.P_SkipL0: action
 			mb_type    :[MacroBlkType],
 			slice_type :[SlcTyp]
 				==>
-			PartSZ :[16,16],
 			RefIdxOut :[0]
 		guard
 			SlcTyp = SLICE_TYPE_P or SlcTyp = SLICE_TYPE_SP,
-			MacroBlkType = BLOCK_TYPE_P_SKIP
+			MacroBlkType = BLOCK_TYPE_P_SKIP,
+			IsPredL0
 		do
 			MbPartIdx    := 0;
 			MbPartIdxMax := 1;
 			SizeMbMv     := SZ_16x16;
 			MbType       := P_L0_16x16;
+		end
+
+	GetMbType.P_SkipL1: action
+			mb_type    :[MacroBlkType],
+			slice_type :[SlcTyp]
+				==>
+			RefIdxOut :[0]
+		guard
+			SlcTyp = SLICE_TYPE_P or SlcTyp = SLICE_TYPE_SP,
+			MacroBlkType = BLOCK_TYPE_P_SKIP,
+			not IsPredL0
 		end
 
 	GetMbType.Others: action
@@ -552,13 +588,13 @@ actor Algo_Mvpl0Reconstr()
 	ComputeMvpL0.Launch16x16: action
 			MbPredRefIdx :[RefIdxCurr]
 				==>
-			PartSZ :[16,16],
 			Location :[Mbx_in_pix,Mby_in_pix],
 			Mvpl0 :[MvpL0] repeat 2,
 			RefIdxOut :[RefIdxCurr]
 		guard
 			MbPartIdx < MbPartIdxMax,
-			Is_PredL0(MbType, MbPartIdx),
+			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
+			or Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
 			SizeMbMv = SZ_16x16
 		var
 			List(type: int(size=16), size=2) MvpL0
@@ -575,13 +611,13 @@ actor Algo_Mvpl0Reconstr()
 	ComputeMvpL0.Launch16x8: action
 			MbPredRefIdx :[RefIdxCurr]
 				==>
-			PartSZ :[16,8],
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0] repeat 2,
 			RefIdxOut :[RefIdxCurr]
 		guard
 			MbPartIdx < MbPartIdxMax,
-			Is_PredL0(MbType, MbPartIdx),
+			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
+			or Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
 			SizeMbMv = SZ_16x8
 		var
 			List(type: int(size=16), size=2) MvpL0,
@@ -614,13 +650,13 @@ actor Algo_Mvpl0Reconstr()
 	ComputeMvpL0.Launch8x16: action
 			MbPredRefIdx :[RefIdxCurr]
 				==>
-			PartSZ :[8,16],
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0] repeat 2,
 			RefIdxOut :[RefIdxCurr]
 		guard
 			MbPartIdx < MbPartIdxMax,
-			Is_PredL0(MbType, MbPartIdx),
+			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
+			or Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
 			SizeMbMv = SZ_8x16
 		var
 			List(type: int(size=16), size=2) MvpL0,
@@ -663,39 +699,29 @@ actor Algo_Mvpl0Reconstr()
 		do
 			SubMbPartIdx    := 0;
 			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
-			IsPred4SubMb    := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0;
+			IsPred4SubMb    :=    ((SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0) and IsPredL0
+			                   or ((SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0) and not IsPredL0;
 			SizeSubMbMv     := SizeSubMb[Idx_Sub_Tab][ValSubMbType & 15];
 		end
 
 	ComputeMvpL0.Skip: action
 				==>
-			PartSZ :[Width,Height],
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[0,0],
 			RefIdxOut :[-1]
 		guard
 			MbPartIdx < MbPartIdxMax,
-			not Is_PredL0(MbType, MbPartIdx),
+			not (    Is_PredL0(MbType, MbPartIdx) and IsPredL0
+			      or Is_PredL1(MbType, MbPartIdx) and not IsPredL0),
 			SizeMbMv != SZ_8x8
 		var
-			uint(size=6) Width,
-			uint(size=6) Height,
 			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
 			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
-			if(SizeMbMv = SZ_16x16)then
-				Width  := 16;
-				Height := 16;
+			if(SizeSubMbMv = SZ_16x8)then
+				Blk_y_in_pix := Blk_y_in_pix + (MbPartIdx&1) * 8;
 			else
-				if(SizeSubMbMv = SZ_16x8)then
-					Blk_y_in_pix := Blk_y_in_pix + (MbPartIdx&1) * 8;	
-					Width  := 16;
-					Height := 8;
-				else
-					Blk_x_in_pix := Blk_x_in_pix + (MbPartIdx&1) * 8;
-					Width  := 8;
-					Height := 16;
-				end
+				Blk_x_in_pix := Blk_x_in_pix + (MbPartIdx&1) * 8;
 			end
 			MbPartIdx := MbPartIdx + 1;
 		end
@@ -714,7 +740,6 @@ actor Algo_Mvpl0Reconstr()
 	ComputeSubMvpL0.Launch8x8: action
 			SubMbPredRefIdx :[RefIdxCurr]
 				==>
-			PartSZ :[8,8],
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0]repeat 2,
 			RefIdxOut :[RefIdxCurr]
@@ -741,7 +766,6 @@ actor Algo_Mvpl0Reconstr()
 	ComputeSubMvpL0.Launch8x4: action
 			SubMbPredRefIdx :[RefIdxCurr]
 				==>
-			PartSZ :[8,4],
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0] repeat 2,
 			RefIdxOut :[RefIdxCurr]
@@ -763,26 +787,10 @@ actor Algo_Mvpl0Reconstr()
 			MvpL0 := [OMv[0],OMv[1]];	
 		end
 
-	List(type: uint(size=2), size=16) TabIdxToX =
-		[ 0, 1, 0, 1, 2, 3, 2, 3, 0, 1,
-		  0, 1, 2, 3, 2, 3];
-
-	List(type: uint(size=2), size=16)TabIdxToY =
-		[ 0, 0, 1, 1, 0, 0, 1, 1, 2, 2,
-		  3, 3, 2, 2, 3, 3];
-
-	List(type: List(type: uint(size=4),size=4),size=4) Loc_xyToTabIdx =
-	[
-		[0,2,8,10],
-		[1,3,9,11],
-		[4,6,12,14],
-		[5,7,13,15]
-	];
 
 	ComputeSubMvpL0.Launch4x8: action
 			SubMbPredRefIdx :[RefIdxCurr]
 				==>
-			PartSZ :[4,8],
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0]repeat 2,
 			RefIdxOut :[RefIdxCurr]
@@ -808,7 +816,6 @@ actor Algo_Mvpl0Reconstr()
 	ComputeSubMvpL0.Launch4x4: action
 			SubMbPredRefIdx :[RefIdxCurr]
 				==>
-			PartSZ :[4,4],
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0]repeat 2,
 			RefIdxOut :[RefIdxCurr]
@@ -831,7 +838,6 @@ actor Algo_Mvpl0Reconstr()
 
 	ComputeSubMvpL0.Skip: action
 				==>
-			PartSZ :[Width,Height],
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[0,0],
 			RefIdxOut :[-1]
@@ -839,33 +845,23 @@ actor Algo_Mvpl0Reconstr()
 			SubMbPartIdx < SubMbPartIdxMax,
 			not IsPred4SubMb
 		var
-			uint(size=6) Width,
-			uint(size=6) Height,
 			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
 			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
 			if(SizeSubMbMv = SZ_8x8)then
 				Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
 				Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
-				Width  := 8;
-				Height := 8;
 			else
 				if(SizeSubMbMv = SZ_8x4)then
 					Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
-					Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1) + 4 * (SubMbPartIdx&1);	
-					Width  := 8;
-					Height := 4;
+					Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1) + 4 * (SubMbPartIdx&1);
 				else
 					if(SizeSubMbMv = SZ_4x8)then
 						Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1) + 4 * (SubMbPartIdx&1);
-						Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);	
-						Width  := 4;
-						Height := 8;
+						Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
 					else
 						Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1) + 4 * (SubMbPartIdx&1);
-						Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1) + 4 * ((SubMbPartIdx>>1)&1);	
-						Width  := 4;
-						Height := 4;
+						Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1) + 4 * ((SubMbPartIdx>>1)&1);
 					end
 				end
 			end
@@ -961,7 +957,8 @@ actor Algo_Mvpl0Reconstr()
 
 	schedule fsm GetMbType:
 		GetMbType         (GetMbType.MacroBlkIorSI  )--> EatTokens;
-		GetMbType         (GetMbType.P_Skip         )--> GetMbInfos4P_Skip;
+		GetMbType         (GetMbType.P_SkipL0         )--> GetMbInfos4P_Skip;
+		GetMbType         (GetMbType.P_SkipL1         )--> EatTokens;
 		GetMbType         (GetMbType.Others         )--> GetMbInfos4Others;
 
 		EatTokens         (EatTokens                )--> GetMbType;
@@ -1000,6 +997,7 @@ actor Algo_Mvpl0Reconstr()
 
 	priority
 		GetMbType.MacroBlkIorSI > GetMbType.Others;
-		GetMbType.P_Skip        > GetMbType.Others;
+		GetMbType.P_SkipL0        > GetMbType.Others;
+		GetMbType.P_SkipL1        > GetMbType.Others;
 	end
 end
