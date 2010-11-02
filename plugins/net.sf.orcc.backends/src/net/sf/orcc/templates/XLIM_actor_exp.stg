@@ -189,12 +189,9 @@ Read(op) ::= <<
 
 Write(op) ::= <<
 <!-- Write $op$ -->
-<operation kind="cast">
-  <port dir="in" source="$op.target$"/>
-  <port dir="out" source="$op.target$\$output" typeName="$op.target$_output_typedef"/>
-</operation>
+
 <operation kind="pinWrite" portName="$op.port.name$" style="simple">
-  <port dir="in" source="$op.target$\$output"/>
+  <port dir="in" source="$op.target$/>
 </operation>
 <note kind="productionRates" name="$op.port.name$" value="$op.numTokens$"/>
 >>
@@ -229,9 +226,19 @@ $<operation kind="noop">
 
 Assign(op) ::= <<
 <!-- $op$ -->
+$if(op.cast)$
+$Cast(target = op.target, value = op.value, cast = op.cast)$
+$else$ 
 $expression(op.value)$
+$endif$
 >>
 
+Cast(target,value,cast) ::= <<
+<operation kind="cast">
+  $port(dir="in",source=value.var.variable)$
+  $port(dir="out",type=target.type,source=target)$
+</operation>
+>>
 
 PhiAssignment(phi) ::= <<
 <PHI>
