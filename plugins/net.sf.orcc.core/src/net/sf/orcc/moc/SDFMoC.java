@@ -29,8 +29,8 @@
 package net.sf.orcc.moc;
 
 /**
- * This class defines the static class. A static actor has fixed
- * production/consumption rates.
+ * This class defines the SDF MoC. A SDF actor has fixed production/consumption
+ * rates.
  * 
  * @author Matthieu Wipliez
  * 

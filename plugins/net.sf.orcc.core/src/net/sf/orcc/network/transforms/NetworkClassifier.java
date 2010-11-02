@@ -35,11 +35,11 @@ import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
+import net.sf.orcc.tools.classifier.ActorClassifier;
 
 /**
  * This class defines a network transformation that classifies all actors using
- * the {@link ActorClassifierIndependent} class.
+ * the {@link ActorClassifier} class.
  * 
  * @author Matthieu Wipliez
  * 

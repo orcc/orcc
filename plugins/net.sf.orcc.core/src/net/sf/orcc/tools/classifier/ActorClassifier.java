@@ -45,7 +45,7 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DynamicMoC;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.moc.QuasiStaticClass;
+import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.util.UniqueEdge;
 
@@ -60,7 +60,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorClassifierIndependent implements ActorTransformation {
+public class ActorClassifier implements ActorTransformation {
 
 	private Actor actor;
 
@@ -69,7 +69,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 	/**
 	 * Creates a new classifier
 	 */
-	public ActorClassifierIndependent() {
+	public ActorClassifier() {
 	}
 
 	/**
@@ -287,7 +287,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 			analyzer.analyze();
 
 			// will unroll for each branch departing from the initial state
-			QuasiStaticClass quasiStatic = new QuasiStaticClass();
+			QSDFMoC quasiStatic = new QSDFMoC();
 
 			for (NextStateInfo info : fsm.getTransitions(initialState)) {
 				Action action = info.getAction();

@@ -37,7 +37,7 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 
 /**
- * This class defines the static class. A static actor has fixed
+ * This class defines the CSDF MoC. A CSDF actor has a sequence of fixed
  * production/consumption rates.
  * 
  * @author Matthieu Wipliez

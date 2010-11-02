@@ -51,7 +51,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
-import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
+import net.sf.orcc.tools.classifier.ActorClassifier;
 
 /**
  * C++ back-end.
@@ -140,7 +140,7 @@ public class CppBackendImpl extends AbstractBackend {
 		
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
-			new ActorClassifierIndependent().transform(actor);
+			new ActorClassifier().transform(actor);
 		}
 	}
 

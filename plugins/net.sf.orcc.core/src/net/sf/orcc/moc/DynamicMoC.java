@@ -29,7 +29,7 @@
 package net.sf.orcc.moc;
 
 /**
- * This class defines the dynamic class. A dynamic actor has data-dependent (and
+ * This class defines the dynamic MoC. A dynamic actor has data-dependent (and
  * possibly state-dependent) production/consumption rates.
  * 
  * @author Matthieu Wipliez

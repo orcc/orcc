@@ -55,7 +55,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transforms.BroadcastAdder;
-import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
+import net.sf.orcc.tools.classifier.ActorClassifier;
 
 /**
  * C back-end.
@@ -154,7 +154,7 @@ public class CBackendImpl extends AbstractBackend {
 		
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
-			new ActorClassifierIndependent().transform(actor);
+			new ActorClassifier().transform(actor);
 		}
 		new MoveReadsWritesTransformation().transform(actor);
 

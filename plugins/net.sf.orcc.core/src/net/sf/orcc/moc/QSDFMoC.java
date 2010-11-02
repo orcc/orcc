@@ -35,7 +35,7 @@ import java.util.Set;
 import net.sf.orcc.ir.Action;
 
 /**
- * This class defines a quasi-static class. Quasi-static is a model that
+ * This class defines a quasi-static dataflow (QSDF) MoC. QSDF is a model that
  * exhibits static behavior for a given configuration. An actor that has the
  * quasi-static class has one action for each configuration, therefore this
  * class associates one action with one static class.
@@ -43,14 +43,14 @@ import net.sf.orcc.ir.Action;
  * @author Matthieu Wipliez
  * 
  */
-public class QuasiStaticClass extends AbstractMoC {
+public class QSDFMoC extends AbstractMoC {
 
 	private Map<Action, SDFMoC> classes;
 
 	/**
 	 * Creates a new quasi-static class.
 	 */
-	public QuasiStaticClass() {
+	public QSDFMoC() {
 		classes = new LinkedHashMap<Action, SDFMoC>();
 	}
 
