@@ -351,7 +351,10 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 						return -2;
 					}
 				}
-				nbOfFiredActions += actorInterpreter.execute(action);
+
+				actorInterpreter.execute(action);
+
+				nbOfFiredActions++;
 				nbOfFirings += nbOfFiredActions;
 				return nbOfFiredActions;
 			}
@@ -379,7 +382,8 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 						return -2;
 					}
 				}
-				return actorInterpreter.execute(action);
+				actorInterpreter.execute(action);
+				return 1;
 			} else {
 				return 0;
 			}

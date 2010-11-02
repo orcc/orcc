@@ -154,15 +154,13 @@ public class ActorInterpreter {
 	}
 
 	/**
-	 * Require the execution (interpretation) of the given actor's action
+	 * Executes the given action.
 	 * 
 	 * @param action
-	 * @return <code>1</code>
 	 */
-	public int execute(Action action) {
+	public void execute(Action action) {
 		// Interpret the whole action
 		interpretProc(action.getBody());
-		return 1;
 	}
 
 	/**
@@ -310,17 +308,19 @@ public class ActorInterpreter {
 	/**
 	 * Schedule next schedulable action if any
 	 * 
-	 * @return the number of scheduled actions (1 or 0)
+	 * @return <code>true</code> if an action was scheduled, <code>false</code>
+	 *         otherwise
 	 */
-	public Integer schedule() {
+	public boolean schedule() {
 		try {
 			// "Synchronous-like" scheduling policy : schedule only 1 action per
 			// actor at each "schedule" (network logical cycle) call
 			Action action = getNextAction();
-			if (action != null) {
-				return execute(action);
+			if (action == null) {
+				return false;
 			} else {
-				return 0;
+				execute(action);
+				return true;
 			}
 		} catch (OrccRuntimeException ex) {
 			throw new OrccRuntimeException("Runtime exception thrown by actor "

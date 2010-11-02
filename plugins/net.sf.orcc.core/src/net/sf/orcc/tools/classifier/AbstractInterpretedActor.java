@@ -70,10 +70,10 @@ public class AbstractInterpretedActor extends ActorInterpreter {
 	}
 
 	@Override
-	public int execute(Action action) {
+	public void execute(Action action) {
 		scheduledAction = action;
 		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(false);
-		return super.execute(action);
+		super.execute(action);
 	}
 
 	/**
@@ -89,9 +89,9 @@ public class AbstractInterpretedActor extends ActorInterpreter {
 	@Override
 	protected boolean isSchedulable(Action action) {
 		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(true);
-		Object isSchedulable = interpretProc(action.getScheduler());
-		return ((isSchedulable instanceof BoolExpr) && (((BoolExpr) isSchedulable)
-				.getValue()));
+		Expression result = interpretProc(action.getScheduler());
+		return result != null && result.isBooleanExpr()
+				&& (((BoolExpr) result).getValue());
 	}
 
 	/**

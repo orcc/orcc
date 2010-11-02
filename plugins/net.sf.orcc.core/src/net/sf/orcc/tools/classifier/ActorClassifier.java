@@ -170,29 +170,30 @@ public class ActorClassifier implements ActorTransformation {
 
 		// schedule the actor
 		CSDFMoC staticClass = new CSDFMoC();
-		int scheduled;
 		int nbPhases = 0;
 		if (fsm == null) {
+			boolean scheduled;
 			do {
 				scheduled = interpretedActor.schedule();
-				if (scheduled != 0) {
+				if (scheduled) {
 					Action latest = interpretedActor.getScheduledAction();
 					staticClass.addAction(latest);
 				}
 				nbPhases++;
-			} while (!state.isInitialState() || scheduled == 0);
+			} while (!state.isInitialState() || !scheduled);
 		} else {
+			boolean scheduled;
 			String initialState = fsm.getInitialState().getName();
 			do {
 				scheduled = interpretedActor.schedule();
-				if (scheduled != 0) {
+				if (scheduled) {
 					Action latest = interpretedActor.getScheduledAction();
 					staticClass.addAction(latest);
 				}
 				nbPhases++;
 			} while (!state.isInitialState()
 					|| !initialState.equals(interpretedActor.getFsmState())
-					|| scheduled == 0);
+					|| !scheduled);
 		}
 
 		// set token rates
