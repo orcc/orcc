@@ -1,6 +1,74 @@
 ///////////////////////////////////////////////////////////////////////////////
 // VHDL Top for the XLiM Hardware code generation
 
+///////////////////////////////////////////////////////////////////////////////
+// Print Components
+///////////////////////////////////////////////////////////////////////////////
+
+PrintComponents(network) ::=<<
+-- ----------------------------------------------------------------------------------
+-- Components of Actors found in the Network
+-- ----------------------------------------------------------------------------------
+
+$network.instances: printActorsComponents(); separator="\n"$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Print Actors Components
+
+printActorsComponents(instance) ::=<<
+component $instance.id$ is
+port(
+	-- $instance.id$ Input(s)
+	$instance.actor.inputs.list: printActorsComponentsInputs(); separator="\n"$
+	-- $instance.id$ Ouput(s)
+	$instance.actor.outputs.list: printActorsComponentsOutputs(); separator="\n"$
+	
+	CLK: in std_logic;
+	RESET: in std_logic   );
+end component $instance.id$;
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Print the Inputs of the Actor Components
+
+printActorsComponentsInputs(port) ::=<<
+$
+if(port.type.bool)
+$
+$port.name$_DATA	: std_logic;
+$
+else
+$
+$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);
+$
+endif
+$
+$port.name$_SEND	: std_logic;
+$port.name$_ACK	: std_logic;
+$port.name$_COUNT	: std_logic_vector(15 downto 0);
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Print the Outputs of the Actor Components
+
+printActorsComponentsOutputs(port) ::=<<
+$
+if(port.type.bool)
+$
+$port.name$_DATA	: std_logic;
+$
+else
+$
+$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);
+$
+endif
+$
+$port.name$_SEND	: std_logic;
+$port.name$_ACK	: std_logic;
+$port.name$_COUNT	: std_logic_vector(15 downto 0);
+$port.name$_RDY	: std_logic;
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print Signals
@@ -12,7 +80,11 @@ $network.inputs.list: printInputPortsSignals(); separator="\n"$
 -- Output Port Signals
 $network.outputs.list: printOutputPortsSignals(); separator="\n"$
 -- Actors I/O Signals
+$network.instances: printActorsSignals(); separator="\n"$
 >>
+
+///////////////////////////////////////////////////////////////////////////////
+// Network Input Signals
 
 printInputPortsSignals(port) ::=<<
 $
@@ -40,6 +112,9 @@ signal nif_$port.name$_COUNT	: in  std_logic_vector(15 downto 0);
 signal nif_$port.name$_RDY	: out std_logic;$\n$
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// Network Output Signals
+
 printOutputPortsSignals(port) ::=<<
 $
 if(port.type.bool)
@@ -52,6 +127,69 @@ signal no_$port.name$_SEND	: out std_logic;
 signal no_$port.name$_ACK	: in  std_logic;
 signal no_$port.name$_COUNT	: out std_logic_vector(15 downto 0);
 signal no_$port.name$_RDY	: in  std_logic;$\n$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actors Input / Output Signals
+
+printActorsSignals(instance) ::=<<
+$instance.actor.outputs.list: printActorSigOutput()$
+$instance.actor.inputs.list: printActorSigInput()$
+>> 
+
+///////////////////////////////////////////////////////////////////////////////
+// Actors Input Signals
+printActorSigInput(port) ::= <<
+$
+if(port.type.bool)
+$
+signal ai_$instance.id$_$port.name$_DATA	: std_logic;
+$
+else
+$
+signal ai_$instance.id$_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);
+$
+endif
+$
+signal ai_$instance.id$_$port.name$_SEND	: std_logic;
+signal ai_$instance.id$_$port.name$_ACK	: std_logic;
+signal ai_$instance.id$_$port.name$_COUNT	: std_logic_vector(15 downto 0);$\n$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actors Input Signals
+printActorSigOutput(port) ::= <<
+$
+if(port.type.bool)
+$
+signal ao_$instance.id$_$port.name$_DATA	: std_logic;
+$
+else
+$
+signal ao_$instance.id$_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);
+$
+endif
+$
+signal ao_$instance.id$_$port.name$_SEND	: std_logic;
+signal ao_$instance.id$_$port.name$_ACK	: std_logic;
+signal ao_$instance.id$_$port.name$_COUNT	: std_logic_vector(15 downto 0);
+signal ao_$instance.id$_$port.name$_RDY	: std_logic;
+
+$
+if(port.type.bool)
+$
+signal aof_$instance.id$_$port.name$_DATA	: std_logic;
+$
+else
+$
+signal aof_$instance.id$_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);
+$
+endif
+$
+signal aof_$instance.id$_$port.name$_SEND	: std_logic;
+signal aof_$instance.id$_$port.name$_ACK	: std_logic;
+signal aof_$instance.id$_$port.name$_COUNT	: std_logic_vector(15 downto 0);
+signal aof_$instance.id$_$port.name$_RDY	: std_logic;$\n$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -139,8 +277,16 @@ architecture rtl of $network.name$ is
 	-- Clock and Reset signal
 	signal clocks, resets: std_logic_vector(0 downto 0);
 	
-	$PrintSignals(network)$
-	
+	$PrintSignals(network); separator="\n"$
+	$PrintComponents(network); separator="\n"$
+begin
+	rcon: entity SystemBuilder.resetController( behavioral )
+	generic map( count => 1 )
+	port map( clocks => clocks, reset_in => RESET, resets => resets );
+
+  	clocks(0) <= CLK;
+  	
+  	
 end architecture rtl;
 
 -- ----------------------------------------------------------------------------------
