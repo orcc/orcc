@@ -1,0 +1,666 @@
+BinOp ::= [
+	"BITAND":"bitand",
+	"BITOR":"bitor",
+	"BITXOR":"bitxor",
+	"DIV":"$div",
+	"DIV_INT":"$div",
+	"EQ":"$eq",
+	"EXP":"exp",
+	"GE":"$ge",
+	"GT":"$gt",
+	"LE":"$le",
+	"LOGIC_AND":"$and",
+	"LOGIC_OR":"$or",
+	"LT":"$lt",
+	"MINUS":"$sub",
+	"MOD":"$mod",
+	"NE":"$ne",
+	"PLUS":"$add",
+	"SHIFT_LEFT":"lshift",
+	"SHIFT_RIGHT":"rshift",
+	"TIMES":"$mul"
+]
+
+UnaryOp ::= [
+	"BITNOT":"bitnot",
+	"LOGIC_NOT":"$not",
+	"MINUS":"$negate",
+	"NUM_ELTS":"$size"
+]
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Ports
+///////////////////////////////////////////////////////////////////////////////
+
+// "actorPort() function"
+// Print the actor-port template for a specific I/O
+
+actorPort(port, dir) ::= <<
+$if (port.type.bool)
+$<actor-port dir="$dir$" name="$port.name$" size="1" typeName="$port.type$"/>$
+else
+$<actor-port dir="$dir$" name="$port.name$" size="$port.type.size$" typeName="$port.type$"/>$
+endif$
+>>
+
+// "actorPorts() function"
+// For each input or output retrieve the list of the I/Os
+// and attribute to the variable "port" the name of the I/O 
+
+actorPorts() ::= <<
+<!-- Ports -->
+<!-- Input Ports -->
+$instance.actor.inputs.list: {port|$actorPort(port=port, dir="in")$}; separator="\n"$
+<!-- Output Ports -->
+$instance.actor.outputs.list: {port|$actorPort(port=port, dir="out")$}; separator="\n"$
+>>
+
+internalPorts() ::= <<
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// State Variables
+///////////////////////////////////////////////////////////////////////////////
+
+initVariable(type, value) ::= <<
+$if(value.listExpr)$<initValue typeName="List"> 
+  $value.value: {value | $initVariable(type=type.type, value=value)$}; separator=""$</initValue>
+$else$<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/>
+$endif$
+>>
+
+stateVar(var) ::= <<
+<stateVar name="$var.name$" sourceName="$var.name$">
+  $initVariable(type=var.type, value=var.value)$</stateVar>
+>>
+
+stateVars() ::= <<
+$instance.actor.stateVars.list: stateVar(); separator="\n"$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Expressions
+///////////////////////////////////////////////////////////////////////////////
+
+expression(expr) ::= <<
+$(expr.class.simpleName)(expr)$
+>>
+
+
+BinaryExpr(expr) ::= <<
+<operation kind="$BinOp.(expr.op)$">
+	$port(dir="in", source=expr.e1)$
+	$port(dir="in", source=expr.e2)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+UnaryExpr(expr) ::= <<
+<operation kind="$UnaryOp.(expr.op)$">
+	$port(dir="in", source=expr.expr)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+IntExpr(expr) ::= <<
+<operation kind="\$literal_Integer" value="$expr$">
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+BoolExpr(expr) ::= <<
+<operation kind="\$literal_Integer" value="$expr$">
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+
+VarExpr(expr) ::= <<
+<operation kind="noop">
+	<port dir="in" source="$expr$"/>
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>
+>>
+///////////////////////////////////////////////////////////////////////////////
+// Instructions
+///////////////////////////////////////////////////////////////////////////////
+
+instruction(op) ::= <<
+$(op.class.simpleName)(op)$
+>>
+
+
+Call(call) ::= <<
+<!-- TODO call-->
+>>
+
+Decrement(decrement) ::= <<
+<!-- TODO decrement -->
+>>
+
+HasTokens(hasTokens) ::= <<
+<operation kind="pinAvail" portName="$hasTokens.port$">
+	<port dir="out" size="32" source="$hasTokens.target$_pinAvail" typeName="int"/>
+</operation>
+<operation kind="\$literal_Integer" value="$hasTokens.numTokens$">
+	<port dir="out" size="32" source="$hasTokens.target$_tokenCount" typeName="int"/>
+</operation>
+<operation kind="\$ge">
+	<port dir="in" source="$hasTokens.target$_pinAvail"/>
+	<port dir="in" source="$hasTokens.target$_tokenCount"/>
+	$port(dir="out", type=hasTokens.target.type, source=hasTokens.target)$
+</operation>
+>>
+
+Increment(increment) ::= <<
+<!-- TODO increment -->
+>>
+
+Peek(peek) ::= <<
+<operation kind="\$literal_Integer" value="0">
+	<port dir="out" size="32" source="peek_$instance.id$_$procedure$_0" typeName="int"/>
+</operation>
+<operation kind="pinPeek" portName="$peek.port.name$" removable="no">
+	<port dir="in" source="peek_$instance.id$_$procedure$_0"/>
+	$port(dir="out", type=peek.port.type, source=peek.target)$
+</operation>
+>>
+
+port(dir, type, source) ::= <<
+$if (!type)
+$<port dir="$dir$" source="$source$"/>$
+else
+$$if(!type.list || source.global)
+$<port dir="$dir$" size="$if (type.bool)$1$else$$type.size$$endif$" source="$source$" typeName="$type$"/>$
+else
+$<port dir="$dir$" source="$source$" typeName="$source$_typedef"/>$
+endif$$
+endif$
+>>
+
+
+Read(op) ::= <<
+<note kind="consumptionRates" name="$op.port.name$" value="$op.numTokens$"/>
+<operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
+	<port dir="out" source="$op.target$" typeName="$op.target$_typedef"/>
+</operation>
+>>
+
+Write(op) ::= <<
+<!-- Write $op$ -->
+<operation kind="cast">
+  <port dir="in" source="$op.target$"/>
+  <port dir="out" source="$op.target$\$output" typeName="$op.target$_output_typedef"/>
+</operation>
+<operation kind="pinWrite" portName="$op.port.name$" style="simple">
+  <port dir="in" source="$op.target$\$output"/>
+</operation>
+<note kind="productionRates" name="$op.port.name$" value="$op.numTokens$"/>
+>>
+
+Load(op) ::= <<
+<!-- Load $op$ -->
+$if(op.source.variable.type.list)
+$<operation kind="var_ref" name="$op.source$">
+	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>$
+else
+$<operation kind="noop">
+	$port(dir="in", source=op.source)$
+	$port(dir="out", type=op.target.type, source=op.target)$
+</operation>$endif$
+>>
+
+Store(op) ::= <<
+<!-- Store $op$ -->
+$if (op.target.type.list)
+$<operation kind="assign" target="$op.target$">
+	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
+	$port(dir="in", source=op.value.var)$
+</operation>$
+else
+$<operation kind="noop">
+	$port(dir="in", source=op.value.var)$
+	$port(dir="out", type=op.value.type, source=op.target)$
+</operation>$endif$
+>>
+
+Assign(op) ::= <<
+<!-- $op$ -->
+$expression(op.value)$
+>>
+
+
+PhiAssignment(phi) ::= <<
+<PHI>
+	<port dir="in" qualifier="then" source="$first(phi.values)$"/>
+	<port dir="in" qualifier="else" source="$rest(phi.values)$"/>
+	$port(dir="out", type=phi.target.type, source=phi.target)$
+</PHI>
+>>
+
+Return(return) ::= <<
+$if (return.value)
+$<operation kind="noop">
+	$port(dir="in", source=return.value)$
+	<port dir="out" size="1" source="$procedure$_go" typeName="bool"/>
+</operation>$
+endif$
+>>
+
+SelfAssignment(selfAssign) ::= <<
+<!-- TODO selfAssign -->
+>>
+
+WriteEnd(writeEnd) ::= <<
+<!-- TODO writeEnd -->
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes
+///////////////////////////////////////////////////////////////////////////////
+
+nodes(nodes) ::= <<
+$nodes: {$(it.class.simpleName)(it)$}$
+>>
+
+BlockNode(blkNode) ::= <<
+$blkNode.instructions: instruction(); separator="\n"$
+>>
+
+PrintPhi(instruction) ::= <<
+$if(instruction.phi)$
+$nodes(instruction)$
+$endif$
+>>
+
+PrintNotPhi(instruction) ::= <<
+$if(!instruction.phi)$
+$nodes(instruction)$
+$endif$
+>>
+
+PhiNodes(phiNodes) ::= <<
+$phiNodes.instructions: PrintPhi()$
+>>
+
+NotPhiNodes(NotphiNodes) ::= <<
+$NotphiNodes.instructions: PrintNotPhi()$
+>>
+
+IfNode(ifNode) ::= <<
+
+<module kind="if">
+	<module decision="decision_$ifNode.value$_$ifNode.location.startLine$_$ifNode.location.startColumn$" kind="test">
+		<operation kind="noop">
+			$port(dir="in", source=ifNode.value)$
+			<port dir="out" size="1" source="decision_$ifNode.value$_$ifNode.location.startLine$_$ifNode.location.startColumn$" typeName="bool"/>
+		</operation>		
+	</module>
+	<module kind="then">
+		$nodes(ifNode.thenNodes)$
+	</module>
+$if(ifNode.elseNodes)$
+	<module kind="else">
+		$nodes(ifNode.elseNodes)$
+	</module>
+$endif$
+	<!-- joinnode -->
+	$PhiNodes(ifNode.joinNode)$
+</module>
+$NotPhiNodes(ifNode.joinNode)$
+<!-- end joinnode -->
+>>
+
+// while node
+WhileNode(whileNode) ::= <<
+<module kind="loop">
+	<!-- joinnode -->
+	$PhiNodes(whileNode.joinNode)$
+	<module decision="decision_$whileNode.value$" kind="test">
+		<!-- Begin joinnode -->
+		$NotPhiNodes(whileNode.joinNode)$
+		<!-- End joinnode -->
+		<operation kind="noop">
+			$port(dir="in", source=whileNode.value)$
+			<port dir="out" size="1" source="decision_$whileNode.value$" typeName="bool"/>
+		</operation>
+	</module>		
+	<module kind="body">
+	$nodes(whileNode.nodes)$
+	</module>
+</module>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Procedure
+///////////////////////////////////////////////////////////////////////////////
+
+procedure(procedure) ::= <<
+$if(!procedure.external)$
+$procedure.nodes: {$(it.class.simpleName)(it)$}$
+$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// TypeDef
+///////////////////////////////////////////////////////////////////////////////
+
+typeDef(action) ::= <<
+$action.body.locals.list: typeDefLocal()$
+>>
+
+typeDefLocal(local) ::= <<
+$if(local.type.list)$
+<typeDef name="$local$_typedef">
+  <type name="List">
+    <valuePar name="size" value="$local.type.size$"/>
+    <typePar name="type">
+      $typeDefListElements(local.type.list.elementType)$
+    </typePar>
+  </type>
+</typeDef>
+$if(local.instruction.write)$
+<typeDef name="$local$_output_typedef">
+  <type name="List">
+    <valuePar name="size" value="$local.type.size$"/>
+    <typePar name="type">
+      $typeDefListElements(local.type.list.elementType)$
+    </typePar>
+  </type>
+</typeDef>
+$endif$
+$endif$
+>>
+
+typeDefListElements(type) ::= <<
+$if(type.list)$
+<type name="List">
+  <valuePar name="size" value="$type.size$"/>
+  <typePar name="type">
+    $typeDefListElements(type.elementType)$
+  </typePar>
+</type>
+$else
+$<type name="int">
+  <valuePar name="size" value="9"/>
+</type>$
+endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+localInitialize(local) ::= <<
+$if(!local.instruction || local.instruction.write)
+$<operation kind="\$valloc">
+  $port(dir="out", type=local.type, source=local)$
+</operation>
+$endif$ 
+>>
+
+action(action) ::= <<
+<!-- Action: "$action.name$" -->
+<module autostart="false" kind="action" name="$action.name$">
+  $action.body.locals.list: localInitialize()$
+	$action.body.nodes: nodes(); separator="\n"$
+</module> 
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action scheduler
+///////////////////////////////////////////////////////////////////////////////
+
+outputPatternPort(port, index, index0, state) ::= <<
+<!--  OutputPattern -->
+<operation kind="pinAvail" portName="$port$">
+	<port dir="out" size="32" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_pinAvail" typeName="int"/>
+</operation>
+<operation kind="\$literal_Integer" value="$pattern.(port)$">
+	<port dir="out" size="32" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount" typeName="int"/>
+</operation>
+<operation kind="\$ge">
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_pinAvail"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
+</operation>
+
+<operation kind="\$and">
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$"/>
+	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index0$"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$" typeName="bool"/>
+</operation>
+>>
+
+outputPatternPortDecision(index,state)::=<<
+<module kind="if">
+	<module decision="outputPattern_$instance.id$_$action.name$_decision_s_$state$_$index$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$"/>
+			<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_decision_s_$state$_$index$" typeName="bool"/>
+		</operation>
+	</module>
+>>
+
+outputPattern(pattern,action,state) ::= <<
+<operation kind="\$literal_Integer" value="1">
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_0" typeName="bool"/>
+</operation>
+$pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0, state=state)$}; separator="\n"$
+<!-- Last outputPattern -->
+$outputPatternPortDecision(index=length(pattern.keys),state=state); separator="\n"$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler without FSM
+
+actionCall(action) ::= <<
+<operation kind="taskCall" target="$action.body$"/>
+>>
+
+actionTest(action) ::= <<
+<module kind="if">
+	<module decision="isSchedulable_$action$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="isSchedulable_$action$_go"/>
+			<port dir="out" size="1" source="isSchedulable_$action$" typeName="bool"/>
+		</operation>
+	</module>
+	<module kind="then">
+		$if(action.outputPattern)$
+		$outputPattern(pattern=action.outputPattern,action=action)$
+			<module kind="then">
+				$actionCall(action)$
+			</module>
+		</module>
+		$else$
+		$actionCall(action)$
+		$endif$
+	</module>
+	<module kind="else">
+>>
+
+schedulingTest(actions) ::= <<
+<!-- All Schedulable expressions -->
+$actions: actionTest(); separator="\n"$
+>>
+
+scheduler(actions) ::= <<
+<module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
+	<operation kind="\$literal_Integer" value="1">
+		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
+	</operation>
+	<module kind="loop">
+		<module decision="var_$instance.id$_sched" kind="test">
+			<operation kind="noop">
+				<port dir="in" source="var_$instance.id$_sched"/>
+				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
+			</operation>
+		</module>
+		<module kind="body">
+			$instance.actor.actions: isSchedulableTest(); separator="\n"$
+			$if(actions)$$schedulingTest(actions)$$endif$
+			<!--Close modules -->
+			$if(actions)$  	 	 
+			$actions:{</module></module>}; separator="\n"$
+			$endif$
+		</module>
+	</module>
+</module>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Scheduler with FSM
+
+actionCallState(nextState) ::= <<
+<operation kind="assign" target="currentState">
+	<port dir="in" source="s_$nextState.targetState$"/>
+</operation>
+>>
+
+actionTestState(nextState) ::= <<
+<module kind="if">
+	<module decision="isSchedulable_$nextState.action$_$transition.sourceState$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="isSchedulable_$nextState.action$_go"/>
+			<port dir="out" size="1" source="isSchedulable_$nextState.action$_$transition.sourceState$" typeName="bool"/>
+		</operation>
+	</module>
+	<module kind="then">
+		$if(nextState.action.outputPattern)$
+		$outputPattern(pattern=nextState.action.outputPattern,action=nextState.action,state=transition.sourceState)$
+			<module kind="then">
+				$actionCall(nextState.action)$
+				$actionCallState(nextState)$
+			</module>
+		</module>
+		$else$
+		<!-- no ouput pattern-->
+		$actionCall(nextState.action)$
+		$actionCallState(nextState)$
+		$endif$
+	</module>
+	<module kind="else">
+>>
+
+schedulingTestState(nextStates) ::= <<
+$nextStates: actionTestState(); separator="\n"$
+$nextStates: {</module></module>}; separator="\n"$
+>>
+
+Transition(transition) ::= <<
+<!-- State s_$transition.sourceState$ -->
+<module kind="if">
+	<module decision="s_$transition.sourceState$_enabled" kind="test">
+		<operation kind="\$eq">
+			<port dir="in" source="s_$transition.sourceState$"/>
+			<port dir="in" source="currentState"/>
+			<port dir="out" size="1" source="s_$transition.sourceState$_enabled" typeName="bool"/>
+		</operation>
+	</module>
+	<module kind="then">
+		$schedulingTestState(nextStates=transition.nextStateInfo)$
+	</module>
+	<module kind="else">
+>>
+
+isSchedulableTest(action) ::= <<
+$procedure(action.scheduler)$
+>>
+
+Transitions(actions, transitions) ::= <<
+<!-- All transitions -->
+$transitions:{transition | $Transition(transition=transition)$}; separator="\n"$
+$transitions:{</module></module>}; separator="\n"$
+>>
+
+enumStates(transition)::= <<
+<operation kind="\$literal_Integer" value="$transition.sourceState.index$">
+	<port dir="out" size="32" source="s_$transition.sourceState$" typeName="int"/>
+</operation>
+>>
+
+schedulerFSM(actions, fsm) ::= <<
+
+<!-- Initializing with the initial state "s_$fsm.initialState$" -->
+<stateVar name="currentState">
+	<initValue size="32" typeName="int" value="$fsm.initialState.index$"/>
+</stateVar>
+<module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
+	<operation kind="\$literal_Integer" value="1">
+		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
+	</operation>
+	<!-- enumerate states -->
+	$fsm.transitions : {transition | $enumStates(transition=transition)$}; separator="\n"$
+	<!-- infinite loop -->
+	<module kind="loop">
+		<module decision="var_$instance.id$_sched" kind="test">
+			<operation kind="noop">
+				<port dir="in" source="var_$instance.id$_sched"/>
+				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
+			</operation>
+		</module>
+		<module kind="body">
+			<!-- All Schedulable expressions -->
+			$instance.actor.actions: isSchedulableTest()$
+			<!--untagged actions -->
+			$if(actions)$  	 	 
+			$schedulingTest(actions)$  	 	 
+			$endif$ 
+			<!-- FSM transitions -->
+			$Transitions(actions=actions, transitions=fsm.transitions)$
+			<!--Close modules for untagged actions -->
+			$if(actions)$  	 	 
+			$actions:{</module></module>}; separator="\n"$
+			$endif$ 			
+		</module>
+	</module>
+</module>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Parameters of the Actor
+///////////////////////////////////////////////////////////////////////////////
+
+parameters(parameters) ::= <<
+$parameters.keys: { k | 
+<stateVar name="$k$" sourceName="$k$">
+	<initValue size="$parameters.(k).type.size$" typeName="$parameters.(k).type$" value="$parameters.(k)$"/>
+</stateVar>
+}$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor
+///////////////////////////////////////////////////////////////////////////////
+
+PrintHierarchicalPath(path) ::= <<
+$path; separator="/"$
+>>
+
+
+design() ::= <<
+<!-- /$first(instance.hierarchicalClass)$/$PrintHierarchicalPath(instance.hierarchicalId)$ -->
+<!-- Source file is "$instance.actor.file$" -->
+<design name="$instance.id$">
+	$actorPorts()$
+	$parameters(instance.parameters)$
+	$stateVars()$
+	$instance.actor.actions: typeDef()$
+	$instance.actor.actions: action(); separator="\n"$
+	$if(instance.actor.actionScheduler.fsm)$
+	$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
+	$else$
+	$scheduler(actions=instance.actor.actionScheduler.actions)$
+	$endif$
+</design>
+>>
+
+instance(instance, options) ::= <<
+<?xml version="1.0" encoding="UTF-8"?>
+$design()$
+>>
+
