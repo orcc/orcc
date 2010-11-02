@@ -191,7 +191,7 @@ Write(op) ::= <<
 <!-- Write $op$ -->
 
 <operation kind="pinWrite" portName="$op.port.name$" style="simple">
-  <port dir="in" source="$op.target$/>
+  <port dir="in" source="$op.target$"/>
 </operation>
 <note kind="productionRates" name="$op.port.name$" value="$op.numTokens$"/>
 >>
