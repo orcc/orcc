@@ -50,7 +50,7 @@ actor Mgnt_DBF (int LUMA_CHROMA)
 	int(size=6) Beta_offset,
 	int(size=8) QP,
 	int(size=16) MV,
-	uint(size=3) RefIdx,
+	uint(size=4) RefIdx,
 	uint(size=2) LFDisable,
 	uint(size=8) DB_O 
 					==> 

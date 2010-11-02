@@ -55,11 +55,11 @@ actor Algo_MvComponentReorder()
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 	int (size=16) Mv,
-	uint(size=3)  RefIdx
+	uint(size=4)  RefIdx
 		==>
 	int (size=16) MvOut,
 	uint(size=6)  PartSZ,
-	uint(size=3)  RefIdxOut
+	uint(size=4)  RefIdxOut
 		:
 
 	uint(size=3) SZ_16x16 = 0;

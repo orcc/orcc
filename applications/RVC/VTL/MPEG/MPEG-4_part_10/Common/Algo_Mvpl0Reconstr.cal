@@ -67,7 +67,7 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 		==>
 	int (size=16) Mvpl0,
 	uint(size=11) Location,
-	uint(size=3)  RefIdxOut
+	uint(size=4)  RefIdxOut
 		:
 
 	uint(size=2) NA = 0;

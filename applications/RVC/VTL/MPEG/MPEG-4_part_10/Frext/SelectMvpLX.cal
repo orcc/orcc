@@ -56,13 +56,13 @@ actor SelectMvpLX()
 	uint(size=4)  SubMbType,
 	int (size=16) MvpL0,
 	uint(size=11) LocationL0,
-	uint(size=3)  RefIdxL0,
+	uint(size=4)  RefIdxL0,
 	int (size=16) MvpL1,
-	uint(size=3)  RefIdxL1,
+	uint(size=4)  RefIdxL1,
 	uint(size=11) LocationL1
 		==>
 	int (size=16) MvOut,
-	uint(size=3)  RefIdxOut,
+	uint(size=4)  RefIdxOut,
 	uint(size=11) Location
 
 		:
