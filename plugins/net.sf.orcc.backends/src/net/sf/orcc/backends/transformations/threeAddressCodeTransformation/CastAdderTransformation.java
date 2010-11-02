@@ -203,6 +203,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			if (expr != binExpr) {
 				assign.setValue(expr);
 			}
+			Use.addUses(assign, expr);
 
 			instructionIterator.next();
 
@@ -232,6 +233,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 				parameters.set(parameters.indexOf(parameter), newParam);
 				instructionIterator.next();
 			}
+			Use.addUses(call, call.getParameters());
 		}
 	}
 
@@ -268,6 +270,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 					new CastExprInterpreter(instructionIterator), type);
 			values.set(indexValue, newValue);
 		}
+		Use.addUses(phi, phi.getValues());
 	}
 
 	@Override
@@ -281,6 +284,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 					new CastExprInterpreter(instructionIterator), returnType);
 			returnInstr.setValue(newValue);
 			instructionIterator.next();
+			Use.addUses(returnInstr, returnInstr.getValue());
 		}
 	}
 
@@ -296,6 +300,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 		if (value != newValue) {
 			store.setValue(newValue);
+			Use.addUses(store, newValue);
 		}
 
 		instructionIterator.next();

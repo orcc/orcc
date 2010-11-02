@@ -39,6 +39,7 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -170,12 +171,14 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 			Expression newExpr = (Expression) value
 					.accept(new ExpressionCopy());
 			assign.setValue(newExpr);
+			Use.addUses(assign, newExpr);
 		}
 	}
 
 	@Override
 	public void visit(Call call) {
 		visitExpressions(call.getParameters());
+		Use.addUses(call, call.getParameters());
 	}
 
 	@Override
@@ -186,12 +189,14 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 		ifNode.setValue(newExpr);
 
 		super.visit(ifNode);
+		Use.addUses(ifNode, newExpr);
 	}
 
 	@Override
 	public void visit(Load load) {
 		// Visit indexes of load
 		visitExpressions(load.getIndexes());
+		Use.addUses(load, load.getIndexes());
 	}
 
 	//
@@ -235,6 +240,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 				}
 			}
 		}
+		Use.addUses(phi, phi.getValues());
 	}
 
 	@Override
@@ -243,6 +249,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 		if (expr != null) {
 			Expression newExpr = (Expression) expr.accept(new ExpressionCopy());
 			returnInstr.setValue(newExpr);
+			Use.addUses(returnInstr, newExpr);
 		}
 	}
 
@@ -255,6 +262,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 
 		// Visit indexes of store
 		visitExpressions(store.getIndexes());
+		Use.addUses(store, newExpr);
 	}
 
 	@Override
@@ -264,6 +272,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 		whileNode.setValue(newExpr);
 
 		super.visit(whileNode);
+		Use.addUses(whileNode, newExpr);
 	}
 
 	private void visitExpressions(List<Expression> expressions) {

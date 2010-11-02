@@ -208,8 +208,7 @@ public class ExpressionSplitterTransformation extends
 				binExpr.setE2(visitExpression(e2, instructionIterator));
 				instructionIterator.next();
 			}
-			
-			Use.addUses(assign, value);
+			Use.addUses(assign, assign.getValue());
 		} else if (value.isUnaryExpr()) {
 			UnaryExpr unaryExpr = (UnaryExpr) value;
 			instructionIterator.previous();
@@ -221,6 +220,7 @@ public class ExpressionSplitterTransformation extends
 					unaryExpr.getOp(), newExpr));
 
 			instructionIterator.next();
+			Use.addUses(assign, assign.getValue());
 		}
 	}
 
@@ -236,14 +236,17 @@ public class ExpressionSplitterTransformation extends
 				instructionIterator.next();
 			}
 		}
+		Use.addUses(call, call.getParameters());
 	}
 
 	@Override
 	public void visit(IfNode ifNode) {
 		Expression value = ifNode.getValue();
 		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
-			ifNode.setValue(visitExpression(ifNode.getValue(),
-					getItr(nodeIterator)));
+			Expression newValue = visitExpression(ifNode.getValue(),
+					getItr(nodeIterator));
+			ifNode.setValue(newValue);
+			Use.addUses(ifNode, newValue);
 		}
 		super.visit(ifNode);
 	}
@@ -252,6 +255,7 @@ public class ExpressionSplitterTransformation extends
 	public void visit(Load load) {
 		instructionIterator.previous();
 		visitIndexes(load.getIndexes(), instructionIterator);
+		Use.addUses(load, load.getIndexes());
 		instructionIterator.next();
 	}
 
@@ -259,8 +263,10 @@ public class ExpressionSplitterTransformation extends
 	public void visit(Return returnInstr) {
 		if (returnInstr.getValue() != null) {
 			instructionIterator.previous();
-			returnInstr.setValue(visitExpression(returnInstr.getValue(),
-					instructionIterator));
+			Expression newValue = visitExpression(returnInstr.getValue(),
+					instructionIterator);
+			returnInstr.setValue(newValue);
+			Use.addUses(returnInstr, newValue);
 			instructionIterator.next();
 		}
 	}
@@ -272,10 +278,12 @@ public class ExpressionSplitterTransformation extends
 		instructionIterator.previous();
 
 		visitIndexes(store.getIndexes(), instructionIterator);
+		Use.addUses(store, store.getIndexes());
 
 		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 			Expression newValue = visitExpression(value, instructionIterator);
 			store.setValue(newValue);
+			Use.addUses(store, newValue);
 		}
 
 		instructionIterator.next();
@@ -294,6 +302,7 @@ public class ExpressionSplitterTransformation extends
 		if ((value.isBinaryExpr()) || (value.isUnaryExpr())) {
 			Expression expr = visitExpression(whileNode.getValue(), it);
 			whileNode.setValue(expr);
+			Use.addUses(whileNode, expr);
 		}
 
 		super.visit(whileNode);
