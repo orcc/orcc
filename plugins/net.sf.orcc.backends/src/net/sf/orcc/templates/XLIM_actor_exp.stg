@@ -392,11 +392,13 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 localInitialize(local) ::= <<
-$if(!local.instruction || local.instruction.write)
+$if(local.type.list)
+$$if(!local.instruction || local.instruction.write)
 $<operation kind="\$valloc">
   $port(dir="out", type=local.type, source=local)$
 </operation>
-$endif$ 
+$endif
+$$endif$ 
 >>
 
 action(action) ::= <<
