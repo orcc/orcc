@@ -33,11 +33,7 @@ import net.sf.orcc.classes.CSDFNetworkClass;
 import net.sf.orcc.classes.DynamicNetworkClass;
 import net.sf.orcc.classes.IClass;
 import net.sf.orcc.classes.SDFNetworkClass;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.transforms.DeadGlobalElimination;
-import net.sf.orcc.ir.transforms.DeadVariableRemoval;
-import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
 
@@ -51,56 +47,41 @@ import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
 public class NetworkClassifier implements INetworkTransformation {
 
 	private static int CSDF = 1;
+
 	private static int DYNAMIC = 2;
+
 	private static int SDF = 0;
-
-	/**
-	 * Creates a new classifier
-	 */
-
-	public NetworkClassifier() {
-	}
 
 	private IClass getNetworkClass(Network network) {
 		IClass networkClass = new SDFNetworkClass();
 
 		int currentClass = SDF;
 
-		for (Actor actor : network.getActors()) {
-			IClass clasz = actor.getActorClass();
-
-			if (clasz.isDynamic() || clasz.isQuasiStatic()) {
-				if (currentClass < DYNAMIC) {
-					networkClass = new DynamicNetworkClass();
-					currentClass = DYNAMIC;
-				}
-			} else if (clasz.isCSDF()) {
-				if (currentClass < CSDF) {
-					networkClass = new CSDFNetworkClass();
-					currentClass = CSDF;
+		for (Instance instance : network.getInstances()) {
+			if (instance.isActor()) {
+				IClass clasz = instance.getActor().getActorClass();
+				if (clasz != null) {
+					if (clasz.isDynamic() || clasz.isQuasiStatic()) {
+						if (currentClass < DYNAMIC) {
+							networkClass = new DynamicNetworkClass();
+							currentClass = DYNAMIC;
+						}
+					} else if (clasz.isCSDF()) {
+						if (currentClass < CSDF) {
+							networkClass = new CSDFNetworkClass();
+							currentClass = CSDF;
+						}
+					}
 				}
 			}
 		}
-		return networkClass;
 
+		return networkClass;
 	}
 
 	@Override
 	public void transform(Network network) throws OrccException {
-		// will remove phi so the actor can be interpreted
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadVariableRemoval(), new PhiRemoval() };
-
-		for (Actor actor : network.getActors()) {
-			for (ActorTransformation transformation : transformations) {
-				transformation.transform(actor);
-			}
-
-			ActorClassifierIndependent classifier = new ActorClassifierIndependent();
-			IClass clasz = classifier.classify(actor);
-			actor.setActorClass(clasz);
-		}
-
 		network.setNetworkClass(getNetworkClass(network));
 	}
+
 }

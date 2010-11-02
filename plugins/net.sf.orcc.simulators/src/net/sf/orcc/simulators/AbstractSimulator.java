@@ -94,6 +94,7 @@ public abstract class AbstractSimulator implements Simulator {
 		public Object[] data;
 
 		public SimulatorEvent event;
+
 		public SimulatorMessage(SimulatorEvent event, Object[] data) {
 			this.event = event;
 			this.data = data;
@@ -172,17 +173,17 @@ public abstract class AbstractSimulator implements Simulator {
 	 * input XDF network file name
 	 */
 	protected String xdfFile;
-	
+
 	public AbstractSimulator() {
 		messageQueue = new LinkedList<SimulatorMessage>();
 		simuActorsMap = new HashMap<String, SimuActor>();
 	}
-	
+
 	@Override
 	final public void addPropertyChangeListener(PropertyChangeListener listener) {
 		propertyChange.addPropertyChangeListener(listener);
 	}
-	
+
 	/**
 	 * Clear a breakpoint related to one or several instances according to the
 	 * actor source file and the line number.
@@ -458,20 +459,15 @@ public abstract class AbstractSimulator implements Simulator {
 	 */
 	private DirectedGraph<Vertex, Connection> getGraphFromNetwork()
 			throws OrccException {
-		// Parses top network
-		Network network;
-		network = new XDFParser(xdfFile).parseNetwork();
+		Network network = new XDFParser(xdfFile).parseNetwork();
+
 		// Instantiate the network
 		network.instantiate(vtlFolder);
 		Network.clearActorPool();
+
 		// Flatten the hierarchical network
 		network.flatten();
-		// Try to merge some actors
-		if (merge) {
-			network.classifyActors();
-			network.normalizeActors();
-			network.mergeActors();
-		}
+
 		// Add broadcasts before connecting actors
 		new BroadcastAdder().transform(network);
 
@@ -629,7 +625,8 @@ public abstract class AbstractSimulator implements Simulator {
 							messageQueue.remove();
 							if (suspendNetwork() > 0) {
 								state = SimulatorState.SUSPENDED;
-								firePropertyChange("suspended client", null, null);
+								firePropertyChange("suspended client", null,
+										null);
 							}
 							break;
 						case SET_BREAKPOINT:
@@ -771,13 +768,13 @@ public abstract class AbstractSimulator implements Simulator {
 		try {
 			// Get configuration attributes
 			stimulusFile = configuration.getAttribute(INPUT_STIMULUS, "");
-			
+
 			String name = configuration.getAttribute(PROJECT, "");
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IProject project = root.getProject(name);
 
 			vtlFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
-			
+
 			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			xdfFile = configuration.getAttribute(XDF_FILE, "");
 		} catch (CoreException e) {

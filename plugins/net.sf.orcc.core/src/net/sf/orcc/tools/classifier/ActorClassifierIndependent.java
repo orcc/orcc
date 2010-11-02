@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.classes.CSDFActorClass;
 import net.sf.orcc.classes.DynamicActorClass;
@@ -41,6 +42,7 @@ import net.sf.orcc.classes.SDFActorClass;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
@@ -58,7 +60,7 @@ import org.jgrapht.traverse.DepthFirstIterator;
  * @author Matthieu Wipliez
  * 
  */
-public class ActorClassifierIndependent {
+public class ActorClassifierIndependent implements ActorTransformation {
 
 	private Actor actor;
 
@@ -73,12 +75,9 @@ public class ActorClassifierIndependent {
 	/**
 	 * Classifies the actor as dynamic, quasi-static, or static.
 	 * 
-	 * @param actor
-	 *            an actor
 	 * @return the class of the actor
 	 */
-	public IClass classify(Actor actor) {
-		this.actor = actor;
+	public void classify() {
 		// interpreter needs the analyzer
 		analyzer = new ConfigurationAnalyzer(actor);
 
@@ -87,7 +86,8 @@ public class ActorClassifierIndependent {
 		if (actions.isEmpty()) {
 			System.out.println("actor " + actor
 					+ " does not contain any actions, defaults to dynamic");
-			return new DynamicActorClass();
+			actor.setActorClass(new DynamicActorClass());
+			return;
 		}
 
 		// checks for actors with time-dependent behavior
@@ -96,7 +96,8 @@ public class ActorClassifierIndependent {
 		if (actor.isTimeDependent()) {
 			System.out.println("actor " + actor
 					+ " is time-dependent, defaults to dynamic");
-			return new DynamicActorClass();
+			actor.setActorClass(new DynamicActorClass());
+			return;
 		}
 
 		// first tries SDF with *all* the actions of the actor
@@ -137,7 +138,7 @@ public class ActorClassifierIndependent {
 			System.out.println("actor " + actor + " classified dynamic");
 		}
 
-		return clasz;
+		actor.setActorClass(clasz);
 	}
 
 	/**
@@ -424,6 +425,13 @@ public class ActorClassifierIndependent {
 	@Override
 	public String toString() {
 		return actor.toString();
+	}
+
+	@Override
+	public void transform(Actor actor) throws OrccException {
+		this.actor = actor;
+		classify();
+		actor = null;
 	}
 
 }

@@ -141,12 +141,12 @@ public class Network {
 	}
 
 	/**
-	 * Classifies all actors of this network.
+	 * Classifies this network.
 	 * 
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	public void classifyActors() throws OrccException {
+	public void classify() throws OrccException {
 		new NetworkClassifier().transform(this);
 	}
 

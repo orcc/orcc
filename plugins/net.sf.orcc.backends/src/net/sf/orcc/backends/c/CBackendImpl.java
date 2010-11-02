@@ -55,6 +55,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transforms.BroadcastAdder;
+import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
 
 /**
  * C back-end.
@@ -142,14 +143,20 @@ public class CBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new TypeSizeTransformation(),
-				new DeadGlobalElimination(), new DeadCodeElimination(),
+				new DeadGlobalElimination(), new DeadCodeElimination(),				
 				new DeadVariableRemoval(),
 				new RenameTransformation(this.transformations),
-				new PhiRemoval(), new MoveReadsWritesTransformation() };
+				new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
 		}
+		
+		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
+		if (classify) {
+			new ActorClassifierIndependent().transform(actor);
+		}
+		new MoveReadsWritesTransformation().transform(actor);
 
 		CTemplateData data = new CTemplateData();
 		data.computeTemplateMaps(actor);
@@ -167,8 +174,6 @@ public class CBackendImpl extends AbstractBackend {
 
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
-			network.classifyActors();
-
 			boolean normalize = getAttribute("net.sf.orcc.backends.normalize",
 					false);
 			if (normalize) {
