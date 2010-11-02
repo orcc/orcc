@@ -271,7 +271,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		}
 
 		if (type.isInt()) {
-			if (value.isIntExpr()) {
+			if (value != null && value.isIntExpr()) {
 				lo = ((IntExpr) value).getIntValue();
 				hi = lo;
 			} else {
@@ -280,7 +280,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				hi = (1 << (size - 1)) - 1;
 			}
 		} else if (type.isUint()) {
-			if (value.isIntExpr()) {
+			if (value != null && value.isIntExpr()) {
 				lo = ((IntExpr) value).getIntValue();
 				hi = lo;
 			} else {
@@ -289,7 +289,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				hi = 1 << size - 1;
 			}
 		} else if (type.isBool()) {
-			if (value.isBooleanExpr()) {
+			if (value != null && value.isBooleanExpr()) {
 				lo = ((BoolExpr) value).getValue() ? 1 : 0;
 				hi = lo;
 			} else {

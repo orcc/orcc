@@ -117,8 +117,9 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	@Override
 	public void visit(IfNode node) {
 		// Interpret first expression ("if" condition)
-		Object condition = node.getValue().accept(exprInterpreter);
-		
+		Expression condition = (Expression) node.getValue().accept(
+				exprInterpreter);
+
 		if (condition instanceof BoolExpr) {
 			if (((BoolExpr) condition).getValue()) {
 				for (CFGNode subNode : node.getThenNodes()) {
@@ -214,24 +215,28 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	@Override
 	public void visit(WhileNode node) {
 		// Interpret first expression ("while" condition)
-		Object condition = node.getValue().accept(exprInterpreter);
+		Expression condition = (Expression) node.getValue().accept(
+				exprInterpreter);
 
-		if (condition instanceof Boolean) {
-			while ((Boolean) condition) {
+		if (condition != null && condition.isBooleanExpr()) {
+			while (((BoolExpr) condition).getValue()) {
 				for (CFGNode subNode : node.getNodes()) {
 					subNode.accept(this);
 				}
 
 				// Interpret next value of "while" condition
-				condition = node.getValue().accept(exprInterpreter);
-				if (!(condition instanceof Boolean) && schedulableMode) {
-					// only throw exception in schedulable mode
-					throw new OrccRuntimeException("null condition");
+				condition = (Expression) node.getValue()
+						.accept(exprInterpreter);
+				if (schedulableMode
+						&& (condition == null || !condition.isBooleanExpr())) {
+					throw new OrccRuntimeException(
+							"Condition not boolean at line "
+									+ node.getLocation().getStartLine() + "\n");
 				}
 			}
 		} else if (schedulableMode) {
 			// only throw exception in schedulable mode
-			throw new OrccRuntimeException("null condition");
+			throw new OrccRuntimeException("condition is data-dependent");
 		}
 
 		node.getJoinNode().accept(this);
