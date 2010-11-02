@@ -365,20 +365,10 @@ $if(local.type.list)$
   <type name="List">
     <valuePar name="size" value="$local.type.size$"/>
     <typePar name="type">
-      $typeDefListElements(local.type.list.elementType)$
+      $typeDefListElements(local.type.elementType)$
     </typePar>
   </type>
 </typeDef>
-$if(local.instruction.write)$
-<typeDef name="$local$_output_typedef">
-  <type name="List">
-    <valuePar name="size" value="$local.type.size$"/>
-    <typePar name="type">
-      $typeDefListElements(local.type.list.elementType)$
-    </typePar>
-  </type>
-</typeDef>
-$endif$
 $endif$
 >>
 
@@ -391,8 +381,8 @@ $if(type.list)$
   </typePar>
 </type>
 $else
-$<type name="int">
-  <valuePar name="size" value="9"/>
+$<type name="$type$">
+  <valuePar name="size" value="$type.size$"/>
 </type>$
 endif$
 >>
