@@ -1,0 +1,149 @@
+///////////////////////////////////////////////////////////////////////////////
+// VHDL Top for the XLiM Hardware code generation
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Print Signals
+///////////////////////////////////////////////////////////////////////////////
+
+PrintSignals(network) ::= <<
+-- Input Port Signals
+$network.inputs.list: printInputPortsSignals(); separator="\n"$
+-- Output Port Signals
+$network.outputs.list: printOutputPortsSignals(); separator="\n"$
+-- Actors I/O Signals
+>>
+
+printInputPortsSignals(port) ::=<<
+$
+if(port.type.bool)
+$signal ni_$port.name$_DATA	: in  std_logic;$\n$$
+else
+$signal ni_$port.name$_DATA	: in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+endif
+$
+signal ni_$port.name$_SEND	: in  std_logic;
+signal ni_$port.name$_ACK	: out std_logic;
+signal ni_$port.name$_COUNT	: in  std_logic_vector(15 downto 0);
+signal ni_$port.name$_RDY	: out std_logic;
+
+$
+if(port.type.bool)
+$signal nif_$port.name$_DATA	: in  std_logic;$\n$$
+else
+$signal nif_$port.name$_DATA	: in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+endif
+$
+signal nif_$port.name$_SEND	: in  std_logic;
+signal nif_$port.name$_ACK	: out std_logic;
+signal nif_$port.name$_COUNT	: in  std_logic_vector(15 downto 0);
+signal nif_$port.name$_RDY	: out std_logic;$\n$
+>>
+
+printOutputPortsSignals(port) ::=<<
+$
+if(port.type.bool)
+$signal no_$port.name$_DATA	: out std_logic;$\n$$
+else
+$signal no_$port.name$_DATA	: out std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+endif
+$
+signal no_$port.name$_SEND	: out std_logic;
+signal no_$port.name$_ACK	: in  std_logic;
+signal no_$port.name$_COUNT	: out std_logic_vector(15 downto 0);
+signal no_$port.name$_RDY	: in  std_logic;$\n$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Print Top Network I/O
+///////////////////////////////////////////////////////////////////////////////
+
+printNetworkPorts(network) ::= <<
+$network.inputs.list: printNetPortsInput(); separator="\n"$
+$network.outputs.list: printNetPortsOutput(); separator="\n"$
+>>
+
+printNetPortsInput(port) ::= <<
+$
+if(port.type.bool)
+$$port.name$_DATA	: in  std_logic;$\n$$
+else
+$$port.name$_DATA	: in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+endif
+$
+$port.name$_SEND	: in  std_logic;
+$port.name$_ACK	: out std_logic;
+$port.name$_COUNT	: in  std_logic_vector(15 downto 0);
+$port.name$_RDY	: out std_logic;$\n$
+>>
+
+printNetPortsOutput(port) ::= <<
+$
+if(port.type.bool)
+$$port.name$_DATA	: out std_logic;$\n$$
+else
+$$port.name$_DATA	: out std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+endif
+$
+$port.name$_SEND	: out std_logic;
+$port.name$_ACK	: in  std_logic;
+$port.name$_COUNT	: out std_logic_vector(15 downto 0);
+$port.name$_RDY	: in  std_logic;
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Print Top Network
+///////////////////////////////////////////////////////////////////////////////
+
+network(debugFifos, fifoSize, network, options) ::= <<
+-- ----------------------------------------------------------------------------------
+-- Top level model for $network.name$
+-- ----------------------------------------------------------------------------------
+
+-- ----------------------------------------------------------------------------------
+--
+-- Clock domain report for network Test (1 clock domains detected)
+--    CLK
+--
+--  Clock domains for top-level network ports:
+--    pInA (Input) --> CLK
+--    pInB (Input) --> CLK
+--    pOutA (Output) --> CLK
+--
+--  Clock domains for all actor instances:
+--    ActorA_0 (ActorA) --> CLK
+--
+-- ----------------------------------------------------------------------------------
+
+library ieee, SystemBuilder;
+use ieee.std_logic_1164.all;
+
+-- ----------------------------------------------------------------------------------
+-- Entity Declaration
+-- ----------------------------------------------------------------------------------
+
+entity $network.name$ is
+port(
+	$printNetworkPorts(network)$
+	
+	CLK: in std_logic;
+	RESET: in std_logic);
+end entity $network.name$;
+
+-- ----------------------------------------------------------------------------------
+-- Architecture Declaration
+-- ----------------------------------------------------------------------------------
+
+architecture rtl of $network.name$ is
+	
+	-- Clock and Reset signal
+	signal clocks, resets: std_logic_vector(0 downto 0);
+	
+	$PrintSignals(network)$
+	
+end architecture rtl;
+
+-- ----------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------------
+>>

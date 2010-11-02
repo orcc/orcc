@@ -51,11 +51,14 @@ import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
+
 /**
  * This class defines a template-based XLIM back-end.
  * 
  * @author Ghislain Roquier
  * @author Herve Yviquel
+ * @author Mickael Raulet
+ * @author Endri Bezati
  * 
  */
 public class XlimBackendImpl extends AbstractBackend {
@@ -69,7 +72,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private STPrinter printer;
-
+	
+	private boolean hardwareGen;
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = {
@@ -98,7 +102,8 @@ public class XlimBackendImpl extends AbstractBackend {
 		network.flatten();
 		
 		// check if "XLiM Hardware Generation" is selected
-		boolean hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", false);
+		
+		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", false);
 		
 		printer = new STPrinter();
 		
@@ -113,6 +118,10 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		transformActors(network.getActors());
 		printInstances(network);
+
+		// print network
+		write("Printing network...\n");
+		printNetwork(network);
 	}
 
 	@Override
@@ -123,6 +132,20 @@ public class XlimBackendImpl extends AbstractBackend {
 			printer.printInstance(outputName, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
+		}
+	}
+	
+	private void printNetwork(Network network) throws OrccException {
+		if (hardwareGen){
+			try {
+				String outputName = path + File.separator + network.getName()
+						+ ".vhd";
+				printer.loadGroups("XLIM_VHDL_network");
+				printer.printNetwork(outputName, network, false, fifoSize);
+	
+			} catch (IOException e) {
+				throw new OrccException("I/O error", e);
+			}
 		}
 	}
 
