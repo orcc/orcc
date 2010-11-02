@@ -26,6 +26,7 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) RefIdxl0,
 	uint(size=4) RefIdxL0,
 	uint(size=4) RefIdxl1,
+	uint(size=4) RefIdxL1,
 	uint(size=3) SelectList,
 	int(size=16) MvResl0,
 	uint(size=5) MbPartHeight,
@@ -330,7 +331,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			end
 			subMbPartIdx := subMbPartIdx +1;
 		end
-
+//Delete me!!
 	ReadMvdl0Done.Skip: action
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
@@ -351,7 +352,26 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			subMbPartIdx := subMbPartIdx +1;
 		end
 
-	ReadMvdl1Done: action
+	ReadMvdl1Done.Launch: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+			RefIdxl1 :[ref_idx_l1[mbPartIdx-1]],
+			RefIdxL1 :[ref_idx_l1[mbPartIdx-1]]
+		guard
+			mb_type >= BLOCK_TYPE_B_MIN,
+			mb_type <= BLOCK_TYPE_B_MAX,
+			sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8,
+			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L0,
+			subMbPartIdx < subMbPartIdxMax
+		do
+			if(DEBUG_MV)then
+				println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
+				println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
+			end
+			subMbPartIdx := subMbPartIdx +1;
+		end
+//Delete me!!
+	ReadMvdl1Done.Skip: action
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
 			RefIdxl1 :[ref_idx_l1[mbPartIdx-1]]
@@ -415,13 +435,15 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 		SendEndSubMbPred   (SendEndSubMbPred    )--> ReadSubMbTypeAsked;
 	end
 	priority
-		AskRefIdxL0.Launch > AskRefIdxLX.Skip;
-		AskRefIdxLX.Skip   > SendOrReadDone;
-		AskRefIdxL1.Launch > AskRefIdxLX.Skip;
-		CheckmbPartIdx     > SendOrReadDone;
-		ReadMvdl0Asked     > CheckmbPartIdx;
-		ReadMvdl1Asked     > CheckmbPartIdx;
-		ReadMvdl0Done      > CheckmbPartIdx;
-		ReadMvdl1Done      > CheckmbPartIdx;
+		AskRefIdxL0.Launch   > AskRefIdxLX.Skip;
+		AskRefIdxLX.Skip     > SendOrReadDone;
+		AskRefIdxL1.Launch   > AskRefIdxLX.Skip;
+		CheckmbPartIdx       > SendOrReadDone;
+		ReadMvdl0Asked       > CheckmbPartIdx;
+		ReadMvdl1Asked       > CheckmbPartIdx;
+		ReadMvdl0Done        > CheckmbPartIdx;
+		ReadMvdl1Done        > CheckmbPartIdx;
+		ReadMvdl1Done.Launch > ReadMvdl1Done.Skip;
+		ReadMvdl0Done.Launch > ReadMvdl0Done.Skip;
 	end
 end

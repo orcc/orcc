@@ -25,6 +25,7 @@ actor Algo_DecodeMbPred()
 
 	uint(size=4)  RefIdxl0,
 	uint(size=4)  RefIdxL0,
+	uint(size=4)  RefIdxl1,
 	uint(size=4)  RefIdxL1,
 	uint(size=3)  SelectList,
 	uint(size=5)  MbPartHeight,
@@ -630,7 +631,7 @@ actor Algo_DecodeMbPred()
 			end
 			mbPartIdx := mbPartIdx + 1;
 		end
-
+//Delete me!!
 	ReadRefIdxL0.DoneSkip: action
 			ValVLD   :[val_ref_idx]
 				==>
@@ -653,9 +654,27 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxL1.Done: action
 			ValVLD :[val_ref_idx]
 				==>
+			RefIdxl1 :[val_ref_idx],
 			RefIdxL1 :[val_ref_idx]
 		guard
-			mbPartIdx < mbPartIdxMax
+			mbPartIdx < mbPartIdxMax,
+			    IS_MbPred_L1(mb_type,mbPartIdx),
+			not IS_MbPred_NA(mb_type,mbPartIdx)
+		do
+			if(DEBUG_MV)then
+				println("ReadRefIdxL1["+mbPartIdx+"] : "+val_ref_idx);
+			end
+			mbPartIdx := mbPartIdx + 1;
+		end
+//Delete me!!
+	ReadRefIdxL1.DoneSkip: action
+			ValVLD   :[val_ref_idx]
+				==>
+			RefIdxl1     :[val_ref_idx]
+		guard
+			mbPartIdx < mbPartIdxMax,
+			   not IS_MbPred_L1(mb_type,mbPartIdx)
+			or IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadRefIdxL1["+mbPartIdx+"] : "+val_ref_idx);
@@ -748,6 +767,7 @@ actor Algo_DecodeMbPred()
 		ReadRefIdxL0Done ( SendOrReadDone)--> ReadRefIdxL1Done;
 
 		ReadRefIdxL1Done ( ReadRefIdxL1.Done)--> ReadRefIdxL1Done;
+		ReadRefIdxL1Done ( ReadRefIdxL1.DoneSkip)--> ReadRefIdxL1Done;
 		ReadRefIdxL1Done ( SendOrReadDone)--> ReadMvdL0Done;
 
 		ReadMvdL0Done (ReadMvdL0.Done)--> ReadMvdL0Done;
@@ -774,6 +794,7 @@ actor Algo_DecodeMbPred()
 		ReadRefIdxL0.DoneSkip              > SendOrReadDone;
 		ReadRefIdxL0.Done                  > SendOrReadDone;
 		ReadRefIdxL1.Done                  > SendOrReadDone;
+		ReadRefIdxL1.DoneSkip              > SendOrReadDone;
 		ReadMvdL0.Done                     > SendOrReadDone;
 		ReadMvdL1.Done                     > SendOrReadDone;
 	end

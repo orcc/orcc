@@ -55,9 +55,10 @@
       <vertex id="RefIdx_l1" x="2617" y="1786"/>
       <vertex id="SelectList" x="2616" y="1855"/>
       <vertex id="slice_type" x="2600" y="1927"/>
-      <vertex id="MbPredRefIdxL0" x="2018" y="1550"/>
+      <vertex id="MbPredRefIdxL0" x="2012" y="1528"/>
       <vertex id="SubMbPredRefIdxL0" x="1967" y="1693"/>
       <vertex id="SubMbType" x="1980" y="1977"/>
+      <vertex id="MbType4Pred" x="2598" y="1434"/>
       <vertex id="Mgnt_DecodePic" x="1515" y="-132"/>
       <vertex id="DecodeSliceHeader" x="329" y="460"/>
       <vertex id="DecodeRefPicList" x="950" y="644"/>
@@ -70,6 +71,7 @@
       <vertex id="DecodeSubMbPred" x="1742" y="1736"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="2238" y="1461"/>
       <vertex id="GenerateSkipBlockInformation" x="2299" y="1210"/>
-      <vertex id="MbType4Pred" x="2598" y="1434"/>
+      <vertex id="MbPredRefIdxL1" x="2025" y="1567"/>
+      <vertex id="SubMbPredRefIdxL1" x="1986" y="1899"/>
    </vertices>
 </layout>

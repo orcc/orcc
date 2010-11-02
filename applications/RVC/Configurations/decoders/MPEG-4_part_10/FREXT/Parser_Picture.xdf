@@ -388,6 +388,20 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="MbPredRefIdxL1">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SubMbPredRefIdxL1">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -719,8 +733,6 @@
     <Connection dst="" dst-port="RefIdx_l1"
         src="MergeDataFromSDataAndMbLayer" src-port="RefIdxl1"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="MbPredRefIdxL1" src="DecodeMbPred" src-port="RefIdxL1"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="SubMbPredSelectList" src="DecodeSubMbPred" src-port="SelectList"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredSelectList" src="DecodeMbPred" src-port="SelectList"/>
@@ -760,4 +772,9 @@
         src="" src-port="SpsParam4SliceData"/>
     <Connection dst="" dst-port="MbType4Pred"
         src="MergeDataFromSDataAndMbLayer" src-port="MBType4Pred"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer"
+        dst-port="MbPredRefIdxL1" src="DecodeMbPred" src-port="RefIdxl1"/>
+    <Connection dst="" dst-port="MbPredRefIdxL1" src="DecodeMbPred" src-port="RefIdxL1"/>
+    <Connection dst="" dst-port="SubMbPredRefIdxL1"
+        src="DecodeSubMbPred" src-port="RefIdxL1"/>
 </XDF>

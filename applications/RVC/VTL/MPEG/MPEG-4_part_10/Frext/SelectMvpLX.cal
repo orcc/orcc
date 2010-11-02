@@ -55,10 +55,15 @@ actor SelectMvpLX()
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 	int (size=16) MvpL0,
-	uint(size=3)  RefIdxL0
+	uint(size=11) LocationL0,
+	uint(size=3)  RefIdxL0,
+	int (size=16) MvpL1,
+	uint(size=3)  RefIdxL1,
+	uint(size=11) LocationL1
 		==>
 	int (size=16) MvOut,
-	uint(size=3)  RefIdxOut
+	uint(size=3)  RefIdxOut,
+	uint(size=11) Location
 
 		:
 
@@ -191,11 +196,13 @@ actor SelectMvpLX()
 		end
 
 	MacroBlkType.IsPredL0: action
-			MvpL0:[Mvx, Mvy],
-			RefIdxL0 :[ref_idx]
+			MvpL0      :[Mvx, Mvy],
+			RefIdxL0   :[ref_idx],
+			LocationL0 :[Mbx_in_pix,Mby_in_pix]
 				==>
-			MvOut:[Mvx, Mvy],
-			RefIdxOut :[ref_idx]
+			MvOut     :[Mvx, Mvy],
+			RefIdxOut :[ref_idx],
+			Location  :[Mbx_in_pix,Mby_in_pix]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
@@ -206,9 +213,13 @@ actor SelectMvpLX()
 		end
 
 	MacroBlkType.IsPredL1: action
+			MvpL1      :[Mvx,Mvy],
+			RefIdxL1   :[ref_idx],
+			LocationL1 :[Mbx_in_pix,Mby_in_pix]
 				==>
-MvOut:[0, 0],
-RefIdxOut :[0]
+			MvOut     :[Mvx,Mvy],
+			RefIdxOut :[ref_idx],
+			Location  :[Mbx_in_pix,Mby_in_pix]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
@@ -228,6 +239,8 @@ RefIdxOut :[0]
 			IsPredL0[MbPartIdx&1],
 			IsPredL1[MbPartIdx&1]
 		do
+			println("MacroBlkType.IsBiPred");
+			while true do end
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -251,11 +264,13 @@ RefIdxOut :[0]
 		end
 
 	SubMacroBlkType.IsPredL0: action
-			MvpL0:[Mvx, Mvy],
-			RefIdxL0 :[ref_idx]
+			MvpL0      :[Mvx, Mvy],
+			RefIdxL0   :[ref_idx],
+			LocationL0 :[Mbx_in_pix,Mby_in_pix]
 				==>
-			MvOut:[Mvx, Mvy],
-			RefIdxOut :[ref_idx]
+			MvOut     :[Mvx, Mvy],
+			RefIdxOut :[ref_idx],
+			Location  :[Mbx_in_pix,Mby_in_pix]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsSubPredL0,
@@ -265,9 +280,13 @@ RefIdxOut :[0]
 		end
 
 	SubMacroBlkType.IsPredL1: action
+			MvpL1      :[Mvx, Mvy],
+			RefIdxL1   :[ref_idx],
+			LocationL1 :[Mbx_in_pix,Mby_in_pix]
 				==>
-MvOut:[0, 0],
-RefIdxOut :[0]
+			MvOut     :[Mvx, Mvy],
+			RefIdxOut :[ref_idx],
+			Location  :[Mbx_in_pix,Mby_in_pix]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			not IsSubPredL0,
@@ -285,6 +304,8 @@ RefIdxOut :[0]
 			IsSubPredL0,
 			IsSubPredL1
 		do
+			println("SubMacroBlkType.IsBiPred");
+			while true do end
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 

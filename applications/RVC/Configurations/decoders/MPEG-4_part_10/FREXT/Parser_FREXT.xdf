@@ -668,4 +668,8 @@
     <Connection dst="" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
     <Connection dst="MVReconstruct" dst-port="MbType4Prediction"
         src="DecodePic" src-port="MbType4Pred"/>
+    <Connection dst="MVReconstruct" dst-port="MbPredRefIdxL1"
+        src="DecodePic" src-port="MbPredRefIdxL1"/>
+    <Connection dst="MVReconstruct" dst-port="SubMbPredRefIdxL1"
+        src="DecodePic" src-port="SubMbPredRefIdxL1"/>
 </XDF>
