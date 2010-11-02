@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.classes.CSDFActorClass;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -65,6 +64,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.tools.transforms.RemoveReadWrites;
 import net.sf.orcc.util.OrderedMap;
 
@@ -174,7 +174,7 @@ public class StaticActorNormalizer {
 
 	private OrderedMap<String, StateVariable> stateVars;
 
-	private CSDFActorClass staticCls;
+	private CSDFMoC staticCls;
 
 	private OrderedMap<String, Variable> variables;
 
@@ -183,7 +183,7 @@ public class StaticActorNormalizer {
 	 */
 	public StaticActorNormalizer(Actor actor) {
 		this.actor = actor;
-		staticCls = (CSDFActorClass) actor.getActorClass();
+		staticCls = (CSDFMoC) actor.getMoC();
 		stateVars = actor.getStateVars();
 	}
 

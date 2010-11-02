@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.classes;
+package net.sf.orcc.moc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ import net.sf.orcc.ir.Port;
  * @author Matthieu Wipliez
  * 
  */
-public class CSDFActorClass extends AbstractActorClass implements StaticClass {
+public class CSDFMoC extends AbstractMoC {
 
 	/**
 	 * a list of actions that can be scheduled statically.
@@ -59,7 +59,7 @@ public class CSDFActorClass extends AbstractActorClass implements StaticClass {
 	/**
 	 * Creates a new static class.
 	 */
-	public CSDFActorClass() {
+	public CSDFMoC() {
 		actions = new ArrayList<Action>();
 		inputPattern = new Pattern();
 		outputPattern = new Pattern();

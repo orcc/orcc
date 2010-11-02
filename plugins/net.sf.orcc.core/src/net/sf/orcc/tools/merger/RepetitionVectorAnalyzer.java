@@ -34,7 +34,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.classes.StaticClass;
+import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Vertex;
@@ -76,7 +76,7 @@ public class RepetitionVectorAnalyzer {
 			throw new OrccException("class" + instance.getClasz()
 					+ "is not static!");
 		}
-		StaticClass SdfActor = (StaticClass) instance.getContentClass();
+		SDFMoC SdfActor = (SDFMoC) instance.getContentClass();
 
 		rationals.put(vertex, rate);
 
@@ -189,9 +189,8 @@ public class RepetitionVectorAnalyzer {
 		return repetitionVector;
 	}
 
-	private StaticClass getStaticClass(Vertex vertex) {
-		StaticClass staticClass = (StaticClass) vertex.getInstance()
-				.getContentClass();
+	private SDFMoC getStaticClass(Vertex vertex) {
+		SDFMoC staticClass = (SDFMoC) vertex.getInstance().getContentClass();
 		return staticClass;
 	}
 

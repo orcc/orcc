@@ -38,10 +38,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.classes.IClass;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.serialize.IRParser;
+import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IAttributeContainer;
 
@@ -275,13 +275,13 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 * 
 	 * @return the classification class of this instance
 	 */
-	public IClass getContentClass() {
-		IClass clasz = null;
+	public MoC getContentClass() {
+		MoC clasz = null;
 
 		if (isActor()) {
-			clasz = actor.getActorClass();
+			clasz = actor.getMoC();
 		} else {
-			clasz = network.getNetworkClass();
+			clasz = network.getMoC();
 		}
 
 		return clasz;

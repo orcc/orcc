@@ -26,26 +26,42 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.classes;
+package net.sf.orcc.moc;
 
 /**
- * This class defines the SDF class. A SDF network has fixed
- * production/consumption rates.
+ * This class defines a Model of Computation.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class SDFNetworkClass extends CSDFNetworkClass {
+public interface MoC {
 
 	/**
-	 * Creates a new SDF class.
+	 * Returns true if this MoC is CSDF.
+	 * 
+	 * @return true if this MoC is CSDF
 	 */
-	public SDFNetworkClass() {
-		numberOfPhases = 1;
-	}
+	public boolean isCSDF();
 
-	public boolean isSDF() {
-		return true;
-	}
+	/**
+	 * Returns true if this MoC is dynamic.
+	 * 
+	 * @return true if this MoC is dynamic
+	 */
+	public boolean isDynamic();
+
+	/**
+	 * Returns true if this MoC is quasi-static.
+	 * 
+	 * @return true if this MoC is quasi-static
+	 */
+	public boolean isQuasiStatic();
+
+	/**
+	 * Returns true if this MoC is SDF.
+	 * 
+	 * @return true if this MoC is SDF
+	 */
+	public boolean isSDF();
 
 }

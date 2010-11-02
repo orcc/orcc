@@ -30,7 +30,7 @@ package net.sf.orcc.ir;
 
 import java.util.List;
 
-import net.sf.orcc.classes.IClass;
+import net.sf.orcc.moc.MoC;
 import net.sf.orcc.util.OrderedMap;
 
 /**
@@ -49,11 +49,6 @@ public class Actor {
 	private ActionScheduler actionScheduler;
 
 	/**
-	 * the class of this actor. Initialized to unknown.
-	 */
-	private IClass actorClass;
-
-	/**
 	 * The RVC-CAL file this actor was defined in.
 	 */
 	private String file;
@@ -61,6 +56,11 @@ public class Actor {
 	private List<Action> initializes;
 
 	private OrderedMap<String, Port> inputs;
+
+	/**
+	 * the class of this actor. Initialized to unknown.
+	 */
+	private MoC moc;
 
 	private String name;
 
@@ -143,15 +143,6 @@ public class Actor {
 	}
 
 	/**
-	 * Returns the class of this actor.
-	 * 
-	 * @return an actor class
-	 */
-	public IClass getActorClass() {
-		return actorClass;
-	}
-
-	/**
 	 * Returns the RVC-CAL file this actor was declared in.
 	 * 
 	 * @return the RVC-CAL file this actor was declared in
@@ -187,6 +178,15 @@ public class Actor {
 	 */
 	public OrderedMap<String, Port> getInputs() {
 		return inputs;
+	}
+
+	/**
+	 * Returns the MoC of this actor.
+	 * 
+	 * @return an MoC
+	 */
+	public MoC getMoC() {
+		return moc;
 	}
 
 	/**
@@ -297,13 +297,13 @@ public class Actor {
 	}
 
 	/**
-	 * Sets the class of this actor.
+	 * Sets the MoC of this actor.
 	 * 
-	 * @param actorClass
-	 *            an actor class
+	 * @param moc
+	 *            an MoC
 	 */
-	public void setActorClass(IClass actorClass) {
-		this.actorClass = actorClass;
+	public void setMoC(MoC moc) {
+		this.moc = moc;
 	}
 
 	/**

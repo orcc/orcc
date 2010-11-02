@@ -38,9 +38,9 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.classes.IClass;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -137,7 +137,7 @@ public class StaticSubsetDetector {
 			if (scc.size() > 1) {
 				if (scc.remove(clusterVertex)) {
 					for (Vertex v : scc) {
-						IClass clasz = v.getInstance().getContentClass();
+						MoC clasz = v.getInstance().getContentClass();
 						if (!clasz.isSDF()) {
 							ret = false;
 						}
@@ -161,7 +161,7 @@ public class StaticSubsetDetector {
 
 		while (!stack.isEmpty()) {
 			Vertex v = stack.pop();
-			IClass clasz = v.getInstance().getContentClass();
+			MoC clasz = v.getInstance().getContentClass();
 			if (clasz.isSDF()) {
 				if (!discovered.contains(v)) {
 					discovered.add(v);
@@ -211,7 +211,7 @@ public class StaticSubsetDetector {
 		Iterator<Vertex> it = orderedVertices.iterator();
 		while (it.hasNext()) {
 			Vertex vertex = it.next();
-			IClass clasz = vertex.getInstance().getContentClass();
+			MoC clasz = vertex.getInstance().getContentClass();
 			if (!discovered.contains(vertex) && clasz.isSDF()) {
 				List<Vertex> set = new LinkedList<Vertex>();
 				staticRegionList.add(set);

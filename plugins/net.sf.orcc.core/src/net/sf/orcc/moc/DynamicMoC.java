@@ -26,33 +26,26 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.classes;
+package net.sf.orcc.moc;
 
 /**
- * This class defines the class of an actor.
+ * This class defines the dynamic class. A dynamic actor has data-dependent (and
+ * possibly state-dependent) production/consumption rates.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractActorClass implements IClass {
+public class DynamicMoC extends AbstractMoC {
 
-	@Override
-	public boolean isCSDF() {
-		return false;
+	/**
+	 * Creates a new dynamic class.
+	 */
+	public DynamicMoC() {
 	}
 
 	@Override
 	public boolean isDynamic() {
-		return false;
+		return true;
 	}
 
-	@Override
-	public boolean isQuasiStatic() {
-		return false;
-	}
-
-	@Override
-	public boolean isSDF() {
-		return false;
-	}
 }

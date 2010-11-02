@@ -29,10 +29,10 @@
 package net.sf.orcc.network.transforms;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.classes.CSDFNetworkClass;
-import net.sf.orcc.classes.DynamicNetworkClass;
-import net.sf.orcc.classes.IClass;
-import net.sf.orcc.classes.SDFNetworkClass;
+import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.DynamicMoC;
+import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.tools.classifier.ActorClassifierIndependent;
@@ -52,23 +52,23 @@ public class NetworkClassifier implements INetworkTransformation {
 
 	private static int SDF = 0;
 
-	private IClass getNetworkClass(Network network) {
-		IClass networkClass = new SDFNetworkClass();
+	private MoC getMoC(Network network) {
+		MoC moc = new SDFMoC();
 
 		int currentClass = SDF;
 
 		for (Instance instance : network.getInstances()) {
 			if (instance.isActor()) {
-				IClass clasz = instance.getActor().getActorClass();
+				MoC clasz = instance.getActor().getMoC();
 				if (clasz != null) {
 					if (clasz.isDynamic() || clasz.isQuasiStatic()) {
 						if (currentClass < DYNAMIC) {
-							networkClass = new DynamicNetworkClass();
+							moc = new DynamicMoC();
 							currentClass = DYNAMIC;
 						}
 					} else if (clasz.isCSDF()) {
 						if (currentClass < CSDF) {
-							networkClass = new CSDFNetworkClass();
+							moc = new CSDFMoC();
 							currentClass = CSDF;
 						}
 					}
@@ -76,12 +76,12 @@ public class NetworkClassifier implements INetworkTransformation {
 			}
 		}
 
-		return networkClass;
+		return moc;
 	}
 
 	@Override
 	public void transform(Network network) throws OrccException {
-		network.setNetworkClass(getNetworkClass(network));
+		network.setMoC(getMoC(network));
 	}
 
 }

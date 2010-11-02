@@ -26,26 +26,33 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.classes;
-
-import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
+package net.sf.orcc.moc;
 
 /**
- * This class defines the interfaces of a static class.
+ * This class defines the class of an actor.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface StaticClass extends IClass {
+public abstract class AbstractMoC implements MoC {
 
-	public Pattern getInputPattern();
+	@Override
+	public boolean isCSDF() {
+		return false;
+	}
 
-	public int getNumberOfPhases();
+	@Override
+	public boolean isDynamic() {
+		return false;
+	}
 
-	public int getNumTokensConsumed(Port port);
+	@Override
+	public boolean isQuasiStatic() {
+		return false;
+	}
 
-	public int getNumTokensProduced(Port port);
-
-	public Pattern getOutputPattern();
+	@Override
+	public boolean isSDF() {
+		return false;
+	}
 }

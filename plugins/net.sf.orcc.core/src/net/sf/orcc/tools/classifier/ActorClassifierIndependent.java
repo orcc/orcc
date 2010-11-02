@@ -34,11 +34,6 @@ import java.util.Set;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
-import net.sf.orcc.classes.CSDFActorClass;
-import net.sf.orcc.classes.DynamicActorClass;
-import net.sf.orcc.classes.IClass;
-import net.sf.orcc.classes.QuasiStaticClass;
-import net.sf.orcc.classes.SDFActorClass;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -47,6 +42,11 @@ import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.DynamicMoC;
+import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.QuasiStaticClass;
+import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -86,7 +86,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 		if (actions.isEmpty()) {
 			System.out.println("actor " + actor
 					+ " does not contain any actions, defaults to dynamic");
-			actor.setActorClass(new DynamicActorClass());
+			actor.setMoC(new DynamicMoC());
 			return;
 		}
 
@@ -96,12 +96,12 @@ public class ActorClassifierIndependent implements ActorTransformation {
 		if (actor.isTimeDependent()) {
 			System.out.println("actor " + actor
 					+ " is time-dependent, defaults to dynamic");
-			actor.setActorClass(new DynamicActorClass());
+			actor.setMoC(new DynamicMoC());
 			return;
 		}
 
 		// first tries SDF with *all* the actions of the actor
-		IClass clasz = classifySDF(actions);
+		MoC clasz = classifySDF(actions);
 		if (!clasz.isSDF()) {
 			ActionScheduler sched = actor.getActionScheduler();
 			try {
@@ -125,12 +125,12 @@ public class ActorClassifierIndependent implements ActorTransformation {
 
 		if (clasz.isSDF()) {
 			// print port token rates
-			SDFActorClass staticClass = (SDFActorClass) clasz;
+			SDFMoC staticClass = (SDFMoC) clasz;
 			staticClass.printTokenConsumption();
 			staticClass.printTokenProduction();
 			System.out.println();
 		} else if (clasz.isCSDF()) {
-			CSDFActorClass csdfClass = (CSDFActorClass) clasz;
+			CSDFMoC csdfClass = (CSDFMoC) clasz;
 			csdfClass.printTokenConsumption();
 			csdfClass.printTokenProduction();
 			System.out.println();
@@ -138,7 +138,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 			System.out.println("actor " + actor + " classified dynamic");
 		}
 
-		actor.setActorClass(clasz);
+		actor.setMoC(clasz);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 	 *            a list of actions
 	 * @return an actor class
 	 */
-	private IClass classifyCSDF(ActionScheduler sched) {
+	private MoC classifyCSDF(ActionScheduler sched) {
 		// new interpreter must be called before creation of ActorState
 		AbstractInterpretedActor interpretedActor = newInterpreter();
 
@@ -165,11 +165,11 @@ public class ActorClassifierIndependent implements ActorTransformation {
 			}
 
 			// no state, no cyclo-static FSM => dynamic
-			return new DynamicActorClass();
+			return new DynamicMoC();
 		}
 
 		// schedule the actor
-		CSDFActorClass staticClass = new CSDFActorClass();
+		CSDFMoC staticClass = new CSDFMoC();
 		int scheduled;
 		int nbPhases = 0;
 		if (fsm == null) {
@@ -210,10 +210,10 @@ public class ActorClassifierIndependent implements ActorTransformation {
 	 * 
 	 * @return an actor class
 	 */
-	private IClass classifyCSDFStateless(FSM fsm,
+	private MoC classifyCSDFStateless(FSM fsm,
 			AbstractInterpretedActor interpretedActor) {
 		// schedule the actor
-		CSDFActorClass staticClass = new CSDFActorClass();
+		CSDFMoC staticClass = new CSDFMoC();
 		String initialState = fsm.getInitialState().getName();
 
 		int nbPhases = 0;
@@ -244,9 +244,9 @@ public class ActorClassifierIndependent implements ActorTransformation {
 	 *            the action to use for configuring the FSM
 	 * @return a static class
 	 */
-	private SDFActorClass classifyFsmConfiguration(String initialState,
+	private SDFMoC classifyFsmConfiguration(String initialState,
 			Action action) {
-		SDFActorClass staticClass = new SDFActorClass();
+		SDFMoC staticClass = new SDFMoC();
 
 		AbstractInterpretedActor interpretedActor = newInterpreter();
 		interpretedActor.setAction(action);
@@ -275,7 +275,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 	 * 
 	 * @return an actor class
 	 */
-	private IClass classifyQSDF() {
+	private MoC classifyQSDF() {
 		ActionScheduler sched = actor.getActionScheduler();
 		FSM fsm = sched.getFsm();
 		if (isQuasiStaticFsm(fsm)) {
@@ -291,7 +291,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 
 			for (NextStateInfo info : fsm.getTransitions(initialState)) {
 				Action action = info.getAction();
-				SDFActorClass staticClass = classifyFsmConfiguration(
+				SDFMoC staticClass = classifyFsmConfiguration(
 						initialState, action);
 				quasiStatic.addConfiguration(action, staticClass);
 			}
@@ -300,7 +300,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 		} else {
 			System.out.println(actor.getName()
 					+ " has an FSM that is NOT compatible with quasi-static");
-			return new DynamicActorClass();
+			return new DynamicMoC();
 		}
 	}
 
@@ -312,7 +312,7 @@ public class ActorClassifierIndependent implements ActorTransformation {
 	 *            a list of actions sorted by descending priority
 	 * @return an actor class
 	 */
-	private IClass classifySDF(List<Action> actions) {
+	private MoC classifySDF(List<Action> actions) {
 		Iterator<Action> it = actions.iterator();
 		if (it.hasNext()) {
 			Action action = it.next();
@@ -323,18 +323,18 @@ public class ActorClassifierIndependent implements ActorTransformation {
 				if ((input.equals(action.getInputPattern()) && output
 						.equals(action.getOutputPattern())) == false) {
 					// one pattern is not equal to another
-					return new DynamicActorClass();
+					return new DynamicMoC();
 				}
 			}
 		} else {
 			// an empty actor is considered dynamic
 			// because the only actors with no actions are system actors
 			// such as source and display
-			return new DynamicActorClass();
+			return new DynamicMoC();
 		}
 
 		// schedule
-		SDFActorClass staticClass = new SDFActorClass();
+		SDFMoC staticClass = new SDFMoC();
 		AbstractInterpretedActor interpretedActor = newInterpreter();
 		interpretedActor.schedule();
 		staticClass.addAction(interpretedActor.getScheduledAction());

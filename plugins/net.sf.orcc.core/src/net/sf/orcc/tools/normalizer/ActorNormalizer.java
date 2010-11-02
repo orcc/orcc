@@ -29,8 +29,8 @@
 package net.sf.orcc.tools.normalizer;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.classes.IClass;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transforms.INetworkTransformation;
 
@@ -52,7 +52,7 @@ public class ActorNormalizer implements INetworkTransformation {
 	@Override
 	public void transform(Network network) throws OrccException {
 		for (Actor actor : network.getActors()) {
-			IClass clasz = actor.getActorClass();
+			MoC clasz = actor.getMoC();
 			if (clasz.isCSDF()) {
 				new StaticActorNormalizer(actor).normalize();
 			}

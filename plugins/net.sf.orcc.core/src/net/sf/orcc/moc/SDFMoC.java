@@ -26,33 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.classes;
+package net.sf.orcc.moc;
 
 /**
- * This class defines the class of a network.
+ * This class defines the static class. A static actor has fixed
+ * production/consumption rates.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public abstract class AbstractNetworkClass implements IClass {
+public class SDFMoC extends CSDFMoC {
 
-	@Override
-	public boolean isCSDF() {
-		return false;
+	/**
+	 * Creates a new SDF class.
+	 */
+	public SDFMoC() {
+		numberOfPhases = 1;
 	}
 
-	@Override
-	public boolean isDynamic() {
-		return false;
-	}
-
-	@Override
-	public boolean isQuasiStatic() {
-		return false;
-	}
-
-	@Override
 	public boolean isSDF() {
-		return false;
+		return true;
 	}
 }

@@ -38,10 +38,10 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.classes.IClass;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.transforms.Instantiator;
 import net.sf.orcc.network.transforms.NetworkClassifier;
 import net.sf.orcc.network.transforms.NetworkFlattener;
@@ -106,12 +106,12 @@ public class Network {
 
 	private OrderedMap<String, Port> inputs;
 
-	private String name;
-
 	/**
 	 * the class of this network. Initialized to unknown.
 	 */
-	private IClass networkClass;
+	private MoC moc;
+
+	private String name;
 
 	private Map<Instance, List<Connection>> outgoingMap;
 
@@ -355,6 +355,10 @@ public class Network {
 		return instances;
 	}
 
+	public MoC getMoC() {
+		return moc;
+	}
+
 	/**
 	 * Returns the name of this network
 	 * 
@@ -362,10 +366,6 @@ public class Network {
 	 */
 	public String getName() {
 		return name;
-	}
-
-	public IClass getNetworkClass() {
-		return networkClass;
 	}
 
 	/**
@@ -519,6 +519,16 @@ public class Network {
 	}
 
 	/**
+	 * Sets the MoC of this network.
+	 * 
+	 * @param moc
+	 *            the new MoC of this network
+	 */
+	public void setMoC(MoC moc) {
+		this.moc = moc;
+	}
+
+	/**
 	 * Sets the name of this network
 	 * 
 	 * @param name
@@ -526,10 +536,6 @@ public class Network {
 	 */
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public void setNetworkClass(IClass networkClass) {
-		this.networkClass = networkClass;
 	}
 
 	@Override

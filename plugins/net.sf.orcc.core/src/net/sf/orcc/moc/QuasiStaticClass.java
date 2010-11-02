@@ -26,25 +26,70 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.classes;
+package net.sf.orcc.moc;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import net.sf.orcc.ir.Action;
 
 /**
- * This class defines the dynamic class. A dynamic actor has data-dependent (and
- * possibly state-dependent) production/consumption rates.
+ * This class defines a quasi-static class. Quasi-static is a model that
+ * exhibits static behavior for a given configuration. An actor that has the
+ * quasi-static class has one action for each configuration, therefore this
+ * class associates one action with one static class.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class DynamicActorClass extends AbstractActorClass {
+public class QuasiStaticClass extends AbstractMoC {
+
+	private Map<Action, SDFMoC> classes;
 
 	/**
-	 * Creates a new dynamic class.
+	 * Creates a new quasi-static class.
 	 */
-	public DynamicActorClass() {
+	public QuasiStaticClass() {
+		classes = new LinkedHashMap<Action, SDFMoC>();
+	}
+
+	/**
+	 * Adds a configuration to this quasi-static class. A configuration is given
+	 * by an action and associated with a static class.
+	 * 
+	 * @param action
+	 *            a configuration action
+	 * @param clasz
+	 *            a static class
+	 */
+	public void addConfiguration(Action action, SDFMoC clasz) {
+		classes.put(action, clasz);
+	}
+
+	/**
+	 * Returns the set of configuration actions.
+	 * 
+	 * @return the set of configuration actions
+	 */
+	public Set<Action> getActions() {
+		return classes.keySet();
+	}
+
+	/**
+	 * Returns the static class that is associated with the configuration given
+	 * by the action.
+	 * 
+	 * @param action
+	 *            a configuration action
+	 * @return a static class
+	 */
+	public SDFMoC getStaticClass(Action action) {
+		return classes.get(action);
 	}
 
 	@Override
-	public boolean isDynamic() {
+	public boolean isQuasiStatic() {
 		return true;
 	}
 
