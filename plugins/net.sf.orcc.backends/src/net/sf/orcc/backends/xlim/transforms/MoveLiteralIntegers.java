@@ -48,6 +48,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -134,6 +135,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	public void visit(Assign assign) {
 		assign.setValue((Expression) assign.getValue().accept(exprInterpreter,
 				instructionIterator));
+		Use.addUses(assign, assign.getValue());
 	}
 
 	@Override
@@ -145,6 +147,18 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		}
 		store.setValue((Expression) store.getValue().accept(exprInterpreter,
 				instructionIterator));
+		Use.addUses(store, store.getIndexes());
+		Use.addUses(store, store.getValue());
+	}
+	
+	@Override
+	public void visit(Load load) {
+		ListIterator<Expression> it = load.getIndexes().listIterator();
+		while (it.hasNext()) {
+			it.set((Expression) it.next().accept(exprInterpreter,
+					instructionIterator));
+		}
+		Use.addUses(load, load.getIndexes());
 	}
 
 	@Override
@@ -172,6 +186,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			visit(ifNode.getElseNodes());
 		}
 		visit(ifNode.getJoinNode());
+		Use.addUses(ifNode, ifNode.getValue());
 	}
 
 	@Override
@@ -190,8 +205,8 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 					exprInterpreter, instructionIterator));
 			visit(whileNode.getNodes());
 		}
-
 		visit(whileNode.getJoinNode());
+		Use.addUses(whileNode, whileNode.getValue());
 	}
 
 	@Override
