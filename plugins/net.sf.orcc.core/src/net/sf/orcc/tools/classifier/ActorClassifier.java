@@ -169,11 +169,7 @@ public class ActorClassifier implements ActorTransformation {
 	 */
 	private MoC classifyCSDFStateful(ActorState state,
 			AbstractInterpreter interpreter) {
-		FSM fsm = actor.getActionScheduler().getFsm();
-		String initialState = null;
-		if (fsm != null) {
-			initialState = fsm.getInitialState().getName();
-		}
+		String initialState = interpreter.getFsmState();
 
 		// creates the MoC
 		CSDFMoC staticClass = new CSDFMoC();
