@@ -23,11 +23,8 @@ actor Algo_DecodeSubMbPred()
 
 	uint(size=4) SubMbType,
 
-	uint(size=4) RefIdxl0,
 	uint(size=4) RefIdxL0,
-	uint(size=4) RefIdxl1,
 	uint(size=4) RefIdxL1,
-	uint(size=3) SelectList,
 	int(size=16) MvResl0,
 	uint(size=5) MbPartHeight,
 	uint(size=5) MbPartWidth,
@@ -312,9 +309,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 	ReadMvdl0Done.Launch: action
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
-			RefIdxl0     :[ref_idx_l0[mbPartIdx-1]],
 			RefIdxL0     :[ref_idx_l0[mbPartIdx-1]],
-			SelectList   :[SubMbPredMode(sub_mb_type[mbPartIdx - 1])],
 			MvResl0      :[ValueOfVLD] repeat 2,
 			MbPartHeight :[SubMbPartWidthHeight(1)],
 			MbPartWidth  :[SubMbPartWidthHeight(0)],
@@ -335,8 +330,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 	ReadMvdl0Done.Skip: action
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
-			RefIdxl0     :[ref_idx_l0[mbPartIdx-1]],
-			SelectList   :[SubMbPredMode(sub_mb_type[mbPartIdx - 1])],
 			MvResl0      :[ValueOfVLD] repeat 2,
 			MbPartHeight :[SubMbPartWidthHeight(1)],
 			MbPartWidth  :[SubMbPartWidthHeight(0)],
@@ -355,7 +348,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 	ReadMvdl1Done.Launch: action
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
-			RefIdxl1 :[ref_idx_l1[mbPartIdx-1]],
 			RefIdxL1 :[ref_idx_l1[mbPartIdx-1]]
 		guard
 			mb_type >= BLOCK_TYPE_B_MIN,
@@ -374,7 +366,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 	ReadMvdl1Done.Skip: action
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
-			RefIdxl1 :[ref_idx_l1[mbPartIdx-1]]
 		guard
 			subMbPartIdx < subMbPartIdxMax
 		do

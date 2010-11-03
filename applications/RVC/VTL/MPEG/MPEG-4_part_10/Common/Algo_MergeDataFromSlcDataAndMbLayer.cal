@@ -35,18 +35,12 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 
 	int (size=8)  MbLayerQp_Y_Cb_Cr,
 
-	uint(size=4)  SubMbPredRefIdxL0,///////
-	uint(size=4)  SubMbPredRefIdxL1,///////
-	uint(size=3)  SubMbPredSelectList,///////
 	uint(size=5)  SubMbPredMbPartHeight,
 	uint(size=5)  SubMbPredMbPartWidth,
 	uint(size=3)  SubMbPredMbPartIdx,
 	bool          SubMbPredEndRefIdxL0,
 	int(size=16)  SubMbPredMvResl0,
 
-	uint(size=4)  MbPredRefIdxL0,///////
-	uint(size=4)  MbPredRefIdxL1,///////
-	uint(size=3)  MbPredSelectList,///////
 	uint(size=5)  MbPredMbPartHeight,
 	uint(size=5)  MbPredMbPartWidth,
 	uint(size=3)  MbPredMbPartIdx,
@@ -254,9 +248,6 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		end
 
 	ReadMbPredParam1.MbIntra: action
-			MbPredRefIdxL0     :[ref_idx_l0],
-			MbPredRefIdxL1     :[ref_idx_l1],
-			MbPredSelectList   :[selectlist],
 			MbPredMbPartHeight :[mb_part_height],
 			MbPredMbPartWidth  :[mb_part_width],
 			MbPredMbPartIdx    :[mb_part_idx],
@@ -272,9 +263,6 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		end
 
 	ReadMbPredParam1.MbInter: action
-			MbPredRefIdxL0     :[ref_idx_l0],
-			MbPredRefIdxL1     :[ref_idx_l1],
-			MbPredSelectList   :[selectlist],
 			MbPredMbPartHeight :[mb_part_height],
 			MbPredMbPartWidth  :[mb_part_width],
 			MbPredMbPartIdx    :[mb_part_idx],
@@ -311,9 +299,6 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		end
 
 	ReadSubMbPredParam: action
-			SubMbPredRefIdxL0     :[ref_idx_l0],
-			SubMbPredSelectList   :[selectlist],
-			SubMbPredRefIdxL1     :[ref_idx_l1],
 			SubMbPredMvResl0      :[mv_res] repeat 2,
 			SubMbPredMbPartHeight :[mb_part_height],
 			SubMbPredMbPartWidth  :[mb_part_width],

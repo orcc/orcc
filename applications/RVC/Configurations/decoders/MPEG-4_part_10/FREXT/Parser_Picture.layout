@@ -56,7 +56,6 @@
       <vertex id="SubMbPredRefIdxL0" x="1967" y="1693"/>
       <vertex id="SubMbType" x="1980" y="1977"/>
       <vertex id="MbType4Pred" x="2598" y="1434"/>
-      <vertex id="MbPredRefIdxL1" x="2025" y="1567"/>
       <vertex id="SubMbPredRefIdxL1" x="1986" y="1899"/>
       <vertex id="NewPic" x="2606" y="1653"/>
       <vertex id="Mgnt_DecodePic" x="1515" y="-132"/>
@@ -71,5 +70,6 @@
       <vertex id="DecodeSubMbPred" x="1742" y="1736"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="2238" y="1461"/>
       <vertex id="GenerateSkipBlockInformation" x="2299" y="1210"/>
+      <vertex id="MbPredRefIdxL1" x="2025" y="1567"/>
    </vertices>
 </layout>

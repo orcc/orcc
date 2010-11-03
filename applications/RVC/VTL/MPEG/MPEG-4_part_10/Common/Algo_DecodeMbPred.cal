@@ -23,11 +23,8 @@ actor Algo_DecodeMbPred()
 
 	uint(size=4)  RemIntraYxYPredMode,
 
-	uint(size=4)  RefIdxl0,
 	uint(size=4)  RefIdxL0,
-	uint(size=4)  RefIdxl1,
 	uint(size=4)  RefIdxL1,
-	uint(size=3)  SelectList,
 	uint(size=5)  MbPartHeight,
 	uint(size=5)  MbPartWidth,
 	uint(size=3)  MbPartIdx,
@@ -595,15 +592,6 @@ actor Algo_DecodeMbPred()
 			mbPartIdx := mbPartIdx + 1;
 		end
 
-	SendSelectList: action
-				==>
-			SelectList :[MbPartPredMode(mbPartIdx - 1)]
-		guard
-			mbPartIdx < mbPartIdxMax
-		do
-			mbPartIdx := mbPartIdx + 1;
-		end
-
 	SendOrReadDone: action
 				==>
 		guard
@@ -615,7 +603,6 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxL0.Done: action
 			ValVLD   :[val_ref_idx]
 				==>
-			RefIdxl0     :[val_ref_idx],
 			RefIdxL0     :[val_ref_idx],
 			MbPartHeight :[MbPartWidthHeight(1)],
 			MbPartWidth  :[MbPartWidthHeight(0)],
@@ -635,7 +622,6 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxL0.DoneSkip: action
 			ValVLD   :[val_ref_idx]
 				==>
-			RefIdxl0     :[val_ref_idx],
 			MbPartHeight :[MbPartWidthHeight(1)],
 			MbPartWidth  :[MbPartWidthHeight(0)],
 			MbPartIdx    :[mbPartIdx - 1],
@@ -654,7 +640,6 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxL1.Done: action
 			ValVLD :[val_ref_idx]
 				==>
-			RefIdxl1 :[val_ref_idx],
 			RefIdxL1 :[val_ref_idx]
 		guard
 			mbPartIdx < mbPartIdxMax,
@@ -670,7 +655,6 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxL1.DoneSkip: action
 			ValVLD   :[val_ref_idx]
 				==>
-			RefIdxl1     :[val_ref_idx]
 		guard
 			mbPartIdx < mbPartIdxMax,
 			   not IS_MbPred_L1(mb_type,mbPartIdx)
@@ -720,7 +704,7 @@ actor Algo_DecodeMbPred()
 		ReadParameters (ReadParameters )--> CheckMbType;
 
 		CheckMbType   (MbType.IsIntra_YxY )--> CheckMbTypeYxY;
-		CheckMbType   (Mb_Type.IsNotEqualToDirect )-->SendSelectList;
+		CheckMbType   (Mb_Type.IsNotEqualToDirect )-->ReadRefIdxl0Asked;
 		CheckMbType   (SendEndMbPred)--> ReadParameters;
 
 		CheckMbTypeYxY (MbType.IsIntra_4x4 )--> ReadPrevAndRemIntra4x4;
@@ -742,9 +726,6 @@ actor Algo_DecodeMbPred()
 		CheckChromaArrayTp (SendEndMbPred  )--> ReadParameters;
 
 		ReadIntraChroma   (ReadIntraChroma)--> SendEndMbPred;
-
-		SendSelectList    (SendSelectList )--> SendSelectList;
-		SendSelectList    (SendOrReadDone )--> ReadRefIdxl0Asked;
 
 		ReadRefIdxl0Asked (ReadRefIdxl0 )--> ReadRefIdxl0Asked;
 		ReadRefIdxl0Asked (ReadParam.Skip1Parameter )--> ReadRefIdxl0Asked;
