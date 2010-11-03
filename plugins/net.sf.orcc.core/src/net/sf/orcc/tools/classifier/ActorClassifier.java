@@ -153,23 +153,12 @@ public class ActorClassifier implements ActorTransformation {
 
 		ActorState state = new ActorState(actor);
 		if (state.isEmpty()) {
-			return classifyCSDFStateless(interpreter);
-		} else {
-			return classifyCSDFStateful(state, interpreter);
+			FSM fsm = actor.getActionScheduler().getFsm();
+			if (fsm == null || !isCycloStaticFsm(fsm)) {
+				// no state, no cyclo-static FSM => dynamic
+				return new DynamicMoC();
+			}
 		}
-	}
-
-	/**
-	 * This method tries to classify an actor as CSDF based on its state (the
-	 * set of state variables that are used in guards) and FSM state.
-	 * 
-	 * @param state
-	 * @param interpreter
-	 * @return
-	 */
-	private MoC classifyCSDFStateful(ActorState state,
-			AbstractInterpreter interpreter) {
-		String initialState = interpreter.getFsmState();
 
 		// creates the MoC
 		CSDFMoC staticClass = new CSDFMoC();
@@ -177,51 +166,13 @@ public class ActorClassifier implements ActorTransformation {
 
 		// loops until the actor goes back to the initial state, or there is a
 		// data-dependent condition
-		do {
-			if (!interpreter.schedule()) {
-				return new DynamicMoC();
-			}
-
-			Action latest = interpreter.getScheduledAction();
-			staticClass.addAction(latest);
-			nbPhases++;
-		} while (!state.isInitialState()
-				|| !interpreter.getFsmState().equals(initialState));
-
-		// set token rates
-		staticClass.setTokenConsumptions(actor);
-		staticClass.setTokenProductions(actor);
-		staticClass.setNumberOfPhases(nbPhases);
-
-		System.out.println("actor " + actor + " is CSDF");
-
-		return staticClass;
-	}
-
-	/**
-	 * Tries to classify this actor with no state as CSDF.
-	 * 
-	 * @param interpreter
-	 *            the abstract interpreter
-	 * @return an actor class
-	 */
-	private MoC classifyCSDFStateless(AbstractInterpreter interpreter) {
-		FSM fsm = actor.getActionScheduler().getFsm();
-		if (fsm == null || !isCycloStaticFsm(fsm)) {
-			// no state, no cyclo-static FSM => dynamic
-			return new DynamicMoC();
-		}
-
-		// schedule the actor
-		CSDFMoC staticClass = new CSDFMoC();
-		String initialState = fsm.getInitialState().getName();
-
-		int nbPhases = 0;
+		String initialState = interpreter.getFsmState();
 		do {
 			interpreter.schedule();
 			staticClass.addAction(interpreter.getScheduledAction());
 			nbPhases++;
-		} while (!initialState.equals(interpreter.getFsmState()));
+		} while (!state.isInitialState()
+				|| !interpreter.getFsmState().equals(initialState));
 
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
@@ -369,7 +320,9 @@ public class ActorClassifier implements ActorTransformation {
 
 	/**
 	 * Returns <code>true</code> if the given FSM looks like the FSM of a
-	 * quasi-static actor, <code>false</code> otherwise.
+	 * quasi-static actor, <code>false</code> otherwise. We simply check that
+	 * for each outgoing edge of the initial state, there is a path back to the
+	 * initial state.
 	 * 
 	 * @param fsm
 	 *            a Finite State Machine
