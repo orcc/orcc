@@ -153,17 +153,10 @@ int main(int argc, char **argv) {
 
 	clock_t timer = clock ();
 
-	#ifdef BSDL
-	if (!BSDLFile.empty()){
-		BSDLParser *bsdlParser = new BSDLParser(BSDLFile);
-		bsdlParser->ParseBSDL();
-		delete bsdlParser;
-	}
-	#endif
-
 	std::cout << "Jade started, parsing file " << XDFFile.getValue() << ". \n";
 	XDFParser *xdfParser = new XDFParser(XDFFile);
 	Network* network = xdfParser->ParseXDF(Context);
+	
 	//delete xdfParser;
 	std::cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 
