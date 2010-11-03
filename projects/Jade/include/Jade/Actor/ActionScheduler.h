@@ -66,18 +66,11 @@ public:
 	 *
 	 *	@param function : llvm::Function corresponding to the action scheduler
      */
-	ActionScheduler(std::list<Action*>* actions, llvm::Function* schedulerFunction, llvm::Function* initializeFunction, FSM* fsm){
-		this->fsm = fsm;
-		this->actions = actions;
-		this->schedulerFunction = schedulerFunction;
-		this->initializeFunction = initializeFunction;
-	};
-
-	ActionScheduler(std::list<Action*>* actions, llvm::Function* initializeFunction, FSM* fsm){
+	ActionScheduler(std::list<Action*>* actions, FSM* fsm){
 		this->fsm = fsm;
 		this->actions = actions;
 		this->schedulerFunction = NULL;
-		this->initializeFunction = initializeFunction;
+		this->initializeFunction = NULL;
 	};
 
 	/**
@@ -97,6 +90,15 @@ public:
 	 *	@param corresponding llvm::Function  of action scheduler
      */
 	 void setSchedulerFunction(llvm::Function* schedulerFunction){ this->schedulerFunction = schedulerFunction;};
+
+	 /**
+     *  @brief Setter of initialize function
+     *
+	 *	Set the corresponding llvm::function of the initialize function
+	 *
+	 *	@param corresponding llvm::Function  of initialize
+     */
+	 void setInitializeFunction(llvm::Function* initializeFunction){ this->initializeFunction = initializeFunction;};
 
 	/**
      *  @brief Getter of initialize scheduler function

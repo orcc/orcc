@@ -186,6 +186,14 @@ public:
 	std::list<Action*>* getInitializes() {return initializes;};
 
 	/**
+     *  @brief return true if actior has initialize actions
+	 *
+	 *  @return true if actor has initializes actions
+	 *
+     */
+	bool hasInitializes() {return !initializes->empty();};
+
+	/**
      *  @brief Create an input port
 	 *
 	 *  Create an input port inside the actor similar to the given Port

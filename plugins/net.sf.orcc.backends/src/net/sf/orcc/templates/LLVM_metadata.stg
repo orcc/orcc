@@ -142,8 +142,7 @@ $name_decl_MD(actor)$ = metadata !{$varName_MD(actor)$}
 actionScheduler_MD(actor) ::= <<
 $actionScheduler_decl_MD(actor)$ = metadata !{$
 if(!actor.actionScheduler.actions.empty)$ metadata $actions_decl_MD(actor)$ $else$ null $endif$, $
-if(actor.actionScheduler.fsm)$ metadata $FSM_decl_MD(actor)$ $else$ null $endif$, i32()* @scheduler $
-if(actor.initializes)$ , i32()* @initialize_actor $endif$}
+if(actor.actionScheduler.fsm)$ metadata $FSM_decl_MD(actor)$ $else$ null $endif$}
 
 $if(!actor.actionScheduler.actions.empty)$
 $actions_MD(actor)$
@@ -215,11 +214,7 @@ $Type_MD(actor=actor, var=var)$
 >>
 
 FSM_MD(actor) ::= <<
-$if(actor.actionScheduler.actions)$
-$FSM_decl_MD(actor)$ = metadata !{$varState_MD(actor.actionScheduler.fsm.initialState)$, metadata $State_decl_MD(actor)$, metadata $Transitions_decl_MD(actor)$, i32* @_FSM_state, i32()* @outside_FSM_scheduler}
-$else$
-$FSM_decl_MD(actor)$ = metadata !{$varState_MD(actor.actionScheduler.fsm.initialState)$, metadata $State_decl_MD(actor)$, metadata $Transitions_decl_MD(actor)$, i32* @_FSM_state}
-$endif$
+$FSM_decl_MD(actor)$ = metadata !{$varState_MD(actor.actionScheduler.fsm.initialState)$, metadata $State_decl_MD(actor)$, metadata $Transitions_decl_MD(actor)$}
 $State_MD(actor)$
 $Transitions_MD(actor)$
 >>
@@ -235,9 +230,9 @@ $actor.actionScheduler.fsm.transitions: { $Transition_MD(actor=actor, transition
 
 Transition_MD(actor, transition) ::= <<
 $if(transition.nextStateInfo.empty)$
-$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, null, i1()* @$transition.sourceState$_state_scheduler}
+$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, null}
 $else$
-$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, metadata $NextStates_decl_MD(actor=actor, nextStates=transition.nextStateInfo)$ , i1()* @$transition.sourceState$_state_scheduler}
+$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, metadata $NextStates_decl_MD(actor=actor, nextStates=transition.nextStateInfo)$}
 $NextStates_MD(actor= actor, nextStates=transition.nextStateInfo)$
 $endif$
 >>

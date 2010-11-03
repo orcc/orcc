@@ -75,6 +75,7 @@ public:
 				std::map<Variable*, llvm::GlobalVariable*>* parameters,
 				std::map<Procedure*, llvm::Function*>* procedures,
 				std::list<Action*>* actions,
+				std::list<Action*>* initializes,
 				ActionScheduler* scheduler);
 
 	~InstancedActor();
@@ -231,6 +232,15 @@ public:
      */
 	std::list<Action*>* getActions(){return actions;};
 
+	/**
+     *  @brief get initializes of the InstancedActor
+	 *
+	 *
+	 *  @return a list of initializes
+	 *
+     */
+	std::list<Action*>* getInitializes(){return initializes;};
+
 	llvm::GlobalVariable* getStateVar(Variable* stateVar);
 
 
@@ -271,6 +281,9 @@ private:
 
 	/** Action map of the instanced Functional Unit */
 	std::list<Action*>* actions;
+
+	/** Initialize map of the instanced Functional Unit */
+	std::list<Action*>* initializes;
 };
 
 #endif

@@ -9,7 +9,12 @@
 @.str4 = private constant [26 x i8] c"could not open file \22%s\22\0A\00", align 1 ; <[26 x i8]*> [#uses=1]
 @O = global %struct.fifo_u8_s* null ; <%struct.fifo_u8_s**> [#uses=3]
 
-define i32 @initialize() nounwind {
+define i1 @isSchedulable_init() nounwind {
+	ret i1 1
+}
+
+
+define i32 @init() nounwind {
 entry:
   %0 = load i8** @input_file, align 4             ; <i8*> [#uses=1]
   %1 = icmp eq i8* %0, null                       ; <i1> [#uses=1]
@@ -58,7 +63,11 @@ declare %struct.FILE* @fopen(i8*, i8*) nounwind
 
 declare i32 @printf(i8*, ...) nounwind
 
-define i32 @scheduler() nounwind {
+define i1 @isSchedulable_send_data() nounwind {
+	ret i1 1
+}
+
+define i32 @send_data() nounwind {
 entry:
   %ptr = alloca i8*                               ; <i8**> [#uses=3]
   %i = alloca i32                                 ; <i32*> [#uses=3]
@@ -131,10 +140,13 @@ return:                                           ; preds = %bb6
 !action_scheduler = !{!2}
 !outputs = !{!3}
 !state_variables = !{!5, !8, !11, !14, !17, !20, !23}
+!initializes = !{!26}
+!actions = !{!29}
 
 !0 = metadata !{metadata !"tools/Source.bc"}
 !1 = metadata !{metadata !"Source"}
-!2 = metadata !{null, null, i32()* @scheduler , i32()* @initialize }
+!2 = metadata !{ metadata !33 ,  null }
+!33 = metadata !{metadata !29}
 !3 = metadata !{metadata !4, metadata !"O", %struct.fifo_u8_s** @O}
 !4 = metadata  !{ i32 8 ,  null }
 !5 = metadata !{metadata !6, metadata !7, i8** @input_file}
@@ -162,7 +174,13 @@ return:                                           ; preds = %bb6
 !23 = metadata !{metadata !24, metadata !25, [7 x i8]* @.str3}
 !24 = metadata !{metadata !".str3", i1 0, i32 0,  i32 0}
 !25 = metadata  !{ i32 8 ,  null }
-
+!26 = metadata !{ null , null , null, metadata !27, metadata !28}
+!27 = metadata  !{metadata !"isSchedulable_initialize", i1 0, i1()* @isSchedulable_init}
+!28 = metadata  !{metadata !"initialize", i1 0, i32()* @init}
+!29 = metadata !{ null, null , metadata !30, metadata !31, metadata !32}
+!30 = metadata !{metadata !3, i32 1}
+!31 = metadata  !{metadata !"isSchedulable_send_data", i1 0, i1()* @isSchedulable_send_data}
+!32 = metadata  !{metadata !"send_data", i1 0, i32()* @send_data}
 
 declare i32 @fseek(%struct.FILE*, i32, i32) nounwind
 declare i32 @fread(i8*, i32, i32, %struct.FILE*) nounwind

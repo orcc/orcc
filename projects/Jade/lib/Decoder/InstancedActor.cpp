@@ -52,6 +52,7 @@ InstancedActor::InstancedActor(Decoder* decoder, Instance* instance,
 								map<Variable*, GlobalVariable*>* parameters,
 								map<Procedure*, Function*>* procedures,
 								list<Action*>* actions,
+								list<Action*>* initializes,
 								ActionScheduler* scheduler){
 		this->instance = instance;
 		this->decoder = decoder;
@@ -63,6 +64,7 @@ InstancedActor::InstancedActor(Decoder* decoder, Instance* instance,
 		this->procedures = procedures;
 		this->scheduler = scheduler;
 		this->actor = instance->getActor();
+		this->initializes = initializes;
 		instance->setInstancedActor(this);
 }
 

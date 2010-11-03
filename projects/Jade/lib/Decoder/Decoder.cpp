@@ -141,7 +141,7 @@ InstancedActor* Decoder::createInstance(Instance* instance){
 	list<Action*>* actions = jit->createActions(instance, actor->getActions(), inputs, outputs);
 	ActionScheduler* actionScheduler = jit->createActionScheduler(instance, actor->getActionScheduler());
 
-	return new InstancedActor(this, instance, inputs, outputs, stateVars, parameters, procs, actions, actionScheduler);
+	return new InstancedActor(this, instance, inputs, outputs, stateVars, parameters, procs, actions, initializes, actionScheduler);
 }
 
 

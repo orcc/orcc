@@ -67,6 +67,10 @@ ActionSchedulerAdder::ActionSchedulerAdder(Instance* instance, Decoder* decoder,
 
 	createScheduler(instancedActor->getActionScheduler());
 
+	if (actor->hasInitializes()){
+		createInitialize(instancedActor->getInitializes());
+	}
+
 }
 
 void ActionSchedulerAdder::createScheduler(ActionScheduler* actionScheduler){
@@ -74,11 +78,45 @@ void ActionSchedulerAdder::createScheduler(ActionScheduler* actionScheduler){
 		instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);
 }
 
+void ActionSchedulerAdder::createInitialize(list<Action*>* initializes){
+	Function* initialize = createInitializeFn(initializes);
+	instancedActor->getActionScheduler()->setInitializeFunction(initialize);
+}
+
+Function* ActionSchedulerAdder::createInitializeFn(list<Action*>* initializes){
+	Module* module = decoder->getModule();
+
+	string name = instance->getId();
+	name.append("_initialize");
+
+	Function* initialize = cast<Function>(module->getOrInsertFunction(name, Type::getVoidTy(Context),
+											  (Type *)0));
+
+	// Add a basic block entry to the scheduler.
+	BasicBlock* BB = BasicBlock::Create(Context, "entry", initialize);
+
+	// Add a basic block return to the scheduler.
+	BasicBlock* returnBB = BasicBlock::Create(Context, "return", initialize);
+	ReturnInst::Create(Context, returnBB);
+
+	//Test initialize function
+	list<Action*>::iterator it;
+
+	for ( it=initializes->begin() ; it != initializes->end(); it++ ){
+		BB = createActionTest(*it, BB, returnBB, initialize);
+	}
+
+	//Create branch from skip to return
+	BranchInst::Create(returnBB, BB);
+
+	return initialize;
+}
+
 Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionScheduler){
 		Module* module = decoder->getModule();
 		
 		string name = instance->getId();
-		name.append("_scheduler2");
+		name.append("_scheduler");
 
 		Function* scheduler = cast<Function>(module->getOrInsertFunction(name, Type::getInt32Ty(Context),
 											  (Type *)0));
@@ -126,7 +164,7 @@ BasicBlock* ActionSchedulerAdder::createSchedulerFSM(ActionScheduler* actionSche
 	//Create a variable that store the current state of the FSM
 	Module* module = decoder->getModule();
 	string name = instance->getId();
-	name.append("_FSM_state2");
+	name.append("_FSM_state");
 	stateVar = cast<GlobalVariable>(module->getOrInsertGlobal(name, Type::getInt32Ty(Context)));
 	
 	//Set initial state to the state variable
@@ -154,7 +192,7 @@ Function* ActionSchedulerAdder::createSchedulerOutsideFSM(list<Action*>* actions
 	Module* module = decoder->getModule();
 	
 	string name = instance->getId();
-	name.append("_outside_FSM_scheduler2");
+	name.append("_outside_FSM_scheduler");
 
 	Function* outsideScheduler = cast<Function>(module->getOrInsertFunction(name, Type::getVoidTy(Context),
 										  (Type *)0));

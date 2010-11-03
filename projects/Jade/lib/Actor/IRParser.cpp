@@ -216,8 +216,6 @@ ActionScheduler* IRParser::parseActionScheduler(Module* module){
 	
 	MDNode* actionSchedulerMD = cast<MDNode>(inputsMD->getOperand(0));
 	list<Action*>* actions = new list<Action*>();
-	Function* schedulerFunction = NULL;
-	Function* initializeFunction = NULL;
 	FSM* fsm = NULL;
 
 	//Get actions outside fsm if present
@@ -237,15 +235,7 @@ ActionScheduler* IRParser::parseActionScheduler(Module* module){
 		fsm = parseFSM(cast<MDNode>(fsmValue));
 	}
 
-	//Get function corresponding to the action scheduler
-	schedulerFunction = cast<Function>(actionSchedulerMD->getOperand(2));
-
-	//Get fsm if present
-	if (actionSchedulerMD->getNumOperands() > 3){
-		initializeFunction = cast<Function>(actionSchedulerMD->getOperand(3));
-	}
-
-	return new ActionScheduler(actions, schedulerFunction, initializeFunction, fsm);
+	return new ActionScheduler(actions, fsm);
 }
 
 map<string, Variable*>* IRParser::parseParameters(Module* module){
@@ -404,7 +394,6 @@ Type* IRParser::parseType(MDNode* node){
 
 FSM* IRParser::parseFSM(llvm::MDNode* node){
 	FSM* fsm = new FSM();
-	list<Function*>* functions = new list<Function*>();
 
 	//Parse initial state
 	MDString* initialState = cast<MDString>(node->getOperand(0));
@@ -444,23 +433,6 @@ FSM* IRParser::parseFSM(llvm::MDNode* node){
 				fsm->addTransition(source->getString(), target->getString(), action);
 			}
 		}
-
-		Function* stateScheduler = cast<Function>(transitionArray->getOperand(2));
-		
-		functions->push_back(stateScheduler);
-	}
-	
-	fsm->setFunctions(functions);
-
-
-	//Parse state variable
-	GlobalVariable* fsmState = cast<GlobalVariable>(node->getOperand(3));
-	fsm->setFsmState(fsmState);
-
-	if (node->getNumOperands()>4){
-		//Outside FSM function
-		Function* outFsm = cast<Function>(node->getOperand(4));
-		fsm->setOutFsm(outFsm);
 	}
 
 	return fsm;

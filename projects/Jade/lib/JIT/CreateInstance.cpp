@@ -370,10 +370,14 @@ Action* JIT::createAction(Instance* instance, Action* action, map<string, Port*>
 		
 		if (inputs != NULL){
 			inputPattern = createPattern(action->getInputPattern(), inputs);
+		}else{
+			inputPattern = new map<Port*, ConstantInt*>();
 		}
 
 		if (outputs != NULL){
 			outputPattern = createPattern(action->getOutputPattern(), outputs);
+		}else{
+			outputPattern = new map<Port*, ConstantInt*>();
 		}
 
 		return new Action(action->getTag(), inputPattern, outputPattern, newScheduler, newBody);
@@ -436,28 +440,7 @@ FSM* JIT::createFSM(Instance* instance, FSM* fsm){
 			newFSM->addTransition(sourceState->getName(), targetState->getName(), getAction(targetAction));
 		}
 	}
-
-	//Create a new fsm_state
-	GlobalVariable* fsmState = CreateVariable(instance, fsm->getFsmState());
-	newFSM->setFsmState(fsmState);
 	
-	//Create a outside fsm if present
-	if(fsm->getOutFsm() != NULL){
-		Function* function = CreateFunction(instance, fsm->getOutFsm());
-		newFSM->setOutFsm(function);
-	}
-
-	//Create state scheduler functions
-	list<llvm::Function*>* functions = fsm->getFunctions();
-	list<llvm::Function*>* newFunctions = new list<llvm::Function*>();
-	
-	for (it = functions->begin(); it != functions->end(); ++it){
-		Function* function = CreateFunction(instance, *it);
-		newFunctions->push_back(function);
-	}
-
-	newFSM->setFunctions(newFunctions);
-
 	//Set initiale state of the FSM
 	newFSM->setInitialState(fsm->getInitialState()->getName());
 
@@ -489,10 +472,7 @@ ActionScheduler* JIT::createActionScheduler(Instance* instance, ActionScheduler*
 		initializeFunction = CreateFunction(instance, actionScheduler->getInitializeFunction());
 	}
 	
-	//Create action scheduler
-	Function* schedulerFunction = CreateFunction(instance, actionScheduler->getSchedulerFunction());
-
-	return new ActionScheduler(instancedActions, schedulerFunction, initializeFunction, fsm);
+	return new ActionScheduler(instancedActions, fsm);
 }
 
 void JIT::putAction(ActionTag* tag, Action* action){

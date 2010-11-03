@@ -97,7 +97,9 @@ private:
 	void createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB);
 	void createStates(std::map<std::string, FSM::State*>* states, llvm::Function* function);
 	llvm::Function* createSchedulerOutsideFSM(std::list<Action*>* actions);
-	
+	void createInitialize(std::list<Action*>* initializes);
+	llvm::Function* createInitializeFn(std::list<Action*>* initializes);
+
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 	Decoder* decoder;

@@ -66,7 +66,8 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 	this->numOutputs = numOutputs;
 	this->fifo = fifo;
 	this->decoder = decoder;
-
+	this->actionScheduler = new ActionScheduler(new list<Action*>(), NULL);
+	
 	module = decoder->getModule();
 
 	// Getting type of fifo
@@ -91,7 +92,8 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 		outputs->insert(pair<string, Port*>(outputName.str(), outputPort));
 	}
 
-	this->actionScheduler = new ActionScheduler(new list<Action*>(), createActionScheduler(), NULL, NULL);
+	actionScheduler->setSchedulerFunction(createActionScheduler());
+
 }
 
 InstancedActor* BroadcastActor::instanciate(Instance* instance){
@@ -108,7 +110,7 @@ InstancedActor* BroadcastActor::instanciate(Instance* instance){
 	}
 
 
-	return new InstancedActor(decoder, instance, instancedInputs, instancedOutputs, new map<Variable*, GlobalVariable*>(), new map<Variable*, GlobalVariable*>(), new map<Procedure*, Function*>(), new list<Action*>(),  actionScheduler);
+	return new InstancedActor(decoder, instance, instancedInputs, instancedOutputs, new map<Variable*, GlobalVariable*>(), new map<Variable*, GlobalVariable*>(), new map<Procedure*, Function*>(), new list<Action*>(), new list<Action*>(), actionScheduler);
 
 }
 

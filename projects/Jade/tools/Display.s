@@ -3,7 +3,20 @@
 @HEIGHT = external global %struct.fifo_i16_s*     ; <%struct.fifo_i16_s**> [#uses=3]
 @B = external global %struct.fifo_u8_s*           ; <%struct.fifo_u8_s**> [#uses=3]
 
-define void @scheduler() nounwind {
+define i1 @isSchedulable_get_data() nounwind {
+entry:
+  %0 = load %struct.fifo_u8_s** @B, align 4      ; <%struct.fifo_u8_s*> [#uses=1]
+  %1 = call i32 @fifo_u8_has_tokens(%struct.fifo_u8_s* %0, i32 384) nounwind ; <i32> [#uses=1]
+  %2 = icmp ne i32 %1, 0                        ; <i1> [#uses=1]
+  br i1 %2, label %ok, label %nok
+ 
+ok:
+	ret i1 1
+nok:
+	ret i1 0
+}
+
+define void @get_data() nounwind {
 entry:
   %i = alloca i32                                 ; <i32*> [#uses=5]
   %ptr = alloca i16*                              ; <i16**> [#uses=4]
@@ -106,10 +119,12 @@ declare void @write_mb(i8*)
 !inputs = !{!3, !5, !7}
 !state_variables = !{!9}
 !procedures = !{!12, !13, !14}
+!actions = !{!15}
 
 !0 = metadata !{metadata !"tools/Display.bc"}
 !1 = metadata !{metadata !"Display"}
-!2 = metadata !{null, null, void()* @scheduler}
+!2 = metadata !{metadata !19, null}
+!19 = metadata !{metadata !15}
 !3 = metadata !{metadata !4, metadata !"B", %struct.fifo_u8_s** @B}
 !4 = metadata  !{ i32 8 ,  null }
 !5 = metadata !{metadata !6, metadata !"WIDTH", %struct.fifo_i16_s** @WIDTH}
@@ -122,6 +137,10 @@ declare void @write_mb(i8*)
 !12 = metadata !{metadata !"set_video", i1 1 , void(i32, i32)* @set_video}
 !13 = metadata !{metadata !"set_init", i1 1 , void(...)* @set_init}
 !14 = metadata !{metadata !"write_mb", i1 1 , void(i8*)* @write_mb}
+!15 = metadata !{ null, metadata !16, null, metadata !17, metadata !18}
+!16 = metadata !{metadata !3, i32 1}
+!17 = metadata  !{metadata !"isSchedulable_get_data", i1 0, i1()* @isSchedulable_get_data}
+!18 = metadata  !{metadata !"get_data", i1 0, void()* @get_data}
 
 %struct.FILE = type { i8*, i32, i8*, i32, i32, i32, i32, i8* }
 %struct.fifo_i8_s = type opaque
