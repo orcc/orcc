@@ -1,15 +1,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 // VHDL Top for the XLiM Hardware code generation
+// Author: Endri Bezati
 
 ///////////////////////////////////////////////////////////////////////////////
-// Print Components
+// Actors Instantiation 
 ///////////////////////////////////////////////////////////////////////////////
+
+PrintActorsInstantiation(network) ::=<<
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// FIFO Instantiation 
+///////////////////////////////////////////////////////////////////////////////
+
+PrintFifosInstantiation(network) ::=<<
+>>
 
 PrintComponents(network) ::=<<
--- ----------------------------------------------------------------------------------
--- Components of Actors found in the Network
--- ----------------------------------------------------------------------------------
-
 $network.instances: printActorsComponents(); separator="\n"$
 >>
 
@@ -36,17 +43,17 @@ printActorsComponentsInputs(port) ::=<<
 $
 if(port.type.bool)
 $
-$port.name$_DATA	: std_logic;
+$port.name$_DATA	: in std_logic;
 $
 else
 $
-$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);
+$port.name$_DATA	: in std_logic_vector($port.type.size$ - 1 downto 0);
 $
 endif
 $
-$port.name$_SEND	: std_logic;
-$port.name$_ACK	: std_logic;
-$port.name$_COUNT	: std_logic_vector(15 downto 0);
+$port.name$_SEND	: in std_logic;
+$port.name$_ACK	: out std_logic;
+$port.name$_COUNT	: in std_logic_vector(15 downto 0);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,18 +63,18 @@ printActorsComponentsOutputs(port) ::=<<
 $
 if(port.type.bool)
 $
-$port.name$_DATA	: std_logic;
+$port.name$_DATA	: out std_logic;
 $
 else
 $
-$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);
+$port.name$_DATA	: out std_logic_vector($port.type.size$ - 1 downto 0);
 $
 endif
 $
-$port.name$_SEND	: std_logic;
-$port.name$_ACK	: std_logic;
-$port.name$_COUNT	: std_logic_vector(15 downto 0);
-$port.name$_RDY	: std_logic;
+$port.name$_SEND	: out std_logic;
+$port.name$_ACK	: in std_logic;
+$port.name$_COUNT	: out std_logic_vector(15 downto 0);
+$port.name$_RDY	: in std_logic;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,27 +96,27 @@ $network.instances: printActorsSignals(); separator="\n"$
 printInputPortsSignals(port) ::=<<
 $
 if(port.type.bool)
-$signal ni_$port.name$_DATA	: in  std_logic;$\n$$
+$signal ni_$port.name$_DATA	: std_logic;$\n$$
 else
-$signal ni_$port.name$_DATA	: in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+$signal ni_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
 endif
 $
-signal ni_$port.name$_SEND	: in  std_logic;
-signal ni_$port.name$_ACK	: out std_logic;
-signal ni_$port.name$_COUNT	: in  std_logic_vector(15 downto 0);
-signal ni_$port.name$_RDY	: out std_logic;
+signal ni_$port.name$_SEND	: std_logic;
+signal ni_$port.name$_ACK	: std_logic;
+signal ni_$port.name$_COUNT	: std_logic_vector(15 downto 0);
+signal ni_$port.name$_RDY	: std_logic;
 
 $
 if(port.type.bool)
-$signal nif_$port.name$_DATA	: in  std_logic;$\n$$
+$signal nif_$port.name$_DATA	: std_logic;$\n$$
 else
-$signal nif_$port.name$_DATA	: in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+$signal nif_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
 endif
 $
-signal nif_$port.name$_SEND	: in  std_logic;
-signal nif_$port.name$_ACK	: out std_logic;
-signal nif_$port.name$_COUNT	: in  std_logic_vector(15 downto 0);
-signal nif_$port.name$_RDY	: out std_logic;$\n$
+signal nif_$port.name$_SEND	: std_logic;
+signal nif_$port.name$_ACK	: std_logic;
+signal nif_$port.name$_COUNT	: std_logic_vector(15 downto 0);
+signal nif_$port.name$_RDY	: std_logic;$\n$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,15 +125,15 @@ signal nif_$port.name$_RDY	: out std_logic;$\n$
 printOutputPortsSignals(port) ::=<<
 $
 if(port.type.bool)
-$signal no_$port.name$_DATA	: out std_logic;$\n$$
+$signal no_$port.name$_DATA	: std_logic;$\n$$
 else
-$signal no_$port.name$_DATA	: out std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+$signal no_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
 endif
 $
-signal no_$port.name$_SEND	: out std_logic;
-signal no_$port.name$_ACK	: in  std_logic;
-signal no_$port.name$_COUNT	: out std_logic_vector(15 downto 0);
-signal no_$port.name$_RDY	: in  std_logic;$\n$
+signal no_$port.name$_SEND	: std_logic;
+signal no_$port.name$_ACK	: std_logic;
+signal no_$port.name$_COUNT	: std_logic_vector(15 downto 0);
+signal no_$port.name$_RDY	: std_logic;$\n$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -274,11 +281,21 @@ end entity $network.name$;
 
 architecture rtl of $network.name$ is
 	
+	-- ----------------------------------------------------------------------------------
+	-- Signal Instantiation
+	-- ----------------------------------------------------------------------------------
+	
 	-- Clock and Reset signal
 	signal clocks, resets: std_logic_vector(0 downto 0);
 	
 	$PrintSignals(network); separator="\n"$
+	
+	-- ----------------------------------------------------------------------------------
+	-- Components of Actors found in the Network
+	-- ----------------------------------------------------------------------------------
+	
 	$PrintComponents(network); separator="\n"$
+	
 begin
 	rcon: entity SystemBuilder.resetController( behavioral )
 	generic map( count => 1 )
@@ -286,7 +303,18 @@ begin
 
   	clocks(0) <= CLK;
   	
+	---------------------------------------------------------------------------
+	-- Actors Instantiation 
+	---------------------------------------------------------------------------
   	
+  	$PrintActorsInstantiation(network); separator="\n"$
+
+  	---------------------------------------------------------------------------
+	-- FIFOs Instantiation 
+	---------------------------------------------------------------------------
+
+	$PrintFifosInstantiation(network); separator="\n"$
+	
 end architecture rtl;
 
 -- ----------------------------------------------------------------------------------
