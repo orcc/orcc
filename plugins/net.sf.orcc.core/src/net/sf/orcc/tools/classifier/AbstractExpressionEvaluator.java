@@ -32,7 +32,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
-import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 
 /**
@@ -49,28 +48,25 @@ public class AbstractExpressionEvaluator extends ExpressionEvaluator {
 	public Object interpret(BinaryExpr expr, Object... args) {
 		Expression val1 = (Expression) expr.getE1().accept(this);
 		Expression val2 = (Expression) expr.getE2().accept(this);
+		Expression result = interpretBinaryExpr(val1, expr.getOp(), val2);
 
-		if (!schedulableMode && (val1 == null || val2 == null)) {
-			return null;
+		// only throws an exception if we are in schedulable mode and the result
+		// is null
+		if (schedulableMode && result == null) {
+			throw new OrccRuntimeException("Runtime binary expression");
 		}
-
-		return super.interpretBinaryExpr(val1, expr.getOp(), val2);
-	}
-
-	@Override
-	public Object interpret(ListExpr expr, Object... args) {
-		throw new OrccRuntimeException("can not evaluate List expression");
+		return result;
 	}
 
 	@Override
 	public Object interpret(UnaryExpr expr, Object... args) {
 		Expression value = (Expression) expr.getExpr().accept(this);
+		Expression result = interpretUnaryExpr(expr.getOp(), value);
 
-		if (!schedulableMode && value == null) {
-			return null;
-		} else {
-			return super.interpretUnaryExpr(expr, value);
+		if (schedulableMode && value == null) {
+			throw new OrccRuntimeException("Runtime unary expression");
 		}
+		return result;
 	}
 
 	/**

@@ -232,11 +232,10 @@ public class ActorInterpreter {
 
 			// Check for List state variables which need to be allocated or
 			// initialized
-			for (Variable stateVar : actor.getStateVars()) {
+			for (StateVariable stateVar : actor.getStateVars()) {
 				Type type = stateVar.getType();
 				// Initialize variables with constant values
-				Expression initConst = ((StateVariable) stateVar)
-						.getConstantValue();
+				Expression initConst = stateVar.getConstantValue();
 				if (initConst == null) {
 					if (type.isList()) {
 						// Allocate empty array variable

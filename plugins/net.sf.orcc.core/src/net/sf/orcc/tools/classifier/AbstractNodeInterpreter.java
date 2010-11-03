@@ -33,7 +33,6 @@ import java.util.Iterator;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
@@ -122,20 +121,16 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 		if (condition instanceof BoolExpr) {
 			if (((BoolExpr) condition).getValue()) {
-				for (CFGNode subNode : node.getThenNodes()) {
-					subNode.accept(this);
-				}
+				visit(node.getThenNodes());
 			} else {
-				for (CFGNode subNode : node.getElseNodes()) {
-					subNode.accept(this);
-				}
+				visit(node.getElseNodes());
 			}
 		} else if (schedulableMode) {
 			// only throw exception in schedulable mode
 			throw new OrccRuntimeException("null condition");
 		}
 
-		node.getJoinNode().accept(this);
+		visit(node.getJoinNode());
 	}
 
 	@Override
@@ -220,9 +215,7 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 		if (condition != null && condition.isBooleanExpr()) {
 			while (((BoolExpr) condition).getValue()) {
-				for (CFGNode subNode : node.getNodes()) {
-					subNode.accept(this);
-				}
+				visit(node.getNodes());
 
 				// Interpret next value of "while" condition
 				condition = (Expression) node.getValue()
@@ -238,8 +231,6 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 			// only throw exception in schedulable mode
 			throw new OrccRuntimeException("condition is data-dependent");
 		}
-
-		node.getJoinNode().accept(this);
 	}
 
 	@Override

@@ -90,7 +90,15 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 	@Override
 	public Object interpret(UnaryExpr expr, Object... args) {
 		Expression value = (Expression) expr.getExpr().accept(this);
-		return interpretUnaryExpr(expr, value);
+		Expression result = interpretUnaryExpr(expr.getOp(), value);
+
+		if (result == null) {
+			throw new OrccRuntimeException(
+					"Could not evaluate unary expression "
+							+ expr.getOp().toString() + "("
+							+ expr.getOp().getText() + ")\n");
+		}
+		return result;
 	}
 
 	@Override
@@ -98,6 +106,19 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 		return expr.getVar().getVariable().getValue();
 	}
 
+	/**
+	 * Returns the value of <code>val1</code> <code>op</code> <code>val2</code>.
+	 * Returns <code>null</code> if the value of the expression cannot be
+	 * computed.
+	 * 
+	 * @param val1
+	 *            an expression
+	 * @param op
+	 *            a binary operator
+	 * @param val2
+	 *            another expression
+	 * @return the value of <code>val1</code> <code>op</code> <code>val2</code>
+	 */
 	public Expression interpretBinaryExpr(Expression val1, BinaryOp op,
 			Expression val2) {
 		switch (op) {
@@ -272,8 +293,18 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 		return null;
 	}
 
-	protected Object interpretUnaryExpr(UnaryExpr expr, Expression value) {
-		switch (expr.getOp()) {
+	/**
+	 * Returns the value of <code>op</code> <code>value</code>. Returns
+	 * <code>null</code> if the value of the expression cannot be computed.
+	 * 
+	 * @param op
+	 *            a unary operator
+	 * @param value
+	 *            an expression
+	 * @return the value of <code>op</code> <code>value</code>
+	 */
+	public Expression interpretUnaryExpr(UnaryOp op, Expression value) {
+		switch (op) {
 		case BITNOT:
 			if (value != null && value.isIntExpr()) {
 				return ((IntExpr) value).not();
@@ -293,9 +324,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 			break;
 		}
 
-		throw new OrccRuntimeException("Could not evaluate unary expression "
-				+ expr.getOp().toString() + "(" + expr.getOp().getText()
-				+ ")\n");
+		return null;
 	}
 
 }

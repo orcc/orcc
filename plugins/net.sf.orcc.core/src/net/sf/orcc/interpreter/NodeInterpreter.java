@@ -36,7 +36,6 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
@@ -49,7 +48,6 @@ import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.HasTokens;
-import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
@@ -58,10 +56,9 @@ import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
@@ -74,7 +71,7 @@ import net.sf.orcc.util.StringUtil;
  * @author Pierre-Laurent Lagalaye
  * 
  */
-public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
+public class NodeInterpreter extends AbstractActorTransformation {
 
 	private boolean blockReturn;
 
@@ -157,13 +154,6 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 	}
 
 	@Override
-	public void visit(BlockNode block) {
-		for (Instruction instruction : block) {
-			instruction.accept(this);
-		}
-	}
-
-	@Override
 	public void visit(Call call) {
 		// Get called procedure
 		Procedure proc = call.getProcedure();
@@ -232,17 +222,13 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 
 		// if (condition is true)
 		if (condition != null && condition.isBooleanExpr()) {
-			List<CFGNode> nodes;
 			if (((BoolExpr) condition).getValue()) {
-				nodes = node.getThenNodes();
+				visit(node.getThenNodes());
 			} else {
-				nodes = node.getElseNodes();
+				visit(node.getElseNodes());
 			}
 
-			for (CFGNode subNode : nodes) {
-				subNode.accept(this);
-			}
-			node.getJoinNode().accept(this);
+			visit(node.getJoinNode());
 		} else {
 			throw new OrccRuntimeException("Condition not boolean at line "
 					+ node.getLocation().getStartLine() + "\n");
@@ -285,7 +271,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 
 	@Override
 	public void visit(PhiAssignment phi) {
-
+		// phi must be removed before calling the interpreter
 	}
 
 	@Override
@@ -354,9 +340,7 @@ public class NodeInterpreter implements NodeVisitor, InstructionVisitor {
 		// while (condition is true) do
 		if (condition != null && condition.isBooleanExpr()) {
 			while (((BoolExpr) condition).getValue()) {
-				for (CFGNode subNode : node.getNodes()) {
-					subNode.accept(this);
-				}
+				visit(node.getNodes());
 
 				condition = (Expression) node.getValue()
 						.accept(exprInterpreter);

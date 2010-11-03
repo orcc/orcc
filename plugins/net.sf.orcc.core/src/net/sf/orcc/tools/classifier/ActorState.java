@@ -41,7 +41,6 @@ import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.nodes.BlockNode;
 
 /**
@@ -53,7 +52,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
  */
 public class ActorState {
 
-	private Map<StateVariable, Object> state;
+	private Map<StateVariable, Expression> state;
 
 	/**
 	 * Creates a new actor state initialized to all the state variables of the
@@ -63,15 +62,14 @@ public class ActorState {
 	 *            an actor
 	 */
 	public ActorState(Actor actor) {
-		state = new HashMap<StateVariable, Object>();
-		for (Variable variable : actor.getStateVars()) {
+		state = new HashMap<StateVariable, Expression>();
+		for (StateVariable variable : actor.getStateVars()) {
 			Type type = variable.getType();
-			StateVariable stateVariable = (StateVariable) variable;
-			Expression constant = stateVariable.getConstantValue();
+			Expression constant = variable.getConstantValue();
 			if (constant != null && !type.isList()) {
 				// we might consider this constant if it is used by guards
 				boolean usedByGuard = false;
-				for (Use use : stateVariable.getUses()) {
+				for (Use use : variable.getUses()) {
 					User user = use.getNode();
 					Procedure proc;
 					if (user instanceof Instruction) {
@@ -87,7 +85,7 @@ public class ActorState {
 				}
 
 				if (usedByGuard) {
-					state.put(stateVariable, stateVariable.getValue());
+					state.put(variable, variable.getValue());
 				}
 			}
 		}
@@ -112,9 +110,9 @@ public class ActorState {
 	 * @return <code>true</code> if the condition stated above holds
 	 */
 	public boolean isInitialState() {
-		for (Entry<StateVariable, Object> entry : state.entrySet()) {
+		for (Entry<StateVariable, Expression> entry : state.entrySet()) {
 			StateVariable stateVariable = entry.getKey();
-			Object value = stateVariable.getValue();
+			Expression value = stateVariable.getValue();
 			if (value == null) {
 				// oops not static!
 				throw new OrccRuntimeException("null state variable");
@@ -127,6 +125,11 @@ public class ActorState {
 
 		// all state variables' values equal initial values
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return state.toString();
 	}
 
 }

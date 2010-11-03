@@ -110,10 +110,9 @@ public class ActorClassifier implements ActorTransformation {
 				// data-dependent behavior
 			}
 
-			ActionScheduler sched = actor.getActionScheduler();
 			if (!clasz.isCSDF()) {
 				// not CSDF, tries QSDF
-				if (sched.hasFsm()) {
+				if (actor.getActionScheduler().hasFsm()) {
 					try {
 						clasz = classifyQSDF();
 					} catch (OrccRuntimeException e) {
