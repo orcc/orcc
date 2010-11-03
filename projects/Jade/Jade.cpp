@@ -49,18 +49,16 @@
 #include "llvm/Support/CommandLine.h"
 #include "llvm/System/Signals.h"
 #include "llvm/Support/PrettyStackTrace.h"
-
-#ifdef BSDL
-#include "BSDLParser/BSDLParser.h"
-#endif
 //------------------------------
 
 #ifdef __APPLE__
 #include "SDL.h"
 #endif
 
+using namespace std;
 using namespace llvm;
 using namespace llvm::cl;
+using namespace llvm::sys;
 
 
 // Jade options
@@ -142,26 +140,26 @@ void clean_exit(int sig){
 
 int main(int argc, char **argv) {
 	// Print a stack trace if we signal out.
-	llvm::sys::PrintStackTraceOnErrorSignal();
-	llvm::PrettyStackTraceProgram X(argc, argv);
-	llvm::cl::ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
+	PrintStackTraceOnErrorSignal();
+	PrettyStackTraceProgram X(argc, argv);
+	ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
 	(void) signal(SIGINT, clean_exit);
     
 	//Initialize context
 	InitializeNativeTarget();
 	LLVMContext &Context = getGlobalContext();
-
 	clock_t timer = clock ();
 
+	//Parsing XDF file
 	std::cout << "Jade started, parsing file " << XDFFile.getValue() << ". \n";
-	XDFParser *xdfParser = new XDFParser(XDFFile);
-	Network* network = xdfParser->ParseXDF(Context);
-	
-	//delete xdfParser;
-	std::cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
+	XDFParser xdfParser(XDFFile);
+	Network* network = xdfParser.ParseXDF(Context);
+	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 
+
+	//Load and execute the parsed network
 	DecoderEngine engine(Context);
 	engine.load(network);
-	
-	std::cout << "Engine created in : " << (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms , start decoding.\n";
+
+	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
 }
