@@ -344,17 +344,37 @@ std::list<Action*>* JIT::createActions(Instance* instance, list<Action*>* action
 	return newActions;
 }
 
+std::list<Action*>* JIT::createInitializes(Instance* instance, list<Action*>* actions){
+	list<Action*>* newActions = new list<Action*>();
+	
+	list<Action*>::iterator it;
+
+	for (it = actions->begin(); it != actions->end(); ++it){
+		Action* action = createAction(instance, *it, NULL, NULL);
+		newActions->push_back(action);
+	}
+
+	return newActions;
+}
+
 
 Action* JIT::createAction(Instance* instance, Action* action, map<string, Port*>* inputs, map<string, Port*>* outputs){
-		
+		map<Port*, ConstantInt*>* inputPattern = NULL;
+		map<Port*, ConstantInt*>* outputPattern = NULL;
+
 		Procedure* scheduler = action->getScheduler();
 		Procedure* body = action->getBody();
 	
 		Procedure* newScheduler = CreateProcedure(instance, scheduler);
 		Procedure* newBody = CreateProcedure(instance, body);
 		
-		map<Port*, ConstantInt*>* inputPattern = createPattern(action->getInputPattern(), inputs);
-		map<Port*, ConstantInt*>* outputPattern = createPattern(action->getOutputPattern(), outputs);
+		if (inputs != NULL){
+			inputPattern = createPattern(action->getInputPattern(), inputs);
+		}
+
+		if (outputs != NULL){
+			outputPattern = createPattern(action->getOutputPattern(), outputs);
+		}
 
 		return new Action(action->getTag(), inputPattern, outputPattern, newScheduler, newBody);
 }

@@ -71,7 +71,7 @@ ActionSchedulerAdder::ActionSchedulerAdder(Instance* instance, Decoder* decoder,
 
 void ActionSchedulerAdder::createScheduler(ActionScheduler* actionScheduler){
 		Function* scheduler = createSchedulerFn(actionScheduler);
-		instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);	
+		instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);
 }
 
 Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionScheduler){
@@ -112,7 +112,7 @@ Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionSchedul
 		BranchInst::Create(BB, incBB);
 		
 		if (actionScheduler->hasFsm()){
-			BB = createSchedulerFSM(actionScheduler, BB, incBB, returnBB , scheduler);			
+			BB = createSchedulerFSM(actionScheduler, BB, incBB, returnBB , scheduler);
 		}else{
 			BB = createSchedulerNoFSM(actionScheduler->getActions(), BB, incBB, returnBB, scheduler);
 		}

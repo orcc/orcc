@@ -240,6 +240,7 @@ public:
 	InstancedFU* instanciate(Instance* instance, Decoder* decoder);
 	void createParameters(Instance* instance, Decoder* decoder);
 	std::list<Action*>* createActions(Instance* instance, std::list<Action*>* actions, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs);
+	std::list<Action*>* createInitializes(Instance* instance, std::list<Action*>* actions);
 	Action* createAction(Instance* instance, Action* action, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs);
 	Procedure* CreateProcedure(Instance* instance, Procedure* procedure);
 	llvm::Function* CreateFunction(Instance* instance, llvm::Function* function);
