@@ -182,9 +182,15 @@ endif$
 
 Read(op) ::= <<
 <note kind="consumptionRates" name="$op.port.name$" value="$op.numTokens$"/>
+$if(op.target)$
 <operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
 	<port dir="out" source="$op.target$" typeName="$op.target$_typedef"/>
 </operation>
+$else$
+<operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
+	$port(dir="out", type=op.port.type, source=op.target)$
+</operation>
+$endif$
 >>
 
 Write(op) ::= <<
@@ -212,7 +218,7 @@ $<operation kind="noop">
 
 Store(op) ::= <<
 <!-- Store $op$ -->
-$if (op.target.type.list)
+$if (op.target.global || op.target.type.list)
 $<operation kind="assign" target="$op.target$">
 	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
 	$port(dir="in", source=op.value.var)$
@@ -226,11 +232,7 @@ $<operation kind="noop">
 
 Assign(op) ::= <<
 <!-- $op$ -->
-$if(op.cast)$
-$Cast(target = op.target, value = op.value, cast = op.cast)$
-$else$ 
 $expression(op.value)$
-$endif$
 >>
 
 Cast(target,value,cast) ::= <<
