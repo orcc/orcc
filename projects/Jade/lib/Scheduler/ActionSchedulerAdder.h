@@ -93,7 +93,7 @@ private:
 	void createTransitions(std::map<std::string, FSM::Transition*>* transitions, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
 	void createTransition(FSM::Transition* transition, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
 	llvm::BasicBlock* createSchedulingTestState(std::list<FSM::NextStateInfo*>* nextStates, FSM::State* sourceState, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
-	llvm::BasicBlock* createActionTestState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* stateBB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
+	llvm::BasicBlock* createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, llvm::BasicBlock* stateBB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
 	void createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB);
 	void createStates(std::map<std::string, FSM::State*>* states, llvm::Function* function);
 	llvm::Function* createSchedulerOutsideFSM(std::list<Action*>* actions);

@@ -71,6 +71,7 @@ ActionSchedulerAdder::ActionSchedulerAdder(Instance* instance, Decoder* decoder,
 
 void ActionSchedulerAdder::createScheduler(ActionScheduler* actionScheduler){
 		Function* scheduler = createSchedulerFn(actionScheduler);
+		instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);	
 }
 
 Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionScheduler){
@@ -111,12 +112,9 @@ Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionSchedul
 		BranchInst::Create(BB, incBB);
 		
 		if (actionScheduler->hasFsm()){
-			BB = createSchedulerFSM(actionScheduler, BB, incBB, returnBB , scheduler);
-			//if (instance->getId().compare("decoder_parser_parseheaders")!=0)
-			instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);		
+			BB = createSchedulerFSM(actionScheduler, BB, incBB, returnBB , scheduler);			
 		}else{
 			BB = createSchedulerNoFSM(actionScheduler->getActions(), BB, incBB, returnBB, scheduler);
-			instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);
 		}
 
 		return scheduler;
@@ -238,7 +236,7 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 			Value* value2 = *itValue;
 			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", fireBB);
 		}
-		
+
 		// Add a basic block hasRoom that fires the action
 		string hasRoomBrName = "hasRoom_";
 		hasRoomBrName.append(name);
@@ -330,7 +328,7 @@ BasicBlock* ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateI
 	//Iterate though next states of the transition
 	list<FSM::NextStateInfo*>::iterator it;
 	for (it = nextStates->begin(); it != nextStates->end(); it++){
-		stateBB = createActionTestState(*it, stateBB, incBB, returnBB, function);
+		stateBB = createActionTestState(*it, sourceState, stateBB, incBB, returnBB, function);
 	}
 
 	//Store current state in skip basic block and brancg to return basic block
@@ -341,7 +339,7 @@ BasicBlock* ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateI
 	return NULL;
 }
 
-BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* nextStateInfo, BasicBlock* stateBB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, BasicBlock* stateBB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
 
 
 	//Get information about next state
@@ -391,8 +389,17 @@ BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* next
 		hasRoomBrName.append(instance->getId());
 		BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
 
+		//Create a basic block skip_hasRoom that store state and return from function
+		string skipHasRoomBrName = "skipHasRoom_";
+		skipHasRoomBrName.append(action->getName());
+		skipHasRoomBrName.append(instance->getId());
+		BasicBlock* skipRoomBB = BasicBlock::Create(Context, skipHasRoomBrName, function);
+		ConstantInt* index = ConstantInt::get(Type::getInt32Ty(Context), sourceState->getIndex());
+		StoreInst* storeInst = new StoreInst(index, stateVar, skipRoomBB);
+		BranchInst::Create(returnBB, skipRoomBB);
+
 		//Finally branch fire to hasRoom block if all outputs have free room
-		BranchInst* brInst = BranchInst::Create(roomBB, skipStateBB, value1, fireStateBB);
+		BranchInst* brInst = BranchInst::Create(roomBB, skipRoomBB, value1, fireStateBB);
 
 		fireStateBB = roomBB;
 	}
