@@ -87,6 +87,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="PocToRead_i">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -118,15 +125,12 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx2PocControl">
+    <Port kind="Output" name="PocToRead_o">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
         </Type>
-    </Port>
-    <Port kind="Output" name="NewMb">
-        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
@@ -219,9 +223,9 @@
     <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN"
         dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Algo_Add" dst-port="Y" src="" src-port="Coef_ACR"/>
-    <Connection dst="" dst-port="RefIdx2PocControl"
-        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="RefIdx2PocControl"/>
-    <Connection dst="" dst-port="NewMb"
-        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="NewMb"/>
     <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="Mv" src="" src-port="MV"/>
+    <Connection dst="" dst-port="PocToRead_o"
+        src="Mgnt_Interp_FBAddr_Chroma_MxN" src-port="PocToRead_o"/>
+    <Connection dst="Mgnt_Interp_FBAddr_Chroma_MxN"
+        dst-port="PocToRead_i" src="" src-port="PocToRead_i"/>
 </XDF>

@@ -13,15 +13,18 @@
       <vertex id="MbType4Prediction" x="158" y="331"/>
       <vertex id="MbPredRefIdxL1" x="-143" y="509"/>
       <vertex id="SubMbPredRefIdxL1" x="-151" y="566"/>
-      <vertex id="MV" x="895" y="102"/>
-      <vertex id="LOCATION" x="577" y="74"/>
-      <vertex id="PartSZ" x="891" y="298"/>
-      <vertex id="mv_out" x="892" y="265"/>
-      <vertex id="ref_idx" x="894" y="330"/>
+      <vertex id="MV" x="911" y="195"/>
+      <vertex id="LOCATION" x="531" y="162"/>
+      <vertex id="PartSZ" x="907" y="341"/>
+      <vertex id="mv_out" x="899" y="264"/>
+      <vertex id="ref_idx" x="912" y="374"/>
       <vertex id="Algo_Add" x="620" y="168"/>
       <vertex id="MvpL0_Reconstr" x="94" y="-78"/>
-      <vertex id="MvComponentReord" x="723" y="256"/>
+      <vertex id="MvComponentReord" x="727" y="263"/>
       <vertex id="SelectMvpLX" x="351" y="147"/>
       <vertex id="MvpL1_Reconstr" x="120" y="571"/>
+      <vertex id="NewPic" x="629" y="285"/>
+      <vertex id="RefIdxL0" x="544" y="-23"/>
+      <vertex id="NewList" x="905" y="302"/>
    </vertices>
 </layout>

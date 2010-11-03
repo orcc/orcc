@@ -58,7 +58,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=2)  LFDisable,
 	int(size=6)   Slice_Beta_Offset,
 	int(size=6)   Slice_Alpha_C0_Offset,
-	int(size=8)   SkipValQp_Y_Cb_Cr
+	int(size=8)   SkipValQp_Y_Cb_Cr,
+
+	bool          NewPic
 		:
 
 
@@ -230,6 +232,18 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 */
 		end
 
+	SendNewPic.Launch: action
+				==>
+			NewPic :[true]
+		guard
+			first_mb_in_slice = 0
+		end
+
+	SendNewPic.Skip: action ==>
+		guard
+			first_mb_in_slice != 0
+		end
+
 	/* It's a CABAC Sequence ! */
 	EntropyCodingModeFlag.IsEqualToTrue: action
 			==>
@@ -270,7 +284,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			LFDisable                 :[disable_deblocking_filter_idc],
 			Slice_Beta_Offset         :[slice_beta_offset],
 			Slice_Alpha_C0_Offset     :[slice_alpha_c0_offset],
-			SkipValQp_Y_Cb_Cr         :[ QpValue , Qp_CbValue , Qp_CrValue]
+			SkipValQp_Y_Cb_Cr         :[ QpValue , Qp_CbValue , Qp_CrValue],
+			NewPic                    :[false]
 		guard
 			mb_skip_run > 0
 		do
@@ -339,7 +354,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	//macroblock_layer()
 	SendMbLayerParameters: action
 				==>
-			MbLayerParameters :[Parameters] repeat 35
+			MbLayerParameters :[Parameters] repeat 35,
+			NewPic            :[false]
 		var
 			List(type: int(size=8), size=35) Parameters,
 			List(type: uint(size=5), size=12) NaTab,
@@ -453,7 +469,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 		end
 
 	schedule fsm GetSpsAndPpsParameters:
-		GetSpsAndPpsParameters     (GetSpsAndPpsParameters              )--> CheckEntropyCodingModeFlag;
+		GetSpsAndPpsParameters     (GetSpsAndPpsParameters              )--> SendNewPic;
+
+		SendNewPic                 (SendNewPic                          )--> CheckEntropyCodingModeFlag;
 
 		CheckEntropyCodingModeFlag (EntropyCodingModeFlag.IsEqualToTrue )--> GetSpsAndPpsParameters;
 		CheckEntropyCodingModeFlag (IsSliceIorSI                        )--> ReadMbSkipRun;

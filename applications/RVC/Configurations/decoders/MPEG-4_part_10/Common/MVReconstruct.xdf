@@ -87,6 +87,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="NewPic">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -124,6 +127,16 @@
                 <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
+    </Port>
+    <Port kind="Output" name="RefIdxL0">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="NewList">
+        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
@@ -227,4 +240,7 @@
         src="MvpL0_Reconstr" src-port="Location"/>
     <Connection dst="SelectMvpLX" dst-port="LocationL1"
         src="MvpL1_Reconstr" src-port="Location"/>
+    <Connection dst="" dst-port="RefIdxL0" src="MvpL0_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="MvComponentReord" dst-port="InputNewPic" src="" src-port="NewPic"/>
+    <Connection dst="" dst-port="NewList" src="MvComponentReord" src-port="NewPic"/>
 </XDF>

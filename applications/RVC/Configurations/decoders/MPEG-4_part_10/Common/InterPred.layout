@@ -17,11 +17,11 @@
       <vertex id="RA_Width_L" x="511" y="564"/>
       <vertex id="RA_Height_L" x="510" y="530"/>
       <vertex id="MB4x4Pred_L" x="1121" y="459"/>
-      <vertex id="RefIdx2PocControl" x="492" y="603"/>
-      <vertex id="NewMb" x="527" y="464"/>
-      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="197" y="446"/>
+      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="235" y="431"/>
       <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="458" y="291"/>
       <vertex id="Algo_Interp_split_MB" x="797" y="182"/>
       <vertex id="Algo_Add_4x4" x="991" y="442"/>
+      <vertex id="PocToRead_i" x="44" y="655"/>
+      <vertex id="PocToRead_o" x="508" y="458"/>
    </vertices>
 </layout>

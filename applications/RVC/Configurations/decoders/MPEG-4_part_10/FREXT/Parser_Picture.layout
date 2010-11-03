@@ -11,23 +11,22 @@
       <vertex id="PpsParam4SliceData" x="56" y="1543"/>
       <vertex id="SpsParam4SliceData" x="90" y="1616"/>
       <vertex id="IntraPredModeC" x="2128" y="1390"/>
-      <vertex id="QP_Cb" x="2598" y="1679"/>
-      <vertex id="QP_Cr" x="2610" y="1717"/>
-      <vertex id="ScalingList" x="2614" y="1824"/>
-      <vertex id="QP" x="2615" y="1643"/>
+      <vertex id="QP_Cb" x="2596" y="1724"/>
+      <vertex id="QP_Cr" x="2608" y="1762"/>
+      <vertex id="ScalingList" x="2612" y="1869"/>
+      <vertex id="QP" x="2614" y="1693"/>
       <vertex id="CurrMbAddr" x="900" y="1465"/>
-      <vertex id="slice_alpha_c0_offset" x="847" y="1662"/>
-      <vertex id="slice_beta_offset" x="860" y="1692"/>
+      <vertex id="slice_alpha_c0_offset" x="855" y="1706"/>
+      <vertex id="slice_beta_offset" x="867" y="1733"/>
       <vertex id="LFDisable" x="896" y="1529"/>
       <vertex id="MbPartIdx" x="2607" y="1552"/>
-      <vertex id="RefIdx_l0" x="2613" y="1749"/>
       <vertex id="MbPartWidth" x="2593" y="1581"/>
       <vertex id="MbPartHeigth" x="2589" y="1524"/>
       <vertex id="CodedBlockPattern" x="2574" y="1250"/>
       <vertex id="ConstrainedIFlag" x="888" y="1438"/>
       <vertex id="MvResl0" x="2601" y="1614"/>
-      <vertex id="PicWidthInMb" x="877" y="1596"/>
-      <vertex id="PicSizeInMb" x="884" y="1567"/>
+      <vertex id="PicWidthInMb" x="876" y="1621"/>
+      <vertex id="PicSizeInMb" x="884" y="1591"/>
       <vertex id="FirstMbInSlice" x="887" y="1496"/>
       <vertex id="POC" x="795" y="603"/>
       <vertex id="I_PCM_Y" x="1621" y="1428"/>
@@ -48,17 +47,18 @@
       <vertex id="Value" x="2609" y="1089"/>
       <vertex id="Last" x="2623" y="1217"/>
       <vertex id="MacroBlockType" x="2587" y="1466"/>
-      <vertex id="TransformSize8x8" x="2586" y="1890"/>
+      <vertex id="TransformSize8x8" x="2584" y="1935"/>
       <vertex id="NbRefFrame_l1" x="1239" y="602"/>
       <vertex id="RefList1Type" x="1246" y="704"/>
       <vertex id="RefReordering_l1" x="1245" y="836"/>
-      <vertex id="RefIdx_l1" x="2617" y="1786"/>
-      <vertex id="SelectList" x="2616" y="1855"/>
-      <vertex id="slice_type" x="2600" y="1927"/>
+      <vertex id="slice_type" x="2598" y="1972"/>
       <vertex id="MbPredRefIdxL0" x="2012" y="1528"/>
       <vertex id="SubMbPredRefIdxL0" x="1967" y="1693"/>
       <vertex id="SubMbType" x="1980" y="1977"/>
       <vertex id="MbType4Pred" x="2598" y="1434"/>
+      <vertex id="MbPredRefIdxL1" x="2025" y="1567"/>
+      <vertex id="SubMbPredRefIdxL1" x="1986" y="1899"/>
+      <vertex id="NewPic" x="2606" y="1653"/>
       <vertex id="Mgnt_DecodePic" x="1515" y="-132"/>
       <vertex id="DecodeSliceHeader" x="329" y="460"/>
       <vertex id="DecodeRefPicList" x="950" y="644"/>
@@ -71,7 +71,5 @@
       <vertex id="DecodeSubMbPred" x="1742" y="1736"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="2238" y="1461"/>
       <vertex id="GenerateSkipBlockInformation" x="2299" y="1210"/>
-      <vertex id="MbPredRefIdxL1" x="2025" y="1567"/>
-      <vertex id="SubMbPredRefIdxL1" x="1986" y="1899"/>
    </vertices>
 </layout>

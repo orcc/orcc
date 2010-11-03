@@ -9,13 +9,11 @@
       <vertex id="MbPartHeigth" x="243" y="972"/>
       <vertex id="MbPartWidth" x="243" y="1069"/>
       <vertex id="MbPartIdx" x="243" y="1166"/>
-      <vertex id="RefIdx_l0" x="635" y="1122"/>
       <vertex id="Coef_ACR" x="57" y="1946"/>
       <vertex id="LOCATION" x="243" y="1360"/>
       <vertex id="MV" x="243" y="1457"/>
       <vertex id="PartSZ" x="243" y="1554"/>
       <vertex id="POC" x="808" y="972"/>
-      <vertex id="RefList0" x="622" y="1195"/>
       <vertex id="Mb_TypeC" x="243" y="1651"/>
       <vertex id="slice_beta_offset" x="808" y="209"/>
       <vertex id="slice_alpha_c0_offset" x="808" y="306"/>
@@ -30,18 +28,13 @@
       <vertex id="PocToDisplay" x="756" y="1112"/>
       <vertex id="IsIDR" x="786" y="1167"/>
       <vertex id="MacroBlockType" x="57" y="1849"/>
-      <vertex id="RefIdx_l1" x="754" y="1433"/>
-      <vertex id="RefList1" x="761" y="1554"/>
-      <vertex id="SelectList" x="840" y="1641"/>
       <vertex id="Display_C" x="1491" y="1296"/>
       <vertex id="Intra8x8" x="1023" y="1859"/>
       <vertex id="Inter" x="507" y="1254"/>
       <vertex id="Buffer_inter" x="1258" y="1164"/>
       <vertex id="Select_chroma" x="808" y="1790"/>
       <vertex id="Deblocking_Filter" x="1023" y="507"/>
-      <vertex id="RefIdxl0toPOC" x="837" y="1200"/>
       <vertex id="DemuxParserInfos" x="243" y="1908"/>
-      <vertex id="RefIdxl1toPOC" x="846" y="1489"/>
-      <vertex id="SelectRefIdx" x="1031" y="1492"/>
+      <vertex id="PocToRead" x="55" y="1484"/>
    </vertices>
 </layout>

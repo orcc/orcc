@@ -18,8 +18,6 @@
       <vertex id="MbPartIdx" x="205" y="1090"/>
       <vertex id="MbPartWidth" x="205" y="1187"/>
       <vertex id="PartSZ" x="205" y="1284"/>
-      <vertex id="RefList0" x="205" y="1381"/>
-      <vertex id="RefIdx_l0" x="205" y="1478"/>
       <vertex id="slice_alpha_c0_offset" x="205" y="1575"/>
       <vertex id="LFDisable" x="205" y="1672"/>
       <vertex id="CodedBlockPattern" x="407" y="781"/>
@@ -32,11 +30,9 @@
       <vertex id="PocToDisplay" x="232" y="1153"/>
       <vertex id="IsIDR" x="205" y="2730"/>
       <vertex id="MacroBlockType" x="188" y="663"/>
-      <vertex id="RefList1" x="274" y="1418"/>
-      <vertex id="RefIdx_l1" x="280" y="1515"/>
-      <vertex id="SelectList" x="237" y="1747"/>
       <vertex id="Display" x="906" y="998"/>
       <vertex id="PRED_C" x="660" y="958"/>
       <vertex id="RES_C" x="205" y="2060"/>
+      <vertex id="PocToRead" x="142" y="1521"/>
    </vertices>
 </layout>

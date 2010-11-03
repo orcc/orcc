@@ -18,14 +18,13 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		uint(size=13) PicSizeInMb,
 		int(size=16) MV,
 		uint(size=11) Location,
+		uint(size=32) Poc2Read,
 		uint(size=6) PartSZ
 		==>
 		uint(size=21) RA,
 		uint(size=11) RA_Width,
 		uint(size=11) RA_Height,
-//		uint(size=16) Frac,
-		uint(size=2)  RefIdx2PocControl,
-		bool          NewMb
+		uint(size=32) PocToRead
 	:
 
 	uint(size=2) GETNEWLIST  = 0;
@@ -49,6 +48,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   int count:=0;
   int currMB                := 0;
   int pic_size              := 0;
+  uint(size=32) poc_to_read;
   
   //Mb_Type_NOK : Consume the token, nothing else to do 
   Mb_Type_NOK_and_IPCM :action Mb_Type:[a], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
@@ -95,7 +95,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   	pic_size:=c;
   end
   
-  get_pos: action MbPartIdx:[idx], Location:[ a, b ], PartSZ:[ c, d ] ==> RefIdx2PocControl :[GETNEWIDX], NewMb:[true]
+  get_pos: action MbPartIdx:[idx], Location:[ a, b ], PartSZ:[ c, d ],Poc2Read:[ValPocToRead] ==>
   do
 	if(DEBUG_INPUT)then
 		println("Input InterpFBAddrLuma MbPartIdx:"+idx);	
@@ -126,13 +126,10 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
     else // if mbpart_h = 4 and mbpart_w = 4 then mode4x4 
       count+rshift(width,2)*rshift(height,2)
     end end end end end end;
-    
-    
+    poc_to_read := ValPocToRead;
   end
   
-  get_mv_send_frac: action MV:[ mx, my ] ==> /*Frac: [frac_x, frac_y]*/
-//  var
-//    uint(size=16) frac_x, uint(size=16) frac_y
+  get_mv_send_frac: action MV:[ mx, my ] ==>
   do
 	if(DEBUG_INPUT)then
 		println("Input InterpFBAddrLuma MV:"+mx+" ; "+my);
@@ -141,18 +138,16 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
     y_index :=rshift (my, 2);
     o_x := x + x_index-2;
     o_y := y + y_index-2;
- //   frac_x := (mx - lshift (x_index, 2));
- //   frac_y := (my - lshift (y_index, 2));
   end
   
-  RA_not_border: action ==>  RA:[ o_x + Picwidth_l * o_y ], RA_Width:[ width + 5 ], RA_Height:[ height + 5 ], RefIdx2PocControl :[ SENDLASTIDX ],NewMb:[false]
+  RA_not_border: action ==> PocToRead:[poc_to_read], RA:[ o_x + Picwidth_l * o_y ], RA_Width:[ width + 5 ], RA_Height:[ height + 5 ]
   guard
     x + x_index-2 >= 0 and (x + x_index + width + 3) <= (Picwidth_l-1) and
     y + y_index-2 >= 0 and (y + y_index + height + 3) <= (Picheight_l-1)
   end
   
   // read_address
-  RA_border: action ==>  RA:[ r_addr ], RA_Width:[ 1 ], RA_Height:[ 1 ], RefIdx2PocControl :[ SENDLASTIDX ],NewMb:[false]
+  RA_border: action ==> PocToRead:[poc_to_read], RA:[ r_addr ], RA_Width:[ 1 ], RA_Height:[ 1 ]
   var uint r_addr
   do
    addr_x := o_x;
@@ -193,9 +188,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   MB_Ndone: action ==>
   end
 
-  PIC_done: action
-  		==>
-  	RefIdx2PocControl :[ GETNEWLIST ]
+  PIC_done: action ==>
   guard
   	currMB = pic_size-1
   end

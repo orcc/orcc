@@ -1,20 +1,9 @@
 actor Dave_Null () 
-	uint(size=4) Token,
-	uint(size=4) Token2
+	int(size=32) Token
 	==>
     :
 	a: action
 			Token:[b]
 				==>
-	do
-		println("Token : "+ b);
-		while true do end
-	end
-	b: action
-			Token2:[b]
-				==>
-	do
-		println("Token : "+ b);
-		while true do end
 	end
 end

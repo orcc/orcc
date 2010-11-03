@@ -13,12 +13,12 @@
       <vertex id="Coef_ACR" x="869" y="532"/>
       <vertex id="Mb_Type" x="44" y="566"/>
       <vertex id="CurrMbAddr" x="25" y="465"/>
+      <vertex id="PocToRead_i" x="115" y="680"/>
       <vertex id="RA_C" x="580" y="496"/>
       <vertex id="MB4x4Pred_C" x="1155" y="509"/>
       <vertex id="RA_Width_C" x="558" y="563"/>
       <vertex id="RA_Height_C" x="555" y="529"/>
-      <vertex id="RefIdx2PocControl" x="535" y="598"/>
-      <vertex id="NewMb" x="572" y="464"/>
+      <vertex id="PocToRead_o" x="575" y="651"/>
       <vertex id="Mgnt_Interp_FBAddr_Chroma_MxN" x="220" y="447"/>
       <vertex id="Algo_Interp_EighthPelBilinear" x="522" y="287"/>
       <vertex id="Algo_Interp_split_MB_C" x="809" y="153"/>

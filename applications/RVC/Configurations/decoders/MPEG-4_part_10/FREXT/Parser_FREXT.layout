@@ -14,7 +14,6 @@
       <vertex id="slice_beta_offset" x="1763" y="1504"/>
       <vertex id="LFDisable" x="1750" y="809"/>
       <vertex id="MbPartIdx" x="1757" y="949"/>
-      <vertex id="RefIdx_l0" x="1799" y="1295"/>
       <vertex id="MbPartWidth" x="1754" y="984"/>
       <vertex id="MbPartHeigth" x="1758" y="895"/>
       <vertex id="CodedBlockPattern" x="1711" y="529"/>
@@ -35,21 +34,18 @@
       <vertex id="PredMode" x="1874" y="429"/>
       <vertex id="DelList" x="1920" y="1582"/>
       <vertex id="IsIDR" x="1929" y="1614"/>
-      <vertex id="Ref_List0" x="2216" y="1218"/>
       <vertex id="MV" x="2227" y="844"/>
       <vertex id="LOCATION" x="2209" y="808"/>
       <vertex id="PART_SZ" x="2212" y="884"/>
       <vertex id="mv_out" x="2217" y="920"/>
-      <vertex id="ref_idx" x="2218" y="962"/>
+      <vertex id="ref_idx" x="2224" y="990"/>
       <vertex id="I_PCM_Y" x="1755" y="733"/>
       <vertex id="I_PCM_U" x="1749" y="664"/>
       <vertex id="I_PCM_V" x="1749" y="694"/>
       <vertex id="MacroBlockType" x="1727" y="845"/>
       <vertex id="TransformSize8x8" x="1760" y="1442"/>
-      <vertex id="Ref_List1" x="2240" y="1491"/>
-      <vertex id="RefIdx_l1" x="1799" y="1323"/>
-      <vertex id="SelectList" x="1788" y="1406"/>
       <vertex id="PocToDisplay" x="1995" y="1834"/>
+      <vertex id="PocToRead" x="2524" y="1043"/>
       <vertex id="Algo_NALU" x="355" y="5"/>
       <vertex id="CheckNaluType" x="663" y="-58"/>
       <vertex id="DecodeSps" x="29" y="1279"/>
@@ -58,13 +54,15 @@
       <vertex id="DecodePps" x="437" y="728"/>
       <vertex id="PicVLDecoding" x="1070" y="266"/>
       <vertex id="MMCO" x="1557" y="1567"/>
-      <vertex id="RefList0" x="2020" y="1192"/>
+      <vertex id="RefList0" x="1999" y="1193"/>
       <vertex id="IntraPredSplit" x="1536" y="351"/>
-      <vertex id="MVReconstruct" x="1992" y="819"/>
+      <vertex id="MVReconstruct" x="1952" y="828"/>
       <vertex id="BlockExpand" x="1997" y="527"/>
       <vertex id="BlockSplit" x="2209" y="289"/>
       <vertex id="DecodePic" x="1012" y="483"/>
-      <vertex id="RefList1" x="2023" y="1464"/>
+      <vertex id="RefList1" x="2004" y="1464"/>
       <vertex id="Mgnt_Display" x="1802" y="1812"/>
+      <vertex id="RefIdxL0ToPoc" x="2354" y="1017"/>
+      <vertex id="BlackHole" x="2402" y="1533"/>
    </vertices>
 </layout>

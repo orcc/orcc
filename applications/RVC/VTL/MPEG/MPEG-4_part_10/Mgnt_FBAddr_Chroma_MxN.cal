@@ -19,14 +19,13 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   							 uint(size=13)   PicSizeInMb, 
   							 uint(size=7)   PicWidthInMb,
   							 uint(size=3)         MbPartIdx,
-  							 uint(size=13)        CurrMbAddr
+  							 uint(size=13)        CurrMbAddr,
+							 uint(size=32) PocToRead_i
   															   ==> 
    																  uint(size=21) 	   RA, 
    																  uint(size=11)        RA_Width, 
    																  uint(size=11)        RA_Height,
-   																 // int (size=4)   Frac,
-																  uint(size=2)  RefIdx2PocControl,
-																  bool 	        NewMb :
+							 									  uint(size=32) PocToRead_o :
 
 	uint(size=2) GETNEWLIST  = 0;
 	uint(size=2) GETNEWIDX   = 1;
@@ -52,6 +51,7 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   int count    := 0;
   int currMB   := 0;
   int pic_size := 0;
+  uint(size=32) poc_to_read;
 
   
   //Mb_Type_NOK_and_IPCM : Consume the token, nothing else to do 
@@ -91,10 +91,8 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   //Mb_Type_OK : Enable the prediction 
   Mb_Type_OK: action Mb_Type      :[a],
   	                 PicWidthInMb :[ b ], 
-  	                 PicSizeInMb  :[ c ], 
-//  	                 Coef_ACR     :[d] repeat 8*8,
-  	                 CurrMbAddr   :[valCurrMbAddr]              ==> 
-//  	     										                   Coef_ACR_P:[d] repeat 8*8
+  	                 PicSizeInMb  :[ c ],
+  	                 CurrMbAddr   :[valCurrMbAddr]              ==>
   guard
   	a = 2
   do 
@@ -106,12 +104,11 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   
   
   
-  get_pos: action MbPartIdx : [ idx  ], 
-  			      Location  : [ a, b ], 
-  			      PartSZ    : [ c, d ]
-  			      	==>
-		      	RefIdx2PocControl :[GETNEWIDX],
-		      	NewMb             :[true]      
+  get_pos: action MbPartIdx   : [ idx  ], 
+  			      Location    : [ a, b ], 
+  			      PartSZ      : [ c, d ],
+  			      PocToRead_i :[PocToRead]
+  			      	==>  
   do
   	x      := a/2;
     y      := b/2;
@@ -134,6 +131,7 @@ actor Mgnt_FBAddr_Chroma_MxN ()
       end
     
     end
+    poc_to_read := PocToRead;
     
   end
    
@@ -168,7 +166,7 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   MB_Ndone: action ==>
   end
   
-  PIC_done: action ==> RefIdx2PocControl     : [GETNEWLIST]
+  PIC_done: action ==>
   guard
   	currMB = pic_size - 1
   end
@@ -182,8 +180,7 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   read_address: action ==> RA        : [ r_addr ], 
   						   RA_Width  : [ 1 ], 
   						   RA_Height : [ 1 ],
-  						   RefIdx2PocControl :[SENDLASTIDX],
-  						   NewMb             :[false]
+  						   PocToRead_o :[poc_to_read]
   
   var int r_addr
   do

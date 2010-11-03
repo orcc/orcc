@@ -97,13 +97,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx_l0">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="MbPartWidth">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -236,13 +229,6 @@
     <Port kind="Output" name="IsIDR">
         <Type name="bool"/>
     </Port>
-    <Port kind="Output" name="Ref_List0">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="MV">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -309,29 +295,15 @@
     <Port kind="Output" name="TransformSize8x8">
         <Type name="bool"/>
     </Port>
-    <Port kind="Output" name="Ref_List1">
+    <Port kind="Output" name="PocToDisplay">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="RefIdx_l1">
+    <Port kind="Output" name="PocToRead">
         <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="SelectList">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="PocToDisplay">
-        <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
             </Entry>
@@ -499,6 +471,24 @@
             <Expr kind="Literal" literal-kind="Boolean" value="true"/>
         </Parameter>
     </Instance>
+    <Instance id="RefIdxL0ToPoc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC2"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="BlackHole">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/Dave_Null"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -555,7 +545,6 @@
     <Connection dst="" dst-port="PredMode" src="IntraPredSplit" src-port="PredMode"/>
     <Connection dst="" dst-port="DelList" src="MMCO" src-port="DelList"/>
     <Connection dst="" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
-    <Connection dst="" dst-port="Ref_List0" src="RefList0" src-port="RefList"/>
     <Connection dst="" dst-port="MV" src="MVReconstruct" src-port="MV"/>
     <Connection dst="" dst-port="LOCATION" src="MVReconstruct" src-port="LOCATION"/>
     <Connection dst="" dst-port="PART_SZ" src="MVReconstruct" src-port="PartSZ"/>
@@ -641,10 +630,6 @@
     <Connection dst="RefList1" dst-port="RefListType" src="DecodePic" src-port="RefList1Type"/>
     <Connection dst="RefList1" dst-port="RefReordering" src="DecodePic" src-port="RefReordering_l1"/>
     <Connection dst="MVReconstruct" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
-    <Connection dst="" dst-port="Ref_List1" src="RefList1" src-port="RefList"/>
-    <Connection dst="" dst-port="RefIdx_l1" src="DecodePic" src-port="RefIdx_l1"/>
-    <Connection dst="" dst-port="SelectList" src="DecodePic" src-port="SelectList"/>
-    <Connection dst="" dst-port="RefIdx_l0" src="DecodePic" src-port="RefIdx_l0"/>
     <Connection dst="MVReconstruct" dst-port="slice_type"
         src="DecodePic" src-port="slice_type"/>
     <Connection dst="MVReconstruct" dst-port="mb_type" src="DecodePic" src-port="MacroBlockType"/>
@@ -672,4 +657,12 @@
         src="DecodePic" src-port="MbPredRefIdxL1"/>
     <Connection dst="MVReconstruct" dst-port="SubMbPredRefIdxL1"
         src="DecodePic" src-port="SubMbPredRefIdxL1"/>
+    <Connection dst="MVReconstruct" dst-port="NewPic" src="DecodePic" src-port="NewPic"/>
+    <Connection dst="RefIdxL0ToPoc" dst-port="RefList" src="RefList0" src-port="RefList"/>
+    <Connection dst="RefIdxL0ToPoc" dst-port="NewList"
+        src="MVReconstruct" src-port="NewList"/>
+    <Connection dst="RefIdxL0ToPoc" dst-port="RefIdx"
+        src="MVReconstruct" src-port="RefIdxL0"/>
+    <Connection dst="" dst-port="PocToRead" src="RefIdxL0ToPoc" src-port="POCtoRead"/>
+    <Connection dst="BlackHole" dst-port="Token" src="RefList1" src-port="RefList"/>
 </XDF>
