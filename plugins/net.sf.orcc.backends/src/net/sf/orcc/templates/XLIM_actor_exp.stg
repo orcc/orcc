@@ -381,9 +381,13 @@ $if(type.list)$
   </typePar>
 </type>
 $else
+$$if(type.bool)
+$<type name="$type$"/>
+$else
 $<type name="$type$">
   <valuePar name="size" value="$type.size$"/>
 </type>$
+endif$$
 endif$
 >>
 
