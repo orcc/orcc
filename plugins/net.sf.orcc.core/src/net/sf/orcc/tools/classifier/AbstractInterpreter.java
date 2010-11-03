@@ -38,30 +38,31 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.expr.BoolExpr;
 
 /**
- * This class defines an actor on which we can do abstract interpretation by
- * calling {@link #initialize()} and {@link #schedule()}. It refines the
- * interpreted actor by not relying on anything that is data-dependent.
+ * This class defines an abstract interpreter of an actor. It refines the
+ * concrete interpreter by not relying on anything that is data-dependent.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class AbstractInterpretedActor extends ActorInterpreter {
+public class AbstractInterpreter extends ActorInterpreter {
 
 	private Action scheduledAction;
 
 	/**
-	 * Creates a new partially interpreted actor
+	 * Creates a new abstract interpreter.
 	 * 
-	 * @param id
-	 *            instance identifier
 	 * @param actor
 	 *            an actor
+	 * @param analyzer
+	 *            a configuration analyzer
 	 */
-	public AbstractInterpretedActor(Actor actor, ConfigurationAnalyzer analyzer) {
+	public AbstractInterpreter(Actor actor, ConfigurationAnalyzer analyzer) {
 		super(new HashMap<String, Expression>(), actor, null);
 
 		// Build a node interpreter for visiting CFG and instructions
 		nodeInterpreter = new AbstractNodeInterpreter(analyzer);
+		
+		exprInterpreter = new AbstractExpressionEvaluator();
 	}
 
 	@Override

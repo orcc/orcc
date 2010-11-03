@@ -42,7 +42,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Matthieu Wipliez
  * 
  */
-public class Actor {
+public class Actor implements Comparable<Actor> {
 
 	private List<Action> actions;
 
@@ -122,6 +122,11 @@ public class Actor {
 		this.procs = procs;
 		this.actionScheduler = scheduler;
 		this.stateVars = stateVars;
+	}
+
+	@Override
+	public int compareTo(Actor actor) {
+		return name.compareTo(actor.getName());
 	}
 
 	/**

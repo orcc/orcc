@@ -36,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
@@ -263,7 +264,7 @@ public class Network {
 	 * @return a list of actors
 	 */
 	public List<Actor> getActors() {
-		Set<Actor> actors = new HashSet<Actor>();
+		Set<Actor> actors = new TreeSet<Actor>();
 		for (Vertex vertex : getGraph().vertexSet()) {
 			if (vertex.isInstance()) {
 				Instance instance = vertex.getInstance();
@@ -277,7 +278,7 @@ public class Network {
 			}
 		}
 
-		return Arrays.asList(actors.toArray(new Actor[0]));
+		return new ArrayList<Actor>(actors);
 	}
 
 	/**

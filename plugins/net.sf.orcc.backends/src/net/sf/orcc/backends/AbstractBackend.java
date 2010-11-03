@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -160,6 +161,14 @@ public abstract class AbstractBackend implements Backend {
 
 		});
 
+		Arrays.sort(files, new Comparator<File>() {
+
+			@Override
+			public int compare(File f1, File f2) {
+				return f1.compareTo(f2);
+			}
+
+		});
 		doVtlCodeGeneration(Arrays.asList(files));
 	}
 
@@ -286,6 +295,30 @@ public abstract class AbstractBackend implements Backend {
 	}
 
 	/**
+	 * Returns the integer-valued attribute with the given name. Returns the
+	 * given default value if the attribute is undefined.
+	 * 
+	 * @param attributeName
+	 *            the name of the attribute
+	 * @param defaultValue
+	 *            the value to use if no value is found
+	 * @return the value or the default value if no value was found.
+	 * @throws OrccException
+	 */
+	final public int getAttribute(String attributeName, int defaultValue)
+			throws OrccException {
+		if (configuration == null) {
+			return defaultValue;
+		}
+
+		try {
+			return configuration.getAttribute(attributeName, defaultValue);
+		} catch (CoreException e) {
+			throw new OrccException("could not read configuration", e);
+		}
+	}
+
+	/**
 	 * Returns the map-valued attribute with the given name. Returns the given
 	 * default value if the attribute is undefined.
 	 * 
@@ -299,30 +332,6 @@ public abstract class AbstractBackend implements Backend {
 	@SuppressWarnings("unchecked")
 	final public Map<String, String> getAttribute(String attributeName,
 			Map<String, String> defaultValue) throws OrccException {
-		if (configuration == null) {
-			return defaultValue;
-		}
-
-		try {
-			return configuration.getAttribute(attributeName, defaultValue);
-		} catch (CoreException e) {
-			throw new OrccException("could not read configuration", e);
-		}
-	}
-
-	/**
-	 * Returns the integer-valued attribute with the given name. Returns the
-	 * given default value if the attribute is undefined.
-	 * 
-	 * @param attributeName
-	 *            the name of the attribute
-	 * @param defaultValue
-	 *            the value to use if no value is found
-	 * @return the value or the default value if no value was found.
-	 * @throws OrccException
-	 */
-	final public int getAttribute(String attributeName, int defaultValue)
-			throws OrccException {
 		if (configuration == null) {
 			return defaultValue;
 		}

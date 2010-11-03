@@ -103,14 +103,14 @@ public class ActorClassifier implements ActorTransformation {
 		// first tries SDF with *all* the actions of the actor
 		MoC clasz = classifySDF(actions);
 		if (!clasz.isSDF()) {
-			ActionScheduler sched = actor.getActionScheduler();
 			try {
 				// not SDF, tries CSDF
-				clasz = classifyCSDF(sched);
+				clasz = classifyCSDF();
 			} catch (OrccRuntimeException e) {
 				// data-dependent behavior
 			}
 
+			ActionScheduler sched = actor.getActionScheduler();
 			if (!clasz.isCSDF()) {
 				// not CSDF, tries QSDF
 				if (sched.hasFsm()) {
@@ -143,58 +143,55 @@ public class ActorClassifier implements ActorTransformation {
 
 	/**
 	 * Tries to classify an actor as CSDF. Classification works only on actor
-	 * with a non-empty state. Such a state consists in all scalar state
-	 * variables that have an initial value.
+	 * with a non-empty state. The state consists of all scalar state variables
+	 * that have an initial value.
 	 * 
-	 * @param actions
-	 *            a list of actions
 	 * @return an actor class
 	 */
-	private MoC classifyCSDF(ActionScheduler sched) {
+	private MoC classifyCSDF() {
 		// new interpreter must be called before creation of ActorState
-		AbstractInterpretedActor interpretedActor = newInterpreter();
+		AbstractInterpreter interpreter = newInterpreter();
 
 		ActorState state = new ActorState(actor);
-		FSM fsm = sched.getFsm();
 		if (state.isEmpty()) {
-			if (sched.hasFsm()) {
-				if (isCycloStaticFsm(fsm)) {
-					return classifyCSDFStateless(sched.getFsm(),
-							interpretedActor);
-				}
-			}
+			return classifyCSDFStateless(interpreter);
+		} else {
+			return classifyCSDFStateful(state, interpreter);
+		}
+	}
 
-			// no state, no cyclo-static FSM => dynamic
-			return new DynamicMoC();
+	/**
+	 * This method tries to classify an actor as CSDF based on its state (the
+	 * set of state variables that are used in guards) and FSM state.
+	 * 
+	 * @param state
+	 * @param interpreter
+	 * @return
+	 */
+	private MoC classifyCSDFStateful(ActorState state,
+			AbstractInterpreter interpreter) {
+		FSM fsm = actor.getActionScheduler().getFsm();
+		String initialState = null;
+		if (fsm != null) {
+			initialState = fsm.getInitialState().getName();
 		}
 
-		// schedule the actor
+		// creates the MoC
 		CSDFMoC staticClass = new CSDFMoC();
 		int nbPhases = 0;
-		if (fsm == null) {
-			boolean scheduled;
-			do {
-				scheduled = interpretedActor.schedule();
-				if (scheduled) {
-					Action latest = interpretedActor.getScheduledAction();
-					staticClass.addAction(latest);
-				}
-				nbPhases++;
-			} while (!state.isInitialState() || !scheduled);
-		} else {
-			boolean scheduled;
-			String initialState = fsm.getInitialState().getName();
-			do {
-				scheduled = interpretedActor.schedule();
-				if (scheduled) {
-					Action latest = interpretedActor.getScheduledAction();
-					staticClass.addAction(latest);
-				}
-				nbPhases++;
-			} while (!state.isInitialState()
-					|| !initialState.equals(interpretedActor.getFsmState())
-					|| !scheduled);
-		}
+
+		// loops until the actor goes back to the initial state, or there is a
+		// data-dependent condition
+		do {
+			if (!interpreter.schedule()) {
+				return new DynamicMoC();
+			}
+
+			Action latest = interpreter.getScheduledAction();
+			staticClass.addAction(latest);
+			nbPhases++;
+		} while (!state.isInitialState()
+				|| !interpreter.getFsmState().equals(initialState));
 
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
@@ -209,21 +206,27 @@ public class ActorClassifier implements ActorTransformation {
 	/**
 	 * Tries to classify this actor with no state as CSDF.
 	 * 
+	 * @param interpreter
+	 *            the abstract interpreter
 	 * @return an actor class
 	 */
-	private MoC classifyCSDFStateless(FSM fsm,
-			AbstractInterpretedActor interpretedActor) {
+	private MoC classifyCSDFStateless(AbstractInterpreter interpreter) {
+		FSM fsm = actor.getActionScheduler().getFsm();
+		if (fsm == null || !isCycloStaticFsm(fsm)) {
+			// no state, no cyclo-static FSM => dynamic
+			return new DynamicMoC();
+		}
+
 		// schedule the actor
 		CSDFMoC staticClass = new CSDFMoC();
 		String initialState = fsm.getInitialState().getName();
 
 		int nbPhases = 0;
-
 		do {
-			interpretedActor.schedule();
-			staticClass.addAction(interpretedActor.getScheduledAction());
+			interpreter.schedule();
+			staticClass.addAction(interpreter.getScheduledAction());
 			nbPhases++;
-		} while (!initialState.equals(interpretedActor.getFsmState()));
+		} while (!initialState.equals(interpreter.getFsmState()));
 
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
@@ -245,11 +248,10 @@ public class ActorClassifier implements ActorTransformation {
 	 *            the action to use for configuring the FSM
 	 * @return a static class
 	 */
-	private SDFMoC classifyFsmConfiguration(String initialState,
-			Action action) {
+	private SDFMoC classifyFsmConfiguration(String initialState, Action action) {
 		SDFMoC staticClass = new SDFMoC();
 
-		AbstractInterpretedActor interpretedActor = newInterpreter();
+		AbstractInterpreter interpretedActor = newInterpreter();
 		interpretedActor.setAction(action);
 
 		// schedule the actor
@@ -292,8 +294,8 @@ public class ActorClassifier implements ActorTransformation {
 
 			for (NextStateInfo info : fsm.getTransitions(initialState)) {
 				Action action = info.getAction();
-				SDFMoC staticClass = classifyFsmConfiguration(
-						initialState, action);
+				SDFMoC staticClass = classifyFsmConfiguration(initialState,
+						action);
 				quasiStatic.addConfiguration(action, staticClass);
 			}
 
@@ -336,7 +338,7 @@ public class ActorClassifier implements ActorTransformation {
 
 		// schedule
 		SDFMoC staticClass = new SDFMoC();
-		AbstractInterpretedActor interpretedActor = newInterpreter();
+		AbstractInterpreter interpretedActor = newInterpreter();
 		interpretedActor.schedule();
 		staticClass.addAction(interpretedActor.getScheduledAction());
 
@@ -411,9 +413,9 @@ public class ActorClassifier implements ActorTransformation {
 	 * 
 	 * @return the interpreter created
 	 */
-	private AbstractInterpretedActor newInterpreter() {
-		AbstractInterpretedActor interpretedActor = new AbstractInterpretedActor(
-				actor, analyzer);
+	private AbstractInterpreter newInterpreter() {
+		AbstractInterpreter interpretedActor = new AbstractInterpreter(actor,
+				analyzer);
 
 		actor.resetTokenConsumption();
 		actor.resetTokenProduction();
