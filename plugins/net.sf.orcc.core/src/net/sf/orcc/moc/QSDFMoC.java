@@ -30,6 +30,7 @@ package net.sf.orcc.moc;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sf.orcc.ir.Action;
@@ -91,6 +92,18 @@ public class QSDFMoC extends AbstractMoC {
 	@Override
 	public boolean isQuasiStatic() {
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for (Entry<Action, SDFMoC> entry : classes.entrySet()) {
+			builder.append("configuration ");
+			builder.append(entry.getKey());
+			builder.append('\n');
+			builder.append(entry.getValue().toString());
+		}
+		return builder.toString();
 	}
 
 }

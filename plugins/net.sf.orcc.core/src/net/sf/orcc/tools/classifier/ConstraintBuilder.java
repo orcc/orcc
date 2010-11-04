@@ -49,6 +49,7 @@ import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
@@ -91,50 +92,50 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		private Object addConstraint(IntVariable v1, BinaryOp op, Object o2) {
 			switch (op) {
 			case BITAND:
-				if (o2 instanceof Integer) {
-					return v1.bitand((Integer) o2);
+				if (o2 instanceof IntExpr) {
+					return v1.bitand(((IntExpr) o2).getIntValue());
 				}
 				break;
 			case EQ:
 				if (o2 instanceof IntVariable) {
 					v1.equals((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.equals(((Integer) o2).intValue());
+				} else if (o2 instanceof IntExpr) {
+					v1.equals(((IntExpr) o2).getIntValue());
 				}
 				break;
 			case GE:
 				if (o2 instanceof IntVariable) {
 					v1.ge((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.ge((Integer) o2);
+				} else if (o2 instanceof IntExpr) {
+					v1.ge(((IntExpr) o2).getIntValue());
 				}
 				break;
 			case GT:
 				if (o2 instanceof IntVariable) {
 					v1.gt((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.gt((Integer) o2);
+				} else if (o2 instanceof IntExpr) {
+					v1.gt(((IntExpr) o2).getIntValue());
 				}
 				break;
 			case LE:
 				if (o2 instanceof IntVariable) {
 					v1.le((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.le((Integer) o2);
+				} else if (o2 instanceof IntExpr) {
+					v1.le(((IntExpr) o2).getIntValue());
 				}
 				break;
 			case LT:
 				if (o2 instanceof IntVariable) {
 					v1.lt((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.lt((Integer) o2);
+				} else if (o2 instanceof IntExpr) {
+					v1.lt(((IntExpr) o2).getIntValue());
 				}
 				break;
 			case NE:
 				if (o2 instanceof IntVariable) {
 					v1.notEquals((IntVariable) o2);
-				} else if (o2 instanceof Integer) {
-					v1.notEquals((Integer) o2);
+				} else if (o2 instanceof IntExpr) {
+					v1.notEquals(((IntExpr) o2).getIntValue());
 				}
 				break;
 			default:
@@ -166,8 +167,7 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 					case LOGIC_AND:
 						return null;
 					default:
-						throw new OrccRuntimeException(
-								"no variable in expression");
+						return new ExpressionEvaluator().interpretBinaryExpr((Expression) o1, op, (Expression) o2);
 					}
 				}
 			}
@@ -190,8 +190,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				Object obj = expr.getExpr().accept(this);
 				if (obj instanceof IntVariable) {
 					return ((IntVariable) obj).negate();
-				} else if (obj instanceof Integer) {
-					return -(Integer) obj;
+				} else if (obj instanceof IntExpr) {
+					return ((IntExpr) obj).negate();
 				}
 			}
 

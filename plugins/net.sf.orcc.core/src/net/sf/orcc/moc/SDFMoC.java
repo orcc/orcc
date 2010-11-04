@@ -47,4 +47,5 @@ public class SDFMoC extends CSDFMoC {
 	public boolean isSDF() {
 		return true;
 	}
+
 }

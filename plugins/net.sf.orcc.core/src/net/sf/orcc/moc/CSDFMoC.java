@@ -142,20 +142,6 @@ public class CSDFMoC extends AbstractMoC {
 		return true;
 	}
 
-	/**
-	 * Prints the token consumption of this static class.
-	 */
-	public void printTokenConsumption() {
-		System.out.println("input ports: " + inputPattern);
-	}
-
-	/**
-	 * Prints the token production of this static class.
-	 */
-	public void printTokenProduction() {
-		System.out.println("output ports: " + outputPattern);
-	}
-
 	public void setNumberOfPhases(int numberOfPhases) {
 		this.numberOfPhases = numberOfPhases;
 	}
@@ -182,6 +168,18 @@ public class CSDFMoC extends AbstractMoC {
 		for (Port port : actor.getOutputs()) {
 			outputPattern.put(port, port.getNumTokensProduced());
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("input ports: ");
+		builder.append(inputPattern);
+		builder.append('\n');
+		builder.append("output ports: ");
+		builder.append(outputPattern);
+		builder.append('\n');
+		return builder.toString();
 	}
 
 }

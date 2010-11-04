@@ -93,26 +93,26 @@ public class ActorClassifier implements ActorTransformation {
 		actor.setTimeDependent(td);
 		if (actor.isTimeDependent()) {
 			System.out.println("actor " + actor
-					+ " is time-dependent, defaults to dynamic");
+					+ " is time-dependent, defaults to dynamic\n");
 			actor.setMoC(new DynamicMoC());
 			return;
 		}
 
 		// first tries SDF with *all* the actions of the actor
-		MoC clasz = classifySDF(actions);
-		if (!clasz.isSDF()) {
+		MoC moc = classifySDF(actions);
+		if (!moc.isSDF()) {
 			try {
 				// not SDF, tries CSDF
-				clasz = classifyCSDF();
+				moc = classifyCSDF();
 			} catch (OrccRuntimeException e) {
 				// data-dependent behavior
 			}
 
-			if (!clasz.isCSDF()) {
+			if (!moc.isCSDF()) {
 				// not CSDF, tries QSDF
 				if (actor.getActionScheduler().hasFsm()) {
 					try {
-						clasz = classifyQSDF();
+						moc = classifyQSDF();
 					} catch (OrccRuntimeException e) {
 						// data-dependent behavior
 					}
@@ -120,22 +120,14 @@ public class ActorClassifier implements ActorTransformation {
 			}
 		}
 
-		if (clasz.isSDF()) {
-			// print port token rates
-			SDFMoC staticClass = (SDFMoC) clasz;
-			staticClass.printTokenConsumption();
-			staticClass.printTokenProduction();
-			System.out.println();
-		} else if (clasz.isCSDF()) {
-			CSDFMoC csdfClass = (CSDFMoC) clasz;
-			csdfClass.printTokenConsumption();
-			csdfClass.printTokenProduction();
-			System.out.println();
-		} else if (clasz.isDynamic()) {
-			System.out.println("actor " + actor + " classified dynamic");
+		// print port token rates
+		if (moc.isDynamic()) {
+			System.out.println("actor " + actor + " classified dynamic\n");
+		} else {
+			System.out.println(moc);
 		}
 
-		actor.setMoC(clasz);
+		actor.setMoC(moc);
 	}
 
 	/**
@@ -236,14 +228,9 @@ public class ActorClassifier implements ActorTransformation {
 
 			for (NextStateInfo info : fsm.getTransitions(initialState)) {
 				Action action = info.getAction();
-				
-				Map<Port, Expression> configuration = analyzer.getConfiguration(action);
+				Map<Port, Expression> configuration = analyzer
+						.getConfiguration(action);
 				SDFMoC staticClass = classifyFsmConfiguration(configuration);
-
-				// print token rates
-				System.out.println("configuration " + action);
-				staticClass.printTokenConsumption();
-				staticClass.printTokenProduction();
 
 				quasiStatic.addConfiguration(action, staticClass);
 			}
