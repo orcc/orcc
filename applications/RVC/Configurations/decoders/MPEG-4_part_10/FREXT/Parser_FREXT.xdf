@@ -475,7 +475,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC2"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -484,7 +484,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC2"/>
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
