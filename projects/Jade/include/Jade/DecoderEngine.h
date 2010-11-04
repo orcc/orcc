@@ -59,17 +59,36 @@ class IRParser;
 
 class DecoderEngine {
 public:
-	
-	DecoderEngine(llvm::LLVMContext& C);
+	/*!
+     *  @brief Create a new Decoder Engine
+     *
+     *  Create a new Decoder Engine with the given llvm::LLVMContext.
+	 *   
+	 *  @param C : the LLVM Context used by JIT
+     */
+	DecoderEngine(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo);
 	~DecoderEngine();
+
+	/*!
+     *  @brief Load the given network
+     *
+     *  Load, create and execute the given network.
+	 *   
+	 *  @param network : the Network to load
+     *
+	 *  @return HDAGGraph representing the network's contents
+     */
 	int load(Network* network);
 
 private:
-	void initInstance(Instance* instance);
+	/*!
+     *  @brief Parse actors
+     *
+     *  Parse the actors of the given network.
+	 *   
+	 *  @param network : the Network to parse
+     */
 	void parseActors(Network* network);
-
-	void createDecoder();
-	AbstractFifo* getFifo();
 	
 	Network* XDFnetwork;
 	Decoder* decoder;

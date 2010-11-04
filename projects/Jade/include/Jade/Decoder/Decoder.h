@@ -61,7 +61,7 @@ class BroadcastAdder;
 
 class Decoder {
 public:
-	Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo* fifo);
+	Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, std::map<std::string, Actor*>* actors, AbstractFifo* fifo);
 	~Decoder();
 	
 	/**

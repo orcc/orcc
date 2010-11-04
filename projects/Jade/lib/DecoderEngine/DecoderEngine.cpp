@@ -41,15 +41,12 @@
 
 #include "llvm/Constants.h"
 #include "llvm/Support/CommandLine.h"
-
-#include "Jade/DecoderEngine.h"
 #include "Jade/JIT.h"
+#include "Jade/DecoderEngine.h"
 #include "Jade/Actor/IRParser.h"
 #include "Jade/Actor/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Fifo/FifoCircular.h"
-#include "Jade/Fifo/FifoTrace.h"
-#include "Jade/Fifo/UnprotectedFifo.h"
+#include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Network/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
@@ -58,38 +55,11 @@
 using namespace std;
 using namespace llvm;
 
-//Options of Jade
-extern cl::opt<std::string> VTLDir;
-extern cl::opt<std::string> ToolsDir;
-extern cl::opt<std::string> Fifo;
-extern cl::opt<std::string> OutputDir;
 
-
-//Verify if directory is well formed
-void setDirectory(std::string* dir){
-	size_t found = dir->find_last_of("/\\");
-	if(found != dir->length()-1){
-		dir->insert(dir->length(),"/");
-	}
-}
-
-
-//Check options of the decoder engine
-void setOptions(){
-	setDirectory(&VTLDir);
-	setDirectory(&ToolsDir);
-	setDirectory(&OutputDir);
-}	
-
-DecoderEngine::DecoderEngine(llvm::LLVMContext& C): Context(C) {
-	// Set Jade options
-	setOptions();
-	
-	//Create JIT
-	jit = new JIT(C);
-	
-	//Set type of fifos
-	this->fifo = getFifo();
+DecoderEngine::DecoderEngine(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo): Context(C) {	
+	//Set properties
+	this->jit = jit;
+	this->fifo = fifo;
 	
 	//Load IR Parser
 	irParser = new IRParser(C, jit, fifo);	
@@ -104,17 +74,11 @@ int DecoderEngine::load(Network* network) {
 	clock_t timer = clock ();
 	XDFnetwork = network;
 
-	//Create decoder
-	decoder = new Decoder(Context, jit, network, fifo);
-	
 	// Parsing actor
 	parseActors(network);
 
-	// Remove opaque type from actor
-	for ( it = actors.begin(); it != actors.end(); ++it ){
-		fifo->refineActor(it->second);
-	}
-
+	//Create decoder
+	decoder = new Decoder(Context, jit, network, &actors, fifo);
 
 	// Instanciating decoder
 	decoder->instanciate();
@@ -150,41 +114,14 @@ int DecoderEngine::load(Network* network) {
 }
 
 void DecoderEngine::parseActors(Network* network) {
-
-	map<string, Instance*>::iterator it;
-	map<string, Actor*>::iterator itActor;
-	map<string, Instance*>* instances = network->getInstances();
-
-	for ( it = instances->begin(); it != instances->end(); ++it ){
-		Instance* instance = (*it).second;
-		Actor* actor;
-		string classz = instance->getClasz();
-		itActor = actors.find(classz);
-
-		if (itActor == actors.end()){
-			actor = irParser->parseActor(classz);
-			actors.insert(pair<string, Actor*>(classz, actor));
-		}else{
-			actor = (*itActor).second;
-		}
-
-		//Bound actor and instance
-		actor->addInstance(instance);
-
-	}
-
-	decoder->setActorList(&actors);
-}
-
-AbstractFifo* DecoderEngine::getFifo(){
-	if(Fifo.compare("trace")==0){
-		return new FifoTrace(Context, jit);
-	}else if(Fifo.compare("circular")==0){
-		return new FifoCircular(Context, jit);
-	}else if(Fifo.compare("fast")==0){
-		return new UnprotectedFifo(Context, jit);
-	}else{
-		cout <<"Fifo selection error: type undefined.\n";
-		exit(0);
+	list<string>::iterator it;
+	list<string>* files = network->getActorFiles();
+	
+	for ( it = files->begin(); it != files->end(); ++it ){
+		Actor* actor = irParser->parseActor(*it);
+		
+		fifo->refineActor(actor);
+		
+		actors.insert(pair<string, Actor*>(*it, actor));
 	}
 }

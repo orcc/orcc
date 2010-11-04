@@ -47,13 +47,14 @@ namespace llvm{
 	class IntegerType;
 	class LLVMContext;
 	class Module;
-	class Type;
 }
 
 class Actor;
 class Decoder;
 class JIT;
 class Connection;
+
+#include "llvm/DerivedTypes.h"
 
 //------------------------------
 /**

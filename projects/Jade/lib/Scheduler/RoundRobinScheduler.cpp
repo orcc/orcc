@@ -88,9 +88,6 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder
 	for (it = instances->begin(); it != instances->end(); ++it){
 		Instance* instance = (*it).second;
 		string id = instance->getId();
-		if (id.compare("source")==0){
-			int i = 0;
-		}
 		ActionSchedulerAdder(instance, decoder, Context);
 
 	}

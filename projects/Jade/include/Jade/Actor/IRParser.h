@@ -51,6 +51,7 @@ namespace llvm{
 class Action;
 class ActionScheduler;
 class ActionTag;
+class Location;
 class FSM;
 class JIT;
 class Port;

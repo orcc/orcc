@@ -50,29 +50,26 @@ Network::Network(std::string name, std::map<std::string, Port*>* inputs, std::ma
 	this->inputs = inputs;
 	this->outputs = outputs;
 	this->graph = graph;
+	setNetwork();
 }
 
-list<Actor*>* Network::getActors(){
-	return &actors;
-}
+void Network::setNetwork(){
+	// Create list of instance and actor
+	int vertices = graph->getNbVertices();
 
-std::map<std::string, Instance*>* Network::getInstances(){
-	
-	// Create list of actor if not done before 
-	if (instances.empty()){
-		int vertices = graph->getNbVertices();
+	for (int i = 0; i < vertices; i++){
+		Vertex* vertex = (Vertex*)graph->getVertex(i);
 
-		for (int i = 0; i < vertices; i++){
-			Vertex* vertex = (Vertex*)graph->getVertex(i);
-
-			if(vertex->isInstance()){
-				Instance* instance = vertex->getInstance();
-				instances.insert(pair<string,Instance*>(instance->getId(), instance));
-			}
+		if(vertex->isInstance()){
+			Instance* instance = vertex->getInstance();
+			instances.insert(pair<string,Instance*>(instance->getId(), instance));
+			actorFiles.push_back(instance->getClasz());
 		}
 	}
 
-	return &instances;
+	//remove duplicate actors
+	actorFiles.sort();
+	actorFiles.unique();
 }
 
 void Network::print(std::string file){

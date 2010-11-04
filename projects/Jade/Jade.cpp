@@ -46,6 +46,10 @@
 
 #include "Jade/XDFParser.h"
 #include "Jade/DecoderEngine.h"
+#include "Jade/Fifo/FifoCircular.h"
+#include "Jade/Fifo/FifoTrace.h"
+#include "Jade/Fifo/UnprotectedFifo.h"
+#include "Jade/JIT.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/System/Signals.h"
 #include "llvm/Support/PrettyStackTrace.h"
@@ -60,85 +64,131 @@ using namespace llvm;
 using namespace llvm::cl;
 using namespace llvm::sys;
 
+//Fifos
+enum FifoTy { circular, trace, unprotected };
+
+cl::opt<FifoTy> 
+Fifo("fifo", CommaSeparated,
+			 desc("Specify fifo to be used in the decoder"),
+			 value_desc("trace, circular, fast"),
+			 values(clEnumVal(trace,   "trace"),
+                    clEnumVal(circular,  "circular"),
+                    clEnumVal(unprotected, "fast"),
+                    clEnumValEnd),
+			 init(circular),
+			 cl::Optional);
 
 // Jade options
-opt<std::string>
+cl::opt<std::string>
 XDFFile("xdf", Required, ValueRequired, desc("XDF network file"), value_desc("XDF filename"));
 
-opt<std::string> 
+cl::opt<std::string> 
 BSDLFile("bsdl", desc("Bitstream description file"), value_desc("BSDL filename"));
 
-opt<std::string> 
+cl::opt<std::string> 
 VidFile("i", Required, ValueRequired, desc("Encoded video file"), value_desc("Video filename"));
 
-opt<std::string>
+cl::opt<std::string>
 VTLDir("L", desc("Video Tools Library directory"),
 	   Required,
 	   ValueRequired,
 	   value_desc("VTL Folder"), 
 	   init(""));
 
-opt<std::string> 
+cl::opt<std::string> 
 ToolsDir("T", desc("Jade tools directory"),
 			  Required,
 			  ValueRequired,
 			  value_desc("Tools Folder"), 
 			  init(""));
 
-opt<std::string> 
+cl::opt<std::string> 
 YuvFile("o", desc("Decoded YUV video file for compare mode"), 
 			  value_desc("YUV filename"), 
 			  init(""));
 
-opt<std::string> 
+cl::opt<std::string> 
 OutputDir("w", desc("Output folder for writing trace/Module/Error files"), 
 			  value_desc("Trace folder"), 
 			  init(""));
 
-opt<bool> 
+cl::opt<bool> 
 ForceInterpreter("force-interpreter", desc("Force interpretation: disable JIT"),
 									  init(false));
 
-opt<bool> 
+cl::opt<bool> 
 nodisplay("nodisplay", desc("Deactivate display"),
 					   init(false));
 
-opt<std::string> 
+cl::opt<std::string> 
 MArch("march", desc("Architecture to generate assembly for (see --version)"));
 
-opt<bool> 
+cl::opt<bool> 
 DisableCoreFiles("disable-core-files", Hidden,
                    desc("Disable emission of core files if possible"));
 
-opt<bool> 
+cl::opt<bool> 
 NoLazyCompilation("disable-lazy-compilation",
                   desc("Disable JIT lazy compilation"),
                   init(false));
 
-list<std::string> 
+cl::list<std::string> 
 MAttrs("mattr", CommaSeparated,
          desc("Target specific attributes (-mattr=help for details)"),
          value_desc("a1,+a2,-a3,..."));
 
- cl::opt<std::string>
+cl::opt<std::string>
   TargetTriple("mtriple", cl::desc("Override target triple for module"));
 
-opt<std::string> 
+cl::opt<std::string> 
 MCPU("mcpu", desc("Target a specific cpu type (-mcpu=help for details)"),
        value_desc("cpu-name"),
        init(""));
-
-opt<std::string> 
-Fifo("fifo", CommaSeparated,
-			 desc("Specify fifo to be used in the decoder"),
-			 value_desc("trace, circular, fast"),
-			 init("circular"));
 
 void clean_exit(int sig){
 	exit(0);
 }
 
+AbstractFifo* getFifo(LLVMContext &Context, JIT* jit){
+	//Select fifo according to options
+	switch (Fifo) {
+		case circular :
+			return new FifoCircular(Context, jit);
+			break;
+
+		case trace :
+			return new FifoTrace(Context, jit);
+			break;
+
+		case unprotected :
+			return new UnprotectedFifo(Context, jit);
+			break;
+
+		default: 
+			cout <<"Fifo selection error: type undefined.\n";
+			exit(0);
+			break;
+	}
+}
+
+//Verify if directory is well formed
+void setDirectory(std::string* dir){
+	size_t found = dir->find_last_of("/\\");
+	if(found != dir->length()-1){
+		dir->insert(dir->length(),"/");
+	}
+}
+
+
+//Check options of the decoder engine
+void setOptions(){
+	setDirectory(&VTLDir);
+	setDirectory(&ToolsDir);
+	setDirectory(&OutputDir);
+}	
+
 int main(int argc, char **argv) {
+
 	// Print a stack trace if we signal out.
 	PrintStackTraceOnErrorSignal();
 	PrettyStackTraceProgram X(argc, argv);
@@ -150,15 +200,18 @@ int main(int argc, char **argv) {
 	LLVMContext &Context = getGlobalContext();
 	clock_t timer = clock ();
 
+	setOptions();
+
 	//Parsing XDF file
 	std::cout << "Jade started, parsing file " << XDFFile.getValue() << ". \n";
 	XDFParser xdfParser(XDFFile);
 	Network* network = xdfParser.ParseXDF(Context);
 	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 
+	JIT* jit = new JIT(Context);
 
 	//Load and execute the parsed network
-	DecoderEngine engine(Context);
+	DecoderEngine engine(Context, jit, getFifo(Context, jit));
 	engine.load(network);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;

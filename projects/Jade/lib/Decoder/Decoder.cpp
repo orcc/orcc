@@ -62,15 +62,18 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo* fifo): Context(C){
+Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, std::map<std::string, Actor*>* actors, AbstractFifo* fifo): Context(C){
+	//Set property of the decoder
 	this->jit = jit;
 	this->network = network;
 	this->fifo = fifo;
+	this->actors = actors;
+	this->instances = network->getInstances();
 
+	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
+
 	jit->setDecoder(this);
-	//instancedFus = new map<std::string, InstancedActor*>();
-	instances = network->getInstances();
 }
 
 Decoder::~Decoder (){
@@ -104,7 +107,12 @@ void Decoder::createActorInstances(){
 	
 
 	for(it = instances->begin(); it != instances->end(); ++it){
+		map<std::string, Actor*>::iterator itActor;
+
 		Instance* instance = (*it).second;
+		itActor = actors->find(instance->getClasz());
+		instance->setActor(itActor->second);
+
 		InstancedActor* instancedActor = createInstance(instance);
 		instance->setInstancedActor(instancedActor);
 		instancedActors.insert(pair<Instance*, InstancedActor*>(instance, instancedActor));
