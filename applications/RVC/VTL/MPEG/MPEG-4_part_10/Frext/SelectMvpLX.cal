@@ -63,7 +63,8 @@ actor SelectMvpLX()
 		==>
 	int (size=16) MvOut,
 	uint(size=4)  RefIdxOut,
-	uint(size=11) Location
+	uint(size=11) Location,
+	uint(size=2)  SelectList
 
 		:
 
@@ -200,9 +201,10 @@ actor SelectMvpLX()
 			RefIdxL0   :[ref_idx],
 			LocationL0 :[Mbx_in_pix,Mby_in_pix]
 				==>
-			MvOut     :[Mvx, Mvy],
-			RefIdxOut :[ref_idx],
-			Location  :[Mbx_in_pix,Mby_in_pix]
+			MvOut      :[Mvx, Mvy],
+			RefIdxOut  :[ref_idx],
+			Location   :[Mbx_in_pix,Mby_in_pix],
+			SelectList :[PRED_L0]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
@@ -217,9 +219,10 @@ actor SelectMvpLX()
 			RefIdxL1   :[ref_idx],
 			LocationL1 :[Mbx_in_pix,Mby_in_pix]
 				==>
-			MvOut     :[Mvx,Mvy],
-			RefIdxOut :[ref_idx],
-			Location  :[Mbx_in_pix,Mby_in_pix]
+			MvOut      :[Mvx,Mvy],
+			RefIdxOut  :[ref_idx],
+			Location   :[Mbx_in_pix,Mby_in_pix],
+			SelectList :[PRED_L1]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
@@ -232,7 +235,8 @@ actor SelectMvpLX()
 	MacroBlkType.IsBiPred: action
 				==>
 MvOut:[0, 0],
-RefIdxOut :[0]
+RefIdxOut :[0],
+			SelectList :[BIPRED]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
@@ -268,9 +272,10 @@ RefIdxOut :[0]
 			RefIdxL0   :[ref_idx],
 			LocationL0 :[Mbx_in_pix,Mby_in_pix]
 				==>
-			MvOut     :[Mvx, Mvy],
-			RefIdxOut :[ref_idx],
-			Location  :[Mbx_in_pix,Mby_in_pix]
+			MvOut      :[Mvx, Mvy],
+			RefIdxOut  :[ref_idx],
+			Location   :[Mbx_in_pix,Mby_in_pix],
+			SelectList :[PRED_L0]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsSubPredL0,
@@ -284,9 +289,10 @@ RefIdxOut :[0]
 			RefIdxL1   :[ref_idx],
 			LocationL1 :[Mbx_in_pix,Mby_in_pix]
 				==>
-			MvOut     :[Mvx, Mvy],
-			RefIdxOut :[ref_idx],
-			Location  :[Mbx_in_pix,Mby_in_pix]
+			MvOut      :[Mvx, Mvy],
+			RefIdxOut  :[ref_idx],
+			Location   :[Mbx_in_pix,Mby_in_pix],
+			SelectList :[PRED_L1]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			not IsSubPredL0,
@@ -298,7 +304,8 @@ RefIdxOut :[0]
 	SubMacroBlkType.IsBiPred: action
 				==>
 MvOut:[0, 0],
-RefIdxOut :[0]	
+RefIdxOut :[0],
+			SelectList :[BIPRED]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsSubPredL0,

@@ -148,6 +148,13 @@
     <Port kind="Output" name="NewListL1">
         <Type name="bool"/>
     </Port>
+    <Port kind="Output" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -256,4 +263,5 @@
     <Connection dst="MvpL1_Reconstr" dst-port="NewPic_i" src="" src-port="NewPic"/>
     <Connection dst="" dst-port="RefIdxL1" src="MvpL1_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="" dst-port="NewListL1" src="MvpL1_Reconstr" src-port="NewPic_o"/>
+    <Connection dst="" dst-port="SelectList" src="SelectMvpLX" src-port="SelectList"/>
 </XDF>
