@@ -30,13 +30,19 @@ package net.sf.orcc.backends.promela;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.transforms.DeadCodeElimination;
+import net.sf.orcc.ir.transforms.DeadVariableRemoval;
 import net.sf.orcc.network.Network;
 
 /**
@@ -56,10 +62,15 @@ public class PromelaBackendImpl extends AbstractBackend {
 	}
 
 	private STPrinter printer;
+	
+	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new GuardsExtractor() };
+		ActorTransformation[] transformations = { 
+				new DeadCodeElimination(),
+				new DeadVariableRemoval(),
+				new GuardsExtractor(guards) };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -80,6 +91,9 @@ public class PromelaBackendImpl extends AbstractBackend {
 		printer.setExpressionPrinter(PromelaExprPrinter.class);
 		printer.setTypePrinter(PromelaTypePrinter.class);
 
+		printer.setOptions(getAttributes()); // need to check what this one does
+		printer.getOptions().put("guards", guards);
+		
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printActors(actors);

@@ -79,7 +79,11 @@ $endif$
 // Scheduler with fsm
 ///////////////////////////////////////////////////////////////////////////////
 
-schedulerFSM() ::= <<
+schedulerFSM(action) ::= << 
+/* $action.name$ */
+:: state == STATE $guard()$ -> 
+	$inputPattern(action.inputPattern)$;
+	$outputPattern(action.outputPattern)$;	
 >>
 
 
@@ -88,6 +92,7 @@ schedulerFSM() ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 guard() ::= <<
+$options.guards.(action) $
 >>
 
 inputPatternPort(port) ::= <<
@@ -127,12 +132,17 @@ active proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap
 	/* State variables */
 	$actor.stateVars.list : stateVar(); separator="\n"$
 
-	do
 	$if (actor.actionScheduler.fsm)$
-	$else$
-		$actor.actionScheduler.actions: scheduler(); separator="\n"$
-	$endif$
+	mtype state = $actor.actionScheduler.fsm.initialState$;
+	
+	do
+		$actor.actionScheduler.fsm.transitions: {k| $k.NextStateInfo: {a| $a.action: schedulerFSM(); separator="\n"$}$ } $
 	od
+	$else$
+	do
+		$actor.actionScheduler.actions: scheduler(); separator="\n"$
+	od
+	$endif$
 }
 >>
 
