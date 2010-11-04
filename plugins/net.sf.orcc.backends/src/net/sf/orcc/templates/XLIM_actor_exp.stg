@@ -181,7 +181,6 @@ endif$
 
 
 Read(op) ::= <<
-<note kind="consumptionRates" name="$op.port.name$" value="$op.numTokens$"/>
 $if(op.target)$
 <operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
 	<port dir="out" source="$op.target$" typeName="$op.target$_typedef"/>
@@ -198,7 +197,6 @@ Write(op) ::= <<
 <operation kind="pinWrite" portName="$op.port.name$" style="simple">
 	<port dir="in" source="$op.target$"/>
 </operation>
-<note kind="productionRates" name="$op.port.name$" value="$op.numTokens$"/>
 >>
 
 Load(op) ::= <<
