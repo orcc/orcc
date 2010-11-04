@@ -57,7 +57,7 @@
       <vertex id="SubMbType" x="1980" y="1977"/>
       <vertex id="MbType4Pred" x="2582" y="1479"/>
       <vertex id="SubMbPredRefIdxL1" x="1986" y="1899"/>
-      <vertex id="NewPic" x="1102" y="1691"/>
+      <vertex id="NewPic" x="896" y="1564"/>
       <vertex id="MbPredRefIdxL1" x="2025" y="1567"/>
       <vertex id="Mgnt_DecodePic" x="1515" y="-132"/>
       <vertex id="DecodeSliceHeader" x="329" y="460"/>

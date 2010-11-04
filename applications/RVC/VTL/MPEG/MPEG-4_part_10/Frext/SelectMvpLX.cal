@@ -132,9 +132,9 @@ actor SelectMvpLX()
 			bool
 		:
 			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
-				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) &  7][mb_part_idx & 1] & PRED_L0) != 0
+				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
 			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
+				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 7][mb_part_idx & 1] & PRED_L0) != 0
 			end
 		end
 
@@ -144,9 +144,9 @@ actor SelectMvpLX()
 			bool
 		:
 			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
-				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) &  7][mb_part_idx & 1] & PRED_L1) != 0
+				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L1) != 0
 			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 31][mb_part_idx & 1] & PRED_L1) != 0
+				false
 			end
 		end
 
@@ -189,11 +189,18 @@ actor SelectMvpLX()
 				end;
 			Is8x8Mb :=    (MacroBlkType = BLOCK_TYPE_P_8x8ref0)
 			           or (MacroBlkType = BLOCK_TYPE_P_8x8);
-
-			IsPredL0[0] := Is_PredL0(MacroBlkType,0);
-			IsPredL0[1] := Is_PredL0(MacroBlkType,1);
-			IsPredL1[0] := Is_PredL1(MacroBlkType,0);
-			IsPredL1[1] := Is_PredL1(MacroBlkType,1);
+			//delete me!! (when import will be supported by Orcc)
+			if(MacroBlkType != BLOCK_TYPE_P_SKIP)then
+				IsPredL0[0] := Is_PredL0(MacroBlkType,0);
+				IsPredL0[1] := Is_PredL0(MacroBlkType,1);
+				IsPredL1[0] := Is_PredL1(MacroBlkType,0);
+				IsPredL1[1] := Is_PredL1(MacroBlkType,1);
+			else
+				IsPredL0[0] := true;
+				IsPredL0[1] := false;
+				IsPredL1[0] := false;
+				IsPredL1[1] := false;	
+			end
 		end
 
 	MacroBlkType.IsPredL0: action
