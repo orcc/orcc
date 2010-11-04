@@ -22,8 +22,8 @@ port map(
 	-- $instance.id$ Ouput(s)
 	$instance.actor.outputs.list: printActorsPortsInstantiationOutputs(); separator="\n"$
 	
-	CLK	==> clocks(0),
-	RESET	==> resets(0)   
+	CLK	=> clocks(0),
+	RESET	=> resets(0)   
 );
 
 >>
@@ -32,10 +32,10 @@ port map(
 // Print Actors Ports Inputs Instantiation 
 
 printActorsPortsInstantiationInputs(port) ::=<<
-$port.name$_DATA	==>	ai_$instance.id$_$port.name$_DATA,
-$port.name$_SEND	==>	ai_$instance.id$_$port.name$_SEND,
-$port.name$_ACK	==>	ai_$instance.id$_$port.name$_ACK,
-$port.name$_COUNT	==>	ai_$instance.id$_$port.name$_COUNT,
+$port.name$_DATA	=>	ai_$instance.id$_$port.name$_DATA,
+$port.name$_SEND	=>	ai_$instance.id$_$port.name$_SEND,
+$port.name$_ACK	=>	ai_$instance.id$_$port.name$_ACK,
+$port.name$_COUNT	=>	ai_$instance.id$_$port.name$_COUNT,
 
 >>
 
@@ -43,11 +43,11 @@ $port.name$_COUNT	==>	ai_$instance.id$_$port.name$_COUNT,
 // Print Actors Ports Outputs Instantiation 
 
 printActorsPortsInstantiationOutputs(port) ::=<<
-$port.name$_DATA	==>	ao_$instance.id$_$port.name$_DATA,
-$port.name$_SEND	==>	ao_$instance.id$_$port.name$_SEND,
-$port.name$_ACK	==>	ao_$instance.id$_$port.name$_ACK,
-$port.name$_COUNT	==>	ao_$instance.id$_$port.name$_COUNT,
-$port.name$_RDY	==>	ao_$instance.id$_$port.name$_RDY,
+$port.name$_DATA	=>	ao_$instance.id$_$port.name$_DATA,
+$port.name$_SEND	=>	ao_$instance.id$_$port.name$_SEND,
+$port.name$_ACK	=>	ao_$instance.id$_$port.name$_ACK,
+$port.name$_COUNT	=>	ao_$instance.id$_$port.name$_COUNT,
+$port.name$_RDY	=>	ao_$instance.id$_$port.name$_RDY,
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,15 +55,23 @@ $port.name$_RDY	==>	ao_$instance.id$_$port.name$_RDY,
 
 printActorsFanOutOutputInstantiation(port) ::=<<
 f_ao_$src.instance.id$_$port.name$ : entity SystemBuilder.Fanout( behavioral )
-generic map ( fanout => 1, width => $port.type.size$ )
+generic map ( fanout => 1, width => $if(port.type.size)$$port.type.size$$else$1$endif$ )
 port map (
+	$if(port.type.bool)$
+	In_DATA(0)  => ao_$src.instance.id$_$port.name$_DATA,
+	$else$
 	In_DATA  => ao_$src.instance.id$_$port.name$_DATA,
+	$endif$
 	In_SEND  => ao_$src.instance.id$_$port.name$_SEND,
 	In_ACK   => ao_$src.instance.id$_$port.name$_ACK,
 	In_COUNT => ao_$src.instance.id$_$port.name$_COUNT,
 	In_RDY   => ao_$src.instance.id$_$port.name$_RDY,
 
+	$if(port.type.bool)$
+	Out_DATA(0)  => aof_$src.instance.id$_$port.name$_DATA,
+	$else$
 	Out_DATA  => aof_$src.instance.id$_$port.name$_DATA,
+	$endif$
 	Out_SEND  => aof_$src.instance.id$_$port.name$_SEND,
 	Out_ACK   => aof_$src.instance.id$_$port.name$_ACK,
 	Out_COUNT => aof_$src.instance.id$_$port.name$_COUNT,
@@ -71,29 +79,37 @@ port map (
 
 	CLK   => clocks(0),
 	RESET => resets(0)
-	);
+);
 
 >>
 
 printNetworkFanOutInputInstantiation(port) ::=<<
 f_ni_$port.name$ : entity SystemBuilder.Fanout( behavioral )
-generic map ( fanout => 1, width => $port.type.size$ )
+generic map ( fanout => 1, width => $if(port.type.size)$$port.type.size$$else$1$endif$ )
 port map (
-	In_DATA  => ao_$port.name$_DATA,
-	In_SEND  => ao_$port.name$_SEND,
-	In_ACK   => ao_$port.name$_ACK,
-	In_COUNT => ao_$port.name$_COUNT,
-	In_RDY   => ao_$port.name$_RDY,
+	$if(port.type.bool)$
+	In_DATA(0)  => ni_$port.name$_DATA,
+	$else$
+	In_DATA  => ni_$port.name$_DATA,
+	$endif$
+	In_SEND  => ni_$port.name$_SEND,
+	In_ACK   => ni_$port.name$_ACK,
+	In_COUNT => ni_$port.name$_COUNT,
+	In_RDY   => ni_$port.name$_RDY,
 
-	Out_DATA  => aof_$port.name$_DATA,
-	Out_SEND  => aof_$port.name$_SEND,
-	Out_ACK   => aof_$port.name$_ACK,
-	Out_COUNT => aof_$port.name$_COUNT,
-	Out_RDY   => aof_$port.name$_RDY,
+	$if(port.type.bool)$
+	Out_DATA(0)  => nif_$port.name$_DATA,
+	$else$
+	Out_DATA  => nif_$port.name$_DATA,
+	$endif$
+	Out_SEND  => nif_$port.name$_SEND,
+	Out_ACK   => nif_$port.name$_ACK,
+	Out_COUNT => nif_$port.name$_COUNT,
+	Out_RDY   => nif_$port.name$_RDY,
 
 	CLK   => clocks(0),
 	RESET => resets(0)
-	);
+);
 
 >>
 
@@ -139,14 +155,22 @@ $
 
 doAssignFifo(source, sourcePort, target, targetPort) ::= <<
 q_ai_$target.id$_$targetPort.name$ : entity SystemBuilder.Queue( behavioral )
-generic map( length => 1, width => $targetPort.type.size$ )
+generic map( length => 1, width => $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
 port map (
-	Out_DATA  => ai_$target.id$_$targetPort$_DATA,
+	$if(sourcePort.type.bool)$
+	Out_DATAA(0)  => ai_$target.id$_$targetPort$_DATA,
+	$else$
+	Out_DAT  => ai_$target.id$_$targetPort$_DATA,
+	$endif$
 	Out_SEND  => ai_$target.id$_$targetPort$_SEND,
 	Out_ACK   => ai_$target.id$_$targetPort$_ACK,
 	Out_COUNT => ai_$target.id$_$targetPort$_COUNT,
 
+	$if(sourcePort.type.bool)$
+	In_DATA(0)  => aof_$source.id$_$sourcePort.name$_DATA,
+	$else$
 	In_DATA  => aof_$source.id$_$sourcePort.name$_DATA,
+	$endif$
 	In_SEND  => aof_$source.id$_$sourcePort.name$_SEND( 1 ),
 	In_ACK   => aof_$source.id$_$sourcePort.name$_ACK( 1 ),
 	In_COUNT => aof_$source.id$_$sourcePort.name$_COUNT,
@@ -161,14 +185,22 @@ port map (
 
 assignIn(source, sourcePort) ::= <<
 q_no_$tgt.port$ : entity SystemBuilder.Queue( behavioral )
-generic map( length => 1, width => $tgt.port.type.size$ )
+generic map( length => 1, width => $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
 port map (
- 	Out_DATA  => no_$tgt.port$_DATA,
+ 	$if(sourcePort.type.bool)$
+ 	Out_DATA(0)  => no_$tgt.port$_DATA,
+	$else$
+	Out_DATA  => no_$tgt.port$_DATA,
+	$endif$
 	Out_SEND  => no_$tgt.port$_SEND,
 	Out_ACK   => no_$tgt.port$_ACK,
 	Out_COUNT => no_$tgt.port$_COUNT,
-
+	
+	$if(sourcePort.type.bool)$
+	In_DATA(0)  => aof_$source.id$_$sourcePort.name$_DATA,
+	$else$
 	In_DATA  => aof_$source.id$_$sourcePort.name$_DATA,
+	$endif$
 	In_SEND  => aof_$source.id$_$sourcePort.name$_SEND( 0 ),
 	In_ACK   => aof_$source.id$_$sourcePort.name$_ACK( 0 ),
 	In_COUNT => aof_$source.id$_$sourcePort.name$_COUNT,
@@ -182,14 +214,22 @@ port map (
 
 assignOut(target, targetPort) ::= <<
 q_ai_$target.id$_$targetPort.name$ : entity SystemBuilder.Queue( behavioral )
-generic map( length => 1, width => $targetPort.type.size$ )
+generic map( length => 1, width => $if(targetPort.type.size)$$targetPort.type.size$$else$1$endif$ )
 port map (
+	$if(targetPort.type.bool)$
+	Out_DATA(0)  => ai_$target.id$_$targetPort.name$_DATA,
+	$else$
 	Out_DATA  => ai_$target.id$_$targetPort.name$_DATA,
+	$endif$
 	Out_SEND  => ai_$target.id$_$targetPort.name$_SEND,
 	Out_ACK   => ai_$target.id$_$targetPort.name$_ACK,
-	Out_COUNT => ai_$target.id$_$targetPort.name$COUNT,
-
+	Out_COUNT => ai_$target.id$_$targetPort.name$_COUNT,
+	
+	$if(targetPort.type.bool)$
+	In_DATA(0)  => nif_$src.port$_DATA,
+	$else$
 	In_DATA  => nif_$src.port$_DATA,
+	$endif$
 	In_SEND  => nif_$src.port$_SEND( 0 ),
 	In_ACK   => nif_$src.port$_ACK( 0 ),
 	In_COUNT => nif_$src.port$_COUNT,
@@ -332,28 +372,29 @@ signal ni_$port.name$_ACK	: std_logic;
 signal ni_$port.name$_COUNT	: std_logic_vector(15 downto 0);
 signal ni_$port.name$_RDY	: std_logic;
 
+$if(port.type.bool)$
+signal nif_$port.name$_DATA	: std_logic;
+$else$
+signal nif_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);
 $
-if(port.type.bool)
-$signal nif_$port.name$_DATA	: std_logic;$\n$$
-else
-$signal nif_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
 endif
 $
-signal nif_$port.name$_SEND	: std_logic;
-signal nif_$port.name$_ACK	: std_logic;
+signal nif_$port.name$_SEND	: std_logic_vector(0 downto 0);
+signal nif_$port.name$_ACK	: std_logic_vector(0 downto 0);
 signal nif_$port.name$_COUNT	: std_logic_vector(15 downto 0);
-signal nif_$port.name$_RDY	: std_logic;$\n$
+signal nif_$port.name$_RDY	: std_logic_vector(0 downto 0);$\n$
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Network Output Signals
 
 printOutputPortsSignals(port) ::=<<
+$if(port.type.bool)$
+signal no_$port.name$_DATA	: std_logic;$\n$
+$else$
+signal no_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);$\n$
 $
-if(port.type.bool)
-$signal no_$port.name$_DATA	: std_logic;$\n$$
-else
-$signal no_$port.name$_DATA	: std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
 endif
 $
 signal no_$port.name$_SEND	: std_logic;
@@ -421,10 +462,10 @@ signal aof_$instance.id$_$port.name$_DATA	: std_logic_vector($port.type.size$ - 
 $
 endif
 $
-signal aof_$instance.id$_$port.name$_SEND	: std_logic;
-signal aof_$instance.id$_$port.name$_ACK	: std_logic;
+signal aof_$instance.id$_$port.name$_SEND	: std_logic_vector(0 downto 0);
+signal aof_$instance.id$_$port.name$_ACK	: std_logic_vector(0 downto 0);
 signal aof_$instance.id$_$port.name$_COUNT	: std_logic_vector(15 downto 0);
-signal aof_$instance.id$_$port.name$_RDY	: std_logic;$\n$
+signal aof_$instance.id$_$port.name$_RDY	: std_logic_vector(0 downto 0);$\n$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -493,7 +534,7 @@ printNetworkInformationPorts(port,type) ::=<<
 >>
 
 printInsancesName(instance) ::=<<
---    $instance.id$ --> CLK
+--    $instance.id$ ($instance.actor.name$) --> CLK
 >>
 
 network(debugFifos, fifoSize, network, options) ::= <<
