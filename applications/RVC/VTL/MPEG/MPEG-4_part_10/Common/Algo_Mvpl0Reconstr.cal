@@ -55,6 +55,7 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 	uint(size=6)  mb_type,
 	uint(size=4)  sub_mb_type,
 	uint(size=4)  slice_type,
+	bool          NewPic_i,
 
 	uint(size=13) CurrMbAddr,
 	uint(size=13) FirstMbInSlice,
@@ -65,6 +66,7 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 
 	int (size=16) Mv
 		==>
+	bool          NewPic_o,
 	int (size=16) Mvpl0,
 	uint(size=11) Location,
 	uint(size=4)  RefIdxOut
@@ -393,22 +395,35 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 			end
 	end
 
+	GetNewPic: action
+			NewPic_i :[IsNewPic]
+				==>
+			NewPic_o :[true]
+		guard
+			IsNewPic
+		end
+
 	GetMbType.MacroBlkIorSI: action
 			mb_type    :[MacroBlkType],
-			slice_type :[SlcTyp]
+			slice_type :[SlcTyp],
+			NewPic_i   :[IsNewPic]
 				==>
 		guard
-			MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX
+			MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX,
+			not IsNewPic
 		end
 
 	GetMbType.P_SkipL0: action
 			mb_type    :[MacroBlkType],
-			slice_type :[SlcTyp]
+			slice_type :[SlcTyp],
+			NewPic_i   :[IsNewPic]
 				==>
-			RefIdxOut :[0]
+			RefIdxOut :[0],
+			NewPic_o  :[false]
 		guard
 			MacroBlkType = BLOCK_TYPE_P_SKIP,
-			IsPredL0
+			IsPredL0,
+			not IsNewPic
 		do
 			MbPartIdx    := 0;
 			MbPartIdxMax := 1;
@@ -418,11 +433,13 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 
 	GetMbType.P_SkipL1: action
 			mb_type    :[MacroBlkType],
-			slice_type :[SlcTyp]
+			slice_type :[SlcTyp],
+			NewPic_i   :[IsNewPic]
 				==>
 		guard
 			MacroBlkType = BLOCK_TYPE_P_SKIP,
-			not IsPredL0
+			not IsPredL0,
+			not IsNewPic
 		do
 			MbPartIdx    := 0;
 			MbPartIdxMax := 1;
@@ -432,8 +449,11 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 
 	GetMbType.Others: action
 			mb_type    :[MacroBlkType],
-			slice_type :[SlcTyp]
+			slice_type :[SlcTyp],
+			NewPic_i   :[IsNewPic]
 				==>
+		guard
+			not IsNewPic
 		do
 			Idx_Sub_Tab   :=
 				if(SlcTyp = SLICE_TYPE_B) then
@@ -593,7 +613,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 				==>
 			Location  :[Mbx_in_pix,Mby_in_pix],
 			Mvpl0     :[MvpL0] repeat 2,
-			RefIdxOut :[RefIdxCurr]
+			RefIdxOut :[RefIdxCurr],
+			NewPic_o  :[false]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
@@ -616,7 +637,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 				==>
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0] repeat 2,
-			RefIdxOut :[RefIdxCurr]
+			RefIdxOut :[RefIdxCurr],
+			NewPic_o  :[false]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
@@ -655,7 +677,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 				==>
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0 :[MvpL0] repeat 2,
-			RefIdxOut :[RefIdxCurr]
+			RefIdxOut :[RefIdxCurr],
+			NewPic_o  :[false]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
@@ -734,7 +757,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0     :[MvpL0]repeat 2,
-			RefIdxOut :[RefIdxCurr]
+			RefIdxOut :[RefIdxCurr],
+			NewPic_o  :[false]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsPred4SubMb,
@@ -760,7 +784,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0     :[MvpL0] repeat 2,
-			RefIdxOut :[RefIdxCurr]
+			RefIdxOut :[RefIdxCurr],
+			NewPic_o  :[false]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsPred4SubMb,
@@ -785,7 +810,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0     :[MvpL0]repeat 2,
-			RefIdxOut :[RefIdxCurr]
+			RefIdxOut :[RefIdxCurr],
+			NewPic_o  :[false]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsPred4SubMb,
@@ -810,7 +836,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			Mvpl0     :[MvpL0]repeat 2,
-			RefIdxOut :[RefIdxCurr]
+			RefIdxOut :[RefIdxCurr],
+			NewPic_o  :[false]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsPred4SubMb,
@@ -924,6 +951,7 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 
 
 	schedule fsm GetMbType:
+		GetMbType         (GetNewPic                )--> GetMbType;
 		GetMbType         (GetMbType.MacroBlkIorSI  )--> EatTokens;
 		GetMbType         (GetMbType.P_SkipL0       )--> GetMbInfos4P_SkipL0;
 		GetMbType         (GetMbType.P_SkipL1       )--> GetMbInfos4P_SkipL1;
@@ -970,5 +998,6 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 		GetMbType.MacroBlkIorSI > GetMbType.Others;
 		GetMbType.P_SkipL0        > GetMbType.Others;
 		GetMbType.P_SkipL1        > GetMbType.Others;
+		GetMbType.Others          > GetNewPic;
 	end
 end

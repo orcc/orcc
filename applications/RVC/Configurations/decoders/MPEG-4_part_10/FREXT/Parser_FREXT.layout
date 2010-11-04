@@ -63,6 +63,7 @@
       <vertex id="RefList1" x="2004" y="1464"/>
       <vertex id="Mgnt_Display" x="1802" y="1812"/>
       <vertex id="RefIdxL0ToPoc" x="2354" y="1017"/>
-      <vertex id="BlackHole" x="2402" y="1533"/>
+      <vertex id="BlackHole" x="2507" y="1222"/>
+      <vertex id="RefIdxL1ToPoc" x="2328" y="1225"/>
    </vertices>
 </layout>

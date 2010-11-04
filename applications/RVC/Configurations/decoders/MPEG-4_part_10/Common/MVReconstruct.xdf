@@ -135,7 +135,17 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="NewList">
+    <Port kind="Output" name="NewListL0">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="RefIdxL1">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="NewListL1">
         <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
@@ -241,6 +251,9 @@
     <Connection dst="SelectMvpLX" dst-port="LocationL1"
         src="MvpL1_Reconstr" src-port="Location"/>
     <Connection dst="" dst-port="RefIdxL0" src="MvpL0_Reconstr" src-port="RefIdxOut"/>
-    <Connection dst="MvComponentReord" dst-port="InputNewPic" src="" src-port="NewPic"/>
-    <Connection dst="" dst-port="NewList" src="MvComponentReord" src-port="NewPic"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="NewPic_i" src="" src-port="NewPic"/>
+    <Connection dst="" dst-port="NewListL0" src="MvpL0_Reconstr" src-port="NewPic_o"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="NewPic_i" src="" src-port="NewPic"/>
+    <Connection dst="" dst-port="RefIdxL1" src="MvpL1_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="" dst-port="NewListL1" src="MvpL1_Reconstr" src-port="NewPic_o"/>
 </XDF>

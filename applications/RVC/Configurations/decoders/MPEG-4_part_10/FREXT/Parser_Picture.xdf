@@ -740,9 +740,6 @@
         src="MergeDataFromSDataAndMbLayer" src-port="MBType4Pred"/>
     <Connection dst="" dst-port="SubMbPredRefIdxL1"
         src="DecodeSubMbPred" src-port="RefIdxL1"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="SDataNewPic" src="DecodeSliceData_Cavlc" src-port="NewPic"/>
-    <Connection dst="" dst-port="NewPic"
-        src="MergeDataFromSDataAndMbLayer" src-port="NewPic"/>
     <Connection dst="" dst-port="MbPredRefIdxL1" src="DecodeMbPred" src-port="RefIdxL1"/>
+    <Connection dst="" dst-port="NewPic" src="DecodeSliceData_Cavlc" src-port="NewPic"/>
 </XDF>

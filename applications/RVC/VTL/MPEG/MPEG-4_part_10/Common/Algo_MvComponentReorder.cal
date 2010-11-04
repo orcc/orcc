@@ -52,7 +52,6 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 actor Algo_MvComponentReorder()
-	bool          InputNewPic,
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 	int (size=16) Mv,
@@ -60,8 +59,7 @@ actor Algo_MvComponentReorder()
 		==>
 	int (size=16) MvOut,
 	uint(size=6)  PartSZ,
-	uint(size=4)  RefIdxOut,
-	bool          NewPic
+	uint(size=4)  RefIdxOut
 		:
 
 	uint(size=3) SZ_16x16 = 0;
@@ -134,20 +132,9 @@ actor Algo_MvComponentReorder()
 	uint(size=3) SizeSubMbMv;
 	uint(size=1) Idx_Sub_Tab;
 
-	GetNewPic: action
-			InputNewPic :[IsNewPic]
-				==>
-			NewPic      :[IsNewPic]
-		guard
-			IsNewPic
-		end
-
 	GetMbType: action
-			InputNewPic :[IsNewPic],
 			MbType :[MacroBlkType]
 				==>
-		guard
-			not IsNewPic
 		do
 			mb_type := MacroBlkType;
 			Idx_Sub_Tab   :=
@@ -191,8 +178,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[16,16],
-			NewPic :[false]	
+			PartSZ :[16,16]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_16x16
@@ -209,8 +195,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[16,8],
-			NewPic :[false]
+			PartSZ :[16,8]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_16x8
@@ -227,8 +212,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[8,16],
-			NewPic :[false]
+			PartSZ :[8,16]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_8x16
@@ -278,8 +262,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[8,8],
-			NewPic :[false]
+			PartSZ :[8,8]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv = SZ_8x8
@@ -296,8 +279,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[8,4],
-			NewPic :[false]
+			PartSZ :[8,4]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv = SZ_8x4
@@ -313,8 +295,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[4,8],
-			NewPic :[false]
+			PartSZ :[4,8]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv = SZ_4x8
@@ -330,8 +311,7 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[4,4],
-			NewPic :[false]
+			PartSZ :[4,4]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv = SZ_4x4
@@ -349,7 +329,6 @@ actor Algo_MvComponentReorder()
 		end
 
 	schedule fsm GetMbType:
-		GetMbType (GetNewPic          )--> GetMbType;
 		GetMbType (GetMbType          )--> GetMv;
 
 		GetMv     (GetMv.Launch16x16  )--> GetMv;

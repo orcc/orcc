@@ -1,5 +1,5 @@
 actor Dave_Null () 
-	int(size=32) Token
+	uint(size=32) Token
 	==>
     :
 	a: action

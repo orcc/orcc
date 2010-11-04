@@ -489,6 +489,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="RefIdxL1ToPoc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_RefIdxtoPOC2"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -659,10 +668,15 @@
         src="DecodePic" src-port="SubMbPredRefIdxL1"/>
     <Connection dst="MVReconstruct" dst-port="NewPic" src="DecodePic" src-port="NewPic"/>
     <Connection dst="RefIdxL0ToPoc" dst-port="RefList" src="RefList0" src-port="RefList"/>
-    <Connection dst="RefIdxL0ToPoc" dst-port="NewList"
-        src="MVReconstruct" src-port="NewList"/>
     <Connection dst="RefIdxL0ToPoc" dst-port="RefIdx"
         src="MVReconstruct" src-port="RefIdxL0"/>
     <Connection dst="" dst-port="PocToRead" src="RefIdxL0ToPoc" src-port="POCtoRead"/>
-    <Connection dst="BlackHole" dst-port="Token" src="RefList1" src-port="RefList"/>
+    <Connection dst="RefIdxL1ToPoc" dst-port="RefIdx"
+        src="MVReconstruct" src-port="RefIdxL1"/>
+    <Connection dst="RefIdxL1ToPoc" dst-port="NewList"
+        src="MVReconstruct" src-port="NewListL1"/>
+    <Connection dst="RefIdxL1ToPoc" dst-port="RefList" src="RefList1" src-port="RefList"/>
+    <Connection dst="BlackHole" dst-port="Token" src="RefIdxL1ToPoc" src-port="POCtoRead"/>
+    <Connection dst="RefIdxL0ToPoc" dst-port="NewList"
+        src="MVReconstruct" src-port="NewListL0"/>
 </XDF>
