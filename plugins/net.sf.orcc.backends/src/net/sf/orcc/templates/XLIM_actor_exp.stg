@@ -195,16 +195,15 @@ $endif$
 
 Write(op) ::= <<
 <!-- Write $op$ -->
-
 <operation kind="pinWrite" portName="$op.port.name$" style="simple">
-  <port dir="in" source="$op.target$"/>
+	<port dir="in" source="$op.target$"/>
 </operation>
 <note kind="productionRates" name="$op.port.name$" value="$op.numTokens$"/>
 >>
 
 Load(op) ::= <<
 <!-- Load $op$ -->
-$if(op.source.variable.type.list)
+$if(!removeList && op.source.variable.type.list)
 $<operation kind="var_ref" name="$op.source$">
 	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
 	$port(dir="out", type=op.target.type, source=op.target)$
@@ -235,12 +234,6 @@ Assign(op) ::= <<
 $expression(op.value)$
 >>
 
-Cast(target,value,cast) ::= <<
-<operation kind="cast">
-  $port(dir="in",source=value.var.variable)$
-  $port(dir="out",type=target.type,source=target)$
-</operation>
->>
 
 PhiAssignment(phi) ::= <<
 <PHI>
@@ -347,7 +340,7 @@ WhileNode(whileNode) ::= <<
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
-procedure(procedure) ::= <<
+procedure(procedure, removeList) ::= <<
 $if(!procedure.external)$
 $procedure.nodes: {$(it.class.simpleName)(it)$}$
 $endif$
@@ -399,9 +392,9 @@ endif$
 
 localInitialize(local) ::= <<
 $if(local.type.list)
-$$if(!local.instruction || local.instruction.write)
-$<operation kind="\$valloc">
-  $port(dir="out", type=local.type, source=local)$
+$$if(!local.instruction || local.instruction.write)$
+<operation kind="\$valloc">
+	$port(dir="out", type=local.type, source=local)$
 </operation>
 $endif
 $$endif$ 
@@ -410,8 +403,8 @@ $$endif$
 action(action) ::= <<
 <!-- Action: "$action.name$" -->
 <module autostart="false" kind="action" name="$action.name$">
-  $action.body.locals.list: localInitialize()$
-	$action.body.nodes: nodes(); separator="\n"$
+	$action.body.locals.list: localInitialize()$
+	$procedure(procedure=action.body)$
 </module> 
 >>
 
@@ -499,7 +492,7 @@ scheduler(actions) ::= <<
 		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
 	</operation>
 	<module kind="loop">
-		<module decision="var_$instance.id$_sched" kind="test">
+		<module decision="var_$instance.id$_loop" kind="test">
 			<operation kind="noop">
 				<port dir="in" source="var_$instance.id$_sched"/>
 				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
@@ -573,7 +566,7 @@ Transition(transition) ::= <<
 >>
 
 isSchedulableTest(action) ::= <<
-$procedure(action.scheduler)$
+$procedure(procedure=action.scheduler, removeList="true")$
 >>
 
 Transitions(actions, transitions) ::= <<
@@ -602,7 +595,7 @@ schedulerFSM(actions, fsm) ::= <<
 	$fsm.transitions : {transition | $enumStates(transition=transition)$}; separator="\n"$
 	<!-- infinite loop -->
 	<module kind="loop">
-		<module decision="var_$instance.id$_sched" kind="test">
+		<module decision="var_$instance.id$_loop" kind="test">
 			<operation kind="noop">
 				<port dir="in" source="var_$instance.id$_sched"/>
 				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>

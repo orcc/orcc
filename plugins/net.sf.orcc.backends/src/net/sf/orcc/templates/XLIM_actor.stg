@@ -177,6 +177,7 @@ endif$
 
 
 Read(op) ::= <<
+<note kind="consumptionRates" name="$op.port.name$" value="$op.numTokens$"/>
 <operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
 	$port(dir="out", type=op.port.type, source=op.target)$
 </operation>
@@ -187,6 +188,7 @@ Write(op) ::= <<
 <operation kind="pinWrite" portName="$op.port.name$" removable="no" style="simple">
 	$port(dir="in", type=op.port.type, source=op.target)$
 </operation>
+<note kind="productionRates" name="$op.port.name$" value="$op.numTokens$"/>
 >>
 
 Load(op) ::= <<
@@ -348,7 +350,7 @@ $if(local.type.list)$
   <type name="List">
     <valuePar name="size" value="$local.type.size$"/>
     <typePar name="type">
-      $typeDefListElements(local.type.list.elementType)$
+      $typeDefListElements(local.type.elementType)$
     </typePar>
   </type>
 </typeDef>
@@ -363,11 +365,15 @@ $if(type.list)$
     $typeDefListElements(type.elementType)$
   </typePar>
 </type>
-$else$
-<type name="int">
-  <valuePar name="size" value="9"/>
-</type>
-$endif$
+$else
+$$if(type.bool)
+$<type name="$type$"/>
+$else
+$<type name="$type$">
+  <valuePar name="size" value="$type.size$"/>
+</type>$
+endif$$
+endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
