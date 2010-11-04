@@ -92,10 +92,7 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C): Context(C) {
 	this->fifo = getFifo();
 	
 	//Load IR Parser
-	irParser = new IRParser(C, jit, fifo);
-
-	fus = new map<string, FuncUnit*>();
-	
+	irParser = new IRParser(C, jit, fifo);	
 }
 
 DecoderEngine::~DecoderEngine(){

@@ -76,7 +76,6 @@ private:
 	JIT* jit;
 	IRParser* irParser;
 	std::map<std::string, Actor*> actors;
-	std::map<std::string, FuncUnit*>* fus;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

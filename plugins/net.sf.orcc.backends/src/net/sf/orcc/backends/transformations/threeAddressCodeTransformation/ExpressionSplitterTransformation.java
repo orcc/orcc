@@ -147,38 +147,26 @@ public class ExpressionSplitterTransformation extends
 		instrs = new ArrayList<Instruction>();
 	}
 
+
+	 
 	/**
 	 * Returns an iterator over the last instruction of the previous block. A
-	 * new block is created if there is no previous one.
+	 * new block is created.
 	 * 
 	 * @param it
 	 * @return
 	 */
 	private ListIterator<Instruction> getItr(ListIterator<CFGNode> it) {
-		BlockNode block;
+		//Create a new basic block
+		BlockNode block = new BlockNode(procedure);
 
+		//Add it before the current node
 		it.previous();
-		if (it.hasPrevious()) {
-			// get previous and restore iterator's position
-			CFGNode previous = it.previous();
-			it.next();
+		it.add(block);
 
-			if (previous.isBlockNode()) {
-				block = ((BlockNode) previous);
-			} else if (previous.isIfNode()) {
-				block = ((IfNode) previous).getJoinNode();
-			} else {
-				block = ((WhileNode) previous).getJoinNode();
-			}
-		} else {
-			// no previous block, create and add a new one
-			block = new BlockNode(procedure);
-			it.add(block);
-		}
-		it.next();
-
-		return block.lastListIterator();
+		return block.listIterator();
 	}
+
 
 	@Override
 	public void transform(Actor actor) throws OrccException {
