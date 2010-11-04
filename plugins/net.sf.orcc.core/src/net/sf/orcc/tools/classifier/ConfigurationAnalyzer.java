@@ -38,15 +38,16 @@ import java.util.Set;
 import jp.ac.kobe_u.cs.cream.DefaultSolver;
 import jp.ac.kobe_u.cs.cream.IntVariable;
 import jp.ac.kobe_u.cs.cream.Solution;
-import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
+import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.nodes.NodeVisitor;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
@@ -94,72 +95,64 @@ public class ConfigurationAnalyzer {
 
 	private Actor actor;
 
-	private FSM fsm;
+	private Map<Action, Map<Port, Expression>> configurations;
 
-	private String initialState;
-
-	private Port port;
-
-	private Map<Action, Integer> values;
+	private List<Port> ports;
 
 	/**
-	 * Creates a new configuration analyzer for the given actor
+	 * Creates a new configuration analyzer.
+	 */
+	public ConfigurationAnalyzer() {
+	}
+
+	/**
+	 * Analyzes the given actor.
 	 * 
 	 * @param actor
 	 *            an actor
 	 */
-	public ConfigurationAnalyzer(Actor actor) {
+	public void analyze(Actor actor) {
 		this.actor = actor;
-		values = new HashMap<Action, Integer>();
-	}
+		ports = new ArrayList<Port>();
+		configurations = new HashMap<Action, Map<Port, Expression>>();
 
-	/**
-	 * Analyze the actor given at construction time
-	 */
-	public void analyze() {
 		ActionScheduler sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
-			fsm = sched.getFsm();
-			initialState = fsm.getInitialState().getName();
-
-			findConfigurationPort();
-			if (port != null) {
-				findConstraints();
+			findConfigurationPorts();
+			if (!ports.isEmpty()) {
+				createConfigurations();
 			}
 		}
 	}
 
 	/**
-	 * Finds the configuration port of this FSM is there is one.
+	 * Creates the configuration for the given action using the constraints set
+	 * by the given constraint builder.
+	 * 
+	 * @param action
+	 *            an action
+	 * @param visitor
+	 *            a constraint builder
 	 */
-	private void findConfigurationPort() {
-		// visits the scheduler of each action departing from the initial state
-		List<Set<Port>> ports = new ArrayList<Set<Port>>();
-		for (NextStateInfo info : fsm.getTransitions(initialState)) {
-			PeekVisitor visitor = new PeekVisitor();
-			visitAction(info.getAction(), visitor);
-			ports.add(visitor.getCandidates());
-		}
-
-		// get the intersection of all ports
-		Set<Port> candidates = new HashSet<Port>();
-
-		// add all ports peeked
-		for (Set<Port> set : ports) {
-			candidates.addAll(set);
-		}
-
-		// get the intersection
-		for (Set<Port> set : ports) {
-			if (!set.isEmpty()) {
-				candidates.retainAll(set);
+	private void createConfiguration(Action action, ConstraintBuilder visitor) {
+		// solve all ports
+		Map<Port, Expression> configuration = new HashMap<Port, Expression>();
+		for (Port port : ports) {
+			IntVariable variable = visitor.getVariable(port.getName());
+			if (variable == null) {
+				System.out.println("no constraint on " + port);
+			} else {
+				DefaultSolver solver = new DefaultSolver(variable.getNetwork());
+				Solution solution = solver.findFirst();
+				if (solution != null) {
+					int value = solution.getIntValue(variable);
+					configuration.put(port, new IntExpr(value));
+				}
 			}
 		}
 
-		// set the port if there is only one
-		if (candidates.size() == 1) {
-			port = candidates.iterator().next();
-		}
+		// add the configuration
+		configurations.put(action, configuration);
 	}
 
 	/**
@@ -167,10 +160,12 @@ public class ConfigurationAnalyzer {
 	 * stores a constrained variable that will contain the value to read from
 	 * the configuration port when solved.
 	 */
-	private void findConstraints() {
+	private void createConfigurations() {
 		List<Action> previous = new ArrayList<Action>();
 
 		// visits the scheduler of each action departing from the initial state
+		FSM fsm = actor.getActionScheduler().getFsm();
+		String initialState = fsm.getInitialState().getName();
 		for (NextStateInfo info : fsm.getTransitions(initialState)) {
 			ConstraintBuilder visitor = new ConstraintBuilder();
 
@@ -181,51 +176,59 @@ public class ConfigurationAnalyzer {
 			}
 
 			// add constraint of current action
+			Action action = info.getAction();
 			visitor.setNegateConstraints(false);
-			visitor.visitAction(info.getAction());
+			visitor.visitAction(action);
 
 			// add current action to "previous" list
-			previous.add(info.getAction());
+			previous.add(action);
 
-			// solve
-			IntVariable variable = visitor.getVariable(port.getName());
-			if (variable == null) {
-				System.out.println("no constraint on " + port);
-			} else {
-				DefaultSolver solver = new DefaultSolver(variable.getNetwork());
-				Solution solution = solver.findFirst();
-				if (solution != null) {
-					int value = solution.getIntValue(variable);
-					values.put(info.getAction(), value);
-				}
-			}
+			// create the configuration for this action based on the constraints
+			createConfiguration(action, visitor);
 		}
 	}
 
 	/**
-	 * Returns the configuration port.
-	 * 
-	 * @return the configuration port
+	 * Finds the configuration ports of this actor, if any.
 	 */
-	public Port getConfigurationPort() {
-		return port;
+	private void findConfigurationPorts() {
+		// visits the scheduler of each action departing from the initial state
+		List<Set<Port>> ports = new ArrayList<Set<Port>>();
+
+		FSM fsm = actor.getActionScheduler().getFsm();
+		String initialState = fsm.getInitialState().getName();
+		for (NextStateInfo info : fsm.getTransitions(initialState)) {
+			PeekVisitor visitor = new PeekVisitor();
+			visitAction(info.getAction(), visitor);
+			ports.add(visitor.getCandidates());
+		}
+
+		// add all ports peeked
+		Set<Port> candidates = new HashSet<Port>();
+		for (Set<Port> set : ports) {
+			candidates.addAll(set);
+		}
+
+		// and then only retains the ones that are common to every action
+		for (Set<Port> set : ports) {
+			if (!set.isEmpty()) {
+				candidates.retainAll(set);
+			}
+		}
+
+		// copies the candidates to the ports list
+		this.ports = new ArrayList<Port>(candidates);
 	}
 
 	/**
-	 * Get a value that, read on the configuration port, would enable the given
-	 * action to fire.
+	 * Returns the configuration associated with the given action.
 	 * 
 	 * @param action
 	 *            an action
-	 * @return an integer value
+	 * @return the configuration associated with the given action
 	 */
-	public int getConfigurationValue(Action action) {
-		Integer value = values.get(action);
-		if (value != null) {
-			return value;
-		}
-
-		throw new OrccRuntimeException("expected value for " + action);
+	public Map<Port, Expression> getConfiguration(Action action) {
+		return configurations.get(action);
 	}
 
 	/**

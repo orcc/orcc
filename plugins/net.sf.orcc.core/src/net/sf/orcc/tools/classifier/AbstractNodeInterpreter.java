@@ -28,13 +28,15 @@
  */
 package net.sf.orcc.tools.classifier;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.NodeInterpreter;
-import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
@@ -57,11 +59,9 @@ import net.sf.orcc.ir.nodes.WhileNode;
  */
 public class AbstractNodeInterpreter extends NodeInterpreter {
 
-	private Action action;
+	private Map<Port, Expression> configuration;
 
-	private ConfigurationAnalyzer analyzer;
-
-	private boolean portRead;
+	private Map<Port, Boolean> portRead;
 
 	private boolean schedulableMode;
 
@@ -75,25 +75,17 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 	}
 
 	/**
-	 * Creates a new abstract node interpreter that uses the given configuration
-	 * analyzer.
+	 * Sets the configuration that should be used by the interpreter.
 	 * 
-	 * @param analyzer
-	 *            a configuration analyzer
+	 * @param configuration
+	 *            a configuration as a map of ports and values
 	 */
-	public AbstractNodeInterpreter(ConfigurationAnalyzer analyzer) {
-		this();
-		this.analyzer = analyzer;
-	}
-
-	/**
-	 * Sets the configuration action that should be executed.
-	 * 
-	 * @param action
-	 *            an action
-	 */
-	public void setAction(Action action) {
-		this.action = action;
+	public void setConfiguration(Map<Port, Expression> configuration) {
+		this.configuration = configuration;
+		portRead = new HashMap<Port, Boolean>(configuration.size());
+		for (Port port : configuration.keySet()) {
+			portRead.put(port, false);
+		}
 	}
 
 	/**
@@ -158,24 +150,26 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 	@Override
 	public void visit(Peek peek) {
-		if (peek.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
-			int value = analyzer.getConfigurationValue(action);
+		Port port = peek.getPort();
+		if (configuration != null && configuration.containsKey(port)
+				&& !portRead.get(port)) {
 			ListExpr target = (ListExpr) peek.getTarget().getValue();
-			target.set(0, new IntExpr(value));
+			target.set(0, configuration.get(port));
 		}
 	}
 
 	@Override
 	public void visit(Read read) {
-		if (read.getPort().equals(analyzer.getConfigurationPort()) && !portRead) {
+		Port port = read.getPort();
+		if (configuration != null && configuration.containsKey(port)
+				&& !portRead.get(port)) {
 			Variable variable = read.getTarget();
 			if (variable != null) {
-				int value = analyzer.getConfigurationValue(action);
 				ListExpr target = (ListExpr) variable.getValue();
-				target.set(0, new IntExpr(value));
+				target.set(0, configuration.get(port));
 			}
 
-			portRead = true;
+			portRead.put(port, true);
 		}
 
 		read.getPort().increaseTokenConsumption(read.getNumTokens());

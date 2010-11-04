@@ -30,6 +30,7 @@ package net.sf.orcc.tools.classifier;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.sf.orcc.OrccException;
@@ -38,10 +39,12 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DynamicMoC;
 import net.sf.orcc.moc.MoC;
@@ -64,8 +67,6 @@ public class ActorClassifier implements ActorTransformation {
 
 	private Actor actor;
 
-	private ConfigurationAnalyzer analyzer;
-
 	/**
 	 * Creates a new classifier
 	 */
@@ -78,9 +79,6 @@ public class ActorClassifier implements ActorTransformation {
 	 * @return the class of the actor
 	 */
 	public void classify() {
-		// interpreter needs the analyzer
-		analyzer = new ConfigurationAnalyzer(actor);
-
 		// checks for empty actors
 		List<Action> actions = actor.getActions();
 		if (actions.isEmpty()) {
@@ -186,21 +184,23 @@ public class ActorClassifier implements ActorTransformation {
 
 	/**
 	 * Classify the FSM of the actor this unroller was created with, starting
-	 * from the given initial state, and using the given configuration action.
+	 * from the given initial state, and using the given configuration.
 	 * 
 	 * @param initialState
 	 *            the initial state of the FSM
-	 * @param action
-	 *            the action to use for configuring the FSM
+	 * @param configuration
+	 *            a configuration
 	 * @return a static class
 	 */
-	private SDFMoC classifyFsmConfiguration(String initialState, Action action) {
+	private SDFMoC classifyFsmConfiguration(Map<Port, Expression> configuration) {
 		SDFMoC staticClass = new SDFMoC();
 
 		AbstractInterpreter interpretedActor = newInterpreter();
-		interpretedActor.setAction(action);
+		interpretedActor.setConfiguration(configuration);
 
 		// schedule the actor
+		String initialState = actor.getActionScheduler().getFsm()
+				.getInitialState().getName();
 		do {
 			interpretedActor.schedule();
 			Action latest = interpretedActor.getScheduledAction();
@@ -210,11 +210,6 @@ public class ActorClassifier implements ActorTransformation {
 		// set token rates
 		staticClass.setTokenConsumptions(actor);
 		staticClass.setTokenProductions(actor);
-
-		// print token rates
-		System.out.println("configuration " + action);
-		staticClass.printTokenConsumption();
-		staticClass.printTokenProduction();
 
 		return staticClass;
 	}
@@ -233,15 +228,23 @@ public class ActorClassifier implements ActorTransformation {
 			String initialState = fsm.getInitialState().getName();
 
 			// analyze the configuration of this actor
-			analyzer.analyze();
+			ConfigurationAnalyzer analyzer = new ConfigurationAnalyzer();
+			analyzer.analyze(actor);
 
 			// will unroll for each branch departing from the initial state
 			QSDFMoC quasiStatic = new QSDFMoC();
 
 			for (NextStateInfo info : fsm.getTransitions(initialState)) {
 				Action action = info.getAction();
-				SDFMoC staticClass = classifyFsmConfiguration(initialState,
-						action);
+				
+				Map<Port, Expression> configuration = analyzer.getConfiguration(action);
+				SDFMoC staticClass = classifyFsmConfiguration(configuration);
+
+				// print token rates
+				System.out.println("configuration " + action);
+				staticClass.printTokenConsumption();
+				staticClass.printTokenProduction();
+
 				quasiStatic.addConfiguration(action, staticClass);
 			}
 
@@ -362,8 +365,7 @@ public class ActorClassifier implements ActorTransformation {
 	 * @return the interpreter created
 	 */
 	private AbstractInterpreter newInterpreter() {
-		AbstractInterpreter interpretedActor = new AbstractInterpreter(actor,
-				analyzer);
+		AbstractInterpreter interpretedActor = new AbstractInterpreter(actor);
 
 		actor.resetTokenConsumption();
 		actor.resetTokenProduction();

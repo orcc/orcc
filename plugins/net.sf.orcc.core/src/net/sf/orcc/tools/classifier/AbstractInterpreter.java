@@ -29,12 +29,14 @@
 package net.sf.orcc.tools.classifier;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.BoolExpr;
 
 /**
@@ -56,12 +58,10 @@ public class AbstractInterpreter extends ActorInterpreter {
 	 * @param analyzer
 	 *            a configuration analyzer
 	 */
-	public AbstractInterpreter(Actor actor, ConfigurationAnalyzer analyzer) {
+	public AbstractInterpreter(Actor actor) {
 		super(new HashMap<String, Expression>(), actor, null);
 
-		// Build a node interpreter for visiting CFG and instructions
-		nodeInterpreter = new AbstractNodeInterpreter(analyzer);
-		
+		nodeInterpreter = new AbstractNodeInterpreter();
 		exprInterpreter = new AbstractExpressionEvaluator();
 	}
 
@@ -96,13 +96,14 @@ public class AbstractInterpreter extends ActorInterpreter {
 	}
 
 	/**
-	 * Sets the configuration action that should be executed.
+	 * Sets the configuration that should be used by the interpreter.
 	 * 
-	 * @param action
-	 *            an action
+	 * @param configuration
+	 *            a configuration as a map of ports and values
 	 */
-	public void setAction(Action action) {
-		((AbstractNodeInterpreter) nodeInterpreter).setAction(action);
+	public void setConfiguration(Map<Port, Expression> configuration) {
+		((AbstractNodeInterpreter) nodeInterpreter)
+				.setConfiguration(configuration);
 	}
 
 }
