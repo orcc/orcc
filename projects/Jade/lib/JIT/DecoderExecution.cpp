@@ -49,7 +49,7 @@
 #include "llvm/Target/TargetSelect.h"
 
 #include "Jade/JIT.h"
-#include "Jade/Actor/ActionScheduler.h"
+#include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Decoder/Decoder.h"
 //------------------------------
 

@@ -28,58 +28,62 @@
  */
 
 /**
-@brief Description of the StateVar class interface
+@brief Description of the TypeEntry class interface
 @author Jerome Gorin
-@file StateVar.h
+@file ExprType.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef STATEVARIABLE_H
-#define STATEVARIABLE_H
+#ifndef EXPRENTRY_H
+#define EXPRENTRY_H
 
-#include "Jade/Actor/Variable.h"
+#include "Jade/Core/Entry.h"
+#include "Jade/Core/Expression.h"
+
+namespace llvm{
+	class Constant;
+}
 //------------------------------
 
 /**
- * @class Variable
+ * @class ExprEntry
  *
- * @brief  This class defines a state variable
+ * This class defines a expression entry.
  *
- * This class represents a state variable. A state variable is a global variable
- * that can be assigned.
- * 
  * @author Jerome Gorin
  * 
  */
-class StateVar : public Variable {
+class ExprEntry : public Entry {
 public:
 
+	/*!
+     *  @brief Constructor
+     *
+	 * Creates an expression entry.
+	 *
+     */
+	ExprEntry(llvm::Constant* expr){this->expr = expr;};
+	~ExprEntry();
+
 	/**
-	 * @brief create a state variable
-	 *
-	 * Creates a new state variable with the given type and name.
+	 * @brief Returns true if this entry is type of ExprEntry.
 	 * 
-	 * @param location : the state variable location
-	 *
-	 * @param type : the state variable type
-	 *
-	 * @param name : the state variable name
-	 *
-	 * @param assignablr : whether this state variable is assignable or not.
-	 *
-	 * @param variable : llvm::GlobalVariable bound to this variable.
+	 * @return true if this type is ExprEntry
 	 */
-	StateVar(Location* location, llvm::Type* type, std::string name, bool assignable, llvm::GlobalVariable* variable) 
-		: Variable(location, type, name, true, variable)
-	{
-		this->assignable = assignable;
-	};
-	~StateVar();
+	bool isExprEntry(){return true;};
+
+	/**
+	 * @brief Getter of expr.
+	 * 
+	 * @return Expr of the Entry
+	 */
+	llvm::Constant* getExprEntry(){return expr;};
 
 private:
-	bool assignable;
+	llvm::Constant* expr;
+
 };
 
 #endif

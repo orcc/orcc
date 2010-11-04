@@ -41,8 +41,7 @@
 #include <stdio.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
-#include "Jade/Expr/Expression.h"
-#include "Jade/Expr/BinaryOp.h"
+#include "Jade/Core/Expr/BinaryOp.h"
 
 namespace llvm{
 	class Constant;

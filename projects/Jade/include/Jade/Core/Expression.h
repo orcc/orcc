@@ -28,58 +28,100 @@
  */
 
 /**
-@brief Description of the IntType class interface
+@brief Description of the Expr class interface
 @author Jerome Gorin
-@file BoolType.h
+@file Expression.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef INTTYPE_H
-#define INTTYPE_H
-
-#include "Jade/Core/Expression.h"
+#ifndef EXPRESSION_H
+#define EXPRESSION_H
 
 #include "Jade/Core/Type.h"
 //------------------------------
 
 /**
- * @class IntType
+ * @class Expr
  *
- * This class defines an integer type.
+ * @brief  This class defines an Expression
  *
+ * This class represents an abstract Expression in a network. This class
+ * intend to be inherit by class corresponding to specific kind 
+ * of Expression.
+ * 
  * @author Jerome Gorin
  * 
  */
-class IntType : public ir::Type {
+class Expr {
 public:
+
 	/*!
      *  @brief Constructor
      *
-	 * Creates a new int type with the given size.
-	 *
-     * @param size : Expr of the size of this integer type
+	 * Creates a new abstract expression
+     *
      */
-	IntType(Expr* size){this->size = size;};
-	~IntType();
+	Expr(){};
+	~Expr(){};
 
 	/**
-	 * @brief Returns true if the current Type is BoolType
+	 * @brief Returns Type corresponding to the type of this expression.
 	 * 
-	 * @return True if the Type is BoolType
+	 * @return ir::Type of this expression
 	 */
-	bool isIntType(){return true;};
+	virtual ir::Type* getType() = 0;
+
 
 	/**
-	 * @brief Returns the size of the intType.
+	 * @brief Returns true if the expression is an instance of BinaryExpr
 	 * 
-	 * @return integer of the size
+	 * @return True if the expression is an instance of BinaryExpr
 	 */
-	Expr* getSize(){return size;};
+	virtual bool isBinaryExpr(){return false;};
 
-private:
-	Expr* size;
+	/**
+	 * @brief Returns true if the expression is an instance of BooleanExpr
+	 * 
+	 * @return True if the expression is an instance of BooleanExpr
+	 */
+	virtual bool isBooleanExpr(){return false;};
+
+	/**
+	 * @brief Returns true if the expression is an instance of IntExpr
+	 * 
+	 * @return True if the expression is an instance of IntExpr
+	 */
+	virtual bool isIntExpr(){return false;};
+
+	/**
+	 * @brief Returns true if the expression is an instance of ListExpr
+	 * 
+	 * @return True if the expression is an instance of ListExpr
+	 */
+	virtual bool isListExpr(){return false;};
+
+	/**
+	 * @brief Returns true if the expression is an instance of StringExpr
+	 * 
+	 * @return True if the expression is an instance of StringExpr
+	 */
+	virtual bool isStringExpr(){return false;};
+
+	/**
+	 * @brief Returns true if the expression is an instance of UnaryExpr
+	 * 
+	 * @return True if the expression is an instance of UnaryExpr
+	 */
+	virtual bool isUnaryExpr(){return false;};
+
+	/**
+	 * @brief Returns true if the expression is an instance of VarExpr
+	 * 
+	 * @return True if the expression is an instance of VarExpr
+	 */
+	virtual bool isVarExpr(){return false;};
 
 };
 

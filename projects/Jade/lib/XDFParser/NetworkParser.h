@@ -43,8 +43,8 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "Jade/Network/Network.h"
-#include "Jade/Entry/Entry.h"
+#include "Jade/Core/Network.h"
+#include "Jade/Core/Entry.h"
 
 #include "TypeParser.h"
 

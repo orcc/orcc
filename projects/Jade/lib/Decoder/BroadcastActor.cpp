@@ -47,11 +47,10 @@
 #include "llvm/Instructions.h"
 #include "llvm/Module.h"
 
-#include "Jade/Actor/ActionScheduler.h"
-#include "Jade/Actor/Port.h"
-#include "Jade/Actor/Location.h"
+#include "Jade/Core/Actor/ActionScheduler.h"
+#include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Decoder/InstancedActor.h"
+#include "Jade/Core/InstancedActor.h"
 #include "Jade/Fifo/AbstractFifo.h"
 //------------------------------
 
@@ -75,12 +74,10 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 	PointerType* fifoType = (PointerType*)structType->getPointerTo();
 	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoType));
 
-	Location* location = new Location();
-
 	// Creating input port of name input
 	string inputName = "input";
 	GlobalVariable* inputVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, name+"_"+inputName);
-	Port* inputPort = new Port(location, inputName, type, inputVar);
+	Port* inputPort = new Port(inputName, type, inputVar);
 	inputs->insert(pair<string, Port*>(inputName, inputPort));
 
 	// Creating output port of name input
@@ -88,7 +85,7 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 		stringstream outputName;
 		outputName <<name<<"_output_" << i;
 		GlobalVariable* outputVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, outputName.str());
-		Port* outputPort = new Port(location, outputName.str(), type, outputVar);
+		Port* outputPort = new Port(outputName.str(), type, outputVar);
 		outputs->insert(pair<string, Port*>(outputName.str(), outputPort));
 	}
 

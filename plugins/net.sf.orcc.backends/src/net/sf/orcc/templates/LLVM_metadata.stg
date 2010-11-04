@@ -252,10 +252,6 @@ $Type_decl_MD(actor=actor, var=var)$ = metadata  !{$varType_MD(var.type)$, $varS
 
 >>
 
-Location_MD(var) ::=<<
-$Location_decl_MD(var)$ = metadata  !{$startLine_MD(var)$, $startColumn_MD(var)$, $endColumn_MD(var)$}
->>
-
 Sched_MD(actor, action) ::= <<
 $Sched_decl_MD(actor=actor, action=action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExtern_MD(action.scheduler)$, i1()* @$action.scheduler$}
 
@@ -324,18 +320,6 @@ metadata !"$var.name$"
 
 file_MD(actor) ::= <<
 metadata !"$actor.file$"
->>
-
-startLine_MD(var) ::= <<
-i32 $var.location.startLine$
->>
-
-startColumn_MD(var) ::= <<
-i32 $var.location.startColumn$
->>
-
-endColumn_MD(var) ::= <<
-i32 $var.location.endColumn$
 >>
 
 varState_MD(state) ::= <<

@@ -47,10 +47,9 @@ namespace llvm {
 	class GlobalVariable;
 }
 
-#include "Jade/Type/Type.h"
-#include "Jade/Actor/Actor.h"
-#include "Jade/Actor/Location.h"
-#include "Jade/Network/Instance.h"
+#include "Jade/Core/Type.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Instance.h"
 
 class AbstractFifo;
 class InputPort;
@@ -77,13 +76,11 @@ public:
 	 *
 	 * Creates a new Port on an actor with the given location, Type, name and llvm variable.
 	 *
-	 * @param location	:	the port location
 	 * @param Type		:	the Port Type
 	 * @param name		:	the Port name
 	 * @param variable	:	the llvm variable corresponding to this port
 	 */
-	Port(Location* location, std::string name, llvm::Type* type, llvm::GlobalVariable* variable){
-		this->location = location; 
+	Port(std::string name, llvm::Type* type, llvm::GlobalVariable* variable){
 		this->name = name; 
 		this->type = type; 
 		this->variable = variable;
@@ -94,12 +91,10 @@ public:
 	 *
 	 * Creates a new Port on an actor with the given location, Type, name.
 	 *
-	 * @param location	:	the port location
 	 * @param Type		:	the Port Type
 	 * @param name		:	the Port name
 	 */
-	Port(Location* location, std::string name, llvm::Type* type){
-		this->location = location; 
+	Port(std::string name, llvm::Type* type){
 		this->name = name; 
 		this->type = type; 
 		this->variable = NULL;
@@ -132,16 +127,6 @@ public:
 	 */
 	llvm::Type* getType(){return type;};
 
-
-	/**
-	 * @brief Getter of location
-	 *
-	 * Get the location of the port
-	 * 
-	 * @return Location of the port
-	 *
-	 */
-	Location* getLocation(){return location;};
 
 	/**
 	 * @brief Add a fifo connection to the port
@@ -197,9 +182,6 @@ protected:
 	/** Fifos bound to the port */
 	std::list<AbstractFifo*> fifos;
 	
-	/** Location of the instance*/
-	Location* location;
-
 	/** Corresponding global variable*/
 	llvm::GlobalVariable* variable;
 };

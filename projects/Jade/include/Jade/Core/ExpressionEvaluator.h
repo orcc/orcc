@@ -43,7 +43,7 @@ namespace llvm{
 	class Constant;
 }
 
-#include "Jade/Expr/Expression.h"
+#include "Jade/Core/Expression.h"
 //------------------------------
 
 /**

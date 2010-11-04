@@ -39,7 +39,7 @@
 #ifndef STRINGTYPE_H
 #define STRINGTYPE_H
 
-#include "Type.h"
+#include "Jade/Core/Type.h"
 //------------------------------
 
 /**

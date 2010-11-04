@@ -43,7 +43,7 @@ namespace llvm{
 	class Constant;
 }
 
-#include "Attribute.h"
+#include "Jade/Core/Attribute.h"
 //------------------------------
 
 /**

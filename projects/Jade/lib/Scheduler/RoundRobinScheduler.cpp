@@ -52,12 +52,12 @@
 #include "llvm/Support/CommandLine.h"
 
 #include "Jade/JIT.h"
-#include "Jade/Actor/Actor.h"
-#include "Jade/Actor/ActionScheduler.h"
-#include "Jade/Decoder/InstancedActor.h"
-#include "Jade/Decoder/Procedure.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Actor/ActionScheduler.h"
+#include "Jade/Core/InstancedActor.h"
+#include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Network/Instance.h"
+#include "Jade/Core/Instance.h"
 
 #include "display.h"
 //------------------------------

@@ -39,7 +39,7 @@
 #ifndef BOOLTYPE_H
 #define BOOLTYPE_H
 
-#include "Type.h"
+#include "Jade/Core/Type.h"
 //------------------------------
 
 /**

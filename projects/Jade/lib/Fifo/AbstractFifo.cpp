@@ -45,10 +45,10 @@
 
 #include "Jade/JIT.h"
 #include "Jade/Fifo/AbstractFifo.h"
-#include "Jade/Actor/Actor.h"
+#include "Jade/Core/Actor.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Network/Network.h"
+#include "Jade/Core/Network.h"
 //------------------------------
 
 using namespace llvm;

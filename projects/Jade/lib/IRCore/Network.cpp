@@ -36,10 +36,10 @@
 */
 
 //------------------------------
-#include "Jade/Network/Network.h"
+#include "Jade/Core/Network.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Graph/DotWriter.h"
-#include "Jade/Network/Vertex.h"
+#include "Jade/Core/Vertex.h"
 //------------------------------
 
 using namespace std;

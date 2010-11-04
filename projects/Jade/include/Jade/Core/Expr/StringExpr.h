@@ -28,101 +28,65 @@
  */
 
 /**
-@brief Description of the Expr class interface
+@brief Description of the StringExpr class interface
 @author Jerome Gorin
-@file Expression.h
+@file StringExpr.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef EXPRESSION_H
-#define EXPRESSION_H
+#ifndef STRINGEXPR_H
+#define STRINGEXPR_H
 
-#include "Jade/Type/Type.h"
+#include <string>
+
+#include "Jade/Type/StringType.h"
+
+#include "Jade/Core/Expression.h"
 //------------------------------
 
 /**
- * @class Expr
+ * @class IntExpr
  *
- * @brief  This class defines an Expression
+ * @brief  This class defines an integer expression.
  *
- * This class represents an abstract Expression in a network. This class
- * intend to be inherit by class corresponding to specific kind 
- * of Expression.
+ * This class represents an integer Expression in a network.
  * 
  * @author Jerome Gorin
  * 
  */
-class Expr {
+class StringExpr : public Expr {
 public:
-
 	/*!
      *  @brief Constructor
      *
-	 * Creates a new abstract expression
+	 * Creates a new string expression.
+	 *
+	 *  @param value : string value of the StringExpr.
      *
      */
-	Expr(){};
-	~Expr(){};
+	StringExpr(std::string value){this->value = value;};
 
-	/**
-	 * @brief Returns Type corresponding to the type of this expression.
-	 * 
-	 * @return ir::Type of this expression
-	 */
-	virtual ir::Type* getType() = 0;
-
-
-	/**
-	 * @brief Returns true if the expression is an instance of BinaryExpr
-	 * 
-	 * @return True if the expression is an instance of BinaryExpr
-	 */
-	virtual bool isBinaryExpr(){return false;};
-
-	/**
-	 * @brief Returns true if the expression is an instance of BooleanExpr
-	 * 
-	 * @return True if the expression is an instance of BooleanExpr
-	 */
-	virtual bool isBooleanExpr(){return false;};
-
-	/**
-	 * @brief Returns true if the expression is an instance of IntExpr
-	 * 
-	 * @return True if the expression is an instance of IntExpr
-	 */
-	virtual bool isIntExpr(){return false;};
-
-	/**
-	 * @brief Returns true if the expression is an instance of ListExpr
-	 * 
-	 * @return True if the expression is an instance of ListExpr
-	 */
-	virtual bool isListExpr(){return false;};
+	~StringExpr();
 
 	/**
 	 * @brief Returns true if the expression is an instance of StringExpr
 	 * 
 	 * @return True if the expression is an instance of StringExpr
 	 */
-	virtual bool isStringExpr(){return false;};
+	bool isStringExpr(){return true;};
 
-	/**
-	 * @brief Returns true if the expression is an instance of UnaryExpr
-	 * 
-	 * @return True if the expression is an instance of UnaryExpr
-	 */
-	virtual bool isUnaryExpr(){return false;};
+	/*!
+     *  @brief Return ir::Type of the string expression
+     *
+	 *  @return ir::Type of the string expression.
+     *
+     */
+	ir::Type* getType(){return new StringType();};
 
-	/**
-	 * @brief Returns true if the expression is an instance of VarExpr
-	 * 
-	 * @return True if the expression is an instance of VarExpr
-	 */
-	virtual bool isVarExpr(){return false;};
-
+private:
+	std::string value;
 };
 
 #endif

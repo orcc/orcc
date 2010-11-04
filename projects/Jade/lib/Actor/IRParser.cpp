@@ -48,15 +48,15 @@
 #include "llvm/Module.h"
 
 #include "Jade/JIT.h"
-#include "Jade/Actor/ActionScheduler.h"
-#include "Jade/Actor/Action.h"
-#include "Jade/Actor/ActionTag.h"
-#include "Jade/Actor/Actor.h"
-#include "Jade/Actor/FSM.h"
+#include "Jade/Core/Actor/ActionScheduler.h"
+#include "Jade/Core/Actor/Action.h"
+#include "Jade/Core/Actor/ActionTag.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Actor/FSM.h"
 #include "Jade/Actor/IRParser.h"
-#include "Jade/Actor/Port.h"
-#include "Jade/Actor/StateVariable.h"
-#include "Jade/Decoder/Procedure.h"
+#include "Jade/Core/Port.h"
+#include "Jade/Core/StateVariable.h"
+#include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
 
 
@@ -355,20 +355,7 @@ Port* IRParser::parsePort(MDNode* node){
 	MDString* name = cast<MDString>(node->getOperand(1));
 	GlobalVariable* variable = cast<GlobalVariable>(node->getOperand(2));
 	
-	return new Port(NULL, name->getString(), (IntegerType*)type, variable);
-}
-
-Location* IRParser::parseLocation(MDNode* node){
-
-	if (node->getNumOperands() == 3) {
-		ConstantInt* startLine = cast<ConstantInt>(node->getOperand(0));
-		ConstantInt* startCol = cast<ConstantInt>(node->getOperand(1));
-		ConstantInt* endCol = cast<ConstantInt>(node->getOperand(2));
-
-		return new Location(startLine, startCol, startCol);
-	}
-	
-	return new Location();
+	return new Port(name->getString(), (IntegerType*)type, variable);
 }
 
 Type* IRParser::parseType(MDNode* node){

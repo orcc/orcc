@@ -38,9 +38,9 @@
 //------------------------------
 #include "llvm/Constants.h"
 
-#include "Jade/Expr/IntExpr.h"
+#include "Jade/Core/Expr/IntExpr.h"
 
-#include "ExpressionEvaluator.h"
+#include "Jade/Core/ExpressionEvaluator.h"
 //------------------------------
 
 using namespace llvm;

@@ -44,7 +44,7 @@ namespace llvm{
 	class LLVMContext;
 }
 
-class Network;
+#include "Jade/Core/Network.h"
 //------------------------------
 
 /**

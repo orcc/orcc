@@ -49,14 +49,14 @@
 #include "llvm/Support/CommandLine.h"
 
 #include "Jade/JIT.h"
-#include "Jade/Actor/Port.h"
+#include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Decoder/Procedure.h"
+#include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/FifoTrace.h"
 #include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Network/Connection.h"
-#include "Jade/Network/Network.h"
-#include "Jade/Network/Vertex.h"
+#include "Jade/Core/Connection.h"
+#include "Jade/Core/Network.h"
+#include "Jade/Core/Vertex.h"
 //------------------------------
 
 using namespace llvm;

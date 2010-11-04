@@ -39,13 +39,13 @@
 #include "llvm/GlobalVariable.h"
 #include "llvm/Constants.h"
 
-#include "Jade/Actor/Actor.h"
-#include "Jade/Actor/Variable.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Variable.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Decoder/InstancedActor.h"
-#include "Jade/Expr/Expression.h"
-#include "Jade/Network/Instance.h"
-#include "Jade/Network/Network.h"
+#include "Jade/Core/InstancedActor.h"
+#include "Jade/Core/Expression.h"
+#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network.h"
 
 #include "SolveParameters.h"
 //------------------------------

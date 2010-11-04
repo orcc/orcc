@@ -28,50 +28,75 @@
  */
 
 /**
-@brief Implementation of class Actor
+@brief Implementation of class InstancedActor
 @author Jerome Gorin
-@file Actor.cpp
+@file InstancedActor.cpp
 @version 0.1
 @date 2010/04/12
 */
 
 //------------------------------
-#include "Jade/Actor/Actor.h"
-#include "Jade/Actor/Action.h"
-#include "Jade/Actor/Variable.h"
-#include "Jade/Network/Instance.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Port.h"
+#include "Jade/Core/InstancedActor.h"
+#include "Jade/Core/Instance.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
-Actor::Actor(string name, string file, map<string, Type*>* fifoTypes, map<string, Port*>* inputs, 
-		     map<string, Port*>* outputs, map<string, Variable*>* stateVars,
-			 std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures,
-			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler){
-	this->name = name;
-	this->file = file;
-	this->inputs = inputs;
-	this->outputs = outputs;
-	this->initializes = initializes;
-	this->actions = actions;
-	this->stateVars = stateVars;
-	this->parameters = parameters;
-	this->procedures = procedures;
-	this->actionScheduler = actionScheduler;
-	this->fifoTypes = fifoTypes;
+InstancedActor::InstancedActor(Decoder* decoder, Instance* instance,
+								map<string, Port*>* inputs,
+								map<string, Port*>* outputs,
+								map<Variable*, GlobalVariable*>* stateVars,
+								map<Variable*, GlobalVariable*>* parameters,
+								map<Procedure*, Function*>* procedures,
+								list<Action*>* actions,
+								list<Action*>* initializes,
+								ActionScheduler* scheduler){
+		this->instance = instance;
+		this->decoder = decoder;
+		this->inputs = inputs;
+		this->outputs = outputs;
+		this->stateVars = stateVars;
+		this->parameters = parameters;
+		this->actions = actions;
+		this->procedures = procedures;
+		this->scheduler = scheduler;
+		this->actor = instance->getActor();
+		this->initializes = initializes;
+		instance->setInstancedActor(this);
 }
 
-Actor::~Actor (){
+
+GlobalVariable* InstancedActor::getParameterVar(Variable* parameter){
+	map<Variable*, llvm::GlobalVariable*>::iterator it;
+	
+	it = parameters->find(parameter);
+
+	if(it == parameters->end()){
+		// This parameter has not be found in the instanced actor
+		return NULL;
+	}
+
+	return (*it).second;
 
 }
 
-void Actor::addInstance(Instance* instance){
-	instance->setActor(this);
-	instances.push_back(instance);
+GlobalVariable* InstancedActor::getStateVar(Variable* stateVar){
+	map<Variable*, GlobalVariable*>::iterator it;
+	
+	it = stateVars->find(stateVar);
+
+	if(it == stateVars->end()){
+		// This parameter has not be found in the instanced actor
+		return NULL;
+	}
+
+	return (*it).second;
 }
 
-Port* Actor::getPort(string portName){
+Port* InstancedActor::getPort(string portName){
 	Port* port = getInput(portName);
 
 	// Search inside input ports 
@@ -83,23 +108,8 @@ Port* Actor::getPort(string portName){
 	return getOutput(portName);
 }
 
-Procedure* Actor::getProcedure(string name){
-	map<string, Procedure*>::iterator it;
-	
-	it = procedures->find(name);
 
-	if(it == procedures->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-Port* Actor::getInput(string portName){
-	if (inputs->empty()){
-		return NULL;
-	}
-
+Port* InstancedActor::getInput(string portName){
 	std::map<std::string, Port*>::iterator it;
 	
 	it = inputs->find(portName);
@@ -111,23 +121,7 @@ Port* Actor::getInput(string portName){
 	return (*it).second;
 }
 
-Type* Actor::getFifoType(string name) {
-	map<string, Type*>::iterator it;
-
-	it = fifoTypes->find(name);
-
-	if(it == fifoTypes->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-Port* Actor::getOutput(string portName){
-	if (outputs->empty()){
-		return NULL;
-	}
-
+Port* InstancedActor::getOutput(string portName){
 	std::map<std::string, Port*>::iterator it;
 	
 	it = outputs->find(portName);
@@ -139,22 +133,12 @@ Port* Actor::getOutput(string portName){
 	return (*it).second;
 }
 
-Variable* Actor::getParameter(std::string name){
-	std::map<std::string, Variable*>::iterator it;
-	it = parameters->find(name);
+Function* InstancedActor::getProcedureVar(Procedure* procedure){
+	map<Procedure*, Function*>::iterator it;
+	
+	it = procedures->find(procedure);
 
-	if(it == parameters->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-Variable* Actor::getStateVar(std::string name){
-	map<string, Variable*>::iterator it;
-	it = stateVars->find(name);
-
-	if(it == stateVars->end()){
+	if(it == procedures->end()){
 		return NULL;
 	}
 

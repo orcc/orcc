@@ -40,8 +40,8 @@
 #include "llvm/LLVMContext.h"
 #include "llvm/DerivedTypes.h"
 
-#include "Jade/Entry/ExprEntry.h"
-#include "Jade/Expr/IntExpr.h"
+#include "Jade/Core/Entry/ExprEntry.h"
+#include "Jade/Core/Expr/IntExpr.h"
 #include "Jade/Type/BoolType.h"
 #include "Jade/Type/IntType.h"
 #include "Jade/Type/UIntType.h"

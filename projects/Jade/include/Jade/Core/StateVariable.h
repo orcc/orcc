@@ -28,60 +28,58 @@
  */
 
 /**
-@brief Description of the BinaryExpr class interface
+@brief Description of the StateVar class interface
 @author Jerome Gorin
-@file BinaryExpr.h
+@file StateVar.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef BINARYEXPR_H
-#define BINARYEXPR_H
-#include "Jade/Type/Type.h"
+#ifndef STATEVARIABLE_H
+#define STATEVARIABLE_H
 
-#include "Expression.h"
-#include "BinaryOp.h"
+#include "Jade/Core/Variable.h"
 //------------------------------
 
 /**
- * @class BinaryExpr
+ * @class Variable
  *
- * @brief  This class defines an binary expression.
+ * @brief  This class defines a state variable
  *
- * This class represents an binary Expression in a network.
+ * This class represents a state variable. A state variable is a global variable
+ * that can be assigned.
  * 
  * @author Jerome Gorin
  * 
  */
-
-class BinaryExpr : public Expr {
+class StateVar : public Variable {
 public:
-	
-	/**
-     *  @brief Constructor of the class BinaryExpr
-     *
-     *  @param	e1 : first Expr of binary expression
-	 *  @param	op : BinaryOp of the binary expression
-	 *  @param	e2 : second Expr of binary expression
-	 *
-     */
-	BinaryExpr(Expr* e1, BinaryOp* op, Expr* e2){this->e1 = e1;this->op = op;this->e2 = e2;};
-	~BinaryExpr();
 
-	/*!
-     *  @brief Return ir::Type of the binary expression
-     *
-	 *  @return ir::Type of the binary expression.
-     *
-     */
-	ir::Type* getType(){return type;};
+	/**
+	 * @brief create a state variable
+	 *
+	 * Creates a new state variable with the given type and name.
+	 * 
+	 * @param location : the state variable location
+	 *
+	 * @param type : the state variable type
+	 *
+	 * @param name : the state variable name
+	 *
+	 * @param assignablr : whether this state variable is assignable or not.
+	 *
+	 * @param variable : llvm::GlobalVariable bound to this variable.
+	 */
+	StateVar(Location* location, llvm::Type* type, std::string name, bool assignable, llvm::GlobalVariable* variable) 
+		: Variable(location, type, name, true, variable)
+	{
+		this->assignable = assignable;
+	};
+	~StateVar();
 
 private:
-	Expr* e1;
-	Expr* e2;
-	BinaryOp* op;
-	ir::Type* type;
+	bool assignable;
 };
 
 #endif

@@ -44,10 +44,10 @@
 #include "Jade/JIT.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Actor/IRParser.h"
-#include "Jade/Actor/Port.h"
+#include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/AbstractFifo.h"
-#include "Jade/Network/Network.h"
+#include "Jade/Core/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
 //------------------------------
@@ -79,12 +79,6 @@ int DecoderEngine::load(Network* network) {
 
 	//Create decoder
 	decoder = new Decoder(Context, jit, network, &actors, fifo);
-
-	// Instanciating decoder
-	decoder->instanciate();
-
-	// Setting connections of the decoder
-	fifo->setConnections(decoder);
 
 	jit->initEngine(decoder);
 	

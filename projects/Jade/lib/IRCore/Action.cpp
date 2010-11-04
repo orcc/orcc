@@ -28,59 +28,33 @@
  */
 
 /**
-@brief Implementation of class Connection
+@brief Implementation of class Action
 @author Jerome Gorin
-@file Connection.cpp
+@file Action.cpp
 @version 0.1
 @date 2010/04/12
 */
 
 //------------------------------
-#include "llvm/DerivedTypes.h"
-
-#include "Jade/Network/Connection.h"
-#include "Jade/Type/Type.h"
-#include "Jade/Attribute/Attribute.h"
-#include "Jade/Attribute/ValueAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
-#include <iostream>
-#include "ExpressionEvaluator.h"
+#include "Jade\Core/Actor/Action.h"
+#include "Jade/Core/Actor/ActionTag.h"
+#include "Jade/Core/Actor/Procedure.h"
 //------------------------------
 
 using namespace std;
 
+string Action::getName(){
+	if(tag->isEmpty()){
+		return body->getName();
+	}
 
-Connection::Connection(Port* source, Port* target, std::map<std::string, Attribute*>* attributes): HDAGEdge()
-{	this->attributes = attributes; 
-	this->source = source;	
-	this->target = target;
-	this->fifo = NULL;
-}
+	string str;
+	list<string>::iterator it;
+	list<string>* identifiers = tag->getIdentifiers();
+	for ( it= identifiers->begin() ; it != identifiers->end(); it++ ){
+		str.append(*it);
+		str.append("_");
+	}
 
-
-int Connection::getFifoSize(){
-	std::map<std::string, Attribute*>::iterator it;	
-	it = attributes->find("bufferSize");
-		
-	if(it != attributes->end()){
-		ExpressionEvaluator evaluator;
-		Attribute* attr = (*it).second;
-			
-		if (!attr->isValue()){
-			cerr<<"Error when parsing type of a connection";
-//			fprintf(stderr,"Error when parsing type of a connection");
-			exit(0);
-		}
-			
-		llvm::Constant* expr = ((ValueAttribute*)attr)->getValue();
-
-		return evaluator.evaluateAsInteger(expr);
-	}		
-	
-	return SIZE;
-}
-
-int Connection::getType(){
-	return type->getBitWidth()/8;
+	return str;
 }

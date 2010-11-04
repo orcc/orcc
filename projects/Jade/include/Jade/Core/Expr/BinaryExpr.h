@@ -28,65 +28,60 @@
  */
 
 /**
-@brief Description of the StringExpr class interface
+@brief Description of the BinaryExpr class interface
 @author Jerome Gorin
-@file StringExpr.h
+@file BinaryExpr.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef STRINGEXPR_H
-#define STRINGEXPR_H
+#ifndef BINARYEXPR_H
+#define BINARYEXPR_H
+#include "Jade/Core/Type.h"
 
-#include <string>
-
-#include "Jade/Type/StringType.h"
-
-#include "Expression.h"
+#include "Jade/Core/Expression.h"
+#include "BinaryOp.h"
 //------------------------------
 
 /**
- * @class IntExpr
+ * @class BinaryExpr
  *
- * @brief  This class defines an integer expression.
+ * @brief  This class defines an binary expression.
  *
- * This class represents an integer Expression in a network.
+ * This class represents an binary Expression in a network.
  * 
  * @author Jerome Gorin
  * 
  */
-class StringExpr : public Expr {
+
+class BinaryExpr : public Expr {
 public:
-	/*!
-     *  @brief Constructor
-     *
-	 * Creates a new string expression.
-	 *
-	 *  @param value : string value of the StringExpr.
-     *
-     */
-	StringExpr(std::string value){this->value = value;};
-
-	~StringExpr();
-
+	
 	/**
-	 * @brief Returns true if the expression is an instance of StringExpr
-	 * 
-	 * @return True if the expression is an instance of StringExpr
-	 */
-	bool isStringExpr(){return true;};
+     *  @brief Constructor of the class BinaryExpr
+     *
+     *  @param	e1 : first Expr of binary expression
+	 *  @param	op : BinaryOp of the binary expression
+	 *  @param	e2 : second Expr of binary expression
+	 *
+     */
+	BinaryExpr(Expr* e1, BinaryOp* op, Expr* e2){this->e1 = e1;this->op = op;this->e2 = e2;};
+	~BinaryExpr();
 
 	/*!
-     *  @brief Return ir::Type of the string expression
+     *  @brief Return ir::Type of the binary expression
      *
-	 *  @return ir::Type of the string expression.
+	 *  @return ir::Type of the binary expression.
      *
      */
-	ir::Type* getType(){return new StringType();};
+	ir::Type* getType(){return type;};
 
 private:
-	std::string value;
+	Expr* e1;
+	Expr* e2;
+	BinaryOp* op;
+	ir::Type* type;
 };
 
 #endif

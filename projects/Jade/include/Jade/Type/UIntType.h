@@ -39,9 +39,9 @@
 #ifndef UINTTYPE_H
 #define UINTTYPE_H
 
-#include "Jade/Expr/Expression.h"
+#include "Jade/Core/Expression.h"
 
-#include "Type.h"
+#include "Jade/Core/Type.h"
 //------------------------------
 
 /**

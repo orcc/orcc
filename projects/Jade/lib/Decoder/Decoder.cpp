@@ -45,14 +45,14 @@
 #include "Instanciator.h"
 
 #include "Jade/JIT.h"
-#include "Jade/Actor/ActionScheduler.h"
+#include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Decoder/InstancedActor.h"
+#include "Jade/Core/InstancedActor.h"
 #include "Jade/Fifo/AbstractFifo.h"
-#include "Jade/Actor/Actor.h"
-#include "Jade/Actor/Port.h"
-#include "Jade/Actor/StateVariable.h"
-#include "Jade/Network/Network.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Port.h"
+#include "Jade/Core/StateVariable.h"
+#include "Jade/Core/Network.h"
 #include "Jade/Graph/HDAGGraph.h"
 
 #include "BroadcastAdder.h"
@@ -74,6 +74,12 @@ Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, std::map<std:
 	module = new Module("decoder", C);
 
 	jit->setDecoder(this);
+	
+	// Instanciating decoder
+	instanciate();
+
+	// Setting connections of the decoder
+	fifo->setConnections(this);
 }
 
 Decoder::~Decoder (){

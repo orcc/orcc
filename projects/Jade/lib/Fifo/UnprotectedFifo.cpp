@@ -48,10 +48,10 @@
 #include "llvm/Support/CommandLine.h"
 
 #include "Jade/JIT.h"
-#include "Jade/Actor/Port.h"
+#include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/UnprotectedFifo.h"
-#include "Jade/Network/Connection.h"
+#include "Jade/Core/Connection.h"
 //------------------------------
 
 using namespace llvm;

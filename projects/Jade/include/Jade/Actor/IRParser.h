@@ -46,7 +46,7 @@ namespace llvm{
 	class Type;
 }
 
-#include "Jade/Actor/ActionTag.h"
+#include "Jade/Core/Actor/ActionTag.h"
 
 class Action;
 class ActionScheduler;

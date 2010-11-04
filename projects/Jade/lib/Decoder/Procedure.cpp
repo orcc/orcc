@@ -36,7 +36,7 @@
 */
 
 //------------------------------
-#include "Jade/Decoder/Procedure.h"
+#include "Jade/Core/Actor/Procedure.h"
 
 #include "llvm/Constants.h"
 //------------------------------

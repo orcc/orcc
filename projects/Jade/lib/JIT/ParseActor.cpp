@@ -47,8 +47,7 @@
 #include "llvm/Support/IRReader.h"
 
 #include "Jade/JIT.h"
-#include "Jade/Actor/Actor.h"
-#include "Jade/Actor/Location.h"
+#include "Jade/Core/Actor.h"
 #include "Jade/Decoder/Decoder.h"
 //------------------------------
 

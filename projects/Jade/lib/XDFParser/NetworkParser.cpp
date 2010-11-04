@@ -38,11 +38,10 @@
 #include "NetworkParser.h"
 #include "Jade/Attribute/TypeAttribute.h"
 #include "Jade/Attribute/ValueAttribute.h"
-#include "Jade/Actor/Location.h"
-#include "Jade/Actor/Port.h"
+#include "Jade/Core/Port.h"
 #include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Network/Vertex.h"
-#include "Jade/Network/Connection.h"
+#include "Jade/Core/Vertex.h"
+#include "Jade/Core/Connection.h"
 //------------------------------
 
 
@@ -280,7 +279,7 @@ Port* NetworkParser::getPort(string vertexName, string portName) {
 	if (vertexName.empty()){
 		return NULL;
 	}else{
-		return new Port(new Location(), portName, NULL);
+		return new Port(portName, NULL);
 	}
 }
 

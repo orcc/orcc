@@ -44,9 +44,9 @@
 #include "llvm/LLVMContext.h"
 
 #include "ExprParser.h"
-#include "Jade/Expr/IntExpr.h"
-#include "Jade/Expr/BinaryExpr.h"
-#include "Jade/Expr/StringExpr.h"
+#include "Jade/Core/Expr/IntExpr.h"
+#include "Jade/Core/Expr/BinaryExpr.h"
+#include "Jade/Core/Expr/StringExpr.h"
 //------------------------------
 
 using namespace std;

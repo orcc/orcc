@@ -86,6 +86,7 @@ add_subdirectory(lib/Network)
 add_subdirectory(lib/Scheduler)
 add_subdirectory(lib/XDFParser)
 add_subdirectory(lib/JIT)
+add_subdirectory(lib/IRCore)
 add_subdirectory(lib/Decoder)
 add_subdirectory(lib/DecoderEngine)
 add_subdirectory(lib/Graph)
@@ -104,4 +105,4 @@ add_executable(Jade Jade.cpp)
 ENDIF(APPLE)
 
 # Library requiered
-target_link_libraries(Jade XDFParser DecoderEngine Fifo Actor Network JIT Scheduler HDAGGraph Decoder ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(Jade IRCore XDFParser DecoderEngine Fifo Actor Network JIT Scheduler HDAGGraph Decoder ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})

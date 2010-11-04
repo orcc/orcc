@@ -28,33 +28,15 @@
  */
 
 /**
-@brief Implementation of class Action
+@brief Implementation of class FSM
 @author Jerome Gorin
-@file Action.cpp
+@file FSM.cpp
 @version 0.1
 @date 2010/04/12
 */
 
 //------------------------------
-#include "Jade\Actor\Action.h"
-#include "Jade\Actor\ActionTag.h"
-#include "Jade\Decoder\Procedure.h"
+#include "Jade/Core/Actor/FSM.h"
 //------------------------------
 
 using namespace std;
-
-string Action::getName(){
-	if(tag->isEmpty()){
-		return body->getName();
-	}
-
-	string str;
-	list<string>::iterator it;
-	list<string>* identifiers = tag->getIdentifiers();
-	for ( it= identifiers->begin() ; it != identifiers->end(); it++ ){
-		str.append(*it);
-		str.append("_");
-	}
-
-	return str;
-}

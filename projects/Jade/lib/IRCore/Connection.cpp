@@ -28,15 +28,59 @@
  */
 
 /**
-@brief Implementation of class FSM
+@brief Implementation of class Connection
 @author Jerome Gorin
-@file FSM.cpp
+@file Connection.cpp
 @version 0.1
 @date 2010/04/12
 */
 
 //------------------------------
-#include "Jade/Actor/FSM.h"
+#include "llvm/DerivedTypes.h"
+
+#include "Jade/Core/Connection.h"
+#include "Jade/Core/Type.h"
+#include "Jade/Core/Attribute.h"
+#include "Jade/Attribute/ValueAttribute.h"
+#include "Jade/Attribute/TypeAttribute.h"
+#include "Jade/Attribute/TypeAttribute.h"
+#include <iostream>
+#include "Jade/Core/ExpressionEvaluator.h"
 //------------------------------
 
 using namespace std;
+
+
+Connection::Connection(Port* source, Port* target, std::map<std::string, Attribute*>* attributes): HDAGEdge()
+{	this->attributes = attributes; 
+	this->source = source;	
+	this->target = target;
+	this->fifo = NULL;
+}
+
+
+int Connection::getFifoSize(){
+	std::map<std::string, Attribute*>::iterator it;	
+	it = attributes->find("bufferSize");
+		
+	if(it != attributes->end()){
+		ExpressionEvaluator evaluator;
+		Attribute* attr = (*it).second;
+			
+		if (!attr->isValue()){
+			cerr<<"Error when parsing type of a connection";
+//			fprintf(stderr,"Error when parsing type of a connection");
+			exit(0);
+		}
+			
+		llvm::Constant* expr = ((ValueAttribute*)attr)->getValue();
+
+		return evaluator.evaluateAsInteger(expr);
+	}		
+	
+	return SIZE;
+}
+
+int Connection::getType(){
+	return type->getBitWidth()/8;
+}

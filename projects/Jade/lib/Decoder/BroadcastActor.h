@@ -39,7 +39,7 @@
 #ifndef BROADCASTACTOR_H
 #define BROADCASTACTOR_H
 
-#include "Jade/Actor/Actor.h"
+#include "Jade/Core/Actor.h"
 
 namespace llvm{
 	class LLVMContext;

@@ -39,14 +39,14 @@
 #include <map>
 #include <sstream>
 
-#include "Jade/Actor/Port.h"
+#include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Decoder/InstancedActor.h"
+#include "Jade/Core/InstancedActor.h"
 #include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Network/Instance.h"
-#include "Jade/Network/Network.h"
-#include "Jade/Network/Vertex.h"
-#include "Jade/Network/Connection.h"
+#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network.h"
+#include "Jade/Core/Vertex.h"
+#include "Jade/Core/Connection.h"
 
 #include "BroadcastAdder.h"
 #include "BroadcastActor.h"

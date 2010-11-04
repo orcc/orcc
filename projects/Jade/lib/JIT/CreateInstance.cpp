@@ -49,16 +49,16 @@
 
 
 #include "Jade/JIT.h"
-#include "Jade/Actor/Action.h"
-#include "Jade/Actor/ActionScheduler.h"
-#include "Jade/Actor/ActionTag.h"
-#include "Jade/Actor/Actor.h"
-#include "Jade/Actor/FSM.h"
-#include "Jade/Actor/Port.h"
-#include "Jade/Actor/Variable.h"
+#include "Jade/Core/Actor/Action.h"
+#include "Jade/Core/Actor/ActionScheduler.h"
+#include "Jade/Core/Actor/ActionTag.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Actor/FSM.h"
+#include "Jade/Core/Port.h"
+#include "Jade/Core/Variable.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Decoder/InstancedActor.h"
-#include "Jade/Decoder/Procedure.h"
+#include "Jade/Core/InstancedActor.h"
+#include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
 //------------------------------
 
@@ -303,7 +303,7 @@ map<Procedure*, Function*>* JIT::createProcedures(Instance* instance, map<string
 Port* JIT::createPort(Instance* instance, Port* port){
 	GlobalVariable* portVar = port->getGlobalVariable();
 	GlobalVariable* var = CreateVariable(instance, portVar);
-	return new Port(port->getLocation(), port->getName(), port->getType(), var);
+	return new Port(port->getName(), port->getType(), var);
 }
 
 
