@@ -46,7 +46,8 @@ import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.moc.DynamicMoC;
+import net.sf.orcc.moc.DPNMoC;
+import net.sf.orcc.moc.KPNMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
@@ -84,50 +85,44 @@ public class ActorClassifier implements ActorTransformation {
 		if (actions.isEmpty()) {
 			System.out.println("actor " + actor
 					+ " does not contain any actions, defaults to dynamic");
-			actor.setMoC(new DynamicMoC());
+			actor.setMoC(new KPNMoC());
 			return;
 		}
 
 		// checks for actors with time-dependent behavior
-		boolean td = new TimeDependencyAnalyzer(actor).isTimeDependent();
-		actor.setTimeDependent(td);
-		if (actor.isTimeDependent()) {
-			System.out.println("actor " + actor
-					+ " is time-dependent, defaults to dynamic\n");
-			actor.setMoC(new DynamicMoC());
-			return;
-		}
+		MoC moc;
+		TimeDependencyAnalyzer tdAnalyzer = new TimeDependencyAnalyzer(actor);
+		if (tdAnalyzer.isTimeDependent()) {
+			moc = new DPNMoC();
+		} else {
+			// first tries SDF with *all* the actions of the actor
+			moc = classifySDF(actions);
+			if (!moc.isSDF()) {
+				try {
+					// not SDF, tries CSDF
+					moc = classifyCSDF();
+				} catch (OrccRuntimeException e) {
+					// data-dependent behavior
+				}
 
-		// first tries SDF with *all* the actions of the actor
-		MoC moc = classifySDF(actions);
-		if (!moc.isSDF()) {
-			try {
-				// not SDF, tries CSDF
-				moc = classifyCSDF();
-			} catch (OrccRuntimeException e) {
-				// data-dependent behavior
-			}
-
-			if (!moc.isCSDF()) {
-				// not CSDF, tries QSDF
-				if (actor.getActionScheduler().hasFsm()) {
-					try {
-						moc = classifyQSDF();
-					} catch (OrccRuntimeException e) {
-						// data-dependent behavior
+				if (!moc.isCSDF()) {
+					// not CSDF, tries QSDF
+					if (actor.getActionScheduler().hasFsm()) {
+						try {
+							moc = classifyQSDF();
+						} catch (OrccRuntimeException e) {
+							// data-dependent behavior
+						}
 					}
 				}
 			}
 		}
 
-		// print port token rates
-		if (moc.isDynamic()) {
-			System.out.println("actor " + actor + " classified dynamic\n");
-		} else {
-			System.out.println(moc);
-		}
-
+		// set and print MoC
 		actor.setMoC(moc);
+		System.out.println("MoC of " + actor + ":");
+		System.out.println(moc);
+		System.out.println();
 	}
 
 	/**
@@ -146,12 +141,12 @@ public class ActorClassifier implements ActorTransformation {
 			FSM fsm = actor.getActionScheduler().getFsm();
 			if (fsm == null || !isCycloStaticFsm(fsm)) {
 				// no state, no cyclo-static FSM => dynamic
-				return new DynamicMoC();
+				return new KPNMoC();
 			}
 		}
 
 		// creates the MoC
-		CSDFMoC staticClass = new CSDFMoC();
+		CSDFMoC csdfMoc = new CSDFMoC();
 		int nbPhases = 0;
 
 		// loops until the actor goes back to the initial state, or there is a
@@ -159,19 +154,17 @@ public class ActorClassifier implements ActorTransformation {
 		String initialState = interpreter.getFsmState();
 		do {
 			interpreter.schedule();
-			staticClass.addAction(interpreter.getScheduledAction());
+			csdfMoc.addAction(interpreter.getScheduledAction());
 			nbPhases++;
 		} while (!state.isInitialState()
 				|| !interpreter.getFsmState().equals(initialState));
 
 		// set token rates
-		staticClass.setTokenConsumptions(actor);
-		staticClass.setTokenProductions(actor);
-		staticClass.setNumberOfPhases(nbPhases);
+		csdfMoc.setTokenConsumptions(actor);
+		csdfMoc.setTokenProductions(actor);
+		csdfMoc.setNumberOfPhases(nbPhases);
 
-		System.out.println("actor " + actor + " is CSDF");
-
-		return staticClass;
+		return csdfMoc;
 	}
 
 	/**
@@ -185,7 +178,7 @@ public class ActorClassifier implements ActorTransformation {
 	 * @return a static class
 	 */
 	private SDFMoC classifyFsmConfiguration(Map<Port, Expression> configuration) {
-		SDFMoC staticClass = new SDFMoC();
+		SDFMoC sdfMoc = new SDFMoC();
 
 		AbstractInterpreter interpretedActor = newInterpreter();
 		interpretedActor.setConfiguration(configuration);
@@ -196,20 +189,20 @@ public class ActorClassifier implements ActorTransformation {
 		do {
 			interpretedActor.schedule();
 			Action latest = interpretedActor.getScheduledAction();
-			staticClass.addAction(latest);
+			sdfMoc.addAction(latest);
 		} while (!interpretedActor.getFsmState().equals(initialState));
 
 		// set token rates
-		staticClass.setTokenConsumptions(actor);
-		staticClass.setTokenProductions(actor);
+		sdfMoc.setTokenConsumptions(actor);
+		sdfMoc.setTokenProductions(actor);
 
-		return staticClass;
+		return sdfMoc;
 	}
 
 	/**
-	 * Tries to classify this actor with an FSM as CSDF or QSDF.
+	 * Tries to classify this actor with an FSM as QSDF.
 	 * 
-	 * @return an actor class
+	 * @return an MoC
 	 */
 	private MoC classifyQSDF() {
 		ActionScheduler sched = actor.getActionScheduler();
@@ -239,7 +232,7 @@ public class ActorClassifier implements ActorTransformation {
 		} else {
 			System.out.println(actor.getName()
 					+ " has an FSM that is NOT compatible with quasi-static");
-			return new DynamicMoC();
+			return new KPNMoC();
 		}
 	}
 
@@ -262,32 +255,30 @@ public class ActorClassifier implements ActorTransformation {
 				if ((input.equals(action.getInputPattern()) && output
 						.equals(action.getOutputPattern())) == false) {
 					// one pattern is not equal to another
-					return new DynamicMoC();
+					return new KPNMoC();
 				}
 			}
 		} else {
 			// an empty actor is considered dynamic
 			// because the only actors with no actions are system actors
 			// such as source and display
-			return new DynamicMoC();
+			return new KPNMoC();
 		}
 
 		// schedule
-		SDFMoC staticClass = new SDFMoC();
+		SDFMoC sdfMoc = new SDFMoC();
 		AbstractInterpreter interpretedActor = newInterpreter();
 		interpretedActor.schedule();
-		staticClass.addAction(interpretedActor.getScheduledAction());
+		sdfMoc.addAction(interpretedActor.getScheduledAction());
 
 		// set token rates
-		staticClass.setTokenConsumptions(actor);
-		staticClass.setTokenProductions(actor);
+		sdfMoc.setTokenConsumptions(actor);
+		sdfMoc.setTokenProductions(actor);
 
 		// an SDF actor is a specific CSDF with 1 phase
-		staticClass.setNumberOfPhases(1);
+		sdfMoc.setNumberOfPhases(1);
 
-		System.out.println("actor " + actor + " is SDF");
-
-		return staticClass;
+		return sdfMoc;
 	}
 
 	/**

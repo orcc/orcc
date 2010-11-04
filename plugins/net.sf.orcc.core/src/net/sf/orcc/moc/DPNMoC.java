@@ -29,48 +29,29 @@
 package net.sf.orcc.moc;
 
 /**
- * This class defines a Model of Computation.
+ * This class defines the Dataflow Process Network MoC. A DPN actor has
+ * data-dependent, state-dependent, and time-dependent production/consumption
+ * rates.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public interface MoC {
+public class DPNMoC extends AbstractMoC {
 
 	/**
-	 * Returns true if this MoC is CSDF.
-	 * 
-	 * @return true if this MoC is CSDF
+	 * Creates a new DPN MoC.
 	 */
-	public boolean isCSDF();
+	public DPNMoC() {
+	}
 
-	/**
-	 * Returns true if this MoC is Dataflow Process Networks (equivalent to
-	 * dynamic <b>and</b> time-dependent).
-	 * 
-	 * @return true if this MoC is Dataflow Process Networks
-	 */
-	public boolean isDPN();
+	@Override
+	public boolean isDPN() {
+		return true;
+	}
 
-	/**
-	 * Returns true if this MoC is Kahn Process Networks (equivalent to dynamic
-	 * but not time-dependent).
-	 * 
-	 * @return true if this MoC is Kahn Process Networks
-	 */
-	public boolean isKPN();
-
-	/**
-	 * Returns true if this MoC is quasi-static.
-	 * 
-	 * @return true if this MoC is quasi-static
-	 */
-	public boolean isQuasiStatic();
-
-	/**
-	 * Returns true if this MoC is SDF.
-	 * 
-	 * @return true if this MoC is SDF
-	 */
-	public boolean isSDF();
+	@Override
+	public String toString() {
+		return "Dataflow Process Network";
+	}
 
 }

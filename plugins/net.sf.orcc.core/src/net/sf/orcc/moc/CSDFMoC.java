@@ -57,7 +57,7 @@ public class CSDFMoC extends AbstractMoC {
 	private Pattern outputPattern;
 
 	/**
-	 * Creates a new static class.
+	 * Creates a new CSDF MoC.
 	 */
 	public CSDFMoC() {
 		actions = new ArrayList<Action>();
@@ -86,9 +86,9 @@ public class CSDFMoC extends AbstractMoC {
 	}
 
 	/**
-	 * Returns the input pattern of this static class.
+	 * Returns the input pattern of this CSDF MoC.
 	 * 
-	 * @return the input pattern of this static class
+	 * @return the input pattern of this CSDF MoC
 	 */
 	public Pattern getInputPattern() {
 		return inputPattern;
@@ -129,9 +129,9 @@ public class CSDFMoC extends AbstractMoC {
 	}
 
 	/**
-	 * Returns the output pattern of this static class.
+	 * Returns the output pattern of this CSDF MoC.
 	 * 
-	 * @return the output pattern of this static class
+	 * @return the output pattern of this CSDF MoC
 	 */
 	public Pattern getOutputPattern() {
 		return outputPattern;
@@ -173,12 +173,11 @@ public class CSDFMoC extends AbstractMoC {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("input ports: ");
+		builder.append("CSDF input ports: ");
 		builder.append(inputPattern);
 		builder.append('\n');
-		builder.append("output ports: ");
+		builder.append("CSDF output ports: ");
 		builder.append(outputPattern);
-		builder.append('\n');
 		return builder.toString();
 	}
 

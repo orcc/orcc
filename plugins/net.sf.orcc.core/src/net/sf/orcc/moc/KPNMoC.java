@@ -29,23 +29,29 @@
 package net.sf.orcc.moc;
 
 /**
- * This class defines the dynamic MoC. A dynamic actor has data-dependent (and
- * possibly state-dependent) production/consumption rates.
+ * This class defines the Kahn Process Network MoC. A KPN actor has
+ * data-dependent, state-dependent production/consumption rates, but contrary to
+ * DPN it cannot be time-dependent.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class DynamicMoC extends AbstractMoC {
+public class KPNMoC extends AbstractMoC {
 
 	/**
-	 * Creates a new dynamic class.
+	 * Creates a new KPN MoC.
 	 */
-	public DynamicMoC() {
+	public KPNMoC() {
 	}
 
 	@Override
-	public boolean isDynamic() {
+	public boolean isKPN() {
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Kahn Process Network";
 	}
 
 }

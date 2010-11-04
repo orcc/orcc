@@ -78,11 +78,6 @@ public class Actor implements Comparable<Actor> {
 	private Object templateData;
 
 	/**
-	 * <code>true</code> if this actor is time-dependent.
-	 */
-	private boolean timeDependent;
-
-	/**
 	 * Creates a new actor.
 	 * 
 	 * @param name
@@ -273,17 +268,6 @@ public class Actor implements Comparable<Actor> {
 	}
 
 	/**
-	 * Returns <code>true</code> if this actor is time-dependent,
-	 * <code>false</code> otherwise.
-	 * 
-	 * @return <code>true</code> if this actor is time-dependent,
-	 *         <code>false</code> otherwise
-	 */
-	public boolean isTimeDependent() {
-		return timeDependent;
-	}
-
-	/**
 	 * Resets input consumption rates.
 	 */
 	public void resetTokenConsumption() {
@@ -330,16 +314,6 @@ public class Actor implements Comparable<Actor> {
 	 */
 	public void setTemplateData(Object templateData) {
 		this.templateData = templateData;
-	}
-
-	/**
-	 * Sets this actor to be time-dependent or not.
-	 * 
-	 * @param timeDependent
-	 *            a boolean indicating if this actor is time-dependent or not
-	 */
-	public void setTimeDependent(boolean timeDependent) {
-		this.timeDependent = timeDependent;
 	}
 
 	@Override

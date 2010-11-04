@@ -30,7 +30,8 @@ package net.sf.orcc.moc;
 
 /**
  * This class defines the SDF MoC. A SDF actor has fixed production/consumption
- * rates.
+ * rates. The SDF MoC is a special case of CSDF MoC where the number of phases
+ * is equal to 1.
  * 
  * @author Matthieu Wipliez
  * 
@@ -38,7 +39,7 @@ package net.sf.orcc.moc;
 public class SDFMoC extends CSDFMoC {
 
 	/**
-	 * Creates a new SDF class.
+	 * Creates a new SDF MoC.
 	 */
 	public SDFMoC() {
 		numberOfPhases = 1;
@@ -46,6 +47,17 @@ public class SDFMoC extends CSDFMoC {
 
 	public boolean isSDF() {
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("input ports: ");
+		builder.append(getInputPattern());
+		builder.append('\n');
+		builder.append("output ports: ");
+		builder.append(getOutputPattern());
+		return builder.toString();
 	}
 
 }

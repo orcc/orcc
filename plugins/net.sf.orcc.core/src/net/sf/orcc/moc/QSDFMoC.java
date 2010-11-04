@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.moc;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,26 +47,26 @@ import net.sf.orcc.ir.Action;
  */
 public class QSDFMoC extends AbstractMoC {
 
-	private Map<Action, SDFMoC> classes;
+	private Map<Action, SDFMoC> configurations;
 
 	/**
-	 * Creates a new quasi-static class.
+	 * Creates a new quasi-static MoC.
 	 */
 	public QSDFMoC() {
-		classes = new LinkedHashMap<Action, SDFMoC>();
+		configurations = new LinkedHashMap<Action, SDFMoC>();
 	}
 
 	/**
-	 * Adds a configuration to this quasi-static class. A configuration is given
-	 * by an action and associated with a static class.
+	 * Adds a configuration to this quasi-static MoC. A configuration is given
+	 * by an action and associated with a SDF MoC.
 	 * 
 	 * @param action
 	 *            a configuration action
-	 * @param clasz
-	 *            a static class
+	 * @param moc
+	 *            a SDF MoC
 	 */
-	public void addConfiguration(Action action, SDFMoC clasz) {
-		classes.put(action, clasz);
+	public void addConfiguration(Action action, SDFMoC moc) {
+		configurations.put(action, moc);
 	}
 
 	/**
@@ -74,19 +75,19 @@ public class QSDFMoC extends AbstractMoC {
 	 * @return the set of configuration actions
 	 */
 	public Set<Action> getActions() {
-		return classes.keySet();
+		return configurations.keySet();
 	}
 
 	/**
-	 * Returns the static class that is associated with the configuration given
-	 * by the action.
+	 * Returns the SDF MoC that is associated with the configuration given by
+	 * the action.
 	 * 
 	 * @param action
 	 *            a configuration action
-	 * @return a static class
+	 * @return a SDF MoC
 	 */
 	public SDFMoC getStaticClass(Action action) {
-		return classes.get(action);
+		return configurations.get(action);
 	}
 
 	@Override
@@ -97,12 +98,23 @@ public class QSDFMoC extends AbstractMoC {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for (Entry<Action, SDFMoC> entry : classes.entrySet()) {
-			builder.append("configuration ");
+		Iterator<Entry<Action, SDFMoC>> it = configurations.entrySet()
+				.iterator();
+		Entry<Action, SDFMoC> entry = it.next();
+		builder.append("QSDF configuration ");
+		builder.append(entry.getKey());
+		builder.append('\n');
+		builder.append(entry.getValue().toString());
+
+		while (it.hasNext()) {
+			entry = it.next();
+			builder.append('\n');
+			builder.append("QSDF configuration ");
 			builder.append(entry.getKey());
 			builder.append('\n');
 			builder.append(entry.getValue().toString());
 		}
+
 		return builder.toString();
 	}
 

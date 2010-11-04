@@ -30,7 +30,7 @@ package net.sf.orcc.network.transforms;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.moc.DynamicMoC;
+import net.sf.orcc.moc.KPNMoC;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.network.Instance;
@@ -61,9 +61,9 @@ public class NetworkClassifier implements INetworkTransformation {
 			if (instance.isActor()) {
 				MoC clasz = instance.getActor().getMoC();
 				if (clasz != null) {
-					if (clasz.isDynamic() || clasz.isQuasiStatic()) {
+					if (clasz.isKPN() || clasz.isQuasiStatic()) {
 						if (currentClass < DYNAMIC) {
-							moc = new DynamicMoC();
+							moc = new KPNMoC();
 							currentClass = DYNAMIC;
 						}
 					} else if (clasz.isCSDF()) {

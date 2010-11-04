@@ -42,7 +42,12 @@ public abstract class AbstractMoC implements MoC {
 	}
 
 	@Override
-	public boolean isDynamic() {
+	public boolean isDPN() {
+		return false;
+	}
+
+	@Override
+	public boolean isKPN() {
 		return false;
 	}
 
@@ -55,4 +60,5 @@ public abstract class AbstractMoC implements MoC {
 	public boolean isSDF() {
 		return false;
 	}
+
 }
