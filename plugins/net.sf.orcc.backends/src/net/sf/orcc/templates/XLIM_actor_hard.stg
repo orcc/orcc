@@ -9,13 +9,18 @@ typeDef(action) ::= <<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Override pinRead
+
+
+
+///////////////////////////////////////////////////////////////////////////////
 // HasTokens
 ///////////////////////////////////////////////////////////////////////////////
 
 HasTokens(hasTokens) ::= <<
 $Peek(hasTokens)$
 <operation kind="pinStatus" portName="$hasTokens.port$">
-	$port(dir="out", type=hasTokens.target.type, source=hasTokens.target)$
+	<port dir="out" size="1" source="$hasTokens.target$" typeName="bool"/>
 </operation>
 >>
 
