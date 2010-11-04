@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -26,37 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.transforms;
+package net.sf.orcc.backends.vhdl.transformations;
 
-import java.util.List;
-
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.network.Connection;
+import net.sf.orcc.network.Vertex;
+import net.sf.orcc.network.transforms.BroadcastAdder;
 
 /**
- * This class defines an actor transformation that modify the dimension of size
- * = 1 variables to avoid generating tables of size 1 (0 downto 0) in VHDL.
+ * Adds broadcast actors when needed.
  * 
+ * @author Matthieu Wipliez
  * @author Nicolas Siret
  * 
  */
-public class VariableRedimension extends AbstractActorTransformation {
+public class VHDLBroadcastAdder extends BroadcastAdder {
 
 	@Override
-	public void visitProcedure(Procedure procedure) {
-		for (Variable variable : procedure.getLocals()) {
-			LocalVariable local = (LocalVariable) variable;
-			// System.out.println("local : " + local.getType().getDimensions());
-			List<Integer> dimensions = local.getType().getDimensions();
-			if (!dimensions.isEmpty() && dimensions.get(0).equals(1)) {
-				Type type = ((TypeList) local.getType()).getType();
-				local.setType(type);
-			}
-		}
+	protected void createIncomingConnection(Connection connection,
+			Vertex vertex, Vertex vertexBCast) {
+		// do nothing here
 	}
 
 }

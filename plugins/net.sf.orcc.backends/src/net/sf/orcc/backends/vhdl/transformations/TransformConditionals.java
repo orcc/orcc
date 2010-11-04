@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.transforms;
+package net.sf.orcc.backends.vhdl.transformations;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;

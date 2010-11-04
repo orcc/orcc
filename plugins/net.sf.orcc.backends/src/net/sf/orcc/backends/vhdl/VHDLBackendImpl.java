@@ -33,7 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,18 +44,16 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
-import net.sf.orcc.backends.vhdl.transforms.BoolExprTransform;
-import net.sf.orcc.backends.vhdl.transforms.NDimArrayTransform;
-import net.sf.orcc.backends.vhdl.transforms.TransformConditionals;
-import net.sf.orcc.backends.vhdl.transforms.VHDLBroadcastAdder;
-import net.sf.orcc.backends.vhdl.transforms.VariableRedimension;
+import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
+import net.sf.orcc.backends.vhdl.transformations.ListFlattenTransformation;
+import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
+import net.sf.orcc.backends.vhdl.transformations.VHDLBroadcastAdder;
+import net.sf.orcc.backends.vhdl.transformations.VariableRedimension;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
-import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
@@ -113,11 +110,11 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new RenameTransformation(this.transformations),
 
 				new Inline(), new VariableRedimension(),
-				new BoolExprTransform(),
+				new BoolExprTransformation(),
 
 				new TransformConditionals(),
 
-				new NDimArrayTransform(),
+				new ListFlattenTransformation(),
 
 				new VariableRenamer(),
 
@@ -166,6 +163,12 @@ public class VHDLBackendImpl extends AbstractBackend {
 		printNetwork(network);
 	}
 
+	/**
+	 * Evaluates the initialize actions of the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
 	private void evaluateInitializeActions(Actor actor) {
 		// initializes the actor
 		Map<String, Expression> parameters = Collections.emptyMap();
@@ -175,16 +178,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 			interpreter.initialize();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
-
-		// Prints all stateVars
-		for (StateVariable stateVar : actor.getStateVars()) {
-			if (stateVar.getType().isList() && !stateVar.isInitialized()) {
-				List<Expression> newValues = new ArrayList<Expression>();
-				// VHDL synthesizers don't support multi-dimensions memory yet
-				printListVars(stateVar.getValue(), newValues);
-				stateVar.setConstantValue(new ListExpr(newValues));
-			}
 		}
 	}
 
@@ -197,25 +190,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 			return printer.printActor(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
-		}
-	}
-
-	/**
-	 * Convert a multis dimension list to a single dimension list
-	 * 
-	 * @param List
-	 *            a list of stateVars
-	 * @param returnList
-	 *            a list of stateVars
-	 */
-	private void printListVars(Expression expression, List<Expression> values) {
-		if (expression.isListExpr()) {
-			List<Expression> expressions = ((ListExpr) expression).getValue();
-			for (Expression subExpr : expressions) {
-				printListVars(subExpr, values);
-			}
-		} else {
-			values.add(expression);
 		}
 	}
 

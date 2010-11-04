@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.transforms;
+package net.sf.orcc.backends.vhdl.transformations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +75,7 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  * @author Nicolas Siret
  * 
  */
-public class BoolExprTransform extends AbstractActorTransformation {
+public class BoolExprTransformation extends AbstractActorTransformation {
 
 	private int tempVarCount;
 

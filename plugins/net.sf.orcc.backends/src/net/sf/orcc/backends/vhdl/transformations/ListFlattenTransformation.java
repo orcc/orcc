@@ -26,21 +26,25 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.transforms;
+package net.sf.orcc.backends.vhdl.transformations;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.vhdl.instructions.AssignIndex;
+import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
@@ -48,15 +52,35 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
 
 /**
- * This class defines an actor transformation that transforms indexes
- * assignments from a N dimension array(index_0, index_1, index_2) to an one
- * dimension array(index) with index = index_0 & index_1 & index_2.
+ * This class defines an actor transformation that transforms declarations and
+ * uses of multi-dimensional lists to declarations and uses of lists with a
+ * single dimension.
  * 
  * @author Matthieu Wipliez
  * @author Nicolas Siret
  * 
  */
-public class NDimArrayTransform extends AbstractActorTransformation {
+public class ListFlattenTransformation extends AbstractActorTransformation {
+
+	/**
+	 * Flattens a multi-dimensional list expression to a list with a single
+	 * dimension.
+	 * 
+	 * @param expression
+	 *            an expression
+	 * @param values
+	 *            a list of values
+	 */
+	private void flattenList(Expression expression, List<Expression> values) {
+		if (expression.isListExpr()) {
+			List<Expression> expressions = ((ListExpr) expression).getValue();
+			for (Expression subExpr : expressions) {
+				flattenList(subExpr, values);
+			}
+		} else {
+			values.add(expression);
+		}
+	}
 
 	/**
 	 * Prints the indexes of an NDim array, each index is print separately and
@@ -124,6 +148,20 @@ public class NDimArrayTransform extends AbstractActorTransformation {
 
 		// so the load (or store) is not endlessly revisited
 		instructionIterator.next();
+	}
+
+	@Override
+	public void transform(Actor actor) throws OrccException {
+		// VHDL synthesizers don't support multi-dimensional memory yet
+		for (StateVariable variable : actor.getStateVars()) {
+			if (variable.getType().isList()) {
+				List<Expression> newValues = new ArrayList<Expression>();
+				flattenList(variable.getValue(), newValues);
+				variable.setConstantValue(new ListExpr(newValues));
+			}
+		}
+
+		super.transform(actor);
 	}
 
 	@Override
