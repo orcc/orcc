@@ -9,9 +9,14 @@ typeDef(action) ::= <<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Override pinRead
+// Override pinWrite
 
-
+Write(op) ::= <<
+<!-- Write $op$ -->
+<operation kind="pinWrite" portName="$op.port.name$" style="simple">
+	<port dir="in" source="$op.target$"/>
+</operation>
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // HasTokens
