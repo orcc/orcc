@@ -77,199 +77,8 @@ import net.sf.orcc.ir.transforms.AbstractActorTransformation;
  */
 public class InlineTransformation extends AbstractActorTransformation {
 
-	private boolean inlineProcedure;
-	private boolean inlineFunction;
-
-	private InlineCloner inlineCloner = new InlineCloner();
-
-	private Map<Variable, LocalVariable> variableToLocalVariableMap;
-	private LocalVariable returnVariableOfCurrentFunction;
-
-	private List<CFGNode> currentNodes;
-	private int currentIndex;
-	private boolean needToSkipThisNode;
-
-	public InlineTransformation(boolean inlineProcedure, boolean inlineFunction) {
-		this.inlineProcedure = inlineProcedure;
-		this.inlineFunction = inlineFunction;
-	}
-
-	public void setInlineProcedure(boolean inlineProcedure) {
-		this.inlineProcedure = inlineProcedure;
-	}
-
-	public boolean inlineProcedure() {
-		return inlineProcedure;
-	}
-
-	public void setInlineFunction(boolean inlineFunction) {
-		this.inlineFunction = inlineFunction;
-	}
-
-	public boolean inlineFunction() {
-		return inlineFunction;
-	}
-
-	@Override
-	public void visit(Call call) {
-		// Function case
-		if (!call.getProcedure().getReturnType().isVoid() && inlineFunction) {
-			returnVariableOfCurrentFunction = call.getTarget();
-			inline(call);
-		}
-		// Procedure case
-		if (call.getProcedure().getReturnType().isVoid() && inlineProcedure) {
-			inline(call);
-		}
-	}
-
-	@Override
-	public void visit(List<CFGNode> nodes) {
-		List<CFGNode> oldCurrentNodes = currentNodes;
-		currentNodes = nodes;
-		for (int i = 0; i < nodes.size(); i++) {
-			currentIndex = i;
-			nodes.get(i).accept(this);
-		}
-		currentNodes = oldCurrentNodes;
-	}
-
-	@Override
-	public void visit(BlockNode blockNode) {
-		List<Instruction> instructions = blockNode.getInstructions();
-		needToSkipThisNode = false;
-		for (int i = 0; i < instructions.size() && !needToSkipThisNode; i++) {
-			instructions.get(i).accept(this);
-		}
-	}
-
-	private void inline(Call call) {
-		// The function or the procedure
-		Procedure function = call.getProcedure();
-
-		// Set the function/procedure to external thus it will not be printed
-		function.setExternal(true);
-
-		// Create a new local variable to all function/procedure's variable
-		variableToLocalVariableMap = new HashMap<Variable, LocalVariable>();
-		for (Variable var : function.getLocals().getList()) {
-			variableToLocalVariableMap.put(
-					var,
-					procedure.newTempLocalVariable("", var.getType(),
-							var.getName()));
-		}
-		for (Variable var : function.getParameters().getList()) {
-			variableToLocalVariableMap.put(
-					var,
-					procedure.newTempLocalVariable("", var.getType(),
-							var.getName()));
-		}
-
-		List<CFGNode> nodes = new ArrayList<CFGNode>();
-
-		// Assign all parameters
-		BlockNode newBlockNode = new BlockNode(procedure);
-		for (int i = 0; i < function.getParameters().getLength(); i++) {
-			Variable parameter = function.getParameters().getList().get(i);
-			Expression expr = call.getParameters().get(i);
-			Assign assign = new Assign(
-					variableToLocalVariableMap.get(parameter), expr);
-			newBlockNode.add(assign);
-			Use.addUses(assign, expr);
-		}
-		if (newBlockNode.getInstructions().size() > 0) {
-			nodes.add(newBlockNode);
-		}
-
-		// Clone function/procedure body
-		for (CFGNode node : function.getNodes()) {
-			nodes.add((CFGNode) node.accept(inlineCloner, (Object) null));
-		}
-
-		// Remove old block and add the new ones
-		List<Instruction> instructions = call.getBlock().getInstructions();
-		BlockNode firstBlockNodePart = new BlockNode(procedure);
-		BlockNode secondBlockNodePart = new BlockNode(procedure);
-
-		int indexOfCall = instructions.indexOf(call);
-		for (int i = 0; i < indexOfCall; i++) {
-			firstBlockNodePart.add(instructions.get(i));
-		}
-		for (int i = indexOfCall + 1; i < instructions.size(); i++) {
-			secondBlockNodePart.add(instructions.get(i));
-		}
-		nodes.add(0, firstBlockNodePart);
-		nodes.add(secondBlockNodePart);
-
-		currentNodes.remove(currentIndex);
-		for (int i = 0; i < nodes.size(); i++) {
-			currentNodes.add(currentIndex + i, nodes.get(i));
-		}
-
-		needToSkipThisNode = true;
-	}
-
 	private class InlineCloner implements NodeInterpreter,
 			InstructionInterpreter, ExpressionInterpreter {
-
-		@Override
-		public Object interpret(BinaryExpr expr, Object... args) {
-			Expression e1 = (Expression) expr.getE1().accept(this, args);
-			Expression e2 = (Expression) expr.getE2().accept(this, args);
-			BinaryExpr e = new BinaryExpr(e1, expr.getOp(), e2, expr.getType());
-			return e;
-		}
-
-		@Override
-		public Object interpret(BoolExpr expr, Object... args) {
-			BoolExpr e = new BoolExpr(expr.getValue());
-			return e;
-		}
-
-		@Override
-		public Object interpret(FloatExpr expr, Object... args) {
-			FloatExpr e = new FloatExpr(expr.getValue());
-			return e;
-		}
-
-		@Override
-		public Object interpret(IntExpr expr, Object... args) {
-			IntExpr e = new IntExpr(expr.getValue());
-			return e;
-		}
-
-		@Override
-		public Object interpret(ListExpr expr, Object... args) {
-			List<Expression> expressions = new ArrayList<Expression>();
-			for (Expression e : expr.getValue()) {
-				expressions.add((Expression) e.accept(this, args));
-			}
-			ListExpr listExpr = new ListExpr(expressions);
-			return listExpr;
-		}
-
-		@Override
-		public Object interpret(StringExpr expr, Object... args) {
-			StringExpr stringExpr = new StringExpr(expr.getValue());
-			return stringExpr;
-		}
-
-		@Override
-		public Object interpret(UnaryExpr expr, Object... args) {
-			Expression expression = (Expression) expr.getExpr().accept(this,
-					args);
-			UnaryExpr unaryExpr = new UnaryExpr(expr.getOp(), expression,
-					expr.getType());
-			return unaryExpr;
-		}
-
-		@Override
-		public Object interpret(VarExpr expr, Object... args) {
-			VarExpr varExpr = new VarExpr(
-					new Use(variableToLocalVariableMap.get(expr.getVar()
-							.getVariable())));
-			return varExpr;
-		}
 
 		@Override
 		public Object interpret(Assign assign, Object... args) {
@@ -280,6 +89,32 @@ public class InlineTransformation extends AbstractActorTransformation {
 			Assign a = new Assign(assign.getLocation(), target, value);
 			Use.addUses(a, value);
 			return a;
+		}
+
+		@Override
+		public Object interpret(BinaryExpr expr, Object... args) {
+			Expression e1 = (Expression) expr.getE1().accept(this, args);
+			Expression e2 = (Expression) expr.getE2().accept(this, args);
+			BinaryExpr e = new BinaryExpr(e1, expr.getOp(), e2, expr.getType());
+			return e;
+		}
+
+		@Override
+		public Object interpret(BlockNode node, Object... args) {
+			BlockNode blockNode = new BlockNode(node.getLocation(), procedure);
+			for (Instruction instruction : node.getInstructions()) {
+				Instruction i = (Instruction) instruction.accept(this, args);
+				if (i != null) {
+					blockNode.add(i);
+				}
+			}
+			return blockNode;
+		}
+
+		@Override
+		public Object interpret(BoolExpr expr, Object... args) {
+			BoolExpr e = new BoolExpr(expr.getValue());
+			return e;
 		}
 
 		@Override
@@ -297,9 +132,51 @@ public class InlineTransformation extends AbstractActorTransformation {
 		}
 
 		@Override
+		public Object interpret(FloatExpr expr, Object... args) {
+			FloatExpr e = new FloatExpr(expr.getValue());
+			return e;
+		}
+
+		@Override
 		public Object interpret(HasTokens hasTokens, Object... args) {
 			throw new OrccRuntimeException(hasTokens.getLocation(),
 					"Error: HasTokens call in function or procedure body.");
+		}
+
+		@Override
+		public Object interpret(IfNode node, Object... args) {
+			Expression condition = (Expression) node.getValue().accept(this,
+					args);
+			List<CFGNode> thenNodes = new ArrayList<CFGNode>();
+			for (CFGNode n : node.getThenNodes()) {
+				thenNodes.add((CFGNode) n.accept(this, args));
+			}
+			List<CFGNode> elseNodes = new ArrayList<CFGNode>();
+			for (CFGNode n : node.getElseNodes()) {
+				elseNodes.add((CFGNode) n.accept(this, args));
+			}
+			BlockNode joinNode = (BlockNode) node.getJoinNode().accept(this,
+					args);
+			IfNode ifNode = new IfNode(node.getLocation(), procedure,
+					condition, thenNodes, elseNodes, joinNode);
+			Use.addUses(ifNode, condition);
+			return ifNode;
+		}
+
+		@Override
+		public Object interpret(IntExpr expr, Object... args) {
+			IntExpr e = new IntExpr(expr.getValue());
+			return e;
+		}
+
+		@Override
+		public Object interpret(ListExpr expr, Object... args) {
+			List<Expression> expressions = new ArrayList<Expression>();
+			for (Expression e : expr.getValue()) {
+				expressions.add((Expression) e.accept(this, args));
+			}
+			ListExpr listExpr = new ListExpr(expressions);
+			return listExpr;
 		}
 
 		@Override
@@ -389,41 +266,26 @@ public class InlineTransformation extends AbstractActorTransformation {
 		}
 
 		@Override
-		public Object interpret(Write write, Object... args) {
-			throw new OrccRuntimeException(write.getLocation(),
-					"Error: Write call in function or procedure body.");
+		public Object interpret(StringExpr expr, Object... args) {
+			StringExpr stringExpr = new StringExpr(expr.getValue());
+			return stringExpr;
 		}
 
 		@Override
-		public Object interpret(BlockNode node, Object... args) {
-			BlockNode blockNode = new BlockNode(node.getLocation(), procedure);
-			for (Instruction instruction : node.getInstructions()) {
-				Instruction i = (Instruction) instruction.accept(this, args);
-				if (i != null) {
-					blockNode.add(i);
-				}
-			}
-			return blockNode;
+		public Object interpret(UnaryExpr expr, Object... args) {
+			Expression expression = (Expression) expr.getExpr().accept(this,
+					args);
+			UnaryExpr unaryExpr = new UnaryExpr(expr.getOp(), expression,
+					expr.getType());
+			return unaryExpr;
 		}
 
 		@Override
-		public Object interpret(IfNode node, Object... args) {
-			Expression condition = (Expression) node.getValue().accept(this,
-					args);
-			List<CFGNode> thenNodes = new ArrayList<CFGNode>();
-			for (CFGNode n : node.getThenNodes()) {
-				thenNodes.add((CFGNode) n.accept(this, args));
-			}
-			List<CFGNode> elseNodes = new ArrayList<CFGNode>();
-			for (CFGNode n : node.getElseNodes()) {
-				elseNodes.add((CFGNode) n.accept(this, args));
-			}
-			BlockNode joinNode = (BlockNode) node.getJoinNode().accept(this,
-					args);
-			IfNode ifNode = new IfNode(node.getLocation(), procedure,
-					condition, thenNodes, elseNodes, joinNode);
-			Use.addUses(ifNode, condition);
-			return ifNode;
+		public Object interpret(VarExpr expr, Object... args) {
+			VarExpr varExpr = new VarExpr(
+					new Use(variableToLocalVariableMap.get(expr.getVar()
+							.getVariable())));
+			return varExpr;
 		}
 
 		@Override
@@ -442,6 +304,150 @@ public class InlineTransformation extends AbstractActorTransformation {
 			return whileNode;
 		}
 
+		@Override
+		public Object interpret(Write write, Object... args) {
+			throw new OrccRuntimeException(write.getLocation(),
+					"Error: Write call in function or procedure body.");
+		}
+
+	}
+
+	private int currentIndex;
+
+	private List<CFGNode> currentNodes;
+
+	private InlineCloner inlineCloner;
+
+	private boolean inlineFunction;
+
+	private boolean inlineProcedure;
+
+	private boolean needToSkipThisNode;
+
+	private LocalVariable returnVariableOfCurrentFunction;
+
+	private Map<Variable, LocalVariable> variableToLocalVariableMap;
+
+	public InlineTransformation(boolean inlineProcedure, boolean inlineFunction) {
+		this.inlineProcedure = inlineProcedure;
+		this.inlineFunction = inlineFunction;
+		inlineCloner = new InlineCloner();
+	}
+
+	private void inline(Call call) {
+		// The function or the procedure
+		Procedure function = call.getProcedure();
+
+		// Set the function/procedure to external thus it will not be printed
+		function.setExternal(true);
+
+		// Create a new local variable to all function/procedure's variable
+		variableToLocalVariableMap = new HashMap<Variable, LocalVariable>();
+		for (Variable var : function.getLocals().getList()) {
+			variableToLocalVariableMap.put(
+					var,
+					procedure.newTempLocalVariable("", var.getType(),
+							var.getName()));
+		}
+		for (Variable var : function.getParameters().getList()) {
+			variableToLocalVariableMap.put(
+					var,
+					procedure.newTempLocalVariable("", var.getType(),
+							var.getName()));
+		}
+
+		List<CFGNode> nodes = new ArrayList<CFGNode>();
+
+		// Assign all parameters
+		BlockNode newBlockNode = new BlockNode(procedure);
+		for (int i = 0; i < function.getParameters().getLength(); i++) {
+			Variable parameter = function.getParameters().getList().get(i);
+			Expression expr = call.getParameters().get(i);
+			Assign assign = new Assign(
+					variableToLocalVariableMap.get(parameter), expr);
+			newBlockNode.add(assign);
+			Use.addUses(assign, expr);
+		}
+		if (newBlockNode.getInstructions().size() > 0) {
+			nodes.add(newBlockNode);
+		}
+
+		// Clone function/procedure body
+		for (CFGNode node : function.getNodes()) {
+			nodes.add((CFGNode) node.accept(inlineCloner, (Object) null));
+		}
+
+		// Remove old block and add the new ones
+		List<Instruction> instructions = call.getBlock().getInstructions();
+		BlockNode firstBlockNodePart = new BlockNode(procedure);
+		BlockNode secondBlockNodePart = new BlockNode(procedure);
+
+		int indexOfCall = instructions.indexOf(call);
+		for (int i = 0; i < indexOfCall; i++) {
+			firstBlockNodePart.add(instructions.get(i));
+		}
+		for (int i = indexOfCall + 1; i < instructions.size(); i++) {
+			secondBlockNodePart.add(instructions.get(i));
+		}
+		nodes.add(0, firstBlockNodePart);
+		nodes.add(secondBlockNodePart);
+
+		currentNodes.remove(currentIndex);
+		for (int i = 0; i < nodes.size(); i++) {
+			currentNodes.add(currentIndex + i, nodes.get(i));
+		}
+
+		needToSkipThisNode = true;
+	}
+
+	public boolean isInlineFunction() {
+		return inlineFunction;
+	}
+
+	public boolean isInlineProcedure() {
+		return inlineProcedure;
+	}
+
+	public void setInlineFunction(boolean inlineFunction) {
+		this.inlineFunction = inlineFunction;
+	}
+
+	public void setInlineProcedure(boolean inlineProcedure) {
+		this.inlineProcedure = inlineProcedure;
+	}
+
+	@Override
+	public void visit(BlockNode blockNode) {
+		List<Instruction> instructions = blockNode.getInstructions();
+		needToSkipThisNode = false;
+		for (int i = 0; i < instructions.size() && !needToSkipThisNode; i++) {
+			instructions.get(i).accept(this);
+		}
+	}
+
+	@Override
+	public void visit(Call call) {
+		// Function case
+		if (!call.getProcedure().getReturnType().isVoid() && inlineFunction) {
+			returnVariableOfCurrentFunction = call.getTarget();
+			inline(call);
+		}
+
+		// Procedure case
+		if (call.getProcedure().getReturnType().isVoid() && inlineProcedure) {
+			inline(call);
+		}
+	}
+
+	@Override
+	public void visit(List<CFGNode> nodes) {
+		List<CFGNode> oldCurrentNodes = currentNodes;
+		currentNodes = nodes;
+		for (int i = 0; i < nodes.size(); i++) {
+			currentIndex = i;
+			nodes.get(i).accept(this);
+		}
+		currentNodes = oldCurrentNodes;
 	}
 
 }

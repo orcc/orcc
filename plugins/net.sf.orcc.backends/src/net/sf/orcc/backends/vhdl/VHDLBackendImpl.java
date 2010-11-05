@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
@@ -57,7 +58,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.transforms.DeadCodeElimination;
 import net.sf.orcc.ir.transforms.DeadGlobalElimination;
 import net.sf.orcc.ir.transforms.DeadVariableRemoval;
-import net.sf.orcc.ir.transforms.Inline;
 import net.sf.orcc.ir.transforms.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -109,8 +109,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 				// renames reserved keywords
 				new RenameTransformation(this.transformations),
 
-				new Inline(), new VariableRedimension(),
-				new BoolExprTransformation(),
+				new InlineTransformation(true, false),
+				new VariableRedimension(), new BoolExprTransformation(),
 
 				new TransformConditionals(),
 
