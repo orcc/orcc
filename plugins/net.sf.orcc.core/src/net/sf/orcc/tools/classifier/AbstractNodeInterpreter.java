@@ -163,11 +163,10 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 		Port port = read.getPort();
 		if (configuration != null && configuration.containsKey(port)
 				&& !portRead.get(port)) {
-			Variable variable = read.getTarget();
-			if (variable != null) {
-				ListExpr target = (ListExpr) variable.getValue();
-				target.set(0, configuration.get(port));
-			}
+			// Should we use a range of values in the spirit of
+			// "Accurate Static Branch Prediction by Value Range Propagation"?
+
+			// in the meantime, we only use the configuration value in the Peek
 
 			portRead.put(port, true);
 		}

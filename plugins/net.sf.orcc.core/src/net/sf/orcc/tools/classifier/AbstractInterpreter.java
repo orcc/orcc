@@ -31,6 +31,7 @@ package net.sf.orcc.tools.classifier;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.interpreter.ActorInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -91,8 +92,11 @@ public class AbstractInterpreter extends ActorInterpreter {
 	protected boolean isSchedulable(Action action) {
 		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(true);
 		Expression result = interpretProc(action.getScheduler());
-		return result != null && result.isBooleanExpr()
-				&& (((BoolExpr) result).getValue());
+		if (result == null) {
+			throw new OrccRuntimeException("could not determine if action "
+					+ action.toString() + " is schedulable");
+		}
+		return result.isBooleanExpr() && ((BoolExpr) result).getValue();
 	}
 
 	/**
