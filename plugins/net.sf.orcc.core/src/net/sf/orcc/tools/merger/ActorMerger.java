@@ -75,7 +75,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.INetworkTransformation;
-import net.sf.orcc.tools.transforms.RemoveReadWrites;
+import net.sf.orcc.tools.transformations.RemoveReadWrites;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 

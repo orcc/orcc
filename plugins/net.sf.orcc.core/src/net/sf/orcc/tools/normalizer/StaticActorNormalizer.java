@@ -65,7 +65,7 @@ import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.moc.CSDFMoC;
-import net.sf.orcc.tools.transforms.RemoveReadWrites;
+import net.sf.orcc.tools.transformations.RemoveReadWrites;
 import net.sf.orcc.util.OrderedMap;
 
 /**
