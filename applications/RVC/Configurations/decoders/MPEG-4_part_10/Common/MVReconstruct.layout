@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="-145" y="145"/>
-      <vertex id="MvRes" x="541" y="209"/>
-      <vertex id="PicWidthInMb" x="-139" y="275"/>
-      <vertex id="FirstMbInSlice" x="-145" y="187"/>
-      <vertex id="slice_type" x="-132" y="353"/>
-      <vertex id="mb_type" x="-130" y="318"/>
-      <vertex id="MbPredRefIdxL0" x="-132" y="3"/>
-      <vertex id="SubMbPredRefIdxL0" x="-150" y="61"/>
-      <vertex id="sub_mb_type" x="-146" y="392"/>
-      <vertex id="MbType4Prediction" x="158" y="331"/>
-      <vertex id="MbPredRefIdxL1" x="-143" y="509"/>
-      <vertex id="SubMbPredRefIdxL1" x="-151" y="566"/>
-      <vertex id="NewPic" x="-121" y="232"/>
-      <vertex id="MV" x="911" y="195"/>
-      <vertex id="LOCATION" x="531" y="162"/>
-      <vertex id="PartSZ" x="907" y="341"/>
-      <vertex id="mv_out" x="899" y="264"/>
-      <vertex id="ref_idx" x="912" y="374"/>
-      <vertex id="RefIdxL0" x="546" y="32"/>
-      <vertex id="NewListL0" x="536" y="-11"/>
-      <vertex id="Algo_Add" x="620" y="168"/>
-      <vertex id="MvpL0_Reconstr" x="94" y="-78"/>
-      <vertex id="MvComponentReord" x="727" y="263"/>
-      <vertex id="SelectMvpLX" x="351" y="147"/>
-      <vertex id="MvpL1_Reconstr" x="120" y="571"/>
-      <vertex id="RefIdxL1" x="500" y="636"/>
-      <vertex id="NewListL1" x="498" y="586"/>
-      <vertex id="SelectList" x="539" y="273"/>
+      <vertex id="CurrMbAddr" x="33" y="234"/>
+      <vertex id="MvRes" x="719" y="298"/>
+      <vertex id="PicWidthInMb" x="39" y="364"/>
+      <vertex id="FirstMbInSlice" x="33" y="276"/>
+      <vertex id="slice_type" x="46" y="442"/>
+      <vertex id="mb_type" x="48" y="407"/>
+      <vertex id="MbPredRefIdxL0" x="46" y="92"/>
+      <vertex id="SubMbPredRefIdxL0" x="28" y="150"/>
+      <vertex id="sub_mb_type" x="32" y="481"/>
+      <vertex id="MbType4Prediction" x="252" y="440"/>
+      <vertex id="MbPredRefIdxL1" x="35" y="598"/>
+      <vertex id="SubMbPredRefIdxL1" x="27" y="655"/>
+      <vertex id="NewPic" x="57" y="321"/>
+      <vertex id="MV" x="1089" y="284"/>
+      <vertex id="LOCATION" x="709" y="251"/>
+      <vertex id="PartSZ" x="1082" y="398"/>
+      <vertex id="mv_out" x="1077" y="353"/>
+      <vertex id="ref_idx" x="1087" y="437"/>
+      <vertex id="RefIdxL0" x="521" y="181"/>
+      <vertex id="NewListL0" x="515" y="151"/>
+      <vertex id="RefIdxL1" x="516" y="606"/>
+      <vertex id="NewListL1" x="515" y="564"/>
+      <vertex id="SelectList" x="706" y="352"/>
+      <vertex id="Algo_Add" x="798" y="257"/>
+      <vertex id="MvpL0_Reconstr" x="249" y="137"/>
+      <vertex id="MvComponentReord" x="905" y="352"/>
+      <vertex id="SelectMvpLX" x="502" y="221"/>
+      <vertex id="MvpL1_Reconstr" x="251" y="492"/>
    </vertices>
 </layout>

@@ -255,8 +255,7 @@ actor SelectMvpLX()
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
-			IsPredL0[MbPartIdx&1],
-			IsPredL1[MbPartIdx&1]
+			IsPredL0[MbPartIdx&1] and IsPredL1[MbPartIdx&1] or (not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1])
 		do
 			println("MacroBlkType.IsBiPred");
 			MbPartIdx := MbPartIdx + 1;

@@ -163,7 +163,7 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 
 	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
 		[
-			[4, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
+			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
 			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		];
 	List(type: uint(size=2), size=16) TabIdxToX =
@@ -454,12 +454,18 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 			slice_type :[SlcTyp],
 			NewPic_i   :[IsNewPic]
 				==>
+	Location  :[0,0],
+	MvplX     :[0,0],
+	RefIdxOut :[0],
+	NewPic_o  :[false]
 		guard
-			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = B_Direct_16x16,
-			not IsNewPic
+			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = B_Direct_16x16
 		do
-			println("GetMbType.B_Skip_B_Direct_16x16 not implemented yet !!");
-			while true do end
+			if(MacroBlkType = BLOCK_TYPE_B_SKIP)then
+				println("GetMbType.B_Skip_B_Direct_16x16 : B_Skip not implemented yet !!");
+			else
+				println("GetMbType.B_Skip_B_Direct_16x16 : B_DIRECT_16x16 not implemented yet !!");	
+			end
 		end
 
 	GetMbType.Others: action
@@ -993,7 +999,7 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 		GetMbType         (GetMbType.MacroBlkIorSI  )--> EatTokens;
 		GetMbType         (GetMbType.P_SkipL0       )--> GetMbInfos4P_SkipL0;
 		GetMbType         (GetMbType.P_SkipL1       )--> GetMbInfos4P_SkipL1;
-		GetMbType         (GetMbType.B_Skip_B_Direct_16x16 )--> undefined;
+		GetMbType         (GetMbType.B_Skip_B_Direct_16x16 )--> GetMbInfos4P_SkipL1;//Fix me when B_Direct_16x16 will be supported.
 		GetMbType         (GetMbType.Others         )--> GetMbInfos4Others;
 
 		EatTokens         (EatTokens                )--> GetMbType;

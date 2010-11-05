@@ -657,8 +657,7 @@ actor Algo_DecodeMbPred()
 				==>
 		guard
 			mbPartIdx < mbPartIdxMax,
-			   not IS_MbPred_L1(mb_type,mbPartIdx)
-			or IS_MbPred_NA(mb_type,mbPartIdx)
+			not IS_MbPred_L1(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadRefIdxL1["+mbPartIdx+"] : "+val_ref_idx);
