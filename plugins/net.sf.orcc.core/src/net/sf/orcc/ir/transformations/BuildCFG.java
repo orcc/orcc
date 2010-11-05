@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.transforms;
+package net.sf.orcc.ir.transformations;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * This class defines a transformation to build the CFG of procedures.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jï¿½rï¿½me Gorin
  * 
  */
 public class BuildCFG extends AbstractActorTransformation {

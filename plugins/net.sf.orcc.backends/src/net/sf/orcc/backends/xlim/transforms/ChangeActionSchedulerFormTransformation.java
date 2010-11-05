@@ -44,14 +44,14 @@ import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * 
  * This class defines a transformation that transforms the 'ActionScheduler'
  * function in order to use XLIM back-end with Ericsson OpenDF runtime
  * 
- * @author Hervé Yviquel
+ * @author Hervï¿½ Yviquel
  * 
  */
 public class ChangeActionSchedulerFormTransformation extends

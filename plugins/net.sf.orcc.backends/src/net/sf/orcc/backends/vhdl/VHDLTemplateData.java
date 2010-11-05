@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines a map that returns, for each action, the variables that

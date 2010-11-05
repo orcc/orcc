@@ -56,7 +56,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * Add cast in IR in the form of assign instruction where target's type differs

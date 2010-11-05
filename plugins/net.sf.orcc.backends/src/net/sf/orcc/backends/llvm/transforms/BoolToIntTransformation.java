@@ -36,14 +36,14 @@ import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Variable;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
  * Change port of type bool declaration into port of type i32
  * 
  * 
- * @author Jérôme GORIN
+ * @author Jï¿½rï¿½me GORIN
  * 
  */
 public class BoolToIntTransformation extends AbstractActorTransformation {

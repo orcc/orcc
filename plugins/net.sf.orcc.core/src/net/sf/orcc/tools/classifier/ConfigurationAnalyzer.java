@@ -50,7 +50,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.nodes.NodeVisitor;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
  * This class defines a configuration analyzer.

@@ -58,7 +58,7 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;

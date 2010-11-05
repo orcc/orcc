@@ -39,15 +39,15 @@ import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.transforms.PhiRemoval;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.PhiRemoval;
 
 /**
  * 
  * This class defines a transformation that initialize array when it is defined
  * by a procedure
  * 
- * @author Hervé Yviquel
+ * @author Hervï¿½ Yviquel
  * 
  */
 public class ArrayInitializeTransformation extends AbstractActorTransformation {

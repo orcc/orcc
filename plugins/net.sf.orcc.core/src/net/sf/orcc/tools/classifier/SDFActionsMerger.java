@@ -57,8 +57,8 @@ import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.transforms.SSATransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;

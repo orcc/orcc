@@ -37,7 +37,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 import org.eclipse.emf.common.util.EList;
 
@@ -46,7 +46,7 @@ import org.eclipse.emf.common.util.EList;
  * This class defines a transformation that replace local list by multiple
  * variables
  * 
- * @author Hervé Yviquel
+ * @author Hervï¿½ Yviquel
  * 
  */
 public class LocalListToMultipleVariableTransformation extends

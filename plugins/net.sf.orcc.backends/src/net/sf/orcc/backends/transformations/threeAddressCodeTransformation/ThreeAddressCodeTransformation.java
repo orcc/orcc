@@ -31,8 +31,8 @@ package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
-import net.sf.orcc.ir.transforms.BuildCFG;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.BuildCFG;
 
 /**
  * Main transformation for applying three-address code form to actor IR.

@@ -35,7 +35,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Write;
-import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
 /**
