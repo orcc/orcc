@@ -56,7 +56,7 @@ public abstract class AbstractScheduler implements IScheduler {
 	protected Map<Connection, Integer> bufferCapacities;
 
 	private boolean stop = false;
-
+	
 	public AbstractScheduler(DirectedGraph<Vertex, Connection> graph)
 			throws OrccException {
 		this.graph = graph;
@@ -108,6 +108,29 @@ public abstract class AbstractScheduler implements IScheduler {
 		}
 
 		return schedules;
+	}
+	
+	private int depth;
+	
+	private int maxDepth;
+
+	
+	public int getDepth() {
+		depth = maxDepth = 0;
+		depth(schedule);
+		return maxDepth;
+	}
+
+	private void depth(Schedule schedule) {
+		for(Iterand iterand : schedule.getIterands()) {
+			if(iterand.isSchedule()) {
+				depth++;
+				depth(iterand.getSchedule());
+				depth--;
+			} else {
+				if(depth > maxDepth) maxDepth = depth;
+			}
+		}
 	}
 
 	public Schedule getSchedule() {

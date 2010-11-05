@@ -43,8 +43,10 @@ import net.sf.orcc.network.Connection;
 public interface IScheduler {
 	public Map<Connection, Integer> getBufferCapacities();
 
-	public Schedule getSchedule();
+	public int getDepth();
 
+	public Schedule getSchedule();
+	
 	/**
 	 * Schedules the given network in-place.
 	 * 
