@@ -18,7 +18,7 @@ import org.eclipse.emf.ecore.EClass;
  * This class defines a boolean type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public class TypeBoolImpl extends TypeImpl implements TypeBool {

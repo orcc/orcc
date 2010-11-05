@@ -39,7 +39,7 @@ import org.eclipse.emf.ecore.EClass;
  * This class defines a void type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public class TypeVoidImpl extends TypeImpl implements TypeVoid {

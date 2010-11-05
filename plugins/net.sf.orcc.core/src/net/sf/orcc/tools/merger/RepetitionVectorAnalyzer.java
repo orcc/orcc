@@ -50,7 +50,6 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-
 public class RepetitionVectorAnalyzer {
 
 	private DirectedGraph<Vertex, Connection> graph;

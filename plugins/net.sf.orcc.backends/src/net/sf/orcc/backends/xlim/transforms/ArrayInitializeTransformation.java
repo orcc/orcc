@@ -47,7 +47,7 @@ import net.sf.orcc.ir.transformations.PhiRemoval;
  * This class defines a transformation that initialize array when it is defined
  * by a procedure
  * 
- * @author Herv� Yviquel
+ * @author Herve Yviquel
  * 
  */
 public class ArrayInitializeTransformation extends AbstractActorTransformation {

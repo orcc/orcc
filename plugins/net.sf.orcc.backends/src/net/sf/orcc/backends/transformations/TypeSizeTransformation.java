@@ -43,7 +43,7 @@ import net.sf.orcc.util.OrderedMap;
  * This class defines a transformation that changes size of variable to fit
  * types of general-purpose programming language such as C, C++ or Java.
  * 
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class TypeSizeTransformation extends AbstractActorTransformation {

@@ -37,7 +37,7 @@ import net.sf.orcc.ir.instructions.SpecificInstruction;
  * This class defines a ReadEnd instruction. This instruction is used in code
  * generation to signal that an action has finished reading from a FIFO.
  * 
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * @author Matthieu Wipliez
  * 
  */

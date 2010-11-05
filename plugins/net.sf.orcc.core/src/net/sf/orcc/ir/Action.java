@@ -34,7 +34,8 @@ package net.sf.orcc.ir;
  * information of an action is decoupled from its body. This is why an action
  * has a "scheduler" and a body.
  * 
- * @author Matthieu Wipliez, Samuel Keller
+ * @author Matthieu Wipliez
+ * @author Samuel Keller
  * 
  */
 public class Action extends AbstractLocalizable {

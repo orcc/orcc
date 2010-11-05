@@ -45,7 +45,7 @@ import org.eclipse.emf.ecore.util.EDataTypeEList;
  * This class defines a List type.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class TypeListImpl extends TypeImpl implements TypeList {

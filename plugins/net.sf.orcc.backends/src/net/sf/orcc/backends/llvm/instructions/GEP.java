@@ -45,7 +45,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * This class defines an 'getelementptr' instruction. This node is used to get
  * the address of a subelement of an expression.
  * 
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public class GEP extends SpecificInstruction implements LocalTargetContainer,

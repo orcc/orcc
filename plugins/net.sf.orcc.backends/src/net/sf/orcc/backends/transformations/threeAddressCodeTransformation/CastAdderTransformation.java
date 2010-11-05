@@ -62,7 +62,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * Add cast in IR in the form of assign instruction where target's type differs
  * from source type.
  * 
- * @author Jérôme GORIN
+ * @author Jerome GORIN
  * 
  */
 public class CastAdderTransformation extends AbstractActorTransformation {

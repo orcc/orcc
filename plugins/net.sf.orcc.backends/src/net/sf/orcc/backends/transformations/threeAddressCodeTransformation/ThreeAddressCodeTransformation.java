@@ -50,7 +50,7 @@ import net.sf.orcc.ir.transformations.BuildCFG;
  * </ul>
  * </p>
  * 
- * @author Jérôme GORIN
+ * @author Jerome GORIN
  * 
  */
 public class ThreeAddressCodeTransformation extends AbstractActorTransformation {

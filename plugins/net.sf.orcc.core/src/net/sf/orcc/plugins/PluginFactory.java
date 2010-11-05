@@ -51,7 +51,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
  * <code>net.sf.orcc.plugin.simulator</code> extension point.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public class PluginFactory {

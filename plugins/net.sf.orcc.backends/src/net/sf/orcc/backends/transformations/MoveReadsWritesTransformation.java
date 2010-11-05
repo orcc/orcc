@@ -48,7 +48,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * read is finished (respectively a write).
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class MoveReadsWritesTransformation extends AbstractActorTransformation {

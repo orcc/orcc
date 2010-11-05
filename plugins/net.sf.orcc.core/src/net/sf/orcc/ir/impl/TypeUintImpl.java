@@ -41,7 +41,7 @@ import org.eclipse.emf.ecore.impl.ENotificationImpl;
  * This class defines an unsigned integer type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public class TypeUintImpl extends TypeImpl implements TypeUint {

@@ -32,7 +32,7 @@ package net.sf.orcc.ir;
  * This class defines an integer type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * @model extends="net.sf.orcc.ir.Type"
  * 
  */

@@ -60,7 +60,6 @@ import org.jgrapht.graph.DirectedMultigraph;
  * @author Ghislain Roquier
  * 
  */
-
 public class StaticSubsetDetector {
 
 	private Set<Vertex> discovered = new HashSet<Vertex>();

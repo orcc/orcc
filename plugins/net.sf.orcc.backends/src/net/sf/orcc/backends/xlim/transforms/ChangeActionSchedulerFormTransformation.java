@@ -51,7 +51,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * This class defines a transformation that transforms the 'ActionScheduler'
  * function in order to use XLIM back-end with Ericsson OpenDF runtime
  * 
- * @author Herv� Yviquel
+ * @author Herve Yviquel
  * 
  */
 public class ChangeActionSchedulerFormTransformation extends

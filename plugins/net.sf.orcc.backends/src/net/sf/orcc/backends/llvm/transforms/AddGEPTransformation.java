@@ -50,7 +50,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * Add GetElementPtr instructions in actor IR.
  * 
  * 
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public class AddGEPTransformation extends AbstractActorTransformation {

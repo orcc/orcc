@@ -34,7 +34,7 @@ import org.eclipse.emf.common.util.EList;
  * This class defines a List type.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * @model extends="net.sf.orcc.ir.Type"
  * 
  */

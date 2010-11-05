@@ -37,7 +37,7 @@ import net.sf.orcc.ir.instructions.Write;
  * This class defines a WriteEnd instruction. This node is used in code
  * generation to signal that an action has finished writing to a FIFO.
  * 
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * @author Matthieu Wipliez
  * 
  */

@@ -31,7 +31,7 @@ package net.sf.orcc.plugins;
 /**
  * This interface defines an option of a plugin.
  * 
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * @author Matthieu Wipliez
  * 
  */

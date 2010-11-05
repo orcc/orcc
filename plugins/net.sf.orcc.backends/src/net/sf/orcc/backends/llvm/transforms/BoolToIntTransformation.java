@@ -43,7 +43,7 @@ import net.sf.orcc.util.OrderedMap;
  * Change port of type bool declaration into port of type i32
  * 
  * 
- * @author J�r�me GORIN
+ * @author Jerome GORIN
  * 
  */
 public class BoolToIntTransformation extends AbstractActorTransformation {
@@ -72,7 +72,7 @@ public class BoolToIntTransformation extends AbstractActorTransformation {
 	}
 
 	public void visitPort(OrderedMap<String, Port> ports) {
-		// Transform Port into int Variable 
+		// Transform Port into int Variable
 		for (Port port : ports) {
 			if (port.getType().isBool()) {
 				port.setType(IrFactory.eINSTANCE.createTypeInt(32));

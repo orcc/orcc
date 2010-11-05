@@ -58,7 +58,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
  * declared in the <code>net.sf.orcc.plugin.backend</code> extension point.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class BackendFactory extends PluginFactory {

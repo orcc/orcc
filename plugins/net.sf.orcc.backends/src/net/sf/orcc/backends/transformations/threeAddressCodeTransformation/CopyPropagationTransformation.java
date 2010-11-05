@@ -63,7 +63,7 @@ import net.sf.orcc.util.OrderedMap;
  * direct assignment is an assign instruction of form x = y, which simply
  * assigns the value of y to x.
  * 
- * @author Jérôme GORIN
+ * @author Jerome GORIN
  * 
  */
 public class CopyPropagationTransformation extends AbstractActorTransformation {

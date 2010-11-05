@@ -46,7 +46,6 @@ import org.jgrapht.DirectedGraph;
  * @author Ghislain Roquier
  * 
  */
-
 public class FlatSASScheduler extends AbstractScheduler {
 
 	public FlatSASScheduler(DirectedGraph<Vertex, Connection> graph)
@@ -66,7 +65,7 @@ public class FlatSASScheduler extends AbstractScheduler {
 			if (vertex.isInstance()) {
 				int rep = repetitions.get(vertex);
 				Iterand iterand = null;
-				if(rep > 1) {
+				if (rep > 1) {
 					Schedule subSched = new Schedule();
 					subSched.setIterationCount(repetitions.get(vertex));
 					subSched.add(new Iterand(vertex));

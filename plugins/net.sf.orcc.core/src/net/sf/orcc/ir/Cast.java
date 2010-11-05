@@ -31,7 +31,7 @@ package net.sf.orcc.ir;
 /**
  * This class provide information about cast associated to an instruction
  * 
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class Cast {

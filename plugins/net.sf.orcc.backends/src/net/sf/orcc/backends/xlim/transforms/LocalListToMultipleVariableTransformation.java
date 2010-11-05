@@ -46,7 +46,7 @@ import org.eclipse.emf.common.util.EList;
  * This class defines a transformation that replace local list by multiple
  * variables
  * 
- * @author Herv� Yviquel
+ * @author Herve Yviquel
  * 
  */
 public class LocalListToMultipleVariableTransformation extends

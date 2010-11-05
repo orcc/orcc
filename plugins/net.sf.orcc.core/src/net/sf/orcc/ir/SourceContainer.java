@@ -31,7 +31,7 @@ package net.sf.orcc.ir;
 /**
  * This interface defines a node that contains a source use.
  * 
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public interface SourceContainer extends User {

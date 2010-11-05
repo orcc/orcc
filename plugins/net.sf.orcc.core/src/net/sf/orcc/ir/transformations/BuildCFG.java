@@ -42,7 +42,7 @@ import net.sf.orcc.ir.nodes.WhileNode;
  * This class defines a transformation to build the CFG of procedures.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class BuildCFG extends AbstractActorTransformation {

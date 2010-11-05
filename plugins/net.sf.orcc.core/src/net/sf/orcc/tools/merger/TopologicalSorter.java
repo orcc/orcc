@@ -51,7 +51,6 @@ import org.jgrapht.alg.CycleDetector;
  * @author Ghislain Roquier
  * 
  */
-
 public class TopologicalSorter {
 
 	private static class TimeStamp {

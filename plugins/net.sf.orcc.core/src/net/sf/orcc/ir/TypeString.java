@@ -33,7 +33,7 @@ package net.sf.orcc.ir;
  * This class defines a String type.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * @model extends="net.sf.orcc.ir.Type"
  * 
  */
