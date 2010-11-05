@@ -35,6 +35,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.serialize.IRWriter;
+import net.sf.orcc.ir.transforms.SSATransformation;
 
 import com.google.inject.Inject;
 
