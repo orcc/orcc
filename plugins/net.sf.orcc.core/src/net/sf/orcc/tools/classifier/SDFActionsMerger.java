@@ -31,21 +31,34 @@ package net.sf.orcc.tools.classifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
-import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
+import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transforms.AbstractActorTransformation;
+import net.sf.orcc.ir.transforms.SSATransformation;
 import net.sf.orcc.util.UniqueEdge;
 
 import org.jgrapht.DirectedGraph;
@@ -65,10 +78,40 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 
 	private Actor actor;
 
+	private String file;
+
 	/**
 	 * Creates a new classifier
 	 */
 	public SDFActionsMerger() {
+	}
+
+	/**
+	 * Creates calls to hasTokens to test that the given input pattern is
+	 * fulfilled.
+	 * 
+	 * @param inputPattern
+	 *            an IR input pattern
+	 * @return a list of local variables that contain the result of the
+	 *         hasTokens
+	 */
+	private List<LocalVariable> actionCreateHasTokens(Procedure procedure,
+			Pattern input) {
+		List<LocalVariable> hasTokenList = new ArrayList<LocalVariable>(
+				input.size());
+		BlockNode block = BlockNode.getLast(procedure);
+		for (Entry<Port, Integer> entry : input.entrySet()) {
+			LocalVariable target = procedure.newTempLocalVariable(file,
+					IrFactory.eINSTANCE.createTypeBool(), "_tmp_hasTokens");
+			hasTokenList.add(target);
+
+			Port port = entry.getKey();
+			int numTokens = entry.getValue();
+			HasTokens hasTokens = new HasTokens(port, numTokens, target);
+			block.add(hasTokens);
+		}
+
+		return hasTokenList;
 	}
 
 	/**
@@ -85,7 +128,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 	private List<Action> mergeActions(List<Action> actions, Pattern input,
 			Pattern output) {
 		// merges actions and removes them from the actor
-		Procedure scheduler = mergeSDFSchedulers(actions);
+		Procedure scheduler = mergeSDFSchedulers(actions, input);
 		Procedure body = mergeSDFBodies(actions);
 
 		Action action = new Action(new Location(), new Tag(), input, output,
@@ -107,17 +150,57 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 		return procedure;
 	}
 
-	private Procedure mergeSDFSchedulers(List<Action> actions) {
+	private Procedure mergeSDFSchedulers(List<Action> actions, Pattern input) {
 		Procedure procedure = new Procedure("isSchedulableSDF", new Location(),
 				IrFactory.eINSTANCE.createTypeBool());
+
+		LocalVariable result = procedure.newTempLocalVariable(file,
+				IrFactory.eINSTANCE.createTypeBool(), "result");
+
+		// create calls to hasTokens
+		List<LocalVariable> hasTokenList = actionCreateHasTokens(procedure,
+				input);
+
+		// create "then" nodes
+		List<CFGNode> thenNodes = new ArrayList<CFGNode>(1);
+		BlockNode thenBlock = BlockNode.getLast(procedure, thenNodes);
+		Assign thenAssign = new Assign(result, new BoolExpr(true));
+		thenBlock.add(thenAssign);
+
+		// create "else" nodes
+		List<CFGNode> elseNodes = new ArrayList<CFGNode>(1);
+		BlockNode elseBlock = BlockNode.getLast(procedure, elseNodes);
+		Assign elseAssign = new Assign(result, new BoolExpr(false));
+		elseBlock.add(elseAssign);
+
+		// create condition hasTokens1 && hasTokens2 && ... && hasTokensn
+		Iterator<LocalVariable> it = hasTokenList.iterator();
+		Expression condition = new VarExpr(new Use(it.next()));
+		while (it.hasNext()) {
+			Expression e2 = new VarExpr(new Use(it.next()));
+			condition = new BinaryExpr(condition, BinaryOp.LOGIC_AND, e2,
+					IrFactory.eINSTANCE.createTypeBool());
+		}
+
+		// create "if" node
+		IfNode node = new IfNode(procedure, condition, thenNodes, elseNodes,
+				new BlockNode(procedure));
+		procedure.getNodes().add(node);
+
+		// add the return
 		BlockNode block = BlockNode.getLast(procedure);
-		block.add(new Return(new BoolExpr(true)));
+		block.add(new Return(new VarExpr(new Use(result))));
+
+		// convert to SSA form
+		new SSATransformation().visitProcedure(procedure);
+
 		return procedure;
 	}
 
 	@Override
 	public void transform(Actor actor) {
 		this.actor = actor;
+		this.file = actor.getFile();
 
 		ActionScheduler scheduler = actor.getActionScheduler();
 		FSM fsm = scheduler.getFsm();
