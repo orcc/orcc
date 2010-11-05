@@ -101,7 +101,7 @@ actor SelectMvpLX()
 
 	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
 		[
-			[4, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
+			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
 			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		];
 
@@ -188,7 +188,8 @@ actor SelectMvpLX()
 					end
 				end;
 			Is8x8Mb :=    (MacroBlkType = BLOCK_TYPE_P_8x8ref0)
-			           or (MacroBlkType = BLOCK_TYPE_P_8x8);
+			           or (MacroBlkType = BLOCK_TYPE_P_8x8)
+			           or (MacroBlkType = BLOCK_TYPE_B_8x8);
 			//delete me!! (when import will be supported by Orcc)
 			if(MacroBlkType != BLOCK_TYPE_P_SKIP)then
 				IsPredL0[0] := Is_PredL0(MacroBlkType,0);
@@ -240,9 +241,16 @@ actor SelectMvpLX()
 		end
 
 	MacroBlkType.IsBiPred: action
+			MvpL1      :[Mvx,Mvy],
+			RefIdxL1   :[ref_idx],
+			LocationL1 :[Mbx_in_pix,Mby_in_pix],
+			MvpL0      :[Mvx2, Mvy2],
+			RefIdxL0   :[ref_idx2],
+			LocationL0 :[Mbx_in_pix2,Mby_in_pix2]
 				==>
-MvOut:[0, 0],
-RefIdxOut :[0],
+		MvOut     :[Mvx,Mvy],
+		RefIdxOut :[ref_idx],
+		Location  :[Mbx_in_pix,Mby_in_pix],
 			SelectList :[BIPRED]
 		guard
 			MbPartIdx < MbPartIdxMax,
@@ -251,7 +259,6 @@ RefIdxOut :[0],
 			IsPredL1[MbPartIdx&1]
 		do
 			println("MacroBlkType.IsBiPred");
-			while true do end
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -266,6 +273,7 @@ RefIdxOut :[0],
 			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
 			IsSubPredL0     := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0;
 			IsSubPredL1     := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0;
+			if(not IsSubPredL0 and not IsSubPredL1)then println("bouh");end
 		end
 
 	GetParameters_Done: action
@@ -309,17 +317,22 @@ RefIdxOut :[0],
 		end
 
 	SubMacroBlkType.IsBiPred: action
+			MvpL1      :[Mvx,Mvy],
+			RefIdxL1   :[ref_idx],
+			LocationL1 :[Mbx_in_pix,Mby_in_pix],
+			MvpL0      :[Mvx2, Mvy2],
+			RefIdxL0   :[ref_idx2],
+			LocationL0 :[Mbx_in_pix2,Mby_in_pix2]
 				==>
-MvOut:[0, 0],
-RefIdxOut :[0],
+		MvOut      :[Mvx, Mvy],
+		RefIdxOut  :[ref_idx],
+		Location   :[Mbx_in_pix,Mby_in_pix],
 			SelectList :[BIPRED]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
-			IsSubPredL0,
-			IsSubPredL1
+			IsSubPredL0 and IsSubPredL1 or (not IsSubPredL0) and (not IsSubPredL1)
 		do
 			println("SubMacroBlkType.IsBiPred");
-			while true do end
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 

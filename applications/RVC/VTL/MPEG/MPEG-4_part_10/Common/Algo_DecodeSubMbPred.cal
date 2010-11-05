@@ -326,7 +326,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			end
 			subMbPartIdx := subMbPartIdx +1;
 		end
-//Delete me!!
+//Delete me!! e carefull with B_DIRECT_8x8
 	ReadMvdl0Done.Skip: action
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>

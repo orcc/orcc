@@ -29,6 +29,7 @@
       <vertex id="IsIDR" x="1204" y="1320"/>
       <vertex id="MacroBlockType" x="57" y="1374"/>
       <vertex id="TransformSize8x8" x="57" y="1277"/>
+      <vertex id="PocToRead" x="243" y="1784"/>
       <vertex id="Display_L" x="1530" y="1399"/>
       <vertex id="Buffer_inter" x="1392" y="1345"/>
       <vertex id="Select" x="1010" y="1015"/>
@@ -36,7 +37,6 @@
       <vertex id="Intra_4x4" x="676" y="1148"/>
       <vertex id="Deblocking_Filter" x="1153" y="532"/>
       <vertex id="DemuxParserInfos" x="235" y="1039"/>
-      <vertex id="PocToRead" x="243" y="1784"/>
-      <vertex id="Inter" x="609" y="1530"/>
+      <vertex id="Inter" x="669" y="1524"/>
    </vertices>
 </layout>

@@ -736,13 +736,36 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 				==>
 		guard
 			MbPartIdx < MbPartIdxMax,
-			SizeMbMv = SZ_8x8
+			SizeMbMv = SZ_8x8,
+			SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] != DIRECT
 		do
 			SubMbPartIdx    := 0;
 			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
 			IsPred4SubMb    :=    ((SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0) and IsPredL0
 			                   or ((SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0) and not IsPredL0;
 			SizeSubMbMv     := SizeSubMb[Idx_Sub_Tab][ValSubMbType & 15];
+		end
+
+	ComputeMvpL0.LaunchB_Direct_8x8: action
+			sub_mb_type :[ValSubMbType]
+				==>
+	//Fix me!!
+	Location  :[Blk_x_in_pix,Blk_y_in_pix],
+	MvplX     :[0,0],
+	RefIdxOut :[0],
+	NewPic_o  :[false]
+		guard
+			MbPartIdx < MbPartIdxMax,
+			SizeMbMv = SZ_8x8,
+			SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] = DIRECT
+		var
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
+		do
+			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
+			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
+			println("GetMbType.Direct_8x8 not implemented yet !!");
+			MbPartIdx := MbPartIdx + 1;
 		end
 
 	ComputeMvpL0.Skip: action
@@ -985,6 +1008,7 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 		ComputeMvpL0      (ComputeMvpL0.Launch16x8  )--> GetMv16x8;
 		ComputeMvpL0      (ComputeMvpL0.Launch8x16  )--> GetMv8x16;
 		ComputeMvpL0      (ComputeMvpL0.Launch8x8   )--> ComputeSubMvpL0;
+		ComputeMvpL0      (ComputeMvpL0.LaunchB_Direct_8x8   )--> GetMvSkip;
 		ComputeMvpL0      (ComputeMvpL0.Launch16x16 )--> GetMv16x16;
 		ComputeMvpL0      (ComputeMvpL0.Skip        )--> GetMvSkip;
 		ComputeMvpL0      (ComputeMvpL0.Done        )--> GetMbType;
