@@ -44,6 +44,7 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
+import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
@@ -111,18 +112,27 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 		Expression condition = (Expression) node.getValue().accept(
 				exprInterpreter);
 
-		if (condition instanceof BoolExpr) {
+		int oldBranch = branch;
+		if (condition != null && condition.isBooleanExpr()) {
 			if (((BoolExpr) condition).getValue()) {
 				visit(node.getThenNodes());
+				branch = 0;
 			} else {
 				visit(node.getElseNodes());
+				branch = 1;
 			}
-		} else if (schedulableMode) {
-			// only throw exception in schedulable mode
-			throw new OrccRuntimeException("null condition");
+
+		} else {
+			if (schedulableMode) {
+				// only throw exception in schedulable mode
+				throw new OrccRuntimeException("null condition");
+			}
+
+			branch = -1;
 		}
 
 		visit(node.getJoinNode());
+		branch = oldBranch;
 	}
 
 	@Override
@@ -155,6 +165,13 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 				&& !portRead.get(port)) {
 			ListExpr target = (ListExpr) peek.getTarget().getValue();
 			target.set(0, configuration.get(port));
+		}
+	}
+
+	@Override
+	public void visit(PhiAssignment phi) {
+		if (branch != -1) {
+			super.visit(phi);
 		}
 	}
 
@@ -202,13 +219,19 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 
 	@Override
 	public void visit(WhileNode node) {
+		int oldBranch = branch;
+		branch = 0;
+		visit(node.getJoinNode());
+
 		// Interpret first expression ("while" condition)
 		Expression condition = (Expression) node.getValue().accept(
 				exprInterpreter);
 
 		if (condition != null && condition.isBooleanExpr()) {
+			branch = 1;
 			while (((BoolExpr) condition).getValue()) {
 				visit(node.getNodes());
+				visit(node.getJoinNode());
 
 				// Interpret next value of "while" condition
 				condition = (Expression) node.getValue()
@@ -224,6 +247,8 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 			// only throw exception in schedulable mode
 			throw new OrccRuntimeException("condition is data-dependent");
 		}
+
+		branch = oldBranch;
 	}
 
 	@Override

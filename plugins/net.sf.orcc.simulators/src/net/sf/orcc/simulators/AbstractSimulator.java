@@ -62,7 +62,6 @@ import net.sf.orcc.ir.serialize.IRParser;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
-import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
@@ -518,10 +517,11 @@ public abstract class AbstractSimulator implements Simulator {
 					ActorTransformation[] transformations = {
 							new DeadGlobalElimination(),
 							new DeadCodeElimination(),
-							new DeadVariableRemoval(), new PhiRemoval() };
+							new DeadVariableRemoval() };
 					for (ActorTransformation transformation : transformations) {
 						transformation.transform(actorIR);
 					}
+
 					simuActorInstance = createSimuActorInstance(
 							instance.getId(), instance.getParameters(), actorIR);
 				} else if (instance.isBroadcast()) {

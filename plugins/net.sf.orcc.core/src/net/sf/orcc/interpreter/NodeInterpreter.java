@@ -75,6 +75,8 @@ public class NodeInterpreter extends AbstractActorTransformation {
 
 	private boolean blockReturn;
 
+	protected int branch;
+
 	protected ExpressionEvaluator exprInterpreter;
 
 	private Map<String, Fifo> fifos;
@@ -222,13 +224,17 @@ public class NodeInterpreter extends AbstractActorTransformation {
 
 		// if (condition is true)
 		if (condition != null && condition.isBooleanExpr()) {
+			int oldBranch = branch;
 			if (((BoolExpr) condition).getValue()) {
 				visit(node.getThenNodes());
+				branch = 0;
 			} else {
 				visit(node.getElseNodes());
+				branch = 1;
 			}
 
 			visit(node.getJoinNode());
+			branch = oldBranch;
 		} else {
 			throw new OrccRuntimeException("Condition not boolean at line "
 					+ node.getLocation().getStartLine() + "\n");
@@ -271,7 +277,8 @@ public class NodeInterpreter extends AbstractActorTransformation {
 
 	@Override
 	public void visit(PhiAssignment phi) {
-		// phi must be removed before calling the interpreter
+		Expression value = phi.getValues().get(branch);
+		phi.getTarget().setValue((Expression) value.accept(exprInterpreter));
 	}
 
 	@Override
@@ -333,15 +340,22 @@ public class NodeInterpreter extends AbstractActorTransformation {
 
 	@Override
 	public void visit(WhileNode node) {
+		int oldBranch = branch;
+		branch = 0;
+		visit(node.getJoinNode());
+
 		// Interpret first expression ("while" condition)
 		Expression condition = (Expression) node.getValue().accept(
 				exprInterpreter);
 
 		// while (condition is true) do
 		if (condition != null && condition.isBooleanExpr()) {
+			branch = 1;
 			while (((BoolExpr) condition).getValue()) {
 				visit(node.getNodes());
+				visit(node.getJoinNode());
 
+				// Interpret next value of "while" condition
 				condition = (Expression) node.getValue()
 						.accept(exprInterpreter);
 				if (condition == null || !condition.isBooleanExpr()) {
@@ -354,6 +368,8 @@ public class NodeInterpreter extends AbstractActorTransformation {
 			throw new OrccRuntimeException("Condition not boolean at line "
 					+ node.getLocation().getStartLine() + "\n");
 		}
+
+		branch = oldBranch;
 	}
 
 	@Override

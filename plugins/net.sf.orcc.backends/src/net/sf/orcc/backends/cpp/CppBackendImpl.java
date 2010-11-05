@@ -91,8 +91,8 @@ public class CppBackendImpl extends AbstractBackend {
 					}
 					list.add(instance);
 				} else {
-					throw new OrccException(
-							"instance " + instance.getId() + " has no partName attribute!");
+					throw new OrccException("instance " + instance.getId()
+							+ " has no partName attribute!");
 				}
 			}
 			printer.getOptions().put("threads", threads);
@@ -130,17 +130,17 @@ public class CppBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
+		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
+		if (classify) {
+			new ActorClassifier().transform(actor);
+		}
+
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
 				new DeadCodeElimination(), new DeadVariableRemoval(),
 				new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
-		}
-		
-		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
-		if (classify) {
-			new ActorClassifier().transform(actor);
 		}
 	}
 
