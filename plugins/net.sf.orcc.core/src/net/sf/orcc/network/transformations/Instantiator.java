@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.network.transforms;
+package net.sf.orcc.network.transformations;
 
 import java.util.Map;
 import java.util.Set;

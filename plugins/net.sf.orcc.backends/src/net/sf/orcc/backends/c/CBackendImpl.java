@@ -54,7 +54,7 @@ import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
-import net.sf.orcc.network.transforms.BroadcastAdder;
+import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 
 /**

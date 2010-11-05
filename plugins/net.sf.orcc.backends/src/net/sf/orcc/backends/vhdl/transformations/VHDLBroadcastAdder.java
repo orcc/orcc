@@ -30,7 +30,7 @@ package net.sf.orcc.backends.vhdl.transformations;
 
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Vertex;
-import net.sf.orcc.network.transforms.BroadcastAdder;
+import net.sf.orcc.network.transformations.BroadcastAdder;
 
 /**
  * Adds broadcast actors when needed.

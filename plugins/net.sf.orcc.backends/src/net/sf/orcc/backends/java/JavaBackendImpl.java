@@ -47,7 +47,7 @@ import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.transforms.BroadcastAdder;
+import net.sf.orcc.network.transformations.BroadcastAdder;
 
 /**
  * Java back-end.

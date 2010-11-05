@@ -26,7 +26,7 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.network.transforms;
+package net.sf.orcc.network.transformations;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.network.Network;

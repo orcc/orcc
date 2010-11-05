@@ -32,7 +32,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.moc.MoC;
 import net.sf.orcc.network.Network;
-import net.sf.orcc.network.transforms.INetworkTransformation;
+import net.sf.orcc.network.transformations.INetworkTransformation;
 
 /**
  * This class defines a network transformation that normalizes actors so they

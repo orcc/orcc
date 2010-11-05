@@ -70,7 +70,7 @@ import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.attributes.IAttribute;
 import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
-import net.sf.orcc.network.transforms.BroadcastAdder;
+import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.plugins.simulators.Simulator;
 
 import org.eclipse.core.resources.IProject;
