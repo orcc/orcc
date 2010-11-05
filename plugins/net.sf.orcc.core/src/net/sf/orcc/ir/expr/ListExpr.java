@@ -40,7 +40,7 @@ import net.sf.orcc.ir.Type;
  * at the network level.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class ListExpr extends AbstractExpression {

@@ -36,7 +36,7 @@ import net.sf.orcc.ir.Use;
  * referenced by an instance of the {@link Use} class.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class VarExpr extends AbstractExpression {

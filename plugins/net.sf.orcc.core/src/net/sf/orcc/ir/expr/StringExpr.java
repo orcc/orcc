@@ -35,7 +35,7 @@ import net.sf.orcc.ir.Type;
  * This class defines a String expression.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class StringExpr extends AbstractExpression {

@@ -35,7 +35,7 @@ import net.sf.orcc.ir.Type;
  * This class defines a binary expression.
  * 
  * @author Matthieu Wipliez
- * @author Jérôme Gorin
+ * @author Jerome Gorin
  * 
  */
 public class BinaryExpr extends AbstractExpression {

@@ -35,7 +35,7 @@ import net.sf.orcc.ir.Type;
  * This class defines a boolean expression.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public class BoolExpr extends AbstractExpression {
