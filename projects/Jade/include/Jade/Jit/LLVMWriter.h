@@ -28,57 +28,73 @@
  */
 
 /**
-@brief Description of the SolveParameters class interface
+@brief Description of the LLVMWriter interface
 @author Jerome Gorin
-@file Instanciator.h
+@file LLVMWriter.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef SOLVEPARAMETERS_H
-#define SOLVEPARAMETERS_H
+#ifndef LLVMWRITER_H
+#define LLVMWRITER_H
 
-#include <map>
+namespace llvm{
+	class Module;
+}
 
-class Expr;
-class Network;
+#include "llvm/Module.h"
+#include "llvm/DerivedTypes.h"
+#include "llvm/Transforms/Utils/ValueMapper.h"
 //------------------------------
 
+
 /**
- * @class SolveParameters
- *
- * @brief Solves all parameters in the decoder.
- *
- * This class defines a network transformation that resolve parameters of actors 
- *   in a decoder.
- *
+ * @brief  This class manages the LLVM infrastructure to write elements
+ * 
  * @author Jerome Gorin
  * 
  */
-class SolveParameters {
+class LLVMWriter {
 public:
 
 	/**
-	 * @brief instanciate a network.
+     *  @brief Constructor
+     *
+	 *	Initialize the JIT engine
 	 *
-	 * Instantiate actors and checks that connections actually point to ports defined in actors. Instantiating an
-	 * actor implies first loading it and then giving it the right parameters.
-	 * 
-	 * @param network : Network to instanciate
-	 *
-	 */
-	SolveParameters(Decoder* decoder);
+     */
+	LLVMWriter(std::string prefix, llvm::Module* module);
 
-	void transform();
-
-	~SolveParameters(){};
+	llvm::GlobalVariable* createVariable(llvm::GlobalVariable* variable);
 
 private:
 
-	void solve(Instance* instance);
+	/**
+     *  @brief Add a new llvm::GlobalVariable in the given decoder
+     *
+	 *  Insert the given global variable into the decoder. This global variable
+	 *   can either represent an actor port, state, parameter or internal variable.
+	 *
+	 * @param variable : llvm::GlobalVariable to add
+	 *
+	 * @param decoder : decoder to had the variable
+	 *
+	 * @return True if successfull, otherwise false
+     */
+	llvm::GlobalVariable* addVariable(llvm::GlobalVariable* variable);
 
-	Network* network;
+	void CopyGVAttributes(llvm::GlobalValue *DestGV, const llvm::GlobalValue *SrcGV);
+	bool LinkGlobalInits(llvm::GlobalVariable* variable);
+
+	/** Module to write element into */
+	llvm::Module* module;
+
+	/** Written values*/
+	llvm::ValueToValueMapTy ValueMap;
+
+	std::string prefix;
+
 };
 
 #endif

@@ -28,54 +28,100 @@
  */
 
 /**
-@brief Implementation of class SolveParameters
+@brief Implementation of class Instance
 @author Jerome Gorin
-@file SolveParameters.cpp
+@file Instance.cpp
 @version 0.1
 @date 2010/04/12
 */
 
 //------------------------------
-#include "llvm/GlobalVariable.h"
 #include "llvm/Constants.h"
+#include "llvm/GlobalVariable.h"
 
-#include "Jade/Core/Actor.h"
-#include "Jade/Core/Variable.h"
-#include "Jade/Decoder/Decoder.h"
-#include "Jade/Core/InstancedActor.h"
-#include "Jade/Core/Expression.h"
 #include "Jade/Core/Instance.h"
-#include "Jade/Core/Network.h"
-
-#include "SolveParameters.h"
+#include "Jade/Core/Variable.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
-SolveParameters::SolveParameters(Decoder* decoder){
-	this->network = decoder->getNetwork();
-}
+Port* Instance::getPort(string portName){
+	Port* port = getInput(portName);
 
-void SolveParameters::transform(){
-	map<string, Instance*>::iterator it;
-	map<string, Instance*>* instances = network->getInstances();
-
-	for (it = instances->begin(); it != instances->end(); it++){
-		solve((*it).second);
+	// Search inside input ports 
+	if (port!= NULL){
+		return port;
 	}
+
+	// Search inside output ports 
+	return getOutput(portName);
 }
 
-void SolveParameters::solve(Instance* instance){
-	map<string, Constant*>::iterator it;
-	Actor* actor = instance->getActor();
-	map<string, Constant*>* parameters = instance->getParameters();
-	InstancedActor* instancedActor = instance->getInstancedActor();
+
+Port* Instance::getInput(string portName){
+	std::map<std::string, Port*>::iterator it;
 	
-	for (it= parameters->begin(); it != parameters->end(); it++){
-		Variable* parameter = actor->getParameter(it->first);
-		GlobalVariable* parameterVar = instancedActor->getParameterVar(parameter);
-		ConstantInt* value = cast<ConstantInt>(it->second);
-		parameterVar->setInitializer(value);
+	//Look for the given name in input
+	it = inputs->find(portName);
+
+	//Port not found
+	if(it == inputs->end()){
+		return NULL;
+	}
+
+	//Port found
+	return (*it).second;
+}
+
+Port* Instance::getOutput(string portName){
+	std::map<std::string, Port*>::iterator it;
+	
+	//Look for the given name in output
+	it = outputs->find(portName);
+
+	//Port not found
+	if(it == outputs->end()){
+		return NULL;
+	}
+
+	//Port found
+	return (*it).second;
+}
+
+Variable* Instance::getStateVar(std::string name){
+	map<string, Variable*>::iterator it;
+	it = stateVars->find(name);
+
+	if(it == stateVars->end()){
+		return NULL;
+	}
+
+	return (*it).second;
+}
+
+Procedure* Instance::getProcedure(string name){
+	map<string, Procedure*>::iterator it;
+	
+	it = procedures->find(name);
+
+	if(it == procedures->end()){
+		return NULL;
+	}
+
+	return (*it).second;
+}
+
+void Instance::solveParameters(){
+	map<string, Constant*>::iterator itValues;
+	std::map<std::string, Variable*>::iterator itParameter;
+	
+	for (itParameter= parameters->begin(); itParameter != parameters->end(); itParameter++){
+		Variable* parameter = itParameter->second;
+		llvm::GlobalVariable* variable = parameter->getGlobalVariable();
+		itValues = parameterValues->find(itParameter->first);
+		
+		ConstantInt* value = cast<ConstantInt>(itValues->second);
+		variable->setInitializer(value);
 	}
 }

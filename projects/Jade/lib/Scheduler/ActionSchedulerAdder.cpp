@@ -62,10 +62,9 @@ ActionSchedulerAdder::ActionSchedulerAdder(Instance* instance, Decoder* decoder,
 	this->actor = instance->getActor();
 	this->decoder = decoder;
 	this->instance = instance;
-	this->instancedActor = instance->getInstancedActor();
 	this->outsideSchedulerFn = NULL;
 
-	createScheduler(instancedActor->getActionScheduler());
+	createScheduler(instance->getActionScheduler());
 
 	if (actor->hasInitializes()){
 		createInitialize(instancedActor->getInitializes());

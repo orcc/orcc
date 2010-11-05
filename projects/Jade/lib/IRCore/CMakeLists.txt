@@ -7,6 +7,6 @@ add_library (IRCore
 	Actor.cpp
 	Connection.cpp
 	FSM.cpp
-	InstancedActor.cpp
+	Instance.cpp
 	Network.cpp
  )

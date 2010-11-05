@@ -65,7 +65,6 @@ InstancedActor::InstancedActor(Decoder* decoder, Instance* instance,
 		this->scheduler = scheduler;
 		this->actor = instance->getActor();
 		this->initializes = initializes;
-		instance->setInstancedActor(this);
 }
 
 

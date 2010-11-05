@@ -63,15 +63,12 @@ class Variable {
 public:
 	/**
 	 * Creates a new variable with the given type, and name.
-	 * 
-	 * @param location :	Location of the variable
 	 *
 	 * @param type :	Type of the variable
 	 *
 	 * @param name :	string on the variable name
 	 */
-	Variable(Location* location, llvm::Type* type, std::string name, bool global, llvm::GlobalVariable* variable){
-		this->location = location;
+	Variable(llvm::Type* type, std::string name, bool global, llvm::GlobalVariable* variable){
 		this->type = type;
 		this->name = name;
 		this->global = global;
@@ -115,15 +112,20 @@ public:
 		return variable;
 	}
 
+
+	/**
+	 * Returns true if this variable is global.
+	 * 
+	 * @return true if this variable is global
+	 */
+	bool isGlobal() {return global;};
+
 private:
 	/** variable type */
 	llvm::Type* type;
 
 	/** variable name */
 	std::string name;
-
-	/** variable location */
-	Location* location;
 
 	/** true if this variable is global */
 	bool global;

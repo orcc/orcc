@@ -40,12 +40,13 @@
 #define INSTANCE_H
 
 #include <map>
+#include <list>
 
 namespace llvm{
 	class Constant;
 }
 
-class Actor;
+#include "Jade/Core/Actor.h"
 class BroadcastActor;
 class Expr;
 class Port;
@@ -75,10 +76,10 @@ public:
 	 * @param parameters : list of Expr representif parameters of this instance
      *
      */
-	Instance(std::string id, std::string clasz, std::map<std::string, llvm::Constant*>* parameters){
+	Instance(std::string id, std::string clasz, std::map<std::string, llvm::Constant*>* parameterValues){
 		this->id = id;
 		this->clasz = clasz;
-		this->parameters = parameters;
+		this->parameterValues = parameterValues;
 		this->actor = NULL;
 	}
 
@@ -130,6 +131,35 @@ public:
      */
 	void setActor(Actor* actor){this->actor = actor;};
 
+	/**
+     *  @brief get the Port corresponding to string name
+	 *
+	 *  @param portName : Name of the port
+	 *
+	 *  @return the corresponding Port if port found, otherwise NULL 
+	 *
+     */
+	Port* getPort(std::string portName);
+
+	/**
+     *  @brief get the input Port corresponding to string name
+	 *
+	 *  @param portName : Name of the input port
+	 *
+	 *  @return the corresponding Port if port found, otherwise NULL 
+	 *
+     */
+	Port* getInput(std::string portName);
+
+	/**
+     *  @brief get the output Port corresponding to string name
+	 *
+	 *  @param portName : Name of the input port
+	 *
+	 *  @return the corresponding Port if port found, otherwise NULL 
+	 *
+     */
+	Port* getOutput(std::string portName);
 
 	/*!
      *  @brief Getter of paramters
@@ -137,26 +167,69 @@ public:
 	 * @return a map on the Instance paramter
      *
      */
-	std::map<std::string, llvm::Constant*>* getParameters(){return parameters;};
+	std::map<std::string, llvm::Constant*>* getParameterValues(){return parameterValues;};
 
-
-	/*!
-     *  @brief Getter of instancedActor
-     *
-	 * @return the instanced actor of the instance
+	/**
+     *  @brief Getter of the action scheduler of this instanced functional unit
+   	 *
+	 *  @return ActionScheduler of the instanced functional unit
      */
-	InstancedActor* getInstancedActor(){return instancedActor;};
+	ActionScheduler* getActionScheduler(){return scheduler;};
 
-	/*!
-     *  @brief Setter of instancedActor
-     *
-	 *  @param instancedActor : InstancedActor of the instance
-     */
-	 void setInstancedActor(InstancedActor* instancedActor){this->instancedActor = instancedActor;};
+	/**
+	 * @brief Getter of stateVars
+	 *
+	 * Returns a map of state variables.
+	 * 
+	 * @return a map of state variables
+	 */
+	std::map<std::string, Variable*>* getStateVars() {return stateVars;}
+
+	/**
+	 * @brief Getter of a state variable
+	 *
+	 * Return the state var corresponding to the given name
+	 *
+	 * @param name : string name of the state var
+	 * 
+	 * @return the corresponding state variable
+	 */
+	Variable* getStateVar(std::string name);
+
+	/**
+	 * @brief Getter of procedures
+	 *
+	 * Returns a map of procedure of this actor.
+	 * 
+	 * @return a map of ProcedureActionScheduler of this actor
+	 */
+	std::map<std::string, Procedure*>* getProcs() {return procedures;}
+
+	/**
+	 * @brief Getter of a procedure
+	 *
+	 * Returns the procedure corresponding to the given name
+	 * 
+	 * @param name: std::string of the procedure
+	 *
+	 * @return the corresponding procedure
+	 */
+	Procedure* getProcedure(std::string name);
+
 	
 private:
+
+	/**
+	*
+	* @brief Solves all parameters.
+	*
+	* Resolves parameters of this instance by using parameter and their values.
+	*/
+
+	void solveParameters();
+
 	/* Parameters of an instance */
-	std::map<std::string, llvm::Constant*>* parameters;	
+	std::map<std::string, llvm::Constant*>* parameterValues;	
 	
 	/* Id of an instance */
 	std::string id;
@@ -167,14 +240,37 @@ private:
 	/* Actor parent to this instance */
 	Actor* actor;
 
-	/* Instanced actor from this instance */
-	InstancedActor* instancedActor;
-
 	/**
 	 * the broadcast referenced by this instance. May be null if
 	 * this instance references an actor or a network.
 	 */
 	BroadcastActor* broadcast;
+
+	/** Port of the instance */
+	std::map<std::string, Port*>* inputs;
+	std::map<std::string, Port*>* outputs;
+
+	/** A map of the parameters of this actor */
+	std::map<std::string, Variable*>* parameters;
+
+	/** State variables of this actor */
+	std::map<std::string, Variable*>* stateVars;
+
+	/** Procedures of this actor */
+	std::map<std::string, Procedure*>* procedures;
+
+	/** Action scheduler of the instance */
+	ActionScheduler* scheduler;
+
+	/** Actions of the instance */
+	std::list<Action*>* actions;
+
+	
+	/** Action scheduler of the instance */
+	ActionScheduler* actionScheduler;
+
+	/** Initialize actions of the instance */
+	std::list<Action*>* initializes;
 };
 
 #endif

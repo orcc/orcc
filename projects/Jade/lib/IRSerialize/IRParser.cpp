@@ -53,7 +53,7 @@
 #include "Jade/Core/Actor/ActionTag.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Actor/FSM.h"
-#include "Jade/Actor/IRParser.h"
+#include "Jade/Serialize/IRParser.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Actor/Procedure.h"
@@ -255,7 +255,7 @@ map<string, Variable*>* IRParser::parseParameters(Module* module){
 			GlobalVariable* variable = cast<GlobalVariable>(parameterNode->getOperand(2));
 
 			//Parse create parameter
-			StateVar* parameter = new StateVar(NULL, type, nameMD->getString(), false, variable);
+			StateVar* parameter = new StateVar(type, nameMD->getString(), false, variable);
 
 			parameters->insert(pair<string, Variable*>(nameMD->getString(), parameter));
 		}
@@ -294,7 +294,7 @@ Variable* IRParser::parseStateVar(MDNode* node){
 	GlobalVariable* variable = cast<GlobalVariable>(node->getOperand(2));
 
 
-	return new StateVar(NULL, type, name->getString(), assignable->getValue().getBoolValue(), variable);
+	return new StateVar(type, name->getString(), assignable->getValue().getBoolValue(), variable);
 }
 
 list<Action*>* IRParser::parseActions(string key, Module* module){

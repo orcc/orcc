@@ -54,32 +54,26 @@
 #include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Graph/HDAGGraph.h"
+#include "Jade/Serialize/IRWriter.h"
 
 #include "BroadcastAdder.h"
-#include "SolveParameters.h"
 //------------------------------
 
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, std::map<std::string, Actor*>* actors, AbstractFifo* fifo): Context(C){
+Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo* fifo): Context(C){
+	
 	//Set property of the decoder
 	this->jit = jit;
 	this->network = network;
 	this->fifo = fifo;
-	this->actors = actors;
 	this->instances = network->getInstances();
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
 
 	jit->setDecoder(this);
-	
-	// Instanciating decoder
-	instanciate();
-
-	// Setting connections of the decoder
-	fifo->setConnections(this);
 }
 
 Decoder::~Decoder (){
@@ -87,17 +81,10 @@ Decoder::~Decoder (){
 }
 
 int Decoder::instanciate(){
-	// Add Fifo function and fifo type into the decoder
-	fifo->addFifoHeader(this);
-	
-	// Create instance in the decoder
-	createActorInstances();
-	
+
+
 	// Instanciate the network
 	Instanciator instanciator(network);
-
-	SolveParameters solver(this);
-	solver.transform();
 
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, this);
@@ -105,7 +92,7 @@ int Decoder::instanciate(){
 	
 	return 0;
 }
-
+/*
 void Decoder::createActorInstances(){
 	// Initialize all instances into the decoder
 	map<string, Instance*>::iterator it;
@@ -120,11 +107,8 @@ void Decoder::createActorInstances(){
 		instance->setActor(itActor->second);
 
 		InstancedActor* instancedActor = createInstance(instance);
-		instance->setInstancedActor(instancedActor);
-		instancedActors.insert(pair<Instance*, InstancedActor*>(instance, instancedActor));
-
 	}
-}
+}*/
 
 Actor* Decoder::getActor(std::string name){
 	map<string, Actor*>::iterator it;
@@ -139,26 +123,6 @@ Actor* Decoder::getActor(std::string name){
 }
 
 
-InstancedActor* Decoder::createInstance(Instance* instance){
-	Actor* actor = instance->getActor();
-
-	//Initialize jit
-	jit->setNewInstance();
-
-	// Instanciate actor
-	map<string, Port*>* inputs = jit->createPorts(instance, actor->getInputs());
-	map<string, Port*>* outputs = jit->createPorts(instance, actor->getOutputs());
-	map<Variable*, GlobalVariable*>* stateVars = jit->createVariables(instance, actor->getStateVars());
-	map<Variable*, GlobalVariable*>* parameters = jit->createVariables(instance, actor->getParameters());
-	map<Procedure*, Function*>* procs = jit->createProcedures(instance, actor->getProcs());
-	list<Action*>* initializes = jit->createInitializes(instance, actor->getInitializes());
-	list<Action*>* actions = jit->createActions(instance, actor->getActions(), inputs, outputs);
-	ActionScheduler* actionScheduler = jit->createActionScheduler(instance, actor->getActionScheduler());
-
-	return new InstancedActor(this, instance, inputs, outputs, stateVars, parameters, procs, actions, initializes, actionScheduler);
-}
-
-
 Instance* Decoder::getInstance(std::string name){
 	map<string, Instance*>::iterator it;
 
@@ -169,4 +133,30 @@ Instance* Decoder::getInstance(std::string name){
 	}
 
 	return it->second;
+}
+
+bool Decoder::compile(map<string, Actor*>* actors){
+	map<string, Instance*>::iterator itInst;
+	map<string, Actor*>::iterator itAct;
+	this->actors = actors;
+
+	// Add Fifo function and fifo type into the decoder
+	fifo->addFifoHeader(this);
+	
+	for (itInst = instances->begin(); itInst != instances->end(); itInst++){
+		Instance* instance = itInst->second;
+		
+		itAct = actors->find(instance->getClasz());
+
+		IRWriter writer(itAct->second, instance);
+		writer.write(this);
+	}
+
+	// Instanciating decoder
+	instanciate();
+
+	// Setting connections of the decoder
+	fifo->setConnections(this);
+
+	return true;
 }

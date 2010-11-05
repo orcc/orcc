@@ -51,7 +51,6 @@ namespace llvm{
 class Action;
 class ActionScheduler;
 class ActionTag;
-class Location;
 class FSM;
 class JIT;
 class Port;
@@ -291,10 +290,10 @@ private:
 	void putAction(ActionTag* tag, Action* action);
 
 
+private:
+
 	/** JIT used to load bitcode */
 	JIT* jit;
-
-private:
 
 	/** list of actions of the current actor */
 	std::map<std::string, Action*> actions;

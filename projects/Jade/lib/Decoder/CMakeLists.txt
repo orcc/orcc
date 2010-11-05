@@ -5,8 +5,6 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 add_library (Decoder
   BroadcastActor.h
   BroadcastActor.cpp
-  SolveParameters.h
-  SolveParameters.cpp
   BroadcastAdder.cpp
   BroadcastAdder.h
   InstancedActor.cpp

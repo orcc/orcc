@@ -61,7 +61,20 @@ class BroadcastAdder;
 
 class Decoder {
 public:
-	Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, std::map<std::string, Actor*>* actors, AbstractFifo* fifo);
+	
+	/**
+	 * Create a new decoder using an XDF network.
+	 * 
+	 * @param C : LLVMContext of LLVM JIT
+	 *            
+	 * @param jit : jit use in this decoder
+	 *            
+	 * @param network : Network that represents the decoder
+	 *
+	 * @param fifo : Fifo used in the decoder
+	 *
+	 */
+	Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo* fifo);
 	~Decoder();
 	
 	/**
@@ -165,6 +178,19 @@ public:
 	 *
      */
 	int instanciate();
+	
+	/**
+	 * @brief Compile the decoder
+	 * 
+	 * Compile the decoder using an XDF Network and the VTL. Compilation may include
+	 * instantiation, flattening, transforming, printing the network, or a subset of these steps.
+	 * 
+	 * @param actors : a map of loaded actors
+	 *
+	 * @return true if compilation ok, otherwise false
+	 */
+	bool compile(std::map<std::string, Actor*>* actors);
+
 
 private:
 	/** Module containing the final decoder */
@@ -194,21 +220,6 @@ private:
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 
-	/**
-     *  @brief Create instance of actors
-	 * 
-	 *	Instanciate actors of the decoder. DecoderEngine MUST have parsed
-	 *	 the necessary actor before instanciating.
-	 *
-     */
-	void createActorInstances();
-
-	/**
-     *  @brief Create the current instance inside the final decoder Module
-	 *
-	 *	@param instance : Instance to create.
-     */
-	InstancedActor* createInstance(Instance* instance);
 };
 
 #endif

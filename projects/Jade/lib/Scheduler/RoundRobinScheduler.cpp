@@ -56,6 +56,7 @@
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/InstancedActor.h"
 #include "Jade/Core/Actor/Procedure.h"
+#include "Jade/Core/Variable.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Core/Instance.h"
 
@@ -168,16 +169,15 @@ void RoundRobinScheduler::setSource(){
 	Module* module = decoder->getModule();
 	
 	//Get source instance
-	Instance* sourceInst = decoder->getInstance("source");
-	InstancedActor* source = sourceInst->getInstancedActor();
-
+	Instance* source = decoder->getInstance("source");
 	
 	//Insert source file string
 	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),VidFile.size()+1); 
 	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context,VidFile), "fileName", 0, false, 0);
 
 	//Store adress in input file of source
-	GlobalVariable* sourceFile = source->getStateVar(sourceInst->getActor()->getStateVar("input_file"));
+	Variable* sourceFileVar = source->getStateVar("input_file");
+	GlobalVariable* sourceFile = sourceFileVar->getGlobalVariable();
 	Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
 	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
 }
@@ -198,33 +198,31 @@ void RoundRobinScheduler::setCompare(){
 
 	//Fix compare file in all instance
 	for ( it=instances->begin() ; it != instances->end(); it++ ){
-		InstancedActor* instancedActor = (*it)->getInstancedActor();
+		Instance* instance = *it;
 
 		//Insert compare file string
 		ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),YuvFile.size()+1); 
 		GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context,YuvFile), "compareFile", 0, false, 0);
 
 		//Store adress in input file of source
-		GlobalVariable* yuvVar = instancedActor->getStateVar(compare->getStateVar("yuv_file"));
+		GlobalVariable* yuvVar = instance->getStateVar("yuv_file")->getGlobalVariable();
 		Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
 		yuvVar->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
 		
 		//Map fstat function used in compare actor
-		Procedure* filesizeFuncProc = compare->getProcedure("Filesize");
-		Function* filesizeFunc = instancedActor->getProcedureVar(filesizeFuncProc);
+		Function* filesizeFunc = instance->getProcedure("Filesize")->getFunction();
 		jit->MapFunction(filesizeFunc, (void *)Filesize);
 	}
 }
 
 void RoundRobinScheduler::setDisplay(){
 	//Get display instance
-	Instance* displayInst = decoder->getInstance("display");
-	InstancedActor* display = displayInst->getInstancedActor();
+	Instance* display = decoder->getInstance("display");
 
 	//Get procedures from display
-	Function* setVideo = display->getProcedureVar(displayInst->getActor()->getProcedure("set_video"));
-	Function* setInit = display->getProcedureVar(displayInst->getActor()->getProcedure("set_init"));
-	Function* writeMb = display->getProcedureVar(displayInst->getActor()->getProcedure("write_mb"));
+	Function* setVideo = display->getProcedure("set_video")->getFunction();
+	Function* setInit = display->getProcedure("set_init")->getFunction();
+	Function* writeMb = display->getProcedure("write_mb")->getFunction();
 
 	//Map procedure to display
 	jit->MapFunction(setVideo, (void *)display_set_video);

@@ -71,8 +71,8 @@ public:
 	 *
 	 * @param variable : llvm::GlobalVariable bound to this variable.
 	 */
-	StateVar(Location* location, llvm::Type* type, std::string name, bool assignable, llvm::GlobalVariable* variable) 
-		: Variable(location, type, name, true, variable)
+	StateVar(llvm::Type* type, std::string name, bool assignable, llvm::GlobalVariable* variable) 
+		: Variable(type, name, true, variable)
 	{
 		this->assignable = assignable;
 	};

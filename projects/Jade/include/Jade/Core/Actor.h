@@ -43,6 +43,8 @@
 #include<map>
 #include<list>
 
+#include "Jade/Core/Variable.h"
+
 namespace llvm{
 	class Type;
 	class StructType;
@@ -403,7 +405,7 @@ protected:
 	/** Procedures of this actor */
 	std::map<std::string, Procedure*>* procedures;
 
-	/** Action schedumer of this actor */
+	/** Action scheduler of this actor */
 	ActionScheduler* actionScheduler;
 
 	/** Structure types from fifo of this actor */

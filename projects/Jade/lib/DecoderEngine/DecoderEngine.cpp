@@ -43,7 +43,7 @@
 #include "llvm/Support/CommandLine.h"
 #include "Jade/JIT.h"
 #include "Jade/DecoderEngine.h"
-#include "Jade/Actor/IRParser.h"
+#include "Jade/Serialize/IRParser.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/AbstractFifo.h"
@@ -78,17 +78,19 @@ int DecoderEngine::load(Network* network) {
 	parseActors(network);
 
 	//Create decoder
-	decoder = new Decoder(Context, jit, network, &actors, fifo);
+	Decoder decoder(Context, jit, network, fifo);
 
-	jit->initEngine(decoder);
+	decoder.compile(&actors);
+
+	jit->initEngine(&decoder);
 	
-	RoundRobinScheduler scheduler(Context, jit, decoder);
+	RoundRobinScheduler scheduler(Context, jit, &decoder);
 
-	jit->optimize(decoder);
+	jit->optimize(&decoder);
 
-	jit->printModule("module.txt", decoder);
+	jit->printModule("module.txt", &decoder);
 
-	jit->verify("error.txt", decoder);
+	jit->verify("error.txt", &decoder);
 
 	scheduler.execute();
 

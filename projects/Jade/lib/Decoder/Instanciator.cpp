@@ -102,8 +102,7 @@ void Instanciator::updateConnection(Connection* connection){
 		}
 
 		// Bound GlobalVariable to port from instance
-		InstancedActor* instancedSrc = source->getInstancedActor();
-		Port* port = instancedSrc->getPort(srcPortInst->getName());
+		Port* port = source->getPort(srcPortInst->getName());
 		connection->setSourcePort(port);
 	}
 
@@ -126,8 +125,7 @@ void Instanciator::updateConnection(Connection* connection){
 		}
 
 		// Bound GlobalVariable to port from instance
-		InstancedActor* instancedDst = target->getInstancedActor();
-		Port* port = instancedDst->getPort(dstPortActor->getName());
+		Port* port = target->getPort(dstPortActor->getName());
 		connection->setDestinationPort(port);
 	}
 
