@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.tools.classifier;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +42,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.State;
-import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.moc.CSDFMoC;
 import net.sf.orcc.moc.DPNMoC;
@@ -95,6 +93,9 @@ public class ActorClassifier implements ActorTransformation {
 		if (tdAnalyzer.isTimeDependent()) {
 			moc = new DPNMoC();
 		} else {
+			// merges actions with the same input/output pattern together
+			new SDFActionsMerger().transform(actor);
+
 			// first tries SDF with *all* the actions of the actor
 			moc = classifySDF(actions);
 			if (!moc.isSDF()) {
@@ -208,8 +209,6 @@ public class ActorClassifier implements ActorTransformation {
 		ActionScheduler sched = actor.getActionScheduler();
 		FSM fsm = sched.getFsm();
 		if (isQuasiStaticFsm(fsm)) {
-			System.out.println(actor.getName()
-					+ " has a quasi-static-compatible FSM");
 			String initialState = fsm.getInitialState().getName();
 
 			// analyze the configuration of this actor
@@ -237,31 +236,24 @@ public class ActorClassifier implements ActorTransformation {
 	}
 
 	/**
-	 * Tries to classify an actor with several actions as SDF. An actor is SDF
-	 * if all its actions have the same patterns.
+	 * Tries to classify an actor as SDF. An actor is SDF if it has one action.
+	 * If an actor has many actions (in a given state if it has an FSM) with the
+	 * same input/output patterns, then these actions are merged by the
+	 * SDFActionsMerger transformation.
 	 * 
 	 * @param actions
 	 *            a list of actions sorted by descending priority
-	 * @return an actor class
+	 * @return a Model of Computation
 	 */
 	private MoC classifySDF(List<Action> actions) {
-		Iterator<Action> it = actions.iterator();
-		if (it.hasNext()) {
-			Action action = it.next();
-			Pattern input = action.getInputPattern();
-			Pattern output = action.getOutputPattern();
-			while (it.hasNext()) {
-				action = it.next();
-				if ((input.equals(action.getInputPattern()) && output
-						.equals(action.getOutputPattern())) == false) {
-					// one pattern is not equal to another
-					return new KPNMoC();
-				}
-			}
-		} else {
-			// an empty actor is considered dynamic
-			// because the only actors with no actions are system actors
-			// such as source and display
+		int numActions = actions.size();
+		if (numActions != 1) {
+			// two cases: 1) an empty actor is considered dynamic because the
+			// only actors with no actions are system actors such as source and
+			// display
+
+			// 2) an actor with many actions after the SDFActionMerger
+			// transformation has been applied is dynamic
 			return new KPNMoC();
 		}
 

@@ -35,7 +35,7 @@ import net.sf.orcc.ir.expr.ExpressionVisitor;
  * This interface defines an expression.
  * 
  * @author Matthieu Wipliez
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * 
  */
 public interface Expression {
