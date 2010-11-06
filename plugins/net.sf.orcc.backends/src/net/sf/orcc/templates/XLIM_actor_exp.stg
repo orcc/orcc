@@ -117,10 +117,14 @@ BoolExpr(expr) ::= <<
 >>
 
 VarExpr(expr) ::= <<
+$if(op.cast)$
+$Cast(target = op.target, value = op.value, cast = op.cast)$
+$else$
 <operation kind="noop">
 	<port dir="in" source="$expr$"/>
 	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>
+$endif$
 >>
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
@@ -130,6 +134,12 @@ instruction(op) ::= <<
 $(op.class.simpleName)(op)$
 >>
 
+Cast(target,value,cast) ::= << 
+<operation kind="cast"> 
+  $port(dir="in",source=value.var.variable)$ 
+  $port(dir="out",type=target.type,source=target)$ 
+</operation> 
+>> 
 
 Call(call) ::= <<
 <!-- TODO call-->
