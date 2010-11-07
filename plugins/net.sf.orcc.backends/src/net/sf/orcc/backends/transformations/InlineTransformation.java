@@ -282,9 +282,9 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 		@Override
 		public Object interpret(VarExpr expr, Object... args) {
-			VarExpr varExpr = new VarExpr(
-					new Use(variableToLocalVariableMap.get(expr.getVar()
-							.getVariable())));
+			Variable newVar = variableToLocalVariableMap.get(expr.getVar()
+					.getVariable());
+			VarExpr varExpr = new VarExpr(new Use(newVar));
 			return varExpr;
 		}
 
@@ -344,16 +344,22 @@ public class InlineTransformation extends AbstractActorTransformation {
 		// Create a new local variable to all function/procedure's variable
 		variableToLocalVariableMap = new HashMap<Variable, LocalVariable>();
 		for (Variable var : function.getLocals().getList()) {
-			variableToLocalVariableMap.put(
-					var,
-					procedure.newTempLocalVariable("", var.getType(),
-							var.getName()));
+			LocalVariable oldVar = (LocalVariable) var;
+			LocalVariable newVar = procedure.newTempLocalVariable("",
+					oldVar.getType(), oldVar.getName());
+			newVar.setIndex(oldVar.getIndex());
+			newVar.setLocation(oldVar.getLocation());
+			newVar.setAssignable(oldVar.isAssignable());
+			variableToLocalVariableMap.put(oldVar, newVar);
 		}
 		for (Variable var : function.getParameters().getList()) {
-			variableToLocalVariableMap.put(
-					var,
-					procedure.newTempLocalVariable("", var.getType(),
-							var.getName()));
+			LocalVariable oldVar = (LocalVariable) var;
+			LocalVariable newVar = procedure.newTempLocalVariable("",
+					oldVar.getType(), oldVar.getName());
+			newVar.setIndex(oldVar.getIndex());
+			newVar.setLocation(oldVar.getLocation());
+			newVar.setAssignable(oldVar.isAssignable());
+			variableToLocalVariableMap.put(oldVar, newVar);
 		}
 
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
