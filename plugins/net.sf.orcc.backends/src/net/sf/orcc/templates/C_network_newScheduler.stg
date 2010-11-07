@@ -1,13 +1,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Declare actors
 
-declareActor(instance) ::= "$instance.id$"
+declareActor(instance) ::= "$GetInstanceId(instance)$"
 declareActors(instances) ::= <<
 struct actor_s $instances: declareActor(); wrap, separator=", "$;
 
 >>
 
-declareActorArray(instance) ::= "&$instance.id$"
+declareActorArray(instance) ::= "&$GetInstanceId(instance)$"
 
 declareActorsArray(instances) ::= <<
 struct actor_s *actors[] = {$instances: declareActorArray(); wrap, separator=", "$};
@@ -17,7 +17,7 @@ struct actor_s *actors[] = {$instances: declareActorArray(); wrap, separator=", 
 // Declare predecessors and successors
 
 Neighbor(port) ::= <<
-&$map.(port).id$
+&$GetInstanceId(map.(port))$
 >>
 
 Neighbors(map, ports) ::= <<
@@ -26,10 +26,10 @@ $ports: Neighbor(); separator=", "$
 
 goDeclarePredSucc(inputs, outputs) ::= <<
 $if(!inputs.empty)
-$struct actor_s *$instance.id$_predecessors[] = {$Neighbors(map=network.predecessorsMap.(instance), ports=inputs)$};
+$struct actor_s *$GetInstanceId(instance)$_predecessors[] = {$Neighbors(map=network.predecessorsMap.(instance), ports=inputs)$};
 $endif$$
 if(!outputs.empty)
-$struct actor_s *$instance.id$_successors[] = {$Neighbors(map=network.successorsMap.(instance), ports=outputs)$};
+$struct actor_s *$GetInstanceId(instance)$_successors[] = {$Neighbors(map=network.successorsMap.(instance), ports=outputs)$};
 $endif$
 >>
 
@@ -67,10 +67,10 @@ elseif (instance.broadcast)$$instance.broadcast.numOutputs$$else$0$endif$
 
 fillActorStruct(instance) ::= <<
 
-struct actor_s $instance.id$ = {"$instance.id$", $instance.id$_scheduler, $
+struct actor_s $GetInstanceId(instance)$ = {"$GetInstanceId(instance)$", $GetInstanceId(instance)$_scheduler, $
 NumInputs(instance)$, $NumOutputs(instance)$, $
-if(instance.actor.inputs.list.empty)$NULL$else$$instance.id$_predecessors$endif$, $
-if(instance.actor.outputs.list.empty)$NULL$else$$instance.id$_successors$endif$};
+if(instance.actor.inputs.list.empty)$NULL$else$$GetInstanceId(instance)$_predecessors$endif$, $
+if(instance.actor.outputs.list.empty)$NULL$else$$GetInstanceId(instance)$_successors$endif$};
 >>
 
 fillActorsStructs(instances) ::= <<
