@@ -222,6 +222,9 @@ public class ActorClassifier implements ActorTransformation {
 				Action action = info.getAction();
 				Map<Port, Expression> configuration = analyzer
 						.getConfiguration(action);
+				if (configuration == null) {
+					return new KPNMoC();
+				}
 				SDFMoC staticClass = classifyFsmConfiguration(configuration);
 
 				quasiStatic.addConfiguration(action, staticClass);

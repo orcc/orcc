@@ -142,11 +142,10 @@ public class CBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		// boolean classify = getAttribute("net.sf.orcc.backends.classify",
-		// false);
-		// if (classify) {
-		new ActorClassifier().transform(actor);
-		// }
+		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
+		if (classify) {
+			new ActorClassifier().transform(actor);
+		}
 
 		ActorTransformation[] transformations = { new TypeSizeTransformation(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
