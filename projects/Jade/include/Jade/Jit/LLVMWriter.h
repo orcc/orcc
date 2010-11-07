@@ -40,8 +40,13 @@
 #define LLVMWRITER_H
 
 namespace llvm{
+	struct ClonedCodeInfo;
 	class Module;
+	class ReturnInst;
 }
+
+class AbstractFifo;
+class Decoder;
 
 #include "llvm/Module.h"
 #include "llvm/DerivedTypes.h"
@@ -64,9 +69,14 @@ public:
 	 *	Initialize the JIT engine
 	 *
      */
-	LLVMWriter(std::string prefix, llvm::Module* module);
+	LLVMWriter(std::string prefix, Decoder* decoder);
 
 	llvm::GlobalVariable* createVariable(llvm::GlobalVariable* variable);
+	llvm::Function* createFunction(llvm::Function* function);
+
+	llvm::Function* addFunctionProtosExternal(const llvm::Function* function);
+	llvm::Function* addFunctionProtosInternal(const llvm::Function* function);
+	bool linkProcedureBody(llvm::Function* function);
 
 private:
 
@@ -86,6 +96,13 @@ private:
 
 	void CopyGVAttributes(llvm::GlobalValue *DestGV, const llvm::GlobalValue *SrcGV);
 	bool LinkGlobalInits(llvm::GlobalVariable* variable);
+	void linkFunctionBody(llvm::Function *NewFunc, const llvm::Function *OldFunc,
+		llvm::ValueMap<const llvm::Value*, llvm::Value*> &VMap,
+                       bool ModuleLevelChanges,
+					   llvm::SmallVectorImpl<llvm::ReturnInst*> &Returns,
+					   AbstractFifo* fifo,
+                       const char *NameSuffix = "", 
+					   llvm::ClonedCodeInfo *CodeInfo = 0);
 
 	/** Module to write element into */
 	llvm::Module* module;
@@ -93,6 +110,7 @@ private:
 	/** Written values*/
 	llvm::ValueToValueMapTy ValueMap;
 
+	Decoder* decoder;
 	std::string prefix;
 
 };

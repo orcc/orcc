@@ -42,13 +42,14 @@
 #include <string>
 #include <list>
 
+#include "Jade/Core/Actor/FSM.h"
+
 namespace llvm {
 	class Function;
 }
 
 class Procedure;
 class Action;
-class FSM;
 //------------------------------
 
 /**

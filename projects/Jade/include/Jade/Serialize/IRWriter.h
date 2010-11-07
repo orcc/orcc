@@ -42,6 +42,7 @@
 #include <map>
 
 namespace llvm{
+	class ConstantInt;
 	class Module;
 }
 
@@ -134,17 +135,148 @@ private:
 	 */
 	Variable* writeVariable(Variable* var);
 
+	/**
+	 * @brief Write initializes actions
+	 *
+	 * Write the given initializes actions for an Instance.
+	 * 
+	 * @param initializes : the initializes actions to write
+	 *
+	 * @return the corresponding initializes actions in the decoder
+	 */
+	std::list<Action*>* writeInitializes(std::list<Action*>* initializes);
+
+	/**
+	 * @brief Write a list of actions
+	 *
+	 * Write a list of actions for an Instance.
+	 * 
+	 * @param vars : the actions to write
+	 *
+	 * @return a map of the actions in the decoder
+	 */
+	std::list<Action*>* writeActions(std::list<Action*>* actions);
+
+	/**
+	 * @brief Write an action
+	 *
+	 * Write the given action for an Instance.
+	 * 
+	 * @param action : the action to write
+	 *
+	 * @return the corresponding action in the decoder
+	 */
+	Action* writeAction(Action* action);
+
+	/**
+	 * @brief Write a procedure
+	 *
+	 * Write the given procedure for an Instance.
+	 * 
+	 * @param procedure : the procedure to write
+	 *
+	 * @return the corresponding procedure in the decoder
+	 */
+	Procedure* writeProcedure(Procedure* procedure);
+
+	/**
+	 * @brief Write a pattern
+	 *
+	 * Write the given pattern for an Instance.
+	 * 
+	 * @param action : the pattern to write
+	 *
+	 * @param ports : the corresponding ports of the pattern
+	 *
+	 * @return the corresponding pattern in the decoder
+	 */
+	std::map<Port*, llvm::ConstantInt*>* writePattern(std::map<Port*, llvm::ConstantInt*>* pattern, std::map<std::string, Port*>* ports);
+
+	/**
+	 * @brief Write a list of procedures
+	 *
+	 * Write the given list of procedure for an Instance.
+	 * 
+	 * @param procs : the procedures to write
+	 *
+	 * @return the corresponding procedures in the decoder
+	 */
+	std::map<std::string, Procedure*>* writeProcedures(std::map<std::string, Procedure*>* procs);
+	
+	/**
+	 * @brief Write an action scheduler
+	 *
+	 * Write the given action scheduler for an Instance.
+	 * 
+	 * @param actionScheduler : the actionScheduler to write
+	 *
+	 * @return the corresponding actionScheduler in the decoder
+	 */
+	ActionScheduler* writeActionScheduler(ActionScheduler* actionScheduler);
+
+	/**
+	 * @brief Write an FSM
+	 *
+	 * Write the given FSM for an Instance.
+	 * 
+	 * @param fsm : the fsm to write
+	 *
+	 * @return the corresponding fsm in the decoder
+	 */
+	FSM* writeFSM(FSM* fsm);
+
+	/**
+	 * @brief Store the action for a later use.
+	 *
+	 * Remember this action depending on the given Tag, ie. tagged or not. 
+	 * 
+	 * @param tag : tag of the action
+	 *
+	 * @param action : action to remember
+	 */
+	void putAction(ActionTag* tag, Action* action);
+
+	/**
+	 *
+	 * @brief Return the corresponding action in the decoder.
+	 *
+	 * Returns the action associated with the tag inside the decoder.
+	 * 
+	 * @param action : the action to look for.
+	 *
+	 * @return the corresponding action in the decoder.
+	 */
+	Action* getAction(Action* action);
+
 	/** Source actor */
 	Actor* actor;
+
+	/** Destinated instance */
+	Instance* instance;
 	
 	/** list of actions of the current instance */
 	std::map<std::string, Action*> actions;
 
-	/** list of untagged actions of the current instance */
+	/** list of untagged actions of the instance */
 	std::list<Action*> untaggedActions;
 
-	/** Destinated instance */
-	Instance* instance;
+	/** list of initialization actions of the instance */
+	std::list<Action*>* initializes;
+
+	/** Action scheduler of the instance */
+	ActionScheduler* actionScheduler;
+
+	/** Ports of the instance */
+	std::map<std::string, Port*>* inputs;
+	std::map<std::string, Port*>* outputs;
+
+	/** Variables of the instance */
+	std::map<std::string, Variable*>* stateVars;
+	std::map<std::string, Variable*>* parameters;
+
+	/**Procedures of the instance */
+	std::map<std::string, Procedure*>* procs;
+	
 
 	/** writer used to manage LLVM infrastructure */
 	LLVMWriter* writer;

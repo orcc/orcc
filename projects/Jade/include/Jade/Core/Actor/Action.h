@@ -46,7 +46,9 @@ namespace llvm{
 	class ConstantInt;
 }
 
-class ActionTag;
+#include "Jade/Core/Actor/ActionTag.h"
+#include "Jade/Core/Actor/ActionScheduler.h"
+
 class Port;
 class Procedure;
 //------------------------------

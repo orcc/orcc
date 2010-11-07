@@ -49,7 +49,8 @@ namespace llvm{
 	class Module;
 }
 
-class AbstractFifo;
+#include "Jade/Fifo/AbstractFifo.h" 
+
 class Actor;
 class Decoder;
 class Instance;

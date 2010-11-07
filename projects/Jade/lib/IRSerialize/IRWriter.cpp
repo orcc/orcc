@@ -53,8 +53,14 @@ IRWriter::IRWriter(Actor* actor, Instance* instance){
 	this->instance = instance;
 }
 
+IRWriter::~IRWriter(){
+	if(!writer){
+		delete writer;
+	}
+}
+
 bool IRWriter::write(Decoder* decoder){
-	writer = new LLVMWriter(instance->getId()+"_", decoder->getModule());
+	writer = new LLVMWriter(instance->getId()+"_", decoder);
 	
 	writeInstance();
 	// Instanciate actor
@@ -71,10 +77,16 @@ bool IRWriter::write(Decoder* decoder){
 }
 
 void IRWriter::writeInstance(){
-	map<string, Port*>* inputs = writePorts(actor->getInputs());
-	map<string, Port*>* outputs = writePorts(actor->getOutputs());
-	map<string, Variable*>* stateVars = writeVariables(actor->getStateVars());
-	map<string, Variable*>* parameters = writeVariables(actor->getParameters());
+	
+	//Write instance elements
+	inputs = writePorts(actor->getInputs());
+	outputs = writePorts(actor->getOutputs());
+	stateVars = writeVariables(actor->getStateVars());
+	parameters = writeVariables(actor->getParameters());
+	procs = writeProcedures(actor->getProcs());
+	initializes = writeInitializes(actor->getInitializes());
+	list<Action*>* actions = writeActions(actor->getActions());
+	actionScheduler = writeActionScheduler(actor->getActionScheduler());
 
 }
 
@@ -129,41 +141,174 @@ list<Action*>* IRWriter::writeInitializes(list<Action*>* actions){
 	list<Action*>* newActions = new list<Action*>();
 
 	for (it = actions->begin(); it != actions->end(); ++it){
-		Action* action = writeAction(instance, *it, NULL, NULL);
+		Action* action = writeAction(*it);
 		newActions->push_back(action);
 	}
 
 	return newActions;
 }
 
-Action* IRWriter::createAction(Instance* instance, Action* action, map<string, Port*>* inputs, map<string, Port*>* outputs){
-		map<Port*, ConstantInt*>* inputPattern = NULL;
-		map<Port*, ConstantInt*>* outputPattern = NULL;
+Action* IRWriter::writeAction(Action* action){
+		//Write body and scheduler of the action
+		Procedure* newScheduler = writeProcedure(action->getScheduler());
+		Procedure* newBody = writeProcedure(action->getBody());
 
-		Procedure* scheduler = action->getScheduler();
-		Procedure* body = action->getBody();
-	
-		Procedure* newScheduler = CreateProcedure(instance, scheduler);
-		Procedure* newBody = CreateProcedure(instance, body);
-		
-		if (inputs != NULL){
-			inputPattern = createPattern(action->getInputPattern(), inputs);
-		}else{
-			inputPattern = new map<Port*, ConstantInt*>();
-		}
+		//Write patterns
+		map<Port*, ConstantInt*>* inputPattern = writePattern(action->getInputPattern(), inputs);
+		map<Port*, ConstantInt*>* outputPattern = writePattern(action->getOutputPattern(), outputs);
 
-		if (outputs != NULL){
-			outputPattern = createPattern(action->getOutputPattern(), outputs);
-		}else{
-			outputPattern = new map<Port*, ConstantInt*>();
-		}
-
+		//Create the action
 		return new Action(action->getTag(), inputPattern, outputPattern, newScheduler, newBody);
 }
 
+Procedure* IRWriter::writeProcedure(Procedure* procedure){
+	Function* function = writer->createFunction((Function*)procedure->getFunction());
+	
+	return new Procedure(procedure->getName(), procedure->getExternal(), function);
+}
 
-IRWriter::~IRWriter(){
-	if(!writer){
-		delete writer;
+map<Port*, ConstantInt*>* IRWriter::writePattern(map<Port*, ConstantInt*>* pattern, map<string, Port*>* ports){
+	map<Port*, ConstantInt*>::iterator itPattern;
+	map<string, Port*>::iterator itPort;
+	map<Port*, ConstantInt*>* newPattern = new map<Port*, ConstantInt*>();
+
+	for (itPattern = pattern->begin(); itPattern != pattern->end(); itPattern++) {
+		itPort = ports->find(itPattern->first->getName());
+		newPattern->insert(pair<Port*, ConstantInt*>(itPort->second, itPattern->second));
 	}
+
+	return newPattern;
+}
+
+map<string, Procedure*>* IRWriter::writeProcedures(map<string, Procedure*>* procs){
+	map<string, Procedure*>::iterator it;
+	map<string, Procedure*>* newProcs = new map<string, Procedure*>();
+
+	
+	//Creation of procedure must be done in two times because function can call other functions
+	for (it = procs->begin(); it != procs->end(); ++it){
+		Procedure* proc = (*it).second;
+		Function* newFunction = NULL;
+		
+		//Write declaration of the function
+		if (proc->isExternal()){
+			newFunction = writer->addFunctionProtosExternal(proc->getFunction());
+		}else{
+			newFunction = writer->addFunctionProtosInternal(proc->getFunction());
+		}
+		
+		//Create a new procedure
+		Procedure* newProc = new Procedure(proc->getName(), proc->getExternal(), newFunction);
+		newProcs->insert(pair<string, Procedure*>(proc->getName(), newProc));
+	}
+
+	//Link body of the procedure
+	for (it = procs->begin(); it != procs->end(); ++it){
+		Procedure* proc = (*it).second;
+		writer->linkProcedureBody(proc->getFunction());
+	}
+	
+	return newProcs;
+}
+
+ActionScheduler* IRWriter::writeActionScheduler(ActionScheduler* actionScheduler){
+	FSM* fsm = NULL;
+	Function* initializeFunction = NULL;
+	list<Action*>* instancedActions = new list<Action*>();
+
+	//Get actions of action scheduler
+	list<Action*>::iterator it;
+	map<string, Action*>::iterator itActionsMap;
+	list<Action*>* actions = actionScheduler->getActions();
+
+	for (it = actions->begin(); it != actions->end(); it++){
+		Action* action = getAction(*it);
+		instancedActions->push_back(action);
+	}
+
+	//Create FSM if present
+	if (actionScheduler->hasFsm()){
+		fsm = writeFSM(actionScheduler->getFsm());
+	}
+	
+	return new ActionScheduler(instancedActions, fsm);
+}
+
+FSM* IRWriter::writeFSM(FSM* fsm){
+	list<llvm::Function*>::iterator it;
+	
+	FSM* newFSM = new FSM();
+	
+	//Copy states of the source fsm
+	std::map<std::string, FSM::State*>::iterator itState;
+	std::map<std::string, FSM::State*>* states = fsm->getStates();
+
+	for (itState = states->begin(); itState != states->end(); itState++){
+		newFSM->addState(itState->first);
+	}
+
+	//Copy transitions of the source fsm
+	map<string, Action*>::iterator itActionsMap;
+	std::map<std::string, FSM::Transition*>::iterator itTransition;
+	std::map<std::string, FSM::Transition*>* transitions = fsm->getTransitions();
+	for (itTransition = transitions->begin(); itTransition != transitions->end(); itTransition++){
+		FSM::Transition* transition = itTransition->second;
+		FSM::State* sourceState = transition->getSourceState();
+		list<FSM::NextStateInfo*>::iterator itNextStateInfo;
+		list<FSM::NextStateInfo*>* nextStateInfos = transition->getNextStateInfo();
+
+		for (itNextStateInfo = nextStateInfos->begin(); itNextStateInfo != nextStateInfos->end(); itNextStateInfo++){
+			Action* actionState = NULL;
+			FSM::State* targetState = (*itNextStateInfo)->getTargetState();
+			Action* targetAction = (*itNextStateInfo)->getAction();
+
+			newFSM->addTransition(sourceState->getName(), targetState->getName(), getAction(targetAction));
+		}
+	}
+	
+	//Set initiale state of the FSM
+	newFSM->setInitialState(fsm->getInitialState()->getName());
+
+	return newFSM;
+}
+
+list<Action*>* IRWriter::writeActions(list<Action*>* actions){
+	list<Action*>::iterator it;
+	list<Action*>* newActions = new list<Action*>();
+
+	for (it = actions->begin(); it != actions->end(); ++it){
+		//Write action
+		Action* action = writeAction(*it);
+		newActions->push_back(action);
+
+		//Save it for a later use	
+		putAction(action->getTag(), action);
+	}
+
+	return newActions;
+}
+
+void IRWriter::putAction(ActionTag* tag, Action* action){
+	if (tag->isEmpty()){
+		untaggedActions.push_back(action);
+	} else {
+		actions.insert(pair<std::string, Action*>(tag->getIdentifier(), action));
+	}
+}
+
+Action* IRWriter::getAction(Action* action) {
+	ActionTag* actionTag = action->getTag();
+	map<string, Action*>::iterator it;
+
+	if (actionTag->isEmpty()){
+		// removes the first untagged action found
+		Action* action = untaggedActions.front();
+		untaggedActions.remove(action);
+		
+		return action;
+	}
+	
+	it = actions.find(actionTag->getIdentifier());
+	
+	return it->second;
 }

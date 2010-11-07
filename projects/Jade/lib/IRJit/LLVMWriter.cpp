@@ -36,14 +36,19 @@
 */
 
 //------------------------------
+#include "Jade/Decoder/Decoder.h"
 #include "Jade/JIT/LLVMWriter.h"
+
+#include "llvm/Instructions.h"
+#include "llvm/Transforms/Utils/Cloning.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
-LLVMWriter::LLVMWriter(string prefix, Module* module){
-	this->module = module;
+LLVMWriter::LLVMWriter(string prefix, Decoder* decoder){
+	this->decoder = decoder;
+	this->module = decoder->getModule();
 	this->prefix = prefix;
 }
 
@@ -103,4 +108,143 @@ void LLVMWriter::CopyGVAttributes(GlobalValue *DestGV, const GlobalValue *SrcGV)
   unsigned Alignment = std::max(DestGV->getAlignment(), SrcGV->getAlignment());
   DestGV->copyAttributesFrom(SrcGV);
   DestGV->setAlignment(Alignment);
+}
+
+Function* LLVMWriter::createFunction(Function* function){
+	Function* newFunction = (Function*)addFunctionProtosInternal(function);
+	linkProcedureBody(function);
+
+	return newFunction;
+}
+
+Function* LLVMWriter::addFunctionProtosInternal(const Function* function){
+    const Function *SF = function;   // SrcFunction
+	Module* Dest = module;
+	std::string Err;
+
+	GlobalValue *DGV = 0;
+
+	Function *NF =
+      Function::Create(cast<FunctionType>(SF->getType()->getElementType()),
+                       GlobalValue::InternalLinkage,  prefix + SF->getName(), Dest);
+    NF->copyAttributesFrom(SF);
+	ValueMap[SF] = NF;
+
+    return NF;
+}
+
+Function* LLVMWriter::addFunctionProtosExternal(const Function* function){
+    const Function *SF = function;   // SrcFunction
+	Module* Dest = module;
+	std::string Err;
+	
+	GlobalValue *DGV = 0;
+	
+	Function *NF =
+	Function::Create(cast<FunctionType>(SF->getType()->getElementType()),
+					 GlobalValue::ExternalLinkage,  prefix + SF->getName(), Dest);
+    NF->copyAttributesFrom(SF);
+	ValueMap[SF] = NF;
+	
+	return NF;
+}
+
+
+bool LLVMWriter::linkProcedureBody(Function* function){
+	Function *F = cast<Function>(ValueMap[function]);
+	if (!function->isDeclaration()) {
+		Function::arg_iterator DestI = F->arg_begin();
+		for (Function::const_arg_iterator J = function->arg_begin(); J != function->arg_end();
+			++J) {
+			DestI->setName(J->getName());
+			ValueMap[J] = DestI++;
+		}
+	
+		SmallVector<ReturnInst*, 8> Returns;  // Ignore returns cloned.
+
+		linkFunctionBody(F, function, ValueMap, /*ModuleLevelChanges=*/true, Returns,  decoder->getFifo());
+
+	}
+
+	F->setLinkage(function->getLinkage());
+
+	return true;	
+}
+
+void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
+                             ValueToValueMapTy &VMap,
+                             bool ModuleLevelChanges,
+                             SmallVectorImpl<ReturnInst*> &Returns, AbstractFifo* fifo,
+                             const char *NameSuffix, ClonedCodeInfo *CodeInfo) {
+   // Clone any attributes.
+  if (NewFunc->arg_size() == OldFunc->arg_size())
+    NewFunc->copyAttributesFrom(OldFunc);
+  else {
+    //Some arguments were deleted with the VMap. Copy arguments one by one
+    for (Function::const_arg_iterator I = OldFunc->arg_begin(), 
+           E = OldFunc->arg_end(); I != E; ++I)
+      if (Argument* Anew = dyn_cast<Argument>(VMap[I]))
+        Anew->addAttr( OldFunc->getAttributes()
+                       .getParamAttributes(I->getArgNo() + 1));
+    NewFunc->setAttributes(NewFunc->getAttributes()
+                           .addAttr(0, OldFunc->getAttributes()
+                                     .getRetAttributes()));
+    NewFunc->setAttributes(NewFunc->getAttributes()
+                           .addAttr(~0, OldFunc->getAttributes()
+                                     .getFnAttributes()));
+
+  }
+  
+    // Loop over all of the basic blocks in the function, cloning them as
+  // appropriate.  Note that we save BE this way in order to handle cloning of
+  // recursive functions into themselves.
+  //
+  for (Function::const_iterator BI = OldFunc->begin(), BE = OldFunc->end();
+       BI != BE; ++BI) {
+    const BasicBlock &BB = *BI;
+
+    // Create a new basic block and copy instructions into it!
+    BasicBlock *CBB = CloneBasicBlock(&BB, VMap, NameSuffix, NewFunc,
+                                      CodeInfo);
+    VMap[&BB] = CBB;                       // Add basic block mapping.
+
+    if (ReturnInst *RI = dyn_cast<ReturnInst>(CBB->getTerminator()))
+      Returns.push_back(RI);
+  }
+
+   // Loop over all of the instructions in the function, fixing up operand
+  // references as we go.  This uses VMap to do all the hard work.
+  //
+  for (Function::iterator BB = cast<BasicBlock>(VMap[OldFunc->begin()]),
+         BE = NewFunc->end(); BB != BE; ++BB)
+    // Loop over all instructions, fixing each one as we find it...
+	for (BasicBlock::iterator II = BB->begin(); II != BB->end(); ++II){ 
+	  // Remap operands.
+	  for (User::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
+		Value *V;
+		
+		if (fifo->isFifoFunction((*op)->getName())){
+			//If this function is a fifo function, this function already exist in the module
+			V = fifo->getFifoFunction((*op)->getName());
+		} else if(fifo->isExternFunction((*op)->getName())){
+			//Same for external function
+			V = fifo->getExternFunction((*op)->getName());
+		} else {
+			V= MapValue(*op, VMap, ModuleLevelChanges);
+			assert(V && "Referenced value not in value map!");
+		}
+		*op = V;
+	  }
+
+	  // Remap attached metadata.
+	  SmallVector<std::pair<unsigned, MDNode *>, 4> MDs;
+	  II->getAllMetadata(MDs);
+	  for (SmallVectorImpl<std::pair<unsigned, MDNode *> >::iterator
+		   MI = MDs.begin(), ME = MDs.end(); MI != ME; ++MI) {
+		Value *Old = MI->second;
+		Value *New = MapValue(Old, VMap, ModuleLevelChanges);
+		if (New != Old)
+		  II->setMetadata(MI->first, cast<MDNode>(New));
+	  }
+  }
 }

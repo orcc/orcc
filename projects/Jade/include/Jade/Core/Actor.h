@@ -44,13 +44,14 @@
 #include<list>
 
 #include "Jade/Core/Variable.h"
+#include "Jade/Core/Actor/Action.h"
+#include "Jade/Core/Actor/Procedure.h"
 
 namespace llvm{
 	class Type;
 	class StructType;
 }
 
-class Action;
 class Variable;
 class Instance;
 class FuncUnit;
