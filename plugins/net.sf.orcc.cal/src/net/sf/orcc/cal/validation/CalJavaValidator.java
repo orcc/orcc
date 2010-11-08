@@ -30,6 +30,7 @@ package net.sf.orcc.cal.validation;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -62,30 +63,27 @@ import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
-import net.sf.orcc.cal.naming.CalQualifiedNameProvider;
 import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.type.TypeCycleDetector;
 import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.util.CollectionsUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.EcoreUtil2;
-import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.util.SimpleAttributeResolver;
 import org.eclipse.xtext.validation.Check;
 import org.eclipse.xtext.validation.CheckType;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-
-import com.google.inject.Inject;
 
 /**
  * This class describes the validation of an RVC-CAL actor. The checks tagged as
@@ -99,8 +97,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	private TypeChecker checker;
 
-	@Inject
-	private IQualifiedNameProvider nameProvider;
+	private SimpleAttributeResolver<EObject, String> resolver = SimpleAttributeResolver
+			.newResolver(String.class, "name");
 
 	/**
 	 * Creates a new CAL validator written in Java.
@@ -191,7 +189,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	 */
 	private void checkActionTag(AstAction action) {
 		AstActor actor = EcoreUtil2.getContainerOfType(action, AstActor.class);
-		String name = nameProvider.getQualifiedName(action);
+
+		String name = getName(action);
 
 		// Check if tag name is not already used in a state variable
 		List<AstVariable> variables = actor.getStateVariables();
@@ -335,10 +334,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkEntity(AstEntity entity) {
-		// fill the name provider's cache
-		((CalQualifiedNameProvider) nameProvider).resetUntaggedCount();
-		getNames(entity);
-
 		checkEntityName(entity);
 
 		// check there are no cycles in type definitions
@@ -367,7 +362,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		String path = entity.eResource().getURI().path();
 		String fileName = new File(path).getName();
 
-		AstTag entityName;
+		String entityName;
 		AstActor actor = entity.getActor();
 		AstUnit unit = null;
 		if (actor == null) {
@@ -377,15 +372,15 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			entityName = actor.getName();
 		}
 
-		List<String> tag = entityName.getIdentifiers();
+		List<String> tag = Arrays.asList(entityName.split("\\."));
 		String lastSegment = tag.get(tag.size() - 1);
 		if (!fileName.equals(lastSegment + ".cal")) {
 			if (actor == null) {
-				error("Unit " + nameProvider.getQualifiedName(entityName)
+				error("Unit " + entityName
 						+ " must be defined in a file named \"" + lastSegment
 						+ ".cal\"", unit, CalPackage.AST_UNIT__NAME);
 			} else {
-				error("Actor " + nameProvider.getQualifiedName(entityName)
+				error("Actor " + entityName
 						+ " must be defined in a file named \"" + lastSegment
 						+ ".cal\"", actor, CalPackage.AST_ACTOR__NAME);
 			}
@@ -409,7 +404,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				List<AstAction> actions = actionList.getTaggedActions(tag
 						.getIdentifiers());
 				if (actions == null || actions.isEmpty()) {
-					error("tag " + nameProvider.getQualifiedName(tag)
+					error("tag " + getName(tag)
 							+ " does not refer to any action", transition,
 							CalPackage.AST_TRANSITION__TAG);
 				}
@@ -541,7 +536,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				List<AstAction> sources = actionList
 						.getTaggedActions(previousTag.getIdentifiers());
 				if (sources == null || sources.isEmpty()) {
-					error("tag " + nameProvider.getQualifiedName(previousTag)
+					error("tag " + getName(previousTag)
 							+ " does not refer to any action", inequality,
 							CalPackage.AST_INEQUALITY);
 				}
@@ -554,7 +549,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 							.getIdentifiers());
 
 					if (targets == null || targets.isEmpty()) {
-						error("tag " + nameProvider.getQualifiedName(tag)
+						error("tag " + getName(tag)
 								+ " does not refer to any action", inequality,
 								CalPackage.AST_INEQUALITY);
 					}
@@ -578,12 +573,12 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		if (!cycle.isEmpty()) {
 			StringBuilder builder = new StringBuilder();
 			for (AstAction action : cycle) {
-				builder.append(nameProvider.getQualifiedName(action.getTag()));
+				builder.append(getName(action.getTag()));
 				builder.append(", ");
 			}
 
 			Iterator<AstAction> it = cycle.iterator();
-			builder.append(nameProvider.getQualifiedName(it.next().getTag()));
+			builder.append(getName(it.next().getTag()));
 
 			error("priorities of actor " + actor.getName()
 					+ " contain a cycle: " + builder.toString(), actor,
@@ -628,7 +623,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	private void checkUniqueNames(List<? extends EObject> variables) {
 		Set<String> names = new HashSet<String>();
 		for (EObject variable : variables) {
-			String name = nameProvider.getQualifiedName(variable);
+			String name = getName(variable);
 			if (names.contains(name)) {
 				error("Duplicate variable " + name, variable,
 						CalPackage.AST_VARIABLE__NAME);
@@ -704,52 +699,21 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	/**
-	 * Fills the name provider's cache by getting names for every action,
-	 * function, generator, foreach.
-	 * 
-	 * @param actor
-	 *            the actor
-	 */
-	private void getNames(AstEntity entity) {
-		new VoidSwitch() {
+	private String getName(AstAction action) {
+		AstTag tag = action.getTag();
+		if (tag == null) {
+			return "(untagged)";
+		} else {
+			return getName(tag);
+		}
+	}
 
-			@Override
-			public Void caseAstAction(AstAction action) {
-				((CalQualifiedNameProvider) nameProvider).resetBlockCount();
-				super.caseAstAction(action);
-				return null;
-			}
+	private String getName(AstTag tag) {
+		return CollectionsUtil.toString(tag.getIdentifiers(), ".");
+	}
 
-			@Override
-			public Void caseAstFunction(AstFunction function) {
-				((CalQualifiedNameProvider) nameProvider).resetBlockCount();
-				super.caseAstFunction(function);
-				return null;
-			}
-
-			@Override
-			public Void caseAstGenerator(AstGenerator generator) {
-				nameProvider.getQualifiedName(generator);
-				super.caseAstGenerator(generator);
-				return null;
-			}
-
-			@Override
-			public Void caseAstProcedure(AstProcedure procedure) {
-				((CalQualifiedNameProvider) nameProvider).resetBlockCount();
-				super.caseAstProcedure(procedure);
-				return null;
-			}
-
-			@Override
-			public Void caseAstStatementForeach(AstStatementForeach foreach) {
-				nameProvider.getQualifiedName(foreach);
-				super.caseAstStatementForeach(foreach);
-				return null;
-			}
-
-		}.doSwitch(entity);
+	private String getName(EObject object) {
+		return resolver.getValue(object);
 	}
 
 }
