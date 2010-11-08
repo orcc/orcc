@@ -30,11 +30,9 @@ package net.sf.orcc.cal.naming;
 
 import java.util.Collections;
 
-import net.sf.orcc.cal.cal.AstAction;
-import net.sf.orcc.cal.cal.AstGenerator;
-import net.sf.orcc.cal.cal.AstStatementForeach;
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstTag;
-import net.sf.orcc.cal.cal.CalPackage;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.util.CollectionsUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -56,8 +54,6 @@ import com.google.inject.Provider;
 public class CalQualifiedNameProvider extends
 		IQualifiedNameProvider.AbstractImpl {
 
-	private int blockCount;
-
 	@Inject
 	private IResourceScopeCache cache = IResourceScopeCache.NullImpl.INSTANCE;
 
@@ -72,8 +68,6 @@ public class CalQualifiedNameProvider extends
 
 	private SimpleAttributeResolver<EObject, String> resolver = SimpleAttributeResolver
 			.newResolver(String.class, "name");
-
-	private int untaggedCount;
 
 	public String getDelimiter() {
 		return ".";
@@ -91,24 +85,18 @@ public class CalQualifiedNameProvider extends
 						String value = resolver.getValue(temp);
 						if (value == null)
 							return null;
-						while (temp.eContainer() != null) {
-							temp = temp.eContainer();
-							if (temp != null) {
-								switch (temp.eClass().getClassifierID()) {
-								case CalPackage.AST_ACTION:
-								case CalPackage.AST_FUNCTION:
-								case CalPackage.AST_INPUT_PATTERN:
-								case CalPackage.AST_PROCEDURE:
-									return value;
-								}
-							}
 
-							String parentsName = getQualifiedName(temp);
-							if (parentsName != null) {
+						if (temp instanceof AstActor || temp instanceof AstUnit) {
+							return value;
+						} else {
+							EObject cter = temp.eContainer();
+							if (cter instanceof AstUnit) {
+								String parentsName = getQualifiedName(cter);
 								return parentsName + getDelimiter() + value;
 							}
 						}
-						return value;
+
+						return null;
 					}
 
 				});
@@ -123,47 +111,8 @@ public class CalQualifiedNameProvider extends
 		return "*";
 	}
 
-	/**
-	 * Resets the block count and returns the qualified name of the tag of the
-	 * given action.
-	 * 
-	 * @param action
-	 *            an action
-	 * @return the action's tag qualified name
-	 */
-	public String qualifiedName(AstAction action) {
-		AstTag tag = action.getTag();
-		if (tag == null) {
-			return "untagged_" + untaggedCount++;
-		} else {
-			return getQualifiedName(tag);
-		}
-	}
-
-	public String qualifiedName(AstGenerator generator) {
-		return "generator" + blockCount++;
-	}
-
-	public String qualifiedName(AstStatementForeach foreach) {
-		return "foreach" + blockCount++;
-	}
-
 	public String qualifiedName(AstTag tag) {
 		return CollectionsUtil.toString(tag.getIdentifiers(), ".");
-	}
-
-	/**
-	 * Resets the block count.
-	 */
-	public void resetBlockCount() {
-		blockCount = 0;
-	}
-
-	/**
-	 * Resets the untagged action count.
-	 */
-	public void resetUntaggedCount() {
-		untaggedCount = 0;
 	}
 
 }
