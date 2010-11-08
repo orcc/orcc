@@ -1,9 +1,11 @@
 actor Dave_Null () 
-	uint(size=32) Token
-	==>
+		==>
+	int(size=16) Token
     :
 	a: action
-			Token:[b]
 				==>
-	end
+			Token:[42]
+		guard
+			1=0
+		end
 end
