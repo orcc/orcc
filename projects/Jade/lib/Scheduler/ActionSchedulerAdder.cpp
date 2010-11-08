@@ -45,7 +45,6 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Core/InstancedActor.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Instance.h"
 
@@ -59,27 +58,26 @@ using namespace llvm;
 using namespace std;
 
 ActionSchedulerAdder::ActionSchedulerAdder(Instance* instance, Decoder* decoder, llvm::LLVMContext& C) : Context(C) {
-	this->actor = instance->getActor();
 	this->decoder = decoder;
 	this->instance = instance;
 	this->outsideSchedulerFn = NULL;
 
 	createScheduler(instance->getActionScheduler());
 
-	if (actor->hasInitializes()){
-		createInitialize(instancedActor->getInitializes());
+	if (instance->hasInitializes()){
+		createInitialize(instance->getInitializes());
 	}
 
 }
 
 void ActionSchedulerAdder::createScheduler(ActionScheduler* actionScheduler){
 		Function* scheduler = createSchedulerFn(actionScheduler);
-		instancedActor->getActionScheduler()->setSchedulerFunction(scheduler);
+		actionScheduler->setSchedulerFunction(scheduler);
 }
 
 void ActionSchedulerAdder::createInitialize(list<Action*>* initializes){
 	Function* initialize = createInitializeFn(initializes);
-	instancedActor->getActionScheduler()->setInitializeFunction(initialize);
+	instance->getActionScheduler()->setInitializeFunction(initialize);
 }
 
 Function* ActionSchedulerAdder::createInitializeFn(list<Action*>* initializes){

@@ -7,7 +7,6 @@ add_library (Decoder
   BroadcastActor.cpp
   BroadcastAdder.cpp
   BroadcastAdder.h
-  InstancedActor.cpp
   Decoder.cpp
   Instanciator.cpp
   Instanciator.h

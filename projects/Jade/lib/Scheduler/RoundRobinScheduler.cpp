@@ -54,7 +54,6 @@
 #include "Jade/JIT.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
-#include "Jade/Core/InstancedActor.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Variable.h"
 #include "Jade/Decoder/Decoder.h"
@@ -115,13 +114,13 @@ RoundRobinScheduler::~RoundRobinScheduler (){
 }
 
 void RoundRobinScheduler::createScheduler(){
-	map<Instance*, InstancedActor*>::iterator it;
+	map<string, Instance*>::iterator it;
 	
 	Module* module = decoder->getModule();
 	LLVMContext &Context = getGlobalContext();
 
 	// create scheduler
-	map<Instance*, InstancedActor*>* InstancedActors = decoder->getInstancedActors();
+	map<string, Instance*>* instances = decoder->getInstances();
 	scheduler = cast<Function>(module->getOrInsertFunction("main", Type::getVoidTy(Context),
                                           (Type *)0));
 										  
@@ -133,9 +132,8 @@ void RoundRobinScheduler::createScheduler(){
 	BasicBlock* BB = BasicBlock::Create(Context, "bb", scheduler);
 
 	//Add initialize scheduler
-	for (it = InstancedActors->begin(); it != InstancedActors->end(); ++it){
-		Instance* instanceTest = (*it).first;
-		InstancedActor* instance = (*it).second;
+	for (it = instances->begin(); it != instances->end(); ++it){
+		Instance* instance = (*it).second;
 		ActionScheduler* scheduler = instance->getActionScheduler();
 		if (scheduler->hasInitializeScheduler()){
 			CallInst *Add1CallRes = CallInst::Create(scheduler->getInitializeFunction(), "", BBEntry);
@@ -146,9 +144,8 @@ void RoundRobinScheduler::createScheduler(){
 	Instruction* brEntryInst = BranchInst::Create(BB, BBEntry);
  
 	//Add action scheduler
-	for (it = InstancedActors->begin(); it != InstancedActors->end(); ++it){
-		Instance* instanceTest = (*it).first;
-		InstancedActor* instance = (*it).second;
+	for (it = instances->begin(); it != instances->end(); ++it){
+		Instance* instance = (*it).second;
 		ActionScheduler* scheduler = instance->getActionScheduler();
 		CallInst *Add1CallRes = CallInst::Create(scheduler->getSchedulerFunction(), "", BB);
 	}

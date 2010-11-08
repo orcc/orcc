@@ -45,7 +45,6 @@
 
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Core/InstancedActor.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Vertex.h"
 #include "Jade/Core/Network.h"
@@ -92,18 +91,17 @@ void Instanciator::updateConnection(Connection* connection){
 		Port* srcPortInst = connection->getSourcePort();
 
 		// Get same port from the instanced actor
-		Port* srcPortActor = source->getActor()->getOutput(srcPortInst->getName());
-		sourceString = srcPortActor->getName();
-		srcPortType = srcPortActor->getType();
+		Port* srcPort = source->getOutput(srcPortInst->getName());
+		sourceString = srcPort->getName();
+		srcPortType = srcPort->getType();
 
-		if (srcPortActor == NULL){
+		if (srcPort == NULL){
 			fprintf(stderr,"A Connection refers to non-existent source port: %s of instance %s", srcPortInst->getName(), source->getId());
 			exit(0);
 		}
 
 		// Bound GlobalVariable to port from instance
-		Port* port = source->getPort(srcPortInst->getName());
-		connection->setSourcePort(port);
+		connection->setSourcePort(srcPort);
 	}
 
 	// Update target 
@@ -115,18 +113,17 @@ void Instanciator::updateConnection(Connection* connection){
 		Port* dstPortInst = connection->getDestinationPort();
 
 		// Get same port from the instanced actor 
-		Port* dstPortActor = target->getActor()->getInput(dstPortInst->getName());
-		targetString = dstPortActor->getName();
-		dstPortType = dstPortActor->getType();
+		Port* dstPort = target->getInput(dstPortInst->getName());
+		targetString = dstPort->getName();
+		dstPortType = dstPort->getType();
 
-		if (dstPortActor == NULL){
-			fprintf(stderr,"A Connection refers to non-existent destination port: %s of instance %s", dstPortInst->getName(), target->getId());
+		if (dstPort == NULL){
+			fprintf(stderr,"A Connection refers to non-existent destination port: %s of instance %s", dstPort->getName(), target->getId());
 			exit(0);
 		}
 
 		// Bound GlobalVariable to port from instance
-		Port* port = target->getPort(dstPortActor->getName());
-		connection->setDestinationPort(port);
+		connection->setDestinationPort(dstPort);
 	}
 
 	// check port types match

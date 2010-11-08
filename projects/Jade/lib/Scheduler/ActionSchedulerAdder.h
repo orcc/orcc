@@ -105,7 +105,6 @@ private:
 	Decoder* decoder;
 	InstancedActor* instancedActor;
 	Instance* instance;
-	Actor* actor;
 
 	llvm::GlobalVariable* stateVar;
 	std::map<FSM::State*, llvm::BasicBlock*> BBTransitions;

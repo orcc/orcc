@@ -47,7 +47,6 @@
 #include "Jade/JIT.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Core/InstancedActor.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Port.h"
@@ -92,23 +91,9 @@ int Decoder::instanciate(){
 	
 	return 0;
 }
-/*
-void Decoder::createActorInstances(){
-	// Initialize all instances into the decoder
-	map<string, Instance*>::iterator it;
-	map<string, Instance*>* instances = network->getInstances();
-	
-
-	for(it = instances->begin(); it != instances->end(); ++it){
-		map<std::string, Actor*>::iterator itActor;
-
-		Instance* instance = (*it).second;
-		itActor = actors->find(instance->getClasz());
-		instance->setActor(itActor->second);
-
-		InstancedActor* instancedActor = createInstance(instance);
-	}
-}*/
+void Decoder::addInstance(Instance* instance){
+	instances->insert(std::pair<std::string, Instance*>(instance->getId(), instance));
+};
 
 Actor* Decoder::getActor(std::string name){
 	map<string, Actor*>::iterator it;

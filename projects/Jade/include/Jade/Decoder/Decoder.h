@@ -54,7 +54,6 @@ namespace llvm{
 class Actor;
 class Decoder;
 class Instance;
-class InstancedActor;
 class JIT;
 class Network;
 class BroadcastAdder;
@@ -95,14 +94,6 @@ public:
 	JIT* getJIT(){return jit;};
 
 	/**
-     *  @brief Getter of instancedFus
-	 *
-	 *  @return a map of instanced FU
-	 *
-     */
-	std::map<Instance*, InstancedActor*>* getInstancedActors(){return &instancedActors;};
-
-	/**
      *  @brief Getter of fifo
 	 *
 	 *  @return Fifo bound to this decoder
@@ -128,6 +119,15 @@ public:
 	 *
      */
 	std::map<std::string, Instance*>* getInstances(){return instances;};
+
+	/**
+     *  @brief Add an instance
+	 * 
+	 *	Add an instance in the decoder
+	 *
+	 *  @param instace: Instance to add in the decoder
+     */
+	void addInstance(Instance* instance);
 
 	/**
      *  @brief return the actor corresponding to the given name
@@ -206,9 +206,6 @@ private:
 	/** List of instances in the decoder */
 	std::map<std::string, Instance*>* instances;
 	
-	/** List of instanced Functional Unit in the decoder */
-	std::map<Instance*, InstancedActor*> instancedActors;
-
 	/** List of Fifo in the decoder */
 	std::list<AbstractFifo*> fifos;
 

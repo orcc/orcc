@@ -48,7 +48,6 @@
 #include "Jade/JIT.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Core/InstancedActor.h"
 #include "Jade/Fifo/AbstractFifo.h"
 //------------------------------
 

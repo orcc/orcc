@@ -141,14 +141,8 @@ private:
 	/** fifo used in the decoder */
 	AbstractFifo* fifo;
 
-	/** list of instance created */
-	std::map<Instance*, InstancedActor*> instancedBroad;
-
 	/** list of connections to be removed */
 	std::list<Connection*> toBeRemoved;
-
-	/** list of instanced actors in the decoder */
-	std::map<Instance*, InstancedActor*>* instancedActors;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

@@ -62,21 +62,13 @@ IRWriter::~IRWriter(){
 bool IRWriter::write(Decoder* decoder){
 	writer = new LLVMWriter(instance->getId()+"_", decoder);
 	
-	writeInstance();
-	// Instanciate actor
-/*	map<string, Port*>* inputs = jit->createPorts(instance, actor->getInputs());
-	map<string, Port*>* outputs = jit->createPorts(instance, actor->getOutputs());
-	map<Variable*, GlobalVariable*>* stateVars = jit->createVariables(instance, actor->getStateVars());
-	map<Variable*, GlobalVariable*>* parameters = jit->createVariables(instance, actor->getParameters());
-	map<Procedure*, Function*>* procs = jit->createProcedures(instance, actor->getProcs());
-	list<Action*>* initializes = jit->createInitializes(instance, actor->getInitializes());
-	list<Action*>* actions = jit->createActions(instance, actor->getActions(), inputs, outputs);
-	ActionScheduler* actionScheduler = jit->createActionScheduler(instance, actor->getActionScheduler());*/
+	writeInstance(decoder);
 
+	// Instanciate actor
 	return true;
 }
 
-void IRWriter::writeInstance(){
+void IRWriter::writeInstance(Decoder* decoder){
 	
 	//Write instance elements
 	inputs = writePorts(actor->getInputs());
@@ -88,6 +80,8 @@ void IRWriter::writeInstance(){
 	list<Action*>* actions = writeActions(actor->getActions());
 	actionScheduler = writeActionScheduler(actor->getActionScheduler());
 
+	//Make the instance concrete
+	instance->makeConcrete(decoder, actor, inputs, outputs, stateVars, parameters, procs, initializes, actions, actionScheduler);
 }
 
 std::map<std::string, Port*>* IRWriter::writePorts(map<string, Port*>* ports){

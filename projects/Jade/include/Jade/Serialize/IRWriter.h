@@ -89,7 +89,7 @@ private:
 	/**
 	 * @brief Write the instance
 	 */
-	void writeInstance();
+	void writeInstance(Decoder* decoder);
 
 	/**
 	 * @brief Writer a list of ports

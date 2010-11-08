@@ -41,7 +41,6 @@
 
 #include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Core/InstancedActor.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Instance.h"
 #include "Jade/Core/Network.h"
@@ -58,7 +57,6 @@ BroadcastAdder::BroadcastAdder(llvm::LLVMContext& C, Decoder* decoder) : Context
 	this->fifo = decoder->getFifo();
 	this->graph = decoder->getNetwork()->getGraph();
 	this->decoder = decoder;
-	this->instancedActors =  decoder->getInstancedActors();
 }
 
 BroadcastAdder::~BroadcastAdder (){
@@ -127,8 +125,8 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				
 				//Instanciate broadcast
 				Instance* newInstance = new Instance(name, actorBCast);
-				InstancedActor* instancedActor = actorBCast->instanciate(newInstance);
-				instancedActors->insert(pair<Instance*, InstancedActor*>(newInstance, instancedActor));
+				actorBCast->instanciate(newInstance);
+				decoder->addInstance(newInstance);
 				
 				//Set a new vertex in the graph
 				Vertex* vertextBCast = new Vertex(newInstance);

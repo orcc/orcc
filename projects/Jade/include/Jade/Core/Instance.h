@@ -47,7 +47,9 @@ namespace llvm{
 }
 
 #include "Jade/Core/Actor.h"
+
 class BroadcastActor;
+class Decoder;
 class Expr;
 class Port;
 class InstancedActor;
@@ -80,7 +82,17 @@ public:
 		this->id = id;
 		this->clasz = clasz;
 		this->parameterValues = parameterValues;
+		this->broadcast = NULL;
 		this->actor = NULL;
+		this->decoder = NULL;
+		this->inputs = NULL;
+		this->outputs = NULL;
+		this->stateVars = NULL;
+		this->parameters = NULL;
+		this->procedures = NULL;
+		this->initializes = NULL;
+		this->actions = NULL;
+		this->actionScheduler = NULL;
 	}
 
 	/*!
@@ -95,6 +107,16 @@ public:
 	Instance(std::string id, BroadcastActor* broadcast){
 		this->id = id;
 		this->broadcast = broadcast;
+		this->actor = NULL;
+		this->decoder = NULL;
+		this->inputs = NULL;
+		this->outputs = NULL;
+		this->stateVars = NULL;
+		this->parameters = NULL;
+		this->procedures = NULL;
+		this->initializes = NULL;
+		this->actions = NULL;
+		this->actionScheduler = NULL;
 	}
 
 	~Instance();
@@ -122,6 +144,15 @@ public:
      *
      */
 	Actor* getActor(){return actor;};
+
+
+	/*!
+     * @brief Return true if this instance is concrete
+     *
+	 * @return true if the instance is concrete, otherwise false
+     *
+     */
+	bool isConcrete(){return decoder!=NULL;};
 
 	/*!
      *  @brief Setter of actor
@@ -174,7 +205,7 @@ public:
    	 *
 	 *  @return ActionScheduler of the instanced functional unit
      */
-	ActionScheduler* getActionScheduler(){return scheduler;};
+	ActionScheduler* getActionScheduler(){return actionScheduler;};
 
 	/**
 	 * @brief Getter of stateVars
@@ -216,6 +247,71 @@ public:
 	 */
 	Procedure* getProcedure(std::string name);
 
+	/**
+     *  @brief get initializes actions of the instance
+	 *
+	 *  @return a list of initializes actions
+	 *
+     */
+	std::list<Action*>* getInitializes(){return initializes;};
+
+	/**
+     *  @brief return true if the instance has initialize actions
+	 *
+	 *  @return true if instance has initializes actions, otherwise false
+	 *
+     */
+	bool hasInitializes() {return !initializes->empty();};
+
+	/**
+	 * @brief make the instance Concrete
+	 *
+	 * Bound this decoder to an actor and a decoder
+	 * 
+	 * @param decoder: Decoder that store the instance
+	 *
+	 * @param actor: Initial Actor of the instance
+	 *
+	 * @param inputs: inputs ports in decoder of the instance
+	 *
+	 * @param outputs: outputs ports in decoder of the instance
+	 *
+	 * @param stateVars: state variable in decoder of the instance
+	 *
+	 * @param parameters: parameters in decoder of the instance
+	 *
+	 * @param procs: procedures in decoder of the instance
+	 *
+	 * @param initializes: initialization actions in decoder of the instance
+	 *
+	 * @param actions: actions in decoder of the instance
+	 *
+	 * @param actionScheduler: actionScheduler in decoder of the instance
+	 *
+	 * @return the corresponding procedure
+	 */
+	void makeConcrete(Decoder* decoder, Actor* actor,	
+					  std::map<std::string, Port*>* inputs,
+					  std::map<std::string, Port*>* outputs,
+					  std::map<std::string, Variable*>* stateVars,
+					  std::map<std::string, Variable*>* parameters,	
+					  std::map<std::string, Procedure*>* procs,	
+					  std::list<Action*>* initializes,
+					  std::list<Action*>* actions,
+					  ActionScheduler* actionScheduler){
+	this->actor = actor;
+	this->decoder = decoder;
+	this->inputs = inputs;
+	this->outputs = outputs;
+	this->stateVars = stateVars;
+	this->parameters = parameters;
+	this->procedures = procs;
+	this->initializes = initializes;
+	this->actions = actions;
+	this->actionScheduler = actionScheduler;
+	solveParameters(); 
+};
+
 	
 private:
 
@@ -237,8 +333,17 @@ private:
 	/* Class of an instance */
 	std::string clasz;	
 
-	/* Actor parent to this instance */
+	/**
+	 * the actor referenced by this instance. May be null< if this
+	 * instance references a network or a broadcast.
+	 */
 	Actor* actor;
+
+
+	/**
+	 * the decoder where the instance has been made concrete.
+	 */
+	Decoder* decoder;
 
 	/**
 	 * the broadcast referenced by this instance. May be null if
@@ -259,12 +364,8 @@ private:
 	/** Procedures of this actor */
 	std::map<std::string, Procedure*>* procedures;
 
-	/** Action scheduler of the instance */
-	ActionScheduler* scheduler;
-
 	/** Actions of the instance */
 	std::list<Action*>* actions;
-
 	
 	/** Action scheduler of the instance */
 	ActionScheduler* actionScheduler;

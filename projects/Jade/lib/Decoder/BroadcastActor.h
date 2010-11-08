@@ -104,7 +104,7 @@ public:
 	 *
 	 *  @return the corresponding InstancedActor
      */
-	InstancedActor* instanciate(Instance* instance);
+	void instanciate(Instance* instance);
 private:
 
 	/** The current decoder  */

@@ -50,7 +50,6 @@
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Core/InstancedActor.h"
 #include "Jade/Fifo/AbstractFifo.h"
 //------------------------------
 
@@ -93,7 +92,7 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 
 }
 
-InstancedActor* BroadcastActor::instanciate(Instance* instance){
+void BroadcastActor::instanciate(Instance* instance){
 	map<string, Port*>::iterator it;
 	map<string, Port*>* instancedInputs = new map<string, Port*>();
 	map<string, Port*>* instancedOutputs = new map<string, Port*>();
@@ -106,9 +105,7 @@ InstancedActor* BroadcastActor::instanciate(Instance* instance){
 		instancedOutputs->insert(pair<string, Port*>((*it).second->getName(), (*it).second));
 	}
 
-
-	return new InstancedActor(decoder, instance, instancedInputs, instancedOutputs, new map<Variable*, GlobalVariable*>(), new map<Variable*, GlobalVariable*>(), new map<Procedure*, Function*>(), new list<Action*>(), new list<Action*>(), actionScheduler);
-
+	instance->makeConcrete(decoder, this, instancedInputs, instancedOutputs, new map<string, Variable*>(), new map<string, Variable*>(), new map<string, Procedure*>(), new list<Action*>(), new list<Action*>(), actionScheduler);
 }
 
 
