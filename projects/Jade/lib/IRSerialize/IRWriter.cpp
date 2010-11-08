@@ -43,14 +43,16 @@
 #include "Jade/JIT.h"
 
 #include "llvm/Module.h"
+
+#include "IRConstant.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
-IRWriter::IRWriter(Actor* actor, Instance* instance){
-	this->actor = actor;
+IRWriter::IRWriter(Instance* instance){
 	this->instance = instance;
+	this->actor = instance->getActor();
 }
 
 IRWriter::~IRWriter(){
@@ -69,10 +71,13 @@ bool IRWriter::write(Decoder* decoder){
 }
 
 void IRWriter::writeInstance(Decoder* decoder){
+	//Get ports from the instance
+	inputs = instance->getInputs();
+	outputs = instance->getOutputs();
 	
 	//Write instance elements
-	inputs = writePorts(actor->getInputs());
-	outputs = writePorts(actor->getOutputs());
+	writePorts(IRConstant::KEY_INPUTS, actor->getInputs());
+	writePorts(IRConstant::KEY_OUTPUTS, actor->getOutputs());
 	stateVars = writeVariables(actor->getStateVars());
 	parameters = writeVariables(actor->getParameters());
 	procs = writeProcedures(actor->getProcs());
@@ -81,10 +86,10 @@ void IRWriter::writeInstance(Decoder* decoder){
 	actionScheduler = writeActionScheduler(actor->getActionScheduler());
 
 	//Make the instance concrete
-	instance->makeConcrete(decoder, actor, inputs, outputs, stateVars, parameters, procs, initializes, actions, actionScheduler);
+	instance->makeConcrete(decoder, stateVars, parameters, procs, initializes, actions, actionScheduler);
 }
 
-std::map<std::string, Port*>* IRWriter::writePorts(map<string, Port*>* ports){
+std::map<std::string, Port*>* IRWriter::writePorts(string key, map<string, Port*>* ports){
 	map<string, Port*>::iterator it;
 	map<string, Port*>* newPorts = new map<string, Port*>();
 
@@ -94,18 +99,32 @@ std::map<std::string, Port*>* IRWriter::writePorts(map<string, Port*>* ports){
 		Port* port = it->second;
 
 		//Create and store port for the instance
-		Port* newPort = writePort(port);
-		newPorts->insert(pair<string, Port*>(name, newPort));
+		writePort(key, port);
 	}
 
 	return newPorts;
 }
 
-Port* IRWriter::writePort(Port* port){
+void IRWriter::writePort(string key, Port* port){
+	string name = port->getName();
 	GlobalVariable* portVar = port->getGlobalVariable();
 	GlobalVariable* globalVariable = writer->createVariable(portVar);
-	
-	return new Port(port->getName(), port->getType(), globalVariable);
+	Port* instPort = NULL;
+
+	if (key == IRConstant::KEY_INPUTS){
+		instPort = instance->getInput(name);
+	}else{
+		instPort = instance->getPort(name);
+	}
+
+	//Port not found
+	if (instPort == NULL){
+		fprintf(stderr,"Port %s as not been found in instance %s", name, instance->getId());
+		exit(0);
+	}
+
+	//Set global variable to the instance port
+	instPort->setGlobalVariable(globalVariable);
 }
 
 map<string, Variable*>* IRWriter::writeVariables(map<string, Variable*>* vars){

@@ -74,15 +74,4 @@ public:
 	static const std::string KEY_STATE_VARS;
 };
 
-const std::string IRConstant::KEY_ACTION_SCHED = "action_scheduler";
-const std::string IRConstant::KEY_ACTIONS= "actions";
-const std::string IRConstant::KEY_INITIALIZES= "initializes";
-const std::string IRConstant::KEY_INPUTS= "inputs";
-const std::string IRConstant::KEY_NAME= "name";
-const std::string IRConstant::KEY_OUTPUTS= "outputs";
-const std::string IRConstant::KEY_PARAMETERS= "parameters";
-const std::string IRConstant::KEY_PROCEDURES= "procedures";
-const std::string IRConstant::KEY_SOURCE_FILE= "source_file";
-const std::string IRConstant::KEY_STATE_VARS= "state_variables";
-
 #endif

@@ -48,12 +48,9 @@ namespace llvm {
 }
 
 #include "Jade/Core/Type.h"
-#include "Jade/Core/Actor.h"
-#include "Jade/Core/Instance.h"
 
+class Actor;
 class AbstractFifo;
-class InputPort;
-class OutputPort;
 //------------------------------
 
 
@@ -126,6 +123,16 @@ public:
 	 *
 	 */
 	llvm::Type* getType(){return type;};
+
+	/**
+	 * @brief Setter of type
+	 *
+	 * Set the type of the port
+	 * 
+	 * @param type : llvm::Type of the port
+	 *
+	 */
+	void setType(llvm::Type* type){this->type = type;};
 
 
 	/**

@@ -56,7 +56,7 @@
 using namespace std;
 using namespace llvm;
 
-BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string name, int numOutputs, IntegerType* type, AbstractFifo* fifo): Actor(name, "", fifo->getFifoTypes(), 
+BroadcastActor::BroadcastActor(llvm::LLVMContext& C, string name, int numOutputs, IntegerType* type, AbstractFifo* fifo): Actor(name, "", fifo->getFifoTypes(), 
 		  new map<string, Port*>(), new map<string, Port*>(), new map<string, Variable*>(), new map<string, Variable*>(), new map<string, Procedure*>(), new list<Action*> (),
 		  new list<Action*> (), NULL) , Context(C)
 {
@@ -66,8 +66,13 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 	this->decoder = decoder;
 	this->actionScheduler = new ActionScheduler(new list<Action*>(), NULL);
 	
-	module = decoder->getModule();
+	module = new Module(name, Context);
 
+	//Create the broadcast actor
+	createActor();
+}
+
+void BroadcastActor::createActor(){
 	// Getting type of fifo
 	StructType* structType = fifo->getFifoType(cast<IntegerType>(type));
 	PointerType* fifoType = (PointerType*)structType->getPointerTo();
@@ -88,176 +93,146 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, string na
 		outputs->insert(pair<string, Port*>(outputName.str(), outputPort));
 	}
 
-	actionScheduler->setSchedulerFunction(createActionScheduler());
-
+	//Create action of the broadcast actor
+	createAction();
+	
+	//Create action scheduler
+	actionScheduler = new ActionScheduler(actions, NULL);
 }
 
-void BroadcastActor::instanciate(Instance* instance){
-	map<string, Port*>::iterator it;
-	map<string, Port*>* instancedInputs = new map<string, Port*>();
-	map<string, Port*>* instancedOutputs = new map<string, Port*>();
+void BroadcastActor::createAction(){
+	//Set properties of the action
+	ActionTag* actionTag = new ActionTag();
+	Procedure* scheduler = createScheduler();
+	Procedure* body = createBody();
+	map<Port*, ConstantInt*>* inputPattern = createPattern(inputs);
+	map<Port*, ConstantInt*>* outputPattern = createPattern(outputs);
 	
-	for (it = inputs->begin(); it != inputs->end(); it++){
-		instancedInputs->insert(pair<string, Port*>((*it).second->getName(), (*it).second));
-	}
-	
-	for (it = outputs->begin(); it != outputs->end(); it++){
-		instancedOutputs->insert(pair<string, Port*>((*it).second->getName(), (*it).second));
-	}
-
-	instance->makeConcrete(decoder, this, instancedInputs, instancedOutputs, new map<string, Variable*>(), new map<string, Variable*>(), new map<string, Procedure*>(), new list<Action*>(), new list<Action*>(), actionScheduler);
+	//Add action to the actor
+	Action* action = new Action(actionTag, inputPattern, outputPattern, scheduler, body);
+	actions->push_back(action);
 }
 
-
-Function* BroadcastActor::createActionScheduler(){
-	// Create an new broadcast module
-	map<string, Port*>::iterator it;
-
-	// Creating action scheduler 
-	FunctionType *FTy = FunctionType::get(Type::getVoidTy(Context),false);
-	Function *NewF = Function::Create(FTy, Function::InternalLinkage , name+"_scheduler", module);
+Procedure* BroadcastActor::createScheduler(){
+	//Name of the scheduler
+	string isSchedulableName = "isSchedulable_" + name;
 	
+	// Creating scheduler function
+	FunctionType *FTy = FunctionType::get(Type::getInt1Ty(Context),false);
+	Function *NewF = Function::Create(FTy, Function::InternalLinkage , isSchedulableName, module);
+
 	// Add the first basic block entry into the function.
 	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", NewF);
 
-	// Add the basic block input to test input status of the broadcast.
-	BasicBlock* BBFirst = BasicBlock::Create(Context, "bb", NewF);
-
-	//Branch entry to input basic bloc
-	BranchInst::Create( BBFirst, BBEntry);
-
-	// Add a basic block to bb to the scheduler.
-	BasicBlock* Bret = BasicBlock::Create(Context, "ret", NewF);
-	
-
 	//Create a test for input port
-	Port* input = getInput();
-	LoadInst* inputStruct = new LoadInst(input->getGlobalVariable(), "l"+input->getName(), BBFirst);
-	BasicBlock* bbInput = createHasTokenTest(NewF, inputStruct, getInput(),BBFirst, Bret);
+	Value* hasTokenValue = createHasTokenTest(getInput(), BBEntry);
 
-	//Create a test for output port
-	BasicBlock* bbFifo = bbInput;
-	map<string, Port*>* outputs = getOutputs();
-	list<LoadInst*> outputsStruct;
+	//Return resut
+	ReturnInst* returnInst = ReturnInst::Create(Context, hasTokenValue, BBEntry);
+
+	return new Procedure(isSchedulableName, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);
+}
+
+Procedure* BroadcastActor::createBody(){
+	//Name of the scheduler
+	string bodyName = name + "_scheduler";
 	
-	for (it = outputs->begin(); it != outputs->end(); it++){
-		Port* port = (*it).second;
-		LoadInst* outputStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), bbFifo);
-		outputsStruct.push_back(outputStruct);
-		bbFifo = createHasRoomTest(NewF, outputStruct, port , bbFifo, Bret);
+	// Creating scheduler function
+	FunctionType *FTy = FunctionType::get(Type::getVoidTy(Context),false);
+	Function *NewF = Function::Create(FTy, Function::InternalLinkage , bodyName, module);
 
-	}
+	// Add the first basic block entry into the function.
+	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", NewF);
 
 	//Read fifo from output
-	Value* token = createReadFifo(input, inputStruct, bbFifo);
+	Value* token = createReadFifo(getInput(), BBEntry);
 
 	//Write token to output
-	list<LoadInst*>::iterator itOut = outputsStruct.begin();
+	map<string, Port*>::iterator it;
+	
 	for (it = outputs->begin(); it != outputs->end(); it++){
-		createWriteFifo((*it).second, (*itOut), token , bbFifo);
-		itOut++;
+		createWriteFifo(it->second, token , BBEntry);
 	}
 
 	//Create setReadEnd on input
-	createSetReadEnd(input, inputStruct, bbFifo);
+	createSetReadEnd(getInput(), BBEntry);
 
-	//Create setWriteEnd on outputs
-	itOut = outputsStruct.begin();
-	for (it = outputs->begin(); it != outputs->end(); it++){
-		createSetWriteEnd((*it).second, (*itOut),  bbFifo);
-		itOut++;
-	}
-
-	//Branch to return basic bloc
-	BranchInst::Create( BBFirst, bbFifo);
-
-	// Create the return instruction and add it to the basic block.
-	ReturnInst::Create(Context, Bret);
-
-	return NewF;
+	return new Procedure(bodyName, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);;
 }
 
+map<Port*, ConstantInt*>* BroadcastActor::createPattern(map<string, Port*>* ports){
+	map<string, Port*>::iterator it;
+	map<Port*, ConstantInt*>* pattern = new map<Port*, ConstantInt*>();
 
-BasicBlock* BroadcastActor::createHasTokenTest(Function* func, LoadInst* fifoStruct, Port* port, BasicBlock* current, BasicBlock* ret){
+	//Set pattern to one token to test on port
+	for (it = ports->begin(); it != ports->end(); it++){
+		ConstantInt* one = ConstantInt::get(Type::getInt32Ty(Context), 1);
+		pattern->insert(pair<Port*, ConstantInt*>(it->second, one));
+	}
 
+	return pattern;
+}
+
+Value* BroadcastActor::createHasTokenTest(Port* port, BasicBlock* current){
+	//Load port structure
+	LoadInst* inputStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), current);
+	
 	// Call hasToken
 	vector<Value*> vector;
-	vector.push_back(fifoStruct);
+	vector.push_back(inputStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
 	CallInst* retVal = CallInst::Create(fifo->getHasTokenFunction(port->getType()), vector.begin(), vector.end(), "c"+port->getName(), current);
 	TruncInst* truncInst = new TruncInst(retVal, Type::getInt1Ty(Context), "t"+port->getName(), current);
 
-	// Add a basic block to bb to the scheduler.
-	BasicBlock* newBB = BasicBlock::Create(Context, port->getName(), func);
-
-	BranchInst::Create( newBB, ret, truncInst, current);
-
-	return newBB;
+	//Return the result
+	return truncInst;
 
 }
 
-BasicBlock* BroadcastActor::createHasRoomTest(Function* func, LoadInst* fifoStruct, Port* port, BasicBlock* current, BasicBlock* ret){
-
-	// Call hasToken
-	vector<Value*> vector;
-	vector.push_back(fifoStruct);
-	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
-
-	CallInst* retVal = CallInst::Create(fifo->getHasRoomFunction(port->getType()), vector.begin(), vector.end(), "c"+port->getName(), current);
-	TruncInst* truncInst = new TruncInst(retVal, Type::getInt1Ty(Context), "t"+port->getName(), current);
-
-	// Add a basic block to bb to the scheduler.
-	BasicBlock* newBB = BasicBlock::Create(Context, port->getName(), func);
-
-	BranchInst::Create( newBB, ret, truncInst, current);
-
-	return newBB;
-
-}
-
-
-Value* BroadcastActor::createReadFifo(Port* port, LoadInst* fifoStruct, BasicBlock* current){
+Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
+	//Load port structure
+	LoadInst* inputStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), current);
+	
 	// Call readPtr
 	vector<Value*> vector;
-	vector.push_back(fifoStruct);
+	vector.push_back(inputStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
 	CallInst* retVal = CallInst::Create(fifo->getReadFunction(port->getType()), vector.begin(), vector.end(), "tokenPtr", current);
 	
+	//Return token value
 	return new LoadInst(retVal,"token", current);
-
 }
 
-void BroadcastActor::createWriteFifo(Port* port, LoadInst* fifoStruct, Value* token ,BasicBlock* current){
+void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* current){
+
+	//Load port structure
+	LoadInst* portStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), current);
 
 	// Call readPtr
 	vector<Value*> vector;
-	vector.push_back(fifoStruct);
+	vector.push_back(portStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
 	CallInst* retVal = CallInst::Create(fifo->getWriteFunction(port->getType()), vector.begin(), vector.end(), "w"+port->getName(), current);
 	
-	new StoreInst (token, retVal, current);
+	//Store token value
+	StoreInst* storeInst = new StoreInst (token, retVal, current);
+
+	// Call setWriteEnd
+	CallInst::Create(fifo->getWriteEndFunction(port->getType()), vector.begin(), vector.end(), "", current);
 
 }
 
-void BroadcastActor::createSetReadEnd(Port* port, LoadInst* fifoStruct,BasicBlock* current){
+void BroadcastActor::createSetReadEnd(Port* port, BasicBlock* current){
+	//Load port structure
+	LoadInst* inputStruct = new LoadInst(port->getGlobalVariable(), "l"+ port->getName(), current);
 
 	// Call readPtr
 	vector<Value*> vector;
-	vector.push_back(fifoStruct);
+	vector.push_back(inputStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
 	CallInst* retVal = CallInst::Create(fifo->getReadEndFunction(port->getType()), vector.begin(), vector.end(), "", current);
-}
-
-void BroadcastActor::createSetWriteEnd(Port* port, LoadInst* fifoStruct,BasicBlock* current){
-
-	// Call readPtr
-	vector<Value*> vector;
-	vector.push_back(fifoStruct);
-	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
-
-	CallInst* retVal = CallInst::Create(fifo->getWriteEndFunction(port->getType()), vector.begin(), vector.end(), "", current);
 }

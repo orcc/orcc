@@ -44,6 +44,7 @@
 #include<list>
 
 #include "Jade/Core/Variable.h"
+#include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/Procedure.h"
 
@@ -55,7 +56,6 @@ namespace llvm{
 class Variable;
 class Instance;
 class FuncUnit;
-class Port;
 class Procedure;
 class ActionScheduler;
 //------------------------------
@@ -348,32 +348,6 @@ public:
 	 *
      */
 	virtual bool isParseable(){return true;};
-
-	/**
-     *  @brief add an input port inside the instance
-	 *
-	 *  Add a new input port inside the current list of instance's port. This function does'nt check
-	 *   if this port already exist in this actor.
-	 *  
-	 *  @param name : string of the port identifier
-	 *
-	 *  @param port : Port to add in the actor
-	 *
-     */
-	void addInput(std::string name, Port* port);
-
-	/**
-     *  @brief add an output port inside the actor
-	 *
-	 *  Add a new output port inside the current list of actor's port. This function does'nt check
-	 *   if this port already exist in the list.
-	 *  
-	 *  @param name : string of the port identifier
-	 *
-	 *  @param port : Port to add in the actor
-	 *
-     */
-	void addOutput(std::string name, Port* port);
 
 protected:
 	/** Name of the actor */

@@ -56,20 +56,45 @@
 using namespace std;
 using namespace llvm;
 
-Instanciator::Instanciator(Network* network){
+Instanciator::Instanciator(Network* network, map<string, Actor*>* actors){
+	this->actors = actors;
 	this->network = network;
 	this->graph = network->getGraph();
-	updateConnections();
+	updateInstances();
 }
 
 
-void Instanciator::updateConnections(){
+void Instanciator::updateInstances(){
+	//Update instances using actors
+	map<string, Instance*>::iterator it;
+	map<string, Instance*>* instances = network->getInstances();
+		
+	for (it = instances->begin(); it != instances->end(); it++){
+		updateInstance(it->second);
+	}
+
+	//Update connections using graph
 	int edges = graph->getNbEdges();
-	
 	for (int i = 0; i < edges; i++){
 		updateConnection((Connection*)graph->getEdge(i));
 	}
 	
+}
+
+void Instanciator::updateInstance(Instance* instance){
+	map<string, Actor*>::iterator it;
+
+	//Look for the actor using instance clasz
+	it = actors->find(instance->getClasz());
+
+	//Actor does not exist
+	if (it == actors->end()){
+		fprintf(stderr,"An instance refers to non-existent actor: actor %s for instance %s", instance->getClasz(), instance->getId());
+		exit(0);
+	}
+
+	//Set instance to its corresponding actor
+	instance->setActor(it->second);
 }
 
 void Instanciator::updateConnection(Connection* connection){
@@ -90,8 +115,9 @@ void Instanciator::updateConnection(Connection* connection){
 		// Get port of the connection 
 		Port* srcPortInst = connection->getSourcePort();
 
-		// Get same port from the instanced actor
-		Port* srcPort = source->getOutput(srcPortInst->getName());
+		// Get same port from the actor
+		Actor* actor = source->getActor();
+		Port* srcPort = actor->getOutput(srcPortInst->getName());
 		sourceString = srcPort->getName();
 		srcPortType = srcPort->getType();
 
@@ -100,8 +126,9 @@ void Instanciator::updateConnection(Connection* connection){
 			exit(0);
 		}
 
-		// Bound GlobalVariable to port from instance
-		connection->setSourcePort(srcPort);
+		// Set port information
+		srcPortInst->setType(srcPortType);
+		source->setAsOutput(srcPortInst);
 	}
 
 	// Update target 
@@ -112,8 +139,9 @@ void Instanciator::updateConnection(Connection* connection){
 		// Get port of the connection 
 		Port* dstPortInst = connection->getDestinationPort();
 
-		// Get same port from the instanced actor 
-		Port* dstPort = target->getInput(dstPortInst->getName());
+		// Get same port from the actor 
+		Actor* actor = target->getActor();
+		Port* dstPort = actor->getInput(dstPortInst->getName());
 		targetString = dstPort->getName();
 		dstPortType = dstPort->getType();
 
@@ -124,6 +152,8 @@ void Instanciator::updateConnection(Connection* connection){
 
 		// Bound GlobalVariable to port from instance
 		connection->setDestinationPort(dstPort);
+		dstPortInst->setType(dstPortType);
+		target->setAsInput(dstPortInst);
 	}
 
 	// check port types match

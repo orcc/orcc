@@ -81,9 +81,8 @@ Decoder::~Decoder (){
 
 int Decoder::instanciate(){
 
-
 	// Instanciate the network
-	Instanciator instanciator(network);
+	Instanciator instanciator(network, actors);
 
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, this);
@@ -91,6 +90,7 @@ int Decoder::instanciate(){
 	
 	return 0;
 }
+
 void Decoder::addInstance(Instance* instance){
 	instances->insert(std::pair<std::string, Instance*>(instance->getId(), instance));
 };
@@ -121,24 +121,20 @@ Instance* Decoder::getInstance(std::string name){
 }
 
 bool Decoder::compile(map<string, Actor*>* actors){
-	map<string, Instance*>::iterator itInst;
-	map<string, Actor*>::iterator itAct;
+	map<string, Instance*>::iterator it;
 	this->actors = actors;
 
 	// Add Fifo function and fifo type into the decoder
 	fifo->addFifoHeader(this);
 	
-	for (itInst = instances->begin(); itInst != instances->end(); itInst++){
-		Instance* instance = itInst->second;
-		
-		itAct = actors->find(instance->getClasz());
-
-		IRWriter writer(itAct->second, instance);
-		writer.write(this);
-	}
-
 	// Instanciating decoder
 	instanciate();
+
+	//Write instance
+	for (it = instances->begin(); it != instances->end(); it++){
+		IRWriter writer(it->second);
+		writer.write(this);
+	}
 
 	// Setting connections of the decoder
 	fifo->setConnections(this);

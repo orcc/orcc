@@ -146,6 +146,17 @@ private:
 	std::map<std::string, Variable*>* parseParameters(llvm::Module* module);
 
 
+	/**
+     * @brief parse pattern of a module
+	 *
+	 * Parses the given value as a MDNode to produce a list of pattern
+	 * 
+	 * @param ports : the ports of the actor
+	 *
+	 * @param value : the value representing an MDNode of pattern
+	 *
+	 * @return a map of patterns.
+	 */
 	std::map<Port*, llvm::ConstantInt*>* parsePattern(std::map<std::string, Port*>* ports, llvm::Value* value);
 
 	/**

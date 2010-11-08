@@ -39,6 +39,10 @@
 #ifndef INSTANCIATOR_H
 #define INSTANCIATOR_H
 
+#include <map>
+
+#include "Jade/Core/Actor.h"
+
 class Network;
 class HDAGGraph;
 class Connection;
@@ -63,27 +67,35 @@ public:
 	 * 
 	 * @param network : Network to instanciate
 	 *
+	 * @param actors : Map of actors used in the instance
 	 */
-	Instanciator(Network* network);
+	Instanciator(Network* network, std::map<std::string, Actor*>* actors);
 
 	~Instanciator(){};
 
 private:
 
 	/**
-	 * @brief Update connections of the network.
+	 * @brief Update instance and connections of the network.
 	 *
-	 * Updates the connections of this network. MUST be called after actors have
-	 * been instantiated.
+	 * Updates the connections of this network. MUST be called before actors are
+	 * instantiated.
 	 * 
 	 */
-	void updateConnections();
+	void updateInstances();
 
+	/**
+	 * @brief Update instance of the network.
+	 *
+	 * Updates the instance of this network using its corresponding actor
+	 * 
+	 */
+	void updateInstance(Instance* instance);
 
 	/**
 	 * @brief Update a connection in the network.
 	 *
-	 * Updates the given connection's source and target port by getting the
+	 * Updates instance using the given connection's source and target port by getting the
 	 * ports from the source and target instances, after checking the ports
 	 * exist and have compatible types.
 	 * 
@@ -96,6 +108,9 @@ private:
 	
 	/** Network to instanciate */
 	Network* network;
+
+	/** List of actor from the network */
+	std::map<std::string, Actor*>* actors;
 
 };
 

@@ -69,9 +69,9 @@ public:
 	/**
 	 * Creates an instance writer on the given actor.
 	 * 
-	 * @param actor an actor
+	 * @param instance : Instance to write
 	 */
-	IRWriter(Actor* actor, Instance* instance);
+	IRWriter(Instance* instance);
 
 	/**
 	 * Write the instance inside the given decoder.
@@ -96,22 +96,24 @@ private:
 	 *
 	 * Writer a list of ports in the module
 	 *
+	 * @param key : whether ports are input or output ports
+	 *
 	 * @param module : llvm::Module to parse
 	 *
 	 * @return a map of ports
 	 */
-	std::map<std::string, Port*>* writePorts(std::map<std::string, Port*>* ports);
+	std::map<std::string, Port*>* writePorts(std::string key, std::map<std::string, Port*>* ports);
 
 	/**
 	 * @brief Write a port
 	 *
 	 * Write the given Port for an Instance.
 	 * 
-	 * @param port : the Port to write
+	 * @param key : whether the ports is an input or output port
 	 *
-	 * @return the corresponding Port in the decoder
+	 * @param port : the Port to write
 	 */
-	Port* writePort(Port* port);
+	void writePort(std::string key, Port* port);
 
 	/**
 	 * @brief Write a list of variable

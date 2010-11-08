@@ -48,11 +48,10 @@ namespace llvm{
 
 #include "Jade/Core/Actor.h"
 
+
 class BroadcastActor;
 class Decoder;
 class Expr;
-class Port;
-class InstancedActor;
 //------------------------------
 
 /**
@@ -85,8 +84,6 @@ public:
 		this->broadcast = NULL;
 		this->actor = NULL;
 		this->decoder = NULL;
-		this->inputs = NULL;
-		this->outputs = NULL;
 		this->stateVars = NULL;
 		this->parameters = NULL;
 		this->procedures = NULL;
@@ -109,8 +106,6 @@ public:
 		this->broadcast = broadcast;
 		this->actor = NULL;
 		this->decoder = NULL;
-		this->inputs = NULL;
-		this->outputs = NULL;
 		this->stateVars = NULL;
 		this->parameters = NULL;
 		this->procedures = NULL;
@@ -157,10 +152,11 @@ public:
 	/*!
      *  @brief Setter of actor
      *
+	 *	Set the actor of this instance and refresh actor instance list
 	 * @param actor : Actor of this instance
      *
      */
-	void setActor(Actor* actor){this->actor = actor;};
+	void setActor(Actor* actor);
 
 	/**
      *  @brief get the Port corresponding to string name
@@ -264,17 +260,47 @@ public:
 	bool hasInitializes() {return !initializes->empty();};
 
 	/**
+     *  @brief Set a new input port for the instance
+	 *
+	 *  Add a new input port in the instance
+	 *
+	 *  @param port : Port to add as input in the instance
+	 *
+     */
+	void setAsInput(Port* port);
+
+	/**
+     *  @brief Set a new output port for the instance
+	 *
+	 *  Add a new output port in the instance
+	 *
+	 *  @param port : Port to add as output in the instance
+	 *
+     */
+	void setAsOutput(Port* port);
+
+	/**
+     *  @brief getter of input ports
+	 *
+	 *  @return a map of Port representing inputs of the instance
+	 *
+     */
+	std::map<std::string, Port*>* getInputs() {return &inputs;};
+
+	/**
+     *  @brief getter of input ports
+	 *
+	 *  @return a map of Port representing inputs of the instance
+	 *
+     */
+	std::map<std::string, Port*>* getOutputs() {return &outputs;};
+
+	/**
 	 * @brief make the instance Concrete
 	 *
 	 * Bound this decoder to an actor and a decoder
 	 * 
 	 * @param decoder: Decoder that store the instance
-	 *
-	 * @param actor: Initial Actor of the instance
-	 *
-	 * @param inputs: inputs ports in decoder of the instance
-	 *
-	 * @param outputs: outputs ports in decoder of the instance
 	 *
 	 * @param stateVars: state variable in decoder of the instance
 	 *
@@ -290,9 +316,7 @@ public:
 	 *
 	 * @return the corresponding procedure
 	 */
-	void makeConcrete(Decoder* decoder, Actor* actor,	
-					  std::map<std::string, Port*>* inputs,
-					  std::map<std::string, Port*>* outputs,
+	void makeConcrete(Decoder* decoder,
 					  std::map<std::string, Variable*>* stateVars,
 					  std::map<std::string, Variable*>* parameters,	
 					  std::map<std::string, Procedure*>* procs,	
@@ -352,8 +376,8 @@ private:
 	BroadcastActor* broadcast;
 
 	/** Port of the instance */
-	std::map<std::string, Port*>* inputs;
-	std::map<std::string, Port*>* outputs;
+	std::map<std::string, Port*> inputs;
+	std::map<std::string, Port*> outputs;
 
 	/** A map of the parameters of this actor */
 	std::map<std::string, Variable*>* parameters;

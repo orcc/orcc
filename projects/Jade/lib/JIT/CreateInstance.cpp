@@ -57,6 +57,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Variable.h"
 #include "Jade/Decoder/Decoder.h"
+#include "Jade/Core/Instance.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
 //------------------------------

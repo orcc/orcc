@@ -121,11 +121,10 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				
 				//Create a new actor for this broadcast
 				string name = "broadcast_"+ instance->getId()+"_"+ srcPort->getName();
-				BroadcastActor* actorBCast = new BroadcastActor(Context, decoder, name, numOuputs, connection->getIntegerType(), fifo);
+				BroadcastActor* actorBCast = new BroadcastActor(Context, name, numOuputs, connection->getIntegerType(), fifo);
 				
 				//Instanciate broadcast
 				Instance* newInstance = new Instance(name, actorBCast);
-				actorBCast->instanciate(newInstance);
 				decoder->addInstance(newInstance);
 				
 				//Set a new vertex in the graph

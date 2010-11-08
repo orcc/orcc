@@ -67,7 +67,9 @@ Actor::~Actor (){
 }
 
 void Actor::addInstance(Instance* instance){
-	instance->setActor(this);
+	if (instance->getActor() != this){
+		instance->setActor(this);
+	}
 	instances.push_back(instance);
 }
 

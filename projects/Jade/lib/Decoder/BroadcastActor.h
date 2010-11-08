@@ -65,7 +65,7 @@ class InstancedActor;
  */
 class BroadcastActor  : public Actor {
 public:
-	BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, std::string name, int numOutputs, llvm::IntegerType* type, AbstractFifo* fifo);
+	BroadcastActor(llvm::LLVMContext& C, std::string name, int numOutputs, llvm::IntegerType* type, AbstractFifo* fifo);
 	~BroadcastActor();
 
 	/**
@@ -97,14 +97,6 @@ public:
 		return inputs->begin()->second;
 	};
 
-	/**
-     *  @brief Instanciate the broadcast
-	 *  
-	 *  @param instance: the instance that the broadcast has to be instanciated with.
-	 *
-	 *  @return the corresponding InstancedActor
-     */
-	void instanciate(Instance* instance);
 private:
 
 	/** The current decoder  */
@@ -126,22 +118,42 @@ private:
 	llvm::LLVMContext &Context;
 
 	/**
-     *  @brief Create the action scheduler of the broadcast
+     *  @brief Create the actor broadcast
      */
-	llvm::Function* createActionScheduler();
+	void createActor();
+
+	/**
+     *  @brief Create the actions of broadcast actor
+     */
+	void createAction();
+
+	/**
+     *  @brief Create the scheduler of the broadcast action
+     */
+	Procedure* createScheduler();
+
+	/**
+     *  @brief Create the body of the broadcast action
+     */
+	Procedure* createBody();
+
+	/**
+     *  @brief Create the pattern of the broadcast action
+	 *
+	 *	@param ports : ports of the action
+     */
+	std::map<Port*, llvm::ConstantInt*>* createPattern(std::map<std::string, Port*>* ports);
 
 	/**
      *  @brief Create a read fifo action in broadcast
 	 *
 	 *  Add llvm instruction to read the fifo corresponding to the given port
 	 *
-	 *  @param port : the Port to read
-	 *
-	 *  @param fifoStruct : llvm::LoadInst corresponding to the fifo pointer
-	 *
 	 *  @param current : llvm::BasicBlock to add the instructions
+	 *
+	 *  @return llvm::Value read from the fifo
      */
-	llvm::Value* createReadFifo(Port* port, llvm::LoadInst* fifoStruct, llvm::BasicBlock* current);
+	llvm::Value* createReadFifo(Port* port, llvm::BasicBlock* current);
 	
 	/**
      *  @brief Create a write fifo action in broadcast
@@ -150,50 +162,33 @@ private:
 	 *
 	 *  @param port : the Port to read
 	 *
-	 *  @param fifoStruct : llvm::LoadInst corresponding to the fifo pointer
+	 *  @param token : the llvm::Value of the token to write
 	 *
 	 *  @param current : llvm::BasicBlock to add the instructions
      */
-	void createWriteFifo(Port* port, llvm::LoadInst* fifoStruct, llvm::Value* token ,llvm::BasicBlock* current);
+	void createWriteFifo(Port* port, llvm::Value* token ,llvm::BasicBlock* current);
 
 	/**
      *  @brief Create an has token test in broadcast
 	 *
 	 *  Add llvm instruction to test the number of token present in the given port
 	 *
-	 *  @param func : llvm::Function to add LLVM instruction
-	 *
-	 *  @param fifoStruct : llvm::LoadInst corresponding to the fifo pointer
-	 *
 	 *  @param port : the Port to test
 	 *
 	 *  @param current : llvm::BasicBlock to add the instructions
-	 *
-	 *  @param ret : llvm::BasicBlock corresponding to the end of the function
      */
-	llvm::BasicBlock* createHasTokenTest(llvm::Function* func, llvm::LoadInst* fifoStruct, Port* port, llvm::BasicBlock* current, llvm::BasicBlock* ret);
+	llvm::Value* createHasTokenTest(Port* port, llvm::BasicBlock* current);
 
 	/**
-     *  @brief Create an has room test in broadcast
+     *  @brief Set read to end
 	 *
-	 *  Add llvm instruction to test the number of free place in the given port
+	 *  Call set readEnd function on the given port
 	 *
-	 *  @param func : llvm::Function to add LLVM instruction
-	 *
-	 *  @param fifoStruct : llvm::LoadInst corresponding to the fifo pointer
-	 *
-	 *  @param port : the Port to test
+	 *  @param port : the Port to set to readEnd
 	 *
 	 *  @param current : llvm::BasicBlock to add the instructions
-	 *
-	 *  @param ret : llvm::BasicBlock corresponding to the end of the function
      */
-	llvm::BasicBlock* createHasRoomTest(llvm::Function* func, llvm::LoadInst* fifoStruct, Port* port, llvm::BasicBlock* current, llvm::BasicBlock* ret);
-
-	void createSetReadEnd(Port* port, llvm::LoadInst* fifoStruct, llvm::BasicBlock* current);
-
-	void createSetWriteEnd(Port* port, llvm::LoadInst* fifoStruct, llvm::BasicBlock* current);
-
+	void createSetReadEnd(Port* port, llvm::BasicBlock* current);
 };
 
 #endif

@@ -63,10 +63,10 @@ Port* Instance::getInput(string portName){
 	std::map<std::string, Port*>::iterator it;
 	
 	//Look for the given name in input
-	it = inputs->find(portName);
+	it = inputs.find(portName);
 
 	//Port not found
-	if(it == inputs->end()){
+	if(it == inputs.end()){
 		return NULL;
 	}
 
@@ -78,10 +78,10 @@ Port* Instance::getOutput(string portName){
 	std::map<std::string, Port*>::iterator it;
 	
 	//Look for the given name in output
-	it = outputs->find(portName);
+	it = outputs.find(portName);
 
 	//Port not found
-	if(it == outputs->end()){
+	if(it == outputs.end()){
 		return NULL;
 	}
 
@@ -110,6 +110,19 @@ Procedure* Instance::getProcedure(string name){
 	}
 
 	return (*it).second;
+}
+
+void Instance::setActor(Actor* actor){
+	this->actor = actor;
+	actor->addInstance(this);
+}
+
+void Instance::setAsInput(Port* port) {
+	inputs.insert(pair<string, Port*>(port->getName(), port));
+}
+
+void Instance::setAsOutput(Port* port) {
+	outputs.insert(pair<string, Port*>(port->getName(), port));
 }
 
 void Instance::solveParameters(){
