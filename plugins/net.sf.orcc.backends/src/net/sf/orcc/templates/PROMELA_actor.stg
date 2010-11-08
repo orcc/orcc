@@ -81,34 +81,14 @@ $endif$
 
 schedulerFSM(action) ::= << 
 /* $action.name$ */
-:: state == STATE $guard()$ -> 
-	$inputPattern(action.inputPattern)$;
-	$outputPattern(action.outputPattern)$;	
+:: state == $fsm_trans.SourceState$ $guardFSM()$ -> 
+	$inputPattern(action.inputPattern)$
+	$outputPattern(action.outputPattern)$
+	state = $fsm_nsi.targetState$;
 >>
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Scheduler without fsm
-///////////////////////////////////////////////////////////////////////////////
-
-guard() ::= <<
-$options.guards.(action) $
->>
-
-inputPatternPort(port) ::= <<
-chan_$port.name$?trash
->>
-
-inputPattern(pattern) ::= <<
-$pattern.keys: inputPatternPort(); separator="\n"$
->>
-
-outputPatternPort(port) ::= <<
-chan_$port$?trash
->>
-
-outputPattern(pattern) ::= <<
-$pattern.keys: outputPatternPort(); separator="\n"$
+guardFSM() ::= <<
+ $options.guards.(action): {act | && $act$} $
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -121,6 +101,32 @@ scheduler(action) ::= <<
 	$inputPattern(action.inputPattern)$;
 	$outputPattern(action.outputPattern)$;	
 >>
+
+guard() ::= <<
+$options.guards.(action)$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Action Templates
+///////////////////////////////////////////////////////////////////////////////
+
+inputPatternPort(port) ::= <<
+chan_$port.name$?trash;
+>>
+
+inputPattern(pattern) ::= <<
+$pattern.keys: inputPatternPort(); separator="\n"$
+>>
+
+outputPatternPort(port) ::= <<
+chan_$port$!trash;
+>>
+
+outputPattern(pattern) ::= <<
+$pattern.keys: outputPatternPort(); separator="\n"$
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Process declaration
@@ -136,7 +142,9 @@ active proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap
 	mtype state = $actor.actionScheduler.fsm.initialState$;
 	
 	do
-		$actor.actionScheduler.fsm.transitions: {k| $k.NextStateInfo: {a| $a.action: schedulerFSM(); separator="\n"$}$ } $
+	$actor.actionScheduler.fsm.transitions: {
+		fsm_trans| $fsm_trans.NextStateInfo: {
+			fsm_nsi| $fsm_nsi.action: schedulerFSM(); separator="\n"$ }$ }$
 	od
 	$else$
 	do
