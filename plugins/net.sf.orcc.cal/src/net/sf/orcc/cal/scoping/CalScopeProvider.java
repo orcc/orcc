@@ -39,6 +39,7 @@ import net.sf.orcc.cal.cal.AstGenerator;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstStatementForeach;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 
 import org.eclipse.emf.ecore.EObject;
@@ -55,6 +56,78 @@ import org.eclipse.xtext.scoping.impl.AbstractDeclarativeScopeProvider;
  * 
  */
 public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
+
+	/**
+	 * Returns the scope of functions within an actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @param reference
+	 *            a reference
+	 * @return a scope
+	 */
+	public IScope scope_AstFunction(AstActor actor, EReference reference) {
+		return Scopes.scopeFor(actor.getFunctions(),
+				delegateGetScope(actor, reference));
+	}
+
+	/**
+	 * Returns the scope of functions within a unit.
+	 * 
+	 * @param unit
+	 *            a unit
+	 * @param reference
+	 *            a reference
+	 * @return a scope
+	 */
+	public IScope scope_AstFunction(AstUnit unit, EReference reference) {
+		return Scopes.scopeFor(unit.getFunctions(),
+				delegateGetScope(unit, reference));
+	}
+
+	/**
+	 * Returns the scope for an input pattern.
+	 * 
+	 * @param action
+	 *            an action
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_AstInputPattern_port(AstAction action,
+			EReference reference) {
+		AstActor actor = (AstActor) action.eContainer();
+		return Scopes.scopeFor(actor.getInputs(), getScope(actor, reference));
+	}
+
+	/**
+	 * Returns the scope for an output pattern.
+	 * 
+	 * @param action
+	 *            an action
+	 * @param reference
+	 *            a variable reference
+	 * @return a scope
+	 */
+	public IScope scope_AstOutputPattern_port(AstAction action,
+			EReference reference) {
+		AstActor actor = (AstActor) action.eContainer();
+		return Scopes.scopeFor(actor.getOutputs(), getScope(actor, reference));
+	}
+
+	/**
+	 * Returns the scope of procedures within an actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @param reference
+	 *            a reference
+	 * @return a scope
+	 */
+	public IScope scope_AstProcedure(AstActor actor, EReference reference) {
+		return Scopes.scopeFor(actor.getProcedures(),
+				delegateGetScope(actor, reference));
+	}
 
 	/**
 	 * Returns the scope for a variable referenced inside an action.
@@ -91,7 +164,8 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 		List<AstVariable> elements = new ArrayList<AstVariable>();
 		elements.addAll(actor.getParameters());
 		elements.addAll(actor.getStateVariables());
-		return Scopes.scopeFor(elements);
+
+		return Scopes.scopeFor(elements, delegateGetScope(actor, reference));
 	}
 
 	/**
