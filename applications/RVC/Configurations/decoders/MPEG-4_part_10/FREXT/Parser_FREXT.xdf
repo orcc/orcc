@@ -675,4 +675,8 @@
         src="DecodePic" src-port="SubMbPredResMvL0"/>
     <Connection dst="BlockSplit" dst-port="MbType" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="BlockExpand" dst-port="MbType" src="DecodePic" src-port="MacroBlockType"/>
+    <Connection dst="MVReconstruct" dst-port="MbPredMvResL1"
+        src="DecodePic" src-port="MbPredResMvL1"/>
+    <Connection dst="MVReconstruct" dst-port="SubMbPredMvResL1"
+        src="DecodePic" src-port="SubMbPredResMvL1"/>
 </XDF>

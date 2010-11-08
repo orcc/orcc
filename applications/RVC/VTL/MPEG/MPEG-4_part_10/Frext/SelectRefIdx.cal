@@ -22,9 +22,9 @@ actor SelectRefIdx()
 	uint(size=32) PocToRead
 		:
 //	uint(size=2) NA = 0;
-//	uint(size=2) PRED_L0 = 1;
+	uint(size=2) PRED_L0 = 1;
 	uint(size=2) PRED_L1 = 2;
-//	uint(size=2) BIPRED  = 3;
+	uint(size=2) BIPRED  = 3;
 //	uint(size=2) DIRECT  = 4;
 
 	SendPocToRead.L0: action
@@ -33,7 +33,7 @@ actor SelectRefIdx()
 				==>
 			PocToRead    :[Poc0]
 		guard
-			list_selected != PRED_L1//PRED_L0 or ListSelected = BIPRED or ListSelected = DIRECT//FixMe!!
+			list_selected = PRED_L0//PRED_L0 or ListSelected = BIPRED or ListSelected = DIRECT//FixMe!!
 		end
 
 	SendPocToRead.L1: action
@@ -44,4 +44,14 @@ actor SelectRefIdx()
 		guard
 			list_selected = PRED_L1
 		end
+
+	SendPocToRead.BiPred: action
+			SelectList   :[list_selected],
+			POCtoRead_l0 :[Poc0],
+			POCtoRead_l1 :[Poc1]
+				==>
+			PocToRead    :[Poc0]
+		guard
+			list_selected = BIPRED
+		end	
 end

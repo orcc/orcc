@@ -51,14 +51,14 @@
       <vertex id="RefList1Type" x="1112" y="700"/>
       <vertex id="RefReordering_l1" x="1117" y="790"/>
       <vertex id="MbPredRefIdxL0" x="1686" y="1336"/>
-      <vertex id="SubMbPredRefIdxL0" x="1713" y="1619"/>
-      <vertex id="SubMbType" x="1734" y="1682"/>
+      <vertex id="SubMbPredRefIdxL0" x="1713" y="1642"/>
+      <vertex id="SubMbType" x="1734" y="1705"/>
       <vertex id="MbType4Pred" x="2266" y="1234"/>
-      <vertex id="SubMbPredRefIdxL1" x="1711" y="1652"/>
+      <vertex id="SubMbPredRefIdxL1" x="1711" y="1675"/>
       <vertex id="NewPic" x="615" y="1148"/>
       <vertex id="MbPredRefIdxL1" x="1689" y="1369"/>
-      <vertex id="MbPredResMvL0" x="1683" y="1306"/>
-      <vertex id="SubMbPredResMvL0" x="1713" y="1586"/>
+      <vertex id="MbPredResMvL0" x="1682" y="1272"/>
+      <vertex id="SubMbPredResMvL0" x="1707" y="1580"/>
       <vertex id="Mgnt_DecodePic" x="1446" y="-92"/>
       <vertex id="DecodeSliceHeader" x="230" y="459"/>
       <vertex id="DecodeRefPicList" x="797" y="593"/>
@@ -71,5 +71,7 @@
       <vertex id="DecodeSubMbPred" x="1424" y="1474"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="1919" y="1242"/>
       <vertex id="GenerateSkipBlockInformation" x="1898" y="1020"/>
+      <vertex id="MbPredResMvL1" x="1685" y="1305"/>
+      <vertex id="SubMbPredResMvL1" x="1708" y="1609"/>
    </vertices>
 </layout>

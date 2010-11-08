@@ -31,7 +31,8 @@ actor Algo_DecodeMbPred()
 	bool          EndRefIdxL0,
 
 	uint(size=4)  IntraPredModeC, 
-	int(size=16)  MvResl0
+	int(size=16)  MvResl0, 
+	int(size=16)  MvResl1
 		:
 
 	bool DEBUG_MV           = false;
@@ -561,6 +562,16 @@ actor Algo_DecodeMbPred()
 			mbPartIdx := mbPartIdx + 1;
 		end
 
+	ReadMvdL0.Skip: action
+				==>
+		guard
+			mbPartIdx < mbPartIdxMax,
+			   IS_MbPred_L1(mb_type,mbPartIdx)
+			or IS_MbPred_NA(mb_type,mbPartIdx)
+		do
+			mbPartIdx := mbPartIdx + 1;
+		end
+
 /*for( mbPartIdx = 0; mbPartIdx < NumMbPart( mb_type ); mbPartIdx++)
    if( MbPartPredMode( mb_type, mbPartIdx ) != Pred_L0 )
        for( compIdx = 0; compIdx < 2; compIdx++ )
@@ -579,14 +590,12 @@ actor Algo_DecodeMbPred()
 			mbPartIdx := mbPartIdx + 1;
 		end
 
-
-	ReadParam.Skip2Parameters: action
+	ReadMvdL1.Skip: action
 				==>
-			//            We read nothing
-			TypeOfVLD    :[ READ_BITS , READ_BITS  ],
-			NbBitsToRead :[     0     ,     0      ]
 		guard
-			mbPartIdx < mbPartIdxMax
+			mbPartIdx < mbPartIdxMax,
+			   IS_MbPred_L0(mb_type,mbPartIdx)
+			or IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -669,7 +678,9 @@ actor Algo_DecodeMbPred()
 				==>
 			MvResl0  :[ValueOfVLD] repeat 2
 		guard
-			mbPartIdx < mbPartIdxMax
+			mbPartIdx < mbPartIdxMax,
+			not IS_MbPred_L1(mb_type,mbPartIdx),
+			not IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadMvdL0["+mbPartIdx+"] : "+ValueOfVLD[0]+" ; "+ValueOfVLD[1]);
@@ -680,8 +691,11 @@ actor Algo_DecodeMbPred()
 	ReadMvdL1.Done: action
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
+			MvResl1 :[ValueOfVLD] repeat 2
 		guard
-			mbPartIdx < mbPartIdxMax
+			mbPartIdx < mbPartIdxMax,
+			not IS_MbPred_L0(mb_type,mbPartIdx),
+			not IS_MbPred_NA(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadMvdL1["+mbPartIdx+"] : "+ValueOfVLD[0]+" ; "+ValueOfVLD[1]);
@@ -732,12 +746,12 @@ actor Algo_DecodeMbPred()
 		ReadRefIdxl1Asked (SendOrReadDone )--> ReadMvdL0Asked;
 
 		ReadMvdL0Asked (ReadMvdL0.Asked )--> ReadMvdL0Asked;
-		ReadMvdL0Asked (ReadParam.Skip2Parameters )--> ReadMvdL0Asked;
+		ReadMvdL0Asked (ReadMvdL0.Skip )--> ReadMvdL0Asked;
 		ReadMvdL0Asked (SendOrReadDone )--> ReadMvdL1Asked;
 
 		ReadMvdL1Asked (ReadMvdL1.Asked )--> ReadMvdL1Asked;
-		ReadMvdL1Asked (ReadParam.Skip2Parameters )--> ReadMvdL1Asked;
-		ReadMvdL1Asked (SendOrReadDone )--> ReadRefIdxL0Done;
+		ReadMvdL1Asked (ReadMvdL1.Skip  )--> ReadMvdL1Asked;
+		ReadMvdL1Asked (SendOrReadDone  )--> ReadRefIdxL0Done;
 
 		ReadRefIdxL0Done ( ReadRefIdxL0.Done)--> ReadRefIdxL0Done;
 		ReadRefIdxL0Done ( ReadRefIdxL0.DoneSkip)--> ReadRefIdxL0Done;
@@ -748,9 +762,11 @@ actor Algo_DecodeMbPred()
 		ReadRefIdxL1Done ( SendOrReadDone)--> ReadMvdL0Done;
 
 		ReadMvdL0Done (ReadMvdL0.Done)--> ReadMvdL0Done;
+		ReadMvdL0Done (ReadMvdL0.Skip)--> ReadMvdL0Done;
 		ReadMvdL0Done (SendOrReadDone)--> ReadMvdL1Done;
 
 		ReadMvdL1Done (ReadMvdL1.Done)--> ReadMvdL1Done;
+		ReadMvdL1Done (ReadMvdL1.Skip)--> ReadMvdL1Done;
 		ReadMvdL1Done (SendOrReadDone)--> SendEndMbPred;
 
 		SendEndMbPred (SendEndMbPred )--> ReadParameters;
@@ -765,9 +781,10 @@ actor Algo_DecodeMbPred()
 		ReadRefIdxl0                       > ReadParam.Skip1Parameter;
 		ReadRefIdxl1                       > ReadParam.Skip1Parameter;
 		ReadParam.Skip1Parameter           > SendOrReadDone;
-		ReadMvdL0                          > ReadParam.Skip2Parameters;
-		ReadMvdL1                          > ReadParam.Skip2Parameters;
-		ReadParam.Skip2Parameters          > SendOrReadDone;
+		ReadMvdL0                          > SendOrReadDone;
+		ReadMvdL1                          > SendOrReadDone;
+		ReadMvdL0.Skip                     > SendOrReadDone;
+		ReadMvdL1.Skip                     > SendOrReadDone;
 		ReadRefIdxL0.DoneSkip              > SendOrReadDone;
 		ReadRefIdxL0.Done                  > SendOrReadDone;
 		ReadRefIdxL1.Done                  > SendOrReadDone;

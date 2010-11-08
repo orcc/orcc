@@ -384,6 +384,20 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="MbPredResMvL1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SubMbPredResMvL1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -734,4 +748,6 @@
     <Connection dst="" dst-port="NewPic" src="DecodeSliceData_Cavlc" src-port="NewPic"/>
     <Connection dst="" dst-port="MbPredResMvL0" src="DecodeMbPred" src-port="MvResl0"/>
     <Connection dst="" dst-port="SubMbPredResMvL0" src="DecodeSubMbPred" src-port="MvResl0"/>
+    <Connection dst="" dst-port="MbPredResMvL1" src="DecodeMbPred" src-port="MvResl1"/>
+    <Connection dst="" dst-port="SubMbPredResMvL1" src="DecodeSubMbPred" src-port="MvResl1"/>
 </XDF>

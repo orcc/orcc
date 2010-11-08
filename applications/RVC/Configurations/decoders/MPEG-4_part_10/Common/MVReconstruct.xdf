@@ -90,6 +90,20 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="MbPredMvResL1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SubMbPredMvResL1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -203,15 +217,6 @@
             <Expr kind="Literal" literal-kind="Boolean" value="false"/>
         </Parameter>
     </Instance>
-    <Instance id="a">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/Trash/Dave_Null"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -258,8 +263,8 @@
         src="MvL1_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="MvL0_Reconstr" dst-port="MbPredMvRes" src="" src-port="MbPredMvResL0"/>
     <Connection dst="MvL0_Reconstr" dst-port="SubMbPredMvRes" src="" src-port="SubMbPredMvResL0"/>
-    <Connection dst="MvL1_Reconstr" dst-port="MbPredMvRes" src="a" src-port="MvRes"/>
-    <Connection dst="MvL1_Reconstr" dst-port="SubMbPredMvRes" src="a" src-port="MvRes"/>
     <Connection dst="SelectMvpLX" dst-port="MvL0" src="MvL0_Reconstr" src-port="MvOut"/>
     <Connection dst="SelectMvpLX" dst-port="MvL1" src="MvL1_Reconstr" src-port="MvOut"/>
+    <Connection dst="MvL1_Reconstr" dst-port="MbPredMvRes" src="" src-port="MbPredMvResL1"/>
+    <Connection dst="MvL1_Reconstr" dst-port="SubMbPredMvRes" src="" src-port="SubMbPredMvResL1"/>
 </XDF>

@@ -993,7 +993,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 		GetMbInfos4P_SkipL0 (GetMbInfos.P_Skip        )--> GetMbType;
 
-
 		GetMbInfos4Others (GetMbInfos.Others        )--> ComputeMvpL0;
 
 		ComputeMvpL0      (ComputeMvpL0.Skip               )--> ComputeMvpL0;

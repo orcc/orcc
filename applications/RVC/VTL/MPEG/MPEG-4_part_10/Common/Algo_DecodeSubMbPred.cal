@@ -26,6 +26,7 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) RefIdxL0,
 	uint(size=4) RefIdxL1,
 	int(size=16) MvResl0,
+	int(size=16) MvResl1,
 	uint(size=5) MbPartHeight,
 	uint(size=5) MbPartWidth,
 	uint(size=3) MbPartIdx,
@@ -255,10 +256,9 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 
 	ReadMvdl0Asked.Skip: action
 				==>
-			//             mvd_l0
-			TypeOfVLD :[  READ_BITS ,  READ_BITS  ],
-			VldParam  :[      0     ,      0      ]
 		guard
+			   (mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX and sub_mb_type[mbPartIdx - 1] = B_DIRECT_8x8)
+			or SubMbPredMode(sub_mb_type[mbPartIdx - 1]) = PRED_L1,
 			subMbPartIdx < subMbPartIdxMax
 		do
 			subMbPartIdx := subMbPartIdx +1;
@@ -282,10 +282,9 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 
 	ReadMvdl1Asked.Skip: action
 				==>
-			//             mvd_l0
-			TypeOfVLD :[  READ_BITS ,  READ_BITS  ],
-			VldParam  :[      0     ,      0      ]
 		guard
+			   (mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX and sub_mb_type[mbPartIdx - 1] = B_DIRECT_8x8)
+			or SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L0,
 			subMbPartIdx < subMbPartIdxMax
 		do
 			subMbPartIdx := subMbPartIdx +1;
@@ -328,7 +327,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 		end
 //Delete me!! e carefull with B_DIRECT_8x8
 	ReadMvdl0Done.Skip: action
-			ValVLD   :[ValueOfVLD] repeat 2
 				==>
 			MbPartHeight :[SubMbPartWidthHeight(1)],
 			MbPartWidth  :[SubMbPartWidthHeight(0)],
@@ -337,16 +335,13 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 		guard
 			subMbPartIdx < subMbPartIdxMax
 		do
-			if(DEBUG_MV)then
-				println("sub_mb_pred mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
-				println("sub_mb_pred mvld0["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
-			end
 			subMbPartIdx := subMbPartIdx +1;
 		end
 
 	ReadMvdl1Done.Launch: action
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
+			MvResl1      :[ValueOfVLD] repeat 2,
 			RefIdxL1 :[ref_idx_l1[mbPartIdx-1]]
 		guard
 			mb_type >= BLOCK_TYPE_B_MIN,
@@ -363,15 +358,10 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 		end
 //Delete me!!
 	ReadMvdl1Done.Skip: action
-			ValVLD :[ValueOfVLD] repeat 2
 				==>
 		guard
 			subMbPartIdx < subMbPartIdxMax
 		do
-			if(DEBUG_MV)then
-				println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
-				println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
-			end
 			subMbPartIdx := subMbPartIdx +1;
 		end
 

@@ -257,7 +257,7 @@ actor SelectMvpLX()
 			not Is8x8Mb,
 			IsPredL0[MbPartIdx&1] and IsPredL1[MbPartIdx&1] or (not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1])
 		do
-			println("MacroBlkType.IsBiPred");
+			println("MacroBlkType.IsBiPred or Direct");
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -272,7 +272,6 @@ actor SelectMvpLX()
 			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
 			IsSubPredL0     := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0;
 			IsSubPredL1     := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0;
-			if(not IsSubPredL0 and not IsSubPredL1)then println("bouh");end
 		end
 
 	GetParameters_Done: action
@@ -331,7 +330,7 @@ actor SelectMvpLX()
 			SubMbPartIdx < SubMbPartIdxMax,
 			IsSubPredL0 and IsSubPredL1 or (not IsSubPredL0) and (not IsSubPredL1)
 		do
-			println("SubMacroBlkType.IsBiPred");
+			println("SubMacroBlkType.IsBiPred or Direct");
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
