@@ -14,12 +14,18 @@ AstEntity: actor=AstActor | unit=AstUnit;
 // unit
 ///////////////////////////////////////////////////////////////////////////////
 
-AstUnit: 'unit' name=AstTag ':'
+AstUnit: 'unit' name=QualifiedName ':'
 
 	(functions += AstFunction
 	| variables += AstConstantVariable)*
 
 	'end';
+
+QualifiedName:
+	ID ('.' ID)*;
+
+QualifiedNameWithWildCard:
+	QualifiedName '.*'?;
 
 AstConstantVariable returns AstVariable:
 	AstVariableDeclaration (constant ?= '=') value=AstExpression ';';
@@ -28,8 +34,12 @@ AstConstantVariable returns AstVariable:
 // actor
 ///////////////////////////////////////////////////////////////////////////////
 
+Import: 'import' importedNamespace=QualifiedNameWithWildCard ';';
+
 AstActor:
-	'actor' name=AstTag
+	(imports += Import)*
+
+	'actor' name=QualifiedName
 		'(' (parameters += AstParameter (',' parameters += AstParameter)*)? ')'
 		(inputs += AstPort (',' inputs += AstPort)*)? '==>'
 		(outputs += AstPort (',' outputs += AstPort)*)? ':'
@@ -299,4 +309,4 @@ AstVariableDeclaration returns AstVariable: type=AstType name=ID;
 AstValuedVariableDeclaration returns AstVariable:
 	AstVariableDeclaration ((constant ?= '=' | ':=') value=AstExpression)?;
 
-AstVariableReference: variable=[AstVariable];
+AstVariableReference: variable=[AstVariable|QualifiedName];

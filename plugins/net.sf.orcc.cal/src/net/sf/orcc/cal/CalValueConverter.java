@@ -37,6 +37,7 @@ import net.sf.orcc.cal.conversion.REALValueConverter;
 import org.eclipse.xtext.common.services.DefaultTerminalConverters;
 import org.eclipse.xtext.conversion.IValueConverter;
 import org.eclipse.xtext.conversion.ValueConverter;
+import org.eclipse.xtext.conversion.impl.QualifiedNameValueConverter;
 
 import com.google.inject.Inject;
 
@@ -56,6 +57,9 @@ public class CalValueConverter extends DefaultTerminalConverters {
 
 	@Inject
 	private OCTALValueConverter octalValueConverter;
+
+	@Inject
+	private QualifiedNameValueConverter qualifiedNameValueConverter;
 
 	@Inject
 	private REALValueConverter realValueConverter;
@@ -78,6 +82,16 @@ public class CalValueConverter extends DefaultTerminalConverters {
 	@ValueConverter(rule = "OCTAL")
 	public IValueConverter<Long> OCTAL() {
 		return octalValueConverter;
+	}
+
+	@ValueConverter(rule = "QualifiedName")
+	public IValueConverter<String> QualifiedName() {
+		return qualifiedNameValueConverter;
+	}
+
+	@ValueConverter(rule = "QualifiedNameWithWildCard")
+	public IValueConverter<String> QualifiedNameWithWildCard() {
+		return qualifiedNameValueConverter;
 	}
 
 	@ValueConverter(rule = "REAL")
