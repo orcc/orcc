@@ -128,8 +128,8 @@ public class CalScopeProvider extends AbstractDeclarativeScopeProvider {
 		elements.addAll(function.getParameters());
 		elements.addAll(function.getVariables());
 
-		AstActor actor = (AstActor) function.eContainer();
-		return Scopes.scopeFor(elements, getScope(actor, reference));
+		EObject cter = function.eContainer();
+		return Scopes.scopeFor(elements, getScope(cter, reference));
 	}
 
 	/**

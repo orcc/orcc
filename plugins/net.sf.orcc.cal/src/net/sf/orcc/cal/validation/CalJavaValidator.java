@@ -37,6 +37,7 @@ import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionCall;
 import net.sf.orcc.cal.cal.AstExpressionIndex;
@@ -55,6 +56,7 @@ import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.CalFactory;
@@ -239,44 +241,12 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkActor(AstActor actor) {
-		// fill the name provider's cache
-		((CalQualifiedNameProvider) nameProvider).resetUntaggedCount();
-		getNames(actor);
-
-		// check there are no cycles in type definitions
-		if (!new TypeCycleDetector(this).detectCycles(actor)) {
-			// evaluate state variables
-			checker = new TypeChecker(this);
-			evaluateStateVariables(actor.getStateVariables());
-
-			// transforms AST types to IR types
-			// this is a prerequisite for type checking
-			TypeTransformer typeTransformer = new TypeTransformer(this);
-			typeTransformer.transformTypes(actor);
-		}
-
-		checkActorStructure(actor);
-	}
-
-	/**
-	 * Checks the actor structural information is correct. Checks name,
-	 * priorities and FSM.
-	 * 
-	 * @param actor
-	 *            the actor
-	 */
-	private void checkActorStructure(AstActor actor) {
-		// check actor name matches file name
-		String path = actor.eResource().getURI().path();
-		String fileName = new File(path).getName();
-		if (!fileName.equals(actor.getName() + ".cal")) {
-			error("Actor " + actor.getName()
-					+ " must be defined in a file named \"" + actor.getName()
-					+ ".cal\"", actor, CalPackage.AST_ACTOR__NAME);
-		}
-
 		// check unique names
 		checkUniqueNames(actor.getParameters());
+		checkUniqueNames(actor.getInputs());
+		checkUniqueNames(actor.getOutputs());
+		checkUniqueNames(actor.getFunctions());
+		checkUniqueNames(actor.getProcedures());
 		checkUniqueNames(actor.getStateVariables());
 
 		// build action list
@@ -363,6 +333,65 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
+	@Check(CheckType.NORMAL)
+	public void checkEntity(AstEntity entity) {
+		// fill the name provider's cache
+		((CalQualifiedNameProvider) nameProvider).resetUntaggedCount();
+		getNames(entity);
+
+		checkEntityName(entity);
+
+		// check there are no cycles in type definitions
+		if (!new TypeCycleDetector(this).detectCycles(entity)) {
+			// evaluate state variables
+			checker = new TypeChecker(this);
+
+			evaluateStateVariables(entity);
+
+			// transforms AST types to IR types
+			// this is a prerequisite for type checking
+			TypeTransformer typeTransformer = new TypeTransformer(this);
+			typeTransformer.transformTypes(entity);
+		}
+	}
+
+	/**
+	 * Checks the actor structural information is correct. Checks name,
+	 * priorities and FSM.
+	 * 
+	 * @param actor
+	 *            the actor
+	 */
+	private void checkEntityName(AstEntity entity) {
+		// check actor name matches file name
+		String path = entity.eResource().getURI().path();
+		String fileName = new File(path).getName();
+
+		AstTag entityName;
+		AstActor actor = entity.getActor();
+		AstUnit unit = null;
+		if (actor == null) {
+			unit = entity.getUnit();
+			entityName = unit.getName();
+		} else {
+			entityName = actor.getName();
+		}
+
+		List<String> tag = entityName.getIdentifiers();
+		String lastSegment = tag.get(tag.size() - 1);
+		if (!fileName.equals(lastSegment + ".cal")) {
+			if (actor == null) {
+				error("Unit " + nameProvider.getQualifiedName(entityName)
+						+ " must be defined in a file named \"" + lastSegment
+						+ ".cal\"", unit, CalPackage.AST_UNIT__NAME);
+			} else {
+				error("Actor " + nameProvider.getQualifiedName(entityName)
+						+ " must be defined in a file named \"" + lastSegment
+						+ ".cal\"", actor, CalPackage.AST_ACTOR__NAME);
+			}
+		}
+	}
+
 	/**
 	 * Checks the given FSM using the given action list. This check is not
 	 * annotated because we need to build the action list, which is also useful
@@ -405,7 +434,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				return super.caseAstExpressionCall(expression);
 			}
 
-		}.doSwitch(Util.getActor(function));
+		}.doSwitch(Util.getTopLevelContainer(function));
 
 		if (!used) {
 			warning("The function " + function.getName() + " is never called",
@@ -471,7 +500,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				return super.caseAstStatementAssign(assign);
 			}
 
-		}.doSwitch(Util.getActor(variable));
+		}.doSwitch(Util.getTopLevelContainer(variable));
 
 		if (!used) {
 			warning("The variable " + variable.getName() + " is never read",
@@ -578,7 +607,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				return false;
 			}
 
-		}.doSwitch(Util.getActor(procedure));
+		}.doSwitch(Util.getTopLevelContainer(procedure));
 
 		if (!used) {
 			warning("The procedure " + procedure.getName() + " is never called",
@@ -586,25 +615,32 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	private void checkUniqueNames(List<AstVariable> variables) {
+	private void checkReturnType(AstFunction function) {
+		Type returnType = function.getIrType();
+		Type expressionType = function.getExpression().getIrType();
+		if (!checker.isConvertibleTo(expressionType, returnType)) {
+			error("Type mismatch: cannot convert from " + expressionType
+					+ " to " + returnType, function.getExpression(),
+					CalPackage.AST_EXPRESSION);
+		}
+	}
+
+	private void checkUniqueNames(List<? extends EObject> variables) {
 		Set<String> names = new HashSet<String>();
-		for (AstVariable variable : variables) {
+		for (EObject variable : variables) {
 			String name = nameProvider.getQualifiedName(variable);
 			if (names.contains(name)) {
-				error("Duplicate variable " + variable.getName(), variable,
+				error("Duplicate variable " + name, variable,
 						CalPackage.AST_VARIABLE__NAME);
 			}
 			names.add(name);
 		}
 	}
-	
-	private void checkReturnType(AstFunction function) {
-		Type returnType = function.getIrType();
-		Type expressionType = function.getExpression().getIrType();
-		if (!checker.isConvertibleTo(expressionType, returnType)) {
-			error("Type mismatch: cannot convert from " + expressionType + " to "
-					+ returnType, function.getExpression(), CalPackage.AST_EXPRESSION);
-		}
+
+	@Check(CheckType.NORMAL)
+	public void checkUnit(AstUnit unit) {
+		// check unique names
+		checkUniqueNames(unit.getVariables());
 	}
 
 	@Check(CheckType.NORMAL)
@@ -634,8 +670,17 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	 * @param stateVariables
 	 *            a list of state variables
 	 */
-	private void evaluateStateVariables(List<AstVariable> stateVariables) {
-		for (AstVariable astVariable : stateVariables) {
+	private void evaluateStateVariables(AstEntity entity) {
+		List<AstVariable> variables;
+		AstActor actor = entity.getActor();
+		if (actor == null) {
+			AstUnit unit = entity.getUnit();
+			variables = unit.getVariables();
+		} else {
+			variables = actor.getStateVariables();
+		}
+
+		for (AstVariable astVariable : variables) {
 			// evaluate initial value (if any)
 			AstExpression astValue = astVariable.getValue();
 			if (astValue != null) {
@@ -666,7 +711,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	 * @param actor
 	 *            the actor
 	 */
-	private void getNames(AstActor actor) {
+	private void getNames(AstEntity entity) {
 		new VoidSwitch() {
 
 			@Override
@@ -704,7 +749,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				return null;
 			}
 
-		}.doSwitch(actor);
+		}.doSwitch(entity);
 	}
 
 }

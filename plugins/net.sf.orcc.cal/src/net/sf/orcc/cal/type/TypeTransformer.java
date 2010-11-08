@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.cal.type;
 
-import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstInputPattern;
@@ -124,8 +124,8 @@ public class TypeTransformer extends VoidSwitch {
 	 *            an AST type
 	 * @return an IR type
 	 */
-	public void transformTypes(AstActor actor) {
-		doSwitch(actor);
+	public void transformTypes(AstEntity entity) {
+		doSwitch(entity);
 	}
 
 }

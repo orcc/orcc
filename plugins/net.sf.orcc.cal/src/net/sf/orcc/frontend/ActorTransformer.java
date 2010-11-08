@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.xtext.naming.IQualifiedNameProvider;
+
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
@@ -112,6 +114,9 @@ public class ActorTransformer {
 	 * A map from AST ports to IR ports.
 	 */
 	final private Map<AstPort, Port> mapPorts;
+
+	@Inject
+	private IQualifiedNameProvider nameProvider;
 
 	/**
 	 * Creates a new AST to IR transformation.
@@ -583,7 +588,7 @@ public class ActorTransformer {
 			context.restoreScope();
 
 			// create IR actor
-			String name = astActor.getName();
+			String name = nameProvider.getQualifiedName(astActor.getName());
 			return new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procedures, actions.getAllActions(),
 					initializes.getAllActions(), scheduler);

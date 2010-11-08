@@ -38,6 +38,7 @@ import java.net.URL;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
@@ -123,8 +124,11 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				IResourceDescription desc = delta.getNew();
 				Resource resource = set.getResource(desc.getURI(), false);
 				for (EObject obj : resource.getContents()) {
-					AstActor actor = (AstActor) obj;
-					build(resource, actor);
+					AstEntity entity = (AstEntity) obj;
+					AstActor actor = entity.getActor();
+					if (actor != null) {
+						build(resource, actor);
+					}
 				}
 			}
 

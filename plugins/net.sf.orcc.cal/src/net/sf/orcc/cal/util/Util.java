@@ -28,8 +28,6 @@
  */
 package net.sf.orcc.cal.util;
 
-import net.sf.orcc.cal.cal.AstActor;
-
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -41,17 +39,18 @@ import org.eclipse.emf.ecore.EObject;
 public class Util {
 
 	/**
-	 * Returns the actor in which <code>context</code> occurs.
+	 * Returns the top-level container in which <code>context</code> occurs.
 	 * 
 	 * @param context
 	 *            an object
-	 * @return the actor in which <code>context</code> occurs
+	 * @return the top-level container in which <code>context</code> occurs
 	 */
-	public static AstActor getActor(EObject context) {
-		if (context instanceof AstActor) {
-			return (AstActor) context;
+	public static EObject getTopLevelContainer(EObject context) {
+		EObject cter = context.eContainer();
+		if (cter == null) {
+			return context;
 		} else {
-			return getActor(context.eContainer());
+			return getTopLevelContainer(cter);
 		}
 	}
 

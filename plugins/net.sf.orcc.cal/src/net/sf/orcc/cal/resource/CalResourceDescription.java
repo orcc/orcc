@@ -32,8 +32,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.orcc.cal.cal.AstActor;
-import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstEntity;
+import net.sf.orcc.cal.cal.AstFunction;
+import net.sf.orcc.cal.cal.AstUnit;
+import net.sf.orcc.cal.cal.AstVariable;
 
 import org.apache.log4j.Logger;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -68,23 +70,26 @@ public class CalResourceDescription extends DefaultResourceDescription {
 		}
 
 		List<IEObjectDescription> result = Lists.newArrayList();
-		AstActor actor = (AstActor) getResource().getContents().get(0);
-		IEObjectDescription actorDescription = createIEObjectDescription(actor);
+		AstEntity entity = (AstEntity) getResource().getContents().get(0);
+		IEObjectDescription actorDescription = createIEObjectDescription(entity);
 		if (actorDescription != null) {
 			result.add(actorDescription);
 		}
 
-		for (AstPort port : actor.getInputs()) {
-			IEObjectDescription description = createIEObjectDescription(port);
-			if (description != null) {
-				result.add(description);
+		AstUnit unit = entity.getUnit();
+		if (unit != null) {
+			for (AstVariable variable : unit.getVariables()) {
+				IEObjectDescription description = createIEObjectDescription(variable);
+				if (description != null) {
+					result.add(description);
+				}
 			}
-		}
 
-		for (AstPort port : actor.getOutputs()) {
-			IEObjectDescription description = createIEObjectDescription(port);
-			if (description != null) {
-				result.add(description);
+			for (AstFunction function : unit.getFunctions()) {
+				IEObjectDescription description = createIEObjectDescription(function);
+				if (description != null) {
+					result.add(description);
+				}
 			}
 		}
 

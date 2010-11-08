@@ -30,7 +30,7 @@ package net.sf.orcc.cal.type;
 
 import java.util.Set;
 
-import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpressionVariable;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
@@ -94,10 +94,10 @@ public class TypeCycleDetector extends VoidSwitch {
 	 *            an actor
 	 * @return <code>true</code> if the actor has cycles in its type definitions
 	 */
-	public boolean detectCycles(AstActor actor) {
+	public boolean detectCycles(AstEntity entity) {
 		graph = new DefaultDirectedGraph<AstVariable, DefaultEdge>(
 				DefaultEdge.class);
-		doSwitch(actor);
+		doSwitch(entity);
 
 		CycleDetector<AstVariable, DefaultEdge> cycleDetector = new CycleDetector<AstVariable, DefaultEdge>(
 				graph);

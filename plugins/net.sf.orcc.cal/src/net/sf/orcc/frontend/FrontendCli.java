@@ -35,6 +35,7 @@ import java.util.List;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.CalStandaloneSetup;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -103,12 +104,12 @@ public class FrontendCli {
 	private void processActor(File actorPath) {
 		URI uri = URI.createFileURI(actorPath.getAbsolutePath());
 		Resource resource = resourceSet.getResource(uri, true);
-		AstActor astActor = (AstActor) resource.getContents().get(0);
+		AstEntity entity = (AstEntity) resource.getContents().get(0);
 
 		boolean hasErrors = false;
 
 		// contains linking errors
-		List<Diagnostic> errors = astActor.eResource().getErrors();
+		List<Diagnostic> errors = resource.getErrors();
 		if (!errors.isEmpty()) {
 			for (Diagnostic error : errors) {
 				System.err.println(error);
@@ -135,7 +136,8 @@ public class FrontendCli {
 		// only compile if there are no errors
 		try {
 			if (!hasErrors) {
-				frontend.compile(actorPath.getAbsolutePath(), astActor);
+				AstActor actor = entity.getActor();
+				frontend.compile(actorPath.getAbsolutePath(), actor);
 			}
 		} catch (OrccException e) {
 			e.printStackTrace();

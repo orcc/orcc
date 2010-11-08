@@ -1,0 +1,11 @@
+unit net.sf.orcc.ImportUnit :
+
+	function x(int a) --> int :
+	  a + 3
+	end
+	
+	int MY_CONSTANT_1 = 33;
+	
+	int MY_CONSTANT_2 = 33;
+
+end

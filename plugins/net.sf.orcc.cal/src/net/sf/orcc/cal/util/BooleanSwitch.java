@@ -32,6 +32,7 @@ import org.eclipse.emf.ecore.EObject;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -63,6 +64,7 @@ import net.sf.orcc.cal.cal.AstTypeInt;
 import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 
@@ -162,6 +164,17 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 		}
 
 		return false;
+	}
+
+	@Override
+	public Boolean caseAstEntity(AstEntity entity) {
+		AstActor actor = entity.getActor();
+		if (actor == null) {
+			AstUnit unit = entity.getUnit();
+			return doSwitch(unit);
+		} else {
+			return doSwitch(actor);
+		}
 	}
 
 	@Override
@@ -439,6 +452,23 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 	@Override
 	public Boolean caseAstTypeUint(AstTypeUint type) {
 		return doSwitch(type.getSize());
+	}
+
+	@Override
+	public Boolean caseAstUnit(AstUnit unit) {
+		for (AstFunction function : unit.getFunctions()) {
+			if (doSwitch(function)) {
+				return true;
+			}
+		}
+
+		for (AstVariable variable : unit.getVariables()) {
+			if (doSwitch(variable)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	@Override

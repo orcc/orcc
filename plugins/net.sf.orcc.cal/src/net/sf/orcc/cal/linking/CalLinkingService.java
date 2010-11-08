@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstState;
@@ -144,10 +143,10 @@ public class CalLinkingService extends DefaultLinkingService {
 	private List<EObject> builtinFunction(EObject context, String name) {
 		AstFunction function = functions.get(name);
 		if (function != null) {
-			AstActor actor = Util.getActor(context);
+			EObject cter = Util.getTopLevelContainer(context);
 
 			// Attach the stub to the resource that's being parsed
-			Resource res = makeResource(actor.eResource());
+			Resource res = makeResource(cter.eResource());
 			res.getContents().add(function);
 
 			return Collections.singletonList((EObject) function);
@@ -169,10 +168,10 @@ public class CalLinkingService extends DefaultLinkingService {
 	private List<EObject> builtinProcedure(EObject context, String name) {
 		AstProcedure procedure = procedures.get(name);
 		if (procedure != null) {
-			AstActor actor = Util.getActor(context);
+			EObject cter = Util.getTopLevelContainer(context);
 
 			// Attach the stub to the resource that's being parsed
-			Resource res = makeResource(actor.eResource());
+			Resource res = makeResource(cter.eResource());
 			res.getContents().add(procedure);
 
 			return Collections.singletonList((EObject) procedure);
@@ -208,14 +207,14 @@ public class CalLinkingService extends DefaultLinkingService {
 
 	private List<EObject> getState(EObject context, EReference reference,
 			String name) {
-		AstActor actor = Util.getActor(context);
+		EObject cter = Util.getTopLevelContainer(context);
 
 		// Create the model element instance using the factory
 		AstState state = CalFactory.eINSTANCE.createAstState();
 		state.setName(name);
 
 		// Attach the stub to the resource that's being parsed
-		Resource res = makeResource(actor.eResource());
+		Resource res = makeResource(cter.eResource());
 		res.getContents().add(state);
 
 		return Collections.singletonList((EObject) state);
