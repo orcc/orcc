@@ -124,10 +124,13 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 				IResourceDescription desc = delta.getNew();
 				Resource resource = set.getResource(desc.getURI(), false);
 				for (EObject obj : resource.getContents()) {
-					AstEntity entity = (AstEntity) obj;
-					AstActor actor = entity.getActor();
-					if (actor != null) {
-						build(resource, actor);
+					if (obj.eClass()
+							.equals(CalPackage.eINSTANCE.getAstEntity())) {
+						AstEntity entity = (AstEntity) obj;
+						AstActor actor = entity.getActor();
+						if (actor != null) {
+							build(resource, actor);
+						}
 					}
 				}
 			}

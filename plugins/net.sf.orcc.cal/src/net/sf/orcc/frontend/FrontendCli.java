@@ -137,7 +137,9 @@ public class FrontendCli {
 		try {
 			if (!hasErrors) {
 				AstActor actor = entity.getActor();
-				frontend.compile(actorPath.getAbsolutePath(), actor);
+				if (actor != null) {
+					frontend.compile(actorPath.getAbsolutePath(), actor);
+				}
 			}
 		} catch (OrccException e) {
 			e.printStackTrace();
