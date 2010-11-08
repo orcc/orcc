@@ -29,8 +29,7 @@
       <vertex id="DelList" x="480" y="272"/>
       <vertex id="PocToDisplay" x="489" y="598"/>
       <vertex id="IsIDR" x="500" y="397"/>
-      <vertex id="BlocksSize" x="9" y="568"/>
-      <vertex id="MacroBlockType" x="475" y="558"/>
+      <vertex id="MacroBlockType" x="-5" y="518"/>
       <vertex id="TransformSize8x8" x="0" y="344"/>
       <vertex id="PocToRead" x="274" y="829"/>
       <vertex id="Display_L" x="949" y="353"/>

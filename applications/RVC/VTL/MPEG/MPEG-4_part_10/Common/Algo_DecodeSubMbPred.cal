@@ -330,7 +330,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 	ReadMvdl0Done.Skip: action
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
-			MvResl0      :[ValueOfVLD] repeat 2,
 			MbPartHeight :[SubMbPartWidthHeight(1)],
 			MbPartWidth  :[SubMbPartWidthHeight(0)],
 			MbPartIdx    :[subMbPartIdx - 1],

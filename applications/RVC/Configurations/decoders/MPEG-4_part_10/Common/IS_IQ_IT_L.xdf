@@ -31,10 +31,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="BlocksSize">
+    <Port kind="Input" name="MbType">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
@@ -121,7 +121,7 @@
         src="Mgnt_IQ_INTRA16x16" src-port="Lev2d"/>
     <Connection dst="IT4x4" dst-port="X"
         src="Algo_IQ_QSAndSLAndIDCTScaler_4x4" src-port="Cof"/>
-    <Connection dst="Mgnt_IQ_INTRA16x16" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
     <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4"
         dst-port="DCCoeff_Present" src="Mgnt_IQ_INTRA16x16" src-port="DCCoeff_Present"/>
+    <Connection dst="Mgnt_IQ_INTRA16x16" dst-port="MbType" src="" src-port="MbType"/>
 </XDF>

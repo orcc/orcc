@@ -64,7 +64,9 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 	uint(size=4)  MbPredRefIdx,
 	uint(size=4)  SubMbPredRefIdx,	
 
-	int (size=16) Mv
+	int (size=16) Mv,
+	int (size=16) MbPredMvRes,
+	int (size=16) SubMbPredMvRes
 		==>
 	bool          NewPic_o,
 	int (size=16) MvplX,
@@ -630,7 +632,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 		end
 
 	ComputeMvpL0.Launch16x16: action
-			MbPredRefIdx :[RefIdxCurr]
+			MbPredRefIdx :[RefIdxCurr],
+			MbPredMvRes      :[mv_res] repeat 2
 				==>
 			Location  :[Mbx_in_pix,Mby_in_pix],
 			MvplX     :[MvpL0] repeat 2,
@@ -650,11 +653,13 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 			end
 			GetNeighbourBlockParametres (0,16);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
-			MvpL0 := [OMv[0],OMv[1]];
+			MvpL0[0]:= OMv[0]+mv_res[0];
+			MvpL0[1]:= OMv[1]+mv_res[1];
 		end
 
 	ComputeMvpL0.Launch16x8: action
-			MbPredRefIdx :[RefIdxCurr]
+			MbPredRefIdx :[RefIdxCurr],
+			MbPredMvRes      :[mv_res] repeat 2
 				==>
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			MvplX :[MvpL0] repeat 2,
@@ -691,10 +696,13 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 					MvpL0 := [OMv[0],OMv[1]];
 				end
 			end
+			MvpL0[0] := MvpL0[0] + mv_res[0];
+			MvpL0[1] := MvpL0[1] + mv_res[1];
 		end
 
 	ComputeMvpL0.Launch8x16: action
-			MbPredRefIdx :[RefIdxCurr]
+			MbPredRefIdx :[RefIdxCurr],
+			MbPredMvRes      :[mv_res] repeat 2
 				==>
 			Location :[Blk_x_in_pix,Blk_y_in_pix],
 			MvplX :[MvpL0] repeat 2,
@@ -735,6 +743,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 					MvpL0 := [OMv[0],OMv[1]];
 				end
 			end
+			MvpL0[0] := MvpL0[0] + mv_res[0];
+			MvpL0[1] := MvpL0[1] + mv_res[1];
 		end
 
 	ComputeMvpL0.Launch8x8: action
@@ -797,7 +807,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 
 
 	ComputeSubMvpL0.Launch8x8: action
-			SubMbPredRefIdx :[RefIdxCurr]
+			SubMbPredRefIdx :[RefIdxCurr],
+			SubMbPredMvRes      :[mv_res] repeat 2
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvplX     :[MvpL0]repeat 2,
@@ -820,11 +831,13 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 			end
 			GetNeighbourBlockParametres (4*(MbPartIdx&3),8);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
-			MvpL0 := [OMv[0],OMv[1]];
+			MvpL0[0] := OMv[0]+mv_res[0];
+			MvpL0[1] := OMv[1]+mv_res[1];
 		end
 
 	ComputeSubMvpL0.Launch8x4: action
-			SubMbPredRefIdx :[RefIdxCurr]
+			SubMbPredRefIdx :[RefIdxCurr],
+			SubMbPredMvRes      :[mv_res] repeat 2
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvplX     :[MvpL0] repeat 2,
@@ -845,12 +858,14 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + 2 * (SubMbPartIdx&1) + 1] := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 2*(SubMbPartIdx&1),8);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
-			MvpL0 := [OMv[0],OMv[1]];	
+			MvpL0[0] := OMv[0]+mv_res[0];
+			MvpL0[1] := OMv[1]+mv_res[1];	
 		end
 
 
 	ComputeSubMvpL0.Launch4x8: action
-			SubMbPredRefIdx :[RefIdxCurr]
+			SubMbPredRefIdx :[RefIdxCurr],
+			SubMbPredMvRes      :[mv_res] repeat 2
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvplX     :[MvpL0]repeat 2,
@@ -871,12 +886,14 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&1) + 2] := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 1*(SubMbPartIdx&1),4);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
-			MvpL0 := [OMv[0],OMv[1]];
+			MvpL0[0] := OMv[0]+mv_res[0];
+			MvpL0[1] := OMv[1]+mv_res[1];
 		end
 
 
 	ComputeSubMvpL0.Launch4x4: action
-			SubMbPredRefIdx :[RefIdxCurr]
+			SubMbPredRefIdx :[RefIdxCurr],
+			SubMbPredMvRes      :[mv_res] repeat 2
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvplX     :[MvpL0]repeat 2,
@@ -896,7 +913,8 @@ actor Algo_Mvpl0Reconstr(bool IsPredL0)
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&3)]     := RefIdxCurr;
 			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 1*(SubMbPartIdx&3),4);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
-			MvpL0 := [OMv[0],OMv[1]];	
+			MvpL0[0]:= OMv[0]+mv_res[0];
+			MvpL0[1]:= OMv[1]+mv_res[1];	
 		end
 
 	ComputeSubMvpL0.Skip: action

@@ -129,7 +129,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
     poc_to_read := ValPocToRead;
   end
   
-  get_mv_send_frac: action MV:[ mx, my ] ==>
+  get_mv: action MV:[ mx, my ] ==>
   do
 	if(DEBUG_INPUT)then
 		println("Input InterpFBAddrLuma MV:"+mx+" ; "+my);
@@ -207,7 +207,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
  
     get_pos        		( get_pos        		) --> get_mv_send_frac;
  
-    get_mv_send_frac    ( get_mv_send_frac 		) --> address;
+    get_mv_send_frac    ( get_mv         		) --> address;
  
     address      		( RA_border				) --> address;
     address      		( RA_not_border			) --> MB_done;

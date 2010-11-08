@@ -270,7 +270,6 @@
     <Connection dst="Decoding_Y" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decode_U" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
     <Connection dst="Decode_V" dst-port="IsIDR" src="FUN_Parser" src-port="IsIDR"/>
-    <Connection dst="Decoding_Y" dst-port="BlocksSize" src="FUN_Parser" src-port="BlocksSize_Luma"/>
     <Connection dst="Decoding_Y" dst-port="MacroBlockType"
         src="FUN_Parser" src-port="MacroBlockType"/>
     <Connection dst="Decoding_Y" dst-port="TransformSize8x8"

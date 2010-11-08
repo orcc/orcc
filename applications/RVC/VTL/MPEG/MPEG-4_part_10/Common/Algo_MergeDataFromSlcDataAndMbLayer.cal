@@ -38,19 +38,15 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 	uint(size=5)  SubMbPredMbPartWidth,
 	uint(size=3)  SubMbPredMbPartIdx,
 	bool          SubMbPredEndRefIdxL0,
-	int(size=16)  SubMbPredMvResl0,
 
 	uint(size=5)  MbPredMbPartHeight,
 	uint(size=5)  MbPredMbPartWidth,
 	uint(size=3)  MbPredMbPartIdx,
-	bool          MbPredEndRefIdxL0,
-	int (size=16) MbPredMvResl0,
-	bool          MbPredEndMvRes
+	bool          MbPredEndRefIdxL0
 
 		==>
 	uint(size=1)  MbIntraFlag,
 	uint(size=4)  IntraPredMode,
-	int (size=16) MvResl0,
 	uint(size=5)  MbPartHeight,
 	uint(size=5)  MbPartWidth,
 	uint(size=3)  MbPartIdx,
@@ -89,7 +85,6 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			SDataQp_Y_Cb_Cr :[ ValQp , ValQpCb , ValQpCr ]
 				==>
 			MbIntraFlag     :[0],
-			MvResl0         :[0,0],
 			MbPartHeight    :[16],
 			MbPartWidth     :[16],
 			MbPartIdx       :[1],
@@ -261,30 +256,14 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			Finished = true
 		end
 
-	ReadMbPredParam2: action
-			MbPredMvResl0  :[mv_res] repeat 2,
-			MbPredEndMvRes :[Finished]
-				==>
-			MvResl0        :[mv_res] repeat 2
-		guard
-			Finished = false
-		end
-
-	ReadMbPredParam2Finished: action
-			MbPredEndMvRes :[Finished]
-				==>
-		guard
-			Finished = true
-		end
-
 	ReadSubMbPredParam: action
-			SubMbPredMvResl0      :[mv_res] repeat 2,
+//			SubMbPredMvResl0      :[mv_res] repeat 2,
 			SubMbPredMbPartHeight :[mb_part_height],
 			SubMbPredMbPartWidth  :[mb_part_width],
 			SubMbPredMbPartIdx    :[mb_part_idx],
 			SubMbPredEndRefIdxL0  :[Finished]
 				==>
-			MvResl0      :[mv_res] repeat 2,
+//			MvResl0      :[mv_res] repeat 2,
 			MbPartHeight :[mb_part_height],
 			MbPartWidth  :[mb_part_width],
 			MbPartIdx    :[mb_part_idx]
@@ -313,10 +292,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		CheckMbTypeInter (LaunchMbPred    )--> ReadMbPredParam1;
 
 		ReadMbPredParam1 (ReadMbPredParam1         )--> ReadMbPredParam1;
-		ReadMbPredParam1 (ReadMbPredParam1Finished )--> ReadMbPredParam2;
-
-		ReadMbPredParam2 (ReadMbPredParam2         )--> ReadMbPredParam2;
-		ReadMbPredParam2 (ReadMbPredParam2Finished )--> ReadMbLayer;
+		ReadMbPredParam1 (ReadMbPredParam1Finished )--> ReadMbLayer;
 
 		ReadSubMbPredParam (ReadSubMbPredParam         )--> ReadSubMbPredParam;
 		ReadSubMbPredParam (ReadSubMbPredParamFinished )--> ReadMbLayer;
@@ -327,7 +303,6 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		MbLayerSkipped     > MbLayer;
 		LaunchSubMbPred    > LaunchMbPred;
 		ReadMbPredParam1   > ReadMbPredParam1Finished;
-		ReadMbPredParam2   > ReadMbPredParam2Finished;
 		ReadSubMbPredParam > ReadSubMbPredParamFinished;
 		ReadMbPredParam1.MbIntra > ReadMbPredParam1.MbInter;
 	end

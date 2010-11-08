@@ -24,10 +24,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="BlocksSize">
+    <Port kind="Input" name="MbType">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
@@ -97,9 +97,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="a">
-            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
-        </Parameter>
     </Instance>
     <Instance id="Algo_DC_Transpose4x4_1">
         <!-- ************************* -->
@@ -141,6 +138,6 @@
         src="Algo_DC_Transpose4x4_1" src-port="Y"/>
     <Connection dst="" dst-port="CoefDCR_L"
         src="Algo_DCR_Hadamard_LUMA_Reordering" src-port="Y"/>
-    <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling"
-        dst-port="BlocksSize" src="" src-port="BlocksSize"/>
+    <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling" dst-port="MbType"
+        src="" src-port="MbType"/>
 </XDF>

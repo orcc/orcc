@@ -10,7 +10,7 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MvRes">
+    <Port kind="Input" name="MbPredMvResL0">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="16"/>
@@ -90,6 +90,13 @@
     <Port kind="Input" name="NewPic">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="SubMbPredMvResL0">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -161,15 +168,6 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="Algo_Add">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_Add_AVC"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="MvpL0_Reconstr">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -212,56 +210,67 @@
             <Expr kind="Literal" literal-kind="Boolean" value="false"/>
         </Parameter>
     </Instance>
+    <Instance id="a">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/Trash/b"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Algo_Add" dst-port="Y" src="" src-port="MvRes"/>
-    <Connection dst="" dst-port="MV" src="Algo_Add" src-port="Z"/>
     <Connection dst="MvpL0_Reconstr" dst-port="slice_type" src="" src-port="slice_type"/>
     <Connection dst="MvpL0_Reconstr" dst-port="mb_type" src="" src-port="mb_type"/>
     <Connection dst="MvpL0_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="MvpL0_Reconstr" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="MvpL0_Reconstr" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="MvpL0_Reconstr" dst-port="Mv" src="Algo_Add" src-port="Z"/>
     <Connection dst="MvpL0_Reconstr" dst-port="MbPredRefIdx" src="" src-port="MbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="MvpL0_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
     <Connection dst="MvComponentReord" dst-port="MbType" src="" src-port="MbType4Prediction"/>
     <Connection dst="MvComponentReord" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
-    <Connection dst="MvComponentReord" dst-port="Mv" src="Algo_Add" src-port="Z"/>
     <Connection dst="" dst-port="mv_out" src="MvComponentReord" src-port="MvOut"/>
     <Connection dst="" dst-port="ref_idx" src="MvComponentReord" src-port="RefIdxOut"/>
-    <Connection dst="SelectMvpLX" dst-port="RefIdxL0"
-        src="MvpL0_Reconstr" src-port="RefIdxOut"/>
-    <Connection dst="SelectMvpLX" dst-port="MbType" src="" src-port="MbType4Prediction"/>
-    <Connection dst="SelectMvpLX" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
-    <Connection dst="Algo_Add" dst-port="X" src="SelectMvpLX" src-port="MvOut"/>
-    <Connection dst="MvComponentReord" dst-port="RefIdx"
-        src="SelectMvpLX" src-port="RefIdxOut"/>
     <Connection dst="" dst-port="PartSZ" src="MvComponentReord" src-port="PartSZ"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL1"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="MbPredRefIdx" src="" src-port="MbPredRefIdxL1"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="Mv" src="Algo_Add" src-port="Z"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="slice_type" src="" src-port="slice_type"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="mb_type" src="" src-port="mb_type"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="SelectMvpLX" dst-port="RefIdxL1"
-        src="MvpL1_Reconstr" src-port="RefIdxOut"/>
-    <Connection dst="" dst-port="LOCATION" src="SelectMvpLX" src-port="Location"/>
-    <Connection dst="SelectMvpLX" dst-port="LocationL0"
-        src="MvpL0_Reconstr" src-port="Location"/>
-    <Connection dst="SelectMvpLX" dst-port="LocationL1"
-        src="MvpL1_Reconstr" src-port="Location"/>
     <Connection dst="" dst-port="RefIdxL0" src="MvpL0_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="MvpL0_Reconstr" dst-port="NewPic_i" src="" src-port="NewPic"/>
     <Connection dst="" dst-port="NewListL0" src="MvpL0_Reconstr" src-port="NewPic_o"/>
-    <Connection dst="MvpL1_Reconstr" dst-port="NewPic_i" src="" src-port="NewPic"/>
-    <Connection dst="" dst-port="RefIdxL1" src="MvpL1_Reconstr" src-port="RefIdxOut"/>
-    <Connection dst="" dst-port="NewListL1" src="MvpL1_Reconstr" src-port="NewPic_o"/>
-    <Connection dst="" dst-port="SelectList" src="SelectMvpLX" src-port="SelectList"/>
-    <Connection dst="SelectMvpLX" dst-port="MvpL1" src="MvpL1_Reconstr" src-port="MvplX"/>
     <Connection dst="SelectMvpLX" dst-port="MvpL0" src="MvpL0_Reconstr" src-port="MvplX"/>
+    <Connection dst="SelectMvpLX" dst-port="LocationL0"
+        src="MvpL0_Reconstr" src-port="Location"/>
+    <Connection dst="SelectMvpLX" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
+    <Connection dst="SelectMvpLX" dst-port="MbType" src="" src-port="MbType4Prediction"/>
+    <Connection dst="SelectMvpLX" dst-port="RefIdxL0"
+        src="MvpL0_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="" dst-port="MV" src="SelectMvpLX" src-port="MvOut"/>
+    <Connection dst="MvComponentReord" dst-port="Mv" src="SelectMvpLX" src-port="MvOut"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="Mv" src="SelectMvpLX" src-port="MvOut"/>
+    <Connection dst="" dst-port="SelectList" src="SelectMvpLX" src-port="SelectList"/>
+    <Connection dst="" dst-port="LOCATION" src="SelectMvpLX" src-port="Location"/>
+    <Connection dst="MvComponentReord" dst-port="RefIdx"
+        src="SelectMvpLX" src-port="RefIdxOut"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="Mv" src="SelectMvpLX" src-port="MvOut"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="NewPic_i" src="" src-port="NewPic"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="mb_type" src="" src-port="mb_type"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="slice_type" src="" src-port="slice_type"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="MbPredRefIdx" src="" src-port="MbPredRefIdxL1"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL1"/>
+    <Connection dst="SelectMvpLX" dst-port="MvpL1" src="MvpL1_Reconstr" src-port="MvplX"/>
+    <Connection dst="" dst-port="NewListL1" src="MvpL1_Reconstr" src-port="NewPic_o"/>
+    <Connection dst="" dst-port="RefIdxL1" src="MvpL1_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="SelectMvpLX" dst-port="LocationL1"
+        src="MvpL1_Reconstr" src-port="Location"/>
+    <Connection dst="SelectMvpLX" dst-port="RefIdxL1"
+        src="MvpL1_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="MbPredMvRes" src="" src-port="MbPredMvResL0"/>
+    <Connection dst="MvpL0_Reconstr" dst-port="SubMbPredMvRes" src="" src-port="SubMbPredMvResL0"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="MbPredMvRes" src="a" src-port="MvRes"/>
+    <Connection dst="MvpL1_Reconstr" dst-port="SubMbPredMvRes" src="a" src-port="MvRes"/>
 </XDF>

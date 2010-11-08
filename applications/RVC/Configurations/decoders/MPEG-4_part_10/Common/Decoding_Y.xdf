@@ -187,13 +187,6 @@
     <Port kind="Input" name="IsIDR">
         <Type name="bool"/>
     </Port>
-    <Port kind="Input" name="BlocksSize">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MacroBlockType">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -332,9 +325,9 @@
     <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_beta_offset"/>
     <Connection dst="TEX_L" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="TEX_L" dst-port="IsIDR" src="" src-port="IsIDR"/>
-    <Connection dst="RES_L" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
     <Connection dst="TEX_L" dst-port="MacroBlockType" src="" src-port="MacroBlockType"/>
     <Connection dst="TEX_L" dst-port="TransformSize8x8" src="" src-port="TransformSize8x8"/>
     <Connection dst="TEX_L" dst-port="PocToDisplay" src="" src-port="PocToDisplay"/>
     <Connection dst="TEX_L" dst-port="PocToRead" src="" src-port="PocToRead"/>
+    <Connection dst="RES_L" dst-port="MbType" src="" src-port="MacroBlockType"/>
 </XDF>

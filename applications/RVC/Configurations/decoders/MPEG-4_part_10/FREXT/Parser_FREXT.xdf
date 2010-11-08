@@ -191,13 +191,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="BlocksSize_Luma">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="Mb_Type">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -535,20 +528,15 @@
     <Connection dst="RefList0" dst-port="ShortTermList" src="MMCO" src-port="ShortTermList"/>
     <Connection dst="RefList0" dst-port="SzShortTermList" src="MMCO" src-port="SzShortTermList"/>
     <Connection dst="RefList0" dst-port="LongTermList" src="MMCO" src-port="LongTermList"/>
-    <Connection dst="BlockExpand" dst-port="BlocksSize_Luma"
-        src="IntraPredSplit" src-port="BlocksSize_Luma"/>
     <Connection dst="" dst-port="Height" src="DecodeSps" src-port="Height"/>
     <Connection dst="" dst-port="Width" src="DecodeSps" src-port="Width"/>
     <Connection dst="BlockSplit" dst-port="Coeff" src="BlockExpand" src-port="Coeff"/>
-    <Connection dst="BlockSplit" dst-port="BlocksSize_Luma"
-        src="IntraPredSplit" src-port="BlocksSize_Luma"/>
     <Connection dst="" dst-port="CoefAC_Cb" src="BlockSplit" src-port="Coeff_U_AC"/>
     <Connection dst="" dst-port="CoefDC_Cb" src="BlockSplit" src-port="Coeff_U_DC"/>
     <Connection dst="" dst-port="CoefAC_Cr" src="BlockSplit" src-port="Coeff_V_AC"/>
     <Connection dst="" dst-port="CoefDC_Cr" src="BlockSplit" src-port="Coeff_V_DC"/>
     <Connection dst="" dst-port="CoefAC_L" src="BlockSplit" src-port="Coeff_Y_AC"/>
     <Connection dst="" dst-port="CoefDC_L" src="BlockSplit" src-port="Coeff_Y_DC"/>
-    <Connection dst="" dst-port="BlocksSize_Luma" src="IntraPredSplit" src-port="BlocksSize_Luma"/>
     <Connection dst="" dst-port="Mb_Type" src="IntraPredSplit" src-port="MbType"/>
     <Connection dst="" dst-port="Mb_TypeC" src="IntraPredSplit" src-port="MbTypeC"/>
     <Connection dst="" dst-port="PredMode" src="IntraPredSplit" src-port="PredMode"/>
@@ -638,7 +626,6 @@
     <Connection dst="RefList1" dst-port="NbRefFrame" src="DecodePic" src-port="NbRefFrame_l1"/>
     <Connection dst="RefList1" dst-port="RefListType" src="DecodePic" src-port="RefList1Type"/>
     <Connection dst="RefList1" dst-port="RefReordering" src="DecodePic" src-port="RefReordering_l1"/>
-    <Connection dst="MVReconstruct" dst-port="MvRes" src="DecodePic" src-port="MvResl0"/>
     <Connection dst="MVReconstruct" dst-port="slice_type"
         src="DecodePic" src-port="slice_type"/>
     <Connection dst="MVReconstruct" dst-port="mb_type" src="DecodePic" src-port="MacroBlockType"/>
@@ -684,4 +671,10 @@
     <Connection dst="" dst-port="PocToRead" src="SelectRefIdx" src-port="PocToRead"/>
     <Connection dst="SelectRefIdx" dst-port="SelectList"
         src="MVReconstruct" src-port="SelectList"/>
+    <Connection dst="MVReconstruct" dst-port="MbPredMvResL0"
+        src="DecodePic" src-port="MbPredResMvL0"/>
+    <Connection dst="MVReconstruct" dst-port="SubMbPredMvResL0"
+        src="DecodePic" src-port="SubMbPredResMvL0"/>
+    <Connection dst="BlockSplit" dst-port="MbType" src="DecodePic" src-port="MacroBlockType"/>
+    <Connection dst="BlockExpand" dst-port="MbType" src="DecodePic" src-port="MacroBlockType"/>
 </XDF>

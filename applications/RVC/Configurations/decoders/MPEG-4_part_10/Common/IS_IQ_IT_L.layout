@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CoefDCR_L" x="124" y="233"/>
-      <vertex id="CoefAC_L" x="2" y="199"/>
-      <vertex id="QP" x="298" y="272"/>
-      <vertex id="ScalingList" x="280" y="304"/>
-      <vertex id="BlocksSize" x="144" y="138"/>
-      <vertex id="CoefACR_L" x="729" y="199"/>
-      <vertex id="Algo_IS_Zigzag_4x4_AC" x="37" y="89"/>
-      <vertex id="Mgnt_IQ_INTRA16x16" x="245" y="182"/>
-      <vertex id="Algo_IQ_QSAndSLAndIDCTScaler_4x4" x="433" y="182"/>
-      <vertex id="IT4x4" x="745" y="76"/>
+      <vertex id="CoefDCR_L" x="278" y="146"/>
+      <vertex id="CoefAC_L" x="16" y="113"/>
+      <vertex id="QP" x="618" y="157"/>
+      <vertex id="ScalingList" x="589" y="191"/>
+      <vertex id="MbType" x="288" y="182"/>
+      <vertex id="CoefACR_L" x="1104" y="80"/>
+      <vertex id="Algo_IS_Zigzag_4x4_AC" x="114" y="99"/>
+      <vertex id="Mgnt_IQ_INTRA16x16" x="387" y="96"/>
+      <vertex id="Algo_IQ_QSAndSLAndIDCTScaler_4x4" x="704" y="89"/>
+      <vertex id="IT4x4" x="1031" y="78"/>
    </vertices>
 </layout>

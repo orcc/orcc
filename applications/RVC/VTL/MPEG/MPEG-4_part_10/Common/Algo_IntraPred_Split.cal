@@ -64,7 +64,6 @@ actor Algo_IntraPred_Split()
 		==>
 	uint(size=4)  PredMode,
 	uint(size=8)  MbType,
-	uint(size=2)  BlocksSize_Luma,
 	uint(size=8)  MbTypeC
 		:
 
@@ -128,7 +127,6 @@ actor Algo_IntraPred_Split()
 			ConstrainedIFlag :[ Constrained_I_Flag ]
 				==>
 			MbType           :[MB_TYPE_INTER],
-			BlocksSize_Luma  :[BLOCK_4x4],
 			MbTypeC          :[2]
 		guard
 			mb_intra_flag = 0
@@ -240,7 +238,6 @@ actor Algo_IntraPred_Split()
 			ConstrainedIFlag :[ Constrained_I_Flag ]
 				==>
 			MbType      :[ MB_TYPE_INTRA_4x4 ],
-			BlocksSize_Luma  :[BLOCK_4x4],
 			MbTypeC     :[ 1 ]
 		guard
 			mb_intra_type = INTRA_4x4 and count = 16
@@ -293,7 +290,6 @@ actor Algo_IntraPred_Split()
 				==>
 			PredMode    :[ Mode_16x16 ],
 			MbType      :[ MB_TYPE_INTRA_16x16 ],
-			BlocksSize_Luma  :[BLOCK_16x16],
 			MbTypeC     :[ 1 ]
 		guard
 			mb_intra_type = INTRA_16x16

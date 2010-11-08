@@ -18,7 +18,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 actor Mgnt_IQ_INTRA16x16()
 	int (size=16) CoefDCR_L,
-	uint(size=2)  BlocksSize,
+	uint(size=6)  MbType,
 	int (size=16) CoefAC_L
 		==>
 	int(size=16) Lev2d,
@@ -27,27 +27,27 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	/* Constants */
-//	uint(size=2) BLOCK_4x4   = 0;
-//	uint(size=2) BLOCK_8x8   = 1;
-	uint(size=2) BLOCK_16x16 = 2;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 
 
 	uint(size=5)  NbBlock       := 0;
 
 
 	HasDCCoeff: action
-			BlocksSize      :[MacroBSize]
+			MbType         :[mb_type]
 				==>
 			DCCoeff_Present :[true]
 		end
 
 
 	HasNotDCCoeff: action
-			BlocksSize      :[MacroBSize]
+			MbType      :[mb_type]
 				==>
 			DCCoeff_Present :[false]
 		guard
-			MacroBSize != BLOCK_16x16
+			   mb_type < BLOCK_TYPE_INTRA_16x16_MIN
+			or mb_type > BLOCK_TYPE_INTRA_16x16_MAX
 		end
 
 

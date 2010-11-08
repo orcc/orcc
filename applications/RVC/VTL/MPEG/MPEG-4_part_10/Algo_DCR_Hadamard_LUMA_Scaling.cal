@@ -54,18 +54,17 @@ Copyright (c) ISO/IEC 2007.
 
 
 
-actor Algo_DCR_Hadamard_LUMA_Scaling (bool a)
+actor Algo_DCR_Hadamard_LUMA_Scaling ()
 		int (size=16) I, 
 		int (size=8)  QP,
 		int (size=8)  ScalingList,
-		uint(size=2)  BlocksSize
+		uint(size=6)  MbType
 				==>
 		int(size=16) O:
 
 
-//	uint(size=2) BLOCK_4x4   = 0;
-//	uint(size=2) BLOCK_8x8   = 1;
-	uint(size=2) BLOCK_16x16 = 2;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 
 	bool DEBUG_INPUT = false;
 	
@@ -123,7 +122,7 @@ actor Algo_DCR_Hadamard_LUMA_Scaling (bool a)
 
   iquantise.Launch: action
   		I:[i] repeat 16,
-		BlocksSize :[BlckSz]
+		MbType :[mb_type]
 			==>
 		O:[ [
     			if qp_per < 6 then
@@ -134,7 +133,6 @@ actor Algo_DCR_Hadamard_LUMA_Scaling (bool a)
     	  ] ] repeat 16
 	do
 		if(DEBUG_INPUT)then
-			println("Input DCR_Hadamard_Luma_Scaling BlocksSize:"+BlckSz);
 			foreach int j in 0 .. 15
 			do
 				println("Input DCR_Hadamard_Luma_Scaling I:"+i[j]);
@@ -144,14 +142,11 @@ actor Algo_DCR_Hadamard_LUMA_Scaling (bool a)
 
 
   iquantise.Skip: action
-		BlocksSize :[BlckSz]
+		MbType :[mb_type]
 			==>
 	guard
-		BlckSz != BLOCK_16x16
-	do
-		if(DEBUG_INPUT)then
-			println("Input DCR_Hadamard_Luma_Scaling BlocksSize:"+BlckSz);
-		end
+		   mb_type < BLOCK_TYPE_INTRA_16x16_MIN
+		or mb_type > BLOCK_TYPE_INTRA_16x16_MAX
   	end
 
   schedule fsm read_qp:

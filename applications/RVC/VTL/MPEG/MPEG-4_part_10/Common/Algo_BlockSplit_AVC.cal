@@ -55,7 +55,7 @@ Copyright (c) ISO/IEC 2008.
 
 actor Algo_BlockSplit_AVC()
 	int (size=12) Coeff,
-	uint(size=2)  BlocksSize_Luma
+	uint(size=6)  MbType
 		==>
 	int(size=16) Coeff_Y_DC,
 	int(size=16) Coeff_Y_AC,
@@ -65,29 +65,20 @@ actor Algo_BlockSplit_AVC()
 	int(size=16) Coeff_V_AC
 		:
 
-
-//	uint(size=2) BLOCK_4x4   = 0;
-//	uint(size=2) BLOCK_8x8   = 1;
-	uint(size=2) BLOCK_16x16 = 2;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 
 	bool DEBUG_INPUT = false;
 
 
 	Block_16x16_Luma.Send_Y_DC: action
-			BlocksSize_Luma :[MBSize],
+			MbType          :[mb_type],
 			Coeff           :[ x ] repeat 16
 				==>
 			Coeff_Y_DC      :[ x ] repeat 16
 		guard
-			MBSize = BLOCK_16x16
-		do
-			if(DEBUG_INPUT)then
-				println("Input BlockSplit BlocksSize_Luma:"+MBSize);
-				foreach int i in 0 .. 15
-				do
-					println("Input BlockSplit Coeff:"+x[i]);
-				end
-			end
+			mb_type >= BLOCK_TYPE_INTRA_16x16_MIN,
+			mb_type <= BLOCK_TYPE_INTRA_16x16_MAX
 		end
 
 
@@ -95,29 +86,17 @@ actor Algo_BlockSplit_AVC()
 			Coeff      :[ x ] repeat 16 * 16
 				==>
 			Coeff_Y_AC :[ x ] repeat 16 * 16
-		do
-			if(DEBUG_INPUT)then
-				foreach int i in 0 .. 16*16 - 1
-				do
-					println("Input BlockSplit Coeff:"+x[i]);
-				end
-			end	
 		end
 
 
 	Block_4x4_Luma.Send_Y_AC: action
-			BlocksSize_Luma :[MBSize],	
+			MbType          :[mb_type],
 			Coeff           :[ x ] repeat 16 * 16
 				==>
 			Coeff_Y_AC      :[ x ] repeat 16 * 16
-		do
-			if(DEBUG_INPUT)then
-				println("Input BlockSplit BlockSize_Luma:"+MBSize);
-				foreach int i in 0 .. 16*16 - 1
-				do
-					println("Input BlockSplit Coeff:"+x[i]);
-				end
-			end	
+		guard
+			   mb_type < BLOCK_TYPE_INTRA_16x16_MIN
+			or mb_type > BLOCK_TYPE_INTRA_16x16_MAX
 		end
 
 
@@ -167,29 +146,26 @@ actor Algo_BlockSplit_AVC()
 			Coeff      :[ x ] repeat 8 * 8
 				==>
 			Coeff_V_AC :[ x ] repeat 8 * 8
-		do
-			if(DEBUG_INPUT)then
-				foreach int i in 0 .. 63
-				do
-					println("Input BlockSplit Coeff:"+x[i]);
-				end
-			end	
 		end
 
 
 	schedule fsm Check_Luma_MBSize :
 		Check_Luma_MBSize (Block_4x4_Luma.Send_Y_AC   )--> splitU_DC;
-
 		Check_Luma_MBSize (Block_16x16_Luma.Send_Y_DC )--> Send_Y_AC_16x16;
+
 		Send_Y_AC_16x16   (Block_16x16_Luma.Send_Y_AC )--> splitU_DC;
 
+
 		splitU_DC         (splitU_DC                  )--> splitV_DC;
+
 		splitV_DC         (splitV_DC                  )--> splitU_AC;
+
 		splitU_AC         (splitU_AC                  )--> splitV_AC;
+
 		splitV_AC         (splitV_AC                  )--> Check_Luma_MBSize;
 	end
 
 	priority
-		Block_16x16_Luma > Block_4x4_Luma;
+		Block_4x4_Luma > Block_16x16_Luma;
 	end
 end

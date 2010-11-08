@@ -52,9 +52,9 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-
+//Modified by Damien de Saint Jorre (IETR/INSA of Rennes)
 actor Algo_BlockExpand_AVC ()
-	uint(size=2)  BlocksSize_Luma,
+	uint(size=6)  MbType,
 	int (size=12) Value,
 	uint(size=4)  Run,
 	bool          Last
@@ -63,9 +63,13 @@ actor Algo_BlockExpand_AVC ()
 		:
 
 	/* Constants */
-//	uint(size=2) BLOCK_4x4   = 0;
+	uint(size=2) BLOCK_4x4   = 0;
 //	uint(size=2) BLOCK_8x8   = 1;
 	uint(size=2) BLOCK_16x16 = 2;	
+
+
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 
 	uint(size=2)  Y_COMPONENT = 0;
 	uint(size=2)  U_COMPONENT = 1;
@@ -76,8 +80,6 @@ actor Algo_BlockExpand_AVC ()
 	int (size=5) SZ_LUMA_AC_4X4   = 16;
 	int (size=5) SZ_CHROMA_DC     = 4;
 	int (size=5) SZ_CHROMA_AC     = 16;
-
-	bool DEBUG_INPUT = false;
 
 	/* State Variable */
 	List(type:int(size=12), size=16) ValCoeff := [ 0 : for int i in 0 .. 15];
@@ -93,15 +95,17 @@ actor Algo_BlockExpand_AVC ()
 	/* Actions */
 
 	ReadBlockSize: action
-			BlocksSize_Luma :[Size]
+			MbType :[mb_type]
 				==>
 		do
-			LumaMBSize       := Size;
+			LumaMBSize       :=
+				if(mb_type >= BLOCK_TYPE_INTRA_16x16_MIN and mb_type <= BLOCK_TYPE_INTRA_16x16_MAX)then
+					BLOCK_16x16
+				else
+					BLOCK_4x4
+				end;
 			NbBlocksSent     := 0;
 			DC_ComponentSent := false;
-			if(DEBUG_INPUT)then
-				println("Input BlockExpand_AVC BlockSize_Luma:"+Size);
-			end
 		end
 
 
@@ -116,12 +120,6 @@ actor Algo_BlockExpand_AVC ()
 		do
 			ValCoeff[IdxValCoeff] := Val;
 			IdxValCoeff           := IdxValCoeff + 1;
-			if(DEBUG_INPUT)then
-				println("Input BlockExpand_AVC Last:"+ValLast);
-				println("Input BlockExpand_AVC Run:"+ValRun);
-				println("Input BlockExpand_AVC Value:"+Val);
-				println("");
-			end	
 		end
 
 
@@ -141,12 +139,6 @@ actor Algo_BlockExpand_AVC ()
 				ValCoeff[IdxValCoeff + j] := 0;
 			end
 			IdxValCoeff           := IdxValCoeff + ValRun;
-			if(DEBUG_INPUT)then
-				println("Input BlockExpand_AVC Last:"+ValLast);
-				println("Input BlockExpand_AVC Run:"+ValRun);
-				println("Input BlockExpand_AVC Value:"+Val);
-				println("");
-			end	
 		end
 
 
@@ -166,12 +158,6 @@ actor Algo_BlockExpand_AVC ()
 					ValCoeff[IdxValCoeff - 1 - j] := buff;
 				end
 			end
-			if(DEBUG_INPUT)then
-				println("Input BlockExpand_AVC Last:"+ValLast);
-				println("");
-				println("");
-				println("");
-			end	
 		end
 
 

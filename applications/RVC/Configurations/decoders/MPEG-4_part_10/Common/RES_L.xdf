@@ -31,10 +31,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="BlocksSize">
+    <Port kind="Input" name="MbType">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
@@ -138,6 +138,6 @@
         src="FUN_IS_IQ_IT_L" src-port="CoefACR_L"/>
     <Connection dst="" dst-port="CoefACR_L"
         src="Algo_Merge_4x4_to_16x16" src-port="Y"/>
-    <Connection dst="FUN_IS_IQ_IT_L" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
-    <Connection dst="FUN_dcr" dst-port="BlocksSize" src="" src-port="BlocksSize"/>
+    <Connection dst="FUN_dcr" dst-port="MbType" src="" src-port="MbType"/>
+    <Connection dst="FUN_IS_IQ_IT_L" dst-port="MbType" src="" src-port="MbType"/>
 </XDF>
