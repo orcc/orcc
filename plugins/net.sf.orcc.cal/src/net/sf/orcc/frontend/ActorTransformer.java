@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.xtext.naming.IQualifiedNameProvider;
-
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
@@ -87,6 +85,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.ActionList;
+import net.sf.orcc.util.CollectionsUtil;
 import net.sf.orcc.util.OrderedMap;
 
 import com.google.inject.Inject;
@@ -102,9 +101,6 @@ public class ActorTransformer {
 	@Inject
 	private AstTransformer astTransformer;
 
-	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
-			.compile("\\.");
-
 	/**
 	 * The file in which the actor is defined.
 	 */
@@ -115,8 +111,10 @@ public class ActorTransformer {
 	 */
 	final private Map<AstPort, Port> mapPorts;
 
-	@Inject
-	private IQualifiedNameProvider nameProvider;
+	/**
+	 * count of un-tagged actions
+	 */
+	private int untaggedCount;
 
 	/**
 	 * Creates a new AST to IR transformation.
@@ -509,6 +507,7 @@ public class ActorTransformer {
 	 */
 	public Actor transform(String file, AstActor astActor) {
 		this.file = file;
+
 		astTransformer.setFile(file);
 
 		Context context = astTransformer.getContext();
@@ -588,7 +587,7 @@ public class ActorTransformer {
 			context.restoreScope();
 
 			// create IR actor
-			String name = nameProvider.getQualifiedName(astActor.getName());
+			String name = astActor.getName();
 			return new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procedures, actions.getAllActions(),
 					initializes.getAllActions(), scheduler);
@@ -596,6 +595,8 @@ public class ActorTransformer {
 			// cleanup
 			astTransformer.clear();
 			mapPorts.clear();
+
+			untaggedCount = 0;
 		}
 	}
 
@@ -613,17 +614,17 @@ public class ActorTransformer {
 		// transform tag
 		AstTag astTag = astAction.getTag();
 		Tag tag;
+		String name;
 		if (astTag == null) {
 			tag = new Tag();
+			name = "untagged_" + untaggedCount++;
 		} else {
 			tag = new Tag(astAction.getTag().getIdentifiers());
+			name = CollectionsUtil.toString(tag, "_");
 		}
 
 		Pattern inputPattern = new Pattern();
 		Pattern outputPattern = new Pattern();
-
-		String name = astTransformer.getQualifiedName(astAction);
-		name = dotPattern.matcher(name).replaceAll("_");
 
 		// creates scheduler and body
 		Procedure scheduler = new Procedure("isSchedulable_" + name, location,

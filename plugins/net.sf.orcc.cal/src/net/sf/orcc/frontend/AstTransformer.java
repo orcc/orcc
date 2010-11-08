@@ -92,9 +92,6 @@ import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.StringUtil;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.xtext.naming.IQualifiedNameProvider;
-
-import com.google.inject.Inject;
 
 /**
  * This class transforms an AST actor to its IR equivalent.
@@ -837,10 +834,12 @@ public class AstTransformer {
 
 	}
 
-	private Context context;
+	/**
+	 * allows creation of unique names
+	 */
+	private int blockCount;
 
-	private final java.util.regex.Pattern dotPattern = java.util.regex.Pattern
-			.compile("\\.");
+	private Context context;
 
 	/**
 	 * expression transformer.
@@ -863,9 +862,6 @@ public class AstTransformer {
 	 * A map from AST procedures to IR procedures.
 	 */
 	final private Map<AstProcedure, Procedure> mapProcedures;
-
-	@Inject
-	private IQualifiedNameProvider nameProvider;
 
 	/**
 	 * the list of procedures of the IR actor.
@@ -922,6 +918,8 @@ public class AstTransformer {
 	 * Clears up context and functions/proceudres maps.
 	 */
 	public void clear() {
+		blockCount = 0;
+
 		mapFunctions.clear();
 		mapProcedures.clear();
 
@@ -1081,8 +1079,18 @@ public class AstTransformer {
 	 *            an object
 	 * @return the qualified name for the given object
 	 */
-	public String getQualifiedName(EObject obj) {
-		return nameProvider.getQualifiedName(obj);
+	private String getQualifiedName(AstVariable variable) {
+		EObject cter = variable.eContainer();
+		String name = variable.getName();
+		if (cter instanceof AstGenerator) {
+			name = "generator" + blockCount + "_" + name;
+			blockCount++;
+		} else if (cter instanceof AstStatementForeach) {
+			name = "foreach" + blockCount + "_" + name;
+			blockCount++;
+		}
+
+		return name;
 	}
 
 	/**
@@ -1311,8 +1319,7 @@ public class AstTransformer {
 	public LocalVariable transformLocalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 
-		String name = nameProvider.getQualifiedName(astVariable);
-		name = dotPattern.matcher(name).replaceAll("_");
+		String name = getQualifiedName(astVariable);
 
 		boolean assignable = !astVariable.isConstant();
 		Type type = astVariable.getIrType();
