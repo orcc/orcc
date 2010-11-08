@@ -1,0 +1,3 @@
+actor DuplicatePort4 () int(size=3) I ==> int(size=3) O, int(size=3) O :
+
+end
