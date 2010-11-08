@@ -339,7 +339,7 @@ WhileNode(whileNode) ::= <<
 		</operation>
 	</module>		
 	<module kind="body">
-	$nodes(whileNode.nodes)$
+		$nodes(whileNode.nodes)$
 	</module>
 </module>
 >>

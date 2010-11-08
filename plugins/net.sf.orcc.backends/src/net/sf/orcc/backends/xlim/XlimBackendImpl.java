@@ -37,6 +37,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
+import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transforms.ArrayInitializeTransformation;
 import net.sf.orcc.backends.xlim.transforms.ChangeActionSchedulerFormTransformation;
@@ -45,12 +46,12 @@ import net.sf.orcc.backends.xlim.transforms.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transformations.BlockCombine;
+import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
-
 
 /**
  * This class defines a template-based XLIM back-end.
@@ -72,8 +73,9 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private STPrinter printer;
-	
+
 	private boolean hardwareGen;
+
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = {
@@ -81,7 +83,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new InlineTransformation(true, true), new BlockCombine(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new DeadVariableRemoval(),
-				new ExpressionSplitterTransformation(),
+				new ExpressionSplitterTransformation(), new BuildCFG(),
+				new CastAdderTransformation(),
 				new LocalListToMultipleVariableTransformation(),
 				new MoveLiteralIntegers(), new VariableRenamer(),
 				new ChangeActionSchedulerFormTransformation() };
@@ -100,17 +103,17 @@ public class XlimBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
-		
+
 		// check if "XLiM Hardware Generation" is selected
-		
+
 		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", false);
-		
+
 		printer = new STPrinter();
-		
-		if (hardwareGen){
-			printer.loadGroups("XLIM_actor","XLIM_actor_hard");
-		}else{
-			printer.loadGroups("XLIM_actor");
+
+		if (hardwareGen) {
+			printer.loadGroups("XLIM_actor", "XLIM_actor_hard");
+		} else {
+			printer.loadGroups("XLIM_actor_exp");
 		}
 
 		printer.setExpressionPrinter(XlimExprPrinter.class);
@@ -134,15 +137,15 @@ public class XlimBackendImpl extends AbstractBackend {
 			throw new OrccException("I/O error", e);
 		}
 	}
-	
+
 	private void printNetwork(Network network) throws OrccException {
-		if (hardwareGen){
+		if (hardwareGen) {
 			try {
 				String outputName = path + File.separator + network.getName()
 						+ ".vhd";
 				printer.loadGroups("XLIM_VHDL_network");
 				printer.printNetwork(outputName, network, false, fifoSize);
-	
+
 			} catch (IOException e) {
 				throw new OrccException("I/O error", e);
 			}

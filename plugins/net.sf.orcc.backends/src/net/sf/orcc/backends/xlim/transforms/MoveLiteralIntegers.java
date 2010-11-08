@@ -30,7 +30,6 @@ package net.sf.orcc.backends.xlim.transforms;
 
 import java.util.List;
 import java.util.ListIterator;
-
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -40,6 +39,7 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -49,11 +49,13 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * 
@@ -150,7 +152,7 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		Use.addUses(store, store.getIndexes());
 		Use.addUses(store, store.getValue());
 	}
-	
+
 	@Override
 	public void visit(Load load) {
 		ListIterator<Expression> it = load.getIndexes().listIterator();
@@ -216,6 +218,38 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			node.accept(this);
 			i = nodes.indexOf(node);
 		}
+	}
+
+	@Override
+	public void visit(PhiAssignment phi) {
+		List<Expression> values = phi.getValues();
+		LocalVariable target = phi.getTarget();
+		OrderedMap<String, Variable> parameters = procedure.getParameters();
+
+		// Remove local variable with index = 0 from value
+		for (Expression value : values) {
+			if (value.isVarExpr()) {
+				VarExpr sourceExpr = (VarExpr) value;
+				LocalVariable source = (LocalVariable) sourceExpr.getVar()
+						.getVariable();
+
+				// Local variable must not be a parameter of the procedure
+				if (source.getIndex() == 0
+						&& !parameters.contains(source.getName())) {
+					Expression expr;
+
+					if (target.getType().isBool()) {
+						expr = new BoolExpr(false);
+					} else {
+						expr = new IntExpr(0);
+					}
+
+					values.set(values.indexOf(value), (Expression) expr.accept(
+							exprInterpreter, instructionIterator));
+				}
+			}
+		}
+		Use.addUses(phi, phi.getValues());
 	}
 
 }
