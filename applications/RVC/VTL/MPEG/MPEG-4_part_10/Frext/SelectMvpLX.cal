@@ -54,10 +54,10 @@ Copyright (c) ISO/IEC 2008.
 actor SelectMvpLX()
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
-	int (size=16) MvpL0,
+	int (size=16) MvL0,
 	uint(size=11) LocationL0,
 	uint(size=4)  RefIdxL0,
-	int (size=16) MvpL1,
+	int (size=16) MvL1,
 	uint(size=4)  RefIdxL1,
 	uint(size=11) LocationL1
 		==>
@@ -205,7 +205,7 @@ actor SelectMvpLX()
 		end
 
 	MacroBlkType.IsPredL0: action
-			MvpL0      :[Mvx, Mvy],
+			MvL0       :[Mvx, Mvy],
 			RefIdxL0   :[ref_idx],
 			LocationL0 :[Mbx_in_pix,Mby_in_pix]
 				==>
@@ -223,7 +223,7 @@ actor SelectMvpLX()
 		end
 
 	MacroBlkType.IsPredL1: action
-			MvpL1      :[Mvx,Mvy],
+			MvL1       :[Mvx,Mvy],
 			RefIdxL1   :[ref_idx],
 			LocationL1 :[Mbx_in_pix,Mby_in_pix]
 				==>
@@ -241,10 +241,10 @@ actor SelectMvpLX()
 		end
 
 	MacroBlkType.IsBiPred: action
-			MvpL1      :[Mvx,Mvy],
+			MvL1       :[Mvx,Mvy],
 			RefIdxL1   :[ref_idx],
 			LocationL1 :[Mbx_in_pix,Mby_in_pix],
-			MvpL0      :[Mvx2, Mvy2],
+			MvL0       :[Mvx2, Mvy2],
 			RefIdxL0   :[ref_idx2],
 			LocationL0 :[Mbx_in_pix2,Mby_in_pix2]
 				==>
@@ -282,7 +282,7 @@ actor SelectMvpLX()
 		end
 
 	SubMacroBlkType.IsPredL0: action
-			MvpL0      :[Mvx, Mvy],
+			MvL0       :[Mvx, Mvy],
 			RefIdxL0   :[ref_idx],
 			LocationL0 :[Mbx_in_pix,Mby_in_pix]
 				==>
@@ -299,7 +299,7 @@ actor SelectMvpLX()
 		end
 
 	SubMacroBlkType.IsPredL1: action
-			MvpL1      :[Mvx, Mvy],
+			MvL1       :[Mvx, Mvy],
 			RefIdxL1   :[ref_idx],
 			LocationL1 :[Mbx_in_pix,Mby_in_pix]
 				==>
@@ -316,10 +316,10 @@ actor SelectMvpLX()
 		end
 
 	SubMacroBlkType.IsBiPred: action
-			MvpL1      :[Mvx,Mvy],
+			MvL1       :[Mvx,Mvy],
 			RefIdxL1   :[ref_idx],
 			LocationL1 :[Mbx_in_pix,Mby_in_pix],
-			MvpL0      :[Mvx2, Mvy2],
+			MvL0       :[Mvx2, Mvy2],
 			RefIdxL0   :[ref_idx2],
 			LocationL0 :[Mbx_in_pix2,Mby_in_pix2]
 				==>

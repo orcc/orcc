@@ -325,13 +325,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="slice_type">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="MbPredRefIdxL0">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -709,8 +702,6 @@
     <Connection dst="" dst-port="RefList1Type" src="DecodeRefPicList" src-port="RefList1Type"/>
     <Connection dst="" dst-port="RefReordering_l1"
         src="DecodeRefPicList" src-port="RefReordering_l1"/>
-    <Connection dst="" dst-port="slice_type"
-        src="MergeDataFromSDataAndMbLayer" src-port="slice_type"/>
     <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="SliceType"
         src="DecodeMacroBlockLayer" src-port="Slice_Type"/>
     <Connection dst="DecodeResidualBlock_Cavlc" dst-port="Parameters"

@@ -1,10 +1,10 @@
 actor Dave_Null () 
 		==>
-	int(size=16) Token
+	int(size=16) MvRes
     :
 	a: action
 				==>
-			Token:[42]
+			MvRes:[42]
 		guard
 			1=0
 		end

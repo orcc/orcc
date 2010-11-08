@@ -626,8 +626,6 @@
     <Connection dst="RefList1" dst-port="NbRefFrame" src="DecodePic" src-port="NbRefFrame_l1"/>
     <Connection dst="RefList1" dst-port="RefListType" src="DecodePic" src-port="RefList1Type"/>
     <Connection dst="RefList1" dst-port="RefReordering" src="DecodePic" src-port="RefReordering_l1"/>
-    <Connection dst="MVReconstruct" dst-port="slice_type"
-        src="DecodePic" src-port="slice_type"/>
     <Connection dst="MVReconstruct" dst-port="mb_type" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="MVReconstruct" dst-port="MbPredRefIdxL0"
         src="DecodePic" src-port="MbPredRefIdxL0"/>
