@@ -32,13 +32,13 @@ import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
 import static net.sf.orcc.OrccProperties.PRETTYPRINT_JSON;
 import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
 
@@ -60,6 +60,9 @@ import org.eclipse.emf.ecore.EValidator;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.builder.IXtextBuilderParticipant;
+import org.eclipse.xtext.resource.IEObjectDescription;
+import org.eclipse.xtext.resource.IResourceDescription;
+import org.eclipse.xtext.resource.IResourceDescription.Delta;
 
 import com.google.inject.Injector;
 
@@ -104,14 +107,22 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 		frontend.setPrettyPrint(Boolean.parseBoolean(compactIR));
 
 		ResourceSet set = context.getResourceSet();
-		List<Resource> resources = set.getResources();
-		monitor.beginTask("Building actors", resources.size());
-		for (Resource resource : resources) {
-			List<EObject> contents = resource.getContents();
-			Iterator<EObject> it = contents.iterator();
-			if (it.hasNext()) {
-				EObject obj = it.next();
-				if (obj instanceof AstActor) {
+		monitor.beginTask("Building actors", context.getDeltas().size());
+		for (Delta delta : context.getDeltas()) {
+			if (delta.getNew() == null) {
+				// deletion
+				IResourceDescription desc = delta.getOld();
+				for (IEObjectDescription objDesc : desc
+						.getExportedObjects(CalPackage.eINSTANCE.getAstActor())) {
+					File file = new File(outputFolder + File.separator
+							+ objDesc.getName() + ".json");
+					file.delete();
+				}
+			} else {
+				// creation
+				IResourceDescription desc = delta.getNew();
+				Resource resource = set.getResource(desc.getURI(), false);
+				for (EObject obj : resource.getContents()) {
 					AstActor actor = (AstActor) obj;
 					build(resource, actor);
 				}
