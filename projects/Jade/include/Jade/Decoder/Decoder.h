@@ -54,6 +54,7 @@ class Instance;
 class JIT;
 class Network;
 class BroadcastAdder;
+class RoundRobinScheduler;
 //------------------------------
 
 class Decoder {
@@ -176,6 +177,20 @@ public:
 	 *
      */
 	int instanciate();
+
+	/**
+     *  @brief Setter of the decoder scheduler
+	 *
+	 *  @param scheduler : the scheduler of the decoder
+	 *
+     */
+	void setScheduler(RoundRobinScheduler* scheduler);
+
+	/**
+     *  @brief Start the decoder
+	 *
+     */
+	void start();
 	
 	/**
 	 * @brief Compile the decoder
@@ -200,11 +215,15 @@ private:
 	/** List of actors contained in the decoder */
 	std::map<std::string, Actor*>* actors;
 
+
 	/** List of instances in the decoder */
 	std::map<std::string, Instance*>* instances;
 	
 	/** List of Fifo in the decoder */
 	std::list<AbstractFifo*> fifos;
+
+	/** Scheduler of the decoder */
+	RoundRobinScheduler* scheduler;
 
 	/** JIT of decoder engine */
 	JIT* jit;

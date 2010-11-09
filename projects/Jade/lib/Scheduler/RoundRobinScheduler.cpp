@@ -58,6 +58,7 @@
 #include "Jade/Core/Variable.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Core/Instance.h"
+#include "Jade/Jit/LLVMExecution.h"
 
 #include "display.h"
 //------------------------------
@@ -77,8 +78,17 @@ static int Filesize(){
 	return st.st_size;
 }
 
-RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder* decoder): Context(C) {
-	this->jit = jit;
+RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C): Context(C) {
+	this->executionEngine = NULL;
+}
+
+RoundRobinScheduler::~RoundRobinScheduler (){
+	if (executionEngine){
+		delete executionEngine;
+	}
+}
+
+void RoundRobinScheduler::createScheduler(Decoder* decoder){
 	this->decoder = decoder;
 	
 	//Create action schedulers
@@ -89,39 +99,32 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, JIT* jit, Decoder
 		Instance* instance = (*it).second;
 		string id = instance->getId();
 		ActionSchedulerAdder(instance, decoder, Context);
-
 	}
 	
+	createSchedulerFn();
 	
-	createScheduler();
-	
-	//Connect decoder to source
+	//Set input file
 	setSource();
 
 	//Set compare file if needed
 	if(YuvFile.compare("") != 0){
 		setCompare();
 	}
-
-	//Connect decoder to display if needed
-	if(!nodisplay){
-		setDisplay();
-	}
 }
 
-RoundRobinScheduler::~RoundRobinScheduler (){
-
-}
-
-void RoundRobinScheduler::createScheduler(){
+void RoundRobinScheduler::createSchedulerFn(){
 	map<string, Instance*>::iterator it;
 	
 	Module* module = decoder->getModule();
 	LLVMContext &Context = getGlobalContext();
 
+	//Create a global value that stop the scheduler and set it to false
+	GlobalVariable* stopGV = (GlobalVariable*)module->getOrInsertGlobal("stop", Type::getInt1Ty(Context));
+	stopGV->setInitializer(ConstantInt::get(Type::getInt1Ty(Context), 0));
+	
 	// create scheduler
 	map<string, Instance*>* instances = decoder->getInstances();
-	scheduler = cast<Function>(module->getOrInsertFunction("main", Type::getVoidTy(Context),
+	scheduler = cast<Function>(module->getOrInsertFunction("main", Type::getInt32Ty(Context),
                                           (Type *)0));
 										  
 
@@ -150,16 +153,52 @@ void RoundRobinScheduler::createScheduler(){
 		CallInst *Add1CallRes = CallInst::Create(scheduler->getSchedulerFunction(), "", BB);
 	}
 	
-	// Create a branch to entry
-	Instruction* brBbInst = BranchInst::Create(BB, BB);
+	// Add a basic block return to the scheduler.
+	BasicBlock* BBReturn = BasicBlock::Create(Context, "return", scheduler);
+	ConstantInt* one = ConstantInt::get(Type::getInt32Ty(Context), 1);
+	ReturnInst* returnInst = ReturnInst::Create(Context, one, BBReturn);
+
+	// Load stop value and test if the scheduler must be stop
+	LoadInst* stopVal = new LoadInst(stopGV, "", BB);
+	Instruction* brBbInst = BranchInst::Create(BBReturn, BB, stopVal, BB);
 }
 
 void RoundRobinScheduler::execute(){
+	executionEngine = new LLVMExecution(Context, decoder);
+
+	setExternalFunctions();
 
 	//Run decoder
-	Module* module = decoder->getModule();
-	Function* main = module->getFunction("main");
-	jit->run(main);
+	executionEngine->run("main");
+}
+
+void RoundRobinScheduler::setExternalFunctions(){
+
+	//Set exit function
+	exit_decoder = (void(*)(int))executionEngine->getExit();
+
+	if(YuvFile.compare("") != 0){
+		Instance* compare = decoder->getInstance("Compare");
+
+		//Map fstat function used in compare actor
+		Procedure* filesize = compare->getProcedure("Filesize");
+		executionEngine->mapProcedure(filesize, (void *)Filesize);
+	}
+
+	if(!nodisplay){
+		//Get display instance
+		Instance* display = decoder->getInstance("display");
+
+		//Get procedures from display
+		Procedure* setVideo = display->getProcedure("set_video");
+		Procedure* setInit = display->getProcedure("set_init");
+		Procedure* writeMb = display->getProcedure("write_mb");
+
+		//Map procedure to display
+		executionEngine->mapProcedure(setVideo, (void *)display_set_video);
+		executionEngine->mapProcedure(setInit, (void *)display_init);
+		executionEngine->mapProcedure(writeMb, (void *)display_write_mb);
+	}
 }
 
 void RoundRobinScheduler::setSource(){
@@ -205,24 +244,5 @@ void RoundRobinScheduler::setCompare(){
 		GlobalVariable* yuvVar = instance->getStateVar("yuv_file")->getGlobalVariable();
 		Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
 		yuvVar->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
-		
-		//Map fstat function used in compare actor
-		Function* filesizeFunc = instance->getProcedure("Filesize")->getFunction();
-		jit->MapFunction(filesizeFunc, (void *)Filesize);
 	}
-}
-
-void RoundRobinScheduler::setDisplay(){
-	//Get display instance
-	Instance* display = decoder->getInstance("display");
-
-	//Get procedures from display
-	Function* setVideo = display->getProcedure("set_video")->getFunction();
-	Function* setInit = display->getProcedure("set_init")->getFunction();
-	Function* writeMb = display->getProcedure("write_mb")->getFunction();
-
-	//Map procedure to display
-	jit->MapFunction(setVideo, (void *)display_set_video);
-	jit->MapFunction(setInit, (void *)display_init);
-	jit->MapFunction(writeMb, (void *)display_write_mb);
 }

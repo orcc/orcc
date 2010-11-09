@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of actor loading in class JIT
+@brief Implementation of LLVMParser
 @author Jerome Gorin
-@file LoadActor.cpp
+@file LLVMParser.cpp
 @version 0.1
 @date 2010/04/12
 */

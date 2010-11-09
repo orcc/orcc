@@ -30,7 +30,7 @@
 /**
 @brief Implementation of LLVMWriter
 @author Jerome Gorin
-@file CreateInstance.cpp
+@file LLVMWriter.cpp
 @version 0.1
 @date 2010/04/12
 */

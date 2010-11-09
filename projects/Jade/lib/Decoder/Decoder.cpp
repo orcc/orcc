@@ -50,6 +50,7 @@
 #include "Jade/Core/Network.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Serialize/IRWriter.h"
+#include "Jade/Scheduler/RoundRobinScheduler.h"
 
 #include "BroadcastAdder.h"
 //------------------------------
@@ -70,7 +71,7 @@ Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo*
 }
 
 Decoder::~Decoder (){
-
+	delete module;
 }
 
 int Decoder::instanciate(){
@@ -134,4 +135,13 @@ bool Decoder::compile(map<string, Actor*>* actors){
 	fifo->setConnections(this);
 
 	return true;
+}
+
+void Decoder::setScheduler(RoundRobinScheduler* scheduler){
+	this->scheduler = scheduler;
+	scheduler->createScheduler(this);
+}
+
+void Decoder::start(){
+	scheduler->execute();
 }

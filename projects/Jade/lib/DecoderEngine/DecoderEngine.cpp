@@ -62,7 +62,7 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo)
 	this->fifo = fifo;
 	
 	//Load IR Parser
-	irParser = new IRParser(C, jit, fifo);	
+	irParser = new IRParser(C, fifo);	
 }
 
 DecoderEngine::~DecoderEngine(){
@@ -80,11 +80,14 @@ int DecoderEngine::load(Network* network) {
 	//Create decoder
 	Decoder decoder(Context, jit, network, fifo);
 
+	//Compile the decoder
 	decoder.compile(&actors);
 
-	jit->initEngine(&decoder);
-	
-	RoundRobinScheduler scheduler(Context, jit, &decoder);
+	//Set the scheduler
+	decoder.setScheduler(new RoundRobinScheduler(Context));
+
+	//Start decoding
+	decoder.start();
 
 	jit->optimize(&decoder);
 
@@ -92,7 +95,6 @@ int DecoderEngine::load(Network* network) {
 
 	jit->verify("error.txt", &decoder);
 
-	scheduler.execute();
 
 
 	cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

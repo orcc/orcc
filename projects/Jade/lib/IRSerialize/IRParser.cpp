@@ -58,6 +58,7 @@
 #include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Jit/LLVMParser.h"
 
 
 #include "IRConstant.h"
@@ -82,8 +83,7 @@ const std::string IRConstant::KEY_SOURCE_FILE= "source_file";
 const std::string IRConstant::KEY_STATE_VARS= "state_variables";
 
 
-IRParser::IRParser(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo) : Context(C){
-	this->jit = jit;
+IRParser::IRParser(llvm::LLVMContext& C, AbstractFifo* fifo) : Context(C){
 	this->fifo = fifo;
 	this->inputs = NULL;
 	this->outputs = NULL;
@@ -107,7 +107,9 @@ Actor* IRParser::parseActor(string classz){
 		}
 	}
 	
-	Module* module = jit->LoadBitcode(file, VTLDir);
+	//Parse the bitcode
+	LLVMParser parser(Context, VTLDir);
+	Module* module = parser.loadBitcode(file);
 
 	if (module == 0){
 		cerr << "Error when parsing bytecode";

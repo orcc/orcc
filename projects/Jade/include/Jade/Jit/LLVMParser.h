@@ -30,7 +30,7 @@
 /**
 @brief Description of the LLVMParser interface
 @author Jerome Gorin
-@file LLVMWriter.h
+@file LLVMParser.h
 @version 0.1
 @date 22/03/2010
 */

@@ -52,11 +52,14 @@ static unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];
 static unsigned char img_buf_u[MAX_WIDTH * MAX_HEIGHT / 4];
 static unsigned char img_buf_v[MAX_WIDTH * MAX_HEIGHT / 4];
 
+//Exit function of the decoder
+void (*exit_decoder)(int);
+
 static void press_a_key(int code) {
 	char buf[2];
 	printf("Press enter to continue\n");
 	fgets(buf, 2, stdin);
-	exit(code);
+	exit_decoder(code);
 }
 
 static Uint32 start_time;
@@ -107,7 +110,7 @@ void display_show_image(void) {
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 			case SDL_QUIT:
-				exit(0);
+				exit_decoder(0);
 				break;
 			default:
 				break;

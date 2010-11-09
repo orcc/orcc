@@ -52,7 +52,6 @@ class Action;
 class ActionScheduler;
 class ActionTag;
 class FSM;
-class JIT;
 class Port;
 class Procedure;
 class Variable;
@@ -76,13 +75,11 @@ public:
 	 * Creates an IRParser.
 	 *
 	 * @param C : llvm::LLVMContext of environnement
-	 * 
-	 * @param jit : JIT used to parse actor
 	 *
 	 * @param fifo : AbstractFifo used in actors of the VTL
 	 *
      */
-	IRParser(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo);
+	IRParser(llvm::LLVMContext& C, AbstractFifo* fifo);
 
 	~IRParser();
 
@@ -302,10 +299,6 @@ private:
 
 
 private:
-
-	/** JIT used to load bitcode */
-	JIT* jit;
-
 	/** list of actions of the current actor */
 	std::map<std::string, Action*> actions;
 

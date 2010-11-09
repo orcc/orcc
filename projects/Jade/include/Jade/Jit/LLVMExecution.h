@@ -28,74 +28,88 @@
  */
 
 /**
-@brief Description of the Procedure ActionScheduler interface
+@brief Description of the LLVMExecution interface
 @author Jerome Gorin
-@file ActionScheduler.h
+@file LLVMExecution.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef ROUNDROBINSCHEDULER_H
-#define ROUNDROBINSCHEDULER_H
+#ifndef LLVMEXECUTION_H
+#define LLVMEXECUTION_H
 
 namespace llvm{
 	class Function;
-	class LLVMContext;
+	class ExecutionEngine;
+	class Module;
 }
 
-class JIT;
-class Decoder;
-class LLVMExecution;
+#include "llvm/LLVMContext.h"
 //------------------------------
 
 /**
- * @brief  This class defines a robin robin scheduler of a decoder.
+ * @brief  This class manages the LLVM infrastructure to write elements
  * 
  * @author Jerome Gorin
  * 
  */
-class RoundRobinScheduler {
+class LLVMExecution {
 public:
+
 	/**
      *  @brief Constructor
      *
-	 *	Create a new round robin scheduler for the given decoder
+	 *	Initialize the execution engine
 	 *
-	 *	@param C : the LLVM Context
-	 *
-	 *	@param decoder : the Decoder to insert the round robin scheduler into
      */
-	RoundRobinScheduler(llvm::LLVMContext& C);
-	~RoundRobinScheduler();
+	LLVMExecution(llvm::LLVMContext& C, Decoder* decoder);
 
-	void createScheduler(Decoder* decoder);
-	void execute();
+	/**
+     *  @brief Destructor
+     *
+	 *	Delete the execution engione
+     */
+	~LLVMExecution();
+
+	/**
+     *  @brief map a function in the decider
+     *
+	 *	Map an external procedure in the decoder
+	 *
+	 *  @param procedure : the procedure to map
+	 *
+	 *  @param adrr : mapping address of the procedure
+     */
+	void mapProcedure(Procedure* procedure, void *Addr);
+
+	/**
+     *  @brief run the current decoder
+     *
+	 *	Run the decoder using the given function name
+	 *
+	 *  @param function : string name of the function to execute
+     */
+	void run(std::string function);
+
+	void* getExit(); 
 
 private:
-
-	void createSchedulerFn();
-
-	void setSource();
-
-	void setDisplay();
-
-	void setCompare();
-	
-	void setExternalFunctions();
-
-
-	/** Decoder bound to the round robin scheduler */
-	Decoder* decoder;
-
-	/** Main scheduling function */
-	llvm::Function* scheduler;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 
-	/** Execution engine of the decoder */
-	LLVMExecution* executionEngine;
+	/** Module that representing the decoder*/
+	llvm::Module* module;
+
+	/** Execution engine*/
+	llvm::ExecutionEngine *EE;
+
+	/** Exit function */
+	llvm::Function *Exit;	
+
+	/** Result of the execution */
+	int result;
 };
 
 #endif
