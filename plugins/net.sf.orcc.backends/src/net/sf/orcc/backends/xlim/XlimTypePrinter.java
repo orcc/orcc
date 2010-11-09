@@ -71,7 +71,7 @@ public class XlimTypePrinter extends TypePrinter {
 
 	@Override
 	public void visit(TypeUint type) {
-		builder.append("int");
+		builder.append("uint");
 	}
 
 	@Override

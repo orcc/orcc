@@ -84,8 +84,9 @@ public class XlimBackendImpl extends AbstractBackend {
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new DeadVariableRemoval(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
-				new CastAdderTransformation(), new MoveLiteralIntegers(),
+				new CastAdderTransformation(),
 				new FirstPhiValuesOfWhileNodeTransformation(),
+				new MoveLiteralIntegers(),
 				new VariableRenamer(),
 				new ChangeActionSchedulerFormTransformation() };
 
