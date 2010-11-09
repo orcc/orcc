@@ -61,10 +61,16 @@ actor Algo_MvBuffer()
 	uint(size=7)  PicWidthInMb,
 
 	int (size=16) MvL0,
-	int (size=16) MvL1
+	int (size=16) MvL1,
+
+	bool          Empty_DPB,
+	int(size=32)  DelList,
+	uint(size=31) LongTermList
+
 		==>
 		:
 
+	int (size=32) SENT_DONE = -2;
 
 	uint(size=3) SZ_16x16 = 0;
 	uint(size=3) SZ_16x8  = 1;
@@ -222,7 +228,9 @@ actor Algo_MvBuffer()
 	bool         IsPredL1;
 
 	GetNewPic: action
-			NewPic :[IsNewPic]
+			NewPic       :[IsNewPic],
+			Empty_DPB    :[ValEmpty],
+			LongTermList :[LTList] repeat 16
 				==>
 		guard
 			IsNewPic
@@ -415,8 +423,26 @@ actor Algo_MvBuffer()
 			while true do end
 		end
 
-	schedule fsm GetMbType:
-		GetMbType          (GetNewPic                  )--> GetMbType;
+
+	ReadDelList.Launch: action
+			DelList:[DelVal]
+				==>
+		guard
+			DelVal != SENT_DONE
+		end
+
+
+	ReadDelList.Done: action
+			DelList:[DelVal]
+				==>
+		guard
+			DelVal = SENT_DONE
+		end
+
+	schedule fsm GetNewPic:
+		GetNewPic          (GetNewPic                  )--> GetMbType;
+
+		GetMbType          (GetNewPic                  )--> ReadDelList;
 		GetMbType          (GetMbType.MacroBlkIorSI    )--> EatTokens;
 		GetMbType          (GetMbType.Others           )--> GetMbParameters;
 
@@ -432,5 +458,8 @@ actor Algo_MvBuffer()
 		GetSubMbParameters (GetSubMbParametersFinished )--> GetMbParameters;
 
 		GetBlockInfo4SubMb (GetBlockInfo               )--> GetSubMbParameters;
+
+		ReadDelList        (ReadDelList.Launch         )--> ReadDelList;
+		ReadDelList        (ReadDelList.Done           )--> GetMbType;
 	end
 end

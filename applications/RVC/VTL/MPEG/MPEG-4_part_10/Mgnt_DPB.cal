@@ -40,7 +40,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 * CONSTANTS
 *
 */
-
 	int (size=32) SENT_DONE       = -2;
 
 	uint(size=32) NB_PIC          = 33;
@@ -52,8 +51,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	int (size=32) PICWIDTH        = 1280/16; //number of MB per lines
 	int (size=32) PICHEIGHT       = 720/16; //number of MB per columns
 
-	bool DEBUG_INPUT  = false;
-	bool DEBUG_OUTPUT = false;
 
 	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
 	List(type:uint,size=NB_PIC)            ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];

@@ -706,10 +706,7 @@ actor Algo_RefList (bool DEBUG)
 
 		SendRefList                       (SendRefList                          )--> SendRefList;
 		SendRefList                       (SendRefListDone                      )--> read_num_ref_frames;
-
-
 	end
-
 
 	priority
 		ReadLists.ShortTerm       > ReadLists.done;

@@ -52,10 +52,10 @@
       <vertex id="PpsVLDecoding" x="464" y="230"/>
       <vertex id="DecodePps" x="355" y="685"/>
       <vertex id="PicVLDecoding" x="895" y="219"/>
-      <vertex id="MMCO" x="1397" y="1587"/>
+      <vertex id="MMCO" x="1367" y="1587"/>
       <vertex id="RefList0" x="1977" y="1157"/>
       <vertex id="IntraPredSplit" x="1409" y="325"/>
-      <vertex id="MVReconstruct" x="1930" y="792"/>
+      <vertex id="MVReconstruct" x="1913" y="703"/>
       <vertex id="BlockExpand" x="1899" y="484"/>
       <vertex id="BlockSplit" x="2101" y="260"/>
       <vertex id="DecodePic" x="800" y="446"/>

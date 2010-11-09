@@ -104,6 +104,23 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="EmptyDPB">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Input" name="DelList">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="LTList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -283,4 +300,7 @@
     <Connection dst="MvBuffer" dst-port="MbType" src="" src-port="mb_type"/>
     <Connection dst="MvBuffer" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
     <Connection dst="MvBuffer" dst-port="MvL1" src="MvL1_Reconstr" src-port="MvOut"/>
+    <Connection dst="MvBuffer" dst-port="Empty_DPB" src="" src-port="EmptyDPB"/>
+    <Connection dst="MvBuffer" dst-port="DelList" src="" src-port="DelList"/>
+    <Connection dst="MvBuffer" dst-port="LongTermList" src="" src-port="LTList"/>
 </XDF>

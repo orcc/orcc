@@ -679,4 +679,7 @@
         src="DecodePic" src-port="MbPredResMvL1"/>
     <Connection dst="MVReconstruct" dst-port="SubMbPredMvResL1"
         src="DecodePic" src-port="SubMbPredResMvL1"/>
+    <Connection dst="MVReconstruct" dst-port="EmptyDPB" src="MMCO" src-port="EmptyDPB"/>
+    <Connection dst="MVReconstruct" dst-port="DelList" src="MMCO" src-port="DelList"/>
+    <Connection dst="MVReconstruct" dst-port="LTList" src="MMCO" src-port="LongTermList"/>
 </XDF>
