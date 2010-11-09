@@ -620,7 +620,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			end
 		end
 
-	ComputeMvpL0.Launch16x16: action
+	ComputeMvLX.Launch16x16: action
 			MbPredRefIdx :[RefIdxCurr],
 			MbPredMvRes      :[mv_res] repeat 2
 				==>
@@ -655,7 +655,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx := MbPartIdx + 1;
 		end
 
-	ComputeMvpL0.Launch16x8: action
+	ComputeMvLX.Launch16x8: action
 			MbPredRefIdx :[RefIdxCurr],
 			MbPredMvRes      :[mv_res] repeat 2
 				==>
@@ -707,7 +707,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx := MbPartIdx + 1;
 		end
 
-	ComputeMvpL0.Launch8x16: action
+	ComputeMvLX.Launch8x16: action
 			MbPredRefIdx :[RefIdxCurr],
 			MbPredMvRes      :[mv_res] repeat 2
 				==>
@@ -764,7 +764,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx := MbPartIdx + 1;
 		end
 
-	ComputeMvpL0.Launch8x8: action
+	ComputeMvLX.Launch8x8: action
 			sub_mb_type :[ValSubMbType]
 				==>
 		guard
@@ -779,7 +779,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			SizeSubMbMv     := SizeSubMb[Idx_Sub_Tab][ValSubMbType & 15];
 		end
 
-	ComputeMvpL0.LaunchB_Direct_8x8: action
+	ComputeMvLX.LaunchB_Direct_8x8: action
 			sub_mb_type :[ValSubMbType]
 				==>
 	//Fix me!!
@@ -803,7 +803,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx := MbPartIdx + 1;
 		end
 
-	ComputeMvpL0.Skip: action
+	ComputeMvLX.Skip: action
 				==>
 		guard
 			MbPartIdx < MbPartIdxMax,
@@ -814,13 +814,13 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx := MbPartIdx + 1;
 		end
 
-	ComputeMvpL0.Done: action ==>
+	ComputeMvLX.Done: action ==>
 		guard
 			MbPartIdx = MbPartIdxMax
 		end
 
 
-	ComputeSubMvpL0.Launch8x8: action
+	ComputeSubMvLX.Launch8x8: action
 			SubMbPredRefIdx :[RefIdxCurr],
 			SubMbPredMvRes      :[mv_res] repeat 2
 				==>
@@ -859,7 +859,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
-	ComputeSubMvpL0.Launch8x4: action
+	ComputeSubMvLX.Launch8x4: action
 			SubMbPredRefIdx :[RefIdxCurr],
 			SubMbPredMvRes      :[mv_res] repeat 2
 				==>
@@ -894,7 +894,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
-	ComputeSubMvpL0.Launch4x8: action
+	ComputeSubMvLX.Launch4x8: action
 			SubMbPredRefIdx :[RefIdxCurr],
 			SubMbPredMvRes      :[mv_res] repeat 2
 				==>
@@ -929,7 +929,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
-	ComputeSubMvpL0.Launch4x4: action
+	ComputeSubMvLX.Launch4x4: action
 			SubMbPredRefIdx :[RefIdxCurr],
 			SubMbPredMvRes      :[mv_res] repeat 2
 				==>
@@ -962,7 +962,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
-	ComputeSubMvpL0.Skip: action
+	ComputeSubMvLX.Skip: action
 				==>
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
@@ -971,7 +971,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
-	ComputeSubMvpL0.Done: action ==>
+	ComputeSubMvLX.Done: action ==>
 		guard
 			SubMbPartIdx = SubMbPartIdxMax
 		do
@@ -993,20 +993,20 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 		GetMbInfos4Others (GetMbInfos.Others        )--> ComputeMvpL0;
 
-		ComputeMvpL0      (ComputeMvpL0.Skip               )--> ComputeMvpL0;
-		ComputeMvpL0      (ComputeMvpL0.Launch16x16        )--> ComputeMvpL0;
-		ComputeMvpL0      (ComputeMvpL0.Launch16x8         )--> ComputeMvpL0;
-		ComputeMvpL0      (ComputeMvpL0.Launch8x16         )--> ComputeMvpL0;
-		ComputeMvpL0      (ComputeMvpL0.LaunchB_Direct_8x8 )--> ComputeMvpL0;
-		ComputeMvpL0      (ComputeMvpL0.Launch8x8          )--> ComputeSubMvpL0;
-		ComputeMvpL0      (ComputeMvpL0.Done               )--> GetMbType;
+		ComputeMvpL0      (ComputeMvLX.Skip               )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvLX.Launch16x16        )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvLX.Launch16x8         )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvLX.Launch8x16         )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvLX.LaunchB_Direct_8x8 )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvLX.Launch8x8          )--> ComputeSubMvpL0;
+		ComputeMvpL0      (ComputeMvLX.Done               )--> GetMbType;
 
-		ComputeSubMvpL0      (ComputeSubMvpL0.Launch8x8 )--> ComputeSubMvpL0;
-		ComputeSubMvpL0      (ComputeSubMvpL0.Launch8x4 )--> ComputeSubMvpL0;
-		ComputeSubMvpL0      (ComputeSubMvpL0.Launch4x8 )--> ComputeSubMvpL0;
-		ComputeSubMvpL0      (ComputeSubMvpL0.Launch4x4 )--> ComputeSubMvpL0;
-		ComputeSubMvpL0      (ComputeSubMvpL0.Skip      )--> ComputeSubMvpL0;
-		ComputeSubMvpL0      (ComputeSubMvpL0.Done      )--> ComputeMvpL0;
+		ComputeSubMvpL0      (ComputeSubMvLX.Launch8x8 )--> ComputeSubMvpL0;
+		ComputeSubMvpL0      (ComputeSubMvLX.Launch8x4 )--> ComputeSubMvpL0;
+		ComputeSubMvpL0      (ComputeSubMvLX.Launch4x8 )--> ComputeSubMvpL0;
+		ComputeSubMvpL0      (ComputeSubMvLX.Launch4x4 )--> ComputeSubMvpL0;
+		ComputeSubMvpL0      (ComputeSubMvLX.Skip      )--> ComputeSubMvpL0;
+		ComputeSubMvpL0      (ComputeSubMvLX.Done      )--> ComputeMvpL0;
 	end
 
 	priority
