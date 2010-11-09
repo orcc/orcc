@@ -30,6 +30,7 @@ package net.sf.orcc.backends.xlim.transforms;
 
 import java.util.List;
 import java.util.ListIterator;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
@@ -39,7 +40,6 @@ import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
-import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -55,7 +55,6 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
-import net.sf.orcc.util.OrderedMap;
 
 /**
  * 
@@ -170,44 +169,47 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 
 	@Override
 	public void visit(IfNode ifNode) {
+		// Check the presence of a BlockNode before and create one if needed
 		if (instructionIterator == null) {
 			Procedure procedure = ifNode.getProcedure();
 			int index = procedure.getNodes().indexOf(ifNode);
 			BlockNode newBlock = new BlockNode(procedure);
 			procedure.getNodes().add(index, newBlock);
 			instructionIterator = newBlock.getInstructions().listIterator();
-			ifNode.setValue((Expression) ifNode.getValue().accept(
-					exprInterpreter, instructionIterator));
-			visit(ifNode.getThenNodes());
-			visit(ifNode.getElseNodes());
-			instructionIterator = null;
-		} else {
-			ifNode.setValue((Expression) ifNode.getValue().accept(
-					exprInterpreter, instructionIterator));
-			visit(ifNode.getThenNodes());
-			visit(ifNode.getElseNodes());
 		}
-		visit(ifNode.getJoinNode());
+		ListIterator<Instruction> instructionIteratorBackup = instructionIterator;
+		ifNode.setValue((Expression) ifNode.getValue().accept(exprInterpreter,
+				instructionIterator));
+		visit(ifNode.getThenNodes());
+		instructionIterator = instructionIteratorBackup;
+		visit(ifNode.getElseNodes());
+		instructionIterator = instructionIteratorBackup;
+		// Unusually visit method to doesn't add new instructions in join node
+		for (Instruction instr : ifNode.getJoinNode().getInstructions()) {
+			instr.accept(this);
+		}
 		Use.addUses(ifNode, ifNode.getValue());
 	}
 
 	@Override
 	public void visit(WhileNode whileNode) {
+		// Check the presence of a BlockNode before and create one if needed
 		if (instructionIterator == null) {
 			Procedure procedure = whileNode.getProcedure();
 			int index = procedure.getNodes().indexOf(whileNode);
 			BlockNode newBlock = new BlockNode(procedure);
 			procedure.getNodes().add(index, newBlock);
 			instructionIterator = newBlock.getInstructions().listIterator();
-			whileNode.setValue((Expression) whileNode.getValue().accept(
-					exprInterpreter, instructionIterator));
-			visit(whileNode.getNodes());
-		} else {
-			whileNode.setValue((Expression) whileNode.getValue().accept(
-					exprInterpreter, instructionIterator));
-			visit(whileNode.getNodes());
 		}
-		visit(whileNode.getJoinNode());
+		ListIterator<Instruction> instructionIteratorBackup = instructionIterator;
+		whileNode.setValue((Expression) whileNode.getValue().accept(
+				exprInterpreter, instructionIterator));
+		visit(whileNode.getNodes());
+		instructionIterator = instructionIteratorBackup;
+		// Unusually visit method to doesn't add new instructions in join node
+		for (Instruction instr : whileNode.getJoinNode().getInstructions()) {
+			instr.accept(this);
+		}
 		Use.addUses(whileNode, whileNode.getValue());
 	}
 
@@ -222,32 +224,10 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 
 	@Override
 	public void visit(PhiAssignment phi) {
-		List<Expression> values = phi.getValues();
-		LocalVariable target = phi.getTarget();
-		OrderedMap<String, Variable> parameters = procedure.getParameters();
-
-		// Remove local variable with index = 0 from value
-		for (Expression value : values) {
-			if (value.isVarExpr()) {
-				VarExpr sourceExpr = (VarExpr) value;
-				LocalVariable source = (LocalVariable) sourceExpr.getVar()
-						.getVariable();
-
-				// Local variable must not be a parameter of the procedure
-				if (source.getIndex() == 0
-						&& !parameters.contains(source.getName())) {
-					Expression expr;
-
-					if (target.getType().isBool()) {
-						expr = new BoolExpr(false);
-					} else {
-						expr = new IntExpr(0);
-					}
-
-					values.set(values.indexOf(value), (Expression) expr.accept(
-							exprInterpreter, instructionIterator));
-				}
-			}
+		ListIterator<Expression> it = phi.getValues().listIterator();
+		while (it.hasNext()) {
+			it.set((Expression) it.next().accept(exprInterpreter,
+					instructionIterator));
 		}
 		Use.addUses(phi, phi.getValues());
 	}
