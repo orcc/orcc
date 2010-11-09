@@ -28,77 +28,61 @@
  */
 package net.sf.orcc.backends.xlim.transforms;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
-import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.Actor;
-import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
-import net.sf.orcc.ir.IrFactory;
-import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
-import net.sf.orcc.ir.instructions.Assign;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.IntExpr;
+import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
+import net.sf.orcc.util.OrderedMap;
 
 /**
  * 
- * This class defines a transformation that transforms the 'ActionScheduler'
- * function in order to use XLIM back-end with Ericsson OpenDF runtime
+ * This class defines a transformation that change the initial value expression
+ * by a constant expression in order to put phiNode before whileNode
  * 
  * @author Herve Yviquel
  * 
  */
-public class ChangeActionSchedulerFormTransformation extends
+public class FirstPhiValuesOfWhileNodeTransformation extends
 		AbstractActorTransformation {
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void visit(IfNode ifNode) {
+		// Override superclass method to avoid joinNode visiting
+		visit(ifNode.getThenNodes());
+		visit(ifNode.getElseNodes());
+	}
 
-		for (Action action : actor.getActions()) {
-			List<CFGNode> schedulerNodes = action.getScheduler().getNodes();
-			List<IfNode> ifNodes = new ArrayList<IfNode>();
+	@Override
+	public void visit(PhiAssignment phi) {
+		List<Expression> values = phi.getValues();
+		LocalVariable target = phi.getTarget();
+		OrderedMap<String, Variable> parameters = procedure.getParameters();
 
-			// Search for guard computing
-			for (CFGNode node : schedulerNodes) {
-				if (node instanceof IfNode) {
-					ifNodes.add((IfNode) node);
+		// Remove local variable with index = 0 from value
+		for (Expression value : values) {
+			if (value.isVarExpr()) {
+				VarExpr sourceExpr = (VarExpr) value;
+				LocalVariable source = (LocalVariable) sourceExpr.getVar()
+						.getVariable();
+
+				// Local variable must not be a parameter of the procedure
+				if (source.getIndex() == 0
+						&& !parameters.contains(source.getName())) {
+					Expression expr;
+					if (target.getType().isBool()) {
+						expr = new BoolExpr(false);
+					} else {
+						expr = new IntExpr(0);
+					}
+					values.set(values.indexOf(value), expr);
 				}
-			}
-
-			for (IfNode ifNode : ifNodes) {
-				schedulerNodes.remove(ifNode);
-
-				BlockNode blockNode = new BlockNode(action.getScheduler());
-
-				
-				int i=0;
-				while(!ifNode.getJoinNode().getInstructions().get(i).isPhi()){
-					blockNode.add(ifNode.getJoinNode().getInstructions().get(i));
-					i++;
-				}
-				
-
-				// Creation of instruction 'result=hasToken(input) AND guard'
-				PhiAssignment phi = (PhiAssignment) ifNode.getJoinNode().getInstructions().get(i);
-				Expression guard = phi.getValues().get(0);
-				Expression and = new BinaryExpr(ifNode.getValue(),
-						BinaryOp.LOGIC_AND, guard,
-						IrFactory.eINSTANCE.createTypeBool());
-				Instruction assignment = new Assign(phi.getTarget(), and);
-
-				schedulerNodes.addAll(ifNode.getThenNodes());
-
-				
-				blockNode.add(assignment);
-				blockNode.add(ifNode.getJoinNode().getInstructions().get(ifNode.getJoinNode().getInstructions().size()-1));
-				
-				schedulerNodes.add(blockNode);
 			}
 		}
 	}
