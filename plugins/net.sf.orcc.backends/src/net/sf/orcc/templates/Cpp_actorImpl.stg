@@ -82,7 +82,7 @@ $endif$
 StateVarDestruction(variable) ::= <<
 $if(variable.assignable)
 $$if (variable.type.dimensions)
-$delete $variable$;$
+$delete [] $variable$;$
 endif$$
 endif$
 
