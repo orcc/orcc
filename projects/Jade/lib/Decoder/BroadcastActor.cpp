@@ -82,7 +82,7 @@ void BroadcastActor::createActor(){
 	string inputName = "input";
 	GlobalVariable* inputVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, name+"_"+inputName);
 	Port* inputPort = new Port(inputName, type, inputVar);
-	inputs->insert(pair<string, Port*>(inputName, inputPort));
+	inputs->insert(pair<string, Port*>(inputPort->getName(), inputPort));
 
 	// Creating output port of name input
 	for (int i = 0; i < numOutputs; i++) {
@@ -90,7 +90,7 @@ void BroadcastActor::createActor(){
 		outputName <<name<<"_output_" << i;
 		GlobalVariable* outputVar = new GlobalVariable(*module, fifoType, true, GlobalValue::ExternalLinkage, portValue, outputName.str());
 		Port* outputPort = new Port(outputName.str(), type, outputVar);
-		outputs->insert(pair<string, Port*>(outputName.str(), outputPort));
+		outputs->insert(pair<string, Port*>(outputPort->getName(), outputPort));
 	}
 
 	//Create action of the broadcast actor
@@ -134,12 +134,9 @@ Procedure* BroadcastActor::createScheduler(){
 }
 
 Procedure* BroadcastActor::createBody(){
-	//Name of the scheduler
-	string bodyName = name + "_scheduler";
-	
 	// Creating scheduler function
-	FunctionType *FTy = FunctionType::get(Type::getVoidTy(Context),false);
-	Function *NewF = Function::Create(FTy, Function::InternalLinkage , bodyName, module);
+	FunctionType *FTy = FunctionType::get(Type::getInt32Ty(Context),false);
+	Function *NewF = Function::Create(FTy, Function::InternalLinkage , name, module);
 
 	// Add the first basic block entry into the function.
 	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", NewF);
@@ -157,7 +154,11 @@ Procedure* BroadcastActor::createBody(){
 	//Create setReadEnd on input
 	createSetReadEnd(getInput(), BBEntry);
 
-	return new Procedure(bodyName, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);;
+	//Return value
+	ConstantInt* one = ConstantInt::get(Type::getInt32Ty(Context), 1);
+	ReturnInst::Create(Context, one, BBEntry);
+
+	return new Procedure(name, ConstantInt::get(Type::getInt1Ty(Context), 0), NewF);;
 }
 
 map<Port*, ConstantInt*>* BroadcastActor::createPattern(map<string, Port*>* ports){

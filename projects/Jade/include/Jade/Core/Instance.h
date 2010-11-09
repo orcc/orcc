@@ -81,7 +81,6 @@ public:
 		this->id = id;
 		this->clasz = clasz;
 		this->parameterValues = parameterValues;
-		this->broadcast = NULL;
 		this->actor = NULL;
 		this->decoder = NULL;
 		this->stateVars = NULL;
@@ -101,10 +100,9 @@ public:
 	 * @param broadcast : a Broadcast
      *
      */
-	Instance(std::string id, BroadcastActor* broadcast){
+	Instance(std::string id, Actor* actor){
 		this->id = id;
-		this->broadcast = broadcast;
-		this->actor = NULL;
+		this->actor = actor;
 		this->decoder = NULL;
 		this->stateVars = NULL;
 		this->parameters = NULL;
@@ -368,12 +366,6 @@ private:
 	 * the decoder where the instance has been made concrete.
 	 */
 	Decoder* decoder;
-
-	/**
-	 * the broadcast referenced by this instance. May be null if
-	 * this instance references an actor or a network.
-	 */
-	BroadcastActor* broadcast;
 
 	/** Port of the instance */
 	std::map<std::string, Port*> inputs;

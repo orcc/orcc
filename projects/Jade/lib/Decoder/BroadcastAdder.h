@@ -114,7 +114,7 @@ private:
 	 *
 	 * @param actorBCast: the current BroadcastActor
 	 */
-	void createIncomingConnection(Connection* connection, Vertex* vertex, Vertex* vertexBCast, BroadcastActor* actorBCast);
+	void createIncomingConnection(Connection* connection, Vertex* vertex, Vertex* vertexBCast, Instance* instance);
 
 	/**
 	 * @brief Creates outgoing connections of a broadcast
@@ -128,7 +128,7 @@ private:
 	 *
 	 * @param actorBCast: the current BroadcastActor
 	 */
-	void createOutgoingConnections(Vertex* vertexBCast,std::list<Connection*>* outList, BroadcastActor* actorBCast);
+	void createOutgoingConnections(Vertex* vertexBCast,std::list<Connection*>* outList, Instance* instance);
 
 	/** graph of the network */
 	HDAGGraph* graph;

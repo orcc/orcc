@@ -124,7 +124,7 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				BroadcastActor* actorBCast = new BroadcastActor(Context, name, numOuputs, connection->getIntegerType(), fifo);
 				
 				//Instanciate broadcast
-				Instance* newInstance = new Instance(name, actorBCast);
+				Instance* newInstance = new Instance(name, actorBCast);		
 				decoder->addInstance(newInstance);
 				
 				//Set a new vertex in the graph
@@ -132,20 +132,24 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				graph->addVertex(vertextBCast);
 				
 				//Connect the broadcast vertex in the graph
-				createIncomingConnection(connections[i], vertex, vertextBCast, actorBCast);
-				createOutgoingConnections(vertextBCast, outList, actorBCast);
+				createIncomingConnection(connections[i], vertex, vertextBCast, newInstance);
+				createOutgoingConnections(vertextBCast, outList, newInstance);
 			}
 			outMap->erase(it);
 		}
 	}
 }
 
-void BroadcastAdder::createIncomingConnection(Connection* connection, Vertex* vertex, Vertex* vertexBCast, BroadcastActor* actorBCast){
+void BroadcastAdder::createIncomingConnection(Connection* connection, Vertex* vertex, Vertex* vertexBCast, Instance* instance){
+	 BroadcastActor* actorBCast = (BroadcastActor*)instance->getActor();
 
 	//Set a new connection that connects the broadcast to the graph
 	Port* bcastInput = actorBCast->getInput();
 	Port* srcPort = connection->getSourcePort();
 	map<string, Attribute*>* attributes = connection->getAttributes();
+	
+	//Bound it to the instance
+	instance->setAsInput(bcastInput);
 
 	Connection* incoming = new Connection(srcPort,bcastInput, attributes);
 	incoming->setType(connection->getIntegerType());
@@ -154,9 +158,10 @@ void BroadcastAdder::createIncomingConnection(Connection* connection, Vertex* ve
 
 }
 
-void BroadcastAdder::createOutgoingConnections(Vertex* vertexBCast, list<Connection*>* outList, BroadcastActor* actorBCast){
+void BroadcastAdder::createOutgoingConnections(Vertex* vertexBCast, list<Connection*>* outList, Instance* instance){
 	list<Connection*>::iterator it;
 	int i = 0;
+	BroadcastActor* actorBCast = (BroadcastActor*)instance->getActor();
 
 	for ( it=outList->begin() ; it != outList->end(); it++ ){
 		
@@ -168,6 +173,9 @@ void BroadcastAdder::createOutgoingConnections(Vertex* vertexBCast, list<Connect
 			stringstream portName;
 			portName << actorBCast->getName()<< "_output_" << i;
 			Port* outputPort = actorBCast->getOutput(portName.str());
+			
+			//Bound it to the instance
+			instance->setAsOutput(outputPort);
 			i++;
 
 			map<string, Attribute*>* attributes = (*it)->getAttributes();

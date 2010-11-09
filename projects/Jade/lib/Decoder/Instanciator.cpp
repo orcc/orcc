@@ -151,7 +151,6 @@ void Instanciator::updateConnection(Connection* connection){
 		}
 
 		// Bound GlobalVariable to port from instance
-		connection->setDestinationPort(dstPort);
 		dstPortInst->setType(dstPortType);
 		target->setAsInput(dstPortInst);
 	}

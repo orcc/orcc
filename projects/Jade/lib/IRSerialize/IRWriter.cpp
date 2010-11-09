@@ -114,7 +114,7 @@ void IRWriter::writePort(string key, Port* port){
 	if (key == IRConstant::KEY_INPUTS){
 		instPort = instance->getInput(name);
 	}else{
-		instPort = instance->getPort(name);
+		instPort = instance->getOutput(name);
 	}
 
 	//Port not found
