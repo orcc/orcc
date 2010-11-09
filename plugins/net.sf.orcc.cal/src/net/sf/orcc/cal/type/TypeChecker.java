@@ -105,7 +105,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		return getLub(t1, t2) != null;
 	}
-	
+
 	/**
 	 * Returns <code>true</code> if type src can be converted to type dst.
 	 * 
@@ -138,8 +138,8 @@ public class TypeChecker extends CalSwitch<Type> {
 			TypeList typeSrc = (TypeList) src;
 			TypeList typeDst = (TypeList) dst;
 			// Recursively check type convertibility
-			return (isConvertibleTo(typeSrc.getType(), typeDst.getType())
-					&& typeSrc.getSize() <= typeDst.getSize());
+			return (isConvertibleTo(typeSrc.getType(), typeDst.getType()) && typeSrc
+					.getSize() <= typeDst.getSize());
 		}
 		return false;
 	}
@@ -162,15 +162,15 @@ public class TypeChecker extends CalSwitch<Type> {
 		if (astCall.getFunction().eContainer() == null) {
 			return getTypeBuiltin(astCall);
 		}
-		
+
 		// user-defined function
 		AstFunction function = astCall.getFunction();
 		String name = function.getName();
 		List<AstExpression> parameters = astCall.getParameters();
 		if (function.getParameters().size() != parameters.size()) {
 			error("function " + name + " takes "
-					+ function.getParameters().size() + " arguments.",
-					astCall, CalPackage.AST_STATEMENT_CALL);
+					+ function.getParameters().size() + " arguments.", astCall,
+					CalPackage.AST_STATEMENT_CALL);
 			return null;
 		}
 
@@ -365,6 +365,16 @@ public class TypeChecker extends CalSwitch<Type> {
 		return null;
 	}
 
+	/**
+	 * Wrapper call to {@link CalJavaValidator#error(String, EObject, Integer)}.
+	 * 
+	 * @param string
+	 *            error message
+	 * @param source
+	 *            source object
+	 * @param feature
+	 *            feature of the object that caused the error
+	 */
 	private void error(String string, EObject source, int feature) {
 		if (validator != null) {
 			validator.error(string, source, feature);

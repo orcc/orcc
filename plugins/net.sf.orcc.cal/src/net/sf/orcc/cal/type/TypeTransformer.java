@@ -28,15 +28,23 @@
  */
 package net.sf.orcc.cal.type;
 
+import java.util.List;
+
+import org.eclipse.emf.ecore.EObject;
+
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.cal.validation.CalJavaValidator;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
@@ -118,6 +126,73 @@ public class TypeTransformer extends VoidSwitch {
 	}
 
 	/**
+	 * Wrapper call to {@link CalJavaValidator#error(String, EObject, Integer)}.
+	 * 
+	 * @param string
+	 *            error message
+	 * @param source
+	 *            source object
+	 * @param feature
+	 *            feature of the object that caused the error
+	 */
+	private void error(String string, EObject source, int feature) {
+		if (validator != null) {
+			validator.error(string, source, feature);
+		}
+	}
+
+	/**
+	 * Evaluates the state variables of the given entity.
+	 * 
+	 * @param entity
+	 *            an entity
+	 */
+	private void evaluateStateVariables(AstEntity entity) {
+		List<AstVariable> variables;
+		AstActor actor = entity.getActor();
+		if (actor == null) {
+			AstUnit unit = entity.getUnit();
+			variables = unit.getVariables();
+		} else {
+			variables = actor.getStateVariables();
+		}
+
+		evaluateStateVariables(variables);
+	}
+
+	/**
+	 * Evaluates the given list of state variables, and register them as
+	 * variables.
+	 * 
+	 * @param variables
+	 *            a list of state variables
+	 */
+	private void evaluateStateVariables(List<AstVariable> variables) {
+		for (AstVariable astVariable : variables) {
+			// evaluate initial value (if any)
+			AstExpression astValue = astVariable.getValue();
+			if (astValue != null) {
+				Expression initialValue = (Expression) astVariable
+						.getInitialValue();
+				if (initialValue == null) {
+					// only evaluates the initial value once (when validating)
+					initialValue = new AstExpressionEvaluator(validator)
+							.evaluate(astValue);
+					if (initialValue == null) {
+						error("variable "
+								+ astVariable.getName()
+								+ " does not have a compile-time constant initial value",
+								astVariable, CalPackage.AST_VARIABLE);
+					} else {
+						// register the value
+						astVariable.setInitialValue(initialValue);
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Transforms the given AST type to an IR type.
 	 * 
 	 * @param type
@@ -125,6 +200,7 @@ public class TypeTransformer extends VoidSwitch {
 	 * @return an IR type
 	 */
 	public void transformTypes(AstEntity entity) {
+		evaluateStateVariables(entity);
 		doSwitch(entity);
 	}
 

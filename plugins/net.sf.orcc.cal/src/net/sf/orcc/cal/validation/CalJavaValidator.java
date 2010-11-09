@@ -69,7 +69,6 @@ import net.sf.orcc.cal.type.TypeTransformer;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
-import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.util.CollectionsUtil;
@@ -94,8 +93,6 @@ import org.jgrapht.graph.DefaultEdge;
  * 
  */
 public class CalJavaValidator extends AbstractCalJavaValidator {
-
-	private TypeChecker checker;
 
 	private SimpleAttributeResolver<EObject, String> resolver = SimpleAttributeResolver
 			.newResolver(String.class, "name");
@@ -158,6 +155,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 						.evaluateAsInteger(astRepeat);
 				if (repeat != 1) {
 					// each value is supposed to be a list
+					TypeChecker checker = new TypeChecker(this);
 					List<AstExpression> values = pattern.getValues();
 					for (AstExpression value : values) {
 						Type type = checker.getType(value);
@@ -283,6 +281,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		expression.getIndexes().addAll(EcoreUtil.copyAll(assign.getIndexes()));
 
 		// check types
+		TypeChecker checker = new TypeChecker(this);
 		Type targetType = checker.getType(expression);
 		Type type = checker.getType(assign.getValue());
 		if (!checker.isConvertibleTo(type, targetType)) {
@@ -316,6 +315,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
+		TypeChecker checker = new TypeChecker(this);
 		Iterator<AstVariable> itFormal = procedure.getParameters().iterator();
 		Iterator<AstExpression> itActual = parameters.iterator();
 		while (itFormal.hasNext() && itActual.hasNext()) {
@@ -338,15 +338,9 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		// check there are no cycles in type definitions
 		if (!new TypeCycleDetector(this).detectCycles(entity)) {
-			// evaluate state variables
-			checker = new TypeChecker(this);
-
-			evaluateStateVariables(entity);
-
 			// transforms AST types to IR types
 			// this is a prerequisite for type checking
-			TypeTransformer typeTransformer = new TypeTransformer(this);
-			typeTransformer.transformTypes(entity);
+			new TypeTransformer(this).transformTypes(entity);
 		}
 	}
 
@@ -611,6 +605,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	private void checkReturnType(AstFunction function) {
+		TypeChecker checker = new TypeChecker(this);
 		Type returnType = function.getIrType();
 		Type expressionType = function.getExpression().getIrType();
 		if (!checker.isConvertibleTo(expressionType, returnType)) {
@@ -642,6 +637,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	public void checkVariable(AstVariable variable) {
 		checkIsVariableUsed(variable);
 		AstExpression value = variable.getValue();
+		TypeChecker checker = new TypeChecker(this);
 		if (value != null) {
 			// check types
 			Type targetType = variable.getIrType();
@@ -656,47 +652,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	@Override
 	public void error(String string, EObject source, Integer feature) {
 		super.error(string, source, feature);
-	}
-
-	/**
-	 * Evaluates the given list of state variables, and register them as
-	 * variables.
-	 * 
-	 * @param stateVariables
-	 *            a list of state variables
-	 */
-	private void evaluateStateVariables(AstEntity entity) {
-		List<AstVariable> variables;
-		AstActor actor = entity.getActor();
-		if (actor == null) {
-			AstUnit unit = entity.getUnit();
-			variables = unit.getVariables();
-		} else {
-			variables = actor.getStateVariables();
-		}
-
-		for (AstVariable astVariable : variables) {
-			// evaluate initial value (if any)
-			AstExpression astValue = astVariable.getValue();
-			if (astValue != null) {
-				Expression initialValue = (Expression) astVariable
-						.getInitialValue();
-				if (initialValue == null) {
-					// only evaluates the initial value once (when validating)
-					initialValue = new AstExpressionEvaluator(this)
-							.evaluate(astValue);
-					if (initialValue == null) {
-						error("variable "
-								+ astVariable.getName()
-								+ " does not have a compile-time constant initial value",
-								astVariable, CalPackage.AST_VARIABLE);
-					} else {
-						// register the value
-						astVariable.setInitialValue(initialValue);
-					}
-				}
-			}
-		}
 	}
 
 	private String getName(AstAction action) {
