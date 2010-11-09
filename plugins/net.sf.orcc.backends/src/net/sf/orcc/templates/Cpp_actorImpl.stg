@@ -346,6 +346,7 @@ default:
 	std::cout << "unknown state: " << _FSM_state << std::endl;
 	break;
 }
+if (res){i++;}
 >>
 
 schedulerFSM(actions, fsm) ::= <<

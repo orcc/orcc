@@ -85,7 +85,9 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 
 	private Fifo_int fifo_B;
 
-	private Fifo_int fifo_SizeOfImage;
+	private Fifo_int fifo_HEIGHT;
+
+	private Fifo_int fifo_WIDTH;
 
 	private JFrame frame;
 
@@ -145,7 +147,7 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 	}
 
 	public String getNextSchedulableAction() {
-		if (fifo_SizeOfImage.hasTokens(1)) {
+		if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
 			return "setImageSize";
 		}
 
@@ -180,7 +182,7 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 
 			if (sizeDone == false) {
 				imageDone = false;
-				if (fifo_SizeOfImage.hasTokens(1)) {
+				if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
 					setImageSize();
 					res = true;
 					i++;
@@ -208,8 +210,10 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 			fifo_G = (Fifo_int) fifo;
 		} else if ("B".equals(portName)) {
 			fifo_B = (Fifo_int) fifo;
-		} else if ("SizeOfImage".equals(portName)) {
-			fifo_SizeOfImage = (Fifo_int) fifo;
+		} else if ("WIDTH".equals(portName)) {
+			fifo_WIDTH = (Fifo_int) fifo;
+		} else if ("HEIGHT".equals(portName)) {
+			fifo_HEIGHT = (Fifo_int) fifo;
 		} else {
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
@@ -217,11 +221,13 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 	}
 
 	private void setImageSize() {
-		int[] SizeOfImage = fifo_SizeOfImage.getReadArray(1);
-		int SizeOfImage_Index = fifo_SizeOfImage.getReadIndex(1);
+		int[] Width = fifo_WIDTH.getReadArray(1);
+		int width_Index = fifo_WIDTH.getReadIndex(1);
+		int[] Height = fifo_HEIGHT.getReadArray(1);
+		int height_Index = fifo_HEIGHT.getReadIndex(1);
 
-		int newWidth = SizeOfImage[SizeOfImage_Index] & 0xFFFF;
-		int newHeight = (SizeOfImage[SizeOfImage_Index] >> 16) & 0xFFFF;
+		int newWidth = Width[width_Index];
+		int newHeight = Height[height_Index];
 
 		if (newWidth != this.width || newHeight != this.height) {
 			this.width = newWidth;
@@ -237,7 +243,8 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 					BufferedImage.TYPE_INT_RGB);
 		}
 
-		fifo_SizeOfImage.readEnd(1);
+		fifo_WIDTH.readEnd(1);
+		fifo_HEIGHT.readEnd(1);
 
 		sizeDone = true;
 	}

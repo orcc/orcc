@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, IETR/INSA of Rennes
+ * Copyright (c) 2010, AKATECH SA
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@
  *   * Redistributions in binary form must reproduce the above copyright notice,
  *     this list of conditions and the following disclaimer in the documentation
  *     and/or other materials provided with the distribution.
- *   * Neither the name of the IETR/INSA of Rennes nor the names of its
+ *   * Neither the name of the AKATECH SA nor the names of its
  *     contributors may be used to endorse or promote products derived from this
  *     software without specific prior written permission.
  * 
@@ -28,72 +28,58 @@
  */
 package net.sf.orcc.simulators.interpreter;
 
+import java.util.Map;
+
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.plugins.simulators.Simulator.DebugStackFrame;
 import net.sf.orcc.runtime.Fifo;
-import net.sf.orcc.runtime.actors.Actor_DisplayImage;
-import net.sf.orcc.runtime.actors.Actor_DisplayImage.OutputStreamProxy;
+import net.sf.orcc.runtime.actors.Actor_ReadFile;
 import net.sf.orcc.simulators.SimuActor;
 
 /**
- * Proxy to connect a Display_Actor for orcc.runtime library as an
+ * Proxy to connect a Actor_ReadFile for orcc.runtime library as an
  * InterpreterSimuActor to the "interpreter simulator"
  * 
- * @author plagalay
+ * @author fabecassis
  * 
  */
-public class InterpreterSimuDisplayImage extends AbstractInterpreterSimuActor
+public class InterpreterSimuReadFile extends AbstractInterpreterSimuActor
 		implements SimuActor {
 
-	private Actor_DisplayImage displayImage;
+	private Actor_ReadFile readFile;
 	private String instanceId;
-	
-	public class DisplayOutputStreamProxy implements OutputStreamProxy {
-		
-		private OrccProcess process;
-		
-		public DisplayOutputStreamProxy(OrccProcess process) {
-			this.process = process;
+
+	public InterpreterSimuReadFile(String instanceId,
+				Map<String, Expression> actorParameters, 
+				OrccProcess process) {
+		Expression expr = actorParameters.get("filename");
+		if (expr.isStringExpr()) {
+			StringExpr s = (StringExpr) expr;
+			this.readFile = new Actor_ReadFile(s.getValue());
+			this.instanceId = instanceId;
 		}
-		
-		@Override
-		public void write(String text) {
-			process.write(text);
+		else {
+			throw new OrccRuntimeException("Parameter filename for " + instanceId + " is not of type String.");
 		}
-	}
-	public InterpreterSimuDisplayImage(String instanceId) {
-		this.instanceId = instanceId;
-	}
-	
-	public InterpreterSimuDisplayImage(String instanceId, OrccProcess process) {
-		this.displayImage = new Actor_DisplayImage();
-		Actor_DisplayImage.setOutputStreamProxy(new DisplayOutputStreamProxy(process));
-		this.instanceId = instanceId;
 	}
 
 	@Override
 	public void clearBreakpoint(int breakpoint) {
-		// DisplayImage actor breakpoint not supported
+		// Source actor breakpoint not supported
 	}
 
 	@Override
 	public void close() {
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		Actor_DisplayImage.closeDisplay();
-	}
-
-	public DisplayOutputStreamProxy createOutputStreamProxy(OrccProcess process) {
-		return new DisplayOutputStreamProxy(process);
+		readFile.close();
 	}
 	
 	@Override
 	public String getActorName() {
-		return "DisplayImage";
+		return "ReadFile";
 	}
 
 	@Override
@@ -116,29 +102,28 @@ public class InterpreterSimuDisplayImage extends AbstractInterpreterSimuActor
 		stackFrame.fsmState = "IDLE";
 		return stackFrame;
 	}
-
+	
 	@Override
 	public int runAllSchedulableAction() {
-		int status = displayImage.schedule();
+		int status = readFile.schedule();
 		nbOfFirings += status;
 		return status;
 	}
 
 	@Override
 	public int runNextSchedulableAction() {
-		int status = displayImage.schedule();
+		int status = readFile.schedule();
 		nbOfFirings += status;
 		return status;
 	}
 
 	@Override
 	public void setBreakpoint(int breakpoint) {
-		// Display actor breakpoint not supported
+		// ReadFile actor breakpoint not supported
 	}
 
 	@Override
 	public void setFifo(Port port, Fifo fifo) {
-		displayImage.setFifo(port.getName(), fifo);
+		readFile.setFifo(port.getName(), fifo);
 	}
-
 }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="img_read" x="45" y="182"/>
-      <vertex id="img_display" x="573" y="184"/>
-      <vertex id="rgb2y" x="191" y="123"/>
-      <vertex id="y2rgb" x="460" y="133"/>
-      <vertex id="sobel" x="312" y="148"/>
+      <vertex id="ReadImage" x="57" y="94"/>
+      <vertex id="DisplayImage" x="625" y="82"/>
+      <vertex id="rgb2y" x="198" y="70"/>
+      <vertex id="y2rgb" x="510" y="91"/>
+      <vertex id="sobel" x="313" y="109"/>
    </vertices>
 </layout>

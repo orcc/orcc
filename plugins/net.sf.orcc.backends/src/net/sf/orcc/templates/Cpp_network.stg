@@ -111,6 +111,16 @@ printInitializes(instances) ::= <<
 $instances: printInitialize()$
 >>
 
+printInitializeActor(instance) ::= <<
+$if (instance.actor)$
+$instance.id$.initializeActor();
+$endif$
+>>
+
+printInitializeActors(instances) ::= <<
+$instances: printInitializeActor()$
+>>
+
 printScheduler(instance) ::= <<
 $if (!instance.serdes)$res += $instance.id$.schedule();$endif$
 >>
@@ -142,6 +152,7 @@ class network_$id$ : public Threadaka
 public:
 	void run(void * args)
 	{
+		$printInitializeActors(instances)$
 		$printInitializes(instances)$
 		while (1) 
 		{
@@ -224,6 +235,11 @@ $endif$
 extern "C" {
 #include "orcc_util.h"
 }
+
+#ifdef __TRACE_TOKENS__
+#include "traceaka.h"
+TraceAka g_oTracer;
+#endif
 
 $includeActors(network.actors)$
 

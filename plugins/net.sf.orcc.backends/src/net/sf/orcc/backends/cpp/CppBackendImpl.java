@@ -191,7 +191,7 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	private String getPartNameAttribute(Instance instance) throws OrccException {
-		String partName = null;
+		String partName = "";
 		IAttribute attr = instance.getAttribute("partName");
 		if (attr != null) {
 			Expression expr = ((IValueAttribute) attr).getValue();

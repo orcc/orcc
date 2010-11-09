@@ -110,7 +110,7 @@ public class InterpreterSimuReadImage extends AbstractInterpreterSimuActor
 
 	@Override
 	public void setBreakpoint(int breakpoint) {
-		// Source actor breakpoint not supported
+		// ReadImage actor breakpoint not supported
 	}
 
 	@Override
