@@ -159,12 +159,18 @@ public class TypeChecker extends CalSwitch<Type> {
 
 	@Override
 	public Type caseAstExpressionCall(AstExpressionCall astCall) {
-		if (astCall.getFunction().eContainer() == null) {
+		// built-in function
+		AstFunction function = astCall.getFunction();
+		if (function.eContainer() == null) {
 			return getTypeBuiltin(astCall);
 		}
 
-		// user-defined function
-		AstFunction function = astCall.getFunction();
+		// if the function has not been typed, type it
+		Type type = function.getIrType();
+		if (type == null) {
+			new TypeTransformer(validator).doSwitch(function);
+		}
+
 		String name = function.getName();
 		List<AstExpression> parameters = astCall.getParameters();
 		if (function.getParameters().size() != parameters.size()) {

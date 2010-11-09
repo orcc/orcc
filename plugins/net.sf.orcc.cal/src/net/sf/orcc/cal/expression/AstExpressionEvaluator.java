@@ -376,11 +376,9 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 		AstVariable variable = expression.getValue().getVariable();
 		Expression value = (Expression) variable.getInitialValue();
 		if (value == null) {
-			error("variable \"" + variable.getName() + "\" ("
-					+ Util.getLocation(variable)
-					+ ") does not have a compile-time constant value",
-					expression, CalPackage.AST_EXPRESSION_VARIABLE);
-			return null;
+			// the variable may be in another unit and it may have a value if we
+			// evaluate it
+			value = evaluate(variable.getValue());
 		}
 
 		return value;
