@@ -28,7 +28,7 @@
  */
 package net.sf.orcc.ir;
 
-import org.eclipse.emf.common.util.EList;
+import java.util.List;
 
 /**
  * This class defines a List type.
@@ -59,7 +59,6 @@ public interface TypeList extends Type {
 	 * </ul>
 	 * 
 	 * @return the element type of this list
-	 * @model changeable="false" derived="true" volatile="true"
 	 */
 	public Type getElementType();
 
@@ -75,9 +74,8 @@ public interface TypeList extends Type {
 	 * Returns a list of indexes that can be used inside a template.
 	 * 
 	 * @return a list of indexes corresponding to the list size
-	 * @model changeable="false" derived="true" volatile="true"
 	 */
-	public EList<Integer> getSizeIterator();
+	public List<Integer> getSizeIterator();
 
 	/**
 	 * Returns the type of the list

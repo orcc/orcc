@@ -52,7 +52,6 @@ public interface TypeInt extends Type {
 	 * Returns true if this type must be represented with a "long".
 	 * 
 	 * @return true if this type must be represented with a "long"
-	 * @model changeable="false" volatile="true" derived="true"
 	 */
 	boolean isLong();
 

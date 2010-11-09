@@ -28,6 +28,9 @@
  */
 package net.sf.orcc.ir.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -35,11 +38,9 @@ import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypeVisitor;
 
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.EDataTypeEList;
 
 /**
  * This class defines a List type.
@@ -53,6 +54,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	/**
 	 * The default value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSize()
 	 * @generated
 	 * @ordered
@@ -61,6 +63,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	/**
 	 * The cached value of the '{@link #getSize() <em>Size</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getSize()
 	 * @generated
 	 * @ordered
@@ -69,6 +72,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	/**
 	 * The cached value of the '{@link #getType() <em>Type</em>}' reference.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @see #getType()
 	 * @generated
 	 * @ordered
@@ -77,6 +81,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	protected TypeListImpl() {
@@ -95,17 +100,7 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Type basicGetElementType() {
-		// TODO: implement this method to return the 'Element Type' reference
-		// -> do not perform proxy resolution
-		// Ensure that you remove @generated or mark it @generated NOT
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	public Type basicGetType() {
@@ -114,40 +109,34 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case IrPackage.TYPE_LIST__ELEMENT_TYPE:
-				if (resolve) return getElementType();
-				return basicGetElementType();
-			case IrPackage.TYPE_LIST__SIZE:
-				return getSize();
-			case IrPackage.TYPE_LIST__SIZE_ITERATOR:
-				return getSizeIterator();
-			case IrPackage.TYPE_LIST__TYPE:
-				if (resolve) return getType();
-				return basicGetType();
+		case IrPackage.TYPE_LIST__SIZE:
+			return getSize();
+		case IrPackage.TYPE_LIST__TYPE:
+			if (resolve)
+				return getType();
+			return basicGetType();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case IrPackage.TYPE_LIST__ELEMENT_TYPE:
-				return basicGetElementType() != null;
-			case IrPackage.TYPE_LIST__SIZE:
-				return size != SIZE_EDEFAULT;
-			case IrPackage.TYPE_LIST__SIZE_ITERATOR:
-				return !getSizeIterator().isEmpty();
-			case IrPackage.TYPE_LIST__TYPE:
-				return type != null;
+		case IrPackage.TYPE_LIST__SIZE:
+			return size != SIZE_EDEFAULT;
+		case IrPackage.TYPE_LIST__TYPE:
+			return type != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -164,23 +153,25 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case IrPackage.TYPE_LIST__SIZE:
-				setSize((Integer)newValue);
-				return;
-			case IrPackage.TYPE_LIST__TYPE:
-				setType((Type)newValue);
-				return;
+		case IrPackage.TYPE_LIST__SIZE:
+			setSize((Integer) newValue);
+			return;
+		case IrPackage.TYPE_LIST__TYPE:
+			setType((Type) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -190,24 +181,25 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case IrPackage.TYPE_LIST__SIZE:
-				setSize(SIZE_EDEFAULT);
-				return;
-			case IrPackage.TYPE_LIST__TYPE:
-				setType((Type)null);
-				return;
+		case IrPackage.TYPE_LIST__SIZE:
+			setSize(SIZE_EDEFAULT);
+			return;
+		case IrPackage.TYPE_LIST__TYPE:
+			setType((Type) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
 
 	@Override
-	public EList<Integer> getDimensions() {
-		EList<Integer> dimensions = super.getDimensions();
+	public List<Integer> getDimensions() {
+		List<Integer> dimensions = new ArrayList<Integer>();
 		dimensions.add(size);
 		dimensions.addAll(getType().getDimensions());
 		return dimensions;
@@ -236,10 +228,8 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 * 
 	 * @return a list of indexes corresponding to the list size
 	 */
-	public EList<Integer> getSizeIterator() {
-		EList<Integer> list = new EDataTypeEList<Integer>(Integer.class, this,
-				IrPackage.TYPE_LIST__SIZE_ITERATOR);
-
+	public List<Integer> getSizeIterator() {
+		List<Integer> list = new ArrayList<Integer>(size);
 		for (int i = 0; i < size; i++) {
 			list.add(i);
 		}
@@ -255,11 +245,12 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 	 */
 	public Type getType() {
 		if (type != null && type.eIsProxy()) {
-			InternalEObject oldType = (InternalEObject)type;
-			type = (Type)eResolveProxy(oldType);
+			InternalEObject oldType = (InternalEObject) type;
+			type = (Type) eResolveProxy(oldType);
 			if (type != oldType) {
 				if (eNotificationRequired())
-					eNotify(new ENotificationImpl(this, Notification.RESOLVE, IrPackage.TYPE_LIST__TYPE, oldType, type));
+					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
+							IrPackage.TYPE_LIST__TYPE, oldType, type));
 			}
 		}
 		return type;
@@ -281,7 +272,8 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		int oldSize = size;
 		size = newSize;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__SIZE, oldSize, size));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.TYPE_LIST__SIZE, oldSize, size));
 	}
 
 	/**
@@ -295,7 +287,8 @@ public class TypeListImpl extends TypeImpl implements TypeList {
 		Type oldType = type;
 		type = newType;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, IrPackage.TYPE_LIST__TYPE, oldType, type));
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					IrPackage.TYPE_LIST__TYPE, oldType, type));
 	}
 
 	@Override

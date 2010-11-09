@@ -5,13 +5,11 @@ allow computations on arbitrary-sized integers in the interpreter
 investigate the possibility of doing computations on arbitrary-sized integers in C (possibly add an option for that)
 
 check to see how to use build path with Xtext
-add qualified names to actors
 how do use qualified names in Graphiti?
 
 implement I/O actors
 re-write FIFOs
 
-clean up Ecore model of Types (remove "long" attribute from Type(U)Int, all attributes from Type, iterator and dimensions for List)
 set "type" feature of TypeList as containment="true"
 remove "transient" and replace by containment="true" in the PostProcessor.ext
 add EcoreUtil.copy everywhere so the whole thing works

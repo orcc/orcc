@@ -155,78 +155,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getType_Dimensions() {
-		return (EAttribute)typeEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getType_Bool() {
-		return (EAttribute)typeEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getType_Float() {
-		return (EAttribute)typeEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getType_Int() {
-		return (EAttribute)typeEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getType_List() {
-		return (EAttribute)typeEClass.getEStructuralFeatures().get(4);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getType_String() {
-		return (EAttribute)typeEClass.getEStructuralFeatures().get(5);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getType_Uint() {
-		return (EAttribute)typeEClass.getEStructuralFeatures().get(6);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getType_Void() {
-		return (EAttribute)typeEClass.getEStructuralFeatures().get(7);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getTypeBool() {
 		return typeBoolEClass;
 	}
@@ -263,15 +191,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTypeInt_Long() {
-		return (EAttribute)typeIntEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getTypeList() {
 		return typeListEClass;
 	}
@@ -281,26 +200,8 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EReference getTypeList_ElementType() {
-		return (EReference)typeListEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getTypeList_Size() {
-		return (EAttribute)typeListEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getTypeList_SizeIterator() {
-		return (EAttribute)typeListEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)typeListEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -309,7 +210,7 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * @generated
 	 */
 	public EReference getTypeList_Type() {
-		return (EReference)typeListEClass.getEStructuralFeatures().get(3);
+		return (EReference)typeListEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -353,15 +254,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTypeUint_Long() {
-		return (EAttribute)typeUintEClass.getEStructuralFeatures().get(1);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getTypeVoid() {
 		return typeVoidEClass;
 	}
@@ -395,14 +287,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Create classes and their features
 		typeEClass = createEClass(TYPE);
-		createEAttribute(typeEClass, TYPE__DIMENSIONS);
-		createEAttribute(typeEClass, TYPE__BOOL);
-		createEAttribute(typeEClass, TYPE__FLOAT);
-		createEAttribute(typeEClass, TYPE__INT);
-		createEAttribute(typeEClass, TYPE__LIST);
-		createEAttribute(typeEClass, TYPE__STRING);
-		createEAttribute(typeEClass, TYPE__UINT);
-		createEAttribute(typeEClass, TYPE__VOID);
 
 		typeBoolEClass = createEClass(TYPE_BOOL);
 
@@ -410,12 +294,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		typeIntEClass = createEClass(TYPE_INT);
 		createEAttribute(typeIntEClass, TYPE_INT__SIZE);
-		createEAttribute(typeIntEClass, TYPE_INT__LONG);
 
 		typeListEClass = createEClass(TYPE_LIST);
-		createEReference(typeListEClass, TYPE_LIST__ELEMENT_TYPE);
 		createEAttribute(typeListEClass, TYPE_LIST__SIZE);
-		createEAttribute(typeListEClass, TYPE_LIST__SIZE_ITERATOR);
 		createEReference(typeListEClass, TYPE_LIST__TYPE);
 
 		typeStringEClass = createEClass(TYPE_STRING);
@@ -423,7 +304,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		typeUintEClass = createEClass(TYPE_UINT);
 		createEAttribute(typeUintEClass, TYPE_UINT__SIZE);
-		createEAttribute(typeUintEClass, TYPE_UINT__LONG);
 
 		typeVoidEClass = createEClass(TYPE_VOID);
 	}
@@ -466,14 +346,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(typeEClass, Type.class, "Type", IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getType_Dimensions(), ecorePackage.getEIntegerObject(), "dimensions", null, 0, -1, Type.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getType_Bool(), ecorePackage.getEBoolean(), "bool", null, 0, 1, Type.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getType_Float(), ecorePackage.getEBoolean(), "float", null, 0, 1, Type.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getType_Int(), ecorePackage.getEBoolean(), "int", null, 0, 1, Type.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getType_List(), ecorePackage.getEBoolean(), "list", null, 0, 1, Type.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getType_String(), ecorePackage.getEBoolean(), "string", null, 0, 1, Type.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getType_Uint(), ecorePackage.getEBoolean(), "uint", null, 0, 1, Type.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getType_Void(), ecorePackage.getEBoolean(), "void", null, 0, 1, Type.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(typeBoolEClass, TypeBool.class, "TypeBool", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -481,12 +353,9 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(typeIntEClass, TypeInt.class, "TypeInt", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTypeInt_Size(), ecorePackage.getEInt(), "size", "32", 0, 1, TypeInt.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTypeInt_Long(), ecorePackage.getEBoolean(), "long", null, 0, 1, TypeInt.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(typeListEClass, TypeList.class, "TypeList", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEReference(getTypeList_ElementType(), this.getType(), null, "elementType", null, 0, 1, TypeList.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTypeList_Size(), ecorePackage.getEInt(), "size", null, 0, 1, TypeList.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTypeList_SizeIterator(), ecorePackage.getEIntegerObject(), "sizeIterator", null, 0, -1, TypeList.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getTypeList_Type(), this.getType(), null, "type", null, 0, 1, TypeList.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(typeStringEClass, TypeString.class, "TypeString", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -494,7 +363,6 @@ public class IrPackageImpl extends EPackageImpl implements IrPackage {
 
 		initEClass(typeUintEClass, TypeUint.class, "TypeUint", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getTypeUint_Size(), ecorePackage.getEInt(), "size", "32", 0, 1, TypeUint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTypeUint_Long(), ecorePackage.getEBoolean(), "long", null, 0, 1, TypeUint.class, !IS_TRANSIENT, IS_VOLATILE, !IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(typeVoidEClass, TypeVoid.class, "TypeVoid", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 

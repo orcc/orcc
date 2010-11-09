@@ -39,8 +39,6 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
-import org.eclipse.emf.common.util.EList;
-
 /**
  * 
  * This class defines a transformation that replace local list by multiple
@@ -57,7 +55,7 @@ public class LocalListToMultipleVariableTransformation extends
 		Variable target = store.getTarget();
 		List<Expression> indexes = store.getIndexes();
 		Expression value = store.getValue();
-		EList<Integer> dimensions = target.getType().getDimensions();
+		List<Integer> dimensions = target.getType().getDimensions();
 		boolean test = false;
 		if (dimensions.size() > 0) {
 			test = dimensions.get(0) > 1;
@@ -77,7 +75,7 @@ public class LocalListToMultipleVariableTransformation extends
 	@Override
 	public void visit(Write write) {
 		Variable target = write.getTarget();
-		EList<Integer> dimensions = target.getType().getDimensions();
+		List<Integer> dimensions = target.getType().getDimensions();
 		boolean test = false;
 		if (dimensions.size() > 0) {
 			test = dimensions.get(0) > 1;

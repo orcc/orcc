@@ -28,16 +28,17 @@
  */
 package net.sf.orcc.ir.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.ir.type.TypePrinter;
 import net.sf.orcc.ir.type.TypeVisitor;
 
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
-import org.eclipse.emf.ecore.util.EDataTypeEList;
 
 /**
  * This class is an abstract implementation of {@link Type}.
@@ -49,71 +50,8 @@ import org.eclipse.emf.ecore.util.EDataTypeEList;
 public abstract class TypeImpl extends EObjectImpl implements Type {
 
 	/**
-	 * The default value of the '{@link #isBool() <em>Bool</em>}' attribute.
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isBool()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean BOOL_EDEFAULT = false;
-
-	/**
-	 * The default value of the '{@link #isFloat() <em>Float</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isFloat()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean FLOAT_EDEFAULT = false;
-
-	/**
-	 * The default value of the '{@link #isInt() <em>Int</em>}' attribute. <!--
-	 * begin-user-doc --> <!-- end-user-doc -->
 	 * 
-	 * @see #isInt()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean INT_EDEFAULT = false;
-
-	/**
-	 * The default value of the '{@link #isList() <em>List</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isList()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean LIST_EDEFAULT = false;
-
-	/**
-	 * The default value of the '{@link #isString() <em>String</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isString()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean STRING_EDEFAULT = false;
-
-	/**
-	 * The default value of the '{@link #isUint() <em>Uint</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isUint()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean UINT_EDEFAULT = false;
-
-	/**
-	 * The default value of the '{@link #isVoid() <em>Void</em>}' attribute.
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @see #isVoid()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean VOID_EDEFAULT = false;
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	protected TypeImpl() {
@@ -128,60 +66,7 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-			case IrPackage.TYPE__DIMENSIONS:
-				return getDimensions();
-			case IrPackage.TYPE__BOOL:
-				return isBool();
-			case IrPackage.TYPE__FLOAT:
-				return isFloat();
-			case IrPackage.TYPE__INT:
-				return isInt();
-			case IrPackage.TYPE__LIST:
-				return isList();
-			case IrPackage.TYPE__STRING:
-				return isString();
-			case IrPackage.TYPE__UINT:
-				return isUint();
-			case IrPackage.TYPE__VOID:
-				return isVoid();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		switch (featureID) {
-			case IrPackage.TYPE__DIMENSIONS:
-				return !getDimensions().isEmpty();
-			case IrPackage.TYPE__BOOL:
-				return isBool() != BOOL_EDEFAULT;
-			case IrPackage.TYPE__FLOAT:
-				return isFloat() != FLOAT_EDEFAULT;
-			case IrPackage.TYPE__INT:
-				return isInt() != INT_EDEFAULT;
-			case IrPackage.TYPE__LIST:
-				return isList() != LIST_EDEFAULT;
-			case IrPackage.TYPE__STRING:
-				return isString() != STRING_EDEFAULT;
-			case IrPackage.TYPE__UINT:
-				return isUint() != UINT_EDEFAULT;
-			case IrPackage.TYPE__VOID:
-				return isVoid() != VOID_EDEFAULT;
-		}
-		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
 	 * @generated
 	 */
 	@Override
@@ -190,9 +75,8 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 	}
 
 	@Override
-	public EList<Integer> getDimensions() {
-		return new EDataTypeEList<Integer>(Integer.class, this,
-				IrPackage.TYPE__DIMENSIONS);
+	public List<Integer> getDimensions() {
+		return new ArrayList<Integer>(0);
 	}
 
 	@Override

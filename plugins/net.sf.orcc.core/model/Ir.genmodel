@@ -7,25 +7,14 @@
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">
-    <genClasses image="false" ecoreClass="Ir.ecore#//Type">
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Type/dimensions"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Type/bool"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Type/float"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Type/int"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Type/list"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Type/string"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Type/uint"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//Type/void"/>
-    </genClasses>
+    <genClasses image="false" ecoreClass="Ir.ecore#//Type"/>
     <genClasses ecoreClass="Ir.ecore#//TypeBool"/>
     <genClasses ecoreClass="Ir.ecore#//TypeFloat"/>
     <genClasses ecoreClass="Ir.ecore#//TypeInt">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//TypeInt/size"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//TypeList">
-      <genFeatures property="Readonly" notify="false" createChild="false" ecoreFeature="ecore:EReference Ir.ecore#//TypeList/elementType"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//TypeList/size"/>
-      <genFeatures property="Readonly" createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//TypeList/sizeIterator"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//TypeList/type"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//TypeString">

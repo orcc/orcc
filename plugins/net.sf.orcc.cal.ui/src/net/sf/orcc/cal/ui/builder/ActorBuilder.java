@@ -122,7 +122,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			} else {
 				// creation
 				IResourceDescription desc = delta.getNew();
-				Resource resource = set.getResource(desc.getURI(), false);
+				Resource resource = set.getResource(desc.getURI(), true);
 				for (EObject obj : resource.getContents()) {
 					if (obj.eClass()
 							.equals(CalPackage.eINSTANCE.getAstEntity())) {
