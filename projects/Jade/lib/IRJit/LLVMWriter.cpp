@@ -37,6 +37,7 @@
 
 //------------------------------
 #include "Jade/Decoder/Decoder.h"
+#include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/JIT/LLVMWriter.h"
 
 #include "llvm/Instructions.h"
@@ -247,4 +248,9 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
 		  II->setMetadata(MI->first, cast<MDNode>(New));
 	  }
   }
+}
+
+bool LLVMWriter::addType(string name, const Type* type){
+	Module* module = decoder->getModule();
+	return module->addTypeName(name, type);
 }

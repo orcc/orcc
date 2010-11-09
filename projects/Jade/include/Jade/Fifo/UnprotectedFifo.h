@@ -132,19 +132,11 @@ public:
 	 *  @param jit : JIT use to load bitcoder
 	 *
      */
-	UnprotectedFifo(llvm::LLVMContext& C, JIT* jit);
-
-	/**
-     *  @brief Constructor
-     *
-	 *	Declare fifo type
-	 *
-     */
 	UnprotectedFifo(llvm::LLVMContext& C);
 	
 	~UnprotectedFifo();
 
-	void setConnection(Connection* connection);
+	void setConnection(Connection* connection, Decoder* decoder);
 	
 
 private:

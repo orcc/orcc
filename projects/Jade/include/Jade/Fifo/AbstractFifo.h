@@ -80,8 +80,7 @@ public:
 	 *  @param jit : JIT use to load bitcoder
 	 *
      */
-	AbstractFifo(JIT* jit){
-		this->jit = jit;
+	AbstractFifo(){
 	};
 
 	~AbstractFifo(){};
@@ -277,9 +276,6 @@ protected:
 	/** Extern structs */
 	std::list<llvm::Function*> externStruct;
 
-	/** Decoder engine's jit */
-	JIT* jit;
-
 	/**
     *  @brief Initialize fifo access map
     */
@@ -301,7 +297,7 @@ protected:
 
 	void setFifoStruct(std::string name, llvm::Type* type);
 
-	virtual void setConnection(Connection* connection)=0;
+	virtual void setConnection(Connection* connection, Decoder* decoder)=0;
 
 	/**
      *  @brief set fifo function name

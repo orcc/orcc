@@ -49,6 +49,7 @@
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Network.h"
+#include "Jade/Jit/LLVMWriter.h"
 //------------------------------
 
 using namespace llvm;
@@ -126,11 +127,13 @@ void AbstractFifo::setFifoStruct(std::string name, llvm::Type* type){
 }
 
 void AbstractFifo::addFifoType(Decoder* decoder){
+	LLVMWriter writer("", decoder);
+	
 	//Get fifos
 	map<string, Type*>::iterator it;
 
 	for (it = structAcces.begin(); it != structAcces.end(); ++it){
-		jit->addType(it->first, it->second, decoder);
+		writer.addType(it->first, it->second);
 	}
 }
 
@@ -183,6 +186,6 @@ void AbstractFifo::setConnections(Decoder* decoder){
 	int edges = graph->getNbEdges();
 	
 	for (int i = 0; i < edges; i++){
-		setConnection((Connection*)graph->getEdge(i));
+		setConnection((Connection*)graph->getEdge(i), decoder);
 	}
 }

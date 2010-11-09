@@ -42,15 +42,12 @@
 #include <map>
 #include <list>
 
-//#include "llvm/Module.h"
-
 namespace llvm{
 	class LLVMContext;
 	class Module;
 }
 
-#include "Jade/Fifo/AbstractFifo.h" 
-
+class AbstractFifo;
 class Actor;
 class Decoder;
 class Instance;
@@ -125,7 +122,7 @@ public:
 	 * 
 	 *	Add an instance in the decoder
 	 *
-	 *  @param instace: Instance to add in the decoder
+	 *  @param instance: Instance to add in the decoder
      */
 	void addInstance(Instance* instance);
 

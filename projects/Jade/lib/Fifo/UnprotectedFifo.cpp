@@ -52,6 +52,8 @@
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/UnprotectedFifo.h"
 #include "Jade/Core/Connection.h"
+#include "Jade/Jit/LLVMParser.h"
+#include "Jade/Jit/LLVMWriter.h"
 //------------------------------
 
 using namespace llvm;
@@ -60,7 +62,7 @@ using namespace std;
 
 extern cl::opt<string> ToolsDir;
 
-UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C, JIT* jit): Context(C), AbstractFifo(jit)
+UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C): Context(C), AbstractFifo()
 {
 	//Initialize map
 	createFifoMap();
@@ -71,15 +73,6 @@ UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C, JIT* jit): Context(C), Ab
 	
 	// Initialize fifo counter
 	fifoCnt = 0;
-}
-
-UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C): Context(C), AbstractFifo(NULL)
-{
-	// Initialize fifo counter 
-	fifoCnt = 0;
-
-	//Parse bitcode
-	declareFifoHeader();
 }
 
 UnprotectedFifo::~UnprotectedFifo (){
@@ -93,7 +86,10 @@ void UnprotectedFifo::declareFifoHeader (){
 }
 
 void UnprotectedFifo::parseHeader (){
-	header = jit->LoadBitcode("UnprotectedFifo", ToolsDir);
+	//Create the parser
+	LLVMParser parser(Context, ToolsDir);
+
+	header = parser.loadBitcode("UnprotectedFifo");
 
 	if (header == NULL){
 		cerr << "Unable to parse fifo header file";
@@ -136,26 +132,26 @@ void UnprotectedFifo::parseFifoStructs(){
 }
 
 void UnprotectedFifo::addFunctions(Decoder* decoder){
-	
 	std::list<llvm::Function*>::iterator itList;
+	LLVMWriter writer("", decoder);
 
 	for(itList = otherFunctions.begin(); itList != otherFunctions.end(); ++itList){
-		Function* function = (Function*)jit->addFunctionProtosExternal("", *itList);
-		jit->LinkProcedureBody(*itList);
+		Function* function = writer.addFunctionProtosExternal(*itList);
+		writer.linkProcedureBody(*itList);
 		*itList = function;
 	}
 
 	std::map<std::string,llvm::Function*>::iterator itMap;
 
 	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
-		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
-		jit->LinkProcedureBody((*itMap).second);
+		Function* function = writer.addFunctionProtosExternal((*itMap).second);
+		writer.linkProcedureBody((*itMap).second);
 		(*itMap).second = function;
 	}
 }
 
-void UnprotectedFifo::setConnection(Connection* connection){
-	Module* module = jit->getModule();
+void UnprotectedFifo::setConnection(Connection* connection, Decoder* decoder){
+	Module* module = decoder->getModule();
 	
 	// fifo name 
 	ostringstream arrayName;

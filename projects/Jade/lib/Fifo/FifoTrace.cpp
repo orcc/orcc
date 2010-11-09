@@ -57,6 +57,8 @@
 #include "Jade/Core/Connection.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Core/Vertex.h"
+#include "Jade/Jit/LLVMParser.h"
+#include "Jade/Jit/LLVMWriter.h"
 //------------------------------
 
 using namespace llvm;
@@ -66,7 +68,7 @@ using namespace std;
 extern cl::opt<string> ToolsDir;
 extern cl::opt<std::string> OutputDir;
 
-FifoTrace::FifoTrace(llvm::LLVMContext& C, JIT* jit): Context(C), AbstractFifo(jit)
+FifoTrace::FifoTrace(llvm::LLVMContext& C): Context(C), AbstractFifo()
 {
 	//Initialize map
 	createFifoMap();
@@ -77,15 +79,6 @@ FifoTrace::FifoTrace(llvm::LLVMContext& C, JIT* jit): Context(C), AbstractFifo(j
 	
 	// Initialize fifo counter
 	fifoCnt = 0;
-}
-
-FifoTrace::FifoTrace(llvm::LLVMContext& C): Context(C), AbstractFifo(NULL)
-{
-	// Initialize fifo counter 
-	fifoCnt = 0;
-
-	//Parse bitcode
-	declareFifoHeader();
 }
 
 FifoTrace::~FifoTrace (){
@@ -100,14 +93,17 @@ void FifoTrace::declareFifoHeader (){
 }
 
 void FifoTrace::parseHeader (){
-	header = jit->LoadBitcode("FifoTrace", ToolsDir);
+	//Create the parser
+	LLVMParser parser(Context, ToolsDir);
+	
+	header = parser.loadBitcode("FifoTrace");
 
 	if (header == NULL){
 		cerr << "Unable to parse fifo header file";
 		exit(0);
 	}
 
-	externMod = jit->LoadBitcode("Extern", ToolsDir);
+	externMod = parser.loadBitcode("Extern");
 
 	if (externMod == NULL){
 		cerr << "Unable to parse extern functions file";
@@ -155,23 +151,23 @@ void FifoTrace::parseFifoStructs(){
 }
 
 void FifoTrace::addFunctions(Decoder* decoder){
-	
 	std::map<std::string,llvm::Function*>::iterator itMap;
+	LLVMWriter writer("", decoder);
 
 	for(itMap = externFunct.begin(); itMap != externFunct.end(); ++itMap){
-		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
+		Function* function = writer.addFunctionProtosExternal((*itMap).second);
 		(*itMap).second = function;
 	}
 
 	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
-		Function* function = (Function*)jit->addFunctionProtosInternal("", (*itMap).second);
-		jit->LinkProcedureBody((*itMap).second);
+		Function* function =  writer.addFunctionProtosInternal((*itMap).second);
+		writer.linkProcedureBody((*itMap).second);
 		(*itMap).second = function;
 	}
 }
 
-void FifoTrace::setConnection(Connection* connection){
-	Module* module = jit->getModule();
+void FifoTrace::setConnection(Connection* connection, Decoder* decoder){
+	Module* module = decoder->getModule();
 	
 	// fifo name 
 	ostringstream arrayName;
@@ -273,7 +269,7 @@ void FifoTrace::setConnections(Decoder* decoder){
 	
 	//Setting connections
 	for (int i = 0; i < edges; i++){
-		setConnection((Connection*)graph->getEdge(i));
+		setConnection((Connection*)graph->getEdge(i), decoder);
 	}
 }
 

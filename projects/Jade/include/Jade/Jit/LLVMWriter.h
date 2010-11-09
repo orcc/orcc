@@ -78,6 +78,21 @@ public:
 	llvm::Function* addFunctionProtosInternal(const llvm::Function* function);
 	bool linkProcedureBody(llvm::Function* function);
 
+	/**
+     *  @brief Add a new llvm::Type in the given decoder
+     *
+	 *  Insert an entry in the decoder Type table mapping. If there is already an entry 
+	 *   for this name, true is returned and the symbol table of the decoder is not modified. 
+	 *
+	 * @param name : name of the type
+	 *
+	 * @param type : llvm::Type to add
+	 *
+	 * @return True ff there is already an entry for this name, otherwise false.
+	 *
+     */
+	bool addType(std::string name, const llvm::Type* type);
+
 private:
 
 	/**

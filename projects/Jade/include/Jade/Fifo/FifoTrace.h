@@ -146,19 +146,11 @@ public:
 	 *  @param jit : JIT use to load bitcoder
 	 *
      */
-	FifoTrace(llvm::LLVMContext& C, JIT* jit);
-
-	/**
-     *  @brief Constructor
-     *
-	 *	Declare fifo type
-	 *
-     */
 	FifoTrace(llvm::LLVMContext& C);
 	
 	~FifoTrace();
 
-	void setConnection(Connection* connection);
+	void setConnection(Connection* connection, Decoder* decoder);
 	
 	void setConnections(Decoder* decoder);
 

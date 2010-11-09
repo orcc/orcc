@@ -52,6 +52,8 @@
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/FifoCircular.h"
 #include "Jade/Core/Connection.h"
+#include "Jade/Jit/LLVMParser.h"
+#include "Jade/Jit/LLVMWriter.h"
 //------------------------------
 
 using namespace llvm;
@@ -60,7 +62,7 @@ using namespace std;
 
 extern cl::opt<string> ToolsDir;
 
-FifoCircular::FifoCircular(llvm::LLVMContext& C, JIT* jit): Context(C), AbstractFifo(jit)
+FifoCircular::FifoCircular(llvm::LLVMContext& C): Context(C), AbstractFifo()
 {
 	//Initialize map
 	createFifoMap();
@@ -71,15 +73,6 @@ FifoCircular::FifoCircular(llvm::LLVMContext& C, JIT* jit): Context(C), Abstract
 	
 	// Initialize fifo counter
 	fifoCnt = 0;
-}
-
-FifoCircular::FifoCircular(llvm::LLVMContext& C): Context(C), AbstractFifo(NULL)
-{
-	// Initialize fifo counter 
-	fifoCnt = 0;
-
-	//Parse bitcode
-	declareFifoHeader();
 }
 
 FifoCircular::~FifoCircular (){
@@ -94,14 +87,17 @@ void FifoCircular::declareFifoHeader (){
 }
 
 void FifoCircular::parseHeader (){
-	header = jit->LoadBitcode("FifoCircular", ToolsDir);
+	//Create the parser
+	LLVMParser parser(Context, ToolsDir);
+
+	header = parser.loadBitcode("FifoCircular");
 
 	if (header == NULL){
 		cerr << "Unable to parse fifo header file";
 		exit(0);
 	}
 
-	externMod = jit->LoadBitcode("Extern", ToolsDir);
+	externMod = parser.loadBitcode("Extern");
 
 	if (externMod == NULL){
 		cerr << "Unable to parse extern functions file";
@@ -149,23 +145,24 @@ void FifoCircular::parseFifoStructs(){
 }
 
 void FifoCircular::addFunctions(Decoder* decoder){
-	
+	LLVMWriter writer("", decoder);
+
 	std::map<std::string,llvm::Function*>::iterator itMap;
 
 	for(itMap = externFunct.begin(); itMap != externFunct.end(); ++itMap){
-		Function* function = (Function*)jit->addFunctionProtosExternal("", (*itMap).second);
+		Function* function = writer.addFunctionProtosExternal((*itMap).second);
 		(*itMap).second = function;
 	}
 
 	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
-		Function* function = (Function*)jit->addFunctionProtosInternal("", (*itMap).second);
-		jit->LinkProcedureBody((*itMap).second);
+		Function* function = writer.addFunctionProtosInternal((*itMap).second);
+		writer.linkProcedureBody((*itMap).second);
 		(*itMap).second = function;
 	}
 }
 
-void FifoCircular::setConnection(Connection* connection){
-	Module* module = jit->getModule();
+void FifoCircular::setConnection(Connection* connection, Decoder* decoder){
+	Module* module = decoder->getModule();
 	
 	// fifo name 
 	ostringstream arrayName;

@@ -149,19 +149,19 @@ void clean_exit(int sig){
 	exit(0);
 }
 
-AbstractFifo* getFifo(LLVMContext &Context, JIT* jit){
+AbstractFifo* getFifo(LLVMContext &Context){
 	//Select fifo according to options
 	switch (Fifo) {
 		case circular :
-			return new FifoCircular(Context, jit);
+			return new FifoCircular(Context);
 			break;
 
 		case trace :
-			return new FifoTrace(Context, jit);
+			return new FifoTrace(Context);
 			break;
 
 		case unprotected :
-			return new UnprotectedFifo(Context, jit);
+			return new UnprotectedFifo(Context);
 			break;
 
 		default: 
@@ -211,7 +211,7 @@ int main(int argc, char **argv) {
 	JIT* jit = new JIT(Context);
 
 	//Load and execute the parsed network
-	DecoderEngine engine(Context, jit, getFifo(Context, jit));
+	DecoderEngine engine(Context, jit, getFifo(Context));
 	engine.load(network);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;

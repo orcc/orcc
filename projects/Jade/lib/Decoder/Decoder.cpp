@@ -41,18 +41,14 @@
 #include <fstream>
 
 #include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
 
 #include "Instanciator.h"
 
-#include "Jade/JIT.h"
-#include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/AbstractFifo.h"
-#include "Jade/Core/Actor.h"
-#include "Jade/Core/Port.h"
-#include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Network.h"
-#include "Jade/Graph/HDAGGraph.h"
+#include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Serialize/IRWriter.h"
 
 #include "BroadcastAdder.h"
@@ -71,8 +67,6 @@ Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo*
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
-
-	jit->setDecoder(this);
 }
 
 Decoder::~Decoder (){

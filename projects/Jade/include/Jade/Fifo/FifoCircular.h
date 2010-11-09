@@ -141,16 +141,6 @@ public:
 	/**
      *  @brief Constructor
      *
-	 *	Load and add fifo declaration inside the given decoder
-	 *
-	 *  @param jit : JIT use to load bitcoder
-	 *
-     */
-	FifoCircular(llvm::LLVMContext& C, JIT* jit);
-
-	/**
-     *  @brief Constructor
-     *
 	 *	Declare fifo type
 	 *
      */
@@ -158,7 +148,7 @@ public:
 	
 	~FifoCircular();
 
-	void setConnection(Connection* connection);
+	void setConnection(Connection* connection, Decoder* decoder);
 	
 
 private:
