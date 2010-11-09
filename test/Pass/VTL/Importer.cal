@@ -3,5 +3,10 @@ import net.sf.orcc.ImportUnit.*;
 actor my.package.Importer () ==> :
 
 	int z := MY_CONSTANT_1;
+	
+	action ==>
+	do
+		z := x(3);
+	end
 
 end
