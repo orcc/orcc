@@ -66,14 +66,18 @@ internalPorts() ::= <<
 initVariable(type, value) ::= <<
 $if(value.listExpr)$<initValue typeName="List"> 
   $value.value: {value | $initVariable(type=type.type, value=value)$}; separator=""$</initValue>
-$else$<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/>
+$else$<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$value$"/>
 $endif$
 >>
 
 stateVar(var) ::= <<
-<stateVar name="$var.name$" sourceName="$var.name$">
+$if(var.initialized)$<stateVar name="$var.name$" sourceName="$var.name$">
   $initVariable(type=var.type, value=var.value)$</stateVar>
->>
+$else$
+$typeDefLocal(var)$
+<stateVar name="$var.name$" sourceName="$var.name$" typeName="$if(var.value.listExpr)$$var.name$_typedef$else$$var.type$$endif$" size="$if (var.type.bool)$1$else$$var.type.size$$endif$">
+</stateVar>
+$endif$>>
 
 stateVars() ::= <<
 $instance.actor.stateVars.list: stateVar(); separator="\n"$
