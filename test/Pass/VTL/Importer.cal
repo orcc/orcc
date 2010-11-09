@@ -1,6 +1,6 @@
 import net.sf.orcc.ImportUnit.*;
 
-actor my.package.Importer () ==> :
+actor Importer () ==> :
 
 	int z := MY_CONSTANT_1;
 	
