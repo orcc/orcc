@@ -153,6 +153,13 @@ public class CppBackendImpl extends AbstractBackend {
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
 
+		printer = new STPrinter();
+		printer.setExpressionPrinter(CppExprPrinter.class);
+		printer.setTypePrinter(CppTypePrinter.class);
+		printer.setOptions(getAttributes());
+
+		transformActors(network.getActors());
+
 		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
 			network.classify();
@@ -171,14 +178,8 @@ public class CppBackendImpl extends AbstractBackend {
 
 		partition = getAttribute("net.sf.orcc.backends.partition", false);
 
-		printer = new STPrinter();
-		printer.setExpressionPrinter(CppExprPrinter.class);
-		printer.setTypePrinter(CppTypePrinter.class);
-		printer.setOptions(getAttributes());
-
 		List<Actor> actors = network.getActors();
-		transformActors(actors);
-
+		
 		printHeader = true;
 		printActors(actors);
 

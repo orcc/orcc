@@ -62,7 +62,7 @@ const $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;$\n$$
 ///////////////////////////////////////////////////////////////////////////////
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
-StateVar(variable) ::= <<
+StateVarAllocation(variable) ::= <<
 $if(variable.assignable)$
 $if (variable.type.dimensions)$
 $variable$(new $variable.type$$listSize(variable.type.dimensions)$),
@@ -72,6 +72,19 @@ $variable$($Constant(variable.constantValue)$),
 $endif$
 $endif$
 $endif$
+
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// State variables
+///////////////////////////////////////////////////////////////////////////////
+StateVarDestruction(variable) ::= <<
+$if(variable.assignable)
+$$if (variable.type.dimensions)
+$delete $variable$;$
+endif$$
+endif$
 
 >>
 
@@ -396,10 +409,18 @@ $parameters: {$it$($it$),}; wrap, separator="\n"$
 $if(actor.actionScheduler.fsm)$
 _FSM_state(state_$actor.actionScheduler.fsm.initialState$),
 $endif$
-$stateVars : StateVar()$
+$stateVars : StateVarAllocation()$
 ActorAKA($length(actor.inputs.list)$, $length(actor.outputs.list)$)
 {
 $stateVars : ListStateVarInitialization()$
+}
+
+>>
+
+destructor(stateVars) ::= <<
+actor_$actor.name$::~actor_$actor.name$()
+{
+	$stateVars: StateVarDestruction()$
 }
 
 >>
@@ -416,6 +437,8 @@ actor(actor, options) ::= <<
 $defineConstantVars(actor.stateVars.list)$
 
 $constructor(parameters=actor.parameters.list, stateVars=actor.stateVars.list)$
+
+$destructor(stateVars=actor.stateVars.list)$
 
 void actor_$actor.name$::initializeActor()
 {

@@ -51,7 +51,6 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BinaryExpr;
@@ -76,7 +75,6 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.Vertex;
 import net.sf.orcc.network.transformations.INetworkTransformation;
 import net.sf.orcc.tools.transformations.RemoveReadWrites;
-import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.OrderedMap;
 
 import org.jgrapht.DirectedGraph;
@@ -128,14 +126,8 @@ public class ActorMerger implements INetworkTransformation {
 
 				BinaryExpr incr = new BinaryExpr(new VarExpr(new Use(readVar)),
 						BinaryOp.PLUS, new IntExpr(cns), null);
-
-				IntExpr modSize = new IntExpr(
-						((TypeList) var.getType()).getSize());
-
-				@SuppressWarnings("unused")
-				BinaryExpr modExpr = new BinaryExpr(incr, BinaryOp.MOD,
-						modSize, null);
 				List<Expression> indexes = new ArrayList<Expression>();
+
 				Store store = new Store(readVar, indexes, incr);
 				currentBlock.add(store);
 			}
@@ -145,18 +137,13 @@ public class ActorMerger implements INetworkTransformation {
 			for (Map.Entry<Variable, Integer> entry : stores.entrySet()) {
 				Variable var = entry.getKey();
 				int prd = entry.getValue();
+
 				Variable readVar = actor.getStateVars().get(
 						var.getName() + "_w");
 
 				BinaryExpr incr = new BinaryExpr(new VarExpr(new Use(readVar)),
 						BinaryOp.PLUS, new IntExpr(prd), null);
 
-				IntExpr modSize = new IntExpr(
-						((TypeList) var.getType()).getSize());
-
-				@SuppressWarnings("unused")
-				BinaryExpr modExpr = new BinaryExpr(incr, BinaryOp.MOD,
-						modSize, null);
 				List<Expression> indexes = new ArrayList<Expression>();
 				Store store = new Store(readVar, indexes, incr);
 				currentBlock.add(store);
@@ -240,11 +227,6 @@ public class ActorMerger implements INetworkTransformation {
 			String id = instance.getId();
 			Actor current = instance.getActor();
 
-			for (StateVariable var : current.getStateVars()) {
-				var.setName(id + "_" + var.getName());
-				actor.getStateVars().put(var.getName(), var);
-			}
-
 			for (Procedure proc : current.getProcs()) {
 				if (!proc.isExternal()) {
 					proc.setName(id + "_" + proc.getName());
@@ -265,8 +247,11 @@ public class ActorMerger implements INetworkTransformation {
 		}
 	}
 
-	private void addStateVariables() {
-		OrderedMap<String, StateVariable> stateVars = actor.getStateVars();
+	private OrderedMap<String, StateVariable> getStateVariables() {
+		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
+
+		// first create internal buffers
+		createInternalBuffers();
 
 		for (Variable var : buffersMap.values()) {
 			stateVars.put(var.getName(), (StateVariable) var);
@@ -280,6 +265,19 @@ public class ActorMerger implements INetworkTransformation {
 							+ "_w", true, new IntExpr(0));
 			stateVars.put(wCount.getName(), wCount);
 		}
+		
+		for (Vertex vertex : scheduler.getSchedule().getActors()) {
+			Instance instance = vertex.getInstance();
+			String id = instance.getId();
+			Actor current = instance.getActor();
+
+			for (StateVariable var : current.getStateVars()) {
+				var.setName(id + "_" + var.getName());
+				stateVars.put(var.getName(), var);
+			}
+		}
+		
+		return stateVars;
 	}
 
 	/**
@@ -307,24 +305,21 @@ public class ActorMerger implements INetworkTransformation {
 	 * 
 	 */
 	private void createActor(Set<Vertex> vertices) throws OrccException {
-		OrderedMap<String, Port> inputs = new OrderedMap<String, Port>();
-		OrderedMap<String, Port> outputs = new OrderedMap<String, Port>();
-		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
+		String name = "cluster_" + clusterIdx++;
+
+		OrderedMap<String, Port> inputs = getInputs(vertices);
+		OrderedMap<String, Port> outputs = getOutputs(vertices);
+		OrderedMap<String, StateVariable> stateVars = getStateVariables();
+
 		OrderedMap<String, Procedure> procs = new OrderedMap<String, Procedure>();
 		OrderedMap<String, Variable> parameters = new OrderedMap<String, Variable>();
-		ActionList actions = new ActionList();
-		ActionList initializes = new ActionList();
-		ActionScheduler scheduler = new ActionScheduler(
-				actions.getAllActions(), null);
+		List<Action> actions = new ArrayList<Action>();
+		List<Action> initializes = new ArrayList<Action>();
+		ActionScheduler sched = new ActionScheduler(actions, null);
 
-		actor = new Actor("cluster_" + clusterIdx++, "", parameters, inputs,
-				outputs, stateVars, procs, actions.getAllActions(),
-				initializes.getAllActions(), scheduler);
+		actor = new Actor(name, "", parameters, inputs, outputs, stateVars,
+				procs, actions, initializes, sched);
 
-		getInputs(vertices);
-		getOutputs(vertices);
-		createInternalBuffers();
-		addStateVariables();
 		addProceduresAndStateVars();
 
 		Action action = createAction();
@@ -435,35 +430,38 @@ public class ActorMerger implements INetworkTransformation {
 
 		// Create internal buffer for inputs
 		for (Map.Entry<Connection, Port> entry : inputPorts.entrySet()) {
+			Connection connection = entry.getKey();
 			Port port = entry.getValue();
 			int size = port.getNumTokensConsumed();
 			Type type = IrFactory.eINSTANCE
 					.createTypeList(size, port.getType());
 			Variable var = new StateVariable(new Location(), type,
 					port.getName(), true);
-			buffersMap.put(entry.getKey(), var);
-			String srcName = graph.getEdgeTarget(entry.getKey()).getInstance()
+			buffersMap.put(connection, var);
+			String srcName = graph.getEdgeTarget(connection).getInstance()
 					.getId()
-					+ "" + entry.getKey().getTarget().getName();
+					+ "" + connection.getTarget().getName();
 			internalBuffersMap.put(srcName, var);
-			portsMap.put(srcName, entry.getKey().getTarget());
+			portsMap.put(srcName, connection.getTarget());
 
 		}
 
 		// Create internal buffer for outputs
 		for (Map.Entry<Connection, Port> entry : outputPorts.entrySet()) {
+			Connection connection = entry.getKey();
 			Port port = entry.getValue();
+
 			int size = port.getNumTokensProduced();
 			Type type = IrFactory.eINSTANCE
 					.createTypeList(size, port.getType());
 			Variable var = new StateVariable(new Location(), type,
 					port.getName(), true);
-			buffersMap.put(entry.getKey(), var);
-			String srcName = graph.getEdgeSource(entry.getKey()).getInstance()
+			buffersMap.put(connection, var);
+			String srcName = graph.getEdgeSource(connection).getInstance()
 					.getId()
-					+ "" + entry.getKey().getSource().getName();
+					+ "" + connection.getSource().getName();
 			internalBuffersMap.put(srcName, var);
-			portsMap.put(srcName, entry.getKey().getSource());
+			portsMap.put(srcName, connection.getSource());
 		}
 
 		// Create internal buffer connections inside the cluster
@@ -586,7 +584,8 @@ public class ActorMerger implements INetworkTransformation {
 		}
 	}
 
-	private void getInputs(Set<Vertex> vertices) {
+	private OrderedMap<String, Port> getInputs(Set<Vertex> vertices) {
+		OrderedMap<String, Port> inputs = new OrderedMap<String, Port>();
 		inputPorts = new HashMap<Connection, Port>();
 
 		int index = 0;
@@ -599,19 +598,21 @@ public class ActorMerger implements INetworkTransformation {
 				Port port = new Port(tgtPort);
 				port.setName("_input_" + index);
 				port.increaseTokenConsumption(tgtPort.getNumTokensConsumed());
-				actor.getInputs().put(port.getName(), port);
+				inputs.put(port.getName(), port);
 				index++;
 
 				// fill the map for the later update of connections
 				inputPorts.put(connection, port);
 			}
 		}
+		return inputs;
 	}
 
-	private void getOutputs(Set<Vertex> vertices) {
-		int index = 0;
+	private OrderedMap<String, Port> getOutputs(Set<Vertex> vertices) {
+		OrderedMap<String, Port> outputs = new OrderedMap<String, Port>();
 		outputPorts = new HashMap<Connection, Port>();
 
+		int index = 0;
 		for (Connection connection : graph.edgeSet()) {
 			Vertex src = graph.getEdgeSource(connection);
 			Vertex tgt = graph.getEdgeTarget(connection);
@@ -621,7 +622,7 @@ public class ActorMerger implements INetworkTransformation {
 				Port port = new Port(srcPort);
 				port.setName("_output_" + index);
 				port.increaseTokenProduction(srcPort.getNumTokensProduced());
-				actor.getOutputs().put(port.getName(), port);
+				outputs.put(port.getName(), port);
 				index++;
 
 				// fill the map for the later update of connections
@@ -629,6 +630,7 @@ public class ActorMerger implements INetworkTransformation {
 
 			}
 		}
+		return outputs;
 	}
 
 	/**
@@ -639,9 +641,9 @@ public class ActorMerger implements INetworkTransformation {
 	private void mergeActors(Set<Vertex> vertices) throws OrccException {
 		createActor(vertices);
 		Instance instance = new Instance(actor.getName(), actor);
-		Object[] v = vertices.toArray();
-		instance.getAttributes().putAll(
-				((Vertex) v[0]).getInstance().getAttributes());
+		Vertex[] v = (Vertex[]) vertices.toArray(new Vertex[0]);
+		instance.getAttributes().putAll(v[0].getInstance().getAttributes());
+
 		Vertex mergeVertex = new Vertex(instance);
 		graph.addVertex(mergeVertex);
 		updateConnection(mergeVertex, vertices);
@@ -658,7 +660,6 @@ public class ActorMerger implements INetworkTransformation {
 					graph, vertices, null);
 
 			scheduler = new FlatSASScheduler(subgraph);
-			scheduler.getDepth();
 
 			for (Vertex vertex : vertices) {
 				Actor actor = vertex.getInstance().getActor();
@@ -674,11 +675,13 @@ public class ActorMerger implements INetworkTransformation {
 		for (Connection connection : connections) {
 			Vertex src = graph.getEdgeSource(connection);
 			Vertex tgt = graph.getEdgeTarget(connection);
+
 			if (!vertices.contains(src) && vertices.contains(tgt)) {
 				Connection newConn = new Connection(connection.getSource(),
 						inputPorts.get(connection), connection.getAttributes());
 				graph.addEdge(graph.getEdgeSource(connection), merge, newConn);
 			}
+
 			if (vertices.contains(src) && !vertices.contains(tgt)) {
 				Connection newConn = new Connection(
 						outputPorts.get(connection), connection.getTarget(),

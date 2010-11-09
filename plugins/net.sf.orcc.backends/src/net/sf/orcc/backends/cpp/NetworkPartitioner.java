@@ -64,9 +64,9 @@ public class NetworkPartitioner implements INetworkTransformation {
 
 	private Map<Connection, Port> incomingPort = new HashMap<Connection, Port>();
 
-	private int nbInput;
+	private static int nbInput = 0;
 
-	private int nbOutput;
+	private static int nbOutput = 0;
 
 	private Map<Vertex, String> partNames;
 
@@ -87,7 +87,7 @@ public class NetworkPartitioner implements INetworkTransformation {
 
 	private void createConnections(Set<Vertex> vertices, Network network)
 			throws OrccException {
-		nbInput = nbOutput = 0;
+//		nbInput = nbOutput = 0;
 		for (Vertex vertex : vertices) {
 			for (Connection connection : graph.incomingEdgesOf(vertex)) {
 				Vertex src = graph.getEdgeSource(connection);

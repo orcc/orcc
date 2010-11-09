@@ -198,7 +198,7 @@ int schedule();
 
 
 constructor(parameters) ::= <<
-	actor_$actor.name$($parameters: {$it.type$}; separator=", "$);
+actor_$actor.name$($parameters: {$it.type$}; separator=", "$);
 >>
 
 parameters(parameters) ::= <<
@@ -235,7 +235,9 @@ class actor_$actor.name$ : public ActorAKA
 {
 
 public:
-$constructor(actor.parameters.list)$
+	$constructor(actor.parameters.list)$
+	
+	~actor_$actor.name$();
 	
 	void initializeActor();
 
