@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstUnit;
@@ -71,26 +72,30 @@ public class CalResourceDescription extends DefaultResourceDescription {
 
 		List<IEObjectDescription> result = Lists.newArrayList();
 		AstEntity entity = (AstEntity) getResource().getContents().get(0);
-		IEObjectDescription actorDescription = createIEObjectDescription(entity);
-		if (actorDescription != null) {
-			result.add(actorDescription);
-		}
 
-		AstUnit unit = entity.getUnit();
-		if (unit != null) {
+		AstActor actor = entity.getActor();
+		if (actor == null) {
+			AstUnit unit = entity.getUnit();
+
+			IEObjectDescription description = createIEObjectDescription(unit);
+			result.add(description);
+
 			for (AstVariable variable : unit.getVariables()) {
-				IEObjectDescription description = createIEObjectDescription(variable);
+				description = createIEObjectDescription(variable);
 				if (description != null) {
 					result.add(description);
 				}
 			}
 
 			for (AstFunction function : unit.getFunctions()) {
-				IEObjectDescription description = createIEObjectDescription(function);
+				description = createIEObjectDescription(function);
 				if (description != null) {
 					result.add(description);
 				}
 			}
+		} else {
+			IEObjectDescription description = createIEObjectDescription(actor);
+			result.add(description);
 		}
 
 		return result;
