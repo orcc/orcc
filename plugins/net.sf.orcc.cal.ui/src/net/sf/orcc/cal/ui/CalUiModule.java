@@ -44,9 +44,8 @@ public class CalUiModule extends net.sf.orcc.cal.ui.AbstractCalUiModule {
 		return CalLocationProvider.class;
 	}
 
-	// TODO uncomment this when IR types and initialization values are not
-	// transient anymore, and we can enable clustering
-
+	// commented out at the moment because clustering seems to double
+	// compilation time
 	// @Override
 	// public void configureIResourceDescriptionsBuilderScope(Binder binder) {
 	// binder.bind(IResourceDescriptions.class)

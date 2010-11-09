@@ -64,6 +64,7 @@ import org.eclipse.xtext.builder.IXtextBuilderParticipant;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescription.Delta;
+import org.eclipse.xtext.resource.XtextResource;
 
 import com.google.inject.Injector;
 
@@ -122,15 +123,16 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			} else {
 				// creation
 				IResourceDescription desc = delta.getNew();
+
+				set.getLoadOptions().put(XtextResource.OPTION_RESOLVE_ALL,
+						Boolean.TRUE);
+
 				Resource resource = set.getResource(desc.getURI(), true);
 				for (EObject obj : resource.getContents()) {
 					if (obj.eClass()
 							.equals(CalPackage.eINSTANCE.getAstEntity())) {
 						AstEntity entity = (AstEntity) obj;
-						AstActor actor = entity.getActor();
-						if (actor != null) {
-							build(resource, actor);
-						}
+						build(resource, entity);
 					}
 				}
 			}
@@ -154,7 +156,8 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	 * @throws CoreException
 	 *             if something goes wrong
 	 */
-	private void build(Resource resource, AstActor actor) throws CoreException {
+	private void build(Resource resource, AstEntity entity)
+			throws CoreException {
 		try {
 			URL resourceUrl = new URL(resource.getURI().toString());
 			URL url = FileLocator.toFileURL(resourceUrl);
@@ -168,20 +171,27 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			for (IMarker marker : markers) {
 				if (IMarker.SEVERITY_ERROR == marker.getAttribute(
 						IMarker.SEVERITY, IMarker.SEVERITY_INFO)) {
+					// an error => no compilation
 					return;
 				}
 			}
 
-			// only compile if there are no errors
-			String fileName = path.toOSString();
-			frontend.compile(fileName, actor);
+			// if using clustering, we need to transform the types
+			// new TypeTransformer(null).transformTypes(entity);
+
+			// and then we compile
+			AstActor actor = entity.getActor();
+			if (actor != null) {
+				String fileName = path.toOSString();
+				frontend.compile(fileName, actor);
+			}
 		} catch (IOException e) {
 			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
-					"could not generate code for " + actor.getName(), e);
+					"could not generate code for " + resource, e);
 			throw new CoreException(status);
 		} catch (OrccException e) {
 			IStatus status = new Status(IStatus.ERROR, "net.sf.orcc.cal.ui",
-					"could not generate code for " + actor.getName(), e);
+					"could not generate code for " + resource, e);
 			throw new CoreException(status);
 		}
 	}
