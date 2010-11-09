@@ -1,0 +1,325 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+actor Algo_MvBuffer()
+	uint(size=6)  mb_type,
+	uint(size=4)  sub_mb_type,
+	bool          NewPic,
+	uint(size=13) CurrMbAddr,
+	uint(size=7)  PicWidthInMb
+		==>
+		:
+
+
+	uint(size=3) SZ_16x16 = 0;
+	uint(size=3) SZ_16x8  = 1;
+	uint(size=3) SZ_8x16  = 2;
+	uint(size=3) SZ_8x8   = 3;
+	uint(size=3) SZ_8x4   = 4;
+	uint(size=3) SZ_4x8   = 5;
+	uint(size=3) SZ_4x4   = 6;
+
+	uint(size=6) BLOCK_TYPE_INTRA_MIN       = 0;
+	uint(size=6) BLOCK_TYPE_I_NxN           = 0;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
+	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
+//	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
+	uint(size=6) BLOCK_TYPE_INTRA_MAX       = 25;
+
+	uint(size=6) BLOCK_TYPE_P_MIN           = 26;
+	uint(size=6) BLOCK_TYPE_P_L0_16x16      = 26;
+	uint(size=6) BLOCK_TYPE_P_L0_L0_16x8    = 27;
+	uint(size=6) BLOCK_TYPE_P_L0_L0_8x16    = 28;
+	uint(size=6) BLOCK_TYPE_P_8x8           = 29;
+	uint(size=6) BLOCK_TYPE_P_8x8ref0       = 30;
+	uint(size=6) BLOCK_TYPE_P_MAX           = 30;
+
+	uint(size=6) BLOCK_TYPE_B_MIN           = 31;
+	uint(size=6) BLOCK_TYPE_B_DIRECT_16x16  = 31;
+	uint(size=6) BLOCK_TYPE_B_L0_16x16      = 32;
+	uint(size=6) BLOCK_TYPE_B_L1_16x16      = 33;
+	uint(size=6) BLOCK_TYPE_B_Bi_16x16      = 34;
+	uint(size=6) BLOCK_TYPE_B_L0_L0_16x8    = 35;
+	uint(size=6) BLOCK_TYPE_B_L0_L0_8x16    = 36;
+	uint(size=6) BLOCK_TYPE_B_L1_L1_16x8    = 37;
+	uint(size=6) BLOCK_TYPE_B_L1_L1_8x16    = 38;
+	uint(size=6) BLOCK_TYPE_B_L0_L1_16x8    = 39;
+	uint(size=6) BLOCK_TYPE_B_L0_L1_8x16    = 40;
+	uint(size=6) BLOCK_TYPE_B_L1_L0_16x8    = 41;
+	uint(size=6) BLOCK_TYPE_B_L1_L0_8x16    = 42;
+	uint(size=6) BLOCK_TYPE_B_L0_Bi_16x8    = 43;
+	uint(size=6) BLOCK_TYPE_B_L0_Bi_8x16    = 44;
+	uint(size=6) BLOCK_TYPE_B_L1_Bi_16x8    = 45;
+	uint(size=6) BLOCK_TYPE_B_L1_Bi_8x16    = 46;
+	uint(size=6) BLOCK_TYPE_B_Bi_L0_16x8    = 47;
+	uint(size=6) BLOCK_TYPE_B_Bi_L0_8x16    = 48;
+	uint(size=6) BLOCK_TYPE_B_Bi_L1_16x8    = 49;
+	uint(size=6) BLOCK_TYPE_B_Bi_L1_8x16    = 50;
+	uint(size=6) BLOCK_TYPE_B_8x8           = 53;
+	uint(size=6) BLOCK_TYPE_B_MAX           = 53;
+	uint(size=6) BLOCK_TYPE_P_SKIP          = 54;
+
+	List(type: uint(size=3),size=8) NumMbPart_P =
+		[
+			1,2,2,4,4,1,1,1
+		];
+
+	List(type: uint(size=3),size=32) NumMbPart_B =
+		[
+			1,1,1,1,2,2,2,2,2,2,
+			2,2,2,2,2,2,2,2,2,2,
+			2,2,4,1,1,1,1,1,1,1,
+			1,1
+		];
+
+	List(type: uint(size=3),size=8) SizeMb_P =
+		[
+			SZ_16x16, SZ_16x8, SZ_8x16, SZ_8x8, SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16
+		];
+
+	List(type: uint(size=3),size=32) SizeMb_B =
+		[
+			 SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
+			SZ_16x8,  SZ_8x16,  SZ_16x8,  SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
+			SZ_16x8,  SZ_8x16,   SZ_8x8,   SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,
+			 SZ_8x8,  SZ_8x8
+		];
+
+	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
+		[
+			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
+			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		];
+
+	List(type: List(type: uint(size=3), size=16), size=2) SizeSubMb =
+		[
+			[SZ_4x4, SZ_8x8, SZ_8x8, SZ_8x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8,
+			 SZ_4x4, SZ_4x4, SZ_4x4, 0, 0, 0],
+			[SZ_8x8, SZ_8x4, SZ_4x8, SZ_4x4, 0, 0, 0, 0, 0, 0,
+			 0, 0, 0, 0, 0, 0]
+		];
+
+
+	uint(size=3) MbPartIdxMax;
+	uint(size=3) MbPartIdx;
+	uint(size=3) SizeMbMv;
+	uint(size=3) SubMbPartIdxMax;
+	uint(size=3) SubMbPartIdx;
+	uint(size=3) SizeSubMbMv;
+	uint(size=1) Idx_Sub_Tab;
+
+	GetNewPic: action
+			NewPic :[IsNewPic]
+				==>
+		guard
+			IsNewPic
+		end
+
+	GetMbType.MacroBlkIorSI: action
+			mb_type :[MacroBlkType],
+			NewPic  :[IsNewPic]
+				==>
+		guard
+			MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX,
+			not IsNewPic
+		end
+
+	EatTokens: action
+			CurrMbAddr     :[Curr_Mb_Addr],
+			PicWidthInMb   :[c]
+				==>
+		end
+
+	GetMbType.Others: action
+			mb_type      :[MacroBlkType],
+			NewPic       :[IsNewPic],
+			CurrMbAddr   :[Curr_Mb_Addr],
+			PicWidthInMb :[PicWidth]
+				==>
+		guard
+			not(MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX),
+			not IsNewPic
+		do
+			MbPartIdx    := 0;
+			MbPartIdxMax :=
+				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
+					NumMbPart_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]
+				else
+					if(MacroBlkType != BLOCK_TYPE_P_SKIP)then
+						NumMbPart_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
+					else
+						1
+					end
+				end;
+			SizeMbMv  :=
+				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
+					SizeMb_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]
+				else
+					if(MacroBlkType != BLOCK_TYPE_P_SKIP)then
+						SizeMb_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
+					else
+						SZ_16x16
+					end
+				end;
+			Idx_Sub_Tab   :=
+				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
+					0
+				else
+					1
+				end;
+		end
+
+	GetMbParameters.Block16x16: action
+				==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			SizeMbMv  = SZ_16x16
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	GetMbParameters.Block16x8: action
+				==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			SizeMbMv  = SZ_16x8
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	GetMbParameters.Block8x16: action
+				==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			SizeMbMv  = SZ_8x16
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	LaunchGetSubMbParameters: action
+			sub_mb_type :[ValSubMbType]
+				==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			SizeMbMv  = SZ_8x8
+		do
+			SubMbPartIdx    := 0;
+			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
+			SizeSubMbMv     := SizeSubMb[Idx_Sub_Tab][ValSubMbType & 15];
+		end
+
+	GetMbParametersFinished: action ==>
+		guard
+			MbPartIdx = MbPartIdxMax
+		end
+
+	GetSubMbParameters.Launch8x8: action
+				==>
+		guard
+			SubMbPartIdx < SubMbPartIdxMax,
+			SizeSubMbMv  = SZ_8x8
+		do
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
+	GetSubMbParameters.Launch8x4: action
+				==>
+		guard
+			SubMbPartIdx < SubMbPartIdxMax,
+			SizeSubMbMv  = SZ_8x4
+		do
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
+
+	GetSubMbParameters.Launch4x8: action
+				==>
+		guard
+			SubMbPartIdx < SubMbPartIdxMax,
+			SizeSubMbMv  = SZ_4x8
+		do
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
+
+	GetSubMbParameters.Launch4x4: action
+				==>
+		guard
+			SubMbPartIdx < SubMbPartIdxMax,
+			SizeSubMbMv  = SZ_4x4
+		do
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
+	GetSubMbParametersFinished: action ==>
+		guard
+			SubMbPartIdx = SubMbPartIdxMax
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	schedule fsm GetMbType:
+		GetMbType          (GetNewPic                  )--> GetMbType;
+		GetMbType          (GetMbType.MacroBlkIorSI    )--> EatTokens;
+		GetMbType          (GetMbType.Others           )--> GetMbParameters;
+
+		EatTokens          (EatTokens                  )--> GetMbType;
+
+		GetMbParameters    (GetMbParameters            )--> GetMbParameters;
+		GetMbParameters    (LaunchGetSubMbParameters   )--> GetSubMbParameters;
+		GetMbParameters    (GetMbParametersFinished    )--> GetMbType;
+
+		GetSubMbParameters (GetSubMbParameters         )--> GetSubMbParameters;
+		GetSubMbParameters (GetSubMbParametersFinished )--> GetMbParameters;
+	end
+end

@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="26" y="268"/>
-      <vertex id="MbPredMvResL0" x="19" y="103"/>
-      <vertex id="PicWidthInMb" x="23" y="372"/>
-      <vertex id="FirstMbInSlice" x="19" y="306"/>
-      <vertex id="mb_type" x="35" y="407"/>
-      <vertex id="MbPredRefIdxL0" x="25" y="142"/>
-      <vertex id="SubMbPredRefIdxL0" x="11" y="213"/>
-      <vertex id="sub_mb_type" x="18" y="441"/>
-      <vertex id="MbType4Prediction" x="252" y="440"/>
-      <vertex id="MbPredRefIdxL1" x="35" y="598"/>
-      <vertex id="SubMbPredRefIdxL1" x="27" y="655"/>
-      <vertex id="NewPic" x="40" y="338"/>
-      <vertex id="SubMbPredMvResL0" x="16" y="178"/>
+      <vertex id="CurrMbAddr" x="15" y="262"/>
+      <vertex id="MbPredMvResL0" x="18" y="69"/>
+      <vertex id="PicWidthInMb" x="11" y="352"/>
+      <vertex id="FirstMbInSlice" x="10" y="291"/>
+      <vertex id="mb_type" x="24" y="382"/>
+      <vertex id="MbPredRefIdxL0" x="24" y="108"/>
+      <vertex id="SubMbPredRefIdxL0" x="10" y="179"/>
+      <vertex id="sub_mb_type" x="9" y="412"/>
+      <vertex id="MbType4Prediction" x="224" y="505"/>
+      <vertex id="MbPredRefIdxL1" x="26" y="590"/>
+      <vertex id="SubMbPredRefIdxL1" x="19" y="650"/>
+      <vertex id="NewPic" x="31" y="323"/>
+      <vertex id="SubMbPredMvResL0" x="15" y="144"/>
+      <vertex id="MbPredMvResL1" x="26" y="557"/>
+      <vertex id="SubMbPredMvResL1" x="16" y="620"/>
       <vertex id="MV" x="825" y="262"/>
       <vertex id="LOCATION" x="799" y="233"/>
-      <vertex id="PartSZ" x="1082" y="398"/>
-      <vertex id="mv_out" x="1077" y="353"/>
-      <vertex id="ref_idx" x="1087" y="437"/>
+      <vertex id="PartSZ" x="1014" y="405"/>
+      <vertex id="mv_out" x="1011" y="373"/>
+      <vertex id="ref_idx" x="1017" y="437"/>
       <vertex id="RefIdxL0" x="521" y="181"/>
       <vertex id="NewListL0" x="515" y="151"/>
-      <vertex id="RefIdxL1" x="516" y="606"/>
-      <vertex id="NewListL1" x="515" y="564"/>
+      <vertex id="RefIdxL1" x="519" y="619"/>
+      <vertex id="NewListL1" x="513" y="589"/>
       <vertex id="SelectList" x="805" y="297"/>
-      <vertex id="MvL0_Reconstr" x="272" y="89"/>
-      <vertex id="MvComponentReord" x="905" y="352"/>
+      <vertex id="MvL0_Reconstr" x="247" y="93"/>
+      <vertex id="MvComponentReord" x="837" y="354"/>
       <vertex id="SelectMvpLX" x="536" y="220"/>
-      <vertex id="MvL1_Reconstr" x="251" y="492"/>
-      <vertex id="MbPredMvResL1" x="26" y="557"/>
-      <vertex id="SubMbPredMvResL1" x="22" y="627"/>
+      <vertex id="MvL1_Reconstr" x="233" y="556"/>
+      <vertex id="MvBuffer" x="678" y="477"/>
    </vertices>
 </layout>

@@ -217,6 +217,15 @@
             <Expr kind="Literal" literal-kind="Boolean" value="false"/>
         </Parameter>
     </Instance>
+    <Instance id="MvBuffer">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_MvBuffer"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -267,4 +276,9 @@
     <Connection dst="SelectMvpLX" dst-port="MvL1" src="MvL1_Reconstr" src-port="MvOut"/>
     <Connection dst="MvL1_Reconstr" dst-port="MbPredMvRes" src="" src-port="MbPredMvResL1"/>
     <Connection dst="MvL1_Reconstr" dst-port="SubMbPredMvRes" src="" src-port="SubMbPredMvResL1"/>
+    <Connection dst="MvBuffer" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="MvBuffer" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
+    <Connection dst="MvBuffer" dst-port="NewPic" src="" src-port="NewPic"/>
+    <Connection dst="MvBuffer" dst-port="mb_type" src="" src-port="mb_type"/>
+    <Connection dst="MvBuffer" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
 </XDF>

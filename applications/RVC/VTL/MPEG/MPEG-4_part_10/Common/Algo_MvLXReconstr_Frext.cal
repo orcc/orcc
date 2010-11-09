@@ -61,7 +61,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=7)  PicWidthInMb,
 
 	uint(size=4)  MbPredRefIdx,
-	uint(size=4)  SubMbPredRefIdx,	
+	uint(size=4)  SubMbPredRefIdx,
 
 	int (size=16) MbPredMvRes,
 	int (size=16) SubMbPredMvRes
@@ -894,7 +894,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
-
 	ComputeSubMvpL0.Launch4x8: action
 			SubMbPredRefIdx :[RefIdxCurr],
 			SubMbPredMvRes      :[mv_res] repeat 2
@@ -929,7 +928,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
-
 
 	ComputeSubMvpL0.Launch4x4: action
 			SubMbPredRefIdx :[RefIdxCurr],

@@ -131,20 +131,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="MbPartWidth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="MbPartHeigth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="CodedBlockPattern">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -395,6 +381,20 @@
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbPartWidth">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbPartHeigth">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
             </Entry>
         </Type>
     </Port>
@@ -650,10 +650,6 @@
     <Connection dst="" dst-port="LFDisable" src="DecodeSliceData_Cavlc" src-port="LFDisable"/>
     <Connection dst="" dst-port="MbPartIdx"
         src="MergeDataFromSDataAndMbLayer" src-port="MbPartIdx"/>
-    <Connection dst="" dst-port="MbPartWidth"
-        src="MergeDataFromSDataAndMbLayer" src-port="MbPartWidth"/>
-    <Connection dst="" dst-port="MbPartHeigth"
-        src="MergeDataFromSDataAndMbLayer" src-port="MbPartHeight"/>
     <Connection dst="" dst-port="CodedBlockPattern"
         src="GenerateSkipBlockInformation" src-port="cbp_blk"/>
     <Connection dst="" dst-port="ConstrainedIFlag"
@@ -750,4 +746,8 @@
     <Connection dst="" dst-port="SubMbPredResMvL0" src="DecodeSubMbPred" src-port="MvResl0"/>
     <Connection dst="" dst-port="MbPredResMvL1" src="DecodeMbPred" src-port="MvResl1"/>
     <Connection dst="" dst-port="SubMbPredResMvL1" src="DecodeSubMbPred" src-port="MvResl1"/>
+    <Connection dst="" dst-port="MbPartWidth"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbPartWidth"/>
+    <Connection dst="" dst-port="MbPartHeigth"
+        src="MergeDataFromSDataAndMbLayer" src-port="MbPartHeight"/>
 </XDF>

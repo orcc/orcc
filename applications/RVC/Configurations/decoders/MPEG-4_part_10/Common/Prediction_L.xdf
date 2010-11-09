@@ -367,7 +367,6 @@
     <Connection dst="Deblocking_Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Deblocking_Filter" dst-port="MbIntraFlag" src="" src-port="Mb_Type"/>
     <Connection dst="Select" dst-port="X3" src="" src-port="I_PCM_Y"/>
-    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="Buffer_inter" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="" dst-port="Display_L" src="Buffer_inter" src-port="Display"/>
@@ -435,4 +434,5 @@
     <Connection dst="Buffer_inter" dst-port="RA" src="Inter" src-port="RA_L"/>
     <Connection dst="Inter" dst-port="PocToRead_i" src="" src-port="PocToRead"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead" src="Inter" src-port="PocToRead_o"/>
+    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
 </XDF>
