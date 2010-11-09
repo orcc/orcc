@@ -279,6 +279,8 @@
     <Connection dst="MvBuffer" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="MvBuffer" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="MvBuffer" dst-port="NewPic" src="" src-port="NewPic"/>
-    <Connection dst="MvBuffer" dst-port="mb_type" src="" src-port="mb_type"/>
-    <Connection dst="MvBuffer" dst-port="sub_mb_type" src="" src-port="sub_mb_type"/>
+    <Connection dst="MvBuffer" dst-port="MvL0" src="MvL0_Reconstr" src-port="MvOut"/>
+    <Connection dst="MvBuffer" dst-port="MbType" src="" src-port="mb_type"/>
+    <Connection dst="MvBuffer" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
+    <Connection dst="MvBuffer" dst-port="MvL1" src="MvL1_Reconstr" src-port="MvOut"/>
 </XDF>
