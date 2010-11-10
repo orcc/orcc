@@ -59,18 +59,26 @@ actor Algo_MvBuffer()
 
 	bool          NewPic,
 
+	uint(size=32) Poc,
+
 	uint(size=13) CurrMbAddr,
 	uint(size=7)  PicWidthInMb,
 
+	uint(size=4)  RefIdxL0,
+	uint(size=4)  RefIdxL1,
 	int (size=16) MvL0,
 	int (size=16) MvL1,
 
 	bool          Empty_DPB,
 	int(size=32)  DelList,
-	uint(size=31) LongTermList
+	uint(size=31) LongTermList,
 
+	int (size=32) RefList1
 		==>
 		:
+
+	int (size=32) PIC_WIDTH_IN_PX        = 1280; //number of MB per lines
+	int (size=32) PIC_HEIGHT_IN_PX       = 720; //number of MB per columns
 
 	int (size=32) SENT_DONE = -2;
 
@@ -177,6 +185,9 @@ actor Algo_MvBuffer()
 			end
 		end
 
+	List(type: List(type: List(type: int(size=5), size=PIC_WIDTH_IN_PX/4), size=PIC_HEIGHT_IN_PX/4), size=16) ListRefIdx;
+	List(type: bool,          size=16) IsReference;
+	List(type: uint(size=32), size=16) ListPoc;
 
 	uint(size=3) MbPartIdxMax;
 	uint(size=3) MbPartIdx;
@@ -188,14 +199,26 @@ actor Algo_MvBuffer()
 	uint(size=6) mb_type;
 	bool         IsPredL0;
 	bool         IsPredL1;
+	uint(size=5) Size_RefList;
+	uint(size=5) Idx_RefList;
+	uint(size=4) WriteListIdx;
+	uint(size=4) ReadListIdx;
 
 	GetNewPic: action
 			NewPic       :[IsNewPic],
-			Empty_DPB    :[ValEmpty],
-			LongTermList :[LTList] repeat 16
+			Poc          :[Picture_Order_Count],
+			Empty_DPB    :[ValEmpty]//////////////////////////////
 				==>
 		guard
 			IsNewPic
+		do
+			WriteListIdx := 0;
+			while( IsReference[WriteListIdx] and WriteListIdx < 15)
+			do
+				WriteListIdx := WriteListIdx + 1;
+			end
+			IsReference[WriteListIdx] := true;
+			ListPoc    [WriteListIdx] := Picture_Order_Count;
 		end
 
 	GetMbType.MacroBlkIorSI: action
@@ -349,7 +372,8 @@ actor Algo_MvBuffer()
 		end
 
 	GetBlockInfo.IsPredL0: action
-			MvL0 :[Mvx,Mvy]
+			MvL0     :[Mvx,Mvy],
+			RefIdxL0 :[ref_idx]
 				==>
 		guard
 			    IsPredL0,
@@ -357,7 +381,8 @@ actor Algo_MvBuffer()
 		end
 
 	GetBlockInfo.IsPredL1: action
-			MvL1 :[Mvx,Mvy]
+			MvL1     :[Mvx,Mvy],
+			RefIdxL1 :[ref_idx]
 				==>
 		guard
 			not IsPredL0,
@@ -366,8 +391,10 @@ actor Algo_MvBuffer()
 		end
 
 	GetBlockInfo.BiPred: action
-			MvL0 :[MvxL0,MvyL0],
-			MvL1 :[MvxL1,MvyL1]
+			MvL0     :[MvxL0,MvyL0],
+			RefIdxL0 :[ref_idx_l0],
+			MvL1     :[MvxL1,MvyL1],
+			RefIdxL1 :[ref_idx_l1]
 				==>
 		guard
 			IsPredL0,
@@ -401,8 +428,48 @@ actor Algo_MvBuffer()
 			DelVal = SENT_DONE
 		end
 
+	ReadSizeRefList: action
+			RefList1 :[SizeRefList]
+				==>
+		do
+			Size_RefList := SizeRefList;
+			Idx_RefList  := 0;
+		end
+
+	ReadRefList.Launch: action
+			RefList1 :[ValRefList]
+				==>
+		guard
+			Idx_RefList < Size_RefList
+		do
+			if(Idx_RefList = 0)then
+				ReadListIdx := 0;
+/*				while()
+				
+				end*/
+			end
+			Idx_RefList := Idx_RefList + 1;
+		end
+
+	ReadRefList.Done: action ==>
+		guard
+			Idx_RefList >= Size_RefList
+		end
+
+	ReadLTList: action
+			LongTermList :[LTList] repeat 16
+				==>
+		end
+
 	schedule fsm GetNewPic:
-		GetNewPic          (GetNewPic                  )--> GetMbType;
+		GetNewPic          (GetNewPic                  )--> ReadSizeRefList;
+
+		ReadSizeRefList    (ReadSizeRefList            )--> ReadRefList;
+
+		ReadRefList        (ReadRefList.Launch         )--> ReadRefList;
+		ReadRefList        (ReadRefList.Done           )--> ReadLTList;
+
+		ReadLTList         (ReadLTList                 )--> GetMbType;
 
 		GetMbType          (GetNewPic                  )--> ReadDelList;
 		GetMbType          (GetMbType.MacroBlkIorSI    )--> EatTokens;
@@ -422,6 +489,6 @@ actor Algo_MvBuffer()
 		GetBlockInfo4SubMb (GetBlockInfo               )--> GetSubMbParameters;
 
 		ReadDelList        (ReadDelList.Launch         )--> ReadDelList;
-		ReadDelList        (ReadDelList.Done           )--> GetMbType;
+		ReadDelList        (ReadDelList.Done           )--> ReadSizeRefList;
 	end
 end

@@ -682,4 +682,6 @@
     <Connection dst="MVReconstruct" dst-port="EmptyDPB" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="MVReconstruct" dst-port="DelList" src="MMCO" src-port="DelList"/>
     <Connection dst="MVReconstruct" dst-port="LTList" src="MMCO" src-port="LongTermList"/>
+    <Connection dst="MVReconstruct" dst-port="RefList1" src="RefList1" src-port="RefList"/>
+    <Connection dst="MVReconstruct" dst-port="Poc" src="DecodePic" src-port="POC"/>
 </XDF>

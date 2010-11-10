@@ -16,6 +16,11 @@
       <vertex id="SubMbPredMvResL0" x="15" y="144"/>
       <vertex id="MbPredMvResL1" x="26" y="557"/>
       <vertex id="SubMbPredMvResL1" x="16" y="620"/>
+      <vertex id="EmptyDPB" x="522" y="500"/>
+      <vertex id="DelList" x="537" y="470"/>
+      <vertex id="LTList" x="543" y="531"/>
+      <vertex id="RefList1" x="495" y="722"/>
+      <vertex id="Poc" x="511" y="690"/>
       <vertex id="MV" x="825" y="262"/>
       <vertex id="LOCATION" x="799" y="233"/>
       <vertex id="PartSZ" x="1014" y="405"/>
@@ -31,8 +36,5 @@
       <vertex id="SelectMvpLX" x="536" y="220"/>
       <vertex id="MvL1_Reconstr" x="233" y="556"/>
       <vertex id="MvBuffer" x="759" y="490"/>
-      <vertex id="EmptyDPB" x="522" y="500"/>
-      <vertex id="DelList" x="537" y="470"/>
-      <vertex id="LTList" x="543" y="531"/>
    </vertices>
 </layout>

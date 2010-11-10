@@ -121,6 +121,20 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="RefList1">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="Poc">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -303,4 +317,8 @@
     <Connection dst="MvBuffer" dst-port="Empty_DPB" src="" src-port="EmptyDPB"/>
     <Connection dst="MvBuffer" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="MvBuffer" dst-port="LongTermList" src="" src-port="LTList"/>
+    <Connection dst="MvBuffer" dst-port="RefList1" src="" src-port="RefList1"/>
+    <Connection dst="MvBuffer" dst-port="Poc" src="" src-port="Poc"/>
+    <Connection dst="MvBuffer" dst-port="RefIdxL0" src="MvL0_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="MvBuffer" dst-port="RefIdxL1" src="MvL1_Reconstr" src-port="RefIdxOut"/>
 </XDF>
