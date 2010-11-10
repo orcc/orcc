@@ -47,7 +47,6 @@
 #include "llvm/Instructions.h"
 #include "llvm/Support/CommandLine.h"
 
-#include "Jade/JIT.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/UnprotectedFifo.h"

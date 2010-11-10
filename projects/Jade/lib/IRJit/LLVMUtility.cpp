@@ -39,16 +39,13 @@
 #include <iostream>
 #include <fstream>
 
-#include "llvm/Instructions.h"
+#include "llvm/Module.h"
 #include "llvm/Analysis/Verifier.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/Support/ManagedStatic.h"
 #include "llvm/Support/CommandLine.h"
 
-#include "Jade/JIT.h"
-#include "Jade/Core/Port.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Jit/LLVMUtility.h"
 //------------------------------
 
 using namespace llvm;
@@ -56,27 +53,7 @@ using namespace std;
 
 extern cl::opt<std::string> OutputDir;
 
-JIT::JIT(llvm::LLVMContext& C): Context(C){
-	module = NULL;
-	//llvm_shutdown_obj Y;  // Call llvm_shutdown() on exit.
-}
-
-JIT::~JIT (){
-	if (EE != NULL){
-		EE->runStaticConstructorsDestructors(true);
-	}
-	
-	do_shutdown();
-
-}
-
-void JIT::do_shutdown() {
-	delete EE;
-	llvm_shutdown();
-}
-
-
-void JIT::printModule(string file, Decoder* decoder){
+void LLVMUtility::printModule(string file, Decoder* decoder){
 	std::string ErrorInfo;
 	Module* module = decoder->getModule();
 
@@ -96,7 +73,7 @@ void JIT::printModule(string file, Decoder* decoder){
 }
 
 
-void JIT::verify(string file, Decoder* decoder){
+void LLVMUtility::verify(string file, Decoder* decoder){
 	std::string Err;
 	Module* module = decoder->getModule();
 
@@ -114,31 +91,4 @@ void JIT::verify(string file, Decoder* decoder){
 	} else {
 		cout << "Generated decoder is ok. \n";
 	}
-
-}
-
-void* JIT::getPortPointer(Port* port){
-	return EE->getPointerToGlobal(port->getGlobalVariable());
-}
-
-
-void* JIT::getFunctionPointer(llvm::Function* function){
-	return EE->getPointerToFunction(function);
-}
-
-
-void JIT::addPrintf(std::string text, Decoder* decoder, Function* function, BasicBlock* bb){
-	
-	Module* module = decoder->getModule();
-	AbstractFifo* fifo = decoder->getFifo();
-
-	Constant* arrayContent = ConstantArray::get(Context, text,true);
-	GlobalVariable *NewArray =
-		new GlobalVariable(*module, arrayContent->getType(),
-		true, GlobalVariable::InternalLinkage, arrayContent, text);
-
-
-	vector<Value*> vector;
-	vector.push_back(ConstantExpr::getBitCast(NewArray,Type::getInt8PtrTy(Context)));
-	CallInst* retVal = CallInst::Create(fifo->getPrintfFunction(), vector.begin(), vector.end(), "test", bb);
 }

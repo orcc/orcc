@@ -41,7 +41,6 @@
 
 #include "llvm/Constants.h"
 #include "llvm/Support/CommandLine.h"
-#include "Jade/JIT.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Serialize/IRParser.h"
 #include "Jade/Core/Port.h"
@@ -49,16 +48,14 @@
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
-
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
 
-DecoderEngine::DecoderEngine(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo): Context(C) {	
+DecoderEngine::DecoderEngine(llvm::LLVMContext& C, AbstractFifo* fifo): Context(C) {	
 	//Set properties
-	this->jit = jit;
 	this->fifo = fifo;
 	
 	//Load IR Parser
@@ -77,35 +74,30 @@ int DecoderEngine::load(Network* network) {
 	// Parsing actor
 	parseActors(network);
 
+	cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	timer = clock ();
+
 	//Create decoder
-	Decoder decoder(Context, jit, network, fifo);
+	Decoder decoder(Context, network, fifo);
 
 	//Compile the decoder
 	decoder.compile(&actors);
-
+	
 	//Set the scheduler
 	decoder.setScheduler(new RoundRobinScheduler(Context));
+
+	cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	timer = clock ();
+	
+	cout << "-->  Start decoding :\n";
+	timer = clock ();
 
 	//Start decoding
 	decoder.start();
 
-	jit->optimize(&decoder);
-
-	jit->printModule("module.txt", &decoder);
-
-	jit->verify("error.txt", &decoder);
-
-
-
-	cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	cout << "-->   Stop decoding. \n";
 	timer = clock ();
 
-	cout << "--> ExecutionEngine initialized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
-	timer = clock ();
-
-	cout << "--> Creating decoder : \n";
-	cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
-	timer = clock ();
 
 	system("pause");
 	return 0;

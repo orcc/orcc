@@ -236,17 +236,6 @@ private:
 	 *
 	 * @return the corresponging llvm::IntegerType
 	 */
-	Location* parseLocation(llvm::MDNode* node);
-
-	/**
-	 *  @brief Parse a type
-	 *
-	 * Parses the given node as an llvm::Type definition.
-	 * 
-	 * @param module : llvm::MDNode representing a type
-	 *
-	 * @return the corresponging llvm::IntegerType
-	 */
 	llvm::Type* parseType(llvm::MDNode* node);
 
 

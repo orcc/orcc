@@ -49,7 +49,6 @@
 #include "Jade/Fifo/FifoCircular.h"
 #include "Jade/Fifo/FifoTrace.h"
 #include "Jade/Fifo/UnprotectedFifo.h"
-#include "Jade/JIT.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/System/Signals.h"
 #include "llvm/Support/PrettyStackTrace.h"
@@ -208,10 +207,8 @@ int main(int argc, char **argv) {
 	Network* network = xdfParser.ParseXDF(Context);
 	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 
-	JIT* jit = new JIT(Context);
-
 	//Load and execute the parsed network
-	DecoderEngine engine(Context, jit, getFifo(Context));
+	DecoderEngine engine(Context, getFifo(Context));
 	engine.load(network);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;

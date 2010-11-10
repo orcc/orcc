@@ -43,7 +43,6 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/Support/CommandLine.h"
 
-#include "Jade/JIT.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Decoder/Decoder.h"

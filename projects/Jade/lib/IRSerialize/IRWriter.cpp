@@ -40,7 +40,6 @@
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Serialize/IRWriter.h"
 #include "Jade/Decoder/Decoder.h"
-#include "Jade/JIT.h"
 
 #include "llvm/Module.h"
 

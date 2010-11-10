@@ -36,19 +36,22 @@
 */
 
 //------------------------------
+#include <iostream>
+
+#include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 
 #include "Jade/Core/Connection.h"
+#include "Jade/Core/Expression.h"
 #include "Jade/Core/Type.h"
 #include "Jade/Core/Attribute.h"
 #include "Jade/Attribute/ValueAttribute.h"
 #include "Jade/Attribute/TypeAttribute.h"
 #include "Jade/Attribute/TypeAttribute.h"
-#include <iostream>
-#include "Jade/Core/ExpressionEvaluator.h"
 //------------------------------
 
 using namespace std;
+using namespace llvm;
 
 
 Connection::Connection(Port* source, Port* target, std::map<std::string, Attribute*>* attributes): HDAGEdge()
@@ -59,12 +62,22 @@ Connection::Connection(Port* source, Port* target, std::map<std::string, Attribu
 }
 
 
+int Connection::evaluateAsInteger(Constant* expr){
+	if(isa<ConstantInt>(expr)){
+		ConstantInt* value = cast<ConstantInt>(expr);
+		return (int)value->getValue().getLimitedValue();
+
+	} else if (isa<ConstantExpr>(expr)){
+		ConstantExpr* value = cast<ConstantExpr>(expr);
+	}
+	return 32;
+}
+
 int Connection::getFifoSize(){
 	std::map<std::string, Attribute*>::iterator it;	
 	it = attributes->find("bufferSize");
 		
 	if(it != attributes->end()){
-		ExpressionEvaluator evaluator;
 		Attribute* attr = (*it).second;
 			
 		if (!attr->isValue()){
@@ -75,7 +88,7 @@ int Connection::getFifoSize(){
 			
 		llvm::Constant* expr = ((ValueAttribute*)attr)->getValue();
 
-		return evaluator.evaluateAsInteger(expr);
+		return evaluateAsInteger(expr);
 	}		
 	
 	return SIZE;

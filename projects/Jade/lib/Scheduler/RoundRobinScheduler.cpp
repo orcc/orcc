@@ -51,7 +51,6 @@
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Support/CommandLine.h"
 
-#include "Jade/JIT.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/Procedure.h"

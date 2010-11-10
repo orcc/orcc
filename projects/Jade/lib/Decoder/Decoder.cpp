@@ -58,10 +58,9 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo* fifo): Context(C){
+Decoder::Decoder(llvm::LLVMContext& C, Network* network, AbstractFifo* fifo): Context(C){
 	
 	//Set property of the decoder
-	this->jit = jit;
 	this->network = network;
 	this->fifo = fifo;
 	this->instances = network->getInstances();

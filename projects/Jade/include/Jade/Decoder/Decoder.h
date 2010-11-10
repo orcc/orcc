@@ -72,7 +72,7 @@ public:
 	 * @param fifo : Fifo used in the decoder
 	 *
 	 */
-	Decoder(llvm::LLVMContext& C, JIT* jit, Network* network, AbstractFifo* fifo);
+	Decoder(llvm::LLVMContext& C, Network* network, AbstractFifo* fifo);
 	~Decoder();
 	
 	/**
@@ -82,14 +82,6 @@ public:
 	 *
      */
 	llvm::Module* getModule(){return module;};
-
-	/**
-     *  @brief Getter of jit
-	 *
-	 *  @return JIT bound to this decoder
-	 *
-     */
-	JIT* getJIT(){return jit;};
 
 	/**
      *  @brief Getter of fifo
@@ -224,9 +216,6 @@ private:
 
 	/** Scheduler of the decoder */
 	RoundRobinScheduler* scheduler;
-
-	/** JIT of decoder engine */
-	JIT* jit;
 
 	/** Fifo of the decoder */
 	AbstractFifo* fifo;

@@ -46,6 +46,7 @@
 #include "Jade/Graph/HDAGEdge.h"
 
 namespace llvm{
+	class Constant;
 	class IntegerType;
 	class GlobalVariable;
 }
@@ -174,6 +175,13 @@ public:
 	void setType(llvm::IntegerType* type) {this->type = type;};
 
 private:
+	/*!
+     *  @brief Evaluate this expression as an integer
+     *
+	 *  @return an integer value of the expression.
+     */
+	int evaluateAsInteger(llvm::Constant* expr);
+
 	std::map<std::string, Attribute*>* attributes;	/** Map of attributes */
 	Port* source;						/** Source Port */
 	Port* target;						/** Destination Port */

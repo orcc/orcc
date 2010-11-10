@@ -47,7 +47,6 @@
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Module.h"
 
-#include "Jade/JIT.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/ActionTag.h"

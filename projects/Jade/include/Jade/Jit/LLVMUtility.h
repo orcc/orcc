@@ -28,39 +28,40 @@
  */
 
 /**
-@brief Implementation of class ExpressionEvaluator
+@brief Description of the LLVMWriter interface
 @author Jerome Gorin
-@file ExpressionEvaluator.cpp
+@file LLVMWriter.h
 @version 0.1
-@date 2010/04/12
+@date 22/03/2010
 */
 
 //------------------------------
-#include "llvm/Constants.h"
+#ifndef LLVMUTILITY_H
+#define LLVMUTILITY_H
 
-#include "Jade/Core/Expr/IntExpr.h"
-
-#include "Jade/Core/ExpressionEvaluator.h"
 //------------------------------
 
-using namespace llvm;
 
-ExpressionEvaluator::ExpressionEvaluator(){
- 
-}
+/**
+ * @brief  This class manages the LLVM infrastructure to write elements
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class LLVMUtility {
+public:
 
-ExpressionEvaluator::~ExpressionEvaluator (){
+	/**
+     *  @brief Constructor
+     *
+	 *	Initialize the JIT engine
+	 *
+     */
+	LLVMUtility();
 
-}
+	void printModule(std::string file, Decoder* decoder);
+	void verify(std::string file, Decoder* decoder);
 
+};
 
-int ExpressionEvaluator::evaluateAsInteger(Constant* expr){
-	if(isa<ConstantInt>(expr)){
-		ConstantInt* value = cast<ConstantInt>(expr);
-		return (int)value->getValue().getLimitedValue();
-
-	} else if (isa<ConstantExpr>(expr)){
-		ConstantExpr* value = cast<ConstantExpr>(expr);
-	}
-	return 32;
-}
+#endif

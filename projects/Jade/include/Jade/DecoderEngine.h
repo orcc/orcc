@@ -66,7 +66,7 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	DecoderEngine(llvm::LLVMContext& C, JIT* jit, AbstractFifo* fifo);
+	DecoderEngine(llvm::LLVMContext& C, AbstractFifo* fifo);
 	~DecoderEngine();
 
 	/*!
@@ -92,7 +92,6 @@ private:
 	
 	Network* XDFnetwork;
 	Decoder* decoder;
-	JIT* jit;
 	IRParser* irParser;
 	std::map<std::string, Actor*> actors;
 

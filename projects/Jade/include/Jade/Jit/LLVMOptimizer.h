@@ -28,51 +28,64 @@
  */
 
 /**
-@brief Description of the ExpressionEvaluator class interface
+@brief Description of the LLVMOptimizer interface
 @author Jerome Gorin
-@file ExpressionEvaluator.h
+@file LLVMExecution.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef EXPRESSIONEVALUATOR_H
-#define EXPRESSIONEVALUATOR_H
+#ifndef LLVMOPTIMIZER_H
+#define LLVMOPTIMIZER_H
 
 namespace llvm{
-	class Constant;
+	class Pass;
+	class PassManagerBase;
+	class Function;
+	class ExecutionEngine;
+	class Module;
 }
 
-#include "Jade/Core/Expression.h"
+#include "llvm/LLVMContext.h"
 //------------------------------
 
 /**
- * @class ExpressionEvaluator
- *
- * @brief  This class defines an expression evaluator.
- *
+ * @brief  This class manages the LLVM infrastructure to optimize a decoder
  * 
  * @author Jerome Gorin
  * 
  */
-class ExpressionEvaluator{
+class LLVMOptimizer {
 public:
-	/*!
+
+	/**
      *  @brief Constructor
      *
-	 *  Creates a new instance.
+	 *	Initialize optimizer
 	 *
-	 * @param id	: string of the instance id
-	 * @param clasz	: string of the instance class
-	 * @param parameters : list of Expr representif parameters of this instance
-     *
      */
-	ExpressionEvaluator();
-	~ExpressionEvaluator();
-	int evaluateAsInteger(llvm::Constant* expr);
+	LLVMOptimizer(Decoder* decoder){ 
+		this->decoder = decoder;
+	}
 
+	/**
+     *  @brief Destructor
+     *
+	 *	Delete optimizer
+     */
+	~LLVMOptimizer();
+
+	void optimize();
 private:
-	
+
+	void AddOptimizationPasses(llvm::PassManagerBase &MPM, llvm::PassManagerBase &FPM, unsigned OptLevel);
+	void AddStandardCompilePasses(llvm::PassManagerBase &PM);
+	void AddStandardLinkPasses(llvm::PassManagerBase &PM);
+	void addPass(llvm::PassManagerBase &PM, llvm::Pass *P);
+
+	Decoder* decoder;
+
 };
 
 #endif
