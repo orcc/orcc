@@ -200,6 +200,9 @@ public class TypeChecker extends CalSwitch<Type> {
 		Type type = variable.getIrType();
 		if (type == null) {
 			type = getTypeVariable(variable);
+			if (type == null) {
+				return null;
+			}
 		}
 
 		List<AstExpression> indexes = expression.getIndexes();
@@ -372,6 +375,9 @@ public class TypeChecker extends CalSwitch<Type> {
 		Type type = variable.getIrType();
 		if (type == null) {
 			type = getTypeVariable(variable);
+			if (type == null) {
+				return null;
+			}
 		}
 
 		List<Integer> dimensions = type.getDimensions();
