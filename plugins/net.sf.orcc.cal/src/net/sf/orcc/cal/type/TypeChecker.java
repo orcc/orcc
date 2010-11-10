@@ -945,8 +945,8 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		if (src.isBool() && src.isBool() || src.isFloat() && dst.isFloat()
 				|| src.isString() && dst.isString()
-				|| (src.isInt() || dst.isUint())
-				&& (src.isInt() || dst.isUint())) {
+				|| (src.isInt() || src.isUint())
+				&& (dst.isInt() || dst.isUint())) {
 			return true;
 		}
 
