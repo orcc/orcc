@@ -55,10 +55,10 @@ import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
 import net.sf.orcc.cal.cal.AstVariable;
-import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.type.TypeChecker;
+import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -1107,6 +1107,36 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Returns <code>true</code> if the given variable needs to be initialized
+	 * in an <code>initialize</code> action. This is the case for lists that
+	 * have generators, because we do not want to statically evaluate the
+	 * generators as this potentially generates many values.
+	 * 
+	 * @param astVariable
+	 *            a state variable
+	 * @return <code>true</code> if the given variable needs to be initialized
+	 *         in an <code>initialize</code> action
+	 * 
+	 */
+	private boolean isInitializeNeeded(AstVariable astVariable) {
+		Type type = astVariable.getIrType();
+		AstExpression value = astVariable.getValue();
+		if (type.isList() && value != null) {
+			// the variable is a List with an initial value
+			return new BooleanSwitch() {
+
+				@Override
+				public Boolean caseAstGenerator(AstGenerator generator) {
+					return true;
+				}
+
+			}.doSwitch(value);
+		}
+
+		return false;
+	}
+
+	/**
 	 * Loads the globals that need to be loaded.
 	 */
 	private void loadGlobals() {
@@ -1268,25 +1298,17 @@ public class AstTransformer {
 		String name = astVariable.getName();
 		boolean assignable = !astVariable.isConstant();
 
-		// initial value (if any) has been computed by validator
-		Expression initialValue = (Expression) astVariable.getInitialValue();
-
-		// this is true when the variable is initialized by a generator
-		boolean mustInitialize = false;
-		if (type.isList() && initialValue != null) {
-			AstExpression value = astVariable.getValue();
-			if (value.eClass().isSuperTypeOf(
-					CalPackage.eINSTANCE.getAstExpressionList())) {
-				AstExpressionList list = (AstExpressionList) astVariable
-						.getValue();
-				if (!list.getGenerators().isEmpty()) {
-					initialValue = null;
-					mustInitialize = true;
-				}
-			}
+		// check if the variable needs to be initialized in the "initialize"
+		// procedure
+		boolean mustInitialize = isInitializeNeeded(astVariable);
+		Expression initialValue;
+		if (mustInitialize) {
+			initialValue = null;
+		} else {
+			initialValue = (Expression) astVariable.getInitialValue();
 		}
 
-		// create state variable with no initialize
+		// create state variable
 		StateVariable variable = new StateVariable(location, type, name,
 				assignable, initialValue);
 
