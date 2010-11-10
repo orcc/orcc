@@ -411,6 +411,11 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		checkUniqueNames(function.getParameters());
 		checkUniqueNames(function.getVariables());
 		checkReturnType(function);
+		
+		// do not check functions of a unit
+		if (function.eContainer() instanceof AstUnit) {
+			return;
+		}
 
 		boolean used = new BooleanSwitch() {
 

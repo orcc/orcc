@@ -4,5 +4,12 @@ actor ListConcat () ==> int(size=64) O :
 	// (i.e. without a generator), and only in initialization of 
 	// state variables.
 	List(type: int, size=4) fib := [ 0, 1 ] + [ 2, 3 ];
+	
+	int x;
+	
+	action ==>
+	do
+		x := fib[0];
+	end
 
 end
