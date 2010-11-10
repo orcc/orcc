@@ -13,6 +13,8 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
+import orcc.Imp_MacroBlockInfo.*;
+
 actor Algo_DecodeMacroblockLayer()
 	int (size=32) ValVLD,
 	int (size=8)  Parameters,
@@ -38,7 +40,6 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=5)  SData_Total_CoeffChroma,
 
 	uint(size=6)  MbType,
-	uint(size=4)  Slice_Type,
 	bool          MergeTransfSz8x8,
 	int(size=9)   pix_I_PCM_Y,
 	int(size=9)   pix_I_PCM_U,
@@ -75,13 +76,6 @@ actor Algo_DecodeMacroblockLayer()
 	uint(size=4) SLICE_TYPE_I  = 2;
 	uint(size=4) SLICE_TYPE_SP = 3;
 	uint(size=4) SLICE_TYPE_SI = 4;
-
-
-	uint(size=6) BLOCK_TYPE_I_NxN           = 0;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
-	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
-	uint(size=6) BLOCK_TYPE_B_DIRECT_16x16  = 31;
 
 	List(type: uint(size=4), size=8) TabCodedBlockPatternChroma = [  0,  1,  2,  0,  1,  2,  0,  0];
 	List(type: uint(size=4), size=8) TabCodedBlockPatternLuma   = [  0,  0,  0, 15, 15, 15,  0,  0];
@@ -224,7 +218,6 @@ actor Algo_DecodeMacroblockLayer()
 	ReadParameters: action
 			Parameters         :[Param] repeat 35
 				==>
-			Slice_Type         :[slice_type],
 			MergeTransfSz8x8   :[transform_8x8_mode_flag]
 		do
 			direct_8x8_inference_flag     := GetFlag(Param[0], 0);

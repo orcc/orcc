@@ -51,6 +51,8 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
+import orcc.Imp_MacroBlockInfo.*;
+
 actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=6)  mb_type,
 	uint(size=4)  sub_mb_type,
@@ -77,17 +79,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=2) PRED_L1 = 2;
 	uint(size=2) BIPRED  = 3;
 	uint(size=2) DIRECT  = 4;
-
-
-	uint(size=6) BLOCK_TYPE_INTRA_MIN = 0;
-	uint(size=6) BLOCK_TYPE_INTRA_MAX = 25;
-	uint(size=6) BLOCK_TYPE_P_MIN     = 26;
-	uint(size=6) P_L0_16x16           = 26;
-	uint(size=6) BLOCK_TYPE_B_MIN     = 31;
-	uint(size=6) B_Direct_16x16       = 31;
-	uint(size=6) BLOCK_TYPE_B_MAX     = 53;
-	uint(size=6) BLOCK_TYPE_P_SKIP    = 54;
-	uint(size=6) BLOCK_TYPE_B_SKIP    = 55;
 
 	int           SZ_TAB      = 128;
 	int           MASK_TAB    = 127;
@@ -424,7 +415,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx    := 0;
 			MbPartIdxMax := 1;
 			SizeMbMv     := SZ_16x16;
-			MbType       := P_L0_16x16;
+			MbType       := BLOCK_TYPE_P_L0_16x16;
 		end
 
 	GetMbType.P_SkipL1: action
@@ -439,7 +430,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx    := 0;
 			MbPartIdxMax := 1;
 			SizeMbMv     := SZ_16x16;
-			MbType       := P_L0_16x16;
+			MbType       := BLOCK_TYPE_P_L0_16x16;
 		end
 
 	GetMbType.B_Skip_B_Direct_16x16: action
@@ -451,7 +442,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	RefIdxOut :[0],
 	NewPic_o  :[false]
 		guard
-			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = B_Direct_16x16
+			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
 		do
 			if(MacroBlkType = BLOCK_TYPE_B_SKIP)then
 				println("GetMbType.B_Skip_B_Direct_16x16 : B_Skip not implemented yet !!");

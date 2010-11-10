@@ -712,8 +712,6 @@
     <Connection dst="" dst-port="RefList1Type" src="DecodeRefPicList" src-port="RefList1Type"/>
     <Connection dst="" dst-port="RefReordering_l1"
         src="DecodeRefPicList" src-port="RefReordering_l1"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="SliceType"
-        src="DecodeMacroBlockLayer" src-port="Slice_Type"/>
     <Connection dst="DecodeResidualBlock_Cavlc" dst-port="Parameters"
         src="DecodeResidual" src-port="ResBlkParameters"/>
     <Connection dst="DecodeResidual" dst-port="Parameters"
