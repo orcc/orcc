@@ -106,44 +106,6 @@ public class TypeChecker extends CalSwitch<Type> {
 		return getLub(t1, t2) != null;
 	}
 
-	/**
-	 * Returns <code>true</code> if type src can be converted to type dst.
-	 * 
-	 * @param src
-	 *            a type
-	 * @param dst
-	 *            the type src should be converted to
-	 * @return <code>true</code> if type src can be converted to type dst
-	 */
-	public boolean isConvertibleTo(Type src, Type dst) {
-		if (src == null || dst == null) {
-			return false;
-		}
-
-		if (src.isBool() && src.isBool()) {
-			return true;
-		} else if (src.isFloat() && dst.isFloat()) {
-			return true;
-		} else if (src.isString() && dst.isString()) {
-			return true;
-		} else if (src.isInt() && dst.isInt()) {
-			return true;
-		} else if (src.isUint() && dst.isUint()) {
-			return true;
-		} else if (src.isInt() && dst.isUint()) {
-			return true;
-		} else if (src.isUint() && dst.isInt()) {
-			return true;
-		} else if (src.isList() && dst.isList()) {
-			TypeList typeSrc = (TypeList) src;
-			TypeList typeDst = (TypeList) dst;
-			// Recursively check type convertibility
-			return (isConvertibleTo(typeSrc.getType(), typeDst.getType()) && typeSrc
-					.getSize() <= typeDst.getSize());
-		}
-		return false;
-	}
-
 	@Override
 	public Type caseAstExpressionBinary(AstExpressionBinary expression) {
 		BinaryOp op = BinaryOp.getOperator(expression.getOperator());
@@ -236,9 +198,8 @@ public class TypeChecker extends CalSwitch<Type> {
 	public Type caseAstExpressionIndex(AstExpressionIndex expression) {
 		AstVariable variable = expression.getSource().getVariable();
 		Type type = variable.getIrType();
-
 		if (type == null) {
-			return null;
+			type = getTypeVariable(variable);
 		}
 
 		List<AstExpression> indexes = expression.getIndexes();
@@ -358,8 +319,7 @@ public class TypeChecker extends CalSwitch<Type> {
 		AstVariable variable = expression.getValue().getVariable();
 		Type type = variable.getIrType();
 		if (type == null) {
-			type = new TypeConverter(validator).doSwitch(variable.getType());
-			variable.setIrType(type);
+			type = getTypeVariable(variable);
 		}
 
 		return type;
@@ -411,7 +371,7 @@ public class TypeChecker extends CalSwitch<Type> {
 
 		Type type = variable.getIrType();
 		if (type == null) {
-			return null;
+			type = getTypeVariable(variable);
 		}
 
 		List<Integer> dimensions = type.getDimensions();
@@ -941,6 +901,64 @@ public class TypeChecker extends CalSwitch<Type> {
 		setSize(type, getSize(t1) + getSize(t2));
 
 		return type;
+	}
+
+	/**
+	 * Converts the AST type of the variable to the IR type system, and checks
+	 * its initial value is well-typed.
+	 * 
+	 * @param variable
+	 *            a variable
+	 * @return the type of the variable
+	 */
+	private Type getTypeVariable(AstVariable variable) {
+		Type targetType = new TypeConverter(validator).doSwitch(variable
+				.getType());
+		variable.setIrType(targetType);
+
+		AstExpression value = variable.getValue();
+		if (value != null) {
+			TypeChecker checker = new TypeChecker(validator);
+			Type type = checker.getType(variable.getValue());
+			if (!checker.isConvertibleTo(type, targetType)) {
+				error("Type mismatch: cannot convert from " + type + " to "
+						+ targetType, variable, CalPackage.AST_VARIABLE);
+			}
+		}
+
+		return targetType;
+	}
+
+	/**
+	 * Returns <code>true</code> if type src can be converted to type dst.
+	 * 
+	 * @param src
+	 *            a type
+	 * @param dst
+	 *            the type src should be converted to
+	 * @return <code>true</code> if type src can be converted to type dst
+	 */
+	public boolean isConvertibleTo(Type src, Type dst) {
+		if (src == null || dst == null) {
+			return false;
+		}
+
+		if (src.isBool() && src.isBool() || src.isFloat() && dst.isFloat()
+				|| src.isString() && dst.isString()
+				|| (src.isInt() || dst.isUint())
+				&& (src.isInt() || dst.isUint())) {
+			return true;
+		}
+
+		if (src.isList() && dst.isList()) {
+			TypeList typeSrc = (TypeList) src;
+			TypeList typeDst = (TypeList) dst;
+			// Recursively check type convertibility
+			return (isConvertibleTo(typeSrc.getType(), typeDst.getType()) && typeSrc
+					.getSize() <= typeDst.getSize());
+		}
+
+		return false;
 	}
 
 	/**
