@@ -38,7 +38,7 @@
 //------------------------------
 #include "Jade/Decoder.h"
 #include "Jade/Fifo/AbstractFifo.h"
-#include "Jade/JIT/LLVMWriter.h"
+#include "Jade/Jit/LLVMWriter.h"
 
 #include "llvm/Instructions.h"
 #include "llvm/Transforms/Utils/Cloning.h"

@@ -37,4 +37,4 @@ add_library (XDFParser
   TypeParser.h
   )
   
-  target_link_libraries(XDFParser Network ${LIBXML2_LIBRARIES})
+  target_link_libraries(XDFParser ${LIBXML2_LIBRARIES})

@@ -36,7 +36,7 @@
 */
 
 //------------------------------
-#include "Jade\Core/Actor/Action.h"
+#include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/ActionTag.h"
 #include "Jade/Core/Actor/Procedure.h"
 //------------------------------

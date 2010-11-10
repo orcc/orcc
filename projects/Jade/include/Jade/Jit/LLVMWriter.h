@@ -41,8 +41,6 @@
 
 namespace llvm{
 	struct ClonedCodeInfo;
-	class Module;
-	class ReturnInst;
 }
 
 class AbstractFifo;
@@ -50,7 +48,8 @@ class Decoder;
 
 #include "llvm/Module.h"
 #include "llvm/DerivedTypes.h"
-#include "llvm/ADT/ValueMap.h"
+#include "llvm/Value.h"
+#include "llvm/Instructions.h"
 #include "llvm/Transforms/Utils/ValueMapper.h"
 //------------------------------
 
@@ -113,7 +112,7 @@ private:
 	void CopyGVAttributes(llvm::GlobalValue *DestGV, const llvm::GlobalValue *SrcGV);
 	bool LinkGlobalInits(llvm::GlobalVariable* variable);
 	void linkFunctionBody(llvm::Function *NewFunc, const llvm::Function *OldFunc,
-		llvm::ValueMap<const llvm::Value*, llvm::Value*> &VMap,
+		llvm::ValueToValueMapTy &VMap,
                        bool ModuleLevelChanges,
 					   llvm::SmallVectorImpl<llvm::ReturnInst*> &Returns,
 					   AbstractFifo* fifo,

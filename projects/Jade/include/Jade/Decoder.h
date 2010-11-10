@@ -39,6 +39,7 @@
 #ifndef DECODER_H
 #define DECODER_H
 
+#include <string>
 #include <map>
 #include <list>
 

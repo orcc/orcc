@@ -36,6 +36,12 @@
 */
 
 //------------------------------
+
+#include "llvm/DerivedTypes.h"
+#include "llvm/Instructions.h"
+#include "llvm/LLVMContext.h"
+#include "llvm/Module.h"
+
 #include "Jade/Decoder.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
@@ -46,11 +52,6 @@
 #include "Jade/Core/Instance.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Transform/ActionSchedulerAdder.h"
-
-#include "llvm/DerivedTypes.h"
-#include "llvm/Instructions.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
 //------------------------------
 
 using namespace llvm;

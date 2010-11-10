@@ -105,4 +105,4 @@ add_executable(Jade Jade.cpp)
 ENDIF(APPLE)
 
 # Library requiered
-target_link_libraries(Jade IRActor IRCore IRJit IRSerialize IRTransform XDFParser DecoderEngine Fifo Scheduler HDAGGraph ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(Jade DecoderEngine XDFParser IRSerialize Scheduler IRJit IRTransform  IRActor Fifo IRCore HDAGGraph ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
