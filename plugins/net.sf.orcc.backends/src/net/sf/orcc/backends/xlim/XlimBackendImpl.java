@@ -86,8 +86,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(),
 				new FirstPhiValuesOfWhileNodeTransformation(),
-				new MoveLiteralIntegers(),
-				new VariableRenamer(),
+				new MoveLiteralIntegers(), new VariableRenamer(),
 				new ChangeActionSchedulerFormTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
@@ -140,16 +139,19 @@ public class XlimBackendImpl extends AbstractBackend {
 	}
 
 	private void printNetwork(Network network) throws OrccException {
-		if (hardwareGen) {
-			try {
-				String outputName = path + File.separator + network.getName()
-						+ ".vhd";
+		try {
+			String outputName = path + File.separator + network.getName();
+			if (hardwareGen) {
+				outputName += ".vhd"; 
 				printer.loadGroups("XLIM_VHDL_network");
-				printer.printNetwork(outputName, network, false, fifoSize);
-
-			} catch (IOException e) {
-				throw new OrccException("I/O error", e);
+			} else {
+				outputName += ".c"; 
+				printer.loadGroups("XLIM_C_network");
 			}
+			printer.printNetwork(outputName, network, false, fifoSize);
+
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
 		}
 	}
 
