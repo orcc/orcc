@@ -81,8 +81,7 @@ int Connection::getFifoSize(){
 		Attribute* attr = (*it).second;
 			
 		if (!attr->isValue()){
-			cerr<<"Error when parsing type of a connection";
-//			fprintf(stderr,"Error when parsing type of a connection");
+			cerr<< "Error when parsing type of a connection";
 			exit(0);
 		}
 			

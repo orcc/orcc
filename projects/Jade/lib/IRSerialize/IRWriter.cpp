@@ -36,6 +36,8 @@
 */
 
 //------------------------------
+#include <iostream>
+
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Jit/LLVMWriter.h"
@@ -118,7 +120,7 @@ void IRWriter::writePort(string key, Port* port){
 
 	//Port not found
 	if (instPort == NULL){
-		fprintf(stderr,"Port %s as not been found in instance %s", name, instance->getId());
+		cerr << "Port " << name << " as not been found in instance " << instance->getId();
 		exit(0);
 	}
 

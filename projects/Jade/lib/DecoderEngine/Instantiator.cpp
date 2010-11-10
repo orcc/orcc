@@ -36,6 +36,7 @@
 */
 
 //------------------------------
+#include <iostream>
 #include <string>
 #include <stdio.h>
 
@@ -89,7 +90,7 @@ void Instantiator::updateInstance(Instance* instance){
 
 	//Actor does not exist
 	if (it == actors->end()){
-		fprintf(stderr,"An instance refers to non-existent actor: actor %s for instance %s", instance->getClasz(), instance->getId());
+		cerr << "An instance refers to non-existent actor: actor "<< instance->getClasz() << " for instance " << instance->getId();
 		exit(0);
 	}
 
@@ -122,7 +123,7 @@ void Instantiator::updateConnection(Connection* connection){
 		srcPortType = srcPort->getType();
 
 		if (srcPort == NULL){
-			fprintf(stderr,"A Connection refers to non-existent source port: %s of instance %s", srcPortInst->getName(), source->getId());
+			cerr << "A Connection refers to non-existent source port: " << srcPortInst->getName() << "of instance " << source->getId();
 			exit(0);
 		}
 
@@ -146,7 +147,7 @@ void Instantiator::updateConnection(Connection* connection){
 		dstPortType = dstPort->getType();
 
 		if (dstPort == NULL){
-			fprintf(stderr,"A Connection refers to non-existent destination port: %s of instance %s", dstPort->getName(), target->getId());
+			cerr << "A Connection refers to non-existent destination port: " << dstPort->getName() << " of instance " << target->getId();
 			exit(0);
 		}
 
@@ -159,7 +160,7 @@ void Instantiator::updateConnection(Connection* connection){
 	IntegerType* srcType = cast<IntegerType>(srcPortType);
 	IntegerType* dstType = cast<IntegerType>(dstPortType);
 	if (srcType->getBitWidth() != dstType->getBitWidth()) {
-		fprintf(stderr, "Type error: size of port %s is %d and different from port %s of size %d \n", sourceString.c_str(),srcType->getBitWidth(), targetString.c_str(), dstType->getBitWidth());
+		cerr << "Type error: size of port " << sourceString.c_str() << " is " << srcType->getBitWidth() << " and different from port " << targetString.c_str() << " of size " << dstType->getBitWidth() << ".\n";
 		exit(0);
 	}
 	

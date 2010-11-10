@@ -36,6 +36,8 @@
 */
 
 //------------------------------
+#include <iostream>
+
 #include "llvm/Constants.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/DerivedTypes.h"
@@ -81,17 +83,17 @@ Type* TypeParser::parseType(xmlNode* element){
 
 				
 			}else if (xmlStrcmp(name, (const xmlChar *)"List")==0) {
-				fprintf(stderr,"List elements are not supPorted yet");
+				cerr << "List elements are not supPorted yet";
 				exit(0);
 			}else if (xmlStrcmp(name, (const xmlChar *)"String")==0) {
-				fprintf(stderr,"String elements are not supPorted yet");
+				cerr << "String elements are not supPorted yet";
 				exit(0);
 			}else if (xmlStrcmp(name, (const xmlChar *)"uint")==0) {
 				map<string, Entry*> *entries = parseTypeEntries(node->children);
 				delete entries;
 				return parseTypeSize(entries);
 			}else {
-				fprintf(stderr,"Unknown Type name: \"%s\"", name);
+				cerr << "Unknown Type name: " << name;
 				exit(0);
 			}
 		}	

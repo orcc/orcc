@@ -35,6 +35,8 @@
  */
 
 //------------------------------
+#include <iostream>
+
 #include "NetworkParser.h"
 #include "Jade/Attribute/TypeAttribute.h"
 #include "Jade/Attribute/ValueAttribute.h"
@@ -58,7 +60,7 @@ NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename){
 
 	/* Parsing file error */
 	if (xdfDoc == NULL) {
-        fprintf(stderr, "Failed to parse %s\n", filename.c_str());
+        cerr << "Failed to parse %s\n" << filename.c_str();
 		exit(0);
     }
 
@@ -96,14 +98,14 @@ Network* NetworkParser::parseNetwork (){
 
 	/*Return NULL if xml document doesn't start with XDF root */
 	if (xmlStrcmp(root_element->name, (const xmlChar *)"XDF")!=0){
-		fprintf(stderr, "Expected \"XDF\" start element");
+		cerr << "Expected \"XDF\" start element";
 		exit(1);
 	}
 	
 	/*Return NULL if network doesn't have a name */
 	root_attribute = root_element->properties;
 	if (xmlStrcmp(root_attribute->name, (const xmlChar *)"name")!=0){
-		fprintf(stderr, "Expected a \"name\" attribute");
+		cerr << "Expected a \"name\" attribute";
 		exit(1);
 	}
 	
@@ -130,7 +132,7 @@ Instance* NetworkParser::parseInstance(xmlNode* instance){
 	const xmlChar* clasz = NULL;
 
 	if (xmlStrcmp(id, (const xmlChar *)"")==0) {
-		fprintf(stderr,"An Instance element must have a valid \"id\" attribute");
+		cerr << "An Instance element must have a valid \"id\" attribute";
 		exit(0);
 	}
 
@@ -144,7 +146,7 @@ Instance* NetworkParser::parseInstance(xmlNode* instance){
 	}
 
 	if (clasz == NULL || (xmlStrcmp(clasz, (const xmlChar *)"")==0)) {
-		fprintf(stderr,"An Instance element must have a valid \"Class\" child.");
+		cerr << "An Instance element must have a valid \"Class\" child.";
 		exit(0);
 	}
 	
@@ -166,7 +168,7 @@ map<string, Constant*> *NetworkParser::parseParameters(xmlNode* element){
 			const xmlChar* name = node_attribute->children->content;
 			
 			if (xmlStrcmp(name, (const xmlChar *)"")==0) {
-				fprintf(stderr,"A Parameter element must have a valid \"name\" attribute");
+				cerr <<"A Parameter element must have a valid \"name\" attribute";
 				exit(0);
 			}
 			expression = exprParser->parseExpr(node->children);
@@ -187,20 +189,20 @@ void  NetworkParser::parseBody(xmlNode* root){
 			if (xmlStrcmp(name, (const xmlChar *)"Connection")==0) {
 				parseConnection(node);
 			}else if (xmlStrcmp(name, (const xmlChar *)"Decl")==0) {
-				fprintf(stderr,"Decl elements are not supPorted yet");
+				cerr << "Decl elements are not supPorted yet";
 				exit(0);
 			}else if (xmlStrcmp(name, (const xmlChar *)"Instance")==0) {
 				Instance* instance = parseInstance(node);
 				instances->insert(pair<string, Instance*>(instance->getId(), instance));
 				graph->addVertex(new Vertex(instance));
 			}else if (xmlStrcmp(name, (const xmlChar *)"Package")==0) {
-				fprintf(stderr,"Package elements are not supPorted yet");
+				cerr << "Package elements are not supPorted yet";
 				exit(0);
 			}else if (xmlStrcmp(name, (const xmlChar *)"Port")==0) {
-				fprintf(stderr,"Port elements are not supPorted yet");
+				cerr << "Port elements are not supPorted yet";
 				exit(0);
 			}else {
-				fprintf(stderr,"invalid node \"%s\"\n", name);
+				cerr << "invalid node \"%s\"\n" << name;
 				exit(0);
 			}
         }
@@ -250,13 +252,13 @@ map<string, Attribute*>* NetworkParser::parseAttributes(xmlNode* element){
 			
 
 			if (xmlStrcmp(kind, (const xmlChar *)"Custom")==0) {
-				fprintf(stderr,"Custom elements are not supPorted yet");
+				cerr << "Custom elements are not supPorted yet";
 				exit(0);
 			}else if (xmlStrcmp(kind, (const xmlChar *)"Flag")==0) {
-				fprintf(stderr,"Flag elements are not supPorted yet");
+				cerr << "Flag elements are not supPorted yet";
 				exit(0);
 			}else if (xmlStrcmp(kind, (const xmlChar *)"String")==0) {
-				fprintf(stderr,"String elements are not supPorted yet");
+				cerr << "String elements are not supPorted yet";
 				exit(0);
 			}else if (xmlStrcmp(kind, (const xmlChar *)"Type")==0) {
 				Type* type = typeParser->parseType(node->children);
@@ -265,7 +267,7 @@ map<string, Attribute*>* NetworkParser::parseAttributes(xmlNode* element){
 				Constant* expression = exprParser->parseExpr(node->children);
 				attr = new ValueAttribute(expression);
 			}else {
-				fprintf(stderr,"invalid node \"%s\"\n", name);
+				cerr << "invalid node \"%s\"\n" << name;
 				exit(0);
 			}
 
@@ -291,7 +293,7 @@ Vertex* NetworkParser::getVertex(string vertexName, string portName, string kind
 		it = ports->find(portName);
 
 		if (it == ports->end()){
-			fprintf(stderr,"Connection element %s has an invalid attribute", portName);
+			cerr << "Connection element %s has an invalid attribute" << portName;
 			exit(0);
 		}
 
@@ -302,7 +304,7 @@ Vertex* NetworkParser::getVertex(string vertexName, string portName, string kind
 		it = instances->find(vertexName);
 
 		if (it == instances->end()){
-			fprintf(stderr,"Connection element %s has an invalid attribute", vertexName);
+			cerr << "Connection element %s has an invalid attribute" << vertexName;
 			exit(0);
 		}
 

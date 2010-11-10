@@ -36,6 +36,7 @@
 */
 
 //------------------------------
+#include <iostream>
 #include <string>
 #include <list>
 
@@ -63,7 +64,7 @@ Constant* ExprParser::parseExpr(xmlNode* node){
 	Constant* expression = parseExprCont(node);
 
 	if (expression == NULL) {
-		fprintf(stderr,"Expected an expression element");
+		cerr << "Expected an expression element";
 		exit(0);
 	} 
 
@@ -85,16 +86,16 @@ Constant* ExprParser::parseExprCont(xmlNode* element){
 				expression = parseExprLiteral(node);
 				break;
 			} else if (xmlStrcmp(kind, (const xmlChar *)"List")==0) {
-				fprintf(stderr,"List not supPorted yet");
+				cerr << "List not supPorted yet";
 				exit(0);
 			} else if (xmlStrcmp(kind, (const xmlChar *)"UnaryOp")==0) {
-				fprintf(stderr,"UnaryOp not supPorted yet");
+				cerr << "UnaryOp not supPorted yet";
 				exit(0);
 			} else if (xmlStrcmp(kind, (const xmlChar *)"Var")==0) {
-				fprintf(stderr,"Var not supPorted yet");
+				cerr << "Var not supPorted yet";
 				exit(0);
 			} else {
-				fprintf(stderr,"Unsupported expression kind: \"%s\"", kind);
+				cerr << "Unsupported expression kind: "<< kind;
 				exit(0);
 			}
 		}
