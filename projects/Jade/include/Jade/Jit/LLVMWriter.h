@@ -50,6 +50,7 @@ class Decoder;
 
 #include "llvm/Module.h"
 #include "llvm/DerivedTypes.h"
+#include "llvm/ADT/ValueMap.h"
 #include "llvm/Transforms/Utils/ValueMapper.h"
 //------------------------------
 
