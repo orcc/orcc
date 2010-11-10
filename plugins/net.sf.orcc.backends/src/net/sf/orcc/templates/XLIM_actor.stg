@@ -472,8 +472,12 @@ schedulingTest(actions) ::= <<
 $actions: actionTest(); separator="\n"$
 >>
 
-scheduler(actions) ::= <<
+schedulerName(actions) ::=<<
 <module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
+>>
+
+scheduler(actions) ::= <<
+$schedulerName(actions)$
 	<operation kind="\$literal_Integer" value="1">
 		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
 	</operation>
@@ -573,7 +577,7 @@ schedulerFSM(actions, fsm) ::= <<
 <stateVar name="currentState">
 	<initValue size="32" typeName="int" value="$fsm.initialState.index$"/>
 </stateVar>
-<module autostart="true" kind="action-scheduler" name="$instance.id$_scheduler" sourcename="$instance.id$_scheduler">
+$schedulerName(actions)$
 	<operation kind="\$literal_Integer" value="1">
 		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
 	</operation>

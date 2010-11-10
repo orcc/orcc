@@ -19,6 +19,20 @@ Write(op) ::= <<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Override Peek
+///////////////////////////////////////////////////////////////////////////////
+
+Peek(peek) ::= <<
+<operation kind="\$literal_Integer" value="0">
+	<port dir="out" size="1" source="peek_$instance.id$_$procedure$_0" typeName="int"/>
+</operation>
+<operation kind="pinPeek" portName="$peek.port.name$">
+	<port dir="in" source="peek_$instance.id$_$procedure$_0"/>
+	$port(dir="out", type=peek.port.type, source=peek.target)$
+</operation>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // HasTokens
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -27,10 +41,20 @@ $Peek(hasTokens)$
 <operation kind="pinStatus" portName="$hasTokens.port$">
 	<port dir="out" size="1" source="$hasTokens.target$" typeName="bool"/>
 </operation>
+
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// outputPatternPort
+// Override scheduler Name
+///////////////////////////////////////////////////////////////////////////////
+
+schedulerName(actions) ::=<<
+<module autostart="true" kind="action-scheduler" name="action-scheduler" 
+		sourcename="action-scheduler">
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Override outputPatternPort
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPatternPort(port, index, index0, state) ::= <<
@@ -44,3 +68,55 @@ outputPatternPort(port, index, index0, state) ::= <<
 	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$" typeName="bool"/>
 </operation>
 >>
+
+///////////////////////////////////////////////////////////////////////////////
+// Override outputPattern
+///////////////////////////////////////////////////////////////////////////////
+
+outputPattern(pattern,action,state) ::= <<
+<operation kind="\$literal_Integer" value="1">
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_0" typeName="bool"/>
+</operation>
+$pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0, state=state)$}; separator="\n"$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// lastOutputPattern
+///////////////////////////////////////////////////////////////////////////////
+
+lastOutputPattern(pattern,action,state) ::=<<
+$outputPatternPortDecision(index=length(pattern.keys),state=state); separator="\n"$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Override actiontest
+///////////////////////////////////////////////////////////////////////////////
+
+actionTest(action) ::= <<
+$if(action.outputPattern)$
+$outputPattern(pattern=action.outputPattern,action=action)$
+$endif$
+<module kind="if">
+	<module decision="isSchedulable_$action$" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="isSchedulable_$action$_go"/>
+			<port dir="out" size="1" source="isSchedulable_$action$" typeName="bool"/>
+		</operation>
+	</module>
+	<module kind="then">
+		$if(action.outputPattern)$
+		$lastOutputPattern(pattern=action.outputPattern,action=action)$
+			<module kind="then">
+				$actionCall(action)$
+			</module>
+		</module>
+		$else$
+		$actionCall(action)$
+		$endif$
+	</module>
+	<module kind="else">
+>>
+
+
