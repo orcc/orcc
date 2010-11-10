@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstExpressionBinary;
 import net.sf.orcc.cal.cal.AstExpressionBoolean;
@@ -89,6 +88,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.Scope;
 import net.sf.orcc.util.StringUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -221,6 +221,9 @@ public class AstTransformer {
 			Location location = Util.getLocation(expression);
 			AstVariable astVariable = expression.getSource().getVariable();
 			Variable variable = context.getVariable(astVariable);
+			if (variable == null) {
+				variable = transformGlobalVariable(astVariable);
+			}
 
 			List<Expression> indexes = transformExpressions(expression
 					.getIndexes());
@@ -295,8 +298,7 @@ public class AstTransformer {
 			AstVariable astVariable = expression.getValue().getVariable();
 
 			Variable variable = context.getVariable(astVariable);
-			if (variable == null
-					&& astVariable.eContainer() instanceof AstActor) {
+			if (variable == null) {
 				variable = transformGlobalVariable(astVariable);
 			}
 
@@ -662,6 +664,9 @@ public class AstTransformer {
 			// get target
 			AstVariable astTarget = astAssign.getTarget().getVariable();
 			Variable target = context.getVariable(astTarget);
+			if (target == null) {
+				target = transformGlobalVariable(astTarget);
+			}
 
 			// transform indexes and value
 			List<Expression> indexes = transformExpressions(astAssign
@@ -851,6 +856,11 @@ public class AstTransformer {
 	 */
 	private String file;
 
+	/**
+	 * a map of global variables (parameters and state variables)
+	 */
+	private OrderedMap<String, StateVariable> globals;
+
 	private Procedure initialize;
 
 	/**
@@ -928,6 +938,9 @@ public class AstTransformer {
 		context = new Context(null, null);
 
 		procedures = new OrderedMap<String, Procedure>();
+
+		// clear the initialize procedure that may have been created
+		initialize = null;
 	}
 
 	private void createAssignOrStore(Location location, Variable target,
@@ -1147,6 +1160,16 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Sets the map in which global variables should be put.
+	 * 
+	 * @param globals
+	 *            a map
+	 */
+	public void setGlobalsMap(OrderedMap<String, StateVariable> globals) {
+		this.globals = globals;
+	}
+
+	/**
 	 * Writes back the globals that need to be stored.
 	 */
 	private void storeGlobals() {
@@ -1173,7 +1196,12 @@ public class AstTransformer {
 	 * @return an IR expression
 	 */
 	public Expression transformExpression(AstExpression expression) {
-		return exprTransformer.doSwitch(expression);
+		Variable target = exprTransformer.target;
+		List<Expression> indexes = exprTransformer.indexes;
+		Expression result = exprTransformer.doSwitch(expression);
+		exprTransformer.target = target;
+		exprTransformer.indexes = indexes;
+		return result;
 	}
 
 	/**
@@ -1202,7 +1230,7 @@ public class AstTransformer {
 	 * @param astFunction
 	 *            an AST function
 	 */
-	public void transformFunction(AstFunction astFunction) {
+	private void transformFunction(AstFunction astFunction) {
 		String name = astFunction.getName();
 		Location location = Util.getLocation(astFunction);
 		Type type = astFunction.getIrType();
@@ -1259,10 +1287,15 @@ public class AstTransformer {
 		}
 
 		// create state variable with no initialize
-		StateVariable stateVariable = new StateVariable(location, type, name,
+		StateVariable variable = new StateVariable(location, type, name,
 				assignable, initialValue);
 
-		context.putVariable(astVariable, stateVariable);
+		// registers the global variable in the outermost scope
+		Scope<AstVariable, Variable> top = context.getMapVariables();
+		while (top.getParent() != null) {
+			top = top.getParent();
+		}
+		top.put(astVariable, variable);
 
 		// translate and add to initialize
 		if (mustInitialize) {
@@ -1274,37 +1307,18 @@ public class AstTransformer {
 			Context oldContext = newContext(initialize);
 			context.newScope();
 
-			exprTransformer.setTarget(stateVariable, new ArrayList<Expression>(
-					0));
+			exprTransformer.setTarget(variable, new ArrayList<Expression>(0));
 			Expression expression = transformExpression(astVariable.getValue());
-			createAssignOrStore(location, stateVariable, null, expression);
+			createAssignOrStore(location, variable, null, expression);
 			exprTransformer.clearTarget();
 
 			context.restoreScope();
 			restoreContext(oldContext);
 		}
 
-		return stateVariable;
-	}
+		globals.put(file, variable.getLocation(), variable.getName(), variable);
 
-	/**
-	 * Transforms AST state variables to IR state variables. The initial value
-	 * of an AST state variable is evaluated to a constant by
-	 * {@link #exprEvaluator}.
-	 * 
-	 * @param stateVariables
-	 *            a list of AST state variables
-	 * @return an ordered map of IR state variables
-	 */
-	public OrderedMap<String, StateVariable> transformGlobalVariables(
-			List<AstVariable> stateVariables) {
-		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
-		for (AstVariable astVariable : stateVariables) {
-			StateVariable variable = transformGlobalVariable(astVariable);
-			stateVars.put(file, variable.getLocation(), variable.getName(),
-					variable);
-		}
-		return stateVars;
+		return variable;
 	}
 
 	/**
@@ -1378,7 +1392,7 @@ public class AstTransformer {
 	 * @param astProcedure
 	 *            an AST procedure
 	 */
-	public void transformProcedure(AstProcedure astProcedure) {
+	private void transformProcedure(AstProcedure astProcedure) {
 		String name = astProcedure.getName();
 		Location location = Util.getLocation(astProcedure);
 

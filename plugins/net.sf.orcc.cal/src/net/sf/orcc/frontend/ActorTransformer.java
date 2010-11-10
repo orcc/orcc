@@ -38,11 +38,9 @@ import java.util.Map.Entry;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstExpression;
-import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
-import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
@@ -515,14 +513,20 @@ public class ActorTransformer {
 			Location location = Util.getLocation(astActor);
 
 			// parameters
-			OrderedMap<String, StateVariable> parameters = astTransformer
-					.transformGlobalVariables(astActor.getParameters());
+			OrderedMap<String, StateVariable> parameters = new OrderedMap<String, StateVariable>();
+			astTransformer.setGlobalsMap(parameters);
+			for (AstVariable astVariable : astActor.getParameters()) {
+				astTransformer.transformGlobalVariable(astVariable);
+			}
 
-			// first state variables, because port's sizes may depend on them.
-			OrderedMap<String, StateVariable> stateVars = astTransformer
-					.transformGlobalVariables(astActor.getStateVariables());
+			// map for state variables
+			// state variables are transformed on demand when referenced by
+			// expressions or statements
+			// this allows imported variables to be transparently handled
+			OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
+			astTransformer.setGlobalsMap(stateVars);
 
-			// then ports
+			// transform ports
 			OrderedMap<String, Port> inputs = transformPorts(astActor
 					.getInputs());
 			OrderedMap<String, Port> outputs = transformPorts(astActor
@@ -532,15 +536,10 @@ public class ActorTransformer {
 			// variables
 			context.newScope();
 
-			// transforms functions and procedures
+			// retrieves the procedure map
+			// like state variables, this is populated on demand
 			OrderedMap<String, Procedure> procedures = astTransformer
 					.getProcedures();
-			for (AstFunction astFunction : astActor.getFunctions()) {
-				astTransformer.transformFunction(astFunction);
-			}
-			for (AstProcedure astProcedure : astActor.getProcedures()) {
-				astTransformer.transformProcedure(astProcedure);
-			}
 
 			// transform actions
 			ActionList actions = transformActions(astActor.getActions());
