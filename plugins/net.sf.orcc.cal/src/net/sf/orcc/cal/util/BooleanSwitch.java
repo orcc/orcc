@@ -243,8 +243,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 		}
 
 		for (AstGenerator generator : expression.getGenerators()) {
-			if (doSwitch(generator.getLower())
-					|| doSwitch(generator.getHigher())) {
+			if (doSwitch(generator)) {
 				return true;
 			}
 		}
@@ -283,6 +282,13 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 		return doSwitch(function.getType())
 				|| doSwitch(function.getExpression());
+	}
+
+	@Override
+	public Boolean caseAstGenerator(AstGenerator generator) {
+		return (doSwitch(generator.getVariable())
+				|| doSwitch(generator.getLower()) || doSwitch(generator
+				.getHigher()));
 	}
 
 	@Override
@@ -375,7 +381,8 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseAstStatementForeach(AstStatementForeach foreach) {
-		if (doSwitch(foreach.getLower()) || doSwitch(foreach.getHigher())) {
+		if (doSwitch(foreach.getVariable()) || doSwitch(foreach.getLower())
+				|| doSwitch(foreach.getHigher())) {
 			return true;
 		}
 
