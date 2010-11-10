@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 channels(port) ::= <<
-chan chan_$port.name$ = [100] of {$port.type$}
+chan chan_$port.name$ = [1] of {$port.type$}
 >>
 
 
@@ -80,8 +80,7 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 schedulerFSM(action) ::= << 
-/* $action.name$ */
-:: state == $fsm_trans.SourceState$ $guardFSM()$ -> 
+:: /* $action.name$ */ state == $fsm_trans.SourceState$ $guardFSM()$ -> 
 	$inputPattern(action.inputPattern)$
 	$outputPattern(action.outputPattern)$
 	state = $fsm_nsi.targetState$;
@@ -91,25 +90,30 @@ guardFSM() ::= <<
  $options.guards.(action): {act | && $act$} $
 >>
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without fsm
 ///////////////////////////////////////////////////////////////////////////////
 
 scheduler(action) ::= <<
-/* $action.name$ */
-:: $guard()$ -> 
-	$inputPattern(action.inputPattern)$;
-	$outputPattern(action.outputPattern)$;	
+:: /* $action.name$ */ $guard()$ -> 
+	$inputPattern(action.inputPattern)$
+	$outputPattern(action.outputPattern)$	
 >>
 
 guard() ::= <<
-$options.guards.(action)$
+$options.guards.(action); separator=" && "$
 >>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Action Templates
 ///////////////////////////////////////////////////////////////////////////////
+
+priorities() ::= << 
+$if (rest(options.guards.(action)))$
+ /*priority*/ && !( $rest(options.guards.(action)); separator=" && "$ )
+$endif$
+>> 
 
 inputPatternPort(port) ::= <<
 chan_$port.name$?trash;

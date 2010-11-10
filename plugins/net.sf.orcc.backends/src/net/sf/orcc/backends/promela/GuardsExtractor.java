@@ -37,7 +37,13 @@ import java.util.Map;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.BoolExpr;
+import net.sf.orcc.ir.expr.UnaryExpr;
+import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.instructions.Assign;
@@ -75,6 +81,34 @@ public class GuardsExtractor extends AbstractActorTransformation {
 			visitProcedure(action.getScheduler());
 			removeLoads();
 		}
+		// Get the priorities. The list of actions are in decreasing priority order.
+		// The easy way is to for each action add the "not guard" of the previous action.
+		// As the guard of the action only needs one list position we can use the rest of the list for the priorities
+		
+		// In each action there is an action scheduler
+		//actions not in a FSM are present in the "actions" list and appear in decreasing priority order.
+		if (!actor.getActionScheduler().hasFsm()) {
+			Action prevAction = null;
+			for (Action action : actor.getActionScheduler().getActions()){
+				if (prevAction != null) {
+					addPriorityToGuard(action, prevAction);	
+				}
+				prevAction = action;
+			}
+		} 
+		// Actions in the FSM appear in actionScheduler->transition<List>->nextStateinfo<List> also in oder of priority
+		else {
+			for (Transition trans : actor.getActionScheduler().getFsm().getTransitions()){
+				Action prevAction = null;
+				for (NextStateInfo nsi : trans.getNextStateInfo()) {
+					Action action = nsi.getAction();
+					if (prevAction != null) {
+						addPriorityToGuard(action, prevAction);
+					}
+					prevAction = action;
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -84,7 +118,7 @@ public class GuardsExtractor extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Peek peek) {
-		peeks.add(peek);
+		peeks.add(peek); // we need the peek instructions "outside" the guards, some guards depend on peeks 
 	}
 	
 	@Override
@@ -123,5 +157,21 @@ public class GuardsExtractor extends AbstractActorTransformation {
 		}
 	}
 	
+	// takes the guard from the previous action and negates it and adds it to the guard of this action which has lower priority
+	private void addPriorityToGuard(Action action, Action prevAction) {
+		Expression prty;
+		if (guards.get(prevAction).isEmpty()){
+			prty = new BoolExpr(true); // this is strange but needed because of the file Xilinx_fairMerge
+		} else {
+			prty = guards.get(prevAction).get(0);
+		}
+		prty = new UnaryExpr(UnaryOp.LOGIC_NOT, prty, prty.getType());
+		if (guards.get(action).isEmpty()) {
+			guards.get(action).add(0, prty);
+		} else {
+			Expression grd = guards.get(action).get(0);
+			guards.get(action).set(0, new BinaryExpr(grd, BinaryOp.LOGIC_AND, prty, prty.getType() ));
+		}
+	}
 	
 }
