@@ -38,7 +38,7 @@
 //------------------------------
 #include <iostream>
 
-#include "Jade/Decoder/Decoder.h"
+#include "Jade/Decoder.h"
 #include "Jade/Jit/LLVMOptimizer.h"
 
 #include "llvm/Module.h"

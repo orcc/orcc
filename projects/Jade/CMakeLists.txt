@@ -81,15 +81,16 @@ set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_Type})
 
 
 # Add libraries
-add_subdirectory(lib/Scheduler)
-add_subdirectory(lib/XDFParser)
-add_subdirectory(lib/IRJit)
-add_subdirectory(lib/IRCore)
-add_subdirectory(lib/IRSerialize)
-add_subdirectory(lib/Decoder)
 add_subdirectory(lib/DecoderEngine)
 add_subdirectory(lib/Graph)
 add_subdirectory(lib/Fifo)
+add_subdirectory(lib/IRActor)
+add_subdirectory(lib/IRCore)
+add_subdirectory(lib/IRJit)
+add_subdirectory(lib/IRSerialize)
+add_subdirectory(lib/IRTransform)
+add_subdirectory(lib/Scheduler)
+add_subdirectory(lib/XDFParser)
 
 # Include directories
 include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_DIR})
@@ -104,4 +105,4 @@ add_executable(Jade Jade.cpp)
 ENDIF(APPLE)
 
 # Library requiered
-target_link_libraries(Jade IRCore IRJit IRSerialize XDFParser DecoderEngine Fifo Scheduler HDAGGraph Decoder ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(Jade IRActor IRCore IRJit IRSerialize IRTransform XDFParser DecoderEngine Fifo Scheduler HDAGGraph ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})

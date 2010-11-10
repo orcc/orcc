@@ -52,8 +52,8 @@
 #include "llvm/System/Process.h"
 #include "llvm/Target/TargetSelect.h"
 
+#include "Jade/Decoder.h"
 #include "Jade/Core/Actor/Procedure.h"
-#include "Jade/Decoder/Decoder.h"
 #include "Jade/Jit/LLVMExecution.h"
 //------------------------------
 

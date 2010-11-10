@@ -43,9 +43,9 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/Support/CommandLine.h"
 
+#include "Jade/Decoder.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Core/Actor.h"
-#include "Jade/Decoder/Decoder.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMWriter.h"

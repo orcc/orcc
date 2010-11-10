@@ -43,16 +43,16 @@
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
 
-#include "Instanciator.h"
+#include "Instantiator.h"
 
-#include "Jade/Decoder/Decoder.h"
+#include "Jade/Decoder.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Serialize/IRWriter.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
-
-#include "BroadcastAdder.h"
+#include "Jade/Transform/ActionSchedulerAdder.h"
+#include "Jade/Transform/BroadcastAdder.h"
 //------------------------------
 
 using namespace llvm;
@@ -71,18 +71,6 @@ Decoder::Decoder(llvm::LLVMContext& C, Network* network, AbstractFifo* fifo): Co
 
 Decoder::~Decoder (){
 	delete module;
-}
-
-int Decoder::instanciate(){
-
-	// Instanciate the network
-	Instanciator instanciator(network, actors);
-
-	// Adding broadcast 
-	BroadcastAdder broadAdder(Context, this);
-	broadAdder.transform();
-	
-	return 0;
 }
 
 void Decoder::addInstance(Instance* instance){
@@ -121,14 +109,22 @@ bool Decoder::compile(map<string, Actor*>* actors){
 	// Add Fifo function and fifo type into the decoder
 	fifo->addFifoHeader(this);
 	
-	// Instanciating decoder
-	instanciate();
+	// Instanciate the network
+	Instantiator Instantiator(network, actors);
+
+	// Adding broadcast 
+	BroadcastAdder broadAdder(Context, this);
+	broadAdder.transform();
 
 	//Write instance
 	for (it = instances->begin(); it != instances->end(); it++){
 		IRWriter writer(it->second);
 		writer.write(this);
 	}
+
+	//Adding action scheduler
+	ActionSchedulerAdder actionSchedulerAdder(Context, this);
+	actionSchedulerAdder.transform();
 
 	// Setting connections of the decoder
 	fifo->setConnections(this);

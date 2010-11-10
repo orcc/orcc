@@ -57,7 +57,7 @@ public:
 	 *	Initialize the JIT engine
 	 *
      */
-	LLVMUtility();
+	LLVMUtility(){};
 
 	void printModule(std::string file, Decoder* decoder);
 	void verify(std::string file, Decoder* decoder);

@@ -64,7 +64,7 @@ class InstancedActor;
 class BroadcastAdder {
 public:
 	/**
-     *  @brief Add broadcast into the given ntework
+     *  @brief Add broadcast into the given network
      *
 	 *	This transformation detect multiple connection to port 
 	 *    and insert broadcast actor to force port being connected 
@@ -133,6 +133,7 @@ private:
 	/** graph of the network */
 	HDAGGraph* graph;
 
+	/** Decoder to apply the transformation */
 	Decoder* decoder;
 
 	/** list of Actor in the decoder */

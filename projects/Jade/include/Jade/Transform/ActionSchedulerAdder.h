@@ -55,7 +55,6 @@ namespace llvm{
 class Action;
 class ActionScheduler;
 class Actor;
-class InstancedActor;
 class Instance;
 class Decoder;
 class Port;
@@ -78,14 +77,15 @@ public:
 	 *
 	 *	@param decoder : the Decoder to insert the round robin scheduler into
      */
-	ActionSchedulerAdder(Instance* instance, Decoder* decoder, llvm::LLVMContext& C);
+	ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder);
+
+	void transform();
 	~ActionSchedulerAdder(){};
 
 private:
-	void createScheduler(ActionScheduler* actionScheduler);
-	llvm::Function* createSchedulerFn(ActionScheduler* actionScheduler);
-	llvm::BasicBlock* createSchedulerNoFSM(std::list<Action*>* actions, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
-	llvm::BasicBlock* createSchedulerFSM(ActionScheduler* actionScheduler, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, llvm::BasicBlock* incBB, llvm::Function* function);
+	void createScheduler(Instance* instance);
+	llvm::BasicBlock* createSchedulerNoFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
+	llvm::BasicBlock* createSchedulerFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, llvm::BasicBlock* incBB, llvm::Function* function);
 	llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::Function* function);
 	llvm::BasicBlock* createOutputPattern(Action* action, llvm::BasicBlock* BB, llvm::Function* function);
 	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
@@ -96,16 +96,15 @@ private:
 	llvm::BasicBlock* createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, llvm::BasicBlock* stateBB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
 	void createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB);
 	void createStates(std::map<std::string, FSM::State*>* states, llvm::Function* function);
-	llvm::Function* createSchedulerOutsideFSM(std::list<Action*>* actions);
-	void createInitialize(std::list<Action*>* initializes);
-	llvm::Function* createInitializeFn(std::list<Action*>* initializes);
+	llvm::Function* createSchedulerOutsideFSM(Instance* instance);
+	void createInitialize(Instance* instance);
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+	
+	/** Decoder to apply the transformation */
 	Decoder* decoder;
-	InstancedActor* instancedActor;
-	Instance* instance;
-
+	
 	llvm::GlobalVariable* stateVar;
 	std::map<FSM::State*, llvm::BasicBlock*> BBTransitions;
 	llvm::Function* outsideSchedulerFn;

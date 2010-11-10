@@ -28,16 +28,16 @@
  */
 
 /**
-@brief Description of the Instanciator class interface
+@brief Description of the Instantiator class interface
 @author Jerome Gorin
-@file Instanciator.h
+@file Instantiator.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef INSTANCIATOR_H
-#define INSTANCIATOR_H
+#ifndef Instantiator_H
+#define Instantiator_H
 
 #include <map>
 
@@ -49,14 +49,14 @@ class Connection;
 //------------------------------
 
 /**
- * @class Instanciator
+ * @class Instantiator
  *
  * @brief This class is used by network transformation to process the instanciation.
  *
  * @author Jerome Gorin
  * 
  */
-class Instanciator {
+class Instantiator {
 public:
 
 	/**
@@ -69,9 +69,9 @@ public:
 	 *
 	 * @param actors : Map of actors used in the instance
 	 */
-	Instanciator(Network* network, std::map<std::string, Actor*>* actors);
+	Instantiator(Network* network, std::map<std::string, Actor*>* actors);
 
-	~Instanciator(){};
+	~Instantiator(){};
 
 private:
 

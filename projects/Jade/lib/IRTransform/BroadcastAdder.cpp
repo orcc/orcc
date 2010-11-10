@@ -39,16 +39,16 @@
 #include <map>
 #include <sstream>
 
+#include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Decoder/Decoder.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Instance.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Core/Vertex.h"
 #include "Jade/Core/Connection.h"
 
-#include "BroadcastAdder.h"
-#include "BroadcastActor.h"
+#include "Jade/Actor/BroadcastActor.h"
+#include "Jade/Transform/BroadcastAdder.h"
 //------------------------------
 
 using namespace std;

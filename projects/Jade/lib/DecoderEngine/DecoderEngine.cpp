@@ -41,12 +41,14 @@
 
 #include "llvm/Constants.h"
 #include "llvm/Support/CommandLine.h"
+
+#include "Jade/Decoder.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Serialize/IRParser.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Core/Network.h"
+#include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 //------------------------------
 
@@ -89,6 +91,13 @@ int DecoderEngine::load(Network* network) {
 	cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 	
+	LLVMUtility utility;
+	utility.printModule("module.txt", &decoder);
+	utility.verify("error.txt", &decoder);
+
+	cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	timer = clock ();
+
 	cout << "-->  Start decoding :\n";
 	timer = clock ();
 

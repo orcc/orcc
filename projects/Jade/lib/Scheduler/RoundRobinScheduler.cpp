@@ -39,9 +39,6 @@
 
 #include <map>
 
-#include "ActionSchedulerAdder.h"
-#include "Jade/Scheduler/RoundRobinScheduler.h"
-
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
 #include "llvm/Constants.h"
@@ -51,13 +48,14 @@
 #include "llvm/ADT/SmallString.h"
 #include "llvm/Support/CommandLine.h"
 
+#include "Jade/Decoder.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Variable.h"
-#include "Jade/Decoder/Decoder.h"
 #include "Jade/Core/Instance.h"
 #include "Jade/Jit/LLVMExecution.h"
+#include "Jade/Scheduler/RoundRobinScheduler.h"
 
 #include "display.h"
 //------------------------------
@@ -90,16 +88,7 @@ RoundRobinScheduler::~RoundRobinScheduler (){
 void RoundRobinScheduler::createScheduler(Decoder* decoder){
 	this->decoder = decoder;
 	
-	//Create action schedulers
-	map<string, Instance*>::iterator it;
-	map<string, Instance*>* instances = decoder->getInstances();
-	
-	for (it = instances->begin(); it != instances->end(); ++it){
-		Instance* instance = (*it).second;
-		string id = instance->getId();
-		ActionSchedulerAdder(instance, decoder, Context);
-	}
-	
+	//Create the scheduler function
 	createSchedulerFn();
 	
 	//Set input file

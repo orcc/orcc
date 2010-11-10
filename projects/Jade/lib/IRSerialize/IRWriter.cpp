@@ -36,10 +36,10 @@
 */
 
 //------------------------------
+#include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Serialize/IRWriter.h"
-#include "Jade/Decoder/Decoder.h"
 
 #include "llvm/Module.h"
 

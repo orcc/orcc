@@ -161,16 +161,6 @@ public:
 	Network* getNetwork(){return network;};
 
 	/**
-     *  @brief Instanciate decoder
-	 * 
-	 *	Instanciate decoder using the given actors
-	 *
-	 *  @return true if instanciate ok
-	 *
-     */
-	int instanciate();
-
-	/**
      *  @brief Setter of the decoder scheduler
 	 *
 	 *  @param scheduler : the scheduler of the decoder

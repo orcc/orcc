@@ -39,17 +39,16 @@
 #include <sstream>
 #include <vector>
 
-#include "BroadcastActor.h"
-
 #include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/LLVMContext.h"
 #include "llvm/Instructions.h"
 #include "llvm/Module.h"
 
+#include "Jade/Decoder.h"
+#include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Decoder/Decoder.h"
 #include "Jade/Fifo/AbstractFifo.h"
 //------------------------------
 

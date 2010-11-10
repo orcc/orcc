@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class Instanciator
+@brief Implementation of class Instantiator
 @author Jerome Gorin
-@file Instanciator.cpp
+@file Instantiator.cpp
 @version 0.1
 @date 2010/04/12
 */
@@ -39,7 +39,7 @@
 #include <string>
 #include <stdio.h>
 
-#include "Instanciator.h"
+#include "Instantiator.h"
 
 #include "llvm/DerivedTypes.h"
 
@@ -56,7 +56,7 @@
 using namespace std;
 using namespace llvm;
 
-Instanciator::Instanciator(Network* network, map<string, Actor*>* actors){
+Instantiator::Instantiator(Network* network, map<string, Actor*>* actors){
 	this->actors = actors;
 	this->network = network;
 	this->graph = network->getGraph();
@@ -64,7 +64,7 @@ Instanciator::Instanciator(Network* network, map<string, Actor*>* actors){
 }
 
 
-void Instanciator::updateInstances(){
+void Instantiator::updateInstances(){
 	//Update instances using actors
 	map<string, Instance*>::iterator it;
 	map<string, Instance*>* instances = network->getInstances();
@@ -81,7 +81,7 @@ void Instanciator::updateInstances(){
 	
 }
 
-void Instanciator::updateInstance(Instance* instance){
+void Instantiator::updateInstance(Instance* instance){
 	map<string, Actor*>::iterator it;
 
 	//Look for the actor using instance clasz
@@ -97,7 +97,7 @@ void Instanciator::updateInstance(Instance* instance){
 	instance->setActor(it->second);
 }
 
-void Instanciator::updateConnection(Connection* connection){
+void Instantiator::updateConnection(Connection* connection){
 	Type* srcPortType;
 	string sourceString;
 	Type* dstPortType;

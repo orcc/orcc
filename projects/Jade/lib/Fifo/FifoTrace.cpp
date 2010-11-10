@@ -48,8 +48,8 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/CommandLine.h"
 
+#include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Decoder/Decoder.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/FifoTrace.h"
 #include "Jade/Graph/HDAGGraph.h"

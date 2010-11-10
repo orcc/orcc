@@ -36,17 +36,16 @@
 */
 
 //------------------------------
-#include "ActionSchedulerAdder.h"
-
+#include "Jade/Decoder.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/ActionTag.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Fifo/AbstractFifo.h"
-#include "Jade/Decoder/Decoder.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Instance.h"
+#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Transform/ActionSchedulerAdder.h"
 
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
@@ -57,37 +56,90 @@
 using namespace llvm;
 using namespace std;
 
-ActionSchedulerAdder::ActionSchedulerAdder(Instance* instance, Decoder* decoder, llvm::LLVMContext& C) : Context(C) {
+ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C) {
 	this->decoder = decoder;
-	this->instance = instance;
-	this->outsideSchedulerFn = NULL;
+}
 
-	createScheduler(instance->getActionScheduler());
+void ActionSchedulerAdder::transform() {
+	map<string, Instance*>::iterator it;
+	map<string, Instance*>* instances = decoder->getInstances();
+	
+	for (it = instances->begin(); it != instances->end(); ++it){
+		BBTransitions.clear();
+		this->outsideSchedulerFn = NULL;
 
-	if (instance->hasInitializes()){
-		createInitialize(instance->getInitializes());
+		Instance* instance = it->second;
+
+		createScheduler(instance);
+
+		if (instance->hasInitializes()){
+			createInitialize(instance);
+		}
 	}
 
 }
 
-void ActionSchedulerAdder::createScheduler(ActionScheduler* actionScheduler){
-		Function* scheduler = createSchedulerFn(actionScheduler);
-		actionScheduler->setSchedulerFunction(scheduler);
-}
-
-void ActionSchedulerAdder::createInitialize(list<Action*>* initializes){
-	Function* initialize = createInitializeFn(initializes);
-	instance->getActionScheduler()->setInitializeFunction(initialize);
-}
-
-Function* ActionSchedulerAdder::createInitializeFn(list<Action*>* initializes){
+void ActionSchedulerAdder::createScheduler(Instance* instance){
+	//Get properties of the instance
 	Module* module = decoder->getModule();
+	ActionScheduler* actionScheduler = instance->getActionScheduler();
+	string name = instance->getId();
+	name.append("_scheduler");
 
+	Function* scheduler = cast<Function>(module->getOrInsertFunction(name, Type::getInt32Ty(Context),
+										  (Type *)0));
+	actionScheduler->setSchedulerFunction(scheduler);
+
+	//Create values
+	Value *Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
+	Value *One = ConstantInt::get(Type::getInt32Ty(Context), 1);
+
+	
+	// Add a basic block entry to the scheduler.
+	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", scheduler);
+
+	//Create alloca on i and store 0
+	AllocaInst* iVar = new AllocaInst(Type::getInt32Ty(Context), "i", BBEntry);
+	StoreInst* storeInst = new StoreInst(Zero, iVar, BBEntry);
+
+	// Add a basic block to bb and branch entry to bb.
+	BasicBlock* BB = BasicBlock::Create(Context, "bb", scheduler);
+	BranchInst::Create(BB, BBEntry);
+	
+	// Add a basic block return that return %i
+	BasicBlock* returnBB = BasicBlock::Create(Context, "return", scheduler);
+	LoadInst* loadIRet = new LoadInst(iVar, "i_ret", returnBB);
+	ReturnInst::Create(Context, loadIRet, returnBB);
+
+
+	// Add a basic block inc that return %i and branch to bb
+	BasicBlock* incBB = BasicBlock::Create(Context, "inc_i", scheduler);
+	LoadInst* loadIInc = new LoadInst(iVar, "i_load", incBB);
+	BinaryOperator* iAdd = BinaryOperator::CreateNSWAdd(loadIInc, One, "i_add", incBB);
+	new StoreInst(iAdd, iVar, incBB);
+	BranchInst::Create(BB, incBB);
+	
+	if (actionScheduler->hasFsm()){
+		BB = createSchedulerFSM(instance, BB, incBB, returnBB , scheduler);
+	}else{
+		BB = createSchedulerNoFSM(instance, BB, incBB, returnBB, scheduler);
+	}
+}
+
+void ActionSchedulerAdder::createInitialize(Instance* instance){
+	
+	//Get properties of the instance
+	Module* module = decoder->getModule();
+	ActionScheduler* actionScheduler = instance->getActionScheduler();
+	list<Action*>* initializes = instance->getInitializes();
 	string name = instance->getId();
 	name.append("_initialize");
 
+	//Create initialize function
 	Function* initialize = cast<Function>(module->getOrInsertFunction(name, Type::getVoidTy(Context),
 											  (Type *)0));
+	//Set function to the ActionScheduler
+	actionScheduler->setInitializeFunction(initialize);
 
 	// Add a basic block entry to the scheduler.
 	BasicBlock* BB = BasicBlock::Create(Context, "entry", initialize);
@@ -105,61 +157,13 @@ Function* ActionSchedulerAdder::createInitializeFn(list<Action*>* initializes){
 
 	//Create branch from skip to return
 	BranchInst::Create(returnBB, BB);
-
-	return initialize;
 }
 
-Function* ActionSchedulerAdder::createSchedulerFn(ActionScheduler* actionScheduler){
-		Module* module = decoder->getModule();
-		
-		string name = instance->getId();
-		name.append("_scheduler");
-
-		Function* scheduler = cast<Function>(module->getOrInsertFunction(name, Type::getInt32Ty(Context),
-											  (Type *)0));
-		//Create values
-		Value *Zero = ConstantInt::get(Type::getInt32Ty(Context), 0);
-		Value *One = ConstantInt::get(Type::getInt32Ty(Context), 1);
-
-		
-		// Add a basic block entry to the scheduler.
-		BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", scheduler);
-
-		//Create alloca on i and store 0
-		AllocaInst* iVar = new AllocaInst(Type::getInt32Ty(Context), "i", BBEntry);
-		StoreInst* storeInst = new StoreInst(Zero, iVar, BBEntry);
-
-		// Add a basic block to bb and branch entry to bb.
-		BasicBlock* BB = BasicBlock::Create(Context, "bb", scheduler);
-		BranchInst::Create(BB, BBEntry);
-		
-		// Add a basic block return that return %i
-		BasicBlock* returnBB = BasicBlock::Create(Context, "return", scheduler);
-		LoadInst* loadIRet = new LoadInst(iVar, "i_ret", returnBB);
-		ReturnInst::Create(Context, loadIRet, returnBB);
-
-
-		// Add a basic block inc that return %i and branch to bb
-		BasicBlock* incBB = BasicBlock::Create(Context, "inc_i", scheduler);
-		LoadInst* loadIInc = new LoadInst(iVar, "i_load", incBB);
-		BinaryOperator* iAdd = BinaryOperator::CreateNSWAdd(loadIInc, One, "i_add", incBB);
-		new StoreInst(iAdd, iVar, incBB);
-		BranchInst::Create(BB, incBB);
-		
-		if (actionScheduler->hasFsm()){
-			BB = createSchedulerFSM(actionScheduler, BB, incBB, returnBB , scheduler);
-		}else{
-			BB = createSchedulerNoFSM(actionScheduler->getActions(), BB, incBB, returnBB, scheduler);
-		}
-
-		return scheduler;
-}
-
-BasicBlock* ActionSchedulerAdder::createSchedulerFSM(ActionScheduler* actionScheduler, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
-	FSM* fsm = actionScheduler->getFsm();
-
+BasicBlock* ActionSchedulerAdder::createSchedulerFSM(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
 	//Create a variable that store the current state of the FSM
 	Module* module = decoder->getModule();
+	ActionScheduler* actionScheduler = instance->getActionScheduler();
+	FSM* fsm = actionScheduler->getFsm();
 	string name = instance->getId();
 	name.append("_FSM_state");
 	stateVar = cast<GlobalVariable>(module->getOrInsertGlobal(name, Type::getInt32Ty(Context)));
@@ -174,7 +178,7 @@ BasicBlock* ActionSchedulerAdder::createSchedulerFSM(ActionScheduler* actionSche
 	//Create action outside fsm
 	std::list<Action*>* actions = actionScheduler->getActions();
 	if (!actions->empty()){
-		outsideSchedulerFn = createSchedulerOutsideFSM(actions);
+		outsideSchedulerFn = createSchedulerOutsideFSM(instance);
 	}
 
 	//Create fsm scheduler
@@ -185,12 +189,13 @@ BasicBlock* ActionSchedulerAdder::createSchedulerFSM(ActionScheduler* actionSche
 	return BB;
 }
 
-Function* ActionSchedulerAdder::createSchedulerOutsideFSM(list<Action*>* actions){
+Function* ActionSchedulerAdder::createSchedulerOutsideFSM(Instance* instance){
 	Module* module = decoder->getModule();
-	
 	string name = instance->getId();
 	name.append("_outside_FSM_scheduler");
-
+	ActionScheduler* actionScheduler = instance->getActionScheduler();
+	std::list<Action*>* actions = actionScheduler->getActions();
+	
 	Function* outsideScheduler = cast<Function>(module->getOrInsertFunction(name, Type::getVoidTy(Context),
 										  (Type *)0));
 	
@@ -216,8 +221,10 @@ Function* ActionSchedulerAdder::createSchedulerOutsideFSM(list<Action*>* actions
 	return outsideScheduler;
 }
 
-BasicBlock* ActionSchedulerAdder::createSchedulerNoFSM(list<Action*>* actions, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+BasicBlock* ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
 	list<Action*>::iterator it;
+	ActionScheduler* actionScheduler = instance->getActionScheduler();
+	list<Action*>* actions = actionScheduler->getActions();
 
 	for ( it=actions->begin() ; it != actions->end(); it++ ){
 		BB = createActionTest(*it, BB, incBB, function);
@@ -231,7 +238,6 @@ BasicBlock* ActionSchedulerAdder::createSchedulerNoFSM(list<Action*>* actions, B
 
 BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, Function* function){
 	string name = action->getName();
-	name.append(instance->getId());
 	string skipBrName = "skip_";
 	string hasRoomBrName = "hasroom_";
 	string fireBrName = "fire_";
@@ -384,13 +390,11 @@ BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* next
 	//Create a branch for firing next state
 	string fireStateBrName = "fire_";
 	fireStateBrName.append(action->getName());
-	fireStateBrName.append(instance->getId());
 	BasicBlock* fireStateBB = BasicBlock::Create(Context, fireStateBrName, function);
 
 	//Create a branch for skip next state
 	string skipStateBrName = "skip_";
 	skipStateBrName.append(action->getName());
-	skipStateBrName.append(instance->getId());
 	BasicBlock* skipStateBB = BasicBlock::Create(Context, skipStateBrName, function);
 
 	//Test firing condition of an action
@@ -421,13 +425,11 @@ BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* next
 		// Add a basic block hasRoom that fires the action
 		string hasRoomBrName = "hasRoom_";
 		hasRoomBrName.append(action->getName());
-		hasRoomBrName.append(instance->getId());
 		BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
 
 		//Create a basic block skip_hasRoom that store state and return from function
 		string skipHasRoomBrName = "skipHasRoom_";
 		skipHasRoomBrName.append(action->getName());
-		skipHasRoomBrName.append(instance->getId());
 		BasicBlock* skipRoomBB = BasicBlock::Create(Context, skipHasRoomBrName, function);
 		ConstantInt* index = ConstantInt::get(Type::getInt32Ty(Context), sourceState->getIndex());
 		StoreInst* storeInst = new StoreInst(index, stateVar, skipRoomBB);
