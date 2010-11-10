@@ -6,5 +6,6 @@
       <vertex id="list_list" x="72" y="261"/>
       <vertex id="sink_big_2" x="330" y="293"/>
       <vertex id="test_import" x="206" y="411"/>
+      <vertex id="test_list_init" x="443" y="494"/>
    </vertices>
 </layout>

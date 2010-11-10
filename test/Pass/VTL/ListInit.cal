@@ -1,0 +1,24 @@
+actor ListInit () ==> :
+
+	List(type: List(type: int, size=8), size=2) fib :=
+		[ [ 0, 1, 2, 3, 4, 5, 6, 7 ],
+		  [ i : for int i in 8 .. 15 ] ];
+
+	procedure printList(List(type:int, size=8) list)
+	begin
+		print("[ " + list[0]);
+		foreach int i in 1 .. 7 do
+			print(", " + list[i]);
+		end
+		println(" ]");
+	end
+
+	action ==>
+	do
+		println("fib := [");
+		printList(fib[0]);
+		printList(fib[1]);
+		println("]");
+	end
+
+end

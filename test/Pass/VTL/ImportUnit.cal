@@ -6,6 +6,10 @@ unit net.sf.orcc.ImportUnit :
 	
 	int MY_CONSTANT_1 = 33;
 	
-	int MY_CONSTANT_2 = 33;
+	int MY_CONSTANT_2 = 34;
+	
+	int MY_CONSTANT_3 = 35;
+	
+	List(type:List(type:int, size=2), size=2) MY_LIST = [ [0, 1], [ i : for int i in 50 .. 51 ] ];
 
 end

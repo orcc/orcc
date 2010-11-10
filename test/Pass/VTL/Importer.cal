@@ -2,11 +2,17 @@ import net.sf.orcc.ImportUnit.*;
 
 actor Importer () ==> :
 
-	int z := MY_CONSTANT_1;
+	int w = MY_CONSTANT_1;
+	
+	int z := MY_CONSTANT_2;
+	
+	int t;
 	
 	action ==>
 	do
-		z := x(3);
+		z := x(3) + MY_CONSTANT_3 * w;
+		t := MY_LIST[1][0];
+		println("z = " + z);
 	end
 
 end
