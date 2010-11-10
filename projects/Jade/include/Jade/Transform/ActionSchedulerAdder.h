@@ -78,36 +78,265 @@ public:
 	 *	@param decoder : the Decoder to insert the round robin scheduler into
      */
 	ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decoder);
-
-	void transform();
 	~ActionSchedulerAdder(){};
 
+	/**
+     *  @brief Start the transformation
+     */
+	void transform();
+
 private:
+
+	/**
+     *  @brief Set an action scheduler to the instance
+	 *
+	 *	Add an action scheduler to the given instance
+	 *
+	 *  @param instance : the Instance to add the action scheduler
+     */
+	void setInstance(Instance* instance);
+	
+	/**
+     *  @brief Create an action scheduler
+	 *
+	 *	Create an action scheduler in the instance
+	 *
+	 *  @param instance : the Instance to add the action scheduler
+     */
 	void createScheduler(Instance* instance);
-	llvm::BasicBlock* createSchedulerNoFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
-	llvm::BasicBlock* createSchedulerFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, llvm::BasicBlock* incBB, llvm::Function* function);
-	llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, llvm::Function* function);
-	llvm::BasicBlock* createOutputPattern(Action* action, llvm::BasicBlock* BB, llvm::Function* function);
-	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
-	void createSwitchTransition(llvm::Value* stateVar, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB);
-	void createTransitions(std::map<std::string, FSM::Transition*>* transitions, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
-	void createTransition(FSM::Transition* transition, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
-	llvm::BasicBlock* createSchedulingTestState(std::list<FSM::NextStateInfo*>* nextStates, FSM::State* sourceState, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
-	llvm::BasicBlock* createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, llvm::BasicBlock* stateBB, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::Function* function);
-	void createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB);
-	void createStates(std::map<std::string, FSM::State*>* states, llvm::Function* function);
-	llvm::Function* createSchedulerOutsideFSM(Instance* instance);
+
+	/**
+     *  @brief Create initialize
+	 *
+	 *	Create the initialize action scheduler for the instance
+	 *
+	 *  @param instance : the Instance to add the initialization action scheduler
+     */
 	void createInitialize(Instance* instance);
+
+	/**
+     *  @brief Create scheduler of action outside the FSM
+	 *
+	 *	Create an action scheduler for the action outside the FSM
+	 *
+	 *  @param instance : the Instance to add the action scheduler
+     */
+	llvm::Function* createSchedulerOutsideFSM(Instance* instance);
+
+	/**
+	 * @brief Creates states of the FSM
+	 *
+	 * Creates a basic bloc for each states of the FSM
+	 * 
+	 * @param states: map of FSM::State to create
+	 *
+	 * @param function : llvm::Function where basic blocs are added
+	 *
+	 * @return a map of FSM::State and their corresponding llvm::BasicBlock
+	 */
+	std::map<FSM::State*, llvm::BasicBlock*>* createStates(std::map<std::string, FSM::State*>* states, llvm::Function* function);
+
+	/**
+	 * @brief Creates a scheduler with no FSM
+	 * 
+	 * @param instance: the Instance to add the scheduler
+	 *
+	 * @param BB : llvm::BasicBlock where scheduler is add
+	 *
+	 * @param incBB : llvm::BasicBlock where scheduler has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where scheduler has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the scheduler is added
+	 */
+	void createSchedulerNoFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* incBB, 
+											llvm::BasicBlock* returnBB, llvm::Function* function);
+
+
+	/**
+	 * @brief Creates a scheduler with FSM
+	 * 
+	 * @param instance: the Instance to add the scheduler
+	 *
+	 * @param BB : llvm::BasicBlock where scheduler is add
+	 *
+	 * @param incBB : llvm::BasicBlock where scheduler has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where scheduler has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the scheduler is added
+	 */
+	void createSchedulerFSM(Instance* instance, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, 
+								llvm::BasicBlock* incBB, llvm::Function* function);
+
+	/**
+	 * @brief Creates a scheduling test for an Action
+	 * 
+	 * @param action : the Action to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is add
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	llvm::BasicBlock* createActionTest(Action* action, llvm::BasicBlock* BB, 
+										llvm::BasicBlock* incBB, llvm::Function* function);
+
+
+	/**
+	 * @brief Creates a output pattern test for an Action
+	 * 
+	 * @param action : the Action to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is add
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	llvm::BasicBlock* createOutputPattern(Action* action, llvm::BasicBlock* BB, llvm::Function* function);
+
+	/**
+	 * @brief Creates a hasRoom test for a Port
+	 * 
+	 * @param port : the Port to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is add
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Creates switcth instruction for the FSM
+	 * 
+	 * @param value : the condition llvm::Value of switch instruction
+	 *
+	 * @param BB : llvm::BasicBlock where switch is add
+	 *
+	 * @param incBB : llvm::BasicBlock where switch has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where switch has to branch in case of return
+	 *
+	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
+	 */
+	void createSwitchTransition(llvm::Value* stateVar, llvm::BasicBlock* BB, llvm::BasicBlock* returnBB, 
+		std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
+
+
+	/**
+	 * @brief Creates transitions for the FSM
+	 * 
+	 * @param transitions : the transitions to create
+	 *
+	 * @param BB : llvm::BasicBlock where transitions are added
+	 *
+	 * @param incBB : llvm::BasicBlock where transitions has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where transitions has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the transitions are added
+	 *
+	 * @param outsideSchedulerFn : llvm::Function to call for outside scheduler functions
+	 *
+	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
+	 */
+	void createTransitions(std::map<std::string, FSM::Transition*>* transitions, llvm::BasicBlock* incBB, 
+							llvm::BasicBlock* returnBB, llvm::GlobalVariable* stateVar, llvm::Function* function, 
+							llvm::Function* outsideSchedulerFn, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
+
+
+	/**
+	 * @brief Creates a transition
+	 * 
+	 * @param transitions : the transition to create
+	 *
+	 * @param BB : llvm::BasicBlock where transition is added
+	 *
+	 * @param incBB : llvm::BasicBlock where transition has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where transition has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the transition is added
+	 *
+	 * @param outsideSchedulerFn : llvm::Function to call for outside scheduler functions
+	 *
+	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
+	 */
+	void createTransition(FSM::Transition* transition, llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, llvm::GlobalVariable* stateVar, llvm::Function* function, llvm::Function* outsideSchedulerFn, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
+	
+	/**
+	 * @brief Creates a test for FSM to  change state
+	 * 
+	 * @param nextStates : the next state of the transition
+	 *
+	 * @param sourceState :  the source state of the transition
+	 *
+	 * @param incBB : llvm::BasicBlock where transition has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where transition has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the transition is added
+	 *
+	 * @param outsideSchedulerFn : llvm::Function to call for outside scheduler functions
+	 *
+	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
+	 */
+	llvm::BasicBlock* createSchedulingTestState(std::list<FSM::NextStateInfo*>* nextStates, FSM::State* sourceState, 
+													llvm::BasicBlock* incBB, llvm::BasicBlock* returnBB, 
+													llvm::GlobalVariable* stateVar, llvm::Function* function, 
+													llvm::Function* outsideSchedulerFn, std::map<FSM::State*, 
+													llvm::BasicBlock*>* BBTransitions);
+
+
+	/**
+	 * @brief Creates an action test state for FSM
+	 * 
+	 * @param nextStates : the next state of the transition
+	 *
+	 * @param sourceState :  the source state of the transition
+	 *
+	 * @param incBB : llvm::BasicBlock where transition has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where transition has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the transition is added
+	 *
+	 * @param outsideSchedulerFn : llvm::Function to call for outside scheduler functions
+	 *
+	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
+	 */
+	llvm::BasicBlock* createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, 
+												llvm::BasicBlock* stateBB, llvm::BasicBlock* incBB, 
+												llvm::BasicBlock* returnBB, llvm::GlobalVariable* stateVar, 
+												llvm::Function* function, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
+
+
+	/**
+	 * @brief Creates an action call for FSM
+	 * 
+	 * @param nextStateInfo : FSM::NextStateInfo of the current state
+	 *
+	 * @param BB : llvm::BasicBlock where the action call is added
+	 *
+	 * @param BBTransitions : map of FSM::State and their corresponding llvm::BasicBlock
+	 */
+	void createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB, std::map<FSM::State*, llvm::BasicBlock*>* BBTransitions);
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 	
 	/** Decoder to apply the transformation */
 	Decoder* decoder;
-	
-	llvm::GlobalVariable* stateVar;
-	std::map<FSM::State*, llvm::BasicBlock*> BBTransitions;
-	llvm::Function* outsideSchedulerFn;
 };
 
 #endif

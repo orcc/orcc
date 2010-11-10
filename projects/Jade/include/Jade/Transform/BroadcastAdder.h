@@ -30,7 +30,7 @@
 /**
 @brief Description of the BroadcastAdder class interface
 @author Jerome Gorin
-@file FifoInit.h
+@file BroadcastAdder.h
 @version 0.1
 @date 22/03/2010
 */

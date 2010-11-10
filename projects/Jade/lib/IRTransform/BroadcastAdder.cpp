@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class FifoInit
+@brief Implementation of class BroadcastAdder
 @author Jerome Gorin
-@file FifoInit.cpp
+@file BroadcastAdder.cpp
 @version 0.1
 @date 2010/04/12
 */
@@ -40,14 +40,13 @@
 #include <sstream>
 
 #include "Jade/Decoder.h"
+#include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Instance.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Core/Vertex.h"
 #include "Jade/Core/Connection.h"
-
-#include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Transform/BroadcastAdder.h"
 //------------------------------
 

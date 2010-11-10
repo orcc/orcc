@@ -65,18 +65,16 @@ void ActionSchedulerAdder::transform() {
 	map<string, Instance*>* instances = decoder->getInstances();
 	
 	for (it = instances->begin(); it != instances->end(); ++it){
-		BBTransitions.clear();
-		this->outsideSchedulerFn = NULL;
-
-		Instance* instance = it->second;
-
-		createScheduler(instance);
-
-		if (instance->hasInitializes()){
-			createInitialize(instance);
-		}
+		setInstance(it->second);
 	}
+}
 
+void ActionSchedulerAdder::setInstance(Instance* instance) {
+	createScheduler(instance);
+
+	if (instance->hasInitializes()){
+		createInitialize(instance);
+	}
 }
 
 void ActionSchedulerAdder::createScheduler(Instance* instance){
@@ -120,9 +118,9 @@ void ActionSchedulerAdder::createScheduler(Instance* instance){
 	BranchInst::Create(BB, incBB);
 	
 	if (actionScheduler->hasFsm()){
-		BB = createSchedulerFSM(instance, BB, incBB, returnBB , scheduler);
+		createSchedulerFSM(instance, BB, incBB, returnBB , scheduler);
 	}else{
-		BB = createSchedulerNoFSM(instance, BB, incBB, returnBB, scheduler);
+		createSchedulerNoFSM(instance, BB, incBB, returnBB, scheduler);
 	}
 }
 
@@ -159,14 +157,15 @@ void ActionSchedulerAdder::createInitialize(Instance* instance){
 	BranchInst::Create(returnBB, BB);
 }
 
-BasicBlock* ActionSchedulerAdder::createSchedulerFSM(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+void ActionSchedulerAdder::createSchedulerFSM(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
 	//Create a variable that store the current state of the FSM
 	Module* module = decoder->getModule();
 	ActionScheduler* actionScheduler = instance->getActionScheduler();
 	FSM* fsm = actionScheduler->getFsm();
 	string name = instance->getId();
 	name.append("_FSM_state");
-	stateVar = cast<GlobalVariable>(module->getOrInsertGlobal(name, Type::getInt32Ty(Context)));
+	Function* outsideSchedulerFn = NULL;
+	GlobalVariable* stateVar = cast<GlobalVariable>(module->getOrInsertGlobal(name, Type::getInt32Ty(Context)));
 	
 	//Set initial state to the state variable
 	FSM::State* state = fsm->getInitialState();
@@ -177,16 +176,15 @@ BasicBlock* ActionSchedulerAdder::createSchedulerFSM(Instance* instance, BasicBl
 
 	//Create action outside fsm
 	std::list<Action*>* actions = actionScheduler->getActions();
+	
 	if (!actions->empty()){
 		outsideSchedulerFn = createSchedulerOutsideFSM(instance);
 	}
 
 	//Create fsm scheduler
-	createStates(fsm->getStates(), function);
-	createTransitions(fsm->getTransitions(), incBB, returnBB, function);
-	createSwitchTransition(loadStateVar, BB, returnBB);
-
-	return BB;
+	map<FSM::State*, BasicBlock*>* BBTransitions = createStates(fsm->getStates(), function);
+	createTransitions(fsm->getTransitions(), incBB, returnBB, stateVar, function, outsideSchedulerFn, BBTransitions);
+	createSwitchTransition(loadStateVar, BB, returnBB, BBTransitions);
 }
 
 Function* ActionSchedulerAdder::createSchedulerOutsideFSM(Instance* instance){
@@ -221,7 +219,7 @@ Function* ActionSchedulerAdder::createSchedulerOutsideFSM(Instance* instance){
 	return outsideScheduler;
 }
 
-BasicBlock* ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+void ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, BasicBlock* BB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
 	list<Action*>::iterator it;
 	ActionScheduler* actionScheduler = instance->getActionScheduler();
 	list<Action*>* actions = actionScheduler->getActions();
@@ -232,8 +230,6 @@ BasicBlock* ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, Basic
 
 	//Create branch from skip to return
 	BranchInst::Create(returnBB, BB);
-
-	return BB;
 }
 
 BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, Function* function){
@@ -303,16 +299,20 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 	return skipBB;
 }
 
-void ActionSchedulerAdder::createStates(map<string, FSM::State*>* states, Function* function){
+map<FSM::State*, BasicBlock*>* ActionSchedulerAdder::createStates(map<string, FSM::State*>* states, Function* function){
 	map<string, FSM::State*>::iterator it;
-
+	map<FSM::State*, BasicBlock*>* BBTransitions = new map<FSM::State*, BasicBlock*>();
+	
+	//Create a basic block for each state
 	for (it = states->begin(); it != states->end(); it++){
 		// Add a basic block for the current state
 		BasicBlock* stateBB = BasicBlock::Create(Context, it->first, function);
 
 		//Store the basic block
-		BBTransitions.insert(pair<FSM::State*, BasicBlock*>(it->second, stateBB));
+		BBTransitions->insert(pair<FSM::State*, BasicBlock*>(it->second, stateBB));
 	}
+
+	return BBTransitions;
 }
 
 CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
@@ -328,14 +328,12 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 	return callInst;
 }
 
-void ActionSchedulerAdder::createSwitchTransition(Value* stateVar, BasicBlock* BB, BasicBlock* returnBB){
+void ActionSchedulerAdder::createSwitchTransition(Value* stateVar, BasicBlock* BB, BasicBlock* returnBB, map<FSM::State*, BasicBlock*>* BBTransitions){
 	map<FSM::State*, BasicBlock*>::iterator it;
 
-	 SwitchInst* stateSwitch =
-      SwitchInst::Create(stateVar, returnBB, BBTransitions.size(),
-                         BB);
+	 SwitchInst* stateSwitch = SwitchInst::Create(stateVar, returnBB, BBTransitions->size(), BB);
 
-	 for (it = BBTransitions.begin(); it != BBTransitions.end(); it++){
+	 for (it = BBTransitions->begin(); it != BBTransitions->end(); it++){
 		 FSM::State* state = it->first;
 		 BasicBlock* stateBB = it->second;
 		 ConstantInt* stateIndex = ConstantInt::get(Type::getInt32Ty(Context),state->getIndex());
@@ -344,22 +342,26 @@ void ActionSchedulerAdder::createSwitchTransition(Value* stateVar, BasicBlock* B
 	 }
 }
 
-void ActionSchedulerAdder::createTransitions(map<string, FSM::Transition*>* transitions, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+void ActionSchedulerAdder::createTransitions(map<string, FSM::Transition*>* transitions, BasicBlock* incBB, BasicBlock* returnBB, GlobalVariable* stateVar, Function* function, Function* outsideSchedulerFn, map<FSM::State*, BasicBlock*>* BBTransitions){
 	map<string, FSM::Transition*>::iterator it;
 
 	for (it = transitions->begin(); it != transitions->end(); it++){
-		createTransition(it->second, incBB, returnBB, function);
+		createTransition(it->second, incBB, returnBB, stateVar, function, outsideSchedulerFn, BBTransitions);
 	}
 }
 
-void ActionSchedulerAdder::createTransition(FSM::Transition* transition, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
-	createSchedulingTestState(transition->getNextStateInfo(), transition->getSourceState(), incBB, returnBB, function);
+void ActionSchedulerAdder::createTransition(FSM::Transition* transition, BasicBlock* incBB, BasicBlock* returnBB, GlobalVariable* stateVar, Function* function, Function* outsideSchedulerFn, map<FSM::State*, BasicBlock*>* BBTransitions){
+	createSchedulingTestState(transition->getNextStateInfo(), transition->getSourceState(), incBB, returnBB, stateVar, function, outsideSchedulerFn, BBTransitions);
 }
 
-BasicBlock* ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateInfo*>* nextStates, FSM::State* sourceState, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+BasicBlock* ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateInfo*>* nextStates, 
+															FSM::State* sourceState, BasicBlock* incBB, 
+															BasicBlock* returnBB, GlobalVariable* stateVar, 
+															Function* function, Function* outsideSchedulerFn,
+															map<FSM::State*, BasicBlock*>* BBTransitions){
 	//Get source state basic block
 	std::map<FSM::State*, llvm::BasicBlock*>::iterator itState;
-	itState = BBTransitions.find(sourceState);
+	itState = BBTransitions->find(sourceState);
 	BasicBlock* stateBB = itState->second;
 
 	if (outsideSchedulerFn != NULL){
@@ -369,7 +371,7 @@ BasicBlock* ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateI
 	//Iterate though next states of the transition
 	list<FSM::NextStateInfo*>::iterator it;
 	for (it = nextStates->begin(); it != nextStates->end(); it++){
-		stateBB = createActionTestState(*it, sourceState, stateBB, incBB, returnBB, function);
+		stateBB = createActionTestState(*it, sourceState, stateBB, incBB, returnBB, stateVar, function, BBTransitions);
 	}
 
 	//Store current state in skip basic block and brancg to return basic block
@@ -380,7 +382,7 @@ BasicBlock* ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateI
 	return NULL;
 }
 
-BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, BasicBlock* stateBB, BasicBlock* incBB, BasicBlock* returnBB, Function* function){
+BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, BasicBlock* stateBB, BasicBlock* incBB, BasicBlock* returnBB, GlobalVariable* stateVar, Function* function, map<FSM::State*, BasicBlock*>* BBTransitions){
 
 
 	//Get information about next state
@@ -441,12 +443,12 @@ BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* next
 		fireStateBB = roomBB;
 	}
 
-	createActionCallState(nextStateInfo, fireStateBB);
+	createActionCallState(nextStateInfo, fireStateBB, BBTransitions);
 
 	return skipStateBB;
 }
 
-void ActionSchedulerAdder::createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB){
+void ActionSchedulerAdder::createActionCallState(FSM::NextStateInfo* nextStateInfo, llvm::BasicBlock* BB, map<FSM::State*, BasicBlock*>* BBTransitions){
 	std::map<FSM::State*, llvm::BasicBlock*>::iterator it;
 	
 	//Get next state information
@@ -458,7 +460,7 @@ void ActionSchedulerAdder::createActionCallState(FSM::NextStateInfo* nextStateIn
 	CallInst* callInst = CallInst::Create(body->getFunction(), "",  BB);
 
 	//Create a branch to the next state
-	it = BBTransitions.find(nextState);
+	it = BBTransitions->find(nextState);
 	BranchInst* brInst = BranchInst::Create(it->second, BB);
 
 }
