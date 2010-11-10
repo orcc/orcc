@@ -459,7 +459,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		EObject container = variable.eContainer();
 		if (container instanceof AstInputPattern
 				|| container instanceof AstGenerator
-				|| container instanceof AstStatementForeach) {
+				|| container instanceof AstStatementForeach
+				|| container instanceof AstUnit) {
 			return;
 		}
 
