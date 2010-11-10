@@ -52,6 +52,7 @@ import net.sf.orcc.ir.transformations.DeadGlobalElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.serialize.XDFWriter;
 
 /**
  * This class defines a template-based XLIM back-end.
@@ -103,6 +104,9 @@ public class XlimBackendImpl extends AbstractBackend {
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
 		network.flatten();
+		// print network
+		write("Printing network...\n");
+		new XDFWriter(new File(path), network);
 
 		// check if "XLiM Hardware Generation" is selected
 

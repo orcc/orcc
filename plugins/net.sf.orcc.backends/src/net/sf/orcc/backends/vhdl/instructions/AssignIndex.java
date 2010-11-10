@@ -33,6 +33,7 @@ import java.util.List;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
 import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.util.CommonNodeOperations;
@@ -43,6 +44,7 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
  * 
  * @author Nicolas Siret
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class AssignIndex extends SpecificInstruction implements
@@ -52,6 +54,8 @@ public class AssignIndex extends SpecificInstruction implements
 
 	private LocalVariable target;
 
+	private Type listType;
+
 	/**
 	 * Creates a new AssignIndex from the given indexes and target.
 	 * 
@@ -60,10 +64,12 @@ public class AssignIndex extends SpecificInstruction implements
 	 * @param indexes
 	 *            a list of indexes
 	 */
-	public AssignIndex(LocalVariable target, List<Expression> indexes) {
+	public AssignIndex(LocalVariable target, List<Expression> indexes,
+			Type listType) {
 		super(target.getLocation());
 		setIndexes(indexes);
 		setTarget(target);
+		setListType(listType);
 	}
 
 	/**
@@ -78,6 +84,15 @@ public class AssignIndex extends SpecificInstruction implements
 	@Override
 	public LocalVariable getTarget() {
 		return target;
+	}
+
+	/**
+	 * Returns the type of the list which use this AssignIndex.
+	 * 
+	 * @return the type of the list which use this AssignIndex
+	 */
+	public Type getListType() {
+		return listType;
 	}
 
 	@Override
@@ -104,6 +119,16 @@ public class AssignIndex extends SpecificInstruction implements
 	@Override
 	public void setTarget(LocalVariable target) {
 		CommonNodeOperations.setTarget(this, target);
+	}
+
+	/**
+	 * Sets the type of the list which use this AssignIndex.
+	 * 
+	 * @param listType
+	 *            a type
+	 */
+	public void setListType(Type listType) {
+		this.listType = listType;
 	}
 
 }

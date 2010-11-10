@@ -272,6 +272,39 @@ WriteEnd(writeEnd) ::= <<
 <!-- TODO writeEnd -->
 >>
 
+AssignIndex(assignIndex) ::= <<
+$if(rest(assignIndex.indexes))$
+$sizeDeclare(assignIndex.target,assignIndex.listType)$
+
+<!-- TODO complete -->
+
+flatIndexes(rest(assignIndex.indexes))
+$else$
+<operation kind="noop">
+  <port dir="in" source="$first(assignIndex.indexes)$"/>
+  $port(dir="out", type=assignIndex.target.type, source=assignIndex.target)$
+</operation>
+$endif$
+
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Flatten indexes
+///////////////////////////////////////////////////////////////////////////////
+
+flatIndexes(indexes) ::= <<
+<!-- TODO complete -->
+>>
+
+sizeDeclare(target,type) ::= <<
+$type.dimensions:{dimension|
+<operation kind="\$literal_Integer" value="dimension">
+  <port dir="out" type="int" source="$target$_size_$i0$">
+</operation>}$
+>>
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////

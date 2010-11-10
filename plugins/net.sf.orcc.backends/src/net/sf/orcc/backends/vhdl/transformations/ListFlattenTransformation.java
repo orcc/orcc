@@ -143,7 +143,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 
 		// add a special assign instruction that assigns the index variable the
 		// concatenation of index expressions
-		AssignIndex assignIndex = new AssignIndex(indexVar, listIndex);
+		AssignIndex assignIndex = new AssignIndex(indexVar, listIndex, type);
 		instructionIterator.add(assignIndex);
 
 		// so the load (or store) is not endlessly revisited

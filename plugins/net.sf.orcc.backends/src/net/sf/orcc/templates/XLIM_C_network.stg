@@ -80,7 +80,7 @@ p$id$_$port$ = create$dir$putPort(p$id$, "$port$", $n$);
 >>
 
 initializeParameter(parameter,id) ::= <<
-setParameter(p$id$, "$parameter$", "$parameter.value.value$");
+setParameter(p$id$, "$parameter$", "$parameter.constantValue$");
 >>
 
 /////////////////////////////
@@ -89,4 +89,30 @@ setParameter(p$id$, "$parameter$", "$parameter.value.value$");
 
 connectPorts(source,idSource,target,idTarget) ::= <<
 connectPorts($idSource$_$source$, $idTarget$_$target$);
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Constants
+///////////////////////////////////////////////////////////////////////////////
+
+Constant(constant) ::= <<
+$(constant.class.simpleName)(constant)$
+>>
+
+BoolExpr(constant) ::= <<
+$if (constant.value)$1$else$0$endif$
+>>
+
+IntExpr(number) ::= <<
+$number$$if (number.long)$L$endif$
+>>
+
+// the values of a list: {val1, val2, ..., valn}
+ListExpr(constant) ::= <<
+{$constant.value: Constant(); wrap, separator=", "$}
+>>
+
+StringExpr(constant) ::= <<
+"$constant$"
 >>
