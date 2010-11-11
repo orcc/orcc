@@ -87,7 +87,7 @@ setParameter(p$id$, "$parameter$", "$parameter.constantValue$");
 /////////////////////////////
 
 connectPorts(source,idSource,target,idTarget) ::= <<
-connectPorts($idSource$_$source$, $idTarget$_$target$);
+connectPorts(p$idSource$_$source$, p$idTarget$_$target$);
 >>
 
 
