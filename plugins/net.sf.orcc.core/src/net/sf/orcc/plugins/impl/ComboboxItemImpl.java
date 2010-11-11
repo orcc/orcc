@@ -26,39 +26,40 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.plugins;
+package net.sf.orcc.plugins.impl;
 
 import java.util.List;
 
-public interface ComboBoxOption extends PluginOption {
+import net.sf.orcc.plugins.ComboBoxItem;
+import net.sf.orcc.plugins.PluginOption;
 
-	/**
-	 * Returns all the possible selections ComboBoxItem.
-	 * 
-	 * @return a list of all the possible selections ComboBoxItem
-	 */
-	List<ComboBoxItem> getComboBoxItems();
+public class ComboboxItemImpl extends PluginOptionImpl implements ComboBoxItem {
 
-	/**
-	 * Returns the options that are required with the current choice.
-	 * 
-	 * @return the options that are required with the current choice
-	 */
-	List<PluginOption> getOptions();
+	private String id;
+	private List<PluginOption> options;
 
-	/**
-	 * Set ComboBoxItems possible selection.
-	 * 
-	 * @param item
-	 *            a list of ComboBoxItem possible selection
-	 */
-	void setComboBoxItems(List<ComboBoxItem> comboboxItems);
+	@Override
+	public String getId() {
+		return id;
+	}
 
-	/**
-	 * Sets the options that are required with the current choice.
-	 * 
-	 * @param options
-	 *            the options that are required with the current choice
-	 */
-	void setOptions(List<PluginOption> options);
+	@Override
+	public List<PluginOption> getOptions() {
+		return options;
+	}
+
+	@Override
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@Override
+	public void setOptions(List<PluginOption> options) {
+		this.options = options;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + ", options: " + getOptions();
+	}
 }

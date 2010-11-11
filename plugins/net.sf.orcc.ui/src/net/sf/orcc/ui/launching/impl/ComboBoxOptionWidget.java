@@ -28,10 +28,11 @@
  */
 package net.sf.orcc.ui.launching.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.plugins.ComboBoxItem;
 import net.sf.orcc.plugins.ComboBoxOption;
-import net.sf.orcc.plugins.backends.BackendFactory;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
@@ -54,6 +55,7 @@ import org.eclipse.swt.widgets.Label;
  * generation assistance.
  * 
  * @author plagalay
+ * @author Jerome Gorin
  * 
  */
 public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
@@ -101,7 +103,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 
 		Label lbl = new Label(parent, SWT.NONE);
 		lbl.setFont(font);
-		lbl.setText("Select a backend:");
+		lbl.setText(option.getName());
 		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
 		lbl.setLayoutData(data);
 
@@ -116,15 +118,9 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 		comboBox.setLayoutData(data);
 		comboBox.setToolTipText(option.getDescription());
 
-		// TODO : add comboxOption's selection content definition capability
-		// List<String> selections = option.getSelections();
-		// for (String selection : selections) {
-		// comboBox.add(selection);
-		// }
-		// For the moment : comboBox lists all ORCC backends
-		BackendFactory factory = BackendFactory.getInstance();
-		for (String backend : factory.listPlugins()) {
-			comboBox.add(backend);
+		List<ComboBoxItem> items = option.getComboBoxItems();
+		for (ComboBoxItem item : items) {
+			comboBox.add(item.getId());
 		}
 
 		composite = new Composite(parent, SWT.NONE);
@@ -137,9 +133,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 		data.horizontalIndent = 10;
 		composite.setLayoutData(data);
 
-		widgets = OptionWidgetManager.createOptions(launchConfigurationTab,
-				option.getOptions(), composite);
-
+		widgets = new ArrayList<OptionWidget>();
 		hide();
 	}
 
@@ -161,6 +155,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 			comboBox.deselectAll();
 		} else {
 			comboBox.select(value);
+			widgets = updateOptions(value);
 			OptionWidgetManager.showOptions(widgets);
 		}
 		OptionWidgetManager.initializeFromOptions(widgets, configuration);
@@ -200,6 +195,21 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 		((GridData) composite.getLayoutData()).exclude = !show;
 	}
 
+	/**
+	 * Update child options of the ComboBox selection
+	 * 
+	 * @param index
+	 *            integer value of the selection
+	 * 
+	 * @return a list of corresponding OptionWidget
+	 * 
+	 */
+	private List<OptionWidget> updateOptions(int index) {
+		ComboBoxItem item = option.getComboBoxItems().get(index);
+		return OptionWidgetManager.createOptions(launchConfigurationTab,
+				item.getOptions(), composite);
+	}
+
 	@Override
 	public void widgetDefaultSelected(SelectionEvent e) {
 	}
@@ -209,7 +219,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 		value = comboBox.getSelectionIndex();
 		if (value != -1) {
 			showComposite(true);
-			// String selection = comboBox.getItem(value);
+			widgets = updateOptions(value);
 			OptionWidgetManager.showOptions(widgets);
 		} else {
 			showComposite(false);

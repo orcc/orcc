@@ -30,35 +30,35 @@ package net.sf.orcc.plugins;
 
 import java.util.List;
 
-public interface ComboBoxOption extends PluginOption {
+public interface ComboBoxItem extends PluginOption {
 
 	/**
-	 * Returns all the possible selections ComboBoxItem.
+	 * Returns the id of the item.
 	 * 
-	 * @return a list of all the possible selections ComboBoxItem
+	 * @return the id of the item
 	 */
-	List<ComboBoxItem> getComboBoxItems();
+	String getId();
 
 	/**
-	 * Returns the options that are required with the current choice.
+	 * Returns the options that are enabled when this item is.
 	 * 
-	 * @return the options that are required with the current choice
+	 * @return the options that are enabled when this item is
 	 */
 	List<PluginOption> getOptions();
 
 	/**
-	 * Set ComboBoxItems possible selection.
+	 * Set the id of the item.
 	 * 
-	 * @param item
-	 *            a list of ComboBoxItem possible selection
+	 * @param id
+	 *            String id of the item
 	 */
-	void setComboBoxItems(List<ComboBoxItem> comboboxItems);
+	void setId(String id);
 
 	/**
-	 * Sets the options that are required with the current choice.
+	 * Sets the options that are enabled when this item is.
 	 * 
 	 * @param options
-	 *            the options that are required with the current choice
+	 *            the options that are enabled when this item is
 	 */
 	void setOptions(List<PluginOption> options);
 }

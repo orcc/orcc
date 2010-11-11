@@ -51,6 +51,9 @@
          <option
                id="net.sf.orcc.backends.llvmBitcode">
          </option>
+         <option
+               id="net.sf.orcc.backends.llvmOpt">
+         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.vhdl.VHDLBackendImpl"
@@ -90,6 +93,7 @@
                      id="net.sf.orcc.backends.llvm-as"
                      name="Location of llvm-as">
                   <browseFile
+                        folder="false"
                         workspace="false">
                   </browseFile>
                </option>
@@ -162,6 +166,38 @@
                id="net.sf.orcc.backends.xlimHard"
                name="Hardware XLIM Code Generation">
             <checkBox></checkBox>
+         </option>
+         <option
+               description="Pass every generated though optimization"
+               id="net.sf.orcc.backends.llvmOpt"
+               name="Optimize the VTL">
+            <checkBox>
+               <option
+                     description="Location of  opt from LLVM"
+                     id="net.sf.orcc.backends.opt"
+                     name="Location of opt :">
+                  <browseFile
+                        folder="false"
+                        workspace="false">
+                  </browseFile>
+               </option>
+               <option
+                     description="Set the level of optimization of opt"
+                     id="net.sf.orcc.backends.optLevel"
+                     name="Optimization level :">
+                  <comboBox>
+                     <comboBoxItem
+                           id="O1">
+                     </comboBoxItem>
+                     <comboBoxItem
+                           id="O2">
+                     </comboBoxItem>
+                     <comboBoxItem
+                           id="O3">
+                     </comboBoxItem>
+                  </comboBox>
+               </option>
+            </checkBox>
          </option>
    </extension>
 

@@ -36,6 +36,7 @@ import java.util.TreeMap;
 import net.sf.orcc.plugins.backends.Backend;
 import net.sf.orcc.plugins.impl.BrowseFileOptionImpl;
 import net.sf.orcc.plugins.impl.CheckboxOptionImpl;
+import net.sf.orcc.plugins.impl.ComboboxItemImpl;
 import net.sf.orcc.plugins.impl.ComboboxOptionImpl;
 import net.sf.orcc.plugins.impl.PluginOptionImpl;
 import net.sf.orcc.plugins.simulators.Simulator;
@@ -198,9 +199,28 @@ public class PluginFactory {
 	 */
 	protected ComboBoxOption parseCombobox(IConfigurationElement element) {
 		ComboBoxOption option = new ComboboxOptionImpl();
-		List<PluginOption> options = parseOptions(element.getChildren());
-		option.setOptions(options);
+		List<ComboBoxItem> items = parseItems(element.getChildren());
+		option.setComboBoxItems(items);
 		return option;
+	}
+	
+	protected List<ComboBoxItem> parseItems(IConfigurationElement[] elements){
+		List<ComboBoxItem> items = new ArrayList<ComboBoxItem>();
+		for (IConfigurationElement element : elements) {
+			ComboboxItemImpl comboBoxItem = new ComboboxItemImpl();
+			
+			//Parse id of combo item
+			String id = element.getAttribute("id");
+			comboBoxItem.setId(id);
+			
+			//Parse children options of comboBox
+			List<PluginOption> options = parseOptions(element.getChildren());
+			comboBoxItem.setOptions(options);
+			
+			items.add(comboBoxItem);
+		}
+		
+		return items;
 	}
 	
 	/**

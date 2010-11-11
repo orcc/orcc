@@ -31,22 +31,33 @@ package net.sf.orcc.plugins.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.plugins.ComboBoxItem;
 import net.sf.orcc.plugins.ComboBoxOption;
 import net.sf.orcc.plugins.PluginOption;
 
 public class ComboboxOptionImpl extends PluginOptionImpl implements
 		ComboBoxOption {
 
-	private List<String> selections;
+	private List<ComboBoxItem> comboboxItems;
 	private List<PluginOption> options;
 
 	public ComboboxOptionImpl() {
-		this.selections = new ArrayList<String>();
+		this.comboboxItems = new ArrayList<ComboBoxItem>();
 	}
-	
+
+	@Override
+	public List<ComboBoxItem> getComboBoxItems() {
+		return this.comboboxItems;
+	}
+
 	@Override
 	public List<PluginOption> getOptions() {
 		return options;
+	}
+
+	@Override
+	public void setComboBoxItems(List<ComboBoxItem> comboboxItems) {
+		this.comboboxItems = comboboxItems;
 	}
 
 	@Override
@@ -57,16 +68,6 @@ public class ComboboxOptionImpl extends PluginOptionImpl implements
 	@Override
 	public String toString() {
 		return super.toString() + ", options: " + getOptions();
-	}
-
-	@Override
-	public void addSelection(String selection) {
-		this.selections.add(selection);
-	}
-
-	@Override
-	public List<String> getSelections() {
-		return this.selections;
 	}
 
 }

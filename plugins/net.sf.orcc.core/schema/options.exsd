@@ -121,12 +121,27 @@
 
    <element name="comboBox">
       <complexType>
-        <sequence>
-            <element ref="option" minOccurs="0" maxOccurs="unbounded"/>
-        </sequence>
+         <sequence minOccurs="1" maxOccurs="unbounded">
+            <element ref="comboBoxItem"/>
+         </sequence>
       </complexType>
    </element>
-   
+
+   <element name="comboBoxItem">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="option"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
    <annotation>
       <appInfo>
          <meta.section type="since"/>
