@@ -23,13 +23,6 @@ Write(op) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 Peek(peek) ::= <<
-<operation kind="\$literal_Integer" value="0">
-	<port dir="out" size="1" source="peek_$instance.id$_$procedure$_0" typeName="int"/>
-</operation>
-<operation kind="pinPeek" portName="$peek.port.name$">
-	<port dir="in" source="peek_$instance.id$_$procedure$_0"/>
-	$port(dir="out", type=peek.port.type, source=peek.target)$
-</operation>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -37,10 +30,18 @@ Peek(peek) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 HasTokens(hasTokens) ::= <<
-$Peek(hasTokens)$
+<!-- Input peeks of $action.name$ -->
+<operation kind="\$literal_Integer" value="0">
+	<port dir="out" size="1" source="hasTokens_$instance.id$_$procedure$_0" typeName="int"/>
+</operation>
+<operation kind="pinPeek" portName="$hasTokens.port.name$">
+	<port dir="in" source="hasTokens_$instance.id$_$procedure$_0"/>
+	$port(dir="out", type=hasTokens.port.type, source=hasTokens.target)$
+</operation>
 <operation kind="pinStatus" portName="$hasTokens.port$">
 	<port dir="out" size="1" source="$hasTokens.target$" typeName="bool"/>
 </operation>
+<!-- Guards Expressions of $action.name$ -->
 
 >>
 
@@ -59,7 +60,7 @@ schedulerName(actions) ::=<<
 
 outputPatternPort(port, index, index0, state) ::= <<
 <!--  OutputPattern -->
-<operation kind="pinStatus" portName="$port$" removable="no">
+<operation kind="pinStatus" portName="$port$">
 	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
 </operation>
 <operation kind="\$and">
@@ -69,54 +70,58 @@ outputPatternPort(port, index, index0, state) ::= <<
 </operation>
 >>
 
-///////////////////////////////////////////////////////////////////////////////
-// Override outputPattern
-///////////////////////////////////////////////////////////////////////////////
 
-outputPattern(pattern,action,state) ::= <<
-<operation kind="\$literal_Integer" value="1">
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_0" typeName="bool"/>
-</operation>
-$pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0, state=state)$}; separator="\n"$
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
-// lastOutputPattern
-///////////////////////////////////////////////////////////////////////////////
-
-lastOutputPattern(pattern,action,state) ::=<<
-$outputPatternPortDecision(index=length(pattern.keys),state=state); separator="\n"$
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Override actiontest
-///////////////////////////////////////////////////////////////////////////////
-
-actionTest(action) ::= <<
-$if(action.outputPattern)$
-$outputPattern(pattern=action.outputPattern,action=action)$
-$endif$
-<module kind="if">
-	<module decision="isSchedulable_$action$" kind="test">
-		<operation kind="noop">
-			<port dir="in" source="isSchedulable_$action$_go"/>
-			<port dir="out" size="1" source="isSchedulable_$action$" typeName="bool"/>
-		</operation>
-	</module>
-	<module kind="then">
-		$if(action.outputPattern)$
-		$lastOutputPattern(pattern=action.outputPattern,action=action)$
-			<module kind="then">
-				$actionCall(action)$
-			</module>
+scheduler(actions) ::= <<
+$schedulerName(actions)$
+	<operation kind="\$literal_Integer" value="1">
+		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
+	</operation>
+	<module kind="loop">
+		<module decision="var_$instance.id$_loop" kind="test">
+			<operation kind="noop">
+				<port dir="in" source="var_$instance.id$_sched"/>
+				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
+			</operation>
 		</module>
-		$else$
-		$actionCall(action)$
-		$endif$
+		<module kind="body">
+			$instance.actor.actions: isSchedulableTest(); separator="\n"$
+			$outputPinStatus()$
+			$instance.actor.actions: {action|$outputPatternFireability(action=action)$}; separator="\n"$
+			$if(actions)$$schedulingTest(actions)$$endif$
+			<!--Close modules -->
+			$if(actions)$  	 	 
+			$actions:{</module></module>}; separator="\n"$
+			$endif$
+		</module>
 	</module>
-	<module kind="else">
+</module>
 >>
 
+inputPeeks(actions) ::=<<
+>>
+
+outputPinStatusPort(port) ::=<<
+<operation kind="pinStatus" portName="$port$">
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$port$_status" typeName="bool"/>
+</operation>
+>>
+
+
+outputPinStatus() ::=<<
+<!-- outputPattern Status -->
+$instance.actor.outputs.list: {port|$outputPinStatusPort(port=port)$}; separator="\n"$
+>>
+
+outputPatternFireabilityPort(port) ::=<<
+<operation kind="\$and">
+	<port dir="in" source="outputPattern_$instance.id$_$port$_status"/>
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_$port$_fireable" typeName="bool"/>
+</operation>
+>>
+
+outputPatternFireability(action) ::=<<
+$if(action.outputPattern)$
+$action.pattern.keys: {port | $outputPatternFireabilityPort(port=port)$}; separator="\n"$
+$endif$
+>>
 
