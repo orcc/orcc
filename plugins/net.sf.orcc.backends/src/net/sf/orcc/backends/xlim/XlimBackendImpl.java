@@ -36,6 +36,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
+import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
@@ -87,7 +88,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(),
 				new FirstPhiValuesOfWhileNodeTransformation(),
-				new MoveLiteralIntegers(), new VariableRenamer(),
+				new MoveLiteralIntegers(), new ListFlattenTransformation(true),
+				new VariableRenamer(),
 				new ChangeActionSchedulerFormTransformation() };
 
 		for (ActorTransformation transformation : transformations) {
@@ -146,10 +148,10 @@ public class XlimBackendImpl extends AbstractBackend {
 		try {
 			String outputName = path + File.separator + network.getName();
 			if (hardwareGen) {
-				outputName += ".vhd"; 
+				outputName += ".vhd";
 				printer.loadGroups("XLIM_VHDL_network");
 			} else {
-				outputName += ".c"; 
+				outputName += ".c";
 				printer.loadGroups("XLIM_C_network");
 			}
 			printer.printNetwork(outputName, network, false, fifoSize);

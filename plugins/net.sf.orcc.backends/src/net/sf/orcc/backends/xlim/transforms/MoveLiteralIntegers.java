@@ -141,25 +141,9 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Store store) {
-		ListIterator<Expression> it = store.getIndexes().listIterator();
-		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(exprInterpreter,
-					instructionIterator));
-		}
 		store.setValue((Expression) store.getValue().accept(exprInterpreter,
 				instructionIterator));
-		Use.addUses(store, store.getIndexes());
 		Use.addUses(store, store.getValue());
-	}
-
-	@Override
-	public void visit(Load load) {
-		ListIterator<Expression> it = load.getIndexes().listIterator();
-		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(exprInterpreter,
-					instructionIterator));
-		}
-		Use.addUses(load, load.getIndexes());
 	}
 
 	@Override

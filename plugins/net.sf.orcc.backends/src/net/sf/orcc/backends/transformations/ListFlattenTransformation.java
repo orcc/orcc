@@ -26,14 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.transformations;
+package net.sf.orcc.backends.transformations;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.backends.vhdl.instructions.AssignIndex;
+import net.sf.orcc.backends.instructions.AssignIndex;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -61,6 +61,12 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * 
  */
 public class ListFlattenTransformation extends AbstractActorTransformation {
+
+	private boolean applyToLocalLists;
+
+	public ListFlattenTransformation(boolean applyToLocalLists) {
+		this.applyToLocalLists = applyToLocalLists;
+	}
 
 	/**
 	 * Flattens a multi-dimensional list expression to a list with a single
@@ -168,8 +174,9 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 	public void visit(Load load) {
 		List<Expression> indexes = load.getIndexes();
 
-		// a VHDL memory is always global
-		if (!indexes.isEmpty() && load.getSource().getVariable().isGlobal()) {
+		if (!indexes.isEmpty()
+				&& (applyToLocalLists || load.getSource().getVariable()
+						.isGlobal())) {
 			Type type = load.getSource().getVariable().getType();
 			printAssignment(indexes, type);
 		}
@@ -179,8 +186,8 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 	public void visit(Store store) {
 		List<Expression> indexes = store.getIndexes();
 
-		// a VHDL memory is always global
-		if (!indexes.isEmpty() && store.getTarget().isGlobal()) {
+		if (!indexes.isEmpty()
+				&& (applyToLocalLists || store.getTarget().isGlobal())) {
 			Type type = store.getTarget().getType();
 			printAssignment(indexes, type);
 		}

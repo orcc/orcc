@@ -26,9 +26,11 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.backends.vhdl.instructions;
+package net.sf.orcc.backends.instructions;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalTargetContainer;
@@ -55,6 +57,8 @@ public class AssignIndex extends SpecificInstruction implements
 	private LocalVariable target;
 
 	private Type listType;
+	
+	private Map<Expression,Integer> expressionToIndexMap;
 
 	/**
 	 * Creates a new AssignIndex from the given indexes and target.
@@ -67,9 +71,17 @@ public class AssignIndex extends SpecificInstruction implements
 	public AssignIndex(LocalVariable target, List<Expression> indexes,
 			Type listType) {
 		super(target.getLocation());
+		expressionToIndexMap = new HashMap<Expression, Integer>();
 		setIndexes(indexes);
 		setTarget(target);
 		setListType(listType);
+	}
+	
+	private void refreshMap(){
+		expressionToIndexMap.clear();
+		for(int i=0; i<indexes.size(); i++){
+			expressionToIndexMap.put(indexes.get(i), i);
+		}
 	}
 
 	/**
@@ -94,6 +106,15 @@ public class AssignIndex extends SpecificInstruction implements
 	public Type getListType() {
 		return listType;
 	}
+	
+	/**
+	 * Returns the map of index expression to index number.
+	 * 
+	 * @return the map of index expression to index number
+	 */
+	public Map<Expression, Integer> getExpressionToIndexMap() {
+		return expressionToIndexMap;
+	}
 
 	@Override
 	public void internalSetTarget(LocalVariable target) {
@@ -114,6 +135,7 @@ public class AssignIndex extends SpecificInstruction implements
 		}
 		this.indexes = indexes;
 		Use.addUses(this, indexes);
+		refreshMap();
 	}
 
 	@Override
@@ -130,5 +152,4 @@ public class AssignIndex extends SpecificInstruction implements
 	public void setListType(Type listType) {
 		this.listType = listType;
 	}
-
 }

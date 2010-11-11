@@ -43,10 +43,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
+import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
-import net.sf.orcc.backends.vhdl.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transformations.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transformations.VariableRedimension;
@@ -114,7 +114,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 				new TransformConditionals(),
 
-				new ListFlattenTransformation(),
+				new ListFlattenTransformation(false),
 
 				new VariableRenamer(),
 

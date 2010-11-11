@@ -274,32 +274,55 @@ WriteEnd(writeEnd) ::= <<
 
 AssignIndex(assignIndex) ::= <<
 $if(rest(assignIndex.indexes))$
-$sizeDeclare(assignIndex.target,assignIndex.listType)$
-
-<!-- TODO complete -->
-
-flatIndexes(rest(assignIndex.indexes))
+$sizeDeclare(target=assignIndex.target, type=assignIndex.listType)$
+<operation kind="\$mul">
+  <port dir="in" source="$first(assignIndex.indexes)$"/>
+  <port dir="in" source="$assignIndex.target$_size_0"/>
+  <port dir="out" size="32" source="$assignIndex.target$_tmp_0" typeName="int"/>
+</operation>
+$flatIndexes(indexes=rest(assignIndex.indexes), target=assignIndex.target, lastIndex="0", indexMap=assignIndex.expressionToIndexMap)$
 $else$
 <operation kind="noop">
   <port dir="in" source="$first(assignIndex.indexes)$"/>
   $port(dir="out", type=assignIndex.target.type, source=assignIndex.target)$
 </operation>
 $endif$
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Flatten indexes
 ///////////////////////////////////////////////////////////////////////////////
 
-flatIndexes(indexes) ::= <<
-<!-- TODO complete -->
+flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
+$if(rest(indexes))$
+<operation kind="\$add">
+  <port dir="in" source="$target$_tmp_$lastIndex$"/>
+  <port dir="in" source="$first(indexes)$"/>
+  <port dir="out" size="32" source="$assignIndex.target$_tmpAdd_$indexMap.(first(indexes))$" typeName="int"/>
+</operation>
+<operation kind="\$mul">
+  <port dir="in" source="$assignIndex.target$_tmpAdd_$indexMap.(first(indexes))$"/>
+  <port dir="in" source="$assignIndex.target$_size_$indexMap.(first(indexes))$"/>
+  <port dir="out" size="32" source="$assignIndex.target$_tmp_$indexMap.(first(indexes))$" typeName="int"/>
+</operation>
+$flatIndexes(indexes=rest(indexes), target=target, lastIndex=indexMap.(first(indexes)), indexMap=indexMap)$
+$else$
+<operation kind="\$add">
+  <port dir="in" source="$target$_tmp_$lastIndex$"/>
+  <port dir="in" source="$first(indexes)$"/>
+  <port dir="out" size="32" source="$assignIndex.target$_tmp_$indexMap.(first(indexes))$" typeName="int"/>
+</operation>
+<operation kind="noop">
+  <port dir="in" source="$assignIndex.target$_tmp_$indexMap.(first(indexes))$"/>
+  $port(dir="out", type=assignIndex.target.type, source=assignIndex.target)$
+</operation>
+$endif$
 >>
 
 sizeDeclare(target,type) ::= <<
 $type.dimensions:{dimension|
-<operation kind="\$literal_Integer" value="dimension">
-  <port dir="out" type="int" source="$target$_size_$i0$">
+<operation kind="\$literal_Integer" value="$dimension$">
+  <port dir="out" size="32" source="$target$_size_$i0$" typeName="int"/>
 </operation>}$
 >>
 
