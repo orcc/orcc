@@ -70,8 +70,7 @@ $dir$putPort *p$id$_$port$;
 initializeActorInstance(actorInstance,index) ::= <<
 p$actorInstance.id$ = createActorInstance(&ActorClass_$actorInstance.id$);
 $actorInstance.actor.inputs.list : {port | $initializePort(dir="In",port=port,id=actorInstance.id,n="0")$}; separator="\n"$
-$actorInstance.actor.outputs.list : {port | $initializePort(dir="Out",port=port,id=actorInstance.id,n="1")$}; separator="\n"$
-$actorInstance.actor.parameters.list : {parameter | $initializeParameter(parameter=parameter,id=actorInstance.id)$}; separator="\n"$
+$actorInstance.actor.outputs.list : {port | $initializePort(dir="Out",port=port,id=actorInstance.id,n=fifoSize)$}; separator="\n"$
 actorInstances[$index$] = p$actorInstance.id$;
 >>
 
