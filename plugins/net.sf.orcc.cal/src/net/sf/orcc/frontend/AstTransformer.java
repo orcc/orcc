@@ -1270,7 +1270,12 @@ public class AstTransformer {
 
 		transformParameters(astFunction.getParameters());
 		transformLocalVariables(astFunction.getVariables());
+
+		Variable target = exprTransformer.target;
+		List<Expression> indexes = exprTransformer.indexes;
+		exprTransformer.clearTarget();
 		Expression value = transformExpression(astFunction.getExpression());
+		exprTransformer.setTarget(target, indexes);
 
 		restoreContext(oldContext);
 		addReturn(procedure, value);
