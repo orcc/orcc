@@ -43,6 +43,7 @@
 #include "llvm/DerivedTypes.h"
 
 #include "Jade/Core/Entry/ExprEntry.h"
+#include "Jade/Core/Entry/TypeEntry.h"
 #include "Jade/Core/Expr/IntExpr.h"
 #include "Jade/Type/BoolType.h"
 #include "Jade/Type/IntType.h"
@@ -62,77 +63,71 @@ TypeParser::~TypeParser (){
 
 }
 
-Type* TypeParser::parseType(xmlNode* element){	
-	xmlNode* node = NULL;
+Type* TypeParser::parseType(TiXmlNode* node){	
+	
+	while(node != NULL){
+		if (TiXmlString(node->Value()) == XDFNetwork::TYPE) {
+			TiXmlElement* eltType = (TiXmlElement*)node;
+			TiXmlString name(eltType->Attribute( XDFNetwork::NAME));
 
-	for (node = element; node; node = node->next) {
-		const xmlChar* name =  node->name;
-
-		if (xmlStrcmp(name, (const xmlChar *)"Type")==0) {
-			xmlAttr *node_attribute = node->properties;
-			const xmlChar* name =  node_attribute->children->content;
-
-			if (xmlStrcmp(name, (const xmlChar *)"bool")==0) {
+			if (name == XDFNetwork::TYPE_BOOL) {
 				return (Type*)Type::getInt1Ty(Context);
-			}else if (xmlStrcmp(name, (const xmlChar *)"int")==0) {
-				map<string, Entry*> *entries = parseTypeEntries(node->children);
+			}else if (name == XDFNetwork::TYPE_INT) {
+				map<string, Entry*> *entries = parseTypeEntries(node->FirstChild());
 
 				delete entries;
 
 				return parseTypeSize(entries);
 
 				
-			}else if (xmlStrcmp(name, (const xmlChar *)"List")==0) {
+			}else if (name == XDFNetwork::TYPE_LIST) {
 				cerr << "List elements are not supPorted yet";
 				exit(0);
-			}else if (xmlStrcmp(name, (const xmlChar *)"String")==0) {
+			}else if (name == XDFNetwork::TYPE_STRING) {
 				cerr << "String elements are not supPorted yet";
 				exit(0);
-			}else if (xmlStrcmp(name, (const xmlChar *)"uint")==0) {
-				map<string, Entry*> *entries = parseTypeEntries(node->children);
+			}else if (name == XDFNetwork::TYPE_UINT) {
+				map<string, Entry*> *entries = parseTypeEntries(node->FirstChild());
 				delete entries;
 				return parseTypeSize(entries);
 			}else {
-				cerr << "Unknown Type name: " << name;
+				cerr << "Unknown Type name: " << name.c_str();
 				exit(0);
 			}
-		}	
+		}
+		
+		node = node->NextSibling();
 	}
 	return NULL;
 }
 
-map<string, Entry*>* TypeParser::parseTypeEntries(xmlNode* element){
-	xmlNode* node = NULL;
-
+map<string, Entry*>* TypeParser::parseTypeEntries(TiXmlNode* node){
 	map<string, Entry*> *entries = new map<string, Entry*>;
 	
-	for (node = element; node; node = node->next) {
-		const xmlChar* nodeName =  node->name;
+	while(node != NULL){
+		if (TiXmlString(node->Value()) == XDFNetwork::ENTRY) {
+			Entry* entry = NULL;
+			TiXmlElement* element = (TiXmlElement*)node;
 
-		if (xmlStrcmp(nodeName, (const xmlChar *)"Entry")==0) {
-			Entry* entry;
+			TiXmlString name(element->Attribute(XDFNetwork::NAME));
+			TiXmlString kind(element->Attribute(XDFNetwork::KIND));
 
-			xmlAttr *node_attribute = node->properties;
-			const xmlChar* kind =  node_attribute->children->content;
-
-			node_attribute = node_attribute->next;
-			const xmlChar* name =  node_attribute->children->content;
-
-			if (xmlStrcmp(kind, (const xmlChar *)"Expr")==0) {
-				Constant* expression = exprParser->parseExpr(node->children);
+			if (kind == XDFNetwork::EXPR) {
+				Expr* expression = exprParser->parseExpr(node->FirstChild());
 				entry = new ExprEntry(expression);
-			}else if (xmlStrcmp(kind, (const xmlChar *)"Type")==0) {
-				fprintf(stderr,"Type elements are not supPorted yet");
-				exit(0);
+			}else if (kind == XDFNetwork::TYPE) {
+				Type* type = parseType(node->FirstChild());
+				entry = new TypeEntry(type);
 			}else {
 				fprintf(stderr, "UnsupPorted entry Type: \"%s\"", kind);
 				exit(0);
 			}
 			
-			entries->insert(pair<string, Entry*>(string((char*)name),entry));
+			entries->insert(pair<string, Entry*>(string(name.c_str()),entry));
 		}
-
+		node = node->NextSibling();
 	}
+	
 	return entries;
 }
 

@@ -90,6 +90,7 @@ add_subdirectory(lib/IRJit)
 add_subdirectory(lib/IRSerialize)
 add_subdirectory(lib/IRTransform)
 add_subdirectory(lib/Scheduler)
+add_subdirectory(lib/TinyXml)
 add_subdirectory(lib/XDFParser)
 
 # Include directories
@@ -105,4 +106,4 @@ add_executable(Jade Jade.cpp)
 ENDIF(APPLE)
 
 # Library requiered
-target_link_libraries(Jade DecoderEngine XDFParser IRSerialize Scheduler IRJit IRTransform  IRActor Fifo IRCore HDAGGraph ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(Jade DecoderEngine XDFParser IRSerialize Scheduler IRJit IRTransform  IRActor Fifo IRCore HDAGGraph TinyXml ${SDL_LIBRARY} ${LIBXML2_LIBRARIES} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})

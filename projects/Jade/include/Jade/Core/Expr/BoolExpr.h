@@ -28,73 +28,71 @@
  */
 
 /**
-@brief Implementation of class Connection
+@brief Description of the BoolExpr class interface
 @author Jerome Gorin
-@file Connection.cpp
+@file IntExpr.h
 @version 0.1
-@date 2010/04/12
+@date 22/03/2010
 */
 
 //------------------------------
-#include <iostream>
+#ifndef BOOLEXPR_H
+#define BOOLEXPR_H
 
-#include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 
-#include "Jade/Core/Connection.h"
-#include "Jade/Core/Expression.h"
-#include "Jade/Core/Type.h"
-#include "Jade/Core/Attribute.h"
-#include "Jade/Attribute/ValueAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
+#include "IntExpr.h"
 //------------------------------
 
-using namespace std;
-using namespace llvm;
+/**
+ * @class IntExpr
+ *
+ * @brief  This class defines a boolean expression.
+ *
+ * This class represents an boolean Expression in a network.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
 
+class BoolExpr : public Expr {
+public:
+	/*!
+     *  @brief Constructor
+     *
+	 * Creates a new boolean expression.
+	 *
+	 *  @param value : boolean value of the BoolExpr.
+     *
+     */
+	BoolExpr(bool value){this->value = value;};
+	~BoolExpr();
 
-Connection::Connection(Port* source, Port* target, std::map<std::string, Attribute*>* attributes): HDAGEdge()
-{	this->attributes = attributes; 
-	this->source = source;	
-	this->target = target;
-	this->fifo = NULL;
-}
+	/*!
+     *  @brief Return ir::Type of the integer expression
+     *
+	 *  @return ir::Type of the integer expression.
+     *
+     */
+	ir::Type* getType(){return new IntType(new IntExpr(32));};
 
+	/*!
+     *  @brief Getter of expression value
+     *
+	 *  @return value of the expression.
+     *
+     */
+	int getValue(){return value;};
 
-int Connection::evaluateAsInteger(Expr* expr){
-	/*if(isa<ConstantInt>(expr)){
-		ConstantInt* value = cast<ConstantInt>(expr);
-		return (int)value->getValue().getLimitedValue();
+	/**
+	 * @brief Returns true if the expression is an instance of IntExpr
+	 * 
+	 * @return True if the expression is an instance of IntExpr
+	 */
+	bool isIntExpr(){return true;};
 
-	} else if (isa<ConstantExpr>(expr)){
-		ConstantExpr* value = cast<ConstantExpr>(expr);
-	}
-	return 32;*/
-	cout << "to be rewritten";
-	exit(1);
-}
+private:
+	bool value;
+};
 
-int Connection::getFifoSize(){
-	std::map<std::string, Attribute*>::iterator it;	
-	it = attributes->find("bufferSize");
-		
-	if(it != attributes->end()){
-		Attribute* attr = (*it).second;
-			
-		if (!attr->isValue()){
-			cerr<< "Error when parsing type of a connection";
-			exit(0);
-		}
-			
-		Expr* expr = ((ValueAttribute*)attr)->getValue();
-
-		return evaluateAsInteger(expr);
-	}		
-	
-	return SIZE;
-}
-
-int Connection::getType(){
-	return type->getBitWidth()/8;
-}
+#endif

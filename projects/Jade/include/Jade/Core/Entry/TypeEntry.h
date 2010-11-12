@@ -39,8 +39,8 @@
 #ifndef TYPEENTRY_H
 #define TYPEENTRY_H
 
-#include "ir/Entry.h"
-#include "ir/Type.h"
+#include "llvm/DerivedTypes.h"
+#include "Jade/Core/Entry.h"
 //------------------------------
 
 /**
@@ -59,7 +59,7 @@ public:
 	 * Creates a type entry.
 	 *
      */
-	TypeEntry(ir::Type* type){this->type = type;};
+	TypeEntry(llvm::Type* type){this->type = type;};
 	~TypeEntry();
 
 	/**
@@ -70,7 +70,7 @@ public:
 	bool isTypeEntry(){return true;};
 
 private:
-	ir::Type* type;
+	llvm::Type* type;
 
 };
 

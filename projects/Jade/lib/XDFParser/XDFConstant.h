@@ -28,73 +28,72 @@
  */
 
 /**
-@brief Implementation of class Connection
+@brief Interface of IRConstant
 @author Jerome Gorin
-@file Connection.cpp
+@file IRConstant.h
 @version 0.1
 @date 2010/04/12
 */
 
 //------------------------------
-#include <iostream>
+#ifndef XDFCONSTANT_H
+#define XDFCONSTANT_H
 
-#include "llvm/Constants.h"
-#include "llvm/DerivedTypes.h"
-
-#include "Jade/Core/Connection.h"
-#include "Jade/Core/Expression.h"
-#include "Jade/Core/Type.h"
-#include "Jade/Core/Attribute.h"
-#include "Jade/Attribute/ValueAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
 //------------------------------
 
-using namespace std;
-using namespace llvm;
+/**
+*
+* @class XDFConstant
+* @brief Constants XDF network fields.
+*
+* @author Jerome Gorin
+*
+*/
+class XDFNetwork {
+public:
 
+	static const char* XDF_ROOT;
+	static const char* NAME;
+	static const char* ATTRIBUTE;
+	static const char* CONNECTION;
+	static const char* CONNECTION_SRC;
+	static const char* CONNECTION_SRC_PORT;
+	static const char* CONNECTION_DST;
+	static const char* CONNECTION_DST_PORT;
+	static const char* DECL;
+	static const char* ENTRY;
+	static const char* EXPR;
+	static const char* EXPR_OP;
+	static const char* INSTANCE;
+	static const char* INSTANCE_CLASS;
+	static const char* INSTANCE_ID;
+	static const char* INSTANCE_PARAMETER;
+	static const char* KIND;
+	static const char* KIND_BINOPSEQ;
+	static const char* KIND_CUSTOM;
+	static const char* KIND_FLAG;
+	static const char* KIND_LITERAL;
+	static const char* KIND_LIST;
+	static const char* KIND_STRING;
+	static const char* KIND_TYPE;
+	static const char* KIND_UNARYOP;
+	static const char* KIND_VALUE;
+	static const char* KIND_VAR;
+	static const char* LITERAL_BOOL;
+	static const char* LITERAL_CHAR;
+	static const char* LITERAL_INT;
+	static const char* LITERAL_KIND;
+	static const char* LITERAL_REAL;
+	static const char* LITERAL_STRING;
+	static const char* LITERAL_VALUE;
+	static const char* PACKAGE;
+	static const char* PORT;
+	static const char* TYPE;
+	static const char* TYPE_BOOL;
+	static const char* TYPE_INT;
+	static const char* TYPE_LIST;
+	static const char* TYPE_STRING;
+	static const char* TYPE_UINT;
+};
 
-Connection::Connection(Port* source, Port* target, std::map<std::string, Attribute*>* attributes): HDAGEdge()
-{	this->attributes = attributes; 
-	this->source = source;	
-	this->target = target;
-	this->fifo = NULL;
-}
-
-
-int Connection::evaluateAsInteger(Expr* expr){
-	/*if(isa<ConstantInt>(expr)){
-		ConstantInt* value = cast<ConstantInt>(expr);
-		return (int)value->getValue().getLimitedValue();
-
-	} else if (isa<ConstantExpr>(expr)){
-		ConstantExpr* value = cast<ConstantExpr>(expr);
-	}
-	return 32;*/
-	cout << "to be rewritten";
-	exit(1);
-}
-
-int Connection::getFifoSize(){
-	std::map<std::string, Attribute*>::iterator it;	
-	it = attributes->find("bufferSize");
-		
-	if(it != attributes->end()){
-		Attribute* attr = (*it).second;
-			
-		if (!attr->isValue()){
-			cerr<< "Error when parsing type of a connection";
-			exit(0);
-		}
-			
-		Expr* expr = ((ValueAttribute*)attr)->getValue();
-
-		return evaluateAsInteger(expr);
-	}		
-	
-	return SIZE;
-}
-
-int Connection::getType(){
-	return type->getBitWidth()/8;
-}
+#endif

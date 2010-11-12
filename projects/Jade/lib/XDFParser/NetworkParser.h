@@ -43,10 +43,11 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
+#include "TypeParser.h"
+
 #include "Jade/Core/Network.h"
 #include "Jade/Core/Entry.h"
-
-#include "TypeParser.h"
+#include "Jade/TinyXML/TinyXml.h"
 
 namespace llvm{
 	class ConstantInt;
@@ -103,8 +104,8 @@ public:
 
 private:
 
-	/* libXml document container */
-	xmlDoc *xdfDoc;
+	/* TinyXml document container */
+	TiXmlDocument* xdfDoc;
 	
 	/* Xml type parser */
 	TypeParser* typeParser;
@@ -132,31 +133,30 @@ private:
 	 *  among the supPorted elements. SupPorted elements are: Connection, Decl
 	 * (kind=Param or kind=Var), Instance, Package, Port.
 	 *
-     *  @param root : xmlNode representation of root element 
+     *  @param root : TiXmlElement representation of root element 
      */
-	void parseBody(xmlNode* root);
+	void parseBody(TiXmlElement* root);
 
 
 	/*!
-     *  @brief Parses the given xmlNode as an instance of the network.
+     *  @brief Parses an "Instance" element and returns an {@link Instance}.
      *
-     *  Parses the body of the XDF document. The body can contain any element
-	 *  among the supPorted elements. SupPorted elements are: Connection, Decl
-	 * (kind=Param or kind=Var), Instance, Package, Port.
 	 *
-     *  @param root : xmlNode representation of root element 
+     *  @param instance : TiXmlElement representation of root element .
+	 *
+	 *  @return an Instance
      */
-	Instance* parseInstance(xmlNode* instance);
+	Instance* parseInstance(TiXmlElement* instance);
 	
 	/*!
-     *  @brief Parses the given xmlNode element as a Connection element.
+     *  @brief Parses the given TiXmlElement as a Connection element.
      *
-	 * Parses the given xmlNode element as a Connection, and adds a matching
+	 * Parses the given TiXmlElement as a Connection, and adds a matching
 	 * Connection to the graph of the network being parsed.
 	 *
-     *  @param root : xmlNode representation of Connection element 
+     *  @param root : TiXmlElement representation of Connection element 
      */
-	void parseConnection(xmlNode* connection);
+	void parseConnection(TiXmlElement* connection);
 
 	/*!
      *  @brief Parses Attributes elements.
@@ -164,11 +164,11 @@ private:
 	 * Returns a map of attribute names -> values by parsing the "Attribute"
 	 * nodes.
 	 *
-     *  @param element : xmlNode representation of attributes element 
+     *  @param element : TiXmlNode representation of attributes element 
 	 *
 	 *  @return  a map of attributes with their names  
      */
-	std::map<std::string, Attribute*> *parseAttributes(xmlNode* element);
+	std::map<std::string, Attribute*> *parseAttributes(TiXmlNode* node);
 
 	/*!
      *  @brief Parses the current node as a actor parameters.
@@ -181,7 +181,7 @@ private:
 	 *  @return  a map of attributes with their value  
      */
 
-	std::map<std::string, llvm::Constant*>* parseParameters(xmlNode* node);
+	std::map<std::string, Expr*>* parseParameters(TiXmlNode* node);
 
 
 	/*!

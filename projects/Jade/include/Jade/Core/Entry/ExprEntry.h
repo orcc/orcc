@@ -64,7 +64,7 @@ public:
 	 * Creates an expression entry.
 	 *
      */
-	ExprEntry(llvm::Constant* expr){this->expr = expr;};
+	ExprEntry(Expr* expr){this->expr = expr;};
 	~ExprEntry();
 
 	/**
@@ -79,10 +79,10 @@ public:
 	 * 
 	 * @return Expr of the Entry
 	 */
-	llvm::Constant* getExprEntry(){return expr;};
+	Expr* getExprEntry(){return expr;};
 
 private:
-	llvm::Constant* expr;
+	Expr* expr;
 
 };
 

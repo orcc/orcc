@@ -39,6 +39,7 @@
 
 #include "Jade/Core/Network.h"
 #include "Jade/Core/Entry.h"
+#include "Jade/TinyXML/TinyXml.h"
 
 #include "ExprParser.h"
 
@@ -73,23 +74,35 @@ public:
 	~TypeParser ();
 
 	/*!
-     *  @brief Parses the given xmlNode as a Type element.
+     *  @brief Parses the given TiXmlNode as a Type.
      *
-	 *	Parses the given xmlNode element as a Type, and returns
+	 *	Parses the given TiXmlNode element as a Type, and returns
 	 * the corresponding Type.
 	 *
-     *  @param root : xmlNode representation of Type element
+     *  @param root : TiXmlNode representation of Type element
 	 *
 	 *  @return  a Type structure corresponding to a Type. 	 
      */
-	llvm::Type* parseType(xmlNode* element);
+	llvm::Type* parseType(TiXmlNode* node);
 
 private:
-	ExprParser* exprParser;
-	std::map<std::string, Entry*>* parseTypeEntries(xmlNode* element);
+	/**
+	 * @brief Parse the given TiXmlNode as a type entries
+	 *
+	 * Parses the TiXmlNode and its siblings as type entries, and returns a map
+	 * of entry names to contents.
+	 * 
+	 * @param node : the first TiXmlNode susceptible to be an entry, or null.
+	 * @return A map of entry names to contents.
+	 */
+	std::map<std::string, Entry*>* parseTypeEntries(TiXmlNode* node);
 	llvm::IntegerType* parseTypeSize(std::map<std::string, Entry*>* entries);
 
+	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Expression parser */
+	ExprParser* exprParser;
 
 };
 

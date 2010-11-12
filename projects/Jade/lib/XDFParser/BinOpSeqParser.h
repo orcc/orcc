@@ -28,62 +28,77 @@
  */
 
 /**
-@brief Description of the ValueAttribute
+@brief Description of the BinOpSeqParser class interface
 @author Jerome Gorin
-@file ValueAttribute.h
+@file IRParser.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef VALUEATTRIBUTE_H
-#define VALUEATTRIBUTE_H
+#ifndef BINOPSEQPARSER_H
+#define BINOPSEQPARSER_H
 
-namespace llvm{
-	class Constant;
-}
+#include <list>
 
-#include "Jade/Core/Attribute.h"
 #include "Jade/Core/Expression.h"
+#include "Jade/Core/Expr/BinaryOp.h"
 //------------------------------
 
+
 /**
- * @class Attribute
+ * @brief This class defines a parser of binary operation sequences.
  *
- * @brief  This class defines a ValueAttribute
- *
- * This interface represents an attribute with Expression value.
+ * This class defines a parser of binary operation sequences. This parser
+ * translates expressions such as "e(1) op(1) e(2) ... op(n-1) e(n)" to a binary
+ * expression tree with respect to operator precedence.
  * 
- * @author Jerome Gorin
+ * @author Jérôme Gorin
  * 
  */
-class ValueAttribute : public Attribute{
+class BinOpSeqParser {
 public:
-
-	/*!
-     *  @brief Constructor
-     *
-	 * Creates a new type Attribute
-     */
-	ValueAttribute(Expr* value){this->value = value;};
-	~ValueAttribute();
-
 	/**
-	 * @brief Getter of value.
+	 * @brief Parses a sequence of expressions and binary operators to a binary
+	 * expression tree.
 	 * 
-	 * @return Value of the attribute
+	 * @param exprs : a list of expressions
+	 * @param ops : a list of binary operators
+	 *
+	 * @return a binary expression tree
 	 */
-	Expr* getValue(){return value;};
-
-	/**
-	 * @brief Returns true if this type is a value attribute.
-	 * 
-	 * @return true if this type is a value attribute
-	 */
-	bool isValue(){return true;};
+	static Expr* parse(std::list<Expr*>* exprs, std::list<BinaryOp*>* ops);
 
 private:
-	Expr* value;
+	/**
+	 * @brief Returns the index of the pivot.
+	 *
+	 * Returns the index of the pivot, which is the operator that has the
+	 * highest precedence between start index and stop index. The pivot is
+	 * therefore the operator that binds the least with its operands.
+	 * 
+	 * @param ops : a list of operators
+	 * @param startIndex : start index
+	 * @param stopIndex : stop index
+	 * @return the index of the pivot operator
+	 */
+	static int findPivot(std::list<BinaryOp*>* ops, int startIndex, int stopIndex);
+
+	/**
+	 * @brief Creates the precedence tree
+	 *
+	 * Creates the precedence tree from the given list of expressions,
+	 * operators, and the start and stop indexes.
+	 * 
+	 * @param exprs : a list of expressions
+	 * @param ops : a list of binary operators
+	 * @param startIndex : start index
+	 * @param stopIndex : stop index
+	 * @return an expression
+	 */
+	static Expr* createPrecedenceTree(std::list<Expr*>* exprs, std::list<BinaryOp*>* ops,
+			int startIndex, int stopIndex);
+
 };
 
 #endif

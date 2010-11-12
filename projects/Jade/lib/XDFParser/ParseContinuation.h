@@ -27,74 +27,77 @@
  * SUCH DAMAGE.
  */
 
+//------------------------------
+#ifndef PARSECONTINUATION_H
+#define PARSECONTINUATION_H
+
+#include "Jade/TinyXML/TinyXml.h"
+//------------------------------
+
 /**
-@brief Implementation of class Connection
+@brief Implementation of ExprParser
 @author Jerome Gorin
-@file Connection.cpp
+@file ParseContinuation.h
 @version 0.1
 @date 2010/04/12
 */
 
-//------------------------------
-#include <iostream>
+/*! 
+*	@class ParseContinuation
+*	@brief  This class defines a parse continuation, by storing the next node that shall
+* be parsed along with the result already computed.
+*
+*/
+template <class T>
+class ParseContinuation {
 
-#include "llvm/Constants.h"
-#include "llvm/DerivedTypes.h"
-
-#include "Jade/Core/Connection.h"
-#include "Jade/Core/Expression.h"
-#include "Jade/Core/Type.h"
-#include "Jade/Core/Attribute.h"
-#include "Jade/Attribute/ValueAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
-//------------------------------
-
-using namespace std;
-using namespace llvm;
-
-
-Connection::Connection(Port* source, Port* target, std::map<std::string, Attribute*>* attributes): HDAGEdge()
-{	this->attributes = attributes; 
-	this->source = source;	
-	this->target = target;
-	this->fifo = NULL;
-}
-
-
-int Connection::evaluateAsInteger(Expr* expr){
-	/*if(isa<ConstantInt>(expr)){
-		ConstantInt* value = cast<ConstantInt>(expr);
-		return (int)value->getValue().getLimitedValue();
-
-	} else if (isa<ConstantExpr>(expr)){
-		ConstantExpr* value = cast<ConstantExpr>(expr);
-	}
-	return 32;*/
-	cout << "to be rewritten";
-	exit(1);
-}
-
-int Connection::getFifoSize(){
-	std::map<std::string, Attribute*>::iterator it;	
-	it = attributes->find("bufferSize");
-		
-	if(it != attributes->end()){
-		Attribute* attr = (*it).second;
-			
-		if (!attr->isValue()){
-			cerr<< "Error when parsing type of a connection";
-			exit(0);
+public:
+	/**
+	 * @brief Creates a new parse continuation
+	 *
+	 * Creates a new parse continuation with the given TiXmlNode and result. The
+	 * constructor stores the next sibling of node.
+	 * 
+	 * @param node: a TiXmlNode that will be used to resume parsing after the result
+	 *            has been stored
+	 * @param result : the result
+	 */
+	ParseContinuation (TiXmlNode* node, T result){
+		if (node == NULL){
+			this->node = NULL;
+		}else{
+			this->node = node->NextSibling();
 		}
-			
-		Expr* expr = ((ValueAttribute*)attr)->getValue();
+		this->result = result;
+	};
 
-		return evaluateAsInteger(expr);
-	}		
-	
-	return SIZE;
-}
+	/*!
+     *  @brief Destructor of the class NetworkParser
+     *
+     */
+	~ParseContinuation (){};
 
-int Connection::getType(){
-	return type->getBitWidth()/8;
-}
+	/**
+	 * @brief Returns the TiXmlNode stored in this continuation.
+	 * 
+	 * @return the TiXmlNode stored in this continuation
+	 */
+	TiXmlNode* getNode() {
+		return node;
+	}
+
+	/**
+	 * Returns the result stored in this continuation.
+	 * 
+	 * @return the result stored in this continuation
+	 */
+	T getResult() {
+		return result;
+	}
+
+private:
+	TiXmlNode* node;
+	T result;
+};
+
+#endif

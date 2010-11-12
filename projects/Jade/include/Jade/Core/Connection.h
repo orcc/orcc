@@ -180,7 +180,7 @@ private:
      *
 	 *  @return an integer value of the expression.
      */
-	int evaluateAsInteger(llvm::Constant* expr);
+	int evaluateAsInteger(Expr* expr);
 
 	std::map<std::string, Attribute*>* attributes;	/** Map of attributes */
 	Port* source;						/** Source Port */

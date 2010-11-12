@@ -77,7 +77,7 @@ public:
 	 * @param parameters : list of Expr representif parameters of this instance
      *
      */
-	Instance(std::string id, std::string clasz, std::map<std::string, llvm::Constant*>* parameterValues){
+	Instance(std::string id, std::string clasz, std::map<std::string, Expr*>* parameterValues){
 		this->id = id;
 		this->clasz = clasz;
 		this->parameterValues = parameterValues;
@@ -192,7 +192,7 @@ public:
 	 * @return a map on the Instance paramter
      *
      */
-	std::map<std::string, llvm::Constant*>* getParameterValues(){return parameterValues;};
+	std::map<std::string, Expr*>* getParameterValues(){return parameterValues;};
 
 	/**
      *  @brief Getter of the action scheduler of this instanced functional unit
@@ -347,7 +347,7 @@ private:
 	void solveParameters();
 
 	/* Parameters of an instance */
-	std::map<std::string, llvm::Constant*>* parameterValues;	
+	std::map<std::string, Expr*>* parameterValues;	
 	
 	/* Id of an instance */
 	std::string id;

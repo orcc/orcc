@@ -44,7 +44,9 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/LLVMContext.h"
 
+#include "BinOpSeqParser.h"
 #include "ExprParser.h"
+#include "Jade/Core/Expr/BoolExpr.h"
 #include "Jade/Core/Expr/IntExpr.h"
 #include "Jade/Core/Expr/BinaryExpr.h"
 #include "Jade/Core/Expr/StringExpr.h"
@@ -60,127 +62,135 @@ ExprParser::~ExprParser (){
 
 }
 
-Constant* ExprParser::parseExpr(xmlNode* node){
-	Constant* expression = parseExprCont(node);
+Expr* ExprParser::parseExpr(TiXmlNode* node){
+	ParseContinuation<Expr*> cont = parseExprCont(node);
 
-	if (expression == NULL) {
+	Expr* expr = cont.getResult();
+
+	if (expr == NULL) {
 		cerr << "Expected an expression element";
 		exit(0);
 	} 
 
-	return expression;	
+	return expr;	
 }
 
-Constant* ExprParser::parseExprCont(xmlNode* element){
-	xmlNode* node = NULL;
-	Constant* expression = NULL;
+ParseContinuation<Expr*> ExprParser::parseExprCont(TiXmlNode* node){
+	Expr* expression = NULL;
 
-	for (node = element; node; node = node->next) {
-		if (xmlStrcmp(node->name, (const xmlChar *)"Expr")==0) {
-			xmlAttr *node_attribute = node->properties;
-			const xmlChar* kind = node_attribute->children->content;
+	while(node != NULL){
+		if (TiXmlString(node->Value()) == XDFNetwork::EXPR) {
+			TiXmlElement* elt = (TiXmlElement*)node;
+			TiXmlString kind(elt->Attribute(XDFNetwork::KIND));
 
-			if (xmlStrcmp(kind, (const xmlChar *)"BinOpSeq")==0) {
-				expression = parseExprBinOpSeq(node->children);
-			} else if (xmlStrcmp(kind, (const xmlChar *)"Literal")==0) {
-				expression = parseExprLiteral(node);
+			if (kind == XDFNetwork::KIND_BINOPSEQ) {
+				return parseExprBinOpSeq(node->FirstChild());
+			} else if (kind == XDFNetwork::KIND_LITERAL) {
+				expression = parseExprLiteral(elt);
 				break;
-			} else if (xmlStrcmp(kind, (const xmlChar *)"List")==0) {
-				cerr << "List not supPorted yet";
+			} else if (kind == XDFNetwork::KIND_LIST) {
+				cerr << "List not supported yet";
 				exit(0);
-			} else if (xmlStrcmp(kind, (const xmlChar *)"UnaryOp")==0) {
-				cerr << "UnaryOp not supPorted yet";
+			} else if (kind == XDFNetwork::KIND_UNARYOP) {
+				cerr << "UnaryOp not supported yet";
 				exit(0);
-			} else if (xmlStrcmp(kind, (const xmlChar *)"Var")==0) {
-				cerr << "Var not supPorted yet";
+			} else if (kind == XDFNetwork::KIND_VAR) {
+				cerr << "Var not supported yet";
 				exit(0);
 			} else {
-				cerr << "Unsupported expression kind: "<< kind;
+				cerr << "Unsupported expression kind: "<< kind.c_str();
 				exit(0);
 			}
 		}
-
+		
+		node = node->NextSibling();	
 	}
-	return expression;
+
+	return ParseContinuation<Expr*>(node, expression);
 }
 
-ConstantInt* ExprParser::parseExprLiteral(xmlNode* element){
-	xmlAttr *node_attribute = element->properties->next;
-	const xmlChar* kind = node_attribute->children->content;
-	node_attribute = node_attribute->next;
-	const xmlChar* value = node_attribute->children->content;
-	ConstantInt* expression = NULL;
+Expr* ExprParser::parseExprLiteral(TiXmlElement* elt){
+	TiXmlString kind(elt->Attribute(XDFNetwork::LITERAL_KIND));
+	TiXmlString value(elt->Attribute(XDFNetwork::LITERAL_VALUE));
 	
-	if (xmlStrcmp(kind, (const xmlChar *)"Boolean")==0) {
+	if (kind == XDFNetwork::LITERAL_BOOL) {
 		return parseBoolean(value);	
-	} else if (xmlStrcmp(kind, (const xmlChar *)"Character")==0) {
+	} else if (kind == XDFNetwork::LITERAL_CHAR) {
 		fprintf(stderr,"Characters not supported yet");
 		exit(0);
-	} else if (xmlStrcmp(kind, (const xmlChar *)"Integer")==0) {
-		int integer = atoi ((char*)value);
-		if (integer == 0 && xmlStrcmp(value, (const xmlChar *)"0")!= 0){
+	} else if (kind == XDFNetwork::LITERAL_INT) {
+		int integer = atoi (value.c_str());
+		if (integer == 0 && value != "0"){
 			fprintf(stderr,"Expression is not an integer");
 			exit(0);
 		}
-		return ConstantInt::get(IntegerType::get(Context, 32),integer);
-	} else if (xmlStrcmp(kind, (const xmlChar *)"Real")==0) {
-		fprintf(stderr,"Reals not supPorted yet");
+		return new IntExpr(integer);
+	} else if (kind == XDFNetwork::LITERAL_REAL) {
+		fprintf(stderr,"Reals not supported yet");
 		exit(0);
-	} else if (xmlStrcmp(kind, (const xmlChar *)"String")==0) {
-		fprintf(stderr,"String not supPorted yet");
+	} else if (kind == XDFNetwork::LITERAL_STRING) {
+		fprintf(stderr,"String not supported yet");
 		exit(0);
 	} else {
 		fprintf(stderr,"Unsupported expression literal kind: \"%s\"", kind);
 		exit(0);
 	}
-
-	return expression;
 }
 
 
-Constant* ExprParser::parseExprBinOpSeq(xmlNode* element){
-	list<Constant*> exprs;
+ParseContinuation<Expr*> ExprParser::parseExprBinOpSeq(TiXmlNode* node){
+	list<Expr*> exprs;
 	list<BinaryOp*> ops;
 
-	Constant* expression = parseExprCont(element);
-	exprs.push_back(expression);
+	ParseContinuation<Expr*> contE = parseExprCont(node);
+	exprs.push_back(contE.getResult());
+	node = contE.getNode();
 
-	//TODO: BinOpParser does only support operation with one operator
-	element = element->next;
-	BinaryOp* op = parseExprBinaryOp(element);
-	ops.push_back(op);
-	element = element->next;
-	expression = parseExprCont(element);
-	exprs.push_back(expression);
-	
-	return ConstantExpr::getMul(exprs.front(), exprs.back());
+	while (node != NULL){
+		ParseContinuation<BinaryOp*> contO = parseExprBinaryOp(node);
+		BinaryOp* op = contO.getResult();
+		node = contO.getNode();
+
+		if (op != NULL) {
+			ops.push_back(op);
+
+			contE = parseExprCont(node);
+			Expr* expr = contE.getResult();
+			if (expr == NULL) {
+				cerr << "Missing an Expr element in Network.";
+				exit(1);
+			}
+
+			exprs.push_back(expr);
+			node = contE.getNode();
+		}
+
+	}
+
+	Expr* expr = BinOpSeqParser().parse(&exprs, &ops);
+	return ParseContinuation<Expr*>(node, expr);
 }
 
-ConstantInt* ExprParser::parseBoolean(const xmlChar* value){
-	if (xmlStrcmp(value, (const xmlChar *)"true")==0) {
-		return ConstantInt::get(IntegerType::get(Context,1),1);
-	}else if (xmlStrcmp(value, (const xmlChar *)"false")==0) {
-		return ConstantInt::get(IntegerType::get(Context,1), 0);
+Expr* ExprParser::parseBoolean(TiXmlString value){
+	if (value == "true") {
+		return new BoolExpr(true);
+	}else if (value =="false") {
+		return new BoolExpr(false);
 	}
 	
 	fprintf(stderr,"Expected a boolean value");
 	exit(0);
 }
 
-BinaryOp* ExprParser::parseExprBinaryOp(xmlNode* element){
-	while (element){
-		const xmlChar* name = element->name;
-		if (xmlStrcmp(name, (const xmlChar *)"Op")==0) {
-			xmlAttr *node_attribute = element->properties;
-			const xmlChar* name = node_attribute->children->content;
-			return new BinaryOp(string((char*)name));
+ParseContinuation<BinaryOp*> ExprParser::parseExprBinaryOp(TiXmlNode* node){
+	while (node != NULL){
+		if (TiXmlString(node->Value()) == XDFNetwork::EXPR_OP) {
+			TiXmlElement* op = (TiXmlElement*)node;
+			string opName = op->Attribute(XDFNetwork::NAME);
+			return ParseContinuation<BinaryOp*>(node, new BinaryOp(opName));
 		}
-		element = element->next;		
+		node = node->NextSibling();
 	}
-	
-	fprintf(stderr,"Binary operation was expected for the current expression");
-	exit(0);
-	
-	return NULL;
+	return ParseContinuation<BinaryOp*>(node, NULL);
 }
 

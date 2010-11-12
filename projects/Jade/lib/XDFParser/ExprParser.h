@@ -41,7 +41,12 @@
 #include <stdio.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
+#include "Jade/Core/Expression.h"
 #include "Jade/Core/Expr/BinaryOp.h"
+#include "Jade/TinyXML/TinyXml.h"
+
+#include "XDFConstant.h"
+#include "ParseContinuation.h"
 
 namespace llvm{
 	class Constant;
@@ -75,54 +80,54 @@ public:
 	
 	
 	/*!
-     *  @brief Parses the given xmlNode as an Expression.
+     *  @brief Parses the given TiXmlNode as an Expression.
      *
      *  Parses the given node as an Expression and returns the matching
 	 *  Expression.
 	 *
-	 *  @param node : xmlNode representation of an Expression.
+	 *  @param node : TiXmlNode representation of an Expression.
 	 *
 	 *  @return  an Expression.
      */
-	llvm::Constant* parseExpr(xmlNode* node);
+	Expr* parseExpr(TiXmlNode* node);
 
 private:
 	/*!
-     *  @brief Parses the given xmlNode as an Expression.
+     *  @brief Parses the given TiXmlNode as an Expression.
      *
      *  Parses the given node as an Expression and returns the matching
 	 *  Expression.
 	 *
-	 *  @param element : xmlNode representation of an Expression.
+	 *  @param element : TiXmlNode representation of an Expression.
 	 *
 	 *  @return  an Expression.
      */
-	llvm::Constant* parseExprCont(xmlNode* element);
+	ParseContinuation<Expr*> parseExprCont(TiXmlNode* node);
 
 	/*!
-     *  @brief Parses the given xmlNode as a literal.
+     *  @brief Parses the given TiXmlElement as a literal.
      *
-	 * Parses the given xmlNode element as a literal and returns the matching
+	 * Parses the given TiXmlElement as a literal and returns the matching
 	 * Expression.
 	 *
-	 *  @param element : xmlNode representation of an Expression.
+	 *  @param element : TiXmlElement representation of an Expression.
 	 *
 	 *  @return  an Expression.
      */
-	llvm::ConstantInt* parseExprLiteral(xmlNode* element);
+	Expr* parseExprLiteral(TiXmlElement* elt);
 
 	/*!
-     *  @brief Parses the given xmlNode as a binary operation.
+     *  @brief Parses the given TiXmlNode as a binary operation.
      *
 	 * Parses the given element as a sequence of binary
 	 * operations, aka "BinOpSeq". A BinOpSeq is a sequence of expr, op,
 	 * expr, op, expr...
 	 *
-	 *  @param element : xmlNode representation of a BinaryExpr.
+	 *  @param element : TiXmlNode representation of a BinaryExpr.
 	 *
 	 *  @return  an expression.
      */
-	llvm::Constant* parseExprBinOpSeq(xmlNode* element);
+	ParseContinuation<Expr*> parseExprBinOpSeq(TiXmlNode* node);
 
 	/*!
      *  @brief Parses the given node as a binary operator.
@@ -130,23 +135,23 @@ private:
 	 * Parses the given node as a binary operator and returns a parse
 	 * continuation with the operator parsed.
 	 *
-	 *  @param element : xmlNode representation of a Binary Operation.
+	 *  @param element : TiXmlNode representation of a Binary Operation.
 	 *
-	 *  @return  a BinaryOp.
+	 *  @return a parse continuation with the operator parsed
      */
-	BinaryOp* parseExprBinaryOp(xmlNode* element);
+	ParseContinuation<BinaryOp*> parseExprBinaryOp(TiXmlNode* node);
 
 	/*!
-     *  @brief Parses the given xmlChar as a boolean constant.
+     *  @brief Parses the given TiXmlString as a boolean constant.
      *
-	 * Parses the given xmlChar as a boolean constant and returns the corresponding 
+	 * Parses the given TiXmlString as a boolean constant and returns the corresponding 
 	 *  llvm::constantInt value.
 	 *
-	 *  @param value : xmlChar to parse.
+	 *  @param value : TiXmlString to parse.
 	 *
-	 *  @return  the corresponding llvm::constantInt value.
+	 *  @return  the corresponding BoolExpr value.
      */
-	llvm::ConstantInt* parseBoolean(const xmlChar* value);
+	Expr* parseBoolean(TiXmlString value);
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

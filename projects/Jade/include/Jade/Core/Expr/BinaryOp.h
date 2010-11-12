@@ -147,8 +147,30 @@ public:
 
 	~BinaryOp();
 
+	/**
+	 * Returns this operator's precedence. An operator O1 that has a lower
+	 * precedence than another operator O2 means that the operation involving O1
+	 * is to be evaluated first.
+	 * 
+	 * @return this operator's precedence
+	 */
+	int getPrecedence() {
+		return precedence;
+	}
+
+	/**
+	 * Returns true if this operator is right-to-left associative.
+	 * 
+	 * @return true if this operator is right-to-left associative
+	 */
+	bool isRightAssociative() {
+		return rightAssociative;
+	}
+
 private:
 	OPTYPE op;
+	int precedence;
+	bool rightAssociative;
 
 };
 

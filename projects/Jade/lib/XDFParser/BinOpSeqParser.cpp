@@ -28,73 +28,64 @@
  */
 
 /**
-@brief Implementation of class Connection
+@brief Description of the BinOpSeqParser
 @author Jerome Gorin
-@file Connection.cpp
+@file BinOpSeqParser.cpp
 @version 0.1
-@date 2010/04/12
+@date 22/03/2010
 */
 
 //------------------------------
-#include <iostream>
+#include "BinOpSeqParser.h"
 
-#include "llvm/Constants.h"
-#include "llvm/DerivedTypes.h"
-
-#include "Jade/Core/Connection.h"
-#include "Jade/Core/Expression.h"
-#include "Jade/Core/Type.h"
-#include "Jade/Core/Attribute.h"
-#include "Jade/Attribute/ValueAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
+#include "Jade/Core/Expr/BinaryExpr.h"
 //------------------------------
-
 using namespace std;
-using namespace llvm;
 
-
-Connection::Connection(Port* source, Port* target, std::map<std::string, Attribute*>* attributes): HDAGEdge()
-{	this->attributes = attributes; 
-	this->source = source;	
-	this->target = target;
-	this->fifo = NULL;
+Expr* BinOpSeqParser::parse(list<Expr*>* exprs, list<BinaryOp*>* ops){
+	return createPrecedenceTree(exprs, ops, 0, exprs->size() - 1);
 }
 
-
-int Connection::evaluateAsInteger(Expr* expr){
-	/*if(isa<ConstantInt>(expr)){
-		ConstantInt* value = cast<ConstantInt>(expr);
-		return (int)value->getValue().getLimitedValue();
-
-	} else if (isa<ConstantExpr>(expr)){
-		ConstantExpr* value = cast<ConstantExpr>(expr);
-	}
-	return 32;*/
-	cout << "to be rewritten";
-	exit(1);
-}
-
-int Connection::getFifoSize(){
-	std::map<std::string, Attribute*>::iterator it;	
-	it = attributes->find("bufferSize");
-		
-	if(it != attributes->end()){
-		Attribute* attr = (*it).second;
-			
-		if (!attr->isValue()){
-			cerr<< "Error when parsing type of a connection";
-			exit(0);
-		}
-			
-		Expr* expr = ((ValueAttribute*)attr)->getValue();
-
-		return evaluateAsInteger(expr);
-	}		
+int BinOpSeqParser::findPivot(list<BinaryOp*>* ops, int startIndex, int stopIndex){
+	int pivot = startIndex;
+	list<BinaryOp*>::iterator it;
 	
-	return SIZE;
+	it = ops->begin();
+	advance(it, pivot);
+	BinaryOp* bop = *it;
+	int pivotRank = bop->getPrecedence();
+	
+	for (int i = startIndex + 1; i <= stopIndex; i++) {
+		it = ops->begin();
+		advance(it, i);
+		bop = *it;
+		int current = bop->getPrecedence();
+		bool rtl = bop->isRightAssociative();
+		if (pivotRank < current || (current == pivotRank && rtl)) {
+			pivot = i;
+			pivotRank = current;
+		}
+	}
+
+	return pivot;
 }
 
-int Connection::getType(){
-	return type->getBitWidth()/8;
+Expr* BinOpSeqParser::createPrecedenceTree(list<Expr*>* exprs, list<BinaryOp*>* ops, int startIndex, int stopIndex){
+	list<BinaryOp*>::iterator itOp;
+	list<Expr*>::iterator itExpr;
+
+	if (stopIndex == startIndex) {
+		itExpr = exprs->begin();
+		advance(itExpr, startIndex);
+		return *itExpr;
+	}
+
+	int pivot = findPivot(ops, startIndex, stopIndex - 1);
+	itOp = ops->begin();
+	advance(itOp, pivot);
+	BinaryOp* op = *itOp;
+	Expr* e1 = createPrecedenceTree(exprs, ops, startIndex, pivot);
+	Expr* e2 = createPrecedenceTree(exprs, ops, pivot + 1, stopIndex);
+
+	return new BinaryExpr(e1, op, e2);
 }

@@ -126,7 +126,7 @@ void Instance::setAsOutput(Port* port) {
 }
 
 void Instance::solveParameters(){
-	map<string, Constant*>::iterator itValues;
+	/*map<string, Constant*>::iterator itValues;
 	std::map<std::string, Variable*>::iterator itParameter;
 	
 	for (itParameter= parameters->begin(); itParameter != parameters->end(); itParameter++){
@@ -136,5 +136,5 @@ void Instance::solveParameters(){
 		
 		ConstantInt* value = cast<ConstantInt>(itValues->second);
 		variable->setInitializer(value);
-	}
+	}*/
 }

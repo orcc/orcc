@@ -37,13 +37,15 @@
 //------------------------------
 #include <iostream>
 
-#include "NetworkParser.h"
 #include "Jade/Attribute/TypeAttribute.h"
 #include "Jade/Attribute/ValueAttribute.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Vertex.h"
 #include "Jade/Core/Connection.h"
+#include "Jade/TinyXML/TinyStr.h"
+
+#include "NetworkParser.h"
 //------------------------------
 
 
@@ -52,20 +54,19 @@ using namespace std;
 using namespace llvm;
 
 NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename){
-	LIBXML_TEST_VERSION
-	
 	/* Initialize attributes */
-	xdfDoc = xmlReadFile(filename.c_str(), NULL, 0);
+	xdfDoc = new TiXmlDocument (filename.c_str());
     network = NULL;
 
 	/* Parsing file error */
-	if (xdfDoc == NULL) {
+	if (!xdfDoc->LoadFile()) {
         cerr << "Failed to parse %s\n" << filename.c_str();
 		exit(0);
     }
 
 	Connections = new list<Connection*>();
-		/* Xml type parser */
+
+	/* Xml type parser */
 	typeParser = new TypeParser(C);
 
 	/** XDF expression parser. */
@@ -73,50 +74,46 @@ NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename){
 }
 
 NetworkParser::~NetworkParser (){
-	xmlFreeDoc(xdfDoc);
+	//xmlFreeDoc(xdfDoc);
 
-	/*
-     * Cleanup function for the XML library.
-     */
-    xmlCleanupParser();
-    /*
-     * this is to debug memory for regression tests
-     */
-    xmlMemoryDump();
+	///*
+ //    * Cleanup function for the XML library.
+ //    */
+ //   xmlCleanupParser();
+ //   /*
+ //    * this is to debug memory for regression tests
+ //    */
+ //   xmlMemoryDump();
 }
 
 
 
 Network* NetworkParser::parseNetwork (){
-	/*Initialize xml element and attribute container*/
-	xmlNode *root_element = NULL;
-	xmlAttr *root_attribute = NULL;
-
-
-	/*Get the root element node */
-    root_element = xmlDocGetRootElement(xdfDoc);
-
-	/*Return NULL if xml document doesn't start with XDF root */
-	if (xmlStrcmp(root_element->name, (const xmlChar *)"XDF")!=0){
-		cerr << "Expected \"XDF\" start element";
+	// Get the root element node
+	TiXmlElement* root_element = xdfDoc->RootElement();
+	
+	// xml document doesn't start with XDF root
+	if (TiXmlString(root_element->Value()) != XDFNetwork::XDF_ROOT){
+		cerr << "XML description does not represent an XDF network";
 		exit(1);
 	}
 	
-	/*Return NULL if network doesn't have a name */
-	root_attribute = root_element->properties;
-	if (xmlStrcmp(root_attribute->name, (const xmlChar *)"name")!=0){
-		cerr << "Expected a \"name\" attribute";
+	// Return NULL if network doesn't have a name
+	TiXmlAttribute* root_attribute = root_element->FirstAttribute();
+	if (TiXmlString(root_attribute->Name()) != XDFNetwork::NAME){
+		cerr << "Expected a \"name\" in XDF network";
 		exit(1);
 	}
 	
-	string name = string((char*)root_attribute->children->content);
+	// Set network properties
+	string name = root_attribute->Value();
 	graph = new HDAGGraph();
 	inputs = new map<string, Port*>();
 	outputs = new map<string, Port*>();
 	instances = new map<string, Instance*>();
 
 	/* Parse root_element */
-	parseBody(root_element->children);
+	parseBody(root_element);
 
 	/* Initialize network */
 	network = new Network(name, inputs, outputs, graph);
@@ -124,103 +121,97 @@ Network* NetworkParser::parseNetwork (){
 	return network;
 }
 
-Instance* NetworkParser::parseInstance(xmlNode* instance){
-	xmlAttr *instance_attribute = instance->properties;
-	xmlNode* child = instance_attribute->children;
+Instance* NetworkParser::parseInstance(TiXmlElement* instance){
+	TiXmlString id (instance->Attribute(XDFNetwork::INSTANCE_ID));
 
-	const xmlChar* id = child->content;
-	const xmlChar* clasz = NULL;
-
-	if (xmlStrcmp(id, (const xmlChar *)"")==0) {
+	if (id.empty()) {
 		cerr << "An Instance element must have a valid \"id\" attribute";
 		exit(0);
 	}
 
-	for (child = instance->children; child; child = child->next) {
-		if (xmlStrcmp(child->name, (const xmlChar *)"Class")==0){
-			xmlAttr *class_attribute = child->properties;
-			xmlNode* class_child = class_attribute->children;
-			clasz = class_child->content;
+	// instance class
+	TiXmlString clasz;
+	TiXmlNode* child = instance->FirstChild();
+
+	while(child != NULL){
+		if (TiXmlString(child->Value()) == XDFNetwork::INSTANCE_CLASS){
+			clasz = TiXmlString(((TiXmlElement*) child)->Attribute(XDFNetwork::NAME));
 			break;
 		}
 	}
 
-	if (clasz == NULL || (xmlStrcmp(clasz, (const xmlChar *)"")==0)) {
+	if (clasz.empty()) {
 		cerr << "An Instance element must have a valid \"Class\" child.";
 		exit(0);
 	}
 	
-	map<string, Constant*>* parameters = parseParameters(child->next);
+	map<string, Expr*>* parameters = parseParameters(child);
 
-	return new Instance(string((char*)id), string((char*)clasz), parameters);
+	return new Instance(string(id.c_str()), string(clasz.c_str()), parameters);
 }
 
 
-map<string, Constant*> *NetworkParser::parseParameters(xmlNode* element){
-	Constant* expression = NULL;
-	xmlNode* node = NULL;
-	map<string, Constant*> *parameters = new map<string, Constant*>;
+map<string, Expr*> *NetworkParser::parseParameters(TiXmlNode* node){
+	map<string, Expr*> *parameters = new map<string, Expr*>;
 
-	for (node = element; node; node = node->next) {
-		if (xmlStrcmp(node->name, (const xmlChar *)"Parameter")==0) {
-			xmlAttr *node_attribute = node->properties;
-
-			const xmlChar* name = node_attribute->children->content;
-			
-			if (xmlStrcmp(name, (const xmlChar *)"")==0) {
+	while(node != NULL){
+		if (TiXmlString(node->Value()) == XDFNetwork::INSTANCE_PARAMETER){
+			TiXmlString name(((TiXmlElement*) node)->Attribute(XDFNetwork::NAME));
+		
+			if (name == "") {
 				cerr <<"A Parameter element must have a valid \"name\" attribute";
 				exit(0);
 			}
-			expression = exprParser->parseExpr(node->children);
-			parameters->insert(pair<string, Constant*>(string((char*)name), expression));
+			Expr* expression = exprParser->parseExpr(node->FirstChild());
+			parameters->insert(pair<string, Expr*>(string(name.c_str()), expression));
 		}
+		node = node->NextSibling();
 	}
 
 	return parameters;
 
 }
 
-void  NetworkParser::parseBody(xmlNode* root){
-	xmlNode* node = NULL;
-	for (node = root; node; node = node->next) {
-        if (node->type == XML_ELEMENT_NODE) {
-			const xmlChar* name =  node->name;
+void  NetworkParser::parseBody(TiXmlElement* root){
+	TiXmlNode* node = root->FirstChild();
 
-			if (xmlStrcmp(name, (const xmlChar *)"Connection")==0) {
-				parseConnection(node);
-			}else if (xmlStrcmp(name, (const xmlChar *)"Decl")==0) {
+	while (node != NULL){
+		if (node->Type() == TiXmlNode::TINYXML_ELEMENT) {
+			TiXmlElement* element = (TiXmlElement*)node;
+			TiXmlString name(node->Value());
+
+			if (name == XDFNetwork::CONNECTION) {
+				parseConnection(element);
+			}else if (name == XDFNetwork::DECL) {
 				cerr << "Decl elements are not supPorted yet";
 				exit(0);
-			}else if (xmlStrcmp(name, (const xmlChar *)"Instance")==0) {
-				Instance* instance = parseInstance(node);
+			}else if (name == XDFNetwork::INSTANCE) {
+				Instance* instance = parseInstance(element);
 				instances->insert(pair<string, Instance*>(instance->getId(), instance));
 				graph->addVertex(new Vertex(instance));
-			}else if (xmlStrcmp(name, (const xmlChar *)"Package")==0) {
+			}else if (name == XDFNetwork::PACKAGE) {
 				cerr << "Package elements are not supPorted yet";
 				exit(0);
-			}else if (xmlStrcmp(name, (const xmlChar *)"Port")==0) {
+			}else if (name == XDFNetwork::PORT) {
 				cerr << "Port elements are not supPorted yet";
 				exit(0);
 			}else {
-				cerr << "invalid node \"%s\"\n" << name;
+				cerr << "invalid node \"%s\"\n" << name.c_str();
 				exit(0);
 			}
+			
+			node = node->NextSibling();
         }
     }
 }
 
-void NetworkParser::parseConnection(xmlNode* connection){
+void NetworkParser::parseConnection(TiXmlElement* connection){
 	
 	// Parse information from fifo 
-	xmlAttr *node_attribute = connection->properties;
-	char* dst =  (char*)node_attribute->children->content;
-	node_attribute = node_attribute->next;
-	char* dst_port =  (char*)node_attribute->children->content;
-	node_attribute = node_attribute->next;
-	char* src =  (char*)node_attribute->children->content;
-	node_attribute = node_attribute->next;
-	char* src_port =  (char*)node_attribute->children->content;
-
+	const char* src = connection->Attribute(XDFNetwork::CONNECTION_SRC);
+	const char* src_port = connection->Attribute(XDFNetwork::CONNECTION_SRC_PORT);
+	const char* dst = connection->Attribute(XDFNetwork::CONNECTION_DST);
+	const char* dst_port = connection->Attribute(XDFNetwork::CONNECTION_DST_PORT);
 
 	Vertex* source = getVertex(src, src_port, "Input", inputs);
 	Port* srcPort = getPort(src, src_port);
@@ -228,50 +219,44 @@ void NetworkParser::parseConnection(xmlNode* connection){
 	Port* dstPort = getPort(dst, dst_port);
 
 	// Get attributes 
-	map<string, Attribute*>* attributes = parseAttributes(connection->children);
+	map<string, Attribute*>* attributes = parseAttributes(connection->FirstChild());
 	Connection* conn = new Connection(srcPort, dstPort, attributes);
 	
 	graph->addEdge(source, target, conn);
 }
 
-map<string, Attribute*>* NetworkParser::parseAttributes(xmlNode* element){
-	xmlNode* node = NULL;
+map<string, Attribute*>* NetworkParser::parseAttributes(TiXmlNode* node){
 	map<string, Attribute*> *attributes = new map<string, Attribute*>;
 
-	for (node = element; node; node = node->next) {
-		const xmlChar* name =  node->name;
-
+	while(node != NULL){
 		// only Attribute nodes are parsed, other one are ignored. 
-		if (xmlStrcmp(name, (const xmlChar *)"Attribute")==0) {
-			Attribute* attr;
-			xmlAttr *node_attribute = node->properties;
-			const xmlChar* kind =  node_attribute->children->content;
+		if (TiXmlString(node->Value()) == XDFNetwork::ATTRIBUTE) {
+			Attribute* attr = NULL;
+			TiXmlElement* attribute = (TiXmlElement*)node;
+			TiXmlString kind(attribute->Attribute(XDFNetwork::KIND));
+			TiXmlString attrName(attribute->Attribute(XDFNetwork::NAME));		
 
-			node_attribute = node_attribute->next;
-			const xmlChar* attrName =  node_attribute->children->content;
-			
-
-			if (xmlStrcmp(kind, (const xmlChar *)"Custom")==0) {
+			if (kind == XDFNetwork::KIND_CUSTOM) {
 				cerr << "Custom elements are not supPorted yet";
 				exit(0);
-			}else if (xmlStrcmp(kind, (const xmlChar *)"Flag")==0) {
+			}else if (kind == XDFNetwork::KIND_FLAG) {
 				cerr << "Flag elements are not supPorted yet";
 				exit(0);
-			}else if (xmlStrcmp(kind, (const xmlChar *)"String")==0) {
+			}else if (kind == XDFNetwork::KIND_STRING) {
 				cerr << "String elements are not supPorted yet";
 				exit(0);
-			}else if (xmlStrcmp(kind, (const xmlChar *)"Type")==0) {
-				Type* type = typeParser->parseType(node->children);
+			}else if (kind == XDFNetwork::KIND_TYPE) {
+				Type* type = typeParser->parseType(attribute->FirstChild());
 				attr = new TypeAttribute(type);
-			}else if (xmlStrcmp(kind, (const xmlChar *)"Value")==0) {
-				Constant* expression = exprParser->parseExpr(node->children);
+			}else if (kind == XDFNetwork::KIND_VALUE) {
+				Expr* expression = exprParser->parseExpr(attribute->FirstChild());
 				attr = new ValueAttribute(expression);
 			}else {
-				cerr << "invalid node \"%s\"\n" << name;
+				cerr << "unsupported attribute kind: " << kind.c_str() ;
 				exit(0);
 			}
 
-			attributes->insert(pair<string, Attribute*>(string((char*)attrName), attr));
+			attributes->insert(pair<string, Attribute*>(string(attrName.c_str()), attr));
         }
 	}
 	return attributes;

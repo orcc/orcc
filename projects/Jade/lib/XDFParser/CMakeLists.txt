@@ -28,13 +28,17 @@ ENDIF (NOT LIBXML2_FOUND)
 include_directories(${LLVM_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR} ${JADE_MAIN_INCLUDE_DIR})
 
 add_library (XDFParser
-  XDFParser.cpp
+  BinOpSeqParser.cpp
+  BinOpSeqParser.h
   ExprParser.cpp
   ExprParser.h
   NetworkParser.cpp
   NetworkParser.h
+  ParseContinuation.h
   TypeParser.cpp
   TypeParser.h
+  XDFConstant.h
+  XDFParser.cpp
   )
   
   target_link_libraries(XDFParser ${LIBXML2_LIBRARIES})
