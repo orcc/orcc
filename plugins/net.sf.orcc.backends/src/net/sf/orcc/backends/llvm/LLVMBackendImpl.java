@@ -230,9 +230,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 				try {
 					BufferedReader reader = new BufferedReader(
 							new InputStreamReader(process.getErrorStream()));
-					String line = "";
 					try {
-						while ((line = reader.readLine()) != null) {
+						String line = reader.readLine();
+						if (line != null) {
 							throw new IOException("Application error :" + line);
 						}
 					} finally {
@@ -243,6 +243,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 				}
 			}
 		}.start();
+
+		try {
+			process.waitFor();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
