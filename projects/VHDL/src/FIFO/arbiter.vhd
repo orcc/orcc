@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-08-19
+-- Last update: 2010-11-12
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -81,105 +81,90 @@ architecture arch_arbiter of arbiter is
   -----------------------------------------------------------------------------
   --
   signal register_data : std_logic_vector (width -1 downto 0);
-  signal data_in_reg   : std_logic;
   signal count_in      : std_logic_vector(2 downto 0);
   signal count_out     : std_logic_vector(2 downto 0);
   -----------------------------------------------------------------------------
   
 begin
 
+  -- Management of the write operations
   wr_proc : process (wr_clk, reset_n) is
-    variable count : std_logic_vector(2 downto 0);
   begin
     if reset_n = '0' then
       register_data <= (others => '0');
-      data_in_reg   <= '0';
-      empty         <= '1';
-      full          <= '0';
-      count_in      <= (others => '0');
-      count         := (others => '0');
     elsif rising_edge(wr_clk) then
       --
-      if wr_data = '1' and count_in = count_out then
+      if count_in /= count_out then     -- Write data while a data is present in register  
+        if rd_ack = '1' then            -- Data in register read -> save the new data in register
+          register_data <= data_in;
+        end if;
+      elsif wr_data = '1' then          -- No data in register, write new data and 
         register_data <= data_in;
-        data_in_reg   <= '1';
-        empty         <= '0';
-        if count = "111" then
-          count := "000";
-        else
-          count := count +'1';
-        end if;
-        --
-      elsif wr_data = '1' and count_in /= count_out then
-        if rd_ack = '1' then
-          register_data <= data_in;
-          data_in_reg   <= '1';
-          empty         <= '0';
-          full          <= '0';
-          if count = "111" then
-            count := "000";
-          else
-            count := count +'1';
-          end if;
-        else
-          data_in_reg <= '1';
-          full        <= '1';
-          empty       <= '0';
-          if count = "111" then
-            count := "000";
-          else
-            count := count +'1';
-          end if;
-        end if;
-      elsif wr_data = '0' and count_in /= count_out then
-        if rd_ack = '1' then
-          register_data <= data_in;
-          data_in_reg   <= '1';
-          empty         <= '0';
-          full          <= '0';
-        else
-          data_in_reg <= '1';
-          full        <= '1';
-          empty       <= '0';
-        end if;
       end if;
       --
-      count_in <= count;
     end if;
   end process wr_proc;
 
-
-  rd_proc : process (count_in, count_out, register_data, reset_n) is
+  cnt_wr_proc : process (rd_clk, reset_n) is
   begin
     if reset_n = '0' then
-      data_out <= (others => '0');
-      send     <= '0';
+      count_in <= (others => '0');
+    elsif rising_edge(wr_clk) then
+      if wr_data = '1' and count_in = "111" then
+        count_in <= "000";
+      elsif wr_data = '1' then
+        count_in <= count_in +'1';
+      end if;
+    end if;
+  end process cnt_wr_proc;
+
+
+  -- Management of the read operation
+  data_out <= register_data;  -- Data are always store in a register to
+  -- enable the input and output frequencies
+  -- to be different.
+  rd_proc : process (count_in, count_out, reset_n) is
+  begin
+    if reset_n = '0' then
+      send <= '0';
     elsif count_in /= count_out then
-      data_out <= register_data;
-      send     <= '1';
+      send <= '1';
     else
-      data_out <= register_data;
-      send     <= '0';
+      send <= '0';
     end if;
   end process rd_proc;
 
 
-  cnt_proc : process (rd_clk, reset_n) is
-    variable count : std_logic_vector(2 downto 0);
+  cnt_rd_proc : process (rd_clk, reset_n) is
   begin
     if reset_n = '0' then
       count_out <= (others => '0');
-      count     := (others => '0');
     elsif rising_edge(rd_clk) then
-      if rd_ack = '1' then
-        if count = "111" then
-          count := "000";
-        else
-          count := count +'1';
-        end if;
-        count_out <= count;
+      if rd_ack = '1' and count_out = "111" then
+        count_out <= "000";
+      elsif rd_ack = '1' then
+        count_out <= count_out +'1';
       end if;
     end if;
-  end process cnt_proc;
+  end process cnt_rd_proc;
+
+
+  -- Management of the write operationsflags
+  flag_proc : process (count_in, count_out, rd_ack, reset_n) is
+  begin
+    if reset_n = '0' then
+      empty <= '1';
+      full  <= '0';
+    elsif count_in /= count_out and rd_ack = '1' then
+      empty <= '0';
+      full  <= '0';
+    elsif count_in /= count_out then
+      empty <= '0';
+      full  <= '1';
+    else
+      empty <= '1';
+      full  <= '0';
+    end if;
+  end process flag_proc;
 
 end arch_arbiter;

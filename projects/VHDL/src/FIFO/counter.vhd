@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-08-30
+-- Last update: 2010-11-10
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -57,8 +57,6 @@ entity counter is
     depth : integer := 32);
   port (
     reset_n  : in    std_logic;
-    reset_rd : in    std_logic;
-    reset_wr : in    std_logic;
     rd_clk   : in    std_logic;
     rd_ack   : in    std_logic;
     wr_clk   : in    std_logic;
@@ -71,19 +69,19 @@ end counter;
 
 architecture archcounter of counter is
 
-  signal ireset_rd : std_logic;
-  signal ireset_wr : std_logic;
+  constant depth_std : std_logic_vector(bit_width(depth)-1 downto 0)
+    := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
+  
 begin
   
-  ireset_rd <= reset_n and reset_rd;
-  ireset_wr <= reset_n and reset_wr;
-
   rd_count : process (rd_clk, reset_n) is
   begin
-    if ireset_rd = '0' then
+    if reset_n = '0' then
       rd_add <= (others => '0');
     elsif rising_edge(rd_clk) then
-      if rd_ack = '1' then
+      if (rd_add = depth_std) and rd_ack = '1' then
+        rd_add <= (others => '0');
+      elsif rd_ack = '1' then
         rd_add <= rd_add +'1';
       end if;
     end if;
@@ -91,10 +89,12 @@ begin
 
   wr_count : process (wr_clk, reset_n) is
   begin
-    if ireset_wr = '0' then
+    if reset_n = '0' then
       wr_add <= (others => '0');
     elsif rising_edge(wr_clk) then
-      if wr_data = '1' then
+      if (wr_add = depth_std) and wr_data = '1' then
+        wr_add <= (others => '0');
+      elsif wr_data = '1' then
         wr_add <= wr_add +'1';
       end if;
     end if;

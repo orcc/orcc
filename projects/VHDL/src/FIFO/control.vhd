@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-08-31
+-- Last update: 2010-11-12
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -57,17 +57,17 @@ entity controler is
     depth : integer := 32;
     width : integer := 32);
   port (
-    reset_n : in    std_logic;
-    rd_clk  : in    std_logic;
-    rd_ack  : in    std_logic;
-    rd_send : out   std_logic;
-    rd_add  : inout std_logic_vector(bit_width(depth)-1 downto 0);
-    wr_clk  : in    std_logic;
-    wr_data : in    std_logic;
-    wr_add  : inout std_logic_vector(bit_width(depth)-1 downto 0);
+    reset_n : in  std_logic;
+    rd_clk  : in  std_logic;
+    rd_ack  : in  std_logic;
+    rd_send : out std_logic;
+    rd_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
+    wr_clk  : in  std_logic;
+    wr_data : in  std_logic;
+    wr_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
     --
-    empty   : out   std_logic;
-    full    : out   std_logic
+    empty   : out std_logic;
+    full    : out std_logic
     );
 end controler;
 
@@ -76,61 +76,56 @@ end controler;
 architecture archcontroler of controler is
 
 
-  -----------------------------------------------------------------------------
-  -- Internal signals and constants declaration
-  -----------------------------------------------------------------------------
-  --
-  constant depth_std : std_logic_vector(bit_width(depth)-1 downto 0)
-    := std_logic_vector(to_unsigned(depth -1, bit_width(depth)));
-  --
-  signal reset_rd : std_logic;
-  signal reset_wr : std_logic;
-  --
-  
+  signal inFull      : std_logic;
+  signal inReadAdd   : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal inWriteAdd  : std_logic_vector(bit_width(depth)-1 downto 0);
+
+
 begin
 
-  reset_wr <= '0' when wr_add = depth_std else
-              '1';
-  reset_rd <= '0' when rd_add = depth_std else
-              '1';
-
-  -- Counter
+  -- Address management
+  rd_add <= inReadAdd;
+  wr_add <= inWriteAdd;
   counter_1 : entity work.counter
     generic map (
       depth => depth)
     port map (
       reset_n  => reset_n,
-      reset_rd => reset_rd,
-      reset_wr => reset_wr,
       rd_clk   => rd_clk,
       rd_ack   => rd_ack,
       wr_clk   => wr_clk,
       wr_data  => wr_data,
-      rd_add   => rd_add,
-      wr_add   => wr_add);
+      rd_add   => inReadAdd,
+      wr_add   => inWriteAdd);
 
-
-
+  
   -- Flags
-  Flag_full : process (rd_add, reset_n, wr_add) is
-    variable wr_add_f : std_logic_vector(bit_width(depth)-1 downto 0);
+  full <= inFull;
+  Flag_full : process (inReadAdd, inWriteAdd) is
+    variable level : integer range depth -1 downto 0 := 0;
   begin
-    wr_add_f := wr_add +'1';
-    if reset_n = '0' then
-      full <= '0';
-    elsif wr_add_f = rd_add then
-      full <= '1';
+    if (inWriteAdd <= inReadAdd) then
+      level := to_integer(unsigned(inReadAdd - inWriteAdd));
     else
-      full <= '0';
+      level := (depth -1) - to_integer(unsigned(inWriteAdd - inReadAdd));
     end if;
+    
+    case level is
+      when 2 =>
+        inFull <= '1';
+      when 1 =>        
+        inFull <= '1';
+      when others =>
+        inFull <= '0';
+    end case;
   end process Flag_full;
 
-  Flag_empty : process (rd_add, reset_n, wr_add) is
+  Flag_empty : process (inReadAdd, reset_n, inWriteAdd) is
   begin
     if reset_n = '0' then
       empty   <= '1';
       rd_send <= '0';
-    elsif rd_add = wr_add then
+    elsif (inReadAdd = inWriteAdd) then
       empty   <= '1';
       rd_send <= '0';
     else

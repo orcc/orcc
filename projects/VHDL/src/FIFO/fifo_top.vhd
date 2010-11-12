@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-07-05
+-- Last update: 2010-11-12
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
