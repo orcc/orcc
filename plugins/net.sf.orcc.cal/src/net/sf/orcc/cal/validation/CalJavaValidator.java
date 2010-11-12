@@ -139,6 +139,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	 */
 	private void checkActionOutputs(List<AstOutputPattern> outputs) {
 		Set<String> names = new HashSet<String>();
+		TypeChecker checker = new TypeChecker(this);
 
 		for (AstOutputPattern pattern : outputs) {
 			// check duplicate ports in output pattern
@@ -149,27 +150,36 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			}
 			names.add(name);
 
+			Type portType = pattern.getPort().getIrType();
 			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
+			if (astRepeat == null) {
+				List<AstExpression> values = pattern.getValues();
+				for (AstExpression value : values) {
+					Type type = checker.getType(value);
+					if (!checker.isConvertibleTo(type, portType)) {
+						error("this expression must be of type " + portType,
+								value, CalPackage.AST_EXPRESSION);
+					}
+				}
+			} else {
 				int repeat = new AstExpressionEvaluator(this)
 						.evaluateAsInteger(astRepeat);
 				if (repeat != 1) {
 					// each value is supposed to be a list
-					TypeChecker checker = new TypeChecker(this);
 					List<AstExpression> values = pattern.getValues();
 					for (AstExpression value : values) {
 						Type type = checker.getType(value);
 						if (type.isList()) {
 							TypeList typeList = (TypeList) type;
-							Type lub = checker.getLub(pattern.getPort()
-									.getIrType(), typeList.getType());
+							Type lub = checker.getLub(portType,
+									typeList.getType());
 							if (lub != null && typeList.getSize() >= repeat) {
 								continue;
 							}
 						}
 
 						error("this expression must be of type List of "
-								+ pattern.getPort().getIrType().toString()
+								+ portType
 								+ " with a size greater than or equal to "
 								+ repeat, value, CalPackage.AST_EXPRESSION);
 					}
@@ -411,7 +421,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		checkUniqueNames(function.getParameters());
 		checkUniqueNames(function.getVariables());
 		checkReturnType(function);
-		
+
 		// do not check functions of a unit
 		if (function.eContainer() instanceof AstUnit) {
 			return;
