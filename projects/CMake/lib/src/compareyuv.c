@@ -227,7 +227,7 @@ void Compare_scheduler(struct schedinfo_s *si) {
 			i++;
 		}
 
-		if (fifo_i8_has_tokens(Compare_B, 384)) {
+		if (fifo_i8_has_tokens(Compare_B, 384) && init == 0) {
 			i8 Compare_B_buf[384];
 			Compare_write_mb(fifo_i8_read(Compare_B, Compare_B_buf, 384));
 			fifo_i8_read_end(Compare_B, 384);
