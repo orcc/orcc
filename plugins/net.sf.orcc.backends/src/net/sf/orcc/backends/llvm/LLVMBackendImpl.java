@@ -33,7 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,23 +70,20 @@ public class LLVMBackendImpl extends AbstractBackend {
 		main(LLVMBackendImpl.class, args);
 	}
 
-	private STPrinter printer;
-
-	private final Map<String, String> transformations;
-
 	/**
 	 * Backend options
 	 */
 	private boolean classify;
-	private boolean llvmBitcode;
-	private boolean opt;
+
 	private String llvmAs;
+
+	private boolean llvmBitcode;
 	private String llvmOpt;
+	private boolean opt;
 	private String optLevel;
-	
-	
-	
-	
+	private STPrinter printer;
+	private final Map<String, String> transformations;
+
 	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
 	 * transformation hash map.
@@ -100,22 +96,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 		transformations.put("min", "min_");
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
-	}
-	
-	private void setBackendOptions()  throws OrccException {
-		llvmBitcode = getAttribute("net.sf.orcc.backends.llvmBitcode", false);
-		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		opt = getAttribute("net.sf.orcc.backends.llvmOpt", false);
-		
-		if (llvmBitcode) {
-			llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
-		}
-		
-		if (opt) {
-			llvmOpt = getAttribute("net.sf.orcc.backends.opt", "");
-			optLevel = getAttribute("net.sf.orcc.backends.optLevel", "");
-		}
-
 	}
 
 	@Override
@@ -137,7 +117,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 	@Override
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
 		setBackendOptions();
-		
+
 		List<Actor> actors = parseActors(files);
 
 		if (classify) {
@@ -145,8 +125,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 
 		printer = new STPrinter(getAttribute(DEBUG_MODE, false));
-		printer.loadGroups("LLVM_header", "LLVM_actor",
-				"LLVM_metadata");
+		printer.loadGroups("LLVM_header", "LLVM_actor", "LLVM_metadata");
 		printer.setExpressionPrinter(LLVMExprPrinter.class);
 		printer.setTypePrinter(LLVMTypePrinter.class);
 
@@ -164,6 +143,26 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new XDFWriter(new File(path), network);
 	}
 
+	private void optimizeActor(String execPath, String inputName) {
+		List<String> cmdList = new ArrayList<String>();
+
+		cmdList.add(execPath);
+		cmdList.add(inputName);
+		cmdList.add("-S");
+		cmdList.add("-" + optLevel);
+		cmdList.add("-o");
+		cmdList.add(inputName);
+
+		String[] cmd = cmdList.toArray(new String[] {});
+
+		try {
+			startExec(cmd);
+		} catch (IOException e) {
+			System.err.println("Could not optimize actors : ");
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
 		String outputName = path + File.separator + actor.getName() + ".s";
@@ -174,7 +173,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 			if (opt) {
 				optimizeActor(llvmOpt, outputName);
 			}
-			
+
 			if (llvmBitcode) {
 				printBitcode(llvmAs, outputName, actor.getName());
 			}
@@ -185,30 +184,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void optimizeActor(String execPath, String inputName) {
-		List<String> cmdList = new ArrayList<String>();
-		
-		cmdList.add(execPath);
-		cmdList.add(inputName);
-		cmdList.add("-S");
-		cmdList.add("-"+optLevel);
-		cmdList.add("-o");
-		cmdList.add(inputName);
-		
-		String[] cmd = cmdList.toArray(new String[] {});
-
-		try {
-			startExec(cmd);
-		} catch (IOException e) {
-			System.err.println("Could not optimize actors : ");
-			e.printStackTrace();
-		}
-	}
-	
 	private void printBitcode(String execPath, String inputName, String actor) {
 		List<String> cmdList = new ArrayList<String>();
 		String outputName = path + File.separator + actor + ".bc";
-		
+
 		cmdList.add(execPath);
 		cmdList.add(inputName);
 		cmdList.add("-f");
@@ -223,25 +202,43 @@ public class LLVMBackendImpl extends AbstractBackend {
 			e.printStackTrace();
 		}
 	}
-	
-	private void startExec(String[] cmd)  throws IOException{
+
+	private void setBackendOptions() throws OrccException {
+		llvmBitcode = getAttribute("net.sf.orcc.backends.llvmBitcode", false);
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		opt = getAttribute("net.sf.orcc.backends.llvmOpt", false);
+
+		if (llvmBitcode) {
+			llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
+		}
+
+		if (opt) {
+			llvmOpt = getAttribute("net.sf.orcc.backends.opt", "");
+			optLevel = getAttribute("net.sf.orcc.backends.optLevel", "");
+		}
+
+	}
+
+	private void startExec(String[] cmd) throws IOException {
 		Runtime run = Runtime.getRuntime();
 		final Process process = run.exec(cmd);
 
 		// Output error message
 		new Thread() {
+			@Override
 			public void run() {
 				try {
-					BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					BufferedReader reader = new BufferedReader(
+							new InputStreamReader(process.getErrorStream()));
 					String line = "";
 					try {
-						while((line = reader.readLine()) != null) {
-							throw new IOException("Application error :"+ line);
+						while ((line = reader.readLine()) != null) {
+							throw new IOException("Application error :" + line);
 						}
 					} finally {
 						reader.close();
 					}
-				} catch(IOException ioe) {
+				} catch (IOException ioe) {
 					ioe.printStackTrace();
 				}
 			}
