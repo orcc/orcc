@@ -86,7 +86,7 @@ $schedulerName(actions)$
 		<module kind="body">
 			$instance.actor.actions: isSchedulableTest(); separator="\n"$
 			$outputPinStatus()$
-			$instance.actor.actions: {action|$outputPatternFireability(action=action)$}; separator="\n"$
+			$instance.actor.actions: outputPatternFireability(); separator="\n"$
 			$if(actions)$$schedulingTest(actions)$$endif$
 			<!--Close modules -->
 			$if(actions)$  	 	 
@@ -113,15 +113,24 @@ $instance.actor.outputs.list: {port|$outputPinStatusPort(port=port)$}; separator
 >>
 
 outputPatternFireabilityPort(port) ::=<<
-<operation kind="\$and">
-	<port dir="in" source="outputPattern_$instance.id$_$port$_status"/>
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_$port$_fireable" typeName="bool"/>
-</operation>
+<port dir="in" source="outputPattern_$instance.id$_$port$_status"/>
 >>
 
 outputPatternFireability(action) ::=<<
 $if(action.outputPattern)$
-$action.pattern.keys: {port | $outputPatternFireabilityPort(port=port)$}; separator="\n"$
+<!-- outputPattern Fireability -->
+<operation kind="\$and">
+	$action.outputPattern.keys: {port | $outputPatternFireabilityPort(port=port)$}; separator="\n"$
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_fireable" typeName="bool"/>
+</operation>
 $endif$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Throw empty AssignIndex
+///////////////////////////////////////////////////////////////////////////////
+
+AssignIndex(assignIndex) ::= <<
 >>
 
