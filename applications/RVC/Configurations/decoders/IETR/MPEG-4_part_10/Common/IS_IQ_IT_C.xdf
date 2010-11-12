@@ -60,7 +60,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IS_Zigzag_4x4"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_IS_Zigzag_4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -69,7 +69,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Mgnt_IQ_Chroma"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Mgnt_IQ_Chroma"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -78,7 +78,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IQ_QSAndSLAndIDCTScaler_4x4"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_IQ_QSAndSLAndIDCTScaler_4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

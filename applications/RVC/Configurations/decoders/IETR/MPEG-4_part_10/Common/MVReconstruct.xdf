@@ -210,7 +210,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MvLXReconstr_Frext"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_MvLXReconstr_Frext"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -222,16 +222,16 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MvComponentReorder"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_MvComponentReorder"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="SelectMvpLX">
+    <Instance id="SelectMvLX">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/SelectMvpLX"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Frext/SelectMvpLX"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -240,7 +240,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MvLXReconstr_Frext"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_MvLXReconstr_Frext"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -252,7 +252,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_MvBuffer"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Frext/Algo_MvBuffer"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -275,18 +275,17 @@
     <Connection dst="" dst-port="RefIdxL0" src="MvL0_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="MvL0_Reconstr" dst-port="NewPic_i" src="" src-port="NewPic"/>
     <Connection dst="" dst-port="NewListL0" src="MvL0_Reconstr" src-port="NewPic_o"/>
-    <Connection dst="SelectMvpLX" dst-port="LocationL0"
+    <Connection dst="SelectMvLX" dst-port="LocationL0"
         src="MvL0_Reconstr" src-port="Location"/>
-    <Connection dst="SelectMvpLX" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
-    <Connection dst="SelectMvpLX" dst-port="MbType" src="" src-port="MbType4Prediction"/>
-    <Connection dst="SelectMvpLX" dst-port="RefIdxL0"
-        src="MvL0_Reconstr" src-port="RefIdxOut"/>
-    <Connection dst="" dst-port="MV" src="SelectMvpLX" src-port="MvOut"/>
-    <Connection dst="MvComponentReord" dst-port="Mv" src="SelectMvpLX" src-port="MvOut"/>
-    <Connection dst="" dst-port="SelectList" src="SelectMvpLX" src-port="SelectList"/>
-    <Connection dst="" dst-port="LOCATION" src="SelectMvpLX" src-port="Location"/>
+    <Connection dst="SelectMvLX" dst-port="SubMbType" src="" src-port="sub_mb_type"/>
+    <Connection dst="SelectMvLX" dst-port="MbType" src="" src-port="MbType4Prediction"/>
+    <Connection dst="SelectMvLX" dst-port="RefIdxL0" src="MvL0_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="" dst-port="MV" src="SelectMvLX" src-port="MvOut"/>
+    <Connection dst="MvComponentReord" dst-port="Mv" src="SelectMvLX" src-port="MvOut"/>
+    <Connection dst="" dst-port="SelectList" src="SelectMvLX" src-port="SelectList"/>
+    <Connection dst="" dst-port="LOCATION" src="SelectMvLX" src-port="Location"/>
     <Connection dst="MvComponentReord" dst-port="RefIdx"
-        src="SelectMvpLX" src-port="RefIdxOut"/>
+        src="SelectMvLX" src-port="RefIdxOut"/>
     <Connection dst="MvL1_Reconstr" dst-port="NewPic_i" src="" src-port="NewPic"/>
     <Connection dst="MvL1_Reconstr" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="MvL1_Reconstr" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
@@ -297,14 +296,13 @@
     <Connection dst="MvL1_Reconstr" dst-port="SubMbPredRefIdx" src="" src-port="SubMbPredRefIdxL1"/>
     <Connection dst="" dst-port="NewListL1" src="MvL1_Reconstr" src-port="NewPic_o"/>
     <Connection dst="" dst-port="RefIdxL1" src="MvL1_Reconstr" src-port="RefIdxOut"/>
-    <Connection dst="SelectMvpLX" dst-port="LocationL1"
+    <Connection dst="SelectMvLX" dst-port="LocationL1"
         src="MvL1_Reconstr" src-port="Location"/>
-    <Connection dst="SelectMvpLX" dst-port="RefIdxL1"
-        src="MvL1_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="SelectMvLX" dst-port="RefIdxL1" src="MvL1_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="MvL0_Reconstr" dst-port="MbPredMvRes" src="" src-port="MbPredMvResL0"/>
     <Connection dst="MvL0_Reconstr" dst-port="SubMbPredMvRes" src="" src-port="SubMbPredMvResL0"/>
-    <Connection dst="SelectMvpLX" dst-port="MvL0" src="MvL0_Reconstr" src-port="MvOut"/>
-    <Connection dst="SelectMvpLX" dst-port="MvL1" src="MvL1_Reconstr" src-port="MvOut"/>
+    <Connection dst="SelectMvLX" dst-port="MvL0" src="MvL0_Reconstr" src-port="MvOut"/>
+    <Connection dst="SelectMvLX" dst-port="MvL1" src="MvL1_Reconstr" src-port="MvOut"/>
     <Connection dst="MvL1_Reconstr" dst-port="MbPredMvRes" src="" src-port="MbPredMvResL1"/>
     <Connection dst="MvL1_Reconstr" dst-port="SubMbPredMvRes" src="" src-port="SubMbPredMvResL1"/>
     <Connection dst="MvBuffer" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>

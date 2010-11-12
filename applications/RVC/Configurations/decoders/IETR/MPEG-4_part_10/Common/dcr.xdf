@@ -57,7 +57,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IS_Zigzag_4x4"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_IS_Zigzag_4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -66,7 +66,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_DCR_Hadamard_LUMA_IHT1d"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_DCR_Hadamard_LUMA_IHT1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -75,7 +75,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Transpose4x4"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Transpose4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -84,7 +84,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_DCR_Hadamard_LUMA_IHT1d"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_DCR_Hadamard_LUMA_IHT1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -93,7 +93,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_DCR_Hadamard_LUMA_Scaling"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_DCR_Hadamard_LUMA_Scaling"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -102,7 +102,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Transpose4x4"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Transpose4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -111,7 +111,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_DCR_Hadamard_LUMA_Reordering"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_DCR_Hadamard_LUMA_Reordering"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

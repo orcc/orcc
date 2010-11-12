@@ -33,7 +33,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IT4x4_1d"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_IT4x4_1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -42,7 +42,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Transpose4x4"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Transpose4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -51,7 +51,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IT4x4_1d"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_IT4x4_1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -60,7 +60,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_Transpose4x4"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Transpose4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -69,7 +69,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Algo_IT4x4_Addshift"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_IT4x4_Addshift"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

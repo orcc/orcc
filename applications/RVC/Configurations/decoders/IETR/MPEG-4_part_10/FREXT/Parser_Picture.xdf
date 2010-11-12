@@ -408,7 +408,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_Slice_layer_without_partitioning"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_Slice_layer_without_partitioning"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -417,7 +417,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSliceHeader"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeSliceHeader"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -426,7 +426,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Frext/Algo_DecodeRefPicList_Frext"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Frext/Algo_DecodeRefPicList_Frext"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -435,7 +435,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeDecRefPicMarking"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeDecRefPicMarking"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -444,7 +444,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSliceData_CAVLC"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeSliceData_CAVLC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -456,7 +456,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeMacroblockLayer"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeMacroblockLayer"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -465,7 +465,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeMbPred"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeMbPred"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -474,7 +474,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeResidual"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeResidual"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -483,7 +483,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeResidualBlock_Cavlc"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeResidualBlock_Cavlc"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -492,7 +492,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_DecodeSubMbPred"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeSubMbPred"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -501,7 +501,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_MergeDataFromSlcDataAndMbLayer"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_MergeDataFromSlcDataAndMbLayer"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -510,7 +510,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../VTL/MPEG/MPEG-4_part_10/Common/Algo_GenerateSkipBlockInformation"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_GenerateSkipBlockInformation"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

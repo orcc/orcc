@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="241" y="70"/>
-      <vertex id="PicWidthInMb" x="241" y="167"/>
-      <vertex id="PredMode" x="241" y="264"/>
-      <vertex id="FirstMbInSlice" x="241" y="361"/>
-      <vertex id="Coef_ACR" x="462" y="176"/>
-      <vertex id="MB_IN" x="57" y="449"/>
-      <vertex id="Mb_Type" x="57" y="546"/>
-      <vertex id="ConstrainedIFlag" x="241" y="458"/>
-      <vertex id="IsIntraFlag" x="241" y="740"/>
-      <vertex id="pic_width_in_mb" x="57" y="643"/>
-      <vertex id="curr_mb_addr" x="57" y="740"/>
-      <vertex id="MBPred_intra_4x4" x="1582" y="377"/>
-      <vertex id="Mgnt_Intra4x4" x="513" y="247"/>
-      <vertex id="Algo_IntraPred_LUMA_4x4" x="782" y="291"/>
-      <vertex id="Algo_Add_4x4" x="1070" y="355"/>
-      <vertex id="Algo_Merge_4x4_to_16x16_norasterscan" x="1240" y="366"/>
-      <vertex id="Algo_Split_16x16_to_4x4_norasterscan" x="740" y="187"/>
-      <vertex id="Buffer_Neighbour_4x4" x="241" y="555"/>
+      <vertex id="CurrMbAddr" x="366" y="101"/>
+      <vertex id="PicWidthInMb" x="356" y="221"/>
+      <vertex id="PredMode" x="374" y="256"/>
+      <vertex id="FirstMbInSlice" x="366" y="161"/>
+      <vertex id="Coef_ACR" x="172" y="481"/>
+      <vertex id="MB_IN" x="75" y="161"/>
+      <vertex id="Mb_Type" x="68" y="188"/>
+      <vertex id="ConstrainedIFlag" x="368" y="67"/>
+      <vertex id="IsIntraFlag" x="365" y="195"/>
+      <vertex id="pic_width_in_mb" x="36" y="216"/>
+      <vertex id="curr_mb_addr" x="43" y="128"/>
+      <vertex id="MBPred_intra_4x4" x="1067" y="460"/>
+      <vertex id="Mgnt_Intra4x4" x="634" y="78"/>
+      <vertex id="Algo_IntraPred_LUMA_4x4" x="903" y="122"/>
+      <vertex id="Algo_Add_4x4" x="601" y="443"/>
+      <vertex id="Algo_Merge_4x4_to_16x16_norasterscan" x="748" y="445"/>
+      <vertex id="Algo_Split_16x16_to_4x4_norasterscan" x="285" y="467"/>
+      <vertex id="Buffer_Neighbour_4x4" x="184" y="114"/>
    </vertices>
 </layout>

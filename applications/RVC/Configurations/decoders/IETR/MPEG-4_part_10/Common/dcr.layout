@@ -2,9 +2,9 @@
 <layout>
    <vertices>
       <vertex id="CoefDC_L" x="57" y="178"/>
-      <vertex id="QP" x="994" y="70"/>
-      <vertex id="ScalingList" x="994" y="286"/>
-      <vertex id="MbType" x="997" y="243"/>
+      <vertex id="QP" x="1169" y="251"/>
+      <vertex id="ScalingList" x="1143" y="281"/>
+      <vertex id="MbType" x="1156" y="221"/>
       <vertex id="CoefDCR_L" x="2203" y="230"/>
       <vertex id="Algo_IS_Zigzag_4x4_DC" x="199" y="167"/>
       <vertex id="Algo_DCR_Hadamard_LUMA_IHT1d_0" x="433" y="167"/>

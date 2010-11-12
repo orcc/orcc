@@ -3,14 +3,14 @@
    <vertices>
       <vertex id="PicWidthInMb" x="16" y="615"/>
       <vertex id="PicSizeInMb" x="20" y="571"/>
-      <vertex id="MbPartIdx" x="57" y="164"/>
+      <vertex id="MbPartIdx" x="17" y="164"/>
       <vertex id="MbPartWidth" x="506" y="251"/>
       <vertex id="MbPartHeigth" x="489" y="176"/>
       <vertex id="RD_L" x="256" y="320"/>
       <vertex id="Coef_ACR" x="865" y="487"/>
       <vertex id="LOCATION" x="19" y="462"/>
-      <vertex id="MV" x="43" y="505"/>
-      <vertex id="PartSZ" x="57" y="261"/>
+      <vertex id="MV" x="107" y="225"/>
+      <vertex id="PartSZ" x="61" y="285"/>
       <vertex id="Mb_Type" x="31" y="540"/>
       <vertex id="currMBaddr" x="16" y="428"/>
       <vertex id="PocToRead_i" x="44" y="655"/>
