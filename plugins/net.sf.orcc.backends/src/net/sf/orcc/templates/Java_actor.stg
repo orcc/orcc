@@ -67,8 +67,20 @@ setParameters(parameters) ::= <<
 $parameters: setParameter()$
 >>
 
-Boolean(constant) ::= <<
-$constant$
+///////////////////////////////////////////////////////////////////////////////
+// Constants
+///////////////////////////////////////////////////////////////////////////////
+
+BoolExpr(expr) ::= <<
+$expr.value$
+>>
+
+BinaryExpr(expr) ::= <<
+($expr$)
+>>
+
+VarExpr(expr) ::= <<
+$expr$
 >>
 
 // a state variable
@@ -84,7 +96,13 @@ $endif$
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-PrintParameter(parameter) ::= <<$parameter$>>
+PrintParameter(parameter) ::= <<
+$if (parameter.stringExpr)
+$"$parameter$"$
+else
+$$Constant(parameter)$$
+endif$
+>>
 
 Call(call) ::= <<
 
