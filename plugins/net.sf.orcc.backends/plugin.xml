@@ -175,7 +175,7 @@
                <option
                      description="Location of  opt from LLVM"
                      id="net.sf.orcc.backends.opt"
-                     name="Location of opt :">
+                     name="Location of opt ">
                   <browseFile
                         folder="false"
                         workspace="false">

@@ -30,8 +30,11 @@ package net.sf.orcc.backends.llvm;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,6 +76,19 @@ public class LLVMBackendImpl extends AbstractBackend {
 	private final Map<String, String> transformations;
 
 	/**
+	 * Backend options
+	 */
+	private boolean classify;
+	private boolean llvmBitcode;
+	private boolean opt;
+	private String llvmAs;
+	private String llvmOpt;
+	private String optLevel;
+	
+	
+	
+	
+	/**
 	 * Creates a new instance of the LLVM back-end. Initializes the
 	 * transformation hash map.
 	 */
@@ -84,6 +100,22 @@ public class LLVMBackendImpl extends AbstractBackend {
 		transformations.put("min", "min_");
 		transformations.put("max", "max_");
 		transformations.put("select", "select_");
+	}
+	
+	private void setBackendOptions()  throws OrccException {
+		llvmBitcode = getAttribute("net.sf.orcc.backends.llvmBitcode", false);
+		classify = getAttribute("net.sf.orcc.backends.classify", false);
+		opt = getAttribute("net.sf.orcc.backends.llvmOpt", false);
+		
+		if (llvmBitcode) {
+			llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
+		}
+		
+		if (opt) {
+			llvmOpt = getAttribute("net.sf.orcc.backends.opt", "");
+			optLevel = getAttribute("net.sf.orcc.backends.optLevel", "");
+		}
+
 	}
 
 	@Override
@@ -104,9 +136,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doVtlCodeGeneration(List<File> files) throws OrccException {
+		setBackendOptions();
+		
 		List<Actor> actors = parseActors(files);
 
-		boolean classify = getAttribute("net.sf.orcc.backends.classify", false);
 		if (classify) {
 			// TODO classify actors
 		}
@@ -138,14 +171,12 @@ public class LLVMBackendImpl extends AbstractBackend {
 		try {
 			boolean cached = printer.printActor(outputName, actor);
 
-			boolean llvmBitcode = getAttribute(
-					"net.sf.orcc.backends.llvmBitcode", false);
-
+			if (opt) {
+				optimizeActor(llvmOpt, outputName);
+			}
+			
 			if (llvmBitcode) {
-				String llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
-				if (!llvmAs.isEmpty()) {
-					printBitcode(llvmAs, outputName, actor.getName());
-				}
+				printBitcode(llvmAs, outputName, actor.getName());
 			}
 
 			return cached;
@@ -154,11 +185,30 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 	}
 
+	private void optimizeActor(String execPath, String inputName) {
+		List<String> cmdList = new ArrayList<String>();
+		
+		cmdList.add(execPath);
+		cmdList.add(inputName);
+		cmdList.add("-S");
+		cmdList.add("-"+optLevel);
+		cmdList.add("-o");
+		cmdList.add(inputName);
+		
+		String[] cmd = cmdList.toArray(new String[] {});
+
+		try {
+			startExec(cmd);
+		} catch (IOException e) {
+			System.err.println("Could not optimize actors : ");
+			e.printStackTrace();
+		}
+	}
+	
 	private void printBitcode(String execPath, String inputName, String actor) {
 		List<String> cmdList = new ArrayList<String>();
 		String outputName = path + File.separator + actor + ".bc";
-
-		Runtime run = Runtime.getRuntime();
+		
 		cmdList.add(execPath);
 		cmdList.add(inputName);
 		cmdList.add("-f");
@@ -167,11 +217,35 @@ public class LLVMBackendImpl extends AbstractBackend {
 		String[] cmd = cmdList.toArray(new String[] {});
 
 		try {
-			run.exec(cmd);
+			startExec(cmd);
 		} catch (IOException e) {
 			System.err.println("Could not print bitcode : ");
 			e.printStackTrace();
 		}
+	}
+	
+	private void startExec(String[] cmd)  throws IOException{
+		Runtime run = Runtime.getRuntime();
+		final Process process = run.exec(cmd);
+
+		// Output error message
+		new Thread() {
+			public void run() {
+				try {
+					BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+					String line = "";
+					try {
+						while((line = reader.readLine()) != null) {
+							throw new IOException("Application error :"+ line);
+						}
+					} finally {
+						reader.close();
+					}
+				} catch(IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		}.start();
 	}
 
 }

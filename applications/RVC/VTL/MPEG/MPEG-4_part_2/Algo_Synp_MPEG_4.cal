@@ -363,7 +363,6 @@ actor Algo_Synp_MPEG_4 (
     bool round := false,
     int(size=BTYPE_SZ) cmd := bitor( NEWVOP, if prediction_is_IVOP then INTRA else INTER end )
   do
-  println("test");
     if not prediction_is_IVOP then
       round := bitand( rshift( read_result(), INTRA_DC_VLC_THR_LENGTH + BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 1 ) = 1;
 	  intra_dc_vlc_thr := intra_dc_threshold_table[ bitand( rshift( read_result(), BITS_QUANT + VOP_FCODE_FOR_LENGTH ), 7 ) ];
