@@ -40,7 +40,6 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
-import net.sf.orcc.ir.transformations.PhiRemoval;
 
 /**
  * 
@@ -52,12 +51,10 @@ import net.sf.orcc.ir.transformations.PhiRemoval;
  */
 public class ArrayInitializeTransformation extends AbstractActorTransformation {
 
-	private AbstractActorTransformation phiRemover;
 	private NodeInterpreter nodeInterpreter;
 	private ListAllocator listAllocator;
 
 	public ArrayInitializeTransformation() {
-		phiRemover = new PhiRemoval();
 		nodeInterpreter = new NodeInterpreter();
 		listAllocator = new ListAllocator();
 	}
@@ -94,8 +91,6 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 
 	@Override
 	public void visit(Call call) {
-		// Remove Phi instruction of initialize function
-		phiRemover.visitProcedure(call.getProcedure());
 		// Set initialize to external thus it will not be printed
 		call.getProcedure().setExternal(true);
 	}
