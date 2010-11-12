@@ -233,7 +233,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							throw new IOException("Application error :" + line);
+							write("Generation error :" + line +"\n");
 						}
 					} finally {
 						reader.close();
