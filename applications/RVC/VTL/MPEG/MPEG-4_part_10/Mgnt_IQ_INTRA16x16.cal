@@ -15,6 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
+import orcc.Imp_MacroBlockInfo.*;
 
 actor Mgnt_IQ_INTRA16x16()
 	int (size=16) CoefDCR_L,
@@ -24,12 +25,6 @@ actor Mgnt_IQ_INTRA16x16()
 	int(size=16) Lev2d,
 	bool         DCCoeff_Present
 		:
-
-
-	/* Constants */
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
-
 
 	uint(size=5)  NbBlock       := 0;
 

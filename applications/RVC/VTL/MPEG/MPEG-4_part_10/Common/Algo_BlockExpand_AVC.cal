@@ -53,6 +53,8 @@ Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre (IETR/INSA of Rennes)
+import orcc.Imp_MacroBlockInfo.*;
+
 actor Algo_BlockExpand_AVC ()
 	uint(size=6)  MbType,
 	int (size=12) Value,
@@ -65,11 +67,7 @@ actor Algo_BlockExpand_AVC ()
 	/* Constants */
 	uint(size=2) BLOCK_4x4   = 0;
 //	uint(size=2) BLOCK_8x8   = 1;
-	uint(size=2) BLOCK_16x16 = 2;	
-
-
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
+	uint(size=2) BLOCK_16x16 = 2;
 
 	uint(size=2)  Y_COMPONENT = 0;
 	uint(size=2)  U_COMPONENT = 1;

@@ -52,6 +52,7 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
+import orcc.Imp_MacroBlockInfo.*;
 
 actor Algo_BlockSplit_AVC()
 	int (size=12) Coeff,
@@ -65,8 +66,6 @@ actor Algo_BlockSplit_AVC()
 	int(size=16) Coeff_V_AC
 		:
 
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
 
 	bool DEBUG_INPUT = false;
 

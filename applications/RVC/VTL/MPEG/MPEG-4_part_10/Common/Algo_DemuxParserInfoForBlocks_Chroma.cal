@@ -14,6 +14,8 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+import orcc.Imp_MacroBlockInfo.*;
+
 actor Algo_DemuxParserInfoForBlocks_Chroma()
 	int (size=16) Coef_ACR,
 	uint(size=6)  MBType,
@@ -38,9 +40,6 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 * Constants
 *
 */
-	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
-	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
-
 	uint(size=7) PICWIDTH = 64;
 
 
@@ -81,7 +80,7 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 			MBType             :[ValMBType]
 				==>
 		guard
-			ValMBType <= MB_TYPE_INTRA_MAX,
+			ValMBType <= BLOCK_TYPE_INTRA_MAX,
 			ValMBType != BLOCK_TYPE_I_PCM
 		do
 			AcrSent   := false;
@@ -152,7 +151,7 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 			MBType           :[ValMBType]
 				==>
 		guard
-			ValMBType > MB_TYPE_INTRA_MAX
+			ValMBType > BLOCK_TYPE_INTRA_MAX
 		do
 			AcrSent   := false;
 			FstMbSent := false;

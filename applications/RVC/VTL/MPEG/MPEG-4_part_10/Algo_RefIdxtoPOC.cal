@@ -22,10 +22,6 @@ actor Algo_RefIdxtoPOC()
 	uint(size=32) POCtoRead
 		:
 
-	uint(size=2) GETNEWLIST  = 0;
-	uint(size=2) GETNEWIDX   = 1;
-	uint(size=2) SENDLASTIDX = 2;
-
 	List(type:uint(size=32), size=16) RefPoc;
 
 	uint(size=5)  SizeList;

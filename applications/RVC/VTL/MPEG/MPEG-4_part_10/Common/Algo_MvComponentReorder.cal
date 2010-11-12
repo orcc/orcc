@@ -51,6 +51,8 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
+import orcc.Imp_MacroBlockInfo.*;
+
 actor Algo_MvComponentReorder()
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
@@ -69,15 +71,6 @@ actor Algo_MvComponentReorder()
 	uint(size=3) SZ_8x4   = 4;
 	uint(size=3) SZ_4x8   = 5;
 	uint(size=3) SZ_4x4   = 6;
-
-	uint(size=6) BLOCK_TYPE_P_MIN     = 26;
-	uint(size=6) BLOCK_TYPE_P_8x8     = 29;
-	uint(size=6) BLOCK_TYPE_P_8x8ref0 = 30;
-	uint(size=6) BLOCK_TYPE_P_MAX     = 30;
-	uint(size=6) BLOCK_TYPE_B_MIN     = 31;
-	uint(size=6) BLOCK_TYPE_B_MAX     = 53;
-
-	uint(size=4) SLICE_TYPE_B  = 1;
 
 
 	List(type: uint(size=3),size=8) NumMbPart_P =

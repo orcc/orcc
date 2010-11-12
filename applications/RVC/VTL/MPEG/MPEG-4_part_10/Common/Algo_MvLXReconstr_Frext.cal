@@ -74,12 +74,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=4)  RefIdxOut
 		:
 
-	uint(size=2) NA = 0;
-	uint(size=2) PRED_L0 = 1;
-	uint(size=2) PRED_L1 = 2;
-	uint(size=2) BIPRED  = 3;
-	uint(size=2) DIRECT  = 4;
-
 	int           SZ_TAB      = 128;
 	int           MASK_TAB    = 127;
 	uint(size=32) LOG2_SZ_TAB = 7;
@@ -91,28 +85,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=3) SZ_8x4   = 4;
 	uint(size=3) SZ_4x8   = 5;
 	uint(size=3) SZ_4x4   = 6;
-
-
-	List(type: List(type: uint(size=3),size=2),size=8) MbPartPredMode_P =
-		[
-			[PRED_L0,NA],[PRED_L0,PRED_L0],[PRED_L0,PRED_L0],[NA,NA],[NA,NA],[PRED_L0,NA],[NA,NA],[NA,NA]
-		];
-
-	List(type: List(type: uint(size=3),size=2),size=32) MbPartPredMode_B =
-		[
-			[DIRECT,NA], [PRED_L0,NA], [PRED_L1,NA], [BIPRED,NA], [PRED_L0,PRED_L0], [PRED_L0,PRED_L0], [PRED_L1,PRED_L1], [PRED_L1,PRED_L1], [PRED_L0,PRED_L1], [PRED_L0,PRED_L1],
-			[PRED_L1,PRED_L0], [PRED_L1,PRED_L0], [PRED_L0,BIPRED], [PRED_L0,BIPRED], [PRED_L1,BIPRED], [PRED_L1,BIPRED], [BIPRED,PRED_L0], [BIPRED,PRED_L0], [BIPRED,PRED_L1], [BIPRED,PRED_L1],
-			[BIPRED,BIPRED], [BIPRED,BIPRED], [NA,NA], [DIRECT,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA],
-			[NA,NA], [NA,NA]
-		];
-
-	List(type: List(type: uint(size=3), size=16), size=2) SubMbPartPredMode =
-		[
-			[DIRECT, PRED_L0, PRED_L1, BIPRED, PRED_L0, PRED_L0, PRED_L1, PRED_L1, BIPRED, BIPRED,
-			 PRED_L0, PRED_L1, BIPRED, NA, NA, NA],
-			[PRED_L0, PRED_L0, PRED_L0, PRED_L0, 0, 0, 0, 0, 0, 0,
-			 0, 0, 0, 0, 0, 0]
-		];
 
 	List(type: uint(size=3),size=8) SizeMb_P =
 		[
@@ -190,28 +162,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	uint(size=11) Mbx_in_pix;
 	uint(size=11) Mby_in_pix;
-
-	function Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
-				-->
-			bool
-		:
-			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
-				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
-			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 7][mb_part_idx & 1] & PRED_L0) != 0
-			end
-		end
-
-	function Is_PredL1(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
-				-->
-			bool
-		:
-			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
-				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) &  31][mb_part_idx & 1] & PRED_L1) != 0
-			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				false
-			end
-		end
 
 	function median(int a, int b, int c)
 				-->

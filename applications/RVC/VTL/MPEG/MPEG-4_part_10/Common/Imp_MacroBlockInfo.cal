@@ -1,7 +1,7 @@
 /********************************************************************************
 
 This software module was originally developed by 
-Florian Decologne (IETR/INSA of Rennes), 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
 in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
 for reference purposes and its performance may not have been optimized. 
 This software module is an implementation of one or more tools as 
@@ -18,7 +18,7 @@ of this software module or modifications thereof.
 
 Copyright is not released for products that do not conform to audiovisual 
 and image-coding related ITU Recommendations and/or ISO/IEC International 
-Standards. 
+Standards.
 
 Assurance that the originally developed software module can be used 
 (1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
@@ -94,4 +94,67 @@ unit orcc.Imp_MacroBlockInfo :
 
 	uint(size=6) BLOCK_TYPE_P_SKIP          = 54;
 	uint(size=6) BLOCK_TYPE_B_SKIP          = 55;
+
+
+	uint(size=2) NA = 0;
+	uint(size=2) PRED_L0 = 1;
+	uint(size=2) PRED_L1 = 2;
+	uint(size=2) BIPRED  = 3;
+	uint(size=2) DIRECT  = 4;
+	
+
+	List(type: List(type: uint(size=3),size=2),size=8) MbPartPredMode_P =
+		[
+			[PRED_L0,NA],[PRED_L0,PRED_L0],[PRED_L0,PRED_L0],[NA,NA],[NA,NA],[PRED_L0,NA],[NA,NA],[NA,NA]
+		];
+
+	List(type: List(type: uint(size=3),size=2),size=32) MbPartPredMode_B =
+		[
+			[DIRECT,NA], [PRED_L0,NA], [PRED_L1,NA], [BIPRED,NA], [PRED_L0,PRED_L0], [PRED_L0,PRED_L0], [PRED_L1,PRED_L1], [PRED_L1,PRED_L1], [PRED_L0,PRED_L1], [PRED_L0,PRED_L1],
+			[PRED_L1,PRED_L0], [PRED_L1,PRED_L0], [PRED_L0,BIPRED], [PRED_L0,BIPRED], [PRED_L1,BIPRED], [PRED_L1,BIPRED], [BIPRED,PRED_L0], [BIPRED,PRED_L0], [BIPRED,PRED_L1], [BIPRED,PRED_L1],
+			[BIPRED,BIPRED], [BIPRED,BIPRED], [NA,NA], [DIRECT,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA],
+			[NA,NA], [NA,NA]
+		];
+
+	List(type: List(type: uint(size=3), size=16), size=2) SubMbPartPredMode =
+		[
+			[DIRECT, PRED_L0, PRED_L1, BIPRED, PRED_L0, PRED_L0, PRED_L1, PRED_L1, BIPRED, BIPRED,
+			 PRED_L0, PRED_L1, BIPRED, NA, NA, NA],
+			[PRED_L0, PRED_L0, PRED_L0, PRED_L0, 0, 0, 0, 0, 0, 0,
+			 0, 0, 0, 0, 0, 0]
+		];
+
+
+	function Is_Intra_16x16(uint MbType)
+				-->
+			bool
+		:
+			if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
+				true
+			else
+				false
+			end
+		end
+
+	function Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
+				-->
+			bool
+		:
+			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
+				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
+			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
+				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 7][mb_part_idx & 1] & PRED_L0) != 0
+			end
+		end
+
+	function Is_PredL1(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
+				-->
+			bool
+		:
+			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
+				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) &  31][mb_part_idx & 1] & PRED_L1) != 0
+			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
+				false
+			end
+		end
 end

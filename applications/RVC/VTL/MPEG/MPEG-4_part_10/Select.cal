@@ -15,6 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes (France)
+import orcc.Imp_MacroBlockInfo.*;
 
 actor Select () 
 	int (size=16) X0,
@@ -26,11 +27,6 @@ actor Select ()
 	int (size=9)  X
 		:
 
-	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
-	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
-	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
 
   
   	bool DEBUG_INPUT = false;
@@ -42,7 +38,7 @@ actor Select ()
 			==>
 		X          :[x] repeat 256
 	guard
-    	MbType = BLOCK_TYPE_I_8x8_or_4x4
+    	MbType = BLOCK_TYPE_I_NxN
     do
 		if(DEBUG_INPUT)then
 			foreach int i in 0 .. 16*16 - 1
@@ -75,7 +71,7 @@ actor Select ()
 			==>
 		X :[x] repeat 16*16
 	guard
-    	MbType > MB_TYPE_INTRA_MAX
+    	MbType > BLOCK_TYPE_INTRA_MAX
     do
 		if(DEBUG_INPUT)then
 			foreach int i in 0 .. 16*16 - 1

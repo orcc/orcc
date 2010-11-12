@@ -14,6 +14,7 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+import orcc.Imp_MacroBlockInfo.*;
 
 actor Select2 ()
 	/* int(size=16) X0,*/
@@ -24,11 +25,6 @@ actor Select2 ()
 		==>
 	int(size=9) X :
 
-	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
-	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
-	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
   /*
 	GetIntra4x4:action X0:[x] repeat 8*8 ==> X:[x] repeat 8*8
 	guard
@@ -41,7 +37,7 @@ actor Select2 ()
 			==>
 		X :[x] repeat 8*8 
 	guard
-		MbType <= MB_TYPE_INTRA_MAX,
+		MbType <= BLOCK_TYPE_INTRA_MAX,
 		MbType != BLOCK_TYPE_I_PCM
 	end
   
@@ -51,7 +47,7 @@ actor Select2 ()
 			==>
 		X :[x] repeat 8*8
 	guard
-    	MbType > MB_TYPE_INTRA_MAX
+    	MbType > BLOCK_TYPE_INTRA_MAX
 	end
 	
 	GetPCM: action

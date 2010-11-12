@@ -14,6 +14,8 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+import orcc.Imp_MacroBlockInfo.*;
+
 actor Algo_DemuxParserInfoForBlocks_Luma()
 	uint(size=6)  MBType,
 	bool          TransformSize8x8,
@@ -50,11 +52,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 * Constants
 *
 */
-	uint(size=6) BLOCK_TYPE_I_8x8_or_4x4    = 0;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MIN = 1;
-	uint(size=6) BLOCK_TYPE_INTRA_16x16_MAX = 24;
-	uint(size=6) BLOCK_TYPE_I_PCM           = 25;
-	uint(size=6) MB_TYPE_INTRA_MAX          = 25;
 
   	uint(size=7) PICWIDTH = 64;
 
@@ -99,7 +96,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			TransformSize8x8 :[Is8x8]
 				==>
 		guard
-			ValMBType    = BLOCK_TYPE_I_8x8_or_4x4,
+			ValMBType    = BLOCK_TYPE_I_NxN,
 			Is8x8        = false
 		do
 			AcrSent        := false;
@@ -182,7 +179,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			TransformSize8x8 :[Is8x8]
 				==>
 		guard
-			ValMBType = BLOCK_TYPE_I_8x8_or_4x4,
+			ValMBType = BLOCK_TYPE_I_NxN,
 			Is8x8     = true
 		do
 			println("Algo_Demux_Coef_ACR MBTypeIsIntra8x8 not implemented yet !!");
@@ -264,12 +261,12 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			MBType      :[ValMBType]
 				==>
 		guard
-			ValMBType > MB_TYPE_INTRA_MAX
+			ValMBType > BLOCK_TYPE_INTRA_MAX
 		do
 			AcrSent        := false;
 			FirstMbSent    := false;
 			ConstrISent    := false;
-			IsIntraSent    := false;	
+			IsIntraSent    := false;
 			PredModeSent   := true;
 
 			CurrValIsIntra := false;
