@@ -13,6 +13,8 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
+import orcc.Imp_DecodingFunctions.*;
+
 actor Algo_VariableLengthDecoding()
 	uint(size=8)  RbspByte,
 	bool          NewNal,
@@ -29,18 +31,6 @@ actor Algo_VariableLengthDecoding()
 * Constants
 *
 */
-
-	uint(size=5) READ_BITS             = 0;
-	uint(size=5) VLD_UE                = 1;
-	uint(size=5) VLD_SE                = 2;
-	uint(size=5) BYTE_ALIGNED_REQUIRED = 3;
-	uint(size=5) MORE_RBSP_DATA        = 4;
-	uint(size=5) CAVLC_COEFF_TOKEN     = 5;
-	uint(size=5) CAVLC_LEVEL_PREFIX    = 6;
-	uint(size=5) CAVLC_TOTAL_ZEROS     = 7;
-	uint(size=5) CAVLC_RUN_BEFORE      = 8;
-	uint(size=5) VLD_TE                = 9;
-	uint(size=5) SKIP_NAL              = 10;
 
 	bool DEBUG_VAL_DECODED  = false;
 	bool DEBUG_FLAG_DECODED = false;

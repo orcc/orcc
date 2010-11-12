@@ -14,6 +14,7 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
 import orcc.Imp_MacroBlockInfo.*;
+import orcc.Imp_DecodingFunctions.*;
 
 actor Algo_DecodeSubMbPred()
 	int (size=32) ValVLD,
@@ -37,19 +38,8 @@ actor Algo_DecodeSubMbPred()
 
 	bool DEBUG_MV = false;
 
-	uint(size=3) READ_BITS = 0;
-	uint(size=3) VLD_UE    = 1;
-	uint(size=3) VLD_SE    = 2;
-	uint(size=4) VLD_TE    = 9;
-	uint(size=4) SKIP_NAL  = 10;
 
 	uint(size=2) B_DIRECT_8x8  = 0;
-
-	uint(size=3) PRED_L0 = 0;
-	uint(size=3) PRED_L1 = 1;
-	uint(size=3) BIPRED  = 2;
-	uint(size=3) DIRECT  = 3;
-	uint(size=3) NA      = 4;
 
 	List(type: uint(size=2), size=16) SubMbPredMode_B
 		=	[  DIRECT , PRED_L0 , PRED_L1 , BIPRED , PRED_L0 , PRED_L0 , PRED_L1 , PRED_L1 , BIPRED , BIPRED 

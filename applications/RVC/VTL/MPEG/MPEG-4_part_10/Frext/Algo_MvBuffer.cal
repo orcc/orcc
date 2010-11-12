@@ -90,12 +90,6 @@ actor Algo_MvBuffer()
 	uint(size=3) SZ_4x8   = 5;
 	uint(size=3) SZ_4x4   = 6;
 
-	uint(size=2) NA = 0;
-	uint(size=2) PRED_L0 = 1;
-	uint(size=2) PRED_L1 = 2;
-	uint(size=2) BIPRED  = 3;
-	uint(size=2) DIRECT  = 4;
-
 	List(type: uint(size=3),size=8) NumMbPart_P =
 		[
 			1,2,2,4,4,1,1,1
@@ -136,20 +130,6 @@ actor Algo_MvBuffer()
 			 0, 0, 0, 0, 0, 0]
 		];
 
-
-	List(type: List(type: uint(size=3),size=2),size=8) MbPartPredMode_P =
-		[
-			[PRED_L0,NA],[PRED_L0,PRED_L0],[PRED_L0,PRED_L0],[NA,NA],[NA,NA],[PRED_L0,NA],[NA,NA],[NA,NA]
-		];
-
-	List(type: List(type: uint(size=3),size=2),size=32) MbPartPredMode_B =
-		[
-			[DIRECT,NA], [PRED_L0,NA], [PRED_L1,NA], [BIPRED,NA], [PRED_L0,PRED_L0], [PRED_L0,PRED_L0], [PRED_L1,PRED_L1], [PRED_L1,PRED_L1], [PRED_L0,PRED_L1], [PRED_L0,PRED_L1],
-			[PRED_L1,PRED_L0], [PRED_L1,PRED_L0], [PRED_L0,BIPRED], [PRED_L0,BIPRED], [PRED_L1,BIPRED], [PRED_L1,BIPRED], [BIPRED,PRED_L0], [BIPRED,PRED_L0], [BIPRED,PRED_L1], [BIPRED,PRED_L1],
-			[BIPRED,BIPRED], [BIPRED,BIPRED], [NA,NA], [DIRECT,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA], [NA,NA],
-			[NA,NA], [NA,NA]
-		];
-
 	List(type: List(type: uint(size=3), size=16), size=2) SubMbPartPredMode =
 		[
 			[DIRECT, PRED_L0, PRED_L1, BIPRED, PRED_L0, PRED_L0, PRED_L1, PRED_L1, BIPRED, BIPRED,
@@ -185,7 +165,8 @@ actor Algo_MvBuffer()
 			end
 		end
 
-	List(type: List(type: List(type: int(size=5), size=PIC_WIDTH_IN_PX/4), size=PIC_HEIGHT_IN_PX/4), size=16) ListRefIdx;
+	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdx;
+	List(type: List(type: List(type: List(type: int(size=5), size=2), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListMv;
 	List(type: bool,          size=16) IsReference;
 	List(type: uint(size=32), size=16) ListPoc;
 
@@ -203,6 +184,7 @@ actor Algo_MvBuffer()
 	uint(size=5) Idx_RefList;
 	uint(size=4) WriteListIdx;
 	uint(size=4) ReadListIdx;
+	bool         CurrL1_IsShortTermRef;
 
 	GetNewPic: action
 			NewPic       :[IsNewPic],
@@ -231,9 +213,27 @@ actor Algo_MvBuffer()
 		end
 
 	EatTokens: action
-			CurrMbAddr     :[Curr_Mb_Addr],
-			PicWidthInMb   :[c]
+			CurrMbAddr     :[Mb_Addr],
+			PicWidthInMb   :[pic_width]
 				==>
+		var
+			uint(size=32) Mbx,
+			uint(size=32) Mby
+		do
+			Mbx := Mb_Addr mod pic_width;
+			Mby := Mb_Addr  /  pic_width;
+			//There are 16 Parts in a macroblock
+			Mbx := Mbx * 4;
+			Mby := Mby * 4;
+			foreach int i in Mbx .. Mbx + 3
+			do
+				foreach int j in Mby .. Mby + 3
+				do
+					ListRefIdx[WriteListIdx][Mbx][Mby]     := -1;
+					ListMv    [WriteListIdx][Mbx][Mby][0]  :=  0;
+					ListMv    [WriteListIdx][Mbx][Mby][1]  :=  0;
+				end
+			end
 		end
 
 	GetMbType.Others: action
@@ -418,6 +418,13 @@ actor Algo_MvBuffer()
 				==>
 		guard
 			DelVal != SENT_DONE
+		do
+			foreach int i in 0 .. 15
+			do
+				if(DelVal = ListPoc[i])then
+					IsReference[i] := false;
+				end
+			end
 		end
 
 
@@ -442,13 +449,14 @@ actor Algo_MvBuffer()
 		guard
 			Idx_RefList < Size_RefList
 		do
-			if(Idx_RefList = 0)then
+/*			if(Idx_RefList   = 0)then
 				ReadListIdx := 0;
-/*				while()
-				
-				end*/
+				while(ListPoc[ReadListIdx] != ValRefList and ReadListIdx < 15)
+				do
+					ReadListIdx := ReadListIdx + 1;
+				end
 			end
-			Idx_RefList := Idx_RefList + 1;
+*/			Idx_RefList := Idx_RefList + 1;
 		end
 
 	ReadRefList.Done: action ==>
@@ -459,6 +467,14 @@ actor Algo_MvBuffer()
 	ReadLTList: action
 			LongTermList :[LTList] repeat 16
 				==>
+		do
+			CurrL1_IsShortTermRef := false;
+			foreach int i in 0 .. 15
+			do
+				if(LTList[i] = ListPoc[ReadListIdx])then
+					CurrL1_IsShortTermRef := true;
+				end
+			end
 		end
 
 	schedule fsm GetNewPic:

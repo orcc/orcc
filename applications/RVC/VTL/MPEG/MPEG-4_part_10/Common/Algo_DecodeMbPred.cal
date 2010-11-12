@@ -14,6 +14,7 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
 import orcc.Imp_MacroBlockInfo.*;
+import orcc.Imp_DecodingFunctions.*;
 
 actor Algo_DecodeMbPred()
 	int (size=32) ValVLD,
@@ -40,17 +41,6 @@ actor Algo_DecodeMbPred()
 	bool DEBUG_MV           = false;
 	bool DEBUG_FLAG_DECODED = false;
 
-	uint(size=3) READ_BITS = 0;
-	uint(size=3) VLD_UE    = 1;
-	uint(size=3) VLD_SE    = 2;
-	uint(size=4) VLD_TE    = 9;
-	uint(size=4) SKIP_NAL  = 10;
-
-	uint(size=3) PRED_L0 = 0;
-	uint(size=3) PRED_L1 = 1;
-	uint(size=3) BIPRED  = 2;
-	uint(size=3) DIRECT  = 3;
-	uint(size=3) NA      = 4;
 
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -80,18 +70,6 @@ actor Algo_DecodeMbPred()
 			1,1,1,1,2,2,2,2,2,2,
 			2,2,2,2,2,2,2,2,2,2,
 			2,2,4
-		];
-
-	List(type: List(type: uint(size=3), size=2), size=6) P_MbPartPredMode =
-		[
-			[PRED_L0,NA],[PRED_L0,PRED_L0],[PRED_L0,PRED_L0],[NA,NA],[NA,NA],[PRED_L0,NA]
-		];
-
-	List(type: List(type: uint(size=3), size=2), size=24) B_MbPartPredMode =
-		[
-			[DIRECT,NA], [PRED_L0,NA], [PRED_L1,NA], [BIPRED,NA], [PRED_L0,PRED_L0], [PRED_L0,PRED_L0], [PRED_L1,PRED_L1], [PRED_L1,PRED_L1], [PRED_L0,PRED_L1], [PRED_L0,PRED_L1],
-			[PRED_L1,PRED_L0], [PRED_L1,PRED_L0], [PRED_L0,BIPRED], [PRED_L0,BIPRED], [PRED_L1,BIPRED], [PRED_L1,BIPRED], [BIPRED,PRED_L0], [BIPRED,PRED_L0], [BIPRED,PRED_L1], [BIPRED,PRED_L1],
-			[BIPRED,BIPRED], [BIPRED,BIPRED], [NA,NA], [DIRECT,NA]
 		];
 
 	List (type:uint(size=3),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
@@ -125,23 +103,6 @@ actor Algo_DecodeMbPred()
 					B_tab[mb_type - BLOCK_TYPE_B_MIN][1+x]
 				else
 					B_tab[23][1+x]
-				end
-			end
-		end
-
-	function MbPartPredMode(uint(size=1) Mb_Part_Idx) --> uint(size=3)
-		:
-			if (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) then 
-				if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
-					P_MbPartPredMode[mb_type-BLOCK_TYPE_P_MIN][Mb_Part_Idx & 1]
-				else
-					P_MbPartPredMode[5][Mb_Part_Idx & 1]
-				end
-			else
-				if mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX then
-					B_MbPartPredMode[mb_type - BLOCK_TYPE_B_MIN][Mb_Part_Idx & 1]
-				else
-					B_MbPartPredMode[23][Mb_Part_Idx & 1]
 				end
 			end
 		end
@@ -240,17 +201,6 @@ actor Algo_DecodeMbPred()
 				else
 					false
 				end
-			end
-		end
-
-	function Is_Intra_16x16(uint MbType)
-				-->
-			bool
-		:
-			if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
-				true
-			else
-				false
 			end
 		end
 

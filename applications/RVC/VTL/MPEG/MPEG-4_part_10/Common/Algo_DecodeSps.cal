@@ -13,6 +13,8 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
+import orcc.Imp_DecodingFunctions.*;
+
 actor Algo_DecodeSps()
 	int (size=32) ValVLD,
 	uint(size=5)  SpsAskedFromPic,
@@ -66,11 +68,6 @@ actor Algo_DecodeSps()
 	                                                      24576,  24576,  26112, 138240, 138240, 138240, 138240, 138240, 138240, 138240,
 	                                                      82800, 138240, 138240, 138240, 138240, 138240, 138240, 138240, 138240, 138240,
 	                                                     138240, 138240, 138240, 138240 ];
-
-	uint(size=3) READ_BITS = 0;
-	uint(size=3) VLD_UE    = 1;
-	uint(size=3) VLD_SE    = 2;
-	uint(size=4) SKIP_NAL  = 10;
 
 
 	bool DEBUG_FLAG_DECODED = false;

@@ -13,6 +13,8 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
+import orcc.Imp_DecodingFunctions.*;
+
 actor Algo_Slice_layer_without_partitioning()
 	int (size=32) ValVLD,
 
@@ -71,12 +73,6 @@ actor Algo_Slice_layer_without_partitioning()
 */
 
 	int (size=6) LAUNCH_ACTOR      = -1;
-	uint(size=5) READ_BITS         =  0;
-	uint(size=5) CAVLC_COEFF_TOKEN =  5;
-	uint(size=5) CAVLC_TOTAL_ZEROS =  7;
-	uint(size=5) CAVLC_RUN_BEFORE  =  8;
-	uint(size=5) VLD_TE            = 9;
-	uint(size=5) SKIP_NAL          = 10;
 
 	uint(size=4) DEC_REF_PIC_MARKING  = 0;
 	uint(size=4) REF_PIC_LIST         = 1;

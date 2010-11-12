@@ -23,6 +23,8 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
+import orcc.Imp_DecodingFunctions.*;
+
 actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int (size=32) ValVLD,
 
@@ -71,10 +73,6 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 */
 
 	int (size=6) LAUNCH_ACTOR   = -1;
-	uint(size=3) READ_BITS      =  0;
-	uint(size=3) VLD_UE         =  1;
-	uint(size=3) MORE_RBSP_DATA =  4;
-	uint(size=5) SKIP_NAL       = 10;
 
 	uint(size=4) MB_LAYER       =  2;
 

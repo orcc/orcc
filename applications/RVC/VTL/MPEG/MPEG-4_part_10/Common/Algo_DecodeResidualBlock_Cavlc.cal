@@ -13,7 +13,7 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
-
+import orcc.Imp_DecodingFunctions.*;
 
 actor Algo_DecodeResidualBlock_Cavlc()
 	int (size=32) ValVLD,
@@ -27,14 +27,6 @@ actor Algo_DecodeResidualBlock_Cavlc()
 	uint(size=4)  Run,
 	bool          Last
 		:
-
-
-	uint(size=4) READ_BITS          = 0;
-	uint(size=4) CAVLC_COEFF_TOKEN  = 5;
-	uint(size=4) CAVLC_LEVEL_PREFIX = 6;
-	uint(size=4) CAVLC_TOTAL_ZEROS  = 7;
-	uint(size=4) CAVLC_RUN_BEFORE   = 8;
-	uint(size=4) SKIP_NAL           = 10;
 
 	bool DEBUG_FLAG_DECODED = false;
 
