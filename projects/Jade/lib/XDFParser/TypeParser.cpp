@@ -45,9 +45,9 @@
 #include "Jade/Core/Entry/ExprEntry.h"
 #include "Jade/Core/Entry/TypeEntry.h"
 #include "Jade/Core/Expr/IntExpr.h"
-#include "Jade/Type/BoolType.h"
-#include "Jade/Type/IntType.h"
-#include "Jade/Type/UIntType.h"
+#include "Jade/Core/Type/BoolType.h"
+#include "Jade/Core/Type/IntType.h"
+#include "Jade/Core/Type/UIntType.h"
 
 #include "TypeParser.h"
 //------------------------------

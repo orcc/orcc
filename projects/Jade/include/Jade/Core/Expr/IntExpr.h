@@ -39,7 +39,7 @@
 #ifndef INTEXPR_H
 #define INTEXPR_H
 
-#include "Jade/Type/IntType.h"
+#include "Jade/Core/Type/IntType.h"
 
 #include "IntExpr.h"
 //------------------------------

@@ -45,9 +45,9 @@
 #include "Jade/Core/Expression.h"
 #include "Jade/Core/Type.h"
 #include "Jade/Core/Attribute.h"
-#include "Jade/Attribute/ValueAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
-#include "Jade/Attribute/TypeAttribute.h"
+#include "Jade/Core/Attribute/ValueAttribute.h"
+#include "Jade/Core/Attribute/TypeAttribute.h"
+#include "Jade/Core/Attribute/TypeAttribute.h"
 //------------------------------
 
 using namespace std;

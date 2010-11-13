@@ -37,9 +37,9 @@
 //------------------------------
 #include <iostream>
 
-#include "Jade/Attribute/TypeAttribute.h"
-#include "Jade/Attribute/ValueAttribute.h"
 #include "Jade/Core/Port.h"
+#include "Jade/Core/Attribute/TypeAttribute.h"
+#include "Jade/Core/Attribute/ValueAttribute.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Vertex.h"
 #include "Jade/Core/Connection.h"

@@ -41,9 +41,8 @@
 
 #include <string>
 
-#include "Jade/Type/StringType.h"
-
 #include "Jade/Core/Expression.h"
+#include "Jade/Core/Type/StringType.h"
 //------------------------------
 
 /**
