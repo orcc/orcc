@@ -69,12 +69,12 @@ public:
 	~IntExpr();
 
 	/*!
-     *  @brief Return ir::Type of the integer expression
+     *  @brief Return IRType of the integer expression
      *
-	 *  @return ir::Type of the integer expression.
+	 *  @return IRType of the integer expression.
      *
      */
-	ir::Type* getType(){return new IntType(new IntExpr(32));};
+	IRType* getType(){return new IntType(new IntExpr(32));};
 
 	/*!
      *  @brief Getter of expression value

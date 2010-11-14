@@ -82,7 +82,7 @@ public:
 	 *  @return ir::Type of the string expression.
      *
      */
-	ir::Type* getType(){return new StringType();};
+	IRType* getType(){return new StringType();};
 
 private:
 	std::string value;

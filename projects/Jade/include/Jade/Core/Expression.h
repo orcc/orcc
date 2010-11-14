@@ -39,7 +39,7 @@
 #ifndef EXPRESSION_H
 #define EXPRESSION_H
 
-#include "Jade/Core/Type.h"
+#include "Jade/Core/IRType.h"
 //------------------------------
 
 /**
@@ -69,9 +69,9 @@ public:
 	/**
 	 * @brief Returns Type corresponding to the type of this expression.
 	 * 
-	 * @return ir::Type of this expression
+	 * @return IRType of this expression
 	 */
-	virtual ir::Type* getType() = 0;
+	virtual IRType* getType() = 0;
 
 
 	/**

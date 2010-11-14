@@ -54,7 +54,7 @@ public:
 
 	static const char* XDF_ROOT;
 	static const char* NAME;
-	static const char* ATTRIBUTE;
+	static const char* IRAttribute;
 	static const char* CONNECTION;
 	static const char* CONNECTION_SRC;
 	static const char* CONNECTION_SRC_PORT;

@@ -38,7 +38,7 @@
 //------------------------------
 #ifndef BINARYEXPR_H
 #define BINARYEXPR_H
-#include "Jade/Core/Type.h"
+#include "Jade/Core/IRType.h"
 
 #include "Jade/Core/Expression.h"
 #include "BinaryOp.h"
@@ -70,18 +70,18 @@ public:
 	~BinaryExpr();
 
 	/*!
-     *  @brief Return ir::Type of the binary expression
+     *  @brief Return IRType of the binary expression
      *
-	 *  @return ir::Type of the binary expression.
+	 *  @return IRType of the binary expression.
      *
      */
-	ir::Type* getType(){return type;};
+	IRType* getType(){return type;};
 
 private:
 	Expr* e1;
 	Expr* e2;
 	BinaryOp* op;
-	ir::Type* type;
+	IRType* type;
 };
 
 #endif

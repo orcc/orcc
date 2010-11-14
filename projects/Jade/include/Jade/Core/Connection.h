@@ -43,6 +43,7 @@
 #include <map>
 #include <string>
 
+#include "Jade/Core/IRAttribute.h"
 #include "Jade/Graph/HDAGEdge.h"
 
 namespace llvm{
@@ -52,7 +53,6 @@ namespace llvm{
 }
 
 class Port;
-class Attribute;
 class Expr;
 
 #define SIZE 10000
@@ -85,7 +85,7 @@ public:
 	 * @param parameters : map of Attr that contains actor parameters
 	 *
      */
-	Connection (Port* source, Port* target, std::map<std::string, Attribute*>* attributes);
+	Connection (Port* source, Port* target, std::map<std::string, IRAttribute*>* attributes);
 
 	~Connection ();
 
@@ -136,7 +136,7 @@ public:
 	 *  @return a map of Attribute.
      *
      */
-	std::map<std::string, Attribute*>* getAttributes(){return attributes;};
+	std::map<std::string, IRAttribute*>* getAttributes(){return attributes;};
 
 	/*!
      *  @brief Get integer size of the connection
@@ -182,7 +182,7 @@ private:
      */
 	int evaluateAsInteger(Expr* expr);
 
-	std::map<std::string, Attribute*>* attributes;	/** Map of attributes */
+	std::map<std::string, IRAttribute*>* attributes;	/** Map of attributes */
 	Port* source;						/** Source Port */
 	Port* target;						/** Destination Port */
 	llvm::IntegerType* type;			/** Type of the connection */

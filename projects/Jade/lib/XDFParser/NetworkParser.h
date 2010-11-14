@@ -59,7 +59,7 @@ class Port;
 class Instance;
 class HDAGGraph;
 class Connection;
-class Attribute;
+class IRAttribute;
 //------------------------------
 
 /*! 
@@ -159,26 +159,26 @@ private:
 	void parseConnection(TiXmlElement* connection);
 
 	/*!
-     *  @brief Parses Attributes elements.
+     *  @brief Parses IRAttributes elements.
      *
-	 * Returns a map of attribute names -> values by parsing the "Attribute"
+	 * Returns a map of IRAttribute names -> values by parsing the "IRAttribute"
 	 * nodes.
 	 *
-     *  @param element : TiXmlNode representation of attributes element 
+     *  @param element : TiXmlNode representation of IRAttributes element 
 	 *
-	 *  @return  a map of attributes with their names  
+	 *  @return  a map of IRAttributes with their names  
      */
-	std::map<std::string, Attribute*> *parseAttributes(TiXmlNode* node);
+	std::map<std::string, IRAttribute*> *parseAttributes(TiXmlNode* node);
 
 	/*!
      *  @brief Parses the current node as a actor parameters.
      *
-	 * Returns a map of attribute parameter names -> values by parsing the parameter
+	 * Returns a map of IRAttribute parameter names -> values by parsing the parameter
 	 * node of an actor.
 	 *
-     *  @param element : xmlNode representation of attributes element 
+     *  @param element : xmlNode representation of IRAttributes element 
 	 *
-	 *  @return  a map of attributes with their value  
+	 *  @return  a map of IRAttributes with their value  
      */
 
 	std::map<std::string, Expr*>* parseParameters(TiXmlNode* node);

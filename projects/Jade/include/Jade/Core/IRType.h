@@ -36,20 +36,18 @@
 */
 
 //------------------------------
-#ifndef TYPE_H
-#define TYPE_H
+#ifndef IRTYPE_H
+#define IRTYPE_H
 
 class Expr;
 
 #define INT_SIZE 32
 //------------------------------
 
-namespace ir
-{
 /**
- * @class Type
+ * @class IRType
  *
- * @brief  This class defines a Type
+ * @brief  This class defines a Type in a network.
  *
  * This class represents an abstract Type in a network. This class
  * intend to be inherit by class corresponding to specific kind 
@@ -58,7 +56,7 @@ namespace ir
  * @author Jerome Gorin
  * 
  */
-class Type {
+class IRType {
 public:
 
 	/*!
@@ -67,8 +65,8 @@ public:
 	 * Creates a new abstract Type
      *
      */
-	Type(){};
-	~Type(){};
+	IRType(){};
+	~IRType(){};
 
 
 	/**
@@ -113,5 +111,5 @@ public:
 	 */
 	virtual bool isVoidType(){return false;};
 };
-}
+
 #endif

@@ -39,8 +39,7 @@
 #ifndef BOOLEXPR_H
 #define BOOLEXPR_H
 
-#include "llvm/DerivedTypes.h"
-
+#include "Jade/Core/IRType.h"
 #include "IntExpr.h"
 //------------------------------
 
@@ -74,7 +73,7 @@ public:
 	 *  @return ir::Type of the integer expression.
      *
      */
-	ir::Type* getType(){return new IntType(new IntExpr(32));};
+	IRType* getType(){return new IntType(new IntExpr(32));};
 
 	/*!
      *  @brief Getter of expression value

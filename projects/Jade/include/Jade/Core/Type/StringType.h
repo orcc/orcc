@@ -39,7 +39,7 @@
 #ifndef STRINGTYPE_H
 #define STRINGTYPE_H
 
-#include "Jade/Core/Type.h"
+#include "Jade/Core/IRType.h"
 //------------------------------
 
 /**
@@ -50,7 +50,7 @@
  * @author Jerome Gorin
  * 
  */
-class StringType : public ir::Type {
+class StringType : public IRType {
 public:
 	/*!
      *  @brief Constructor

@@ -28,42 +28,42 @@
  */
 
 /**
-@brief Description of the ValueAttribute
+@brief Description of the ValueIRAttribute
 @author Jerome Gorin
-@file ValueAttribute.h
+@file ValueIRAttribute.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef VALUEATTRIBUTE_H
-#define VALUEATTRIBUTE_H
+#ifndef VALUEIRAttribute_H
+#define VALUEIRAttribute_H
 
 namespace llvm{
 	class Constant;
 }
 
-#include "Jade/Core/Attribute.h"
+#include "Jade/Core/IRAttribute.h"
 #include "Jade/Core/Expression.h"
 //------------------------------
 
 /**
- * @class Attribute
+ * @class IRAttribute
  *
- * @brief  This class defines a ValueAttribute
+ * @brief  This class defines a ValueIRAttribute
  *
- * This interface represents an attribute with Expression value.
+ * This interface represents an IRAttribute with Expression value.
  * 
  * @author Jerome Gorin
  * 
  */
-class ValueAttribute : public Attribute{
+class ValueAttribute : public IRAttribute{
 public:
 
 	/*!
      *  @brief Constructor
      *
-	 * Creates a new type Attribute
+	 * Creates a new type IRAttribute
      */
 	ValueAttribute(Expr* value){this->value = value;};
 	~ValueAttribute();
@@ -71,14 +71,14 @@ public:
 	/**
 	 * @brief Getter of value.
 	 * 
-	 * @return Value of the attribute
+	 * @return Value of the IRAttribute
 	 */
 	Expr* getValue(){return value;};
 
 	/**
-	 * @brief Returns true if this type is a value attribute.
+	 * @brief Returns true if this type is a value IRAttribute.
 	 * 
-	 * @return true if this type is a value attribute
+	 * @return true if this type is a value IRAttribute
 	 */
 	bool isValue(){return true;};
 

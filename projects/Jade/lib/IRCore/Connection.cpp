@@ -43,18 +43,14 @@
 
 #include "Jade/Core/Connection.h"
 #include "Jade/Core/Expression.h"
-#include "Jade/Core/Type.h"
-#include "Jade/Core/Attribute.h"
 #include "Jade/Core/Attribute/ValueAttribute.h"
-#include "Jade/Core/Attribute/TypeAttribute.h"
-#include "Jade/Core/Attribute/TypeAttribute.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
 
-Connection::Connection(Port* source, Port* target, std::map<std::string, Attribute*>* attributes): HDAGEdge()
+Connection::Connection(Port* source, Port* target, std::map<std::string, IRAttribute*>* attributes): HDAGEdge()
 {	this->attributes = attributes; 
 	this->source = source;	
 	this->target = target;
@@ -76,11 +72,11 @@ int Connection::evaluateAsInteger(Expr* expr){
 }
 
 int Connection::getFifoSize(){
-	std::map<std::string, Attribute*>::iterator it;	
+	std::map<std::string, IRAttribute*>::iterator it;	
 	it = attributes->find("bufferSize");
 		
 	if(it != attributes->end()){
-		Attribute* attr = (*it).second;
+		IRAttribute* attr = (*it).second;
 			
 		if (!attr->isValue()){
 			cerr<< "Error when parsing type of a connection";

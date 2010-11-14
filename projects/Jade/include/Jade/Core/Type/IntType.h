@@ -41,7 +41,7 @@
 
 #include "Jade/Core/Expression.h"
 
-#include "Jade/Core/Type.h"
+#include "Jade/Core/IRType.h"
 //------------------------------
 
 /**
@@ -52,7 +52,7 @@
  * @author Jerome Gorin
  * 
  */
-class IntType : public ir::Type {
+class IntType : public IRType {
 public:
 	/*!
      *  @brief Constructor

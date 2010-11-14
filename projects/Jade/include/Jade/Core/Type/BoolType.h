@@ -39,7 +39,7 @@
 #ifndef BOOLTYPE_H
 #define BOOLTYPE_H
 
-#include "Jade/Core/Type.h"
+#include "Jade/Core/IRType.h"
 //------------------------------
 
 /**
@@ -50,7 +50,7 @@
  * @author Jerome Gorin
  * 
  */
-class BoolType : public ir::Type {
+class BoolType : public IRType {
 public:
 	/*!
      *  @brief Constructor

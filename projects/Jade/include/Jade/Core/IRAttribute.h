@@ -28,65 +28,65 @@
  */
 
 /**
-@brief Description of the attribute
+@brief Description of the IRAttribute
 @author Jerome Gorin
-@file Attribute.h
+@file IRAttribute.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef ATTRIBUTE_H
-#define ATTRIBUTE_H
+#ifndef IRAttribute_H
+#define IRAttribute_H
 //------------------------------
 
 /**
- * @class Attribute
+ * @class IRAttribute
  *
- * @brief  This class defines a Attribute
+ * @brief  This class defines a IRAttribute in a network
  *
- * This interface represents an abstract attribute that can be put on instances or
+ * This interface represents an abstract IRAttribute that can be put on instances or
  * connections in a network.
  * 
  * @author Jerome Gorin
  * 
  */
-class Attribute{
+class IRAttribute{
 public:
 
 	/*!
      *  @brief Constructor
      *
-	 * Creates a new abstract Attribute
+	 * Creates a new abstract IRAttribute
      */
-	Attribute(){};
-	~Attribute(){};
+	IRAttribute(){};
+	~IRAttribute(){};
 
 	/**
-	 * @brief Returns true if this type is custom attribute.
+	 * @brief Returns true if this type is custom IRAttribute.
 	 * 
-	 * @return true if this type is custom attribute
+	 * @return true if this type is custom IRAttribute
 	 */
 	virtual bool isCustom(){return false;};
 
 	/**
-	 * @brief Returns true if this type is a string attribute.
+	 * @brief Returns true if this type is a string IRAttribute.
 	 * 
-	 * @return true if this type is a string attribute
+	 * @return true if this type is a string IRAttribute
 	 */
 	virtual bool isString(){return false;};
 
 	/**
-	 * @brief Returns true if this type is a type attribute.
+	 * @brief Returns true if this type is a type IRAttribute.
 	 * 
-	 * @return true if this type is a type attribute
+	 * @return true if this type is a type IRAttribute
 	 */
 	virtual bool isType(){return false;};
 
 	/**
-	 * @brief Returns true if this type is a value attribute.
+	 * @brief Returns true if this type is a value IRAttribute.
 	 * 
-	 * @return true if this type is a value attribute
+	 * @return true if this type is a value IRAttribute
 	 */
 	virtual bool isValue(){return false;};
 };

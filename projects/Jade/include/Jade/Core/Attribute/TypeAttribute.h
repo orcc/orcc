@@ -28,63 +28,60 @@
  */
 
 /**
-@brief Description of the attribute
+@brief Description of the IRAttribute
 @author Jerome Gorin
-@file TypeAttribute.h
+@file TypeIRAttribute.h
 @version 0.1
 @date 22/03/2010
 */
 
 //------------------------------
-#ifndef TYPEATTRIBUTE_H
-#define TYPEATTRIBUTE_H
+#ifndef TYPEIRAttribute_H
+#define TYPEIRAttribute_H
 
-namespace llvm{
-	class Type;
-}
-
-#include "Jade/Core/Attribute.h"
+#include "Jade/Core/IRType.h"
+#include "Jade/Core/IRAttribute.h"
 //------------------------------
 
 /**
- * @class Attribute
+ * @class IRAttribute
  *
- * @brief  This class defines an Attribute of type Type
+ * @brief  This class defines an IRAttribute of type Type
  *
- * This interface represents an attribute whose value is a type.
+ * This interface represents an IRAttribute whose value is a type.
  * 
  * @author Jerome Gorin
  * 
  */
-class TypeAttribute : public Attribute{
+class TypeAttribute : public IRAttribute{
 public:
 
 	/*!
      *  @brief Constructor
      *
-	 * Creates a new type Attribute with type Type
+	 * Creates a new type IRAttribute with type Type
 	 *
-	 * @param type : Type of the Attribute
+	 * @param type : Type of the IRAttribute
      */
-	TypeAttribute(llvm::Type* type){this->type = type;};
+	TypeAttribute(IRType* type){this->type = type;};
 	~TypeAttribute();
 
 	/**
-	 * @brief Returns true if this type is a type attribute.
+	 * @brief Returns true if this type is a type IRAttribute.
 	 * 
-	 * @return true if this type is a type attribute
+	 * @return true if this type is a type IRAttribute
 	 */
 	bool isType(){return true;};
 
 	/**
 	 * @brief Getter of type.
 	 * 
-	 * @return Type of the attribute
+	 * @return Type of the IRAttribute
 	 */
-	llvm::Type* getType(){return type;};
+	IRType* getType(){return type;};
 
 private:
-	llvm::Type* type;
+	IRType* type;
 };
 
 #endif

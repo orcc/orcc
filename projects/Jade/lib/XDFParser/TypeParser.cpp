@@ -63,7 +63,7 @@ TypeParser::~TypeParser (){
 
 }
 
-Type* TypeParser::parseType(TiXmlNode* node){	
+IRType* TypeParser::parseType(TiXmlNode* node){	
 	
 	while(node != NULL){
 		if (TiXmlString(node->Value()) == XDFNetwork::TYPE) {
@@ -71,7 +71,7 @@ Type* TypeParser::parseType(TiXmlNode* node){
 			TiXmlString name(eltType->Attribute( XDFNetwork::NAME));
 
 			if (name == XDFNetwork::TYPE_BOOL) {
-				return (Type*)Type::getInt1Ty(Context);
+				return new BoolType();
 			}else if (name == XDFNetwork::TYPE_INT) {
 				map<string, Entry*> *entries = parseTypeEntries(node->FirstChild());
 
@@ -116,7 +116,7 @@ map<string, Entry*>* TypeParser::parseTypeEntries(TiXmlNode* node){
 				Expr* expression = exprParser->parseExpr(node->FirstChild());
 				entry = new ExprEntry(expression);
 			}else if (kind == XDFNetwork::TYPE) {
-				Type* type = parseType(node->FirstChild());
+				IRType* type = parseType(node->FirstChild());
 				entry = new TypeEntry(type);
 			}else {
 				fprintf(stderr, "UnsupPorted entry Type: \"%s\"", kind);
@@ -131,7 +131,7 @@ map<string, Entry*>* TypeParser::parseTypeEntries(TiXmlNode* node){
 	return entries;
 }
 
-IntegerType* TypeParser::parseTypeSize(map<string, Entry*>* entries){
+IRType* TypeParser::parseTypeSize(map<string, Entry*>* entries){
 	LLVMContext &context = getGlobalContext();
 
 	map<string, Entry*>::iterator it;
@@ -140,7 +140,7 @@ IntegerType* TypeParser::parseTypeSize(map<string, Entry*>* entries){
 	for ( it=entries->begin() ; it != entries->end(); it++ ){
 		string entryName = (*it).first;
 		if(entryName.compare("size")==0){
-			//Size attribute found
+			//Size Attribute found
 			
 			Entry* entry = (*it).second;
 
@@ -149,12 +149,10 @@ IntegerType* TypeParser::parseTypeSize(map<string, Entry*>* entries){
 				exit(0);
 			}
 
-			///Return size
-			//return cast<IntegerType>(((ExprEntry*)entry)->getExprEntry());
-			return (IntegerType*)IntegerType::get(context,INT_SIZE);
+			return new IntType(new IntExpr(INT_SIZE));
 		}
 	}
 
-	///Size attribute not found, return default int size
-	return (IntegerType*)IntegerType::get(context,INT_SIZE);
+	///Size Attribute not found, return default int size
+	return new IntType(new IntExpr(INT_SIZE));
 }

@@ -219,19 +219,19 @@ void NetworkParser::parseConnection(TiXmlElement* connection){
 	Port* dstPort = getPort(dst, dst_port);
 
 	// Get attributes 
-	map<string, Attribute*>* attributes = parseAttributes(connection->FirstChild());
+	map<string, IRAttribute*>* attributes = parseAttributes(connection->FirstChild());
 	Connection* conn = new Connection(srcPort, dstPort, attributes);
 	
 	graph->addEdge(source, target, conn);
 }
 
-map<string, Attribute*>* NetworkParser::parseAttributes(TiXmlNode* node){
-	map<string, Attribute*> *attributes = new map<string, Attribute*>;
+map<string, IRAttribute*>* NetworkParser::parseAttributes(TiXmlNode* node){
+	map<string, IRAttribute*> *IRAttributes = new map<string, IRAttribute*>;
 
 	while(node != NULL){
-		// only Attribute nodes are parsed, other one are ignored. 
-		if (TiXmlString(node->Value()) == XDFNetwork::ATTRIBUTE) {
-			Attribute* attr = NULL;
+		// only IRAttribute nodes are parsed, other one are ignored. 
+		if (TiXmlString(node->Value()) == XDFNetwork::IRAttribute) {
+			IRAttribute* attr = NULL;
 			TiXmlElement* attribute = (TiXmlElement*)node;
 			TiXmlString kind(attribute->Attribute(XDFNetwork::KIND));
 			TiXmlString attrName(attribute->Attribute(XDFNetwork::NAME));		
@@ -246,20 +246,20 @@ map<string, Attribute*>* NetworkParser::parseAttributes(TiXmlNode* node){
 				cerr << "String elements are not supPorted yet";
 				exit(0);
 			}else if (kind == XDFNetwork::KIND_TYPE) {
-				Type* type = typeParser->parseType(attribute->FirstChild());
+				IRType* type = typeParser->parseType(attribute->FirstChild());
 				attr = new TypeAttribute(type);
 			}else if (kind == XDFNetwork::KIND_VALUE) {
 				Expr* expression = exprParser->parseExpr(attribute->FirstChild());
 				attr = new ValueAttribute(expression);
 			}else {
-				cerr << "unsupported attribute kind: " << kind.c_str() ;
+				cerr << "unsupported IRAttribute kind: " << kind.c_str() ;
 				exit(0);
 			}
 
-			attributes->insert(pair<string, Attribute*>(string(attrName.c_str()), attr));
+			IRAttributes->insert(pair<string, IRAttribute*>(string(attrName.c_str()), attr));
         }
 	}
-	return attributes;
+	return IRAttributes;
 }
 
 Port* NetworkParser::getPort(string vertexName, string portName) {
@@ -278,7 +278,7 @@ Vertex* NetworkParser::getVertex(string vertexName, string portName, string kind
 		it = ports->find(portName);
 
 		if (it == ports->end()){
-			cerr << "Connection element %s has an invalid attribute" << portName;
+			cerr << "Connection element %s has an invalid IRAttribute" << portName;
 			exit(0);
 		}
 
@@ -289,7 +289,7 @@ Vertex* NetworkParser::getVertex(string vertexName, string portName, string kind
 		it = instances->find(vertexName);
 
 		if (it == instances->end()){
-			cerr << "Connection element %s has an invalid attribute" << vertexName;
+			cerr << "Connection element %s has an invalid IRAttribute" << vertexName;
 			exit(0);
 		}
 

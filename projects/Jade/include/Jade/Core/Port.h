@@ -47,7 +47,7 @@ namespace llvm {
 	class GlobalVariable;
 }
 
-#include "Jade/Core/Type.h"
+#include "Jade/Core/IRType.h"
 
 class Actor;
 class AbstractFifo;
@@ -60,7 +60,7 @@ class AbstractFifo;
  * @brief  This class defines a Connection
  *
  * This class represents a connection in a network. A connection can have a
- * number of attributes, that can be Types or Expression.
+ * number of IRAttributes, that can be Types or Expression.
  * 
  * @author Jerome Gorin
  * 

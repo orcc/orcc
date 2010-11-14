@@ -41,6 +41,7 @@
 
 #include "llvm/DerivedTypes.h"
 #include "Jade/Core/Entry.h"
+#include "Jade/Core/IRType.h"
 //------------------------------
 
 /**
@@ -59,7 +60,7 @@ public:
 	 * Creates a type entry.
 	 *
      */
-	TypeEntry(llvm::Type* type){this->type = type;};
+	TypeEntry(IRType* type){this->type = type;};
 	~TypeEntry();
 
 	/**
@@ -70,7 +71,7 @@ public:
 	bool isTypeEntry(){return true;};
 
 private:
-	llvm::Type* type;
+	IRType* type;
 
 };
 

@@ -133,7 +133,7 @@ NoLazyCompilation("disable-lazy-compilation",
 
 cl::list<std::string> 
 MAttrs("mattr", CommaSeparated,
-         desc("Target specific attributes (-mattr=help for details)"),
+         desc("Target specific IRAttributes (-mattr=help for details)"),
          value_desc("a1,+a2,-a3,..."));
 
 cl::opt<std::string>
