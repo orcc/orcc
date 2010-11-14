@@ -47,11 +47,11 @@ namespace llvm{
 }
 
 #include "Jade/Core/Actor.h"
+#include "Jade/Core/Expression.h"
 
 
 class BroadcastActor;
 class Decoder;
-class Expr;
 //------------------------------
 
 /**

@@ -63,7 +63,7 @@ Constant* BoolExpr::getConstant(){
 }
 
 Constant* IntExpr::getConstant(){
-	return NULL;
+	return ConstantInt::get(Type::getInt32Ty(Context), value);
 }
 
 Constant* BinaryExpr::getConstant(){

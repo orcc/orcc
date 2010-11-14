@@ -133,8 +133,8 @@ void Instance::solveParameters(){
 		Variable* parameter = itParameter->second;
 		llvm::GlobalVariable* variable = parameter->getGlobalVariable();
 		itValues = parameterValues->find(itParameter->first);
-		Expr* value = itValues->second;
-		//ConstantInt* value = cast<ConstantInt>(itValues->second);
-		//variable->setInitializer(value);
+		Expr* expr = itValues->second;
+		ConstantInt* value = cast<ConstantInt>(expr->getConstant());
+		variable->setInitializer(value);
 	}
 }
