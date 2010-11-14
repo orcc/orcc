@@ -39,8 +39,6 @@
 #define EXPRPARSER_H
 
 #include <stdio.h>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
 #include "Jade/Core/Expression.h"
 #include "Jade/Core/Expr/BinaryOp.h"
 #include "Jade/TinyXML/TinyXml.h"

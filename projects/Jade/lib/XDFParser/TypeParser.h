@@ -34,9 +34,6 @@
 #include <stdio.h>
 #include <string>
 
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-
 #include "Jade/Core/Entry.h"
 #include "Jade/Core/IRType.h"
 #include "Jade/Core/Network.h"

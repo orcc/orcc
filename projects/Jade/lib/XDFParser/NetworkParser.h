@@ -38,11 +38,7 @@
 #ifndef NETPARSER_H
 #define NETPARSER_H
 
-//#include <xstring>
 #include <stdio.h>
-#include <libxml/parser.h>
-#include <libxml/tree.h>
-
 #include "TypeParser.h"
 
 #include "Jade/Core/Network.h"
