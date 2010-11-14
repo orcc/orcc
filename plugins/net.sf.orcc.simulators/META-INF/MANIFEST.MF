@@ -8,7 +8,8 @@ Require-Bundle: net.sf.orcc.core,
  org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.emf.ecore,
- org.eclipse.ui
+ org.eclipse.ui,
+ net.sf.orcc.ui;bundle-version="0.9.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: IETR/INSA Rennes
@@ -20,4 +21,5 @@ Export-Package: net.sf.orcc.simulators;
    org.osgi.framework,
    net.sf.orcc.debug.model,
    net.sf.orcc.plugins.simulators",
+ net.sf.orcc.simulators.Jade,
  net.sf.orcc.simulators.interpreter

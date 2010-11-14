@@ -56,7 +56,7 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 	 * editor knows how to save and restore itself.
 	 */
 	public void createFieldEditors() {
-		addField(new FileFieldEditor(PreferenceConstants.P_JADE, "&Jade path:",
+		addField(new FileFieldEditor(PreferenceConstants.P_JADE, "&Jade executable path:",
 				getFieldEditorParent()));
 	}
 
