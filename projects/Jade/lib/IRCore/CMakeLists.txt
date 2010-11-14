@@ -6,6 +6,7 @@ add_library (IRCore
 	Action.cpp 
 	Actor.cpp
 	Connection.cpp
+	Expression.cpp
 	FSM.cpp
 	Instance.cpp
 	Network.cpp

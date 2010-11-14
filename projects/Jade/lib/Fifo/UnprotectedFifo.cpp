@@ -164,13 +164,14 @@ void UnprotectedFifo::setConnection(Connection* connection, Decoder* decoder){
 	Port* dst = connection->getDestinationPort();
 	GlobalVariable* srcVar = src->getGlobalVariable();
 	GlobalVariable* dstVar = dst->getGlobalVariable();
+	IntegerType* connectionType = cast<IntegerType>(src->getType());
 
 	//Get fifo structure
-	StructType* structType = getFifoType(connection->getIntegerType());
+	StructType* structType = getFifoType(connectionType);
 
 	// Initialize array 
-	PATypeHolder EltTy(connection->getIntegerType());
-	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize());
+	PATypeHolder EltTy(connectionType);
+	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getSize());
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
 	GlobalVariable *NewArray =
         new GlobalVariable(*module, arrayType,
@@ -178,8 +179,8 @@ void UnprotectedFifo::setConnection(Connection* connection, Decoder* decoder){
 	
 	
 	// Initialize fifo elements
-	Constant* elt_size = ConstantInt::get(Type::getInt32Ty(Context), connection->getType());
-	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize());
+	Constant* elt_size = ConstantInt::get(Type::getInt32Ty(Context), connectionType->getBitWidth());
+	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getSize());
 	Constant* read_ptr = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* write_ptr = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* expr = ConstantExpr::getBitCast(NewArray,Type::getInt8PtrTy(Context));

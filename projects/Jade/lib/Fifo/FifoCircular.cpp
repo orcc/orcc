@@ -177,13 +177,14 @@ void FifoCircular::setConnection(Connection* connection, Decoder* decoder){
 	Port* dst = connection->getDestinationPort();
 	GlobalVariable* srcVar = src->getGlobalVariable();
 	GlobalVariable* dstVar = dst->getGlobalVariable();
+	IntegerType* connectionType = cast<IntegerType>(src->getType());
 
 	//Get fifo structure
-	StructType* structType = getFifoType(connection->getIntegerType());
+	StructType* structType = getFifoType(connectionType);
 
 	//Get fifo array structure
-	PATypeHolder EltTy(connection->getIntegerType());
-	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getFifoSize());
+	PATypeHolder EltTy(connectionType);
+	const ArrayType* arrayType = ArrayType::get(EltTy, connection->getSize());
 
 	// Initialize array for content
 	Constant* arrayContent = ConstantArray::get(arrayType, NULL,0);
@@ -200,7 +201,7 @@ void FifoCircular::setConnection(Connection* connection, Decoder* decoder){
 	NewArrayFifoBuffer->setAlignment(32);
 
 	// Initialize fifo elements
-	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getFifoSize());
+	Constant* size = ConstantInt::get(Type::getInt32Ty(Context), connection->getSize());
 	Constant* read_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* write_ind = ConstantInt::get(Type::getInt32Ty(Context), 0);
 	Constant* fill_count = ConstantInt::get(Type::getInt32Ty(Context), 0);

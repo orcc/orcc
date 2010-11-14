@@ -124,7 +124,7 @@ Expr* ExprParser::parseExprLiteral(TiXmlElement* elt){
 			fprintf(stderr,"Expression is not an integer");
 			exit(0);
 		}
-		return new IntExpr(integer);
+		return new IntExpr(Context, integer);
 	} else if (kind == XDFNetwork::LITERAL_REAL) {
 		fprintf(stderr,"Reals not supported yet");
 		exit(0);
@@ -167,15 +167,15 @@ ParseContinuation<Expr*> ExprParser::parseExprBinOpSeq(TiXmlNode* node){
 
 	}
 
-	Expr* expr = BinOpSeqParser().parse(&exprs, &ops);
+	Expr* expr = BinOpSeqParser().parse(Context, &exprs, &ops);
 	return ParseContinuation<Expr*>(node, expr);
 }
 
 Expr* ExprParser::parseBoolean(TiXmlString value){
 	if (value == "true") {
-		return new BoolExpr(true);
+		return new BoolExpr(Context, true);
 	}else if (value =="false") {
-		return new BoolExpr(false);
+		return new BoolExpr(Context, false);
 	}
 	
 	fprintf(stderr,"Expected a boolean value");

@@ -62,10 +62,13 @@ public:
      *
 	 * Creates a new string expression.
 	 *
+	 *  @param C : llvm::LLVMContext.
 	 *  @param value : string value of the StringExpr.
      *
      */
-	StringExpr(std::string value){this->value = value;};
+	StringExpr(llvm::LLVMContext &C, std::string value): Expr(C){
+		this->value = value;
+	};
 
 	~StringExpr();
 
@@ -82,7 +85,7 @@ public:
 	 *  @return ir::Type of the string expression.
      *
      */
-	IRType* getType(){return new StringType();};
+	IRType* getIRType(){return new StringType();};
 
 private:
 	std::string value;

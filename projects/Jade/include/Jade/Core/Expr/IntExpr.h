@@ -39,9 +39,8 @@
 #ifndef INTEXPR_H
 #define INTEXPR_H
 
+#include "Jade/Core/Expression.h"
 #include "Jade/Core/Type/IntType.h"
-
-#include "IntExpr.h"
 //------------------------------
 
 /**
@@ -62,10 +61,15 @@ public:
      *
 	 * Creates a new integer expression.
 	 *
+	 *  @param C : llvm::LLVMContext.
+	 *
 	 *  @param value : integer value of the IntExpr.
      *
      */
-	IntExpr(int value){this->value = value;};
+	IntExpr(llvm::LLVMContext &C, int value) : Expr(C){
+		this->value = value;
+	};
+
 	~IntExpr();
 
 	/*!
@@ -74,7 +78,9 @@ public:
 	 *  @return IRType of the integer expression.
      *
      */
-	IRType* getType(){return new IntType(new IntExpr(32));};
+	IRType* getIRType(){return new IntType(32);};
+
+
 
 	/*!
      *  @brief Getter of expression value
@@ -85,6 +91,13 @@ public:
 	int getValue(){return value;};
 
 	/**
+	 * @brief Returns llvm::Constant corresponding to the llvm value of this expression.
+	 * 
+	 * @return llvm::Constant of this expression
+	 */
+	llvm::Constant* getConstant();
+
+	/**
 	 * @brief Returns true if the expression is an instance of IntExpr
 	 * 
 	 * @return True if the expression is an instance of IntExpr
@@ -92,6 +105,7 @@ public:
 	bool isIntExpr(){return true;};
 
 private:
+	/** Value of IntExpr */
 	int value;
 };
 

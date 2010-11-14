@@ -164,6 +164,4 @@ void Instantiator::updateConnection(Connection* connection){
 		exit(0);
 	}
 	
-	connection->setType(srcType);
-	
 }

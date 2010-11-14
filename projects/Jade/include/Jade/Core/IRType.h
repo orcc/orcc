@@ -39,8 +39,6 @@
 #ifndef IRTYPE_H
 #define IRTYPE_H
 
-class Expr;
-
 #define INT_SIZE 32
 //------------------------------
 

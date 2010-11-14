@@ -39,6 +39,12 @@
 #ifndef EXPRESSION_H
 #define EXPRESSION_H
 
+namespace llvm{
+	class Constant;
+}
+
+#include "llvm/LLVMContext.h"
+
 #include "Jade/Core/IRType.h"
 //------------------------------
 
@@ -62,16 +68,24 @@ public:
      *
 	 * Creates a new abstract expression
      *
+	 * @param C : llvm::Context of the expression
      */
-	Expr(){};
+	Expr(llvm::LLVMContext &C): Context(C){};
 	~Expr(){};
 
 	/**
-	 * @brief Returns Type corresponding to the type of this expression.
+	 * @brief Returns IRType corresponding to the type of this expression.
 	 * 
 	 * @return IRType of this expression
 	 */
-	virtual IRType* getType() = 0;
+	virtual IRType* getIRType() = 0;
+
+	/**
+	 * @brief Returns llvm::Constant corresponding to the llvm value of this expression.
+	 * 
+	 * @return llvm::Constant of this expression
+	 */
+	virtual llvm::Constant* getConstant() = 0;
 
 
 	/**
@@ -122,6 +136,19 @@ public:
 	 * @return True if the expression is an instance of VarExpr
 	 */
 	virtual bool isVarExpr(){return false;};
+
+	/**
+	 * @brief evalue this expression as an integer
+	 *
+	 * Evaluates this expression and return its value as an integer.
+	 * 
+	 * @return the expression evaluated as an integer
+	 */
+	int evaluateAsInteger();
+
+protected:
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
 
 };
 

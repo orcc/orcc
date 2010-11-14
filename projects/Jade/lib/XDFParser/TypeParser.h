@@ -37,9 +37,9 @@
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 
-#include "Jade/Core/Network.h"
 #include "Jade/Core/Entry.h"
 #include "Jade/Core/IRType.h"
+#include "Jade/Core/Network.h"
 #include "Jade/TinyXML/TinyXml.h"
 
 #include "ExprParser.h"
@@ -97,7 +97,7 @@ private:
 	 * @return A map of entry names to contents.
 	 */
 	std::map<std::string, Entry*>* parseTypeEntries(TiXmlNode* node);
-	IRType* parseTypeSize(std::map<std::string, Entry*>* entries);
+	Expr* parseTypeSize(std::map<std::string, Entry*>* entries);
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

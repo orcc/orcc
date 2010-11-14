@@ -39,7 +39,6 @@
 #ifndef BINARYEXPR_H
 #define BINARYEXPR_H
 #include "Jade/Core/IRType.h"
-
 #include "Jade/Core/Expression.h"
 #include "BinaryOp.h"
 //------------------------------
@@ -60,13 +59,18 @@ public:
 	
 	/**
      *  @brief Constructor of the class BinaryExpr
-     *
+	 *
+	 *  @param C : llvm::LLVMContext.
      *  @param	e1 : first Expr of binary expression
 	 *  @param	op : BinaryOp of the binary expression
 	 *  @param	e2 : second Expr of binary expression
 	 *
      */
-	BinaryExpr(Expr* e1, BinaryOp* op, Expr* e2){this->e1 = e1;this->op = op;this->e2 = e2;};
+	BinaryExpr(llvm::LLVMContext &C, Expr* e1, BinaryOp* op, Expr* e2) :  Expr(C){
+		this->e1 = e1;
+		this->op = op;
+		this->e2 = e2;
+	};
 	~BinaryExpr();
 
 	/*!
@@ -75,7 +79,14 @@ public:
 	 *  @return IRType of the binary expression.
      *
      */
-	IRType* getType(){return type;};
+	IRType* getIRType(){return type;};
+
+	/**
+	 * @brief Returns llvm::Constant corresponding to the llvm value of this expression.
+	 * 
+	 * @return llvm::Constant of this expression
+	 */
+	llvm::Constant* getConstant();
 
 private:
 	Expr* e1;

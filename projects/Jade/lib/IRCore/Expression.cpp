@@ -28,64 +28,45 @@
  */
 
 /**
-@brief Description of the BinOpSeqParser
+@brief Implementation of deriving class from Expression
 @author Jerome Gorin
-@file BinOpSeqParser.cpp
+@file Expression.cpp
 @version 0.1
-@date 22/03/2010
+@date 2010/04/12
 */
 
 //------------------------------
-#include "BinOpSeqParser.h"
+#include <iostream>
 
+#include "llvm/Constants.h"
+#include "llvm/DerivedTypes.h"
+
+#include "Jade/Core/Expr/BoolExpr.h"
 #include "Jade/Core/Expr/BinaryExpr.h"
+#include "Jade/Core/Expr/IntExpr.h"
 //------------------------------
+
 using namespace std;
+using namespace llvm;
 
-Expr* BinOpSeqParser::parse(llvm::LLVMContext &C, list<Expr*>* exprs, list<BinaryOp*>* ops){
-	return createPrecedenceTree(C, exprs, ops, 0, exprs->size() - 1);
+int Expr::evaluateAsInteger(){
+	if (isIntExpr()){
+		return ((IntExpr*)this)->getValue();
+	}
+	
+	cerr << "Can't evaluate a non IntExpr";
+	exit(0);
 }
 
-int BinOpSeqParser::findPivot(list<BinaryOp*>* ops, int startIndex, int stopIndex){
-	int pivot = startIndex;
-	list<BinaryOp*>::iterator it;
-	
-	it = ops->begin();
-	advance(it, pivot);
-	BinaryOp* bop = *it;
-	int pivotRank = bop->getPrecedence();
-	
-	for (int i = startIndex + 1; i <= stopIndex; i++) {
-		it = ops->begin();
-		advance(it, i);
-		bop = *it;
-		int current = bop->getPrecedence();
-		bool rtl = bop->isRightAssociative();
-		if (pivotRank < current || (current == pivotRank && rtl)) {
-			pivot = i;
-			pivotRank = current;
-		}
-	}
-
-	return pivot;
+Constant* BoolExpr::getConstant(){
+	return ConstantInt::get(Type::getInt1Ty(Context), value);
 }
 
-Expr* BinOpSeqParser::createPrecedenceTree(llvm::LLVMContext &C, list<Expr*>* exprs, list<BinaryOp*>* ops, int startIndex, int stopIndex){
-	list<BinaryOp*>::iterator itOp;
-	list<Expr*>::iterator itExpr;
+Constant* IntExpr::getConstant(){
+	return NULL;
+}
 
-	if (stopIndex == startIndex) {
-		itExpr = exprs->begin();
-		advance(itExpr, startIndex);
-		return *itExpr;
-	}
+Constant* BinaryExpr::getConstant(){
 
-	int pivot = findPivot(ops, startIndex, stopIndex - 1);
-	itOp = ops->begin();
-	advance(itOp, pivot);
-	BinaryOp* op = *itOp;
-	Expr* e1 = createPrecedenceTree(C, exprs, ops, startIndex, pivot);
-	Expr* e2 = createPrecedenceTree(C, exprs, ops, pivot + 1, stopIndex);
-
-	return new BinaryExpr(C, e1, op, e2);
+	return NULL;
 }

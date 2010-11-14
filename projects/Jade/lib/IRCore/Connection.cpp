@@ -58,39 +58,30 @@ Connection::Connection(Port* source, Port* target, std::map<std::string, IRAttri
 }
 
 
-int Connection::evaluateAsInteger(Expr* expr){
-	/*if(isa<ConstantInt>(expr)){
-		ConstantInt* value = cast<ConstantInt>(expr);
-		return (int)value->getValue().getLimitedValue();
-
-	} else if (isa<ConstantExpr>(expr)){
-		ConstantExpr* value = cast<ConstantExpr>(expr);
-	}
-	return 32;*/
-	cout << "to be rewritten";
-	exit(1);
-}
-
-int Connection::getFifoSize(){
-	std::map<std::string, IRAttribute*>::iterator it;	
-	it = attributes->find("bufferSize");
-		
-	if(it != attributes->end()){
-		IRAttribute* attr = (*it).second;
-			
-		if (!attr->isValue()){
-			cerr<< "Error when parsing type of a connection";
-			exit(0);
-		}
-			
-		Expr* expr = ((ValueAttribute*)attr)->getValue();
-
-		return evaluateAsInteger(expr);
-	}		
+int Connection::getSize(){
+	IRAttribute* attribute = getAttribute("bufferSize");
 	
-	return SIZE;
+	if (attribute == NULL){
+		return 10000;
+	}
+	
+	if (attribute->isValue()){
+		Expr* expr = ((ValueAttribute*)attribute)->getValue();
+		return expr->evaluateAsInteger();
+	}
+
+	cerr<< "Error when parsing type of a connection";
+	exit(0);
 }
 
-int Connection::getType(){
-	return type->getBitWidth()/8;
+IRAttribute* Connection::getAttribute(std::string name){
+	map<string, IRAttribute*>::iterator it;
+
+	it = attributes->find(name);
+
+	if(it == attributes->end()){
+		return NULL;
+	}
+
+	return it->second;
 }

@@ -120,7 +120,7 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				
 				//Create a new actor for this broadcast
 				string name = "broadcast_"+ instance->getId()+"_"+ srcPort->getName();
-				BroadcastActor* actorBCast = new BroadcastActor(Context, name, numOuputs, connection->getIntegerType(), fifo);
+				BroadcastActor* actorBCast = new BroadcastActor(Context, name, numOuputs, srcPort->getType(), fifo);
 				
 				//Instanciate broadcast
 				Instance* newInstance = new Instance(name, actorBCast);		
@@ -151,7 +151,6 @@ void BroadcastAdder::createIncomingConnection(Connection* connection, Vertex* ve
 	instance->setAsInput(bcastInput);
 
 	Connection* incoming = new Connection(srcPort,bcastInput, IRAttributes);
-	incoming->setType(connection->getIntegerType());
 
 	graph->addEdge(vertex, vertexBCast, incoming);
 
@@ -179,7 +178,6 @@ void BroadcastAdder::createOutgoingConnections(Vertex* vertexBCast, list<Connect
 
 			map<string, IRAttribute*>* attributes = (*it)->getAttributes();
 			Connection* connBcastTarget = new Connection(outputPort, (*it)->getDestinationPort(), attributes);
-			connBcastTarget->setType((*it)->getIntegerType());
 
 			//Add the connection into the graph
 			graph->addEdge(vertexBCast, target, connBcastTarget);

@@ -41,6 +41,8 @@
 
 #include <list>
 
+#include "llvm/LLVMContext.h"
+
 #include "Jade/Core/Expression.h"
 #include "Jade/Core/Expr/BinaryOp.h"
 //------------------------------
@@ -67,7 +69,7 @@ public:
 	 *
 	 * @return a binary expression tree
 	 */
-	static Expr* parse(std::list<Expr*>* exprs, std::list<BinaryOp*>* ops);
+	static Expr* parse(llvm::LLVMContext &C, std::list<Expr*>* exprs, std::list<BinaryOp*>* ops);
 
 private:
 	/**
@@ -96,9 +98,8 @@ private:
 	 * @param stopIndex : stop index
 	 * @return an expression
 	 */
-	static Expr* createPrecedenceTree(std::list<Expr*>* exprs, std::list<BinaryOp*>* ops,
+	static Expr* createPrecedenceTree(llvm::LLVMContext &C, std::list<Expr*>* exprs, std::list<BinaryOp*>* ops,
 			int startIndex, int stopIndex);
-
 };
 
 #endif

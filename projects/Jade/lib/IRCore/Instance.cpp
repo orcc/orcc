@@ -126,15 +126,15 @@ void Instance::setAsOutput(Port* port) {
 }
 
 void Instance::solveParameters(){
-	/*map<string, Constant*>::iterator itValues;
+	map<string, Expr*>::iterator itValues;
 	std::map<std::string, Variable*>::iterator itParameter;
 	
 	for (itParameter= parameters->begin(); itParameter != parameters->end(); itParameter++){
 		Variable* parameter = itParameter->second;
 		llvm::GlobalVariable* variable = parameter->getGlobalVariable();
 		itValues = parameterValues->find(itParameter->first);
-		
-		ConstantInt* value = cast<ConstantInt>(itValues->second);
-		variable->setInitializer(value);
-	}*/
+		Expr* value = itValues->second;
+		//ConstantInt* value = cast<ConstantInt>(itValues->second);
+		//variable->setInitializer(value);
+	}
 }

@@ -39,8 +39,6 @@
 #ifndef INTTYPE_H
 #define INTTYPE_H
 
-#include "Jade/Core/Expression.h"
-
 #include "Jade/Core/IRType.h"
 //------------------------------
 
@@ -61,7 +59,7 @@ public:
 	 *
      * @param size : Expr of the size of this integer type
      */
-	IntType(Expr* size){this->size = size;};
+	IntType(int size){this->size = size;};
 	~IntType();
 
 	/**
@@ -76,10 +74,10 @@ public:
 	 * 
 	 * @return integer of the size
 	 */
-	Expr* getSize(){return size;};
+	int getSize(){return size;};
 
 private:
-	Expr* size;
+	int size;
 
 };
 

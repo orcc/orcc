@@ -129,7 +129,6 @@ public:
 	void setSourcePort(Port* source){this->source = source;};
 
 
-
 	/*!
      *  @brief Getter of attributes
      *
@@ -139,12 +138,12 @@ public:
 	std::map<std::string, IRAttribute*>* getAttributes(){return attributes;};
 
 	/*!
-     *  @brief Get integer size of the connection
+     *  @brief Get size of the connection
      *
 	 *  @return an integer representing the size of the connection.
      *
      */
-	int getFifoSize();
+	int getSize();
 
 	/*!
      *  @brief Get fifo bound to the connection
@@ -162,30 +161,20 @@ public:
      */
 	 void setFifo(llvm::GlobalVariable* fifo){this->fifo = fifo;};
 
-	/*!
-     *  @brief Get integer size of the token carried by this connection
-     *
-	 *  @return an integer representing the size of token.
-     *
-     */
-	int getType();
-
-	llvm::IntegerType* getIntegerType(){return type;};
-
-	void setType(llvm::IntegerType* type) {this->type = type;};
+	 /**
+	 * @brief  return an attribute
+	 *
+	 * Returns the IRAttribute associated with the given name.
+	 * 
+	 * @param name : an attribute name
+	 * @return the attribute associated with the given name, or if not found, NULL
+	 */
+	 IRAttribute* getAttribute(std::string name);
 
 private:
-	/*!
-     *  @brief Evaluate this expression as an integer
-     *
-	 *  @return an integer value of the expression.
-     */
-	int evaluateAsInteger(Expr* expr);
-
 	std::map<std::string, IRAttribute*>* attributes;	/** Map of attributes */
 	Port* source;						/** Source Port */
 	Port* target;						/** Destination Port */
-	llvm::IntegerType* type;			/** Type of the connection */
 	llvm::GlobalVariable* fifo;			/** Fifo of the connection */
 };
 

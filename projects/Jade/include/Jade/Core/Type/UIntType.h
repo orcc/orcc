@@ -61,7 +61,7 @@ public:
 	 *
      * @param size : Expr of the size of this unsigned integer type
      */
-	UIntType(Expr* size){this->size = size;};
+	UIntType(int size){this->size = size;};
 	~UIntType();
 
 	/**
@@ -76,10 +76,10 @@ public:
 	 * 
 	 * @return integer of the size
 	 */
-	int getSize(){return 32;};
+	int getSize(){return size;};
 
 private:
-	Expr* size;
+	int size;
 
 };
 

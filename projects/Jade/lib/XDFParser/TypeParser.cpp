@@ -74,12 +74,8 @@ IRType* TypeParser::parseType(TiXmlNode* node){
 				return new BoolType();
 			}else if (name == XDFNetwork::TYPE_INT) {
 				map<string, Entry*> *entries = parseTypeEntries(node->FirstChild());
-
-				delete entries;
-
-				return parseTypeSize(entries);
-
-				
+				Expr* expr = parseTypeSize(entries);
+				return new IntType(expr->evaluateAsInteger());
 			}else if (name == XDFNetwork::TYPE_LIST) {
 				cerr << "List elements are not supPorted yet";
 				exit(0);
@@ -88,8 +84,8 @@ IRType* TypeParser::parseType(TiXmlNode* node){
 				exit(0);
 			}else if (name == XDFNetwork::TYPE_UINT) {
 				map<string, Entry*> *entries = parseTypeEntries(node->FirstChild());
-				delete entries;
-				return parseTypeSize(entries);
+				Expr* expr = parseTypeSize(entries);
+				return new UIntType(expr->evaluateAsInteger());
 			}else {
 				cerr << "Unknown Type name: " << name.c_str();
 				exit(0);
@@ -131,28 +127,25 @@ map<string, Entry*>* TypeParser::parseTypeEntries(TiXmlNode* node){
 	return entries;
 }
 
-IRType* TypeParser::parseTypeSize(map<string, Entry*>* entries){
+Expr* TypeParser::parseTypeSize(map<string, Entry*>* entries){
 	LLVMContext &context = getGlobalContext();
 
 	map<string, Entry*>::iterator it;
 
-	
-	for ( it=entries->begin() ; it != entries->end(); it++ ){
-		string entryName = (*it).first;
-		if(entryName.compare("size")==0){
-			//Size Attribute found
-			
-			Entry* entry = (*it).second;
+	it = entries->find("size");
 
-			if (entry->isTypeEntry()){
-				fprintf(stderr,"Entry does not contain an Expression");
-				exit(0);
-			}
-
-			return new IntType(new IntExpr(INT_SIZE));
-		}
+	if (it == entries->end()){
+		return new IntExpr(Context, INT_SIZE);
 	}
 
-	///Size Attribute not found, return default int size
-	return new IntType(new IntExpr(INT_SIZE));
+	//Size Attribute found
+	Entry* entry = (*it).second;
+
+	if (entry->isTypeEntry()){
+		fprintf(stderr,"Entry does not contain an Expression");
+		exit(0);
+	}
+
+	return ((ExprEntry*) entry)->getExprEntry();
+	
 }

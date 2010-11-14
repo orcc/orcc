@@ -61,10 +61,15 @@ public:
      *
 	 * Creates a new boolean expression.
 	 *
+	 *  @param C : llvm::LLVMContext.
+	 *
 	 *  @param value : boolean value of the BoolExpr.
      *
      */
-	BoolExpr(bool value){this->value = value;};
+	BoolExpr(llvm::LLVMContext &C, bool value) : Expr(C){
+		this->value = value;
+	};
+
 	~BoolExpr();
 
 	/*!
@@ -73,7 +78,7 @@ public:
 	 *  @return ir::Type of the integer expression.
      *
      */
-	IRType* getType(){return new IntType(new IntExpr(32));};
+	IRType* getIRType(){return new IntType(32);};
 
 	/*!
      *  @brief Getter of expression value
@@ -82,6 +87,13 @@ public:
      *
      */
 	int getValue(){return value;};
+
+	/**
+	 * @brief Returns llvm::Constant corresponding to the llvm value of this expression.
+	 * 
+	 * @return llvm::Constant of this expression
+	 */
+	llvm::Constant* getConstant();
 
 	/**
 	 * @brief Returns true if the expression is an instance of IntExpr
