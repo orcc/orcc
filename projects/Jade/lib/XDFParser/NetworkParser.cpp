@@ -60,7 +60,7 @@ NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename){
 
 	/* Parsing file error */
 	if (!xdfDoc->LoadFile()) {
-        cerr << "Failed to parse %s\n" << filename.c_str();
+        cerr << "Failed to open file " << filename.c_str();
 		exit(0);
     }
 
@@ -74,16 +74,7 @@ NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename){
 }
 
 NetworkParser::~NetworkParser (){
-	//xmlFreeDoc(xdfDoc);
-
-	///*
- //    * Cleanup function for the XML library.
- //    */
- //   xmlCleanupParser();
- //   /*
- //    * this is to debug memory for regression tests
- //    */
- //   xmlMemoryDump();
+	delete xdfDoc;
 }
 
 
@@ -226,10 +217,10 @@ void NetworkParser::parseConnection(TiXmlElement* connection){
 }
 
 map<string, IRAttribute*>* NetworkParser::parseAttributes(TiXmlNode* node){
-	map<string, IRAttribute*> *IRAttributes = new map<string, IRAttribute*>;
+	map<string, IRAttribute*> *attributes = new map<string, IRAttribute*>;
 
 	while(node != NULL){
-		// only IRAttribute nodes are parsed, other one are ignored. 
+		// only attributes nodes are parsed, other one are ignored. 
 		if (TiXmlString(node->Value()) == XDFNetwork::IRAttribute) {
 			IRAttribute* attr = NULL;
 			TiXmlElement* attribute = (TiXmlElement*)node;
@@ -237,13 +228,13 @@ map<string, IRAttribute*>* NetworkParser::parseAttributes(TiXmlNode* node){
 			TiXmlString attrName(attribute->Attribute(XDFNetwork::NAME));		
 
 			if (kind == XDFNetwork::KIND_CUSTOM) {
-				cerr << "Custom elements are not supPorted yet";
+				cerr << "Custom elements are not supported yet";
 				exit(0);
 			}else if (kind == XDFNetwork::KIND_FLAG) {
-				cerr << "Flag elements are not supPorted yet";
+				cerr << "Flag elements are not supported yet";
 				exit(0);
 			}else if (kind == XDFNetwork::KIND_STRING) {
-				cerr << "String elements are not supPorted yet";
+				cerr << "String elements are not supported yet";
 				exit(0);
 			}else if (kind == XDFNetwork::KIND_TYPE) {
 				IRType* type = typeParser->parseType(attribute->FirstChild());
@@ -252,14 +243,15 @@ map<string, IRAttribute*>* NetworkParser::parseAttributes(TiXmlNode* node){
 				Expr* expression = exprParser->parseExpr(attribute->FirstChild());
 				attr = new ValueAttribute(expression);
 			}else {
-				cerr << "unsupported IRAttribute kind: " << kind.c_str() ;
+				cerr << "unsupported attribute kind: " << kind.c_str() ;
 				exit(0);
 			}
 
-			IRAttributes->insert(pair<string, IRAttribute*>(string(attrName.c_str()), attr));
+			attributes->insert(pair<string, IRAttribute*>(string(attrName.c_str()), attr));
         }
+		node = node->NextSibling();
 	}
-	return IRAttributes;
+	return attributes;
 }
 
 Port* NetworkParser::getPort(string vertexName, string portName) {
