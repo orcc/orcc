@@ -52,13 +52,13 @@ import net.sf.orcc.ir.util.CommonNodeOperations;
 public class AssignIndex extends SpecificInstruction implements
 		LocalTargetContainer {
 
-	private List<Expression> indexes;
+	private Map<Expression,Integer> expressionToIndexMap;
 
-	private LocalVariable target;
+	private List<Expression> indexes;
 
 	private Type listType;
 	
-	private Map<Expression,Integer> expressionToIndexMap;
+	private LocalVariable target;
 
 	/**
 	 * Creates a new AssignIndex from the given indexes and target.
@@ -77,11 +77,13 @@ public class AssignIndex extends SpecificInstruction implements
 		setListType(listType);
 	}
 	
-	private void refreshMap(){
-		expressionToIndexMap.clear();
-		for(int i=0; i<indexes.size(); i++){
-			expressionToIndexMap.put(indexes.get(i), i);
-		}
+	/**
+	 * Returns the map of index expression to index number.
+	 * 
+	 * @return the map of index expression to index number
+	 */
+	public Map<Expression, Integer> getExpressionToIndexMap() {
+		return expressionToIndexMap;
 	}
 
 	/**
@@ -93,11 +95,6 @@ public class AssignIndex extends SpecificInstruction implements
 		return indexes;
 	}
 
-	@Override
-	public LocalVariable getTarget() {
-		return target;
-	}
-
 	/**
 	 * Returns the type of the list which use this AssignIndex.
 	 * 
@@ -106,19 +103,22 @@ public class AssignIndex extends SpecificInstruction implements
 	public Type getListType() {
 		return listType;
 	}
-	
-	/**
-	 * Returns the map of index expression to index number.
-	 * 
-	 * @return the map of index expression to index number
-	 */
-	public Map<Expression, Integer> getExpressionToIndexMap() {
-		return expressionToIndexMap;
-	}
 
+	@Override
+	public LocalVariable getTarget() {
+		return target;
+	}
+	
 	@Override
 	public void internalSetTarget(LocalVariable target) {
 		this.target = target;
+	}
+
+	private void refreshMap(){
+		expressionToIndexMap.clear();
+		for(int i=0; i<indexes.size(); i++){
+			expressionToIndexMap.put(indexes.get(i), i);
+		}
 	}
 
 	/**
@@ -138,11 +138,6 @@ public class AssignIndex extends SpecificInstruction implements
 		refreshMap();
 	}
 
-	@Override
-	public void setTarget(LocalVariable target) {
-		CommonNodeOperations.setTarget(this, target);
-	}
-
 	/**
 	 * Sets the type of the list which use this AssignIndex.
 	 * 
@@ -151,5 +146,10 @@ public class AssignIndex extends SpecificInstruction implements
 	 */
 	public void setListType(Type listType) {
 		this.listType = listType;
+	}
+
+	@Override
+	public void setTarget(LocalVariable target) {
+		CommonNodeOperations.setTarget(this, target);
 	}
 }
