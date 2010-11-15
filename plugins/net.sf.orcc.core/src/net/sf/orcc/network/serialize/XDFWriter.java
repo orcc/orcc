@@ -40,10 +40,10 @@ import java.util.TreeMap;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
-import net.sf.orcc.ir.TypeInt;
-import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryExpr;
 import net.sf.orcc.ir.expr.BinaryOp;
@@ -198,6 +198,11 @@ public class XDFWriter {
 	private final Document document;
 
 	/**
+	 * The writer's output file.
+	 */
+	private File file;
+
+	/**
 	 * the graph of the network being written.
 	 */
 	private final DirectedGraph<Vertex, Connection> graph;
@@ -222,7 +227,7 @@ public class XDFWriter {
 		document = DomUtil.createDocument("XDF");
 		writeXDF(document.getDocumentElement(), network);
 
-		File file = new File(path, network.getName() + ".xdf");
+		file = new File(path, network.getName() + ".xdf");
 		OutputStream os;
 		try {
 			os = new FileOutputStream(file);
@@ -241,6 +246,15 @@ public class XDFWriter {
 		}
 
 		writeChildren(path);
+	}
+
+	/**
+	 * Return resulting file of XDFWriter
+	 * 
+	 * @return the File where network is written
+	 */
+	public File getFile() {
+		return file;
 	}
 
 	/**

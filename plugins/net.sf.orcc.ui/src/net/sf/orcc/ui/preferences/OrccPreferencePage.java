@@ -31,8 +31,10 @@ package net.sf.orcc.ui.preferences;
 import net.sf.orcc.preferences.PreferenceConstants;
 import net.sf.orcc.ui.OrccActivator;
 
+import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.FileFieldEditor;
+
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -58,6 +60,8 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 	 */
 	public void createFieldEditors() {
 		addField(new FileFieldEditor(PreferenceConstants.P_JADE, "&Jade executable path:",
+				getFieldEditorParent()));
+		addField(new DirectoryFieldEditor(PreferenceConstants.P_JADE_TOOLS, "&Jade tools path:",
 				getFieldEditorParent()));
 	}
 

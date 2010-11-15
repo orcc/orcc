@@ -79,12 +79,12 @@ Module* LLVMParser::loadBitcode(string file) {
 	
 	// Load the bitcode...
 	Module *Mod = ParseIRFile(Filename.c_str(), Err, Context);
- 
+
 	if (!Mod) {
-		cout << "Error opening bitcode file: '" << Filename.c_str() << "'";
+		cerr << "Error opening bitcode file: '" << file.c_str() << "\n";
 		exit(1);
 	}
-	
+
 	return Mod;
 }
 

@@ -31,11 +31,11 @@ package net.sf.orcc.simulators.jade;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
-import static net.sf.orcc.OrccLaunchConstants.TOOLS_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
+import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLS;
 
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -45,8 +45,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.debug.model.OrccProcess;
+import net.sf.orcc.network.Network;
+import net.sf.orcc.network.serialize.XDFParser;
+import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.plugins.simulators.Simulator;
 import net.sf.orcc.ui.OrccActivator;
 
@@ -83,6 +87,11 @@ public class JadeSimulatorImpl implements Simulator {
 	protected OrccProcess orccProcess;
 
 	/**
+	 * Master caller associated process for jade I/O access.
+	 */
+	protected Process jadeProcess;
+
+	/**
 	 * Input stimulus file name
 	 */
 	protected String stimulusFile;
@@ -106,6 +115,11 @@ public class JadeSimulatorImpl implements Simulator {
 	 * input XDF network file name
 	 */
 	protected String xdfFile;
+	
+	/**
+	 * XDF network flatten file
+	 */
+	protected File xdfFlattenFile;
 
 	@Override
 	public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -162,12 +176,29 @@ public class JadeSimulatorImpl implements Simulator {
 
 	}
 
+	private void flatten(){
+		try {
+			Network network = new XDFParser(xdfFile).parseNetwork();
+			network.flatten();
+					
+			XDFWriter writer = new XDFWriter(new File(vtlFolder), network);
+			xdfFlattenFile = writer.getFile();
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 	@Override
 	public void run() {
+		// Flatten the network
+		flatten();
+		
+		//Preparing command line
 		List<String> cmdList = new ArrayList<String>();
 		cmdList.add(execJade);
 		cmdList.add("-xdf");
-		cmdList.add(xdfFile);
+		cmdList.add(xdfFlattenFile.getAbsolutePath());
 		cmdList.add("-i");
 		cmdList.add(stimulusFile);
 		cmdList.add("-L");
@@ -181,61 +212,63 @@ public class JadeSimulatorImpl implements Simulator {
 		}
 		String[] cmd = cmdList.toArray(new String[] {});
 
+		//Run application
 		Runtime run = Runtime.getRuntime();
 
 		try {
-			final Process process = run.exec(cmd);
-		
-			// Output application message
-			new Thread() {
-				@Override
-				public void run() {
-					try {
-						BufferedReader reader = new BufferedReader(
-								new InputStreamReader(process.getInputStream()));
-						try {
-							String line = reader.readLine();
-							if (line != null) {
-								orccProcess.write(line+ "\n");
-							}
-						} finally {
-							reader.close();
-						}
-					} catch (IOException ioe) {
-						ioe.printStackTrace();
-					}
-				}
-			}.start();
-			
-			// Output error message
-			new Thread() {
-				@Override
-				public void run() {
-					try {
-						BufferedReader reader = new BufferedReader(
-								new InputStreamReader(process.getErrorStream()));
-						try {
-							String line = reader.readLine();
-							if (line != null) {
-								orccProcess.write("Generation error :" + line
-										+ "\n");
-							}
-						} finally {
-							reader.close();
-						}
-					} catch (IOException ioe) {
-						ioe.printStackTrace();
-					}
-				}
-			}.start();
-
-			process.waitFor();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+			jadeProcess = run.exec(cmd);
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
 
+		// Output application message
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					BufferedReader reader = new BufferedReader(
+							new InputStreamReader(jadeProcess.getInputStream()));
+					try {
+						String line = reader.readLine();
+						if (line != null) {
+							orccProcess.write(line + "\n");
+						}
+					} finally {
+						reader.close();
+					}
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		}.start();
+
+		// Output error message
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					BufferedReader reader = new BufferedReader(
+							new InputStreamReader(jadeProcess.getErrorStream()));
+					try {
+						String line = reader.readLine();
+						if (line != null) {
+							orccProcess.write("Generation error :" + line
+									+ "\n");
+						}
+					} finally {
+						reader.close();
+					}
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+		}.start();
+
+		try {
+			jadeProcess.waitFor();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -246,9 +279,11 @@ public class JadeSimulatorImpl implements Simulator {
 			vtlFolder = configuration.getAttribute(VTL_FOLDER, "");
 			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			xdfFile = configuration.getAttribute(XDF_FILE, "");
-			toolsFolder = configuration.getAttribute(TOOLS_FOLDER, "");
 			tracesFolder = configuration.getAttribute(TRACES_FOLDER, "");
-			execJade = OrccActivator.getDefault().getPreferenceStore().getString(P_JADE);
+			execJade = OrccActivator.getDefault().getPreferenceStore()
+					.getString(P_JADE);
+			toolsFolder = OrccActivator.getDefault().getPreferenceStore()
+					.getString(P_JADE_TOOLS);
 
 			// Jade location has not been set
 			if (execJade.equals("")) {
@@ -256,12 +291,10 @@ public class JadeSimulatorImpl implements Simulator {
 						"Jade path must first be set in window->Preference->Orcc");
 			}
 
-			// Verify that the file is executable
-			File file = new File(execJade);
-
-			if (!file.canExecute()) {
+			// Jade location has not been set
+			if (toolsFolder.equals("")) {
 				throw new OrccRuntimeException(
-						"Wrong Jade location in Orcc Preference");
+						"Jade tools path must first be set in window->Preference->Orcc");
 			}
 		} catch (CoreException e) {
 			throw new OrccRuntimeException(e.getMessage());

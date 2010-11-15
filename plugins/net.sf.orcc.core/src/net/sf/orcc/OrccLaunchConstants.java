@@ -126,11 +126,6 @@ public interface OrccLaunchConstants {
 	public static final String SIMULATOR = "net.sf.orcc.simulator";
 
 	/**
-	 * Specific option of Orcc that defines its tools folders.
-	 */
-	public static final String TOOLS_FOLDER = "net.sf.orcc.plugins.toolsFolder";
-
-	/**
 	 * Simulator traces folder associated with an Orcc configuration
 	 */
 	public static final String TRACES_FOLDER = "net.sf.orcc.simulators.tracesFolder";

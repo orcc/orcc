@@ -108,7 +108,7 @@ Network* NetworkParser::parseNetwork (){
 
 	/* Initialize network */
 	network = new Network(name, inputs, outputs, graph);
-	
+
 	return network;
 }
 
@@ -128,6 +128,8 @@ Instance* NetworkParser::parseInstance(TiXmlElement* instance){
 		if (TiXmlString(child->Value()) == XDFNetwork::INSTANCE_CLASS){
 			clasz = TiXmlString(((TiXmlElement*) child)->Attribute(XDFNetwork::NAME));
 			break;
+		} else {
+			child = child->NextSibling();
 		}
 	}
 
@@ -175,24 +177,24 @@ void  NetworkParser::parseBody(TiXmlElement* root){
 				parseConnection(element);
 			}else if (name == XDFNetwork::DECL) {
 				cerr << "Decl elements are not supPorted yet";
-				exit(0);
+				exit(1);
 			}else if (name == XDFNetwork::INSTANCE) {
 				Instance* instance = parseInstance(element);
 				instances->insert(pair<string, Instance*>(instance->getId(), instance));
 				graph->addVertex(new Vertex(instance));
 			}else if (name == XDFNetwork::PACKAGE) {
 				cerr << "Package elements are not supPorted yet";
-				exit(0);
+				exit(1);
 			}else if (name == XDFNetwork::PORT) {
 				cerr << "Port elements are not supPorted yet";
-				exit(0);
+				exit(1);
 			}else {
-				cerr << "invalid node \"%s\"\n" << name.c_str();
-				exit(0);
+				cerr << "Invalid node "<< name.c_str() <<"\n";
+				exit(1);
 			}
-			
-			node = node->NextSibling();
         }
+
+		node = node->NextSibling();
     }
 }
 
@@ -270,8 +272,8 @@ Vertex* NetworkParser::getVertex(string vertexName, string portName, string kind
 		it = ports->find(portName);
 
 		if (it == ports->end()){
-			cerr << "Connection element %s has an invalid IRAttribute" << portName;
-			exit(0);
+			cerr << "Connection element " << portName <<" has an invalid attribute";
+			exit(1);
 		}
 
 		return new Vertex(kind, it->second);
@@ -281,8 +283,8 @@ Vertex* NetworkParser::getVertex(string vertexName, string portName, string kind
 		it = instances->find(vertexName);
 
 		if (it == instances->end()){
-			cerr << "Connection element %s has an invalid IRAttribute" << vertexName;
-			exit(0);
+			cerr << "Connection element " << vertexName << " has an invalid Attribute";
+			exit(1);
 		}
 
 		return new Vertex(it->second);

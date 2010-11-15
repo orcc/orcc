@@ -50,11 +50,13 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.ui.DebugUITools;
 import org.eclipse.debug.ui.IDebugModelPresentation;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.debug.ui.ILaunchShortcut2;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
@@ -95,9 +97,14 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 		} else {
 			config = chooseConfiguration(configs);
 		}
+		
+		Shell shell = getShell();
 
 		if (config != null) {
-			DebugUITools.launch(config, mode);
+			// open launch dialog so the user can tune the settings
+			DebugUITools.openLaunchConfigurationDialogOnGroup(shell,
+					new StructuredSelection(config),
+					IDebugUIConstants.ID_RUN_LAUNCH_GROUP);
 		}
 	}
 

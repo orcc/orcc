@@ -47,15 +47,6 @@
                workspace="false">
          </browseFile>
       </option>
-      <option
-            description="Folder where Jade can find its tools"
-            id="net.sf.orcc.plugins.toolsFolder"
-            name="Tools Folder">
-         <browseFile
-               folder="true"
-               workspace="false">
-         </browseFile>
-      </option>
    </extension>
    <extension
          point="net.sf.orcc.core.simulators">
@@ -86,9 +77,6 @@
          </option>
          <option
                id="net.sf.orcc.simulators.VTLFolder">
-         </option>
-         <option
-               id="net.sf.orcc.plugins.toolsFolder">
          </option>
       </simulator>
    </extension>

@@ -118,7 +118,6 @@ void DecoderEngine::parseActors(Network* network) {
 	
 	for ( it = files->begin(); it != files->end(); ++it ){
 		Actor* actor = irParser->parseActor(*it);
-		
 		fifo->refineActor(actor);
 		
 		actors.insert(pair<string, Actor*>(*it, actor));

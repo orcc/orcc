@@ -28,10 +28,10 @@
  */
 package net.sf.orcc.preferences;
 
+import net.sf.orcc.ui.OrccActivator;
+
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-
-import net.sf.orcc.ui.OrccActivator;
 
 /**
  * This class initializes default preference values.
@@ -45,6 +45,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		IPreferenceStore store = OrccActivator.getDefault()
 				.getPreferenceStore();
 		store.setDefault(PreferenceConstants.P_JADE, "");
+		store.setDefault(PreferenceConstants.P_JADE_TOOLS, "");
 	}
 
 }
