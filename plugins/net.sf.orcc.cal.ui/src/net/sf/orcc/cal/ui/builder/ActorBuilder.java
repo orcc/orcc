@@ -42,6 +42,7 @@ import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
+import net.sf.orcc.ui.OrccProjectNature;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -64,7 +65,6 @@ import org.eclipse.xtext.builder.IXtextBuilderParticipant;
 import org.eclipse.xtext.resource.IEObjectDescription;
 import org.eclipse.xtext.resource.IResourceDescription;
 import org.eclipse.xtext.resource.IResourceDescription.Delta;
-import org.eclipse.xtext.resource.XtextResource;
 
 import com.google.inject.Injector;
 
@@ -94,9 +94,14 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 	@Override
 	public void build(IBuildContext context, IProgressMonitor monitor)
 			throws CoreException {
+		// only build Orcc projects
+		IProject project = context.getBuiltProject();
+		if (!project.hasNature(OrccProjectNature.NATURE_ID)) {
+			return;
+		}
+
 		// retrieve output folder from project
 		// by default output in .generated
-		IProject project = context.getBuiltProject();
 		String outputFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
 		if (outputFolder == null) {
 			outputFolder = new Path(project.getLocation().toOSString()).append(
@@ -123,10 +128,6 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			} else {
 				// creation
 				IResourceDescription desc = delta.getNew();
-
-				set.getLoadOptions().put(XtextResource.OPTION_RESOLVE_ALL,
-						Boolean.TRUE);
-
 				Resource resource = set.getResource(desc.getURI(), true);
 				for (EObject obj : resource.getContents()) {
 					if (obj.eClass()
