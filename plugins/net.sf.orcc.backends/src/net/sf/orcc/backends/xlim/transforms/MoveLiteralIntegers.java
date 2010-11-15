@@ -48,7 +48,6 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
@@ -67,8 +66,6 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * 
  */
 public class MoveLiteralIntegers extends AbstractActorTransformation {
-
-	private String file;
 
 	private ExpressionInterpreter exprInterpreter = new AbstractExpressionInterpreter() {
 
@@ -126,6 +123,8 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		}
 	};
 
+	private String file;
+
 	@Override
 	public void transform(Actor actor) throws OrccException {
 		this.file = actor.getFile();
@@ -137,34 +136,6 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		assign.setValue((Expression) assign.getValue().accept(exprInterpreter,
 				instructionIterator));
 		Use.addUses(assign, assign.getValue());
-	}
-
-	@Override
-	public void visit(Store store) {
-		ListIterator<Expression> it = store.getIndexes().listIterator();
-		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(exprInterpreter,
-					instructionIterator));
-		}
-		store.setValue((Expression) store.getValue().accept(exprInterpreter,
-				instructionIterator));
-		Use.addUses(store, store.getIndexes());
-		Use.addUses(store, store.getValue());
-	}
-
-	@Override
-	public void visit(Load load) {
-		ListIterator<Expression> it = load.getIndexes().listIterator();
-		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(exprInterpreter,
-					instructionIterator));
-		}
-		Use.addUses(load, load.getIndexes());
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		super.visitProcedure(procedure);
 	}
 
 	@Override
@@ -192,6 +163,32 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(List<CFGNode> nodes) {
+		for (int i = 0; i < nodes.size(); i++) {
+			CFGNode node = nodes.get(i);
+			node.accept(this);
+			i = nodes.indexOf(node);
+		}
+	}
+
+	@Override
+	public void visit(PhiAssignment phi) {
+		ListIterator<Expression> it = phi.getValues().listIterator();
+		while (it.hasNext()) {
+			it.set((Expression) it.next().accept(exprInterpreter,
+					instructionIterator));
+		}
+		Use.addUses(phi, phi.getValues());
+	}
+
+	@Override
+	public void visit(Store store) {
+		store.setValue((Expression) store.getValue().accept(exprInterpreter,
+				instructionIterator));
+		Use.addUses(store, store.getValue());
+	}
+
+	@Override
 	public void visit(WhileNode whileNode) {
 		// Check the presence of a BlockNode before and create one if needed
 		if (instructionIterator == null) {
@@ -214,22 +211,8 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(List<CFGNode> nodes) {
-		for (int i = 0; i < nodes.size(); i++) {
-			CFGNode node = nodes.get(i);
-			node.accept(this);
-			i = nodes.indexOf(node);
-		}
-	}
-
-	@Override
-	public void visit(PhiAssignment phi) {
-		ListIterator<Expression> it = phi.getValues().listIterator();
-		while (it.hasNext()) {
-			it.set((Expression) it.next().accept(exprInterpreter,
-					instructionIterator));
-		}
-		Use.addUses(phi, phi.getValues());
+	public void visitProcedure(Procedure procedure) {
+		super.visitProcedure(procedure);
 	}
 
 }

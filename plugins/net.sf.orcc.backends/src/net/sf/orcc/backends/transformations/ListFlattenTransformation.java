@@ -58,14 +58,20 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * 
  * @author Matthieu Wipliez
  * @author Nicolas Siret
+ * @author Herve Yviquel
  * 
  */
 public class ListFlattenTransformation extends AbstractActorTransformation {
 
 	private boolean applyToLocalLists;
+	private boolean applyToDeclarations;
+	private boolean useUint;
 
-	public ListFlattenTransformation(boolean applyToLocalLists) {
+	public ListFlattenTransformation(boolean applyToDeclarations,
+			boolean applyToLocalLists, boolean useUint) {
+		this.applyToDeclarations = applyToDeclarations;
 		this.applyToLocalLists = applyToLocalLists;
+		this.useUint = useUint;
 	}
 
 	/**
@@ -125,8 +131,14 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 			int indexSize = IntExpr.getSize(size - 1) - 1;
 
 			// new index variable
-			LocalVariable indexVar = procedure.newTempLocalVariable("",
-					IrFactory.eINSTANCE.createTypeUint(indexSize), "index");
+			LocalVariable indexVar;
+			if (useUint) {
+				indexVar = procedure.newTempLocalVariable("",
+						IrFactory.eINSTANCE.createTypeUint(indexSize), "index");
+			} else {
+				indexVar = procedure.newTempLocalVariable("",
+						IrFactory.eINSTANCE.createTypeInt(indexSize), "index");
+			}
 			listIndex.add(new VarExpr(new Use(indexVar)));
 
 			// add the assign instruction for each index
@@ -138,10 +150,16 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 		}
 
 		// creates the variable that will hold the concatenation of indexes
-		LocalVariable indexVar = procedure.newTempLocalVariable("",
-				IrFactory.eINSTANCE.createTypeUint(concatenatedSize),
-				"concat_index");
-
+		LocalVariable indexVar;
+		if (useUint) {
+			indexVar = procedure.newTempLocalVariable("",
+					IrFactory.eINSTANCE.createTypeUint(concatenatedSize),
+					"concat_index");
+		} else {
+			indexVar = procedure.newTempLocalVariable("",
+					IrFactory.eINSTANCE.createTypeInt(concatenatedSize),
+					"concat_index");
+		}
 		// sets indexVar as memory index
 		Use.removeUses(instruction, indexes);
 		indexes.clear();
@@ -158,12 +176,14 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 
 	@Override
 	public void transform(Actor actor) throws OrccException {
-		// VHDL synthesizers don't support multi-dimensional memory yet
-		for (StateVariable variable : actor.getStateVars()) {
-			if (variable.getType().isList()) {
-				List<Expression> newValues = new ArrayList<Expression>();
-				flattenList(variable.getValue(), newValues);
-				variable.setConstantValue(new ListExpr(newValues));
+		if (applyToDeclarations) {
+			// VHDL synthesizers don't support multi-dimensional memory yet
+			for (StateVariable variable : actor.getStateVars()) {
+				if (variable.getType().isList()) {
+					List<Expression> newValues = new ArrayList<Expression>();
+					flattenList(variable.getValue(), newValues);
+					variable.setConstantValue(new ListExpr(newValues));
+				}
 			}
 		}
 

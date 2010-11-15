@@ -38,6 +38,7 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
+import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
@@ -88,14 +89,11 @@ public class XlimBackendImpl extends AbstractBackend {
 				new InlineTransformation(true, true), new BlockCombine(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new DeadVariableRemoval(),
+				new ListFlattenTransformation(false, true, false),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(),
 				new FirstPhiValuesOfWhileNodeTransformation(),
-				new MoveLiteralIntegers(), /*
-											 * new
-											 * ListFlattenTransformation(true),
-											 */
-				new VariableRenamer(),
+				new MoveLiteralIntegers(), new VariableRenamer(),
 				new ChangeActionSchedulerFormTransformation() };
 
 		for (ActorTransformation transformation : transformations) {

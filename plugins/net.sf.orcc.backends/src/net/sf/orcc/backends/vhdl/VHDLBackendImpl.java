@@ -114,7 +114,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 				new TransformConditionals(),
 
-				new ListFlattenTransformation(false),
+				new ListFlattenTransformation(true, false, true),
 
 				new VariableRenamer(),
 
