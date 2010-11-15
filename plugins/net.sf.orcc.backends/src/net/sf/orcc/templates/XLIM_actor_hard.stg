@@ -41,6 +41,10 @@ HasTokens(hasTokens) ::= <<
 <operation kind="pinStatus" portName="$hasTokens.port$">
 	<port dir="out" size="1" source="$hasTokens.target$" typeName="bool"/>
 </operation>
+<operation kind="noop">
+	<port dir="in" source="$hasTokens.target$"/>
+	<port dir="out" size="32" source="isSchedulable_$action.name$_$hasTokens.port.name$" typeName="int"/>
+</operation>
 <!-- Guards Expressions of $action.name$ -->
 
 >>
@@ -55,21 +59,59 @@ schedulerName(actions) ::=<<
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Override outputPatternPort
+// Override outputPattern
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPatternPort(port, index, index0, state) ::= <<
-<!--  OutputPattern -->
-<operation kind="pinStatus" portName="$port$">
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
-</operation>
+>>
+
+outputPattern(pattern,action,state) ::= <<
+$outputPatternPortDecision(); separator="\n"$
+>>
+
+outputPatternPortDecision()::=<<
+<module kind="if">
+	<module decision="outputPattern_$instance.id$_$action.name$_fireable_condition" kind="test">
+		<operation kind="noop">
+			<port dir="in" source="outputPattern_$instance.id$_$action.name$_fireable"/>
+			<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_fireable_condition" typeName="bool"/>
+		</operation>
+	</module>
+>>
+
+outputPatternFireabilityPort(port) ::=<<
+<port dir="in" source="outputPattern_$instance.id$_$port$_status"/>
+>>
+
+outputPatternFireability(action) ::=<<
+$if(action.outputPattern)$
+<!-- outputPattern Fireability -->
 <operation kind="\$and">
-	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$"/>
-	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index0$"/>
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$" typeName="bool"/>
+	$action.outputPattern.keys: {port | $outputPatternFireabilityPort(port=port)$}; separator="\n"$
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_fireable" typeName="bool"/>
+</operation>
+$endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// outputPinStatus
+///////////////////////////////////////////////////////////////////////////////
+
+outputPinStatusPort(port) ::=<<
+<operation kind="pinStatus" portName="$port$">
+	<port dir="out" size="1" source="outputPattern_$instance.id$_$port$_status" typeName="bool"/>
 </operation>
 >>
 
+outputPinStatus() ::=<<
+<!-- outputPattern Status -->
+$instance.actor.outputs.list: {port|$outputPinStatusPort(port=port)$}; separator="\n"$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// scheduler without FSM
+///////////////////////////////////////////////////////////////////////////////
 
 scheduler(actions) ::= <<
 $schedulerName(actions)$
@@ -87,7 +129,10 @@ $schedulerName(actions)$
 			$instance.actor.actions: isSchedulableTest(); separator="\n"$
 			$outputPinStatus()$
 			$instance.actor.actions: outputPatternFireability(); separator="\n"$
-			$if(actions)$$schedulingTest(actions)$$endif$
+			$if(actions)$
+			$schedulingTest(actions)$
+					<module kind="block" mutex="true"/>
+			$endif$
 			<!--Close modules -->
 			$if(actions)$  	 	 
 			$actions:{</module></module>}; separator="\n"$
@@ -95,35 +140,6 @@ $schedulerName(actions)$
 		</module>
 	</module>
 </module>
->>
-
-inputPeeks(actions) ::=<<
->>
-
-outputPinStatusPort(port) ::=<<
-<operation kind="pinStatus" portName="$port$">
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$port$_status" typeName="bool"/>
-</operation>
->>
-
-
-outputPinStatus() ::=<<
-<!-- outputPattern Status -->
-$instance.actor.outputs.list: {port|$outputPinStatusPort(port=port)$}; separator="\n"$
->>
-
-outputPatternFireabilityPort(port) ::=<<
-<port dir="in" source="outputPattern_$instance.id$_$port$_status"/>
->>
-
-outputPatternFireability(action) ::=<<
-$if(action.outputPattern)$
-<!-- outputPattern Fireability -->
-<operation kind="\$and">
-	$action.outputPattern.keys: {port | $outputPatternFireabilityPort(port=port)$}; separator="\n"$
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_fireable" typeName="bool"/>
-</operation>
-$endif$
 >>
 
 
