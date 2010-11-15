@@ -79,15 +79,38 @@ $endif$
 // Scheduler with fsm
 ///////////////////////////////////////////////////////////////////////////////
 
-schedulerFSM(action) ::= << 
-:: /* $action.name$ */ state == $fsm_trans.SourceState$ $guardFSM()$ -> 
+newState() ::= << 
+:: state == $fsm_trans.SourceState$
+$if (rest(fsm_trans.NextStateInfo))$
+	/*do peeks here!*/
+	if
+	$fsm_trans.NextStateInfo: {
+			fsm_nsi| 
+:: $fsm_nsi.action: schedulerFSM(); separator="\n"$ }$
+	fi
+$else$
+$fsm_trans.NextStateInfo: {
+		fsm_nsi| $fsm_nsi.action: schedulerFSM(); separator="\n"$ }$
+$endif$
+>>
+
+schedulerFSM(action) ::= <<
+	/* $action.name$ */ atomic { 
+	$guardFSM()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
+	-> 
 	$inputPattern(action.inputPattern)$
+	$action.body.CFG$
 	$outputPattern(action.outputPattern)$
 	state = $fsm_nsi.targetState$;
+}
 >>
 
 guardFSM() ::= <<
+$if (options.guards.(action))$
  $options.guards.(action): {act | && $act$} $
+$else$
+skip
+$endif$
 >>
 
 
@@ -96,9 +119,12 @@ guardFSM() ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 scheduler(action) ::= <<
-:: /* $action.name$ */ $guard()$ -> 
+:: /* $action.name$ */ atomic { 
+	$guard()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
+	-> 
 	$inputPattern(action.inputPattern)$
-	$outputPattern(action.outputPattern)$	
+	$outputPattern(action.outputPattern)$
+}	
 >>
 
 guard() ::= <<
@@ -131,6 +157,13 @@ outputPattern(pattern) ::= <<
 $pattern.keys: outputPatternPort(); separator="\n"$
 >>
 
+inputChannelCheck(pattern) ::= <<
+$pattern.keys: {key | && nempty($key$)} $
+>>
+
+outputChannelCheck(pattern) ::= <<
+$pattern.keys: {key | && nfull($key$)} $
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Process declaration
@@ -146,13 +179,11 @@ active proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap
 	mtype state = $actor.actionScheduler.fsm.initialState$;
 	
 	do
-	$actor.actionScheduler.fsm.transitions: {
-		fsm_trans| $fsm_trans.NextStateInfo: {
-			fsm_nsi| $fsm_nsi.action: schedulerFSM(); separator="\n"$ }$ }$
+	$actor.actionScheduler.fsm.transitions: { fsm_trans| $newState()$ }$
 	od
 	$else$
 	do
-		$actor.actionScheduler.actions: scheduler(); separator="\n"$
+	$actor.actionScheduler.actions: scheduler(); separator="\n"$
 	od
 	$endif$
 }
