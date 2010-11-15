@@ -144,6 +144,14 @@ MCPU("mcpu", desc("Target a specific cpu type (-mcpu=help for details)"),
        value_desc("cpu-name"),
        init(""));
 
+cl::opt<bool> OptLevelO1("O1", cl::desc("Optimization level 1. Similar to llvm-gcc -O1"));
+
+cl::opt<bool> OptLevelO2("O2",
+           cl::desc("Optimization level 2. Similar to llvm-gcc -O2"));
+
+cl::opt<bool> OptLevelO3("O3",
+           cl::desc("Optimization level 3. Similar to llvm-gcc -O3"));
+
 void clean_exit(int sig){
 	exit(0);
 }

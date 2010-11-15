@@ -49,6 +49,7 @@
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMUtility.h"
+#include "Jade/Jit/LLVMOptimizer.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 //------------------------------
 
@@ -87,8 +88,12 @@ int DecoderEngine::load(Network* network) {
 	
 	//Set the scheduler
 	decoder.setScheduler(new RoundRobinScheduler(Context));
-
 	cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	timer = clock ();
+
+	LLVMOptimizer opt(&decoder);
+	opt.optimize();
+	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 	
 	LLVMUtility utility;
@@ -98,7 +103,6 @@ int DecoderEngine::load(Network* network) {
 	cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 
-	cout << "-->  Start decoding :\n";
 	timer = clock ();
 
 	//Start decoding

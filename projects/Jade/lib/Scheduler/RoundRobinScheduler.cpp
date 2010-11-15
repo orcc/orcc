@@ -36,7 +36,8 @@
 */
 
 //------------------------------
-
+#include <time.h>
+#include <iostream>
 #include <map>
 
 #include "llvm/LLVMContext.h"
@@ -152,11 +153,15 @@ void RoundRobinScheduler::createSchedulerFn(){
 }
 
 void RoundRobinScheduler::execute(){
+	clock_t timer = clock ();
 	executionEngine = new LLVMExecution(Context, decoder);
 
 	setExternalFunctions();
 
+	cout << "--> Engine initialized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+
 	//Run decoder
+	cout << "-->  Start decoding :\n";
 	executionEngine->run("main");
 }
 

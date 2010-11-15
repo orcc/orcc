@@ -74,7 +74,7 @@ public:
      *
 	 *	Delete optimizer
      */
-	~LLVMOptimizer();
+	~LLVMOptimizer(){};
 
 	void optimize();
 private:

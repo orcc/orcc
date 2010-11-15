@@ -88,7 +88,7 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder): Context(C)  {
       exit(1);
     }
   }
-
+  
   EngineBuilder builder(module);
   builder.setMArch(MArch);
   builder.setMCPU(MCPU);
@@ -101,6 +101,20 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder): Context(C)  {
   // If we are supposed to override the target triple, do so now.
   if (!TargetTriple.empty())
     module->setTargetTriple(Triple::normalize(TargetTriple));
+
+  //TODO : select optimization level
+  char OptLevel = '2';
+  CodeGenOpt::Level OLvl = CodeGenOpt::Default;
+  switch (OptLevel) {
+  default:
+   exit (1);
+  case ' ': break;
+  case '0': OLvl = CodeGenOpt::None; break;
+  case '1': OLvl = CodeGenOpt::Less; break;
+  case '2': OLvl = CodeGenOpt::Default; break;
+  case '3': OLvl = CodeGenOpt::Aggressive; break;
+  }
+  builder.setOptLevel(OLvl);
 
   EE = builder.create();
   if (!EE) {
