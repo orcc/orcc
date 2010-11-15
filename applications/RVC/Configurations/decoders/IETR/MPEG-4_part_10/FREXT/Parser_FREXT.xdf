@@ -684,4 +684,6 @@
     <Connection dst="MVReconstruct" dst-port="LTList" src="MMCO" src-port="LongTermList"/>
     <Connection dst="MVReconstruct" dst-port="RefList1" src="RefList1" src-port="RefList"/>
     <Connection dst="MVReconstruct" dst-port="Poc" src="DecodePic" src-port="POC"/>
+    <Connection dst="MVReconstruct" dst-port="Direct8x8InferenceFlag"
+        src="DecodeSps" src-port="Direct8x8Inference"/>
 </XDF>

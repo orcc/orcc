@@ -66,7 +66,9 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=4)  SubMbPredRefIdx,
 
 	int (size=16) MbPredMvRes,
-	int (size=16) SubMbPredMvRes
+	int (size=16) SubMbPredMvRes,
+
+	bool          colPic
 		==>
 	bool          NewPic_o,
 	int (size=16) MvOut,
@@ -385,7 +387,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	GetMbType.B_Skip_B_Direct_16x16: action
 			mb_type    :[MacroBlkType],
-			NewPic_i   :[IsNewPic]
+			NewPic_i   :[IsNewPic],
+			colPic     :[TabColPic] repeat 16
 				==>
 	Location  :[0,0],
 	MvOut     :[0,0],
@@ -598,12 +601,12 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	ComputeMvLX.Launch16x8: action
 			MbPredRefIdx :[RefIdxCurr],
-			MbPredMvRes      :[mv_res] repeat 2
+			MbPredMvRes  :[mv_res] repeat 2
 				==>
-			Location :[Blk_x_in_pix,Blk_y_in_pix],
-			MvOut :[MvpL0] repeat 2,
-			RefIdxOut :[RefIdxCurr],
-			NewPic_o  :[false]
+			Location     :[Blk_x_in_pix,Blk_y_in_pix],
+			MvOut        :[MvpL0] repeat 2,
+			RefIdxOut    :[RefIdxCurr],
+			NewPic_o     :[false]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			   Is_PredL0(MbType, MbPartIdx) and IsPredL0

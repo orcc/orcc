@@ -31,6 +31,8 @@ actor Algo_DecodeSps()
 	uint(size=31) MMCO_MaxFrameNum,
 	uint(size=5)  MMCO_NumRefFrame,
 
+	bool          Direct8x8Inference,
+
 	uint(size=32) Pps_PicWidthInMbs,
 	uint(size=32) Pps_PicHeightInMapUnits, 
 
@@ -148,6 +150,7 @@ actor Algo_DecodeSps()
 			SliceDataParameters   :[SliceDataParam] repeat 7,
 			SliceHeaderParameters :[SliceHeaderParam]repeat 8,
 			SizeDPBMax            :[MaxDPBSz[ValSps]],
+			Direct8x8Inference    :[ValDirect8x8Inference],
 
 			MMCO_MaxFrameNum      :[max_frame_num[ValSps]],
 			MMCO_NumRefFrame      :[num_ref_frames[ValSps]]

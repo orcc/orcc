@@ -135,6 +135,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="Direct8x8InferenceFlag">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -317,6 +320,9 @@
     <Connection dst="MvBuffer" dst-port="LongTermList" src="" src-port="LTList"/>
     <Connection dst="MvBuffer" dst-port="RefList1" src="" src-port="RefList1"/>
     <Connection dst="MvBuffer" dst-port="Poc" src="" src-port="Poc"/>
+    <Connection dst="MvBuffer" dst-port="Direct8x8Inference" src="" src-port="Direct8x8InferenceFlag"/>
     <Connection dst="MvBuffer" dst-port="RefIdxL0" src="MvL0_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="MvBuffer" dst-port="RefIdxL1" src="MvL1_Reconstr" src-port="RefIdxOut"/>
+    <Connection dst="MvL0_Reconstr" dst-port="colPic" src="MvBuffer" src-port="colPic"/>
+    <Connection dst="MvL1_Reconstr" dst-port="colPic" src="MvBuffer" src-port="colPic"/>
 </XDF>

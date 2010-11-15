@@ -60,6 +60,7 @@ actor Algo_MvBuffer()
 	bool          NewPic,
 
 	uint(size=32) Poc,
+	bool          Direct8x8Inference,
 
 	uint(size=13) CurrMbAddr,
 	uint(size=7)  PicWidthInMb,
@@ -75,6 +76,7 @@ actor Algo_MvBuffer()
 
 	int (size=32) RefList1
 		==>
+	bool colPic
 		:
 
 	int (size=32) PIC_WIDTH_IN_PX        = 1280; //number of MB per lines
@@ -153,7 +155,6 @@ actor Algo_MvBuffer()
 			end
 		end
 
-
 	function Is_PredL1(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
 				-->
 			bool
@@ -165,31 +166,41 @@ actor Algo_MvBuffer()
 			end
 		end
 
-	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdx;
-	List(type: List(type: List(type: List(type: int(size=5), size=2), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListMv;
+	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdxL0;
+	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdxL1;
+	List(type: List(type: List(type: List(type: int(size=5), size=2), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListMvL0;
+	List(type: List(type: List(type: List(type: int(size=5), size=2), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListMvL1;
 	List(type: bool,          size=16) IsReference;
 	List(type: uint(size=32), size=16) ListPoc;
 
-	uint(size=3) MbPartIdxMax;
-	uint(size=3) MbPartIdx;
-	uint(size=3) SizeMbMv;
-	uint(size=3) SubMbPartIdxMax;
-	uint(size=3) SubMbPartIdx;
-	uint(size=3) SizeSubMbMv;
-	uint(size=1) Idx_Sub_Tab;
-	uint(size=6) mb_type;
-	bool         IsPredL0;
-	bool         IsPredL1;
-	uint(size=5) Size_RefList;
-	uint(size=5) Idx_RefList;
-	uint(size=4) WriteListIdx;
-	uint(size=4) ReadListIdx;
-	bool         CurrL1_IsShortTermRef;
+	uint(size=3)  MbPartIdxMax;
+	uint(size=3)  MbPartIdx;
+	uint(size=3)  SizeMbMv;
+	uint(size=3)  SubMbPartIdxMax;
+	uint(size=3)  SubMbPartIdx;
+	uint(size=3)  SizeSubMbMv;
+	uint(size=1)  Idx_Sub_Tab;
+	uint(size=6)  mb_type;
+	bool          IsPredL0;
+	bool          IsPredL1;
+	uint(size=5)  Size_RefList;
+	uint(size=5)  Idx_RefList;
+	uint(size=4)  WriteListIdx;
+	uint(size=4)  ReadListIdx;
+	bool          colPic_IsShortTermRef;
+	uint(size=32) Mbx;
+	uint(size=32) Mby;
+	bool          direct_8x8_inference_flag;///////////////////////////////
+
+	uint(size=4) NbPartitionsToWrite;
+	List(type: uint(size=32), size=16) Partition_Mbx;
+	List(type: uint(size=32), size=16) Partition_Mby;
 
 	GetNewPic: action
-			NewPic       :[IsNewPic],
-			Poc          :[Picture_Order_Count],
-			Empty_DPB    :[ValEmpty]//////////////////////////////
+			NewPic             :[IsNewPic],
+			Poc                :[Picture_Order_Count],
+			Empty_DPB          :[ValEmpty],//////////////////////////////
+			Direct8x8Inference :[Direct8x8InferFlag]
 				==>
 		guard
 			IsNewPic
@@ -201,6 +212,7 @@ actor Algo_MvBuffer()
 			end
 			IsReference[WriteListIdx] := true;
 			ListPoc    [WriteListIdx] := Picture_Order_Count;
+			direct_8x8_inference_flag := Direct8x8InferFlag;
 		end
 
 	GetMbType.MacroBlkIorSI: action
@@ -216,22 +228,89 @@ actor Algo_MvBuffer()
 			CurrMbAddr     :[Mb_Addr],
 			PicWidthInMb   :[pic_width]
 				==>
-		var
-			uint(size=32) Mbx,
-			uint(size=32) Mby
 		do
 			Mbx := Mb_Addr mod pic_width;
 			Mby := Mb_Addr  /  pic_width;
-			//There are 16 Parts in a macroblock
+			//There are 16 Partitions in a macroblock
 			Mbx := Mbx * 4;
 			Mby := Mby * 4;
 			foreach int i in Mbx .. Mbx + 3
 			do
 				foreach int j in Mby .. Mby + 3
 				do
-					ListRefIdx[WriteListIdx][Mbx][Mby]     := -1;
-					ListMv    [WriteListIdx][Mbx][Mby][0]  :=  0;
-					ListMv    [WriteListIdx][Mbx][Mby][1]  :=  0;
+					ListRefIdxL0[WriteListIdx][Mbx][Mby]    := -1;
+					ListRefIdxL1[WriteListIdx][Mbx][Mby]    := -1;
+					ListMvL0    [WriteListIdx][Mbx][Mby][0] :=  0;
+					ListMvL0    [WriteListIdx][Mbx][Mby][1] :=  0;
+					ListMvL1    [WriteListIdx][Mbx][Mby][0] :=  0;
+					ListMvL1    [WriteListIdx][Mbx][Mby][1] :=  0;
+				end
+			end
+		end
+
+	List(type: List(type: uint(size=4), size = 4), size=4) PartitionIdx =
+		[
+			[  0,  2,  8, 10],
+			[  1,  3,  6,  7],
+			[  4,  6, 12, 14],
+			[  5,  7, 13, 15]
+		];
+
+	GetMbType.B_Skip: action
+			MbType       :[MacroBlkType],
+			NewPic       :[IsNewPic],
+			CurrMbAddr   :[Curr_Mb_Addr],
+			PicWidthInMb :[PicWidth]
+				==>
+			colPic       :[IsColPic] repeat 16
+		guard
+			MacroBlkType = BLOCK_TYPE_B_SKIP,
+			not IsNewPic
+		var
+			List(type: bool, size=16) IsColPic
+		do
+			Mbx := Curr_Mb_Addr mod PicWidth;
+			Mby := Curr_Mb_Addr  /  PicWidth;
+			//There are 16 Partitions in a macroblock
+			Mbx := Mbx * 4;
+			Mby := Mby * 4;
+			if(not colPic_IsShortTermRef)then
+				foreach int i in 0 .. 15
+				do
+					IsColPic[i] := false;
+				end
+			else
+				foreach int i in 0 .. 3
+				do
+					foreach int j in 0 .. 3
+					do
+						IsColPic[PartitionIdx[i][j]] :=
+							if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] = -1 and ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j] = -1)then
+								true
+							else
+								if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] != -1)then
+									if(     ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j]     =  0
+									    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][0] >= -1
+									    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][0] <=  1
+									    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][1] >= -1
+									    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][1] <=  1)then
+										true
+									else
+										false
+									end
+								else
+									if(     ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j]     =  0
+									    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][0] >= -1
+									    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][0] <=  1
+									    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][1] >= -1
+									    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][1] <=  1)then
+										true
+									else
+										false
+									end
+								end
+							end;
+					end
 				end
 			end
 		end
@@ -244,6 +323,7 @@ actor Algo_MvBuffer()
 				==>
 		guard
 			not(MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX),
+			MacroBlkType != BLOCK_TYPE_B_SKIP,
 			not IsNewPic
 		do
 			mb_type      := MacroBlkType;
@@ -274,6 +354,11 @@ actor Algo_MvBuffer()
 				else
 					1
 				end;
+			Mbx := Curr_Mb_Addr mod PicWidth;
+			Mby := Curr_Mb_Addr  /  PicWidth;
+			//There are 16 Partitions in a macroblock
+			Mbx := Mbx * 4;
+			Mby := Mby * 4;
 		end
 
 	GetMbParameters.Block16x16: action
@@ -281,7 +366,19 @@ actor Algo_MvBuffer()
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv  = SZ_16x16
+		var
+			uint(size=4) Idx := 0
 		do
+			NbPartitionsToWrite := 16;
+			foreach int i in Mbx .. Mbx + 3
+			do
+				foreach int j in Mby .. Mby + 3
+				do
+					Partition_Mbx[Idx] := i;
+					Partition_Mby[Idx] := j;
+					Idx                := Idx + 1;
+				end
+			end
 			IsPredL0  := Is_PredL0(mb_type, MbPartIdx);
 			IsPredL1  := Is_PredL1(mb_type, MbPartIdx);
 			MbPartIdx := MbPartIdx + 1;
@@ -292,7 +389,19 @@ actor Algo_MvBuffer()
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv  = SZ_16x8
+		var
+			uint(size=4) Idx := 0
 		do
+			NbPartitionsToWrite := 8;
+			foreach int i in Mbx .. Mbx + 3
+			do
+				foreach int j in Mby + 2* (MbPartIdx&1) .. Mby + 2* (MbPartIdx&1) + 1
+				do
+					Partition_Mbx[Idx] := i;
+					Partition_Mby[Idx] := j;
+					Idx                := Idx + 1;
+				end
+			end
 			IsPredL0  := Is_PredL0(mb_type, MbPartIdx);
 			IsPredL1  := Is_PredL1(mb_type, MbPartIdx);
 			MbPartIdx := MbPartIdx + 1;
@@ -303,7 +412,19 @@ actor Algo_MvBuffer()
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv  = SZ_8x16
+		var
+			uint(size=4) Idx := 0
 		do
+			NbPartitionsToWrite := 8;
+			foreach int i in Mbx + 2* (MbPartIdx&1) .. Mbx + 2* (MbPartIdx&1) + 1
+			do
+				foreach int j in Mby .. Mby + 3
+				do
+					Partition_Mbx[Idx] := i;
+					Partition_Mby[Idx] := j;
+					Idx                := Idx + 1;
+				end
+			end
 			IsPredL0  := Is_PredL0(mb_type, MbPartIdx);
 			IsPredL1  := Is_PredL1(mb_type, MbPartIdx);
 			MbPartIdx := MbPartIdx + 1;
@@ -333,7 +454,19 @@ actor Algo_MvBuffer()
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv  = SZ_8x8
+		var
+			uint(size=4) Idx := 0
 		do
+			NbPartitionsToWrite := 4;
+			foreach int i in Mbx + 2* (MbPartIdx&1) .. Mbx + 2* (MbPartIdx&1) + 1
+			do
+				foreach int j in Mby + 2* ((MbPartIdx>>1)&1) .. Mby + 2* ((MbPartIdx>>1)&1) + 1
+				do
+					Partition_Mbx[Idx] := i;
+					Partition_Mby[Idx] := j;
+					Idx                := Idx + 1;
+				end
+			end
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
@@ -343,6 +476,11 @@ actor Algo_MvBuffer()
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv  = SZ_8x4
 		do
+			NbPartitionsToWrite := 2;
+			Partition_Mbx[0]    := Mbx + 2* (MbPartIdx&1) + (SubMbPartIdx&1);
+			Partition_Mby[0]    := Mby + 2* ((MbPartIdx>>1)&1);
+			Partition_Mbx[1]    := Mbx + 2* (MbPartIdx&1) + (SubMbPartIdx&1);
+			Partition_Mby[1]    := Mby + 2* ((MbPartIdx>>1)&1);
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
@@ -352,6 +490,11 @@ actor Algo_MvBuffer()
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv  = SZ_4x8
 		do
+			NbPartitionsToWrite := 2;
+			Partition_Mbx[0]    := Mbx + 2* (MbPartIdx&1);
+			Partition_Mby[0]    := Mby + 2* ((MbPartIdx>>1)&1) + (SubMbPartIdx&1);
+			Partition_Mbx[1]    := Mbx + 2* (MbPartIdx&1);
+			Partition_Mby[1]    := Mby + 2* ((MbPartIdx>>1)&1) + (SubMbPartIdx&1);
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
@@ -361,6 +504,9 @@ actor Algo_MvBuffer()
 			SubMbPartIdx < SubMbPartIdxMax,
 			SizeSubMbMv  = SZ_4x4
 		do
+			NbPartitionsToWrite := 1;
+			Partition_Mbx[0]    := Mbx + 2* (MbPartIdx&1)      + (SubMbPartIdx&1);
+			Partition_Mby[0]    := Mby + 2* ((MbPartIdx>>1)&1) + ((SubMbPartIdx>>1)&1);
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
@@ -378,6 +524,16 @@ actor Algo_MvBuffer()
 		guard
 			    IsPredL0,
 			not IsPredL1
+		do
+			foreach int i in 0 .. NbPartitionsToWrite - 1
+			do
+				ListRefIdxL0[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := ref_idx;
+				ListRefIdxL1[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := -1;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  Mvx;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  Mvy;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  0;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  0;
+			end
 		end
 
 	GetBlockInfo.IsPredL1: action
@@ -388,21 +544,43 @@ actor Algo_MvBuffer()
 			not IsPredL0,
 			    IsPredL1
 		do
+			foreach int i in 0 .. NbPartitionsToWrite - 1
+			do
+				ListRefIdxL0[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := -1;
+				ListRefIdxL1[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := ref_idx;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  0;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  0;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  Mvx;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  Mvy;
+			end
 		end
 
 	GetBlockInfo.BiPred: action
-			MvL0     :[MvxL0,MvyL0],
 			RefIdxL0 :[ref_idx_l0],
-			MvL1     :[MvxL1,MvyL1],
-			RefIdxL1 :[ref_idx_l1]
+			RefIdxL1 :[ref_idx_l1],
+			MvL0     :[MvxL0,MvyL0],
+			MvL1     :[MvxL1,MvyL1]
 				==>
 		guard
 			IsPredL0,
 			IsPredL1
 		do
+			foreach int i in 0 .. NbPartitionsToWrite - 1
+			do
+				ListRefIdxL0[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := ref_idx_l0;
+				ListRefIdxL1[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := ref_idx_l1;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  MvxL0;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  MvyL0;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  MvxL1;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  MvyL1;
+			end
 		end
 
-	GetBlockInfo.IsDirect: action
+	GetBlockInfo.IsDirectOrB_Skip: action
+			RefIdxL0 :[ref_idx_l0],
+			RefIdxL1 :[ref_idx_l1],
+			MvL0     :[MvxL0,MvyL0],
+			MvL1     :[MvxL1,MvyL1]
 				==>
 		guard
 			not IsPredL0,
@@ -411,7 +589,6 @@ actor Algo_MvBuffer()
 			println("In MvBuffer GetBlockInfo.IsDirect");
 			while true do end
 		end
-
 
 	ReadDelList.Launch: action
 			DelList:[DelVal]
@@ -426,7 +603,6 @@ actor Algo_MvBuffer()
 				end
 			end
 		end
-
 
 	ReadDelList.Done: action
 			DelList:[DelVal]
@@ -449,14 +625,14 @@ actor Algo_MvBuffer()
 		guard
 			Idx_RefList < Size_RefList
 		do
-/*			if(Idx_RefList   = 0)then
+			if(Idx_RefList   = 0)then
 				ReadListIdx := 0;
 				while(ListPoc[ReadListIdx] != ValRefList and ReadListIdx < 15)
 				do
 					ReadListIdx := ReadListIdx + 1;
 				end
 			end
-*/			Idx_RefList := Idx_RefList + 1;
+			Idx_RefList := Idx_RefList + 1;
 		end
 
 	ReadRefList.Done: action ==>
@@ -468,11 +644,11 @@ actor Algo_MvBuffer()
 			LongTermList :[LTList] repeat 16
 				==>
 		do
-			CurrL1_IsShortTermRef := false;
+			colPic_IsShortTermRef := false;
 			foreach int i in 0 .. 15
 			do
 				if(LTList[i] = ListPoc[ReadListIdx])then
-					CurrL1_IsShortTermRef := true;
+					colPic_IsShortTermRef := true;
 				end
 			end
 		end
