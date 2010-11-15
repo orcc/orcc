@@ -203,7 +203,7 @@
    <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
-            class="net.sf.orcc.ui.preferences.PreferenceInitializer">
+            class="net.sf.orcc.preferences.PreferenceInitializer">
       </initializer>
    </extension>
    <extension

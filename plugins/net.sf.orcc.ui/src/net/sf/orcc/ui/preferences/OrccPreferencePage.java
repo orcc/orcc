@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ui.preferences;
 
+import net.sf.orcc.preferences.PreferenceConstants;
 import net.sf.orcc.ui.OrccActivator;
 
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
