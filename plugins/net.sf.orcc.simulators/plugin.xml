@@ -72,25 +72,6 @@
                id="net.sf.orcc.simulators.inputStimulus">
          </option>
       </simulator>
-      <simulator
-            class="net.sf.orcc.simulators.Jade.JadeSimulatorImpl"
-            name="Jade">
-         <option
-               id="net.sf.orcc.simulators.enableTraces">
-         </option>
-         <option
-               id="net.sf.orcc.plugins.xdfFile">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.inputStimulus">
-         </option>
-         <option
-               id="net.sf.orcc.simulators.VTLFolder">
-         </option>
-         <option
-               id="net.sf.orcc.plugins.toolsFolder">
-         </option>
-      </simulator>
    </extension>
 
 </plugin>
