@@ -364,7 +364,7 @@ switch(transitions) ::= <<
 switch (_FSM_state) {
 $transitions: switchTransition()$
 default:
-	printf("unknown state: %s\n", stateNames[_FSM_state]);
+	printf("unknown state in $instance.id$.c : %s\n", stateNames[_FSM_state]);
 	wait_for_key();
 	exit(1);
 }
