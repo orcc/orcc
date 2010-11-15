@@ -205,9 +205,9 @@ actor Algo_DecodeRefPicList_Frext()
 
 
 	ReadRefPicList0Reord.Done: action
-			ValVLD :[ValueOfVLD]
+			ValVLD           :[ValueOfVLD]
 				==>
-			RefReordering_l0 :[if ref_pic_list_reordering_flag then 1 else 0 end]
+			RefReordering_l0 :[ValueOfVLD]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
@@ -224,7 +224,7 @@ actor Algo_DecodeRefPicList_Frext()
 	ReadRefPicList1Reord.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
-			RefReordering_l1 :[if ref_pic_list_reordering_flag then 1 else 0 end]
+			RefReordering_l1 :[ValueOfVLD]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
