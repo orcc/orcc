@@ -1310,7 +1310,12 @@ public class AstTransformer {
 		if (mustInitialize) {
 			initialValue = null;
 		} else {
+			AstExpression value = astVariable.getValue();
 			initialValue = (Expression) astVariable.getInitialValue();
+			if (initialValue == null && value != null) {
+				initialValue = (Expression) new AstExpressionEvaluator(null)
+						.evaluate(value);
+			}
 		}
 
 		// create state variable
