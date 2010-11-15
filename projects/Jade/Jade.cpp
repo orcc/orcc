@@ -31,7 +31,7 @@
 @brief Main function of Jade
 @author Jerome Gorin
 @file Jade.cpp
-@version 0.1
+@version 1.0
 @date 2010/04/13
 */
 

@@ -31,8 +31,8 @@
 @brief Description of the StateVar class interface
 @author Jerome Gorin
 @file StateVar.h
-@version 0.1
-@date 22/03/2010
+@version 1.0
+@date 15/11/2010
 */
 
 //------------------------------

@@ -31,8 +31,8 @@
 @brief Implementation of class Connection
 @author Jerome Gorin
 @file Connection.cpp
-@version 0.1
-@date 2010/04/12
+@version 1.0
+@date 15/11/2010
 */
 
 //------------------------------

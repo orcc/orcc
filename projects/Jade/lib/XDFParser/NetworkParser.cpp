@@ -31,7 +31,7 @@
  * @file NetworkParser.cpp
  * @brief Implementation of NetworkParser
  * @author Jerome Gorin
- * @version 0.1
+ * @version 1.0
  */
 
 //------------------------------

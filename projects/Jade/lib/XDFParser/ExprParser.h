@@ -31,7 +31,7 @@
  * @file ExprParser.h
  * @brief Interface of ExprParser
  * @author Jerome Gorin
- * @version 0.1
+ * @version 1.0
  */
 
 //------------------------------

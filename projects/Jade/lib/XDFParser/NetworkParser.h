@@ -31,7 +31,7 @@
  * @file NetworkParser.h
  * @brief Interface of NetworkParser
  * @author Jerome Gorin
- * @version 0.1
+ * @version 1.0
  */
 
 //------------------------------

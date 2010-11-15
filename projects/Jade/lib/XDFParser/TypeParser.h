@@ -54,7 +54,7 @@ namespace llvm{
  * @file TypeParser.h
  * @brief Interface of TypeParser
  * @author Jerome Gorin
- * @version 0.1
+ * @version 1.0
  */
 class TypeParser {
 

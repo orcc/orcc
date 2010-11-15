@@ -31,7 +31,7 @@
 @brief Interface of XDFParser
 @author Jerome Gorin
 @file XDFParser.h
-@version 0.1
+@version 1.0
 @date 2010/04/12
 */
 

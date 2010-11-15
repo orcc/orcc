@@ -31,8 +31,8 @@
 @brief Implementation of utility function in class JIT
 @author Jerome Gorin
 @file Utility.cpp
-@version 0.1
-@date 2010/04/12
+@version 1.0
+@date 15/11/2010
 */
 
 //------------------------------
