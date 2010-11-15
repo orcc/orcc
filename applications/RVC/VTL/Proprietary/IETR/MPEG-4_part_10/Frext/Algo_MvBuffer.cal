@@ -267,7 +267,8 @@ actor Algo_MvBuffer()
 			MacroBlkType = BLOCK_TYPE_B_SKIP,
 			not IsNewPic
 		var
-			List(type: bool, size=16) IsColPic
+			List(type: bool, size=16) IsColPic,
+			uint(size=4)              Idx
 		do
 			Mbx := Curr_Mb_Addr mod PicWidth;
 			Mby := Curr_Mb_Addr  /  PicWidth;
@@ -312,7 +313,20 @@ actor Algo_MvBuffer()
 							end;
 					end
 				end
+			end	
+
+			NbPartitionsToWrite := 16;
+			foreach int i in Mbx .. Mbx + 3
+			do
+				foreach int j in Mby .. Mby + 3
+				do
+					Partition_Mbx[Idx] := i;
+					Partition_Mby[Idx] := j;
+					Idx                := Idx + 1;
+				end
 			end
+			IsPredL0  := false;
+			IsPredL1  := false;
 		end
 
 	GetMbType.Others: action
@@ -665,9 +679,12 @@ actor Algo_MvBuffer()
 
 		GetMbType          (GetNewPic                  )--> ReadDelList;
 		GetMbType          (GetMbType.MacroBlkIorSI    )--> EatTokens;
+		GetMbType          (GetMbType.B_Skip           )--> GetBlockInfo4BSkip;
 		GetMbType          (GetMbType.Others           )--> GetMbParameters;
 
 		EatTokens          (EatTokens                  )--> GetMbType;
+
+		GetBlockInfo4BSkip (GetBlockInfo               )--> GetMbType;
 
 		GetMbParameters    (GetMbParameters            )--> GetBlockInfo4Mb;
 		GetMbParameters    (LaunchGetSubMbParameters   )--> GetSubMbParameters;

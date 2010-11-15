@@ -5,7 +5,7 @@
       <vertex id="MbPredMvResL0" x="5" y="41"/>
       <vertex id="PicWidthInMb" x="23" y="376"/>
       <vertex id="FirstMbInSlice" x="22" y="315"/>
-      <vertex id="mb_type" x="36" y="406"/>
+      <vertex id="mb_type" x="38" y="402"/>
       <vertex id="MbPredRefIdxL0" x="11" y="80"/>
       <vertex id="SubMbPredRefIdxL0" x="-3" y="151"/>
       <vertex id="sub_mb_type" x="21" y="436"/>

@@ -485,15 +485,15 @@ actor Algo_Slice_layer_without_partitioning()
 			LaunchMbLayer    (MbLayer.LaunchMbPred    )--> LaunchMbPred;
 			LaunchMbLayer    (MbLayer.LaunchResidual  )--> LaunchResidual;
 	
-				LaunchMbPred   (MbPred.AskVLD       )--> LaunchMbPred;
-				LaunchMbPred   (MbPred.AskReadBitsOrTeV  )--> LaunchMbPred;
-				LaunchMbPred   (MbPred.GetVLDVal    )--> LaunchMbPred;
-				LaunchMbPred   (MbPred.Done         )--> LaunchMbLayer;
+				LaunchMbPred   (MbPred.AskVLD           )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.AskReadBitsOrTeV )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.GetVLDVal        )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.Done             )--> LaunchMbLayer;
 	
-				LaunchSubMbPred   (SubMbPred.AskVLD       )--> LaunchSubMbPred;
-				LaunchSubMbPred   (SubMbPred.AskReadBitsOrTeV  )--> LaunchSubMbPred;
-				LaunchSubMbPred   (SubMbPred.GetVLDVal    )--> LaunchSubMbPred;
-				LaunchSubMbPred   (SubMbPred.Done         )--> LaunchMbLayer;
+				LaunchSubMbPred   (SubMbPred.AskVLD           )--> LaunchSubMbPred;
+				LaunchSubMbPred   (SubMbPred.AskReadBitsOrTeV )--> LaunchSubMbPred;
+				LaunchSubMbPred   (SubMbPred.GetVLDVal        )--> LaunchSubMbPred;
+				LaunchSubMbPred   (SubMbPred.Done             )--> LaunchMbLayer;
 
 				LaunchResidual (Residual.Done              )--> LaunchMbLayer;
 				LaunchResidual (Residual.LaunchResBlkCavlc )--> LaunchResBlkCavlc;

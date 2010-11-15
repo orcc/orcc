@@ -409,7 +409,11 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			NewPic_i   :[IsNewPic]
 				==>
 		guard
-			not IsNewPic
+			not IsNewPic,
+			not(MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX),
+			MacroBlkType != BLOCK_TYPE_P_SKIP,
+			MacroBlkType != BLOCK_TYPE_B_SKIP,
+			MacroBlkType != BLOCK_TYPE_B_DIRECT_16x16
 		do
 			Idx_Sub_Tab   :=
 				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then

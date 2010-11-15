@@ -704,8 +704,6 @@
         src="" src-port="ResetPrevFrameNum"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="ValQpFeedback"
         src="DecodeMacroBlockLayer" src-port="QpFeedback"/>
-    <Connection dst="" dst-port="MacroBlockType"
-        src="MergeDataFromSDataAndMbLayer" src-port="MacroBlockType"/>
     <Connection dst="" dst-port="TransformSize8x8"
         src="MergeDataFromSDataAndMbLayer" src-port="TransformSize8x8"/>
     <Connection dst="" dst-port="NbRefFrame_l1" src="DecodeRefPicList" src-port="NbRefFrame_l1"/>
@@ -748,4 +746,8 @@
         src="MergeDataFromSDataAndMbLayer" src-port="MbPartWidth"/>
     <Connection dst="" dst-port="MbPartHeigth"
         src="MergeDataFromSDataAndMbLayer" src-port="MbPartHeight"/>
+    <Connection dst="" dst-port="MacroBlockType"
+        src="MergeDataFromSDataAndMbLayer" src-port="MacroBlockType"/>
+    <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="IsB_Skip"
+        src="DecodeSliceData_Cavlc" src-port="Is_B_Skip"/>
 </XDF>

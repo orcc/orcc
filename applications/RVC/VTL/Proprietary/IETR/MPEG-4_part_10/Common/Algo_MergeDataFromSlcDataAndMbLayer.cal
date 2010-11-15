@@ -27,6 +27,7 @@ import orcc.Imp_MacroBlockInfo.*;
 
 actor Algo_MergeDataFromSlcDataAndMbLayer()
 	bool          SkipMbLayer,
+	bool          IsB_Skip,
 	bool          TransfSz8x8Flag,
 	uint(size=6)  MbType,
 	uint(size=4)  RemIntraYxYPredMode,
@@ -65,6 +66,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 
 	MbLayerSkipped: action
 			SkipMbLayer     :[skip],
+			IsB_Skip        :[is_B_Skip],
 			SDataQp_Y_Cb_Cr :[ ValQp , ValQpCb , ValQpCr ]
 				==>
 			MbIntraFlag     :[0],
@@ -75,10 +77,19 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			Qp              :[ValQp],
 			Qp_Cb           :[ValQpCb],
 			Qp_Cr           :[ValQpCr],
-			MacroBlockType  :[BLOCK_TYPE_P_SKIP],
-			MBType4Pred     :[BLOCK_TYPE_P_SKIP]
+			MacroBlockType  :[mb_type],
+			MBType4Pred     :[mb_type]
 		guard
 			skip = true
+		var
+			uint(size=6) mb_type
+		do
+			mb_type :=
+				if(is_B_Skip)then
+					BLOCK_TYPE_B_SKIP
+				else
+					BLOCK_TYPE_P_SKIP
+				end;
 		end
 
 	MbLayer.IsIntra4x4or8x8: action
