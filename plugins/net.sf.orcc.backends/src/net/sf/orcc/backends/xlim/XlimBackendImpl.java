@@ -49,6 +49,7 @@ import net.sf.orcc.backends.xlim.transforms.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Port;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
@@ -57,6 +58,7 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.network.Connection;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFWriter;
 
 /**
@@ -160,7 +162,8 @@ public class XlimBackendImpl extends AbstractBackend {
 			}
 
 			Map<String, Object> optionsMap = new HashMap<String, Object>();
-			optionsMap.put("numberOfReaders", computeNumberOfReaders(network));
+			optionsMap
+					.put("portInformations", computePortInformations(network));
 			printer.setOptions(optionsMap);
 
 			printer.printNetwork(outputName, network, false, fifoSize);
@@ -170,11 +173,13 @@ public class XlimBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private Map<Instance, Map<Port, Integer>> computeNumberOfReaders(
+	private Map<Instance, Map<Port, Integer>> computePortInformations(
 			Network network) {
 		network.computeTemplateMaps();
 
 		Map<Instance, Map<Port, Integer>> computedMap = new HashMap<Instance, Map<Port, Integer>>();
+
+		// Compute number of output port readers
 		for (Instance instance : network.getOutgoingMap().keySet()) {
 			Map<Port, Integer> portToNumberOfReadersMap = new HashMap<Port, Integer>();
 			for (Connection connection : network.getOutgoingMap().get(instance)) {
@@ -189,6 +194,27 @@ public class XlimBackendImpl extends AbstractBackend {
 				}
 			}
 			computedMap.put(instance, portToNumberOfReadersMap);
+		}
+
+		// Search local fifo size of an input port
+		ExpressionEvaluator exprEvaluator = new ExpressionEvaluator();
+		for (Instance instance : network.getIncomingMap().keySet()) {
+			Map<Port, Integer> portToFifoSize = new HashMap<Port, Integer>();
+			for (Connection connection : network.getIncomingMap().get(instance)) {
+				Port trgtPort = connection.getTarget();
+				IValueAttribute attribute = ((IValueAttribute) connection
+						.getAttribute(Connection.BUFFER_SIZE));
+				if (attribute != null) {
+					portToFifoSize.put(trgtPort, exprEvaluator
+							.evaluateAsInteger(attribute.getValue()));
+				}
+			}
+			Map<Port, Integer> existingMap = computedMap.get(instance);
+			if (existingMap == null) {
+				computedMap.put(instance, portToFifoSize);
+			} else {
+				existingMap.putAll(portToFifoSize);
+			}
 		}
 		return computedMap;
 	}

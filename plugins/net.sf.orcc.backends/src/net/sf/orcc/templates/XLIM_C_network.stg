@@ -42,7 +42,7 @@ static void initNetwork(AbstractActorInstance ***pInstances, int *pNumberOfInsta
 
   $network.instances : {instance | $declareActorInstance(actorInstance=instance)$}; separator="\n\n"$
   
-  $network.instances : {instance | $initializeActorInstance(actorInstance=instance,numberOfReadersMap=options.("numberOfReaders").(instance),index=i0)$}; separator="\n\n"$
+  $network.instances : {instance | $initializeActorInstance(actorInstance=instance,portInformationsMap=options.("portInformations").(instance),index=i0)$}; separator="\n\n"$
   
   $network.connections : {connection | $connectPorts(source=connection.source, idSource=network.sourceMap.(connection).instance.id, target=connection.target, idTarget=network.targetMap.(connection).instance.id)$}; separator="\n"$
 }
@@ -67,10 +67,10 @@ $dir$putPort *p$id$_$port$;
 // Initialization
 /////////////////////////////
 
-initializeActorInstance(actorInstance,numberOfReadersMap,index) ::= <<
+initializeActorInstance(actorInstance,portInformationsMap,index) ::= <<
 p$actorInstance.id$ = createActorInstance(&ActorClass_$actorInstance.id$);
-$actorInstance.actor.inputs.list : {port | $initializePort(dir="In",port=port,id=actorInstance.id,n=fifoSize)$}; separator="\n"$
-$actorInstance.actor.outputs.list : {port | $initializePort(dir="Out",port=port,id=actorInstance.id,n=numberOfReadersMap.(port))$}; separator="\n"$
+$actorInstance.actor.inputs.list : {port | $if(portInformationsMap.(port))$$initializePort(dir="In",port=port,id=actorInstance.id,n=portInformationsMap.(port))$$else$$initializePort(dir="In",port=port,id=actorInstance.id,n=fifoSize)$$endif$}; separator="\n"$
+$actorInstance.actor.outputs.list : {port | $initializePort(dir="Out",port=port,id=actorInstance.id,n=portInformationsMap.(port))$}; separator="\n"$
 actorInstances[$index$] = p$actorInstance.id$;
 >>
 
