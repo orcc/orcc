@@ -15,6 +15,5 @@ Require-Bundle: net.sf.orcc.core,
  org.eclipse.xtext.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.orcc.ui.launching,
- net.sf.orcc.ui.preferences
+Export-Package: net.sf.orcc.ui.launching
 Bundle-Vendor: IETR/INSA Rennes
