@@ -29,7 +29,6 @@
 package net.sf.orcc.backends.xlim.transforms;
 
 import net.sf.orcc.OrccException;
-import net.sf.orcc.interpreter.ListAllocator;
 import net.sf.orcc.interpreter.NodeInterpreter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
@@ -60,14 +59,11 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 
 	@Override
 	public void transform(Actor actor) throws OrccException {
-		// Check for List state variables which need to be allocated or
-		// initialized
+		// Initialize value field if there is an initial value
 		for (Variable stateVar : actor.getStateVars()) {
-			// Initialize variables with constant values
 			Expression initConst = ((StateVariable) stateVar)
 					.getConstantValue();
 			if (initConst != null) {
-				// initialize
 				stateVar.setValue(initConst);
 			}
 		}
@@ -78,13 +74,15 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 				node.accept(nodeInterpreter);
 			}
 		}
-		
+
+		// Copy computed value to initialValue field and clean value field
 		for (Variable stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
 			StateVariable s = (StateVariable) stateVar;
-			if (type.isList() && s.getConstantValue() == null && s.getValue() != null) {
+			if (type.isList() && s.getConstantValue() == null
+					&& s.getValue() != null) {
 				s.setConstantValue(s.getValue());
-			}		
+			}
 			stateVar.setValue(null);
 		}
 	}
@@ -94,13 +92,14 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 		// Set initialize to external thus it will not be printed
 		call.getProcedure().setExternal(true);
 	}
-	
-	private class SpecialNodeInterpreter extends NodeInterpreter{
+
+	private class SpecialNodeInterpreter extends NodeInterpreter {
 		@Override
 		public void visit(Store instr) {
 			Variable target = instr.getTarget();
 			Type type = target.getType();
-			if(type.isList() && target.getValue() == null){
+			// Allocate value field of list if it is initialized
+			if (type.isList() && target.getValue() == null) {
 				target.setValue((Expression) type.accept(listAllocator));
 			}
 			super.visit(instr);
