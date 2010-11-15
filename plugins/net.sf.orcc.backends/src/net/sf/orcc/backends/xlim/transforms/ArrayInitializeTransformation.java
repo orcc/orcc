@@ -39,6 +39,7 @@ import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Call;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
@@ -52,11 +53,9 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 public class ArrayInitializeTransformation extends AbstractActorTransformation {
 
 	private NodeInterpreter nodeInterpreter;
-	private ListAllocator listAllocator;
 
 	public ArrayInitializeTransformation() {
-		nodeInterpreter = new NodeInterpreter();
-		listAllocator = new ListAllocator();
+		nodeInterpreter = new SpecialNodeInterpreter();
 	}
 
 	@Override
@@ -64,16 +63,10 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 		// Check for List state variables which need to be allocated or
 		// initialized
 		for (Variable stateVar : actor.getStateVars()) {
-			Type type = stateVar.getType();
 			// Initialize variables with constant values
 			Expression initConst = ((StateVariable) stateVar)
 					.getConstantValue();
-			if (initConst == null) {
-				if (type.isList()) {
-					// Allocate empty array variable
-					stateVar.setValue((Expression) type.accept(listAllocator));
-				}
-			} else {
+			if (initConst != null) {
 				// initialize
 				stateVar.setValue(initConst);
 			}
@@ -81,18 +74,37 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 
 		for (Action action : actor.getInitializes()) {
 			for (CFGNode node : action.getBody().getNodes()) {
-
 				node.accept(this);
 				node.accept(nodeInterpreter);
 			}
 		}
-		System.out.println("");
+		
+		for (Variable stateVar : actor.getStateVars()) {
+			Type type = stateVar.getType();
+			StateVariable s = (StateVariable) stateVar;
+			if (type.isList() && s.getConstantValue() == null && s.getValue() != null) {
+				s.setConstantValue(s.getValue());
+			}		
+			stateVar.setValue(null);
+		}
 	}
 
 	@Override
 	public void visit(Call call) {
 		// Set initialize to external thus it will not be printed
 		call.getProcedure().setExternal(true);
+	}
+	
+	private class SpecialNodeInterpreter extends NodeInterpreter{
+		@Override
+		public void visit(Store instr) {
+			Variable target = instr.getTarget();
+			Type type = target.getType();
+			if(type.isList() && target.getValue() == null){
+				target.setValue((Expression) type.accept(listAllocator));
+			}
+			super.visit(instr);
+		}
 	}
 
 }
