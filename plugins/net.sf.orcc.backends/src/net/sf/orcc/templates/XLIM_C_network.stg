@@ -71,6 +71,7 @@ initializeActorInstance(actorInstance,portInformationsMap,index) ::= <<
 p$actorInstance.id$ = createActorInstance(&ActorClass_$actorInstance.id$);
 $actorInstance.actor.inputs.list : {port | $if(portInformationsMap.(port))$$initializePort(dir="In",port=port,id=actorInstance.id,n=portInformationsMap.(port))$$else$$initializePort(dir="In",port=port,id=actorInstance.id,n=fifoSize)$$endif$}; separator="\n"$
 $actorInstance.actor.outputs.list : {port | $initializePort(dir="Out",port=port,id=actorInstance.id,n=portInformationsMap.(port))$}; separator="\n"$
+$actorInstance.actor.parameters.list : {parameter | $initializeParameter(parameter=parameter,value=actorInstance.parameters.(parameter.name),id=actorInstance.id)$}; separator="\n"$
 actorInstances[$index$] = p$actorInstance.id$;
 >>
 
@@ -78,8 +79,8 @@ initializePort(dir,port,id,n) ::= <<
 p$id$_$port$ = create$dir$putPort(p$id$, "$port$", $n$);
 >>
 
-initializeParameter(parameter,id) ::= <<
-setParameter(p$id$, "$parameter$", "$parameter.constantValue$");
+initializeParameter(parameter,value,id) ::= <<
+setParameter(p$id$, "$parameter$", "$Constant(value)$");
 >>
 
 /////////////////////////////
