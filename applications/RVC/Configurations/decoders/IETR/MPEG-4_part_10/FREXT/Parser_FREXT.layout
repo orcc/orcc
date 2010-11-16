@@ -55,7 +55,7 @@
       <vertex id="MMCO" x="1367" y="1587"/>
       <vertex id="RefList0" x="1977" y="1157"/>
       <vertex id="IntraPredSplit" x="1409" y="325"/>
-      <vertex id="MVReconstruct" x="1908" y="647"/>
+      <vertex id="MVReconstruct" x="1902" y="620"/>
       <vertex id="BlockExpand" x="1899" y="484"/>
       <vertex id="BlockSplit" x="2101" y="260"/>
       <vertex id="DecodePic" x="800" y="446"/>

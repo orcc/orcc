@@ -16,27 +16,27 @@
       <vertex id="SubMbPredMvResL0" x="43" y="122"/>
       <vertex id="MbPredMvResL1" x="36" y="575"/>
       <vertex id="SubMbPredMvResL1" x="26" y="638"/>
-      <vertex id="EmptyDPB" x="550" y="497"/>
-      <vertex id="DelList" x="559" y="437"/>
-      <vertex id="LTList" x="564" y="529"/>
-      <vertex id="RefList1" x="576" y="743"/>
-      <vertex id="Poc" x="588" y="694"/>
-      <vertex id="Direct8x8InferenceFlag" x="513" y="466"/>
-      <vertex id="MV" x="895" y="234"/>
-      <vertex id="LOCATION" x="869" y="205"/>
-      <vertex id="PartSZ" x="988" y="374"/>
-      <vertex id="mv_out" x="985" y="342"/>
-      <vertex id="ref_idx" x="991" y="406"/>
+      <vertex id="EmptyDPB" x="623" y="512"/>
+      <vertex id="DelList" x="638" y="453"/>
+      <vertex id="LTList" x="642" y="550"/>
+      <vertex id="RefList1" x="619" y="753"/>
+      <vertex id="Poc" x="636" y="725"/>
+      <vertex id="Direct8x8InferenceFlag" x="583" y="485"/>
+      <vertex id="DirectSpatialMvPred" x="9" y="318"/>
+      <vertex id="MV" x="954" y="200"/>
+      <vertex id="LOCATION" x="929" y="164"/>
+      <vertex id="PartSZ" x="1144" y="361"/>
+      <vertex id="mv_out" x="1141" y="329"/>
+      <vertex id="ref_idx" x="1147" y="393"/>
       <vertex id="RefIdxL0" x="591" y="153"/>
       <vertex id="NewListL0" x="585" y="123"/>
-      <vertex id="RefIdxL1" x="571" y="631"/>
-      <vertex id="NewListL1" x="564" y="599"/>
-      <vertex id="SelectList" x="875" y="269"/>
-      <vertex id="MvL0_Reconstr" x="268" y="43"/>
-      <vertex id="MvComponentReord" x="821" y="328"/>
-      <vertex id="SelectMvLX" x="553" y="204"/>
-      <vertex id="MvL1_Reconstr" x="278" y="544"/>
-      <vertex id="MvBuffer" x="829" y="462"/>
-      <vertex id="DirectSpatialMvPred" x="9" y="318"/>
+      <vertex id="RefIdxL1" x="623" y="669"/>
+      <vertex id="NewListL1" x="617" y="637"/>
+      <vertex id="SelectList" x="934" y="233"/>
+      <vertex id="MvL0_Reconstr" x="223" y="45"/>
+      <vertex id="MvComponentReord" x="977" y="315"/>
+      <vertex id="SelectMvLX" x="715" y="151"/>
+      <vertex id="MvL1_Reconstr" x="237" y="540"/>
+      <vertex id="MvBuffer" x="951" y="460"/>
    </vertices>
 </layout>

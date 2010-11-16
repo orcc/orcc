@@ -326,10 +326,16 @@
     <Connection dst="MvBuffer" dst-port="Direct8x8Inference" src="" src-port="Direct8x8InferenceFlag"/>
     <Connection dst="MvBuffer" dst-port="RefIdxL0" src="MvL0_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="MvBuffer" dst-port="RefIdxL1" src="MvL1_Reconstr" src-port="RefIdxOut"/>
-    <Connection dst="MvL0_Reconstr" dst-port="colPic" src="MvBuffer" src-port="colPic"/>
-    <Connection dst="MvL1_Reconstr" dst-port="colPic" src="MvBuffer" src-port="colPic"/>
     <Connection dst="MvL0_Reconstr" dst-port="DirectSpatialMvPredFlag"
         src="" src-port="DirectSpatialMvPred"/>
     <Connection dst="MvL1_Reconstr" dst-port="DirectSpatialMvPredFlag"
         src="" src-port="DirectSpatialMvPred"/>
+    <Connection dst="SelectMvLX" dst-port="DirectPredL0"
+        src="MvL0_Reconstr" src-port="DirectPredLX"/>
+    <Connection dst="SelectMvLX" dst-port="DirectPredL1"
+        src="MvL1_Reconstr" src-port="DirectPredLX"/>
+    <Connection dst="MvL0_Reconstr" dst-port="colZeroFlag"
+        src="MvBuffer" src-port="colZeroFlag"/>
+    <Connection dst="MvL1_Reconstr" dst-port="colZeroFlag"
+        src="MvBuffer" src-port="colZeroFlag"/>
 </XDF>

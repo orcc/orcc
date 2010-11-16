@@ -76,7 +76,7 @@ actor Algo_MvBuffer()
 
 	int (size=32) RefList1
 		==>
-	bool colPic
+	bool colZeroFlag
 		:
 
 	int (size=32) PIC_WIDTH_IN_PX        = 1280; //number of MB per lines
@@ -262,12 +262,12 @@ actor Algo_MvBuffer()
 			CurrMbAddr   :[Curr_Mb_Addr],
 			PicWidthInMb :[PicWidth]
 				==>
-			colPic       :[IsColPic] repeat 16
+			colZeroFlag  :[IsColZero] repeat 16
 		guard
 			MacroBlkType = BLOCK_TYPE_B_SKIP,
 			not IsNewPic
 		var
-			List(type: bool, size=16) IsColPic,
+			List(type: bool, size=16) IsColZero,
 			uint(size=4)              Idx
 		do
 			Mbx := Curr_Mb_Addr mod PicWidth;
@@ -278,7 +278,7 @@ actor Algo_MvBuffer()
 			if(not colPic_IsShortTermRef)then
 				foreach int i in 0 .. 15
 				do
-					IsColPic[i] := false;
+					IsColZero[i] := false;
 				end
 			else
 				if(not direct_8x8_inference_flag)then
@@ -286,7 +286,7 @@ actor Algo_MvBuffer()
 					do
 						foreach int j in 0 .. 3
 						do
-							IsColPic[PartitionIdx[i][j]] :=
+							IsColZero[PartitionIdx[i][j]] :=
 								if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] = -1 and ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j] = -1)then
 									true
 								else
@@ -322,7 +322,7 @@ actor Algo_MvBuffer()
 							if(ListRefIdxL0[ReadListIdx][Mbx+3*i][Mby+3*j] = -1 and ListRefIdxL1[ReadListIdx][Mbx+3*i][Mby+3*j] = -1)then
 								foreach int k in 0 .. 3
 								do
-									IsColPic[8*j + 4*i + k] := true;
+									IsColZero[8*j + 4*i + k] := true;
 								end
 							else
 								if(ListRefIdxL0[ReadListIdx][Mbx+3*i][Mby+3*j] != -1)then
@@ -333,12 +333,12 @@ actor Algo_MvBuffer()
 									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][1] <=  1)then
 										foreach int k in 0 .. 3
 										do
-											IsColPic[8*j + 4*i + k] := true;
+											IsColZero[8*j + 4*i + k] := true;
 										end
 									else
 										foreach int k in 0 .. 3
 										do
-											IsColPic[8*j + 4*i + k] := false;
+											IsColZero[8*j + 4*i + k] := false;
 										end
 									end
 								else
@@ -349,12 +349,12 @@ actor Algo_MvBuffer()
 									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][1] <=  1)then
 										foreach int k in 0 .. 3
 										do
-											IsColPic[8*j + 4*i + k] := true;
+											IsColZero[8*j + 4*i + k] := true;
 										end
 									else
 										foreach int k in 0 .. 3
 										do
-											IsColPic[8*j + 4*i + k] := false;
+											IsColZero[8*j + 4*i + k] := false;
 										end
 									end
 								end

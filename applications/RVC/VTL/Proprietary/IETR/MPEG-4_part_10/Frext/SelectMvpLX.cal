@@ -61,13 +61,14 @@ actor SelectMvpLX()
 	uint(size=4)  RefIdxL0,
 	int (size=16) MvL1,
 	uint(size=4)  RefIdxL1,
-	uint(size=11) LocationL1
+	uint(size=11) LocationL1,
+	bool          DirectPredL0,
+	bool          DirectPredL1
 		==>
 	int (size=16) MvOut,
 	uint(size=4)  RefIdxOut,
 	uint(size=11) Location,
 	uint(size=2)  SelectList
-
 		:
 
 	List(type: uint(size=3),size=8) NumMbPart_P =
@@ -218,9 +219,54 @@ actor SelectMvpLX()
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
-			IsPredL0[MbPartIdx&1] and IsPredL1[MbPartIdx&1] or (not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1])
+			IsPredL0[MbPartIdx&1] and IsPredL1[MbPartIdx&1]
 		do
 			println("MacroBlkType.IsBiPred or Direct");
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	MacroBlkType.IsDirect: action
+			MvL0         :[Mvxl0, Mvyl0],
+			RefIdxL0     :[ref_idxl0],
+			LocationL0   :[Mbx_in_pixl0,Mby_in_pixl0],
+			MvL1         :[Mvxl1, Mvyl1],
+			RefIdxL1     :[ref_idxl1],
+			LocationL1   :[Mbx_in_pixl1,Mby_in_pixl1],
+			DirectPredL0 :[Is_direct_l0],
+			DirectPredL1 :[Is_direct_l1]
+				==>
+		MvOut     :[mv_selected]repeat 2,
+		RefIdxOut :[ref_idx_selected],
+		Location  :[Mbx_in_pixl0,Mby_in_pixl0],
+			SelectList :[list_selected]
+		guard
+			MbPartIdx < MbPartIdxMax,
+			not Is8x8Mb,
+			(not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1])
+		var
+			uint(size=2) list_selected,
+			uint(size=4) ref_idx_selected,
+			List(type: int(size=16), size=2) mv_selected
+		do
+			if(Is_direct_l0 and Is_direct_l1)then//Is BiPred
+				println("MacroBlkType.IsBiPred or Direct _BiPred not implemented");
+				list_selected := BIPRED;
+			else
+				if((not Is_direct_l0) and Is_direct_l1)then//Is Pred_L1
+					list_selected    := PRED_L1;
+					ref_idx_selected := ref_idxl1;
+					mv_selected      := [Mvxl1,Mvyl1];
+				else
+					if(Is_direct_l0 and (not Is_direct_l1))then//Is Pred_L0
+						list_selected    := PRED_L0;
+						ref_idx_selected := ref_idxl0;
+						mv_selected      := [Mvxl0,Mvyl0];
+					else//Is BiPred
+						println("MacroBlkType.IsBiPred or Direct _Init not implemented");
+						list_selected := BIPRED;
+					end
+				end
+			end
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -291,9 +337,53 @@ actor SelectMvpLX()
 			SelectList :[BIPRED]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
-			IsSubPredL0 and IsSubPredL1 or (not IsSubPredL0) and (not IsSubPredL1)
+			IsSubPredL0 and IsSubPredL1
 		do
-			println("SubMacroBlkType.IsBiPred or Direct");
+			println("In SelectMvpLX SubMacroBlkType.IsBiPred");
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
+	SubMacroBlkType.Direct: action
+			MvL0         :[Mvxl0, Mvyl0],
+			RefIdxL0     :[ref_idxl0],
+			LocationL0   :[Mbx_in_pixl0,Mby_in_pixl0],
+			DirectPredL0 :[Is_direct_l0],
+			MvL1         :[Mvxl1,Mvyl1],
+			RefIdxL1     :[ref_idxl1],
+			LocationL1   :[Mbx_in_pixl1,Mby_in_pixl1],
+			DirectPredL1 :[Is_direct_l1]
+				==>
+		MvOut     :[mv_selected]repeat 2,
+		RefIdxOut :[ref_idx_selected],
+		Location  :[Mbx_in_pixl0,Mby_in_pixl0],
+			SelectList :[list_selected]
+		guard
+			SubMbPartIdx < SubMbPartIdxMax,
+			(not IsSubPredL0) and (not IsSubPredL1)
+		var
+			uint(size=2) list_selected,
+			uint(size=4) ref_idx_selected,
+			List(type: int(size=16), size=2) mv_selected
+		do
+			if(Is_direct_l0 and Is_direct_l1)then//Is BiPred
+				println("In SelectMvpLX SubMacroBlkType.Direct_Bipred not implemented yet !!");
+				list_selected := BIPRED;
+			else
+				if((not Is_direct_l0) and Is_direct_l1)then//Is Pred_L1
+					list_selected    := PRED_L1;
+					ref_idx_selected := ref_idxl1;
+					mv_selected      := [Mvxl1,Mvyl1];
+				else
+					if(Is_direct_l0 and (not Is_direct_l1))then//Is Pred_L0
+						list_selected    := PRED_L0;
+						ref_idx_selected := ref_idxl0;
+						mv_selected      := [Mvxl0,Mvyl0];
+					else//Is BiPred
+						println("In SelectMvpLX SubMacroBlkType.Direct_Init not implemented yet !!");
+						list_selected := BIPRED;
+					end
+				end
+			end
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 

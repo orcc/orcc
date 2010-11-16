@@ -30,7 +30,7 @@ actor SelectRefIdx()
 				==>
 			PocToRead    :[Poc0]
 		guard
-			list_selected = PRED_L0//PRED_L0 or ListSelected = BIPRED or ListSelected = DIRECT//FixMe!!
+			list_selected = PRED_L0
 		end
 
 	SendPocToRead.L1: action
