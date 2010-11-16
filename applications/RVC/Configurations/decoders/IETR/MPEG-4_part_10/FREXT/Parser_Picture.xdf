@@ -398,6 +398,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="DirectSpatialMvPred">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -738,4 +741,6 @@
         src="DecodeSliceData_Cavlc" src-port="Is_B_Skip"/>
     <Connection dst="DecodeSliceData_Cavlc"
         dst-port="SliceHeaderParameters" src="DecodeSliceHeader" src-port="SliceDataParam"/>
+    <Connection dst="" dst-port="DirectSpatialMvPred"
+        src="DecodeRefPicList" src-port="DirectSpatialMvPredFlag"/>
 </XDF>

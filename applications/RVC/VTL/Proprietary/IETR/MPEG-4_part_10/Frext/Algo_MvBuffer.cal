@@ -190,7 +190,7 @@ actor Algo_MvBuffer()
 	bool          colPic_IsShortTermRef;
 	uint(size=32) Mbx;
 	uint(size=32) Mby;
-	bool          direct_8x8_inference_flag;///////////////////////////////
+	bool          direct_8x8_inference_flag;
 
 	uint(size=4) NbPartitionsToWrite;
 	List(type: uint(size=32), size=16) Partition_Mbx;
@@ -281,36 +281,85 @@ actor Algo_MvBuffer()
 					IsColPic[i] := false;
 				end
 			else
-				foreach int i in 0 .. 3
-				do
-					foreach int j in 0 .. 3
+				if(not direct_8x8_inference_flag)then
+					foreach int i in 0 .. 3
 					do
-						IsColPic[PartitionIdx[i][j]] :=
-							if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] = -1 and ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j] = -1)then
-								true
-							else
-								if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] != -1)then
-									if(     ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j]     =  0
-									    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][0] >= -1
-									    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][0] <=  1
-									    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][1] >= -1
-									    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][1] <=  1)then
-										true
+						foreach int j in 0 .. 3
+						do
+							IsColPic[PartitionIdx[i][j]] :=
+								if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] = -1 and ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j] = -1)then
+									true
+								else
+									if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] != -1)then
+										if(     ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j]     =  0
+										    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][0] >= -1
+										    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][0] <=  1
+										    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][1] >= -1
+										    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][1] <=  1)then
+											true
+										else
+											false
+										end
 									else
-										false
+										if(     ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j]     =  0
+										    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][0] >= -1
+										    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][0] <=  1
+										    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][1] >= -1
+										    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][1] <=  1)then
+											true
+										else
+											false
+										end
+									end
+								end;
+						end
+					end
+				else
+					foreach int i in 0 .. 1
+					do
+						foreach int j in 0 .. 1
+						do
+							if(ListRefIdxL0[ReadListIdx][Mbx+3*i][Mby+3*j] = -1 and ListRefIdxL1[ReadListIdx][Mbx+3*i][Mby+3*j] = -1)then
+								foreach int k in 0 .. 3
+								do
+									IsColPic[8*j + 4*i + k] := true;
+								end
+							else
+								if(ListRefIdxL0[ReadListIdx][Mbx+3*i][Mby+3*j] != -1)then
+									if(     ListRefIdxL0[ReadListIdx][Mbx+3*i][Mby+3*j]     =  0
+									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][0] >= -1
+									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][0] <=  1
+									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][1] >= -1
+									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][1] <=  1)then
+										foreach int k in 0 .. 3
+										do
+											IsColPic[8*j + 4*i + k] := true;
+										end
+									else
+										foreach int k in 0 .. 3
+										do
+											IsColPic[8*j + 4*i + k] := false;
+										end
 									end
 								else
-									if(     ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j]     =  0
-									    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][0] >= -1
-									    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][0] <=  1
-									    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][1] >= -1
-									    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][1] <=  1)then
-										true
+									if(     ListRefIdxL1[ReadListIdx][Mbx+3*i][Mby+3*j]     =  0
+									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][0] >= -1
+									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][0] <=  1
+									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][1] >= -1
+									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][1] <=  1)then
+										foreach int k in 0 .. 3
+										do
+											IsColPic[8*j + 4*i + k] := true;
+										end
 									else
-										false
+										foreach int k in 0 .. 3
+										do
+											IsColPic[8*j + 4*i + k] := false;
+										end
 									end
 								end
-							end;
+							end
+						end
 					end
 				end
 			end	
@@ -600,8 +649,15 @@ actor Algo_MvBuffer()
 			not IsPredL0,
 			not IsPredL1
 		do
-			println("In MvBuffer GetBlockInfo.IsDirect");
-			while true do end
+			foreach int i in 0 .. NbPartitionsToWrite - 1
+			do
+				ListRefIdxL0[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := ref_idx_l0;
+				ListRefIdxL1[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := ref_idx_l1;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  MvxL0;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  MvyL0;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  MvxL1;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  MvyL1;
+			end
 		end
 
 	ReadDelList.Launch: action

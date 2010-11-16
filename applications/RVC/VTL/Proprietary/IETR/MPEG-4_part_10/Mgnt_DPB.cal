@@ -169,6 +169,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				end
 			end
 			if(not found)then
+				println("Current Poc : "+ListPOC[pic_curr_idx]);
 				println("POC not found :"+poc2read);
 					foreach int i in 0 .. NB_PIC-1
 					do

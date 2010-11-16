@@ -30,24 +30,24 @@
       <vertex id="I_PCM_U" x="1255" y="1205"/>
       <vertex id="I_PCM_V" x="1253" y="1236"/>
       <vertex id="DecodeNextNal" x="547" y="296"/>
-      <vertex id="TypeOfVLD" x="1876" y="94"/>
+      <vertex id="TypeOfVLD" x="1871" y="94"/>
       <vertex id="VLDParam" x="1869" y="128"/>
       <vertex id="GetPps" x="576" y="356"/>
       <vertex id="FrameNum" x="565" y="326"/>
       <vertex id="Mmco" x="786" y="128"/>
-      <vertex id="NbRefFrame_l0" x="1091" y="399"/>
-      <vertex id="RefList0Type" x="1107" y="502"/>
-      <vertex id="RefReordering_l0" x="1112" y="586"/>
+      <vertex id="NbRefFrame_l0" x="1123" y="456"/>
+      <vertex id="RefList0Type" x="1135" y="533"/>
+      <vertex id="RefReordering_l0" x="1123" y="610"/>
       <vertex id="IntraPredMode" x="2262" y="1048"/>
       <vertex id="MbIntraFlag" x="2260" y="1141"/>
-      <vertex id="Run" x="2069" y="657"/>
-      <vertex id="Value" x="2061" y="749"/>
+      <vertex id="Run" x="2153" y="663"/>
+      <vertex id="Value" x="2145" y="755"/>
       <vertex id="Last" x="2271" y="882"/>
       <vertex id="MacroBlockType" x="2249" y="1109"/>
       <vertex id="TransformSize8x8" x="2245" y="1400"/>
-      <vertex id="NbRefFrame_l1" x="1099" y="442"/>
-      <vertex id="RefList1Type" x="1106" y="544"/>
-      <vertex id="RefReordering_l1" x="1111" y="634"/>
+      <vertex id="NbRefFrame_l1" x="1131" y="499"/>
+      <vertex id="RefList1Type" x="1138" y="572"/>
+      <vertex id="RefReordering_l1" x="1113" y="649"/>
       <vertex id="MbPredRefIdxL0" x="1680" y="1180"/>
       <vertex id="SubMbPredRefIdxL0" x="1707" y="1486"/>
       <vertex id="SubMbType" x="1728" y="1549"/>
@@ -63,15 +63,16 @@
       <vertex id="MbPartHeigth" x="2251" y="1168"/>
       <vertex id="Mgnt_DecodePic" x="1446" y="-92"/>
       <vertex id="DecodeSliceHeader" x="224" y="303"/>
-      <vertex id="DecodeRefPicList" x="791" y="437"/>
+      <vertex id="DecodeRefPicList" x="723" y="418"/>
       <vertex id="DecodeDecRefPicMarking" x="581" y="144"/>
       <vertex id="DecodeSliceData_Cavlc" x="164" y="868"/>
       <vertex id="DecodeMacroBlockLayer" x="859" y="849"/>
       <vertex id="DecodeMbPred" x="1393" y="993"/>
       <vertex id="DecodeResidual" x="1394" y="559"/>
-      <vertex id="DecodeResidualBlock_Cavlc" x="1827" y="620"/>
+      <vertex id="DecodeResidualBlock_Cavlc" x="1911" y="626"/>
       <vertex id="DecodeSubMbPred" x="1418" y="1318"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="1913" y="1086"/>
-      <vertex id="GenerateSkipBlockInformation" x="1892" y="864"/>
+      <vertex id="GenerateSkipBlockInformation" x="1907" y="865"/>
+      <vertex id="DirectSpatialMvPred" x="1108" y="419"/>
    </vertices>
 </layout>

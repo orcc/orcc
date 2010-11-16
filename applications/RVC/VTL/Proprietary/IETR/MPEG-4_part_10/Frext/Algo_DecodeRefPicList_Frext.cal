@@ -32,7 +32,9 @@ actor Algo_DecodeRefPicList_Frext()
 
 	uint(size=2)  RefList1Type,
 	uint(size=5)  NbRefFrame_l1,
-	uint(size=31) RefReordering_l1
+	uint(size=31) RefReordering_l1,
+
+	bool          DirectSpatialMvPredFlag
 		:
 
 /*   
@@ -53,7 +55,6 @@ actor Algo_DecodeRefPicList_Frext()
 
 	bool DEBUG_FLAG_DECODED = false;
 
-	bool direct_spatial_mv_pred_flag := false;
 	bool num_ref_idx_active_override_flag := false;
 	uint(size=5) num_ref_idx_l0_active := 0;
 	uint(size=5) num_ref_idx_l1_active := 0;
@@ -80,7 +81,9 @@ actor Algo_DecodeRefPicList_Frext()
 
 			RefList0Type     :[REFLIST0_PRED],
 			RefList1Type     :[0],
-			RefReordering_l1 :[0]
+			RefReordering_l1 :[0],
+
+			DirectSpatialMvPredFlag :[false]
 		guard
 			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP)
 		do
@@ -95,7 +98,9 @@ actor Algo_DecodeRefPicList_Frext()
 
 			RefList1Type     :[0],
 			NbRefFrame_l1    :[0],
-			RefReordering_l1 :[0]
+			RefReordering_l1 :[0],
+
+			DirectSpatialMvPredFlag :[false]
 		end
 
 	ReadNumRefIdxAct.Done: action
@@ -148,6 +153,9 @@ actor Algo_DecodeRefPicList_Frext()
 	Read_DirecSpat_NumRefIdxAct.Done: action
 			ValVLD     :[ValueOfVLD] repeat 2
 				==>
+			DirectSpatialMvPredFlag :[direct_spatial_mv_pred_flag]
+		var
+			bool direct_spatial_mv_pred_flag
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tdirect_spatial_mv_pred_flag: "+ValueOfVLD[0]);

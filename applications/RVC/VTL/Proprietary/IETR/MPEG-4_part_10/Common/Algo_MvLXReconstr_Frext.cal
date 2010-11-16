@@ -68,7 +68,9 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	int (size=16) MbPredMvRes,
 	int (size=16) SubMbPredMvRes,
 
-	bool          colPic
+	bool          colPic,
+
+	bool          DirectSpatialMvPredFlag
 		==>
 	bool          NewPic_o,
 	int (size=16) MvOut,
@@ -162,6 +164,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	int (size=LOG2_SZ_TAB+1) Idx_mbAddrC;
 	int (size=LOG2_SZ_TAB+1) Idx_mbAddrD;
 
+	bool          direct_spatial_mv_pred;
 	uint(size=11) Mbx_in_pix;
 	uint(size=11) Mby_in_pix;
 
@@ -398,7 +401,11 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
 		do
 			if(MacroBlkType = BLOCK_TYPE_B_SKIP)then
-				println("GetMbType.B_Skip_B_Direct_16x16 : B_Skip not implemented yet !!");
+				if(direct_spatial_mv_pred)then
+					println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
+				else //spatial prediction
+					println("GetMbType.B_Skip_B_Direct_16x16 : spatial prediction for B_Skip not implemented yet !!");
+				end
 			else
 				println("GetMbType.B_Skip_B_Direct_16x16 : B_DIRECT_16x16 not implemented yet !!");	
 			end

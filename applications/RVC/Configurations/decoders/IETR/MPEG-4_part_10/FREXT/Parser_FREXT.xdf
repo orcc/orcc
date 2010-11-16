@@ -686,4 +686,6 @@
     <Connection dst="MVReconstruct" dst-port="Poc" src="DecodePic" src-port="POC"/>
     <Connection dst="MVReconstruct" dst-port="Direct8x8InferenceFlag"
         src="DecodeSps" src-port="Direct8x8Inference"/>
+    <Connection dst="MVReconstruct" dst-port="DirectSpatialMvPred"
+        src="DecodePic" src-port="DirectSpatialMvPred"/>
 </XDF>

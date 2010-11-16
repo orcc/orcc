@@ -138,6 +138,9 @@
     <Port kind="Input" name="Direct8x8InferenceFlag">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="DirectSpatialMvPred">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -325,4 +328,8 @@
     <Connection dst="MvBuffer" dst-port="RefIdxL1" src="MvL1_Reconstr" src-port="RefIdxOut"/>
     <Connection dst="MvL0_Reconstr" dst-port="colPic" src="MvBuffer" src-port="colPic"/>
     <Connection dst="MvL1_Reconstr" dst-port="colPic" src="MvBuffer" src-port="colPic"/>
+    <Connection dst="MvL0_Reconstr" dst-port="DirectSpatialMvPredFlag"
+        src="" src-port="DirectSpatialMvPred"/>
+    <Connection dst="MvL1_Reconstr" dst-port="DirectSpatialMvPredFlag"
+        src="" src-port="DirectSpatialMvPred"/>
 </XDF>
