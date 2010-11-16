@@ -127,15 +127,17 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 				size = ((TypeInt) type).getSize();
 			}
 
-			// index goes from 0 to size - 1, and we remove the sign bit
-			int indexSize = IntExpr.getSize(size - 1) - 1;
-
+			int indexSize;
 			// new index variable
 			LocalVariable indexVar;
+			
 			if (useUint) {
+				// index goes from 0 to size - 1, and we remove the sign bit
+				indexSize = IntExpr.getSize(size - 1) - 1;
 				indexVar = procedure.newTempLocalVariable("",
 						IrFactory.eINSTANCE.createTypeUint(indexSize), "index");
 			} else {
+				indexSize = IntExpr.getSize(size - 1);
 				indexVar = procedure.newTempLocalVariable("",
 						IrFactory.eINSTANCE.createTypeInt(indexSize), "index");
 			}
