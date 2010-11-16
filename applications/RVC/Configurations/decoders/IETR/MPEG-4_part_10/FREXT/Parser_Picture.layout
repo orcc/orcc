@@ -8,8 +8,8 @@
       <vertex id="ResetPrevFrameNum" x="10" y="402"/>
       <vertex id="PpsParam4SliceHeader" x="7" y="369"/>
       <vertex id="SpsParam4SliceHeader" x="6" y="434"/>
-      <vertex id="PpsParam4SliceData" x="-4" y="977"/>
-      <vertex id="SpsParam4SliceData" x="0" y="1064"/>
+      <vertex id="PpsParam4SliceData" x="-11" y="909"/>
+      <vertex id="SpsParam4SliceData" x="-10" y="948"/>
       <vertex id="IntraPredModeC" x="1685" y="1027"/>
       <vertex id="QP_Cb" x="2274" y="1291"/>
       <vertex id="QP_Cr" x="2274" y="1327"/>
@@ -25,15 +25,15 @@
       <vertex id="PicWidthInMb" x="589" y="1049"/>
       <vertex id="PicSizeInMb" x="597" y="1019"/>
       <vertex id="FirstMbInSlice" x="600" y="924"/>
-      <vertex id="POC" x="585" y="453"/>
+      <vertex id="POC" x="586" y="385"/>
       <vertex id="I_PCM_Y" x="1249" y="1271"/>
       <vertex id="I_PCM_U" x="1255" y="1205"/>
       <vertex id="I_PCM_V" x="1253" y="1236"/>
-      <vertex id="DecodeNextNal" x="544" y="329"/>
+      <vertex id="DecodeNextNal" x="547" y="296"/>
       <vertex id="TypeOfVLD" x="1876" y="94"/>
       <vertex id="VLDParam" x="1869" y="128"/>
-      <vertex id="GetPps" x="572" y="418"/>
-      <vertex id="FrameNum" x="562" y="391"/>
+      <vertex id="GetPps" x="576" y="356"/>
+      <vertex id="FrameNum" x="565" y="326"/>
       <vertex id="Mmco" x="786" y="128"/>
       <vertex id="NbRefFrame_l0" x="1091" y="399"/>
       <vertex id="RefList0Type" x="1107" y="502"/>
@@ -65,7 +65,7 @@
       <vertex id="DecodeSliceHeader" x="224" y="303"/>
       <vertex id="DecodeRefPicList" x="791" y="437"/>
       <vertex id="DecodeDecRefPicMarking" x="581" y="144"/>
-      <vertex id="DecodeSliceData_Cavlc" x="166" y="868"/>
+      <vertex id="DecodeSliceData_Cavlc" x="164" y="868"/>
       <vertex id="DecodeMacroBlockLayer" x="859" y="849"/>
       <vertex id="DecodeMbPred" x="1393" y="993"/>
       <vertex id="DecodeResidual" x="1394" y="559"/>

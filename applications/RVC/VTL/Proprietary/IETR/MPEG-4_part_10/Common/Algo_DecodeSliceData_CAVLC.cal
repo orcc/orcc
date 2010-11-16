@@ -32,13 +32,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=32) SpsParameters,
 	uint(size=5)  NumRefIdxLXActive,
 	//Slice Header Parameters
-	uint(size=13) FstMbInSlc,
-	uint(size=4)  SliceType,
-	bool          MbaffFrame,
-	uint(size=2)  DisDeblocFilterIdc,
-	int(size=6)   SliceBetaOffset,
-	int (size=6)  SliceAlphaC0Offset,
-	int (size=8)  ValQp,
+	int (size=14) SliceHeaderParameters,
 
 	uint(size=5)  Total_CoeffLuma,
 	uint(size=5)  Total_CoeffChroma,
@@ -175,14 +169,11 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	GetSpsAndPpsParameters: action
 			PpsParameters         :[PpsParam] repeat 3,
 			SpsParameters         :[SpsParam] repeat 7,
-			FstMbInSlc            :[ValFirstMbInSlice],
-			SliceType             :[ValSliceType],
-			MbaffFrame            :[ValMbaffFrame],
-			NumRefIdxLXActive     :[ValNumRefIdxLXActive] repeat 2,
-			DisDeblocFilterIdc    :[ValDisDebFil],
-			SliceBetaOffset       :[ValSliceBetaOffset],
-			SliceAlphaC0Offset    :[ValSliceAlphaC0Offset],
-			ValQp                 :[Val_Qp]
+			SliceHeaderParameters :[ ValSliceType  , ValFirstMbInSlice,
+			                         ValMbaffFrame , Val_Qp,
+			                         ValDisDebFil  , ValSliceBetaOffset,
+			                         ValSliceAlphaC0Offset],
+			NumRefIdxLXActive     :[ValNumRefIdxLXActive] repeat 2
 				==>
 		guard
 			Is_CBP = false
@@ -202,7 +193,12 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			transform_8x8_mode_flag       := GetFlag(PpsParam[2],2);
 
 			slice_type                    := ValSliceType;
-			MbaffFrameFlag                := ValMbaffFrame;
+			MbaffFrameFlag                :=
+				if(ValMbaffFrame = 0)then
+					false
+				else
+					true
+				end;
 			num_ref_idx_l0_active         := ValNumRefIdxLXActive[0];
 			num_ref_idx_l1_active         := ValNumRefIdxLXActive[1];
 			first_mb_in_slice             := ValFirstMbInSlice;

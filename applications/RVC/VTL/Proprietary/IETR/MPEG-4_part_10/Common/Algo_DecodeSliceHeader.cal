@@ -34,14 +34,9 @@ actor Algo_DecodeSliceHeader()
 
 	uint(size=4)  SliceType,
 
-	uint(size=13) FirstMbInSlice,
-	bool          MbaffFrame,
-
 	uint(size=32) Poc,
-	uint(size=2)  DisDeblockingFilterIdc,
-	int (size=6)  SliceBetaOffset,
-	int (size=6)  SliceAlphaC0Offset,
-	int (size=8)  ValQp
+
+	int (size=14) SliceDataParam
 		:
 
 
@@ -161,7 +156,7 @@ actor Algo_DecodeSliceHeader()
 	ReadSliceType.Done: action
 			ValVLD         :[ValueOfVLD] repeat 3
 				==>
-			FirstMbInSlice :[ValueOfVLD[0]],
+			SliceDataParam :[slice_type,ValueOfVLD[0]],
 			GetPps         :[ValueOfVLD[2]],
 			SliceType      :[slice_type]
 		do
@@ -558,7 +553,7 @@ actor Algo_DecodeSliceHeader()
 
 	SendSliceDataParameters: action
 				==>
-			MbaffFrame :[MbaffFrameFlag]
+			SliceDataParam :[if MbaffFrameFlag then 1 else 0 end]
 		end
 
 
@@ -599,9 +594,9 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadSliceQpDelta.Done: action
-			ValVLD    :[VLDecoding]
+			ValVLD         :[VLDecoding]
 				==>
-			ValQp     :[ValueOfQp]
+			SliceDataParam :[ValueOfQp]
 		var
 			int(size=8) ValueOfQp
 		do
@@ -728,9 +723,8 @@ actor Algo_DecodeSliceHeader()
 
 	SendEndSliceHeader: action
 				==>
-			DisDeblockingFilterIdc :[disable_deblocking_filter_idc],
-			SliceBetaOffset        :[slice_beta_offset],
-			SliceAlphaC0Offset     :[slice_alpha_c0_offset],
+			SliceDataParam :[disable_deblocking_filter_idc , slice_beta_offset,
+			                 slice_alpha_c0_offset],
 			TypeOfVLD              :[SKIP_NAL],
 			DecodeNextNal          :[true]
 		end

@@ -528,10 +528,6 @@
         src="Mgnt_DecodePic" src-port="DataValVLD"/>
     <Connection dst="Mgnt_DecodePic" dst-port="DataTypeOfVLD"
         src="DecodeSliceData_Cavlc" src-port="TypeOfVLD"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="SliceType"
-        src="DecodeSliceHeader" src-port="SliceType"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="MbaffFrame"
-        src="DecodeSliceHeader" src-port="MbaffFrame"/>
     <Connection dst="DecodeDecRefPicMarking" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="DecRefPicMarkingValVLD"/>
     <Connection dst="Mgnt_DecodePic"
@@ -580,8 +576,6 @@
         src="DecodeSubMbPred" src-port="VldParam"/>
     <Connection dst="DecodeSubMbPred" dst-port="ValVLD"
         src="Mgnt_DecodePic" src-port="SubMbPredValVLD"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="FstMbInSlc"
-        src="DecodeSliceHeader" src-port="FirstMbInSlice"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="SkipMbLayer" src="DecodeSliceData_Cavlc" src-port="SkipMbLayer"/>
     <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="MbType"
@@ -622,14 +616,6 @@
         src="DecodeMacroBlockLayer" src-port="IsIPCM"/>
     <Connection dst="GenerateSkipBlockInformation" dst-port="CbpBlk"
         src="DecodeMacroBlockLayer" src-port="cbp_blk"/>
-    <Connection dst="DecodeSliceData_Cavlc"
-        dst-port="DisDeblocFilterIdc" src="DecodeSliceHeader" src-port="DisDeblockingFilterIdc"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="SliceBetaOffset"
-        src="DecodeSliceHeader" src-port="SliceBetaOffset"/>
-    <Connection dst="DecodeSliceData_Cavlc"
-        dst-port="SliceAlphaC0Offset" src="DecodeSliceHeader" src-port="SliceAlphaC0Offset"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="ValQp"
-        src="DecodeSliceHeader" src-port="ValQp"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="SDataQp_Y_Cb_Cr" src="DecodeSliceData_Cavlc" src-port="SkipValQp_Y_Cb_Cr"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
@@ -750,4 +736,6 @@
         src="MergeDataFromSDataAndMbLayer" src-port="MacroBlockType"/>
     <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="IsB_Skip"
         src="DecodeSliceData_Cavlc" src-port="Is_B_Skip"/>
+    <Connection dst="DecodeSliceData_Cavlc"
+        dst-port="SliceHeaderParameters" src="DecodeSliceHeader" src-port="SliceDataParam"/>
 </XDF>
