@@ -15,12 +15,13 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 Buffer store edge value from current macrobloc and provide edge for intra-decoding
 Edge are provided from bottom to top, then corner, then left to right 
-Jérôme GORIN IETR/ARTEMIS
+Jerome GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
+import orcc.Imp_MacroBlockInfo.* ;
 
-actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
-	uint (size=8) Mb_Type,
+actor Buffer_Neighbour_FullMb ( int MB_WIDTH , bool IsChroma)
+	uint (size=6) Mb_Type,
 	uint(size=13) CurrMbAddr,
 	int(size=9) MB_IN,
 	uint(size=7) PicWidthInMb 
@@ -39,7 +40,7 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   	
   	// Index of the macroblock in the current line
   	uint(size=13) mb_Index := 0;
-  	uint(size=2) mb_type_ok:=0;
+  	uint(size=6)  mb_type  :=0;
   	
 	//List containing edge pixel value 
 	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH_MAX) top_edge := [0 : for int i in 0 .. PICWIDTH * MB_WIDTH_MAX-1];
@@ -51,11 +52,11 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
 	
   
   	//Mb_Type_OK : Send value of edge needed and store the edge of macroblock decoded
-  	Read_Mb_Type: action Mb_Type:[a], PicWidthInMb:[b], CurrMbAddr:[c] ==>
+  	Read_Mb_Type: action Mb_Type:[MbType], PicWidthInMb:[b], CurrMbAddr:[c] ==>
    	do 
   		// position of the current macroblock in the line
   		mb_Index := c mod b; 
-  		mb_type_ok:=a; // mb_type is equal to 1  		
+  		mb_type  := MbType; // mb_type is equal to 1  		
   	end  
   
   	//Receive pixel value from current decoded macroblock
@@ -88,7 +89,8 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   
   	EDGE_CALC_LUMA: action ==> EDGE:[ [ result[s] : for int s in 0 .. 2*MB_WIDTH_LUMA]	] repeat 2*MB_WIDTH_LUMA+1
   	guard
-  		mb_type_ok = 1,
+  		   (mb_type >= BLOCK_TYPE_INTRA_16x16_MIN and mb_type <= BLOCK_TYPE_INTRA_16x16_MAX)
+  		or (mb_type = BLOCK_TYPE_I_NxN            and IsChroma),
   		MB_WIDTH = MB_WIDTH_LUMA
   	do
 		
@@ -107,7 +109,8 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
   
   	EDGE_CALC_CHROMA: action ==> EDGE:[ [ result[s] : for int s in 0 .. 2*MB_WIDTH_CHROMA]	] repeat 2*MB_WIDTH_CHROMA+1
   	guard
-  		mb_type_ok = 1,
+  		   (mb_type >= BLOCK_TYPE_INTRA_16x16_MIN and mb_type <= BLOCK_TYPE_INTRA_16x16_MAX)
+  		or (mb_type = BLOCK_TYPE_I_NxN            and IsChroma),
   		MB_WIDTH = MB_WIDTH_CHROMA
   	do
 		
@@ -126,7 +129,10 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH )
 
   	NOT_EDGE_CALC: action ==>
   	guard
-  		mb_type_ok != 1
+  		not(
+  			   (mb_type >= BLOCK_TYPE_INTRA_16x16_MIN and mb_type <= BLOCK_TYPE_INTRA_16x16_MAX)
+  			or (mb_type = BLOCK_TYPE_I_NxN            and IsChroma)
+  		)
    	end
 
 	schedule fsm Mb_Type:

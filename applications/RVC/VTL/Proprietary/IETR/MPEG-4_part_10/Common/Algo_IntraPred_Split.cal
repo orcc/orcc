@@ -62,9 +62,7 @@ actor Algo_IntraPred_Split()
 	uint(size=13) FirstMBInSlice,
 	bool          ConstrainedIFlag
 		==>
-	uint(size=4)  PredMode,
-	uint(size=8)  MbType,
-	uint(size=8)  MbTypeC
+	uint(size=4)  PredMode
 		:
 
 
@@ -72,15 +70,6 @@ actor Algo_IntraPred_Split()
 //	uint(size=4) INTRA_8x8   = 2;	
 	uint(size=4) INTRA_16x16 = 3;	
 	uint(size=4) I_PCM       = 4;
-//Should be the same values !!!
-	uint(size=4) MB_TYPE_INTRA_4x4   = 0;
-	uint(size=4) MB_TYPE_INTRA_16x16 = 1;	
-	uint(size=4) MB_TYPE_INTER       = 2;
-	uint(size=4) MB_TYPE_I_PCM       = 4;
-//	uint(size=4) MB_TYPE_INTRA_8x8   = ??;
-	uint(size=2) BLOCK_4x4   = 0;
-//	uint(size=2) BLOCK_8x8   = 1;
-	uint(size=2) BLOCK_16x16 = 2;
 	
 	bool DEBUG_INPUT = false;	
 
@@ -126,8 +115,6 @@ actor Algo_IntraPred_Split()
 			FirstMBInSlice   :[ First_MB_In_Slice ],
 			ConstrainedIFlag :[ Constrained_I_Flag ]
 				==>
-			MbType           :[MB_TYPE_INTER],
-			MbTypeC          :[2]
 		guard
 			mb_intra_flag = 0
 		do
@@ -237,8 +224,6 @@ actor Algo_IntraPred_Split()
 	get_intra4x4_done: action 
 			ConstrainedIFlag :[ Constrained_I_Flag ]
 				==>
-			MbType      :[ MB_TYPE_INTRA_4x4 ],
-			MbTypeC     :[ 1 ]
 		guard
 			mb_intra_type = INTRA_4x4 and count = 16
 		do
@@ -288,9 +273,7 @@ actor Algo_IntraPred_Split()
 			ConstrainedIFlag :[ Constrained_I_Flag ],
 			IntraPredMode    :[ Mode_16x16 ]
 				==>
-			PredMode    :[ Mode_16x16 ],
-			MbType      :[ MB_TYPE_INTRA_16x16 ],
-			MbTypeC     :[ 1 ]
+			PredMode    :[ Mode_16x16 ]
 		guard
 			mb_intra_type = INTRA_16x16
 		do
@@ -306,8 +289,6 @@ actor Algo_IntraPred_Split()
 	get_i_pcm: action
 			ConstrainedIFlag :[ cflag ]
 				==>
-			MbType  :[ MB_TYPE_I_PCM ],
-			MbTypeC :[ 4 ]
 		guard
 			mb_intra_type = I_PCM
 		do

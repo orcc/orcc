@@ -4,7 +4,7 @@
       <vertex id="Z" x="57" y="79"/>
       <vertex id="PicWidthInMb" x="57" y="176"/>
       <vertex id="PicSizeInMb" x="57" y="273"/>
-      <vertex id="MbIntraFlag" x="57" y="370"/>
+      <vertex id="Mbtype" x="57" y="370"/>
       <vertex id="Cbp_blk" x="57" y="467"/>
       <vertex id="Alpha_offset" x="57" y="564"/>
       <vertex id="Beta_offset" x="57" y="661"/>

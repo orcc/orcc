@@ -24,10 +24,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MbIntraFlag">
+    <Port kind="Input" name="Mbtype">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
@@ -148,7 +148,6 @@
     <Connection dst="Mgnt_DBF" dst-port="Z" src="" src-port="Z"/>
     <Connection dst="Mgnt_DBF" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Mgnt_DBF" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
-    <Connection dst="Mgnt_DBF" dst-port="MbIntraFlag" src="" src-port="MbIntraFlag"/>
     <Connection dst="Mgnt_DBF" dst-port="Cbp_blk" src="" src-port="Cbp_blk"/>
     <Connection dst="Mgnt_DBF" dst-port="Alpha_offset" src="" src-port="Alpha_offset"/>
     <Connection dst="Mgnt_DBF" dst-port="Beta_offset" src="" src-port="Beta_offset"/>
@@ -158,4 +157,5 @@
     <Connection dst="Mgnt_DBF" dst-port="LFDisable" src="" src-port="LFDisable"/>
     <Connection dst="Mgnt_DBF" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="" dst-port="WD" src="Mgnt_DBF" src-port="WD"/>
+    <Connection dst="Mgnt_DBF" dst-port="MbType" src="" src-port="Mbtype"/>
 </XDF>

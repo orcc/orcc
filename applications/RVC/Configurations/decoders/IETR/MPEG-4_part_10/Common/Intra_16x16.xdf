@@ -48,7 +48,7 @@
     <Port kind="Input" name="Mb_Type">
         <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
             </Entry>
         </Type>
     </Port>
@@ -135,6 +135,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="IsChroma">
+            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        </Parameter>
         <Parameter name="MB_WIDTH">
             <Expr kind="Var" name="MB_WIDTH"/>
         </Parameter>

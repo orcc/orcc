@@ -8,7 +8,6 @@
       <vertex id="CurrMbAddr" x="205" y="99"/>
       <vertex id="PredMode" x="205" y="196"/>
       <vertex id="FirstMbInSlice" x="205" y="293"/>
-      <vertex id="Mb_TypeC" x="205" y="390"/>
       <vertex id="PicWidthInMB" x="205" y="487"/>
       <vertex id="POC" x="205" y="584"/>
       <vertex id="PicSizeInMb" x="205" y="702"/>
@@ -30,9 +29,9 @@
       <vertex id="PocToDisplay" x="232" y="1153"/>
       <vertex id="IsIDR" x="205" y="2730"/>
       <vertex id="MacroBlockType" x="188" y="663"/>
+      <vertex id="PocToRead" x="142" y="1521"/>
       <vertex id="Display" x="906" y="998"/>
       <vertex id="PRED_C" x="660" y="958"/>
       <vertex id="RES_C" x="205" y="2060"/>
-      <vertex id="PocToRead" x="142" y="1521"/>
    </vertices>
 </layout>

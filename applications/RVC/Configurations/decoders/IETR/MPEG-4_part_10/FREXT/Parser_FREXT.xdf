@@ -191,20 +191,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="Mb_Type">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="Mb_TypeC">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="PredMode">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -537,8 +523,6 @@
     <Connection dst="" dst-port="CoefDC_Cr" src="BlockSplit" src-port="Coeff_V_DC"/>
     <Connection dst="" dst-port="CoefAC_L" src="BlockSplit" src-port="Coeff_Y_AC"/>
     <Connection dst="" dst-port="CoefDC_L" src="BlockSplit" src-port="Coeff_Y_DC"/>
-    <Connection dst="" dst-port="Mb_Type" src="IntraPredSplit" src-port="MbType"/>
-    <Connection dst="" dst-port="Mb_TypeC" src="IntraPredSplit" src-port="MbTypeC"/>
     <Connection dst="" dst-port="PredMode" src="IntraPredSplit" src-port="PredMode"/>
     <Connection dst="" dst-port="DelList" src="MMCO" src-port="DelList"/>
     <Connection dst="" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>

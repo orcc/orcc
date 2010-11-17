@@ -14,7 +14,6 @@
       <vertex id="MV" x="251" y="1553"/>
       <vertex id="PartSZ" x="264" y="1730"/>
       <vertex id="POC" x="1214" y="1360"/>
-      <vertex id="Mb_Type" x="250" y="869"/>
       <vertex id="QP" x="1019" y="744"/>
       <vertex id="LFDisable" x="980" y="566"/>
       <vertex id="slice_alpha_c0_offset" x="946" y="463"/>
@@ -27,10 +26,10 @@
       <vertex id="DelList" x="1198" y="1269"/>
       <vertex id="PocToDisplay" x="1191" y="1396"/>
       <vertex id="IsIDR" x="1204" y="1320"/>
-      <vertex id="MacroBlockType" x="57" y="1374"/>
+      <vertex id="MacroBlockType" x="15" y="1441"/>
       <vertex id="TransformSize8x8" x="57" y="1277"/>
       <vertex id="PocToRead" x="243" y="1784"/>
-      <vertex id="Display_L" x="1530" y="1399"/>
+      <vertex id="Display_L" x="1556" y="1366"/>
       <vertex id="Buffer_inter" x="1392" y="1345"/>
       <vertex id="Select" x="1010" y="1015"/>
       <vertex id="Intra_16x16" x="702" y="724"/>

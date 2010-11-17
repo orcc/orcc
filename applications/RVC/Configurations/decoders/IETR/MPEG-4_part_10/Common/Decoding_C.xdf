@@ -52,13 +52,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="Mb_TypeC">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PicWidthInMB">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -284,7 +277,6 @@
     <Connection dst="RES_C" dst-port="CoefAC" src="" src-port="CoefAC"/>
     <Connection dst="PRED_C" dst-port="Coef_ACR" src="RES_C" src-port="CoefACR_C"/>
     <Connection dst="" dst-port="Display" src="PRED_C" src-port="Display_C"/>
-    <Connection dst="PRED_C" dst-port="Mb_TypeC" src="" src-port="Mb_TypeC"/>
     <Connection dst="PRED_C" dst-port="PicWidthInMb" src="" src-port="PicWidthInMB"/>
     <Connection dst="PRED_C" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="PRED_C" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>

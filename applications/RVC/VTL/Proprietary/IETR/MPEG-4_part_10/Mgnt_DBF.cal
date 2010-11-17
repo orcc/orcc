@@ -37,6 +37,7 @@
 
 // Mgnt_DBF.cal
 // Description: The management part of deblocking filter without mbaff
+import orcc.Imp_MacroBlockInfo.* ;
 
   
 actor Mgnt_DBF (int LUMA_CHROMA) 
@@ -44,7 +45,7 @@ actor Mgnt_DBF (int LUMA_CHROMA)
 	uint(size=7) PicWidthInMb,
 	uint(size=13) PicSizeInMb,
 	uint(size=13) FirstMbInSlice,
-	uint(size=8) MbIntraFlag,
+	uint(size=6) MbType,
 	uint(size=16) Cbp_blk,
 	int(size=6) Alpha_offset,
 	int(size=6) Beta_offset,
@@ -250,9 +251,10 @@ read_pic_parameters: action  ==>
     firstmbinslice:=0;
   end
 
-ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g] repeat 32,LFDisable:[j]==> 
-  guard a=2
-  do   
+ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[height], MbType:[Mbtype],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],RefIdx:[f] repeat 16, MV:[g] repeat 32,LFDisable:[j]==> 
+  guard
+	not(Mbtype >= BLOCK_TYPE_INTRA_MIN and Mbtype <= BLOCK_TYPE_INTRA_MAX)
+  do
 /*	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
 //		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
 //		println("Input Mgnt_DBF PicWidthInMb:"+width);	
@@ -274,7 +276,7 @@ ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[hei
   	end //*/  	
     MB_Width := width;          
     MB_Height:= height / width;
-    mb_type:=a;
+    mb_type:=2;
     valQP:=b;
     cbp_blk := c;
     alpha_offset := d;
@@ -293,9 +295,11 @@ ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[hei
     end    
   end
 
-ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
-  guard a=0 or a=1 
-  do   
+ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbType:[Mbtype],QP:[b],Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
+  guard
+	Mbtype >= BLOCK_TYPE_INTRA_MIN and Mbtype <= BLOCK_TYPE_INTRA_MAX,
+	Mbtype != BLOCK_TYPE_I_PCM
+  do
 /*	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
 //		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
 //		println("Input Mgnt_DBF PicWidthInMb:"+width);	
@@ -309,7 +313,7 @@ ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[he
   	end   //*/     
     MB_Width := width;          
     MB_Height:= height / width;
-    mb_type:=a;     
+    mb_type:=1;     
     valQP:=b;
     cbp_blk := c;
     alpha_offset := d;
@@ -326,8 +330,9 @@ ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[he
     end    
   end 
 
-ReadMB.IPCM: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbIntraFlag:[a], Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
-  guard a=4 
+ReadMB.IPCM: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[height], MbType:[Mbtype], Cbp_blk :[c],Alpha_offset:[d],Beta_offset:[e],LFDisable:[j]==> 
+  guard
+  	Mbtype = BLOCK_TYPE_I_PCM
   do       
 /*  	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
 //		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
@@ -341,7 +346,7 @@ ReadMB.IPCM: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[hei
   	end    //*/
     MB_Width := width;          
     MB_Height:= height / width;
-    mb_type:=a;     
+    mb_type:=4;     
     valQP:=valQP;
     cbp_blk := c;
     alpha_offset := d;

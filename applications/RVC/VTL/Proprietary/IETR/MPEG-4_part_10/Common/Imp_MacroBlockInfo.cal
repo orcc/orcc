@@ -157,4 +157,15 @@ unit orcc.Imp_MacroBlockInfo :
 				false
 			end
 		end
+
+	function IsIntra(uint(size=6) MacroBlk_Type)
+				-->
+			bool
+		:
+			if(MacroBlk_Type >= BLOCK_TYPE_INTRA_MIN and MacroBlk_Type <= BLOCK_TYPE_INTRA_MAX)then
+				true
+			else
+				false
+			end
+		end
 end

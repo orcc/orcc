@@ -176,7 +176,6 @@
     <Connection dst="Decoding_Y" dst-port="QP" src="FUN_Parser" src-port="QP"/>
     <Connection dst="Decoding_Y" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
     <Connection dst="Decoding_Y" dst-port="CoefAC_L" src="FUN_Parser" src-port="CoefAC_L"/>
-    <Connection dst="Decoding_Y" dst-port="Mb_Type" src="FUN_Parser" src-port="Mb_Type"/>
     <Connection dst="Decoding_Y" dst-port="PicWidthInMb"
         src="FUN_Parser" src-port="PicWidthInMb"/>
     <Connection dst="" dst-port="Display_Cb" src="Decode_U" src-port="Display"/>
@@ -197,11 +196,9 @@
     <Connection dst="Decode_U" dst-port="FirstMbInSlice"
         src="FUN_Parser" src-port="FirstMbInSlice"/>
     <Connection dst="Decode_U" dst-port="CurrMbAddr" src="FUN_Parser" src-port="CurrMbAddr"/>
-    <Connection dst="Decode_U" dst-port="Mb_TypeC" src="FUN_Parser" src-port="Mb_TypeC"/>
     <Connection dst="Decode_V" dst-port="CurrMbAddr" src="FUN_Parser" src-port="CurrMbAddr"/>
     <Connection dst="Decode_V" dst-port="FirstMbInSlice"
         src="FUN_Parser" src-port="FirstMbInSlice"/>
-    <Connection dst="Decode_V" dst-port="Mb_TypeC" src="FUN_Parser" src-port="Mb_TypeC"/>
     <Connection dst="Decode_V" dst-port="PicWidthInMB" src="FUN_Parser" src-port="PicWidthInMb"/>
     <Connection dst="Decode_V" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
     <Connection dst="Decode_U" dst-port="CoefAC" src="FUN_Parser" src-port="CoefAC_Cb"/>

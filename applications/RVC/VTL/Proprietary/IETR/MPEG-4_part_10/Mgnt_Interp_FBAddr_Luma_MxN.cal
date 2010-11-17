@@ -9,11 +9,12 @@
 
 //Modified by Endri Bezati <endri.bezati@insa-rennes.fr>
 //Modified the "size" correctly to work with orcc
+import orcc.Imp_MacroBlockInfo.*;
 
 actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		uint(size=13) CurrMbAddr,
 		uint(size=3) MbPartIdx,
-		uint (size=8) Mb_Type,
+		uint (size=6) Mb_Type,
 		uint(size=7) PicWidthInMb,
 		uint(size=13) PicSizeInMb,
 		int(size=16) MV,
@@ -26,10 +27,6 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
 		uint(size=11) RA_Height,
 		uint(size=32) PocToRead
 	:
-
-	uint(size=2) GETNEWLIST  = 0;
-	uint(size=2) GETNEWIDX   = 1;
-	uint(size=2) SENDLASTIDX = 2;
 
 	bool DEBUG_INPUT = false;
 
@@ -51,12 +48,12 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   uint(size=32) poc_to_read;
   
   //Mb_Type_NOK : Consume the token, nothing else to do 
-  Mb_Type_NOK_and_IPCM :action Mb_Type:[a], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
+  Mb_Type_NOK_and_IPCM :action Mb_Type:[mb_type], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
   guard
-  	a = 4
+  	mb_type = BLOCK_TYPE_I_PCM
   do
 	if(DEBUG_INPUT)then
-		println("Input InterpFBAddrLuma Mb_Type:"+a);	
+		println("Input InterpFBAddrLuma Mb_Type:"+mb_type);	
 		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
 		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);	
 	end
@@ -65,12 +62,14 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   end
 
   //Mb_Type_NOK : Consume the token, nothing else to do 
-  Mb_Type_NOK :action Mb_Type:[a], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
+  Mb_Type_NOK :action Mb_Type:[mb_type], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr] ==> 
   guard
-  	a = 0 or a = 1
+	mb_type >= BLOCK_TYPE_INTRA_MIN,
+	mb_type <= BLOCK_TYPE_INTRA_MAX,
+	mb_type != BLOCK_TYPE_I_PCM
   do
 	if(DEBUG_INPUT)then
-		println("Input InterpFBAddrLuma Mb_Type:"+a);
+		println("Input InterpFBAddrLuma Mb_Type:"+mb_type);
 		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
 		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);
 	end
@@ -79,12 +78,12 @@ actor Mgnt_Interp_FBAddr_Luma_MxN ()
   end
   
   //Mb_Type_OK : Enable the prediction 
-  Mb_Type_OK :action Mb_Type:[a], PicWidthInMb:[b], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr]  ==>
+  Mb_Type_OK :action Mb_Type:[mb_type], PicWidthInMb:[b], PicSizeInMb:[ c ], CurrMbAddr:[valCurrMbAddr]  ==>
   guard
-  	a = 2
-  do 
+	not( mb_type >= BLOCK_TYPE_INTRA_MIN and mb_type <= BLOCK_TYPE_INTRA_MAX)
+  do
 	if(DEBUG_INPUT)then
-		println("Input InterpFBAddrLuma Mb_Type:"+a);	
+		println("Input InterpFBAddrLuma Mb_Type:"+mb_type);	
 		println("Input InterpFBAddrLuma PicWidthInMb:"+b);	
 		println("Input InterpFBAddrLuma PicSizeInMb:"+c);	
 		println("Input InterpFBAddrLuma CurrMbAddr:"+valCurrMbAddr);

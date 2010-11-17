@@ -52,13 +52,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="Mb_Type">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PicWidthInMb">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -304,7 +297,6 @@
     <Connection dst="RES_L" dst-port="ScalingList" src="" src-port="ScalingList"/>
     <Connection dst="TEX_L" dst-port="Coef_ACR" src="RES_L" src-port="CoefACR_L"/>
     <Connection dst="" dst-port="Display_L" src="TEX_L" src-port="Display_L"/>
-    <Connection dst="TEX_L" dst-port="Mb_Type" src="" src-port="Mb_Type"/>
     <Connection dst="TEX_L" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="TEX_L" dst-port="LOCATION" src="" src-port="LOCATION"/>
     <Connection dst="TEX_L" dst-port="MV" src="" src-port="MV"/>

@@ -28,16 +28,14 @@
       <vertex id="CoefDC_Cr" x="2335" y="349"/>
       <vertex id="CoefAC_L" x="2338" y="384"/>
       <vertex id="CoefDC_L" x="2339" y="415"/>
-      <vertex id="Mb_Type" x="1744" y="340"/>
-      <vertex id="Mb_TypeC" x="1733" y="374"/>
-      <vertex id="PredMode" x="1735" y="410"/>
+      <vertex id="PredMode" x="1709" y="343"/>
       <vertex id="DelList" x="1778" y="1601"/>
       <vertex id="IsIDR" x="1777" y="1628"/>
       <vertex id="MV" x="2260" y="712"/>
       <vertex id="LOCATION" x="2241" y="679"/>
-      <vertex id="PART_SZ" x="2242" y="771"/>
-      <vertex id="mv_out" x="2254" y="852"/>
-      <vertex id="ref_idx" x="2259" y="883"/>
+      <vertex id="PART_SZ" x="2243" y="747"/>
+      <vertex id="mv_out" x="2250" y="800"/>
+      <vertex id="ref_idx" x="2259" y="855"/>
       <vertex id="I_PCM_Y" x="1733" y="697"/>
       <vertex id="I_PCM_U" x="1727" y="628"/>
       <vertex id="I_PCM_V" x="1727" y="658"/>

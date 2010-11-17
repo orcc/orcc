@@ -90,13 +90,6 @@
     <Port kind="Input" name="POC">
         <Type name="uint"/>
     </Port>
-    <Port kind="Input" name="Mb_TypeC">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="8"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="slice_beta_offset">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -316,8 +309,6 @@
     <Connection dst="Buffer_inter" dst-port="RA" src="Inter" src-port="RA_C"/>
     <Connection dst="Buffer_inter" dst-port="RA_Height" src="Inter" src-port="RA_Height_C"/>
     <Connection dst="Buffer_inter" dst-port="RA_Width" src="Inter" src-port="RA_Width_C"/>
-    <Connection dst="Intra8x8" dst-port="Mb_Type" src="" src-port="Mb_TypeC"/>
-    <Connection dst="Inter" dst-port="Mb_Type" src="" src-port="Mb_TypeC"/>
     <Connection dst="Inter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Inter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Select_chroma" dst-port="X1" src="Intra8x8" src-port="MB4x4Pred_C"/>
@@ -335,7 +326,6 @@
     <Connection dst="Deblocking_Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="Z" src="Select_chroma" src-port="X"/>
     <Connection dst="Deblocking_Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
-    <Connection dst="Deblocking_Filter" dst-port="MbIntraFlag" src="" src-port="Mb_TypeC"/>
     <Connection dst="Select_chroma" dst-port="X3" src="" src-port="I_PCM_C"/>
     <Connection dst="Deblocking_Filter" dst-port="Alpha_offset" src="" src-port="slice_alpha_c0_offset"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
@@ -368,4 +358,7 @@
     <Connection dst="Inter" dst-port="PocToRead_i" src="" src-port="PocToRead"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead" src="Inter" src-port="PocToRead_o"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
+    <Connection dst="Intra8x8" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
+    <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
+    <Connection dst="Inter" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
 </XDF>

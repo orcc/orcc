@@ -14,7 +14,6 @@
       <vertex id="MV" x="20" y="416"/>
       <vertex id="PartSZ" x="11" y="562"/>
       <vertex id="POC" x="1064" y="185"/>
-      <vertex id="Mb_TypeC" x="6" y="314"/>
       <vertex id="slice_beta_offset" x="860" y="506"/>
       <vertex id="slice_alpha_c0_offset" x="842" y="478"/>
       <vertex id="LFDisable" x="885" y="568"/>

@@ -4,6 +4,7 @@
 //
 // Chroma frame buffer generator for AVC inter prediction
 //Modified By Endri Bezati <endri.bezati@insa-rennes.fr>IETR/INSA
+import orcc.Imp_MacroBlockInfo.*;
 
 
 
@@ -12,7 +13,7 @@
 // refID  MB position (x,y)
 actor Mgnt_FBAddr_Chroma_MxN () 
 
-   							 uint(size=8)         Mb_Type, 
+   							 uint(size=6)         Mb_Type, 
    							 int (size=16)     MV, 
   							 uint(size=11)   Location , 
   							 uint(size=6) PartSZ, 
@@ -27,9 +28,6 @@ actor Mgnt_FBAddr_Chroma_MxN ()
    																  uint(size=11)        RA_Height,
 							 									  uint(size=32) PocToRead_o :
 
-	uint(size=2) GETNEWLIST  = 0;
-	uint(size=2) GETNEWIDX   = 1;
-	uint(size=2) SENDLASTIDX = 2;
 	/* ***
 		Global Variables
 							*** */
@@ -55,12 +53,12 @@ actor Mgnt_FBAddr_Chroma_MxN ()
 
   
   //Mb_Type_NOK_and_IPCM : Consume the token, nothing else to do 
-  Mb_Type_NOK_and_IPCM: action Mb_Type      :[a],
+  Mb_Type_NOK_and_IPCM: action Mb_Type      :[mb_type],
   		              PicWidthInMb :[ b ], 
   		              PicSizeInMb  :[ c ],
   		              CurrMbAddr   :[ valCurrMbAddr ] ==> 
   guard
-  	a = 4
+  	mb_type = BLOCK_TYPE_I_PCM
   do 
     Picwidth_c  := lshift(b,3);
     Picheight_c := lshift(c/b,3);
@@ -70,13 +68,15 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   end
 
   //Mb_Type_NOK : Consume the token, nothing else to do 
-  Mb_Type_NOK: action Mb_Type      :[a],
+  Mb_Type_NOK: action Mb_Type      :[mb_type],
   		              PicWidthInMb :[ b ], 
   		              PicSizeInMb  :[ c ], 
  // 		              Coef_ACR     :[ d ] repeat 8*8,
   		              CurrMbAddr   :[ valCurrMbAddr ] ==> 
   guard
-  	a = 0 or a = 1
+  	mb_type >= BLOCK_TYPE_INTRA_MIN,
+  	mb_type <= BLOCK_TYPE_INTRA_MAX,
+  	mb_type != BLOCK_TYPE_I_PCM
   do 
     Picwidth_c  := lshift(b,3);
     Picheight_c := lshift(c/b,3);
@@ -89,12 +89,12 @@ actor Mgnt_FBAddr_Chroma_MxN ()
   
   
   //Mb_Type_OK : Enable the prediction 
-  Mb_Type_OK: action Mb_Type      :[a],
+  Mb_Type_OK: action Mb_Type      :[mb_type],
   	                 PicWidthInMb :[ b ], 
   	                 PicSizeInMb  :[ c ],
   	                 CurrMbAddr   :[valCurrMbAddr]              ==>
   guard
-  	a = 2
+  	not(mb_type >= BLOCK_TYPE_INTRA_MIN and mb_type <= BLOCK_TYPE_INTRA_MAX)
   do 
     Picwidth_c  := lshift(b,3);
     Picheight_c := lshift(c/b,3);
