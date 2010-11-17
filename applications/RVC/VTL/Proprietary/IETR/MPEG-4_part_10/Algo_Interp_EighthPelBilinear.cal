@@ -92,9 +92,13 @@ actor Algo_Interp_EighthPelBilinear()
 
   schedule fsm get_fract_x:
     get_fract_x  ( get_fract_x ) --> get_fract_y;
+
     get_fract_y  ( get_fract_y ) --> getwidth;
+
     getwidth     ( getwidth    ) --> getheight;
+
     getheight    ( getheight   ) --> interpolate;
+
     interpolate  ( fetch       ) --> interpolate;
     interpolate  ( done        ) --> get_fract_x;
     interpolate  ( process     ) --> interpolate;
