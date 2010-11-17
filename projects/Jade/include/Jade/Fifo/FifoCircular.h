@@ -130,10 +130,6 @@ private:
 		fifoStruct["short_s"] = "struct.fifo_i16_s";
 		fifoStruct["int_s"] = "struct.fifo_i32_s";
 		fifoStruct["long_s"] = "struct.fifo_i64_s";
-		fifoStruct["uchar_s"] = "struct.fifo_u8_s";
-		fifoStruct["ushort_s"] = "struct.fifo_u16_s";
-		fifoStruct["uint_s"] = "struct.fifo_u32_s";
-		fifoStruct["ulong_s"] = "struct.fifo_u64_s";
 		return fifoStruct;
 	}
 

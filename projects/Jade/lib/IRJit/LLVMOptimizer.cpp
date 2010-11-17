@@ -51,14 +51,9 @@
 using namespace llvm;
 using namespace std;
 
-
-static cl::list<const PassInfo*, bool, PassNameParser>
-PassList(cl::desc("Optimizations available:"));
-
+extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
 extern cl::opt<bool> OptLevelO1;
-
 extern cl::opt<bool> OptLevelO2;
-
 extern cl::opt<bool> OptLevelO3;
 
    static cl::opt<bool>

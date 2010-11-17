@@ -11,11 +11,7 @@ endif$
 >>
 
 fifoType(port) ::= <<
-$if(port.type.uint)
-$u$port.type.size$$
-else
-$i$port.type.size$$
-endif$
+i$port.type.size$
 >>
 
 fifo(port) ::= <<

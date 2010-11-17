@@ -42,7 +42,8 @@
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Target/TargetSelect.h"
-
+#include "llvm/Support/PassNameParser.h"
+#include "llvm/Support/StandardPasses.h"
 
 #include "Jade/XDFParser.h"
 #include "Jade/DecoderEngine.h"
@@ -151,6 +152,8 @@ cl::opt<bool> OptLevelO2("O2",
 
 cl::opt<bool> OptLevelO3("O3",
            cl::desc("Optimization level 3. Similar to llvm-gcc -O3"));
+
+cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations available:"));
 
 void clean_exit(int sig){
 	exit(0);

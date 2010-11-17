@@ -11,7 +11,7 @@ target triple = "i386-mingw32"
 %struct.fifo_u64_s = type { i32, i64*, i64*, i32, i32, i32 }
 %struct.fifo_u8_s = type { i32, i8*, i8*, i32, i32, i32 }
 
-define internal i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -36,7 +36,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_i8_has_room(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_i8_has_room(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=3]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -65,7 +65,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_i8_get_room(%struct.fifo_i8_s* %fifo) nounwind {
+define i32 @fifo_i8_get_room(%struct.fifo_i8_s* %fifo) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=3]
   %retval = alloca i32                            ; <i32*> [#uses=2]
@@ -89,7 +89,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i8* @fifo_i8_peek(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  i8* @fifo_i8_peek(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=3]
@@ -191,7 +191,7 @@ return:                                           ; preds = %bb6
 
 declare void @llvm.memcpy.i32(i8* nocapture, i8* nocapture, i32, i32) nounwind
 
-define internal i8* @fifo_i8_read(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  i8* @fifo_i8_read(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -213,7 +213,7 @@ return:                                           ; preds = %entry
   ret i8* %retval1
 }
 
-define internal void @fifo_i8_read_end(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  void @fifo_i8_read_end(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -293,7 +293,7 @@ return:                                           ; preds = %bb4
   ret void
 }
 
-define internal i8* @fifo_i8_write(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  i8* @fifo_i8_write(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=6]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -341,7 +341,7 @@ return:                                           ; preds = %bb2
   ret i8* %retval3
 }
 
-define internal void @fifo_i8_write_end(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  void @fifo_i8_write_end(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=18]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -462,7 +462,7 @@ return:                                           ; preds = %bb8
   ret void
 }
 
-define internal i32 @fifo_i16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_i16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -487,7 +487,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_i16_has_room(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_i16_has_room(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=3]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -516,7 +516,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_i16_get_room(%struct.fifo_i16_s* %fifo) nounwind {
+define i32 @fifo_i16_get_room(%struct.fifo_i16_s* %fifo) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=3]
   %retval = alloca i32                            ; <i32*> [#uses=2]
@@ -540,7 +540,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i16* @fifo_i16_peek(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  i16* @fifo_i16_peek(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=3]
@@ -646,7 +646,7 @@ return:                                           ; preds = %bb6
   ret i16* %retval7
 }
 
-define internal i16* @fifo_i16_read(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  i16* @fifo_i16_read(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -668,7 +668,7 @@ return:                                           ; preds = %entry
   ret i16* %retval1
 }
 
-define internal void @fifo_i16_read_end(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  void @fifo_i16_read_end(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -748,7 +748,7 @@ return:                                           ; preds = %bb4
   ret void
 }
 
-define internal i16* @fifo_i16_write(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  i16* @fifo_i16_write(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=6]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -796,7 +796,7 @@ return:                                           ; preds = %bb2
   ret i16* %retval3
 }
 
-define internal void @fifo_i16_write_end(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  void @fifo_i16_write_end(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=18]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -923,7 +923,7 @@ return:                                           ; preds = %bb8
   ret void
 }
 
-define internal i32 @fifo_i32_has_tokens(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_i32_has_tokens(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -948,7 +948,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_i32_has_room(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_i32_has_room(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=3]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -977,7 +977,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_i32_get_room(%struct.fifo_i32_s* %fifo) nounwind {
+define i32 @fifo_i32_get_room(%struct.fifo_i32_s* %fifo) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=3]
   %retval = alloca i32                            ; <i32*> [#uses=2]
@@ -1001,7 +1001,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32* @fifo_i32_peek(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32* @fifo_i32_peek(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=3]
@@ -1107,7 +1107,7 @@ return:                                           ; preds = %bb6
   ret i32* %retval7
 }
 
-define internal i32* @fifo_i32_read(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32* @fifo_i32_read(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -1129,7 +1129,7 @@ return:                                           ; preds = %entry
   ret i32* %retval1
 }
 
-define internal void @fifo_i32_read_end(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define  void @fifo_i32_read_end(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -1209,7 +1209,7 @@ return:                                           ; preds = %bb4
   ret void
 }
 
-define internal i32* @fifo_i32_write(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32* @fifo_i32_write(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=6]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -1257,7 +1257,7 @@ return:                                           ; preds = %bb2
   ret i32* %retval3
 }
 
-define internal void @fifo_i32_write_end(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define  void @fifo_i32_write_end(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=18]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -1384,7 +1384,7 @@ return:                                           ; preds = %bb8
   ret void
 }
 
-define internal i32 @fifo_i64_has_tokens(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_i64_has_tokens(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -1409,7 +1409,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_i64_has_room(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_i64_has_room(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=3]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -1438,7 +1438,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_i64_get_room(%struct.fifo_i64_s* %fifo) nounwind {
+define i32 @fifo_i64_get_room(%struct.fifo_i64_s* %fifo) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=3]
   %retval = alloca i32                            ; <i32*> [#uses=2]
@@ -1462,7 +1462,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i64* @fifo_i64_peek(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  i64* @fifo_i64_peek(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=3]
@@ -1568,7 +1568,7 @@ return:                                           ; preds = %bb6
   ret i64* %retval7
 }
 
-define internal i64* @fifo_i64_read(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  i64* @fifo_i64_read(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -1590,7 +1590,7 @@ return:                                           ; preds = %entry
   ret i64* %retval1
 }
 
-define internal void @fifo_i64_read_end(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  void @fifo_i64_read_end(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -1670,7 +1670,7 @@ return:                                           ; preds = %bb4
   ret void
 }
 
-define internal i64* @fifo_i64_write(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  i64* @fifo_i64_write(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=6]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -1718,7 +1718,7 @@ return:                                           ; preds = %bb2
   ret i64* %retval3
 }
 
-define internal void @fifo_i64_write_end(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  void @fifo_i64_write_end(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=18]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -1845,7 +1845,7 @@ return:                                           ; preds = %bb8
   ret void
 }
 
-define internal i32 @fifo_u8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_u8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -1870,7 +1870,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_u8_has_room(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_u8_has_room(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=3]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -1899,7 +1899,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_u8_get_room(%struct.fifo_i8_s* %fifo) nounwind {
+define i32 @fifo_u8_get_room(%struct.fifo_i8_s* %fifo) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=3]
   %retval = alloca i32                            ; <i32*> [#uses=2]
@@ -1923,7 +1923,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i8* @fifo_u8_peek(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  i8* @fifo_u8_peek(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=3]
@@ -2023,7 +2023,7 @@ return:                                           ; preds = %bb6
   ret i8* %retval7
 }
 
-define internal i8* @fifo_u8_read(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  i8* @fifo_u8_read(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2045,7 +2045,7 @@ return:                                           ; preds = %entry
   ret i8* %retval1
 }
 
-define internal void @fifo_u8_read_end(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  void @fifo_u8_read_end(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -2125,7 +2125,7 @@ return:                                           ; preds = %bb4
   ret void
 }
 
-define internal i8* @fifo_u8_write(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  i8* @fifo_u8_write(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=6]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2173,7 +2173,7 @@ return:                                           ; preds = %bb2
   ret i8* %retval3
 }
 
-define internal void @fifo_u8_write_end(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
+define  void @fifo_u8_write_end(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i8_s*          ; <%struct.fifo_i8_s**> [#uses=18]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -2294,7 +2294,7 @@ return:                                           ; preds = %bb8
   ret void
 }
 
-define internal i32 @fifo_u16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_u16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2319,7 +2319,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_u16_has_room(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_u16_has_room(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=3]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2348,7 +2348,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_u16_get_room(%struct.fifo_i16_s* %fifo) nounwind {
+define i32 @fifo_u16_get_room(%struct.fifo_i16_s* %fifo) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=3]
   %retval = alloca i32                            ; <i32*> [#uses=2]
@@ -2372,7 +2372,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i16* @fifo_u16_peek(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  i16* @fifo_u16_peek(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=3]
@@ -2478,7 +2478,7 @@ return:                                           ; preds = %bb6
   ret i16* %retval7
 }
 
-define internal i16* @fifo_u16_read(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  i16* @fifo_u16_read(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2500,7 +2500,7 @@ return:                                           ; preds = %entry
   ret i16* %retval1
 }
 
-define internal void @fifo_u16_read_end(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  void @fifo_u16_read_end(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -2580,7 +2580,7 @@ return:                                           ; preds = %bb4
   ret void
 }
 
-define internal i16* @fifo_u16_write(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  i16* @fifo_u16_write(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=6]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2628,7 +2628,7 @@ return:                                           ; preds = %bb2
   ret i16* %retval3
 }
 
-define internal void @fifo_u16_write_end(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
+define  void @fifo_u16_write_end(%struct.fifo_i16_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i16_s*         ; <%struct.fifo_i16_s**> [#uses=18]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -2755,7 +2755,7 @@ return:                                           ; preds = %bb8
   ret void
 }
 
-define internal i32 @fifo_u32_has_tokens(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_u32_has_tokens(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2780,7 +2780,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_u32_has_room(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_u32_has_room(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=3]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2809,7 +2809,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_u32_get_room(%struct.fifo_i32_s* %fifo) nounwind {
+define i32 @fifo_u32_get_room(%struct.fifo_i32_s* %fifo) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=3]
   %retval = alloca i32                            ; <i32*> [#uses=2]
@@ -2833,7 +2833,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32* @fifo_u32_peek(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32* @fifo_u32_peek(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=3]
@@ -2939,7 +2939,7 @@ return:                                           ; preds = %bb6
   ret i32* %retval7
 }
 
-define internal i32* @fifo_u32_read(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32* @fifo_u32_read(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -2961,7 +2961,7 @@ return:                                           ; preds = %entry
   ret i32* %retval1
 }
 
-define internal void @fifo_u32_read_end(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define  void @fifo_u32_read_end(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -3041,7 +3041,7 @@ return:                                           ; preds = %bb4
   ret void
 }
 
-define internal i32* @fifo_u32_write(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define i32* @fifo_u32_write(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=6]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -3089,7 +3089,7 @@ return:                                           ; preds = %bb2
   ret i32* %retval3
 }
 
-define internal void @fifo_u32_write_end(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
+define  void @fifo_u32_write_end(%struct.fifo_i32_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i32_s*         ; <%struct.fifo_i32_s**> [#uses=18]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -3216,7 +3216,7 @@ return:                                           ; preds = %bb8
   ret void
 }
 
-define internal i32 @fifo_u64_has_tokens(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_u64_has_tokens(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -3241,7 +3241,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_u64_has_room(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define i32 @fifo_u64_has_room(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=3]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -3270,7 +3270,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i32 @fifo_u64_get_room(%struct.fifo_i64_s* %fifo) nounwind {
+define i32 @fifo_u64_get_room(%struct.fifo_i64_s* %fifo) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=3]
   %retval = alloca i32                            ; <i32*> [#uses=2]
@@ -3294,7 +3294,7 @@ return:                                           ; preds = %entry
   ret i32 %retval1
 }
 
-define internal i64* @fifo_u64_peek(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  i64* @fifo_u64_peek(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=3]
@@ -3400,7 +3400,7 @@ return:                                           ; preds = %bb6
   ret i64* %retval7
 }
 
-define internal i64* @fifo_u64_read(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  i64* @fifo_u64_read(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=2]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -3422,7 +3422,7 @@ return:                                           ; preds = %entry
   ret i64* %retval1
 }
 
-define internal void @fifo_u64_read_end(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  void @fifo_u64_read_end(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=13]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
@@ -3502,7 +3502,7 @@ return:                                           ; preds = %bb4
   ret void
 }
 
-define internal i64* @fifo_u64_write(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  i64* @fifo_u64_write(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=6]
   %n_addr = alloca i32                            ; <i32*> [#uses=2]
@@ -3550,7 +3550,7 @@ return:                                           ; preds = %bb2
   ret i64* %retval3
 }
 
-define internal void @fifo_u64_write_end(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
+define  void @fifo_u64_write_end(%struct.fifo_i64_s* %fifo, i32 %n) nounwind {
 entry:
   %fifo_addr = alloca %struct.fifo_i64_s*         ; <%struct.fifo_i64_s**> [#uses=18]
   %n_addr = alloca i32                            ; <i32*> [#uses=6]
