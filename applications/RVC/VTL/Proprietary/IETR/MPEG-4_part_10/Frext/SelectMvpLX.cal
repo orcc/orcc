@@ -139,15 +139,11 @@ actor SelectMvpLX()
 			MbPartIdx     := 0;
 			MbPartIdxMax  :=
 				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
-					if(MacroBlkType <= BLOCK_TYPE_B_MAX)then
-						NumMbPart_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]	
-					else
-						1
-					end
+					NumMbPart_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]	
 				else
 					if(MacroBlkType <= BLOCK_TYPE_P_MAX)then
 						NumMbPart_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
-					else
+					else//MacroBlockType = P_SKIP or B_SKIP
 						1
 					end
 				end;
@@ -155,16 +151,23 @@ actor SelectMvpLX()
 			           or (MacroBlkType = BLOCK_TYPE_P_8x8)
 			           or (MacroBlkType = BLOCK_TYPE_B_8x8);
 			//delete me!! (when import will be supported by Orcc)
-			if(MacroBlkType != BLOCK_TYPE_P_SKIP)then
+			if(MacroBlkType != BLOCK_TYPE_P_SKIP and MacroBlkType != BLOCK_TYPE_B_SKIP)then
 				IsPredL0[0] := Is_PredL0(MacroBlkType,0);
 				IsPredL0[1] := Is_PredL0(MacroBlkType,1);
 				IsPredL1[0] := Is_PredL1(MacroBlkType,0);
 				IsPredL1[1] := Is_PredL1(MacroBlkType,1);
 			else
-				IsPredL0[0] := true;
-				IsPredL0[1] := false;
-				IsPredL1[0] := false;
-				IsPredL1[1] := false;	
+				if(MacroBlkType = BLOCK_TYPE_P_SKIP)then
+					IsPredL0[0] := true;
+					IsPredL0[1] := false;
+					IsPredL1[0] := false;
+					IsPredL1[1] := false;
+				else
+					IsPredL0[0] := false;
+					IsPredL0[1] := false;
+					IsPredL1[0] := false;
+					IsPredL1[1] := false;
+				end
 			end
 		end
 
