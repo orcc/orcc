@@ -33,7 +33,9 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
@@ -41,7 +43,9 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
- * This transformation transforms an actor so that there is at most one
+ * This transformation transforms an actor so that there is at most one access
+ * (read or write) per each given array accessed by an action. This pass should
+ * be run after inline.
  * 
  * @author Matthieu Wipliez
  * @author Nicolas Siret
@@ -60,6 +64,10 @@ public class MultipleArrayAccessTransformation extends
 
 		public RWCounter() {
 			numRW = new HashMap<Variable, Integer>();
+		}
+
+		public Map<Variable, Integer> getMap() {
+			return numRW;
 		}
 
 		@Override
@@ -93,6 +101,24 @@ public class MultipleArrayAccessTransformation extends
 
 	}
 
+	/**
+	 * Adds an FSM to the given action scheduler.
+	 * 
+	 * @param actionScheduler
+	 *            action scheduler
+	 */
+	private void addFsm(ActionScheduler actionScheduler) {
+		FSM fsm = new FSM();
+		fsm.setInitialState("init");
+		fsm.addState("init");
+		for (Action action : actionScheduler.getActions()) {
+			fsm.addTransition("init", "init", action);
+		}
+
+		actionScheduler.getActions().clear();
+		actionScheduler.setFsm(fsm);
+	}
+
 	@Override
 	public void visit(Action action) {
 		// we are only interested in the body
@@ -103,6 +129,22 @@ public class MultipleArrayAccessTransformation extends
 	public void visit(Procedure procedure) {
 		RWCounter counter = new RWCounter();
 		counter.visit(procedure);
+
+		Map<Variable, Integer> numRW = counter.getMap();
+		boolean needsTransformation = false;
+		for (Integer value : numRW.values()) {
+			if (value > 1) {
+				needsTransformation = true;
+				break;
+			}
+		}
+
+		if (needsTransformation) {
+			FSM fsm = actor.getActionScheduler().getFsm();
+			if (fsm == null) {
+				addFsm(actor.getActionScheduler());
+			}
+		}
 	}
 
 }

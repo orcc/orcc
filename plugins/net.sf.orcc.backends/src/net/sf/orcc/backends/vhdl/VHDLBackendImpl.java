@@ -42,11 +42,11 @@ import java.util.regex.Pattern;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
-import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.vhdl.transformations.BoolExprTransformation;
+import net.sf.orcc.backends.vhdl.transformations.MultipleArrayAccessTransformation;
 import net.sf.orcc.backends.vhdl.transformations.TransformConditionals;
 import net.sf.orcc.backends.vhdl.transformations.VHDLBroadcastAdder;
 import net.sf.orcc.backends.vhdl.transformations.VariableRedimension;
@@ -105,11 +105,18 @@ public class VHDLBackendImpl extends AbstractBackend {
 		evaluateInitializeActions(actor);
 
 		ActorTransformation[] transformationsCodegen = {
-				new InlineTransformation(true, false),
-				new VariableRedimension(), new BoolExprTransformation(),
+				// commented out inline because it has bugs
+				// new InlineTransformation(true, false),
+
+				new VariableRedimension(),
+				new BoolExprTransformation(),
 
 				new TransformConditionals(),
 
+				// transform multiple array accesses
+				new MultipleArrayAccessTransformation(),
+
+				//
 				new ListFlattenTransformation(true, false, true),
 
 				// renames variables so we can inline them in the template
@@ -143,7 +150,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doXdfCodeGeneration(Network network) throws OrccException {
-		printer = new STPrinter(getAttribute(DEBUG_MODE, false));
+		printer = new STPrinter(getAttribute(DEBUG_MODE, true));
 		printer.loadGroups("VHDL_actor");
 		printer.setExpressionPrinter(VHDLExpressionPrinter.class);
 		printer.setTypePrinter(VHDLTypePrinter.class);
