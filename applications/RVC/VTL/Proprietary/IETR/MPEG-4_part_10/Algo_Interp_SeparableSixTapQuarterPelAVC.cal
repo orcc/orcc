@@ -24,7 +24,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
   int height;
   int temp;
   int temp2;
-  List( type:int(size=16), size=441 ) inbuf := [ 0 : for int i in 0 .. 440 ];
+  List(type: List(type:int(size=16), size=21 ), size=21) TabPix;
   List( type:int(size=32), size=6 ) half_pel := [ 0 : for int i in 0 .. 5 ];
 
 	function Clip1(int x)
@@ -49,40 +49,40 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 
     // xFrac = 0
     if xFrac = 0 and yFrac = 0 then 
-      temp := inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
+      temp := TabPix [2 + o_x][2 + o_y];
     end    
     if xFrac = 0  and yFrac = 2 then 
   
-      temp := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y]+ 20 * TabPix[2 + o_x][2 + o_y];
+      temp := temp + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
       temp := rshift (temp,5);
       temp := Clip1(temp);
     end
 
     if xFrac = 0  and yFrac = 1 then 
-      temp := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y] + 20 *TabPix[2 + o_x][2 + o_y];
+      temp := temp + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
-      temp := temp + inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ]+1;
+      temp := temp + TabPix[2 + o_x][2 + o_y]+1;
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end 
 
     if xFrac = 0  and yFrac = 3 then 
-      temp := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
+      temp := temp + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
-      temp := temp + inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]+1;
+      temp := temp + TabPix[2 + o_x][3 + o_y]+1;
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end  
 
     // xFrac = 2
     if xFrac = 2  and yFrac = 0 then 
-      temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
+      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
+      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
     end  
@@ -91,8 +91,8 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       n :=0;
       while n < 6 
       do
-        half_pel[n] := inbuf [ ( 0 + o_x) + ( n + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( n + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( n + o_y) * 21 ];
-        half_pel[n] := half_pel[n] + 20 * inbuf [ ( 3 + o_x) + ( n + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( n + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( n + o_y) * 21 ];
+        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y] + 20 * TabPix[2 + o_x][n + o_y];
+        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
         n := n+1;
       end
 
@@ -104,15 +104,15 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       n :=0;
       while n < 6 
       do
-        half_pel[n] := inbuf [ ( 0 + o_x) + ( n + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( n + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( n + o_y) * 21 ];
-        half_pel[n] := half_pel[n] + 20 * inbuf [ ( 3 + o_x) + ( n + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( n + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( n + o_y) * 21 ];
+        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y] + 20 * TabPix[2 + o_x][n + o_y];
+        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
         n := n+1;
       end
       temp :=half_pel[0]-5*half_pel[1]+20*half_pel[2]+20*half_pel[3]-5*half_pel[4]+half_pel[5]+512;  
       temp := rshift ( temp, 10);
       temp := Clip1(temp);
-      temp2 := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp2 := temp2 + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
+      temp2 := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
+      temp2 := temp2 + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
       temp2 := rshift ( temp2, 5);        
       temp := Clip1(temp);
       temp := temp+temp2+1;
@@ -123,15 +123,15 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       n :=0;
       while n < 6 
       do
-        half_pel[n] := inbuf [ ( 0 + o_x) + ( n + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( n + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( n + o_y) * 21 ];
-        half_pel[n] := half_pel[n] + 20 * inbuf [ ( 3 + o_x) + ( n + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( n + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( n + o_y) * 21 ];
+        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y] + 20 * TabPix[2 + o_x][n + o_y];
+        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
         n := n+1;
       end
-      temp :=half_pel[0]-5*half_pel[1]+20*half_pel[2]+20*half_pel[3]-5*half_pel[4]+half_pel[5]+512;  
+      temp := half_pel[0] -5* half_pel[1] +20* half_pel[2] +20* half_pel[3] -5* half_pel[4] + half_pel[5] + 512;  
       temp := rshift ( temp, 10);
       temp := Clip1(temp);
-      temp2 := inbuf [ ( 0 + o_x) + ( 3 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 3 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ];
-      temp2 := temp2 + 20 * inbuf [ ( 3 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 3 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 3 + o_y) * 21 ] + 16;
+      temp2 := TabPix[o_x][3 + o_y] -5 * TabPix[1 + o_x][3 + o_y] + 20 * TabPix[2 + o_x][3 + o_y];
+      temp2 := temp2 + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[4 + o_x][3 + o_y] + TabPix[5 + o_x][3 + o_y] + 16;
       temp2 := rshift ( temp2, 5);        
       temp := Clip1(temp);
       temp := temp+temp2+1;
@@ -140,11 +140,11 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
     end
    // xFrac = 1
    if xFrac = 1  and yFrac = 0 then 
-      temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
+      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
+      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
-      temp := temp+inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ]+1;
+      temp := temp + TabPix[2 + o_x][2 + o_y] +1;
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end  
@@ -152,15 +152,15 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       n :=0;
       while n < 6 
       do
-        half_pel[n] := inbuf [ ( 0 + o_x) + ( n + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( n + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( n + o_y) * 21 ];
-        half_pel[n] := half_pel[n] + 20 * inbuf [ ( 3 + o_x) + ( n + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( n + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( n + o_y) * 21 ];
+        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y]+ 20 * TabPix[2 + o_x][n + o_y];
+        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
         n := n+1;
       end
       temp :=half_pel[0]-5*half_pel[1]+20*half_pel[2]+20*half_pel[3]-5*half_pel[4]+half_pel[5]+512;  
       temp := rshift (temp, 10);
       temp := Clip1(temp);
-      temp2 := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp2 := temp2 + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp2 := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
+      temp2 := temp2 + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
       temp2 := rshift (temp2, 5);
       temp2 := Clip1(temp2);
       temp := temp+temp2+1;
@@ -168,12 +168,12 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := Clip1(temp);
     end
     if xFrac = 1  and yFrac = 1 then 
-      temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
+      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y]+ 20 * TabPix[2 + o_x][2 + o_y];
+      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
-      temp2 := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp2 := temp2 + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp2 := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
+      temp2 := temp2 + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
       temp2 := rshift (temp2, 5);        
       temp2 := Clip1(temp2);
       temp := temp+temp2+1;
@@ -181,12 +181,12 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := Clip1(temp);    
     end
     if xFrac = 1  and yFrac = 3 then 
-      temp := inbuf [ ( 0 + o_x) + ( 3 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 3 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 3 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 3 + o_y) * 21 ] + 16;
+      temp := TabPix[o_x][3 + o_y] -5 * TabPix[1 + o_x][3 + o_y] + 20 * TabPix[2 + o_x][3 + o_y];
+      temp := temp + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[4 + o_x][3 + o_y] + TabPix[5 + o_x][3 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
-      temp2 := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp2 := temp2 + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp2 := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y]+ 20 * TabPix[2 + o_x][2 + o_y];
+      temp2 := temp2 + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
       temp2 := rshift (temp2, 5);        
       temp2 := Clip1(temp2);
       temp := temp+temp2+1;
@@ -195,11 +195,11 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
     end
    // xFrac = 3
    if xFrac = 3  and yFrac = 0 then 
-      temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
+      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y]+ 20 * TabPix[2 + o_x][2 + o_y];
+      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
-      temp := temp+inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]+1;
+      temp := temp + TabPix[3 + o_x][2 + o_y] + 1;
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end  
@@ -207,15 +207,15 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       n :=0;
       while n < 6 
       do
-        half_pel[n] := inbuf [ ( 0 + o_x) + ( n + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( n + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( n + o_y) * 21 ];
-        half_pel[n] := half_pel[n] + 20 * inbuf [ ( 3 + o_x) + ( n + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( n + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( n + o_y) * 21 ];
+        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y] + 20 * TabPix[2 + o_x][n + o_y];
+        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
         n := n+1;
       end
       temp :=half_pel[0]-5*half_pel[1]+20*half_pel[2]+20*half_pel[3]-5*half_pel[4]+half_pel[5]+512;  
       temp := rshift (temp, 10);
       temp := Clip1(temp);
-      temp2 := inbuf [ ( 3 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 3 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ];
-      temp2 := temp2 + 20 * inbuf [ ( 3 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 3 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 3 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp2 := TabPix[3 + o_x][o_y] -5 * TabPix[3 + o_x][1 + o_y]+ 20 * TabPix[3 + o_x][2 + o_y];
+      temp2 := temp2 + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[3 + o_x][4 + o_y] + TabPix[3 + o_x][5 + o_y] + 16;
       temp2 := rshift (temp2, 5);
       temp2 := Clip1(temp2);
       temp := temp+temp2+1;
@@ -223,12 +223,12 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := Clip1(temp);
     end
     if xFrac = 3  and yFrac = 1 then 
-      temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
+      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
+      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
-      temp2 := inbuf [ ( 3 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 3 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ];
-      temp2 := temp2 + 20 * inbuf [ ( 3 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 3 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 3 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp2 := TabPix[3 + o_x][o_y] -5 * TabPix[3 + o_x][1 + o_y] + 20 * TabPix[3 + o_x][2 + o_y];
+      temp2 := temp2 + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[3 + o_x][4 + o_y] + TabPix[3 + o_x][5 + o_y] + 16;
       temp2 := rshift (temp2, 5);        
       temp2 := Clip1(temp2);
       temp := temp+temp2+1;
@@ -236,12 +236,12 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := Clip1(temp);
     end
     if xFrac = 3  and yFrac = 3 then 
-      temp := inbuf [ ( 0 + o_x) + ( 3 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 3 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ];
-      temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 3 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 3 + o_y) * 21 ] + 16;
+      temp := TabPix[o_x][3 + o_y] -5 * TabPix[1 + o_x][3 + o_y]+ 20 * TabPix[2 + o_x][3 + o_y];
+      temp := temp + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[4 + o_x][3 + o_y] + TabPix[5 + o_x][3 + o_y] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
-      temp2 := inbuf [ ( 3 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 3 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ];
-      temp2 := temp2 + 20 * inbuf [ ( 3 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 3 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 3 + o_x) + ( 5 + o_y) * 21 ] + 16;
+      temp2 := TabPix[3 + o_x][o_y] -5 * TabPix[3 + o_x][1 + o_y]+ 20 * TabPix[3 + o_x][2 + o_y];
+      temp2 := temp2 + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[3 + o_x][4 + o_y] + TabPix[3 + o_x][5 + o_y] + 16;
       temp2 := rshift (temp2, 5);        
       temp2 := Clip1(temp2);
       temp := temp+temp2+1;
@@ -274,7 +274,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 		guard 
 			y < (height+5)
 		do
-			inbuf[y * 21 + x] := d;
+			TabPix[x][y] := d;
 			x := x + 1;
 			if x >= (width+5) then
 				x := 0;
