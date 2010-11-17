@@ -94,7 +94,7 @@ public class TypeSizeTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visitProcedure(Procedure procedure) {
+	public void visit(Procedure procedure) {
 		checkVariables(procedure.getParameters());
 		checkVariables(procedure.getLocals());
 		checkType(procedure.getReturnType());

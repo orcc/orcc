@@ -182,6 +182,11 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(Procedure procedure) {
+		super.visit(procedure);
+	}
+
+	@Override
 	public void visit(Store store) {
 		store.setValue((Expression) store.getValue().accept(exprInterpreter,
 				instructionIterator));
@@ -208,11 +213,6 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 			instr.accept(this);
 		}
 		Use.addUses(whileNode, whileNode.getValue());
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		super.visitProcedure(procedure);
 	}
 
 }

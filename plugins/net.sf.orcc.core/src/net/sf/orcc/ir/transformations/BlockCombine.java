@@ -78,6 +78,12 @@ public class BlockCombine extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(Procedure procedure) {
+		previous = null;
+		super.visit(procedure);
+	}
+
+	@Override
 	public void visit(WhileNode node) {
 		// previous blocks are not linked to the body of the while
 		previous = null;
@@ -85,12 +91,6 @@ public class BlockCombine extends AbstractActorTransformation {
 
 		// no previous block to be linked to
 		previous = null;
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		previous = null;
-		super.visitProcedure(procedure);
 	}
 
 }

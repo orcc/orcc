@@ -47,6 +47,20 @@ import net.sf.orcc.util.OrderedMap;
 public class RemoveReadWrites extends AbstractActorTransformation {
 
 	@Override
+	public void visit(Procedure procedure) {
+		OrderedMap<String, Variable> locals = procedure.getLocals();
+		Iterator<Variable> it = locals.iterator();
+		while (it.hasNext()) {
+			LocalVariable local = (LocalVariable) it.next();
+			if (local.isPort()) {
+				it.remove();
+			}
+		}
+
+		super.visit(procedure);
+	}
+
+	@Override
 	public void visit(Read read) {
 		if(read.getTarget() != null) {			
 			read.getTarget().removeUse(read);
@@ -60,20 +74,6 @@ public class RemoveReadWrites extends AbstractActorTransformation {
 		write.getTarget().removeUse(write);
 		write.getPort().removeUse(write);
 		instructionIterator.remove();
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		OrderedMap<String, Variable> locals = procedure.getLocals();
-		Iterator<Variable> it = locals.iterator();
-		while (it.hasNext()) {
-			LocalVariable local = (LocalVariable) it.next();
-			if (local.isPort()) {
-				it.remove();
-			}
-		}
-
-		super.visitProcedure(procedure);
 	}
 
 }

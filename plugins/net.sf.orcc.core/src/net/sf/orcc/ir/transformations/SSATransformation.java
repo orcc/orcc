@@ -402,6 +402,13 @@ public class SSATransformation extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(Procedure procedure) {
+		definitions.clear();
+		uses.clear();
+		super.visit(procedure);
+	}
+
+	@Override
 	public void visit(Return returnInstr) {
 		replaceUses(returnInstr.getValue());
 	}
@@ -432,13 +439,6 @@ public class SSATransformation extends AbstractActorTransformation {
 		join = outerJoin;
 		loop = outerLoop;
 		commitPhi(innerJoin);
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		definitions.clear();
-		uses.clear();
-		super.visitProcedure(procedure);
 	}
 
 }

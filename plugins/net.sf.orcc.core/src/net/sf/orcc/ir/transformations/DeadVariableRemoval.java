@@ -146,6 +146,29 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(Procedure procedure) {
+		changed = true;
+
+		while (changed) {
+			changed = false;
+
+			// first shot: removes locals not used by any instruction
+			OrderedMap<String, Variable> locals = procedure.getLocals();
+			Iterator<Variable> it = locals.iterator();
+			while (it.hasNext()) {
+				LocalVariable local = (LocalVariable) it.next();
+				if (!local.isUsed() && local.getInstruction() == null
+						&& local.getInstructions() == null) {
+					changed = true;
+					it.remove();
+				}
+			}
+
+			super.visit(procedure);
+		}
+	}
+
+	@Override
 	public void visit(Read read) {
 		Variable variable = read.getTarget();
 		if (variable != null && !variable.isUsed()) {
@@ -181,29 +204,6 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 
 			procedure.getLocals().remove(target.getName());
 			changed = true;
-		}
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		changed = true;
-
-		while (changed) {
-			changed = false;
-
-			// first shot: removes locals not used by any instruction
-			OrderedMap<String, Variable> locals = procedure.getLocals();
-			Iterator<Variable> it = locals.iterator();
-			while (it.hasNext()) {
-				LocalVariable local = (LocalVariable) it.next();
-				if (!local.isUsed() && local.getInstruction() == null
-						&& local.getInstructions() == null) {
-					changed = true;
-					it.remove();
-				}
-			}
-
-			super.visitProcedure(procedure);
 		}
 	}
 

@@ -28,35 +28,81 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Action;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
- * This class defines an actor transformation that modify the dimension of size
- * = 1 variables to avoid generating tables of size 1 (0 downto 0) in VHDL.
+ * This transformation transforms an actor so that there is at most one
  * 
+ * @author Matthieu Wipliez
  * @author Nicolas Siret
  * 
  */
-public class VariableRedimension extends AbstractActorTransformation {
+public class MultipleArrayAccessTransformation extends
+		AbstractActorTransformation {
+
+	/**
+	 * This class counts the number of loads/stores to each given array.
+	 * 
+	 */
+	private static class RWCounter extends AbstractActorTransformation {
+
+		private Map<Variable, Integer> numRW;
+
+		public RWCounter() {
+			numRW = new HashMap<Variable, Integer>();
+		}
+
+		@Override
+		public void visit(Load load) {
+			visitLoadStore(load.getSource().getVariable(), load.getIndexes());
+		}
+
+		@Override
+		public void visit(Store store) {
+			visitLoadStore(store.getTarget(), store.getIndexes());
+		}
+
+		/**
+		 * Visits a load or a store, and updates the numRW map.
+		 * 
+		 * @param variable
+		 *            a variable
+		 * @param indexes
+		 *            a list of indexes
+		 */
+		private void visitLoadStore(Variable variable, List<Expression> indexes) {
+			if (!indexes.isEmpty()) {
+				Integer numReads = numRW.get(variable);
+				if (numReads == null) {
+					numRW.put(variable, 1);
+				} else {
+					numRW.put(variable, numReads + 1);
+				}
+			}
+		}
+
+	}
+
+	@Override
+	public void visit(Action action) {
+		// we are only interested in the body
+		visit(action.getBody());
+	}
 
 	@Override
 	public void visit(Procedure procedure) {
-		for (Variable variable : procedure.getLocals()) {
-			LocalVariable local = (LocalVariable) variable;
-			// System.out.println("local : " + local.getType().getDimensions());
-			List<Integer> dimensions = local.getType().getDimensions();
-			if (!dimensions.isEmpty() && dimensions.get(0).equals(1)) {
-				Type type = ((TypeList) local.getType()).getType();
-				local.setType(type);
-			}
-		}
+		RWCounter counter = new RWCounter();
+		counter.visit(procedure);
 	}
 
 }

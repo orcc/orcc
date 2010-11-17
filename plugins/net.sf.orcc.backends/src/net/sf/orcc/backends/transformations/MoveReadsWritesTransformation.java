@@ -63,19 +63,8 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visit(Read read) {
-		readEnds.add(new ReadEnd(read));
-	}
-
-	@Override
-	public void visit(Write write) {
-		writes.add(write);
-		instructionIterator.set(new WriteEnd(write));
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		super.visitProcedure(procedure);
+	public void visit(Procedure procedure) {
+		super.visit(procedure);
 
 		List<CFGNode> nodes = procedure.getNodes();
 
@@ -107,6 +96,17 @@ public class MoveReadsWritesTransformation extends AbstractActorTransformation {
 		// clears the lists
 		writes.clear();
 		readEnds.clear();
+	}
+
+	@Override
+	public void visit(Read read) {
+		readEnds.add(new ReadEnd(read));
+	}
+
+	@Override
+	public void visit(Write write) {
+		writes.add(write);
+		instructionIterator.set(new WriteEnd(write));
 	}
 
 }

@@ -105,10 +105,6 @@ public class VHDLBackendImpl extends AbstractBackend {
 		evaluateInitializeActions(actor);
 
 		ActorTransformation[] transformationsCodegen = {
-
-				// renames reserved keywords
-				new RenameTransformation(this.transformations),
-
 				new InlineTransformation(true, false),
 				new VariableRedimension(), new BoolExprTransformation(),
 
@@ -116,9 +112,13 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 				new ListFlattenTransformation(true, false, true),
 
+				// renames variables so we can inline them in the template
+				// should remain after other transformations
 				new VariableRenamer(),
 
-				// replaces adjacent underscores by a single underscore
+				// renames reserved keywords and replaces adjacent underscores
+				// by a single underscore
+				new RenameTransformation(this.transformations),
 				new RenameTransformation(adjacentUnderscores, "_") };
 
 		for (ActorTransformation transformation : transformationsCodegen) {

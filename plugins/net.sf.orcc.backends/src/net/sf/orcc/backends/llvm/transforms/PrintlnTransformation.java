@@ -66,8 +66,10 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 	 * 
 	 */
 	private class LLVMString {
-		StringBuffer llvmStr;
-		int size;
+		
+		private StringBuffer llvmStr;
+		
+		private int size;
 
 		LLVMString(String str) {
 			// Replace characters unsupported by llvm
@@ -119,17 +121,17 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 		}
 
 		for (Procedure proc : actor.getProcs()) {
-			visitProcedure(proc);
+			visit(proc);
 		}
 
 		for (Action action : actor.getActions()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
+			visit(action.getBody());
+			visit(action.getScheduler());
 		}
 
 		for (Action action : actor.getInitializes()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
+			visit(action.getBody());
+			visit(action.getScheduler());
 		}
 
 	}

@@ -39,13 +39,17 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * MUST NOT be added to any procedure after this pass, for they won't be
  * renamed.
  * 
+ * Note: it is difficult to do this transformation in the template, since
+ * variables would have to be renamed everywhere (in the expression printer, in
+ * Assign, Load, Store...)
+ * 
  * @author Matthieu Wipliez
  * 
  */
 public class VariableRenamer extends AbstractActorTransformation {
 
 	@Override
-	public void visitProcedure(Procedure procedure) {
+	public void visit(Procedure procedure) {
 		String procName = procedure.getName();
 		for (Variable variable : procedure.getLocals()) {
 			LocalVariable local = (LocalVariable) variable;

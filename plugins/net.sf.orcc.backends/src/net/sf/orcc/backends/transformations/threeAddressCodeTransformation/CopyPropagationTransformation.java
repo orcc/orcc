@@ -108,6 +108,7 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	}
 
 	private Map<Variable, Expression> copyVars;
+
 	private List<Instruction> removedInstrs;
 
 	public CopyPropagationTransformation() {
@@ -244,6 +245,16 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(Procedure procedure) {
+		copyVars.clear();
+		super.visit(procedure);
+
+		// Remove useless instructions and variables
+		removeInstructions(removedInstrs);
+		removeVariables(copyVars);
+	}
+
+	@Override
 	public void visit(Return returnInstr) {
 		Expression expr = returnInstr.getValue();
 		if (expr != null) {
@@ -282,15 +293,5 @@ public class CopyPropagationTransformation extends AbstractActorTransformation {
 				expressions.set(expressions.indexOf(expr), newExpr);
 			}
 		}
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		copyVars.clear();
-		super.visitProcedure(procedure);
-
-		// Remove useless instructions and variables
-		removeInstructions(removedInstrs);
-		removeVariables(copyVars);
 	}
 }

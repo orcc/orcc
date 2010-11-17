@@ -172,9 +172,43 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 		block.add(new Return(new VarExpr(new Use(result))));
 
 		// convert to SSA form
-		new SSATransformation().visitProcedure(procedure);
+		new SSATransformation().visit(procedure);
 
 		return procedure;
+	}
+
+	private void examineState(DirectedGraph<State, UniqueEdge> graph,
+			State source) {
+		Iterator<UniqueEdge> it = graph.outgoingEdgesOf(source).iterator();
+		if (it.hasNext()) {
+			boolean mergeActions = true;
+			List<Action> actions = new ArrayList<Action>();
+
+			UniqueEdge edge = it.next();
+			State target = graph.getEdgeTarget(edge);
+			actions.add((Action) edge.getObject());
+
+			while (it.hasNext()) {
+				edge = it.next();
+				if (target != graph.getEdgeTarget(edge)) {
+					mergeActions = false;
+					break;
+				}
+				actions.add((Action) edge.getObject());
+			}
+
+			if (mergeActions) {
+				List<Action> newActions = tryAndMerge(actions);
+				if (actions.size() > 1 && newActions.size() == 1) {
+					System.out.println("in actor " + actor.getName()
+							+ ", state " + source + ", merging actions "
+							+ actions);
+					graph.removeAllEdges(source, target);
+					graph.addEdge(source, target,
+							new UniqueEdge(newActions.get(0)));
+				}
+			}
+		}
 	}
 
 	/**
@@ -258,40 +292,6 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
 			for (State state : graph.vertexSet()) {
 				examineState(graph, state);
-			}
-		}
-	}
-
-	private void examineState(DirectedGraph<State, UniqueEdge> graph,
-			State source) {
-		Iterator<UniqueEdge> it = graph.outgoingEdgesOf(source).iterator();
-		if (it.hasNext()) {
-			boolean mergeActions = true;
-			List<Action> actions = new ArrayList<Action>();
-
-			UniqueEdge edge = it.next();
-			State target = graph.getEdgeTarget(edge);
-			actions.add((Action) edge.getObject());
-
-			while (it.hasNext()) {
-				edge = it.next();
-				if (target != graph.getEdgeTarget(edge)) {
-					mergeActions = false;
-					break;
-				}
-				actions.add((Action) edge.getObject());
-			}
-
-			if (mergeActions) {
-				List<Action> newActions = tryAndMerge(actions);
-				if (actions.size() > 1 && newActions.size() == 1) {
-					System.out.println("in actor " + actor.getName()
-							+ ", state " + source + ", merging actions "
-							+ actions);
-					graph.removeAllEdges(source, target);
-					graph.addEdge(source, target,
-							new UniqueEdge(newActions.get(0)));
-				}
 			}
 		}
 	}

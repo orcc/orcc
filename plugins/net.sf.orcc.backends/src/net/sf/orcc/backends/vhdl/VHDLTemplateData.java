@@ -68,7 +68,7 @@ public class VHDLTemplateData extends AbstractActorTransformation {
 	@Override
 	public void transform(Actor actor) {
 		for (Action action : actor.getActions()) {
-			visitProcedure(action.getScheduler());
+			visit(action.getScheduler());
 		}
 	}
 

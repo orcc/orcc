@@ -160,6 +160,12 @@ public class BoolExprTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
+	public void visit(Procedure procedure) {
+		tempVarCount = 1;
+		super.visit(procedure);
+	}
+
+	@Override
 	public void visit(Return returnInstr) {
 		if (procedure.getReturnType().isBool()) {
 			Expression expr = returnInstr.getValue();
@@ -192,12 +198,6 @@ public class BoolExprTransformation extends AbstractActorTransformation {
 				createNewBlock(instructionIterator);
 			}
 		}
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		tempVarCount = 1;
-		super.visitProcedure(procedure);
 	}
 
 }

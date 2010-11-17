@@ -107,7 +107,7 @@ public class ActorMerger implements INetworkTransformation {
 			for (Procedure proc : actor.getProcs()) {
 				loads = new HashMap<Variable, Integer>();
 				stores = new HashMap<Variable, Integer>();
-				visitProcedure(proc);
+				visit(proc);
 
 				currentBlock = BlockNode.getLast(proc);
 

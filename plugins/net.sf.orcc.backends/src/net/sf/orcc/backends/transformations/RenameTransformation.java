@@ -101,7 +101,7 @@ public class RenameTransformation extends AbstractActorTransformation {
 	}
 
 	@Override
-	public void visitProcedure(Procedure procedure) {
+	public void visit(Procedure procedure) {
 		String name = procedure.getName();
 		if (transformations != null && transformations.containsKey(name)) {
 			procedure.setName(transformations.get(name));

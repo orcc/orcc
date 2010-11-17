@@ -71,6 +71,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  */
 public class ExpressionSplitterTransformation extends
 		AbstractActorTransformation {
+
 	private class ExpressionSplitter extends AbstractExpressionInterpreter {
 
 		@Override
@@ -137,7 +138,8 @@ public class ExpressionSplitterTransformation extends
 
 	}
 
-	ExpressionSplitter expressionSplitter;
+	private ExpressionSplitter expressionSplitter;
+
 	private String file;
 
 	private List<Instruction> instrs;
@@ -147,8 +149,6 @@ public class ExpressionSplitterTransformation extends
 		instrs = new ArrayList<Instruction>();
 	}
 
-
-	 
 	/**
 	 * Returns an iterator over the last instruction of the previous block. A
 	 * new block is created.
@@ -157,16 +157,15 @@ public class ExpressionSplitterTransformation extends
 	 * @return
 	 */
 	private ListIterator<Instruction> getItr(ListIterator<CFGNode> it) {
-		//Create a new basic block
+		// Create a new basic block
 		BlockNode block = new BlockNode(procedure);
 
-		//Add it before the current node
+		// Add it before the current node
 		it.previous();
 		it.add(block);
 
 		return block.listIterator();
 	}
-
 
 	@Override
 	public void transform(Actor actor) throws OrccException {
@@ -248,6 +247,18 @@ public class ExpressionSplitterTransformation extends
 	}
 
 	@Override
+	public void visit(Procedure procedure) {
+		// set the label counter to prevent new nodes from having the same label
+		// as existing nodes
+		List<CFGNode> nodes = procedure.getNodes();
+		if (nodes.size() > 0) {
+			CFGNode lastNode = nodes.get(nodes.size() - 1);
+			AbstractNode.setLabelCount(lastNode.getLabel() + 2);
+		}
+		super.visit(procedure);
+	}
+
+	@Override
 	public void visit(Return returnInstr) {
 		if (returnInstr.getValue() != null) {
 			instructionIterator.previous();
@@ -316,17 +327,5 @@ public class ExpressionSplitterTransformation extends
 				indexes.set(indexes.indexOf(value), newValue);
 			}
 		}
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		// set the label counter to prevent new nodes from having the same label
-		// as existing nodes
-		List<CFGNode> nodes = procedure.getNodes();
-		if (nodes.size() > 0) {
-			CFGNode lastNode = nodes.get(nodes.size() - 1);
-			AbstractNode.setLabelCount(lastNode.getLabel() + 2);
-		}
-		super.visitProcedure(procedure);
 	}
 }

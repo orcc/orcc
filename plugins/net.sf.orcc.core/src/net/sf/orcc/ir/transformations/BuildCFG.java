@@ -145,7 +145,7 @@ public class BuildCFG extends AbstractActorTransformation {
 	private CFG graph;
 
 	@Override
-	public void visitProcedure(Procedure procedure) {
+	public void visit(Procedure procedure) {
 		CFGBuilder builder = new CFGBuilder();
 		builder.visit(procedure.getNodes(), null);
 		procedure.setGraph(graph);

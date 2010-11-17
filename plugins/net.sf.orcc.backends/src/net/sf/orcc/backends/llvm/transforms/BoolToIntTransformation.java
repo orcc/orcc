@@ -57,17 +57,30 @@ public class BoolToIntTransformation extends AbstractActorTransformation {
 
 		// Set corresponding in procedure
 		for (Procedure proc : actor.getProcs()) {
-			visitProcedure(proc);
+			visit(proc);
 		}
 
 		for (Action action : actor.getActions()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
+			visit(action.getBody());
+			visit(action.getScheduler());
 		}
 
 		for (Action action : actor.getInitializes()) {
-			visitProcedure(action.getBody());
-			visitProcedure(action.getScheduler());
+			visit(action.getBody());
+			visit(action.getScheduler());
+		}
+	}
+
+	@Override
+	public void visit(Procedure procedure) {
+		// Transform Local boolean Variable assigned to port into int Variable
+		for (Variable var : procedure.getLocals()) {
+			if (((LocalVariable) var).isPort()) {
+				TypeList listType = (TypeList) var.getType();
+				if (listType.getElementType().isBool()) {
+					listType.setType(IrFactory.eINSTANCE.createTypeInt(32));
+				}
+			}
 		}
 	}
 
@@ -76,19 +89,6 @@ public class BoolToIntTransformation extends AbstractActorTransformation {
 		for (Port port : ports) {
 			if (port.getType().isBool()) {
 				port.setType(IrFactory.eINSTANCE.createTypeInt(32));
-			}
-		}
-	}
-
-	@Override
-	public void visitProcedure(Procedure procedure) {
-		// Transform Local boolean Variable assigned to port into int Variable
-		for (Variable var : procedure.getLocals()) {
-			if (((LocalVariable) var).isPort()) {
-				TypeList listType = (TypeList) var.getType();
-				if (listType.getElementType().isBool()) {
-					listType.setType(IrFactory.eINSTANCE.createTypeInt(32));
-				}
 			}
 		}
 	}
