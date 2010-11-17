@@ -342,6 +342,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 		function.setExternal(true);
 
 		// Create a new local variable to all function/procedure's variable
+		// except for list (reference is using)
 		variableToLocalVariableMap = new HashMap<Variable, LocalVariable>();
 		for (Variable var : function.getLocals().getList()) {
 			LocalVariable oldVar = (LocalVariable) var;
@@ -354,25 +355,34 @@ public class InlineTransformation extends AbstractActorTransformation {
 		}
 		for (Variable var : function.getParameters().getList()) {
 			LocalVariable oldVar = (LocalVariable) var;
-			LocalVariable newVar = procedure.newTempLocalVariable("",
-					oldVar.getType(), oldVar.getName());
-			newVar.setIndex(oldVar.getIndex());
-			newVar.setLocation(oldVar.getLocation());
-			newVar.setAssignable(oldVar.isAssignable());
+			LocalVariable newVar;
+			if (var.getType().isList()) {
+				newVar = (LocalVariable) ((VarExpr) call.getParameters().get(
+						function.getParameters().getList().indexOf(var)))
+						.getVar().getVariable();
+			} else {
+				newVar = procedure.newTempLocalVariable("", oldVar.getType(),
+						oldVar.getName());
+				newVar.setIndex(oldVar.getIndex());
+				newVar.setLocation(oldVar.getLocation());
+				newVar.setAssignable(oldVar.isAssignable());
+			}
 			variableToLocalVariableMap.put(oldVar, newVar);
 		}
 
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
 
-		// Assign all parameters
+		// Assign all parameters except for list
 		BlockNode newBlockNode = new BlockNode(procedure);
 		for (int i = 0; i < function.getParameters().getLength(); i++) {
 			Variable parameter = function.getParameters().getList().get(i);
-			Expression expr = call.getParameters().get(i);
-			Assign assign = new Assign(
-					variableToLocalVariableMap.get(parameter), expr);
-			newBlockNode.add(assign);
-			Use.addUses(assign, expr);
+			if (!parameter.getType().isList()) {
+				Expression expr = call.getParameters().get(i);
+				Assign assign = new Assign(
+						variableToLocalVariableMap.get(parameter), expr);
+				newBlockNode.add(assign);
+				Use.addUses(assign, expr);
+			}
 		}
 		if (newBlockNode.getInstructions().size() > 0) {
 			nodes.add(newBlockNode);
