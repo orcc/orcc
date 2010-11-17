@@ -4,27 +4,26 @@
 //
 // Fractional luma sample interpolation for motion compensation of AVC
 
+//Modified by Damien de Saint Jorre ; IETR/INSA of Rennes (France)
 
-actor Algo_Interp_SeparableSixTapQuarterPelAVC () 
-		int (size=16) Mv,
-		int (size=16) RD,
-		uint(size=6)  PartSZ
-				==>
-				int(size=16) INTERP:
-
-	bool DEBUG_INPUT  = false;
+actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
+	int (size=16) Mv,
+	int (size=16) RD,
+	uint(size=6)  PartSZ
+		==>
+	int(size=16) INTERP
+		:
 
   int(size=32) x ;
   int(size=32) y ;
   int(size=32) o_x ;
   int(size=32) o_y ;
-  int(size=32) x_index ;
-  int(size=32) y_index ;
+  int(size=32) xFrac;
+  int(size=32) yFrac;
   int width;
   int height;
-  int temp; 
+  int temp;
   int temp2;
-  uint(size=1) buf_done;  
   List( type:int(size=16), size=441 ) inbuf := [ 0 : for int i in 0 .. 440 ];
   List( type:int(size=32), size=6 ) half_pel := [ 0 : for int i in 0 .. 5 ];
 
@@ -48,11 +47,11 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
     int(size=32) n
   begin
 
-    // x_index = 0
-    if x_index = 0 and y_index = 0 then 
+    // xFrac = 0
+    if xFrac = 0 and yFrac = 0 then 
       temp := inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
     end    
-    if x_index = 0  and y_index = 2 then 
+    if xFrac = 0  and yFrac = 2 then 
   
       temp := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
@@ -60,7 +59,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := Clip1(temp);
     end
 
-    if x_index = 0  and y_index = 1 then 
+    if xFrac = 0  and yFrac = 1 then 
       temp := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
@@ -70,7 +69,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := Clip1(temp);
     end 
 
-    if x_index = 0  and y_index = 3 then 
+    if xFrac = 0  and yFrac = 3 then 
       temp := inbuf [ ( 2 + o_x) + ( 0 + o_y) * 21 ]-5 * inbuf [ ( 2 + o_x) + ( 1 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 2 + o_x) + ( 4 + o_y) * 21 ] + inbuf [ ( 2 + o_x) + ( 5 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
@@ -80,15 +79,15 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := Clip1(temp);
     end  
 
-    // x_index = 2
-    if x_index = 2  and y_index = 0 then 
+    // xFrac = 2
+    if xFrac = 2  and yFrac = 0 then 
       temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
       temp := Clip1(temp);
     end  
 
-    if x_index = 2  and y_index = 2 then 
+    if xFrac = 2  and yFrac = 2 then 
       n :=0;
       while n < 6 
       do
@@ -101,7 +100,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 10);
       temp := Clip1(temp);
     end
-    if x_index = 2  and y_index = 1 then 
+    if xFrac = 2  and yFrac = 1 then 
       n :=0;
       while n < 6 
       do
@@ -120,7 +119,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);
       temp := Clip1(temp);   
     end
-    if x_index = 2  and y_index = 3 then 
+    if xFrac = 2  and yFrac = 3 then 
       n :=0;
       while n < 6 
       do
@@ -139,8 +138,8 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end
-   // x_index = 1
-   if x_index = 1  and y_index = 0 then 
+   // xFrac = 1
+   if xFrac = 1  and yFrac = 0 then 
       temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
@@ -149,7 +148,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end  
-    if x_index = 1  and y_index = 2 then 
+    if xFrac = 1  and yFrac = 2 then 
       n :=0;
       while n < 6 
       do
@@ -168,7 +167,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end
-    if x_index = 1  and y_index = 1 then 
+    if xFrac = 1  and yFrac = 1 then 
       temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
@@ -181,7 +180,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);
       temp := Clip1(temp);    
     end
-    if x_index = 1  and y_index = 3 then 
+    if xFrac = 1  and yFrac = 3 then 
       temp := inbuf [ ( 0 + o_x) + ( 3 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 3 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 3 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 3 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
@@ -194,8 +193,8 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);  
       temp := Clip1(temp);
     end
-   // x_index = 3
-   if x_index = 3  and y_index = 0 then 
+   // xFrac = 3
+   if xFrac = 3  and yFrac = 0 then 
       temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
@@ -204,7 +203,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end  
-    if x_index = 3  and y_index = 2 then 
+    if xFrac = 3  and yFrac = 2 then 
       n :=0;
       while n < 6 
       do
@@ -223,7 +222,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);
       temp := Clip1(temp);
     end
-    if x_index = 3  and y_index = 1 then 
+    if xFrac = 3  and yFrac = 1 then 
       temp := inbuf [ ( 0 + o_x) + ( 2 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 2 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 2 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 2 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 2 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 2 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
@@ -236,7 +235,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
       temp := rshift ( temp, 1);      
       temp := Clip1(temp);
     end
-    if x_index = 3  and y_index = 3 then 
+    if xFrac = 3  and yFrac = 3 then 
       temp := inbuf [ ( 0 + o_x) + ( 3 + o_y) * 21 ]-5 * inbuf [ ( 1 + o_x) + ( 3 + o_y) * 21 ]+ 20 * inbuf [ ( 2 + o_x) + ( 3 + o_y) * 21 ];
       temp := temp + 20 * inbuf [ ( 3 + o_x) + ( 3 + o_y) * 21 ]-5*inbuf [ ( 4 + o_x) + ( 3 + o_y) * 21 ] + inbuf [ ( 5 + o_x) + ( 3 + o_y) * 21 ] + 16;
       temp := rshift ( temp, 5);
@@ -251,100 +250,72 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
     end
   end
 
-  get_fract_x: action Mv:[ MovementVector ] ==>
-  do
-    x := 0;
-    y := 0;
-    o_x := 0;
-    o_y := 0;
-    buf_done := 0;
-    x_index := MovementVector & 3;
-  	if(DEBUG_INPUT) then
-		println("Input Interp_SeparableSixTap... Frac:"+MovementVector);
-  	end
-  end
+	GetMv: action Mv:[ Mv_x , Mv_y ] ==>
+	do
+		x := 0;
+		y := 0;
+		o_x := 0;
+		o_y := 0;
+		xFrac := Mv_x & 3;
+		yFrac := Mv_y & 3;
+	end
 
-  get_fract_y: action Mv:[ MovementVector ] ==>
-  do
-    y_index := MovementVector & 3;   
-  	if(DEBUG_INPUT) then
-		println("Input Interp_SeparableSixTap... Frac:"+MovementVector);
-  	end
-  end
-
-  getwidth: action PartSZ:[ f ] ==>
-  do
-    width :=f;
-  	if(DEBUG_INPUT) then
-		println("Input Interp_SeparableSixTap... PartSZ:"+f);
-  	end
-  end
-
-  getheight: action PartSZ:[ f ] ==>
-  do
-    height :=f;
-  	if(DEBUG_INPUT) then
-		println("Input Interp_SeparableSixTap... PartSZ:"+f);
-  	end
-  end
+	GetSize: action PartSZ:[ PartWidth, PartHeight ] ==>
+	do
+		width  := PartWidth;
+		height := PartHeight;
+	end
 
   // fetch (width+5)x(height+5) pixels
 
-  fetch: action RD:[d] ==>
-  guard 
-   x < (width+5) and y < (height+5) and buf_done = 0
-  do
-   inbuf[y * 21 + x] := d;
-   x := x + 1;
-   if x >= (width+5) then
-      x := 0;
-      y := y + 1;
-      if y >= height +5 then
-      	buf_done := 1 ;
-      	end
-    end
-  	if(DEBUG_INPUT) then
-		println("Input Interp_SeparableSixTap... RD:"+d);
-  	end
+	GetPixVal.Launch: action
+			RD:[d]
+				==>
+		guard 
+			y < (height+5)
+		do
+			inbuf[y * 21 + x] := d;
+			x := x + 1;
+			if x >= (width+5) then
+				x := 0;
+				y := y + 1;
+			end
+		end
+
+	GetPixVal.Done: action ==>
+		guard
+			y >= height +5
+		end
+
+	Interpolate.Launch: action ==> INTERP:[ p ]
+		guard
+			o_y < height
+		var 
+			int p
+		do
+			compensate();
+			p := temp;
+			o_x := o_x + 1;
+			if o_x >= width then
+				o_x := 0;
+				o_y := o_y + 1;
+			end
+		end
+
+	Interpolate.Done: action ==>
+		guard
+			o_y = height
+		end
+
+  schedule fsm GetMv:
+    GetMv       (GetMv              )--> GetSize;
+
+    GetSize     (GetSize            )--> GetValue;
+
+	GetValue    (GetPixVal.Launch   )--> GetValue;
+	GetValue    (GetPixVal.Done     )--> Interpolate;
+
+    Interpolate (Interpolate.Launch )--> Interpolate;
+    Interpolate (Interpolate.Done   )--> GetMv;
   end
-  
-  done: action ==>
-  guard
-    o_y = height and buf_done =1
-  end
-
-  
-  // interpolation according to MODE
-  process: action ==> INTERP:[ p ]
-  guard
-   buf_done = 1,
-   o_y < height
-  var 
-	int p
-  do
-   compensate();
-   p := temp;
-   o_x := o_x + 1;
-   if o_x >= width then
-      o_x := 0;
-      o_y := o_y + 1;
-    end
-  end
-
-  schedule fsm get_fract_x:
-
-    get_fract_x  ( get_fract_x ) --> get_fract_y;
-    get_fract_y  ( get_fract_y ) --> getwidth;
-    getwidth     ( getwidth    ) --> getheight;
-    getheight    ( getheight   ) --> interpolate;
-    interpolate  ( fetch       ) --> interpolate;
-    interpolate  ( done        ) --> get_fract_x;
-    interpolate  ( process     ) --> interpolate;
-
-  end
-
-  priority
-    done >  fetch > process  ;
-  end
-
 end
