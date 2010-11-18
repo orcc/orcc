@@ -58,9 +58,16 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			)
 		end
 
+	function ComputeQuarterPixel(int HalfPixel1, int HalfPixel2)
+				-->
+			int
+		:
+			Clip1(
+				(HalfPixel1 + HalfPixel2 + 1) >> 1
+			)
+		end
+
 	procedure compensate( )
-		var
-			int(size=32) n
 		begin
 			if xFrac = 0 and yFrac = 0 then 
 				temp := TabPix [2 + o_x][2 + o_y];
@@ -72,16 +79,12 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			if xFrac = 0  and yFrac = 1 then
 				temp := ComputeHalfPixel(TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y] ,
 				                         TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
-				temp := temp + TabPix[2 + o_x][2 + o_y]+1;
-				temp := rshift ( temp, 1);
-				temp := Clip1(temp);
+				temp := ComputeQuarterPixel(temp,TabPix[2 + o_x][2 + o_y]);
 			end
 			if xFrac = 0  and yFrac = 3 then
 				temp := ComputeHalfPixel( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y],
 				                          TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y] );
-				temp := temp + TabPix[2 + o_x][3 + o_y]+1;
-				temp := rshift ( temp, 1);
-				temp := Clip1(temp);
+				temp := ComputeQuarterPixel(temp,TabPix[2 + o_x][3 + o_y]);
 			end  
 
 			if xFrac = 2  and yFrac = 0 then
@@ -109,9 +112,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				temp  := Clip1(temp);
 				temp2 := ComputeHalfPixel( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
 				                           TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
-				temp  := temp+temp2+1;
-				temp  := rshift ( temp, 1);
-				temp  := Clip1(temp);   
+				temp := ComputeQuarterPixel(temp,temp2);
 			end
 			if xFrac = 2  and yFrac = 3 then 
 				foreach int n in 0 .. 5
@@ -124,16 +125,12 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				temp  := Clip1(temp);
 				temp2 := ComputeHalfPixel( TabPix[o_x][3 + o_y]     , TabPix[1 + o_x][3 + o_y] , TabPix[2 + o_x][3 + o_y] ,
 				                           TabPix[3 + o_x][3 + o_y] , TabPix[4 + o_x][3 + o_y] , TabPix[5 + o_x][3 + o_y]);
-				temp  := temp+temp2+1;
-				temp  := rshift ( temp, 1);
-				temp  := Clip1(temp);
+				temp  := ComputeQuarterPixel(temp,temp2);
 			end
 			if xFrac = 1  and yFrac = 0 then
 				temp := ComputeHalfPixel( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
 				                          TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
-				temp := temp + TabPix[2 + o_x][2 + o_y] +1;
-				temp := rshift ( temp, 1);
-				temp := Clip1(temp);
+				temp := ComputeQuarterPixel(temp,TabPix[2 + o_x][2 + o_y]);
 			end  
 			if xFrac = 1  and yFrac = 2 then
 				foreach int n in 0 .. 5
@@ -146,34 +143,26 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				temp  := Clip1(temp);
 				temp2 := ComputeHalfPixel( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y],
 				                           TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
-				temp  := temp+temp2+1;
-				temp  := rshift ( temp, 1);
-				temp  := Clip1(temp);
+				temp  := ComputeQuarterPixel(temp,temp2);
 			end
 			if xFrac = 1  and yFrac = 1 then
 				temp  := ComputeHalfPixel( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
 				                           TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
 				temp2 := ComputeHalfPixel( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y],
 				                           TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
-				temp  := temp+temp2+1;
-				temp  := rshift ( temp, 1);
-				temp  := Clip1(temp);    
+				temp  := ComputeQuarterPixel(temp,temp2);
 			end
 			if xFrac = 1  and yFrac = 3 then
 				temp := ComputeHalfPixel( TabPix[o_x][3 + o_y]     , TabPix[1 + o_x][3 + o_y] , TabPix[2 + o_x][3 + o_y],
 				                          TabPix[3 + o_x][3 + o_y] , TabPix[4 + o_x][3 + o_y] , TabPix[5 + o_x][3 + o_y]);
 				temp2 := ComputeHalfPixel( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y],
 				                           TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
-				temp  := temp+temp2+1;
-				temp  := rshift ( temp, 1);  
-				temp  := Clip1(temp);
+				temp  := ComputeQuarterPixel(temp,temp2);
 			end
 			if xFrac = 3  and yFrac = 0 then
 				temp := ComputeHalfPixel( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y] ,
 				                          TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
-				temp := temp + TabPix[3 + o_x][2 + o_y] + 1;
-				temp := rshift ( temp, 1);
-				temp := Clip1(temp);
+				temp := ComputeQuarterPixel(temp,TabPix[3 + o_x][2 + o_y]);
 			end  
 			if xFrac = 3  and yFrac = 2 then
 				foreach int n in 0 .. 5
@@ -186,27 +175,21 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				temp  := Clip1(temp);
 				temp2 := ComputeHalfPixel( TabPix[3 + o_x][o_y]     , TabPix[3 + o_x][1 + o_y] , TabPix[3 + o_x][2 + o_y] ,
 				                           TabPix[3 + o_x][3 + o_y] , TabPix[3 + o_x][4 + o_y] , TabPix[3 + o_x][5 + o_y]);
-				temp  := temp+temp2+1;
-				temp  := rshift ( temp, 1);
-				temp  := Clip1(temp);
+				temp  := ComputeQuarterPixel(temp,temp2);
 			end
 			if xFrac = 3  and yFrac = 1 then
 				temp := ComputeHalfPixel( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
 				                          TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
 				temp2 := ComputeHalfPixel( TabPix[3 + o_x][o_y]     , TabPix[3 + o_x][1 + o_y] , TabPix[3 + o_x][2 + o_y],
 				                           TabPix[3 + o_x][3 + o_y] , TabPix[3 + o_x][4 + o_y] , TabPix[3 + o_x][5 + o_y]);
-				temp  := temp+temp2+1;
-				temp  := rshift ( temp, 1);      
-				temp  := Clip1(temp);
+				temp  := ComputeQuarterPixel(temp,temp2);
 			end
 			if xFrac = 3  and yFrac = 3 then
 				temp  := ComputeHalfPixel( TabPix[o_x][3 + o_y]     , TabPix[1 + o_x][3 + o_y] , TabPix[2 + o_x][3 + o_y],
 				                           TabPix[3 + o_x][3 + o_y] , TabPix[4 + o_x][3 + o_y] , TabPix[5 + o_x][3 + o_y]);
 				temp2 := ComputeHalfPixel( TabPix[3 + o_x][o_y]     , TabPix[3 + o_x][1 + o_y] , TabPix[3 + o_x][2 + o_y] ,
 				                           TabPix[3 + o_x][3 + o_y] , TabPix[3 + o_x][4 + o_y] , TabPix[3 + o_x][5 + o_y]);
-				temp  := temp+temp2+1;
-				temp  := rshift ( temp, 1);
-				temp  := Clip1(temp);
+				temp  := ComputeQuarterPixel(temp,temp2);
 			end
 		end
 
