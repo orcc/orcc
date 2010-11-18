@@ -46,6 +46,7 @@ import net.sf.orcc.backends.xlim.transforms.ArrayInitializeTransformation;
 import net.sf.orcc.backends.xlim.transforms.ChangeActionSchedulerFormTransformation;
 import net.sf.orcc.backends.xlim.transforms.FirstPhiValuesOfWhileNodeTransformation;
 import net.sf.orcc.backends.xlim.transforms.MoveLiteralIntegers;
+import net.sf.orcc.backends.xlim.transforms.RecreateTokenSwallowerVariableTransormation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Port;
@@ -96,7 +97,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new CastAdderTransformation(),
 				new FirstPhiValuesOfWhileNodeTransformation(),
 				new MoveLiteralIntegers(), new VariableRenamer(),
-				new ChangeActionSchedulerFormTransformation() };
+				new ChangeActionSchedulerFormTransformation(),
+				new RecreateTokenSwallowerVariableTransormation() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
