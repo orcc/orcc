@@ -156,6 +156,6 @@
     <Connection dst="Mgnt_DBF" dst-port="RefIdx" src="" src-port="RefIdx"/>
     <Connection dst="Mgnt_DBF" dst-port="LFDisable" src="" src-port="LFDisable"/>
     <Connection dst="Mgnt_DBF" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
-    <Connection dst="" dst-port="WD" src="Mgnt_DBF" src-port="WD"/>
     <Connection dst="Mgnt_DBF" dst-port="MbType" src="" src-port="Mbtype"/>
+    <Connection dst="" dst-port="WD" src="Mgnt_DBF" src-port="WD"/>
 </XDF>

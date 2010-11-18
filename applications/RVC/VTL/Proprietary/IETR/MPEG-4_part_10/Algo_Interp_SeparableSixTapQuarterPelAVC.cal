@@ -42,213 +42,201 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			end
 		end
 
-  procedure compensate( )
-  var
-    int(size=32) n
-  begin
+	function SixTapFilter(int a1, int b1, int c1, int c2, int b2, int a2)
+				-->
+			int
+		:
+			a1 - (5 * b1) + (20 * c1) + (20 * c2) - (5 * b2) + a2
+		end
 
-    // xFrac = 0
-    if xFrac = 0 and yFrac = 0 then 
-      temp := TabPix [2 + o_x][2 + o_y];
-    end    
-    if xFrac = 0  and yFrac = 2 then 
-  
-      temp := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y]+ 20 * TabPix[2 + o_x][2 + o_y];
-      temp := temp + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
-      temp := rshift (temp,5);
-      temp := Clip1(temp);
-    end
 
-    if xFrac = 0  and yFrac = 1 then 
-      temp := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y] + 20 *TabPix[2 + o_x][2 + o_y];
-      temp := temp + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-      temp := temp + TabPix[2 + o_x][2 + o_y]+1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);
-    end 
+	procedure compensate( )
+		var
+			int(size=32) n
+		begin
+			if xFrac = 0 and yFrac = 0 then 
+				temp := TabPix [2 + o_x][2 + o_y];
+			end    
+ 			if xFrac = 0  and yFrac = 2 then 
+ 				temp := SixTapFilter(TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y] ,
+				                     TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
+				temp := rshift (temp + 16 ,5);
+				temp := Clip1(temp);
+			end
+			if xFrac = 0  and yFrac = 1 then
+				temp := SixTapFilter( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y] ,
+				                      TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
+				temp := rshift ( temp + 16, 5);
+				temp := Clip1(temp);
+				temp := temp + TabPix[2 + o_x][2 + o_y]+1;
+				temp := rshift ( temp, 1);
+				temp := Clip1(temp);
+			end
+			if xFrac = 0  and yFrac = 3 then
+				temp := SixTapFilter( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                      TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y] );
+				temp := rshift ( temp + 16, 5);
+				temp := Clip1(temp);
+				temp := temp + TabPix[2 + o_x][3 + o_y]+1;
+				temp := rshift ( temp, 1);
+				temp := Clip1(temp);
+			end  
 
-    if xFrac = 0  and yFrac = 3 then 
-      temp := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
-      temp := temp + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-      temp := temp + TabPix[2 + o_x][3 + o_y]+1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);
-    end  
-
-    // xFrac = 2
-    if xFrac = 2  and yFrac = 0 then 
-      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
-      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-    end  
-
-    if xFrac = 2  and yFrac = 2 then 
-      n :=0;
-      while n < 6 
-      do
-        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y] + 20 * TabPix[2 + o_x][n + o_y];
-        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
-        n := n+1;
-      end
-
-      temp :=half_pel[0]-5*half_pel[1]+20*half_pel[2]+20*half_pel[3]-5*half_pel[4]+half_pel[5]+512;  
-      temp := rshift ( temp, 10);
-      temp := Clip1(temp);
-    end
-    if xFrac = 2  and yFrac = 1 then 
-      n :=0;
-      while n < 6 
-      do
-        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y] + 20 * TabPix[2 + o_x][n + o_y];
-        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
-        n := n+1;
-      end
-      temp :=half_pel[0]-5*half_pel[1]+20*half_pel[2]+20*half_pel[3]-5*half_pel[4]+half_pel[5]+512;  
-      temp := rshift ( temp, 10);
-      temp := Clip1(temp);
-      temp2 := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
-      temp2 := temp2 + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
-      temp2 := rshift ( temp2, 5);        
-      temp := Clip1(temp);
-      temp := temp+temp2+1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);   
-    end
-    if xFrac = 2  and yFrac = 3 then 
-      n :=0;
-      while n < 6 
-      do
-        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y] + 20 * TabPix[2 + o_x][n + o_y];
-        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
-        n := n+1;
-      end
-      temp := half_pel[0] -5* half_pel[1] +20* half_pel[2] +20* half_pel[3] -5* half_pel[4] + half_pel[5] + 512;  
-      temp := rshift ( temp, 10);
-      temp := Clip1(temp);
-      temp2 := TabPix[o_x][3 + o_y] -5 * TabPix[1 + o_x][3 + o_y] + 20 * TabPix[2 + o_x][3 + o_y];
-      temp2 := temp2 + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[4 + o_x][3 + o_y] + TabPix[5 + o_x][3 + o_y] + 16;
-      temp2 := rshift ( temp2, 5);        
-      temp := Clip1(temp);
-      temp := temp+temp2+1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);
-    end
-   // xFrac = 1
-   if xFrac = 1  and yFrac = 0 then 
-      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
-      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-      temp := temp + TabPix[2 + o_x][2 + o_y] +1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);
-    end  
-    if xFrac = 1  and yFrac = 2 then 
-      n :=0;
-      while n < 6 
-      do
-        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y]+ 20 * TabPix[2 + o_x][n + o_y];
-        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
-        n := n+1;
-      end
-      temp :=half_pel[0]-5*half_pel[1]+20*half_pel[2]+20*half_pel[3]-5*half_pel[4]+half_pel[5]+512;  
-      temp := rshift (temp, 10);
-      temp := Clip1(temp);
-      temp2 := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
-      temp2 := temp2 + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
-      temp2 := rshift (temp2, 5);
-      temp2 := Clip1(temp2);
-      temp := temp+temp2+1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);
-    end
-    if xFrac = 1  and yFrac = 1 then 
-      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y]+ 20 * TabPix[2 + o_x][2 + o_y];
-      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-      temp2 := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
-      temp2 := temp2 + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
-      temp2 := rshift (temp2, 5);        
-      temp2 := Clip1(temp2);
-      temp := temp+temp2+1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);    
-    end
-    if xFrac = 1  and yFrac = 3 then 
-      temp := TabPix[o_x][3 + o_y] -5 * TabPix[1 + o_x][3 + o_y] + 20 * TabPix[2 + o_x][3 + o_y];
-      temp := temp + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[4 + o_x][3 + o_y] + TabPix[5 + o_x][3 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-      temp2 := TabPix[2 + o_x][o_y] -5 * TabPix[2 + o_x][1 + o_y]+ 20 * TabPix[2 + o_x][2 + o_y];
-      temp2 := temp2 + 20 * TabPix[2 + o_x][3 + o_y] -5* TabPix[2 + o_x][4 + o_y] + TabPix[2 + o_x][5 + o_y] + 16;
-      temp2 := rshift (temp2, 5);        
-      temp2 := Clip1(temp2);
-      temp := temp+temp2+1;
-      temp := rshift ( temp, 1);  
-      temp := Clip1(temp);
-    end
-   // xFrac = 3
-   if xFrac = 3  and yFrac = 0 then 
-      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y]+ 20 * TabPix[2 + o_x][2 + o_y];
-      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-      temp := temp + TabPix[3 + o_x][2 + o_y] + 1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);
-    end  
-    if xFrac = 3  and yFrac = 2 then 
-      n :=0;
-      while n < 6 
-      do
-        half_pel[n] := TabPix[o_x][n + o_y] -5 * TabPix[1 + o_x][n + o_y] + 20 * TabPix[2 + o_x][n + o_y];
-        half_pel[n] := half_pel[n] + 20 * TabPix[3 + o_x][n + o_y] -5* TabPix[4 + o_x][n + o_y] + TabPix[5 + o_x][n + o_y];
-        n := n+1;
-      end
-      temp :=half_pel[0]-5*half_pel[1]+20*half_pel[2]+20*half_pel[3]-5*half_pel[4]+half_pel[5]+512;  
-      temp := rshift (temp, 10);
-      temp := Clip1(temp);
-      temp2 := TabPix[3 + o_x][o_y] -5 * TabPix[3 + o_x][1 + o_y]+ 20 * TabPix[3 + o_x][2 + o_y];
-      temp2 := temp2 + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[3 + o_x][4 + o_y] + TabPix[3 + o_x][5 + o_y] + 16;
-      temp2 := rshift (temp2, 5);
-      temp2 := Clip1(temp2);
-      temp := temp+temp2+1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);
-    end
-    if xFrac = 3  and yFrac = 1 then 
-      temp := TabPix[o_x][2 + o_y] -5 * TabPix[1 + o_x][2 + o_y] + 20 * TabPix[2 + o_x][2 + o_y];
-      temp := temp + 20 * TabPix[3 + o_x][2 + o_y] -5* TabPix[4 + o_x][2 + o_y] + TabPix[5 + o_x][2 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-      temp2 := TabPix[3 + o_x][o_y] -5 * TabPix[3 + o_x][1 + o_y] + 20 * TabPix[3 + o_x][2 + o_y];
-      temp2 := temp2 + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[3 + o_x][4 + o_y] + TabPix[3 + o_x][5 + o_y] + 16;
-      temp2 := rshift (temp2, 5);        
-      temp2 := Clip1(temp2);
-      temp := temp+temp2+1;
-      temp := rshift ( temp, 1);      
-      temp := Clip1(temp);
-    end
-    if xFrac = 3  and yFrac = 3 then 
-      temp := TabPix[o_x][3 + o_y] -5 * TabPix[1 + o_x][3 + o_y]+ 20 * TabPix[2 + o_x][3 + o_y];
-      temp := temp + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[4 + o_x][3 + o_y] + TabPix[5 + o_x][3 + o_y] + 16;
-      temp := rshift ( temp, 5);
-      temp := Clip1(temp);
-      temp2 := TabPix[3 + o_x][o_y] -5 * TabPix[3 + o_x][1 + o_y]+ 20 * TabPix[3 + o_x][2 + o_y];
-      temp2 := temp2 + 20 * TabPix[3 + o_x][3 + o_y] -5* TabPix[3 + o_x][4 + o_y] + TabPix[3 + o_x][5 + o_y] + 16;
-      temp2 := rshift (temp2, 5);        
-      temp2 := Clip1(temp2);
-      temp := temp+temp2+1;
-      temp := rshift ( temp, 1);
-      temp := Clip1(temp);
-    end
-  end
+			if xFrac = 2  and yFrac = 0 then
+				temp := SixTapFilter( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                      TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
+				temp := rshift ( temp + 16, 5);
+				temp := Clip1(temp);
+			end
+			if xFrac = 2  and yFrac = 2 then 
+				foreach int n in 0 .. 5
+				do
+					half_pel[n] := SixTapFilter( TabPix[o_x][n + o_y]     , TabPix[1 + o_x][n + o_y] , TabPix[2 + o_x][n + o_y],
+					                             TabPix[3 + o_x][n + o_y] , TabPix[4 + o_x][n + o_y] , TabPix[5 + o_x][n + o_y]);
+				end
+				temp := SixTapFilter(half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+				temp := rshift ( temp + 512, 10);
+				temp := Clip1(temp);
+			end
+			if xFrac = 2  and yFrac = 1 then 
+				foreach int n in 0 .. 5
+				do
+					half_pel[n] := SixTapFilter( TabPix[o_x][n + o_y]     , TabPix[1 + o_x][n + o_y] , TabPix[2 + o_x][n + o_y] ,
+					                             TabPix[3 + o_x][n + o_y] , TabPix[4 + o_x][n + o_y] , TabPix[5 + o_x][n + o_y]);
+				end
+				temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+				temp  := rshift ( temp + 512 , 10);
+				temp  := Clip1(temp);
+				temp2 := SixTapFilter( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                       TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
+				temp2 := rshift ( temp2 + 16, 5);        
+				temp := Clip1(temp);
+				temp := temp+temp2+1;
+				temp := rshift ( temp, 1);
+				temp := Clip1(temp);   
+			end
+			if xFrac = 2  and yFrac = 3 then 
+				foreach int n in 0 .. 5
+				do
+					half_pel[n] := SixTapFilter( TabPix[o_x][n + o_y]     , TabPix[1 + o_x][n + o_y] , TabPix[2 + o_x][n + o_y],
+					                             TabPix[3 + o_x][n + o_y] , TabPix[4 + o_x][n + o_y] , TabPix[5 + o_x][n + o_y]);
+				end
+				temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+				temp  := rshift ( temp + 512, 10);
+				temp  := Clip1(temp);
+				temp2 := SixTapFilter( TabPix[o_x][3 + o_y]     , TabPix[1 + o_x][3 + o_y] , TabPix[2 + o_x][3 + o_y] ,
+				                       TabPix[3 + o_x][3 + o_y] , TabPix[4 + o_x][3 + o_y] , TabPix[5 + o_x][3 + o_y]);
+				temp2 := rshift ( temp2 + 16, 5);        
+				temp  := Clip1(temp);
+				temp  := temp+temp2+1;
+				temp  := rshift ( temp, 1);
+				temp  := Clip1(temp);
+			end
+			if xFrac = 1  and yFrac = 0 then
+				temp := SixTapFilter( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                      TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
+				temp := rshift ( temp + 16, 5);
+				temp := Clip1(temp);
+				temp := temp + TabPix[2 + o_x][2 + o_y] +1;
+				temp := rshift ( temp, 1);
+				temp := Clip1(temp);
+			end  
+			if xFrac = 1  and yFrac = 2 then
+				foreach int n in 0 .. 5
+				do
+					half_pel[n] := SixTapFilter( TabPix[o_x][n + o_y]     , TabPix[1 + o_x][n + o_y] , TabPix[2 + o_x][n + o_y],
+					                             TabPix[3 + o_x][n + o_y] , TabPix[4 + o_x][n + o_y] , TabPix[5 + o_x][n + o_y]);
+				end
+				temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+				temp  := rshift (temp + 512, 10);
+				temp  := Clip1(temp);
+				temp2 := SixTapFilter( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                       TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
+				temp2 := rshift (temp2 + 16, 5);
+				temp2 := Clip1(temp2);
+				temp  := temp+temp2+1;
+				temp  := rshift ( temp, 1);
+				temp  := Clip1(temp);
+			end
+			if xFrac = 1  and yFrac = 1 then
+				temp  := SixTapFilter( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                      TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
+				temp  := rshift ( temp + 16, 5);
+				temp  := Clip1(temp);
+				temp2 := SixTapFilter( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                       TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
+				temp2 := rshift (temp2 + 16, 5);        
+				temp2 := Clip1(temp2);
+				temp  := temp+temp2+1;
+				temp  := rshift ( temp, 1);
+				temp  := Clip1(temp);    
+			end
+			if xFrac = 1  and yFrac = 3 then
+				temp := SixTapFilter( TabPix[o_x][3 + o_y]     , TabPix[1 + o_x][3 + o_y] , TabPix[2 + o_x][3 + o_y],
+				                      TabPix[3 + o_x][3 + o_y] , TabPix[4 + o_x][3 + o_y] , TabPix[5 + o_x][3 + o_y]);
+				temp  := rshift ( temp + 16, 5);
+				temp  := Clip1(temp);
+				temp2 := SixTapFilter( TabPix[2 + o_x][o_y]     , TabPix[2 + o_x][1 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                       TabPix[2 + o_x][3 + o_y] , TabPix[2 + o_x][4 + o_y] , TabPix[2 + o_x][5 + o_y]);
+				temp2 := rshift (temp2 + 16, 5);        
+				temp2 := Clip1(temp2);
+				temp  := temp+temp2+1;
+				temp  := rshift ( temp, 1);  
+				temp  := Clip1(temp);
+			end
+			if xFrac = 3  and yFrac = 0 then
+				temp := SixTapFilter( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y] ,
+				                      TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
+				temp := rshift ( temp + 16, 5);
+				temp := Clip1(temp);
+				temp := temp + TabPix[3 + o_x][2 + o_y] + 1;
+				temp := rshift ( temp, 1);
+				temp := Clip1(temp);
+			end  
+			if xFrac = 3  and yFrac = 2 then
+				foreach int n in 0 .. 5
+				do
+					half_pel[n] := SixTapFilter( TabPix[o_x][n + o_y]     , TabPix[1 + o_x][n + o_y] , TabPix[2 + o_x][n + o_y],
+					                             TabPix[3 + o_x][n + o_y] , TabPix[4 + o_x][n + o_y] , TabPix[5 + o_x][n + o_y]);
+				end
+				temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
+				temp  := rshift (temp+512, 10);
+				temp  := Clip1(temp);
+				temp2 := SixTapFilter( TabPix[3 + o_x][o_y]     , TabPix[3 + o_x][1 + o_y] , TabPix[3 + o_x][2 + o_y] ,
+				                       TabPix[3 + o_x][3 + o_y] , TabPix[3 + o_x][4 + o_y] , TabPix[3 + o_x][5 + o_y]);
+				temp2 := rshift (temp2 + 16, 5);
+				temp2 := Clip1(temp2);
+				temp  := temp+temp2+1;
+				temp  := rshift ( temp, 1);
+				temp  := Clip1(temp);
+			end
+			if xFrac = 3  and yFrac = 1 then
+				temp := SixTapFilter( TabPix[o_x][2 + o_y]     , TabPix[1 + o_x][2 + o_y] , TabPix[2 + o_x][2 + o_y],
+				                      TabPix[3 + o_x][2 + o_y] , TabPix[4 + o_x][2 + o_y] , TabPix[5 + o_x][2 + o_y]);
+				temp  := rshift ( temp+16, 5);
+				temp  := Clip1(temp);
+				temp2 := SixTapFilter( TabPix[3 + o_x][o_y]     , TabPix[3 + o_x][1 + o_y] , TabPix[3 + o_x][2 + o_y],
+				                       TabPix[3 + o_x][3 + o_y] , TabPix[3 + o_x][4 + o_y] , TabPix[3 + o_x][5 + o_y]);
+				temp2 := rshift (temp2 + 16, 5);        
+				temp2 := Clip1(temp2);
+				temp  := temp+temp2+1;
+				temp  := rshift ( temp, 1);      
+				temp  := Clip1(temp);
+			end
+			if xFrac = 3  and yFrac = 3 then
+				temp  := SixTapFilter( TabPix[o_x][3 + o_y]     , TabPix[1 + o_x][3 + o_y] , TabPix[2 + o_x][3 + o_y],
+				                      TabPix[3 + o_x][3 + o_y] , TabPix[4 + o_x][3 + o_y] , TabPix[5 + o_x][3 + o_y]);
+				temp  := rshift ( temp + 16, 5);
+				temp  := Clip1(temp);
+				temp2 := SixTapFilter( TabPix[3 + o_x][o_y]     , TabPix[3 + o_x][1 + o_y] , TabPix[3 + o_x][2 + o_y] ,
+				                       TabPix[3 + o_x][3 + o_y] , TabPix[3 + o_x][4 + o_y] , TabPix[3 + o_x][5 + o_y]);
+				temp2 := rshift (temp2+16, 5);
+				temp2 := Clip1(temp2);
+				temp  := temp+temp2+1;
+				temp  := rshift ( temp, 1);
+				temp  := Clip1(temp);
+			end
+		end
 
 	GetMv: action Mv:[ Mv_x , Mv_y ] ==>
 	do
@@ -271,7 +259,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	GetPixVal.Launch: action
 			RD:[d]
 				==>
-		guard 
+		guard
 			y < (height+5)
 		do
 			TabPix[x][y] := d;
