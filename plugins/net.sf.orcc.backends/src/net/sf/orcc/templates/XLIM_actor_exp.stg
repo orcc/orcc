@@ -194,15 +194,9 @@ endif$
 
 
 Read(op) ::= <<
-$if(op.target)$
 <operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
-	<port dir="out" source="$op.target$" typeName="$op.target$_typedef"/>
+	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>
-$else$
-<operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
-	<port dir="out" source="$action.name$_$op.port.name$" typeName="$op.port.type$" size="$if(op.port.type.bool)$1$else$$op.port.type.size$$endif$"/>
-</operation>
-$endif$
 >>
 
 Write(op) ::= <<
