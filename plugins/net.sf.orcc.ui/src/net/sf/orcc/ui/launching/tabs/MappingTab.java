@@ -59,13 +59,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.SWTError;
-import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
@@ -298,46 +297,13 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	}
 
 	private void createLabel(Composite composite) {
-		String html = "<html>\n"
-				+ "<head>\n"
-				+ "<title>Mapping</title>\n"
-				+ "<style type=\"text/css\">\n"
-				+ "body {\n"
-				+ "font-family: Verdana;\n"
-				+ "font-size: small;\n"
-				+ "}\n"
-				+ "</style>\n"
-				+ "</head>\n\n"
+		String html = "";
 
-				+ "<body>\n\n"
+		Label browser = new Label(composite, SWT.NONE);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		browser.setLayoutData(data);
 
-				+ "<p>Warning: the mapping feature is experimental and likely to evolve. "
-				+ "Furthermore, the name of the components is implementation-specific, "
-				+ "and is likely to change in the future."
-				+ "</p>\n\n"
-
-				+ "<p>In the meantime, you can use:</p>\n"
-				+ "<ul>\n"
-				+ "<li>with the C back-end: c&lt;x&gt; to indicate core x with x an integer &gt;= 0, like c0, c1, and so on. "
-				+ "If there is only one core set, usual single-threaded code will be generated. "
-				+ "At this time the mapping is not used by the C back-end.</li>\n"
-				+ "</ul>\n\n"
-
-				+ "<p>Setting the component on a network sets the component of all its sub-networks.</p>\n"
-
-				+ "</body>\n" + "</html>\n";
-
-		try {
-			Browser browser = new Browser(composite, SWT.NONE);
-			GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-			browser.setLayoutData(data);
-
-			if (!browser.setText(html, true)) {
-				System.err.println("browser could not render HTML");
-			}
-		} catch (SWTError e) {
-			e.printStackTrace();
-		}
+		browser.setText(html);
 	}
 
 	/**
