@@ -114,5 +114,5 @@ ListExpr(constant) ::= <<
 >>
 
 StringExpr(constant) ::= <<
-"$constant$"
+$constant$
 >>

@@ -517,7 +517,7 @@ public abstract class AbstractSimulator implements Simulator {
 					ActorTransformation[] transformations = {
 							new DeadGlobalElimination(),
 							new DeadCodeElimination(),
-							new DeadVariableRemoval() };
+							new DeadVariableRemoval(false) };
 					for (ActorTransformation transformation : transformations) {
 						transformation.transform(actorIR);
 					}

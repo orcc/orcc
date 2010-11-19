@@ -55,6 +55,11 @@ import net.sf.orcc.util.OrderedMap;
 public class DeadVariableRemoval extends AbstractActorTransformation {
 
 	private boolean changed;
+	private boolean keepTokenSwallowerVariable;
+
+	public DeadVariableRemoval(boolean keepTokenSwallowerVariable) {
+		this.keepTokenSwallowerVariable = keepTokenSwallowerVariable;
+	}
 
 	@Override
 	public void visit(Assign assign) {
@@ -171,7 +176,8 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	@Override
 	public void visit(Read read) {
 		Variable variable = read.getTarget();
-		if (variable != null && !variable.isUsed()) {
+		if (variable != null && !variable.isUsed()
+				&& !keepTokenSwallowerVariable) {
 			// clean up target
 			read.setTarget(null);
 

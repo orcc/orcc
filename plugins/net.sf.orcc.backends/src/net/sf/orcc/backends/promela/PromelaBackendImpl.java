@@ -62,15 +62,13 @@ public class PromelaBackendImpl extends AbstractBackend {
 	}
 
 	private STPrinter printer;
-	
+
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { 
-				new DeadCodeElimination(),
-				new DeadVariableRemoval(),
-				new GuardsExtractor(guards) };
+		ActorTransformation[] transformations = { new DeadCodeElimination(),
+				new DeadVariableRemoval(false), new GuardsExtractor(guards) };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -93,7 +91,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 		printer.setOptions(getAttributes()); // need to check what this one does
 		printer.getOptions().put("guards", guards);
-		
+
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printActors(actors);

@@ -136,7 +136,7 @@ public class CppBackendImpl extends AbstractBackend {
 		}
 
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new DeadCodeElimination(), new DeadVariableRemoval(false),
 				new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
@@ -179,7 +179,7 @@ public class CppBackendImpl extends AbstractBackend {
 		partition = getAttribute("net.sf.orcc.backends.partition", false);
 
 		List<Actor> actors = network.getActors();
-		
+
 		printHeader = true;
 		printActors(actors);
 

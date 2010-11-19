@@ -72,13 +72,14 @@ public class JavaBackendImpl extends AbstractBackend {
 	public JavaBackendImpl() {
 		transformations = new HashMap<String, String>();
 		transformations.put("initialize", "initialize_");
-		transformations.put("isSchedulable_initialize", "isSchedulable_initialize_");
+		transformations.put("isSchedulable_initialize",
+				"isSchedulable_initialize_");
 	}
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new DeadCodeElimination(), new DeadVariableRemoval(false),
 				new RenameTransformation(this.transformations),
 				new PhiRemoval(), new MoveReadsWritesTransformation() };
 

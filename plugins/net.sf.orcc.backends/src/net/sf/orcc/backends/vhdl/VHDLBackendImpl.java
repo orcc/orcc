@@ -95,7 +95,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(),
+				new DeadCodeElimination(), new DeadVariableRemoval(false),
 				new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {

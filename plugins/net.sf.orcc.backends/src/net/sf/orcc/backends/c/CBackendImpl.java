@@ -149,7 +149,7 @@ public class CBackendImpl extends AbstractBackend {
 
 		ActorTransformation[] transformations = { new TypeSizeTransformation(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new DeadVariableRemoval(),
+				new DeadVariableRemoval(false),
 				new RenameTransformation(this.transformations),
 				new PhiRemoval(), new MoveReadsWritesTransformation() };
 
