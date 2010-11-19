@@ -1,0 +1,39 @@
+printActor(id, actor) ::= <<
+$if (!actor.system)
+$$id$.c
+$endif$
+>>
+
+printInstance(instance) ::= <<
+$if (instance.actor)
+$$printActor(id=instance.id, actor=instance.actor)$$
+endif$
+>>
+
+CMakeLists(network) ::= <<
+# Generated from $network.name$
+
+cmake_minimum_required (VERSION 2.8)
+project ($network.name$)
+
+# Common packages required
+find_library(orcc_LIBRARY orcc)
+find_file(orcc_INCLUDE_DIR orcc)
+
+find_package(SDL REQUIRED)
+find_package(LibXml2)
+
+# Common include directories
+include_directories(\${actors-rts_INCLUDE_DIR} \${SDL_INCLUDE_DIR})
+
+set(filenames
+\${actors-rts_INCLUDE_DIR}/display-sdl.c
+$network.instances: printInstance()$
+$network.name$.c
+)
+
+add_executable($network.name$ \${filenames})
+
+target_link_libraries($network.name$ \${actors-rts_LIBRARY} \${SDL_LIBRARY} \${LIBXML2_LIBRARIES})
+
+>>

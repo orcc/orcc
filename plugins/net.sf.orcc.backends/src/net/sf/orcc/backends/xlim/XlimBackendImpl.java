@@ -168,6 +168,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 			printer.printNetwork(outputName, network, false, fifoSize);
 
+			new XlimCMakePrinter().printCMake(path, network);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
