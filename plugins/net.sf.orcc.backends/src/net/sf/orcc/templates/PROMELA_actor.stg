@@ -82,10 +82,10 @@ $endif$
 newState() ::= << 
 :: state == $fsm_trans.SourceState$
 $if (rest(fsm_trans.NextStateInfo))$
-	/*do peeks here!*/
+	$options.peeks.(first(fsm_trans.NextStateInfo).action): { p | chan_$p.port$?<$p.port$>;}$
 	if
 	$fsm_trans.NextStateInfo: {
-			fsm_nsi| 
+			fsm_nsi|
 :: $fsm_nsi.action: schedulerFSM(); separator="\n"$ }$
 	fi
 $else$
@@ -164,6 +164,7 @@ $pattern.keys: {key | && nempty($key$)} $
 outputChannelCheck(pattern) ::= <<
 $pattern.keys: {key | && nfull($key$)} $
 >>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Process declaration

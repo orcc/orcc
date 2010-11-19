@@ -60,15 +60,18 @@ public class GuardsExtractor extends AbstractActorTransformation {
 	private Action currAction;
 
 	private Map<Action, List<Expression>> guards;
+	
+	private Map<Action, List<Peek>> peeks;
 
 	private List<Expression> list;
 
 	private List<Load> loads;
 
-	private List<Peek> peeks;
+	private List<Peek> peekList;
 
-	public GuardsExtractor(Map<Action, List<Expression>> guards) {
+	public GuardsExtractor(Map<Action, List<Expression>> guards, Map<Action, List<Peek>> peeks) {
 		this.guards = guards;
+		this.peeks = peeks;
 	}
 
 	// takes the guard from the previous action and negates it and adds it to
@@ -129,8 +132,9 @@ public class GuardsExtractor extends AbstractActorTransformation {
 			currAction = action;
 			list = new ArrayList<Expression>();
 			loads = new ArrayList<Load>();
-			peeks = new ArrayList<Peek>(); // this is not used at the moment
+			peekList = new ArrayList<Peek>();
 			guards.put(currAction, list);
+			peeks.put(currAction, peekList);
 			visit(action.getScheduler());
 			removeLoads();
 		}
@@ -170,24 +174,24 @@ public class GuardsExtractor extends AbstractActorTransformation {
 			}
 		}
 	}
+	
 
+	@Override
+	public void visit(Load load) { 
+		loads.add(load);
+	}
+
+	@Override
+	public void visit(Peek peek) {
+		peekList.add(peek); // we need the peek instructions "outside" the guards, some guards depend on peeks
+	}
+	
 	@Override
 	public void visit(Assign assign) {
 		// we should also consider other cases but this is enough for now
 		if (!assign.getValue().isBooleanExpr()) {
 			list.add(assign.getValue());
 		}
-	}
-
-	@Override
-	public void visit(Load load) {
-		loads.add(load);
-	}
-
-	@Override
-	public void visit(Peek peek) {
-		peeks.add(peek); // we need the peek instructions "outside" the guards,
-							// some guards depend on peeks
 	}
 
 }

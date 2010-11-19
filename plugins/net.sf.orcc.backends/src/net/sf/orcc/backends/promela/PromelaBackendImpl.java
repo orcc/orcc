@@ -41,6 +41,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.network.Network;
@@ -64,11 +65,14 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
-
+	private Map<Action, List<Peek>>       peeks  = new HashMap<Action, List<Peek>>();
+	 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadCodeElimination(),
-				new DeadVariableRemoval(false), new GuardsExtractor(guards) };
+		ActorTransformation[] transformations = { 
+				new DeadCodeElimination(),
+				new DeadVariableRemoval(false),
+				new GuardsExtractor(guards, peeks) };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -91,7 +95,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 		printer.setOptions(getAttributes()); // need to check what this one does
 		printer.getOptions().put("guards", guards);
-
+		printer.getOptions().put("peeks", peeks);
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printActors(actors);
