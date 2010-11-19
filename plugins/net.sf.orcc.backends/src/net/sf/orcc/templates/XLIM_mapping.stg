@@ -1,0 +1,30 @@
+
+mapping(network, mapping) ::= <<
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+  <Partitioning>
+    $mapping.keys : {processorId | $core(id=processorId, instances=mapping.(processorId))$}; separator="\n"$
+  
+    $network.connections : {connection | $connection(connection=connection,src=network.sourceMap.(connection).instance,dst=network.targetMap.(connection).instance)$}; separator="\n"$
+  </Partitioning>
+  
+  <Scheduling type="RoundRobin"/>
+</Configuration>
+
+>>
+
+core(id, instances) ::= <<
+<Partition id="$id$">
+  $instances : {instance | <Instance actor-id="$instance.id$"/>}; separator="\n"$
+</Partition>
+>>
+
+
+connection(connection,src,dst) ::= <<
+<Connection src="$src.id$" src-port="$connection.source$" dst="$dst.id$" dst-port="$connection.target$" size="$connection.size$"/>
+>>
+
+
+
+

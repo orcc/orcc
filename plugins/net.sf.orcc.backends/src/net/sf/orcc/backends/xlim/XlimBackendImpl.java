@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
@@ -169,6 +170,11 @@ public class XlimBackendImpl extends AbstractBackend {
 			printer.printNetwork(outputName, network, false, fifoSize);
 
 			new XlimCMakePrinter().printCMake(path, network);
+			
+			Map<String,String> mapping = getAttribute(OrccLaunchConstants.MAPPING, new HashMap<String,String>());
+			if(!mapping.isEmpty()){
+				new XlimMappingPrinter().printMapping(path, network, mapping);
+			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
