@@ -172,10 +172,10 @@ Increment(increment) ::= <<
 
 Peek(peek) ::= <<
 <operation kind="\$literal_Integer" value="0">
-	<port dir="out" size="32" source="peek_$instance.id$_$procedure$_0" typeName="int"/>
+	<port dir="out" size="32" source="peek_$instance.id$_$procedure$_0_$peek.target$" typeName="int"/>
 </operation>
 <operation kind="pinPeek" portName="$peek.port.name$" removable="no">
-	<port dir="in" source="peek_$instance.id$_$procedure$_0"/>
+	<port dir="in" source="peek_$instance.id$_$procedure$_0_$peek.target$"/>
 	$port(dir="out", type=peek.port.type, source=peek.target)$
 </operation>
 >>
