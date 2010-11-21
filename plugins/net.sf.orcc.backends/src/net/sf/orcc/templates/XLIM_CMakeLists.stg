@@ -26,7 +26,7 @@ find_package(LibXml2)
 include_directories(\${actors-rts_DIR} \${SDL_INCLUDE_DIR})
 
 set(filenames
-\${actors-rts_INCLUDE_DIR}/display-sdl.c
+\${actors-rts_DIR}/display-sdl.c
 $network.instances: printInstance()$
 $network.name$.c
 )
