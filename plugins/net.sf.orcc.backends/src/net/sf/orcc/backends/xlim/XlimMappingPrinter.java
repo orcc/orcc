@@ -78,10 +78,11 @@ public class XlimMappingPrinter {
 	 *             if there is an I/O error
 	 */
 	public void printMapping(String path, Network network,
-			Map<String, String> mapping) throws IOException {
+			Map<String, String> mapping, int fifoSize) throws IOException {
 		ST template = group.getInstanceOf("mapping");
 		template.add("network", network);
 		template.add("mapping", computeMap(network, mapping));
+		template.add("fifoSize", fifoSize);
 
 		String fileName = path + File.separator + network.getName() + ".xcf";
 

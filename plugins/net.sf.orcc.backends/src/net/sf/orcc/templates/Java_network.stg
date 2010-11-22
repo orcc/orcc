@@ -16,7 +16,7 @@ actor_$target.id$.setFifo("$targetPort.name$", fifo_$count$);
 >>
 
 allocateFifoType(type, size, count) ::= <<
-private Fifo_$type$ fifo_$count$ = new Fifo_$type$($size$);
+private Fifo_$type$ fifo_$count$ = new Fifo_$type$($if(size)$$size$$else$SIZE$endif$);
 >>
 
 printInitialize(instance) ::= <<

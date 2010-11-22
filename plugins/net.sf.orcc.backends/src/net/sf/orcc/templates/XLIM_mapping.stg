@@ -1,5 +1,5 @@
 
-mapping(network, mapping) ::= <<
+mapping(network, mapping, fifoSize) ::= <<
 
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
@@ -22,7 +22,7 @@ core(id, instances) ::= <<
 
 
 connection(connection,src,dst) ::= <<
-<Connection src="$src.id$" src-port="$connection.source$" dst="$dst.id$" dst-port="$connection.target$" size="$connection.size$"/>
+<Connection src="$src.id$" src-port="$connection.source$" dst="$dst.id$" dst-port="$connection.target$" size="$if(connection.size)$$connection.size$$else$$fifoSize$$endif$"/>
 >>
 
 

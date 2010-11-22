@@ -60,6 +60,7 @@ import org.jgrapht.graph.DirectedMultigraph;
  * templates can walk through the graph of the network.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class Network {
@@ -130,6 +131,10 @@ public class Network {
 
 	private OrderedMap<String, GlobalVariable> variables;
 
+	private Map<Instance, Map<Port, Integer>> numberOfReadersMap;
+
+	private Map<Instance, Map<Port, Integer>> portToFifoSizeMap;
+
 	/**
 	 * Creates a new network.
 	 */
@@ -168,6 +173,38 @@ public class Network {
 						connections);
 				outgoingMap.put(vertex.getInstance(), outgoing);
 			}
+		}
+	}
+
+	private void computePortInformationMaps() {
+		numberOfReadersMap = new HashMap<Instance, Map<Port, Integer>>();
+		for (Instance instance : outgoingMap.keySet()) {
+			Map<Port, Integer> portToNumberOfReadersMap = new HashMap<Port, Integer>();
+			for (Connection connection : outgoingMap.get(instance)) {
+				Port srcPort = connection.getSource();
+				if (portToNumberOfReadersMap.get(srcPort) == null) {
+					portToNumberOfReadersMap.put(srcPort, 1);
+				} else {
+					int n = portToNumberOfReadersMap.get(srcPort);
+					n++;
+					portToNumberOfReadersMap.remove(srcPort);
+					portToNumberOfReadersMap.put(srcPort, n);
+				}
+			}
+			numberOfReadersMap.put(instance, portToNumberOfReadersMap);
+		}
+
+		portToFifoSizeMap = new HashMap<Instance, Map<Port, Integer>>();
+		for (Instance instance : getIncomingMap().keySet()) {
+			Map<Port, Integer> portToFifoSize = new HashMap<Port, Integer>();
+			for (Connection connection : getIncomingMap().get(instance)) {
+				Port trgtPort = connection.getTarget();
+				Integer fifoSize = connection.getSize();
+				if (fifoSize != null) {
+					portToFifoSize.put(trgtPort, fifoSize);
+				}
+			}
+			portToFifoSizeMap.put(instance, portToFifoSize);
 		}
 	}
 
@@ -239,7 +276,10 @@ public class Network {
 		}
 
 		computeIncomingOutgoingMaps();
+
 		computePredecessorsSuccessorsMaps();
+
+		computePortInformationMaps();
 	}
 
 	/**
@@ -399,6 +439,15 @@ public class Network {
 	}
 
 	/**
+	 * Returns a map that associates each output port to the number of readers.
+	 * 
+	 * @return a map that associates each output port to the number of readers
+	 */
+	public Map<Instance, Map<Port, Integer>> getNumberOfReadersMap() {
+		return numberOfReadersMap;
+	}
+
+	/**
 	 * Returns a map that associates each instance to the list of its outgoing
 	 * edges.
 	 * 
@@ -436,6 +485,17 @@ public class Network {
 	 */
 	public OrderedMap<String, GlobalVariable> getParameters() {
 		return parameters;
+	}
+
+	/**
+	 * Returns a map that associates each input port to the local specified size
+	 * of its FIFO.
+	 * 
+	 * @return a map that associates each input port to the local specified size
+	 *         of its FIFO
+	 */
+	public Map<Instance, Map<Port, Integer>> getPortToFifoSizeMap() {
+		return portToFifoSizeMap;
 	}
 
 	/**

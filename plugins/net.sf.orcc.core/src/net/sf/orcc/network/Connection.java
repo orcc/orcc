@@ -31,7 +31,6 @@ package net.sf.orcc.network;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
@@ -46,6 +45,7 @@ import net.sf.orcc.network.attributes.ValueAttribute;
  * number of attributes, that can be types or expressions.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class Connection implements IAttributeContainer {
@@ -142,15 +142,14 @@ public class Connection implements IAttributeContainer {
 	 * Returns the size of this connection.
 	 * 
 	 * @return the size of this connection
-	 * @throws OrccException
 	 */
-	public Object getSize() throws OrccException {
+	public Integer getSize() {
 		IAttribute attr = getAttribute(Connection.BUFFER_SIZE);
 		if (attr != null && attr.getType() == IAttribute.VALUE) {
 			Expression expr = ((IValueAttribute) attr).getValue();
 			return new ExpressionEvaluator().evaluateAsInteger(expr);
 		} else {
-			return "SIZE";
+			return null;
 		}
 	}
 

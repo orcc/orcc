@@ -62,7 +62,7 @@ $instances: declareBroadcast()$
 // allocates FIFOs
 
 allocateFifoType(type, size, count) ::= <<
-DECLARE_FIFO($type$, $size$, $count$)
+DECLARE_FIFO($type$, $if(size)$$size$$else$SIZE$endif$, $count$)
 >>
 
 doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
