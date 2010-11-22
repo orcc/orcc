@@ -206,7 +206,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			end
 		end
 
-
 	// Read data
 	read_data: action
 				==>
