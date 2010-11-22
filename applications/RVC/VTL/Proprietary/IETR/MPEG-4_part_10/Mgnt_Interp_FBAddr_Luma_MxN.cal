@@ -55,6 +55,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 	Mb_Type_NOK_and_IPCM: action
 			Mb_Type:[ mb_type ],
 			PicSizeInMb:[ c ],
+			PicWidthInMb :[pic_width],
 			CurrMbAddr:[ valCurrMbAddr ]
 				==>
 		guard
@@ -73,6 +74,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 	Mb_Type_NOK: action
 			Mb_Type     :[ mb_type ],
 			PicSizeInMb :[ c ],
+			PicWidthInMb :[pic_width],
 			CurrMbAddr  :[ valCurrMbAddr ]
 				==>
 		guard
@@ -179,17 +181,10 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 			o_y := y + y_index - 2;
 		end
 
-	RA_not_border: action
+	Send_ReadAddr: action
 				==>
 			PocToRead :[ poc_to_read ],
 			ReadAddr :[ o_x, o_y , width + 5 , height + 5 ]
-		guard
-			o_y < (y + y_index + height + 3)
-		end
-
-	done: action ==>
-		guard
-			o_y = (y + y_index + height + 3)
 		end
 
 	MB_done: action ==>
@@ -224,8 +219,7 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 
 		get_mv_send_frac ( get_mv ) --> address;
 
-		address ( RA_not_border ) --> MB_done;
-		address ( done ) --> MB_done;
+		address ( Send_ReadAddr ) --> MB_done;
 
 		MB_done ( MB_done ) --> get_pic_done;
 		MB_done ( MB_Ndone ) --> get_pos;
@@ -233,7 +227,6 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 
 	priority
 		PIC_done      > MB_done > MB_Ndone;
-		RA_not_border > done;
 		PIC_Ndone     > PIC_done;
 	end
 

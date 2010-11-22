@@ -66,13 +66,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="LOCATION">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="11"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MV">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -180,6 +173,13 @@
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ReadAddress">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
@@ -405,25 +405,18 @@
     <Connection dst="Intra_16x16" dst-port="Pic_WidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Intra_16x16" dst-port="CurrMb_Addr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
-    <Connection dst="Inter" dst-port="PicWidthInMb"
-        src="DemuxParserInfos" src-port="PicWidthInMbInter"/>
     <Connection dst="Inter" dst-port="Coef_ACR" src="DemuxParserInfos" src-port="Coef_ACR_Inter"/>
-    <Connection dst="Inter" dst-port="currMBaddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Inter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Inter" dst-port="RD_L" src="Buffer_inter" src-port="RD"/>
-    <Connection dst="Inter" dst-port="LOCATION" src="" src-port="LOCATION"/>
     <Connection dst="Inter" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="Inter" dst-port="PartSZ" src="" src-port="PartSZ"/>
     <Connection dst="Inter" dst-port="MbPartHeigth" src="" src-port="MbPartHeigth"/>
     <Connection dst="Inter" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
     <Connection dst="Inter" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
     <Connection dst="Select" dst-port="X2" src="Inter" src-port="MB4x4Pred_L"/>
-    <Connection dst="Inter" dst-port="PocToRead_i" src="" src-port="PocToRead"/>
-    <Connection dst="Buffer_inter" dst-port="POCtoRead" src="Inter" src-port="PocToRead_o"/>
-    <Connection dst="Inter" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Intra_4x4" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Intra_16x16" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
-    <Connection dst="Buffer_inter" dst-port="ReadAddress" src="Inter" src-port="ReadAddr_L"/>
+    <Connection dst="Buffer_inter" dst-port="POCtoRead" src="" src-port="PocToRead"/>
+    <Connection dst="Buffer_inter" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
 </XDF>

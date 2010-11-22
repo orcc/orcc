@@ -190,7 +190,6 @@
     <Connection dst="Decoding_Y" dst-port="MbPartIdx" src="FUN_Parser" src-port="MbPartIdx"/>
     <Connection dst="Decoding_Y" dst-port="PicSizeInMb" src="FUN_Parser" src-port="PicSizeInMb"/>
     <Connection dst="Decoding_Y" dst-port="MV" src="FUN_Parser" src-port="MV"/>
-    <Connection dst="Decoding_Y" dst-port="LOCATION" src="FUN_Parser" src-port="LOCATION"/>
     <Connection dst="Decode_U" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
     <Connection dst="Decode_U" dst-port="PicWidthInMB" src="FUN_Parser" src-port="PicWidthInMb"/>
     <Connection dst="Decode_U" dst-port="FirstMbInSlice"
@@ -279,7 +278,8 @@
         src="FUN_Parser" src-port="PocToDisplay"/>
     <Connection dst="Decode_U" dst-port="PocToDisplay" src="FUN_Parser" src-port="PocToDisplay"/>
     <Connection dst="Decode_V" dst-port="PocToDisplay" src="FUN_Parser" src-port="PocToDisplay"/>
-    <Connection dst="Decoding_Y" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead"/>
     <Connection dst="Decode_U" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead"/>
     <Connection dst="Decode_V" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead"/>
+    <Connection dst="Decoding_Y" dst-port="ReadAddress" src="FUN_Parser" src-port="ReadAddress_l"/>
+    <Connection dst="Decoding_Y" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead_l"/>
 </XDF>

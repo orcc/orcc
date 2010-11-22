@@ -101,13 +101,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="LOCATION">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="11"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="POC">
         <Type name="uint"/>
     </Port>
@@ -194,6 +187,13 @@
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="ReadAddress">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
@@ -298,7 +298,6 @@
     <Connection dst="TEX_L" dst-port="Coef_ACR" src="RES_L" src-port="CoefACR_L"/>
     <Connection dst="" dst-port="Display_L" src="TEX_L" src-port="Display_L"/>
     <Connection dst="TEX_L" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="TEX_L" dst-port="LOCATION" src="" src-port="LOCATION"/>
     <Connection dst="TEX_L" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="TEX_L" dst-port="MbPartHeigth" src="" src-port="MbPartHeigth"/>
     <Connection dst="TEX_L" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
@@ -322,4 +321,5 @@
     <Connection dst="TEX_L" dst-port="PocToDisplay" src="" src-port="PocToDisplay"/>
     <Connection dst="TEX_L" dst-port="PocToRead" src="" src-port="PocToRead"/>
     <Connection dst="RES_L" dst-port="MbType" src="" src-port="MacroBlockType"/>
+    <Connection dst="TEX_L" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
 </XDF>

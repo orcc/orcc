@@ -10,7 +10,6 @@
       <vertex id="MbPartHeigth" x="234" y="1596"/>
       <vertex id="PicSizeInMb" x="250" y="294"/>
       <vertex id="Coef_ACR" x="57" y="1083"/>
-      <vertex id="LOCATION" x="233" y="1522"/>
       <vertex id="MV" x="251" y="1553"/>
       <vertex id="PartSZ" x="264" y="1730"/>
       <vertex id="POC" x="1214" y="1360"/>
@@ -28,7 +27,7 @@
       <vertex id="IsIDR" x="1204" y="1320"/>
       <vertex id="MacroBlockType" x="15" y="1441"/>
       <vertex id="TransformSize8x8" x="57" y="1277"/>
-      <vertex id="PocToRead" x="243" y="1784"/>
+      <vertex id="PocToRead" x="911" y="1639"/>
       <vertex id="Display_L" x="1556" y="1366"/>
       <vertex id="Buffer_inter" x="1392" y="1345"/>
       <vertex id="Select" x="1010" y="1015"/>
@@ -37,5 +36,6 @@
       <vertex id="Deblocking_Filter" x="1153" y="532"/>
       <vertex id="DemuxParserInfos" x="235" y="1039"/>
       <vertex id="Inter" x="669" y="1524"/>
+      <vertex id="ReadAddress" x="910" y="1692"/>
    </vertices>
 </layout>

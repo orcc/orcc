@@ -62,5 +62,8 @@
       <vertex id="RefIdxL0ToPoc" x="2304" y="955"/>
       <vertex id="RefIdxL1ToPoc" x="2306" y="1189"/>
       <vertex id="SelectRefIdx" x="2481" y="1088"/>
+      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="2522" y="1533"/>
+      <vertex id="PocToRead_l" x="2794" y="1546"/>
+      <vertex id="ReadAddress_l" x="2789" y="1579"/>
    </vertices>
 </layout>

@@ -15,14 +15,13 @@
       <vertex id="MbPartWidth" x="499" y="715"/>
       <vertex id="MV" x="512" y="518"/>
       <vertex id="PartSZ" x="166" y="135"/>
-      <vertex id="LOCATION" x="491" y="483"/>
       <vertex id="POC" x="166" y="426"/>
       <vertex id="CodedBlockPattern" x="440" y="128"/>
       <vertex id="LFDisable" x="491" y="441"/>
-      <vertex id="slice_alpha_c0_offset" x="458" y="1091"/>
-      <vertex id="slice_beta_offset" x="467" y="1126"/>
-      <vertex id="ref_idx_in" x="496" y="1055"/>
-      <vertex id="mv_in" x="509" y="1015"/>
+      <vertex id="slice_alpha_c0_offset" x="458" y="966"/>
+      <vertex id="slice_beta_offset" x="467" y="1001"/>
+      <vertex id="ref_idx_in" x="496" y="930"/>
+      <vertex id="mv_in" x="509" y="890"/>
       <vertex id="I_PCM_Y" x="486" y="363"/>
       <vertex id="ConstrainedIFlag" x="438" y="179"/>
       <vertex id="DelList" x="480" y="272"/>
@@ -34,5 +33,6 @@
       <vertex id="Display_L" x="949" y="353"/>
       <vertex id="TEX_L" x="694" y="364"/>
       <vertex id="RES_L" x="166" y="620"/>
+      <vertex id="ReadAddress" x="327" y="756"/>
    </vertices>
 </layout>

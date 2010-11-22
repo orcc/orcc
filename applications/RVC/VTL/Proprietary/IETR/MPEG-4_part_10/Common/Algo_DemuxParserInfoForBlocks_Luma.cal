@@ -42,8 +42,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 	uint(size=7)  PicWidthInMb_16x16,
 	uint(size=13) CurrMbAddr_16x16,
 
-	int(size=16)  Coef_ACR_Inter,
-	uint(size=7)  PicWidthInMbInter
+	int(size=16)  Coef_ACR_Inter
 		:
 
 
@@ -297,7 +296,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			PicWidthInMb      :[PicWidth],
 			CurrMbAddr        :[CurrMb]
 				==>
-			PicWidthInMbInter :[PicWidth]
+//			PicWidthInMbInter :[PicWidth]
 		guard
 			not IsIntraSent
 		do
