@@ -25,9 +25,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	uint(size=32) POCtoRead,
 	int(size=32)  DelList,
 	int(size=9)   WD,
-	int (size=12) RA,
-	uint(size=11) RA_Width,
-	uint(size=11) RA_Height,
+	int (size=12) ReadAddress,
 	bool          IsIDR
 		==> 
 	int(size=16) RD, 
@@ -167,10 +165,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 
 	get_readAddr: action
-			RA        :[Ra_off_x,Ra_off_y],
-			RA_Width  :[RAWidth],
-			RA_Height :[RAHeight],
-			POCtoRead :[poc2read]
+			ReadAddress :[Ra_off_x , Ra_off_y , RAWidth , RAHeight],
+			POCtoRead   :[poc2read]
 				==>
 		guard
 			read_done  = true,

@@ -14,10 +14,8 @@
       <vertex id="Mb_Type" x="39" y="450"/>
       <vertex id="CurrMbAddr" x="20" y="349"/>
       <vertex id="PocToRead_i" x="110" y="564"/>
-      <vertex id="RA_C" x="509" y="347"/>
+      <vertex id="ReadAddr_C" x="509" y="347"/>
       <vertex id="MB4x4Pred_C" x="1087" y="196"/>
-      <vertex id="RA_Width_C" x="487" y="414"/>
-      <vertex id="RA_Height_C" x="484" y="380"/>
       <vertex id="PocToRead_o" x="479" y="318"/>
       <vertex id="Mgnt_Interp_FBAddr_Chroma_MxN" x="215" y="331"/>
       <vertex id="Algo_Interp_EighthPelBilinear" x="517" y="171"/>

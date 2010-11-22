@@ -14,9 +14,7 @@
       <vertex id="Mb_Type" x="31" y="540"/>
       <vertex id="currMBaddr" x="16" y="428"/>
       <vertex id="PocToRead_i" x="44" y="655"/>
-      <vertex id="RA_L" x="508" y="460"/>
-      <vertex id="RA_Width_L" x="487" y="530"/>
-      <vertex id="RA_Height_L" x="486" y="496"/>
+      <vertex id="ReadAddr_L" x="508" y="460"/>
       <vertex id="MB4x4Pred_L" x="1287" y="337"/>
       <vertex id="PocToRead_o" x="484" y="424"/>
       <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="235" y="431"/>

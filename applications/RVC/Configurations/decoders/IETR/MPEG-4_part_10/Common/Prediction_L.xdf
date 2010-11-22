@@ -418,9 +418,6 @@
     <Connection dst="Inter" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
     <Connection dst="Inter" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
     <Connection dst="Select" dst-port="X2" src="Inter" src-port="MB4x4Pred_L"/>
-    <Connection dst="Buffer_inter" dst-port="RA_Height" src="Inter" src-port="RA_Height_L"/>
-    <Connection dst="Buffer_inter" dst-port="RA_Width" src="Inter" src-port="RA_Width_L"/>
-    <Connection dst="Buffer_inter" dst-port="RA" src="Inter" src-port="RA_L"/>
     <Connection dst="Inter" dst-port="PocToRead_i" src="" src-port="PocToRead"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead" src="Inter" src-port="PocToRead_o"/>
     <Connection dst="Inter" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
@@ -428,4 +425,5 @@
     <Connection dst="Intra_16x16" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
+    <Connection dst="Buffer_inter" dst-port="ReadAddress" src="Inter" src-port="ReadAddr_L"/>
 </XDF>
