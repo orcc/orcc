@@ -430,7 +430,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			FirstMbInSlice :[Fst_Mb],
 			PicWidthInMb   :[pic_width_in_mb]
 				==>
-	Location  :[0,0],
+	Location  :[Mbx_in_pix,Mby_in_pix]/* *16 */,
 	MvOut     :[mv_out]repeat 2/* *16 */,
 	RefIdxOut :[RefIdxLX],
 	NewPic_o  :[false],

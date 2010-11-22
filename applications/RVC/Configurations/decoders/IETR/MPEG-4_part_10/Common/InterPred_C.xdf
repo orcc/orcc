@@ -98,9 +98,9 @@
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
     <Port kind="Output" name="RA_C">
-        <Type name="uint">
+        <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="21"/>
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
