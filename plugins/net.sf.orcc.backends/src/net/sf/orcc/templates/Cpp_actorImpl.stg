@@ -431,6 +431,7 @@ actor_$actor.name$::~actor_$actor.name$()
 
 actor(actor, options) ::= <<
 #include <iostream>
+#include <string.h>
 
 #include "$actor.name$.h"
 
