@@ -22,11 +22,9 @@ actor Mgnt_FBAddr_Chroma_MxN()
 	uint(size=13) PicSizeInMb,
 	uint(size=7)  PicWidthInMb,
 	uint(size=3)  MbPartIdx,
-	uint(size=13) CurrMbAddr,
-	uint(size=32) PocToRead_i
+	uint(size=13) CurrMbAddr
 		==>
-	int (size=12) ReadAddr,
-	uint(size=32) PocToRead_o :
+	int (size=12) ReadAddr:
 
 /**** Global Variables ****/
 	int x_index;
@@ -42,7 +40,6 @@ actor Mgnt_FBAddr_Chroma_MxN()
 	int count := 0;
 	int currMB := 0;
 	int pic_size := 0;
-	uint(size=32) poc_to_read;
 
 	//Mb_Type_NOK_and_IPCM : Consume the token, nothing else to do 
 	Mb_Type_NOK_and_IPCM: action
@@ -97,8 +94,7 @@ actor Mgnt_FBAddr_Chroma_MxN()
 	get_pos: action
 			MbPartIdx   :[ idx ],
 			Location    :[ a, b ],
-			PartSZ      :[ c, d ],
-			PocToRead_i :[ PocToRead ]
+			PartSZ      :[ c, d ]
 				==>
 		do
 			x := a / 2;
@@ -118,7 +114,6 @@ actor Mgnt_FBAddr_Chroma_MxN()
 					count := count + rshift(width, 1) * rshift(height, 1);
 				end
 			end
-			poc_to_read := PocToRead;
 		end
 
 	get_mv_send_frac: action
@@ -158,8 +153,7 @@ actor Mgnt_FBAddr_Chroma_MxN()
 
 	// read_address
 	read_address: action ==>
-			ReadAddr:[ o_x , o_y , width  + 1 , height + 1],
-			PocToRead_o:[ poc_to_read ]
+			ReadAddr:[ o_x , o_y , width  + 1 , height + 1]
 		end
 
 	schedule fsm get_MB :

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="MbPartIdx" x="17" y="164"/>
-      <vertex id="MbPartWidth" x="506" y="251"/>
-      <vertex id="MbPartHeigth" x="489" y="176"/>
-      <vertex id="RD_L" x="336" y="355"/>
-      <vertex id="Coef_ACR" x="843" y="350"/>
-      <vertex id="MV" x="107" y="225"/>
-      <vertex id="PartSZ" x="61" y="285"/>
-      <vertex id="MB4x4Pred_L" x="1287" y="337"/>
-      <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="458" y="291"/>
-      <vertex id="Algo_Interp_split_MB" x="787" y="176"/>
-      <vertex id="Algo_Add_4x4" x="969" y="306"/>
+      <vertex id="MbPartIdx" x="212" y="75"/>
+      <vertex id="MbPartWidth" x="212" y="115"/>
+      <vertex id="MbPartHeigth" x="195" y="40"/>
+      <vertex id="RD_L" x="42" y="219"/>
+      <vertex id="Coef_ACR" x="549" y="214"/>
+      <vertex id="MV" x="48" y="160"/>
+      <vertex id="PartSZ" x="34" y="189"/>
+      <vertex id="MB4x4Pred_L" x="814" y="194"/>
+      <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="164" y="155"/>
+      <vertex id="Algo_Interp_split_MB" x="493" y="40"/>
+      <vertex id="Algo_Add_4x4" x="675" y="170"/>
    </vertices>
 </layout>

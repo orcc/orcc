@@ -3,15 +3,15 @@
    <vertices>
       <vertex id="CurrMbAddr" x="57" y="889"/>
       <vertex id="PicWidthInMb" x="57" y="580"/>
-      <vertex id="PredMode" x="57" y="986"/>
+      <vertex id="PredMode" x="55" y="1149"/>
       <vertex id="FirstMbInSlice" x="57" y="677"/>
-      <vertex id="MbPartIdx" x="243" y="1634"/>
-      <vertex id="MbPartWidth" x="248" y="1669"/>
-      <vertex id="MbPartHeigth" x="234" y="1596"/>
+      <vertex id="MbPartIdx" x="554" y="1538"/>
+      <vertex id="MbPartWidth" x="544" y="1565"/>
+      <vertex id="MbPartHeigth" x="542" y="1510"/>
       <vertex id="PicSizeInMb" x="250" y="294"/>
-      <vertex id="Coef_ACR" x="57" y="1083"/>
-      <vertex id="MV" x="251" y="1553"/>
-      <vertex id="PartSZ" x="264" y="1730"/>
+      <vertex id="Coef_ACR" x="63" y="1069"/>
+      <vertex id="MV" x="571" y="1480"/>
+      <vertex id="PartSZ" x="560" y="1592"/>
       <vertex id="POC" x="1214" y="1360"/>
       <vertex id="QP" x="1019" y="744"/>
       <vertex id="LFDisable" x="980" y="566"/>
@@ -20,14 +20,15 @@
       <vertex id="CodedBlockPattern" x="950" y="529"/>
       <vertex id="ref_idx_in" x="1000" y="784"/>
       <vertex id="mv_in" x="999" y="604"/>
-      <vertex id="I_PCM_Y" x="609" y="681"/>
-      <vertex id="ConstrainedIFlag" x="57" y="1180"/>
+      <vertex id="I_PCM_Y" x="881" y="1094"/>
+      <vertex id="ConstrainedIFlag" x="35" y="1101"/>
       <vertex id="DelList" x="1198" y="1269"/>
       <vertex id="PocToDisplay" x="1191" y="1396"/>
       <vertex id="IsIDR" x="1204" y="1320"/>
       <vertex id="MacroBlockType" x="15" y="1441"/>
-      <vertex id="TransformSize8x8" x="57" y="1277"/>
-      <vertex id="PocToRead" x="911" y="1639"/>
+      <vertex id="TransformSize8x8" x="30" y="1181"/>
+      <vertex id="PocToRead" x="1210" y="1496"/>
+      <vertex id="ReadAddress" x="1209" y="1549"/>
       <vertex id="Display_L" x="1556" y="1366"/>
       <vertex id="Buffer_inter" x="1392" y="1345"/>
       <vertex id="Select" x="1010" y="1015"/>
@@ -35,7 +36,6 @@
       <vertex id="Intra_4x4" x="676" y="1148"/>
       <vertex id="Deblocking_Filter" x="1153" y="532"/>
       <vertex id="DemuxParserInfos" x="235" y="1039"/>
-      <vertex id="Inter" x="669" y="1524"/>
-      <vertex id="ReadAddress" x="910" y="1692"/>
+      <vertex id="Inter" x="681" y="1453"/>
    </vertices>
 </layout>

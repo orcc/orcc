@@ -11,7 +11,6 @@
       <vertex id="PicWidthInMB" x="205" y="487"/>
       <vertex id="POC" x="205" y="584"/>
       <vertex id="PicSizeInMb" x="205" y="702"/>
-      <vertex id="LOCATION" x="205" y="799"/>
       <vertex id="MV" x="205" y="896"/>
       <vertex id="MbPartHeight" x="205" y="993"/>
       <vertex id="MbPartIdx" x="205" y="1090"/>
@@ -33,5 +32,6 @@
       <vertex id="Display" x="906" y="998"/>
       <vertex id="PRED_C" x="660" y="958"/>
       <vertex id="RES_C" x="205" y="2060"/>
+      <vertex id="ReadAddress" x="432" y="546"/>
    </vertices>
 </layout>

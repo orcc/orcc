@@ -32,7 +32,6 @@
       <vertex id="DelList" x="1778" y="1601"/>
       <vertex id="IsIDR" x="1777" y="1628"/>
       <vertex id="MV" x="2260" y="712"/>
-      <vertex id="LOCATION" x="2241" y="679"/>
       <vertex id="PART_SZ" x="2243" y="747"/>
       <vertex id="mv_out" x="2250" y="800"/>
       <vertex id="ref_idx" x="2259" y="855"/>
@@ -42,7 +41,9 @@
       <vertex id="MacroBlockType" x="1705" y="809"/>
       <vertex id="TransformSize8x8" x="1738" y="1406"/>
       <vertex id="PocToDisplay" x="1846" y="1821"/>
-      <vertex id="PocToRead" x="2675" y="1111"/>
+      <vertex id="PocToRead" x="2978" y="793"/>
+      <vertex id="ReadAddress_l" x="2965" y="857"/>
+      <vertex id="ReadAddress_c" x="2965" y="825"/>
       <vertex id="Algo_NALU" x="333" y="7"/>
       <vertex id="CheckNaluType" x="644" y="-22"/>
       <vertex id="DecodeSps" x="7" y="1243"/>
@@ -60,10 +61,8 @@
       <vertex id="RefList1" x="1982" y="1428"/>
       <vertex id="Mgnt_Display" x="1686" y="1794"/>
       <vertex id="RefIdxL0ToPoc" x="2304" y="955"/>
-      <vertex id="RefIdxL1ToPoc" x="2306" y="1189"/>
+      <vertex id="RefIdxL1ToPoc" x="2292" y="1192"/>
       <vertex id="SelectRefIdx" x="2481" y="1088"/>
-      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="2522" y="1533"/>
-      <vertex id="PocToRead_l" x="2794" y="1546"/>
-      <vertex id="ReadAddress_l" x="2789" y="1579"/>
+      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="2702" y="780"/>
    </vertices>
 </layout>

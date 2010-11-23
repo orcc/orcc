@@ -1,25 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="PicWidthInMb" x="20" y="548"/>
-      <vertex id="MbPartIdx" x="51" y="71"/>
-      <vertex id="MbPartWidth" x="519" y="121"/>
-      <vertex id="MbPartHeigth" x="517" y="53"/>
-      <vertex id="RD_C" x="370" y="248"/>
-      <vertex id="PicSizeInMb" x="37" y="495"/>
-      <vertex id="LOCATION" x="28" y="388"/>
-      <vertex id="MV" x="43" y="196"/>
-      <vertex id="PartSZ" x="24" y="231"/>
-      <vertex id="Coef_ACR" x="837" y="223"/>
-      <vertex id="Mb_Type" x="39" y="450"/>
-      <vertex id="CurrMbAddr" x="20" y="349"/>
-      <vertex id="PocToRead_i" x="110" y="564"/>
-      <vertex id="ReadAddr_C" x="509" y="347"/>
-      <vertex id="MB4x4Pred_C" x="1087" y="196"/>
-      <vertex id="PocToRead_o" x="479" y="318"/>
-      <vertex id="Mgnt_Interp_FBAddr_Chroma_MxN" x="215" y="331"/>
-      <vertex id="Algo_Interp_EighthPelBilinear" x="517" y="171"/>
-      <vertex id="Algo_Interp_split_MB_C" x="752" y="37"/>
-      <vertex id="Algo_Add" x="974" y="178"/>
+      <vertex id="MbPartIdx" x="203" y="88"/>
+      <vertex id="MbPartWidth" x="202" y="120"/>
+      <vertex id="MbPartHeigth" x="200" y="52"/>
+      <vertex id="RD_C" x="53" y="247"/>
+      <vertex id="MV" x="64" y="180"/>
+      <vertex id="PartSZ" x="45" y="215"/>
+      <vertex id="Coef_ACR" x="520" y="222"/>
+      <vertex id="MB4x4Pred_C" x="770" y="195"/>
+      <vertex id="Algo_Interp_EighthPelBilinear" x="200" y="170"/>
+      <vertex id="Algo_Interp_split_MB_C" x="435" y="36"/>
+      <vertex id="Algo_Add" x="657" y="177"/>
    </vertices>
 </layout>

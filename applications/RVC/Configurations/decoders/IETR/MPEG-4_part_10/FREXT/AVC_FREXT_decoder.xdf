@@ -204,8 +204,6 @@
     <Connection dst="Decode_U" dst-port="CoefDC" src="FUN_Parser" src-port="CoefDC_Cb"/>
     <Connection dst="Decode_V" dst-port="CoefDC" src="FUN_Parser" src-port="CoefDC_Cr"/>
     <Connection dst="Decode_V" dst-port="CoefAC" src="FUN_Parser" src-port="CoefAC_Cr"/>
-    <Connection dst="Decode_U" dst-port="LOCATION" src="FUN_Parser" src-port="LOCATION"/>
-    <Connection dst="Decode_V" dst-port="LOCATION" src="FUN_Parser" src-port="LOCATION"/>
     <Connection dst="Decode_U" dst-port="MV" src="FUN_Parser" src-port="MV"/>
     <Connection dst="Decode_V" dst-port="MV" src="FUN_Parser" src-port="MV"/>
     <Connection dst="Decode_U" dst-port="MbPartHeight" src="FUN_Parser" src-port="MbPartHeigth"/>
@@ -281,5 +279,7 @@
     <Connection dst="Decode_U" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead"/>
     <Connection dst="Decode_V" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead"/>
     <Connection dst="Decoding_Y" dst-port="ReadAddress" src="FUN_Parser" src-port="ReadAddress_l"/>
-    <Connection dst="Decoding_Y" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead_l"/>
+    <Connection dst="Decoding_Y" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead"/>
+    <Connection dst="Decode_U" dst-port="ReadAddress" src="FUN_Parser" src-port="ReadAddress_c"/>
+    <Connection dst="Decode_V" dst-port="ReadAddress" src="FUN_Parser" src-port="ReadAddress_c"/>
 </XDF>

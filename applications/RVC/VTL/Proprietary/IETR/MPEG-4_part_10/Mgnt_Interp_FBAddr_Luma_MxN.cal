@@ -24,26 +24,22 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 	uint(size=13) CurrMbAddr,
 	uint(size=3)  MbPartIdx,
 	uint(size=6)  Mb_Type,
-	uint(size=7)  PicWidthInMb,
 	uint(size=13) PicSizeInMb,
 	int (size=16) MV,
 	uint(size=11) Location,
 	uint(size=32) Poc2Read,
 	uint(size=6)  PartSZ
 		==>
-	int (size=12) ReadAddr,
+	int (size=12) ReadAddr_l,
+	int (size=12) ReadAddr_c,
 	uint(size=32) PocToRead :
 
 	bool DEBUG_INPUT = false;
 
 	int(size=32) x_index;
 	int(size=32) y_index;
-	uint(size=11) Picheight_l := 1;
-	uint(size=11) Picwidth_l := 1;
 	int(size=32) x;
 	int(size=32) y;
-	int(size=32) o_x;
-	int(size=32) o_y;
 	int width;
 	int height;
 	int count := 0;
@@ -55,17 +51,11 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 	Mb_Type_NOK_and_IPCM: action
 			Mb_Type:[ mb_type ],
 			PicSizeInMb:[ c ],
-			PicWidthInMb :[pic_width],
 			CurrMbAddr:[ valCurrMbAddr ]
 				==>
 		guard
 			mb_type = BLOCK_TYPE_I_PCM
 		do
-			if (DEBUG_INPUT) then
-				println("Input InterpFBAddrLuma Mb_Type:" + mb_type);
-				println("Input InterpFBAddrLuma PicSizeInMb:" + c);
-				println("Input InterpFBAddrLuma CurrMbAddr:" + valCurrMbAddr);
-			end
 			currMB := valCurrMbAddr;
 			pic_size := c;
 		end
@@ -74,7 +64,6 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 	Mb_Type_NOK: action
 			Mb_Type     :[ mb_type ],
 			PicSizeInMb :[ c ],
-			PicWidthInMb :[pic_width],
 			CurrMbAddr  :[ valCurrMbAddr ]
 				==>
 		guard
@@ -82,11 +71,6 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 			mb_type <= BLOCK_TYPE_INTRA_MAX,
 			mb_type != BLOCK_TYPE_I_PCM
 		do
-			if (DEBUG_INPUT) then
-				println("Input InterpFBAddrLuma Mb_Type:" + mb_type);
-				println("Input InterpFBAddrLuma PicSizeInMb:" + c);
-				println("Input InterpFBAddrLuma CurrMbAddr:" + valCurrMbAddr);
-			end
 			currMB := valCurrMbAddr;
 			pic_size := c;
 	end
@@ -94,21 +78,12 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 	//Mb_Type_OK : Enable the prediction 
 	Mb_Type_OK: action
 			Mb_Type      :[ mb_type ],
-			PicWidthInMb :[ b ],
 			PicSizeInMb  :[ c ],
 			CurrMbAddr   :[ valCurrMbAddr ]
 				==>
 		guard
 			not(mb_type >= BLOCK_TYPE_INTRA_MIN and mb_type <= BLOCK_TYPE_INTRA_MAX)
 		do
-			if (DEBUG_INPUT) then
-				println("Input InterpFBAddrLuma Mb_Type:" + mb_type);
-				println("Input InterpFBAddrLuma PicWidthInMb:" + b);
-				println("Input InterpFBAddrLuma PicSizeInMb:" + c);
-				println("Input InterpFBAddrLuma CurrMbAddr:" + valCurrMbAddr);
-			end
-			Picwidth_l := lshift(b, 4);
-			Picheight_l := lshift(c / b, 4);
 			currMB := valCurrMbAddr;
 			pic_size := c;
 		end
@@ -171,20 +146,12 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 	get_mv: action
 			MV:[ mx, my ]
 				==>
+			PocToRead  :[ poc_to_read ],
+			ReadAddr_l :[ x + rshift(mx, 2) - 2     , y + rshift(my, 2) - 2     , width + 5     , height + 5 ],
+			ReadAddr_c :[ x/2 + rshift(mx, 3) , y/2 + rshift(my, 3) , width / 2 + 1 , height / 2 + 1 ]
 		do
-			if (DEBUG_INPUT) then
-				println("Input InterpFBAddrLuma MV:" + mx + " ; " + my);
-			end
 			x_index := rshift(mx, 2);
 			y_index := rshift(my, 2);
-			o_x := x + x_index - 2;
-			o_y := y + y_index - 2;
-		end
-
-	Send_ReadAddr: action
-				==>
-			PocToRead :[ poc_to_read ],
-			ReadAddr :[ o_x, o_y , width + 5 , height + 5 ]
 		end
 
 	MB_done: action ==>
@@ -208,21 +175,19 @@ actor Mgnt_Interp_FBAddr_Luma_MxN()
 		end
 
 	schedule fsm get_MB :
-		get_MB ( Mb_Type_NOK_and_IPCM )--> get_pic_done;
-		get_MB ( Mb_Type_NOK          )--> get_pic_done;
-		get_MB ( Mb_Type_OK           )--> get_pos;
+		get_MB       (Mb_Type_NOK_and_IPCM )--> get_pic_done;
+		get_MB       (Mb_Type_NOK          )--> get_pic_done;
+		get_MB       (Mb_Type_OK           )--> get_pos;
 
-		get_pic_done ( PIC_done ) --> get_MB;
-		get_pic_done ( PIC_Ndone ) --> get_MB;
+		get_pic_done (PIC_done             )--> get_MB;
+		get_pic_done (PIC_Ndone            )--> get_MB;
 
-		get_pos ( get_pos ) --> get_mv_send_frac;
+		MB_done      (MB_done              )--> get_pic_done;
+		MB_done      (MB_Ndone             )--> get_pos;
 
-		get_mv_send_frac ( get_mv ) --> address;
+		get_pos      (get_pos              )--> get_mv;
 
-		address ( Send_ReadAddr ) --> MB_done;
-
-		MB_done ( MB_done ) --> get_pic_done;
-		MB_done ( MB_Ndone ) --> get_pos;
+		get_mv       (get_mv               )--> MB_done;
 	end
 
 	priority

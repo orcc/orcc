@@ -215,13 +215,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="LOCATION">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="11"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="PART_SZ">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -288,14 +281,14 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="PocToRead_l">
-        <Type name="uint">
+    <Port kind="Output" name="ReadAddress_l">
+        <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="ReadAddress_l">
+    <Port kind="Output" name="ReadAddress_c">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="12"/>
@@ -550,7 +543,6 @@
     <Connection dst="" dst-port="DelList" src="MMCO" src-port="DelList"/>
     <Connection dst="" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="MV" src="MVReconstruct" src-port="MV"/>
-    <Connection dst="" dst-port="LOCATION" src="MVReconstruct" src-port="LOCATION"/>
     <Connection dst="" dst-port="PART_SZ" src="MVReconstruct" src-port="PartSZ"/>
     <Connection dst="" dst-port="mv_out" src="MVReconstruct" src-port="mv_out"/>
     <Connection dst="" dst-port="ref_idx" src="MVReconstruct" src-port="ref_idx"/>
@@ -673,7 +665,6 @@
         src="RefIdxL0ToPoc" src-port="POCtoRead"/>
     <Connection dst="SelectRefIdx" dst-port="POCtoRead_l1"
         src="RefIdxL1ToPoc" src-port="POCtoRead"/>
-    <Connection dst="" dst-port="PocToRead" src="SelectRefIdx" src-port="PocToRead"/>
     <Connection dst="SelectRefIdx" dst-port="SelectList"
         src="MVReconstruct" src-port="SelectList"/>
     <Connection dst="MVReconstruct" dst-port="MbPredMvResL0"
@@ -707,14 +698,14 @@
         src="MVReconstruct" src-port="LOCATION"/>
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="Mb_Type"
         src="DecodePic" src-port="MacroBlockType"/>
-    <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="PicSizeInMb"
-        src="DecodePic" src-port="PicSizeInMb"/>
-    <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN"
-        dst-port="PicWidthInMb" src="DecodePic" src-port="PicWidthInMb"/>
     <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="Poc2Read"
         src="SelectRefIdx" src-port="PocToRead"/>
-    <Connection dst="" dst-port="PocToRead_l"
+    <Connection dst="Mgnt_Interp_FBAddr_Luma_MxN" dst-port="PicSizeInMb"
+        src="DecodePic" src-port="PicSizeInMb"/>
+    <Connection dst="" dst-port="PocToRead"
         src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="PocToRead"/>
     <Connection dst="" dst-port="ReadAddress_l"
-        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="ReadAddr"/>
+        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="ReadAddr_l"/>
+    <Connection dst="" dst-port="ReadAddress_c"
+        src="Mgnt_Interp_FBAddr_Luma_MxN" src-port="ReadAddr_c"/>
 </XDF>
