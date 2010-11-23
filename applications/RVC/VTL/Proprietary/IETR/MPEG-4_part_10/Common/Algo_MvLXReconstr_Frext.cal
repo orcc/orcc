@@ -374,7 +374,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	end
 
 	GetNewPic: action
-			NewPic_i :[IsNewPic]
+			NewPic_i :[IsNewPic],
+			DirectSpatialMvPredFlag :[direct_spatial_mv_pred]//////////////////////////////////////////////////
 				==>
 			NewPic_o :[true]
 		guard
