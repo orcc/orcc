@@ -20,7 +20,7 @@
 //Modified by Damien de Saint Jorre (IETR/Insa of Rennes)
 import orcc.Imp_MacroBlockInfo.* ;
 
-actor Mgnt_Interp_FBAddr_Luma_MxN()
+actor Mgnt_InterPred()
 	uint(size=13) CurrMbAddr,
 	uint(size=3)  MbPartIdx,
 	uint(size=6)  Mb_Type,

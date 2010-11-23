@@ -488,7 +488,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Mgnt_Interp_FBAddr_Luma_MxN"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Mgnt_InterPred"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
