@@ -16,13 +16,13 @@ mapping(network, mapping, fifoSize) ::= <<
 
 core(id, instances) ::= <<
 <Partition id="$id$">
-  $instances : {instance | <Instance actor-id="$instance.id$"/>}; separator="\n"$
+  $instances : {instance | <Instance actor-id="$instance.id$/0"/>}; separator="\n"$
 </Partition>
 >>
 
 
 connection(connection,src,dst) ::= <<
-<Connection src="$src.id$" src-port="$connection.source$" dst="$dst.id$" dst-port="$connection.target$" size="$if(connection.size)$$connection.size$$else$$fifoSize$$endif$"/>
+<Connection src="$src.id$/0" src-port="$connection.source$" dst="$dst.id$/0" dst-port="$connection.target$" size="$if(connection.size)$$connection.size$$else$$fifoSize$$endif$"/>
 >>
 
 
