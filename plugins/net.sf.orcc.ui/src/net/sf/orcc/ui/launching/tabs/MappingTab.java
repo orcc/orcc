@@ -286,7 +286,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 		Font font = parent.getFont();
 		composite.setFont(font);
 
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(1, false);
 		layout.verticalSpacing = 0;
 		composite.setLayout(layout);
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -297,13 +297,17 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	}
 
 	private void createLabel(Composite composite) {
-		String html = "";
+		String html = "Warning: the mapping feature is experimental and likely to evolve.\n"
+				+ "Furthermore, the name of the components is implementation-specific, "
+				+ "and is likely to change in the future.\n"
+				+ "A component should be named like an identifier"
+				+ " (only letters, digits, underscore allowed).\n\n";
 
-		Label browser = new Label(composite, SWT.NONE);
-		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
-		browser.setLayoutData(data);
+		Label label = new Label(composite, SWT.NONE);
+		GridData data = new GridData(SWT.FILL, SWT.TOP, false, false);
+		label.setLayoutData(data);
 
-		browser.setText(html);
+		label.setText(html);
 	}
 
 	/**
@@ -315,7 +319,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 	private void createTreeViewer(Composite composite) {
 		Tree tree = new Tree(composite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL
 				| SWT.V_SCROLL);
-		GridData data = new GridData(SWT.RIGHT, SWT.FILL, false, true);
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		tree.setLayoutData(data);
 
 		tree.setHeaderVisible(true);
