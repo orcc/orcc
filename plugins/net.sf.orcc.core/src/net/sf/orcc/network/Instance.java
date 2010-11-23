@@ -107,92 +107,22 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	private Map<String, Expression> parameters;
 
+	private Instance parent;
+
 	/**
 	 * the serializer/deserializer referenced by this instance.
 	 */
 	private SerDes serdes;
 
 	/**
-	 * Creates a new instance of the given actor with the given identifier.
-	 * 
-	 * @param id
-	 *            the instance identifier
-	 * @param actor
-	 *            an actor
-	 */
-	public Instance(String id, Actor actor) {
-		this(id, actor.getName());
-		this.actor = actor;
-	}
-
-	/**
-	 * Creates a new instance of the given broadcast with the given identifier.
-	 * 
-	 * @param id
-	 *            the instance identifier
-	 * @param broadcast
-	 *            a broadcast
-	 */
-	public Instance(String id, Broadcast broadcast) {
-		this(id, "Broadcast");
-		this.broadcast = broadcast;
-	}
-
-	/**
-	 * Creates a new instance of the given network with the given identifier.
-	 * 
-	 * @param id
-	 *            the instance identifier
-	 * @param network
-	 *            a network
-	 */
-	public Instance(String id, Network network) {
-		this(id, network.getName());
-		this.network = network;
-	}
-
-	/**
-	 * Creates a new instance of the given network with the given identifier.
-	 * 
-	 * @param id
-	 *            the instance identifier
-	 * @param network
-	 *            a network
-	 * @param parameters
-	 *            the parameters of this instance
-	 * @param attributes
-	 *            the attributes of this instance
-	 */
-	public Instance(String id, Network network,
-			Map<String, Expression> parameters,
-			Map<String, IAttribute> attributes) {
-		this(id, network);
-		this.parameters.putAll(parameters);
-		this.attributes.putAll(attributes);
-	}
-
-	/**
-	 * Creates a new instance of the given serializer/deserializer with the
-	 * given identifier.
-	 * 
-	 * @param id
-	 *            the instance identifier
-	 * @param serdes
-	 *            a wrapper
-	 */
-	public Instance(String id, SerDes serdes) {
-		this(id, "SerDes");
-		this.serdes = serdes;
-	}
-
-	/**
-	 * Creates a new instance with the given id and empty parameters and
-	 * attributes.
+	 * Creates a new instance with the given id and class.
 	 * 
 	 * @param id
 	 *            instance identifier
+	 * @param clasz
+	 *            the class of the instance
 	 */
-	private Instance(String id, String clasz) {
+	public Instance(String id, String clasz) {
 		this.id = id;
 		this.clasz = clasz;
 
@@ -204,26 +134,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 
 		this.hierarchicalClass = new ArrayList<String>(1);
 		this.hierarchicalClass.add(clasz);
-	}
-
-	/**
-	 * Creates a new virtual instance.
-	 * 
-	 * @param id
-	 *            the instance id
-	 * @param clasz
-	 *            the instance class
-	 * @param parameters
-	 *            the parameters of this instance
-	 * @param attributes
-	 *            the attributes of this instance
-	 */
-	public Instance(String id, String clasz,
-			Map<String, Expression> parameters,
-			Map<String, IAttribute> attributes) {
-		this(id, clasz);
-		this.parameters.putAll(parameters);
-		this.attributes.putAll(attributes);
 	}
 
 	@Override
@@ -361,6 +271,15 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	}
 
 	/**
+	 * Returns the instance that contains this instance, or <code>null</code>.
+	 * 
+	 * @return the instance that contains this instance, or <code>null</code>
+	 */
+	public Instance getParent() {
+		return parent;
+	}
+
+	/**
 	 * Returns the wrapper referenced by this instance.
 	 * 
 	 * @return the wrapper referenced by this instance, or <code>null</code> if
@@ -451,6 +370,62 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	}
 
 	/**
+	 * Sets the contents of this instance to be that of an actor. Removes any
+	 * prior contents.
+	 * 
+	 * @param actor
+	 *            an actor
+	 */
+	public void setContents(Actor actor) {
+		this.actor = actor;
+		this.broadcast = null;
+		this.network = null;
+		this.serdes = null;
+	}
+
+	/**
+	 * Sets the contents of this instance to be that of a broadcast. Removes any
+	 * prior contents.
+	 * 
+	 * @param broadcast
+	 *            a broadcast
+	 */
+	public void setContents(Broadcast broadcast) {
+		this.actor = null;
+		this.broadcast = broadcast;
+		this.network = null;
+		this.serdes = null;
+	}
+
+	/**
+	 * Sets the contents of this instance to be that of a network. Removes any
+	 * prior contents.
+	 * 
+	 * @param network
+	 *            a network
+	 */
+	public void setContents(Network network) {
+		this.actor = null;
+		this.broadcast = null;
+		this.network = network;
+		this.serdes = null;
+	}
+
+	/**
+	 * Sets the contents of this instance to be that of a serdes. Removes any
+	 * prior contents.
+	 * 
+	 * @param serdes
+	 *            a serdes
+	 */
+	public void setContents(SerDes serdes) {
+		this.actor = null;
+		this.broadcast = null;
+		this.network = null;
+		this.serdes = serdes;
+	}
+
+	/**
 	 * Changes the identifier of this instance.
 	 * 
 	 * @param id
@@ -458,6 +433,16 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	/**
+	 * Sets the parent of this instance.
+	 * 
+	 * @param parent
+	 *            the parent of this instance
+	 */
+	public void setParent(Instance parent) {
+		this.parent = parent;
 	}
 
 	@Override

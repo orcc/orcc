@@ -216,7 +216,8 @@ public class VHDLBackendImpl extends AbstractBackend {
 			folder.mkdir();
 		}
 
-		Instance instance = new Instance(network.getName(), network);
+		Instance instance = new Instance(network.getName(), network.getName());
+		instance.setContents(network);
 		printTestbench(instance);
 
 		try {

@@ -265,7 +265,7 @@ public class ActorMerger implements INetworkTransformation {
 							+ "_w", true, new IntExpr(0));
 			stateVars.put(wCount.getName(), wCount);
 		}
-		
+
 		for (Vertex vertex : scheduler.getSchedule().getActors()) {
 			Instance instance = vertex.getInstance();
 			String id = instance.getId();
@@ -276,7 +276,7 @@ public class ActorMerger implements INetworkTransformation {
 				stateVars.put(var.getName(), var);
 			}
 		}
-		
+
 		return stateVars;
 	}
 
@@ -640,7 +640,8 @@ public class ActorMerger implements INetworkTransformation {
 	 */
 	private void mergeActors(Set<Vertex> vertices) throws OrccException {
 		createActor(vertices);
-		Instance instance = new Instance(actor.getName(), actor);
+		Instance instance = new Instance(actor.getName(), actor.getName());
+		instance.setContents(actor);
 		Vertex[] v = (Vertex[]) vertices.toArray(new Vertex[0]);
 		instance.getAttributes().putAll(v[0].getInstance().getAttributes());
 

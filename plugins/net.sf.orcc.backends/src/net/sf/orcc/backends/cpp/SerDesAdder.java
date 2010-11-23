@@ -138,7 +138,8 @@ public class SerDesAdder {
 							srcPort.getType());
 					String name = "broadcast_" + instance.getId() + "_"
 							+ srcPort.getName();
-					Instance newInst = new Instance(name, bcast);
+					Instance newInst = new Instance(name, "Broadcast");
+					newInst.setContents(bcast);
 					Vertex vertexBCast = new Vertex(newInst);
 					graph.addVertex(vertexBCast);
 
@@ -193,8 +194,10 @@ public class SerDesAdder {
 						int out = serdes.getNumOutputs();
 						serdes.setNumOutputs(out++);
 					} else {
-						Vertex serdes = new Vertex(new Instance("SerDes_"
-								+ attrName, new SerDes(0, 1)));
+						Instance inst = new Instance("SerDes_" + attrName,
+								"SerDes");
+						inst.setContents(new SerDes(0, 1));
+						Vertex serdes = new Vertex(inst);
 						serdesMap.put(attrName, serdes);
 						graph.addVertex(serdes);
 					}
@@ -212,8 +215,10 @@ public class SerDesAdder {
 						int in = serdes.getNumInputs();
 						serdes.setNumOutputs(in++);
 					} else {
-						Vertex serdes = new Vertex(new Instance("SerDes_"
-								+ attrName, new SerDes(1, 0)));
+						Instance inst = new Instance("SerDes_" + attrName,
+								"SerDes");
+						inst.setContents(new SerDes(1, 0));
+						Vertex serdes = new Vertex(inst);
 						serdesMap.put(attrName, serdes);
 						graph.addVertex(serdes);
 					}

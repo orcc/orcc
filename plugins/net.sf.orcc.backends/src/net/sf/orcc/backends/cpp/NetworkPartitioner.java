@@ -87,7 +87,7 @@ public class NetworkPartitioner implements INetworkTransformation {
 
 	private void createConnections(Set<Vertex> vertices, Network network)
 			throws OrccException {
-//		nbInput = nbOutput = 0;
+		// nbInput = nbOutput = 0;
 		for (Vertex vertex : vertices) {
 			for (Connection connection : graph.incomingEdgesOf(vertex)) {
 				Vertex src = graph.getEdgeSource(connection);
@@ -264,8 +264,9 @@ public class NetworkPartitioner implements INetworkTransformation {
 	private void initPartNames(Network network) throws OrccException {
 		partNames = new HashMap<Vertex, String>();
 		for (Vertex vertex : network.getGraph().vertexSet()) {
-			if(vertex.isInstance()) {
-				partNames.put(vertex, getPartNameAttribute(vertex.getInstance()));
+			if (vertex.isInstance()) {
+				partNames.put(vertex,
+						getPartNameAttribute(vertex.getInstance()));
 			}
 		}
 	}
@@ -290,8 +291,10 @@ public class NetworkPartitioner implements INetworkTransformation {
 
 			networks.add(subNetwork);
 
-			Vertex vertex = new Vertex(new Instance(subNetwork.getName(),
-					subNetwork));
+			Instance inst = new Instance(subNetwork.getName(),
+					subNetwork.getName());
+			inst.setContents(subNetwork);
+			Vertex vertex = new Vertex(inst);
 
 			graph.addVertex(vertex);
 

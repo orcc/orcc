@@ -497,6 +497,8 @@ public class XDFParser {
 
 	private Network network;
 
+	private Instance parent;
+
 	/**
 	 * parent path of {@link #file}
 	 */
@@ -518,6 +520,16 @@ public class XDFParser {
 		path = file.getParent();
 		exprParser = new ExprParser();
 		typeParser = new TypeParser();
+	}
+
+	/**
+	 * 
+	 * @param fileName
+	 * @param parent
+	 */
+	private XDFParser(String fileName, Instance parent) {
+		this(fileName);
+		this.parent = parent;
 	}
 
 	/**
@@ -753,18 +765,20 @@ public class XDFParser {
 		Map<String, IAttribute> attributes = parseAttributes(child);
 
 		// create instance
+		Instance newInst = new Instance(id, clasz);
+		newInst.setParent(parent);
+		newInst.getAttributes().putAll(attributes);
+		newInst.getParameters().putAll(parameters);
+
 		File file = new File(path, clasz + ".xdf");
 		if (file.exists()) {
-			// cool, we got a network
-			XDFParser parser = new XDFParser(file.getAbsolutePath());
+			// parse and set contents
+			XDFParser parser = new XDFParser(file.getAbsolutePath(), newInst);
 			Network network = parser.parseNetwork();
-
-			return new Instance(id, network, parameters, attributes);
-		} else {
-			// not a network => will load later when the instantiate method is
-			// called
-			return new Instance(id, clasz, parameters, attributes);
+			newInst.setContents(network);
 		}
+
+		return newInst;
 	}
 
 	/**

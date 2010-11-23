@@ -68,8 +68,8 @@ public class BroadcastAdder implements INetworkTransformation {
 	 * @param vertexBCast
 	 *            the vertex that contains the broadcast
 	 */
-	protected void createIncomingConnection(Connection connection, Vertex vertex,
-			Vertex vertexBCast) {
+	protected void createIncomingConnection(Connection connection,
+			Vertex vertex, Vertex vertexBCast) {
 		Broadcast bcast = vertexBCast.getInstance().getBroadcast();
 		Port bcastInput = bcast.getInput();
 
@@ -135,9 +135,9 @@ public class BroadcastAdder implements INetworkTransformation {
 					// add broadcast vertex
 					Broadcast bcast = new Broadcast(numOutput,
 							srcPort.getType());
-					String name = instance.getId() + "_"
-							+ srcPort.getName();
-					Instance newInst = new Instance(name, bcast);
+					String name = instance.getId() + "_" + srcPort.getName();
+					Instance newInst = new Instance(name, "Broadcast");
+					newInst.setContents(bcast);
 					Vertex vertexBCast = new Vertex(newInst);
 					graph.addVertex(vertexBCast);
 
