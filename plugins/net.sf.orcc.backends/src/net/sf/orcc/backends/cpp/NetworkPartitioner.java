@@ -175,7 +175,7 @@ public class NetworkPartitioner implements INetworkTransformation {
 
 		Map<String, Instance> instances = new HashMap<String, Instance>();
 
-		Network subNetwork = new Network();
+		Network subNetwork = new Network(network.getFile());
 		subNetwork.setName(name);
 
 		for (Vertex vertex : entry.getValue()) {

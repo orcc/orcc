@@ -766,7 +766,14 @@ public class XDFParser {
 
 		// create instance
 		Instance newInst = new Instance(id, clasz);
-		newInst.setParent(parent);
+		if (parent == null) {
+			Instance parentInst = new Instance(network.getName(),
+					network.getName());
+			parentInst.setContents(network);
+			newInst.setParent(parentInst);
+		} else {
+			newInst.setParent(parent);
+		}
 		newInst.getAttributes().putAll(attributes);
 		newInst.getParameters().putAll(parameters);
 
@@ -886,7 +893,7 @@ public class XDFParser {
 			throw new OrccException("Expected a \"name\" attribute");
 		}
 
-		this.network = new Network();
+		this.network = new Network(file.getAbsolutePath());
 		instances = new HashMap<String, Instance>();
 		network.setName(name);
 

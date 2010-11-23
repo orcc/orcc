@@ -102,6 +102,8 @@ public class Network {
 
 	private Map<Connection, Integer> connectionMap;
 
+	private String file;
+
 	private DirectedGraph<Vertex, Connection> graph;
 
 	private Map<Instance, List<Connection>> incomingMap;
@@ -115,11 +117,15 @@ public class Network {
 
 	private String name;
 
+	private Map<Instance, Map<Port, Integer>> numberOfReadersMap;
+
 	private Map<Instance, List<Connection>> outgoingMap;
 
 	private OrderedMap<String, Port> outputs;
 
 	private Scope<String, GlobalVariable> parameters;
+
+	private Map<Instance, Map<Port, Integer>> portToFifoSizeMap;
 
 	private Map<Instance, Map<Port, Instance>> predecessorsMap;
 
@@ -131,14 +137,11 @@ public class Network {
 
 	private OrderedMap<String, GlobalVariable> variables;
 
-	private Map<Instance, Map<Port, Integer>> numberOfReadersMap;
-
-	private Map<Instance, Map<Port, Integer>> portToFifoSizeMap;
-
 	/**
 	 * Creates a new network.
 	 */
-	public Network() {
+	public Network(String file) {
+		this.file = file;
 		graph = new DirectedMultigraph<Vertex, Connection>(Connection.class);
 		inputs = new OrderedMap<String, Port>();
 		outputs = new OrderedMap<String, Port>();
@@ -337,6 +340,15 @@ public class Network {
 	 */
 	public List<Connection> getConnections() {
 		return Arrays.asList(graph.edgeSet().toArray(new Connection[0]));
+	}
+
+	/**
+	 * Returns the XDF file this network was declared in.
+	 * 
+	 * @return the XDF file this network was declared in
+	 */
+	public String getFile() {
+		return file;
 	}
 
 	/**

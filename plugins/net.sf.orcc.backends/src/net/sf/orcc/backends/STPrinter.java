@@ -117,6 +117,34 @@ public final class STPrinter {
 	}
 
 	/**
+	 * Returns the time of the most recently modified file in the hierarchy.
+	 * 
+	 * @param instance
+	 *            an instance
+	 * @return the time of the most recently modified file in the hierarchy
+	 */
+	private long getLastModifiedHierarchy(Instance instance) {
+		long instanceModified = 0;
+		if (instance.isActor()) {
+			Actor actor = instance.getActor();
+			File actorFile = new File(actor.getFile());
+			instanceModified = actorFile.lastModified();
+		} else if (instance.isNetwork()) {
+			Network network = instance.getNetwork();
+			File networkFile = new File(network.getFile());
+			instanceModified = networkFile.lastModified();
+		}
+
+		Instance parent = instance.getParent();
+		if (parent != null) {
+			long parentModif = getLastModifiedHierarchy(parent);
+			return Math.max(parentModif, instanceModified);
+		} else {
+			return instanceModified;
+		}
+	}
+
+	/**
 	 * Returns a map of options associated with the selected back-end.
 	 * 
 	 * @return a map of options
@@ -210,7 +238,16 @@ public final class STPrinter {
 	 */
 	public void printInstance(String fileName, Instance instance)
 			throws IOException {
-		if (!instance.isActor() || !instance.getActor().isSystem()) {
+		long lastModified = getLastModifiedHierarchy(instance);
+
+		if (instance.isActor() && !instance.getActor().isSystem()) {
+			// if source file is older than target file, do not generate
+			File targetFile = new File(fileName);
+			long targetLastModified = targetFile.lastModified();
+			if (lastModified < targetLastModified && !debugMode) {
+				return;
+			}
+
 			ST template = group.getInstanceOf("instance");
 
 			template.add("instance", instance);
