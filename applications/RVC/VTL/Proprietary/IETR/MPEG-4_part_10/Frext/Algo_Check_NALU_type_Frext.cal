@@ -179,7 +179,9 @@ actor Algo_Check_NALU_type_Frext()
 
 	NalUnitType_Unknown: action ==>
 		do
-			println("NalUnitType_Unknown");	
+			if(DEBUG_FLAG_DECODED)then
+				println("NalUnitType_Unknown");
+			end
 		end
 
 
