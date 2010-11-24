@@ -37,7 +37,7 @@
 
 // Mgnt_DBF.cal
 // Description: The management part of deblocking filter without mbaff
-import orcc.Imp_MacroBlockInfo.* ;
+import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.* ;
 
   
 actor Mgnt_DBF (int LUMA_CHROMA) 

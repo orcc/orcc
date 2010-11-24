@@ -15,7 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
-import orcc.Imp_MacroBlockInfo.*;
+import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.*;
 
 actor Mgnt_IQ_INTRA16x16()
 	int (size=16) CoefDCR_L,

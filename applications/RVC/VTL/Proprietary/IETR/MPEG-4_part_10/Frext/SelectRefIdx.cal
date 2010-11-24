@@ -14,7 +14,7 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-import orcc.Imp_MacroBlockInfo.*;
+import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.*;
 
 actor SelectRefIdx()
 	uint(size=2)  SelectList,

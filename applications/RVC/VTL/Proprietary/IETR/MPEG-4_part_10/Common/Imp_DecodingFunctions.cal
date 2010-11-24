@@ -51,7 +51,7 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-unit orcc.Imp_DecodingFunctions :
+unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_DecodingFunctions :
 
 	uint(size=5) SKIP_NAL              =  0;
 

@@ -53,7 +53,7 @@ Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre (IETR/INSA of Rennes)
-import orcc.Imp_MacroBlockInfo.*;
+import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.*;
 
 actor Algo_BlockExpand_AVC ()
 	uint(size=6)  MbType,

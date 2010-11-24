@@ -51,7 +51,7 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-unit orcc.Imp_MacroBlockInfo :
+unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 
 	uint(size=6) BLOCK_TYPE_INTRA_MIN       = 0;
 	uint(size=6) BLOCK_TYPE_I_NxN           = 0;

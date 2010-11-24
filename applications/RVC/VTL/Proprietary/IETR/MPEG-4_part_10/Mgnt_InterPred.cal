@@ -18,7 +18,7 @@
 //Modified the "size" correctly to work with orcc
 
 //Modified by Damien de Saint Jorre (IETR/Insa of Rennes)
-import orcc.Imp_MacroBlockInfo.* ;
+import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.* ;
 
 actor Mgnt_InterPred()
 	uint(size=13) CurrMbAddr,

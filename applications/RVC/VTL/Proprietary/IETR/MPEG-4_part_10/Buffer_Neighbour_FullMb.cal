@@ -18,7 +18,7 @@ Edge are provided from bottom to top, then corner, then left to right
 Jerome GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
-import orcc.Imp_MacroBlockInfo.* ;
+import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.* ;
 
 actor Buffer_Neighbour_FullMb ( int MB_WIDTH , bool IsChroma)
 	uint (size=6) Mb_Type,
