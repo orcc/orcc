@@ -79,6 +79,11 @@ public interface OrccLaunchConstants {
 	 * (output)FIFO
 	 */
 	public static final String ENABLE_TRACES = "net.sf.orcc.simulators.enableTraces";
+	
+	/**
+	 * When enabled, interpreter compare the output of the decoder with a reference video.
+	 */
+	public static final String ENABLE_COMP = "net.sf.orcc.simulators.enableComparison";
 
 	/**
 	 * Size of FIFO channels when not specified by the network.
@@ -129,6 +134,11 @@ public interface OrccLaunchConstants {
 	 * Simulator traces folder associated with an Orcc configuration
 	 */
 	public static final String TRACES_FOLDER = "net.sf.orcc.simulators.tracesFolder";
+	
+	/**
+	 * Simulator reference video for testing video output
+	 */
+	public static final String REFERENCE_FILE = "net.sf.orcc.simulators.compareFile";
 
 	/**
 	 * Folder where the compiled Actors can be found.

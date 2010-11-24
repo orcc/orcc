@@ -34,6 +34,7 @@ import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
+import static net.sf.orcc.OrccLaunchConstants.REFERENCE_FILE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLS;
 
@@ -105,6 +106,11 @@ public class JadeSimulatorImpl implements Simulator {
 	 * Traces folder
 	 */
 	protected String tracesFolder;
+	
+	/**
+	 * Reference video file
+	 */
+	protected String refVideo;
 
 	/**
 	 * Folder where the VTL is
@@ -210,6 +216,12 @@ public class JadeSimulatorImpl implements Simulator {
 			cmdList.add("-w");
 			cmdList.add(tracesFolder);
 		}
+		
+		if (!refVideo.equals("")) {
+			cmdList.add("-o");
+			cmdList.add(refVideo);
+		}
+		
 		String[] cmd = cmdList.toArray(new String[] {});
 
 		//Run application
@@ -280,6 +292,7 @@ public class JadeSimulatorImpl implements Simulator {
 			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			xdfFile = configuration.getAttribute(XDF_FILE, "");
 			tracesFolder = configuration.getAttribute(TRACES_FOLDER, "");
+			refVideo = configuration.getAttribute(REFERENCE_FILE, "");
 			execJade = OrccActivator.getDefault().getPreferenceStore()
 					.getString(P_JADE);
 			toolsFolder = OrccActivator.getDefault().getPreferenceStore()

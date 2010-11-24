@@ -96,9 +96,7 @@ void RoundRobinScheduler::createScheduler(Decoder* decoder){
 	setSource();
 
 	//Set compare file if needed
-	if(YuvFile.compare("") != 0){
-		setCompare();
-	}
+	setCompare();
 }
 
 void RoundRobinScheduler::createSchedulerFn(){
@@ -217,11 +215,23 @@ void RoundRobinScheduler::setSource(){
 
 void RoundRobinScheduler::setCompare(){
 	list<Instance*>::iterator it;
-	Actor* compare = decoder->getActor("Compare");
+	Actor* compare = decoder->getActor("../../../VTL/System/Compare");
 	
-	//Actor compare must be present in the decoder
-	if ( compare == NULL){
+	//Actor compare is not present in the decoder
+	if ((compare == NULL) && (YuvFile.compare("") != 0)){
 		printf("Actor Compare is not present in the current description");
+		exit(1);
+	}
+	
+	//Actor compare is present but the option not set
+	if ((compare != NULL) && (YuvFile.compare("") == 0)){
+		printf("Actor Compare is present in the current description but not set");
+		exit(1);
+	}
+
+	//Actor compare is not present and the option is not set
+	if ((compare == NULL) && (YuvFile.compare("") == 0)){
+		return;
 	}
 	
 	//Get all instances of actor compare

@@ -47,6 +47,23 @@
                workspace="false">
          </browseFile>
       </option>
+      <option
+            defaultValue="false"
+            description="Compare the generated decoder with the reference video"
+            id="net.sf.orcc.simulators.enableComparison"
+            name="Verify output">
+         <checkBox>
+            <option
+                  description="Path of the reference video"
+                  id="net.sf.orcc.simulators.compareFile"
+                  name="Reference video">
+               <browseFile
+                     folder="false"
+                     workspace="false">
+               </browseFile>
+            </option>
+         </checkBox>
+      </option>
    </extension>
    <extension
          point="net.sf.orcc.core.simulators">
@@ -77,6 +94,9 @@
          </option>
          <option
                id="net.sf.orcc.simulators.VTLFolder">
+         </option>
+         <option
+               id="net.sf.orcc.simulators.enableComparison">
          </option>
       </simulator>
    </extension>
