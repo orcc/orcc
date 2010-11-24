@@ -150,16 +150,16 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	List(type: List(type: List(type: int(size=16),size=2), size=16),size= SZ_TAB) MvTab;
 	List(type: List(type: int(size=5), size=16),size= SZ_TAB) RefIdxTab;
 
-	uint(size=3) MbPartIdxMax;
-	uint(size=3) MbPartIdx;
-	uint(size=3) SizeMbMv;
-	uint(size=3) SubMbPartIdxMax;
-	uint(size=3) SubMbPartIdx;
-	uint(size=3) SizeSubMbMv;
-	uint(size=6) MbType;
-	uint(size=LOG2_SZ_TAB) Idx_CurrBlk;
-	uint(size=1) Idx_Sub_Tab;
-	bool IsPred4SubMb;
+	uint(size=3)             MbPartIdxMax;
+	uint(size=3)             MbPartIdx;
+	uint(size=3)             SizeMbMv;
+	uint(size=3)             SubMbPartIdxMax;
+	uint(size=3)             SubMbPartIdx;
+	uint(size=3)             SizeSubMbMv;
+	uint(size=6)             MbType;
+	uint(size=LOG2_SZ_TAB)   Idx_CurrBlk;
+	uint(size=1)             Idx_Sub_Tab;
+	bool                     IsPred4SubMb;
 	int (size=LOG2_SZ_TAB+1) Idx_mbAddrA;
 	int (size=LOG2_SZ_TAB+1) Idx_mbAddrB;
 	int (size=LOG2_SZ_TAB+1) Idx_mbAddrC;
@@ -375,11 +375,13 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	GetNewPic: action
 			NewPic_i :[IsNewPic],
-			DirectSpatialMvPredFlag :[direct_spatial_mv_pred]//////////////////////////////////////////////////
+			DirectSpatialMvPredFlag :[DirectSpatMvPred]
 				==>
 			NewPic_o :[true]
 		guard
 			IsNewPic
+		do
+			direct_spatial_mv_pred := DirectSpatMvPred;
 		end
 
 	GetMbType.MacroBlkIorSI: action
