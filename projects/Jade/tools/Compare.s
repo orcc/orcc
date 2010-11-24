@@ -3,39 +3,37 @@
 
 declare void @llvm.memcpy.i32(i8* nocapture, i8* nocapture, i32, i32) nounwind
 
-@FrameCounter = internal global i32 0             ; <i32*> [#uses=4]
+@FrameCounter = global i32 0             ; <i32*> [#uses=4]
 @ARG_INPUTFILE = internal global i8* null         ; <i8**> [#uses=0]
-@images = internal global i32 0                   ; <i32*> [#uses=4]
+@images = global i32 0                   ; <i32*> [#uses=4]
 @.str = private constant [3 x i8] c"rb\00", align 1 ; <[3 x i8]*> [#uses=1]
-@ptfile = internal global %struct.FILE* null      ; <%struct.FILE**> [#uses=7]
+@ptfile = global %struct.FILE* null      ; <%struct.FILE**> [#uses=7]
 @.str1 = private constant [63 x i8] c"Cannot open yuv_file concatenated input file '%s' for reading\0A\00", align 4 ; <[63 x i8]*> [#uses=1]
-@xsize_int = internal global i32 0                ; <i32*> [#uses=5]
+@xsize_int = global i32 0                ; <i32*> [#uses=5]
 @.str2 = private constant [18 x i8] c"xsize %d invalid\0A\00", align 1 ; <[18 x i8]*> [#uses=1]
-@ysize_int = internal global i32 0                ; <i32*> [#uses=5]
+@ysize_int = global i32 0                ; <i32*> [#uses=5]
 @.str3 = private constant [18 x i8] c"ysize %d invalid\0A\00", align 1 ; <[18 x i8]*> [#uses=1]
-@NumberOfFrames = internal global i32 0           ; <i32*> [#uses=3]
+@NumberOfFrames = global i32 0           ; <i32*> [#uses=3]
 @.str4 = private constant [76 x i8] c"error %d instead of %d at position : i = %d, j = %d, mb_x = %d, mb_y = %d \0A\00", align 4 ; <[76 x i8]*> [#uses=1]
 @.str5 = private constant [24 x i8] c"error %d !!!!!!!!!!!!!\0A\00", align 1 ; <[24 x i8]*> [#uses=1]
-@m_y = internal global i32 0                      ; <i32*> [#uses=6]
-@m_width = internal global i32 0                  ; <i32*> [#uses=10]
-@m_x = internal global i32 0                      ; <i32*> [#uses=7]
-@img_buf_y = internal global [405504 x i8] zeroinitializer, align 32 ; <[405504 x i8]*> [#uses=2]
-@img_buf_u = internal global [101376 x i8] zeroinitializer, align 32 ; <[101376 x i8]*> [#uses=2]
-@img_buf_v = internal global [101376 x i8] zeroinitializer, align 32 ; <[101376 x i8]*> [#uses=2]
-@m_height = internal global i32 0                 ; <i32*> [#uses=5]
+@m_y = global i32 0                      ; <i32*> [#uses=6]
+@m_width = global i32 0                  ; <i32*> [#uses=10]
+@m_x = global i32 0                      ; <i32*> [#uses=7]
+@img_buf_y = global [405504 x i8] zeroinitializer, align 32 ; <[405504 x i8]*> [#uses=2]
+@img_buf_u = global [101376 x i8] zeroinitializer, align 32 ; <[101376 x i8]*> [#uses=2]
+@img_buf_v = global [101376 x i8] zeroinitializer, align 32 ; <[101376 x i8]*> [#uses=2]
+@m_height = global i32 0                 ; <i32*> [#uses=5]
 @.str6 = private constant [18 x i8] c"Frame number %d \0A\00", align 1 ; <[18 x i8]*> [#uses=1]
 @Y = internal global [405504 x i8] zeroinitializer, align 32 ; <[405504 x i8]*> [#uses=1]
 @U = internal global [101376 x i8] zeroinitializer, align 32 ; <[101376 x i8]*> [#uses=1]
 @V = internal global [101376 x i8] zeroinitializer, align 32 ; <[101376 x i8]*> [#uses=1]
-@yuv_file = internal global i8* null                   ; <i8**> [#uses=1]
-@init = internal global i32 1                     ; <i32*> [#uses=2]
-@WIDTH = external global %struct.fifo_i16_s* ; <%struct.fifo_i16_s**> [#uses=3]
-@HEIGHT = external global %struct.fifo_i16_s* ; <%struct.fifo_i16_s**> [#uses=3]
-@B = external global %struct.fifo_u8_s* ; <%struct.fifo_u8_s**> [#uses=3]
+@yuv_file = global i8* null                ; <i8**> [#uses=1]
+@init = global i32 1                     ; <i32*> [#uses=3]
+@B = external global %struct.fifo_i8_s*           ; <%struct.fifo_i8_s**> [#uses=4]
+@WIDTH = external global %struct.fifo_i16_s*      ; <%struct.fifo_i16_s**> [#uses=3]
+@HEIGHT = external global %struct.fifo_i16_s*     ; <%struct.fifo_i16_s**> [#uses=3]
 
-declare i32 @Filesize() nounwind
-
-define internal void @Read_YUV_init(i32 %xsize, i32 %ysize, i8* %filename) nounwind {
+define void @Read_YUV_init(i32 %xsize, i32 %ysize, i8* %filename) nounwind {
 entry:
   %xsize_addr = alloca i32                        ; <i32*> [#uses=5]
   %ysize_addr = alloca i32                        ; <i32*> [#uses=5]
@@ -108,7 +106,9 @@ declare i32 @printf(i8*, ...) nounwind
 
 declare void @exit(i32) noreturn nounwind
 
-define internal void @Read_YUV(i8* %Y, i8* %U, i8* %V) nounwind {
+declare i32 @Filesize()
+
+define void @Read_YUV(i8* %Y, i8* %U, i8* %V) nounwind {
 entry:
   %Y_addr = alloca i8*                            ; <i8**> [#uses=2]
   %U_addr = alloca i8*                            ; <i8**> [#uses=2]
@@ -162,7 +162,7 @@ declare i32 @fread(i8*, i32, i32, %struct.FILE*) nounwind
 
 declare i32 @fseek(%struct.FILE*, i32, i32) nounwind
 
-define internal void @DiffUcharImage(i32 %x_size, i32 %y_size, i8* %img1_uchar, i8* %img2_uchar) nounwind {
+define void @DiffUcharImage(i32 %x_size, i32 %y_size, i8* %img1_uchar, i8* %img2_uchar) nounwind {
 entry:
   %x_size_addr = alloca i32                       ; <i32*> [#uses=6]
   %y_size_addr = alloca i32                       ; <i32*> [#uses=2]
@@ -530,7 +530,7 @@ return:                                           ; preds = %bb25
   ret void
 }
 
-define internal void @set_init(i32 %width, i32 %height) nounwind {
+define void @set_init(i32 %width, i32 %height) nounwind {
 entry:
   %width_addr = alloca i32                        ; <i32*> [#uses=3]
   %height_addr = alloca i32                       ; <i32*> [#uses=3]
@@ -551,40 +551,44 @@ return:                                           ; preds = %entry
   ret void
 }
 
-define void @scheduler() nounwind {
+define i1 @isSchedulable_get_data() nounwind {
+entry:
+  %0 = load %struct.fifo_i8_s** @B, align 4      ; <%struct.fifo_i8_s*> [#uses=1]
+  %1 = call i32 @fifo_u8_has_tokens(%struct.fifo_i8_s* %0, i32 384) nounwind ; <i32> [#uses=1]
+  %2 = icmp ne i32 %1, 0                        ; <i1> [#uses=1]
+  br i1 %2, label %ok, label %nok
+ 
+ok:
+	ret i1 1
+nok:
+	ret i1 0
+}
+
+define void @get_data() nounwind {
 entry:
   %i = alloca i32                                 ; <i32*> [#uses=5]
   %ptr = alloca i16*                              ; <i16**> [#uses=4]
   %width = alloca i16                             ; <i16*> [#uses=2]
   %height = alloca i16                            ; <i16*> [#uses=2]
-  %HEIGHT_buf = alloca [1 x i16]          ; <[1 x i16]*> [#uses=1]
-  %WIDTH_buf = alloca [1 x i16]           ; <[1 x i16]*> [#uses=1]
-  %B_buf = alloca [384 x i8]              ; <[384 x i8]*> [#uses=1]
   %"alloca point" = bitcast i32 0 to i32          ; <i32> [#uses=0]
   store i32 0, i32* %i, align 4
   br label %bb
 
-bb:                                               ; preds = %bb8, %entry
-  %0 = load %struct.fifo_i16_s** @WIDTH, align 4 ; <%struct.fifo_i16_s*> [#uses=1]
+bb:                                               ; preds = %bb7, %entry
+  %0 = load %struct.fifo_i16_s** @WIDTH, align 4  ; <%struct.fifo_i16_s*> [#uses=1]
   %1 = call i32 @fifo_i16_has_tokens(%struct.fifo_i16_s* %0, i32 1) nounwind ; <i32> [#uses=1]
   %2 = icmp ne i32 %1, 0                          ; <i1> [#uses=1]
-  br i1 %2, label %bb1, label %bb7
+  br i1 %2, label %bb1, label %bb5
 
 bb1:                                              ; preds = %bb
   %3 = load %struct.fifo_i16_s** @HEIGHT, align 4 ; <%struct.fifo_i16_s*> [#uses=1]
   %4 = call i32 @fifo_i16_has_tokens(%struct.fifo_i16_s* %3, i32 1) nounwind ; <i32> [#uses=1]
   %5 = icmp ne i32 %4, 0                          ; <i1> [#uses=1]
-  br i1 %5, label %bb2, label %bb7
+  br i1 %5, label %bb2, label %bb5
 
 bb2:                                              ; preds = %bb1
-  %6 = load %struct.fifo_i16_s** @WIDTH, align 4 ; <%struct.fifo_i16_s*> [#uses=1]
-  %WIDTH_buf3 = bitcast [1 x i16]* %WIDTH_buf to i16* ; <i16*> [#uses=1]
-  
-  ;left for the current fifos
-  ;%7 = call i16* @fifo_i16_read(%struct.fifo_i16_s* %6, i16* %WIDTH_buf3, i32 1) nounwind ; <i16*> [#uses=1]
-  
+  %6 = load %struct.fifo_i16_s** @WIDTH, align 4  ; <%struct.fifo_i16_s*> [#uses=1]
   %7 = call i16* @fifo_i16_read(%struct.fifo_i16_s* %6, i32 1) nounwind ; <i16*> [#uses=1]
-  
   store i16* %7, i16** %ptr, align 4
   %8 = load i16** %ptr, align 4                   ; <i16*> [#uses=1]
   %9 = getelementptr inbounds i16* %8, i32 0      ; <i16*> [#uses=1]
@@ -596,13 +600,7 @@ bb2:                                              ; preds = %bb1
   %14 = load %struct.fifo_i16_s** @WIDTH, align 4 ; <%struct.fifo_i16_s*> [#uses=1]
   call void @fifo_i16_read_end(%struct.fifo_i16_s* %14, i32 1) nounwind
   %15 = load %struct.fifo_i16_s** @HEIGHT, align 4 ; <%struct.fifo_i16_s*> [#uses=1]
-  %HEIGHT_buf4 = bitcast [1 x i16]* %HEIGHT_buf to i16* ; <i16*> [#uses=1]
-  
-  ;left for the current fifos
-  ;%16 = call i16* @fifo_i16_read(%struct.fifo_i16_s* %15, i16* %HEIGHT_buf4, i32 1) nounwind ; <i16*> [#uses=1]
-  
   %16 = call i16* @fifo_i16_read(%struct.fifo_i16_s* %15, i32 1) nounwind ; <i16*> [#uses=1]
-  
   store i16* %16, i16** %ptr, align 4
   %17 = load i16** %ptr, align 4                  ; <i16*> [#uses=1]
   %18 = getelementptr inbounds i16* %17, i32 0    ; <i16*> [#uses=1]
@@ -615,50 +613,49 @@ bb2:                                              ; preds = %bb1
   call void @fifo_i16_read_end(%struct.fifo_i16_s* %23, i32 1) nounwind
   %24 = load i32* @init, align 4                  ; <i32> [#uses=1]
   %25 = icmp eq i32 %24, 1                        ; <i1> [#uses=1]
-  br i1 %25, label %bb5, label %bb6
+  br i1 %25, label %bb3, label %bb4
 
-bb5:                                              ; preds = %bb2
+bb3:                                              ; preds = %bb2
   %26 = load i16* %height, align 2                ; <i16> [#uses=1]
   %27 = sext i16 %26 to i32                       ; <i32> [#uses=1]
   %28 = load i16* %width, align 2                 ; <i16> [#uses=1]
   %29 = sext i16 %28 to i32                       ; <i32> [#uses=1]
   call void @set_init(i32 %29, i32 %27) nounwind
   store i32 0, i32* @init, align 4
-  br label %bb6
+  br label %bb4
 
-bb6:                                              ; preds = %bb5, %bb2
+bb4:                                              ; preds = %bb3, %bb2
   %30 = load i32* %i, align 4                     ; <i32> [#uses=1]
   %31 = add nsw i32 %30, 1                        ; <i32> [#uses=1]
   store i32 %31, i32* %i, align 4
-  br label %bb7
+  br label %bb5
 
-bb7:                                              ; preds = %bb6, %bb1, %bb
-  %32 = load %struct.fifo_u8_s** @B, align 4 ; <%struct.fifo_u8_s*> [#uses=1]
-  %33 = call i32 @fifo_u8_has_tokens(%struct.fifo_u8_s* %32, i32 384) nounwind ; <i32> [#uses=1]
-  %34 = icmp ne i32 %33, 0                        ; <i1> [#uses=1]
-  br i1 %34, label %bb8, label %bb10
+bb5:                                              ; preds = %bb4, %bb1, %bb
+  %32 = load %struct.fifo_i8_s** @B, align 4      ; <%struct.fifo_i8_s*> [#uses=1]
+  %33 = call i32 @fifo_u8_has_tokens(%struct.fifo_i8_s* %32, i32 384) nounwind ; <i32> [#uses=1]
+  %34 = icmp eq i32 %33, 0                        ; <i1> [#uses=1]
+  br i1 %34, label %bb8, label %bb6
 
-bb8:                                              ; preds = %bb7
-  %35 = load %struct.fifo_u8_s** @B, align 4 ; <%struct.fifo_u8_s*> [#uses=1]
-  %B_buf9 = bitcast [384 x i8]* %B_buf to i8* ; <i8*> [#uses=1]
-  
-  ;left for the current fifos
-  ;%36 = call i8* @fifo_u8_read(%struct.fifo_u8_s* %35, i8* %B_buf9, i32 384) nounwind ; <i8*> [#uses=1]
-  
-  %36 = call i8* @fifo_u8_read(%struct.fifo_u8_s* %35, i32 384) nounwind ; <i8*> [#uses=1]
-  
-  call void @write_mb(i8* %36) nounwind
-  %37 = load %struct.fifo_u8_s** @B, align 4 ; <%struct.fifo_u8_s*> [#uses=1]
-  call void @fifo_u8_read_end(%struct.fifo_u8_s* %37, i32 384) nounwind
-  %38 = load i32* %i, align 4                     ; <i32> [#uses=1]
-  %39 = add nsw i32 %38, 1                        ; <i32> [#uses=1]
-  store i32 %39, i32* %i, align 4
+bb6:                                              ; preds = %bb5
+  %35 = load i32* @init, align 4                  ; <i32> [#uses=1]
+  %36 = icmp ne i32 %35, 0                        ; <i1> [#uses=1]
+  br i1 %36, label %bb8, label %bb7
+
+bb7:                                              ; preds = %bb6
+  %37 = load %struct.fifo_i8_s** @B, align 4      ; <%struct.fifo_i8_s*> [#uses=1]
+  %38 = call i8* @fifo_u8_read(%struct.fifo_i8_s* %37, i32 384) nounwind ; <u8*> [#uses=1]
+  call void @write_mb(i8* %38) nounwind
+  %39 = load %struct.fifo_i8_s** @B, align 4      ; <%struct.fifo_i8_s*> [#uses=1]
+  call void @fifo_u8_read_end(%struct.fifo_i8_s* %39, i32 384) nounwind ; <i32> [#uses=0]
+  %40 = load i32* %i, align 4                     ; <i32> [#uses=1]
+  %41 = add nsw i32 %40, 1                        ; <i32> [#uses=1]
+  store i32 %41, i32* %i, align 4
   br label %bb
 
-bb10:                                             ; preds = %bb7
+bb8:                                              ; preds = %bb6, %bb5
   br label %return
 
-return:                                           ; preds = %bb10
+return:                                           ; preds = %bb8
   ret void
 }
 
@@ -667,12 +664,15 @@ return:                                           ; preds = %bb10
 !action_scheduler = !{!2}
 !inputs = !{!3, !5, !7}
 !state_variables = !{!9, !12, !15, !18, !21, !24, !27, !30, !33, !36, !39, !42, !45, !48, !51}
-!procedures = !{!54, !55, !56, !57, !58, !59}
+!procedures = !{!58, !59, !60, !61, !62, !63}
+!actions = !{!54}
+
 
 !0 = metadata !{metadata !"tools/Compare.bc"}
 !1 = metadata !{metadata !"Compare"}
-!2 = metadata !{null, null, void()* @scheduler}
-!3 = metadata !{metadata !4, metadata !"B", %struct.fifo_u8_s** @B}
+!2 = metadata !{metadata !64, null}
+!64 = metadata !{metadata !54}
+!3 = metadata !{metadata !4, metadata !"B", %struct.fifo_i8_s** @B}
 !4 = metadata  !{ i32 8 ,  null }
 !5 = metadata !{metadata !6, metadata !"WIDTH", %struct.fifo_i16_s** @WIDTH}
 !6 = metadata  !{ i32 16 ,  null }
@@ -723,21 +723,21 @@ return:                                           ; preds = %bb10
 !51 = metadata !{metadata !52, metadata !53, i32* @images}
 !52 = metadata !{metadata !"images", i1 0, i32 0,  i32 0}
 !53 = metadata  !{ i32 32 ,  null }
-!54 = metadata !{metadata !"Filesize", i1 1 , i32()* @Filesize}
-!55 = metadata !{metadata !"set_init", i1 0 , void(i32, i32)* @set_init}
-!56 = metadata !{metadata !"write_mb", i1 0 , void(i8*)* @write_mb}
-!57 = metadata !{metadata !"Read_YUV_init", i1 0 , void(i32, i32, i8*)* @Read_YUV_init}
-!58 = metadata !{metadata !"Read_YUV", i1 0 , void(i8*, i8*, i8*)* @Read_YUV}
-!59 = metadata !{metadata !"DiffUcharImage", i1 0 , void(i32, i32, i8*, i8*)* @DiffUcharImage}
+!54 = metadata !{ null, metadata !55, null, metadata !56, metadata !57}
+!55 = metadata !{metadata !3, i32 1}
+!56 = metadata  !{metadata !"isSchedulable_get_data", i1 0, i1()* @isSchedulable_get_data}
+!57 = metadata  !{metadata !"get_data", i1 0, void()* @get_data}
+!58 = metadata !{metadata !"Filesize", i1 1 , i32()* @Filesize}
+!59 = metadata !{metadata !"set_init", i1 0 , void(i32, i32)* @set_init}
+!60 = metadata !{metadata !"write_mb", i1 0 , void(i8*)* @write_mb}
+!61 = metadata !{metadata !"Read_YUV_init", i1 0 , void(i32, i32, i8*)* @Read_YUV_init}
+!62 = metadata !{metadata !"Read_YUV", i1 0 , void(i8*, i8*, i8*)* @Read_YUV}
+!63 = metadata !{metadata !"DiffUcharImage", i1 0 , void(i32, i32, i8*, i8*)* @DiffUcharImage}
 
 %struct.fifo_i8_s = type opaque
 %struct.fifo_i16_s = type opaque
 %struct.fifo_i32_s = type opaque
 %struct.fifo_i64_s = type opaque
-%struct.fifo_u8_s = type opaque
-%struct.fifo_u16_s = type opaque
-%struct.fifo_u32_s = type opaque
-%struct.fifo_u64_s = type opaque
 
 declare i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n)
 declare i32 @fifo_i8_has_room(%struct.fifo_i8_s* %fifo, i32 %n)
@@ -746,13 +746,13 @@ declare i8* @fifo_i8_read(%struct.fifo_i8_s* %fifo, i32 %n)
 declare void @fifo_i8_read_end(%struct.fifo_i8_s* %fifo, i32 %n)
 declare i8* @fifo_i8_write(%struct.fifo_i8_s* %fifo, i32 %n)
 declare void @fifo_i8_write_end(%struct.fifo_i8_s* %fifo, i32 %n)
-declare i32 @fifo_u8_has_tokens(%struct.fifo_u8_s* %fifo, i32 %n)
-declare i32 @fifo_u8_has_room(%struct.fifo_u8_s* %fifo, i32 %n)
-declare i8* @fifo_u8_peek(%struct.fifo_u8_s* %fifo, i32 %n)
-declare i8* @fifo_u8_read(%struct.fifo_u8_s* %fifo, i32 %n)
-declare void @fifo_u8_read_end(%struct.fifo_u8_s* %fifo, i32 %n)
-declare i8* @fifo_u8_write(%struct.fifo_u8_s* %fifo, i32 %n)
-declare void @fifo_u8_write_end(%struct.fifo_u8_s* %fifo, i32 %n)
+declare i32 @fifo_u8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n)
+declare i32 @fifo_u8_has_room(%struct.fifo_i8_s* %fifo, i32 %n)
+declare i8* @fifo_u8_peek(%struct.fifo_i8_s* %fifo, i32 %n)
+declare i8* @fifo_u8_read(%struct.fifo_i8_s* %fifo, i32 %n)
+declare void @fifo_u8_read_end(%struct.fifo_i8_s* %fifo, i32 %n)
+declare i8* @fifo_u8_write(%struct.fifo_i8_s* %fifo, i32 %n)
+declare void @fifo_u8_write_end(%struct.fifo_i8_s* %fifo, i32 %n)
 declare i32 @fifo_i16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n)
 declare i32 @fifo_i16_has_room(%struct.fifo_i16_s* %fifo, i32 %n)
 declare i16* @fifo_i16_peek(%struct.fifo_i16_s* %fifo, i32 %n)
@@ -761,13 +761,13 @@ declare void @fifo_i16_read_end(%struct.fifo_i16_s* %fifo, i32 %n)
 declare i16* @fifo_i16_write(%struct.fifo_i16_s* %fifo, i32 %n)
 declare void @fifo_i16_write_end(%struct.fifo_i16_s* %fifo, i32 %n)
 declare i32 @fifo_i16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n)
-declare i32 @fifo_u16_has_room(%struct.fifo_u16_s* %fifo, i32 %n)
-declare i16* @fifo_u16_peek(%struct.fifo_u16_s* %fifo, i32 %n)
-declare i16* @fifo_u16_read(%struct.fifo_u16_s* %fifo, i32 %n) 
-declare void @fifo_u16_read_end(%struct.fifo_u16_s* %fifo, i32 %n)
-declare i16* @fifo_u16_write(%struct.fifo_u16_s* %fifo, i32 %n)
-declare void @fifo_u16_write_end(%struct.fifo_u16_s* %fifo, i32 %n)
-declare i32 @fifo_u16_has_tokens(%struct.fifo_u16_s* %fifo, i32 %n)
+declare i32 @fifo_u16_has_room(%struct.fifo_i16_s* %fifo, i32 %n)
+declare i16* @fifo_u16_peek(%struct.fifo_i16_s* %fifo, i32 %n)
+declare i16* @fifo_u16_read(%struct.fifo_i16_s* %fifo, i32 %n) 
+declare void @fifo_u16_read_end(%struct.fifo_i16_s* %fifo, i32 %n)
+declare i16* @fifo_u16_write(%struct.fifo_i16_s* %fifo, i32 %n)
+declare void @fifo_u16_write_end(%struct.fifo_i16_s* %fifo, i32 %n)
+declare i32 @fifo_u16_has_tokens(%struct.fifo_i16_s* %fifo, i32 %n)
 declare i32 @fifo_i32_has_tokens(%struct.fifo_i32_s* %fifo, i32 %n)
 declare i32 @fifo_i32_has_room(%struct.fifo_i32_s* %fifo, i32 %n)
 declare i32* @fifo_i32_peek(%struct.fifo_i32_s* %fifo, i32 %n)
@@ -775,13 +775,13 @@ declare i32* @fifo_i32_read(%struct.fifo_i32_s* %fifo, i32 %n)
 declare void @fifo_i32_read_end(%struct.fifo_i32_s* %fifo, i32 %n)
 declare i32* @fifo_i32_write(%struct.fifo_i32_s* %fifo, i32 %n)
 declare void @fifo_i32_write_end(%struct.fifo_i32_s* %fifo, i32 %n)
-declare i32 @fifo_u32_has_tokens(%struct.fifo_u32_s* %fifo, i32 %n)
-declare i32 @fifo_u32_has_room(%struct.fifo_u32_s* %fifo, i32 %n)
-declare i32* @fifo_u32_peek(%struct.fifo_u32_s* %fifo, i32 %n)
-declare i32* @fifo_u32_read(%struct.fifo_u32_s* %fifo, i32 %n)
-declare void @fifo_u32_read_end(%struct.fifo_u32_s* %fifo, i32 %n)
-declare i32* @fifo_u32_write(%struct.fifo_u32_s* %fifo, i32 %n)
-declare void @fifo_u32_write_end(%struct.fifo_u32_s* %fifo, i32 %n) 
+declare i32 @fifo_u32_has_tokens(%struct.fifo_i32_s* %fifo, i32 %n)
+declare i32 @fifo_u32_has_room(%struct.fifo_i32_s* %fifo, i32 %n)
+declare i32* @fifo_u32_peek(%struct.fifo_i32_s* %fifo, i32 %n)
+declare i32* @fifo_u32_read(%struct.fifo_i32_s* %fifo, i32 %n)
+declare void @fifo_u32_read_end(%struct.fifo_i32_s* %fifo, i32 %n)
+declare i32* @fifo_u32_write(%struct.fifo_i32_s* %fifo, i32 %n)
+declare void @fifo_u32_write_end(%struct.fifo_i32_s* %fifo, i32 %n) 
 declare i32 @fifo_i64_has_tokens(%struct.fifo_i64_s* %fifo, i32 %n)
 declare i32 @fifo_i64_get_room(%struct.fifo_i64_s* %fifo)
 declare i64* @fifo_i64_peek(%struct.fifo_i64_s* %fifo, i32 %n)

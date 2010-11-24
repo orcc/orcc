@@ -51,11 +51,13 @@
 #include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Jit/LLVMOptimizer.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
+#include "llvm/Support/PassNameParser.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
+extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
 
 DecoderEngine::DecoderEngine(llvm::LLVMContext& C, AbstractFifo* fifo): Context(C) {	
 	//Set properties
@@ -97,7 +99,19 @@ int DecoderEngine::load(Network* network) {
 	timer = clock ();
 	
 	LLVMUtility utility;
-	utility.printModule("module.txt", &decoder);
+	string outName;
+
+	if (PassList.size() > 0){
+		outName = PassList[0]->getPassArgument();
+	}else{
+		outName = "module";
+	}
+
+	outName.append(".txt");
+	
+	utility.printModule(outName, &decoder);
+
+	
 	utility.verify("error.txt", &decoder);
 
 	cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

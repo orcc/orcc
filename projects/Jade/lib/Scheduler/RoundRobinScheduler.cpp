@@ -178,15 +178,19 @@ void RoundRobinScheduler::setExternalFunctions(){
 		executionEngine->mapProcedure(filesize, (void *)Filesize);
 	}
 
-	if(!nodisplay){
-		//Get display instance
-		Instance* display = decoder->getInstance("display");
+	//Get display instance
+	Instance* display = decoder->getInstance("display");
 
-		//Get procedures from display
-		Procedure* setVideo = display->getProcedure("set_video");
-		Procedure* setInit = display->getProcedure("set_init");
-		Procedure* writeMb = display->getProcedure("write_mb");
+	//Get procedures from display
+	Procedure* setVideo = display->getProcedure("set_video");
+	Procedure* setInit = display->getProcedure("set_init");
+	Procedure* writeMb = display->getProcedure("write_mb");
 
+	if(nodisplay){
+		executionEngine->mapProcedure(setVideo, (void *)emptyFunc);
+		executionEngine->mapProcedure(setInit, (void *)initT);
+		executionEngine->mapProcedure(writeMb, (void *)display_write_mb);
+	}else{
 		//Map procedure to display
 		executionEngine->mapProcedure(setVideo, (void *)display_set_video);
 		executionEngine->mapProcedure(setInit, (void *)display_init);

@@ -67,7 +67,6 @@ using namespace std;
 using namespace llvm;
 
 extern cl::opt<std::string> VTLDir;
-extern cl::opt<bool> nodisplay;
 
 // Define MDNode keys
 const std::string IRConstant::KEY_ACTION_SCHED = "action_scheduler";
@@ -97,13 +96,6 @@ Actor* IRParser::parseActor(string classz){
 		file = classz.substr(found + 1);
 	}else {
 		file = classz;
-	}
-	
-	//Don't load actor display if option nodisplay is selected
-	if(nodisplay){
-		if (classz.compare("Display")==0){
-			file = "Nodisplay";
-		}
 	}
 	
 	//Parse the bitcode

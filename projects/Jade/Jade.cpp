@@ -212,6 +212,11 @@ int main(int argc, char **argv) {
 
 	setOptions();
 
+	for (unsigned int i =0 ; i < PassList.size(); i++ ){
+		cout << "Pass added: "<< PassList[i]->getPassName() << "\n";
+		cout << "Argument name :" << PassList[i]->getPassArgument() << "\n";
+	}
+
 	//Parsing XDF file
 	std::cout << "Jade started, parsing file " << XDFFile.getValue() << ". \n";
 	XDFParser xdfParser(XDFFile);

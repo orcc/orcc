@@ -31,7 +31,7 @@
 #include "SDL.h"
 
 static SDL_Surface *m_screen;
-static SDL_Overlay *m_overlay;
+static SDL_Overlay *m_overlay = NULL;
 
 #define MAX_WIDTH 720
 #define MAX_HEIGHT 576
@@ -76,6 +76,15 @@ void print_fps_avg(void) {
 
 static Uint32 t;
 
+void emptyFunc(){
+
+}
+
+void initT(){
+	start_time = SDL_GetTicks();
+	t = start_time;
+}
+
 void display_show_image(void) {
 	SDL_Rect rect = { 0, 0, m_width, m_height };
 
@@ -105,6 +114,10 @@ void display_show_image(void) {
 		t = t2;
 		num_images_start = num_images_end;
 	}
+/*
+	if (num_images_end > 100){
+		exit(1);
+	}*/
 
 	/* Grab all the events off the queue. */
 	while (SDL_PollEvent(&event)) {
@@ -163,7 +176,19 @@ void display_write_mb(unsigned char tokens[384]) {
 	if (m_y == m_height) {
 		m_x = 0;
 		m_y = 0;
-		display_show_image();
+		if (m_overlay != NULL){
+			display_show_image();
+		}else{
+			num_images_end++;
+			int t2 = SDL_GetTicks();
+			if (t2 - t > 3000) {
+				printf("%f images/sec\n",
+					1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
+
+				t = t2;
+				num_images_start = num_images_end;
+			}
+		}
 	}
 }
 
