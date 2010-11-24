@@ -426,9 +426,9 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		end
 
 	GetMbType.B_Skip_B_Direct_16x16: action
-			mb_type     :[MacroBlkType],
-			NewPic_i    :[IsNewPic],
-			colZeroFlag :[TabColZero] repeat 16,
+			mb_type        :[MacroBlkType],
+			NewPic_i       :[IsNewPic],
+			colZeroFlag    :[TabColZero] repeat 16,
 			CurrMbAddr     :[Curr_Mb_Addr],
 			FirstMbInSlice :[Fst_Mb],
 			PicWidthInMb   :[pic_width_in_mb]
@@ -476,9 +476,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				Idx_mbAddrD := -1;
 			end
 			if(MacroBlkType = BLOCK_TYPE_B_SKIP)then
-				if(direct_spatial_mv_pred)then
-					println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
-				else //spatial prediction
+				if(direct_spatial_mv_pred)then // spatial prediction
 					foreach int i in 0 .. 15
 					do
 						GetNeighbourBlockParametres (i,4);
@@ -496,6 +494,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 							MvTab[Idx_CurrBlk][i][1] := OMv[1];
 						end
 					end
+				else //temporal prediction
+					println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
 				end
 			else
 				println("GetMbType.B_Skip_B_Direct_16x16 : B_DIRECT_16x16 not implemented yet !!");	
