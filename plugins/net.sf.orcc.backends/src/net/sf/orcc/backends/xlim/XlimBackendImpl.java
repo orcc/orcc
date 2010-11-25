@@ -40,6 +40,7 @@ import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
+import net.sf.orcc.backends.transformations.ListOfOneElementToScalarTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
@@ -49,7 +50,6 @@ import net.sf.orcc.backends.xlim.transformations.FirstPhiValuesOfWhileNodeTransf
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
-import net.sf.orcc.ir.transformations.BlockCombine;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
@@ -85,7 +85,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = {
 				new ArrayInitializeTransformation(),
-				new InlineTransformation(true, true), new BlockCombine(),
+				new InlineTransformation(true, true),
+				new ListOfOneElementToScalarTransformation(),
 				new DeadGlobalElimination(), new DeadCodeElimination(),
 				new DeadVariableRemoval(true),
 				new ListFlattenTransformation(false, true, false),
