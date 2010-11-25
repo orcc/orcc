@@ -687,20 +687,16 @@
     <Connection dst="MVReconstruct" dst-port="DirectSpatialMvPred"
         src="DecodePic" src-port="DirectSpatialMvPred"/>
     <Connection dst="Mgnt_InterPred" dst-port="MV" src="MVReconstruct" src-port="MV"/>
-    <Connection dst="Mgnt_InterPred" dst-port="CurrMbAddr"
-        src="DecodePic" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_InterPred" dst-port="MbPartIdx"
         src="DecodePic" src-port="MbPartIdx"/>
     <Connection dst="Mgnt_InterPred" dst-port="PartSZ"
         src="MVReconstruct" src-port="PartSZ"/>
     <Connection dst="Mgnt_InterPred" dst-port="Location"
         src="MVReconstruct" src-port="LOCATION"/>
-    <Connection dst="Mgnt_InterPred" dst-port="Mb_Type" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="Mgnt_InterPred" dst-port="Poc2Read"
         src="SelectRefIdx" src-port="PocToRead"/>
-    <Connection dst="Mgnt_InterPred" dst-port="PicSizeInMb"
-        src="DecodePic" src-port="PicSizeInMb"/>
     <Connection dst="" dst-port="PocToRead" src="Mgnt_InterPred" src-port="PocToRead"/>
     <Connection dst="" dst-port="ReadAddress_l" src="Mgnt_InterPred" src-port="ReadAddr_l"/>
     <Connection dst="" dst-port="ReadAddress_c" src="Mgnt_InterPred" src-port="ReadAddr_c"/>
+    <Connection dst="Mgnt_InterPred" dst-port="Mb_Type" src="DecodePic" src-port="MbType4Pred"/>
 </XDF>

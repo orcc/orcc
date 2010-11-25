@@ -21,14 +21,12 @@
 import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.* ;
 
 actor Mgnt_InterPred()
-	uint(size=13) CurrMbAddr,
-	uint(size=3)  MbPartIdx,
+	uint(size=3)  MbPartIdx,/* Should be replaced by Mb_Type + look_up table*/
+	uint(size=6)  PartSZ,/* Should be replaced by Mb_Type + look_up table*/
 	uint(size=6)  Mb_Type,
-	uint(size=13) PicSizeInMb,
 	int (size=16) MV,
 	uint(size=11) Location,
-	uint(size=32) Poc2Read,
-	uint(size=6)  PartSZ
+	uint(size=32) Poc2Read
 		==>
 	int (size=12) ReadAddr_l,
 	int (size=12) ReadAddr_c,
@@ -43,49 +41,11 @@ actor Mgnt_InterPred()
 	int width;
 	int height;
 	int count := 0;
-	int currMB := 0;
-	int pic_size := 0;
 	uint(size=32) poc_to_read;
 
-	//Mb_Type_NOK : Consume the token, nothing else to do 
-	Mb_Type_NOK_and_IPCM: action
-			Mb_Type:[ mb_type ],
-			PicSizeInMb:[ c ],
-			CurrMbAddr:[ valCurrMbAddr ]
+	get_MB: action
+			Mb_Type      :[ mb_type ]
 				==>
-		guard
-			mb_type = BLOCK_TYPE_I_PCM
-		do
-			currMB := valCurrMbAddr;
-			pic_size := c;
-		end
-
-	//Mb_Type_NOK : Consume the token, nothing else to do 
-	Mb_Type_NOK: action
-			Mb_Type     :[ mb_type ],
-			PicSizeInMb :[ c ],
-			CurrMbAddr  :[ valCurrMbAddr ]
-				==>
-		guard
-			mb_type >= BLOCK_TYPE_INTRA_MIN,
-			mb_type <= BLOCK_TYPE_INTRA_MAX,
-			mb_type != BLOCK_TYPE_I_PCM
-		do
-			currMB := valCurrMbAddr;
-			pic_size := c;
-	end
-
-	//Mb_Type_OK : Enable the prediction 
-	Mb_Type_OK: action
-			Mb_Type      :[ mb_type ],
-			PicSizeInMb  :[ c ],
-			CurrMbAddr   :[ valCurrMbAddr ]
-				==>
-		guard
-			not(mb_type >= BLOCK_TYPE_INTRA_MIN and mb_type <= BLOCK_TYPE_INTRA_MAX)
-		do
-			currMB := valCurrMbAddr;
-			pic_size := c;
 		end
 
 	get_pos: action
@@ -162,37 +122,22 @@ actor Mgnt_InterPred()
 		end
 
 	MB_Ndone: action ==>
-		end
-
-	PIC_done: action ==>
 		guard
-			currMB = pic_size - 1
-		end
-
-	PIC_Ndone: action ==>
-		guard
-			currMB < pic_size - 1
+			count < 16
 		end
 
 	schedule fsm get_MB :
-		get_MB       (Mb_Type_NOK_and_IPCM )--> get_pic_done;
-		get_MB       (Mb_Type_NOK          )--> get_pic_done;
-		get_MB       (Mb_Type_OK           )--> get_pos;
+		MB_done (MB_done    )--> get_MB;
+		MB_done (MB_Ndone   )--> get_pos;
 
-		get_pic_done (PIC_done             )--> get_MB;
-		get_pic_done (PIC_Ndone            )--> get_MB;
+		get_MB  (get_MB     )--> get_pos;
 
-		MB_done      (MB_done              )--> get_pic_done;
-		MB_done      (MB_Ndone             )--> get_pos;
+		get_pos (get_pos    )--> get_mv;
 
-		get_pos      (get_pos              )--> get_mv;
-
-		get_mv       (get_mv               )--> MB_done;
+		get_mv  (get_mv     )--> MB_done;
 	end
 
 	priority
-		PIC_done      > MB_done > MB_Ndone;
-		PIC_Ndone     > PIC_done;
+		MB_Ndone > MB_done;
 	end
-
 end
