@@ -71,19 +71,6 @@ actor SelectMvpLX()
 	uint(size=2)  SelectList
 		:
 
-	List(type: uint(size=3),size=8) NumMbPart_P =
-		[
-			1,2,2,4,4,1,1,1
-		];
-
-	List(type: uint(size=3),size=32) NumMbPart_B =
-		[
-			1,1,1,1,2,2,2,2,2,2,
-			2,2,2,2,2,2,2,2,2,2,
-			2,2,4,1,1,1,1,1,1,1,
-			1,1
-		];
-
 	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
 		[
 			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
@@ -137,16 +124,7 @@ actor SelectMvpLX()
 					1
 				end;
 			MbPartIdx     := 0;
-			MbPartIdxMax  :=
-				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
-					NumMbPart_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]	
-				else
-					if(MacroBlkType <= BLOCK_TYPE_P_MAX)then
-						NumMbPart_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
-					else//MacroBlockType = P_SKIP or B_SKIP
-						1
-					end
-				end;
+			MbPartIdxMax  := NumMbPart(MacroBlkType);
 			Is8x8Mb :=    (MacroBlkType = BLOCK_TYPE_P_8x8ref0)
 			           or (MacroBlkType = BLOCK_TYPE_P_8x8)
 			           or (MacroBlkType = BLOCK_TYPE_B_8x8);

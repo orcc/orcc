@@ -113,19 +113,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			 0, 0, 0, 0, 0, 0]
 		];
 
-	List(type: uint(size=3),size=8) NumMbPart_P =
-		[
-			1,2,2,4,4,1,1,1
-		];
-
-	List(type: uint(size=3),size=32) NumMbPart_B =
-		[
-			1,1,1,1,2,2,2,2,2,2,
-			2,2,2,2,2,2,2,2,2,2,
-			2,2,4,1,1,1,1,1,1,1,
-			1,1
-		];	
-
 	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
 		[
 			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
@@ -546,12 +533,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				end;
 			MbType        := MacroBlkType;
 			MbPartIdx     := 0;
-			MbPartIdxMax  :=
-				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
-					NumMbPart_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]
-				else
-					NumMbPart_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
-				end;
+			MbPartIdxMax  := NumMbPart(MacroBlkType);
 			SizeMbMv  :=
 				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
 					SizeMb_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]
