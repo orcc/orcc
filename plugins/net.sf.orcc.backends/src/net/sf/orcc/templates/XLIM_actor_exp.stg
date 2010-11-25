@@ -153,14 +153,11 @@ Decrement(decrement) ::= <<
 >>
 
 HasTokens(hasTokens) ::= <<
-<operation kind="pinAvail" portName="$hasTokens.port$">
-	<port dir="out" size="32" source="$hasTokens.target$_pinAvail" typeName="int"/>
-</operation>
 <operation kind="\$literal_Integer" value="$hasTokens.numTokens$">
 	<port dir="out" size="32" source="$hasTokens.target$_tokenCount" typeName="int"/>
 </operation>
 <operation kind="\$ge">
-	<port dir="in" source="$hasTokens.target$_pinAvail"/>
+	<port dir="in" source="$hasTokens.port$_pinAvail"/>
 	<port dir="in" source="$hasTokens.target$_tokenCount"/>
 	$port(dir="out", type=hasTokens.target.type, source=hasTokens.target)$
 </operation>
@@ -469,14 +466,11 @@ action(action) ::= <<
 
 outputPatternPort(port, index, index0, state) ::= <<
 <!--  OutputPattern -->
-<operation kind="pinAvail" portName="$port$">
-	<port dir="out" size="32" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_pinAvail" typeName="int"/>
-</operation>
 <operation kind="\$literal_Integer" value="$pattern.(port)$">
 	<port dir="out" size="32" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount" typeName="int"/>
 </operation>
 <operation kind="\$ge">
-	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_pinAvail"/>
+	<port dir="in" source="$port$_pinAvail"/>
 	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount"/>
 	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
 </operation>
@@ -505,6 +499,12 @@ outputPattern(pattern,action,state) ::= <<
 $pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0, state=state)$}; separator="\n"$
 <!-- Last outputPattern -->
 $outputPatternPortDecision(index=length(pattern.keys),state=state); separator="\n"$
+>>
+
+declarePinAvailableVariable(port) ::= <<
+<operation kind="pinAvail" portName="$port$">
+  <port dir="out" size="32" source="$port$_pinAvail" typeName="int"/>
+</operation>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -554,6 +554,10 @@ scheduler(actions) ::= <<
 			</operation>
 		</module>
 		<module kind="body">
+		  <!-- Make all pinAvail call -->
+		  $instance.actor.inputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
+      $instance.actor.outputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
+    
 			$instance.actor.actions: isSchedulableTest(); separator="\n"$
 			$if(actions)$$schedulingTest(actions)$$endif$
 			<!--Close modules -->
@@ -650,13 +654,17 @@ schedulerFSM(actions, fsm) ::= <<
 	$fsm.transitions : {transition | $enumStates(transition=transition)$}; separator="\n"$
 	<!-- infinite loop -->
 	<module kind="loop">
-		<module decision="var_$instance.id$_loop" kind="test">
+	  <module decision="var_$instance.id$_loop" kind="test">
 			<operation kind="noop">
 				<port dir="in" source="var_$instance.id$_sched"/>
 				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
 			</operation>
 		</module>
 		<module kind="body">
+		  <!-- Make all pinAvail call -->
+		  $instance.actor.inputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
+      $instance.actor.outputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
+    
 			<!-- All Schedulable expressions -->
 			$instance.actor.actions: isSchedulableTest()$
 			<!--untagged actions -->
