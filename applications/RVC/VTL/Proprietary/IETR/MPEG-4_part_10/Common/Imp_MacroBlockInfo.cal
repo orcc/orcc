@@ -146,6 +146,12 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			1,1
 		];
 
+	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPartTab =
+		[
+			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
+			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+		];
+
 	List(type: uint(size=3),size=8) SizeMb_P =
 		[
 			SZ_16x16, SZ_16x8, SZ_8x16, SZ_8x8, SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16
@@ -224,6 +230,17 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 				else
 					1
 				end
+			end
+		end
+
+	function NumSubMbPart(uint(size=6) MbType, uint(size=4) SubMbType)
+				-->
+			uint(size=3)
+		:
+			if(MbType >= BLOCK_TYPE_B_MIN and MbType <= BLOCK_TYPE_B_MAX or MbType = BLOCK_TYPE_B_SKIP)then
+				NumSubMbPartTab[0][SubMbType & 15]
+			else //MbType --> Mono Prediction
+				NumSubMbPartTab[1][SubMbType & 15]
 			end
 		end
 

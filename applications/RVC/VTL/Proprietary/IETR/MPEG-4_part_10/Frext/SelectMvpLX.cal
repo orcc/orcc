@@ -71,13 +71,6 @@ actor SelectMvpLX()
 	uint(size=2)  SelectList
 		:
 
-	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
-		[
-			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
-			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-		];
-
-
 	function Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
 				-->
 			bool
@@ -109,6 +102,7 @@ actor SelectMvpLX()
 	uint(size=3) SubMbPartIdx;
 	bool         IsSubPredL0;
 	bool         IsSubPredL1;
+	uint(size=6) mb_type;
 
 	List(type: bool, size=2) IsPredL0;
 	List(type: bool, size=2) IsPredL1;
@@ -117,6 +111,7 @@ actor SelectMvpLX()
 			MbType    :[MacroBlkType]
 				==>
 		do
+			mb_type := MacroBlkType;
 			Idx_Sub_Tab   :=
 				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
 					0
@@ -281,7 +276,7 @@ actor SelectMvpLX()
 			Is8x8Mb
 		do
 			SubMbPartIdx    := 0;
-			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
+			SubMbPartIdxMax := NumSubMbPart(mb_type,ValSubMbType);
 			IsSubPredL0     := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0;
 			IsSubPredL1     := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0;
 		end

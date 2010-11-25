@@ -16,12 +16,13 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 //Modified to work with ORCC
 //By Endri Bezati <endri.bezati@insa-rennes.fr>
+//By Damien de Saint Jorre <damien.de-saint-jorre@insa-rennes.fr>
 
 actor Algo_Interp_split_MB () 
 		uint(size=3) MbPartIdx,
 		uint(size=5) MbPartWidth,
 		uint(size=5) MbPartHeigth,
-		int(size=16) INTERP 
+		int(size=16) INTERP
 				==> 
 				int(size=16) MBPred:
  
@@ -36,7 +37,7 @@ actor Algo_Interp_split_MB ()
   bool DEBUG_INPUT = false;
   bool DEBUG_OUTPUT = false;
   
-  get_part: action MbPartIdx:[a], MbPartWidth:[b], MbPartHeigth:[c] ==> 
+  GetMb: action MbPartIdx:[a], MbPartWidth:[b], MbPartHeigth:[c] ==> 
   guard
     count < 16
   do
@@ -214,7 +215,7 @@ actor Algo_Interp_split_MB ()
   end
   
   schedule fsm get_send_part :
-    get_send_part	( get_part 	) --> get_data;
+    get_send_part	( GetMb 	) --> get_data;
     get_data    	( get_data  ) --> get_send_part;
     get_send_part	( send_data	) --> get_send_part;
   end

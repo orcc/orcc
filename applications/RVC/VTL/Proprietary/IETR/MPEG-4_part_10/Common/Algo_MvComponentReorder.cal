@@ -65,12 +65,6 @@ actor Algo_MvComponentReorder()
 	uint(size=4)  RefIdxOut
 		:
 
-	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
-		[
-			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
-			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-		];
-
 	List(type: List(type: int(size=16),size=2), size=16) MvTab;
 	List(type: int(size=5), size=16) RefIdxTab;
 
@@ -81,7 +75,6 @@ actor Algo_MvComponentReorder()
 	uint(size=3) SubMbPartIdxMax;
 	uint(size=3) SubMbPartIdx;
 	uint(size=3) SizeSubMbMv;
-	uint(size=1) Idx_Sub_Tab;
 	uint(size=2) NbListToGet;
 
 	GetMbType: action
@@ -89,12 +82,6 @@ actor Algo_MvComponentReorder()
 				==>
 		do
 			mb_type := MacroBlkType;
-			Idx_Sub_Tab   :=
-				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
-					0
-				else
-					1
-				end;
 			MbPartIdx     := 0;
 			MbPartIdxMax  := NumMbPart(MacroBlkType);
 			SizeMbMv      := SizeMbPart(MacroBlkType);
@@ -183,7 +170,7 @@ actor Algo_MvComponentReorder()
 			MbPartIdx < MbPartIdxMax
 		do
 			SubMbPartIdx    := 0;
-			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
+			SubMbPartIdxMax := NumSubMbPart(mb_type,ValSubMbType);
 			SizeSubMbMv     := SizeSubMbPart(mb_type,ValSubMbType);
 		end
 

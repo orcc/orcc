@@ -45,10 +45,6 @@ actor Algo_DecodeSubMbPred()
 		=	[  DIRECT , PRED_L0 , PRED_L1 , BIPRED , PRED_L0 , PRED_L0 , PRED_L1 , PRED_L1 , BIPRED , BIPRED 
 			, PRED_L0 , PRED_L1 , BIPRED  ,   NA   ,   NA    ,   NA    ];
 
-	List(type: uint(size=3), size=4)  NumSubMbPart_P = [1,2,2,4];
-
-	List(type: uint(size=3), size=11)  NumSubMbPart_B = [4,1,1,1,2,2,2,2,2,2,4];
-
 	List ( type: List ( type: uint(size=5), size=4), size=4 ) P_tab_sub = //[sub_mb_type[mbPartIdx]][NumSubMbPart / MbPartWidth / MbPartHeight / SubMbPredMode]
 		[ [1,8,8,0], [2,8,4,0], [2,4,8,0], [4,4,4,0] ];
 
@@ -211,15 +207,7 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 			mbPartIdx < 4
 		do
 			subMbPartIdx := 0;
-			if( (mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX) )then
-				subMbPartIdxMax := NumSubMbPart_P[ (sub_mb_type[mbPartIdx]) & 0x03 ];
-			else
-				if(sub_mb_type[mbPartIdx] > 10) then
-					subMbPartIdxMax := 4;
-				else
-					subMbPartIdxMax :=  NumSubMbPart_B[ sub_mb_type[mbPartIdx] ];
-				end
-			end
+			subMbPartIdxMax := NumSubMbPart(mb_type,sub_mb_type[mbPartIdx]);
 			mbPartIdx    := mbPartIdx + 1;
 		end
 

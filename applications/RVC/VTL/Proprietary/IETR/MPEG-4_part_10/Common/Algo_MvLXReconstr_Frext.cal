@@ -84,12 +84,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	int           MASK_TAB    = 127;
 	uint(size=32) LOG2_SZ_TAB = 7;
 
-
-	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
-		[
-			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
-			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-		];
 	List(type: uint(size=2), size=16) TabIdxToX =
 		[ 0, 1, 0, 1, 2, 3, 2, 3, 0, 1,
 		  0, 1, 2, 3, 2, 3];
@@ -793,7 +787,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] != DIRECT
 		do
 			SubMbPartIdx    := 0;
-			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
+			SubMbPartIdxMax := NumSubMbPart(MbType,ValSubMbType);
 			IsPred4SubMb    :=    ((SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0) and IsPredL0
 			                   or ((SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0) and not IsPredL0;
 			SizeSubMbMv     := SizeSubMbPart(MbType,ValSubMbType);
