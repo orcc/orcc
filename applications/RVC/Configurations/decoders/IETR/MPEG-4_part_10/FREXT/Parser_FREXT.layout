@@ -60,9 +60,9 @@
       <vertex id="DecodePic" x="800" y="446"/>
       <vertex id="RefList1" x="1982" y="1428"/>
       <vertex id="Mgnt_Display" x="1686" y="1794"/>
-      <vertex id="RefIdxL0ToPoc" x="2304" y="955"/>
+      <vertex id="RefIdxL0ToPoc" x="2286" y="958"/>
       <vertex id="RefIdxL1ToPoc" x="2292" y="1192"/>
-      <vertex id="SelectRefIdx" x="2481" y="1088"/>
-      <vertex id="Mgnt_Interp_FBAddr_Luma_MxN" x="2702" y="780"/>
+      <vertex id="SelectRefIdx" x="2487" y="1089"/>
+      <vertex id="Mgnt_InterPred" x="2702" y="780"/>
    </vertices>
 </layout>

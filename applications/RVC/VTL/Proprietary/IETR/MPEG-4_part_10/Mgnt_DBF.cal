@@ -57,7 +57,7 @@ actor Mgnt_DBF (int LUMA_CHROMA)
 					==> 
 						uint(size=6) BS,
 						uint(size=8) DB_I,
-						int(size=9)WD:
+						int (size=9) WD:
 
 ///////////////
 // Constants //
@@ -793,7 +793,7 @@ DB_done: action  ==>
 end 
 
 flush_fifo_CHROMA: action  ==>  WD:[buff] repeat MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA 
-  guard 
+  guard
     MB_BLOCK_SIZE = MB_BLOCK_SIZE_CHROMA
   var 
       List(type:uint(size=SAMPLE_SZ),size = MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA) buff := [ 0 :for int s in 0 .. MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1 ] 

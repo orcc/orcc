@@ -52,7 +52,7 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.*;
-
+//Clean me !!!
 actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=6)  mb_type,
 	uint(size=4)  sub_mb_type,
@@ -70,13 +70,14 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	bool          colZeroFlag,
 
-	bool          DirectSpatialMvPredFlag
+	bool          DirectSpatialMvPredFlag,
+	bool          DirectPredLX_In
 		==>
 	bool          NewPic_o,
 	int (size=16) MvOut,
 	uint(size=11) Location,
 	uint(size=4)  RefIdxOut,
-	bool          DirectPredLX
+	bool          DirectPredLX_Out
 		:
 
 	int           SZ_TAB      = 128;
@@ -425,28 +426,27 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbType       := BLOCK_TYPE_P_L0_16x16;
 		end
 
+	int(size=5) RefIdxLX_Direct;
+	bool        direct_pred_lx;
+	List(type: int (size=16), size=2) mv_out_Direct;
+	List(type: uint(size=11), size=2) Loc_Direct;
+
+	//Should be made for all partitions !! ==> fix me !
 	GetMbType.B_Skip_B_Direct_16x16: action
-			mb_type        :[MacroBlkType],
-			NewPic_i       :[IsNewPic],
-			colZeroFlag    :[TabColZero] repeat 16,
-			CurrMbAddr     :[Curr_Mb_Addr],
-			FirstMbInSlice :[Fst_Mb],
-			PicWidthInMb   :[pic_width_in_mb]
+			mb_type          :[MacroBlkType],
+			NewPic_i         :[IsNewPic],
+			colZeroFlag      :[TabColZero] repeat 16,
+			CurrMbAddr       :[Curr_Mb_Addr],
+			FirstMbInSlice   :[Fst_Mb],
+			PicWidthInMb     :[pic_width_in_mb]
 				==>
-	Location  :[Mbx_in_pix,Mby_in_pix]/* *16 */,
-	MvOut     :[mv_out]repeat 2/* *16 */,
-	RefIdxOut :[RefIdxLX],
-	NewPic_o  :[false],
-	DirectPredLX :[true]
+			DirectPredLX_Out :[direct_pred_lx]
 		guard
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
-		var
-			int(size=5) RefIdxLX,
-			List(type: int (size=16), size=2) mv_out
 		do
-			Mbx_in_pix             := (Curr_Mb_Addr mod pic_width_in_mb)*16;
-			Mby_in_pix             := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
-			Idx_CurrBlk            := Curr_Mb_Addr & MASK_TAB;
+			Loc_Direct[0] := (Curr_Mb_Addr mod pic_width_in_mb)*16;
+			Loc_Direct[1] := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
+			Idx_CurrBlk   := Curr_Mb_Addr & MASK_TAB;
 
 			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0) then
 				Idx_mbAddrA := -1;
@@ -480,18 +480,20 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 					foreach int i in 0 .. 15
 					do
 						GetNeighbourBlockParametres (i,4);
-						RefIdxLX := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
-						RefIdxTab[Idx_CurrBlk][i] := RefIdxLX;
-						if(RefIdxLX < 0 or RefIdxLX = 0 and TabColZero[i])then
-							mv_out[0] := 0;
-							mv_out[1] := 0;
+						RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
+						RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
+						if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[i])then
+							mv_out_Direct[0] := 0;
+							mv_out_Direct[1] := 0;
 							MvTab[Idx_CurrBlk][i] := [0,0];
+							direct_pred_lx        := false;
 						else
-							ComputeMvPredL0(RefIdxLX,RefIdxA,RefIdxB,RefIdxC);
-							mv_out[0] := OMv[0];
-							mv_out[1] := OMv[1];
+							ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
+							mv_out_Direct[0] := OMv[0];
+							mv_out_Direct[1] := OMv[1];
 							MvTab[Idx_CurrBlk][i][0] := OMv[0];
 							MvTab[Idx_CurrBlk][i][1] := OMv[1];
+							direct_pred_lx           := true;
 						end
 					end
 				else //temporal prediction
@@ -500,6 +502,29 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			else
 				println("GetMbType.B_Skip_B_Direct_16x16 : B_DIRECT_16x16 not implemented yet !!");	
 			end
+		end
+
+	SendMv4Direct.Launch: action
+			DirectPredLX_In :[other_direct_pred_lx]
+				==>
+			Location  :[Loc_Direct] repeat 2,
+			MvOut     :[mv_out_Direct]repeat 2,
+			RefIdxOut :[RefIdxLX_Direct],
+			NewPic_o  :[false]
+		guard
+			direct_pred_lx or (not other_direct_pred_lx)
+		do
+			if( (not direct_pred_lx) and (not other_direct_pred_lx))then
+				RefIdxLX_Direct := 0;
+			end
+		end
+
+
+	SendMv4Direct.Skip: action
+			DirectPredLX_In :[other_direct_pred_lx]
+				==>
+		guard
+			not direct_pred_lx and other_direct_pred_lx
 		end
 
 	GetMbType.Others: action
@@ -833,7 +858,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	MvOut     :[0,0],
 	RefIdxOut :[0],
 	NewPic_o  :[false],
-	DirectPredLX :[true]
+	DirectPredLX_Out :[true]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_8x8,
@@ -846,6 +871,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
 
 			println("GetMbType.Direct_8x8 not implemented yet !!");
+			while true do end
 
 			MbPartIdx := MbPartIdx + 1;
 		end
@@ -1031,10 +1057,12 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		GetMbType         (GetMbType.MacroBlkIorSI  )--> EatTokens;
 		GetMbType         (GetMbType.P_SkipL0       )--> GetMbInfos4P_SkipL0;
 		GetMbType         (GetMbType.P_SkipL1       )--> EatTokens;
-		GetMbType         (GetMbType.B_Skip_B_Direct_16x16 )--> EatTokens;//Fix me when B_Direct_16x16 will be supported.
+		GetMbType         (GetMbType.B_Skip_B_Direct_16x16 )--> SendMv4Direct;
 		GetMbType         (GetMbType.Others         )--> GetMbInfos4Others;
 
 		EatTokens         (EatTokens                )--> GetMbType;
+
+		SendMv4Direct     (SendMv4Direct            )--> GetMbType;
 
 		GetMbInfos4P_SkipL0 (GetMbInfos.P_Skip        )--> GetMbType;
 

@@ -47,7 +47,7 @@ actor SelectRefIdx()
 			POCtoRead_l0 :[Poc0],
 			POCtoRead_l1 :[Poc1]
 				==>
-			PocToRead    :[Poc0]
+			PocToRead    :[Poc0,Poc1]
 		guard
 			list_selected = BIPRED
 		end	

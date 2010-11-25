@@ -350,7 +350,7 @@
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
     <Connection dst="Intra8x8" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
-    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead" src="" src-port="PocToRead"/>
     <Connection dst="Buffer_inter" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
+    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
 </XDF>

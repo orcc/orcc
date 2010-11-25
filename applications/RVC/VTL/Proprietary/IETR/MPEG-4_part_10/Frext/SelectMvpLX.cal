@@ -208,68 +208,90 @@ actor SelectMvpLX()
 		end
 
 	MacroBlkType.IsBiPred: action
-			MvL1       :[Mvx,Mvy],
-			RefIdxL1   :[ref_idx],
-			LocationL1 :[Mbx_in_pix,Mby_in_pix],
-			MvL0       :[Mvx2, Mvy2],
-			RefIdxL0   :[ref_idx2],
-			LocationL0 :[Mbx_in_pix2,Mby_in_pix2]
+			MvL0       :[MvxL0, MvyL0],
+			RefIdxL0   :[ref_idxL0],
+			LocationL0 :[Mbx_in_pixL0,Mby_in_pixL0],
+
+			MvL1       :[MvxL1,MvyL1],
+			RefIdxL1   :[ref_idxL1],
+			LocationL1 :[Mbx_in_pixL1,Mby_in_pixL1]
 				==>
-		MvOut     :[Mvx,Mvy],
-		RefIdxOut :[ref_idx],
-		Location  :[Mbx_in_pix,Mby_in_pix],
+			MvOut     :[MvxL0,MvyL0,MvxL1,MvyL1],
+			RefIdxOut :[ref_idxL0],///////////////////////////////////
+			Location  :[Mbx_in_pixL0,Mby_in_pixL0],
 			SelectList :[BIPRED]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
 			IsPredL0[MbPartIdx&1] and IsPredL1[MbPartIdx&1]
 		do
-			println("MacroBlkType.IsBiPred or Direct");
+			println("In SelectMvpLX MacroBlkType.IsBiPred");
 			MbPartIdx := MbPartIdx + 1;
 		end
 
-	MacroBlkType.IsDirect: action
+	MacroBlkType.IsDirect_PredL0: action
 			MvL0         :[Mvxl0, Mvyl0],
 			RefIdxL0     :[ref_idxl0],
 			LocationL0   :[Mbx_in_pixl0,Mby_in_pixl0],
-			MvL1         :[Mvxl1, Mvyl1],
-			RefIdxL1     :[ref_idxl1],
-			LocationL1   :[Mbx_in_pixl1,Mby_in_pixl1],
 			DirectPredL0 :[Is_direct_l0],
 			DirectPredL1 :[Is_direct_l1]
 				==>
-		MvOut     :[mv_selected]repeat 2,
-		RefIdxOut :[ref_idx_selected],
-		Location  :[Mbx_in_pixl0,Mby_in_pixl0],
-			SelectList :[list_selected]
+			MvOut     :[Mvxl0,Mvyl0],
+			RefIdxOut :[ref_idxl0],
+			Location  :[Mbx_in_pixl0,Mby_in_pixl0],
+			SelectList :[PRED_L0]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			not Is8x8Mb,
-			(not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1])
-		var
-			uint(size=2) list_selected,
-			uint(size=4) ref_idx_selected,
-			List(type: int(size=16), size=2) mv_selected
+			(not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1]),
+	        Is_direct_l0  and (not Is_direct_l1)
 		do
-			if(Is_direct_l0 and Is_direct_l1)then//Is BiPred
-				println("MacroBlkType.IsBiPred or Direct _BiPred not implemented");
-				list_selected := BIPRED;
-			else
-				if((not Is_direct_l0) and Is_direct_l1)then//Is Pred_L1
-					list_selected    := PRED_L1;
-					ref_idx_selected := ref_idxl1;
-					mv_selected      := [Mvxl1,Mvyl1];
-				else
-					if(Is_direct_l0 and (not Is_direct_l1))then//Is Pred_L0
-						list_selected    := PRED_L0;
-						ref_idx_selected := ref_idxl0;
-						mv_selected      := [Mvxl0,Mvyl0];
-					else//Is BiPred
-						println("MacroBlkType.IsBiPred or Direct _Init not implemented");
-						list_selected := BIPRED;
-					end
-				end
-			end
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	MacroBlkType.IsDirect_PredL1: action
+			MvL1         :[Mvxl1, Mvyl1],
+			RefIdxL1     :[ref_idxl1],
+			LocationL1   :[Mbx_in_pixl1,Mby_in_pixl1],
+			DirectPredL1 :[Is_direct_l1],
+
+			DirectPredL0 :[Is_direct_l0]
+				==>
+			MvOut      :[Mvxl1,Mvyl1],
+			RefIdxOut  :[ref_idxl1],
+			Location   :[Mbx_in_pixl1,Mby_in_pixl1],
+			SelectList :[PRED_L1]
+		guard
+			MbPartIdx < MbPartIdxMax,
+			not Is8x8Mb,
+			(not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1]),
+			(not Is_direct_l0) and Is_direct_l1
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	MacroBlkType.IsDirect_BiPred: action
+			MvL0         :[Mvxl0, Mvyl0],
+			RefIdxL0     :[ref_idxl0],
+			LocationL0   :[Mbx_in_pixl0,Mby_in_pixl0],
+			DirectPredL0 :[Is_direct_l0],
+
+			MvL1         :[Mvxl1, Mvyl1],
+			RefIdxL1     :[ref_idxl1],
+			LocationL1   :[Mbx_in_pixl1,Mby_in_pixl1],
+			DirectPredL1 :[Is_direct_l1]
+				==>
+			MvOut        :[Mvxl0,Mvyl0,Mvxl1,Mvyl1],
+			RefIdxOut    :[ref_idxl0],/////////////////////////
+			Location     :[Mbx_in_pixl0 , Mby_in_pixl0],
+			SelectList   :[BIPRED]
+		guard
+			MbPartIdx < MbPartIdxMax,
+			not Is8x8Mb,
+			(not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1]),
+			        Is_direct_l0  and      Is_direct_l1
+			or (not Is_direct_l0) and (not Is_direct_l1)
+		do
 			MbPartIdx := MbPartIdx + 1;
 		end
 
