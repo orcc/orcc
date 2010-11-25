@@ -26,7 +26,8 @@ actor Mgnt_InterPred()
 	uint(size=6)  Mb_Type,
 	int (size=16) MV,
 	uint(size=11) Location,
-	uint(size=32) Poc2Read
+	uint(size=32) Poc2Read,
+	uint(size=2)  SelectList
 		==>
 	int (size=12) ReadAddr_l,
 	int (size=12) ReadAddr_c,
@@ -34,14 +35,12 @@ actor Mgnt_InterPred()
 
 	bool DEBUG_INPUT = false;
 
-	int(size=32) x_index;
-	int(size=32) y_index;
 	int(size=32) x;
 	int(size=32) y;
 	int width;
 	int height;
 	int count := 0;
-	uint(size=32) poc_to_read;
+	uint(size=2) NbListToRead;
 
 	get_MB: action
 			Mb_Type      :[ mb_type ]
@@ -49,10 +48,10 @@ actor Mgnt_InterPred()
 		end
 
 	get_pos: action
-			MbPartIdx :[ idx ],
-			Location  :[ a, b ],
-			PartSZ    :[ c, d ],
-			Poc2Read  :[ ValPocToRead ]
+			MbPartIdx  :[ idx ],
+			Location   :[ a, b ],
+			PartSZ     :[ c, d ],
+			SelectList :[ list_selected ]
 				==>
 		do
 			if (DEBUG_INPUT) then
@@ -100,18 +99,30 @@ actor Mgnt_InterPred()
 						end
 					end
 				end;
-			poc_to_read := ValPocToRead;
+			NbListToRead :=
+				if(list_selected != BIPRED)then
+					1
+				else
+					2
+				end;
 		end
 
-	get_mv: action
-			MV:[ mx, my ]
+	get_mv.Launch: action
+			Poc2Read :[ poc_to_read ],
+			MV       :[ mx, my ]
 				==>
 			PocToRead  :[ poc_to_read ],
 			ReadAddr_l :[ x + rshift(mx, 2) - 2     , y + rshift(my, 2) - 2     , width + 5     , height + 5 ],
 			ReadAddr_c :[ x/2 + rshift(mx, 3) , y/2 + rshift(my, 3) , width / 2 + 1 , height / 2 + 1 ]
+		guard
+			NbListToRead > 0
 		do
-			x_index := rshift(mx, 2);
-			y_index := rshift(my, 2);
+			NbListToRead := NbListToRead - 1;
+		end
+
+	get_mv.Done: action ==>
+		guard
+			NbListToRead = 0
 		end
 
 	MB_done: action ==>
@@ -127,14 +138,15 @@ actor Mgnt_InterPred()
 		end
 
 	schedule fsm get_MB :
-		MB_done (MB_done    )--> get_MB;
-		MB_done (MB_Ndone   )--> get_pos;
+		MB_done (MB_done       )--> get_MB;
+		MB_done (MB_Ndone      )--> get_pos;
 
-		get_MB  (get_MB     )--> get_pos;
+		get_MB  (get_MB        )--> get_pos;
 
-		get_pos (get_pos    )--> get_mv;
+		get_pos (get_pos       )--> get_mv;
 
-		get_mv  (get_mv     )--> MB_done;
+		get_mv  (get_mv.Launch )--> get_mv;
+		get_mv  (get_mv.Done   )--> MB_done;
 	end
 
 	priority

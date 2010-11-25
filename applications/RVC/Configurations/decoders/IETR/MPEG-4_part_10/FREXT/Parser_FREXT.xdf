@@ -699,4 +699,6 @@
     <Connection dst="" dst-port="ReadAddress_l" src="Mgnt_InterPred" src-port="ReadAddr_l"/>
     <Connection dst="" dst-port="ReadAddress_c" src="Mgnt_InterPred" src-port="ReadAddr_c"/>
     <Connection dst="Mgnt_InterPred" dst-port="Mb_Type" src="DecodePic" src-port="MbType4Pred"/>
+    <Connection dst="Mgnt_InterPred" dst-port="SelectList"
+        src="MVReconstruct" src-port="SelectList"/>
 </XDF>

@@ -41,9 +41,9 @@
       <vertex id="MacroBlockType" x="1705" y="809"/>
       <vertex id="TransformSize8x8" x="1738" y="1406"/>
       <vertex id="PocToDisplay" x="1846" y="1821"/>
-      <vertex id="PocToRead" x="2978" y="793"/>
-      <vertex id="ReadAddress_l" x="2965" y="857"/>
-      <vertex id="ReadAddress_c" x="2965" y="825"/>
+      <vertex id="PocToRead" x="2866" y="793"/>
+      <vertex id="ReadAddress_l" x="2853" y="857"/>
+      <vertex id="ReadAddress_c" x="2853" y="825"/>
       <vertex id="Algo_NALU" x="333" y="7"/>
       <vertex id="CheckNaluType" x="644" y="-22"/>
       <vertex id="DecodeSps" x="7" y="1243"/>
@@ -60,9 +60,9 @@
       <vertex id="DecodePic" x="800" y="446"/>
       <vertex id="RefList1" x="1982" y="1428"/>
       <vertex id="Mgnt_Display" x="1686" y="1794"/>
-      <vertex id="RefIdxL0ToPoc" x="2286" y="958"/>
-      <vertex id="RefIdxL1ToPoc" x="2292" y="1192"/>
-      <vertex id="SelectRefIdx" x="2487" y="1089"/>
-      <vertex id="Mgnt_InterPred" x="2702" y="780"/>
+      <vertex id="RefIdxL0ToPoc" x="2252" y="958"/>
+      <vertex id="RefIdxL1ToPoc" x="2262" y="1175"/>
+      <vertex id="SelectRefIdx" x="2442" y="1080"/>
+      <vertex id="Mgnt_InterPred" x="2666" y="781"/>
    </vertices>
 </layout>
