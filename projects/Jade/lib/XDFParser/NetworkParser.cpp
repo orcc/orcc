@@ -176,17 +176,17 @@ void  NetworkParser::parseBody(TiXmlElement* root){
 			if (name == XDFNetwork::CONNECTION) {
 				parseConnection(element);
 			}else if (name == XDFNetwork::DECL) {
-				cerr << "Decl elements are not supPorted yet";
+				cerr << "Decl elements are not supported yet";
 				exit(1);
 			}else if (name == XDFNetwork::INSTANCE) {
 				Instance* instance = parseInstance(element);
 				instances->insert(pair<string, Instance*>(instance->getId(), instance));
 				graph->addVertex(new Vertex(instance));
 			}else if (name == XDFNetwork::PACKAGE) {
-				cerr << "Package elements are not supPorted yet";
+				cerr << "Package elements are not supported yet";
 				exit(1);
 			}else if (name == XDFNetwork::PORT) {
-				cerr << "Port elements are not supPorted yet";
+				cerr << "Port elements are not supported yet";
 				exit(1);
 			}else {
 				cerr << "Invalid node "<< name.c_str() <<"\n";

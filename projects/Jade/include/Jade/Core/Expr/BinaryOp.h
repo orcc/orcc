@@ -56,7 +56,7 @@
  */
 class BinaryOp{
 
-private:
+public:
 	
 	/** Binary operation type */
 	enum OPTYPE{ 
@@ -166,6 +166,13 @@ public:
 	bool isRightAssociative() {
 		return rightAssociative;
 	}
+
+	/**
+	 * @brief Returns the binary operator.
+	 * 
+	 * @return a binary operator.
+	 */
+	OPTYPE getType() {return op;};
 
 private:
 	OPTYPE op;

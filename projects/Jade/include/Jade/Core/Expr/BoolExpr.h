@@ -96,11 +96,11 @@ public:
 	llvm::Constant* getConstant();
 
 	/**
-	 * @brief Returns true if the expression is an instance of IntExpr
+	 * @brief Returns true if the expression is an instance of BoolExpr
 	 * 
-	 * @return True if the expression is an instance of IntExpr
+	 * @return True if the expression is an instance of BoolExpr
 	 */
-	bool isIntExpr(){return true;};
+	bool isBooleanExpr(){return true;};
 
 private:
 	bool value;

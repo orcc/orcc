@@ -82,11 +82,40 @@ public:
 	IRType* getIRType(){return type;};
 
 	/**
+	 * @brief Returns the first operand of this binary expression as an expression.
+	 * 
+	 * @return the first operand of this binary expression
+	 */
+	Expr* getE1() {return e1;};
+
+	/**
+	 * @brief Returns the second operand of this binary expression as an expression.
+	 * 
+	 * @return the second operand of this binary expression
+	 */
+	Expr* getE2() {return e2;};
+
+	/**
+	 * @brief Returns the operator of this binary expression.
+	 * 
+	 * @return the operator of this binary expression
+	 */
+	BinaryOp* getOp() {return op;};
+
+	/**
 	 * @brief Returns llvm::Constant corresponding to the llvm value of this expression.
 	 * 
 	 * @return llvm::Constant of this expression
 	 */
 	llvm::Constant* getConstant();
+
+
+	/**
+	 * @brief Returns true if the expression is an instance of BinaryExpr
+	 * 
+	 * @return True if the expression is an instance of BinaryExpr
+	 */
+	bool isBinaryExpr(){return true;};
 
 private:
 	Expr* e1;

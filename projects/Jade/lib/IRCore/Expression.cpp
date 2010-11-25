@@ -54,7 +54,33 @@ int Expr::evaluateAsInteger(){
 		return ((IntExpr*)this)->getValue();
 	}
 	
-	cerr << "Can't evaluate a non IntExpr";
+	if (isBinaryExpr()){
+		BinaryExpr* binExpr = (BinaryExpr*)this;
+		int e1 = binExpr->getE1()->evaluateAsInteger();
+		int e2 = binExpr->getE1()->evaluateAsInteger();
+		BinaryOp* op = binExpr->getOp();
+
+		switch(op->getType()){
+			case BinaryOp::TIMES: 
+				return e1*e2;
+				break;
+
+			case BinaryOp::MINUS: 
+				return e1-e2;
+				break;
+			
+			case BinaryOp::PLUS: 
+				return e1+e2;
+				break;
+
+			default : 
+				cerr << "Unsupported binary expression for evaluation \n";
+				exit(1);
+		}
+
+	}
+	
+	cerr << "Can't evaluate this expression";
 	exit(0);
 }
 

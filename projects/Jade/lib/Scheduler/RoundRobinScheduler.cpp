@@ -215,7 +215,7 @@ void RoundRobinScheduler::setSource(){
 
 void RoundRobinScheduler::setCompare(){
 	list<Instance*>::iterator it;
-	Actor* compare = decoder->getActor("../../../VTL/System/Compare");
+	Actor* compare = decoder->getActor("Compare");
 	
 	//Actor compare is not present in the decoder
 	if ((compare == NULL) && (YuvFile.compare("") != 0)){

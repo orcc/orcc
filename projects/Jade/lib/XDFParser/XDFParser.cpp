@@ -45,7 +45,7 @@ using namespace std;
 // Define static key for XDF parsing
 const char* XDFNetwork::XDF_ROOT = "XDF";
 const char* XDFNetwork::NAME = "name";
-const char* XDFNetwork::IRAttribute = "IRAttribute";
+const char* XDFNetwork::IRAttribute = "Attribute";
 const char* XDFNetwork::CONNECTION = "Connection";
 const char* XDFNetwork::CONNECTION_SRC = "src";
 const char* XDFNetwork::CONNECTION_SRC_PORT = "src-port";
