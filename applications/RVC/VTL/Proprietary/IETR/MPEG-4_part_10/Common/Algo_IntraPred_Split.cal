@@ -235,40 +235,6 @@ actor Algo_IntraPred_Split()
 		end
 
 
-/*  get_intra8x8: action IntraPredMode:[a] ==> PredMode:[val] // Not yet tested
-  guard
-    intratype = INTRA_8x8 and count <16
-  var 
-    uint CurrMb4x4Addr := y * lshift( picW,4) + lshift(x,2) + InverseScan4x4(count,lshift( picW,2)),
-    uint CurrMb8x8Addr :=0,
-    int(size=5) top, 
-	int(size=5) left, 
-	int(size=5) predicted, 
-	int(size=5) val    
-  do
-    if (CurrMb4x4Addr / lshift( picW,2)) = 0 then // MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
-         top:= -1;
-    else
-         top := intra4x4predmode[CurrMb4x4Addr - lshift(picW,2)];
-    end
-    if (CurrMb4x4Addr mod lshift( picW,2)) = 0 then // MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
-       left:= -1;
-    else
-       left := intra4x4predmode[CurrMb4x4Addr - 1];
-    end
-    if left < top then predicted := left; else predicted := top; end
-    if predicted < 0 then predicted := 2; end //INTRA_4x4_DC
-    if a < predicted then val := a+1; else val := a; end
-    if a = 15 then val := predicted; end
-    println("Prediction : Intra8x8 "+CurrMb4x4Addr+" get "+a+" pred "+predicted+" --> val = "+val);
-    foreach int i in 0 .. 3 do
-      CurrMb8x8Addr := y * lshift( picW,4) + lshift(x,2) + InverseScan4x4(count+i,lshift( picW,2));
-      intra4x4predmode[CurrMb8x8Addr] := val;
-    end
-    count := count +4;
-  end */
-
-
 	get_intra16x16: action
 			ConstrainedIFlag :[ Constrained_I_Flag ],
 			IntraPredMode    :[ Mode_16x16 ]

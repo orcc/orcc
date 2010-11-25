@@ -71,14 +71,6 @@ actor Algo_MvComponentReorder()
 			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		];
 
-	List(type: List(type: uint(size=3), size=16), size=2) SizeSubMb =
-		[
-			[SZ_4x4, SZ_8x8, SZ_8x8, SZ_8x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8,
-			 SZ_4x4, SZ_4x4, SZ_4x4, 0, 0, 0],
-			[SZ_8x8, SZ_8x4, SZ_4x8, SZ_4x4, 0, 0, 0, 0, 0, 0,
-			 0, 0, 0, 0, 0, 0]
-		];
-
 	List(type: List(type: int(size=16),size=2), size=16) MvTab;
 	List(type: int(size=5), size=16) RefIdxTab;
 
@@ -192,7 +184,7 @@ actor Algo_MvComponentReorder()
 		do
 			SubMbPartIdx    := 0;
 			SubMbPartIdxMax := NumSubMbPart[Idx_Sub_Tab][ValSubMbType & 15];
-			SizeSubMbMv     := SizeSubMb[Idx_Sub_Tab][ValSubMbType & 15];
+			SizeSubMbMv     := SizeSubMbPart(mb_type,ValSubMbType);
 		end
 
 	GetListSel4SubMb: action

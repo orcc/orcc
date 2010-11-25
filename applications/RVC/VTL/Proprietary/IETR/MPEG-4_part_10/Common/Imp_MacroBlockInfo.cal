@@ -159,6 +159,14 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			 SZ_8x8,  SZ_8x8
 		];
 
+	List(type: List(type: uint(size=3), size=16), size=2) SizeSubMb =
+		[
+			[SZ_4x4, SZ_8x8, SZ_8x8, SZ_8x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8,
+			 SZ_4x4, SZ_4x4, SZ_4x4, 0, 0, 0],
+			[SZ_8x8, SZ_8x4, SZ_4x8, SZ_4x4, 0, 0, 0, 0, 0, 0,
+			 0, 0, 0, 0, 0, 0]
+		];
+
 
 	function Is_Intra_16x16(uint MbType)
 				-->
@@ -232,5 +240,16 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 						SZ_16x16
 					end
 				end
+		end
+
+	function SizeSubMbPart(uint(size=6) MbType, uint(size=4) SubMbType)
+				-->
+			uint(size=3)
+		:
+			if(MbType >= BLOCK_TYPE_B_MIN and MbType <= BLOCK_TYPE_B_MAX or MbType = BLOCK_TYPE_B_SKIP)then
+				SizeSubMb[0][SubMbType & 15]
+			else //MbType --> Mono Prediction
+				SizeSubMb[1][SubMbType & 15]
+			end
 		end
 end

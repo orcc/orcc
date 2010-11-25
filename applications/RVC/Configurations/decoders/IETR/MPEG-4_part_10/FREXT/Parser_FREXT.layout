@@ -28,7 +28,7 @@
       <vertex id="CoefDC_Cr" x="2335" y="349"/>
       <vertex id="CoefAC_L" x="2338" y="384"/>
       <vertex id="CoefDC_L" x="2339" y="415"/>
-      <vertex id="PredMode" x="1709" y="343"/>
+      <vertex id="PredMode" x="1676" y="344"/>
       <vertex id="DelList" x="1778" y="1601"/>
       <vertex id="IsIDR" x="1777" y="1628"/>
       <vertex id="MV" x="2260" y="712"/>
@@ -60,9 +60,9 @@
       <vertex id="DecodePic" x="800" y="446"/>
       <vertex id="RefList1" x="1982" y="1428"/>
       <vertex id="Mgnt_Display" x="1686" y="1794"/>
-      <vertex id="RefIdxL0ToPoc" x="2252" y="958"/>
-      <vertex id="RefIdxL1ToPoc" x="2262" y="1175"/>
-      <vertex id="SelectRefIdx" x="2442" y="1080"/>
+      <vertex id="RefIdxL0ToPoc" x="2248" y="960"/>
+      <vertex id="RefIdxL1ToPoc" x="2251" y="1174"/>
+      <vertex id="SelectRefIdx" x="2439" y="1081"/>
       <vertex id="Mgnt_InterPred" x="2666" y="781"/>
    </vertices>
 </layout>
