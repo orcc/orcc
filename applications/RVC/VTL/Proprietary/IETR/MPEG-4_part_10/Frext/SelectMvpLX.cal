@@ -71,29 +71,6 @@ actor SelectMvpLX()
 	uint(size=2)  SelectList
 		:
 
-	function Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
-				-->
-			bool
-		:
-			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
-				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
-			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 7][mb_part_idx & 1] & PRED_L0) != 0
-			end
-		end
-
-
-	function Is_PredL1(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
-				-->
-			bool
-		:
-			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
-				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L1) != 0
-			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				false
-			end
-		end
-
 	uint(size=3) MbPartIdxMax;
 	uint(size=3) MbPartIdx;
 	uint(size=1) Idx_Sub_Tab;
