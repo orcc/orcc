@@ -301,7 +301,7 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax,
 			(num_ref_idx_l0_active > 1) or (mb_field_decoding_flag = true),
-			Is_PredL0(mb_type,mbPartIdx)
+			Mb_Is_PredL0(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -321,7 +321,7 @@ actor Algo_DecodeMbPred()
 		guard
 			mbPartIdx < mbPartIdxMax,
 			(num_ref_idx_l1_active > 1) or (mb_field_decoding_flag = true),
-			Is_PredL1(mb_type,mbPartIdx)
+			Mb_Is_PredL1(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -348,7 +348,7 @@ actor Algo_DecodeMbPred()
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			Is_PredL0(mb_type,mbPartIdx)
+			Mb_Is_PredL0(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -357,7 +357,7 @@ actor Algo_DecodeMbPred()
 				==>
 		guard
 			mbPartIdx < mbPartIdxMax,
-			not Is_PredL0(mb_type,mbPartIdx)
+			not Mb_Is_PredL0(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -374,7 +374,7 @@ actor Algo_DecodeMbPred()
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			Is_PredL1(mb_type,mbPartIdx)
+			Mb_Is_PredL1(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -383,7 +383,7 @@ actor Algo_DecodeMbPred()
 				==>
 		guard
 			mbPartIdx < mbPartIdxMax,
-			not Is_PredL1(mb_type,mbPartIdx)
+			not Mb_Is_PredL1(mb_type,mbPartIdx)
 		do
 			mbPartIdx := mbPartIdx + 1;
 		end
@@ -406,7 +406,7 @@ actor Algo_DecodeMbPred()
 			EndRefIdxL0  :[false]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			Is_PredL0(mb_type,mbPartIdx)
+			Mb_Is_PredL0(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadRefIdxL0["+mbPartIdx+"] : "+val_ref_idx);
@@ -423,7 +423,7 @@ actor Algo_DecodeMbPred()
 			EndRefIdxL0  :[false]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			not Is_PredL0(mb_type,mbPartIdx)
+			not Mb_Is_PredL0(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadRefIdxL0["+mbPartIdx+"] : "+val_ref_idx);
@@ -437,7 +437,7 @@ actor Algo_DecodeMbPred()
 			RefIdxL1 :[val_ref_idx]
 		guard
 			mbPartIdx < mbPartIdxMax,
-			Is_PredL1(mb_type,mbPartIdx)
+			Mb_Is_PredL1(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadRefIdxL1["+mbPartIdx+"] : "+val_ref_idx);
@@ -450,7 +450,7 @@ actor Algo_DecodeMbPred()
 				==>
 		guard
 			mbPartIdx < mbPartIdxMax,
-			not Is_PredL1(mb_type,mbPartIdx)
+			not Mb_Is_PredL1(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadRefIdxL1["+mbPartIdx+"] : "+val_ref_idx);
@@ -464,7 +464,7 @@ actor Algo_DecodeMbPred()
 			MvResl0  :[ValueOfVLD] repeat 2
 		guard
 			mbPartIdx < mbPartIdxMax,
-			Is_PredL0(mb_type,mbPartIdx)
+			Mb_Is_PredL0(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadMvdL0["+mbPartIdx+"] : "+ValueOfVLD[0]+" ; "+ValueOfVLD[1]);
@@ -478,7 +478,7 @@ actor Algo_DecodeMbPred()
 			MvResl1 :[ValueOfVLD] repeat 2
 		guard
 			mbPartIdx < mbPartIdxMax,
-			Is_PredL1(mb_type,mbPartIdx)
+			Mb_Is_PredL1(mb_type,mbPartIdx)
 		do
 			if(DEBUG_MV)then
 				println("ReadMvdL1["+mbPartIdx+"] : "+ValueOfVLD[0]+" ; "+ValueOfVLD[1]);

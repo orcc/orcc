@@ -644,8 +644,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			NewPic_o  :[false]
 		guard
 			MbPartIdx < MbPartIdxMax,
-			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
-			or Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
+			   Mb_Is_PredL0(MbType, MbPartIdx) and IsPredL0
+			or Mb_Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
 			SizeMbMv = SZ_16x16
 		var
 			List(type: int(size=16), size=2) MvpL0
@@ -679,8 +679,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			NewPic_o     :[false]
 		guard
 			MbPartIdx < MbPartIdxMax,
-			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
-			or Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
+			   Mb_Is_PredL0(MbType, MbPartIdx) and IsPredL0
+			or Mb_Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
 			SizeMbMv = SZ_16x8
 		var
 			List(type: int(size=16), size=2) MvpL0,
@@ -731,8 +731,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			NewPic_o  :[false]
 		guard
 			MbPartIdx < MbPartIdxMax,
-			   Is_PredL0(MbType, MbPartIdx) and IsPredL0
-			or Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
+			   Mb_Is_PredL0(MbType, MbPartIdx) and IsPredL0
+			or Mb_Is_PredL1(MbType, MbPartIdx) and not IsPredL0,
 			SizeMbMv = SZ_8x16
 		var
 			List(type: int(size=16), size=2) MvpL0,
@@ -823,8 +823,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				==>
 		guard
 			MbPartIdx < MbPartIdxMax,
-			not (    Is_PredL0(MbType, MbPartIdx) and IsPredL0
-			      or Is_PredL1(MbType, MbPartIdx) and not IsPredL0),
+			not (    Mb_Is_PredL0(MbType, MbPartIdx) and IsPredL0
+			      or Mb_Is_PredL1(MbType, MbPartIdx) and not IsPredL0),
 			SizeMbMv != SZ_8x8
 		do
 			MbPartIdx := MbPartIdx + 1;

@@ -350,8 +350,8 @@ actor Algo_MvBuffer()
 					Idx                := Idx + 1;
 				end
 			end
-			IsPredL0  := Is_PredL0(mb_type, MbPartIdx);
-			IsPredL1  := Is_PredL1(mb_type, MbPartIdx);
+			IsPredL0  := Mb_Is_PredL0(mb_type, MbPartIdx);
+			IsPredL1  := Mb_Is_PredL1(mb_type, MbPartIdx);
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -373,8 +373,8 @@ actor Algo_MvBuffer()
 					Idx                := Idx + 1;
 				end
 			end
-			IsPredL0  := Is_PredL0(mb_type, MbPartIdx);
-			IsPredL1  := Is_PredL1(mb_type, MbPartIdx);
+			IsPredL0  := Mb_Is_PredL0(mb_type, MbPartIdx);
+			IsPredL1  := Mb_Is_PredL1(mb_type, MbPartIdx);
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -396,8 +396,8 @@ actor Algo_MvBuffer()
 					Idx                := Idx + 1;
 				end
 			end
-			IsPredL0  := Is_PredL0(mb_type, MbPartIdx);
-			IsPredL1  := Is_PredL1(mb_type, MbPartIdx);
+			IsPredL0  := Mb_Is_PredL0(mb_type, MbPartIdx);
+			IsPredL1  := Mb_Is_PredL1(mb_type, MbPartIdx);
 			MbPartIdx := MbPartIdx + 1;
 		end
 

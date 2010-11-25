@@ -102,10 +102,10 @@ actor SelectMvpLX()
 			           or (MacroBlkType = BLOCK_TYPE_B_8x8);
 			//delete me!! (when import will be supported by Orcc)
 			if(MacroBlkType != BLOCK_TYPE_P_SKIP and MacroBlkType != BLOCK_TYPE_B_SKIP)then
-				IsPredL0[0] := Is_PredL0(MacroBlkType,0);
-				IsPredL0[1] := Is_PredL0(MacroBlkType,1);
-				IsPredL1[0] := Is_PredL1(MacroBlkType,0);
-				IsPredL1[1] := Is_PredL1(MacroBlkType,1);
+				IsPredL0[0] := Mb_Is_PredL0(MacroBlkType,0);
+				IsPredL0[1] := Mb_Is_PredL0(MacroBlkType,1);
+				IsPredL1[0] := Mb_Is_PredL1(MacroBlkType,0);
+				IsPredL1[1] := Mb_Is_PredL1(MacroBlkType,1);
 			else
 				if(MacroBlkType = BLOCK_TYPE_P_SKIP)then
 					IsPredL0[0] := true;

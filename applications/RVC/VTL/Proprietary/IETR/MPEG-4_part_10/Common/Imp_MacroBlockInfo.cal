@@ -185,7 +185,7 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			end
 		end
 
-	function Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
+	function Mb_Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
 				-->
 			bool
 		:
@@ -200,7 +200,7 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			end
 		end
 
-	function Is_PredL1(uint(size=6) MbType, uint(size=1) mb_part_idx)
+	function Mb_Is_PredL1(uint(size=6) MbType, uint(size=1) mb_part_idx)
 				-->
 			bool
 		:
@@ -211,7 +211,7 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			end
 		end
 
-	function IsIntra(uint(size=6) MbType)
+	function Mb_IsIntra(uint(size=6) MbType)
 				-->
 			bool
 		:
@@ -273,4 +273,15 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 				SizeSubMb[1][SubMbType & 15]
 			end
 		end
+/*
+	function SubMbPartPredMode(uint(size=6) MbType, uint(size=4) SubMbType)
+				-->
+			uint(size=3)
+		:
+			if(MbType >= BLOCK_TYPE_B_MIN and MbType <= BLOCK_TYPE_B_MAX or MbType = BLOCK_TYPE_B_SKIP)then
+				SubMbPartPredModeTab[0][SubMbType & 15]
+			else //MbType --> Mono Prediction
+				SubMbPartPredModeTab[1][SubMbType & 15]
+			end
+		end*/
 end
