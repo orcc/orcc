@@ -209,8 +209,6 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 		height := PartHeight;
 	end
 
-  // fetch (width+5)x(height+5) pixels
-
 	GetPixVal.Launch: action
 			RD:[d]
 				==>

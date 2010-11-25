@@ -13,27 +13,27 @@
       <vertex id="MV" x="20" y="416"/>
       <vertex id="PartSZ" x="11" y="562"/>
       <vertex id="POC" x="1055" y="158"/>
-      <vertex id="slice_beta_offset" x="860" y="506"/>
-      <vertex id="slice_alpha_c0_offset" x="842" y="478"/>
-      <vertex id="LFDisable" x="885" y="568"/>
-      <vertex id="CodedBlockPattern" x="853" y="533"/>
-      <vertex id="QP" x="920" y="678"/>
-      <vertex id="ref_idx_in" x="900" y="707"/>
-      <vertex id="mv_in" x="899" y="600"/>
+      <vertex id="slice_beta_offset" x="790" y="482"/>
+      <vertex id="slice_alpha_c0_offset" x="772" y="454"/>
+      <vertex id="LFDisable" x="815" y="544"/>
+      <vertex id="CodedBlockPattern" x="783" y="509"/>
+      <vertex id="QP" x="850" y="654"/>
+      <vertex id="ref_idx_in" x="830" y="683"/>
+      <vertex id="mv_in" x="829" y="576"/>
       <vertex id="I_PCM_C" x="548" y="346"/>
       <vertex id="ConstrainedIFlag" x="-3" y="75"/>
       <vertex id="DelList" x="1043" y="86"/>
-      <vertex id="PocToDisplay" x="1042" y="238"/>
+      <vertex id="PocToDisplay" x="1020" y="200"/>
       <vertex id="IsIDR" x="1051" y="115"/>
       <vertex id="MacroBlockType" x="-6" y="236"/>
-      <vertex id="PocToRead" x="1036" y="196"/>
+      <vertex id="PocToRead" x="1030" y="236"/>
       <vertex id="ReadAddress" x="1045" y="298"/>
       <vertex id="Display_C" x="1397" y="119"/>
       <vertex id="Intra8x8" x="508" y="8"/>
       <vertex id="Inter" x="457" y="416"/>
       <vertex id="Buffer_inter" x="1185" y="99"/>
       <vertex id="Select_chroma" x="736" y="287"/>
-      <vertex id="Deblocking_Filter" x="1032" y="412"/>
+      <vertex id="Deblocking_Filter" x="1008" y="426"/>
       <vertex id="DemuxParserInfos" x="178" y="7"/>
    </vertices>
 </layout>

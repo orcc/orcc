@@ -194,9 +194,9 @@ actor SelectMvpLX()
 			RefIdxL1   :[ref_idxL1],
 			LocationL1 :[Mbx_in_pixL1,Mby_in_pixL1]
 				==>
-			MvOut     :[MvxL0,MvyL0,MvxL1,MvyL1],
-			RefIdxOut :[ref_idxL0],///////////////////////////////////
-			Location  :[Mbx_in_pixL0,Mby_in_pixL0],
+			MvOut      :[MvxL0,MvyL0 , MvxL1,MvyL1],
+			RefIdxOut  :[ref_idxL0 , ref_idxL1],
+			Location   :[Mbx_in_pixL0,Mby_in_pixL0],
 			SelectList :[BIPRED]
 		guard
 			MbPartIdx < MbPartIdxMax,
@@ -259,9 +259,9 @@ actor SelectMvpLX()
 			LocationL1   :[Mbx_in_pixl1,Mby_in_pixl1],
 			DirectPredL1 :[Is_direct_l1]
 				==>
-			MvOut        :[Mvxl0,Mvyl0,Mvxl1,Mvyl1],
-			RefIdxOut    :[ref_idxl0],/////////////////////////
-			Location     :[Mbx_in_pixl0 , Mby_in_pixl0],
+			MvOut        :[Mvxl0,Mvyl0 , Mvxl1,Mvyl1],
+			RefIdxOut    :[ref_idxl0 , ref_idxl1],
+			Location     :[Mbx_in_pixl0,Mby_in_pixl0],
 			SelectList   :[BIPRED]
 		guard
 			MbPartIdx < MbPartIdxMax,

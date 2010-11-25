@@ -4,13 +4,13 @@
       <vertex id="MbPartIdx" x="203" y="88"/>
       <vertex id="MbPartWidth" x="202" y="120"/>
       <vertex id="MbPartHeigth" x="200" y="52"/>
-      <vertex id="RD_C" x="53" y="247"/>
-      <vertex id="MV" x="64" y="180"/>
-      <vertex id="PartSZ" x="45" y="215"/>
-      <vertex id="Coef_ACR" x="520" y="222"/>
-      <vertex id="MB4x4Pred_C" x="770" y="195"/>
-      <vertex id="Algo_Interp_EighthPelBilinear" x="200" y="170"/>
+      <vertex id="RD_C" x="104" y="243"/>
+      <vertex id="MV" x="108" y="177"/>
+      <vertex id="PartSZ" x="96" y="211"/>
+      <vertex id="Coef_ACR" x="616" y="80"/>
+      <vertex id="MB4x4Pred_C" x="820" y="58"/>
+      <vertex id="Algo_Interp_EighthPelBilinear" x="182" y="169"/>
       <vertex id="Algo_Interp_split_MB_C" x="435" y="36"/>
-      <vertex id="Algo_Add" x="657" y="177"/>
+      <vertex id="Algo_Add" x="714" y="36"/>
    </vertices>
 </layout>

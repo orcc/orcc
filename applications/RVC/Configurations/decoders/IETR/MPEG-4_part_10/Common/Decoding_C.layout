@@ -29,9 +29,9 @@
       <vertex id="IsIDR" x="205" y="2730"/>
       <vertex id="MacroBlockType" x="188" y="663"/>
       <vertex id="PocToRead" x="142" y="1521"/>
-      <vertex id="Display" x="906" y="998"/>
+      <vertex id="ReadAddress" x="432" y="546"/>
+      <vertex id="Display" x="916" y="986"/>
       <vertex id="PRED_C" x="660" y="958"/>
       <vertex id="RES_C" x="205" y="2060"/>
-      <vertex id="ReadAddress" x="432" y="546"/>
    </vertices>
 </layout>
