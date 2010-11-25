@@ -65,27 +65,6 @@ actor Algo_MvComponentReorder()
 	uint(size=4)  RefIdxOut
 		:
 
-	uint(size=3) SZ_16x16 = 0;
-	uint(size=3) SZ_16x8  = 1;
-	uint(size=3) SZ_8x16  = 2;
-	uint(size=3) SZ_8x8   = 3;
-	uint(size=3) SZ_8x4   = 4;
-	uint(size=3) SZ_4x8   = 5;
-	uint(size=3) SZ_4x4   = 6;
-
-	List(type: uint(size=3),size=8) SizeMb_P =
-		[
-			SZ_16x16, SZ_16x8, SZ_8x16, SZ_8x8, SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16
-		];
-
-	List(type: uint(size=3),size=32) SizeMb_B =
-		[
-			 SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
-			SZ_16x8,  SZ_8x16,  SZ_16x8,  SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
-			SZ_16x8,  SZ_8x16,   SZ_8x8,   SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,
-			 SZ_8x8,  SZ_8x8
-		];
-
 	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPart =
 		[
 			[1/*Change me when B_Direct_8x8 will be supported !! 4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
@@ -126,20 +105,7 @@ actor Algo_MvComponentReorder()
 				end;
 			MbPartIdx     := 0;
 			MbPartIdxMax  := NumMbPart(MacroBlkType);
-			SizeMbMv  :=
-				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
-					if(MacroBlkType <= BLOCK_TYPE_B_MAX)then	
-						SizeMb_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]
-					else
-						SZ_16x16
-					end
-				else
-					if(MacroBlkType <= BLOCK_TYPE_P_MAX)then
-						SizeMb_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
-					else
-						SZ_16x16
-					end
-				end;
+			SizeMbMv      := SizeMbPart(MacroBlkType);
 		end
 
 	GetListSel4Mb: action

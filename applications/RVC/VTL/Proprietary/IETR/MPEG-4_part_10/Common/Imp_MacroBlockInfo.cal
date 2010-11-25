@@ -101,6 +101,15 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 	uint(size=2) PRED_L1 = 2;
 	uint(size=2) BIPRED  = 3;
 	uint(size=2) DIRECT  = 4;
+
+
+	uint(size=3) SZ_16x16 = 0;
+	uint(size=3) SZ_16x8  = 1;
+	uint(size=3) SZ_8x16  = 2;
+	uint(size=3) SZ_8x8   = 3;
+	uint(size=3) SZ_8x4   = 4;
+	uint(size=3) SZ_4x8   = 5;
+	uint(size=3) SZ_4x4   = 6;
 	
 
 	List(type: List(type: uint(size=3),size=2),size=8) MbPartPredMode_P =
@@ -137,6 +146,19 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			1,1
 		];
 
+	List(type: uint(size=3),size=8) SizeMb_P =
+		[
+			SZ_16x16, SZ_16x8, SZ_8x16, SZ_8x8, SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16
+		];
+
+	List(type: uint(size=3),size=32) SizeMb_B =
+		[
+			 SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
+			SZ_16x8,  SZ_8x16,  SZ_16x8,  SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
+			SZ_16x8,  SZ_8x16,   SZ_8x8,   SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,
+			 SZ_8x8,  SZ_8x8
+		];
+
 
 	function Is_Intra_16x16(uint MbType)
 				-->
@@ -160,29 +182,29 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			end
 		end
 
-	function Is_PredL1(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
+	function Is_PredL1(uint(size=6) MbType, uint(size=1) mb_part_idx)
 				-->
 			bool
 		:
-			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
-				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) &  31][mb_part_idx & 1] & PRED_L1) != 0
+			if(MbType >= BLOCK_TYPE_B_MIN and MbType <= BLOCK_TYPE_B_MAX) then
+				(MbPartPredMode_B[(MbType - BLOCK_TYPE_B_MIN) &  31][mb_part_idx & 1] & PRED_L1) != 0
 			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
 				false
 			end
 		end
 
-	function IsIntra(uint(size=6) MacroBlk_Type)
+	function IsIntra(uint(size=6) MbType)
 				-->
 			bool
 		:
-			if(MacroBlk_Type >= BLOCK_TYPE_INTRA_MIN and MacroBlk_Type <= BLOCK_TYPE_INTRA_MAX)then
+			if(MbType >= BLOCK_TYPE_INTRA_MIN and MbType <= BLOCK_TYPE_INTRA_MAX)then
 				true
 			else
 				false
 			end
 		end
 
-	function NumMbPart(uint MbType)
+	function NumMbPart(uint(size=6) MbType)
 				-->
 			uint
 		:
@@ -195,5 +217,20 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 					1
 				end
 			end
+		end
+
+	function SizeMbPart(uint(size=6) MbType)
+				-->
+			uint(size=3)
+		:
+				if(MbType >= BLOCK_TYPE_B_MIN and MbType <= BLOCK_TYPE_B_MAX) then
+					SizeMb_B[(MbType - BLOCK_TYPE_B_MIN) & 31]
+				else
+					if(MbType <= BLOCK_TYPE_P_MAX)then
+						SizeMb_P[(MbType - BLOCK_TYPE_P_MIN) &  7]
+					else
+						SZ_16x16
+					end
+				end
 		end
 end

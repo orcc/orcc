@@ -30,8 +30,8 @@
       <vertex id="I_PCM_U" x="1255" y="1205"/>
       <vertex id="I_PCM_V" x="1253" y="1236"/>
       <vertex id="DecodeNextNal" x="547" y="296"/>
-      <vertex id="TypeOfVLD" x="1871" y="94"/>
-      <vertex id="VLDParam" x="1869" y="128"/>
+      <vertex id="TypeOfVLD" x="1902" y="93"/>
+      <vertex id="VLDParam" x="1910" y="126"/>
       <vertex id="GetPps" x="576" y="356"/>
       <vertex id="FrameNum" x="565" y="326"/>
       <vertex id="Mmco" x="786" y="128"/>
@@ -61,6 +61,7 @@
       <vertex id="SubMbPredResMvL1" x="1702" y="1453"/>
       <vertex id="MbPartWidth" x="2255" y="1225"/>
       <vertex id="MbPartHeigth" x="2251" y="1168"/>
+      <vertex id="DirectSpatialMvPred" x="1108" y="419"/>
       <vertex id="Mgnt_DecodePic" x="1446" y="-92"/>
       <vertex id="DecodeSliceHeader" x="224" y="303"/>
       <vertex id="DecodeRefPicList" x="723" y="418"/>
@@ -73,6 +74,5 @@
       <vertex id="DecodeSubMbPred" x="1418" y="1318"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="1913" y="1086"/>
       <vertex id="GenerateSkipBlockInformation" x="1907" y="865"/>
-      <vertex id="DirectSpatialMvPred" x="1108" y="419"/>
    </vertices>
 </layout>

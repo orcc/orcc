@@ -84,27 +84,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	int           MASK_TAB    = 127;
 	uint(size=32) LOG2_SZ_TAB = 7;
 
-	uint(size=3) SZ_16x16 = 0;
-	uint(size=3) SZ_16x8  = 1;
-	uint(size=3) SZ_8x16  = 2;
-	uint(size=3) SZ_8x8   = 3;
-	uint(size=3) SZ_8x4   = 4;
-	uint(size=3) SZ_4x8   = 5;
-	uint(size=3) SZ_4x4   = 6;
-
-	List(type: uint(size=3),size=8) SizeMb_P =
-		[
-			SZ_16x16, SZ_16x8, SZ_8x16, SZ_8x8, SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16
-		];
-
-	List(type: uint(size=3),size=32) SizeMb_B =
-		[
-			 SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
-			SZ_16x8,  SZ_8x16,  SZ_16x8,  SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
-			SZ_16x8,  SZ_8x16,   SZ_8x8,   SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,
-			 SZ_8x8,  SZ_8x8
-		];
-
 	List(type: List(type: uint(size=3), size=16), size=2) SizeSubMb =
 		[
 			[SZ_4x4, SZ_8x8, SZ_8x8, SZ_8x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8,
@@ -534,12 +513,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbType        := MacroBlkType;
 			MbPartIdx     := 0;
 			MbPartIdxMax  := NumMbPart(MacroBlkType);
-			SizeMbMv  :=
-				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
-					SizeMb_B[(MacroBlkType - BLOCK_TYPE_B_MIN) & 31]
-				else
-					SizeMb_P[(MacroBlkType - BLOCK_TYPE_P_MIN) &  7]
-				end;
+			SizeMbMv      := SizeMbPart(MacroBlkType);
 		end
 
 	EatTokens: action
