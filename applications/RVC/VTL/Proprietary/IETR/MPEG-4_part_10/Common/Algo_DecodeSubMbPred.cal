@@ -30,7 +30,6 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) RefIdxL1,
 	int(size=16) MvResl0,
 	int(size=16) MvResl1,
-	uint(size=3) MbPartIdx,
 	bool         EndRefIdxL0
 		:
 
@@ -264,7 +263,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 				==>
 			RefIdxL0     :[ref_idx_l0[mbPartIdx-1]],
 			MvResl0      :[ValueOfVLD] repeat 2,
-			MbPartIdx    :[subMbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard
 			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
@@ -280,7 +278,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 //Delete me!! Be carefull with B_DIRECT_8x8
 	ReadMvdl0Done.Skip: action
 				==>
-			MbPartIdx    :[subMbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard
 			subMbPartIdx < subMbPartIdxMax

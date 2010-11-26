@@ -28,7 +28,6 @@ actor Algo_DecodeMbPred()
 
 	uint(size=4)  RefIdxL0,
 	uint(size=4)  RefIdxL1,
-	uint(size=3)  MbPartIdx,
 	bool          EndRefIdxL0,
 
 	uint(size=4)  IntraPredModeC, 
@@ -367,7 +366,6 @@ actor Algo_DecodeMbPred()
 			ValVLD   :[val_ref_idx]
 				==>
 			RefIdxL0     :[val_ref_idx],
-			MbPartIdx    :[mbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard
 			mbPartIdx < mbPartIdxMax,
@@ -382,7 +380,6 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxL0.DoneSkip: action
 			ValVLD   :[val_ref_idx]
 				==>
-			MbPartIdx    :[mbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard
 			mbPartIdx < mbPartIdxMax,

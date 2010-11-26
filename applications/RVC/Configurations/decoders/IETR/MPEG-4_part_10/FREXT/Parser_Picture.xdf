@@ -124,13 +124,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="MbPartIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="CodedBlockPattern">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -577,10 +570,6 @@
         dst-port="SubMbPredEndRefIdxL0" src="DecodeSubMbPred" src-port="EndRefIdxL0"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredEndRefIdxL0" src="DecodeMbPred" src-port="EndRefIdxL0"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="SubMbPredMbPartIdx" src="DecodeSubMbPred" src-port="MbPartIdx"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="MbPredMbPartIdx" src="DecodeMbPred" src-port="MbPartIdx"/>
     <Connection dst="GenerateSkipBlockInformation" dst-port="Res_Last"
         src="DecodeResidualBlock_Cavlc" src-port="Last"/>
     <Connection dst="GenerateSkipBlockInformation" dst-port="Skip_Block"
@@ -615,8 +604,6 @@
     <Connection dst="" dst-port="slice_beta_offset"
         src="DecodeSliceData_Cavlc" src-port="Slice_Beta_Offset"/>
     <Connection dst="" dst-port="LFDisable" src="DecodeSliceData_Cavlc" src-port="LFDisable"/>
-    <Connection dst="" dst-port="MbPartIdx"
-        src="MergeDataFromSDataAndMbLayer" src-port="MbPartIdx"/>
     <Connection dst="" dst-port="CodedBlockPattern"
         src="GenerateSkipBlockInformation" src-port="cbp_blk"/>
     <Connection dst="" dst-port="ConstrainedIFlag"

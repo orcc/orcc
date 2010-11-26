@@ -41,6 +41,9 @@
       <vertex id="PocToRead" x="2866" y="793"/>
       <vertex id="ReadAddress_l" x="2853" y="857"/>
       <vertex id="ReadAddress_c" x="2853" y="825"/>
+      <vertex id="MbType4Pred" x="1714" y="854"/>
+      <vertex id="SelectList" x="2570" y="720"/>
+      <vertex id="SubMbType" x="1752" y="1282"/>
       <vertex id="Algo_NALU" x="333" y="7"/>
       <vertex id="CheckNaluType" x="644" y="-22"/>
       <vertex id="DecodeSps" x="7" y="1243"/>
@@ -61,8 +64,5 @@
       <vertex id="RefIdxL1ToPoc" x="2251" y="1174"/>
       <vertex id="SelectRefIdx" x="2439" y="1081"/>
       <vertex id="Mgnt_InterPred" x="2666" y="781"/>
-      <vertex id="MbType4Pred" x="1714" y="854"/>
-      <vertex id="SelectList" x="2570" y="720"/>
-      <vertex id="SubMbType" x="1752" y="1282"/>
    </vertices>
 </layout>
