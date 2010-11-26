@@ -29,8 +29,7 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) RefIdxL0,
 	uint(size=4) RefIdxL1,
 	int(size=16) MvResl0,
-	int(size=16) MvResl1,
-	bool         EndRefIdxL0
+	int(size=16) MvResl1
 		:
 
 	bool DEBUG_MV = false;
@@ -262,8 +261,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
 			RefIdxL0     :[ref_idx_l0[mbPartIdx-1]],
-			MvResl0      :[ValueOfVLD] repeat 2,
-			EndRefIdxL0  :[false]
+			MvResl0      :[ValueOfVLD] repeat 2
 		guard
 			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1,
@@ -278,7 +276,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 //Delete me!! Be carefull with B_DIRECT_8x8
 	ReadMvdl0Done.Skip: action
 				==>
-			EndRefIdxL0  :[false]
 		guard
 			subMbPartIdx < subMbPartIdxMax
 		do
@@ -314,8 +311,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 
 	SendEndSubMbPred: action
 				==>
-			TypeOfVLD   :[ SKIP_NAL ],
-			EndRefIdxL0 :[   true   ]
+			TypeOfVLD   :[ SKIP_NAL ]
 		end
 
 	schedule fsm ReadSubMbTypeAsked:

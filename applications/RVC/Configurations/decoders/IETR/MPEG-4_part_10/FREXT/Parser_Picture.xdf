@@ -566,10 +566,6 @@
         dst-port="TransfSz8x8Flag" src="DecodeMacroBlockLayer" src-port="MergeTransfSz8x8"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="RemIntraYxYPredMode" src="DecodeMbPred" src-port="RemIntraYxYPredMode"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="SubMbPredEndRefIdxL0" src="DecodeSubMbPred" src-port="EndRefIdxL0"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="MbPredEndRefIdxL0" src="DecodeMbPred" src-port="EndRefIdxL0"/>
     <Connection dst="GenerateSkipBlockInformation" dst-port="Res_Last"
         src="DecodeResidualBlock_Cavlc" src-port="Last"/>
     <Connection dst="GenerateSkipBlockInformation" dst-port="Skip_Block"

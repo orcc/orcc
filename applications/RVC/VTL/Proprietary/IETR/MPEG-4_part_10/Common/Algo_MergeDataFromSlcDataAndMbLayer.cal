@@ -34,11 +34,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 
 	int (size=8)  SDataQp_Y_Cb_Cr,
 
-	int (size=8)  MbLayerQp_Y_Cb_Cr,
-
-	bool          SubMbPredEndRefIdxL0,
-
-	bool          MbPredEndRefIdxL0
+	int (size=8)  MbLayerQp_Y_Cb_Cr
 
 		==>
 	uint(size=1)  MbIntraFlag,
@@ -184,79 +180,18 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			mb_type := Mb_type;
 		end
 
-	LaunchSubMbPred: action ==>
-		guard
-			   (mb_type = BLOCK_TYPE_P_8x8)
-			or (mb_type = BLOCK_TYPE_P_8x8ref0)
-			or (mb_type = BLOCK_TYPE_B_8x8)
-		end
-
-	LaunchMbPred: action ==>
-		end
-
-	ReadMbPredParam1.MbIntra: action
-			MbPredEndRefIdxL0  :[Finished]
-				==>
-		guard
-			Finished = false,
-			mb_type >= BLOCK_TYPE_INTRA_MIN,
-			mb_type <= BLOCK_TYPE_INTRA_MAX
-		end
-
-	ReadMbPredParam1.MbInter: action
-			MbPredEndRefIdxL0  :[Finished]
-				==>
-		guard
-			Finished = false
-		end
-
-	ReadMbPredParam1Finished: action
-			MbPredEndRefIdxL0 :[Finished]
-				==>
-		guard
-			Finished = true
-		end
-
-	ReadSubMbPredParam: action
-			SubMbPredEndRefIdxL0  :[Finished]
-				==>
-		guard
-			Finished = false
-		end
-
-	ReadSubMbPredParamFinished: action
-			SubMbPredEndRefIdxL0 :[Finished]
-				==>
-		guard
-			Finished = true
-		end
-
 	schedule fsm ReadMbLayer:
 		ReadMbLayer (MbLayerSkipped          )--> ReadMbLayer;
 		ReadMbLayer (MbLayer.IsIntra4x4or8x8 )--> IsIntra4x4or8x8;
-		ReadMbLayer (MbLayer.IsIntra16x16    )--> ReadMbPredParam1;
+		ReadMbLayer (MbLayer.IsIntra16x16    )--> ReadMbLayer;
 		ReadMbLayer (MbLayer.IsIntraPCM      )--> ReadMbLayer;
-		ReadMbLayer (MbLayer.IsNotIntra      )--> CheckMbTypeInter;
+		ReadMbLayer (MbLayer.IsNotIntra      )--> ReadMbLayer;
 
-		IsIntra4x4or8x8 (MbLayer.IsIntra8x8 )--> ReadMbPredParam1;
-		IsIntra4x4or8x8 (MbLayer.IsIntra4x4 )--> ReadMbPredParam1;
-
-		CheckMbTypeInter (LaunchSubMbPred )--> ReadSubMbPredParam;
-		CheckMbTypeInter (LaunchMbPred    )--> ReadMbPredParam1;
-
-		ReadMbPredParam1 (ReadMbPredParam1         )--> ReadMbPredParam1;
-		ReadMbPredParam1 (ReadMbPredParam1Finished )--> ReadMbLayer;
-
-		ReadSubMbPredParam (ReadSubMbPredParam         )--> ReadSubMbPredParam;
-		ReadSubMbPredParam (ReadSubMbPredParamFinished )--> ReadMbLayer;
-
+		IsIntra4x4or8x8 (MbLayer.IsIntra8x8 )--> ReadMbLayer;
+		IsIntra4x4or8x8 (MbLayer.IsIntra4x4 )--> ReadMbLayer;
 	end
 
 	priority
 		MbLayerSkipped     > MbLayer;
-		LaunchSubMbPred    > LaunchMbPred;
-		ReadMbPredParam1   > ReadMbPredParam1Finished;
-		ReadSubMbPredParam > ReadSubMbPredParamFinished;
-		ReadMbPredParam1.MbIntra > ReadMbPredParam1.MbInter;
 	end
 end
