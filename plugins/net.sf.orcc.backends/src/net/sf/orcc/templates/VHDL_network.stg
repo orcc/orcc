@@ -1,82 +1,57 @@
 ///////////////////////////////////////////////////////////////////////////////
 // print signals()
 
-printSignals(instances) ::= <<
-$instances: printSig()$
->>
-
-printSig(instance) ::= <<
-
-$
-if(instance.actor)
-$                                             
-                                             -- Actor : $instance.id$
+printSignals(instance) ::= <<
+$if(instance.actor)
+$                                            -- Actor : $instance.id$
 $instance.actor.inputs.list: printSigInput()$
-$instance.actor.outputs.list: printSigOutput()$
-$
+$instance.actor.outputs.list: printSigOutput()$$
 elseif(instance.network)
-$
-                                             -- Network : $instance.id$
+$                                            -- Network : $instance.id$
 $instance.network.inputs.list: printSigInput()$
-$instance.network.outputs.list: printSigOutput()$
-$
+$instance.network.outputs.list: printSigOutput()$$
 else
-$
-                                             -- Broadcast : $instance.id$
-$instance.broadcast.outputList: printBroadOutput(); separator="\n"$
-$
-endif
-$
+$                                            -- Broadcast : $instance.id$
+$instance.broadcast.outputList: printBroadOutput(); separator="\n"$$
+endif$
 >>
-
 
 
 printBroadOutput(num) ::= <<
-$
-if(instance.broadcast.type.bool)
-$
-signal $instance.id$_output_$num$_data_out   : std_logic;
-$
+
+$if(instance.broadcast.type.bool)
+$signal $instance.id$_output_$num$_data_out   : std_logic;$
 else
-$
-signal $instance.id$_output_$num$_data_out   : std_logic_vector($instance.broadcast.type.size$ - 1 downto 0);
-$
-endif
-$
+$signal $instance.id$_output_$num$_data_out   : std_logic_vector($instance.broadcast.type.size$ - 1 downto 0);$
+endif$
+
 signal $instance.id$_output_$num$_write       : std_logic;
-signal $instance.id$_output_$num$_full        : std_logic;
+signal $instance.id$_output_$num$_rdy        : std_logic;
 >> 
 
 
 printSigInput(port) ::= <<
-$
-if(port.type.bool)
-$
-signal $instance.id$_$port.name$_data_in   : std_logic;
-$
+
+$if(port.type.bool)
+$signal $instance.id$_$port.name$_data_in   : std_logic;$
 else
-$
-signal $instance.id$_$port.name$_data_in   : std_logic_vector($port.type.size$ - 1 downto 0);
-$
-endif
-$
-signal $instance.id$_$port.name$_ack       : std_logic;
+$signal $instance.id$_$port.name$_data_in   : std_logic_vector($port.type.size$ - 1 downto 0);$
+endif$
+
+signal $instance.id$_$port.name$_rdy       : std_logic;
 signal $instance.id$_$port.name$_send      : std_logic;
 >>
 
 printSigOutput(port) ::= <<
+
 --
-$
-if(port.type.bool)
-$
-signal $instance.id$_$port.name$_data_out   : std_logic;
-$
+$if(port.type.bool)
+$signal $instance.id$_$port.name$_data_out   : std_logic;$
 else
-$signal $instance.id$_$port.name$_data_out   : std_logic_vector($port.type.size$ - 1 downto 0);
-$
-endif
-$
-signal $instance.id$_$port.name$_full       : std_logic;
+$signal $instance.id$_$port.name$_data_out   : std_logic_vector($port.type.size$ - 1 downto 0);$
+endif$
+
+signal $instance.id$_$port.name$_rdy        : std_logic;
 signal $instance.id$_$port.name$_write      : std_logic;
 >> 
 
@@ -92,10 +67,8 @@ $tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(e
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$
-if (src.instance)
-$$
-  if (tgt.instance)
+$if (src.instance)
+  $$if (tgt.instance)
 $
 
 $doAssignFifo(
@@ -106,52 +79,40 @@ $doAssignFifo(
   $
 
 $assignIn(source=src.instance, sourcePort=edge.source)$$
-  endif
-$$
-else
-$$
-  if (tgt.instance)
+  endif$$
+elseif (tgt.instance)
   $
 
 $assignOut(target=tgt.instance, targetPort=edge.target)$$
-  endif
-  $$
-endif
-$
+endif$
 >>
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 
 fifo_$count$ : entity work.fifo_top 
 generic map (
-depth => $if(edge.size)$$edge.size$$else$SIZE$endif$,
-$
-if(targetPort.type.bool)
-$width => 1)
-$
+depth => $edge.size$,
+$if(targetPort.type.bool)
+$width => 1)$
 else
-$width => $targetPort.type.size$)
-$
-endif
-$
+$width => $targetPort.type.size$)$
+endif$
+
 port map (
   wr_data    => $source.id$_$sourcePort.name$_write, 
-$
-if(targetPort.type.bool)
+$if(targetPort.type.bool)
 $  data_in(0) => $source.id$_$sourcePort.name$_data_out,$\n$$
 else
 $  data_in    => $source.id$_$sourcePort.name$_data_out,$\n$$
-endif
-$  full       => $source.id$_$sourcePort.name$_full, 
-  rd_ack      => $target.id$_$targetPort.name$_ack, 
-$
-if(targetPort.type.bool)
-$   data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$$
+endif$
+  wr_rdy      => $source.id$_$sourcePort.name$_rdy, 
+  rd_rdy      => $target.id$_$targetPort.name$_rdy, 
+$if(targetPort.type.bool)
+$  data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$$
 else
 $  data_out   => $target.id$_$targetPort.name$_data_in,$\n$$
 endif
 $  send       => $target.id$_$targetPort.name$_send, 
-  empty      => open,
   wr_clk     => clock, 
   rd_clk     => clock, 
   reset_n    => reset_n); 
@@ -161,14 +122,14 @@ assignIn(source, sourcePort) ::= <<
 
 $tgt.port$_data    <= $source.id$_$sourcePort.name$_data_out;
 $tgt.port$_write   <= $source.id$_$sourcePort.name$_write;
-$source.id$_$sourcePort.name$_full   <= $tgt.port$_full;
+$source.id$_$sourcePort.name$_rdy   <= $tgt.port$_rdy;
 >>
 
 assignOut(target, targetPort) ::= <<
 
 $target.id$_$targetPort.name$_data_in <= $src.port$_data;
 $target.id$_$targetPort.name$_send    <= $src.port$_send;
-$src.port$_ack <= $target.id$_$targetPort.name$_ack;
+$src.port$_rdy <= $target.id$_$targetPort.name$_rdy;
 >>
 
 
@@ -181,27 +142,23 @@ $network.outputs.list: printNetPortsOutput(); separator="\n"$
 >>
 
 printNetPortsInput(port) ::= <<
-$
-if(port.type.bool)
-$$port.name$_data    : in  std_logic;$\n$$
+$if(port.type.bool)
+$$port.name$_data  : in  std_logic;$\n$$
 else
-$$port.name$_data    : in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
-endif
-$
-$port.name$_send     : in  std_logic;
-$port.name$_ack      : out std_logic;
+$$port.name$_data  : in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
+endif$
+$port.name$_send  : in  std_logic;
+$port.name$_rdy   : out std_logic;
 >>
 
 printNetPortsOutput(port) ::= <<
-$
-if(port.type.bool)
+$if(port.type.bool)
 $$port.name$_data   : out std_logic;$\n$$
 else
 $$port.name$_data   : out std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
-endif
-$
-$port.name$_write      : out std_logic;
-$port.name$_full       : in  std_logic;
+endif$
+$port.name$_write  : out std_logic;
+$port.name$_rdy    : in  std_logic;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,20 +176,20 @@ $instance.network.outputs.list: printPortsOutput(); separator="\n"$
 
 printPortsInput(port) ::= <<
 $port.name$_data   => $instance.id$_$port.name$_data_in,
-$port.name$_ack    => $instance.id$_$port.name$_ack,
+$port.name$_rdy    => $instance.id$_$port.name$_rdy,
 $port.name$_send   => $instance.id$_$port.name$_send,
 >>
 
 printPortsOutput(port) ::= <<
 $port.name$_data   => $instance.id$_$port.name$_data_out,
-$port.name$_full   => $instance.id$_$port.name$_full,
+$port.name$_rdy    => $instance.id$_$port.name$_rdy,
 $port.name$_write  => $instance.id$_$port.name$_write,
 >> 
 
 printBroadcastPorts(instance) ::= <<
 -- Print Broadcast: $instance.id$
 $instance.broadcast.outputList: printBroadcastOutput(); separator="\n"$
-$instance.id$_full       <= ($instance.broadcast.outputList: printBroadcastFull(); separator=" or "$
+$instance.id$_rdy       <= ($instance.broadcast.outputList: printBroadcastFull(); separator=" or "$
 >>
 
 printBroadcastOutput(num) ::= <<
@@ -241,51 +198,40 @@ $instance.id$_output_$num$_write    <= $instance.id$_write;
 >> 
 
 printBroadcastFull(num) ::= <<
-$instance.id$_output_$num$_full
+$instance.id$_output_$num$_rdy
 >> 
 
 ///////////////////////////////////////////////////////////////////////////////
 // print actors and networks
 
 printActor(instance) ::= <<
-$
-if (instance.actor)
-$$
-  if (!instance.actor.system)
-  $
-$instance.id$ : entity work.$instance.actor$
+
+$if (instance.actor)
+  $$if (!instance.actor.system)
+  $$instance.id$ : entity work.$instance.actor$
   port map (
     $printActorPorts(instance)$
-    clock            => clock, 
-    reset_n          => reset_n);
-  $
-  endif
-  $$
-endif
-$
+    clock     => clock, 
+    reset_n   => reset_n);$
+  endif$$
+endif$
 >>
 
 printNetwork(instance) ::= <<
-$
-if (!instance.actor)
-$$
-  if (!instance.broadcast)
-  $
-$instance.id$ : entity work.$instance.network$
+
+$if (!instance.actor)
+  $$if (!instance.broadcast)
+  $$instance.id$ : entity work.$instance.network$
   generic map (
     SIZE             => SIZE) 
   port map (
     $printNetworksPorts(instance)$
-    clock            => clock, 
-    reset_n          => reset_n);
-  $
+    clock     => clock, 
+    reset_n   => reset_n);$
   else
-  $$printBroadcastPorts(instance)$);
-  $
-  endif
-  $$
-endif
-$
+  $$printBroadcastPorts(instance)$);$
+  endif$$
+endif$
 >>
 
 printNetAct(instances) ::= <<
@@ -309,8 +255,8 @@ entity $network.name$ is
   SIZE : integer := $fifoSize$);
   port (
     $printNetworkPorts(network)$
-    clock   : in std_logic;
-    reset_n : in std_logic);  
+    clock    : in  std_logic;
+    reset_n  : in  std_logic);  
 end $network.name$;
 
 
@@ -319,7 +265,7 @@ architecture rtl_$network.name$ of $network.name$ is
   ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------
-  $printSignals(network.instances); separator="\n"$
+  $network.instances : printSignals(); separator="\n"$
   ---------------------------------------------------------------------------
 
 begin
