@@ -296,6 +296,15 @@ public class ActorInterpreter {
 	 * @return true if the given action is schedulable
 	 */
 	protected boolean isSchedulable(Action action) {
+		// check tokens
+		for (Entry<Port, Integer> entry : action.getInputPattern().entrySet()) {
+			Fifo fifo = ioFifos.get(entry.getKey().getName());
+			boolean hasTok = fifo.hasTokens(entry.getValue());
+			if (!hasTok) {
+				return false;
+			}
+		}
+		
 		Expression isSchedulable = interpretProc(action.getScheduler());
 		if (isSchedulable != null && isSchedulable.isBooleanExpr()) {
 			return ((BoolExpr) isSchedulable).getValue();

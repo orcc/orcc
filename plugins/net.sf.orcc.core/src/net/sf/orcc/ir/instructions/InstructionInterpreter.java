@@ -59,17 +59,6 @@ public interface InstructionInterpreter {
 	public Object interpret(Call call, Object... args);
 
 	/**
-	 * Interprets a hasTokens instruction.
-	 * 
-	 * @param hasTokens
-	 *            an hasTokens instruction
-	 * @param args
-	 *            arguments
-	 * @return an object
-	 */
-	public Object interpret(HasTokens hasTokens, Object... args);
-
-	/**
 	 * Interprets a load instruction.
 	 * 
 	 * @param load

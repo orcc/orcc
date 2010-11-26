@@ -41,7 +41,6 @@ import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
@@ -99,11 +98,6 @@ public class AbstractNodeInterpreter extends NodeInterpreter {
 		this.schedulableMode = schedulableMode;
 		((AbstractExpressionEvaluator) exprInterpreter)
 				.setSchedulableMode(schedulableMode);
-	}
-
-	@Override
-	public void visit(HasTokens instr) {
-		instr.getTarget().setValue(new BoolExpr(true));
 	}
 
 	@Override

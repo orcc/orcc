@@ -49,7 +49,6 @@ import net.sf.orcc.ir.expr.AbstractExpressionVisitor;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.PhiAssignment;
 import net.sf.orcc.ir.instructions.Return;
@@ -319,11 +318,6 @@ public class SSATransformation extends AbstractActorTransformation {
 
 		for (Use use : uses) {
 			User user = use.getNode();
-			if (user == null) {
-				// TODO to be removed when AstTransformer works on generators
-				System.err.println("null user of " + oldVar + " !!");
-				continue;
-			}
 			CFGNode node;
 			if (user.isCFGNode()) {
 				node = (CFGNode) user;
@@ -360,11 +354,6 @@ public class SSATransformation extends AbstractActorTransformation {
 	public void visit(Call call) {
 		replaceUses(call.getParameters());
 		replaceDef(call);
-	}
-
-	@Override
-	public void visit(HasTokens hasTokens) {
-		replaceDef(hasTokens);
 	}
 
 	@Override

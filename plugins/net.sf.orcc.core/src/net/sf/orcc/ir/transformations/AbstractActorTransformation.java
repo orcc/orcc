@@ -40,7 +40,6 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.InstructionVisitor;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -117,10 +116,6 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 
 	@Override
 	public void visit(Call call) {
-	}
-
-	@Override
-	public void visit(HasTokens hasTokens) {
 	}
 
 	@Override

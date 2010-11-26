@@ -48,8 +48,6 @@ public interface IRConstants {
 
 	public static final String INSTR_CALL = "call";
 
-	public static final String INSTR_HAS_TOKENS = "hasTokens";
-
 	public static final String INSTR_LOAD = "load";
 
 	public static final String INSTR_PEEK = "peek";

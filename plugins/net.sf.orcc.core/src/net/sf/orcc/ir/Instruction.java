@@ -90,13 +90,6 @@ public interface Instruction extends User {
 	boolean isCall();
 
 	/**
-	 * Returns <code>true</code> if the instruction is an HasTokens.
-	 * 
-	 * @return <code>true</code> if the instruction is an HasTokens
-	 */
-	boolean isHasTokens();
-
-	/**
 	 * Returns <code>true</code> if the instruction is a Load.
 	 * 
 	 * @return <code>true</code> if the instruction is a Load

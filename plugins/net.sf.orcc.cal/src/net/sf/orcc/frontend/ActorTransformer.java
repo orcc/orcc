@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
@@ -73,14 +72,12 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
-import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.CollectionsUtil;
@@ -119,36 +116,6 @@ public class ActorTransformer {
 	 */
 	public ActorTransformer() {
 		mapPorts = new HashMap<AstPort, Port>();
-	}
-
-	/**
-	 * Creates calls to hasTokens to test that the given input pattern is
-	 * fulfilled.
-	 * 
-	 * @param inputPattern
-	 *            an IR input pattern
-	 * @return a list of local variables that contain the result of the
-	 *         hasTokens
-	 */
-	private List<LocalVariable> actionCreateHasTokens(Pattern inputPattern) {
-		List<LocalVariable> hasTokenList = new ArrayList<LocalVariable>(
-				inputPattern.size());
-		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
-			LocalVariable target = astTransformer
-					.getContext()
-					.getProcedure()
-					.newTempLocalVariable(file,
-							IrFactory.eINSTANCE.createTypeBool(),
-							"_tmp_hasTokens");
-			hasTokenList.add(target);
-
-			Port port = entry.getKey();
-			int numTokens = entry.getValue();
-			HasTokens hasTokens = new HasTokens(port, numTokens, target);
-			addInstruction(hasTokens);
-		}
-
-		return hasTokenList;
 	}
 
 	/**
@@ -355,37 +322,16 @@ public class ActorTransformer {
 	 */
 	private void createActionTest(AstAction astAction, Pattern inputPattern,
 			LocalVariable result) {
-		Context context = astTransformer.getContext();
-		if (inputPattern.isEmpty()) {
-			transformGuards(astAction.getGuards(), result);
+		List<AstExpression> guards = astAction.getGuards();
+		if (guards.isEmpty()) {
+			Assign assign = new Assign(result, new BoolExpr(true));
+			addInstruction(assign);
 		} else {
-			// create calls to hasTokens
-			List<LocalVariable> hasTokenList = actionCreateHasTokens(inputPattern);
-
-			// create "then" nodes with peeks and guards
-			List<CFGNode> thenNodes = transformInputPatternAndGuards(astAction,
-					result);
-
-			// create "else" node with Assign(result, false)
-			List<CFGNode> elseNodes = new ArrayList<CFGNode>(1);
-			BlockNode block = new BlockNode(context.getProcedure());
-			Assign assign = new Assign(result, new BoolExpr(false));
-			block.add(assign);
-			elseNodes.add(block);
-
-			// create condition hasTokens1 && hasTokens2 && ... && hasTokensn
-			Iterator<LocalVariable> it = hasTokenList.iterator();
-			Expression condition = new VarExpr(new Use(it.next()));
-			while (it.hasNext()) {
-				Expression e2 = new VarExpr(new Use(it.next()));
-				condition = new BinaryExpr(condition, BinaryOp.LOGIC_AND, e2,
-						IrFactory.eINSTANCE.createTypeBool());
-			}
-
-			// create "if" node
-			IfNode node = new IfNode(context.getProcedure(), condition,
-					thenNodes, elseNodes, new BlockNode(context.getProcedure()));
-			context.getProcedure().getNodes().add(node);
+			transformInputPattern(astAction, Peek.class);
+			// local variables are not transformed because they are not
+			// supposed to be available for guards
+			// astTransformer.transformLocalVariables(astAction.getVariables());
+			transformGuards(astAction.getGuards(), result);
 		}
 	}
 
@@ -790,48 +736,6 @@ public class ActorTransformer {
 			// loads tokens
 			actionLoadTokens(variable, tokens, repeat);
 		}
-	}
-
-	/**
-	 * Returns a list of CFG nodes where the input pattern of the given action
-	 * is peeked. This method creates a new block node to hold the blocks, peeks
-	 * the input pattern, and transfers the nodes created to a new list that is
-	 * the result.
-	 * 
-	 * @param astAction
-	 *            an AST action
-	 * @param result
-	 *            a local variable
-	 * @return a list of CFG nodes
-	 */
-	private List<CFGNode> transformInputPatternAndGuards(AstAction astAction,
-			LocalVariable result) {
-		Context context = astTransformer.getContext();
-		List<CFGNode> nodes = context.getProcedure().getNodes();
-
-		int first = nodes.size();
-		nodes.add(new BlockNode(context.getProcedure()));
-
-		List<AstExpression> guards = astAction.getGuards();
-		if (guards.isEmpty()) {
-			Assign assign = new Assign(result, new BoolExpr(true));
-			addInstruction(assign);
-		} else {
-			transformInputPattern(astAction, Peek.class);
-			// local variables are not transformed because they are not
-			// supposed to be available for guards
-			// astTransformer.transformLocalVariables(astAction.getVariables());
-			transformGuards(astAction.getGuards(), result);
-		}
-
-		int last = nodes.size();
-
-		// moves selected CFG nodes from "nodes" list to resultNodes
-		List<CFGNode> subList = nodes.subList(first, last);
-		List<CFGNode> resultNodes = new ArrayList<CFGNode>(subList);
-		subList.clear();
-
-		return resultNodes;
 	}
 
 	/**

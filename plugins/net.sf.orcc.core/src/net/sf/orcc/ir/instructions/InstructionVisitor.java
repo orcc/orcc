@@ -53,14 +53,6 @@ public interface InstructionVisitor {
 	public void visit(Call call);
 
 	/**
-	 * Visits a hasTokens instruction.
-	 * 
-	 * @param hasTokens
-	 *            an hasTokens instruction
-	 */
-	public void visit(HasTokens hasTokens);
-
-	/**
 	 * Visits a load instruction.
 	 * 
 	 * @param load

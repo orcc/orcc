@@ -75,11 +75,6 @@ public abstract class AbstractInstruction extends AbstractLocalizable implements
 	}
 
 	@Override
-	public boolean isHasTokens() {
-		return false;
-	}
-
-	@Override
 	public boolean isInstruction() {
 		return true;
 	}

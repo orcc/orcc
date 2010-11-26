@@ -47,7 +47,6 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
@@ -207,13 +206,6 @@ public class NodeInterpreter extends AbstractActorTransformation {
 				call.getTarget().setValue(returnValue);
 			}
 		}
-	}
-
-	@Override
-	public void visit(HasTokens instr) {
-		Fifo fifo = fifos.get(instr.getPort().getName());
-		boolean hasTok = fifo.hasTokens(instr.getNumTokens());
-		instr.getTarget().setValue(new BoolExpr(hasTok));
 	}
 
 	@Override

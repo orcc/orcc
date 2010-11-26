@@ -57,7 +57,6 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
@@ -346,32 +345,6 @@ public class StaticActorNormalizer {
 	}
 
 	/**
-	 * Creates hasTokens tests for the input pattern of the static class.
-	 * 
-	 * @param block
-	 *            the block to which hasTokens instructions are added
-	 */
-	private void createInputTests(BlockNode block) {
-		Pattern inputPattern = staticCls.getInputPattern();
-		int i = 0;
-		for (Entry<Port, Integer> entry : inputPattern.entrySet()) {
-			Location location = new Location();
-			Port port = entry.getKey();
-			int numTokens = entry.getValue();
-
-			LocalVariable varDef = new LocalVariable(true, i, new Location(),
-					"pattern", IrFactory.eINSTANCE.createTypeBool());
-			i++;
-			variables.put(actor.getFile(), location, varDef.getName(), varDef);
-
-			HasTokens hasTokens = new HasTokens(location, port, numTokens,
-					varDef);
-			varDef.setInstruction(hasTokens);
-			block.add(hasTokens);
-		}
-	}
-
-	/**
 	 * Creates calls to Read instructions.
 	 * 
 	 * @param procedure
@@ -407,7 +380,6 @@ public class StaticActorNormalizer {
 		BlockNode block = new BlockNode(procedure);
 		nodes.add(block);
 
-		createInputTests(block);
 		createInputCondition(block);
 
 		return procedure;

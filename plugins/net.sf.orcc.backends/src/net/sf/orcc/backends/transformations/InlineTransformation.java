@@ -52,7 +52,6 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -135,12 +134,6 @@ public class InlineTransformation extends AbstractActorTransformation {
 		public Object interpret(FloatExpr expr, Object... args) {
 			FloatExpr e = new FloatExpr(expr.getValue());
 			return e;
-		}
-
-		@Override
-		public Object interpret(HasTokens hasTokens, Object... args) {
-			throw new OrccRuntimeException(hasTokens.getLocation(),
-					"Error: HasTokens call in function or procedure body.");
 		}
 
 		@Override

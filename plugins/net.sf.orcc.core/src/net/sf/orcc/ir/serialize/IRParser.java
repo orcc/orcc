@@ -34,7 +34,6 @@ import static net.sf.orcc.ir.serialize.IRConstants.EXPR_UNARY;
 import static net.sf.orcc.ir.serialize.IRConstants.EXPR_VAR;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_ASSIGN;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_CALL;
-import static net.sf.orcc.ir.serialize.IRConstants.INSTR_HAS_TOKENS;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_LOAD;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_PEEK;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_PHI;
@@ -104,7 +103,6 @@ import net.sf.orcc.ir.expr.UnaryOp;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.PhiAssignment;
@@ -496,29 +494,6 @@ public class IRParser {
 	}
 
 	/**
-	 * Parses the given JSON array as a HasTokens instruction
-	 * 
-	 * @param loc
-	 *            location information
-	 * @param array
-	 *            a JSON array
-	 * @return a HasTokens instruction
-	 * @throws OrccException
-	 */
-	private HasTokens parseInstrHasTokens(Location loc, JsonArray array)
-			throws OrccException {
-		Variable target = getVariable(array.get(2).getAsJsonArray());
-		String fifoName = array.get(3).getAsString();
-		Port port = inputs.get(fifoName);
-		int numTokens = array.get(4).getAsInt();
-
-		LocalVariable local = (LocalVariable) target;
-		HasTokens hasTokens = new HasTokens(loc, port, numTokens, local);
-		target.setInstruction(hasTokens);
-		return hasTokens;
-	}
-
-	/**
 	 * Parses the given JSON array as a Load instruction
 	 * 
 	 * @param loc
@@ -658,8 +633,6 @@ public class IRParser {
 			return parseInstrAssign(loc, array);
 		} else if (name.equals(INSTR_CALL)) {
 			return parseInstrCall(loc, array);
-		} else if (name.equals(INSTR_HAS_TOKENS)) {
-			return parseInstrHasTokens(loc, array);
 		} else if (name.equals(INSTR_LOAD)) {
 			return parseInstrLoad(loc, array);
 		} else if (name.equals(INSTR_PEEK)) {

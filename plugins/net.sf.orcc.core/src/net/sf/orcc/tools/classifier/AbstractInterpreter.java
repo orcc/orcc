@@ -90,6 +90,9 @@ public class AbstractInterpreter extends ActorInterpreter {
 
 	@Override
 	protected boolean isSchedulable(Action action) {
+		// unlike parent, do not check the number of tokens present on FIFOs
+
+		// check isSchedulable procedure
 		((AbstractNodeInterpreter) nodeInterpreter).setSchedulableMode(true);
 		Expression result = interpretProc(action.getScheduler());
 		if (result == null) {

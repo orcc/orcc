@@ -60,7 +60,6 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Return;
@@ -396,28 +395,6 @@ public class ActorMerger implements INetworkTransformation {
 	}
 
 	/**
-	 * Creates hasTokens tests for the input pattern of the static class.
-	 * 
-	 * @param block
-	 *            the block to which hasTokens instructions are added
-	 */
-	private void createInputTests(BlockNode block) {
-		int i = 0;
-		for (Port port : actor.getInputs()) {
-			Location location = new Location();
-			int numTokens = port.getNumTokensConsumed();
-			LocalVariable varDef = new LocalVariable(true, i, new Location(),
-					"pattern", IrFactory.eINSTANCE.createTypeBool());
-			i++;
-			variables.put(varDef.getName(), varDef);
-			HasTokens hasTokens = new HasTokens(location, port, numTokens,
-					varDef);
-			varDef.setInstruction(hasTokens);
-			block.add(hasTokens);
-		}
-	}
-
-	/**
 	 * turns FIFOs between static actors into buffers
 	 * 
 	 */
@@ -566,7 +543,6 @@ public class ActorMerger implements INetworkTransformation {
 				new OrderedMap<String, Variable>(), variables, nodes);
 		BlockNode block = new BlockNode(procedure);
 		nodes.add(block);
-		createInputTests(block);
 		createInputCondition(block);
 		return procedure;
 	}

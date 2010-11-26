@@ -34,7 +34,6 @@ import static net.sf.orcc.ir.serialize.IRConstants.EXPR_UNARY;
 import static net.sf.orcc.ir.serialize.IRConstants.EXPR_VAR;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_ASSIGN;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_CALL;
-import static net.sf.orcc.ir.serialize.IRConstants.INSTR_HAS_TOKENS;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_LOAD;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_PEEK;
 import static net.sf.orcc.ir.serialize.IRConstants.INSTR_PHI;
@@ -105,7 +104,6 @@ import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.AbstractFifoInstruction;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Call;
-import net.sf.orcc.ir.instructions.HasTokens;
 import net.sf.orcc.ir.instructions.InstructionInterpreter;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -242,13 +240,6 @@ public class IRWriter {
 			array.add(call.hasResult() ? writeVariable(call.getTarget()) : null);
 
 			return array;
-		}
-
-		@Override
-		public Object interpret(HasTokens hasTokens, Object... args) {
-			return visitFifoOperation(INSTR_HAS_TOKENS,
-					hasTokens.getLocation(), hasTokens.getTarget(),
-					hasTokens.getPort(), hasTokens.getNumTokens());
 		}
 
 		@Override

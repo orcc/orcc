@@ -47,10 +47,6 @@ public abstract class AbstractInstructionVisitor implements InstructionVisitor {
 	}
 
 	@Override
-	public void visit(HasTokens node) {
-	}
-
-	@Override
 	public void visit(Load node) {
 	}
 
