@@ -2,180 +2,120 @@
 // FIFOs
 ///////////////////////////////////////////////////////////////////////////////
 fifo_in(port) ::= <<
-$
-if(port.type.bool)
-$$port.name$_data  : in std_logic;$
+$if(port.type.bool)
+$$port.name$_data  : in  std_logic;$
 else
-$$port.name$_data  : in std_logic_vector($port.type.size$ -1 downto 0);$
-endif
-$
+$$port.name$_data  : in  std_logic_vector($port.type.size$ -1 downto 0);$
+endif$
 
-$port.name$_send : in std_logic;
-$port.name$_ack  : out std_logic;
-
+$port.name$_rdy   : out std_logic;
+$port.name$_send  : in  std_logic;
+$port.name$_ack   : out  std_logic;
 >>
 
 fifo_out(port) ::= <<
-$port.name$_full  : in std_logic;
-$
-if(last(port.name))
-  $$
-  if(port.type.bool)
+$if(port.type.bool)
 $$port.name$_data  : out std_logic;$
-  else
-$$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$
-  endif
-  $
-
-$port.name$_write : out std_logic$
 else
-$$port.name$_data  : out $port.type$;
-$port.name$_write : out std_logic;$
-endif
-$
+$$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$
+endif$
+
+$port.name$_rdy   : in  std_logic;
+$port.name$_send  : out std_logic;
+$if(last(port.name))
+$$port.name$_ack : out std_logic$
+else
+$$port.name$_ack : out std_logic;$
+endif$
 >>
 
 fifo_out_init(port) ::=<<
-$port.name$_write <= '0';
+
+$port.name$_send <= '0';
+$if(port.type.bool)
+$$port.name$_data  <= '0';$
+else
+$$port.name$_data  <= (others => '0');$
+endif$
 >>
 
+fifo_in_init(port) ::=<<
 
+$port.name$_rdy <= '0';
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Scheduler process
 ///////////////////////////////////////////////////////////////////////////////
 
-Actor_out(port) ::= <<
-$
-if(port.type.bool)
-$$port.name$_data  <= '0';$\n$$
+Actor_Scheduler(actor) ::= <<
+$actor.actions:Actor_Schedul(); separator="\n"$
+
+>>
+
+Actor_Schedul(action) ::= <<
+$if (actor.templateData  || action.inputPattern.keys)
+$$action$_scheduler : process ($sensitivity(action)$) is
+  $action: printActionLocalSchedul()$  --
+begin
+  $action: printActionSchedulerInline(); separator="\n"$
+  $if(action.outputPattern.keys)
+$  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
+    $action$_go <= isSchedulable_$action$_go;
+  else
+    $action$_go <= '0';
+  end if;$
+  else
+    $  $action$_go <= isSchedulable_$action$_go;$
+  endif$$
 else
-$$port.name$_data  <= (others => '0');$\n$$
-endif
 $
+$action$_go <= '1';$
+endif$
+
+  $action.inputPattern.keys :{port|$port.name$_ack <= isSchedulable_$action$_go}; separator=";\n"$;
+end process $action$_scheduler;
 
 >>
 
-SensitivFIFOin(port) ::= <<
-$port.name$_send
+sensitivity(action) ::= <<
+$action.inputPattern.keys :{port|$port.name$_send}; separator=", "$$
+if(action.inputPattern.keys && actor.templateData)
+$, $
+endif$
+$action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$$
+if(action.outputPattern.keys && actor.templateData)
+$, $
+endif$
+$actor.templateData: {$it$}; separator=", "$
 >>
-
-SensitivFIFOout(port) ::= <<
-$port.name$_full
->>
-
-Actor_Schedul(actor) ::= <<
-  $actor.name$_scheduler : process (reset_n$actor.templateData: {, $it$}$,
-  $actor.inputs.list: SensitivFIFOin(); separator=", "$,
-  $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
-    $actor.actions: printActionLocalSchedul()$  --
-  begin
-    if reset_n = '0' then 
-      $actor.actions:printActionNoACK(); separator="\n"$
-      $actor.inputs.list: NoACK(); separator="\n"$      
-    else
-      $actor.actions: printActionSchedulerInline(); separator="\n"$
-    
-      -- ACK
-      $actor.actions:printActionNoACK(); separator="\n"$
-      $actor.inputs.list: NoACK(); separator="\n"$
-      if $actor.actions:printActionACK(); separator="      elsif "$      end if;
-    end if;
-  end process $actor.name$_scheduler;
-
->>
-
-printActionNoACK(action) ::= <<
-$action$_go <= '0';
->>
-
-NoACK(port) ::= <<
-$port.name$_ack <= '0';
->>
-
-printActionACK(action) ::= <<
-$
-if(action.outputPattern)
-$($outputPattern(pattern=action.outputPattern)$ and isSchedulable_$action$_go = '1') then$
-else
-$(isSchedulable_$action$_go = '1') then$
-endif
-$        -- Action : $action$
-        $action$_go <= '1';
-        $action.inputPattern.keys : ValidAck(); separator="\n"$
-
->>
-
-ValidAck(port) ::= <<
-$port$_ack <= '1';
->>
-
-
-
-
-Actor_Schedul_FSM(actor) ::= <<
-  $actor.name$_scheduler : process (reset_n, FSM$actor.templateData: {, $it$}$,
-  $actor.inputs.list: SensitivFIFOin(); separator=", "$,
-  $actor.outputs.list: SensitivFIFOout(); separator=", "$) is
-    $actor.actions: printActionLocalSchedul()$  --
-  begin
-    if reset_n = '0' then 
-      $actor.actions:printActionNoACK(); separator="\n"$
-      $actor.inputs.list: NoACK(); separator="\n"$      
-    else
-      $actor.actions: printActionSchedulerInline(); separator="\n"$
-    
-      -- ACK
-      $actor.actions:printActionNoACK(); separator="\n"$
-      $actor.inputs.list: NoACK(); separator="\n"$          
-      $schedulerAckFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
-    --
-    end if;
-  end process $actor.name$_scheduler;
-
->>
-
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Execute process
 ///////////////////////////////////////////////////////////////////////////////
 
-
 Actor_Exec(actor) ::= <<
-  $actor.name$_execute : process (reset_n, clock) is
-    $actor.actions: printActionLocalBody()$  --
-  begin
-    if reset_n = '0' then 
-      $actor.stateVars.list: stateConst()$      --
-      $actor.outputs.list: fifo_out_init(); separator="\n"$
-      $actor.outputs.list: Actor_out()$    --
-    elsif rising_edge(clock) then
-      $actor.outputs.list: fifo_out_init(); separator="\n"$
-      --  
-      $schedulingTest(actor.actions)$
-      end if;
-    end if;
-  end process $actor.name$_execute;
+$actor.name$_execute : process (reset_n, clock) is
+  $actor.actions: printActionLocalBody()$  --
+begin
+  if reset_n = '0' then 
+    $actor.stateVars.list: stateConst()$    --
+    $actor.outputs.list: fifo_out_init()$
+    $actor.inputs.list: fifo_in_init()$
+$if(actor.actionScheduler.fsm)    
+$    FSM    <= s_$actor.actionScheduler.fsm.initialState$;$
+endif$  
+  --
+  elsif rising_edge(clock) then
+    --  
+$if(actor.actionScheduler.fsm)    
+$    $executeCoreFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
+else
+$    $executeCore(actor.actions)$$
+endif$
 
->>
-
-
-Actor_Exec_FSM(actor) ::= <<
-  $actor.name$_execute : process (reset_n, clock) is
-    $actor.actions: printActionLocalBody()$  --
-  begin
-    if reset_n = '0' then 
-      $actor.stateVars.list: stateConst()$      $InitFSM(actor.actionScheduler.fsm)$      --
-      $actor.outputs.list: fifo_out_init(); separator="\n"$
-      $actor.outputs.list: Actor_out()$    --
-    elsif rising_edge(clock) then
-      $actor.outputs.list: fifo_out_init(); separator="\n"$
-      --     
-      $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$   
-    end if;
-  end process $actor.name$_execute;
+  end if;
+end process $actor.name$_execute;
 
 >>
 
@@ -191,51 +131,33 @@ $value : {$it$}; separator=" * "$
 >>
 
 signalDeclaration(variable) ::= <<
-$
-if(variable.port)
-$signal $variable$ : $variable.type$;
-$
-else
-$$
-  if(!variable.type.list)
-  $$
-    if(!variable.assignable)
-    $
+$if(variable.port)$
+signal $variable$ : $variable.type$;$
+else$
+  $if(!variable.type.list)$
+    $if(!variable.assignable)$
 constant $variable$ : $variable.type$ := $Constant(variable.constantValue)$;$
     else
-    $
-signal $variable$ : $variable.type$;$
-    endif
-  $$
-  else
-  $$
-    if(!variable.assignable)
-    $$
-      if(variable.initialized)
-      $
-          
-type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
-constant $variable$ : memory_type_$variable$ := $Constant(variable.constantValue)$;$ 
-      endif
-    $$
+$signal $variable$ : $variable.type$;$
+    endif$$
+  else$
+    $if(!variable.assignable)
+      $$if(variable.initialized)
+$type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
+constant $variable$ : memory_type_$variable$ := $Constant(variable.constantValue)$;$
+      endif$$
     else
-    $
-type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
+$type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
 signal $variable$ : memory_type_$variable$;$
-    endif
-  $$
-  endif
-$$
-endif
-$
+    endif$$
+  endif$$
+endif$
 >>
 
 
 variableDeclaration(variable) ::= <<
-$
-if(variable.type.list)
-$-- error !!!!! type memory_type
--- variable $variable$ : $variable.type$ (0 to $listSize(variable.type.dimensions)$ -1)$
+$if(variable.type.list)
+$-- error !!!!! variable $variable$ : $variable.type$ (0 to $listSize(variable.type.dimensions)$ -1)$
 else
 $variable $variable$ : $variable.type$$
 endif
@@ -367,8 +289,7 @@ $$
   if(load.source.variable.port)
   $$
     if(load.cast)
-$$CastLoad(target=load.target, source=load.source, cast=load.cast)$;
--- $load.target$ := $load.source$;$
+$$CastLoad(target=load.target, source=load.source, cast=load.cast)$;$
     else
 $$load.target$ := $load.source$;$
     endif
@@ -423,8 +344,7 @@ $read.target$ := to_integer(unsigned($read.port$_data));$
   $$
 else
 $-- read multiple token not coded yet$
-endif
-$
+endif$
 >>
 
 // a "return" must be transformed when the attribute "transformReturn"
@@ -443,8 +363,7 @@ $
 return $return.value$;$
   endif
 $$
-endif
-$
+endif$
 >>
 
 Store(store) ::= <<
@@ -454,8 +373,7 @@ $$
   if(store.target.port)
   $$
     if(store.cast)
-$$CastStore(value=store.value, target=store.target, cast=store.cast)$;
--- $store.target$ := $store.value$;$
+$$CastStore(value=store.value, target=store.target, cast=store.cast)$;$
     else
 $$store.target$ := $store.value$;$
     endif
@@ -468,36 +386,26 @@ $$
 else
 $
 $store.target$ <= $store.value$;$
-endif
-$
+endif$
 >>
 
 PrintIndexes(indexes) ::= <<
-$
-if(indexes.type.int)
-$
--- nop $store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
+$if(indexes.type.int)
+$-- nop $store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
 else
 $$store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
-endif
-$
+endif$
 >>
 
 Write(write) ::= <<
 
-$
-if(write.target.type.bool)
+$if(write.target.type.bool)
 $$write.port$_data <= $write.target$;$
 elseif(write.target.type.int)
-$
-$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
+$$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
 else
-$
-$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
-endif
-$
-
-$write.port$_write <= '1';
+$$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
+endif$
 >>
 
 
@@ -542,25 +450,19 @@ end loop;
 ///////////////////////////////////////////////////////////////////////////////
 
 function(procedure, transformReturn) ::= <<
-$
-if (!procedure.external)
-  $$
-  if (procedure.returnType.void)
-$procedure $procedure$($parameters(procedure.parameters.list)$dummy : std_logic) is
-  $
+$if (!procedure.external)
+  $$if (procedure.returnType.void)
+$procedure $procedure$($parameters(procedure.parameters.list)$dummy : std_logic) is$
   else
-$function $procedure$($VarUsed(procedure)$$parameters(procedure)$dummy : std_logic) $returnFunction(procedure.returnType) $ is
-  $
-  endif
-$$
-  if(procedure.locals.list)
+$function $procedure$($VarUsed(procedure)$$parameters(procedure)$dummy : std_logic) $returnFunction(procedure.returnType) $ is$
+  endif$
+  $if(procedure.locals.list)
 $$procedure.locals.list: {$VarInFctDeclaration(it)$;$\n$}$$
-  endif
-$begin
+  endif$
+begin
   $procedure.nodes: {$(it.class.simpleName)(it)$}$
 end $procedure$;$
-endif
-$
+endif$
 
 >>
 
@@ -582,40 +484,33 @@ $
 >>
 
 VarInFctDeclaration(variable) ::= <<
-$
-if(variable.port)
+$if(variable.port)
 $  variable $variable$ : $typeFunction(variable.type)$$
 elseif(!variable.type.list)
 $  variable $variable$ : $typeFunction(variable.type)$$
 else
 $  -- error !!!!! type memory_type$
-endif
-$
+endif$
 >>
 
 
 returnFunction(type) ::= <<
-$
-if(type.bool)
+$if(type.bool)
 $return std_logic$
 elseif(type.int)
 $return integer$
-endif
-$
+endif$
 >>
 
 typeFunction(type) ::= <<
-$
-if(type.bool)
+$if(type.bool)
 $std_logic$
 elseif(type.int)
 $integer$
 else
 $integer$
-endif
-$
+endif$
 >>
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -634,11 +529,9 @@ $procedure(procedure=action.scheduler, transformReturn="true")$
 >>
 
 printLocals(procedure) ::= <<
-$
-if(procedure.locals.list)
+$if(procedure.locals.list)
 $$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$$
-endif
-$
+endif$
 
 >>
 
@@ -659,174 +552,131 @@ $printLocals(action.body)$
 
 // prints the body of the given action "inline" (ie not within a function)
 printActionBodyInline(action) ::= <<
-
--- body of "$action$" action
 $procedure(procedure=action.body)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Action scheduler
+// Action
 ///////////////////////////////////////////////////////////////////////////////
 
-outputPattern(pattern) ::= <<
-$pattern.keys:{port|$port$_full = '0'}; separator=" and "$
+actionTestSceduler(action) ::= <<
+($action$_go = '1'$actor.outputs.list: writeTest()$) then
+  -- body of "$action$" action
+  $actor.inputs.list: rdyManagement(); separator="\n"$
+  --
+  $printActionBodyInline(action)$  --$actor.outputs.list: writeManagement()$
+>>
+
+rdyManagement(port) ::= <<
+$if(!action.inputPattern.(port))
+$$port.name$_rdy <= '0';$
+else
+$$port.name$_rdy <= '1';$
+endif$
+>>
+
+writeManagement(port) ::= <<
+$if(action.outputPattern.(port))
+$
+  $port.name$_send <= '1';$
+endif$
+>>
+
+writeTest(port) ::= <<
+$if(action.outputPattern.(port))
+$ and $port.name$_rdy = '1'$
+endif$
+>>
+
+othersIF(action) ::= <<
+$if(action.inputPattern.keys && action.outputPattern.keys)
+    $elsif (($action.outputPattern.keys :{port|$port.name$_rdy}; separator=" or "$) = '1') then
+  $action.inputPattern.keys :{port|$port.name$_rdy <= '1';}; separator="\n"$
+else
+  $actor.inputs.list :{port|$port.name$_rdy <= '0';}; separator="\n"$
+end if;$
+elseif(action.inputPattern.keys && !action.outputPattern.keys)
+$else
+  $action.inputPattern.keys :{port|$port.name$_rdy <= '1';}; separator="\n"$
+end if;$
+else
+$else
+  $actor.inputs.list :{port|$port.name$_rdy <= '0';}; separator="\n"$
+end if;$
+endif$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Core of an action - NO FSM
+
+executeCore(actions) ::= <<
+$actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n    "$
+    if $executeIndent(actions)$
+    $if(actor.inputs.list && actor.outputs.list)
+    $    elsif (($actor.outputs.list :{port|$port.name$_rdy}; separator=" or "$) = '1') then
+      $actor.inputs.list :{port|$port.name$_rdy <= '1';}; separator="\n"$$
+    endif$
+    
+    else
+      $actor.inputs.list :{port|$port.name$_rdy <= '0';}; separator="\n"$
+    end if;
+>>
+
+executeIndent(actions) ::= <<
+    $actions: actionTestSceduler(); separator="\nelsif "$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Scheduler without FSM
-
-schedulingTest(actions) ::= <<
-if $actions: actionTest(); separator="\nelsif "$
->>
-
-actionTest(action) ::= <<
-($action$_go = '1') then
-  $printActionBodyInline(action)$
-
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Scheduler with FSM (execute)
+// Core of an action - WITH FSM
 
 DefineFSM(actions, fsm) ::= <<
-$
-if(fsm)
-$type FSM_type is ($fsm.states: {s_$it$}; separator=", "$);
+$if(fsm)
+$---------------------------------------------------------------------------
+-- FSM
+---------------------------------------------------------------------------
+type FSM_type is ($fsm.states: {s_$it$}; separator=", "$);
 signal FSM : FSM_type;$
-endif
-$
+endif$
 
 >>
 
-InitFSM(fsm) ::= <<
-FSM <= s_$fsm.initialState$;
-
->>
-
-schedulerFSM(actions, fsm) ::= <<
-
-$
-if(actions)
-$
-$schedulingTest(actions)$
+executeCoreFSM(actions, fsm) ::= <<
+$if(actions)
+$$executeCore(actions)$
 else
   case FSM is
   $switch(fsm.transitions)$
-end case;
+      end case;
 end if;$
 else
-$
-
-case FSM is
-  $switch(fsm.transitions)$
-end case;$
-endif
-$
+$$actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n    "$
+    case FSM is
+  $fsm.transitions: switchTransition(); separator="\n\n"$
+    end case;$
+endif$
 >>
 
-
-switch(transitions) ::= <<
-$transitions: switchTransition()$
->>
 
 switchTransition(transition) ::= <<
-
-
-when s_$transition.sourceState$ =>
-  $stateScheduler(transition)$
+    when s_$transition.sourceState$ =>
+      $executeCoreState(nextStates=transition.nextStateInfo)$
 >>
 
-stateScheduler(transition) ::= <<
-  -- $transition.sourceState$_state_scheduler
-  $schedulingTestState(nextStates=transition.nextStateInfo)$
->>
+executeCoreState(nextStates) ::= <<
 
-schedulingTestState(nextStates) ::= <<
-
-if $nextStates: actionTestState(); separator="--\nelsif"$end if;
+if $nextStates: actionTestState(); separator="--\nelsif"$
+$if(last(nextStates))
+$$othersIF()$$
+endif$
 >>
 
 actionTestState(nextState) ::= <<
-($nextState.action$_go = '1') then
-  $actionCallState(nextState)$
->>
-
-// prints the action referenced by the "nextState" parameter
-// and updates the FSM state
-actionCallState(nextState) ::= <<
-$printActionBodyInline(nextState.action)$FSM <= s_$nextState.targetState$;
-
+$actionTestSceduler(nextState.action)$
+  FSM <= s_$nextState.targetState$;
 >>
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Scheduler with FSM (schedule)
-
-
-schedulerAckFSM(actions, fsm) ::= <<
-
-$
-if(actions)
-$
-$schedulingTest(actions)$
-else
-  case FSM is
-  $switchAck(fsm.transitions)$
-end case;
-end if;$
-else
-$
-
-case FSM is
-  $switchAck(fsm.transitions)$
-  
-  when others =>
-    null;
-end case;$
-endif
-$
->>
-
-
-switchAck(transitions) ::= <<
-$transitions: switchTransitionAck()$
->>
-
-switchTransitionAck(transition) ::= <<
-
-
-when s_$transition.sourceState$ =>
-$stateSchedulerAck(transition)$
->>
-
-
-stateSchedulerAck(transition) ::= <<
-  $schedulingTestStateAck(nextStates=transition.nextStateInfo)$
->>
-
-schedulingTestStateAck(nextStates) ::= <<
-
-if $nextStates: actionTestStateAck(); separator="--\nelsif"$end if;
->>
-
-actionTestStateAck(nextState) ::= <<
-(isSchedulable_$nextState.action$_go = '1'$
-if(nextState.action.outputPattern)
-$ and $outputPattern(nextState.action.outputPattern)$) then
-  $nextState.action.inputPattern.keys : ValidAck(); separator="\n"$
-  $nextState.action$_go <= '1';
-    -- Action : $nextState.action$
-$
-else
-$) then
-  $nextState.action.inputPattern.keys : ValidAck(); separator="\n"$
-  $nextState.action$_go <= '1';
-  -- Action : $nextState.action$
-$
-endif
-$
-
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
@@ -849,8 +699,8 @@ use work.orcc_package.all;
 entity $actor.name$ is
   port (
   -- Inputs
-  clock   : in std_logic;
-  reset_n : in std_logic;
+  clock    : in  std_logic;
+  reset_n  : in  std_logic;
   $actor.inputs.list: fifo_in()$  -- Outputs
   $actor.outputs.list: fifo_out(); separator=";\n"$);  
 end $actor.name$;
@@ -863,32 +713,23 @@ architecture rtl_$actor.name$ of $actor.name$ is
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
   $actorParameters(actor.parameters)$
-  $actor.actions: {action| signal $action$_go : std_logic;}; separator="\n"$  
+  $actor.actions: {action| signal $action$_go : std_logic;}; separator="\n"$
+  --
   $actor.stateVars.list: signalDeclaration()$
 
-  ---------------------------------------------------------------------------
+$if (actor.procs.list)
+$  ---------------------------------------------------------------------------
   -- Functions and procedures
   ---------------------------------------------------------------------------
-  $actor.procs.list: {$function(procedure=it)$}; separator="\n"$
+  $actor.procs.list: {$function(procedure=it)$}; separator="\n"$$
+endif$
 
-  ---------------------------------------------------------------------------
-  -- FSM
-  ---------------------------------------------------------------------------
   $DefineFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 
 begin
-
-$
-if(actor.actionScheduler.fsm)
-$
-  $Actor_Schedul_FSM(actor)$
-  $Actor_Exec_FSM(actor)$$
-else
-$
-  $Actor_Schedul(actor)$
-  $Actor_Exec(actor)$$
-endif
-$
+  $Actor_Scheduler(actor)$
+  
+  $Actor_Exec(actor)$
 
 end architecture rtl_$actor.name$;
 
