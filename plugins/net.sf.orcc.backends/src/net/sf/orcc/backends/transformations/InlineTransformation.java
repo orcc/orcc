@@ -82,8 +82,8 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 		@Override
 		public Object interpret(Assign assign, Object... args) {
-			LocalVariable target = variableToLocalVariableMap.get(assign
-					.getTarget());
+			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+					.get(assign.getTarget());
 			Expression value = (Expression) assign.getValue()
 					.accept(this, args);
 			Assign a = new Assign(assign.getLocation(), target, value);
@@ -119,8 +119,8 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 		@Override
 		public Object interpret(Call call, Object... args) {
-			LocalVariable target = variableToLocalVariableMap.get(call
-					.getTarget());
+			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+					.get(call.getTarget());
 			List<Expression> parameters = new ArrayList<Expression>();
 			for (Expression parameter : call.getParameters()) {
 				parameters.add((Expression) parameter.accept(this, args));
@@ -181,8 +181,8 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 		@Override
 		public Object interpret(Load load, Object... args) {
-			LocalVariable target = variableToLocalVariableMap.get(load
-					.getTarget());
+			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+					.get(load.getTarget());
 			List<Expression> indexes = new ArrayList<Expression>();
 			for (Expression index : load.getIndexes()) {
 				indexes.add((Expression) index.accept(this, args));
@@ -209,8 +209,8 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 		@Override
 		public Object interpret(PhiAssignment phi, Object... args) {
-			LocalVariable target = variableToLocalVariableMap.get(phi
-					.getTarget());
+			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+					.get(phi.getTarget());
 			List<Expression> values = new ArrayList<Expression>();
 			for (Expression value : phi.getValues()) {
 				values.add((Expression) value.accept(this, args));
@@ -326,7 +326,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 	private LocalVariable returnVariableOfCurrentFunction;
 
-	private Map<Variable, LocalVariable> variableToLocalVariableMap;
+	private Map<Variable, Variable> variableToLocalVariableMap;
 
 	public InlineTransformation(boolean inlineProcedure, boolean inlineFunction) {
 		this.inlineProcedure = inlineProcedure;
@@ -343,7 +343,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 		// Create a new local variable to all function/procedure's variable
 		// except for list (reference is using)
-		variableToLocalVariableMap = new HashMap<Variable, LocalVariable>();
+		variableToLocalVariableMap = new HashMap<Variable, Variable>();
 		for (Variable var : function.getLocals().getList()) {
 			LocalVariable oldVar = (LocalVariable) var;
 			LocalVariable newVar = procedure.newTempLocalVariable("",
@@ -355,19 +355,20 @@ public class InlineTransformation extends AbstractActorTransformation {
 		}
 		for (Variable var : function.getParameters().getList()) {
 			LocalVariable oldVar = (LocalVariable) var;
-			LocalVariable newVar;
 			if (var.getType().isList()) {
-				newVar = (LocalVariable) ((VarExpr) call.getParameters().get(
+				// In case of list, the parameter could be a global variable
+				Variable newVar =  ((VarExpr) call.getParameters().get(
 						function.getParameters().getList().indexOf(var)))
 						.getVar().getVariable();
+				variableToLocalVariableMap.put(oldVar, newVar);
 			} else {
-				newVar = procedure.newTempLocalVariable("", oldVar.getType(),
+				LocalVariable newVar = procedure.newTempLocalVariable("", oldVar.getType(),
 						oldVar.getName());
 				newVar.setIndex(oldVar.getIndex());
 				newVar.setLocation(oldVar.getLocation());
 				newVar.setAssignable(oldVar.isAssignable());
+				variableToLocalVariableMap.put(oldVar, newVar);
 			}
-			variableToLocalVariableMap.put(oldVar, newVar);
 		}
 
 		List<CFGNode> nodes = new ArrayList<CFGNode>();
@@ -379,7 +380,9 @@ public class InlineTransformation extends AbstractActorTransformation {
 			if (!parameter.getType().isList()) {
 				Expression expr = call.getParameters().get(i);
 				Assign assign = new Assign(
-						variableToLocalVariableMap.get(parameter), expr);
+						(LocalVariable) variableToLocalVariableMap
+								.get(parameter),
+						expr);
 				newBlockNode.add(assign);
 				Use.addUses(assign, expr);
 			}
