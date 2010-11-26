@@ -205,7 +205,7 @@ Write(op) ::= <<
 
 Load(op) ::= <<
 <!-- Load $op$ -->
-$if(!removeList && op.source.variable.type.list)
+$if(op.source.variable.type.list)
 $<operation kind="var_ref" name="$op.source$">
 	$op.indexes: {$port(dir="in", source=it.var)$}; separator="\n"$
 	$port(dir="out", type=op.target.type, source=op.target)$
@@ -392,7 +392,7 @@ WhileNode(whileNode) ::= <<
 // Procedure
 ///////////////////////////////////////////////////////////////////////////////
 
-procedure(procedure, removeList) ::= <<
+procedure(procedure) ::= <<
 $if(!procedure.external)$
 $procedure.nodes: {$(it.class.simpleName)(it)$}$
 $endif$
@@ -625,7 +625,7 @@ Transition(transition) ::= <<
 >>
 
 isSchedulableTest(action) ::= <<
-$procedure(procedure=action.scheduler, removeList="true")$
+$procedure(action.scheduler)$
 >>
 
 Transitions(actions, transitions) ::= <<
