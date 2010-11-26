@@ -28,8 +28,6 @@ actor Algo_DecodeMbPred()
 
 	uint(size=4)  RefIdxL0,
 	uint(size=4)  RefIdxL1,
-	uint(size=5)  MbPartHeight,
-	uint(size=5)  MbPartWidth,
 	uint(size=3)  MbPartIdx,
 	bool          EndRefIdxL0,
 
@@ -45,20 +43,6 @@ actor Algo_DecodeMbPred()
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_SP = 3;
-
-
-	List ( type: List ( type: uint(size=5), size=5), size=6 ) P_tab = //[mb_type][NumMbPart / MbPartWidth / MbPartHeight /MbPartPredMode,0 / MbPartPredMode,1]
-		[ [1,16,16,0,7], [2,16,8,0,0], [2,8,16,0,0], [4,8,8,7,7], [4,8,8,7,7], [1,16,16,0,7] ];
-
-	List ( type: List ( type: uint(size=5), size=5), size=24 ) B_tab = //[mb_type][NumMbPart / MbPartWidth / MbPartHeight /MbPartPredMode,0 / MbPartPredMode,1]
-		[ 
-			[0,8,8,3,0], [1,16,16,0,7], [1,16,16,1,7], [1,16,16,2,7], 
-			[2,16,8,0,0], [2,8,16,0,0], [2,16,8,1,1], [2,8,16,1,1],
-			[2,16,8,0,1], [2,8,16,0,1], [2,16,8,1,0], [2,8,16,1,0],
-			[2,16,8,0,2], [2,8,16,0,2], [2,16,8,1,2], [2,8,16,1,2],
-			[2,16,8,2,0], [2,8,16,2,0], [2,16,8,2,1], [2,8,16,2,1], 
-			[2,16,8,2,2], [2,8,16,2,2], [4,8,8,7,7],[0,8,8,3,7] 
-		];
 
 	List (type:uint(size=3),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
 
@@ -77,23 +61,6 @@ actor Algo_DecodeMbPred()
 	uint(size=5)  num_ref_idx_l1_active;
 	bool          mb_field_decoding_flag;
 
-
-	function MbPartWidthHeight(uint(size=1) x) --> uint(size=5)
-		: 
-			if (slice_type = SLICE_TYPE_P or slice_type = SLICE_TYPE_SP) then 
-				if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
-					P_tab[mb_type-BLOCK_TYPE_P_MIN][1+x]
-				else
-					P_tab[5][1+x]
-				end
-			else
-				if mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX then
-					B_tab[mb_type - BLOCK_TYPE_B_MIN][1+x]
-				else
-					B_tab[23][1+x]
-				end
-			end
-		end
 
 	function Is_Intra_8x8(uint MbType)
 				-->
@@ -400,8 +367,6 @@ actor Algo_DecodeMbPred()
 			ValVLD   :[val_ref_idx]
 				==>
 			RefIdxL0     :[val_ref_idx],
-			MbPartHeight :[MbPartWidthHeight(1)],
-			MbPartWidth  :[MbPartWidthHeight(0)],
 			MbPartIdx    :[mbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard
@@ -417,8 +382,6 @@ actor Algo_DecodeMbPred()
 	ReadRefIdxL0.DoneSkip: action
 			ValVLD   :[val_ref_idx]
 				==>
-			MbPartHeight :[MbPartWidthHeight(1)],
-			MbPartWidth  :[MbPartWidthHeight(0)],
 			MbPartIdx    :[mbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="MbPartIdx" x="203" y="88"/>
-      <vertex id="MbPartWidth" x="202" y="120"/>
-      <vertex id="MbPartHeigth" x="200" y="52"/>
       <vertex id="RD_C" x="104" y="243"/>
       <vertex id="MV" x="108" y="177"/>
       <vertex id="PartSZ" x="96" y="211"/>
       <vertex id="Coef_ACR" x="616" y="80"/>
       <vertex id="MB4x4Pred_C" x="820" y="58"/>
       <vertex id="Algo_Interp_EighthPelBilinear" x="182" y="169"/>
-      <vertex id="Algo_Interp_split_MB_C" x="435" y="36"/>
       <vertex id="Algo_Add" x="714" y="36"/>
+      <vertex id="Algo_Interp_Reord" x="439" y="36"/>
+      <vertex id="SelectList" x="226" y="104"/>
+      <vertex id="MbType" x="228" y="66"/>
+      <vertex id="SubMbType" x="219" y="135"/>
    </vertices>
 </layout>

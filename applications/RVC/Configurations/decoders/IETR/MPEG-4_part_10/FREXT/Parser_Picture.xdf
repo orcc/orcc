@@ -384,20 +384,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="MbPartWidth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="MbPartHeigth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="DirectSpatialMvPred">
         <Type name="bool"/>
     </Port>
@@ -592,15 +578,7 @@
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredEndRefIdxL0" src="DecodeMbPred" src-port="EndRefIdxL0"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="SubMbPredMbPartHeight" src="DecodeSubMbPred" src-port="MbPartHeight"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="SubMbPredMbPartWidth" src="DecodeSubMbPred" src-port="MbPartWidth"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="SubMbPredMbPartIdx" src="DecodeSubMbPred" src-port="MbPartIdx"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="MbPredMbPartHeight" src="DecodeMbPred" src-port="MbPartHeight"/>
-    <Connection dst="MergeDataFromSDataAndMbLayer"
-        dst-port="MbPredMbPartWidth" src="DecodeMbPred" src-port="MbPartWidth"/>
     <Connection dst="MergeDataFromSDataAndMbLayer"
         dst-port="MbPredMbPartIdx" src="DecodeMbPred" src-port="MbPartIdx"/>
     <Connection dst="GenerateSkipBlockInformation" dst-port="Res_Last"
@@ -731,10 +709,6 @@
     <Connection dst="" dst-port="SubMbPredResMvL0" src="DecodeSubMbPred" src-port="MvResl0"/>
     <Connection dst="" dst-port="MbPredResMvL1" src="DecodeMbPred" src-port="MvResl1"/>
     <Connection dst="" dst-port="SubMbPredResMvL1" src="DecodeSubMbPred" src-port="MvResl1"/>
-    <Connection dst="" dst-port="MbPartWidth"
-        src="MergeDataFromSDataAndMbLayer" src-port="MbPartWidth"/>
-    <Connection dst="" dst-port="MbPartHeigth"
-        src="MergeDataFromSDataAndMbLayer" src-port="MbPartHeight"/>
     <Connection dst="" dst-port="MacroBlockType"
         src="MergeDataFromSDataAndMbLayer" src-port="MacroBlockType"/>
     <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="IsB_Skip"

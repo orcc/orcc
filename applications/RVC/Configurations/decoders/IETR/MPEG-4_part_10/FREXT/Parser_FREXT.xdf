@@ -90,27 +90,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="MbPartIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="MbPartWidth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="MbPartHeigth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="CodedBlockPattern">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -572,11 +551,8 @@
     <Connection dst="CheckNaluType" dst-port="SpsSkipNal"
         src="DecodeSps" src-port="DecodeNextNal"/>
     <Connection dst="" dst-port="CodedBlockPattern" src="DecodePic" src-port="CodedBlockPattern"/>
-    <Connection dst="" dst-port="MbPartIdx" src="DecodePic" src-port="MbPartIdx"/>
     <Connection dst="" dst-port="ScalingList" src="DecodePic" src-port="ScalingList"/>
-    <Connection dst="" dst-port="MbPartHeigth" src="DecodePic" src-port="MbPartHeigth"/>
     <Connection dst="" dst-port="QP" src="DecodePic" src-port="QP"/>
-    <Connection dst="" dst-port="MbPartWidth" src="DecodePic" src-port="MbPartWidth"/>
     <Connection dst="" dst-port="QP_Cr" src="DecodePic" src-port="QP_Cr"/>
     <Connection dst="" dst-port="QP_Cb" src="DecodePic" src-port="QP_Cb"/>
     <Connection dst="" dst-port="IntraPredModeC" src="DecodePic" src-port="IntraPredModeC"/>

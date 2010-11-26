@@ -33,6 +33,6 @@
       <vertex id="RES_L" x="166" y="620"/>
       <vertex id="SubMbType" x="286" y="917"/>
       <vertex id="MbType4Pred" x="285" y="1001"/>
-      <vertex id="SelectList" x="220" y="965"/>
+      <vertex id="SelectList" x="275" y="958"/>
    </vertices>
 </layout>

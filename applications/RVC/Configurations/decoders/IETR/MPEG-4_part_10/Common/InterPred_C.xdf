@@ -3,27 +3,6 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="MbPartIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbPartWidth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbPartHeigth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="RD_C">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -49,6 +28,27 @@
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="16"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MbType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SubMbType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
             </Entry>
         </Type>
     </Port>
@@ -86,15 +86,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_Interp_split_MB_C">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Interp_split_MB_C"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="Algo_Add">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -107,21 +98,31 @@
             <Expr kind="Literal" literal-kind="Boolean" value="false"/>
         </Parameter>
     </Instance>
+    <Instance id="Algo_Interp_Reord">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Interp_Reord"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="SzSidePerPart">
+            <Expr kind="Literal" literal-kind="Integer" value="2"/>
+        </Parameter>
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="RD" src="" src-port="RD_C"/>
-    <Connection dst="Algo_Interp_split_MB_C" dst-port="INTERP"
-        src="Algo_Interp_EighthPelBilinear" src-port="INTERP"/>
-    <Connection dst="Algo_Interp_split_MB_C" dst-port="MbPartWidth"
-        src="" src-port="MbPartWidth"/>
-    <Connection dst="Algo_Interp_split_MB_C" dst-port="MbPartHeigth"
-        src="" src-port="MbPartHeigth"/>
-    <Connection dst="Algo_Interp_split_MB_C" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
     <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="PartSZ"
         src="" src-port="PartSZ"/>
     <Connection dst="" dst-port="MB4x4Pred_C" src="Algo_Add" src-port="Z"/>
-    <Connection dst="Algo_Add" dst-port="X" src="Algo_Interp_split_MB_C" src-port="MBPred"/>
     <Connection dst="Algo_Add" dst-port="Y" src="" src-port="Coef_ACR"/>
     <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="Mv" src="" src-port="MV"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="SubMbType" src="" src-port="SubMbType"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="SelectList" src="" src-port="SelectList"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="MbType" src="" src-port="MbType"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="Interp"
+        src="Algo_Interp_EighthPelBilinear" src-port="INTERP"/>
+    <Connection dst="Algo_Add" dst-port="X" src="Algo_Interp_Reord" src-port="MbPred"/>
 </XDF>

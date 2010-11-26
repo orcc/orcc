@@ -13,9 +13,6 @@
       <vertex id="slice_alpha_c0_offset" x="1731" y="1436"/>
       <vertex id="slice_beta_offset" x="1741" y="1468"/>
       <vertex id="LFDisable" x="1728" y="773"/>
-      <vertex id="MbPartIdx" x="1727" y="935"/>
-      <vertex id="MbPartWidth" x="1716" y="967"/>
-      <vertex id="MbPartHeigth" x="1718" y="899"/>
       <vertex id="CodedBlockPattern" x="1689" y="493"/>
       <vertex id="ConstrainedIFlag" x="1694" y="526"/>
       <vertex id="PicWidthInMb" x="1738" y="1134"/>

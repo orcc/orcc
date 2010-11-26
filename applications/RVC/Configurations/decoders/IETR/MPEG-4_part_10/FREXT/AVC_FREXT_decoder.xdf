@@ -202,12 +202,6 @@
     <Connection dst="Decode_V" dst-port="CoefAC" src="FUN_Parser" src-port="CoefAC_Cr"/>
     <Connection dst="Decode_U" dst-port="MV" src="FUN_Parser" src-port="MV"/>
     <Connection dst="Decode_V" dst-port="MV" src="FUN_Parser" src-port="MV"/>
-    <Connection dst="Decode_U" dst-port="MbPartHeight" src="FUN_Parser" src-port="MbPartHeigth"/>
-    <Connection dst="Decode_V" dst-port="MbPartHeight" src="FUN_Parser" src-port="MbPartHeigth"/>
-    <Connection dst="Decode_U" dst-port="MbPartIdx" src="FUN_Parser" src-port="MbPartIdx"/>
-    <Connection dst="Decode_V" dst-port="MbPartIdx" src="FUN_Parser" src-port="MbPartIdx"/>
-    <Connection dst="Decode_U" dst-port="MbPartWidth" src="FUN_Parser" src-port="MbPartWidth"/>
-    <Connection dst="Decode_V" dst-port="MbPartWidth" src="FUN_Parser" src-port="MbPartWidth"/>
     <Connection dst="Decode_U" dst-port="POC" src="FUN_Parser" src-port="POC"/>
     <Connection dst="Decode_V" dst-port="POC" src="FUN_Parser" src-port="POC"/>
     <Connection dst="Decode_U" dst-port="PartSZ" src="FUN_Parser" src-port="PART_SZ"/>
@@ -281,4 +275,10 @@
     <Connection dst="Decoding_Y" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
     <Connection dst="Decoding_Y" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
     <Connection dst="Decoding_Y" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
+    <Connection dst="Decode_U" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decode_V" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decode_U" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
+    <Connection dst="Decode_V" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
+    <Connection dst="Decode_U" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
+    <Connection dst="Decode_V" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
 </XDF>

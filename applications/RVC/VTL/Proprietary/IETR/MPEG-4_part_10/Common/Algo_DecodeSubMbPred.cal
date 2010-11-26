@@ -30,8 +30,6 @@ actor Algo_DecodeSubMbPred()
 	uint(size=4) RefIdxL1,
 	int(size=16) MvResl0,
 	int(size=16) MvResl1,
-	uint(size=5) MbPartHeight,
-	uint(size=5) MbPartWidth,
 	uint(size=3) MbPartIdx,
 	bool         EndRefIdxL0
 		:
@@ -44,12 +42,6 @@ actor Algo_DecodeSubMbPred()
 	List(type: uint(size=2), size=16) SubMbPredMode_B
 		=	[  DIRECT , PRED_L0 , PRED_L1 , BIPRED , PRED_L0 , PRED_L0 , PRED_L1 , PRED_L1 , BIPRED , BIPRED 
 			, PRED_L0 , PRED_L1 , BIPRED  ,   NA   ,   NA    ,   NA    ];
-
-	List ( type: List ( type: uint(size=5), size=4), size=4 ) P_tab_sub = //[sub_mb_type[mbPartIdx]][NumSubMbPart / MbPartWidth / MbPartHeight / SubMbPredMode]
-		[ [1,8,8,0], [2,8,4,0], [2,4,8,0], [4,4,4,0] ];
-
-	List ( type: List ( type: uint(size=5), size=4), size=13 ) B_tab_sub = //[sub_mb_type[mbPartIdx]][NumSubMbPart / MbPartWidth / MbPartHeight / SubMbPredMode]
-		[ [4,4,4,3], [1,8,8,0], [1,8,8,1], [1,8,8,2], [2,8,4,0], [2,4,8,0], [2,8,4,1], [2,4,8,1], [2,8,4,2], [2,4,8,2], [4,4,4,0], [4,4,4,1], [4,4,4,2] ];
 
 
 	uint(size=5)  num_ref_idx_l0_active;
@@ -78,17 +70,6 @@ actor Algo_DecodeSubMbPred()
 				else
 					DIRECT
 				end
-			end
-		end
-
-	function SubMbPartWidthHeight(uint(size=1) x)
-				-->
-			uint(size=5)
-		:
-			if(mb_type >= BLOCK_TYPE_P_MIN and mb_type <= BLOCK_TYPE_P_MAX)then
-				P_tab_sub[sub_mb_type[mbPartIdx - 1]][1+x]
-			else
-				B_tab_sub[sub_mb_type[mbPartIdx - 1]][1+x]
 			end
 		end
 
@@ -283,8 +264,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 				==>
 			RefIdxL0     :[ref_idx_l0[mbPartIdx-1]],
 			MvResl0      :[ValueOfVLD] repeat 2,
-			MbPartHeight :[SubMbPartWidthHeight(1)],
-			MbPartWidth  :[SubMbPartWidthHeight(0)],
 			MbPartIdx    :[subMbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard
@@ -301,8 +280,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 //Delete me!! Be carefull with B_DIRECT_8x8
 	ReadMvdl0Done.Skip: action
 				==>
-			MbPartHeight :[SubMbPartWidthHeight(1)],
-			MbPartWidth  :[SubMbPartWidthHeight(0)],
 			MbPartIdx    :[subMbPartIdx - 1],
 			EndRefIdxL0  :[false]
 		guard

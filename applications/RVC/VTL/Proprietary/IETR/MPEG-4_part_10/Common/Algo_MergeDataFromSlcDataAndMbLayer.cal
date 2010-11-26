@@ -36,21 +36,15 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 
 	int (size=8)  MbLayerQp_Y_Cb_Cr,
 
-	uint(size=5)  SubMbPredMbPartHeight,
-	uint(size=5)  SubMbPredMbPartWidth,
 	uint(size=3)  SubMbPredMbPartIdx,
 	bool          SubMbPredEndRefIdxL0,
 
-	uint(size=5)  MbPredMbPartHeight,
-	uint(size=5)  MbPredMbPartWidth,
 	uint(size=3)  MbPredMbPartIdx,
 	bool          MbPredEndRefIdxL0
 
 		==>
 	uint(size=1)  MbIntraFlag,
 	uint(size=4)  IntraPredMode,
-	uint(size=5)  MbPartHeight,
-	uint(size=5)  MbPartWidth,
 	uint(size=3)  MbPartIdx,
 	int (size=8)  ScalingList,
 	int (size=8)  Qp,
@@ -70,8 +64,6 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			SDataQp_Y_Cb_Cr :[ ValQp , ValQpCb , ValQpCr ]
 				==>
 			MbIntraFlag     :[0],
-			MbPartHeight    :[16],
-			MbPartWidth     :[16],
 			MbPartIdx       :[1],
 			ScalingList     :[[16 : for int i in 0 .. 15]] repeat 16,
 			Qp              :[ValQp],
@@ -207,13 +199,9 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		end
 
 	ReadMbPredParam1.MbIntra: action
-			MbPredMbPartHeight :[mb_part_height],
-			MbPredMbPartWidth  :[mb_part_width],
 			MbPredMbPartIdx    :[mb_part_idx],
 			MbPredEndRefIdxL0  :[Finished]
 				==>
-			MbPartHeight :[mb_part_height],
-			MbPartWidth  :[mb_part_width],
 			MbPartIdx    :[mb_part_idx]
 		guard
 			Finished = false,
@@ -222,13 +210,9 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		end
 
 	ReadMbPredParam1.MbInter: action
-			MbPredMbPartHeight :[mb_part_height],
-			MbPredMbPartWidth  :[mb_part_width],
 			MbPredMbPartIdx    :[mb_part_idx],
 			MbPredEndRefIdxL0  :[Finished]
 				==>
-			MbPartHeight :[mb_part_height],
-			MbPartWidth  :[mb_part_width],
 			MbPartIdx    :[mb_part_idx]
 		guard
 			Finished = false
@@ -242,15 +226,9 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		end
 
 	ReadSubMbPredParam: action
-//			SubMbPredMvResl0      :[mv_res] repeat 2,
-			SubMbPredMbPartHeight :[mb_part_height],
-			SubMbPredMbPartWidth  :[mb_part_width],
 			SubMbPredMbPartIdx    :[mb_part_idx],
 			SubMbPredEndRefIdxL0  :[Finished]
 				==>
-//			MvResl0      :[mv_res] repeat 2,
-			MbPartHeight :[mb_part_height],
-			MbPartWidth  :[mb_part_width],
 			MbPartIdx    :[mb_part_idx]
 		guard
 			Finished = false

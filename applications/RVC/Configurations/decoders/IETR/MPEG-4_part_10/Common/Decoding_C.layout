@@ -12,9 +12,6 @@
       <vertex id="POC" x="205" y="584"/>
       <vertex id="PicSizeInMb" x="205" y="702"/>
       <vertex id="MV" x="205" y="896"/>
-      <vertex id="MbPartHeight" x="205" y="993"/>
-      <vertex id="MbPartIdx" x="205" y="1090"/>
-      <vertex id="MbPartWidth" x="205" y="1187"/>
       <vertex id="PartSZ" x="205" y="1284"/>
       <vertex id="slice_alpha_c0_offset" x="205" y="1575"/>
       <vertex id="LFDisable" x="205" y="1672"/>
@@ -33,5 +30,8 @@
       <vertex id="Display" x="916" y="986"/>
       <vertex id="PRED_C" x="660" y="958"/>
       <vertex id="RES_C" x="205" y="2060"/>
+      <vertex id="SelectList" x="361" y="995"/>
+      <vertex id="MbType4Pred" x="399" y="1038"/>
+      <vertex id="SubMbType" x="385" y="954"/>
    </vertices>
 </layout>
