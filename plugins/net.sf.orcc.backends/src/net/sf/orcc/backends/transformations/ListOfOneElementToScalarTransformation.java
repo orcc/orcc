@@ -32,6 +32,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.instructions.Write;
@@ -81,5 +82,17 @@ public class ListOfOneElementToScalarTransformation extends
 			}
 		}
 
+	}
+	
+	@Override
+	public void visit(Peek peek) {
+		if (peek.getNumTokens() == 1 && instructionIterator.hasNext()) {
+			Instruction instruction = instructionIterator.next();
+			if (instruction.isLoad()) {
+				Load load = (Load) instruction;
+				peek.setTarget(load.getTarget());
+				instructionIterator.remove();
+			}
+		}
 	}
 }
