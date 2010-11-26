@@ -1,62 +1,57 @@
 fifo_in(port) ::= <<
-$
-if(port.type.bool)
+$if(port.type.bool)
 $signal $port.name$_data  : std_logic;$\n$$
 else
 $signal $port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
-endif
-$
+endif$
 signal $port.name$_send : std_logic;
-signal $port.name$_ack  : std_logic;
+signal $port.name$_rdy  : std_logic;
 >>
 
 fifo_out(port) ::= <<
-signal $port.name$_full  : std_logic;
-$
-if(last(port.name))
-$$
-if(port.type.bool)
+signal $port.name$_rdy  : std_logic;
+$if(last(port.name))
+$$if(port.type.bool)
 $signal $port.name$_data  : std_logic;$\n$$
 else
 $signal $port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
-endif
-$signal $port.name$_write : std_logic;$
+endif$
+signal $port.name$_write : std_logic;$
 else
 $signal $port.name$_data  : $port.type$;
 signal $port.name$_write : std_logic;$
-endif
-$
+endif$
 >>
 
 
 fifo_in_init(port) ::=<<
-$port.name$_send <= '0';$"\n"$
+$port.name$_rdy <= '1';$"\n"$
 >>
 fifo_out_init(port) ::=<<
-$port.name$_full <= '0';$"\n"$
+$port.name$_rdy <= '1';$"\n"$
 >>
 
 fifo_actor_in(port) ::= <<
 $port.name$_data  => $port.name$_data,
 $port.name$_send  => $port.name$_send,
-$port.name$_ack   => $port.name$_ack
+$port.name$_rdy   => $port.name$_rdy
 >>
 
 fifo_actor_out(port) ::= <<
 $port.name$_data  => $port.name$_data,
-$port.name$_full  => $port.name$_full,
+$port.name$_rdy   => $port.name$_rdy,
 $port.name$_write => $port.name$_write
 >>
 
 fifo_network_in(port) ::= <<
 $port.name$_data  => $port.name$_data,
 $port.name$_send  => $port.name$_send,
-$port.name$_ack   => $port.name$_ack
+$port.name$_rdy   => $port.name$_rdy
 >>
 
 fifo_network_out(port) ::= <<
 $port.name$_data  => $port.name$_data,
-$port.name$_full  => $port.name$_full,
+$port.name$_rdy   => $port.name$_rdy,
 $port.name$_write => $port.name$_write
 >>
 
@@ -154,7 +149,7 @@ case tb_FSM_$port.name$ is
     end if;
 
   when read_file =>
-    if (not endfile (sim_file_$instance.id$_$port.name$)) then
+    if (not endfile (sim_file_$instance.id$_$port.name$)) and $port.name$_rdy = '1' then
       readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
@@ -181,7 +176,7 @@ $        $port.name$_send <= '1';
     end if;
 
   when CheckRead =>
-    if (not endfile (sim_file_$instance.id$_$port.name$)) and $port.name$_ack = '1' then
+    if (not endfile (sim_file_$instance.id$_$port.name$)) and $port.name$_rdy = '1' then
       readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
@@ -260,7 +255,7 @@ $$
   $$
 endif
 $        --
-        $port.name$_full <= '0';    
+        $port.name$_rdy <= '1';    
       end if;
     end if;
 
