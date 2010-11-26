@@ -40,7 +40,7 @@ import net.sf.orcc.ir.Type;
  * @author Jerome Gorin
  * 
  */
-public class IntExpr extends AbstractExpression {
+public class IntExpr extends ExpressionImpl {
 
 	/**
 	 * Returns the number of bits in the two's-complement representation of the

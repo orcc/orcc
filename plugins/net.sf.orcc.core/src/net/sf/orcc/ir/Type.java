@@ -71,6 +71,14 @@ public interface Type extends EObject {
 	public List<Integer> getDimensions();
 
 	/**
+	 * Returns a list of dimensions of this type. Returns an empty list if the
+	 * type is not a list.
+	 * 
+	 * @return the list of dimensions of this type if it is a list
+	 */
+	public List<Expression> getDimensionsExpr();
+
+	/**
 	 * Returns true if this type is <tt>bool</tt>.
 	 * 
 	 * @return true if this type is <tt>bool</tt>

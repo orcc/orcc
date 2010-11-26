@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009, IETR/INSA of Rennes
+ * Copyright (c) 2009-2010, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -29,14 +29,28 @@
 package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrPackage;
+
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.impl.EObjectImpl;
 
 /**
- * This interface defines an expression.
+ * This class is an abstract implementation of {@link Expression}.
  * 
  * @author Matthieu Wipliez
+ * @generated
  * 
  */
-public abstract class AbstractExpression implements Expression {
+public abstract class ExpressionImpl extends EObjectImpl implements Expression {
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	protected ExpressionImpl() {
+		super();
+	}
 
 	@Override
 	public abstract Object accept(ExpressionInterpreter interpreter,
@@ -44,6 +58,16 @@ public abstract class AbstractExpression implements Expression {
 
 	@Override
 	public abstract void accept(ExpressionVisitor visitor, Object... args);
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * 
+	 * @generated
+	 */
+	@Override
+	protected EClass eStaticClass() {
+		return IrPackage.Literals.TYPE;
+	}
 
 	@Override
 	public boolean isBinaryExpr() {

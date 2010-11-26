@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="TestList">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="ListParameter">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../VTL/ListParameter"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="M">
+            <Expr kind="Literal" literal-kind="Integer" value="3"/>
+        </Parameter>
+        <Parameter name="N">
+            <Expr kind="Literal" literal-kind="Integer" value="4"/>
+        </Parameter>
+        <Parameter name="filter">
+            <Expr kind="List">
+                <Expr kind="List">
+                    <Expr kind="Literal" literal-kind="Integer" value="2"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="4"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                </Expr>
+                <Expr kind="List">
+                    <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                </Expr>
+                <Expr kind="List">
+                    <Expr kind="Literal" literal-kind="Integer" value="4"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="8"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="12"/>
+                </Expr>
+                <Expr kind="List">
+                    <Expr kind="Literal" literal-kind="Integer" value="5"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="10"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="15"/>
+                </Expr>
+            </Expr>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+</XDF>
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="TestList">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="ListParameter">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../VTL/ListParameter"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="M">
+            <Expr kind="Literal" literal-kind="Integer" value="3"/>
+        </Parameter>
+        <Parameter name="N">
+            <Expr kind="Literal" literal-kind="Integer" value="4"/>
+        </Parameter>
+        <Parameter name="filter">
+            <Expr kind="List">
+                <Expr kind="List">
+                    <Expr kind="Literal" literal-kind="Integer" value="2"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="4"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                </Expr>
+                <Expr kind="List">
+                    <Expr kind="Literal" literal-kind="Integer" value="3"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="6"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                </Expr>
+                <Expr kind="List">
+                    <Expr kind="Literal" literal-kind="Integer" value="4"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="8"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="12"/>
+                </Expr>
+                <Expr kind="List">
+                    <Expr kind="Literal" literal-kind="Integer" value="5"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="10"/>
+                    <Expr kind="Literal" literal-kind="Integer" value="15"/>
+                </Expr>
+            </Expr>
+        </Parameter>
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+</XDF>

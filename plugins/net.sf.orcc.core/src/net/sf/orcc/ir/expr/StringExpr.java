@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Type;
  * @author Jerome Gorin
  * 
  */
-public class StringExpr extends AbstractExpression {
+public class StringExpr extends ExpressionImpl {
 
 	private String value;
 

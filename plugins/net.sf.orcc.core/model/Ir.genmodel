@@ -7,6 +7,7 @@
   <foreignModel>@model</foreignModel>
   <genPackages prefix="Ir" basePackage="net.sf.orcc" disposableProviderFactory="true"
       ecorePackage="Ir.ecore#/">
+    <genClasses image="false" ecoreClass="Ir.ecore#//Expression"/>
     <genClasses image="false" ecoreClass="Ir.ecore#//Type"/>
     <genClasses ecoreClass="Ir.ecore#//TypeBool"/>
     <genClasses ecoreClass="Ir.ecore#//TypeFloat"/>
@@ -14,7 +15,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//TypeInt/size"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//TypeList">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ir.ecore#//TypeList/size"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//TypeList/sizeExpr"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ir.ecore#//TypeList/type"/>
     </genClasses>
     <genClasses ecoreClass="Ir.ecore#//TypeString">

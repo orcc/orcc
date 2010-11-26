@@ -39,7 +39,7 @@ import net.sf.orcc.ir.Use;
  * @author Jerome Gorin
  * 
  */
-public class VarExpr extends AbstractExpression {
+public class VarExpr extends ExpressionImpl {
 
 	private Use use;
 

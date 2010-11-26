@@ -60,6 +60,25 @@ public interface IrPackage extends EPackage {
 	IrPackage eINSTANCE = net.sf.orcc.ir.impl.IrPackageImpl.init();
 
 	/**
+	 * The meta object id for the '{@link net.sf.orcc.ir.impl.ExpressionImpl <em>Expression</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see net.sf.orcc.ir.impl.ExpressionImpl
+	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExpression()
+	 * @generated
+	 */
+	int EXPRESSION = 0;
+
+	/**
+	 * The number of structural features of the '<em>Expression</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int EXPRESSION_FEATURE_COUNT = 0;
+
+	/**
 	 * The meta object id for the '{@link net.sf.orcc.ir.impl.TypeImpl <em>Type</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -67,7 +86,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getType()
 	 * @generated
 	 */
-	int TYPE = 0;
+	int TYPE = 1;
 
 	/**
 	 * The number of structural features of the '<em>Type</em>' class.
@@ -87,7 +106,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeBool()
 	 * @generated
 	 */
-	int TYPE_BOOL = 1;
+	int TYPE_BOOL = 2;
 
 	/**
 	 * The number of structural features of the '<em>Type Bool</em>' class.
@@ -106,7 +125,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeFloat()
 	 * @generated
 	 */
-	int TYPE_FLOAT = 2;
+	int TYPE_FLOAT = 3;
 
 	/**
 	 * The number of structural features of the '<em>Type Float</em>' class.
@@ -125,7 +144,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeInt()
 	 * @generated
 	 */
-	int TYPE_INT = 3;
+	int TYPE_INT = 4;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute.
@@ -153,16 +172,16 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeList()
 	 * @generated
 	 */
-	int TYPE_LIST = 4;
+	int TYPE_LIST = 5;
 
 	/**
-	 * The feature id for the '<em><b>Size</b></em>' attribute.
+	 * The feature id for the '<em><b>Size Expr</b></em>' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int TYPE_LIST__SIZE = TYPE_FEATURE_COUNT + 0;
+	int TYPE_LIST__SIZE_EXPR = TYPE_FEATURE_COUNT + 0;
 
 	/**
 	 * The feature id for the '<em><b>Type</b></em>' reference.
@@ -190,7 +209,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeString()
 	 * @generated
 	 */
-	int TYPE_STRING = 5;
+	int TYPE_STRING = 6;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute.
@@ -218,7 +237,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeUint()
 	 * @generated
 	 */
-	int TYPE_UINT = 6;
+	int TYPE_UINT = 7;
 
 	/**
 	 * The feature id for the '<em><b>Size</b></em>' attribute.
@@ -246,7 +265,7 @@ public interface IrPackage extends EPackage {
 	 * @see net.sf.orcc.ir.impl.IrPackageImpl#getTypeVoid()
 	 * @generated
 	 */
-	int TYPE_VOID = 7;
+	int TYPE_VOID = 8;
 
 	/**
 	 * The number of structural features of the '<em>Type Void</em>' class.
@@ -257,6 +276,16 @@ public interface IrPackage extends EPackage {
 	 */
 	int TYPE_VOID_FEATURE_COUNT = TYPE_FEATURE_COUNT + 0;
 
+
+	/**
+	 * Returns the meta object for class '{@link net.sf.orcc.ir.Expression <em>Expression</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Expression</em>'.
+	 * @see net.sf.orcc.ir.Expression
+	 * @generated
+	 */
+	EClass getExpression();
 
 	/**
 	 * Returns the meta object for class '{@link net.sf.orcc.ir.Type <em>Type</em>}'.
@@ -320,15 +349,15 @@ public interface IrPackage extends EPackage {
 	EClass getTypeList();
 
 	/**
-	 * Returns the meta object for the attribute '{@link net.sf.orcc.ir.TypeList#getSize <em>Size</em>}'.
+	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.TypeList#getSizeExpr <em>Size Expr</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Size</em>'.
-	 * @see net.sf.orcc.ir.TypeList#getSize()
+	 * @return the meta object for the reference '<em>Size Expr</em>'.
+	 * @see net.sf.orcc.ir.TypeList#getSizeExpr()
 	 * @see #getTypeList()
 	 * @generated
 	 */
-	EAttribute getTypeList_Size();
+	EReference getTypeList_SizeExpr();
 
 	/**
 	 * Returns the meta object for the reference '{@link net.sf.orcc.ir.TypeList#getType <em>Type</em>}'.
@@ -416,6 +445,16 @@ public interface IrPackage extends EPackage {
 	 */
 	interface Literals {
 		/**
+		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.ExpressionImpl <em>Expression</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see net.sf.orcc.ir.impl.ExpressionImpl
+		 * @see net.sf.orcc.ir.impl.IrPackageImpl#getExpression()
+		 * @generated
+		 */
+		EClass EXPRESSION = eINSTANCE.getExpression();
+
+		/**
 		 * The meta object literal for the '{@link net.sf.orcc.ir.impl.TypeImpl <em>Type</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -474,12 +513,12 @@ public interface IrPackage extends EPackage {
 		EClass TYPE_LIST = eINSTANCE.getTypeList();
 
 		/**
-		 * The meta object literal for the '<em><b>Size</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Size Expr</b></em>' reference feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute TYPE_LIST__SIZE = eINSTANCE.getTypeList_Size();
+		EReference TYPE_LIST__SIZE_EXPR = eINSTANCE.getTypeList_SizeExpr();
 
 		/**
 		 * The meta object literal for the '<em><b>Type</b></em>' reference feature.

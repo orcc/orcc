@@ -60,22 +60,29 @@ public interface TypeList extends Type {
 	 * 
 	 * @return the element type of this list
 	 */
-	public Type getElementType();
+	Type getElementType();
 
 	/**
 	 * Returns the number of elements of this list type.
 	 * 
 	 * @return the number of elements of this list type
+	 */
+	int getSize();
+
+	/**
+	 * Returns the number of elements of this list type as an expression.
+	 * 
+	 * @return the number of elements of this list type as an expression
 	 * @model
 	 */
-	public int getSize();
+	Expression getSizeExpr();
 
 	/**
 	 * Returns a list of indexes that can be used inside a template.
 	 * 
 	 * @return a list of indexes corresponding to the list size
 	 */
-	public List<Integer> getSizeIterator();
+	List<Integer> getSizeIterator();
 
 	/**
 	 * Returns the type of the list
@@ -83,7 +90,7 @@ public interface TypeList extends Type {
 	 * @return the type of the list
 	 * @model
 	 */
-	public Type getType();
+	Type getType();
 
 	/**
 	 * Sets the number of elements of this list type.
@@ -91,7 +98,15 @@ public interface TypeList extends Type {
 	 * @param size
 	 *            the number of elements of this list type
 	 */
-	public void setSize(int size);
+	void setSize(int size);
+
+	/**
+	 * Sets the number of elements of this list type as an expression.
+	 * 
+	 * @param value
+	 *            the number of elements of this list type as an expression
+	 */
+	void setSizeExpr(Expression value);
 
 	/**
 	 * Sets the type of this list.
@@ -99,6 +114,6 @@ public interface TypeList extends Type {
 	 * @param type
 	 *            element type
 	 */
-	public void setType(Type type);
+	void setType(Type type);
 
 }

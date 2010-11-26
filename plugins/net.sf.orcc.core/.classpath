@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding=".svn/|net/.svn/|net/sf/.svn/|net/sf/orcc/.svn/" kind="src" path="src"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/gson-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/net.sf.orcc.runtime.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgrapht-jdk1.6.jar">

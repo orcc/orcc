@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Type;
  * @author Jerome Gorin
  * 
  */
-public class BoolExpr extends AbstractExpression {
+public class BoolExpr extends ExpressionImpl {
 
 	private boolean value;
 

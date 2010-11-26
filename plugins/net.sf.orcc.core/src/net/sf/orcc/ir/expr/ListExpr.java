@@ -43,7 +43,7 @@ import net.sf.orcc.ir.Type;
  * @author Jerome Gorin
  * 
  */
-public class ListExpr extends AbstractExpression {
+public class ListExpr extends ExpressionImpl {
 
 	private List<Expression> expressions;
 

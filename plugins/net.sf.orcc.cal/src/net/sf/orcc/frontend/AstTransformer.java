@@ -54,6 +54,8 @@ import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
 import net.sf.orcc.cal.cal.AstStatementIf;
 import net.sf.orcc.cal.cal.AstStatementWhile;
+import net.sf.orcc.cal.cal.AstType;
+import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
@@ -299,7 +301,10 @@ public class AstTransformer {
 
 			Variable variable = context.getVariable(astVariable);
 			if (variable == null) {
-				variable = transformGlobalVariable(astVariable);
+				variable = globals.get(astVariable.getName());
+				if (variable == null) {
+					variable = transformGlobalVariable(astVariable);
+				}
 			}
 
 			if (variable.getType().isList()) {
@@ -307,8 +312,13 @@ public class AstTransformer {
 				Expression varExpr = new VarExpr(use);
 				return varExpr;
 			} else {
-				LocalVariable local = getLocalVariable(variable, false);
-				Use use = new Use(local);
+				Variable v = null;
+				if (context.getProcedure() != null) {
+					v = getLocalVariable(variable, false);
+				} else {
+					v = variable;
+				}
+				Use use = new Use(v);
 				Expression varExpr = new VarExpr(use);
 				return varExpr;
 			}
@@ -1166,6 +1176,30 @@ public class AstTransformer {
 	}
 
 	/**
+	 * Recursively convert a global variable of type List. If the size was not
+	 * set, transform the size expression to IR and set the size.
+	 * 
+	 * @param type
+	 *            The IR type of the list.
+	 * @param astType
+	 *            The AST type of the list.
+	 */
+	private void recTransformList(Type type, AstType astType) {
+		if (type.isList()) {
+			AstTypeList astTypeList = (AstTypeList) astType;
+			TypeList typeList = (TypeList) type;
+			if (typeList.getSizeExpr() == null) {
+				// The size is not an integer constant, transform the size
+				// expression now.
+				Expression newSize = exprTransformer.doSwitch(astTypeList
+						.getSize());
+				typeList.setSizeExpr(newSize);
+			}
+			recTransformList(typeList.getType(), astTypeList.getType());
+		}
+	}
+
+	/**
 	 * Loads globals at the beginning of the current procedure, stores them at
 	 * the end, and restores the context
 	 * 
@@ -1299,7 +1333,16 @@ public class AstTransformer {
 	 */
 	public StateVariable transformGlobalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
+		AstType astType = astVariable.getType();
 		Type type = astVariable.getIrType();
+		if (type.isList()) {
+			// Create a null context in order to prevent the expression
+			// transformer
+			// from adding a local_ prefix to every variable.
+			Context oldContext = newContext(null);
+			recTransformList(type, astType);
+			restoreContext(oldContext);
+		}
 		String name = astVariable.getName();
 		boolean assignable = !astVariable.isConstant();
 

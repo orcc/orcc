@@ -6,27 +6,45 @@
  */
 package net.sf.orcc.ir.impl;
 
-import net.sf.orcc.ir.*;
+import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.TypeBool;
+import net.sf.orcc.ir.TypeFloat;
+import net.sf.orcc.ir.TypeInt;
+import net.sf.orcc.ir.TypeList;
+import net.sf.orcc.ir.TypeString;
+import net.sf.orcc.ir.TypeUint;
+import net.sf.orcc.ir.TypeVoid;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
-
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
-
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 
 /**
- * <!-- begin-user-doc -->
- * An implementation of the model <b>Factory</b>.
- * <!-- end-user-doc -->
+ * <!-- begin-user-doc --> An implementation of the model <b>Factory</b>. <!--
+ * end-user-doc -->
  * @generated
  */
 public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
+
+	/**
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
+	 * @deprecated
+	 * @generated
+	 */
+	@Deprecated
+	public static IrPackage getPackage() {
+		return IrPackage.eINSTANCE;
+	}
+
 	/**
 	 * Creates the default factory implementation.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @generated
 	 */
 	public static IrFactory init() {
@@ -42,25 +60,10 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return new IrFactoryImpl();
 	}
 
-	@Override
-	public TypeInt createTypeInt(int size) {
-		TypeIntImpl intType = new TypeIntImpl();
-		intType.setSize(size);
-		return intType;
-	}
-
-	@Override
-	public TypeList createTypeList(int size, Type type) {
-		TypeListImpl listType = new TypeListImpl();
-		listType.setSize(size);
-		listType.setType(type);
-		return listType;
-	}
-
 	/**
 	 * Creates an instance of the factory.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!--
+	 * end-user-doc -->
 	 * @generated
 	 */
 	public IrFactoryImpl() {
@@ -68,8 +71,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	@Override
@@ -88,8 +90,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TypeBool createTypeBool() {
@@ -98,8 +99,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TypeFloat createTypeFloat() {
@@ -108,8 +108,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TypeInt createTypeInt() {
@@ -117,9 +116,15 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return typeInt;
 	}
 
+	@Override
+	public TypeInt createTypeInt(int size) {
+		TypeIntImpl intType = new TypeIntImpl();
+		intType.setSize(size);
+		return intType;
+	}
+
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TypeList createTypeList() {
@@ -127,9 +132,24 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 		return typeList;
 	}
 
+	@Override
+	public TypeList createTypeList(Expression size, Type type) {
+		TypeListImpl listType = new TypeListImpl();
+		listType.setSizeExpr(size);
+		listType.setType(type);
+		return listType;
+	}
+
+	@Override
+	public TypeList createTypeList(int size, Type type) {
+		TypeListImpl listType = new TypeListImpl();
+		listType.setSize(size);
+		listType.setType(type);
+		return listType;
+	}
+
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TypeString createTypeString() {
@@ -138,8 +158,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TypeUint createTypeUint() {
@@ -155,8 +174,7 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public TypeVoid createTypeVoid() {
@@ -165,23 +183,11 @@ public class IrFactoryImpl extends EFactoryImpl implements IrFactory {
 	}
 
 	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
+	 * <!-- begin-user-doc --> <!-- end-user-doc -->
 	 * @generated
 	 */
 	public IrPackage getIrPackage() {
 		return (IrPackage)getEPackage();
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @deprecated
-	 * @generated
-	 */
-	@Deprecated
-	public static IrPackage getPackage() {
-		return IrPackage.eINSTANCE;
-	}
-
-} //IrFactoryImpl
+} // IrFactoryImpl

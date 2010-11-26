@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Type;
  * @author Jerome Gorin
  * 
  */
-public class UnaryExpr extends AbstractExpression {
+public class UnaryExpr extends ExpressionImpl {
 
 	private Expression expr;
 

@@ -56,6 +56,7 @@ import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.Cast;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -63,6 +64,7 @@ import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.TypeString;
 import net.sf.orcc.ir.TypeUint;
 import net.sf.orcc.ir.expr.BinaryOp;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
 
@@ -380,16 +382,22 @@ public class TypeChecker extends CalSwitch<Type> {
 			}
 		}
 
-		List<Integer> dimensions = type.getDimensions();
+		List<Expression> dimensions = type.getDimensionsExpr();
 
-		Iterator<Integer> itD = dimensions.iterator();
+		Iterator<Expression> itD = dimensions.iterator();
 		Iterator<AstExpression> itI = indexes.iterator();
 		while (itD.hasNext() && itI.hasNext()) {
-			int dim = itD.next();
+			Expression dim = itD.next();
+			if (dim == null) {
+				// no index size: assume 32 bits
+				dim = new IntExpr(32);
+			}
+
 			AstExpression index = itI.next();
 			if (EcoreUtil.isAncestor(index, expression)) {
 				// index goes from 0 to dim - 1
-				int indexSize = IntExpr.getSize(dim - 1);
+				int indexSize = IntExpr.getSize(new ExpressionEvaluator()
+						.evaluateAsInteger(dim) - 1);
 				return IrFactory.eINSTANCE.createTypeInt(indexSize);
 			}
 		}

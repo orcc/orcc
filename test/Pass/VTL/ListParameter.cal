@@ -1,0 +1,24 @@
+// 2D list as a parameter
+actor ListParameter(int N, int M, List(type:List(type:int, size=M), size=N) filter) ==> :
+
+	// 2D list as a global variable
+	List(type:List(type:int, size=M), size=N) list2D;
+	// 1D list as a global variable
+	List(type:int, size=N) list1D;
+	
+	initialize ==>
+	do
+		println(filter);
+		foreach int i in 0 .. N - 1 do
+			foreach int j in 0 .. M - 1 do
+				list2D[i][j] := i * M + j;
+			end
+		end
+		println(list2D);
+		foreach int i in 0 .. N - 1 do
+			list1D[i] := i;
+		end
+		println(list1D);
+	end
+
+end

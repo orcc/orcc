@@ -38,7 +38,7 @@ import net.sf.orcc.ir.Type;
  * @author Jerome Gorin
  * 
  */
-public class BinaryExpr extends AbstractExpression {
+public class BinaryExpr extends ExpressionImpl {
 
 	/**
 	 * Constant indicating left branch of a binary expression.

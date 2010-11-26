@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import org.eclipse.emf.ecore.EObject;
 import net.sf.orcc.ir.expr.ExpressionInterpreter;
 import net.sf.orcc.ir.expr.ExpressionVisitor;
 
@@ -36,9 +37,10 @@ import net.sf.orcc.ir.expr.ExpressionVisitor;
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
+ * @model abstract="true"
  * 
  */
-public interface Expression {
+public interface Expression extends EObject {
 
 	/**
 	 * Accepts an interpreter.
@@ -62,65 +64,65 @@ public interface Expression {
 	public void accept(ExpressionVisitor visitor, Object... args);
 
 	/**
-	 * Returns Type corresponding to the type of this expression.
+	 * Returns the type of this expression.
 	 * 
-	 * @return Type of this expression
+	 * @return the type of this expression
 	 */
 	public Type getType();
 
 	/**
-	 * Returns true if the expression is an instance of BinaryExpr
+	 * Returns true if the expression is a binary expression.
 	 * 
-	 * @return True if the expression is an instance of BinaryExpr
+	 * @return true if the expression is a binary expression
 	 */
 	public boolean isBinaryExpr();
 
 	/**
-	 * Returns true if the expression is an instance of BooleanExpr
+	 * Returns true if the expression is a boolean expression.
 	 * 
-	 * @return True if the expression is an instance of BooleanExpr
+	 * @return true if the expression is a boolean expression
 	 */
 	public boolean isBooleanExpr();
 
 	/**
-	 * Returns true if the expression is an instance of FloatExpr
+	 * Returns true if the expression is a float expression.
 	 * 
-	 * @return True if the expression is an instance of FloatExpr
+	 * @return true if the expression is a float expression
 	 */
 	public boolean isFloatExpr();
 
 	/**
-	 * Returns true if the expression is an instance of IntExpr
+	 * Returns true if the expression is an integer expression.
 	 * 
-	 * @return True if the expression is an instance of IntExpr
+	 * @return true if the expression is an integer expression
 	 */
 	public boolean isIntExpr();
 
 	/**
-	 * Returns true if the expression is an instance of ListExpr
+	 * Returns true if the expression is a list expression.
 	 * 
-	 * @return True if the expression is an instance of ListExpr
+	 * @return true if the expression is a list expression
 	 */
 	public boolean isListExpr();
 
 	/**
-	 * Returns true if the expression is an instance of StringExpr
+	 * Returns true if the expression is a string expression.
 	 * 
-	 * @return True if the expression is an instance of StringExpr
+	 * @return true if the expression is a string expression
 	 */
 	public boolean isStringExpr();
 
 	/**
-	 * Returns true if the expression is an instance of UnaryExpr
+	 * Returns true if the expression is a unary expression.
 	 * 
-	 * @return True if the expression is an instance of UnaryExpr
+	 * @return true if the expression is a unary expression
 	 */
 	public boolean isUnaryExpr();
 
 	/**
-	 * Returns true if the expression is an instance of VarExpr
+	 * Returns true if the expression is a variable expression.
 	 * 
-	 * @return True if the expression is an instance of VarExpr
+	 * @return true if the expression is a variable expression
 	 */
 	public boolean isVarExpr();
 

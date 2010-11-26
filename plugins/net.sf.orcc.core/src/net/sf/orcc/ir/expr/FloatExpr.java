@@ -40,7 +40,7 @@ import net.sf.orcc.ir.Type;
  * @author Jerome Gorin
  * 
  */
-public class FloatExpr extends AbstractExpression {
+public class FloatExpr extends ExpressionImpl {
 
 	private BigDecimal value;
 

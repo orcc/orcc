@@ -988,7 +988,7 @@ public class IRParser {
 				int size = array.get(1).getAsInt();
 				return IrFactory.eINSTANCE.createTypeUint(size);
 			} else if (name.equals(TypeList.NAME)) {
-				int size = array.get(1).getAsInt();
+				Expression size = parseExpr(array.get(1));
 				Type subType = parseType(array.get(2));
 
 				return IrFactory.eINSTANCE.createTypeList(size, subType);

@@ -31,6 +31,7 @@ package net.sf.orcc.ir.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.type.TypeInterpreter;
@@ -51,7 +52,6 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	protected TypeImpl() {
@@ -66,7 +66,6 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 
 	/**
 	 * <!-- begin-user-doc --> <!-- end-user-doc -->
-	 * 
 	 * @generated
 	 */
 	@Override
@@ -77,6 +76,11 @@ public abstract class TypeImpl extends EObjectImpl implements Type {
 	@Override
 	public List<Integer> getDimensions() {
 		return new ArrayList<Integer>(0);
+	}
+
+	@Override
+	public List<Expression> getDimensionsExpr() {
+		return new ArrayList<Expression>(0);
 	}
 
 	@Override

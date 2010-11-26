@@ -464,7 +464,7 @@ public class IRWriter {
 		public Object interpret(TypeList type) {
 			JsonArray array = new JsonArray();
 			array.add(new JsonPrimitive(TypeList.NAME));
-			array.add(new JsonPrimitive(type.getSize()));
+			array.add(writeExpression(type.getSizeExpr()));
 			array.add(writeType(type.getType()));
 			return array;
 		}

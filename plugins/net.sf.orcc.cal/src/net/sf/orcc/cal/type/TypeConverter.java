@@ -39,6 +39,7 @@ import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.cal.validation.CalJavaValidator;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
 
@@ -88,8 +89,8 @@ public class TypeConverter extends CalSwitch<Type> {
 	public Type caseAstTypeList(AstTypeList listType) {
 		Type type = transformType(listType.getType());
 		AstExpression expression = listType.getSize();
-		int size = new AstExpressionEvaluator(validator)
-				.evaluateAsInteger(expression);
+		Expression size = new AstExpressionEvaluator(validator)
+				.evaluate(expression);
 		return IrFactory.eINSTANCE.createTypeList(size, type);
 	}
 

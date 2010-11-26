@@ -30,14 +30,13 @@ package net.sf.orcc.cal.type;
 
 import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
-
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstFunction;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstPort;
+import net.sf.orcc.cal.cal.AstTypeList;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.cal.CalPackage;
@@ -47,6 +46,8 @@ import net.sf.orcc.cal.validation.CalJavaValidator;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
+
+import org.eclipse.emf.ecore.EObject;
 
 /**
  * This class defines an AST type to IR type transformer.
@@ -115,8 +116,16 @@ public class TypeTransformer extends VoidSwitch {
 	}
 
 	@Override
+	public Void caseAstTypeList(AstTypeList typeList) {
+		doSwitch(typeList.getType());
+		doSwitch(typeList.getSize());
+		return null;
+	}
+
+	@Override
 	public Void caseAstVariable(AstVariable variable) {
 		TypeConverter converter = new TypeConverter(validator);
+		doSwitch(variable.getType());
 		Type type = converter.transformType(variable.getType());
 		variable.setIrType(type);
 
