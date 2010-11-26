@@ -12,5 +12,9 @@
       <vertex id="Algo_Interp_SeparableSixTapQuarterPelAVC" x="122" y="148"/>
       <vertex id="Algo_Interp_split_MB" x="473" y="17"/>
       <vertex id="Algo_Add_4x4" x="690" y="168"/>
+      <vertex id="Algo_Interp_Reord" x="520" y="369"/>
+      <vertex id="MbType" x="391" y="402"/>
+      <vertex id="SubMbType" x="377" y="461"/>
+      <vertex id="SelectList" x="385" y="433"/>
    </vertices>
 </layout>

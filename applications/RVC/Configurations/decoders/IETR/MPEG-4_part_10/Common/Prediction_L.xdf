@@ -183,6 +183,27 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="SubMbType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MbType4Pred">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -419,4 +440,7 @@
     <Connection dst="Buffer_inter" dst-port="POCtoRead" src="" src-port="PocToRead"/>
     <Connection dst="Buffer_inter" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
     <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
+    <Connection dst="Inter" dst-port="SubMbType" src="" src-port="SubMbType"/>
+    <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>
+    <Connection dst="Inter" dst-port="SelectList" src="" src-port="SelectList"/>
 </XDF>

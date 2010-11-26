@@ -282,4 +282,7 @@
     <Connection dst="Decoding_Y" dst-port="PocToRead" src="FUN_Parser" src-port="PocToRead"/>
     <Connection dst="Decode_U" dst-port="ReadAddress" src="FUN_Parser" src-port="ReadAddress_c"/>
     <Connection dst="Decode_V" dst-port="ReadAddress" src="FUN_Parser" src-port="ReadAddress_c"/>
+    <Connection dst="Decoding_Y" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decoding_Y" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
+    <Connection dst="Decoding_Y" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
 </XDF>

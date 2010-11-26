@@ -37,5 +37,8 @@
       <vertex id="Deblocking_Filter" x="972" y="70"/>
       <vertex id="DemuxParserInfos" x="54" y="577"/>
       <vertex id="Inter" x="500" y="991"/>
+      <vertex id="SubMbType" x="344" y="1166"/>
+      <vertex id="MbType4Pred" x="180" y="1147"/>
+      <vertex id="SelectList" x="147" y="1071"/>
    </vertices>
 </layout>

@@ -52,6 +52,27 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="MbType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SubMbType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -113,6 +134,15 @@
             <Expr kind="Literal" literal-kind="Boolean" value="true"/>
         </Parameter>
     </Instance>
+    <Instance id="Algo_Interp_Reord">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Interp_split_MB2"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -132,4 +162,9 @@
     <Connection dst="Algo_Add_4x4" dst-port="Y" src="" src-port="Coef_ACR"/>
     <Connection dst="Algo_Interp_SeparableSixTapQuarterPelAVC"
         dst-port="Mv" src="" src-port="MV"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="Interp"
+        src="Algo_Interp_SeparableSixTapQuarterPelAVC" src-port="INTERP"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="MbType" src="" src-port="MbType"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="SubMbType" src="" src-port="SubMbType"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="SelectList" src="" src-port="SelectList"/>
 </XDF>

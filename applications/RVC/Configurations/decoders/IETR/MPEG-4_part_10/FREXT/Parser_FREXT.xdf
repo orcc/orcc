@@ -295,6 +295,27 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="MbType4Pred">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SelectList">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SubMbType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -701,4 +722,7 @@
     <Connection dst="Mgnt_InterPred" dst-port="Mb_Type" src="DecodePic" src-port="MbType4Pred"/>
     <Connection dst="Mgnt_InterPred" dst-port="SelectList"
         src="MVReconstruct" src-port="SelectList"/>
+    <Connection dst="" dst-port="MbType4Pred" src="DecodePic" src-port="MbType4Pred"/>
+    <Connection dst="" dst-port="SelectList" src="MVReconstruct" src-port="SelectList"/>
+    <Connection dst="" dst-port="SubMbType" src="DecodePic" src-port="SubMbType"/>
 </XDF>

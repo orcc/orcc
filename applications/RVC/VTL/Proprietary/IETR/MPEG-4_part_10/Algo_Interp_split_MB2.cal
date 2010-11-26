@@ -14,9 +14,197 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.*;
+
 actor Algo_Interp_split_MB2()
 	uint(size=6)  MbType,
-	int(size=16) Interp
+	uint(size=4)  SubMbType,
+	uint(size=2)  SelectList,
+	int (size=16) Interp
 		==>
 		:
+
+	List(type: List(type: int(size=16), size=16), size=16) ListInterp;
+
+	uint(size=6) mb_type;
+
+	uint(size=3) MbPartIdxMax;
+	uint(size=3) MbPartIdx;
+	uint(size=3) SizeMb;
+
+	uint(size=3) SubMbPartIdxMax;
+	uint(size=3) SubMbPartIdx;
+	uint(size=3) Size_SubMb;
+	uint(size=2) NbListToGet;
+
+	GetMbType: action
+			MbType :[MacroBlkType]
+				==>
+		do
+			mb_type       := MacroBlkType;
+			MbPartIdx     := 0;
+			MbPartIdxMax  := NumMbPart(MacroBlkType);
+			SizeMb        := SizeMbPart(MacroBlkType);
+		end
+
+	GetListSel4Mb: action
+			SelectList:[list_selected]
+				==>
+		guard
+			MbPartIdx  < MbPartIdxMax,
+			SizeMb    != SZ_8x8
+		do
+			NbListToGet :=
+				if(list_selected != BIPRED)then
+					1
+				else
+					2
+				end;
+		end
+
+	GetInterp.Launch16x16: action
+			Interp:[InterpolationValues] repeat 16*16
+				==>
+		guard
+			SizeMb      = SZ_16x16,
+			NbListToGet > 0
+		do
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterp.Launch16x8: action
+			Interp:[InterpolationValues] repeat 16*8
+				==>
+		guard
+			SizeMb      = SZ_16x8,
+			NbListToGet > 0
+		do
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterp.Launch8x16: action
+			Interp:[InterpolationValues] repeat 8*16
+				==>
+		guard
+			SizeMb      = SZ_8x16,
+			NbListToGet > 0
+		do
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterp.Done: action ==>
+		guard
+			NbListToGet = 0
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	GetInterp.Launch8x8: action
+			SubMbType :[ValSubMbType]
+				==>
+		guard
+			SizeMb    = SZ_8x8,
+			MbPartIdx < MbPartIdxMax
+		do
+			SubMbPartIdx    := 0;
+			SubMbPartIdxMax := NumSubMbPart(mb_type,ValSubMbType);
+			Size_SubMb       := SizeSubMbPart(mb_type,ValSubMbType);
+		end
+
+	GetListSel4SubMb: action
+			SelectList:[list_selected]
+				==>
+		guard
+			SubMbPartIdx < SubMbPartIdxMax
+		do
+			NbListToGet :=
+				if(list_selected != BIPRED)then
+					1
+				else
+					2
+				end;
+		end
+
+	GetInterpSubMb.Launch8x8: action
+			Interp:[InterpolationValues] repeat 8*8
+				==>
+		guard
+			Size_SubMb   = SZ_8x8,
+			NbListToGet > 0
+		do
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterpSubMb.Launch8x4: action
+			Interp:[InterpolationValues] repeat 8*4
+				==>
+		guard
+			Size_SubMb   = SZ_8x4,
+			NbListToGet > 0
+		do
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterpSubMb.Launch4x8: action
+			Interp:[InterpolationValues] repeat 4*8
+				==>
+		guard
+			Size_SubMb   = SZ_4x8,
+			NbListToGet > 0
+		do
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterpSubMb.Launch4x4: action
+			Interp:[InterpolationValues] repeat 4*4
+				==>
+		guard
+			Size_SubMb   = SZ_4x4,
+			NbListToGet > 0
+		do
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterpSubMb.Done: action ==>
+		guard
+			NbListToGet = 0
+		do
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
+	GetSubMbInfo.Done: action ==>
+		guard
+			SubMbPartIdx = SubMbPartIdxMax
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	SendParameters: action
+				==>
+		guard
+			MbPartIdx = MbPartIdxMax
+		end
+
+	schedule fsm GetMbType:
+		GetMbType        (GetMbType                )--> GetListSel4Mb;
+
+		GetListSel4Mb    (GetListSel4Mb            )--> GetMb;
+		GetListSel4Mb    (GetInterp.Launch8x8      )--> GetListSel4SubMb;
+		GetListSel4Mb    (SendParameters           )--> GetMbType;
+
+		GetMb            (GetInterp.Launch16x16    )--> GetMb;
+		GetMb            (GetInterp.Launch16x8     )--> GetMb;
+		GetMb            (GetInterp.Launch8x16     )--> GetMb;
+		GetMb            (GetInterp.Done           )--> GetListSel4Mb;
+
+		GetListSel4SubMb (GetListSel4SubMb         )--> GetSubMb;
+		GetListSel4SubMb (GetSubMbInfo.Done        )--> GetListSel4Mb;
+
+		GetSubMb         (GetInterpSubMb.Launch8x8 )--> GetSubMb;
+		GetSubMb         (GetInterpSubMb.Launch8x4 )--> GetSubMb;
+		GetSubMb         (GetInterpSubMb.Launch4x8 )--> GetSubMb;
+		GetSubMb         (GetInterpSubMb.Launch4x4 )--> GetSubMb;
+		GetSubMb         (GetInterpSubMb.Done      )--> GetListSel4SubMb;
+	end
+
 end
