@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-11-12
+-- Last update: 2010-11-24
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -59,8 +59,7 @@ entity controler is
   port (
     reset_n : in  std_logic;
     rd_clk  : in  std_logic;
-    rd_ack  : in  std_logic;
-    rd_send : out std_logic;
+    rd_data : in  std_logic;
     rd_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
     wr_clk  : in  std_logic;
     wr_data : in  std_logic;
@@ -75,11 +74,8 @@ end controler;
 
 architecture archcontroler of controler is
 
-
-  signal inFull      : std_logic;
-  signal inReadAdd   : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal inWriteAdd  : std_logic_vector(bit_width(depth)-1 downto 0);
-
+  signal inReadAdd  : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal inWriteAdd : std_logic_vector(bit_width(depth)-1 downto 0);
 
 begin
 
@@ -90,50 +86,39 @@ begin
     generic map (
       depth => depth)
     port map (
-      reset_n  => reset_n,
-      rd_clk   => rd_clk,
-      rd_ack   => rd_ack,
-      wr_clk   => wr_clk,
-      wr_data  => wr_data,
-      rd_add   => inReadAdd,
-      wr_add   => inWriteAdd);
+      reset_n => reset_n,
+      rd_clk  => rd_clk,
+      rd_data => rd_data,
+      wr_clk  => wr_clk,
+      wr_data => wr_data,
+      rd_add  => inReadAdd,
+      wr_add  => inWriteAdd);
 
-  
+
   -- Flags
-  full <= inFull;
   Flag_full : process (inReadAdd, inWriteAdd) is
     variable level : integer range depth -1 downto 0 := 0;
   begin
     if (inWriteAdd <= inReadAdd) then
       level := to_integer(unsigned(inReadAdd - inWriteAdd));
+      empty <= '0';
+    elsif (inWriteAdd <= inReadAdd) then
+      level := 0;
+      empty <= '1';
     else
       level := (depth -1) - to_integer(unsigned(inWriteAdd - inReadAdd));
+      empty <= '0';
     end if;
-    
+
     case level is
       when 2 =>
-        inFull <= '1';
-      when 1 =>        
-        inFull <= '1';
+        full <= '1';
+      when 1 =>
+        full <= '1';
       when others =>
-        inFull <= '0';
+        full <= '0';
     end case;
   end process Flag_full;
-
-  Flag_empty : process (inReadAdd, reset_n, inWriteAdd) is
-  begin
-    if reset_n = '0' then
-      empty   <= '1';
-      rd_send <= '0';
-    elsif (inReadAdd = inWriteAdd) then
-      empty   <= '1';
-      rd_send <= '0';
-    else
-      empty   <= '0';
-      rd_send <= '1';
-    end if;
-  end process Flag_empty;
-
 
 end archcontroler;
 

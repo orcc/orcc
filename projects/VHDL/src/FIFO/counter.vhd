@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-11-10
+-- Last update: 2010-11-24
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -56,13 +56,13 @@ entity counter is
   generic (
     depth : integer := 32);
   port (
-    reset_n  : in    std_logic;
-    rd_clk   : in    std_logic;
-    rd_ack   : in    std_logic;
-    wr_clk   : in    std_logic;
-    wr_data  : in    std_logic;
-    rd_add   : inout std_logic_vector(bit_width(depth) -1 downto 0);
-    wr_add   : inout std_logic_vector(bit_width(depth) -1 downto 0));
+    reset_n : in    std_logic;
+    rd_clk  : in    std_logic;
+    rd_data : in    std_logic;
+    wr_clk  : in    std_logic;
+    wr_data : in    std_logic;
+    rd_add  : inout std_logic_vector(bit_width(depth) -1 downto 0);
+    wr_add  : inout std_logic_vector(bit_width(depth) -1 downto 0));
 end counter;
 
 -------------------------------------------------------------------------------
@@ -79,9 +79,9 @@ begin
     if reset_n = '0' then
       rd_add <= (others => '0');
     elsif rising_edge(rd_clk) then
-      if (rd_add = depth_std) and rd_ack = '1' then
+      if (rd_add = depth_std) and rd_data = '1' then
         rd_add <= (others => '0');
-      elsif rd_ack = '1' then
+      elsif rd_data = '1' then
         rd_add <= rd_add +'1';
       end if;
     end if;

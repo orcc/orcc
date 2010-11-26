@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-11-12
+-- Last update: 2010-11-24
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -56,18 +56,17 @@ entity fifo_top is
       width : integer := 32);
   port
     (
-      reset_n  : in    std_logic;
+      reset_n  : in  std_logic;
       --
-      wr_clk   : in    std_logic;
-      wr_data  : in    std_logic;
-      data_in  : in    std_logic_vector (width -1 downto 0);
-      full     : inout std_logic;
+      wr_clk   : in  std_logic;
+      wr_data  : in  std_logic;
+      data_in  : in  std_logic_vector (width -1 downto 0);
+      wr_rdy   : out std_logic;
       --
-      rd_clk   : in    std_logic;
-      rd_ack   : in    std_logic;
-      send     : out   std_logic;
-      data_out : out   std_logic_vector (width -1 downto 0);
-      empty    : out   std_logic);
+      rd_clk   : in  std_logic;
+      send     : out std_logic;
+      data_out : out std_logic_vector (width -1 downto 0);
+      rd_rdy   : in  std_logic);
 end fifo_top;
 
 
@@ -76,9 +75,16 @@ end fifo_top;
 
 architecture arch_fifo_top of fifo_top is
 
+  signal iFull   : std_logic;
+  signal iEmpty  : std_logic;
+  signal rd_data : std_logic;
+  
 begin
 
   create_FIFO : if depth > 1 generate
+    wr_rdy  <= not iFull;
+    rd_data <= (not iEmpty) and rd_rdy;
+    send    <= (not iEmpty) and rd_rdy;
     FIFO_generic_1 : entity work.FIFO_generic
       generic map (
         depth => depth,
@@ -88,12 +94,11 @@ begin
         wr_clk   => wr_clk,
         wr_data  => wr_data,
         data_in  => data_in,
-        full     => full,
+        full     => iFull,
         rd_clk   => rd_clk,
-        rd_ack   => rd_ack,
-        send     => send,
+        rd_data  => rd_data,
         data_out => data_out,
-        empty    => empty);
+        empty    => iEmpty);
   end generate;
 
   create_link : if depth = 1 generate
@@ -101,16 +106,13 @@ begin
       generic map (
         width => width)
       port map (
-        reset_n  => reset_n,
-        wr_clk   => wr_clk,
         wr_data  => wr_data,
         data_in  => data_in,
-        full     => full,
-        rd_clk   => rd_clk,
-        rd_ack   => rd_ack,
+        wr_rdy   => wr_rdy,
         send     => send,
         data_out => data_out,
-        empty    => empty);
+        rd_rdy   => rd_rdy);
+
   end generate;
 
 

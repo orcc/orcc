@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-08-31
+-- Last update: 2010-11-24
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -63,8 +63,7 @@ entity fifo_generic is
     full     : out std_logic;
     --
     rd_clk   : in  std_logic;
-    rd_ack   : in  std_logic;
-    send     : out std_logic;
+    rd_data  : in  std_logic;   
     data_out : out std_logic_vector(width -1 downto 0);
     empty    : out std_logic);
 end fifo_generic;
@@ -85,13 +84,12 @@ begin
       reset_n => reset_n,
       rd_clk  => rd_clk,
       rd_add  => rd_address,
-      rd_send => send,
+      rd_data => rd_data,     
       wr_clk  => wr_clk,
       wr_add  => wr_address,
       empty   => empty,
       full    => full,
-      wr_data => wr_data,
-      rd_ack  => rd_ack);
+      wr_data => wr_data);
 
   ram_generic_1 : entity work.ram_generic
     generic map (
