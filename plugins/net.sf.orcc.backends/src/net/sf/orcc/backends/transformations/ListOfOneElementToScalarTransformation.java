@@ -73,11 +73,13 @@ public class ListOfOneElementToScalarTransformation extends
 						write.setTarget(var.getVar().getVariable());
 						instructionIterator.remove();
 					}
+					instructionIterator.next();
 				}
-				instructionIterator.next();
+				if (instructionIterator.hasNext()) {
+					instructionIterator.next();
+				}
 			}
-			instructionIterator.next();
 		}
-	}
 
+	}
 }
