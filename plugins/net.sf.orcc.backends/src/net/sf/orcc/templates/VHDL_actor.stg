@@ -39,86 +39,6 @@ $$port.name$_data  <= (others => '0');$
 endif$
 >>
 
-fifo_in_init(port) ::=<<
-
-$port.name$_rdy <= '0';
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Actor VHDL Architecture - Scheduler process
-///////////////////////////////////////////////////////////////////////////////
-
-Actor_Scheduler(actor) ::= <<
-$actor.actions:Actor_Schedul(); separator="\n"$
-
->>
-
-Actor_Schedul(action) ::= <<
-$if (actor.templateData  || action.inputPattern.keys)
-$$action$_scheduler : process ($sensitivity(action)$) is
-  $action: printActionLocalSchedul()$  --
-begin
-  $action: printActionSchedulerInline(); separator="\n"$
-  $if(action.outputPattern.keys)
-$  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
-    $action$_go <= isSchedulable_$action$_go;
-  else
-    $action$_go <= '0';
-  end if;$
-  else
-    $  $action$_go <= isSchedulable_$action$_go;$
-  endif$$
-else
-$
-$action$_go <= '1';$
-endif$
-
-  $action.inputPattern.keys :{port|$port.name$_ack <= isSchedulable_$action$_go}; separator=";\n"$;
-end process $action$_scheduler;
-
->>
-
-sensitivity(action) ::= <<
-$action.inputPattern.keys :{port|$port.name$_send}; separator=", "$$
-if(action.inputPattern.keys && actor.templateData)
-$, $
-endif$
-$action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$$
-if(action.outputPattern.keys && actor.templateData)
-$, $
-endif$
-$actor.templateData: {$it$}; separator=", "$
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Actor VHDL Architecture - Execute process
-///////////////////////////////////////////////////////////////////////////////
-
-Actor_Exec(actor) ::= <<
-$actor.name$_execute : process (reset_n, clock) is
-  $actor.actions: printActionLocalBody()$  --
-begin
-  if reset_n = '0' then 
-    $actor.stateVars.list: stateConst()$    --
-    $actor.outputs.list: fifo_out_init()$
-    $actor.inputs.list: fifo_in_init()$
-$if(actor.actionScheduler.fsm)    
-$    FSM    <= s_$actor.actionScheduler.fsm.initialState$;$
-endif$  
-  --
-  elsif rising_edge(clock) then
-    --  
-$if(actor.actionScheduler.fsm)    
-$    $executeCoreFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
-else
-$    $executeCore(actor.actions)$$
-endif$
-
-  end if;
-end process $actor.name$_execute;
-
->>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
@@ -555,24 +475,94 @@ printActionBodyInline(action) ::= <<
 $procedure(procedure=action.body)$
 >>
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Action
+// Actor VHDL Architecture - Scheduler process
 ///////////////////////////////////////////////////////////////////////////////
 
-actionTestSceduler(action) ::= <<
-($action$_go = '1'$actor.outputs.list: writeTest()$) then
-  -- body of "$action$" action
-  $actor.inputs.list: rdyManagement(); separator="\n"$
-  --
-  $printActionBodyInline(action)$  --$actor.outputs.list: writeManagement()$
+Actor_Scheduler(actor) ::= <<
+$actor.actions:Actor_Schedul(); separator="\n"$
+
 >>
 
-rdyManagement(port) ::= <<
-$if(!action.inputPattern.(port))
-$$port.name$_rdy <= '0';$
+Actor_Schedul(action) ::= <<
+$if (actor.templateData  || action.inputPattern.keys)
+$$action$_scheduler : process ($sensitivity(action)$) is
+  $action: printActionLocalSchedul()$  --
+begin
+  $action: printActionSchedulerInline(); separator="\n"$
+  $if(action.outputPattern.keys)
+$  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
+    $action$_go <= isSchedulable_$action$_go;
+    $if(action.inputPattern.keys)
+    $    $action.inputPattern.keys :{port|$port.name$_ack <= isSchedulable_$action$_go}; separator=";\n    "$;$
+    endif$
+    
+  else
+    $action$_go <= '0';
+    $if(action.inputPattern.keys)
+    $    $action.inputPattern.keys :{port|$port.name$_ack <= '0'}; separator=";\n    "$;$
+    endif$
+        
+  end if;$
+  else
+    $  $action$_go <= isSchedulable_$action$_go;$   
+  endif$
+  
+end process $action$_scheduler;$
 else
-$$port.name$_rdy <= '1';$
+$
+$action$_go <= '1';$
 endif$
+
+
+>>
+
+sensitivity(action) ::= <<
+$action.inputPattern.keys :{port|$port.name$_send}; separator=", "$$
+if(action.inputPattern.keys && actor.templateData)
+$, $
+endif$
+$action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$$
+if(action.outputPattern.keys && actor.templateData)
+$, $
+endif$
+$actor.templateData: {$it$}; separator=", "$
+>>
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Actor VHDL Architecture - Execute process
+///////////////////////////////////////////////////////////////////////////////
+
+Actor_Exec(actor) ::= <<
+$actor.name$_execute : process (reset_n, clock) is
+  $actor.actions: printActionLocalBody()$  --
+begin
+  if reset_n = '0' then 
+    $actor.stateVars.list: stateConst()$    --
+    $actor.outputs.list: fifo_out_init()$
+$if(actor.actionScheduler.fsm)    
+$    FSM    <= s_$actor.actionScheduler.fsm.initialState$;
+$
+endif$  --
+  elsif rising_edge(clock) then
+    --  
+$if(actor.actionScheduler.fsm)    
+$    $executeCoreFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
+else
+$    $executeCore(actor.actions)$$
+endif$
+
+  end if;
+end process $actor.name$_execute;
+
+>>
+
+actionTestSceduler(action) ::= <<
+($action$_go = '1') then
+  -- body of "$action$" action
+  $printActionBodyInline(action)$  --$actor.outputs.list: writeManagement()$
 >>
 
 writeManagement(port) ::= <<
@@ -582,45 +572,12 @@ $
 endif$
 >>
 
-writeTest(port) ::= <<
-$if(action.outputPattern.(port))
-$ and $port.name$_rdy = '1'$
-endif$
->>
-
-othersIF(action) ::= <<
-$if(action.inputPattern.keys && action.outputPattern.keys)
-    $elsif (($action.outputPattern.keys :{port|$port.name$_rdy}; separator=" or "$) = '1') then
-  $action.inputPattern.keys :{port|$port.name$_rdy <= '1';}; separator="\n"$
-else
-  $actor.inputs.list :{port|$port.name$_rdy <= '0';}; separator="\n"$
-end if;$
-elseif(action.inputPattern.keys && !action.outputPattern.keys)
-$else
-  $action.inputPattern.keys :{port|$port.name$_rdy <= '1';}; separator="\n"$
-end if;$
-else
-$else
-  $actor.inputs.list :{port|$port.name$_rdy <= '0';}; separator="\n"$
-end if;$
-endif$
->>
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Core of an action - NO FSM
 
 executeCore(actions) ::= <<
 $actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n    "$
     if $executeIndent(actions)$
-    $if(actor.inputs.list && actor.outputs.list)
-    $    elsif (($actor.outputs.list :{port|$port.name$_rdy}; separator=" or "$) = '1') then
-      $actor.inputs.list :{port|$port.name$_rdy <= '1';}; separator="\n"$$
-    endif$
-    
-    else
-      $actor.inputs.list :{port|$port.name$_rdy <= '0';}; separator="\n"$
-    end if;
 >>
 
 executeIndent(actions) ::= <<
@@ -665,10 +622,7 @@ switchTransition(transition) ::= <<
 
 executeCoreState(nextStates) ::= <<
 
-if $nextStates: actionTestState(); separator="--\nelsif"$
-$if(last(nextStates))
-$$othersIF()$$
-endif$
+if $nextStates: actionTestState(); separator="\n--\nelsif"$
 >>
 
 actionTestState(nextState) ::= <<
