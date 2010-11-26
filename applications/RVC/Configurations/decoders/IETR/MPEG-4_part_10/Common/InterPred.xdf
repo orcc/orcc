@@ -112,7 +112,7 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="PixWidthPerPartition">
+        <Parameter name="SzSidePerPart">
             <Expr kind="Literal" literal-kind="Integer" value="4"/>
         </Parameter>
     </Instance>

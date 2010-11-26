@@ -16,7 +16,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.*;
 
-actor Algo_Interp_Reord(uint(size=8)PixWidthPerPartition)
+actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 	uint(size=2)  SelectList,
@@ -37,6 +37,11 @@ actor Algo_Interp_Reord(uint(size=8)PixWidthPerPartition)
 	uint(size=3) SubMbPartIdx;
 	uint(size=3) Size_SubMb;
 	uint(size=2) NbListToGet;
+
+	List(type: uint(size=4), size=256) TabX_Out;
+	List(type: uint(size=4), size=256) TabY_Out;
+	uint(size=9) NbValueToRead;
+	uint(size=9) ReadIdx;
 
 	uint(size=4) x_idx;
 	uint(size=4) y_idx;
@@ -66,54 +71,59 @@ actor Algo_Interp_Reord(uint(size=8)PixWidthPerPartition)
 				end;
 		end
 
-	GetInterp.Launch16x16: action
-			Interp:[InterpolationValues] repeat 16*16
-				==>
+	GetInterp.Launch16x16: action ==>
 		guard
 			SizeMb      = SZ_16x16,
 			NbListToGet > 0
 		do
-			foreach int j in 0 .. 15
+			foreach int j in 0 .. 4*SzSidePerPart -1
 			do
-				foreach int i in 0 .. 15
+				foreach int i in 0 .. 4*SzSidePerPart -1
 				do
-					ListInterp[i][j] := InterpolationValues[i + 16*j];
+					TabX_Out[i + 4 * SzSidePerPart*j]:= i;
+					TabY_Out[i + 4 * SzSidePerPart*j]:= j;
 				end
 			end
-			NbListToGet := NbListToGet - 1;
+			NbValueToRead := 16 * SzSidePerPart * SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet   := NbListToGet - 1;
 		end
 
 	GetInterp.Launch16x8: action
-			Interp:[InterpolationValues] repeat 16*8
 				==>
 		guard
 			SizeMb      = SZ_16x8,
 			NbListToGet > 0
 		do
-			foreach int j in 0 .. 7
+			foreach int j in 0 .. 2*SzSidePerPart -1
 			do
-				foreach int i in 0 .. 15
+				foreach int i in 0 .. 4*SzSidePerPart -1
 				do
-					ListInterp[i][j + 8*MbPartIdx] := InterpolationValues[i + 16*j];
+					TabX_Out[i + 4*SzSidePerPart*j]:= i;
+					TabY_Out[i + 4*SzSidePerPart*j]:= j + 2*SzSidePerPart*MbPartIdx;
 				end
 			end
+			NbValueToRead := 8 * SzSidePerPart * SzSidePerPart;
+			ReadIdx       := 0;
 			NbListToGet := NbListToGet - 1;
 		end
 
 	GetInterp.Launch8x16: action
-			Interp:[InterpolationValues] repeat 8*16
 				==>
 		guard
 			SizeMb      = SZ_8x16,
 			NbListToGet > 0
 		do
-			foreach int j in 0 .. 15
+			foreach int j in 0 .. 4*SzSidePerPart -1
 			do
-				foreach int i in 0 .. 7
+				foreach int i in 0 .. 2*SzSidePerPart -1
 				do
-					ListInterp[i + 8*MbPartIdx][j] := InterpolationValues[i + 8*j];
+					TabX_Out[i + 2*SzSidePerPart*j]:= i + 2*SzSidePerPart*MbPartIdx;
+					TabY_Out[i + 2*SzSidePerPart*j]:= j;
 				end
 			end
+			NbValueToRead := 8 * SzSidePerPart * SzSidePerPart;
+			ReadIdx       := 0;
 			NbListToGet := NbListToGet - 1;
 		end
 
@@ -151,70 +161,78 @@ actor Algo_Interp_Reord(uint(size=8)PixWidthPerPartition)
 		end
 
 	GetInterpSubMb.Launch8x8: action
-			Interp:[InterpolationValues] repeat 8*8
 				==>
 		guard
 			Size_SubMb   = SZ_8x8,
 			NbListToGet > 0
 		do
-			foreach int j in 0 .. 7
+			foreach int j in 0 .. 2*SzSidePerPart -1
 			do
-				foreach int i in 0 .. 7
+				foreach int i in 0 .. 2*SzSidePerPart -1
 				do
-					ListInterp[i + 8*(MbPartIdx &1)][j + 8*(MbPartIdx>>1)] := InterpolationValues[i + 8*j];
+					TabX_Out[i + 2*SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1);
+					TabY_Out[i + 2*SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1);
 				end
 			end
+			NbValueToRead := 4*SzSidePerPart*SzSidePerPart;
+			ReadIdx       := 0;
 			NbListToGet := NbListToGet - 1;
 		end
 
 	GetInterpSubMb.Launch8x4: action
-			Interp:[InterpolationValues] repeat 8*4
 				==>
 		guard
 			Size_SubMb   = SZ_8x4,
 			NbListToGet > 0
 		do
-			foreach int j in 0 .. 3
+			foreach int j in 0 .. SzSidePerPart -1
 			do
-				foreach int i in 0 .. 7
+				foreach int i in 0 .. 2*SzSidePerPart -1
 				do
-					ListInterp[i + 8*(MbPartIdx &1)][j + 8*(MbPartIdx>>1) + 4*SubMbPartIdx] := InterpolationValues[i + 8*j];
+					TabX_Out[i + 2*SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1);
+					TabY_Out[i + 2*SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1) + SzSidePerPart*SubMbPartIdx;
 				end
 			end
-			NbListToGet := NbListToGet - 1;
+			NbValueToRead := 2*SzSidePerPart*SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet   := NbListToGet - 1;
 		end
 
 	GetInterpSubMb.Launch4x8: action
-			Interp:[InterpolationValues] repeat 4*8
 				==>
 		guard
 			Size_SubMb   = SZ_4x8,
 			NbListToGet > 0
 		do
-			foreach int j in 0 .. 7
+			foreach int j in 0 .. 2*SzSidePerPart -1
 			do
-				foreach int i in 0 .. 3
+				foreach int i in 0 .. SzSidePerPart -1
 				do
-					ListInterp[i + 8*(MbPartIdx &1) + 4*SubMbPartIdx][j + 8*(MbPartIdx>>1)] := InterpolationValues[i + 4*j];
+					TabX_Out[i + SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1) + SzSidePerPart*SubMbPartIdx;
+					TabY_Out[i + SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1);
 				end
 			end
-			NbListToGet := NbListToGet - 1;
+			NbValueToRead := 2*SzSidePerPart*SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet   := NbListToGet - 1;
 		end
 
 	GetInterpSubMb.Launch4x4: action
-			Interp:[InterpolationValues] repeat 4*4
 				==>
 		guard
 			Size_SubMb   = SZ_4x4,
 			NbListToGet > 0
 		do
-			foreach int j in 0 .. 3
+			foreach int j in 0 .. SzSidePerPart -1
 			do
-				foreach int i in 0 .. 3
+				foreach int i in 0 .. SzSidePerPart -1
 				do
-					ListInterp[i + 8*(MbPartIdx &1) + 4*(SubMbPartIdx&1)][j + 8*(MbPartIdx>>1) + 4*(SubMbPartIdx>>1)] := InterpolationValues[i + 4*j];
+					TabX_Out[i + SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1) + SzSidePerPart*(SubMbPartIdx&1);
+					TabY_Out[i + SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1) + SzSidePerPart*(SubMbPartIdx>>1);
 				end
 			end
+			NbValueToRead := SzSidePerPart*SzSidePerPart;
+			ReadIdx       := 0;
 			NbListToGet := NbListToGet - 1;
 		end
 
@@ -240,17 +258,32 @@ actor Algo_Interp_Reord(uint(size=8)PixWidthPerPartition)
 			y_idx := 0;
 		end
 
+	ReadInterp.Launch: action
+			Interp:[InterpolationValue]
+				==>
+		guard
+			ReadIdx < NbValueToRead
+		do
+			ListInterp[TabX_Out[ReadIdx]][TabY_Out[ReadIdx]] := InterpolationValue;
+			ReadIdx := ReadIdx + 1;
+		end
+
+	ReadInterp.Done: action ==>
+		guard
+			ReadIdx = NbValueToRead
+		end
+
 	SendParameters.Launch: action
 				==>
 			MbPred :[mb_pred]
 		guard
-			y_idx < 4*PixWidthPerPartition
+			y_idx < 4*SzSidePerPart
 		var
 			int(size=16) mb_pred
 		do
 			mb_pred := ListInterp[x_idx][y_idx];
 			x_idx := x_idx + 1;
-			if(x_idx >= 4*PixWidthPerPartition)then
+			if(x_idx >= 4*SzSidePerPart)then
 				x_idx := 0;
 				y_idx := y_idx + 1;
 			end
@@ -259,32 +292,53 @@ actor Algo_Interp_Reord(uint(size=8)PixWidthPerPartition)
 	SendParameters.Done: action
 				==>
 		guard
-			y_idx = 4*PixWidthPerPartition
+			y_idx = 4*SzSidePerPart
 		end
 
 	schedule fsm GetMbType:
-		GetMbType        (GetMbType                )--> GetListSel4Mb;
+		GetMbType          (GetMbType                )--> GetListSel4Mb;
 
-		GetListSel4Mb    (GetListSel4Mb            )--> GetMb;
-		GetListSel4Mb    (GetInterp.Launch8x8      )--> GetListSel4SubMb;
-		GetListSel4Mb    (GetMbInfo.Done           )--> SendParameters;
+		GetListSel4Mb      (GetListSel4Mb            )--> GetMb;
+		GetListSel4Mb      (GetInterp.Launch8x8      )--> GetListSel4SubMb;
+		GetListSel4Mb      (GetMbInfo.Done           )--> SendParameters;
 
-		GetMb            (GetInterp.Launch16x16    )--> GetMb;
-		GetMb            (GetInterp.Launch16x8     )--> GetMb;
-		GetMb            (GetInterp.Launch8x16     )--> GetMb;
-		GetMb            (GetInterp.Done           )--> GetListSel4Mb;
+		GetMb              (GetInterp.Launch16x16    )--> ReadInterpFor16x16;
+		GetMb              (GetInterp.Launch16x8     )--> ReadInterpFor16x8;
+		GetMb              (GetInterp.Launch8x16     )--> ReadInterpFor8x16;
+		GetMb              (GetInterp.Done           )--> GetListSel4Mb;
 
-		GetListSel4SubMb (GetListSel4SubMb         )--> GetSubMb;
-		GetListSel4SubMb (GetSubMbInfo.Done        )--> GetListSel4Mb;
+		ReadInterpFor16x16 (ReadInterp.Launch        )--> ReadInterpFor16x16;
+		ReadInterpFor16x16 (ReadInterp.Done          )--> GetMb;
 
-		GetSubMb         (GetInterpSubMb.Launch8x8 )--> GetSubMb;
-		GetSubMb         (GetInterpSubMb.Launch8x4 )--> GetSubMb;
-		GetSubMb         (GetInterpSubMb.Launch4x8 )--> GetSubMb;
-		GetSubMb         (GetInterpSubMb.Launch4x4 )--> GetSubMb;
-		GetSubMb         (GetInterpSubMb.Done      )--> GetListSel4SubMb;
+		ReadInterpFor16x8  (ReadInterp.Launch        )--> ReadInterpFor16x8;
+		ReadInterpFor16x8  (ReadInterp.Done          )--> GetMb;
 
-		SendParameters   (SendParameters.Launch    )--> SendParameters;
-		SendParameters   (SendParameters.Done      )--> GetMbType;
+		ReadInterpFor8x16  (ReadInterp.Launch        )--> ReadInterpFor8x16;
+		ReadInterpFor8x16  (ReadInterp.Done          )--> GetMb;
+
+		GetListSel4SubMb   (GetListSel4SubMb         )--> GetSubMb;
+		GetListSel4SubMb   (GetSubMbInfo.Done        )--> GetListSel4Mb;
+
+		GetSubMb           (GetInterpSubMb.Launch8x8 )--> ReadInterpFor8x8;
+		GetSubMb           (GetInterpSubMb.Launch8x4 )--> ReadInterpFor8x4;
+		GetSubMb           (GetInterpSubMb.Launch4x8 )--> ReadInterpFor4x8;
+		GetSubMb           (GetInterpSubMb.Launch4x4 )--> ReadInterpFor4x4;
+		GetSubMb           (GetInterpSubMb.Done      )--> GetListSel4SubMb;
+
+		ReadInterpFor8x8   (ReadInterp.Launch        )--> ReadInterpFor8x8;
+		ReadInterpFor8x8   (ReadInterp.Done          )--> GetSubMb;
+
+		ReadInterpFor8x4   (ReadInterp.Launch        )--> ReadInterpFor8x4;
+		ReadInterpFor8x4   (ReadInterp.Done          )--> GetSubMb;
+
+		ReadInterpFor4x8   (ReadInterp.Launch        )--> ReadInterpFor4x8;
+		ReadInterpFor4x8   (ReadInterp.Done          )--> GetSubMb;
+
+		ReadInterpFor4x4   (ReadInterp.Launch        )--> ReadInterpFor4x4;
+		ReadInterpFor4x4   (ReadInterp.Done          )--> GetSubMb;
+
+		SendParameters     (SendParameters.Launch    )--> SendParameters;
+		SendParameters     (SendParameters.Done      )--> GetMbType;
 	end
 
 end
