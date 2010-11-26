@@ -112,6 +112,9 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
+        <Parameter name="PixWidthPerPartition">
+            <Expr kind="Literal" literal-kind="Integer" value="4"/>
+        </Parameter>
     </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->

@@ -16,7 +16,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.*;
 
-actor Algo_Interp_Reord()
+actor Algo_Interp_Reord(uint(size=8)PixWidthPerPartition)
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 	uint(size=2)  SelectList,
@@ -37,6 +37,9 @@ actor Algo_Interp_Reord()
 	uint(size=3) SubMbPartIdx;
 	uint(size=3) Size_SubMb;
 	uint(size=2) NbListToGet;
+
+	uint(size=4) x_idx;
+	uint(size=4) y_idx;
 
 	GetMbType: action
 			MbType :[MacroBlkType]
@@ -70,12 +73,11 @@ actor Algo_Interp_Reord()
 			SizeMb      = SZ_16x16,
 			NbListToGet > 0
 		do
-//			println("16x16");
-			foreach int i in 0 .. 15
+			foreach int j in 0 .. 15
 			do
-				foreach int j in 0 .. 15
+				foreach int i in 0 .. 15
 				do
-					ListInterp[i][j] := InterpolationValues[16*i + j];
+					ListInterp[i][j] := InterpolationValues[i + 16*j];
 				end
 			end
 			NbListToGet := NbListToGet - 1;
@@ -88,12 +90,11 @@ actor Algo_Interp_Reord()
 			SizeMb      = SZ_16x8,
 			NbListToGet > 0
 		do
-//			println("16x8");
-			foreach int i in 0 .. 7
+			foreach int j in 0 .. 7
 			do
-				foreach int j in 0 .. 15
+				foreach int i in 0 .. 15
 				do
-					ListInterp[i + 8*MbPartIdx][j] := InterpolationValues[16*i + j];
+					ListInterp[i][j + 8*MbPartIdx] := InterpolationValues[i + 16*j];
 				end
 			end
 			NbListToGet := NbListToGet - 1;
@@ -106,12 +107,11 @@ actor Algo_Interp_Reord()
 			SizeMb      = SZ_8x16,
 			NbListToGet > 0
 		do
-//			println("8x16");
-			foreach int i in 0 .. 15
+			foreach int j in 0 .. 15
 			do
-				foreach int j in 0 .. 7
+				foreach int i in 0 .. 7
 				do
-					ListInterp[i][j + 8*MbPartIdx] := InterpolationValues[8*i + j];
+					ListInterp[i + 8*MbPartIdx][j] := InterpolationValues[i + 8*j];
 				end
 			end
 			NbListToGet := NbListToGet - 1;
@@ -157,12 +157,11 @@ actor Algo_Interp_Reord()
 			Size_SubMb   = SZ_8x8,
 			NbListToGet > 0
 		do
-//			println("8x8");
-			foreach int i in 0 .. 7
+			foreach int j in 0 .. 7
 			do
-				foreach int j in 0 .. 7
+				foreach int i in 0 .. 7
 				do
-					ListInterp[i + 8*(MbPartIdx>>1)][j + 8*(MbPartIdx &1)] := InterpolationValues[8*i + j];
+					ListInterp[i + 8*(MbPartIdx &1)][j + 8*(MbPartIdx>>1)] := InterpolationValues[i + 8*j];
 				end
 			end
 			NbListToGet := NbListToGet - 1;
@@ -175,12 +174,11 @@ actor Algo_Interp_Reord()
 			Size_SubMb   = SZ_8x4,
 			NbListToGet > 0
 		do
-//			println("8x4");
-			foreach int i in 0 .. 3
+			foreach int j in 0 .. 3
 			do
-				foreach int j in 0 .. 7
+				foreach int i in 0 .. 7
 				do
-					ListInterp[i + 8*(MbPartIdx>>1) + 4*SubMbPartIdx][j + 8*(MbPartIdx &1)] := InterpolationValues[8*i + j];
+					ListInterp[i + 8*(MbPartIdx &1)][j + 8*(MbPartIdx>>1) + 4*SubMbPartIdx] := InterpolationValues[i + 8*j];
 				end
 			end
 			NbListToGet := NbListToGet - 1;
@@ -193,12 +191,11 @@ actor Algo_Interp_Reord()
 			Size_SubMb   = SZ_4x8,
 			NbListToGet > 0
 		do
-//			println("4x8");
-			foreach int i in 0 .. 7
+			foreach int j in 0 .. 7
 			do
-				foreach int j in 0 .. 3
+				foreach int i in 0 .. 3
 				do
-					ListInterp[i + 8*(MbPartIdx>>1)][j + 8*(MbPartIdx &1) + 4*SubMbPartIdx] := InterpolationValues[4*i + j];
+					ListInterp[i + 8*(MbPartIdx &1) + 4*SubMbPartIdx][j + 8*(MbPartIdx>>1)] := InterpolationValues[i + 4*j];
 				end
 			end
 			NbListToGet := NbListToGet - 1;
@@ -211,12 +208,11 @@ actor Algo_Interp_Reord()
 			Size_SubMb   = SZ_4x4,
 			NbListToGet > 0
 		do
-//			println("4x4");
-			foreach int i in 0 .. 3
+			foreach int j in 0 .. 3
 			do
-				foreach int j in 0 .. 3
+				foreach int i in 0 .. 3
 				do
-					ListInterp[i + 8*(MbPartIdx>>1) + 4*(SubMbPartIdx>>1)][j + 8*(MbPartIdx &1) + 4*(SubMbPartIdx&1)] := InterpolationValues[4*i + j];
+					ListInterp[i + 8*(MbPartIdx &1) + 4*(SubMbPartIdx&1)][j + 8*(MbPartIdx>>1) + 4*(SubMbPartIdx>>1)] := InterpolationValues[i + 4*j];
 				end
 			end
 			NbListToGet := NbListToGet - 1;
@@ -236,21 +232,34 @@ actor Algo_Interp_Reord()
 			MbPartIdx := MbPartIdx + 1;
 		end
 
-	SendParameters: action
-				==>
-			MbPred :[mb_pred] repeat 256
+	GetMbInfo.Done: action ==>
 		guard
 			MbPartIdx = MbPartIdxMax
-		var
-			List(type: int(size=16), size=256) mb_pred
 		do
-			foreach int i in 0 .. 15
-			do
-				foreach int j in 0 .. 15
-				do
-					mb_pred[16*i + j] := ListInterp[i][j];
-				end
+			x_idx := 0;
+			y_idx := 0;
+		end
+
+	SendParameters.Launch: action
+				==>
+			MbPred :[mb_pred]
+		guard
+			y_idx < 4*PixWidthPerPartition
+		var
+			int(size=16) mb_pred
+		do
+			mb_pred := ListInterp[x_idx][y_idx];
+			x_idx := x_idx + 1;
+			if(x_idx >= 4*PixWidthPerPartition)then
+				x_idx := 0;
+				y_idx := y_idx + 1;
 			end
+		end
+
+	SendParameters.Done: action
+				==>
+		guard
+			y_idx = 4*PixWidthPerPartition
 		end
 
 	schedule fsm GetMbType:
@@ -258,7 +267,7 @@ actor Algo_Interp_Reord()
 
 		GetListSel4Mb    (GetListSel4Mb            )--> GetMb;
 		GetListSel4Mb    (GetInterp.Launch8x8      )--> GetListSel4SubMb;
-		GetListSel4Mb    (SendParameters           )--> GetMbType;
+		GetListSel4Mb    (GetMbInfo.Done           )--> SendParameters;
 
 		GetMb            (GetInterp.Launch16x16    )--> GetMb;
 		GetMb            (GetInterp.Launch16x8     )--> GetMb;
@@ -273,6 +282,9 @@ actor Algo_Interp_Reord()
 		GetSubMb         (GetInterpSubMb.Launch4x8 )--> GetSubMb;
 		GetSubMb         (GetInterpSubMb.Launch4x4 )--> GetSubMb;
 		GetSubMb         (GetInterpSubMb.Done      )--> GetListSel4SubMb;
+
+		SendParameters   (SendParameters.Launch    )--> SendParameters;
+		SendParameters   (SendParameters.Done      )--> GetMbType;
 	end
 
 end
