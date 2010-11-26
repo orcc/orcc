@@ -258,6 +258,14 @@ $pattern.keys: outputPatternPort(); separator="\n"$
 if (ports != 0) {
 >>
 
+checkInputPatternPort(port) ::= <<
+fifo_$port.type$_has_tokens($instance.id$_$port$, $pattern.(port)$)
+>>
+
+checkInputPattern(pattern) ::= <<
+$pattern.keys: { port | $checkInputPatternPort(port)$ && }$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
@@ -267,7 +275,7 @@ i++;
 >>
 
 actionTest(action) ::= <<
-if (isSchedulable_$action$()) {
+if ($checkInputPattern(action.inputPattern)$isSchedulable_$action$()) {
 	$if(action.outputPattern)$
 	$outputPattern(pattern=action.outputPattern)$
 		si->num_firings = i;
@@ -309,7 +317,7 @@ goto l_$nextState.targetState$;
 >>
 
 actionTestState(nextState) ::= <<
-if (isSchedulable_$nextState.action$()) {
+if ($checkInputPattern(nextState.action.inputPattern)$isSchedulable_$nextState.action$()) {
 	$if(nextState.action.outputPattern)$
 	$outputPattern(nextState.action.outputPattern)$
 		_FSM_state = s_$transition.sourceState$;
