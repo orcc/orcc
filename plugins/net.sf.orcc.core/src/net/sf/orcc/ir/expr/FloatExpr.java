@@ -32,6 +32,7 @@ import java.math.BigDecimal;
 
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.impl.ExpressionImpl;
 
 /**
  * This class defines an integer expression.

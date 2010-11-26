@@ -34,6 +34,7 @@ import java.util.List;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.impl.ExpressionImpl;
 
 /**
  * This class defines a list expression. This kind of expression is only present

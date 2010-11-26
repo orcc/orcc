@@ -30,6 +30,7 @@ package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
+import net.sf.orcc.ir.impl.ExpressionImpl;
 
 /**
  * This class defines an expression that references a variable. The variable is

@@ -30,6 +30,7 @@ package net.sf.orcc.ir.expr;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Type;
+import net.sf.orcc.ir.impl.ExpressionImpl;
 
 /**
  * This class defines a unary expression.

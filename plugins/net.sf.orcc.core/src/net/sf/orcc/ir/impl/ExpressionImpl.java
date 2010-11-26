@@ -26,10 +26,13 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ir.expr;
+package net.sf.orcc.ir.impl;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.IrPackage;
+import net.sf.orcc.ir.expr.ExpressionInterpreter;
+import net.sf.orcc.ir.expr.ExpressionPrinter;
+import net.sf.orcc.ir.expr.ExpressionVisitor;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.impl.EObjectImpl;
@@ -66,7 +69,7 @@ public abstract class ExpressionImpl extends EObjectImpl implements Expression {
 	 */
 	@Override
 	protected EClass eStaticClass() {
-		return IrPackage.Literals.TYPE;
+		return IrPackage.Literals.EXPRESSION;
 	}
 
 	@Override
