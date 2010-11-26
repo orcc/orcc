@@ -66,27 +66,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MbPartHeigth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbPartIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbPartWidth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MV">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -320,9 +299,6 @@
     <Connection dst="" dst-port="Display_L" src="TEX_L" src-port="Display_L"/>
     <Connection dst="TEX_L" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="TEX_L" dst-port="MV" src="" src-port="MV"/>
-    <Connection dst="TEX_L" dst-port="MbPartHeigth" src="" src-port="MbPartHeigth"/>
-    <Connection dst="TEX_L" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
-    <Connection dst="TEX_L" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
     <Connection dst="TEX_L" dst-port="PartSZ" src="" src-port="PartSZ"/>
     <Connection dst="TEX_L" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="TEX_L" dst-port="POC" src="" src-port="POC"/>

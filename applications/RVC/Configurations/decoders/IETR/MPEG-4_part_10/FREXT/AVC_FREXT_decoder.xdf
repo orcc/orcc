@@ -184,10 +184,6 @@
     <Connection dst="" dst-port="Height" src="FUN_Parser" src-port="Height"/>
     <Connection dst="Decoding_Y" dst-port="POC" src="FUN_Parser" src-port="POC"/>
     <Connection dst="Decoding_Y" dst-port="PartSZ" src="FUN_Parser" src-port="PART_SZ"/>
-    <Connection dst="Decoding_Y" dst-port="MbPartHeigth"
-        src="FUN_Parser" src-port="MbPartHeigth"/>
-    <Connection dst="Decoding_Y" dst-port="MbPartWidth" src="FUN_Parser" src-port="MbPartWidth"/>
-    <Connection dst="Decoding_Y" dst-port="MbPartIdx" src="FUN_Parser" src-port="MbPartIdx"/>
     <Connection dst="Decoding_Y" dst-port="PicSizeInMb" src="FUN_Parser" src-port="PicSizeInMb"/>
     <Connection dst="Decoding_Y" dst-port="MV" src="FUN_Parser" src-port="MV"/>
     <Connection dst="Decode_U" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>

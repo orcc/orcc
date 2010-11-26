@@ -10,9 +10,6 @@
       <vertex id="ScalingList" x="18" y="724"/>
       <vertex id="PicWidthInMb" x="157" y="188"/>
       <vertex id="PicSizeInMb" x="157" y="285"/>
-      <vertex id="MbPartHeigth" x="490" y="638"/>
-      <vertex id="MbPartIdx" x="501" y="677"/>
-      <vertex id="MbPartWidth" x="499" y="715"/>
       <vertex id="MV" x="512" y="518"/>
       <vertex id="PartSZ" x="166" y="135"/>
       <vertex id="POC" x="166" y="426"/>

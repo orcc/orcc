@@ -31,27 +31,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="MbPartIdx">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="3"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbPartWidth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MbPartHeigth">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="5"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PicSizeInMb">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -430,9 +409,6 @@
     <Connection dst="Inter" dst-port="RD_L" src="Buffer_inter" src-port="RD"/>
     <Connection dst="Inter" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="Inter" dst-port="PartSZ" src="" src-port="PartSZ"/>
-    <Connection dst="Inter" dst-port="MbPartHeigth" src="" src-port="MbPartHeigth"/>
-    <Connection dst="Inter" dst-port="MbPartWidth" src="" src-port="MbPartWidth"/>
-    <Connection dst="Inter" dst-port="MbPartIdx" src="" src-port="MbPartIdx"/>
     <Connection dst="Select" dst-port="X2" src="Inter" src-port="MB4x4Pred_L"/>
     <Connection dst="Intra_4x4" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Intra_16x16" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
