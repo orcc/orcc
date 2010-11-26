@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
-   <vertices>
-      <vertex id="is" x="172" y="45"/>
-      <vertex id="halfpel" x="231" y="173"/>
-      <vertex id="framebuf" x="419" y="103"/>
-   </vertices>
+   <vertices/>
 </layout>
