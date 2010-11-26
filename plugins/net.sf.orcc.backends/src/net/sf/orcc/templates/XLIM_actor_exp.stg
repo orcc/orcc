@@ -689,7 +689,7 @@ schedulerFSM(actions, fsm) ::= <<
 parameters(parameters) ::= <<
 $parameters.keys: { k | 
 <stateVar name="$k$" sourceName="$k$">
-	<initValue size="$parameters.(k).type.size$" typeName="$parameters.(k).type$" value="$parameters.(k)$"/>
+	<initValue size="$if(parameters.(k).type.bool)$1$else$$parameters.(k).type.size$$endif$" typeName="$parameters.(k).type$" value="$parameters.(k)$"/>
 </stateVar>
 }$
 >>
