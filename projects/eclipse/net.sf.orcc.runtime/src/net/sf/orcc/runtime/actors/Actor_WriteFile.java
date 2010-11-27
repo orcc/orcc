@@ -34,11 +34,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import net.sf.orcc.runtime.Fifo;
+import net.sf.orcc.runtime.Fifo_boolean;
 import net.sf.orcc.runtime.Fifo_int;
 
 public class Actor_WriteFile implements IActor {
 
-	private Fifo_int fifo_IN;
+	private Fifo_int fifo_In;
+	private Fifo_boolean fifo_EOF;
 	
 	private String fileName;
 	private DataOutputStream out;
@@ -54,7 +56,7 @@ public class Actor_WriteFile implements IActor {
 	}
 
 	public String getNextSchedulableAction() {
-		if (fifo_IN.hasRoom(1)) {
+		if (fifo_In.hasRoom(1)) {
 			return "write";
 		}
 		return null;
@@ -71,10 +73,10 @@ public class Actor_WriteFile implements IActor {
 
 		do {
 			res = false;
-			if (out != null && fifo_IN.hasTokens(1)) {
+			if (out != null && fifo_In.hasTokens(1)) {
 				res = true;
-				int[] IN = fifo_IN.getReadArray(1);
-				int IN_Index = fifo_IN.getReadIndex(1);
+				int[] IN = fifo_In.getReadArray(1);
+				int IN_Index = fifo_In.getReadIndex(1);
 				try {
 					out.writeByte(IN[IN_Index]);
 				} catch (IOException e) {
@@ -82,7 +84,13 @@ public class Actor_WriteFile implements IActor {
 						+ fileName + "\"";
 					throw new RuntimeException(msg, e);
 				}
-				fifo_IN.readEnd(1);
+				fifo_In.readEnd(1);
+			} else if (out != null && fifo_EOF.hasTokens(1)) {
+				res = true;
+				fifo_EOF.getReadArray(1);
+				fifo_EOF.getReadIndex(1);
+//				close();
+				fifo_EOF.readEnd(1);
 			}
 		} while (res);
 
@@ -91,8 +99,10 @@ public class Actor_WriteFile implements IActor {
 
 	@Override
 	public void setFifo(String portName, Fifo fifo) {
-		if ("IN".equals(portName)) {
-			fifo_IN = (Fifo_int) fifo;
+		if ("In".equals(portName)) {
+			fifo_In = (Fifo_int) fifo;
+		} else if("EOF".equals(portName)) {
+			fifo_EOF = (Fifo_boolean) fifo;
 		}
 		else {
 			String msg = "unknown port \"" + portName + "\"";
