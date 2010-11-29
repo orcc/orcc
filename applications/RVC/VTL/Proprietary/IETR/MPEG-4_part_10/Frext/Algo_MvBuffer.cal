@@ -65,6 +65,8 @@ actor Algo_MvBuffer()
 	uint(size=13) CurrMbAddr,
 	uint(size=7)  PicWidthInMb,
 
+	bool          DirectPredL0,
+	bool          DirectPredL1,
 	uint(size=4)  RefIdxL0,
 	uint(size=4)  RefIdxL1,
 	int (size=16) MvL0,
@@ -547,15 +549,65 @@ actor Algo_MvBuffer()
 			end
 		end
 
-	GetBlockInfo.IsDirectOrB_Skip: action
-			RefIdxL0 :[ref_idx_l0],
-			RefIdxL1 :[ref_idx_l1],
-			MvL0     :[MvxL0,MvyL0],
-			MvL1     :[MvxL1,MvyL1]
+	GetBlockInfo.IsDirectOrB_Skip_PredL0: action
+			RefIdxL0     :[ref_idx_l0],
+			MvL0         :[MvxL0,MvyL0],
+			DirectPredL0 :[IsDirectPredL0],
+			DirectPredL1 :[IsDirectPredL1]
 				==>
 		guard
 			not IsPredL0,
-			not IsPredL1
+			not IsPredL1,
+			IsDirectPredL0,
+			not IsDirectPredL1
+		do
+			foreach int i in 0 .. NbPartitionsToWrite - 1
+			do
+				ListRefIdxL0[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := ref_idx_l0;
+				ListRefIdxL1[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := -1;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  MvxL0;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  MvyL0;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  0;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  0;
+			end
+		end
+
+	GetBlockInfo.IsDirectOrB_Skip_PredL1: action
+			RefIdxL1     :[ref_idx_l1],
+			MvL1         :[MvxL1,MvyL1],
+			DirectPredL0 :[IsDirectPredL0],
+			DirectPredL1 :[IsDirectPredL1]
+				==>
+		guard
+			not IsPredL0,
+			not IsPredL1,
+			not IsDirectPredL0,
+			IsDirectPredL1
+		do
+			foreach int i in 0 .. NbPartitionsToWrite - 1
+			do
+				ListRefIdxL0[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := -1;
+				ListRefIdxL1[WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]]     := ref_idx_l1;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  0;
+				ListMvL0    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  0;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][0]  :=  MvxL1;
+				ListMvL1    [WriteListIdx][Partition_Mbx[i]][Partition_Mby[i]][1]  :=  MvyL1;
+			end
+		end
+
+	GetBlockInfo.IsDirectOrB_Skip_BiPred: action
+			RefIdxL0     :[ref_idx_l0],
+			RefIdxL1     :[ref_idx_l1],
+			MvL0         :[MvxL0,MvyL0],
+			MvL1         :[MvxL1,MvyL1],
+			DirectPredL0 :[IsDirectPredL0],
+			DirectPredL1 :[IsDirectPredL1]
+				==>
+		guard
+			not IsPredL0,
+			not IsPredL1,
+			       IsDirectPredL0 and     IsDirectPredL1
+			or not IsDirectPredL0 and not IsDirectPredL1
 		do
 			foreach int i in 0 .. NbPartitionsToWrite - 1
 			do
