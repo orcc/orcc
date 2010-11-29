@@ -224,13 +224,13 @@ Peek(peek) ::= <<
 $if(peek.unit)
   $$
   if(peek.target.type.bool)
-$$peek.target$ := $peek.port$_data;$\n$$
+$$peek.target$ := $peek.port$_data;    -- peek$
   else
   $$
     if(peek.target.type.int)
-$$peek.target$ := to_integer(signed($peek.port$_data));$
+$$peek.target$ := to_integer(signed($peek.port$_data));    -- peek$
     else
-$$peek.target$ := to_integer(unsigned($peek.port$_data));$
+$$peek.target$ := to_integer(unsigned($peek.port$_data));    -- peek$
     endif
   $$
   endif
@@ -437,13 +437,6 @@ procedure(procedure, transformReturn) ::= <<
 $procedure.nodes: {$(it.class.simpleName)(it)$}$
 >>
 
-// prints the scheduler of the given action "inline" (ie not within a function)
-printActionSchedulerInline(action) ::= <<
-
--- test if "$action$" action is schedulable
-$procedure(procedure=action.scheduler, transformReturn="true")$
->>
-
 printLocals(procedure) ::= <<
 $if(procedure.locals.list)
 $$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$$
@@ -528,7 +521,15 @@ endif$
 $actor.templateData: {$it$}; separator=", "$
 >>
 
+// prints the scheduler of the given action "inline" (ie not within a function)
+printActionSchedulerInline(action) ::= <<
 
+-- test if "$action$" action is schedulable
+if(($action.inputPattern.keys :{port|$port.name$_send}; separator=" and "$) = '1') then
+  $procedure(procedure=action.scheduler, transformReturn="true")$
+end if;
+
+>>
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Execute process
 ///////////////////////////////////////////////////////////////////////////////
