@@ -86,14 +86,6 @@ actor Algo_MvBuffer()
 
 	int (size=32) SENT_DONE = -2;
 
-	List(type: List(type: uint(size=3), size=16), size=2) SubMbPartPredMode =
-		[
-			[DIRECT, PRED_L0, PRED_L1, BIPRED, PRED_L0, PRED_L0, PRED_L1, PRED_L1, BIPRED, BIPRED,
-			 PRED_L0, PRED_L1, BIPRED, NA, NA, NA],
-			[PRED_L0, PRED_L0, PRED_L0, PRED_L0, 0, 0, 0, 0, 0, 0,
-			 0, 0, 0, 0, 0, 0]
-		];
-
 	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdxL0;
 	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdxL1;
 	List(type: List(type: List(type: List(type: int(size=5), size=2), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListMvL0;
@@ -415,6 +407,10 @@ actor Algo_MvBuffer()
 			SizeSubMbMv     :=  SizeSubMbPart(mb_type,ValSubMbType);
 			IsPredL0        := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0;
 			IsPredL1        := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0;
+	//FIX ME !!!!
+			if(not IsPredL0 and not IsPredL1)then
+				IsPredL0 := true;
+			end
 		end
 
 	GetMbParametersFinished: action ==>

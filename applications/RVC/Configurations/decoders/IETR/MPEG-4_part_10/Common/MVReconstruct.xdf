@@ -344,4 +344,8 @@
         src="MvL1_Reconstr" src-port="DirectPredLX_Out"/>
     <Connection dst="MvComponentReord" dst-port="SelectList"
         src="SelectMvLX" src-port="SelectList"/>
+    <Connection dst="MvBuffer" dst-port="DirectPredL0"
+        src="MvL0_Reconstr" src-port="DirectPredLX_Out"/>
+    <Connection dst="MvBuffer" dst-port="DirectPredL1"
+        src="MvL1_Reconstr" src-port="DirectPredLX_Out"/>
 </XDF>

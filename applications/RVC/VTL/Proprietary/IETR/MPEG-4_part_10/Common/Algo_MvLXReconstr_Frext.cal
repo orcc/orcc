@@ -797,11 +797,11 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			sub_mb_type :[ValSubMbType]
 				==>
 	//Fix me!!
-	Location  :[Blk_x_in_pix,Blk_y_in_pix],
+			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 	MvOut     :[0,0],
 	RefIdxOut :[0],
-	NewPic_o  :[false],
-	DirectPredLX_Out :[true]
+	NewPic_o  :[false]//,
+	//DirectPredLX_Out :[true]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_8x8,
@@ -814,7 +814,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
 
 			println("GetMbType.Direct_8x8 not implemented yet !!");
-			while true do end
 
 			MbPartIdx := MbPartIdx + 1;
 		end
