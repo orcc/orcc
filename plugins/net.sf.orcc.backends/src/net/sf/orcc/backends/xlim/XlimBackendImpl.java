@@ -45,7 +45,6 @@ import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
-import net.sf.orcc.backends.xlim.transformations.ChangeActionSchedulerFormTransformation;
 import net.sf.orcc.backends.xlim.transformations.FirstPhiValuesOfWhileNodeTransformation;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
@@ -93,8 +92,7 @@ public class XlimBackendImpl extends AbstractBackend {
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(),
 				new FirstPhiValuesOfWhileNodeTransformation(),
-				new MoveLiteralIntegers(), new VariableRenamer(),
-				new ChangeActionSchedulerFormTransformation() };
+				new MoveLiteralIntegers(), new VariableRenamer() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

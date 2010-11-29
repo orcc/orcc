@@ -56,9 +56,6 @@ $instance.actor.inputs.list: {port|$actorPort(port=port, dir="in")$}; separator=
 $instance.actor.outputs.list: {port|$actorPort(port=port, dir="out")$}; separator="\n"$
 >>
 
-internalPorts() ::= <<
->>
-
 ///////////////////////////////////////////////////////////////////////////////
 // State Variables
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,6 +126,23 @@ $else$
 </operation>
 $endif$
 >>
+
+///////////////////////////////////////////////////////////////////////////////
+// XLIM Port
+///////////////////////////////////////////////////////////////////////////////
+
+port(dir, type, source) ::= <<
+$if (!type)
+$<port dir="$dir$" source="$source$"/>$
+else
+$$if(!type.list || source.global)
+$<port dir="$dir$" size="$if (type.bool)$1$else$$type.size$$endif$" source="$source$" typeName="$type$"/>$
+else
+$<port dir="$dir$" source="$source$" typeName="$source$_typedef"/>$
+endif$$
+endif$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
@@ -152,17 +166,6 @@ Decrement(decrement) ::= <<
 <!-- TODO decrement -->
 >>
 
-HasTokens(hasTokens) ::= <<
-<operation kind="\$literal_Integer" value="$hasTokens.numTokens$">
-	<port dir="out" size="32" source="$hasTokens.target$_tokenCount" typeName="int"/>
-</operation>
-<operation kind="\$ge">
-	<port dir="in" source="$hasTokens.port$_pinAvail"/>
-	<port dir="in" source="$hasTokens.target$_tokenCount"/>
-	$port(dir="out", type=hasTokens.target.type, source=hasTokens.target)$
-</operation>
->>
-
 Increment(increment) ::= <<
 <!-- TODO increment -->
 >>
@@ -176,19 +179,6 @@ Peek(peek) ::= <<
 	$port(dir="out", type=peek.port.type, source=peek.target)$
 </operation>
 >>
-
-port(dir, type, source) ::= <<
-$if (!type)
-$<port dir="$dir$" source="$source$"/>$
-else
-$$if(!type.list || source.global)
-$<port dir="$dir$" size="$if (type.bool)$1$else$$type.size$$endif$" source="$source$" typeName="$type$"/>$
-else
-$<port dir="$dir$" source="$source$" typeName="$source$_typedef"/>$
-endif$$
-endif$
->>
-
 
 Read(op) ::= <<
 <operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
@@ -310,8 +300,6 @@ $type.dimensions:{dimension|
 </operation>}$
 >>
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
@@ -345,7 +333,6 @@ $NotphiNodes.instructions: PrintNotPhi()$
 >>
 
 IfNode(ifNode) ::= <<
-
 <module kind="if">
 	<module decision="decision_$ifNode.value$_$ifNode.location.startLine$_$ifNode.location.startColumn$" kind="test">
 		<operation kind="noop">
@@ -464,25 +451,28 @@ action(action) ::= <<
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
 
-outputPatternPort(port, index, index0, state) ::= <<
-<!--  OutputPattern -->
+
+// Input and output pattern
+
+patternPort(dir, port, index, index0, state) ::= <<
+<!--  $dir$putPattern -->
 <operation kind="\$literal_Integer" value="$pattern.(port)$">
-	<port dir="out" size="32" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount" typeName="int"/>
+	<port dir="out" size="32" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount" typeName="int"/>
 </operation>
 <operation kind="\$ge">
 	<port dir="in" source="$port$_pinAvail"/>
-	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount"/>
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
+	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount"/>
+	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
 </operation>
 
 <operation kind="\$and">
-	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_$port$"/>
-	<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index0$"/>
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$" typeName="bool"/>
+	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_$port$"/>
+	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_res_$index0$"/>
+	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_res_$index$" typeName="bool"/>
 </operation>
 >>
 
-outputPatternPortDecision(index,state)::=<<
+outputPatternDecision(index, state)::=<<
 <module kind="if">
 	<module decision="outputPattern_$instance.id$_$action.name$_decision_s_$state$_$index$" kind="test">
 		<operation kind="noop">
@@ -492,14 +482,33 @@ outputPatternPortDecision(index,state)::=<<
 	</module>
 >>
 
-outputPattern(pattern,action,state) ::= <<
-<operation kind="\$literal_Integer" value="1">
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_0" typeName="bool"/>
+inputPatternDecision(index)::=<<
+<operation kind="noop">
+  <port dir="in" source="inputPattern_$instance.id$_$action.name$_s__res_$index$"/>
+  <port dir="out" size="1" source="inputPattern_$instance.id$_$action.name$_decision" typeName="bool"/>
 </operation>
-$pattern.keys: {port | $outputPatternPort(port=port, index=i, index0=i0, state=state)$}; separator="\n"$
-<!-- Last outputPattern -->
-$outputPatternPortDecision(index=length(pattern.keys),state=state); separator="\n"$
 >>
+
+pattern(dir, pattern, action, state) ::= <<
+<operation kind="\$literal_Integer" value="1">
+	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_res_0" typeName="bool"/>
+</operation>
+$pattern.keys: {port | $patternPort(dir=dir, port=port, index=i, index0=i0, state=state)$}; separator="\n"$
+>>
+
+outputPattern(pattern, action, state) ::= <<
+$pattern(dir="out", pattern=pattern, action=action, state=state)$
+<!-- Last outputPattern -->
+$outputPatternDecision(index=length(pattern.keys),state=state); separator="\n"$
+>>
+
+inputPattern(pattern, action) ::= <<
+$pattern(dir="in", pattern=pattern, action=action)$
+<!-- Last inputPattern -->
+$inputPatternDecision(index=length(pattern.keys)); separator="\n"$
+>>
+
+// Pin Available declaration
 
 declarePinAvailableVariable(port) ::= <<
 <operation kind="pinAvail" portName="$port$">
@@ -518,7 +527,7 @@ actionTest(action) ::= <<
 <module kind="if">
 	<module decision="isSchedulable_$action$" kind="test">
 		<operation kind="noop">
-			<port dir="in" source="isSchedulable_$action$_go"/>
+			<port dir="in" source="isSchedulable_$action$_goWithToken"/>
 			<port dir="out" size="1" source="isSchedulable_$action$" typeName="bool"/>
 		</operation>
 	</module>
@@ -559,6 +568,7 @@ scheduler(actions) ::= <<
       $instance.actor.outputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
     
 			$instance.actor.actions: isSchedulableTest(); separator="\n"$
+			$instance.actor.actions: inputPatternTest()$
 			$if(actions)$$schedulingTest(actions)$$endif$
 			<!--Close modules -->
 			$if(actions)$  	 	 
@@ -582,7 +592,7 @@ actionTestState(nextState) ::= <<
 <module kind="if">
 	<module decision="isSchedulable_$nextState.action$_$transition.sourceState$" kind="test">
 		<operation kind="noop">
-			<port dir="in" source="isSchedulable_$nextState.action$_go"/>
+			<port dir="in" source="isSchedulable_$nextState.action$_goWithToken"/>
 			<port dir="out" size="1" source="isSchedulable_$nextState.action$_$transition.sourceState$" typeName="bool"/>
 		</operation>
 	</module>
@@ -628,6 +638,22 @@ isSchedulableTest(action) ::= <<
 $procedure(action.scheduler)$
 >>
 
+inputPatternTest(action) ::= <<
+$if(action.inputPattern)$
+$inputPattern(pattern=action.inputPattern,action=action)$
+<operation kind="\$and">
+  <port dir="in" source="inputPattern_$instance.id$_$action$_decision"/>
+  <port dir="in" source="isSchedulable_$action$_go"/>
+  <port dir="out" size="1" source="isSchedulable_$action$_goWithToken" typeName="bool"/>
+</operation>
+$else$
+<operation kind="noop">
+  <port dir="in" source="isSchedulable_$action$_go"/>
+  <port dir="out" size="1" source="isSchedulable_$action$_goWithToken" typeName="bool"/>
+</operation>
+$endif$
+>>
+
 Transitions(actions, transitions) ::= <<
 <!-- All transitions -->
 $transitions:{transition | $Transition(transition=transition)$}; separator="\n"$
@@ -661,13 +687,15 @@ schedulerFSM(actions, fsm) ::= <<
 			</operation>
 		</module>
 		<module kind="body">
-		  <!-- Make all pinAvail call -->
+		  <!-- PinAvail call -->
 		  $instance.actor.inputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
       $instance.actor.outputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
     
 			<!-- All Schedulable expressions -->
 			$instance.actor.actions: isSchedulableTest()$
-			<!--untagged actions -->
+			$instance.actor.actions: inputPatternTest()$
+			
+			<!-- Untagged actions -->
 			$if(actions)$  	 	 
 			$schedulingTest(actions)$  	 	 
 			$endif$ 
@@ -702,7 +730,6 @@ PrintHierarchicalPath(path) ::= <<
 $path; separator="/"$
 >>
 
-
 design() ::= <<
 <!-- /$first(instance.hierarchicalClass)$/$PrintHierarchicalPath(instance.hierarchicalId)$ -->
 <!-- Source file is "$instance.actor.file$" -->
@@ -724,4 +751,3 @@ instance(instance, options) ::= <<
 <?xml version="1.0" encoding="UTF-8"?>
 $design()$
 >>
-
