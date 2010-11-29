@@ -94,7 +94,7 @@ doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 
 fifo_$count$ : entity work.fifo_top 
 generic map (
-depth => $if(size)$$size$$else$1$endif$,
+depth => $if(edge.size)$$edge.size$$else$1$endif$,
 $if(targetPort.type.bool)
 $width => 1)$
 else

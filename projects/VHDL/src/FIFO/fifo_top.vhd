@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-11-24
+-- Last update: 2010-11-29
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -62,11 +62,13 @@ entity fifo_top is
       wr_data  : in  std_logic;
       data_in  : in  std_logic_vector (width -1 downto 0);
       wr_rdy   : out std_logic;
+      wr_ack   : out std_logic;
       --
       rd_clk   : in  std_logic;
       send     : out std_logic;
       data_out : out std_logic_vector (width -1 downto 0);
-      rd_rdy   : in  std_logic);
+      rd_rdy   : in  std_logic;
+      rd_ack   : in  std_logic);
 end fifo_top;
 
 
@@ -102,17 +104,10 @@ begin
   end generate;
 
   create_link : if depth = 1 generate
-    arbiter_1 : entity work.arbiter
-      generic map (
-        width => width)
-      port map (
-        wr_data  => wr_data,
-        data_in  => data_in,
-        wr_rdy   => wr_rdy,
-        send     => send,
-        data_out => data_out,
-        rd_rdy   => rd_rdy);
-
+  send     <= wr_data;
+  data_out <= data_in;
+  wr_rdy   <= rd_rdy;
+  wr_ack <= rd_ack;
   end generate;
 
 

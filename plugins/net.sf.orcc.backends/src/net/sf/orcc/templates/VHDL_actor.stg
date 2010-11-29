@@ -198,11 +198,6 @@ endif
 $
 >>
 
-HasTokens(hasTokens) ::= <<
-
-$hasTokens.target$ := $hasTokens.port$_send;
->>
-
 Load(load) ::= <<
 
 $if(load.indexes)
@@ -526,6 +521,8 @@ $, $
 endif$
 $action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$$
 if(action.outputPattern.keys && actor.templateData)
+$, $
+elseif(action.inputPattern.keys && actor.templateData)
 $, $
 endif$
 $actor.templateData: {$it$}; separator=", "$
