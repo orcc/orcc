@@ -37,6 +37,7 @@
 
 //------------------------------
 #include "llvm/Constants.h"
+#include "llvm/DerivedTypes.h"
 #include "llvm/GlobalVariable.h"
 
 #include "Jade/Core/Instance.h"
@@ -134,7 +135,18 @@ void Instance::solveParameters(){
 		llvm::GlobalVariable* variable = parameter->getGlobalVariable();
 		itValues = parameterValues->find(itParameter->first);
 		Expr* expr = itValues->second;
-		ConstantInt* value = cast<ConstantInt>(expr->getConstant());
+		Constant* value = NULL;
+
+		if (expr->isIntExpr()){
+			//Get corresponding parameter value with the correct size
+			GlobalVariable* GV = cast<GlobalVariable>(variable);
+			const Type* type = GV->getType()->getElementType();	
+
+			value = ConstantInt::get(type, expr->evaluateAsInteger());
+		}else{
+			value = expr->getConstant();
+		}
+
 		variable->setInitializer(value);
 	}
 }

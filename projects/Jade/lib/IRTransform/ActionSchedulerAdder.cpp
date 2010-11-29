@@ -234,6 +234,7 @@ void ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, BasicBlock* 
 }
 
 BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, Function* function){
+	map<Port*, ConstantInt*>::iterator it;
 	string name = action->getName();
 	string skipBrName = "skip_";
 	string hasRoomBrName = "hasroom_";
@@ -249,13 +250,25 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 	// Add a basic block to bb for ski instructions
 	BasicBlock* skipBB = BasicBlock::Create(Context, skipBrName, function);
 
+	//Test if tokens are available on input
+	map<Port*, ConstantInt*>* inputPattern = action->getInputPattern();
+
+	if (!inputPattern->empty()){
+		std::list<Value*>::iterator itValue;
+		std::list<Value*> values;
+
+		for ( it=inputPattern->begin() ; it != inputPattern->end(); it++ ){
+
+		}
+
+	}
+
 	//Test firing condition of an action
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  BB);
 	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, callInst, BB);
 
-	//Test if rooms are available on ouput
-	map<Port*, ConstantInt*>::iterator it;
+	//Test if rooms are available on output
 	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
 	
 	if (!outputPattern->empty()){
