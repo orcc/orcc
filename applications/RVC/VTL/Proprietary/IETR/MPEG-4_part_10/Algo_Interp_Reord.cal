@@ -46,6 +46,8 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 	uint(size=4) x_idx;
 	uint(size=4) y_idx;
 
+	bool IsBiPred;
+
 	GetMbType: action
 			MbType :[MacroBlkType]
 				==>
@@ -69,6 +71,7 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 				else
 					2
 				end;
+			IsBiPred := (list_selected = BIPRED);
 		end
 
 	GetInterp.Launch16x16: action ==>
@@ -264,7 +267,11 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 		guard
 			ReadIdx < NbValueToRead
 		do
-			ListInterp[TabX_Out[ReadIdx]][TabY_Out[ReadIdx]] := InterpolationValue;
+			if(IsBiPred and NbListToGet = 0)then
+				ListInterp[TabX_Out[ReadIdx]][TabY_Out[ReadIdx]] := (ListInterp[TabX_Out[ReadIdx]][TabY_Out[ReadIdx]] + InterpolationValue + 1) >> 1;
+			else
+				ListInterp[TabX_Out[ReadIdx]][TabY_Out[ReadIdx]] := InterpolationValue;
+			end
 			ReadIdx := ReadIdx + 1;
 		end
 
