@@ -157,6 +157,10 @@ cl::opt<int> FifoSize("default-fifo-size",
          cl::desc("Defaut size of fifos"),
          cl::init(10000));
 
+cl::opt<int> StopAt("stop-at-frame",
+         cl::desc("Stop decoder after a given number of frame decoded."),
+         cl::init(0));
+
 cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations available:"));
 
 void clean_exit(int sig){

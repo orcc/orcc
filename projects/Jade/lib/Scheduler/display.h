@@ -30,6 +30,8 @@
 #include <sys/stat.h>
 #include "SDL.h"
 
+#include "llvm/Support/CommandLine.h"
+
 static SDL_Surface *m_screen;
 static SDL_Overlay *m_overlay = NULL;
 
@@ -51,6 +53,8 @@ static int m_height;
 static unsigned char img_buf_y[MAX_WIDTH * MAX_HEIGHT];
 static unsigned char img_buf_u[MAX_WIDTH * MAX_HEIGHT / 4];
 static unsigned char img_buf_v[MAX_WIDTH * MAX_HEIGHT / 4];
+
+extern llvm::cl::opt<int> StopAt;
 
 //Exit function of the decoder
 void (*exit_decoder)(int);
@@ -114,11 +118,11 @@ void display_show_image(void) {
 		t = t2;
 		num_images_start = num_images_end;
 	}
-/*
-	if (num_images_end > 100){
+
+	if (num_images_end == StopAt){
 		exit(1);
 	}
-*/
+
 	/* Grab all the events off the queue. */
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
