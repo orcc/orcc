@@ -38,9 +38,9 @@
       <vertex id="MacroBlockType" x="1705" y="809"/>
       <vertex id="TransformSize8x8" x="1738" y="1406"/>
       <vertex id="PocToDisplay" x="1846" y="1821"/>
-      <vertex id="PocToRead" x="2866" y="793"/>
-      <vertex id="ReadAddress_l" x="2853" y="857"/>
-      <vertex id="ReadAddress_c" x="2853" y="825"/>
+      <vertex id="PocToRead" x="2700" y="1101"/>
+      <vertex id="ReadAddress_l" x="2858" y="838"/>
+      <vertex id="ReadAddress_c" x="2859" y="808"/>
       <vertex id="MbType4Pred" x="1714" y="854"/>
       <vertex id="SelectList" x="2570" y="720"/>
       <vertex id="SubMbType" x="1752" y="1282"/>

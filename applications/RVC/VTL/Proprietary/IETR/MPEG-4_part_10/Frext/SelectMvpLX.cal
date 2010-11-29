@@ -168,7 +168,7 @@ actor SelectMvpLX()
 				==>
 			MvOut      :[MvxL0,MvyL0 , MvxL1,MvyL1],
 			RefIdxOut  :[ref_idxL0 , ref_idxL1],
-			Location   :[Mbx_in_pixL0,Mby_in_pixL0],
+			Location   :[Mbx_in_pixL0,Mby_in_pixL0 , Mbx_in_pixL1,Mby_in_pixL1],
 			SelectList :[BIPRED]
 		guard
 			MbPartIdx < MbPartIdxMax,
@@ -233,7 +233,7 @@ actor SelectMvpLX()
 				==>
 			MvOut        :[Mvxl0,Mvyl0 , Mvxl1,Mvyl1],
 			RefIdxOut    :[ref_idxl0 , ref_idxl1],
-			Location     :[Mbx_in_pixl0,Mby_in_pixl0],
+			Location     :[Mbx_in_pixl0,Mby_in_pixl0 , Mbx_in_pixl1,Mby_in_pixl1],
 			SelectList   :[BIPRED]
 		guard
 			MbPartIdx < MbPartIdxMax,
@@ -315,6 +315,7 @@ actor SelectMvpLX()
 			IsSubPredL0 and IsSubPredL1
 		do
 			println("In SelectMvpLX SubMacroBlkType.IsBiPred");
+			while true do end
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 

@@ -23,58 +23,18 @@ import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.* ;
 actor Mgnt_InterPred()
 	uint(size=6)  PartSZ,
 	int (size=16) MV,
-	uint(size=11) Location,
-	uint(size=32) Poc2Read,
-	uint(size=2)  SelectList
+	uint(size=11) Location
 		==>
 	int (size=12) ReadAddr_l,
-	int (size=12) ReadAddr_c,
-	uint(size=32) PocToRead
+	int (size=12) ReadAddr_c
 		:
 
-	int(size=32) x;
-	int(size=32) y;
-	uint(size=2) NbListToRead;
-
-
-	get_pos: action
-			Location   :[ a, b ],
-			SelectList :[ list_selected ]
-				==>
-		do
-			x      := a;
-			y      := b;
-			NbListToRead :=
-				if(list_selected != BIPRED)then
-					1
-				else
-					2
-				end;
-		end
-
-	get_mv.Launch: action
+	ComputeReadAddr: action
+			Location   :[ loc_x , loc_y ],
 			PartSZ     :[ width , height ],
-			Poc2Read :[ poc_to_read ],
-			MV       :[ mx, my ]
+			MV         :[ mx, my ]
 				==>
-			PocToRead  :[ poc_to_read ],
-			ReadAddr_l :[ x + rshift(mx, 2) - 2     , y + rshift(my, 2) - 2     , width + 5     , height + 5 ],
-			ReadAddr_c :[ x/2 + rshift(mx, 3) , y/2 + rshift(my, 3) , width / 2 + 1 , height / 2 + 1 ]
-		guard
-			NbListToRead > 0
-		do
-			NbListToRead := NbListToRead - 1;
+			ReadAddr_l :[ loc_x + rshift(mx, 2) - 2     , loc_y + rshift(my, 2) - 2     , width + 5     , height + 5 ],
+			ReadAddr_c :[ loc_x/2 + rshift(mx, 3) , loc_y/2 + rshift(my, 3) , width / 2 + 1 , height / 2 + 1 ]
 		end
-
-	get_mv.Done: action ==>
-		guard
-			NbListToRead = 0
-		end
-
-	schedule fsm get_pos :
-		get_pos (get_pos       )--> get_mv;
-
-		get_mv  (get_mv.Launch )--> get_mv;
-		get_mv  (get_mv.Done   )--> get_pos;
-	end
 end

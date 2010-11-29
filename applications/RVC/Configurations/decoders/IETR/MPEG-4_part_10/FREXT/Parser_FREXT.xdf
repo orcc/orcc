@@ -688,14 +688,10 @@
         src="MVReconstruct" src-port="PartSZ"/>
     <Connection dst="Mgnt_InterPred" dst-port="Location"
         src="MVReconstruct" src-port="LOCATION"/>
-    <Connection dst="Mgnt_InterPred" dst-port="Poc2Read"
-        src="SelectRefIdx" src-port="PocToRead"/>
-    <Connection dst="" dst-port="PocToRead" src="Mgnt_InterPred" src-port="PocToRead"/>
     <Connection dst="" dst-port="ReadAddress_l" src="Mgnt_InterPred" src-port="ReadAddr_l"/>
     <Connection dst="" dst-port="ReadAddress_c" src="Mgnt_InterPred" src-port="ReadAddr_c"/>
-    <Connection dst="Mgnt_InterPred" dst-port="SelectList"
-        src="MVReconstruct" src-port="SelectList"/>
     <Connection dst="" dst-port="MbType4Pred" src="DecodePic" src-port="MbType4Pred"/>
     <Connection dst="" dst-port="SelectList" src="MVReconstruct" src-port="SelectList"/>
     <Connection dst="" dst-port="SubMbType" src="DecodePic" src-port="SubMbType"/>
+    <Connection dst="" dst-port="PocToRead" src="SelectRefIdx" src-port="PocToRead"/>
 </XDF>
