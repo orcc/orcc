@@ -240,7 +240,7 @@ public final class STPrinter {
 			throws IOException {
 		long lastModified = getLastModifiedHierarchy(instance);
 
-		if (instance.isActor() && !instance.getActor().isSystem()) {
+		if (instance.isNetwork() ||(instance.isActor() && !instance.getActor().isSystem())) {
 			// if source file is older than target file, do not generate
 			File targetFile = new File(fileName);
 			long targetLastModified = targetFile.lastModified();
