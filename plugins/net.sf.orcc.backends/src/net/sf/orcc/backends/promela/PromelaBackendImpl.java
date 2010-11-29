@@ -44,6 +44,7 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
+import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.network.Network;
 
 /**
@@ -72,7 +73,8 @@ public class PromelaBackendImpl extends AbstractBackend {
 		ActorTransformation[] transformations = { 
 				new DeadCodeElimination(),
 				new DeadVariableRemoval(false),
-				new GuardsExtractor(guards, peeks) };
+				new GuardsExtractor(guards, peeks),
+				new PhiRemoval()};
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);

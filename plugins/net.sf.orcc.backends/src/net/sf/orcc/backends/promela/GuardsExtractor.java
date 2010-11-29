@@ -60,7 +60,7 @@ public class GuardsExtractor extends AbstractActorTransformation {
 	private Action currAction;
 
 	private Map<Action, List<Expression>> guards;
-	
+
 	private Map<Action, List<Peek>> peeks;
 
 	private List<Expression> list;
@@ -69,7 +69,8 @@ public class GuardsExtractor extends AbstractActorTransformation {
 
 	private List<Peek> peekList;
 
-	public GuardsExtractor(Map<Action, List<Expression>> guards, Map<Action, List<Peek>> peeks) {
+	public GuardsExtractor(Map<Action, List<Expression>> guards,
+			Map<Action, List<Peek>> peeks) {
 		this.guards = guards;
 		this.peeks = peeks;
 	}
@@ -118,10 +119,8 @@ public class GuardsExtractor extends AbstractActorTransformation {
 			replaceVarInExpr(((BinaryExpr) expr).getE2(), ld);
 		} else if (expr.isVarExpr()) {
 			if (((VarExpr) expr).getVar().getVariable() == ld.getTarget()) {
-				((VarExpr) expr).setVar(ld.getSource()); // Here I modify the
-															// model.. Should we
-															// work with a
-															// copy??
+				// Here I modify the model.. Should we work with a copy??
+				((VarExpr) expr).setVar(ld.getSource());
 			}
 		}
 	}
@@ -174,24 +173,23 @@ public class GuardsExtractor extends AbstractActorTransformation {
 			}
 		}
 	}
-	
 
-	@Override
-	public void visit(Load load) { 
-		loads.add(load);
-	}
-
-	@Override
-	public void visit(Peek peek) {
-		peekList.add(peek); // we need the peek instructions "outside" the guards, some guards depend on peeks
-	}
-	
 	@Override
 	public void visit(Assign assign) {
 		// we should also consider other cases but this is enough for now
 		if (!assign.getValue().isBooleanExpr()) {
 			list.add(assign.getValue());
 		}
+	}
+
+	@Override
+	public void visit(Load load) {
+		loads.add(load);
+	}
+
+	@Override
+	public void visit(Peek peek) {
+		peekList.add(peek); 
 	}
 
 }

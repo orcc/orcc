@@ -58,6 +58,139 @@ StringExpr(constant) ::= <<
 "$constant$"
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// Instructions
+///////////////////////////////////////////////////////////////////////////////
+
+Assign(assign) ::= <<
+
+$assign.target$ = $assign.value$;
+>>
+
+PrintFormatType(type) ::= <<
+$if (type.bool)
+$i$
+elseif (type.float)
+$f$
+elseif (type.int)
+$$if (type.long)$ll$endif$i$
+elseif (type.list)
+$p$
+elseif (type.string)
+$s$
+elseif (type.uint)
+$$if (type.long)$ll$endif$u$
+elseif (type.void)
+$p$
+endif$
+>>
+
+PrintFormat(parameter) ::= <<
+$if (parameter.stringExpr)
+$"$parameter$"$
+else
+$ "%$PrintFormatType(parameter.type)$" $
+endif$
+>>
+
+PrintParameter(parameter) ::= <<
+$if (!parameter.stringExpr)$, $parameter$$endif$
+>>
+
+Call(call) ::= <<
+ERROR this must be removed
+>>
+
+Decrement(decrement) ::= <<
+
+$decrement.target$--;
+>>
+
+Increment(increment) ::= <<
+
+$increment.target$++;
+>>
+
+Load(load) ::= <<
+
+$load.target$ = $load.source$$load.indexes : {[$it$]}$;
+>>
+
+Peek(peek) ::= <<
+$peek.port$?<$peek.target$>;
+>>
+
+Read(read) ::= <<
+
+$if (read.target)$
+$read.port$?$read.target$;
+$endif$
+>>
+
+
+Return(return) ::= <<
+$if(return.value)$
+return $return.value$;$
+endif$
+>>
+
+SelfAssignment(selfAssign) ::= <<
+
+$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
+>>
+
+Store(store) ::= <<
+
+$store.target$$store.indexes : {[$it$]}$ = $store.value$;
+>>
+
+Write(write) ::= <<
+
+chan_$write.port$!$write.target$;
+>>
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Nodes 
+///////////////////////////////////////////////////////////////////////////////
+
+instructions(instructions) ::= <<
+$instructions: {$(it.class.simpleName)(it)$}$
+>>
+
+nodes(nodes) ::= <<
+$nodes: {$(it.class.simpleName)(it)$}$
+>>
+
+// if node
+BlockNode(blockNode) ::= <<
+$instructions(blockNode.instructions)$
+>>
+
+// if node
+IfNode(ifNode) ::= <<
+
+if 
+:: ($ifNode.value$) ->
+	$nodes(ifNode.thenNodes)$
+}$if(ifNode.elseNodes)$ else ->
+	$nodes(ifNode.elseNodes)$
+}$endif$
+$BlockNode(ifNode.joinNode)$
+>>
+
+// while node
+WhileNode(whileNode) ::= <<
+
+do 
+:: $whileNode.value$ ->
+	$nodes(whileNode.nodes)$
+:: else -> break;
+od
+}
+$BlockNode(whileNode.joinNode)$
+>>
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,7 +232,7 @@ schedulerFSM(action) ::= <<
 	$guardFSM()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
 	-> 
 	$inputPattern(action.inputPattern)$
-	$action.body.CFG$
+	$action.body.nodes: {$(it.class.simpleName)(it)$}$
 	$outputPattern(action.outputPattern)$
 	state = $fsm_nsi.targetState$;
 }
@@ -123,6 +256,7 @@ scheduler(action) ::= <<
 	$guard()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
 	-> 
 	$inputPattern(action.inputPattern)$
+	$action.body.nodes: {$(it.class.simpleName)(it)$}$
 	$outputPattern(action.outputPattern)$
 }	
 >>
