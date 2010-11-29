@@ -216,6 +216,22 @@ private:
 	 */
 	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
 
+
+	/**
+	 * @brief Creates a hasToken test for a Port
+	 * 
+	 * @param port : the Port to test
+	 *
+	 * @param BB : llvm::BasicBlock where test is add
+	 *
+	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 *
+	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 *
+	 * @param function : llvm::Function where the test is added
+	 */
+	llvm::CallInst* createInputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
 	/**
 	 * @brief Creates switcth instruction for the FSM
 	 * 

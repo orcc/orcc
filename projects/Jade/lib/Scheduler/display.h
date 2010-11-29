@@ -114,11 +114,11 @@ void display_show_image(void) {
 		t = t2;
 		num_images_start = num_images_end;
 	}
-
+/*
 	if (num_images_end > 100){
 		exit(1);
 	}
-
+*/
 	/* Grab all the events off the queue. */
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {

@@ -250,6 +250,8 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 	// Add a basic block to bb for ski instructions
 	BasicBlock* skipBB = BasicBlock::Create(Context, skipBrName, function);
 
+
+	
 	//Test if tokens are available on input
 	map<Port*, ConstantInt*>* inputPattern = action->getInputPattern();
 
@@ -258,15 +260,34 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 		std::list<Value*> values;
 
 		for ( it=inputPattern->begin() ; it != inputPattern->end(); it++ ){
-
+			Value* hasTokenValue = createInputTest(it->first, it->second, BB);
+			TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
+			values.push_back(truncTokenInst);
 		}
 
+		itValue=values.begin();
+		Value* value1 = *itValue;
+		for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
+			Value* value2 = *itValue;
+			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", BB);
+		}
+
+		// Add a basic block hasToken that test the isSchedulable of a function
+		string hasTokenBrName = "hasToken_";
+		hasTokenBrName.append(name);
+		BasicBlock* tokenBB = BasicBlock::Create(Context, hasTokenBrName, function);
+
+		//Finally branch fire to hasToken block if all inputs have tokens
+		BranchInst* brInst = BranchInst::Create(tokenBB, skipBB, value1, BB);
+		BB = tokenBB;
 	}
 
 	//Test firing condition of an action
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  BB);
 	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, callInst, BB);
+
+
 
 	//Test if rooms are available on output
 	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
@@ -342,6 +363,19 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 	return callInst;
 }
 
+CallInst* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numTokens, BasicBlock* BB){
+	//Load selected port
+	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
+	
+	//Call hasRoom function
+	AbstractFifo* fifo = decoder->getFifo();
+	Function* hasTokenFn = fifo->getHasTokenFunction(port->getType());
+	Value* hasTokenArgs[] = { loadPort, numTokens};
+	CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs, hasTokenArgs+2,"",  BB);
+
+	return callInst;
+}
+
 void ActionSchedulerAdder::createSwitchTransition(Value* stateVar, BasicBlock* BB, BasicBlock* returnBB, map<FSM::State*, BasicBlock*>* BBTransitions){
 	map<FSM::State*, BasicBlock*>::iterator it;
 
@@ -397,7 +431,7 @@ BasicBlock* ActionSchedulerAdder::createSchedulingTestState(list<FSM::NextStateI
 }
 
 BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* nextStateInfo, FSM::State* sourceState, BasicBlock* stateBB, BasicBlock* incBB, BasicBlock* returnBB, GlobalVariable* stateVar, Function* function, map<FSM::State*, BasicBlock*>* BBTransitions){
-
+	map<Port*, ConstantInt*>::iterator it;
 
 	//Get information about next state
 	Action* action = nextStateInfo->getAction();
@@ -413,12 +447,42 @@ BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* next
 	skipStateBrName.append(action->getName());
 	BasicBlock* skipStateBB = BasicBlock::Create(Context, skipStateBrName, function);
 
+
+	//Test input firing condition of an action
+	map<Port*, ConstantInt*>* inputPattern = action->getInputPattern();
+	if (!inputPattern->empty()){
+		std::list<Value*>::iterator itValue;
+		std::list<Value*> values;
+
+		for ( it=inputPattern->begin() ; it != inputPattern->end(); it++ ){
+			Value* hasTokenValue = createInputTest(it->first, it->second, stateBB);
+			TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", stateBB);
+			values.push_back(truncTokenInst);
+		}
+
+		itValue=values.begin();
+		Value* value1 = *itValue;
+		for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
+			Value* value2 = *itValue;
+			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", stateBB);
+		}
+
+		// Add a basic block hasToken that test the isSchedulable of a function
+		string hasTokenBrName = "hasToken_";
+		hasTokenBrName.append(action->getName());
+		BasicBlock* tokenBB = BasicBlock::Create(Context, hasTokenBrName, function);
+
+		//Finally branch fire to hasToken block if all inputs have tokens
+		BranchInst* brInst = BranchInst::Create(tokenBB, skipStateBB, value1, stateBB);
+		stateBB = tokenBB;
+	}
+
 	//Test firing condition of an action
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  stateBB);
 	BranchInst* branchInst	= BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);
 
-	map<Port*, ConstantInt*>::iterator it;
+	//Test output firing condition of an action
 	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
 	
 	if (!outputPattern->empty()){
