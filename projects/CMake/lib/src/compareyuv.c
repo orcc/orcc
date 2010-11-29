@@ -111,7 +111,7 @@ static void Read_YUV(unsigned char *Y, unsigned char *U, unsigned char *V) {
 	}
 }
 
-static void DiffUcharImage(const int x_size, const int y_size, const unsigned char *img1_uchar, const unsigned char *img2_uchar) {
+static void DiffUcharImage(const int x_size, const int y_size, const unsigned char *img1_uchar, const unsigned char *img2_uchar, unsigned char SizeMbSide) {
 	int i, j;
 	int error = 0;
 
@@ -122,7 +122,7 @@ static void DiffUcharImage(const int x_size, const int y_size, const unsigned ch
 
 				if (error < 100) {
 					printf("error %d instead of %d at position : i = %d, j = %d, mb_x = %d, mb_y = %d \n",
-						img1_uchar[j * x_size + i] , img2_uchar[j * x_size + i], i, j, i/16, j/16);
+						img1_uchar[j * x_size + i] , img2_uchar[j * x_size + i], i, j, i/SizeMbSide, j/SizeMbSide);
 				}
 			}
 		}
@@ -185,11 +185,12 @@ void Compare_write_mb(unsigned char tokens[384]) {
 		m_y = 0;
 		printf("Frame number %d \n", FrameCounter);
 		Read_YUV(Y, U, V);
-		DiffUcharImage(m_width, m_height, Y, img_buf_y);
-		DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u);
-		DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v);
+		DiffUcharImage(m_width, m_height, Y, img_buf_y,16);
+		DiffUcharImage(m_width >> 1, m_height >> 1, U, img_buf_u,8);
+		DiffUcharImage(m_width >> 1, m_height >> 1, V, img_buf_v,8);
 		if (NumberOfFrames == FrameCounter){
-			exit(666);
+			printf("\nThat's all folks\n");
+			exit(0);
 		}
 		FrameCounter ++;
 	}
