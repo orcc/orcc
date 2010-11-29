@@ -40,6 +40,7 @@
 
 #include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
+#include "llvm/Support/CommandLine.h"
 
 #include "Jade/Core/Connection.h"
 #include "Jade/Core/Expression.h"
@@ -49,6 +50,7 @@
 using namespace std;
 using namespace llvm;
 
+extern cl::opt<int> FifoSize;
 
 Connection::Connection(Port* source, Port* target, std::map<std::string, IRAttribute*>* attributes): HDAGEdge()
 {	this->attributes = attributes; 
@@ -62,7 +64,7 @@ int Connection::getSize(){
 	IRAttribute* attribute = getAttribute("bufferSize");
 	
 	if (attribute == NULL){
-		return 10000;
+		return FifoSize;
 	}
 	
 	if (attribute->isValue()){

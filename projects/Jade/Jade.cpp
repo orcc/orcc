@@ -153,6 +153,10 @@ cl::opt<bool> OptLevelO2("O2",
 cl::opt<bool> OptLevelO3("O3",
            cl::desc("Optimization level 3. Similar to llvm-gcc -O3"));
 
+cl::opt<int> FifoSize("default-fifo-size",
+         cl::desc("Defaut size of fifos"),
+         cl::init(10000));
+
 cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations available:"));
 
 void clean_exit(int sig){
