@@ -20,7 +20,9 @@ endif$
 
 initializeInstance(instance) ::= <<
 $if (instance.actor.parameters.list)
-$($instance.actor.parameters.list: argumentList(); separator=", "$)$
+$("$instance.actor.name$", $instance.actor.parameters.list: argumentList(); separator=", "$)$
+else
+$("$instance.actor.name$")$
 endif$
 >>
 

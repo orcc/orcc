@@ -196,9 +196,12 @@ int schedule();
 
 >>
 
-
 constructor(parameters) ::= <<
-actor_$actor.name$($parameters: {$it.type$}; separator=", "$);
+$if (actor.parameters.list)$
+actor_$actor.name$(char*, $parameters: {$it.type$}; separator=", "$);
+$else$
+actor_$actor.name$(char*);
+$endif$
 >>
 
 parameters(parameters) ::= <<
@@ -215,6 +218,7 @@ actor(actor, options) ::= <<
 #ifndef __ACTOR_$actor.name$_H__
 #define __ACTOR_$actor.name$_H__
 
+#include <fstream>
 #include "actoraka.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -246,6 +250,9 @@ $! /////////////////////////////////////////////////////////////////////////////
 	$actor.stateVars.list: nonConstStateVar(it)$ !$
 
 private:
+#ifdef __TRACE_CAPTURE__
+	TraceCapture m_actionTracer;
+#endif
 ////////////////////////////////////////////////////////////////////////////////
 // Parameters
 $parameters(actor.parameters.list)$

@@ -266,6 +266,12 @@ action(action) ::= <<
 $procedure(action.body)$$procedure(action.scheduler)$
 >>
 
+actionTrace(action) ::= <<
+#ifdef __TRACE_CAPTURE__
+m_actionTracer.captureAction("$action.name$");
+#endif
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Action scheduler
 ///////////////////////////////////////////////////////////////////////////////
@@ -278,6 +284,7 @@ $pattern.keys:{port|m_poTabOut[$actor.name$_$port$]->hasRooms($pattern.(port)$)}
 // Scheduler without FSM
 
 actionCall(action) ::= <<
+$actionTrace(action)$
 $action.body$();
 res = true;
 i++;
@@ -316,6 +323,7 @@ int actor_$actor.name$::schedule()
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
+$actionTrace(nextState.action)$
 $nextState.action.body$();
 _FSM_state = state_$nextState.targetState$;
 res = true;
@@ -403,14 +411,18 @@ int actor_$actor.name$::schedule()
 >>
 
 constructor(parameters, stateVars) ::= <<
-actor_$actor.name$::actor_$actor.name$($parameters: {$it.type$ $it$}; separator=", "$)
+$if (actor.parameters.list)$
+actor_$actor.name$::actor_$actor.name$(char* instanceName, $parameters: {$it.type$ $it$}; separator=", "$)
+$else$
+actor_$actor.name$::actor_$actor.name$(char* instanceName)
+$endif$
 :
 $parameters: {$it$($it$),}; wrap, separator="\n"$
 $if(actor.actionScheduler.fsm)$
 _FSM_state(state_$actor.actionScheduler.fsm.initialState$),
 $endif$
 $stateVars : StateVarAllocation()$
-ActorAKA($length(actor.inputs.list)$, $length(actor.outputs.list)$)
+ActorAKA(instanceName, $length(actor.inputs.list)$, $length(actor.outputs.list)$)
 {
 $stateVars : ListStateVarInitialization()$
 }
@@ -452,6 +464,9 @@ void actor_$actor.name$::initializeActor()
 	  strTrace = "m_poTabIn[" + toString(uIdx) + "] = " + toString((unsigned)m_poTabIn[uIdx]);
 	  g_oTracer.addPort(uDesc, strTrace);
 	}
+#endif
+#ifdef __TRACE_CAPTURE__
+	m_actionTracer.openFile(getInstanceName());
 #endif
 }
 
