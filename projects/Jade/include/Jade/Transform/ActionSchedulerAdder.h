@@ -191,22 +191,22 @@ private:
 	 * 
 	 * @param action : the Action to test
 	 *
-	 * @param BB : llvm::BasicBlock where test is add
+	 * @param function : function where test is added
 	 *
-	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
+	 * @param skipBB : llvm::BasicBlock where to branch in case of fail
 	 *
-	 * @param returnBB : llvm::BasicBlock where test has to branch in case of return
+	 * @param BB : llvm::BasicBlock where add instructions
 	 *
-	 * @param function : llvm::Function where the test is added
+	 * @param llvm::BasicBlock : the next basic block to add instruction
 	 */
-	llvm::BasicBlock* createOutputPattern(Action* action, llvm::BasicBlock* BB, llvm::Function* function);
+	llvm::BasicBlock* createOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
 
 	/**
 	 * @brief Creates a hasRoom test for a Port
 	 * 
 	 * @param port : the Port to test
 	 *
-	 * @param BB : llvm::BasicBlock where test is add
+	 * @param BB : llvm::BasicBlock where test is added
 	 *
 	 * @param incBB : llvm::BasicBlock where test has to branch in case of success
 	 *
@@ -215,6 +215,21 @@ private:
 	 * @param function : llvm::Function where the test is added
 	 */
 	llvm::CallInst* createOutputTest(Port* port, llvm::ConstantInt* numTokens, llvm::BasicBlock* BB);
+
+	/**
+	 * @brief Check input pattern of an action
+	 *
+	 * @param action : Action to check
+	 *
+	 * @param function : llvm::Function to add the check
+	 *
+	 * @param skipBB : llvm::BasicBlock to branch in case of failure
+	 *
+	 * @param BB : llvm::BasicBlock that start the checking
+	 *
+	 * @return the last llvm::BasicBlock to add instruction
+	 */
+	llvm::BasicBlock* checkInputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB);
 
 
 	/**

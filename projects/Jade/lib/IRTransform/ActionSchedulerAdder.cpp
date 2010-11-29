@@ -233,6 +233,79 @@ void ActionSchedulerAdder::createSchedulerNoFSM(Instance* instance, BasicBlock* 
 	BranchInst::Create(returnBB, BB);
 }
 
+BasicBlock* ActionSchedulerAdder::checkInputPattern(Action* action, Function* function, BasicBlock* skipBB, BasicBlock* BB){
+	map<Port*, ConstantInt*>* pattern = action->getInputPattern();
+	
+	//Pattern is empty, return current basic block
+	if (pattern->empty()){
+		return BB;
+	}
+
+	//Check inputs
+	map<Port*, ConstantInt*>::iterator it;
+	list<Value*>::iterator itValue;
+	list<Value*> values;
+
+	for ( it=pattern->begin() ; it != pattern->end(); it++ ){
+		Value* hasTokenValue = createInputTest(it->first, it->second, BB);
+		TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
+		values.push_back(truncTokenInst);
+	}
+	
+	itValue=values.begin();
+	Value* value1 = *itValue;
+	for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
+		Value* value2 = *itValue;
+		value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", BB);
+	}
+
+	// Add a basic block hasToken that test the isSchedulable of a function
+	string hasTokenBrName = "hasToken";
+	hasTokenBrName.append(action->getName());
+	BasicBlock* tokenBB = BasicBlock::Create(Context, hasTokenBrName, function);
+
+	//Finally branch fire to hasToken block if all inputs have tokens
+	BranchInst* brInst = BranchInst::Create(tokenBB, skipBB, value1, BB);
+	return tokenBB;
+}
+
+BasicBlock* ActionSchedulerAdder::createOutputPattern(Action* action, llvm::Function* function, llvm::BasicBlock* skipBB, llvm::BasicBlock* BB){
+	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
+
+	//No output pattern return basic block
+	if (outputPattern->empty()){
+		return BB;
+	}
+	
+	//Test if rooms are available on output
+	map<Port*, ConstantInt*>::iterator it;
+	list<Value*>::iterator itValue;
+	list<Value*> values;
+
+	for ( it=outputPattern->begin() ; it != outputPattern->end(); it++ ){
+		Value* hasRoomValue = createOutputTest(it->first, it->second, BB);
+		TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", BB);
+		values.push_back(truncRoomInst);
+	}
+
+	itValue=values.begin();
+	Value* value1 = *itValue;
+	for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
+		Value* value2 = *itValue;
+		value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", BB);
+	}
+
+	// Add a basic block hasRoom that fires the action
+	string hasRoomBrName = "hasRoom_";
+	hasRoomBrName.append(action->getName());
+	BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
+
+	//Finally branch fire to hasRoom block if all outputs have free room
+	BranchInst* brInst = BranchInst::Create(roomBB, skipBB, value1, BB);
+
+	return roomBB;
+}
+
 BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* BB, BasicBlock* incBB, Function* function){
 	map<Port*, ConstantInt*>::iterator it;
 	string name = action->getName();
@@ -251,86 +324,23 @@ BasicBlock* ActionSchedulerAdder::createActionTest(Action* action, BasicBlock* B
 	BasicBlock* skipBB = BasicBlock::Create(Context, skipBrName, function);
 
 
+	//Create check input pattern
+	BB = checkInputPattern(action, function, skipBB, BB);
 	
-	//Test if tokens are available on input
-	map<Port*, ConstantInt*>* inputPattern = action->getInputPattern();
-
-	if (!inputPattern->empty()){
-		std::list<Value*>::iterator itValue;
-		std::list<Value*> values;
-
-		for ( it=inputPattern->begin() ; it != inputPattern->end(); it++ ){
-			Value* hasTokenValue = createInputTest(it->first, it->second, BB);
-			TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", BB);
-			values.push_back(truncTokenInst);
-		}
-
-		itValue=values.begin();
-		Value* value1 = *itValue;
-		for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
-			Value* value2 = *itValue;
-			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", BB);
-		}
-
-		// Add a basic block hasToken that test the isSchedulable of a function
-		string hasTokenBrName = "hasToken_";
-		hasTokenBrName.append(name);
-		BasicBlock* tokenBB = BasicBlock::Create(Context, hasTokenBrName, function);
-
-		//Finally branch fire to hasToken block if all inputs have tokens
-		BranchInst* brInst = BranchInst::Create(tokenBB, skipBB, value1, BB);
-		BB = tokenBB;
-	}
-
 	//Test firing condition of an action
 	Procedure* scheduler = action->getScheduler();
-	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  BB);
-	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, callInst, BB);
+	CallInst* schedInst = CallInst::Create(scheduler->getFunction(), "",  BB);
+	BranchInst* branchInst	= BranchInst::Create(fireBB, skipBB, schedInst, BB);
 
-
-
-	//Test if rooms are available on output
-	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
+	//Create output pattern
+	fireBB = createOutputPattern(action, function, skipBB, fireBB);
 	
-	if (!outputPattern->empty()){
-		std::list<Value*>::iterator itValue;
-		std::list<Value*> values;
+	//Launch action body
+	CallInst* bodyInst = CallInst::Create(body->getFunction(), "",  fireBB);
 
-		for ( it=outputPattern->begin() ; it != outputPattern->end(); it++ ){
-			Value* hasRoomValue = createOutputTest(it->first, it->second, fireBB);
-			TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", fireBB);
-			values.push_back(truncRoomInst);
-		}
-
-		itValue=values.begin();
-		Value* value1 = *itValue;
-		for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
-			Value* value2 = *itValue;
-			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", fireBB);
-		}
-
-		// Add a basic block hasRoom that fires the action
-		string hasRoomBrName = "hasRoom_";
-		hasRoomBrName.append(name);
-		BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
-		CallInst* callInst = CallInst::Create(body->getFunction(), "",  roomBB);
-
-		//Branch hasRoom block to inc i block
-		BranchInst::Create(incBB, roomBB);
-
-
-		//Finally branch fire to hasRoom block if all outputs have free room
-		BranchInst* brInst = BranchInst::Create(roomBB, skipBB, value1, fireBB);
-		
-	}else{
-		//Launch action body
-		CallInst* callInst = CallInst::Create(body->getFunction(), "",  fireBB);
-
-		//Branch fire basic block to BB basic block
-		BranchInst::Create(incBB, fireBB);
-	}
-
-
+	//Branch fire basic block to BB basic block
+	BranchInst::Create(incBB, fireBB);
+	
 	return skipBB;
 }
 
@@ -449,78 +459,26 @@ BasicBlock* ActionSchedulerAdder::createActionTestState(FSM::NextStateInfo* next
 
 
 	//Test input firing condition of an action
-	map<Port*, ConstantInt*>* inputPattern = action->getInputPattern();
-	if (!inputPattern->empty()){
-		std::list<Value*>::iterator itValue;
-		std::list<Value*> values;
-
-		for ( it=inputPattern->begin() ; it != inputPattern->end(); it++ ){
-			Value* hasTokenValue = createInputTest(it->first, it->second, stateBB);
-			TruncInst* truncTokenInst = new TruncInst(hasTokenValue, Type::getInt1Ty(Context),"", stateBB);
-			values.push_back(truncTokenInst);
-		}
-
-		itValue=values.begin();
-		Value* value1 = *itValue;
-		for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
-			Value* value2 = *itValue;
-			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", stateBB);
-		}
-
-		// Add a basic block hasToken that test the isSchedulable of a function
-		string hasTokenBrName = "hasToken_";
-		hasTokenBrName.append(action->getName());
-		BasicBlock* tokenBB = BasicBlock::Create(Context, hasTokenBrName, function);
-
-		//Finally branch fire to hasToken block if all inputs have tokens
-		BranchInst* brInst = BranchInst::Create(tokenBB, skipStateBB, value1, stateBB);
-		stateBB = tokenBB;
-	}
-
+	stateBB = checkInputPattern(action, function, skipStateBB, stateBB);
+	
 	//Test firing condition of an action
 	Procedure* scheduler = action->getScheduler();
 	CallInst* callInst = CallInst::Create(scheduler->getFunction(), "",  stateBB);
 	BranchInst* branchInst	= BranchInst::Create(fireStateBB, skipStateBB, callInst, stateBB);
 
-	//Test output firing condition of an action
-	map<Port*, ConstantInt*>* outputPattern = action->getOutputPattern();
+
+	//Create a basic block skip_hasRoom that store state and return from function
+	string skipHasRoomBrName = "skipHasRoom_";
+	skipHasRoomBrName.append(action->getName());
+	BasicBlock* skipRoomBB = BasicBlock::Create(Context, skipHasRoomBrName, function);
+	ConstantInt* index = ConstantInt::get(Type::getInt32Ty(Context), sourceState->getIndex());
+	StoreInst* storeInst = new StoreInst(index, stateVar, skipRoomBB);
+	BranchInst::Create(returnBB, skipRoomBB);
+
+	//Create output pattern
+	fireStateBB = createOutputPattern(action, function, skipRoomBB, fireStateBB);
 	
-	if (!outputPattern->empty()){
-		std::list<Value*>::iterator itValue;
-		std::list<Value*> values;
-
-		for ( it=outputPattern->begin() ; it != outputPattern->end(); it++ ){
-			Value* hasRoomValue = createOutputTest(it->first, it->second, fireStateBB);
-			TruncInst* truncRoomInst = new TruncInst(hasRoomValue, Type::getInt1Ty(Context),"", fireStateBB);
-			values.push_back(truncRoomInst);
-		}
-
-		itValue=values.begin();
-		Value* value1 = *itValue;
-		for ( itValue=++itValue ; itValue != values.end(); itValue++ ){
-			Value* value2 = *itValue;
-			value1 = BinaryOperator::Create(Instruction::And,value1, value2, "", fireStateBB);
-		}
-
-		// Add a basic block hasRoom that fires the action
-		string hasRoomBrName = "hasRoom_";
-		hasRoomBrName.append(action->getName());
-		BasicBlock* roomBB = BasicBlock::Create(Context, hasRoomBrName, function);
-
-		//Create a basic block skip_hasRoom that store state and return from function
-		string skipHasRoomBrName = "skipHasRoom_";
-		skipHasRoomBrName.append(action->getName());
-		BasicBlock* skipRoomBB = BasicBlock::Create(Context, skipHasRoomBrName, function);
-		ConstantInt* index = ConstantInt::get(Type::getInt32Ty(Context), sourceState->getIndex());
-		StoreInst* storeInst = new StoreInst(index, stateVar, skipRoomBB);
-		BranchInst::Create(returnBB, skipRoomBB);
-
-		//Finally branch fire to hasRoom block if all outputs have free room
-		BranchInst* brInst = BranchInst::Create(roomBB, skipRoomBB, value1, fireStateBB);
-
-		fireStateBB = roomBB;
-	}
-
+	//Create call state
 	createActionCallState(nextStateInfo, fireStateBB, BBTransitions);
 
 	return skipStateBB;
