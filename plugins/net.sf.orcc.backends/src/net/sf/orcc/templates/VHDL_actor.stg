@@ -11,6 +11,7 @@ endif$
 $port.name$_rdy   : out std_logic;
 $port.name$_send  : in  std_logic;
 $port.name$_ack   : out  std_logic;
+
 >>
 
 fifo_out(port) ::= <<
@@ -23,9 +24,9 @@ endif$
 $port.name$_rdy   : in  std_logic;
 $port.name$_send  : out std_logic;
 $if(last(port.name))
-$$port.name$_ack : out std_logic$
+$$port.name$_ack   : out std_logic$
 else
-$$port.name$_ack : out std_logic;$
+$$port.name$_ack   : out std_logic;$
 endif$
 >>
 
@@ -520,7 +521,7 @@ endif$
 
 sensitivity(action) ::= <<
 $action.inputPattern.keys :{port|$port.name$_send}; separator=", "$$
-if(action.inputPattern.keys && actor.templateData)
+if(action.inputPattern.keys && action.outputPattern.keys)
 $, $
 endif$
 $action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$$
@@ -582,6 +583,7 @@ $actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n    "$
 
 executeIndent(actions) ::= <<
     $actions: actionTestSceduler(); separator="\nelsif "$
+    end if;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -603,7 +605,7 @@ $if(actions)
 $$executeCore(actions)$
 else
   case FSM is
-  $switch(fsm.transitions)$
+  $switchTransition()$
       end case;
 end if;$
 else
@@ -623,6 +625,7 @@ switchTransition(transition) ::= <<
 executeCoreState(nextStates) ::= <<
 
 if $nextStates: actionTestState(); separator="\n--\nelsif"$
+end if;
 >>
 
 actionTestState(nextState) ::= <<

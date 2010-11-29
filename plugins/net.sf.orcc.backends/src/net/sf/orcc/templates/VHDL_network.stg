@@ -25,8 +25,9 @@ else
 $signal $instance.id$_output_$num$_data_out   : std_logic_vector($instance.broadcast.type.size$ - 1 downto 0);$
 endif$
 
-signal $instance.id$_output_$num$_write       : std_logic;
+signal $instance.id$_output_$num$_send       : std_logic;
 signal $instance.id$_output_$num$_rdy        : std_logic;
+signal $instance.id$_output_$num$_ack        : std_logic;
 >> 
 
 
@@ -38,8 +39,9 @@ else
 $signal $instance.id$_$port.name$_data_in   : std_logic_vector($port.type.size$ - 1 downto 0);$
 endif$
 
-signal $instance.id$_$port.name$_rdy       : std_logic;
 signal $instance.id$_$port.name$_send      : std_logic;
+signal $instance.id$_$port.name$_rdy       : std_logic;
+signal $instance.id$_$port.name$_ack       : std_logic;
 >>
 
 printSigOutput(port) ::= <<
@@ -51,8 +53,9 @@ else
 $signal $instance.id$_$port.name$_data_out   : std_logic_vector($port.type.size$ - 1 downto 0);$
 endif$
 
+signal $instance.id$_$port.name$_send       : std_logic;
 signal $instance.id$_$port.name$_rdy        : std_logic;
-signal $instance.id$_$port.name$_write      : std_logic;
+signal $instance.id$_$port.name$_ack        : std_logic;
 >> 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,7 +94,7 @@ doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 
 fifo_$count$ : entity work.fifo_top 
 generic map (
-depth => $edge.size$,
+depth => $if(size)$$size$$else$1$endif$,
 $if(targetPort.type.bool)
 $width => 1)$
 else
@@ -99,30 +102,33 @@ $width => $targetPort.type.size$)$
 endif$
 
 port map (
-  wr_data    => $source.id$_$sourcePort.name$_write, 
+  wr_data    => $source.id$_$sourcePort.name$_send, 
 $if(targetPort.type.bool)
 $  data_in(0) => $source.id$_$sourcePort.name$_data_out,$\n$$
 else
 $  data_in    => $source.id$_$sourcePort.name$_data_out,$\n$$
 endif$
+  wr_clk     => clock, 
   wr_rdy      => $source.id$_$sourcePort.name$_rdy, 
-  rd_rdy      => $target.id$_$targetPort.name$_rdy, 
+  wr_ack      => $source.id$_$sourcePort.name$_ack, 
 $if(targetPort.type.bool)
 $  data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$$
 else
 $  data_out   => $target.id$_$targetPort.name$_data_in,$\n$$
 endif
-$  send       => $target.id$_$targetPort.name$_send, 
-  wr_clk     => clock, 
-  rd_clk     => clock, 
+$  rd_clk     => clock, 
+  send        => $target.id$_$targetPort.name$_send, 
+  rd_rdy      => $target.id$_$targetPort.name$_rdy, 
+  rd_ack      => $target.id$_$targetPort.name$_ack,  
   reset_n    => reset_n); 
 >>
 
 assignIn(source, sourcePort) ::= <<
 
 $tgt.port$_data    <= $source.id$_$sourcePort.name$_data_out;
-$tgt.port$_write   <= $source.id$_$sourcePort.name$_write;
+$tgt.port$_send    <= $source.id$_$sourcePort.name$_send;
 $source.id$_$sourcePort.name$_rdy   <= $tgt.port$_rdy;
+$source.id$_$sourcePort.name$_ack   <= $tgt.port$_ack;
 >>
 
 assignOut(target, targetPort) ::= <<
@@ -130,6 +136,7 @@ assignOut(target, targetPort) ::= <<
 $target.id$_$targetPort.name$_data_in <= $src.port$_data;
 $target.id$_$targetPort.name$_send    <= $src.port$_send;
 $src.port$_rdy <= $target.id$_$targetPort.name$_rdy;
+$src.port$_ack <= $target.id$_$targetPort.name$_ack;
 >>
 
 
@@ -149,6 +156,7 @@ $$port.name$_data  : in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
 endif$
 $port.name$_send  : in  std_logic;
 $port.name$_rdy   : out std_logic;
+$port.name$_ack   : out std_logic;
 >>
 
 printNetPortsOutput(port) ::= <<
@@ -157,8 +165,9 @@ $$port.name$_data   : out std_logic;$\n$$
 else
 $$port.name$_data   : out std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
 endif$
-$port.name$_write  : out std_logic;
+$port.name$_send   : out std_logic;
 $port.name$_rdy    : in  std_logic;
+$port.name$_ack    : in  std_logic;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -176,14 +185,16 @@ $instance.network.outputs.list: printPortsOutput(); separator="\n"$
 
 printPortsInput(port) ::= <<
 $port.name$_data   => $instance.id$_$port.name$_data_in,
-$port.name$_rdy    => $instance.id$_$port.name$_rdy,
 $port.name$_send   => $instance.id$_$port.name$_send,
+$port.name$_rdy    => $instance.id$_$port.name$_rdy,
+$port.name$_ack    => $instance.id$_$port.name$_ack,
 >>
 
 printPortsOutput(port) ::= <<
 $port.name$_data   => $instance.id$_$port.name$_data_out,
+$port.name$_send   => $instance.id$_$port.name$_send,
 $port.name$_rdy    => $instance.id$_$port.name$_rdy,
-$port.name$_write  => $instance.id$_$port.name$_write,
+$port.name$_ack    => $instance.id$_$port.name$_ack,
 >> 
 
 printBroadcastPorts(instance) ::= <<
@@ -194,7 +205,8 @@ $instance.id$_rdy       <= ($instance.broadcast.outputList: printBroadcastFull()
 
 printBroadcastOutput(num) ::= <<
 $instance.id$_output_$num$_data_out <= $instance.id$_data_out;
-$instance.id$_output_$num$_write    <= $instance.id$_write;
+$instance.id$_output_$num$_send     <= $instance.id$_send;
+$instance.id$_output_$num$_ack      <= $instance.id$_ack;
 >> 
 
 printBroadcastFull(num) ::= <<

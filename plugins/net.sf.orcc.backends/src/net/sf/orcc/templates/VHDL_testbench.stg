@@ -1,25 +1,27 @@
 fifo_in(port) ::= <<
 $if(port.type.bool)
-$signal $port.name$_data  : std_logic;$\n$$
+$signal $port.name$_data : std_logic;$\n$$
 else
-$signal $port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $port.name$_data : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif$
-signal $port.name$_send : std_logic;
-signal $port.name$_rdy  : std_logic;
+signal $port.name$_send  : std_logic;
+signal $port.name$_rdy   : std_logic;
+signal $port.name$_ack   : std_logic;
 >>
 
 fifo_out(port) ::= <<
-signal $port.name$_rdy  : std_logic;
+signal $port.name$_rdy   : std_logic;
+signal $port.name$_ack   : std_logic;
 $if(last(port.name))
 $$if(port.type.bool)
-$signal $port.name$_data  : std_logic;$\n$$
+$signal $port.name$_data : std_logic;$\n$$
 else
-$signal $port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $port.name$_data : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif$
-signal $port.name$_write : std_logic;$
+signal $port.name$_send  : std_logic;$
 else
-$signal $port.name$_data  : $port.type$;
-signal $port.name$_write : std_logic;$
+$signal $port.name$_data : $port.type$;
+signal $port.name$_send  : std_logic;$
 endif$
 >>
 
@@ -35,24 +37,28 @@ fifo_actor_in(port) ::= <<
 $port.name$_data  => $port.name$_data,
 $port.name$_send  => $port.name$_send,
 $port.name$_rdy   => $port.name$_rdy
+$port.name$_ack   => $port.name$_rdy
 >>
 
 fifo_actor_out(port) ::= <<
 $port.name$_data  => $port.name$_data,
+$port.name$_send  => $port.name$_send,
 $port.name$_rdy   => $port.name$_rdy,
-$port.name$_write => $port.name$_write
+$port.name$_ack   => $port.name$_ack
 >>
 
 fifo_network_in(port) ::= <<
 $port.name$_data  => $port.name$_data,
 $port.name$_send  => $port.name$_send,
-$port.name$_rdy   => $port.name$_rdy
+$port.name$_rdy   => $port.name$_rdy,
+$port.name$_ack   => $port.name$_ack
 >>
 
 fifo_network_out(port) ::= <<
 $port.name$_data  => $port.name$_data,
+$port.name$_send  => $port.name$_send,
 $port.name$_rdy   => $port.name$_rdy,
-$port.name$_write => $port.name$_write
+$port.name$_ack   => $port.name$_ack
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
