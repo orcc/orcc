@@ -280,6 +280,10 @@ outputPattern(pattern) ::= <<
 $pattern.keys:{port|m_poTabOut[$actor.name$_$port$]->hasRooms($pattern.(port)$)}; separator=" && "$
 >>
 
+inputPattern(pattern) ::= <<
+$pattern.keys:{port|m_poTabIn[$actor.name$_$port$]->hasTokens($pattern.(port)$) && }$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
@@ -291,7 +295,7 @@ i++;
 >>
 
 actionTest(action) ::= <<
-if(isSchedulable_$action$()$if(action.outputPattern)$ && $outputPattern(pattern=action.outputPattern)$$endif$)
+if($inputPattern(action.inputPattern)$isSchedulable_$action$()$if(action.outputPattern)$ && $outputPattern(pattern=action.outputPattern)$$endif$)
 {
 	$actionCall(action)$
 }
@@ -330,7 +334,7 @@ res = true;
 >>
 
 actionTestState(nextState) ::= <<
-if(isSchedulable_$nextState.action$())
+if($inputPattern(nextState.action.inputPattern)$isSchedulable_$nextState.action$())
 {
 	$if(nextState.action.outputPattern)$
 	if($outputPattern(nextState.action.outputPattern)$)
