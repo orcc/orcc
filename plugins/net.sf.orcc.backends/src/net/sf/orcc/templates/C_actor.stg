@@ -115,21 +115,6 @@ $$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; sepa
 endif$
 >>
 
-Decrement(decrement) ::= <<
-
-$decrement.target$--;
->>
-
-HasTokens(hasTokens) ::= <<
-
-$hasTokens.target$ = fifo_$hasTokens.port.type$_has_tokens($instance.id$_$hasTokens.port$, $hasTokens.numTokens$);
->>
-
-Increment(increment) ::= <<
-
-$increment.target$++;
->>
-
 Load(load) ::= <<
 
 $load.target$ = $load.source$$load.indexes : {[$it$]}$;
@@ -156,11 +141,6 @@ Return(return) ::= <<
 $if(return.value)$
 return $return.value$;$
 endif$
->>
-
-SelfAssignment(selfAssign) ::= <<
-
-$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
 >>
 
 Store(store) ::= <<
