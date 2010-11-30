@@ -34,9 +34,9 @@ import java.util.List;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.TypeString;
@@ -102,7 +102,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 	/**
 	 * State variables of the actor
 	 */
-	private OrderedMap<String, StateVariable> stateVars;
+	private OrderedMap<String, GlobalVariable> stateVars;
 
 	/**
 	 * String counter
@@ -185,7 +185,7 @@ public class PrintlnTransformation extends AbstractActorTransformation {
 			TypeString type = IrFactory.eINSTANCE.createTypeString();
 			type.setSize(llvmStr.getSize());
 
-			StateVariable variable = new StateVariable(call.getLocation(),
+			GlobalVariable variable = new GlobalVariable(call.getLocation(),
 					type, name, false, new StringExpr(llvmStr.getStr()));
 			Use use = new Use(variable);
 

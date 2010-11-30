@@ -39,10 +39,10 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.NextStateInfo;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.BoolExpr;
@@ -232,7 +232,7 @@ public class ActorInterpreter {
 
 			// Check for List state variables which need to be allocated or
 			// initialized
-			for (StateVariable stateVar : actor.getStateVars()) {
+			for (GlobalVariable stateVar : actor.getStateVars()) {
 				Type type = stateVar.getType();
 				// Initialize variables with constant values
 				Expression initConst = stateVar.getConstantValue();

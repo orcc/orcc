@@ -73,6 +73,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
@@ -80,7 +81,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
@@ -307,7 +307,7 @@ public class IRParser {
 			outputs = parsePorts(obj.get(KEY_OUTPUTS).getAsJsonArray());
 
 			JsonArray array = obj.get(KEY_STATE_VARS).getAsJsonArray();
-			OrderedMap<String, StateVariable> stateVars = parseStateVars(array);
+			OrderedMap<String, GlobalVariable> stateVars = parseStateVars(array);
 
 			array = obj.get(KEY_PROCEDURES).getAsJsonArray();
 			for (JsonElement element : array) {
@@ -808,7 +808,7 @@ public class IRParser {
 					.getAsJsonArray());
 			Type type = parseType(varDefArray.get(2));
 
-			StateVariable parameter = new StateVariable(location, type, name,
+			GlobalVariable parameter = new GlobalVariable(location, type, name,
 					false);
 
 			// register the state variable
@@ -899,9 +899,9 @@ public class IRParser {
 	 *            A list of JSON-encoded {@link LocalVariable}.
 	 * @return A {@link List}&lt;{@link StateVariable}&gt;.
 	 */
-	private OrderedMap<String, StateVariable> parseStateVars(JsonArray array)
+	private OrderedMap<String, GlobalVariable> parseStateVars(JsonArray array)
 			throws OrccException {
-		OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
+		OrderedMap<String, GlobalVariable> stateVars = new OrderedMap<String, GlobalVariable>();
 		for (JsonElement element : array) {
 			JsonArray stateArray = element.getAsJsonArray();
 
@@ -919,7 +919,7 @@ public class IRParser {
 				init = parseExpr(stateArray.get(1));
 			}
 
-			StateVariable stateVar = new StateVariable(location, type, name,
+			GlobalVariable stateVar = new GlobalVariable(location, type, name,
 					assignable, init);
 			stateVars.put(file, location, name, stateVar);
 

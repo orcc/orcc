@@ -39,13 +39,13 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
@@ -171,7 +171,7 @@ public class StaticActorNormalizer {
 
 	private Actor actor;
 
-	private OrderedMap<String, StateVariable> stateVars;
+	private OrderedMap<String, GlobalVariable> stateVars;
 
 	private CSDFMoC staticCls;
 
@@ -203,12 +203,12 @@ public class StaticActorNormalizer {
 
 			Type type = IrFactory.eINSTANCE.createTypeList(numTokens,
 					port.getType());
-			StateVariable var = new StateVariable(new Location(), type,
+			GlobalVariable var = new GlobalVariable(new Location(), type,
 					port.getName(), false);
 			stateVars.put(actor.getFile(), var.getLocation(), var.getName(),
 					var);
 
-			StateVariable varCount = new StateVariable(new Location(),
+			GlobalVariable varCount = new GlobalVariable(new Location(),
 					IrFactory.eINSTANCE.createTypeInt(32), port.getName()
 							+ "_count", true, new IntExpr(0));
 			stateVars.put(actor.getFile(), varCount.getLocation(),

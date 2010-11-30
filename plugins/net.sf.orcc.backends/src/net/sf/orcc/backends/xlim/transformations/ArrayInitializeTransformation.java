@@ -34,7 +34,7 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.StateVariable;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Call;
@@ -61,7 +61,7 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 	public void transform(Actor actor) throws OrccException {
 		// Initialize value field if there is an initial value
 		for (Variable stateVar : actor.getStateVars()) {
-			Expression initConst = ((StateVariable) stateVar)
+			Expression initConst = ((GlobalVariable) stateVar)
 					.getConstantValue();
 			if (initConst != null) {
 				stateVar.setValue(initConst);
@@ -78,7 +78,7 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 		// Copy computed value to initialValue field and clean value field
 		for (Variable stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
-			StateVariable s = (StateVariable) stateVar;
+			GlobalVariable s = (GlobalVariable) stateVar;
 			if (type.isList() && s.getConstantValue() == null
 					&& s.getValue() != null) {
 				s.setConstantValue(s.getValue());

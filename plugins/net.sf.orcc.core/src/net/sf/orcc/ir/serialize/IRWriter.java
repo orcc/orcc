@@ -75,13 +75,13 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeBool;
@@ -830,7 +830,7 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JsonArray writeParameter(StateVariable variable) {
+	private JsonArray writeParameter(GlobalVariable variable) {
 		JsonArray variableArray = new JsonArray();
 
 		JsonArray details = new JsonArray();
@@ -856,7 +856,7 @@ public class IRWriter {
 			OrderedMap<String, ? extends Variable> variables) {
 		JsonArray array = new JsonArray();
 		for (Variable variable : variables) {
-			array.add(writeParameter((StateVariable) variable));
+			array.add(writeParameter((GlobalVariable) variable));
 		}
 		return array;
 	}
@@ -928,7 +928,7 @@ public class IRWriter {
 	 *            a variable
 	 * @return
 	 */
-	private JsonArray writeStateVariable(StateVariable variable) {
+	private JsonArray writeStateVariable(GlobalVariable variable) {
 		JsonArray array = new JsonArray();
 
 		// variable
@@ -963,9 +963,9 @@ public class IRWriter {
 	 * @return a JSON array
 	 */
 	private JsonArray writeStateVariables(
-			OrderedMap<String, StateVariable> variables) {
+			OrderedMap<String, GlobalVariable> variables) {
 		JsonArray array = new JsonArray();
-		for (StateVariable variable : variables) {
+		for (GlobalVariable variable : variables) {
 			array.add(writeStateVariable(variable));
 		}
 		return array;

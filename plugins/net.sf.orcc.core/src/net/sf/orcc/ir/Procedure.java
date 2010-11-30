@@ -54,28 +54,28 @@ public class Procedure extends AbstractLocalizable {
 	 */
 	private class ProcVisitor extends AbstractActorTransformation {
 
-		private Set<StateVariable> loadedVariables;
+		private Set<GlobalVariable> loadedVariables;
 
-		private Set<StateVariable> storedVariables;
+		private Set<GlobalVariable> storedVariables;
 
 		public ProcVisitor() {
-			storedVariables = new HashSet<StateVariable>();
-			loadedVariables = new HashSet<StateVariable>();
+			storedVariables = new HashSet<GlobalVariable>();
+			loadedVariables = new HashSet<GlobalVariable>();
 		}
 
-		public List<StateVariable> getLoadedVariables() {
-			return new ArrayList<StateVariable>(loadedVariables);
+		public List<GlobalVariable> getLoadedVariables() {
+			return new ArrayList<GlobalVariable>(loadedVariables);
 		}
 
-		public List<StateVariable> getStoredVariables() {
-			return new ArrayList<StateVariable>(storedVariables);
+		public List<GlobalVariable> getStoredVariables() {
+			return new ArrayList<GlobalVariable>(storedVariables);
 		}
 
 		@Override
 		public void visit(Load node) {
 			Variable var = node.getSource().getVariable();
 			if (!var.getType().isList()) {
-				loadedVariables.add((StateVariable) var);
+				loadedVariables.add((GlobalVariable) var);
 			}
 		}
 
@@ -83,7 +83,7 @@ public class Procedure extends AbstractLocalizable {
 		public void visit(Store store) {
 			Variable var = store.getTarget();
 			if (!var.getType().isList()) {
-				storedVariables.add((StateVariable) var);
+				storedVariables.add((GlobalVariable) var);
 			}
 		}
 
@@ -190,7 +190,7 @@ public class Procedure extends AbstractLocalizable {
 	 * 
 	 * @return the list of scalar variables loaded by this procedure
 	 */
-	public List<StateVariable> getLoadedVariables() {
+	public List<GlobalVariable> getLoadedVariables() {
 		ProcVisitor visitor = new ProcVisitor();
 		visitor.visit(nodes);
 		return visitor.getLoadedVariables();
@@ -251,7 +251,7 @@ public class Procedure extends AbstractLocalizable {
 	 * 
 	 * @return the list of scalar variables stored by this procedure
 	 */
-	public List<StateVariable> getStoredVariables() {
+	public List<GlobalVariable> getStoredVariables() {
 		ProcVisitor visitor = new ProcVisitor();
 		visitor.visit(nodes);
 		return visitor.getStoredVariables();

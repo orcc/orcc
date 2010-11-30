@@ -63,12 +63,12 @@ import net.sf.orcc.cal.type.TypeChecker;
 import net.sf.orcc.cal.util.BooleanSwitch;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.ir.Use;
@@ -869,7 +869,7 @@ public class AstTransformer {
 	/**
 	 * a map of global variables (parameters and state variables)
 	 */
-	private OrderedMap<String, StateVariable> globals;
+	private OrderedMap<String, GlobalVariable> globals;
 
 	private Procedure initialize;
 
@@ -1229,7 +1229,7 @@ public class AstTransformer {
 	 * @param globals
 	 *            a map
 	 */
-	public void setGlobalsMap(OrderedMap<String, StateVariable> globals) {
+	public void setGlobalsMap(OrderedMap<String, GlobalVariable> globals) {
 		this.globals = globals;
 	}
 
@@ -1331,7 +1331,7 @@ public class AstTransformer {
 	 *            a list of AST state variables
 	 * @return an ordered map of IR state variables
 	 */
-	public StateVariable transformGlobalVariable(AstVariable astVariable) {
+	public GlobalVariable transformGlobalVariable(AstVariable astVariable) {
 		Location location = Util.getLocation(astVariable);
 		AstType astType = astVariable.getType();
 		Type type = astVariable.getIrType();
@@ -1362,7 +1362,7 @@ public class AstTransformer {
 		}
 
 		// create state variable
-		StateVariable variable = new StateVariable(location, type, name,
+		GlobalVariable variable = new GlobalVariable(location, type, name,
 				assignable, initialValue);
 
 		// registers the global variable in the outermost scope

@@ -35,9 +35,9 @@ import java.util.Map.Entry;
 import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.User;
@@ -52,7 +52,7 @@ import net.sf.orcc.ir.nodes.BlockNode;
  */
 public class ActorState {
 
-	private Map<StateVariable, Expression> state;
+	private Map<GlobalVariable, Expression> state;
 
 	/**
 	 * Creates a new actor state initialized to all the state variables of the
@@ -62,8 +62,8 @@ public class ActorState {
 	 *            an actor
 	 */
 	public ActorState(Actor actor) {
-		state = new HashMap<StateVariable, Expression>();
-		for (StateVariable variable : actor.getStateVars()) {
+		state = new HashMap<GlobalVariable, Expression>();
+		for (GlobalVariable variable : actor.getStateVars()) {
 			Type type = variable.getType();
 			Expression constant = variable.getConstantValue();
 			if (constant != null && !type.isList()) {
@@ -110,8 +110,8 @@ public class ActorState {
 	 * @return <code>true</code> if the condition stated above holds
 	 */
 	public boolean isInitialState() {
-		for (Entry<StateVariable, Expression> entry : state.entrySet()) {
-			StateVariable stateVariable = entry.getKey();
+		for (Entry<GlobalVariable, Expression> entry : state.entrySet()) {
+			GlobalVariable stateVariable = entry.getKey();
 			Expression value = stateVariable.getValue();
 			if (value == null) {
 				// oops not static!

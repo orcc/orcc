@@ -70,7 +70,7 @@ public class Actor implements Comparable<Actor> {
 
 	private OrderedMap<String, Procedure> procs;
 
-	private OrderedMap<String, StateVariable> stateVars;
+	private OrderedMap<String, GlobalVariable> stateVars;
 
 	/**
 	 * holds template-specific data.
@@ -104,7 +104,7 @@ public class Actor implements Comparable<Actor> {
 	public Actor(String name, String file,
 			OrderedMap<String, ? extends Variable> parameters,
 			OrderedMap<String, Port> inputs, OrderedMap<String, Port> outputs,
-			OrderedMap<String, StateVariable> stateVars,
+			OrderedMap<String, GlobalVariable> stateVars,
 			OrderedMap<String, Procedure> procs, List<Action> actions,
 			List<Action> initializes, ActionScheduler scheduler) {
 		this.actions = actions;
@@ -241,7 +241,7 @@ public class Actor implements Comparable<Actor> {
 	 * 
 	 * @return the ordered map of state variables
 	 */
-	public OrderedMap<String, StateVariable> getStateVars() {
+	public OrderedMap<String, GlobalVariable> getStateVars() {
 		return stateVars;
 	}
 

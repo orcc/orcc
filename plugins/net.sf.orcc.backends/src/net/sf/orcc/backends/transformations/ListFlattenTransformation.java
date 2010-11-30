@@ -36,10 +36,10 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.instructions.AssignIndex;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
 import net.sf.orcc.ir.Use;
@@ -180,7 +180,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 	public void transform(Actor actor) throws OrccException {
 		if (applyToDeclarations) {
 			// VHDL synthesizers don't support multi-dimensional memory yet
-			for (StateVariable variable : actor.getStateVars()) {
+			for (GlobalVariable variable : actor.getStateVars()) {
 				if (variable.getType().isList()) {
 					List<Expression> newValues = new ArrayList<Expression>();
 					flattenList(variable.getValue(), newValues);

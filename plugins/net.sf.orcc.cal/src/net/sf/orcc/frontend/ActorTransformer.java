@@ -52,6 +52,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
@@ -59,7 +60,6 @@ import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
-import net.sf.orcc.ir.StateVariable;
 import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
@@ -459,7 +459,7 @@ public class ActorTransformer {
 			Location location = Util.getLocation(astActor);
 
 			// parameters
-			OrderedMap<String, StateVariable> parameters = new OrderedMap<String, StateVariable>();
+			OrderedMap<String, GlobalVariable> parameters = new OrderedMap<String, GlobalVariable>();
 			astTransformer.setGlobalsMap(parameters);
 			for (AstVariable astVariable : astActor.getParameters()) {
 				astTransformer.transformGlobalVariable(astVariable);
@@ -469,7 +469,7 @@ public class ActorTransformer {
 			// state variables are transformed on demand when referenced by
 			// expressions or statements
 			// this allows imported variables to be transparently handled
-			OrderedMap<String, StateVariable> stateVars = new OrderedMap<String, StateVariable>();
+			OrderedMap<String, GlobalVariable> stateVars = new OrderedMap<String, GlobalVariable>();
 			astTransformer.setGlobalsMap(stateVars);
 
 			// transform ports

@@ -40,7 +40,7 @@ public class GlobalVariable extends Variable {
 	/**
 	 * initial value, if present, <code>null</code> otherwise
 	 */
-	private Expression expression;
+	private Expression initialValue;
 
 	/**
 	 * Creates a new global variable with the given location, type, and name.
@@ -73,7 +73,44 @@ public class GlobalVariable extends Variable {
 	public GlobalVariable(Location location, Type type, String name,
 			Expression value) {
 		super(location, type, name, true);
-		this.expression = value;
+		this.initialValue = value;
+	}
+	
+	/**
+	 * Creates a new state variable with the given location, type, name and
+	 * initial value expressed as an expression.
+	 * 
+	 * @param location
+	 *            the state variable location
+	 * @param type
+	 *            the state variable type
+	 * @param name
+	 *            the state variable name
+	 * @param value
+	 *            initial value
+	 */
+	public GlobalVariable(Location location, Type type, String name,
+			boolean assignable) {
+		this(location, type, name, assignable, null);
+	}
+
+	/**
+	 * Creates a new state variable with the given location, type, name and
+	 * initial value.
+	 * 
+	 * @param location
+	 *            the state variable location
+	 * @param type
+	 *            the state variable type
+	 * @param name
+	 *            the state variable name
+	 * @param value
+	 *            initial value
+	 */
+	public GlobalVariable(Location location, Type type, String name,
+			boolean assignable, Expression initialValue) {
+		super(location, type, name, true, assignable);
+		this.initialValue = initialValue;
 	}
 
 	/**
@@ -82,7 +119,28 @@ public class GlobalVariable extends Variable {
 	 * @return the initial expression of this variable
 	 */
 	public Expression getExpression() {
-		return expression;
+		return initialValue;
+	}
+
+	/**
+	 * Returns the initial value of this state variable, or <code>null</code> if
+	 * this variable has no initial constant value. The initial value may be a
+	 * boolean, an integer, a list or a string.
+	 * 
+	 * @return an object, or <code>null</code> if this variable has no constant
+	 *         value
+	 */
+	public Expression getConstantValue() {
+		return initialValue;
+	}
+
+	/**
+	 * Returns <code>true</code> if this state variable has an initial value.
+	 * 
+	 * @return <code>true</code> if this state variable has an initial value
+	 */
+	public boolean isInitialized() {
+		return (initialValue != null);
 	}
 
 	/**
@@ -91,7 +149,19 @@ public class GlobalVariable extends Variable {
 	 * @return <code>true</code> if this variable has an initial expression
 	 */
 	public boolean hasExpression() {
-		return (expression != null);
+		return (initialValue != null);
+	}
+
+	/**
+	 * Sets the initial value of this state variable. The initial value may be a
+	 * boolean, an integer, a list or a string.
+	 * 
+	 * @param initialValue
+	 *            an object, or <code>null</code> if this variable has no
+	 *            constant value
+	 */
+	public void setConstantValue(Expression initialValue) {
+		this.initialValue = initialValue;
 	}
 
 	/**
@@ -101,7 +171,7 @@ public class GlobalVariable extends Variable {
 	 *            the initial expression of this variable
 	 */
 	public void setExpression(Expression expression) {
-		this.expression = expression;
+		this.initialValue = expression;
 	}
 
 }
