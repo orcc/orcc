@@ -25,7 +25,7 @@ distribution.
 #include <ctype.h>
 #include <stddef.h>
 
-#include "Jade/TinyXml/tinyxml.h"
+#include "Jade/TinyXml/TinyXml.h"
 
 //#define DEBUG_PARSER
 #if defined( DEBUG_PARSER )
