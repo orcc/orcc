@@ -53,6 +53,8 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
+import net.sf.orcc.tools.classifier.ActorClassifier;
+import net.sf.orcc.tools.normalizer.ActorNormalizer;
 
 /**
  * LLVM back-end.
@@ -74,13 +76,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 	 * Backend options
 	 */
 	private boolean classify;
-
 	private String llvmAs;
-
 	private boolean llvmBitcode;
 	private String llvmOpt;
+	private boolean normalize;
 	private boolean opt;
 	private String optLevel;
+
 	private STPrinter printer;
 	private final Map<String, String> transformations;
 
@@ -100,6 +102,14 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
+		if (classify) {
+			new ActorClassifier().transform(actor);
+
+			if (normalize) {
+				new ActorNormalizer().transform(actor);
+			}
+		}
+
 		ActorTransformation[] transformations = { new TypeSizeTransformation(),
 				new BoolToIntTransformation(), new PrintlnTransformation(),
 				new RenameTransformation(this.transformations),
@@ -207,6 +217,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		llvmBitcode = getAttribute("net.sf.orcc.backends.llvmBitcode", false);
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
 		opt = getAttribute("net.sf.orcc.backends.llvmOpt", false);
+		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
 
 		if (llvmBitcode) {
 			llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
@@ -233,7 +244,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 					try {
 						String line = reader.readLine();
 						if (line != null) {
-							write("Generation error :" + line +"\n");
+							write("Generation error :" + line + "\n");
 						}
 					} finally {
 						reader.close();

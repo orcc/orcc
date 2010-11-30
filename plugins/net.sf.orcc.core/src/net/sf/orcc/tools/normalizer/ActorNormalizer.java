@@ -30,18 +30,18 @@ package net.sf.orcc.tools.normalizer;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.moc.MoC;
-import net.sf.orcc.network.Network;
-import net.sf.orcc.network.transformations.INetworkTransformation;
 
 /**
  * This class defines a network transformation that normalizes actors so they
  * can later be merged together.
  * 
  * @author Matthieu Wipliez
+ * @author Jerome Gorin
  * 
  */
-public class ActorNormalizer implements INetworkTransformation {
+public class ActorNormalizer implements ActorTransformation {
 
 	/**
 	 * Creates a new normalizer
@@ -50,12 +50,10 @@ public class ActorNormalizer implements INetworkTransformation {
 	}
 
 	@Override
-	public void transform(Network network) throws OrccException {
-		for (Actor actor : network.getActors()) {
-			MoC clasz = actor.getMoC();
-			if (clasz.isCSDF()) {
-				new StaticActorNormalizer(actor).normalize();
-			}
+	public void transform(Actor actor) throws OrccException {
+		MoC clasz = actor.getMoC();
+		if (clasz.isCSDF()) {
+			new StaticActorNormalizer(actor).normalize();
 		}
 	}
 

@@ -588,7 +588,9 @@ public class Network {
 	 *             if something goes wrong
 	 */
 	public void normalizeActors() throws OrccException {
-		new ActorNormalizer().transform(this);
+		for (Actor actor : getActors()){
+			new ActorNormalizer().transform(actor);
+		}
 	}
 
 	/**
