@@ -451,6 +451,8 @@ actor(actor, options) ::= <<
 
 #include "$actor.name$.h"
 
+char* actor_$actor.name$::className = "$actor.name$";
+
 $defineConstantVars(actor.stateVars.list)$
 
 $constructor(parameters=actor.parameters.list, stateVars=actor.stateVars.list)$

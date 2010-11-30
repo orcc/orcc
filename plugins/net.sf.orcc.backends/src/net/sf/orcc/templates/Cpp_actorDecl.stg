@@ -253,6 +253,7 @@ private:
 #ifdef __TRACE_CAPTURE__
 	TraceCapture m_actionTracer;
 #endif
+static char* className;
 ////////////////////////////////////////////////////////////////////////////////
 // Parameters
 $parameters(actor.parameters.list)$
