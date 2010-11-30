@@ -470,66 +470,64 @@ $procedure(procedure=action.body)$
 ///////////////////////////////////////////////////////////////////////////////
 
 Actor_Scheduler(actor) ::= <<
-$actor.actions:Actor_Schedul(); separator="\n"$
-
->>
-
-Actor_Schedul(action) ::= <<
-$if (actor.templateData  || action.inputPattern.keys)
-$$action$_scheduler : process ($sensitivity(action)$) is
-  $action: printActionLocalSchedul()$  --
+$actor$_scheduler : process ($actor.actions: sensitivity()$) is
+  $actor.actions: printActionLocalSchedul()$  --
 begin
-  $action: printActionSchedulerInline(); separator="\n"$
-  $if(action.outputPattern.keys)
-$  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
-    $action$_go <= isSchedulable_$action$_go;
-    $if(action.inputPattern.keys)
-    $    $action.inputPattern.keys :{port|$port.name$_ack <= isSchedulable_$action$_go}; separator=";\n    "$;$
-    endif$
-    
-  else
-    $action$_go <= '0';
-    $if(action.inputPattern.keys)
-    $    $action.inputPattern.keys :{port|$port.name$_ack <= '0'}; separator=";\n    "$;$
-    endif$
-        
-  end if;$
-  else
-    $  $action$_go <= isSchedulable_$action$_go;$   
-  endif$
-  
-end process $action$_scheduler;$
-else
-$
-$action$_go <= '1';$
-endif$
-
+if $actor.actions: printActionSchedulerInline(); separator="\nelsif "$
+end if;
+$actor.actions: printActionSchedulerInlineNoInput(); separator="\n"$
+end process $actor$_scheduler;
 
 >>
 
 sensitivity(action) ::= <<
 $action.inputPattern.keys :{port|$port.name$_send}; separator=", "$$
-if(action.inputPattern.keys && action.outputPattern.keys)
+if(action.inputPattern.keys && actor.templateData)
 $, $
 endif$
-$action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$$
+$actor.templateData: {$it$}; separator=", "$$
 if(action.outputPattern.keys && actor.templateData)
 $, $
-elseif(action.inputPattern.keys && actor.templateData)
+elseif(action.inputPattern.keys && action.outputPattern.keys)
 $, $
 endif$
-$actor.templateData: {$it$}; separator=", "$
+$action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$
 >>
 
 // prints the scheduler of the given action "inline" (ie not within a function)
 printActionSchedulerInline(action) ::= <<
-
--- test if "$action$" action is schedulable
-if(($action.inputPattern.keys :{port|$port.name$_send}; separator=" and "$) = '1') then
-  $procedure(procedure=action.scheduler, transformReturn="true")$
-end if;
-
+$if(action.inputPattern.keys)
+$(($action.inputPattern.keys :{port|$port.name$_send}; separator=" and "$) = '1') then
+  -- test if "$action$" action is schedulable
+  $procedure(procedure=action.scheduler, transformReturn="true")$   
+$if(action.outputPattern.keys)
+  $  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
+    $action$_go <= isSchedulable_$action$_go;
+    $action.inputPattern.keys :{port|$port.name$_ack <= isSchedulable_$action$_go}; separator=";\n"$;
+  end if;$
+  else
+  $  $action$_go <= isSchedulable_$action$_go;$
+  endif$$
+endif$
+  
 >>
+
+printActionSchedulerInlineNoInput(action) ::= <<
+$if(actor.templateData)
+$  -- test if "$action$" action is schedulable
+  $procedure(procedure=action.scheduler, transformReturn="true")$   
+  $if(action.outputPattern.keys)
+  $  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
+    $action$_go <= isSchedulable_$action$_go;
+  end if;$
+  endif$
+  $action$_go <= isSchedulable_$action$_go;$
+elseif(!actor.templateData && !action.inputPattern.keys)
+$  $action$_go <= '1';$
+endif$
+  
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Execute process
 ///////////////////////////////////////////////////////////////////////////////

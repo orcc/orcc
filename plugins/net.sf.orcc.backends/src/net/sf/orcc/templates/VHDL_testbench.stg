@@ -229,7 +229,7 @@ end process WaveGen_Proc_Out;
 
 
 case_define_out(port) ::= <<
-    if (not endfile (sim_file_$instance.id$_$port.name$) and $port.name$_write = '1') then
+    if (not endfile (sim_file_$instance.id$_$port.name$) and $port.name$_send = '1') then
       readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
