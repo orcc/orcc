@@ -710,7 +710,7 @@ public class XDFParser {
 			ParseContinuation<Type> cont = typeParser.parseType(decl
 					.getFirstChild());
 			Type type = cont.getResult();
-			GlobalVariable var = new GlobalVariable(location, type, name);
+			GlobalVariable var = new GlobalVariable(location, type, name, false);
 			network.getParameters().put(file.getAbsolutePath(), location, name,
 					var);
 		} else if (kind.equals("Variable")) {
@@ -718,7 +718,8 @@ public class XDFParser {
 					.getFirstChild());
 			Type type = cont.getResult();
 			Expression expr = exprParser.parseExpr(cont.getNode());
-			GlobalVariable var = new GlobalVariable(location, type, name, expr);
+			GlobalVariable var = new GlobalVariable(location, type, name,
+					false, expr);
 			network.getVariables().put(file.getAbsolutePath(), location, name,
 					var);
 		} else {

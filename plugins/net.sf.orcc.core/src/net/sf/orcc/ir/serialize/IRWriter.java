@@ -944,7 +944,7 @@ public class IRWriter {
 		variableArray.add(writeLocation(variable.getLocation()));
 		variableArray.add(writeType(variable.getType()));
 
-		Expression constant = variable.getConstantValue();
+		Expression constant = variable.getInitialValue();
 		if (constant == null) {
 			array.add(null);
 		} else {

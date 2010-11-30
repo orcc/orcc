@@ -59,9 +59,9 @@ StringExpr(constant) ::= <<
 stateVar(variable) ::= <<
 $if(variable.initialized)$
 $if(!variable.assignable && !variable.type.list)$
-#define $variable$ $Constant(variable.constantValue)$
+#define $variable$ $Constant(variable.initialValue)$
 $else$
-static $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;
+static $variableDeclaration(variable)$ = $Constant(variable.initialValue)$;
 $endif$
 $else$
 static $variableDeclaration(variable)$;

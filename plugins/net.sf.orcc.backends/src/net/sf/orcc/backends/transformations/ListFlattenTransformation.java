@@ -130,7 +130,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 			int indexSize;
 			// new index variable
 			LocalVariable indexVar;
-			
+
 			if (useUint) {
 				// index goes from 0 to size - 1, and we remove the sign bit
 				indexSize = IntExpr.getSize(size - 1) - 1;
@@ -184,7 +184,7 @@ public class ListFlattenTransformation extends AbstractActorTransformation {
 				if (variable.getType().isList()) {
 					List<Expression> newValues = new ArrayList<Expression>();
 					flattenList(variable.getValue(), newValues);
-					variable.setConstantValue(new ListExpr(newValues));
+					variable.setInitialValue(new ListExpr(newValues));
 				}
 			}
 		}

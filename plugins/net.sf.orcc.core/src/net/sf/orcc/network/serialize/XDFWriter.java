@@ -413,8 +413,8 @@ public class XDFWriter {
 			decl.setAttribute("name", variable.getName());
 			decl.appendChild(writeType(variable.getType()));
 
-			if (variable.hasExpression()) {
-				writeExpr(decl, variable.getExpression());
+			if (variable.isInitialized()) {
+				writeExpr(decl, variable.getInitialValue());
 			}
 		}
 	}

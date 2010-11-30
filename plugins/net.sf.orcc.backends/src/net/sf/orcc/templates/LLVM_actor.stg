@@ -131,7 +131,7 @@ phiPair(value, label) ::= <<
 stateVar(variable) ::= <<
 @$variable$ = $if(variable.assignable)$ global $
 else$ constant $endif$ $variable.type$ $
-if(variable.constantValue)$ $ConstantValue(type=variable.type, const=variable.constantValue)$
+if(variable.initialValue)$ $ConstantValue(type=variable.type, const=variable.initialValue)$
 $else$ zeroinitializer, align 32 
 $endif$
 

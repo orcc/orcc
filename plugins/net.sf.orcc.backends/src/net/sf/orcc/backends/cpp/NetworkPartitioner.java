@@ -187,7 +187,7 @@ public class NetworkPartitioner implements INetworkTransformation {
 		// adds variables of the previous flatten network to the sub-network
 		for (GlobalVariable var : network.getVariables()) {
 			GlobalVariable newVar = new GlobalVariable(new Location(),
-					var.getType(), var.getName(), var.getExpression());
+					var.getType(), var.getName(), false, var.getInitialValue());
 
 			subNetwork.getVariables().put(newVar.getName(), newVar);
 		}

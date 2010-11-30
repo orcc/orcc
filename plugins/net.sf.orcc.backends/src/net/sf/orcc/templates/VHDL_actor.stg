@@ -57,7 +57,7 @@ signal $variable$ : $variable.type$;$
 else$
   $if(!variable.type.list)$
     $if(!variable.assignable)$
-constant $variable$ : $variable.type$ := $Constant(variable.constantValue)$;$
+constant $variable$ : $variable.type$ := $Constant(variable.initialValue)$;$
     else
 $signal $variable$ : $variable.type$;$
     endif$$
@@ -65,7 +65,7 @@ $signal $variable$ : $variable.type$;$
     $if(!variable.assignable)
       $$if(variable.initialized)
 $type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
-constant $variable$ : memory_type_$variable$ := $Constant(variable.constantValue)$;$
+constant $variable$ : memory_type_$variable$ := $Constant(variable.initialValue)$;$
       endif$$
     else
 $type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
@@ -91,7 +91,7 @@ $
 
 stateConst(variable) ::= <<
 $
-if(variable.constantValue)
+if(variable.initialized)
   $$
   if(variable.assignable)
 $$declareConst(variable)$$
@@ -103,7 +103,7 @@ $
 >>
 
 declareConst(variable) ::= <<
-$variable$ <= $Constant(variable.constantValue)$;
+$variable$ <= $Constant(variable.initialValue)$;
 
 >>
 

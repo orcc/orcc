@@ -200,7 +200,7 @@ $BlockNode(whileNode.joinNode)$
 stateVar(var) ::= <<
 $if (var.assignable)$
 $if (var.initialized)$
-$variableDeclaration(var)$ = $Constant(var.constantValue)$;
+$variableDeclaration(var)$ = $Constant(var.initialValue)$;
 $else$
 $variableDeclaration(var)$;
 $endif$

@@ -86,7 +86,7 @@ $expr$
 // a state variable
 stateVar(variable) ::= <<
 $if(variable.initialized)$
-private $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;
+private $variableDeclaration(variable)$ = $Constant(variable.initialValue)$;
 $else$
 private $variableDeclarationInit(variable)$;
 $endif$

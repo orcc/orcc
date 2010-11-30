@@ -56,7 +56,7 @@ namespace
 
 defineConstantVar(variable) ::= <<
 $if(!variable.assignable)$
-const $variableDeclaration(variable)$ = $Constant(variable.constantValue)$;$\n$$endif$
+const $variableDeclaration(variable)$ = $Constant(variable.initialValue)$;$\n$$endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ $if (variable.type.dimensions)$
 $variable$(new $variable.type$$listSize(variable.type.dimensions)$),
 $else$
 $if (variable.initialized)$
-$variable$($Constant(variable.constantValue)$),
+$variable$($Constant(variable.initialValue)$),
 $endif$
 $endif$
 $endif$
@@ -96,7 +96,7 @@ ListStateVarInitialization(variable) ::= <<
 $if(variable.assignable)$
 $if (variable.type.dimensions)$
 $if (variable.initialized)$
-const $variable.type$ tmp_$variable$[$variable.type.dimensions$] = $Constant(variable.constantValue)$;
+const $variable.type$ tmp_$variable$[$variable.type.dimensions$] = $Constant(variable.initialValue)$;
 memcpy($variable$, tmp_$variable$, $variable.type.dimensions$ * sizeof($variable.type$));
 $endif$
 $endif$

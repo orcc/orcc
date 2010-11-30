@@ -69,7 +69,7 @@ $endif$
 
 stateVar(var) ::= <<
 $if(var.initialized)$<stateVar name="$var.name$" sourceName="$var.name$">
-  $initVariable(type=var.type, value=var.constantValue)$</stateVar>
+  $initVariable(type=var.type, value=var.initialValue)$</stateVar>
 $else$
 $typeDefLocal(var)$
 <stateVar name="$var.name$" sourceName="$var.name$" typeName="$if(var.type.list)$$var.name$_typedef$else$$var.type$$endif$" size="$if (var.type.bool)$1$else$$var.type.size$$endif$"/>

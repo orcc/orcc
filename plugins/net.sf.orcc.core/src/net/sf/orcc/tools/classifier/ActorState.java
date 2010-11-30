@@ -65,7 +65,7 @@ public class ActorState {
 		state = new HashMap<GlobalVariable, Expression>();
 		for (GlobalVariable variable : actor.getStateVars()) {
 			Type type = variable.getType();
-			Expression constant = variable.getConstantValue();
+			Expression constant = variable.getInitialValue();
 			if (constant != null && !type.isList()) {
 				// we might consider this constant if it is used by guards
 				boolean usedByGuard = false;

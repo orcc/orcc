@@ -30,7 +30,7 @@ package net.sf.orcc.ir;
 
 /**
  * This class represents a global variable. A global variable is a variable that
- * is not assignable and may have a value as an expression.
+ * has an initial value in addition to its value as a variable.
  * 
  * @author Matthieu Wipliez
  * 
@@ -42,40 +42,6 @@ public class GlobalVariable extends Variable {
 	 */
 	private Expression initialValue;
 
-	/**
-	 * Creates a new global variable with the given location, type, and name.
-	 * The global variable created will have no value.
-	 * 
-	 * @param location
-	 *            the global variable location
-	 * @param type
-	 *            the global variable type
-	 * @param name
-	 *            the global variable name
-	 */
-	public GlobalVariable(Location location, Type type, String name) {
-		this(location, type, name, null);
-	}
-
-	/**
-	 * Creates a new global variable with the given location, type, name, and
-	 * initial value.
-	 * 
-	 * @param location
-	 *            the global variable location
-	 * @param type
-	 *            the global variable type
-	 * @param name
-	 *            the global variable name
-	 * @param value
-	 *            the value of the global variable
-	 */
-	public GlobalVariable(Location location, Type type, String name,
-			Expression value) {
-		super(location, type, name, true);
-		this.initialValue = value;
-	}
-	
 	/**
 	 * Creates a new state variable with the given location, type, name and
 	 * initial value expressed as an expression.
@@ -118,19 +84,7 @@ public class GlobalVariable extends Variable {
 	 * 
 	 * @return the initial expression of this variable
 	 */
-	public Expression getExpression() {
-		return initialValue;
-	}
-
-	/**
-	 * Returns the initial value of this state variable, or <code>null</code> if
-	 * this variable has no initial constant value. The initial value may be a
-	 * boolean, an integer, a list or a string.
-	 * 
-	 * @return an object, or <code>null</code> if this variable has no constant
-	 *         value
-	 */
-	public Expression getConstantValue() {
+	public Expression getInitialValue() {
 		return initialValue;
 	}
 
@@ -144,33 +98,12 @@ public class GlobalVariable extends Variable {
 	}
 
 	/**
-	 * Returns <code>true</code> if this variable has an initial expression.
-	 * 
-	 * @return <code>true</code> if this variable has an initial expression
-	 */
-	public boolean hasExpression() {
-		return (initialValue != null);
-	}
-
-	/**
-	 * Sets the initial value of this state variable. The initial value may be a
-	 * boolean, an integer, a list or a string.
-	 * 
-	 * @param initialValue
-	 *            an object, or <code>null</code> if this variable has no
-	 *            constant value
-	 */
-	public void setConstantValue(Expression initialValue) {
-		this.initialValue = initialValue;
-	}
-
-	/**
 	 * Sets the initial expression of this variable.
 	 * 
 	 * @param expression
 	 *            the initial expression of this variable
 	 */
-	public void setExpression(Expression expression) {
+	public void setInitialValue(Expression expression) {
 		this.initialValue = expression;
 	}
 

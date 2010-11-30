@@ -76,7 +76,7 @@ public class SolveParametersTransform extends AbstractExpressionInterpreter
 		Variable var = expr.getVar().getVariable();
 		OrderedMap<String, GlobalVariable> variables = network.getVariables();
 		GlobalVariable variable = variables.get(var.getName());
-		Expression value = variable.getExpression();
+		Expression value = variable.getInitialValue();
 		return value;
 	}
 
@@ -137,7 +137,7 @@ public class SolveParametersTransform extends AbstractExpressionInterpreter
 						+ " has no value for parameter " + name);
 			}
 
-			parameter.setExpression(value);
+			parameter.setInitialValue(value);
 		}
 	}
 

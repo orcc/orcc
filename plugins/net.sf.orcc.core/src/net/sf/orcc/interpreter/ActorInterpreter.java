@@ -235,7 +235,7 @@ public class ActorInterpreter {
 			for (GlobalVariable stateVar : actor.getStateVars()) {
 				Type type = stateVar.getType();
 				// Initialize variables with constant values
-				Expression initConst = stateVar.getConstantValue();
+				Expression initConst = stateVar.getInitialValue();
 				if (initConst == null) {
 					if (type.isList()) {
 						// Allocate empty array variable

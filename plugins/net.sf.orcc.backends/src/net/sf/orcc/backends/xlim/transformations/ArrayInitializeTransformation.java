@@ -62,7 +62,7 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 		// Initialize value field if there is an initial value
 		for (Variable stateVar : actor.getStateVars()) {
 			Expression initConst = ((GlobalVariable) stateVar)
-					.getConstantValue();
+					.getInitialValue();
 			if (initConst != null) {
 				stateVar.setValue(initConst);
 			}
@@ -79,9 +79,9 @@ public class ArrayInitializeTransformation extends AbstractActorTransformation {
 		for (Variable stateVar : actor.getStateVars()) {
 			Type type = stateVar.getType();
 			GlobalVariable s = (GlobalVariable) stateVar;
-			if (type.isList() && s.getConstantValue() == null
+			if (type.isList() && s.getInitialValue() == null
 					&& s.getValue() != null) {
-				s.setConstantValue(s.getValue());
+				s.setInitialValue(s.getValue());
 			}
 			stateVar.setValue(null);
 		}
