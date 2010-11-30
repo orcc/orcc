@@ -157,10 +157,10 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		AstActorElements access = f.getAstActorAccess();
 
 		c.setLinewrap(2).after(access.getColonKeyword_9());
-		c.setIndentation(access.getColonKeyword_9(), access.getEndKeyword_13());
+		c.setIndentation(access.getColonKeyword_9(), access.getEndKeyword_14());
 
-		c.setLinewrap(2).before(access.getEndKeyword_13());
-		c.setLinewrap(2).after(access.getEndKeyword_13());
+		c.setLinewrap(2).before(access.getEndKeyword_14());
+		c.setLinewrap(2).after(access.getEndKeyword_14());
 	}
 
 	/**

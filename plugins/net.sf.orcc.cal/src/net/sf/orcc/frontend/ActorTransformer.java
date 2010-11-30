@@ -41,11 +41,13 @@ import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstOutputPattern;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstSchedule;
+import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
+import net.sf.orcc.frontend.schedule.RegExpConverter;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
@@ -518,13 +520,20 @@ public class ActorTransformer {
 
 			// transform FSM
 			AstSchedule schedule = astActor.getSchedule();
+			AstScheduleRegExp scheduleRegExp = astActor.getScheduleRegExp();
 			ActionScheduler scheduler;
-			if (schedule == null) {
+			if (schedule == null && scheduleRegExp == null) {
 				scheduler = new ActionScheduler(sortedActions.getAllActions(),
 						null);
 			} else {
-				FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
-				FSM fsm = builder.buildFSM(sortedActions);
+				FSM fsm = null;
+				if (schedule != null) {
+					FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
+					fsm = builder.buildFSM(sortedActions);
+				} else {
+					RegExpConverter converter = new RegExpConverter(scheduleRegExp);
+					fsm = converter.convert(sortedActions);
+				}
 				scheduler = new ActionScheduler(
 						sortedActions.getUntaggedActions(), fsm);
 			}

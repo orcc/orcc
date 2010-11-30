@@ -1,0 +1,27 @@
+actor Test() int In ==>:
+
+	int letter_a = 1;
+	int letter_b = 2;
+	int letter_c = 3;
+	int EOI = 0;
+
+	a:action In:[letter] ==>
+	guard (letter = letter_a)
+	end
+	
+	b:action In:[letter] ==>
+	guard (letter = letter_b)
+	end
+	
+	c:action In:[letter] ==>
+	guard (letter = letter_c)
+	end
+	
+	MATCH:action In:[s] ==>
+	guard (s = EOI)
+	do
+		println("match !");
+	end
+	
+	schedule regexp c (a* b | a b*) c MATCH end
+end

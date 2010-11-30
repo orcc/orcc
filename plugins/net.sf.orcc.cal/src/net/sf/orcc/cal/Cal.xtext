@@ -51,6 +51,8 @@ AstActor:
 	| stateVariables += AstStateVariable)*
 
 	(schedule = AstSchedule)?
+	
+	(scheduleRegExp = AstScheduleRegExp)?
 
 	(priorities += AstPriority)*
 
@@ -114,6 +116,23 @@ AstTransition:
 	source=[AstState] '(' tag=AstTag ')' '-->' target=[AstState] ';';
 
 AstState: name=ID;
+
+AstScheduleRegExp:
+	'schedule' 'regexp' AstRegExp
+	'end';
+	
+AstRegExp:
+	AstRegExpConcatenation({AstRegExpBinary.left=current} operator=('|') right=AstRegExpConcatenation)*;
+AstRegExpConcatenation returns AstRegExp:
+	AstRegExpPostfix({AstRegExpBinary.left=current} right=AstRegExpPostfix)*;
+AstRegExpPostfix returns AstRegExp:
+	AstRegExpGrouping({AstRegExpUnary.child=current} unaryOperator=('*'|'?'))*;
+AstRegExpGrouping returns AstRegExp:
+	  AstRegExpTerminal
+	| '(' AstRegExp ')';
+
+AstRegExpTerminal returns AstRegExp:
+	{AstRegExpTag} tag=AstTag;
 
 ///////////////////////////////////////////////////////////////////////////////
 // actions

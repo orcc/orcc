@@ -1,0 +1,15 @@
+actor RegExpError() ==> :
+
+	a:action ==>
+	end
+
+	b:action ==>
+	end
+
+	schedule regexp a* b end
+
+	priority
+		a > b;
+	end
+
+end

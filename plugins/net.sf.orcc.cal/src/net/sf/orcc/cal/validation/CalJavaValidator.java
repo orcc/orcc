@@ -52,6 +52,7 @@ import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstProcedure;
 import net.sf.orcc.cal.cal.AstSchedule;
+import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstStatementAssign;
 import net.sf.orcc.cal.cal.AstStatementCall;
 import net.sf.orcc.cal.cal.AstStatementForeach;
@@ -264,6 +265,11 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		AstSchedule schedule = actor.getSchedule();
 		if (schedule != null) {
 			checkFsm(actionList, schedule);
+		}
+		AstScheduleRegExp scheduleRegExp = actor.getScheduleRegExp();
+		if (scheduleRegExp != null && !actor.getPriorities().isEmpty()) {
+			error("Regexp scheduler with priorities.", scheduleRegExp,
+					CalPackage.AST_SCHEDULE_REG_EXP);
 		}
 
 		checkPriorities(actor, actionList);

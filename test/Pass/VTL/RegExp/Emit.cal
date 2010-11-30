@@ -1,0 +1,22 @@
+actor Emit() ==> int Out:
+	
+	int a = 1;
+	int b = 2;
+	int c = 3;
+	int EOI = 0;
+	
+	List(type:int, size=8) s = [c, a, a, a, a, b, c, EOI]; // must match
+	//List(type:int, size=11) s = [c, a, b, b, b, b, b, b, b, c, EOI]; // must match
+	//List(type:int, size=4) s = [c, a, c, EOI]; // must match
+	//List(type:int, size=8) s = [c, a, a, b, a, a, c, EOI]; // musn't match
+	//List(type:int, size=7) s = [c, a, a, b, b, b, EOI]; // musn't match
+	
+	bool done := false;
+	
+	once:action ==> Out:[s] repeat #s
+	guard (not done)
+	do
+		done := true;
+	end
+	
+end
