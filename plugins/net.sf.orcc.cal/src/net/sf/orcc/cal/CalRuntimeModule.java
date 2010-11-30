@@ -35,6 +35,7 @@ import net.sf.orcc.cal.resource.CalResourceDescriptionManager;
 import org.eclipse.xtext.conversion.IValueConverterService;
 import org.eclipse.xtext.linking.ILinkingService;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
+import org.eclipse.xtext.parser.antlr.ISyntaxErrorMessageProvider;
 import org.eclipse.xtext.resource.IResourceDescription;
 
 /**
@@ -64,6 +65,10 @@ public class CalRuntimeModule extends net.sf.orcc.cal.AbstractCalRuntimeModule {
 		// CalJavaValidator
 
 		return CalResourceDescriptionManager.class;
+	}
+	
+	public Class<? extends ISyntaxErrorMessageProvider> bindISyntaxErrorMessageProvider() {
+		return CalSyntaxErrorMessageProvider.class;
 	}
 
 	@Override
