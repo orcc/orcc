@@ -52,6 +52,7 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.*;
+import VTL.MPEG.Common.Imp_Math.*;
 //Clean me !!!
 actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=6)  mb_type,
@@ -175,39 +176,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			int (size=5) Idx_A;
 			int (size=5) Idx_B;
 			int (size=5) Idx_C;
-
-	function Min(int a, int b)
-				-->
-			int
-		:
-			if(a < b)then
-				a
-			else
-				b
-			end
-		end
-
-	function Max(int a, int b)
-				-->
-			int
-		:
-			if(a > b)then
-				a
-			else
-				b
-			end
-		end
-
-	function MinPositive(int(size=5) a, int(size=5) b)
-				-->
-			int(size=5)
-		:
-			if( a >= 0 and b >= 0)then
-				Min(a,b)
-			else
-				Max(a,b)
-			end
-		end
 
 	procedure GetNeighbourBlockParametres (uint(size=4) IdxBlk, uint(size=2) SzBlkMv)
 	var
@@ -379,9 +347,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbType       := BLOCK_TYPE_P_L0_16x16;
 		end
 
-	int(size=5) RefIdxLX_Direct;
 	bool        direct_pred_lx;
-	List(type: int (size=16), size=2) mv_out_Direct;
 	List(type: uint(size=11), size=2) Loc_Direct;
 
 	//Should be made for all partitions !! ==> fix me !
@@ -396,6 +362,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			DirectPredLX_Out :[direct_pred_lx]
 		guard
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
+		var
+			int(size=5) RefIdxLX_Direct
 		do
 			Loc_Direct[0] := (Curr_Mb_Addr mod pic_width_in_mb)*16;
 			Loc_Direct[1] := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
@@ -430,25 +398,30 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			end
 			if(MacroBlkType = BLOCK_TYPE_B_SKIP)then
 				if(direct_spatial_mv_pred)then // spatial prediction
+					//foreach int i in 0 .. 15 //FIXME
+					//do
+					GetNeighbourBlockParametres (0,16);
+					RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
 					foreach int i in 0 .. 15
 					do
-						GetNeighbourBlockParametres (i,4);
-						RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
 						RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
-						if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[i])then
-							mv_out_Direct[0] := 0;
-							mv_out_Direct[1] := 0;
+					end
+					if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[0])then
+						foreach int i in 0 .. 15
+						do
 							MvTab[Idx_CurrBlk][i] := [0,0];
-							direct_pred_lx        := false;
-						else
-							ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
-							mv_out_Direct[0] := OMv[0];
-							mv_out_Direct[1] := OMv[1];
+						end
+						direct_pred_lx        := false;
+					else
+						ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
+						foreach int i in 0 .. 15
+						do
 							MvTab[Idx_CurrBlk][i][0] := OMv[0];
 							MvTab[Idx_CurrBlk][i][1] := OMv[1];
-							direct_pred_lx           := true;
 						end
+						direct_pred_lx           := true;
 					end
+					//end
 				else //temporal prediction
 					println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
 				end
@@ -461,14 +434,17 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			DirectPredLX_In :[other_direct_pred_lx]
 				==>
 			Location  :[Loc_Direct] repeat 2,
-			MvOut     :[mv_out_Direct]repeat 2,
-			RefIdxOut :[RefIdxLX_Direct],
+			MvOut     :[MvTab[Idx_CurrBlk][0][0],MvTab[Idx_CurrBlk][0][1]],
+			RefIdxOut :[RefIdxTab[Idx_CurrBlk][0]],
 			NewPic_o  :[false]
 		guard
 			direct_pred_lx or (not other_direct_pred_lx)
 		do
 			if( (not direct_pred_lx) and (not other_direct_pred_lx))then
-				RefIdxLX_Direct := 0;
+				foreach int i in 0 .. 15
+				do
+					RefIdxTab[Idx_CurrBlk][i] := 0;
+				end
 			end
 		end
 

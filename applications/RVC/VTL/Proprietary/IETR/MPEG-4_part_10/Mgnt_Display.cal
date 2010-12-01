@@ -151,6 +151,6 @@ actor Mgnt_Display (bool Debug)
 
 	priority
 		SearchForNextPOC.BufferNotFull > SearchForNextPOC.BufferFull_or_IDR;
-		SendNextPOC.launch               > SendNextPOC.skip;
+		SendNextPOC.launch             > SendNextPOC.skip;
 	end
 end

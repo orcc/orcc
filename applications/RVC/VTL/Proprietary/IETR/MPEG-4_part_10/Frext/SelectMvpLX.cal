@@ -175,7 +175,6 @@ actor SelectMvpLX()
 			not Is8x8Mb,
 			IsPredL0[MbPartIdx&1] and IsPredL1[MbPartIdx&1]
 		do
-			println("In SelectMvpLX MacroBlkType.IsBiPred");
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -337,10 +336,10 @@ actor SelectMvpLX()
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			(not IsSubPredL0) and (not IsSubPredL1)
-		var
-			uint(size=2) list_selected,
-			uint(size=4) ref_idx_selected,
-			List(type: int(size=16), size=2) mv_selected
+//		var
+//			uint(size=2) list_selected,
+//			uint(size=4) ref_idx_selected,
+//			List(type: int(size=16), size=2) mv_selected
 		do
 /*			if(Is_direct_l0 and Is_direct_l1)then//Is BiPred
 				println("In SelectMvpLX SubMacroBlkType.Direct_Bipred not implemented yet !!");

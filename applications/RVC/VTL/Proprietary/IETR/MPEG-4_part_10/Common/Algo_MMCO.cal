@@ -55,6 +55,7 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Mederic Blestel and Endri Bezati IETR/INSA of Rennes
 //Modified by Mickael Raulet IETR/INSA of Rennes
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes
+import VTL.MPEG.Common.Imp_Math.*;
 
 actor Algo_MMCO () 
 	uint(size=31) MMCO,
@@ -110,15 +111,6 @@ actor Algo_MMCO ()
 	uint(size=6)  IdxPocList       := 0;
 	bool          ValIsIDR         := false;
 	int (size=32) ValDelPoc        := 0;
-
-
-	function min(uint a, uint b) --> uint:
-			if(a > b)then
-				b
-			else
-				a
-			end
-		end
 
 /*
 *

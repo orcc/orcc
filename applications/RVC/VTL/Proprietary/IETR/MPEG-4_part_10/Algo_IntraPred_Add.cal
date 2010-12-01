@@ -14,27 +14,28 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 Add value from input X with value from input Y to output Z
-Jérôme GORIN IETR/ARTEMIS
+Jerome GORIN IETR/ARTEMIS
 gorinje@gmail.com
+Modified by Damien de Saint Jorre ; IETR/INSA of Rennes
 *****************************************************************************/
+import VTL.MPEG.Common.Imp_Math.*;
 
 actor Algo_IntraPred_Add (bool a) 
 		int(size=16) X, 
 		int(size=16) Y 
 				==> 
-				int(size=9) Z :
+		int(size=9) Z :
  
  	bool DEBUG_INPUT = false;
- 
-  // Clip the value higher than 255 and lower to 0
-  function clip(int x)-->int :
-    if x > 255 then 255 else if x < 0 then 0 else x end end
-  end
   
-  Add:action X:[x], Y:[y] ==> Z:[clip(x + y)]
-  do
-  	if(DEBUG_INPUT and a)then
-		println("Input IntraPredAdd: X=>"+x+" ; Y=>"+y);
-  	end
-  end
+	Add:action
+		X:[x],
+		Y:[y]
+			==>
+		Z:[ clip(x + y , 0,255) ]
+	do
+		if(DEBUG_INPUT and a)then
+			println("Input IntraPredAdd: X=>"+x+" ; Y=>"+y);
+		end
+	end
 end
