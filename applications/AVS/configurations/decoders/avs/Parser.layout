@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="bits" x="57" y="430"/>
+      <vertex id="BTYPE_Y" x="682" y="124"/>
+      <vertex id="BTYPE_U" x="682" y="217"/>
+      <vertex id="BTYPE_V" x="682" y="310"/>
+      <vertex id="INTRA_INFO_Y" x="682" y="550"/>
+      <vertex id="INTRA_INFO_U" x="682" y="643"/>
+      <vertex id="INTRA_INFO_V" x="682" y="736"/>
+      <vertex id="Block_Y" x="842" y="337"/>
+      <vertex id="Block_U" x="842" y="430"/>
+      <vertex id="Block_V" x="842" y="523"/>
+      <vertex id="WIDTH" x="454" y="70"/>
+      <vertex id="HEIGHT" x="454" y="163"/>
+      <vertex id="serialize" x="157" y="421"/>
+      <vertex id="Algo_Synp_AVSJZ" x="282" y="367"/>
+      <vertex id="BTYPESplit" x="454" y="256"/>
+      <vertex id="BlockExpand" x="454" y="403"/>
+      <vertex id="INTRA_INFOSplit" x="454" y="571"/>
+      <vertex id="BlockSplit" x="682" y="403"/>
+   </vertices>
+</layout>

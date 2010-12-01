@@ -100,7 +100,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Serialize"/>
+        <Class name="../../../VTL/avs/byte2bit"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

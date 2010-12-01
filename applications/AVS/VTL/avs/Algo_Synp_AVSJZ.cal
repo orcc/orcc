@@ -121,7 +121,6 @@ actor Algo_Synp_AVSJZ(
   
   int I_PICTURE_START_CODE = 179;
   int PB_PICTURE_START_CODE = 182;
-  int PB_PICTURE_START_CODE = 182;
   int BBV_DELAY_LENGTH = 16;
   //int TIME_CODE_FLAG_LENGTH = 1; not used
   int TIME_CODE_LENGTH = 24;
@@ -134,7 +133,7 @@ actor Algo_Synp_AVSJZ(
   int PICTURE_QP_LENGTH = 6;
   int SKIP_MODE_FLAG_LENGTH = 1;
   int LOOP_FILTER_DISABLE_LENGTH = 1;
-  //int LOOP_FILTER_PARAMETER_FLAG_LENGTH = 1; not used
+  int LOOP_FILTER_PARAMETER_FLAG_LENGTH = 1; //not used
   //int PICTURE_CODING_TYPE_LENGTH = 2; 
   //int NO_FORWARD_REFERENCE_FLAG_LENGTH = 1; not used
 
@@ -190,7 +189,7 @@ actor Algo_Synp_AVSJZ(
   int (size=BIT_RATE_LOWER_LENGTH) bit_rate_lower;
   int (size=BIT_RATE_UPPER_LENGTH) bit_rate_upper;
   int (size=LOW_DELAY_LENGTH) low_delay;
-  //int (size=MARKER_LENGTH) marker_one_bit;
+  int (size=MARKER_LENGTH) marker_one_bit;
   int (size=BBV_BUFFER_SIZE_LENGTH) bbv_buffer_size;
   
   int (size=BBV_DEALY_LENGTH) bbv_delay;
@@ -203,9 +202,9 @@ actor Algo_Synp_AVSJZ(
   uint (size=REPEAT_FIRST_FIELD_LENGTH) repeat_first_field;
   uint (size=FIXED_PICTURE_QP_LENGTH) fixed_picture_qp;
   int (size=PICTURE_QP_LENGTH) picture_qp;
-  //int (size=SKIP_MODE_FLAG_LENGTH) skip_mode_flag; not used
-  //int (size=LOOP_FILTER_DISABLE_LENGTH) loop_filter_disable; not used
-  //int (size=LOOP_FILTER_PARAMETER_FLAG_LENGTH) loop_filter_parameter_flag; not used
+  int (size=SKIP_MODE_FLAG_LENGTH) skip_mode_flag; //not used
+  int (size=LOOP_FILTER_DISABLE_LENGTH) loop_filter_disable; //not used
+  int (size=LOOP_FILTER_PARAMETER_FLAG_LENGTH) loop_filter_parameter_flag; //not used
   int alpha_offset;
   int beta_offset;
   
@@ -742,9 +741,10 @@ end
         picture_qp :=  mask_bits( read_result(), PICTURE_QP_LENGTH );  
     //println("picture_qp = " + picture_qp);
     set_bits_to_read( 4 + LOOP_FILTER_DISABLE_LENGTH );
+    end
   end
 
-  read_Picture_Header_Loop_filter_parameter: action bits:[b] ==>
+  /*read_Picture_Header_Loop_filter_parameter: action bits:[b] ==>
   guard
     done_reading_bits(),
     not b
@@ -752,7 +752,8 @@ end
     bit_count := bit_count + 1;
     set_bits_to_read( 4 );  
   end
-  //---------------------- PB picture -------------------------------------//
+  */
+  /* ---------------------- PB picture ------------------------------------- */
   read_Picture_Coding_Type: action ==>
   guard
       done_reading_bits()
@@ -800,7 +801,7 @@ end
   guard
       done_reading_bits()
   do
-      read_Picture_Reference_Flag := mask_bits(read_result(),1);
+      picture_reference_flag := mask_bits(read_result(),1);
       set_bits_to_read(1);
   end
   
@@ -875,9 +876,6 @@ end
   end 
   
   Slice_Header_Slice_Weighting_Flag: action ==>
-  guard
-       
-  do
   end
   
   //before start decoding one MB, first send the BTYPE token.  
@@ -1580,7 +1578,7 @@ end
     read_Picture_Header_Picture_qp_next           ( read_Picture_Header_Skip_mode_flag            ) --> read_Picture_Header_Loop_filter_disable;
     read_Picture_Header_Picture_qp_next           ( read_Picture_Header_Loop_filter_disable       ) --> Slice_byte_align;
     read_Picture_Header_Picture_qp_next           ( get_Picture_QP                                ) --> get_Picture_QP_next;
-    read_Picture_Header_Loop_filter_disable       ( read_Picture_Header_Loop_filter_disable       ) --> Slice_byte_align;//no loopfilter now
+    read_Picture_Header_Loop_filter_disable       ( read_Picture_Header_Loop_filter_disable       ) --> Slice_byte_align; //no loopfilter now
     
     //pb picture
     read_Picture_Coding_Type                      ( read_Picture_Coding_Type                      ) --> read_PB_Picture_Distance;
@@ -1731,7 +1729,7 @@ end
   priority
     read_Picture_Header_BBV_check_times       > read_Picture_Header_Progressive_frame;
     read_Picture_Header_Skip_mode_flag        > read_Picture_Header_Loop_filter_disable;
-    read_Picture_Header_Loop_filter_parameter > byte_align;
+//    read_Picture_Header_Loop_filter_parameter > byte_align;
     
     MB_read_I_mode_Luma_one                   > MB_read_I_mode_Luma_two;
     
