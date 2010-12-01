@@ -470,13 +470,20 @@ $procedure(procedure=action.body)$
 ///////////////////////////////////////////////////////////////////////////////
 
 Actor_Scheduler(actor) ::= <<
-$actor$_scheduler : process ($actor.actions: sensitivity()$) is
-  $actor.actions: printActionLocalSchedul()$  --
+$actor.actions: printActionSchedulerInline(); separator="\n"$
+
+ack_process : process ($actor.actions :{actions|$actions$_go}; separator=", "$$if(actor.actionScheduler.fsm)$, FSM$endif$) is
 begin
-if $actor.actions: printActionSchedulerInline(); separator="\nelsif "$
-end if;
-$actor.actions: printActionSchedulerInlineNoInput(); separator="\n"$
-end process $actor$_scheduler;
+  $actor.inputs.list: {port|$port.name$_ack <= '0';}; separator="\n"$
+  --
+$if(actor.actionScheduler.fsm)    
+$  $printActionSchedulerAckFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
+else  
+$  if $actor.actions: printActionSchedulerAck(); separator="\n  elsif"$
+  end if;$
+endif$
+
+end process;
 
 >>
 
@@ -496,36 +503,66 @@ $action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$
 
 // prints the scheduler of the given action "inline" (ie not within a function)
 printActionSchedulerInline(action) ::= <<
+
+$action$_scheduler : process ($sensitivity(action)$) is
+  $printActionLocalSchedul(action)$  --
+begin
 $if(action.inputPattern.keys)
-$(($action.inputPattern.keys :{port|$port.name$_send}; separator=" and "$) = '1') then
-  -- test if "$action$" action is schedulable
+$if (($action.inputPattern.keys :{port|$port.name$_send}; separator=" and "$) = '1') then$
+endif$
+$if(action.inputPattern.keys || actor.templateData)
+$  -- test if "$action$" action is schedulable
   $procedure(procedure=action.scheduler, transformReturn="true")$   
 $if(action.outputPattern.keys)
   $  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
     $action$_go <= isSchedulable_$action$_go;
-    $action.inputPattern.keys :{port|$port.name$_ack <= isSchedulable_$action$_go}; separator=";\n"$;
+  else
+    $action$_go <= '0';    
   end if;$
   else
-  $  $action$_go <= isSchedulable_$action$_go;$
-  endif$$
-endif$
+  $
+  $action$_go <= isSchedulable_$action$_go;$
+  endif$
   
+end if;$
+else
+$$action$_go <= '1';$
+endif$  
+end process $action$_scheduler;
 >>
 
-printActionSchedulerInlineNoInput(action) ::= <<
-$if(actor.templateData)
-$  -- test if "$action$" action is schedulable
-  $procedure(procedure=action.scheduler, transformReturn="true")$   
-  $if(action.outputPattern.keys)
-  $  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
-    $action$_go <= isSchedulable_$action$_go;
-  end if;$
-  endif$
-  $action$_go <= isSchedulable_$action$_go;$
-elseif(!actor.templateData && !action.inputPattern.keys)
-$  $action$_go <= '1';$
+printActionSchedulerAck(action) ::= <<
+($action$_go = '1') then
+$if(action.inputPattern.keys)
+$    $action.inputPattern.keys :{port|$port.name$_ack <= '1';}; separator="\n    "$$
+else
+$    null;$  
 endif$
-  
+>>
+
+printActionSchedulerAckFSM(actions, fsm) ::= <<
+$if(actions)
+$if$printActionSchedulerAck(actions)$
+else
+  case FSM is
+  $TransitionAck()$
+      end case;
+end if;$
+else
+$case FSM is
+$fsm.transitions: TransitionAck(); separator="\n\n"$
+end case;$
+endif$
+>>
+
+TransitionAck(transition) ::= <<
+    when s_$transition.sourceState$ =>
+      if $transition.nextStateInfo: Acknoledgement(); separator="\n      elsif"$
+      end if;
+>>
+
+Acknoledgement(nextstate) ::= <<
+    $printActionSchedulerAck(nextstate.action)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -615,18 +652,14 @@ endif$
 
 switchTransition(transition) ::= <<
     when s_$transition.sourceState$ =>
-      $executeCoreState(nextStates=transition.nextStateInfo)$
+      if $transition.nextStateInfo: actionTestState(); separator="\n--\nelsif"$
+      end if;
 >>
 
-executeCoreState(nextStates) ::= <<
-
-if $nextStates: actionTestState(); separator="\n--\nelsif"$
-end if;
->>
 
 actionTestState(nextState) ::= <<
-$actionTestSceduler(nextState.action)$
-  FSM <= s_$nextState.targetState$;
+      $actionTestSceduler(nextState.action)$
+        FSM <= s_$nextState.targetState$;
 >>
 
 
