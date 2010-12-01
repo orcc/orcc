@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="IS_IN" x="57" y="87"/>
+      <vertex id="BTYPE" x="57" y="247"/>
+      <vertex id="INTRA_INFO" x="57" y="339"/>
+      <vertex id="RD_C" x="197" y="196"/>
+      <vertex id="REC_DONE" x="57" y="431"/>
+      <vertex id="IntraPred_C" x="729" y="305"/>
+      <vertex id="RA_INTRA_C" x="463" y="431"/>
+      <vertex id="mot" x="463" y="87"/>
+      <vertex id="ISIQIT" x="197" y="70"/>
+      <vertex id="Algo_IntraModePred_CHROMA_AVSJZ" x="197" y="288"/>
+      <vertex id="Mgnt_IntraPred_CHROMA_Addr" x="197" y="414"/>
+      <vertex id="Algo_IntraPred_CHROMA_8x8_AVSJZ" x="463" y="280"/>
+   </vertices>
+</layout>

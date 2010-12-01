@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="bits" x="45" y="440"/>
+      <vertex id="YUV" x="889" y="482"/>
+      <vertex id="WIDTH" x="313" y="70"/>
+      <vertex id="HEIGHT" x="313" y="162"/>
+      <vertex id="Decoding_Y" x="313" y="254"/>
+      <vertex id="MotionCompensation_Y" x="524" y="262"/>
+      <vertex id="Parser" x="161" y="401"/>
+      <vertex id="Decoding_U" x="313" y="452"/>
+      <vertex id="MotionCompensation_U" x="524" y="460"/>
+      <vertex id="Decoding_V" x="313" y="650"/>
+      <vertex id="MotionCompensation_V" x="524" y="658"/>
+      <vertex id="Mgnt_PixelMerger_420" x="724" y="469"/>
+   </vertices>
+</layout>

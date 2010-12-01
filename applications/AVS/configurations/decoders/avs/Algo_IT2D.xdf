@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Algo_IT2D">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="IT_IN">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="14"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="res">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="Algo_IT8x8_1d_AVSJZ_ROW">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/avs/Algo_IT8x8_1d_AVSJZ"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_IT8x8_1d_AVSJZ_COLUMN">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/avs/Algo_IT8x8_1d_AVSJZ"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_Transpose8x8_row">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/avs/Algo_Transpose8x8_row"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_Transpose8x8_col">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/avs/Algo_Transpose8x8_col"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_IT_clip_col">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/avs/Algo_IT_clip_col"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Algo_IT_clip_row">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="../../../VTL/avs/Algo_IT_clip_row"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="Algo_IT8x8_1d_AVSJZ_ROW" dst-port="X" src="" src-port="IT_IN"/>
+    <Connection dst="Algo_IT8x8_1d_AVSJZ_COLUMN" dst-port="X"
+        src="Algo_Transpose8x8_row" src-port="Y"/>
+    <Connection dst="Algo_IT_clip_row" dst-port="X"
+        src="Algo_IT8x8_1d_AVSJZ_ROW" src-port="Y"/>
+    <Connection dst="Algo_Transpose8x8_row" dst-port="X"
+        src="Algo_IT_clip_row" src-port="Y"/>
+    <Connection dst="Algo_IT_clip_col" dst-port="X"
+        src="Algo_IT8x8_1d_AVSJZ_COLUMN" src-port="Y"/>
+    <Connection dst="Algo_Transpose8x8_col" dst-port="X"
+        src="Algo_IT_clip_col" src-port="Y"/>
+    <Connection dst="" dst-port="res" src="Algo_Transpose8x8_col" src-port="Y"/>
+</XDF>

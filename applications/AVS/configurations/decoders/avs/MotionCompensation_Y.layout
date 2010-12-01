@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="BTYPE" x="57" y="96"/>
+      <vertex id="res" x="43" y="227"/>
+      <vertex id="Pred" x="38" y="178"/>
+      <vertex id="RA_INTRA" x="332" y="193"/>
+      <vertex id="Rec_Y" x="324" y="306"/>
+      <vertex id="REC_DONE" x="560" y="71"/>
+      <vertex id="RD" x="688" y="188"/>
+      <vertex id="Algo_Add_avs" x="139" y="165"/>
+      <vertex id="Mgnt_Reconstruct_LUMA_Addr" x="311" y="79"/>
+      <vertex id="Mgnt_FB" x="560" y="163"/>
+   </vertices>
+</layout>
