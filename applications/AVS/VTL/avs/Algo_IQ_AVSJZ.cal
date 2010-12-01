@@ -1,0 +1,145 @@
+/*******************************************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*******************************************************************************************************/
+
+
+// Author: Dandan Ding (dandan2036@163.com), Honggang Qi(hgqi@jdl.ac.cn), Lu Yu, Wen Gao
+
+// Algo_IQ_AVSJZ.cal
+// Function: This module implements Inverse Quantization (IQ) of AVS Jizhun Profile.
+
+/*******************************************************************************************************
+ Input Ports:
+ =============
+ *int(size=SAMPLE_SZ) IQ_IN
+ A sequence of 64 ouputs of IS, which is 12bits (SAMPLE_SZ=12bits).
+ 
+ *int(size=BTYPE_SZ) BTYPE
+ Offer QP which is BTYPE[5:0]
+ 
+ Output Ports:
+ =============
+ *int(size=IT_IN_SZ) IT_IN :
+ A sequence of 64 pixel after quantization, which is 14bits (IT_IN_SZ=14bits).
+  
+*******************************************************************************************************/
+
+
+actor Algo_IQ_AVSJZ( 
+)   
+  int(size=SAMPLE_SZ) IQ_IN, 
+  int(size=BTYPE_SZ) BTYPE 
+  ==> 
+  int(size=IT_IN_SZ) IT_IN :
+  
+  int BTYPE_SZ = 12;
+  int NEWVOP = 2048;
+  int QUANT_MASK = 63;
+  int QP_SZ = 6;
+  int IT_IN_SZ = 14;
+  int SAMPLE_SZ = 13;
+  
+  uint(size=7) count;
+  int(size=QP_SZ) qp;
+  uint(size=16) dequant;
+  uint(size=13) round;
+  uint(size=4) shift;
+  
+  List( type:uint(size=4), size=64 ) find_shift = 
+ [14, 14, 14, 14, 14, 14, 14, 14,
+ 13, 13, 13, 13, 13, 13, 13, 13,
+ 13, 12, 12, 12, 12, 12, 12, 12,
+ 11, 11, 11, 11, 11, 11, 11, 11,
+ 11, 10, 10, 10, 10, 10, 10, 10,
+ 10,  9,  9,  9,  9,  9,  9,  9,
+ 9,  8,  8,  8,  8,  8,  8,  8,
+ 7,  7,  7,  7,  7,  7,  7,  7];
+ 
+  List( type:uint(size=16), size=64 ) find_dequant = 
+ [32768,36061,38968,42495,46341,50535,55437,60424,
+32932,35734,38968,42495,46177,50535,55109,59933,
+65535,35734,38968,42577,46341,50617,55027,60097,
+32809,35734,38968,42454,46382,50576,55109,60056,
+65535,35734,38968,42495,46320,50515,55109,60076,
+65535,35744,38968,42495,46341,50535,55099,60087,
+65535,35734,38973,42500,46341,50535,55109,60097,
+32771,35734,38965,42497,46341,50535,55109,60099];
+  
+  get_new_qp: action BTYPE:[cmd] ==>
+  guard
+    bitand(NEWVOP,cmd) != 0
+  do
+    qp := bitand( cmd, QUANT_MASK );
+    //println("qp "+qp);    
+  end
+
+  skip_wh: action BTYPE:[cmd] repeat 2 ==>
+  end
+
+  skip_other: action BTYPE:[cmd]  ==>
+  guard
+    bitand(NEWVOP,cmd) = 0
+  end
+
+  get_para: action ==>
+  do
+    dequant := find_dequant[qp];
+    shift := find_shift[qp];
+    round := lshift(1,find_shift[qp]-1);
+    count := 0;
+    //println("dequant "+dequant+" shift "+shift+" round "+round);
+  end
+
+  done: action ==>
+  guard 
+    count = 64
+  end
+
+  iq: action IQ_IN:[i] ==> IT_IN:[o]
+  var
+    int(size=IT_IN_SZ) o = rshift(( dequant * i + round),shift)
+  do
+    count := count + 1;
+    //println("IQ_IN="+i);
+    //println("IQ_OUT="+o);
+  end
+
+  schedule fsm start :
+    start     ( get_new_qp ) --> skip_wh;
+    skip_wh   ( skip_wh    ) --> skip_other;
+    skip_other( skip_other ) --> get_para;
+    start     ( skip_other ) --> get_para;
+
+    get_para  ( get_para   ) --> iq;
+    iq        ( done       ) --> start;
+    iq        ( iq         ) --> iq;
+  end
+
+  priority
+    done > iq;
+  end
+
+end

@@ -1,0 +1,447 @@
+/*******************************************************************************************************
+* COPYRIGHT AND WARRANTY INFORMATION
+*
+* Copyright 2003, Advanced Audio Video Coding Standard, Part II
+*
+* DISCLAIMER OF WARRANTY
+*
+* The contents of this file are subject to the Mozilla Public License
+* Version 1.1 (the "License"); you may not use this file except in
+* compliance with the License. You may obtain a copy of the License at
+* http://www.mozilla.org/MPL/
+*
+* Software distributed under the License is distributed on an "AS IS"
+* basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
+* License for the specific language governing rights and limitations under
+* the License.
+*                     
+* THIS IS NOT A GRANT OF PATENT RIGHTS - SEE THE AVS PATENT POLICY.
+* The AVS Working Group doesn't represent or warrant that the programs
+* furnished here under are free of infringement of any third-party patents.
+* Commercial implementations of AVS, including shareware, may be
+* subject to royalty fees to patent holders. Information regarding
+* the AVS patent policy for standardization procedure is available at 
+* AVS Web site http://www.avs.org.cn. Patent Licensing is outside
+* of AVS Working Group.
+*******************************************************************************************************/
+
+// Author: Dandan Ding (dandan2036@163.com), Honggang Qi(hgqi@jdl.ac.cn), Lu Yu, TiejunHuang, and Wen Gao
+
+// Algo_IntraPred_LUMA_8x8_AVSJZ.cal
+// Function: This module implements intra prediction for 8x8 luma block of AVS Jizhun Profile.
+
+/**********************************************************************************************************
+ Input Ports:
+ ============
+ *int(size_PIX_SZ) Intra_TOP_LEFT_Data
+ A sequence of reconstructed data from buffer "Mgnt_FB", first arrives the L_LEFT, following the L_TOP,
+ at last the L_TOP_LEFT.
+ 
+ *int(size=1) AVAIL
+ A sequence of available or not signal for current block. First arrives the left_avail, following the top_avail,
+ at last the top_left_avail.
+
+ *int(size=3) IntraLumaPredMode:
+ 0 : Intra_8x8_Vertical;
+ 1 : Intra_8x8_Horizontal;
+ 2 : Intra_8x8_DC;
+ 3 : Intra_8x8_Down_left;
+ 4 : Intra_8x8_Down_Right;
+
+ Output Ports:
+ =============
+ *int(size_PIX_SZ) IntraPred_Y
+ TA sequence of 64 outputs of intra prediction. It is in a horizontal raster order.
+*********************************************************************************************************/
+
+
+
+actor Algo_IntraPred_LUMA_8x8_AVSJZ ( 
+/*int PIX_SZ*/
+ )
+  //int(size=PIX_SZ) Y_LEFT,     // List
+  //int(size=PIX_SZ) Y_UP,       // List
+  //int(size=PIX_SZ) Y_UP_LEFT,  // point
+
+  
+  
+  int(size=PIX_SZ) Intra_TOP_LEFT_Data, //left, up, up_left data for intra prediction
+  int(size=1) AVAIL,                    // left, up, up_left, up_right availability List
+  int(size=3) IntraLumaPredMode                 // the mode of current 8x8 intra block.
+
+  ==> int(size=PIX_SZ) IntraPred_Y :
+  
+  int PIX_SZ = 9;
+  
+  uint(size=1) left_avail;
+  uint(size=1) up_avail;
+  uint(size=1) up_left_avail;
+
+  /*
+  function initList (int v_size) --> int:
+  [0: for int i in Integers(1,v_size)]
+  end
+  */
+  List(type:int(size=PIX_SZ),size=16) y_left := [0: for int i in 1 .. 16];
+  List(type:int(size=PIX_SZ),size=16) y_up:= [0: for int i in 1 .. 16];
+  List(type:int(size=PIX_SZ),size=1)  y_up_left:= [0: for int i in  1 .. 1];
+
+  List(type:int(size=PIX_SZ),size=16) f_y_left := [0: for int i in 1 .. 16];
+  List(type:int(size=PIX_SZ),size=16) f_y_up:= [0: for int i in 1 .. 16];
+  List(type:int(size=PIX_SZ),size=1)  f_y_up_left:= [0: for int i in 1 .. 1];
+  /*
+  function lowpass(int LineBuffer) --> int:
+    
+    LineBuffer = [ rshift(3*LineBuffer[0] + LineBuffer[1] + 2, 2)] +
+                 [ rshift(LineBuffer[x-1] + 2*LineBuffer[x] + LineBuffer[x+1] + 2, 2): for x in Integers(1,31)] +
+                 [ rshift(LineBuffer[31]  + 3*LineBuffer[32] + 2, 2)]
+    
+    LineBuffer[0]:= [ rshift(3*LineBuffer[0] + LineBuffer[1] + 2, 2)];
+    foreach int i in Integers(1,31)
+    do
+      LineBuffer[i]:=  rshift(LineBuffer[i-1] + 2*LineBuffer[i] + LineBuffer[i+1] + 2, 2);
+    end
+    LineBuffer[31]:=[ rshift(LineBuffer[31]  + 3*LineBuffer[32] + 2, 2)];
+  end
+  */
+  read_avail: action AVAIL:[avail] repeat 3 ==>
+  do
+    left_avail    := avail[0];
+    up_avail      := avail[1];
+    up_left_avail := avail[2];
+    //println("IntraPred_Y:left_avail="+left_avail);
+    //println("IntraPred_Y:up_avail="+up_avail);
+    //println("IntraPred_Y:up_left_avail="+up_left_avail);
+  end
+  
+  //case_0: all unavailable
+  read_case_0: action ==>
+  guard
+      left_avail=0,
+      up_avail=0,
+      up_left_avail=0
+  //do
+      //println("read_case_0");
+  end
+  
+  read_case_1: action Intra_TOP_LEFT_Data:[x] repeat 17 ==>
+  guard
+      left_avail=0,
+      up_avail=1,
+      up_left_avail=1
+  do
+      y_up:=[ x[i] : for int i in 0 .. 15 ];
+      y_up_left := [x[16]];
+      /*
+      println("read_case_1");
+      println("y_up="+x[0]);
+      println("y_up="+x[1]);
+      println("y_up="+x[2]);
+      println("y_up="+x[3]);
+      println("y_up="+x[4]);
+      println("y_up="+x[5]);
+      println("y_up="+x[6]);
+      println("y_up="+x[7]);
+      println("y_up="+x[8]);
+      println("y_up="+x[9]);
+      println("y_up="+x[10]);
+      println("y_up="+x[11]);
+      println("y_up="+x[12]);
+      println("y_up="+x[13]);
+      println("y_up="+x[14]);
+      println("y_up="+x[15]);
+      println("y_up_left="+x[16]);*/
+  end
+  
+  read_case_2: action Intra_TOP_LEFT_Data:[x] repeat 17 ==>
+  guard
+      left_avail=1,
+      up_avail=0,
+      up_left_avail=1
+  do
+      y_left:=[ x[i] : for int i in 0 .. 15 ];
+      y_up_left := [x[16]];
+      /*
+      println("read_case_1");
+      println("y_left="+x[0]);
+      println("y_left="+x[1]);
+      println("y_left="+x[2]);
+      println("y_left="+x[3]);
+      println("y_left="+x[4]);
+      println("y_left="+x[5]);
+      println("y_left="+x[6]);
+      println("y_left="+x[7]);
+      println("y_left="+x[8]);
+      println("y_left="+x[9]);
+      println("y_left="+x[10]);
+      println("y_left="+x[11]);
+      println("y_left="+x[12]);
+      println("y_left="+x[13]);
+      println("y_left="+x[14]);
+      println("y_left="+x[15]);
+      println("y_up_left="+x[16]);*/
+      
+  end
+
+  read_case_3: action Intra_TOP_LEFT_Data:[x] repeat 33 ==>
+  guard
+      left_avail=1,
+      up_avail=1,
+      up_left_avail=1
+  do
+      y_left:=[ x[i] : for int i in 0 .. 15 ];
+      y_up:=[ x[i] : for int i in 16 .. 31 ];
+      y_up_left := [x[32]];
+  end
+  /*
+  read_left_avail: action Intra_TOP_LEFT_Data:[x] repeat 16 ==>
+  guard left_avail = 1
+  do
+    y_left:=[ x[i] : for int i in 0 .. 15 ];
+    //println("IntraPred_Y:read_left_avail:y_left=");
+  end
+
+  read_left_navail: action ==>
+  guard left_avail = 0
+  //do
+    //println("IntraPred_Y:read_left_navail");
+  end
+  
+  read_top_avail: action Intra_TOP_LEFT_Data:[x] repeat 16 ==>
+  guard up_avail = 1
+  do
+    y_up:=[ x[i] : for int i in 0 .. 15 ];
+    //println("IntraPred_Y:read_top_avail:y_up=");
+  end
+
+  read_top_navail: action ==>
+  guard up_avail = 0
+  //do
+    //println("IntraPred_Y:read_top_navail");
+  end
+  
+  read_top_left_avail: action Intra_TOP_LEFT_Data:[x] repeat 1==>
+  guard up_left_avail = 1
+  do
+    y_up_left:= x;
+    //println("IntraPred_Y:read_top_left_avail:y_up_left=");
+  end
+
+  read_top_left_navail: action ==>
+  guard up_left_avail = 0
+  //do
+    //println("IntraPred_Y:read_top_left_navail");
+  end
+  */
+  
+  //the output of intra prediction is in horizontal raster order.
+  write: action IntraLumaPredMode:[mode] ==>
+    IntraPred_Y:[[predpels[8*j+i]: for int i in 0 .. 7, for int j in 0 .. 7]] repeat 64
+  var 
+    List(type:int(size=PIX_SZ),size=33) PredPixBuffer, //:= [y_left[15-i]: for int i in Integers(0,15)] + y_up_left + y_up,
+    List(type:int(size=PIX_SZ),size=33) PredPixBuffer_pass := [0: for int t in 1 .. 33],
+    List(type:int(size=PIX_SZ),size=64) predpels := [0: for int k in 1 .. 64]
+    //List(type:int(size=PIX_SZ),size=64) predpels_test := [0: for int k in 1 .. 64]
+    
+  do
+    PredPixBuffer[0] := y_left[15];
+    PredPixBuffer[1] := y_left[14];
+    PredPixBuffer[2] := y_left[13];
+    PredPixBuffer[3] := y_left[12];
+    PredPixBuffer[4] := y_left[11];
+    PredPixBuffer[5] := y_left[10];
+    PredPixBuffer[6] := y_left[9];
+    PredPixBuffer[7] := y_left[8];
+    PredPixBuffer[8] := y_left[7];
+    PredPixBuffer[9] := y_left[6];
+    PredPixBuffer[10] := y_left[5];
+    PredPixBuffer[11] := y_left[4];
+    PredPixBuffer[12] := y_left[3];
+    PredPixBuffer[13] := y_left[2];
+    PredPixBuffer[14] := y_left[1];
+    PredPixBuffer[15] := y_left[0];
+    
+    PredPixBuffer[16] := y_up_left[0];
+    
+    PredPixBuffer[17] := y_up[0];
+    PredPixBuffer[18] := y_up[1];
+    PredPixBuffer[19] := y_up[2];      
+    PredPixBuffer[20] := y_up[3];
+    PredPixBuffer[21] := y_up[4];
+    PredPixBuffer[22] := y_up[5];
+    PredPixBuffer[23] := y_up[6];
+    PredPixBuffer[24] := y_up[7];
+    PredPixBuffer[25] := y_up[8];
+    PredPixBuffer[26] := y_up[9];
+    PredPixBuffer[27] := y_up[10];
+    PredPixBuffer[28] := y_up[11];
+    PredPixBuffer[29] := y_up[12];
+    PredPixBuffer[30] := y_up[13];
+    PredPixBuffer[31] := y_up[14];
+    PredPixBuffer[32] := y_up[15];
+    
+    
+    /*
+    PredPixBuffer_pass := [ rshift(3*PredPixBuffer[0] + PredPixBuffer[1] + 2, 2)] +
+                          [ rshift(PredPixBuffer[x-1] + 2*PredPixBuffer[x] + PredPixBuffer[x+1] + 2, 2): for x in Integers(1,31)] +
+                          [ rshift(PredPixBuffer[31]  + 3*PredPixBuffer[32] + 2, 2)];
+    
+    */
+    PredPixBuffer_pass[0]:= rshift(3*PredPixBuffer[0] + PredPixBuffer[1] + 2, 2);
+    foreach int x in 1 .. 31
+    do
+      PredPixBuffer_pass[x]:=  rshift(PredPixBuffer[x-1] + 2*PredPixBuffer[x] + PredPixBuffer[x+1] + 2, 2);
+    end
+    PredPixBuffer_pass[32]:= rshift(PredPixBuffer[31]  + 3*PredPixBuffer[32] + 2, 2);
+    //println("IntraPred_Y:PredPixBuffer="+PredPixBuffer);
+    //println("IntraPred_Y:PredPixBuffer_pass="+PredPixBuffer_pass);
+    if mode = 0 then //vertical
+      predpels := [y_up[i]  : for int i in 0 .. 7, for int j in 0 .. 7];
+      //println("IntraPred_Y:mode="+mode);
+      //println("IntraPred_Y:predpels=");
+    end
+    
+    if mode = 1 then //horiaontal
+      predpels := [y_left[j]: for int i in 0 .. 7, for int j in 0 .. 7];
+      //println("IntraPred_Y:mode="+mode);
+      //println("IntraPred_Y:predpels=");     
+    end
+    
+    if mode = 2 then //DC
+      f_y_left := [PredPixBuffer_pass[15-x]: for int x in 0 .. 15];
+      f_y_up_left := [PredPixBuffer_pass[16]];
+      f_y_up := [PredPixBuffer_pass[x]: for int x in 17 .. 32];
+
+      //println("IntraPred_Y:f_y_left="+f_y_left);
+      //println("IntraPred_Y:f_y_up_left="+f_y_up_left);
+      //println("IntraPred_Y:f_y_up="+f_y_up);
+
+      if left_avail = 1 and up_avail = 1 then
+        predpels := [rshift((f_y_up[i] + f_y_left[j]), 1): for int i in 0 .. 7, for int j in 0 .. 7];
+      else if left_avail = 1 then
+             predpels := [f_y_left[j]: for int i in 0 .. 7, for int j in 0 .. 7];	   
+	      else if up_avail = 1 then
+	          predpels := [f_y_up[i]:  for int i in 0 .. 7, for int j in 0 .. 7];
+                else
+	          predpels := [128: for int i in 0 .. 7, for int j in 0 .. 7];
+	        end
+	      end
+      end
+    end
+
+    
+    if mode = 3 then //down-left
+      predpels := [rshift(( PredPixBuffer_pass[i+j+2+16] + PredPixBuffer_pass[-i-j-2+16] ), 1) : for int i in  0 .. 7, for int j in 0 .. 7];
+      //println("IntraPred_Y:mode="+mode);
+      //println("IntraPred_Y:predpels=");
+    end
+    
+    if mode = 4 then //down-right 
+      predpels := [PredPixBuffer_pass[i-j+16]: for int i in  0 .. 7, for int j in 0 .. 7];
+      //println("IntraPred_Y:mode="+mode);
+      //println("IntraPred_Y:predpels=");
+    end
+      // for test
+      //predpels_test := [predpels[8*j+i]: for int i in 0 .. 7, for int j in 0 .. 7];
+      /*
+      println("IntraPred_Y:mode="+mode);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[0]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[1]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[2]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[3]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[4]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[5]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[6]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[7]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[8]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[9]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[10]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[11]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[12]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[13]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[14]);
+      println("IntraPred_Y:IntraPred_Y="+predpels_test[15]);
+      *¡¢
+       /*
+      println("IntraPred_Y:predpels="+predpels[16]);
+      println("IntraPred_Y:predpels="+predpels[17]);
+      println("IntraPred_Y:predpels="+predpels[18]);
+      println("IntraPred_Y:predpels="+predpels[19]);
+      println("IntraPred_Y:predpels="+predpels[20]);
+      println("IntraPred_Y:predpels="+predpels[21]);
+      println("IntraPred_Y:predpels="+predpels[22]);
+      println("IntraPred_Y:predpels="+predpels[23]);
+      println("IntraPred_Y:predpels="+predpels[24]);
+      println("IntraPred_Y:predpels="+predpels[25]);
+      println("IntraPred_Y:predpels="+predpels[26]);
+      println("IntraPred_Y:predpels="+predpels[27]);
+      println("IntraPred_Y:predpels="+predpels[28]);
+      println("IntraPred_Y:predpels="+predpels[29]);
+      println("IntraPred_Y:predpels="+predpels[30]);
+      println("IntraPred_Y:predpels="+predpels[31]);
+      println("IntraPred_Y:predpels="+predpels[32]);
+      println("IntraPred_Y:predpels="+predpels[33]);
+      println("IntraPred_Y:predpels="+predpels[34]);
+      println("IntraPred_Y:predpels="+predpels[35]);
+      println("IntraPred_Y:predpels="+predpels[36]);
+      println("IntraPred_Y:predpels="+predpels[37]);
+      println("IntraPred_Y:predpels="+predpels[38]);
+      println("IntraPred_Y:predpels="+predpels[39]);
+      println("IntraPred_Y:predpels="+predpels[40]);
+      println("IntraPred_Y:predpels="+predpels[41]);
+      println("IntraPred_Y:predpels="+predpels[42]);
+      println("IntraPred_Y:predpels="+predpels[43]);
+      println("IntraPred_Y:predpels="+predpels[44]);
+      println("IntraPred_Y:predpels="+predpels[45]);
+      println("IntraPred_Y:predpels="+predpels[46]);
+      println("IntraPred_Y:predpels="+predpels[47]);
+      println("IntraPred_Y:predpels="+predpels[48]);
+      println("IntraPred_Y:predpels="+predpels[49]);
+      println("IntraPred_Y:predpels="+predpels[50]);
+      println("IntraPred_Y:predpels="+predpels[51]);
+      println("IntraPred_Y:predpels="+predpels[52]);
+      println("IntraPred_Y:predpels="+predpels[53]);
+      println("IntraPred_Y:predpels="+predpels[54]);
+      println("IntraPred_Y:predpels="+predpels[55]);
+      println("IntraPred_Y:predpels="+predpels[56]);
+      println("IntraPred_Y:predpels="+predpels[57]);
+      println("IntraPred_Y:predpels="+predpels[58]);
+      println("IntraPred_Y:predpels="+predpels[59]);
+      println("IntraPred_Y:predpels="+predpels[60]);
+      println("IntraPred_Y:predpels="+predpels[61]);
+      println("IntraPred_Y:predpels="+predpels[62]);
+      println("IntraPred_Y:predpels="+predpels[63]);
+      */
+    
+    //println("IntraPred_Y:PredPixBuffer="+PredPixBuffer);
+    //println("IntraPred_Y:PredPixBuffer_pass="+PredPixBuffer_pass);
+    //println("IntraPred_Y: Done!");
+  end
+
+  schedule fsm start:
+    /*
+    start    ( read_avail           )    --> readpix0;
+
+    readpix0 ( read_left_avail      )    --> readpix1;
+    readpix0 ( read_left_navail     )    --> readpix1;
+    readpix1 ( read_top_avail       )    --> readpix2;
+    readpix1 ( read_top_navail      )    --> readpix2;    
+    readpix2 ( read_top_left_avail  )    --> pixdone;
+    readpix2 ( read_top_left_navail )    --> pixdone;
+
+    pixdone  ( write                )    --> start;
+    */
+    start    ( read_avail           )    --> readpix;
+
+    readpix ( read_case_0      )    --> write;
+    readpix ( read_case_1      )    --> write;
+    readpix ( read_case_2      )    --> write;
+    readpix ( read_case_3      )    --> write;    
+
+    write   ( write                )    --> start;
+  end
+  
+  priority
+    read_case_0 > read_case_1 >read_case_2 >read_case_3;
+  end
+end

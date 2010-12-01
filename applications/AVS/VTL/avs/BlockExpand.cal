@@ -1,0 +1,181 @@
+// BlockExpand.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+//
+// Copyright (c) 2004-2006 Xilinx Inc.
+// All Rights Reserved
+//
+// Disclaimer:  THIS PROGRAM IS PROVIDED "AS IS" WITH NO WARRANTY 
+//              WHATSOEVER AND XILINX SPECIFICALLY DISCLAIMS ANY 
+//              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+//              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
+
+// Modified by: DandanDing(dandan2036@163.com)
+// Data: 22.02.2008 10:15:38
+// Function: Insert zero coefficients into a sparsely encoded block
+// Note:
+// add BLOCK_SZ to replace BLOCK_SIZE
+
+
+
+actor BlockExpand (
+  /*
+  int SAMPLE_COUNT_SZ,
+  int BLOCK_SZ,
+  int SAMPLE_SZ
+  */
+) 
+  int(size=SAMPLE_COUNT_SZ) RUN, 
+  int(size=SAMPLE_SZ) VALUE,
+  bool LAST 
+  ==> 
+  //List(type:int(size=SAMPLE_SZ),size=64) Block :
+  int(size=SAMPLE_SZ) Block:
+  
+  int SAMPLE_COUNT_SZ =13;
+  int BLOCK_SZ = 64;
+  int SAMPLE_SZ = 13;
+  /*
+  function initList( v, size ) :
+    [ v : for i in Integers(1,size) ]
+  end
+  */
+  List( type:int(size=SAMPLE_SZ), size=64 ) value_buf := [ 0 : for int i in 1 .. 64 ];  
+  uint(size=6) stuff_count := 0;
+  
+  int(size=SAMPLE_COUNT_SZ) count := 0;   // Index of next sample to be transmitted
+  int(size=SAMPLE_COUNT_SZ) run := -1;    // Index offset of next sample decoded (-1 means no sample pending)
+  bool last := false;                     // the end of block.
+
+  //if it is the end of a block, begin to stuff 0.
+  //if it is not the end, begin to read data to buffer.
+  check_last: action LAST:[l] ==>
+  do
+    last := l;
+    stuff_count := if last then (64 - count) else 0 end;
+    //println("check_last");
+    //println("last = "+last);
+    //println("count = "+count);
+    //println("stuff_count = "+stuff_count);
+  end
+  
+  //output the stuff zero before the first level
+  out_zero: action ==> Block:[0]
+  guard
+    last,
+    stuff_count > 0,
+    count = 0
+  do
+    stuff_count := stuff_count - 1;  
+    //println("out_zero : stuff_count = "+stuff_count);  
+  end
+  
+  //after the stuff, begin to output data in buffer: from high address to low address
+  out_buffer: action ==> Block:[b]
+  guard
+    last,
+    //stuff_count = 0,
+    count > 0
+  var
+    int(size=SAMPLE_SZ) b
+  do
+    b := value_buf[count-1];
+    count := count - 1;
+    //println("out_buffer : b = "+b);
+    //println("out_buffer : count = "+count+", b = "+b);
+  end
+  
+  out_finish: action ==>
+  guard
+    last,
+    stuff_count = 0,
+    count = 0
+  //do
+    //println("==================OUT FINISH!=====================");
+  end
+
+  // Read and write the sample out immediately if RUN = 0
+  read_immediate: action RUN:[ r ], VALUE:[ v ] ==>
+  guard
+    r = 0,
+    not last
+  do
+    value_buf[count]:= v;
+    count := count + 1;
+    //println("read.immediate : run := "+run+", "+"value = "+v);
+    //println("count = "+count);
+  end  
+
+  // Save the level in buffer and write out a zero sample
+  read_save: action RUN:[ r ], VALUE:[ v ] ==>
+  guard
+    r > 0,
+    not last
+  do
+    value_buf[count]:= v;
+    run := r ;
+    count := count + 1;
+    //println("read.save : run := "+run+", "+"value = "+v);
+    //println("count = "+count);
+  end
+
+  // Stuff zeros after the sample value
+  write_zero: action ==>
+  guard 
+    run > 0
+  do
+    value_buf[count]:= 0;
+    run := run - 1;
+    count := count + 1;
+    //println("write_zero : run = "+run);
+    //println("write_zero : count = "+count);
+  end
+  
+  write_zero_finish: action ==>
+  guard 
+    run = 0
+  //do
+    //println("write_zero_finish");
+  end
+
+  schedule fsm check_last:
+    /*
+    check_last      ( check_last     ) --> read_immediate;
+    check_last      ( check_last     ) --> read_save;
+    check_last      ( check_last     ) --> out_zero;
+    check_last      ( check_last     ) --> out_buffer;
+    
+    read_immediate  ( read_immediate ) --> check_last;
+    read_save       ( read_save      ) --> write_zero;
+    write_zero      ( write_zero     ) --> write_zero;
+    write_zero      ( write_zero     ) --> write_zero_finish;
+    write_zero_finish(write_zero_finish)--> check_last;
+                                     
+    out_zero        ( out_zero       ) --> out_zero;
+    out_zero        ( out_zero       ) --> out_finish;
+                      
+    out_buffer      ( out_buffer     ) --> out_buffer;
+    out_buffer      ( out_buffer     ) --> out_zero;
+    out_buffer      ( out_buffer     ) --> out_finish;
+    
+    out_finish      ( out_finish     ) --> check_last;
+    */                                 
+    check_last      ( check_last     ) --> check_last_next;
+    check_last_next ( read_immediate ) --> check_last;
+    check_last_next ( read_save      ) --> write_zero;
+    check_last_next ( out_zero       ) --> out_zero_next;
+    check_last_next ( out_buffer     ) --> out_buffer_next;
+    
+    write_zero      ( write_zero     ) --> write_zero_next;
+    write_zero_next ( write_zero     ) --> write_zero_next;
+    write_zero_next ( write_zero_finish ) --> check_last;
+    
+    out_zero_next   ( out_zero       ) --> out_zero_next;
+    out_zero_next   ( out_finish     ) --> check_last;
+    
+    out_buffer_next ( out_buffer     ) --> out_buffer_next;
+    out_buffer_next ( out_zero       ) --> out_zero_next;
+    out_buffer_next ( out_finish     ) --> check_last;
+  end
+    
+end
