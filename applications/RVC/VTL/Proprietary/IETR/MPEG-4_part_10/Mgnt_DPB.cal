@@ -91,12 +91,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	bool          ValIsIDR := false;
 
 
-	initialize ==>
-	do
-		pic := [ [-1 : for int i in 0 .. PICWIDTH*PICHEIGHT*255]: for int j in 0 .. NB_PIC-1 ];
-	end
-
-
 	get_writeAddr: action
 			PicWidthInMb :[PICwidthInMb],
 			PicSizeInMb  :[PICSizeInMb],

@@ -813,7 +813,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	ComputeSubMvLX.Launch8x8: action
 			SubMbPredRefIdx :[RefIdxCurr],
-			SubMbPredMvRes      :[mv_res] repeat 2
+			SubMbPredMvRes  :[mv_res] repeat 2
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvOut     :[MvpL0]repeat 2,
@@ -852,7 +852,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	ComputeSubMvLX.Launch8x4: action
 			SubMbPredRefIdx :[RefIdxCurr],
-			SubMbPredMvRes      :[mv_res] repeat 2
+			SubMbPredMvRes  :[mv_res] repeat 2
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvOut     :[MvpL0] repeat 2,
@@ -887,7 +887,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	ComputeSubMvLX.Launch4x8: action
 			SubMbPredRefIdx :[RefIdxCurr],
-			SubMbPredMvRes      :[mv_res] repeat 2
+			SubMbPredMvRes  :[mv_res] repeat 2
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvOut     :[MvpL0]repeat 2,
@@ -922,7 +922,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	ComputeSubMvLX.Launch4x4: action
 			SubMbPredRefIdx :[RefIdxCurr],
-			SubMbPredMvRes      :[mv_res] repeat 2
+			SubMbPredMvRes  :[mv_res] repeat 2
 				==>
 			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvOut     :[MvpL0]repeat 2,

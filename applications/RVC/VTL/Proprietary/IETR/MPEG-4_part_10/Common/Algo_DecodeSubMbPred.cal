@@ -199,7 +199,8 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			//             mvd_l0
 			TypeOfVLD    :[  VLD_SE ,  VLD_SE  ]
 		guard
-			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
+			   not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX)
+			or    (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
 			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1,
 			subMbPartIdx < subMbPartIdxMax
 		do
@@ -273,6 +274,7 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			end
 			subMbPartIdx := subMbPartIdx +1;
 		end
+
 //Delete me!! Be carefull with B_DIRECT_8x8
 	ReadMvdl0Done.Skip: action
 				==>
