@@ -30,6 +30,7 @@ package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
@@ -54,6 +55,11 @@ public class ListOfOneElementToScalarTransformation extends
 			Instruction instruction = instructionIterator.next();
 			if (instruction.isLoad()) {
 				Load load = (Load) instruction;
+				
+				Variable oldTarget = read.getTarget();
+				oldTarget.removeUse(read);
+				oldTarget.removeInstruction(read);
+				
 				read.setTarget(load.getTarget());
 				instructionIterator.remove();
 			}
@@ -71,6 +77,11 @@ public class ListOfOneElementToScalarTransformation extends
 					Expression expr = store.getValue();
 					if (expr.isVarExpr()) {
 						VarExpr var = (VarExpr) expr;
+						
+						Variable oldTarget = write.getTarget();
+						oldTarget.removeUse(write);
+						oldTarget.removeInstruction(write);
+						
 						write.setTarget(var.getVar().getVariable());
 						instructionIterator.remove();
 					}
@@ -90,6 +101,11 @@ public class ListOfOneElementToScalarTransformation extends
 			Instruction instruction = instructionIterator.next();
 			if (instruction.isLoad()) {
 				Load load = (Load) instruction;
+				
+				Variable oldTarget = peek.getTarget();
+				oldTarget.removeUse(peek);
+				oldTarget.removeInstruction(peek);
+				
 				peek.setTarget(load.getTarget());
 				instructionIterator.remove();
 			}
