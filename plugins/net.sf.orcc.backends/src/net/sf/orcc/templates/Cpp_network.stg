@@ -20,9 +20,9 @@ endif$
 
 initializeInstance(instance) ::= <<
 $if (instance.actor.parameters.list)
-$("$instance.hierarchicalId: {$it$}; separator="/"$", $instance.actor.parameters.list: argumentList(); separator=", "$)$
+$("$instance.hierarchicalId: {$it$}; separator="/"$", $instance.actor.parameters.list: argumentList(); separator=", "$, NETWORK_PROFILING_MODE)$
 else
-$("$instance.hierarchicalId: {$it$}; separator="/"$")$
+$("$instance.hierarchicalId: {$it$}; separator="/"$", NETWORK_PROFILING_MODE)$
 endif$
 >>
 
@@ -239,8 +239,10 @@ extern "C" {
 }
 
 #ifdef __TRACE_TOKENS__
-#include "traceaka.h"
 TraceAka g_oTracer;
+#define NETWORK_PROFILING_MODE	AKA_PROFILING_CAPTURE_TOKEN 
+#else
+#define NETWORK_PROFILING_MODE	AKA_PROFILING_NONE 
 #endif
 
 $includeActors(network.actors)$

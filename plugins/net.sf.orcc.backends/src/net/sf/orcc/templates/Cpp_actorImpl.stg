@@ -416,9 +416,9 @@ int actor_$actor.name$::schedule()
 
 constructor(parameters, stateVars) ::= <<
 $if (actor.parameters.list)$
-actor_$actor.name$::actor_$actor.name$(char* instanceName, $parameters: {$it.type$ $it$}; separator=", "$)
+actor_$actor.name$::actor_$actor.name$(char* instanceName, $parameters: {$it.type$ $it$}; separator=", "$, AKA_PROFILING_MODE eProfilingMode)
 $else$
-actor_$actor.name$::actor_$actor.name$(char* instanceName)
+actor_$actor.name$::actor_$actor.name$(char* instanceName, AKA_PROFILING_MODE eProfilingMode)
 $endif$
 :
 $parameters: {$it$($it$),}; wrap, separator="\n"$
@@ -426,7 +426,7 @@ $if(actor.actionScheduler.fsm)$
 _FSM_state(state_$actor.actionScheduler.fsm.initialState$),
 $endif$
 $stateVars : StateVarAllocation()$
-ActorAKA(instanceName, $length(actor.inputs.list)$, $length(actor.outputs.list)$)
+ActorAKA("$actor.name$", instanceName, $length(actor.inputs.list)$, $length(actor.outputs.list)$, eProfilingMode)
 {
 $stateVars : ListStateVarInitialization()$
 }
@@ -461,16 +461,6 @@ $destructor(stateVars=actor.stateVars.list)$
 
 void actor_$actor.name$::initializeActor()
 {
-#ifdef __TRACE_TOKENS__
-	std::string strTrace("");
-	strTrace = __FILE__;
-	unsigned uDesc = g_oTracer.createFileDescriptor(strTrace);
-	for(unsigned uIdx = 0; uIdx < $length(actor.inputs.list)$; uIdx++)
-	{
-	  strTrace = "m_poTabIn[" + toString(uIdx) + "] = " + toString((unsigned)m_poTabIn[uIdx]);
-	  g_oTracer.addPort(uDesc, strTrace);
-	}
-#endif
 #ifdef __TRACE_CAPTURE__
 	m_actionTracer.openFile(getInstanceName());
 #endif

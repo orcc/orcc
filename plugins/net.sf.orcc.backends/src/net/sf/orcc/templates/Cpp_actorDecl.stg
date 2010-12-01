@@ -198,9 +198,9 @@ int schedule();
 
 constructor(parameters) ::= <<
 $if (actor.parameters.list)$
-actor_$actor.name$(char*, $parameters: {$it.type$}; separator=", "$);
+actor_$actor.name$(char*, $parameters: {$it.type$}; separator=", "$, AKA_PROFILING_MODE );
 $else$
-actor_$actor.name$(char*);
+actor_$actor.name$(char*, AKA_PROFILING_MODE);
 $endif$
 >>
 
