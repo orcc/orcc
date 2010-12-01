@@ -57,11 +57,10 @@ public class ListOfOneElementToScalarTransformation extends
 				Load load = (Load) instruction;
 				
 				Variable oldTarget = read.getTarget();
-				oldTarget.removeUse(load);
-				oldTarget.removeInstruction(read);
-				
 				read.setTarget(load.getTarget());
+				
 				instructionIterator.remove();
+				procedure.getLocals().remove(oldTarget.getName());
 			}
 		}
 	}
@@ -79,11 +78,10 @@ public class ListOfOneElementToScalarTransformation extends
 						VarExpr var = (VarExpr) expr;
 						
 						Variable oldTarget = write.getTarget();
-						oldTarget.removeUse(store);
-						oldTarget.removeInstruction(write);
-						
 						write.setTarget(var.getVar().getVariable());
+						
 						instructionIterator.remove();
+						procedure.getLocals().remove(oldTarget.getName());
 					}
 					instructionIterator.next();
 				}
@@ -103,11 +101,10 @@ public class ListOfOneElementToScalarTransformation extends
 				Load load = (Load) instruction;
 				
 				Variable oldTarget = peek.getTarget();
-				oldTarget.removeUse(load);
-				oldTarget.removeInstruction(peek);
-				
 				peek.setTarget(load.getTarget());
+				
 				instructionIterator.remove();
+				procedure.getLocals().remove(oldTarget.getName());
 			}
 		}
 	}
