@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import net.sf.orcc.OrccException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
+import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.RenameTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
@@ -93,19 +94,18 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(false),
-				new PhiRemoval() };
-
-		for (ActorTransformation transformation : transformations) {
-			transformation.transform(actor);
-		}
-
 		evaluateInitializeActions(actor);
 
 		ActorTransformation[] transformationsCodegen = {
-				// commented out inline because it has bugs
-				// new InlineTransformation(true, false),
+				new InlineTransformation(true, false),
+
+				// cleanup code
+				new DeadGlobalElimination(),
+				new DeadCodeElimination(),
+				new DeadVariableRemoval(false),
+
+				// out-of-SSA transformation
+				new PhiRemoval(),
 
 				new VariableRedimension(),
 				new BoolExprTransformation(),
@@ -127,6 +127,7 @@ public class VHDLBackendImpl extends AbstractBackend {
 				new RenameTransformation(this.transformations),
 				new RenameTransformation(adjacentUnderscores, "_") };
 
+		// applies transformations
 		for (ActorTransformation transformation : transformationsCodegen) {
 			transformation.transform(actor);
 		}
