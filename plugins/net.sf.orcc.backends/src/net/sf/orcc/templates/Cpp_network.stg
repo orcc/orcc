@@ -239,6 +239,7 @@ extern "C" {
 }
 
 #ifdef __TRACE_TOKENS__
+#include "traceaka.h"
 TraceAka g_oTracer;
 #define NETWORK_PROFILING_MODE	AKA_PROFILING_CAPTURE_TOKEN 
 #else
