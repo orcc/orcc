@@ -15,7 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
  
 Manager of the intra 4x4 Prediction
-Jérôme GORIN IETR/ARTEMIS
+Jï¿½rï¿½me GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
@@ -26,13 +26,11 @@ actor Mgnt_Intra_4x4 ()
 	uint(size=4) PredMode,
 	uint(size=16) EDGE,
 	int(size=9) MB_4X4,
-//	int(size=16) Coef_ACR,
 	bool ConstrainedIFlag,
 	bool IsIntraFlag
 		==> 
 		uint(size=1) Avail,
 		uint(size=4) PredMode4x4,
-//		int(size=16) Coef_ACR_4X4,
 		int(size=16) Y_Left4,
 		int(size=16) Y_Up4,
 		int(size=16) Y_UpLeft4
@@ -293,8 +291,11 @@ actor Mgnt_Intra_4x4 ()
 
 	schedule fsm Mb_Type:
 		Mb_Type     	(MbTypeOK		)--> EdgeNeighbour;
+
 		EdgeNeighbour	(EdgeNeighbour	)--> AvailEdge;
+
 		AvailEdge		(AvailEdge		)--> Process;
+
 		Process    		(SendEdge		)--> Process;
 		Process      	(StoreEdge		)--> AvailEdge;
 		

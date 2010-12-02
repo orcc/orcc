@@ -322,11 +322,11 @@ actor SelectMvpLX()
 			MvL0         :[Mvxl0, Mvyl0],
 			RefIdxL0     :[ref_idxl0],
 			LocationL0   :[Mbx_in_pixl0,Mby_in_pixl0],
-//			DirectPredL0 :[Is_direct_l0],
+			DirectPredL0 :[Is_direct_l0],
 			MvL1         :[Mvxl1,Mvyl1],
 			RefIdxL1     :[ref_idxl1],
-			LocationL1   :[Mbx_in_pixl1,Mby_in_pixl1]//,
-//			DirectPredL1 :[Is_direct_l1]
+			LocationL1   :[Mbx_in_pixl1,Mby_in_pixl1],
+			DirectPredL1 :[Is_direct_l1]
 				==>
 			MvOut     :[Mvxl0, Mvyl0],
 			RefIdxOut :[ref_idxl0],

@@ -772,12 +772,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	ComputeMvLX.LaunchB_Direct_8x8: action
 			sub_mb_type :[ValSubMbType]
 				==>
-	//Fix me!!
-			Location  :[Blk_x_in_pix,Blk_y_in_pix],
-	MvOut     :[0,0],
-	RefIdxOut :[0],
-	NewPic_o  :[false]//,
-	//DirectPredLX_Out :[true]
+			DirectPredLX_Out :[true]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_8x8,
@@ -786,11 +781,14 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
 			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
-			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
-			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
-
-			println("GetMbType.Direct_8x8 not implemented yet !!");
-
+			Loc_Direct[0] := Blk_x_in_pix + 8 * (MbPartIdx&1);
+			Loc_Direct[1] := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
+			RefIdxTab[Idx_CurrBlk][0] := 0;//Fixme
+				if(direct_spatial_mv_pred)then // spatial prediction
+					println("GetMbType.Direct_8x8 : spatial prediction not implemented yet !!");
+				else //temporal prediction
+					println("GetMbType.Direct_8x8 : temporal prediction not implemented yet !!");
+				end
 			MbPartIdx := MbPartIdx + 1;
 		end
 
@@ -990,9 +988,11 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		ComputeMvpL0      (ComputeMvLX.Launch16x16        )--> ComputeMvpL0;
 		ComputeMvpL0      (ComputeMvLX.Launch16x8         )--> ComputeMvpL0;
 		ComputeMvpL0      (ComputeMvLX.Launch8x16         )--> ComputeMvpL0;
-		ComputeMvpL0      (ComputeMvLX.LaunchB_Direct_8x8 )--> ComputeMvpL0;
+		ComputeMvpL0      (ComputeMvLX.LaunchB_Direct_8x8 )--> SendSubMv4Direct;
 		ComputeMvpL0      (ComputeMvLX.Launch8x8          )--> ComputeSubMvpL0;
 		ComputeMvpL0      (ComputeMvLX.Done               )--> GetMbType;
+
+		SendSubMv4Direct  (SendMv4Direct                  )--> ComputeMvpL0;
 
 		ComputeSubMvpL0      (ComputeSubMvLX.Launch8x8 )--> ComputeSubMvpL0;
 		ComputeSubMvpL0      (ComputeSubMvLX.Launch8x4 )--> ComputeSubMvpL0;

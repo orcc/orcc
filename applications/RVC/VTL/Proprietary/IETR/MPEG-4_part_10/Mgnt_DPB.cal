@@ -52,10 +52,10 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 
 	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
-	List(type:uint,size=NB_PIC)            ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];
-	List(type:bool        ,size=NB_PIC)    PictureReady  := [false :for int s in 0 .. NB_PIC-1];
-	List(type:bool        ,size=NB_PIC)    PicDisplayed  := [true  :for int s in 0 .. NB_PIC-1];
-	List(type:bool        ,size=NB_PIC)    IsAReference  := [false :for int s in 0 .. NB_PIC-1];
+	List(type:uint ,size=NB_PIC) ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];
+	List(type:bool ,size=NB_PIC) PictureReady  := [false :for int s in 0 .. NB_PIC-1];
+	List(type:bool ,size=NB_PIC) PicDisplayed  := [true  :for int s in 0 .. NB_PIC-1];
+	List(type:bool ,size=NB_PIC) IsAReference  := [false :for int s in 0 .. NB_PIC-1];
 
 	int (size=32) pic_curr_idx     := 0;
 	uint(size=7)  PicWidthInMacroB := 0;

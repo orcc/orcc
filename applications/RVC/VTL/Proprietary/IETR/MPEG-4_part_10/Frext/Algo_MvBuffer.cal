@@ -119,7 +119,6 @@ actor Algo_MvBuffer()
 	GetNewPic: action
 			NewPic             :[IsNewPic],
 			Poc                :[Picture_Order_Count],
-			Empty_DPB          :[ValEmpty],//////////////////////////////
 			Direct8x8Inference :[Direct8x8InferFlag]
 				==>
 		guard
@@ -184,7 +183,7 @@ actor Algo_MvBuffer()
 				==>
 			colZeroFlag  :[IsColZero] repeat 16
 		guard
-			MacroBlkType = BLOCK_TYPE_B_SKIP,
+			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16,
 			not IsNewPic
 		var
 			List(type: bool, size=16) IsColZero,
@@ -307,6 +306,7 @@ actor Algo_MvBuffer()
 		guard
 			not(MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX),
 			MacroBlkType != BLOCK_TYPE_B_SKIP,
+			MacroBlkType != BLOCK_TYPE_B_DIRECT_16x16,
 			not IsNewPic
 		do
 			mb_type      := MacroBlkType;
@@ -407,10 +407,6 @@ actor Algo_MvBuffer()
 			SizeSubMbMv     :=  SizeSubMbPart(mb_type,ValSubMbType);
 			IsPredL0        := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0;
 			IsPredL1        := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0;
-	//FIX ME !!!!
-			if(not IsPredL0 and not IsPredL1)then
-				IsPredL0 := true;
-			end
 		end
 
 	GetMbParametersFinished: action ==>
@@ -631,10 +627,20 @@ actor Algo_MvBuffer()
 		end
 
 	ReadDelList.Done: action
-			DelList:[DelVal]
+			DelList   :[DelVal],
+			Empty_DPB :[EmptyList]
 				==>
 		guard
 			DelVal = SENT_DONE
+		do
+			if(EmptyList)then
+				foreach int i in 0 .. 15
+				do
+					if(i != WriteListIdx)then
+						IsReference[i] := false;
+					end
+				end
+			end
 		end
 
 	ReadSizeRefList: action

@@ -115,14 +115,14 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			RemIntraYxYPredMode :[rem_intra_8x8_pred_mode] repeat 4
 				==>
 			TransformSize8x8 :[Is8x8],
-			IntraPredMode    :[intra_pred_mode] repeat 4
+			IntraPredMode    :[intra_pred_mode] repeat 5
 		guard
 			Is8x8   = true
 		var
 			List(type: uint(size=4), size=5) intra_pred_mode
 		do
 			intra_pred_mode[0] := 2;
-			foreach int i in 0 .. 4
+			foreach int i in 0 .. 3
 			do
 				intra_pred_mode[i+1] := rem_intra_8x8_pred_mode[i];
 			end

@@ -274,7 +274,7 @@ actor Algo_RefList (bool DEBUG)
 		end
 
 
-	//Fill the Long Term List
+	//Fill the Short Term List
 	ReadLists.ShortTerm: action
 			ShortTermList :[ValShortTerm]
 				==>
