@@ -1,0 +1,12 @@
+actor RegExpFSM() ==> :
+
+	a:action ==>
+	end
+
+	schedule fsm init:
+		init(a)-->sink;
+	end
+	
+	schedule regexp a* end
+
+end

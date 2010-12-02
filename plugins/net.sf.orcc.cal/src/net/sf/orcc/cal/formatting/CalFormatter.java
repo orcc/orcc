@@ -157,10 +157,10 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 		AstActorElements access = f.getAstActorAccess();
 
 		c.setLinewrap(2).after(access.getColonKeyword_9());
-		c.setIndentation(access.getColonKeyword_9(), access.getEndKeyword_14());
+		c.setIndentation(access.getColonKeyword_9(), access.getEndKeyword_13());
 
-		c.setLinewrap(2).before(access.getEndKeyword_14());
-		c.setLinewrap(2).after(access.getEndKeyword_14());
+		c.setLinewrap(2).before(access.getEndKeyword_13());
+		c.setLinewrap(2).after(access.getEndKeyword_13());
 	}
 
 	/**
@@ -401,10 +401,7 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureSchedule(FormattingConfig c) {
 		AstScheduleElements access = f.getAstScheduleAccess();
 
-		c.setIndentation(access.getScheduleKeyword_0(),
-				access.getEndKeyword_5());
-		c.setLinewrap().after(access.getColonKeyword_3());
-		c.setLinewrap(2).after(access.getEndKeyword_5());
+		c.setLinewrap().after(access.getColonKeyword_1());
 
 		c.setNoSpace().before(
 				f.getAstTransitionAccess().getSemicolonKeyword_6());
