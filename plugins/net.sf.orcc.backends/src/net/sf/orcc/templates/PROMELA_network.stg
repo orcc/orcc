@@ -1,0 +1,27 @@
+
+allocateFifos() ::= <<
+
+>>
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// print network
+
+network(debugFifos, fifoSize, network, options) ::= <<
+// Generated from "$network.name$"
+
+// FIFO allocation
+$allocateFifos(network.connections)$
+
+// Include the actors
+$network.Actors: {actor | #include "$actor$.pml"}; separator="\n"$
+
+init {
+	$network.Actors: {actor | run $actor$(init_state);}; separator="\n"$	
+
+}
+
+>>
+

@@ -97,8 +97,8 @@ PrintParameter(parameter) ::= <<
 $if (!parameter.stringExpr)$, $parameter$$endif$
 >>
 
-Call(call) ::= <<
-ERROR this must be removed
+Call(call) ::= << 
+//ERROR this function call must be removed
 >>
 
 Decrement(decrement) ::= <<
@@ -123,15 +123,8 @@ $peek.port$?<$peek.target$>;
 Read(read) ::= <<
 
 $if (read.target)$
-$read.port$?$read.target$;
+chan_$read.port$?$read.target$;
 $endif$
->>
-
-
-Return(return) ::= <<
-$if(return.value)$
-return $return.value$;$
-endif$
 >>
 
 SelfAssignment(selfAssign) ::= <<
@@ -149,7 +142,9 @@ Write(write) ::= <<
 chan_$write.port$!$write.target$;
 >>
 
+Return(return) ::= <<
 
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes 
@@ -174,9 +169,10 @@ IfNode(ifNode) ::= <<
 if 
 :: ($ifNode.value$) ->
 	$nodes(ifNode.thenNodes)$
-}$if(ifNode.elseNodes)$ else ->
+$if(ifNode.elseNodes)$:: else ->
 	$nodes(ifNode.elseNodes)$
-}$endif$
+$endif$
+fi
 $BlockNode(ifNode.joinNode)$
 >>
 
@@ -300,12 +296,13 @@ $pattern.keys: {key | && nfull($key$)} $
 >>
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Process declaration
 ///////////////////////////////////////////////////////////////////////////////
 
 proctype() ::= <<
-active proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap, separator=", "$) {
+proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap, separator=", "$) {
 
 	/* State variables */
 	$actor.stateVars.list : stateVar(); separator="\n"$

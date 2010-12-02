@@ -66,15 +66,13 @@ public class PromelaBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
-	private Map<Action, List<Peek>>       peeks  = new HashMap<Action, List<Peek>>();
-	 
+	private Map<Action, List<Peek>> peeks = new HashMap<Action, List<Peek>>();
+
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { 
-				new DeadCodeElimination(),
+		ActorTransformation[] transformations = { new DeadCodeElimination(),
 				new DeadVariableRemoval(false),
-				new GuardsExtractor(guards, peeks),
-				new PhiRemoval()};
+				new GuardsExtractor(guards, peeks), new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -101,6 +99,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printActors(actors);
+		printNetwork(network);
 	}
 
 	@Override
@@ -113,5 +112,24 @@ public class PromelaBackendImpl extends AbstractBackend {
 			throw new OrccException("I/O error", e);
 		}
 		return false;
+	}
+
+	/**
+	 * Prints the given network.
+	 * 
+	 * @param network
+	 *            a network
+	 * @throws OrccException
+	 *             if something goes wrong
+	 */
+	private void printNetwork(Network network) throws OrccException {
+		String outputName = path + File.separator + "main_" + network.getName()
+				+ ".pml";
+		printer.loadGroups("PROMELA_network");
+		try {
+			printer.printNetwork(outputName, network, false, fifoSize);
+		} catch (IOException e) {
+			throw new OrccException("I/O error", e);
+		}
 	}
 }
