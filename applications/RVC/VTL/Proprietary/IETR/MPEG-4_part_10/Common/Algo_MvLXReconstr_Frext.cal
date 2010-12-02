@@ -396,37 +396,34 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				Idx_mbAddrC := -1;
 				Idx_mbAddrD := -1;
 			end
-			if(MacroBlkType = BLOCK_TYPE_B_SKIP)then
-				if(direct_spatial_mv_pred)then // spatial prediction
-					//foreach int i in 0 .. 15 //FIXME
-					//do
-					GetNeighbourBlockParametres (0,16);
-					RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
+
+			if(direct_spatial_mv_pred)then // spatial prediction
+				//foreach int i in 0 .. 15 //FIXME
+				//do
+				GetNeighbourBlockParametres (0,16);
+				RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
+				foreach int i in 0 .. 15
+				do
+					RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
+				end
+				if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[0])then
 					foreach int i in 0 .. 15
 					do
-						RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
+						MvTab[Idx_CurrBlk][i] := [0,0];
 					end
-					if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[0])then
-						foreach int i in 0 .. 15
-						do
-							MvTab[Idx_CurrBlk][i] := [0,0];
-						end
-						direct_pred_lx        := false;
-					else
-						ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
-						foreach int i in 0 .. 15
-						do
-							MvTab[Idx_CurrBlk][i][0] := OMv[0];
-							MvTab[Idx_CurrBlk][i][1] := OMv[1];
-						end
-						direct_pred_lx           := true;
+					direct_pred_lx        := false;
+				else
+					ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
+					foreach int i in 0 .. 15
+					do
+						MvTab[Idx_CurrBlk][i][0] := OMv[0];
+						MvTab[Idx_CurrBlk][i][1] := OMv[1];
 					end
-					//end
-				else //temporal prediction
-					println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
+					direct_pred_lx           := true;
 				end
-			else
-				println("GetMbType.B_Skip_B_Direct_16x16 : B_DIRECT_16x16 not implemented yet !!");	
+				//end
+			else //temporal prediction
+				println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
 			end
 		end
 

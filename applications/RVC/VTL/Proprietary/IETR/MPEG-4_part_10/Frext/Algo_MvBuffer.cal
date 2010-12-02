@@ -86,6 +86,8 @@ actor Algo_MvBuffer()
 
 	int (size=32) SENT_DONE = -2;
 
+	uint(size=4) B_DIRECT_8x8 = 0;
+
 	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdxL0;
 	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdxL1;
 	List(type: List(type: List(type: List(type: int(size=5), size=2), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListMvL0;
@@ -101,6 +103,7 @@ actor Algo_MvBuffer()
 	uint(size=3)  SizeSubMbMv;
 	uint(size=1)  Idx_Sub_Tab;
 	uint(size=6)  mb_type;
+	uint(size=6)  sub_mb_type;
 	bool          IsPredL0;
 	bool          IsPredL1;
 	uint(size=5)  Size_RefList;
@@ -175,7 +178,66 @@ actor Algo_MvBuffer()
 			[  5,  7, 13, 15]
 		];
 
-	GetMbType.B_Skip: action
+	function GetDirect8x8InfIdx(uint Idx)
+				-->
+			uint
+		:
+			//XXXXXX00 -> XXXXXX00
+			//XXXXXX01 -> XXXXXX00
+			//XXXXXX10 -> XXXXXX11
+			//XXXXXX11 -> XXXXXX11
+			Idx & 0xFFFFFFFE + (Idx >> 1)&1
+		end
+
+	function Compute_ColZero(uint Idx_x, uint Idx_y)
+				-->
+			bool
+		var
+			uint Idx_x_Infer =
+				if(direct_8x8_inference_flag)then
+					GetDirect8x8InfIdx(Idx_x)
+				else
+					Idx_x
+				end,
+			uint Idx_y_Infer =
+				if(direct_8x8_inference_flag)then
+					GetDirect8x8InfIdx(Idx_y)
+				else
+					Idx_y
+				end
+		:
+			if(not colPic_IsShortTermRef)then
+				false
+			else
+				if(ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y] = -1 and ListRefIdxL1[ReadListIdx][Idx_x][Idx_y] = -1)then
+					true
+				else
+					if(ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y_Infer] != -1)then
+						if(     ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y_Infer]     =  0
+						    and ListMvL0    [ReadListIdx][Idx_x_Infer][Idx_y_Infer][0] >= -1
+						    and ListMvL0    [ReadListIdx][Idx_x_Infer][Idx_y_Infer][0] <=  1
+						    and ListMvL0    [ReadListIdx][Idx_x_Infer][Idx_y_Infer][1] >= -1
+						    and ListMvL0    [ReadListIdx][Idx_x_Infer][Idx_y_Infer][1] <=  1)then
+							true
+						else
+							false
+						end
+					else
+						if(     ListRefIdxL1[ReadListIdx][Idx_x_Infer][Idx_y_Infer]     =  0
+						    and ListMvL1    [ReadListIdx][Idx_x_Infer][Idx_y_Infer][0] >= -1
+						    and ListMvL1    [ReadListIdx][Idx_x_Infer][Idx_y_Infer][0] <=  1
+						    and ListMvL1    [ReadListIdx][Idx_x_Infer][Idx_y_Infer][1] >= -1
+						    and ListMvL1    [ReadListIdx][Idx_x_Infer][Idx_y_Infer][1] <=  1)then
+							true
+						else
+							false
+						end
+					end
+				end
+			end
+		end
+
+	GetMbType.B_Skip_B_Direct_16x16: action
 			MbType       :[MacroBlkType],
 			NewPic       :[IsNewPic],
 			CurrMbAddr   :[Curr_Mb_Addr],
@@ -194,92 +256,11 @@ actor Algo_MvBuffer()
 			//There are 16 Partitions in a macroblock
 			Mbx := Mbx * 4;
 			Mby := Mby * 4;
-			if(not colPic_IsShortTermRef)then
-				foreach int i in 0 .. 15
+			foreach int i in 0 .. 3
+			do
+				foreach int j in 0 .. 3
 				do
-					IsColZero[i] := false;
-				end
-			else
-				if(not direct_8x8_inference_flag)then
-					foreach int i in 0 .. 3
-					do
-						foreach int j in 0 .. 3
-						do
-							IsColZero[PartitionIdx[i][j]] :=
-								if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] = -1 and ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j] = -1)then
-									true
-								else
-									if(ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j] != -1)then
-										if(     ListRefIdxL0[ReadListIdx][Mbx+i][Mby+j]     =  0
-										    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][0] >= -1
-										    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][0] <=  1
-										    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][1] >= -1
-										    and ListMvL0    [ReadListIdx][Mbx+i][Mby+j][1] <=  1)then
-											true
-										else
-											false
-										end
-									else
-										if(     ListRefIdxL1[ReadListIdx][Mbx+i][Mby+j]     =  0
-										    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][0] >= -1
-										    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][0] <=  1
-										    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][1] >= -1
-										    and ListMvL1    [ReadListIdx][Mbx+i][Mby+j][1] <=  1)then
-											true
-										else
-											false
-										end
-									end
-								end;
-						end
-					end
-				else
-					foreach int i in 0 .. 1
-					do
-						foreach int j in 0 .. 1
-						do
-							if(ListRefIdxL0[ReadListIdx][Mbx+3*i][Mby+3*j] = -1 and ListRefIdxL1[ReadListIdx][Mbx+3*i][Mby+3*j] = -1)then
-								foreach int k in 0 .. 3
-								do
-									IsColZero[8*j + 4*i + k] := true;
-								end
-							else
-								if(ListRefIdxL0[ReadListIdx][Mbx+3*i][Mby+3*j] != -1)then
-									if(     ListRefIdxL0[ReadListIdx][Mbx+3*i][Mby+3*j]     =  0
-									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][0] >= -1
-									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][0] <=  1
-									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][1] >= -1
-									    and ListMvL0    [ReadListIdx][Mbx+3*i][Mby+3*j][1] <=  1)then
-										foreach int k in 0 .. 3
-										do
-											IsColZero[8*j + 4*i + k] := true;
-										end
-									else
-										foreach int k in 0 .. 3
-										do
-											IsColZero[8*j + 4*i + k] := false;
-										end
-									end
-								else
-									if(     ListRefIdxL1[ReadListIdx][Mbx+3*i][Mby+3*j]     =  0
-									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][0] >= -1
-									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][0] <=  1
-									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][1] >= -1
-									    and ListMvL1    [ReadListIdx][Mbx+3*i][Mby+3*j][1] <=  1)then
-										foreach int k in 0 .. 3
-										do
-											IsColZero[8*j + 4*i + k] := true;
-										end
-									else
-										foreach int k in 0 .. 3
-										do
-											IsColZero[8*j + 4*i + k] := false;
-										end
-									end
-								end
-							end
-						end
-					end
+					IsColZero[PartitionIdx[i][j]] := Compute_ColZero(Mbx+i,Mby+j);
 				end
 			end	
 
@@ -407,6 +388,7 @@ actor Algo_MvBuffer()
 			SizeSubMbMv     :=  SizeSubMbPart(mb_type,ValSubMbType);
 			IsPredL0        := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L0) != 0;
 			IsPredL1        := (SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] & PRED_L1) != 0;
+			sub_mb_type     := ValSubMbType;
 		end
 
 	GetMbParametersFinished: action ==>
@@ -414,11 +396,24 @@ actor Algo_MvBuffer()
 			MbPartIdx = MbPartIdxMax
 		end
 
+	GetSubMbParameters.Launch_B_Direct_8x8: action
+				==>
+		guard
+			SubMbPartIdx < SubMbPartIdxMax,
+			mb_type     = BLOCK_TYPE_B_8x8,
+			sub_mb_type = B_DIRECT_8x8
+		do
+			println("bouh");
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
 	GetSubMbParameters.Launch8x8: action
 				==>
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
-			SizeSubMbMv  = SZ_8x8
+			SizeSubMbMv  = SZ_8x8,
+			   mb_type     != BLOCK_TYPE_B_8x8
+			or sub_mb_type != B_DIRECT_8x8
 		var
 			uint(size=4) Idx := 0
 		do
@@ -686,36 +681,36 @@ actor Algo_MvBuffer()
 		end
 
 	schedule fsm GetNewPic:
-		GetNewPic          (GetNewPic                  )--> ReadSizeRefList;
+		GetNewPic          (GetNewPic                       )--> ReadSizeRefList;
 
-		ReadSizeRefList    (ReadSizeRefList            )--> ReadRefList;
+		ReadSizeRefList    (ReadSizeRefList                 )--> ReadRefList;
 
-		ReadRefList        (ReadRefList.Launch         )--> ReadRefList;
-		ReadRefList        (ReadRefList.Done           )--> ReadLTList;
+		ReadRefList        (ReadRefList.Launch              )--> ReadRefList;
+		ReadRefList        (ReadRefList.Done                )--> ReadLTList;
 
-		ReadLTList         (ReadLTList                 )--> GetMbType;
+		ReadLTList         (ReadLTList                      )--> GetMbType;
 
-		GetMbType          (GetNewPic                  )--> ReadDelList;
-		GetMbType          (GetMbType.MacroBlkIorSI    )--> EatTokens;
-		GetMbType          (GetMbType.B_Skip           )--> GetBlockInfo4BSkip;
-		GetMbType          (GetMbType.Others           )--> GetMbParameters;
+		GetMbType          (GetNewPic                       )--> ReadDelList;
+		GetMbType          (GetMbType.MacroBlkIorSI         )--> EatTokens;
+		GetMbType          (GetMbType.B_Skip_B_Direct_16x16 )--> GetBlockInfo4BSkip;
+		GetMbType          (GetMbType.Others                )--> GetMbParameters;
 
-		EatTokens          (EatTokens                  )--> GetMbType;
+		EatTokens          (EatTokens                       )--> GetMbType;
 
-		GetBlockInfo4BSkip (GetBlockInfo               )--> GetMbType;
+		GetBlockInfo4BSkip (GetBlockInfo                    )--> GetMbType;
 
-		GetMbParameters    (GetMbParameters            )--> GetBlockInfo4Mb;
-		GetMbParameters    (LaunchGetSubMbParameters   )--> GetSubMbParameters;
-		GetMbParameters    (GetMbParametersFinished    )--> GetMbType;
+		GetMbParameters    (GetMbParameters                 )--> GetBlockInfo4Mb;
+		GetMbParameters    (LaunchGetSubMbParameters        )--> GetSubMbParameters;
+		GetMbParameters    (GetMbParametersFinished         )--> GetMbType;
 
-		GetBlockInfo4Mb    (GetBlockInfo               )--> GetMbParameters;
+		GetBlockInfo4Mb    (GetBlockInfo                    )--> GetMbParameters;
 
-		GetSubMbParameters (GetSubMbParameters         )--> GetBlockInfo4SubMb;
-		GetSubMbParameters (GetSubMbParametersFinished )--> GetMbParameters;
+		GetSubMbParameters (GetSubMbParameters              )--> GetBlockInfo4SubMb;
+		GetSubMbParameters (GetSubMbParametersFinished      )--> GetMbParameters;
 
-		GetBlockInfo4SubMb (GetBlockInfo               )--> GetSubMbParameters;
+		GetBlockInfo4SubMb (GetBlockInfo                    )--> GetSubMbParameters;
 
-		ReadDelList        (ReadDelList.Launch         )--> ReadDelList;
-		ReadDelList        (ReadDelList.Done           )--> ReadSizeRefList;
+		ReadDelList        (ReadDelList.Launch              )--> ReadDelList;
+		ReadDelList        (ReadDelList.Done                )--> ReadSizeRefList;
 	end
 end

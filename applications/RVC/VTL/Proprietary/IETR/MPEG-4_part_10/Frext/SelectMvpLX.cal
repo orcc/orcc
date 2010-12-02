@@ -106,7 +106,7 @@ actor SelectMvpLX()
 				IsPredL0[1] := Mb_Is_PredL0(MacroBlkType,1);
 				IsPredL1[0] := Mb_Is_PredL1(MacroBlkType,0);
 				IsPredL1[1] := Mb_Is_PredL1(MacroBlkType,1);
-			else
+			else//Fix me!!
 				if(MacroBlkType = BLOCK_TYPE_P_SKIP)then
 					IsPredL0[0] := true;
 					IsPredL0[1] := false;
