@@ -66,6 +66,7 @@ import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 
 /**
@@ -220,6 +221,10 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseAstExpressionIndex(AstExpressionIndex expression) {
+		if (doSwitch(expression.getSource())) {
+			return true;
+		}
+		
 		for (AstExpression index : expression.getIndexes()) {
 			if (doSwitch(index)) {
 				return true;
@@ -263,7 +268,7 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 
 	@Override
 	public Boolean caseAstExpressionVariable(AstExpressionVariable expression) {
-		return false;
+		return doSwitch(expression.getValue());
 	}
 
 	@Override
@@ -486,6 +491,11 @@ public class BooleanSwitch extends CalSwitch<Boolean> {
 		}
 
 		return doSwitch(variable.getValue());
+	}
+
+	@Override
+	public Boolean caseAstVariableReference(AstVariableReference reference) {
+		return false;
 	}
 
 	@Override

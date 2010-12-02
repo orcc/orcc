@@ -65,6 +65,7 @@ import net.sf.orcc.cal.cal.AstTypeString;
 import net.sf.orcc.cal.cal.AstTypeUint;
 import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.cal.util.CalSwitch;
 
 /**
@@ -189,6 +190,8 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstExpressionIndex(AstExpressionIndex expression) {
+		doSwitch(expression.getSource());
+
 		for (AstExpression index : expression.getIndexes()) {
 			doSwitch(index);
 		}
@@ -226,7 +229,7 @@ public class VoidSwitch extends CalSwitch<Void> {
 
 	@Override
 	public Void caseAstExpressionVariable(AstExpressionVariable expression) {
-		return null;
+		return doSwitch(expression.getValue());
 	}
 
 	@Override
@@ -410,6 +413,11 @@ public class VoidSwitch extends CalSwitch<Void> {
 	public Void caseAstVariable(AstVariable variable) {
 		doSwitch(variable.getType());
 		return doSwitch(variable.getValue());
+	}
+
+	@Override
+	public Void caseAstVariableReference(AstVariableReference reference) {
+		return null;
 	}
 
 	@Override

@@ -30,9 +30,11 @@ package net.sf.orcc.frontend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
@@ -44,7 +46,9 @@ import net.sf.orcc.cal.cal.AstSchedule;
 import net.sf.orcc.cal.cal.AstScheduleRegExp;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstVariable;
+import net.sf.orcc.cal.cal.AstVariableReference;
 import net.sf.orcc.cal.expression.AstExpressionEvaluator;
+import net.sf.orcc.cal.util.VoidSwitch;
 import net.sf.orcc.frontend.schedule.ActionSorter;
 import net.sf.orcc.frontend.schedule.FSMBuilder;
 import net.sf.orcc.frontend.schedule.RegExpConverter;
@@ -84,6 +88,8 @@ import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.ActionList;
 import net.sf.orcc.util.CollectionsUtil;
 import net.sf.orcc.util.OrderedMap;
+
+import org.eclipse.emf.ecore.EObject;
 
 import com.google.inject.Inject;
 
@@ -329,7 +335,7 @@ public class ActorTransformer {
 			Assign assign = new Assign(result, new BoolExpr(true));
 			addInstruction(assign);
 		} else {
-			transformInputPattern(astAction, Peek.class);
+			transformInputPatternPeek(astAction);
 			// local variables are not transformed because they are not
 			// supposed to be available for guards
 			// astTransformer.transformLocalVariables(astAction.getVariables());
@@ -531,7 +537,8 @@ public class ActorTransformer {
 					FSMBuilder builder = new FSMBuilder(astActor.getSchedule());
 					fsm = builder.buildFSM(sortedActions);
 				} else {
-					RegExpConverter converter = new RegExpConverter(scheduleRegExp);
+					RegExpConverter converter = new RegExpConverter(
+							scheduleRegExp);
 					fsm = converter.convert(sortedActions);
 				}
 				scheduler = new ActionScheduler(
@@ -611,7 +618,10 @@ public class ActorTransformer {
 	private void transformActionBody(AstAction astAction, Procedure body) {
 		Context oldContext = astTransformer.newContext(body);
 
-		transformInputPattern(astAction, Read.class);
+		for (AstInputPattern pattern : astAction.getInputs()) {
+			transformInputPattern(pattern, Read.class);
+		}
+
 		astTransformer.transformLocalVariables(astAction.getVariables());
 		astTransformer.transformStatements(astAction.getStatements());
 		transformOutputPattern(astAction);
@@ -694,56 +704,87 @@ public class ActorTransformer {
 	}
 
 	/**
-	 * Transforms the AST input patterns of the given action as local variables,
-	 * adds reads and assigns tokens.
+	 * Transforms the AST input pattern of the given action as a local variable,
+	 * adds peeks/reads and assigns tokens.
+	 * 
+	 * @param pattern
+	 *            an input pattern
+	 */
+	private void transformInputPattern(AstInputPattern pattern, Class<?> clasz) {
+		Context context = astTransformer.getContext();
+		Port port = mapPorts.get(pattern.getPort());
+		List<AstVariable> tokens = pattern.getTokens();
+
+		// evaluates token consumption
+		int totalConsumption = tokens.size();
+		int repeat = 1;
+		AstExpression astRepeat = pattern.getRepeat();
+		if (astRepeat != null) {
+			repeat = new AstExpressionEvaluator(null)
+					.evaluateAsInteger(astRepeat);
+			totalConsumption *= repeat;
+		}
+
+		// create port variable
+		LocalVariable variable = createPortVariable(port, totalConsumption);
+
+		// add the peek/read
+		try {
+			Object obj = clasz.newInstance();
+			AbstractFifoInstruction instr = (AbstractFifoInstruction) obj;
+			instr.setPort(port);
+			instr.setNumTokens(totalConsumption);
+			instr.setTarget(variable);
+			addInstruction(instr);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+
+		// declare tokens
+		for (AstVariable token : tokens) {
+			LocalVariable local = astTransformer.transformLocalVariable(token);
+			context.getProcedure().getLocals()
+					.put(file, local.getLocation(), local.getName(), local);
+		}
+
+		// loads tokens
+		actionLoadTokens(variable, tokens, repeat);
+	}
+
+	/**
+	 * Transforms the input patterns of the given AST action when necessary by
+	 * generating Peek instructions. An input pattern needs to be transformed to
+	 * Peeks when guards reference tokens from the pattern.
 	 * 
 	 * @param astAction
 	 *            an AST action
 	 */
-	private void transformInputPattern(AstAction astAction, Class<?> clasz) {
-		Context context = astTransformer.getContext();
-		List<AstInputPattern> astInputPattern = astAction.getInputs();
-		for (AstInputPattern pattern : astInputPattern) {
-			Port port = mapPorts.get(pattern.getPort());
-			List<AstVariable> tokens = pattern.getTokens();
+	private void transformInputPatternPeek(final AstAction astAction) {
+		final Set<AstInputPattern> patterns = new HashSet<AstInputPattern>();
+		VoidSwitch peekVariables = new VoidSwitch() {
 
-			// evaluates token consumption
-			int totalConsumption = tokens.size();
-			int repeat = 1;
-			AstExpression astRepeat = pattern.getRepeat();
-			if (astRepeat != null) {
-				repeat = new AstExpressionEvaluator(null)
-						.evaluateAsInteger(astRepeat);
-				totalConsumption *= repeat;
+			@Override
+			public Void caseAstVariableReference(AstVariableReference reference) {
+				EObject obj = reference.getVariable().eContainer();
+				if (obj instanceof AstInputPattern) {
+					patterns.add((AstInputPattern) obj);
+				}
+
+				return null;
 			}
 
-			// create port variable
-			LocalVariable variable = createPortVariable(port, totalConsumption);
+		};
 
-			// add the peek/read
-			try {
-				Object obj = clasz.newInstance();
-				AbstractFifoInstruction instr = (AbstractFifoInstruction) obj;
-				instr.setPort(port);
-				instr.setNumTokens(totalConsumption);
-				instr.setTarget(variable);
-				addInstruction(instr);
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
+		// fills the patterns set by visiting guards
+		for (AstExpression guard : astAction.getGuards()) {
+			peekVariables.doSwitch(guard);
+		}
 
-			// declare tokens
-			for (AstVariable token : tokens) {
-				LocalVariable local = astTransformer
-						.transformLocalVariable(token);
-				context.getProcedure().getLocals()
-						.put(file, local.getLocation(), local.getName(), local);
-			}
-
-			// loads tokens
-			actionLoadTokens(variable, tokens, repeat);
+		// add peeks for each pattern of the patterns set
+		for (AstInputPattern pattern : patterns) {
+			transformInputPattern(pattern, Peek.class);
 		}
 	}
 
