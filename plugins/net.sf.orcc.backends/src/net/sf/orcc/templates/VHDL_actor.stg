@@ -86,7 +86,7 @@ $
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Constant Signal
+// Init at reset
 ///////////////////////////////////////////////////////////////////////////////
 
 stateConst(variable) ::= <<
@@ -94,17 +94,11 @@ $
 if(variable.initialized)
   $$
   if(variable.assignable)
-$$declareConst(variable)$$
+$$variable$ <= $Constant(variable.initialValue)$;$
   endif
   $$
 endif
 $
-
->>
-
-declareConst(variable) ::= <<
-$variable$ <= $Constant(variable.initialValue)$;
-
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -441,17 +435,11 @@ printLocals(procedure) ::= <<
 $if(procedure.locals.list)
 $$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$$
 endif$
-
->>
-
-// this template prints the locals of the body and the scheduler function
-// of the given action
-printActionLocals(action) ::= <<
-$printLocals(action.body)$$printLocals(action.scheduler)$
 >>
 
 printActionLocalSchedul(action) ::= <<
-$printLocals(action.scheduler)$variable $action.scheduler$_go : std_logic;
+$printLocals(action.scheduler)
+$variable $action.scheduler$_go : std_logic;
 
 >>
 
@@ -508,28 +496,49 @@ $action$_scheduler : process ($sensitivity(action)$) is
   $printActionLocalSchedul(action)$  --
 begin
 $if(action.inputPattern.keys)
-$if (($action.inputPattern.keys :{port|$port.name$_send}; separator=" and "$) = '1') then$
-endif$
-$if(action.inputPattern.keys || actor.templateData)
+$$printActionSchedulerInPattern(action)$$
+elseif(actor.templateData)
 $  -- test if "$action$" action is schedulable
   $procedure(procedure=action.scheduler, transformReturn="true")$   
-$if(action.outputPattern.keys)
-  $  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
-    $action$_go <= isSchedulable_$action$_go;
+  $printActionSchedulerOutPattern(action)$$
+else
+$$if(action.outputPattern.keys)
+$  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
+    $action$_go <= '1';
   else
     $action$_go <= '0';    
   end if;$
-  else
-  $
-  $action$_go <= isSchedulable_$action$_go;$
-  endif$
-  
-end if;$
 else
-$$action$_go <= '1';$
+$  $action$_go <= '1'$
+endif$$
 endif$  
 end process $action$_scheduler;
 >>
+
+
+
+printActionSchedulerInPattern(action) ::= <<
+  if (($action.inputPattern.keys :{port|$port.name$_send}; separator=" and "$) = '1') then
+    -- test if "$action$" action is schedulable
+    $procedure(procedure=action.scheduler, transformReturn="true")$   
+  end if;
+  $printActionSchedulerOutPattern(action)$
+>>
+
+
+printActionSchedulerOutPattern(action) ::= << 
+$if(action.outputPattern.keys)
+$if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
+  $action$_go <= isSchedulable_$action$_go;
+else
+  $action$_go <= '0';    
+end if;$
+else
+$$action$_go <= isSchedulable_$action$_go;$
+endif$
+>>
+
+
 
 printActionSchedulerAck(action) ::= <<
 ($action$_go = '1') then
@@ -574,13 +583,17 @@ $actor.name$_execute : process (reset_n, clock) is
   $actor.actions: printActionLocalBody()$  --
 begin
   if reset_n = '0' then 
-    $actor.stateVars.list: stateConst()$    --
+    $actor.stateVars.list: stateConst(); separator="\n"$     
+    --
     $actor.outputs.list: fifo_out_init()$
+    $actor.inputs.list :{port|$port.name$_rdy <= '0';}; separator="\n"$    
 $if(actor.actionScheduler.fsm)    
 $    FSM    <= s_$actor.actionScheduler.fsm.initialState$;
 $
 endif$  --
   elsif rising_edge(clock) then
+    $actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n"$
+    $actor.inputs.list :{port|$port.name$_rdy <= '1';}; separator="\n"$  
     --  
 $if(actor.actionScheduler.fsm)    
 $    $executeCoreFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
@@ -596,7 +609,7 @@ end process $actor.name$_execute;
 actionTestSceduler(action) ::= <<
 ($action$_go = '1') then
   -- body of "$action$" action
-  $printActionBodyInline(action)$  --$actor.outputs.list: writeManagement()$
+  $printActionBodyInline(action)$  --$actor.outputs.list: writeManagement()$$actor.inputs.list: rdyManagement()$
 >>
 
 writeManagement(port) ::= <<
@@ -606,14 +619,22 @@ $
 endif$
 >>
 
+rdyManagement(port) ::= <<
+$if(!action.inputPattern.(port))
+$
+  $port.name$_rdy <= '0';$
+endif$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Core of an action - NO FSM
 
 executeCore(actions) ::= <<
-$actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n    "$
     if $executeIndent(actions)$
 >>
 
+
+// just to have a correct indentation
 executeIndent(actions) ::= <<
     $actions: actionTestSceduler(); separator="\nelsif "$
     end if;
@@ -642,8 +663,7 @@ else
       end case;
 end if;$
 else
-$$actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n    "$
-    case FSM is
+$    case FSM is
   $fsm.transitions: switchTransition(); separator="\n\n"$
     end case;$
 endif$
@@ -652,7 +672,7 @@ endif$
 
 switchTransition(transition) ::= <<
     when s_$transition.sourceState$ =>
-      if $transition.nextStateInfo: actionTestState(); separator="\n--\nelsif"$
+      if $transition.nextStateInfo: actionTestState(); separator="\n      elsif"$
       end if;
 >>
 
