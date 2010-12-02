@@ -1,8 +1,8 @@
 fifo_in(port) ::= <<
 $if(port.type.bool)
-$signal $port.name$_data : std_logic;$\n$$
+$signal $port.name$_data  : std_logic;$\n$$
 else
-$signal $port.name$_data : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif$
 signal $port.name$_send  : std_logic;
 signal $port.name$_rdy   : std_logic;
@@ -14,9 +14,9 @@ signal $port.name$_rdy   : std_logic;
 signal $port.name$_ack   : std_logic;
 $if(last(port.name))
 $$if(port.type.bool)
-$signal $port.name$_data : std_logic;$\n$$
+$signal $port.name$_data  : std_logic;$\n$$
 else
-$signal $port.name$_data : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
+$signal $port.name$_data  : std_logic_vector($port.type.size$ -1 downto 0);$\n$$
 endif$
 signal $port.name$_send  : std_logic;$
 else
@@ -27,7 +27,7 @@ endif$
 
 
 fifo_in_init(port) ::=<<
-$port.name$_rdy <= '1';$"\n"$
+$port.name$_ack <= '0';$"\n"$
 >>
 fifo_out_init(port) ::=<<
 $port.name$_rdy <= '1';$"\n"$
@@ -90,9 +90,9 @@ $input.list: fifo_in(); separator="\n"$
 $output.list: fifo_out(); separator="\n"$
 --
 -- Configuration
-signal count             : integer range 255 downto 0;
-signal clock             : std_logic := '0';
-signal reset_n           : std_logic := '0';
+signal count       : integer range 255 downto 0;
+signal clock       : std_logic := '0';
+signal reset_n     : std_logic := '0';
 
 >>
 
@@ -182,7 +182,7 @@ $        $port.name$_send <= '1';
     end if;
 
   when CheckRead =>
-    if (not endfile (sim_file_$instance.id$_$port.name$)) and $port.name$_rdy = '1' then
+    if (not endfile (sim_file_$instance.id$_$port.name$)) and $port.name$_rdy = '1' and $port.name$_ack = '1' then
       readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
@@ -262,7 +262,11 @@ $$
 endif
 $        --
         $port.name$_rdy <= '1';    
+        $port.name$_ack <= '1';    
       end if;
+    else
+      $port.name$_rdy <= '0';    
+      $port.name$_ack <= '0';     
     end if;
 
 >>
