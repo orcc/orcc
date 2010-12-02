@@ -37,11 +37,6 @@ actor Algo_DecodeMbPred()
 	bool DEBUG_MV           = false;
 	bool DEBUG_FLAG_DECODED = false;
 
-
-	uint(size=4) SLICE_TYPE_P  = 0;
-	uint(size=4) SLICE_TYPE_B  = 1;
-	uint(size=4) SLICE_TYPE_SP = 3;
-
 	List (type:uint(size=3),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
 
 	uint(size=5)  lumaYxYBlkIdx := 0;
@@ -51,7 +46,6 @@ actor Algo_DecodeMbPred()
 	uint(size=5)  mbPartIdx     := 0;
 	uint(size=5)  mbPartIdxMax  := 0;
 	//MbLayer Parameters
-	uint(size=4)  slice_type;
 	uint(size=6)  mb_type;
 	bool          transform_size_8x8_flag;
 	uint(size=2)  Chroma_Array_Type;
@@ -90,12 +84,11 @@ actor Algo_DecodeMbPred()
 		end
 
 	ReadParameters: action
-			Parameters :[SliceType , MbType , ChromaArrayType , 
-			                   NumRefIdxL0Active , NumRefIdxL1Active ,
-			                   Flags]
+			Parameters :[ MbType            , ChromaArrayType , 
+			              NumRefIdxL0Active , NumRefIdxL1Active ,
+			              Flags]
 				==>
 		do
-			slice_type              := SliceType;
 			mb_type                 := MbType;
 			Chroma_Array_Type       := ChromaArrayType;
 			num_ref_idx_l0_active   := NumRefIdxL0Active;
@@ -110,7 +103,7 @@ actor Algo_DecodeMbPred()
 	MbType.IsIntra_YxY: action
 				==>
 		guard
-			Is_Intra_16x16(mb_type) or Is_Intra_8x8(mb_type) or Is_Intra_4x4(mb_type)
+			Mb_IsIntra(mb_type) and mb_type != BLOCK_TYPE_I_PCM
 		end
 
 //We read 16 bits for limiting communication with others actors and improving performance
@@ -241,11 +234,8 @@ actor Algo_DecodeMbPred()
 	Mb_Type.IsNotEqualToDirect: action
 				==>
 		guard
-			   (slice_type = SLICE_TYPE_P)
-			or (slice_type = SLICE_TYPE_SP) 
-			or     (slice_type = SLICE_TYPE_B)
-			   and (mb_type  > BLOCK_TYPE_P_MAX)
-			   and (mb_type != BLOCK_TYPE_B_DIRECT_16x16)
+			   Mb_IsPred(mb_type)
+			or Mb_IsBiPred(mb_type) and mb_type != BLOCK_TYPE_B_DIRECT_16x16
 		do
 			mbPartIdxMax:= NumMbPart(mb_type);
 			mbPartIdx    := 0;

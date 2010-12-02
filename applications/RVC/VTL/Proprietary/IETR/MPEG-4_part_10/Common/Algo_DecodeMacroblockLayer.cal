@@ -434,7 +434,7 @@ actor Algo_DecodeMacroblockLayer()
 			TypeOfVLD               :[LAUNCH_ACTOR],
 			VLDParam                :[MB_PRED],
 
-			MbPredParameters :[slice_type , mb_type , Chroma_Array_Type , 
+			MbPredParameters :[mb_type               , Chroma_Array_Type , 
 			                   num_ref_idx_l0_active , num_ref_idx_l1_active ,
 			                   SetFlag(transform_size_8x8_flag,1,SetFlag(mb_field_decoding,0,0))]
 		end
