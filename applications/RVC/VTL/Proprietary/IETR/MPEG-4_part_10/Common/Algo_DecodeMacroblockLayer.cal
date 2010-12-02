@@ -153,18 +153,6 @@ actor Algo_DecodeMacroblockLayer()
 	int (size=5)  chroma_qp_index_offset;
 	int (size=5)  second_chroma_qp_index_offset;
 
-
-	function Is_Intra_16x16(uint MbType)
-				-->
-			bool
-		:
-			if( (MbType >= BLOCK_TYPE_INTRA_16x16_MIN) and (MbType <= BLOCK_TYPE_INTRA_16x16_MAX)) then
-				true
-			else
-				false
-			end
-		end
-
 	function Is_Intra_8x8(uint MbType)
 				-->
 			bool

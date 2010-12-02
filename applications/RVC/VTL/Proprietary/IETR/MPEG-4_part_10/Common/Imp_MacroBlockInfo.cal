@@ -174,6 +174,20 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 		];
 
 
+
+
+
+	function Mb_IsIntra(uint(size=6) MbType)
+				-->
+			bool
+		:
+			if(MbType >= BLOCK_TYPE_INTRA_MIN and MbType <= BLOCK_TYPE_INTRA_MAX)then
+				true
+			else
+				false
+			end
+		end
+
 	function Is_Intra_16x16(uint MbType)
 				-->
 			bool
@@ -185,6 +199,30 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			end
 		end
 
+	function Mb_IsPred(uint(size=6) MbType)
+				-->
+			bool
+		:
+			if(MbType >= BLOCK_TYPE_P_MIN and MbType <= BLOCK_TYPE_P_MAX or MbType = BLOCK_TYPE_P_SKIP)then
+				true
+			else
+				false
+			end
+		end
+
+	function Mb_IsBiPred(uint(size=6) MbType)
+				-->
+			bool
+		:
+			if(MbType >= BLOCK_TYPE_B_MIN and MbType <= BLOCK_TYPE_B_MAX or MbType = BLOCK_TYPE_B_SKIP)then
+				true
+			else
+				false
+			end
+		end
+
+
+
 	function Mb_Is_PredL0(uint(size=6) Mb_Type, uint(size=1) mb_part_idx)
 				-->
 			bool
@@ -192,10 +230,14 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 			if(Mb_Type >= BLOCK_TYPE_B_MIN and Mb_Type <= BLOCK_TYPE_B_MAX) then
 				(MbPartPredMode_B[(Mb_Type - BLOCK_TYPE_B_MIN) & 31][mb_part_idx & 1] & PRED_L0) != 0
 			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				if(Mb_Type != BLOCK_TYPE_P_SKIP)then
+				if(Mb_Type != BLOCK_TYPE_P_SKIP and Mb_Type != BLOCK_TYPE_B_SKIP)then
 					(MbPartPredMode_P[(Mb_Type - BLOCK_TYPE_P_MIN) & 7][mb_part_idx & 1] & PRED_L0) != 0
 				else
-					true
+					if(Mb_Type != BLOCK_TYPE_B_SKIP)then
+						true
+					else
+						false
+					end
 				end
 			end
 		end
@@ -204,20 +246,9 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 				-->
 			bool
 		:
-			if(MbType >= BLOCK_TYPE_B_MIN and MbType <= BLOCK_TYPE_B_MAX) then
+			if(MbType >= BLOCK_TYPE_B_MIN and MbType <= BLOCK_TYPE_B_MAX and MbType != BLOCK_TYPE_B_SKIP) then
 				(MbPartPredMode_B[(MbType - BLOCK_TYPE_B_MIN) &  31][mb_part_idx & 1] & PRED_L1) != 0
 			else//if(Mb_Type >= BLOCK_TYPE_P_MIN and Mb_Type <= BLOCK_TYPE_P_MAX)
-				false
-			end
-		end
-
-	function Mb_IsIntra(uint(size=6) MbType)
-				-->
-			bool
-		:
-			if(MbType >= BLOCK_TYPE_INTRA_MIN and MbType <= BLOCK_TYPE_INTRA_MAX)then
-				true
-			else
 				false
 			end
 		end
