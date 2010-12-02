@@ -471,8 +471,10 @@ public abstract class AbstractBackend implements Backend {
 	 * 
 	 * @param instance
 	 *            the instance
+	 * @return <code>true</code> if the actor was cached
 	 */
-	protected void printInstance(Instance instance) throws OrccException {
+	protected boolean printInstance(Instance instance) throws OrccException {
+		return false;
 	}
 
 	/**
@@ -493,20 +495,24 @@ public abstract class AbstractBackend implements Backend {
 
 				@Override
 				public Boolean call() throws OrccException {
-					if (instance.isActor()) {
-						printInstance(instance);
-					}
-					return false;
+					return printInstance(instance);
 				}
 
 			});
 		}
 
 		// executes the tasks
-		executeTasks(tasks);
+		int numCached = executeTasks(tasks);
 
 		long t1 = System.currentTimeMillis();
 		write("Done in " + ((float) (t1 - t0) / (float) 1000) + "s\n");
+
+		if (numCached > 0) {
+			write("*******************************************************************************\n");
+			write("* NOTE: " + numCached + " instances were not regenerated "
+					+ "because they were already up-to-date. *\n");
+			write("*******************************************************************************\n");
+		}
 	}
 
 	@Override

@@ -202,11 +202,11 @@ public class CBackendImpl extends AbstractBackend {
 	}
 
 	@Override
-	protected void printInstance(Instance instance) throws OrccException {
+	protected boolean printInstance(Instance instance) throws OrccException {
 		String id = instance.getId();
 		String outputName = path + File.separator + id + ".c";
 		try {
-			printer.printInstance(outputName, instance);
+			return printer.printInstance(outputName, instance);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}

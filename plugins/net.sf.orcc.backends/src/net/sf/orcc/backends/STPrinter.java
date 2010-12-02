@@ -194,7 +194,7 @@ public final class STPrinter {
 	 *            output file name
 	 * @param actor
 	 *            the actor
-	 * @return
+	 * @return <code>true</code> if the actor was cached
 	 * @throws IOException
 	 */
 	public boolean printActor(String fileName, Actor actor) throws IOException {
@@ -234,18 +234,20 @@ public final class STPrinter {
 	 *            output file name
 	 * @param instance
 	 *            the instance
+	 * @return <code>true</code> if the instance was cached
 	 * @throws IOException
 	 */
-	public void printInstance(String fileName, Instance instance)
+	public boolean printInstance(String fileName, Instance instance)
 			throws IOException {
 		long lastModified = getLastModifiedHierarchy(instance);
 
-		if (instance.isNetwork() ||(instance.isActor() && !instance.getActor().isSystem())) {
+		if (instance.isNetwork()
+				|| (instance.isActor() && !instance.getActor().isSystem())) {
 			// if source file is older than target file, do not generate
 			File targetFile = new File(fileName);
 			long targetLastModified = targetFile.lastModified();
 			if (lastModified < targetLastModified && !debugMode) {
-				return;
+				return true;
 			}
 
 			ST template = group.getInstanceOf("instance");
@@ -258,6 +260,8 @@ public final class STPrinter {
 			os.write(b);
 			os.close();
 		}
+
+		return false;
 	}
 
 	/**
