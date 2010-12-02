@@ -311,7 +311,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			NewPic_i   :[IsNewPic]
 				==>
 		guard
-			MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX,
+			Mb_IsIntra(MacroBlkType),
 			not IsNewPic
 		end
 
@@ -329,7 +329,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx    := 0;
 			MbPartIdxMax := 1;
 			SizeMbMv     := SZ_16x16;
-			MbType       := BLOCK_TYPE_P_L0_16x16;
+			MbType       := BLOCK_TYPE_P_L0_16x16;//FixMe
 		end
 
 	GetMbType.P_SkipL1: action
@@ -344,7 +344,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MbPartIdx    := 0;
 			MbPartIdxMax := 1;
 			SizeMbMv     := SZ_16x16;
-			MbType       := BLOCK_TYPE_P_L0_16x16;
+			MbType       := BLOCK_TYPE_P_L0_16x16;//FixMe
 		end
 
 	bool        direct_pred_lx;
@@ -459,13 +459,13 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				==>
 		guard
 			not IsNewPic,
-			not(MacroBlkType >= BLOCK_TYPE_INTRA_MIN and MacroBlkType <= BLOCK_TYPE_INTRA_MAX),
+			not Mb_IsIntra(MacroBlkType),
 			MacroBlkType != BLOCK_TYPE_P_SKIP,
 			MacroBlkType != BLOCK_TYPE_B_SKIP,
 			MacroBlkType != BLOCK_TYPE_B_DIRECT_16x16
 		do
 			Idx_Sub_Tab   :=
-				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
+				if(Mb_IsBiPred(MacroBlkType)) then
 					0
 				else
 					1

@@ -48,8 +48,8 @@ actor Algo_DecodeResidual()
 	uint(size=1) iCr = 1;
 
 	uint(size=2) RESIDUAL_LUMA_LUMA_OUTPUT := 0;
-	uint(size=2) RESIDUAL_LUMA_CHROMA1_OUTPUT := 0;
-	uint(size=2) RESIDUAL_LUMA_CHROMA2_OUTPUT := 0;
+//	uint(size=2) RESIDUAL_LUMA_CHROMA1_OUTPUT := 0;
+//	uint(size=2) RESIDUAL_LUMA_CHROMA2_OUTPUT := 0;
 
 
 	bool          bmFlag;

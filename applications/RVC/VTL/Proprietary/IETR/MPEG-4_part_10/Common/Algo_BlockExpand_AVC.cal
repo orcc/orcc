@@ -97,7 +97,7 @@ actor Algo_BlockExpand_AVC ()
 				==>
 		do
 			LumaMBSize       :=
-				if(mb_type >= BLOCK_TYPE_INTRA_16x16_MIN and mb_type <= BLOCK_TYPE_INTRA_16x16_MAX)then
+				if(Is_Intra_16x16(mb_type))then
 					BLOCK_16x16
 				else
 					BLOCK_4x4
