@@ -223,7 +223,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 		ActionScheduler scheduler = actor.getActionScheduler();
 		FSM fsm = scheduler.getFsm();
 		if (fsm == null) {
-			List<Action> actions = tryAndMerge(actor.getActions());
+			List<Action> actions = tryAndMerge(scheduler.getActions());
 			scheduler.getActions().clear();
 			scheduler.getActions().addAll(actions);
 		} else {
