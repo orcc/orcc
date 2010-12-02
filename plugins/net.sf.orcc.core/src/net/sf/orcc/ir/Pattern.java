@@ -54,20 +54,24 @@ public class Pattern extends LinkedHashMap<Port, Integer> {
 	}
 
 	/**
-	 * Returns <code>true</code> if this pattern is a subset of the given
+	 * Returns <code>true</code> if this pattern is a superset of the given
 	 * pattern. This can be used to determine time-dependent behavior, which
 	 * occurs when an action reads inputs not read by a higher-priority action.
 	 * 
-	 * @param pattern
-	 *            a pattern
+	 * @param other
+	 *            another pattern
 	 * @return <code>true</code> if this pattern is a subset of the given
 	 *         pattern
 	 */
-	public boolean isSubsetOf(Pattern pattern) {
-		if (pattern.keySet().containsAll(keySet())) {
-			for (Entry<Port, Integer> entry : entrySet()) {
-				// consumption must be >=
-				if (pattern.get(entry.getKey()) < entry.getValue()) {
+	public boolean isSupersetOf(Pattern other) {
+		if (this.keySet().containsAll(other.keySet())) {
+			// OK we read from at least the same ports as the other pattern
+
+			// let's check the consumption
+			for (Entry<Port, Integer> entry : other.entrySet()) {
+				// if this pattern consumes less than the other pattern then
+				// this pattern is not a superset
+				if (this.get(entry.getKey()) < entry.getValue()) {
 					return false;
 				}
 			}

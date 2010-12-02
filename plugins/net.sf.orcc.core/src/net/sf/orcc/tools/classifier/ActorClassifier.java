@@ -89,8 +89,8 @@ public class ActorClassifier implements ActorTransformation {
 
 		// checks for actors with time-dependent behavior
 		MoC moc;
-		TimeDependencyAnalyzer tdAnalyzer = new TimeDependencyAnalyzer(actor);
-		if (tdAnalyzer.isTimeDependent()) {
+		TimeDependencyAnalyzer tdAnalyzer = new TimeDependencyAnalyzer();
+		if (tdAnalyzer.isTimeDependent(actor)) {
 			moc = new DPNMoC();
 		} else {
 			// merges actions with the same input/output pattern together

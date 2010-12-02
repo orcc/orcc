@@ -54,13 +54,9 @@ public class TimeDependencyAnalyzer {
 	private Actor actor;
 
 	/**
-	 * Creates a new configuration analyzer for the given actor
-	 * 
-	 * @param actor
-	 *            an actor
+	 * Creates a new configuration analyzer.
 	 */
-	public TimeDependencyAnalyzer(Actor actor) {
-		this.actor = actor;
+	public TimeDependencyAnalyzer() {
 	}
 
 	/**
@@ -98,7 +94,9 @@ public class TimeDependencyAnalyzer {
 	 * 
 	 * @return <code>true</code> if this actor has a time-dependent behavior
 	 */
-	public boolean isTimeDependent() {
+	public boolean isTimeDependent(Actor actor) {
+		this.actor = actor;
+
 		ActionScheduler sched = actor.getActionScheduler();
 		if (sched.hasFsm()) {
 			FSM fsm = sched.getFsm();
@@ -131,24 +129,28 @@ public class TimeDependencyAnalyzer {
 	private boolean isTimeDependent(List<Action> actions) {
 		Iterator<Action> it = actions.iterator();
 		if (it.hasNext()) {
-			Action previous = it.next();
-			Pattern input = previous.getInputPattern();
+			Action higherPriorityAction = it.next();
+			Pattern higherPriorityPattern = higherPriorityAction
+					.getInputPattern();
 			while (it.hasNext()) {
-				Action action = it.next();
-				Pattern newInput = action.getInputPattern();
-				if (input.isSubsetOf(newInput)) {
-					// because the next action must have a pattern which is
-					// a superset of (or equal to) this one
-					input = newInput;
+				Action lowerPriorityAction = it.next();
+				Pattern lowerPriorityPattern = lowerPriorityAction
+						.getInputPattern();
+				if (lowerPriorityPattern.isSupersetOf(higherPriorityPattern)) {
+					// ok: the lower-priority action has a pattern which is a
+					// superset of (or equal to) the pattern of the
+					// higher-priority action
+					higherPriorityPattern = lowerPriorityPattern;
 				} else {
-					// the new pattern is not a superset of (or equal to)
-					// this one, this means time-dependent behavior
-					if (areGuardsCompatible(previous, action)) {
+					// otherwise, it may still be ok if guards are mutually
+					// exclusive
+					if (areGuardsCompatible(higherPriorityAction,
+							lowerPriorityAction)) {
 						return true;
 					}
 				}
 
-				previous = action;
+				higherPriorityAction = lowerPriorityAction;
 			}
 		}
 
