@@ -167,7 +167,8 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 					case LOGIC_AND:
 						return null;
 					default:
-						return new ExpressionEvaluator().interpretBinaryExpr((Expression) o1, op, (Expression) o2);
+						return new ExpressionEvaluator().interpretBinaryExpr(
+								(Expression) o1, op, (Expression) o2);
 					}
 				}
 			}
@@ -186,6 +187,15 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 		@Override
 		public Object interpret(UnaryExpr expr, Object... args) {
 			switch (expr.getOp()) {
+			case LOGIC_NOT: {
+				Object obj = expr.getExpr().accept(this);
+				if (obj instanceof IntVariable) {
+					return addConstraint((IntVariable) obj, BinaryOp.EQ,
+							new IntExpr(0));
+				}
+				break;
+			}
+
 			case MINUS:
 				Object obj = expr.getExpr().accept(this);
 				if (obj instanceof IntVariable) {
