@@ -468,6 +468,9 @@ $if(actor.actionScheduler.fsm)
 $  $printActionFireFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
 else  
 $  if $actor.actions: printActionFire(); separator="\n  elsif"$
+  else
+    $actor.actions : {actions|$actions$_go  <= '0'}; separator="\n"$
+    $actor.actions : {actions|$actions$_ack <= '0'}; separator="\n"$
   end if;$
 endif$
 
@@ -498,21 +501,17 @@ $procedure(procedure=action.scheduler, transformReturn="true")$
   
 
 printActionFire(action) ::= <<
-((isSchedulable_$action$_go $action.inputPattern.keys :{port| and $port.name$_send}$) = '1') then
-    $printActionFireOutPattern(action)$
-
--- nop
-$if(action.inputPattern.keys)
-$    $action.inputPattern.keys :{port|$port.name$_ack <= '1';}; separator="\n    "$$
-else
-$    null;$  
-endif$
+((isSchedulable_$action$_go $action.inputPattern.keys : {port| and $port.name$_send }$) = '1') then
+    $action$_go <= isSchedulable_$action$_go $action.outputPattern.keys : {port| and $port.name$_rdy }$;
+    $action$_ack <= isSchedulable_$action$_go $action.outputPattern.keys : {port| and $port.name$_rdy }$;
 >>
 
 printActionFireFSM(actions, fsm) ::= <<
 $if(actions)
 $if$printActionFire(actions)$
 else
+  $actor.actions : {actions|$actions$_go  <= '0'}; separator="\n"$
+  $actor.actions : {actions|$actions$_ack <= '0'}; separator="\n"$
   case FSM is
   $TransitionAck()$
       end case;
@@ -532,34 +531,6 @@ TransitionFire(transition) ::= <<
 
 actionFire(nextstate) ::= <<
     $printActionFire(nextstate.action)$
->>
-
-
-printActionSchedulerInPattern(action) ::= <<
-$if(action.outputPattern.keys)
-$if ($action.outputPattern.keys :{port|$port.name$_rdy}; separator=" and "$)  = '1' then
-  $action$_go <= '1';
-  $action.inputPattern.keys :{port|$port.name$_rdy <= '1'}; separator="\n"$
-else
-  $action$_go <= '0';    
-  $action.inputPattern.keys :{port|$port.name$_rdy <= '0'}; separator="\n"$    
-end if;$
-else
-$$action$_go <= isSchedulable_$action$_go;$
-endif$  
->>
-
-
-printActionFireOutPattern(action) ::= << 
-$if(action.outputPattern.keys)
-$if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
-  $action$_go <= '1';
-else
-  $action$_go <= '0';    
-end if;$
-else
-$$action$_go <= isSchedulable_$action$_go;$
-endif$
 >>
 
 
