@@ -440,6 +440,7 @@ endif$
 printActionLocalSchedul(action) ::= <<
 $printLocals(action.scheduler)
 $variable $action.scheduler$_go : std_logic;
+
 >>
 
 printActionLocalBody(action) ::= <<
@@ -457,8 +458,8 @@ $procedure(procedure=action.body)$
 ///////////////////////////////////////////////////////////////////////////////
 
 Actor_Scheduler(actor) ::= <<
-$actor$_sceduler : process($sensitivity()$)
-  $actor.actions : printActionLocalSchedul()$
+$actor$_sceduler : process($sensitivity(actor)$)
+  $actor.actions : printActionLocalSchedul()$--
 begin
   $actor.actions: printTemplateDataScheduler(); separator="\n\n"$
 
@@ -469,8 +470,8 @@ $  $printActionFireFSM(actions=actor.actionScheduler.actions, fsm=actor.actionSc
 else  
 $  if $actor.actions: printActionFire(); separator="\n  elsif"$
   else
-    $actor.actions : {actions|$actions$_go  <= '0'}; separator="\n"$
-    $actor.actions : {actions|$actions$_ack <= '0'}; separator="\n"$
+    $actor.actions : {actions|$actions$_go  <= '0';}; separator="\n"$
+    $actor.actions : initAck() ; separator="\n"$  
   end if;$
 endif$
 
@@ -480,17 +481,24 @@ end process;
 
 // print the sensitivity list of the actor
 sensitivity(actor) ::= <<
-$actor.inputs.list: {port|$port.name$_send}; separator=", "$
-$if(actor.inputs.list)
+$actor.inputs.list: {port|$port.name$_send}; separator=", "$$
+if(actor.inputs.list)
 $$if(actor.outputs.list || actor.templateData)
 $, $
 endif$$
-endif$
-$actor.outputs.list: {port|$port.name$_rdy, }; separator=", "$
-$if(actor.outputs.list || actor.templateData)
+endif
+$$actor.outputs.list: {port|$port.name$_rdy}; separator=", "$$
+if(actor.outputs.list)
+$$if(actor.actionScheduler.fsm || actor.templateData)
 $, $
+endif$$
+endif
+$$actor.templateData: {$it$}; separator=", "$$
+if(actor.templateData && actor.actionScheduler.fsm)    
+$, FSM$
+elseif(actor.actionScheduler.fsm)
+$FSM$
 endif$
-$actor.templateData: {$it$}; separator=", "$
 >>
 
 // prints the scheduler of the given action according to the actor's template data
@@ -502,22 +510,26 @@ $procedure(procedure=action.scheduler, transformReturn="true")$
 
 printActionFire(action) ::= <<
 ((isSchedulable_$action$_go $action.inputPattern.keys : {port| and $port.name$_send }$) = '1') then
-    $action$_go <= isSchedulable_$action$_go $action.outputPattern.keys : {port| and $port.name$_rdy }$;
-    $action$_ack <= isSchedulable_$action$_go $action.outputPattern.keys : {port| and $port.name$_rdy }$;
+    $action$_go  <= isSchedulable_$action$_go $action.outputPattern.keys : {port| and $port.name$_rdy }$;
+    $action.inputPattern.keys : {
+      port|$port.name$_ack <= isSchedulable_$action$_go $action.outputPattern.keys : {port| and $port.name$_rdy }$;} ; separator="\n"$
 >>
 
 printActionFireFSM(actions, fsm) ::= <<
 $if(actions)
 $if$printActionFire(actions)$
 else
-  $actor.actions : {actions|$actions$_go  <= '0'}; separator="\n"$
-  $actor.actions : {actions|$actions$_ack <= '0'}; separator="\n"$
+  $actor.actions : {actions|$actions$_go  <= '0';}; separator="\n  "$
+  $actions : initAck() ; separator="\n"$  
+  $actor.actions : {actions|$actions$_ack <= '0';}; separator="\n  "$
   case FSM is
   $TransitionAck()$
       end case;
 end if;$
 else
-$case FSM is
+$$actor.actions : {actions|$actions$_go  <= '0';}; separator="\n  "$
+  $actions : initAck() ; separator="\n"$  
+  case FSM is
 $fsm.transitions: TransitionFire(); separator="\n\n"$
 end case;$
 endif$
@@ -533,6 +545,9 @@ actionFire(nextstate) ::= <<
     $printActionFire(nextstate.action)$
 >>
 
+initAck(action) ::= <<
+$action.inputPattern.keys : {port|$port.name$_ack <= '0';} ; separator="\n"$  
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Execute process
