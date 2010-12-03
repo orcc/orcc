@@ -124,6 +124,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=11) Mbx_in_pix;
 	uint(size=11) Mby_in_pix;
 
+
 	function median(int a, int b, int c)
 				-->
 			int
@@ -438,7 +439,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			direct_pred_lx or (not other_direct_pred_lx)
 		do
 			if( (not direct_pred_lx) and (not other_direct_pred_lx))then
-				foreach int i in 0 .. 15
+				foreach int i in 0 .. 15//Fixme!!
 				do
 					RefIdxTab[Idx_CurrBlk][i] := 0;
 				end
@@ -767,25 +768,49 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		end
 
 	ComputeMvLX.LaunchB_Direct_8x8: action
-			sub_mb_type :[ValSubMbType]
+			sub_mb_type :[ValSubMbType],
+			colZeroFlag :[TabColZero] repeat 4
 				==>
-			DirectPredLX_Out :[true]
+			DirectPredLX_Out :[direct_pred_lx]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			SizeMbMv = SZ_8x8,
 			SubMbPartPredMode[Idx_Sub_Tab][ValSubMbType & 15] = DIRECT
 		var
-			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
-			uint(size=11) Blk_y_in_pix := Mby_in_pix
+			int(size=5) RefIdxLX_Direct
 		do
-			Loc_Direct[0] := Blk_x_in_pix + 8 * (MbPartIdx&1);
-			Loc_Direct[1] := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
-			RefIdxTab[Idx_CurrBlk][0] := 0;//Fixme
-				if(direct_spatial_mv_pred)then // spatial prediction
-					println("GetMbType.Direct_8x8 : spatial prediction not implemented yet !!");
-				else //temporal prediction
-					println("GetMbType.Direct_8x8 : temporal prediction not implemented yet !!");
+			Loc_Direct[0] := Mbx_in_pix + 8 * (MbPartIdx&1);
+			Loc_Direct[1] := Mby_in_pix + 8 * ((MbPartIdx>>1)&1);
+
+			if(direct_spatial_mv_pred)then // spatial prediction
+				//foreach int i in 0 .. 15 //FIXME
+				//do
+				GetNeighbourBlockParametres (0,16);
+				RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
+				foreach int i in 0 .. 15
+				do
+					RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
 				end
+				if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[0])then
+					foreach int i in 0 .. 15
+					do
+						MvTab[Idx_CurrBlk][i] := [0,0];
+					end
+					direct_pred_lx        := false;
+				else
+					ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
+					foreach int i in 0 .. 15
+					do
+						MvTab[Idx_CurrBlk][i][0] := OMv[0];
+						MvTab[Idx_CurrBlk][i][1] := OMv[1];
+					end
+					direct_pred_lx           := true;
+				end
+				//end
+			else //temporal prediction
+				println("GetMbType.B_Skip_B_Direct_8x8 : temporal prediction for B_Skip not implemented yet !!");
+			end
+
 			MbPartIdx := MbPartIdx + 1;
 		end
 
