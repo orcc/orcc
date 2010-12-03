@@ -57,6 +57,7 @@ actor Algo_IQ_AVSJZ(
   
   int BTYPE_SZ = 12;
   int NEWVOP = 2048;
+  int COEFF_CODED = 2;
   int QUANT_MASK = 63;
   int QP_SZ = 6;
   int IT_IN_SZ = 14;
@@ -99,9 +100,15 @@ actor Algo_IQ_AVSJZ(
   skip_wh: action BTYPE:[cmd] repeat 2 ==>
   end
 
-  skip_other: action BTYPE:[cmd]  ==>
+  check_coeff_ncoded: action BTYPE:[cmd] ==>
   guard
-    bitand(NEWVOP,cmd) = 0
+    bitand(NEWVOP,cmd) = 0,
+    bitand( COEFF_CODED, cmd) = 0
+  //do
+    //println("IS:Coeff_coded = 0. Skip IS!");
+  end
+
+  check_coeff_coded: action BTYPE:[cmd]  ==>
   end
 
   get_para: action ==>
@@ -128,17 +135,18 @@ actor Algo_IQ_AVSJZ(
   end
 
   schedule fsm start :
-    start     ( get_new_qp ) --> skip_wh;
-    skip_wh   ( skip_wh    ) --> skip_other;
-    skip_other( skip_other ) --> get_para;
-    start     ( skip_other ) --> get_para;
+    start     ( get_new_qp         ) --> skip_wh;
+    skip_wh   ( skip_wh            ) --> start;
+    start     ( check_coeff_ncoded ) --> start;
+    start     ( check_coeff_coded  ) --> get_para;
 
-    get_para  ( get_para   ) --> iq;
-    iq        ( done       ) --> start;
-    iq        ( iq         ) --> iq;
+    get_para  ( get_para           ) --> iq;
+    iq        ( done               ) --> start;
+    iq        ( iq                 ) --> iq;
   end
 
   priority
+    get_new_qp > check_coeff_ncoded > check_coeff_coded;
     done > iq;
   end
 

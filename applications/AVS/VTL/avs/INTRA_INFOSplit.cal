@@ -27,8 +27,8 @@ actor INTRA_INFOSplit(
   new_frame : action BTYPE:[cmd] ==>
   guard
       bitand(cmd,NEWVOP) != 0
-  do
-    println("INTRA_INFOSplit new_frame "+cmd);
+  //do
+    //println("INTRA_INFOSplit new_frame "+cmd);
   end 
   
   // Skip width and height
@@ -41,8 +41,8 @@ actor INTRA_INFOSplit(
   skip_split : action BTYPE:[btype] ==>
   guard
     bitand(btype,INTRA) = 0
-  do
-    println("INTRA_INFOSplit skip_split "+btype);
+  //do
+    //println("INTRA_INFOSplit skip_split "+btype);
   end
 
   do_split: action BTYPE:[btype] repeat 6==>
@@ -50,8 +50,8 @@ actor INTRA_INFOSplit(
     
   //the intra_info for U and V is the same.
   split_INTRA_INFO : action INTRA_INFO:[info] repeat 5 ==> INTRA_INFO_Y:[ info[0], info[1],info[2],info[3] ], INTRA_INFO_U:[ info[4] ], INTRA_INFO_V:[ info[4] ]
-  do
-    println("INTRA_INFOSplit split_INTRA_INFO " + info[0] + " " + info[1] + " " + info[2] + " " + info[3]);
+  //do
+    //println("INTRA_INFOSplit split_INTRA_INFO " + info[0] + " " + info[1] + " " + info[2] + " " + info[3]);
   end
   
   
