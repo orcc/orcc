@@ -121,7 +121,7 @@ public class XlimBackendImpl extends AbstractBackend {
 		if (hardwareGen) {
 			printer.loadGroups("XLIM_actor", "XLIM_actor_hard");
 		} else {
-			printer.loadGroups("XLIM_actor_exp");
+			printer.loadGroups("XLIM_actor");
 		}
 
 		printer.setExpressionPrinter(XlimExprPrinter.class);
