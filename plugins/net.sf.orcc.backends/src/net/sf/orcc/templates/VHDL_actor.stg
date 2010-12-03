@@ -471,7 +471,7 @@ else
 $  if $actor.actions: printActionFire(); separator="\n  elsif"$
   else
     $actor.actions : {actions|$actions$_go  <= '0';}; separator="\n"$
-    $actor.actions : initAck() ; separator="\n"$  
+    $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
   end if;$
 endif$
 
@@ -520,7 +520,7 @@ $if(actions)
 $if$printActionFire(actions)$
 else
   $actor.actions : {actions|$actions$_go  <= '0';}; separator="\n  "$
-  $actions : initAck() ; separator="\n"$  
+  $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
   $actor.actions : {actions|$actions$_ack <= '0';}; separator="\n  "$
   case FSM is
   $TransitionAck()$
@@ -528,7 +528,7 @@ else
 end if;$
 else
 $$actor.actions : {actions|$actions$_go  <= '0';}; separator="\n  "$
-  $actions : initAck() ; separator="\n"$  
+  $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
   case FSM is
 $fsm.transitions: TransitionFire(); separator="\n\n"$
 end case;$
@@ -545,9 +545,6 @@ actionFire(nextstate) ::= <<
     $printActionFire(nextstate.action)$
 >>
 
-initAck(action) ::= <<
-$action.inputPattern.keys : {port|$port.name$_ack <= '0';} ; separator="\n"$  
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Execute process
