@@ -440,7 +440,6 @@ endif$
 printActionLocalSchedul(action) ::= <<
 $printLocals(action.scheduler)
 $variable $action.scheduler$_go : std_logic;
-
 >>
 
 printActionLocalBody(action) ::= <<
@@ -458,16 +457,17 @@ $procedure(procedure=action.body)$
 ///////////////////////////////////////////////////////////////////////////////
 
 Actor_Scheduler(actor) ::= <<
-$actor.actions: printActionSchedulerInline(); separator="\n"$
-
-ack_process : process ($actor.actions :{actions|$actions$_go}; separator=", "$$if(actor.actionScheduler.fsm)$, FSM$endif$) is
+$actor$_sceduler : process($sensitivity()$)
+  $actor.actions : printActionLocalSchedul()$
 begin
-  $actor.inputs.list: {port|$port.name$_ack <= '0';}; separator="\n"$
+  $actor.actions: printTemplateDataScheduler(); separator="\n\n"$
+
   --
+  -- Test the action's inputs to fire (or not) an action  
 $if(actor.actionScheduler.fsm)    
-$  $printActionSchedulerAckFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
+$  $printActionFireFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
 else  
-$  if $actor.actions: printActionSchedulerAck(); separator="\n  elsif"$
+$  if $actor.actions: printActionFire(); separator="\n  elsif"$
   end if;$
 endif$
 
@@ -475,61 +475,85 @@ end process;
 
 >>
 
-sensitivity(action) ::= <<
-$action.inputPattern.keys :{port|$port.name$_send}; separator=", "$$
-if(action.inputPattern.keys && actor.templateData)
+// print the sensitivity list of the actor
+sensitivity(actor) ::= <<
+$actor.inputs.list: {port|$port.name$_send}; separator=", "$
+$if(actor.inputs.list)
+$$if(actor.outputs.list || actor.templateData)
 $, $
-endif$
-$actor.templateData: {$it$}; separator=", "$$
-if(action.outputPattern.keys && actor.templateData)
-$, $
-elseif(action.inputPattern.keys && action.outputPattern.keys)
-$, $
-endif$
-$action.outputPattern.keys :{port|$port.name$_rdy}; separator=", "$
->>
-
-// prints the scheduler of the given action "inline" (ie not within a function)
-printActionSchedulerInline(action) ::= <<
-
-$action$_scheduler : process ($sensitivity(action)$) is
-  $printActionLocalSchedul(action)$  --
-begin
-$if(action.inputPattern.keys)
-$$printActionSchedulerInPattern(action)$$
-elseif(actor.templateData)
-$  -- test if "$action$" action is schedulable
-  $procedure(procedure=action.scheduler, transformReturn="true")$   
-  $printActionSchedulerOutPattern(action)$$
-else
-$$if(action.outputPattern.keys)
-$  if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
-    $action$_go <= '1';
-  else
-    $action$_go <= '0';    
-  end if;$
-else
-$  $action$_go <= '1'$
 endif$$
-endif$  
-end process $action$_scheduler;
+endif$
+$actor.outputs.list: {port|$port.name$_rdy, }; separator=", "$
+$if(actor.outputs.list || actor.templateData)
+$, $
+endif$
+$actor.templateData: {$it$}; separator=", "$
 >>
 
+// prints the scheduler of the given action according to the actor's template data
+printTemplateDataScheduler(action) ::= <<
+-- test if "$action$" action is schedulable
+$procedure(procedure=action.scheduler, transformReturn="true")$
+>>  
+  
+
+printActionFire(action) ::= <<
+((isSchedulable_$action$_go $action.inputPattern.keys :{port| and $port.name$_send}$) = '1') then
+    $printActionFireOutPattern(action)$
+
+-- nop
+$if(action.inputPattern.keys)
+$    $action.inputPattern.keys :{port|$port.name$_ack <= '1';}; separator="\n    "$$
+else
+$    null;$  
+endif$
+>>
+
+printActionFireFSM(actions, fsm) ::= <<
+$if(actions)
+$if$printActionFire(actions)$
+else
+  case FSM is
+  $TransitionAck()$
+      end case;
+end if;$
+else
+$case FSM is
+$fsm.transitions: TransitionFire(); separator="\n\n"$
+end case;$
+endif$
+>>
+
+TransitionFire(transition) ::= <<
+    when s_$transition.sourceState$ =>
+      if $transition.nextStateInfo: actionFire(); separator="\n      elsif"$
+      end if;
+>>
+
+actionFire(nextstate) ::= <<
+    $printActionFire(nextstate.action)$
+>>
 
 
 printActionSchedulerInPattern(action) ::= <<
-  if (($action.inputPattern.keys :{port|$port.name$_send}; separator=" and "$) = '1') then
-    -- test if "$action$" action is schedulable
-    $procedure(procedure=action.scheduler, transformReturn="true")$   
-  end if;
-  $printActionSchedulerOutPattern(action)$
+$if(action.outputPattern.keys)
+$if ($action.outputPattern.keys :{port|$port.name$_rdy}; separator=" and "$)  = '1' then
+  $action$_go <= '1';
+  $action.inputPattern.keys :{port|$port.name$_rdy <= '1'}; separator="\n"$
+else
+  $action$_go <= '0';    
+  $action.inputPattern.keys :{port|$port.name$_rdy <= '0'}; separator="\n"$    
+end if;$
+else
+$$action$_go <= isSchedulable_$action$_go;$
+endif$  
 >>
 
 
-printActionSchedulerOutPattern(action) ::= << 
+printActionFireOutPattern(action) ::= << 
 $if(action.outputPattern.keys)
 $if ($action.outputPattern.keys :{port|$port.name$_rdy = '1'}; separator=" and "$) then
-  $action$_go <= isSchedulable_$action$_go;
+  $action$_go <= '1';
 else
   $action$_go <= '0';    
 end if;$
@@ -538,41 +562,6 @@ $$action$_go <= isSchedulable_$action$_go;$
 endif$
 >>
 
-
-
-printActionSchedulerAck(action) ::= <<
-($action$_go = '1') then
-$if(action.inputPattern.keys)
-$    $action.inputPattern.keys :{port|$port.name$_ack <= '1';}; separator="\n    "$$
-else
-$    null;$  
-endif$
->>
-
-printActionSchedulerAckFSM(actions, fsm) ::= <<
-$if(actions)
-$if$printActionSchedulerAck(actions)$
-else
-  case FSM is
-  $TransitionAck()$
-      end case;
-end if;$
-else
-$case FSM is
-$fsm.transitions: TransitionAck(); separator="\n\n"$
-end case;$
-endif$
->>
-
-TransitionAck(transition) ::= <<
-    when s_$transition.sourceState$ =>
-      if $transition.nextStateInfo: Acknoledgement(); separator="\n      elsif"$
-      end if;
->>
-
-Acknoledgement(nextstate) ::= <<
-    $printActionSchedulerAck(nextstate.action)$
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Execute process

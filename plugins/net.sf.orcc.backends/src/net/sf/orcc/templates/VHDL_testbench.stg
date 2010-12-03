@@ -137,6 +137,7 @@ begin
   --  
   elsif rising_edge(clock) then
     --
+    
     $input.list: case_define_in(); separator="\n"$$\n$
   end if;
 end process WaveGen_Proc_In;
@@ -145,7 +146,7 @@ end process WaveGen_Proc_In;
 
 
 case_define_in(port) ::= <<
-
+$port.name$_send <= '0'; 
 case tb_FSM_$port.name$ is
   when after_reset =>
     count <= count + 1;
