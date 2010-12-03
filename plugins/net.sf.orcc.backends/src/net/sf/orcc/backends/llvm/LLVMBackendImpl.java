@@ -130,10 +130,6 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		List<Actor> actors = parseActors(files);
 
-		if (classify) {
-			// TODO classify actors
-		}
-
 		printer = new STPrinter(getAttribute(DEBUG_MODE, false));
 		printer.loadGroups("LLVM_header", "LLVM_actor", "LLVM_metadata");
 		printer.setExpressionPrinter(LLVMExprPrinter.class);
