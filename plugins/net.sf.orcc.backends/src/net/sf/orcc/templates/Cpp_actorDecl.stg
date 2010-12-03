@@ -225,13 +225,15 @@ actor(actor, options) ::= <<
 // Input FIFOs
 enum
 {
-	$actor.inputs.list: {$actor.name$_$it.name$}; separator=",\n"$
+	$actor.inputs.list: {$actor.name$_$it.name$}; separator=",\n"$,
+	$actor.name$_nbInputs
 };
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
 enum
 {
-	$actor.outputs.list: {$actor.name$_$it.name$}; separator=",\n"$
+	$actor.outputs.list: {$actor.name$_$it.name$}; separator=",\n"$,
+	$actor.name$_nbOutputs
 };
 
 
@@ -244,22 +246,6 @@ public:
 	~actor_$actor.name$();
 	
 	void initializeActor();
-
-$! ////////////////////////////////////////////////////////////////////////////////
-// State variables of the actor
-	$actor.stateVars.list: nonConstStateVar(it)$ !$
-
-private:
-#ifdef __TRACE_CAPTURE__
-	TraceCapture m_actionTracer;
-#endif
-static char* className;
-////////////////////////////////////////////////////////////////////////////////
-// Parameters
-$parameters(actor.parameters.list)$
-////////////////////////////////////////////////////////////////////////////////
-// Non-const state variables of the actor
-$actor.stateVars.list: nonConstStateVar()$
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
 	$actor.procs.list: procedure()$
@@ -268,7 +254,7 @@ $actor.stateVars.list: nonConstStateVar()$
 	$actor.actions: action()$
 
 public:
-	$if(actor.initializes)$
+$if(actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
 	$actor.initializes: action()$
@@ -283,6 +269,28 @@ $else$
 $scheduler(actions=actor.actionScheduler.actions)$
 $endif$
 
+private:
+const bool hasTokens(int port, int iSize) const {return  (m_arrAvailStatus[port] >= iSize);};
+const bool hasRooms(int port, int iSize) const {return  (m_arrRoomStatus[port] >= iSize);};
+
+void getFifoStatus();
+
+private:
+#ifdef __TRACE_CAPTURE__
+	TraceCapture m_actionTracer;
+#endif
+static char* className;
+
+////////////////////////////////////////////////////////////////////////////////
+// Parameters
+$parameters(actor.parameters.list)$
+////////////////////////////////////////////////////////////////////////////////
+// Non-const state variables of the actor
+$actor.stateVars.list: nonConstStateVar()$
+////////////////////////////////////////////////////////////////////////////////
+// Fifo Status members
+int m_arrAvailStatus[$actor.name$_nbInputs];
+int m_arrRoomStatus[$actor.name$_nbOutputs];
 };
 
 #endif

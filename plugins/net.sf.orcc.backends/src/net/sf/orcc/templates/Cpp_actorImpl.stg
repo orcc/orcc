@@ -133,11 +133,6 @@ Decrement(decrement) ::= <<
 $decrement.target$--;
 >>
 
-HasTokens(hasTokens) ::= <<
-
-$hasTokens.target$ = m_poTabIn[$actor.name$_$hasTokens.port$]->hasTokens($hasTokens.numTokens$);
->>
-
 Increment(increment) ::= <<
 
 $increment.target$++;
@@ -162,11 +157,14 @@ Read(read) ::= <<
 $if (read.target)$
 $if(read.unit)$
 m_poTabIn[$actor.name$_$read.port$]->get($read.target$);$\n$
+m_arrAvailStatus[$actor.name$_$read.port$] --;
 $else$
 m_poTabIn[$actor.name$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
+m_arrAvailStatus[$actor.name$_$read.port$] -= $read.numTokens$;
 $endif$
 $else$
 m_poTabIn[$actor.name$_$read.port$]->skip($read.numTokens$);$\n$
+m_arrAvailStatus[$actor.name$_$read.port$] -= $read.numTokens$;
 $endif$
 >>
 
@@ -194,8 +192,11 @@ Write(write) ::= <<
 
 $if(write.unit)$
 m_poTabOut[$actor.name$_$write.port$]->put($write.target$);$\n$
+m_arrRoomStatus[$actor.name$_$write.port$]--;
 $else$
 m_poTabOut[$actor.name$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
+m_arrRoomStatus[$actor.name$_$write.port$] -= $write.numTokens$;
+
 $endif$
 
 >>
@@ -277,11 +278,11 @@ m_actionTracer.captureAction("$action.name$");
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|m_poTabOut[$actor.name$_$port$]->hasRooms($pattern.(port)$)}; separator=" && "$
+$pattern.keys:{port|hasRooms($actor.name$_$port$, $pattern.(port)$)}; wrap, anchor, separator=" && "$
 >>
 
 inputPattern(pattern) ::= <<
-$pattern.keys:{port|m_poTabIn[$actor.name$_$port$]->hasTokens($pattern.(port)$) && }$
+$pattern.keys:{port|hasTokens($actor.name$_$port$, $pattern.(port)$) && }$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -295,9 +296,16 @@ i++;
 >>
 
 actionTest(action) ::= <<
-if($inputPattern(action.inputPattern)$isSchedulable_$action$()$if(action.outputPattern)$ && $outputPattern(pattern=action.outputPattern)$$endif$)
+if($inputPattern(action.inputPattern)$isSchedulable_$action$())
 {
+	$if(action.outputPattern)$
+	if($outputPattern(pattern=action.outputPattern)$)
+	{
+		$actionCall(action)$
+	}
+	$else$
 	$actionCall(action)$
+	$endif$
 }
 >>
 
@@ -308,6 +316,8 @@ $actions: actionTest(); separator="\nelse "$
 scheduler(actions) ::= <<
 int actor_$actor.name$::schedule()
 {
+	getFifoStatus();
+
 	bool res = true;
 	int i = 0;
   
@@ -389,12 +399,15 @@ $endif$
 $fsm.transitions: stateScheduler(); separator="\n"$
 int actor_$actor.name$::schedule()
 {
+	getFifoStatus();
+
 	bool res = true;
 	int i = 0;
-	
+
 	while (res)
 	{
 		res = false;
+		
 		$if(actions)$
 		if(outside_FSM_scheduler())
 		{
@@ -495,5 +508,19 @@ $schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.f
 $else$
 $scheduler(actions=actor.actionScheduler.actions)$
 $endif$
+
+
+void actor_$actor.name$::getFifoStatus()
+{
+  	for(int i=0; i<$actor.name$_nbInputs; i++) 
+	{
+		m_arrAvailStatus[i] = m_poTabIn[i]->getCount();
+	}
+
+	for(int i=0; i<$actor.name$_nbOutputs; i++) 
+	{
+		m_arrRoomStatus[i] = m_poTabOut[i]->getRooms();
+	}
+}
 
 >>
