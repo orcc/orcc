@@ -360,7 +360,6 @@ actor SelectMvpLX()
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			(not IsSubPredL0) and (not IsSubPredL1),
-			(not IsPredL0[MbPartIdx&1]) and (not IsPredL1[MbPartIdx&1]),
 			        Is_direct_l0  and      Is_direct_l1
 			or (not Is_direct_l0) and (not Is_direct_l1)
 		do
