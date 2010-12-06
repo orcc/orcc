@@ -111,18 +111,18 @@ static void Read_YUV(unsigned char *Y, unsigned char *U, unsigned char *V) {
 	}
 }
 
-static void DiffUcharImage(const int x_size, const int y_size, const unsigned char *img1_uchar, const unsigned char *img2_uchar, unsigned char SizeMbSide) {
+static void DiffUcharImage(const int x_size, const int y_size, const unsigned char *true_img_uchar, const unsigned char *test_img_uchar, unsigned char SizeMbSide) {
 	int i, j;
 	int error = 0;
 
 	for (j = 0; j < y_size; j++) {
 		for (i = 0; i < x_size; i++) {
-			if (abs(img1_uchar[j * x_size + i ] - img2_uchar[j * x_size + i]) != 0) {
+			if (abs(true_img_uchar[j * x_size + i ] - test_img_uchar[j * x_size + i]) != 0) {
 				error++;
 
 				if (error < 100) {
 					printf("error %d instead of %d at position : i = %d, j = %d, mb_x = %d, mb_y = %d \n",
-						img1_uchar[j * x_size + i] , img2_uchar[j * x_size + i], i, j, i/SizeMbSide, j/SizeMbSide);
+						test_img_uchar[j * x_size + i] , true_img_uchar[j * x_size + i], i, j, i/SizeMbSide, j/SizeMbSide);
 				}
 			}
 		}
