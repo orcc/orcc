@@ -225,9 +225,7 @@ public class ActorInterpreter {
 			// Initialize actors parameters with instance map
 			for (Variable param : actor.getParameters()) {
 				Expression value = parameters.get(param.getName());
-				if (value != null) {
-					param.setValue((Expression) value.accept(exprInterpreter));
-				}
+				param.setValue(value);
 			}
 
 			// Check for List state variables which need to be allocated or

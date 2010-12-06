@@ -1,0 +1,15 @@
+actor Dummy(int par) ==>:
+
+
+List(type: int, size=20) dc_buf := [ par : for int k in 1 .. 20 ];
+
+bool done := false;
+
+action ==>
+guard not done
+do
+	done := true;
+	println(dc_buf);
+end
+
+end

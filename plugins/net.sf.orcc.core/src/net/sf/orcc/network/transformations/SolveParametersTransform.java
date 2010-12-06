@@ -38,6 +38,7 @@ import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.AbstractExpressionInterpreter;
 import net.sf.orcc.ir.expr.BinaryExpr;
+import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.network.Instance;
@@ -96,7 +97,8 @@ public class SolveParametersTransform extends AbstractExpressionInterpreter
 			}
 
 			Expression resolvedValue = (Expression) value.accept(this);
-			entry.setValue(resolvedValue);
+			Expression constantValue = (Expression) resolvedValue.accept(new ExpressionEvaluator());
+			entry.setValue(constantValue);
 		}
 	}
 
