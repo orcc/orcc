@@ -161,6 +161,7 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 				else
 					2
 				end;
+			IsBiPred := (list_selected = BIPRED);
 		end
 
 	GetInterpSubMb.Launch8x8: action
