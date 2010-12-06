@@ -455,6 +455,31 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			not direct_pred_lx and other_direct_pred_lx
 		end
 
+	SendSubMv4Direct.Launch: action
+			DirectPredLX_In :[other_direct_pred_lx]
+				==>
+			Location  :[Loc_Direct] repeat 2,
+			MvOut     :[MvTab[Idx_CurrBlk][4*((MbPartIdx-1)&3)][0],MvTab[Idx_CurrBlk][4*((MbPartIdx-1)&3)][1]],
+			RefIdxOut :[RefIdxTab[Idx_CurrBlk][4*((MbPartIdx-1)&3)]],
+			NewPic_o  :[false]
+		guard
+			direct_pred_lx or (not other_direct_pred_lx)
+		do
+			if( (not direct_pred_lx) and (not other_direct_pred_lx))then
+				foreach int i in 4*((MbPartIdx-1)&3) .. 4*((MbPartIdx-1)&3) + 3
+				do
+					RefIdxTab[Idx_CurrBlk][i] := 0;
+				end
+			end
+		end
+
+
+	SendSubMv4Direct.Skip: action
+			DirectPredLX_In :[other_direct_pred_lx]
+				==>
+		guard
+			not direct_pred_lx and other_direct_pred_lx
+		end
 	GetMbType.Others: action
 			mb_type    :[MacroBlkType],
 			NewPic_i   :[IsNewPic]
@@ -784,30 +809,27 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			Loc_Direct[1] := Mby_in_pix + 8 * ((MbPartIdx>>1)&1);
 
 			if(direct_spatial_mv_pred)then // spatial prediction
-				//foreach int i in 0 .. 15 //FIXME
-				//do
-				GetNeighbourBlockParametres (0,16);
+				GetNeighbourBlockParametres (4*(MbPartIdx&3),8);
 				RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
-				foreach int i in 0 .. 15
+				foreach int i in 4*(MbPartIdx&3) .. 4*(MbPartIdx&3) + 3
 				do
 					RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
 				end
 				if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[0])then
-					foreach int i in 0 .. 15
+					foreach int i in 4*(MbPartIdx&3) .. 4*(MbPartIdx&3) + 3
 					do
 						MvTab[Idx_CurrBlk][i] := [0,0];
 					end
 					direct_pred_lx        := false;
 				else
 					ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
-					foreach int i in 0 .. 15
+					foreach int i in 4*(MbPartIdx&3) .. 4*(MbPartIdx&3) + 3
 					do
 						MvTab[Idx_CurrBlk][i][0] := OMv[0];
 						MvTab[Idx_CurrBlk][i][1] := OMv[1];
 					end
 					direct_pred_lx           := true;
 				end
-				//end
 			else //temporal prediction
 				println("GetMbType.B_Skip_B_Direct_8x8 : temporal prediction for B_Skip not implemented yet !!");
 			end
@@ -1015,7 +1037,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		ComputeMvpL0      (ComputeMvLX.Launch8x8          )--> ComputeSubMvpL0;
 		ComputeMvpL0      (ComputeMvLX.Done               )--> GetMbType;
 
-		SendSubMv4Direct  (SendMv4Direct                  )--> ComputeMvpL0;
+		SendSubMv4Direct  (SendSubMv4Direct               )--> ComputeMvpL0;
 
 		ComputeSubMvpL0      (ComputeSubMvLX.Launch8x8 )--> ComputeSubMvpL0;
 		ComputeSubMvpL0      (ComputeSubMvLX.Launch8x4 )--> ComputeSubMvpL0;
