@@ -24,9 +24,9 @@ endif$
 $port.name$_rdy   : in  std_logic;
 $port.name$_send  : out std_logic;
 $if(last(port.name))
-$$port.name$_ack   : out std_logic$
+$$port.name$_ack   : in  std_logic$
 else
-$$port.name$_ack   : out std_logic;$
+$$port.name$_ack   : in  std_logic;$
 endif$
 >>
 

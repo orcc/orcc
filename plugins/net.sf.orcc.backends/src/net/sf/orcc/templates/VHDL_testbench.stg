@@ -27,10 +27,20 @@ endif$
 
 
 fifo_in_init(port) ::=<<
-$port.name$_ack <= '0';$"\n"$
+$port.name$_send <= '0';
+$if(port.type.bool)
+$$port.name$_data <= '0';$
+else
+$$port.name$_data <= (others => '0');$
+endif$
+
+
 >>
+
 fifo_out_init(port) ::=<<
-$port.name$_rdy <= '1';$"\n"$
+$port.name$_rdy <= '1';
+$port.name$_ack <= '1';
+
 >>
 
 fifo_actor_in(port) ::= <<
@@ -126,7 +136,7 @@ tb_FSM_$port.name$ <= after_reset;
 
 waveform_process_in(input) ::= <<
 --
--- Input(s) waveform Generation
+-- Input(s) Waveform Generation
 WaveGen_Proc_In : process (reset_n, clock)
   variable Input_bit   : integer range 2147483647 downto - 2147483648;
   variable line_number : line;
@@ -135,9 +145,7 @@ begin
     $input.list: fifo_in_init()$    --
     $input.list: tb_FSM_init()$    count <= 0;
   --  
-  elsif rising_edge(clock) then
-    --
-    
+  elsif rising_edge(clock) then 
     $input.list: case_define_in(); separator="\n"$$\n$
   end if;
 end process WaveGen_Proc_In;
@@ -146,6 +154,8 @@ end process WaveGen_Proc_In;
 
 
 case_define_in(port) ::= <<
+--
+-- Input port: $port.name$ Waveform Generation
 $port.name$_send <= '0'; 
 case tb_FSM_$port.name$ is
   when after_reset =>
@@ -183,7 +193,7 @@ $        $port.name$_send <= '1';
     end if;
 
   when CheckRead =>
-    if (not endfile (sim_file_$instance.id$_$port.name$)) and $port.name$_rdy = '1' and $port.name$_ack = '1' then
+    if (not endfile (sim_file_$instance.id$_$port.name$)) and $port.name$_rdy = '1' then --and $port.name$_ack = '1' then
       readline(sim_file_$instance.id$_$port.name$, line_number);
       --
       if line_number'length > 0 and line_number(1) /= '/' then
@@ -210,6 +220,7 @@ $        $port.name$_send <= '1';
 
   when others => null;
 end case;
+
 >>
 
 waveform_process_out(output) ::= <<
@@ -221,7 +232,6 @@ begin
   if reset_n = '0' then
     $output.list: fifo_out_init()$    --
   elsif rising_edge(clock) then
-    --
     $output.list: case_define_out(); separator="\n"$
   end if;
 end process WaveGen_Proc_Out;
@@ -230,45 +240,47 @@ end process WaveGen_Proc_Out;
 
 
 case_define_out(port) ::= <<
-    if (not endfile (sim_file_$instance.id$_$port.name$) and $port.name$_send = '1') then
-      readline(sim_file_$instance.id$_$port.name$, line_number);
-      --
-      if line_number'length > 0 and line_number(1) /= '/' then
-        read(line_number, input_bit);
+--
+-- Output port: $port.name$ Waveform Generation
+if (not endfile (sim_file_$instance.id$_$port.name$) and $port.name$_send = '1') then
+  readline(sim_file_$instance.id$_$port.name$, line_number);
+  --
+  if line_number'length > 0 and line_number(1) /= '/' then
+    read(line_number, input_bit);
 $
 if(port.type.bool)
-$        if Input_bit = 1 then
-          assert ($port.name$_data = '1')
-            report "incorrectly value computed : 0 instead of : 1"
-            severity error;
-        else
-          assert ($port.name$_data = '0')
-            report "incorrectly value computed : 1 instead of : 0"
-            severity error;                
-        end if;$
+$    if Input_bit = 1 then
+      assert ($port.name$_data = '1')
+        report "incorrectly value computed : 0 instead of : 1"
+        severity error;
+    else
+      assert ($port.name$_data = '0')
+        report "incorrectly value computed : 1 instead of : 0"
+        severity error;                
+    end if;$
 else
 $$
   if(port.type.int)
-  $        assert ($port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
-          -- report "incorrectly value computed : " & to_string(to_integer(to_signed($port.name$_data))) & " instead of :" & to_string(input_bit)
-          report "incorrectly value computed : " & str(to_integer(signed($port.name$_data))) & " instead of :" & str(input_bit)
-          severity error;$\n$$
+  $    assert ($port.name$_data  = std_logic_vector(to_signed(input_bit, $port.type.size$)))
+      -- report "incorrectly value computed : " & to_string(to_integer(to_signed($port.name$_data))) & " instead of :" & to_string(input_bit)
+      report "incorrectly value computed : " & str(to_integer(signed($port.name$_data))) & " instead of :" & str(input_bit)
+      severity error;$\n$$
   else
-  $        assert ($port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
-          report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($port.name$_data))) & " instead of :" & to_string(input_bit)
-          --report "Incorrectly value computed : " & str(to_integer(unsigned($port.name$_data))) & " instead of :" & str(input_bit)
-          severity error;$\n$$
+  $    assert ($port.name$_data  = std_logic_vector(to_unsigned(input_bit, $port.type.size$)))
+      report "Incorrectly value computed : " & to_string(to_integer(to_unsigned($port.name$_data))) & " instead of :" & to_string(input_bit)
+      --report "Incorrectly value computed : " & str(to_integer(unsigned($port.name$_data))) & " instead of :" & str(input_bit)
+      severity error;$\n$$
   endif
   $$
 endif
-$        --
-        $port.name$_rdy <= '1';    
-        $port.name$_ack <= '1';    
-      end if;
-    else
-      $port.name$_rdy <= '0';    
-      $port.name$_ack <= '0';     
-    end if;
+$    --
+    $port.name$_rdy <= '1';    
+    $port.name$_ack <= '1';    
+  end if;
+else
+  $port.name$_rdy <= '0';    
+  $port.name$_ack <= '0';     
+end if;
 
 >>
 
