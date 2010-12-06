@@ -62,7 +62,7 @@ public class XlimMappingPrinter {
 	 *             if the template file could not be read
 	 */
 	public XlimMappingPrinter() throws IOException {
-		group = TemplateGroupLoader.loadGroup("XLIM_mapping");
+		group = TemplateGroupLoader.loadGroup("XLIM_sw_mapping");
 	}
 
 	/**

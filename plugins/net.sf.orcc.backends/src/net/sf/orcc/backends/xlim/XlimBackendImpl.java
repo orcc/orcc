@@ -119,9 +119,9 @@ public class XlimBackendImpl extends AbstractBackend {
 		printer = new STPrinter();
 
 		if (hardwareGen) {
-			printer.loadGroups("XLIM_actor", "XLIM_actor_hard");
+			printer.loadGroups("XLIM_sw_actor", "XLIM_hw_actor");
 		} else {
-			printer.loadGroups("XLIM_actor");
+			printer.loadGroups("XLIM_sw_actor");
 		}
 
 		printer.setExpressionPrinter(XlimExprPrinter.class);
@@ -151,21 +151,24 @@ public class XlimBackendImpl extends AbstractBackend {
 			String outputName = path + File.separator + network.getName();
 			if (hardwareGen) {
 				outputName += ".vhd";
-				printer.loadGroups("XLIM_VHDL_network");
+				printer.loadGroups("XLIM_hw_network");
 			} else {
 				outputName += ".c";
-				printer.loadGroups("XLIM_C_network");
+				printer.loadGroups("XLIM_sw_network");
 			}
 
 			printer.printNetwork(outputName, network, false, fifoSize);
 
-			new XlimCMakePrinter().printCMake(path, network);
+			if (!hardwareGen) {
+				new XlimCMakePrinter().printCMake(path, network);
 
-			Map<String, String> mapping = getAttribute(
-					OrccLaunchConstants.MAPPING, new HashMap<String, String>());
-			if (!mapping.isEmpty()) {
-				new XlimMappingPrinter().printMapping(path, network, mapping,
-						fifoSize);
+				Map<String, String> mapping = getAttribute(
+						OrccLaunchConstants.MAPPING,
+						new HashMap<String, String>());
+				if (!mapping.isEmpty()) {
+					new XlimMappingPrinter().printMapping(path, network,
+							mapping, fifoSize);
+				}
 			}
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);

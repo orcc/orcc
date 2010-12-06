@@ -57,7 +57,7 @@ public class XlimCMakePrinter {
 	 *             if the template file could not be read
 	 */
 	public XlimCMakePrinter() throws IOException {
-		group = TemplateGroupLoader.loadGroup("XLIM_CMakeLists");
+		group = TemplateGroupLoader.loadGroup("XLIM_sw_CMakeLists");
 	}
 
 	/**
