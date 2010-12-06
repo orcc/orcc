@@ -199,6 +199,10 @@ private:
 	std::map<std::string, Actor*>* actors;
 
 
+	/** List of specific actors contained in the decoder */
+	std::map<std::string, Actor*>* specificActors;
+
+
 	/** List of instances in the decoder */
 	std::map<std::string, Instance*>* instances;
 	

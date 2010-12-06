@@ -156,6 +156,15 @@ public:
      */
 	void setActor(Actor* actor);
 
+	/*!
+     *  @brief Setter of decoder
+     *
+	 *	Set the decoder where this instance is written
+	 *
+	 *  @param decoder : The decoder where the instance is written
+     */
+	void setDecoder(Decoder* decoder){this->decoder = decoder;};
+
 	/**
      *  @brief get the Port corresponding to string name
 	 *
@@ -202,6 +211,13 @@ public:
 	ActionScheduler* getActionScheduler(){return actionScheduler;};
 
 	/**
+     *  @brief Set the action scheduler of this instance
+   	 *
+	 *  @param actionScheduler : ActionScheduler of the instanced functional unit
+     */
+	void setActionScheduler(ActionScheduler* actionScheduler){this->actionScheduler = actionScheduler;};
+
+	/**
 	 * @brief Getter of stateVars
 	 *
 	 * Returns a map of state variables.
@@ -209,6 +225,16 @@ public:
 	 * @return a map of state variables
 	 */
 	std::map<std::string, Variable*>* getStateVars() {return stateVars;}
+
+
+	/**
+	 * @brief Setter of stateVars
+	 *
+	 * Set the map of state variables.
+	 * 
+	 * @param stateVars : a map of state variables
+	 */
+	void setStateVars(std::map<std::string, Variable*>* stateVars) {this->stateVars = stateVars;}
 
 	/**
 	 * @brief Getter of a state variable
@@ -231,6 +257,15 @@ public:
 	std::map<std::string, Procedure*>* getProcs() {return procedures;}
 
 	/**
+	 * @brief Setter of procedures
+	 *
+	 * Set the map of procedure of this instance.
+	 * 
+	 * @return procedures : a map of Procedure.
+	 */
+	void setProcs(std::map<std::string, Procedure*>* procedures) {this->procedures = procedures;};
+
+	/**
 	 * @brief Getter of a procedure
 	 *
 	 * Returns the procedure corresponding to the given name
@@ -250,12 +285,39 @@ public:
 	std::list<Action*>* getInitializes(){return initializes;};
 
 	/**
+	 * @brief Returns all the actions of this instance.
+	 * 
+	 * @return all the actions of this instance
+	 */
+	std::list<Action*>* getActions() {return actions;};
+
+	/**
+	 * @brief Set the actions of this instance.
+	 * 
+	 * @return all the actions of this instance
+	 */
+	void setActions(std::list<Action*>* actions) {this->actions = actions;};
+
+	/**
+     *  @brief set initializes actions of the instance
+	 *
+	 *  @param initializes : a list of initializes actions
+	 *
+     */
+	 void setInitializes(std::list<Action*>* initializes){this->initializes = initializes;};
+
+	/**
      *  @brief return true if the instance has initialize actions
 	 *
 	 *  @return true if instance has initializes actions, otherwise false
 	 *
      */
-	bool hasInitializes() {return !initializes->empty();};
+	bool hasInitializes() { 
+		if (initializes == NULL){
+			return false;
+		}		
+		return !initializes->empty();
+	};
 
 	/**
      *  @brief Set a new input port for the instance
@@ -294,48 +356,18 @@ public:
 	std::map<std::string, Port*>* getOutputs() {return &outputs;};
 
 	/**
-	 * @brief make the instance Concrete
-	 *
-	 * Bound this decoder to an actor and a decoder
+	 * @brief Returns a map of parameters.
 	 * 
-	 * @param decoder: Decoder that store the instance
-	 *
-	 * @param stateVars: state variable in decoder of the instance
-	 *
-	 * @param parameters: parameters in decoder of the instance
-	 *
-	 * @param procs: procedures in decoder of the instance
-	 *
-	 * @param initializes: initialization actions in decoder of the instance
-	 *
-	 * @param actions: actions in decoder of the instance
-	 *
-	 * @param actionScheduler: actionScheduler in decoder of the instance
-	 *
-	 * @return the corresponding procedure
+	 * @return a map of parameters
 	 */
-	void makeConcrete(Decoder* decoder,
-					  std::map<std::string, Variable*>* stateVars,
-					  std::map<std::string, Variable*>* parameters,	
-					  std::map<std::string, Procedure*>* procs,	
-					  std::list<Action*>* initializes,
-					  std::list<Action*>* actions,
-					  ActionScheduler* actionScheduler){
-	this->actor = actor;
-	this->decoder = decoder;
-	this->inputs = inputs;
-	this->outputs = outputs;
-	this->stateVars = stateVars;
-	this->parameters = parameters;
-	this->procedures = procs;
-	this->initializes = initializes;
-	this->actions = actions;
-	this->actionScheduler = actionScheduler;
-	solveParameters(); 
-};
+	std::map<std::string, Variable*>* getParameters() {return parameters;};
 
-	
-private:
+	/**
+	 * @brief Set the map of parameters of this instance.
+	 * 
+	 * @param parameters: a map of parameters
+	 */
+	 void setParameters(std::map<std::string, Variable*>* parameters) {this->parameters = parameters;};
 
 	/**
 	*
@@ -343,8 +375,9 @@ private:
 	*
 	* Resolves parameters of this instance by using parameter and their values.
 	*/
-
 	void solveParameters();
+	
+private:
 
 	/* Parameters of an instance */
 	std::map<std::string, Expr*>* parameterValues;	

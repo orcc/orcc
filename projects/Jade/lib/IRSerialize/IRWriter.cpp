@@ -86,8 +86,18 @@ void IRWriter::writeInstance(Decoder* decoder){
 	list<Action*>* actions = writeActions(actor->getActions());
 	actionScheduler = writeActionScheduler(actor->getActionScheduler());
 
-	//Make the instance concrete
-	instance->makeConcrete(decoder, stateVars, parameters, procs, initializes, actions, actionScheduler);
+	
+	//Set the property of the instance
+	instance->setDecoder(decoder);
+	instance->setActions(actions);
+	instance->setStateVars(stateVars);
+	instance->setParameters(parameters);
+	instance->setProcs(procs);
+	instance->setInitializes(initializes);
+	instance->setActionScheduler(actionScheduler);
+
+	//Resolve paramaters of this instance
+	instance->solveParameters();
 }
 
 std::map<std::string, Port*>* IRWriter::writePorts(string key, map<string, Port*>* ports){
