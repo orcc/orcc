@@ -453,18 +453,20 @@ action(action) ::= <<
 
 
 // Input and output pattern
-
-patternPort(dir, port, index, index0) ::= <<
+patternPortPinAvail(dir, port)::= <<
 <!--  $dir$putPattern -->
 <operation kind="\$literal_Integer" value="$pattern.(port)$">
 	<port dir="out" size="32" source="$dir$putPattern_$instance.id$_$action.name$_$port$_tokenCount" typeName="int"/>
 </operation>
-<operation kind="\$ge">
+<operation kind="noop">
 	<port dir="in" source="$port$_pinAvail"/>
 	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_$port$_tokenCount"/>
 	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_$port$" typeName="bool"/>
 </operation>
+>>
 
+patternPort(dir, port, index, index0) ::= <<
+$patternPortPinAvail(dir=dir, port=port)$
 <operation kind="\$and">
 	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_$port$"/>
 	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_res_$index0$"/>

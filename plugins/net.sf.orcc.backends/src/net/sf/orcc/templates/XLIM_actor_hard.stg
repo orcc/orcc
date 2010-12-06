@@ -1,152 +1,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Override XLIM Templates For XLIM Hardware Generation
 
-///////////////////////////////////////////////////////////////////////////////
-// Throw an empty TypeDef in Hardware Generation
-///////////////////////////////////////////////////////////////////////////////
 
-typeDef(action) ::= <<
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Override pinWrite
-
-Write(op) ::= <<
-<!-- Write $op$ -->
-<operation kind="pinWrite" portName="$op.port.name$" style="simple">
-	<port dir="in" source="$op.target$"/>
-</operation>
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Override Peek
-///////////////////////////////////////////////////////////////////////////////
-
-Peek(peek) ::= <<
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// HasTokens
-///////////////////////////////////////////////////////////////////////////////
-
-HasTokens(hasTokens) ::= <<
-<!-- Input peeks of $action.name$ -->
-<operation kind="\$literal_Integer" value="0">
-	<port dir="out" size="1" source="hasTokens_$instance.id$_$procedure$_0" typeName="int"/>
-</operation>
-<operation kind="pinPeek" portName="$hasTokens.port.name$">
-	<port dir="in" source="hasTokens_$instance.id$_$procedure$_0"/>
-	$port(dir="out", type=hasTokens.port.type, source=hasTokens.target)$
-</operation>
-<operation kind="pinStatus" portName="$hasTokens.port$">
-	<port dir="out" size="1" source="$hasTokens.target$" typeName="bool"/>
-</operation>
+// Input and output pattern
+patternPortPinAvail(dir, port)::= <<
+<!--  $dir$putPattern -->
 <operation kind="noop">
-	<port dir="in" source="$hasTokens.target$"/>
-	<port dir="out" size="32" source="isSchedulable_$action.name$_$hasTokens.port.name$" typeName="int"/>
+	<port dir="in" source="$port$_pinStatus"/>
+	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_$port$" typeName="bool"/>
 </operation>
-<!-- Guards Expressions of $action.name$ -->
-
 >>
 
-///////////////////////////////////////////////////////////////////////////////
-// Override scheduler Name
-///////////////////////////////////////////////////////////////////////////////
 
-schedulerName(actions) ::=<<
-<module autostart="true" kind="action-scheduler" name="action-scheduler" 
-		sourcename="action-scheduler">
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Override outputPattern
-///////////////////////////////////////////////////////////////////////////////
-
-outputPatternPort(port, index, index0, state) ::= <<
->>
-
-outputPattern(pattern,action,state) ::= <<
-$outputPatternPortDecision(); separator="\n"$
->>
-
-outputPatternPortDecision()::=<<
-<module kind="if">
-	<module decision="outputPattern_$instance.id$_$action.name$_fireable_condition" kind="test">
-		<operation kind="noop">
-			<port dir="in" source="outputPattern_$instance.id$_$action.name$_fireable"/>
-			<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_fireable_condition" typeName="bool"/>
-		</operation>
-	</module>
->>
-
-outputPatternFireabilityPort(port) ::=<<
-<port dir="in" source="outputPattern_$instance.id$_$port$_status"/>
->>
-
-outputPatternFireability(action) ::=<<
-$if(action.outputPattern)$
-<!-- outputPattern Fireability -->
-<operation kind="\$and">
-	$action.outputPattern.keys: {port | $outputPatternFireabilityPort(port=port)$}; separator="\n"$
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_fireable" typeName="bool"/>
-</operation>
-$endif$
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// outputPinStatus
-///////////////////////////////////////////////////////////////////////////////
-
-outputPinStatusPort(port) ::=<<
+declarePinAvailableVariable(port) ::= <<
 <operation kind="pinStatus" portName="$port$">
-	<port dir="out" size="1" source="outputPattern_$instance.id$_$port$_status" typeName="bool"/>
+  <port dir="out" source="$port$_pinStatus" typeName="bool"/>
 </operation>
 >>
-
-outputPinStatus() ::=<<
-<!-- outputPattern Status -->
-$instance.actor.outputs.list: {port|$outputPinStatusPort(port=port)$}; separator="\n"$
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
-// scheduler without FSM
-///////////////////////////////////////////////////////////////////////////////
-
-scheduler(actions) ::= <<
-$schedulerName(actions)$
-	<operation kind="\$literal_Integer" value="1">
-		<port dir="out" size="1" source="var_$instance.id$_sched" typeName="bool"/>
-	</operation>
-	<module kind="loop">
-		<module decision="var_$instance.id$_loop" kind="test">
-			<operation kind="noop">
-				<port dir="in" source="var_$instance.id$_sched"/>
-				<port dir="out" size="1" source="var_$instance.id$_loop" typeName="bool"/>
-			</operation>
-		</module>
-		<module kind="body">
-			$instance.actor.actions: isSchedulableTest(); separator="\n"$
-			$outputPinStatus()$
-			$instance.actor.actions: outputPatternFireability(); separator="\n"$
-			$if(actions)$
-			$schedulingTest(actions)$
-					<module kind="block" mutex="true"/>
-			$endif$
-			<!--Close modules -->
-			$if(actions)$  	 	 
-			$actions:{</module></module>}; separator="\n"$
-			$endif$
-		</module>
-	</module>
-</module>
->>
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Throw empty AssignIndex
-///////////////////////////////////////////////////////////////////////////////
-
-AssignIndex(assignIndex) ::= <<
->>
-
