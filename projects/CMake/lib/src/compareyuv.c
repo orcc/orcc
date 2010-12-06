@@ -112,17 +112,17 @@ static void Read_YUV(unsigned char *Y, unsigned char *U, unsigned char *V) {
 }
 
 static void DiffUcharImage(const int x_size, const int y_size, const unsigned char *true_img_uchar, const unsigned char *test_img_uchar, unsigned char SizeMbSide) {
-	int i, j;
+	int pix_x, pix_y;
 	int error = 0;
 
-	for (j = 0; j < y_size; j++) {
-		for (i = 0; i < x_size; i++) {
-			if (abs(true_img_uchar[j * x_size + i ] - test_img_uchar[j * x_size + i]) != 0) {
+	for (pix_y = 0; pix_y < y_size; pix_y++) {
+		for (pix_x = 0; pix_x < x_size; pix_x++) {
+			if (abs(true_img_uchar[pix_y * x_size + pix_x ] - test_img_uchar[pix_y * x_size + pix_x]) != 0) {
 				error++;
 
 				if (error < 100) {
-					printf("error %d instead of %d at position : i = %d, j = %d, mb_x = %d, mb_y = %d \n",
-						test_img_uchar[j * x_size + i] , true_img_uchar[j * x_size + i], i, j, i/SizeMbSide, j/SizeMbSide);
+					printf("error %d instead of %d at position : pix_x = %d, pix_y = %d, mb_x = %d, mb_y = %d \n",
+						test_img_uchar[pix_y * x_size + pix_x] , true_img_uchar[pix_y * x_size + pix_x], pix_x, pix_y, pix_x/SizeMbSide, pix_y/SizeMbSide);
 				}
 			}
 		}
