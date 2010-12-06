@@ -30,8 +30,11 @@ package net.sf.orcc.backends.transformations;
 
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
+import net.sf.orcc.ir.LocalVariable;
+import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.expr.VarExpr;
+import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.instructions.Read;
@@ -59,6 +62,11 @@ public class ListOfOneElementToScalarTransformation extends
 				Variable oldTarget = read.getTarget();
 				read.setTarget(load.getTarget());
 				
+				// clean up uses
+				load.setTarget(null);
+				load.setSource(null);
+				
+				// remove instruction				
 				instructionIterator.remove();
 				procedure.getLocals().remove(oldTarget.getName());
 			}
@@ -74,15 +82,39 @@ public class ListOfOneElementToScalarTransformation extends
 				if (instruction.isStore()) {
 					Store store = (Store) instruction;
 					Expression expr = store.getValue();
+					
+					Variable oldTarget = write.getTarget();
+					Variable newTarget;
+					
+					// clean up uses
+					store.setTarget(null);
+					store.setValue(null);
+					
+					// remove instruction
+					instructionIterator.remove();
+					procedure.getLocals().remove(oldTarget.getName());
+					
 					if (expr.isVarExpr()) {
 						VarExpr var = (VarExpr) expr;
-						
-						Variable oldTarget = write.getTarget();
-						write.setTarget(var.getVar().getVariable());
-						
-						instructionIterator.remove();
-						procedure.getLocals().remove(oldTarget.getName());
+						newTarget = var.getVar().getVariable();
 					}
+					else {
+						LocalVariable localNewTarget = procedure.newTempLocalVariable(null, expr.getType(), "scalar_" + oldTarget.getName());
+						localNewTarget.setAssignable(true);
+						localNewTarget.setIndex(1);
+						
+						Assign assign = new Assign(localNewTarget, expr);
+						Use.addUses(assign, expr);
+						
+						localNewTarget.setInstruction(write);
+						
+						
+						newTarget = localNewTarget;
+						
+						//instructionIterator.previous();
+						instructionIterator.add(assign);						
+					}
+					write.setTarget(newTarget);
 					instructionIterator.next();
 				}
 				if (instructionIterator.hasNext()) {
@@ -103,6 +135,11 @@ public class ListOfOneElementToScalarTransformation extends
 				Variable oldTarget = peek.getTarget();
 				peek.setTarget(load.getTarget());
 				
+				// clean up uses
+				load.setTarget(null);
+				load.setSource(null);
+				
+				// remove instruction
 				instructionIterator.remove();
 				procedure.getLocals().remove(oldTarget.getName());
 			}

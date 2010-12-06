@@ -65,6 +65,12 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	public void visit(Assign assign) {
 		LocalVariable variable = assign.getTarget();
 		if (!variable.isUsed()) {
+
+			// do not remove stores to variables that are used by writes
+			if (variable.isPort()) {
+				return;
+			}
+
 			// clean up uses
 			assign.setTarget(null);
 			assign.setValue(null);
