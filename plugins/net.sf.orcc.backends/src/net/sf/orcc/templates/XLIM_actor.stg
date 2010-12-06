@@ -454,29 +454,29 @@ action(action) ::= <<
 
 // Input and output pattern
 
-patternPort(dir, port, index, index0, state) ::= <<
+patternPort(dir, port, index, index0) ::= <<
 <!--  $dir$putPattern -->
 <operation kind="\$literal_Integer" value="$pattern.(port)$">
-	<port dir="out" size="32" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount" typeName="int"/>
+	<port dir="out" size="32" source="$dir$putPattern_$instance.id$_$action.name$_$port$_tokenCount" typeName="int"/>
 </operation>
 <operation kind="\$ge">
 	<port dir="in" source="$port$_pinAvail"/>
-	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_$port$_tokenCount"/>
-	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_$port$" typeName="bool"/>
+	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_$port$_tokenCount"/>
+	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_$port$" typeName="bool"/>
 </operation>
 
 <operation kind="\$and">
-	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_$port$"/>
-	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_res_$index0$"/>
-	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_res_$index$" typeName="bool"/>
+	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_$port$"/>
+	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_res_$index0$"/>
+	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_res_$index$" typeName="bool"/>
 </operation>
 >>
 
-outputPatternDecision(index, state)::=<<
+outputPatternDecision(index, action, state)::=<<
 <module kind="if">
 	<module decision="outputPattern_$instance.id$_$action.name$_decision_s_$state$_$index$" kind="test">
 		<operation kind="noop">
-			<port dir="in" source="outputPattern_$instance.id$_$action.name$_s_$state$_res_$index$"/>
+			<port dir="in" source="outputPattern_$instance.id$_$action.name$_res_$index$"/>
 			<port dir="out" size="1" source="outputPattern_$instance.id$_$action.name$_decision_s_$state$_$index$" typeName="bool"/>
 		</operation>
 	</module>
@@ -484,22 +484,20 @@ outputPatternDecision(index, state)::=<<
 
 inputPatternDecision(index)::=<<
 <operation kind="noop">
-  <port dir="in" source="inputPattern_$instance.id$_$action.name$_s__res_$index$"/>
+  <port dir="in" source="inputPattern_$instance.id$_$action.name$_res_$index$"/>
   <port dir="out" size="1" source="inputPattern_$instance.id$_$action.name$_decision" typeName="bool"/>
 </operation>
 >>
 
-pattern(dir, pattern, action, state) ::= <<
+pattern(dir, pattern, action) ::= <<
 <operation kind="\$literal_Integer" value="1">
-	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_s_$state$_res_0" typeName="bool"/>
+	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_res_0" typeName="bool"/>
 </operation>
-$pattern.keys: {port | $patternPort(dir=dir, port=port, index=i, index0=i0, state=state)$}; separator="\n"$
+$pattern.keys: {port | $patternPort(dir=dir, port=port, index=i, index0=i0)$}; separator="\n"$
 >>
 
-outputPattern(pattern, action, state) ::= <<
-$pattern(dir="out", pattern=pattern, action=action, state=state)$
-<!-- Last outputPattern -->
-$outputPatternDecision(index=length(pattern.keys),state=state); separator="\n"$
+outputPattern(pattern, action) ::= <<
+$pattern(dir="out", pattern=pattern, action=action)$
 >>
 
 inputPattern(pattern, action) ::= <<
@@ -533,7 +531,8 @@ actionTest(action) ::= <<
 	</module>
 	<module kind="then">
 		$if(action.outputPattern)$
-		$outputPattern(pattern=action.outputPattern,action=action)$
+		<!-- Last outputPattern -->
+		$outputPatternDecision(index=length(action.outputPattern.keys),action=action); separator="\n"$
 			<module kind="then">
 				$actionCall(action)$
 			</module>
@@ -563,12 +562,13 @@ scheduler(actions) ::= <<
 			</operation>
 		</module>
 		<module kind="body">
-		  <!-- Make all pinAvail call -->
-		  $instance.actor.inputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
-      $instance.actor.outputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
+			<!-- Make all pinAvail call -->
+			$instance.actor.inputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
+			$instance.actor.outputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
     
 			$instance.actor.actions: isSchedulableTest(); separator="\n"$
 			$instance.actor.actions: inputPatternTest()$
+			$instance.actor.actions: outputPatternTest()$
 			$if(actions)$$schedulingTest(actions)$$endif$
 			<!--Close modules -->
 			$if(actions)$  	 	 
@@ -598,7 +598,8 @@ actionTestState(nextState) ::= <<
 	</module>
 	<module kind="then">
 		$if(nextState.action.outputPattern)$
-		$outputPattern(pattern=nextState.action.outputPattern,action=nextState.action,state=transition.sourceState)$
+		<!-- Last outputPattern -->
+		$outputPatternDecision(index=length(nextState.action.outputPattern.keys),action=nextState.action,state=transition.sourceState); separator="\n"$
 			<module kind="then">
 				$actionCall(nextState.action)$
 				$actionCallState(nextState)$
@@ -636,6 +637,11 @@ Transition(transition) ::= <<
 
 isSchedulableTest(action) ::= <<
 $procedure(action.scheduler)$
+>>
+
+
+outputPatternTest(action) ::= <<
+$outputPattern(pattern=action.outputPattern,action=action)$
 >>
 
 inputPatternTest(action) ::= <<
@@ -687,13 +693,14 @@ schedulerFSM(actions, fsm) ::= <<
 			</operation>
 		</module>
 		<module kind="body">
-		  <!-- PinAvail call -->
-		  $instance.actor.inputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
-      $instance.actor.outputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
+			<!-- PinAvail call -->
+			$instance.actor.inputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
+			$instance.actor.outputs.list: {port | $declarePinAvailableVariable(port=port)$}; separator="\n"$
     
 			<!-- All Schedulable expressions -->
 			$instance.actor.actions: isSchedulableTest()$
 			$instance.actor.actions: inputPatternTest()$
+			$instance.actor.actions: outputPatternTest()$
 			
 			<!-- Untagged actions -->
 			$if(actions)$  	 	 
