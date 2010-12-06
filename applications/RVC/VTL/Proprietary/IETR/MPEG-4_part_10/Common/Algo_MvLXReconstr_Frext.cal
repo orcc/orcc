@@ -178,7 +178,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			int (size=5) Idx_B;
 			int (size=5) Idx_C;
 
-	procedure GetNeighbourBlockParametres (uint(size=4) IdxBlk, uint(size=2) SzBlkMv)
+	procedure GetNeighbourBlockParameters (uint(size=4) IdxBlk, uint(size=2) SzBlkMv)
 	var
 			int (size=4) loc_x,
 			int (size=4) loc_y
@@ -402,7 +402,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			if(direct_spatial_mv_pred)then // spatial prediction
 				//foreach int i in 0 .. 15 //FIXME
 				//do
-				GetNeighbourBlockParametres (0,16);
+				GetNeighbourBlockParameters (0,16);
 				RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
 				foreach int i in 0 .. 15
 				do
@@ -655,7 +655,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				RefIdxTab[Idx_CurrBlk][i] := RefIdxCurr;
 			end
 
-			GetNeighbourBlockParametres (0,16);
+			GetNeighbourBlockParameters (0,16);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 
 			MvpL0[0]:= OMv[0]+mv_res[0];
@@ -692,7 +692,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				RefIdxTab[Idx_CurrBlk][i + 8 * (MbPartIdx&1)] := RefIdxCurr;
 			end
 
-			GetNeighbourBlockParametres (8*(MbPartIdx&1),16);
+			GetNeighbourBlockParameters (8*(MbPartIdx&1),16);
 			if(MbPartIdx = 0)then
 				if(RefIdxCurr = RefIdxB)then
 					MvpL0 := [MvB[0],MvB[1]];
@@ -748,7 +748,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				RefIdxTab[Idx_CurrBlk][i + 4 * (MbPartIdx&1)] := RefIdxCurr;
 			end
 
-			GetNeighbourBlockParametres (4*(MbPartIdx&1),8);
+			GetNeighbourBlockParameters (4*(MbPartIdx&1),8);
 			if(MbPartIdx = 0)then
 				if(RefIdxCurr = RefIdxA)then
 					MvpL0 := [MvA[0],MvA[1]];
@@ -809,7 +809,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			Loc_Direct[1] := Mby_in_pix + 8 * ((MbPartIdx>>1)&1);
 
 			if(direct_spatial_mv_pred)then // spatial prediction
-				GetNeighbourBlockParametres (0,16);
+				GetNeighbourBlockParameters (0,16);
 				RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
 				foreach int i in 4*(MbPartIdx&3) .. 4*(MbPartIdx&3) + 3
 				do
@@ -879,7 +879,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + i] := RefIdxCurr;
 			end
 
-			GetNeighbourBlockParametres (4*(MbPartIdx&3),8);
+			GetNeighbourBlockParameters (4*(MbPartIdx&3),8);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 
 			MvpL0[0] := OMv[0]+mv_res[0];
@@ -916,7 +916,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + 2 * (SubMbPartIdx&1)]     := RefIdxCurr;
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + 2 * (SubMbPartIdx&1) + 1] := RefIdxCurr;
 
-			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 2*(SubMbPartIdx&1),8);
+			GetNeighbourBlockParameters (4*(MbPartIdx&3) + 2*(SubMbPartIdx&1),8);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 
 			MvpL0[0] := OMv[0]+mv_res[0];
@@ -951,7 +951,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&1)]     := RefIdxCurr;
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&1) + 2] := RefIdxCurr;
 	
-			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 1*(SubMbPartIdx&1),4);
+			GetNeighbourBlockParameters (4*(MbPartIdx&3) + 1*(SubMbPartIdx&1),4);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 
 			MvpL0[0] := OMv[0]+mv_res[0];
@@ -985,7 +985,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 			RefIdxTab[Idx_CurrBlk][4 * (MbPartIdx&3) + (SubMbPartIdx&3)]     := RefIdxCurr;
 
-			GetNeighbourBlockParametres (4*(MbPartIdx&3) + 1*(SubMbPartIdx&3),4);
+			GetNeighbourBlockParameters (4*(MbPartIdx&3) + 1*(SubMbPartIdx&3),4);
 			ComputeMvPredL0(RefIdxCurr,RefIdxA,RefIdxB,RefIdxC);
 
 			MvpL0[0]:= OMv[0]+mv_res[0];
