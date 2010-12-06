@@ -121,8 +121,8 @@ static void DiffUcharImage(const int x_size, const int y_size, const unsigned ch
 				error++;
 
 				if (error < 100) {
-					printf("error %d instead of %d at position : pix_x = %d, pix_y = %d, mb_x = %d, mb_y = %d \n",
-						test_img_uchar[pix_y * x_size + pix_x] , true_img_uchar[pix_y * x_size + pix_x], pix_x, pix_y, pix_x/SizeMbSide, pix_y/SizeMbSide);
+					printf("error %d instead of %d at position : pix = (%d ; %d), mb = (%d ; %d) , loc_in_mb = (%d ; %d)\n",
+						test_img_uchar[pix_y * x_size + pix_x] , true_img_uchar[pix_y * x_size + pix_x], pix_x, pix_y, pix_x/SizeMbSide, pix_y/SizeMbSide, pix_x % SizeMbSide, pix_y % SizeMbSide);
 				}
 			}
 		}
