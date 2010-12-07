@@ -32,6 +32,7 @@ package net.sf.orcc.ir;
  * This class provide information about cast associated to an instruction
  * 
  * @author Jerome Gorin
+ * @author Herve Yviquel
  * 
  */
 public class Cast {
@@ -57,20 +58,6 @@ public class Cast {
 		}
 
 		return 0;
-	}
-	
-	/**
-	 * Determine the size of a type.
-	 * 
-	 * @return integer corresponding to the size of the selected type
-	 */
-	private Type getType(Type type) {
-		if (type.isList()) {
-			TypeList listType = (TypeList) type;
-			return getType(listType.getType());
-		}
-
-		return type;
 	}
 
 	private Type source;
@@ -101,6 +88,35 @@ public class Cast {
 	}
 
 	/**
+	 * Determine the size of a type.
+	 * 
+	 * @return integer corresponding to the size of the selected type
+	 */
+	private Type getType(Type type) {
+		if (type.isList()) {
+			TypeList listType = (TypeList) type;
+			return getType(listType.getType());
+		}
+
+		return type;
+	}
+
+	/**
+	 * Return true if the target type is different from the source type.
+	 * 
+	 * @return a boolean indicating if target type is different from the source
+	 *         type
+	 */
+	public boolean isDifferent() {
+		if (target.isList()) {
+			TypeList list = (TypeList) target;
+			return source.getClass() != list.getElementType().getClass();
+		} else {
+			return source.getClass() != target.getClass();
+		}
+	}
+
+	/**
 	 * Return true if the target type is extended from the source type.
 	 * 
 	 * @return a boolean indicating if target type is extended from the source
@@ -122,12 +138,17 @@ public class Cast {
 	 * 
 	 * @return a boolean indicating if source is signed type
 	 */
+	/**
+	 * Determine the size of a type.
+	 * 
+	 * @return integer corresponding to the size of the selected type
+	 */
 	public boolean isSigned() {
 		if (source.isUint() || target.isUint()) {
 			return false;
 		}
-		
-		if (source.isBool()|| target.isBool()) {
+
+		if (source.isBool() || target.isBool()) {
 			return false;
 		}
 
@@ -138,7 +159,7 @@ public class Cast {
 				return false;
 			}
 		}
-		
+
 		if (target.isList()) {
 			TypeList type = (TypeList) target;
 			Type elementType = type.getElementType();
@@ -149,8 +170,6 @@ public class Cast {
 
 		return true;
 	}
-	
-
 
 	/**
 	 * Return true if the target type is trunced from the source type.

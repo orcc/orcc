@@ -29,14 +29,12 @@
 package net.sf.orcc.backends.transformations.threeAddressCodeTransformation;
 
 import java.util.List;
-import java.util.ListIterator;
 
 import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Cast;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Procedure;
@@ -63,25 +61,12 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  * from source type.
  * 
  * @author Jerome GORIN
+ * @author Herve Yviquel
  * 
  */
 public class CastAdderTransformation extends AbstractActorTransformation {
 
 	private class CastExprInterpreter extends AbstractExpressionInterpreter {
-
-		private ListIterator<Instruction> it;
-
-		/**
-		 * Creates a new expression splitter with the given list iterator. The
-		 * iterator must be placed immediately before the expression to be
-		 * translated is used.
-		 * 
-		 * @param it
-		 *            iterator on a list of instructions
-		 */
-		public CastExprInterpreter(ListIterator<Instruction> it) {
-			this.it = it;
-		}
 
 		@Override
 		public Object interpret(BinaryExpr expr, Object... args) {
@@ -140,7 +125,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 				Assign assign = new Assign(newVar, expr);
 
 				// Add assignement to instruction's list
-				it.add(assign);
+				instructionIterator.add(assign);
 
 				return new VarExpr(new Use(newVar));
 			}
@@ -154,12 +139,35 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 
 	}
 
+	private boolean castType;
+
 	private String file;
+
+	public CastAdderTransformation(boolean castType) {
+		this.castType = castType;
+	}
 
 	private LocalVariable castTarget(LocalVariable target, Type type) {
 		Cast castTarget = new Cast(target.getType(), type);
 
-		if (castTarget.isExtended() || castTarget.isTrunced()) {
+		if (castType & castTarget.isDifferent()) {
+			Location location = target.getLocation();
+
+			// Make a new assignment to the binary expression
+			LocalVariable transitionVar = procedure.newTempLocalVariable(file,
+					castTarget.getTarget(), procedure.getName() + "_" + "expr");
+
+			transitionVar.setIndex(1);
+
+			VarExpr varExpr = new VarExpr(new Use(transitionVar));
+
+			Assign newAssign = new Assign(location, target, varExpr);
+
+			// Add assignement to instruction's list
+			instructionIterator.add(newAssign);
+
+			return transitionVar;			
+		} else if (castTarget.isExtended() || castTarget.isTrunced()) {
 			Location location = target.getLocation();
 
 			// Make a new assignment to the binary expression
@@ -197,8 +205,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			instructionIterator.previous();
 
 			Expression expr = (Expression) binExpr.accept(
-					new CastExprInterpreter(instructionIterator),
-					binExpr.getType());
+					new CastExprInterpreter(), binExpr.getType());
 
 			if (expr != binExpr) {
 				assign.setValue(expr);
@@ -228,8 +235,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 						.get(parameters.indexOf(parameter));
 				instructionIterator.previous();
 				Expression newParam = (Expression) parameter.accept(
-						new CastExprInterpreter(instructionIterator),
-						variable.getType());
+						new CastExprInterpreter(), variable.getType());
 				parameters.set(parameters.indexOf(parameter), newParam);
 				instructionIterator.next();
 			}
@@ -267,7 +273,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			}
 
 			Expression newValue = (Expression) value.accept(
-					new CastExprInterpreter(instructionIterator), type);
+					new CastExprInterpreter(), type);
 			values.set(indexValue, newValue);
 		}
 		Use.addUses(phi, phi.getValues());
@@ -281,7 +287,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 			instructionIterator.previous();
 			Expression value = returnInstr.getValue();
 			Expression newValue = (Expression) value.accept(
-					new CastExprInterpreter(instructionIterator), returnType);
+					new CastExprInterpreter(), returnType);
 			returnInstr.setValue(newValue);
 			instructionIterator.next();
 			Use.addUses(returnInstr, returnInstr.getValue());
@@ -296,7 +302,7 @@ public class CastAdderTransformation extends AbstractActorTransformation {
 		instructionIterator.previous();
 
 		Expression newValue = (Expression) value.accept(
-				new CastExprInterpreter(instructionIterator), target.getType());
+				new CastExprInterpreter(), target.getType());
 
 		if (value != newValue) {
 			store.setValue(newValue);

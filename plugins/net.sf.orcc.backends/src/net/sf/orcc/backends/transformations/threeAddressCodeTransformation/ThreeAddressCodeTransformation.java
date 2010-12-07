@@ -59,7 +59,7 @@ public class ThreeAddressCodeTransformation extends AbstractActorTransformation 
 		ActorTransformation[] transformations = {
 				new CopyPropagationTransformation(),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
-				new CastAdderTransformation() };
+				new CastAdderTransformation(false) };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
