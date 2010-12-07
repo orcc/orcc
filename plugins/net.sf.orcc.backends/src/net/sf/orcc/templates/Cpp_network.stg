@@ -238,9 +238,10 @@ extern "C" {
 #include "orcc_util.h"
 }
 
-#ifdef __TRACE_TOKENS__
 #include "traceaka.h"
 TraceAka g_oTracer;
+
+#ifdef __TRACE_TOKENS__
 #define NETWORK_PROFILING_MODE	AKA_PROFILING_CAPTURE_TOKEN 
 #else
 #define NETWORK_PROFILING_MODE	AKA_PROFILING_NONE 
