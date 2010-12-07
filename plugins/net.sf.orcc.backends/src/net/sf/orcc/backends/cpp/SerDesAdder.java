@@ -194,8 +194,7 @@ public class SerDesAdder {
 						int out = serdes.getNumOutputs();
 						serdes.setNumOutputs(out++);
 					} else {
-						Instance inst = new Instance("SerDes_" + attrName,
-								"SerDes");
+						Instance inst = new Instance(attrName, "SerDes");
 						inst.setContents(new SerDes(0, 1));
 						Vertex serdes = new Vertex(inst);
 						serdesMap.put(attrName, serdes);
@@ -215,8 +214,7 @@ public class SerDesAdder {
 						int in = serdes.getNumInputs();
 						serdes.setNumOutputs(in++);
 					} else {
-						Instance inst = new Instance("SerDes_" + attrName,
-								"SerDes");
+						Instance inst = new Instance(attrName, "SerDes");
 						inst.setContents(new SerDes(1, 0));
 						Vertex serdes = new Vertex(inst);
 						serdesMap.put(attrName, serdes);

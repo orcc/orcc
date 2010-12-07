@@ -25,116 +25,8 @@ $variableDeclaration(variable)$;$\n$
 $endif$
 >>
 
-///////////////////////////////////////////////////////////////////////////////
-// Instructions
-///////////////////////////////////////////////////////////////////////////////
 
-Assign(assign) ::= <<
-$assign.target$ = $assign.value$;
 
->>
-
-Call(call) ::= <<
-$if(call.target)$
-$call.target$ = 
-$endif$
-$call.procedure$($call.parameters; separator=", "$);
-
->>
-
-Decrement(decrement) ::= <<
-$decrement.target$--;
-
->>
-
-HasTokens(hasTokens) ::= <<
-$hasTokens.target$ = hasTokens($actor.name$_$hasTokens.port$, $hasTokens.numTokens$);
-
->>
-
-Increment(increment) ::= <<
-$increment.target$++;
-
->>
-
-Load(load) ::= <<
-$load.target$ = $load.source$$load.indexes : {[$it$]}$;
-
->>
-
-Peek(peek) ::= <<
-$peek.target$ = getPeekPtr($actor.name$_$peek.port$, $peek.numTokens$);
-
->>
-
-Read(read) ::= <<
-$read.target$ = getReadPtr($actor.name$_$read.port$, $read.numTokens$);
-
->>
-
-ReadEnd(readEnd) ::= <<
-setReadEnd($actor.name$_$readEnd.port$);
-
->>
-
-Return(return) ::= <<
-$if(return.value)$
-return $return.value$;
-
-$endif$
->>
-
-SelfAssignment(selfAssign) ::= <<
-$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
-
->>
-
-Store(store) ::= <<
-$store.target$$store.indexes : {[$it$]}$ = $store.value$;
-
->>
-
-Write(write) ::= <<
-$write.target$ = getWritePtr($actor.name$_$write.port$, $write.numTokens$);
-
->>
-
-WriteEnd(writeEnd) ::= <<
-setWriteEnd($actor.name$_$writeEnd.port$);
-
->>
-
-///////////////////////////////////////////////////////////////////////////////
-// Nodes
-///////////////////////////////////////////////////////////////////////////////
-
-instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
->>
-
-nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}$
->>
-
-// if node
-BlockNode(blockNode) ::= <<
-$instructions(blockNode.instructions)$
->>
-
-// if node
-IfNode(ifNode) ::= <<
-if ($ifNode.value$) {
-	$nodes(ifNode.thenNodes)$}$if(ifNode.elseNodes)$ else {
-	$nodes(ifNode.elseNodes)$}$endif$
-$BlockNode(ifNode.joinNode)$
->>
-
-// while node
-WhileNode(whileNode) ::= <<
-while ($whileNode.value$) {
-	$nodes(whileNode.nodes)$}
-$BlockNode(whileNode.joinNode)$
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Procedure
@@ -225,14 +117,14 @@ actor(actor, options) ::= <<
 // Input FIFOs
 enum
 {
-	$actor.inputs.list: {$actor.name$_$it.name$}; separator=",\n"$,
+	$actor.inputs.list: {$actor.name$_$it.name$,}; separator="\n"$
 	$actor.name$_nbInputs
 };
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
 enum
 {
-	$actor.outputs.list: {$actor.name$_$it.name$}; separator=",\n"$,
+	$actor.outputs.list: {$actor.name$_$it.name$,}; separator="\n"$
 	$actor.name$_nbOutputs
 };
 
@@ -270,8 +162,12 @@ $scheduler(actions=actor.actionScheduler.actions)$
 $endif$
 
 private:
+$if(actor.inputs.list)$
 const bool hasTokens(int port, int iSize) const {return  (m_arrAvailStatus[port] >= iSize);};
+$endif$
+$if(actor.outputs.list)$
 const bool hasRooms(int port, int iSize) const {return  (m_arrRoomStatus[port] >= iSize);};
+$endif$
 
 void getFifoStatus();
 
@@ -289,8 +185,12 @@ $parameters(actor.parameters.list)$
 $actor.stateVars.list: nonConstStateVar()$
 ////////////////////////////////////////////////////////////////////////////////
 // Fifo Status members
+$if(actor.inputs.list)$
 int m_arrAvailStatus[$actor.name$_nbInputs];
+$endif$
+$if(actor.outputs.list)$
 int m_arrRoomStatus[$actor.name$_nbOutputs];
+$endif$
 };
 
 #endif

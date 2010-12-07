@@ -87,7 +87,7 @@ $edges: assignFifo(); separator="\n"$
 
 declareInstance(instance) ::= <<
 $if(instance.serdes)$
-WrapperAka $instance.id$;
+WrapperAka $instance.id$("$instance.id$");
 $else$
 actor_$instance.actor.name$ $instance.id$$initializeInstance(instance)$;
 $endif$
