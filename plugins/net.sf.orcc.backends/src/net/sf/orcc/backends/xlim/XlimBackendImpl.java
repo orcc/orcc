@@ -45,6 +45,7 @@ import net.sf.orcc.backends.transformations.VariableRenamer;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.CastAdderTransformation;
 import net.sf.orcc.backends.transformations.threeAddressCodeTransformation.ExpressionSplitterTransformation;
 import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
+import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.FirstPhiValuesOfWhileNodeTransformation;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
 import net.sf.orcc.ir.Actor;
@@ -86,8 +87,8 @@ public class XlimBackendImpl extends AbstractBackend {
 				new ArrayInitializeTransformation(),
 				new InlineTransformation(true, true),
 				new ListOfOneElementToScalarTransformation(),
-				new DeadGlobalElimination(), new DeadCodeElimination(),
-				new DeadVariableRemoval(true),
+				new CustomPeekAdder(), new DeadGlobalElimination(),
+				new DeadCodeElimination(), new DeadVariableRemoval(true),
 				new ListFlattenTransformation(false, true, false),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(),
