@@ -398,22 +398,16 @@ actor Algo_MvBuffer()
 
 	GetSubMbParameters.Launch_B_Direct_8x8: action
 				==>
-			colZeroFlag  :[IsColZero] repeat 4
+			colZeroFlag  :[IsColZero]
 		guard
 			SubMbPartIdx < SubMbPartIdxMax,
 			mb_type     = BLOCK_TYPE_B_8x8,
 			sub_mb_type = B_DIRECT_8x8
 		var
-			uint(size=4)             Idx := 0,
-			List(type: bool, size=4) IsColZero
+			uint(size=4) Idx := 0,
+			bool         IsColZero
 		do
-			foreach int i in 0 .. 1
-			do
-				foreach int j in 0 .. 1
-				do
-					IsColZero[PartitionIdx[i][j]] := Compute_ColZero(Mbx + 2* (MbPartIdx&1) + i,Mby + 2* ((MbPartIdx >>1)&1) +  j);
-				end
-			end
+			IsColZero := Compute_ColZero(Mbx + 2* (MbPartIdx&1) + (SubMbPartIdx&1) ,Mby + 2* ((MbPartIdx >>1)&1) +  ((SubMbPartIdx >>1)&1));
 
 			NbPartitionsToWrite := 4;
 			foreach int i in Mbx + 2* (MbPartIdx&1) .. Mbx + 2* (MbPartIdx&1) + 1

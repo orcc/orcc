@@ -859,7 +859,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		end
 
 	ComputeSubMvLX.LaunchB_Direct_8x8: action
-			colZeroFlag :[TabColZero] repeat 4
+			colZeroFlag :[TabColZero]
 				==>
 			DirectPredLX_Out :[direct_pred_lx]
 		guard
@@ -878,13 +878,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				do
 					RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
 				end
-				if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[0])then
-					foreach int i in 1 .. 3
-					do
-						if(TabColZero[i] = false)then
-							println("Ooops : TabColZero["+i+"] : "+TabColZero[i]);
-						end
-					end
+				if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero)then
 					foreach int i in 4*(MbPartIdx&3) .. 4*(MbPartIdx&3) + 3
 					do
 						MvTab[Idx_CurrBlk][i] := [0,0];
