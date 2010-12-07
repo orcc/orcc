@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ui.launching.tabs;
 
-import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
 import java.util.HashMap;
@@ -147,7 +146,6 @@ public class SimuSettingsTab extends OrccAbstractSettingsTab {
 	@Override
 	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
 		super.setDefaults(configuration);
-		configuration.setAttribute(COMPILE_XDF, true);
 	}
 
 }

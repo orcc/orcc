@@ -47,6 +47,7 @@ import net.sf.orcc.ir.Instruction;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.ExpressionEvaluator;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -255,7 +256,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		if (node.nbSubNodes > 0) {
 			if (node.subNodeIdx == node.nbSubNodes) {
 				if ((node.condition != null)
-						&& ((Boolean) node.condition.accept(exprEvaluator))) {
+						&& ((BoolExpr)node.condition.accept(exprEvaluator)).getValue()) {
 					node.subNodeIdx = 0;
 					exeStmt = true;
 				} else {
@@ -275,7 +276,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 				if (subNode instanceof IfNode) {
 					Object condition = ((IfNode) subNode).getValue().accept(
 							exprEvaluator);
-					if ((Boolean) condition) {
+					if (((BoolExpr)condition).getValue()) {
 						nodeStack.add(new NodeInfo(0, ((IfNode) subNode)
 								.getThenNodes().size(), ((IfNode) subNode)
 								.getThenNodes(), ((IfNode) subNode)
@@ -290,7 +291,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 					exeStmt = true;
 				} else if (subNode instanceof WhileNode) {
 					Expression condition = ((WhileNode) subNode).getValue();
-					if ((Boolean) condition.accept(exprEvaluator)) {
+					if (((BoolExpr)condition.accept(exprEvaluator)).getValue()) {
 						nodeStack.add(new NodeInfo(0, ((WhileNode) subNode)
 								.getNodes().size(), ((WhileNode) subNode)
 								.getNodes(), null, condition));

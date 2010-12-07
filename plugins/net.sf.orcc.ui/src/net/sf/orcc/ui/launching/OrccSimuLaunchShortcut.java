@@ -28,7 +28,6 @@
  */
 package net.sf.orcc.ui.launching;
 
-import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
@@ -172,8 +171,7 @@ public class OrccSimuLaunchShortcut implements ILaunchShortcut2 {
 
 			// source XDF file
 			wc.setAttribute(XDF_FILE, file.getLocation().toOSString());
-			wc.setAttribute(COMPILE_XDF, true);
-
+			
 			// stimulus file
 			String stimulus = browseStimulusFiles(getShell(), file);
 			if (stimulus == null) {

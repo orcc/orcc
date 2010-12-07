@@ -269,9 +269,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 	 */
 	public void start(String option) throws CoreException {
 		try {
-			if (option.equals("backend")
-					|| configuration.getAttribute(ACTIVATE_BACKEND,
-							DEFAULT_BACKEND)) {
+			if (option.equals("backend")) {
 				monitor.subTask("Launching backend...");
 				write("\n");
 				write("*********************************************"
@@ -279,9 +277,7 @@ public class OrccProcess extends PlatformObject implements IProcess {
 				write("Launching Orcc backend...\n");
 				launchBackend();
 				write("Orcc backend done.");
-			}
-
-			if (option.equals("simulator") || option.equals("debugger")) {
+			}else if (option.equals("simulator") || option.equals("debugger")) {
 				monitor.subTask("Launching simulator...");
 				write("\n");
 				write("*********************************************"
