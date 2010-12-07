@@ -458,7 +458,7 @@ patternPortPinAvail(dir, port)::= <<
 <operation kind="\$literal_Integer" value="$pattern.(port)$">
 	<port dir="out" size="32" source="$dir$putPattern_$instance.id$_$action.name$_$port$_tokenCount" typeName="int"/>
 </operation>
-<operation kind="noop">
+<operation kind="\$ge">
 	<port dir="in" source="$port$_pinAvail"/>
 	<port dir="in" source="$dir$putPattern_$instance.id$_$action.name$_$port$_tokenCount"/>
 	<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_$port$" typeName="bool"/>
