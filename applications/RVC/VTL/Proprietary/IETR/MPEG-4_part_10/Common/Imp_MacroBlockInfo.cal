@@ -148,7 +148,7 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 
 	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPartTab =
 		[
-			[1/*4*/, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
+			[4, 1, 1, 1, 2, 2, 2, 2, 2, 2, 4, 4, 4, 0, 0, 0],
 			[1, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 		];
 
@@ -167,7 +167,7 @@ unit VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo :
 
 	List(type: List(type: uint(size=3), size=16), size=2) SizeSubMb =
 		[
-			[SZ_8x8/*SZ_4x4*/, SZ_8x8, SZ_8x8, SZ_8x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8,
+			[SZ_4x4, SZ_8x8, SZ_8x8, SZ_8x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8, SZ_8x4, SZ_4x8,
 			 SZ_4x4, SZ_4x4, SZ_4x4, 0, 0, 0],
 			[SZ_8x8, SZ_8x4, SZ_4x8, SZ_4x4, 0, 0, 0, 0, 0, 0,
 			 0, 0, 0, 0, 0, 0]
