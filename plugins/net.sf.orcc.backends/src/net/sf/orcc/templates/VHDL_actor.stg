@@ -523,7 +523,7 @@ else
   $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
   $actor.actions : {actions|$actions$_ack <= '0';}; separator="\n  "$
   case FSM is
-  $TransitionAck()$
+  $TransitionFire()$
       end case;
 end if;$
 else
