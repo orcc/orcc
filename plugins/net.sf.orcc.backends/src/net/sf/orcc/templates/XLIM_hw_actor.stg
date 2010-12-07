@@ -1,6 +1,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Override XLIM Templates For XLIM Hardware Generation
 
+initVariable(type, value) ::= <<
+$if(value.listExpr)$<initValue typeName="List"> 
+  $value.value: {value | $initVariable(type=type.type, value=value)$}; separator=""$</initValue>
+$else$<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/>
+$endif$
+>>
+
+stateVar(var) ::= <<
+<stateVar name="$var.name$" sourceName="$var.name$">
+  $initVariable(type=var.type, value=var.initialValue)$</stateVar>
+>>
 
 // Input and output pattern
 patternPortPinAvail(dir, port)::= <<
