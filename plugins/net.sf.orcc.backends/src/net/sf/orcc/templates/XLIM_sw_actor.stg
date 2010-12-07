@@ -180,6 +180,16 @@ Peek(peek) ::= <<
 </operation>
 >>
 
+CustomPeek(customPeek) ::= <<
+<operation kind="\$literal_Integer" value="$customPeek.tokenIndex$">
+  <port dir="out" size="32" source="customPeek_$instance.id$_$procedure$_$customPeek.tokenIndex$_$customPeek.target$" typeName="int"/>
+</operation>
+<operation kind="pinPeek" portName="$customPeek.port.name$" removable="no">
+  <port dir="in" source="customPeek_$instance.id$_$procedure$_$customPeek.tokenIndex$_$customPeek.target$"/>
+  $port(dir="out", type=customPeek.port.type, source=customPeek.target)$
+</operation>
+>>
+
 Read(op) ::= <<
 <operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
 	$port(dir="out", type=op.target.type, source=op.target)$
