@@ -66,7 +66,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 		LocalVariable variable = assign.getTarget();
 		if (!variable.isUsed()) {
 
-			// do not remove stores to variables that are used by writes
+			// do not remove assign to variables that are used by writes
 			if (variable.isPort()) {
 				return;
 			}
@@ -88,6 +88,12 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 		if (call.hasResult()) {
 			LocalVariable variable = call.getTarget();
 			if (!variable.isUsed()) {
+				
+				// do not remove call to variables that are used by writes
+				if (variable.isPort()) {
+					return;
+				}
+				
 				// clean up target
 				call.setTarget(null);
 
@@ -106,6 +112,11 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	public void visit(Load load) {
 		LocalVariable target = load.getTarget();
 		if (!target.isUsed()) {
+			// do not remove loads to variables that are used by writes
+			if (target.isPort()) {
+				return;
+			}
+			
 			// clean up uses
 			load.setTarget(null);
 			load.setSource(null);
@@ -123,6 +134,11 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	public void visit(Peek peek) {
 		Variable variable = peek.getTarget();
 		if (!variable.isUsed()) {
+			// do not remove peek to variables that are used by writes
+			if (variable.isPort()) {
+				return;
+			}
+			
 			// clean up uses
 			peek.setTarget(null);
 			peek.setPort(null);
@@ -139,6 +155,11 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 	public void visit(PhiAssignment phi) {
 		Variable variable = phi.getTarget();
 		if (!variable.isUsed()) {
+			// do not remove phi to variables that are used by writes
+			if (variable.isPort()) {
+				return;
+			}
+			
 			// clean up uses
 			phi.setTarget(null);
 			List<Expression> values = phi.getValues();
@@ -184,6 +205,11 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 		Variable variable = read.getTarget();
 		if (variable != null && !variable.isUsed()
 				&& !keepTokenSwallowerVariable) {
+			// do not remove read to variables that are used by writes
+			if (variable.isPort()) {
+				return;
+			}
+			
 			// clean up target
 			read.setTarget(null);
 

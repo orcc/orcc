@@ -86,10 +86,6 @@ public class ListOfOneElementToScalarTransformation extends
 					Variable oldTarget = write.getTarget();
 					Variable newTarget;
 					
-					// clean up uses
-					store.setTarget(null);
-					store.setValue(null);
-					
 					// remove instruction
 					instructionIterator.remove();
 					procedure.getLocals().remove(oldTarget.getName());
@@ -97,6 +93,7 @@ public class ListOfOneElementToScalarTransformation extends
 					if (expr.isVarExpr()) {
 						VarExpr var = (VarExpr) expr;
 						newTarget = var.getVar().getVariable();
+						
 					}
 					else {
 						LocalVariable localNewTarget = procedure.newTempLocalVariable(null, expr.getType(), "scalar_" + oldTarget.getName());
@@ -104,10 +101,7 @@ public class ListOfOneElementToScalarTransformation extends
 						localNewTarget.setIndex(1);
 						
 						Assign assign = new Assign(localNewTarget, expr);
-						Use.addUses(assign, expr);
-						
-						localNewTarget.setInstruction(write);
-						
+						Use.addUses(assign, expr);						
 						
 						newTarget = localNewTarget;
 						
@@ -115,7 +109,12 @@ public class ListOfOneElementToScalarTransformation extends
 						instructionIterator.add(assign);						
 					}
 					write.setTarget(newTarget);
+					newTarget.setInstruction(write);
 					instructionIterator.next();
+					
+					// clean up uses
+					store.setTarget(null);
+					store.setValue(null);
 				}
 				if (instructionIterator.hasNext()) {
 					instructionIterator.next();
