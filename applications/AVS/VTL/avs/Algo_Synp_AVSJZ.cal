@@ -88,7 +88,7 @@ actor Algo_Synp_AVSJZ(
   int PROGRESSIVE_SEQUENCE_LENGTH = 1;
   int PROGRESSIVE_SEQUENCE_LENGTH_HOR_SIZE = 15;
   */
-  uint PROGRESSIVE_SEQUENCE_LENGTH = 1;
+  int PROGRESSIVE_SEQUENCE_LENGTH = 1;
   int HORIZONTAL_SIZE_LENGTH = 14;
   int VERTICAL_SIZE_LENGTH = 14;
   
@@ -133,7 +133,7 @@ actor Algo_Synp_AVSJZ(
   int PICTURE_QP_LENGTH = 6;
   int SKIP_MODE_FLAG_LENGTH = 1;
   int LOOP_FILTER_DISABLE_LENGTH = 1;
-  int LOOP_FILTER_PARAMETER_FLAG_LENGTH = 1; //not used
+  //int LOOP_FILTER_PARAMETER_FLAG_LENGTH = 1; //not used
   //int PICTURE_CODING_TYPE_LENGTH = 2; 
   //int NO_FORWARD_REFERENCE_FLAG_LENGTH = 1; not used
 
@@ -141,7 +141,7 @@ actor Algo_Synp_AVSJZ(
   int FIXED_SLICE_QP_LENGTH = 1;
   int SLICE_QP_LENGTH = 6;
   
-  function mask_bits( int(size=41)v, int(size=41)n ) --> int :
+  function mask_bits( int v, int n ) --> int  :
     bitand( v, lshift(1,n)-1 )
   end
   
@@ -165,8 +165,8 @@ actor Algo_Synp_AVSJZ(
     read_result_in_progress := bitor( lshift( read_result_in_progress, 1), if b then 1 else 0 end );
     bits_to_read_count := bits_to_read_count - 1;
     bit_count := bit_count + 1;
-    //println("bits="+b);
-    //println("bits_to_read_count="+bits_to_read_count);
+    // println("bits="+b);
+    // println("bits_to_read_count="+bits_to_read_count);
   end
 
   int(size=4) bit_count := 0;
@@ -189,8 +189,8 @@ actor Algo_Synp_AVSJZ(
   int (size=BIT_RATE_LOWER_LENGTH) bit_rate_lower;
   int (size=BIT_RATE_UPPER_LENGTH) bit_rate_upper;
   int (size=LOW_DELAY_LENGTH) low_delay;
-  int (size=MARKER_LENGTH) marker_one_bit;
-  int (size=BBV_BUFFER_SIZE_LENGTH) bbv_buffer_size;
+  //int (size=MARKER_LENGTH) marker_one_bit;
+  //int (size=BBV_BUFFER_SIZE_LENGTH) bbv_buffer_size;
   
   int (size=BBV_DEALY_LENGTH) bbv_delay;
   int (size=TIME_CODE_LENGTH) time_code;
@@ -203,10 +203,10 @@ actor Algo_Synp_AVSJZ(
   uint (size=FIXED_PICTURE_QP_LENGTH) fixed_picture_qp;
   int (size=PICTURE_QP_LENGTH) picture_qp;
   int (size=SKIP_MODE_FLAG_LENGTH) skip_mode_flag; //not used
-  int (size=LOOP_FILTER_DISABLE_LENGTH) loop_filter_disable; //not used
-  int (size=LOOP_FILTER_PARAMETER_FLAG_LENGTH) loop_filter_parameter_flag; //not used
-  int alpha_offset;
-  int beta_offset;
+  //int (size=LOOP_FILTER_DISABLE_LENGTH) loop_filter_disable; //not used
+  //int (size=LOOP_FILTER_PARAMETER_FLAG_LENGTH) loop_filter_parameter_flag; //not used
+  //int alpha_offset;
+  //int beta_offset;
   
   int(size=MB_COORD_SZ) MB_width;
   int(size=MB_COORD_SZ) MB_height;
@@ -220,9 +220,16 @@ actor Algo_Synp_AVSJZ(
 
   look_for_Sequence_Header: action ==>
   do
-    set_bits_to_read( START_CODE_LENGTH + EXTRA_START_LENGTH );
+    set_bits_to_read( START_CODE_LENGTH );
   end
   
+  look_for_Sequence_Header_done: action ==>
+  guard
+  	done_reading_bits()
+  do
+    set_bits_to_read( EXTRA_START_LENGTH );
+  end
+
   int(size=START_CODE_LENGTH) video_sequence_start_code;
   read_Sequence_Header_Profile_id: action ==>
   guard
@@ -232,7 +239,7 @@ actor Algo_Synp_AVSJZ(
   do
     video_sequence_start_code := mask_bits( read_result(), QUARTER_START_CODE_LENGTH );
     set_bits_to_read(PROFILE_ID_LENGTH);
-    //println("********** AVS Decoder Configuration for RVC **********");
+    println("********** AVS Decoder Configuration for RVC **********");
     //println("Video Sequence Start!");
     //println("video_sequence_start_code = "+video_sequence_start_code);
   end
@@ -243,7 +250,7 @@ actor Algo_Synp_AVSJZ(
   do
     profile_id := mask_bits( read_result(), PROFILE_ID_LENGTH );
     set_bits_to_read( LEVEL_ID_LENGTH);
-    //println("profile_id = "+profile_id);
+    println("profile_id = "+profile_id);
   end
   
   read_Sequence_Header_Progress_sequence: action ==>
@@ -252,7 +259,7 @@ actor Algo_Synp_AVSJZ(
   do
     level_id := mask_bits( read_result(), LEVEL_ID_LENGTH );
     set_bits_to_read(PROGRESSIVE_SEQUENCE_LENGTH);
-    //println("level_id = "+level_id);
+    println("level_id = "+level_id);
   end
   
   read_Sequence_Header_Width_Height: action ==> 
@@ -261,7 +268,7 @@ actor Algo_Synp_AVSJZ(
   do
     progressive_sequence := mask_bits( read_result(), PROGRESSIVE_SEQUENCE_LENGTH );
     set_bits_to_read( HORIZONTAL_SIZE_LENGTH + VERTICAL_SIZE_LENGTH );
-    //println("progressive = "+progressive_sequence);
+    println("progressive = "+progressive_sequence);
   end
   
   read_Sequence_Header_Chroma_format: action ==> WIDTH:[MB_width], HEIGHT:[MB_height]
@@ -281,8 +288,8 @@ actor Algo_Synp_AVSJZ(
     end
     end
     set_bits_to_read( CHROMA_FORMAT_LENGTH );
-    //println("MB_width = "+MB_width);
-    //println("MB_height = "+MB_height);
+    println("MB_width = "+MB_width);
+    println("MB_height = "+MB_height);
   end
   
   read_Sequence_Header_Sample_precision: action ==>
@@ -291,7 +298,7 @@ actor Algo_Synp_AVSJZ(
   do
     chroma_format := mask_bits( read_result(), CHROMA_FORMAT_LENGTH );
     set_bits_to_read( SAMPLE_PRECISION_LENGTH );
-    //println("chroma_format = "+chroma_format);
+    println("chroma_format = "+chroma_format);
   end
   
   read_Sequence_Header_Aspect_ratio_information: action ==>
@@ -300,7 +307,7 @@ actor Algo_Synp_AVSJZ(
   do
     sample_precision := mask_bits( read_result(), SAMPLE_PRECISION_LENGTH );
     set_bits_to_read( ASPECT_RATIO_INFORMATION_LENGTH );
-    //println("sample_precision = "+sample_precision);
+    println("sample_precision = "+sample_precision);
   end
   
   read_Sequence_Header_Frame_rate_code: action ==>
@@ -309,7 +316,7 @@ actor Algo_Synp_AVSJZ(
   do
     aspect_ratio_information := mask_bits( read_result(), ASPECT_RATIO_INFORMATION_LENGTH );
     set_bits_to_read( FRAME_RATE_CODE_LENGTH );
-    //println("aspect_ratio_information = "+aspect_ratio_information);
+    println("aspect_ratio_information = "+aspect_ratio_information);
   end
   
   read_Sequence_Header_Bit_rate_lower_upper: action ==>
@@ -795,7 +802,7 @@ end
       set_bits_to_read(1);//read the picture_reference_flag;
   end
   
-  uint(size=1) no_forward_reference_flag;
+  // uint(size=1) no_forward_reference_flag;
   
   read_No_Forward_Reference_Flag: action ==>
   guard
@@ -917,7 +924,7 @@ end
  *************************************************************/
  
   bool I_mode_uncoded;
-  int (size=3) Intra_mode_code;
+  //int (size=3) Intra_mode_code;
   uint (size=3) b8;
   bool b_last;
   int(size=4) comp;
@@ -1151,7 +1158,7 @@ end
   int level;
   int run_level;
   bool escape_code;
-  bool IsLuma;
+  //bool IsLuma;
   
   MB_read_intra_blockcoefficient_one: action ==>
   guard
@@ -1345,7 +1352,7 @@ end
   
   bool NewVLD := false;
   int VLD_Counter;
-  bool First_part;
+  bool First_part:=false;
   int Codeword;
   int CodeLen;
   int CodeTail;
@@ -1374,10 +1381,10 @@ end
       CodeTail := VLD_Counter + grad;
       CodeLen := VLD_Counter;
       if CodeTail = 0 then NewVLD := false; end
-      //println("VLD_Counter0 "+VLD_Counter);
+      // println("VLD_Counter0 "+VLD_Counter);
     else
       VLD_Counter := VLD_Counter + 1;
-      //println("VLD_Counter1 "+VLD_Counter);
+      // println("VLD_Counter1 "+VLD_Counter);
     end
     bit_count := bit_count + 1;    
   end
@@ -1391,7 +1398,7 @@ end
     Codeword := bitor( lshift( Codeword, 1), if b then 1 else 0 end);
     bit_count := bit_count + 1;
     if   (VLD_Counter + grad) = 0 then NewVLD := false; end
-      //println("VLD_Counter2 "+VLD_Counter);
+    //  println("VLD_Counter2 "+VLD_Counter);
   end      
   
   List ( type: List ( type: int(size=6), size=2), size=64 ) CBP_Table=
@@ -1501,15 +1508,12 @@ end
 
   schedule fsm look_for_Sequence_Header :
     // read sequence header
-    look_for_Sequence_Header                      ( look_for_Sequence_Header                      ) --> read_Sequence_Header_Profile_id;
+    look_for_Sequence_Header                      ( look_for_Sequence_Header                      ) --> look_for_Sequence_Header_done;
+    look_for_Sequence_Header_done                 ( look_for_Sequence_Header_done                 ) --> read_Sequence_Header_Profile_id;
     read_Sequence_Header_Profile_id               ( read_Sequence_Header_Profile_id               ) --> read_Sequence_Header_Level_id;
     read_Sequence_Header_Level_id                 ( read_Sequence_Header_Level_id                 ) --> read_Sequence_Header_Progress_sequence;
-    read_Sequence_Header_Progress_sequence        ( read_Sequence_Header_Progress_sequence        ) --> read_Sequence_Header_Width_Height;
-    //test
-    /*
-    temp_0 (temp_0) --> temp_1;
-    temp1(temp_1) --> read_Sequence_Header_Width_Height;
-    */
+    read_Sequence_Header_Progress_sequence        ( read_Sequence_Header_Progress_sequence        ) --> read_Sequence_Header_Width_Height;    
+    
     read_Sequence_Header_Width_Height             ( read_Sequence_Header_Width_Height             ) --> read_Sequence_Header_Chroma_format;
     read_Sequence_Header_Chroma_format            ( read_Sequence_Header_Chroma_format            ) --> read_Sequence_Header_Sample_precision;
     read_Sequence_Header_Sample_precision         ( read_Sequence_Header_Sample_precision         ) --> read_Sequence_Header_Aspect_ratio_information;
