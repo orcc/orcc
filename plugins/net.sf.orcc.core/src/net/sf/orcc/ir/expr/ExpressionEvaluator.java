@@ -69,9 +69,11 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 
 		if (result == null) {
 			throw new OrccRuntimeException(
-					"Could not evaluate binary expression "
-							+ expr.getOp().toString() + "("
-							+ expr.getOp().getText() + ")\n");
+					"Could not evaluate binary expression " + " expr " + expr
+							+ " " + expr.getOp().toString() + "(" + " exp1: "
+							+ expr.getE1() + " = " + val1
+							+ expr.getOp().getText() + " exp2: " + expr.getE2()
+							+ " = " + val2 + ")\n");
 		}
 		return result;
 	}
@@ -94,7 +96,7 @@ public class ExpressionEvaluator extends AbstractExpressionInterpreter {
 
 		if (result == null) {
 			throw new OrccRuntimeException(
-					"Could not evaluate unary expression "
+					"Could not evaluate unary expression " + "expr "
 							+ expr.getOp().toString() + "("
 							+ expr.getOp().getText() + ")\n");
 		}

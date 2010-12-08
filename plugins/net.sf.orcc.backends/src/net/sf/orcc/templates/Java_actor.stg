@@ -112,12 +112,6 @@ $$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; sepa
 endif$
 >>
 
-// hasTokens instruction
-HasTokens(hasTokens) ::= <<
-
-$hasTokens.target$ = fifo_$hasTokens.port$.hasTokens($hasTokens.numTokens$);
->>
-
 Load(load) ::= <<
 
 $if (load.source.variable.port && !load.indexes.empty)
@@ -192,6 +186,14 @@ outputPattern(pattern) ::= <<
 $pattern.keys:{port|fifo_$port$.hasRoom($pattern.(port)$)}; separator=" && "$
 >>
 
+checkInputPatternPort(port) ::= <<
+fifo_$port$.hasTokens($pattern.(port)$)
+>>
+
+checkInputPattern(pattern) ::= <<
+$pattern.keys: { port | $checkInputPatternPort(port)$ && }$
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
@@ -202,7 +204,7 @@ i++;
 >>
 
 actionTest(action) ::= <<
-if (isSchedulable_$action$()) {
+if ($checkInputPattern(action.inputPattern)$isSchedulable_$action$()) {
 	$if(action.outputPattern)$
 	if ($outputPattern(action.outputPattern)$) {
 		$actionCall(action)$
@@ -244,7 +246,7 @@ res = true;
 >>
 
 actionTestState(nextState) ::= <<
-if (isSchedulable_$nextState.action$()) {
+if ($checkInputPattern(nextState.action.inputPattern)$isSchedulable_$nextState.action$()) {
 	$if(nextState.action.outputPattern)$
 	if ($outputPattern(nextState.action.outputPattern)$) {
 		$actionCallState(nextState)$
