@@ -37,7 +37,6 @@ import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.PhiAssignment;
-import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
@@ -51,13 +50,6 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class FirstPhiValuesOfWhileNodeTransformation extends
 		AbstractActorTransformation {
-
-	@Override
-	public void visit(IfNode ifNode) {
-		// Override superclass method to avoid joinNode visiting
-		visit(ifNode.getThenNodes());
-		visit(ifNode.getElseNodes());
-	}
 
 	@Override
 	public void visit(PhiAssignment phi) {
