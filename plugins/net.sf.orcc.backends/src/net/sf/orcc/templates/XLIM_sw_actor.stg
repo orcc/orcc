@@ -239,8 +239,8 @@ $expression(op.value)$
 
 PhiAssignment(phi) ::= <<
 <PHI>
-	<port dir="in" qualifier="then" source="$first(phi.values)$"/>
-	<port dir="in" qualifier="else" source="$rest(phi.values)$"/>
+	<port dir="in" source="$first(phi.values)$"/>
+	<port dir="in" source="$rest(phi.values)$"/>
 	$port(dir="out", type=phi.target.type, source=phi.target)$
 </PHI>
 >>
