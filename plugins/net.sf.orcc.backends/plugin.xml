@@ -35,9 +35,6 @@
          <option
                id="net.sf.orcc.backends.classify">
          </option>
-         <option
-               id="net.sf.orcc.backends.partition">
-         </option>
       </backend>
       <backend
             class="net.sf.orcc.backends.llvm.LLVMBackendImpl"

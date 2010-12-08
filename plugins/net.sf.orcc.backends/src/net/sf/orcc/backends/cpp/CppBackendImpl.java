@@ -62,7 +62,7 @@ import net.sf.orcc.tools.classifier.ActorClassifier;
  */
 public class CppBackendImpl extends AbstractBackend {
 
-	public static Boolean partition = false;
+	public static final String DEFAULT_PARTITION = "default_partition";
 
 	public static Boolean printHeader = false;
 
@@ -79,7 +79,6 @@ public class CppBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	private void computeMapping(Network network) throws OrccException {
-		if (partition) {
 			Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
 			for (Instance instance : network.getInstances()) {
 				String component = getPartNameAttribute(instance);
@@ -99,7 +98,6 @@ public class CppBackendImpl extends AbstractBackend {
 			printer.getOptions().put("needThreads",
 					(threads.keySet().size() > 1));
 		}
-	}
 
 	private void computeFifoKind(Network network) throws OrccException {
 		Map<Connection, Integer> fifoKind = new HashMap<Connection, Integer>();
@@ -118,7 +116,7 @@ public class CppBackendImpl extends AbstractBackend {
 				needSerDes = true;
 				printer.getOptions().put("needSerDes", needSerDes);
 				kind = 1;
-			} else if (!srcName.equals(tgtName) && partition) {
+			} else if (!srcName.equals(tgtName)) {
 				kind = 2;
 			}
 
@@ -176,8 +174,6 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 		}
 
-		partition = getAttribute("net.sf.orcc.backends.partition", false);
-
 		List<Actor> actors = network.getActors();
 
 		printHeader = true;
@@ -192,7 +188,7 @@ public class CppBackendImpl extends AbstractBackend {
 	}
 
 	private String getPartNameAttribute(Instance instance) throws OrccException {
-		String partName = "";
+		String partName = DEFAULT_PARTITION;
 		IAttribute attr = instance.getAttribute("partName");
 		if (attr != null) {
 			Expression expr = ((IValueAttribute) attr).getValue();
