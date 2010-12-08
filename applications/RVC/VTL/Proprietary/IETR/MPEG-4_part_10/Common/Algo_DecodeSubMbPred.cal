@@ -185,9 +185,9 @@ for( mbPartIdx = 0; mbPartIdx < 4; mbPartIdx++ )
 		guard
 			mbPartIdx < 4
 		do
-			subMbPartIdx := 0;
+			subMbPartIdx    := 0;
 			subMbPartIdxMax := NumSubMbPart(mb_type,sub_mb_type[mbPartIdx]);
-			mbPartIdx    := mbPartIdx + 1;
+			mbPartIdx       := mbPartIdx + 1;
 		end
 
 /*
@@ -258,14 +258,26 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			end
 		end
 
-	ReadMvdl0Done.Launch: action
+	HasMvdl0: action ==>
+		guard
+			//Fix me : should be SubMbPredMode(mb_type,sub_mb_type)& PRED_L0 != 0
+			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
+			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1
+		end
+
+	HasNotMvdl0: action ==>
+		guard
+			//Fix me : should be SubMbPredMode(mb_type,sub_mb_type)& PRED_L0 = 0
+			mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX and sub_mb_type[mbPartIdx - 1] = B_DIRECT_8x8
+			or SubMbPredMode(sub_mb_type[mbPartIdx - 1]) = PRED_L1
+		end
+
+	ReadMvdl0.Launch: action
 			ValVLD   :[ValueOfVLD] repeat 2
 				==>
 			RefIdxL0     :[ref_idx_l0[mbPartIdx-1]],
 			MvResl0      :[ValueOfVLD] repeat 2
 		guard
-			not(mb_type >= BLOCK_TYPE_B_MIN and mb_type <= BLOCK_TYPE_B_MAX) or (sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8),
-			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L1,
 			subMbPartIdx < subMbPartIdxMax
 		do
 			if(DEBUG_MV)then
@@ -275,39 +287,42 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 			subMbPartIdx := subMbPartIdx +1;
 		end
 
-//Delete me!! Be carefull with B_DIRECT_8x8
-	ReadMvdl0Done.Skip: action
-				==>
+	ReadMvdlX_Done: action ==>
 		guard
-			subMbPartIdx < subMbPartIdxMax
-		do
-			subMbPartIdx := subMbPartIdx +1;
+			subMbPartIdx = subMbPartIdxMax
 		end
 
-	ReadMvdl1Done.Launch: action
+
+	HasMvdl1: action ==>
+		guard
+			//Fix me : should be SubMbPredMode(mb_type,sub_mb_type)& PRED_L1 != 0
+			mb_type >= BLOCK_TYPE_B_MIN,
+			mb_type <= BLOCK_TYPE_B_MAX,
+			sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8,
+			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L0
+		end
+
+	HasNotMvdl1: action ==>
+		guard
+			//Fix me : should be SubMbPredMode(mb_type,sub_mb_type)& PRED_L1 = 0
+			mb_type < BLOCK_TYPE_B_MIN
+			or mb_type > BLOCK_TYPE_B_MAX
+			or sub_mb_type[mbPartIdx - 1] = B_DIRECT_8x8
+			or SubMbPredMode(sub_mb_type[mbPartIdx - 1]) = PRED_L0
+		end
+
+	ReadMvdl1.Launch: action
 			ValVLD :[ValueOfVLD] repeat 2
 				==>
 			MvResl1      :[ValueOfVLD] repeat 2,
 			RefIdxL1 :[ref_idx_l1[mbPartIdx-1]]
 		guard
-			mb_type >= BLOCK_TYPE_B_MIN,
-			mb_type <= BLOCK_TYPE_B_MAX,
-			sub_mb_type[mbPartIdx - 1] != B_DIRECT_8x8,
-			SubMbPredMode(sub_mb_type[mbPartIdx - 1]) != PRED_L0,
 			subMbPartIdx < subMbPartIdxMax
 		do
 			if(DEBUG_MV)then
 				println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][0]:"+ValueOfVLD[0]);
 				println("mvld1["+ (mbPartIdx - 1) +"]["+subMbPartIdx+"][1]:"+ValueOfVLD[1]);
 			end
-			subMbPartIdx := subMbPartIdx +1;
-		end
-//Delete me!!
-	ReadMvdl1Done.Skip: action
-				==>
-		guard
-			subMbPartIdx < subMbPartIdxMax
-		do
 			subMbPartIdx := subMbPartIdx +1;
 		end
 
@@ -345,17 +360,27 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 
 		ReadRefIdxLX       (ReadRefIdxLX        )--> CheckmbPartIdx2;
 
-		CheckmbPartIdx2    (CheckmbPartIdx      )--> ReadMvdl0Done;
+		CheckmbPartIdx2    (CheckmbPartIdx      )--> CheckReadMvdl0;
 
-		ReadMvdl0Done      (ReadMvdl0Done       )--> ReadMvdl0Done;
-		ReadMvdl0Done      (CheckmbPartIdx      )--> ReadMvdl0Done;
-		ReadMvdl0Done      (SendOrReadDone      )--> CheckmbPartIdx3;
+		CheckReadMvdl0     (HasMvdl0            )--> ReadMvdl0;
+		CheckReadMvdl0     (HasNotMvdl0         )--> CheckMbPart4MvdL0;
 
-		CheckmbPartIdx3    (CheckmbPartIdx      )--> ReadMvdl1Done;
+		ReadMvdl0          (ReadMvdl0           )--> ReadMvdl0;
+		ReadMvdl0          (ReadMvdlX_Done      )--> CheckMbPart4MvdL0;
 
-		ReadMvdl1Done      (ReadMvdl1Done       )--> ReadMvdl1Done;
-		ReadMvdl1Done      (CheckmbPartIdx      )--> ReadMvdl1Done;
-		ReadMvdl1Done      (SendOrReadDone      )--> SendEndSubMbPred;
+		CheckMbPart4MvdL0  (CheckmbPartIdx      )--> CheckReadMvdl0;
+		CheckMbPart4MvdL0  (SendOrReadDone      )--> CheckmbPartIdx3;
+
+		CheckmbPartIdx3    (CheckmbPartIdx      )--> CheckReadMvdl1;
+
+		CheckReadMvdl1     (HasMvdl1            )--> ReadMvdl1;
+		CheckReadMvdl1     (HasNotMvdl1         )--> CheckMbPart4MvdL1;
+
+		ReadMvdl1          (ReadMvdl1           )--> ReadMvdl1;
+		ReadMvdl1          (ReadMvdlX_Done      )--> CheckMbPart4MvdL1;
+
+		CheckMbPart4MvdL1  (CheckmbPartIdx      )--> CheckReadMvdl1;
+		CheckMbPart4MvdL1  (SendOrReadDone      )--> SendEndSubMbPred;
 
 		SendEndSubMbPred   (SendEndSubMbPred    )--> ReadSubMbTypeAsked;
 	end
@@ -366,9 +391,6 @@ if( sub_mb_type[ mbPartIdx ] != B_Direct_8x8 &&
 		CheckmbPartIdx       > SendOrReadDone;
 		ReadMvdl0Asked       > CheckmbPartIdx;
 		ReadMvdl1Asked       > CheckmbPartIdx;
-		ReadMvdl0Done        > CheckmbPartIdx;
-		ReadMvdl1Done        > CheckmbPartIdx;
-		ReadMvdl1Done.Launch > ReadMvdl1Done.Skip;
-		ReadMvdl0Done.Launch > ReadMvdl0Done.Skip;
+		ReadMvdl0            > ReadMvdlX_Done;
 	end
 end

@@ -330,10 +330,6 @@
         src="" src-port="DirectSpatialMvPred"/>
     <Connection dst="MvL1_Reconstr" dst-port="DirectSpatialMvPredFlag"
         src="" src-port="DirectSpatialMvPred"/>
-    <Connection dst="MvL0_Reconstr" dst-port="colZeroFlag"
-        src="MvBuffer" src-port="colZeroFlag"/>
-    <Connection dst="MvL1_Reconstr" dst-port="colZeroFlag"
-        src="MvBuffer" src-port="colZeroFlag"/>
     <Connection dst="SelectMvLX" dst-port="DirectPredL0"
         src="MvL0_Reconstr" src-port="DirectPredLX_Out"/>
     <Connection dst="MvL1_Reconstr" dst-port="DirectPredLX_In"
@@ -348,4 +344,8 @@
         src="MvL0_Reconstr" src-port="DirectPredLX_Out"/>
     <Connection dst="MvBuffer" dst-port="DirectPredL1"
         src="MvL1_Reconstr" src-port="DirectPredLX_Out"/>
+    <Connection dst="MvL0_Reconstr" dst-port="colZeroFlag"
+        src="MvBuffer" src-port="colZeroFlag"/>
+    <Connection dst="MvL1_Reconstr" dst-port="colZeroFlag"
+        src="MvBuffer" src-port="colZeroFlag"/>
 </XDF>

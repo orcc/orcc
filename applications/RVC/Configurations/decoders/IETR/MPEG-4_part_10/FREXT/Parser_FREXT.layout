@@ -30,7 +30,7 @@
       <vertex id="IsIDR" x="1777" y="1628"/>
       <vertex id="MV" x="2260" y="712"/>
       <vertex id="PART_SZ" x="2243" y="747"/>
-      <vertex id="mv_out" x="2250" y="800"/>
+      <vertex id="mv_out" x="2259" y="821"/>
       <vertex id="ref_idx" x="2259" y="855"/>
       <vertex id="I_PCM_Y" x="1733" y="697"/>
       <vertex id="I_PCM_U" x="1727" y="628"/>
@@ -42,7 +42,7 @@
       <vertex id="ReadAddress_l" x="2858" y="838"/>
       <vertex id="ReadAddress_c" x="2859" y="808"/>
       <vertex id="MbType4Pred" x="1714" y="854"/>
-      <vertex id="SelectList" x="2570" y="720"/>
+      <vertex id="SelectList" x="2244" y="789"/>
       <vertex id="SubMbType" x="1752" y="1282"/>
       <vertex id="Algo_NALU" x="333" y="7"/>
       <vertex id="CheckNaluType" x="644" y="-22"/>
