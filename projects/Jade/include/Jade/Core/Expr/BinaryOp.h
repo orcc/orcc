@@ -141,7 +141,6 @@ public:
 			op = TIMES;
 		}else{
 			fprintf(stderr,"Unkow binary");
-			exit(0);
 		}
 	};
 
