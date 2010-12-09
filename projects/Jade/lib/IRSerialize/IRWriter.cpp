@@ -72,6 +72,9 @@ bool IRWriter::write(Decoder* decoder){
 }
 
 void IRWriter::writeInstance(Decoder* decoder){
+	//Set the property of the instance
+	instance->setDecoder(decoder);
+	
 	//Get ports from the instance
 	inputs = instance->getInputs();
 	outputs = instance->getOutputs();
@@ -86,9 +89,6 @@ void IRWriter::writeInstance(Decoder* decoder){
 	list<Action*>* actions = writeActions(actor->getActions());
 	actionScheduler = writeActionScheduler(actor->getActionScheduler());
 
-	
-	//Set the property of the instance
-	instance->setDecoder(decoder);
 	instance->setActions(actions);
 	instance->setStateVars(stateVars);
 	instance->setParameters(parameters);
