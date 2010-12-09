@@ -210,7 +210,7 @@ actor Algo_MvBuffer()
 				false
 			else
 				if(ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y] = -1 and ListRefIdxL1[ReadListIdx][Idx_x][Idx_y] = -1)then
-					true
+					false
 				else
 					if(ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y_Infer] != -1)then
 						if(     ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y_Infer]     =  0
@@ -677,11 +677,11 @@ actor Algo_MvBuffer()
 			LongTermList :[LTList] repeat 16
 				==>
 		do
-			colPic_IsShortTermRef := false;
+			colPic_IsShortTermRef := true;
 			foreach int i in 0 .. 15
 			do
 				if(LTList[i] = ListPoc[ReadListIdx])then
-					colPic_IsShortTermRef := true;
+					colPic_IsShortTermRef := false;
 				end
 			end
 		end
