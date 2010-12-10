@@ -20,6 +20,9 @@ $endif$
 $if(actor.initializes)$
 !initializes = !{$actor.initializes: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
 $endif$
+$if(actor.actions)$
+!actions = !{$actor.actions: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
+$endif$
 $if(actor.MoC)$
 !MoC = !{$MoC_decl_MD(actor=actor)$}
 $endif$
