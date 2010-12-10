@@ -41,6 +41,9 @@ import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.moc.CSDFMoC;
+import net.sf.orcc.moc.MoC;
+import net.sf.orcc.moc.QSDFMoC;
 
 /**
  * This class computes a map for inserting metadata information into LLVM
@@ -70,6 +73,11 @@ public class LLVMTemplateData {
 	 * Medata identifier counter
 	 */
 	private int id;
+
+	/**
+	 * Medata container of MoCs
+	 */
+	private Map<Object, Integer> mocs;
 
 	/**
 	 * Medata container of names
@@ -110,6 +118,7 @@ public class LLVMTemplateData {
 		vars = new HashMap<Object, Integer>();
 		types = new HashMap<Object, Integer>();
 		names = new HashMap<Object, Integer>();
+		mocs = new HashMap<Object, Integer>();
 		this.actor = actor;
 		this.id = 0;
 
@@ -204,15 +213,35 @@ public class LLVMTemplateData {
 		for (Action action : actor.getActions()) {
 			computeAction(action);
 		}
+
+		if (actor.hasMoC()) {
+			computeMoC(actor.getMoC());
+		}
+	}
+
+	private void computeCSDFMoC(CSDFMoC sdfmoc) {
+		mocs.put(sdfmoc, id++);
+		computePattern(sdfmoc.getInputPattern());
+		computePattern(sdfmoc.getOutputPattern());
+	}
+
+	private void computeMoC(MoC moc) {
+		if (moc.isSDF() || moc.isCSDF()) {
+			computeCSDFMoC((CSDFMoC) moc);
+		} else if (moc.isQuasiStatic()) {
+			mocs.put(moc, id++);
+			QSDFMoC qsdfMoc = (QSDFMoC) moc;
+			for (Action action : qsdfMoc.getActions()) {
+				computeCSDFMoC(qsdfMoc.getStaticClass(action));
+			}
+		} else if(moc.isDPN()||moc.isKPN()){
+			mocs.put(moc, id++);
+		}
 	}
 
 	private void computePattern(Pattern pattern) {
 		if (!pattern.isEmpty()) {
 			patterns.put(pattern, id++);
-			/*
-			 * for (Entry<Port, Integer> entry : pattern.entrySet()) {
-			 * templateDataMap.put(entry, id++); }
-			 */
 		}
 	}
 
@@ -283,6 +312,15 @@ public class LLVMTemplateData {
 	 */
 	public Map<Object, Integer> getProcs() {
 		return procs;
+	}
+	
+	/**
+	 * get Model of Computations map
+	 * 
+	 * @return a map of MoC information.
+	 */
+	public Map<Object, Integer> getMocs() {
+		return mocs;
 	}
 
 	/**

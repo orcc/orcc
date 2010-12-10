@@ -117,6 +117,7 @@ public class Actor implements Comparable<Actor> {
 		this.procs = procs;
 		this.actionScheduler = scheduler;
 		this.stateVars = stateVars;
+		this.moc = null;
 	}
 
 	@Override
@@ -252,6 +253,15 @@ public class Actor implements Comparable<Actor> {
 	 */
 	public Object getTemplateData() {
 		return templateData;
+	}
+
+	/**
+	 * Returns true if the actor has a Model of Computation.
+	 * 
+	 * @return true if actor has MoC, otherwise false.
+	 */
+	public Boolean hasMoC() {
+		return moc != null;
 	}
 
 	/**

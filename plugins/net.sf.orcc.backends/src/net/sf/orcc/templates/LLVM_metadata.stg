@@ -20,8 +20,8 @@ $endif$
 $if(actor.initializes)$
 !initializes = !{$actor.initializes: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
 $endif$
-$if(actor.actions)$
-!actions = !{$actor.actions: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
+$if(actor.MoC)$
+!MoC = !{$MoC_decl_MD(actor=actor)$}
 $endif$
 
 $source_MD(actor)$
@@ -35,6 +35,9 @@ $actor.procs.list: {$proc_MD(actor=actor, proc=it)$}$
 $actor.initializes: {$action_MD(actor=actor, action=it)$}$
 $actor.actions: {$action_MD(actor=actor, action=it)$}$
 $actor.templateData.patterns.keys: {$patterns_MD(actor=actor, patterns=it)$}$
+$if(actor.MoC)$
+$MoC_MD(actor)$
+$endif$
 
 >>
 
@@ -123,6 +126,10 @@ VarDef_decl_MD(actor, var) ::= <<
 
 patterns_decl_MD(actor, patterns) ::= <<
 !$actor.templateData.patterns.(patterns)$
+>>
+
+MoC_decl_MD(actor) ::= <<
+!$actor.templateData.mocs.(actor.MoC)$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -273,6 +280,28 @@ $Body_decl_MD(actor=actor, action=action)$ = metadata  !{$varName_MD(action.body
 
 >>
 
+///////////////////////////////////////////////////////////////////////////////
+// MoC MD data
+///////////////////////////////////////////////////////////////////////////////
+
+MoC_MD(actor)::= <<
+$MoC_decl_MD(actor=actor)$ = metadata !{$MoCName_MD(actor.MoC)$}
+>>
+
+MoCName_MD(MoC)::= <<
+metadata !$
+if(MoC.quasiStatic)$ "QuasiStatic"$
+endif$$
+if(MoC.CSDF)$$
+	if(MoC.SDF)$"SDF"$
+	else$"CSDF"$
+	endif$$
+endif$$
+if(MoC.DPN)$"DPN"$
+endif$$
+if(MoC.KPN)$"KPN"$
+endif$
+>>
 ///////////////////////////////////////////////////////////////////////////////
 // Actor MD data
 ///////////////////////////////////////////////////////////////////////////////

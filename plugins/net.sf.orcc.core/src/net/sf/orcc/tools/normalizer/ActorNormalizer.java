@@ -34,7 +34,7 @@ import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.moc.MoC;
 
 /**
- * This class defines a network transformation that normalizes actors so they
+ * This class defines an actor transformation that normalizes actors so they
  * can later be merged together.
  * 
  * @author Matthieu Wipliez

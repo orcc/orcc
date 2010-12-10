@@ -147,7 +147,8 @@ uint(size=32) DataOut :
 	//
 	schedule fsm init :
 		init (fill_input_buffer) --> listen_controller;
-		listen_controller (read_bits) --> listen_controller;
+		//listen_controller (read_bits) --> listen_controller; modified by jerome gorin to avoid classification problems
+		listen_controller (read_bits) --> init;
 	end
 
 end
