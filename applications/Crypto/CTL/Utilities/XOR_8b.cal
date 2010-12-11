@@ -12,7 +12,7 @@
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor XOR_8b () uint(size=TOKEN_SIZE) IP1, uint(size=TOKEN_SIZE) IP2 ==> uint(size=TOKEN_SIZE) OP:
+actor Utilities.XOR_8b () uint(size=TOKEN_SIZE) IP1, uint(size=TOKEN_SIZE) IP2 ==> uint(size=TOKEN_SIZE) OP:
 
 	int TOKEN_SIZE = 8;
 	

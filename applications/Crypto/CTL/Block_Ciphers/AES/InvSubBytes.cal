@@ -11,7 +11,7 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor InvSubBytes () uint(size=8) IP ==> uint(size=8) OP:
+actor Block_Ciphers.AES.InvSubBytes () uint(size=8) IP ==> uint(size=8) OP:
 
 	List(type:uint(size=8), size=256) S_BOX_INV = 
 	[

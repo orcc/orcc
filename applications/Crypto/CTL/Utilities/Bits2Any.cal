@@ -19,7 +19,7 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Bits2Any (bool IS_BIG_ENDIAN = true) uint(size=1) IP ==> uint(size=OP_PORT_SIZE) OP:
+actor Utilities.Bits2Any (bool IS_BIG_ENDIAN = true) uint(size=1) IP ==> uint(size=OP_PORT_SIZE) OP:
 	
 	int OP_PORT_SIZE = 8;
 	int IP_NUM_BITS = OP_PORT_SIZE; // must be <= OP_PORT_SIZE

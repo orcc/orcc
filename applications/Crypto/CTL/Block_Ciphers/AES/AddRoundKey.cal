@@ -21,7 +21,7 @@
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP2_Key, uint(size=8) IP3_FD ==> 
+actor Block_Ciphers.AES.AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP2_Key, uint(size=8) IP3_FD ==> 
 		uint(size=8) OP1_Text, uint(size=8) OP2_FD :
 
 	// The following variables are values for AES-256.

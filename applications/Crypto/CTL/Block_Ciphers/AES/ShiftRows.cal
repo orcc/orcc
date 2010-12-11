@@ -11,7 +11,7 @@
  * Developer: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor ShiftRows () uint(size=8) IP ==> uint(size=8) OP:
+actor Block_Ciphers.AES.ShiftRows () uint(size=8) IP ==> uint(size=8) OP:
 	
 	List(type:int, size=16) INDICES =
 	[ // Note that the plaintext is columnwise.

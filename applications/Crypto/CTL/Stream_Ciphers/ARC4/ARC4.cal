@@ -13,7 +13,7 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010 
  */
 
-actor ARC4() uint(size=8) IP1_Key, uint(size=8) IP2_Text ==> uint(size=8) OP:
+actor Stream_Ciphers.ARC4.ARC4() uint(size=8) IP1_Key, uint(size=8) IP2_Text ==> uint(size=8) OP:
 
 	uint KEY_SIZE_MAX = 256; // maximum key size (in byte)
 	List(type:uint(size=8), size=KEY_SIZE_MAX) key := [0: for int a in 1 .. KEY_SIZE_MAX];

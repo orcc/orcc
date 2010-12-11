@@ -12,7 +12,7 @@
 
 // Read in bytes and shift out serially in msb-first order.
 
-actor byte2bit () uint(size=8) in8 ==> bool out :
+actor avs.byte2bit () uint(size=8) in8 ==> bool out :
 
   int(size=4) count := 0;
   int(size=9) buf;

@@ -12,7 +12,7 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor TruncateHash(int NUM_HASH_TOKENS = 7) uint(size=32) IP ==> uint(size=32) OP:
+actor Hash_Functions.common.TruncateHash(int NUM_HASH_TOKENS = 7) uint(size=32) IP ==> uint(size=32) OP:
 	
 	int counter := 0;
 	truncateHash:

@@ -12,7 +12,7 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor SHA_160() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
+actor Hash_Functions.SHA_1.SHA_160() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
 	
 	// Receive the number of messages to be processed.
 	int N := -1; // Number of messages.

@@ -11,7 +11,7 @@
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
- actor DES_f_S7 () uint(size=1) IP ==> uint(size=1) OP:
+ actor Block_Ciphers.DES.DES_f_S7 () uint(size=1) IP ==> uint(size=1) OP:
 	
 	// S-Box S7.
 /*	List(type:uint(size=4), size=64) S =

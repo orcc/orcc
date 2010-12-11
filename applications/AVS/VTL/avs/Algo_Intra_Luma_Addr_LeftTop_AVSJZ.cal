@@ -60,7 +60,7 @@
 //[3:1] indicates the intra mode of A/B.
 
 
-actor Algo_Intra_Luma_Addr_LeftTop_AVSJZ (
+actor avs.Algo_Intra_Luma_Addr_LeftTop_AVSJZ (
   /*
   int MAXW_IN_MB, 
   int MB_COORD_SZ,

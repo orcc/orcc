@@ -18,7 +18,7 @@
 
 
 
-actor BlockExpand (
+actor avs.BlockExpand (
   /*
   int SAMPLE_COUNT_SZ,
   int BLOCK_SZ,

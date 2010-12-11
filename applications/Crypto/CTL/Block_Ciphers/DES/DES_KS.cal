@@ -18,7 +18,7 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor DES_KS (bool IS_ENCIPHER = true) uint(size=1) IP ==> uint(size=1) OP: 
+actor Block_Ciphers.DES.DES_KS (bool IS_ENCIPHER = true) uint(size=1) IP ==> uint(size=1) OP: 
 
 	// Flag controlling firing of action.
 	bool keysScheduled := false;

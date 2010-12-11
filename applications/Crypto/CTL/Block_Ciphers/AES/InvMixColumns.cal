@@ -11,7 +11,7 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor InvMixColumns () uint(size=8) IP ==> uint(size=8) OP:
+actor Block_Ciphers.AES.InvMixColumns () uint(size=8) IP ==> uint(size=8) OP:
 	
 	initialRound: // If it is the initial round, simply forward tokens to the next FU.
 	action IP:[x] repeat 17 ==> OP:[x] repeat 17 guard x[0]=0 end

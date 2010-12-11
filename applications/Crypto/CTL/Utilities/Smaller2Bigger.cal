@@ -20,7 +20,7 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Smaller2Bigger (bool IS_BIG_ENDIAN) uint(size=IP_PORT_SIZE) IP ==> uint(size=OP_PORT_SIZE) OP:
+actor Utilities.Smaller2Bigger (bool IS_BIG_ENDIAN) uint(size=IP_PORT_SIZE) IP ==> uint(size=OP_PORT_SIZE) OP:
 	
 	int IP_PORT_SIZE = 8;
 	int OP_PORT_SIZE = 32;

@@ -32,7 +32,7 @@
 // Note:
 
 
-actor Algo_Add_avs(
+actor avs.Algo_Add_avs(
  )
   int(size=PIX_SZ) res,
   int(size=PIX_SZ) Pred,

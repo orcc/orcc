@@ -42,7 +42,7 @@
  A sequence of 64 coefficients after IICT. The coefficients is 9bits. 
 *******************************************************************************************************/
 
-actor Algo_IT_clip( bool ROW ) int X ==> int Y :
+actor avs.Algo_IT_clip( bool ROW ) int X ==> int Y :
 
   function Clip16( int N ) --> int
     var

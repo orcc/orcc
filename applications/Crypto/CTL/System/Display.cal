@@ -29,6 +29,6 @@
  
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 
-actor Display () uint(size=8) IP ==> :
+actor System.Display () uint(size=8) IP ==> :
 
 end

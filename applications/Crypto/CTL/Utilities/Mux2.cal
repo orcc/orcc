@@ -21,7 +21,7 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
  
-actor Mux2 () uint(size=PORT_SIZE) IP1, uint(size=PORT_SIZE) IP2 ==> uint(size=PORT_SIZE) OP:  
+actor Utilities.Mux2 () uint(size=PORT_SIZE) IP1, uint(size=PORT_SIZE) IP2 ==> uint(size=PORT_SIZE) OP:  
  	// Constants to reconfigure this FU.	  
  	int PORT_SIZE = 1; 
  	int IP1_NUM_TOKENS = 32;

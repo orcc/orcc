@@ -61,7 +61,7 @@
 *******************************************************************************************************/
 
 
-actor Algo_IntraModePred_LUMA_AVSJZ (
+actor avs.Algo_IntraModePred_LUMA_AVSJZ (
  /*int MAXW_IN_MB,
  int MB_COORD_SZ,
  int BTYPE_SZ,

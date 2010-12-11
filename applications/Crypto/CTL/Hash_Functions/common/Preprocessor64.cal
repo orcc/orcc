@@ -15,7 +15,7 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor Preprocessor64() uint(size=64) IP1_Size, uint(size=8) IP2_M ==> uint(size=32) OP1_N, uint(size=8) OP2_M:
+actor Hash_Functions.common.Preprocessor64() uint(size=64) IP1_Size, uint(size=8) IP2_M ==> uint(size=32) OP1_N, uint(size=8) OP2_M:
 	// State variables:
 	uint BLOCK_SIZE = 64; // Block size of one message in bytes.
 	uint(size=64) messageSize := 0; // Size of the current message in bytes.

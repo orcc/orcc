@@ -18,7 +18,7 @@
  * Developer: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010 
  */
  
- actor LCG64 () uint(size=64) IP  ==> uint(size=64) Xn:
+ actor PRNGs.LCG.LCG64 () uint(size=64) IP  ==> uint(size=64) Xn:
 	// Two flags controlling firings of different actions.
 	bool runInit := true;
 	bool runGenerator := false;

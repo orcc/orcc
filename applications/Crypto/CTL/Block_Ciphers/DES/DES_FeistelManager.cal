@@ -22,7 +22,7 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor DES_FeistelManager ()
+actor Block_Ciphers.DES.DES_FeistelManager ()
 	uint(size=1) IP1_L0, uint(size=1) IP2_R0, uint(size=1) IP3_L, uint(size=1) IP4_R, uint(size=8) IP5_RN
 	==> uint(size=1) OP1_FL, uint(size=1) OP2_FR, uint(size=1) OP3_L, uint(size=1) OP4_R, uint(size=8)OP5_RN :
 

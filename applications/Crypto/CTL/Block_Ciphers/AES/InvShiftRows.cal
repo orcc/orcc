@@ -11,7 +11,7 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor InvShiftRows () uint(size=8) IP ==> uint(size=8) OP:
+actor Block_Ciphers.AES.InvShiftRows () uint(size=8) IP ==> uint(size=8) OP:
 
 	List(type:int, size=16) INDICES = 
 	[ // Note that the plaintext is columnwise.

@@ -1,8 +1,10 @@
 /**
- * This FU is part of a CAL implementation of Secure Hash Algorithms (SHA-224) specified in FIPS-180-3.
- * It performs the SHA-224 hash computation. 
+ * This FU is part of a CAL implementation of Secure Hash Algorithms (SHA-256) specified in FIPS-180-3.
+ * It performs the SHA-256 hash computation. 
  * 
- * FU ID: SHA_256 (This FU is not named as 'SHA-224' because '-' cannot be used the CAL actor names)
+ * FU ID: SHA_256 (This FU is not named as 'SHA-256' because '-' cannot be used the CAL actor names)
+ * One FU parameter:
+ * 	 1) bool IS_SHA256: run in SHA-256 mode? (true = SHA-256, false = SHA-224)
  * Two input port:
  * 		1) uint(size=32) IP1_N: the number of input message blocks
  * 		2) uint(size=32) IP2_M: the input message (as double word stream)
@@ -12,17 +14,28 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor SHA_224() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
-	// Receive the number of 16 dword (512 bit) messages.
+actor Hash_Functions.SHA_2.SHA_256(bool IS_SHA256) uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
+	// Receive the number of messages to be processed and init hash variables for SHA-224.
 	int N := -1; // Number of messages.
-	receiveN:
+	init:
 	action IP1_N:[n] ==>
 	do
 		N := n;
+		// Initialize Initial hash values for SHA-224.
+		if IS_SHA256 = false then
+			H[0] := 0xC1059ED8;
+			H[1] := 0x367CD507;
+			H[2] := 0x3070DD17;
+			H[3] := 0xF70E5939;
+			H[4] := 0xFFC00B31;
+			H[5] := 0x68581511;
+			H[6] := 0x64F98FA7;
+			H[7] := 0xBEFA4FA4;		
+		end		
 	end
 	
 	// State variables:
-	List(type:uint(size=32),size=64) K := [ // SHA-224 constants K.
+	List(type:uint(size=32),size=64) K := [ // SHA-256 constants K.
 		0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 		0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
 		0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
@@ -43,32 +56,32 @@ actor SHA_224() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
 		((x >> n) | (x << (32-n))) & 0xffffffff // Orcc bug: We should not manually truncate the experssion value.
 	end 
 
-	// SHA-224 and SHA-224 function 'Ch'.
+	// SHA-224 and SHA-256 function 'Ch'.
 	function Ch(uint(size=32) x, uint(size=32) y, uint(size=32) z) --> uint(size=32):
 		(x & y) ^ ( (bitnot(x) & 0xffffffff) & z) // Orcc bug: We should not manually truncate the experssion value.
 	end
 
-	// SHA-224 and SHA-224 function 'Maj'.
+	// SHA-224 and SHA-256 function 'Maj'.
 	function Maj(uint(size=32) x, uint(size=32) y, uint(size=32) z) --> uint(size=32):
 		(x & y) ^ (x & z) ^ (y & z)
 	end
 	
-	// SHA-224 and SHA-224 function 'BigSigma0'.
+	// SHA-224 and SHA-256 function 'BigSigma0'.
 	function BigSigma0(uint(size=32) x) --> uint(size=32):
 		(ROTR32(x,2) ^ ROTR32(x,13) ^ ROTR32(x,22)) & 0xffffffff 
 	end
 	
-	// SHA-224 and SHA-224 function 'BigSigma1'.
+	// SHA-224 and SHA-256 function 'BigSigma1'.
 	function BigSigma1(uint(size=32) x) --> uint(size=32):
 		(ROTR32(x,6) ^ ROTR32(x,11) ^ ROTR32(x,25)) & 0xffffffff
 	end
 
-	// SHA-224 and SHA-224 function 'SmallSigma0'.
+	// SHA-224 and SHA-256 function 'SmallSigma0'.
 	function SmallSigma0(uint(size=32) x) --> uint(size=32):
 		(ROTR32(x,7) ^ ROTR32(x,18) ^ (x >> 3)) & 0xffffffff
 	end
 
-	// SHA-224 and SHA-224 function 'SmallSigma1'.
+	// SHA-224 and SHA-256 function 'SmallSigma1'.
 	function SmallSigma1(uint(size=32) x) --> uint(size=32):
 		(ROTR32(x,17) ^ ROTR32(x,19) ^ (x >> 10)) & 0xffffffff
 	end

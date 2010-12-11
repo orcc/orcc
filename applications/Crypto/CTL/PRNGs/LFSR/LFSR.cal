@@ -29,7 +29,7 @@
  * Developer: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010 
  */
  
- actor LFSR () uint(size=64) IP ==> uint(size=1) Bit:
+ actor PRNGs.LFSR.LFSR () uint(size=64) IP ==> uint(size=1) Bit:
 	// Two flags controlling firings of different actions.
 	bool runInit := true;
 	bool runGenerator := false;

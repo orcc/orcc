@@ -18,7 +18,7 @@
  * Developer: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010 
  */
  
- actor LCG32 () uint(size=32) IP  ==> uint(size=32) Xn:
+ actor PRNGs.LCG.LCG32 () uint(size=32) IP  ==> uint(size=32) Xn:
 	// Two flags controlling firings of different actions.
 	bool runInit := true;
 	bool runGenerator := false;

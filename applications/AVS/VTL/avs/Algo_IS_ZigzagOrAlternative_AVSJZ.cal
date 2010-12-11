@@ -47,7 +47,7 @@
 // don't support field IS in this version.
 
 
-actor Algo_IS_ZigzagOrAlternative_AVSJZ (
+actor avs.Algo_IS_ZigzagOrAlternative_AVSJZ (
 ) 
   
   int(size=BTYPE_SZ) BTYPE,

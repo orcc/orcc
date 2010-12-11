@@ -1,7 +1,7 @@
 // Mgnt_Merger420
 //
 // Author: Christophe Lucarz (christophe.lucarz@epfl.ch)
-actor Mgnt_PixelMerger_420 () int(size=9) Y, int(size=9) U, int(size=9) V ==> uint(size=8) YUV :
+actor avs.Mgnt_PixelMerger_420 () int(size=9) Y, int(size=9) U, int(size=9) V ==> uint(size=8) YUV :
 
 	List(type: int(size=9), size=256) out_y := [ 0 : for int i in 0 .. 255 ];
 

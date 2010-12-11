@@ -32,7 +32,7 @@
 // Note:
 
 // BTYPE
-actor Mgnt_Reconstruct_CHROMA_Addr (
+actor avs.Mgnt_Reconstruct_CHROMA_Addr (
     /*
     int BTYPE_SZ,
     int NEWVOP,

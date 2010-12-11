@@ -32,7 +32,7 @@
 // Note:
 
 // BTYPE
-actor Mgnt_Reconstruct_LUMA_Addr (
+actor avs.Mgnt_Reconstruct_LUMA_Addr (
  )
    int(size=PIX_SZ) RecData, 
    int(size=BTYPE_SZ) BTYPE 
