@@ -245,7 +245,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Mgnt_DPB"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Mgnt_DPB"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -257,7 +257,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Select2"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Select2"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -287,7 +287,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DemuxParserInfoForBlocks_Chroma"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_DemuxParserInfoForBlocks_Chroma"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

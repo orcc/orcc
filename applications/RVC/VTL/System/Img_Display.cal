@@ -29,7 +29,7 @@
  
 // Author: Endri Bezati (endri.bezati@epfl.ch)
 
-actor Img_Display () 
+actor System.Img_Display () 
 	int(size=8)  RED,
 	int(size=8)  GREEN,
 	int(size=8)  BLUE,

@@ -8,7 +8,7 @@
 // 
 
 // Description: the sequence of BTYPE token is not homogeneous, there is fist a NEW VOP command, then, the width and height of this VOP, then the  corresponding 8x8 blocks of texture, motion or mixed tex/mot. This actor will delete the tokens concerning the information of the VOP and redistribute the tokens to the Y, U and V components. So that the adder have directly the token intra, accoded or mixed.
-actor GUC_splitter_BTYPE () bool NEW_VOP, bool AC_CODED, bool MOT, int (size=2) BTYPE, bool AC_PRED
+actor Proprietary.GUC.GUC_splitter_BTYPE () bool NEW_VOP, bool AC_CODED, bool MOT, int (size=2) BTYPE, bool AC_PRED
 ==> bool NEW_VOP_Y, bool NEW_VOP_U, bool NEW_VOP_V, bool AC_Y, bool AC_U, bool AC_V, bool MOT_Y, bool MOT_U, bool MOT_V, int (size=2)BTYPE_Y, int (size=2)BTYPE_U, int (size=2)BTYPE_V, 
 bool ACP_Y, bool ACP_U, bool ACP_V:
 // Port size declaration

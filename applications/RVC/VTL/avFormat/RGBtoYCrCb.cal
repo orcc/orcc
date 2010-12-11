@@ -53,7 +53,7 @@
  */
 
 
-actor RGBtoYCrCb()
+actor avFormat.RGBtoYCrCb()
 	int(size=8) R, 
 	int(size=8) G, 
 	int(size=8) B

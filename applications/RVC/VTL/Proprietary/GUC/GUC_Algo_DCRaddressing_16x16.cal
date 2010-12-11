@@ -47,7 +47,7 @@
 // * Block pointer bitwidth reduced from MB_COORD_SZ+3 to MB_COORD_SZ+2 since only
 //   4 components per block.
 
-actor GUC_Algo_DCRaddressing_16x16 () bool NEW_VOP, int(size=16) WIDTH, int (size=2) BTYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
+actor Proprietary.GUC.GUC_Algo_DCRaddressing_16x16 () bool NEW_VOP, int(size=16) WIDTH, int (size=2) BTYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
 + 2) B , int(size=MB_COORD_SZ + 2) C :
 
 // Port size declaration

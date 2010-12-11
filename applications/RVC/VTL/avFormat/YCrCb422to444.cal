@@ -58,7 +58,7 @@
  *  (1)lena 512x512 	(2)lena422 512x512		37.887		45.356		1.322	1.012
  */
 
-actor YCrCb422to444()
+actor avFormat.YCrCb422to444()
     int(size=10) CrCb422,
    int(size=16) WIDTH,
     int(size=16) HEIGHT

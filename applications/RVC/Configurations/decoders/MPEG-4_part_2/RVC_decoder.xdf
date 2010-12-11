@@ -319,7 +319,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Mgnt_Merger420"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_Merger420"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

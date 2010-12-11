@@ -78,7 +78,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Mgnt_DCSplit"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_DCSplit"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -96,7 +96,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_IS"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_IS"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -105,7 +105,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_IAP_8x8"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_IAP_8x8"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -114,7 +114,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_Inversequant"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_Inversequant"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -123,7 +123,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/iDCT/Algo_IDCT2D_ISOIEC_23002_1"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/iDCT/Algo_IDCT2D_ISOIEC_23002_1"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

@@ -75,7 +75,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_DCRaddressing_8x8"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_DCRaddressing_8x8"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -84,7 +84,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_DCRinvpred_chroma_8x8"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_DCRinvpred_chroma_8x8"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

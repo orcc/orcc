@@ -72,7 +72,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/MemoryManager"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/MemoryManager"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -81,7 +81,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/MBPacker"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/MBPacker"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -90,7 +90,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/SearchWindow"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/SearchWindow"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -99,7 +99,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Unpack"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/Unpack"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -117,7 +117,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Add"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/Add"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

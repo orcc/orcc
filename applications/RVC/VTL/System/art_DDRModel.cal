@@ -41,6 +41,6 @@ ENDCOPYRIGHT
 //
 
 
-actor art_DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
+actor System.art_DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
  
 end

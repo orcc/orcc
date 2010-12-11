@@ -29,7 +29,7 @@
 
 //import all caltrop.lib.BitOps;
 
-actor MacroblockToRaster()
+actor avFormat.MacroblockToRaster()
 	int(size=10) YCrCb420mb
         ==>
         	int(size=10) Y420,

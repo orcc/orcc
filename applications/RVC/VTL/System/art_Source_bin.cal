@@ -29,7 +29,7 @@
   
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 
-actor art_Source_bin (String fileName) ==> uint(size=8) Out :
+actor System.art_Source_bin (String fileName) ==> uint(size=8) Out :
 
 	// so the actor scheduler will call an initialize function
 	initialize ==>

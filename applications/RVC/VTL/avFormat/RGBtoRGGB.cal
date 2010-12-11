@@ -53,7 +53,7 @@
  */
 
 
-actor RGBtoRGGB()
+actor avFormat.RGBtoRGGB()
 	int(size=16) WIDTH,
     int(size=16) HEIGHT,
 	int(size=8) R, 

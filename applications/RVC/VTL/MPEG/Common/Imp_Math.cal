@@ -51,7 +51,7 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-unit VTL.MPEG.Common.Imp_Math :
+unit MPEG.Common.Imp_Math :
 	function max(int a,int b)
 				-->
 			int

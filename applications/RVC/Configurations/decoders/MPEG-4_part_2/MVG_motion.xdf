@@ -86,7 +86,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Mgnt_Framebuf"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_Framebuf"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -95,7 +95,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_Interpolation_halfpel"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_Interpolation_halfpel"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

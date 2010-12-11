@@ -29,6 +29,6 @@
  
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 
-actor Compare () uint(size=8) B, int(size=16) WIDTH, int(size=16) HEIGHT ==> :
+actor System.Compare () uint(size=8) B, int(size=16) WIDTH, int(size=16) HEIGHT ==> :
 
 end

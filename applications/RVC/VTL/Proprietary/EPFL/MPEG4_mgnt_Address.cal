@@ -10,7 +10,7 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Frame buffer address generation for motion compensation
-actor MPEG4_mgnt_Address (int INTRA,
+actor Proprietary.EPFL.MPEG4_mgnt_Address (int INTRA,
 	int MOTION,
 	int NEWVOP,
 	int ROUND_TYPE) int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE ==> int(size=ADDR_SZ) RA ,

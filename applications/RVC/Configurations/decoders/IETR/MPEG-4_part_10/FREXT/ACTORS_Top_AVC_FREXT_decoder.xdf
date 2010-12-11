@@ -25,7 +25,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Mgnt_Merger420_AVC"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Mgnt_Merger420_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

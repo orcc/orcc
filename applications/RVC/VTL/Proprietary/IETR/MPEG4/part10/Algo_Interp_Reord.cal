@@ -1,0 +1,352 @@
+/********************************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+
+*****************************************************************************/
+import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+
+actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart)
+	uint(size=6)  MbType,
+	uint(size=4)  SubMbType,
+	uint(size=2)  SelectList,
+	int (size=16) Interp
+		==>
+	int (size=16) MbPred
+		:
+
+	List(type: List(type: int(size=16), size=16), size=16) ListInterp;
+
+	uint(size=6) mb_type;
+
+	uint(size=3) MbPartIdxMax;
+	uint(size=3) MbPartIdx;
+	uint(size=3) SizeMb;
+
+	uint(size=3) SubMbPartIdxMax;
+	uint(size=3) SubMbPartIdx;
+	uint(size=3) Size_SubMb;
+	uint(size=2) NbListToGet;
+
+	List(type: uint(size=4), size=256) TabX_Out;
+	List(type: uint(size=4), size=256) TabY_Out;
+	uint(size=9) NbValueToRead;
+	uint(size=9) ReadIdx;
+
+	uint(size=4) x_idx;
+	uint(size=4) y_idx;
+
+	bool IsBiPred;
+
+	GetMbType: action
+			MbType :[MacroBlkType]
+				==>
+		do
+			mb_type       := MacroBlkType;
+			MbPartIdx     := 0;
+			MbPartIdxMax  := NumMbPart(MacroBlkType);
+			SizeMb        := SizeMbPart(MacroBlkType);
+		end
+
+	GetListSel4Mb: action
+			SelectList:[list_selected]
+				==>
+		guard
+			MbPartIdx  < MbPartIdxMax,
+			SizeMb    != SZ_8x8
+		do
+			NbListToGet :=
+				if(list_selected != BIPRED)then
+					1
+				else
+					2
+				end;
+			IsBiPred := (list_selected = BIPRED);
+		end
+
+	GetInterp.Launch16x16: action ==>
+		guard
+			SizeMb      = SZ_16x16,
+			NbListToGet > 0
+		do
+			foreach int j in 0 .. 4*SzSidePerPart -1
+			do
+				foreach int i in 0 .. 4*SzSidePerPart -1
+				do
+					TabX_Out[i + 4 * SzSidePerPart*j]:= i;
+					TabY_Out[i + 4 * SzSidePerPart*j]:= j;
+				end
+			end
+			NbValueToRead := 16 * SzSidePerPart * SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet   := NbListToGet - 1;
+		end
+
+	GetInterp.Launch16x8: action
+				==>
+		guard
+			SizeMb      = SZ_16x8,
+			NbListToGet > 0
+		do
+			foreach int j in 0 .. 2*SzSidePerPart -1
+			do
+				foreach int i in 0 .. 4*SzSidePerPart -1
+				do
+					TabX_Out[i + 4*SzSidePerPart*j]:= i;
+					TabY_Out[i + 4*SzSidePerPart*j]:= j + 2*SzSidePerPart*MbPartIdx;
+				end
+			end
+			NbValueToRead := 8 * SzSidePerPart * SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterp.Launch8x16: action
+				==>
+		guard
+			SizeMb      = SZ_8x16,
+			NbListToGet > 0
+		do
+			foreach int j in 0 .. 4*SzSidePerPart -1
+			do
+				foreach int i in 0 .. 2*SzSidePerPart -1
+				do
+					TabX_Out[i + 2*SzSidePerPart*j]:= i + 2*SzSidePerPart*MbPartIdx;
+					TabY_Out[i + 2*SzSidePerPart*j]:= j;
+				end
+			end
+			NbValueToRead := 8 * SzSidePerPart * SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterp.Done: action ==>
+		guard
+			NbListToGet = 0
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	GetInterp.Launch8x8: action
+			SubMbType :[ValSubMbType]
+				==>
+		guard
+			SizeMb    = SZ_8x8,
+			MbPartIdx < MbPartIdxMax
+		do
+			SubMbPartIdx    := 0;
+			SubMbPartIdxMax := NumSubMbPart(mb_type,ValSubMbType);
+			Size_SubMb       := SizeSubMbPart(mb_type,ValSubMbType);
+		end
+
+	GetListSel4SubMb: action
+			SelectList:[list_selected]
+				==>
+		guard
+			SubMbPartIdx < SubMbPartIdxMax
+		do
+			NbListToGet :=
+				if(list_selected != BIPRED)then
+					1
+				else
+					2
+				end;
+			IsBiPred := (list_selected = BIPRED);
+		end
+
+	GetInterpSubMb.Launch8x8: action
+				==>
+		guard
+			Size_SubMb   = SZ_8x8,
+			NbListToGet > 0
+		do
+			foreach int j in 0 .. 2*SzSidePerPart -1
+			do
+				foreach int i in 0 .. 2*SzSidePerPart -1
+				do
+					TabX_Out[i + 2*SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1);
+					TabY_Out[i + 2*SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1);
+				end
+			end
+			NbValueToRead := 4*SzSidePerPart*SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterpSubMb.Launch8x4: action
+				==>
+		guard
+			Size_SubMb   = SZ_8x4,
+			NbListToGet > 0
+		do
+			foreach int j in 0 .. SzSidePerPart -1
+			do
+				foreach int i in 0 .. 2*SzSidePerPart -1
+				do
+					TabX_Out[i + 2*SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1);
+					TabY_Out[i + 2*SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1) + SzSidePerPart*SubMbPartIdx;
+				end
+			end
+			NbValueToRead := 2*SzSidePerPart*SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet   := NbListToGet - 1;
+		end
+
+	GetInterpSubMb.Launch4x8: action
+				==>
+		guard
+			Size_SubMb   = SZ_4x8,
+			NbListToGet > 0
+		do
+			foreach int j in 0 .. 2*SzSidePerPart -1
+			do
+				foreach int i in 0 .. SzSidePerPart -1
+				do
+					TabX_Out[i + SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1) + SzSidePerPart*SubMbPartIdx;
+					TabY_Out[i + SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1);
+				end
+			end
+			NbValueToRead := 2*SzSidePerPart*SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet   := NbListToGet - 1;
+		end
+
+	GetInterpSubMb.Launch4x4: action
+				==>
+		guard
+			Size_SubMb   = SZ_4x4,
+			NbListToGet > 0
+		do
+			foreach int j in 0 .. SzSidePerPart -1
+			do
+				foreach int i in 0 .. SzSidePerPart -1
+				do
+					TabX_Out[i + SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1) + SzSidePerPart*(SubMbPartIdx&1);
+					TabY_Out[i + SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1) + SzSidePerPart*(SubMbPartIdx>>1);
+				end
+			end
+			NbValueToRead := SzSidePerPart*SzSidePerPart;
+			ReadIdx       := 0;
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetInterpSubMb.Done: action ==>
+		guard
+			NbListToGet = 0
+		do
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
+	GetSubMbInfo.Done: action ==>
+		guard
+			SubMbPartIdx = SubMbPartIdxMax
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	GetMbInfo.Done: action ==>
+		guard
+			MbPartIdx = MbPartIdxMax
+		do
+			x_idx := 0;
+			y_idx := 0;
+		end
+
+	ReadInterp.Launch: action
+			Interp:[InterpolationValue]
+				==>
+		guard
+			ReadIdx < NbValueToRead
+		do
+			if(IsBiPred and NbListToGet = 0)then
+				ListInterp[TabX_Out[ReadIdx]][TabY_Out[ReadIdx]] := (ListInterp[TabX_Out[ReadIdx]][TabY_Out[ReadIdx]] + InterpolationValue + 1) >> 1;
+			else
+				ListInterp[TabX_Out[ReadIdx]][TabY_Out[ReadIdx]] := InterpolationValue;
+			end
+			ReadIdx := ReadIdx + 1;
+		end
+
+	ReadInterp.Done: action ==>
+		guard
+			ReadIdx = NbValueToRead
+		end
+
+	SendParameters.Launch: action
+				==>
+			MbPred :[mb_pred]
+		guard
+			y_idx < 4*SzSidePerPart
+		var
+			int(size=16) mb_pred
+		do
+			mb_pred := ListInterp[x_idx][y_idx];
+			x_idx := x_idx + 1;
+			if(x_idx >= 4*SzSidePerPart)then
+				x_idx := 0;
+				y_idx := y_idx + 1;
+			end
+		end
+
+	SendParameters.Done: action
+				==>
+		guard
+			y_idx = 4*SzSidePerPart
+		end
+
+	schedule fsm GetMbType:
+		GetMbType          (GetMbType                )--> GetListSel4Mb;
+
+		GetListSel4Mb      (GetListSel4Mb            )--> GetMb;
+		GetListSel4Mb      (GetInterp.Launch8x8      )--> GetListSel4SubMb;
+		GetListSel4Mb      (GetMbInfo.Done           )--> SendParameters;
+
+		GetMb              (GetInterp.Launch16x16    )--> ReadInterpFor16x16;
+		GetMb              (GetInterp.Launch16x8     )--> ReadInterpFor16x8;
+		GetMb              (GetInterp.Launch8x16     )--> ReadInterpFor8x16;
+		GetMb              (GetInterp.Done           )--> GetListSel4Mb;
+
+		ReadInterpFor16x16 (ReadInterp.Launch        )--> ReadInterpFor16x16;
+		ReadInterpFor16x16 (ReadInterp.Done          )--> GetMb;
+
+		ReadInterpFor16x8  (ReadInterp.Launch        )--> ReadInterpFor16x8;
+		ReadInterpFor16x8  (ReadInterp.Done          )--> GetMb;
+
+		ReadInterpFor8x16  (ReadInterp.Launch        )--> ReadInterpFor8x16;
+		ReadInterpFor8x16  (ReadInterp.Done          )--> GetMb;
+
+		GetListSel4SubMb   (GetListSel4SubMb         )--> GetSubMb;
+		GetListSel4SubMb   (GetSubMbInfo.Done        )--> GetListSel4Mb;
+
+		GetSubMb           (GetInterpSubMb.Launch8x8 )--> ReadInterpFor8x8;
+		GetSubMb           (GetInterpSubMb.Launch8x4 )--> ReadInterpFor8x4;
+		GetSubMb           (GetInterpSubMb.Launch4x8 )--> ReadInterpFor4x8;
+		GetSubMb           (GetInterpSubMb.Launch4x4 )--> ReadInterpFor4x4;
+		GetSubMb           (GetInterpSubMb.Done      )--> GetListSel4SubMb;
+
+		ReadInterpFor8x8   (ReadInterp.Launch        )--> ReadInterpFor8x8;
+		ReadInterpFor8x8   (ReadInterp.Done          )--> GetSubMb;
+
+		ReadInterpFor8x4   (ReadInterp.Launch        )--> ReadInterpFor8x4;
+		ReadInterpFor8x4   (ReadInterp.Done          )--> GetSubMb;
+
+		ReadInterpFor4x8   (ReadInterp.Launch        )--> ReadInterpFor4x8;
+		ReadInterpFor4x8   (ReadInterp.Done          )--> GetSubMb;
+
+		ReadInterpFor4x4   (ReadInterp.Launch        )--> ReadInterpFor4x4;
+		ReadInterpFor4x4   (ReadInterp.Done          )--> GetSubMb;
+
+		SendParameters     (SendParameters.Launch    )--> SendParameters;
+		SendParameters     (SendParameters.Done      )--> GetMbType;
+	end
+
+end

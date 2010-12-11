@@ -14,7 +14,7 @@
 // Author: Ghislain Roquier(ghislain.roquier@epfl.ch)
 // Rewrote the actor at block level
 // The actor has now the SDF property
-actor MPEG4_algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC,
+actor Proprietary.EPFL.MPEG4_algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC,
 int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 
 // Port size declaration

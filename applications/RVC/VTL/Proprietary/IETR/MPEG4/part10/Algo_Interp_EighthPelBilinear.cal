@@ -1,0 +1,111 @@
+// Algo_Interp_EighthPelBilinear.cal
+//
+// Author: He-Yuan Lin
+//
+// Fractional chroma sample interpolation for motion compensation of AVC
+
+
+
+actor Proprietary.IETR.MPEG4.part10.Algo_Interp_EighthPelBilinear() 
+		int(size=16) Mv, 
+		int(size=16) RD, 
+		uint(size=6) PartSZ 
+				==> 
+				int(size=16) INTERP:
+
+  int(size=32) x ;
+  int(size=32) y ;
+  int(size=32) o_x ;
+  int(size=32) o_y ;
+  int(size=32) x_index ;
+  int(size=32) y_index ;
+  int temp;
+  int width;
+  int height;
+
+  List( type:int(size=16), size=289 ) inbuf := [ 0 : for int i in 0 .. 288 ];
+
+  procedure compensate( )
+  begin  
+      temp := (8-x_index)*(8-y_index)*inbuf[ ( o_x) + ( o_y) * 17 ]+ (x_index)*(8-y_index)* inbuf[ ( 1 + o_x) + (o_y) * 17 ];
+      temp := temp + (8-x_index)*(y_index)*inbuf[ ( 0 + o_x) + ( 1 + o_y) * 17 ]+x_index*y_index*inbuf [ ( 1 + o_x) + ( 1 + o_y) * 17 ] + 32;
+      temp := rshift (temp,6);
+  end
+
+  get_fract_x: action Mv:[ MovementVector ] ==>
+  do
+    x := 0;
+    y := 0;
+    o_x := 0;
+    o_y := 0;
+    x_index := MovementVector & 7;
+  end
+
+  get_fract_y: action Mv:[ MovementVector ] ==>
+  do
+    y_index := MovementVector & 7;
+  end
+
+  getwidth: action PartSZ:[ f ] ==>
+  do
+    width :=f/2;
+  end
+
+  getheight: action PartSZ:[ f ] ==>
+  do
+    height :=f/2;
+  end
+
+  // fetch (width+1)x(height+1) pixels
+  fetch: action RD:[d] ==>
+  guard 
+   x < (width+1) and y < (height+1)
+  do
+   inbuf[y * 17 + x] := d;
+   x := x + 1;
+   if x >= (width+1) then
+      x := 0;
+      y := y + 1;
+   end
+  end
+
+  done: action ==>
+  guard
+    o_y = height
+  end
+  
+  // interpolation according to MODE
+  process: action ==> INTERP:[ p ]
+  guard
+    x = 0 and y = (height+1)
+  var 
+	int p
+  do
+   compensate();
+   p := temp;
+   o_x := o_x + 1;
+   if o_x >= width then
+      o_x := 0;
+      o_y := o_y + 1;
+    end
+  end
+
+  schedule fsm get_fract_x:
+    get_fract_x  ( get_fract_x ) --> get_fract_y;
+
+    get_fract_y  ( get_fract_y ) --> getwidth;
+
+    getwidth     ( getwidth    ) --> getheight;
+
+    getheight    ( getheight   ) --> interpolate;
+
+    interpolate  ( fetch       ) --> interpolate;
+    interpolate  ( done        ) --> get_fract_x;
+    interpolate  ( process     ) --> interpolate;
+  end
+
+  priority
+    done >  fetch > process  ;
+  end
+
+end

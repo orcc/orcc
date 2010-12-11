@@ -12,7 +12,7 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Add motion and texture to produce pixels
 
-actor MPEG4_algo_Add (// Command flags from parser
+actor Proprietary.EPFL.MPEG4_algo_Add (// Command flags from parser
 	int NEWVOP,
 	int INTRA,
 	int ACCODED) int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==>

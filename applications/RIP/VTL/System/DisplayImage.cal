@@ -31,7 +31,7 @@
 
 // Displays an image. Reads width, height, and image content (RGB).
 
-actor DisplayImage()
+actor System.DisplayImage()
   uint(size=8) R, uint(size=8) G, uint(size=8) B, uint SizeOfImage ==> :
 
 end

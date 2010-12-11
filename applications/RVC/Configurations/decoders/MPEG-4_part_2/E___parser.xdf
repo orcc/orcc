@@ -150,7 +150,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_Synp_MPEG_4"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_Synp_MPEG_4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -189,7 +189,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Mgnt_MVSequence"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_MVSequence"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -210,7 +210,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Mgnt_BlockExpand"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_BlockExpand"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -219,7 +219,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Mgnt_MVReconstruct"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_MVReconstruct"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -246,7 +246,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/splitter_BTYPE"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/splitter_BTYPE"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -255,7 +255,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/splitter_MV"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/splitter_MV"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -264,7 +264,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/splitter_420_B"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/splitter_420_B"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -273,7 +273,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/splitter_Qp"/>
+        <Class name="../../../VTL/MPEG/MPEG4/part2/splitter_Qp"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

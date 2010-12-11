@@ -57,7 +57,7 @@
  */
 
 
-actor YCrCb422to420()
+actor avFormat.YCrCb422to420()
 	int(size=16) WIDTH,
     int(size=16) HEIGHT,
     int(size=10) CrCb422

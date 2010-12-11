@@ -1,0 +1,152 @@
+actor Proprietary.IETR.MPEG4.part10.Common.Algo_GenerateSkipBlockInformation()
+	bool          SData_SkipMb,
+	uint(size=5)  SData_SzMb,
+	uint(size=5)  NbCoeffInMB,
+	bool          MbLay_SkipMb,
+	bool          Skip_Block,
+	bool          Res_Last,
+	bool          IsIPCM,
+	uint(size=16) CbpBlk
+	
+		==>
+	bool          Last,
+	uint(size=16) cbp_blk
+		:
+
+
+	uint(size=5) NbCoefLeft;
+
+	SData.LaunchMbLayer: action
+			SData_SkipMb:[skip]
+				==>
+		guard
+			skip = false
+		end
+
+	SData.SkipMbLayer: action
+			SData_SkipMb :[skip],
+			SData_SzMb   :[SizeMacroB]
+				==>
+			cbp_blk   :[0]
+		guard
+			skip = true
+		do
+			NbCoefLeft := SizeMacroB;
+		end
+
+	GetNumberOfMacroBlk: action
+			IsIPCM      :[IPCM],
+			NbCoeffInMB :[NbCoeff]
+				==>
+		guard
+			IPCM = false
+		do
+			NbCoefLeft := NbCoeff;
+		end
+
+	IsIPCM_MacroB: action
+			IsIPCM :[IPCM]
+				==>
+			cbp_blk :[0xFF]//Coeff_token of I_PCM MacroB is always equal to 16!
+		guard
+			IPCM = true
+		end
+
+	MBLaySkipBlk.IsTrue: action
+			MbLay_SkipMb :[SkipMb]
+				==>
+			cbp_blk      :[0]
+		guard
+			SkipMb = true
+		end
+
+	MBLaySkipBlk.IsFalse: action
+			MbLay_SkipMb :[SkipMb],
+			CbpBlk       :[coded_block_pattern]
+				==>
+			cbp_blk      :[coded_block_pattern]
+		guard
+			SkipMb = false
+		end
+
+	SkipBlockIsEqualToTrue: action
+			Skip_Block :[skip_tablet]
+				==>
+			Last       :[skip_tablet]
+		guard
+			skip_tablet = true,
+			NbCoefLeft  > 0
+		do
+			NbCoefLeft := NbCoefLeft - 1;
+		end
+
+	SkipBlockIsEqualToFalse: action
+			Skip_Block :[skip_tablet]
+				==>
+		guard
+			skip_tablet = false,
+			NbCoefLeft  > 0
+		do
+			NbCoefLeft := NbCoefLeft - 1;
+		end
+
+	EndOfMacroBlock: action ==>
+		guard
+			NbCoefLeft = 0
+		end
+
+	ResLastIsEqualToFalse: action
+			Res_Last :[last]
+				==>
+			Last     :[last]
+		guard
+			last = false
+		end
+
+	ResLastIsEqualToTrue: action
+			Res_Last :[last]
+				==>
+			Last     :[last]
+		guard
+			last = true
+		end
+
+	SkipBlk: action
+				==>
+			Last :[true]
+		guard
+			NbCoefLeft  > 0
+		do
+			NbCoefLeft := NbCoefLeft - 1;
+		end
+
+	EndSkipBlk: action ==>
+		end
+
+	schedule fsm CheckSDataInfo:
+		CheckSDataInfo (SData.LaunchMbLayer     )--> GetNbrOfMBlk;
+		CheckSDataInfo (SData.SkipMbLayer       )--> SkipMb;
+
+		GetNbrOfMBlk   (GetNumberOfMacroBlk     )--> MBLaySkipBlk;
+		GetNbrOfMBlk   (IsIPCM_MacroB           )--> CheckSDataInfo;
+
+		MBLaySkipBlk   (MBLaySkipBlk.IsTrue     )--> SkipMb;
+		MBLaySkipBlk   (MBLaySkipBlk.IsFalse    )--> CheckSkipBlock;
+
+		CheckSkipBlock (SkipBlockIsEqualToTrue  )--> CheckSkipBlock;
+		CheckSkipBlock (SkipBlockIsEqualToFalse )--> Launch_ResBlk;
+		CheckSkipBlock (EndOfMacroBlock         )--> CheckSDataInfo;
+
+		Launch_ResBlk  (ResLastIsEqualToFalse   )--> Launch_ResBlk;
+		Launch_ResBlk  (ResLastIsEqualToTrue    )--> CheckSkipBlock;
+
+		SkipMb          (SkipBlk                )--> SkipMb;
+		SkipMb          (EndSkipBlk             )--> CheckSDataInfo;
+	end
+	priority
+		SkipBlockIsEqualToTrue  > EndOfMacroBlock;
+		SkipBlockIsEqualToFalse > EndOfMacroBlock;
+		ResLastIsEqualToFalse   > ResLastIsEqualToTrue;
+		SkipBlk                 > EndSkipBlk;
+	end
+end

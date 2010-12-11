@@ -17,7 +17,7 @@
 * Interpolation for motion compensation
 */
 
-actor E___Algo_Interpolation_halfpel
+actor Proprietary.E__.E___Algo_Interpolation_halfpel
 () int(size=9) RD, int(size=4) halfpel ==> int(size=PIX_SZ) MOT :
 
 	int PIX_SZ = 9;

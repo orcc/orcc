@@ -1,0 +1,309 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+
+actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
+	uint(size=6)  MbType,
+	uint(size=4)  SubMbType,
+	int (size=16) Mv,
+	uint(size=4)  RefIdx,
+	uint(size=2)  SelectList
+		==>
+	int (size=16) MvOut,
+	uint(size=6)  PartSZ,
+	uint(size=4)  RefIdxOut
+		:
+
+	List(type: List(type: int(size=16),size=2), size=16) MvTab;
+	List(type: int(size=5), size=16) RefIdxTab;
+
+	uint(size=6) mb_type;
+	uint(size=3) MbPartIdxMax;
+	uint(size=3) MbPartIdx;
+	uint(size=3) SizeMbMv;
+	uint(size=3) SubMbPartIdxMax;
+	uint(size=3) SubMbPartIdx;
+	uint(size=3) SizeSubMbMv;
+	uint(size=2) NbListToGet;
+
+	GetMbType: action
+			MbType :[MacroBlkType]
+				==>
+		do
+			mb_type := MacroBlkType;
+			MbPartIdx     := 0;
+			MbPartIdxMax  := NumMbPart(MacroBlkType);
+			SizeMbMv      := SizeMbPart(MacroBlkType);
+		end
+
+	GetListSel4Mb: action
+			SelectList:[list_selected]
+				==>
+		guard
+			MbPartIdx  < MbPartIdxMax,
+			SizeMbMv  != SZ_8x8
+		do
+			NbListToGet :=
+				if(list_selected != BIPRED)then
+					1
+				else
+					2
+				end;
+		end
+
+	GetMv.Launch16x16: action
+			Mv:[Mvx, Mvy],
+			RefIdx :[ref_idx]
+				==>
+			PartSZ :[16,16]
+		guard
+			SizeMbMv    = SZ_16x16,
+			NbListToGet > 0
+		do
+			foreach int i in 0 .. 15
+			do
+				MvTab[i]     := [Mvx,Mvy];
+				RefIdxTab[i] := ref_idx;
+			end
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetMv.Launch16x8: action
+			Mv:[Mvx, Mvy],
+			RefIdx :[ref_idx]
+				==>
+			PartSZ :[16,8]
+		guard
+			SizeMbMv    = SZ_16x8,
+			NbListToGet > 0
+		do
+			foreach int i in 0 .. 7
+			do
+				MvTab[i+(8*(MbPartIdx & 1))] := [Mvx,Mvy];
+				RefIdxTab[i+(8*(MbPartIdx & 1))] := ref_idx;
+			end
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetMv.Launch8x16: action
+			Mv:[Mvx, Mvy],
+			RefIdx :[ref_idx]
+				==>
+			PartSZ :[8,16]
+		guard
+			SizeMbMv    = SZ_8x16,
+			NbListToGet > 0
+		do
+			foreach int i in 0 .. 3
+			do
+				MvTab[    i+(4*(MbPartIdx & 1))] := [Mvx,Mvy];
+				MvTab[8 + i+(4*(MbPartIdx & 1))] := [Mvx,Mvy];
+				RefIdxTab[    i+(4*(MbPartIdx & 1))] := ref_idx;
+				RefIdxTab[8 + i+(4*(MbPartIdx & 1))] := ref_idx;
+			end
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetMv.Done: action ==>
+		guard
+			NbListToGet = 0
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	GetMv.Launch8x8: action
+			SubMbType :[ValSubMbType]
+				==>
+		guard
+			SizeMbMv  = SZ_8x8,
+			MbPartIdx < MbPartIdxMax
+		do
+			SubMbPartIdx    := 0;
+			SubMbPartIdxMax := NumSubMbPart(mb_type,ValSubMbType);
+			SizeSubMbMv     := SizeSubMbPart(mb_type,ValSubMbType);
+		end
+
+	GetListSel4SubMb: action
+			SelectList:[list_selected]
+				==>
+		guard
+			SubMbPartIdx < SubMbPartIdxMax
+		do
+			NbListToGet :=
+				if(list_selected != BIPRED)then
+					1
+				else
+					2
+				end;
+		end
+
+	GetSubMv.Launch8x8: action
+			Mv:[Mvx, Mvy],
+			RefIdx :[ref_idx]
+				==>
+			PartSZ :[8,8]
+		guard
+			SizeSubMbMv = SZ_8x8,
+			NbListToGet > 0
+		do
+			foreach int i in 0 .. 3
+			do
+				MvTab[i + 4*(MbPartIdx&3)] := [Mvx,Mvy];
+				RefIdxTab[i + 4*(MbPartIdx&3)] := ref_idx;
+			end
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetSubMv.Launch8x4: action
+			Mv:[Mvx, Mvy],
+			RefIdx :[ref_idx]
+				==>
+			PartSZ :[8,4]
+		guard
+			SizeSubMbMv = SZ_8x4,
+			NbListToGet > 0
+		do
+			MvTab[4*(MbPartIdx&3) + 2*(SubMbPartIdx&1)]     := [Mvx,Mvy];
+			MvTab[4*(MbPartIdx&3) + 2*(SubMbPartIdx&1) + 1] := [Mvx,Mvy];
+			RefIdxTab[4*(MbPartIdx&3) + 2*(SubMbPartIdx&1)] := ref_idx;
+			RefIdxTab[4*(MbPartIdx&3) + 2*(SubMbPartIdx&1) + 1] := ref_idx;
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetSubMv.Launch4x8: action
+			Mv:[Mvx, Mvy],
+			RefIdx :[ref_idx]
+				==>
+			PartSZ :[4,8]
+		guard
+			SizeSubMbMv = SZ_4x8,
+			NbListToGet > 0
+		do
+			MvTab[4*(MbPartIdx&3) + (SubMbPartIdx&1)]     := [Mvx,Mvy];
+			MvTab[4*(MbPartIdx&3) + (SubMbPartIdx&1) + 2] := [Mvx,Mvy];
+			RefIdxTab[4*(MbPartIdx&3) + (SubMbPartIdx&1)] := ref_idx;
+			RefIdxTab[4*(MbPartIdx&3) + (SubMbPartIdx&1) + 2] := ref_idx;
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetSubMv.Launch4x4: action
+			Mv:[Mvx, Mvy],
+			RefIdx :[ref_idx]
+				==>
+			PartSZ :[4,4]
+		guard
+			SizeSubMbMv = SZ_4x4,
+			NbListToGet > 0
+		do
+			MvTab[4*(MbPartIdx&3) + (SubMbPartIdx&3)]     := [Mvx,Mvy];
+			RefIdxTab[4*(MbPartIdx&3) + (SubMbPartIdx&3)] := ref_idx;
+			NbListToGet := NbListToGet - 1;
+		end
+
+	GetSubMv.Done: action ==>
+		guard
+			NbListToGet = 0
+		do
+			SubMbPartIdx := SubMbPartIdx + 1;
+		end
+
+	GetSubMvInfo.Done: action ==>
+		guard
+			SubMbPartIdx = SubMbPartIdxMax
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	SendParameters: action
+				==>
+			RefIdxOut :[refidx_out] repeat 16,
+			MvOut     :[mv_out]     repeat 32	
+		guard
+			MbPartIdx = MbPartIdxMax
+		var
+			List(type: uint(size=5),  size=16) refidx_out,
+			List(type: int (size=16), size=32) mv_out,
+			List(type: uint(size=4),  size=16) InverseScan4x4Tab = [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ]	
+		do
+			foreach int i in 0 .. 15
+			do
+				refidx_out[i] := RefIdxTab[InverseScan4x4Tab[i]];
+				mv_out[2*i]   := MvTab[InverseScan4x4Tab[i]][0];
+				mv_out[2*i+1] := MvTab[InverseScan4x4Tab[i]][1];
+			end	
+		end
+
+	schedule fsm GetMbType:
+		GetMbType        (GetMbType          )--> GetListSel4Mb;
+
+		GetListSel4Mb    (GetListSel4Mb      )--> GetMv;
+		GetListSel4Mb    (GetMv.Launch8x8    )--> GetListSel4SubMb;
+		GetListSel4Mb    (SendParameters     )--> GetMbType;
+
+		GetMv            (GetMv.Launch16x16  )--> GetMv;
+		GetMv            (GetMv.Launch16x8   )--> GetMv;
+		GetMv            (GetMv.Launch8x16   )--> GetMv;
+		GetMv            (GetMv.Done         )--> GetListSel4Mb;
+
+		GetListSel4SubMb (GetListSel4SubMb   )--> GetSubMv;
+		GetListSel4SubMb (GetSubMvInfo.Done  )--> GetListSel4Mb;
+
+		GetSubMv         (GetSubMv.Launch8x8 )--> GetSubMv;
+		GetSubMv         (GetSubMv.Launch8x4 )--> GetSubMv;
+		GetSubMv         (GetSubMv.Launch4x8 )--> GetSubMv;
+		GetSubMv         (GetSubMv.Launch4x4 )--> GetSubMv;
+		GetSubMv         (GetSubMv.Done      )--> GetListSel4SubMb;
+	end
+
+end

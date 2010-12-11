@@ -1,0 +1,135 @@
+/* 
+BEGINCOPYRIGHT X
+	
+	Copyright (c) 2004-2005, Xilinx Inc.
+	All rights reserved.
+	
+	Redistribution and use in source and binary forms, 
+	with or without modification, are permitted provided 
+	that the following conditions are met:
+	- Redistributions of source code must retain the above 
+	  copyright notice, this list of conditions and the 
+	  following disclaimer.
+	- Redistributions in binary form must reproduce the 
+	  above copyright notice, this list of conditions and 
+	  the following disclaimer in the documentation and/or 
+	  other materials provided with the distribution.
+	- Neither the name of the copyright holder nor the names 
+	  of its contributors may be used to endorse or promote 
+	  products derived from this software without specific 
+	  prior written permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	
+ENDCOPYRIGHT
+*/
+// Add.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+// Add motion and texture to produce pixels
+
+actor Proprietary.Xilinx.MPEG4_part2.Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==>
+int(size=PIX_SZ) VID :
+
+	int PIX_SZ = 9;
+
+	int BTYPE_SZ = 12;
+
+	int NEWVOP = 2048;
+
+	int INTRA = 1024;
+
+	int ACCODED = 2;
+
+	// Ignore new VOP command
+	cmd.newVop: action BTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, NEWVOP) != 0
+	end
+
+	int(size=8) count := 0;
+
+	// Pure texture
+	cmd.textureOnly: action BTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, INTRA) != 0
+	end
+
+	// Pure motion
+	cmd.motionOnly: action BTYPE:[ cmd ] ==>
+	guard
+		bitand(cmd, ACCODED) = 0
+	end
+
+	// Mixed texture and motion
+	// (Also used to skip vop w,h)
+	cmd.other: action BTYPE:[ cmd ] ==>
+	end
+
+	done: action ==>
+	guard
+		count = 64
+	do
+		count := 0;
+	end
+
+	texture: action TEX:[ tex ] ==> VID:[ tex ]
+	do
+		count := count + 1;
+	end
+
+	motion: action MOT:[ mot ] ==> VID:[ mot ]
+	do
+		count := count + 1;
+	end
+
+	combine: action MOT:[ mot ], TEX:[ tex ] ==> VID:[ if s < 0 then
+			0
+		else
+			if s > 255 then
+				255
+			else
+				s
+			end
+		end ]
+	var
+		int(size=PIX_SZ + 1) s = tex + mot
+	do
+		count := count + 1;
+	end
+
+	schedule fsm cmd :
+		cmd ( cmd.newVop ) --> skipw;
+		cmd ( cmd.textureOnly ) --> texture;
+		cmd ( cmd.motionOnly ) --> motion;
+		cmd ( cmd.other ) --> combine;
+		texture ( done ) --> cmd;
+		texture ( texture ) --> texture;
+		motion ( done ) --> cmd;
+		motion ( motion ) --> motion;
+		combine ( done ) --> cmd;
+		combine ( combine ) --> combine;
+		skipw ( cmd.other ) --> skiph;
+		skiph ( cmd.other ) --> cmd;
+	end
+
+	priority
+		cmd.newVop > cmd.textureOnly > cmd.motionOnly > cmd.other;
+		done > combine;
+		done > texture;
+		done > motion;
+	end
+
+end

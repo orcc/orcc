@@ -11,7 +11,7 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Frame buffer
 
-actor MPEG4_mgnt_Framebuf () int(size=ADDR_SZ) RA, int(size=ADDR_SZ) WA,
+actor Proprietary.EPFL.MPEG4_mgnt_Framebuf () int(size=ADDR_SZ) RA, int(size=ADDR_SZ) WA,
 int(size=PIX_SZ) WD ==> int(size=PIX_SZ) RD :
 
 // Port size declaration

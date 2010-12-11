@@ -15,7 +15,7 @@
 // Rewrote the actor at block level
 // The actor has now the SDF property
 
-actor MPEG4_algo_Interpolation_halfpel () int(size=PIX_SZ) RD,
+actor Proprietary.EPFL.MPEG4_algo_Interpolation_halfpel () int(size=PIX_SZ) RD,
 int(size=FLAG_SZ) halfpel ==> int(size=PIX_SZ) MOT :
 
 // Port size declaration

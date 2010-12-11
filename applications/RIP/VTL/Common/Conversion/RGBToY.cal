@@ -1,7 +1,7 @@
 // Author: Matthieu Wipliez
 
 // Converts RGB to Y.
-actor RGBToY
+actor Common.Conversion.RGBToY
 () uint(size=8) RED, uint(size=8) GREEN, uint(size=8) BLUE ==> uint(size=8) Y :
 
 	action RED:[ r ], GREEN:[ g ], BLUE:[ b ] ==> Y:[ rshift(66 * r + 129 * g + 25

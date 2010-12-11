@@ -32,5 +32,5 @@
 /******************************************************************************
  * ResultPrinter : "Fake" actor for printing test check result into a FIFO    *
  ******************************************************************************/
-actor ResultPrinter() String Check ==> :
+actor System.ResultPrinter() String Check ==> :
 end

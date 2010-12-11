@@ -29,7 +29,7 @@
  
 // Author: Endri Bezati (endri.bezati@epfl.ch)
 
-actor Source_no_loop () 
+actor System.Source_no_loop () 
 		==> 
 			uint(size=8) O,
 			bool EOF :

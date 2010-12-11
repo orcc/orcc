@@ -61,7 +61,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_DCR_Hadamard_CHROMA"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Algo_DCR_Hadamard_CHROMA"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -88,7 +88,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Merge_4x4_to_8x8"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Algo_Merge_4x4_to_8x8"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

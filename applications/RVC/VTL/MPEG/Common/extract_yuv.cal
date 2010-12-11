@@ -1,4 +1,4 @@
-actor extract_yuv () int(size=16) Width, int(size=16) Height, uint(size=8) YUV ==>
+actor MPEG.Common.extract_yuv () int(size=16) Width, int(size=16) Height, uint(size=8) YUV ==>
 int(size=PIX_SZ) Y , int(size=PIX_SZ) U , int(size=PIX_SZ) V :
 
 // Port size declaration

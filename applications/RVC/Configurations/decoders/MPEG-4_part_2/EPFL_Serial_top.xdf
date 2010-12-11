@@ -52,7 +52,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Mgnt_Merger_xilinx"/>
+        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/Mgnt_Merger_xilinx"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

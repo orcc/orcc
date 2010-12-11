@@ -5,7 +5,7 @@
 
 // Reads an image in raster scan order, fills a three-line cache, and apply Sobel filter.
 
-actor Sobel()
+actor Common.Sobel.Sobel()
   uint(size=32) SizeOfImage, uint(size=8) Y ==>
   uint(size=8) GRADIENT :
 

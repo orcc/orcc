@@ -41,7 +41,7 @@
 
 //  The INTRA type also has ACPRED
 
-actor GUC_Algo_Synp_MPEG_4 () bool bits ==> bool NEW_VOP, bool ROUND, int(size=VOP_FCODE_FOR_LENGTH+1) FCODE, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
+actor Proprietary.GUC.GUC_Algo_Synp_MPEG_4 () bool bits ==> bool NEW_VOP, bool ROUND, int(size=VOP_FCODE_FOR_LENGTH+1) FCODE, int(size=MV_SZ) MV, int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
   bool LAST, int(size=16) WIDTH, int(size=16) HEIGHT, int(size=BITS_QUANT+1) QP, bool AC_CODED, bool MOT, bool AC_PRED, int(size=2) BTYPE, bool FOUR_MV :
 
 

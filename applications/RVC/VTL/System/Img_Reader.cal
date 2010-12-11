@@ -29,7 +29,7 @@
  
 // Author: Endri Bezati (endri.bezati@epfl.ch)
 
-actor Img_Reader () 
+actor System.Img_Reader () 
 		==> 
 			int(size=8)  RED,
 			int(size=8)  GREEN,

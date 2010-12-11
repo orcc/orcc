@@ -1,0 +1,446 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+
+actor Proprietary.IETR.MPEG4.part10.Common.Algo_DecodePps(bool IsCBP)
+	int (size=32) ValVLD,
+	uint(size=8)  PpsAsked,
+
+	uint(size=32) PicWidthInMbs,
+	uint(size=32) PicHeightInMapUnits
+		==>
+	uint(size=5)  TypeOfVLD,
+	int (size=32) NbBitsToRead,
+	bool          DecodeNextNal,
+
+	uint(size=5)  GetSps4Pic,
+	uint(size=5)  GetSps,
+
+	int (size=32) SliceHeaderParameters,
+	int (size=5)  SliceDataParameters,
+
+	uint(size=5)  NumRefIdxLXActive
+		:
+
+
+/*   
+*
+* Constants
+*
+*/
+
+	bool DEBUG_FLAG_DECODED = false;
+
+/*   
+*
+* State variables
+*
+*/
+
+	List (type:List (type:uint,size=7),size=255) run_length_minus1 := [[ 0 : for int i in 1 .. 7] :for int j in 0 .. 254];
+	List (type:List (type:uint,size=7),size=255) top_left          := [[ 0 : for int i in 1 .. 7] : for int j in 0 .. 254];
+	List (type:List (type:uint,size=7),size=255) bottom_right      := [[ 0 : for int i in 1 .. 7] : for int j in 0 .. 254];
+
+	List (type:uint(size=5) ,size=255) sequence_parameter_set_id              := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=1) ,size=255) entropy_coding_mode_flag               := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=1) ,size=255) pic_order_present_flag                 := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=3) ,size=255) num_slice_groups_minus1                := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=3) ,size=255) slice_group_map_type                   := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=1) ,size=255) slice_group_change_direction_flag      := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=32),size=255) slice_group_change_rate_minus1         := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=5) ,size=255) num_ref_idx_l0_active_minus1           := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=5) ,size=255) num_ref_idx_l1_active_minus1           := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=1) ,size=255) weighted_pred_flag                     := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=2) ,size=255) weighted_bipred_idc                    := [ 0     : for int i in 0 .. 254];
+	List (type:int (size=6) ,size=255) pic_init_qp_minus26                    := [ 0     : for int i in 0 .. 254];
+	List (type:int (size=6) ,size=255) pic_init_qs_minus26                    := [ 0     : for int i in 0 .. 254];
+	List (type:int (size=5) ,size=255) chroma_qp_index_offset                 := [ 0     : for int i in 0 .. 254];
+	List (type:int (size=5) ,size=255) second_chroma_qp_index_offset          := [ 0     : for int i in 0 .. 254];
+	List (type:uint(size=1) ,size=255) deblocking_filter_control_present_flag := [ 0     : for int i in 0 .. 254];
+	List (type:bool         ,size=255) constrained_intra_pred_flag            := [ false : for int i in 0 .. 254];
+	List (type:uint(size=1) ,size=255) redundant_pic_cnt_present_flag         := [ 0     : for int i in 0 .. 254];
+	List (type:int (size=32),size=255) SzSliceGroupChgCycle                   := [ 0     : for int i in 0 .. 254];
+	List (type:bool         ,size=255) transform_8x8_mode_flag                := [ false : for int i in 0 .. 254];
+
+	uint(size=8)  pps_id;
+	int (size=32) LoopVal;
+	uint(size=32) ValPicWidthInMbs;
+
+	function SetFlag(bool ValFlag, uint(size=5)Idx, int(size=32) Val)
+				-->
+			int(size=32)
+		:
+			if(ValFlag) then
+				Val | (1<<Idx)
+			else
+				Val & (-1 ^ (1<<Idx))
+			end
+		end
+
+/*   
+*
+* Actions
+*
+*/
+
+	ReadPpsId.Asked: action
+				==>
+			//             pps_id  , sps_id , entropy_c , pic_order , num_sli
+			TypeOfVLD    :[ VLD_UE , VLD_UE , READ_BITS , READ_BITS , VLD_UE ],
+			NbBitsToRead :[                       1     ,     1              ]
+		end
+
+	PpsParamAsked.Frext: action
+			PpsAsked              :[ValPps]
+				==>
+			GetSps4Pic            :[sequence_parameter_set_id[ValPps]],
+
+			SliceHeaderParameters :[HeaderParam]     repeat 5,
+			SliceDataParameters   :[DataParam]       repeat 3,
+			NumRefIdxLXActive     :[ValNumRefIdxAct] repeat 2
+		guard
+			not IsCBP
+		var
+			bool ValPicOrderPresent,
+			bool ValRedPicCntPres,
+			bool ValEntropyCodingMode,
+			bool ValDebFiltContPres,
+			List(type:uint(size=5), size=2) ValNumRefIdxAct,
+			List(type: int(size=32), size=5) HeaderParam,
+			List(type: int(size=32), size=3) DataParam
+		do
+			ValPicOrderPresent :=
+				if(pic_order_present_flag[ValPps] = 0)then
+					false
+				else
+					true
+				end;
+			ValRedPicCntPres :=
+				if(redundant_pic_cnt_present_flag[ValPps] = 0)then
+					false
+				else
+					true
+				end;
+			ValNumRefIdxAct[0]   := num_ref_idx_l0_active_minus1[ValPps] + 1;
+			ValNumRefIdxAct[1]   := num_ref_idx_l1_active_minus1[ValPps] + 1;
+			ValEntropyCodingMode :=
+				if(entropy_coding_mode_flag[ValPps] = 0) then
+					false
+				else
+					true
+				end;
+			ValDebFiltContPres :=
+				if(deblocking_filter_control_present_flag[ValPps] = 0)then
+					false
+				else
+					true
+				end;
+			DataParam[0]   := chroma_qp_index_offset[ValPps];
+			DataParam[1]   := second_chroma_qp_index_offset[ValPps];
+			DataParam[2]   := SetFlag(ValEntropyCodingMode,1,SetFlag(constrained_intra_pred_flag[ValPps],0,0));
+			DataParam[2]   := SetFlag(transform_8x8_mode_flag[ValPps],2,DataParam[2]);
+			HeaderParam[0] := num_slice_groups_minus1[ValPps] + 1;
+			HeaderParam[1] := pic_init_qp_minus26[ValPps] + 26;
+			HeaderParam[2] := SzSliceGroupChgCycle[ValPps];
+			HeaderParam[3] := slice_group_map_type[ValPps];
+			HeaderParam[4] := SetFlag(ValPicOrderPresent,1,SetFlag(ValDebFiltContPres,0,0));
+			HeaderParam[4] := SetFlag(ValEntropyCodingMode,3,SetFlag(ValRedPicCntPres,2,HeaderParam[4]));
+		end
+
+
+	ReadPpsId.Done: action
+			ValVLD :[ValueOfVLD] repeat 5
+				==>
+			GetSps :[ValueOfVLD[1]]
+		do
+			pps_id                            := ValueOfVLD[0];
+			sequence_parameter_set_id[pps_id] := ValueOfVLD[1];
+			entropy_coding_mode_flag[pps_id]  := ValueOfVLD[2];
+			pic_order_present_flag[pps_id]    := ValueOfVLD[3];
+			num_slice_groups_minus1[pps_id]   := ValueOfVLD[4];
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tpps_id : "+ValueOfVLD[0]);
+				println("\t\tsequence_parameter_set_id : "+ValueOfVLD[1]);
+				println("\t\tentropy_coding_mode_flag : "+ValueOfVLD[2]);
+				println("\t\tpic_order_present_flag : "+ValueOfVLD[3]);
+				println("\t\tnum_slice_groups_minus1 : "+ValueOfVLD[4]);
+			end
+		end
+
+	ReadSliceGroupMapType.IsAsked: action
+				==>
+			//      slice_group_map_type
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			num_slice_groups_minus1[pps_id] > 0
+		end
+
+
+	ReadSliceGroupMapType.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			slice_group_map_type[pps_id] := ValueOfVLD;
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tslice_group_map_type : "+ValueOfVLD);
+			end
+		end
+
+	CheckSliceGroupMapType.IsEqualTo0: action
+			==>
+		guard
+			slice_group_map_type[pps_id] = 0
+		end
+
+	CheckNumSliceGroup.SliceGroupMapEqualTo0: action
+				==>
+			//          run_length_minus1
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			num_slice_groups_minus1[pps_id] > 0
+		do
+			LoopVal := 0;
+		end
+
+	ReadRunLength.Launch: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//          run_length_minus1
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			LoopVal < num_slice_groups_minus1[pps_id] - 1
+		do
+			run_length_minus1[pps_id][LoopVal] := ValueOfVLD;
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\trun_length_minus1["+LoopVal+"] : "+ValueOfVLD);
+			end
+			LoopVal := LoopVal + 1;
+		end
+
+	ReadRunLength.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			run_length_minus1[pps_id][LoopVal] := ValueOfVLD;
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\trun_length_minus1["+LoopVal+"] : "+ValueOfVLD);
+			end
+		end
+
+	CheckSliceGroupMapType.IsEqualTo2: action
+			==>
+		guard
+			slice_group_map_type[pps_id] = 2
+		end
+
+
+	CheckNumSliceGroup.SliceGroupMapEqualTo2: action
+				==>
+			//              top_le , bottom
+			TypeOfVLD    :[ VLD_UE , VLD_UE ]
+		guard
+			num_slice_groups_minus1[pps_id] > 0
+		do
+			LoopVal := 0;
+		end
+
+	ReadTopLeftAndBottomRight.Launch: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+			//              top_le , bottom
+			TypeOfVLD    :[ VLD_UE , VLD_UE ]
+		guard
+			LoopVal < num_slice_groups_minus1[pps_id] - 1
+		do
+			top_left[pps_id][LoopVal]     := ValueOfVLD[0];
+			bottom_right[pps_id][LoopVal] := ValueOfVLD[1];
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\ttop_left["+LoopVal+"] : "+ValueOfVLD[0]);
+				println("\t\tbottom_right["+LoopVal+"] : "+ValueOfVLD[1]);
+			end
+			LoopVal := LoopVal + 1;
+		end
+
+	ReadTopLeftAndBottomRight.Done: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+		do
+			top_left[pps_id][LoopVal]     := ValueOfVLD[0];
+			bottom_right[pps_id][LoopVal] := ValueOfVLD[1];
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\ttop_left["+LoopVal+"] : "+ValueOfVLD[0]);
+				println("\t\tbottom_right["+LoopVal+"] : "+ValueOfVLD[1]);
+			end
+		end
+
+	CheckSliceGroupMapType.IsBetween3and5: action
+				==>
+			//              slice_gro , slice_
+			TypeOfVLD    :[ READ_BITS , VLD_UE ],
+			NbBitsToRead :[     1              ]
+		guard
+			   slice_group_map_type[pps_id] = 3
+			or slice_group_map_type[pps_id] = 4
+			or slice_group_map_type[pps_id] = 5
+		end
+
+	ReadSliceGroupChangeParam: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+		do
+			slice_group_change_direction_flag[pps_id] := ValueOfVLD[0];
+			slice_group_change_rate_minus1[pps_id] := ValueOfVLD[1];
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tslice_group_change_direction_flag : "+ValueOfVLD[0]);
+				println("\t\tslice_group_change_rate_minus1 : "+ValueOfVLD[1]);
+			end
+		end
+		
+
+	CheckSliceGroupMapType.IsEqualTo6: action
+			==>
+			//     pic_size_in_map_units_minus1
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			slice_group_map_type[pps_id] = 6
+		do
+			println("pic_size_in_map_units_minus1 not implemented yet");
+		end
+
+
+	ReadNumRefIdx.Asked: action
+				==>
+			//              num_re , num_re , weighted_ , weighted_ , pic_in , pic_in , chroma , deblockin , constrain , redundant
+			TypeOfVLD    :[ VLD_UE , VLD_UE , READ_BITS , READ_BITS , VLD_SE , VLD_SE , VLD_SE , READ_BITS , READ_BITS , READ_BITS ],
+			NbBitsToRead :[                       1     ,     2     ,                                1     ,     1     ,     1     ]
+		end
+
+	ReadNumRefIdx.Done: action
+			ValVLD        :[ValueOfVLD] repeat 10,
+			PicWidthInMbs :[ValPcWdthInMbs]
+				==>
+			DecodeNextNal :[true]
+		do
+			num_ref_idx_l0_active_minus1[pps_id] := ValueOfVLD[0];
+			num_ref_idx_l1_active_minus1[pps_id] := ValueOfVLD[1];
+			weighted_pred_flag[pps_id] := ValueOfVLD[2];
+			weighted_bipred_idc[pps_id] := ValueOfVLD[3];
+			pic_init_qp_minus26[pps_id] := ValueOfVLD[4];
+			pic_init_qs_minus26[pps_id] := ValueOfVLD[5];
+			chroma_qp_index_offset[pps_id] := ValueOfVLD[6];
+			deblocking_filter_control_present_flag[pps_id] := ValueOfVLD[7];
+			constrained_intra_pred_flag[pps_id] :=
+				if(ValueOfVLD[8] = 0) then
+					false
+				else
+					true
+				end;
+			redundant_pic_cnt_present_flag[pps_id] := ValueOfVLD[9];
+			ValPicWidthInMbs := ValPcWdthInMbs;
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tnum_ref_idx_l0_active_minus1 : "+ValueOfVLD[0]);
+				println("\t\tnum_ref_idx_l1_active_minus1 : "+ValueOfVLD[1]);
+				println("\t\tweighted_pred_flag : "+ValueOfVLD[2]);
+				println("\t\tweighted_bipred_idc : "+ValueOfVLD[3]);
+				println("\t\tpic_init_qp_minus26 : "+ValueOfVLD[4]);
+				println("\t\tpic_init_qs_minus26 : "+ValueOfVLD[5]);
+				println("\t\tchroma_qp_index_offset : "+ValueOfVLD[6]);
+				println("\t\tdeblocking_filter_control_present_flag : "+ValueOfVLD[7]);
+				println("\t\tconstrained_intra_pred_flag : "+ValueOfVLD[8]);
+				println("\t\tredundant_pic_cnt_present_flag : "+ValueOfVLD[9]);
+			end
+		end
+
+	AskMoreRbspData: action
+				==>
+		do
+			println("AskMoreRbspData not implemented yet");
+		end
+
+	SendEndPps: action
+			PicHeightInMapUnits :[ValPicHeightInMapUnits]
+				==>
+			TypeOfVLD :[SKIP_NAL]
+		var
+			int ValMaxSliceGroupChgCycle
+		do
+			ValMaxSliceGroupChgCycle     := (ValPicWidthInMbs * ValPicHeightInMapUnits) / (slice_group_change_rate_minus1[pps_id] + 1);
+			//SzSliceGroupChgCycle := log_base2( ValMaxSliceGroupChgCycle ) :
+			ValMaxSliceGroupChgCycle     := ValMaxSliceGroupChgCycle -1;
+			SzSliceGroupChgCycle[pps_id] := 0;
+			while(ValMaxSliceGroupChgCycle != 0)
+			do
+				ValMaxSliceGroupChgCycle     := rshift(ValMaxSliceGroupChgCycle,1);
+				SzSliceGroupChgCycle[pps_id] := SzSliceGroupChgCycle[pps_id] + 1;
+			end
+		end
+
+
+/*   
+*
+* Scheduler
+*
+*/
+
+	schedule fsm AskReadPpsId:
+		AskReadPpsId              (ReadPpsId.Asked                          )--> ReadPpsIdDoneOrPpsAsked;
+
+		ReadPpsIdDoneOrPpsAsked   (PpsParamAsked                            )--> ReadPpsIdDoneOrPpsAsked;
+		ReadPpsIdDoneOrPpsAsked   (ReadPpsId.Done                           )--> CheckNumSliceGroup;
+
+		CheckNumSliceGroup        (ReadSliceGroupMapType.IsAsked            )--> ReadSliceGroupMapType;
+		CheckNumSliceGroup        (ReadNumRefIdx.Asked                      )--> ReadNumRefIdxDone;
+
+		ReadSliceGroupMapType     (ReadSliceGroupMapType.Done               )--> CheckSliceGroupMapType;
+
+		CheckSliceGroupMapType    (CheckSliceGroupMapType.IsEqualTo0        )--> CheckNumSliceGroup4SGM0;
+		CheckSliceGroupMapType    (CheckSliceGroupMapType.IsEqualTo2        )--> CheckNumSliceGroup4SGM2;
+		CheckSliceGroupMapType    (CheckSliceGroupMapType.IsBetween3and5    )--> ReadSliceGroupChangeParam;
+		CheckSliceGroupMapType    (CheckSliceGroupMapType.IsEqualTo6        )-->                                 undefined; //Not implemented yet
+		CheckSliceGroupMapType    (ReadNumRefIdx.Asked                      )--> ReadNumRefIdxDone;
+
+		CheckNumSliceGroup4SGM0   (CheckNumSliceGroup.SliceGroupMapEqualTo0 )--> ReadRunLength;
+		CheckNumSliceGroup4SGM0   (ReadNumRefIdx.Asked                      )--> ReadNumRefIdxDone;
+
+		ReadRunLength             (ReadRunLength.Launch                     )--> ReadRunLength;
+		ReadRunLength             (ReadRunLength.Done                       )--> ReadNumRefIdxAsked;
+
+		CheckNumSliceGroup4SGM2   (CheckNumSliceGroup.SliceGroupMapEqualTo2 )--> ReadTopLeftAndBottomRight;
+		CheckNumSliceGroup4SGM2   (ReadNumRefIdx.Asked                      )--> ReadNumRefIdxDone;
+
+		ReadTopLeftAndBottomRight (ReadTopLeftAndBottomRight.Launch         )--> ReadTopLeftAndBottomRight;
+		ReadTopLeftAndBottomRight (ReadTopLeftAndBottomRight.Done           )--> ReadNumRefIdxAsked;
+
+		ReadSliceGroupChangeParam (ReadSliceGroupChangeParam                )--> ReadNumRefIdxAsked;
+
+		ReadNumRefIdxAsked        (ReadNumRefIdx.Asked                      )--> ReadNumRefIdxDone;
+
+		ReadNumRefIdxDone         (ReadNumRefIdx.Done                       )--> EndPPS;//AskMoreRbspData;
+
+		AskMoreRbspData           (AskMoreRbspData                          )-->                                 undefined; //Not implemented yet
+
+		EndPPS                    (SendEndPps                               )--> AskReadPpsId;
+	end
+	priority
+		PpsParamAsked                            > ReadPpsId.Done;
+		ReadSliceGroupMapType.IsAsked            > ReadNumRefIdx.Asked;
+		CheckSliceGroupMapType                   > ReadNumRefIdx.Asked;
+		CheckNumSliceGroup.SliceGroupMapEqualTo0 > ReadNumRefIdx.Asked;
+		ReadRunLength.Launch                     > ReadRunLength.Done;
+		CheckNumSliceGroup.SliceGroupMapEqualTo2 > ReadNumRefIdx.Asked;
+		ReadTopLeftAndBottomRight.Launch         > ReadTopLeftAndBottomRight.Done;
+	end
+end

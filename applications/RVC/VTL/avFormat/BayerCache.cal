@@ -7,7 +7,7 @@
 *	output: 		outData - 13 parallel outputs for one stage filter
 */
 
-actor BayerCache() 
+actor avFormat.BayerCache() 
 	int (size = 8) inData, 
 	int(size=16) WIDTH,
     int(size=16) HEIGHT

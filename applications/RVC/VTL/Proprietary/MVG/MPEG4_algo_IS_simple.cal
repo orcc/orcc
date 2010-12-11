@@ -23,7 +23,7 @@
 
 
 
-actor MPEG4_algo_IS_simple () int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS_AC ==> int(size=SAMPLE_SZ) PQF_AC :
+actor Proprietary.MVG.MPEG4_algo_IS_simple () int(size=3) AC_PRED_DIR, int(size = SAMPLE_SZ) QFS_AC ==> int(size=SAMPLE_SZ) PQF_AC :
 
 	int SAMPLE_SZ = 13;
 	 

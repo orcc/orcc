@@ -19,7 +19,7 @@
 
 
 
-actor Framebuf_w_Address_16X16 (int INTRA,
+actor Proprietary.E__.Framebuf_w_Address_16X16 (int INTRA,
 	int NEWVOP,
 	int MOTION,
 	int ROUND_TYPE)

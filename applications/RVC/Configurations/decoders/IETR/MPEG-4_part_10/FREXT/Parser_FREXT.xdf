@@ -305,7 +305,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_NALU"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_NALU"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -314,7 +314,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Frext/Algo_Check_NALU_type_Frext"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Frext/Algo_Check_NALU_type_Frext"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -323,7 +323,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodeSps"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_DecodeSps"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -332,7 +332,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_VariableLengthDecoding"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_VariableLengthDecoding"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -341,7 +341,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_VariableLengthDecoding"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_VariableLengthDecoding"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -350,7 +350,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_DecodePps"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_DecodePps"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -362,7 +362,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_VariableLengthDecoding"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_VariableLengthDecoding"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -371,7 +371,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_MMCO"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_MMCO"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -380,7 +380,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_RefList"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_RefList"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -392,7 +392,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_IntraPred_Split"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_IntraPred_Split"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -410,7 +410,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_BlockExpand_AVC"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_BlockExpand_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -419,7 +419,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_BlockSplit_AVC"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_BlockSplit_AVC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -437,7 +437,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Common/Algo_RefList"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Common/Algo_RefList"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -449,7 +449,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Mgnt_Display"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Mgnt_Display"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -461,7 +461,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_RefIdxtoPOC"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Algo_RefIdxtoPOC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -470,7 +470,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_RefIdxtoPOC"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Algo_RefIdxtoPOC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -479,7 +479,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Frext/SelectRefIdx"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Frext/SelectRefIdx"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -488,7 +488,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Mgnt_InterPred"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Mgnt_InterPred"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

@@ -1,0 +1,145 @@
+/* 
+BEGINCOPYRIGHT X
+	
+	Copyright (c) 2004-2005, Xilinx Inc.
+	All rights reserved.
+	
+	Redistribution and use in source and binary forms, 
+	with or without modification, are permitted provided 
+	that the following conditions are met:
+	- Redistributions of source code must retain the above 
+	  copyright notice, this list of conditions and the 
+	  following disclaimer.
+	- Redistributions in binary form must reproduce the 
+	  above copyright notice, this list of conditions and 
+	  the following disclaimer in the documentation and/or 
+	  other materials provided with the distribution.
+	- Neither the name of the copyright holder nor the names 
+	  of its contributors may be used to endorse or promote 
+	  products derived from this software without specific 
+	  prior written permission.
+	
+	THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND 
+	CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, 
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF 
+	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE 
+	DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR 
+	CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
+	SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT 
+	NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; 
+	LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) 
+	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR 
+	OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
+	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+	
+ENDCOPYRIGHT
+*/
+// ACPred.cal
+//
+// Author: David B. Parlour (dave.parlour@xilinx.com)
+
+actor Proprietary.Xilinx.MPEG4_part2.ACPred () int(size=SAMPLE_SZ) AC, int(size=MB_COORD_SZ + 3) PTR, int(size=3) START
+==> int(size=SAMPLE_SZ) OUT :
+
+	int MAXW_IN_MB = 121;
+
+	int MB_COORD_SZ = 8;
+
+	int SAMPLE_SZ = 13;
+
+	int(size=8) count;
+
+	// Use 3 address lines for component index to save address calculation effort
+	// Also, location 0 is reserved for all uncoded blocks. This protocol must
+	// be identical to the buffer addressing in Predict.cal and Sequence.cal, since
+	// pointer values are generated there.
+	int BUF_SIZE = (MAXW_IN_MB + 2) * 8;
+
+	int(size=MB_COORD_SZ + 3) ptr;
+
+	int(size=MB_COORD_SZ + 3) pred_ptr;
+
+	// Initialize to the dummy values needed for uncoded blocks (always mapped to index 0)
+	// Add 4 address lines  so that we can store the left edge and top edge AC values (14 in all).
+	List(type: int(size=SAMPLE_SZ), size=BUF_SIZE * 16) buf := [ 0 : for int k in 1 .. BUF_SIZE * 16 ];
+
+	int(size=4) comp;
+
+	newvop: action START:[ s ] ==>
+	guard
+		s = -2
+	do
+		comp := 0;
+		ptr := 8;
+		// Start at 8, since 0-7 are reserved
+
+	end
+
+	skip: action START:[ s ] ==>
+	guard
+		s < 0
+	do
+		count := 64;
+	end
+
+	bool top;
+
+	bool acpred_flag;
+
+	start: action START:[ s ], PTR:[ p ] ==>
+	do
+		count := 1;
+		pred_ptr := p;
+		top := s = 2;
+		acpred_flag := s != 0;
+	end
+
+	advance: action ==>
+	guard
+		count = 64
+	do
+		comp := comp + 1;
+		if comp = 6 then
+			comp := 0;
+			ptr := if ptr = 8 then
+				BUF_SIZE - 8
+			else
+				ptr - 8
+			end;
+		end
+	end
+
+	copy: action AC:[ ac ] ==> OUT:[ pred ]
+	var
+		int(size=SAMPLE_SZ) pred := ac , int(size=4) v = bitand(count, 7) , int(size=4) h = bitand(
+		rshift(count, 3), 7) , bool top_edge = (h = 0) , bool left_edge = (v = 0) , int(size=5) index = if
+		top_edge then
+			v
+		else
+			bitor(h, 8)
+		end
+	do
+		if acpred_flag and ((top and top_edge) or ((not top) and left_edge)) then
+			pred := pred + buf[bitor(lshift(pred_ptr, 4), index)];
+		end
+		if left_edge or top_edge then
+			buf[bitor(lshift(bitor(ptr, comp), 4), index)] := pred;
+		end
+		count := count + 1;
+	end
+
+	schedule fsm start :
+		start ( newvop ) --> start;
+		start ( skip ) --> pred;
+		start ( start ) --> pred;
+		pred ( copy ) --> pred;
+		pred ( advance ) --> start;
+	end
+
+	priority
+		newvop > skip > start;
+		advance > copy;
+	end
+
+end

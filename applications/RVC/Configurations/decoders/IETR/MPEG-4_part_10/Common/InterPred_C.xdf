@@ -81,7 +81,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Interp_EighthPelBilinear"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Algo_Interp_EighthPelBilinear"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -90,7 +90,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_IntraPred_Add"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Algo_IntraPred_Add"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -102,7 +102,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Interp_Reord"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Algo_Interp_Reord"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

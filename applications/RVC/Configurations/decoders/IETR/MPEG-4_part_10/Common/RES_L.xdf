@@ -119,7 +119,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../../../VTL/Proprietary/IETR/MPEG-4_part_10/Algo_Merge_4x4_to_16x16"/>
+        <Class name="../../../../../VTL/Proprietary/IETR/MPEG4/part10/Algo_Merge_4x4_to_16x16"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

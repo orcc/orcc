@@ -70,7 +70,7 @@
 // * In advance action, indices adjust after every component instead of 6 since now
 //   dealing with a single 8x8 block rather than 6 8x8 blocks.
 
-actor GUC_Algo_DCRinvpred_chroma_8x8 () bool NEW_VOP, int(size=16) WIDTH, bool AC_CODED, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B,
+actor Proprietary.GUC.GUC_Algo_DCRinvpred_chroma_8x8 () bool NEW_VOP, int(size=16) WIDTH, bool AC_CODED, int(size=MB_COORD_SZ) A, int(size=MB_COORD_SZ) B,
 int(size=MB_COORD_SZ) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP, int (size=2)BTYPE, bool AC_PRED ==>
 int(size=SAMPLE_SZ) QF_DC , int(size=MB_COORD_SZ) PTR , int(size=3) AC_PRED_DIR , bool
 SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :

@@ -1,4 +1,4 @@
-actor MPEG4_algo_DCRinvpred (int NEWVOP,
+actor Proprietary.EPFL.MPEG4_algo_DCRinvpred (int NEWVOP,
 	int INTRA,
 	int INTER,
 	int ACCODED,
