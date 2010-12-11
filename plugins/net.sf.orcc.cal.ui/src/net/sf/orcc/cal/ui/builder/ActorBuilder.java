@@ -28,9 +28,7 @@
  */
 package net.sf.orcc.cal.ui.builder;
 
-import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
 import static net.sf.orcc.OrccProperties.PRETTYPRINT_JSON;
-import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,6 +41,7 @@ import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ui.OrccProjectNature;
+import net.sf.orcc.util.ResourceUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -100,16 +99,13 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			return;
 		}
 
-		// retrieve output folder from project
-		// by default output in .generated
-		String outputFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
+		String outputFolder = ResourceUtil.getOutputFolder(project);
 		if (outputFolder == null) {
-			outputFolder = new Path(project.getLocation().toOSString()).append(
-					DEFAULT_OUTPUT).toOSString();
-			project.setPersistentProperty(PROPERTY_OUTPUT, outputFolder);
+			return;
 		}
 		frontend.setOutputFolder(outputFolder);
 
+		// whether IR is to be pretty-printed or not
 		String compactIR = project.getPersistentProperty(PRETTYPRINT_JSON);
 		frontend.setPrettyPrint(Boolean.parseBoolean(compactIR));
 

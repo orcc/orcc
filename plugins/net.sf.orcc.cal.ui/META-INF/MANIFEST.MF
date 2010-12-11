@@ -8,13 +8,14 @@ Bundle-ActivationPolicy: lazy
 Require-Bundle: net.sf.orcc.cal;visibility:=reexport,
  net.sf.orcc.core,
  net.sf.orcc.ui,
+ org.antlr.runtime,
+ org.eclipse.jdt.core,
+ org.eclipse.ui,
  org.eclipse.ui.editors,
  org.eclipse.ui.ide,
+ org.eclipse.xtext.builder,
  org.eclipse.xtext.ui,
- org.eclipse.xtext.ui.shared,
- org.eclipse.ui,
- org.antlr.runtime,
- org.eclipse.xtext.builder
+ org.eclipse.xtext.ui.shared
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Activator: net.sf.orcc.cal.ui.internal.CalActivator
 Import-Package: org.apache.log4j

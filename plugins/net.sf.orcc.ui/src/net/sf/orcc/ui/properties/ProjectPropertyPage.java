@@ -28,30 +28,19 @@
  */
 package net.sf.orcc.ui.properties;
 
-import static net.sf.orcc.OrccProperties.DEFAULT_OUTPUT;
 import static net.sf.orcc.OrccProperties.DEFAULT_PRETTYPRINT;
 import static net.sf.orcc.OrccProperties.PRETTYPRINT_JSON;
-import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
-
-import java.io.File;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 /**
@@ -67,27 +56,11 @@ public class ProjectPropertyPage extends PropertyPage {
 
 	private IProject project;
 
-	private Text textOutput;
-
 	/**
 	 * Creates a new project property page.
 	 */
 	public ProjectPropertyPage() {
 		super();
-	}
-
-	private void browseOutputFolder(Shell shell) {
-		DirectoryDialog dialog = new DirectoryDialog(shell, SWT.NONE);
-		dialog.setMessage("Select output folder:");
-		if (getFolderFromText()) {
-			// set initial directory if it is valid
-			dialog.setFilterPath(textOutput.getText());
-		}
-
-		String dir = dialog.open();
-		if (dir != null) {
-			textOutput.setText(dir);
-		}
 	}
 
 	@Override
@@ -106,42 +79,12 @@ public class ProjectPropertyPage extends PropertyPage {
 
 		Composite container = createTopLevelComposite(composite);
 
-		createControlOutputFolder(container);
 		createControlPrettyPrint(container);
 
 		// apply dialog font to the whole composite
 		applyDialogFont(composite);
 
 		return composite;
-	}
-
-	private void createControlOutputFolder(final Composite parent) {
-		GridData data;
-
-		Label lbl = new Label(parent, SWT.NONE);
-		lbl.setText("Output folder:");
-		lbl.setToolTipText("The folder where IR files will be generated.");
-		data = new GridData(SWT.BEGINNING, SWT.CENTER, false, false);
-		lbl.setLayoutData(data);
-
-		textOutput = new Text(parent, SWT.BORDER | SWT.SINGLE);
-		data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-		textOutput.setLayoutData(data);
-		try {
-			textOutput.setText(project.getPersistentProperty(PROPERTY_OUTPUT));
-		} catch (CoreException e) {
-		}
-
-		Button buttonBrowse = new Button(parent, SWT.PUSH);
-		data = new GridData(SWT.FILL, SWT.CENTER, false, false);
-		buttonBrowse.setLayoutData(data);
-		buttonBrowse.setText("&Browse...");
-		buttonBrowse.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				browseOutputFolder(parent.getShell());
-			}
-		});
 	}
 
 	private void createControlPrettyPrint(Composite parent) {
@@ -182,16 +125,6 @@ public class ProjectPropertyPage extends PropertyPage {
 		return container;
 	}
 
-	private boolean getFolderFromText() {
-		String value = textOutput.getText();
-		File file = new File(value);
-		if (file.isDirectory()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	/**
 	 * Initializes a ProjectReferencePage.
 	 */
@@ -204,13 +137,6 @@ public class ProjectPropertyPage extends PropertyPage {
 				+ "Please read tooltips for more information on configuration properties.");
 
 		try {
-			String outputFolder = project
-					.getPersistentProperty(PROPERTY_OUTPUT);
-			if (outputFolder == null) {
-				project.setPersistentProperty(PROPERTY_OUTPUT, new Path(project
-						.getLocation().toOSString()).append(DEFAULT_OUTPUT)
-						.toOSString());
-			}
 			String prettyPrint = project
 					.getPersistentProperty(PRETTYPRINT_JSON);
 
@@ -227,23 +153,18 @@ public class ProjectPropertyPage extends PropertyPage {
 	protected void performDefaults() {
 		super.performDefaults();
 		// Populate the owner text field with the default value
-		textOutput.setText(DEFAULT_OUTPUT);
 		prettyPrintIR.setSelection(DEFAULT_PRETTYPRINT);
 	}
 
 	@Override
 	public boolean performOk() {
 		try {
-			String oldOutput = project.getPersistentProperty(PROPERTY_OUTPUT);
-			String newOutput = textOutput.getText();
-			project.setPersistentProperty(PROPERTY_OUTPUT, newOutput);
 			String oldPrettyPrint = project
 					.getPersistentProperty(PRETTYPRINT_JSON);
 			String newPrettyPrint = Boolean.toString(prettyPrintIR
 					.getSelection());
 			project.setPersistentProperty(PRETTYPRINT_JSON, newPrettyPrint);
-			if (!newOutput.equals(oldOutput)
-					|| !oldPrettyPrint.equals(newPrettyPrint)) {
+			if (!oldPrettyPrint.equals(newPrettyPrint)) {
 				// build if new value is different from old value
 				project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);
 			}

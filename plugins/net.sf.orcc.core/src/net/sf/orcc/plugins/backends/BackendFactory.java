@@ -33,7 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.COMPILE_XDF;
 import static net.sf.orcc.OrccLaunchConstants.OUTPUT_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
-import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
 import java.io.File;
 import java.util.HashMap;
@@ -43,6 +42,7 @@ import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.plugins.PluginFactory;
 import net.sf.orcc.plugins.PluginOption;
 import net.sf.orcc.ui.OrccActivator;
+import net.sf.orcc.util.ResourceUtil;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -123,7 +123,7 @@ public class BackendFactory extends PluginFactory {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = root.getProject(name);
 
-		String vtlFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
+		String vtlFolder = ResourceUtil.getOutputFolder(project);
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)

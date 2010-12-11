@@ -37,11 +37,6 @@ import org.eclipse.core.runtime.QualifiedName;
  * 
  */
 public interface OrccProperties {
-
-	/**
-	 * Default value for {@value #OUTPUT_FOLDER}.
-	 */
-	public static final String DEFAULT_OUTPUT = ".generated";
 	
 	/**
 	 * Default value for {@value #COMPACTJSON}.
@@ -52,12 +47,6 @@ public interface OrccProperties {
 	 * Prefix for Orcc properties
 	 */
 	public static final String PREFIX = "net.sf.orcc";
-
-	/**
-	 * Property for output folder for Xtext front-end.
-	 */
-	public static final QualifiedName PROPERTY_OUTPUT = new QualifiedName(
-			PREFIX, "outputFolder");
 	
 	/**
 	 * Property for producing compact json for Xtext front-end.

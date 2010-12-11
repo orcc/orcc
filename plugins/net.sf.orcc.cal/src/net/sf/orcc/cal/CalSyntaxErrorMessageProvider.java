@@ -49,17 +49,20 @@ public class CalSyntaxErrorMessageProvider implements
 			MismatchedTokenException mte = (MismatchedTokenException) ex;
 			if ("schedule".equals(mte.token.getText())) {
 				return new SyntaxErrorMessage(
-						"At most one \"schedule\" construct allowed", "dummy");
+						"At most one \"schedule\" construct allowed",
+						CalConstants.ERROR_SCHEDULE);
 			}
 		}
 
-		return new SyntaxErrorMessage(context.getDefaultMessage(), "dummy");
+		return new SyntaxErrorMessage(context.getDefaultMessage(),
+				CalConstants.ERROR_DEFAULT);
 	}
 
 	@Override
 	public SyntaxErrorMessage getSyntaxErrorMessage(
 			IValueConverterErrorContext context) {
-		return new SyntaxErrorMessage(context.getDefaultMessage(), "dummy");
+		return new SyntaxErrorMessage(context.getDefaultMessage(),
+				CalConstants.ERROR_DEFAULT);
 	}
 
 }

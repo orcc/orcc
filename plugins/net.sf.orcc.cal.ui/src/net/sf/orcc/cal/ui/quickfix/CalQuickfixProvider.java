@@ -28,27 +28,62 @@
  */
 package net.sf.orcc.cal.ui.quickfix;
 
-import org.eclipse.xtext.ui.editor.quickfix.DefaultQuickfixProvider;
+import net.sf.orcc.cal.CalConstants;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.xtext.ui.editor.model.IXtextDocument;
+import org.eclipse.xtext.ui.editor.model.edit.IModification;
+import org.eclipse.xtext.ui.editor.model.edit.IModificationContext;
+import org.eclipse.xtext.ui.editor.quickfix.DefaultQuickfixProvider;
+import org.eclipse.xtext.ui.editor.quickfix.Fix;
+import org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor;
+import org.eclipse.xtext.util.Strings;
+import org.eclipse.xtext.validation.Issue;
+
+/**
+ * This class
+ * 
+ * @author Matthieu Wipliez
+ * 
+ */
 public class CalQuickfixProvider extends DefaultQuickfixProvider {
 
-	// org.eclipse.xtext.ui.editor.quickfix.Fix
-	// org.eclipse.xtext.ui.editor.quickfix.IssueResolutionAcceptor
-	// org.eclipse.xtext.validation.Issue
+	@Fix(CalConstants.ERROR_LIST)
+	public void capitalizeList(final Issue issue,
+			IssueResolutionAcceptor acceptor) {
+		acceptor.accept(issue, "Capitalize name", "Capitalize name of type",
+				"upcase.png", new IModification() {
+					public void apply(IModificationContext context)
+							throws BadLocationException {
+						IXtextDocument xtextDocument = context
+								.getXtextDocument();
+						String firstLetter = xtextDocument.get(
+								issue.getOffset(), 1);
+						xtextDocument.replace(issue.getOffset(), 1,
+								Strings.toFirstUpper(firstLetter));
+					}
+				});
+	}
 
-	// @Fix(MyJavaValidator.INVALID_TYPE_NAME)
-	// public void capitalizeName(final Issue issue, IssueResolutionAcceptor
-	// acceptor) {
-	// acceptor.accept(issue, "Capitalize name", "Capitalize name of type",
-	// "upcase.png", new IModification() {
-	// public void apply(IModificationContext context) throws
-	// BadLocationException {
-	// IXtextDocument xtextDocument = context.getXtextDocument();
-	// String firstLetter = xtextDocument.get(issue.getOffset(), 1);
-	// xtextDocument.replace(issue.getOffset(), 1,
-	// Strings.toFirstUpper(firstLetter));
-	// }
-	// });
-	// }
+	@Fix(CalConstants.ERROR_NAME)
+	public void correctEntityName(final Issue issue,
+			IssueResolutionAcceptor acceptor) {
+		String packageName = issue.getData()[0];
+		final String expectedName = issue.getData()[1];
+
+		String message = "Change name from " + packageName + " to "
+				+ expectedName;
+		acceptor.accept(issue, message, message, "upcase.png",
+				new IModification() {
+
+					@Override
+					public void apply(IModificationContext context)
+							throws Exception {
+						IXtextDocument document = context.getXtextDocument();
+						document.replace(issue.getOffset(), issue.getLength(),
+								expectedName);
+					}
+				});
+	}
 
 }

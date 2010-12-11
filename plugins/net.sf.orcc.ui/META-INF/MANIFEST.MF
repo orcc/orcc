@@ -10,6 +10,7 @@ Require-Bundle: net.sf.orcc.core,
  org.eclipse.core.runtime,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
+ org.eclipse.jdt.core,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.xtext.ui

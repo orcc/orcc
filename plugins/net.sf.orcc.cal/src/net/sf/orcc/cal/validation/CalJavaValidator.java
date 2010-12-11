@@ -28,14 +28,13 @@
  */
 package net.sf.orcc.cal.validation;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.orcc.cal.CalConstants;
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstEntity;
@@ -74,8 +73,18 @@ import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
 import net.sf.orcc.util.CollectionsUtil;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.util.SimpleAttributeResolver;
 import org.eclipse.xtext.validation.Check;
@@ -368,10 +377,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	 *            the actor
 	 */
 	private void checkEntityName(AstEntity entity) {
-		// check actor name matches file name
-		String path = entity.eResource().getURI().path();
-		String fileName = new File(path).getName();
-
+		// retrieve name of entity
 		String entityName;
 		AstActor actor = entity.getActor();
 		AstUnit unit = null;
@@ -382,19 +388,82 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			entityName = actor.getName();
 		}
 
-		List<String> tag = Arrays.asList(entityName.split("\\."));
-		String lastSegment = tag.get(tag.size() - 1);
-		if (!fileName.equals(lastSegment + ".cal")) {
-			if (actor == null) {
-				error("Unit " + entityName
-						+ " must be defined in a file named \"" + lastSegment
-						+ ".cal\"", unit, CalPackage.AST_UNIT__NAME);
-			} else {
-				error("Actor " + entityName
-						+ " must be defined in a file named \"" + lastSegment
-						+ ".cal\"", actor, CalPackage.AST_ACTOR__NAME);
-			}
+		// get segments
+		String[] segments = entityName.split("\\.");
+		String lastSegment = segments[segments.length - 1];
+		segments[segments.length - 1] = lastSegment + ".cal";
+
+		// get platform path /project/folder/.../file
+		String platformPath = entity.eResource().getURI()
+				.toPlatformString(true);
+		if (platformPath == null) {
+			return;
 		}
+
+		// get the file (we know it's a file)
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IFile file = (IFile) workspace.getRoot().findMember(platformPath);
+		if (file == null) {
+			return;
+		}
+
+		// get the associated Java project (if any)
+		IProject project = file.getProject();
+		IJavaProject javaProject = JavaCore.create(project);
+		if (!javaProject.exists()) {
+			return;
+		}
+
+		try {
+			IPackageFragmentRoot[] roots = javaProject
+					.getAllPackageFragmentRoots();
+			for (IPackageFragmentRoot root : roots) {
+				IPath rootPath = root.getPath();
+				if (!rootPath.isPrefixOf(file.getFullPath())) {
+					continue;
+				}
+
+				IPath path = rootPath;
+				for (String segment : segments) {
+					path = path.append(segment);
+				}
+
+				IResource res = workspace.getRoot().findMember(path);
+				String expectedName = getExpectedName(rootPath,
+						file.getFullPath());
+				if (res == null) {
+					EObject object;
+					int feature;
+					if (unit == null) {
+						object = actor;
+						feature = CalPackage.AST_ACTOR__NAME;
+					} else {
+						object = unit;
+						feature = CalPackage.AST_UNIT__NAME;
+					}
+
+					error("The qualified name " + entityName
+							+ " does not match the expected name "
+							+ expectedName, object, feature,
+							CalConstants.ERROR_NAME, entityName, expectedName);
+				}
+			}
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private String getExpectedName(IPath rootPath, IPath filePath) {
+		int n = rootPath.matchingFirstSegments(filePath);
+		String[] segments = filePath.removeFileExtension().segments();
+		StringBuilder builder = new StringBuilder();
+		builder.append(segments[n]);
+		for (int i = n + 1; i < segments.length; i++) {
+			builder.append('.');
+			builder.append(segments[i]);
+		}
+
+		return builder.toString();
 	}
 
 	/**

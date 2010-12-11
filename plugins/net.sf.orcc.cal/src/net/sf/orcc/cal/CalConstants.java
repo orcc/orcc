@@ -26,52 +26,22 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
-import org.eclipse.xtext.ui.XtextProjectHelper;
+package net.sf.orcc.cal;
 
 /**
- * This class provides a wizard to create a new Preesm Project.
+ * This class contains constants used by the front-end.
  * 
  * @author Matthieu Wipliez
+ * 
  */
-public class OrccProjectWizard extends BasicNewProjectResourceWizard {
+public interface CalConstants {
 
-	@Override
-	public void addPages() {
-		super.addPages();
-		super.setWindowTitle("New Orcc Project");
-	}
+	public static final String ERROR_DEFAULT = "default";
 
-	@Override
-	protected void initializeDefaultPageImageDescriptor() {
-		super.initializeDefaultPageImageDescriptor();
-	}
+	public static final String ERROR_LIST = "list";
 
-	@Override
-	public boolean performFinish() {
-		boolean finish = super.performFinish();
-		try {
-			IProject project = this.getNewProject();
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 2];
+	public static final String ERROR_NAME = "name";
 
-			System.arraycopy(natures, 0, newNatures, 2, natures.length);
-			newNatures[0] = OrccProjectNature.NATURE_ID;
-			newNatures[1] = XtextProjectHelper.NATURE_ID;
-			newNatures[2] = JavaCore.NATURE_ID;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
+	public static final String ERROR_SCHEDULE = "schedule";
 
-		return finish;
-	}
 }

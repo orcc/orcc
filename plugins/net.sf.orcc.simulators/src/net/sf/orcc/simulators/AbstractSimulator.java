@@ -33,7 +33,6 @@ import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
 import static net.sf.orcc.OrccLaunchConstants.PROJECT;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
-import static net.sf.orcc.OrccProperties.PROPERTY_OUTPUT;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -71,6 +70,7 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.plugins.simulators.Simulator;
+import net.sf.orcc.util.ResourceUtil;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -773,7 +773,7 @@ public abstract class AbstractSimulator implements Simulator {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IProject project = root.getProject(name);
 
-			vtlFolder = project.getPersistentProperty(PROPERTY_OUTPUT);
+			vtlFolder = ResourceUtil.getOutputFolder(project);
 
 			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			xdfFile = configuration.getAttribute(XDF_FILE, "");

@@ -33,6 +33,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
 
 /**
  * This class defines a property tester for the "isVTL" and "isXDF" properties.
@@ -55,14 +56,20 @@ public class OrccPropertyTester extends PropertyTester {
 				return ("xdf".equals(file.getFileExtension()));
 			}
 		} else if ("isOrccProject".equals(property)) {
-			if (receiver instanceof IProject) {
-				IProject project = (IProject) receiver;
-				try {
-					return project.exists() && project.isOpen()
-							&& project.hasNature(OrccProjectNature.NATURE_ID);
-				} catch (CoreException e) {
-					e.printStackTrace();
-				}
+			IProject project;
+			if (receiver instanceof IJavaProject) {
+				project = ((IJavaProject) receiver).getProject();
+			} else if (receiver instanceof IProject) {
+				project = (IProject) receiver;
+			} else {
+				return false;
+			}
+
+			try {
+				return project.exists() && project.isOpen()
+						&& project.hasNature(OrccProjectNature.NATURE_ID);
+			} catch (CoreException e) {
+				e.printStackTrace();
 			}
 		}
 

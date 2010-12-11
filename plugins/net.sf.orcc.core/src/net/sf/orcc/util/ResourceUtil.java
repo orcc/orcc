@@ -26,52 +26,47 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui;
+package net.sf.orcc.util;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
-import org.eclipse.xtext.ui.XtextProjectHelper;
+import org.eclipse.jdt.core.JavaModelException;
 
 /**
- * This class provides a wizard to create a new Preesm Project.
+ * This class contains utility methods for dealing with resources.
  * 
  * @author Matthieu Wipliez
+ * 
  */
-public class OrccProjectWizard extends BasicNewProjectResourceWizard {
+public class ResourceUtil {
 
-	@Override
-	public void addPages() {
-		super.addPages();
-		super.setWindowTitle("New Orcc Project");
-	}
-
-	@Override
-	protected void initializeDefaultPageImageDescriptor() {
-		super.initializeDefaultPageImageDescriptor();
-	}
-
-	@Override
-	public boolean performFinish() {
-		boolean finish = super.performFinish();
-		try {
-			IProject project = this.getNewProject();
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 2];
-
-			System.arraycopy(natures, 0, newNatures, 2, natures.length);
-			newNatures[0] = OrccProjectNature.NATURE_ID;
-			newNatures[1] = XtextProjectHelper.NATURE_ID;
-			newNatures[2] = JavaCore.NATURE_ID;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, null);
-		} catch (CoreException e) {
-			e.printStackTrace();
+	/**
+	 * Returns the output location of the given project.
+	 * 
+	 * @param project
+	 *            a project
+	 * @return the output location of the given project, or <code>null</code> if
+	 *         none is found
+	 */
+	public static String getOutputFolder(IProject project) {
+		// retrieve output folder from project
+		IJavaProject javaProject = JavaCore.create(project);
+		if (!javaProject.exists()) {
+			return null;
 		}
 
-		return finish;
+		IPath path;
+		try {
+			path = javaProject.getOutputLocation();
+			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+			return root.getFile(path).getLocation().toOSString();
+		} catch (JavaModelException e) {
+			return null;
+		}
 	}
+
 }
