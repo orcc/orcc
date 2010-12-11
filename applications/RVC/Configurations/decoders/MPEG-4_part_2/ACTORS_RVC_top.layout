@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+   <vertices>
+      <vertex id="decoder" x="264" y="70"/>
+      <vertex id="art_Source_bin" x="57" y="95"/>
+      <vertex id="art_Display_yuv_width_height" x="446" y="70"/>
+   </vertices>
+</layout>
