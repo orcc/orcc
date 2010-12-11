@@ -28,9 +28,7 @@
  */
 package net.sf.orcc.debug.model;
 
-import static net.sf.orcc.OrccLaunchConstants.ACTIVATE_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.BACKEND;
-import static net.sf.orcc.OrccLaunchConstants.DEFAULT_BACKEND;
 import static net.sf.orcc.OrccLaunchConstants.SIMULATOR;
 
 import java.io.IOException;
