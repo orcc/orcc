@@ -1,4 +1,4 @@
-actor DataSource (int NUM) ==> int O :
+actor Fifo.DataSource (int NUM) ==> int O :
 
 	int count := 0;
 

@@ -1,4 +1,4 @@
-actor Compute () int I ==> int O :
+actor Fifo.Compute () int I ==> int O :
 
 	int(size=64) sum := 0;
 

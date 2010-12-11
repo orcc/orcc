@@ -14,5 +14,6 @@
 	<natures>
 		<nature>net.sf.orcc.ui.OrccNature</nature>
 		<nature>org.eclipse.xtext.ui.shared.xtextNature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
 </projectDescription>

@@ -1,0 +1,5 @@
+actor DuplicatePort1 () int(size=3) I ==> int(size=3) O :
+
+	list toto;
+
+end

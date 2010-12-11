@@ -1,4 +1,4 @@
-import net.sf.orcc.ImportUnit.*;
+import ImportUnit.*;
 
 actor Importer () ==> :
 

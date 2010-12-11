@@ -40,7 +40,7 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 // Read row queue and write pairs of data to IDCT FairMerge
-actor Xilinx_rowSort () int(size=sz) ROW ==> int(size=sz) Y0 , int(size=sz) Y1 :
+actor iDCT.Xilinx_rowSort () int(size=sz) ROW ==> int(size=sz) Y0 , int(size=sz) Y1 :
 
 	int sz = 13;
 

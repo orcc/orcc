@@ -40,7 +40,7 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 // Halve the token rate (needed in idct2d pipeline)
-actor Xilinx_downsample () bool R ==> bool R2 :
+actor iDCT.Xilinx_downsample () bool R ==> bool R2 :
 
 	a0: action R:[ r ] ==>
 	end

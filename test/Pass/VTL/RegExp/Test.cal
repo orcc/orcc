@@ -1,4 +1,4 @@
-actor Test() int In ==>:
+actor RegExp.Test() int In ==>:
 
 	int letter_a = 1;
 	int letter_b = 2;

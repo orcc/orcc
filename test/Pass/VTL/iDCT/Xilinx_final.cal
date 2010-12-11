@@ -41,7 +41,7 @@ ENDCOPYRIGHT
 //
 // Final IDCT scaling in idct1d pipeline
 
-actor Xilinx_final () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3 ==>
+actor iDCT.Xilinx_final () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3 ==>
 int(size=osz) Y0 , int(size=osz) Y1 , int(size=osz) Y2 , int(size=osz) Y3 :
 
 	int isz = 24;

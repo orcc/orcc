@@ -42,7 +42,7 @@ ENDCOPYRIGHT
 // Take pairs of row/col data and repackage in quads as follows:
 //  Input   {0,1} {2,3}
 // Output   {0,2,1,3}
-actor Xilinx_shuffleFly () int(size=sz) X0, int(size=sz) X1 ==> int(size=sz) Y0 , int(size=sz) Y1 ,
+actor iDCT.Xilinx_shuffleFly () int(size=sz) X0, int(size=sz) X1 ==> int(size=sz) Y0 , int(size=sz) Y1 ,
 int(size=sz) Y2 , int(size=sz) Y3 :
 
 	int sz = 24;

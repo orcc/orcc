@@ -39,7 +39,7 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 // Limit pixel value to either [0,255] or [-255,255]
-actor Xilinx_clip () int(size=isz) I, bool SIGNED ==> int(size=osz) O :
+actor iDCT.Xilinx_clip () int(size=isz) I, bool SIGNED ==> int(size=osz) O :
 
 	int isz = 10;
 
