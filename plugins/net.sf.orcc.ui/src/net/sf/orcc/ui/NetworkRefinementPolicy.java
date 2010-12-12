@@ -28,14 +28,15 @@
  */
 package net.sf.orcc.ui;
 
+import net.sf.graphiti.model.DefaultRefinementPolicy;
+import net.sf.graphiti.model.Vertex;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-
-import net.sf.graphiti.model.DefaultRefinementPolicy;
-import net.sf.graphiti.model.Vertex;
+import org.eclipse.core.runtime.Path;
 
 /**
  * This class extends the default refinement policy with XDF-specific policy.
@@ -45,12 +46,37 @@ import net.sf.graphiti.model.Vertex;
  */
 public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 
+	private final String[] fileExtensions = { "cal", "nl", "xdf" };
+
+	@Override
+	public String getNewRefinement(Vertex vertex) {
+		String newRefinement = super.getNewRefinement(vertex);
+		if (newRefinement == null) {
+			return null;
+		}
+
+		for (String extension : fileExtensions) {
+			IPath path = getAbsolutePath(vertex.getParent().getFileName(),
+					newRefinement);
+			if (extension.equals(path.getFileExtension())) {
+				return new Path(newRefinement).removeFileExtension().toString();
+			}
+		}
+
+		return null;
+
+	}
+
 	@Override
 	public IFile getRefinementFile(Vertex vertex) {
-		IPath path = getRefinementAbsolutePath(vertex);
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		String refinement = getRefinement(vertex);
+		if (refinement == null) {
+			return null;
+		}
 
-		String[] fileExtensions = { "cal", "nl", "xdf" };
+		IPath path = getAbsolutePath(vertex.getParent().getFileName(),
+				refinement);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		for (String extension : fileExtensions) {
 			IPath extPath = path.addFileExtension(extension);
 			IResource resource = root.findMember(extPath);
@@ -60,11 +86,6 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 		}
 
 		return null;
-	}
-
-	@Override
-	public boolean editRefinement(Vertex vertex) {
-		return false;
 	}
 
 }
