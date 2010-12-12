@@ -4,7 +4,8 @@ Bundle-Name: Orcc UI
 Bundle-SymbolicName: net.sf.orcc.ui;singleton:=true
 Bundle-Version: 0.9.1.v20101124
 Bundle-Activator: net.sf.orcc.ui.OrccActivator
-Require-Bundle: net.sf.orcc.core,
+Require-Bundle: net.sf.graphiti.model,
+ net.sf.orcc.core,
  org.eclipse.core.expressions,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
