@@ -560,12 +560,14 @@ public class Network {
 	 * connections actually point to ports defined in actors. Instantiating an
 	 * actor implies first loading it and then giving it the right parameters.
 	 * 
+	 * @param paths
+	 *            a list of paths
 	 * @throws OrccException
 	 *             if an actor could not be instantiated, or a connection is
 	 *             wrong
 	 */
-	public void instantiate(String path) throws OrccException {
-		new Instantiator(path).transform(this);
+	public void instantiate(List<String> paths) throws OrccException {
+		new Instantiator(paths).transform(this);
 	}
 
 	/**
@@ -588,7 +590,7 @@ public class Network {
 	 *             if something goes wrong
 	 */
 	public void normalizeActors() throws OrccException {
-		for (Actor actor : getActors()){
+		for (Actor actor : getActors()) {
 			new ActorNormalizer().transform(actor);
 		}
 	}

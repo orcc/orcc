@@ -112,7 +112,7 @@ public class BackendFactory extends PluginFactory {
 			output.mkdir();
 			outputFolder = output.getAbsolutePath();
 		}
-		
+
 		String backend = configuration.getAttribute(BACKEND, "");
 
 		Backend backendObj = (Backend) plugins.get(backend);
@@ -123,11 +123,11 @@ public class BackendFactory extends PluginFactory {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = root.getProject(name);
 
-		String vtlFolder = ResourceUtil.getOutputFolder(project);
+		List<String> vtlFolders = ResourceUtil.getOutputFolders(project);
 
 		// always compile VTL.
 		// an actor is only compiled if it needs to (based on modification date)
-		backendObj.compileVTL(process, vtlFolder);
+		backendObj.compileVTL(process, vtlFolders);
 
 		if (configuration.getAttribute(COMPILE_XDF, false)) {
 			String xdfFile = configuration.getAttribute(XDF_FILE, "");

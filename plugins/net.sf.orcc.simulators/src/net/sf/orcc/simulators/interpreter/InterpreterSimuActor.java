@@ -140,7 +140,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	 */
 	public InterpreterSimuActor(String instanceId,
 			Map<String, Expression> actorParameters, Actor actorIR,
-			String outputFolder, OrccProcess process) {
+			List<String> vtlFolders, OrccProcess process) {
 		this.process = process;
 
 		this.instanceId = instanceId;

@@ -91,7 +91,7 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 		} else {
 			// Generic simulator actor
 			simuActorInstance = new InterpreterSimuActor(instanceId,
-					actorParameters, actorIR, vtlFolder, process);
+					actorParameters, actorIR, vtlFolders, process);
 		}
 		
 		return simuActorInstance;

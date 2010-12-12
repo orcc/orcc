@@ -28,9 +28,13 @@
  */
 package net.sf.orcc.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -67,6 +71,33 @@ public class ResourceUtil {
 		} catch (JavaModelException e) {
 			return null;
 		}
+	}
+
+	/**
+	 * Returns the output locations of the given project and the project it
+	 * references in its build path.
+	 * 
+	 * @param project
+	 *            a project
+	 * @return the output location of the given project, or an empty list
+	 */
+	public static List<String> getOutputFolders(IProject project)
+			throws CoreException {
+		List<String> vtlFolders = new ArrayList<String>();
+		vtlFolders.add(ResourceUtil.getOutputFolder(project));
+
+		IJavaProject javaProject = JavaCore.create(project);
+		if (!javaProject.exists()) {
+			return vtlFolders;
+		}
+
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		for (String name : javaProject.getRequiredProjectNames()) {
+			IProject refProject = root.getProject(name);
+			vtlFolders.add(getOutputFolder(refProject));
+		}
+
+		return vtlFolders;
 	}
 
 }

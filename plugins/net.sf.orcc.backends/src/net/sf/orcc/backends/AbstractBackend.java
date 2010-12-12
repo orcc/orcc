@@ -32,12 +32,12 @@ import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -101,13 +101,14 @@ public abstract class AbstractBackend implements Backend {
 			String[] args) {
 		if (args.length == 3) {
 			String inputFile = args[0];
-			String vtlFolder = args[1];
+			List<String> vtlFolders = Arrays.asList(args[1]
+					.split(File.pathSeparator));
 			String outputFolder = args[2];
 
 			try {
 				AbstractBackend backend = clasz.newInstance();
 				backend.setOutputFolder(outputFolder);
-				backend.compileVTL(null, vtlFolder);
+				backend.compileVTL(null, vtlFolders);
 				backend.compileXDF(null, inputFile);
 			} catch (Exception e) {
 				System.err.println("Could not print \"" + args[0] + "\"");
@@ -142,26 +143,22 @@ public abstract class AbstractBackend implements Backend {
 	/**
 	 * Path of the folder that contains VTL under IR form.
 	 */
-	private String vtlFolder;
+	private List<String> vtlFolders;
 
 	@Override
-	final public void compileVTL(OrccProcess process, String vtlFolder)
+	final public void compileVTL(OrccProcess process, List<String> vtlFolders)
 			throws OrccException {
 		this.process = process;
-		this.vtlFolder = vtlFolder;
+		this.vtlFolders = vtlFolders;
 
 		// lists actors
 		write("Lists actors...\n");
-		File[] files = new File(vtlFolder).listFiles(new FileFilter() {
+		List<File> vtlFiles = new ArrayList<File>();
+		for (String folder : vtlFolders) {
+			findFiles(vtlFiles, new File(folder));
+		}
 
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.getName().endsWith(".json");
-			}
-
-		});
-
-		Arrays.sort(files, new Comparator<File>() {
+		Collections.sort(vtlFiles, new Comparator<File>() {
 
 			@Override
 			public int compare(File f1, File f2) {
@@ -169,7 +166,7 @@ public abstract class AbstractBackend implements Backend {
 			}
 
 		});
-		doVtlCodeGeneration(Arrays.asList(files));
+		doVtlCodeGeneration(vtlFiles);
 	}
 
 	@Override
@@ -186,7 +183,7 @@ public abstract class AbstractBackend implements Backend {
 		network.updateIdentifiers();
 
 		write("Instantiating actors...\n");
-		network.instantiate(vtlFolder);
+		network.instantiate(vtlFolders);
 		Network.clearActorPool();
 		write("Instantiation done\n");
 
@@ -267,6 +264,16 @@ public abstract class AbstractBackend implements Backend {
 			return numCached;
 		} catch (InterruptedException e) {
 			throw new OrccException("actors could not be printed", e);
+		}
+	}
+
+	private void findFiles(List<File> vtlFiles, File vtl) {
+		for (File file : vtl.listFiles()) {
+			if (file.isDirectory()) {
+				findFiles(vtlFiles, file);
+			} else if (file.getName().endsWith(".json")) {
+				vtlFiles.add(file);
+			}
 		}
 	}
 

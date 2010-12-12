@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.network.transformations;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -58,16 +59,16 @@ public class Instantiator implements INetworkTransformation {
 
 	private Network network;
 
-	private String path;
+	private List<String> paths;
 
 	/**
 	 * Creates a new instantiator that will look up actors in the given path.
 	 * 
-	 * @param path
-	 *            the path where actors should be looked up
+	 * @param paths
+	 *            the paths where actors should be looked up
 	 */
-	public Instantiator(String path) {
-		this.path = path;
+	public Instantiator(List<String> paths) {
+		this.paths = paths;
 	}
 
 	/**
@@ -175,11 +176,11 @@ public class Instantiator implements INetworkTransformation {
 				Instance instance = vertex.getInstance();
 				if (instance.isNetwork()) {
 					// instantiate the child network
-					instance.getNetwork().instantiate(path);
+					instance.getNetwork().instantiate(paths);
 				} else {
 					// at this point there are only actors and networks, so if
 					// it is not a network it's an actor: instantiate it
-					instance.instantiate(path);
+					instance.instantiate(paths);
 				}
 			}
 		}

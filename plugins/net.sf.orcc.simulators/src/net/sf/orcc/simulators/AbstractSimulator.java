@@ -166,7 +166,7 @@ public abstract class AbstractSimulator implements Simulator {
 	 */
 	protected String stimulusFile;
 
-	protected String vtlFolder;
+	protected List<String> vtlFolders;
 
 	/**
 	 * input XDF network file name
@@ -461,7 +461,7 @@ public abstract class AbstractSimulator implements Simulator {
 		Network network = new XDFParser(xdfFile).parseNetwork();
 
 		// Instantiate the network
-		network.instantiate(vtlFolder);
+		network.instantiate(vtlFolders);
 		Network.clearActorPool();
 
 		// Flatten the hierarchical network
@@ -773,7 +773,7 @@ public abstract class AbstractSimulator implements Simulator {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IProject project = root.getProject(name);
 
-			vtlFolder = ResourceUtil.getOutputFolder(project);
+			vtlFolders = ResourceUtil.getOutputFolders(project);
 
 			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			xdfFile = configuration.getAttribute(XDF_FILE, "");

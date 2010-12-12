@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.plugins.backends;
 
+import java.util.List;
+
 import net.sf.orcc.OrccException;
 import net.sf.orcc.debug.model.OrccProcess;
 import net.sf.orcc.plugins.Plugin;
@@ -47,12 +49,13 @@ public interface Backend extends Plugin {
 	 * @param process
 	 *            the process that launched the back-end, so we can report
 	 *            messages to it
-	 * @param vtlFolder
-	 *            absolute path of folder that contains IR files
+	 * @param vtlFolders
+	 *            absolute path of folders that contains IR files
 	 * @throws OrccException
 	 *             if something goes wrong
 	 */
-	void compileVTL(OrccProcess process, String vtlFolder) throws OrccException;
+	void compileVTL(OrccProcess process, List<String> vtlFolders)
+			throws OrccException;
 
 	/**
 	 * Loads a hierarchical XDF network and compile it. Compilation may include
