@@ -28,6 +28,12 @@
  */
 package net.sf.orcc.ui;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+
 import net.sf.graphiti.model.DefaultRefinementPolicy;
 import net.sf.graphiti.model.Vertex;
 
@@ -38,12 +44,24 @@ import net.sf.graphiti.model.Vertex;
  * 
  */
 public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
-	
+
 	@Override
-	public String getRefinement(Vertex vertex) {
-		return super.getRefinement(vertex) + ".cal";
+	public IFile getRefinementFile(Vertex vertex) {
+		IPath path = getRefinementAbsolutePath(vertex);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+		String[] fileExtensions = { "cal", "nl", "xdf" };
+		for (String extension : fileExtensions) {
+			IPath extPath = path.addFileExtension(extension);
+			IResource resource = root.findMember(extPath);
+			if (resource != null && resource.getType() == IResource.FILE) {
+				return (IFile) resource;
+			}
+		}
+
+		return null;
 	}
-	
+
 	@Override
 	public boolean editRefinement(Vertex vertex) {
 		return false;
