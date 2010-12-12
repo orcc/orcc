@@ -28,24 +28,33 @@
  */
 package net.sf.orcc.cal.ui.contentassist;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstPort;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.CalFactory;
+import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.CalActionList;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CrossReference;
+import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.resource.IEObjectDescription;
+import org.eclipse.xtext.scoping.IScope;
 import org.eclipse.xtext.ui.editor.contentassist.ContentAssistContext;
 import org.eclipse.xtext.ui.editor.contentassist.ICompletionProposalAcceptor;
 
@@ -57,6 +66,62 @@ import com.google.common.base.Predicate;
  * how to customize content assistant
  */
 public class CalProposalProvider extends AbstractCalProposalProvider {
+
+	/**
+	 * Adds the name of units that contain objects referenceable from the model
+	 * using the given reference.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param reference
+	 *            a reference
+	 * @param units
+	 *            a set of units
+	 */
+	private void addUnits(EObject model, EReference reference, Set<String> units) {
+		IScope scope = getScopeProvider().getScope(model, reference);
+		Iterable<IEObjectDescription> candidates = scope.getAllContents();
+		for (IEObjectDescription candidate : candidates) {
+			URI uri = candidate.getEObjectURI();
+			uri = uri.trimFragment();
+			EObject obj = model.eResource().getResourceSet()
+					.getResource(uri, true).getContents().get(0);
+			if (obj instanceof AstEntity) {
+				AstEntity entity = (AstEntity) obj;
+				AstUnit unit = entity.getUnit();
+				if (unit != null) {
+					String name = unit.getName();
+					units.add(name);
+				}
+			}
+		}
+	}
+
+	public void complete_QualifiedNameWithWildCard(EObject model,
+			RuleCall ruleCall, ContentAssistContext context,
+			ICompletionProposalAcceptor acceptor) {
+		if (model != null) {
+			// the set of units that contain variables
+			Set<String> units = new HashSet<String>();
+
+			// find all variables to which we have access and are in units
+			EReference reference = CalPackage.eINSTANCE
+					.getAstVariableReference_Variable();
+			addUnits(model, reference, units);
+
+			// find all functions to which we have access and are in units
+			reference = CalPackage.eINSTANCE.getAstExpressionCall_Function();
+			addUnits(model, reference, units);
+
+			for (String unit : units) {
+				if (!acceptor.canAcceptMoreProposals())
+					return;
+				ICompletionProposal proposal = createCompletionProposal(unit
+						+ ".*", context);
+				acceptor.accept(proposal);
+			}
+		}
+	}
 
 	public void completeInequality_Tags(EObject model, Assignment assignment,
 			ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
