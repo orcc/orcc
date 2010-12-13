@@ -1,164 +1,163 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Xilinx_acdc">
-    <!-- ************************************** -->
-    <!-- Input ports of the Graph               -->
-    <!-- ************************************** -->
-    <Port kind="Input" name="BTYPE">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="data">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="Qp">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-            </Entry>
-        </Type>
-    </Port>
-    <!-- ************************************** -->
-    <!-- Output ports of the Graph              -->
-    <!-- ************************************** -->
-    <Port kind="Output" name="signed">
-        <Type name="bool"/>
-    </Port>
-    <Port kind="Output" name="out">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
-    <!-- ************************************** -->
-    <!-- Variables and Parameters of the Graph  -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Instances of the Graph                 -->
-    <!-- ************************************** -->
-    <Instance id="seq">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/Sequence"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="dcsplit">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/DCSplit"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="dcpred">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/DCPred"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="zzaddr">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/ZigzagAddr"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="zigzag">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/Zigzag"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="acpred">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/ACPred"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="dequant">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/Dequant"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <!-- ************************************** -->
-    <!-- Connections of the Graph               -->
-    <!-- ************************************** -->
-    <Connection dst="seq" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="dcpred" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="dcsplit" dst-port="IN" src="" src-port="data"/>
-    <Connection dst="dcpred" dst-port="A" src="seq" src-port="A"/>
-    <Connection dst="dcpred" dst-port="B" src="seq" src-port="B"/>
-    <Connection dst="dcpred" dst-port="C" src="seq" src-port="C"/>
-    <Connection dst="dcpred" dst-port="IN" src="dcsplit" src-port="DC"/>
-    <Connection dst="zigzag" dst-port="AC" src="dcsplit" src-port="AC">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="64"/>
-            </Expr>
-        </Attribute>
-    </Connection>
-    <Connection dst="" dst-port="signed" src="dcpred" src-port="SIGNED"/>
-    <Connection dst="dequant" dst-port="QP" src="dcpred" src-port="QUANT">
-        <Attribute kind="Value" name="bufferSize">
+<?xml version="1.0" encoding="UTF-8"?><XDF name="Xilinx_acdc">
+   <!-- ************************************** -->
+   <!-- Input ports of the Graph               -->
+   <!-- ************************************** -->
+   <Port kind="Input" name="BTYPE">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="12"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="data">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="13"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="Qp">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
             <Expr kind="Literal" literal-kind="Integer" value="6"/>
-        </Attribute>
-    </Connection>
-    <Connection dst="dequant" dst-port="DC" src="dcpred" src-port="OUT">
-        <Attribute kind="Value" name="bufferSize">
+         </Entry>
+      </Type>
+   </Port>
+   <!-- ************************************** -->
+   <!-- Output ports of the Graph              -->
+   <!-- ************************************** -->
+   <Port kind="Output" name="signed">
+      <Type name="bool"/>
+   </Port>
+   <Port kind="Output" name="out">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="13"/>
+         </Entry>
+      </Type>
+   </Port>
+   <!-- ************************************** -->
+   <!-- Variables and Parameters of the Graph  -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Instances of the Graph                 -->
+   <!-- ************************************** -->
+   <Instance id="seq">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.Sequence"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="dcsplit">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.DCSplit"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="dcpred">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.DCPred"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="zzaddr">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.ZigzagAddr"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="zigzag">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.Zigzag"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="acpred">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.ACPred"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="dequant">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.Dequant"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <!-- ************************************** -->
+   <!-- Connections of the Graph               -->
+   <!-- ************************************** -->
+   <Connection dst="seq" dst-port="BTYPE" src="" src-port="BTYPE"/>
+   <Connection dst="dcpred" dst-port="BTYPE" src="" src-port="BTYPE"/>
+   <Connection dst="dcsplit" dst-port="IN" src="" src-port="data"/>
+   <Connection dst="dcpred" dst-port="A" src="seq" src-port="A"/>
+   <Connection dst="dcpred" dst-port="B" src="seq" src-port="B"/>
+   <Connection dst="dcpred" dst-port="C" src="seq" src-port="C"/>
+   <Connection dst="dcpred" dst-port="IN" src="dcsplit" src-port="DC"/>
+   <Connection dst="zigzag" dst-port="AC" src="dcsplit" src-port="AC">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="BinOpSeq">
             <Expr kind="Literal" literal-kind="Integer" value="6"/>
-        </Attribute>
-    </Connection>
-    <Connection dst="acpred" dst-port="PTR" src="dcpred" src-port="PTR"/>
-    <Connection dst="zzaddr" dst-port="START" src="dcpred" src-port="START"/>
-    <Connection dst="zigzag" dst-port="START" src="dcpred" src-port="START"/>
-    <Connection dst="acpred" dst-port="START" src="dcpred" src-port="START"/>
-    <Connection dst="zigzag" dst-port="ADDR" src="zzaddr" src-port="ADDR"/>
-    <Connection dst="acpred" dst-port="AC" src="zigzag" src-port="OUT">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="64"/>
-            </Expr>
-        </Attribute>
-    </Connection>
-    <Connection dst="dequant" dst-port="AC" src="acpred" src-port="OUT">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="63"/>
-            </Expr>
-        </Attribute>
-    </Connection>
-    <Connection dst="" dst-port="out" src="dequant" src-port="OUT"/>
-    <Connection dst="dcpred" dst-port="QP" src="" src-port="Qp"/>
+            <Op name="*"/>
+            <Expr kind="Literal" literal-kind="Integer" value="64"/>
+         </Expr>
+      </Attribute>
+   </Connection>
+   <Connection dst="" dst-port="signed" src="dcpred" src-port="SIGNED"/>
+   <Connection dst="dequant" dst-port="QP" src="dcpred" src-port="QUANT">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="Literal" literal-kind="Integer" value="6"/>
+      </Attribute>
+   </Connection>
+   <Connection dst="dequant" dst-port="DC" src="dcpred" src-port="OUT">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="Literal" literal-kind="Integer" value="6"/>
+      </Attribute>
+   </Connection>
+   <Connection dst="acpred" dst-port="PTR" src="dcpred" src-port="PTR"/>
+   <Connection dst="zzaddr" dst-port="START" src="dcpred" src-port="START"/>
+   <Connection dst="zigzag" dst-port="START" src="dcpred" src-port="START"/>
+   <Connection dst="acpred" dst-port="START" src="dcpred" src-port="START"/>
+   <Connection dst="zigzag" dst-port="ADDR" src="zzaddr" src-port="ADDR"/>
+   <Connection dst="acpred" dst-port="AC" src="zigzag" src-port="OUT">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="BinOpSeq">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            <Op name="*"/>
+            <Expr kind="Literal" literal-kind="Integer" value="64"/>
+         </Expr>
+      </Attribute>
+   </Connection>
+   <Connection dst="dequant" dst-port="AC" src="acpred" src-port="OUT">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="BinOpSeq">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            <Op name="*"/>
+            <Expr kind="Literal" literal-kind="Integer" value="63"/>
+         </Expr>
+      </Attribute>
+   </Connection>
+   <Connection dst="" dst-port="out" src="dequant" src-port="OUT"/>
+   <Connection dst="dcpred" dst-port="QP" src="" src-port="Qp"/>
 </XDF>

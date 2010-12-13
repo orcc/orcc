@@ -1,182 +1,181 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Xilinx_motion">
-    <!-- ************************************** -->
-    <!-- Input ports of the Graph               -->
-    <!-- ************************************** -->
-    <Port kind="Input" name="MV">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="BTYPE">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="12"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="TEX">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="MCD">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <!-- ************************************** -->
-    <!-- Output ports of the Graph              -->
-    <!-- ************************************** -->
-    <Port kind="Output" name="MBD">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="MBA">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="MCA">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="VID">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
-            </Entry>
-        </Type>
-    </Port>
-    <!-- ************************************** -->
-    <!-- Variables and Parameters of the Graph  -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Instances of the Graph                 -->
-    <!-- ************************************** -->
-    <Instance id="memorymanager">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/MemoryManager"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="mbpack">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/MBPacker"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="searchwin">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/SearchWindow"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="unpack">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/Unpack"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="interpolate">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG-4_part_2/Algo_Interpolation_halfpel"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="add">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG4_part2/Add"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <!-- ************************************** -->
-    <!-- Connections of the Graph               -->
-    <!-- ************************************** -->
-    <Connection dst="searchwin" dst-port="MV" src="" src-port="MV"/>
-    <Connection dst="unpack" dst-port="MV" src="" src-port="MV"/>
-    <Connection dst="memorymanager" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="searchwin" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="unpack" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="add" dst-port="BTYPE" src="" src-port="BTYPE"/>
-    <Connection dst="add" dst-port="TEX" src="" src-port="TEX"/>
-    <Connection dst="mbpack" dst-port="AI" src="memorymanager" src-port="WA">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="Literal" literal-kind="Integer" value="3"/>
-        </Attribute>
-    </Connection>
-    <Connection dst="" dst-port="MCA" src="memorymanager" src-port="RA"/>
-    <Connection dst="" dst-port="MBD" src="mbpack" src-port="DO"/>
-    <Connection dst="" dst-port="MBA" src="mbpack" src-port="AO"/>
-    <Connection dst="searchwin" dst-port="DI" src="" src-port="MCD"/>
-    <Connection dst="unpack" dst-port="DI" src="searchwin" src-port="DO"/>
-    <Connection dst="interpolate" dst-port="halfpel" src="searchwin" src-port="FLAGS"/>
-    <Connection dst="interpolate" dst-port="RD" src="unpack" src-port="DO">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="81"/>
-            </Expr>
-        </Attribute>
-    </Connection>
-    <Connection dst="add" dst-port="MOT" src="interpolate" src-port="MOT">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="64"/>
-            </Expr>
-        </Attribute>
-    </Connection>
-    <Connection dst="mbpack" dst-port="DI" src="add" src-port="VID">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="64"/>
-            </Expr>
-        </Attribute>
-    </Connection>
-    <Connection dst="" dst-port="VID" src="add" src-port="VID">
-        <Attribute kind="Value" name="bufferSize">
-            <Expr kind="BinOpSeq">
-                <Expr kind="Literal" literal-kind="Integer" value="6"/>
-                <Op name="*"/>
-                <Expr kind="Literal" literal-kind="Integer" value="64"/>
-            </Expr>
-        </Attribute>
-    </Connection>
+<?xml version="1.0" encoding="UTF-8"?><XDF name="Xilinx_motion">
+   <!-- ************************************** -->
+   <!-- Input ports of the Graph               -->
+   <!-- ************************************** -->
+   <Port kind="Input" name="MV">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="9"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="BTYPE">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="12"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="TEX">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="9"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Input" name="MCD">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="32"/>
+         </Entry>
+      </Type>
+   </Port>
+   <!-- ************************************** -->
+   <!-- Output ports of the Graph              -->
+   <!-- ************************************** -->
+   <Port kind="Output" name="MBD">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="32"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Output" name="MBA">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="32"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Output" name="MCA">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="32"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Output" name="VID">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="9"/>
+         </Entry>
+      </Type>
+   </Port>
+   <!-- ************************************** -->
+   <!-- Variables and Parameters of the Graph  -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Instances of the Graph                 -->
+   <!-- ************************************** -->
+   <Instance id="memorymanager">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.MemoryManager"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="mbpack">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.MBPacker"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="searchwin">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.SearchWindow"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="unpack">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.Unpack"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="interpolate">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="MPEG.MPEG4.part2.Algo_Interpolation_halfpel"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="add">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.Add"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <!-- ************************************** -->
+   <!-- Connections of the Graph               -->
+   <!-- ************************************** -->
+   <Connection dst="searchwin" dst-port="MV" src="" src-port="MV"/>
+   <Connection dst="unpack" dst-port="MV" src="" src-port="MV"/>
+   <Connection dst="memorymanager" dst-port="BTYPE" src="" src-port="BTYPE"/>
+   <Connection dst="searchwin" dst-port="BTYPE" src="" src-port="BTYPE"/>
+   <Connection dst="unpack" dst-port="BTYPE" src="" src-port="BTYPE"/>
+   <Connection dst="add" dst-port="BTYPE" src="" src-port="BTYPE"/>
+   <Connection dst="add" dst-port="TEX" src="" src-port="TEX"/>
+   <Connection dst="mbpack" dst-port="AI" src="memorymanager" src-port="WA">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="Literal" literal-kind="Integer" value="3"/>
+      </Attribute>
+   </Connection>
+   <Connection dst="" dst-port="MCA" src="memorymanager" src-port="RA"/>
+   <Connection dst="" dst-port="MBD" src="mbpack" src-port="DO"/>
+   <Connection dst="" dst-port="MBA" src="mbpack" src-port="AO"/>
+   <Connection dst="searchwin" dst-port="DI" src="" src-port="MCD"/>
+   <Connection dst="unpack" dst-port="DI" src="searchwin" src-port="DO"/>
+   <Connection dst="interpolate" dst-port="halfpel" src="searchwin" src-port="FLAGS"/>
+   <Connection dst="interpolate" dst-port="RD" src="unpack" src-port="DO">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="BinOpSeq">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            <Op name="*"/>
+            <Expr kind="Literal" literal-kind="Integer" value="81"/>
+         </Expr>
+      </Attribute>
+   </Connection>
+   <Connection dst="add" dst-port="MOT" src="interpolate" src-port="MOT">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="BinOpSeq">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            <Op name="*"/>
+            <Expr kind="Literal" literal-kind="Integer" value="64"/>
+         </Expr>
+      </Attribute>
+   </Connection>
+   <Connection dst="mbpack" dst-port="DI" src="add" src-port="VID">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="BinOpSeq">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            <Op name="*"/>
+            <Expr kind="Literal" literal-kind="Integer" value="64"/>
+         </Expr>
+      </Attribute>
+   </Connection>
+   <Connection dst="" dst-port="VID" src="add" src-port="VID">
+      <Attribute kind="Value" name="bufferSize">
+         <Expr kind="BinOpSeq">
+            <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            <Op name="*"/>
+            <Expr kind="Literal" literal-kind="Integer" value="64"/>
+         </Expr>
+      </Attribute>
+   </Connection>
 </XDF>
