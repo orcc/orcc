@@ -1,4 +1,4 @@
-// $ANTLR 3.3 Nov 30, 2010 12:45:30 D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g 2010-12-13 15:54:15
+// $ANTLR 3.3 Nov 30, 2010 12:45:30 D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g 2010-12-13 15:58:04
 
 package net.sf.orcc.ui.editor;
 
@@ -21,7 +21,7 @@ import org.antlr.runtime.tree.TreeAdaptor;
 @SuppressWarnings("unused")
 public class CalParser extends Parser {
     public static final String[] tokenNames = new String[] {
-        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "Attribute", "Connector", "EntityDecl", "EntityExpr", "EntityPar", "Network", "StructureStmt", "VarDecl", "Actor", "Dot", "Empty", "Name", "Inputs", "Outputs", "PortDecl", "QualifiedId", "Parameter", "Type", "TypeAttr", "ExprAttr", "TypePar", "BinOp", "Boolean", "Expression", "Integer", "List", "Minus", "Not", "Real", "String", "UnOp", "Var", "NETWORK", "QID", "LBRACKET", "RBRACKET", "LPAREN", "RPAREN", "COLON", "END", "DOUBLE_EQUAL_ARROW", "VAR", "MUTABLE", "EQ", "COLON_EQUAL", "SEMICOLON", "ENTITIES", "COMMA", "STRUCTURE", "DOUBLE_DASH_ARROW", "DOT", "LBRACE", "RBRACE", "ACTOR", "IMPORT", "TIMES", "MULTI", "LT", "MINUS", "NOT", "PLUS", "DIV", "XOR", "FLOAT", "INTEGER", "STRING", "TRUE", "FALSE", "ALL", "ID", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "GE", "GT", "LE", "NE", "ARROW", "DOUBLE_DOT", "AND", "OR", "SHARP"
+        "<invalid>", "<EOR>", "<DOWN>", "<UP>", "Attribute", "Connector", "EntityDecl", "EntityExpr", "EntityPar", "Network", "StructureStmt", "VarDecl", "Actor", "Dot", "Empty", "Name", "Inputs", "Outputs", "PortDecl", "QualifiedId", "Parameter", "Type", "TypeAttr", "ExprAttr", "TypePar", "BinOp", "Boolean", "Expression", "Integer", "List", "Minus", "Not", "Real", "String", "UnOp", "Var", "NETWORK", "QID", "LBRACKET", "RBRACKET", "LPAREN", "RPAREN", "COLON", "END", "DOUBLE_EQUAL_ARROW", "VAR", "MUTABLE", "EQ", "COLON_EQUAL", "SEMICOLON", "ENTITIES", "COMMA", "STRUCTURE", "DOUBLE_DASH_ARROW", "DOT", "LBRACE", "RBRACE", "ACTOR", "IMPORT", "QID_WILDCARD", "MULTI", "LT", "MINUS", "NOT", "PLUS", "TIMES", "DIV", "XOR", "FLOAT", "INTEGER", "STRING", "TRUE", "FALSE", "ALL", "ID", "LINE_COMMENT", "MULTI_LINE_COMMENT", "WHITESPACE", "GE", "GT", "LE", "NE", "ARROW", "DOUBLE_DOT", "AND", "OR", "SHARP"
     };
     public static final int EOF=-1;
     public static final int Attribute=4;
@@ -79,33 +79,34 @@ public class CalParser extends Parser {
     public static final int RBRACE=56;
     public static final int ACTOR=57;
     public static final int IMPORT=58;
-    public static final int TIMES=59;
+    public static final int QID_WILDCARD=59;
     public static final int MULTI=60;
     public static final int LT=61;
     public static final int MINUS=62;
     public static final int NOT=63;
     public static final int PLUS=64;
-    public static final int DIV=65;
-    public static final int XOR=66;
-    public static final int FLOAT=67;
-    public static final int INTEGER=68;
-    public static final int STRING=69;
-    public static final int TRUE=70;
-    public static final int FALSE=71;
-    public static final int ALL=72;
-    public static final int ID=73;
-    public static final int LINE_COMMENT=74;
-    public static final int MULTI_LINE_COMMENT=75;
-    public static final int WHITESPACE=76;
-    public static final int GE=77;
-    public static final int GT=78;
-    public static final int LE=79;
-    public static final int NE=80;
-    public static final int ARROW=81;
-    public static final int DOUBLE_DOT=82;
-    public static final int AND=83;
-    public static final int OR=84;
-    public static final int SHARP=85;
+    public static final int TIMES=65;
+    public static final int DIV=66;
+    public static final int XOR=67;
+    public static final int FLOAT=68;
+    public static final int INTEGER=69;
+    public static final int STRING=70;
+    public static final int TRUE=71;
+    public static final int FALSE=72;
+    public static final int ALL=73;
+    public static final int ID=74;
+    public static final int LINE_COMMENT=75;
+    public static final int MULTI_LINE_COMMENT=76;
+    public static final int WHITESPACE=77;
+    public static final int GE=78;
+    public static final int GT=79;
+    public static final int LE=80;
+    public static final int NE=81;
+    public static final int ARROW=82;
+    public static final int DOUBLE_DOT=83;
+    public static final int AND=84;
+    public static final int OR=85;
+    public static final int SHARP=86;
 
     // delegates
     // delegators
@@ -396,7 +397,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: parameters, portSignature, structureSection, entitySection, varDeclSection, QID
+            // elements: varDeclSection, portSignature, entitySection, structureSection, QID, parameters
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1039,7 +1040,7 @@ public class CalParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: expression, typeAndId
+                    // elements: typeAndId, expression
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -1623,7 +1624,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: QID, expression
+            // elements: expression, QID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1870,7 +1871,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: c2, c1, at
+            // elements: at, c2, c1
             // token labels: 
             // rule labels: retval, c1, c2, at
             // token list labels: 
@@ -1984,7 +1985,7 @@ public class CalParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: v1, v2
+                    // elements: v2, v1
                     // token labels: v1, v2
                     // rule labels: retval
                     // token list labels: 
@@ -2342,7 +2343,7 @@ public class CalParser extends Parser {
 
 
                     // AST REWRITE
-                    // elements: id, type
+                    // elements: type, id
                     // token labels: id
                     // rule labels: retval
                     // token list labels: 
@@ -2570,7 +2571,7 @@ public class CalParser extends Parser {
 
 
             // AST REWRITE
-            // elements: portSignature, parameters, QID
+            // elements: QID, portSignature, parameters
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2636,7 +2637,7 @@ public class CalParser extends Parser {
     };
 
     // $ANTLR start "oneImport"
-    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:149:1: oneImport : IMPORT QID ( DOT TIMES )? SEMICOLON ;
+    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:149:1: oneImport : IMPORT QID_WILDCARD SEMICOLON ;
     public final CalParser.oneImport_return oneImport() throws RecognitionException {
         CalParser.oneImport_return retval = new CalParser.oneImport_return();
         retval.start = input.LT(1);
@@ -2644,20 +2645,16 @@ public class CalParser extends Parser {
         Object root_0 = null;
 
         Token IMPORT70=null;
-        Token QID71=null;
-        Token DOT72=null;
-        Token TIMES73=null;
-        Token SEMICOLON74=null;
+        Token QID_WILDCARD71=null;
+        Token SEMICOLON72=null;
 
         Object IMPORT70_tree=null;
-        Object QID71_tree=null;
-        Object DOT72_tree=null;
-        Object TIMES73_tree=null;
-        Object SEMICOLON74_tree=null;
+        Object QID_WILDCARD71_tree=null;
+        Object SEMICOLON72_tree=null;
 
         try {
-            // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:149:10: ( IMPORT QID ( DOT TIMES )? SEMICOLON )
-            // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:149:12: IMPORT QID ( DOT TIMES )? SEMICOLON
+            // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:149:10: ( IMPORT QID_WILDCARD SEMICOLON )
+            // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:149:12: IMPORT QID_WILDCARD SEMICOLON
             {
             root_0 = (Object)adaptor.nil();
 
@@ -2665,38 +2662,13 @@ public class CalParser extends Parser {
             IMPORT70_tree = (Object)adaptor.create(IMPORT70);
             adaptor.addChild(root_0, IMPORT70_tree);
 
-            QID71=(Token)match(input,QID,FOLLOW_QID_in_oneImport835); 
-            QID71_tree = (Object)adaptor.create(QID71);
-            adaptor.addChild(root_0, QID71_tree);
+            QID_WILDCARD71=(Token)match(input,QID_WILDCARD,FOLLOW_QID_WILDCARD_in_oneImport835); 
+            QID_WILDCARD71_tree = (Object)adaptor.create(QID_WILDCARD71);
+            adaptor.addChild(root_0, QID_WILDCARD71_tree);
 
-            // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:149:23: ( DOT TIMES )?
-            int alt25=2;
-            int LA25_0 = input.LA(1);
-
-            if ( (LA25_0==DOT) ) {
-                alt25=1;
-            }
-            switch (alt25) {
-                case 1 :
-                    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:149:24: DOT TIMES
-                    {
-                    DOT72=(Token)match(input,DOT,FOLLOW_DOT_in_oneImport838); 
-                    DOT72_tree = (Object)adaptor.create(DOT72);
-                    adaptor.addChild(root_0, DOT72_tree);
-
-                    TIMES73=(Token)match(input,TIMES,FOLLOW_TIMES_in_oneImport840); 
-                    TIMES73_tree = (Object)adaptor.create(TIMES73);
-                    adaptor.addChild(root_0, TIMES73_tree);
-
-
-                    }
-                    break;
-
-            }
-
-            SEMICOLON74=(Token)match(input,SEMICOLON,FOLLOW_SEMICOLON_in_oneImport844); 
-            SEMICOLON74_tree = (Object)adaptor.create(SEMICOLON74);
-            adaptor.addChild(root_0, SEMICOLON74_tree);
+            SEMICOLON72=(Token)match(input,SEMICOLON,FOLLOW_SEMICOLON_in_oneImport837); 
+            SEMICOLON72_tree = (Object)adaptor.create(SEMICOLON72);
+            adaptor.addChild(root_0, SEMICOLON72_tree);
 
 
             }
@@ -2732,13 +2704,13 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token EQ76=null;
-        CalParser.typeAndId_return typeAndId75 = null;
+        Token EQ74=null;
+        CalParser.typeAndId_return typeAndId73 = null;
 
-        CalParser.expression_return expression77 = null;
+        CalParser.expression_return expression75 = null;
 
 
-        Object EQ76_tree=null;
+        Object EQ74_tree=null;
         RewriteRuleTokenStream stream_EQ=new RewriteRuleTokenStream(adaptor,"token EQ");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_typeAndId=new RewriteRuleSubtreeStream(adaptor,"rule typeAndId");
@@ -2746,45 +2718,45 @@ public class CalParser extends Parser {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:154:10: ( typeAndId ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) ) )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:154:12: typeAndId ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) )
             {
-            pushFollow(FOLLOW_typeAndId_in_parameter854);
-            typeAndId75=typeAndId();
+            pushFollow(FOLLOW_typeAndId_in_parameter847);
+            typeAndId73=typeAndId();
 
             state._fsp--;
 
-            stream_typeAndId.add(typeAndId75.getTree());
+            stream_typeAndId.add(typeAndId73.getTree());
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:155:3: ( EQ expression -> ^( Parameter typeAndId ^( Expression expression ) ) | -> ^( Parameter typeAndId ) )
-            int alt26=2;
-            int LA26_0 = input.LA(1);
+            int alt25=2;
+            int LA25_0 = input.LA(1);
 
-            if ( (LA26_0==EQ) ) {
-                alt26=1;
+            if ( (LA25_0==EQ) ) {
+                alt25=1;
             }
-            else if ( (LA26_0==RPAREN||LA26_0==COMMA) ) {
-                alt26=2;
+            else if ( (LA25_0==RPAREN||LA25_0==COMMA) ) {
+                alt25=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 26, 0, input);
+                    new NoViableAltException("", 25, 0, input);
 
                 throw nvae;
             }
-            switch (alt26) {
+            switch (alt25) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:155:4: EQ expression
                     {
-                    EQ76=(Token)match(input,EQ,FOLLOW_EQ_in_parameter859);  
-                    stream_EQ.add(EQ76);
+                    EQ74=(Token)match(input,EQ,FOLLOW_EQ_in_parameter852);  
+                    stream_EQ.add(EQ74);
 
-                    pushFollow(FOLLOW_expression_in_parameter861);
-                    expression77=expression();
+                    pushFollow(FOLLOW_expression_in_parameter854);
+                    expression75=expression();
 
                     state._fsp--;
 
-                    stream_expression.add(expression77.getTree());
+                    stream_expression.add(expression75.getTree());
 
 
                     // AST REWRITE
-                    // elements: typeAndId, expression
+                    // elements: expression, typeAndId
                     // token labels: 
                     // rule labels: retval
                     // token list labels: 
@@ -2889,55 +2861,55 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token COMMA79=null;
+        Token COMMA77=null;
+        CalParser.parameter_return parameter76 = null;
+
         CalParser.parameter_return parameter78 = null;
 
-        CalParser.parameter_return parameter80 = null;
 
-
-        Object COMMA79_tree=null;
+        Object COMMA77_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_parameter=new RewriteRuleSubtreeStream(adaptor,"rule parameter");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:158:11: ( parameter ( COMMA parameter )* -> ( parameter )+ )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:158:13: parameter ( COMMA parameter )*
             {
-            pushFollow(FOLLOW_parameter_in_parameters895);
-            parameter78=parameter();
+            pushFollow(FOLLOW_parameter_in_parameters888);
+            parameter76=parameter();
 
             state._fsp--;
 
-            stream_parameter.add(parameter78.getTree());
+            stream_parameter.add(parameter76.getTree());
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:158:23: ( COMMA parameter )*
-            loop27:
+            loop26:
             do {
-                int alt27=2;
-                int LA27_0 = input.LA(1);
+                int alt26=2;
+                int LA26_0 = input.LA(1);
 
-                if ( (LA27_0==COMMA) ) {
-                    alt27=1;
+                if ( (LA26_0==COMMA) ) {
+                    alt26=1;
                 }
 
 
-                switch (alt27) {
+                switch (alt26) {
             	case 1 :
             	    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:158:24: COMMA parameter
             	    {
-            	    COMMA79=(Token)match(input,COMMA,FOLLOW_COMMA_in_parameters898);  
-            	    stream_COMMA.add(COMMA79);
+            	    COMMA77=(Token)match(input,COMMA,FOLLOW_COMMA_in_parameters891);  
+            	    stream_COMMA.add(COMMA77);
 
-            	    pushFollow(FOLLOW_parameter_in_parameters900);
-            	    parameter80=parameter();
+            	    pushFollow(FOLLOW_parameter_in_parameters893);
+            	    parameter78=parameter();
 
             	    state._fsp--;
 
-            	    stream_parameter.add(parameter80.getTree());
+            	    stream_parameter.add(parameter78.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop27;
+            	    break loop26;
                 }
             } while (true);
 
@@ -3001,11 +2973,11 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token MULTI81=null;
-        CalParser.typeAndId_return typeAndId82 = null;
+        Token MULTI79=null;
+        CalParser.typeAndId_return typeAndId80 = null;
 
 
-        Object MULTI81_tree=null;
+        Object MULTI79_tree=null;
         RewriteRuleTokenStream stream_MULTI=new RewriteRuleTokenStream(adaptor,"token MULTI");
         RewriteRuleSubtreeStream stream_typeAndId=new RewriteRuleSubtreeStream(adaptor,"rule typeAndId");
         try {
@@ -3013,18 +2985,18 @@ public class CalParser extends Parser {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:163:11: ( MULTI )? typeAndId
             {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:163:11: ( MULTI )?
-            int alt28=2;
-            int LA28_0 = input.LA(1);
+            int alt27=2;
+            int LA27_0 = input.LA(1);
 
-            if ( (LA28_0==MULTI) ) {
-                alt28=1;
+            if ( (LA27_0==MULTI) ) {
+                alt27=1;
             }
-            switch (alt28) {
+            switch (alt27) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:163:11: MULTI
                     {
-                    MULTI81=(Token)match(input,MULTI,FOLLOW_MULTI_in_portDecl917);  
-                    stream_MULTI.add(MULTI81);
+                    MULTI79=(Token)match(input,MULTI,FOLLOW_MULTI_in_portDecl910);  
+                    stream_MULTI.add(MULTI79);
 
 
                     }
@@ -3032,12 +3004,12 @@ public class CalParser extends Parser {
 
             }
 
-            pushFollow(FOLLOW_typeAndId_in_portDecl920);
-            typeAndId82=typeAndId();
+            pushFollow(FOLLOW_typeAndId_in_portDecl913);
+            typeAndId80=typeAndId();
 
             state._fsp--;
 
-            stream_typeAndId.add(typeAndId82.getTree());
+            stream_typeAndId.add(typeAndId80.getTree());
 
 
             // AST REWRITE
@@ -3099,55 +3071,55 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token COMMA84=null;
+        Token COMMA82=null;
+        CalParser.portDecl_return portDecl81 = null;
+
         CalParser.portDecl_return portDecl83 = null;
 
-        CalParser.portDecl_return portDecl85 = null;
 
-
-        Object COMMA84_tree=null;
+        Object COMMA82_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_portDecl=new RewriteRuleSubtreeStream(adaptor,"rule portDecl");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:10: ( portDecl ( COMMA portDecl )* -> ( portDecl )+ )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:12: portDecl ( COMMA portDecl )*
             {
-            pushFollow(FOLLOW_portDecl_in_portDecls935);
-            portDecl83=portDecl();
+            pushFollow(FOLLOW_portDecl_in_portDecls928);
+            portDecl81=portDecl();
 
             state._fsp--;
 
-            stream_portDecl.add(portDecl83.getTree());
+            stream_portDecl.add(portDecl81.getTree());
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:21: ( COMMA portDecl )*
-            loop29:
+            loop28:
             do {
-                int alt29=2;
-                int LA29_0 = input.LA(1);
+                int alt28=2;
+                int LA28_0 = input.LA(1);
 
-                if ( (LA29_0==COMMA) ) {
-                    alt29=1;
+                if ( (LA28_0==COMMA) ) {
+                    alt28=1;
                 }
 
 
-                switch (alt29) {
+                switch (alt28) {
             	case 1 :
             	    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:165:22: COMMA portDecl
             	    {
-            	    COMMA84=(Token)match(input,COMMA,FOLLOW_COMMA_in_portDecls938);  
-            	    stream_COMMA.add(COMMA84);
+            	    COMMA82=(Token)match(input,COMMA,FOLLOW_COMMA_in_portDecls931);  
+            	    stream_COMMA.add(COMMA82);
 
-            	    pushFollow(FOLLOW_portDecl_in_portDecls940);
-            	    portDecl85=portDecl();
+            	    pushFollow(FOLLOW_portDecl_in_portDecls933);
+            	    portDecl83=portDecl();
 
             	    state._fsp--;
 
-            	    stream_portDecl.add(portDecl85.getTree());
+            	    stream_portDecl.add(portDecl83.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop29;
+            	    break loop28;
                 }
             } while (true);
 
@@ -3211,25 +3183,25 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token EOF87=null;
-        CalParser.typeAndId_return typeAndId86 = null;
+        Token EOF85=null;
+        CalParser.typeAndId_return typeAndId84 = null;
 
 
-        Object EOF87_tree=null;
+        Object EOF85_tree=null;
         RewriteRuleTokenStream stream_EOF=new RewriteRuleTokenStream(adaptor,"token EOF");
         RewriteRuleSubtreeStream stream_typeAndId=new RewriteRuleSubtreeStream(adaptor,"rule typeAndId");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:170:14: ( typeAndId EOF -> ^( Parameter typeAndId ) )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:170:16: typeAndId EOF
             {
-            pushFollow(FOLLOW_typeAndId_in_mainParameter958);
-            typeAndId86=typeAndId();
+            pushFollow(FOLLOW_typeAndId_in_mainParameter951);
+            typeAndId84=typeAndId();
 
             state._fsp--;
 
-            stream_typeAndId.add(typeAndId86.getTree());
-            EOF87=(Token)match(input,EOF,FOLLOW_EOF_in_mainParameter960);  
-            stream_EOF.add(EOF87);
+            stream_typeAndId.add(typeAndId84.getTree());
+            EOF85=(Token)match(input,EOF,FOLLOW_EOF_in_mainParameter953);  
+            stream_EOF.add(EOF85);
 
 
 
@@ -3294,7 +3266,7 @@ public class CalParser extends Parser {
 
         Token typeName=null;
         Token varName=null;
-        CalParser.typeRest_return typeRest88 = null;
+        CalParser.typeRest_return typeRest86 = null;
 
 
         Object typeName_tree=null;
@@ -3305,59 +3277,59 @@ public class CalParser extends Parser {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:10: (typeName= QID ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) ) )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:172:12: typeName= QID ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) )
             {
-            typeName=(Token)match(input,QID,FOLLOW_QID_in_typeAndId977);  
+            typeName=(Token)match(input,QID,FOLLOW_QID_in_typeAndId970);  
             stream_QID.add(typeName);
 
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:173:3: ( ( typeRest )? varName= QID -> ^( Type ^( Var $typeName) ( typeRest )? ) ^( Var $varName) | -> ^( Var $typeName) )
-            int alt31=2;
-            int LA31_0 = input.LA(1);
+            int alt30=2;
+            int LA30_0 = input.LA(1);
 
-            if ( ((LA31_0>=QID && LA31_0<=LBRACKET)||LA31_0==LPAREN) ) {
-                alt31=1;
+            if ( ((LA30_0>=QID && LA30_0<=LBRACKET)||LA30_0==LPAREN) ) {
+                alt30=1;
             }
-            else if ( (LA31_0==EOF||(LA31_0>=RPAREN && LA31_0<=COLON)||LA31_0==DOUBLE_EQUAL_ARROW||(LA31_0>=EQ && LA31_0<=SEMICOLON)||LA31_0==COMMA) ) {
-                alt31=2;
+            else if ( (LA30_0==EOF||(LA30_0>=RPAREN && LA30_0<=COLON)||LA30_0==DOUBLE_EQUAL_ARROW||(LA30_0>=EQ && LA30_0<=SEMICOLON)||LA30_0==COMMA) ) {
+                alt30=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 31, 0, input);
+                    new NoViableAltException("", 30, 0, input);
 
                 throw nvae;
             }
-            switch (alt31) {
+            switch (alt30) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:173:4: ( typeRest )? varName= QID
                     {
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:173:4: ( typeRest )?
-                    int alt30=2;
-                    int LA30_0 = input.LA(1);
+                    int alt29=2;
+                    int LA29_0 = input.LA(1);
 
-                    if ( (LA30_0==LBRACKET||LA30_0==LPAREN) ) {
-                        alt30=1;
+                    if ( (LA29_0==LBRACKET||LA29_0==LPAREN) ) {
+                        alt29=1;
                     }
-                    switch (alt30) {
+                    switch (alt29) {
                         case 1 :
                             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:173:4: typeRest
                             {
-                            pushFollow(FOLLOW_typeRest_in_typeAndId982);
-                            typeRest88=typeRest();
+                            pushFollow(FOLLOW_typeRest_in_typeAndId975);
+                            typeRest86=typeRest();
 
                             state._fsp--;
 
-                            stream_typeRest.add(typeRest88.getTree());
+                            stream_typeRest.add(typeRest86.getTree());
 
                             }
                             break;
 
                     }
 
-                    varName=(Token)match(input,QID,FOLLOW_QID_in_typeAndId987);  
+                    varName=(Token)match(input,QID,FOLLOW_QID_in_typeAndId980);  
                     stream_QID.add(varName);
 
 
 
                     // AST REWRITE
-                    // elements: typeRest, typeName, varName
+                    // elements: typeName, typeRest, varName
                     // token labels: typeName, varName
                     // rule labels: retval
                     // token list labels: 
@@ -3479,37 +3451,37 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token QID89=null;
-        CalParser.typeRest_return typeRest90 = null;
+        Token QID87=null;
+        CalParser.typeRest_return typeRest88 = null;
 
 
-        Object QID89_tree=null;
+        Object QID87_tree=null;
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_typeRest=new RewriteRuleSubtreeStream(adaptor,"rule typeRest");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:176:5: ( QID ( typeRest )? -> ^( Type ^( Var QID ) ( typeRest )? ) )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:176:7: QID ( typeRest )?
             {
-            QID89=(Token)match(input,QID,FOLLOW_QID_in_type1031);  
-            stream_QID.add(QID89);
+            QID87=(Token)match(input,QID,FOLLOW_QID_in_type1024);  
+            stream_QID.add(QID87);
 
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:176:11: ( typeRest )?
-            int alt32=2;
-            int LA32_0 = input.LA(1);
+            int alt31=2;
+            int LA31_0 = input.LA(1);
 
-            if ( (LA32_0==LBRACKET||LA32_0==LPAREN) ) {
-                alt32=1;
+            if ( (LA31_0==LBRACKET||LA31_0==LPAREN) ) {
+                alt31=1;
             }
-            switch (alt32) {
+            switch (alt31) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:176:11: typeRest
                     {
-                    pushFollow(FOLLOW_typeRest_in_type1033);
-                    typeRest90=typeRest();
+                    pushFollow(FOLLOW_typeRest_in_type1026);
+                    typeRest88=typeRest();
 
                     state._fsp--;
 
-                    stream_typeRest.add(typeRest90.getTree());
+                    stream_typeRest.add(typeRest88.getTree());
 
                     }
                     break;
@@ -3591,19 +3563,19 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token LBRACKET91=null;
-        Token RBRACKET93=null;
-        Token LPAREN94=null;
-        Token RPAREN96=null;
-        CalParser.typePars_return typePars92 = null;
+        Token LBRACKET89=null;
+        Token RBRACKET91=null;
+        Token LPAREN92=null;
+        Token RPAREN94=null;
+        CalParser.typePars_return typePars90 = null;
 
-        CalParser.typeAttrs_return typeAttrs95 = null;
+        CalParser.typeAttrs_return typeAttrs93 = null;
 
 
-        Object LBRACKET91_tree=null;
-        Object RBRACKET93_tree=null;
-        Object LPAREN94_tree=null;
-        Object RPAREN96_tree=null;
+        Object LBRACKET89_tree=null;
+        Object RBRACKET91_tree=null;
+        Object LPAREN92_tree=null;
+        Object RPAREN94_tree=null;
         RewriteRuleTokenStream stream_LBRACKET=new RewriteRuleTokenStream(adaptor,"token LBRACKET");
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_RBRACKET=new RewriteRuleTokenStream(adaptor,"token RBRACKET");
@@ -3612,53 +3584,53 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_typeAttrs=new RewriteRuleSubtreeStream(adaptor,"rule typeAttrs");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:9: ( LBRACKET ( typePars )? RBRACKET -> ( typePars )? | LPAREN ( typeAttrs )? RPAREN -> ( typeAttrs )? )
-            int alt35=2;
-            int LA35_0 = input.LA(1);
+            int alt34=2;
+            int LA34_0 = input.LA(1);
 
-            if ( (LA35_0==LBRACKET) ) {
-                alt35=1;
+            if ( (LA34_0==LBRACKET) ) {
+                alt34=1;
             }
-            else if ( (LA35_0==LPAREN) ) {
-                alt35=2;
+            else if ( (LA34_0==LPAREN) ) {
+                alt34=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 35, 0, input);
+                    new NoViableAltException("", 34, 0, input);
 
                 throw nvae;
             }
-            switch (alt35) {
+            switch (alt34) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:11: LBRACKET ( typePars )? RBRACKET
                     {
-                    LBRACKET91=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_typeRest1056);  
-                    stream_LBRACKET.add(LBRACKET91);
+                    LBRACKET89=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_typeRest1049);  
+                    stream_LBRACKET.add(LBRACKET89);
 
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:20: ( typePars )?
-                    int alt33=2;
-                    int LA33_0 = input.LA(1);
+                    int alt32=2;
+                    int LA32_0 = input.LA(1);
 
-                    if ( (LA33_0==QID) ) {
-                        alt33=1;
+                    if ( (LA32_0==QID) ) {
+                        alt32=1;
                     }
-                    switch (alt33) {
+                    switch (alt32) {
                         case 1 :
                             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:178:20: typePars
                             {
-                            pushFollow(FOLLOW_typePars_in_typeRest1058);
-                            typePars92=typePars();
+                            pushFollow(FOLLOW_typePars_in_typeRest1051);
+                            typePars90=typePars();
 
                             state._fsp--;
 
-                            stream_typePars.add(typePars92.getTree());
+                            stream_typePars.add(typePars90.getTree());
 
                             }
                             break;
 
                     }
 
-                    RBRACKET93=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_typeRest1061);  
-                    stream_RBRACKET.add(RBRACKET93);
+                    RBRACKET91=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_typeRest1054);  
+                    stream_RBRACKET.add(RBRACKET91);
 
 
 
@@ -3690,34 +3662,34 @@ public class CalParser extends Parser {
                 case 2 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:179:5: LPAREN ( typeAttrs )? RPAREN
                     {
-                    LPAREN94=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_typeRest1072);  
-                    stream_LPAREN.add(LPAREN94);
+                    LPAREN92=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_typeRest1065);  
+                    stream_LPAREN.add(LPAREN92);
 
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:179:12: ( typeAttrs )?
-                    int alt34=2;
-                    int LA34_0 = input.LA(1);
+                    int alt33=2;
+                    int LA33_0 = input.LA(1);
 
-                    if ( (LA34_0==QID) ) {
-                        alt34=1;
+                    if ( (LA33_0==QID) ) {
+                        alt33=1;
                     }
-                    switch (alt34) {
+                    switch (alt33) {
                         case 1 :
                             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:179:12: typeAttrs
                             {
-                            pushFollow(FOLLOW_typeAttrs_in_typeRest1074);
-                            typeAttrs95=typeAttrs();
+                            pushFollow(FOLLOW_typeAttrs_in_typeRest1067);
+                            typeAttrs93=typeAttrs();
 
                             state._fsp--;
 
-                            stream_typeAttrs.add(typeAttrs95.getTree());
+                            stream_typeAttrs.add(typeAttrs93.getTree());
 
                             }
                             break;
 
                     }
 
-                    RPAREN96=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_typeRest1077);  
-                    stream_RPAREN.add(RPAREN96);
+                    RPAREN94=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_typeRest1070);  
+                    stream_RPAREN.add(RPAREN94);
 
 
 
@@ -3779,55 +3751,55 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token COMMA98=null;
+        Token COMMA96=null;
+        CalParser.typeAttr_return typeAttr95 = null;
+
         CalParser.typeAttr_return typeAttr97 = null;
 
-        CalParser.typeAttr_return typeAttr99 = null;
 
-
-        Object COMMA98_tree=null;
+        Object COMMA96_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_typeAttr=new RewriteRuleSubtreeStream(adaptor,"rule typeAttr");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:10: ( typeAttr ( COMMA typeAttr )* -> ( typeAttr )+ )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:12: typeAttr ( COMMA typeAttr )*
             {
-            pushFollow(FOLLOW_typeAttr_in_typeAttrs1089);
-            typeAttr97=typeAttr();
+            pushFollow(FOLLOW_typeAttr_in_typeAttrs1082);
+            typeAttr95=typeAttr();
 
             state._fsp--;
 
-            stream_typeAttr.add(typeAttr97.getTree());
+            stream_typeAttr.add(typeAttr95.getTree());
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:21: ( COMMA typeAttr )*
-            loop36:
+            loop35:
             do {
-                int alt36=2;
-                int LA36_0 = input.LA(1);
+                int alt35=2;
+                int LA35_0 = input.LA(1);
 
-                if ( (LA36_0==COMMA) ) {
-                    alt36=1;
+                if ( (LA35_0==COMMA) ) {
+                    alt35=1;
                 }
 
 
-                switch (alt36) {
+                switch (alt35) {
             	case 1 :
             	    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:181:22: COMMA typeAttr
             	    {
-            	    COMMA98=(Token)match(input,COMMA,FOLLOW_COMMA_in_typeAttrs1092);  
-            	    stream_COMMA.add(COMMA98);
+            	    COMMA96=(Token)match(input,COMMA,FOLLOW_COMMA_in_typeAttrs1085);  
+            	    stream_COMMA.add(COMMA96);
 
-            	    pushFollow(FOLLOW_typeAttr_in_typeAttrs1094);
-            	    typeAttr99=typeAttr();
+            	    pushFollow(FOLLOW_typeAttr_in_typeAttrs1087);
+            	    typeAttr97=typeAttr();
 
             	    state._fsp--;
 
-            	    stream_typeAttr.add(typeAttr99.getTree());
+            	    stream_typeAttr.add(typeAttr97.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop36;
+            	    break loop35;
                 }
             } while (true);
 
@@ -3891,26 +3863,26 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token QID100=null;
-        CalParser.typeAttrRest_return typeAttrRest101 = null;
+        Token QID98=null;
+        CalParser.typeAttrRest_return typeAttrRest99 = null;
 
 
-        Object QID100_tree=null;
+        Object QID98_tree=null;
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_typeAttrRest=new RewriteRuleSubtreeStream(adaptor,"rule typeAttrRest");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:9: ( QID typeAttrRest -> typeAttrRest )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:183:11: QID typeAttrRest
             {
-            QID100=(Token)match(input,QID,FOLLOW_QID_in_typeAttr1108);  
-            stream_QID.add(QID100);
+            QID98=(Token)match(input,QID,FOLLOW_QID_in_typeAttr1101);  
+            stream_QID.add(QID98);
 
-            pushFollow(FOLLOW_typeAttrRest_in_typeAttr1110);
-            typeAttrRest101=typeAttrRest();
+            pushFollow(FOLLOW_typeAttrRest_in_typeAttr1103);
+            typeAttrRest99=typeAttrRest();
 
             state._fsp--;
 
-            stream_typeAttrRest.add(typeAttrRest101.getTree());
+            stream_typeAttrRest.add(typeAttrRest99.getTree());
 
 
             // AST REWRITE
@@ -3964,49 +3936,49 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token COLON102=null;
-        Token EQ104=null;
-        CalParser.type_return type103 = null;
+        Token COLON100=null;
+        Token EQ102=null;
+        CalParser.type_return type101 = null;
 
-        CalParser.expression_return expression105 = null;
+        CalParser.expression_return expression103 = null;
 
 
-        Object COLON102_tree=null;
-        Object EQ104_tree=null;
+        Object COLON100_tree=null;
+        Object EQ102_tree=null;
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
         RewriteRuleTokenStream stream_EQ=new RewriteRuleTokenStream(adaptor,"token EQ");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         RewriteRuleSubtreeStream stream_type=new RewriteRuleSubtreeStream(adaptor,"rule type");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:185:13: ( COLON type -> ^( TypeAttr type ) | EQ expression -> ^( ExprAttr ^( Expression expression ) ) )
-            int alt37=2;
-            int LA37_0 = input.LA(1);
+            int alt36=2;
+            int LA36_0 = input.LA(1);
 
-            if ( (LA37_0==COLON) ) {
-                alt37=1;
+            if ( (LA36_0==COLON) ) {
+                alt36=1;
             }
-            else if ( (LA37_0==EQ) ) {
-                alt37=2;
+            else if ( (LA36_0==EQ) ) {
+                alt36=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 37, 0, input);
+                    new NoViableAltException("", 36, 0, input);
 
                 throw nvae;
             }
-            switch (alt37) {
+            switch (alt36) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:185:15: COLON type
                     {
-                    COLON102=(Token)match(input,COLON,FOLLOW_COLON_in_typeAttrRest1121);  
-                    stream_COLON.add(COLON102);
+                    COLON100=(Token)match(input,COLON,FOLLOW_COLON_in_typeAttrRest1114);  
+                    stream_COLON.add(COLON100);
 
-                    pushFollow(FOLLOW_type_in_typeAttrRest1123);
-                    type103=type();
+                    pushFollow(FOLLOW_type_in_typeAttrRest1116);
+                    type101=type();
 
                     state._fsp--;
 
-                    stream_type.add(type103.getTree());
+                    stream_type.add(type101.getTree());
 
 
                     // AST REWRITE
@@ -4040,15 +4012,15 @@ public class CalParser extends Parser {
                 case 2 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:186:3: EQ expression
                     {
-                    EQ104=(Token)match(input,EQ,FOLLOW_EQ_in_typeAttrRest1135);  
-                    stream_EQ.add(EQ104);
+                    EQ102=(Token)match(input,EQ,FOLLOW_EQ_in_typeAttrRest1128);  
+                    stream_EQ.add(EQ102);
 
-                    pushFollow(FOLLOW_expression_in_typeAttrRest1137);
-                    expression105=expression();
+                    pushFollow(FOLLOW_expression_in_typeAttrRest1130);
+                    expression103=expression();
 
                     state._fsp--;
 
-                    stream_expression.add(expression105.getTree());
+                    stream_expression.add(expression103.getTree());
 
 
                     // AST REWRITE
@@ -4120,55 +4092,55 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token COMMA107=null;
+        Token COMMA105=null;
+        CalParser.typePar_return typePar104 = null;
+
         CalParser.typePar_return typePar106 = null;
 
-        CalParser.typePar_return typePar108 = null;
 
-
-        Object COMMA107_tree=null;
+        Object COMMA105_tree=null;
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleSubtreeStream stream_typePar=new RewriteRuleSubtreeStream(adaptor,"rule typePar");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:9: ( typePar ( COMMA typePar )* -> ( typePar )+ )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:11: typePar ( COMMA typePar )*
             {
-            pushFollow(FOLLOW_typePar_in_typePars1156);
-            typePar106=typePar();
+            pushFollow(FOLLOW_typePar_in_typePars1149);
+            typePar104=typePar();
 
             state._fsp--;
 
-            stream_typePar.add(typePar106.getTree());
+            stream_typePar.add(typePar104.getTree());
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:19: ( COMMA typePar )*
-            loop38:
+            loop37:
             do {
-                int alt38=2;
-                int LA38_0 = input.LA(1);
+                int alt37=2;
+                int LA37_0 = input.LA(1);
 
-                if ( (LA38_0==COMMA) ) {
-                    alt38=1;
+                if ( (LA37_0==COMMA) ) {
+                    alt37=1;
                 }
 
 
-                switch (alt38) {
+                switch (alt37) {
             	case 1 :
             	    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:188:20: COMMA typePar
             	    {
-            	    COMMA107=(Token)match(input,COMMA,FOLLOW_COMMA_in_typePars1159);  
-            	    stream_COMMA.add(COMMA107);
+            	    COMMA105=(Token)match(input,COMMA,FOLLOW_COMMA_in_typePars1152);  
+            	    stream_COMMA.add(COMMA105);
 
-            	    pushFollow(FOLLOW_typePar_in_typePars1161);
-            	    typePar108=typePar();
+            	    pushFollow(FOLLOW_typePar_in_typePars1154);
+            	    typePar106=typePar();
 
             	    state._fsp--;
 
-            	    stream_typePar.add(typePar108.getTree());
+            	    stream_typePar.add(typePar106.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop38;
+            	    break loop37;
                 }
             } while (true);
 
@@ -4232,13 +4204,13 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token QID109=null;
-        Token LT110=null;
-        CalParser.type_return type111 = null;
+        Token QID107=null;
+        Token LT108=null;
+        CalParser.type_return type109 = null;
 
 
-        Object QID109_tree=null;
-        Object LT110_tree=null;
+        Object QID107_tree=null;
+        Object LT108_tree=null;
         RewriteRuleTokenStream stream_LT=new RewriteRuleTokenStream(adaptor,"token LT");
         RewriteRuleTokenStream stream_QID=new RewriteRuleTokenStream(adaptor,"token QID");
         RewriteRuleSubtreeStream stream_type=new RewriteRuleSubtreeStream(adaptor,"rule type");
@@ -4246,29 +4218,29 @@ public class CalParser extends Parser {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:8: ( QID ( LT type )? -> ^( TypePar QID ( type )? ) )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:10: QID ( LT type )?
             {
-            QID109=(Token)match(input,QID,FOLLOW_QID_in_typePar1175);  
-            stream_QID.add(QID109);
+            QID107=(Token)match(input,QID,FOLLOW_QID_in_typePar1168);  
+            stream_QID.add(QID107);
 
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:14: ( LT type )?
-            int alt39=2;
-            int LA39_0 = input.LA(1);
+            int alt38=2;
+            int LA38_0 = input.LA(1);
 
-            if ( (LA39_0==LT) ) {
-                alt39=1;
+            if ( (LA38_0==LT) ) {
+                alt38=1;
             }
-            switch (alt39) {
+            switch (alt38) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:190:15: LT type
                     {
-                    LT110=(Token)match(input,LT,FOLLOW_LT_in_typePar1178);  
-                    stream_LT.add(LT110);
+                    LT108=(Token)match(input,LT,FOLLOW_LT_in_typePar1171);  
+                    stream_LT.add(LT108);
 
-                    pushFollow(FOLLOW_type_in_typePar1180);
-                    type111=type();
+                    pushFollow(FOLLOW_type_in_typePar1173);
+                    type109=type();
 
                     state._fsp--;
 
-                    stream_type.add(type111.getTree());
+                    stream_type.add(type109.getTree());
 
                     }
                     break;
@@ -4342,25 +4314,25 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token EOF113=null;
-        CalParser.expression_return expression112 = null;
+        Token EOF111=null;
+        CalParser.expression_return expression110 = null;
 
 
-        Object EOF113_tree=null;
+        Object EOF111_tree=null;
         RewriteRuleTokenStream stream_EOF=new RewriteRuleTokenStream(adaptor,"token EOF");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:195:15: ( expression EOF -> ^( Expression expression ) )
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:195:17: expression EOF
             {
-            pushFollow(FOLLOW_expression_in_mainExpression1203);
-            expression112=expression();
+            pushFollow(FOLLOW_expression_in_mainExpression1196);
+            expression110=expression();
 
             state._fsp--;
 
-            stream_expression.add(expression112.getTree());
-            EOF113=(Token)match(input,EOF,FOLLOW_EOF_in_mainExpression1205);  
-            stream_EOF.add(EOF113);
+            stream_expression.add(expression110.getTree());
+            EOF111=(Token)match(input,EOF,FOLLOW_EOF_in_mainExpression1198);  
+            stream_EOF.add(EOF111);
 
 
 
@@ -4423,11 +4395,11 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
+        CalParser.factor_return factor112 = null;
+
+        CalParser.binop_return binop113 = null;
+
         CalParser.factor_return factor114 = null;
-
-        CalParser.binop_return binop115 = null;
-
-        CalParser.factor_return factor116 = null;
 
 
 
@@ -4437,45 +4409,45 @@ public class CalParser extends Parser {
             {
             root_0 = (Object)adaptor.nil();
 
-            pushFollow(FOLLOW_factor_in_expression1220);
-            factor114=factor();
+            pushFollow(FOLLOW_factor_in_expression1213);
+            factor112=factor();
 
             state._fsp--;
 
-            adaptor.addChild(root_0, factor114.getTree());
+            adaptor.addChild(root_0, factor112.getTree());
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:20: ( binop factor )*
-            loop40:
+            loop39:
             do {
-                int alt40=2;
-                int LA40_0 = input.LA(1);
+                int alt39=2;
+                int LA39_0 = input.LA(1);
 
-                if ( (LA40_0==TIMES||LA40_0==MINUS||(LA40_0>=PLUS && LA40_0<=XOR)) ) {
-                    alt40=1;
+                if ( (LA39_0==MINUS||(LA39_0>=PLUS && LA39_0<=XOR)) ) {
+                    alt39=1;
                 }
 
 
-                switch (alt40) {
+                switch (alt39) {
             	case 1 :
             	    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:197:21: binop factor
             	    {
-            	    pushFollow(FOLLOW_binop_in_expression1223);
-            	    binop115=binop();
+            	    pushFollow(FOLLOW_binop_in_expression1216);
+            	    binop113=binop();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, binop115.getTree());
-            	    pushFollow(FOLLOW_factor_in_expression1225);
-            	    factor116=factor();
+            	    adaptor.addChild(root_0, binop113.getTree());
+            	    pushFollow(FOLLOW_factor_in_expression1218);
+            	    factor114=factor();
 
             	    state._fsp--;
 
-            	    adaptor.addChild(root_0, factor116.getTree());
+            	    adaptor.addChild(root_0, factor114.getTree());
 
             	    }
             	    break;
 
             	default :
-            	    break loop40;
+            	    break loop39;
                 }
             } while (true);
 
@@ -4524,26 +4496,26 @@ public class CalParser extends Parser {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:7: (op= MINUS | op= NOT )
             {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:7: (op= MINUS | op= NOT )
-            int alt41=2;
-            int LA41_0 = input.LA(1);
+            int alt40=2;
+            int LA40_0 = input.LA(1);
 
-            if ( (LA41_0==MINUS) ) {
-                alt41=1;
+            if ( (LA40_0==MINUS) ) {
+                alt40=1;
             }
-            else if ( (LA41_0==NOT) ) {
-                alt41=2;
+            else if ( (LA40_0==NOT) ) {
+                alt40=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 41, 0, input);
+                    new NoViableAltException("", 40, 0, input);
 
                 throw nvae;
             }
-            switch (alt41) {
+            switch (alt40) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:8: op= MINUS
                     {
-                    op=(Token)match(input,MINUS,FOLLOW_MINUS_in_unop1237);  
+                    op=(Token)match(input,MINUS,FOLLOW_MINUS_in_unop1230);  
                     stream_MINUS.add(op);
 
 
@@ -4552,7 +4524,7 @@ public class CalParser extends Parser {
                 case 2 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:199:19: op= NOT
                     {
-                    op=(Token)match(input,NOT,FOLLOW_NOT_in_unop1243);  
+                    op=(Token)match(input,NOT,FOLLOW_NOT_in_unop1236);  
                     stream_NOT.add(op);
 
 
@@ -4637,45 +4609,45 @@ public class CalParser extends Parser {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:8: (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR )
             {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:8: (op= PLUS | op= MINUS | op= TIMES | op= DIV | op= XOR )
-            int alt42=5;
+            int alt41=5;
             switch ( input.LA(1) ) {
             case PLUS:
                 {
-                alt42=1;
+                alt41=1;
                 }
                 break;
             case MINUS:
                 {
-                alt42=2;
+                alt41=2;
                 }
                 break;
             case TIMES:
                 {
-                alt42=3;
+                alt41=3;
                 }
                 break;
             case DIV:
                 {
-                alt42=4;
+                alt41=4;
                 }
                 break;
             case XOR:
                 {
-                alt42=5;
+                alt41=5;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("", 42, 0, input);
+                    new NoViableAltException("", 41, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt42) {
+            switch (alt41) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:9: op= PLUS
                     {
-                    op=(Token)match(input,PLUS,FOLLOW_PLUS_in_binop1263);  
+                    op=(Token)match(input,PLUS,FOLLOW_PLUS_in_binop1256);  
                     stream_PLUS.add(op);
 
 
@@ -4684,7 +4656,7 @@ public class CalParser extends Parser {
                 case 2 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:19: op= MINUS
                     {
-                    op=(Token)match(input,MINUS,FOLLOW_MINUS_in_binop1269);  
+                    op=(Token)match(input,MINUS,FOLLOW_MINUS_in_binop1262);  
                     stream_MINUS.add(op);
 
 
@@ -4693,7 +4665,7 @@ public class CalParser extends Parser {
                 case 3 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:30: op= TIMES
                     {
-                    op=(Token)match(input,TIMES,FOLLOW_TIMES_in_binop1275);  
+                    op=(Token)match(input,TIMES,FOLLOW_TIMES_in_binop1268);  
                     stream_TIMES.add(op);
 
 
@@ -4702,7 +4674,7 @@ public class CalParser extends Parser {
                 case 4 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:41: op= DIV
                     {
-                    op=(Token)match(input,DIV,FOLLOW_DIV_in_binop1281);  
+                    op=(Token)match(input,DIV,FOLLOW_DIV_in_binop1274);  
                     stream_DIV.add(op);
 
 
@@ -4711,7 +4683,7 @@ public class CalParser extends Parser {
                 case 5 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:201:50: op= XOR
                     {
-                    op=(Token)match(input,XOR,FOLLOW_XOR_in_binop1287);  
+                    op=(Token)match(input,XOR,FOLLOW_XOR_in_binop1280);  
                     stream_XOR.add(op);
 
 
@@ -4782,62 +4754,62 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
+        CalParser.term_return term115 = null;
+
+        CalParser.unop_return unop116 = null;
+
         CalParser.term_return term117 = null;
-
-        CalParser.unop_return unop118 = null;
-
-        CalParser.term_return term119 = null;
 
 
         RewriteRuleSubtreeStream stream_unop=new RewriteRuleSubtreeStream(adaptor,"rule unop");
         RewriteRuleSubtreeStream stream_term=new RewriteRuleSubtreeStream(adaptor,"rule term");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:7: ( term | unop term -> ^( Expression unop term ) )
-            int alt43=2;
-            int LA43_0 = input.LA(1);
+            int alt42=2;
+            int LA42_0 = input.LA(1);
 
-            if ( ((LA43_0>=QID && LA43_0<=LBRACKET)||LA43_0==LPAREN||(LA43_0>=FLOAT && LA43_0<=FALSE)) ) {
-                alt43=1;
+            if ( ((LA42_0>=QID && LA42_0<=LBRACKET)||LA42_0==LPAREN||(LA42_0>=FLOAT && LA42_0<=FALSE)) ) {
+                alt42=1;
             }
-            else if ( ((LA43_0>=MINUS && LA43_0<=NOT)) ) {
-                alt43=2;
+            else if ( ((LA42_0>=MINUS && LA42_0<=NOT)) ) {
+                alt42=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 43, 0, input);
+                    new NoViableAltException("", 42, 0, input);
 
                 throw nvae;
             }
-            switch (alt43) {
+            switch (alt42) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:203:9: term
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_term_in_factor1304);
-                    term117=term();
+                    pushFollow(FOLLOW_term_in_factor1297);
+                    term115=term();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, term117.getTree());
+                    adaptor.addChild(root_0, term115.getTree());
 
                     }
                     break;
                 case 2 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:204:3: unop term
                     {
-                    pushFollow(FOLLOW_unop_in_factor1308);
-                    unop118=unop();
+                    pushFollow(FOLLOW_unop_in_factor1301);
+                    unop116=unop();
 
                     state._fsp--;
 
-                    stream_unop.add(unop118.getTree());
-                    pushFollow(FOLLOW_term_in_factor1310);
-                    term119=term();
+                    stream_unop.add(unop116.getTree());
+                    pushFollow(FOLLOW_term_in_factor1303);
+                    term117=term();
 
                     state._fsp--;
 
-                    stream_term.add(term119.getTree());
+                    stream_term.add(term117.getTree());
 
 
                     // AST REWRITE
@@ -4902,64 +4874,64 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token LPAREN121=null;
-        Token RPAREN123=null;
-        CalParser.atom_return atom120 = null;
+        Token LPAREN119=null;
+        Token RPAREN121=null;
+        CalParser.atom_return atom118 = null;
 
-        CalParser.expression_return expression122 = null;
+        CalParser.expression_return expression120 = null;
 
 
-        Object LPAREN121_tree=null;
-        Object RPAREN123_tree=null;
+        Object LPAREN119_tree=null;
+        Object RPAREN121_tree=null;
         RewriteRuleTokenStream stream_RPAREN=new RewriteRuleTokenStream(adaptor,"token RPAREN");
         RewriteRuleTokenStream stream_LPAREN=new RewriteRuleTokenStream(adaptor,"token LPAREN");
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:206:5: ( atom | LPAREN expression RPAREN -> ^( Expression expression ) )
-            int alt44=2;
-            int LA44_0 = input.LA(1);
+            int alt43=2;
+            int LA43_0 = input.LA(1);
 
-            if ( ((LA44_0>=QID && LA44_0<=LBRACKET)||(LA44_0>=FLOAT && LA44_0<=FALSE)) ) {
-                alt44=1;
+            if ( ((LA43_0>=QID && LA43_0<=LBRACKET)||(LA43_0>=FLOAT && LA43_0<=FALSE)) ) {
+                alt43=1;
             }
-            else if ( (LA44_0==LPAREN) ) {
-                alt44=2;
+            else if ( (LA43_0==LPAREN) ) {
+                alt43=2;
             }
             else {
                 NoViableAltException nvae =
-                    new NoViableAltException("", 44, 0, input);
+                    new NoViableAltException("", 43, 0, input);
 
                 throw nvae;
             }
-            switch (alt44) {
+            switch (alt43) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:206:7: atom
                     {
                     root_0 = (Object)adaptor.nil();
 
-                    pushFollow(FOLLOW_atom_in_term1327);
-                    atom120=atom();
+                    pushFollow(FOLLOW_atom_in_term1320);
+                    atom118=atom();
 
                     state._fsp--;
 
-                    adaptor.addChild(root_0, atom120.getTree());
+                    adaptor.addChild(root_0, atom118.getTree());
 
                     }
                     break;
                 case 2 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:207:5: LPAREN expression RPAREN
                     {
-                    LPAREN121=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_term1333);  
-                    stream_LPAREN.add(LPAREN121);
+                    LPAREN119=(Token)match(input,LPAREN,FOLLOW_LPAREN_in_term1326);  
+                    stream_LPAREN.add(LPAREN119);
 
-                    pushFollow(FOLLOW_expression_in_term1335);
-                    expression122=expression();
+                    pushFollow(FOLLOW_expression_in_term1328);
+                    expression120=expression();
 
                     state._fsp--;
 
-                    stream_expression.add(expression122.getTree());
-                    RPAREN123=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_term1337);  
-                    stream_RPAREN.add(RPAREN123);
+                    stream_expression.add(expression120.getTree());
+                    RPAREN121=(Token)match(input,RPAREN,FOLLOW_RPAREN_in_term1330);  
+                    stream_RPAREN.add(RPAREN121);
 
 
 
@@ -5024,29 +4996,29 @@ public class CalParser extends Parser {
 
         Object root_0 = null;
 
-        Token QID124=null;
-        Token FLOAT125=null;
-        Token INTEGER126=null;
-        Token STRING127=null;
-        Token TRUE128=null;
-        Token FALSE129=null;
-        Token LBRACKET130=null;
-        Token COMMA132=null;
-        Token RBRACKET134=null;
+        Token QID122=null;
+        Token FLOAT123=null;
+        Token INTEGER124=null;
+        Token STRING125=null;
+        Token TRUE126=null;
+        Token FALSE127=null;
+        Token LBRACKET128=null;
+        Token COMMA130=null;
+        Token RBRACKET132=null;
+        CalParser.expression_return expression129 = null;
+
         CalParser.expression_return expression131 = null;
 
-        CalParser.expression_return expression133 = null;
 
-
-        Object QID124_tree=null;
-        Object FLOAT125_tree=null;
-        Object INTEGER126_tree=null;
-        Object STRING127_tree=null;
-        Object TRUE128_tree=null;
-        Object FALSE129_tree=null;
-        Object LBRACKET130_tree=null;
-        Object COMMA132_tree=null;
-        Object RBRACKET134_tree=null;
+        Object QID122_tree=null;
+        Object FLOAT123_tree=null;
+        Object INTEGER124_tree=null;
+        Object STRING125_tree=null;
+        Object TRUE126_tree=null;
+        Object FALSE127_tree=null;
+        Object LBRACKET128_tree=null;
+        Object COMMA130_tree=null;
+        Object RBRACKET132_tree=null;
         RewriteRuleTokenStream stream_LBRACKET=new RewriteRuleTokenStream(adaptor,"token LBRACKET");
         RewriteRuleTokenStream stream_INTEGER=new RewriteRuleTokenStream(adaptor,"token INTEGER");
         RewriteRuleTokenStream stream_FLOAT=new RewriteRuleTokenStream(adaptor,"token FLOAT");
@@ -5059,56 +5031,56 @@ public class CalParser extends Parser {
         RewriteRuleSubtreeStream stream_expression=new RewriteRuleSubtreeStream(adaptor,"rule expression");
         try {
             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:209:5: ( QID -> ^( Var QID ) | FLOAT -> ^( Real FLOAT ) | INTEGER -> ^( Integer INTEGER ) | STRING -> ^( String STRING ) | TRUE -> ^( Boolean TRUE ) | FALSE -> ^( Boolean FALSE ) | LBRACKET ( expression ( COMMA expression )* )? RBRACKET -> ^( List ( expression )* ) )
-            int alt47=7;
+            int alt46=7;
             switch ( input.LA(1) ) {
             case QID:
                 {
-                alt47=1;
+                alt46=1;
                 }
                 break;
             case FLOAT:
                 {
-                alt47=2;
+                alt46=2;
                 }
                 break;
             case INTEGER:
                 {
-                alt47=3;
+                alt46=3;
                 }
                 break;
             case STRING:
                 {
-                alt47=4;
+                alt46=4;
                 }
                 break;
             case TRUE:
                 {
-                alt47=5;
+                alt46=5;
                 }
                 break;
             case FALSE:
                 {
-                alt47=6;
+                alt46=6;
                 }
                 break;
             case LBRACKET:
                 {
-                alt47=7;
+                alt46=7;
                 }
                 break;
             default:
                 NoViableAltException nvae =
-                    new NoViableAltException("", 47, 0, input);
+                    new NoViableAltException("", 46, 0, input);
 
                 throw nvae;
             }
 
-            switch (alt47) {
+            switch (alt46) {
                 case 1 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:209:7: QID
                     {
-                    QID124=(Token)match(input,QID,FOLLOW_QID_in_atom1352);  
-                    stream_QID.add(QID124);
+                    QID122=(Token)match(input,QID,FOLLOW_QID_in_atom1345);  
+                    stream_QID.add(QID122);
 
 
 
@@ -5143,8 +5115,8 @@ public class CalParser extends Parser {
                 case 2 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:210:3: FLOAT
                     {
-                    FLOAT125=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_atom1364);  
-                    stream_FLOAT.add(FLOAT125);
+                    FLOAT123=(Token)match(input,FLOAT,FOLLOW_FLOAT_in_atom1357);  
+                    stream_FLOAT.add(FLOAT123);
 
 
 
@@ -5179,8 +5151,8 @@ public class CalParser extends Parser {
                 case 3 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:211:3: INTEGER
                     {
-                    INTEGER126=(Token)match(input,INTEGER,FOLLOW_INTEGER_in_atom1376);  
-                    stream_INTEGER.add(INTEGER126);
+                    INTEGER124=(Token)match(input,INTEGER,FOLLOW_INTEGER_in_atom1369);  
+                    stream_INTEGER.add(INTEGER124);
 
 
 
@@ -5215,8 +5187,8 @@ public class CalParser extends Parser {
                 case 4 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:212:3: STRING
                     {
-                    STRING127=(Token)match(input,STRING,FOLLOW_STRING_in_atom1388);  
-                    stream_STRING.add(STRING127);
+                    STRING125=(Token)match(input,STRING,FOLLOW_STRING_in_atom1381);  
+                    stream_STRING.add(STRING125);
 
 
 
@@ -5251,8 +5223,8 @@ public class CalParser extends Parser {
                 case 5 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:213:3: TRUE
                     {
-                    TRUE128=(Token)match(input,TRUE,FOLLOW_TRUE_in_atom1400);  
-                    stream_TRUE.add(TRUE128);
+                    TRUE126=(Token)match(input,TRUE,FOLLOW_TRUE_in_atom1393);  
+                    stream_TRUE.add(TRUE126);
 
 
 
@@ -5287,8 +5259,8 @@ public class CalParser extends Parser {
                 case 6 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:214:3: FALSE
                     {
-                    FALSE129=(Token)match(input,FALSE,FOLLOW_FALSE_in_atom1412);  
-                    stream_FALSE.add(FALSE129);
+                    FALSE127=(Token)match(input,FALSE,FOLLOW_FALSE_in_atom1405);  
+                    stream_FALSE.add(FALSE127);
 
 
 
@@ -5323,56 +5295,56 @@ public class CalParser extends Parser {
                 case 7 :
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:3: LBRACKET ( expression ( COMMA expression )* )? RBRACKET
                     {
-                    LBRACKET130=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_atom1424);  
-                    stream_LBRACKET.add(LBRACKET130);
+                    LBRACKET128=(Token)match(input,LBRACKET,FOLLOW_LBRACKET_in_atom1417);  
+                    stream_LBRACKET.add(LBRACKET128);
 
                     // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:12: ( expression ( COMMA expression )* )?
-                    int alt46=2;
-                    int LA46_0 = input.LA(1);
+                    int alt45=2;
+                    int LA45_0 = input.LA(1);
 
-                    if ( ((LA46_0>=QID && LA46_0<=LBRACKET)||LA46_0==LPAREN||(LA46_0>=MINUS && LA46_0<=NOT)||(LA46_0>=FLOAT && LA46_0<=FALSE)) ) {
-                        alt46=1;
+                    if ( ((LA45_0>=QID && LA45_0<=LBRACKET)||LA45_0==LPAREN||(LA45_0>=MINUS && LA45_0<=NOT)||(LA45_0>=FLOAT && LA45_0<=FALSE)) ) {
+                        alt45=1;
                     }
-                    switch (alt46) {
+                    switch (alt45) {
                         case 1 :
                             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:13: expression ( COMMA expression )*
                             {
-                            pushFollow(FOLLOW_expression_in_atom1427);
-                            expression131=expression();
+                            pushFollow(FOLLOW_expression_in_atom1420);
+                            expression129=expression();
 
                             state._fsp--;
 
-                            stream_expression.add(expression131.getTree());
+                            stream_expression.add(expression129.getTree());
                             // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:24: ( COMMA expression )*
-                            loop45:
+                            loop44:
                             do {
-                                int alt45=2;
-                                int LA45_0 = input.LA(1);
+                                int alt44=2;
+                                int LA44_0 = input.LA(1);
 
-                                if ( (LA45_0==COMMA) ) {
-                                    alt45=1;
+                                if ( (LA44_0==COMMA) ) {
+                                    alt44=1;
                                 }
 
 
-                                switch (alt45) {
+                                switch (alt44) {
                             	case 1 :
                             	    // D:\\orcc\\trunk\\plugins\\net.sf.orcc.ui\\src\\net\\sf\\orcc\\ui\\editor\\Cal.g:215:25: COMMA expression
                             	    {
-                            	    COMMA132=(Token)match(input,COMMA,FOLLOW_COMMA_in_atom1430);  
-                            	    stream_COMMA.add(COMMA132);
+                            	    COMMA130=(Token)match(input,COMMA,FOLLOW_COMMA_in_atom1423);  
+                            	    stream_COMMA.add(COMMA130);
 
-                            	    pushFollow(FOLLOW_expression_in_atom1432);
-                            	    expression133=expression();
+                            	    pushFollow(FOLLOW_expression_in_atom1425);
+                            	    expression131=expression();
 
                             	    state._fsp--;
 
-                            	    stream_expression.add(expression133.getTree());
+                            	    stream_expression.add(expression131.getTree());
 
                             	    }
                             	    break;
 
                             	default :
-                            	    break loop45;
+                            	    break loop44;
                                 }
                             } while (true);
 
@@ -5382,8 +5354,8 @@ public class CalParser extends Parser {
 
                     }
 
-                    RBRACKET134=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_atom1438);  
-                    stream_RBRACKET.add(RBRACKET134);
+                    RBRACKET132=(Token)match(input,RBRACKET,FOLLOW_RBRACKET_in_atom1431);  
+                    stream_RBRACKET.add(RBRACKET132);
 
 
 
@@ -5470,8 +5442,8 @@ public class CalParser extends Parser {
     public static final BitSet FOLLOW_varDecl_in_varDeclSection394 = new BitSet(new long[]{0x0000402000000002L});
     public static final BitSet FOLLOW_MUTABLE_in_varDecl407 = new BitSet(new long[]{0x0000002000000000L});
     public static final BitSet FOLLOW_typeAndId_in_varDecl410 = new BitSet(new long[]{0x0003800000000000L});
-    public static final BitSet FOLLOW_EQ_in_varDecl416 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
-    public static final BitSet FOLLOW_COLON_EQUAL_in_varDecl420 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
+    public static final BitSet FOLLOW_EQ_in_varDecl416 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
+    public static final BitSet FOLLOW_COLON_EQUAL_in_varDecl420 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
     public static final BitSet FOLLOW_expression_in_varDecl423 = new BitSet(new long[]{0x0002000000000000L});
     public static final BitSet FOLLOW_SEMICOLON_in_varDecl452 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_ENTITIES_in_entitySection460 = new BitSet(new long[]{0x0000002000000000L});
@@ -5488,7 +5460,7 @@ public class CalParser extends Parser {
     public static final BitSet FOLLOW_COMMA_in_entityPars534 = new BitSet(new long[]{0x0000002000000000L});
     public static final BitSet FOLLOW_entityPar_in_entityPars536 = new BitSet(new long[]{0x0008000000000002L});
     public static final BitSet FOLLOW_QID_in_entityPar550 = new BitSet(new long[]{0x0000800000000000L});
-    public static final BitSet FOLLOW_EQ_in_entityPar552 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
+    public static final BitSet FOLLOW_EQ_in_entityPar552 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
     public static final BitSet FOLLOW_expression_in_entityPar554 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_STRUCTURE_in_structureSection580 = new BitSet(new long[]{0x0000002000000000L});
     public static final BitSet FOLLOW_structureStmt_in_structureSection582 = new BitSet(new long[]{0x0000002000000002L});
@@ -5504,7 +5476,7 @@ public class CalParser extends Parser {
     public static final BitSet FOLLOW_attributeDecl_in_attributeSection695 = new BitSet(new long[]{0x0100002000000000L});
     public static final BitSet FOLLOW_RBRACE_in_attributeSection698 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_QID_in_attributeDecl712 = new BitSet(new long[]{0x0000840000000000L});
-    public static final BitSet FOLLOW_EQ_in_attributeDecl715 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
+    public static final BitSet FOLLOW_EQ_in_attributeDecl715 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
     public static final BitSet FOLLOW_expression_in_attributeDecl717 = new BitSet(new long[]{0x0002000000000000L});
     public static final BitSet FOLLOW_SEMICOLON_in_attributeDecl719 = new BitSet(new long[]{0x0000000000000002L});
     public static final BitSet FOLLOW_COLON_in_attributeDecl742 = new BitSet(new long[]{0x0000002000000000L});
@@ -5517,81 +5489,79 @@ public class CalParser extends Parser {
     public static final BitSet FOLLOW_parameters_in_actor788 = new BitSet(new long[]{0x0000020000000000L});
     public static final BitSet FOLLOW_RPAREN_in_actor791 = new BitSet(new long[]{0x1000102000000000L});
     public static final BitSet FOLLOW_portSignature_in_actor795 = new BitSet(new long[]{0x0000040000000000L});
-    public static final BitSet FOLLOW_COLON_in_actor797 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x00000000003FFFFFL});
+    public static final BitSet FOLLOW_COLON_in_actor797 = new BitSet(new long[]{0xFFFFFFFFFFFFFFF0L,0x00000000007FFFFFL});
     public static final BitSet FOLLOW_EOF_in_actor802 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_IMPORT_in_oneImport833 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_QID_in_oneImport835 = new BitSet(new long[]{0x0042000000000000L});
-    public static final BitSet FOLLOW_DOT_in_oneImport838 = new BitSet(new long[]{0x0800000000000000L});
-    public static final BitSet FOLLOW_TIMES_in_oneImport840 = new BitSet(new long[]{0x0002000000000000L});
-    public static final BitSet FOLLOW_SEMICOLON_in_oneImport844 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeAndId_in_parameter854 = new BitSet(new long[]{0x0000800000000002L});
-    public static final BitSet FOLLOW_EQ_in_parameter859 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
-    public static final BitSet FOLLOW_expression_in_parameter861 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_parameter_in_parameters895 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_COMMA_in_parameters898 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_parameter_in_parameters900 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_MULTI_in_portDecl917 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_typeAndId_in_portDecl920 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_portDecl_in_portDecls935 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_COMMA_in_portDecls938 = new BitSet(new long[]{0x1000002000000000L});
-    public static final BitSet FOLLOW_portDecl_in_portDecls940 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_typeAndId_in_mainParameter958 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_mainParameter960 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QID_in_typeAndId977 = new BitSet(new long[]{0x0000016000000002L});
-    public static final BitSet FOLLOW_typeRest_in_typeAndId982 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_QID_in_typeAndId987 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QID_in_type1031 = new BitSet(new long[]{0x0000014000000002L});
-    public static final BitSet FOLLOW_typeRest_in_type1033 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LBRACKET_in_typeRest1056 = new BitSet(new long[]{0x000000A000000000L});
-    public static final BitSet FOLLOW_typePars_in_typeRest1058 = new BitSet(new long[]{0x0000008000000000L});
-    public static final BitSet FOLLOW_RBRACKET_in_typeRest1061 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_typeRest1072 = new BitSet(new long[]{0x0000022000000000L});
-    public static final BitSet FOLLOW_typeAttrs_in_typeRest1074 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_typeRest1077 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typeAttr_in_typeAttrs1089 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_COMMA_in_typeAttrs1092 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_typeAttr_in_typeAttrs1094 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_QID_in_typeAttr1108 = new BitSet(new long[]{0x0000840000000000L});
-    public static final BitSet FOLLOW_typeAttrRest_in_typeAttr1110 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_COLON_in_typeAttrRest1121 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_type_in_typeAttrRest1123 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_EQ_in_typeAttrRest1135 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
-    public static final BitSet FOLLOW_expression_in_typeAttrRest1137 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_typePar_in_typePars1156 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_COMMA_in_typePars1159 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_typePar_in_typePars1161 = new BitSet(new long[]{0x0008000000000002L});
-    public static final BitSet FOLLOW_QID_in_typePar1175 = new BitSet(new long[]{0x2000000000000002L});
-    public static final BitSet FOLLOW_LT_in_typePar1178 = new BitSet(new long[]{0x0000002000000000L});
-    public static final BitSet FOLLOW_type_in_typePar1180 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_expression_in_mainExpression1203 = new BitSet(new long[]{0x0000000000000000L});
-    public static final BitSet FOLLOW_EOF_in_mainExpression1205 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_factor_in_expression1220 = new BitSet(new long[]{0x4800000000000002L,0x0000000000000007L});
-    public static final BitSet FOLLOW_binop_in_expression1223 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
-    public static final BitSet FOLLOW_factor_in_expression1225 = new BitSet(new long[]{0x4800000000000002L,0x0000000000000007L});
-    public static final BitSet FOLLOW_MINUS_in_unop1237 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_NOT_in_unop1243 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_PLUS_in_binop1263 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_MINUS_in_binop1269 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TIMES_in_binop1275 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_DIV_in_binop1281 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_XOR_in_binop1287 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_term_in_factor1304 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_unop_in_factor1308 = new BitSet(new long[]{0x0000016000000000L,0x00000000000000F8L});
-    public static final BitSet FOLLOW_term_in_factor1310 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_atom_in_term1327 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LPAREN_in_term1333 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
-    public static final BitSet FOLLOW_expression_in_term1335 = new BitSet(new long[]{0x0000020000000000L});
-    public static final BitSet FOLLOW_RPAREN_in_term1337 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_QID_in_atom1352 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FLOAT_in_atom1364 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_INTEGER_in_atom1376 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_STRING_in_atom1388 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_TRUE_in_atom1400 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_FALSE_in_atom1412 = new BitSet(new long[]{0x0000000000000002L});
-    public static final BitSet FOLLOW_LBRACKET_in_atom1424 = new BitSet(new long[]{0xC00001E000000000L,0x00000000000000F8L});
-    public static final BitSet FOLLOW_expression_in_atom1427 = new BitSet(new long[]{0x0008008000000000L});
-    public static final BitSet FOLLOW_COMMA_in_atom1430 = new BitSet(new long[]{0xC000016000000000L,0x00000000000000F8L});
-    public static final BitSet FOLLOW_expression_in_atom1432 = new BitSet(new long[]{0x0008008000000000L});
-    public static final BitSet FOLLOW_RBRACKET_in_atom1438 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_IMPORT_in_oneImport833 = new BitSet(new long[]{0x0800000000000000L});
+    public static final BitSet FOLLOW_QID_WILDCARD_in_oneImport835 = new BitSet(new long[]{0x0002000000000000L});
+    public static final BitSet FOLLOW_SEMICOLON_in_oneImport837 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeAndId_in_parameter847 = new BitSet(new long[]{0x0000800000000002L});
+    public static final BitSet FOLLOW_EQ_in_parameter852 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
+    public static final BitSet FOLLOW_expression_in_parameter854 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_parameter_in_parameters888 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_COMMA_in_parameters891 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_parameter_in_parameters893 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_MULTI_in_portDecl910 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_typeAndId_in_portDecl913 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_portDecl_in_portDecls928 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_COMMA_in_portDecls931 = new BitSet(new long[]{0x1000002000000000L});
+    public static final BitSet FOLLOW_portDecl_in_portDecls933 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_typeAndId_in_mainParameter951 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_mainParameter953 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QID_in_typeAndId970 = new BitSet(new long[]{0x0000016000000002L});
+    public static final BitSet FOLLOW_typeRest_in_typeAndId975 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_QID_in_typeAndId980 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QID_in_type1024 = new BitSet(new long[]{0x0000014000000002L});
+    public static final BitSet FOLLOW_typeRest_in_type1026 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LBRACKET_in_typeRest1049 = new BitSet(new long[]{0x000000A000000000L});
+    public static final BitSet FOLLOW_typePars_in_typeRest1051 = new BitSet(new long[]{0x0000008000000000L});
+    public static final BitSet FOLLOW_RBRACKET_in_typeRest1054 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_typeRest1065 = new BitSet(new long[]{0x0000022000000000L});
+    public static final BitSet FOLLOW_typeAttrs_in_typeRest1067 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_typeRest1070 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typeAttr_in_typeAttrs1082 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_COMMA_in_typeAttrs1085 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_typeAttr_in_typeAttrs1087 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_QID_in_typeAttr1101 = new BitSet(new long[]{0x0000840000000000L});
+    public static final BitSet FOLLOW_typeAttrRest_in_typeAttr1103 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_COLON_in_typeAttrRest1114 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_type_in_typeAttrRest1116 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_EQ_in_typeAttrRest1128 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
+    public static final BitSet FOLLOW_expression_in_typeAttrRest1130 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_typePar_in_typePars1149 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_COMMA_in_typePars1152 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_typePar_in_typePars1154 = new BitSet(new long[]{0x0008000000000002L});
+    public static final BitSet FOLLOW_QID_in_typePar1168 = new BitSet(new long[]{0x2000000000000002L});
+    public static final BitSet FOLLOW_LT_in_typePar1171 = new BitSet(new long[]{0x0000002000000000L});
+    public static final BitSet FOLLOW_type_in_typePar1173 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_expression_in_mainExpression1196 = new BitSet(new long[]{0x0000000000000000L});
+    public static final BitSet FOLLOW_EOF_in_mainExpression1198 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_factor_in_expression1213 = new BitSet(new long[]{0x4000000000000002L,0x000000000000000FL});
+    public static final BitSet FOLLOW_binop_in_expression1216 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
+    public static final BitSet FOLLOW_factor_in_expression1218 = new BitSet(new long[]{0x4000000000000002L,0x000000000000000FL});
+    public static final BitSet FOLLOW_MINUS_in_unop1230 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_NOT_in_unop1236 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_PLUS_in_binop1256 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_MINUS_in_binop1262 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TIMES_in_binop1268 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_DIV_in_binop1274 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_XOR_in_binop1280 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_term_in_factor1297 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_unop_in_factor1301 = new BitSet(new long[]{0x0000016000000000L,0x00000000000001F0L});
+    public static final BitSet FOLLOW_term_in_factor1303 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_atom_in_term1320 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LPAREN_in_term1326 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
+    public static final BitSet FOLLOW_expression_in_term1328 = new BitSet(new long[]{0x0000020000000000L});
+    public static final BitSet FOLLOW_RPAREN_in_term1330 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_QID_in_atom1345 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FLOAT_in_atom1357 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_INTEGER_in_atom1369 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_STRING_in_atom1381 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_TRUE_in_atom1393 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_FALSE_in_atom1405 = new BitSet(new long[]{0x0000000000000002L});
+    public static final BitSet FOLLOW_LBRACKET_in_atom1417 = new BitSet(new long[]{0xC00001E000000000L,0x00000000000001F0L});
+    public static final BitSet FOLLOW_expression_in_atom1420 = new BitSet(new long[]{0x0008008000000000L});
+    public static final BitSet FOLLOW_COMMA_in_atom1423 = new BitSet(new long[]{0xC000016000000000L,0x00000000000001F0L});
+    public static final BitSet FOLLOW_expression_in_atom1425 = new BitSet(new long[]{0x0008008000000000L});
+    public static final BitSet FOLLOW_RBRACKET_in_atom1431 = new BitSet(new long[]{0x0000000000000002L});
 
 }
