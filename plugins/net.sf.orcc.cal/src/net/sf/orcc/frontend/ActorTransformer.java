@@ -547,12 +547,8 @@ public class ActorTransformer {
 
 			context.restoreScope();
 
-			// temporary: only use the last name
-			// the full name will be used when back-ends etc. handle it
-			String[] segments = astActor.getName().split("\\.");
-			String name = segments[segments.length - 1];
-
 			// create IR actor
+			String name = astActor.getName();
 			return new Actor(name, file, parameters, inputs, outputs,
 					stateVars, procedures, actions.getAllActions(),
 					initializes.getAllActions(), scheduler);

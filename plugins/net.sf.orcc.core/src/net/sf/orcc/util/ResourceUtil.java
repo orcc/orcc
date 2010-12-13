@@ -31,12 +31,17 @@ package net.sf.orcc.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.orcc.ir.Actor;
+
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
@@ -49,6 +54,61 @@ import org.eclipse.jdt.core.JavaModelException;
 public class ResourceUtil {
 
 	/**
+	 * Returns the list of ALL source folders of the required projects as well
+	 * as of the given project as a list of absolute workspace paths.
+	 * 
+	 * @param project
+	 *            a project
+	 * @return a list of absolute workspace paths
+	 * @throws CoreException
+	 */
+	public static List<IFolder> getAllSourceFolders(IProject project)
+			throws CoreException {
+		List<IFolder> srcFolders = new ArrayList<IFolder>();
+
+		IJavaProject javaProject = JavaCore.create(project);
+		if (!javaProject.exists()) {
+			return srcFolders;
+		}
+
+		// add source folders of required projects
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		for (String name : javaProject.getRequiredProjectNames()) {
+			IProject refProject = root.getProject(name);
+			srcFolders.addAll(getAllSourceFolders(refProject));
+		}
+
+		// add source folders of this project
+		srcFolders.addAll(getSourceFolders(project));
+
+		return srcFolders;
+	}
+
+	/**
+	 * Returns the file name that corresponds to the qualified name of the
+	 * actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @return the file name that corresponds to the qualified name of the actor
+	 */
+	public static String getFile(Actor actor) {
+		return actor.getName().replace('.', '/');
+	}
+
+	/**
+	 * Returns the folder that corresponds to the package of the given actor.
+	 * 
+	 * @param actor
+	 *            an actor
+	 * @return the folder that corresponds to the package of the given actor
+	 */
+	public static String getFolder(Actor actor) {
+		String folderName = actor.getName().replace('.', '/');
+		return folderName.substring(0, folderName.lastIndexOf('/'));
+	}
+
+	/**
 	 * Returns the output location of the given project.
 	 * 
 	 * @param project
@@ -57,7 +117,6 @@ public class ResourceUtil {
 	 *         none is found
 	 */
 	public static String getOutputFolder(IProject project) {
-		// retrieve output folder from project
 		IJavaProject javaProject = JavaCore.create(project);
 		if (!javaProject.exists()) {
 			return null;
@@ -84,20 +143,51 @@ public class ResourceUtil {
 	public static List<String> getOutputFolders(IProject project)
 			throws CoreException {
 		List<String> vtlFolders = new ArrayList<String>();
-		vtlFolders.add(ResourceUtil.getOutputFolder(project));
 
 		IJavaProject javaProject = JavaCore.create(project);
 		if (!javaProject.exists()) {
 			return vtlFolders;
 		}
 
+		// add output folders of required projects
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		for (String name : javaProject.getRequiredProjectNames()) {
 			IProject refProject = root.getProject(name);
 			vtlFolders.add(getOutputFolder(refProject));
 		}
 
+		// add output folders of this project
+		vtlFolders.add(ResourceUtil.getOutputFolder(project));
+
 		return vtlFolders;
 	}
 
+	/**
+	 * Returns the list of source folders of the given project as a list of
+	 * absolute workspace paths.
+	 * 
+	 * @param project
+	 *            a project
+	 * @return a list of absolute workspace paths
+	 * @throws CoreException
+	 */
+	public static List<IFolder> getSourceFolders(IProject project)
+			throws CoreException {
+		List<IFolder> srcFolders = new ArrayList<IFolder>();
+
+		IJavaProject javaProject = JavaCore.create(project);
+		if (!javaProject.exists()) {
+			return srcFolders;
+		}
+
+		// iterate over package roots
+		for (IPackageFragmentRoot root : javaProject.getPackageFragmentRoots()) {
+			IResource resource = root.getCorrespondingResource();
+			if (resource != null && resource.getType() == IResource.FOLDER) {
+				srcFolders.add((IFolder) resource);
+			}
+		}
+
+		return srcFolders;
+	}
 }

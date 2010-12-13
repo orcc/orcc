@@ -308,7 +308,7 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 		actor = Network.getActorFromPool(className);
 		if (actor == null) {
 			for (String path : vtlFolders) {
-				file = new File(path, className + ".json");
+				file = new File(path, className.replace('.', '/') + ".json");
 				if (file.exists()) {
 					break;
 				} else {

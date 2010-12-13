@@ -28,15 +28,27 @@
  */
 package net.sf.orcc.ui.editor;
 
+import java.util.List;
+
 import net.sf.graphiti.model.DefaultRefinementPolicy;
 import net.sf.graphiti.model.Vertex;
+import net.sf.orcc.util.ResourceUtil;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * This class extends the default refinement policy with XDF-specific policy.
@@ -50,21 +62,50 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 
 	@Override
 	public String getNewRefinement(Vertex vertex) {
-		String newRefinement = super.getNewRefinement(vertex);
-		if (newRefinement == null) {
-			return null;
-		}
+		IWorkbench workbench = PlatformUI.getWorkbench();
+		IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
+		Shell shell = window.getShell();
 
-		for (String extension : fileExtensions) {
-			IPath path = getAbsolutePath(vertex.getParent().getFileName(),
-					newRefinement);
-			if (extension.equals(path.getFileExtension())) {
-				return new Path(newRefinement).removeFileExtension().toString();
+		// prompts the user to choose a file
+		final String message = "The selected instance can be refined by an existing "
+				+ "actor or network.";
+		MessageDialog dialog = new MessageDialog(shell,
+				"Set/Update Refinement", null, message, MessageDialog.QUESTION,
+				new String[] { "Select actor", "Select network" }, 0);
+		int index = dialog.open();
+		String newRefinement = null;
+		if (index == 0) {
+			newRefinement = selectActor(vertex, shell);
+		} else if (index == 1) {
+			// network = same behavior as before
+			newRefinement = useExistingFile(vertex, shell);
+			if (newRefinement != null) {
+				for (String extension : fileExtensions) {
+					IPath path = getAbsolutePath(vertex.getParent()
+							.getFileName(), newRefinement);
+					if (extension.equals(path.getFileExtension())) {
+						return new Path(newRefinement).removeFileExtension()
+								.toString();
+					}
+				}
 			}
 		}
 
-		return null;
+		return newRefinement;
+	}
 
+	/**
+	 * Returns the project to which the vertex belongs.
+	 * 
+	 * @param vertex
+	 *            a vertex
+	 * @return a project
+	 */
+	private IProject getProject(Vertex vertex) {
+		IPath location = new Path(vertex.getParent().getFileName());
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IFile file = root.getFileForLocation(location);
+		return file.getProject();
 	}
 
 	@Override
@@ -74,6 +115,7 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 			return null;
 		}
 
+		// first try network
 		IPath path = getAbsolutePath(vertex.getParent().getFileName(),
 				refinement);
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -83,6 +125,45 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 			if (resource != null && resource.getType() == IResource.FILE) {
 				return (IFile) resource;
 			}
+		}
+
+		// then actor
+		IProject project = getProject(vertex);
+		try {
+			List<IFolder> folders = ResourceUtil.getAllSourceFolders(project);
+			for (IFolder folder : folders) {
+				String actorPath = refinement.replace('.', '/');
+				IFile file = folder.getFile(new Path(actorPath + ".cal"));
+				if (file != null && file.exists()) {
+					return file;
+				}
+			}
+		} catch (CoreException e) {
+			return null;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Selects the qualified identifier of an actor.
+	 * 
+	 * @param vertex
+	 *            a vertex
+	 * @param shell
+	 *            shell
+	 * @return the qualified identifier of an actor
+	 */
+	private String selectActor(Vertex vertex, Shell shell) {
+		IProject project = getProject(vertex);
+
+		FilteredActorsDialog dialog = new FilteredActorsDialog(project, shell);
+		dialog.setTitle("Select actor");
+		dialog.setMessage("&Select existing actor:");
+		dialog.setInitialPattern(getRefinement(vertex));
+		int result = dialog.open();
+		if (result == Window.OK) {
+			return (String) dialog.getFirstResult();
 		}
 
 		return null;

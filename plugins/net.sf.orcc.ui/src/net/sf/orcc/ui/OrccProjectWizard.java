@@ -60,7 +60,7 @@ public class OrccProjectWizard extends BasicNewProjectResourceWizard {
 			IProject project = this.getNewProject();
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 2];
+			String[] newNatures = new String[natures.length + 3];
 
 			System.arraycopy(natures, 0, newNatures, 2, natures.length);
 			newNatures[0] = OrccProjectNature.NATURE_ID;

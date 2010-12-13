@@ -119,6 +119,7 @@ import net.sf.orcc.ir.nodes.NodeInterpreter;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.ir.type.TypeInterpreter;
 import net.sf.orcc.util.OrderedMap;
+import net.sf.orcc.util.ResourceUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -597,8 +598,10 @@ public class IRWriter {
 			throws OrccException {
 		Writer writer;
 		try {
+			String folder = ResourceUtil.getFolder(actor);
+			new File(outputDir + File.separator + folder).mkdirs();
 			OutputStream os = new FileOutputStream(outputDir + File.separator
-					+ actor.getName() + ".json");
+					+ ResourceUtil.getFile(actor) + ".json");
 			// write output as UTF-8
 			writer = new BufferedWriter(new OutputStreamWriter(os));
 		} catch (IOException e) {
