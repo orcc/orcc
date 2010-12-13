@@ -62,10 +62,8 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 			SelectList:[list_selected]
 				==>
 		guard
-			MbPartIdx   < MbPartIdxMax,
-			   SizeMb  != SZ_8x8
-			or mb_type  = BLOCK_TYPE_B_SKIP
-			or mb_type  = BLOCK_TYPE_B_DIRECT_16x16
+			MbPartIdx  < MbPartIdxMax,
+			SizeMb    != SZ_8x8
 		do
 			NbListToGet :=
 				if(list_selected != BIPRED)then
@@ -132,25 +130,6 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 			NbListToGet := NbListToGet - 1;
 		end
 
-	GetInterpMb.B_Skip: action
-				==>
-		guard
-			SizeMb      = SZ_8x8,
-			NbListToGet > 0
-		do
-			foreach int j in 0 .. 2*SzSidePerPart -1
-			do
-				foreach int i in 0 .. 2*SzSidePerPart -1
-				do
-					TabX_Out[i + 2*SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1);
-					TabY_Out[i + 2*SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1);
-				end
-			end
-			NbValueToRead := 4*SzSidePerPart*SzSidePerPart;
-			ReadIdx       := 0;
-			NbListToGet := NbListToGet - 1;
-		end
-
 	GetInterp.Done: action ==>
 		guard
 			NbListToGet = 0
@@ -162,10 +141,8 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 			SubMbType :[ValSubMbType]
 				==>
 		guard
-			SizeMb     = SZ_8x8,
-			mb_type   != BLOCK_TYPE_B_SKIP,
-			mb_type   != BLOCK_TYPE_B_DIRECT_16x16,
-			MbPartIdx  < MbPartIdxMax
+			SizeMb    = SZ_8x8,
+			MbPartIdx < MbPartIdxMax
 		do
 			SubMbPartIdx    := 0;
 			SubMbPartIdxMax := NumSubMbPart(mb_type,ValSubMbType);
@@ -336,7 +313,6 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 		GetMb              (GetInterp.Launch16x16    )--> ReadInterpFor16x16;
 		GetMb              (GetInterp.Launch16x8     )--> ReadInterpFor16x8;
 		GetMb              (GetInterp.Launch8x16     )--> ReadInterpFor8x16;
-		GetMb              (GetInterpMb.B_Skip       )--> ReadInterpFor8x16;
 		GetMb              (GetInterp.Done           )--> GetListSel4Mb;
 
 		ReadInterpFor16x16 (ReadInterp.Launch        )--> ReadInterpFor16x16;
@@ -347,9 +323,6 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 
 		ReadInterpFor8x16  (ReadInterp.Launch        )--> ReadInterpFor8x16;
 		ReadInterpFor8x16  (ReadInterp.Done          )--> GetMb;
-
-		ReadInterpForBSkip (ReadInterp.Launch        )--> ReadInterpForBSkip;
-		ReadInterpForBSkip (ReadInterp.Done          )--> GetMb;
 
 		GetListSel4SubMb   (GetListSel4SubMb         )--> GetSubMb;
 		GetListSel4SubMb   (GetSubMbInfo.Done        )--> GetListSel4Mb;
