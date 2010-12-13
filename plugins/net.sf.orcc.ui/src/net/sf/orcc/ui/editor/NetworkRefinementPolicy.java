@@ -58,7 +58,7 @@ import org.eclipse.ui.PlatformUI;
  */
 public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 
-	private final String[] fileExtensions = { "cal", "nl", "xdf" };
+	private final String[] fileExtensions = { "nl", "xdf" };
 
 	@Override
 	public String getNewRefinement(Vertex vertex) {

@@ -55,8 +55,8 @@ public class XdfValidator extends DataflowValidator {
 		}
 
 		if (!fileName.equals(name)) {
-			String message = "The current name of the network is \"" + name
-					+ "\", it should be \"" + fileName + "\"";
+			String message = "Invalid network " + name + ", expected "
+					+ fileName;
 			createMarker(file, message);
 			return false;
 		}
@@ -68,21 +68,19 @@ public class XdfValidator extends DataflowValidator {
 		IRefinementPolicy policy = graph.getConfiguration()
 				.getRefinementPolicy();
 
-		boolean refinementsValid = true;
 		Set<Vertex> vertices = graph.vertexSet();
 		for (Vertex vertex : vertices) {
 			if ("Instance".equals(vertex.getType().getName())) {
 				if (policy.getRefinementFile(vertex) == null) {
-					refinementsValid = false;
-					String message = "Refinement of vertex "
+					String message = "Invalid refinement of vertex "
 							+ vertex.getValue(ObjectType.PARAMETER_ID) + ": "
-							+ policy.getRefinement(vertex) + " is invalid";
+							+ policy.getRefinement(vertex);
 					createMarker(file, message);
 				}
 			}
 		}
 
-		return refinementsValid;
+		return true;
 	}
 
 	@Override
