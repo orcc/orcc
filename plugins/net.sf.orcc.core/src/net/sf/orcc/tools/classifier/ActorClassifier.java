@@ -154,6 +154,7 @@ public class ActorClassifier implements ActorTransformation {
 		// data-dependent condition
 		String initialState = interpreter.getFsmState();
 		do {
+			//TODO : Limit the loop in the case of actor never return to initial state
 			interpreter.schedule();
 			csdfMoc.addAction(interpreter.getScheduledAction());
 			nbPhases++;

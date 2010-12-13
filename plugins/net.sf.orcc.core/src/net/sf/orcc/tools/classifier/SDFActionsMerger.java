@@ -31,29 +31,28 @@ package net.sf.orcc.tools.classifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
+import net.sf.orcc.ir.CFGNode;
+import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Location;
 import net.sf.orcc.ir.Pattern;
-import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Tag;
-import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.Use;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
-import net.sf.orcc.ir.instructions.Read;
+import net.sf.orcc.ir.instructions.Call;
 import net.sf.orcc.ir.instructions.Return;
-import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.ir.transformations.SSATransformation;
 import net.sf.orcc.util.UniqueEdge;
@@ -85,6 +84,28 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 	public SDFActionsMerger() {
 	}
 
+	private IfNode createActionCall(Expression expr, Procedure body){
+		actor.getProcs().put(body.getName(), body);
+		List<CFGNode> thenNodes = new ArrayList<CFGNode>();
+		BlockNode node = new BlockNode(target);
+		
+		node.add(new Call(new Location(), null, body, new ArrayList<Expression>()));
+		
+		thenNodes.add(node);
+		return new IfNode(target, expr, thenNodes, new ArrayList<CFGNode>(), new BlockNode(target));
+	}
+
+	private Expression createActionCondition(BlockNode node, Procedure scheduler){
+		actor.getProcs().put(scheduler.getName(), scheduler);
+		LocalVariable returnVar = target.newTempLocalVariable(file, scheduler.getReturnType(),
+				scheduler.getName()+"_ret");
+		node.add(new Call(new Location(), returnVar, scheduler, new ArrayList<Expression>()));
+		
+		Use use = new Use(returnVar);
+		return new VarExpr(use);
+	}
+	
+
 	/**
 	 * Creates an isSchedulable procedure for the given input pattern.
 	 * 
@@ -93,7 +114,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 	 * @return a procedure
 	 */
 	private Procedure createIsSchedulable(Pattern input) {
-		Procedure procedure = new Procedure("isSchedulableSDF", new Location(),
+		Procedure procedure = new Procedure("isSchedulable_SDF", new Location(),
 				IrFactory.eINSTANCE.createTypeBool());
 
 		LocalVariable result = procedure.newTempLocalVariable(file,
@@ -144,6 +165,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 					graph.removeAllEdges(source, target);
 					graph.addEdge(source, target,
 							new UniqueEdge(newActions.get(0)));
+					
 				}
 			}
 		}
@@ -180,13 +202,15 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 		newActions.add(action);
 		return newActions;
 	}
-
+	
 	private Procedure mergeSDFBodies(Pattern input, Pattern output,
 			List<Action> actions) {
 		target = new Procedure("SDF", new Location(),
 				IrFactory.eINSTANCE.createTypeVoid());
-		BlockNode block = BlockNode.getFirst(target);
+		/*BlockNode block = BlockNode.getFirst(target);
 
+		// TODO Add input pattern to the merged action
+		
 		for (Entry<Port, Integer> entry : input.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
@@ -195,13 +219,21 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 			LocalVariable variable = target.newTempLocalVariable(file, type,
 					port.getName());
 			block.add(new Read(port, numTokens, variable));
-		}
+		}*/
 
+	
+		//Launch action
+		List<CFGNode> elseNodes = target.getNodes();
+		
 		for (Action action : actions) {
-			// TODO copy action and isSchedulable test
-			action.toString();
+			BlockNode thenBlock = BlockNode.getFirst(target, elseNodes);
+			Expression callExpr = createActionCondition(thenBlock, action.getScheduler());
+			IfNode ifNode = createActionCall(callExpr, action.getBody());
+			elseNodes.add(ifNode);
+			elseNodes = ifNode.getElseNodes();
 		}
-
+		// TODO Add input pattern to the merged action
+/*
 		for (Entry<Port, Integer> entry : output.entrySet()) {
 			Port port = entry.getKey();
 			int numTokens = entry.getValue();
@@ -210,7 +242,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 			LocalVariable variable = target.newTempLocalVariable(file, type,
 					port.getName());
 			block.add(new Write(port, numTokens, variable));
-		}
+		}*/
 
 		return target;
 	}
@@ -232,6 +264,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 			for (State state : graph.vertexSet()) {
 				examineState(graph, state);
 			}
+			fsm.setGraph(graph);
 		}
 	}
 

@@ -297,7 +297,7 @@ public class FSM {
 
 		return graph;
 	}
-
+	
 	/**
 	 * Returns the initial state.
 	 * 
@@ -355,6 +355,34 @@ public class FSM {
 			exporter.export(new OutputStreamWriter(out), getGraph());
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
+		}
+	}
+
+	/**
+	 * Refresh this FSM with the corresponding a graph representation of this FSM. 
+	 * 
+	 * @param graph : a graph representation of this FSM
+	 */
+	public void setGraph(DirectedGraph<State, UniqueEdge>  graph) {
+		
+		//Clear fsm
+		states.clear();
+		transitions.clear();
+		
+		//TODO : Initial state from graph not taken in account
+		setInitialState(getInitialState().getName());
+		
+		//Set states of the fsm
+		for (State state : graph.vertexSet()) {
+			addState(state.getName());
+		}
+		
+		//Set transitions of the fsm
+		for (UniqueEdge edge : graph.edgeSet()) {
+			State source = graph.getEdgeSource(edge);
+			State target = graph.getEdgeTarget(edge);
+			Action action = (Action)edge.getObject();
+			addTransition(source.getName(), target.getName(), action);
 		}
 	}
 
