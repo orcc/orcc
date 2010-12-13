@@ -244,9 +244,12 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16,
 			not IsNewPic
 		var
-			List(type: bool, size=4) IsColZero,
-			uint(size=4)              Idx
+			List(type: bool, size=4) IsColZero
 		do
+			mb_type      := MacroBlkType;
+			MbPartIdx    := 0;
+			MbPartIdxMax := 1;//4;
+			SizeMbMv     := SZ_8x8;
 			Mbx := Curr_Mb_Addr mod PicWidth;
 			Mby := Curr_Mb_Addr  /  PicWidth;
 			//There are 16 Partitions in a macroblock
@@ -258,20 +261,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 				do
 					IsColZero[2*j+i] := Compute_ColZero(Mbx+2*i,Mby+2*j);
 				end
-			end	
-
-			NbPartitionsToWrite := 16;
-			foreach int i in Mbx .. Mbx + 3
-			do
-				foreach int j in Mby .. Mby + 3
-				do
-					Partition_Mbx[Idx] := i;
-					Partition_Mby[Idx] := j;
-					Idx                := Idx + 1;
-				end
 			end
-			IsPredL0  := false;
-			IsPredL1  := false;
 		end
 
 	GetMbType.Others: action
@@ -372,12 +362,48 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			MbPartIdx := MbPartIdx + 1;
 		end
 
+	GetMbParameters.Launch_B_Direct: action
+				==>
+		guard
+			MbPartIdx < MbPartIdxMax,
+			   mb_type = BLOCK_TYPE_B_SKIP
+			or mb_type = BLOCK_TYPE_B_DIRECT_16x16
+		var
+			uint(size=4) Idx := 0
+		do
+			NbPartitionsToWrite := 16;
+			foreach int i in Mbx .. Mbx + 3
+			do
+				foreach int j in Mby .. Mby + 3
+				do
+					Partition_Mbx[Idx] := i;
+					Partition_Mby[Idx] := j;
+					Idx                := Idx + 1;
+				end
+			end
+/*			NbPartitionsToWrite := 4;
+			foreach int i in Mbx + 2* (MbPartIdx&1) .. Mbx + 2* (MbPartIdx&1) + 1
+			do
+				foreach int j in Mby + 2* ((MbPartIdx>>1)&1) .. Mby + 2* ((MbPartIdx>>1)&1) + 1
+				do
+					Partition_Mbx[Idx] := i;
+					Partition_Mby[Idx] := j;
+					Idx                := Idx + 1;
+				end
+			end*/
+			IsPredL0  := false;
+			IsPredL1  := false;
+			MbPartIdx := MbPartIdx + 1;
+		end
+
 	LaunchGetSubMbParameters: action
 			SubMbType :[ValSubMbType]
 				==>
 		guard
-			MbPartIdx < MbPartIdxMax,
-			SizeMbMv  = SZ_8x8
+			MbPartIdx  < MbPartIdxMax,
+			SizeMbMv   = SZ_8x8,
+			mb_type   != BLOCK_TYPE_B_SKIP,
+			mb_type   != BLOCK_TYPE_B_DIRECT_16x16
 		do
 			SubMbPartIdx    :=  0;
 			SubMbPartIdxMax :=  NumSubMbPart(mb_type,ValSubMbType);
@@ -698,12 +724,10 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 
 		GetMbType          (GetNewPic                       )--> ReadDelList;
 		GetMbType          (GetMbType.MacroBlkIorSI         )--> EatTokens;
-		GetMbType          (GetMbType.B_Skip_B_Direct_16x16 )--> GetBlockInfo4BSkip;
+		GetMbType          (GetMbType.B_Skip_B_Direct_16x16 )--> GetMbParameters;
 		GetMbType          (GetMbType.Others                )--> GetMbParameters;
 
 		EatTokens          (EatTokens                       )--> GetMbType;
-
-		GetBlockInfo4BSkip (GetBlockInfo                    )--> GetMbType;
 
 		GetMbParameters    (GetMbParameters                 )--> GetBlockInfo4Mb;
 		GetMbParameters    (LaunchGetSubMbParameters        )--> GetSubMbParameters;

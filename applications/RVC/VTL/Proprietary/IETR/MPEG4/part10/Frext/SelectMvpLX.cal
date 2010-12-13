@@ -90,7 +90,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.SelectMvpLX()
 		do
 			mb_type := MacroBlkType;
 			Idx_Sub_Tab   :=
-				if(MacroBlkType >= BLOCK_TYPE_B_MIN and MacroBlkType <= BLOCK_TYPE_B_MAX) then
+				if Mb_IsBiPred(MacroBlkType) then
 					0
 				else
 					1
