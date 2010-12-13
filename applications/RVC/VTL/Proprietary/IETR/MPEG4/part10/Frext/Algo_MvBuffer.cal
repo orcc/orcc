@@ -190,7 +190,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			//XXXXXX01 -> XXXXXX00
 			//XXXXXX10 -> XXXXXX11
 			//XXXXXX11 -> XXXXXX11
-			Idx & 0xFFFFFFFE + (Idx >> 1)&1
+			Idx & 0xFFFFFFFE + ((Idx >> 1)&1)
 		end
 
 	function Compute_ColZero(uint Idx_x, uint Idx_y)
@@ -213,7 +213,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			if(not colPic_IsShortTermRef)then
 				false
 			else
-				if(ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y] = -1 and ListRefIdxL1[ReadListIdx][Idx_x][Idx_y] = -1)then
+				if(ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y_Infer] = -1 and ListRefIdxL1[ReadListIdx][Idx_x_Infer][Idx_y_Infer] = -1)then
 					false
 				else
 					if(ListRefIdxL0[ReadListIdx][Idx_x_Infer][Idx_y_Infer] != -1)then
@@ -661,12 +661,16 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 				==>
 		guard
 			Idx_RefList < Size_RefList
+		var
+			bool IdxNotFound//Delete me when the bug in Orcc will be solved
 		do
 			if(Idx_RefList   = 0)then
 				ReadListIdx := 0;
-				while(ListPoc[ReadListIdx] != ValRefList and ReadListIdx < 15)
+				IdxNotFound := ListPoc[ReadListIdx] != ValRefList;
+				while(/*ListPoc[ReadListIdx] != ValRefList*/IdxNotFound and ReadListIdx < 15)
 				do
 					ReadListIdx := ReadListIdx + 1;
+					IdxNotFound := ListPoc[ReadListIdx] != ValRefList;
 				end
 			end
 			Idx_RefList := Idx_RefList + 1;
