@@ -209,7 +209,7 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 newState() ::= << 
-:: state == $fsm_trans.SourceState$
+:: state == $fsm_trans.SourceState$ ->
 $if (rest(fsm_trans.NextStateInfo))$
 	$options.peeks.(first(fsm_trans.NextStateInfo).action): { p | chan_$p.port$?<$p.port$>;}$
 	if
@@ -236,7 +236,7 @@ schedulerFSM(action) ::= <<
 
 guardFSM() ::= <<
 $if (options.guards.(action))$
- $options.guards.(action): {act | && $act$} $
+ $options.guards.(action): {act | $act$} $
 $else$
 skip
 $endif$
@@ -272,7 +272,7 @@ $endif$
 >> 
 
 inputPatternPort(port) ::= <<
-chan_$port.name$?trash;
+/*chan_$port.name$?trash;*/
 >>
 
 inputPattern(pattern) ::= <<
@@ -280,7 +280,7 @@ $pattern.keys: inputPatternPort(); separator="\n"$
 >>
 
 outputPatternPort(port) ::= <<
-chan_$port$!trash;
+/*chan_$port$!trash;*/
 >>
 
 outputPattern(pattern) ::= <<
