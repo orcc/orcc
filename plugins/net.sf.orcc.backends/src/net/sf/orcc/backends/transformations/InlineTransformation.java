@@ -31,6 +31,7 @@ package net.sf.orcc.backends.transformations;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
@@ -305,10 +306,6 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 	}
 
-	private int currentIndex;
-
-	private List<CFGNode> currentNodes;
-
 	private InlineCloner inlineCloner;
 
 	private boolean inlineFunction;
@@ -350,13 +347,13 @@ public class InlineTransformation extends AbstractActorTransformation {
 			LocalVariable oldVar = (LocalVariable) var;
 			if (var.getType().isList()) {
 				// In case of list, the parameter could be a global variable
-				Variable newVar =  ((VarExpr) call.getParameters().get(
+				Variable newVar = ((VarExpr) call.getParameters().get(
 						function.getParameters().getList().indexOf(var)))
 						.getVar().getVariable();
 				variableToLocalVariableMap.put(oldVar, newVar);
 			} else {
-				LocalVariable newVar = procedure.newTempLocalVariable("", oldVar.getType(),
-						oldVar.getName());
+				LocalVariable newVar = procedure.newTempLocalVariable("",
+						oldVar.getType(), oldVar.getName());
 				newVar.setIndex(oldVar.getIndex());
 				newVar.setLocation(oldVar.getLocation());
 				newVar.setAssignable(oldVar.isAssignable());
@@ -390,23 +387,25 @@ public class InlineTransformation extends AbstractActorTransformation {
 		}
 
 		// Remove old block and add the new ones
-		List<Instruction> instructions = call.getBlock().getInstructions();
 		BlockNode firstBlockNodePart = new BlockNode(procedure);
 		BlockNode secondBlockNodePart = new BlockNode(procedure);
 
-		int indexOfCall = instructions.indexOf(call);
-		for (int i = 0; i < indexOfCall; i++) {
-			firstBlockNodePart.add(instructions.get(i));
+		instructionIterator.remove();
+		while(instructionIterator.hasPrevious()){
+			firstBlockNodePart.add(0, instructionIterator.previous());
+			instructionIterator.remove();
 		}
-		for (int i = indexOfCall + 1; i < instructions.size(); i++) {
-			secondBlockNodePart.add(instructions.get(i));
+		while(instructionIterator.hasNext()){
+			secondBlockNodePart.add(instructionIterator.next());
+			instructionIterator.remove();
 		}
+
 		nodes.add(0, firstBlockNodePart);
 		nodes.add(secondBlockNodePart);
 
-		currentNodes.remove(currentIndex);
-		for (int i = 0; i < nodes.size(); i++) {
-			currentNodes.add(currentIndex + i, nodes.get(i));
+		nodeIterator.remove();
+		for (CFGNode node : nodes) {
+			nodeIterator.add(node);
 		}
 
 		needToSkipThisNode = true;
@@ -430,10 +429,15 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 	@Override
 	public void visit(BlockNode blockNode) {
-		List<Instruction> instructions = blockNode.getInstructions();
+		ListIterator<Instruction> it = blockNode.listIterator();
 		needToSkipThisNode = false;
-		for (int i = 0; i < instructions.size() && !needToSkipThisNode; i++) {
-			instructions.get(i).accept(this);
+		while (it.hasNext() && !needToSkipThisNode) {
+			Instruction instruction = it.next();
+			instructionIterator = it;
+			instruction.accept(this);
+		}
+		if(needToSkipThisNode){
+			nodeIterator.previous();
 		}
 	}
 
@@ -449,17 +453,6 @@ public class InlineTransformation extends AbstractActorTransformation {
 		if (call.getProcedure().getReturnType().isVoid() && inlineProcedure) {
 			inline(call);
 		}
-	}
-
-	@Override
-	public void visit(List<CFGNode> nodes) {
-		List<CFGNode> oldCurrentNodes = currentNodes;
-		currentNodes = nodes;
-		for (int i = 0; i < nodes.size(); i++) {
-			currentIndex = i;
-			nodes.get(i).accept(this);
-		}
-		currentNodes = oldCurrentNodes;
 	}
 
 }
