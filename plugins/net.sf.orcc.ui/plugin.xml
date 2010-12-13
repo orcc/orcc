@@ -210,7 +210,7 @@
             name="XDF"
             refinement="net.sf.orcc.ui.editor.NetworkRefinementPolicy"
             type="text/xml"
-            validator="net.sf.graphiti.validators.XdfValidator">
+            validator="net.sf.orcc.ui.editor.XdfValidator">
          <graphType
                name="XML Dataflow Network">
             <parameter
@@ -412,7 +412,7 @@
             name="NL"
             refinement="net.sf.orcc.ui.editor.NetworkRefinementPolicy"
             type="text"
-            validator="net.sf.graphiti.validators.XdfValidator">
+            validator="net.sf.orcc.ui.editor.XdfValidator">
          <graphType
                name="Network">
             <parameter
