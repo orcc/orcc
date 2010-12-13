@@ -14,7 +14,7 @@
     <xsl:param name="path"/>
     <xsl:variable name="file" select="replace($path, '(.+)[.].+', '$1.layout')"/>
     
-    <xsl:variable name="grammarId" select="'net.sf.graphiti.grammar.cal'"/>
+    <xsl:variable name="grammarId" select="'net.sf.orcc.ui.grammar.cal'"/>
 
     <!-- Top-level: graph -> XDF -->
     <xsl:template match="graph">
