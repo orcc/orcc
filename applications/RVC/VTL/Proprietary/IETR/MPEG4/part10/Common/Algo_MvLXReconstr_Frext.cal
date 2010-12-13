@@ -356,7 +356,7 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 	GetMbType.B_Skip_B_Direct_16x16: action
 			mb_type          :[MacroBlkType],
 			NewPic_i         :[IsNewPic],
-			colZeroFlag      :[TabColZero] repeat 16,
+			colZeroFlag      :[TabColZero] repeat 4,
 			CurrMbAddr       :[Curr_Mb_Addr],
 			FirstMbInSlice   :[Fst_Mb],
 			PicWidthInMb     :[pic_width_in_mb]
@@ -401,21 +401,13 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 			end
 
 			if(direct_spatial_mv_pred)then // spatial prediction
-				//foreach int i in 0 .. 15 //FIXME
-				//do
 				GetNeighbourBlockParameters (0,16);
 				RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
 				foreach int i in 0 .. 15
 				do
 					RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
 				end
-/*				foreach int i in 1 .. 15
-				do
-					if(TabColZero[0] != TabColZero[i])then
-						println("Ooops : TabColZero[0] : "+TabColZero[0]+" ; TabColZero["+i+"] : "+TabColZero[i]);
-					end
-				end
-*/				if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[0])then
+				if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[0])then
 					foreach int i in 0 .. 15
 					do
 						MvTab[Idx_CurrBlk][i] := [0,0];
@@ -430,7 +422,6 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 					end
 					direct_pred_lx           := true;
 				end
-				//end
 			else //temporal prediction
 				println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
 			end
