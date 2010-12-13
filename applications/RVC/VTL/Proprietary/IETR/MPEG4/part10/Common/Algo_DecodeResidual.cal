@@ -304,7 +304,9 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeResidual()
 			if(Component_type = LUMA_COMPONENT)then
 				TotalCoeffTabLuma[IdxCurrMb - 1]   := ValTotal_Coeff;
 			else
-				TotalCoeffTabChroma[iCbCrLoop - 1][IdxCurrMb - 1] := ValTotal_Coeff;
+				if(Component_type = CHROMA_AC_COMPONENT)then
+					TotalCoeffTabChroma[iCbCrLoop - 1][IdxCurrMb - 1] := ValTotal_Coeff;
+				end
 			end
 		end
 
@@ -351,7 +353,7 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeResidual()
 			maxNumCoeff  := 15;
 		end
 
-	ChromaAcLoopiCbCr: action ==>
+	ChromaLoopiCbCr: action ==>
 		guard
 			iCbCrLoop < 2
 		do
@@ -452,19 +454,12 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeResidual()
 				CheckBmFlagEndIx             (ResLuma_LaunchResBlk_1                )--> ResLumaSendResBlkPar2_0;
 	
 				ResLumaSendResBlkPar2_0      (SendResBlockParameters                )--> ResLumaGetTotalCoeff2_0;
-	
 				ResLumaGetTotalCoeff2_0      (GetTotalCoeff                         )--> ResLumaSendResBlkPar2_1;
-	
 				ResLumaSendResBlkPar2_1      (SendResBlockParameters                )--> ResLumaGetTotalCoeff2_1;
-	
 				ResLumaGetTotalCoeff2_1      (GetTotalCoeff                         )--> ResLumaSendResBlkPar2_2;
-	
 				ResLumaSendResBlkPar2_2      (SendResBlockParameters                )--> ResLumaGetTotalCoeff2_2;
-	
 				ResLumaGetTotalCoeff2_2      (GetTotalCoeff                         )--> ResLumaSendResBlkPar2_3;
-	
 				ResLumaSendResBlkPar2_3      (SendResBlockParameters                )--> ResLumaGetTotalCoeff2_3;
-	
 				ResLumaGetTotalCoeff2_3      (GetTotalCoeff                         )--> CheckEndLoop8x8;
 	
 				CheckEndLoop8x8              (EndLoop8x8.IsEqualToFalse             )--> CheckCodeBlockBmFlag;
@@ -477,66 +472,58 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeResidual()
 			ResidualLumaFinished (ResLumaOutput.IsLuma )--> CheckChromaArrayType;
 			ResidualLumaFinished (a )-->undefined;
 
-		CheckChromaArrayType (ChromaArrayTypeVal.IsEqualTo1or2 )--> CheckChromaDc;
-		CheckChromaArrayType (ChromaArrayTypeVal.IsEqualTo3    )--> undefined;
-		CheckChromaArrayType (SendEndResidual                  )--> GetParameters;
 
-		CheckChromaDc (ChromaDCResBlk )--> ChromaDCSendResBlockParam_1;
-		CheckChromaDc (SendSkipChromaDc )--> CheckChromaAC;
+		CheckChromaArrayType        (ChromaArrayTypeVal.IsEqualTo1or2 )--> CheckChromaDc;
+		CheckChromaArrayType        (ChromaArrayTypeVal.IsEqualTo3    )--> undefined;
+		CheckChromaArrayType        (SendEndResidual                  )--> GetParameters;
+
+
+		CheckChromaDc               (ChromaDCResBlk                   )--> ChromaDCSendResBlockParam_1;
+		CheckChromaDc               (SendSkipChromaDc                 )--> CheckChromaAC;
+
+		ChromaDCSendResBlockParam_1 (SendResBlockParameters           )--> ChromaDCGetTotalCoeff_1;
+		ChromaDCGetTotalCoeff_1     (GetTotalCoeff                    )--> ChromaDCSendResBlockParam_2;
+		ChromaDCSendResBlockParam_2 (SendResBlockParameters           )--> ChromaDCGetTotalCoeff_2;
+		ChromaDCGetTotalCoeff_2     (GetTotalCoeff                    )--> CheckChromaAC;
+
+
+		CheckChromaAC               (ChromaAcComponentPresent         )--> CheckLoopiCbCr;
+		CheckChromaAC               (ChromaAcComponentNotPresent      )--> ChromaAcComponentNotPresent;
+
+		CheckLoopiCbCr              (ChromaLoopiCbCr                  )--> CheckLoopi8x8;
+		CheckLoopiCbCr              (SendEndResidual                  )--> GetParameters;
+
+		CheckLoopi8x8               (ChromaAcLoopi8x8                 )--> ChromaAcSendResBlockPar_1;
+		CheckLoopi8x8               (SendChromaCoeffToken             )--> CheckLoopiCbCr;
 	
-		ChromaDCSendResBlockParam_1 (SendResBlockParameters                )--> ChromaDCGetTotalCoeff_1;
+		ChromaAcSendResBlockPar_1   (SendResBlockParameters           )--> ChromaAcGetTotalCoeff_1;
+		ChromaAcGetTotalCoeff_1     (GetTotalCoeff                    )--> ChromaAcSendResBlockPar_2;
+		ChromaAcSendResBlockPar_2   (SendResBlockParameters           )--> ChromaAcGetTotalCoeff_2;
+		ChromaAcGetTotalCoeff_2     (GetTotalCoeff                    )--> ChromaAcSendResBlockPar_3;
+		ChromaAcSendResBlockPar_3   (SendResBlockParameters           )--> ChromaAcGetTotalCoeff_3;
+		ChromaAcGetTotalCoeff_3     (GetTotalCoeff                    )--> ChromaAcSendResBlockPar_4;
+		ChromaAcSendResBlockPar_4   (SendResBlockParameters           )--> ChromaAcGetTotalCoeff_4;
+		ChromaAcGetTotalCoeff_4     (GetTotalCoeff                    )--> CheckLoopi8x8;
 
-		ChromaDCGetTotalCoeff_1     (GetTotalCoeff                        )--> ChromaDCSendResBlockParam_2;
-	
-		ChromaDCSendResBlockParam_2 (SendResBlockParameters                )--> ChromaDCGetTotalCoeff_2;
+		ChromaAcComponentNotPresent (ChromaAcComponentNotPresent      )--> ChromaAcComponentNotPresent;
+		ChromaAcComponentNotPresent (SendEndResidual                  )--> GetParameters;
 
-		ChromaDCGetTotalCoeff_2     (GetTotalCoeff                        )--> CheckChromaAC;
-
-		CheckChromaAC (ChromaAcComponentPresent    )--> CheckLoopiCbCr;
-		CheckChromaAC (ChromaAcComponentNotPresent )--> ChromaAcComponentNotPresent;
-
-		CheckLoopiCbCr (ChromaAcLoopiCbCr )--> CheckLoopi8x8;
-		CheckLoopiCbCr (SendEndResidual )--> GetParameters;
-
-		CheckLoopi8x8 (ChromaAcLoopi8x8 )--> ChromaAcSendResBlockPar_1;
-		CheckLoopi8x8 (SendChromaCoeffToken )--> CheckLoopiCbCr;
-
-	
-		ChromaAcSendResBlockPar_1      (SendResBlockParameters                )--> ChromaAcGetTotalCoeff_1;
-
-		ChromaAcGetTotalCoeff_1      (GetTotalCoeff                         )--> ChromaAcSendResBlockPar_2;
-
-		ChromaAcSendResBlockPar_2      (SendResBlockParameters                )--> ChromaAcGetTotalCoeff_2;
-
-		ChromaAcGetTotalCoeff_2      (GetTotalCoeff                         )--> ChromaAcSendResBlockPar_3;
-
-		ChromaAcSendResBlockPar_3      (SendResBlockParameters                )--> ChromaAcGetTotalCoeff_3;
-
-		ChromaAcGetTotalCoeff_3      (GetTotalCoeff                         )--> ChromaAcSendResBlockPar_4;
-
-		ChromaAcSendResBlockPar_4      (SendResBlockParameters                )--> ChromaAcGetTotalCoeff_4;
-
-		ChromaAcGetTotalCoeff_4      (GetTotalCoeff                         )--> CheckLoopi8x8;
-
-		ChromaAcComponentNotPresent (ChromaAcComponentNotPresent )--> ChromaAcComponentNotPresent;
-		ChromaAcComponentNotPresent (SendEndResidual )--> GetParameters;
-
-		SendEndResidual(SendEndResidual )--> GetParameters;
+		SendEndResidual             (SendEndResidual )--> GetParameters;
 	a(a)-->undefined;
 	end
 
 	priority
-		ResLuma_Launch16x16DCResBlock  > ResLuma_CheckTransfSzAndCavlc;
-		ResLuma_CheckTransfSzAndCavlc  > a;
-		ResLuma_CheckCodedBlockPattern > ResetLevelTab;
+		ResLuma_Launch16x16DCResBlock         > ResLuma_CheckTransfSzAndCavlc;
+		ResLuma_CheckTransfSzAndCavlc         > a;
+		ResLuma_CheckCodedBlockPattern        > ResetLevelTab;
 		ResLuma_CheckBmFlagAndEndIdxAndMbType > ResLuma_LaunchResBlk_1;
-		EndLoop8x8.IsEqualToFalse             > ResLuma_CheckCavlc8x8 > ResLumaOutput.IsLuma;
-		ResLumaOutput.IsLuma       > a;
-		ChromaArrayTypeVal.IsEqualTo1or2 > ChromaArrayTypeVal.IsEqualTo3 > SendEndResidual;
-		ChromaDCResBlk > SendSkipChromaDc;
-		ChromaAcComponentPresent > ChromaAcComponentNotPresent;
-		ChromaAcLoopi8x8 > SendChromaCoeffToken;
-		ChromaAcLoopiCbCr > SendEndResidual;
-		ChromaAcComponentNotPresent > SendEndResidual;
+		EndLoop8x8.IsEqualToFalse             > ResLuma_CheckCavlc8x8           > ResLumaOutput.IsLuma;
+		ResLumaOutput.IsLuma                  > a;
+		ChromaArrayTypeVal.IsEqualTo1or2      > ChromaArrayTypeVal.IsEqualTo3   > SendEndResidual;
+		ChromaDCResBlk                        > SendSkipChromaDc;
+		ChromaAcComponentPresent              > ChromaAcComponentNotPresent;
+		ChromaAcLoopi8x8                      > SendChromaCoeffToken;
+		ChromaLoopiCbCr                       > SendEndResidual;
+		ChromaAcComponentNotPresent           > SendEndResidual;
 	end
 end
