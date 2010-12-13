@@ -31,7 +31,7 @@
 #ifndef PARSECONTINUATION_H
 #define PARSECONTINUATION_H
 
-#include "Jade/TinyXML/TinyXml.h"
+#include "Jade/TinyXml/TinyXml.h"
 //------------------------------
 
 /**

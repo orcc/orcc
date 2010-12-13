@@ -43,7 +43,7 @@
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Vertex.h"
 #include "Jade/Core/Connection.h"
-#include "Jade/TinyXML/TinyStr.h"
+#include "Jade/TinyXml/TinyStr.h"
 
 #include "NetworkParser.h"
 //------------------------------

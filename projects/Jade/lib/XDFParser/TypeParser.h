@@ -37,7 +37,7 @@
 #include "Jade/Core/Entry.h"
 #include "Jade/Core/IRType.h"
 #include "Jade/Core/Network.h"
-#include "Jade/TinyXML/TinyXml.h"
+#include "Jade/TinyXml/TinyXml.h"
 
 #include "ExprParser.h"
 

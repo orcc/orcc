@@ -43,7 +43,7 @@
 
 #include "Jade/Core/Network.h"
 #include "Jade/Core/Entry.h"
-#include "Jade/TinyXML/TinyXml.h"
+#include "Jade/TinyXml/TinyXml.h"
 
 namespace llvm{
 	class ConstantInt;

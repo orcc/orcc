@@ -41,7 +41,7 @@
 #include <stdio.h>
 #include "Jade/Core/Expression.h"
 #include "Jade/Core/Expr/BinaryOp.h"
-#include "Jade/TinyXML/TinyXml.h"
+#include "Jade/TinyXml/TinyXml.h"
 
 #include "XDFConstant.h"
 #include "ParseContinuation.h"
