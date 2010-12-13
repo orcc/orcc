@@ -223,9 +223,10 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 		ActionScheduler scheduler = actor.getActionScheduler();
 		FSM fsm = scheduler.getFsm();
 		if (fsm == null) {
-			List<Action> actions = tryAndMerge(scheduler.getActions());
-			scheduler.getActions().clear();
-			scheduler.getActions().addAll(actions);
+			List<Action> actions = scheduler.getActions();
+			List<Action> mergedActions = tryAndMerge(scheduler.getActions());
+			actions.clear();
+			actions.addAll(mergedActions);
 		} else {
 			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
 			for (State state : graph.vertexSet()) {
@@ -245,7 +246,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 	private List<Action> tryAndMerge(List<Action> actions) {
 		int numActions = actions.size();
 		if (numActions <= 1) {
-			return actions;
+			return new ArrayList<Action>(actions);
 		} else {
 			// check if actions have the same input/output pattern
 			Iterator<Action> it = actions.iterator();
