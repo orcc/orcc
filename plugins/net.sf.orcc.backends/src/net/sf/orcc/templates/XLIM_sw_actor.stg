@@ -191,6 +191,7 @@ CustomPeek(customPeek) ::= <<
 >>
 
 Read(op) ::= <<
+<note kind="consumptionRates" name="$op.port.name$" value="$op.numTokens$"/>
 <operation kind="pinRead" portName="$op.port.name$" removable="no" style="simple">
 	$port(dir="out", type=op.target.type, source=op.target)$
 </operation>
@@ -201,6 +202,7 @@ Write(op) ::= <<
 <operation kind="pinWrite" portName="$op.port.name$" style="simple">
 	<port dir="in" source="$op.target$"/>
 </operation>
+<note kind="productionRates" name="$op.port.name$" value="$op.numTokens$"/>
 >>
 
 Load(op) ::= <<
