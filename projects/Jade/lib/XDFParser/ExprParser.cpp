@@ -132,7 +132,7 @@ Expr* ExprParser::parseExprLiteral(TiXmlElement* elt){
 		fprintf(stderr,"String not supported yet");
 		exit(0);
 	} else {
-		fprintf(stderr,"Unsupported expression literal kind: \"%s\"", kind);
+		fprintf(stderr,"Unsupported expression literal kind: \"%s\"", kind.c_str());
 		exit(0);
 	}
 }

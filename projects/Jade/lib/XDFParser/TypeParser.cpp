@@ -115,7 +115,7 @@ map<string, Entry*>* TypeParser::parseTypeEntries(TiXmlNode* node){
 				IRType* type = parseType(node->FirstChild());
 				entry = new TypeEntry(type);
 			}else {
-				fprintf(stderr, "UnsupPorted entry Type: \"%s\"", kind);
+				fprintf(stderr, "UnsupPorted entry Type: \"%s\"", kind.c_str());
 				exit(0);
 			}
 			
