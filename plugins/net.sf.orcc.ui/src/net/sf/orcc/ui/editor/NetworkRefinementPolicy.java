@@ -26,32 +26,66 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-package net.sf.orcc.ui.editors;
+package net.sf.orcc.ui.editor;
 
-import org.eclipse.ui.editors.text.TextEditor;
+import net.sf.graphiti.model.DefaultRefinementPolicy;
+import net.sf.graphiti.model.Vertex;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 
 /**
- * This class defines a STG editor. It simply sets the configuration and
- * document provider.
+ * This class extends the default refinement policy with XDF-specific policy.
  * 
  * @author Matthieu Wipliez
  * 
  */
-public class StgEditor extends TextEditor {
+public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 
-	private ColorManager colorManager;
+	private final String[] fileExtensions = { "cal", "nl", "xdf" };
 
-	public StgEditor() {
-		super();
-		colorManager = new ColorManager();
-		setSourceViewerConfiguration(new StgConfiguration(colorManager));
-		setDocumentProvider(new StgDocumentProvider());
+	@Override
+	public String getNewRefinement(Vertex vertex) {
+		String newRefinement = super.getNewRefinement(vertex);
+		if (newRefinement == null) {
+			return null;
+		}
+
+		for (String extension : fileExtensions) {
+			IPath path = getAbsolutePath(vertex.getParent().getFileName(),
+					newRefinement);
+			if (extension.equals(path.getFileExtension())) {
+				return new Path(newRefinement).removeFileExtension().toString();
+			}
+		}
+
+		return null;
+
 	}
 
 	@Override
-	public void dispose() {
-		colorManager.dispose();
-		super.dispose();
+	public IFile getRefinementFile(Vertex vertex) {
+		String refinement = getRefinement(vertex);
+		if (refinement == null) {
+			return null;
+		}
+
+		IPath path = getAbsolutePath(vertex.getParent().getFileName(),
+				refinement);
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		for (String extension : fileExtensions) {
+			IPath extPath = path.addFileExtension(extension);
+			IResource resource = root.findMember(extPath);
+			if (resource != null && resource.getType() == IResource.FILE) {
+				return (IFile) resource;
+			}
+		}
+
+		return null;
 	}
 
 }

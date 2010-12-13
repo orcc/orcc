@@ -65,18 +65,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="net.sf.orcc.ui.editors.StgEditor"
-            contributorClass="org.eclipse.ui.texteditor.BasicTextEditorActionContributor"
-            default="false"
-            extensions="stg"
-            icon="icons/orcc_run.gif"
-            id="net.sf.orcc.ui.editors.StgEditor"
-            name="StringTemplateGroup editor">
-      </editor>
-   </extension>
-   <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
       <launchConfigurationType
             delegate="net.sf.orcc.ui.launching.OrccRunLaunchDelegate"
@@ -220,7 +208,7 @@
             extension="xdf"
             file-extensions="cal,nl,xdf"
             name="XDF"
-            refinement="net.sf.orcc.ui.NetworkRefinementPolicy"
+            refinement="net.sf.orcc.ui.editor.NetworkRefinementPolicy"
             type="text/xml"
             validator="net.sf.graphiti.validators.XdfValidator">
          <graphType
@@ -370,7 +358,7 @@
          </graphType>
          <import>
             <grammar
-                  definition="net.sf.graphiti.grammar.cal"
+                  definition="net.sf.orcc.ui.grammar.cal"
                   startRule="actor">
             </grammar>
             <xslt
@@ -422,7 +410,7 @@
       <configuration
             extension="nl"
             name="NL"
-            refinement="net.sf.orcc.ui.NetworkRefinementPolicy"
+            refinement="net.sf.orcc.ui.editor.NetworkRefinementPolicy"
             type="text"
             validator="net.sf.graphiti.validators.XdfValidator">
          <graphType
@@ -534,7 +522,7 @@
          </edgeType>
          <import>
             <grammar
-                  definition="net.sf.graphiti.grammar.cal"
+                  definition="net.sf.orcc.ui.grammar.cal"
                   startRule="network">
             </grammar>
             <xslt
@@ -556,5 +544,12 @@
             </xslt>
          </export>
       </configuration>
-   </extension>      
+   </extension>
+   <extension
+         point="net.sf.graphiti.model.grammar">
+      <definition
+            class="net.sf.orcc.ui.editor.CalAntlrProxy"
+            id="net.sf.orcc.ui.grammar.cal">
+      </definition>
+   </extension>
 </plugin>

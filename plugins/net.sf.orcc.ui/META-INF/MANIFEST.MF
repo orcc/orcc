@@ -20,3 +20,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sf.orcc.ui,
  net.sf.orcc.ui.launching
 Bundle-Vendor: IETR/INSA Rennes
+Bundle-ClassPath: .
