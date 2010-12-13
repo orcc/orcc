@@ -356,12 +356,12 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 	GetMbType.B_Skip_B_Direct_16x16: action
 			mb_type          :[MacroBlkType],
 			NewPic_i         :[IsNewPic],
-			colZeroFlag      :[TabColZero] repeat 16,
+			colZeroFlag      :[TabColZero] repeat 4,
 			CurrMbAddr       :[Curr_Mb_Addr],
 			FirstMbInSlice   :[Fst_Mb],
 			PicWidthInMb     :[pic_width_in_mb]
 				==>
-			DirectPredLX_Out :[direct_pred_lx]
+			DirectPredLX_Out :[direct_pred_lx, direct_pred_lx,direct_pred_lx,direct_pred_lx]
 		guard
 			not IsNewPic,
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
@@ -401,15 +401,13 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 			end
 
 			if(direct_spatial_mv_pred)then // spatial prediction
-				//foreach int i in 0 .. 15 //FIXME
-				//do
 				GetNeighbourBlockParameters (0,16);
 				RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
 				foreach int i in 0 .. 15
 				do
 					RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
 				end
-				foreach int i in 1 .. 15
+				foreach int i in 1 .. 3
 				do
 					if(TabColZero[0] != TabColZero[i])then
 						println("Ooops : TabColZero[0] : "+TabColZero[0]+" ; TabColZero["+i+"] : "+TabColZero[i]);
@@ -430,10 +428,11 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 					end
 					direct_pred_lx           := true;
 				end
-				//end
 			else //temporal prediction
 				println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
 			end
+			MbPartIdx    := 0;
+			MbPartIdxMax := 4;
 		end
 
 	SendMv4Direct.Launch: action
@@ -441,10 +440,11 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 				==>
 			Location  :[Loc_Direct] repeat 2,
 			MvOut     :[MvTab[Idx_CurrBlk][0][0],MvTab[Idx_CurrBlk][0][1]],
-			RefIdxOut :[RefIdxTab[Idx_CurrBlk][0]],
+			RefIdxOut :[0/*RefIdxTab[Idx_CurrBlk][0]*/],
 			NewPic_o  :[false]
 		guard
-			direct_pred_lx or (not other_direct_pred_lx)
+			direct_pred_lx or (not other_direct_pred_lx),
+			MbPartIdx < MbPartIdxMax
 		do
 			if( (not direct_pred_lx) and (not other_direct_pred_lx))then
 				foreach int i in 0 .. 15//Fixme!!
@@ -452,6 +452,7 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 					RefIdxTab[Idx_CurrBlk][i] := 0;
 				end
 			end
+			MbPartIdx := MbPartIdx + 1;
 		end
 
 
@@ -459,7 +460,15 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 			DirectPredLX_In :[other_direct_pred_lx]
 				==>
 		guard
-			not direct_pred_lx and other_direct_pred_lx
+			not direct_pred_lx and other_direct_pred_lx,
+			MbPartIdx < MbPartIdxMax
+		do
+			MbPartIdx := MbPartIdx + 1;
+		end
+
+	SendMv4Direct_Done: action ==>
+		guard
+			MbPartIdx = MbPartIdxMax
 		end
 
 	SendSubMv4Direct.Launch: action
@@ -1016,15 +1025,16 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 		GetMbType           (GetMbType.P_SkipL0                )--> GetMbInfos4P_SkipL0;
 		GetMbType           (GetMbType.P_SkipL1                )--> EatTokens;
 		GetMbType           (GetMbType.B_Skip_B_Direct_16x16   )--> SendMv4Direct;
-		GetMbType           (GetMbType.Others                  )--> GetMbInfos4Others;
+		GetMbType           (GetMbType.Others                  )--> GetMbInfosForOthers;
 
 		EatTokens           (EatTokens                         )--> GetMbType;
 
-		SendMv4Direct       (SendMv4Direct                     )--> GetMbType;
+		SendMv4Direct       (SendMv4Direct                     )--> SendMv4Direct;
+		SendMv4Direct       (SendMv4Direct_Done                )--> GetMbType;
 
 		GetMbInfos4P_SkipL0 (GetMbInfos.P_Skip                 )--> GetMbType;
 
-		GetMbInfos4Others   (GetMbInfos.Others                 )--> ComputeMvpL0;
+		GetMbInfosForOthers (GetMbInfos.Others                 )--> ComputeMvpL0;
 
 		ComputeMvpL0        (ComputeMvLX.Skip                  )--> ComputeMvpL0;
 		ComputeMvpL0        (ComputeMvLX.Launch16x16           )--> ComputeMvpL0;
