@@ -108,8 +108,8 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 	bool          IsPredL1;
 	uint(size=5)  Size_RefList;
 	uint(size=5)  Idx_RefList;
-	uint(size=4)  WriteListIdx;
-	uint(size=4)  ReadListIdx;
+	uint(size=5)  WriteListIdx;
+	uint(size=5)  ReadListIdx;
 	bool          colPic_IsShortTermRef;
 	uint(size=32) Mbx;
 	uint(size=32) Mby;
@@ -126,11 +126,15 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 				==>
 		guard
 			IsNewPic
+		var
+			bool EndLoop//Delete me when the bug in Orcc will be solved
 		do
 			WriteListIdx := 0;
-			while( IsReference[WriteListIdx] and WriteListIdx < 15)
+			EndLoop := IsReference[0];
+			while( EndLoop /*IsReference[WriteListIdx]*/ and WriteListIdx < 15)
 			do
 				WriteListIdx := WriteListIdx + 1;
+				EndLoop := IsReference[WriteListIdx];
 			end
 			IsReference[WriteListIdx] := true;
 			ListPoc    [WriteListIdx] := Picture_Order_Count;
@@ -160,12 +164,12 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			do
 				foreach int j in Mby .. Mby + 3
 				do
-					ListRefIdxL0[WriteListIdx][Mbx][Mby]    := -1;
-					ListRefIdxL1[WriteListIdx][Mbx][Mby]    := -1;
-					ListMvL0    [WriteListIdx][Mbx][Mby][0] :=  0;
-					ListMvL0    [WriteListIdx][Mbx][Mby][1] :=  0;
-					ListMvL1    [WriteListIdx][Mbx][Mby][0] :=  0;
-					ListMvL1    [WriteListIdx][Mbx][Mby][1] :=  0;
+					ListRefIdxL0[WriteListIdx][i][j]    := -1;
+					ListRefIdxL1[WriteListIdx][i][j]    := -1;
+					ListMvL0    [WriteListIdx][i][j][0] :=  0;
+					ListMvL0    [WriteListIdx][i][j][1] :=  0;
+					ListMvL1    [WriteListIdx][i][j][0] :=  0;
+					ListMvL1    [WriteListIdx][i][j][1] :=  0;
 				end
 			end
 		end
