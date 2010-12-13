@@ -13,8 +13,8 @@
       <vertex id="RefIdx" x="57" y="952"/>
       <vertex id="LFDisable" x="57" y="1049"/>
       <vertex id="FirstMbInSlice" x="57" y="1146"/>
+      <vertex id="WD" x="523" y="502"/>
       <vertex id="Algo_DBF" x="416" y="590"/>
       <vertex id="Mgnt_DBF" x="223" y="469"/>
-      <vertex id="WD" x="523" y="502"/>
    </vertices>
 </layout>

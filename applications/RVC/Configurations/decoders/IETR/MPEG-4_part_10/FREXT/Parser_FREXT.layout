@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="212" y="20"/>
+      <vertex id="bits8" x="215" y="25"/>
       <vertex id="Height" x="357" y="1280"/>
       <vertex id="IntraPredModeC" x="1712" y="738"/>
       <vertex id="QP_Cb" x="1770" y="1198"/>

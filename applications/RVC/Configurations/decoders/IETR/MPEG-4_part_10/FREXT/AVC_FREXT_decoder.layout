@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="bits8" x="34" y="540"/>
+      <vertex id="bits8" x="28" y="538"/>
       <vertex id="Display_L" x="1187" y="51"/>
       <vertex id="Display_Cb" x="1199" y="789"/>
       <vertex id="Display_Cr" x="1185" y="1494"/>

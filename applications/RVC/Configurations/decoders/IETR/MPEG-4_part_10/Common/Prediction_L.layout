@@ -26,6 +26,9 @@
       <vertex id="TransformSize8x8" x="-151" y="719"/>
       <vertex id="PocToRead" x="1029" y="1034"/>
       <vertex id="ReadAddress" x="1028" y="1087"/>
+      <vertex id="SubMbType" x="354" y="1142"/>
+      <vertex id="MbType4Pred" x="342" y="1053"/>
+      <vertex id="SelectList" x="361" y="1110"/>
       <vertex id="Display_L" x="1375" y="904"/>
       <vertex id="Buffer_inter" x="1197" y="884"/>
       <vertex id="Select" x="829" y="553"/>
@@ -34,8 +37,5 @@
       <vertex id="Deblocking_Filter" x="972" y="70"/>
       <vertex id="DemuxParserInfos" x="54" y="577"/>
       <vertex id="Inter" x="500" y="991"/>
-      <vertex id="SubMbType" x="354" y="1142"/>
-      <vertex id="MbType4Pred" x="342" y="1053"/>
-      <vertex id="SelectList" x="361" y="1110"/>
    </vertices>
 </layout>
