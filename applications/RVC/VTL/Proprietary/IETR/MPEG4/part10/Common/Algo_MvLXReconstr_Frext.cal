@@ -361,7 +361,7 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 			FirstMbInSlice   :[Fst_Mb],
 			PicWidthInMb     :[pic_width_in_mb]
 				==>
-			DirectPredLX_Out :[direct_pred_lx]
+			DirectPredLX_Out :[direct_pred_lx/*,direct_pred_lx,direct_pred_lx,direct_pred_lx*/]
 		guard
 			not IsNewPic,
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
@@ -425,6 +425,8 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 			else //temporal prediction
 				println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
 			end
+			MbPartIdx    := 0;
+			MbPartIdxMax := 1;//4;
 		end
 
 	SendMv4Direct.Launch: action
@@ -435,6 +437,7 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 			RefIdxOut :[RefIdxTab[Idx_CurrBlk][0]],
 			NewPic_o  :[false]
 		guard
+			MbPartIdx < MbPartIdxMax,
 			direct_pred_lx or (not other_direct_pred_lx)
 		do
 			if( (not direct_pred_lx) and (not other_direct_pred_lx))then
@@ -443,15 +446,24 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 					RefIdxTab[Idx_CurrBlk][i] := 0;
 				end
 			end
+			MbPartIdx := MbPartIdx + 1;
 		end
-
 
 	SendMv4Direct.Skip: action
 			DirectPredLX_In :[other_direct_pred_lx]
 				==>
 		guard
+			MbPartIdx < MbPartIdxMax,
 			not direct_pred_lx and other_direct_pred_lx
+		do
+			MbPartIdx := MbPartIdx + 1;
 		end
+
+	SendMv4Direct_Done: action ==>
+		guard
+			MbPartIdx = MbPartIdxMax
+		end
+
 
 	SendSubMv4Direct.Launch: action
 			DirectPredLX_In :[other_direct_pred_lx]
@@ -1011,7 +1023,8 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 
 		EatTokens           (EatTokens                         )--> GetMbType;
 
-		SendMv4Direct       (SendMv4Direct                     )--> GetMbType;
+		SendMv4Direct       (SendMv4Direct                     )--> SendMv4Direct;
+		SendMv4Direct       (SendMv4Direct_Done                )--> GetMbType;
 
 		GetMbInfos4P_SkipL0 (GetMbInfos.P_Skip                 )--> GetMbType;
 

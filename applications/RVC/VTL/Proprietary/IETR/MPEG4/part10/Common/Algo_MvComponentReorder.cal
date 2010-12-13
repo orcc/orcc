@@ -85,6 +85,10 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
 			MbPartIdx     := 0;
 			MbPartIdxMax  := NumMbPart(MacroBlkType);
 			SizeMbMv      := SizeMbPart(MacroBlkType);
+			//delete me!!
+			if(mb_type = BLOCK_TYPE_B_SKIP or mb_type = BLOCK_TYPE_B_DIRECT_16x16)then
+				SizeMbMv := SZ_8x8;
+			end
 		end
 
 	GetListSel4Mb: action
@@ -92,7 +96,9 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
 				==>
 		guard
 			MbPartIdx  < MbPartIdxMax,
-			SizeMbMv  != SZ_8x8
+			   SizeMbMv  != SZ_8x8
+			or mb_type = BLOCK_TYPE_B_SKIP
+			or mb_type = BLOCK_TYPE_B_DIRECT_16x16
 		do
 			NbListToGet :=
 				if(list_selected != BIPRED)then
@@ -155,6 +161,30 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
 			NbListToGet := NbListToGet - 1;
 		end
 
+	GetMv.Launch_B_Skip: action
+			Mv:[Mvx, Mvy],
+			RefIdx :[ref_idx]
+				==>
+			PartSZ :[16,16]
+//			PartSZ :[8,8]
+		guard
+			   mb_type = BLOCK_TYPE_B_SKIP
+			or mb_type = BLOCK_TYPE_B_DIRECT_16x16,
+			NbListToGet > 0
+		do
+			foreach int i in 0 .. 15
+			do
+				MvTab[i]     := [Mvx,Mvy];
+				RefIdxTab[i] := ref_idx;
+			end
+			/*foreach int i in 0 .. 3
+			do
+				MvTab[i + 4*(MbPartIdx&3)] := [Mvx,Mvy];
+				RefIdxTab[i + 4*(MbPartIdx&3)] := ref_idx;
+			end*/
+			NbListToGet := NbListToGet - 1;
+		end
+
 	GetMv.Done: action ==>
 		guard
 			NbListToGet = 0
@@ -166,8 +196,10 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
 			SubMbType :[ValSubMbType]
 				==>
 		guard
-			SizeMbMv  = SZ_8x8,
-			MbPartIdx < MbPartIdxMax
+			MbPartIdx  < MbPartIdxMax,
+			SizeMbMv   = SZ_8x8,
+			mb_type   != BLOCK_TYPE_B_SKIP,
+			mb_type   != BLOCK_TYPE_B_DIRECT_16x16
 		do
 			SubMbPartIdx    := 0;
 			SubMbPartIdxMax := NumSubMbPart(mb_type,ValSubMbType);
@@ -285,25 +317,26 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
 		end
 
 	schedule fsm GetMbType:
-		GetMbType        (GetMbType          )--> GetListSel4Mb;
+		GetMbType        (GetMbType           )--> GetListSel4Mb;
 
-		GetListSel4Mb    (GetListSel4Mb      )--> GetMv;
-		GetListSel4Mb    (GetMv.Launch8x8    )--> GetListSel4SubMb;
-		GetListSel4Mb    (SendParameters     )--> GetMbType;
+		GetListSel4Mb    (GetListSel4Mb       )--> GetMv;
+		GetListSel4Mb    (GetMv.Launch8x8     )--> GetListSel4SubMb;
+		GetListSel4Mb    (SendParameters      )--> GetMbType;
 
-		GetMv            (GetMv.Launch16x16  )--> GetMv;
-		GetMv            (GetMv.Launch16x8   )--> GetMv;
-		GetMv            (GetMv.Launch8x16   )--> GetMv;
-		GetMv            (GetMv.Done         )--> GetListSel4Mb;
+		GetMv            (GetMv.Launch16x16   )--> GetMv;
+		GetMv            (GetMv.Launch16x8    )--> GetMv;
+		GetMv            (GetMv.Launch8x16    )--> GetMv;
+		GetMv            (GetMv.Launch_B_Skip )--> GetMv;
+		GetMv            (GetMv.Done          )--> GetListSel4Mb;
 
-		GetListSel4SubMb (GetListSel4SubMb   )--> GetSubMv;
-		GetListSel4SubMb (GetSubMvInfo.Done  )--> GetListSel4Mb;
+		GetListSel4SubMb (GetListSel4SubMb    )--> GetSubMv;
+		GetListSel4SubMb (GetSubMvInfo.Done   )--> GetListSel4Mb;
 
-		GetSubMv         (GetSubMv.Launch8x8 )--> GetSubMv;
-		GetSubMv         (GetSubMv.Launch8x4 )--> GetSubMv;
-		GetSubMv         (GetSubMv.Launch4x8 )--> GetSubMv;
-		GetSubMv         (GetSubMv.Launch4x4 )--> GetSubMv;
-		GetSubMv         (GetSubMv.Done      )--> GetListSel4SubMb;
+		GetSubMv         (GetSubMv.Launch8x8  )--> GetSubMv;
+		GetSubMv         (GetSubMv.Launch8x4  )--> GetSubMv;
+		GetSubMv         (GetSubMv.Launch4x8  )--> GetSubMv;
+		GetSubMv         (GetSubMv.Launch4x4  )--> GetSubMv;
+		GetSubMv         (GetSubMv.Done       )--> GetListSel4SubMb;
 	end
 
 end
