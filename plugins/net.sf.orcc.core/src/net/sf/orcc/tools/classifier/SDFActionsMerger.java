@@ -259,7 +259,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 				if (!input.equals(currentAction.getInputPattern())
 						|| !output.equals(currentAction.getOutputPattern())) {
 					// one pattern is not equal to another
-					return actions;
+					return new ArrayList<Action>(actions);
 				}
 			}
 
