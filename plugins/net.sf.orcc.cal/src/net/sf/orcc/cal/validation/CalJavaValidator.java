@@ -80,6 +80,7 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -582,7 +583,10 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 		}.doSwitch(Util.getTopLevelContainer(variable));
 
-		if (!used) {
+		// do not warn about unused actor parameters
+		// used for system actors
+		EReference reference = variable.eContainmentFeature();
+		if (!used && reference != CalPackage.eINSTANCE.getAstActor_Parameters()) {
 			warning("The variable " + variable.getName() + " is never read",
 					CalPackage.AST_VARIABLE__NAME);
 		}
