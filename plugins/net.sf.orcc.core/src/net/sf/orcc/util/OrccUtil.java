@@ -144,7 +144,12 @@ public class OrccUtil {
 	 */
 	public static String getFolder(Actor actor) {
 		String folderName = actor.getName().replace('.', '/');
-		return folderName.substring(0, folderName.lastIndexOf('/'));
+		int index = folderName.lastIndexOf('/');
+		if (index == -1) {
+			return "";
+		} else {
+			return folderName.substring(0, index);
+		}
 	}
 
 	/**
@@ -235,7 +240,7 @@ public class OrccUtil {
 
 		return srcFolders;
 	}
-	
+
 	/**
 	 * Returns a string that contains all objects separated with the given
 	 * separator.
