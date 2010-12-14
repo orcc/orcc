@@ -435,10 +435,7 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 	SendMv4Direct.Launch: action
 			DirectPredLX_In :[other_direct_pred_lx]
 				==>
-			/*Should be :
-			 * Location  :[Blk_x_in_pix,Blk_y_in_pix], 
-			 */
-			Location  :[Mbx_in_pix,Mby_in_pix],
+			Location  :[Blk_x_in_pix,Blk_y_in_pix],
 			MvOut     :[MvTab[Idx_CurrBlk][IdxPartition][0],MvTab[Idx_CurrBlk][IdxPartition][1]],
 			RefIdxOut :[RefIdxTab[Idx_CurrBlk][IdxPartition]],
 			NewPic_o  :[false]
@@ -446,12 +443,12 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 			MbPartIdx < MbPartIdxMax,
 			direct_pred_lx[MbPartIdx&3] or (not other_direct_pred_lx)
 		var
-//			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
-//			uint(size=11) Blk_y_in_pix := Mby_in_pix,
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix,
 			uint(size=4)  IdxPartition = 4 * MbPartIdx
 		do
-//			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
-//			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
+			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
+			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
 			if( (not direct_pred_lx[MbPartIdx]) and (not other_direct_pred_lx))then
 				foreach int i in 0 .. 3
 				do

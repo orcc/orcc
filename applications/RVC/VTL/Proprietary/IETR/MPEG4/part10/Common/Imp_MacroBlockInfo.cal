@@ -293,7 +293,11 @@ unit Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo :
 					if(MbType <= BLOCK_TYPE_P_MAX)then
 						SizeMb_P[(MbType - BLOCK_TYPE_P_MIN) &  7]
 					else
-						SZ_16x16
+						if(MbType = BLOCK_TYPE_P_SKIP) then
+							SZ_16x16
+						else
+							SZ_8x8
+						end
 					end
 				end
 		end

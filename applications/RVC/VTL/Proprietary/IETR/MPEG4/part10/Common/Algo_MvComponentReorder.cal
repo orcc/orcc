@@ -161,23 +161,17 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-//			PartSZ :[16,16]
 			PartSZ :[8,8]
 		guard
 			   mb_type = BLOCK_TYPE_B_SKIP
 			or mb_type = BLOCK_TYPE_B_DIRECT_16x16,
 			NbListToGet > 0
 		do
-			foreach int i in 0 .. 15
-			do
-				MvTab[i]     := [Mvx,Mvy];
-				RefIdxTab[i] := ref_idx;
-			end
-			/*foreach int i in 0 .. 3
+			foreach int i in 0 .. 3
 			do
 				MvTab[i + 4*(MbPartIdx&3)] := [Mvx,Mvy];
 				RefIdxTab[i + 4*(MbPartIdx&3)] := ref_idx;
-			end*/
+			end
 			NbListToGet := NbListToGet - 1;
 		end
 

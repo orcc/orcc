@@ -55,9 +55,6 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 			mb_type       := MacroBlkType;
 			MbPartIdx     := 0;
 			MbPartIdxMax  := NumMbPart(MacroBlkType);
-			if(mb_type = BLOCK_TYPE_B_SKIP or mb_type = BLOCK_TYPE_B_DIRECT_16x16)then
-				MbPartIdxMax := 4;
-			end
 			SizeMb        := SizeMbPart(MacroBlkType);
 		end
 

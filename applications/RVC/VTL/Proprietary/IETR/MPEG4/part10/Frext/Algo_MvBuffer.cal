@@ -371,17 +371,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 		var
 			uint(size=4) Idx := 0
 		do
-			NbPartitionsToWrite := 16;
-			foreach int i in Mbx .. Mbx + 3
-			do
-				foreach int j in Mby .. Mby + 3
-				do
-					Partition_Mbx[Idx] := i;
-					Partition_Mby[Idx] := j;
-					Idx                := Idx + 1;
-				end
-			end
-/*			NbPartitionsToWrite := 4;
+			NbPartitionsToWrite := 4;
 			foreach int i in Mbx + 2* (MbPartIdx&1) .. Mbx + 2* (MbPartIdx&1) + 1
 			do
 				foreach int j in Mby + 2* ((MbPartIdx>>1)&1) .. Mby + 2* ((MbPartIdx>>1)&1) + 1
@@ -390,7 +380,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 					Partition_Mby[Idx] := j;
 					Idx                := Idx + 1;
 				end
-			end*/
+			end
 			IsPredL0  := false;
 			IsPredL1  := false;
 			MbPartIdx := MbPartIdx + 1;
