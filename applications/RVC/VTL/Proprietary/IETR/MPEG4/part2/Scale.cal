@@ -34,7 +34,7 @@ actor Proprietary.IETR.MPEG4.part2.Scale () int(size=SIN_SZ) SIn ==> int(size=SO
 		List(type: int(size=32), size=64) y
 	do
 		y := [ x[i] * scale[i] : for int i in 0 .. 63 ];
-		y[0] := y[0] + lshift(1, 12);
+		y[0] := y[0] + 4096;
 	end
 
 end
