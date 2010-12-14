@@ -333,6 +333,8 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				throw new OrccException("Actor \"" + className
 						+ "\" not found! Did you compile the VTL?", e);
 			}
+		} else {
+			file = new File(actor.getFile());
 		}
 
 		// replace path-based class by actor class
