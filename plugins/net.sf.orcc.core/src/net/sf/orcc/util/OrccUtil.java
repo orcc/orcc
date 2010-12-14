@@ -143,13 +143,7 @@ public class OrccUtil {
 	 * @return the folder that corresponds to the package of the given actor
 	 */
 	public static String getFolder(Actor actor) {
-		String folderName = actor.getName().replace('.', '/');
-		int index = folderName.lastIndexOf('/');
-		if (index == -1) {
-			return "";
-		} else {
-			return folderName.substring(0, index);
-		}
+		return actor.getPackage().replace('.', '/');
 	}
 
 	/**
@@ -242,31 +236,6 @@ public class OrccUtil {
 	}
 
 	/**
-	 * Returns a string that contains all objects separated with the given
-	 * separator.
-	 * 
-	 * @param objects
-	 *            an iterable of objects
-	 * @param sep
-	 *            a separator string
-	 * @return a string that contains all objects separated with the given
-	 *         separator
-	 */
-	public static String toString(Iterable<? extends Object> objects, String sep) {
-		StringBuilder builder = new StringBuilder();
-		Iterator<? extends Object> it = objects.iterator();
-		if (it.hasNext()) {
-			builder.append(it.next());
-			while (it.hasNext()) {
-				builder.append(sep);
-				builder.append(it.next());
-			}
-		}
-
-		return builder.toString();
-	}
-
-	/**
 	 * Returns a new string that is an unescaped version of the given string.
 	 * Unespaced means that "\\\\", "\\n", "\\r", "\\t" are replaced by '\\',
 	 * '\n', '\r', '\t' respectively.
@@ -306,6 +275,31 @@ public class OrccUtil {
 				} else {
 					builder.append(chr);
 				}
+			}
+		}
+
+		return builder.toString();
+	}
+
+	/**
+	 * Returns a string that contains all objects separated with the given
+	 * separator.
+	 * 
+	 * @param objects
+	 *            an iterable of objects
+	 * @param sep
+	 *            a separator string
+	 * @return a string that contains all objects separated with the given
+	 *         separator
+	 */
+	public static String toString(Iterable<? extends Object> objects, String sep) {
+		StringBuilder builder = new StringBuilder();
+		Iterator<? extends Object> it = objects.iterator();
+		if (it.hasNext()) {
+			builder.append(it.next());
+			while (it.hasNext()) {
+				builder.append(sep);
+				builder.append(it.next());
 			}
 		}
 

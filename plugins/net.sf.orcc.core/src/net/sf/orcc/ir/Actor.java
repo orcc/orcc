@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.ir;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.orcc.moc.MoC;
@@ -220,6 +221,34 @@ public class Actor implements Comparable<Actor> {
 	}
 
 	/**
+	 * Returns the simple name of this actor.
+	 * 
+	 * @return the simple name of this actor
+	 */
+	public String getPackage() {
+		int index = name.lastIndexOf('.');
+		if (index == -1) {
+			return "";
+		} else {
+			return name.substring(0, index);
+		}
+	}
+
+	/**
+	 * Returns the package of this actor as a list of strings.
+	 * 
+	 * @return the package of this actor as a list of strings
+	 */
+	public List<String> getPackageAsList() {
+		String[] segments = name.split("\\.");
+		List<String> list = new ArrayList<String>(segments.length - 1);
+		for (int i = 0; i < segments.length - 1; i++) {
+			list.add(segments[i]);
+		}
+		return list;
+	}
+
+	/**
 	 * Returns the ordered map of parameters.
 	 * 
 	 * @return the ordered map of parameters
@@ -235,6 +264,20 @@ public class Actor implements Comparable<Actor> {
 	 */
 	public OrderedMap<String, Procedure> getProcs() {
 		return procs;
+	}
+
+	/**
+	 * Returns the simple name of this actor.
+	 * 
+	 * @return the simple name of this actor
+	 */
+	public String getSimpleName() {
+		int index = name.lastIndexOf('.');
+		if (index == -1) {
+			return name;
+		} else {
+			return name.substring(index);
+		}
 	}
 
 	/**
