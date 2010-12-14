@@ -54,7 +54,7 @@ import net.sf.orcc.util.OrderedMap;
  */
 public class DeadVariableRemoval extends AbstractActorTransformation {
 
-	private boolean changed;
+	protected boolean changed;
 	private boolean keepTokenSwallowerVariable;
 
 	public DeadVariableRemoval(boolean keepTokenSwallowerVariable) {
@@ -88,12 +88,12 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 		if (call.hasResult()) {
 			LocalVariable variable = call.getTarget();
 			if (!variable.isUsed()) {
-				
+
 				// do not remove call to variables that are used by writes
 				if (variable.isPort()) {
 					return;
 				}
-				
+
 				// clean up target
 				call.setTarget(null);
 
@@ -116,7 +116,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			if (target.isPort()) {
 				return;
 			}
-			
+
 			// clean up uses
 			load.setTarget(null);
 			load.setSource(null);
@@ -138,7 +138,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			if (variable.isPort()) {
 				return;
 			}
-			
+
 			// clean up uses
 			peek.setTarget(null);
 			peek.setPort(null);
@@ -159,7 +159,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			if (variable.isPort()) {
 				return;
 			}
-			
+
 			// clean up uses
 			phi.setTarget(null);
 			List<Expression> values = phi.getValues();
@@ -209,7 +209,7 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 			if (variable.isPort()) {
 				return;
 			}
-			
+
 			// clean up target
 			read.setTarget(null);
 

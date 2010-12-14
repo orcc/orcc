@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
@@ -49,6 +50,7 @@ import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.Assign;
 import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
@@ -191,6 +193,28 @@ public class MoveLiteralIntegers extends AbstractActorTransformation {
 		store.setValue((Expression) store.getValue().accept(exprInterpreter,
 				instructionIterator));
 		Use.addUses(store, store.getValue());
+	}
+
+	@Override
+	public void visit(SpecificInstruction node) {
+		if (node instanceof TernaryOperation) {
+			TernaryOperation ternaryOperation = (TernaryOperation) node;
+
+			ternaryOperation.setConditionValue((Expression) ternaryOperation
+					.getConditionValue().accept(exprInterpreter,
+							instructionIterator));
+			Use.addUses(ternaryOperation, ternaryOperation.getConditionValue());
+
+			ternaryOperation.setTrueValue((Expression) ternaryOperation
+					.getTrueValue()
+					.accept(exprInterpreter, instructionIterator));
+			Use.addUses(ternaryOperation, ternaryOperation.getTrueValue());
+
+			ternaryOperation.setFalseValue((Expression) ternaryOperation
+					.getFalseValue().accept(exprInterpreter,
+							instructionIterator));
+			Use.addUses(ternaryOperation, ternaryOperation.getFalseValue());
+		}
 	}
 
 	@Override

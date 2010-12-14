@@ -280,6 +280,15 @@ $else$
 $endif$
 >>
 
+TernaryOperation(ternaryOperation) ::= <<
+<operation kind="\$selector">
+  $port(dir="in", source=ternaryOperation.conditionValue)$
+  $port(dir="in", source=ternaryOperation.trueValue)$
+  $port(dir="in", source=ternaryOperation.falseValue)$
+  $port(dir="out", type=ternaryOperation.target.type, source=ternaryOperation.target)$
+</operation>
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Flatten indexes
 ///////////////////////////////////////////////////////////////////////////////

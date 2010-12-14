@@ -30,6 +30,7 @@ package net.sf.orcc.backends.xlim.transformations;
 
 import java.util.List;
 
+import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.LocalVariable;
 import net.sf.orcc.ir.Variable;
@@ -37,6 +38,7 @@ import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.VarExpr;
 import net.sf.orcc.ir.instructions.PhiAssignment;
+import net.sf.orcc.ir.instructions.SpecificInstruction;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.OrderedMap;
 
@@ -77,6 +79,39 @@ public class FirstPhiValuesOfWhileNodeTransformation extends
 				}
 			}
 		}
+	}
+
+	@Override
+	public void visit(SpecificInstruction node) {
+		if (node instanceof TernaryOperation) {
+			TernaryOperation ternaryOperation = (TernaryOperation) node;
+			ternaryOperation.setConditionValue(clean(ternaryOperation
+					.getConditionValue()));
+			ternaryOperation
+					.setTrueValue(clean(ternaryOperation.getTrueValue()));
+			ternaryOperation.setFalseValue(clean(ternaryOperation
+					.getFalseValue()));
+		}
+	}
+
+	public Expression clean(Expression oldExpr) {
+		if (oldExpr.isVarExpr()) {
+			LocalVariable var = (LocalVariable) ((VarExpr) oldExpr).getVar()
+					.getVariable();
+
+			// Local variable must not be a parameter of the procedure
+			if (var.getIndex() == 0
+					&& !procedure.getParameters().contains(var.getName())) {
+				Expression expr;
+				if (var.getType().isBool()) {
+					expr = new BoolExpr(false);
+				} else {
+					expr = new IntExpr(0);
+				}
+				return expr;
+			}
+		}
+		return oldExpr;
 	}
 
 }

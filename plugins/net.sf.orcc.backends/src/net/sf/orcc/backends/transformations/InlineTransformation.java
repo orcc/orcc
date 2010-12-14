@@ -35,6 +35,7 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import net.sf.orcc.OrccRuntimeException;
+import net.sf.orcc.backends.xlim.instructions.TernaryOperation;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.Instruction;
@@ -77,7 +78,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
  */
 public class InlineTransformation extends AbstractActorTransformation {
 
-	private class InlineCloner implements NodeInterpreter,
+	protected class InlineCloner implements NodeInterpreter,
 			InstructionInterpreter, ExpressionInterpreter {
 
 		@Override
@@ -265,6 +266,26 @@ public class InlineTransformation extends AbstractActorTransformation {
 			return stringExpr;
 		}
 
+		public Object interpret(TernaryOperation ternaryOperation,
+				Object... args) {
+			LocalVariable target = (LocalVariable) variableToLocalVariableMap
+					.get(ternaryOperation.getTarget());
+
+			Expression conditionValue = (Expression) ternaryOperation
+					.getConditionValue().accept(this, args);
+			Expression trueValue = (Expression) ternaryOperation.getTrueValue()
+					.accept(this, args);
+			Expression falseValue = (Expression) ternaryOperation
+					.getFalseValue().accept(this, args);
+
+			TernaryOperation t = new TernaryOperation(target, conditionValue,
+					trueValue, falseValue);
+			Use.addUses(t, conditionValue);
+			Use.addUses(t, trueValue);
+			Use.addUses(t, falseValue);
+			return t;
+		}
+
 		@Override
 		public Object interpret(UnaryExpr expr, Object... args) {
 			Expression expression = (Expression) expr.getExpr().accept(this,
@@ -306,7 +327,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 	}
 
-	private InlineCloner inlineCloner;
+	protected InlineCloner inlineCloner;
 
 	private boolean inlineFunction;
 
@@ -316,7 +337,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 
 	private LocalVariable returnVariableOfCurrentFunction;
 
-	private Map<Variable, Variable> variableToLocalVariableMap;
+	protected Map<Variable, Variable> variableToLocalVariableMap;
 
 	public InlineTransformation(boolean inlineProcedure, boolean inlineFunction) {
 		this.inlineProcedure = inlineProcedure;
@@ -391,11 +412,11 @@ public class InlineTransformation extends AbstractActorTransformation {
 		BlockNode secondBlockNodePart = new BlockNode(procedure);
 
 		instructionIterator.remove();
-		while(instructionIterator.hasPrevious()){
+		while (instructionIterator.hasPrevious()) {
 			firstBlockNodePart.add(0, instructionIterator.previous());
 			instructionIterator.remove();
 		}
-		while(instructionIterator.hasNext()){
+		while (instructionIterator.hasNext()) {
 			secondBlockNodePart.add(instructionIterator.next());
 			instructionIterator.remove();
 		}
@@ -436,7 +457,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 			instructionIterator = it;
 			instruction.accept(this);
 		}
-		if(needToSkipThisNode){
+		if (needToSkipThisNode) {
 			nodeIterator.previous();
 		}
 	}

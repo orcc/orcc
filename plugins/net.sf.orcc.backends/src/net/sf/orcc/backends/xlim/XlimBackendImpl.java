@@ -38,7 +38,6 @@ import net.sf.orcc.OrccException;
 import net.sf.orcc.OrccLaunchConstants;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
-import net.sf.orcc.backends.transformations.InlineTransformation;
 import net.sf.orcc.backends.transformations.ListFlattenTransformation;
 import net.sf.orcc.backends.transformations.ListOfOneElementToScalarTransformation;
 import net.sf.orcc.backends.transformations.VariableRenamer;
@@ -48,12 +47,14 @@ import net.sf.orcc.backends.xlim.transformations.ArrayInitializeTransformation;
 import net.sf.orcc.backends.xlim.transformations.CustomPeekAdder;
 import net.sf.orcc.backends.xlim.transformations.FirstPhiValuesOfWhileNodeTransformation;
 import net.sf.orcc.backends.xlim.transformations.MoveLiteralIntegers;
+import net.sf.orcc.backends.xlim.transformations.TernaryOperationAdder;
+import net.sf.orcc.backends.xlim.transformations.XlimDeadVariableRemoval;
+import net.sf.orcc.backends.xlim.transformations.XlimInlineTransformation;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.transformations.BuildCFG;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadGlobalElimination;
-import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
@@ -85,10 +86,11 @@ public class XlimBackendImpl extends AbstractBackend {
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = {
 				new ArrayInitializeTransformation(),
-				new InlineTransformation(true, true),
+				new TernaryOperationAdder(),
+				new XlimInlineTransformation(true, true),
 				new ListOfOneElementToScalarTransformation(),
 				new CustomPeekAdder(), new DeadGlobalElimination(),
-				new DeadCodeElimination(), new DeadVariableRemoval(true),
+				new DeadCodeElimination(), new XlimDeadVariableRemoval(true),
 				new ListFlattenTransformation(false, true, false),
 				new ExpressionSplitterTransformation(), new BuildCFG(),
 				new CastAdderTransformation(true),
