@@ -33,7 +33,7 @@ import java.util.Collections;
 import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstUnit;
-import net.sf.orcc.util.CollectionsUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.naming.IQualifiedNameProvider;
@@ -112,7 +112,7 @@ public class CalQualifiedNameProvider extends
 	}
 
 	public String qualifiedName(AstTag tag) {
-		return CollectionsUtil.toString(tag.getIdentifiers(), ".");
+		return OrccUtil.toString(tag.getIdentifiers(), ".");
 	}
 
 }

@@ -86,7 +86,7 @@ import net.sf.orcc.ir.instructions.Write;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.WhileNode;
 import net.sf.orcc.util.ActionList;
-import net.sf.orcc.util.CollectionsUtil;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
 
 import org.eclipse.emf.ecore.EObject;
@@ -581,7 +581,7 @@ public class ActorTransformer {
 			name = "untagged_" + untaggedCount++;
 		} else {
 			tag = new Tag(astAction.getTag().getIdentifiers());
-			name = CollectionsUtil.toString(tag, "_");
+			name = OrccUtil.toString(tag, "_");
 		}
 
 		Pattern inputPattern = new Pattern();

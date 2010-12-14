@@ -32,7 +32,7 @@ import java.util.List;
 
 import net.sf.graphiti.model.DefaultRefinementPolicy;
 import net.sf.graphiti.model.Vertex;
-import net.sf.orcc.util.ResourceUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -130,7 +130,7 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 		// then actor
 		IProject project = getProject(vertex);
 		try {
-			List<IFolder> folders = ResourceUtil.getAllSourceFolders(project);
+			List<IFolder> folders = OrccUtil.getAllSourceFolders(project);
 			for (IFolder folder : folders) {
 				String actorPath = refinement.replace('.', '/');
 				IFile file = folder.getFile(new Path(actorPath + ".cal"));

@@ -62,7 +62,7 @@ import net.sf.orcc.ir.expr.IntExpr;
 import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.util.StringUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -315,8 +315,7 @@ public class AstExpressionEvaluator extends CalSwitch<Expression> {
 
 	@Override
 	public Expression caseAstExpressionString(AstExpressionString expression) {
-		return new StringExpr(
-				StringUtil.getEscapedString(expression.getValue()));
+		return new StringExpr(OrccUtil.getEscapedString(expression.getValue()));
 	}
 
 	@Override

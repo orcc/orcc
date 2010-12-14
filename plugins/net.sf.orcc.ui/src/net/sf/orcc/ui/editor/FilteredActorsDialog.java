@@ -32,7 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import net.sf.orcc.ui.OrccActivator;
-import net.sf.orcc.util.ResourceUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -144,7 +144,7 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 	protected void fillContentProvider(AbstractContentProvider contentProvider,
 			ItemsFilter itemsFilter, IProgressMonitor progressMonitor)
 			throws CoreException {
-		List<IFolder> srcFolders = ResourceUtil.getAllSourceFolders(project
+		List<IFolder> srcFolders = OrccUtil.getAllSourceFolders(project
 				.getProject());
 		for (IFolder srcFolder : srcFolders) {
 			for (IResource member : srcFolder.members()) {

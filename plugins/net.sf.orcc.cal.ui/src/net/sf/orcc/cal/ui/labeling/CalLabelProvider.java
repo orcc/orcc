@@ -35,7 +35,7 @@ import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
-import net.sf.orcc.util.CollectionsUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider;
@@ -84,7 +84,7 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 	}
 
 	public String text(AstTag tag) {
-		return CollectionsUtil.toString(tag.getIdentifiers(), ".");
+		return OrccUtil.toString(tag.getIdentifiers(), ".");
 	}
 
 	public String text(AstTransition transition) {

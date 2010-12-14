@@ -44,7 +44,7 @@ import net.sf.orcc.ir.expr.ListExpr;
 import net.sf.orcc.ir.expr.StringExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
-import net.sf.orcc.util.CollectionsUtil;
+import net.sf.orcc.util.OrccUtil;
 
 /**
  * This class defines a VHDL expression printer.
@@ -230,7 +230,7 @@ public class VHDLExpressionPrinter extends ExpressionPrinter {
 	@Override
 	public void visit(ListExpr expr, Object... args) {
 		builder.append('(');
-		builder.append(CollectionsUtil.toString(expr.getValue(), ", "));
+		builder.append(OrccUtil.toString(expr.getValue(), ", "));
 		builder.append(')');
 	}
 

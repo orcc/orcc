@@ -29,6 +29,7 @@
 package net.sf.orcc.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Actor;
@@ -51,7 +52,7 @@ import org.eclipse.jdt.core.JavaModelException;
  * @author Matthieu Wipliez
  * 
  */
-public class ResourceUtil {
+public class OrccUtil {
 
 	/**
 	 * Returns the list of ALL source folders of the required projects as well
@@ -82,6 +83,44 @@ public class ResourceUtil {
 		srcFolders.addAll(getSourceFolders(project));
 
 		return srcFolders;
+	}
+
+	/**
+	 * Returns a new string that is an escaped version of the given string.
+	 * Espaced means that '\\', '\n', '\r', '\t' are replaced by "\\\\, "\\n",
+	 * "\\r", "\\t" respectively.
+	 * 
+	 * @param string
+	 *            a string
+	 * @return a new string that is an escaped version of the given string
+	 */
+	public static String getEscapedString(String string) {
+		StringBuilder builder = new StringBuilder(string.length());
+		for (int i = 0; i < string.length(); i++) {
+			char chr = string.charAt(i);
+			switch (chr) {
+			case '\\':
+				builder.append("\\\\");
+				break;
+			case '"':
+				builder.append("\"");
+				break;
+			case '\n':
+				builder.append("\\n");
+				break;
+			case '\r':
+				builder.append("\\r");
+				break;
+			case '\t':
+				builder.append("\\t");
+				break;
+			default:
+				builder.append(chr);
+				break;
+			}
+		}
+
+		return builder.toString();
 	}
 
 	/**
@@ -153,11 +192,17 @@ public class ResourceUtil {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		for (String name : javaProject.getRequiredProjectNames()) {
 			IProject refProject = root.getProject(name);
-			vtlFolders.add(getOutputFolder(refProject));
+			String outputFolder = getOutputFolder(refProject);
+			if (outputFolder != null) {
+				vtlFolders.add(outputFolder);
+			}
 		}
 
 		// add output folders of this project
-		vtlFolders.add(ResourceUtil.getOutputFolder(project));
+		String outputFolder = getOutputFolder(project);
+		if (outputFolder != null) {
+			vtlFolders.add(outputFolder);
+		}
 
 		return vtlFolders;
 	}
@@ -190,4 +235,76 @@ public class ResourceUtil {
 
 		return srcFolders;
 	}
+	
+	/**
+	 * Returns a string that contains all objects separated with the given
+	 * separator.
+	 * 
+	 * @param objects
+	 *            an iterable of objects
+	 * @param sep
+	 *            a separator string
+	 * @return a string that contains all objects separated with the given
+	 *         separator
+	 */
+	public static String toString(Iterable<? extends Object> objects, String sep) {
+		StringBuilder builder = new StringBuilder();
+		Iterator<? extends Object> it = objects.iterator();
+		if (it.hasNext()) {
+			builder.append(it.next());
+			while (it.hasNext()) {
+				builder.append(sep);
+				builder.append(it.next());
+			}
+		}
+
+		return builder.toString();
+	}
+
+	/**
+	 * Returns a new string that is an unescaped version of the given string.
+	 * Unespaced means that "\\\\", "\\n", "\\r", "\\t" are replaced by '\\',
+	 * '\n', '\r', '\t' respectively.
+	 * 
+	 * @param string
+	 *            a string
+	 * @return a new string that is an unescaped version of the given string
+	 */
+	public static String getUnescapedString(String string) {
+		StringBuilder builder = new StringBuilder(string.length());
+		boolean escape = false;
+		for (int i = 0; i < string.length(); i++) {
+			char chr = string.charAt(i);
+			if (escape) {
+				switch (chr) {
+				case '\\':
+					builder.append('\\');
+					break;
+				case 'n':
+					builder.append('\n');
+					break;
+				case 'r':
+					builder.append('\r');
+					break;
+				case 't':
+					builder.append('\t');
+					break;
+				default:
+					// we could throw an exception here
+					builder.append(chr);
+					break;
+				}
+				escape = false;
+			} else {
+				if (chr == '\\') {
+					escape = true;
+				} else {
+					builder.append(chr);
+				}
+			}
+		}
+
+		return builder.toString();
+	}
+
 }

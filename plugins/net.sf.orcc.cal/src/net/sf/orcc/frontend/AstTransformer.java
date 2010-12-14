@@ -89,9 +89,9 @@ import net.sf.orcc.ir.instructions.Store;
 import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.nodes.WhileNode;
+import net.sf.orcc.util.OrccUtil;
 import net.sf.orcc.util.OrderedMap;
 import net.sf.orcc.util.Scope;
-import net.sf.orcc.util.StringUtil;
 
 import org.eclipse.emf.ecore.EObject;
 
@@ -277,7 +277,7 @@ public class AstTransformer {
 
 		@Override
 		public Expression caseAstExpressionString(AstExpressionString expression) {
-			return new StringExpr(StringUtil.getEscapedString(expression
+			return new StringExpr(OrccUtil.getEscapedString(expression
 					.getValue()));
 		}
 

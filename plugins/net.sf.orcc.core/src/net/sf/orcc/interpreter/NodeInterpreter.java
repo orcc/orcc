@@ -62,7 +62,7 @@ import net.sf.orcc.runtime.Fifo;
 import net.sf.orcc.runtime.Fifo_String;
 import net.sf.orcc.runtime.Fifo_boolean;
 import net.sf.orcc.runtime.Fifo_int;
-import net.sf.orcc.util.StringUtil;
+import net.sf.orcc.util.OrccUtil;
 
 /**
  * This class defines a node interpreter.
@@ -171,7 +171,7 @@ public class NodeInterpreter extends AbstractActorTransformation {
 						// management
 						String str = ((StringExpr) callParams.get(i))
 								.getValue();
-						String unescaped = StringUtil.getUnescapedString(str);
+						String unescaped = OrccUtil.getUnescapedString(str);
 						process.write(unescaped);
 					} else {
 						Object value = callParams.get(i)

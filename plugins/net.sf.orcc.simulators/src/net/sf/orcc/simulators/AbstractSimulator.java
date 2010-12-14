@@ -70,7 +70,7 @@ import net.sf.orcc.network.attributes.IValueAttribute;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.network.transformations.BroadcastAdder;
 import net.sf.orcc.plugins.simulators.Simulator;
-import net.sf.orcc.util.ResourceUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -773,7 +773,7 @@ public abstract class AbstractSimulator implements Simulator {
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IProject project = root.getProject(name);
 
-			vtlFolders = ResourceUtil.getOutputFolders(project);
+			vtlFolders = OrccUtil.getOutputFolders(project);
 
 			fifoSize = configuration.getAttribute(FIFO_SIZE, DEFAULT_FIFO_SIZE);
 			xdfFile = configuration.getAttribute(XDF_FILE, "");

@@ -42,7 +42,7 @@ import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFParser;
 import net.sf.orcc.ui.OrccActivator;
-import net.sf.orcc.util.CollectionsUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -225,7 +225,7 @@ public class MappingTab extends AbstractLaunchConfigurationTab {
 					if (instance.isNetwork()) {
 						Set<String> subComponents = new TreeSet<String>();
 						getComponents(subComponents, instance);
-						return CollectionsUtil.toString(subComponents, ", ");
+						return OrccUtil.toString(subComponents, ", ");
 					} else {
 						return mapping.get(instance.getHierarchicalPath());
 					}

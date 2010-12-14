@@ -71,7 +71,7 @@ import net.sf.orcc.cal.util.CalActionList;
 import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeList;
-import net.sf.orcc.util.CollectionsUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -454,19 +454,6 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		}
 	}
 
-	private String getExpectedName(IPath rootPath, IPath filePath) {
-		int n = rootPath.matchingFirstSegments(filePath);
-		String[] segments = filePath.removeFileExtension().segments();
-		StringBuilder builder = new StringBuilder();
-		builder.append(segments[n]);
-		for (int i = n + 1; i < segments.length; i++) {
-			builder.append('.');
-			builder.append(segments[i]);
-		}
-
-		return builder.toString();
-	}
-
 	/**
 	 * Checks the given FSM using the given action list. This check is not
 	 * annotated because we need to build the action list, which is also useful
@@ -749,6 +736,19 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 		super.error(string, source, feature);
 	}
 
+	private String getExpectedName(IPath rootPath, IPath filePath) {
+		int n = rootPath.matchingFirstSegments(filePath);
+		String[] segments = filePath.removeFileExtension().segments();
+		StringBuilder builder = new StringBuilder();
+		builder.append(segments[n]);
+		for (int i = n + 1; i < segments.length; i++) {
+			builder.append('.');
+			builder.append(segments[i]);
+		}
+
+		return builder.toString();
+	}
+
 	private String getName(AstAction action) {
 		AstTag tag = action.getTag();
 		if (tag == null) {
@@ -759,7 +759,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	private String getName(AstTag tag) {
-		return CollectionsUtil.toString(tag.getIdentifiers(), ".");
+		return OrccUtil.toString(tag.getIdentifiers(), ".");
 	}
 
 	private String getName(EObject object) {

@@ -41,7 +41,7 @@ import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.ui.internal.CalActivator;
 import net.sf.orcc.frontend.Frontend;
 import net.sf.orcc.ui.OrccProjectNature;
-import net.sf.orcc.util.ResourceUtil;
+import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -99,7 +99,7 @@ public class ActorBuilder implements IXtextBuilderParticipant {
 			return;
 		}
 
-		String outputFolder = ResourceUtil.getOutputFolder(project);
+		String outputFolder = OrccUtil.getOutputFolder(project);
 		if (outputFolder == null) {
 			return;
 		}
