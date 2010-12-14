@@ -85,10 +85,6 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
 			MbPartIdx     := 0;
 			MbPartIdxMax  := NumMbPart(MacroBlkType);
 			SizeMbMv      := SizeMbPart(MacroBlkType);
-			//delete me!!
-			if(mb_type = BLOCK_TYPE_B_SKIP or mb_type = BLOCK_TYPE_B_DIRECT_16x16)then
-				SizeMbMv := SZ_8x8;
-			end
 		end
 
 	GetListSel4Mb: action

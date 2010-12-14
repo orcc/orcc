@@ -159,7 +159,7 @@ unit Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo :
 
 	List(type: uint(size=3),size=32) SizeMb_B =
 		[
-			 /*SZ_8x8*/SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
+			 SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
 			SZ_16x8,  SZ_8x16,  SZ_16x8,  SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
 			SZ_16x8,  SZ_8x16,   SZ_8x8,   SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,
 			 SZ_8x8,  SZ_8x8
