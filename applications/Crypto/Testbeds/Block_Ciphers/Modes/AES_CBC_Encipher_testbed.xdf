@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><XDF name="Rabbit_testbed">
+<?xml version="1.0" encoding="UTF-8"?><XDF name="AES_CBC_Encipher_testbed">
    <!-- ************************************** -->
    <!-- Input ports of the Graph               -->
    <!-- ************************************** -->
@@ -11,11 +11,11 @@
    <!-- ************************************** -->
    <!-- Instances of the Graph                 -->
    <!-- ************************************** -->
-   <Instance id="Rabbit">
+   <Instance id="AES_CBC_Encipher">
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="../../../CTL/Stream_Ciphers/Rabbit/Rabbit_Cipher"/>
+      <Class name="../../../CTL/Block_Ciphers/AES/AES_CBC_Encipher"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -24,16 +24,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Stream_Ciphers.Rabbit.Source_Rabbit"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <Instance id="XOR">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Utilities.XOR_8b"/>
+      <Class name="Block_Ciphers.Modes.Source_AES_CBC_Cipher"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -42,7 +33,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="System.Validator_1B"/>
+      <Class name="../../System/Validator_16B"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -50,12 +41,9 @@
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->
    <!-- ************************************** -->
-   <Connection dst="Validator" dst-port="IP1_Data" src="XOR" src-port="OP"/>
-   <Connection dst="Rabbit" dst-port="IP1_Key" src="Source" src-port="OP1_Key"/>
-   <Connection dst="Rabbit" dst-port="IP2_IV" src="Source" src-port="OP2_IV"/>
-   <Connection dst="Rabbit" dst-port="IP3_TextSize" src="Source" src-port="OP3_TextSize"/>
-   <Connection dst="Rabbit" dst-port="IP4_Text" src="Source" src-port="OP4_Text"/>
-   <Connection dst="XOR" dst-port="IP2" src="Source" src-port="OP4_Text"/>
-   <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP5_GR"/>
-   <Connection dst="XOR" dst-port="IP1" src="Rabbit" src-port="OP_Text"/>
+   <Connection dst="Validator" dst-port="IP1_Data" src="AES_CBC_Encipher" src-port="Ciphertext"/>
+   <Connection dst="AES_CBC_Encipher" dst-port="IV" src="Source" src-port="OP1_IV"/>
+   <Connection dst="AES_CBC_Encipher" dst-port="Key" src="Source" src-port="OP2_Key"/>
+   <Connection dst="AES_CBC_Encipher" dst-port="Plaintext" src="Source" src-port="OP3_PT"/>
+   <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP4_GR"/>
 </XDF>

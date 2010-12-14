@@ -13,7 +13,7 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Source_TDES_Decipher () ==>
+actor Block_Ciphers.TDES.Source_TDES_Decipher () ==>
 	uint(size=8) OP1_CT, 
 	uint(size=8) OP2_Key1, uint(size=8) OP3_Key2, uint(size=8) OP4_Key3,
 	uint(size=8) OP5_GR :

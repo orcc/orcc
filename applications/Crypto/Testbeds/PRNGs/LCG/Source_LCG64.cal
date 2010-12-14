@@ -16,7 +16,7 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
  
-actor Source_LCG64() ==> uint(size=64) OP1_Params, uint OP2_StreamSize, uint(size=64) OP3_GR:
+actor PRNGs.LCG.Source_LCG64() ==> uint(size=64) OP1_Params, uint OP2_StreamSize, uint(size=64) OP3_GR:
 	
 	// Test parameters for LCG64 taken from [1].
 	uint(size=64) a = 0x00002455;

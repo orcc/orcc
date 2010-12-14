@@ -16,7 +16,7 @@
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor Source_AES_CFB8_Decipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key, uint(size=8) OP3_CT, uint(size=8) OP4_GR:
+actor Block_Ciphers.Modes.Source_AES_CFB8_Decipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key, uint(size=8) OP3_CT, uint(size=8) OP4_GR:
 
 	// Test vectors for AES-128 (F.3.8 CFB8-AES128.Decrypt)
 	int KEY_SIZE = 16;

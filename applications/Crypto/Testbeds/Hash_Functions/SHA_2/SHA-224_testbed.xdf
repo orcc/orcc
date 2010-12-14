@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><XDF name="Rabbit_testbed">
+<?xml version="1.0" encoding="UTF-8"?><XDF name="SHA-224_testbed">
    <!-- ************************************** -->
    <!-- Input ports of the Graph               -->
    <!-- ************************************** -->
@@ -11,29 +11,20 @@
    <!-- ************************************** -->
    <!-- Instances of the Graph                 -->
    <!-- ************************************** -->
-   <Instance id="Rabbit">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="../../../CTL/Stream_Ciphers/Rabbit/Rabbit_Cipher"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
    <Instance id="Source">
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Stream_Ciphers.Rabbit.Source_Rabbit"/>
+      <Class name="Hash_Functions.SHA_2.Source_SHA_224"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
    </Instance>
-   <Instance id="XOR">
+   <Instance id="SHA-224">
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="Utilities.XOR_8b"/>
+      <Class name="Hash_Functions.SHA_2.SHA_224"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -42,7 +33,7 @@
       <!-- ************************* -->
       <!-- FU/Network refinement     -->
       <!-- ************************* -->
-      <Class name="System.Validator_1B"/>
+      <Class name="../../System/Validator_DWordStream"/>
       <!-- ************************* -->
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
@@ -50,12 +41,9 @@
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->
    <!-- ************************************** -->
-   <Connection dst="Validator" dst-port="IP1_Data" src="XOR" src-port="OP"/>
-   <Connection dst="Rabbit" dst-port="IP1_Key" src="Source" src-port="OP1_Key"/>
-   <Connection dst="Rabbit" dst-port="IP2_IV" src="Source" src-port="OP2_IV"/>
-   <Connection dst="Rabbit" dst-port="IP3_TextSize" src="Source" src-port="OP3_TextSize"/>
-   <Connection dst="Rabbit" dst-port="IP4_Text" src="Source" src-port="OP4_Text"/>
-   <Connection dst="XOR" dst-port="IP2" src="Source" src-port="OP4_Text"/>
-   <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP5_GR"/>
-   <Connection dst="XOR" dst-port="IP1" src="Rabbit" src-port="OP_Text"/>
+   <Connection dst="Validator" dst-port="IP1_Data" src="SHA-224" src-port="MessageDigest"/>
+   <Connection dst="Validator" dst-port="IP2_StreamSize" src="Source" src-port="OP3_HashSize"/>
+   <Connection dst="Validator" dst-port="IP3_GR" src="Source" src-port="OP4_GR"/>
+   <Connection dst="SHA-224" dst-port="IP1_MessageSize" src="Source" src-port="OP1_MessageSize"/>
+   <Connection dst="SHA-224" dst-port="IP2_Message" src="Source" src-port="OP2_Message"/>
 </XDF>

@@ -17,7 +17,7 @@
  * Developers: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
  
-actor Source_LFSR() ==> uint(size=64) OP1_Params, uint OP2_StreamSize, uint(size=1) OP3_GR:
+actor PRNGs.LFSR.Source_LFSR() ==> uint(size=64) OP1_Params, uint OP2_StreamSize, uint(size=1) OP3_GR:
 	
 /*	// Test parameters for LFSR taken from [1].
 	uint(size=64) mask = 0x8E; // Primitve polynomial (8, 4, 3, 2, 0).)

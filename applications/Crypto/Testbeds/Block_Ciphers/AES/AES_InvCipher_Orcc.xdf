@@ -1,57 +1,56 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<XDF name="AES_InvCipher_Orcc">
-    <!-- ************************************** -->
-    <!-- Input ports of the Graph               -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Output ports of the Graph              -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Variables and Parameters of the Graph  -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Instances of the Graph                 -->
-    <!-- ************************************** -->
-    <Instance id="AES_Decipher">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../CTL/Block_Ciphers/AES/AES_InvCipher"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="source">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../CTL/System/Source"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="KeyGenerator">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="KeyGenerator_AES"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="Display">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../CTL/System/Display_Byte"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <!-- ************************************** -->
-    <!-- Connections of the Graph               -->
-    <!-- ************************************** -->
-    <Connection dst="AES_Decipher" dst-port="Ciphertext" src="source" src-port="O"/>
-    <Connection dst="AES_Decipher" dst-port="Key" src="KeyGenerator" src-port="Key"/>
-    <Connection dst="Display" dst-port="IP" src="AES_Decipher" src-port="Plaintext"/>
+<?xml version="1.0" encoding="UTF-8"?><XDF name="AES_InvCipher_Orcc">
+   <!-- ************************************** -->
+   <!-- Input ports of the Graph               -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Output ports of the Graph              -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Variables and Parameters of the Graph  -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Instances of the Graph                 -->
+   <!-- ************************************** -->
+   <Instance id="AES_Decipher">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="../../../CTL/Block_Ciphers/AES/AES_InvCipher"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="source">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.Source"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="KeyGenerator">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Block_Ciphers.AES.KeyGenerator_AES"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="Display">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.Display_Byte"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <!-- ************************************** -->
+   <!-- Connections of the Graph               -->
+   <!-- ************************************** -->
+   <Connection dst="AES_Decipher" dst-port="Ciphertext" src="source" src-port="O"/>
+   <Connection dst="AES_Decipher" dst-port="Key" src="KeyGenerator" src-port="Key"/>
+   <Connection dst="Display" dst-port="IP" src="AES_Decipher" src-port="Plaintext"/>
 </XDF>

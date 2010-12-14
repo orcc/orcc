@@ -11,7 +11,7 @@
  * Developer: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Validator_QWordStream () uint(size=64) IP1_Data, uint IP2_StreamSize, uint(size=64) IP3_GR ==> :
+actor System.Validator_QWordStream () uint(size=64) IP1_Data, uint IP2_StreamSize, uint(size=64) IP3_GR ==> :
 
 	int streamSize := 8;
 	bool streamSizeReceived := false;

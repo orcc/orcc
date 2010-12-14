@@ -1,51 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<XDF name="TDES_Encipher_testbed">
-    <!-- ************************************** -->
-    <!-- Input ports of the Graph               -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Output ports of the Graph              -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Variables and Parameters of the Graph  -->
-    <!-- ************************************** -->
-    <!-- ************************************** -->
-    <!-- Instances of the Graph                 -->
-    <!-- ************************************** -->
-    <Instance id="Source">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Source_TDES_Encipher"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="Encipher">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../../CTL/Block_Ciphers/TDES/TDES_Encipher"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="Validator">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="../../System/Validator_8B"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <!-- ************************************** -->
-    <!-- Connections of the Graph               -->
-    <!-- ************************************** -->
-    <Connection dst="Encipher" dst-port="Key1" src="Source" src-port="OP1_Key1"/>
-    <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP5_GR"/>
-    <Connection dst="Encipher" dst-port="Key2" src="Source" src-port="OP2_Key2"/>
-    <Connection dst="Encipher" dst-port="Key3" src="Source" src-port="OP3_Key3"/>
-    <Connection dst="Encipher" dst-port="Plaintext" src="Source" src-port="OP4_PT"/>
-    <Connection dst="Validator" dst-port="IP1_Data" src="Encipher" src-port="Ciphertext"/>
+<?xml version="1.0" encoding="UTF-8"?><XDF name="TDES_Encipher_testbed">
+   <!-- ************************************** -->
+   <!-- Input ports of the Graph               -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Output ports of the Graph              -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Variables and Parameters of the Graph  -->
+   <!-- ************************************** -->
+   <!-- ************************************** -->
+   <!-- Instances of the Graph                 -->
+   <!-- ************************************** -->
+   <Instance id="Source">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Block_Ciphers.TDES.Source_TDES_Encipher"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="Encipher">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="../../../CTL/Block_Ciphers/TDES/TDES_Encipher"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <Instance id="Validator">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="../../System/Validator_8B"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
+   <!-- ************************************** -->
+   <!-- Connections of the Graph               -->
+   <!-- ************************************** -->
+   <Connection dst="Encipher" dst-port="Key1" src="Source" src-port="OP1_Key1"/>
+   <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP5_GR"/>
+   <Connection dst="Encipher" dst-port="Key2" src="Source" src-port="OP2_Key2"/>
+   <Connection dst="Encipher" dst-port="Key3" src="Source" src-port="OP3_Key3"/>
+   <Connection dst="Encipher" dst-port="Plaintext" src="Source" src-port="OP4_PT"/>
+   <Connection dst="Validator" dst-port="IP1_Data" src="Encipher" src-port="Ciphertext"/>
 </XDF>

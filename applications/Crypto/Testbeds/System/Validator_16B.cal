@@ -11,7 +11,7 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Validator_16B () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = Golden response
+actor System.Validator_16B () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = Golden response
 
 	int BLOCK_SIZE = 16;
 	

@@ -4,7 +4,7 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Source_Any2Bits () ==> uint(size=8) OP:
+actor Utilities.Source_Any2Bits () ==> uint(size=8) OP:
 
 	bool dataSent := false;
 	
