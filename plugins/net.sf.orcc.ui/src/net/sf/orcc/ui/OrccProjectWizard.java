@@ -28,6 +28,10 @@
  */
 package net.sf.orcc.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -62,11 +66,28 @@ public class OrccProjectWizard extends BasicNewProjectResourceWizard {
 			String[] natures = description.getNatureIds();
 			String[] newNatures = new String[natures.length + 3];
 
+			// add new natures
 			System.arraycopy(natures, 0, newNatures, 2, natures.length);
 			newNatures[0] = OrccProjectNature.NATURE_ID;
 			newNatures[1] = XtextProjectHelper.NATURE_ID;
 			newNatures[2] = JavaCore.NATURE_ID;
 			description.setNatureIds(newNatures);
+			project.setDescription(description, null);
+
+			// retrieves the up-to-date description
+			description = project.getDescription();
+
+			// filters out the Java builder
+			ICommand[] commands = description.getBuildSpec();
+			List<ICommand> buildSpec = new ArrayList<ICommand>(commands.length);
+			for (ICommand command : commands) {
+				if (!JavaCore.BUILDER_ID.equals(command.getBuilderName())) {
+					buildSpec.add(command);
+				}
+			}
+
+			// updates the description and replaces the existing description
+			description.setBuildSpec(buildSpec.toArray(new ICommand[0]));
 			project.setDescription(description, null);
 		} catch (CoreException e) {
 			e.printStackTrace();
@@ -74,4 +95,5 @@ public class OrccProjectWizard extends BasicNewProjectResourceWizard {
 
 		return finish;
 	}
+
 }
