@@ -269,7 +269,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 
 actionTrace(action) ::= <<
 #ifdef __TRACE_CAPTURE__
-m_actionTracer.captureAction("$action.name$");
+g_oTracer.captureAction(this, "$action.name$");
 #endif
 >>
 
@@ -464,6 +464,10 @@ actor(actor, options) ::= <<
 
 #include "$actor.name$.h"
 
+#ifdef __TRACE_CAPTURE__
+extern TraceAka g_oTracer;
+#endif
+
 char* actor_$actor.name$::className = "$actor.name$";
 
 $defineConstantVars(actor.stateVars.list)$
@@ -474,9 +478,6 @@ $destructor(stateVars=actor.stateVars.list)$
 
 void actor_$actor.name$::initializeActor()
 {
-#ifdef __TRACE_CAPTURE__
-	m_actionTracer.openFile(getInstanceName());
-#endif
 }
 
 

@@ -244,7 +244,11 @@ TraceAka g_oTracer;
 #ifdef __TRACE_TOKENS__
 #define NETWORK_PROFILING_MODE	AKA_PROFILING_CAPTURE_TOKEN 
 #else
+#ifdef __TRACE_CAPTURE__
+#define NETWORK_PROFILING_MODE	AKA_PROFILING_CAPTURE_TRACE
+#else
 #define NETWORK_PROFILING_MODE	AKA_PROFILING_NONE 
+#endif
 #endif
 
 $includeActors(network.actors)$
