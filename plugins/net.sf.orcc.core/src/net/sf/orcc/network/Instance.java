@@ -305,22 +305,20 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 	 */
 	public void instantiate(List<String> vtlFolders) throws OrccException {
 		String className = new File(clasz).getName();
+		for (String path : vtlFolders) {
+			file = new File(path, className.replace('.', '/') + ".json");
+			if (file.exists()) {
+				break;
+			} else {
+				file = null;
+			}
+		}
+		if (file == null) {
+			throw new OrccException("Actor \"" + className
+					+ "\" not found! Did you compile the VTL?");
+		}
 		actor = Network.getActorFromPool(className);
 		if (actor == null) {
-			for (String path : vtlFolders) {
-				file = new File(path, className.replace('.', '/') + ".json");
-				if (file.exists()) {
-					break;
-				} else {
-					file = null;
-				}
-			}
-
-			if (file == null) {
-				throw new OrccException("Actor \"" + className
-						+ "\" not found! Did you compile the VTL?");
-			}
-
 			// try and load the actor
 			try {
 				InputStream in = new FileInputStream(file);
@@ -333,8 +331,6 @@ public class Instance implements Comparable<Instance>, IAttributeContainer {
 				throw new OrccException("Actor \"" + className
 						+ "\" not found! Did you compile the VTL?", e);
 			}
-		} else {
-			file = new File(actor.getFile());
 		}
 
 		// replace path-based class by actor class
