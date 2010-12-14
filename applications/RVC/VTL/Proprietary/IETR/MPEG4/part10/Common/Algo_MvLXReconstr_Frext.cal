@@ -361,15 +361,15 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 			FirstMbInSlice   :[Fst_Mb],
 			PicWidthInMb     :[pic_width_in_mb]
 				==>
-			DirectPredLX_Out :[direct_pred_lx/*,direct_pred_lx,direct_pred_lx,direct_pred_lx*/]
+			DirectPredLX_Out :[direct_pred_lx,direct_pred_lx,direct_pred_lx,direct_pred_lx]
 		guard
 			not IsNewPic,
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
 		var
 			int(size=5) RefIdxLX_Direct
 		do
-			Loc_Direct[0] := (Curr_Mb_Addr mod pic_width_in_mb)*16;
-			Loc_Direct[1] := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
+			Mbx_in_pix := (Curr_Mb_Addr mod pic_width_in_mb)*16;
+			Mby_in_pix := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
 			Idx_CurrBlk   := Curr_Mb_Addr & MASK_TAB;
 
 			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0) then
@@ -426,20 +426,28 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 				println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
 			end
 			MbPartIdx    := 0;
-			MbPartIdxMax := 1;//4;
+			MbPartIdxMax := 4;
 		end
 
 	SendMv4Direct.Launch: action
 			DirectPredLX_In :[other_direct_pred_lx]
 				==>
-			Location  :[Loc_Direct] repeat 2,
+			/*Should be :
+			 * Location  :[Blk_x_in_pix,Blk_y_in_pix], 
+			 */
+			Location  :[Mbx_in_pix,Mby_in_pix],
 			MvOut     :[MvTab[Idx_CurrBlk][0][0],MvTab[Idx_CurrBlk][0][1]],
 			RefIdxOut :[RefIdxTab[Idx_CurrBlk][0]],
 			NewPic_o  :[false]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			direct_pred_lx or (not other_direct_pred_lx)
+		var
+			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
+			uint(size=11) Blk_y_in_pix := Mby_in_pix
 		do
+			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
+			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
 			if( (not direct_pred_lx) and (not other_direct_pred_lx))then
 				foreach int i in 0 .. 15//Fixme!!
 				do

@@ -161,8 +161,8 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[16,16]
-//			PartSZ :[8,8]
+//			PartSZ :[16,16]
+			PartSZ :[8,8]
 		guard
 			   mb_type = BLOCK_TYPE_B_SKIP
 			or mb_type = BLOCK_TYPE_B_DIRECT_16x16,

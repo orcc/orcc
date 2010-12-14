@@ -140,7 +140,7 @@ unit Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo :
 
 	List(type: uint(size=3),size=32) NumMbPart_B =
 		[
-			1,1,1,1,2,2,2,2,2,2,
+			4,1,1,1,2,2,2,2,2,2,
 			2,2,2,2,2,2,2,2,2,2,
 			2,2,4,1,1,1,1,1,1,1,
 			1,1
@@ -263,7 +263,11 @@ unit Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo :
 				if(MbType <= BLOCK_TYPE_P_MAX)then
 					NumMbPart_P[(MbType - BLOCK_TYPE_P_MIN) &  7]
 				else
-					1
+					if(MbType = BLOCK_TYPE_P_SKIP)then
+						1
+					else
+						4
+					end
 				end
 			end
 		end

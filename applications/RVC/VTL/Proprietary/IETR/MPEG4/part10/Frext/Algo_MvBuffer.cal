@@ -248,7 +248,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 		do
 			mb_type      := MacroBlkType;
 			MbPartIdx    := 0;
-			MbPartIdxMax := 1;//4;
+			MbPartIdxMax := 4;
 			SizeMbMv     := SZ_8x8;
 			Mbx := Curr_Mb_Addr mod PicWidth;
 			Mby := Curr_Mb_Addr  /  PicWidth;

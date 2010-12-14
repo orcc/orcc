@@ -55,6 +55,9 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 			mb_type       := MacroBlkType;
 			MbPartIdx     := 0;
 			MbPartIdxMax  := NumMbPart(MacroBlkType);
+			if(mb_type = BLOCK_TYPE_B_SKIP or mb_type = BLOCK_TYPE_B_DIRECT_16x16)then
+				MbPartIdxMax := 4;
+			end
 			SizeMb        := SizeMbPart(MacroBlkType);
 		end
 
@@ -136,18 +139,7 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 			or mb_type = BLOCK_TYPE_B_DIRECT_16x16,
 			NbListToGet > 0
 		do
-			foreach int j in 0 .. 4*SzSidePerPart -1
-			do
-				foreach int i in 0 .. 4*SzSidePerPart -1
-				do
-					TabX_Out[i + 4 * SzSidePerPart*j]:= i;
-					TabY_Out[i + 4 * SzSidePerPart*j]:= j;
-				end
-			end
-			NbValueToRead := 16 * SzSidePerPart * SzSidePerPart;
-			ReadIdx       := 0;
-			NbListToGet   := NbListToGet - 1;
-			/*foreach int j in 0 .. 2*SzSidePerPart -1
+			foreach int j in 0 .. 2*SzSidePerPart -1
 			do
 				foreach int i in 0 .. 2*SzSidePerPart -1
 				do
@@ -157,7 +149,7 @@ actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart
 			end
 			NbValueToRead := 4*SzSidePerPart*SzSidePerPart;
 			ReadIdx       := 0;
-			NbListToGet   := NbListToGet - 1;*/
+			NbListToGet   := NbListToGet - 1;
 		end
 
 	GetInterp.Done: action ==>
