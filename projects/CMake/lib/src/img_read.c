@@ -37,11 +37,10 @@
 
 #define MIN(a,b) ((a)>(b)?(b):(a))
 
-extern struct fifo_i16_s *img_read_WIDTH;
-extern struct fifo_i16_s *img_read_HEIGHT;
-extern struct fifo_i8_s *img_read_RED;
-extern struct fifo_i8_s *img_read_GREEN;
-extern struct fifo_i8_s *img_read_BLUE;
+extern struct fifo_i32_s *img_read_SOI;
+extern struct fifo_i8_s *img_read_R;
+extern struct fifo_i8_s *img_read_G;
+extern struct fifo_i8_s *img_read_B;
 
 static SDL_Surface *image;
 static SDL_PixelFormat *format;
@@ -49,8 +48,8 @@ static int count;
 
 // Called before any *_scheduler function.
 void img_read_initialize() {
-	unsigned short *ptr;
-	i16 img_read_WIDTH_buf[1], img_read_HEIGHT_buf[1];
+	i32 *ptr;
+	i32 img_read_SOI_buf[2];
 
 	if (input_file == NULL) {
 		print_usage();
@@ -69,13 +68,10 @@ void img_read_initialize() {
 	format = image->format;
 	count = image->w * image->h;
 
-	ptr = fifo_i16_write(img_read_WIDTH, img_read_WIDTH_buf, 1);
+	ptr = fifo_i32_write(img_read_SOI, img_read_SOI_buf, 2);
 	ptr[0] = image->w;
-	fifo_i16_write_end(img_read_WIDTH, img_read_WIDTH_buf, 1);
-
-	ptr = fifo_i16_write(img_read_HEIGHT, img_read_HEIGHT_buf, 1);
-	ptr[0] = image->h;
-	fifo_i16_write_end(img_read_HEIGHT, img_read_HEIGHT_buf, 1);
+	ptr[1] = image->h;
+	fifo_i32_write_end(img_read_SOI, img_read_SOI_buf, 2);
 }
 
 static int idx_pixel = 0;
@@ -83,19 +79,19 @@ static int idx_pixel = 0;
 static void write_pixels(struct schedinfo_s *si) {
 	int ports = 0;
 
-	int num_red = fifo_i8_get_room(img_read_RED);
-	int num_green = fifo_i8_get_room(img_read_GREEN);
-	int num_blue = fifo_i8_get_room(img_read_BLUE);
+	int num_red = fifo_i8_get_room(img_read_R);
+	int num_green = fifo_i8_get_room(img_read_G);
+	int num_blue = fifo_i8_get_room(img_read_B);
 
 	int num_colors = MIN(MIN(MIN(num_red, num_green), num_blue), count - idx_pixel);
 
-	i8 *img_read_RED_buf = (i8 *) malloc(num_colors);
-	i8 *img_read_GREEN_buf = (i8 *) malloc(num_colors);
-	i8 *img_read_BLUE_buf = (i8 *) malloc(num_colors);
+	i8 *img_read_R_buf = (i8 *) malloc(num_colors);
+	i8 *img_read_G_buf = (i8 *) malloc(num_colors);
+	i8 *img_read_B_buf = (i8 *) malloc(num_colors);
 
-	u8* ptr_red = fifo_i8_write(img_read_RED, img_read_RED_buf, num_colors);
-	u8* ptr_green = fifo_i8_write(img_read_GREEN, img_read_GREEN_buf, num_colors);
-	u8* ptr_blue = fifo_i8_write(img_read_BLUE, img_read_BLUE_buf, num_colors);
+	u8* ptr_red = fifo_i8_write(img_read_R, img_read_R_buf, num_colors);
+	u8* ptr_green = fifo_i8_write(img_read_G, img_read_G_buf, num_colors);
+	u8* ptr_blue = fifo_i8_write(img_read_B, img_read_B_buf, num_colors);
 
 	int i;
 	for (i = 0; i < num_colors; i++) {
@@ -112,13 +108,13 @@ static void write_pixels(struct schedinfo_s *si) {
 		idx_pixel++;
 	}
 
-	fifo_i8_write_end(img_read_RED, img_read_RED_buf, num_colors);
-	fifo_i8_write_end(img_read_GREEN, img_read_GREEN_buf, num_colors);
-	fifo_i8_write_end(img_read_BLUE, img_read_BLUE_buf, num_colors);
+	fifo_i8_write_end(img_read_R, img_read_R_buf, num_colors);
+	fifo_i8_write_end(img_read_G, img_read_G_buf, num_colors);
+	fifo_i8_write_end(img_read_B, img_read_B_buf, num_colors);
 
-	free(img_read_RED_buf);
-	free(img_read_GREEN_buf);
-	free(img_read_BLUE_buf);
+	free(img_read_R_buf);
+	free(img_read_G_buf);
+	free(img_read_B_buf);
 
 	if (num_red <= num_colors) {
 		ports |= 0x01;
