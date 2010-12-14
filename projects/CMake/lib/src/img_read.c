@@ -38,9 +38,9 @@
 #define MIN(a,b) ((a)>(b)?(b):(a))
 
 extern struct fifo_i32_s *img_read_SOI;
-extern struct fifo_i8_s *img_read_R;
-extern struct fifo_i8_s *img_read_G;
-extern struct fifo_i8_s *img_read_B;
+extern struct fifo_u8_s *img_read_R;
+extern struct fifo_u8_s *img_read_G;
+extern struct fifo_u8_s *img_read_B;
 
 static SDL_Surface *image;
 static SDL_PixelFormat *format;
@@ -79,19 +79,19 @@ static int idx_pixel = 0;
 static void write_pixels(struct schedinfo_s *si) {
 	int ports = 0;
 
-	int num_red = fifo_i8_get_room(img_read_R);
-	int num_green = fifo_i8_get_room(img_read_G);
-	int num_blue = fifo_i8_get_room(img_read_B);
+	int num_red = fifo_u8_get_room(img_read_R);
+	int num_green = fifo_u8_get_room(img_read_G);
+	int num_blue = fifo_u8_get_room(img_read_B);
 
 	int num_colors = MIN(MIN(MIN(num_red, num_green), num_blue), count - idx_pixel);
 
-	i8 *img_read_R_buf = (i8 *) malloc(num_colors);
-	i8 *img_read_G_buf = (i8 *) malloc(num_colors);
-	i8 *img_read_B_buf = (i8 *) malloc(num_colors);
+	u8 *img_read_R_buf = (u8 *) malloc(num_colors);
+	u8 *img_read_G_buf = (u8 *) malloc(num_colors);
+	u8 *img_read_B_buf = (u8 *) malloc(num_colors);
 
-	u8* ptr_red = fifo_i8_write(img_read_R, img_read_R_buf, num_colors);
-	u8* ptr_green = fifo_i8_write(img_read_G, img_read_G_buf, num_colors);
-	u8* ptr_blue = fifo_i8_write(img_read_B, img_read_B_buf, num_colors);
+	u8* ptr_red = fifo_u8_write(img_read_R, img_read_R_buf, num_colors);
+	u8* ptr_green = fifo_u8_write(img_read_G, img_read_G_buf, num_colors);
+	u8* ptr_blue = fifo_u8_write(img_read_B, img_read_B_buf, num_colors);
 
 	int i;
 	for (i = 0; i < num_colors; i++) {
@@ -108,9 +108,9 @@ static void write_pixels(struct schedinfo_s *si) {
 		idx_pixel++;
 	}
 
-	fifo_i8_write_end(img_read_R, img_read_R_buf, num_colors);
-	fifo_i8_write_end(img_read_G, img_read_G_buf, num_colors);
-	fifo_i8_write_end(img_read_B, img_read_B_buf, num_colors);
+	fifo_u8_write_end(img_read_R, img_read_R_buf, num_colors);
+	fifo_u8_write_end(img_read_G, img_read_G_buf, num_colors);
+	fifo_u8_write_end(img_read_B, img_read_B_buf, num_colors);
 
 	free(img_read_R_buf);
 	free(img_read_G_buf);
