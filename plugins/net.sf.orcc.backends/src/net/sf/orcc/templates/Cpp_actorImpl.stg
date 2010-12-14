@@ -146,9 +146,9 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 Peek(peek) ::= <<
 
 $if(peek.unit)$
-m_poTabIn[$actor.name$_$peek.port$]->peek($peek.target$);$\n$
+m_poTabIn[$actor.simpleName$_$peek.port$]->peek($peek.target$);$\n$
 $else$
-m_poTabIn[$actor.name$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
+m_poTabIn[$actor.simpleName$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
 $endif$
 >>
 
@@ -156,15 +156,15 @@ Read(read) ::= <<
 
 $if (read.target)$
 $if(read.unit)$
-m_poTabIn[$actor.name$_$read.port$]->get($read.target$);$\n$
-m_arrAvailStatus[$actor.name$_$read.port$] --;
+m_poTabIn[$actor.simpleName$_$read.port$]->get($read.target$);$\n$
+m_arrAvailStatus[$actor.simpleName$_$read.port$] --;
 $else$
-m_poTabIn[$actor.name$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
-m_arrAvailStatus[$actor.name$_$read.port$] -= $read.numTokens$;
+m_poTabIn[$actor.simpleName$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
+m_arrAvailStatus[$actor.simpleName$_$read.port$] -= $read.numTokens$;
 $endif$
 $else$
-m_poTabIn[$actor.name$_$read.port$]->skip($read.numTokens$);$\n$
-m_arrAvailStatus[$actor.name$_$read.port$] -= $read.numTokens$;
+m_poTabIn[$actor.simpleName$_$read.port$]->skip($read.numTokens$);$\n$
+m_arrAvailStatus[$actor.simpleName$_$read.port$] -= $read.numTokens$;
 $endif$
 >>
 
@@ -191,11 +191,11 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 Write(write) ::= <<
 
 $if(write.unit)$
-m_poTabOut[$actor.name$_$write.port$]->put($write.target$);$\n$
-m_arrRoomStatus[$actor.name$_$write.port$]--;
+m_poTabOut[$actor.simpleName$_$write.port$]->put($write.target$);$\n$
+m_arrRoomStatus[$actor.simpleName$_$write.port$]--;
 $else$
-m_poTabOut[$actor.name$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
-m_arrRoomStatus[$actor.name$_$write.port$] -= $write.numTokens$;
+m_poTabOut[$actor.simpleName$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
+m_arrRoomStatus[$actor.simpleName$_$write.port$] -= $write.numTokens$;
 
 $endif$
 
@@ -249,7 +249,7 @@ $BlockNode(whileNode.joinNode)$
 
 procedure(procedure) ::= <<
 
-$procedure.returnType$ actor_$actor.name$::$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$)
+$procedure.returnType$ $actor.simpleName$::$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$)
 {
 $if(procedure.locals.list)$
 	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
@@ -269,7 +269,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 
 actionTrace(action) ::= <<
 #ifdef __TRACE_CAPTURE__
-g_oTracer.captureAction(this, "$action.name$");
+g_oTracer.captureAction(this, "$action.simpleName$");
 #endif
 >>
 
@@ -278,11 +278,11 @@ g_oTracer.captureAction(this, "$action.name$");
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|hasRooms($actor.name$_$port$, $pattern.(port)$)}; wrap, anchor, separator=" && "$
+$pattern.keys:{port|hasRooms($actor.simpleName$_$port$, $pattern.(port)$)}; wrap, anchor, separator=" && "$
 >>
 
 inputPattern(pattern) ::= <<
-$pattern.keys:{port|hasTokens($actor.name$_$port$, $pattern.(port)$) && }$
+$pattern.keys:{port|hasTokens($actor.simpleName$_$port$, $pattern.(port)$) && }$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,7 +314,7 @@ $actions: actionTest(); separator="\nelse "$
 >>
 
 scheduler(actions) ::= <<
-int actor_$actor.name$::schedule()
+int $actor.simpleName$::schedule()
 {
 	getFifoStatus();
 
@@ -361,7 +361,7 @@ $nextStates: actionTestState(); separator=" else "$
 >>
 
 stateScheduler(transition) ::= <<
-bool actor_$actor.name$::$transition.sourceState$_state_scheduler()
+bool $actor.simpleName$::$transition.sourceState$_state_scheduler()
 {
 	bool res = false;
 	$schedulingTestState(nextStates=transition.nextStateInfo)$
@@ -386,7 +386,7 @@ if (res){i++;}
 
 schedulerFSM(actions, fsm) ::= <<
 $if(actions)$
-bool actor_$actor.name$::outside_FSM_scheduler()
+bool $actor.simpleName$::outside_FSM_scheduler()
 {
 	bool res = false;
 	int i = 0;
@@ -397,7 +397,7 @@ bool actor_$actor.name$::outside_FSM_scheduler()
 
 $endif$
 $fsm.transitions: stateScheduler(); separator="\n"$
-int actor_$actor.name$::schedule()
+int $actor.simpleName$::schedule()
 {
 	getFifoStatus();
 
@@ -429,9 +429,9 @@ int actor_$actor.name$::schedule()
 
 constructor(parameters, stateVars) ::= <<
 $if (actor.parameters.list)$
-actor_$actor.name$::actor_$actor.name$(char* instanceName, $parameters: {$it.type$ $it$}; separator=", "$, AKA_PROFILING_MODE eProfilingMode)
+$actor.simpleName$::$actor.simpleName$(char* instanceName, $parameters: {$it.type$ $it$}; separator=", "$, AKA_PROFILING_MODE eProfilingMode)
 $else$
-actor_$actor.name$::actor_$actor.name$(char* instanceName, AKA_PROFILING_MODE eProfilingMode)
+$actor.simpleName$::$actor.simpleName$(char* instanceName, AKA_PROFILING_MODE eProfilingMode)
 $endif$
 :
 $parameters: {$it$($it$),}; wrap, separator="\n"$
@@ -439,7 +439,7 @@ $if(actor.actionScheduler.fsm)$
 _FSM_state(state_$actor.actionScheduler.fsm.initialState$),
 $endif$
 $stateVars : StateVarAllocation()$
-ActorAKA("$actor.name$", instanceName, $length(actor.inputs.list)$, $length(actor.outputs.list)$, eProfilingMode)
+ActorAKA("$actor.simpleName$", instanceName, $length(actor.inputs.list)$, $length(actor.outputs.list)$, eProfilingMode)
 {
 $stateVars : ListStateVarInitialization()$
 }
@@ -447,11 +447,15 @@ $stateVars : ListStateVarInitialization()$
 >>
 
 destructor(stateVars) ::= <<
-actor_$actor.name$::~actor_$actor.name$()
+$actor.simpleName$::~$actor.simpleName$()
 {
 	$stateVars: StateVarDestruction()$
 }
 
+>>
+
+namespace()::= <<
+$actor.packageAsList; separator="::"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -462,13 +466,15 @@ actor(actor, options) ::= <<
 #include <iostream>
 #include <string.h>
 
-#include "$actor.name$.h"
+#include "$actor.simpleName$.h"
+
+using namespace $namespace()$;
 
 #ifdef __TRACE_CAPTURE__
 extern TraceAka g_oTracer;
 #endif
 
-char* actor_$actor.name$::className = "$actor.name$";
+char* $actor.simpleName$::className = "$actor.simpleName$";
 
 $defineConstantVars(actor.stateVars.list)$
 
@@ -476,7 +482,7 @@ $constructor(parameters=actor.parameters.list, stateVars=actor.stateVars.list)$
 
 $destructor(stateVars=actor.stateVars.list)$
 
-void actor_$actor.name$::initializeActor()
+void $actor.simpleName$::initializeActor()
 {
 }
 
@@ -491,7 +497,7 @@ $if(actor.initializes)$
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
 $actor.initializes: action()$
-void actor_$actor.name$::initialize()
+void $actor.simpleName$::initialize()
 {
 	bool res = true;
 	int i = 0;
@@ -511,16 +517,16 @@ $scheduler(actions=actor.actionScheduler.actions)$
 $endif$
 
 
-void actor_$actor.name$::getFifoStatus()
+void $actor.simpleName$::getFifoStatus()
 {
 $if(actor.inputs.list)$
-  	for(int i=0; i<$actor.name$_nbInputs; i++) 
+  	for(int i=0; i<$actor.simpleName$_nbInputs; i++) 
 	{
 		m_arrAvailStatus[i] = m_poTabIn[i]->getCount();
 	}
 $endif$
 $if(actor.outputs.list)$
-	for(int i=0; i<$actor.name$_nbOutputs; i++) 
+	for(int i=0; i<$actor.simpleName$_nbOutputs; i++) 
 	{
 		m_arrRoomStatus[i] = m_poTabOut[i]->getRooms();
 	}

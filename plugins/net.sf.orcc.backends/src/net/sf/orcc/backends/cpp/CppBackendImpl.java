@@ -79,25 +79,24 @@ public class CppBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	private void computeMapping(Network network) throws OrccException {
-			Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
-			for (Instance instance : network.getInstances()) {
-				String component = getPartNameAttribute(instance);
-				if (component != null) {
-					List<Instance> list = threads.get(component);
-					if (list == null) {
-						list = new ArrayList<Instance>();
-						threads.put(component, list);
-					}
-					list.add(instance);
-				} else {
-					throw new OrccException("instance " + instance.getId()
-							+ " has no partName attribute!");
+		Map<String, List<Instance>> threads = new HashMap<String, List<Instance>>();
+		for (Instance instance : network.getInstances()) {
+			String component = getPartNameAttribute(instance);
+			if (component != null) {
+				List<Instance> list = threads.get(component);
+				if (list == null) {
+					list = new ArrayList<Instance>();
+					threads.put(component, list);
 				}
+				list.add(instance);
+			} else {
+				throw new OrccException("instance " + instance.getId()
+						+ " has no partName attribute!");
 			}
-			printer.getOptions().put("threads", threads);
-			printer.getOptions().put("needThreads",
-					(threads.keySet().size() > 1));
 		}
+		printer.getOptions().put("threads", threads);
+		printer.getOptions().put("needThreads", (threads.keySet().size() > 1));
+	}
 
 	private void computeFifoKind(Network network) throws OrccException {
 		Map<Connection, Integer> fifoKind = new HashMap<Connection, Integer>();
@@ -201,8 +200,9 @@ public class CppBackendImpl extends AbstractBackend {
 	protected boolean printActor(Actor actor) throws OrccException {
 		boolean res = false;
 		try {
-			String name = path + File.separator + actor.getName();
+			String name = path + File.separator + actor.getSimpleName();
 
+			
 			if (printHeader) {
 				printer.loadGroups("Cpp_actorDecl");
 				printer.printActor(name + ".h", actor);

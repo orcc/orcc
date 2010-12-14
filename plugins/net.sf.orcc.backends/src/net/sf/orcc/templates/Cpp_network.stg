@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // include Actors
 includeActor(actor) ::= <<
-#include "$actor.name$.h"
+#include "$actor.simpleName$.h"
 >>
 
 includeActors(actors) ::= <<
@@ -54,13 +54,13 @@ $network.connections: declareFifo()$
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 $if (source.actor)$$
-source.id$.connect(ACTOR_PORT_OUT, $source.actor.name$_$sourcePort.name$, fifo_$count$);$
+source.id$.connect(ACTOR_PORT_OUT, $source.actor.packageAsList; separator="::"$::$source.actor.simpleName$_$sourcePort.name$, fifo_$count$);$
 else
 $$source.id$.connect(ACTOR_PORT_OUT, $network.name$_$sourcePort.name$, fifo_$count$);$
 endif$
 
 $if (target.actor)
-$$target.id$.connect(ACTOR_PORT_IN, $target.actor.name$_$targetPort.name$, fifo_$count$);$
+$$target.id$.connect(ACTOR_PORT_IN, $target.actor.packageAsList; separator="::"$::$target.actor.simpleName$_$targetPort.name$, fifo_$count$);$
 else
 $$target.id$.connect(ACTOR_PORT_IN, $network.name$_$targetPort.name$, fifo_$count$);$
 endif$
@@ -82,6 +82,9 @@ $edges: assignFifo(); separator="\n"$
 >>
 
 
+namespace()::= <<
+$instance.actor.packageAsList; separator="::"$
+>>
 ///////////////////////////////////////////////////////////////////////////////
 // declare Instances
 
@@ -89,7 +92,7 @@ declareInstance(instance) ::= <<
 $if(instance.serdes)$
 WrapperAka $instance.id$("$instance.id$");
 $else$
-actor_$instance.actor.name$ $instance.id$$initializeInstance(instance)$;
+$namespace()$::$instance.actor.simpleName$ $instance.id$$initializeInstance(instance)$;
 $endif$
 >>
 

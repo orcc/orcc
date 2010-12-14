@@ -1,6 +1,6 @@
 addActor(actor) ::= <<
 $if (!actor.system)
-$$actor.name$.cpp
+$$actor.simpleName$.cpp
 $endif$
 >>
 
