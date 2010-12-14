@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
+import org.eclipse.ui.dialogs.SearchPattern;
 
 /**
  * This class defines a custom filtered items selection dialog.
@@ -80,6 +81,16 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 	 */
 	private class ActorFilter extends ItemsFilter {
 
+		public ActorFilter() {
+			super(new SearchPattern(SearchPattern.RULE_PATTERN_MATCH));
+
+			// update pattern to look for anything before and after the original
+			// pattern
+			String pattern = patternMatcher.getPattern();
+			pattern = "*" + pattern + "*";
+			patternMatcher.setPattern(pattern);
+		}
+
 		@Override
 		public boolean isConsistentItem(Object item) {
 			return true;
@@ -87,10 +98,9 @@ public class FilteredActorsDialog extends FilteredItemsSelectionDialog {
 
 		@Override
 		public boolean matchItem(Object item) {
-			return getElementName(item).toLowerCase().contains(
-					super.getPattern().toLowerCase());
+			String name = getElementName(item);
+			return matches(name);
 		}
-
 	}
 
 	private static final String DIALOG_SETTINGS = "net.sf.orcc.ui.editor.FilteredActorsDialog"; //$NON-NLS-1$
