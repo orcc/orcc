@@ -160,7 +160,10 @@ public class NetworkRefinementPolicy extends DefaultRefinementPolicy {
 		FilteredActorsDialog dialog = new FilteredActorsDialog(project, shell);
 		dialog.setTitle("Select actor");
 		dialog.setMessage("&Select existing actor:");
-		dialog.setInitialPattern(getRefinement(vertex));
+		String refinement = getRefinement(vertex);
+		if (refinement != null) {
+			dialog.setInitialPattern(refinement);
+		}
 		int result = dialog.open();
 		if (result == Window.OK) {
 			return (String) dialog.getFirstResult();
