@@ -50,7 +50,7 @@ import net.sf.orcc.util.OrderedMap;
  * @author Herve Yviquel
  * 
  */
-public class FirstPhiValuesOfWhileNodeTransformation extends
+public class ConstantPhiValuesTransformation extends
 		AbstractActorTransformation {
 
 	@Override
