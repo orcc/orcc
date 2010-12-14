@@ -206,7 +206,6 @@
          point="net.sf.graphiti.model.definition">
       <configuration
             extension="xdf"
-            file-extensions="cal,nl,xdf"
             name="XDF"
             refinement="net.sf.orcc.ui.editor.NetworkRefinementPolicy"
             type="text/xml"
