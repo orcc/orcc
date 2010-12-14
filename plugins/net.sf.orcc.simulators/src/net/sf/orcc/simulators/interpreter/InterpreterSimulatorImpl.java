@@ -75,18 +75,19 @@ public class InterpreterSimulatorImpl extends AbstractSimulator {
 		SimuActor simuActorInstance;
 		// Check if the actor is a "system actor". That is to say an actor
 		// connected to a system I/O that has to be managed specifically
-		if ("Source".equals(actorIR.getSimpleName())) {
+		String simpleName = actorIR.getSimpleName();
+		if ("Source".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuSource(instanceId,
 					stimulusFile, process);
-		} else if ("Display".equals(actorIR.getSimpleName())) {
+		} else if ("Display".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuDisplay(instanceId, process);
-		} else if ("ReadImage".equals(actorIR.getSimpleName())) {
+		} else if ("ReadImage".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuReadImage(instanceId, stimulusFile, process);
-		} else if ("DisplayImage".equals(actorIR.getSimpleName())) {
+		} else if ("DisplayImage".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuDisplayImage(instanceId, process);
-		} else if ("WriteFile".equals(actorIR.getSimpleName())) {
+		} else if ("WriteFile".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuWriteFile(instanceId, actorParameters, process);
-		} else if ("ReadFile".equals(actorIR.getSimpleName())) {
+		} else if ("ReadFile".equals(simpleName)) {
 			simuActorInstance = new InterpreterSimuReadFile(instanceId, actorParameters, process);
 		} else {
 			// Generic simulator actor

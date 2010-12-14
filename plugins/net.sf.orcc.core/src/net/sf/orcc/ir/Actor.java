@@ -230,7 +230,7 @@ public class Actor implements Comparable<Actor> {
 		if (index == -1) {
 			return "";
 		} else {
-			return name.substring(0, index - 1);
+			return name.substring(0, index);
 		}
 	}
 
