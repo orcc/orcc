@@ -105,7 +105,9 @@ public class TernaryOperationAdder extends AbstractActorTransformation {
 		LocalVariable condVar = procedure.newTempLocalVariable(null,
 				IrFactory.eINSTANCE.createTypeBool(), "ifCondition_"
 						+ ifNode.getLocation().getStartLine());
+		condVar.setIndex(1);
 		Assign assignCond = new Assign(condVar, condExpr);
+		condVar.setInstruction(assignCond);
 		newBlockNode.add(assignCond);
 
 		// clean uses
