@@ -182,7 +182,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			//XXXXXX01 -> XXXXXX00
 			//XXXXXX10 -> XXXXXX11
 			//XXXXXX11 -> XXXXXX11
-			Idx & 0xFFFFFFFE + ((Idx >> 1)&1)
+			(Idx & 0xFFFFFFFE) + ((Idx >> 1)&1)
 		end
 
 	function Compute_ColZero(uint Idx_x, uint Idx_y)
@@ -455,10 +455,10 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			SizeSubMbMv  = SZ_8x4
 		do
 			NbPartitionsToWrite := 2;
-			Partition_Mbx[0]    := Mbx + 2* (MbPartIdx&1) + (SubMbPartIdx&1);
-			Partition_Mby[0]    := Mby + 2* ((MbPartIdx>>1)&1);
-			Partition_Mbx[1]    := Mbx + 2* (MbPartIdx&1) + (SubMbPartIdx&1);
-			Partition_Mby[1]    := Mby + 2* ((MbPartIdx>>1)&1);
+			Partition_Mbx[0]    := Mbx + 2* (MbPartIdx&1);
+			Partition_Mby[0]    := Mby + 2* ((MbPartIdx>>1)&1) + (SubMbPartIdx&1);
+			Partition_Mbx[1]    := Mbx + 2* (MbPartIdx&1) + 1;
+			Partition_Mby[1]    := Mby + 2* ((MbPartIdx>>1)&1) + (SubMbPartIdx&1);
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
@@ -469,10 +469,10 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			SizeSubMbMv  = SZ_4x8
 		do
 			NbPartitionsToWrite := 2;
-			Partition_Mbx[0]    := Mbx + 2* (MbPartIdx&1);
-			Partition_Mby[0]    := Mby + 2* ((MbPartIdx>>1)&1) + (SubMbPartIdx&1);
-			Partition_Mbx[1]    := Mbx + 2* (MbPartIdx&1);
-			Partition_Mby[1]    := Mby + 2* ((MbPartIdx>>1)&1) + (SubMbPartIdx&1);
+			Partition_Mbx[0]    := Mbx + 2* (MbPartIdx&1) + (SubMbPartIdx&1);
+			Partition_Mby[0]    := Mby + 2* ((MbPartIdx>>1)&1);
+			Partition_Mbx[1]    := Mbx + 2* (MbPartIdx&1) + (SubMbPartIdx&1);
+			Partition_Mby[1]    := Mby + 2* ((MbPartIdx>>1)&1) + 1;
 			SubMbPartIdx := SubMbPartIdx + 1;
 		end
 
@@ -674,11 +674,11 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 		do
 			if(Idx_RefList   = 0)then
 				ReadListIdx := 0;
-				IdxNotFound := ListPoc[ReadListIdx] != ValRefList;
-				while(/*ListPoc[ReadListIdx] != ValRefList*/IdxNotFound and ReadListIdx < 15)
+				IdxNotFound := (ListPoc[ReadListIdx] != ValRefList) or (not IsReference[ReadListIdx]);
+				while(/*(ListPoc[ReadListIdx] != ValRefList) or (not IsReference[ReadListIdx])*/IdxNotFound and ReadListIdx < 15)
 				do
 					ReadListIdx := ReadListIdx + 1;
-					IdxNotFound := ListPoc[ReadListIdx] != ValRefList;
+					IdxNotFound := (ListPoc[ReadListIdx] != ValRefList)  or (not IsReference[ReadListIdx]);
 				end
 			end
 			Idx_RefList := Idx_RefList + 1;
