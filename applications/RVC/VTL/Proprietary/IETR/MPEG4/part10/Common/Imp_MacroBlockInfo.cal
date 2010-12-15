@@ -140,10 +140,10 @@ unit Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo :
 
 	List(type: uint(size=3),size=32) NumMbPart_B =
 		[
-			16,1,1,1,2,2,2,2,2,2,
-			 2,2,2,2,2,2,2,2,2,2,
-			 2,2,4,1,1,1,1,1,1,1,
-			 1,1
+			4,1,1,1,2,2,2,2,2,2,
+			2,2,2,2,2,2,2,2,2,2,
+			2,2,4,1,1,1,1,1,1,1,
+			1,1
 		];
 
 	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPartTab =
@@ -266,7 +266,7 @@ unit Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo :
 					if(MbType = BLOCK_TYPE_P_SKIP)then
 						1
 					else
-						16
+						4
 					end
 				end
 			end
