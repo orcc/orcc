@@ -886,13 +886,12 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 				RefIdxTab[Idx_CurrBlk][Idx_Partition] := RefIdxLX_Direct;
 				if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero)then
 					MvTab[Idx_CurrBlk][Idx_Partition] := [0,0];
-					direct_pred_lx[0]       := false;
 				else
 					ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
 					MvTab[Idx_CurrBlk][Idx_Partition][0] := OMv[0];
 					MvTab[Idx_CurrBlk][Idx_Partition][1] := OMv[1];
-					direct_pred_lx[0]         := true;
 				end
+				direct_pred_lx[0] := (RefIdxLX_Direct >= 0);
 			else //temporal prediction
 				println("GetMbType.B_Skip_B_Direct_8x8 : temporal prediction for B_Direct_8x8 not implemented yet !!");
 			end
