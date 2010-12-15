@@ -1,4 +1,6 @@
-actor Proprietary.IETR.MPEG4.part2.scaled_1d_idct () int(size=IN_SZ) In ==> int(size=OUT_SZ) Out :
+package Proprietary.IETR.MPEG4.part2;
+
+actor scaled_1d_idct () int(size=IN_SZ) In ==> int(size=OUT_SZ) Out :
 
 // Port size declaration
 	int IN_SZ = 32;

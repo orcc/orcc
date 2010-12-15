@@ -26,7 +26,9 @@
 * done --> done reading or writing or both (64 AC coeffs) --> fired when count is 64
 */
 
-actor Proprietary.E__.E___Algo_IS () int(size=3) AC_PRED_DIR, int(size=SAMPLE_SZ) QFS_AC
+package Proprietary.E__;
+
+actor E___Algo_IS () int(size=3) AC_PRED_DIR, int(size=SAMPLE_SZ) QFS_AC
 ==> int(size=SAMPLE_SZ) PQF_AC :
 
 	int SAMPLE_SZ = 13;

@@ -15,9 +15,11 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes (France)
+package Proprietary.IETR.MPEG4.part10;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Proprietary.IETR.MPEG4.part10.Select () 
+actor Select () 
 	int (size=16) X0,
 	int (size=9)  X1,
 	int (size=9)  X2,

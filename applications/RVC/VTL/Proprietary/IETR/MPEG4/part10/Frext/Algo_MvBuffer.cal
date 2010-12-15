@@ -51,9 +51,11 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
+package Proprietary.IETR.MPEG4.part10.Frext;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
+actor Algo_MvBuffer()
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 

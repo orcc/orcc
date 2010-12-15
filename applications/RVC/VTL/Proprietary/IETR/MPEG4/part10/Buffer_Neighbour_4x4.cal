@@ -18,9 +18,11 @@ Edge are provided from bottom to top, then corner, then left to right
 Jerome GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
+package Proprietary.IETR.MPEG4.part10;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
 
-actor Proprietary.IETR.MPEG4.part10.Buffer_Neighbour_4x4()
+actor Buffer_Neighbour_4x4()
 	uint(size=6) Mb_Type,
 	uint(size=13) CurrMbAddr,
 	int(size=9) MB_IN,

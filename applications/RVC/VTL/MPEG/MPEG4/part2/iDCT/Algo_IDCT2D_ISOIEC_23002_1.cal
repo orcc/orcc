@@ -1,4 +1,6 @@
-actor MPEG.MPEG4.part2.iDCT.Algo_IDCT2D_ISOIEC_23002_1 () int(size=13) IN, bool
+package MPEG.MPEG4.part2.iDCT;
+
+actor Algo_IDCT2D_ISOIEC_23002_1 () int(size=13) IN, bool
 SIGNED ==> int(size=9) OUT :
 
 	int A = 1024;

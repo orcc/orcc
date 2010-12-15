@@ -39,7 +39,9 @@ ENDCOPYRIGHT
 //
 // Author: J�rn W. Janneck (jorn.janneck@xilinx.com)
 //
-actor Proprietary.Xilinx.MPEG4_part2.SendDC () int TYPE, int IN ==> int DC :
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor SendDC () int TYPE, int IN ==> int DC :
 
 	int INTER = 1;
 

@@ -51,7 +51,9 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-unit Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions :
+package Proprietary.IETR.MPEG4.part10.Common;
+
+unit Imp_DecodingFunctions :
 
 	uint(size=5) SKIP_NAL              =  0;
 

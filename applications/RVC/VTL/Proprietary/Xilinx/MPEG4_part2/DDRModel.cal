@@ -41,7 +41,9 @@ ENDCOPYRIGHT
 //
 
 
-actor Proprietary.Xilinx.MPEG4_part2.DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
 
 	//bool _CAL_tokenMonitor := true;
 	// find the number of bits needed to represent some positive integer

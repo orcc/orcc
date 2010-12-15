@@ -17,7 +17,9 @@
 *              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 */ 
 
-actor Proprietary.E__.Framebuf_w_Address_8X8 (int INTRA,
+package Proprietary.E__;
+
+actor Framebuf_w_Address_8X8 (int INTRA,
 	int NEWVOP,
 	int MOTION,
 	int

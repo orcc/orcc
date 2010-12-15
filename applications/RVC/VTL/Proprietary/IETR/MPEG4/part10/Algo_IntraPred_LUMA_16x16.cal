@@ -69,9 +69,9 @@ This copyright notice must be included in all copies or derivative works. Copyri
 *****************************************************************************/
 //For making possible to work with ORCC interpreter
 
+package Proprietary.IETR.MPEG4.part10;
 
-
-actor Proprietary.IETR.MPEG4.part10.Algo_IntraPred_LUMA_16x16 ()
+actor Algo_IntraPred_LUMA_16x16 ()
   int(size=16) Y_LEFT,     // List
   int(size=16) Y_UP,       // List
   int(size=16) Y_UP_LEFT,  // point

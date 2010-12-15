@@ -54,7 +54,9 @@ Copyright (c) ISO/IEC 2007.
   and a parameter NB4x4 which is set to 16 for luma or 4 for chroma
 *************************************************************************/
 
-actor Proprietary.IETR.MPEG4.part10.Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
+package Proprietary.IETR.MPEG4.part10;
+
+actor Algo_IQ_QSAndSLAndIDCTScaler_4x4 (int NB4x4 )
 		int(size=16) Lev2d, 
 		int(size=8) QP,
 		bool        DCCoeff_Present, 

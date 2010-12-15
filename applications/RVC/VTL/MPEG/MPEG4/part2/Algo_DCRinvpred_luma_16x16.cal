@@ -71,7 +71,9 @@
 // * In advance action, indices adjust after every 4 components instead of 6 since now
 //   dealing with 4 8x8 blocks rather than 6 8x8 blocks.
 
-actor MPEG.MPEG4.part2.Algo_DCRinvpred_luma_16x16 () int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ + 2) A, int(size=MB_COORD_SZ +
+package MPEG.MPEG4.part2;
+
+actor Algo_DCRinvpred_luma_16x16 () int(size=BTYPE_SZ) BTYPE, int(size=MB_COORD_SZ + 2) A, int(size=MB_COORD_SZ +
 2) B, int(size=MB_COORD_SZ + 2) C, int(size=SAMPLE_SZ) QFS_DC, int(size=QUANT_SZ) QP ==>
 int(size=SAMPLE_SZ) QF_DC , int(size=MB_COORD_SZ + 2) PTR , int(size=3) AC_PRED_DIR , bool
 SIGNED , int(size=QUANT_SZ) QUANT , int(size=QUANT_SZ) PREV_QUANT :

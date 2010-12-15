@@ -47,7 +47,9 @@
 // * Block pointer bitwidth reduced from MB_COORD_SZ+3 to MB_COORD_SZ+2 since only
 //   4 components per block.
 
-actor MPEG.MPEG4.part2.Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
+package MPEG.MPEG4.part2;
+
+actor Algo_DCRaddressing_16x16 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 2) A , int(size=MB_COORD_SZ
 + 2) B , int(size=MB_COORD_SZ + 2) C :
 
 // Port size declaration

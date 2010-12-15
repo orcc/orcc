@@ -1,4 +1,6 @@
-actor Fifo.Demux2() ==> uint Out1, uint Out2:
+package Fifo;
+
+actor Demux2() ==> uint Out1, uint Out2:
 
 	// Send data on two channels.
 	uint max1 := 520; // Should be more than the default FIFO size

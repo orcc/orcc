@@ -30,8 +30,9 @@
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 
 // Reads an image. Outputs width, height, and image content (RGB).
+package System;
 
-actor System.ReadImage() ==>
+actor ReadImage() ==>
 	uint(size=8) R, uint(size=8) G, uint(size=8) B, uint SizeOfImage :
 
 	// so the actor scheduler will call an initialize function

@@ -15,7 +15,9 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
-actor Proprietary.IETR.MPEG4.part10.Mgnt_Display (bool Debug)
+package Proprietary.IETR.MPEG4.part10;
+
+actor Mgnt_Display (bool Debug)
 	uint(size=32) POC,
 	uint(size=5)  MaxDPBSize,
 	bool          IsIDR

@@ -1,4 +1,6 @@
-actor Proprietary.IETR.MPEG4.part10.Common.Algo_GenerateSkipBlockInformation()
+package Proprietary.IETR.MPEG4.part10.Common;
+
+actor Algo_GenerateSkipBlockInformation()
 	bool          SData_SkipMb,
 	uint(size=5)  SData_SzMb,
 	uint(size=5)  NbCoeffInMB,

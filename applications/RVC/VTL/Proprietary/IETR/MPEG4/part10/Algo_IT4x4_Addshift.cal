@@ -51,7 +51,9 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-actor Proprietary.IETR.MPEG4.part10.Algo_IT4x4_Addshift () int(size=16) X ==> int(size=16) Y :
+package Proprietary.IETR.MPEG4.part10;
+
+actor Algo_IT4x4_Addshift () int(size=16) X ==> int(size=16) Y :
 
   action X:[x] ==> Y:[y]
   var 

@@ -42,7 +42,9 @@ ENDCOPYRIGHT
 // Frame buffer address generation for motion compensation
 
 
-actor Proprietary.Xilinx.MPEG4_part2.MemoryManager () int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA , int(size=32) WA :
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor MemoryManager () int(size=BTYPE_SZ) BTYPE ==> int(size=32) RA , int(size=32) WA :
 
 	// search window size (in macroblocks)
 	int BTYPE_SZ = 12;

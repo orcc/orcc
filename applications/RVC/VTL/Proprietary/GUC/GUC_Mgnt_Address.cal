@@ -13,7 +13,9 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Frame buffer address generation for motion compensation
 
-actor Proprietary.GUC.GUC_Mgnt_Address (int LAYOUT) bool NEW_VOP, bool ROUND, bool MOT,int (size=2)BTYPE, 
+package Proprietary.GUC;
+
+actor GUC_Mgnt_Address (int LAYOUT) bool NEW_VOP, bool ROUND, bool MOT,int (size=2)BTYPE, 
 	int(size=16) WIDTH, int(size=16) HEIGHT, int(size=MV_SZ) MV ==> int(size=ADDR_SZ) RA ,
 int(size=ADDR_SZ) WA , int(size=FLAG_SZ) halfpel :
 

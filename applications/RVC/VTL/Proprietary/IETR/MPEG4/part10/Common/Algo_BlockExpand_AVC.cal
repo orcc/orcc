@@ -53,9 +53,11 @@ Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
 //Modified by Damien de Saint Jorre (IETR/INSA of Rennes)
+package Proprietary.IETR.MPEG4.part10.Common;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Proprietary.IETR.MPEG4.part10.Common.Algo_BlockExpand_AVC ()
+actor Algo_BlockExpand_AVC ()
 	uint(size=6)  MbType,
 	int (size=12) Value,
 	uint(size=4)  Run,

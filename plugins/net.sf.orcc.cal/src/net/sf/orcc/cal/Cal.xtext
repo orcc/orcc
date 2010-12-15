@@ -8,24 +8,30 @@ generate cal "http://orcc.sf.net/cal/Cal"
 // top-level entity
 ///////////////////////////////////////////////////////////////////////////////
 
-AstEntity: actor=AstActor | unit=AstUnit;
+AstEntity: 
+	('package' package=QualifiedName ';')?
+	(imports += Import)*
+	
+	(('actor' name=ID actor=AstActor) | ('unit' name=ID unit=AstUnit));
 
-///////////////////////////////////////////////////////////////////////////////
-// unit
-///////////////////////////////////////////////////////////////////////////////
-
-AstUnit: 'unit' name=QualifiedName ':'
-
-	(functions += AstFunction
-	| variables += AstConstantVariable)*
-
-	'end';
+Import: 'import' importedNamespace=QualifiedNameWithWildCard ';';
 
 QualifiedName:
 	ID ('.' ID)*;
 
 QualifiedNameWithWildCard:
 	QualifiedName '.*'?;
+	
+///////////////////////////////////////////////////////////////////////////////
+// unit
+///////////////////////////////////////////////////////////////////////////////
+
+AstUnit: {AstUnit} ':'
+
+	(functions += AstFunction
+	| variables += AstConstantVariable)*
+
+	'end';
 
 AstConstantVariable returns AstVariable:
 	AstVariableDeclaration (constant ?= '=') value=AstExpression ';';
@@ -34,12 +40,7 @@ AstConstantVariable returns AstVariable:
 // actor
 ///////////////////////////////////////////////////////////////////////////////
 
-Import: 'import' importedNamespace=QualifiedNameWithWildCard ';';
-
-AstActor:
-	(imports += Import)*
-
-	'actor' name=QualifiedName
+AstActor: {AstActor}
 		'(' (parameters += AstParameter (',' parameters += AstParameter)*)? ')'
 		(inputs += AstPort (',' inputs += AstPort)*)? '==>'
 		(outputs += AstPort (',' outputs += AstPort)*)? ':'

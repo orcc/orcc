@@ -40,7 +40,9 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 // Read row queue and write pairs of data to IDCT FairMerge
-actor Proprietary.Xilinx.MPEG4_part2.iDCT.Xilinx_rowSort () int(size=sz) ROW ==> int(size=sz) Y0 , int(size=sz) Y1 :
+package Proprietary.Xilinx.MPEG4_part2.iDCT;
+
+actor Xilinx_rowSort () int(size=sz) ROW ==> int(size=sz) Y0 , int(size=sz) Y1 :
 
 	int sz = 13;
 

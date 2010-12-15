@@ -30,7 +30,9 @@
 /******************************************************************************
  * HeadersParser : MPEG2 sequence and picture layer headers parser            *
  ******************************************************************************/
-actor Proprietary.IETR.MPEG2.Algo_Synp_MPEG_2 () uint(size=32) Symbol ==> uint(size=8) CtrlBitstreamReader ,
+package Proprietary.IETR.MPEG2;
+
+actor Algo_Synp_MPEG_2 () uint(size=32) Symbol ==> uint(size=8) CtrlBitstreamReader ,
 uint(size=12) Width , uint(size=12) Height , uint(size=1) HasIntraQuant ,
 uint(size=1) HasNonIntraQuant , uint(size=8) NonIntraQuantCoeff :
 

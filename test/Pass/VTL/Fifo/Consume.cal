@@ -1,4 +1,6 @@
-actor Fifo.Consume () int I ==> :
+package Fifo;
+
+actor Consume () int I ==> :
 
 	int(size=64) sum := 0;
 

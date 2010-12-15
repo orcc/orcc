@@ -12,7 +12,9 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Add motion and texture to produce pixels
 
-actor Proprietary.GUC.GUC_Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, bool AC_CODED, int (size=2)BTYPE
+package Proprietary.GUC;
+
+actor GUC_Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, bool AC_CODED, int (size=2)BTYPE
 ==> int(size=PIX_SZ) VID 
 :
 

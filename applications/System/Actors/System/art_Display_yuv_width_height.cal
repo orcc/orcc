@@ -29,6 +29,8 @@
   
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 
-actor System.art_Display_yuv_width_height (String title, int width, int height) int(size=9) In, int(size=16) WIDTH, int(size=16) HEIGHT ==> :
+package System;
+
+actor art_Display_yuv_width_height (String title, int width, int height) int(size=9) In, int(size=16) WIDTH, int(size=16) HEIGHT ==> :
 
 end

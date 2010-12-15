@@ -43,7 +43,9 @@ ENDCOPYRIGHT
 // (4 sample pairs each) into the shared idct1d. During start-up
 // or wind-down of a burst of video it will break the pattern
 // as needed.
-actor Proprietary.Xilinx.MPEG4_part2.iDCT.Xilinx_fairMerge () int(size=rsz) R0, int(size=rsz) R1, int(size=csz) C0, int(size=csz) C1
+package Proprietary.Xilinx.MPEG4_part2.iDCT;
+
+actor Xilinx_fairMerge () int(size=rsz) R0, int(size=rsz) R1, int(size=csz) C0, int(size=csz) C1
 ==> int(size=csz) Y0 , int(size=csz) Y1 , bool ROWOUT :
 
 	int rsz = 13;

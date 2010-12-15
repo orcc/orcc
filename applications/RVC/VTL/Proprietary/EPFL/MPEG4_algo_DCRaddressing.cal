@@ -1,5 +1,7 @@
 
-actor Proprietary.EPFL.MPEG4_algo_DCRaddressing (int NEWVOP,
+package Proprietary.EPFL;
+
+actor MPEG4_algo_DCRaddressing (int NEWVOP,
 	int INTRA) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A,
 int(size=MB_COORD_SZ + 3) B, int(size=MB_COORD_SZ + 3) C :
 

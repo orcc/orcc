@@ -40,7 +40,9 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 
-actor Proprietary.Xilinx.MPEG4_part2.SearchWindow () int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI ==>
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor SearchWindow () int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI ==>
 int(size=32) DO , int(size=FLAG_SZ) FLAGS :
 
 	int BTYPE_SZ = 12;

@@ -28,6 +28,8 @@
  */
 package net.sf.orcc.cal.util;
 
+import net.sf.orcc.cal.cal.AstEntity;
+
 import org.eclipse.emf.ecore.EObject;
 
 /**
@@ -37,6 +39,27 @@ import org.eclipse.emf.ecore.EObject;
  * 
  */
 public class Util {
+
+	/**
+	 * Returns the qualified name of the given entity as
+	 * <code>package + "." + name</code>. If <code>package</code> is
+	 * <code>null</code>, only the name is returned.
+	 * 
+	 * @param entity
+	 *            an entity
+	 * @return the qualified name of the given entity
+	 */
+	public static String getQualifiedName(AstEntity entity) {
+		String packageName = entity.getPackage();
+		String simpleName = entity.getName();
+
+		String name = simpleName;
+		if (packageName != null) {
+			name = packageName + "." + name;
+		}
+
+		return name;
+	}
 
 	/**
 	 * Returns the top-level container in which <code>context</code> occurs.

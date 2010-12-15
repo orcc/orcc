@@ -51,7 +51,9 @@
  * This copyright notice must be included in all copies or derivative works. 
  * Copyright (c) ISO/IEC 2008-2010.
  */
-actor Proprietary.IETR.MPEG4.part10.Common.Algo_Add_AVC () int(size=16) X, int(size=16) Y	==> int(size=16) Z:
+package Proprietary.IETR.MPEG4.part10.Common;
+
+actor Algo_Add_AVC () int(size=16) X, int(size=16) Y	==> int(size=16) Z:
 
 bool DEBUG_INPUT  = false;
 bool DEBUG_OUTPUT = false;

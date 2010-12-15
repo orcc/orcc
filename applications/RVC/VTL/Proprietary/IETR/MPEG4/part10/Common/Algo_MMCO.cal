@@ -55,9 +55,11 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Mederic Blestel and Endri Bezati IETR/INSA of Rennes
 //Modified by Mickael Raulet IETR/INSA of Rennes
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes
+package Proprietary.IETR.MPEG4.part10.Common;
+
 import MPEG.Common.Imp_Math.*;
 
-actor Proprietary.IETR.MPEG4.part10.Common.Algo_MMCO () 
+actor Algo_MMCO () 
 	uint(size=31) MMCO,
 	uint(size=31) FraNum,
 	uint(size=31) MaxFrameNum,

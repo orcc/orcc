@@ -19,7 +19,9 @@ Jerome GORIN IETR/ARTEMIS
 gorinje@gmail.com
 *****************************************************************************/
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes (France)
-actor Proprietary.IETR.MPEG4.part10.Mgnt_Intra_16x16 (int MB_WIDTH)
+package Proprietary.IETR.MPEG4.part10;
+
+actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	uint(size=13) FirstMbInSlice,
 	uint(size=7)  PicWidthInMb,
 	uint(size=13) CurrMbAddr,

@@ -43,7 +43,9 @@
 // * In advance action, indices adjust after every 4 components instead of 6 since now
 //   dealing with 4 8x8 blocks rather than 6 8x8 blocks.
 
-actor MPEG.MPEG4.part2.Algo_IAP_16x16 () int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ + 2) PTR,
+package MPEG.MPEG4.part2;
+
+actor Algo_IAP_16x16 () int(size=SAMPLE_SZ) PQF_AC, int(size=MB_COORD_SZ + 2) PTR,
 int(size=3) AC_PRED_DIR, int(size=6) QP, int(size=6) PREV_QP ==>
 int(size=SAMPLE_SZ) QF_AC :
 

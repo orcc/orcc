@@ -11,7 +11,9 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // MPEG-4 inverse quantization function
 
-actor MPEG.MPEG4.part2.Algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC,
+package MPEG.MPEG4.part2;
+
+actor Algo_Inversequant () int(size=SAMPLE_SZ) DC, int(size=SAMPLE_SZ) AC,
 int(size=QUANT_SZ) QP ==> int(size=SAMPLE_SZ) OUT :
 
 // Port size declaration

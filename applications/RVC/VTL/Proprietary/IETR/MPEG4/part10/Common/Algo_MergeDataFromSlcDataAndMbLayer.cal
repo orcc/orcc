@@ -23,9 +23,11 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Proprietary.IETR.MPEG4.part10.Common.Algo_MergeDataFromSlcDataAndMbLayer()
+actor Algo_MergeDataFromSlcDataAndMbLayer()
 	bool          SkipMbLayer,
 	bool          IsB_Skip,
 	bool          TransfSz8x8Flag,

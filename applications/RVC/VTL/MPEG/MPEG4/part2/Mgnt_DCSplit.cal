@@ -12,7 +12,9 @@
 // Author: Matthieu Wipliez (mwipliez@insa-rennes.fr)
 // Rewrote the actor at block-level
 
-actor MPEG.MPEG4.part2.Mgnt_DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC ,
+package MPEG.MPEG4.part2;
+
+actor Mgnt_DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC ,
 int(size=SAMPLE_SZ) AC :
 
 // Port size declaration

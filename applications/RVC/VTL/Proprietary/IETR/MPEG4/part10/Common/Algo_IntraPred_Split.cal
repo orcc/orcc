@@ -54,7 +54,9 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Endri Bezati IETR/INSA Rennes
 
 //Added FSM to the actor
-actor Proprietary.IETR.MPEG4.part10.Common.Algo_IntraPred_Split()
+package Proprietary.IETR.MPEG4.part10.Common;
+
+actor Algo_IntraPred_Split()
 	uint(size=1)  MbIntraFlag,
 	uint(size=4)  IntraPredMode,
 	uint(size=13) CurrMbAddr,

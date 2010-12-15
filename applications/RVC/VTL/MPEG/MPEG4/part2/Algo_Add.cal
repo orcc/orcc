@@ -12,7 +12,9 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Add motion and texture to produce pixels
 
-actor MPEG.MPEG4.part2.Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE
+package MPEG.MPEG4.part2;
+
+actor Algo_Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE
 ==> int(size=PIX_SZ) VID :
 
 // Port size declaration

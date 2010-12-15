@@ -52,8 +52,9 @@
  *  (1)lena 512x512 	(2)lena444 512x512		40.853		48.323		0.94	0.883
  */
 
+package avFormat;
 
-actor avFormat.RGBtoYCrCb()
+actor RGBtoYCrCb()
 	int(size=8) R, 
 	int(size=8) G, 
 	int(size=8) B

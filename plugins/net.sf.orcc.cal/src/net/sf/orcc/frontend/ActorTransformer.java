@@ -38,6 +38,7 @@ import java.util.Set;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstExpression;
 import net.sf.orcc.cal.cal.AstInputPattern;
 import net.sf.orcc.cal.cal.AstOutputPattern;
@@ -548,10 +549,13 @@ public class ActorTransformer {
 			context.restoreScope();
 
 			// create IR actor
-			String name = astActor.getName();
-			return new Actor(name, file, parameters, inputs, outputs,
-					stateVars, procedures, actions.getAllActions(),
-					initializes.getAllActions(), scheduler);
+			AstEntity entity = (AstEntity) astActor.eContainer();
+
+			return new Actor(
+					net.sf.orcc.cal.util.Util.getQualifiedName(entity), file,
+					parameters, inputs, outputs, stateVars, procedures,
+					actions.getAllActions(), initializes.getAllActions(),
+					scheduler);
 		} finally {
 			// cleanup
 			astTransformer.clear();

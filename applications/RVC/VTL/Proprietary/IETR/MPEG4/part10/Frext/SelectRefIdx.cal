@@ -14,9 +14,11 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+package Proprietary.IETR.MPEG4.part10.Frext;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Proprietary.IETR.MPEG4.part10.Frext.SelectRefIdx()
+actor SelectRefIdx()
 	uint(size=2)  SelectList,
 	uint(size=32) POCtoRead_l0,
 	uint(size=32) POCtoRead_l1

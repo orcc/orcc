@@ -4,8 +4,9 @@
 //
 
 // Converts Y to RGB.
+package Common.Conversion;
 
-actor Common.Conversion.YToRGB() uint(size=8) Y ==>
+actor YToRGB() uint(size=8) Y ==>
   uint(size=8) RED, uint(size=8) GREEN, uint(size=8) BLUE :
   
   action Y:[ g ] ==> RED:[g], GREEN:[g], BLUE:[g]

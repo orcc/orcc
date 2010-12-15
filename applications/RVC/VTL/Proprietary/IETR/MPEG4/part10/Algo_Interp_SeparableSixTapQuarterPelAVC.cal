@@ -6,7 +6,9 @@
 
 //Modified by Damien de Saint Jorre ; IETR/INSA of Rennes (France)
 
-actor Proprietary.IETR.MPEG4.part10.Algo_Interp_SeparableSixTapQuarterPelAVC ()
+package Proprietary.IETR.MPEG4.part10;
+
+actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	int (size=16) Mv,
 	int (size=16) RD,
 	uint(size=6)  PartSZ

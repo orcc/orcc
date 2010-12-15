@@ -1,4 +1,6 @@
-actor RegExp.Emit() ==> int Out:
+package RegExp;
+
+actor Emit() ==> int Out:
 	
 	int a = 1;
 	int b = 2;

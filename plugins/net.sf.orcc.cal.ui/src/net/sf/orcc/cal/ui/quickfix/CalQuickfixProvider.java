@@ -86,4 +86,49 @@ public class CalQuickfixProvider extends DefaultQuickfixProvider {
 				});
 	}
 
+	@Fix(CalConstants.ERROR_MISSING_PACKAGE)
+	public void correctEntityMissingPackage(final Issue issue,
+			IssueResolutionAcceptor acceptor) {
+		final String expectedName = issue.getData()[1];
+
+		String message = "Add package " + expectedName;
+		acceptor.accept(issue, message, message, "upcase.png",
+				new IModification() {
+
+					@Override
+					public void apply(IModificationContext context)
+							throws Exception {
+						IXtextDocument document = context.getXtextDocument();
+
+						int offset = issue.getOffset();
+						int length = issue.getLength();
+
+						String text = "package " + expectedName + ";\n\n"
+								+ document.get(offset, length);
+						document.replace(offset, length, text);
+					}
+				});
+	}
+
+	@Fix(CalConstants.ERROR_PACKAGE)
+	public void correctEntityPackage(final Issue issue,
+			IssueResolutionAcceptor acceptor) {
+		String packageName = issue.getData()[0];
+		final String expectedName = issue.getData()[1];
+
+		String message = "Change name from " + packageName + " to "
+				+ expectedName;
+		acceptor.accept(issue, message, message, "upcase.png",
+				new IModification() {
+
+					@Override
+					public void apply(IModificationContext context)
+							throws Exception {
+						IXtextDocument document = context.getXtextDocument();
+						document.replace(issue.getOffset(), issue.getLength(),
+								expectedName);
+					}
+				});
+	}
+
 }

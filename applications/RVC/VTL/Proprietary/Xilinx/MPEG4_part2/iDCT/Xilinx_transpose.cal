@@ -40,7 +40,9 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 
-actor Proprietary.Xilinx.MPEG4_part2.iDCT.Xilinx_transpose () int(size=sz) X0, int(size=sz) X1, int(size=sz) X2, int(size=sz) X3 ==>
+package Proprietary.Xilinx.MPEG4_part2.iDCT;
+
+actor Xilinx_transpose () int(size=sz) X0, int(size=sz) X1, int(size=sz) X2, int(size=sz) X3 ==>
 int(size=sz) Y0 , int(size=sz) Y1 :
 
 	int sz = 16;

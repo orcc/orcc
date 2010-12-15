@@ -42,7 +42,9 @@ ENDCOPYRIGHT
 // Pack pixels into 32-bit words, pass an address once per macroblock so that the
 // burst write into the DRAM will not be starved for data
 
-actor Proprietary.Xilinx.MPEG4_part2.MBPacker () int(size=PIX_SZ) DI, int(size=32) AI ==> int(size=32) DO , int(size=32) AO
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor MBPacker () int(size=PIX_SZ) DI, int(size=32) AI ==> int(size=32) DO , int(size=32) AO
 :
 
 	int PIX_SZ = 9;

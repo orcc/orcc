@@ -79,6 +79,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -104,6 +105,8 @@ import org.jgrapht.graph.DefaultEdge;
  * 
  */
 public class CalJavaValidator extends AbstractCalJavaValidator {
+
+	private static final String DEFAULT = "(default)";
 
 	private SimpleAttributeResolver<EObject, String> resolver = SimpleAttributeResolver
 			.newResolver(String.class, "name");
@@ -360,6 +363,7 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 
 	@Check(CheckType.NORMAL)
 	public void checkEntity(AstEntity entity) {
+		checkEntityPackage(entity);
 		checkEntityName(entity);
 
 		// check there are no cycles in type definitions
@@ -371,29 +375,33 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	/**
-	 * Checks the actor structural information is correct. Checks name,
-	 * priorities and FSM.
+	 * Checks the name of the given entity.
 	 * 
-	 * @param actor
-	 *            the actor
+	 * @param entity
+	 *            the entity
 	 */
 	private void checkEntityName(AstEntity entity) {
-		// retrieve name of entity
-		String entityName;
-		AstActor actor = entity.getActor();
-		AstUnit unit = null;
-		if (actor == null) {
-			unit = entity.getUnit();
-			entityName = unit.getName();
-		} else {
-			entityName = actor.getName();
+		// check entity name matches file name
+		String path = entity.eResource().getURI().path();
+		String expectedName = new Path(path).removeFileExtension()
+				.lastSegment();
+
+		String entityName = entity.getName();
+		if (!expectedName.equals(entityName)) {
+			error("The qualified name " + entityName
+					+ " does not match the expected name " + expectedName,
+					entity, CalPackage.AST_ENTITY__NAME,
+					CalConstants.ERROR_NAME, entityName, expectedName);
 		}
+	}
 
-		// get segments
-		String[] segments = entityName.split("\\.");
-		String lastSegment = segments[segments.length - 1];
-		segments[segments.length - 1] = lastSegment + ".cal";
-
+	/**
+	 * Checks the package of the given entity.
+	 * 
+	 * @param entity
+	 *            the entity
+	 */
+	private void checkEntityPackage(AstEntity entity) {
 		// get platform path /project/folder/.../file
 		String platformPath = entity.eResource().getURI()
 				.toPlatformString(true);
@@ -415,6 +423,16 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			return;
 		}
 
+		// get segments
+		String[] segments;
+		String packageName = entity.getPackage();
+		if (packageName == null) {
+			packageName = DEFAULT;
+			segments = new String[0];
+		} else {
+			segments = packageName.split("\\.");
+		}
+
 		try {
 			IPackageFragmentRoot[] roots = javaProject
 					.getAllPackageFragmentRoots();
@@ -430,23 +448,23 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 				}
 
 				IResource res = workspace.getRoot().findMember(path);
-				String expectedName = getExpectedName(rootPath,
-						file.getFullPath());
-				if (res == null) {
-					EObject object;
-					int feature;
-					if (unit == null) {
-						object = actor;
-						feature = CalPackage.AST_ACTOR__NAME;
+				if (res == null || !file.getParent().equals(res)) {
+					String expectedName = getExpectedName(rootPath,
+							file.getFullPath());
+					String code;
+					if (packageName == DEFAULT) {
+						code = CalConstants.ERROR_MISSING_PACKAGE;
+					} else if (expectedName == DEFAULT) {
+						code = CalConstants.ERROR_EXTRANEOUS_PACKAGE;
 					} else {
-						object = unit;
-						feature = CalPackage.AST_UNIT__NAME;
+						code = CalConstants.ERROR_PACKAGE;
 					}
 
-					error("The qualified name " + entityName
-							+ " does not match the expected name "
-							+ expectedName, object, feature,
-							CalConstants.ERROR_NAME, entityName, expectedName);
+					error("The package " + packageName
+							+ " does not match the expected package "
+							+ expectedName, entity,
+							CalPackage.AST_ENTITY__PACKAGE, code, packageName,
+							expectedName);
 				}
 			}
 		} catch (JavaModelException e) {
@@ -656,7 +674,8 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 			Iterator<AstAction> it = cycle.iterator();
 			builder.append(getName(it.next().getTag()));
 
-			error("priorities of actor " + actor.getName()
+			error("priorities of actor "
+					+ ((AstEntity) actor.eContainer()).getName()
 					+ " contain a cycle: " + builder.toString(), actor,
 					CalPackage.AST_ACTOR__PRIORITIES);
 		}
@@ -737,16 +756,21 @@ public class CalJavaValidator extends AbstractCalJavaValidator {
 	}
 
 	private String getExpectedName(IPath rootPath, IPath filePath) {
-		int n = rootPath.matchingFirstSegments(filePath);
-		String[] segments = filePath.removeFileExtension().segments();
-		StringBuilder builder = new StringBuilder();
-		builder.append(segments[n]);
-		for (int i = n + 1; i < segments.length; i++) {
-			builder.append('.');
-			builder.append(segments[i]);
-		}
+		int count = rootPath.matchingFirstSegments(filePath);
+		String[] segments = filePath.removeFirstSegments(count)
+				.removeLastSegments(1).segments();
+		if (segments.length == 0) {
+			return DEFAULT;
+		} else {
+			StringBuilder builder = new StringBuilder();
+			builder.append(segments[0]);
+			for (int i = 1; i < segments.length; i++) {
+				builder.append('.');
+				builder.append(segments[i]);
+			}
 
-		return builder.toString();
+			return builder.toString();
+		}
 	}
 
 	private String getName(AstAction action) {

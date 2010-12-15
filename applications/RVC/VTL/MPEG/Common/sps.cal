@@ -1,4 +1,6 @@
-actor MPEG.Common.sps () ==> int(size=16) Width , int(size=16) Height :
+package MPEG.Common;
+
+actor sps () ==> int(size=16) Width , int(size=16) Height :
 
 	int _width = 176/16;
 

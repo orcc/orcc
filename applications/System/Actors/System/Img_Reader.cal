@@ -28,8 +28,9 @@
  */
  
 // Author: Endri Bezati (endri.bezati@epfl.ch)
+package System;
 
-actor System.Img_Reader () 
+actor Img_Reader () 
 		==> 
 			uint(size=8)  R,
 			uint(size=8)  G,

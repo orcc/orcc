@@ -14,7 +14,9 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-actor Proprietary.IETR.MPEG4.part10.Algo_RefIdxtoPOC()
+package Proprietary.IETR.MPEG4.part10;
+
+actor Algo_RefIdxtoPOC()
 	int (size=32) RefList,
 	uint(size=4)  RefIdx,
 	bool          NewList

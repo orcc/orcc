@@ -11,7 +11,9 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
 // Insert zero coefficients into a sparsely encoded block
-actor MPEG.MPEG4.part2.Mgnt_BlockExpand () int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
+package MPEG.MPEG4.part2;
+
+actor Mgnt_BlockExpand () int(size=SAMPLE_COUNT_SZ) RUN, int(size=SAMPLE_SZ) VALUE,
 bool LAST ==> int(size=SAMPLE_SZ) OUT :
 
 // Port size declaration

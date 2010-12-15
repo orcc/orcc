@@ -13,10 +13,12 @@ ISO/IEC gives You a free license to this software module or modifications thereo
 IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 
-actor Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeSubMbPred()
+actor Algo_DecodeSubMbPred()
 	int (size=32) ValVLD,
 
 	uint(size=6)  Parameters

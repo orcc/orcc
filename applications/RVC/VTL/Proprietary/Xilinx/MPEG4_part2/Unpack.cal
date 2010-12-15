@@ -42,7 +42,9 @@ ENDCOPYRIGHT
 // Each row of compensation data arrives as 3 32 bits numbers. This actor extracts
 // the 9 relevant horizontal pixels. This must take no more than 9 clocks for HD rate!
 
-actor Proprietary.Xilinx.MPEG4_part2.Unpack () int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI ==>
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor Unpack () int(size=MV_SZ) MV, int(size=BTYPE_SZ) BTYPE, int(size=32) DI ==>
 int(size=PIX_SZ) DO :
 
 	int BTYPE_SZ = 12;

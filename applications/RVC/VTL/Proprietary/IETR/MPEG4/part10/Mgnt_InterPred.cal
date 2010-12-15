@@ -18,9 +18,11 @@
 //Modified the "size" correctly to work with orcc
 
 //Modified by Damien de Saint Jorre (IETR/Insa of Rennes)
+package Proprietary.IETR.MPEG4.part10;
+
 import VTL.Proprietary.IETR.MPEG_4_part_10.Common.Imp_MacroBlockInfo.* ;
 
-actor Proprietary.IETR.MPEG4.part10.Mgnt_InterPred()
+actor Mgnt_InterPred()
 	uint(size=6)  PartSZ,
 	int (size=16) MV,
 	uint(size=11) Location

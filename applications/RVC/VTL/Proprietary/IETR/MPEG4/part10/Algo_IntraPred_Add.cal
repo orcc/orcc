@@ -18,9 +18,11 @@ Jerome GORIN IETR/ARTEMIS
 gorinje@gmail.com
 Modified by Damien de Saint Jorre ; IETR/INSA of Rennes
 *****************************************************************************/
+package Proprietary.IETR.MPEG4.part10;
+
 import MPEG.Common.Imp_Math.*;
 
-actor Proprietary.IETR.MPEG4.part10.Algo_IntraPred_Add (bool a) 
+actor Algo_IntraPred_Add (bool a) 
 		int(size=16) X, 
 		int(size=16) Y 
 				==> 

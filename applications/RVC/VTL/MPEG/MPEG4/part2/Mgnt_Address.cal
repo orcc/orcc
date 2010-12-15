@@ -13,7 +13,9 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Frame buffer address generation for motion compensation
 
-actor MPEG.MPEG4.part2.Mgnt_Address (int INTRA,
+package MPEG.MPEG4.part2;
+
+actor Mgnt_Address (int INTRA,
 	int NEWVOP,
 	int MOTION,
 	int ROUND_TYPE,

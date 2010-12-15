@@ -21,7 +21,9 @@
 // read_write -->tokens on QFS_AC --> buf ; AC coeffs in buf --> PQF_AC; fired only when buf is full and tokens are available on AC_PRED_DIR
 // done --> done reading or writing or both (64 AC coeffs) --> fired when count is 64
 
-actor MPEG.MPEG4.part2.Algo_IS () int(size=3) AC_PRED_DIR, int(size=SAMPLE_SZ) QFS_AC ==>
+package MPEG.MPEG4.part2;
+
+actor Algo_IS () int(size=3) AC_PRED_DIR, int(size=SAMPLE_SZ) QFS_AC ==>
 int(size=SAMPLE_SZ) PQF_AC :
 
 // Port size declaration

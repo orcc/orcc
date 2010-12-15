@@ -41,7 +41,9 @@ ENDCOPYRIGHT
 //
 // Put pixels out of col IDCT back into scan order
 
-actor Proprietary.Xilinx.MPEG4_part2.iDCT.Xilinx_retranspose () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2,
+package Proprietary.Xilinx.MPEG4_part2.iDCT;
+
+actor Xilinx_retranspose () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2,
 int(size=isz) X3 ==> int(size=osz) Y :
 
 	int isz = 10;

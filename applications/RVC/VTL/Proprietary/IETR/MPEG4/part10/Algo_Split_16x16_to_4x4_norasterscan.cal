@@ -18,7 +18,9 @@ This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
  
 *****************************************************************************/
 
-actor Proprietary.IETR.MPEG4.part10.Algo_Split_16x16_to_4x4_norasterscan () int(size=16) X ==> int(size=16) Y :
+package Proprietary.IETR.MPEG4.part10;
+
+actor Algo_Split_16x16_to_4x4_norasterscan () int(size=16) X ==> int(size=16) Y :
 
   //Tab containing the 16x16 macroblock
   List( type:int(size=16), size=64 ) buff := [ 0 : for int i in 0 .. 63 ];

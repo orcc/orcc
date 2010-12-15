@@ -11,7 +11,9 @@
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 // Interpolation for motion compensation
 
-actor MPEG.MPEG4.part2.Algo_Interpolation_halfpel () int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==>
+package MPEG.MPEG4.part2;
+
+actor Algo_Interpolation_halfpel () int(size=PIX_SZ) RD, int(size=FLAG_SZ) halfpel ==>
 int(size=PIX_SZ) MOT :
 
 // Port size declaration

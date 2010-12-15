@@ -30,9 +30,10 @@ package net.sf.orcc.cal.naming;
 
 import java.util.Collections;
 
-import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstUnit;
+import net.sf.orcc.cal.util.Util;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.ecore.EObject;
@@ -80,20 +81,31 @@ public class CalQualifiedNameProvider extends
 					public String get() {
 						EObject temp = obj;
 						String name = qualifiedName.invoke(temp);
-						if (name != null)
+						if (name != null) {
 							return name;
-						String value = resolver.getValue(temp);
-						if (value == null)
-							return null;
+						}
 
-						if (temp instanceof AstActor || temp instanceof AstUnit) {
-							return value;
-						} else {
+						AstEntity entity = null;
+						if (temp instanceof AstEntity) {
+							// return qualified name of entity
+							entity = (AstEntity) temp;
+						} else if (temp.eContainer() instanceof AstEntity) {
+							// return qualified name of entity
+							entity = (AstEntity) temp.eContainer();
+						}
+
+						if (entity == null) {
+							// object inside an entity
 							EObject cter = temp.eContainer();
 							if (cter instanceof AstUnit) {
 								String parentsName = getQualifiedName(cter);
-								return parentsName + getDelimiter() + value;
+								String value = resolver.getValue(temp);
+								if (value != null) {
+									return parentsName + getDelimiter() + value;
+								}
 							}
+						} else {
+							return Util.getQualifiedName(entity);
 						}
 
 						return null;

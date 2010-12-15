@@ -51,9 +51,11 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 //Modified by Damien de Saint Jorre, IETR/INSA of Rennes (France)
+package Proprietary.IETR.MPEG4.part10;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Proprietary.IETR.MPEG4.part10.Algo_DCR_Hadamard_LUMA_Scaling ()
+actor Algo_DCR_Hadamard_LUMA_Scaling ()
 		int (size=16) I, 
 		int (size=8)  QP,
 		int (size=8)  ScalingList,

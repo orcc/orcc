@@ -10,7 +10,9 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
-actor MPEG.MPEG4.part2.Mgnt_MVSequence (int FOURMV,
+package MPEG.MPEG4.part2;
+
+actor Mgnt_MVSequence (int FOURMV,
 	int NEWVOP,
 	int INTER,
 	int MOTION) int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A :

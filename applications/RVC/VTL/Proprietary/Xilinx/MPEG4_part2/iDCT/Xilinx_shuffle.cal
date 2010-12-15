@@ -41,7 +41,9 @@ ENDCOPYRIGHT
 //
 // Reorder pipeline data before final scaling
 
-actor Proprietary.Xilinx.MPEG4_part2.iDCT.Xilinx_shuffle () int(size=sz) X0, int(size=sz) X1, int(size=sz) X2, int(size=sz) X3 ==>
+package Proprietary.Xilinx.MPEG4_part2.iDCT;
+
+actor Xilinx_shuffle () int(size=sz) X0, int(size=sz) X1, int(size=sz) X2, int(size=sz) X3 ==>
 int(size=sz) Y0 , int(size=sz) Y1 , int(size=sz) Y2 , int(size=sz) Y3 :
 
 	int sz = 24;

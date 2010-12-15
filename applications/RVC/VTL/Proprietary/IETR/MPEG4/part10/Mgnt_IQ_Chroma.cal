@@ -14,7 +14,9 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-actor Proprietary.IETR.MPEG4.part10.Mgnt_IQ_Chroma()
+package Proprietary.IETR.MPEG4.part10;
+
+actor Mgnt_IQ_Chroma()
 	int(size=16) CoefDCR_C,
 	int(size=16) CoefAC_C
 		==>

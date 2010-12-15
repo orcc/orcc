@@ -28,8 +28,9 @@
  */
  
 // Author: Endri Bezati (endri.bezati@epfl.ch)
+package System;
 
-actor System.Source_no_loop () 
+actor Source_no_loop () 
 		==> 
 			uint(size=8) O,
 			bool EOF :

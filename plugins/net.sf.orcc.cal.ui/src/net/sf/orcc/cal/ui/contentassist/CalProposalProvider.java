@@ -44,6 +44,7 @@ import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.cal.cal.CalFactory;
 import net.sf.orcc.cal.cal.CalPackage;
 import net.sf.orcc.cal.util.CalActionList;
+import net.sf.orcc.cal.util.Util;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -90,7 +91,7 @@ public class CalProposalProvider extends AbstractCalProposalProvider {
 				AstEntity entity = (AstEntity) obj;
 				AstUnit unit = entity.getUnit();
 				if (unit != null) {
-					String name = unit.getName();
+					String name = Util.getQualifiedName(entity);
 					units.add(name);
 				}
 			}

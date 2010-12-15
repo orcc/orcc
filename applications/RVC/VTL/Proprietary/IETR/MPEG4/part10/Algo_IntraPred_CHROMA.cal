@@ -68,9 +68,9 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 *****************************************************************************/
 
+package Proprietary.IETR.MPEG4.part10;
 
-
-actor Proprietary.IETR.MPEG4.part10.Algo_IntraPred_CHROMA ()
+actor Algo_IntraPred_CHROMA ()
 		int(size=16) C_LEFT,     // List
 		int(size=16) C_UP,       // List
 		int(size=16) C_UP_LEFT,  // point

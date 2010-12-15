@@ -51,7 +51,9 @@ Standards.
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
-unit Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo :
+package Proprietary.IETR.MPEG4.part10.Common;
+
+unit Imp_MacroBlockInfo :
 
 	uint(size=6) BLOCK_TYPE_INTRA_MIN       = 0;
 	uint(size=6) BLOCK_TYPE_I_NxN           = 0;

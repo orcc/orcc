@@ -1,4 +1,6 @@
-actor Fifo.Merge() uint In1, uint In2 ==>:
+package Fifo;
+
+actor Merge() uint In1, uint In2 ==>:
 
 	action In1:[i1], In2:[i2] ==>
 	var

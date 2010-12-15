@@ -10,7 +10,9 @@
 //              IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR
 //              A PARTICULAR PURPOSE, OR AGAINST INFRINGEMENT.
 
-actor Proprietary.GUC.GUC_Mgnt_MVSequence () 
+package Proprietary.GUC;
+
+actor GUC_Mgnt_MVSequence () 
 	bool NEW_VOP, int(size=16) WIDTH, bool MOT, int (size=2) BTYPE, bool FOUR_MV ==> int(size=MB_COORD_SZ + 3) A:
 
 	// Port size declaration

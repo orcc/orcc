@@ -40,7 +40,9 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 // Add motion and texture to produce pixels
 
-actor Proprietary.Xilinx.MPEG4_part2.Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==>
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor Add () int(size=PIX_SZ) MOT, int(size=PIX_SZ) TEX, int(size=BTYPE_SZ) BTYPE ==>
 int(size=PIX_SZ) VID :
 
 	int PIX_SZ = 9;

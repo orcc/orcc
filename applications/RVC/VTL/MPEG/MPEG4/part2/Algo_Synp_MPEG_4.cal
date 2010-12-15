@@ -41,7 +41,9 @@
 
 //  The INTRA type also has ACPRED
 
-actor MPEG.MPEG4.part2.Algo_Synp_MPEG_4 (
+package MPEG.MPEG4.part2;
+
+actor Algo_Synp_MPEG_4 (
     // Maximum image width (in units of macroblocks) that the decoder can handle.
     // It is used to allocate line buffer space at compile time.
   int ROUND_TYPE,

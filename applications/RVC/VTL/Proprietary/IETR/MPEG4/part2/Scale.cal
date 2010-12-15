@@ -1,5 +1,7 @@
 
-actor Proprietary.IETR.MPEG4.part2.Scale () int(size=SIN_SZ) SIn ==> int(size=SOUT_SZ) SOut :
+package Proprietary.IETR.MPEG4.part2;
+
+actor Scale () int(size=SIN_SZ) SIn ==> int(size=SOUT_SZ) SOut :
 
 // Port size declaration
 	int SIN_SZ = 13;

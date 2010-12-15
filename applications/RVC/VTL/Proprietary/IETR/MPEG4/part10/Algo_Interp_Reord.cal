@@ -14,9 +14,11 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
+package Proprietary.IETR.MPEG4.part10;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Proprietary.IETR.MPEG4.part10.Algo_Interp_Reord(uint(size=8) SzSidePerPart)
+actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 	uint(size=2)  SelectList,

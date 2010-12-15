@@ -40,7 +40,9 @@ ENDCOPYRIGHT
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 //
 
-actor Proprietary.MVG.Addressing_simple () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A ,
+package Proprietary.MVG;
+
+actor Addressing_simple () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ + 3) A ,
 int(size=MB_COORD_SZ + 3) B , int(size=MB_COORD_SZ + 3) C :
 
 	int MB_COORD_SZ = 8;

@@ -51,9 +51,9 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
+package Proprietary.IETR.MPEG4.part10;
 
-
-actor Proprietary.IETR.MPEG4.part10.Algo_IntraPred_LUMA_4x4 ()
+actor Algo_IntraPred_LUMA_4x4 ()
   int(size=16) Y_LEFT,     // List
   int(size=16) Y_UP,       // List
   int(size=16) Y_UP_LEFT,  // point

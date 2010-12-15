@@ -41,7 +41,9 @@ ENDCOPYRIGHT
 //
 // idct1d pipeline stage
 
-actor Proprietary.Xilinx.MPEG4_part2.iDCT.Xilinx_combine () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3,
+package Proprietary.Xilinx.MPEG4_part2.iDCT;
+
+actor Xilinx_combine () int(size=isz) X0, int(size=isz) X1, int(size=isz) X2, int(size=isz) X3,
 bool ROW ==> int(size=osz) Y0 , int(size=osz) Y1 :
 
 	int isz = 30;

@@ -1,7 +1,9 @@
 // Mgnt_Merger420
 //
 // Author: Christophe Lucarz (christophe.lucarz@epfl.ch)
-actor Proprietary.Xilinx.MPEG4_part2.Mgnt_Merger_xilinx () int(size=9) YUV_i ==> uint(size=8) YUV :
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor Mgnt_Merger_xilinx () int(size=9) YUV_i ==> uint(size=8) YUV :
 
 	List(type: uint(size=8), size=256) out_y := [ 0 : for int i in 0 .. 255 ];
 

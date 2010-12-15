@@ -39,8 +39,8 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com), Ian Miller (ian.miller@xilinx.com)
 //
+package System;
 
+actor art_DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
 
-actor System.art_DDRModel () int(size=32) RA, int(size=32) WA, int(size=32) WD ==> int(size=32) RD :
- 
 end

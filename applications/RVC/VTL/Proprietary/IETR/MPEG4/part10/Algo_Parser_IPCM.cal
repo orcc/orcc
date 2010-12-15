@@ -52,7 +52,9 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 
-actor Proprietary.IETR.MPEG4.part10.Algo_Parser_IPCM ( ) 
+package Proprietary.IETR.MPEG4.part10;
+
+actor Algo_Parser_IPCM ( ) 
 		int ( size = 9 ) I_PCM
 				==>
 				int ( size = 9 ) I_PCM_Y,

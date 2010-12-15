@@ -12,7 +12,9 @@
 // Author: Matthieu Wipliez (mwipliez@insa-rennes.fr)
 // Rewrote because code generator does not accept x := [ x[i] ... ]; assignments yet.
 
-actor Proprietary.IETR.MPEG4.part2.GEN_124_algo_Idct1d (bool ROW) int X ==> int Y :
+package Proprietary.IETR.MPEG4.part2;
+
+actor GEN_124_algo_Idct1d (bool ROW) int X ==> int Y :
 
 	List(type: int, size=4) W0 = [ 2048, 2676, 2841, 1609 ];
 

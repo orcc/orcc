@@ -1,4 +1,6 @@
-actor Proprietary.IETR.MPEG4.part10.Mgnt_Merger420_AVC () int(size=9) Y, int(size=9) U, int(size=9) V ==> uint(size=8) YUV :
+package Proprietary.IETR.MPEG4.part10;
+
+actor Mgnt_Merger420_AVC () int(size=9) Y, int(size=9) U, int(size=9) V ==> uint(size=8) YUV :
 
 	// Select the Y blocks 
 	Read_Y: action Y:[ y ] repeat 4 * 64 ==> YUV:[ y ] repeat 256

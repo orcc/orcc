@@ -156,11 +156,11 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureActorBody(FormattingConfig c) {
 		AstActorElements access = f.getAstActorAccess();
 
-		c.setLinewrap(2).after(access.getColonKeyword_9());
-		c.setIndentation(access.getColonKeyword_9(), access.getEndKeyword_13());
+		c.setLinewrap(2).after(access.getColonKeyword_7());
+		c.setIndentation(access.getColonKeyword_7(), access.getEndKeyword_11());
 
-		c.setLinewrap(2).before(access.getEndKeyword_13());
-		c.setLinewrap(2).after(access.getEndKeyword_13());
+		c.setLinewrap(2).before(access.getEndKeyword_11());
+		c.setLinewrap(2).after(access.getEndKeyword_11());
 	}
 
 	/**
@@ -340,24 +340,24 @@ public class CalFormatter extends AbstractDeclarativeFormatter {
 	private void configureParameters(FormattingConfig c) {
 		AstActorElements access = f.getAstActorAccess();
 
-		c.setIndentation(access.getLeftParenthesisKeyword_3(),
-				access.getRightParenthesisKeyword_5());
-		c.setNoSpace().after(access.getLeftParenthesisKeyword_3());
-		c.setLinewrap().before(access.getParametersAssignment_4_0());
-		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
-		c.setLinewrap().after(access.getCommaKeyword_4_1_0());
-		c.setNoSpace().before(access.getRightParenthesisKeyword_5());
+		c.setIndentation(access.getLeftParenthesisKeyword_1(),
+				access.getRightParenthesisKeyword_3());
+		c.setNoSpace().after(access.getLeftParenthesisKeyword_1());
+		c.setLinewrap().before(access.getParametersAssignment_2_0());
+		c.setNoSpace().before(access.getCommaKeyword_2_1_0());
+		c.setLinewrap().after(access.getCommaKeyword_2_1_0());
+		c.setNoSpace().before(access.getRightParenthesisKeyword_3());
 	}
 
 	private void configurePorts(FormattingConfig c) {
 		AstActorElements access = f.getAstActorAccess();
 
-		c.setNoLinewrap().around(access.getInputsAssignment_6_0());
-		c.setNoLinewrap().around(access.getInputsAssignment_6_1_1());
-		c.setNoLinewrap().around(access.getOutputsAssignment_8_0());
-		c.setNoLinewrap().around(access.getOutputsAssignment_8_1_1());
+		c.setNoLinewrap().around(access.getInputsAssignment_4_0());
+		c.setNoLinewrap().around(access.getInputsAssignment_4_1_1());
+		c.setNoLinewrap().around(access.getOutputsAssignment_6_0());
+		c.setNoLinewrap().around(access.getOutputsAssignment_6_1_1());
+		c.setNoSpace().before(access.getCommaKeyword_4_1_0());
 		c.setNoSpace().before(access.getCommaKeyword_6_1_0());
-		c.setNoSpace().before(access.getCommaKeyword_8_1_0());
 	}
 
 	private void configurePriorities(FormattingConfig c) {

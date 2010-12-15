@@ -39,7 +39,9 @@
 //  Description: The algorithm part of deblocking filter without mbaff
 
 
-actor Proprietary.IETR.MPEG4.part10.Algo_DBF (int LUMA_CHROMA) uint(size=8)DB_I,uint(size=6)BS ==> uint(size=8)DB_O : //LUMA_CHROMA luma:=0, chroma:=1
+package Proprietary.IETR.MPEG4.part10;
+
+actor Algo_DBF (int LUMA_CHROMA) uint(size=8)DB_I,uint(size=6)BS ==> uint(size=8)DB_O : //LUMA_CHROMA luma:=0, chroma:=1
       
 ///////////////
 // Constants //

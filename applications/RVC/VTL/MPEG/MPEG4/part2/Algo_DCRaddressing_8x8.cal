@@ -48,7 +48,9 @@
 //   1 component per block.
 // * Variable 'comp' removed since only one component.
 
-actor MPEG.MPEG4.part2.Algo_DCRaddressing_8x8 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ) A , int(size=MB_COORD_SZ) B
+package MPEG.MPEG4.part2;
+
+actor Algo_DCRaddressing_8x8 () int(size=BTYPE_SZ) BTYPE ==> int(size=MB_COORD_SZ) A , int(size=MB_COORD_SZ) B
 , int(size=MB_COORD_SZ) C :
 
 // Port size declaration

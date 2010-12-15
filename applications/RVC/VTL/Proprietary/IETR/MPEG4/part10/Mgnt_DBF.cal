@@ -37,10 +37,11 @@
 
 // Mgnt_DBF.cal
 // Description: The management part of deblocking filter without mbaff
-import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
+package Proprietary.IETR.MPEG4.part10;
 
+import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
   
-actor Proprietary.IETR.MPEG4.part10.Mgnt_DBF (int LUMA_CHROMA) 
+actor Mgnt_DBF (int LUMA_CHROMA) 
 	int(size=9) Z,
 	uint(size=7) PicWidthInMb,
 	uint(size=13) PicSizeInMb,

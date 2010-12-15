@@ -52,7 +52,9 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-actor Proprietary.IETR.MPEG4.part10.Frext.Algo_Check_NALU_type_Frext()
+package Proprietary.IETR.MPEG4.part10.Frext;
+
+actor Algo_Check_NALU_type_Frext()
 	uint(size=8) RbspByte,
 	bool         NewNal,
 

@@ -30,8 +30,9 @@
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 
 // Displays an image. Reads width, height, and image content (RGB).
+package System;
 
-actor System.DisplayImage()
+actor DisplayImage()
   uint(size=8) R, uint(size=8) G, uint(size=8) B, int WIDTH, int HEIGHT ==> :
 
 end

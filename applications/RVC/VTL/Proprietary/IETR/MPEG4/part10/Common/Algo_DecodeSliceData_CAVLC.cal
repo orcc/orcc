@@ -23,9 +23,11 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 ***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 
-actor Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeSliceData_CAVLC(bool Is_CBP)
+actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int (size=32) ValVLD,
 
 	int(size=5)   PpsParameters,

@@ -39,7 +39,9 @@ ENDCOPYRIGHT
 //
 // Author: David B. Parlour (dave.parlour@xilinx.com)
 
-actor Proprietary.Xilinx.MPEG4_part2.DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC ,
+package Proprietary.Xilinx.MPEG4_part2;
+
+actor DCSplit () int(size=SAMPLE_SZ) IN ==> int(size=SAMPLE_SZ) DC ,
 int(size=SAMPLE_SZ) AC :
 
 	int SAMPLE_SZ = 13;

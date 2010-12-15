@@ -28,7 +28,9 @@
  */
  
 // Author: Endri Bezati <endri.bezati@epfl.ch>
-actor System.Writer()
+package System;
+
+actor Writer()
 	uint(size=8) In,
 	bool EOF ==>:
 	

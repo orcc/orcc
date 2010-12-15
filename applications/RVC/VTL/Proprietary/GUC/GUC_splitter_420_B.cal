@@ -6,7 +6,9 @@
 //              into its respective Y, U and V components.
 //
 
-actor Proprietary.GUC.GUC_splitter_420_B () int(size=SAMPLE_SZ) B, bool AC_CODED, int (size=2) BTYPE ==> int(size=SAMPLE_SZ) Y ,
+package Proprietary.GUC;
+
+actor GUC_splitter_420_B () int(size=SAMPLE_SZ) B, bool AC_CODED, int (size=2) BTYPE ==> int(size=SAMPLE_SZ) Y ,
 int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V
  :
 

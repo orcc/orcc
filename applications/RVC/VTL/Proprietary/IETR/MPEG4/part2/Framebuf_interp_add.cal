@@ -2,7 +2,9 @@
 //
 // Authors: Ghislain Roquier(ghislain.roquier@epfl.ch), Matthieu Wipliez <mwipliez@insa-rennes.fr>
 
-actor Proprietary.IETR.MPEG4.part2.Framebuf_interp_add (// Command flags from parser
+package Proprietary.IETR.MPEG4.part2;
+
+actor Framebuf_interp_add (// Command flags from parser
 	int NEWVOP,
 	int INTRA,
 	int ACCODED) int(size=FLAG_SZ) halfpel, // from MPEG4_algo_Interpolation_halfpel

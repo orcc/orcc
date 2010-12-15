@@ -6,7 +6,9 @@
 //              into its respective Y, U and V components.
 //
 
-actor MPEG.MPEG4.part2.splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BTYPE ==> int(size=SAMPLE_SZ) Y ,
+package MPEG.MPEG4.part2;
+
+actor splitter_420_B () int(size=SAMPLE_SZ) B, int(size=BTYPE_SZ) BTYPE ==> int(size=SAMPLE_SZ) Y ,
 int(size=SAMPLE_SZ) U , int(size=SAMPLE_SZ) V :
 
 // Port size declaration
