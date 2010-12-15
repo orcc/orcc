@@ -57,7 +57,7 @@ import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 public class TernaryOperationAdder extends AbstractActorTransformation {
 
 	private BlockNode newBlockNode;
-	private Expression condValue;
+	private LocalVariable condVar;
 
 	@Override
 	public void transform(Actor actor) throws OrccException {
@@ -81,8 +81,8 @@ public class TernaryOperationAdder extends AbstractActorTransformation {
 				PhiAssignment phi = (PhiAssignment) instruction;
 
 				TernaryOperation ternaryOp = new TernaryOperation(null,
-						phi.getTarget(), condValue, phi.getValues().get(0), phi
-								.getValues().get(1));
+						phi.getTarget(), new VarExpr(new Use(condVar)), phi
+								.getValues().get(0), phi.getValues().get(1));
 
 				// add uses
 				Use.addUses(ternaryOp, ternaryOp.getConditionValue());
@@ -99,10 +99,10 @@ public class TernaryOperationAdder extends AbstractActorTransformation {
 
 	@Override
 	public void visit(IfNode ifNode) {
-		Expression oldCondValue = condValue;
+		LocalVariable oldCondVar = condVar;
 
 		Expression condExpr = ifNode.getValue();
-		LocalVariable condVar = procedure.newTempLocalVariable(null,
+		condVar = procedure.newTempLocalVariable(null,
 				IrFactory.eINSTANCE.createTypeBool(), "ifCondition_"
 						+ ifNode.getLocation().getStartLine());
 		condVar.setIndex(1);
@@ -117,10 +117,9 @@ public class TernaryOperationAdder extends AbstractActorTransformation {
 		// add uses
 		Use.addUses(assignCond, condExpr);
 
-		condValue = new VarExpr(new Use(condVar));
 		visit(ifNode.getThenNodes());
 		visit(ifNode.getElseNodes());
 		visit(ifNode.getJoinNode());
-		condValue = oldCondValue;
+		condVar = oldCondVar;
 	}
 }
