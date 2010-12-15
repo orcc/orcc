@@ -1,27 +1,25 @@
 ///////////////////////////////////////////////////////////////////////////////
 // FIFOs
 ///////////////////////////////////////////////////////////////////////////////
-fifo_in(port) ::= <<
+port_in(port) ::= <<
 $if(port.type.bool)
 $$port.name$_data  : in  std_logic;$
 else
 $$port.name$_data  : in  std_logic_vector($port.type.size$ -1 downto 0);$
 endif$
 
-$port.name$_rdy   : out std_logic;
 $port.name$_send  : in  std_logic;
 $port.name$_ack   : out  std_logic;
 
 >>
 
-fifo_out(port) ::= <<
+port_out(port) ::= <<
 $if(port.type.bool)
 $$port.name$_data  : out std_logic;$
 else
 $$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$
 endif$
 
-$port.name$_rdy   : in  std_logic;
 $port.name$_send  : out std_logic;
 $if(last(port.name))
 $$port.name$_ack   : in  std_logic$
@@ -30,7 +28,7 @@ $$port.name$_ack   : in  std_logic;$
 endif$
 >>
 
-fifo_out_init(port) ::=<<
+port_out_init(port) ::=<<
 
 $port.name$_send <= '0';
 $if(port.type.bool)
@@ -510,9 +508,14 @@ $procedure(procedure=action.scheduler, transformReturn="true")$
 
 printActionFire(action) ::= <<
 ((isSchedulable_$action$_go $action.inputPattern.keys : {port| and $port.name$_send }$) = '1') then
-    $action$_go  <= isSchedulable_$action$_go $action.outputPattern.keys : {port| and $port.name$_rdy }$;
+$if(action.outputPattern.keys)
+$    $action$_go  <= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$;
     $action.inputPattern.keys : {
-      port|$port.name$_ack <= isSchedulable_$action$_go $action.outputPattern.keys : {port| and $port.name$_rdy }$;} ; separator="\n"$
+      port|$port.name$_ack <= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$} ; separator="\n"$;$
+else
+$    $action$_go  <= isSchedulable_$action$_go;
+    $action.inputPattern.keys : {port|$port.name$_ack <= isSchedulable_$action$_go;} ; separator="\n"$$
+endif$
 >>
 
 printActionFireFSM(actions, fsm) ::= <<
@@ -557,15 +560,15 @@ begin
   if reset_n = '0' then 
     $actor.stateVars.list: stateConst(); separator="\n"$     
     --
-    $actor.outputs.list: fifo_out_init()$
-    $actor.inputs.list :{port|$port.name$_rdy <= '0';}; separator="\n"$    
+    $actor.outputs.list : port_out_init()$
+    $actor.inputs.list  :{port|$port.name$_rdy   <= '0';}; separator="\n"$    
+    $actor.outputs.list :{port|$port.name$_first <= '1';}; separator="\n"$    
 $if(actor.actionScheduler.fsm)    
 $    FSM    <= s_$actor.actionScheduler.fsm.initialState$;
 $
 endif$  --
   elsif rising_edge(clock) then
     $actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n"$
-    $actor.inputs.list :{port|$port.name$_rdy <= '1';}; separator="\n"$  
     --  
 $if(actor.actionScheduler.fsm)    
 $    $executeCoreFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
@@ -581,7 +584,7 @@ end process $actor.name$_execute;
 actionTestSceduler(action) ::= <<
 ($action$_go = '1') then
   -- body of "$action$" action
-  $printActionBodyInline(action)$  --$actor.outputs.list: writeManagement()$$actor.inputs.list: rdyManagement()$
+  $printActionBodyInline(action)$  --$actor.outputs.list: writeManagement()$
 >>
 
 writeManagement(port) ::= <<
@@ -591,12 +594,6 @@ $
 endif$
 >>
 
-rdyManagement(port) ::= <<
-$if(!action.inputPattern.(port))
-$
-  $port.name$_rdy <= '0';$
-endif$
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Core of an action - NO FSM
@@ -679,8 +676,8 @@ entity $actor.name$ is
   -- Inputs
   clock    : in  std_logic;
   reset_n  : in  std_logic;
-  $actor.inputs.list: fifo_in()$  -- Outputs
-  $actor.outputs.list: fifo_out(); separator=";\n"$);  
+  $actor.inputs.list: port_in()$  -- Outputs
+  $actor.outputs.list: port_out(); separator=";\n"$);  
 end $actor.name$;
 
 ------------------------------------------------------------------------------
@@ -691,7 +688,9 @@ architecture rtl_$actor.name$ of $actor.name$ is
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
   $actorParameters(actor.parameters)$
-  $actor.actions: {action| signal $action$_go : std_logic;}; separator="\n"$
+  $actor.actions:       {action| signal $action$_go    : std_logic;}; separator="\n"$
+  $actor.outputs.list : {port| signal $port.name$_rdy   : std_logic;}; separator="\n"$
+  $actor.outputs.list : {port| signal $port.name$_first : std_logic;}; separator="\n"$
   --
   $actor.stateVars.list: signalDeclaration()$
 
@@ -705,6 +704,9 @@ endif$
   $DefineFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
 
 begin
+
+  $actor.outputs.list : {port|$port.name$_rdy <= ($port.name$_send and $port.name$_ack) or $port.name$_first}; separator=";\n"$;
+
   $Actor_Scheduler(actor)$
   
   $Actor_Exec(actor)$
