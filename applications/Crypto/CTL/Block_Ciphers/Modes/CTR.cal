@@ -32,7 +32,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010 
  */
 
-actor Block_Ciphers.Modes.CTR(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=BLOCK_SIZE_CIPHER, uint BLOCK_SIZE_COUNTER=BLOCK_SIZE_CIPHER/2, uint COUNTER_INCREMENT=1)
+package Block_Ciphers.Modes;
+
+actor CTR(uint BLOCK_SIZE_CIPHER=16, uint BLOCK_SIZE_MODE=BLOCK_SIZE_CIPHER, uint BLOCK_SIZE_COUNTER=BLOCK_SIZE_CIPHER/2, uint COUNTER_INCREMENT=1)
 	uint(size=8) IP1_IV, uint(size=8) IP2_IT, uint(size=64) IP3_IDX, uint(size=8) IP4_OB
 		==> uint(size=8) OP1_OT, uint(size=8) OP2_IB:
 

@@ -30,8 +30,9 @@
 // Algo_IntraPred_CHROMA_8x8_AVSJZ.cal
 // Function: This module implements intra prediction for 8x8 chroma block of AVS JiZhun Profile.
 
+package avs;
 
-actor avs.Algo_IntraPred_CHROMA_8x8_AVSJZ (
+actor Algo_IntraPred_CHROMA_8x8_AVSJZ (
   /*int PIX_SZ*/
 )
 

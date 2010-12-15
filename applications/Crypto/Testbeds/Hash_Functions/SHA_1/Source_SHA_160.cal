@@ -13,7 +13,9 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
  
-actor Hash_Functions.SHA_1.Source_SHA_160() ==> uint(size=64) OP1_MessageSize, uint(size=8) OP2_Message, uint OP3_HashSize, uint(size=32) OP4_GR:
+package Hash_Functions.SHA_1;
+
+actor Source_SHA_160() ==> uint(size=64) OP1_MessageSize, uint(size=8) OP2_Message, uint OP3_HashSize, uint(size=32) OP4_GR:
 	
 /*	// Test parameters for SHA-1 taken from [1].
 	uint(size=64) MESSAGE_SIZE = 3; // 3 bytes.

@@ -53,9 +53,9 @@
  3 --> Intra_Chroma_Plane
 ************************************************************************************************************************************8***/
 
+package avs;
 
-
-actor avs.Algo_IntraModePred_CHROMA_AVSJZ (
+actor Algo_IntraModePred_CHROMA_AVSJZ (
  /*int MB_COORD_SZ,
  int BTYPE_SZ,
  int SAMPLE_SZ,

@@ -13,7 +13,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Block_Ciphers.TDES.Source_TDES_Encipher () ==> uint(size=8) OP1_Key1, uint(size=8) OP2_Key2, uint(size=8) OP3_Key3,
+package Block_Ciphers.TDES;
+
+actor Source_TDES_Encipher () ==> uint(size=8) OP1_Key1, uint(size=8) OP2_Key2, uint(size=8) OP3_Key3,
 								  uint(size=8) OP4_PT, uint(size=8) OP5_GR :
 
 	// Test vectors for TDES (taken from NIST SP 800-67).

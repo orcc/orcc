@@ -4,7 +4,9 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Utilities.Source_Bits2Any () ==> uint(size=1) OP:
+package Utilities;
+
+actor Source_Bits2Any () ==> uint(size=1) OP:
 
 	bool dataSent := false;
 	

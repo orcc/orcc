@@ -13,7 +13,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Block_Ciphers.DES.DES_f_XOR () uint(size=1) IP1_Keys, uint(size=1) IP2_Text, uint(size=8) IP3_RN ==> uint(size=1) OP: 
+package Block_Ciphers.DES;
+
+actor DES_f_XOR () uint(size=1) IP1_Keys, uint(size=1) IP2_Text, uint(size=8) IP3_RN ==> uint(size=1) OP: 
 
 	// Flag controlling firings of different actions.
 	bool keysReceived := false;

@@ -17,7 +17,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Utilities.Any2Bits (bool IS_BIG_ENDIAN = true) uint(size=IP_SIZE) IP ==> uint(size=1) OP:
+package Utilities;
+
+actor Any2Bits (bool IS_BIG_ENDIAN = true) uint(size=IP_SIZE) IP ==> uint(size=1) OP:
 
 	// Input port size in bits.
 	int IP_SIZE = 8;

@@ -12,7 +12,9 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor Hash_Functions.SHA_2.SHA_224() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
+package Hash_Functions.SHA_2;
+
+actor SHA_224() uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
 	// Receive the number of 16 dword (512 bit) messages.
 	int N := -1; // Number of messages.
 	receiveN:

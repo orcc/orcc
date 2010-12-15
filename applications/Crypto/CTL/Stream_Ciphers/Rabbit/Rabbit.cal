@@ -17,7 +17,9 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010 
  */
 
-actor Stream_Ciphers.Rabbit.Rabbit() uint(size=32) IP1_Key, uint(size=32) IP2_IV, uint(size=8) IP3_KeyStreamSize ==> uint(size=32) OP:
+package Stream_Ciphers.Rabbit;
+
+actor Rabbit() uint(size=32) IP1_Key, uint(size=32) IP2_IV, uint(size=8) IP3_KeyStreamSize ==> uint(size=32) OP:
 
 	// Rabbit state variables.
 	List(type:uint(size=32), size=8) x := [0: for int a in 0 .. 7]; // x state variables

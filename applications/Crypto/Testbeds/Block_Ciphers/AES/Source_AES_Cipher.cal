@@ -11,7 +11,9 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Block_Ciphers.AES.Source_AES_Cipher () ==> uint(size=8) OP1_PT, uint(size=8) OP2_Key, uint(size=8) OP3_GR :
+package Block_Ciphers.AES;
+
+actor Source_AES_Cipher () ==> uint(size=8) OP1_PT, uint(size=8) OP2_Key, uint(size=8) OP3_GR :
 
 	// Test vectors for AES-128 (taken from FIPS 197).
 /*	int KEY_SIZE = 16;

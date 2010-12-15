@@ -11,7 +11,9 @@
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
- actor Block_Ciphers.DES.DES_f_S8 () uint(size=1) IP ==> uint(size=1) OP:
+ package Block_Ciphers.DES;
+
+actor DES_f_S8 () uint(size=1) IP ==> uint(size=1) OP:
 	
 	// S-Box S8.
 /*	List(type:uint(size=4), size=64) S =

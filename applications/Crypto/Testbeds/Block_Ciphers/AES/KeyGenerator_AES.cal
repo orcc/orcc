@@ -9,7 +9,9 @@
  * Developer: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Block_Ciphers.AES.KeyGenerator_AES () ==> uint(size=8) Key :
+package Block_Ciphers.AES;
+
+actor KeyGenerator_AES () ==> uint(size=8) Key :
 
 	int KEY_SIZE = 16;
 	List(type:uint(size=8), size=KEY_SIZE+1) k = [ // Key

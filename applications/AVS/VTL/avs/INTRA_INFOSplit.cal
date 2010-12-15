@@ -3,7 +3,9 @@
 // Function: Split INTRA_INFO.
 // The INTRA_INFO includes 3bits[2:0](INTRA_INFO_SZ=4) in which [2:1] indicate the intra_luma/chroma_pred_mode and [0] indicates pred_mode_flag.
 
-actor avs.INTRA_INFOSplit(
+package avs;
+
+actor INTRA_INFOSplit(
   /*
   int INTRA_INFO_SZ, 
   int BTYPE_SZ,

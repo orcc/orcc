@@ -19,7 +19,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
  
-actor Utilities.Demux8 () uint(size=PORT_SIZE) IP ==> 
+package Utilities;
+
+actor Demux8 () uint(size=PORT_SIZE) IP ==> 
 	uint(size=PORT_SIZE) OP1, uint(size=PORT_SIZE) OP2, uint(size=PORT_SIZE) OP3, uint(size=PORT_SIZE) OP4, 
  	uint(size=PORT_SIZE) OP5, uint(size=PORT_SIZE) OP6, uint(size=PORT_SIZE) OP7, uint(size=PORT_SIZE) OP8:
  		    

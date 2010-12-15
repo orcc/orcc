@@ -19,7 +19,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
  
-actor Utilities.Demux2 () uint(size=PORT_SIZE) IP ==> uint(size=PORT_SIZE) OP1, uint(size=PORT_SIZE) OP2:
+package Utilities;
+
+actor Demux2 () uint(size=PORT_SIZE) IP ==> uint(size=PORT_SIZE) OP1, uint(size=PORT_SIZE) OP2:
  		    
  	// Constants to reconfigure this FU.
  	int PORT_SIZE = 1; 

@@ -16,9 +16,9 @@
 // Note:
 // add BLOCK_SZ to replace BLOCK_SIZE
 
+package avs;
 
-
-actor avs.BlockExpand (
+actor BlockExpand (
   /*
   int SAMPLE_COUNT_SZ,
   int BLOCK_SZ,

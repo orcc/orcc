@@ -31,7 +31,9 @@
 // Function: This module is to calculate address in frame buffer for intra prediction for AVS Jizhun Profile.
 // Note:
 
-actor avs.Mgnt_IntraPred_CHROMA_Addr(
+package avs;
+
+actor Mgnt_IntraPred_CHROMA_Addr(
   /*
   int BTYPE_SZ,
   int NEWVOP,

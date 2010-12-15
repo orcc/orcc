@@ -14,7 +14,9 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor Hash_Functions.SHA_2.SHA_256(bool IS_SHA256) uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
+package Hash_Functions.SHA_2;
+
+actor SHA_256(bool IS_SHA256) uint(size=32) IP1_N, uint(size=32) IP2_M ==> uint(size=32) OP:
 	// Receive the number of messages to be processed and init hash variables for SHA-224.
 	int N := -1; // Number of messages.
 	init:

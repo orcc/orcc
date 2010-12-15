@@ -10,7 +10,9 @@
  * Developers: Shujun Li @ Uni-Konstanz 2010
  */
 
-actor System.Display_Bit () uint(size=1) IP ==> :
+package System;
+
+actor Display_Bit () uint(size=1) IP ==> :
 
 	int BITS_PER_LINE = 8;
 

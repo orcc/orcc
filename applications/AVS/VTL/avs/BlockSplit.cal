@@ -8,7 +8,9 @@
 // Modified by: DandanDing (dandan2036@163.com)
 // Data : 22.02.2008 09:16:52
 
-actor avs.BlockSplit (
+package avs;
+
+actor BlockSplit (
   /*
   int BLOCK_SZ,
   int SAMPLE_SZ,

@@ -11,7 +11,9 @@
 * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
  
-actor Block_Ciphers.DES.DES_IP () uint(size=1) IP ==> uint(size=1) OP:
+package Block_Ciphers.DES;
+
+actor DES_IP () uint(size=1) IP ==> uint(size=1) OP:
 	// Initial permutation table.
 	List(type:uint(size=8), size=64) IPTable =
 	[

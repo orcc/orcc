@@ -8,7 +8,9 @@
 // Data: 22.02.2008 10:18:52 
 
 
-actor avs.BTYPESplit(
+package avs;
+
+actor BTYPESplit(
   /*
   int BTYPE_SZ, 
   int NEWVOP

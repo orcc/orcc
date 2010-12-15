@@ -51,7 +51,9 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-actor avs.Algo_Transpose8x8_row ( 
+package avs;
+
+actor Algo_Transpose8x8_row ( 
 
  ) int(size=14) X ==> int(size=14) Y :
   

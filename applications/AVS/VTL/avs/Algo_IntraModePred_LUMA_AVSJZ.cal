@@ -60,8 +60,9 @@
  4 --> Intra_8x8_Down_Right
 *******************************************************************************************************/
 
+package avs;
 
-actor avs.Algo_IntraModePred_LUMA_AVSJZ (
+actor Algo_IntraModePred_LUMA_AVSJZ (
  /*int MAXW_IN_MB,
  int MB_COORD_SZ,
  int BTYPE_SZ,

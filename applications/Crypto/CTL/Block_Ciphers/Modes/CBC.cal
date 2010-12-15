@@ -26,7 +26,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010 
  */
 
-actor Block_Ciphers.Modes.CBC(uint BLOCK_SIZE=16) uint(size=8) IP1_IV, uint(size=8) IP2_IT, uint(size=8) IP3_FT 
+package Block_Ciphers.Modes;
+
+actor CBC(uint BLOCK_SIZE=16) uint(size=8) IP1_IV, uint(size=8) IP2_IT, uint(size=8) IP3_FT 
 	==> uint(size=8) OP:
 	
 	int BLOCK_SIZE_MAX = 32; // Maximum block size in bytes

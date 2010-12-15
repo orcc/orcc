@@ -17,7 +17,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Block_Ciphers.Modes.Source_AES_CTR_Encipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key, uint(size=8) OP3_PT, uint(size=64) OP4_IDX, uint(size=8) OP5_GR:
+package Block_Ciphers.Modes;
+
+actor Source_AES_CTR_Encipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key, uint(size=8) OP3_PT, uint(size=64) OP4_IDX, uint(size=8) OP5_GR:
 
 	// Test vectors for AES-128 (F.5.1 CTR-AES128.Encrypt).
 	int KEY_SIZE = 16;

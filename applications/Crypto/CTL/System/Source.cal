@@ -29,7 +29,9 @@
  
 // Author: Matthieu Wipliez <mwipliez@users.sourceforge.net>
 
-actor System.Source() ==> uint(size=8) O :
+package System;
+
+actor Source() ==> uint(size=8) O :
 
   // so the actor scheduler will call an initialize function
   initialize ==>

@@ -14,7 +14,9 @@
  * Developers: Junaid Jamee Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Stream_Ciphers.Rabbit.Source_Rabbit () ==> uint(size=8) OP1_Key, uint(size=8) OP2_IV, uint(size=8) OP3_TextSize, uint(size=8) OP4_Text, uint(size=8) OP5_GR:
+package Stream_Ciphers.Rabbit;
+
+actor Source_Rabbit () ==> uint(size=8) OP1_Key, uint(size=8) OP2_IV, uint(size=8) OP3_TextSize, uint(size=8) OP4_Text, uint(size=8) OP5_GR:
 
 	// Test vectors for Rabbit.
 	int TEXT_SIZE = 48;

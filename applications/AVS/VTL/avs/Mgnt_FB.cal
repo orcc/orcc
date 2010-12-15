@@ -10,7 +10,9 @@
 
 // Frame buffer
 
-actor avs.Mgnt_FB ( 
+package avs;
+
+actor Mgnt_FB ( 
  /*
  int BUF_SZ,
  int ADDR_SZ,

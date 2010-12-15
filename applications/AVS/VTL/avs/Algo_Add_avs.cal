@@ -31,8 +31,9 @@
 // Function: This module is to reconstruct picture: combine resduals and preds for AVS Jizhun Profile.
 // Note:
 
+package avs;
 
-actor avs.Algo_Add_avs(
+actor Algo_Add_avs(
  )
   int(size=PIX_SZ) res,
   int(size=PIX_SZ) Pred,

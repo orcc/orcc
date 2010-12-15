@@ -11,7 +11,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
 
-actor Block_Ciphers.DES.Source_DES_Decipher () ==> uint(size=8) OP1_CT, uint(size=8) OP2_Key, uint(size=8) OP3_GR :
+package Block_Ciphers.DES;
+
+actor Source_DES_Decipher () ==> uint(size=8) OP1_CT, uint(size=8) OP2_Key, uint(size=8) OP3_GR :
 
 /*	int KEY_SIZE = 8;
 	List(type:uint(size=8), size=KEY_SIZE) k = [ // Key

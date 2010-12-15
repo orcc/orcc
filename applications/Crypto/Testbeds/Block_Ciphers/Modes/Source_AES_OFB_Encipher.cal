@@ -16,7 +16,9 @@
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor Block_Ciphers.Modes.Source_AES_OFB_Encipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key, uint(size=8) OP3_PT, uint(size=8) OP4_GR:
+package Block_Ciphers.Modes;
+
+actor Source_AES_OFB_Encipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key, uint(size=8) OP3_PT, uint(size=8) OP4_GR:
 
 	// Test vectors for AES-128 (F.4.1 OFB-AES128.Encrypt).
 	int KEY_SIZE = 16;

@@ -12,7 +12,9 @@
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor Stream_Ciphers.ARC4.Source_ARC4 () ==> uint(size=8) OP1_Key, uint(size=8) OP2_PT, uint(size=8) OP3_GR :
+package Stream_Ciphers.ARC4;
+
+actor Source_ARC4 () ==> uint(size=8) OP1_Key, uint(size=8) OP2_PT, uint(size=8) OP3_GR :
 
 	// Test vectors for ARC4.
 	int KEY_SIZE = 16;

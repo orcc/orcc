@@ -34,7 +34,9 @@
 // modify BTYPE output
 // add output INTRA_INFO(3bit)
 
-actor avs.Algo_Synp_AVSJZ(
+package avs;
+
+actor Algo_Synp_AVSJZ(
   /*
   int INTRA,
   int INTER,

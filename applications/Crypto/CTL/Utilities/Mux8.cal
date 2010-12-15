@@ -20,7 +20,9 @@
  * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
  */
  
-actor Utilities.Mux8 ()
+package Utilities;
+
+actor Mux8 ()
 	uint(size=PORT_SIZE) IP1, uint(size=PORT_SIZE) IP2, uint(size=PORT_SIZE) IP3, uint(size=PORT_SIZE) IP4, 
  	uint(size=PORT_SIZE) IP5, uint(size=PORT_SIZE) IP6, uint(size=PORT_SIZE) IP7, uint(size=PORT_SIZE) IP8
 	==> uint(size=PORT_SIZE) OP:

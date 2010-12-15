@@ -16,7 +16,9 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
  
-actor PRNGs.LCG.Source_LCG32() ==> uint(size=32) OP1_Params, uint OP2_StreamSize, uint(size=32) OP3_GR:
+package PRNGs.LCG;
+
+actor Source_LCG32() ==> uint(size=32) OP1_Params, uint OP2_StreamSize, uint(size=32) OP3_GR:
 	
 	// Test parameters for LCG32 taken from [1].
 	uint(size=32) a = 0x00002455;

@@ -47,8 +47,9 @@
   
 *******************************************************************************************************/
 
+package avs;
 
-actor avs.Algo_IQ_AVSJZ( 
+actor Algo_IQ_AVSJZ( 
 )   
   int(size=SAMPLE_SZ) IQ_IN, 
   int(size=BTYPE_SZ) BTYPE 

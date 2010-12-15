@@ -54,9 +54,9 @@
  TA sequence of 64 outputs of intra prediction. It is in a horizontal raster order.
 *********************************************************************************************************/
 
+package avs;
 
-
-actor avs.Algo_IntraPred_LUMA_8x8_AVSJZ ( 
+actor Algo_IntraPred_LUMA_8x8_AVSJZ ( 
 /*int PIX_SZ*/
  )
   //int(size=PIX_SZ) Y_LEFT,     // List

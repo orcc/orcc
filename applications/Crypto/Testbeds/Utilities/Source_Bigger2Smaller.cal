@@ -4,7 +4,9 @@
  * Developer: Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
-actor Utilities.Source_Bigger2Smaller () ==> uint(size=32) OP:
+package Utilities;
+
+actor Source_Bigger2Smaller () ==> uint(size=32) OP:
 
 	bool dataSent := false;
 	
