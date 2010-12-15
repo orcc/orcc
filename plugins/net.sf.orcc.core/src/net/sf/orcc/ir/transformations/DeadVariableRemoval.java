@@ -97,9 +97,8 @@ public class DeadVariableRemoval extends AbstractActorTransformation {
 				// clean up target
 				call.setTarget(null);
 
-				// do not remove call instruction because it may have
-				// side-effects
-				// maybe something worth checking later
+				// remove instruction
+				instructionIterator.remove();
 
 				// remove result
 				procedure.getLocals().remove(variable.getName());
