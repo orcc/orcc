@@ -434,17 +434,20 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 	SendMv4Direct.Launch: action
 			DirectPredLX_In :[other_direct_pred_lx]
 				==>
-			Location  :[Blk_x_in_pix,Blk_y_in_pix],
-			MvOut     :[MvTab[Idx_CurrBlk][IdxPartition][0],MvTab[Idx_CurrBlk][IdxPartition][1]],
-			RefIdxOut :[RefIdxTab[Idx_CurrBlk][IdxPartition]],
-			NewPic_o  :[false]
+			Location  :[ListLocation] repeat 8,
+			MvOut     :[ListMv] repeat 8,
+			RefIdxOut :[ListRefIdx] repeat 4,
+			NewPic_o  :[false , false , false , false]
 		guard
 			MbPartIdx < MbPartIdxMax,
 			direct_pred_lx[MbPartIdx&3] or (not other_direct_pred_lx)
 		var
 			uint(size=11) Blk_x_in_pix := Mbx_in_pix,
 			uint(size=11) Blk_y_in_pix := Mby_in_pix,
-			uint(size=4)  IdxPartition = 4 * MbPartIdx
+			uint(size=4)  IdxPartition = 4 * MbPartIdx,
+			List(type: uint(size=11), size=8) ListLocation,
+			List(type:  int(size=16), size=8) ListMv,
+			List(type: uint(size=4) , size=4) ListRefIdx
 		do
 			Blk_x_in_pix := Blk_x_in_pix + 8 * (MbPartIdx&1);
 			Blk_y_in_pix := Blk_y_in_pix + 8 * ((MbPartIdx>>1)&1);
@@ -453,6 +456,15 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 				do
 					RefIdxTab[Idx_CurrBlk][IdxPartition + i] := 0;
 				end
+			end
+			//Foreach 4x4 Sub-macroblocks :
+			foreach int i in 0 .. 3
+			do
+				ListLocation[2*i]     := Blk_x_in_pix + 4*(i&1);
+				ListLocation[2*i + 1] := Blk_y_in_pix + 4*((i>>1)&1);
+				ListMv      [2*i]     := MvTab[Idx_CurrBlk][IdxPartition][0];
+				ListMv      [2*i + 1] := MvTab[Idx_CurrBlk][IdxPartition][1];
+				ListRefIdx  [i]       := RefIdxTab[Idx_CurrBlk][IdxPartition];
 			end
 			MbPartIdx := MbPartIdx + 1;
 		end

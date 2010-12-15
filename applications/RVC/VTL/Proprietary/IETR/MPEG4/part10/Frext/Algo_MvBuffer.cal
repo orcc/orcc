@@ -60,6 +60,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 	bool          NewPic,
 
 	uint(size=32) Poc,
+	bool          DirectSpatialMvPredFlag,
 	bool          Direct8x8Inference,
 
 	uint(size=13) CurrMbAddr,
@@ -114,15 +115,17 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 	uint(size=32) Mbx;
 	uint(size=32) Mby;
 	bool          direct_8x8_inference_flag;
+	bool          direct_spatial_mv_pred;
 
 	uint(size=4) NbPartitionsToWrite;
 	List(type: uint(size=32), size=16) Partition_Mbx;
 	List(type: uint(size=32), size=16) Partition_Mby;
 
 	GetNewPic: action
-			NewPic             :[IsNewPic],
-			Poc                :[Picture_Order_Count],
-			Direct8x8Inference :[Direct8x8InferFlag]
+			NewPic                  :[IsNewPic],
+			Poc                     :[Picture_Order_Count],
+			Direct8x8Inference      :[Direct8x8InferFlag],
+			DirectSpatialMvPredFlag :[DirectSpatialMv]
 				==>
 		guard
 			IsNewPic
@@ -139,6 +142,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 			IsReference[WriteListIdx] := true;
 			ListPoc    [WriteListIdx] := Picture_Order_Count;
 			direct_8x8_inference_flag := Direct8x8InferFlag;
+			direct_spatial_mv_pred    := DirectSpatialMv;
 		end
 
 	GetMbType.MacroBlkIorSI: action
@@ -248,8 +252,8 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 		do
 			mb_type      := MacroBlkType;
 			MbPartIdx    := 0;
-			MbPartIdxMax := 4;
-			SizeMbMv     := SZ_8x8;
+			MbPartIdxMax := 16;
+			SizeMbMv     := SZ_4x4;
 			Mbx := Curr_Mb_Addr mod PicWidth;
 			Mby := Curr_Mb_Addr  /  PicWidth;
 			//There are 16 Partitions in a macroblock
@@ -391,9 +395,7 @@ actor Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer()
 				==>
 		guard
 			MbPartIdx  < MbPartIdxMax,
-			SizeMbMv   = SZ_8x8,
-			mb_type   != BLOCK_TYPE_B_SKIP,
-			mb_type   != BLOCK_TYPE_B_DIRECT_16x16
+			SizeMbMv   = SZ_8x8
 		do
 			SubMbPartIdx    :=  0;
 			SubMbPartIdxMax :=  NumSubMbPart(mb_type,ValSubMbType);
