@@ -414,7 +414,6 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 						do
 							MvTab[Idx_CurrBlk][4*i+j] := [0,0];
 						end
-						direct_pred_lx[i] := false;
 					else
 						ComputeMvPredL0(RefIdxLX_Direct,RefIdxA,RefIdxB,RefIdxC);
 						foreach int j in 0 .. 3
@@ -422,8 +421,8 @@ actor Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext(bool IsPredL0
 							MvTab[Idx_CurrBlk][4*i+j][0] := OMv[0];
 							MvTab[Idx_CurrBlk][4*i+j][1] := OMv[1];
 						end
-						direct_pred_lx[i] := true;
 					end
+					direct_pred_lx[i] := (RefIdxLX_Direct >= 0);
 				end
 			else //temporal prediction
 				println("GetMbType.B_Skip_B_Direct_16x16 : temporal prediction for B_Skip not implemented yet !!");
