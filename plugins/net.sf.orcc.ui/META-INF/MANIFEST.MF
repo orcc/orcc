@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Orcc UI
 Bundle-SymbolicName: net.sf.orcc.ui;singleton:=true
-Bundle-Version: 0.9.1.v20101124
+Bundle-Version: 0.9.2.v20101216
 Bundle-Activator: net.sf.orcc.ui.OrccActivator
 Require-Bundle: net.sf.graphiti.model,
  net.sf.orcc.core,

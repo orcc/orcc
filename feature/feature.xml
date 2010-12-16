@@ -2,7 +2,7 @@
 <feature
       id="net.sf.orcc"
       label="Orcc"
-      version="0.9.1.v20101124"
+      version="0.9.2.v20101216"
       provider-name="IETR/INSA Rennes">
 
    <description url="http://orcc.sf.net">
@@ -49,8 +49,12 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
    </license>
 
    <url>
-      <update url="http://orcc.sf.net/eclipse"/>
+      <update label="Orcc Project Update Site" url="http://orcc.sf.net/eclipse/"/>
    </url>
+
+   <requires>
+      <import feature="net.sf.graphiti" version="1.2.0.v20101216" match="greaterOrEqual"/>
+   </requires>
 
    <plugin
          id="net.sf.orcc.core"

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Orcc simulators plug-in
 Bundle-SymbolicName: net.sf.orcc.simulators;singleton:=true
-Bundle-Version: 0.9.1.v20101124
+Bundle-Version: 0.9.2.v20101216
 Bundle-Activator: net.sf.orcc.simulators.Activator
 Require-Bundle: net.sf.orcc.core,
  org.eclipse.core.runtime,
