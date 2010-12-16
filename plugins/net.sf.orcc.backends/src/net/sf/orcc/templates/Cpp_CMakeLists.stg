@@ -21,7 +21,7 @@ endif(MSVC)
 
 # Common packages required
 find_library(CALaka_LIBRARY CALaka HINTS \$ENV{CALDIR} PATH_SUFFIXES lib)
-find_library(Orcc_LIBRARY Orcc HINTS \$ENV{CALDIR} PATH_SUFFIXES lib)
+find_library(SystemActor_LIBRARY SystemActor HINTS \$ENV{CALDIR} PATH_SUFFIXES lib)
 find_library(Thread_LIBRARY Thread HINTS \$ENV{CALDIR} PATH_SUFFIXES lib)
 
 find_path(CAL_INCLUDE_DIR actoraka.h HINTS \$ENV{CALDIR} PATH_SUFFIXES include include/CAL)
@@ -56,7 +56,7 @@ Wrapper
 \${AdaptorFactory_LIBRARY}
 $endif$
 \${CALaka_LIBRARY}
-\${Orcc_LIBRARY}
+\${SystemActor_LIBRARY}
 \${Thread_LIBRARY}
 \${SDL_LIBRARY}
 )
