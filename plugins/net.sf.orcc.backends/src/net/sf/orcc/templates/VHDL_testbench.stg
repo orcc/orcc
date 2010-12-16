@@ -307,7 +307,7 @@ $  ---------------------------------------------------------------------------
 
 begin
 
-  $instance.actor.name$_orcc : entity work.$instance.actor.name$
+  $instance.actor.simpleName$_orcc : entity work.$instance.actor.simpleName$
     port map (
       clock      => clock,
       reset_n    => reset_n,

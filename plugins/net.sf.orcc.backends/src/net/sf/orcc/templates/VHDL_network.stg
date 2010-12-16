@@ -204,7 +204,7 @@ printActor(instance) ::= <<
 
 $if (instance.actor)
   $$if (!instance.actor.system)
-  $$instance.id$ : entity work.$instance.actor$
+  $$instance.id$ : entity work.$instance.actor.simpleName$
   port map (
     $printActorPorts(instance)$
     clock     => clock, 
@@ -225,7 +225,7 @@ $if (!instance.actor)
     clock     => clock, 
     reset_n   => reset_n);$
   else
-  $$printBroadcastPorts(instance)$);$
+  $$printBroadcastPorts(instance)$$
   endif$$
 endif$
 >>

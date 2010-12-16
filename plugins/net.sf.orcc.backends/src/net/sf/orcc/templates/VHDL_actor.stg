@@ -500,7 +500,7 @@ end process $port.name$_management;
 ///////////////////////////////////////////////////////////////////////////////
 
 Actor_Scheduler(actor) ::= <<
-$actor$_sceduler : process($sensitivity(actor)$)
+$actor.simpleName$_sceduler : process($sensitivity(actor)$)
   $actor.actions : printActionLocalSchedul()$--
 begin
   $actor.actions: printTemplateDataScheduler(); separator="\n\n"$
@@ -552,14 +552,18 @@ $procedure(procedure=action.scheduler, transformReturn="true")$
 
 printActionFire(action) ::= <<
 ((isSchedulable_$action$_go $action.inputPattern.keys : {port| and $port.name$_send }$) = '1') then
-$if(action.outputPattern.keys)
+$if(action.inputPattern.keys)
+$$ if(action.outputPattern.keys)
 $    $action$_go  <= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$;
     $action.inputPattern.keys : {
-      port|$port.name$_ack <= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$} ; separator="\n"$;$
-else
+      port|$port.name$_ack <= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$} ; separator=";\n"$;$
+  else
 $    $action$_go  <= isSchedulable_$action$_go;
     $action.inputPattern.keys : {port|$port.name$_ack <= isSchedulable_$action$_go;} ; separator="\n"$$
-endif$
+  endif$$
+else
+$    $action$_go  <= isSchedulable_$action$_go;$
+endif$  
 >>
 
 printActionFireFSM(actions, fsm) ::= <<
@@ -578,7 +582,7 @@ $$actor.actions : {actions|$actions$_go  <= '0';}; separator="\n  "$
   $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
   case FSM is
 $fsm.transitions: TransitionFire(); separator="\n\n"$
-end case;$
+  end case;$
 endif$
 >>
 
