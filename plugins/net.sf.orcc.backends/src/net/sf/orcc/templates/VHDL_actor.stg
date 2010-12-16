@@ -30,7 +30,7 @@ endif$
 
 port_out_init(port) ::=<<
 
-$port.name$_send <= '0';
+$port.name$_isend <= '0';
 $if(port.type.bool)
 $$port.name$_data  <= '0';$
 else
@@ -451,6 +451,50 @@ $procedure(procedure=action.body)$
 >>
 
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Management of intercommunications 
+///////////////////////////////////////////////////////////////////////////////
+
+RdyManag(port) ::= <<
+$port.name$_management : process(reset_n, $port.name$_ack, $port.name$_isend, $port.name$FSM_out)
+begin
+  if reset_n = '0' then
+    $port.name$_rdy     <= '0';
+    $port.name$_send    <= '0';
+    $port.name$FSM_out   <= waitSend;
+  else
+    case $port.name$FSM_out is
+      when waitSend =>
+        if $port.name$_isend = '1' then
+          $port.name$_rdy    <= '1';
+          $port.name$_send   <= '1';
+          $port.name$FSM_out <= waitAck;
+        else
+          $port.name$_rdy    <= '1';
+          $port.name$_send   <= '0';
+          $port.name$FSM_out <= waitSend;
+        end if;
+      when waitAck =>
+        if $port.name$_ack = '1' and $port.name$_isend = '1' then
+          $port.name$_rdy    <= '1';
+          $port.name$_send   <= '1';
+          $port.name$FSM_out <= waitAck;
+        elsif $port.name$_ack = '1' then
+          $port.name$_rdy    <= '1';
+          $port.name$_send   <= '0';
+          $port.name$FSM_out <= waitSend;
+        else
+          $port.name$_rdy    <= '0';
+          $port.name$_send   <= '1';
+          $port.name$FSM_out <= waitAck;
+        end if;
+      when others => null;
+    end case;
+  end if;
+end process $port.name$_management;
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Scheduler process
 ///////////////////////////////////////////////////////////////////////////////
@@ -554,21 +598,19 @@ actionFire(nextstate) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 Actor_Exec(actor) ::= <<
-$actor.name$_execute : process (reset_n, clock) is
+$actor.simpleName$_execute : process (reset_n, clock) is
   $actor.actions: printActionLocalBody()$  --
 begin
   if reset_n = '0' then 
     $actor.stateVars.list: stateConst(); separator="\n"$     
     --
     $actor.outputs.list : port_out_init()$
-    $actor.inputs.list  :{port|$port.name$_rdy   <= '0';}; separator="\n"$    
-    $actor.outputs.list :{port|$port.name$_first <= '1';}; separator="\n"$    
 $if(actor.actionScheduler.fsm)    
 $    FSM    <= s_$actor.actionScheduler.fsm.initialState$;
 $
 endif$  --
   elsif rising_edge(clock) then
-    $actor.outputs.list :{port|$port.name$_send <= '0';}; separator="\n"$
+    $actor.outputs.list :{port|$port.name$_isend <= '0';}; separator="\n"$
     --  
 $if(actor.actionScheduler.fsm)    
 $    $executeCoreFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
@@ -577,7 +619,7 @@ $    $executeCore(actor.actions)$$
 endif$
 
   end if;
-end process $actor.name$_execute;
+end process $actor.simpleName$_execute;
 
 >>
 
@@ -590,7 +632,7 @@ actionTestSceduler(action) ::= <<
 writeManagement(port) ::= <<
 $if(action.outputPattern.(port))
 $
-  $port.name$_send <= '1';$
+  $port.name$_isend <= '1';$
 endif$
 >>
 
@@ -612,16 +654,6 @@ executeIndent(actions) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 // Core of an action - WITH FSM
 
-DefineFSM(actions, fsm) ::= <<
-$if(fsm)
-$---------------------------------------------------------------------------
--- FSM
----------------------------------------------------------------------------
-type FSM_type is ($fsm.states: {s_$it$}; separator=", "$);
-signal FSM : FSM_type;$
-endif$
-
->>
 
 executeCoreFSM(actions, fsm) ::= <<
 $if(actions)
@@ -659,7 +691,7 @@ actionTestState(nextState) ::= <<
 
 actor(actor, options) ::= <<
 ------------------------------------------------------------------------------
--- Generated from $actor.name$ actor
+-- Generated from $actor.simpleName$ actor
 ------------------------------------------------------------------------------
 
 library ieee;
@@ -671,26 +703,26 @@ use work.orcc_package.all;
 
 ------------------------------------------------------------------------------
 
-entity $actor.name$ is
+entity $actor.simpleName$ is
   port (
   -- Inputs
   clock    : in  std_logic;
   reset_n  : in  std_logic;
   $actor.inputs.list: port_in()$  -- Outputs
   $actor.outputs.list: port_out(); separator=";\n"$);  
-end $actor.name$;
+end $actor.simpleName$;
 
 ------------------------------------------------------------------------------
 
-architecture rtl_$actor.name$ of $actor.name$ is
+architecture rtl_$actor.simpleName$ of $actor.simpleName$ is
 
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
   $actorParameters(actor.parameters)$
   $actor.actions:       {action| signal $action$_go    : std_logic;}; separator="\n"$
-  $actor.outputs.list : {port| signal $port.name$_rdy   : std_logic;}; separator="\n"$
-  $actor.outputs.list : {port| signal $port.name$_first : std_logic;}; separator="\n"$
+  $actor.outputs.list : {port| signal $port.name$_rdy   : std_logic;}; separator="\n"$ -- Internal rdy
+  $actor.outputs.list : {port| signal $port.name$_isend : std_logic;}; separator="\n"$ -- Internal send
   --
   $actor.stateVars.list: signalDeclaration()$
 
@@ -701,16 +733,26 @@ $  ---------------------------------------------------------------------------
   $actor.procs.list: {$function(procedure=it)$}; separator="\n"$$
 endif$
 
-  $DefineFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
+  ---------------------------------------------------------------------------
+  -- FSM
+  ---------------------------------------------------------------------------
+  type FSM_out_type is (waitSend, waitAck);
+  $actor.outputs.list : {port| signal $port.name$FSM_out : FSM_out_type;}; separator="\n"$
+  $if(actor.actionScheduler.fsm)
+  $  --
+  type FSM_type is ($actor.actionScheduler.fsm.states: {s_$it$}; separator=", "$);
+  signal FSM : FSM_type;$
+  endif$
+
 
 begin
 
-  $actor.outputs.list : {port|$port.name$_rdy <= ($port.name$_send and $port.name$_ack) or $port.name$_first}; separator=";\n"$;
+  $actor.outputs.list : RdyManag(); separator="\n\n"$
 
   $Actor_Scheduler(actor)$
   
   $Actor_Exec(actor)$
 
-end architecture rtl_$actor.name$;
+end architecture rtl_$actor.simpleName$;
 
 >>
