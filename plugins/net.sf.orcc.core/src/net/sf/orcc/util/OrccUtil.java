@@ -143,7 +143,7 @@ public class OrccUtil {
 	 * @return the folder that corresponds to the package of the given actor
 	 */
 	public static String getFolder(Actor actor) {
-		return actor.getPackage().replace('.', '\\');
+		return actor.getPackage().replace('.', '/');
 	}
 
 	/**
