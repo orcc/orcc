@@ -48,6 +48,7 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.network.Network;
 import net.sf.orcc.network.transformations.BroadcastAdder;
+import net.sf.orcc.util.OrccUtil;
 
 /**
  * Java back-end.
@@ -113,8 +114,12 @@ public class JavaBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
-		String name = actor.getName();
-		String outputName = path + File.separator + "Actor_" + name + ".java";
+		// Create folder if necessary
+		String folder = path + File.separator + OrccUtil.getFolder(actor);
+		new File(folder).mkdirs();
+
+		// Set output file name for this actor
+		String outputName = folder + File.separator + "Actor_" + actor.getSimpleName()+ ".java";
 		try {
 			return printer.printActor(outputName, actor);
 		} catch (IOException e) {

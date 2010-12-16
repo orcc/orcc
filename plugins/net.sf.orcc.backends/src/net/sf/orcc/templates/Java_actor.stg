@@ -337,7 +337,7 @@ actor(actor, options) ::= <<
 /**
  * Generated from "$actor.name$"
  */
-package net.sf.orcc.generated;
+package net.sf.orcc.generated.$actor.package$;
 
 import net.sf.orcc.runtime.*;
 import net.sf.orcc.runtime.actors.IActor;
