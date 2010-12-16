@@ -41,7 +41,7 @@ $parameters: parameter(); wrap, separator=", "$
 
 constructActor(instance) ::= <<
 $if (instance.actor)$
-actor_$instance.id$ = new Actor_$instance.actor.name$($parameters(instance.actor.parameters.list)$);
+actor_$instance.id$ = new $instance.actor.package$.Actor_$instance.actor.simpleName$($parameters(instance.actor.parameters.list)$);
 $endif$
 >>
 

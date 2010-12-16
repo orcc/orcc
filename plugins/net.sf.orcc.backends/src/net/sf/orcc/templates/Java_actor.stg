@@ -342,7 +342,7 @@ package net.sf.orcc.generated.$actor.package$;
 import net.sf.orcc.runtime.*;
 import net.sf.orcc.runtime.actors.IActor;
 
-public class Actor_$actor.name$ implements IActor {
+public class Actor_$actor.simpleName$ implements IActor {
 
 
 	// Input FIFOs
@@ -354,7 +354,7 @@ public class Actor_$actor.name$ implements IActor {
 	// State variables of the actor
 	$actor.stateVars.list: stateVar()$
 	
-	public Actor_$actor.name$($declareParameters(actor.parameters.list)$) {
+	public Actor_$actor.simpleName$($declareParameters(actor.parameters.list)$) {
 		$setParameters(actor.parameters.list)$
 	}
 	
