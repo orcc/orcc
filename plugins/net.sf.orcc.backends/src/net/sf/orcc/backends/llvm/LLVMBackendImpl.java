@@ -55,6 +55,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
+import net.sf.orcc.util.OrccUtil;
 
 /**
  * LLVM back-end.
@@ -171,7 +172,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	@Override
 	protected boolean printActor(Actor actor) throws OrccException {
-		String outputName = path + File.separator + actor.getName() + ".s";
+		// Create folder if necessary
+		String folder = path + File.separator + OrccUtil.getFolder(actor);
+		new File(folder).mkdirs();
+
+		// Set output file name for this actor
+		String outputName = folder + File.separator + actor.getSimpleName()
+				+ ".s";
 
 		try {
 			boolean cached = printer.printActor(outputName, actor);
@@ -192,7 +199,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 	private void printBitcode(String execPath, String inputName, String actor) {
 		List<String> cmdList = new ArrayList<String>();
-		String outputName = path + File.separator + actor + ".bc";
+		String outputName = inputName.replace(".s", ".bc");
 
 		cmdList.add(execPath);
 		cmdList.add(inputName);

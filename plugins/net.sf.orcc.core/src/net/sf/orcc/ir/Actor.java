@@ -221,9 +221,9 @@ public class Actor implements Comparable<Actor> {
 	}
 
 	/**
-	 * Returns the simple name of this actor.
+	 * Returns the package of this actor.
 	 * 
-	 * @return the simple name of this actor
+	 * @return the package of this actor
 	 */
 	public String getPackage() {
 		int index = name.lastIndexOf('.');
