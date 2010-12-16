@@ -362,11 +362,12 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			FirstMbInSlice   :[Fst_Mb],
 			PicWidthInMb     :[pic_width_in_mb]
 				==>
-			DirectPredLX_Out :[direct_pred_lx,direct_pred_lx,direct_pred_lx,direct_pred_lx]
+			DirectPredLX_Out :[ListDirectPred] repeat 4//16
 		guard
 			not IsNewPic,
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
 		var
+			List(type: bool, size=16) ListDirectPred,
 			int(size=5) RefIdxLX_Direct
 		do
 			Mbx_in_pix := (Curr_Mb_Addr mod pic_width_in_mb)*16;
@@ -404,11 +405,12 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			if(direct_spatial_mv_pred)then // spatial prediction
 				GetNeighbourBlockParameters (0,16);
 				RefIdxLX_Direct := MinPositive(RefIdxA,MinPositive(RefIdxB,RefIdxC));
+				direct_pred_lx := (RefIdxLX_Direct >= 0);
 				foreach int i in 0 .. 15
 				do
 					RefIdxTab[Idx_CurrBlk][i] := RefIdxLX_Direct;
+					ListDirectPred[i]         := direct_pred_lx;
 				end
-				direct_pred_lx := (RefIdxLX_Direct >= 0);
 				foreach int i in 0 .. 3
 				do
 					if(RefIdxLX_Direct < 0 or RefIdxLX_Direct = 0 and TabColZero[i])then
@@ -431,7 +433,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		end
 
 	GetOtherDirectPredLx: action
-			DirectPredLX_In :[other_direct_pred_lx]repeat 4
+			DirectPredLX_In :[other_direct_pred_lx]repeat 4//16
 				==>
 		do
 			if( (not direct_pred_lx) and (not other_direct_pred_lx[0]))then
@@ -445,10 +447,10 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	SendMv4Direct.Launch: action
 				==>
-			Location  :[ListLocation] repeat 8,
-			MvOut     :[ListMv]       repeat 8,
-			RefIdxOut :[ListRefIdx]   repeat 4,
-			NewPic_o  :[false,false,false,false]
+			Location  :[ListLocation] repeat 8,//32
+			MvOut     :[ListMv]       repeat 8,//32
+			RefIdxOut :[ListRefIdx]   repeat 4,//16
+			NewPic_o  :[false,false,false,false]//:[FalseList] repeat 16
 		guard
 			direct_pred_lx
 		var

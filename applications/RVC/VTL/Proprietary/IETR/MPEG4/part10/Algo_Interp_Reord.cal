@@ -54,10 +54,10 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 			MbType :[MacroBlkType]
 				==>
 		do
-			mb_type       := MacroBlkType;
-			MbPartIdx     := 0;
-			MbPartIdxMax  := NumMbPart(MacroBlkType);
-			SizeMb        := SizeMbPart(MacroBlkType);
+			mb_type      := MacroBlkType;
+			MbPartIdx    := 0;
+			MbPartIdxMax := NumMbPart(MacroBlkType);
+			SizeMb       := SizeMbPart(MacroBlkType);
 		end
 
 	GetListSel4Mb: action
@@ -65,9 +65,7 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 				==>
 		guard
 			MbPartIdx  < MbPartIdxMax,
-			   SizeMb    != SZ_8x8
-			or mb_type = BLOCK_TYPE_B_SKIP
-			or mb_type = BLOCK_TYPE_B_DIRECT_16x16
+			SizeMb    != SZ_8x8
 		do
 			NbListToGet :=
 				if(list_selected != BIPRED)then
@@ -163,9 +161,7 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 				==>
 		guard
 			MbPartIdx  < MbPartIdxMax,
-			SizeMb     = SZ_8x8,
-			mb_type   != BLOCK_TYPE_B_SKIP,
-			mb_type   != BLOCK_TYPE_B_DIRECT_16x16
+			SizeMb     = SZ_8x8
 		do
 			SubMbPartIdx    := 0;
 			SubMbPartIdxMax := NumSubMbPart(mb_type,ValSubMbType);

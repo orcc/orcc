@@ -250,8 +250,8 @@ actor Algo_MvBuffer()
 		do
 			mb_type      := MacroBlkType;
 			MbPartIdx    := 0;
-			MbPartIdxMax := 4;
-			SizeMbMv     := SZ_8x8;
+			MbPartIdxMax := 4;//16
+			SizeMbMv     := SZ_4x4;
 			Mbx := Curr_Mb_Addr mod PicWidth;
 			Mby := Curr_Mb_Addr  /  PicWidth;
 			//There are 16 Partitions in a macroblock
@@ -393,9 +393,7 @@ actor Algo_MvBuffer()
 				==>
 		guard
 			MbPartIdx  < MbPartIdxMax,
-			SizeMbMv   = SZ_8x8,
-			mb_type   != BLOCK_TYPE_B_SKIP,
-			mb_type   != BLOCK_TYPE_B_DIRECT_16x16
+			SizeMbMv   = SZ_8x8
 		do
 			SubMbPartIdx    :=  0;
 			SubMbPartIdxMax :=  NumSubMbPart(mb_type,ValSubMbType);

@@ -161,7 +161,7 @@ unit Imp_MacroBlockInfo :
 
 	List(type: uint(size=3),size=32) SizeMb_B =
 		[
-			 SZ_8x8, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
+			 SZ_4x4, SZ_16x16, SZ_16x16, SZ_16x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
 			SZ_16x8,  SZ_8x16,  SZ_16x8,  SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16, SZ_16x8, SZ_8x16,
 			SZ_16x8,  SZ_8x16,   SZ_8x8,   SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,  SZ_8x8,
 			 SZ_8x8,  SZ_8x8
@@ -298,7 +298,7 @@ unit Imp_MacroBlockInfo :
 						if(MbType = BLOCK_TYPE_P_SKIP) then
 							SZ_16x16
 						else
-							SZ_8x8
+							SZ_4x4
 						end
 					end
 				end
