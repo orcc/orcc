@@ -269,7 +269,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 
 actionTrace(action) ::= <<
 #ifdef __TRACE_CAPTURE__
-g_oTracer.captureAction(this, "$action.simpleName$");
+g_oTracer.captureAction(this, "$action.name$");
 #endif
 >>
 
