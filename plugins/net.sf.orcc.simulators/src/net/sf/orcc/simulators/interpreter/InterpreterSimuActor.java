@@ -140,7 +140,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	 */
 	public InterpreterSimuActor(String instanceId,
 			Map<String, Expression> actorParameters, Actor actorIR,
-			List<String> vtlFolders, OrccProcess process) {
+			OrccProcess process) {
 		this.process = process;
 
 		this.instanceId = instanceId;
@@ -191,7 +191,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 	public String getActorName() {
 		return actorIR.getName();
 	}
-
+	
 	@Override
 	public String getFileName() {
 		return actorIR.getFile();
@@ -256,7 +256,8 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 		if (node.nbSubNodes > 0) {
 			if (node.subNodeIdx == node.nbSubNodes) {
 				if ((node.condition != null)
-						&& ((BoolExpr)node.condition.accept(exprEvaluator)).getValue()) {
+						&& ((BoolExpr) node.condition.accept(exprEvaluator))
+								.getValue()) {
 					node.subNodeIdx = 0;
 					exeStmt = true;
 				} else {
@@ -276,7 +277,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 				if (subNode instanceof IfNode) {
 					Object condition = ((IfNode) subNode).getValue().accept(
 							exprEvaluator);
-					if (((BoolExpr)condition).getValue()) {
+					if (((BoolExpr) condition).getValue()) {
 						nodeStack.add(new NodeInfo(0, ((IfNode) subNode)
 								.getThenNodes().size(), ((IfNode) subNode)
 								.getThenNodes(), ((IfNode) subNode)
@@ -291,7 +292,7 @@ public class InterpreterSimuActor extends AbstractInterpreterSimuActor
 					exeStmt = true;
 				} else if (subNode instanceof WhileNode) {
 					Expression condition = ((WhileNode) subNode).getValue();
-					if (((BoolExpr)condition.accept(exprEvaluator)).getValue()) {
+					if (((BoolExpr) condition.accept(exprEvaluator)).getValue()) {
 						nodeStack.add(new NodeInfo(0, ((WhileNode) subNode)
 								.getNodes().size(), ((WhileNode) subNode)
 								.getNodes(), null, condition));
