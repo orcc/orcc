@@ -182,9 +182,6 @@ $endif$
 	void getFifoStatus();
 
 	private:
-#ifdef __TRACE_CAPTURE__
-	TraceCapture m_actionTracer;
-#endif
 	static char* className;
 
 	////////////////////////////////////////////////////////////////////////////////
