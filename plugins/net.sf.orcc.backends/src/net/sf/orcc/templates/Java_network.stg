@@ -41,7 +41,11 @@ $parameters: parameter(); wrap, separator=", "$
 
 constructActor(instance) ::= <<
 $if (instance.actor)$
-actor_$instance.id$ = new $instance.actor.package$.Actor_$instance.actor.simpleName$($parameters(instance.actor.parameters.list)$);
+$if(instance.actor.actions.empty)$
+actor_$instance.id$ = new Actor_$instance.actor.simpleName$($parameters(instance.actor.parameters.list)$);
+$else$
+actor_$instance.id$ = new net.sf.orcc.generated.$instance.actor.package$.Actor_$instance.actor.simpleName$($parameters(instance.actor.parameters.list)$);
+$endif$
 $endif$
 >>
 
