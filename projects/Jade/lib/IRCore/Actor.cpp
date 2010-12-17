@@ -125,6 +125,26 @@ Type* Actor::getFifoType(string name) {
 	return (*it).second;
 }
 
+string Actor::getPackage() {
+	int index = name.rfind('.');
+
+	if (index == string::npos){
+		return "";
+	}
+
+	return name.substr(0, index);
+}
+
+string Actor::getSimpleName() {
+	int index = name.rfind('.');
+
+	if (index == string::npos){
+		return "";
+	}
+
+	return name.substr(index + 1);
+}
+
 Port* Actor::getOutput(string portName){
 	if (outputs->empty()){
 		return NULL;

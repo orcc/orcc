@@ -120,12 +120,28 @@ public:
 	std::map<std::string, Variable*>* getParameters(){return parameters;};
 
 	/**
+     *  @brief Return the package of this actor
+	 *
+	 *  @return the package of this actor
+	 *
+     */
+	Variable* getParameter(std::string name);
+
+	/**
      *  @brief Return the Parameter corresponding to the given name
 	 *
 	 *  @return the Parameter corresponding to the given name
 	 *
      */
-	Variable* getParameter(std::string name);
+	std::string getPackage();
+
+	/**
+     *  @brief Returns the simple name of this actor
+	 *
+	 *  @return the simple name of this actor
+	 *
+     */
+	std::string getSimpleName();
 
 	/**
      *  @brief Getter of actor name
