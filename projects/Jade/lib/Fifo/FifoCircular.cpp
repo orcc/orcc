@@ -89,14 +89,14 @@ void FifoCircular::parseHeader (){
 	//Create the parser
 	LLVMParser parser(Context, ToolsDir);
 
-	header = parser.loadBitcode("FifoCircular");
+	header = parser.loadBitcode("System", "FifoCircular");
 
 	if (header == NULL){
 		cerr << "Unable to parse fifo header file";
 		exit(0);
 	}
 
-	externMod = parser.loadBitcode("Extern");
+	externMod = parser.loadBitcode("System", "Extern");
 
 	if (externMod == NULL){
 		cerr << "Unable to parse extern functions file";

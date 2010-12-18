@@ -89,18 +89,21 @@ IRParser::IRParser(llvm::LLVMContext& C, AbstractFifo* fifo) : Context(C){
 
 
 Actor* IRParser::parseActor(string classz){
-    size_t found=classz.find_last_of("/");;
+    size_t found=classz.find_last_of(".");;
 	string file;
+	string package;
 
 	if (found!=string::npos){
-		file = classz.substr(found + 1);
+		file = classz.substr(found+1);
+		package = classz.substr(0, found);
 	}else {
 		file = classz;
+		package = "";
 	}
 	
 	//Parse the bitcode
 	LLVMParser parser(Context, VTLDir);
-	Module* module = parser.loadBitcode(file);
+	Module* module = parser.loadBitcode(package, file);
 
 	if (module == 0){
 		cerr << "Error when parsing bytecode";

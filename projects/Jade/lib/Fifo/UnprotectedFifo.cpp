@@ -88,7 +88,7 @@ void UnprotectedFifo::parseHeader (){
 	//Create the parser
 	LLVMParser parser(Context, ToolsDir);
 
-	header = parser.loadBitcode("UnprotectedFifo");
+	header = parser.loadBitcode("System", "UnprotectedFifo");
 
 	if (header == NULL){
 		cerr << "Unable to parse fifo header file";

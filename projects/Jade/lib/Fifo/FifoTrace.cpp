@@ -95,14 +95,14 @@ void FifoTrace::parseHeader (){
 	//Create the parser
 	LLVMParser parser(Context, ToolsDir);
 	
-	header = parser.loadBitcode("FifoTrace");
+	header = parser.loadBitcode("System", "FifoTrace");
 
 	if (header == NULL){
 		cerr << "Unable to parse fifo header file";
 		exit(0);
 	}
 
-	externMod = parser.loadBitcode("Extern");
+	externMod = parser.loadBitcode("System", "Extern");
 
 	if (externMod == NULL){
 		cerr << "Unable to parse extern functions file";

@@ -75,7 +75,7 @@ public:
 	 * @return the corresponding llvm::Module
 	 *
      */
-	llvm::Module* loadBitcode(std::string file);
+	llvm::Module* loadBitcode(std::string package, std::string file);
 
 private:
 	/**

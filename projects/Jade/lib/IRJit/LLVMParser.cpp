@@ -58,13 +58,13 @@ LLVMParser::LLVMParser(LLVMContext& C, string directory): Context(C){
 }
 
 
-Module* LLVMParser::loadBitcode(string file) {
+Module* LLVMParser::loadBitcode(string package, string file) {
 	SMDiagnostic Err;
 	string bitcode = file;
 	bitcode.append(".bc");
 
 	sys::Path Filename = getFilename(bitcode);
-
+    //isBitcodeFile
 	//bitcode not found, looking for assembly
 	if (!Filename.exists()){
 		string assembly = file;
