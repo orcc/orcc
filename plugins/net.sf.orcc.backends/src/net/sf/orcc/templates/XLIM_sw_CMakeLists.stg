@@ -4,11 +4,24 @@ $$id$.c
 $endif$
 >>
 
+xlim2c(id, actor) ::= <<
+$if (!actor.system)$
+run_xlim2c($id$)
+$endif$
+>>
+
 printInstance(instance) ::= <<
 $if (instance.actor)
 $$printActor(id=instance.id, actor=instance.actor)$$
 endif$
 >>
+
+printXlim2c(instance) ::= <<
+$if (instance.actor)
+$$xlim2c(id=instance.id, actor=instance.actor)$$
+endif$
+>>
+
 
 CMakeLists(network) ::= <<
 # Generated from $network.name$
@@ -17,22 +30,30 @@ cmake_minimum_required (VERSION 2.8)
 project ($network.name$)
 
 # Common packages required
-find_file(actors-rts_DIR actors-rts)
+find_file(ACTORS actors)
 
 find_package(SDL REQUIRED)
 find_package(LibXml2)
 
 # Common include directories
-include_directories(\${actors-rts_DIR} \${SDL_INCLUDE_DIR})
+include_directories(\${ACTORS}/include \${SDL_INCLUDE_DIR})
+
+macro (run_xlim2c actor) 
+  add_custom_command (
+    OUTPUT \${actor}.c
+    COMMAND \${ACTORS}/bin/xlim2c \${actor}.xlim \${actor}.c)
+endmacro(run_xlim2c)
+
+$network.instances: printXlim2c()$
 
 set(filenames
-\${actors-rts_DIR}/display-sdl.c
+\${ACTORS}/share/sysactors/c/display-sdl.c
 $network.instances: printInstance()$
 $network.name$.c
 )
 
 add_executable($network.name$ \${filenames})
 
-target_link_libraries($network.name$ \${actors-rts_DIR}/libactors-rts.a \${SDL_LIBRARY} \${LIBXML2_LIBRARIES})
+target_link_libraries($network.name$ \${ACTORS}/lib/libactors-rts.a \${SDL_LIBRARY} \${LIBXML2_LIBRARIES})
 
 >>
