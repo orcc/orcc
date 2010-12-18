@@ -96,11 +96,9 @@ VTLDir("L", desc("Video Tools Library directory"),
 	   init(""));
 
 cl::opt<std::string> 
-ToolsDir("T", desc("Jade tools directory"),
-			  Required,
-			  ValueRequired,
-			  value_desc("Tools Folder"), 
-			  init(""));
+SystemDir("S", desc("Specifiy a specify location for package System"),
+			  value_desc("Location of package System"), 
+			  init("System"));
 
 cl::opt<std::string> 
 YuvFile("o", desc("Decoded YUV video file for compare mode"), 
@@ -161,25 +159,27 @@ cl::opt<int> StopAt("stop-at-frame",
          cl::desc("Stop decoder after a given number of frame decoded."),
          cl::init(0));
 
+static cl::opt<bool> Verbose("v", cl::desc("Print information about actions taken"), cl::init(false));
+
 cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations available:"));
 
 void clean_exit(int sig){
 	exit(0);
 }
 
-AbstractFifo* getFifo(LLVMContext &Context){
+AbstractFifo* getFifo(LLVMContext &Context, string system){
 	//Select fifo according to options
 	switch (Fifo) {
 		case circular :
-			return new FifoCircular(Context);
+			return new FifoCircular(Context, system);
 			break;
 
 		case trace :
-			return new FifoTrace(Context);
+			return new FifoTrace(Context, system);
 			break;
 
 		case unprotected :
-			return new UnprotectedFifo(Context);
+			return new UnprotectedFifo(Context, system);
 			break;
 
 		default: 
@@ -201,7 +201,7 @@ void setDirectory(std::string* dir){
 //Check options of the decoder engine
 void setOptions(){
 	setDirectory(&VTLDir);
-	setDirectory(&ToolsDir);
+	setDirectory(&SystemDir);
 	setDirectory(&OutputDir);
 }	
 
@@ -232,7 +232,7 @@ int main(int argc, char **argv) {
 	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 
 	//Load and execute the parsed network
-	DecoderEngine engine(Context, getFifo(Context));
+	DecoderEngine engine(Context, getFifo(Context, SystemDir), VTLDir, SystemDir, Verbose);
 	engine.load(network);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;

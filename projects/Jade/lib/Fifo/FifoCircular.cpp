@@ -45,7 +45,6 @@
 #include "llvm/Constants.h"
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
-#include "llvm/Support/CommandLine.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
@@ -58,10 +57,7 @@
 using namespace llvm;
 using namespace std;
 
-
-extern cl::opt<string> ToolsDir;
-
-FifoCircular::FifoCircular(llvm::LLVMContext& C): Context(C), AbstractFifo()
+FifoCircular::FifoCircular(llvm::LLVMContext& C, string system): Context(C), AbstractFifo()
 {
 	//Initialize map
 	createFifoMap();
@@ -72,6 +68,9 @@ FifoCircular::FifoCircular(llvm::LLVMContext& C): Context(C), AbstractFifo()
 	
 	// Initialize fifo counter
 	fifoCnt = 0;
+
+	// Set location of system
+	this->system = system;
 }
 
 FifoCircular::~FifoCircular (){
@@ -87,7 +86,7 @@ void FifoCircular::declareFifoHeader (){
 
 void FifoCircular::parseHeader (){
 	//Create the parser
-	LLVMParser parser(Context, ToolsDir);
+	LLVMParser parser(Context, system);
 
 	header = parser.loadBitcode("System", "FifoCircular");
 

@@ -62,7 +62,7 @@ public:
 	 * @param directory : default directory of the module
 	 *
      */
-	LLVMParser(llvm::LLVMContext& C, std::string directory);
+	LLVMParser(llvm::LLVMContext& C, std::string directory, bool verbose = false);
 	
 	/**
      *  @brief Load and parse the bitcode file
@@ -95,6 +95,9 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Print information about actor taken*/
+	bool verbose;
 	
 };
 

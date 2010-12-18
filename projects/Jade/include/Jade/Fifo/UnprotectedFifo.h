@@ -132,7 +132,7 @@ public:
 	 *  @param jit : JIT use to load bitcoder
 	 *
      */
-	UnprotectedFifo(llvm::LLVMContext& C);
+	UnprotectedFifo(llvm::LLVMContext& C, std::string system);
 	
 	~UnprotectedFifo();
 
@@ -181,6 +181,9 @@ private:
 	void declareFifoHeader();
 
 	llvm::StructType* getFifoType(llvm::IntegerType* type);
+
+	/** System package location */
+	std::string system;
 
 };
 

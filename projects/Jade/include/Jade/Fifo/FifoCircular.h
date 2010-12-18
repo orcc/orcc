@@ -140,7 +140,7 @@ public:
 	 *	Declare fifo type
 	 *
      */
-	FifoCircular(llvm::LLVMContext& C);
+	FifoCircular(llvm::LLVMContext& C, std::string system);
 	
 	~FifoCircular();
 
@@ -197,6 +197,9 @@ private:
 	void declareFifoHeader();
 
 	llvm::StructType* getFifoType(llvm::IntegerType* type);
+
+	/** System package location */
+	std::string system;
 
 };
 

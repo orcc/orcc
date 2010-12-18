@@ -66,7 +66,7 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	DecoderEngine(llvm::LLVMContext& C, AbstractFifo* fifo);
+	DecoderEngine(llvm::LLVMContext& C, AbstractFifo* fifo, std::string library, std::string system = "", bool verbose = false);
 	~DecoderEngine();
 
 	/*!
@@ -100,6 +100,15 @@ private:
 
 	/** Fifo of Jade */
 	AbstractFifo* fifo;
+
+	/** Library location */
+	std::string library;
+
+	/** System package location */
+	std::string systemPackage;
+
+	/** Print all actions made by decoder engine*/
+	bool verbose;
 };
 
 #endif

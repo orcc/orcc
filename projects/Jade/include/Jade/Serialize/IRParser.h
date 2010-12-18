@@ -39,6 +39,9 @@
 #ifndef IRPARSER_H
 #define IRPARSER_H
 
+#include "Jade/Core/Actor.h"
+//------------------------------
+
 namespace llvm{
 	class ConstantInt;
 	class Module;
@@ -46,16 +49,9 @@ namespace llvm{
 	class Type;
 }
 
-#include "Jade/Core/Actor/ActionTag.h"
 
-class Action;
-class ActionScheduler;
-class ActionTag;
-class FSM;
-class Port;
-class Procedure;
-class Variable;
-//------------------------------
+class LLVMParser;
+
 
 
 /**
@@ -303,6 +299,9 @@ private:
 
 	/** Abstract fifos of actors */
 	AbstractFifo* fifo;
+
+	/** Parser of LLVM modules */
+	LLVMParser* parser;
 };
 
 #endif

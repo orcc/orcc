@@ -59,12 +59,20 @@ using namespace llvm;
 
 extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
 
-DecoderEngine::DecoderEngine(llvm::LLVMContext& C, AbstractFifo* fifo): Context(C) {	
+DecoderEngine::DecoderEngine(llvm::LLVMContext& C, 
+							 AbstractFifo* fifo, 
+							 string library, 
+							 string system, 
+							 bool verbose): Context(C) {	
 	//Set properties
 	this->fifo = fifo;
 	
 	//Load IR Parser
 	irParser = new IRParser(C, fifo);	
+	this->library = library;
+	this->systemPackage = system;
+	this->verbose = verbose;
+
 }
 
 DecoderEngine::~DecoderEngine(){

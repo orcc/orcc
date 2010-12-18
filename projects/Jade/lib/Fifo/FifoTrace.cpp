@@ -64,10 +64,9 @@ using namespace llvm;
 using namespace std;
 
 
-extern cl::opt<string> ToolsDir;
 extern cl::opt<std::string> OutputDir;
 
-FifoTrace::FifoTrace(llvm::LLVMContext& C): Context(C), AbstractFifo()
+FifoTrace::FifoTrace(llvm::LLVMContext& C, string system): Context(C), AbstractFifo()
 {
 	//Initialize map
 	createFifoMap();
@@ -78,6 +77,9 @@ FifoTrace::FifoTrace(llvm::LLVMContext& C): Context(C), AbstractFifo()
 	
 	// Initialize fifo counter
 	fifoCnt = 0;
+
+	// Set location of system
+	this->system = system;
 }
 
 FifoTrace::~FifoTrace (){
@@ -93,7 +95,7 @@ void FifoTrace::declareFifoHeader (){
 
 void FifoTrace::parseHeader (){
 	//Create the parser
-	LLVMParser parser(Context, ToolsDir);
+	LLVMParser parser(Context, system);
 	
 	header = parser.loadBitcode("System", "FifoTrace");
 

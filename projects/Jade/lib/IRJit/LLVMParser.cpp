@@ -38,8 +38,6 @@
 //------------------------------
 #include <iostream>
 
-
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/IRReader.h"
 
 #include "Jade/Jit/LLVMParser.h"
@@ -48,13 +46,11 @@
 using namespace llvm;
 using namespace std;
 
-static cl::opt<bool> Verbose("v", cl::desc("Print information about actions taken"));
-extern cl::opt<std::string> VTLDir;
-extern cl::opt<std::string> ToolsDir;
  
 
-LLVMParser::LLVMParser(LLVMContext& C, string directory): Context(C){
+LLVMParser::LLVMParser(LLVMContext& C, string directory, bool verbose): Context(C){
 	this->directory = directory;
+	this->verbose = verbose;
 }
 
 
@@ -63,7 +59,7 @@ Module* LLVMParser::loadBitcode(string package, string file) {
 	string bitcode = file;
 	bitcode.append(".bc");
 
-	sys::Path Filename = getFilename(bitcode);
+	sys::Path Filename= getFilename(bitcode);
     //isBitcodeFile
 	//bitcode not found, looking for assembly
 	if (!Filename.exists()){
@@ -72,7 +68,7 @@ Module* LLVMParser::loadBitcode(string package, string file) {
 		Filename = getFilename(assembly);
 	}
   
-	if (Verbose) cout << "Loading '" << Filename.c_str() << "'\n";
+	if (verbose) cout << "Loading '" << Filename.c_str() << "'\n";
 	Module* Result = 0;
 
 	const std::string &FNStr = Filename.c_str();
@@ -89,7 +85,7 @@ Module* LLVMParser::loadBitcode(string package, string file) {
 }
 
 sys::Path LLVMParser::getFilename(string file){
-	sys::Path Filename;
+/*	sys::Path Filename;
 
 	//Filename is correct
 	if (!Filename.set(file)) {
@@ -137,6 +133,6 @@ sys::Path LLVMParser::getFilename(string file){
 			return Filename;
 		}
 	}
-
+*/
 	return sys::Path("");
 }

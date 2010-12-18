@@ -146,7 +146,7 @@ public:
 	 *  @param jit : JIT use to load bitcoder
 	 *
      */
-	FifoTrace(llvm::LLVMContext& C);
+	FifoTrace(llvm::LLVMContext& C, std::string system);
 	
 	~FifoTrace();
 
@@ -205,6 +205,8 @@ private:
 
 	llvm::StructType* getFifoType(llvm::IntegerType* type);
 
+	/** System package location */
+	std::string system;
 };
 
 #endif

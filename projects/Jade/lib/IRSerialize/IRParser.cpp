@@ -85,6 +85,7 @@ IRParser::IRParser(llvm::LLVMContext& C, AbstractFifo* fifo) : Context(C){
 	this->fifo = fifo;
 	this->inputs = NULL;
 	this->outputs = NULL;
+	this->parser = 	new LLVMParser(Context, VTLDir);
 }
 
 
@@ -102,8 +103,7 @@ Actor* IRParser::parseActor(string classz){
 	}
 	
 	//Parse the bitcode
-	LLVMParser parser(Context, VTLDir);
-	Module* module = parser.loadBitcode(package, file);
+	Module* module = parser->loadBitcode(package, file);
 
 	if (module == 0){
 		cerr << "Error when parsing bytecode";
