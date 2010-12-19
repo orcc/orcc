@@ -58,12 +58,12 @@ actor Algo_IntraPred_CHROMA_8x8_AVSJZ (
     [ v : for int i in Integers(1,v_size) ]
   end
 */
-  List(type:int(size=PIX_SZ),size=9) c_left := [ 0 : for int i in 1 .. 8 ];//initList(0,8);
-  List(type:int(size=PIX_SZ),size=9) c_up := [ 0 : for int i in 1 .. 8 ];//initList(0,8);
+  List(type:int(size=PIX_SZ),size=9) c_left := [ 0 : for int i in 1 .. 9 ];//initList(0,8);
+  List(type:int(size=PIX_SZ),size=9) c_up := [ 0 : for int i in 1 .. 9 ];//initList(0,8);
   List(type:int(size=PIX_SZ),size=1) c_up_left := [ 0 ];//initList(0,1);
 
-  List(type:int(size=PIX_SZ),size=8) f_c_left := [ 0 : for int i in 1 .. 8 ];//initList(0,8);
-  List(type:int(size=PIX_SZ),size=8) f_c_up := [ 0 : for int i in 1 .. 8 ];//initList(0,8);
+  List(type:int(size=PIX_SZ),size=9) f_c_left := [ 0 : for int i in 1 .. 9 ];//initList(0,8);
+  List(type:int(size=PIX_SZ),size=9) f_c_up := [ 0 : for int i in 1 .. 9 ];//initList(0,8);
   List(type:int(size=PIX_SZ),size=1) f_c_up_left := [ 0 ];
   
   /*
@@ -76,7 +76,7 @@ actor Algo_IntraPred_CHROMA_8x8_AVSJZ (
     if x > 255 then 255 else if x < 0 then 0 else x end end
   end
   
-  List(type:int(size=PIX_SZ),size=17) PredPixBuffer_pass := [ 0 : for int i in 1 .. 17 ];//initList(0,17);
+  List(type:int(size=PIX_SZ),size=19) PredPixBuffer_pass := [ 0 : for int i in 1 .. 19 ];//initList(0,17);
   
   read_avail: action AVAIL:[avail] repeat 3 ==>
   do
@@ -218,9 +218,9 @@ actor Algo_IntraPred_CHROMA_8x8_AVSJZ (
     PredPixBuffer_pass[18]:= rshift(PredPixBuffer[17]  + 3*PredPixBuffer[18] + 2, 2);
     
     if mode = 0 then // DC
-      f_c_left := [PredPixBuffer_pass[8-x]: for int x in 0 .. 7];
+      f_c_left := [PredPixBuffer_pass[8-x]: for int x in 0 .. 8];
       f_c_up_left := [PredPixBuffer_pass[9]];
-      f_c_up := [PredPixBuffer_pass[x]: for int x in 10 .. 17];
+      f_c_up := [PredPixBuffer_pass[x]: for int x in 10 .. 18];
       if( left_avail=1 and up_avail=1) then
         predpels := [rshift((f_c_up[i] + f_c_left[j]), 1): for int i in 0 .. 7, for int j in 0 .. 7];
       else if left_avail=1 then
