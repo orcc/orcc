@@ -59,6 +59,15 @@
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
    </Instance>
+   <Instance id="Merger">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="Proprietary.Xilinx.MPEG4_part2.Mgnt_Merger_xilinx"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+   </Instance>
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->
    <!-- ************************************** -->
@@ -71,7 +80,8 @@
       </Attribute>
    </Connection>
    <Connection dst="decoder" dst-port="bits" src="art_Source_bin" src-port="Out"/>
-   <Connection dst="art_Display_yuv_width_height" dst-port="In" src="decoder" src-port="VIDEO"/>
    <Connection dst="art_Display_yuv_width_height" dst-port="WIDTH" src="decoder" src-port="WIDTH"/>
    <Connection dst="art_Display_yuv_width_height" dst-port="HEIGHT" src="decoder" src-port="HEIGHT"/>
+   <Connection dst="Merger" dst-port="YUV_i" src="decoder" src-port="VIDEO"/>
+   <Connection dst="art_Display_yuv_width_height" dst-port="In" src="Merger" src-port="YUV"/>
 </XDF>
