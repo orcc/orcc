@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <description name="Orcc Project Update Site" url="http://orcc.sf.net/eclipse/">
+   <description name="Orcc Project Update Site" url="http://orcc.sourceforge.net/eclipse/updates/">
       Orcc Project Update Site
    </description>
-   <feature url="features/net.sf.orcc_0.9.1.v20101124.jar" id="net.sf.orcc" version="0.9.1.v20101124">
-      <category name="Open RVC-CAL Compiler"/>
-   </feature>
-   <feature url="features/net.sf.orcc_0.9.2.v20101216.jar" id="net.sf.orcc" version="0.9.2.v20101216">
+   <feature url="features/net.sf.orcc_0.9.2.v20101219.jar" id="net.sf.orcc" version="0.9.2.v20101219">
       <category name="Open RVC-CAL Compiler"/>
    </feature>
    <category-def name="Open RVC-CAL Compiler" label="Open RVC-CAL Compiler">
