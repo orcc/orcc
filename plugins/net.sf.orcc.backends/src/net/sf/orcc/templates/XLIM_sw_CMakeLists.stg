@@ -56,6 +56,10 @@ $network.instances: printInstance()$
 $network.name$.c
 )
 
+set(ORCC_C_FLAGS "-DORCC")
+
+add_definitions(\${ORCC_C_FLAGS})
+
 add_executable($network.name$ \${filenames})
 
 target_link_libraries($network.name$ \${ACTORS}/lib/libactors-rts.a \${SDL_LIBRARY} \${LIBXML2_LIBRARIES})
