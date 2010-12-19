@@ -37,6 +37,7 @@
 
 //------------------------------
 #include <iostream>
+#include <algorithm>
 
 #include "llvm/Support/IRReader.h"
 
@@ -56,18 +57,10 @@ LLVMParser::LLVMParser(LLVMContext& C, string directory, bool verbose): Context(
 
 Module* LLVMParser::loadBitcode(string package, string file) {
 	SMDiagnostic Err;
-	string bitcode = file;
-	bitcode.append(".bc");
 
-	sys::Path Filename= getFilename(bitcode);
+	sys::Path Filename= getFilename(package, file);
     //isBitcodeFile
-	//bitcode not found, looking for assembly
-	if (!Filename.exists()){
-		string assembly = file;
-		assembly.append(".s");
-		Filename = getFilename(assembly);
-	}
-  
+
 	if (verbose) cout << "Loading '" << Filename.c_str() << "'\n";
 	Module* Result = 0;
 
@@ -84,55 +77,37 @@ Module* LLVMParser::loadBitcode(string package, string file) {
 	return Mod;
 }
 
-sys::Path LLVMParser::getFilename(string file){
-/*	sys::Path Filename;
+sys::Path LLVMParser::getFilename(string packageName, string file){
+	replace(packageName.begin(), packageName.end(), '.', '/' );
+	sys::Path package(directory + packageName);
 
-	//Filename is correct
-	if (!Filename.set(file)) {
-		cout << "Invalid file name: '" << file << "'\n";
+	if (!package.exists()){
+		cout << "Package" << package.c_str() << " is required but not found.'\n";
 		exit(0);
 	}
 
-	//Test if file is located in current folder
-	if (Filename.exists()) {
-		return Filename;
+	if (package.isArchive()){
+		cout << "Found " << package.c_str() << " as archive.'\n";
+		exit(0);
 	}
 
-	//Test if file is located in directory
-	if (!directory.empty()){
-		string DirFile = file;
+	sys::Path bitcodeFile(package.str()+"/"+file+".bc");
 
-		DirFile.insert(0,directory);
-		Filename.set(DirFile);
-
-		if (Filename.exists()) {
-			return Filename;
+	if (bitcodeFile.exists()){
+		if (bitcodeFile.isBitcodeFile()){
+			return bitcodeFile;
+		}else{
+			cout << "File  " << bitcodeFile.c_str() << " is not a bitcode file.'\n";
+			exit(0);
 		}
 	}
 
-	//Test if file is located in VTL Folder
-	if (!VTLDir.empty()){
-		string VtlFile = file;
+	sys::Path assemblyFile(package.str()+"/"+file+".s");
 
-		VtlFile.insert(0,VTLDir);
-		Filename.set(VtlFile);
-
-		if (Filename.exists()) {
-			return Filename;
-		}
+	if (assemblyFile.exists()){
+		return bitcodeFile;
 	}
-
-	//Test if file is located in tools Folder
-	if (!ToolsDir.empty()){
-		string ToolFile = file;
-
-		ToolFile.insert(0,ToolsDir);
-		Filename.set(ToolFile);
-
-		if (Filename.exists()) {
-			return Filename;
-		}
-	}
-*/
-	return sys::Path("");
+	
+	cout <<  "File  " << file.c_str() << " has not been found in package "<< packageName.c_str() <<".\n";
+	exit(0);
 }

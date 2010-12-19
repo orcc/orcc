@@ -88,7 +88,7 @@ private:
 	 * @return the corresponding llvm::sys::Path
 	 *
      */
-	llvm::sys::Path getFilename(std::string file);
+	llvm::sys::Path getFilename(std::string package, std::string file);
 
 	/** default directory of the actor */
 	std::string directory;

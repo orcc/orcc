@@ -98,7 +98,7 @@ VTLDir("L", desc("Video Tools Library directory"),
 cl::opt<std::string> 
 SystemDir("S", desc("Specifiy a specify location for package System"),
 			  value_desc("Location of package System"), 
-			  init("System"));
+			  init(""));
 
 cl::opt<std::string> 
 YuvFile("o", desc("Decoded YUV video file for compare mode"), 
@@ -231,8 +231,16 @@ int main(int argc, char **argv) {
 	Network* network = xdfParser.ParseXDF(Context);
 	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 
+	//Load fifos
+	AbstractFifo* fifo = NULL;
+	if (SystemDir.getValue().compare("") != 0){
+		fifo = getFifo(Context, SystemDir);
+	}else{
+		fifo = getFifo(Context, VTLDir);
+	}
+
 	//Load and execute the parsed network
-	DecoderEngine engine(Context, getFifo(Context, SystemDir), VTLDir, SystemDir, Verbose);
+	DecoderEngine engine(Context, fifo , VTLDir, SystemDir, Verbose);
 	engine.load(network);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;

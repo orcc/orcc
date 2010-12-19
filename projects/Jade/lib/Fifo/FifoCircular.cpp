@@ -59,6 +59,9 @@ using namespace std;
 
 FifoCircular::FifoCircular(llvm::LLVMContext& C, string system): Context(C), AbstractFifo()
 {
+	// Set location of system
+	this->system = system;
+
 	//Initialize map
 	createFifoMap();
 	createStructMap();
@@ -68,9 +71,6 @@ FifoCircular::FifoCircular(llvm::LLVMContext& C, string system): Context(C), Abs
 	
 	// Initialize fifo counter
 	fifoCnt = 0;
-
-	// Set location of system
-	this->system = system;
 }
 
 FifoCircular::~FifoCircular (){
