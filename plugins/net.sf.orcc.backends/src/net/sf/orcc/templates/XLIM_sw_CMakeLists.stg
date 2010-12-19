@@ -29,6 +29,9 @@ CMakeLists(network) ::= <<
 cmake_minimum_required (VERSION 2.8)
 project ($network.name$)
 
+#set build type to Release
+SET(CMAKE_BUILD_TYPE Release)
+
 # Common packages required
 find_file(ACTORS actors)
 
@@ -40,8 +43,9 @@ include_directories(\${ACTORS}/include \${SDL_INCLUDE_DIR})
 
 macro (run_xlim2c actor) 
   add_custom_command (
-    OUTPUT \${actor}.c
-    COMMAND \${ACTORS}/bin/xlim2c \${actor}.xlim \${actor}.c)
+    OUTPUT \${CMAKE_SOURCE_DIR}/\${actor}.c
+    DEPENDS \${CMAKE_SOURCE_DIR}/\${actor}.xlim
+    COMMAND \${ACTORS}/bin/xlim2c \${CMAKE_SOURCE_DIR}/\${actor}.xlim \${CMAKE_SOURCE_DIR}/\${actor}.c)
 endmacro(run_xlim2c)
 
 $network.instances: printXlim2c()$
