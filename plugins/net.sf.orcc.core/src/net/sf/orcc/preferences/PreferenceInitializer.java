@@ -45,7 +45,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		IPreferenceStore store = OrccActivator.getDefault()
 				.getPreferenceStore();
 		store.setDefault(PreferenceConstants.P_JADE, "");
-		store.setDefault(PreferenceConstants.P_JADE_TOOLS, "");
 	}
 
 }

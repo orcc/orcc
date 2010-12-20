@@ -31,12 +31,11 @@ package net.sf.orcc.simulators.jade;
 import static net.sf.orcc.OrccLaunchConstants.DEFAULT_FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.FIFO_SIZE;
 import static net.sf.orcc.OrccLaunchConstants.INPUT_STIMULUS;
+import static net.sf.orcc.OrccLaunchConstants.REFERENCE_FILE;
 import static net.sf.orcc.OrccLaunchConstants.TRACES_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.VTL_FOLDER;
 import static net.sf.orcc.OrccLaunchConstants.XDF_FILE;
-import static net.sf.orcc.OrccLaunchConstants.REFERENCE_FILE;
 import static net.sf.orcc.preferences.PreferenceConstants.P_JADE;
-import static net.sf.orcc.preferences.PreferenceConstants.P_JADE_TOOLS;
 
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
@@ -77,6 +76,11 @@ public class JadeSimulatorImpl implements Simulator {
 	protected int fifoSize;
 
 	/**
+	 * Master caller associated process for jade I/O access.
+	 */
+	protected Process jadeProcess;
+
+	/**
 	 * Monitor associated to the simulator execution. Used for user
 	 * cancellation.
 	 */
@@ -88,29 +92,19 @@ public class JadeSimulatorImpl implements Simulator {
 	protected OrccProcess orccProcess;
 
 	/**
-	 * Master caller associated process for jade I/O access.
+	 * Reference video file
 	 */
-	protected Process jadeProcess;
+	protected String refVideo;
 
 	/**
 	 * Input stimulus file name
 	 */
 	protected String stimulusFile;
-
-	/**
-	 * Folder where the Jade Tools are placed
-	 */
-	protected String toolsFolder;
-
+	
 	/**
 	 * Traces folder
 	 */
 	protected String tracesFolder;
-	
-	/**
-	 * Reference video file
-	 */
-	protected String refVideo;
 
 	/**
 	 * Folder where the VTL is
@@ -138,6 +132,18 @@ public class JadeSimulatorImpl implements Simulator {
 		this.orccProcess = process;
 		this.monitor = monitor;
 		this.debugMode = debugMode;
+	}
+
+	private void flatten(){
+		try {
+			Network network = new XDFParser(xdfFile).parseNetwork();
+			network.flatten();
+					
+			XDFWriter writer = new XDFWriter(new File(vtlFolder), network);
+			xdfFlattenFile = writer.getFile();
+		} catch (OrccException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -181,18 +187,6 @@ public class JadeSimulatorImpl implements Simulator {
 		// TODO Auto-generated method stub
 
 	}
-
-	private void flatten(){
-		try {
-			Network network = new XDFParser(xdfFile).parseNetwork();
-			network.flatten();
-					
-			XDFWriter writer = new XDFWriter(new File(vtlFolder), network);
-			xdfFlattenFile = writer.getFile();
-		} catch (OrccException e) {
-			e.printStackTrace();
-		}
-	}
 	
 	
 	@Override
@@ -209,8 +203,6 @@ public class JadeSimulatorImpl implements Simulator {
 		cmdList.add(stimulusFile);
 		cmdList.add("-L");
 		cmdList.add(vtlFolder);
-		cmdList.add("-T");
-		cmdList.add(toolsFolder);
 
 		if (!tracesFolder.equals("")) {
 			cmdList.add("-w");
@@ -295,19 +287,11 @@ public class JadeSimulatorImpl implements Simulator {
 			refVideo = configuration.getAttribute(REFERENCE_FILE, "");
 			execJade = OrccActivator.getDefault().getPreferenceStore()
 					.getString(P_JADE);
-			toolsFolder = OrccActivator.getDefault().getPreferenceStore()
-					.getString(P_JADE_TOOLS);
 
 			// Jade location has not been set
 			if (execJade.equals("")) {
 				throw new OrccRuntimeException(
 						"Jade path must first be set in window->Preference->Orcc");
-			}
-
-			// Jade location has not been set
-			if (toolsFolder.equals("")) {
-				throw new OrccRuntimeException(
-						"Jade tools path must first be set in window->Preference->Orcc");
 			}
 		} catch (CoreException e) {
 			throw new OrccRuntimeException(e.getMessage());
