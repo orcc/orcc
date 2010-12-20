@@ -656,6 +656,10 @@ Transition(transition) ::= <<
 		$schedulingTestState(nextStates=transition.nextStateInfo)$
 	</module>
 	<module kind="else">
+	$closeHwTransition()$
+>>
+
+closeHwTransition() ::=<<
 >>
 
 isSchedulableTest(action) ::= <<

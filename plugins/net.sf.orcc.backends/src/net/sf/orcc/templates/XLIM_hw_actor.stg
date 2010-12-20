@@ -28,3 +28,16 @@ declarePinAvailableVariable(port) ::= <<
   <port dir="out" source="$port$_pinStatus" typeName="bool"/>
 </operation>
 >>
+
+// For the switch structure of Openforge BE
+
+Transitions(actions, transitions) ::= <<
+<!-- All transitions -->
+<module kind="block" mutex="true">
+	$transitions:{transition | $Transition(transition=transition)$}; separator="\n"$
+</module>
+>>
+
+closeHwTransition() ::=<<
+</module></module>
+>>
