@@ -105,7 +105,7 @@ sys::Path LLVMParser::getFilename(string packageName, string file){
 	sys::Path assemblyFile(package.str()+"/"+file+".s");
 
 	if (assemblyFile.exists()){
-		return bitcodeFile;
+		return assemblyFile;
 	}
 	
 	cout <<  "File  " << file.c_str() << " has not been found in package "<< packageName.c_str() <<".\n";
