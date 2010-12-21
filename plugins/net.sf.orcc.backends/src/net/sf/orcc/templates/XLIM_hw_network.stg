@@ -53,9 +53,9 @@ $port.name$_RDY	=>	ao_$instance.id$_$port.name$_RDY,
 ///////////////////////////////////////////////////////////////////////////////
 // Print Actors Fanout Output(s) Ports Instantiation 
 
-printActorsFanOutOutputInstantiation(port) ::=<<
+printActorsFanOutOutputInstantiation(port,numberOfReaders) ::=<<
 f_ao_$src.instance.id$_$port.name$ : entity SystemBuilder.Fanout( behavioral )
-generic map ( fanout => 1, width => $if(port.type.size)$$port.type.size$$else$1$endif$ )
+generic map ( fanout => $numberOfReaders.(port)$, width => $if(port.type.size)$$port.type.size$$else$1$endif$ )
 port map (
 	$if(port.type.bool)$
 	In_DATA(0)  => ao_$src.instance.id$_$port.name$_DATA,
@@ -129,7 +129,7 @@ tryAssignFifo(edge, src, tgt) ::= <<
 $
 if (src.instance)
 
-$$src.instance.actor.outputs.list: printActorsFanOutOutputInstantiation(); separator="\n"$$
+$$src.instance.actor.outputs.list: {port | $printActorsFanOutOutputInstantiation(port=port,numberOfReaders=network.numberOfReadersMap.(src.instance))$}; separator="\n"$$
   if (tgt.instance)
 $
 
