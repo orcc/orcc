@@ -105,5 +105,8 @@ ELSE(APPLE)
 add_executable(Jade Jade.cpp)
 ENDIF(APPLE)
 
+add_executable(JadeTools JadeTools.cpp)
+
 # Library requiered
 target_link_libraries(Jade DecoderEngine XDFParser IRSerialize Scheduler IRJit IRTransform  IRActor Fifo IRCore HDAGGraph TinyXml ${SDL_LIBRARY} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(JadeTools ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
