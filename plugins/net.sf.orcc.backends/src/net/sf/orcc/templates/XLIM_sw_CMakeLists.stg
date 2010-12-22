@@ -33,7 +33,7 @@ project ($network.name$)
 SET(CMAKE_BUILD_TYPE Release)
 
 # Common packages required
-find_file(ACTORS actors)
+find_file(ACTORS NAMES actors actorsproject)
 
 find_package(SDL REQUIRED)
 find_package(LibXml2)
