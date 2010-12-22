@@ -1,16 +1,10 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Composite types
-///////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Channel declaration
 ///////////////////////////////////////////////////////////////////////////////
 
 channels(port) ::= <<
-chan chan_$port.name$ = [1] of {$port.type$}
+/*chan chan_$port.name$ = [1] of {$port.type$}*/
 >>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // parameters
@@ -25,7 +19,7 @@ $value : {[$it$]} $
 variableDeclaration(variable) ::= <<
 $
 if(variable.port)
-$$variable.type$ *$variable$$
+$$variable.type$ $variable$$listSize(variable.type.dimensions)$$
 else
 $$variable.type$ $variable$$listSize(variable.type.dimensions)$$
 endif
@@ -123,7 +117,7 @@ $peek.port$?<$peek.target$>;
 Read(read) ::= <<
 
 $if (read.target)$
-chan_$read.port$?$read.target$;
+chan_$read.port$?$read.target$[0];
 $endif$
 >>
 
@@ -139,7 +133,7 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 
 Write(write) ::= <<
 
-chan_$write.port$!$write.target$;
+chan_$write.port$!$write.target$[0];
 >>
 
 Return(return) ::= <<
@@ -194,12 +188,10 @@ $BlockNode(whileNode.joinNode)$
 ///////////////////////////////////////////////////////////////////////////////
 
 stateVar(var) ::= <<
-$if (var.assignable)$
 $if (var.initialized)$
 $variableDeclaration(var)$ = $Constant(var.initialValue)$;
 $else$
 $variableDeclaration(var)$;
-$endif$
 $endif$
 >>
 
@@ -227,6 +219,10 @@ schedulerFSM(action) ::= <<
 	/* $action.name$ */ atomic { 
 	$guardFSM()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
 	-> 
+	/* Temp variables*/
+	$if(action.body.locals.list)$
+	$action.body.locals.list: {$variableDeclaration(it)$;$\n$}$
+	$endif$ 
 	$inputPattern(action.inputPattern)$
 	$action.body.nodes: {$(it.class.simpleName)(it)$}$
 	$outputPattern(action.outputPattern)$
@@ -250,7 +246,11 @@ $endif$
 scheduler(action) ::= <<
 :: /* $action.name$ */ atomic { 
 	$guard()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
-	-> 
+	->
+	/* Temp variables*/
+	$if(action.body.locals.list)$
+	$action.body.locals.list: {$variableDeclaration(it)$;$\n$}$
+	$endif$ 
 	$inputPattern(action.inputPattern)$
 	$action.body.nodes: {$(it.class.simpleName)(it)$}$
 	$outputPattern(action.outputPattern)$
@@ -308,7 +308,11 @@ proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap, separ
 	$actor.stateVars.list : stateVar(); separator="\n"$
 
 	$if (actor.actionScheduler.fsm)$
-	mtype state = $actor.actionScheduler.fsm.initialState$;
+	/* States of the FSM */
+	$actor.actionScheduler.fsm.states: {s | int $s$ = $i0$;}; separator="\n"$
+	
+	/* Initial State */
+	int state = $actor.actionScheduler.fsm.initialState$;
 	
 	do
 	$actor.actionScheduler.fsm.transitions: { fsm_trans| $newState()$ }$

@@ -33,7 +33,7 @@ $edges: allocateFifo()$
 // assigns FIFOs
 
 doAssignFifoSrc(source, sourcePort, count) ::= <<
-#define $GetInstanceId(source)$_$sourcePort.name$ chan_$count$;
+#define $GetInstanceId(source)$_$sourcePort.name$ chan_$count$; 
 >>
 
 doAssignFifoTgt(target, targetPort, count) ::= <<
@@ -78,8 +78,7 @@ $assignFifos(network.connections)$
 $network.Actors: {actor | #include "$actor$.pml"}; separator="\n"$
 
 init {
-	$network.Actors: {actor | run $actor$(init_state);}; separator="\n"$	
-
+	$network.Actors: {actor | run $actor$(/*init_state*/);}; separator="\n"$	
 }
 
 >>
