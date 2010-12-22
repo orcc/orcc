@@ -40,6 +40,7 @@
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Variable.h"
 #include "Jade/Core/Instance.h"
+#include "Jade/Util/PackageMng.h"
 //------------------------------
 
 using namespace std;
@@ -126,23 +127,11 @@ Type* Actor::getFifoType(string name) {
 }
 
 string Actor::getPackage() {
-	int index = name.rfind('.');
-
-	if (index == string::npos){
-		return "";
-	}
-
-	return name.substr(0, index);
+	return PackageMng::getPackages(this);
 }
 
 string Actor::getSimpleName() {
-	int index = name.rfind('.');
-
-	if (index == string::npos){
-		return "";
-	}
-
-	return name.substr(index + 1);
+	return PackageMng::getSimpleName(this);
 }
 
 Port* Actor::getOutput(string portName){

@@ -37,7 +37,6 @@
 
 //------------------------------
 #include <iostream>
-#include <algorithm>
 
 #include "llvm/Support/IRReader.h"
 

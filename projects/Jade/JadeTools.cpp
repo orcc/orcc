@@ -45,6 +45,8 @@
 #include "llvm/Support/IRReader.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/System/Signals.h"
+
+#include "Jade/Util/PackageMng.h"
 //------------------------------
 using namespace llvm;
 using namespace std;
@@ -67,7 +69,7 @@ OptLevelO3("O3",
 
 
 static cl::list<string>
-Files(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
+ActorFiles(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
 
 cl::opt<bool> 
 AssemblyFlag("S", cl::desc("Generate LLVM in assembly representation"));
@@ -84,14 +86,17 @@ LibraryFolder("L", cl::Required, cl::ValueRequired, cl::desc("Input folder of Vi
 int main(int argc, char **argv) {
 	sys::PrintStackTraceOnErrorSignal();
 	PrettyStackTraceProgram X(argc, argv);
-
+	
 	SMDiagnostic Err;
 	LLVMContext &Context = getGlobalContext();
+	cl::ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
 	
+	//Parsing files
 	cl::list<string>::iterator it;
 	map<string,Module*> modules;
 
-	for (it=Files.begin() ; it != Files.end(); it++){
+	for (it=ActorFiles.begin() ; it != ActorFiles.end(); it++){
+		
 		Module* mod = ParseIRFile(it->c_str(), Err, Context);
 		modules.insert(pair<string,Module*>(*it, mod));
 	}

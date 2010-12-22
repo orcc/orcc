@@ -28,31 +28,69 @@
  */
 
 /**
-@brief Description of the CoreUtil class interface
+@brief Implementation of class PackageMng
 @author Jerome Gorin
-@file CoreUtil.h
+@file PackageMng.cpp
 @version 1.0
-@date 15/11/2010
+@date 17/12/2010
 */
 
 //------------------------------
-#ifndef COREUTIL_H
-#define COREUTIL_H
+#include "Jade/Util/PackageMng.h"
 
-#include "Jade/Core/Actor.h"
+#include <algorithm>
 //------------------------------
 
-/**
- * @class CoreUtil
- *
- *  This class contains utility methods for dealing with resources.
- *
- * @author Jerome Gorin
- * 
- */
-class CoreUtil {
-public:
-	static std::string getFolder(Actor* actor);
-};
 
-#endif
+using namespace std;
+
+string PackageMng::getFolder(Actor* actor){
+	return getFolder(actor->getPackage());
+}
+
+string PackageMng::getFolder(string package){
+	replace( package.begin(), package.end(), '.', '/' );
+	return package;
+}
+
+string PackageMng::getPackages(Actor* actor){
+	return getPackages(actor->getName());
+}
+
+string PackageMng::getPackages(string name){
+	int index = name.rfind('.');
+
+	if (index == string::npos){
+		return "";
+	}
+
+	return name.substr(0, index);
+}
+
+string PackageMng::getFirstPackage(Actor* actor){
+	return getFirstPackage(actor->getName());
+}
+
+string PackageMng::getFirstPackage(string name){
+	int index = name.find('.');
+
+	if (index == string::npos){
+		return "";
+	}
+
+	return name.substr(0, index);
+}
+
+string PackageMng::getSimpleName(Actor* actor){
+	return getSimpleName(actor->getName());
+}
+
+string PackageMng::getSimpleName(string name){
+	int index = name.rfind('.');
+
+	if (index == string::npos){
+		return "";
+	}
+
+	return name.substr(index + 1);
+}
