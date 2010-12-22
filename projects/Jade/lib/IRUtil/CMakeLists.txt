@@ -2,6 +2,7 @@ add_definitions(${JADE_CPP_FLAGS})
 
 include_directories(${JADE_MAIN_INCLUDE_DIR})
 
-add_library (JadeUtil
+add_library (IRUtil
 	PackageMgn.cpp
+	OptionMgn.cpp
  )

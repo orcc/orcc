@@ -96,7 +96,9 @@ int main(int argc, char **argv) {
 	map<string,Module*> modules;
 
 	for (it=ActorFiles.begin() ; it != ActorFiles.end(); it++){
-		
+		sys::Path fullPath(LibraryFolder + *it);
+
+
 		Module* mod = ParseIRFile(it->c_str(), Err, Context);
 		modules.insert(pair<string,Module*>(*it, mod));
 	}

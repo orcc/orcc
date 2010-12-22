@@ -44,15 +44,16 @@
 #include "llvm/Target/TargetSelect.h"
 #include "llvm/Support/PassNameParser.h"
 #include "llvm/Support/StandardPasses.h"
+#include "llvm/Support/CommandLine.h"
+#include "llvm/Support/PrettyStackTrace.h"
+#include "llvm/System/Signals.h"
 
 #include "Jade/XDFParser.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Fifo/FifoCircular.h"
 #include "Jade/Fifo/FifoTrace.h"
 #include "Jade/Fifo/UnprotectedFifo.h"
-#include "llvm/Support/CommandLine.h"
-#include "llvm/System/Signals.h"
-#include "llvm/Support/PrettyStackTrace.h"
+#include "Jade/Util/OptionMng.h"
 //------------------------------
 
 #ifdef __APPLE__
@@ -200,9 +201,10 @@ void setDirectory(std::string* dir){
 
 //Check options of the decoder engine
 void setOptions(){
-	setDirectory(&VTLDir);
-	setDirectory(&SystemDir);
-	setDirectory(&OutputDir);
+	//Verify if directory is well formed
+	OptionMng::setDirectory(&VTLDir);
+	OptionMng::setDirectory(&SystemDir);
+	OptionMng::setDirectory(&OutputDir);
 }	
 
 int main(int argc, char **argv) {
