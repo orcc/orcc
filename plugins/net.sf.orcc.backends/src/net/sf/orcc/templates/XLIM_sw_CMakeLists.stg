@@ -1,25 +1,18 @@
-printActor(id, actor) ::= <<
-$if (!actor.system)
-$$id$.c
-$endif$
->>
-
-xlim2c(id, actor) ::= <<
-$if (!actor.system)$
-run_xlim2c($id$)
-$endif$
->>
 
 printInstance(instance) ::= <<
-$if (instance.actor)
-$$printActor(id=instance.id, actor=instance.actor)$$
-endif$
+$if(instance.actor)$
+$if(!instance.actor.system)$
+$instance.id$.c
+$endif$
+$endif$
 >>
 
 printXlim2c(instance) ::= <<
-$if (instance.actor)
-$$xlim2c(id=instance.id, actor=instance.actor)$$
-endif$
+$if(instance.actor)$
+$if(!instance.actor.system)$
+run_xlim2c($instance.id$)
+$endif$
+$endif$
 >>
 
 
@@ -29,8 +22,11 @@ CMakeLists(network) ::= <<
 cmake_minimum_required (VERSION 2.8)
 project ($network.name$)
 
-#set build type to Release
-SET(CMAKE_BUILD_TYPE Release)
+# If the user specifies -DCMAKE_BUILD_TYPE on the command line take their definition,
+# otherwise set CMAKE_BUILD_TYPE to Release
+IF(NOT DEFINED CMAKE_BUILD_TYPE OR CMAKE_BUILD_TYPE STREQUAL "")
+   SET(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel." FORCE)
+ENDIF()
 
 # Common packages required
 find_file(ACTORS NAMES actors actorsproject)
@@ -45,7 +41,8 @@ macro (run_xlim2c actor)
   add_custom_command (
     OUTPUT \${CMAKE_SOURCE_DIR}/\${actor}.c
     DEPENDS \${CMAKE_SOURCE_DIR}/\${actor}.xlim
-    COMMAND \${ACTORS}/bin/xlim2c \${CMAKE_SOURCE_DIR}/\${actor}.xlim \${CMAKE_SOURCE_DIR}/\${actor}.c)
+    COMMAND \${ACTORS}/bin/xlim2c \${CMAKE_SOURCE_DIR}/\${actor}.xlim \${CMAKE_SOURCE_DIR}/\${actor}.c
+  )
 endmacro(run_xlim2c)
 
 $network.instances: printXlim2c()$
