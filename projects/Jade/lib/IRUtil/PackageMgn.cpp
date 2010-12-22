@@ -45,7 +45,7 @@
 using namespace std;
 
 string PackageMng::getFolder(Actor* actor){
-	return getFolder(actor->getPackage());
+	return getFolder(getPackages(actor));
 }
 
 string PackageMng::getFolder(string package){

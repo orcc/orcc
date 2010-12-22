@@ -146,6 +146,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 		printActors(actors);
 
 		// Finalize actor generation
+		write("Finalize actors...\n");
 		finalizeActors(actors);
 	}
 
@@ -200,7 +201,7 @@ public class LLVMBackendImpl extends AbstractBackend {
 
 		// Set generation mode
 		if (llvmGenMod.equals("Assembly")) {
-			cmdList.add("-s");
+			cmdList.add("-S");
 		} else if (llvmGenMod.equals("Bitcode")) {
 			cmdList.add("-c");
 		} else if (llvmGenMod.equals("Archive")) {
