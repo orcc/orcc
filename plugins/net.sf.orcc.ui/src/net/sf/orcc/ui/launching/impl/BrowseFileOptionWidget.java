@@ -72,7 +72,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
  * 
  * Class that create input file interface into plugin options.
  * 
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * @author Matthieu Wipliez
  * 
  */

@@ -29,6 +29,7 @@
 package net.sf.orcc.backends.llvm;
 
 import static net.sf.orcc.OrccLaunchConstants.DEBUG_MODE;
+import static net.sf.orcc.preferences.PreferenceConstants.P_JADETOOLBOX;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.orcc.OrccException;
+import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.backends.AbstractBackend;
 import net.sf.orcc.backends.STPrinter;
 import net.sf.orcc.backends.llvm.transformations.AddGEPTransformation;
@@ -55,6 +57,7 @@ import net.sf.orcc.network.Network;
 import net.sf.orcc.network.serialize.XDFWriter;
 import net.sf.orcc.tools.classifier.ActorClassifier;
 import net.sf.orcc.tools.normalizer.ActorNormalizer;
+import net.sf.orcc.ui.OrccActivator;
 import net.sf.orcc.util.OrccUtil;
 
 /**
@@ -77,11 +80,13 @@ public class LLVMBackendImpl extends AbstractBackend {
 	 * Backend options
 	 */
 	private boolean classify;
-	private String llvmAs;
-	private boolean llvmBitcode;
-	private String llvmOpt;
+	/**
+	 * Path of JadeToolbox executable
+	 */
+	protected String jadeToolbox;
+	private String llvmGenMod;
 	private boolean normalize;
-	private boolean opt;
+
 	private String optLevel;
 
 	private STPrinter printer;
@@ -139,6 +144,9 @@ public class LLVMBackendImpl extends AbstractBackend {
 		// transforms and prints actors
 		transformActors(actors);
 		printActors(actors);
+
+		// Finalize actor generation
+		finalizeActors(actors);
 	}
 
 	@Override
@@ -150,24 +158,19 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new XDFWriter(new File(path), network);
 	}
 
-	private void optimizeActor(String execPath, String inputName) {
-		List<String> cmdList = new ArrayList<String>();
-
-		cmdList.add(execPath);
-		cmdList.add(inputName);
-		cmdList.add("-S");
-		cmdList.add("-" + optLevel);
-		cmdList.add("-o");
-		cmdList.add(inputName);
-
-		String[] cmd = cmdList.toArray(new String[] {});
-
-		try {
-			startExec(cmd);
-		} catch (IOException e) {
-			System.err.println("Could not optimize actors : ");
-			e.printStackTrace();
+	private void finalizeActors(List<Actor> actors) throws OrccException {
+		// Jade location has not been set
+		if (jadeToolbox.equals("")) {
+			if (!optLevel.equals("O0") || !llvmGenMod.equals("Assembly")) {
+				throw new OrccRuntimeException(
+						"For optimizing, generating bitcode or archive, Jade Toolbox path must first be set in window->Preference->Orcc");
+			} else {
+				return;
+			}
 		}
+
+		// JadeToolbox is required to finalize actors
+		runJadeToolBox(actors);
 	}
 
 	@Override
@@ -177,19 +180,10 @@ public class LLVMBackendImpl extends AbstractBackend {
 		new File(folder).mkdirs();
 
 		// Set output file name for this actor
-		String outputName = folder + File.separator + actor.getSimpleName()
-				+ ".s";
+		String outputName = folder + File.separator + actor.getSimpleName();
 
 		try {
 			boolean cached = printer.printActor(outputName, actor);
-
-			if (opt) {
-				optimizeActor(llvmOpt, outputName);
-			}
-
-			if (llvmBitcode) {
-				printBitcode(llvmAs, outputName, actor.getName());
-			}
 
 			return cached;
 		} catch (IOException e) {
@@ -197,40 +191,45 @@ public class LLVMBackendImpl extends AbstractBackend {
 		}
 	}
 
-	private void printBitcode(String execPath, String inputName, String actor) {
+	private void runJadeToolBox(List<Actor> actors) throws OrccException {
 		List<String> cmdList = new ArrayList<String>();
-		String outputName = inputName.replace(".s", ".bc");
+		cmdList.add(jadeToolbox);
+		cmdList.add("-" + optLevel);
+		cmdList.add("-L");
+		cmdList.add(path);
 
-		cmdList.add(execPath);
-		cmdList.add(inputName);
-		cmdList.add("-f");
-		cmdList.add("-o");
-		cmdList.add(outputName);
+		// Set generation mode
+		if (llvmGenMod.equals("Assembly")) {
+			cmdList.add("-s");
+		} else if (llvmGenMod.equals("Bitcode")) {
+			cmdList.add("-c");
+		} else if (llvmGenMod.equals("Archive")) {
+			cmdList.add("-a");
+		}
+
+		// Add list of actor
+		for (Actor actor : actors) {
+			cmdList.add(actor.getName());
+		}
+
 		String[] cmd = cmdList.toArray(new String[] {});
 
+		// Launch application
 		try {
 			startExec(cmd);
 		} catch (IOException e) {
-			System.err.println("Could not print bitcode : ");
+			System.err.println("Jade toolbox error : ");
 			e.printStackTrace();
 		}
 	}
 
 	private void setBackendOptions() throws OrccException {
-		llvmBitcode = getAttribute("net.sf.orcc.backends.llvmBitcode", false);
+		llvmGenMod = getAttribute("net.sf.orcc.backends.llvmMode", "Assembly");
+		optLevel = getAttribute("net.sf.orcc.backends.optLevel", "O0");
 		classify = getAttribute("net.sf.orcc.backends.classify", false);
-		opt = getAttribute("net.sf.orcc.backends.llvmOpt", false);
 		normalize = getAttribute("net.sf.orcc.backends.normalize", false);
-
-		if (llvmBitcode) {
-			llvmAs = getAttribute("net.sf.orcc.backends.llvm-as", "");
-		}
-
-		if (opt) {
-			llvmOpt = getAttribute("net.sf.orcc.backends.opt", "");
-			optLevel = getAttribute("net.sf.orcc.backends.optLevel", "");
-		}
-
+		jadeToolbox = OrccActivator.getDefault().getPreferenceStore()
+				.getString(P_JADETOOLBOX);
 	}
 
 	private void startExec(String[] cmd) throws IOException {

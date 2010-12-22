@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.Composite;
  * 
  * Class that add a check box input into plugin options.
  * 
- * @author J�r�me Gorin
+ * @author Jerome Gorin
  * @author Matthieu Wipliez
  * 
  */
@@ -96,7 +96,6 @@ public class CheckBoxOptionWidget implements OptionWidget, SelectionListener {
 	 */
 	private void createCheckBox(Composite parent) {
 		Font font = parent.getFont();
-
 		GridData data = new GridData(SWT.LEFT, SWT.TOP, false, false);
 		data.horizontalIndent = 5;
 

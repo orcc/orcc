@@ -100,7 +100,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 	 */
 	private void createComboBox(Composite parent) {
 		Font font = parent.getFont();
-
+		    
 		Label lbl = new Label(parent, SWT.NONE);
 		lbl.setFont(font);
 		lbl.setText(option.getName());
@@ -110,6 +110,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 		data = new GridData(SWT.LEFT, SWT.TOP, false, false);
 		data.horizontalIndent = 5;
 		data.horizontalSpan = 2;
+
 
 		comboBox = new Combo(parent, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
 		comboBox.setFont(font);

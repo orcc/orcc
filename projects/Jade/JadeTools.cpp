@@ -70,10 +70,16 @@ static cl::list<string>
 Files(cl::Positional, cl::OneOrMore, cl::desc("Input actors"));
 
 cl::opt<bool> 
-AssemblyFlag("s", cl::desc("Generate LLVM in assembly representation"));
+AssemblyFlag("S", cl::desc("Generate LLVM in assembly representation"));
 
 cl::opt<bool> 
 BitcodeFlag("c", cl::desc("Generate LLVM in bytecode representation"));
+
+cl::opt<bool> 
+ArchiveFlag("a", cl::desc("Generate package in archives"));
+
+cl::opt<string> 
+LibraryFolder("L", cl::Required, cl::ValueRequired, cl::desc("Input folder of Video Tool Library"));
 
 int main(int argc, char **argv) {
 	sys::PrintStackTraceOnErrorSignal();

@@ -91,21 +91,10 @@ sys::Path LLVMParser::getFilename(string packageName, string file){
 		exit(0);
 	}
 
-	sys::Path bitcodeFile(package.str()+"/"+file+".bc");
+	sys::Path actorFile(package.str()+"/"+file);
 
-	if (bitcodeFile.exists()){
-		if (bitcodeFile.isBitcodeFile()){
-			return bitcodeFile;
-		}else{
-			cout << "File  " << bitcodeFile.c_str() << " is not a bitcode file.'\n";
-			exit(0);
-		}
-	}
-
-	sys::Path assemblyFile(package.str()+"/"+file+".s");
-
-	if (assemblyFile.exists()){
-		return assemblyFile;
+	if (actorFile.exists()){
+		return actorFile;
 	}
 	
 	cout <<  "File  " << file.c_str() << " has not been found in package "<< packageName.c_str() <<".\n";

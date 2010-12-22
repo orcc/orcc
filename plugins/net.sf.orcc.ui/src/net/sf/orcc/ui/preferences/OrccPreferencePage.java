@@ -60,6 +60,8 @@ public class OrccPreferencePage extends FieldEditorPreferencePage implements
 	public void createFieldEditors() {
 		addField(new FileFieldEditor(PreferenceConstants.P_JADE, "&Jade executable path:",
 				getFieldEditorParent()));
+		addField(new FileFieldEditor(PreferenceConstants.P_JADETOOLBOX, "&Jade toolbox path:",
+				getFieldEditorParent()));
 	}
 
 	@Override

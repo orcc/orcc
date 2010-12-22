@@ -40,16 +40,16 @@
             class="net.sf.orcc.backends.llvm.LLVMBackendImpl"
             name="LLVM">
          <option
+               id="net.sf.orcc.backends.llvmMode">
+         </option>
+         <option
+               id="net.sf.orcc.backends.optLevel">
+         </option>
+         <option
                id="net.sf.orcc.plugins.compileXDF">
          </option>
          <option
                id="net.sf.orcc.backends.classify">
-         </option>
-         <option
-               id="net.sf.orcc.backends.llvmBitcode">
-         </option>
-         <option
-               id="net.sf.orcc.backends.llvmOpt">
          </option>
       </backend>
       <backend
@@ -79,23 +79,6 @@
    </extension>
    <extension
          point="net.sf.orcc.core.options">
-         <option
-               defaultValue="false"
-               description="Whether we should generate .ll or .bc files"
-               id="net.sf.orcc.backends.llvmBitcode"
-               name="Generate bitcode">
-            <checkBox>
-               <option
-                     description="Location of llvm-as"
-                     id="net.sf.orcc.backends.llvm-as"
-                     name="Location of llvm-as">
-                  <browseFile
-                        folder="false"
-                        workspace="false">
-                  </browseFile>
-               </option>
-            </checkBox>
-         </option>
 		 <option
                defaultValue="false"
                id="net.sf.orcc.backends.partition"
@@ -165,36 +148,39 @@
             <checkBox></checkBox>
          </option>
          <option
-               description="Pass every generated though optimization"
-               id="net.sf.orcc.backends.llvmOpt"
-               name="Optimize the VTL">
-            <checkBox>
-               <option
-                     description="Location of  opt from LLVM"
-                     id="net.sf.orcc.backends.opt"
-                     name="Location of opt ">
-                  <browseFile
-                        folder="false"
-                        workspace="false">
-                  </browseFile>
-               </option>
-               <option
-                     description="Set the level of optimization of opt"
-                     id="net.sf.orcc.backends.optLevel"
-                     name="Optimization level :">
-                  <comboBox>
-                     <comboBoxItem
-                           id="O1">
-                     </comboBoxItem>
-                     <comboBoxItem
-                           id="O2">
-                     </comboBoxItem>
-                     <comboBoxItem
-                           id="O3">
-                     </comboBoxItem>
-                  </comboBox>
-               </option>
-            </checkBox>
+               description="Select a representation for the VTL"
+               id="net.sf.orcc.backends.llvmMode"
+               name="Generation mode:">
+            <comboBox>
+               <comboBoxItem
+                     id="Assembly">
+               </comboBoxItem>
+               <comboBoxItem
+                     id="Bitcode">
+               </comboBoxItem>
+               <comboBoxItem
+                     id="Archive">
+               </comboBoxItem>
+            </comboBox>
+         </option>
+         <option
+               description="Set level of optimization"
+               id="net.sf.orcc.backends.optLevel"
+               name="Optimization level:">
+            <comboBox>
+               <comboBoxItem
+                     id="O0">
+               </comboBoxItem>
+               <comboBoxItem
+                     id="O1">
+               </comboBoxItem>
+               <comboBoxItem
+                     id="O2">
+               </comboBoxItem>
+               <comboBoxItem
+                     id="O3">
+               </comboBoxItem>
+            </comboBox>
          </option>
    </extension>
 
