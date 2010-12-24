@@ -50,6 +50,8 @@
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Jit/LLVMOptimizer.h"
+#include "Jade/Optimize/FifoFnRemoval.h"
+#include "Jade/Optimize/InstanceInternalize.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 #include "llvm/Support/PassNameParser.h"
 //------------------------------
@@ -79,7 +81,7 @@ DecoderEngine::~DecoderEngine(){
 
 }
 
-int DecoderEngine::load(Network* network) {
+int DecoderEngine::load(Network* network, int optLevel) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 	XDFnetwork = network;
@@ -101,8 +103,8 @@ int DecoderEngine::load(Network* network) {
 	cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 
-	LLVMOptimizer opt(&decoder);
-	opt.optimize();
+	doOptimizeDecoder(&decoder);
+
 	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 	
@@ -148,4 +150,16 @@ void DecoderEngine::parseActors(Network* network) {
 		
 		actors.insert(pair<string, Actor*>(*it, actor));
 	}
+}
+
+void DecoderEngine::doOptimizeDecoder(Decoder* decoder){
+
+	InstanceInternalize internalize;
+	internalize.transform(decoder);
+	
+	LLVMOptimizer opt(decoder);
+	opt.optimize();
+
+	FifoFnRemoval removeFifo;
+	removeFifo.transform(decoder);
 }

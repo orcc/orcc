@@ -44,6 +44,7 @@
 #include "llvm/Module.h"
 #include "llvm/PassManager.h"
 #include "llvm/LinkAllPasses.h"
+#include "llvm/Bitcode/Archive.h"
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/IRReader.h"
@@ -328,6 +329,29 @@ void opt(string file, Module* M){
 
 }
 
+void createArchives(map<string,Module*>* modules){
+	map<string,Archive*> archives;
+	map<string,Archive*>::iterator itArchive;
+	map<string,Module*>::iterator itModule;
+	LLVMContext &Context = getGlobalContext();
+
+	for (itModule = modules->begin(); itModule != modules->end(); itModule++){
+		Archive* archive;
+		string firstPackage = PackageMng::getFirstPackage(itModule->first);
+
+		itArchive = archives.find(firstPackage);
+
+		if(itArchive == archives.end()){
+			sys::Path ArchivePath(LibraryFolder + firstPackage+ ".a");
+			archive =  Archive::CreateEmpty(ArchivePath, Context);
+			archives.insert(pair<string,Archive*>(firstPackage, archive));
+		}else{
+			archive = itArchive->second;
+		}
+	}
+}
+
+
 //main function of Jade toolbox
 int main(int argc, char **argv) {
 	sys::PrintStackTraceOnErrorSignal();
@@ -371,5 +395,8 @@ int main(int argc, char **argv) {
 		opt(LibraryFolder + PackageMng::getFolder(itModule->first), itModule->second);
 	}
 
+	if(OutputArchive){
+		createArchives(&modules);
+	}
 		
 }

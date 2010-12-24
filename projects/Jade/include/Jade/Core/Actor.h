@@ -365,6 +365,14 @@ public:
      */
 	virtual bool isParseable(){return true;};
 
+	/**
+	 * @brief Returns true if this actor is a system actor.
+	 * 
+	 * @return true if this actor is a system actor,
+	 *         false otherwise
+	 */
+	bool isSystem();
+
 protected:
 	/** Name of the actor */
 	std::string name;

@@ -198,6 +198,7 @@ void setDirectory(std::string* dir){
 	}
 }
 
+int optLevel;
 
 //Check options of the decoder engine
 void setOptions(){
@@ -205,6 +206,16 @@ void setOptions(){
 	OptionMng::setDirectory(&VTLDir);
 	OptionMng::setDirectory(&SystemDir);
 	OptionMng::setDirectory(&OutputDir);
+
+	if (OptLevelO1){
+		optLevel = 1;
+	}else if (OptLevelO2){
+		optLevel = 2;
+	}else if (OptLevelO3){
+		optLevel = 3;
+	}else{
+		optLevel = 0;
+	}
 }	
 
 int main(int argc, char **argv) {
@@ -243,7 +254,7 @@ int main(int argc, char **argv) {
 
 	//Load and execute the parsed network
 	DecoderEngine engine(Context, fifo , VTLDir, SystemDir, Verbose);
-	engine.load(network);
+	engine.load(network, optLevel);
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
 }

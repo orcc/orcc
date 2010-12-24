@@ -76,9 +76,11 @@ public:
 	 *   
 	 *  @param network : the Network to load
      *
+	 *  @param optLevel : the level of optimization to apply
+	 *
 	 *  @return HDAGGraph representing the network's contents
      */
-	int load(Network* network);
+	int load(Network* network, int optLevel);
 
 private:
 	/*!
@@ -89,6 +91,15 @@ private:
 	 *  @param network : the Network to parse
      */
 	void parseActors(Network* network);
+
+	/*!
+     *  @brief Optimize decoder
+     *
+     *  Perform special optimization for the decoder
+	 *   
+	 *  @param decoder : the Decoder to optimize
+     */
+	void doOptimizeDecoder(Decoder* decoder);
 	
 	Network* XDFnetwork;
 	Decoder* decoder;
