@@ -70,7 +70,6 @@ void InstanceInternalize::doInternalize(Instance* instance){
 	list<Action*>* initializes = instance->getInitializes();
 
 	for (it = initializes->begin(); it != initializes->end(); it++){
-		setProcInternal((*it)->getBody());
 		setProcInternal((*it)->getScheduler());
 	}
 

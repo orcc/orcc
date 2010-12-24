@@ -41,6 +41,7 @@
 
 #include "llvm/Constants.h"
 #include "llvm/Support/CommandLine.h"
+#include "llvm/Support/StandardPasses.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/DecoderEngine.h"
@@ -105,6 +106,9 @@ int DecoderEngine::load(Network* network, int optLevel) {
 
 	doOptimizeDecoder(&decoder);
 
+	LLVMOptimizer opt(&decoder);
+	opt.optimize();
+
 	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 	
@@ -157,8 +161,9 @@ void DecoderEngine::doOptimizeDecoder(Decoder* decoder){
 	InstanceInternalize internalize;
 	internalize.transform(decoder);
 	
-	LLVMOptimizer opt(decoder);
-	opt.optimize();
+	PassManager Passes;
+	Passes.add(createFunctionInliningPass());
+	Passes.run(*decoder->getModule());
 
 	FifoFnRemoval removeFifo;
 	removeFifo.transform(decoder);

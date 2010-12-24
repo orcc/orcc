@@ -482,7 +482,7 @@ b$label(blockNode)$:
 
 procedure(procedure) ::= <<
 $if(!procedure.external)$
-define $procedure.returnType$ @$procedure$($procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", "$) {
+define $procedure.returnType$ @$procedure$($procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", "$) nounwind {
 entry:
 $if(procedure.locals.list)$
 	$procedure.locals.list: variableDeclaration()$

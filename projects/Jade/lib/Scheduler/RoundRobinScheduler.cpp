@@ -138,6 +138,7 @@ void RoundRobinScheduler::createSchedulerFn(){
 		Instance* instance = (*it).second;
 		ActionScheduler* scheduler = instance->getActionScheduler();
 		CallInst *Add1CallRes = CallInst::Create(scheduler->getSchedulerFunction(), "", BB);
+		Add1CallRes->setTailCall();
 	}
 	
 	// Add a basic block return to the scheduler.
