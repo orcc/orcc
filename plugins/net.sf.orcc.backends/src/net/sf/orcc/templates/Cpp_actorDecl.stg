@@ -90,9 +90,9 @@ int schedule();
 
 constructor(parameters) ::= <<
 $if (actor.parameters.list)$
-$actor.simpleName$(char*, $parameters: {$it.type$}; separator=", "$, AKA_PROFILING_MODE );
+$actor.simpleName$(const char*, $parameters: {$it.type$}; separator=", "$, AKA_PROFILING_MODE );
 $else$
-$actor.simpleName$(char*, AKA_PROFILING_MODE);
+$actor.simpleName$(const char*, AKA_PROFILING_MODE);
 $endif$
 >>
 
@@ -182,7 +182,7 @@ $endif$
 	void getFifoStatus();
 
 	private:
-	static char* className;
+	static const char* className;
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Parameters

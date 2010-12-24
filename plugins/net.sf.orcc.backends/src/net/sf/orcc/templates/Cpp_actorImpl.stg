@@ -429,9 +429,9 @@ int $actor.simpleName$::schedule()
 
 constructor(parameters, stateVars) ::= <<
 $if (actor.parameters.list)$
-$actor.simpleName$::$actor.simpleName$(char* instanceName, $parameters: {$it.type$ $it$}; separator=", "$, AKA_PROFILING_MODE eProfilingMode)
+$actor.simpleName$::$actor.simpleName$(const char* instanceName, $parameters: {$it.type$ $it$}; separator=", "$, AKA_PROFILING_MODE eProfilingMode)
 $else$
-$actor.simpleName$::$actor.simpleName$(char* instanceName, AKA_PROFILING_MODE eProfilingMode)
+$actor.simpleName$::$actor.simpleName$(const char* instanceName, AKA_PROFILING_MODE eProfilingMode)
 $endif$
 :
 $parameters: {$it$($it$),}; wrap, separator="\n"$
@@ -474,7 +474,7 @@ using namespace $namespace()$;
 extern TraceAka g_oTracer;
 #endif
 
-char* $actor.simpleName$::className = "$actor.simpleName$";
+const char* $actor.simpleName$::className = "$actor.simpleName$";
 
 $defineConstantVars(actor.stateVars.list)$
 
