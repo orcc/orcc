@@ -130,16 +130,8 @@ static void scheduler() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char *argv[]) {
-	init_orcc(argc, argv);
 
-	scheduler();
-
-	printf("End of simulation! Press a key to continue\n");
-	wait_for_key();
-
-	return 0;
-}
+$printMain()$
 
 >>
 

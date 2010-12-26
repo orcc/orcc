@@ -209,6 +209,22 @@ void *thread_scheduler(void *data) {
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// main
+
+printMain() ::= <<
+int main(int argc, char *argv[]) {
+  init_orcc(argc, argv);
+  
+  scheduler();
+
+  printf("End of simulation! Press a key to continue\n");
+  wait_for_key();
+
+  return 0;
+}
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // print network
 network(debugFifos, fifoSize, network, options) ::= <<
 // Generated from "$network.name$"
@@ -329,16 +345,8 @@ static void scheduler() {
 $endif$
 
 ////////////////////////////////////////////////////////////////////////////////
-int main(int argc, char *argv[]) {
-	init_orcc(argc, argv);
-	
-	scheduler();
 
-	printf("End of simulation! Press a key to continue\n");
-	wait_for_key();
-
-	return 0;
-}
+$printMain()$
 
 >>
 
