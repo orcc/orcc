@@ -29,6 +29,8 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+#define MAX_ACTORS 1000
+
 struct conn_s {
 	struct fifo_s *fifo;
 	struct actor_s *source;
@@ -42,13 +44,15 @@ struct actor_s {
 	int num_outputs; /** number of output ports */
 	struct actor_s **predecessors; /** predecessors: one pointer to an actor per port. */
 	struct actor_s **successors; /** successors: one pointer to an actor per port. */
-
 	int in_list; /** set to 1 when the actor is in the schedulable list. Used by add_schedulable to do the membership test in O(1). */
 };
 
 struct scheduler_s {
 	int num_actors;
 	struct actor_s **actors;
+	struct actor_s *schedulable[MAX_ACTORS];
+	int next_entry;
+	int next_schedulable;
 };
 
 #include "orcc_scheduler.inl"

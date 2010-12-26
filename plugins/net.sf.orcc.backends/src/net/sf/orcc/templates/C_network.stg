@@ -115,6 +115,46 @@ $edges: assignFifo()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
+// Declare actors
+
+declareActor(instance) ::= "$GetInstanceId(instance)$"
+declareActors(instances) ::= <<
+struct actor_s $instances: declareActor(); wrap, separator=", "$;
+
+>>
+
+declareActorArray(instance) ::= "&$GetInstanceId(instance)$"
+
+declareActorsArray(thread,instances) ::= <<
+struct actor_s *actors$if(thread)$_$thread$$endif$[] = {$instances: declareActorArray(); wrap, separator=", "$};
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// Define actors
+
+NumInputs(instance) ::= <<
+$if (instance.actor)
+$$instance.actor.inputs.length$$
+elseif (instance.broadcast)$1$else$0$endif$
+>>
+
+NumOutputs(instance) ::= <<
+$if (instance.actor)
+$$instance.actor.outputs.length$$
+elseif (instance.broadcast)$$instance.broadcast.numOutputs$$else$0$endif$
+>>
+
+fillActorStruct(instance) ::= <<
+
+struct actor_s $GetInstanceId(instance)$ = {"$GetInstanceId(instance)$", $GetInstanceId(instance)$_scheduler, $
+NumInputs(instance)$, $NumOutputs(instance)$, NULL, NULL};
+>>
+
+fillActorsStructs(instances) ::= <<
+$instances: fillActorStruct()$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // declares initialize and scheduler functions
 
 initialize(instance) ::= <<
@@ -144,40 +184,28 @@ printInitializes(instances) ::= <<
 $instances: printInitialize()$
 >>
 
-printSchedulerInstance(instance) ::= <<
-si.num_firings = 0;
-$GetInstanceId(instance)$_scheduler(&si);
-#ifdef PRINT_FIRINGS
-printf("$GetInstanceId(instance)$_scheduler: %i\n", si.num_firings);
-#endif
->>
+printSchedulers(isPointer) ::= <<
+struct actor_s *my_actor;
+struct schedinfo_s si;
 
-printSchedulers(instances) ::= <<
-$instances: printSchedulerInstance(); separator="\n"$
-
+while (1) {
+  my_actor = sched_get_next($if(!isPointer)$&$endif$sched);    
+  si.num_firings = 0;
+  my_actor->sched_func(&si);
 #ifdef PRINT_FIRINGS
-printf("\n");
+  printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 #endif
+}
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // threads
 
-printThread(thread) ::= <<
-void *$thread$(void *user_data) {
-	struct schedinfo_s si;
-
-	printf("Started thread \"$thread$\"\n");
-
-	while (1) {
-		$printSchedulers(threads.(thread))$
-	}
-	return NULL;
+printThread() ::= <<
+void *thread_scheduler(void *data) {
+  struct scheduler_s *sched = data;
+  $printSchedulers("true")$
 }
->>
-
-printThreads(threads) ::= <<
-$threads.keys: printThread(); separator="\n\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,6 +229,7 @@ $endif$
 
 #include "orcc.h"
 #include "orcc_fifo.h"
+#include "orcc_scheduler.h"
 #include "orcc_util.h"
 
 #define SIZE $fifoSize$
@@ -225,7 +254,7 @@ $if (options.needPthreads)
 $////////////////////////////////////////////////////////////////////////////////
 // Threads
 
-$printThreads(options.threads)$
+$printThread()$
 
 #ifdef _WIN32
 typedef long cpu_set_t;
@@ -251,13 +280,32 @@ void orcc_set_affinity(cpu_set_t *cpuset, int proc_num, pthread_t tid) {
 	}
 #endif
 }
+$endif$
+
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of a struct actor for each actor
+
+$declareActors(network.instances)$
+
+////////////////////////////////////////////////////////////////////////////////
+// Declaration of the actors array
+
+$fillActorsStructs(network.instances)$
+
+$if(options.needPthreads)$
+$options.threads.keys: {$declareActorsArray(thread=it,instances=options.threads.(it))$}; separator="\n"$
 
 static void scheduler() {
 	pthread_t $options.threads.keys: {thread_$it$}; separator=", "$;
+	struct scheduler_s $options.threads.keys: {sched_$it$}; separator=", "$;
+	
 	cpu_set_t cpuset;
 
 	$printInitializes(network.instances)$
-	$options.threads.keys: {pthread_create(&thread_$it$, NULL, $it$, NULL);}; separator="\n"$
+	
+	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors_$it$) / sizeof(actors_$it$[0]), actors_$it$);}; separator="\n"$
+	
+	$options.threads.keys: {pthread_create(&thread_$it$, NULL, thread_scheduler, (void *) &sched_$it$);}; separator="\n"$
 
 	clear_cpu_set(&cpuset);
 	$options.threads.keys: {orcc_set_affinity(&cpuset, $i0$, thread_$it$);}; separator="\n"$
@@ -269,13 +317,14 @@ $else$
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
-static void scheduler() {
-	struct schedinfo_s si;
+$declareActorsArray(instances=network.instances)$
 
+static void scheduler() {
 	$printInitializes(network.instances)$
-	while (1) {
-		$printSchedulers(network.instances)$
-	}
+	struct scheduler_s sched;
+  sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors);
+  
+	$printSchedulers()$
 }
 $endif$
 
@@ -292,4 +341,7 @@ int main(int argc, char *argv[]) {
 }
 
 >>
+
+
+
 

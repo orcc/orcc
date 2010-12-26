@@ -31,21 +31,27 @@
 // Scheduling list
 ///////////////////////////////////////////////////////////////////////////////
 
-#define MAX_ACTORS 1000
-
-static struct actor_s *schedulable[MAX_ACTORS];
-static int next_entry;
-static int next_schedulable;
+/**
+* Returns the next actor in actors list.
+*/
+static struct actor_s *sched_get_next(struct scheduler_s *sched) {
+	struct actor_s *actor = sched->actors[sched->next_schedulable];
+	sched->next_schedulable++;
+	if(sched->next_schedulable == sched->num_actors){
+	  sched->next_schedulable = 0;
+	}
+	return actor;
+}
 
 /**
 * Returns the next schedulable actor, or NULL if no actor is schedulable.
 * The actor is removed from the schedulable list.
 */
 static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
-	struct actor_s *actor = schedulable[next_schedulable];
-	next_schedulable++;
-	if (next_schedulable >= MAX_ACTORS) {
-		next_schedulable = 0;
+	struct actor_s *actor = sched->schedulable[sched->next_schedulable];
+	sched->next_schedulable++;
+	if (sched->next_schedulable >= MAX_ACTORS) {
+		sched->next_schedulable = 0;
 	}
 
 	// actor is not a member of the list anymore
@@ -60,10 +66,10 @@ static void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *act
 	// only add the actor in the schedulable list if it is not already there
 	// like a list.contains(actor) but in O(1) instead of O(n)
 	if (!actor->in_list) {
-		schedulable[next_entry] = actor;
-		next_entry++;
-		if (next_entry >= MAX_ACTORS) {
-			next_entry = 0;
+		sched->schedulable[sched->next_entry] = actor;
+		sched->next_entry++;
+		if (sched->next_entry >= MAX_ACTORS) {
+			sched->next_entry = 0;
 		}
 
 		actor->in_list = 1;
