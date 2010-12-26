@@ -1,19 +1,4 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Declare actors
-
-declareActor(instance) ::= "$GetInstanceId(instance)$"
-declareActors(instances) ::= <<
-struct actor_s $instances: declareActor(); wrap, separator=", "$;
-
->>
-
-declareActorArray(instance) ::= "&$GetInstanceId(instance)$"
-
-declareActorsArray(instances) ::= <<
-struct actor_s *actors[] = {$instances: declareActorArray(); wrap, separator=", "$};
->>
-
-///////////////////////////////////////////////////////////////////////////////
 // Declare predecessors and successors
 
 Neighbor(port) ::= <<
@@ -53,28 +38,12 @@ $instances:
 ///////////////////////////////////////////////////////////////////////////////
 // Define actors
 
-NumInputs(instance) ::= <<
-$if (instance.actor)
-$$instance.actor.inputs.length$$
-elseif (instance.broadcast)$1$else$0$endif$
->>
-
-NumOutputs(instance) ::= <<
-$if (instance.actor)
-$$instance.actor.outputs.length$$
-elseif (instance.broadcast)$$instance.broadcast.numOutputs$$else$0$endif$
->>
-
 fillActorStruct(instance) ::= <<
 
 struct actor_s $GetInstanceId(instance)$ = {"$GetInstanceId(instance)$", $GetInstanceId(instance)$_scheduler, $
 NumInputs(instance)$, $NumOutputs(instance)$, $
 if(instance.actor.inputs.list.empty)$NULL$else$$GetInstanceId(instance)$_predecessors$endif$, $
 if(instance.actor.outputs.list.empty)$NULL$else$$GetInstanceId(instance)$_successors$endif$};
->>
-
-fillActorsStructs(instances) ::= <<
-$instances: fillActorStruct()$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -119,7 +88,7 @@ $declarePredsSuccs(network.instances)$
 
 $fillActorsStructs(network.instances)$
 
-$declareActorsArray(network.instances)$
+$declareActorsArray(instances=network.instances)$
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
