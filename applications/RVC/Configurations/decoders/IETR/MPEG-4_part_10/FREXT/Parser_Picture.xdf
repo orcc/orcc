@@ -379,6 +379,20 @@
    <Port kind="Output" name="DirectSpatialMvPred">
       <Type name="bool"/>
    </Port>
+   <Port kind="Output" name="Width">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+         </Entry>
+      </Type>
+   </Port>
+   <Port kind="Output" name="Height">
+      <Type name="int">
+         <Entry kind="Expr" name="size">
+            <Expr kind="Literal" literal-kind="Integer" value="16"/>
+         </Entry>
+      </Type>
+   </Port>
    <!-- ************************************** -->
    <!-- Variables and Parameters of the Graph  -->
    <!-- ************************************** -->
@@ -615,4 +629,6 @@
    <Connection dst="MergeDataFromSDataAndMbLayer" dst-port="IsB_Skip" src="DecodeSliceData_Cavlc" src-port="Is_B_Skip"/>
    <Connection dst="DecodeSliceData_Cavlc" dst-port="SliceHeaderParameters" src="DecodeSliceHeader" src-port="SliceDataParam"/>
    <Connection dst="" dst-port="DirectSpatialMvPred" src="DecodeRefPicList" src-port="DirectSpatialMvPredFlag"/>
+   <Connection dst="" dst-port="Width" src="DecodeSliceHeader" src-port="Width"/>
+   <Connection dst="" dst-port="Height" src="DecodeSliceHeader" src-port="Height"/>
 </XDF>

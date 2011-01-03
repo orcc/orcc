@@ -164,7 +164,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			if(ValFlag) then
 				Val | (1<<Idx)
 			else
-				Val & (-1 ^ (1<<Idx))
+				Val & (0xFFFFFFFF ^ (1<<Idx))
 			end
 		end
 

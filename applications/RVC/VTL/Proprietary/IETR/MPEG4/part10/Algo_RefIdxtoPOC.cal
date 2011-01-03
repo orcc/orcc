@@ -26,8 +26,8 @@ actor Algo_RefIdxtoPOC()
 
 	List(type:uint(size=32), size=16) RefPoc;
 
-	uint(size=5)  SizeList;
-	uint(size=5)  CountRead;
+	uint(size=6)  SizeList;
+	uint(size=6)  CountRead;
 
 	SendIdxAsked: action
 			NewList   :[ IsNewPic ],

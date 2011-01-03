@@ -73,7 +73,7 @@ actor Algo_DecodeResidual()
 	List(type: bool        , size = 24 ) MbExists := [true : for int s in 0 .. 23];
 	List(type: uint(size=5), size = 16 ) IdxLeftNeighbour  = [16, 0,17, 2, 1, 4, 3, 6,18, 8,19,10, 9,12,11,14];
 	List(type: uint(size=5), size = 16 ) IdxAboveNeighbour = [20,21, 0, 1,22,23, 4, 5, 2, 3, 8, 9, 6, 7,12,13];
-	uint(size=4) IdxCurrMb := 0;
+	uint(size=5) IdxCurrMb := 0;
 	uint(size=3) i8x8Loop;
 	uint(size=3) iCbCrLoop;
 	uint(size=2) Component_type := 0;

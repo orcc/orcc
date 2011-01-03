@@ -49,7 +49,7 @@ actor Algo_DecodeSubMbPred()
 	bool          mb_field_decoding_flag;
 	uint(size=6)  mb_type;
 
-	uint(size=2) mbPartIdx;
+	uint(size=3) mbPartIdx;
 	uint(size=3) subMbPartIdx;
 	uint(size=3) subMbPartIdxMax;
 

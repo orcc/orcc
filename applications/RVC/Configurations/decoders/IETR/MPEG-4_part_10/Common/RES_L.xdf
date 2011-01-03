@@ -123,6 +123,30 @@
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
    </Instance>
+   <Instance id="Sink_2">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/coef_res_2.txt"/>
+      </Parameter>
+   </Instance>
+   <Instance id="Sink_1">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.int8.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/QP_2.txt"/>
+      </Parameter>
+   </Instance>
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->
    <!-- ************************************** -->
@@ -137,4 +161,6 @@
    <Connection dst="" dst-port="CoefACR_L" src="Algo_Merge_4x4_to_16x16" src-port="Y"/>
    <Connection dst="FUN_dcr" dst-port="MbType" src="" src-port="MbType"/>
    <Connection dst="FUN_IS_IQ_IT_L" dst-port="MbType" src="" src-port="MbType"/>
+   <Connection dst="Sink_2" dst-port="In" src="Algo_Merge_4x4_to_16x16" src-port="Y"/>
+   <Connection dst="Sink_1" dst-port="In" src="" src-port="QP"/>
 </XDF>

@@ -2,11 +2,11 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="215" y="25"/>
-      <vertex id="Height" x="357" y="1280"/>
+      <vertex id="Height" x="1227" y="1144"/>
       <vertex id="IntraPredModeC" x="1712" y="738"/>
       <vertex id="QP_Cb" x="1770" y="1198"/>
       <vertex id="QP_Cr" x="1780" y="1227"/>
-      <vertex id="Width" x="344" y="1523"/>
+      <vertex id="Width" x="1130" y="931"/>
       <vertex id="ScalingList" x="1755" y="1340"/>
       <vertex id="QP" x="1778" y="1165"/>
       <vertex id="CurrMbAddr" x="1713" y="558"/>
@@ -64,5 +64,8 @@
       <vertex id="RefIdxL1ToPoc" x="2251" y="1174"/>
       <vertex id="SelectRefIdx" x="2439" y="1081"/>
       <vertex id="Mgnt_InterPred" x="2666" y="781"/>
+      <vertex id="Sink_1" x="1681" y="385"/>
+      <vertex id="Sink_2" x="2022" y="479"/>
+      <vertex id="Sink_3" x="2287" y="639"/>
    </vertices>
 </layout>

@@ -59,6 +59,8 @@
       <vertex id="MbPredResMvL1" x="1693" y="1076"/>
       <vertex id="SubMbPredResMvL1" x="1671" y="1282"/>
       <vertex id="DirectSpatialMvPred" x="1108" y="419"/>
+      <vertex id="Width" x="588" y="417"/>
+      <vertex id="Height" x="581" y="459"/>
       <vertex id="Mgnt_DecodePic" x="1446" y="-92"/>
       <vertex id="DecodeSliceHeader" x="224" y="303"/>
       <vertex id="DecodeRefPicList" x="723" y="418"/>

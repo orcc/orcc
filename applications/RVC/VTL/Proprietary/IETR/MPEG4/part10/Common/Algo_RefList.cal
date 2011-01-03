@@ -62,9 +62,9 @@ actor Algo_RefList (bool DEBUG)
 	uint(size=31) RefReordering,
 	uint(size=31) FraNum,
 	uint(size=31) MaxFrameNum,
-	uint(size=31) LongTermList,
-	uint(size=31) ShortTermList,
-	uint(size=4)  SzShortTermList,
+	int(size=32) LongTermList,
+	int(size=32) ShortTermList,
+	uint(size=5)  SzShortTermList,
 	uint(size=5)  NbRefFrame,
 	uint(size=32) POC,
 	uint(size=2)  RefListType,
@@ -102,11 +102,11 @@ actor Algo_RefList (bool DEBUG)
 
 	int (size=32) ValMovedFrame            := 0;
 	uint(size=31) ValMaxFrameNum           := 0;
-	uint(size=5)  CounterRefListTab        := 0; /* Contains the number of RefList's element which are sent                   */
-	uint(size=5)  NbSTRead                 := 0; /* Contains the number of Long Term List's' element which are read           */
-	uint(size=5)  NbSTCount                := 0; /* Contains the number of Long Term List's' element which are read           */
-	uint(size=5)  NumMaxListRefFrame       := 0; /* Frame Number of all pictures must be between 0 and NumMaxListRefFrame - 1 */
-	uint(size=5)  IdxCurrentPic            := 0;
+	uint(size=6)  CounterRefListTab        := 0; /* Contains the number of RefList's element which are sent                   */
+	uint(size=6)  NbSTRead                 := 0; /* Contains the number of Long Term List's' element which are read           */
+	uint(size=6)  NbSTCount                := 0; /* Contains the number of Long Term List's' element which are read           */
+	uint(size=6)  NumMaxListRefFrame       := 0; /* Frame Number of all pictures must be between 0 and NumMaxListRefFrame - 1 */
+	uint(size=6)  IdxCurrentPic            := 0;
 	uint(size=6)  NbPOC                    := 0;
 	int (size=32) LastFrameNum             := 0;
 	uint(size=2)  ListType                 := REFLIST0_PRED;

@@ -83,7 +83,7 @@ actor Algo_BlockExpand_AVC ()
 
 	/* State Variable */
 	List(type:int(size=12), size=16) ValCoeff := [ 0 : for int i in 0 .. 15];
-	uint(size=4) IdxValCoeff      := 0;
+	uint(size=5) IdxValCoeff      := 0;
 
 	uint(size=8) LumaMBSize;
 	uint(size=2) Component        := Y_COMPONENT;

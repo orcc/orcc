@@ -67,9 +67,9 @@ actor Algo_MMCO ()
 	uint(size=32) POC
 		==>
 	int (size=32) DelList,
-	uint(size=31) LongTermList,
-	uint(size=31) ShortTermList,
-	uint(size=4)  SzShortTermList,
+	int(size=32) LongTermList,
+	int(size=32) ShortTermList,
+	uint(size=5)  SzShortTermList,
 	bool          EmptyDPB
 		:
 
@@ -104,13 +104,13 @@ actor Algo_MMCO ()
 	uint(size=32) ValCurrPoc       := 0;
 	uint(size=31) LastFrameNum     := 0;
 	uint(size=31) ValMaxFrameNum   := 0;
-	uint(size=5)  NumRefFrame      := 0;
+	uint(size=6)  NumRefFrame      := 0;
 	uint(size=5)  ShortTermCount   := 0;
 	uint(size=5)  LongTermCount    := 0;
 	uint(size=5)  NbShortTermSent  := 0;
 	uint(size=1)  FlagLongTerm     := 0;
-	uint(size=4)  LongTermFrameIdx := 0;
-	uint(size=6)  IdxPocList       := 0;
+	uint(size=5)  LongTermFrameIdx := 0;
+	uint(size=7)  IdxPocList       := 0;
 	bool          ValIsIDR         := false;
 	int (size=32) ValDelPoc        := 0;
 

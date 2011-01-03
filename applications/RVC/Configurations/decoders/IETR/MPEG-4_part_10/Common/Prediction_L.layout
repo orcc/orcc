@@ -37,5 +37,9 @@
       <vertex id="Deblocking_Filter" x="972" y="70"/>
       <vertex id="DemuxParserInfos" x="54" y="577"/>
       <vertex id="Inter" x="500" y="991"/>
+      <vertex id="Sink_1" x="962" y="569"/>
+      <vertex id="Sink_2" x="751" y="696"/>
+      <vertex id="Sink_3" x="740" y="333"/>
+      <vertex id="Sink_4" x="742" y="998"/>
    </vertices>
 </layout>

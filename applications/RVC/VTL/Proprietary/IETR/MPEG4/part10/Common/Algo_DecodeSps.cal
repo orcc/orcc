@@ -36,10 +36,7 @@ actor Algo_DecodeSps()
 	bool          Direct8x8Inference,
 
 	uint(size=32) Pps_PicWidthInMbs,
-	uint(size=32) Pps_PicHeightInMapUnits, 
-
-	int (size=16) Height,
-	int (size=16) Width
+	uint(size=32) Pps_PicHeightInMapUnits
 		:
 
 
@@ -135,7 +132,7 @@ actor Algo_DecodeSps()
 			if(ValFlag) then
 				Val | (1<<Idx)
 			else
-				Val & (-1 ^ (1<<Idx))
+				Val & (0xFFFFFFFF ^ (1<<Idx))
 			end
 		end
 
@@ -150,7 +147,7 @@ actor Algo_DecodeSps()
 			SpsAskedFromPic :[ValSps]
 				==>
 			SliceDataParameters   :[SliceDataParam] repeat 7,
-			SliceHeaderParameters :[SliceHeaderParam]repeat 8,
+			SliceHeaderParameters :[SliceHeaderParam]repeat 10,
 			SizeDPBMax            :[MaxDPBSz[ValSps]],
 			Direct8x8Inference    :[ValDirect8x8Inference],
 
@@ -161,7 +158,7 @@ actor Algo_DecodeSps()
 			bool ValDeltaPic,
 			bool ValMbAdaptFrameField,
 			bool ValDirect8x8Inference,
-			List(type: int(size=32), size=8) SliceHeaderParam,
+			List(type: int(size=32), size=10) SliceHeaderParam,
 			List(type: int(size=32), size=7) SliceDataParam
 		do
 			val_frame_mbs_only :=
@@ -205,6 +202,9 @@ actor Algo_DecodeSps()
 			SliceHeaderParam[5] := log2_max_pic_order_cnt_lsb_minus4[ValSps] + 4;
 			SliceHeaderParam[6] := pic_order_cnt_type[ValSps];
 			SliceHeaderParam[7] := SetFlag(val_frame_mbs_only,2,SetFlag(ValDeltaPic,1,SetFlag(ValMbAdaptFrameField,0,0)));
+			SliceHeaderParam[8] := pic_width_in_mbs_minus1[ValSps] + 1;
+			SliceHeaderParam[9] := pic_height_in_map_units_minus1[ValSps] + 1;
+			
 
 			sps_id  := ValSps;
 			LoopVal := 0;
@@ -426,8 +426,6 @@ actor Algo_DecodeSps()
 	ReadNumRefFrame.Done: action
 			ValVLD :[ValueOfVLD] repeat 5
 				==>
-			Height :[pic_height_in_map_units_minus1[sps_id] + 1],
-			Width  :[pic_width_in_mbs_minus1[sps_id] + 1]
 	var
 		uint(size=32) PicWidthInMacroBs,
 		uint(size=32) FrameHeightInMacroBs,

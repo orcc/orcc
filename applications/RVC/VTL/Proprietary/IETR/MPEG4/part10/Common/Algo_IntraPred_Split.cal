@@ -86,18 +86,11 @@ actor Algo_IntraPred_Split()
 	uint          pic_width_in_mb;
 	uint(size=13) curr_mb_addr;
 	uint(size=13) first_mb_in_slice;
-	List(type: List(type: int(size=5), size=16), size=PICWIDTH) intra4x4predmode;
+	List(type: List(type: int(size=5), size=16), size=PICWIDTH) intra4x4predmode:= [ [ 2 : for int j in 0 .. 15 ] : for int i in
+			0 .. PICWIDTH - 1 ];
 	List(type: uint(size=4) , size=16)   InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
 	//FIXME! Maximum size of a line in macroclock
 	List(type: bool, size=PICWIDTH) is_constrained_i_flag := [ false : for int i in 0 .. PICWIDTH - 1 ];
-
-
-	// initialize intra4x4predmode to a huge list of 2's
-	initialize ==>
-		do
-			intra4x4predmode := [ [ 2 : for int j in 0 .. 15 ] : for int i in
-			0 .. PICWIDTH - 1 ];
-		end
 
 
 	Get_MbType: action

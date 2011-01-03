@@ -38,7 +38,10 @@ actor Algo_DecodeSliceHeader()
 
 	uint(size=32) Poc,
 
-	int (size=14) SliceDataParam
+	int (size=14) SliceDataParam,
+	
+    int (size=16) Width,
+    int (size=16) Height
 		:
 
 
@@ -191,11 +194,13 @@ actor Algo_DecodeSliceHeader()
 
 
 	ReadFrameNum.Asked: action
-			SpsParameters :[SpsParam] repeat 8
+			SpsParameters :[SpsParam] repeat 10
 				==>
 			//                frame_num
 			TypeOfVLD :[   READ_BITS   ],
-			VLDParam  :[ log2_max_frame_num ]
+			VLDParam  :[ log2_max_frame_num ],
+			Width          :[SpsParam[8]],
+			Height         :[SpsParam[9]]
 		do
 			expected_delta_per_poc_cycle           := SpsParam[0];
 			log2_max_frame_num                     := SpsParam[1];

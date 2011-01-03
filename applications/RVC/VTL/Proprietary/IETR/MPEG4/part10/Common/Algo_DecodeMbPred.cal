@@ -39,11 +39,11 @@ actor Algo_DecodeMbPred()
 	bool DEBUG_MV           = false;
 	bool DEBUG_FLAG_DECODED = false;
 
-	List (type:uint(size=3),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
+	List (type:uint(size=4),size=16) rem_intraYxY_pred_mode := [ 0 : for int i in 0 .. 15];
 
 	uint(size=5)  lumaYxYBlkIdx := 0;
 	uint(size=2)  BitMissed     := 0;
-	int (size=5)  CountBit      := 0;
+	int (size=6)  CountBit      := 0;
 	//uint(size=2)  intra_chroma_pred_mode;
 	uint(size=5)  mbPartIdx     := 0;
 	uint(size=5)  mbPartIdxMax  := 0;

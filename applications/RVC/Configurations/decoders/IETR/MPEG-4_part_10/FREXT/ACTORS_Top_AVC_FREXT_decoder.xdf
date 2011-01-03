@@ -38,7 +38,7 @@
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
       <Parameter name="fileName">
-         <Expr kind="Literal" literal-kind="String" value="/home/hyviquel/Téléchargements/Rec._ITU-T_H.264.1(2010-04)_Base_Ext_Main_profiles_bitstreams/NL1_Sony_D/NL1_Sony_D.jsv"/>
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/NL2_Sony_H.jsv"/>
       </Parameter>
    </Instance>
    <Instance id="art_Display_yuv_width_height">

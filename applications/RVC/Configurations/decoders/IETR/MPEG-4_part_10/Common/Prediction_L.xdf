@@ -334,6 +334,54 @@
          <Expr kind="Var" name="SAMPLE_SIZE"/>
       </Parameter>
    </Instance>
+   <Instance id="Sink_1">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.int9.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/select_2.txt"/>
+      </Parameter>
+   </Instance>
+   <Instance id="Sink_2">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/intra4x4_2.txt"/>
+      </Parameter>
+   </Instance>
+   <Instance id="Sink_3">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.int9.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/intra16x16_2.txt"/>
+      </Parameter>
+   </Instance>
+   <Instance id="Sink_4">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.int9.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/intra4x4_2.txt"/>
+      </Parameter>
+   </Instance>
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->
    <!-- ************************************** -->
@@ -402,4 +450,8 @@
    <Connection dst="Inter" dst-port="SubMbType" src="" src-port="SubMbType"/>
    <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>
    <Connection dst="Inter" dst-port="SelectList" src="" src-port="SelectList"/>
+   <Connection dst="Sink_1" dst-port="In" src="Select" src-port="X"/>
+   <Connection dst="Sink_2" dst-port="In" src="Intra_4x4" src-port="MBPred_intra_4x4"/>
+   <Connection dst="Sink_3" dst-port="In" src="Intra_16x16" src-port="MB_intraPred16x16"/>
+   <Connection dst="Sink_4" dst-port="In" src="Inter" src-port="MB4x4Pred_L"/>
 </XDF>

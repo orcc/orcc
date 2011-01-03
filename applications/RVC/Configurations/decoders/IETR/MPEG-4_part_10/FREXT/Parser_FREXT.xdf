@@ -492,6 +492,42 @@
       <!-- FU/Network Parameter      -->
       <!-- ************************* -->
    </Instance>
+   <Instance id="Sink_1">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.uint4.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/predmode_2.txt"/>
+      </Parameter>
+   </Instance>
+   <Instance id="Sink_2">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.int12.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/blockexpand_2.txt"/>
+      </Parameter>
+   </Instance>
+   <Instance id="Sink_3">
+      <!-- ************************* -->
+      <!-- FU/Network refinement     -->
+      <!-- ************************* -->
+      <Class name="System.art_Sink_txt"/>
+      <!-- ************************* -->
+      <!-- FU/Network Parameter      -->
+      <!-- ************************* -->
+      <Parameter name="fileName">
+         <Expr kind="Literal" literal-kind="String" value="/mnt/orcc/Sequences/MV_2.txt"/>
+      </Parameter>
+   </Instance>
    <!-- ************************************** -->
    <!-- Connections of the Graph               -->
    <!-- ************************************** -->
@@ -520,8 +556,6 @@
    <Connection dst="RefList0" dst-port="ShortTermList" src="MMCO" src-port="ShortTermList"/>
    <Connection dst="RefList0" dst-port="SzShortTermList" src="MMCO" src-port="SzShortTermList"/>
    <Connection dst="RefList0" dst-port="LongTermList" src="MMCO" src-port="LongTermList"/>
-   <Connection dst="" dst-port="Height" src="DecodeSps" src-port="Height"/>
-   <Connection dst="" dst-port="Width" src="DecodeSps" src-port="Width"/>
    <Connection dst="BlockSplit" dst-port="Coeff" src="BlockExpand" src-port="Coeff"/>
    <Connection dst="" dst-port="CoefAC_Cb" src="BlockSplit" src-port="Coeff_U_AC"/>
    <Connection dst="" dst-port="CoefDC_Cb" src="BlockSplit" src-port="Coeff_U_DC"/>
@@ -645,4 +679,9 @@
    <Connection dst="" dst-port="SelectList" src="MVReconstruct" src-port="SelectList"/>
    <Connection dst="" dst-port="SubMbType" src="DecodePic" src-port="SubMbType"/>
    <Connection dst="" dst-port="PocToRead" src="SelectRefIdx" src-port="PocToRead"/>
+   <Connection dst="" dst-port="Height" src="DecodePic" src-port="Height"/>
+   <Connection dst="" dst-port="Width" src="DecodePic" src-port="Width"/>
+   <Connection dst="Sink_1" dst-port="In" src="IntraPredSplit" src-port="PredMode"/>
+   <Connection dst="Sink_2" dst-port="In" src="BlockExpand" src-port="Coeff"/>
+   <Connection dst="Sink_3" dst-port="In" src="MVReconstruct" src-port="MV"/>
 </XDF>

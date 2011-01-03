@@ -76,7 +76,7 @@ actor Algo_MvBuffer()
 
 	bool          Empty_DPB,
 	int(size=32)  DelList,
-	uint(size=31) LongTermList,
+	int(size=32) LongTermList,
 
 	int (size=32) RefList1
 		==>
