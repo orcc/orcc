@@ -106,9 +106,6 @@ actor SelectMvpLX()
 			IsPredL0[1] := Mb_Is_PredL0(MacroBlkType,1);
 			IsPredL1[0] := Mb_Is_PredL1(MacroBlkType,0);
 			IsPredL1[1] := Mb_Is_PredL1(MacroBlkType,1);
-			if(mb_type = BLOCK_TYPE_B_SKIP or mb_type = BLOCK_TYPE_B_DIRECT_16x16)then
-				MbPartIdxMax := 16;
-			end
 		end
 
 	MacroBlkType.IsPredL0: action

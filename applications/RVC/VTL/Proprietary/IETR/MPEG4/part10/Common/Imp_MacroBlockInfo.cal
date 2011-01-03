@@ -142,10 +142,10 @@ unit Imp_MacroBlockInfo :
 
 	List(type: uint(size=3),size=32) NumMbPart_B =
 		[
-			4,1,1,1,2,2,2,2,2,2,
-			2,2,2,2,2,2,2,2,2,2,
-			2,2,4,1,1,1,1,1,1,1,
-			1,1
+			16,1,1,1,2,2,2,2,2,2,
+			 2,2,2,2,2,2,2,2,2,2,
+			 2,2,4,1,1,1,1,1,1,1,
+			 1,1
 		];
 
 	List(type: List(type: uint(size=3), size=16), size=2) NumSubMbPartTab =
@@ -268,7 +268,7 @@ unit Imp_MacroBlockInfo :
 					if(MbType = BLOCK_TYPE_P_SKIP)then
 						1
 					else
-						4
+						16
 					end
 				end
 			end

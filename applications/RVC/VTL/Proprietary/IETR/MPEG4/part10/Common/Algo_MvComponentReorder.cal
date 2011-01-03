@@ -87,9 +87,6 @@ actor Algo_MvComponentReorder()
 			MbPartIdx    := 0;
 			MbPartIdxMax := NumMbPart(MacroBlkType);
 			SizeMbMv     := SizeMbPart(MacroBlkType);
-			if(mb_type = BLOCK_TYPE_B_SKIP or mb_type = BLOCK_TYPE_B_DIRECT_16x16)then
-				MbPartIdxMax := 16;
-			end
 		end
 
 	GetListSel4Mb: action
