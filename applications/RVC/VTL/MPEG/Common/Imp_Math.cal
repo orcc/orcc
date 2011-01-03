@@ -87,18 +87,35 @@ unit Imp_Math :
 			end
 		end
 
-	  function clip(int Value, int minVal, int maxVal)
-	  			-->
-	  		int
-	  	:
-	    	if Value > maxVal then
-	    		maxVal
-	    	else
-	    		if Value < minVal then
-	    			minVal
-	    		else
-	    			Value
-	    		end
-	    	end
-	  end
+	function clip(int Value, int minVal, int maxVal)
+				-->
+			int
+		:
+			if Value > maxVal then
+				maxVal
+			else
+				if Value < minVal then
+					minVal
+				else
+					Value
+				end
+			end
+		end
+
+	function median(int a, int b, int c)
+				-->
+			int
+		:
+			if(   b<=a and a<=c
+			   or c<=a and a<=b )then
+				a
+			else
+				if(   a<=b and b<=c
+				   or c<=b and b<=a )then
+					b
+				else
+					c
+				end
+			end
+		end	
 end

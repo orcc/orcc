@@ -128,24 +128,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=11) Mbx_in_pix;
 	uint(size=11) Mby_in_pix;
 
-
-	function median(int a, int b, int c)
-				-->
-			int
-		:
-			if(   b<=a and a<=c
-			   or c<=a and a<=b )then
-				a
-			else
-				if(   a<=b and b<=c
-				   or c<=b and b<=a )then
-					b
-				else
-					c
-				end
-			end
-		end	
-
 		List(type: int (size=16),size=2) MvA;
 		List(type: int (size=16),size=2) MvB;
 		List(type: int (size=16),size=2) MvC;	
