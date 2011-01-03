@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<XDF name="Parser_FREXT">
+<XDF name="Parser_SVC">
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
@@ -428,7 +428,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Parser_Picture_Frext"/>
+        <Class name="Parser_Picture_Svc"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

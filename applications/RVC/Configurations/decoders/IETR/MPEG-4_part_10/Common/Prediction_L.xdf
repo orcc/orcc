@@ -281,27 +281,6 @@
             <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
-    <Instance id="Deblocking_Filter">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="DBF"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-        <Parameter name="Idx_SZ">
-            <Expr kind="Var" name="Idx_SZ"/>
-        </Parameter>
-        <Parameter name="LUMA_CHROMA">
-            <Expr kind="Literal" literal-kind="Integer" value="16"/>
-        </Parameter>
-        <Parameter name="MV_SZ">
-            <Expr kind="Var" name="MV_SZ"/>
-        </Parameter>
-        <Parameter name="QUANT_SIZE">
-            <Expr kind="Var" name="QUANT_SIZE"/>
-        </Parameter>
-    </Instance>
     <Instance id="DemuxParserInfos">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -335,6 +314,15 @@
             <Expr kind="Var" name="SAMPLE_SIZE"/>
         </Parameter>
     </Instance>
+    <Instance id="a">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Trash.a"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -345,17 +333,6 @@
     <Connection dst="Intra_16x16" dst-port="MB_IN" src="Select" src-port="X"/>
     <Connection dst="Select" dst-port="X1" src="Intra_16x16" src-port="MB_intraPred16x16"/>
     <Connection dst="Select" dst-port="X0" src="Intra_4x4" src-port="MBPred_intra_4x4"/>
-    <Connection dst="Deblocking_Filter" dst-port="Z" src="Select" src-port="X"/>
-    <Connection dst="Deblocking_Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
-    <Connection dst="Deblocking_Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="Deblocking_Filter" dst-port="QP" src="" src-port="QP"/>
-    <Connection dst="Deblocking_Filter" dst-port="LFDisable" src="" src-port="LFDisable"/>
-    <Connection dst="Deblocking_Filter" dst-port="Alpha_offset" src="" src-port="slice_alpha_c0_offset"/>
-    <Connection dst="Deblocking_Filter" dst-port="Beta_offset" src="" src-port="slice_beta_offset"/>
-    <Connection dst="Deblocking_Filter" dst-port="Cbp_blk" src="" src-port="CodedBlockPattern"/>
-    <Connection dst="Deblocking_Filter" dst-port="MV" src="" src-port="mv_in"/>
-    <Connection dst="Deblocking_Filter" dst-port="RefIdx" src="" src-port="ref_idx_in"/>
-    <Connection dst="Deblocking_Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Select" dst-port="X3" src="" src-port="I_PCM_Y"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="Buffer_inter" dst-port="IsIDR" src="" src-port="IsIDR"/>
@@ -412,11 +389,17 @@
     <Connection dst="Select" dst-port="X2" src="Inter" src-port="MB4x4Pred_L"/>
     <Connection dst="Intra_4x4" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Intra_16x16" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
-    <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
     <Connection dst="Buffer_inter" dst-port="POCtoRead" src="" src-port="PocToRead"/>
     <Connection dst="Buffer_inter" dst-port="ReadAddress" src="" src-port="ReadAddress"/>
-    <Connection dst="Buffer_inter" dst-port="WD" src="Deblocking_Filter" src-port="WD"/>
     <Connection dst="Inter" dst-port="SubMbType" src="" src-port="SubMbType"/>
     <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>
     <Connection dst="Inter" dst-port="SelectList" src="" src-port="SelectList"/>
+    <Connection dst="Buffer_inter" dst-port="WD" src="Select" src-port="X"/>
+    <Connection dst="a" dst-port="a" src="" src-port="slice_alpha_c0_offset"/>
+    <Connection dst="a" dst-port="b" src="" src-port="slice_beta_offset"/>
+    <Connection dst="a" dst-port="c" src="" src-port="CodedBlockPattern"/>
+    <Connection dst="a" dst-port="d" src="" src-port="LFDisable"/>
+    <Connection dst="a" dst-port="e" src="" src-port="mv_in"/>
+    <Connection dst="a" dst-port="f" src="" src-port="QP"/>
+    <Connection dst="a" dst-port="g" src="" src-port="ref_idx_in"/>
 </XDF>

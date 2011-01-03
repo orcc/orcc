@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Top_SVC_decoder_compare">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="System.Source"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="AVCDecoder">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="SVC_decoder"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Merger">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_Merger420_AVC"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="System.Display"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Compare">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="System.Compare"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="AVCDecoder" dst-port="bits8" src="source" src-port="O"/>
+    <Connection dst="Merger" dst-port="U" src="AVCDecoder" src-port="Display_Cb"/>
+    <Connection dst="Merger" dst-port="V" src="AVCDecoder" src-port="Display_Cr"/>
+    <Connection dst="display" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="display" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
+    <Connection dst="display" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
+    <Connection dst="Merger" dst-port="Y" src="AVCDecoder" src-port="Display_L"/>
+    <Connection dst="Compare" dst-port="B" src="Merger" src-port="YUV"/>
+    <Connection dst="Compare" dst-port="WIDTH" src="AVCDecoder" src-port="Width"/>
+    <Connection dst="Compare" dst-port="HEIGHT" src="AVCDecoder" src-port="Height"/>
+</XDF>
