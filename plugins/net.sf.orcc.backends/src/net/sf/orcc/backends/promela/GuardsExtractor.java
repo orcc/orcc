@@ -63,16 +63,23 @@ public class GuardsExtractor extends AbstractActorTransformation {
 
 	private Map<Action, List<Peek>> peeks;
 
-	private List<Expression> list;
+	private Map<Action, List<Load>> loads;
+	
+	private List<Expression> guardList;
 
-	private List<Load> loads;
+	private List<Load> loadList;
 
+	private List<Load> usedLoadsList;
+	
 	private List<Peek> peekList;
+	
+	private int peekCnt = 0;
 
 	public GuardsExtractor(Map<Action, List<Expression>> guards,
-			Map<Action, List<Peek>> peeks) {
+			Map<Action, List<Peek>> peeks, Map<Action, List<Load>> loads) {
 		this.guards = guards;
 		this.peeks = peeks;
+		this.loads = loads;
 	}
 
 	// takes the guard from the previous action and negates it and adds it to
@@ -100,17 +107,34 @@ public class GuardsExtractor extends AbstractActorTransformation {
 	// If the local variable derived from this variable is used in an expression
 	// then the variable is put directly in the expression instead
 	private void removeLoads() {
-		ListIterator<Load> loadIter = loads.listIterator();
+		ListIterator<Load> loadIter = loadList.listIterator();
 		while (loadIter.hasNext()) {
 			Load ld = loadIter.next();
-			ListIterator<Expression> itr = list.listIterator();
+			// do not remove the Loads related to Peeks
+			if (isFromPeek(ld)) {
+				usedLoadsList.add(ld);
+				ld.getTarget().setName(ld.getTarget().getBaseName()+"_peek_"+peekCnt++);
+				continue;
+			}
+			ListIterator<Expression> itr = guardList.listIterator();
 			while (itr.hasNext()) {
 				Expression element = itr.next();
 				replaceVarInExpr(element, ld);
 			}
 		}
 	}
-
+	
+	private boolean isFromPeek(Load ld) {
+		ListIterator<Peek> peekIter = peekList.listIterator();
+		while (peekIter.hasNext()){
+			Peek pk = peekIter.next();
+			if (ld.getSource().getVariable() == pk.getTarget()){
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	// recursively searches through the expression and finds if the local
 	// variable derived from the Load is present
 	private void replaceVarInExpr(Expression expr, Load ld) {
@@ -129,11 +153,13 @@ public class GuardsExtractor extends AbstractActorTransformation {
 	public void transform(Actor actor) throws OrccException {
 		for (Action action : actor.getActions()) {
 			currAction = action;
-			list = new ArrayList<Expression>();
-			loads = new ArrayList<Load>();
+			guardList = new ArrayList<Expression>();
+			loadList = new ArrayList<Load>();
 			peekList = new ArrayList<Peek>();
-			guards.put(currAction, list);
+			usedLoadsList = new ArrayList<Load>();
+			guards.put(currAction, guardList);
 			peeks.put(currAction, peekList);
+			loads.put(currAction, usedLoadsList);
 			visit(action.getScheduler());
 			removeLoads();
 		}
@@ -178,13 +204,13 @@ public class GuardsExtractor extends AbstractActorTransformation {
 	public void visit(Assign assign) {
 		// we should also consider other cases but this is enough for now
 		if (!assign.getValue().isBooleanExpr()) {
-			list.add(assign.getValue());
+			guardList.add(assign.getValue());
 		}
 	}
 
 	@Override
 	public void visit(Load load) {
-		loads.add(load);
+		loadList.add(load);
 	}
 
 	@Override

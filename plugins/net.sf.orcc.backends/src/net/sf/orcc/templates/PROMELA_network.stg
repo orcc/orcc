@@ -33,11 +33,11 @@ $edges: allocateFifo()$
 // assigns FIFOs
 
 doAssignFifoSrc(source, sourcePort, count) ::= <<
-#define $GetInstanceId(source)$_$sourcePort.name$ chan_$count$; 
+#define chan_$GetInstanceId(source)$_$sourcePort.name$ chan_$count$
 >>
 
 doAssignFifoTgt(target, targetPort, count) ::= <<
-#define $GetInstanceId(target)$_$targetPort.name$ chan_$count$;
+#define chan_$GetInstanceId(target)$_$targetPort.name$ chan_$count$
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
@@ -75,10 +75,10 @@ $allocateFifos(network.connections)$
 $assignFifos(network.connections)$
 
 // Include the actors
-$network.Actors: {actor | #include "$actor$.pml"}; separator="\n"$
+$network.Instances: {instance | #include "$instance.id$.pml"}; separator="\n"$
 
 init {
-	$network.Actors: {actor | run $actor$(/*init_state*/);}; separator="\n"$	
+	$network.Instances: {instance | run $instance.id$(/*init_state*/);}; separator="\n"$	
 }
 
 >>

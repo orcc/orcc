@@ -1,9 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Channel declaration
+// Port declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-channels(port) ::= <<
-/*chan chan_$port.name$ = [1] of {$port.type$}*/
+// TODO: the [1] is not OK, it did not work with the "port.type.dimensions"
+
+portDeclaration(port) ::= <<
+	$port.type$ $port$[1];
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,7 +21,7 @@ $value : {[$it$]} $
 variableDeclaration(variable) ::= <<
 $
 if(variable.port)
-$$variable.type$ $variable$$listSize(variable.type.dimensions)$$
+$$
 else
 $$variable.type$ $variable$$listSize(variable.type.dimensions)$$
 endif
@@ -111,13 +113,13 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 >>
 
 Peek(peek) ::= <<
-$peek.port$?<$peek.target$>;
+chan_$instance.id$_$peek.port$?<$peek.target$>;
 >>
 
 Read(read) ::= <<
 
 $if (read.target)$
-chan_$read.port$?$read.target$[0];
+chan_$instance.id$_$read.port$?$read.target$[0];
 $endif$
 >>
 
@@ -133,7 +135,7 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 
 Write(write) ::= <<
 
-chan_$write.port$!$write.target$[0];
+chan_$instance.id$_$write.port$!$write.target$[0];
 >>
 
 Return(return) ::= <<
@@ -166,7 +168,7 @@ if
 $if(ifNode.elseNodes)$:: else ->
 	$nodes(ifNode.elseNodes)$
 $endif$
-fi
+fi;
 $BlockNode(ifNode.joinNode)$
 >>
 
@@ -201,18 +203,13 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 newState() ::= << 
-:: state == $fsm_trans.SourceState$ ->
-$if (rest(fsm_trans.NextStateInfo))$
-	$options.peeks.(first(fsm_trans.NextStateInfo).action): { p | chan_$p.port$?<$p.port$>;}$
+:: state == state_$fsm_trans.SourceState$ -> {
+	$fsm_trans.NextStateInfo: { fsm_nsi | $fsm_nsi.action: peeks()$}$
 	if
 	$fsm_trans.NextStateInfo: {
 			fsm_nsi|
 :: $fsm_nsi.action: schedulerFSM(); separator="\n"$ }$
-	fi
-$else$
-$fsm_trans.NextStateInfo: {
-		fsm_nsi| $fsm_nsi.action: schedulerFSM(); separator="\n"$ }$
-$endif$
+	fi;}
 >>
 
 schedulerFSM(action) ::= <<
@@ -226,16 +223,23 @@ schedulerFSM(action) ::= <<
 	$inputPattern(action.inputPattern)$
 	$action.body.nodes: {$(it.class.simpleName)(it)$}$
 	$outputPattern(action.outputPattern)$
-	state = $fsm_nsi.targetState$;
+	state = state_$fsm_nsi.targetState$;
 }
 >>
 
 guardFSM() ::= <<
 $if (options.guards.(action))$
- $options.guards.(action): {act | $act$} $
+ $options.guards.(action): {grd | $grd$} $
 $else$
 skip
 $endif$
+>>
+
+peeks(action) ::= <<
+	$options.loads.(action): { p | $p.Target.type$ $p.Target$;}$
+	$options.peeks.(action): { p | chan_$instance.id$_$p.port$?<$p.port$[0]>;}$
+	$options.loads.(action): { p | $p.Target$ = $p.Source$[0];}$
+
 >>
 
 
@@ -288,11 +292,11 @@ $pattern.keys: outputPatternPort(); separator="\n"$
 >>
 
 inputChannelCheck(pattern) ::= <<
-$pattern.keys: {key | && nempty($key$)} $
+$pattern.keys: {key | && nempty(chan_$instance.id$_$key$)} $
 >>
 
 outputChannelCheck(pattern) ::= <<
-$pattern.keys: {key | && nfull($key$)} $
+$pattern.keys: {key | && nfull(chan_$instance.id$_$key$)} $
 >>
 
 
@@ -301,39 +305,38 @@ $pattern.keys: {key | && nfull($key$)} $
 // Process declaration
 ///////////////////////////////////////////////////////////////////////////////
 
-proctype() ::= <<
-proctype $actor.name$($actor.parameters.list: variableDeclaration(); wrap, separator=", "$) {
+proctype(instance, actor) ::= <<
+proctype $instance.id$($actor.parameters.list: variableDeclaration(); wrap, separator=", "$) {
 
 	/* State variables */
 	$actor.stateVars.list : stateVar(); separator="\n"$
+	
+	/* Ports */
+    $ [instance.actor.inputs.list, instance.actor.outputs.list] : portDeclaration(); separator="\n"$
 
 	$if (actor.actionScheduler.fsm)$
 	/* States of the FSM */
-	$actor.actionScheduler.fsm.states: {s | int $s$ = $i0$;}; separator="\n"$
+	$actor.actionScheduler.fsm.states: {s | int state_$s$ = $i0$;}; separator="\n"$
 	
 	/* Initial State */
-	int state = $actor.actionScheduler.fsm.initialState$;
+	int state = state_$actor.actionScheduler.fsm.initialState$;
 	
 	do
 	$actor.actionScheduler.fsm.transitions: { fsm_trans| $newState()$ }$
-	od
+	od;
 	$else$
 	do
 	$actor.actionScheduler.actions: scheduler(); separator="\n"$
-	od
+	od;
 	$endif$
 }
 >>
 
 
-actor(actor, options) ::= <<
-/* Composite type */
-
-/* Channels */
-$ [actor.inputs.list, actor.outputs.list] : channels(); separator="\n"$
+instance(instance, options) ::= <<
 
 
 /* Process */
-$proctype()$
+$proctype(instance=instance, actor=instance.actor)$
 
 >>

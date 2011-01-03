@@ -41,10 +41,12 @@ import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Peek;
 import net.sf.orcc.ir.transformations.DeadCodeElimination;
 import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
+import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
 
 /**
@@ -67,12 +69,13 @@ public class PromelaBackendImpl extends AbstractBackend {
 
 	private Map<Action, List<Expression>> guards = new HashMap<Action, List<Expression>>();
 	private Map<Action, List<Peek>> peeks = new HashMap<Action, List<Peek>>();
-
+	private Map<Action, List<Load>> loads = new HashMap<Action, List<Load>>();
+	
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
 		ActorTransformation[] transformations = { new DeadCodeElimination(),
 				new DeadVariableRemoval(false),
-				new GuardsExtractor(guards, peeks), new PhiRemoval() };
+				new GuardsExtractor(guards, peeks, loads), new PhiRemoval() };
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
@@ -96,18 +99,19 @@ public class PromelaBackendImpl extends AbstractBackend {
 		printer.setOptions(getAttributes()); // need to check what this one does
 		printer.getOptions().put("guards", guards);
 		printer.getOptions().put("peeks", peeks);
+		printer.getOptions().put("loads", loads);
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
-		printActors(actors);
+		printInstances(network);
 		printNetwork(network);
 	}
 
 	@Override
-	protected boolean printActor(Actor actor) throws OrccException {
-		String name = actor.getName();
+	protected boolean printInstance(Instance actor) throws OrccException {
+		String name = actor.getId();
 		String outputName = path + File.separator + name + ".pml";
 		try {
-			printer.printActor(outputName, actor);
+			printer.printInstance(outputName, actor);
 		} catch (IOException e) {
 			throw new OrccException("I/O error", e);
 		}
