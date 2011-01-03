@@ -10,7 +10,5 @@
       <vertex id="FUN_dcr" x="205" y="188"/>
       <vertex id="FUN_IS_IQ_IT_L" x="428" y="187"/>
       <vertex id="Algo_Merge_4x4_to_16x16" x="650" y="231"/>
-      <vertex id="Sink_2" x="912" y="164"/>
-      <vertex id="Sink_1" x="148" y="60"/>
    </vertices>
 </layout>

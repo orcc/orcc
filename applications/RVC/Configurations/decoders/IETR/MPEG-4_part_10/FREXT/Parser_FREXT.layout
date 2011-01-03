@@ -64,8 +64,5 @@
       <vertex id="RefIdxL1ToPoc" x="2251" y="1174"/>
       <vertex id="SelectRefIdx" x="2439" y="1081"/>
       <vertex id="Mgnt_InterPred" x="2666" y="781"/>
-      <vertex id="Sink_1" x="1681" y="385"/>
-      <vertex id="Sink_2" x="2022" y="479"/>
-      <vertex id="Sink_3" x="2287" y="639"/>
    </vertices>
 </layout>
