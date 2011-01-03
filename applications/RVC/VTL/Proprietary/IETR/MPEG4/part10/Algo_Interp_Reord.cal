@@ -58,6 +58,9 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 			MbPartIdx    := 0;
 			MbPartIdxMax := NumMbPart(MacroBlkType);
 			SizeMb       := SizeMbPart(MacroBlkType);
+			if(mb_type = BLOCK_TYPE_B_SKIP or mb_type = BLOCK_TYPE_B_DIRECT_16x16)then
+				MbPartIdxMax := 16;
+			end
 		end
 
 	GetListSel4Mb: action
@@ -135,16 +138,19 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 			   mb_type = BLOCK_TYPE_B_SKIP
 			or mb_type = BLOCK_TYPE_B_DIRECT_16x16,
 			NbListToGet > 0
+		var
+			uint(size=3) localMbPartIdx    = MbPartIdx  /  4,
+			uint(size=3) localSubMbPartIdx = MbPartIdx mod 4
 		do
-			foreach int j in 0 .. 2*SzSidePerPart -1
+			foreach int j in 0 .. SzSidePerPart -1
 			do
-				foreach int i in 0 .. 2*SzSidePerPart -1
+				foreach int i in 0 .. SzSidePerPart -1
 				do
-					TabX_Out[i + 2*SzSidePerPart*j]:= i + 2*SzSidePerPart*(MbPartIdx &1);
-					TabY_Out[i + 2*SzSidePerPart*j]:= j + 2*SzSidePerPart*(MbPartIdx>>1);
+					TabX_Out[i + SzSidePerPart*j]:= i + 2*SzSidePerPart*(localMbPartIdx &1) + SzSidePerPart*(localSubMbPartIdx&1);
+					TabY_Out[i + SzSidePerPart*j]:= j + 2*SzSidePerPart*(localMbPartIdx>>1) + SzSidePerPart*(localSubMbPartIdx>>1);
 				end
 			end
-			NbValueToRead := 4*SzSidePerPart*SzSidePerPart;
+			NbValueToRead := SzSidePerPart*SzSidePerPart;
 			ReadIdx       := 0;
 			NbListToGet   := NbListToGet - 1;
 		end

@@ -362,7 +362,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			FirstMbInSlice   :[Fst_Mb],
 			PicWidthInMb     :[pic_width_in_mb]
 				==>
-			DirectPredLX_Out :[ListDirectPred] repeat 4//16
+			DirectPredLX_Out :[ListDirectPred] repeat 16
 		guard
 			not IsNewPic,
 			MacroBlkType = BLOCK_TYPE_B_SKIP or MacroBlkType = BLOCK_TYPE_B_DIRECT_16x16
@@ -433,7 +433,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		end
 
 	GetOtherDirectPredLx: action
-			DirectPredLX_In :[other_direct_pred_lx]repeat 4//16
+			DirectPredLX_In :[other_direct_pred_lx]repeat 16
 				==>
 		do
 			if( (not direct_pred_lx) and (not other_direct_pred_lx[0]))then
@@ -447,24 +447,28 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	SendMv4Direct.Launch: action
 				==>
-			Location  :[ListLocation] repeat 8,//32
-			MvOut     :[ListMv]       repeat 8,//32
-			RefIdxOut :[ListRefIdx]   repeat 4,//16
-			NewPic_o  :[false,false,false,false]//:[FalseList] repeat 16
+			Location  :[ListLocation] repeat 32,
+			MvOut     :[ListMv]       repeat 32,
+			RefIdxOut :[ListRefIdx]   repeat 16,
+			NewPic_o  :[FalseList]    repeat 16
 		guard
 			direct_pred_lx
 		var
-			List(type: uint(size=11), size=8) ListLocation,
-			List(type:  int(size=16), size=8) ListMv,
-			List(type: uint(size=4) , size=8) ListRefIdx
+			List(type: uint(size=11), size=32) ListLocation,
+			List(type:  int(size=16), size=32) ListMv,
+			List(type: uint(size=4) , size=16) ListRefIdx,
+			List(type: bool         , size=16) FalseList = [false : for int i in 1 .. 16]
 		do
 			foreach int mb_part_idx in 0 .. 3
 			do
-				ListLocation[2*mb_part_idx]   := Mbx_in_pix + 8 *  (mb_part_idx&1);
-				ListLocation[2*mb_part_idx+1] := Mby_in_pix + 8 * ((mb_part_idx>>1)&1);
-				ListMv[2*mb_part_idx]         := MvTab[Idx_CurrBlk][4 * mb_part_idx][0];
-				ListMv[2*mb_part_idx + 1]     := MvTab[Idx_CurrBlk][4 * mb_part_idx][1];
-				ListRefIdx[mb_part_idx]       := RefIdxTab[Idx_CurrBlk][4 * mb_part_idx];
+				foreach int sub_mb_part_idx in 0 .. 3
+				do
+					ListLocation[2* (4*mb_part_idx+sub_mb_part_idx)]     := Mbx_in_pix + 8 *  (mb_part_idx&1) + 4 * (sub_mb_part_idx&1);
+					ListLocation[2* (4*mb_part_idx+sub_mb_part_idx) + 1] := Mby_in_pix + 8 * ((mb_part_idx>>1)&1) + 4 * ((sub_mb_part_idx>>1)&1);
+					ListMv[2* (4*mb_part_idx+sub_mb_part_idx)]           := MvTab[Idx_CurrBlk][4 * mb_part_idx + sub_mb_part_idx][0];
+					ListMv[2* (4*mb_part_idx+sub_mb_part_idx) + 1]       := MvTab[Idx_CurrBlk][4 * mb_part_idx + sub_mb_part_idx][1];
+					ListRefIdx[4*mb_part_idx+sub_mb_part_idx]            := RefIdxTab[Idx_CurrBlk][4 * mb_part_idx + sub_mb_part_idx];
+				end
 			end
 		end
 

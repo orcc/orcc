@@ -250,7 +250,7 @@ actor Algo_MvBuffer()
 		do
 			mb_type      := MacroBlkType;
 			MbPartIdx    := 0;
-			MbPartIdxMax := 4;//16
+			MbPartIdxMax := 16;
 			SizeMbMv     := SZ_4x4;
 			Mbx := Curr_Mb_Addr mod PicWidth;
 			Mby := Curr_Mb_Addr  /  PicWidth;
@@ -371,18 +371,12 @@ actor Algo_MvBuffer()
 			   mb_type = BLOCK_TYPE_B_SKIP
 			or mb_type = BLOCK_TYPE_B_DIRECT_16x16
 		var
-			uint(size=4) Idx := 0
+			uint(size=3) localMbPartIdx    = MbPartIdx  /  4,
+			uint(size=3) localSubMbPartIdx = MbPartIdx mod 4
 		do
-			NbPartitionsToWrite := 4;
-			foreach int i in Mbx + 2* (MbPartIdx&1) .. Mbx + 2* (MbPartIdx&1) + 1
-			do
-				foreach int j in Mby + 2* ((MbPartIdx>>1)&1) .. Mby + 2* ((MbPartIdx>>1)&1) + 1
-				do
-					Partition_Mbx[Idx] := i;
-					Partition_Mby[Idx] := j;
-					Idx                := Idx + 1;
-				end
-			end
+			NbPartitionsToWrite := 1;
+			Partition_Mbx[0]    := Mbx + 2* (localMbPartIdx&1)      + (localSubMbPartIdx&1);
+			Partition_Mby[0]    := Mby + 2* ((localMbPartIdx>>1)&1) + ((localSubMbPartIdx>>1)&1);
 			IsPredL0  := false;
 			IsPredL1  := false;
 			MbPartIdx := MbPartIdx + 1;

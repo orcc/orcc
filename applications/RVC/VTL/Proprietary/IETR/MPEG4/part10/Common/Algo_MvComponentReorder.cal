@@ -87,6 +87,9 @@ actor Algo_MvComponentReorder()
 			MbPartIdx    := 0;
 			MbPartIdxMax := NumMbPart(MacroBlkType);
 			SizeMbMv     := SizeMbPart(MacroBlkType);
+			if(mb_type = BLOCK_TYPE_B_SKIP or mb_type = BLOCK_TYPE_B_DIRECT_16x16)then
+				MbPartIdxMax := 16;
+			end
 		end
 
 	GetListSel4Mb: action
@@ -161,17 +164,17 @@ actor Algo_MvComponentReorder()
 			Mv:[Mvx, Mvy],
 			RefIdx :[ref_idx]
 				==>
-			PartSZ :[8,8]
+			PartSZ :[4,4]
 		guard
 			   mb_type = BLOCK_TYPE_B_SKIP
 			or mb_type = BLOCK_TYPE_B_DIRECT_16x16,
 			NbListToGet > 0
+		var
+			uint(size=3) localMbPartIdx    = MbPartIdx  /  4,
+			uint(size=3) localSubMbPartIdx = MbPartIdx mod 4
 		do
-			foreach int i in 0 .. 3
-			do
-				MvTab[i + 4*(MbPartIdx&3)] := [Mvx,Mvy];
-				RefIdxTab[i + 4*(MbPartIdx&3)] := ref_idx;
-			end
+			MvTab[4*(localMbPartIdx&3) + (localSubMbPartIdx&3)]     := [Mvx,Mvy];
+			RefIdxTab[4*(localMbPartIdx&3) + (localSubMbPartIdx&3)] := ref_idx;
 			NbListToGet := NbListToGet - 1;
 		end
 
