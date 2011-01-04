@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="DecodeSpsSvc">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <Port kind="Input" name="ValDecoded">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SpsAskedFromPic">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="SpsAskedFromPps">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <Port kind="Output" name="DecodeNextNal">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="TypeOfVLD">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="NbBitsToRead">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SizeMaxDpb">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SliceHeaderParameters">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="SliceDataParameters">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MMCO_MaxFrameNum">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MMCO_NumRefFrame">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Direct8x8Inference$">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="Pps_PicWidthInMbs">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="Pps_PicHeightInMapUnits">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="32"/>
+            </Entry>
+        </Type>
+    </Port>
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="DecodeSps">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeSps"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="MergeSpsAsk">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Svc.MergeSpsAsk"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="SpsSvc">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Trash.SpsSvc"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="SplitSpsInfo">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Svc.SplitSpsInfo"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="DecodeSps" dst-port="ValVLD" src="" src-port="ValDecoded"/>
+    <Connection dst="" dst-port="TypeOfVLD" src="DecodeSps" src-port="TypeOfVLD"/>
+    <Connection dst="" dst-port="DecodeNextNal" src="DecodeSps" src-port="DecodeNextNal"/>
+    <Connection dst="" dst-port="NbBitsToRead" src="DecodeSps" src-port="NbBitsToRead"/>
+    <Connection dst="" dst-port="Direct8x8Inference$" src="DecodeSps" src-port="Direct8x8Inference"/>
+    <Connection dst="" dst-port="Pps_PicHeightInMapUnits"
+        src="DecodeSps" src-port="Pps_PicHeightInMapUnits"/>
+    <Connection dst="" dst-port="Pps_PicWidthInMbs" src="DecodeSps" src-port="Pps_PicWidthInMbs"/>
+    <Connection dst="" dst-port="SliceHeaderParameters" src="DecodeSps" src-port="SliceHeaderParameters"/>
+    <Connection dst="" dst-port="MMCO_NumRefFrame" src="DecodeSps" src-port="MMCO_NumRefFrame"/>
+    <Connection dst="" dst-port="SliceDataParameters" src="DecodeSps" src-port="SliceDataParameters"/>
+    <Connection dst="" dst-port="MMCO_MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
+    <Connection dst="DecodeSps" dst-port="SpsAsked" src="MergeSpsAsk" src-port="SpsAsked"/>
+    <Connection dst="SplitSpsInfo" dst-port="IsSizeDPB"
+        src="MergeSpsAsk" src-port="IsSizeDPB"/>
+    <Connection dst="" dst-port="SizeMaxDpb" src="SplitSpsInfo" src-port="SizeDPB"/>
+    <Connection dst="SplitSpsInfo" dst-port="SzDPB_or_profile_idc"
+        src="DecodeSps" src-port="SzDPB_or_profile_idc"/>
+    <Connection dst="SpsSvc" dst-port="ProfileIdc" src="SplitSpsInfo" src-port="ProfileIdc"/>
+    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
+        src="SpsSvc" src-port="SpsAskedFromSpsSvc"/>
+    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPic" src="" src-port="SpsAskedFromPic"/>
+    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPps" src="" src-port="SpsAskedFromPps"/>
+</XDF>

@@ -319,15 +319,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="DecodeSps">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeSps"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="SpsVLDecoding">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -493,29 +484,11 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="MergeSpsAsk">
+    <Instance id="DecodeSpsSvc">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Svc.MergeSpsAsk"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="SpsSvc">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Trash.SpsSvc"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="SplitSpsInfo">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Svc.SplitSpsInfo"/>
+        <Class name="DecodeSpsSvc"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -528,27 +501,19 @@
     <Connection dst="CheckNaluType" dst-port="RbspByte" src="Algo_NALU" src-port="RbspByte"/>
     <Connection dst="SpsVLDecoding" dst-port="RbspByte"
         src="CheckNaluType" src-port="SpsRbsp"/>
-    <Connection dst="SpsVLDecoding" dst-port="TypeOfVLD" src="DecodeSps" src-port="TypeOfVLD"/>
-    <Connection dst="DecodeSps" dst-port="ValVLD" src="SpsVLDecoding" src-port="ValDecoded"/>
     <Connection dst="DecodePps" dst-port="ValVLD" src="PpsVLDecoding" src-port="ValDecoded"/>
     <Connection dst="PpsVLDecoding" dst-port="TypeOfVLD" src="DecodePps" src-port="TypeOfVLD"/>
     <Connection dst="PpsVLDecoding" dst-port="RbspByte"
         src="CheckNaluType" src-port="PpsRbsp"/>
     <Connection dst="PicVLDecoding" dst-port="RbspByte"
         src="CheckNaluType" src-port="PicRbsp"/>
-    <Connection dst="DecodePps" dst-port="PicWidthInMbs" src="DecodeSps" src-port="Pps_PicWidthInMbs"/>
-    <Connection dst="DecodePps" dst-port="PicHeightInMapUnits"
-        src="DecodeSps" src-port="Pps_PicHeightInMapUnits"/>
     <Connection dst="PicVLDecoding" dst-port="NewNal"
         src="CheckNaluType" src-port="PicNewNal"/>
     <Connection dst="PpsVLDecoding" dst-port="NewNal"
         src="CheckNaluType" src-port="PpsNewNal"/>
     <Connection dst="SpsVLDecoding" dst-port="NewNal"
         src="CheckNaluType" src-port="SpsNewNal"/>
-    <Connection dst="SpsVLDecoding" dst-port="VLD_Param" src="DecodeSps" src-port="NbBitsToRead"/>
     <Connection dst="PpsVLDecoding" dst-port="VLD_Param" src="DecodePps" src-port="NbBitsToRead"/>
-    <Connection dst="MMCO" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
-    <Connection dst="MMCO" dst-port="NumReferenceFrame" src="DecodeSps" src-port="MMCO_NumRefFrame"/>
     <Connection dst="RefList0" dst-port="EmptyDPB" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="RefList0" dst-port="ShortTermList" src="MMCO" src-port="ShortTermList"/>
     <Connection dst="RefList0" dst-port="SzShortTermList" src="MMCO" src-port="SzShortTermList"/>
@@ -569,8 +534,6 @@
     <Connection dst="" dst-port="ref_idx" src="MVReconstruct" src-port="ref_idx"/>
     <Connection dst="CheckNaluType" dst-port="PpsSkipNal"
         src="DecodePps" src-port="DecodeNextNal"/>
-    <Connection dst="CheckNaluType" dst-port="SpsSkipNal"
-        src="DecodeSps" src-port="DecodeNextNal"/>
     <Connection dst="" dst-port="CodedBlockPattern" src="DecodePic" src-port="CodedBlockPattern"/>
     <Connection dst="" dst-port="ScalingList" src="DecodePic" src-port="ScalingList"/>
     <Connection dst="" dst-port="QP" src="DecodePic" src-port="QP"/>
@@ -637,8 +600,6 @@
     <Connection dst="RefList1" dst-port="ShortTermList" src="MMCO" src-port="ShortTermList"/>
     <Connection dst="RefList1" dst-port="SzShortTermList" src="MMCO" src-port="SzShortTermList"/>
     <Connection dst="RefList1" dst-port="FraNum" src="DecodePic" src-port="FrameNum"/>
-    <Connection dst="RefList0" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
-    <Connection dst="RefList1" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
     <Connection dst="RefList1" dst-port="POC" src="DecodePic" src-port="POC"/>
     <Connection dst="RefList1" dst-port="NbRefFrame" src="DecodePic" src-port="NbRefFrame_l1"/>
     <Connection dst="RefList1" dst-port="RefListType" src="DecodePic" src-port="RefList1Type"/>
@@ -652,12 +613,8 @@
         src="DecodePic" src-port="SubMbType"/>
     <Connection dst="DecodePic" dst-port="PpsParam4SliceHeader"
         src="DecodePps" src-port="SliceHeaderParameters"/>
-    <Connection dst="DecodePic" dst-port="SpsParam4SliceHeader"
-        src="DecodeSps" src-port="SliceHeaderParameters"/>
     <Connection dst="DecodePic" dst-port="PpsParam4SliceData"
         src="DecodePps" src-port="SliceDataParameters"/>
-    <Connection dst="DecodePic" dst-port="SpsParam4SliceData"
-        src="DecodeSps" src-port="SliceDataParameters"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="DecodePic" src-port="POC"/>
     <Connection dst="Mgnt_Display" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
@@ -699,8 +656,6 @@
     <Connection dst="MVReconstruct" dst-port="LTList" src="MMCO" src-port="LongTermList"/>
     <Connection dst="MVReconstruct" dst-port="RefList1" src="RefList1" src-port="RefList"/>
     <Connection dst="MVReconstruct" dst-port="Poc" src="DecodePic" src-port="POC"/>
-    <Connection dst="MVReconstruct" dst-port="Direct8x8InferenceFlag"
-        src="DecodeSps" src-port="Direct8x8Inference"/>
     <Connection dst="MVReconstruct" dst-port="DirectSpatialMvPred"
         src="DecodePic" src-port="DirectSpatialMvPred"/>
     <Connection dst="Mgnt_InterPred" dst-port="MV" src="MVReconstruct" src-port="MV"/>
@@ -716,18 +671,33 @@
     <Connection dst="" dst-port="PocToRead" src="SelectRefIdx" src-port="PocToRead"/>
     <Connection dst="" dst-port="Height" src="DecodePic" src-port="Height"/>
     <Connection dst="" dst-port="Width" src="DecodePic" src-port="Width"/>
-    <Connection dst="DecodeSps" dst-port="SpsAsked" src="MergeSpsAsk" src-port="SpsAsked"/>
-    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPic"
-        src="DecodePps" src-port="GetSps4Pic"/>
-    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPps"
-        src="DecodePps" src-port="GetSps"/>
-    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
-        src="SpsSvc" src-port="SpsAskedFromSpsSvc"/>
-    <Connection dst="SplitSpsInfo" dst-port="SzDPB_or_profile_idc"
-        src="DecodeSps" src-port="SzDPB_or_profile_idc"/>
-    <Connection dst="SplitSpsInfo" dst-port="IsSizeDPB"
-        src="MergeSpsAsk" src-port="IsSizeDPB"/>
+    <Connection dst="CheckNaluType" dst-port="SpsSkipNal"
+        src="DecodeSpsSvc" src-port="DecodeNextNal"/>
+    <Connection dst="MVReconstruct" dst-port="Direct8x8InferenceFlag"
+        src="DecodeSpsSvc" src-port="Direct8x8Inference$"/>
+    <Connection dst="RefList1" dst-port="MaxFrameNum" src="DecodeSpsSvc" src-port="MMCO_MaxFrameNum"/>
+    <Connection dst="RefList0" dst-port="MaxFrameNum" src="DecodeSpsSvc" src-port="MMCO_MaxFrameNum"/>
+    <Connection dst="MMCO" dst-port="MaxFrameNum" src="DecodeSpsSvc" src-port="MMCO_MaxFrameNum"/>
+    <Connection dst="MMCO" dst-port="NumReferenceFrame"
+        src="DecodeSpsSvc" src-port="MMCO_NumRefFrame"/>
+    <Connection dst="SpsVLDecoding" dst-port="VLD_Param"
+        src="DecodeSpsSvc" src-port="NbBitsToRead"/>
+    <Connection dst="DecodePps" dst-port="PicHeightInMapUnits"
+        src="DecodeSpsSvc" src-port="Pps_PicHeightInMapUnits"/>
+    <Connection dst="DecodePps" dst-port="PicWidthInMbs"
+        src="DecodeSpsSvc" src-port="Pps_PicWidthInMbs"/>
+    <Connection dst="DecodePic" dst-port="SpsParam4SliceData"
+        src="DecodeSpsSvc" src-port="SliceDataParameters"/>
+    <Connection dst="DecodePic" dst-port="SpsParam4SliceHeader"
+        src="DecodeSpsSvc" src-port="SliceHeaderParameters"/>
+    <Connection dst="SpsVLDecoding" dst-port="TypeOfVLD"
+        src="DecodeSpsSvc" src-port="TypeOfVLD"/>
+    <Connection dst="DecodeSpsSvc" dst-port="ValDecoded"
+        src="SpsVLDecoding" src-port="ValDecoded"/>
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize"
-        src="SplitSpsInfo" src-port="SizeDPB"/>
-    <Connection dst="SpsSvc" dst-port="ProfileIdc" src="SplitSpsInfo" src-port="ProfileIdc"/>
+        src="DecodeSpsSvc" src-port="SizeMaxDpb"/>
+    <Connection dst="DecodeSpsSvc" dst-port="SpsAskedFromPic"
+        src="DecodePps" src-port="GetSps4Pic"/>
+    <Connection dst="DecodeSpsSvc" dst-port="SpsAskedFromPps"
+        src="DecodePps" src-port="GetSps"/>
 </XDF>
