@@ -1,4 +1,11 @@
 ///////////////////////////////////////////////////////////////////////////////
+// Functions for generating schedules
+///////////////////////////////////////////////////////////////////////////////
+printActionName() ::= <<
+printf("$instance.Id$_$action.name$();\n");
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // Port declaration
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -220,6 +227,7 @@ schedulerFSM(action) ::= <<
 	$if(action.body.locals.list)$
 	$action.body.locals.list: {$variableDeclaration(it)$;$\n$}$
 	$endif$ 
+	$printActionName()$
 	$inputPattern(action.inputPattern)$
 	$action.body.nodes: {$(it.class.simpleName)(it)$}$
 	$outputPattern(action.outputPattern)$
@@ -255,6 +263,7 @@ scheduler(action) ::= <<
 	$if(action.body.locals.list)$
 	$action.body.locals.list: {$variableDeclaration(it)$;$\n$}$
 	$endif$ 
+	$printActionName()$
 	$inputPattern(action.inputPattern)$
 	$action.body.nodes: {$(it.class.simpleName)(it)$}$
 	$outputPattern(action.outputPattern)$
