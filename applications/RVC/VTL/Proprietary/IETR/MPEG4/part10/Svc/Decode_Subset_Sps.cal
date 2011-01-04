@@ -50,131 +50,15 @@ Standards.
 
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
-
 *****************************************************************************/
 package Proprietary.IETR.MPEG4.part10.Svc;
 
-import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
-
-actor MgntSps()
-	uint(size=5)  TypeOfVLDFromSps,
-	int (size=32) VLDParamFromSps,
-
-	uint(size=5)  TypeOfVLDFromSubSps,
-	int (size=32) VLDParamFromSubSps,
-
+actor Decode_Subset_Sps()
 	int (size=32) ValVLD,
-
-	uint(size=5) NalUnitType
+	uint(size=8)  ProfileIdc
 		==>
 	uint(size=5)  TypeOfVLD,
-	int (size=32) VLDParam,
-
-	int (size=32) ValVLD4DecodeSps,
-
-	int (size=32) ValVLD4DecodeSubSps,
-
-	bool          AskPrfIdcForSubSps
+	int (size=32) VldParam
 		:
-
-
-	uint(size=5) NAL_SPS           =  7;
-	uint(size=5) NAL_SUBSET_SPS    = 15;
-
-	DecodeSps.GetVLDVal: action
-			ValVLD           :[VLDecoding]
-				==>
-			ValVLD4DecodeSps :[VLDecoding]
-		end
-
-	DecodeSps.FunctionWithoutParam: action
-			TypeOfVLDFromSps :[ValTypeOfVLD]
-				==>
-			TypeOfVLD        :[ValTypeOfVLD]
-		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
-			ValTypeOfVLD  != SKIP_NAL
-		end
-
-	DecodeSps.FunctionWith1Param: action
-			TypeOfVLDFromSps :[ValTypeOfVLD],
-			VLDParamFromSps  :[Param]
-				==>
-			TypeOfVLD        :[ValTypeOfVLD],
-			VLDParam         :[Param]
-		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
-		end
-
-	EndDecodeSps: action
-			TypeOfVLDFromSps :[Function]
-				==>
-		guard
-			Function = SKIP_NAL
-		end
-
-	NaluType.IsSpsNalUnit : action
-			NalUnitType :[nal_unit_type]
-				==>
-		guard
-			nal_unit_type = NAL_SPS
-		end
-
-	NaluType.IsSubsetSpsNalUnit : action
-			NalUnitType :[nal_unit_type]
-				==>
-			AskPrfIdcForSubSps :[true]
-		guard
-			nal_unit_type = NAL_SUBSET_SPS
-		end
-
-	DecodeSubSps.GetVLDVal: action
-			ValVLD           :[VLDecoding]
-				==>
-			ValVLD4DecodeSubSps :[VLDecoding]
-		end
-
-	DecodeSubSps.FunctionWithoutParam: action
-			TypeOfVLDFromSubSps :[ValTypeOfVLD]
-				==>
-			TypeOfVLD        :[ValTypeOfVLD]
-		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
-			ValTypeOfVLD  != SKIP_NAL
-		end
-
-	DecodeSubSps.FunctionWith1Param: action
-			TypeOfVLDFromSubSps :[ValTypeOfVLD],
-			VLDParamFromSubSps  :[Param]
-				==>
-			TypeOfVLD        :[ValTypeOfVLD],
-			VLDParam         :[Param]
-		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
-		end
-
-	EndDecodeSubSps: action
-			TypeOfVLDFromSubSps :[Function]
-				==>
-		guard
-			Function = SKIP_NAL
-		end
-
-	EndOfNal: action
-				==>
-			TypeOfVLD :[SKIP_NAL]
-		end
-
-	schedule fsm LaunchDecodeSps:
-		LaunchDecodeSps    (DecodeSps                   )--> LaunchDecodeSps;
-		LaunchDecodeSps    (EndDecodeSps                )--> CheckNaluType;
-
-		CheckNaluType      (NaluType.IsSpsNalUnit       )--> EndOfNal;
-		CheckNaluType      (NaluType.IsSubsetSpsNalUnit )--> LaunchDecodeSubSps;
-
-		LaunchDecodeSubSps (DecodeSubSps                )--> LauchDecodeSubSps;
-		LaunchDecodeSubSps (EndDecodeSubSps             )--> EndOfNal;
-
-		EndOfNal           (EndOfNal                    )--> LaunchDecodeSps;
-	end
+	
 end

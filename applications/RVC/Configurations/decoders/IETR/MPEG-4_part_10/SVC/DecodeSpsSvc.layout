@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="ValDecoded" x="347" y="88"/>
-      <vertex id="DecodeNextNal" x="888" y="193"/>
-      <vertex id="TypeOfVLD" x="915" y="30"/>
-      <vertex id="VldParam" x="916" y="76"/>
-      <vertex id="SizeMaxDpb" x="1300" y="569"/>
-      <vertex id="SliceHeaderParameters" x="862" y="417"/>
-      <vertex id="SliceDataParameters" x="874" y="385"/>
-      <vertex id="MMCO_MaxFrameNum" x="871" y="259"/>
-      <vertex id="MMCO_NumRefFrame" x="873" y="291"/>
-      <vertex id="Direct8x8Inference$" x="876" y="224"/>
-      <vertex id="Pps_PicWidthInMbs" x="880" y="352"/>
-      <vertex id="Pps_PicHeightInMapUnits" x="857" y="322"/>
-      <vertex id="DecodeSps" x="576" y="196"/>
-      <vertex id="MergeSpsAsk" x="302" y="441"/>
-      <vertex id="SpsSvc" x="657" y="677"/>
-      <vertex id="SplitSpsInfo" x="996" y="525"/>
-      <vertex id="SpsAskedFromPic" x="128" y="457"/>
-      <vertex id="SpsAskedFromPps" x="130" y="491"/>
+      <vertex id="ValDecoded" x="360" y="142"/>
+      <vertex id="DecodeNextNal" x="880" y="254"/>
+      <vertex id="TypeOfVLD" x="907" y="44"/>
+      <vertex id="VldParam" x="916" y="87"/>
+      <vertex id="SizeMaxDpb" x="1290" y="615"/>
+      <vertex id="SliceHeaderParameters" x="854" y="471"/>
+      <vertex id="SliceDataParameters" x="866" y="439"/>
+      <vertex id="MMCO_MaxFrameNum" x="863" y="313"/>
+      <vertex id="MMCO_NumRefFrame" x="865" y="345"/>
+      <vertex id="Direct8x8Inference$" x="868" y="284"/>
+      <vertex id="Pps_PicWidthInMbs" x="872" y="406"/>
+      <vertex id="Pps_PicHeightInMapUnits" x="849" y="376"/>
+      <vertex id="DecodeSps" x="566" y="242"/>
+      <vertex id="MergeSpsAsk" x="292" y="487"/>
+      <vertex id="SpsSvc" x="1262" y="352"/>
+      <vertex id="SplitSpsInfo" x="986" y="571"/>
+      <vertex id="SpsAskedFromPic" x="119" y="494"/>
+      <vertex id="SpsAskedFromPps" x="121" y="528"/>
       <vertex id="Mgnt_Sps" x="529" y="18"/>
+      <vertex id="NalUnitType" x="343" y="36"/>
    </vertices>
 </layout>

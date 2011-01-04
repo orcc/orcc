@@ -24,6 +24,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="NalUnitType">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="5"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -124,7 +131,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Trash.SpsSvc"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Svc.Decode_Subset_Sps"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -165,9 +172,6 @@
     <Connection dst="" dst-port="SizeMaxDpb" src="SplitSpsInfo" src-port="SizeDPB"/>
     <Connection dst="SplitSpsInfo" dst-port="SzDPB_or_profile_idc"
         src="DecodeSps" src-port="SzDPB_or_profile_idc"/>
-    <Connection dst="SpsSvc" dst-port="ProfileIdc" src="SplitSpsInfo" src-port="ProfileIdc"/>
-    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
-        src="SpsSvc" src-port="SpsAskedFromSpsSvc"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPic" src="" src-port="SpsAskedFromPic"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPps" src="" src-port="SpsAskedFromPps"/>
     <Connection dst="Mgnt_Sps" dst-port="ValVLD" src="" src-port="ValDecoded"/>
@@ -178,4 +182,13 @@
         src="DecodeSps" src-port="NbBitsToRead"/>
     <Connection dst="" dst-port="TypeOfVLD" src="Mgnt_Sps" src-port="TypeOfVLD"/>
     <Connection dst="" dst-port="VldParam" src="Mgnt_Sps" src-port="VLDParam"/>
+    <Connection dst="Mgnt_Sps" dst-port="NalUnitType" src="" src-port="NalUnitType"/>
+    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
+        src="Mgnt_Sps" src-port="AskPrfIdcForSubSps"/>
+    <Connection dst="SpsSvc" dst-port="ProfileIdc" src="SplitSpsInfo" src-port="ProfileIdc"/>
+    <Connection dst="SpsSvc" dst-port="ValVLD" src="Mgnt_Sps" src-port="ValVLD4DecodeSubSps"/>
+    <Connection dst="Mgnt_Sps" dst-port="TypeOfVLDFromSubSps"
+        src="SpsSvc" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_Sps" dst-port="VLDParamFromSubSps"
+        src="SpsSvc" src-port="VldParam"/>
 </XDF>

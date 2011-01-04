@@ -66,6 +66,7 @@ actor CheckNaluType()
 		==>
 	uint(size=8) SpsRbsp,
 	bool         SpsNewNal,
+	uint(size=5) SpsNalUnitType,
 
 	uint(size=8) PpsRbsp,
 	bool         PpsNewNal,
@@ -83,10 +84,11 @@ actor CheckNaluType()
 * Constants 
 *
 */
-	uint(size=5) NAL_SLICE_NON_IDR = 1;
-	uint(size=5) NAL_SLICE_IDR     = 5;
-	uint(size=5) NAL_SPS           = 7;
-	uint(size=5) NAL_PPS           = 8;
+	uint(size=5) NAL_SLICE_NON_IDR =  1;
+	uint(size=5) NAL_SLICE_IDR     =  5;
+	uint(size=5) NAL_SPS           =  7;
+	uint(size=5) NAL_PPS           =  8;
+	uint(size=5) NAL_SUBSET_SPS    = 15;
 
 	bool DEBUG_FLAG_DECODED = false;
 
@@ -133,9 +135,11 @@ actor CheckNaluType()
 			end
 		end
 
-	IsSps: action ==>
+	IsSps: action
+				==>
+			SpsNalUnitType :[nal_unit_type]
 		guard
-			nal_unit_type = NAL_SPS
+			(nal_unit_type = NAL_SPS) or (nal_unit_type = NAL_SUBSET_SPS) 
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("Is Sps");
