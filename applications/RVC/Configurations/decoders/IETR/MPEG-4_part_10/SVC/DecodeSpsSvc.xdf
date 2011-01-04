@@ -37,7 +37,7 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="NbBitsToRead">
+    <Port kind="Output" name="VldParam">
         <Type name="int">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -138,13 +138,19 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Mgnt_Sps">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Svc.MgntSps"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="DecodeSps" dst-port="ValVLD" src="" src-port="ValDecoded"/>
-    <Connection dst="" dst-port="TypeOfVLD" src="DecodeSps" src-port="TypeOfVLD"/>
     <Connection dst="" dst-port="DecodeNextNal" src="DecodeSps" src-port="DecodeNextNal"/>
-    <Connection dst="" dst-port="NbBitsToRead" src="DecodeSps" src-port="NbBitsToRead"/>
     <Connection dst="" dst-port="Direct8x8Inference$" src="DecodeSps" src-port="Direct8x8Inference"/>
     <Connection dst="" dst-port="Pps_PicHeightInMapUnits"
         src="DecodeSps" src-port="Pps_PicHeightInMapUnits"/>
@@ -164,4 +170,12 @@
         src="SpsSvc" src-port="SpsAskedFromSpsSvc"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPic" src="" src-port="SpsAskedFromPic"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPps" src="" src-port="SpsAskedFromPps"/>
+    <Connection dst="Mgnt_Sps" dst-port="ValVLD" src="" src-port="ValDecoded"/>
+    <Connection dst="DecodeSps" dst-port="ValVLD" src="Mgnt_Sps" src-port="ValVLD4DecodeSps"/>
+    <Connection dst="Mgnt_Sps" dst-port="TypeOfVLDFromSps"
+        src="DecodeSps" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_Sps" dst-port="VLDParamFromSps"
+        src="DecodeSps" src-port="NbBitsToRead"/>
+    <Connection dst="" dst-port="TypeOfVLD" src="Mgnt_Sps" src-port="TypeOfVLD"/>
+    <Connection dst="" dst-port="VldParam" src="Mgnt_Sps" src-port="VLDParam"/>
 </XDF>

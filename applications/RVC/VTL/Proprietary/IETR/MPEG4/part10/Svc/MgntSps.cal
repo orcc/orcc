@@ -18,7 +18,7 @@ of this software module or modifications thereof.
 
 Copyright is not released for products that do not conform to audiovisual 
 and image-coding related ITU Recommendations and/or ISO/IEC International 
-Standards.
+Standards. 
 
 Assurance that the originally developed software module can be used 
 (1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
@@ -50,30 +50,59 @@ Standards.
 
 This copyright notice must be included in all copies or derivative works. 
 Copyright (c) ISO/IEC 2008.
+
 *****************************************************************************/
-package Proprietary.IETR.MPEG4.part10.Common;
+package Proprietary.IETR.MPEG4.part10.Svc;
 
-unit Imp_DecodingFunctions :
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 
-	uint(size=5) SKIP_NAL              =  0;
+actor MgntSps()
+	uint(size=5)  TypeOfVLDFromSps,
+	int (size=32) VLDParamFromSps,
 
-	uint(size=5) READ_BITS             =  1;
+	int (size=32) ValVLD
+		==>
+	uint(size=5)  TypeOfVLD,
+	int (size=32) VLDParam,
 
-	uint(size=5) VLD_UE                =  2;
-	uint(size=5) VLD_SE                =  3;
-	uint(size=5) VLD_TE                =  4;
+	int (size=32) ValVLD4DecodeSps
+		:
 
-	uint(size=5) BYTE_ALIGNED_REQUIRED =  5;
-	uint(size=5) MORE_RBSP_DATA        =  6;
+	DecodeSps.GetVLDVal: action
+			ValVLD           :[VLDecoding]
+				==>
+			ValVLD4DecodeSps :[VLDecoding]
+		end
 
-	uint(size=5) CAVLC_COEFF_TOKEN     =  7;
-	uint(size=5) CAVLC_LEVEL_PREFIX    =  8;
-	uint(size=5) CAVLC_TOTAL_ZEROS     =  9;
-	uint(size=5) CAVLC_RUN_BEFORE      = 10;
+	DecodeSps.FunctionWithoutParam: action
+			TypeOfVLDFromSps :[ValTypeOfVLD]
+				==>
+			TypeOfVLD        :[ValTypeOfVLD]
+		guard
+			NbParamForFunction[ValTypeOfVLD] = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
 
-	List(type: uint(size=8), size=11) NbParamForFunction =
-		[ 0, 1, 0, 0, 1, 0, 0, 1, 0, 2
-		, 1];
+	DecodeSps.FunctionWith1Param: action
+			TypeOfVLDFromSps :[ValTypeOfVLD],
+			VLDParamFromSps  :[Param]
+				==>
+			TypeOfVLD        :[ValTypeOfVLD],
+			VLDParam         :[Param]
+		guard
+			NbParamForFunction[ValTypeOfVLD] = 1
+		end
 
-	int (size=6) LAUNCH_ACTOR      = -1;
+	EndDecodeSps: action
+			TypeOfVLDFromSps :[Function]
+				==>
+			TypeOfVLD        :[SKIP_NAL]
+		guard
+			Function = SKIP_NAL
+		end
+
+	schedule fsm LaunchDecodeSps:
+		LaunchDecodeSps (DecodeSps    )--> LaunchDecodeSps;
+		LaunchDecodeSps (EndDecodeSps )--> LaunchDecodeSps;
+	end
 end

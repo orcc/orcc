@@ -680,8 +680,6 @@
     <Connection dst="MMCO" dst-port="MaxFrameNum" src="DecodeSpsSvc" src-port="MMCO_MaxFrameNum"/>
     <Connection dst="MMCO" dst-port="NumReferenceFrame"
         src="DecodeSpsSvc" src-port="MMCO_NumRefFrame"/>
-    <Connection dst="SpsVLDecoding" dst-port="VLD_Param"
-        src="DecodeSpsSvc" src-port="NbBitsToRead"/>
     <Connection dst="DecodePps" dst-port="PicHeightInMapUnits"
         src="DecodeSpsSvc" src-port="Pps_PicHeightInMapUnits"/>
     <Connection dst="DecodePps" dst-port="PicWidthInMbs"
@@ -700,4 +698,6 @@
         src="DecodePps" src-port="GetSps4Pic"/>
     <Connection dst="DecodeSpsSvc" dst-port="SpsAskedFromPps"
         src="DecodePps" src-port="GetSps"/>
+    <Connection dst="SpsVLDecoding" dst-port="VLD_Param"
+        src="DecodeSpsSvc" src-port="VldParam"/>
 </XDF>

@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="ValDecoded" x="451" y="108"/>
-      <vertex id="DecodeNextNal" x="889" y="26"/>
-      <vertex id="TypeOfVLD" x="918" y="313"/>
-      <vertex id="NbBitsToRead" x="902" y="156"/>
-      <vertex id="SizeMaxDpb" x="1295" y="474"/>
-      <vertex id="SliceHeaderParameters" x="871" y="282"/>
-      <vertex id="SliceDataParameters" x="883" y="250"/>
-      <vertex id="MMCO_MaxFrameNum" x="872" y="92"/>
-      <vertex id="MMCO_NumRefFrame" x="874" y="124"/>
-      <vertex id="Direct8x8Inference$" x="877" y="57"/>
-      <vertex id="Pps_PicWidthInMbs" x="889" y="217"/>
-      <vertex id="Pps_PicHeightInMapUnits" x="866" y="187"/>
-      <vertex id="DecodeSps" x="585" y="61"/>
-      <vertex id="MergeSpsAsk" x="181" y="36"/>
-      <vertex id="SpsSvc" x="665" y="667"/>
-      <vertex id="SplitSpsInfo" x="991" y="430"/>
-      <vertex id="SpsAskedFromPic" x="7" y="52"/>
-      <vertex id="SpsAskedFromPps" x="9" y="86"/>
+      <vertex id="ValDecoded" x="347" y="88"/>
+      <vertex id="DecodeNextNal" x="888" y="193"/>
+      <vertex id="TypeOfVLD" x="915" y="30"/>
+      <vertex id="VldParam" x="916" y="76"/>
+      <vertex id="SizeMaxDpb" x="1300" y="569"/>
+      <vertex id="SliceHeaderParameters" x="862" y="417"/>
+      <vertex id="SliceDataParameters" x="874" y="385"/>
+      <vertex id="MMCO_MaxFrameNum" x="871" y="259"/>
+      <vertex id="MMCO_NumRefFrame" x="873" y="291"/>
+      <vertex id="Direct8x8Inference$" x="876" y="224"/>
+      <vertex id="Pps_PicWidthInMbs" x="880" y="352"/>
+      <vertex id="Pps_PicHeightInMapUnits" x="857" y="322"/>
+      <vertex id="DecodeSps" x="576" y="196"/>
+      <vertex id="MergeSpsAsk" x="302" y="441"/>
+      <vertex id="SpsSvc" x="657" y="677"/>
+      <vertex id="SplitSpsInfo" x="996" y="525"/>
+      <vertex id="SpsAskedFromPic" x="128" y="457"/>
+      <vertex id="SpsAskedFromPps" x="130" y="491"/>
+      <vertex id="Mgnt_Sps" x="529" y="18"/>
    </vertices>
 </layout>

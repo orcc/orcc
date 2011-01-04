@@ -74,8 +74,6 @@ actor Algo_Slice_layer_without_partitioning()
 *
 */
 
-	int (size=6) LAUNCH_ACTOR      = -1;
-
 	uint(size=4) DEC_REF_PIC_MARKING  = 0;
 	uint(size=4) REF_PIC_LIST         = 1;
 	uint(size=4) MB_LAYER             = 2;
@@ -93,7 +91,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	SliceHeader.AskVLD: action
+	SliceHeader.FunctionWithoutParam: action
 			HeaderTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD       :[ValTypeOfVLD]
@@ -104,7 +102,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	SliceHeader.AskReadBits: action
+	SliceHeader.FunctionWith1Param: action
 			HeaderTypeOfVLD :[ValTypeOfVLD],
 			HeaderVLDParam  :[Param]
 				==>
@@ -147,7 +145,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	RefPicMark.AskVLD: action
+	RefPicMark.FunctionWithoutParam: action
 			DecRefPicMarkingTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD                 :[ValTypeOfVLD]
@@ -157,7 +155,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	RefPicMark.AskReadBits: action
+	RefPicMark.FunctionWith1Param: action
 			DecRefPicMarkingTypeOfVLD    :[ValTypeOfVLD],
 			DecRefPicMarkingNbBitsToRead :[Param]
 				==>
@@ -182,7 +180,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	RefPicList.AskVLD: action
+	RefPicList.FunctionWithoutParam: action
 			RefPicListTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD           :[ValTypeOfVLD]
@@ -192,7 +190,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	RefPicList.AskReadBits: action
+	RefPicList.FunctionWith1Param: action
 			RefPicListTypeOfVLD    :[ValTypeOfVLD],
 			RefPicListNbBitsToRead :[Param]
 				==>
@@ -217,7 +215,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	SliceData.AskVLD: action
+	SliceData.FunctionWithoutParam: action
 			DataTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD     :[ValTypeOfVLD]
@@ -228,7 +226,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	SliceData.AskReadBits: action
+	SliceData.FunctionWith1Param: action
 			DataTypeOfVLD :[ValTypeOfVLD],
 			DataVLDParam  :[Param]
 				==>
@@ -263,7 +261,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	MbLayer.AskVLD: action
+	MbLayer.FunctionWithoutParam: action
 			MbLayerTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD        :[ValTypeOfVLD]
@@ -274,7 +272,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	MbLayer.AskReadBits: action
+	MbLayer.FunctionWith1Param: action
 			MbLayerTypeOfVLD :[ValTypeOfVLD],
 			MbLayerVLDParam  :[Param]
 				==>
@@ -326,7 +324,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	MbPred.AskVLD: action
+	MbPred.FunctionWithoutParam: action
 			MbPredTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD       :[ValTypeOfVLD]
@@ -336,7 +334,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	MbPred.AskReadBitsOrTeV: action
+	MbPred.FunctionWith1Param: action
 			MbPredTypeOfVLD    :[ValTypeOfVLD],
 			MbPredNbBitsToRead :[VldParam]
 				==>
@@ -361,7 +359,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	SubMbPred.AskVLD: action
+	SubMbPred.FunctionWithoutParam: action
 			SubMbPredTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD          :[ValTypeOfVLD]
@@ -371,7 +369,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	SubMbPred.AskReadBitsOrTeV: action
+	SubMbPred.FunctionWith1Param: action
 			SubMbPredTypeOfVLD    :[ValTypeOfVLD],
 			SubMbPredNbBitsToRead :[VldParam]
 				==>
@@ -412,7 +410,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	ResBlkCavlc.AskVLD: action
+	ResBlkCavlc.FunctionWithoutParam: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD            :[ValTypeOfVLD]
@@ -422,7 +420,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	ResBlkCavlc.AskReadBitsOrCavlc: action
+	ResBlkCavlc.FunctionWith1Param: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
 			ResBlkCavlcVLD_Param :[Param]
 				==>
@@ -433,7 +431,7 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 
-	ResBlkCavlc.AskCavlcTotalZeros: action
+	ResBlkCavlc.FunctionWith2Param: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
 			ResBlkCavlcVLD_Param :[Param1 , Param2]
 				==>
@@ -451,44 +449,44 @@ actor Algo_Slice_layer_without_partitioning()
 		end
 
 	schedule fsm LaunchSliceHeader:
-		LaunchSliceHeader (SliceHeader.AskVLD           )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.AskReadBits      )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.FunctionWithoutParam )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.FunctionWith1Param      )--> LaunchSliceHeader;
 		LaunchSliceHeader (SliceHeader.GetVLDVal        )--> LaunchSliceHeader;
 		LaunchSliceHeader (SliceHeader.LaunchRefPicMark )--> LaunchRefPicMark;
 		LaunchSliceHeader (SliceHeader.LaunchRefPicList )--> LaunchRefPicList;
 		LaunchSliceHeader (SliceHeader.Done             )--> LaunchSliceData;
 
-			LaunchRefPicMark (RefPicMark.AskVLD       )--> LaunchRefPicMark;
-			LaunchRefPicMark (RefPicMark.AskReadBits  )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.FunctionWithoutParam       )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.FunctionWith1Param  )--> LaunchRefPicMark;
 			LaunchRefPicMark (RefPicMark.GetVLDVal    )--> LaunchRefPicMark;
 			LaunchRefPicMark (RefPicMark.Done         )--> LaunchSliceHeader;
 	
-			LaunchRefPicList (RefPicList.AskVLD       )--> LaunchRefPicList;
-			LaunchRefPicList (RefPicList.AskReadBits  )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.FunctionWithoutParam       )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.FunctionWith1Param  )--> LaunchRefPicList;
 			LaunchRefPicList (RefPicList.GetVLDVal    )--> LaunchRefPicList;
 			LaunchRefPicList (RefPicList.Done         )--> LaunchSliceHeader;
 
-		LaunchSliceData   (SliceData.AskVLD             )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.AskReadBits        )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.FunctionWithoutParam             )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.FunctionWith1Param        )--> LaunchSliceData;
 		LaunchSliceData   (SliceData.GetVLDVal          )--> LaunchSliceData;
 		LaunchSliceData   (SliceData.LaunchMbLayer      )--> LaunchMbLayer;
 		LaunchSliceData   (SliceData.Done               )--> LaunchSliceHeader;
 	
-			LaunchMbLayer    (MbLayer.AskVLD          )--> LaunchMbLayer;
-			LaunchMbLayer    (MbLayer.AskReadBits     )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.FunctionWithoutParam          )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.FunctionWith1Param     )--> LaunchMbLayer;
 			LaunchMbLayer    (MbLayer.GetVLDVal       )--> LaunchMbLayer;
 			LaunchMbLayer    (MbLayer.Done            )--> LaunchSliceData;
 			LaunchMbLayer    (MbLayer.LaunchSubMbPred )--> LaunchSubMbPred;
 			LaunchMbLayer    (MbLayer.LaunchMbPred    )--> LaunchMbPred;
 			LaunchMbLayer    (MbLayer.LaunchResidual  )--> LaunchResidual;
 	
-				LaunchMbPred   (MbPred.AskVLD           )--> LaunchMbPred;
-				LaunchMbPred   (MbPred.AskReadBitsOrTeV )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.FunctionWithoutParam           )--> LaunchMbPred;
+				LaunchMbPred   (MbPred.FunctionWith1Param )--> LaunchMbPred;
 				LaunchMbPred   (MbPred.GetVLDVal        )--> LaunchMbPred;
 				LaunchMbPred   (MbPred.Done             )--> LaunchMbLayer;
 	
-				LaunchSubMbPred   (SubMbPred.AskVLD           )--> LaunchSubMbPred;
-				LaunchSubMbPred   (SubMbPred.AskReadBitsOrTeV )--> LaunchSubMbPred;
+				LaunchSubMbPred   (SubMbPred.FunctionWithoutParam           )--> LaunchSubMbPred;
+				LaunchSubMbPred   (SubMbPred.FunctionWith1Param )--> LaunchSubMbPred;
 				LaunchSubMbPred   (SubMbPred.GetVLDVal        )--> LaunchSubMbPred;
 				LaunchSubMbPred   (SubMbPred.Done             )--> LaunchMbLayer;
 
@@ -496,21 +494,22 @@ actor Algo_Slice_layer_without_partitioning()
 				LaunchResidual (Residual.LaunchResBlkCavlc )--> LaunchResBlkCavlc;
 
 	
-					LaunchResBlkCavlc (ResBlkCavlc.AskVLD             )--> LaunchResBlkCavlc;
-					LaunchResBlkCavlc (ResBlkCavlc.AskReadBitsOrCavlc )--> LaunchResBlkCavlc;
-					LaunchResBlkCavlc (ResBlkCavlc.AskCavlcTotalZeros )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWithoutParam             )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWith1Param )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWith2Param )--> LaunchResBlkCavlc;
 					LaunchResBlkCavlc (ResBlkCavlc.GetVLDVal          )--> LaunchResBlkCavlc;
 					LaunchResBlkCavlc (ResBlkCavlc.Done               )--> LaunchResidual;
 	end
 
 	priority
-		SliceHeader.GetVLDVal        > SliceHeader.AskVLD           > SliceHeader.AskReadBits > SliceHeader.LaunchRefPicMark;
-		SliceHeader.LaunchRefPicMark > SliceHeader.LaunchRefPicList > SliceHeader.Done;
-		RefPicMark.GetVLDVal         > RefPicMark.AskVLD            > RefPicMark.AskReadBits  > RefPicMark.Done;
-		RefPicList.GetVLDVal         > RefPicList.AskVLD            > RefPicList.AskReadBits  > RefPicList.Done;
-		SliceData.GetVLDVal          > SliceData.AskVLD             > SliceData.AskReadBits   > SliceData.LaunchMbLayer       > SliceData.Done;
-		MbLayer.GetVLDVal            > MbLayer.AskVLD               > MbLayer.AskReadBits     > MbLayer.LaunchMbPred;
-		MbLayer.LaunchMbPred         > MbLayer.LaunchSubMbPred      > MbLayer.LaunchResidual  > MbLayer.Done;
-		MbPred.GetVLDVal             > MbPred.AskVLD                > MbPred.AskReadBitsOrTeV > MbPred.Done;
+		SliceHeader.GetVLDVal        > SliceHeader.FunctionWithoutParam > SliceHeader.FunctionWith1Param > SliceHeader.LaunchRefPicMark;
+		SliceHeader.LaunchRefPicMark > SliceHeader.LaunchRefPicList     > SliceHeader.Done;
+		RefPicMark.GetVLDVal         > RefPicMark.FunctionWithoutParam  > RefPicMark.FunctionWith1Param  > RefPicMark.Done;
+		RefPicList.GetVLDVal         > RefPicList.FunctionWithoutParam  > RefPicList.FunctionWith1Param  > RefPicList.Done;
+		SliceData.GetVLDVal          > SliceData.FunctionWithoutParam   > SliceData.FunctionWith1Param   > SliceData.LaunchMbLayer        > SliceData.Done;
+		MbLayer.GetVLDVal            > MbLayer.FunctionWithoutParam     > MbLayer.FunctionWith1Param     > MbLayer.LaunchMbPred;
+		MbLayer.LaunchMbPred         > MbLayer.LaunchSubMbPred          > MbLayer.LaunchResidual         > MbLayer.Done;
+		MbPred.GetVLDVal             > MbPred.FunctionWithoutParam      > MbPred.FunctionWith1Param      > MbPred.Done;
+		ResBlkCavlc.GetVLDVal        > ResBlkCavlc.FunctionWithoutParam > ResBlkCavlc.FunctionWith1Param > ResBlkCavlc.FunctionWith2Param > ResBlkCavlc.Done;
 	end
 end
