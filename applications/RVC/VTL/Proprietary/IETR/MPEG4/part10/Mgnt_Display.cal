@@ -19,7 +19,7 @@ package Proprietary.IETR.MPEG4.part10;
 
 actor Mgnt_Display (bool Debug)
 	uint(size=32) POC,
-	uint(size=5)  MaxDPBSize,
+	uint(size=8)  MaxDPBSize,
 	bool          IsIDR
 	
 		==>

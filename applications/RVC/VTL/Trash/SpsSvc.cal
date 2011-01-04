@@ -1,0 +1,13 @@
+package Trash;
+
+actor SpsSvc()
+	uint(size=8) ProfileIdc
+		==>
+	bool SpsAskedFromSpsSvc
+		:
+	
+	az: action
+		ProfileIdc :[a]
+			==>
+	end
+end

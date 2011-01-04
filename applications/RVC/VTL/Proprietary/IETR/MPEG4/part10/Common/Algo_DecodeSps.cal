@@ -19,14 +19,13 @@ import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 
 actor Algo_DecodeSps()
 	int (size=32) ValVLD,
-	uint(size=5)  SpsAskedFromPic,
-	uint(size=5)  SpsAskedFromPps
+	uint(size=5)  SpsAsked
 		==>
 	uint(size=5)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
 	bool          DecodeNextNal,
 
-	uint(size=5)  SizeDPBMax,
+	uint(size=8)  SzDPB_or_profile_idc,
 	int (size=32) SliceHeaderParameters,
 	uint(size=32) SliceDataParameters,
 
@@ -45,6 +44,10 @@ actor Algo_DecodeSps()
 * Constants
 *
 */
+
+	uint(size=2) GET_SPS_FROM_PIC = 0;
+	uint(size=2) GET_SPS_FROM_PPS = 1;
+	uint(size=2) GET_SPS_FROM_SVC = 2;
 
 	List(type: uint, size=64) MaxFS_LookUpTable = [   99,    99,    99,    99,    99,    99,    99,    99,    99,    99,
 	                                                  99,   396,   396,   396,   396,   396,   396,   396,   396,   396,
@@ -118,6 +121,7 @@ actor Algo_DecodeSps()
 	uint(size=5)  sps_id ;
 	int (size=32) LoopVal;
 	int (size=32) PrevOffForRefFramAccum;
+	uint(size=8)  last_profile_idc;
 
 
 /*
@@ -143,16 +147,27 @@ actor Algo_DecodeSps()
 			NbBitsToRead :[     8     ,     4     ,     4     ,     8     ]
 		end
 
+
+	SpsParam.AskedFromSvc: action
+			SpsAsked :[Sender]
+				==>
+			SzDPB_or_profile_idc  :[last_profile_idc]
+		guard
+			Sender = GET_SPS_FROM_SVC
+		end
+
 	SpsParam.AskedFromPic: action
-			SpsAskedFromPic :[ValSps]
+			SpsAsked :[Sender , ValSps]
 				==>
 			SliceDataParameters   :[SliceDataParam] repeat 7,
 			SliceHeaderParameters :[SliceHeaderParam]repeat 10,
-			SizeDPBMax            :[MaxDPBSz[ValSps]],
+			SzDPB_or_profile_idc  :[MaxDPBSz[ValSps]],
 			Direct8x8Inference    :[ValDirect8x8Inference],
 
 			MMCO_MaxFrameNum      :[max_frame_num[ValSps]],
 			MMCO_NumRefFrame      :[num_ref_frames[ValSps]]
+		guard
+			Sender = GET_SPS_FROM_PIC
 		var
 			bool val_frame_mbs_only,
 			bool ValDeltaPic,
@@ -226,11 +241,12 @@ actor Algo_DecodeSps()
 		end
 
 	SpsParam.AskedFromPps: action
-			SpsAskedFromPps :[ValSps]
+			SpsAsked :[Sender , ValSps]
 				==>
 			Pps_PicWidthInMbs       :[pic_width_in_mbs_minus1[ValSps] + 1],
 			Pps_PicHeightInMapUnits :[pic_height_in_map_units_minus1[ValSps] + 1]
-		do
+		guard
+			Sender = GET_SPS_FROM_PPS
 		end
 
 	ReadSpsId.Done: action
@@ -246,7 +262,9 @@ actor Algo_DecodeSps()
 			end
 
 			sps_id                                        := ValueOfVLD[4];
+
 			profile_idc[sps_id]                           := ValueOfVLD[0];
+			last_profile_idc                              := ValueOfVLD[0];
 			constraint_set_flag[sps_id]                   := ValueOfVLD[1];
 			level_idc[sps_id]                             := ValueOfVLD[3];
 			expected_delta_per_poc_cycle[sps_id]          := 0;
@@ -583,6 +601,7 @@ actor Algo_DecodeSps()
 
 		ReadSpsIdDone                (SpsParam.AskedFromPic          )--> SendOff4RefFrameAcc;
 		ReadSpsIdDone                (SpsParam.AskedFromPps          )--> ReadSpsIdDone;
+		ReadSpsIdDone                (SpsParam.AskedFromSvc          )--> ReadSpsIdDone;
 		ReadSpsIdDone                (ReadSpsId.Done                 )--> CheckChromaFormatIdc;
 
 		SendOff4RefFrameAcc          (SendOff4RefFrameAcc.Launch     )--> SendOff4RefFrameAcc;

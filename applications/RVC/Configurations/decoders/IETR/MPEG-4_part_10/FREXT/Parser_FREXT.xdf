@@ -493,6 +493,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="MergeSpsAsk">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Frext.MergeSpsAsk"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -512,10 +521,6 @@
     <Connection dst="DecodePps" dst-port="PicWidthInMbs" src="DecodeSps" src-port="Pps_PicWidthInMbs"/>
     <Connection dst="DecodePps" dst-port="PicHeightInMapUnits"
         src="DecodeSps" src-port="Pps_PicHeightInMapUnits"/>
-    <Connection dst="DecodeSps" dst-port="SpsAskedFromPic"
-        src="DecodePps" src-port="GetSps4Pic"/>
-    <Connection dst="DecodeSps" dst-port="SpsAskedFromPps"
-        src="DecodePps" src-port="GetSps"/>
     <Connection dst="PicVLDecoding" dst-port="NewNal"
         src="CheckNaluType" src-port="PicNewNal"/>
     <Connection dst="PpsVLDecoding" dst-port="NewNal"
@@ -635,7 +640,6 @@
         src="DecodePps" src-port="SliceDataParameters"/>
     <Connection dst="DecodePic" dst-port="SpsParam4SliceData"
         src="DecodeSps" src-port="SliceDataParameters"/>
-    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="DecodeSps" src-port="SizeDPBMax"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="DecodePic" src-port="POC"/>
     <Connection dst="Mgnt_Display" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
@@ -694,4 +698,10 @@
     <Connection dst="" dst-port="PocToRead" src="SelectRefIdx" src-port="PocToRead"/>
     <Connection dst="" dst-port="Height" src="DecodePic" src-port="Height"/>
     <Connection dst="" dst-port="Width" src="DecodePic" src-port="Width"/>
+    <Connection dst="DecodeSps" dst-port="SpsAsked" src="MergeSpsAsk" src-port="SpsAsked"/>
+    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPic"
+        src="DecodePps" src-port="GetSps4Pic"/>
+    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPps"
+        src="DecodePps" src-port="GetSps"/>
+    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="DecodeSps" src-port="SzDPB_or_profile_idc"/>
 </XDF>
