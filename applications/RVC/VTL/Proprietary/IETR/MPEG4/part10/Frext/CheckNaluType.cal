@@ -54,7 +54,7 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 package Proprietary.IETR.MPEG4.part10.Frext;
 
-actor Algo_Check_NALU_type_Frext()
+actor CheckNaluType()
 	uint(size=8) RbspByte,
 	bool         NewNal,
 

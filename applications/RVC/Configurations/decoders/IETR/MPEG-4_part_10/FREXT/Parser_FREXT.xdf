@@ -314,7 +314,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Frext.Algo_Check_NALU_type_Frext"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Frext.CheckNaluType"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
