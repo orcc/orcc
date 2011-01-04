@@ -53,6 +53,7 @@ struct scheduler_s {
 	struct actor_s *schedulable[MAX_ACTORS];
 	int next_entry;
 	int next_schedulable;
+	struct sync_s *sync; 
 };
 
 #include "orcc_scheduler.inl"
@@ -60,6 +61,6 @@ struct scheduler_s {
 /**
  * Initializes the given scheduler.
  */
-void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors);
+void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors, struct sync_s *sync);
 
 #endif
