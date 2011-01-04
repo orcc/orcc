@@ -94,11 +94,11 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	SliceHeader.AskVLD: action
-			HeaderTypeOfVLD   :[ValTypeOfVLD]
+			HeaderTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD       :[ValTypeOfVLD]
 		guard
-			ValTypeOfVLD  != READ_BITS,
+			NbParamForFunction[ValTypeOfVLD] = 0,
 			ValTypeOfVLD  != SKIP_NAL,
 			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
@@ -106,12 +106,12 @@ actor Algo_Slice_layer_without_partitioning()
 
 	SliceHeader.AskReadBits: action
 			HeaderTypeOfVLD :[ValTypeOfVLD],
-			HeaderVLDParam  :[NbBits]
+			HeaderVLDParam  :[Param]
 				==>
-			TypeOfVLD       :[READ_BITS],
-			VLD_Param       :[NbBits]
+			TypeOfVLD       :[ValTypeOfVLD],
+			VLD_Param       :[Param]
 		guard
-			ValTypeOfVLD  = READ_BITS
+			NbParamForFunction[ValTypeOfVLD] = 1
 		end
 
 	SliceHeader.LaunchRefPicMark: action
@@ -148,27 +148,27 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	RefPicMark.AskVLD: action
-			DecRefPicMarkingTypeOfVLD   :[ValTypeOfVLD]
+			DecRefPicMarkingTypeOfVLD :[ValTypeOfVLD]
 				==>
-			TypeOfVLD       :[ValTypeOfVLD]
+			TypeOfVLD                 :[ValTypeOfVLD]
 		guard
-			ValTypeOfVLD  != READ_BITS,
+			NbParamForFunction[ValTypeOfVLD] = 0,
 			ValTypeOfVLD  != SKIP_NAL
 		end
 
 
 	RefPicMark.AskReadBits: action
 			DecRefPicMarkingTypeOfVLD    :[ValTypeOfVLD],
-			DecRefPicMarkingNbBitsToRead :[NbBits]
+			DecRefPicMarkingNbBitsToRead :[Param]
 				==>
-			TypeOfVLD :[READ_BITS],
-			VLD_Param :[NbBits]
+			TypeOfVLD :[ValTypeOfVLD],
+			VLD_Param :[Param]
 		guard
-			ValTypeOfVLD  = READ_BITS
+			NbParamForFunction[ValTypeOfVLD] = 1
 		end
 
 	RefPicMark.Done: action
-			DecRefPicMarkingTypeOfVLD    :[Function]
+			DecRefPicMarkingTypeOfVLD :[Function]
 				==>
 		guard
 			Function = SKIP_NAL
@@ -176,30 +176,30 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	RefPicList.GetVLDVal: action
-			ValVLD                 :[VLDecoding]
+			ValVLD           :[VLDecoding]
 				==>
 			RefPicListValVLD :[VLDecoding]
 		end
 
 
 	RefPicList.AskVLD: action
-			RefPicListTypeOfVLD   :[ValTypeOfVLD]
+			RefPicListTypeOfVLD :[ValTypeOfVLD]
 				==>
-			TypeOfVLD       :[ValTypeOfVLD]
+			TypeOfVLD           :[ValTypeOfVLD]
 		guard
-			ValTypeOfVLD  != READ_BITS,
+			NbParamForFunction[ValTypeOfVLD] = 0,
 			ValTypeOfVLD  != SKIP_NAL
 		end
 
 
 	RefPicList.AskReadBits: action
 			RefPicListTypeOfVLD    :[ValTypeOfVLD],
-			RefPicListNbBitsToRead :[NbBits]
+			RefPicListNbBitsToRead :[Param]
 				==>
-			TypeOfVLD              :[READ_BITS],
-			VLD_Param              :[NbBits]
+			TypeOfVLD              :[ValTypeOfVLD],
+			VLD_Param              :[Param]
 		guard
-			ValTypeOfVLD  = READ_BITS
+			NbParamForFunction[ValTypeOfVLD] = 1
 		end
 
 	RefPicList.Done: action
@@ -222,7 +222,7 @@ actor Algo_Slice_layer_without_partitioning()
 				==>
 			TypeOfVLD     :[ValTypeOfVLD]
 		guard
-			ValTypeOfVLD  != READ_BITS,
+			NbParamForFunction[ValTypeOfVLD] = 0,
 			ValTypeOfVLD  != SKIP_NAL,
 			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
@@ -230,12 +230,12 @@ actor Algo_Slice_layer_without_partitioning()
 
 	SliceData.AskReadBits: action
 			DataTypeOfVLD :[ValTypeOfVLD],
-			DataVLDParam  :[NbBits]
+			DataVLDParam  :[Param]
 				==>
-			TypeOfVLD        :[READ_BITS],
-			VLD_Param        :[NbBits]
+			TypeOfVLD     :[ValTypeOfVLD],
+			VLD_Param     :[Param]
 		guard
-			ValTypeOfVLD  = READ_BITS
+			NbParamForFunction[ValTypeOfVLD] = 1
 		end
 
 	SliceData.LaunchMbLayer: action
@@ -257,18 +257,18 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	MbLayer.GetVLDVal: action
-			ValVLD                 :[VLDecoding]
+			ValVLD        :[VLDecoding]
 				==>
 			MbLayerValVLD :[VLDecoding]
 		end
 
 
 	MbLayer.AskVLD: action
-			MbLayerTypeOfVLD   :[ValTypeOfVLD]
+			MbLayerTypeOfVLD :[ValTypeOfVLD]
 				==>
-			TypeOfVLD          :[ValTypeOfVLD]
+			TypeOfVLD        :[ValTypeOfVLD]
 		guard
-			ValTypeOfVLD  != READ_BITS,
+			NbParamForFunction[ValTypeOfVLD] = 0,
 			ValTypeOfVLD  != SKIP_NAL,
 			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
@@ -276,12 +276,12 @@ actor Algo_Slice_layer_without_partitioning()
 
 	MbLayer.AskReadBits: action
 			MbLayerTypeOfVLD :[ValTypeOfVLD],
-			MbLayerVLDParam  :[NbBits]
+			MbLayerVLDParam  :[Param]
 				==>
-			TypeOfVLD           :[READ_BITS],
-			VLD_Param           :[NbBits]
+			TypeOfVLD        :[ValTypeOfVLD],
+			VLD_Param        :[Param]
 		guard
-			ValTypeOfVLD   = READ_BITS
+			NbParamForFunction[ValTypeOfVLD] = 1
 		end
 
 	MbLayer.Done: action
@@ -320,20 +320,19 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	MbPred.GetVLDVal: action
-			ValVLD                 :[VLDecoding]
+			ValVLD       :[VLDecoding]
 				==>
 			MbPredValVLD :[VLDecoding]
 		end
 
 
 	MbPred.AskVLD: action
-			MbPredTypeOfVLD   :[ValTypeOfVLD]
+			MbPredTypeOfVLD :[ValTypeOfVLD]
 				==>
-			TypeOfVLD         :[ValTypeOfVLD]
+			TypeOfVLD       :[ValTypeOfVLD]
 		guard
-			ValTypeOfVLD  != READ_BITS,
-			ValTypeOfVLD  != SKIP_NAL,
-			ValTypeOfVLD  != VLD_TE
+			NbParamForFunction[ValTypeOfVLD] = 0,
+			ValTypeOfVLD  != SKIP_NAL
 		end
 
 
@@ -344,11 +343,11 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD          :[ValTypeOfVLD],
 			VLD_Param          :[VldParam]
 		guard
-			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE
+			NbParamForFunction[ValTypeOfVLD] = 1
 		end
 
 	MbPred.Done: action
-			MbPredTypeOfVLD   :[Function]
+			MbPredTypeOfVLD :[Function]
 				==>
 		guard
 			Function = SKIP_NAL
@@ -356,20 +355,19 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	SubMbPred.GetVLDVal: action
-			ValVLD                 :[VLDecoding]
+			ValVLD          :[VLDecoding]
 				==>
 			SubMbPredValVLD :[VLDecoding]
 		end
 
 
 	SubMbPred.AskVLD: action
-			SubMbPredTypeOfVLD   :[ValTypeOfVLD]
+			SubMbPredTypeOfVLD :[ValTypeOfVLD]
 				==>
-			TypeOfVLD         :[ValTypeOfVLD]
+			TypeOfVLD          :[ValTypeOfVLD]
 		guard
-			ValTypeOfVLD  != READ_BITS,
-			ValTypeOfVLD  != SKIP_NAL,
-			ValTypeOfVLD  != VLD_TE
+			NbParamForFunction[ValTypeOfVLD] = 0,
+			ValTypeOfVLD  != SKIP_NAL
 		end
 
 
@@ -380,7 +378,7 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD             :[ValTypeOfVLD],
 			VLD_Param             :[VldParam]
 		guard
-			ValTypeOfVLD  = READ_BITS or ValTypeOfVLD = VLD_TE
+			NbParamForFunction[ValTypeOfVLD] = 1
 		end
 
 	SubMbPred.Done: action
@@ -408,7 +406,7 @@ actor Algo_Slice_layer_without_partitioning()
 
 
 	ResBlkCavlc.GetVLDVal: action
-			ValVLD                 :[VLDecoding]
+			ValVLD            :[VLDecoding]
 				==>
 			ResBlkCavlcValVLD :[VLDecoding]
 		end
@@ -417,35 +415,32 @@ actor Algo_Slice_layer_without_partitioning()
 	ResBlkCavlc.AskVLD: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD]
 				==>
-			TypeOfVLD       :[ValTypeOfVLD]
+			TypeOfVLD            :[ValTypeOfVLD]
 		guard
-			ValTypeOfVLD != READ_BITS,
-			ValTypeOfVLD != CAVLC_COEFF_TOKEN,
-			ValTypeOfVLD != CAVLC_TOTAL_ZEROS,
-			ValTypeOfVLD != CAVLC_RUN_BEFORE,
+			NbParamForFunction[ValTypeOfVLD] = 0,
 			ValTypeOfVLD != SKIP_NAL
 		end
 
 
 	ResBlkCavlc.AskReadBitsOrCavlc: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
-			ResBlkCavlcVLD_Param :[NbBits]
+			ResBlkCavlcVLD_Param :[Param]
 				==>
 			TypeOfVLD            :[ValTypeOfVLD],
-			VLD_Param            :[NbBits]
+			VLD_Param            :[Param]
 		guard
-			(ValTypeOfVLD = READ_BITS) or (ValTypeOfVLD = CAVLC_COEFF_TOKEN) or (ValTypeOfVLD = CAVLC_RUN_BEFORE)
+			NbParamForFunction[ValTypeOfVLD] = 1
 		end
 
 
 	ResBlkCavlc.AskCavlcTotalZeros: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
-			ResBlkCavlcVLD_Param :[maxNumCoeff , TotalCoeff]
+			ResBlkCavlcVLD_Param :[Param1 , Param2]
 				==>
-			TypeOfVLD            :[CAVLC_TOTAL_ZEROS],
-			VLD_Param            :[maxNumCoeff , TotalCoeff]
+			TypeOfVLD            :[ValTypeOfVLD],
+			VLD_Param            :[Param1 , Param2]
 		guard
-			ValTypeOfVLD = CAVLC_TOTAL_ZEROS
+			NbParamForFunction[ValTypeOfVLD] = 2
 		end
 
 	ResBlkCavlc.Done: action
