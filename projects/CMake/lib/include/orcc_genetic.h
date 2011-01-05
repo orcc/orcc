@@ -26,36 +26,29 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include <semaphore.h>
-#include <stdio.h>
+#ifndef GENETIC_H
+#define GENETIC_H
 
-#include "orcc.h"
-#include "orcc_thread.h"
+#define POPULATION_SIZE 25
 
-void sync_init(struct sync_s *sync, int threadsNb) {
-	sync->threadsNb = 2;
-	sem_init(&sync->sem_monitor, 0, 0);
-	sem_init(&sync->sem_threads, 0, 0);
-}
+typedef struct gene_s {
+	struct actor_s *actor;
+	int mappedCore;
+} gene;
 
-void *monitor(void *data) {
-	struct sync_s *sched_sync = (struct sync_s *) data;
+typedef struct individual_s {
+	gene **genes;
+	float fps;
+} individual;
 
-	while (1) {
-		// wait threads synchro
-		int i;
-		for (i = 0; i < sched_sync->threadsNb; i++) {
-			sem_wait(&sched_sync->sem_monitor);
-		}
+typedef struct population_s {
+	int generationNb;
+	individual *individuals[POPULATION_SIZE];
+} population;
 
-		// work process
-		printf("Time to process mapping (all threads are stopped)...\n");
+void initializePopulation(population *pop, struct actor_s *actors[],
+		int actorsNb, int nbAvailCores);
+population* computeNextPopulation(population *pop, int actorsNb,
+		int nbAvailCores);
 
-		// wakeup all threads
-		for (i = 0; i < sched_sync->threadsNb; i++) {
-			sem_post(&sched_sync->sem_threads);
-		}
-	}
-
-	return NULL;
-}
+#endif
