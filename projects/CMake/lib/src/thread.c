@@ -26,12 +26,12 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
- #include "orcc.h"
- #include "orcc_thread.h"
- 
  #include <semaphore.h>
  #include <stdio.h>
  #include <stdlib.h>
+ 
+ #include "orcc.h"
+ #include "orcc_thread.h"
  
 void sync_init(struct sync_s *sync, int threadsNb){
 	sync->threadsNb = 2;
@@ -40,7 +40,7 @@ void sync_init(struct sync_s *sync, int threadsNb){
 }
 
 void *monitor(void *data) {
-	struct sync_s *sched_sync = data;
+	struct sync_s *sched_sync = (struct sync_s *) data;
 	
 	while(1){
 		// wait threads synchro
@@ -50,11 +50,13 @@ void *monitor(void *data) {
 		}
 		
 		// work process
-		printf("Monitor work !!\n");
+		printf("Time to process mapping (all threads are stopped)...\n");
 		
 		// wakeup all threads
 		for(i=0; i<sched_sync->threadsNb; i++){
 			sem_post(&sched_sync->sem_threads);
 		}
 	}
+	
+	return NULL;
 }
