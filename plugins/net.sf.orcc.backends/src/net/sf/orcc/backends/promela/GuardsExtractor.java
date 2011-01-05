@@ -40,7 +40,6 @@ import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
 import net.sf.orcc.ir.expr.BinaryExpr;
-import net.sf.orcc.ir.expr.BinaryOp;
 import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.expr.UnaryExpr;
 import net.sf.orcc.ir.expr.UnaryOp;
@@ -84,24 +83,18 @@ public class GuardsExtractor extends AbstractActorTransformation {
 
 	// takes the guard from the previous action and negates it and adds it to
 	// the guard of this action which has lower priority
-	private void addPriorityToGuard(Action action, Action prevAction) {
+	private void addPriorityToGuard(Action action, List<Expression> prevGuards) {
 		Expression prty;
-		if (guards.get(prevAction).isEmpty()) {
-			prty = new BoolExpr(true); // this is strange but needed because of
-										// the file Xilinx_fairMerge
-		} else {
-			prty = guards.get(prevAction).get(0);
-		}
-		prty = new UnaryExpr(UnaryOp.LOGIC_NOT, prty, prty.getType());
+		// if there is no guard add the guard "true"
 		if (guards.get(action).isEmpty()) {
-			guards.get(action).add(0, prty);
-		} else {
-			Expression grd = guards.get(action).get(0);
-			guards.get(action).set(
-					0,
-					new BinaryExpr(grd, BinaryOp.LOGIC_AND, prty, prty
-							.getType()));
+			guards.get(action).add(0, new BoolExpr(true));
 		}
+		// add the guards from the previous actions as not guard
+		for (Expression expr : prevGuards){
+			prty = new UnaryExpr(UnaryOp.LOGIC_NOT, expr, expr.getType());
+			guards.get(action).add(prty);
+		}
+		prevGuards.add(guards.get(action).get(0)); // TODO: if the original guard is more than 1 expr this will not work
 	}
 
 	// If the local variable derived from this variable is used in an expression
@@ -174,12 +167,9 @@ public class GuardsExtractor extends AbstractActorTransformation {
 		// actions not in a FSM are present in the "actions" list and appear in
 		// decreasing priority order.
 		if (!actor.getActionScheduler().hasFsm()) {
-			Action prevAction = null;
+			List<Expression> prevGuards = new ArrayList<Expression>();
 			for (Action action : actor.getActionScheduler().getActions()) {
-				if (prevAction != null) {
-					addPriorityToGuard(action, prevAction);
-				}
-				prevAction = action;
+				addPriorityToGuard(action, prevGuards);
 			}
 		}
 		// Actions in the FSM appear in
@@ -188,13 +178,9 @@ public class GuardsExtractor extends AbstractActorTransformation {
 		else {
 			for (Transition trans : actor.getActionScheduler().getFsm()
 					.getTransitions()) {
-				Action prevAction = null;
+				List<Expression> prevGuards = new ArrayList<Expression>();
 				for (NextStateInfo nsi : trans.getNextStateInfo()) {
-					Action action = nsi.getAction();
-					if (prevAction != null) {
-						addPriorityToGuard(action, prevAction);
-					}
-					prevAction = action;
+					addPriorityToGuard(nsi.getAction(), prevGuards);
 				}
 			}
 		}

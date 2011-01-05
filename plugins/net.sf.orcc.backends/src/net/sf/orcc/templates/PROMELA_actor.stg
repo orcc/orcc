@@ -2,7 +2,7 @@
 // Functions for generating schedules
 ///////////////////////////////////////////////////////////////////////////////
 printActionName() ::= <<
-printf("$instance.Id$_$action.name$();\n");
+printf("$instance.Id$.$action.name$();\n");
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -237,7 +237,7 @@ schedulerFSM(action) ::= <<
 
 guardFSM() ::= <<
 $if (options.guards.(action))$
- $options.guards.(action): {grd | $grd$} $
+ $options.guards.(action); separator=" && "$
 $else$
 skip
 $endif$
