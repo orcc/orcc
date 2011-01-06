@@ -26,6 +26,9 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+#include <stdlib.h>
+#include <stdio.h>
+#include <time.h>
 
 #include "orcc.h"
 #include "orcc_genetic.h"
@@ -58,32 +61,94 @@ void quickSort(population *pop, int p, int r) {
 	}
 }
 
-void initializePopulation(population *pop, struct actor_s *actors[],
-		int actorsNb, int availCoresNb) {
+population* initializePopulation(struct actor_s *actors[], int actorsNb,
+		int availCoresNb) {
+	// Allocate memory to store the new population
+	population *pop = (population *) malloc(sizeof(*pop));
+	individual **individuals = (individual**) malloc(POPULATION_SIZE
+			* sizeof(**individuals));
+
+	// Initialize population fields
+	pop->individuals = individuals;
+	pop->generationNb = 0;
+
+	// Initialize random function
+	srand(time(NULL));
+
+	// Create first generation of individuals
 	int i, j;
 	for (i = 0; i < POPULATION_SIZE; i++) {
-		individual ind;
-		ind.fps = -1;
+		// Allocate memory to store new individuals
+		individual *ind = malloc(sizeof(individual));
+		gene **genes = malloc(actorsNb * sizeof(**genes));
+
+		// Initialize individuals fields
+		ind->genes = genes;
+		ind->fps = -1;
 		for (j = 0; j < actorsNb; j++) {
-			gene g =
-					{ .actor = actors[j], .mappedCore = rand() % availCoresNb };
-			ind.genes[j] = &g;
+			gene *gene = malloc(sizeof(*gene));
+			gene->actor = actors[j];
+			gene->mappedCore = rand() % availCoresNb;
+			ind->genes[j] = gene;
 		}
-		pop->individuals[i] = &ind;
+		pop->individuals[i] = ind;
 	}
-	pop->generationNb = 0;
+
+	return pop;
 }
 
 population* computeNextPopulation(population *pop, int actorsNb,
 		int availCoresNb) {
-	// sort population by descending fps value
+	// Allocate memory to store the new population
+	population *nextPop = malloc(sizeof(population));
+	individual **individuals = (individual**) malloc(POPULATION_SIZE
+			* sizeof(**individuals));
+
+	// Initialize population fields
+	nextPop->individuals = individuals;
+	nextPop->generationNb = pop->generationNb + 1;
+
+	// Sort population by descending fps value
 	quickSort(pop, 0, POPULATION_SIZE);
 
-	// selection
-	// crossover
-	// mutation
+	// Backup better individuals
+	int i;
+	for (i = 0; i < POPULATION_SIZE * KEEP_RATIO; i++) {
+		nextPop->individuals[i] = pop->individuals[i];
+	}
 
-	return pop;
+	// Crossover
+	int free = POPULATION_SIZE - i;
+	int last = free * CROSS_OVER_RATIO + i;
+	if ((last - free) % 2 == 1) {
+		last = last - 1;
+	}
+	for (; i < last; i = i + 2) {
+		individual *children[2];
+		individual *parents[2];
+		children[0] = malloc(sizeof(children[0]));
+		children[1] = malloc(sizeof(children[1]));
+
+		// TOFIX: choose parents with tournament
+		parents[0] = pop->individuals[rand() % POPULATION_SIZE];
+		parents[1] = pop->individuals[rand() % POPULATION_SIZE];
+
+		crossover(children, parents, actorsNb);
+
+		nextPop->individuals[i] = children[0];
+		nextPop->individuals[i + 1] = children[1];
+	}
+
+	// Mutation
+	for (; i < POPULATION_SIZE; i++) {
+		individual *mutated = malloc(sizeof(individual));
+		mutation(mutated, pop->individuals[rand() % POPULATION_SIZE], actorsNb,
+				availCoresNb);
+	}
+
+	// TODO: Remove old population and unused individuals from memory
+
+	return nextPop;
 }
 
 void crossover(individual *children[2], individual *parents[2], int actorsNb) {
@@ -91,16 +156,17 @@ void crossover(individual *children[2], individual *parents[2], int actorsNb) {
 
 	int i;
 	for (i = 0; i < actorsNb; i++) {
-		gene childGene0, childGene1;
+		gene *childGene0 = (gene*) malloc(sizeof(gene));
+		gene *childGene1 = (gene*) malloc(sizeof(gene));
 		if (i < cut) {
-			childGene0 = *parents[0]->genes[i];
-			childGene1 = *parents[1]->genes[i];
+			childGene0 = parents[0]->genes[i];
+			childGene1 = parents[1]->genes[i];
 		} else {
-			childGene0 = *parents[1]->genes[i];
-			childGene1 = *parents[0]->genes[i];
+			childGene0 = parents[1]->genes[i];
+			childGene1 = parents[0]->genes[i];
 		}
-		children[0]->genes[i] = &childGene0;
-		children[1]->genes[i] = &childGene1;
+		children[0]->genes[i] = childGene0;
+		children[1]->genes[i] = childGene1;
 	}
 	children[0]->fps = -1;
 	children[1]->fps = -1;
@@ -120,5 +186,4 @@ void mutation(individual *mutated, individual *original, int actorsNb,
 	}
 	mutated->fps = -1;
 }
-
 

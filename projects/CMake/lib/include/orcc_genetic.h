@@ -31,6 +31,9 @@
 
 #define POPULATION_SIZE 25
 
+#define KEEP_RATIO 0.5
+#define CROSS_OVER_RATIO 0.6
+
 typedef struct gene_s {
 	struct actor_s *actor;
 	int mappedCore;
@@ -43,12 +46,19 @@ typedef struct individual_s {
 
 typedef struct population_s {
 	int generationNb;
-	individual *individuals[POPULATION_SIZE];
+	individual **individuals;
 } population;
 
-void initializePopulation(population *pop, struct actor_s *actors[],
+population* initializePopulation(struct actor_s *actors[],
 		int actorsNb, int nbAvailCores);
 population* computeNextPopulation(population *pop, int actorsNb,
 		int nbAvailCores);
+
+void crossover(individual *children[2], individual *parents[2], int actorsNb);
+void mutation(individual *mutated, individual *original, int actorsNb,
+		int availCoresNb);
+
+void quickSort(population *pop, int p, int r);
+int partitionner(population *pop, int p, int r);
 
 #endif
