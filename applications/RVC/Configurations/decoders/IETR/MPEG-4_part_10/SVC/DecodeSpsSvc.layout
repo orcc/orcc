@@ -17,7 +17,7 @@
       <vertex id="PpsParam" x="1251" y="629"/>
       <vertex id="DecodeSps" x="566" y="242"/>
       <vertex id="MergeSpsAsk" x="240" y="484"/>
-      <vertex id="SpsSvc" x="1194" y="254"/>
+      <vertex id="Decode_Subset_Sps" x="1194" y="254"/>
       <vertex id="SplitSpsInfo" x="906" y="558"/>
       <vertex id="Mgnt_Sps" x="529" y="18"/>
    </vertices>

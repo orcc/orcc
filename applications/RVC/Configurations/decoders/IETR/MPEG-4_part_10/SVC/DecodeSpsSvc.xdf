@@ -120,7 +120,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="SpsSvc">
+    <Instance id="Decode_Subset_Sps">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -167,11 +167,11 @@
     <Connection dst="Mgnt_Sps" dst-port="NalUnitType" src="" src-port="NalUnitType"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
         src="Mgnt_Sps" src-port="AskPrfIdcForSubSps"/>
-    <Connection dst="SpsSvc" dst-port="ValVLD" src="Mgnt_Sps" src-port="ValVLD4DecodeSubSps"/>
+    <Connection dst="Decode_Subset_Sps" dst-port="ValVLD" src="Mgnt_Sps" src-port="ValVLD4DecodeSubSps"/>
     <Connection dst="Mgnt_Sps" dst-port="TypeOfVLDFromSubSps"
-        src="SpsSvc" src-port="TypeOfVLD"/>
+        src="Decode_Subset_Sps" src-port="TypeOfVLD"/>
     <Connection dst="Mgnt_Sps" dst-port="VLDParamFromSubSps"
-        src="SpsSvc" src-port="VldParam"/>
+        src="Decode_Subset_Sps" src-port="VldParam"/>
     <Connection dst="SplitSpsInfo" dst-port="SenderOfRequest"
         src="MergeSpsAsk" src-port="SenderOfRequest"/>
     <Connection dst="DecodeSps" dst-port="NumSpsAsked" src="MergeSpsAsk" src-port="NumSpsAsked"/>
@@ -179,7 +179,8 @@
         src="MergeSpsAsk" src-port="SenderOfRequest"/>
     <Connection dst="SplitSpsInfo" dst-port="Parameters" src="DecodeSps" src-port="SpsParameters"/>
     <Connection dst="" dst-port="SizeMaxDpb" src="DecodeSps" src-port="SzDPB"/>
-    <Connection dst="SpsSvc" dst-port="Parameters" src="SplitSpsInfo" src-port="SubSpsParameters"/>
+    <Connection dst="Decode_Subset_Sps" dst-port="Parameters"
+        src="SplitSpsInfo" src-port="SubSpsParameters"/>
     <Connection dst="" dst-port="PpsParam" src="SplitSpsInfo" src-port="PpsParameters"/>
     <Connection dst="" dst-port="SliceHeaderParameters"
         src="SplitSpsInfo" src-port="HeaderParameters"/>
