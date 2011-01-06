@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@ltdsa.com)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2010-11-29
+-- Last update: 2011-01-03
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -61,13 +61,11 @@ entity fifo_top is
       wr_clk   : in  std_logic;
       wr_data  : in  std_logic;
       data_in  : in  std_logic_vector (width -1 downto 0);
-      wr_rdy   : out std_logic;
       wr_ack   : out std_logic;
       --
       rd_clk   : in  std_logic;
       send     : out std_logic;
       data_out : out std_logic_vector (width -1 downto 0);
-      rd_rdy   : in  std_logic;
       rd_ack   : in  std_logic);
 end fifo_top;
 
@@ -84,9 +82,8 @@ architecture arch_fifo_top of fifo_top is
 begin
 
   create_FIFO : if depth > 1 generate
-    wr_rdy  <= not iFull;
-    rd_data <= (not iEmpty) and rd_rdy;
-    send    <= (not iEmpty) and rd_rdy;
+    rd_data <= not iEmpty;
+    send    <= not iEmpty;
     FIFO_generic_1 : entity work.FIFO_generic
       generic map (
         depth => depth,
@@ -104,10 +101,9 @@ begin
   end generate;
 
   create_link : if depth = 1 generate
-  send     <= wr_data;
-  data_out <= data_in;
-  wr_rdy   <= rd_rdy;
-  wr_ack <= rd_ack;
+    send     <= wr_data;
+    data_out <= data_in;
+    wr_ack   <= rd_ack;
   end generate;
 
 
