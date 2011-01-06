@@ -67,23 +67,6 @@ actor Algo_Slice_layer_without_partitioning()
 	int (size=32) ResBlkCavlcValVLD
 		:
 
-
-/*
-*
-* Constants
-*
-*/
-
-	uint(size=4) DEC_REF_PIC_MARKING  = 0;
-	uint(size=4) REF_PIC_LIST         = 1;
-	uint(size=4) MB_LAYER             = 2;
-	uint(size=4) SUB_MB_PRED          = 3;
-	uint(size=4) MB_PRED              = 4;
-	uint(size=4) RESIDUAL             = 5;
-	uint(size=4) RESIDUAL_BLOCK_CAVLC = 6;
-//	uint(size=4) RESIDUAL_BLOCK_CABAC = 7;
-
-
 	SliceHeader.GetVLDVal: action
 			ValVLD       :[VLDecoding]
 				==>

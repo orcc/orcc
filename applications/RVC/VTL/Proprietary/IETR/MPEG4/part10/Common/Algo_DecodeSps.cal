@@ -116,10 +116,10 @@ actor Algo_DecodeSps()
 	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8                := [ 0     : for int i in 0 .. 31 ];
 	List (type:uint(size=2), size=32 ) chroma_format_idc                      := [ 1     : for int i in 0 .. 31 ];
 
-	uint(size=5)  sps_id ;
-	int (size=32) LoopVal;
+	uint(size=5)  sps_id      := 0;
+	uint(size=5)  last_sps_id := 0;
+	int (size=32) LoopVal     := 0;
 	int (size=32) PrevOffForRefFramAccum;
-	uint(size=8)  last_profile_idc;
 
 
 /*
@@ -149,7 +149,7 @@ actor Algo_DecodeSps()
 	SpsParam.AskedFromSvc: action
 			SenderOfRequest :[Sender]
 				==>
-			SpsParameters  :[1 , last_profile_idc]
+			SpsParameters  :[2 , profile_idc[last_sps_id] , Chroma_Array_Type[last_sps_id]]
 		guard
 			Sender = GET_SPS_FROM_SVC
 		end
@@ -173,30 +173,10 @@ actor Algo_DecodeSps()
 			bool ValMbAdaptFrameField,
 			List(type: int(size=32), size=12) parameters_to_send
 		do
-			val_frame_mbs_only :=
-				if(frame_mbs_only_flag[ValSps] = 0)then
-					false
-				else
-					true
-				end;
-			ValDeltaPic :=
-				if(delta_pic_order_always_zero_flag[ValSps] = 0)then
-					false
-				else
-					true
-				end;
-			ValMbAdaptFrameField :=
-				if(mb_adaptive_frame_field_flag[ValSps] = 0)then
-					false
-				else
-					true
-				end;
-			ValDirect8x8Inference :=
-				if(direct_8x8_inference_flag[ValSps] = 0) then
-					false
-				else
-					true
-				end;
+			val_frame_mbs_only    := (frame_mbs_only_flag[ValSps]              != 0);
+			ValDeltaPic           := (delta_pic_order_always_zero_flag[ValSps] != 0);
+			ValMbAdaptFrameField  := (mb_adaptive_frame_field_flag[ValSps]     != 0);
+			ValDirect8x8Inference := (direct_8x8_inference_flag[ValSps]        != 0);
 
 			/*Size of List Header Param*/
 			parameters_to_send[0] := 10 + num_ref_frames_in_pic_order_cnt_cycle[ValSps] + 1;
@@ -235,12 +215,7 @@ actor Algo_DecodeSps()
 			bool ValDirect8x8Inference,
 			List(type: int(size=32), size=8) SliceDataParam
 		do
-			ValDirect8x8Inference :=
-				if(direct_8x8_inference_flag[sps_id] = 0) then
-					false
-				else
-					true
-				end;
+			ValDirect8x8Inference := (direct_8x8_inference_flag[sps_id] != 0);
 
 			/*Size of List Data Param*/
 			SliceDataParam[0] := 7;
@@ -278,7 +253,6 @@ actor Algo_DecodeSps()
 			sps_id                                        := ValueOfVLD[4];
 
 			profile_idc[sps_id]                           := ValueOfVLD[0];
-			last_profile_idc                              := ValueOfVLD[0];
 			constraint_set_flag[sps_id]                   := ValueOfVLD[1];
 			level_idc[sps_id]                             := ValueOfVLD[3];
 			expected_delta_per_poc_cycle[sps_id]          := 0;
@@ -601,6 +575,7 @@ actor Algo_DecodeSps()
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tvui_parameters_present_flag : "+ValueOfVLD);
 			end
+			last_sps_id := sps_id;
 		end
 
 		

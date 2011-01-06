@@ -34,11 +34,6 @@ actor Algo_DecodeResidual()
 	bool         Skip_Block
 		:
 
-	int (size=6) LAUNCH_ACTOR      = -1;
-
-	uint(size=4) RESIDUAL_BLOCK_CAVLC = 6;
-	uint(size=4) RESIDUAL_BLOCK_CABAC = 7;
-
 	bool         CAVLC_ENTROPY = false;
 //	bool         CABAC_ENTROPY = true;
 

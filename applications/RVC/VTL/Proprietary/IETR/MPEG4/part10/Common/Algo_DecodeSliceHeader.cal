@@ -51,12 +51,6 @@ actor Algo_DecodeSliceHeader()
 *
 */
 
-
-	int (size=6) LAUNCH_ACTOR = -1;
-
-	uint(size=4) DEC_REF_PIC_MARKING  = 0;
-	uint(size=4) REF_PIC_LIST         = 1;
-
 //	uint(size=4) SLICE_TYPE_P  = 0;
 //	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_I  = 2;

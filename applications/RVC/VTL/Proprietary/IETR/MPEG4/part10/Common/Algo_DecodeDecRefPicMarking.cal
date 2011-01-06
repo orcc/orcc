@@ -30,13 +30,6 @@ actor Algo_DecodeDecRefPicMarking()
 		:
 
 
-/*   
-*
-* Constants
-*
-*/
-
-
 	bool DEBUG_FLAG_DECODED = false;
 
 	bool adaptive_ref_pic_marking_mode_flag;

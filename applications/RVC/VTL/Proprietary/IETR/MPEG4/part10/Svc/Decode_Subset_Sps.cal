@@ -63,31 +63,174 @@ actor Decode_Subset_Sps()
 	int (size=32) VldParam
 		:
 
-	ProfileIdcValue.Is_83or86: action
-			Parameters :[profile_idc]
+	uint(size=8) profile_idc;
+	uint(size=2) ChromaArrayType;
+
+	uint(size=2)  extended_spatial_scalability;
+	bool          seq_tcoeff_level_prediction;
+	bool          svc_vui_parameters_present;
+	uint(size=12) num_layers;
+
+	GetParameters: action
+			Parameters :[ValParam] repeat 2
 				==>
-		guard
-			(profile_idc = 83) or (profile_idc = 86)
+		do
+			profile_idc     := ValParam[0];
+			ChromaArrayType := ValParam[1];
 		end
 
-	ProfileIdcValue.Isnot_83or86: action
-			Parameters :[profile_idc]
-				==>
+	ProfileIdcValue.Isnot_83or86: action ==>
 		guard
 			profile_idc != 83,
 			profile_idc != 86
 		end
 
-	AskInterLayer: action
+	ProfileIdcValue.Is_83or86: action
 				==>
 			//          inter_lay  extended_s
 			TypeOfVLD :[READ_BITS , READ_BITS],
 			VldParam  :[    1     ,     2    ]
+		guard
+			(profile_idc = 83) or (profile_idc = 86)
 		end
 
 	ReadInterLayer.Done: action
 			ValVLD :[inter_layer_dbf_contr_pres , ext_spat_scalability]
 				==>
+		do
+			extended_spatial_scalability := ext_spat_scalability;
+		end
+
+	ChromaArrayTypeVal.Is1: action
+				==>
+			//          chroma_ph  chroma_pha
+			TypeOfVLD :[READ_BITS , READ_BITS],
+			VldParam  :[    1     ,     2    ]
+		guard
+			ChromaArrayType = 1
+		end
+
+	ChromaArrayTypeVal.Is2: action
+				==>
+			//  chroma_phase_x_plus1_flag
+			TypeOfVLD :[READ_BITS],
+			VldParam  :[    1    ]
+		guard
+			ChromaArrayType = 2
+		end
+
+	Read_2_ChromaPhase.Done: action
+			ValVLD :[chroma_phase_x_plus1_flag , chroma_phase_y_plus1]
+				==>
+		end
+
+	Read_1_ChromaPhase.Done: action
+			ValVLD :[chroma_phase_x_plus1_flag]
+				==>
+		end
+
+	ChromaArrayTypeVal.IsNot1Nor2: action ==>
+		guard
+			ChromaArrayType != 1,
+			ChromaArrayType != 2
+		end
+
+	ReadSeq_Ref_Scal_TCoef.Asked: action
+				==>
+			//          seq_ref_l  seq_ref_la  seq_sca  seq_sca  seq_sca  seq_sca  seq_tcoeff
+			TypeOfVLD :[READ_BITS , READ_BITS , VLD_SE , VLD_SE , VLD_SE , VLD_SE , READ_BITS],
+			VldParam  :[    1     ,     2                                         ,     1    ]
+		guard
+			extended_spatial_scalability = 1,
+			ChromaArrayType != 0
+		end
+
+	ReadSeq_Ref_Scal_TCoef.Done: action
+			ValVLD :[ seq_ref_layer_x  , seq_ref_layer_y   , seq_scaled_left , seq_scaled_top
+			        , seq_scaled_right , seq_scaled_bottom , seq_tcoeff_level ]
+				==>
+		do
+			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+		end
+
+	ReadSeq_Scal_TCoef.Asked: action
+				==>
+			//          seq_sca  seq_sca  seq_sca  seq_sca  seq_tcoeff
+			TypeOfVLD :[VLD_SE , VLD_SE , VLD_SE , VLD_SE , READ_BITS],
+			VldParam  :[                                        1    ]
+		guard
+			extended_spatial_scalability = 1,
+			ChromaArrayType = 0
+		end
+
+	ReadSeq_Scal_TCoef.Done: action
+			ValVLD :[ seq_scaled_left , seq_scaled_top , seq_scaled_right , seq_scaled_bottom , seq_tcoeff_level ]
+				==>
+		do
+			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+		end
+
+	ReadSeq_TCoef.Asked: action
+				==>
+			//seq_tcoeff_level_prediction_flag
+			TypeOfVLD :[READ_BITS],
+			VldParam  :[    1    ]
+		guard
+			extended_spatial_scalability != 1
+		end
+
+	ReadSeq_TCoef.Done: action
+			ValVLD :[seq_tcoeff_level]
+				==>
+		do
+			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+		end
+
+	CheckSeqTcoeff.IsTrue: action
+				==>
+			//          adaptive_  slice_head  svc_vui_pa
+			TypeOfVLD :[READ_BITS , READ_BITS , READ_BITS],
+			VldParam  :[    1     ,     1     ,     1    ]
+		guard
+			seq_tcoeff_level_prediction
+		end
+
+	CheckSeqTcoeff.IsFalse: action
+				==>
+			//          slice_head  svc_vui_pa
+			TypeOfVLD :[READ_BITS , READ_BITS],
+			VldParam  :[    1     ,     1    ]
+		guard
+			not seq_tcoeff_level_prediction
+		end
+
+	Read_Adapt_SliceHead_SvcVui: action
+			ValVLD :[adaptive_tcoeff , slice_head_restr , svc_vui_param_pres]
+				==>
+		do
+			svc_vui_parameters_present := (svc_vui_param_pres != 0);
+		end
+
+	Read_SliceHead_SvcVui: action
+			ValVLD :[slice_head_restr , svc_vui_param_pres]
+				==>
+		do
+			svc_vui_parameters_present := (svc_vui_param_pres != 0);
+		end
+
+	SvcVuiParamExt.Launch: action
+				==>
+			//     num_layers_minus1
+			TypeOfVLD :[VLD_UE]
+		guard
+			svc_vui_parameters_present
+		end
+
+	ReadNumLayers.Done: action
+			ValVLD :[num_layers_minus1]
+				==>
+		do
+			num_layers := num_layers_minus1 + 1;
 		end
 
 	EndDecodingSubsetSps: action
@@ -95,11 +238,14 @@ actor Decode_Subset_Sps()
 			TypeOfVLD :[SKIP_NAL]
 		end
 
-	schedule fsm CheckProfileIdc:
-		CheckProfileIdc (ProfileIdcValue.Is_83or86    )--> undefined;
+	schedule fsm GetParameters:
+		GetParameters   (GetParameters                )--> GetParameters;
+
+		CheckProfileIdc (ProfileIdcValue.Is_83or86    )--> ReadInterLayerDone;
 		CheckProfileIdc (ProfileIdcValue.Isnot_83or86 )-->             undefined;//not implemented yet !
 
 		/* _begin seq_parameter_set_svc_extension()_ */
+			ReadInterLayerDone (ReadInterLayer.Done   )--> undefined;
 		/* _end   seq_parameter_set_svc_extension()_ */
 
 		EndOfNal        (EndDecodingSubsetSps         )--> CheckProfileIdc;

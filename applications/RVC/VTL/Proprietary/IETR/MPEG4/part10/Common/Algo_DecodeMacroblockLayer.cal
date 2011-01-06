@@ -63,12 +63,6 @@ actor Algo_DecodeMacroblockLayer()
 *
 */
 
-	int (size=6) LAUNCH_ACTOR          = -1;
-
-	uint(size=4) SUB_MB_PRED          = 3;
-	uint(size=4) MB_PRED              = 4;
-	uint(size=4) RESIDUAL             = 5;
-
 	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
 	uint(size=4) SLICE_TYPE_I  = 2;
