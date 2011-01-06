@@ -53,28 +53,101 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 package Proprietary.IETR.MPEG4.part10.Frext;
 
-actor MergeSpsAsk()
-	uint(size=5) SpsAskedFromPic,
-	uint(size=5) SpsAskedFromPps
+actor SplitSpsInfo()
+	uint(size=2) SenderOfRequest,
+	int (size=32) Parameters
 		==>
-	uint(size=5) NumSpsAsked,
-	uint(size=2) SenderOfRequest
+	uint(size=32) PpsParameters,
+	int (size=32) HeaderParameters,
+	uint(size=32) DataParameters
 		:
 
 	uint(size=2) GET_SPS_FROM_PIC = 0;
 	uint(size=2) GET_SPS_FROM_PPS = 1;
 
-	GetSpsForPic: action
-			SpsAskedFromPic :[NumSps]
+	uint(size=32) NbValLeft;
+
+	SelectOutput.Pic: action
+			SenderOfRequest :[sender],
+			Parameters      :[SizeOfHeaderList]
 				==>
-			SenderOfRequest :[GET_SPS_FROM_PIC],
-			NumSpsAsked     :[NumSps]
+		guard
+			sender = GET_SPS_FROM_PIC
+		do
+			NbValLeft := SizeOfHeaderList;
 		end
 
-	GetSpsForPps: action
-			SpsAskedFromPps :[NumSps]
+	SelectOutput.Pps: action
+			SenderOfRequest :[sender],
+			Parameters      :[SizeOfList]
 				==>
-			SenderOfRequest :[GET_SPS_FROM_PPS],
-			NumSpsAsked     :[NumSps]
+		guard
+			sender = GET_SPS_FROM_PPS
+		do
+			NbValLeft := SizeOfList;
 		end
+
+	GetInfoForPps.Launch: action
+			Parameters    :[ParameterValue]
+				==>
+			PpsParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForPps.Done: action ==>
+		guard
+			NbValLeft = 0
+		end
+
+	GetInfoForHeader.Launch: action
+			Parameters       :[ParameterValue]
+				==>
+			HeaderParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForHeader.Done: action
+			Parameters      :[SizeOfDataList]
+				==>
+		guard
+			NbValLeft = 0
+		do
+			NbValLeft := SizeOfDataList;
+		end
+
+	GetInfoForData.Launch: action
+			Parameters     :[ParameterValue]
+				==>
+			DataParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForData.Done: action
+				==>
+		guard
+			NbValLeft = 0
+		end
+
+	schedule fsm SelectOutput:
+		SelectOutput     (SelectOutput.Pic        )--> GetInfoForHeader;
+		SelectOutput     (SelectOutput.Pps        )--> GetInfoForPps;
+
+		GetInfoForPps    (GetInfoForPps.Launch    )--> GetInfoForPps;
+		GetInfoForPps    (GetInfoForPps.Done      )--> SelectOutput;
+
+		GetInfoForHeader (GetInfoForHeader.Launch )--> GetInfoForHeader;
+		GetInfoForHeader (GetInfoForHeader.Done   )--> GetInfoForData;
+
+		GetInfoForData   (GetInfoForData.Launch   )--> GetInfoForData;
+		GetInfoForData   (GetInfoForData.Done     )--> SelectOutput;
+	end
 end
