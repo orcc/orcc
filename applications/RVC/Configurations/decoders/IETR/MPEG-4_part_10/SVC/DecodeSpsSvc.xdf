@@ -89,14 +89,7 @@
     <Port kind="Output" name="Direct8x8Inference$">
         <Type name="bool"/>
     </Port>
-    <Port kind="Output" name="Pps_PicWidthInMbs">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="Pps_PicHeightInMapUnits">
+    <Port kind="Output" name="PpsParam">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="32"/>
@@ -159,19 +152,8 @@
     <!-- ************************************** -->
     <Connection dst="" dst-port="DecodeNextNal" src="DecodeSps" src-port="DecodeNextNal"/>
     <Connection dst="" dst-port="Direct8x8Inference$" src="DecodeSps" src-port="Direct8x8Inference"/>
-    <Connection dst="" dst-port="Pps_PicHeightInMapUnits"
-        src="DecodeSps" src-port="Pps_PicHeightInMapUnits"/>
-    <Connection dst="" dst-port="Pps_PicWidthInMbs" src="DecodeSps" src-port="Pps_PicWidthInMbs"/>
-    <Connection dst="" dst-port="SliceHeaderParameters" src="DecodeSps" src-port="SliceHeaderParameters"/>
     <Connection dst="" dst-port="MMCO_NumRefFrame" src="DecodeSps" src-port="MMCO_NumRefFrame"/>
-    <Connection dst="" dst-port="SliceDataParameters" src="DecodeSps" src-port="SliceDataParameters"/>
     <Connection dst="" dst-port="MMCO_MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
-    <Connection dst="DecodeSps" dst-port="SpsAsked" src="MergeSpsAsk" src-port="SpsAsked"/>
-    <Connection dst="SplitSpsInfo" dst-port="IsSizeDPB"
-        src="MergeSpsAsk" src-port="IsSizeDPB"/>
-    <Connection dst="" dst-port="SizeMaxDpb" src="SplitSpsInfo" src-port="SizeDPB"/>
-    <Connection dst="SplitSpsInfo" dst-port="SzDPB_or_profile_idc"
-        src="DecodeSps" src-port="SzDPB_or_profile_idc"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPic" src="" src-port="SpsAskedFromPic"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromPps" src="" src-port="SpsAskedFromPps"/>
     <Connection dst="Mgnt_Sps" dst-port="ValVLD" src="" src-port="ValDecoded"/>
@@ -185,10 +167,21 @@
     <Connection dst="Mgnt_Sps" dst-port="NalUnitType" src="" src-port="NalUnitType"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
         src="Mgnt_Sps" src-port="AskPrfIdcForSubSps"/>
-    <Connection dst="SpsSvc" dst-port="ProfileIdc" src="SplitSpsInfo" src-port="ProfileIdc"/>
     <Connection dst="SpsSvc" dst-port="ValVLD" src="Mgnt_Sps" src-port="ValVLD4DecodeSubSps"/>
     <Connection dst="Mgnt_Sps" dst-port="TypeOfVLDFromSubSps"
         src="SpsSvc" src-port="TypeOfVLD"/>
     <Connection dst="Mgnt_Sps" dst-port="VLDParamFromSubSps"
         src="SpsSvc" src-port="VldParam"/>
+    <Connection dst="SplitSpsInfo" dst-port="SenderOfRequest"
+        src="MergeSpsAsk" src-port="SenderOfRequest"/>
+    <Connection dst="DecodeSps" dst-port="NumSpsAsked" src="MergeSpsAsk" src-port="NumSpsAsked"/>
+    <Connection dst="DecodeSps" dst-port="SenderOfRequest"
+        src="MergeSpsAsk" src-port="SenderOfRequest"/>
+    <Connection dst="SplitSpsInfo" dst-port="Parameters" src="DecodeSps" src-port="SpsParameters"/>
+    <Connection dst="" dst-port="SizeMaxDpb" src="DecodeSps" src-port="SzDPB"/>
+    <Connection dst="SpsSvc" dst-port="Parameters" src="SplitSpsInfo" src-port="SubSpsParameters"/>
+    <Connection dst="" dst-port="PpsParam" src="SplitSpsInfo" src-port="PpsParameters"/>
+    <Connection dst="" dst-port="SliceHeaderParameters"
+        src="SplitSpsInfo" src-port="HeaderParameters"/>
+    <Connection dst="" dst-port="SliceDataParameters" src="SplitSpsInfo" src-port="DataParameters"/>
 </XDF>

@@ -2,24 +2,23 @@
 <layout>
    <vertices>
       <vertex id="ValDecoded" x="360" y="142"/>
-      <vertex id="DecodeNextNal" x="880" y="254"/>
+      <vertex id="SpsAskedFromPic" x="71" y="494"/>
+      <vertex id="SpsAskedFromPps" x="73" y="528"/>
+      <vertex id="NalUnitType" x="343" y="36"/>
+      <vertex id="DecodeNextNal" x="915" y="245"/>
       <vertex id="TypeOfVLD" x="907" y="44"/>
       <vertex id="VldParam" x="916" y="87"/>
-      <vertex id="SizeMaxDpb" x="1290" y="615"/>
-      <vertex id="SliceHeaderParameters" x="854" y="471"/>
-      <vertex id="SliceDataParameters" x="866" y="439"/>
-      <vertex id="MMCO_MaxFrameNum" x="863" y="313"/>
-      <vertex id="MMCO_NumRefFrame" x="865" y="345"/>
-      <vertex id="Direct8x8Inference$" x="868" y="284"/>
-      <vertex id="Pps_PicWidthInMbs" x="872" y="406"/>
-      <vertex id="Pps_PicHeightInMapUnits" x="849" y="376"/>
+      <vertex id="SizeMaxDpb" x="941" y="436"/>
+      <vertex id="SliceHeaderParameters" x="1205" y="600"/>
+      <vertex id="SliceDataParameters" x="1212" y="570"/>
+      <vertex id="MMCO_MaxFrameNum" x="898" y="304"/>
+      <vertex id="MMCO_NumRefFrame" x="900" y="336"/>
+      <vertex id="Direct8x8Inference$" x="903" y="275"/>
+      <vertex id="PpsParam" x="1251" y="629"/>
       <vertex id="DecodeSps" x="566" y="242"/>
-      <vertex id="MergeSpsAsk" x="292" y="487"/>
-      <vertex id="SpsSvc" x="1262" y="352"/>
-      <vertex id="SplitSpsInfo" x="986" y="571"/>
-      <vertex id="SpsAskedFromPic" x="119" y="494"/>
-      <vertex id="SpsAskedFromPps" x="121" y="528"/>
+      <vertex id="MergeSpsAsk" x="240" y="484"/>
+      <vertex id="SpsSvc" x="1194" y="254"/>
+      <vertex id="SplitSpsInfo" x="906" y="558"/>
       <vertex id="Mgnt_Sps" x="529" y="18"/>
-      <vertex id="NalUnitType" x="343" y="36"/>
    </vertices>
 </layout>

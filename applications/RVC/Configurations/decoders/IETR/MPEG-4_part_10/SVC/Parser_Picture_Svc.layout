@@ -15,15 +15,15 @@
       <vertex id="QP_Cr" x="2278" y="1228"/>
       <vertex id="ScalingList" x="2259" y="1260"/>
       <vertex id="QP" x="2282" y="1171"/>
-      <vertex id="CurrMbAddr" x="613" y="893"/>
+      <vertex id="CurrMbAddr" x="596" y="891"/>
       <vertex id="slice_alpha_c0_offset" x="568" y="1134"/>
       <vertex id="slice_beta_offset" x="580" y="1161"/>
       <vertex id="LFDisable" x="609" y="957"/>
       <vertex id="CodedBlockPattern" x="2184" y="894"/>
-      <vertex id="ConstrainedIFlag" x="601" y="866"/>
+      <vertex id="ConstrainedIFlag" x="578" y="865"/>
       <vertex id="PicWidthInMb" x="589" y="1049"/>
       <vertex id="PicSizeInMb" x="597" y="1019"/>
-      <vertex id="FirstMbInSlice" x="600" y="924"/>
+      <vertex id="FirstMbInSlice" x="593" y="923"/>
       <vertex id="POC" x="586" y="385"/>
       <vertex id="I_PCM_Y" x="1261" y="1269"/>
       <vertex id="I_PCM_U" x="1267" y="1203"/>

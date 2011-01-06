@@ -19,23 +19,21 @@ import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 
 actor Algo_DecodeSps()
 	int (size=32) ValVLD,
-	uint(size=5)  SpsAsked
+	uint(size=5)  NumSpsAsked,
+	uint(size=2)  SenderOfRequest
 		==>
 	uint(size=5)  TypeOfVLD,
 	int (size=32) NbBitsToRead,
 	bool          DecodeNextNal,
 
-	uint(size=8)  SzDPB_or_profile_idc,
-	int (size=32) SliceHeaderParameters,
-	uint(size=32) SliceDataParameters,
+	uint(size=8)  SzDPB,
 
 	uint(size=31) MMCO_MaxFrameNum,
 	uint(size=5)  MMCO_NumRefFrame,
 
 	bool          Direct8x8Inference,
 
-	uint(size=32) Pps_PicWidthInMbs,
-	uint(size=32) Pps_PicHeightInMapUnits
+	int (size=32) SpsParameters
 		:
 
 
@@ -149,19 +147,19 @@ actor Algo_DecodeSps()
 
 
 	SpsParam.AskedFromSvc: action
-			SpsAsked :[Sender]
+			SenderOfRequest :[Sender]
 				==>
-			SzDPB_or_profile_idc  :[last_profile_idc]
+			SpsParameters  :[1 , last_profile_idc]
 		guard
 			Sender = GET_SPS_FROM_SVC
 		end
 
 	SpsParam.AskedFromPic: action
-			SpsAsked :[Sender , ValSps]
+			SenderOfRequest :[Sender],
+			NumSpsAsked     :[ValSps]
 				==>
-			SliceDataParameters   :[SliceDataParam] repeat 7,
-			SliceHeaderParameters :[SliceHeaderParam]repeat 10,
-			SzDPB_or_profile_idc  :[MaxDPBSz[ValSps]],
+			SpsParameters         :[parameters_to_send]repeat 11,
+			SzDPB                 :[MaxDPBSz[ValSps]],
 			Direct8x8Inference    :[ValDirect8x8Inference],
 
 			MMCO_MaxFrameNum      :[max_frame_num[ValSps]],
@@ -169,12 +167,11 @@ actor Algo_DecodeSps()
 		guard
 			Sender = GET_SPS_FROM_PIC
 		var
+			bool ValDirect8x8Inference,
 			bool val_frame_mbs_only,
 			bool ValDeltaPic,
 			bool ValMbAdaptFrameField,
-			bool ValDirect8x8Inference,
-			List(type: int(size=32), size=10) SliceHeaderParam,
-			List(type: int(size=32), size=7) SliceDataParam
+			List(type: int(size=32), size=12) parameters_to_send
 		do
 			val_frame_mbs_only :=
 				if(frame_mbs_only_flag[ValSps] = 0)then
@@ -201,24 +198,19 @@ actor Algo_DecodeSps()
 					true
 				end;
 
-			SliceDataParam[0] := bit_depth_chroma_minus8[ValSps]+8;
-			SliceDataParam[1] := bit_depth_luma_minus8[ValSps]+8;
-			SliceDataParam[2] := Chroma_Array_Type[ValSps];
-			SliceDataParam[3] := NumC8x8[ValSps];
-			SliceDataParam[4] := pic_size_in_mbs[ValSps];
-			SliceDataParam[5] := pic_width_in_mbs_minus1[ValSps] + 1;
-			SliceDataParam[6] := SetFlag(ValDirect8x8Inference,0,0);
+			/*Size of List Header Param*/
+			parameters_to_send[0] := 10 + num_ref_frames_in_pic_order_cnt_cycle[ValSps] + 1;
 
-			SliceHeaderParam[0] := expected_delta_per_poc_cycle[ValSps];
-			SliceHeaderParam[1] := log2_max_frame_num_minus4[ValSps] + 4;
-			SliceHeaderParam[2] := num_ref_frames_in_pic_order_cnt_cycle[ValSps];
-			SliceHeaderParam[3] := offset_for_top_to_bottom_field[ValSps];
-			SliceHeaderParam[4] := offset_for_non_ref_pic[ValSps];
-			SliceHeaderParam[5] := log2_max_pic_order_cnt_lsb_minus4[ValSps] + 4;
-			SliceHeaderParam[6] := pic_order_cnt_type[ValSps];
-			SliceHeaderParam[7] := SetFlag(val_frame_mbs_only,2,SetFlag(ValDeltaPic,1,SetFlag(ValMbAdaptFrameField,0,0)));
-			SliceHeaderParam[8] := pic_width_in_mbs_minus1[ValSps] + 1;
-			SliceHeaderParam[9] := pic_height_in_map_units_minus1[ValSps] + 1;
+			parameters_to_send[1]  := expected_delta_per_poc_cycle[ValSps];
+			parameters_to_send[2]  := log2_max_frame_num_minus4[ValSps] + 4;
+			parameters_to_send[3]  := num_ref_frames_in_pic_order_cnt_cycle[ValSps];
+			parameters_to_send[4]  := offset_for_top_to_bottom_field[ValSps];
+			parameters_to_send[5]  := offset_for_non_ref_pic[ValSps];
+			parameters_to_send[6]  := log2_max_pic_order_cnt_lsb_minus4[ValSps] + 4;
+			parameters_to_send[7]  := pic_order_cnt_type[ValSps];
+			parameters_to_send[8]  := SetFlag(val_frame_mbs_only,2,SetFlag(ValDeltaPic,1,SetFlag(ValMbAdaptFrameField,0,0)));
+			parameters_to_send[9]  := pic_width_in_mbs_minus1[ValSps] + 1;
+			parameters_to_send[10] := pic_height_in_map_units_minus1[ValSps] + 1;
 			
 
 			sps_id  := ValSps;
@@ -227,7 +219,7 @@ actor Algo_DecodeSps()
 
 	SendOff4RefFrameAcc.Launch: action
 				==>
-			SliceHeaderParameters:[offset_for_ref_frame_accumul[sps_id][LoopVal]]
+			SpsParameters:[offset_for_ref_frame_accumul[sps_id][LoopVal]]
 		guard
 			LoopVal <= num_ref_frames_in_pic_order_cnt_cycle[sps_id]
 		do
@@ -236,15 +228,37 @@ actor Algo_DecodeSps()
 
 	SendOff4RefFrameAcc.Done: action
 			==>
+			SpsParameters :[SliceDataParam] repeat 8
 		guard
 			LoopVal >= num_ref_frames_in_pic_order_cnt_cycle[sps_id]
+		var
+			bool ValDirect8x8Inference,
+			List(type: int(size=32), size=8) SliceDataParam
+		do
+			ValDirect8x8Inference :=
+				if(direct_8x8_inference_flag[sps_id] = 0) then
+					false
+				else
+					true
+				end;
+
+			/*Size of List Data Param*/
+			SliceDataParam[0] := 7;
+
+			SliceDataParam[1] := bit_depth_chroma_minus8[sps_id]+8;
+			SliceDataParam[2] := bit_depth_luma_minus8[sps_id]+8;
+			SliceDataParam[3] := Chroma_Array_Type[sps_id];
+			SliceDataParam[4] := NumC8x8[sps_id];
+			SliceDataParam[5] := pic_size_in_mbs[sps_id];
+			SliceDataParam[6] := pic_width_in_mbs_minus1[sps_id] + 1;
+			SliceDataParam[7] := SetFlag(ValDirect8x8Inference,0,0);
 		end
 
 	SpsParam.AskedFromPps: action
-			SpsAsked :[Sender , ValSps]
+			SenderOfRequest :[Sender],
+			NumSpsAsked     :[ValSps]
 				==>
-			Pps_PicWidthInMbs       :[pic_width_in_mbs_minus1[ValSps] + 1],
-			Pps_PicHeightInMapUnits :[pic_height_in_map_units_minus1[ValSps] + 1]
+			SpsParameters :[2 , pic_width_in_mbs_minus1[ValSps] + 1 , pic_height_in_map_units_minus1[ValSps] + 1]
 		guard
 			Sender = GET_SPS_FROM_PPS
 		end

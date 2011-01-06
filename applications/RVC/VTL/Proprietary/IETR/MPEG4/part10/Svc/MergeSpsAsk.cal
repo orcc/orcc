@@ -58,8 +58,8 @@ actor MergeSpsAsk()
 	uint(size=5) SpsAskedFromPps,
 	bool         SpsAskedFromSpsSvc
 		==>
-	uint(size=5) SpsAsked,
-	bool         IsSizeDPB
+	uint(size=5) NumSpsAsked,
+	uint(size=2) SenderOfRequest
 		:
 
 	uint(size=2) GET_SPS_FROM_PIC = 0;
@@ -69,20 +69,20 @@ actor MergeSpsAsk()
 	GetSpsForPic: action
 			SpsAskedFromPic :[NumSps]
 				==>
-			SpsAsked        :[GET_SPS_FROM_PIC , NumSps],
-			IsSizeDPB       :[true]
+			SenderOfRequest :[GET_SPS_FROM_PIC],
+			NumSpsAsked     :[NumSps]
 		end
 
 	GetSpsForSvc: action
 			SpsAskedFromSpsSvc :[sps_asked]
 				==>
-			SpsAsked           :[GET_SPS_FROM_SVC],
-			IsSizeDPB          :[false]
+			SenderOfRequest    :[GET_SPS_FROM_SVC]
 		end
 
 	GetSpsForPps: action
 			SpsAskedFromPps :[NumSps]
 				==>
-			SpsAsked        :[GET_SPS_FROM_PPS , NumSps]
+			SenderOfRequest :[GET_SPS_FROM_PPS],
+			NumSpsAsked     :[NumSps]
 		end
 end

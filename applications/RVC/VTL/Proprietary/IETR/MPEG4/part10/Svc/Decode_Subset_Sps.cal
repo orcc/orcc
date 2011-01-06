@@ -53,12 +53,55 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 package Proprietary.IETR.MPEG4.part10.Svc;
 
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+
 actor Decode_Subset_Sps()
 	int (size=32) ValVLD,
-	uint(size=8)  ProfileIdc
+	int (size=32) Parameters
 		==>
 	uint(size=5)  TypeOfVLD,
 	int (size=32) VldParam
 		:
-	
+
+	ProfileIdcValue.Is_83or86: action
+			Parameters :[profile_idc]
+				==>
+		guard
+			(profile_idc = 83) or (profile_idc = 86)
+		end
+
+	ProfileIdcValue.Isnot_83or86: action
+			Parameters :[profile_idc]
+				==>
+		guard
+			profile_idc != 83,
+			profile_idc != 86
+		end
+
+	AskInterLayer: action
+				==>
+			//          inter_lay  extended_s
+			TypeOfVLD :[READ_BITS , READ_BITS],
+			VldParam  :[    1     ,     2    ]
+		end
+
+	ReadInterLayer.Done: action
+			ValVLD :[inter_layer_dbf_contr_pres , ext_spat_scalability]
+				==>
+		end
+
+	EndDecodingSubsetSps: action
+				==>
+			TypeOfVLD :[SKIP_NAL]
+		end
+
+	schedule fsm CheckProfileIdc:
+		CheckProfileIdc (ProfileIdcValue.Is_83or86    )--> undefined;
+		CheckProfileIdc (ProfileIdcValue.Isnot_83or86 )-->             undefined;//not implemented yet !
+
+		/* _begin seq_parameter_set_svc_extension()_ */
+		/* _end   seq_parameter_set_svc_extension()_ */
+
+		EndOfNal        (EndDecodingSubsetSps         )--> CheckProfileIdc;
+	end
 end

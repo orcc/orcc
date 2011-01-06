@@ -55,28 +55,131 @@ Copyright (c) ISO/IEC 2008.
 package Proprietary.IETR.MPEG4.part10.Svc;
 
 actor SplitSpsInfo()
-	bool         IsSizeDPB,
-	uint(size=8) SzDPB_or_profile_idc
+	uint(size=2) SenderOfRequest,
+	int (size=32) Parameters
 		==>
-	uint(size=8) SizeDPB,
-	uint(size=8) ProfileIdc
+	int (size=32) SubSpsParameters,
+	uint(size=32) PpsParameters,
+	int (size=32) HeaderParameters,
+	uint(size=32) DataParameters
 		:
 
-	GetInfo.IsSizeDPB: action
-			IsSizeDPB            :[is_size_dpb],
-			SzDPB_or_profile_idc :[ValSizeDPB]
+	uint(size=2) GET_SPS_FROM_PIC = 0;
+	uint(size=2) GET_SPS_FROM_PPS = 1;
+	uint(size=2) GET_SPS_FROM_SVC = 2;
+
+	uint(size=32) NbValLeft;
+
+	SelectOutput.Pic: action
+			SenderOfRequest :[sender],
+			Parameters      :[SizeOfHeaderList]
 				==>
-			SizeDPB              :[ValSizeDPB]
 		guard
-			is_size_dpb
+			sender = GET_SPS_FROM_PIC
+		do
+			NbValLeft := SizeOfHeaderList;
 		end
 
-	GetInfo.IsProfileIdc: action
-			IsSizeDPB            :[is_size_dpb],
-			SzDPB_or_profile_idc :[ValProfileIdc]
+	SelectOutput.Pps: action
+			SenderOfRequest :[sender],
+			Parameters      :[SizeOfList]
 				==>
-			ProfileIdc           :[ValProfileIdc]
 		guard
-			not is_size_dpb
+			sender = GET_SPS_FROM_PPS
+		do
+			NbValLeft := SizeOfList;
 		end
+
+	SelectOutput.Svc: action
+			SenderOfRequest :[sender],
+			Parameters      :[SizeOfList]
+				==>
+		guard
+			sender = GET_SPS_FROM_SVC
+		do
+			NbValLeft := SizeOfList;
+		end
+
+	GetInfoForSvc.Launch: action
+			Parameters       :[ParameterValue]
+				==>
+			SubSpsParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForSvc.Done: action ==>
+		guard
+			NbValLeft = 0
+		end
+
+	GetInfoForPps.Launch: action
+			Parameters    :[ParameterValue]
+				==>
+			PpsParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForPps.Done: action ==>
+		guard
+			NbValLeft = 0
+		end
+
+	GetInfoForHeader.Launch: action
+			Parameters       :[ParameterValue]
+				==>
+			HeaderParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForHeader.Done: action
+			Parameters      :[SizeOfDataList]
+				==>
+		guard
+			NbValLeft = 0
+		do
+			NbValLeft := SizeOfDataList;
+		end
+
+	GetInfoForData.Launch: action
+			Parameters     :[ParameterValue]
+				==>
+			DataParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForData.Done: action
+				==>
+		guard
+			NbValLeft = 0
+		end
+
+	schedule fsm SelectOutput:
+		SelectOutput     (SelectOutput.Pic        )--> GetInfoForHeader;
+		SelectOutput     (SelectOutput.Pps        )--> GetInfoForPps;
+		SelectOutput     (SelectOutput.Svc        )--> GetInfoForSvc;
+
+		GetInfoForSvc    (GetInfoForSvc.Launch    )--> GetInfoForSvc;
+		GetInfoForSvc    (GetInfoForSvc.Done      )--> SelectOutput;
+
+		GetInfoForPps    (GetInfoForPps.Launch    )--> GetInfoForPps;
+		GetInfoForPps    (GetInfoForPps.Done      )--> SelectOutput;
+
+		GetInfoForHeader (GetInfoForHeader.Launch )--> GetInfoForHeader;
+		GetInfoForHeader (GetInfoForHeader.Done   )--> GetInfoForData;
+
+		GetInfoForData   (GetInfoForData.Launch   )--> GetInfoForData;
+		GetInfoForData   (GetInfoForData.Done     )--> SelectOutput;
+	end
 end
