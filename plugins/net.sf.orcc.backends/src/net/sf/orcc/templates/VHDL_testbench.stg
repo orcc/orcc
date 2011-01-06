@@ -148,7 +148,6 @@ end process WaveGen_Proc_In;
 case_define_in(port) ::= <<
 --
 -- Input port: $port.name$ Waveform Generation
-$port.name$_send <= '0'; 
 case tb_FSM_$port.name$ is
   when after_reset =>
     count <= count + 1;
@@ -208,6 +207,8 @@ $$
 endif
 $        $port.name$_send <= '1';      
       end if;
+    elsif (endfile (sim_file_$instance.id$_$port.name$)) then
+      $port.name$_send <= '0'; 
     end if;
 
   when others => null;
