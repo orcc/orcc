@@ -367,7 +367,7 @@ $declareActorsArray(instances=network.instances)$
 static void scheduler() {
 	$printInitializes(network.instances)$
 	struct scheduler_s sched;
-  sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors);
+  sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
   
 	$printSchedulers()$
 }

@@ -104,7 +104,7 @@ static void scheduler() {
 	// initializes the actors that need it
 	$printInitializes(network.instances)$
 	// initialize scheduler
-	sched_init(&my_scheduler, sizeof(actors) / sizeof(actors[0]), actors);
+	sched_init(&my_scheduler, sizeof(actors) / sizeof(actors[0]), actors, NULL);
 
 	sched_add_schedulable(&my_scheduler, &source);
 	my_actor = sched_get_next_schedulable(&my_scheduler);
