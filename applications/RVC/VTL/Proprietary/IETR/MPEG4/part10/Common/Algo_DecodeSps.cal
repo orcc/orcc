@@ -230,7 +230,7 @@ actor Algo_DecodeSps()
 			==>
 			SpsParameters :[SliceDataParam] repeat 8
 		guard
-			LoopVal >= num_ref_frames_in_pic_order_cnt_cycle[sps_id]
+			LoopVal >  num_ref_frames_in_pic_order_cnt_cycle[sps_id]
 		var
 			bool ValDirect8x8Inference,
 			List(type: int(size=32), size=8) SliceDataParam
