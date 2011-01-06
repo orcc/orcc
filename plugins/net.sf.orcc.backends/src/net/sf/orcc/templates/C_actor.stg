@@ -324,7 +324,7 @@ l_$transition.sourceState$:
 	}
 	$endif$
 	$if (transition.nextStateInfo.empty)$
-	printf("stuck in state \"$transition.sourceState$\"\n");
+	printf("stuck in state \"$transition.sourceState$\" in the instance $instance.id$\n");
 	wait_for_key();
 	exit(1);
 	$else$
