@@ -60,7 +60,9 @@ actor Decode_Subset_Sps()
 	int (size=32) Parameters
 		==>
 	uint(size=5)  TypeOfVLD,
-	int (size=32) VldParam
+	int (size=32) VldParam,
+
+	uint(size=2)  SpsSvcExtParam
 		:
 
 	uint(size=8) profile_idc;
@@ -80,8 +82,9 @@ actor Decode_Subset_Sps()
 
 	ProfileIdcValue.Is_83or86: action
 				==>
-			TypeOfVLD :[LAUNCH_ACTOR],
-			VldParam  :[SPS_SVC_EXTENSION]
+			TypeOfVLD      :[LAUNCH_ACTOR],
+			VldParam       :[SPS_SVC_EXTENSION],
+			SpsSvcExtParam :[ChromaArrayType]
 		guard
 			(profile_idc = 83) or (profile_idc = 86)
 		end

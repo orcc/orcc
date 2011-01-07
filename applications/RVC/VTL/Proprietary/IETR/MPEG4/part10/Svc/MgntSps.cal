@@ -63,6 +63,9 @@ actor MgntSps()
 	uint(size=5)  TypeOfVLDFromSubSps,
 	int (size=32) VLDParamFromSubSps,
 
+	uint(size=5)  TypeOfVLDFromSpsSvcExt,
+	int (size=32) VLDParamFromSpsSvcExt,
+
 	int (size=32) ValVLD,
 
 	uint(size=5) NalUnitType
@@ -74,7 +77,9 @@ actor MgntSps()
 
 	int (size=32) ValVLD4DecodeSubSps,
 
-	bool          AskPrfIdcForSubSps
+	int (size=32) ValVLD4DecodeSpsSvcExt,
+
+	bool          AskSpsInfoForSubSps
 		:
 
 
@@ -123,7 +128,7 @@ actor MgntSps()
 	NaluType.IsSubsetSpsNalUnit : action
 			NalUnitType :[nal_unit_type]
 				==>
-			AskPrfIdcForSubSps :[true]
+			AskSpsInfoForSubSps :[true]
 		guard
 			nal_unit_type = NAL_SUBSET_SPS
 		end

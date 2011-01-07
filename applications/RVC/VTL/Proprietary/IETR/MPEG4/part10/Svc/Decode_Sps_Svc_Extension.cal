@@ -1,0 +1,245 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+package Proprietary.IETR.MPEG4.part10.Svc;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+
+actor Decode_Sps_Svc_Extension()
+	int (size=32) ValVLD,
+	uint(size=2) ChromaArrayType
+		==>
+	uint(size=5)  TypeOfVLD,
+	int (size=32) VldParam
+		:
+
+	uint(size=2)  chroma_array_type;
+	uint(size=2)  extended_spatial_scalability;
+	bool          seq_tcoeff_level_prediction;
+
+
+	ReadInterLayer.Asked: action
+				==>
+			//          inter_lay  extended_s
+			TypeOfVLD :[READ_BITS , READ_BITS],
+			VldParam  :[    1     ,     2    ]
+		end
+
+	ReadChromArrayType.Done: action
+			ChromaArrayType :[ChromaArray]
+				==>
+		do
+			chroma_array_type := ChromaArray;
+		end
+
+	ReadInterLayer.Done: action
+			ValVLD :[inter_layer_dbf_contr_pres , ext_spat_scalability]
+				==>
+		do
+			extended_spatial_scalability := ext_spat_scalability;
+		end
+
+	ChromaArrayTypeVal.Is1: action
+				==>
+			//          chroma_ph  chroma_pha
+			TypeOfVLD :[READ_BITS , READ_BITS],
+			VldParam  :[    1     ,     2    ]
+		guard
+			chroma_array_type = 1
+		end
+
+	ChromaArrayTypeVal.Is2: action
+				==>
+			//  chroma_phase_x_plus1_flag
+			TypeOfVLD :[READ_BITS],
+			VldParam  :[    1    ]
+		guard
+			chroma_array_type = 2
+		end
+
+	Read_2_ChromaPhase.Done: action
+			ValVLD :[chroma_phase_x_plus1_flag , chroma_phase_y_plus1]
+				==>
+		end
+
+	Read_1_ChromaPhase.Done: action
+			ValVLD :[chroma_phase_x_plus1_flag]
+				==>
+		end
+
+	ReadSeq_Ref_Scal_TCoef.Asked: action
+				==>
+			//          seq_ref_l  seq_ref_la  seq_sca  seq_sca  seq_sca  seq_sca  seq_tcoeff
+			TypeOfVLD :[READ_BITS , READ_BITS , VLD_SE , VLD_SE , VLD_SE , VLD_SE , READ_BITS],
+			VldParam  :[    1     ,     2                                         ,     1    ]
+		guard
+			extended_spatial_scalability = 1,
+			chroma_array_type != 0
+		end
+
+	ReadSeq_Ref_Scal_TCoef.Done: action
+			ValVLD :[ seq_ref_layer_x  , seq_ref_layer_y   , seq_scaled_left , seq_scaled_top
+			        , seq_scaled_right , seq_scaled_bottom , seq_tcoeff_level ]
+				==>
+		do
+			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+		end
+
+	ReadSeq_Scal_TCoef.Asked: action
+				==>
+			//          seq_sca  seq_sca  seq_sca  seq_sca  seq_tcoeff
+			TypeOfVLD :[VLD_SE , VLD_SE , VLD_SE , VLD_SE , READ_BITS],
+			VldParam  :[                                        1    ]
+		guard
+			extended_spatial_scalability = 1,
+			chroma_array_type = 0
+		end
+
+	ReadSeq_Scal_TCoef.Done: action
+			ValVLD :[ seq_scaled_left , seq_scaled_top , seq_scaled_right , seq_scaled_bottom , seq_tcoeff_level ]
+				==>
+		do
+			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+		end
+
+	ReadSeq_TCoef.Asked: action
+				==>
+			//seq_tcoeff_level_prediction_flag
+			TypeOfVLD :[READ_BITS],
+			VldParam  :[    1    ]
+		guard
+			extended_spatial_scalability != 1
+		end
+
+	ReadSeq_TCoef.Done: action
+			ValVLD :[seq_tcoeff_level]
+				==>
+		do
+			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+		end
+
+	CheckSeqTcoeff.IsTrue: action
+				==>
+			//          adaptive_  slice_head  svc_vui_pa
+			TypeOfVLD :[READ_BITS , READ_BITS ],
+			VldParam  :[    1     ,     1     ]
+		guard
+			seq_tcoeff_level_prediction
+		end
+
+	CheckSeqTcoeff.IsFalse: action
+				==>
+			//          slice_head  svc_vui_pa
+			TypeOfVLD :[READ_BITS],
+			VldParam  :[    1    ]
+		guard
+			not seq_tcoeff_level_prediction
+		end
+
+	Read_Adapt_SliceHead_SvcVui: action
+			ValVLD :[adaptive_tcoeff , slice_head_restr]
+				==>
+		end
+
+	Read_SliceHead_SvcVui: action
+			ValVLD :[slice_head_restr]
+				==>
+		end
+
+	EndSpsSvcExt: action
+				==>
+			TypeOfVLD :[SKIP_NAL]
+		end
+
+	schedule fsm AskReadInterLayer:
+		AskReadInterLayer           (ReadInterLayer.Asked         )--> ReadChromArrayType;
+
+		ReadChromArrayType          (ReadChromArrayType           )--> ReadInterLayerDone;
+
+		ReadInterLayerDone          (ReadInterLayer.Done          )--> CheckChromaArrayType;
+
+		CheckChromaArrayType        (ChromaArrayTypeVal.Is1       )--> Read_2_ChromaPhase;
+		CheckChromaArrayType        (ChromaArrayTypeVal.Is2       )--> Read_1_ChromaPhase;
+		CheckChromaArrayType        (ReadSeq_Ref_Scal_TCoef.Asked )--> ReadSeq_Ref_Scal_TCoefDone;
+		CheckChromaArrayType        (ReadSeq_Scal_TCoef.Asked     )--> ReadSeq_Scal_TCoefDone;
+		CheckChromaArrayType        (ReadSeq_TCoef.Asked          )--> ReadSeq_TCoefDone;
+
+		Read_2_ChromaPhase          (Read_2_ChromaPhase           )--> CheckExtSpatScal;
+
+		Read_1_ChromaPhase          (Read_1_ChromaPhase           )--> CheckExtSpatScal;
+
+		CheckExtSpatScal            (ReadSeq_Ref_Scal_TCoef.Asked )--> ReadSeq_Ref_Scal_TCoefDone;
+		CheckExtSpatScal            (ReadSeq_Scal_TCoef.Asked     )--> ReadSeq_Scal_TCoefDone;
+		CheckExtSpatScal            (ReadSeq_TCoef.Asked          )--> ReadSeq_TCoefDone;
+
+		ReadSeq_Ref_Scal_TCoefDone  (ReadSeq_Ref_Scal_TCoef.Done  )--> CheckSeqTcoeff;
+
+		ReadSeq_Scal_TCoefDone      (ReadSeq_Scal_TCoef.Done      )--> CheckSeqTcoeff;
+
+		ReadSeq_TCoefDone           (ReadSeq_TCoef.Done           )--> CheckSeqTcoeff;
+
+		CheckSeqTcoeff              (CheckSeqTcoeff.IsTrue        )--> Read_Adapt_SliceHead_SvcVui;
+		CheckSeqTcoeff              (CheckSeqTcoeff.IsFalse       )--> Read_SliceHead_SvcVui;
+
+		Read_Adapt_SliceHead_SvcVui (Read_Adapt_SliceHead_SvcVui  )--> EndSpsSvcExt;
+
+		Read_SliceHead_SvcVui       (Read_SliceHead_SvcVui        )--> EndSpsSvcExt;
+
+		EndSpsSvcExt                (EndSpsSvcExt                 )--> AskReadInterLayer;
+	end
+
+	priority
+			ChromaArrayTypeVal.Is1       > ChromaArrayTypeVal.Is2   > ReadSeq_Ref_Scal_TCoef.Asked;
+			ReadSeq_Ref_Scal_TCoef.Asked > ReadSeq_Scal_TCoef.Asked > ReadSeq_TCoef.Asked;
+	end
+end

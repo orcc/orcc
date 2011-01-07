@@ -147,6 +147,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Decode_Sps_Svc_Extension">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Svc.Decode_Sps_Svc_Extension"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -165,8 +174,6 @@
     <Connection dst="" dst-port="TypeOfVLD" src="Mgnt_Sps" src-port="TypeOfVLD"/>
     <Connection dst="" dst-port="VldParam" src="Mgnt_Sps" src-port="VLDParam"/>
     <Connection dst="Mgnt_Sps" dst-port="NalUnitType" src="" src-port="NalUnitType"/>
-    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
-        src="Mgnt_Sps" src-port="AskPrfIdcForSubSps"/>
     <Connection dst="Decode_Subset_Sps" dst-port="ValVLD" src="Mgnt_Sps" src-port="ValVLD4DecodeSubSps"/>
     <Connection dst="Mgnt_Sps" dst-port="TypeOfVLDFromSubSps"
         src="Decode_Subset_Sps" src-port="TypeOfVLD"/>
@@ -185,4 +192,14 @@
     <Connection dst="" dst-port="SliceHeaderParameters"
         src="SplitSpsInfo" src-port="HeaderParameters"/>
     <Connection dst="" dst-port="SliceDataParameters" src="SplitSpsInfo" src-port="DataParameters"/>
+    <Connection dst="Decode_Sps_Svc_Extension"
+        dst-port="ChromaArrayType" src="Decode_Subset_Sps" src-port="SpsSvcExtParam"/>
+    <Connection dst="Decode_Sps_Svc_Extension" dst-port="ValVLD"
+        src="Mgnt_Sps" src-port="ValVLD4DecodeSpsSvcExt"/>
+    <Connection dst="Mgnt_Sps" dst-port="TypeOfVLDFromSpsSvcExt"
+        src="Decode_Sps_Svc_Extension" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_Sps" dst-port="VLDParamFromSpsSvcExt"
+        src="Decode_Sps_Svc_Extension" src-port="VldParam"/>
+    <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
+        src="Mgnt_Sps" src-port="AskSpsInfoForSubSps"/>
 </XDF>
