@@ -156,6 +156,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Decode_Svc_Vui_Param_Ext">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Svc.Decode_Svc_Vui_Param_Extension"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -202,4 +211,10 @@
         src="Decode_Sps_Svc_Extension" src-port="VldParam"/>
     <Connection dst="MergeSpsAsk" dst-port="SpsAskedFromSpsSvc"
         src="Mgnt_Sps" src-port="AskSpsInfoForSubSps"/>
+    <Connection dst="Decode_Svc_Vui_Param_Ext" dst-port="ValVLD"
+        src="Mgnt_Sps" src-port="ValVLD4DecodeSpsVui"/>
+    <Connection dst="Mgnt_Sps" dst-port="TypeOfVLDFromSpsVui"
+        src="Decode_Svc_Vui_Param_Ext" src-port="TypeOfVLD"/>
+    <Connection dst="Mgnt_Sps" dst-port="VLDParamFromSpsVui"
+        src="Decode_Svc_Vui_Param_Ext" src-port="VldParam"/>
 </XDF>

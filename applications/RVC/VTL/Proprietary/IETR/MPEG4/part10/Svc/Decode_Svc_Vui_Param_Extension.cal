@@ -1,0 +1,245 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+package Proprietary.IETR.MPEG4.part10.Svc;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+
+actor Decode_Svc_Vui_Param_Extension()
+	int (size=32) ValVLD
+		==>
+	uint(size=5)  TypeOfVLD,
+	int (size=32) VldParam
+		:
+
+	List(type: bool, size=2048) timing_info_present;
+	List(type: bool, size=2048) nal_hrd_param_present;
+	List(type: bool, size=2048) vcl_hrd_param_present;
+
+	uint(size=12) num_layers;
+	uint(size=12) iLoop;
+
+	ReadNumLayers.Asked: action
+				==>
+			//     num_layers_minus1
+			TypeOfVLD :[VLD_UE]
+		end
+
+	ReadNumLayers.Done: action
+			ValVLD :[num_layers_minus1]
+				==>
+		do
+			num_layers := (num_layers_minus1 + 1) & 0x7FF;
+			iLoop      := 0;
+		end
+
+	ReadSvcId.Asked: action
+				==>
+			//          dependenc  quality_id  temporal_i  timing_info
+			TypeOfVLD :[READ_BITS , READ_BITS , READ_BITS , READ_BITS],
+			VldParam  :[    3     ,     4     ,     3     ,     1    ]
+		guard
+			iLoop < num_layers
+		end
+
+	ReadSvcId.Done: action
+			ValVLD :[DependecyId , QualityId , TemporalId , TimingInfoPresent]
+				==>
+		do
+			timing_info_present[iLoop] := (TimingInfoPresent != 0);
+		end
+
+	TimeInfo.IsPresent: action
+				==>
+			// We split 32 bits word in two word of 16 bits, because the type of the result is int(size=32)
+			//            num_units_in_ticks        time_scale          fixed_fra   nal_hrd_p
+			TypeOfVLD :[READ_BITS , READ_BITS , READ_BITS , READ_BITS , READ_BITS , READ_BITS],
+			VldParam  :[   16     ,    16     ,    16     ,    16     ,     1     ,     1    ]
+		guard
+			timing_info_present[iLoop]
+		end
+
+	TimeInfo.IsNotPresent: action
+				==>
+			//nal_hrd_parameters_present_flag
+			TypeOfVLD :[READ_BITS],
+			VldParam  :[    1    ]
+		guard
+			not timing_info_present[iLoop]
+		end
+
+	ReadTimeInfo.Done: action
+			ValVLD :[ num_units_part1 , num_units_part2 , time_scale_part1 , time_scale_part2
+			        , fixed_frame_rate_flag , nal_hrd_parameters_present_flag]
+				==>
+		do
+			nal_hrd_param_present[iLoop] := (nal_hrd_parameters_present_flag != 0);
+		end
+
+	ReadNalHrdParam.Done: action
+			ValVLD :[nal_hrd_parameters_present_flag]
+				==>
+		do
+			nal_hrd_param_present[iLoop] := (nal_hrd_parameters_present_flag != 0);
+		end
+
+	CheckNalHrdParamPres.IsEqualToTrue: action
+				==>
+			TypeOfVLD :[LAUNCH_ACTOR],
+			VldParam  :[HRD_PARAMETERS]
+		guard
+			nal_hrd_param_present[iLoop]
+		end
+
+	ReadVclHrdParamPres.Asked: action
+				==>
+			//vcl_hrd_parameters_present_flag
+			TypeOfVLD :[READ_BITS],
+			VldParam  :[    1    ]
+		end
+
+	ReadVclHrdParamPres.Done: action
+			ValVLD :[vcl_hrd_parameters_present_flag]
+				==>
+		do
+			vcl_hrd_param_present[iLoop] := (vcl_hrd_parameters_present_flag != 0);
+		end
+
+	CheckVclHrdParamPres.IsEqualToTrue: action
+				==>
+			TypeOfVLD :[LAUNCH_ACTOR],
+			VldParam  :[HRD_PARAMETERS]
+		guard
+			vcl_hrd_param_present[iLoop]
+		end
+
+	ReadLowDelay_PicStruct.Asked: action
+				==>
+			//          low_delay_  pic_struct
+			TypeOfVLD :[READ_BITS , READ_BITS],
+			VldParam  :[    1     ,     1    ]
+		guard
+			   nal_hrd_param_present[iLoop]
+			or vcl_hrd_param_present[iLoop]
+		end
+
+	ReadLowDelay_PicStruct.Done: action
+			ValVLD :[low_delay_hrd_flag , pic_struct_present_flag]
+				==>
+		do
+			iLoop := iLoop + 1;
+		end
+
+	ReadPicStruct.Asked: action
+				==>
+			// pic_struct_present_flag
+			TypeOfVLD :[READ_BITS],
+			VldParam  :[    1    ]
+		end
+
+	ReadPicStruct.Done: action
+			ValVLD :[pic_struct_present_flag]
+				==>
+		do
+			iLoop := iLoop + 1;
+		end
+
+	EndSvcVuiParamExt: action
+				==>
+			TypeOfVLD :[SKIP_NAL]
+		end
+
+	schedule fsm AskReadNumLayer:
+		AskReadNumLayer         (ReadNumLayers.Asked                )--> ReadNumLayerDone;
+
+		ReadNumLayerDone        (ReadNumLayers.Done                 )--> CheckLoop;
+
+		CheckLoop               (ReadSvcId.Asked                    )--> ReadSvcIdDone;
+		CheckLoop               (EndSvcVuiParamExt                  )--> AskReadNumLayer;
+
+		ReadSvcIdDone           (ReadSvcId.Done                     )--> CheckTimingInfoPresent;
+
+		CheckTimingInfoPresent  (TimeInfo.IsPresent                 )--> ReadTimeInfoDone;
+		CheckTimingInfoPresent  (TimeInfo.IsNotPresent              )--> ReadNalHrdParamDone;
+
+		ReadTimeInfoDone        (ReadTimeInfo.Done                  )--> CheckNalHrdParamPres;
+
+		ReadNalHrdParamDone     (ReadNalHrdParam.Done               )--> CheckNalHrdParamPres;
+
+		CheckNalHrdParamPres    (CheckNalHrdParamPres.IsEqualToTrue )--> AskReadVclHrdParamPres;
+		CheckNalHrdParamPres    (ReadVclHrdParamPres.Asked          )--> ReadVclHrdParamPresDone;
+
+		AskReadVclHrdParamPres  (ReadVclHrdParamPres.Asked          )--> ReadVclHrdParamPresDone;
+
+		ReadVclHrdParamPresDone (ReadVclHrdParamPres.Done           )--> CheckVclHrdParamPres;
+
+		CheckVclHrdParamPres    (CheckVclHrdParamPres.IsEqualToTrue )--> CheckHrdParamFlag;
+		CheckVclHrdParamPres    (ReadLowDelay_PicStruct.Asked       )--> ReadLowDelay_PicStructDone;
+		CheckVclHrdParamPres    (ReadPicStruct.Asked                )--> ReadPicStructDone;
+
+
+		CheckHrdParamFlag       (ReadLowDelay_PicStruct.Asked       )--> ReadLowDelay_PicStructDone;
+		CheckHrdParamFlag       (ReadPicStruct.Asked                )--> ReadPicStructDone;
+
+		ReadLowDel_PicStr_Done  (ReadLowDelay_PicStruct.Done        )--> CheckLoop;
+
+		ReadPicStructDone       (ReadPicStruct.Done                 )--> CheckLoop;
+	end
+
+	priority
+		ReadSvcId.Asked      > EndSvcVuiParamExt;
+		TimeInfo.IsPresent   > TimeInfo.IsNotPresent;
+		CheckNalHrdParamPres > ReadVclHrdParamPres;
+		CheckVclHrdParamPres > ReadLowDelay_PicStruct > ReadPicStruct;
+	end
+end

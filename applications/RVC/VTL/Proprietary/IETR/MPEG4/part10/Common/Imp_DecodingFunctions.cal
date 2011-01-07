@@ -88,15 +88,16 @@ unit Imp_DecodingFunctions :
 
 	int (size=6) LAUNCH_ACTOR      = -1;
 
-	uint(size=5) DEC_REF_PIC_MARKING     = 0;
-	uint(size=5) REF_PIC_LIST            = 1;
-	uint(size=5) MB_LAYER                = 2;
-	uint(size=5) SUB_MB_PRED             = 3;
-	uint(size=5) MB_PRED                 = 4;
-	uint(size=5) RESIDUAL                = 5;
-	uint(size=5) RESIDUAL_BLOCK_CAVLC    = 6;
-	uint(size=5) RESIDUAL_BLOCK_CABAC    = 7;
-	uint(size=5) SPS_SVC_EXTENSION       = 8;
-	uint(size=5) SPS_VUI_PARAM_EXTENSION = 9;
+	uint(size=5) DEC_REF_PIC_MARKING     =  0;
+	uint(size=5) REF_PIC_LIST            =  1;
+	uint(size=5) MB_LAYER                =  2;
+	uint(size=5) SUB_MB_PRED             =  3;
+	uint(size=5) MB_PRED                 =  4;
+	uint(size=5) RESIDUAL                =  5;
+	uint(size=5) RESIDUAL_BLOCK_CAVLC    =  6;
+	uint(size=5) RESIDUAL_BLOCK_CABAC    =  7;
+	uint(size=5) SPS_SVC_EXTENSION       =  8;
+	uint(size=5) SPS_VUI_PARAM_EXTENSION =  9;
+	uint(size=5) HRD_PARAMETERS          = 10;
 
 end
