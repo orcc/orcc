@@ -157,11 +157,54 @@ actor MgntSps()
 			TypeOfVLD        :[ValTypeOfVLD],
 			VLDParam         :[Param]
 		guard
-			NbParamForFunction(ValTypeOfVLD) = 1
+			NbParamForFunction(ValTypeOfVLD) = 1,
+			ValTypeOfVLD != LAUNCH_ACTOR
+		end
+
+	DecodeSubSps_LaunchSpsSvcExt: action
+			TypeOfVLDFromSubSps :[Function],
+			VLDParamFromSubSps  :[NumFunction]
+				==>
+		guard
+			Function    = LAUNCH_ACTOR,
+			NumFunction = SPS_SVC_EXTENSION
 		end
 
 	EndDecodeSubSps: action
 			TypeOfVLDFromSubSps :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	DecodeSpsSvcExt.GetVLDVal: action
+			ValVLD           :[VLDecoding]
+				==>
+			ValVLD4DecodeSpsSvcExt :[VLDecoding]
+		end
+
+	DecodeSpsSvcExt.FunctionWithoutParam: action
+			TypeOfVLDFromSpsSvcExt :[ValTypeOfVLD]
+				==>
+			TypeOfVLD              :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	DecodeSpsSvcExt.FunctionWith1Param: action
+			TypeOfVLDFromSpsSvcExt :[ValTypeOfVLD],
+			VLDParamFromSpsSvcExt  :[Param]
+				==>
+			TypeOfVLD :[ValTypeOfVLD],
+			VLDParam  :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	EndDecodeSpsSvcExt: action
+			TypeOfVLDFromSpsSvcExt :[Function]
 				==>
 		guard
 			Function = SKIP_NAL
@@ -174,15 +217,19 @@ actor MgntSps()
 		end
 
 	schedule fsm LaunchDecodeSps:
-		LaunchDecodeSps    (DecodeSps                   )--> LaunchDecodeSps;
-		LaunchDecodeSps    (EndDecodeSps                )--> CheckNaluType;
+		LaunchDecodeSps    (DecodeSps                    )--> LaunchDecodeSps;
+		LaunchDecodeSps    (EndDecodeSps                 )--> CheckNaluType;
 
-		CheckNaluType      (NaluType.IsSpsNalUnit       )--> EndOfNal;
-		CheckNaluType      (NaluType.IsSubsetSpsNalUnit )--> LaunchDecodeSubSps;
+		CheckNaluType      (NaluType.IsSpsNalUnit        )--> EndOfNal;
+		CheckNaluType      (NaluType.IsSubsetSpsNalUnit  )--> LaunchDecodeSubSps;
 
-		LaunchDecodeSubSps (DecodeSubSps                )--> LauchDecodeSubSps;
-		LaunchDecodeSubSps (EndDecodeSubSps             )--> EndOfNal;
+		LaunchDecodeSubSps (DecodeSubSps                 )--> LauchDecodeSubSps;
+		LaunchDecodeSubSps (DecodeSubSps_LaunchSpsSvcExt )--> LaunchDecodeSpsSvcExt;
+		LaunchDecodeSubSps (EndDecodeSubSps              )--> EndOfNal;
 
-		EndOfNal           (EndOfNal                    )--> LaunchDecodeSps;
+			LaunchDecodeSpsSvcExt (DecodeSpsSvcExt          )--> LaunchDecodeSpsSvcExt;
+			LaunchDecodeSpsSvcExt (EndDecodeSpsSvcExt       )--> LaunchDecodeSubSps;
+
+		EndOfNal           (EndOfNal                     )--> LaunchDecodeSps;
 	end
 end

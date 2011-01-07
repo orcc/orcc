@@ -419,55 +419,55 @@ actor Algo_Slice_layer_without_partitioning()
 
 	schedule fsm LaunchSliceHeader:
 		LaunchSliceHeader (SliceHeader.FunctionWithoutParam )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.FunctionWith1Param      )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.GetVLDVal        )--> LaunchSliceHeader;
-		LaunchSliceHeader (SliceHeader.LaunchRefPicMark )--> LaunchRefPicMark;
-		LaunchSliceHeader (SliceHeader.LaunchRefPicList )--> LaunchRefPicList;
-		LaunchSliceHeader (SliceHeader.Done             )--> LaunchSliceData;
+		LaunchSliceHeader (SliceHeader.FunctionWith1Param   )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.GetVLDVal            )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.LaunchRefPicMark     )--> LaunchRefPicMark;
+		LaunchSliceHeader (SliceHeader.LaunchRefPicList     )--> LaunchRefPicList;
+		LaunchSliceHeader (SliceHeader.Done                 )--> LaunchSliceData;
 
-			LaunchRefPicMark (RefPicMark.FunctionWithoutParam       )--> LaunchRefPicMark;
-			LaunchRefPicMark (RefPicMark.FunctionWith1Param  )--> LaunchRefPicMark;
-			LaunchRefPicMark (RefPicMark.GetVLDVal    )--> LaunchRefPicMark;
-			LaunchRefPicMark (RefPicMark.Done         )--> LaunchSliceHeader;
+			LaunchRefPicMark (RefPicMark.FunctionWithoutParam )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.FunctionWith1Param   )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.GetVLDVal            )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.Done                 )--> LaunchSliceHeader;
 	
-			LaunchRefPicList (RefPicList.FunctionWithoutParam       )--> LaunchRefPicList;
-			LaunchRefPicList (RefPicList.FunctionWith1Param  )--> LaunchRefPicList;
-			LaunchRefPicList (RefPicList.GetVLDVal    )--> LaunchRefPicList;
-			LaunchRefPicList (RefPicList.Done         )--> LaunchSliceHeader;
+			LaunchRefPicList (RefPicList.FunctionWithoutParam )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.FunctionWith1Param   )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.GetVLDVal            )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.Done                 )--> LaunchSliceHeader;
 
-		LaunchSliceData   (SliceData.FunctionWithoutParam             )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.FunctionWith1Param        )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.GetVLDVal          )--> LaunchSliceData;
-		LaunchSliceData   (SliceData.LaunchMbLayer      )--> LaunchMbLayer;
-		LaunchSliceData   (SliceData.Done               )--> LaunchSliceHeader;
+		LaunchSliceData   (SliceData.FunctionWithoutParam   )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.FunctionWith1Param     )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.GetVLDVal              )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.LaunchMbLayer          )--> LaunchMbLayer;
+		LaunchSliceData   (SliceData.Done                   )--> LaunchSliceHeader;
 	
-			LaunchMbLayer    (MbLayer.FunctionWithoutParam          )--> LaunchMbLayer;
-			LaunchMbLayer    (MbLayer.FunctionWith1Param     )--> LaunchMbLayer;
-			LaunchMbLayer    (MbLayer.GetVLDVal       )--> LaunchMbLayer;
-			LaunchMbLayer    (MbLayer.Done            )--> LaunchSliceData;
-			LaunchMbLayer    (MbLayer.LaunchSubMbPred )--> LaunchSubMbPred;
-			LaunchMbLayer    (MbLayer.LaunchMbPred    )--> LaunchMbPred;
-			LaunchMbLayer    (MbLayer.LaunchResidual  )--> LaunchResidual;
+			LaunchMbLayer    (MbLayer.FunctionWithoutParam    )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.FunctionWith1Param      )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.GetVLDVal               )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.Done                    )--> LaunchSliceData;
+			LaunchMbLayer    (MbLayer.LaunchSubMbPred         )--> LaunchSubMbPred;
+			LaunchMbLayer    (MbLayer.LaunchMbPred            )--> LaunchMbPred;
+			LaunchMbLayer    (MbLayer.LaunchResidual          )--> LaunchResidual;
 	
-				LaunchMbPred   (MbPred.FunctionWithoutParam           )--> LaunchMbPred;
-				LaunchMbPred   (MbPred.FunctionWith1Param )--> LaunchMbPred;
-				LaunchMbPred   (MbPred.GetVLDVal        )--> LaunchMbPred;
-				LaunchMbPred   (MbPred.Done             )--> LaunchMbLayer;
+				LaunchMbPred    (MbPred.FunctionWithoutParam    )--> LaunchMbPred;
+				LaunchMbPred    (MbPred.FunctionWith1Param      )--> LaunchMbPred;
+				LaunchMbPred    (MbPred.GetVLDVal               )--> LaunchMbPred;
+				LaunchMbPred    (MbPred.Done                    )--> LaunchMbLayer;
 	
-				LaunchSubMbPred   (SubMbPred.FunctionWithoutParam           )--> LaunchSubMbPred;
-				LaunchSubMbPred   (SubMbPred.FunctionWith1Param )--> LaunchSubMbPred;
-				LaunchSubMbPred   (SubMbPred.GetVLDVal        )--> LaunchSubMbPred;
-				LaunchSubMbPred   (SubMbPred.Done             )--> LaunchMbLayer;
+				LaunchSubMbPred (SubMbPred.FunctionWithoutParam )--> LaunchSubMbPred;
+				LaunchSubMbPred (SubMbPred.FunctionWith1Param   )--> LaunchSubMbPred;
+				LaunchSubMbPred (SubMbPred.GetVLDVal            )--> LaunchSubMbPred;
+				LaunchSubMbPred (SubMbPred.Done                 )--> LaunchMbLayer;
 
-				LaunchResidual (Residual.Done              )--> LaunchMbLayer;
-				LaunchResidual (Residual.LaunchResBlkCavlc )--> LaunchResBlkCavlc;
+				LaunchResidual  (Residual.Done                  )--> LaunchMbLayer;
+				LaunchResidual  (Residual.LaunchResBlkCavlc     )--> LaunchResBlkCavlc;
 
 	
-					LaunchResBlkCavlc (ResBlkCavlc.FunctionWithoutParam             )--> LaunchResBlkCavlc;
-					LaunchResBlkCavlc (ResBlkCavlc.FunctionWith1Param )--> LaunchResBlkCavlc;
-					LaunchResBlkCavlc (ResBlkCavlc.FunctionWith2Param )--> LaunchResBlkCavlc;
-					LaunchResBlkCavlc (ResBlkCavlc.GetVLDVal          )--> LaunchResBlkCavlc;
-					LaunchResBlkCavlc (ResBlkCavlc.Done               )--> LaunchResidual;
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWithoutParam )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWith1Param   )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWith2Param   )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.GetVLDVal            )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.Done                 )--> LaunchResidual;
 	end
 
 	priority
