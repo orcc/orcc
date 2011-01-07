@@ -180,6 +180,15 @@ actor MgntSps()
 			NumFunction = SPS_SVC_EXTENSION
 		end
 
+	DecodeSubSps_LaunchSvcVui: action
+			TypeOfVLDFromSubSps :[Function],
+			VLDParamFromSubSps  :[NumFunction]
+				==>
+		guard
+			Function    = LAUNCH_ACTOR,
+			NumFunction = SPS_VUI_PARAM_EXTENSION
+		end
+
 	EndDecodeSubSps: action
 			TypeOfVLDFromSubSps :[Function]
 				==>
@@ -221,6 +230,81 @@ actor MgntSps()
 		end
 
 
+	DecodeSvcVui.GetVLDVal: action
+			ValVLD           :[VLDecoding]
+				==>
+			ValVLD4DecodeSpsVui :[VLDecoding]
+		end
+
+	DecodeSvcVui.FunctionWithoutParam: action
+			TypeOfVLDFromSpsVui :[ValTypeOfVLD]
+				==>
+			TypeOfVLD              :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	DecodeSvcVui.FunctionWith1Param: action
+			TypeOfVLDFromSpsVui :[ValTypeOfVLD],
+			VLDParamFromSpsVui  :[Param]
+				==>
+			TypeOfVLD :[ValTypeOfVLD],
+			VLDParam  :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	DecodeSvcVui_LaunchHrdParam: action
+			TypeOfVLDFromSpsVui :[Function],
+			VLDParamFromSpsVui  :[Num_Function]
+				==>
+		guard
+			Function     = LAUNCH_ACTOR,
+			Num_Function = HRD_PARAMETERS
+		end
+
+	EndDecodeSvcVui: action
+			TypeOfVLDFromSpsVui :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	DecodeHrdParameters.GetVLDVal: action
+			ValVLD           :[VLDecoding]
+				==>
+			ValVLD4DecodeSpsVui :[VLDecoding]
+		end
+
+	DecodeHrdParameters.FunctionWithoutParam: action
+			TypeOfVLDFromSpsVui :[ValTypeOfVLD]
+				==>
+			TypeOfVLD              :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	DecodeHrdParameters.FunctionWith1Param: action
+			TypeOfVLDFromSpsVui :[ValTypeOfVLD],
+			VLDParamFromSpsVui  :[Param]
+				==>
+			TypeOfVLD :[ValTypeOfVLD],
+			VLDParam  :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	EndDecodeHrdParameters: action
+			TypeOfVLDFromSpsVui :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
 	EndOfNal: action
 				==>
 			TypeOfVLD :[SKIP_NAL]
@@ -235,10 +319,18 @@ actor MgntSps()
 
 		LaunchDecodeSubSps (DecodeSubSps                 )--> LauchDecodeSubSps;
 		LaunchDecodeSubSps (DecodeSubSps_LaunchSpsSvcExt )--> LaunchDecodeSpsSvcExt;
+		LaunchDecodeSubSps (DecodeSubSps_LaunchSvcVui    )--> LaunchDecodeSvcVui;
 		LaunchDecodeSubSps (EndDecodeSubSps              )--> EndOfNal;
 
-			LaunchDecodeSpsSvcExt (DecodeSpsSvcExt          )--> LaunchDecodeSpsSvcExt;
-			LaunchDecodeSpsSvcExt (EndDecodeSpsSvcExt       )--> LaunchDecodeSubSps;
+			LaunchDecodeSpsSvcExt (DecodeSpsSvcExt             )--> LaunchDecodeSpsSvcExt;
+			LaunchDecodeSpsSvcExt (EndDecodeSpsSvcExt          )--> LaunchDecodeSubSps;
+
+			LaunchDecodeSvcVui    (DecodeSvcVui                )--> LaunchDecodeSvcVui;
+			LaunchDecodeSvcVui    (DecodeSvcVui_LaunchHrdParam )--> LaunchDecodeHrdParameters;
+			LaunchDecodeSvcVui    (EndDecodeSvcVui             )--> LaunchDecodeSubSps;
+
+				LaunchHrdParameters (DecodeHrdParameters          )--> LaunchHrdParameters;
+				LaunchHrdParameters (EndDecodeHrdParameters       )--> LaunchDecodeSvcVui;
 
 		EndOfNal           (EndOfNal                     )--> LaunchDecodeSps;
 	end
