@@ -69,6 +69,9 @@ actor MgntSps()
 	uint(size=5)  TypeOfVLDFromSpsVui,
 	int (size=32) VLDParamFromSpsVui,
 
+	uint(size=5)  TypeOfVLDFromHrdParam,
+	int (size=32) VLDParamFromHrdParam,
+
 	int (size=32) ValVLD,
 
 	uint(size=5) NalUnitType
@@ -83,6 +86,8 @@ actor MgntSps()
 	int (size=32) ValVLD4DecodeSpsSvcExt,
 
 	int (size=32) ValVLD4DecodeSpsVui,
+
+	int (size=32) ValVLD4DecodeHrdParam,
 
 	bool          AskSpsInfoForSubSps
 		:
