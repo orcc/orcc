@@ -77,12 +77,12 @@ unit Imp_DecodingFunctions :
 
 	function NbParamForFunction(int NumFunction)
 					-->
-				uint(size=8)
+				int(size=8)
 			:
-				if(NumFunction > 0)then
+				if(NumFunction >= 0)then
 					TabNbParamForFunction[NumFunction]
 				else
-					1
+					-1
 				end
 			end
 
