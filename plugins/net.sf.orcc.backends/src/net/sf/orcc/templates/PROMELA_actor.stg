@@ -225,7 +225,7 @@ schedulerFSM(action) ::= <<
 	-> 
 	/* Temp variables*/
 	$if(action.body.locals.list)$
-	$action.body.locals.list: {$variableDeclaration(it)$;$\n$}$
+	$action.body.locals.list: { var | $if(!var.port)$ $variableDeclaration(var)$;$\n$$endif$}$
 	$endif$ 
 	$printActionName()$
 	$inputPattern(action.inputPattern)$
@@ -261,7 +261,7 @@ scheduler(action) ::= <<
 	->
 	/* Temp variables*/
 	$if(action.body.locals.list)$
-	$action.body.locals.list: {$variableDeclaration(it)$;$\n$}$
+	$action.body.locals.list: {var | $if(!var.port)$$variableDeclaration(var)$;$\n$$endif$}$
 	$endif$ 
 	$printActionName()$
 	$inputPattern(action.inputPattern)$

@@ -73,9 +73,10 @@ public class PromelaBackendImpl extends AbstractBackend {
 	
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
-		ActorTransformation[] transformations = { new DeadCodeElimination(),
-				new DeadVariableRemoval(false),
-				new GuardsExtractor(guards, peeks, loads), new PhiRemoval() };
+		ActorTransformation[] transformations = { 
+				new GuardsExtractor(guards, peeks, loads), new PhiRemoval(),
+				new DeadCodeElimination(),
+				new DeadVariableRemoval(false)};
 
 		for (ActorTransformation transformation : transformations) {
 			transformation.transform(actor);
