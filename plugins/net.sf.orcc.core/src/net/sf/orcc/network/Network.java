@@ -119,6 +119,8 @@ public class Network {
 
 	private Map<Instance, Map<Port, Integer>> numberOfReadersMap;
 
+	private Map<Port, Integer> numberOfInputReadersMap;
+
 	private Map<Instance, List<Connection>> outgoingMap;
 
 	private OrderedMap<String, Port> outputs;
@@ -208,6 +210,17 @@ public class Network {
 				}
 			}
 			portToFifoSizeMap.put(instance, portToFifoSize);
+		}
+
+		numberOfInputReadersMap = new HashMap<Port, Integer>();
+		OrderedMap<String, Port> inputs = this.getInputs();
+		for (Vertex vertex : graph.vertexSet()) {
+			if (vertex.isPort()) {
+				Port port = vertex.getPort();
+				if (inputs.contains(port.getName())) {
+					numberOfInputReadersMap.put(port, graph.outDegreeOf(vertex));
+				}
+			}
 		}
 	}
 
@@ -457,6 +470,17 @@ public class Network {
 	 */
 	public Map<Instance, Map<Port, Integer>> getNumberOfReadersMap() {
 		return numberOfReadersMap;
+	}
+
+	/**
+	 * Returns a map that associates each network input port to the number of
+	 * readers.
+	 * 
+	 * @return a map that associates each network input port to the number of
+	 *         readers
+	 */
+	public Map<Port, Integer> getInputNumberOfReadersMap() {
+		return numberOfInputReadersMap;
 	}
 
 	/**
