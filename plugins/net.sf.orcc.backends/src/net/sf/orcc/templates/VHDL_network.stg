@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 // print signals()
 
 printSignals(instance) ::= <<
@@ -58,13 +58,29 @@ signal $instance.id$_$port.name$_ack        : std_logic;
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
-assignFifos(edges) ::= <<
-$edges: assignFifo()$
+assignFifos(outgoingMap) ::= <<
+$outgoingMap.keys: {instance | $assignFifo(instance=instance, connection=outgoingMap.(connection))$}; separator="\n\n"$
 >>
 
-assignFifo(edge) ::= <<
-$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+assignFifo(instance, connection) ::= <<
+-- connection : $outgoingMap.(instance)$
+
+$instance.id$ : entity work.$instance.id$
+  port map (
+    $outgoingMap.(instance) : AssignInOut()$
+    clock     => clock, 
+    reset_n   => reset_n);
 >>
+
+
+
+AssignInOut(connections) ::= <<
+  $connections.source$_data   => $connections.target$_$connections.name$_data_in,
+  $connections.source$_send   => $connections.target$_$connections.name$_send,
+  $connections.source$_ack    => $connections.target$_$connections.name$_ack,
+
+>>
+
 
 tryAssignFifo(edge, src, tgt) ::= <<
 $if (src.instance)
@@ -87,7 +103,12 @@ $assignOut(target=tgt.instance, targetPort=edge.target)$$
 endif$
 >>
 
-doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
+
+
+
+
+
+doAssignFifoOld(source, sourcePort, target, targetPort, count) ::= <<
 
 fifo_$count$ : entity work.fifo_top 
 generic map (
@@ -230,10 +251,60 @@ $if (!instance.actor)
 endif$
 >>
 
-printNetAct(instances) ::= <<
-$instances: printActor(); separator="\n"$
-$instances: printNetwork(); separator="\n"$
+printNetworkAndActors(instances) ::= <<
+$instances:
+  {$checkNetworkOrActors(instance=it,
+    incoming=network.incomingMap.(it),
+    outgoing=network.outgoingMap.(it))$}; separator="\n\n"$
 >>
+
+
+
+checkNetworkOrActors(instance, incoming, outgoing) ::= <<
+$if (instance.actor)
+$$printInstances(inputs=instance.actor.inputs.list,
+                    outputs=instance.actor.outputs.list)$$
+elseif (instance.broadcast)
+$$printInstances(inputs=instance.broadcast.inputs.list,
+                   outputs=instance.broadcast.outputs.list)$$
+endif$
+>>
+
+
+printInstances(inputs, outputs) ::= <<
+$instance.id$ : entity work.$instance.id$
+  port map (
+$if(!inputs.empty)
+$$printInputs(map=network.predecessorsMap.(instance), ports=inputs)$$
+endif$$
+if(!outputs.empty)
+$    --
+    $printOutputs(map=network.successorsMap.(instance), ports=outputs)$
+    clock     => clock, 
+    reset_n   => reset_n);$
+endif$
+>>
+
+printInputs(map, ports) ::= <<
+$ports: printPortsInputs(); separator="\n"$
+>>
+
+printPortsInputs(port) ::= <<
+    $port.name$_data   => $instance.id$_$port.name$_data,
+    $port.name$_send   => $instance.id$_$port.name$_send,
+    $port.name$_ack    => $instance.id$_$port.name$_ack,
+>>
+
+printOutputs(map, ports) ::= <<
+$ports: printPortsOutputs(); separator="\n"$
+>>
+
+printPortsOutputs(port) ::= <<
+$port.name$_data   => $map.(port).id$_data,
+$port.name$_send   => $map.(port).id$_send,
+$port.name$_ack    => $map.(port).id$_ack,
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
@@ -269,12 +340,11 @@ begin
   ---------------------------------------------------------------------------
   -- Actors and Networks instantiation 
   ---------------------------------------------------------------------------
-  $printNetAct(network.instances); separator="\n"$
+  $printNetworkAndActors(instances=network.instances); separator="\n"$
 
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
   ---------------------------------------------------------------------------  
-  $assignFifos(network.connections)$ 
   ---------------------------------------------------------------------------
 
 end architecture rtl_$network.name$;
