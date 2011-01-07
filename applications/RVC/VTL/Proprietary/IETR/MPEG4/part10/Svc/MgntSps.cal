@@ -97,7 +97,7 @@ actor MgntSps()
 				==>
 			TypeOfVLD        :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
+			NbParamForFunction(ValTypeOfVLD) = 0,
 			ValTypeOfVLD  != SKIP_NAL
 		end
 
@@ -108,7 +108,7 @@ actor MgntSps()
 			TypeOfVLD        :[ValTypeOfVLD],
 			VLDParam         :[Param]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1
 		end
 
 	EndDecodeSps: action
@@ -117,6 +117,7 @@ actor MgntSps()
 		guard
 			Function = SKIP_NAL
 		end
+
 
 	NaluType.IsSpsNalUnit : action
 			NalUnitType :[nal_unit_type]
@@ -133,6 +134,7 @@ actor MgntSps()
 			nal_unit_type = NAL_SUBSET_SPS
 		end
 
+
 	DecodeSubSps.GetVLDVal: action
 			ValVLD           :[VLDecoding]
 				==>
@@ -144,7 +146,7 @@ actor MgntSps()
 				==>
 			TypeOfVLD        :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
+			NbParamForFunction(ValTypeOfVLD) = 0,
 			ValTypeOfVLD  != SKIP_NAL
 		end
 
@@ -155,7 +157,7 @@ actor MgntSps()
 			TypeOfVLD        :[ValTypeOfVLD],
 			VLDParam         :[Param]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1
 		end
 
 	EndDecodeSubSps: action
@@ -164,6 +166,7 @@ actor MgntSps()
 		guard
 			Function = SKIP_NAL
 		end
+
 
 	EndOfNal: action
 				==>

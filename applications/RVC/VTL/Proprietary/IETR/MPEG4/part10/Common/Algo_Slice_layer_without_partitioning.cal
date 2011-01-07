@@ -79,11 +79,9 @@ actor Algo_Slice_layer_without_partitioning()
 				==>
 			TypeOfVLD       :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
-			ValTypeOfVLD  != SKIP_NAL,
-			ValTypeOfVLD  != LAUNCH_ACTOR
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
 		end
-
 
 	SliceHeader.FunctionWith1Param: action
 			HeaderTypeOfVLD :[ValTypeOfVLD],
@@ -92,7 +90,8 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD       :[ValTypeOfVLD],
 			VLD_Param       :[Param]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1,
+			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
 
 	SliceHeader.LaunchRefPicMark: action
@@ -127,16 +126,14 @@ actor Algo_Slice_layer_without_partitioning()
 			DecRefPicMarkingValVLD :[VLDecoding]
 		end
 
-
 	RefPicMark.FunctionWithoutParam: action
 			DecRefPicMarkingTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD                 :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
+			NbParamForFunction(ValTypeOfVLD) = 0,
 			ValTypeOfVLD  != SKIP_NAL
 		end
-
 
 	RefPicMark.FunctionWith1Param: action
 			DecRefPicMarkingTypeOfVLD    :[ValTypeOfVLD],
@@ -145,7 +142,7 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD :[ValTypeOfVLD],
 			VLD_Param :[Param]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1
 		end
 
 	RefPicMark.Done: action
@@ -162,16 +159,14 @@ actor Algo_Slice_layer_without_partitioning()
 			RefPicListValVLD :[VLDecoding]
 		end
 
-
 	RefPicList.FunctionWithoutParam: action
 			RefPicListTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD           :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
+			NbParamForFunction(ValTypeOfVLD) = 0,
 			ValTypeOfVLD  != SKIP_NAL
 		end
-
 
 	RefPicList.FunctionWith1Param: action
 			RefPicListTypeOfVLD    :[ValTypeOfVLD],
@@ -180,7 +175,7 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD              :[ValTypeOfVLD],
 			VLD_Param              :[Param]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1
 		end
 
 	RefPicList.Done: action
@@ -197,17 +192,14 @@ actor Algo_Slice_layer_without_partitioning()
 			DataValVLD :[VLDecoding]
 		end
 
-
 	SliceData.FunctionWithoutParam: action
 			DataTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD     :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
-			ValTypeOfVLD  != SKIP_NAL,
-			ValTypeOfVLD  != LAUNCH_ACTOR
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
 		end
-
 
 	SliceData.FunctionWith1Param: action
 			DataTypeOfVLD :[ValTypeOfVLD],
@@ -216,7 +208,8 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD     :[ValTypeOfVLD],
 			VLD_Param     :[Param]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1,
+			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
 
 	SliceData.LaunchMbLayer: action
@@ -243,17 +236,14 @@ actor Algo_Slice_layer_without_partitioning()
 			MbLayerValVLD :[VLDecoding]
 		end
 
-
 	MbLayer.FunctionWithoutParam: action
 			MbLayerTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD        :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
-			ValTypeOfVLD  != SKIP_NAL,
-			ValTypeOfVLD  != LAUNCH_ACTOR
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
 		end
-
 
 	MbLayer.FunctionWith1Param: action
 			MbLayerTypeOfVLD :[ValTypeOfVLD],
@@ -262,14 +252,8 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD        :[ValTypeOfVLD],
 			VLD_Param        :[Param]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
-		end
-
-	MbLayer.Done: action
-			MbLayerTypeOfVLD :[Function]
-				==>
-		guard
-			Function = SKIP_NAL
+			NbParamForFunction(ValTypeOfVLD) = 1,
+			ValTypeOfVLD  != LAUNCH_ACTOR
 		end
 
 	MbLayer.LaunchSubMbPred: action
@@ -299,6 +283,13 @@ actor Algo_Slice_layer_without_partitioning()
 			Actor    = RESIDUAL
 		end
 
+	MbLayer.Done: action
+			MbLayerTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
 
 	MbPred.GetVLDVal: action
 			ValVLD       :[VLDecoding]
@@ -306,16 +297,14 @@ actor Algo_Slice_layer_without_partitioning()
 			MbPredValVLD :[VLDecoding]
 		end
 
-
 	MbPred.FunctionWithoutParam: action
 			MbPredTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD       :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
+			NbParamForFunction(ValTypeOfVLD) = 0,
 			ValTypeOfVLD  != SKIP_NAL
 		end
-
 
 	MbPred.FunctionWith1Param: action
 			MbPredTypeOfVLD    :[ValTypeOfVLD],
@@ -324,7 +313,7 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD          :[ValTypeOfVLD],
 			VLD_Param          :[VldParam]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1
 		end
 
 	MbPred.Done: action
@@ -341,16 +330,14 @@ actor Algo_Slice_layer_without_partitioning()
 			SubMbPredValVLD :[VLDecoding]
 		end
 
-
 	SubMbPred.FunctionWithoutParam: action
 			SubMbPredTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD          :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
+			NbParamForFunction(ValTypeOfVLD) = 0,
 			ValTypeOfVLD  != SKIP_NAL
 		end
-
 
 	SubMbPred.FunctionWith1Param: action
 			SubMbPredTypeOfVLD    :[ValTypeOfVLD],
@@ -359,7 +346,7 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD             :[ValTypeOfVLD],
 			VLD_Param             :[VldParam]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1
 		end
 
 	SubMbPred.Done: action
@@ -369,12 +356,6 @@ actor Algo_Slice_layer_without_partitioning()
 			Function = SKIP_NAL
 		end
 
-	Residual.Done: action
-			ResTypeOfVLD :[Function]
-				==>
-		guard
-			Function = SKIP_NAL
-		end
 
 	Residual.LaunchResBlkCavlc: action
 			ResTypeOfVLD     :[Function],
@@ -385,6 +366,13 @@ actor Algo_Slice_layer_without_partitioning()
 			Actor    = RESIDUAL_BLOCK_CAVLC
 		end
 
+	Residual.Done: action
+			ResTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
 
 	ResBlkCavlc.GetVLDVal: action
 			ValVLD            :[VLDecoding]
@@ -392,16 +380,14 @@ actor Algo_Slice_layer_without_partitioning()
 			ResBlkCavlcValVLD :[VLDecoding]
 		end
 
-
 	ResBlkCavlc.FunctionWithoutParam: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD]
 				==>
 			TypeOfVLD            :[ValTypeOfVLD]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 0,
+			NbParamForFunction(ValTypeOfVLD) = 0,
 			ValTypeOfVLD != SKIP_NAL
 		end
-
 
 	ResBlkCavlc.FunctionWith1Param: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
@@ -410,9 +396,8 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD            :[ValTypeOfVLD],
 			VLD_Param            :[Param]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 1
+			NbParamForFunction(ValTypeOfVLD) = 1
 		end
-
 
 	ResBlkCavlc.FunctionWith2Param: action
 			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
@@ -421,7 +406,7 @@ actor Algo_Slice_layer_without_partitioning()
 			TypeOfVLD            :[ValTypeOfVLD],
 			VLD_Param            :[Param1 , Param2]
 		guard
-			NbParamForFunction[ValTypeOfVLD] = 2
+			NbParamForFunction(ValTypeOfVLD) = 2
 		end
 
 	ResBlkCavlc.Done: action
@@ -430,6 +415,7 @@ actor Algo_Slice_layer_without_partitioning()
 		guard
 			Function = SKIP_NAL
 		end
+
 
 	schedule fsm LaunchSliceHeader:
 		LaunchSliceHeader (SliceHeader.FunctionWithoutParam )--> LaunchSliceHeader;
