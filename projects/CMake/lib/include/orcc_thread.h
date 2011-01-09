@@ -39,6 +39,4 @@ struct sync_s {
 
 void sync_init(struct sync_s *sync, int threadsNb);
 
-void *monitor(void *data);
-
 #endif

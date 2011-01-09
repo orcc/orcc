@@ -34,6 +34,17 @@
 #define KEEP_RATIO 0.5
 #define CROSS_OVER_RATIO 0.6
 
+
+
+struct monitor_s {
+	struct sync_s *sync;
+	struct actor_s **actors;
+	struct scheduler_s **schedulers;
+	int actorsNb;
+	int threadsNb;
+	float (*compute_fps_sync) ();
+};
+
 typedef struct gene_s {
 	struct actor_s *actor;
 	int mappedCore;
@@ -49,6 +60,9 @@ typedef struct population_s {
 	individual **individuals;
 } population;
 
+
+void *monitor(void *data);
+
 population* initializePopulation(struct actor_s *actors[],
 		int actorsNb, int nbAvailCores);
 population* computeNextPopulation(population *pop, int actorsNb,
@@ -60,5 +74,8 @@ void mutation(individual *mutated, individual *original, int actorsNb,
 
 void quickSort(population *pop, int p, int r);
 int partitionner(population *pop, int p, int r);
+
+void compute_new_mapping(individual *individual, struct scheduler_s **schedulers,
+		int threadsNb, int actorsNb);
 
 #endif

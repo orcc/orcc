@@ -62,5 +62,6 @@ struct scheduler_s {
  * Initializes the given scheduler.
  */
 void sched_init(struct scheduler_s *sched, int num_actors, struct actor_s **actors, struct sync_s *sync);
+void sched_reinit(struct scheduler_s *sched, int num_actors, struct actor_s **actors);
 
 #endif

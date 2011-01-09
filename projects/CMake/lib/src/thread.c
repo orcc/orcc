@@ -38,24 +38,4 @@ void sync_init(struct sync_s *sync, int threadsNb) {
 	sem_init(&sync->sem_threads, 0, 0);
 }
 
-void *monitor(void *data) {
-	struct sync_s *sched_sync = (struct sync_s *) data;
 
-	while (1) {
-		// wait threads synchro
-		int i;
-		for (i = 0; i < sched_sync->threadsNb; i++) {
-			sem_wait(&sched_sync->sem_monitor);
-		}
-
-		// work process
-		printf("Time to process mapping (all threads are stopped)...\n");
-
-		// wakeup all threads
-		for (i = 0; i < sched_sync->threadsNb; i++) {
-			sem_post(&sched_sync->sem_threads);
-		}
-	}
-
-	return NULL;
-}

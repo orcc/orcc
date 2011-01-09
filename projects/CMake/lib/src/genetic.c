@@ -32,37 +32,75 @@
 
 #include "orcc.h"
 #include "orcc_genetic.h"
+#include "orcc_thread.h"
 
-int partitionner(population *pop, int p, int r) {
-	int pivot = pop->individuals[p]->fps, i = p - 1, j = r + 1;
-	individual *temp;
+void *monitor(void *data) {
+	struct monitor_s *monitoring = (struct monitor_s *) data;
+	int i, evalIndNb = 0;
+
+	// Initialize
+	population *population = initializePopulation(monitoring->actors,
+			monitoring->actorsNb, monitoring->threadsNb);
+
+	
+	compute_new_mapping(population->individuals[evalIndNb],
+			monitoring->schedulers, monitoring->threadsNb, monitoring->actorsNb);
+
 	while (1) {
-		do
-			j--;
-		while (pop->individuals[j]->fps < pivot);
-		do
-			i++;
-		while (pop->individuals[i]->fps > pivot);
-		if (i < j) {
-			temp = pop->individuals[i];
-			pop->individuals[i] = pop->individuals[j];
-			pop->individuals[j] = temp;
-		} else
-			return j;
+		// wakeup all threads
+		for (i = 0; i < monitoring->threadsNb; i++) {
+			sem_post(&monitoring->sync->sem_threads);
+		}
+
+		// wait threads synchro
+		int i;
+		for (i = 0; i < monitoring->sync->threadsNb; i++) {
+			sem_wait(&monitoring->sync->sem_monitor);
+		}
+
+		// work process
+		printf("Time to process mapping (all threads are stopped)...\n");
+		float fps = monitoring->compute_fps_sync();
+		population->individuals[evalIndNb]->fps = fps;
+		printf("Computed FPS = %f\n",fps);
+
+		evalIndNb++;
+
+
+		if (evalIndNb == POPULATION_SIZE) {
+			population = computeNextPopulation(population,
+					monitoring->actorsNb, monitoring->threadsNb);
+			evalIndNb = 0;
+		}
+		compute_new_mapping(population->individuals[evalIndNb],
+				monitoring->schedulers, monitoring->threadsNb,
+				monitoring->actorsNb);
+	}
+
+	return NULL;
+}
+
+void compute_new_mapping(individual *individual, struct scheduler_s **schedulers, int threadsNb, int actorsNb) {
+	printf("compute_new_mapping\n");
+	int i, j, k;
+	for (i = 0; i < threadsNb; i++) {
+		struct actor_s **actors = (struct actor_s **) malloc(actorsNb * sizeof(struct actor_s **));
+		k = 0;
+		for (j = 0; j < actorsNb; j++) {
+			gene *gene = individual->genes[j];
+			if (gene->mappedCore == i) {
+				actors[k] = gene->actor;
+				k++;
+			}
+		}
+		sched_reinit(schedulers[i], k, actors);
 	}
 }
 
-void quickSort(population *pop, int p, int r) {
-	int q;
-	if (p < r) {
-		q = partitionner(pop, p, r);
-		quickSort(pop, p, q);
-		quickSort(pop, q + 1, r);
-	}
-}
-
-population* initializePopulation(struct actor_s *actors[], int actorsNb,
+population* initializePopulation(struct actor_s **actors, int actorsNb,
 		int availCoresNb) {
+	printf("Monitor: initialize population\n");
+
 	// Allocate memory to store the new population
 	population *pop = (population *) malloc(sizeof(*pop));
 	individual **individuals = (individual**) malloc(POPULATION_SIZE
@@ -99,6 +137,7 @@ population* initializePopulation(struct actor_s *actors[], int actorsNb,
 
 population* computeNextPopulation(population *pop, int actorsNb,
 		int availCoresNb) {
+	printf("compute next population\n");
 	// Allocate memory to store the new population
 	population *nextPop = malloc(sizeof(population));
 	individual **individuals = (individual**) malloc(POPULATION_SIZE
@@ -109,7 +148,7 @@ population* computeNextPopulation(population *pop, int actorsNb,
 	nextPop->generationNb = pop->generationNb + 1;
 
 	// Sort population by descending fps value
-	quickSort(pop, 0, POPULATION_SIZE);
+	quickSort(pop, 0, POPULATION_SIZE-1);
 
 	// Backup better individuals
 	int i;
@@ -187,3 +226,30 @@ void mutation(individual *mutated, individual *original, int actorsNb,
 	mutated->fps = -1;
 }
 
+int partitionner(population *pop, int p, int r) {
+	int pivot = pop->individuals[p]->fps, i = p - 1, j = r + 1;
+	individual *temp;
+	while (1) {
+		do
+			j--;
+		while (pop->individuals[j]->fps < pivot);
+		do
+			i++;
+		while (pop->individuals[i]->fps > pivot);
+		if (i < j) {
+			temp = pop->individuals[i];
+			pop->individuals[i] = pop->individuals[j];
+			pop->individuals[j] = temp;
+		} else
+			return j;
+	}
+}
+
+void quickSort(population *pop, int p, int r) {
+	int q;
+	if (p < r) {
+		q = partitionner(pop, p, r);
+		quickSort(pop, p, q);
+		quickSort(pop, q + 1, r);
+	}
+}
