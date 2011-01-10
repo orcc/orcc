@@ -391,10 +391,10 @@ signal nif_$port.name$_DATA 	: std_logic_vector($port.type.size$ - 1 downto 0);
 $
 endif
 $
-signal nif_$port.name$_SEND 	: std_logic_vector(0 downto 0);
-signal nif_$port.name$_ACK  	: std_logic_vector(0 downto 0);
+signal nif_$port.name$_SEND 	: std_logic_vector($network.inputNumberOfReadersMap.(port)$ - 1 downto 0);
+signal nif_$port.name$_ACK  	: std_logic_vector($network.inputNumberOfReadersMap.(port)$ - 1 downto 0);
 signal nif_$port.name$_COUNT	: std_logic_vector(15 downto 0);
-signal nif_$port.name$_RDY  	: std_logic_vector(0 downto 0);$\n$
+signal nif_$port.name$_RDY  	: std_logic_vector($network.inputNumberOfReadersMap.(port)$ - 1 downto 0);$\n$
 
 >>
 
