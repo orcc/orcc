@@ -360,5 +360,5 @@
     <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>
     <Connection dst="Inter" dst-port="SelectList" src="" src-port="SelectList"/>
     <Connection dst="Inter" dst-port="SubMbType" src="" src-port="SubMbType"/>
-    <Connection dst="Buffer_inter" dst-port="IsNewMbOrSlice" src="" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Buffer_inter" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
 </XDF>
