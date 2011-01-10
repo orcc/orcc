@@ -295,6 +295,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="IsNewPicOrSlice">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -699,4 +706,5 @@
     <Connection dst="DecodeSpsSvc" dst-port="NalUnitType"
         src="CheckNaluType" src-port="SpsNalUnitType"/>
     <Connection dst="DecodePps" dst-port="Parameters" src="DecodeSpsSvc" src-port="PpsParam"/>
+    <Connection dst="" dst-port="IsNewPicOrSlice" src="DecodePic" src-port="IsNewPicOrSlice"/>
 </XDF>

@@ -295,6 +295,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="IsNewPicOrSlice">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -718,4 +725,5 @@
     <Connection dst="DecodePps" dst-port="Parameters"
         src="SplitSpsInfos" src-port="PpsParameters"/>
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="DecodeSps" src-port="SzDPB"/>
+    <Connection dst="" dst-port="IsNewPicOrSlice" src="DecodePic" src-port="IsNewPicOrSlice"/>
 </XDF>

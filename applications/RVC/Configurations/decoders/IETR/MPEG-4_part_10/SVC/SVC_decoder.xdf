@@ -281,4 +281,10 @@
     <Connection dst="Decode_V" dst-port="SelectList" src="FUN_Parser" src-port="SelectList"/>
     <Connection dst="Decode_U" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
     <Connection dst="Decode_V" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
+    <Connection dst="Decoding_Y" dst-port="IsNewPicOrSlice"
+        src="FUN_Parser" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Decode_U" dst-port="IsNewPicOrSlice"
+        src="FUN_Parser" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Decode_V" dst-port="IsNewPicOrSlice"
+        src="FUN_Parser" src-port="IsNewPicOrSlice"/>
 </XDF>

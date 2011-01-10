@@ -59,7 +59,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int(size=6)   Slice_Alpha_C0_Offset,
 	int(size=8)   SkipValQp_Y_Cb_Cr,
 
-	bool          NewPic
+	bool          NewPic,
+	uint(size=2)  IsNewPicOrSlice
 		:
 
 
@@ -68,6 +69,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 * Constants
 *
 */
+	uint(size=2) IS_NEW_MB    = 0;
+	uint(size=2) IS_NEW_SLICE = 1;
+	uint(size=2) IS_NEW_PIC   = 2;
 
 //	uint(size=4) SLICE_TYPE_P  = 0;
 	uint(size=4) SLICE_TYPE_B  = 1;
@@ -227,12 +231,15 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 	SendNewPic.Launch: action
 				==>
-			NewPic :[true]
+			NewPic          :[true],
+			IsNewPicOrSlice :[IS_NEW_PIC]
 		guard
 			first_mb_in_slice = 0
 		end
 
-	SendNewPic.Skip: action ==>
+	SendNewPic.Skip: action
+				==>
+			IsNewPicOrSlice :[IS_NEW_SLICE]
 		guard
 			first_mb_in_slice != 0
 		end
@@ -279,7 +286,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			Slice_Beta_Offset         :[slice_beta_offset],
 			Slice_Alpha_C0_Offset     :[slice_alpha_c0_offset],
 			SkipValQp_Y_Cb_Cr         :[ QpValue , Qp_CbValue , Qp_CrValue],
-			NewPic                    :[false]
+			NewPic                    :[false],
+			IsNewPicOrSlice           :[IS_NEW_MB]
 		guard
 			mb_skip_run > 0
 		do
@@ -349,7 +357,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	SendMbLayerParameters: action
 				==>
 			MbLayerParameters :[Parameters] repeat 35,
-			NewPic            :[false]
+			NewPic            :[false],
+			IsNewPicOrSlice   :[IS_NEW_MB]
 		var
 			List(type: int(size=8), size=35) Parameters,
 			List(type: uint(size=5), size=12) NaTab,

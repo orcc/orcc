@@ -183,6 +183,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="IsNewPicOrSlice">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="2"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -419,4 +426,5 @@
     <Connection dst="Inter" dst-port="SubMbType" src="" src-port="SubMbType"/>
     <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>
     <Connection dst="Inter" dst-port="SelectList" src="" src-port="SelectList"/>
+    <Connection dst="Buffer_inter" dst-port="IsNewMbOrSlice" src="" src-port="IsNewPicOrSlice"/>
 </XDF>

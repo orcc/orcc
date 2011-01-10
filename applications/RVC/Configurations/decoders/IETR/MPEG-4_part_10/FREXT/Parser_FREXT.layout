@@ -66,5 +66,6 @@
       <vertex id="Mgnt_InterPred" x="2666" y="781"/>
       <vertex id="MergeSpsAsk" x="478" y="1069"/>
       <vertex id="SplitSpsInfos" x="504" y="1272"/>
+      <vertex id="IsNewPicOrSlice" x="1266" y="665"/>
    </vertices>
 </layout>

@@ -64,5 +64,6 @@
       <vertex id="SelectRefIdx" x="2439" y="1081"/>
       <vertex id="Mgnt_InterPred" x="2666" y="781"/>
       <vertex id="DecodeSpsSvc" x="46" y="1022"/>
+      <vertex id="IsNewPicOrSlice" x="2125" y="550"/>
    </vertices>
 </layout>

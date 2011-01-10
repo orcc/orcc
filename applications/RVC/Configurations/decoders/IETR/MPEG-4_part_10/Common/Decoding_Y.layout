@@ -28,11 +28,12 @@
       <vertex id="TransformSize8x8" x="0" y="344"/>
       <vertex id="PocToRead" x="274" y="829"/>
       <vertex id="ReadAddress" x="327" y="756"/>
-      <vertex id="Display_L" x="949" y="353"/>
-      <vertex id="TEX_L" x="694" y="364"/>
-      <vertex id="RES_L" x="166" y="620"/>
       <vertex id="SubMbType" x="286" y="917"/>
       <vertex id="MbType4Pred" x="285" y="1001"/>
       <vertex id="SelectList" x="275" y="958"/>
+      <vertex id="Display_L" x="949" y="353"/>
+      <vertex id="TEX_L" x="694" y="364"/>
+      <vertex id="RES_L" x="166" y="620"/>
+      <vertex id="IsNewPicOrSlice" x="407" y="656"/>
    </vertices>
 </layout>

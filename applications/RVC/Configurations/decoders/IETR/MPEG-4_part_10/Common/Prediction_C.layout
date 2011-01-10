@@ -9,7 +9,7 @@
       <vertex id="Coef_ACR" x="23" y="27"/>
       <vertex id="MV" x="38" y="426"/>
       <vertex id="PartSZ" x="19" y="489"/>
-      <vertex id="POC" x="1055" y="158"/>
+      <vertex id="POC" x="1052" y="188"/>
       <vertex id="slice_beta_offset" x="790" y="482"/>
       <vertex id="slice_alpha_c0_offset" x="772" y="454"/>
       <vertex id="LFDisable" x="815" y="544"/>
@@ -20,10 +20,10 @@
       <vertex id="I_PCM_C" x="548" y="346"/>
       <vertex id="ConstrainedIFlag" x="-3" y="75"/>
       <vertex id="DelList" x="1043" y="86"/>
-      <vertex id="PocToDisplay" x="1020" y="200"/>
+      <vertex id="PocToDisplay" x="1023" y="222"/>
       <vertex id="IsIDR" x="1051" y="115"/>
       <vertex id="MacroBlockType" x="-6" y="236"/>
-      <vertex id="PocToRead" x="1030" y="236"/>
+      <vertex id="PocToRead" x="1032" y="251"/>
       <vertex id="ReadAddress" x="1045" y="298"/>
       <vertex id="MbType4Pred" x="1" y="461"/>
       <vertex id="SelectList" x="8" y="519"/>
@@ -35,5 +35,6 @@
       <vertex id="Select_chroma" x="736" y="287"/>
       <vertex id="Deblocking_Filter" x="1008" y="426"/>
       <vertex id="DemuxParserInfos" x="178" y="7"/>
+      <vertex id="IsNewPicOrSlice" x="1010" y="159"/>
    </vertices>
 </layout>
