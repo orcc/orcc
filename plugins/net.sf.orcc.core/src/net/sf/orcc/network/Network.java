@@ -121,6 +121,8 @@ public class Network {
 
 	private Map<Port, Integer> numberOfInputReadersMap;
 
+	private Map<Connection, Integer> numberOfConnectionReadersMap;
+
 	private Map<Instance, List<Connection>> outgoingMap;
 
 	private OrderedMap<String, Port> outputs;
@@ -183,8 +185,10 @@ public class Network {
 
 	private void computePortInformationMaps() {
 		numberOfReadersMap = new HashMap<Instance, Map<Port, Integer>>();
+		numberOfConnectionReadersMap = new HashMap<Connection, Integer>();
 		for (Instance instance : outgoingMap.keySet()) {
 			Map<Port, Integer> portToNumberOfReadersMap = new HashMap<Port, Integer>();
+			int cp = 0;
 			for (Connection connection : outgoingMap.get(instance)) {
 				Port srcPort = connection.getSource();
 				if (portToNumberOfReadersMap.get(srcPort) == null) {
@@ -195,6 +199,8 @@ public class Network {
 					portToNumberOfReadersMap.remove(srcPort);
 					portToNumberOfReadersMap.put(srcPort, n);
 				}
+				numberOfConnectionReadersMap.put(connection, cp);
+				cp++;
 			}
 			numberOfReadersMap.put(instance, portToNumberOfReadersMap);
 		}
@@ -218,8 +224,15 @@ public class Network {
 			if (vertex.isPort()) {
 				Port port = vertex.getPort();
 				if (inputs.contains(port.getName())) {
-					numberOfInputReadersMap.put(port, graph.outDegreeOf(vertex));
+					numberOfInputReadersMap
+							.put(port, graph.outDegreeOf(vertex));
 				}
+				int cp = 0;
+				for (Connection connection : graph.outgoingEdgesOf(vertex)){
+					numberOfConnectionReadersMap.put(connection, cp);
+					cp++;
+				}
+				
 			}
 		}
 	}
@@ -481,6 +494,18 @@ public class Network {
 	 */
 	public Map<Port, Integer> getInputNumberOfReadersMap() {
 		return numberOfInputReadersMap;
+	}
+
+	/**
+	 * Returns a map that associates each broadcast/fan-out connection the
+	 * number of readers.
+	 * 
+	 * @return a map that associates each broadcast/fan-out connection the
+	 *         number of readers
+	 */
+
+	public Map<Connection, Integer> getNumberOfConnectionReadersMap() {
+		return numberOfConnectionReadersMap;
 	}
 
 	/**
