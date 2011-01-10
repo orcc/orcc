@@ -39,9 +39,9 @@ port map(
 // Print Actors Ports Inputs Instantiation 
 
 printActorsPortsInstantiationInputs(port) ::=<<
-$port.name$_DATA	=>	ai_$actorInstance.id$_$port.name$_DATA,
-$port.name$_SEND	=>	ai_$actorInstance.id$_$port.name$_SEND,
-$port.name$_ACK 	=>	ai_$actorInstance.id$_$port.name$_ACK,
+$port.name$_DATA 	=>	ai_$actorInstance.id$_$port.name$_DATA,
+$port.name$_SEND 	=>	ai_$actorInstance.id$_$port.name$_SEND,
+$port.name$_ACK  	=>	ai_$actorInstance.id$_$port.name$_ACK,
 $port.name$_COUNT	=>	ai_$actorInstance.id$_$port.name$_COUNT,
 
 >>
@@ -50,11 +50,11 @@ $port.name$_COUNT	=>	ai_$actorInstance.id$_$port.name$_COUNT,
 // Print Actors Ports Outputs Instantiation 
 
 printActorsPortsInstantiationOutputs(port) ::=<<
-$port.name$_DATA	=>	ao_$actorInstance.id$_$port.name$_DATA,
-$port.name$_SEND	=>	ao_$actorInstance.id$_$port.name$_SEND,
-$port.name$_ACK 	=>	ao_$actorInstance.id$_$port.name$_ACK,
+$port.name$_DATA 	=>	ao_$actorInstance.id$_$port.name$_DATA,
+$port.name$_SEND 	=>	ao_$actorInstance.id$_$port.name$_SEND,
+$port.name$_ACK  	=>	ao_$actorInstance.id$_$port.name$_ACK,
 $port.name$_COUNT	=>	ao_$actorInstance.id$_$port.name$_COUNT,
-$port.name$_RDY 	=>	ao_$actorInstance.id$_$port.name$_RDY,
+$port.name$_RDY  	=>	ao_$actorInstance.id$_$port.name$_RDY,
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,22 +72,22 @@ port map (
 	$if(port.type.bool)$
 	In_DATA(0)		=>	ao_$actorInstance.id$_$port.name$_DATA,
 	$else$
-	In_DATA			=>	ao_$actorInstance.id$_$port.name$_DATA,
+	In_DATA   		=>	ao_$actorInstance.id$_$port.name$_DATA,
 	$endif$
-	In_SEND			=>	ao_$actorInstance.id$_$port.name$_SEND,
-	In_ACK 			=>	ao_$actorInstance.id$_$port.name$_ACK,
-	In_COUNT		=>	ao_$actorInstance.id$_$port.name$_COUNT,
-	In_RDY 			=>	ao_$actorInstance.id$_$port.name$_RDY,
+	In_SEND   		=>	ao_$actorInstance.id$_$port.name$_SEND,
+	In_ACK    		=>	ao_$actorInstance.id$_$port.name$_ACK,
+	In_COUNT  		=>	ao_$actorInstance.id$_$port.name$_COUNT,
+	In_RDY    		=>	ao_$actorInstance.id$_$port.name$_RDY,
 
 	$if(port.type.bool)$
 	Out_DATA(0)		=>	aof_$actorInstance.id$_$port.name$_DATA,
 	$else$
-	Out_DATA		=>	aof_$actorInstance.id$_$port.name$_DATA,
+	Out_DATA   		=>	aof_$actorInstance.id$_$port.name$_DATA,
 	$endif$
-	Out_SEND		=>	aof_$actorInstance.id$_$port.name$_SEND,
-	Out_ACK 		=>	aof_$actorInstance.id$_$port.name$_ACK,
-	Out_COUNT		=>	aof_$actorInstance.id$_$port.name$_COUNT,
-	Out_RDY 		=>	aof_$actorInstance.id$_$port.name$_RDY,
+	Out_SEND   		=>	aof_$actorInstance.id$_$port.name$_SEND,
+	Out_ACK    		=>	aof_$actorInstance.id$_$port.name$_ACK,
+	Out_COUNT  		=>	aof_$actorInstance.id$_$port.name$_COUNT,
+	Out_RDY    		=>	aof_$actorInstance.id$_$port.name$_RDY,
 
 	CLK  	=> clocks(0),
 	RESET	=> resets(0)
@@ -172,7 +172,7 @@ q_ai_$target.id$_$targetPort.name$ : entity SystemBuilder.Queue( behavioral )
 generic map( length => 1, width => $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
 port map (
 	$if(sourcePort.type.bool)$
-	Out_DATAA(0)  => ai_$target.id$_$targetPort$_DATA,
+	Out_DATA(0)  => ai_$target.id$_$targetPort$_DATA,
 	$else$
 	Out_DAT  => ai_$target.id$_$targetPort$_DATA,
 	$endif$
@@ -270,11 +270,11 @@ $network.inputs.list: printNetworkInputPortsInstantiation(); separator="\n"$
 // Print Network Output Port(s) Instantiation
 
 printNetworkOutputPortsInstantiation(port) ::=<<
-$port.name$_DATA	<=	no_$port.name$_DATA;
-$port.name$_SEND	<=	no_$port.name$_SEND;
-no_$port.name$_ACK	<=	$port.name$_ACK;
+$port.name$_DATA 	<=	no_$port.name$_DATA;
+$port.name$_SEND 	<=	no_$port.name$_SEND;
+no_$port.name$_ACK  <=	$port.name$_ACK;
 $port.name$_COUNT	<=	no_$port.name$_COUNT;
-no_$port.name$_RDY	<=	$port.name$_RDY;$\n$
+no_$port.name$_RDY  <=	$port.name$_RDY;$\n$
 >> 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -365,7 +365,7 @@ $network.inputs.list: printInputPortsSignals(); separator="\n"$
 -- Output Port Signals
 $network.outputs.list: printOutputPortsSignals(); separator="\n"$
 -- Actors I/O Signals
-$network.instances: printActorsSignals(); separator="\n"$
+$network.instances: {instance | $printActorsSignals(instance=instance,numberOfReaders=network.numberOfReadersMap.(instance))$}; separator="\n"$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -418,8 +418,8 @@ signal no_$port.name$_RDY  		: std_logic;$\n$
 ///////////////////////////////////////////////////////////////////////////////
 // Actors Input / Output Signals
 
-printActorsSignals(instance) ::=<<
-$instance.actor.outputs.list: printActorSigOutput()$
+printActorsSignals(instance,numberOfReaders) ::=<<
+$instance.actor.outputs.list: {port | $printActorSigOutput(port=port,numberOfReaders=numberOfReaders)$};  separator="\n"$
 $instance.actor.inputs.list: printActorSigInput()$
 >> 
 
@@ -446,7 +446,7 @@ signal ai_$instance.id$_$port.name$_COUNT	: std_logic_vector(15 downto 0);$\n$
 ///////////////////////////////////////////////////////////////////////////////
 // Actors Ouput Signals
 
-printActorSigOutput(port) ::= <<
+printActorSigOutput(port,numberOfReaders) ::= <<
 $
 if(port.type.bool)
 $
@@ -474,10 +474,10 @@ signal aof_$instance.id$_$port.name$_DATA 	: std_logic_vector($port.type.size$ -
 $
 endif
 $
-signal aof_$instance.id$_$port.name$_SEND 	: std_logic_vector(0 downto 0);
-signal aof_$instance.id$_$port.name$_ACK  	: std_logic_vector(0 downto 0);
+signal aof_$instance.id$_$port.name$_SEND 	: std_logic_vector($numberOfReaders$ - 1 downto 0);
+signal aof_$instance.id$_$port.name$_ACK  	: std_logic_vector($numberOfReaders$ - 1 downto 0);
 signal aof_$instance.id$_$port.name$_COUNT	: std_logic_vector(15 downto 0);
-signal aof_$instance.id$_$port.name$_RDY  	: std_logic_vector(0 downto 0);$\n$
+signal aof_$instance.id$_$port.name$_RDY  	: std_logic_vector($numberOfReaders$ - 1 downto 0);$\n$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -550,8 +550,8 @@ entity $network.name$ is
 port(
 	$printNetworkPorts(network)$
 	
-	CLK: in std_logic;
-	RESET: in std_logic);
+	CLK:  	in std_logic;
+	RESET:	in std_logic);
 end entity $network.name$;
 
 -- ----------------------------------------------------------------------------------
