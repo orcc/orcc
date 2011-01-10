@@ -408,7 +408,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	end
 
   priority
-    write_data                 > read_data                > write_picture_done  > get_writeAddr > get_readAddr ;
+    write_picture_done         > get_writeAddr       > get_readAddr  > write_data                 > read_data;
   	Display.done               > Display.chroma      > Display.luma;
   	ReadDelList.Launch         > ReadDelList.Done;
   	getNextPOCtoDisplay.launch > getNextPOCtoDisplay.sync;
