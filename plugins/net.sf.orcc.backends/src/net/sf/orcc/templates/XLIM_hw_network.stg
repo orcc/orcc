@@ -168,7 +168,7 @@ $
 
 doAssignFifo(source, sourcePort, target, targetPort) ::= <<
 q_ai_$target.id$_$targetPort.name$ : entity SystemBuilder.Queue( behavioral )
-generic map( length => 1, width => $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
+generic map( length => $if(edge.size)$$edge.size$$else$1$endif$, width => $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
 port map (
 	$if(sourcePort.type.bool)$
 	Out_DATA(0)  => ai_$target.id$_$targetPort$_DATA,
@@ -198,7 +198,7 @@ port map (
 
 assignIn(source, sourcePort) ::= <<
 q_no_$tgt.port$ : entity SystemBuilder.Queue( behavioral )
-generic map( length => 1, width => $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
+generic map( length => $if(edge.size)$$edge.size$$else$1$endif$, width => $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
 port map (
  	$if(sourcePort.type.bool)$
  	Out_DATA(0)		=> no_$tgt.port$_DATA,
@@ -227,7 +227,8 @@ port map (
 
 assignOut(target, targetPort) ::= <<
 q_ai_$target.id$_$targetPort.name$ : entity SystemBuilder.Queue( behavioral )
-generic map( length => 1, width => $if(targetPort.type.size)$$targetPort.type.size$$else$1$endif$ )
+generic map( length => $if(edge.size)$$edge.size$$else$1$endif$, width => $if(targetPort.type.size)$$targetPort.type.size$$else$1$endif$ )
+
 port map (
 	$if(targetPort.type.bool)$
 	Out_DATA(0)		=> ai_$target.id$_$targetPort.name$_DATA,
