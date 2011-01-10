@@ -190,6 +190,9 @@ struct schedinfo_s si;
 $if(options.needSync)$
 clock_t start, end;
 start = clock ();
+
+sem_wait(&sched->sync->sem_threads); 
+start = clock ();
 $endif$
 
 while (1) {
@@ -201,11 +204,11 @@ while (1) {
 #endif
   $if(options.needSync)$
   end = clock ();
-  if((((end - start) / (double)CLOCKS_PER_SEC) >= SYNC_DELAY)){
-    sem_post(&sched->sync->sem_monitor);
-    sem_wait(&sched->sync->sem_threads);
-    start = clock ();
-  }
+    if((((end - start) / (double)CLOCKS_PER_SEC) >= SYNC_DELAY)){
+      sem_post(&sched->sync->sem_monitor);
+      sem_wait(&sched->sync->sem_threads);
+      start = clock ();
+    }
   $endif$
 }
 >>
@@ -264,6 +267,7 @@ $endif$
 #include "orcc_util.h"
 $if(options.needSync)$
 #include "orcc_thread.h"
+#include "orcc_genetic.h"
 
 #define SYNC_DELAY 10
 $endif$
@@ -327,29 +331,46 @@ $declareActors(network.instances)$
 $fillActorsStructs(network.instances)$
 
 $if(options.needPthreads)$
+
+$if(options.needSync)$
+$declareActorsArray(instances=network.instances)$
+$else$
 $options.threads.keys: {$declareActorsArray(thread=it,instances=options.threads.(it))$}; separator="\n"$
+$endif$
 
 $printThread()$
 
 static void scheduler() {
+	cpu_set_t cpuset;
 	pthread_t $options.threads.keys: {thread_$it$}; separator=", "$$if(options.needSync)$, thread_monitor$endif$;
 	struct scheduler_s $options.threads.keys: {sched_$it$}; separator=", "$;
-	
 	$if(options.needSync)$
+	struct scheduler_s *schedulers[$length(options.threads)$] = {$options.threads.keys: {&sched_$it$}; separator=", "$};
+	
 	struct sync_s sched_sync;
+	struct monitor_s monitoring = {
+		.sync = &sched_sync,
+		.actors = actors,
+		.schedulers = schedulers,
+		.actorsNb = sizeof(actors) / sizeof(actors[0]),
+		.threadsNb = $length(options.threads)$
+	};
+	
 	sync_init(&sched_sync,$length(options.threads)$);
 	$endif$
 	
-	cpu_set_t cpuset;
-
 	$printInitializes(network.instances)$
 	
-	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors_$it$) / sizeof(actors_$it$[0]), actors_$it$, $if(options.needSync)$&sched_sync$else$NULL$endif$);}; separator="\n"$
+	$if(options.needSync)$
+	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);}; separator="\n"$
+	$else$
+	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors_$it$) / sizeof(actors_$it$[0]), actors_$it$, NULL);}; separator="\n"$
+	$endif$
 	
 	$options.threads.keys: {pthread_create(&thread_$it$, NULL, thread_scheduler, (void *) &sched_$it$);}; separator="\n"$
 	
 	$if(options.needSync)$
-	pthread_create(&thread_monitor, NULL, monitor, (void *) &sched_sync);
+	pthread_create(&thread_monitor, NULL, monitor, (void *) &monitoring);
 	$endif$
 
 	clear_cpu_set(&cpuset);

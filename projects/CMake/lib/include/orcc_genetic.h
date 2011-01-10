@@ -42,7 +42,6 @@ struct monitor_s {
 	struct scheduler_s **schedulers;
 	int actorsNb;
 	int threadsNb;
-	float (*compute_fps_sync) ();
 };
 
 typedef struct gene_s {
@@ -77,5 +76,7 @@ int partitionner(population *pop, int p, int r);
 
 void compute_new_mapping(individual *individual, struct scheduler_s **schedulers,
 		int threadsNb, int actorsNb);
+		
+extern float compute_fps_sync();
 
 #endif

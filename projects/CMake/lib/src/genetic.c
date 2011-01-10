@@ -47,25 +47,27 @@ void *monitor(void *data) {
 			monitoring->schedulers, monitoring->threadsNb, monitoring->actorsNb);
 
 	while (1) {
+		int i;
+		float fps;		
+		
 		// wakeup all threads
 		for (i = 0; i < monitoring->threadsNb; i++) {
 			sem_post(&monitoring->sync->sem_threads);
 		}
 
 		// wait threads synchro
-		int i;
+		
 		for (i = 0; i < monitoring->sync->threadsNb; i++) {
 			sem_wait(&monitoring->sync->sem_monitor);
 		}
 
 		// work process
 		printf("Time to process mapping (all threads are stopped)...\n");
-		float fps = monitoring->compute_fps_sync();
+		fps = compute_fps_sync();;
 		population->individuals[evalIndNb]->fps = fps;
 		printf("Computed FPS = %f\n",fps);
 
 		evalIndNb++;
-
 
 		if (evalIndNb == POPULATION_SIZE) {
 			population = computeNextPopulation(population,
