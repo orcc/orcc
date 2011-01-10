@@ -63,6 +63,8 @@ actor Decode_Sps_Svc_Extension()
 	int (size=32) VldParam
 		:
 
+	bool DEBUG_FLAG_DECODED = true;
+
 	uint(size=2)  chroma_array_type;
 	uint(size=2)  extended_spatial_scalability;
 	bool          seq_tcoeff_level_prediction;
@@ -87,6 +89,10 @@ actor Decode_Sps_Svc_Extension()
 				==>
 		do
 			extended_spatial_scalability := ext_spat_scalability;
+			if(DEBUG_FLAG_DECODED)then
+				println("inter_layer_deblocking_filter_control_present_flag : " + inter_layer_dbf_contr_pres);
+				println("extended_spatial_scalability : " + ext_spat_scalability);
+			end
 		end
 
 	ChromaArrayTypeVal.Is1: action
@@ -110,11 +116,20 @@ actor Decode_Sps_Svc_Extension()
 	Read_2_ChromaPhase.Done: action
 			ValVLD :[chroma_phase_x_plus1_flag , chroma_phase_y_plus1]
 				==>
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("chroma_phase_x_plus1_flag : " + chroma_phase_x_plus1_flag);
+				println("chroma_phase_y_plus1 : " + chroma_phase_y_plus1);
+			end
 		end
 
 	Read_1_ChromaPhase.Done: action
 			ValVLD :[chroma_phase_x_plus1_flag]
 				==>
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("chroma_phase_x_plus1_flag : " + chroma_phase_x_plus1_flag);
+			end
 		end
 
 	ReadSeq_Ref_Scal_TCoef.Asked: action
@@ -133,6 +148,15 @@ actor Decode_Sps_Svc_Extension()
 				==>
 		do
 			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+			if(DEBUG_FLAG_DECODED)then
+				println("seq_ref_layer_chroma_phase_x_plus1_flag : " + seq_ref_layer_x);
+				println("seq_ref_layer_chroma_phase_y_plus1 : " + seq_ref_layer_y);
+				println("seq_scaled_ref_layer_left_offset : " + seq_scaled_left);
+				println("seq_scaled_ref_layer_top_offset : " + seq_scaled_top);
+				println("seq_scaled_ref_layer_right_offset : " + seq_scaled_right);
+				println("seq_scaled_ref_layer_bottom_offset : " + seq_scaled_bottom);
+				println("seq_tcoeff_level_prediction_flag : " + seq_tcoeff_level);
+			end
 		end
 
 	ReadSeq_Scal_TCoef.Asked: action
@@ -150,6 +174,13 @@ actor Decode_Sps_Svc_Extension()
 				==>
 		do
 			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+			if(DEBUG_FLAG_DECODED)then
+				println("seq_scaled_ref_layer_left_offset : " + seq_scaled_left);
+				println("seq_scaled_ref_layer_top_offset : " + seq_scaled_top);
+				println("seq_scaled_ref_layer_right_offset : " + seq_scaled_right);
+				println("seq_scaled_ref_layer_bottom_offset : " + seq_scaled_bottom);
+				println("seq_tcoeff_level_prediction_flag : " + seq_tcoeff_level);
+			end
 		end
 
 	ReadSeq_TCoef.Asked: action
@@ -166,6 +197,9 @@ actor Decode_Sps_Svc_Extension()
 				==>
 		do
 			seq_tcoeff_level_prediction := (seq_tcoeff_level != 0);
+			if(DEBUG_FLAG_DECODED)then
+				println("seq_tcoeff_level_prediction_flag : " + seq_tcoeff_level);
+			end
 		end
 
 	CheckSeqTcoeff.IsTrue: action
@@ -189,11 +223,20 @@ actor Decode_Sps_Svc_Extension()
 	Read_Adapt_SliceHead_SvcVui: action
 			ValVLD :[adaptive_tcoeff , slice_head_restr]
 				==>
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("adaptive_tcoeff_level_prediction_flag : " + adaptive_tcoeff);
+				println("slice_header_restriction_flag : " + slice_head_restr);
+			end
 		end
 
 	Read_SliceHead_SvcVui: action
 			ValVLD :[slice_head_restr]
 				==>
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("slice_header_restriction_flag : " + slice_head_restr);
+			end
 		end
 
 	EndSpsSvcExt: action

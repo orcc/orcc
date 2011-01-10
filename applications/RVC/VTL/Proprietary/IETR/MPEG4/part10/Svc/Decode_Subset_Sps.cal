@@ -65,6 +65,9 @@ actor Decode_Subset_Sps()
 	uint(size=2)  SpsSvcExtParam
 		:
 
+
+	bool DEBUG_FLAG_DECODED = true;
+
 	uint(size=8) profile_idc;
 	uint(size=2) ChromaArrayType;
 
@@ -101,6 +104,9 @@ actor Decode_Subset_Sps()
 				==>
 		do
 			svc_vui_parameters_present := (SvcVuiParamPresent != 0);
+			if(DEBUG_FLAG_DECODED)then
+				println("\n****Subset_Sps*****\nsvc_vui_parameters_present_flag : " + SvcVuiParamPresent);
+			end
 		end
 
 	LaunchSvcVuiParamExt: action
@@ -123,6 +129,9 @@ actor Decode_Subset_Sps()
 				==>
 		do
 			additional_extension2 := (addit_ext2_flag != 0);
+			if(DEBUG_FLAG_DECODED)then
+				println("additional_extension2_flag : " + addit_ext2_flag);
+			end
 		end
 
 	AddExt2Flag.IsEqualToTrue: action
@@ -149,6 +158,10 @@ actor Decode_Subset_Sps()
 	ReadAddExt2Data.Done: action
 			ValVLD :[additional_extension2_data_flag]
 				==>
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("additional_extension2_data_flag : " + additional_extension2_data_flag);
+			end
 		end
 
 	MoreRbspData.IsEqualToFalse: action

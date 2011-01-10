@@ -62,6 +62,8 @@ actor Decode_Hrd_Parameters()
 	int (size=32) VldParam
 		:
 
+	bool DEBUG_FLAG_DECODED = true;
+
 	uint(size=6) cpb_cnt;
 	uint(size=6) iLoop;
 
@@ -75,6 +77,11 @@ actor Decode_Hrd_Parameters()
 			ValVLD :[cpb_cnt_minus1 , bit_rate_scale , cpb_size_scale]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("cpb_cnt_minus1 : "+cpb_cnt_minus1);
+				println("bit_rate_scale : "+bit_rate_scale);
+				println("cpb_size_scale : "+cpb_size_scale);
+			end
 			cpb_cnt := cpb_cnt_minus1 + 1;
 			iLoop := 0;
 		end
@@ -91,6 +98,11 @@ actor Decode_Hrd_Parameters()
 			ValVLD :[bit_rate_value_minus1 , cpb_size_value_minus1 , cbr_flag]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("bit_rate_value_minus1["+iLoop+"] : "+bit_rate_value_minus1);
+				println("cpb_size_value_minus1["+iLoop+"] : "+cpb_size_value_minus1);
+				println("cbr_flag["+iLoop+"] : "+cbr_flag);
+			end
 			iLoop := iLoop + 1;
 		end
 
@@ -104,6 +116,13 @@ actor Decode_Hrd_Parameters()
 			ValVLD :[initial_cpb , cpb_removal_delay , dpb_output_delay , time_offset_length]
 				==>
 			TypeOfVLD :[SKIP_NAL]
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("initial_cpb_removal_delay_length_minus1 : "+initial_cpb);
+				println("cpb_removal_delay_length_minus1 : "+cpb_removal_delay);
+				println("dpb_output_delay_length_minus1 : "+dpb_output_delay);
+				println("time_offset_length : "+time_offset_length);
+			end
 		end
 
 	schedule fsm AskReadCpbBitRate:

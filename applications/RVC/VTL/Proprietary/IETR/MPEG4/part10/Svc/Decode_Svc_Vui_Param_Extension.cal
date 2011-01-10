@@ -62,6 +62,8 @@ actor Decode_Svc_Vui_Param_Extension()
 	int (size=32) VldParam
 		:
 
+	bool DEBUG_FLAG_DECODED = true;
+
 	List(type: bool, size=2048) timing_info_present;
 	List(type: bool, size=2048) nal_hrd_param_present;
 	List(type: bool, size=2048) vcl_hrd_param_present;
@@ -79,6 +81,9 @@ actor Decode_Svc_Vui_Param_Extension()
 			ValVLD :[num_layers_minus1]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("num_layers_minus1 : "+num_layers_minus1);
+			end
 			num_layers := (num_layers_minus1 + 1) & 0x7FF;
 			iLoop      := 0;
 		end
@@ -96,6 +101,12 @@ actor Decode_Svc_Vui_Param_Extension()
 			ValVLD :[DependecyId , QualityId , TemporalId , TimingInfoPresent]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("dependency_id["+iLoop+"] : "+DependecyId);
+				println("quality_id["+iLoop+"] : "+QualityId);
+				println("temporal_id["+iLoop+"] : "+TemporalId);
+				println("timing_info_present_flag["+iLoop+"] : "+TimingInfoPresent);
+			end
 			timing_info_present[iLoop] := (TimingInfoPresent != 0);
 		end
 
@@ -119,10 +130,18 @@ actor Decode_Svc_Vui_Param_Extension()
 		end
 
 	ReadTimeInfo.Done: action
-			ValVLD :[ num_units_part1 , num_units_part2 , time_scale_part1 , time_scale_part2
-			        , fixed_frame_rate_flag , nal_hrd_parameters_present_flag]
+			ValVLD :[ num_units_part1       , num_units_part2                 , time_scale_part1 , time_scale_part2
+			        , fixed_frame_rate_flag , nal_hrd_parameters_present_flag ]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("num_units_in_tick_part1["+iLoop+"] : "+num_units_part1);
+				println("num_units_in_tick_part2["+iLoop+"] : "+num_units_part2);
+				println("time_scale_part1["+iLoop+"] : "+time_scale_part1);
+				println("time_scale_part2["+iLoop+"] : "+time_scale_part2);
+				println("fixed_frame_rate_flag["+iLoop+"] : "+fixed_frame_rate_flag);
+				println("nal_hrd_parameters_present_flag["+iLoop+"] : "+nal_hrd_parameters_present_flag);
+			end
 			nal_hrd_param_present[iLoop] := (nal_hrd_parameters_present_flag != 0);
 		end
 
@@ -130,6 +149,9 @@ actor Decode_Svc_Vui_Param_Extension()
 			ValVLD :[nal_hrd_parameters_present_flag]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("nal_hrd_parameters_present_flag["+iLoop+"] : "+nal_hrd_parameters_present_flag);
+			end
 			nal_hrd_param_present[iLoop] := (nal_hrd_parameters_present_flag != 0);
 		end
 
@@ -152,6 +174,9 @@ actor Decode_Svc_Vui_Param_Extension()
 			ValVLD :[vcl_hrd_parameters_present_flag]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("vcl_hrd_parameters_present_flag["+iLoop+"] : "+vcl_hrd_parameters_present_flag);
+			end
 			vcl_hrd_param_present[iLoop] := (vcl_hrd_parameters_present_flag != 0);
 		end
 
@@ -177,6 +202,10 @@ actor Decode_Svc_Vui_Param_Extension()
 			ValVLD :[low_delay_hrd_flag , pic_struct_present_flag]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("low_delay_hrd_flag["+iLoop+"] : "+low_delay_hrd_flag);
+				println("pic_struct_present_flag["+iLoop+"] : "+pic_struct_present_flag);
+			end
 			iLoop := iLoop + 1;
 		end
 
@@ -191,6 +220,9 @@ actor Decode_Svc_Vui_Param_Extension()
 			ValVLD :[pic_struct_present_flag]
 				==>
 		do
+			if(DEBUG_FLAG_DECODED)then
+				println("pic_struct_present_flag["+iLoop+"] : "+pic_struct_present_flag);
+			end
 			iLoop := iLoop + 1;
 		end
 
