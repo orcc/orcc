@@ -117,7 +117,7 @@ public class XlimBackendImpl extends AbstractBackend {
 
 		// check if "XLiM Hardware Generation" is selected
 
-		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", false);
+		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
 
 		printer = new STPrinter();
 
@@ -177,5 +177,4 @@ public class XlimBackendImpl extends AbstractBackend {
 			throw new OrccException("I/O error", e);
 		}
 	}
-
 }
