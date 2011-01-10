@@ -11,7 +11,7 @@ IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 	if( MSVC )
 		set(LLVM_LIB "Debug" CACHE STRING "Specify the llvm library Debug/Release configuration.")
 		set(LLVM_INCLUDE_DIRS ${LLVM_DIR}/include ${LLVM_INST_DIR}/include)
-		set(LLVM_LIBRARY ${LLVM_INST_DIR}/lib/${LLVM_LIB})
+		set(LLVM_LIBRARY ${LLVM_INST_DIR}/lib/${CMAKE_CFG_INTDIR})
 		set(LLVM_CPP_FLAGS "/D __STDC_CONSTANT_MACROS";
 							"/D _CRT_SECURE_NO_DEPRECATE";
 							"/D _CRT_SECURE_NO_WARNINGS";

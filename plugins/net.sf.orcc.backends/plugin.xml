@@ -148,6 +148,7 @@
             <checkBox></checkBox>
          </option>
          <option
+               defaultValue="Assembly"
                description="Select a representation for the VTL"
                id="net.sf.orcc.backends.llvmMode"
                name="Generation mode:">
@@ -164,6 +165,7 @@
             </comboBox>
          </option>
          <option
+               defaultValue="O0"
                description="Set level of optimization"
                id="net.sf.orcc.backends.optLevel"
                name="Optimization level:">

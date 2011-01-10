@@ -70,6 +70,8 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 	private OrccAbstractSettingsTab launchConfigurationTab;
 
 	private ComboBoxOption option;
+	
+	private Label lbl;
 
 	/**
 	 * Value of the option
@@ -101,7 +103,7 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 	private void createComboBox(Composite parent) {
 		Font font = parent.getFont();
 		    
-		Label lbl = new Label(parent, SWT.NONE);
+		lbl = new Label(parent, SWT.NONE);
 		lbl.setFont(font);
 		lbl.setText(option.getName());
 		GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, true);
@@ -141,8 +143,11 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 	@Override
 	public void hide() {
 		comboBox.setVisible(false);
+		lbl.setVisible(false);
+		
 		((GridData) comboBox.getLayoutData()).exclude = true;
-
+		((GridData) lbl.getLayoutData()).exclude = true;
+		
 		showComposite(false);
 	}
 
@@ -182,7 +187,10 @@ public class ComboBoxOptionWidget implements OptionWidget, SelectionListener {
 	@Override
 	public void show() {
 		comboBox.setVisible(true);
+		lbl.setVisible(true);
+		
 		((GridData) comboBox.getLayoutData()).exclude = false;
+		((GridData) lbl.getLayoutData()).exclude = false;
 
 		showComposite(value > -1);
 	}
