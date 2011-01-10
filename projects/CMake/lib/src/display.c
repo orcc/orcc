@@ -79,9 +79,10 @@ void print_fps_avg(void) {
 }
 
 static Uint32 tmp_time;
-static int num_images_tmp;
 
 float compute_fps_sync(){
+	static int num_images_tmp = 0;
+
 	Uint32 t_sync = tmp_time;
 	int num_images_sync = num_images_tmp;
 	
@@ -210,7 +211,6 @@ static void display_init() {
 	start_time = SDL_GetTicks();
 	t = start_time;
 	tmp_time = start_time;
-	num_images_tmp = 0;
 
 #ifdef BENCHMARK
 	{
