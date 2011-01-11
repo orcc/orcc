@@ -36,5 +36,6 @@
       <vertex id="Select_chroma" x="736" y="287"/>
       <vertex id="Deblocking_Filter" x="1008" y="426"/>
       <vertex id="DemuxParserInfos" x="178" y="7"/>
+      <vertex id="EnableRead" x="854" y="208"/>
    </vertices>
 </layout>

@@ -190,6 +190,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="EnableRead">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -427,4 +430,5 @@
     <Connection dst="Inter" dst-port="MbType" src="" src-port="MbType4Pred"/>
     <Connection dst="Inter" dst-port="SelectList" src="" src-port="SelectList"/>
     <Connection dst="Buffer_inter" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Buffer_inter" dst-port="EnableRead" src="" src-port="EnableRead"/>
 </XDF>

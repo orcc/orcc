@@ -28,11 +28,12 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	uint(size=32) POCtoRead,
 	int(size=32)  DelList,
 	int(size=9)   WD,
+	bool          EnableRead,
 	int (size=12) ReadAddress,
 	bool          IsIDR,
 	uint(size=2)  IsNewPicOrSlice
 		==> 
-	int(size=16) RD, 
+	int(size=16) RD,
 	int(size=9)  Display
 		:
 
@@ -97,7 +98,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	/*Delete information*/
 	bool          ValIsIDR := false;
 
-
 	get_writeAddr: action
 			PicWidthInMb    :[PICwidthInMb],
 			PicSizeInMb     :[PICSizeInMb],
@@ -147,11 +147,13 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 	get_readAddr: action
 			ReadAddress :[Ra_off_x , Ra_off_y , RAWidth , RAHeight],
-			POCtoRead   :[poc2read]
+			POCtoRead   :[poc2read],
+			EnableRead  :[read_enabled]
 				==>
 		guard
 			read_done  = true,
-			poc2read  != ListPOC[pic_curr_idx]
+			poc2read  != ListPOC[pic_curr_idx],
+			read_enabled
 		var
 			bool found := false
 		do
@@ -225,10 +227,12 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	read_ref_parameters: action
 			POC             :[Valpoc],
 			IsIDR           :[IsIDRPic],
-			IsNewPicOrSlice :[is_new_mb_or_slice]
+			IsNewPicOrSlice :[is_new_mb_or_slice],
+			EnableRead      :[enabled_read]
 				==>
 		guard
-			is_new_mb_or_slice = IS_NEW_PIC
+			is_new_mb_or_slice = IS_NEW_PIC,
+			not enabled_read
 		var
 			bool         idx_selected := false,
 			int(size=32) i            := 0

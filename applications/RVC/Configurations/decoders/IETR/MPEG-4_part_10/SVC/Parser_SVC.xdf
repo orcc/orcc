@@ -302,6 +302,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="Read4MbPred">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -707,4 +710,9 @@
         src="CheckNaluType" src-port="SpsNalUnitType"/>
     <Connection dst="DecodePps" dst-port="Parameters" src="DecodeSpsSvc" src-port="PpsParam"/>
     <Connection dst="" dst-port="IsNewPicOrSlice" src="DecodePic" src-port="IsNewPicOrSlice"/>
+    <Connection dst="SelectRefIdx" dst-port="NewPic_l0"
+        src="MVReconstruct" src-port="NewListL0"/>
+    <Connection dst="SelectRefIdx" dst-port="NewPic_l1"
+        src="MVReconstruct" src-port="NewListL1"/>
+    <Connection dst="" dst-port="Read4MbPred" src="SelectRefIdx" src-port="Read4MbPred"/>
 </XDF>

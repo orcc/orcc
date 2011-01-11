@@ -38,12 +38,13 @@
       <vertex id="MacroBlockType" x="1705" y="809"/>
       <vertex id="TransformSize8x8" x="1738" y="1406"/>
       <vertex id="PocToDisplay" x="1846" y="1821"/>
-      <vertex id="PocToRead" x="2700" y="1101"/>
+      <vertex id="PocToRead" x="2713" y="1069"/>
       <vertex id="ReadAddress_l" x="2858" y="838"/>
       <vertex id="ReadAddress_c" x="2859" y="808"/>
       <vertex id="MbType4Pred" x="1714" y="854"/>
       <vertex id="SelectList" x="2244" y="789"/>
       <vertex id="SubMbType" x="1752" y="1282"/>
+      <vertex id="IsNewPicOrSlice" x="2125" y="550"/>
       <vertex id="Algo_NALU" x="333" y="7"/>
       <vertex id="CheckNaluType" x="644" y="-22"/>
       <vertex id="SpsVLDecoding" x="71" y="235"/>
@@ -61,9 +62,9 @@
       <vertex id="Mgnt_Display" x="1686" y="1794"/>
       <vertex id="RefIdxL0ToPoc" x="2248" y="960"/>
       <vertex id="RefIdxL1ToPoc" x="2251" y="1174"/>
-      <vertex id="SelectRefIdx" x="2439" y="1081"/>
+      <vertex id="SelectRefIdx" x="2476" y="1041"/>
       <vertex id="Mgnt_InterPred" x="2666" y="781"/>
       <vertex id="DecodeSpsSvc" x="46" y="1022"/>
-      <vertex id="IsNewPicOrSlice" x="2125" y="550"/>
+      <vertex id="Read4MbPred" x="2697" y="1127"/>
    </vertices>
 </layout>

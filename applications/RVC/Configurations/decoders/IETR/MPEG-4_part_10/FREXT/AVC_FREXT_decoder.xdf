@@ -287,4 +287,7 @@
         src="FUN_Parser" src-port="IsNewPicOrSlice"/>
     <Connection dst="Decode_V" dst-port="IsNewPicOrSlice"
         src="FUN_Parser" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Decoding_Y" dst-port="EnableRead" src="FUN_Parser" src-port="Read4MbPred"/>
+    <Connection dst="Decode_U" dst-port="EnableRead" src="FUN_Parser" src-port="Read4MbPred"/>
+    <Connection dst="Decode_V" dst-port="EnableRead" src="FUN_Parser" src-port="Read4MbPred"/>
 </XDF>
