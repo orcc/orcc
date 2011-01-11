@@ -98,15 +98,11 @@ $tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(e
 >> 
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$if (src.instance)
-  $$if (tgt.instance)
+$if (src.instance && tgt.instance)
 $$doAssignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
   count=network.connectionMap.(edge))$$
-  endif$$
-elseif (tgt.instance)
-  $$assignOut(target=tgt.instance, targetPort=edge.target)$$
 endif$
 >>
 
@@ -142,23 +138,16 @@ $  rd_clk     => clock,
 endif$
 >>
 
-assignOut(target, targetPort) ::= <<
-
-$target.id$_$targetPort.name$_data_in <= $src.port$_data;
-$target.id$_$targetPort.name$_send    <= $src.port$_send;
-$src.port$_ack <= $target.id$_$targetPort.name$_ack;
->>
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // print actors and networks instantiation
 ///////////////////////////////////////////////////////////////////////////////
 
 PrintNetworksAndActors(outgoingMap) ::= <<
-$outgoingMap.keys: {instance | $checkNetworkOrActors(instance=instance, map=network.predecessorsMap.(instance))$}; separator="\n\n"$
+$outgoingMap.keys: {instance | $checkNetworkOrActors(instance=instance)$}; separator="\n\n"$
 >>
 
-checkNetworkOrActors(instance, map) ::= <<
+checkNetworkOrActors(instance) ::= <<
 $if (instance.actor)
 $$printInstances(inputs=instance.actor.inputs.list,
                     outputs=instance.actor.outputs.list)$$
@@ -173,7 +162,8 @@ printInstances(inputs, outputs) ::= <<
 $instance.id$ : entity work.$instance.id$
   port map (
 $if(!inputs.empty)
-$$printInputs(map=network.predecessorsMap.(instance), ports=inputs)$
+$
+$network.incomingMap.(instance):printInputs(); separator="\n"$
 $
 endif$$
 if(!outputs.empty)
@@ -184,29 +174,37 @@ endif$
     reset_n   => reset_n);
 >>
 
-printInputs(map, ports) ::= <<
-    $ports: printPortsInputs(); separator="\n"$
+
+printInputs(connection) ::= <<
+    $printPortsIn(connection=connection, map=network.predecessorsMap.(instance), vmap=network.sourceMap.(connection))$  
 >>
 
-printPortsInputs(port) ::= <<
-$port.name$_data   => $instance.id$_$port.name$_data,
-$port.name$_send   => $instance.id$_$port.name$_send,
-$port.name$_ack    => $instance.id$_$port.name$_ack,
+printPortsIn(connection, map, vmap) ::= <<
+$if(map.(connection.target))
+$$connection.target$_data   => $instance.id$_$connection.target$_data,
+$connection.target$_send   => $instance.id$_$connection.target$_send,
+$connection.target$_ack    => $instance.id$_$connection.target$_ack,$
+else
+$$connection.target$_data   => $vmap.port$_data,
+$connection.target$_send   => $vmap.port$_send,
+$connection.target$_ack    => $vmap.port$_ack,$
+endif$
 >>
 
-printOutputs(connections) ::= <<
-    $printOutput(connections=connections, map=network.successorsMap.(instance), vmap=network.targetMap.(connections))$  
+
+printOutputs(connection) ::= <<
+    $printPortsOut(connection=connection, map=network.successorsMap.(instance), vmap=network.targetMap.(connection))$  
 >>
 
-printOutput(connections, map, vmap) ::= <<
-$if(map.(connections.source))
-$$connections.source$_data   => $map.(connections.source).id$_$connections.target$_data,
-$connections.source$_send   => $map.(connections.source).id$_$connections.target$_send,
-$connections.source$_ack    => $map.(connections.source).id$_$connections.target$_ack,
-$else
-$$connections.source$_data   => $vmap.port$_data
-$connections.source$_send   => $vmap.port$_send
-$connections.source$_ack    => $vmap.port$_ack$
+printPortsOut(connection, map, vmap) ::= <<
+$if(map.(connection.source))
+$$connection.source$_data   => $map.(connection.source).id$_$connection.target$_data,
+$connection.source$_send   => $map.(connection.source).id$_$connection.target$_send,
+$connection.source$_ack    => $map.(connection.source).id$_$connection.target$_ack,$
+else
+$$connection.source$_data   => $vmap.port$_data,
+$connection.source$_send   => $vmap.port$_send,
+$connection.source$_ack    => $vmap.port$_ack,$
 endif$
 >>
 
