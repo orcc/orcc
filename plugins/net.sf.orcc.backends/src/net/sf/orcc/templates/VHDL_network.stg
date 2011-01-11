@@ -59,26 +59,26 @@ signal $instance.id$_$port.name$_ack        : std_logic;
 // assigns FIFOs
 
 assignFifos(outgoingMap) ::= <<
-$outgoingMap.keys: {instance | $assignFifo(instance=instance, connection=outgoingMap.(connection))$}; separator="\n\n"$
+$outgoingMap.keys: {instance | $assignFifo(instance=instance, map=network.predecessorsMap.(instance))$}; separator="\n\n"$
 >>
 
-assignFifo(instance, connection) ::= <<
--- connection : $outgoingMap.(instance)$
-
+assignFifo(instance, map) ::= <<
 $instance.id$ : entity work.$instance.id$
   port map (
-    $outgoingMap.(instance) : AssignInOut()$
+    $printInputs(map=map, ports=instance.actor.inputs.list)$
+    $outgoingMap.(instance) : AssignInOuts(); separator="\n"$
     clock     => clock, 
     reset_n   => reset_n);
 >>
 
+AssignInOuts(connections) ::= <<
+$AssignInOut(connections=connections, map=network.successorsMap.(instance))$  
+>>
 
-
-AssignInOut(connections) ::= <<
-  $connections.source$_data   => $connections.target$_$connections.name$_data_in,
-  $connections.source$_send   => $connections.target$_$connections.name$_send,
-  $connections.source$_ack    => $connections.target$_$connections.name$_ack,
-
+AssignInOut(connections, map) ::= <<
+$connections.source$_data   => $map.(connections.source).id$_$connections.target$_data,
+$connections.source$_send   => $map.(connections.source).id$_$connections.target$_send,
+$connections.source$_ack    => $map.(connections.source).id$_$connections.target$_ack,
 >>
 
 
@@ -290,9 +290,9 @@ $ports: printPortsInputs(); separator="\n"$
 >>
 
 printPortsInputs(port) ::= <<
-    $port.name$_data   => $instance.id$_$port.name$_data,
-    $port.name$_send   => $instance.id$_$port.name$_send,
-    $port.name$_ack    => $instance.id$_$port.name$_ack,
+$port.name$_data   => $instance.id$_$port.name$_data,
+$port.name$_send   => $instance.id$_$port.name$_send,
+$port.name$_ack    => $instance.id$_$port.name$_ack,
 >>
 
 printOutputs(map, ports) ::= <<
@@ -340,11 +340,11 @@ begin
   ---------------------------------------------------------------------------
   -- Actors and Networks instantiation 
   ---------------------------------------------------------------------------
-  $printNetworkAndActors(instances=network.instances); separator="\n"$
 
   ---------------------------------------------------------------------------
   -- FIFOs instantiation 
-  ---------------------------------------------------------------------------  
+  --------------------------------------------------------------------------- 
+  $assignFifos(network.outgoingMap)$
   ---------------------------------------------------------------------------
 
 end architecture rtl_$network.name$;
