@@ -188,19 +188,19 @@ public class Network {
 		numberOfConnectionReadersMap = new HashMap<Connection, Integer>();
 		for (Instance instance : outgoingMap.keySet()) {
 			Map<Port, Integer> portToNumberOfReadersMap = new HashMap<Port, Integer>();
-			int cp = 0;
+
 			for (Connection connection : outgoingMap.get(instance)) {
 				Port srcPort = connection.getSource();
 				if (portToNumberOfReadersMap.get(srcPort) == null) {
 					portToNumberOfReadersMap.put(srcPort, 1);
+					numberOfConnectionReadersMap.put(connection, 0);
 				} else {
 					int n = portToNumberOfReadersMap.get(srcPort);
 					n++;
 					portToNumberOfReadersMap.remove(srcPort);
 					portToNumberOfReadersMap.put(srcPort, n);
+					numberOfConnectionReadersMap.put(connection, n-1);
 				}
-				numberOfConnectionReadersMap.put(connection, cp);
-				cp++;
 			}
 			numberOfReadersMap.put(instance, portToNumberOfReadersMap);
 		}
@@ -228,11 +228,11 @@ public class Network {
 							.put(port, graph.outDegreeOf(vertex));
 				}
 				int cp = 0;
-				for (Connection connection : graph.outgoingEdgesOf(vertex)){
+				for (Connection connection : graph.outgoingEdgesOf(vertex)) {
 					numberOfConnectionReadersMap.put(connection, cp);
 					cp++;
 				}
-				
+
 			}
 		}
 	}
