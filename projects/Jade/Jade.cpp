@@ -216,7 +216,7 @@ void setOptions(){
 	}else{
 		optLevel = 0;
 	}
-}	
+}
 
 int main(int argc, char **argv) {
 

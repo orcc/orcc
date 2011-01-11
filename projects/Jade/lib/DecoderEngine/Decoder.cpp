@@ -140,3 +140,13 @@ void Decoder::setScheduler(RoundRobinScheduler* scheduler){
 void Decoder::start(){
 	scheduler->execute();
 }
+
+void Decoder::startInThread(pthread_t* thread){
+	pthread_create( thread, NULL, &Decoder::threadStart, this );
+}
+
+void* Decoder::threadStart( void* args ){
+	Decoder* decoder = static_cast<Decoder*>(args);
+	decoder->start();
+	return NULL;
+}

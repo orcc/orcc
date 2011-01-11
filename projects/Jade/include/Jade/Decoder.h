@@ -42,6 +42,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <pthread.h>
 
 namespace llvm{
 	class LLVMContext;
@@ -174,7 +175,13 @@ public:
 	 *
      */
 	void start();
-	
+
+	/**
+     *  @brief Start the decoder in a specific thread
+	 *
+     */
+	void startInThread(pthread_t* thread);
+
 	/**
 	 * @brief Compile the decoder
 	 * 
@@ -189,6 +196,8 @@ public:
 
 
 private:
+	static void* threadStart( void* args );
+
 	/** Module containing the final decoder */
 	llvm::Module* module;
 

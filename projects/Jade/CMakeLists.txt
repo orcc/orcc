@@ -4,7 +4,8 @@ project (Jade)
 
 find_program(LLVM_CONFIG llvm-config ${LLVM_INSTDIR}/bin DOC "path to llvm-config tool")
 find_package(SDL REQUIRED)
-
+find_package(Threads REQUIRED)
+  
 IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 	set(LLVM_DIR /where/llvm/lives CACHE STRING "llvm source directory")
 	set(LLVM_INST_DIR /where/llvm/is/installed CACHE STRING "llvm installation directory")
@@ -109,5 +110,5 @@ ENDIF(APPLE)
 add_executable(JadeToolbox Toolbox.cpp)
 
 # Library requiered
-target_link_libraries(Jade DecoderEngine XDFParser IROptimize IRSerialize Scheduler IRJit IRTransform  IRActor Fifo IRCore IRUtil HDAGGraph TinyXml ${SDL_LIBRARY} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+target_link_libraries(Jade DecoderEngine XDFParser IROptimize IRSerialize Scheduler IRJit IRTransform  IRActor Fifo IRCore IRUtil HDAGGraph TinyXml ${SDL_LIBRARY} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(JadeToolbox IRUtil ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})

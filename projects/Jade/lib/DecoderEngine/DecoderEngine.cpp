@@ -134,7 +134,9 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	timer = clock ();
 
 	//Start decoding
-	decoder.start();
+	pthread_t th1;
+
+	decoder.startInThread(&th1);
 
 	cout << "-->   Stop decoding. \n";
 	timer = clock ();
