@@ -34,15 +34,23 @@
 #include "orcc_genetic.h"
 #include "orcc_thread.h"
 
+static population* initialize_population(struct actor_s **actors, int actorsNb, int availCoresNb);
+static population* compute_next_population(population *pop, int actorsNb, int availCoresNb);
+static void compute_new_mapping(individual *individual, struct scheduler_s **schedulers, int threadsNb, int actorsNb);
+static void crossover(individual **children, individual **parents, int actorsNb);
+static individual* mutation(individual *original, int actorsNb, int availCoresNb);
+static int compare(void const *a, void const *b);
+
 void *monitor(void *data) {
 	struct monitor_s *monitoring = (struct monitor_s *) data;
-	int i, evalIndNb = 0;
+	int evalIndNb = 0;
+	population *population;
 
 	// Initialize
-	population *population = initializePopulation(monitoring->actors,
+	printf("\nGenerate initial population...\n\n");
+	population = initialize_population(monitoring->actors,
 			monitoring->actorsNb, monitoring->threadsNb);
 
-	
 	compute_new_mapping(population->individuals[evalIndNb],
 			monitoring->schedulers, monitoring->threadsNb, monitoring->actorsNb);
 
@@ -62,15 +70,15 @@ void *monitor(void *data) {
 		}
 
 		// work process
-		printf("Time to process mapping (all threads are stopped)...\n");
 		fps = compute_fps_sync();;
 		population->individuals[evalIndNb]->fps = fps;
-		printf("Computed FPS = %f\n",fps);
+		printf("Evaluation of mapping %i = %f fps\n",evalIndNb,fps);
 
 		evalIndNb++;
 
 		if (evalIndNb == POPULATION_SIZE) {
-			population = computeNextPopulation(population,
+			printf("\nCompute next generation...\n\n");
+			population = compute_next_population(population,
 					monitoring->actorsNb, monitoring->threadsNb);
 			evalIndNb = 0;
 		}
@@ -82,16 +90,16 @@ void *monitor(void *data) {
 	return NULL;
 }
 
-void compute_new_mapping(individual *individual, struct scheduler_s **schedulers, int threadsNb, int actorsNb) {
-	printf("compute_new_mapping\n");
+static void compute_new_mapping(individual *individual, struct scheduler_s **schedulers, int threadsNb, int actorsNb) {
 	int i, j, k;
+
 	for (i = 0; i < threadsNb; i++) {
-		struct actor_s **actors = (struct actor_s **) malloc(actorsNb * sizeof(struct actor_s **));
+		struct actor_s **actors = (struct actor_s **) malloc(actorsNb * sizeof(struct actor_s *));
 		k = 0;
+
 		for (j = 0; j < actorsNb; j++) {
-			gene *gene = individual->genes[j];
-			if (gene->mappedCore == i) {
-				actors[k] = gene->actor;
+			if (individual->genes[j]->mappedCore == i) {
+				actors[k] = individual->genes[j]->actor;
 				k++;
 			}
 		}
@@ -99,14 +107,14 @@ void compute_new_mapping(individual *individual, struct scheduler_s **schedulers
 	}
 }
 
-population* initializePopulation(struct actor_s **actors, int actorsNb,
+static population* initialize_population(struct actor_s **actors, int actorsNb,
 		int availCoresNb) {
-	printf("Monitor: initialize population\n");
+	int i, j;
 
 	// Allocate memory to store the new population
-	population *pop = (population *) malloc(sizeof(*pop));
+	population *pop = (population *) malloc(sizeof(population));
 	individual **individuals = (individual**) malloc(POPULATION_SIZE
-			* sizeof(**individuals));
+			* sizeof(individual*));
 
 	// Initialize population fields
 	pop->individuals = individuals;
@@ -115,45 +123,40 @@ population* initializePopulation(struct actor_s **actors, int actorsNb,
 	// Initialize random function
 	srand(time(NULL));
 
-	// Create first generation of individuals
-	int i, j;
+	// Initialize first generation of individuals
 	for (i = 0; i < POPULATION_SIZE; i++) {
-		// Allocate memory to store new individuals
-		individual *ind = malloc(sizeof(individual));
-		gene **genes = malloc(actorsNb * sizeof(**genes));
+		pop->individuals[i] = malloc(sizeof(individual));
+		pop->individuals[i]->genes = malloc(actorsNb * sizeof(gene*));
+		pop->individuals[i]->fps = -1;
 
-		// Initialize individuals fields
-		ind->genes = genes;
-		ind->fps = -1;
+		// Initialize genes randomly
 		for (j = 0; j < actorsNb; j++) {
-			gene *gene = malloc(sizeof(*gene));
-			gene->actor = actors[j];
-			gene->mappedCore = rand() % availCoresNb;
-			ind->genes[j] = gene;
+			pop->individuals[i]->genes[j] = malloc(sizeof(gene));
+			pop->individuals[i]->genes[j]->actor = actors[j];
+			pop->individuals[i]->genes[j]->mappedCore = rand() % availCoresNb;
 		}
-		pop->individuals[i] = ind;
 	}
 
 	return pop;
 }
 
-population* computeNextPopulation(population *pop, int actorsNb,
+static population* compute_next_population(population *pop, int actorsNb,
 		int availCoresNb) {
-	printf("compute next population\n");
+	int i;
+
 	// Allocate memory to store the new population
 	population *nextPop = malloc(sizeof(population));
 	individual **individuals = (individual**) malloc(POPULATION_SIZE
-			* sizeof(**individuals));
+			* sizeof(individual*));
 
 	// Initialize population fields
 	nextPop->individuals = individuals;
 	nextPop->generationNb = pop->generationNb + 1;
 
 	// Sort population by descending fps value
-	quickSort(pop, 0, POPULATION_SIZE-1);
+	qsort(pop->individuals, sizeof(pop->individuals)/sizeof(*pop->individuals), sizeof(*pop->individuals), compare);
 
 	// Backup better individuals
-	int i;
 	for (i = 0; i < POPULATION_SIZE * KEEP_RATIO; i++) {
 		nextPop->individuals[i] = pop->individuals[i];
 	}
@@ -167,8 +170,6 @@ population* computeNextPopulation(population *pop, int actorsNb,
 	for (; i < last; i = i + 2) {
 		individual *children[2];
 		individual *parents[2];
-		children[0] = malloc(sizeof(children[0]));
-		children[1] = malloc(sizeof(children[1]));
 
 		// TOFIX: choose parents with tournament
 		parents[0] = pop->individuals[rand() % POPULATION_SIZE];
@@ -182,9 +183,7 @@ population* computeNextPopulation(population *pop, int actorsNb,
 
 	// Mutation
 	for (; i < POPULATION_SIZE; i++) {
-		individual *mutated = malloc(sizeof(individual));
-		mutation(mutated, pop->individuals[rand() % POPULATION_SIZE], actorsNb,
-				availCoresNb);
+		nextPop->individuals[i] = mutation(pop->individuals[rand() % POPULATION_SIZE], actorsNb, availCoresNb);
 	}
 
 	// TODO: Remove old population and unused individuals from memory
@@ -192,45 +191,50 @@ population* computeNextPopulation(population *pop, int actorsNb,
 	return nextPop;
 }
 
-void crossover(individual *children[2], individual *parents[2], int actorsNb) {
-	int cut = rand() % (actorsNb - 1) + 1;
+static void crossover(individual **children, individual **parents, int actorsNb) {
+	int i, cut = rand() % (actorsNb - 1) + 1;
 
-	int i;
+	children[0] = (individual*) malloc(sizeof(individual));
+	children[1] = (individual*) malloc(sizeof(individual));
+	children[0]->genes = (gene**) malloc(actorsNb * sizeof(gene*));
+	children[1]->genes = (gene**) malloc(actorsNb * sizeof(gene*));
+
 	for (i = 0; i < actorsNb; i++) {
-		gene *childGene0 = (gene*) malloc(sizeof(gene));
-		gene *childGene1 = (gene*) malloc(sizeof(gene));
+		children[0]->genes[i] = (gene*) malloc(sizeof(gene));
+		children[1]->genes[i] = (gene*) malloc(sizeof(gene));
 		if (i < cut) {
-			childGene0 = parents[0]->genes[i];
-			childGene1 = parents[1]->genes[i];
+			children[0]->genes[i] = parents[0]->genes[i];
+			children[1]->genes[i] = parents[1]->genes[i];
 		} else {
-			childGene0 = parents[1]->genes[i];
-			childGene1 = parents[0]->genes[i];
+			children[0]->genes[i] = parents[1]->genes[i];
+			children[1]->genes[i] = parents[0]->genes[i];
 		}
-		children[0]->genes[i] = childGene0;
-		children[1]->genes[i] = childGene1;
 	}
-	children[0]->fps = -1;
-	children[1]->fps = -1;
 }
 
-void mutation(individual *mutated, individual *original, int actorsNb,
-		int availCoresNb) {
-	int mutatedIndex = rand() % actorsNb;
+static individual* mutation(individual *original, int actorsNb, int availCoresNb) {
+	individual *mutated = (individual*) malloc(sizeof(individual));
+	int i, mutatedIndex = rand() % actorsNb;
 
-	int i;
-	for (i = 0; i < actorsNb; i++) {
-		gene mutatedGene = *original->genes[i];
-		if (i == mutatedIndex) {
-			mutatedGene.mappedCore = rand() % availCoresNb;
-		}
-		mutated->genes[i] = &mutatedGene;
-	}
+	mutated->genes = (gene**) malloc(actorsNb * sizeof(gene*));
 	mutated->fps = -1;
+
+	for (i = 0; i < actorsNb; i++) {
+		mutated->genes[i] = (gene*) malloc(sizeof(gene));
+
+		mutated->genes[i] = original->genes[i];
+		if (i == mutatedIndex) {
+			mutated->genes[i]->mappedCore = rand() % availCoresNb;
+		}
+	}
+
+	return mutated;
 }
 
-int partitionner(population *pop, int p, int r) {
+static int partition(population *pop, int p, int r) {
 	int pivot = pop->individuals[p]->fps, i = p - 1, j = r + 1;
 	individual *temp;
+	printf("partition\n");
 	while (1) {
 		do
 			j--;
@@ -247,11 +251,21 @@ int partitionner(population *pop, int p, int r) {
 	}
 }
 
-void quickSort(population *pop, int p, int r) {
+static void quicksort(population *pop, int p, int r) {
 	int q;
+	printf("quicksort\n");
 	if (p < r) {
-		q = partitionner(pop, p, r);
-		quickSort(pop, p, q);
-		quickSort(pop, q + 1, r);
+		q = partition(pop, p, r);
+		quicksort(pop, p, q);
+		quicksort(pop, q + 1, r);
 	}
 }
+
+static int compare(void const *a, void const *b)
+{
+	individual const *i1 = (individual const *) a;
+	individual const *i2 = (individual const *) b;
+
+	return i1->fps - i2->fps;
+}
+
