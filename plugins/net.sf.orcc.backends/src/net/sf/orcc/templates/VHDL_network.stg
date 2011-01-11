@@ -104,8 +104,6 @@ $$doAssignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
   count=network.connectionMap.(edge))$$
-  else
-  $$assignIn(source=src.instance, sourcePort=edge.source)$$
   endif$$
 elseif (tgt.instance)
   $$assignOut(target=tgt.instance, targetPort=edge.target)$$
@@ -144,13 +142,6 @@ $  rd_clk     => clock,
 endif$
 >>
 
-assignIn(source, sourcePort) ::= <<
-
-$tgt.port$_data    <= $source.id$_$sourcePort.name$_data_out;
-$tgt.port$_send    <= $source.id$_$sourcePort.name$_send;
-$source.id$_$sourcePort.name$_ack   <= $tgt.port$_ack;
->>
-
 assignOut(target, targetPort) ::= <<
 
 $target.id$_$targetPort.name$_data_in <= $src.port$_data;
@@ -176,6 +167,7 @@ $$printInstances(inputs=instance.broadcast.inputs.list,
                    outputs=instance.broadcast.outputs.list)$$
 endif$
 >>
+
 
 printInstances(inputs, outputs) ::= <<
 $instance.id$ : entity work.$instance.id$
@@ -203,13 +195,19 @@ $port.name$_ack    => $instance.id$_$port.name$_ack,
 >>
 
 printOutputs(connections) ::= <<
-    $printOutput(connections=connections, map=network.successorsMap.(instance))$  
+    $printOutput(connections=connections, map=network.successorsMap.(instance), vmap=network.targetMap.(connections))$  
 >>
 
-printOutput(connections, map) ::= <<
-$connections.source$_data   => $map.(connections.source).id$_$connections.target$_data,
+printOutput(connections, map, vmap) ::= <<
+$if(map.(connections.source))
+$$connections.source$_data   => $map.(connections.source).id$_$connections.target$_data,
 $connections.source$_send   => $map.(connections.source).id$_$connections.target$_send,
 $connections.source$_ack    => $map.(connections.source).id$_$connections.target$_ack,
+$else
+$$connections.source$_data   => $vmap.port$_data
+$connections.source$_send   => $vmap.port$_send
+$connections.source$_ack    => $vmap.port$_ack$
+endif$
 >>
 
 
