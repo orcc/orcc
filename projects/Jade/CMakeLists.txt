@@ -5,7 +5,16 @@ project (Jade)
 find_program(LLVM_CONFIG llvm-config ${LLVM_INSTDIR}/bin DOC "path to llvm-config tool")
 find_package(SDL REQUIRED)
 find_package(Threads REQUIRED)
-  
+
+IF(NOT CMAKE_HAVE_PTHREAD_H)
+set(PHTREAD_DIR CACHE STRING "pthread directory")
+
+set(PHTREAD_INCLUDE_DIRS ${PHTREAD_DIR}/include)
+set(CMAKE_THREAD_LIBS_INIT ${PHTREAD_DIR}/lib/pthreadVCE2.lib)
+
+include_directories(${PHTREAD_INCLUDE_DIRS})
+ENDIF(NOT CMAKE_HAVE_PTHREAD_H)
+
 IF(LLVM_CONFIG STREQUAL "LLVM_CONFIG-NOTFOUND" )
 	set(LLVM_DIR /where/llvm/lives CACHE STRING "llvm source directory")
 	set(LLVM_INST_DIR /where/llvm/is/installed CACHE STRING "llvm installation directory")
