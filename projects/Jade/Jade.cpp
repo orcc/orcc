@@ -208,7 +208,7 @@ void setDirectory(std::string* dir){
 
 int optLevel;
 DecoderEngine* engine;
-
+pthread_t t1;
 
 //Check options of the decoder engine
 void setOptions(){
@@ -252,7 +252,6 @@ int runNetwork(Network* network, string inputFile){
 	}
 
 	//Load and execute the parsed network
-	pthread_t t1;
 	engine = new DecoderEngine(Context, fifo , VTLDir, SystemDir, Verbose);
 	engine->load(network, InputDir + inputFile, optLevel, &t1);
 
@@ -402,8 +401,7 @@ void startCmdLine(){
 
 	runNetwork(network, VidFile);
 
-	system("pause");
-
+	pthread_join (t1, NULL);
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
 }
 
