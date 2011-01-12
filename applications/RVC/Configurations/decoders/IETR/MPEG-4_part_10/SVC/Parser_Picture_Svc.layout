@@ -62,6 +62,7 @@
       <vertex id="Width" x="588" y="417"/>
       <vertex id="Height" x="581" y="459"/>
       <vertex id="IsNewPicOrSlice" x="590" y="958"/>
+      <vertex id="IsNewPic" x="585" y="577"/>
       <vertex id="Mgnt_DecodePic" x="1446" y="-92"/>
       <vertex id="DecodeSliceHeader" x="224" y="303"/>
       <vertex id="DecodeRefPicList" x="723" y="418"/>
@@ -74,6 +75,5 @@
       <vertex id="DecodeSubMbPred" x="1433" y="1238"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="1901" y="1066"/>
       <vertex id="GenerateSkipBlockInformation" x="1909" y="846"/>
-      <vertex id="IsNewPic" x="585" y="577"/>
    </vertices>
 </layout>

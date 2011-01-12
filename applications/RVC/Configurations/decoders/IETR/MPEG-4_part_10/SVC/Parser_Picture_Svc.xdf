@@ -726,11 +726,11 @@
     <Connection dst="" dst-port="Height" src="DecodeSliceHeader" src-port="Height"/>
     <Connection dst="" dst-port="IsNewPicOrSlice"
         src="DecodeSliceData_Cavlc" src-port="IsNewPicOrSlice"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="QpFeedback"
-        src="DecodeMacroBlockLayer" src-port="Qp_Y_Cb_Cr"/>
     <Connection dst="DecodeRefPicList" dst-port="IsNewPic"
         src="DecodeSliceHeader" src-port="Others_IsNewPic"/>
     <Connection dst="" dst-port="IsNewPic" src="DecodeSliceHeader" src-port="Others_IsNewPic"/>
     <Connection dst="DecodeDecRefPicMarking" dst-port="IsNewPic"
         src="DecodeSliceHeader" src-port="RefPicMrk_IsNewPic"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="QpFeedback"
+        src="DecodeMacroBlockLayer" src-port="QpFeedback"/>
 </XDF>
