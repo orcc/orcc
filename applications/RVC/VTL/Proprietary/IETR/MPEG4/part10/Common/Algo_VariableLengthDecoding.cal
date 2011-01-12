@@ -387,7 +387,9 @@ actor Algo_VariableLengthDecoding()
 		guard
 			ValTypeOfVLD = BYTE_ALIGNED_REQUIRED
 		do
-			CountBufferRbsp := 0;
+			if(CountBufferRbsp != 8)then
+				CountBufferRbsp := 0;
+			end
 			if(DEBUG_VAL_DECODED)then
 				println("IsByteAligned");
 			end
