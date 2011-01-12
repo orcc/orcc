@@ -401,6 +401,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="IsNewPic">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -725,4 +728,9 @@
         src="DecodeSliceData_Cavlc" src-port="IsNewPicOrSlice"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="QpFeedback"
         src="DecodeMacroBlockLayer" src-port="Qp_Y_Cb_Cr"/>
+    <Connection dst="DecodeRefPicList" dst-port="IsNewPic"
+        src="DecodeSliceHeader" src-port="Others_IsNewPic"/>
+    <Connection dst="" dst-port="IsNewPic" src="DecodeSliceHeader" src-port="Others_IsNewPic"/>
+    <Connection dst="DecodeDecRefPicMarking" dst-port="IsNewPic"
+        src="DecodeSliceHeader" src-port="RefPicMrk_IsNewPic"/>
 </XDF>

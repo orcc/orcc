@@ -45,6 +45,7 @@
       <vertex id="SelectList" x="2244" y="789"/>
       <vertex id="SubMbType" x="1752" y="1282"/>
       <vertex id="IsNewPicOrSlice" x="2125" y="550"/>
+      <vertex id="Read4MbPred" x="2697" y="1127"/>
       <vertex id="Algo_NALU" x="333" y="7"/>
       <vertex id="CheckNaluType" x="644" y="-22"/>
       <vertex id="SpsVLDecoding" x="71" y="235"/>
@@ -65,6 +66,6 @@
       <vertex id="SelectRefIdx" x="2476" y="1041"/>
       <vertex id="Mgnt_InterPred" x="2666" y="781"/>
       <vertex id="DecodeSpsSvc" x="46" y="1022"/>
-      <vertex id="Read4MbPred" x="2697" y="1127"/>
+      <vertex id="CheckNewSlice" x="1072" y="1745"/>
    </vertices>
 </layout>

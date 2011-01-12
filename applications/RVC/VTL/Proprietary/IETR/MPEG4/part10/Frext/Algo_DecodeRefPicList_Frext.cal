@@ -21,6 +21,7 @@ actor Algo_DecodeRefPicList_Frext()
 	int (size=32) ValVLD,
 
 	uint(size=4)  Slice_Type,
+	bool          IsNewPic,
 
 	uint(size=5)  NumRefIdxLXActive
 		==>
@@ -63,19 +64,21 @@ actor Algo_DecodeRefPicList_Frext()
 	bool         ref_pic_list_reordering_flag;
 
 	uint(size=4)  slice_type := 2;
-
+	bool          is_new_pic;
 
 	ReadSliceType: action
 			Slice_Type        :[ValSliceType],
+			IsNewPic          :[ValIsNewPic],
 			NumRefIdxLXActive :[ValRefIdxAct] repeat 2
 				==>
 		do
 			slice_type            := ValSliceType;
+			is_new_pic            := ValIsNewPic;
 			num_ref_idx_l0_active := ValRefIdxAct[0];
 			num_ref_idx_l1_active := ValRefIdxAct[1];
 		end
 
-	SliceType.IsEqualToP: action
+	SliceType.IsEqualToP.IsNewPic: action
 				==>
 			//  num_ref_idx_active_override_flag   
 			TypeOfVLD    :[READ_BITS],
@@ -87,12 +90,25 @@ actor Algo_DecodeRefPicList_Frext()
 
 			DirectSpatialMvPredFlag :[false]
 		guard
-			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP)
+			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP),
+			is_new_pic
 		do
 			num_ref_idx_l1_active := 0;
 		end
 
-	SliceType.IsEqualToI: action
+	SliceType.IsEqualToP.IsNewSlice: action
+				==>
+			//  num_ref_idx_active_override_flag   
+			TypeOfVLD    :[READ_BITS],
+			NbBitsToRead :[    1    ]
+		guard
+			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP),
+			not is_new_pic
+		do
+			num_ref_idx_l1_active := 0;
+		end
+
+	SliceType.IsEqualToI.IsNewPic: action
 				==>
 			RefList0Type     :[0],
 			NbRefFrame_l0    :[0],
@@ -103,6 +119,13 @@ actor Algo_DecodeRefPicList_Frext()
 			RefReordering_l1 :[0],
 
 			DirectSpatialMvPredFlag :[false]
+		guard
+			is_new_pic
+		end
+
+	SliceType.IsEqualToI.IsNewSlice: action ==>
+		guard
+			not is_new_pic
 		end
 
 	ReadNumRefIdxAct.Done: action
@@ -140,7 +163,7 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	SliceType.IsEqualToB: action
+	SliceType.IsEqualToB.IsNewPic: action
 			==>
 			//              direct_sp , num_ref_i
 			TypeOfVLD    :[ READ_BITS , READ_BITS ],
@@ -149,7 +172,18 @@ actor Algo_DecodeRefPicList_Frext()
 			RefList0Type  :[REFLIST0_BI_PRED],
 			RefList1Type  :[REFLIST1_BI_PRED]
 		guard
-			slice_type = SLICE_TYPE_B
+			slice_type = SLICE_TYPE_B,
+			is_new_pic
+		end
+
+	SliceType.IsEqualToB.IsNewSlice: action
+			==>
+			//              direct_sp , num_ref_i
+			TypeOfVLD    :[ READ_BITS , READ_BITS ],
+			NbBitsToRead :[     1     ,     1     ]
+		guard
+			slice_type = SLICE_TYPE_B,
+			not is_new_pic
 		end
 
 	Read_DirecSpat_NumRefIdxAct.Done: action
@@ -199,10 +233,17 @@ actor Algo_DecodeRefPicList_Frext()
 			num_ref_idx_l1_active := ValueOfVLD[1] + 1;
 		end
 
-	SendNumRefIdxlXActive: action
+	SendNumRefIdxlXActive.IsNewPic: action
 				==>
 			NbRefFrame_l0 :[num_ref_idx_l0_active],
 			NbRefFrame_l1 :[num_ref_idx_l1_active]
+		guard
+			is_new_pic
+		end
+
+	SendNumRefIdxlXActive.IsNewSlice: action ==>
+		guard
+			not is_new_pic
 		end
 
 
@@ -214,10 +255,12 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReadRefPicList0Reord.Done: action
+	ReadRefPicList0Reord.Done.IsNewPic: action
 			ValVLD           :[ValueOfVLD]
 				==>
 			RefReordering_l0 :[ValueOfVLD]
+		guard
+			is_new_pic
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
@@ -231,10 +274,47 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReadRefPicList1Reord.Done: action
+	ReadRefPicList0Reord.Done.IsNewSlice: action
+			ValVLD           :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
+			end
+			ref_pic_list_reordering_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+		end
+
+
+	ReadRefPicList1Reord.Done.IsNewPic: action
 			ValVLD :[ValueOfVLD]
 				==>
 			RefReordering_l1 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
+			end
+			ref_pic_list_reordering_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+		end
+
+	ReadRefPicList1Reord.Done.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
@@ -257,7 +337,7 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReordPicNumIdcL0.IsNotEqualTo3: action
+	ReordPicNumIdcL0.IsNotEqualTo3.IsNewPic: action
 			ValVLD :[ValueOfVLD]
 				==>
 			//      abs_diff_pic_num_minus1
@@ -267,7 +347,24 @@ actor Algo_DecodeRefPicList_Frext()
 
 			RefReordering_l0 :[ValueOfVLD]
 		guard
-			ValueOfVLD != 3
+			ValueOfVLD != 3,
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+	ReordPicNumIdcL0.IsNotEqualTo3.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      abs_diff_pic_num_minus1
+			//                or
+			//        long_term_pic_num
+			TypeOfVLD        :[ VLD_UE ]
+		guard
+			ValueOfVLD != 3,
+			not is_new_pic
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
@@ -275,7 +372,7 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReordPicNumIdcL1.IsNotEqualTo3: action
+	ReordPicNumIdcL1.IsNotEqualTo3.IsNewPic: action
 			ValVLD :[ValueOfVLD]
 				==>
 			//      abs_diff_pic_num_minus1
@@ -285,7 +382,24 @@ actor Algo_DecodeRefPicList_Frext()
 
 			RefReordering_l1 :[ValueOfVLD]
 		guard
-			ValueOfVLD != 3
+			ValueOfVLD != 3,
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+	ReordPicNumIdcL1.IsNotEqualTo3.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      abs_diff_pic_num_minus1
+			//                or
+			//        long_term_pic_num
+			TypeOfVLD        :[ VLD_UE ]
+		guard
+			ValueOfVLD != 3,
+			not is_new_pic
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
@@ -293,10 +407,23 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReordPicNumIdcL0.IsEqualTo3: action
+	ReordPicNumIdcL0.IsEqualTo3.IsNewPic: action
 			ValVLD           :[ValueOfVLD]
 				==>
 			RefReordering_l0 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+	ReordPicNumIdcL0.IsEqualTo3.IsNewSlice: action
+			ValVLD           :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
@@ -304,10 +431,23 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReordPicNumIdcL1.IsEqualTo3: action
+	ReordPicNumIdcL1.IsEqualTo3.IsNewPic: action
 			ValVLD           :[ValueOfVLD]
 				==>
 			RefReordering_l1 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+	ReordPicNumIdcL1.IsEqualTo3.IsNewSlice: action
+			ValVLD           :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
@@ -315,13 +455,28 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReadPicNumIdcParamL0.Done: action
+	ReadPicNumIdcParamL0.Done.IsNewPic: action
 			ValVLD :[ValueOfVLD]
 				==>
 			//      reordering_of_pic_nums_idc
 			TypeOfVLD        :[ VLD_UE ],
 
 			RefReordering_l0 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
+			end
+		end
+
+	ReadPicNumIdcParamL0.Done.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD        :[ VLD_UE ]
+		guard
+			not is_new_pic
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
@@ -329,13 +484,28 @@ actor Algo_DecodeRefPicList_Frext()
 		end
 
 
-	ReadPicNumIdcParamL1.Done: action
+	ReadPicNumIdcParamL1.Done.IsNewPic: action
 			ValVLD           :[ValueOfVLD]
 				==>
 			//      reordering_of_pic_nums_idc
 			TypeOfVLD        :[ VLD_UE ],
 
 			RefReordering_l1 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
+			end
+		end
+
+	ReadPicNumIdcParamL1.Done.IsNewSlice: action
+			ValVLD           :[ValueOfVLD]
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD        :[ VLD_UE ]
+		guard
+			not is_new_pic
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);

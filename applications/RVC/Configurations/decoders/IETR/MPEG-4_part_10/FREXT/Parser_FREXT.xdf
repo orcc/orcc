@@ -521,6 +521,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="CheckIsNewSlice">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Frext.CheckNewSlice"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -545,8 +554,6 @@
         src="CheckNaluType" src-port="SpsNewNal"/>
     <Connection dst="SpsVLDecoding" dst-port="VLD_Param" src="DecodeSps" src-port="NbBitsToRead"/>
     <Connection dst="PpsVLDecoding" dst-port="VLD_Param" src="DecodePps" src-port="NbBitsToRead"/>
-    <Connection dst="MMCO" dst-port="MaxFrameNum" src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
-    <Connection dst="MMCO" dst-port="NumReferenceFrame" src="DecodeSps" src-port="MMCO_NumRefFrame"/>
     <Connection dst="RefList0" dst-port="EmptyDPB" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="RefList0" dst-port="ShortTermList" src="MMCO" src-port="ShortTermList"/>
     <Connection dst="RefList0" dst-port="SzShortTermList" src="MMCO" src-port="SzShortTermList"/>
@@ -727,11 +734,23 @@
         src="MergeSpsAsk" src-port="SenderOfRequest"/>
     <Connection dst="DecodePps" dst-port="Parameters"
         src="SplitSpsInfos" src-port="PpsParameters"/>
-    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize" src="DecodeSps" src-port="SzDPB"/>
     <Connection dst="" dst-port="IsNewPicOrSlice" src="DecodePic" src-port="IsNewPicOrSlice"/>
     <Connection dst="SelectRefIdx" dst-port="NewPic_l0"
         src="MVReconstruct" src-port="NewListL0"/>
     <Connection dst="SelectRefIdx" dst-port="NewPic_l1"
         src="MVReconstruct" src-port="NewListL1"/>
     <Connection dst="" dst-port="Read4MbPred" src="SelectRefIdx" src-port="Read4MbPred"/>
+    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize"
+        src="CheckIsNewSlice" src-port="MaxDPBSize_o"/>
+    <Connection dst="CheckIsNewSlice" dst-port="MaxDPBSize_i"
+        src="DecodeSps" src-port="SzDPB"/>
+    <Connection dst="MMCO" dst-port="NumReferenceFrame"
+        src="CheckIsNewSlice" src-port="NumRefFrame_o"/>
+    <Connection dst="MMCO" dst-port="MaxFrameNum" src="CheckIsNewSlice" src-port="MaxFrameNum_o"/>
+    <Connection dst="CheckIsNewSlice" dst-port="MaxFrameNum_i"
+        src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
+    <Connection dst="CheckIsNewSlice" dst-port="NumRefFrame_i"
+        src="DecodeSps" src-port="MMCO_NumRefFrame"/>
+    <Connection dst="CheckIsNewSlice" dst-port="IsNewPic"
+        src="DecodePic" src-port="IsNewPic"/>
 </XDF>

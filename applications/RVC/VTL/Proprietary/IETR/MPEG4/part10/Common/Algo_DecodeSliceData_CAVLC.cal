@@ -70,7 +70,6 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 *
 */
 	uint(size=2) IS_NEW_MB    = 0;
-	uint(size=2) IS_NEW_SLICE = 1;
 	uint(size=2) IS_NEW_PIC   = 2;
 
 //	uint(size=4) SLICE_TYPE_P  = 0;
@@ -237,9 +236,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			first_mb_in_slice = 0
 		end
 
-	SendNewPic.Skip: action
-				==>
-			IsNewPicOrSlice :[IS_NEW_SLICE]
+	SendNewPic.Skip: action ==>
 		guard
 			first_mb_in_slice != 0
 		end

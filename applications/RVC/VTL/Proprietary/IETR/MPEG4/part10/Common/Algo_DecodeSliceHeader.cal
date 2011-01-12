@@ -34,7 +34,10 @@ actor Algo_DecodeSliceHeader()
 
 	uint(size=8)  GetPps,
 
+	bool          RefPicMrk_IsNewPic,
+
 	uint(size=4)  SliceType,
+	bool          Others_IsNewPic,
 
 	uint(size=32) Poc,
 
@@ -121,6 +124,9 @@ actor Algo_DecodeSliceHeader()
 
 	int (size=32) LoopVal;
 
+
+	bool IsNewPic;
+
 	function GetFlag(int(size=32) Val, uint(size=5) Idx)
 				-->
 			bool
@@ -132,13 +138,19 @@ actor Algo_DecodeSliceHeader()
 * Actions
 *
 */
-	ResetPrevFrameNum: action
+	ResetPrevFrameNum.Launch: action
 			RstPrevFrameNum :[ResetAsked]
 				==>
+		guard
+			IsNewPic
 		do
 			if(ResetAsked) then
 				frame_num := 0;
 			end
+		end
+	ResetPrevFrameNum.Skip: action ==>
+		guard
+			not IsNewPic
 		end
 
 	ReadSliceType.Asked: action
@@ -155,11 +167,13 @@ actor Algo_DecodeSliceHeader()
 	ReadSliceType.Done: action
 			ValVLD         :[ValueOfVLD] repeat 3
 				==>
-			SliceDataParam :[slice_type,ValueOfVLD[0]],
-			GetPps         :[ValueOfVLD[2]],
-			SliceType      :[slice_type]
+			SliceDataParam  :[slice_type,ValueOfVLD[0]],
+			GetPps          :[ValueOfVLD[2]],
+			SliceType       :[slice_type],
+			Others_IsNewPic :[IsNewPic]
 		do
 			first_mb_in_slice := ValueOfVLD[0];
+			IsNewPic          := (first_mb_in_slice = 0);
 			slice_type        :=
 				if( ValueOfVLD[1] < 5) then
 					ValueOfVLD[1]
@@ -209,7 +223,7 @@ actor Algo_DecodeSliceHeader()
 		end
 
 
-	ReadFrameNum.Done: action
+	ReadFrameNum.Done.IsNewPic: action
 			ValVLD        :[ValueOfVLD],
 
 			PpsParameters :[PpsParam] repeat 5,
@@ -217,6 +231,8 @@ actor Algo_DecodeSliceHeader()
 			NalRefIdc     :[ValNalRefIdc]
 				==>
 			FramNumCurrPic                    :[ValueOfVLD]
+		guard
+			IsNewPic
 		do
 			num_slice_groups                       := PpsParam[0];
 			ValPicInitQp                           := PpsParam[1];
@@ -227,6 +243,33 @@ actor Algo_DecodeSliceHeader()
 			redundant_pic_cnt_present_flag         := GetFlag(PpsParam[4],2);
 			entropy_coding_mode_flag               := GetFlag(PpsParam[4],3);
 			prev_frame_num                         := frame_num;
+			Idr_flag                               := IdrPic;
+			nal_ref_idc                            := ValNalRefIdc;
+			frame_num                              := ValueOfVLD;
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tframe_num:        "+ValueOfVLD);
+			end
+			LoopVal := 0;
+		end
+
+	ReadFrameNum.Done.IsNewSlice: action
+			ValVLD        :[ValueOfVLD],
+
+			PpsParameters :[PpsParam] repeat 5,
+			IsAnIdrPic    :[IdrPic],
+			NalRefIdc     :[ValNalRefIdc]
+				==>
+		guard
+			not IsNewPic
+		do
+			num_slice_groups                       := PpsParam[0];
+			ValPicInitQp                           := PpsParam[1];
+			SzSliceGroupChgCycle                   := PpsParam[2];
+			slice_group_map_type                   := PpsParam[3];
+			deblocking_filter_control_present_flag := GetFlag(PpsParam[4],0);
+			pic_order_present_flag                 := GetFlag(PpsParam[4],1);
+			redundant_pic_cnt_present_flag         := GetFlag(PpsParam[4],2);
+			entropy_coding_mode_flag               := GetFlag(PpsParam[4],3);
 			Idr_flag                               := IdrPic;
 			nal_ref_idc                            := ValNalRefIdc;
 			frame_num                              := ValueOfVLD;
@@ -354,10 +397,12 @@ actor Algo_DecodeSliceHeader()
 		end
 
 
-	ReadPocLsb.Done: action
+	ReadPocLsb.Done.IsNewPic: action
 			ValVLD :[ValueOfVLD]
 				==>
 			Poc    :[POC_val]
+		guard
+			IsNewPic
 		var
 			int MaxPicOrderCntLsb,
 			int POC_val
@@ -388,6 +433,14 @@ actor Algo_DecodeSliceHeader()
 		end
 
 
+	ReadPocLsb.Done.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+		guard
+			not IsNewPic
+		end
+
+
 	Check_PicOrPres_FieldPic: action
 				==>
 			//     delta_pic_order_cnt_bottom
@@ -411,9 +464,11 @@ actor Algo_DecodeSliceHeader()
 		end
 
 
-	PocType.IsEqualTo2: action
+	PocType.IsEqualTo2.IsNewPic: action
 				==>
 			Poc    :[POC_val]
+		guard
+			IsNewPic
 		var
 			int POC_val
 		do
@@ -430,6 +485,11 @@ actor Algo_DecodeSliceHeader()
 			if(DEBUG_FLAG_DECODED)then
 				println("PocVal: "+POC_val);
 			end
+		end
+
+	PocType.IsEqualTo2.IsNewSlice: action ==>
+		guard
+			not IsNewPic
 		end
 
 
@@ -496,9 +556,11 @@ actor Algo_DecodeSliceHeader()
 		end
 
 
-	CalcPOC4PocType1: action
+	CalcPOC4PocType1.IsNewPic: action
 			==>
 		Poc :[POC_val]
+	guard
+		IsNewPic
 	var 
 /*		int TopFieldOrderCnt,
 		int BottomFieldOrderCnt,*/
@@ -523,6 +585,11 @@ actor Algo_DecodeSliceHeader()
 		if(DEBUG_FLAG_DECODED)then
 			println("PocVal: "+POC_val);
 		end
+	end
+
+	CalcPOC4PocType1.IsNewSlice: action ==>
+	guard
+		not IsNewPic
 	end
 
 
@@ -560,8 +627,9 @@ actor Algo_DecodeSliceHeader()
 
 	DecRefPicMarking.Launch: action
 				==>
-			TypeOfVLD :[LAUNCH_ACTOR],
-			VLDParam  :[DEC_REF_PIC_MARKING]
+			TypeOfVLD          :[LAUNCH_ACTOR],
+			VLDParam           :[DEC_REF_PIC_MARKING],
+			RefPicMrk_IsNewPic :[IsNewPic]
 		end
 
 

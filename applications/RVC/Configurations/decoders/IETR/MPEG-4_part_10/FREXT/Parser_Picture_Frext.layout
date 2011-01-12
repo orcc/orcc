@@ -33,7 +33,7 @@
       <vertex id="VLDParam" x="1910" y="126"/>
       <vertex id="GetPps" x="576" y="356"/>
       <vertex id="FrameNum" x="565" y="326"/>
-      <vertex id="Mmco" x="786" y="128"/>
+      <vertex id="Mmco" x="821" y="156"/>
       <vertex id="NbRefFrame_l0" x="1123" y="456"/>
       <vertex id="RefList0Type" x="1135" y="533"/>
       <vertex id="RefReordering_l0" x="1123" y="610"/>
@@ -74,5 +74,6 @@
       <vertex id="DecodeSubMbPred" x="1433" y="1238"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="1901" y="1066"/>
       <vertex id="GenerateSkipBlockInformation" x="1909" y="846"/>
+      <vertex id="IsNewPic" x="610" y="638"/>
    </vertices>
 </layout>
