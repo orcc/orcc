@@ -53,6 +53,13 @@ Network::Network(std::string name, std::map<std::string, Port*>* inputs, std::ma
 	setNetwork();
 }
 
+Network::~Network(){
+	delete graph;
+	delete inputs;
+	delete outputs;
+}
+
+
 void Network::setNetwork(){
 	// Create list of instance and actor
 	int vertices = graph->getNbVertices();

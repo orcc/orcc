@@ -209,6 +209,8 @@ void setDirectory(std::string* dir){
 }
 
 int optLevel;
+DecoderEngine* engine;
+
 
 //Check options of the decoder engine
 void setOptions(){
@@ -253,10 +255,19 @@ int runNetwork(Network* network, string inputFile){
 
 	//Load and execute the parsed network
 	pthread_t t1;
-	DecoderEngine engine(Context, fifo , VTLDir, SystemDir, Verbose);
-	engine.load(network, InputDir + inputFile, optLevel, &t1);
+	engine = new DecoderEngine(Context, fifo , VTLDir, SystemDir, Verbose);
+	engine->load(network, InputDir + inputFile, optLevel, &t1);
 
 	return 0;
+}
+
+int stopNetwork(Network* network){
+	if (engine == NULL){
+		cout << "No network are running.\n";
+		return 1;
+	}
+
+	engine->stop(network);
 }
 
 //Console control
@@ -303,16 +314,69 @@ void parseConsole(string cmd){
 
 			runNetwork(it->second, input);
 
+		}else if (cmd == "S"){
+			map<int, Network*>::iterator it;
+			string input;
+			int id;
+
+			//Select network
+			cout << "Select the id of the network to stop : ";
+			cin >> id;
+
+			//Look for the network
+			it = networks.find(id);
+			if(it == networks.end()){
+				cout << "No network loads at the given id.\n";
+				return;
+			}
+
+			//Stop the given network
+			stopNetwork(it->second);
+
+		}else if (cmd == "U"){
+			map<int, Network*>::iterator it;
+			string input;
+			int id;
+
+			//Select network
+			cout << "Select the id of the network to unload : ";
+			cin >> id;
+
+			//Look for the network
+			it = networks.find(id);
+			if(it == networks.end()){
+				cout << "No network loads at the given id.\n";
+				return;
+			}
+			
+			Network* network = it->second;
+			networks.erase(id);
+
+			delete network;
+
+		}else if (cmd == "V"){
+			map<int, Network*>::iterator it;
+			string input;
+
+			for (it = networks.begin(); it != networks.end(); it++){
+				Network* network = it->second;
+				cout << it->first << " : " << network->getName() << "\n";
+			}
 		} else if (cmd == "help"){ 
 			cout << "Command line options :\n";
 			cout << "L : load a network \n";
+			cout << "R : run a network \n";
+			cout << "S : stop a network \n";
+			cout << "U : unload a network \n";
+			cout << "V : list view of the networks loads \n";
+			cout << "X : exit console \n";
 		}
 }
 
 void startConsole(){
 	string cmdLine;
 
-	while (cmdLine != "exit"){
+	while (cmdLine != "X"){
 		cout << "Enter a command (help for documentation) : ";
 		cin >> cmdLine;
 		parseConsole(cmdLine);
@@ -356,6 +420,7 @@ int main(int argc, char **argv) {
 	InitializeNativeTarget();
 
 	setOptions();
+	engine = NULL;
 
 	if (Console){
 		startConsole();

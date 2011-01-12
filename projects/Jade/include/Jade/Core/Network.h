@@ -100,6 +100,11 @@ public:
 	Network(std::string name, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs, HDAGGraph* graph);
 
 
+	/*!
+     *  @brief Delete a network.
+	 */
+	~Network();
+
 	/**
 	 * @brief Getter of graph
 	 *
@@ -108,6 +113,15 @@ public:
 	 * @return HDAGGraph representing the network's contents
 	 */
 	HDAGGraph* getGraph() {	return graph;};
+
+	/**
+	 * @brief Getter of name
+	 *
+	 * Returns the name of the network
+	 * 
+	 * @return the name of the network
+	 */
+	std::string getName() {	return name;};
 
 	/*!
      *  @brief Print network in a dot file.
@@ -142,10 +156,6 @@ private:
 	
 	/** instances of the network  */
 	std::map<std::string, Instance*> instances;
-
-	/** initialization procedure of the network  */
-	Procedure* initialize;
-
 };
 
 #endif

@@ -74,8 +74,9 @@ static int Filesize(){
 	return st.st_size;
 }
 
-RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C): Context(C) {
+RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, bool verbose): Context(C) {
 	this->executionEngine = NULL;
+	this->verbose = verbose;
 }
 
 RoundRobinScheduler::~RoundRobinScheduler (){
@@ -156,10 +157,12 @@ void RoundRobinScheduler::execute(){
 
 	setExternalFunctions();
 
-	cout << "--> Engine initialized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	if (verbose){
+		cout << "--> Engine initialized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+		cout << "-->  Start decoding :\n";
+	}
 
 	//Run decoder
-	cout << "-->  Start decoding :\n";
 	executionEngine->run("main");
 }
 

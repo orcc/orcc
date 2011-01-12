@@ -39,7 +39,18 @@
 #include "Jade/Core/Actor/Procedure.h"
 
 #include "llvm/Constants.h"
+#include "llvm/Function.h"
 //------------------------------
+
+Procedure::~Procedure(){
+	delete external;
+	if (function != NULL){
+		function->removeFromParent();
+	}
+	
+	delete function;
+}
+
 
 bool Procedure::isExternal(){
 	return external->isOne();

@@ -87,6 +87,14 @@ public:
      */
 	int load(Network* network, std::string input, int optLevel, pthread_t* thread = NULL);
 
+	/*!
+     *  @brief Stop the given network
+	 *   
+	 *  @param network : the Network to stop
+	 *
+     */
+	int stop(Network* network);
+
 private:
 	/*!
      *  @brief Parse actors

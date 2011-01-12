@@ -91,7 +91,10 @@ int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t*
 	// Parsing actor
 	parseActors(network);
 
-	cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	if (verbose){
+		cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	}
+
 	timer = clock ();
 
 	//Create decoder
@@ -105,7 +108,9 @@ int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t*
 	
 	//Set the scheduler
 	decoder->setScheduler(new RoundRobinScheduler(Context));
-	cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	if (verbose){
+		cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	}
 	timer = clock ();
 
 	doOptimizeDecoder(decoder);
@@ -113,7 +118,9 @@ int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t*
 	LLVMOptimizer opt(decoder);
 	opt.optimize();
 
-	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	if (verbose){
+		cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	}
 	timer = clock ();
 	
 	LLVMUtility utility;
@@ -132,7 +139,9 @@ int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t*
 	
 	utility.verify("error.txt", decoder);
 
-	cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	if (verbose){
+		cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	}
 	timer = clock ();
 
 	//Start decoding
@@ -142,6 +151,11 @@ int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t*
 		decoder->start();
 	}
 		
+	return 0;
+}
+
+int DecoderEngine::stop(Network* network){
+	decoder->stop();
 	return 0;
 }
 
