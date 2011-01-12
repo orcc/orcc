@@ -160,17 +160,23 @@ $outgoingMap.keys: {instance | $checkNetworkOrActors(instance=instance)$}; separ
 
 checkNetworkOrActors(instance) ::= <<
 $if (instance.actor)
-$$printInstances(inputs=instance.actor.inputs.list,
-                    outputs=instance.actor.outputs.list)$$
+$$printInstances(name=instance.actor.simpleName,
+				 inputs=instance.actor.inputs.list,
+                 outputs=instance.actor.outputs.list)$$
 elseif (instance.broadcast)
-$$printInstances(inputs=instance.broadcast.inputs.list,
-                   outputs=instance.broadcast.outputs.list)$$
+$$printInstances(name=instance.id,
+				 inputs=instance.broadcast.inputs.list,
+                 outputs=instance.broadcast.outputs.list)$$
+elseif (instance.network)
+$$printInstances(name=instance.id,
+				 inputs=instance.broadcast.inputs.list,
+                 outputs=instance.broadcast.outputs.list)$$
 endif$
 >>
 
 
-printInstances(inputs, outputs) ::= <<
-$instance.id$ : entity work.$instance.id$
+printInstances(name, inputs, outputs) ::= <<
+$instance.id$ : entity work.$name$
   port map (
 $if(!inputs.empty)
 $
