@@ -31,59 +31,48 @@ $port.name$_ack    : in  std_logic;
 // Print signals
 //////////////////////////////////////////////////////////////////////////////
 
-printSignals(instance) ::= <<
-$if(instance.actor)
+
+tryPrintSignals(outgoingMap) ::= <<
+$outgoingMap.keys: {instance | $checkInstanceType(instance)$}$
+>>
+
+checkInstanceType(instance) ::= <<
+$if (instance.actor)
 $                                            -- Actor : $instance.id$
-$instance.actor.inputs.list: printSigInput()$
-$instance.actor.outputs.list: printSigOutput()$$
-elseif(instance.network)
-$                                            -- Network : $instance.id$
-$instance.network.inputs.list: printSigInput()$
-$instance.network.outputs.list: printSigOutput()$$
-else
+$printSignals(inputs=instance.actor.inputs.list)$$
+elseif (instance.broadcast)
 $                                            -- Broadcast : $instance.id$
-$instance.broadcast.outputList: printBroadOutput(); separator="\n"$$
+$printSignals(inputs=instance.broadcast.inputs.list)$$
+elseif (instance.network)
+$                                            -- Network : $instance.id$
+$printSignals(inputs=instance.network.inputs.list)$$
 endif$
 >>
 
-
-printBroadOutput(num) ::= <<
-
-$if(instance.broadcast.type.bool)
-$signal $instance.id$_output_$num$_data_out   : std_logic;$
-else
-$signal $instance.id$_output_$num$_data_out   : std_logic_vector($instance.broadcast.type.size$ - 1 downto 0);$
+printSignals(inputs) ::= <<
+$if(!inputs.empty)
+$$network.incomingMap.(instance):printInSignals()$$
 endif$
-
-signal $instance.id$_output_$num$_send       : std_logic;
-signal $instance.id$_output_$num$_ack        : std_logic;
->> 
-
-
-printSigInput(port) ::= <<
-
-$if(port.type.bool)
-$signal $instance.id$_$port.name$_data_in   : std_logic;$
-else
-$signal $instance.id$_$port.name$_data_in   : std_logic_vector($port.type.size$ - 1 downto 0);$
-endif$
-
-signal $instance.id$_$port.name$_send      : std_logic;
-signal $instance.id$_$port.name$_ack       : std_logic;
 >>
 
-printSigOutput(port) ::= <<
+printInSignals(connection) ::= <<
+$printInSignal(connection=connection, map=network.predecessorsMap.(instance))$
+>>
 
---
-$if(port.type.bool)
-$signal $instance.id$_$port.name$_data_out   : std_logic;$
+printInSignal(connection, map) ::= <<
+$if(map.(connection.target))
+$$if(connection.target.type.bool)
+$signal $instance.id$_$connection.target$_data   : std_logic;$
 else
-$signal $instance.id$_$port.name$_data_out   : std_logic_vector($port.type.size$ - 1 downto 0);$
+$signal $instance.id$_$connection.target$_data   : std_logic_vector($connection.target.type.size$ - 1 downto 0);$
 endif$
 
-signal $instance.id$_$port.name$_send       : std_logic;
-signal $instance.id$_$port.name$_ack        : std_logic;
->> 
+signal $instance.id$_$connection.target$_send   : std_logic;
+signal $instance.id$_$connection.target$_ack    : std_logic;
+$
+endif$
+>>
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print FIFOs instantiation
@@ -213,6 +202,10 @@ endif$
 // print broadcasts instantiation
 ///////////////////////////////////////////////////////////////////////////////
 
+
+
+
+
 printActorPorts(instance) ::= <<
 $instance.actor.inputs.list: printPortsInput(); separator="\n"$
 $instance.actor.outputs.list: printPortsOutput(); separator="\n"$
@@ -252,14 +245,30 @@ $instance.id$_output_$num$_ack      <= $instance.id$_ack;
 ///////////////////////////////////////////////////////////////////////////////
 
 network(debugFifos, fifoSize, network, options) ::= <<
-------------------------------------------------------------------------------
--- Generated from $network.name$ actor
-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Title      : $network.name$
+-- Project    : 
+-------------------------------------------------------------------------------
+-- File       : $network.name$.vhd
+-- Author     : Orcc - VHDL
+-- Company    : 
+-- Created    : 
+-- Standard   : VHDL'93
+-------------------------------------------------------------------------------
+-- Copyright (c)  
+-------------------------------------------------------------------------------
+-- Revisions  :
+-- Date        Version  Author  Description
+-- 
+-------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+
+------------------------------------------------------------------------------
 entity $network.name$ is
   generic (
   SIZE : integer := $fifoSize$);
@@ -270,12 +279,13 @@ entity $network.name$ is
 end $network.name$;
 
 
+------------------------------------------------------------------------------
 architecture rtl_$network.name$ of $network.name$ is
 
   ---------------------------------------------------------------------------
   -- Signals declaration
   ---------------------------------------------------------------------------
-  $network.instances : printSignals(); separator="\n"$
+  $tryPrintSignals(network.outgoingMap); separator="\n"$
   ---------------------------------------------------------------------------
 
 begin
