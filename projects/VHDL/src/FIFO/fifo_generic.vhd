@@ -63,8 +63,9 @@ entity fifo_generic is
     data_in  : in  std_logic_vector(width -1 downto 0);
     --
     rd_clk   : in  std_logic;
-    data_out : out std_logic_vector(width -1 downto 0);
     send     : out std_logic;
+    rd_ack   : in  std_logic;
+    data_out : out std_logic_vector(width -1 downto 0);
     --
     full     : out std_logic;
     empty    : out std_logic);
