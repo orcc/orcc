@@ -34,7 +34,7 @@
 #define KEEP_RATIO 0.5
 #define CROSS_OVER_RATIO 0.6
 
-struct monitor_s {
+struct genetic_s {
 	struct sync_s *sync;
 	struct actor_s **actors;
 	struct scheduler_s **schedulers;

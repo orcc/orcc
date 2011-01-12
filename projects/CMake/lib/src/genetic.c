@@ -34,114 +34,79 @@
 #include "orcc_genetic.h"
 #include "orcc_thread.h"
 
-static population* initialize_population(struct actor_s **actors, int actorsNb, int availCoresNb);
-static population* compute_next_population(population *pop, int actorsNb, int availCoresNb);
-static void compute_new_mapping(individual *individual, struct scheduler_s **schedulers, int threadsNb, int actorsNb);
-static void crossover(individual **children, individual **parents, int actorsNb);
-static individual* mutation(individual *original, int actorsNb, int availCoresNb);
-static int compare(void const *a, void const *b);
 
-void *monitor(void *data) {
-	struct monitor_s *monitoring = (struct monitor_s *) data;
-	int evalIndNb = 0;
-	population *population;
+static int compare(void const *a, void const *b)
+{
+	individual const **pi1 = (individual const **) a;
+	individual const **pi2 = (individual const **) b;
+	individual const *i1 = *pi1;
+	individual const *i2 = *pi2;
 
-	// Initialize
-	printf("\nGenerate initial population...\n\n");
-	population = initialize_population(monitoring->actors,
-			monitoring->actorsNb, monitoring->threadsNb);
-
-	compute_new_mapping(population->individuals[evalIndNb],
-			monitoring->schedulers, monitoring->threadsNb, monitoring->actorsNb);
-
-	while (1) {
-		int i;
-		float fps;		
-		
-		// wakeup all threads
-		for (i = 0; i < monitoring->threadsNb; i++) {
-			sem_post(&monitoring->sync->sem_threads);
-		}
-
-		// wait threads synchro
-		
-		for (i = 0; i < monitoring->sync->threadsNb; i++) {
-			sem_wait(&monitoring->sync->sem_monitor);
-		}
-
-		// work process
-		fps = compute_fps_sync();;
-		population->individuals[evalIndNb]->fps = fps;
-		printf("Evaluation of mapping %i = %f fps\n",evalIndNb,fps);
-
-		evalIndNb++;
-
-		if (evalIndNb == POPULATION_SIZE) {
-			printf("\nCompute next generation...\n\n");
-			population = compute_next_population(population,
-					monitoring->actorsNb, monitoring->threadsNb);
-			evalIndNb = 0;
-		}
-		compute_new_mapping(population->individuals[evalIndNb],
-				monitoring->schedulers, monitoring->threadsNb,
-				monitoring->actorsNb);
-	}
-
-	return NULL;
+	return i2->fps - i1->fps;
 }
 
-static void compute_new_mapping(individual *individual, struct scheduler_s **schedulers, int threadsNb, int actorsNb) {
+
+static void crossover(individual **children, individual **parents, struct genetic_s *genetic_info) {
+	int i, cut = rand() % (genetic_info->actorsNb - 1) + 1;
+
+	children[0] = (individual*) malloc(sizeof(individual));
+	children[1] = (individual*) malloc(sizeof(individual));
+	children[0]->genes = (gene**) malloc(genetic_info->actorsNb * sizeof(gene*));
+	children[1]->genes = (gene**) malloc(genetic_info->actorsNb * sizeof(gene*));
+
+	for (i = 0; i < genetic_info->actorsNb; i++) {
+		children[0]->genes[i] = (gene*) malloc(sizeof(gene));
+		children[1]->genes[i] = (gene*) malloc(sizeof(gene));
+		if (i < cut) {
+			children[0]->genes[i] = parents[0]->genes[i];
+			children[1]->genes[i] = parents[1]->genes[i];
+		} else {
+			children[0]->genes[i] = parents[1]->genes[i];
+			children[1]->genes[i] = parents[0]->genes[i];
+		}
+	}
+}
+
+
+static individual* mutation(individual *original, struct genetic_s *genetic_info) {
+	individual *mutated = (individual*) malloc(sizeof(individual));
+	int i, mutatedIndex = rand() % genetic_info->actorsNb;
+
+	mutated->genes = (gene**) malloc(genetic_info->actorsNb * sizeof(gene*));
+	mutated->fps = -1;
+
+	for (i = 0; i < genetic_info->actorsNb; i++) {
+		mutated->genes[i] = (gene*) malloc(sizeof(gene));
+
+		mutated->genes[i] = original->genes[i];
+		if (i == mutatedIndex) {
+			mutated->genes[i]->mappedCore = rand() % genetic_info->threadsNb;
+		}
+	}
+
+	return mutated;
+}
+
+
+static void compute_new_mapping(individual *individual, struct genetic_s *genetic_info) {
 	int i, j, k;
 
-	for (i = 0; i < threadsNb; i++) {
-		struct actor_s **actors = (struct actor_s **) malloc(actorsNb * sizeof(struct actor_s *));
+	for (i = 0; i < genetic_info->threadsNb; i++) {
+		struct actor_s **actors = (struct actor_s **) malloc(genetic_info->actorsNb * sizeof(struct actor_s *));
 		k = 0;
 
-		for (j = 0; j < actorsNb; j++) {
+		for (j = 0; j < genetic_info->actorsNb; j++) {
 			if (individual->genes[j]->mappedCore == i) {
 				actors[k] = individual->genes[j]->actor;
 				k++;
 			}
 		}
-		sched_reinit(schedulers[i], k, actors);
+		sched_reinit(genetic_info->schedulers[i], k, actors);
 	}
 }
 
-static population* initialize_population(struct actor_s **actors, int actorsNb,
-		int availCoresNb) {
-	int i, j;
 
-	// Allocate memory to store the new population
-	population *pop = (population *) malloc(sizeof(population));
-	individual **individuals = (individual**) malloc(POPULATION_SIZE
-			* sizeof(individual*));
-
-	// Initialize population fields
-	pop->individuals = individuals;
-	pop->generationNb = 0;
-
-	// Initialize random function
-	srand(time(NULL));
-
-	// Initialize first generation of individuals
-	for (i = 0; i < POPULATION_SIZE; i++) {
-		pop->individuals[i] = malloc(sizeof(individual));
-		pop->individuals[i]->genes = malloc(actorsNb * sizeof(gene*));
-		pop->individuals[i]->fps = -1;
-
-		// Initialize genes randomly
-		for (j = 0; j < actorsNb; j++) {
-			pop->individuals[i]->genes[j] = malloc(sizeof(gene));
-			pop->individuals[i]->genes[j]->actor = actors[j];
-			pop->individuals[i]->genes[j]->mappedCore = rand() % availCoresNb;
-		}
-	}
-
-	return pop;
-}
-
-static population* compute_next_population(population *pop, int actorsNb,
-		int availCoresNb) {
+static population* compute_next_population(population *pop, struct genetic_s *genetic_info) {
 	int i;
 
 	// Allocate memory to store the new population
@@ -153,8 +118,20 @@ static population* compute_next_population(population *pop, int actorsNb,
 	nextPop->individuals = individuals;
 	nextPop->generationNb = pop->generationNb + 1;
 
+	printf("FPS unsort:");
+		for (i = 0; i < POPULATION_SIZE; i++) {
+			printf(" %f",pop->individuals[i]->fps);
+		}
+		printf("\n");
+
 	// Sort population by descending fps value
-	qsort(pop->individuals, sizeof(pop->individuals)/sizeof(*pop->individuals), sizeof(*pop->individuals), compare);
+	qsort(pop->individuals, POPULATION_SIZE, sizeof(individual*), compare);
+
+	printf("FPS sort:");
+	for (i = 0; i < POPULATION_SIZE; i++) {
+		printf(" %f",pop->individuals[i]->fps);
+	}
+	printf("\n");
 
 	// Backup better individuals
 	for (i = 0; i < POPULATION_SIZE * KEEP_RATIO; i++) {
@@ -175,7 +152,7 @@ static population* compute_next_population(population *pop, int actorsNb,
 		parents[0] = pop->individuals[rand() % POPULATION_SIZE];
 		parents[1] = pop->individuals[rand() % POPULATION_SIZE];
 
-		crossover(children, parents, actorsNb);
+		crossover(children, parents, genetic_info);
 
 		nextPop->individuals[i] = children[0];
 		nextPop->individuals[i + 1] = children[1];
@@ -183,7 +160,7 @@ static population* compute_next_population(population *pop, int actorsNb,
 
 	// Mutation
 	for (; i < POPULATION_SIZE; i++) {
-		nextPop->individuals[i] = mutation(pop->individuals[rand() % POPULATION_SIZE], actorsNb, availCoresNb);
+		nextPop->individuals[i] = mutation(pop->individuals[rand() % POPULATION_SIZE], genetic_info);
 	}
 
 	// TODO: Remove old population and unused individuals from memory
@@ -191,81 +168,81 @@ static population* compute_next_population(population *pop, int actorsNb,
 	return nextPop;
 }
 
-static void crossover(individual **children, individual **parents, int actorsNb) {
-	int i, cut = rand() % (actorsNb - 1) + 1;
 
-	children[0] = (individual*) malloc(sizeof(individual));
-	children[1] = (individual*) malloc(sizeof(individual));
-	children[0]->genes = (gene**) malloc(actorsNb * sizeof(gene*));
-	children[1]->genes = (gene**) malloc(actorsNb * sizeof(gene*));
+static population* initialize_population(struct genetic_s *genetic_info) {
+	int i, j;
 
-	for (i = 0; i < actorsNb; i++) {
-		children[0]->genes[i] = (gene*) malloc(sizeof(gene));
-		children[1]->genes[i] = (gene*) malloc(sizeof(gene));
-		if (i < cut) {
-			children[0]->genes[i] = parents[0]->genes[i];
-			children[1]->genes[i] = parents[1]->genes[i];
-		} else {
-			children[0]->genes[i] = parents[1]->genes[i];
-			children[1]->genes[i] = parents[0]->genes[i];
-		}
-	}
-}
+	// Allocate memory to store the new population
+	population *pop = (population *) malloc(sizeof(population));
+	individual **individuals = (individual**) malloc(POPULATION_SIZE
+			* sizeof(individual*));
 
-static individual* mutation(individual *original, int actorsNb, int availCoresNb) {
-	individual *mutated = (individual*) malloc(sizeof(individual));
-	int i, mutatedIndex = rand() % actorsNb;
+	// Initialize population fields
+	pop->individuals = individuals;
+	pop->generationNb = 0;
 
-	mutated->genes = (gene**) malloc(actorsNb * sizeof(gene*));
-	mutated->fps = -1;
+	// Initialize random function
+	srand(time(NULL));
 
-	for (i = 0; i < actorsNb; i++) {
-		mutated->genes[i] = (gene*) malloc(sizeof(gene));
+	// Initialize first generation of individuals
+	for (i = 0; i < POPULATION_SIZE; i++) {
+		pop->individuals[i] = malloc(sizeof(individual));
+		pop->individuals[i]->genes = malloc(genetic_info->actorsNb * sizeof(gene*));
+		pop->individuals[i]->fps = -1;
 
-		mutated->genes[i] = original->genes[i];
-		if (i == mutatedIndex) {
-			mutated->genes[i]->mappedCore = rand() % availCoresNb;
+		// Initialize genes randomly
+		for (j = 0; j < genetic_info->actorsNb; j++) {
+			pop->individuals[i]->genes[j] = malloc(sizeof(gene));
+			pop->individuals[i]->genes[j]->actor = genetic_info->actors[j];
+			pop->individuals[i]->genes[j]->mappedCore = rand() % genetic_info->threadsNb;
 		}
 	}
 
-	return mutated;
+	return pop;
 }
 
-static int partition(population *pop, int p, int r) {
-	int pivot = pop->individuals[p]->fps, i = p - 1, j = r + 1;
-	individual *temp;
-	printf("partition\n");
+
+void *monitor(void *data) {
+	struct genetic_s *genetic_info = (struct genetic_s *) data;
+	int evalIndNb = 0;
+	population *population;
+
+	// Initialize
+	printf("\nGenerate initial population...\n\n");
+	population = initialize_population(genetic_info);
+
+	compute_new_mapping(population->individuals[evalIndNb], genetic_info);
+
 	while (1) {
-		do
-			j--;
-		while (pop->individuals[j]->fps < pivot);
-		do
-			i++;
-		while (pop->individuals[i]->fps > pivot);
-		if (i < j) {
-			temp = pop->individuals[i];
-			pop->individuals[i] = pop->individuals[j];
-			pop->individuals[j] = temp;
-		} else
-			return j;
+		int i;
+		float fps;
+
+		// wakeup all threads
+		for (i = 0; i < genetic_info->threadsNb; i++) {
+			sem_post(&genetic_info->sync->sem_threads);
+		}
+
+		// wait threads synchro
+
+		for (i = 0; i < genetic_info->sync->threadsNb; i++) {
+			sem_wait(&genetic_info->sync->sem_monitor);
+		}
+
+		// work process
+		fps = compute_fps_sync();;
+		population->individuals[evalIndNb]->fps = fps;
+		printf("Evaluation of mapping %i = %f fps\n",evalIndNb,fps);
+
+		evalIndNb++;
+
+		if (evalIndNb == POPULATION_SIZE) {
+			printf("\nCompute next generation...\n\n");
+			population = compute_next_population(population, genetic_info);
+			evalIndNb = 0;
+		}
+		compute_new_mapping(population->individuals[evalIndNb], genetic_info);
 	}
-}
 
-static void quicksort(population *pop, int p, int r) {
-	int q;
-	printf("quicksort\n");
-	if (p < r) {
-		q = partition(pop, p, r);
-		quicksort(pop, p, q);
-		quicksort(pop, q + 1, r);
-	}
-}
-
-static int compare(void const *a, void const *b)
-{
-	individual const *i1 = (individual const *) a;
-	individual const *i2 = (individual const *) b;
-
-	return i1->fps - i2->fps;
+	return NULL;
 }
 

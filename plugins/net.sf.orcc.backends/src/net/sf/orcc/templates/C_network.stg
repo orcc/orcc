@@ -348,7 +348,7 @@ static void scheduler() {
 	struct scheduler_s *schedulers[$length(options.threads)$] = {$options.threads.keys: {&sched_$it$}; separator=", "$};
 	
 	struct sync_s sched_sync;
-	struct monitor_s monitoring = {
+	struct genetic_s monitoring = {
 		.sync = &sched_sync,
 		.actors = actors,
 		.schedulers = schedulers,
