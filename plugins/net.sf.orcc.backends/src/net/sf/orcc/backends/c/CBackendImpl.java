@@ -61,6 +61,7 @@ import net.sf.orcc.tools.classifier.ActorClassifier;
  * C back-end.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class CBackendImpl extends AbstractBackend {
@@ -138,6 +139,10 @@ public class CBackendImpl extends AbstractBackend {
 
 		needPthreads = (threads.keySet().size() > 1);
 		printer.getOptions().put("needPthreads", needPthreads);
+		printer.getOptions().put("needDynamicMapping",
+				getAttribute("net.sf.orcc.backends.dynamicMapping", false));
+		printer.getOptions().put("threadsNb",
+				getAttribute("net.sf.orcc.backends.processorsNumber", "1"));
 	}
 
 	@Override

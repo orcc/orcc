@@ -13,6 +13,25 @@ include_directories(${SDL_INCLUDE_DIR} ${SDLIMAGE_INCLUDE_DIR})
 
 # Orcc library
 include_directories(${orcc_SOURCE_DIR}/include)
+
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+add_library (orcc
+${orcc_SOURCE_DIR}/src/cJSON.c
+
+${orcc_SOURCE_DIR}/src/compareyuv.c
+${orcc_SOURCE_DIR}/src/display.c
+${orcc_SOURCE_DIR}/src/getopt.c
+${orcc_SOURCE_DIR}/src/img_display.c
+${orcc_SOURCE_DIR}/src/img_read.c
+${orcc_SOURCE_DIR}/src/scheduler.c
+${orcc_SOURCE_DIR}/src/source.c
+${orcc_SOURCE_DIR}/src/writer.c
+${orcc_SOURCE_DIR}/src/source_no_loop.c
+${orcc_SOURCE_DIR}/src/orcc_util.c
+${orcc_SOURCE_DIR}/src/thread.c
+${orcc_SOURCE_DIR}/src/genetic.c
+)
+else()
 add_library (orcc
 ${orcc_SOURCE_DIR}/src/cJSON.c
 
@@ -27,6 +46,7 @@ ${orcc_SOURCE_DIR}/src/writer.c
 ${orcc_SOURCE_DIR}/src/source_no_loop.c
 ${orcc_SOURCE_DIR}/src/orcc_util.c
 )
+endif()
 
 install (TARGETS orcc DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include/orcc PATTERN ".svn" EXCLUDE)

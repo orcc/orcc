@@ -187,7 +187,7 @@ $instances: printInitialize()$
 printSchedulers(isPointer) ::= <<
 struct actor_s *my_actor;
 struct schedinfo_s si;
-$if(options.needSync)$
+$if(options.needDynamicMapping)$
 clock_t start, end;
 start = clock ();
 
@@ -202,7 +202,7 @@ while (1) {
 #ifdef PRINT_FIRINGS
   printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 #endif
-  $if(options.needSync)$
+  $if(options.needDynamicMapping)$
   end = clock ();
     if((((end - start) / (double)CLOCKS_PER_SEC) >= SYNC_DELAY)){
       sem_post(&sched->sync->sem_monitor);
@@ -220,6 +220,36 @@ printThread() ::= <<
 void *thread_scheduler(void *data) {
   struct scheduler_s *sched = data;
   $printSchedulers("true")$
+}
+>>
+
+printThreadManagment() ::= <<
+////////////////////////////////////////////////////////////////////////////////
+// Threads
+
+#ifdef _WIN32
+typedef long cpu_set_t;
+#endif
+
+void clear_cpu_set(cpu_set_t *cpuset) {
+#ifdef _WIN32
+	*cpuset = 0;
+#else
+	CPU_ZERO(cpuset);
+#endif
+}
+
+void orcc_set_affinity(cpu_set_t *cpuset, int proc_num, pthread_t tid) {
+#ifdef _WIN32
+	*cpuset = 1 << proc_num;
+	// need to get the handle
+	// SetThreadAffinityMask(tid, cpuset);
+#else
+	CPU_SET(proc_num, cpuset);
+	if (pthread_setaffinity_np(tid, sizeof(cpu_set_t), cpuset) < 0) {
+		perror("pthread_setaffinity_np");
+	}
+#endif
 }
 >>
 
@@ -257,7 +287,11 @@ $if (options.needPthreads)$
 #endif
 #include <pthread.h>
 $endif$
-$if (options.needSync)$
+$if (options.needDynamicMapping)$
+#ifndef _WIN32
+#define __USE_GNU
+#endif
+#include <pthread.h>
 #include <semaphore.h>
 $endif$
 
@@ -265,7 +299,7 @@ $endif$
 #include "orcc_fifo.h"
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
-$if(options.needSync)$
+$if(options.needDynamicMapping)$
 #include "orcc_thread.h"
 #include "orcc_genetic.h"
 
@@ -274,6 +308,13 @@ $endif$
 
 #define SIZE $fifoSize$
 // #define PRINT_FIRINGS
+
+$if(options.needDynamicMapping)$
+$printThreadManagment()$
+$endif$
+$if(options.needPthreads)$
+$printThreadManagment()$
+$endif$
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
@@ -290,35 +331,6 @@ $declareBroadcasts(network.instances)$
 $declareInitializes(network.instances)$
 $declareSchedulers(network.instances)$
 
-$if (options.needPthreads)
-$////////////////////////////////////////////////////////////////////////////////
-// Threads
-
-#ifdef _WIN32
-typedef long cpu_set_t;
-#endif
-
-void clear_cpu_set(cpu_set_t *cpuset) {
-#ifdef _WIN32
-	*cpuset = 0;
-#else
-	CPU_ZERO(cpuset);
-#endif
-}
-
-void orcc_set_affinity(cpu_set_t *cpuset, int proc_num, pthread_t tid) {
-#ifdef _WIN32
-	*cpuset = 1 << proc_num;
-	// need to get the handle
-	// SetThreadAffinityMask(tid, cpuset);
-#else
-	CPU_SET(proc_num, cpuset);
-	if (pthread_setaffinity_np(tid, sizeof(cpu_set_t), cpuset) < 0) {
-		perror("pthread_setaffinity_np");
-	}
-#endif
-}
-$endif$
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of a struct actor for each actor
@@ -332,51 +344,20 @@ $fillActorsStructs(network.instances)$
 
 $if(options.needPthreads)$
 
-$if(options.needSync)$
-$declareActorsArray(instances=network.instances)$
-$else$
 $options.threads.keys: {$declareActorsArray(thread=it,instances=options.threads.(it))$}; separator="\n"$
-
-extern void remove_fps_printing();
-$endif$
-
 
 $printThread()$
 
 static void scheduler() {
 	cpu_set_t cpuset;
-	pthread_t $options.threads.keys: {thread_$it$}; separator=", "$$if(options.needSync)$, thread_monitor$endif$;
+	pthread_t $options.threads.keys: {thread_$it$}; separator=", "$;
 	struct scheduler_s $options.threads.keys: {sched_$it$}; separator=", "$;
-	$if(options.needSync)$
-	struct scheduler_s *schedulers[$length(options.threads)$] = {$options.threads.keys: {&sched_$it$}; separator=", "$};
-	
-	struct sync_s sched_sync;
-	struct genetic_s monitoring = {
-		.sync = &sched_sync,
-		.actors = actors,
-		.schedulers = schedulers,
-		.actorsNb = sizeof(actors) / sizeof(actors[0]),
-		.threadsNb = $length(options.threads)$
-	};
-	
-	sync_init(&sched_sync,$length(options.threads)$);
-	$endif$
 	
 	$printInitializes(network.instances)$
 	
-	$if(options.needSync)$
-	remove_fps_printing();
-	
-	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);}; separator="\n"$
-	$else$
 	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors_$it$) / sizeof(actors_$it$[0]), actors_$it$, NULL);}; separator="\n"$
-	$endif$
 	
 	$options.threads.keys: {pthread_create(&thread_$it$, NULL, thread_scheduler, (void *) &sched_$it$);}; separator="\n"$
-	
-	$if(options.needSync)$
-	pthread_create(&thread_monitor, NULL, monitor, (void *) &monitoring);
-	$endif$
 
 	clear_cpu_set(&cpuset);
 	$options.threads.keys: {orcc_set_affinity(&cpuset, $i0$, thread_$it$);}; separator="\n"$
@@ -384,7 +365,57 @@ static void scheduler() {
 	$options.threads.keys: {pthread_join(thread_$it$, NULL);}; separator="\n"$
 }
 
+$elseif(options.needDynamicMapping)$
+
+$declareActorsArray(instances=network.instances)$
+
+extern void remove_fps_printing();
+
+
+$printThread()$
+
+static void scheduler() {
+	int i;
+	
+	cpu_set_t cpuset;
+	pthread_t threads[$options.threadsNb$], thread_monitor;
+	
+	struct scheduler_s *schedulers[$options.threadsNb$];
+	struct sync_s sched_sync;
+	struct genetic_s monitoring = {
+		.sync = &sched_sync,
+		.actors = actors,
+		.schedulers = schedulers,
+		.actorsNb = sizeof(actors) / sizeof(actors[0]),
+		.threadsNb = $options.threadsNb$
+	};
+	
+	sync_init(&sched_sync,$options.threadsNb$);
+	
+	$printInitializes(network.instances)$
+	
+	remove_fps_printing();
+	
+	for(i=0; i<$options.threadsNb$; i++){
+		schedulers[i] = malloc(sizeof(struct scheduler_s));
+		sched_init(schedulers[i], sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);
+		pthread_create(&threads[i], NULL, thread_scheduler, (void *) schedulers[i]); 
+	}
+	pthread_create(&thread_monitor, NULL, monitor, (void *) &monitoring);
+
+	clear_cpu_set(&cpuset);
+	for(i=0; i<$options.threadsNb$; i++){
+		orcc_set_affinity(&cpuset, i, threads[i]);
+	}
+	
+	for(i=0; i<$options.threadsNb$; i++){
+		pthread_join(threads[i], NULL);
+	}
+	pthread_join(thread_monitor,NULL);
+}
+
 $else$
+
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
