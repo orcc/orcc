@@ -64,6 +64,7 @@ Decoder::Decoder(llvm::LLVMContext& C, Network* network, AbstractFifo* fifo): Co
 	this->network = network;
 	this->fifo = fifo;
 	this->instances = network->getInstances();
+	thread = NULL;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
@@ -141,8 +142,16 @@ void Decoder::start(){
 	scheduler->execute();
 }
 
+void Decoder::stop(){
+	int ret = pthread_cancel (*thread);
+	cout << ret;
+}
+
 void Decoder::startInThread(pthread_t* thread){
+	this->thread = thread;
 	pthread_create( thread, NULL, &Decoder::threadStart, this );
+	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 }
 
 void* Decoder::threadStart( void* args ){

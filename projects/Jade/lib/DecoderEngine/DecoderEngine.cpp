@@ -134,19 +134,25 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	timer = clock ();
 
 	//Start decoding
+	llvm_start_multithreaded();
 	pthread_t th1;
 	void *ret;
+	string test;
 
 	decoder.startInThread(&th1);
-	//decoder.start();
+	
+	system("pause");
+
+	decoder.stop();
+	cout << "-->   Stop decoding. \n";
+	llvm_stop_multithreaded();
 	
 	(void)pthread_join (th1, &ret);
 	
-	cout << "-->   Stop decoding. \n";
 	timer = clock ();
 
 
-	system("pause");
+	
 	return 0;
 }
 

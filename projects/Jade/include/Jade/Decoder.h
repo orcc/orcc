@@ -183,6 +183,12 @@ public:
 	void startInThread(pthread_t* thread);
 
 	/**
+     *  @brief Stop the execution of the decoder
+	 *
+     */
+	void stop();
+
+	/**
 	 * @brief Compile the decoder
 	 * 
 	 * Compile the decoder using an XDF Network and the VTL. Compilation may include
@@ -196,6 +202,10 @@ public:
 
 
 private:
+	/**
+     *  @brief Static method for launching decoder in a thread
+	 *
+     */
 	static void* threadStart( void* args );
 
 	/** Module containing the final decoder */
@@ -226,6 +236,9 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Current thread used by the decoder */
+	pthread_t* thread;
 
 };
 
