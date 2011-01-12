@@ -28,30 +28,38 @@
  */
 
 /**
-@brief Implementation of class Procedure
+@brief Description of the Procedure ActionScheduler interface
 @author Jerome Gorin
-@file Procedure.cpp
+@file Scheduler.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#include "Jade/Core/Actor/Procedure.h"
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
-#include "llvm/Constants.h"
-#include "llvm/Function.h"
+#include <string>
 //------------------------------
 
-Procedure::~Procedure(){
-	//delete external;
-	if (function != NULL){
-		function->eraseFromParent();
-	}
-	
-	delete function;
-}
+/**
+ * @brief  This class defines an abstract scheduler of a decoder.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class Scheduler {
+public:
+	/**
+     *  @brief Constructor
+     *
+	 *	Create a scheduler
+     */
+	Scheduler(){};
+	virtual ~Scheduler(){};
+	virtual void createScheduler(Decoder* decoder){};
+	virtual void execute(std::string stimulus){};
+	virtual void stop(){};
+};
 
-
-bool Procedure::isExternal(){
-	return external->isOne();
-}
+#endif

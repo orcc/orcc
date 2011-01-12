@@ -71,6 +71,10 @@ BroadcastActor::BroadcastActor(llvm::LLVMContext& C, string name, int numOutputs
 	createActor();
 }
 
+BroadcastActor::~BroadcastActor(){
+
+}
+
 void BroadcastActor::createActor(){
 	// Getting type of fifo
 	StructType* structType = fifo->getFifoType(cast<IntegerType>(type));

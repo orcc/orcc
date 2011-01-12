@@ -76,7 +76,11 @@ Decoder::~Decoder (){
 
 void Decoder::addInstance(Instance* instance){
 	instances->insert(std::pair<std::string, Instance*>(instance->getId(), instance));
-};
+}
+
+void Decoder::addSpecific(Actor* actor){
+	specificActors.push_back(actor);
+}
 
 Actor* Decoder::getActor(std::string name){
 	map<string, Actor*>::iterator it;
@@ -133,7 +137,7 @@ bool Decoder::compile(map<string, Actor*>* actors){
 	return true;
 }
 
-void Decoder::setScheduler(RoundRobinScheduler* scheduler){
+void Decoder::setScheduler(Scheduler* scheduler){
 	this->scheduler = scheduler;
 	scheduler->createScheduler(this);
 }
@@ -150,8 +154,6 @@ void Decoder::stop(){
 
 void Decoder::startInThread(pthread_t* thread){
 	this->thread = thread;
-/*	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);*/
 	pthread_create( thread, NULL, &Decoder::threadStart, this );
 }
 
@@ -159,4 +161,8 @@ void* Decoder::threadStart( void* args ){
 	Decoder* decoder = static_cast<Decoder*>(args);
 	decoder->start();
 	return NULL;
+}
+
+void Decoder::remove(Instance* instance){
+
 }

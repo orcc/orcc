@@ -110,6 +110,7 @@ public:
 		this->initializes = NULL;
 		this->actions = NULL;
 		this->actionScheduler = NULL;
+		actor->addInstance(this);
 	}
 
 	~Instance();

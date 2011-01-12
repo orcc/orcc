@@ -47,6 +47,8 @@ namespace llvm{
 class JIT;
 class Decoder;
 class LLVMExecution;
+
+#include "Scheduler.h"
 //------------------------------
 
 /**
@@ -55,7 +57,7 @@ class LLVMExecution;
  * @author Jerome Gorin
  * 
  */
-class RoundRobinScheduler {
+class RoundRobinScheduler : public Scheduler {
 public:
 	/**
      *  @brief Constructor

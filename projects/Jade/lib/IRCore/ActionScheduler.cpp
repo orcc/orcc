@@ -28,30 +28,22 @@
  */
 
 /**
-@brief Implementation of class Procedure
+@brief Implementation of class ActionScheduler
 @author Jerome Gorin
-@file Procedure.cpp
+@file ActionScheduler.cpp
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#include "Jade/Core/Actor/Procedure.h"
-
-#include "llvm/Constants.h"
 #include "llvm/Function.h"
+
+#include "Jade/Core/Actor/ActionScheduler.h"
 //------------------------------
 
-Procedure::~Procedure(){
-	//delete external;
-	if (function != NULL){
-		function->eraseFromParent();
-	}
-	
-	delete function;
-}
+using namespace std;
 
-
-bool Procedure::isExternal(){
-	return external->isOne();
+ActionScheduler::~ActionScheduler(){
+	schedulerFunction->eraseFromParent();
+	initializeFunction->eraseFromParent();
 }

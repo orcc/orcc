@@ -101,7 +101,7 @@ public:
 		std::map<std::string, Port*>* outputs, std::map<std::string, Variable*>* stateVars, 
 		std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures, 
 		std::list<Action*>* initializes, std::list<Action*>* actions, ActionScheduler* actionScheduler);
-	~Actor();
+	virtual ~Actor();
 
 	/**
      *  @brief Add an instance bound to this actor

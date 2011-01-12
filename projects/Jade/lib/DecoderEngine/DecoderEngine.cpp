@@ -110,7 +110,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	}
 	timer = clock ();
 
-	doOptimizeDecoder(decoder);
+	//doOptimizeDecoder(decoder);
 
 	LLVMOptimizer opt(decoder);
 	opt.optimize();
@@ -159,7 +159,20 @@ int DecoderEngine::run(Network* network, string input, pthread_t* thread){
 }
 
 int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
+	list<Actor*>::iterator it;
+	list<Actor*>* actors = decoder->getSpecifics();
 
+	for (it = actors->begin(); it != actors->end(); it++){
+		list<Instance*>::iterator itInst;
+		list<Instance*>* instances = (*it)->getInstances();
+
+		for (itInst = instances->begin(); itInst != instances->end(); itInst++){
+
+		}
+	}
+	
+	actors->erase(actors->begin(), actors->end());
+	
 	return 0;
 }
 

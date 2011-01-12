@@ -51,12 +51,14 @@ namespace llvm{
 
 class AbstractFifo;
 class Actor;
+class BroadcastActor;
 class Decoder;
 class Instance;
 class JIT;
 class Network;
 class BroadcastAdder;
-class RoundRobinScheduler;
+
+#include "Jade/Scheduler/Scheduler.h"
 //------------------------------
 
 class Decoder {
@@ -122,6 +124,22 @@ public:
 	void addInstance(Instance* instance);
 
 	/**
+     *  @brief Remove an instance from the decoder
+	 *
+	 *  @param instance: Instance to remove
+     */
+	void remove(Instance* instance);
+
+	/**
+     *  @brief Add a specific actor in the decoder
+	 * 
+	 *	Add an actor specific to this decoder
+	 *
+	 *  @param actor: specific actor to add
+     */
+	void addSpecific(Actor* actor);
+
+	/**
      *  @brief return the actor corresponding to the given name
 	 * 
 	 *	Return an actor corresponding to the given name if the current decoder is contained in the decoder,
@@ -163,6 +181,16 @@ public:
 	Network* getNetwork(){return network;};
 
 	/**
+     *  @brief Getter of a specific actor
+	 *
+	 *	Return the specifics actors to this decoder
+	 * 
+	 *  @return a list of actors
+	 *
+     */
+	std::list<Actor*>* getSpecifics(){return &specificActors;};
+
+	/**
      *  @brief Getter of a stimulus file
 	 * 
 	 *  @return the stimulus file
@@ -183,7 +211,7 @@ public:
 	 *  @param scheduler : the scheduler of the decoder
 	 *
      */
-	void setScheduler(RoundRobinScheduler* scheduler);
+	void setScheduler(Scheduler* scheduler);
 
 	/**
      *  @brief Start the decoder
@@ -237,17 +265,17 @@ private:
 
 
 	/** List of specific actors contained in the decoder */
-	std::map<std::string, Actor*>* specificActors;
+	std::list<Actor*> specificActors;
 
 
-	/** List of instances in the decoder */
+	/** Map of instances in the decoder */
 	std::map<std::string, Instance*>* instances;
 	
 	/** List of Fifo in the decoder */
 	std::list<AbstractFifo*> fifos;
 
 	/** Scheduler of the decoder */
-	RoundRobinScheduler* scheduler;
+	Scheduler* scheduler;
 
 	/** Fifo of the decoder */
 	AbstractFifo* fifo;

@@ -44,6 +44,7 @@
 #include <string>
 
 class Actor;
+class Decoder;
 class Instance;
 class HDAGGraph;
 class Port;
@@ -123,6 +124,24 @@ public:
 	 */
 	std::string getName() {	return name;};
 
+	/**
+	 * @brief Getter of decoder
+	 *
+	 * Returns the decoder bound to the network
+	 * 
+	 * @return the decoder bound to the network
+	 */
+	Decoder* getDecoder() {return decoder;};
+
+	/**
+	 * @brief Setter of decoder
+	 *
+	 * Set the decoder bound to the network
+	 * 
+	 * @param decoder : the decoder bound to the network
+	 */
+	void setDecoder(Decoder* decoder) {this->decoder = decoder;};
+
 	/*!
      *  @brief Print network in a dot file.
 	 *
@@ -156,6 +175,10 @@ private:
 	
 	/** instances of the network  */
 	std::map<std::string, Instance*> instances;
+
+	/** decoder of the instance */
+	Decoder* decoder;
+
 };
 
 #endif

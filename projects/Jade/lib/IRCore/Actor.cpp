@@ -64,7 +64,11 @@ Actor::Actor(string name, string file, map<string, Type*>* fifoTypes, map<string
 }
 
 Actor::~Actor (){
+	list<Instance*>::iterator it;
 
+	for (it = instances.begin(); it != instances.end(); it++){
+		delete(*it);
+	}
 }
 
 void Actor::addInstance(Instance* instance){

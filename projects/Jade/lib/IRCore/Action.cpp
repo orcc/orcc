@@ -58,3 +58,10 @@ string Action::getName(){
 
 	return str;
 }
+
+Action::~Action(){
+	delete tag;
+	delete body;
+	delete scheduler;
+
+}

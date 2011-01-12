@@ -47,6 +47,20 @@
 using namespace std;
 using namespace llvm;
 
+Instance::~Instance(){
+	list<Action*>::iterator it;
+
+	if (actionScheduler != NULL){
+		delete actionScheduler;
+	}
+
+	for (it = actions->begin(); it != actions->end(); it++){
+		delete (*it);
+	}
+
+	delete actions;
+}
+
 Port* Instance::getPort(string portName){
 	Port* port = getInput(portName);
 

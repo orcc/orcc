@@ -74,6 +74,8 @@ public:
 		this->initializeFunction = NULL;
 	};
 
+	~ActionScheduler();
+
 	/**
      *  @brief Getter of scheduler function
      *
@@ -146,9 +148,6 @@ public:
 	 *	@return true if the action scheduler has a scheduler function.
      */
 	bool hasInitializeScheduler(){ return initializeFunction != NULL;};
-
-
-	~ActionScheduler();
 
 private:
 	/** llvm::Function corresponding to the action scheduler */
