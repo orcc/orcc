@@ -82,18 +82,16 @@ Fifo("fifo", CommaSeparated,
 
 // Jade options
 cl::opt<std::string>
-XDFFile("xdf", Required, ValueRequired, desc("XDF network file"), value_desc("XDF filename"));
+XDFFile("xdf", desc("XDF network file"), value_desc("XDF filename"));
 
 cl::opt<std::string> 
 BSDLFile("bsdl", desc("Bitstream description file"), value_desc("BSDL filename"));
 
 cl::opt<std::string> 
-VidFile("i", Required, ValueRequired, desc("Encoded video file"), value_desc("Video filename"));
+VidFile("i", desc("Encoded video file"), value_desc("Video filename"));
 
 cl::opt<std::string>
 VTLDir("L", desc("Video Tools Library directory"),
-	   Required,
-	   ValueRequired,
 	   value_desc("VTL Folder"), 
 	   init(""));
 
