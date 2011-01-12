@@ -149,9 +149,9 @@ void Decoder::stop(){
 
 void Decoder::startInThread(pthread_t* thread){
 	this->thread = thread;
-	pthread_create( thread, NULL, &Decoder::threadStart, this );
 	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
 	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	pthread_create( thread, NULL, &Decoder::threadStart, this );
 }
 
 void* Decoder::threadStart( void* args ){
