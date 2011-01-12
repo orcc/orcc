@@ -71,6 +71,7 @@ public:
 
 	void createScheduler(Decoder* decoder, std::string stimulus);
 	void execute();
+	void stop();
 
 private:
 

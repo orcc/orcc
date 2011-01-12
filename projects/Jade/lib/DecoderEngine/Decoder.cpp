@@ -143,14 +143,15 @@ void Decoder::start(){
 }
 
 void Decoder::stop(){
-	int ret = pthread_cancel (*thread);
-	cout << ret;
+	scheduler->stop();
+	//int ret = pthread_cancel (*thread);
+	//cout << ret;
 }
 
 void Decoder::startInThread(pthread_t* thread){
 	this->thread = thread;
-	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
-	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+/*	pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
+	pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);*/
 	pthread_create( thread, NULL, &Decoder::threadStart, this );
 }
 

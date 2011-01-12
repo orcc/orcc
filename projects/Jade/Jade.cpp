@@ -375,6 +375,7 @@ void startConsole(){
 	string cmdLine;
 
 	while (cmdLine != "X"){
+		cmdLine = "";
 		cout << "Enter a command (help for documentation) : ";
 		cin >> cmdLine;
 		parseConsole(cmdLine);

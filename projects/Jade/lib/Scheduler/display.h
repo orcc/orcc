@@ -69,6 +69,7 @@ static void press_a_key(int code) {
 static Uint32 start_time;
 static int num_images_start;
 static int num_images_end;
+bool verboseDisplay;
 
 void print_fps_avg(void) {
 	Uint32 t = SDL_GetTicks();
@@ -111,7 +112,7 @@ void display_show_image(void) {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	num_images_end++;
 	t2 = SDL_GetTicks();
-	if (t2 - t > 3000) {
+	if ((t2 - t > 3000)&&(verboseDisplay)) {
 		printf("%f images/sec\n",
 			1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
 
@@ -127,7 +128,7 @@ void display_show_image(void) {
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 			case SDL_QUIT:
-				exit_decoder(0);
+				pthread_exit(NULL);
 				break;
 			default:
 				break;
@@ -185,7 +186,7 @@ void display_write_mb(unsigned char tokens[384]) {
 		}else{
 			num_images_end++;
 			int t2 = SDL_GetTicks();
-			if (t2 - t > 3000) {
+			if ((t2 - t > 3000)&&(verboseDisplay)) {
 				printf("%f images/sec\n",
 					1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
 
@@ -207,8 +208,7 @@ static void display_init() {
 
 	start_time = SDL_GetTicks();
 	t = start_time;
-
-	atexit(SDL_Quit);
+	
 	atexit(print_fps_avg);
 }
 
@@ -220,7 +220,10 @@ static void display_set_video(int width, int height) {
 
 	m_width = width;
 	m_height = height;
-	printf("set display to %ix%i\n", width, height);
+
+	if (verboseDisplay){
+		printf("set display to %ix%i\n", width, height);
+	}
 
 	m_screen = SDL_SetVideoMode(m_width, m_height, 24, SDL_HWSURFACE | SDL_DOUBLEBUF);
 	if (m_screen == NULL) {

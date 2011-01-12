@@ -77,6 +77,7 @@ static int Filesize(){
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, bool verbose): Context(C) {
 	this->executionEngine = NULL;
 	this->verbose = verbose;
+	verboseDisplay = verbose;
 }
 
 RoundRobinScheduler::~RoundRobinScheduler (){
@@ -164,6 +165,12 @@ void RoundRobinScheduler::execute(){
 
 	//Run decoder
 	executionEngine->run("main");
+}
+
+void RoundRobinScheduler::stop(){
+	SDL_Event sdlEvent;
+	sdlEvent.type = SDL_QUIT;
+	SDL_PushEvent(&sdlEvent);
 }
 
 void RoundRobinScheduler::setExternalFunctions(){
