@@ -32,9 +32,9 @@ port_out_init(port) ::=<<
 
 $port.name$_isend <= '0';
 $if(port.type.bool)
-$$port.name$_data  <= '0';$
+$$port.name$_idata  <= '0';$
 else
-$$port.name$_data  <= (others => '0');$
+$$port.name$_idata  <= (others => '0');$
 endif$
 >>
 
@@ -47,6 +47,16 @@ endif$
 // does not output anything if $value$ is empty
 listSize(value) ::= <<
 $value : {$it$}; separator=" * "$
+>>
+
+internalSignalsDeclaration(port)::= <<
+signal $port.name$_rdy   : std_logic;
+signal $port.name$_isend : std_logic;
+$if(port.type.bool)
+$signal $port.name$_idata : std_logic;$
+else
+$signal $port.name$_idata : std_logic_vector ($port.type.size$ -1 downto 0);$
+endif$
 >>
 
 signalDeclaration(variable) ::= <<
@@ -88,19 +98,16 @@ $
 ///////////////////////////////////////////////////////////////////////////////
 
 stateConst(variable) ::= <<
+$if(variable.initialized)
+  $$if(variable.assignable)
+$    $variable$ <= $Constant(variable.initialValue)$;
 $
-if(variable.initialized)
-  $$
-  if(variable.assignable)
-$$variable$ <= $Constant(variable.initialValue)$;$
-  endif
-  $$
-endif
-$
+  endif$$
+endif$
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Constants
+// Constants and Signals
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
@@ -111,6 +118,7 @@ actorParameters(parameters) ::= <<
 $parameters.keys: { k | #define $k$ $Constant(parameters.(k))$
 }$
 >>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Cast
 ///////////////////////////////////////////////////////////////////////////////
@@ -308,11 +316,11 @@ endif$
 Write(write) ::= <<
 
 $if(write.target.type.bool)
-$$write.port$_data <= $write.target$;$
+$$write.port$_idata <= $write.target$;$
 elseif(write.target.type.int)
-$$write.port$_data <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
+$$write.port$_idata <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
 else
-$$write.port$_data <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
+$$write.port$_idata <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
 endif$
 >>
 
@@ -453,47 +461,70 @@ $procedure(procedure=action.body)$
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Management of intercommunications 
+// Management of Outputs 
 ///////////////////////////////////////////////////////////////////////////////
 
-RdyManag(port) ::= <<
-$port.name$_management : process(reset_n, $port.name$_ack, $port.name$_isend, $port.name$FSM_out)
+OutputsManag() ::= <<
+out_management : process (clock, reset_n) is
 begin
   if reset_n = '0' then
-    $port.name$_rdy     <= '0';
-    $port.name$_send    <= '0';
-    $port.name$FSM_out   <= waitSend;
-  else
-    case $port.name$FSM_out is
-      when waitSend =>
-        if $port.name$_isend = '1' then
-          $port.name$_rdy    <= '1';
-          $port.name$_send   <= '1';
-          $port.name$FSM_out <= waitAck;
-        else
-          $port.name$_rdy    <= '1';
-          $port.name$_send   <= '0';
-          $port.name$FSM_out <= waitSend;
-        end if;
-      when waitAck =>
-        if $port.name$_ack = '1' and $port.name$_isend = '1' then
-          $port.name$_rdy    <= '1';
-          $port.name$_send   <= '1';
-          $port.name$FSM_out <= waitAck;
-        elsif $port.name$_ack = '1' then
-          $port.name$_rdy    <= '1';
-          $port.name$_send   <= '0';
-          $port.name$FSM_out <= waitSend;
-        else
-          $port.name$_rdy    <= '0';
-          $port.name$_send   <= '1';
-          $port.name$FSM_out <= waitAck;
-        end if;
-      when others => null;
-    end case;
+    $actor.outputs.list : OutputsReset(); separator="\n"$
+    --
+    $actor.outputs.list : {port|$port.name$FSM_out <= waitSend;}; separator="\n"$
+  --
+  elsif rising_edge(clock) then
+    $actor.outputs.list : FSM_outputs(); separator="\n\n"$
   end if;
-end process $port.name$_management;
+end process out_management;
 >>
+
+FSM_outputs(port) ::= <<
+case $port.name$FSM_out is
+  when waitSend =>
+    if $port.name$_isend = '1' then
+      $port.name$_rdy    <= '1';
+      $port.name$_send   <= '1';
+      $port.name$_data   <= $port.name$_idata;      
+      $port.name$FSM_out <= waitAck;
+    else
+      $port.name$_rdy    <= '1';
+      $port.name$_send   <= '0';
+      $port.name$FSM_out <= waitSend;
+    end if;
+  --
+  when waitAck =>
+    if $port.name$_ack = '1' and $port.name$_isend = '1' then
+      $port.name$_rdy    <= '1';
+      $port.name$_send   <= '1';
+      $port.name$_data   <= $port.name$_idata;            
+      $port.name$FSM_out <= waitAck;
+    elsif $port.name$_ack = '1' then
+      $port.name$_rdy    <= '1';
+      $port.name$_send   <= '0';
+      $port.name$FSM_out <= waitSend;
+    else
+      $port.name$_rdy    <= '0';
+      $port.name$_send   <= '1';
+      $port.name$_data   <= $port.name$_idata;            
+      $port.name$FSM_out <= waitAck;
+    end if;
+  --
+  when others => null;
+end case;
+>>
+
+OutputsReset(port) ::= <<
+$if(port.type.bool)
+$$port.name$_data <= '0';$
+else
+$$port.name$_data <= (others => '0');$
+endif$
+
+$port.name$_rdy  <= '0';     
+$port.name$_send <= '0';
+>>
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Scheduler process
@@ -605,9 +636,10 @@ Actor_Exec(actor) ::= <<
 $actor.simpleName$_execute : process (reset_n, clock) is
   $actor.actions: printActionLocalBody()$  --
 begin
-  if reset_n = '0' then 
-    $actor.stateVars.list: stateConst(); separator="\n"$     
-    --
+  if reset_n = '0' then
+$if(actor.stateVars.list)
+$$actor.stateVars.list: stateConst()$    --$
+endif$
     $actor.outputs.list : port_out_init()$
 $if(actor.actionScheduler.fsm)    
 $    FSM    <= s_$actor.actionScheduler.fsm.initialState$;
@@ -740,8 +772,8 @@ architecture rtl_$actor.simpleName$ of $actor.simpleName$ is
   ---------------------------------------------------------------------------
   $actorParameters(actor.parameters)$
   $actor.actions:       {action| signal $action$_go    : std_logic;}; separator="\n"$
-  $actor.outputs.list : {port| signal $port.name$_rdy   : std_logic;}; separator="\n"$ -- Internal rdy
-  $actor.outputs.list : {port| signal $port.name$_isend : std_logic;}; separator="\n"$ -- Internal send
+  --
+  $actor.outputs.list :internalSignalsDeclaration(); separator="\n"$
   --
   $actor.stateVars.list: signalDeclaration()$
 
@@ -766,11 +798,11 @@ endif$
 
 begin
 
-  $actor.outputs.list : RdyManag(); separator="\n\n"$
-
   $Actor_Scheduler(actor)$
   
   $Actor_Exec(actor)$
+
+  $OutputsManag()$
 
 end architecture rtl_$actor.simpleName$;
 
