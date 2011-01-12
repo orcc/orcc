@@ -78,18 +78,29 @@ void print_fps_avg(void) {
 		1000.0f * (float)num_images_end / (float)t);
 }
 
-static Uint32 tmp_time;
+static Uint32 partial_start_time;
+static Uint32 partial_end_time;
+static int partial_num_images_start;
+static int partial_num_images_end;
 
-float compute_fps_sync(){
-	static int num_images_tmp = 0;
+float compute_partial_fps(){
+	return 1000.0f * (float)(partial_num_images_end - partial_num_images_start) / (float)(partial_end_time - partial_start_time);
+}
 
-	Uint32 t_sync = tmp_time;
-	int num_images_sync = num_images_tmp;
-	
-	tmp_time = SDL_GetTicks();
-	num_images_tmp = num_images_end;
-	
-	return 1000.0f * (float)(num_images_end - num_images_sync) / (float)(tmp_time - t_sync);
+void backup_partial_start_info(){
+	partial_start_time = SDL_GetTicks();
+	partial_num_images_start = num_images_end;
+}
+
+void backup_partial_end_info(){
+	partial_end_time = SDL_GetTicks();
+	partial_num_images_end = num_images_end;
+}
+
+static int show_fps = 1;
+
+void remove_fps_printing(){
+	show_fps = 0;
 }
 
 static Uint32 t;
@@ -120,7 +131,7 @@ void display_show_image(void) {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	num_images_end++;
 	t2 = SDL_GetTicks();
-	if (t2 - t > 3000) {
+	if (show_fps && t2 - t > 3000) {
 		printf("%f images/sec\n",
 			1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
 
@@ -210,7 +221,8 @@ static void display_init() {
 
 	start_time = SDL_GetTicks();
 	t = start_time;
-	tmp_time = start_time;
+	partial_start_time = start_time;
+	partial_num_images_start = 0;
 
 #ifdef BENCHMARK
 	{

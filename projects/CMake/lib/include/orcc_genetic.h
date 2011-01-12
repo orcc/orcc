@@ -60,6 +60,8 @@ typedef struct population_s {
 
 void *monitor(void *data);
 		
-extern float compute_fps_sync();
+extern float compute_partial_fps();
+extern void backup_partial_start_info();
+extern void backup_partial_end_info();
 
 #endif

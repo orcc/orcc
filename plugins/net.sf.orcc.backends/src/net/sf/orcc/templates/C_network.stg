@@ -269,7 +269,7 @@ $if(options.needSync)$
 #include "orcc_thread.h"
 #include "orcc_genetic.h"
 
-#define SYNC_DELAY 10
+#define SYNC_DELAY 3
 $endif$
 
 #define SIZE $fifoSize$
@@ -336,7 +336,10 @@ $if(options.needSync)$
 $declareActorsArray(instances=network.instances)$
 $else$
 $options.threads.keys: {$declareActorsArray(thread=it,instances=options.threads.(it))$}; separator="\n"$
+
+extern void remove_fps_printing();
 $endif$
+
 
 $printThread()$
 
@@ -362,6 +365,8 @@ static void scheduler() {
 	$printInitializes(network.instances)$
 	
 	$if(options.needSync)$
+	remove_fps_printing();
+	
 	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);}; separator="\n"$
 	$else$
 	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors_$it$) / sizeof(actors_$it$[0]), actors_$it$, NULL);}; separator="\n"$

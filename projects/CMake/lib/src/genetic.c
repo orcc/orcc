@@ -118,20 +118,8 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 	nextPop->individuals = individuals;
 	nextPop->generationNb = pop->generationNb + 1;
 
-	printf("FPS unsort:");
-		for (i = 0; i < POPULATION_SIZE; i++) {
-			printf(" %f",pop->individuals[i]->fps);
-		}
-		printf("\n");
-
 	// Sort population by descending fps value
 	qsort(pop->individuals, POPULATION_SIZE, sizeof(individual*), compare);
-
-	printf("FPS sort:");
-	for (i = 0; i < POPULATION_SIZE; i++) {
-		printf(" %f",pop->individuals[i]->fps);
-	}
-	printf("\n");
 
 	// Backup better individuals
 	for (i = 0; i < POPULATION_SIZE * KEEP_RATIO; i++) {
@@ -217,6 +205,10 @@ void *monitor(void *data) {
 		int i;
 		float fps;
 
+		// Backup informations to compute partial fps except first time
+		if(evalIndNb != 0 || population->generationNb != 0){
+			backup_partial_start_info();
+		}
 		// wakeup all threads
 		for (i = 0; i < genetic_info->threadsNb; i++) {
 			sem_post(&genetic_info->sync->sem_threads);
@@ -227,9 +219,10 @@ void *monitor(void *data) {
 		for (i = 0; i < genetic_info->sync->threadsNb; i++) {
 			sem_wait(&genetic_info->sync->sem_monitor);
 		}
+		backup_partial_end_info();
 
 		// work process
-		fps = compute_fps_sync();;
+		fps = compute_partial_fps();
 		population->individuals[evalIndNb]->fps = fps;
 		printf("Evaluation of mapping %i = %f fps\n",evalIndNb,fps);
 
