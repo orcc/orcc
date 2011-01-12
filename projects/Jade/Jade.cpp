@@ -234,7 +234,7 @@ Network* loadNetwork(string file){
 	LLVMContext &Context = getGlobalContext();
 
 	//Parsing XDF file
-	XDFParser xdfParser(VTLDir + file);
+	XDFParser xdfParser(file);
 	Network* network = xdfParser.ParseXDF(Context);
 
 	return network;
@@ -279,7 +279,7 @@ void parseConsole(string cmd){
 			//Load the network
 			cout << "Select a network to load : ";
 			cin >> file;
-			Network* network = loadNetwork(file);
+			Network* network = loadNetwork(VTLDir + file);
 
 			if (network == NULL){
 				cout << "No network load. \n";
