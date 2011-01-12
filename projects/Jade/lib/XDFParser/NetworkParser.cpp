@@ -58,12 +58,6 @@ NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename){
 	xdfDoc = new TiXmlDocument (filename.c_str());
     network = NULL;
 
-	/* Parsing file error */
-	if (!xdfDoc->LoadFile()) {
-        cerr << "Failed to open file " << filename.c_str();
-		exit(0);
-    }
-
 	Connections = new list<Connection*>();
 
 	/* Xml type parser */
@@ -80,20 +74,27 @@ NetworkParser::~NetworkParser (){
 
 
 Network* NetworkParser::parseNetwork (){
+
+	/* Parsing XML file error */
+	if (!xdfDoc->LoadFile()) {
+		cerr << "Error : the given file does not exist. \n";
+		return NULL;
+    }
+
 	// Get the root element node
 	TiXmlElement* root_element = xdfDoc->RootElement();
 	
 	// xml document doesn't start with XDF root
 	if (TiXmlString(root_element->Value()) != XDFNetwork::XDF_ROOT){
 		cerr << "XML description does not represent an XDF network";
-		exit(1);
+		return NULL;
 	}
 	
 	// Return NULL if network doesn't have a name
 	TiXmlAttribute* root_attribute = root_element->FirstAttribute();
 	if (TiXmlString(root_attribute->Name()) != XDFNetwork::NAME){
 		cerr << "Expected a \"name\" in XDF network";
-		exit(1);
+		return NULL;
 	}
 	
 	// Set network properties

@@ -64,8 +64,6 @@
 using namespace std;
 using namespace llvm;
 
-
-extern cl::opt<std::string> VidFile;
 extern cl::opt<bool> nodisplay;
 extern cl::opt<std::string> YuvFile;
 
@@ -86,15 +84,15 @@ RoundRobinScheduler::~RoundRobinScheduler (){
 	}
 }
 
-void RoundRobinScheduler::createScheduler(Decoder* decoder){
+void RoundRobinScheduler::createScheduler(Decoder* decoder, string stimulus){
 	this->decoder = decoder;
 	
+	//Set input file
+	setSource(stimulus);
+
 	//Create the scheduler function
 	createSchedulerFn();
 	
-	//Set input file
-	setSource();
-
 	//Set compare file if needed
 	setCompare();
 }
@@ -152,6 +150,7 @@ void RoundRobinScheduler::createSchedulerFn(){
 }
 
 void RoundRobinScheduler::execute(){
+
 	clock_t timer = clock ();
 	executionEngine = new LLVMExecution(Context, decoder);
 
@@ -197,15 +196,15 @@ void RoundRobinScheduler::setExternalFunctions(){
 	}
 }
 
-void RoundRobinScheduler::setSource(){
+void RoundRobinScheduler::setSource(string input){
 	Module* module = decoder->getModule();
 	
 	//Get source instance
 	Instance* source = decoder->getInstance("source");
 	
 	//Insert source file string
-	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),VidFile.size()+1); 
-	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context,VidFile), "fileName", 0, false, 0);
+	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),input.size()+1); 
+	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, input), "fileName", 0, false, 0);
 
 	//Store adress in input file of source
 	Variable* sourceFileVar = source->getStateVar("input_file");

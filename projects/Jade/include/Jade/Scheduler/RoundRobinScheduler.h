@@ -69,14 +69,14 @@ public:
 	RoundRobinScheduler(llvm::LLVMContext& C);
 	~RoundRobinScheduler();
 
-	void createScheduler(Decoder* decoder);
+	void createScheduler(Decoder* decoder, std::string stimulus);
 	void execute();
 
 private:
 
 	void createSchedulerFn();
 
-	void setSource();
+	void setSource(std::string input);
 
 	void setDisplay();
 

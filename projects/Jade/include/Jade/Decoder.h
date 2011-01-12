@@ -163,6 +163,21 @@ public:
 	Network* getNetwork(){return network;};
 
 	/**
+     *  @brief Getter of a stimulus file
+	 * 
+	 *  @return the stimulus file
+     */
+	std::string getStimulus(){return stimulus;};
+
+	/**
+     *  @brief Setter of a stimulus file
+	 * 
+	 *  @param file : the stimulus file
+     */
+	void setStimulus(std::string file){this->stimulus = file;};
+
+
+	/**
      *  @brief Setter of the decoder scheduler
 	 *
 	 *  @param scheduler : the scheduler of the decoder
@@ -213,6 +228,9 @@ private:
 
 	/** Input network */
 	Network* network;
+
+	/** Input stimulus */
+	std::string stimulus;
 
 	/** List of actors contained in the decoder */
 	std::map<std::string, Actor*>* actors;

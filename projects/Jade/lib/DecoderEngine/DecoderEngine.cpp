@@ -76,16 +76,17 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 	this->systemPackage = system;
 	this->verbose = verbose;
 
+	llvm_start_multithreaded();
+
 }
 
 DecoderEngine::~DecoderEngine(){
-
+	llvm_stop_multithreaded();
 }
 
-int DecoderEngine::load(Network* network, int optLevel) {
+int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t* thread) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
-	XDFnetwork = network;
 
 	// Parsing actor
 	parseActors(network);
@@ -94,19 +95,22 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	timer = clock ();
 
 	//Create decoder
-	Decoder decoder(Context, network, fifo);
+	decoder = new Decoder(Context, network, fifo);
+
+	//Set input of the decoder
+	decoder->setStimulus(input);
 
 	//Compile the decoder
-	decoder.compile(&actors);
+	decoder->compile(&actors);
 	
 	//Set the scheduler
-	decoder.setScheduler(new RoundRobinScheduler(Context));
+	decoder->setScheduler(new RoundRobinScheduler(Context));
 	cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 
-	doOptimizeDecoder(&decoder);
+	doOptimizeDecoder(decoder);
 
-	LLVMOptimizer opt(&decoder);
+	LLVMOptimizer opt(decoder);
 	opt.optimize();
 
 	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
@@ -123,36 +127,21 @@ int DecoderEngine::load(Network* network, int optLevel) {
 
 	outName.append(".txt");
 	
-	utility.printModule(outName, &decoder);
+	utility.printModule(outName, decoder);
 
 	
-	utility.verify("error.txt", &decoder);
+	utility.verify("error.txt", decoder);
 
 	cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	timer = clock ();
 
-	timer = clock ();
-
 	//Start decoding
-	llvm_start_multithreaded();
-	pthread_t th1;
-	void *ret;
-	string test;
-
-	decoder.startInThread(&th1);
-	
-	system("pause");
-
-	decoder.stop();
-	cout << "-->   Stop decoding. \n";
-	llvm_stop_multithreaded();
-	
-	(void)pthread_join (th1, &ret);
-	
-	timer = clock ();
-
-
-	
+	if (thread != NULL){
+		decoder->startInThread(thread);
+	} else {
+		decoder->start();
+	}
+		
 	return 0;
 }
 

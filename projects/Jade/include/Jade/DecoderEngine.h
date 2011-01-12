@@ -41,6 +41,7 @@
 
 #include <map>
 #include <string>
+#include <pthread.h>
 
 namespace llvm{
 	class LLVMContext;
@@ -75,12 +76,16 @@ public:
      *  Load, create and execute the given network.
 	 *   
 	 *  @param network : the Network to load
+	 *
+	 *  @param input : the input stimulus
      *
 	 *  @param optLevel : the level of optimization to apply
 	 *
+	 *  @param thread : the thread where network is execute
+	 *
 	 *  @return HDAGGraph representing the network's contents
      */
-	int load(Network* network, int optLevel);
+	int load(Network* network, std::string input, int optLevel, pthread_t* thread = NULL);
 
 private:
 	/*!
@@ -101,8 +106,6 @@ private:
      */
 	void doOptimizeDecoder(Decoder* decoder);
 	
-	Network* XDFnetwork;
-	Decoder* decoder;
 	IRParser* irParser;
 	std::map<std::string, Actor*> actors;
 
@@ -117,6 +120,9 @@ private:
 
 	/** System package location */
 	std::string systemPackage;
+	
+	/** Decoder used by the decoder engine */
+	Decoder* decoder;
 
 	/** Print all actions made by decoder engine*/
 	bool verbose;

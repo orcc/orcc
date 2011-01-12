@@ -39,6 +39,7 @@
 #include <time.h>
 #include <signal.h>
 #include <iostream>
+#include <map>
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Target/TargetSelect.h"
@@ -94,6 +95,11 @@ VTLDir("L", desc("Video Tools Library directory"),
 	   Required,
 	   ValueRequired,
 	   value_desc("VTL Folder"), 
+	   init(""));
+
+cl::opt<std::string>
+InputDir("I", desc("Stimulus directory"),
+	   value_desc("A folder that contains input stimulus"),
 	   init(""));
 
 cl::opt<std::string> 
@@ -162,6 +168,8 @@ cl::opt<int> StopAt("stop-at-frame",
 
 static cl::opt<bool> Verbose("v", cl::desc("Print information about actions taken"), cl::init(false));
 
+static cl::opt<bool> Console("console", cl::desc("Enter in console mode"), cl::init(false));
+
 cl::list<const PassInfo*, bool, PassNameParser> PassList(cl::desc("Optimizations available:"));
 
 void clean_exit(int sig){
@@ -192,9 +200,11 @@ AbstractFifo* getFifo(LLVMContext &Context, string system){
 
 //Verify if directory is well formed
 void setDirectory(std::string* dir){
-	size_t found = dir->find_last_of("/\\");
-	if(found != dir->length()-1){
-		dir->insert(dir->length(),"/");
+	if (dir->compare("") != 0){
+		size_t found = dir->find_last_of("/\\");
+		if(found != dir->length()-1){
+			dir->insert(dir->length(),"/");
+		}
 	}
 }
 
@@ -206,6 +216,7 @@ void setOptions(){
 	OptionMng::setDirectory(&VTLDir);
 	OptionMng::setDirectory(&SystemDir);
 	OptionMng::setDirectory(&OutputDir);
+	OptionMng::setDirectory(&InputDir);
 
 	if (OptLevelO1){
 		optLevel = 1;
@@ -218,31 +229,19 @@ void setOptions(){
 	}
 }
 
-int main(int argc, char **argv) {
-
-	// Print a stack trace if we signal out.
-	PrintStackTraceOnErrorSignal();
-	PrettyStackTraceProgram X(argc, argv);
-	ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
-	(void) signal(SIGINT, clean_exit);
-    
-	//Initialize context
-	InitializeNativeTarget();
+//Decoder engine managing
+Network* loadNetwork(string file){
 	LLVMContext &Context = getGlobalContext();
-	clock_t timer = clock ();
-
-	setOptions();
-
-	for (unsigned int i =0 ; i < PassList.size(); i++ ){
-		cout << "Pass added: "<< PassList[i]->getPassName() << "\n";
-		cout << "Argument name :" << PassList[i]->getPassArgument() << "\n";
-	}
 
 	//Parsing XDF file
-	std::cout << "Jade started, parsing file " << XDFFile.getValue() << ". \n";
-	XDFParser xdfParser(XDFFile);
+	XDFParser xdfParser(VTLDir + file);
 	Network* network = xdfParser.ParseXDF(Context);
-	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
+
+	return network;
+}
+
+int runNetwork(Network* network, string inputFile){
+	LLVMContext &Context = getGlobalContext();
 
 	//Load fifos
 	AbstractFifo* fifo = NULL;
@@ -253,8 +252,114 @@ int main(int argc, char **argv) {
 	}
 
 	//Load and execute the parsed network
+	pthread_t t1;
 	DecoderEngine engine(Context, fifo , VTLDir, SystemDir, Verbose);
-	engine.load(network, optLevel);
+	engine.load(network, InputDir + inputFile, optLevel, &t1);
+
+	return 0;
+}
+
+//Console control
+map<int, Network*> networks;
+
+void parseConsole(string cmd){
+	if (cmd == "L"){
+			string file;
+			int id;
+
+			//Load the network
+			cout << "Select a network to load : ";
+			cin >> file;
+			Network* network = loadNetwork(file);
+
+			if (network == NULL){
+				cout << "No network load. \n";
+				return;
+			}
+
+			//Store the network in an id
+			cout << "Select an id for this network : ";
+			cin >> id;
+			networks.insert(pair<int, Network*>(id, network));
+		}else if (cmd == "R"){
+			map<int, Network*>::iterator it;
+			string input;
+			int id;
+
+			//Select network
+			cout << "Select the id of the network to run : ";
+			cin >> id;
+
+			//Look for the network
+			it = networks.find(id);
+			if(it == networks.end()){
+				cout << "No network loads at the given id.\n";
+				return;
+			}
+
+			//Select network
+			cout << "Select an input stimulus : ";
+			cin >> input;
+
+			runNetwork(it->second, input);
+
+		} else if (cmd == "help"){ 
+			cout << "Command line options :\n";
+			cout << "L : load a network \n";
+		}
+}
+
+void startConsole(){
+	string cmdLine;
+
+	while (cmdLine != "exit"){
+		cout << "Enter a command (help for documentation) : ";
+		cin >> cmdLine;
+		parseConsole(cmdLine);
+	}
+}
+
+
+//Command line decoder control
+void startCmdLine(){
+
+	LLVMContext &Context = getGlobalContext();
+
+	for (unsigned int i =0 ; i < PassList.size(); i++ ){
+		cout << "Pass added: "<< PassList[i]->getPassName() << "\n";
+		cout << "Argument name :" << PassList[i]->getPassArgument() << "\n";
+	}
+
+	clock_t timer = clock ();
+
+	//Parsing XDF file
+	std::cout << "Parsing file " << XDFFile.getValue() << ". \n";
+	Network* network = loadNetwork(XDFFile);
+	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
+
+	runNetwork(network, VidFile);
+
+	system("pause");
 
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
+}
+
+int main(int argc, char **argv) {
+
+	// Print a stack trace if we signal out.
+	PrintStackTraceOnErrorSignal();
+	PrettyStackTraceProgram X(argc, argv);
+	ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
+	(void) signal(SIGINT, clean_exit);
+    
+	//Initialize context
+	InitializeNativeTarget();
+
+	setOptions();
+
+	if (Console){
+		startConsole();
+	} else {
+		startCmdLine();
+	}
 }

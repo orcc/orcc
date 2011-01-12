@@ -135,7 +135,7 @@ bool Decoder::compile(map<string, Actor*>* actors){
 
 void Decoder::setScheduler(RoundRobinScheduler* scheduler){
 	this->scheduler = scheduler;
-	scheduler->createScheduler(this);
+	scheduler->createScheduler(this, this->getStimulus());
 }
 
 void Decoder::start(){
