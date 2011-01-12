@@ -102,6 +102,16 @@ public:
 	int run(Network* network, std::string input, pthread_t* thread = NULL);
 
 	/*!
+     *  @brief Reconfigure a network into another network
+	 *   
+	 *  @param oldNetwork : the original network
+	 *
+	 *  @param newNetwork : the new network
+	 *
+     */
+	int reconfigure(Network* oldNetwork, Network* newNetwork);
+
+	/*!
      *  @brief Print the given network into a file
 	 *   
 	 *  @param network : the Network to print

@@ -158,6 +158,11 @@ int DecoderEngine::run(Network* network, string input, pthread_t* thread){
 	return 0;
 }
 
+int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
+
+	return 0;
+}
+
 void DecoderEngine::parseActors(Network* network) {
 	list<string>::iterator it;
 	list<string>* files = network->getActorFiles();

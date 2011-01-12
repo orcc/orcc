@@ -275,7 +275,39 @@ int stopNetwork(Network* network){
 map<int, Network*> networks;
 
 void parseConsole(string cmd){
-	if (cmd == "L"){
+	if (cmd == "C"){
+			map<int, Network*>::iterator it;
+			string file;
+			int id;
+
+			//Select network
+			cout << "Select the id of the network to run : ";
+			cin >> id;
+
+			//Look for the network
+			it = networks.find(id);
+			if(it == networks.end()){
+				cout << "No network loads at the given id.\n";
+				return;
+			}
+
+			//Select network
+			cout << "Select a new network : ";
+			cin >> file;
+
+			//Load a network
+			Network* network = loadNetwork(VTLDir + file);
+
+			if (network == NULL){
+				cout << "No network load. \n";
+				return;
+			}
+
+			engine->reconfigure(it->second, network);
+
+			networks.erase(id);
+			networks.insert(pair<int, Network*>(id, network));
+	}else if (cmd == "L"){
 			string file;
 			int id;
 
@@ -389,6 +421,7 @@ void parseConsole(string cmd){
 			}
 		} else if (cmd == "help"){ 
 			cout << "Command line options :\n";
+			cout << "C : change a network to another\n";
 			cout << "L : load a network \n";
 			cout << "P : print a network \n";
 			cout << "R : run a network \n";
