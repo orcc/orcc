@@ -86,12 +86,9 @@ RoundRobinScheduler::~RoundRobinScheduler (){
 	}
 }
 
-void RoundRobinScheduler::createScheduler(Decoder* decoder, string stimulus){
+void RoundRobinScheduler::createScheduler(Decoder* decoder){
 	this->decoder = decoder;
 	
-	//Set input file
-	setSource(stimulus);
-
 	//Create the scheduler function
 	createSchedulerFn();
 	
@@ -151,7 +148,9 @@ void RoundRobinScheduler::createSchedulerFn(){
 	Instruction* brBbInst = BranchInst::Create(BBReturn, BB, stopVal, BB);
 }
 
-void RoundRobinScheduler::execute(){
+void RoundRobinScheduler::execute(string stimulus){
+	//Set input file
+	setSource(stimulus);
 
 	clock_t timer = clock ();
 	executionEngine = new LLVMExecution(Context, decoder);

@@ -84,7 +84,7 @@ DecoderEngine::~DecoderEngine(){
 	llvm_stop_multithreaded();
 }
 
-int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t* thread) {
+int DecoderEngine::load(Network* network, int optLevel) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 
@@ -99,9 +99,6 @@ int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t*
 
 	//Create decoder
 	decoder = new Decoder(Context, network, fifo);
-
-	//Set input of the decoder
-	decoder->setStimulus(input);
 
 	//Compile the decoder
 	decoder->compile(&actors);
@@ -131,11 +128,6 @@ int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t*
 	}else{
 		outName = "module";
 	}
-
-	outName.append(".txt");
-	
-	utility.printModule(outName, decoder);
-
 	
 	utility.verify("error.txt", decoder);
 
@@ -143,19 +135,26 @@ int DecoderEngine::load(Network* network, string input, int optLevel, pthread_t*
 		cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	}
 	timer = clock ();
-
-	//Start decoding
-	if (thread != NULL){
-		decoder->startInThread(thread);
-	} else {
-		decoder->start();
-	}
 		
 	return 0;
 }
 
 int DecoderEngine::stop(Network* network){
 	decoder->stop();
+	return 0;
+}
+
+int DecoderEngine::run(Network* network, string input, pthread_t* thread){
+	//Set input of the decoder
+	decoder->setStimulus(input);
+	
+	//Start decoding
+	if (thread != NULL){
+		decoder->startInThread(thread);
+	} else {
+		decoder->start();
+	}
+
 	return 0;
 }
 
@@ -182,4 +181,11 @@ void DecoderEngine::doOptimizeDecoder(Decoder* decoder){
 
 	FifoFnRemoval removeFifo;
 	removeFifo.transform(decoder);
+}
+
+int DecoderEngine::printNetwork(Network* network, string outputFile){
+	LLVMUtility utility;
+
+	utility.printModule(outputFile, decoder);
+	return 0;
 }

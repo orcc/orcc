@@ -76,24 +76,40 @@ public:
      *  Load, create and execute the given network.
 	 *   
 	 *  @param network : the Network to load
-	 *
-	 *  @param input : the input stimulus
      *
 	 *  @param optLevel : the level of optimization to apply
 	 *
-	 *  @param thread : the thread where network is execute
-	 *
 	 *  @return HDAGGraph representing the network's contents
      */
-	int load(Network* network, std::string input, int optLevel, pthread_t* thread = NULL);
+	int load(Network* network, int optLevel);
 
 	/*!
      *  @brief Stop the given network
 	 *   
 	 *  @param network : the Network to stop
-	 *
      */
 	int stop(Network* network);
+
+	/*!
+     *  @brief Run the given network
+	 *   
+	 *  @param network : the Network to run
+	 *
+	 *  @param input : the input stimulus
+	 *
+	 *  @param thread : the thread where network is execute
+     */
+	int run(Network* network, std::string input, pthread_t* thread = NULL);
+
+	/*!
+     *  @brief Print the given network into a file
+	 *   
+	 *  @param network : the Network to print
+	 *
+	 *  @param outputFile : the name of the file to print into
+	 *
+     */
+	int printNetwork(Network* network, std::string outputFile);
 
 private:
 	/*!

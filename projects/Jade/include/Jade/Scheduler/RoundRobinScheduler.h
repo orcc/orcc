@@ -69,8 +69,8 @@ public:
 	RoundRobinScheduler(llvm::LLVMContext& C, bool verbose = false);
 	~RoundRobinScheduler();
 
-	void createScheduler(Decoder* decoder, std::string stimulus);
-	void execute();
+	void createScheduler(Decoder* decoder);
+	void execute(std::string stimulus);
 	void stop();
 
 private:

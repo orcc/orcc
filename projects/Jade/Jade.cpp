@@ -240,7 +240,7 @@ Network* loadNetwork(string file){
 	return network;
 }
 
-int runNetwork(Network* network, string inputFile){
+void prepareNetwork(Network* network){
 	LLVMContext &Context = getGlobalContext();
 
 	//Load fifos
@@ -253,7 +253,11 @@ int runNetwork(Network* network, string inputFile){
 
 	//Load and execute the parsed network
 	engine = new DecoderEngine(Context, fifo , VTLDir, SystemDir, Verbose);
-	engine->load(network, InputDir + inputFile, optLevel, &t1);
+	engine->load(network, optLevel);
+}
+
+int runNetwork(Network* network, string inputFile){
+	engine->run(network, InputDir + inputFile, &t1);
 
 	return 0;
 }
@@ -289,6 +293,30 @@ void parseConsole(string cmd){
 			cout << "Select an id for this network : ";
 			cin >> id;
 			networks.insert(pair<int, Network*>(id, network));
+
+			prepareNetwork(network);
+		}else if (cmd == "P"){
+			map<int, Network*>::iterator it;
+			string output;
+			int id;
+
+			//Select network
+			cout << "Select the id of the network to run : ";
+			cin >> id;
+
+			//Look for the network
+			it = networks.find(id);
+			if(it == networks.end()){
+				cout << "No network loads at the given id.\n";
+				return;
+			}
+
+			//Select network
+			cout << "Select an ouput file : ";
+			cin >> output;
+
+			engine->printNetwork(it->second, output);
+
 		}else if (cmd == "R"){
 			map<int, Network*>::iterator it;
 			string input;
@@ -362,6 +390,7 @@ void parseConsole(string cmd){
 		} else if (cmd == "help"){ 
 			cout << "Command line options :\n";
 			cout << "L : load a network \n";
+			cout << "P : print a network \n";
 			cout << "R : run a network \n";
 			cout << "S : stop a network \n";
 			cout << "U : unload a network \n";
@@ -398,6 +427,8 @@ void startCmdLine(){
 	std::cout << "Parsing file " << XDFFile.getValue() << ". \n";
 	Network* network = loadNetwork(XDFFile);
 	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
+
+	prepareNetwork(network);
 
 	runNetwork(network, VidFile);
 
