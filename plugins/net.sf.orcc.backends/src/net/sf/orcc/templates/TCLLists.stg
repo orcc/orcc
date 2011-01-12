@@ -16,8 +16,7 @@ vcom -93 -reportprogress 30 -work work \$SRC/FIFO/broadcast.vhd
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/ram_generic.vhd 
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/counter.vhd 
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/control.vhd 
-vcom -93 -reportprogress 30 -work work \$SRC/FIFO/fifo.vhd 
-vcom -93 -reportprogress 30 -work work \$SRC/FIFO/fifo_top.vhd 
+vcom -93 -reportprogress 30 -work work \$SRC/FIFO/fifo_generic.vhd 
 # Compile actors and networks
 $entities: printEntity(); separator="\n"$
 vcom -93 -reportprogress 30 -work work \$Testbench/$name$_tb.vhd

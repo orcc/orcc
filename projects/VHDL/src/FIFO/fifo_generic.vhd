@@ -22,7 +22,7 @@
 --  -- Redistributions in binary form must reproduce the above copyright notice,
 --     this list of conditions and the following disclaimer in the documentation
 --     and/or other materials provided with the distribution.
---  -- Neither the name of the LEAD TECH DESIGN and INSA/IETR nor the names of its
+--  -- Neither the name of the IETR/INSA of Rennes nor the names of its
 --     contributors may be used to endorse or promote products derived from this
 --     software without specific prior written permission.
 -- 
@@ -45,88 +45,64 @@
 
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
-use ieee.numeric_std.all;
 
 library work;
 use work.orcc_package.all;
 -------------------------------------------------------------------------------
 
-entity controler is
+entity fifo_generic is
   generic (
     depth : integer := 32;
     width : integer := 32);
   port (
-    reset_n : in  std_logic;
+    reset_n  : in  std_logic;
     --
-    rd_clk  : in  std_logic;
-    rd_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
+    wr_clk   : in  std_logic;
+    wr_data  : in  std_logic;
+    wr_ack   : out std_logic;
+    data_in  : in  std_logic_vector(width -1 downto 0);
     --
-    wr_clk  : in  std_logic;
-    wr_data : in  std_logic;
-    wr_add  : out std_logic_vector(bit_width(depth)-1 downto 0);
+    rd_clk   : in  std_logic;
+    data_out : out std_logic_vector(width -1 downto 0);
+    send     : out std_logic;
     --
-    empty   : out std_logic;
-    full    : out std_logic;
-    send    : out std_logic
-    );
-end controler;
+    full     : out std_logic;
+    empty    : out std_logic);
+end fifo_generic;
 
 -------------------------------------------------------------------------------
 
-architecture archcontroler of controler is
+architecture arch_fifo_generic of fifo_generic is
 
-  signal inReadAdd  : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal inWriteAdd : std_logic_vector(bit_width(depth)-1 downto 0);
-  signal iempty     : std_logic;
-  signal rd_data    : std_logic;
-  
+  signal rd_address : std_logic_vector(bit_width(depth)-1 downto 0);
+  signal wr_address : std_logic_vector(bit_width(depth)-1 downto 0);
 begin
-
-  empty <= iempty;
-  send  <= not iempty;
-
-  -- Address management
-  rd_add  <= inReadAdd;
-  wr_add  <= inWriteAdd;
-  rd_data <= not iempty;
-  counter_1 : entity work.counter
+  
+  controler_1 : entity work.controler
     generic map (
-      depth => depth)
+      depth => depth,
+      width => width)
     port map (
       reset_n => reset_n,
       rd_clk  => rd_clk,
-      rd_data => rd_data,
+      rd_add  => rd_address,
       wr_clk  => wr_clk,
+      wr_add  => wr_address,
+      empty   => empty,
+      full    => full,
       wr_data => wr_data,
-      rd_add  => inReadAdd,
-      wr_add  => inWriteAdd);
+      send    => send);
 
+  ram_generic_1 : entity work.ram_generic
+    generic map (
+      depth => depth,
+      width => width)
+    port map (
+      rd_address => rd_address,
+      q          => data_out,
+      data       => data_in,
+      wr_address => wr_address,
+      wrclock    => wr_clk,
+      wren       => wr_data);
 
-  -- Flags
-  Flag_full : process (inReadAdd, inWriteAdd) is
-    variable level : integer range depth -1 downto 0 := 0;
-  begin
-    if (inWriteAdd <= inReadAdd) then
-      level  := to_integer(unsigned(inReadAdd - inWriteAdd));
-      iempty <= '0';
-    elsif (inWriteAdd <= inReadAdd) then
-      level  := 0;
-      iempty <= '1';
-    else
-      level  := (depth -1) - to_integer(unsigned(inWriteAdd - inReadAdd));
-      iempty <= '0';
-    end if;
-
-    case level is
-      when 2 =>
-        full <= '1';
-      when 1 =>
-        full <= '1';
-      when others =>
-        full <= '0';
-    end case;
-  end process Flag_full;
-
-end archcontroler;
-
+end arch_fifo_generic;
