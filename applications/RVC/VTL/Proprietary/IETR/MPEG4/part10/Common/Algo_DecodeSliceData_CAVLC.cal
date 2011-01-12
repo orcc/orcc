@@ -38,7 +38,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 	uint(size=5)  Total_CoeffLuma,
 	uint(size=5)  Total_CoeffChroma,
-	int (size=8)  ValQpFeedback
+	int (size=8)  QpFeedback
 		==>
 	int (size=6)  TypeOfVLD,
 	int (size=32) VLDParam,
@@ -87,7 +87,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	bool DEBUG_FLAG_DECODED = false;
 
 
-	List (type:uint(size=6),size=64) QP_TAB := 
+	List (type:uint(size=6),size=64) QP_TAB = 
 		[
 			 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
 			10,11,12,13,14,15,16,17,18,19,
@@ -448,7 +448,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	GetTotalCoeffLuma: action
 		Total_CoeffLuma   :[CoLu]    repeat 16,
 		Total_CoeffChroma :[CoLuChe] repeat 32,
-		ValQpFeedback     :[NewQp]
+		QpFeedback        :[NewQp , NewQpCb , NewQpCr]
 				==>
 		do
 			foreach int i in 0 .. 15
@@ -458,6 +458,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				TotalCoeffTabChroma[1][bitand(curr_mb_addr ,MASK_TOTALCOEFF)][i] := CoLuChe[16+i];
 			end
 			QpValue := NewQp;
+			Qp_CbValue := NewQpCb;
+			Qp_CrValue := NewQpCr;
 		end
 
 	LaunchNextMbAddr: action

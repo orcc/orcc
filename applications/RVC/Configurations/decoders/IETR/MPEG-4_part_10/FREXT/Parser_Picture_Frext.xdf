@@ -673,8 +673,6 @@
         src="GenerateSkipBlockInformation" src-port="Last"/>
     <Connection dst="DecodeSliceHeader" dst-port="RstPrevFrameNum"
         src="" src-port="ResetPrevFrameNum"/>
-    <Connection dst="DecodeSliceData_Cavlc" dst-port="ValQpFeedback"
-        src="DecodeMacroBlockLayer" src-port="QpFeedback"/>
     <Connection dst="" dst-port="TransformSize8x8"
         src="MergeDataFromSDataAndMbLayer" src-port="TransformSize8x8"/>
     <Connection dst="" dst-port="NbRefFrame_l1" src="DecodeRefPicList" src-port="NbRefFrame_l1"/>
@@ -725,4 +723,6 @@
     <Connection dst="" dst-port="Height" src="DecodeSliceHeader" src-port="Height"/>
     <Connection dst="" dst-port="IsNewPicOrSlice"
         src="DecodeSliceData_Cavlc" src-port="IsNewPicOrSlice"/>
+    <Connection dst="DecodeSliceData_Cavlc" dst-port="QpFeedback"
+        src="DecodeMacroBlockLayer" src-port="Qp_Y_Cb_Cr"/>
 </XDF>

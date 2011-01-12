@@ -52,8 +52,7 @@ actor Algo_DecodeMacroblockLayer()
 	bool          SkipMacroBlk,
 	bool          IsIPCM,
 	uint(size=16) cbp_blk,
-	int (size=8)  Qp_Y_Cb_Cr,
-	int (size=8)  QpFeedback
+	int (size=8)  Qp_Y_Cb_Cr
 		:
 
 
@@ -504,8 +503,7 @@ actor Algo_DecodeMacroblockLayer()
 	ReadMbQpDelta.Done: action
 			ValVLD :[ValueOfVLD]
 				==>
-			Qp_Y_Cb_Cr :[QpValue , Qp_CbValue , Qp_CrValue],
-			QpFeedback :[QpValue]
+			Qp_Y_Cb_Cr :[QpValue , Qp_CbValue , Qp_CrValue]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("mb_qp_delta : "+ValueOfVLD);
@@ -571,8 +569,7 @@ actor Algo_DecodeMacroblockLayer()
 			SData_Total_CoeffLuma   :[[0: for int s in 0 .. 15]] repeat 16,
 			SData_Total_CoeffChroma :[[0: for int s in 0 .. 31]] repeat 32,
 			SkipMacroBlk            :[true],
-			Qp_Y_Cb_Cr              :[QpValue , Qp_CbValue , Qp_CrValue],
-			QpFeedback              :[QpValue]
+			Qp_Y_Cb_Cr              :[QpValue , Qp_CbValue , Qp_CrValue]
 		end
 
 	SendEndSliceHeader: action

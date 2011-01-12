@@ -61,11 +61,12 @@
       <vertex id="DirectSpatialMvPred" x="1108" y="419"/>
       <vertex id="Width" x="588" y="417"/>
       <vertex id="Height" x="581" y="459"/>
+      <vertex id="IsNewPicOrSlice" x="584" y="957"/>
       <vertex id="Mgnt_DecodePic" x="1446" y="-92"/>
       <vertex id="DecodeSliceHeader" x="224" y="303"/>
       <vertex id="DecodeRefPicList" x="723" y="418"/>
       <vertex id="DecodeDecRefPicMarking" x="581" y="144"/>
-      <vertex id="DecodeSliceData_Cavlc" x="164" y="868"/>
+      <vertex id="DecodeSliceData_Cavlc" x="172" y="850"/>
       <vertex id="DecodeMacroBlockLayer" x="859" y="849"/>
       <vertex id="DecodeMbPred" x="1394" y="943"/>
       <vertex id="DecodeResidual" x="1394" y="559"/>
@@ -73,6 +74,5 @@
       <vertex id="DecodeSubMbPred" x="1433" y="1238"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="1901" y="1066"/>
       <vertex id="GenerateSkipBlockInformation" x="1909" y="846"/>
-      <vertex id="IsNewPicOrSlice" x="584" y="957"/>
    </vertices>
 </layout>
