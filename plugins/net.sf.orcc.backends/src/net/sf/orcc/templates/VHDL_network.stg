@@ -270,7 +270,7 @@ $instance.id$_output_$num$_ack      <= $instance.id$_ack;
 
 network(debugFifos, fifoSize, network, options) ::= <<
 -------------------------------------------------------------------------------
--- Title      : $network.name$
+-- Title      : Configuration: $network.name$
 -- Project    : 
 -------------------------------------------------------------------------------
 -- File       : $network.name$.vhd
