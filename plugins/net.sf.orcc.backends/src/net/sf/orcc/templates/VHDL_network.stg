@@ -39,19 +39,25 @@ $outgoingMap.keys: {instance | $checkInstanceType(instance)$}$
 checkInstanceType(instance) ::= <<
 $if (instance.actor)
 $                                            -- Actor : $instance.id$
-$printSignals(inputs=instance.actor.inputs.list)$$
+$printSignals(inputs=instance.actor.inputs.list,
+              outputs=instance.actor.outputs.list)$$
 elseif (instance.broadcast)
 $                                            -- Broadcast : $instance.id$
-$printSignals(inputs=instance.broadcast.inputs.list)$$
+$printSignals(inputs=instance.broadcast.inputs.list,
+              outputs=broadcast.actor.outputs.list)$$
 elseif (instance.network)
 $                                            -- Network : $instance.id$
-$printSignals(inputs=instance.network.inputs.list)$$
+$printSignals(inputs=instance.network.inputs.list,
+              outputs=broadcast.network.outputs.list)$$
 endif$
 >>
 
-printSignals(inputs) ::= <<
+printSignals(inputs, outputs) ::= <<
 $if(!inputs.empty)
 $$network.incomingMap.(instance):printInSignals()$$
+endif$$
+if(!outputs.empty)
+$$outgoingMap.(instance) : printOutSignals()$$
 endif$
 >>
 
@@ -73,7 +79,23 @@ $
 endif$
 >>
 
+printOutSignals(connection) ::= <<
+$printOutSignal(connection=connection, map=network.successorsMap.(instance))$
+>>
 
+printOutSignal(connection, map) ::= <<
+$if(map.(connection.source) && connection.attributes)
+$$if(connection.source.type.bool)
+$signal $instance.id$_$connection.source$_data   : std_logic;$
+else
+$signal $instance.id$_$connection.source$_data   : std_logic_vector($connection.source.type.size$ - 1 downto 0);$
+endif$
+
+signal $instance.id$_$connection.source$_send   : std_logic;
+signal $instance.id$_$connection.source$_ack    : std_logic;
+$
+endif$
+>>
 ///////////////////////////////////////////////////////////////////////////////
 // Print FIFOs instantiation
 ///////////////////////////////////////////////////////////////////////////////
@@ -187,9 +209,15 @@ printOutputs(connection) ::= <<
 
 printPortsOut(connection, map, vmap) ::= <<
 $if(map.(connection.source))
+$$if(connection.attributes)
+$$connection.source$_data   => $instance.id$_$connection.source$_data,
+$connection.source$_send   => $instance.id$_$connection.source$_send,
+$connection.source$_ack    => $instance.id$_$connection.source$_ack,$
+else
 $$connection.source$_data   => $map.(connection.source).id$_$connection.target$_data,
 $connection.source$_send   => $map.(connection.source).id$_$connection.target$_send,
 $connection.source$_ack    => $map.(connection.source).id$_$connection.target$_ack,$
+endif$$
 else
 $$connection.source$_data   => $vmap.port$_data,
 $connection.source$_send   => $vmap.port$_send,
