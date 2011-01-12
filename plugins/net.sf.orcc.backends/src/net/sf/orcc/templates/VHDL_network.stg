@@ -79,11 +79,11 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 assignFifos(edges) ::= << 
-$edges: assignFifo()$ 
+$edges: assignFifo()$
 >> 
 
-assignFifo(edge) ::= << 
-$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$ 
+assignFifo(edge) ::= <<
+$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
 >> 
 
 tryAssignFifo(edge, src, tgt) ::= <<
@@ -99,31 +99,31 @@ doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 $if(edge.size)
 $fifo_$count$ : entity work.fifo_top 
 generic map (
-depth => $edge.size$,
-$if(targetPort.type.bool)
-$width => 1)$
-else
-$width => $targetPort.type.size$)$
-endif$
+  depth => $edge.size$,
+  $if(targetPort.type.bool)
+$  width => 1)$
+  else
+$  width => $targetPort.type.size$)$
+  endif$
 
 port map (
   wr_data    => $source.id$_$sourcePort.name$_send, 
-$if(targetPort.type.bool)
-$  data_in(0) => $source.id$_$sourcePort.name$_data_out,$\n$$
-else
-$  data_in    => $source.id$_$sourcePort.name$_data_out,$\n$$
-endif$
+  $if(targetPort.type.bool)
+$  data_in(0) => $source.id$_$sourcePort.name$_data,$\n$$
+  else
+$  data_in    => $source.id$_$sourcePort.name$_data,$\n$$
+  endif$
   wr_clk     => clock, 
-  wr_ack      => $source.id$_$sourcePort.name$_ack, 
-$if(targetPort.type.bool)
-$  data_out(0)=> $target.id$_$targetPort.name$_data_in,$\n$$
-else
-$  data_out   => $target.id$_$targetPort.name$_data_in,$\n$$
-endif
+  wr_ack     => $source.id$_$sourcePort.name$_ack, 
+  $if(targetPort.type.bool)
+$  data_out(0)=> $target.id$_$targetPort.name$_data,$\n$$
+  else
+$  data_out   => $target.id$_$targetPort.name$_data,$\n$$
+  endif
 $  rd_clk     => clock, 
-  send        => $target.id$_$targetPort.name$_send, 
-  rd_ack      => $target.id$_$targetPort.name$_ack,  
-  reset_n    => reset_n); $
+  send       => $target.id$_$targetPort.name$_send, 
+  rd_ack     => $target.id$_$targetPort.name$_ack,  
+  reset_n    => reset_n);$
 endif$
 >>
 
@@ -201,10 +201,6 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 // print broadcasts instantiation
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 printActorPorts(instance) ::= <<
 $instance.actor.inputs.list: printPortsInput(); separator="\n"$
