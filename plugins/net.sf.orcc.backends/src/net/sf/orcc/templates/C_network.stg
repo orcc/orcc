@@ -196,20 +196,22 @@ start = clock ();
 $endif$
 
 while (1) {
-  my_actor = sched_get_next($if(!isPointer)$&$endif$sched);    
-  si.num_firings = 0;
-  my_actor->sched_func(&si);
+	my_actor = sched_get_next($if(!isPointer)$&$endif$sched);    
+	si.num_firings = 0;
+	my_actor->sched_func(&si);
 #ifdef PRINT_FIRINGS
-  printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
+	printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
 #endif
-  $if(options.needDynamicMapping)$
-  end = clock ();
-    if((((end - start) / (double)CLOCKS_PER_SEC) >= SYNC_DELAY)){
-      sem_post(&sched->sync->sem_monitor);
-      sem_wait(&sched->sync->sem_threads);
-      start = clock ();
-    }
-  $endif$
+$if(options.needDynamicMapping)$
+	if(sched->sync->active_sync){
+		end = clock ();
+		if((((end - start) / (double)CLOCKS_PER_SEC) >= SYNC_DELAY)){
+			sem_post(&sched->sync->sem_monitor);
+			sem_wait(&sched->sync->sem_threads);
+			start = clock ();
+		}
+	}
+$endif$
 }
 >>
 
@@ -382,15 +384,18 @@ static void scheduler() {
 	
 	struct scheduler_s *schedulers[$options.threadsNb$];
 	struct sync_s sched_sync;
-	struct genetic_s monitoring = {
-		.sync = &sched_sync,
+	struct genetic_s genetic_info = {
 		.actors = actors,
 		.schedulers = schedulers,
 		.actorsNb = sizeof(actors) / sizeof(actors[0]),
 		.threadsNb = $options.threadsNb$
 	};
+	struct monitor_s monitoring = {
+		.sync = &sched_sync,
+		.genetic_info = &genetic_info
+	};
 	
-	sync_init(&sched_sync,$options.threadsNb$);
+	sync_init(&sched_sync);
 	
 	$printInitializes(network.instances)$
 	

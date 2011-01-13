@@ -29,10 +29,67 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 #include "orcc.h"
 #include "orcc_genetic.h"
 #include "orcc_thread.h"
+
+
+static struct mapping_s* compute_mapping(individual *individual, struct genetic_s *genetic_info){
+	int i, j, k;
+	struct mapping_s *mapping = malloc(sizeof(struct mapping_s));
+	mapping->actors_per_threads = malloc(genetic_info->threadsNb * sizeof(int));
+	mapping->actors_mapping = malloc(genetic_info->threadsNb * sizeof(struct actor_s **));
+
+	for (i = 0; i < genetic_info->threadsNb; i++) {
+		struct actor_s *actors_tmp[genetic_info->actorsNb];
+		k = 0;
+
+		for (j = 0; j < genetic_info->actorsNb; j++) {
+			if (individual->genes[j]->mappedCore == i) {
+				actors_tmp[k] = individual->genes[j]->actor;
+				k++;
+			}
+		}
+
+		mapping->actors_mapping[i] = malloc(k * sizeof(struct actor_s*));
+		memcpy(mapping->actors_mapping[i], actors_tmp, k * sizeof(struct actor_s*));
+		mapping->actors_per_threads[i] = k;
+	}
+
+	return mapping;
+}
+
+
+static int write_better_mapping(population *pop, struct genetic_s *genetic_info){
+	FILE *mappingFile = fopen ("better_mapping.txt", "w");
+	if (mappingFile != NULL){
+		int i,j,k;
+		fprintf (mappingFile, "// Better mapping\n\n");
+
+		for(i = 0; i < POPULATION_SIZE * KEEP_RATIO; i++) {
+			struct mapping_s* mapping = compute_mapping(pop->individuals[i],genetic_info);
+			fprintf (mappingFile, "// Mapping n°%i (%f fps)\n\n", i, pop->individuals[i]->fps);
+
+			for(j = 0; j < genetic_info->threadsNb; j++){
+				fprintf (mappingFile, "<Partition id=\"%i\">\n", j);
+
+				for(k = 0; k < mapping->actors_per_threads[j]; k++){
+					fprintf (mappingFile, "\t<Instance actor-id=\"%s/0\"/>\n", get_actor_name(mapping->actors_mapping[j][k]));
+				}
+
+				fprintf (mappingFile, "</Partition>\n\n");
+			}
+		}
+
+		fclose (mappingFile);
+	}
+	else {
+		perror("I/O error during writing of final mapping file");
+	}
+	return 0;
+}
 
 
 static int compare(void const *a, void const *b)
@@ -88,20 +145,13 @@ static individual* mutation(individual *original, struct genetic_s *genetic_info
 }
 
 
-static void compute_new_mapping(individual *individual, struct genetic_s *genetic_info) {
-	int i, j, k;
+static void map_actors_on_threads(individual *individual, struct genetic_s *genetic_info) {
+	int i;
+	struct mapping_s *mapping  = compute_mapping(individual, genetic_info);
+	struct actor_s **actors = mapping->actors_mapping[0];
 
 	for (i = 0; i < genetic_info->threadsNb; i++) {
-		struct actor_s **actors = (struct actor_s **) malloc(genetic_info->actorsNb * sizeof(struct actor_s *));
-		k = 0;
-
-		for (j = 0; j < genetic_info->actorsNb; j++) {
-			if (individual->genes[j]->mappedCore == i) {
-				actors[k] = individual->genes[j]->actor;
-				k++;
-			}
-		}
-		sched_reinit(genetic_info->schedulers[i], k, actors);
+		sched_reinit(genetic_info->schedulers[i], mapping->actors_per_threads[i], mapping->actors_mapping[i]);
 	}
 }
 
@@ -191,18 +241,17 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 
 
 void *monitor(void *data) {
-	struct genetic_s *genetic_info = (struct genetic_s *) data;
-	int evalIndNb = 0;
+	struct monitor_s *monitoring = (struct monitor_s *) data;
+	int i, evalIndNb = 0;
 	population *population;
 
 	// Initialize
 	printf("\nGenerate initial population...\n\n");
-	population = initialize_population(genetic_info);
+	population = initialize_population(monitoring->genetic_info);
 
-	compute_new_mapping(population->individuals[evalIndNb], genetic_info);
+	map_actors_on_threads(population->individuals[evalIndNb], monitoring->genetic_info);
 
-	while (1) {
-		int i;
+	while (population->generationNb < GENERATION_NB) {
 		float fps;
 
 		// Backup informations to compute partial fps except first time
@@ -210,14 +259,13 @@ void *monitor(void *data) {
 			backup_partial_start_info();
 		}
 		// wakeup all threads
-		for (i = 0; i < genetic_info->threadsNb; i++) {
-			sem_post(&genetic_info->sync->sem_threads);
+		for (i = 0; i < monitoring->genetic_info->threadsNb; i++) {
+			sem_post(&monitoring->sync->sem_threads);
 		}
 
 		// wait threads synchro
-
-		for (i = 0; i < genetic_info->sync->threadsNb; i++) {
-			sem_wait(&genetic_info->sync->sem_monitor);
+		for (i = 0; i < monitoring->genetic_info->threadsNb; i++) {
+			sem_wait(&monitoring->sync->sem_monitor);
 		}
 		backup_partial_end_info();
 
@@ -230,10 +278,16 @@ void *monitor(void *data) {
 
 		if (evalIndNb == POPULATION_SIZE) {
 			printf("\nCompute next generation...\n\n");
-			population = compute_next_population(population, genetic_info);
+			population = compute_next_population(population, monitoring->genetic_info);
 			evalIndNb = 0;
 		}
-		compute_new_mapping(population->individuals[evalIndNb], genetic_info);
+		map_actors_on_threads(population->individuals[evalIndNb], monitoring->genetic_info);
+	}
+	monitoring->sync->active_sync = 0;
+	write_better_mapping(population,monitoring->genetic_info);
+
+	for (i = 0; i < monitoring->genetic_info->threadsNb; i++) {
+		sem_post(&monitoring->sync->sem_threads);
 	}
 
 	return NULL;

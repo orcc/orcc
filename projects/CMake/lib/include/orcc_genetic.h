@@ -29,17 +29,27 @@
 #ifndef GENETIC_H
 #define GENETIC_H
 
-#define POPULATION_SIZE 5
+#define POPULATION_SIZE 20
+#define GENERATION_NB 5
 
 #define KEEP_RATIO 0.5
 #define CROSS_OVER_RATIO 0.6
 
-struct genetic_s {
+struct monitor_s {
 	struct sync_s *sync;
+	struct genetic_s *genetic_info;
+};
+
+struct genetic_s {
 	struct actor_s **actors;
 	struct scheduler_s **schedulers;
 	int actorsNb;
 	int threadsNb;
+};
+
+struct mapping_s {
+	int *actors_per_threads;
+	struct actor_s ***actors_mapping;
 };
 
 typedef struct gene_s {

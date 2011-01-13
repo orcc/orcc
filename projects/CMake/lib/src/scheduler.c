@@ -28,3 +28,7 @@ void sched_reinit(struct scheduler_s *sched, int num_actors, struct actor_s **ac
 	sched->next_entry = 0;
 	sched->next_schedulable = 0;
 }
+
+char* get_actor_name(struct actor_s *actor){
+	return actor->name;
+}

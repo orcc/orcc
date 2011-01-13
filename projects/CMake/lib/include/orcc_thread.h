@@ -32,11 +32,11 @@
 #include <semaphore.h>
 
 struct sync_s {
-	int threadsNb;
 	sem_t sem_monitor;
 	sem_t sem_threads;
+	int active_sync;
 };
 
-void sync_init(struct sync_s *sync, int threadsNb);
+void sync_init(struct sync_s *sync);
 
 #endif

@@ -32,10 +32,10 @@
 #include "orcc.h"
 #include "orcc_thread.h"
 
-void sync_init(struct sync_s *sync, int threadsNb) {
-	sync->threadsNb = 2;
+void sync_init(struct sync_s *sync) {
 	sem_init(&sync->sem_monitor, 0, 0);
 	sem_init(&sync->sem_threads, 0, 0);
+	sync->active_sync = 1;
 }
 
 
