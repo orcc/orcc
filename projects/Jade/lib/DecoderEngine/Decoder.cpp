@@ -49,7 +49,9 @@
 #include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Serialize/IRWriter.h"
+#include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 #include "Jade/Transform/ActionSchedulerAdder.h"
 #include "Jade/Transform/BroadcastAdder.h"
@@ -59,18 +61,25 @@ using namespace llvm;
 using namespace std;
 
 Decoder::Decoder(llvm::LLVMContext& C, Network* network, AbstractFifo* fifo): Context(C){
-	
 	//Set property of the decoder
 	this->network = network;
 	this->fifo = fifo;
 	this->instances = network->getInstances();
-	thread = NULL;
+	this->thread = NULL;
+	this->executionEngine = NULL;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
 }
 
 Decoder::~Decoder (){
+	delete scheduler;
+
+	list<Actor*>::iterator it;
+	for (it = specificActors.begin(); it != specificActors.end(); it++){
+		delete *it;
+	}
+
 	delete module;
 }
 
@@ -107,7 +116,7 @@ Instance* Decoder::getInstance(std::string name){
 	return it->second;
 }
 
-bool Decoder::compile(map<string, Actor*>* actors){
+bool Decoder::make(map<string, Actor*>* actors){
 	map<string, Instance*>::iterator it;
 	this->actors = actors;
 
@@ -134,16 +143,21 @@ bool Decoder::compile(map<string, Actor*>* actors){
 	// Setting connections of the decoder
 	fifo->setConnections(this);
 
+	//Set the scheduler
+	scheduler = new RoundRobinScheduler(Context);
+	scheduler->createScheduler(this);
+
 	return true;
 }
 
-void Decoder::setScheduler(Scheduler* scheduler){
-	this->scheduler = scheduler;
-	scheduler->createScheduler(this);
+void Decoder::start(){
+	scheduler->setSource(stimulus);
+	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine);
+	executionEngine->run();
 }
 
-void Decoder::start(){
-	scheduler->execute(this->getStimulus());
+void Decoder::compile(){
+	executionEngine = new LLVMExecution(Context, this);
 }
 
 void Decoder::stop(){
@@ -164,5 +178,10 @@ void* Decoder::threadStart( void* args ){
 }
 
 void Decoder::remove(Instance* instance){
-
+	IRUnwriter unwriter(this);
+	unwriter.remove(instance);
 }
+
+void Decoder::setStimulus(std::string file){
+	this->stimulus = file;
+};

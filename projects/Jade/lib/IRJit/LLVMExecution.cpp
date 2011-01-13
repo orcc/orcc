@@ -75,7 +75,9 @@ extern cl::opt<std::string> TargetTriple;
 //
 LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder): Context(C)  {
   std::string ErrorMsg;
-  module = decoder->getModule();
+
+  this->decoder = decoder;
+  Module* module = decoder->getModule();
 
   // If the user doesn't want core files, disable them.
   if (DisableCoreFiles)
@@ -149,9 +151,10 @@ void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
 	EE->addGlobalMapping(procedure->getFunction(), Addr);
 }
 
-void LLVMExecution::run(std::string function) {
+void LLVMExecution::run() {
 	std::string ErrorMsg;
 	clock_t timer = clock();
+	Module* module = decoder->getModule();
 
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
@@ -165,13 +168,19 @@ void LLVMExecution::run(std::string function) {
 		cout << "--> No lazy compilation enable, the decoder has been compiled in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms \n";
 	}
 
-	Function* func = module->getFunction(function);
+   Scheduler* scheduler = decoder->getScheduler();
+	Function* func = scheduler->getMainFunction();
 
 	std::vector<GenericValue> noargs;
 	GenericValue Result = EE->runFunction(func, noargs);
 
 	// Run static destructors.
 	EE->runStaticConstructorsDestructors(true);
+}
+
+void LLVMExecution::setInputStimulus(std::string input){
+	
+	decoder->getScheduler()->setSource(input);
 }
 
 LLVMExecution::~LLVMExecution(){

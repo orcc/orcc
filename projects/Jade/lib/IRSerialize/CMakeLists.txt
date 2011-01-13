@@ -6,4 +6,5 @@ add_library (IRSerialize
   IRConstant.h
   IRParser.cpp
   IRWriter.cpp
+  IRUnwriter.cpp
  )

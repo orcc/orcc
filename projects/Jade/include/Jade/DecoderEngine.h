@@ -84,6 +84,15 @@ public:
 	int load(Network* network, int optLevel);
 
 	/*!
+     *  @brief Unload the given network
+     *
+     *  Unload and clear the given network.
+	 *   
+	 *  @param network : the Network to unload
+     */
+	int unload(Network* network);
+
+	/*!
      *  @brief Stop the given network
 	 *   
 	 *  @param network : the Network to stop

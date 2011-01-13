@@ -46,9 +46,9 @@ namespace llvm{
 
 class JIT;
 class Decoder;
-class LLVMExecution;
 
 #include "Scheduler.h"
+#include "Jade/Jit/LLVMExecution.h"
 //------------------------------
 
 /**
@@ -75,17 +75,19 @@ public:
 	void execute(std::string stimulus);
 	void stop();
 
+	llvm::Function* getMainFunction(){return scheduler;};
+	
+	void setExternalFunctions(LLVMExecution* executionEngine);
+
+	void setSource(std::string input);
+
 private:
 
 	void createSchedulerFn();
 
-	void setSource(std::string input);
-
 	void setDisplay();
 
 	void setCompare();
-	
-	void setExternalFunctions();
 
 
 	/** Decoder bound to the round robin scheduler */
@@ -96,9 +98,6 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
-
-	/** Execution engine of the decoder */
-	LLVMExecution* executionEngine;
 	
 	/** Print all actions made by LLVM execution engine*/
 	bool verbose;

@@ -28,93 +28,67 @@
  */
 
 /**
-@brief Description of the LLVMExecution interface
+@brief Description of the IRUnwriter class interface
 @author Jerome Gorin
-@file LLVMExecution.h
+@file IRUnwriter.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#ifndef LLVMEXECUTION_H
-#define LLVMEXECUTION_H
+#ifndef IRUNWRITER_H
+#define IRUNWRITER_H
+
+#include <map>
 
 namespace llvm{
-	class Function;
-	class ExecutionEngine;
+	class ConstantInt;
 	class Module;
 }
 
-#include "llvm/LLVMContext.h"
+class Decoder;
+class JIT;
+class LLVMWriter;
+
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Instance.h"
 //------------------------------
 
+
 /**
- * @brief  This class manages the LLVM infrastructure to write elements
- * 
+ * @class IRUnwriter
+ *
+ * @brief This class defines a unwriter that removes an instance from a decoder.
+ *
  * @author Jerome Gorin
  * 
  */
-class LLVMExecution {
+class IRUnwriter{
 public:
 
 	/**
-     *  @brief Constructor
-     *
-	 *	Initialize the execution engine
-	 *
-     */
-	LLVMExecution(llvm::LLVMContext& C, Decoder* decoder);
+	 * Creates an instance writer on the given actor.
+	 * 
+	 * @param instance : Instance to write
+	 */
+	IRUnwriter(Decoder* decoder);
 
 	/**
-     *  @brief Destructor
+	 * Write the instance inside the given decoder.
+	 * 
+	 * @param decoder: the decoder to write the instance into
      *
-	 *	Delete the execution engione
-     */
-	~LLVMExecution();
+	 * @return true if the actor is written, otherwise false
+	 */
+	int remove(Instance* instance);
 
-	/**
-     *  @brief map a function in the decider
-     *
-	 *	Map an external procedure in the decoder
-	 *
-	 *  @param procedure : the procedure to map
-	 *
-	 *  @param adrr : mapping address of the procedure
-     */
-	void mapProcedure(Procedure* procedure, void *Addr);
-
-	/**
-     *  @brief Set the input stimulus for the  decoder
-     *
-	 *	@param input : input string of the decoder
-     */
-	void setInputStimulus(std::string input);
-
-	/**
-     *  @brief run the current decoder
-     *
-	 *	Run the decoder using the given function name
-     */
-	void run();
-
-	void* getExit(); 
+	~IRUnwriter();
 
 private:
-
-	/** LLVM Context */
-	llvm::LLVMContext &Context;
-
-	/** Module that representing the decoder*/
+	
+	/** Decoder where instance is unwrite*/
 	Decoder* decoder;
 
-	/** Execution engine*/
-	llvm::ExecutionEngine *EE;
-
-	/** Exit function */
-	llvm::Function *Exit;	
-
-	/** Result of the execution */
-	int result;
 };
 
 #endif

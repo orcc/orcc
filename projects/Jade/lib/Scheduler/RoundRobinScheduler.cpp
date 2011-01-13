@@ -55,7 +55,6 @@
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Variable.h"
 #include "Jade/Core/Instance.h"
-#include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
 #include "display.h"
@@ -75,15 +74,12 @@ static int Filesize(){
 }
 
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, bool verbose): Context(C) {
-	this->executionEngine = NULL;
 	this->verbose = verbose;
 	verboseDisplay = verbose;
 }
 
 RoundRobinScheduler::~RoundRobinScheduler (){
-	if (executionEngine){
-		delete executionEngine;
-	}
+	scheduler->eraseFromParent();
 }
 
 void RoundRobinScheduler::createScheduler(Decoder* decoder){
@@ -153,17 +149,11 @@ void RoundRobinScheduler::execute(string stimulus){
 	setSource(stimulus);
 
 	clock_t timer = clock ();
-	executionEngine = new LLVMExecution(Context, decoder);
-
-	setExternalFunctions();
 
 	if (verbose){
 		cout << "--> Engine initialized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 		cout << "-->  Start decoding :\n";
 	}
-
-	//Run decoder
-	executionEngine->run("main");
 }
 
 void RoundRobinScheduler::stop(){
@@ -172,7 +162,7 @@ void RoundRobinScheduler::stop(){
 	SDL_PushEvent(&sdlEvent);
 }
 
-void RoundRobinScheduler::setExternalFunctions(){
+void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 
 	//Set exit function
 	exit_decoder = (void(*)(int))executionEngine->getExit();

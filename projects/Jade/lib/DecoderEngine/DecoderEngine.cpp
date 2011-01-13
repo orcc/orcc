@@ -53,7 +53,6 @@
 #include "Jade/Jit/LLVMOptimizer.h"
 #include "Jade/Optimize/FifoFnRemoval.h"
 #include "Jade/Optimize/InstanceInternalize.h"
-#include "Jade/Scheduler/RoundRobinScheduler.h"
 #include "llvm/Support/PassNameParser.h"
 //------------------------------
 
@@ -101,10 +100,8 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	decoder = new Decoder(Context, network, fifo);
 
 	//Compile the decoder
-	decoder->compile(&actors);
+	decoder->make(&actors);
 	
-	//Set the scheduler
-	decoder->setScheduler(new RoundRobinScheduler(Context));
 	if (verbose){
 		cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	}
@@ -135,19 +132,26 @@ int DecoderEngine::load(Network* network, int optLevel) {
 		cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	}
 	timer = clock ();
+
+	decoder->compile();
 		
 	return 0;
 }
+
+int DecoderEngine::unload(Network* network) {
+	delete decoder;
+	return 0;
+}
+
 
 int DecoderEngine::stop(Network* network){
 	decoder->stop();
 	return 0;
 }
 
-int DecoderEngine::run(Network* network, string input, pthread_t* thread){
-	//Set input of the decoder
+int DecoderEngine::run(Network* network, string input, pthread_t* thread){	
 	decoder->setStimulus(input);
-	
+
 	//Start decoding
 	if (thread != NULL){
 		decoder->startInThread(thread);
@@ -167,7 +171,7 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 		list<Instance*>* instances = (*it)->getInstances();
 
 		for (itInst = instances->begin(); itInst != instances->end(); itInst++){
-
+			decoder->remove(*itInst);
 		}
 	}
 	

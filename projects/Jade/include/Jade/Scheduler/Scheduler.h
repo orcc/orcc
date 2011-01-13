@@ -39,6 +39,10 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
+namespace llvm{
+	class Function;
+}
+
 #include <string>
 //------------------------------
 
@@ -60,6 +64,8 @@ public:
 	virtual void createScheduler(Decoder* decoder){};
 	virtual void execute(std::string stimulus){};
 	virtual void stop(){};
+	virtual llvm::Function* getMainFunction(){return NULL;};
+	virtual void setSource(std::string input){};
 };
 
 #endif

@@ -405,8 +405,10 @@ void parseConsole(string cmd){
 				cout << "No network loads at the given id.\n";
 				return;
 			}
-			
+
 			Network* network = it->second;
+			engine->unload(network);
+
 			networks.erase(id);
 
 			delete network;

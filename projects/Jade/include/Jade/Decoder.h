@@ -55,6 +55,7 @@ class BroadcastActor;
 class Decoder;
 class Instance;
 class JIT;
+class LLVMExecution;
 class Network;
 class BroadcastAdder;
 
@@ -198,20 +199,21 @@ public:
 	std::string getStimulus(){return stimulus;};
 
 	/**
+     *  @brief Getter of scheduler
+	 *
+	 *  Returns the scheduler used in the decoder
+	 * 
+	 *  @return the scheduler used by the decoder
+     */
+	 Scheduler* getScheduler(){return scheduler;};
+
+	/**
      *  @brief Setter of a stimulus file
 	 * 
 	 *  @param file : the stimulus file
      */
-	void setStimulus(std::string file){this->stimulus = file;};
+	void setStimulus(std::string file);
 
-
-	/**
-     *  @brief Setter of the decoder scheduler
-	 *
-	 *  @param scheduler : the scheduler of the decoder
-	 *
-     */
-	void setScheduler(Scheduler* scheduler);
 
 	/**
      *  @brief Start the decoder
@@ -232,16 +234,24 @@ public:
 	void stop();
 
 	/**
-	 * @brief Compile the decoder
+	 * @brief Make the decoder
 	 * 
-	 * Compile the decoder using an XDF Network and the VTL. Compilation may include
+	 * Make the decoder using an XDF Network and the VTL. Compilation may include
 	 * instantiation, flattening, transforming, printing the network, or a subset of these steps.
 	 * 
 	 * @param actors : a map of loaded actors
 	 *
 	 * @return true if compilation ok, otherwise false
 	 */
-	bool compile(std::map<std::string, Actor*>* actors);
+	bool make(std::map<std::string, Actor*>* actors);
+
+	/**
+     *  @brief Compile the decoder
+	 *
+	 *	Compile the decoder to make it ready for execution.
+	 *
+     */
+	void compile();
 
 
 private:
@@ -267,7 +277,6 @@ private:
 	/** List of specific actors contained in the decoder */
 	std::list<Actor*> specificActors;
 
-
 	/** Map of instances in the decoder */
 	std::map<std::string, Instance*>* instances;
 	
@@ -282,6 +291,9 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
+
+	/** Execution engine of the decoder */
+	LLVMExecution* executionEngine;
 
 	/** Current thread used by the decoder */
 	pthread_t* thread;
