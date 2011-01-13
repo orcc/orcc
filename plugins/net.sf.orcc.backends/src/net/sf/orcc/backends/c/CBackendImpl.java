@@ -135,14 +135,13 @@ public class CBackendImpl extends AbstractBackend {
 			}
 		}
 
-		printer.getOptions().put("threads", threads);
-
-		needPthreads = (threads.keySet().size() > 1);
+		boolean needDynamicMapping = getAttribute(
+				"net.sf.orcc.backends.dynamicMapping", false);
+		printer.getOptions().put("needDynamicMapping", needDynamicMapping);
+		
+		needPthreads = (threads.keySet().size() > 1) || needDynamicMapping;
 		printer.getOptions().put("needPthreads", needPthreads);
-		printer.getOptions().put("needDynamicMapping",
-				getAttribute("net.sf.orcc.backends.dynamicMapping", false));
-		printer.getOptions().put("threadsNb",
-				getAttribute("net.sf.orcc.backends.processorsNumber", "1"));
+		printer.getOptions().put("threads", threads);
 	}
 
 	@Override
