@@ -235,39 +235,8 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 // print broadcasts instantiation
 ///////////////////////////////////////////////////////////////////////////////
+// TODO
 
-printActorPorts(instance) ::= <<
-$instance.actor.inputs.list: printPortsInput(); separator="\n"$
-$instance.actor.outputs.list: printPortsOutput(); separator="\n"$
->>
-
-printNetworksPorts(instance) ::= <<
-$instance.network.inputs.list: printPortsInput(); separator="\n"$
-$instance.network.outputs.list: printPortsOutput(); separator="\n"$
->>
-
-printPortsInput(port) ::= <<
-$port.name$_data   => $instance.id$_$port.name$_data_in,
-$port.name$_send   => $instance.id$_$port.name$_send,
-$port.name$_ack    => $instance.id$_$port.name$_ack,
->>
-
-printPortsOutput(port) ::= <<
-$port.name$_data   => $instance.id$_$port.name$_data_out,
-$port.name$_send   => $instance.id$_$port.name$_send,
-$port.name$_ack    => $instance.id$_$port.name$_ack,
->> 
-
-printBroadcastPorts(instance) ::= <<
--- Print Broadcast: $instance.id$
-$instance.broadcast.outputList: printBroadcastOutput(); separator="\n"$
->>
-
-printBroadcastOutput(num) ::= <<
-$instance.id$_output_$num$_data_out <= $instance.id$_data_out;
-$instance.id$_output_$num$_send     <= $instance.id$_send;
-$instance.id$_output_$num$_ack      <= $instance.id$_ack;
->> 
 
 
 ///////////////////////////////////////////////////////////////////////////////
