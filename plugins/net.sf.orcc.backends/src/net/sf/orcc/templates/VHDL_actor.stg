@@ -538,13 +538,12 @@ begin
 
   --
   -- Test the action's inputs to fire (or not) an action  
+  $actor.actions : {actions|$actions$_go  <= '0';}; separator="\n"$
+  $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
 $if(actor.actionScheduler.fsm)    
 $  $printActionFireFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
 else  
 $  if $actor.actions: printActionFire(); separator="\n  elsif"$
-  else
-    $actor.actions : {actions|$actions$_go  <= '0';}; separator="\n"$
-    $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
   end if;$
 endif$
 
@@ -601,17 +600,12 @@ printActionFireFSM(actions, fsm) ::= <<
 $if(actions)
 $if$printActionFire(actions)$
 else
-  $actor.actions : {actions|$actions$_go  <= '0';}; separator="\n  "$
-  $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
-  $actor.actions : {actions|$actions$_ack <= '0';}; separator="\n  "$
   case FSM is
   $TransitionFire()$
       end case;
 end if;$
 else
-$$actor.actions : {actions|$actions$_go  <= '0';}; separator="\n  "$
-  $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
-  case FSM is
+$  case FSM is
 $fsm.transitions: TransitionFire(); separator="\n\n"$
   end case;$
 endif$
