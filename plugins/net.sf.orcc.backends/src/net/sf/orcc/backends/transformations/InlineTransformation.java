@@ -461,6 +461,7 @@ public class InlineTransformation extends AbstractActorTransformation {
 		if (!call.getProcedure().getReturnType().isVoid() && inlineFunction) {
 			returnVariableOfCurrentFunction = call.getTarget();
 			inline(call);
+			returnVariableOfCurrentFunction = null;
 		}
 
 		// Procedure case
