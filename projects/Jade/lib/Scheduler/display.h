@@ -129,6 +129,10 @@ void display_show_image(void) {
 		switch (event.type) {
 			case SDL_QUIT:
 				pthread_exit(NULL);
+				m_x = 0;
+				m_y = 0;
+				m_width = 0;
+				m_height = 0;
 				break;
 			default:
 				break;

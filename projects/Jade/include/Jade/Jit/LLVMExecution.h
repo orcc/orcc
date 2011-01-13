@@ -97,6 +97,20 @@ public:
      */
 	void run();
 
+	/**
+     *  @brief stop the current decoder
+     *
+	 *	Stop the decoder
+     */
+	void stop();
+
+	/**
+     *  @brief cleart the current decoder
+     *
+	 *	Clear the decoder
+     */
+	void clear();
+
 	void* getExit(); 
 
 private:

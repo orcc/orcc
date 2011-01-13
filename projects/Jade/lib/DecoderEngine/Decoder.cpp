@@ -152,7 +152,9 @@ bool Decoder::make(map<string, Actor*>* actors){
 
 void Decoder::start(){
 	scheduler->setSource(stimulus);
+	
 	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine);
+	
 	executionEngine->run();
 }
 
@@ -161,9 +163,9 @@ void Decoder::compile(){
 }
 
 void Decoder::stop(){
-	scheduler->stop();
-	//int ret = pthread_cancel (*thread);
-	//cout << ret;
+	executionEngine->stop();
+	pthread_join (*thread, NULL);
+	executionEngine->clear();
 }
 
 void Decoder::startInThread(pthread_t* thread){

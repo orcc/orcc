@@ -141,20 +141,8 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder): Context(C)  {
   
   // Reset errno to zero on entry to main.
   errno = 0;
-}
 
-void* LLVMExecution::getExit() {
-	return EE->getPointerToFunction(Exit);
-}
-
-void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
-	EE->addGlobalMapping(procedure->getFunction(), Addr);
-}
-
-void LLVMExecution::run() {
-	std::string ErrorMsg;
 	clock_t timer = clock();
-	Module* module = decoder->getModule();
 
 	// Run static constructors.
     EE->runStaticConstructorsDestructors(false);
@@ -167,16 +155,41 @@ void LLVMExecution::run() {
 		}
 		cout << "--> No lazy compilation enable, the decoder has been compiled in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms \n";
 	}
+}
+
+void* LLVMExecution::getExit() {
+	return EE->getPointerToFunction(Exit);
+}
+
+void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
+	EE->addGlobalMapping(procedure->getFunction(), Addr);
+}
+
+void LLVMExecution::run() {
+	std::string ErrorMsg;
 
    Scheduler* scheduler = decoder->getScheduler();
 	Function* func = scheduler->getMainFunction();
 
 	std::vector<GenericValue> noargs;
 	GenericValue Result = EE->runFunction(func, noargs);
-
-	// Run static destructors.
-	EE->runStaticConstructorsDestructors(true);
 }
+
+void LLVMExecution::stop() {
+	Scheduler* scheduler = decoder->getScheduler();
+	scheduler->stop();
+}
+
+void LLVMExecution::clear() {
+	Module* module = decoder->getModule();
+	EE->runStaticConstructorsDestructors(true);
+	EE->clearAllGlobalMappings();
+/*
+	for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
+		EE->freeMachineCodeForFunction(I);
+	}*/
+}
+
 
 void LLVMExecution::setInputStimulus(std::string input){
 	
@@ -184,6 +197,9 @@ void LLVMExecution::setInputStimulus(std::string input){
 }
 
 LLVMExecution::~LLVMExecution(){
+	// Run static destructors.
+	EE->runStaticConstructorsDestructors(true);
+
 	delete EE;
 	llvm_shutdown();
 }
