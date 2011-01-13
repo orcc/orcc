@@ -109,6 +109,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=2)  NumC8x8;
 	uint(size=32) PicSizeInMbs;
 	uint(size=32) PicWidthInMbs;
+	uint(size=5)  MbWidthC;
+	uint(size=5)  MbHeightC;
 	//Pps Parameters
 	bool          entropy_coding_mode_flag;
 	bool          transform_8x8_mode_flag;
@@ -169,7 +171,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 	GetSpsAndPpsParameters: action
 			PpsParameters         :[PpsParam] repeat 3,
-			SpsParameters         :[SpsParam] repeat 7,
+			SpsParameters         :[SpsParam] repeat 9,
 			SliceHeaderParameters :[ ValSliceType  , ValFirstMbInSlice,
 			                         ValMbaffFrame , Val_Qp,
 			                         ValDisDebFil  , ValSliceBetaOffset,
@@ -186,6 +188,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			PicSizeInMbs                  := SpsParam[4];
 			PicWidthInMbs                 := SpsParam[5];
 			direct_8x8_inference_flag     := GetFlag(SpsParam[6],0);
+			MbWidthC                      := SpsParam[7];
+			MbHeightC                     := SpsParam[8];
 
 			chroma_qp_index_offset        := PpsParam[0];
 			second_chroma_qp_index_offset := PpsParam[1];
@@ -353,11 +357,11 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	//macroblock_layer()
 	SendMbLayerParameters: action
 				==>
-			MbLayerParameters :[Parameters] repeat 35,
+			MbLayerParameters :[Parameters] repeat 37,
 			NewPic            :[false],
 			IsNewPicOrSlice   :[IS_NEW_MB]
 		var
-			List(type: int(size=8), size=35) Parameters,
+			List(type: int(size=8), size=37) Parameters,
 			List(type: uint(size=5), size=12) NaTab,
 			List(type: uint(size=5), size=12) NbTab,
 			bool        LMbExists,
@@ -421,6 +425,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				Parameters[11 + i] := NaTab[i];
 				Parameters[23 + i] := NbTab[i];
 			end
+			Parameters[35] := MbWidthC;
+			Parameters[36] := MbHeightC;
 		end
 
 

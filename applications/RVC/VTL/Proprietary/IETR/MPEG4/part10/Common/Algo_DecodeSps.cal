@@ -115,6 +115,8 @@ actor Algo_DecodeSps()
 	List (type:uint(size=4), size=32 ) bit_depth_luma_minus8                  := [ 0     : for int i in 0 .. 31 ];
 	List (type:uint(size=3), size=32 ) bit_depth_chroma_minus8                := [ 0     : for int i in 0 .. 31 ];
 	List (type:uint(size=2), size=32 ) chroma_format_idc                      := [ 1     : for int i in 0 .. 31 ];
+	List (type:uint(size=5), size=32 ) MbWidthC                               := [ 8     : for int i in 0 .. 31 ];
+	List (type:uint(size=5), size=32 ) MbHeightC                              := [ 8     : for int i in 0 .. 31 ];
 
 	uint(size=5)  sps_id      := 0;
 	uint(size=5)  last_sps_id := 0;
@@ -207,18 +209,18 @@ actor Algo_DecodeSps()
 		end
 
 	SendOff4RefFrameAcc.Done: action
-			==>
-			SpsParameters :[SliceDataParam] repeat 8
+				==>
+			SpsParameters :[SliceDataParam] repeat 10
 		guard
 			LoopVal >  num_ref_frames_in_pic_order_cnt_cycle[sps_id]
 		var
 			bool ValDirect8x8Inference,
-			List(type: int(size=32), size=8) SliceDataParam
+			List(type: int(size=32), size=10) SliceDataParam
 		do
 			ValDirect8x8Inference := (direct_8x8_inference_flag[sps_id] != 0);
 
 			/*Size of List Data Param*/
-			SliceDataParam[0] := 7;
+			SliceDataParam[0] := 9;
 
 			SliceDataParam[1] := bit_depth_chroma_minus8[sps_id]+8;
 			SliceDataParam[2] := bit_depth_luma_minus8[sps_id]+8;
@@ -227,6 +229,8 @@ actor Algo_DecodeSps()
 			SliceDataParam[5] := pic_size_in_mbs[sps_id];
 			SliceDataParam[6] := pic_width_in_mbs_minus1[sps_id] + 1;
 			SliceDataParam[7] := SetFlag(ValDirect8x8Inference,0,0);
+			SliceDataParam[8] := MbWidthC[sps_id];
+			SliceDataParam[9] := MbHeightC[sps_id];
 		end
 
 	SpsParam.AskedFromPps: action
@@ -572,6 +576,23 @@ actor Algo_DecodeSps()
 						4
 					end
 				end;
+			if(chroma_format_idc[sps_id] = 0)then
+				MbWidthC[sps_id]  := 0;
+				MbHeightC[sps_id] := 0;
+			else
+				if(chroma_format_idc[sps_id] = 1)then
+					MbWidthC[sps_id]  := 8;
+					MbHeightC[sps_id] := 8;
+				else
+					if(chroma_format_idc[sps_id] = 2)then
+						MbWidthC[sps_id]  :=  8;
+						MbHeightC[sps_id] := 16;
+					else
+						MbWidthC[sps_id]  := 16;
+						MbHeightC[sps_id] := 16;
+					end
+				end
+			end
 			if(DEBUG_FLAG_DECODED)then
 				println("\t\tvui_parameters_present_flag : "+ValueOfVLD);
 			end

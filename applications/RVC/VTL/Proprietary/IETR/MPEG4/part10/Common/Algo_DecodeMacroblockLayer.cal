@@ -123,7 +123,7 @@ actor Algo_DecodeMacroblockLayer()
 			42,42,42,42
 		];
 
-	bool DEBUG_FLAG_DECODED = true;
+	bool DEBUG_FLAG_DECODED = false;
 
 
 	uint(size=6)  mb_type                        := 0;
@@ -154,6 +154,10 @@ actor Algo_DecodeMacroblockLayer()
 	int (size=8)  Qp_CrValue;
 	int (size=5)  chroma_qp_index_offset;
 	int (size=5)  second_chroma_qp_index_offset;
+
+	uint(size=9)  NbCoeffChroma;
+	uint(size=9)  ChromaReadIdx  := 0;
+	uint(size=9)  ChromaWriteIdx := 0;
 
 	function Is_Intra_8x8(uint MbType)
 				-->
@@ -202,7 +206,7 @@ actor Algo_DecodeMacroblockLayer()
 		end
 
 	ReadParameters: action
-			Parameters         :[Param] repeat 35
+			Parameters         :[Param] repeat 37
 				==>
 			MergeTransfSz8x8   :[transform_8x8_mode_flag]
 		do
@@ -230,6 +234,7 @@ actor Algo_DecodeMacroblockLayer()
 				nATab[i] := Param[11 + i];
 				nBTab[i] := Param[23 + i];
 			end
+			NbCoeffChroma := Param[35] * Param[36];
 		end
 
 	ReadMbType.Done: action
@@ -328,43 +333,50 @@ actor Algo_DecodeMacroblockLayer()
 			end
 		end
 
-	ReadPcmSampleLuma.Asked: action
+	ReadPcmSampleChroma.Asked: action
 				==>
 			//            pcm_sample_chroma[ i ]
-			TypeOfVLD :[    ReadBitsTab    ] repeat 256,
-			VLDParam  :[ BitDepthChromaTab ] repeat 256
-			// Size is not always 256. Should be corrected and the value should be compute in Pps or Sps actor
-		var
-			List(type: uint(size=3), size=256) ReadBitsTab       = [READ_BITS        : for int s in 0 .. 255],
-			List(type: uint(size=5), size=256) BitDepthChromaTab = [bit_depth_chroma : for int s in 0 .. 255]
+			TypeOfVLD :[     READ_BITS    ],
+			VLDParam  :[ bit_depth_chroma ]
+		guard
+			ChromaWriteIdx < NbCoeffChroma
+		do
+			ChromaWriteIdx  := ChromaWriteIdx + 1;
 		end
 
 	ReadPcmSampleChroma.UComponent: action
-			ValVLD       :[ValueOfVLD] repeat 256
+			ValVLD      :[ValueOfVLD]
 				==>
-			pix_I_PCM_U  :[ValueOfVLD] repeat 256
+			pix_I_PCM_U :[ValueOfVLD]
+		guard
+			ChromaReadIdx < ChromaWriteIdx
 		do
 			if(DEBUG_FLAG_DECODED)then
-				/* Forward to the output for the pcm decoding */
-				foreach int a in 0 .. 255
-				do
-					println("\t\tpcm_sample_chroma1[" + a + "] : " + ValueOfVLD[a]);
-				end
-				println("");
+				println("\t\tpcm_sample_chroma1[" + ChromaReadIdx + "] : " + ValueOfVLD);
 			end
+			ChromaReadIdx := ChromaReadIdx + 1;
 		end
 
 	ReadPcmSampleChroma.VComponent: action
-			ValVLD       :[ValueOfVLD] repeat 256
+			ValVLD      :[ValueOfVLD]
 				==>
-			pix_I_PCM_V  :[ValueOfVLD] repeat 256
+			pix_I_PCM_V :[ValueOfVLD]
+		guard
+			ChromaReadIdx < ChromaWriteIdx
 		do
 			if(DEBUG_FLAG_DECODED)then
-				/* Forward to the output for the pcm decoding */
-				foreach int a in 0 .. 255
-				do
-					println("\t\tpcm_sample_chroma2[" + a + "] : " + ValueOfVLD[a]);
-				end
+				println("\t\tpcm_sample_chroma2[" + ChromaReadIdx + "] : " + ValueOfVLD);
+			end
+			ChromaReadIdx := ChromaReadIdx + 1;
+		end
+
+	ReadPcmSampleChroma.Done: action ==>
+		guard
+			ChromaReadIdx = NbCoeffChroma
+		do
+			ChromaReadIdx  := 0;
+			ChromaWriteIdx := 0;
+			if(DEBUG_FLAG_DECODED)then
 				println("");
 			end
 		end
@@ -596,15 +608,15 @@ actor Algo_DecodeMacroblockLayer()
 		CheckMbPred               (LaunchMbPred                   )--> Check4CodedBlockPattern;
 
 		/* PCM Macroblock */
-		ReadPcmSampleLuma         (ReadPcmSampleLuma.Done         )--> ReadPcmSampleChroma1Asked;
+		ReadPcmSampleLuma         (ReadPcmSampleLuma.Done         )--> ReadPcmSampleChroma1;
 
-		ReadPcmSampleChroma1Asked (ReadPcmSampleLuma.Asked        )--> ReadPcmSampleChroma1;
+		ReadPcmSampleChroma1      (ReadPcmSampleChroma.Asked      )--> ReadPcmSampleChroma1;
+		ReadPcmSampleChroma1      (ReadPcmSampleChroma.UComponent )--> ReadPcmSampleChroma1;
+		ReadPcmSampleChroma1      (ReadPcmSampleChroma.Done       )--> ReadPcmSampleChroma2;
 
-		ReadPcmSampleChroma1      (ReadPcmSampleChroma.UComponent )--> ReadPcmSampleChroma2Asked;
-
-		ReadPcmSampleChroma2Asked (ReadPcmSampleLuma.Asked        )--> ReadPcmSampleChroma2;
-
-		ReadPcmSampleChroma2      (ReadPcmSampleChroma.VComponent )--> SendEndSliceHeader;
+		ReadPcmSampleChroma2      (ReadPcmSampleChroma.Asked      )--> ReadPcmSampleChroma2;
+		ReadPcmSampleChroma2      (ReadPcmSampleChroma.VComponent )--> ReadPcmSampleChroma2;
+		ReadPcmSampleChroma2      (ReadPcmSampleChroma.Done       )--> SendEndSliceHeader;
 
 		/* Other Macroblock */
 		CheckSubMbType            (CheckSubMbType                 )--> Check4CodedBlockPattern;
@@ -638,10 +650,13 @@ actor Algo_DecodeMacroblockLayer()
 	end
 
 	priority
-		CheckMbType.IsIPCM          > CheckMbType.IsNotIPCM;
-		LaunchSubMbPred             > ReadTransformSize.Asked > LaunchMbPred;
-		ReadCodedBlockPattern.Asked > ReadMbQpDelta.Asked;
-		ReadTransformSize8x8.Asked  > ReadMbQpDelta.Asked;
-		ReadMbQpDelta.Asked         > NoResidual;
+		CheckMbType.IsIPCM             > CheckMbType.IsNotIPCM;
+		LaunchSubMbPred                > ReadTransformSize.Asked > LaunchMbPred;
+		ReadCodedBlockPattern.Asked    > ReadMbQpDelta.Asked;
+		ReadTransformSize8x8.Asked     > ReadMbQpDelta.Asked;
+		ReadMbQpDelta.Asked            > NoResidual;
+		ReadPcmSampleChroma.VComponent > ReadPcmSampleChroma.Asked;
+		ReadPcmSampleChroma.UComponent > ReadPcmSampleChroma.Asked;
+		ReadPcmSampleChroma.Asked      > ReadPcmSampleChroma.Done;
 	end
 end
