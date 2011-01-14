@@ -1,4 +1,23 @@
 ///////////////////////////////////////////////////////////////////////////////
+// Common applet
+///////////////////////////////////////////////////////////////////////////////
+portType(port, IOtype, dataType) ::=<<
+$if(port.type.bool)
+$$port.name$_$dataType$  :$IOtype$std_logic;$
+else
+$$port.name$_$dataType$  :$IOtype$std_logic_vector($port.type.size$ -1 downto 0);$
+endif$
+>>
+
+SignalType(instance, port, dataType) ::=<<
+$if(port.type.bool)
+$signal $instance.id$_$port.name$_$dataType$   : std_logic;$
+else
+$signal $instance.id$_$port.name$_$dataType$   : std_logic_vector($port.type.size$ -1 downto 0);$
+endif$
+>>
+
+///////////////////////////////////////////////////////////////////////////////
 // print IOs of the TOP Network
 ///////////////////////////////////////////////////////////////////////////////
 printNetworkPorts(network) ::= <<
@@ -7,21 +26,13 @@ $network.outputs.list: printNetPortsOutput(); separator="\n"$
 >>
 
 printNetPortsInput(port) ::= <<
-$if(port.type.bool)
-$$port.name$_data  : in  std_logic;$\n$$
-else
-$$port.name$_data  : in  std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
-endif$
+$portType(port=port, IOtype=" in  ", dataType="data")$
 $port.name$_send  : in  std_logic;
 $port.name$_ack   : out std_logic;
 >>
 
 printNetPortsOutput(port) ::= <<
-$if(port.type.bool)
-$$port.name$_data   : out std_logic;$\n$$
-else
-$$port.name$_data   : out std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
-endif$
+$portType(port=port, IOtype=" out ", dataType="data")$
 $port.name$_send   : out std_logic;
 $port.name$_ack    : in  std_logic;
 >>
@@ -47,7 +58,7 @@ $printSignals(inputs=instance.broadcast.inputs.list,
 elseif (instance.network)
 $                                            -- Network : $instance.id$
 $printSignals(inputs=instance.network.inputs.list,
-              outputs=broadcast.network.outputs.list)$$
+              outputs=instance.network.outputs.list)$$
 endif$
 >>
 
@@ -66,12 +77,7 @@ $printInSignal(connection=connection, map=network.predecessorsMap.(instance))$
 
 printInSignal(connection, map) ::= <<
 $if(map.(connection.target))
-$$if(connection.target.type.bool)
-$signal $instance.id$_$connection.target$_data   : std_logic;$
-else
-$signal $instance.id$_$connection.target$_data   : std_logic_vector($connection.target.type.size$ - 1 downto 0);$
-endif$
-
+$$SignalType(instance=instance, port=connection.target, dataType="data")$
 signal $instance.id$_$connection.target$_send   : std_logic;
 signal $instance.id$_$connection.target$_ack    : std_logic;
 $
@@ -84,12 +90,7 @@ $printOutSignal(connection=connection, map=network.successorsMap.(instance))$
 
 printOutSignal(connection, map) ::= <<
 $if(map.(connection.source) && connection.attributes)
-$$if(connection.source.type.bool)
-$signal $instance.id$_$connection.source$_data   : std_logic;$
-else
-$signal $instance.id$_$connection.source$_data   : std_logic_vector($connection.source.type.size$ - 1 downto 0);$
-endif$
-
+$$SignalType(instance=instance, port=connection.source, dataType="data")$
 signal $instance.id$_$connection.source$_send   : std_logic;
 signal $instance.id$_$connection.source$_ack    : std_logic;
 $
