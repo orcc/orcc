@@ -83,7 +83,7 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 			MbType            :[mb_type],
 			MbLayerQp_Y_Cb_Cr :[ValQp , ValQpCb , ValQpCr]
 				==>
-			MbIntraFlag      :[1],
+			MbIntraFlag    :[1],
 			ScalingList    :[[16 : for int i in 0 .. 15]] repeat 16,
 			Qp             :[ValQp],
 			Qp_Cb          :[ValQpCb],
@@ -163,9 +163,9 @@ actor Algo_MergeDataFromSlcDataAndMbLayer()
 		end
 
 	MbLayer.IsNotIntra: action
-			SkipMbLayer     :[skip],
-			MbType          :[Mb_type],
-			TransfSz8x8Flag :[Is8x8],
+			SkipMbLayer       :[skip],
+			MbType            :[Mb_type],
+			TransfSz8x8Flag   :[Is8x8],
 			MbLayerQp_Y_Cb_Cr :[ValQp , ValQpCb , ValQpCr]
 				==>
 			MbIntraFlag    :[0],

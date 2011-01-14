@@ -49,7 +49,7 @@ actor Algo_GenerateSkipBlockInformation()
 	IsIPCM_MacroB: action
 			IsIPCM :[IPCM]
 				==>
-			cbp_blk :[0xFF]//Coeff_token of I_PCM MacroB is always equal to 16!
+			cbp_blk :[0]
 		guard
 			IPCM = true
 		end

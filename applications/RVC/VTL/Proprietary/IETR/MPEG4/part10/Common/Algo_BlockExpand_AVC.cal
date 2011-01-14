@@ -94,9 +94,18 @@ actor Algo_BlockExpand_AVC ()
 
 	/* Actions */
 
+	SkipBlock: action
+			MbType :[mb_type]
+				==>
+		guard
+			mb_type = BLOCK_TYPE_I_PCM
+		end
+
 	ReadBlockSize: action
 			MbType :[mb_type]
 				==>
+		guard
+			mb_type != BLOCK_TYPE_I_PCM
 		do
 			LumaMBSize       :=
 				if(Is_Intra_16x16(mb_type))then
@@ -328,6 +337,7 @@ actor Algo_BlockExpand_AVC ()
 	schedule fsm ReadBlockSize:
 
 		ReadBlockSize    ( ReadBlockSize                     )--> ReadData;
+		ReadBlockSize    ( SkipBlock                         )--> ReadBlockSize;
 
 		ReadData         ( NoLast_NoRun                      )--> ReadData;
 		ReadData         ( NoLast_Run                        )--> ReadData;

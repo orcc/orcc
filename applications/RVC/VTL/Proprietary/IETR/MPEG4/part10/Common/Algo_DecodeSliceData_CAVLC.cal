@@ -144,7 +144,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	procedure NextMbAddress()
 		begin
 			curr_mb_addr        := curr_mb_addr + 1;
-			TotalCoeffTabLuma[bitand(curr_mb_addr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
+			TotalCoeffTabLuma[bitand(curr_mb_addr ,MASK_TOTALCOEFF)]      := [0: for int i in 0 .. 15];
+			TotalCoeffTabChroma[0][bitand(curr_mb_addr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
+			TotalCoeffTabChroma[1][bitand(curr_mb_addr ,MASK_TOTALCOEFF)] := [0: for int i in 0 .. 15];
 			if(DEBUG_FLAG_DECODED)then
 				println("\n\n\n*** New Mb *** Val = "+curr_mb_addr);
 			end

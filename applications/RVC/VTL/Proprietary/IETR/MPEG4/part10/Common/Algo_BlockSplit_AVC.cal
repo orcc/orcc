@@ -71,6 +71,12 @@ actor Algo_BlockSplit_AVC()
 
 	bool DEBUG_INPUT = false;
 
+	Block_I_PCM: action
+			MbType :[mb_type]
+				==>
+		guard
+			mb_type = BLOCK_TYPE_I_PCM
+		end
 
 	Block_16x16_Luma.Send_Y_DC: action
 			MbType          :[mb_type],
@@ -95,7 +101,8 @@ actor Algo_BlockSplit_AVC()
 				==>
 			Coeff_Y_AC      :[ x ] repeat 16 * 16
 		guard
-			not Is_Intra_16x16(mb_type)
+			not Is_Intra_16x16(mb_type),
+			mb_type != BLOCK_TYPE_I_PCM
 		end
 
 
@@ -151,6 +158,7 @@ actor Algo_BlockSplit_AVC()
 	schedule fsm Check_Luma_MBSize :
 		Check_Luma_MBSize (Block_4x4_Luma.Send_Y_AC   )--> splitU_DC;
 		Check_Luma_MBSize (Block_16x16_Luma.Send_Y_DC )--> Send_Y_AC_16x16;
+		Check_Luma_MBSize (Block_I_PCM                )--> Check_Luma_MBSize;
 
 		Send_Y_AC_16x16   (Block_16x16_Luma.Send_Y_AC )--> splitU_DC;
 

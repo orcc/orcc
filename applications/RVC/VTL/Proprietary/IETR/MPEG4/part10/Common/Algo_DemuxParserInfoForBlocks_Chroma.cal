@@ -197,7 +197,7 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 
 	schedule fsm CheckMbType:
 		CheckMbType    (MBTypeIsInter           )--> SendInterInfos;	
-		CheckMbType    (MBTypeIsPCM             )--> CheckMbType;
+		CheckMbType    (MBTypeIsPCM             )--> SendPCMInfos;
 		CheckMbType    (MBTypeIsIntra           )--> SendIntraInfos;
 
 		SendIntraInfos (SendAcrIntra            )--> SendIntraInfos;
@@ -210,5 +210,8 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 		SendInterInfos (GetConstrIAndFstMbInter )--> SendInterInfos;
 		SendInterInfos (UpdateIsIntra           )--> SendInterInfos;
 		SendInterInfos (SendInfosDone           )--> CheckMbType;
+
+		SendPCMInfos   (UpdateIsIntra           )--> SendPCMInfos;
+		SendPCMInfos   (SendInfosDone           )--> CheckMbType;
 	end
 end
