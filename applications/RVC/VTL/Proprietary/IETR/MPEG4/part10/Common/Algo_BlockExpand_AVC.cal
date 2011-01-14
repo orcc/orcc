@@ -118,7 +118,7 @@ actor Algo_BlockExpand_AVC ()
 		end
 
 
-	NoLast_NoRun: action
+	NoLast: action
 			Last  :[ValLast],
 			Run   :[ValRun],
 			Value :[Val]
@@ -129,25 +129,13 @@ actor Algo_BlockExpand_AVC ()
 		do
 			ValCoeff[IdxValCoeff] := Val;
 			IdxValCoeff           := IdxValCoeff + 1;
-		end
-
-
-	NoLast_Run: action
-			Last  :[ValLast],
-			Run   :[ValRun],
-			Value :[Val]
-				==>
-		guard
-			ValLast = false,
-			ValRun  > 0
-		do
-			ValCoeff[IdxValCoeff] := Val;
-			IdxValCoeff           := IdxValCoeff + 1;
-			foreach int j in 0 .. ValRun - 1
-			do
-				ValCoeff[IdxValCoeff + j] := 0;
+			if (ValRun > 0) then
+				foreach int j in 0 .. ValRun - 1
+				do
+					ValCoeff[IdxValCoeff + j] := 0;
+				end
+				IdxValCoeff           := IdxValCoeff + ValRun;
 			end
-			IdxValCoeff           := IdxValCoeff + ValRun;
 		end
 
 
@@ -339,8 +327,7 @@ actor Algo_BlockExpand_AVC ()
 		ReadBlockSize    ( ReadBlockSize                     )--> ReadData;
 		ReadBlockSize    ( SkipBlock                         )--> ReadBlockSize;
 
-		ReadData         ( NoLast_NoRun                      )--> ReadData;
-		ReadData         ( NoLast_Run                        )--> ReadData;
+		ReadData         ( NoLast                            )--> ReadData;
 		ReadData         ( Last_equaltrue                    )--> ChooseSizeData;
 
 		ChooseSizeData   ( isLumaDC_16x16                    )--> SendLumaDC_16x16;
