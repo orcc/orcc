@@ -125,13 +125,6 @@ public:
 	void addInstance(Instance* instance);
 
 	/**
-     *  @brief Remove an instance from the decoder
-	 *
-	 *  @param instance: Instance to remove
-     */
-	void remove(Instance* instance);
-
-	/**
      *  @brief Add a specific actor in the decoder
 	 * 
 	 *	Add an actor specific to this decoder
@@ -252,6 +245,16 @@ public:
 	 *
      */
 	void compile();
+
+	/**
+     *  @brief Set a new decoder
+	 *
+	 *	Change the network of the decoder into a new network
+	 *
+	 *	@param network : the new Network
+	 *
+     */
+	void setNetwork(Network* network);
 
 
 private:

@@ -145,6 +145,8 @@ public:
 	~FifoCircular();
 
 	void setConnection(Connection* connection, Decoder* decoder);
+
+	void unsetConnection(Connection* connection, Decoder* decoder);
 	
 
 private:

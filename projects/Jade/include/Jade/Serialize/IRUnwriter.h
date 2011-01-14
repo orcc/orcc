@@ -46,6 +46,7 @@ namespace llvm{
 	class Module;
 }
 
+class Connection;
 class Decoder;
 class JIT;
 class LLVMWriter;
@@ -74,11 +75,11 @@ public:
 	IRUnwriter(Decoder* decoder);
 
 	/**
-	 * Write the instance inside the given decoder.
+	 * Unwrite the instance from the given decoder.
 	 * 
-	 * @param decoder: the decoder to write the instance into
+	 * @param instance: the Instance to remove
      *
-	 * @return true if the actor is written, otherwise false
+	 * @return true if the actor is unwritten, otherwise false
 	 */
 	int remove(Instance* instance);
 

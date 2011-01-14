@@ -235,6 +235,25 @@ void FifoCircular::setConnection(Connection* connection, Decoder* decoder){
 	
 }
 
+void FifoCircular::unsetConnection(Connection* connection, Decoder* decoder){
+	//Get information from connection
+	Port* src = connection->getSourcePort();
+	Port* dst = connection->getDestinationPort();
+	GlobalVariable* srcVar = src->getGlobalVariable();
+	GlobalVariable* dstVar = dst->getGlobalVariable();
+	GlobalVariable* fifo = connection->getFifo();
+	
+	// Unset fifo from port
+	srcVar->setInitializer(NULL);
+	dstVar->setInitializer(NULL);
+
+	// Unset element of the fifo
+	
+
+	fifo->eraseFromParent();
+	
+}
+
 StructType* FifoCircular::getFifoType(IntegerType* type){
 	map<string,Type*>::iterator it;
 

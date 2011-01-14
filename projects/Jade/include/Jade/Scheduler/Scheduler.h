@@ -67,6 +67,7 @@ public:
 	virtual llvm::Function* getMainFunction(){return NULL;};
 	virtual void setSource(std::string input){};
 	virtual void addInstance(Instance* instance){};
+	virtual void removeInstance(Instance* instance){};
 };
 
 #endif

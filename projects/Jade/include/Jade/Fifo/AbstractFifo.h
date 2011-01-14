@@ -254,6 +254,12 @@ public:
 	 */
 	virtual void setConnections(Decoder* decoder);
 
+	/**
+	 * @brief remove connections from the given decoder.
+	 *
+	 */
+	virtual void unsetConnections(Decoder* decoder);
+
 protected:
 	/** module of the fifo */
 	llvm::Module* header;
@@ -298,6 +304,8 @@ protected:
 	void setFifoStruct(std::string name, llvm::Type* type);
 
 	virtual void setConnection(Connection* connection, Decoder* decoder)=0;
+
+	virtual void unsetConnection(Connection* connection, Decoder* decoder)=0;
 
 	/**
      *  @brief set fifo function name

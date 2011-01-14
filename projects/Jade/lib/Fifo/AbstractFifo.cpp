@@ -188,3 +188,16 @@ void AbstractFifo::setConnections(Decoder* decoder){
 		setConnection((Connection*)graph->getEdge(i), decoder);
 	}
 }
+
+void AbstractFifo::unsetConnections(Decoder* decoder){
+	
+	Network* network = decoder->getNetwork();
+	HDAGGraph* graph = network->getGraph();
+	
+	int edges = graph->getNbEdges();
+	
+	for (int i = 0; i < edges; i++){
+		unsetConnection((Connection*)graph->getEdge(i), decoder);
+	}
+}
+

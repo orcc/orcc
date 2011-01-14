@@ -179,11 +179,21 @@ void* Decoder::threadStart( void* args ){
 	return NULL;
 }
 
-void Decoder::remove(Instance* instance){
-	IRUnwriter unwriter(this);
-	unwriter.remove(instance);
-}
-
 void Decoder::setStimulus(std::string file){
 	this->stimulus = file;
-};
+}
+
+void Decoder::setNetwork(Network* network){
+	list<Actor*>::iterator it;
+	IRUnwriter unwriter(this);
+	fifo->unsetConnections(this);
+
+	for (it = specificActors.begin(); it != specificActors.end(); it++){
+		list<Instance*>::iterator itInst;
+		list<Instance*>* instances = (*it)->getInstances();
+
+		for (itInst = instances->begin(); itInst != instances->end(); itInst++){
+			unwriter.remove(*itInst);
+		}
+	}
+}

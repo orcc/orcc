@@ -40,6 +40,7 @@
 #define ROUNDROBINSCHEDULER_H
 
 namespace llvm{
+	class CallInst;
 	class Function;
 	class LLVMContext;
 }
@@ -82,6 +83,8 @@ public:
 	void setSource(std::string input);
 
 	void addInstance(Instance* instance);
+	void removeInstance(Instance* instance);
+
 
 private:
 
@@ -91,6 +94,7 @@ private:
 
 	void setCompare();
 
+	void removeCall(llvm::Function* function);
 
 	/** Decoder bound to the round robin scheduler */
 	Decoder* decoder;
@@ -101,6 +105,9 @@ private:
 	/** Main scheduling component */
 	llvm::BasicBlock* initializeBB;
 	llvm::BasicBlock* schedulerBB;
+
+	/** Function calls */
+	std::map<llvm::Function*, llvm::CallInst*> functionCall;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

@@ -51,6 +51,7 @@ using namespace std;
 using namespace llvm;
 
 IRUnwriter::IRUnwriter(Decoder* decoder){
+	this->decoder = decoder;
 
 }
 
@@ -59,11 +60,13 @@ IRUnwriter::~IRUnwriter(){
 }
 
 int IRUnwriter::remove(Instance* instance){
+	Scheduler* scheduler = decoder->getScheduler();
+	scheduler->removeInstance(instance);
 
 	unwriteActionScheduler(instance->getActionScheduler());
 	unwriteActions(instance->getActions());
-	unwritePorts(IRConstant::KEY_INPUTS, instance->getInputs());
-	unwritePorts(IRConstant::KEY_OUTPUTS, instance->getInputs());
+	//unwritePorts(IRConstant::KEY_INPUTS, instance->getInputs());
+	//unwritePorts(IRConstant::KEY_OUTPUTS, instance->getInputs());
 
 	return 0;
 }

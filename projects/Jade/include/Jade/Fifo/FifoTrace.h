@@ -154,6 +154,8 @@ public:
 	
 	void setConnections(Decoder* decoder);
 
+	void unsetConnection(Connection* connection, Decoder* decoder){};
+
 private:
 
 	/** module for extern functions */

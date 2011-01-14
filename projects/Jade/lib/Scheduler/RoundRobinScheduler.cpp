@@ -246,13 +246,36 @@ void RoundRobinScheduler::setCompare(){
 }
 
 void RoundRobinScheduler::addInstance(Instance* instance){
-	ActionScheduler* scheduler = instance->getActionScheduler();
+	ActionScheduler* actionScheduler = instance->getActionScheduler();
 	
-	if (scheduler->hasInitializeScheduler()){
-		CallInst *Add1CallRes = CallInst::Create(scheduler->getInitializeFunction(), "", initializeBB);
+	if (actionScheduler->hasInitializeScheduler()){
+		Function* initialize = actionScheduler->getInitializeFunction();
+		CallInst* CallInit = CallInst::Create(initialize, "", initializeBB);
+		functionCall.insert(pair<Function*, CallInst*>(initialize, CallInit));
 	}
 
-	CallInst *Add1CallRes = CallInst::Create(scheduler->getSchedulerFunction(), "", schedulerBB);
-	Add1CallRes->setTailCall();
+	Function* scheduler = actionScheduler->getSchedulerFunction();
+	CallInst* CallSched = CallInst::Create(scheduler, "", schedulerBB);
+	CallSched->setTailCall();
+	functionCall.insert(pair<Function*, CallInst*>(scheduler, CallSched));
+}
 
+void RoundRobinScheduler::removeInstance(Instance* instance){
+	ActionScheduler* actionScheduler = instance->getActionScheduler();
+
+	if (actionScheduler->hasInitializeScheduler()){
+		removeCall(actionScheduler->getInitializeFunction());
+	}
+
+	removeCall(actionScheduler->getSchedulerFunction());
+
+}
+
+void RoundRobinScheduler::removeCall(llvm::Function* function){
+	map<llvm::Function*, llvm::CallInst*>::iterator it;
+	
+	it = functionCall.find(function);
+	CallInst* call = it->second;
+	call->eraseFromParent();
+	functionCall.erase(it);
 }
