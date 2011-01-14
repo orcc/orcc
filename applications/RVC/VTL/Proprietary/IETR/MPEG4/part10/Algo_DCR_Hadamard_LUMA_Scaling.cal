@@ -95,6 +95,25 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
   int(size=8) qp_rem;
   int(size=8) qp_sft;
 
+  bool IsIntra16x16;
+
+
+	MacroBlockType.IsIPCM: action
+			MbType :[mb_type]
+				==>
+		guard
+			mb_type = BLOCK_TYPE_I_PCM
+		end
+
+	MacroBlockType.IsNotIPCM: action
+			MbType :[mb_type]
+				==>
+		guard
+			mb_type != BLOCK_TYPE_I_PCM
+		do
+			IsIntra16x16 := Is_Intra_16x16(mb_type);
+		end
+
   read_qp: action QP:[x] ==>
   do
 	if(DEBUG_INPUT)then
@@ -119,8 +138,7 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
 
 
   iquantise.Launch: action
-  		I:[i] repeat 16,
-		MbType :[mb_type]
+  		I:[i] repeat 16
 			==>
 		O:[ [
     			if qp_per < 6 then
@@ -140,19 +158,21 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
 
 
   iquantise.Skip: action
-		MbType :[mb_type]
 			==>
 	guard
-		   mb_type < BLOCK_TYPE_INTRA_16x16_MIN
-		or mb_type > BLOCK_TYPE_INTRA_16x16_MAX
+		not IsIntra16x16
   	end
 
-  schedule fsm read_qp:
+  schedule fsm CheckMbType:
+	CheckMbType (MacroBlockType.IsIPCM )--> CheckMbType;
+	CheckMbType (MacroBlockType.IsNotIPCM )--> read_qp;
+
     read_qp      ( read_qp 	  		) --> read_sl;
     read_sl      ( read_sl    		) --> iquantise;
-    iquantise    ( iquantise 		) --> read_qp;
+    iquantise    ( iquantise 		) --> CheckMbType;
   end
   priority
   	iquantise.Skip > iquantise.Launch;
+  	MacroBlockType.IsNotIPCM > MacroBlockType.IsIPCM;
   end
 end

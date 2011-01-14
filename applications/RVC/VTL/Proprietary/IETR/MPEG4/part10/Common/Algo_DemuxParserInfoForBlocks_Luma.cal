@@ -214,7 +214,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 		end
 
 	SendFstMb16x16: action
-			FirstMbInSlice         :[FirstMb]
+			FirstMbInSlice           :[FirstMb]
 				==>
 			FstMbInSlice_Intra_16x16 :[FirstMb]
 		guard
@@ -294,18 +294,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			ConstrISent := true;
 		end
 
-	SendPicWidthCurrMbInter: action
-			PicWidthInMb      :[PicWidth],
-			CurrMbAddr        :[CurrMb]
-				==>
-//			PicWidthInMbInter :[PicWidth]
-		guard
-			not IsIntraSent
-		do
-			curr_pos    := CurrMb mod PicWidth;
-			IsIntraSent := true;
-		end	
-
 	UpdateIsIntra: action
 			PicWidthInMb :[PicWidth],
 			CurrMbAddr   :[CurrMb]
@@ -340,7 +328,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 
 		SendInterInfos      (SendAcrInter            )--> SendInterInfos;
 		SendInterInfos      (GetCnstrIAndFstMbInter  )--> SendInterInfos;
-		SendInterInfos      (SendPicWidthCurrMbInter )--> SendInterInfos;
+		SendInterInfos      (UpdateIsIntra           )--> SendInterInfos;
 		SendInterInfos      (SendInfosDone           )--> CheckMbType;
 
 		SendPCMInfos        (UpdateIsIntra           )--> SendPCMInfos;

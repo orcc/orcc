@@ -30,9 +30,15 @@ actor Mgnt_IQ_INTRA16x16()
 
 	uint(size=5)  NbBlock       := 0;
 
+	HasNoCoeff: action
+			MbType :[mb_type]
+				==>
+		guard
+			mb_type = BLOCK_TYPE_I_PCM
+		end
 
 	HasDCCoeff: action
-			MbType         :[mb_type]
+			MbType          :[mb_type]
 				==>
 			DCCoeff_Present :[true]
 		end
@@ -103,7 +109,7 @@ actor Mgnt_IQ_INTRA16x16()
 
 
 	schedule fsm CheckMBType :
-
+		CheckMBType          ( HasNoCoeff                    )--> CheckMBType;
 		CheckMBType          ( HasDCCoeff                    )--> Merge_DCandAC_Coeff;
 		CheckMBType          ( HasNotDCCoeff                 )--> Send_AC_Coeff;
 
@@ -115,7 +121,7 @@ actor Mgnt_IQ_INTRA16x16()
 	end
 
 	priority
-		HasNotDCCoeff              > HasDCCoeff;
+		HasNoCoeff                 > HasNotDCCoeff                 > HasDCCoeff;
 		Merge_DCandAC_Coeff.Launch > Merge_DCandAC_Coeff.LastBlock;
 		Send_AC_Coeff.Launch       > Send_AC_Coeff.LastBlock;
 	end
