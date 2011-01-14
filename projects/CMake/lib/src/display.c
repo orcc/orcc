@@ -103,6 +103,10 @@ void remove_fps_printing(){
 	show_fps = 0;
 }
 
+void active_fps_printing(){
+	show_fps = 1;
+}
+
 static Uint32 t;
 
 void display_show_image(void) {

@@ -306,6 +306,12 @@ $if(options.needDynamicMapping)$
 #include "orcc_genetic.h"
 
 #define SYNC_DELAY 3
+
+#define POPULATION_SIZE 20
+#define GENERATION_NB 5
+
+#define KEEP_RATIO 0.5
+#define CROSSOVER_RATIO 0.6
 $endif$
 
 #define SIZE $fifoSize$
@@ -385,10 +391,14 @@ static void scheduler() {
 	struct scheduler_s *schedulers[$options.threadsNb$];
 	struct sync_s sched_sync;
 	struct genetic_s genetic_info = {
+		.population_size = POPULATION_SIZE,
+		.generation_nb = GENERATION_NB,
+		.keep_ratio = KEEP_RATIO,
+		.crossover_ratio = CROSSOVER_RATIO,
 		.actors = actors,
 		.schedulers = schedulers,
-		.actorsNb = sizeof(actors) / sizeof(actors[0]),
-		.threadsNb = $options.threadsNb$
+		.actors_nb = sizeof(actors) / sizeof(actors[0]),
+		.threads_nb = $options.threadsNb$
 	};
 	struct monitor_s monitoring = {
 		.sync = &sched_sync,

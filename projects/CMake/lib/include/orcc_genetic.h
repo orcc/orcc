@@ -29,22 +29,20 @@
 #ifndef GENETIC_H
 #define GENETIC_H
 
-#define POPULATION_SIZE 20
-#define GENERATION_NB 5
-
-#define KEEP_RATIO 0.5
-#define CROSS_OVER_RATIO 0.6
-
 struct monitor_s {
 	struct sync_s *sync;
 	struct genetic_s *genetic_info;
 };
 
 struct genetic_s {
+	int population_size;
+	int generation_nb;
+	int keep_ratio;
+	int crossover_ratio;
 	struct actor_s **actors;
 	struct scheduler_s **schedulers;
-	int actorsNb;
-	int threadsNb;
+	int actors_nb;
+	int threads_nb;
 };
 
 struct mapping_s {
@@ -54,7 +52,7 @@ struct mapping_s {
 
 typedef struct gene_s {
 	struct actor_s *actor;
-	int mappedCore;
+	int mapped_core;
 } gene;
 
 typedef struct individual_s {
@@ -63,7 +61,7 @@ typedef struct individual_s {
 } individual;
 
 typedef struct population_s {
-	int generationNb;
+	int generation_nb;
 	individual **individuals;
 } population;
 
@@ -73,5 +71,6 @@ void *monitor(void *data);
 extern float compute_partial_fps();
 extern void backup_partial_start_info();
 extern void backup_partial_end_info();
+extern void active_fps_printing();
 
 #endif
