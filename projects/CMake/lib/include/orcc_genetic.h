@@ -37,8 +37,8 @@ struct monitor_s {
 struct genetic_s {
 	int population_size;
 	int generation_nb;
-	int keep_ratio;
-	int crossover_ratio;
+	double keep_ratio;
+	double crossover_ratio;
 	struct actor_s **actors;
 	struct scheduler_s **schedulers;
 	int actors_nb;
@@ -58,6 +58,7 @@ typedef struct gene_s {
 typedef struct individual_s {
 	gene **genes;
 	float fps;
+	float old_fps;
 } individual;
 
 typedef struct population_s {

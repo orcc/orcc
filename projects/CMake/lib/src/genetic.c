@@ -99,7 +99,15 @@ static int compare(void const *a, void const *b)
 	individual const *i1 = *pi1;
 	individual const *i2 = *pi2;
 
-	return i2->fps - i1->fps;
+    if(i2->fps < i1->fps){
+        return -1;
+    }
+    else if(i2->fps > i1->fps){
+    	return 1;
+    }
+    else{
+    	return 0;
+    }
 }
 
 
@@ -110,6 +118,10 @@ static void crossover(individual **children, individual **parents, struct geneti
 	children[1] = (individual*) malloc(sizeof(individual));
 	children[0]->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
 	children[1]->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
+	children[0]->fps = -1;
+	children[0]->old_fps = -1;
+	children[1]->fps = -1;
+	children[1]->old_fps = -1;
 
 	for (i = 0; i < genetic_info->actors_nb; i++) {
 		children[0]->genes[i] = (gene*) malloc(sizeof(gene));
@@ -131,6 +143,7 @@ static individual* mutation(individual *original, struct genetic_s *genetic_info
 
 	mutated->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
 	mutated->fps = -1;
+	mutated->old_fps = -1;
 
 	for (i = 0; i < genetic_info->actors_nb; i++) {
 		mutated->genes[i] = (gene*) malloc(sizeof(gene));
@@ -174,6 +187,8 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 	// Backup better individuals
 	for (i = 0; i < genetic_info->population_size * genetic_info->keep_ratio; i++) {
 		nextPop->individuals[i] = pop->individuals[i];
+		nextPop->individuals[i]->old_fps = nextPop->individuals[i]->fps;
+		nextPop->individuals[i]->fps = -1;
 	}
 
 	// Crossover
@@ -227,6 +242,7 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 		pop->individuals[i] = malloc(sizeof(individual));
 		pop->individuals[i]->genes = malloc(genetic_info->actors_nb * sizeof(gene*));
 		pop->individuals[i]->fps = -1;
+		pop->individuals[i]->old_fps = -1;
 
 		// Initialize genes randomly
 		for (j = 0; j < genetic_info->actors_nb; j++) {
@@ -270,9 +286,14 @@ void *monitor(void *data) {
 		backup_partial_end_info();
 
 		// work process
-		fps = compute_partial_fps();
-		population->individuals[evalIndNb]->fps = fps;
-		printf("Evaluation of mapping %i = %f fps\n",evalIndNb,fps);
+		population->individuals[evalIndNb]->fps = compute_partial_fps();
+		printf("Evaluation of mapping %i = %f fps",evalIndNb,population->individuals[evalIndNb]->fps);
+		if(population->individuals[evalIndNb]->old_fps == -1){
+			printf("\n");
+		}
+		else{
+			printf(" (old = %f fps)\n",population->individuals[evalIndNb]->old_fps);
+		}
 
 		evalIndNb++;
 
