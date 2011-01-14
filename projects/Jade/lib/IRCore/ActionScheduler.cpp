@@ -44,6 +44,5 @@
 using namespace std;
 
 ActionScheduler::~ActionScheduler(){
-	schedulerFunction->eraseFromParent();
-	initializeFunction->eraseFromParent();
+
 }

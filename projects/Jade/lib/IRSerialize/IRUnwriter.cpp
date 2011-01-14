@@ -60,11 +60,17 @@ IRUnwriter::~IRUnwriter(){
 }
 
 int IRUnwriter::remove(Instance* instance){
+	//Remove instance from the scheduler
 	Scheduler* scheduler = decoder->getScheduler();
 	scheduler->removeInstance(instance);
 
+	//Remove all elements of the instance
 	unwriteActionScheduler(instance->getActionScheduler());
 	unwriteActions(instance->getActions());
+	unwriteInitializes(instance->getInitializes());
+	unwriteProcedures(instance->getProcs());
+	unwriteVariables(instance->getStateVars());
+	unwriteVariables(instance->getParameters());
 	unwritePorts(IRConstant::KEY_INPUTS, instance->getInputs());
 	unwritePorts(IRConstant::KEY_OUTPUTS, instance->getOutputs());
 
@@ -80,21 +86,43 @@ void IRUnwriter::unwriteFSM(FSM* fsm){
 
 }
 
-std::map<std::string, Port*>* IRUnwriter::unwritePorts(string key, map<string, Port*>* ports){
+void IRUnwriter::unwriteVariables(map<string, Variable*>* vars){
+	map<string, Variable*>::iterator it;
+
+	for (it = vars->begin(); it != vars->end(); ++it){
+		Variable* var = it->second;
+
+		//Create and store new variable for the instance
+		unwriteVariable(var);
+	}
+}
+
+void IRUnwriter::unwriteVariable(Variable* var){
+	GlobalVariable* GV = var->getGlobalVariable();
+	GV->eraseFromParent();
+}
+
+void IRUnwriter::unwritePorts(string key, map<string, Port*>* ports){
 	map<string, Port*>::iterator it;
-	map<string, Port*>* newPorts = new map<string, Port*>();
 
 	//Iterate though the given ports
 	for (it = ports->begin(); it != ports->end(); ++it){
-		string name = it->first;
 		Port* port = it->second;
 
-		//Create and store port for the instance
+		//Remove the port
 		unwritePort(key, port);
 	}
-
-	return newPorts;
 }
+
+void IRUnwriter::unwriteProcedures(map<string, Procedure*>* procs){
+	map<string, Procedure*>::iterator it;
+	
+	//Creation of procedure must be done in two times because function can call other functions
+	for (it = procs->begin(); it != procs->end(); ++it){
+		unwriteProcedure(it->second);
+	}
+}
+
 
 void IRUnwriter::unwritePort(string key, Port* port){
 	string name = port->getName();
@@ -103,6 +131,14 @@ void IRUnwriter::unwritePort(string key, Port* port){
 }
 
 void IRUnwriter::unwriteActions(list<Action*>* actions){
+	list<Action*>::iterator it;
+	list<Action*>* newActions = new list<Action*>();
+
+	for (it = actions->begin(); it != actions->end(); ++it){
+		unwriteAction(*it);
+	}
+}
+void IRUnwriter::unwriteInitializes(list<Action*>* actions){
 	list<Action*>::iterator it;
 	list<Action*>* newActions = new list<Action*>();
 

@@ -86,18 +86,16 @@ public:
 	~IRUnwriter();
 
 private:
-		/**
+	/**
 	 * @brief Unwrite a list of ports
 	 *
 	 * Erase a list of ports in the module
 	 *
 	 * @param key : whether ports are input or output ports
 	 *
-	 * @param module : llvm::Module to parse
-	 *
-	 * @return a map of ports
+	 * @param ports : map of Port to erase
 	 */
-	std::map<std::string, Port*>* unwritePorts(std::string key, std::map<std::string, Port*>* ports);
+	void unwritePorts(std::string key, std::map<std::string, Port*>* ports);
 
 	/**
 	 * @brief Unwrite a port
@@ -109,6 +107,24 @@ private:
 	 * @param port : the Port to write
 	 */
 	void unwritePort(std::string key, Port* port);
+
+	/**
+	 * @brief Unwrite a list of variable
+	 *
+	 * Erase a list of variable from a decoder.
+	 * 
+	 * @param vars : the variables to erase
+	 */
+	void unwriteVariables(std::map<std::string, Variable*>* vars);
+
+	/**
+	 * @brief Unwrite a variable
+	 *
+	 * Erase the given variable from the decoder.
+	 * 
+	 * @param var : the variable to erase
+	 */
+	void unwriteVariable(Variable* var);
 
 	/**
 	 * @brief Unwrite an action scheduler
@@ -147,6 +163,15 @@ private:
 	void unwriteAction(Action* action);
 
 	/**
+	 * @brief Unwrite initializes actions
+	 *
+	 * erase the given initializes actions from a decoder.
+	 * 
+	 * @param initializes : the initializes actions to erase
+	 */
+	void unwriteInitializes(std::list<Action*>* initializes);
+
+	/**
 	 * @brief Unwrite a procedure
 	 *
 	 * Erase the given procedure from a decoder.
@@ -154,6 +179,15 @@ private:
 	 * @param procedure : the procedure to erase
 	 */
 	void unwriteProcedure(Procedure* procedure);
+
+	/**
+	 * @brief Unwrite a list of procedures
+	 *
+	 * Erase the given list of procedure from a decoder.
+	 * 
+	 * @param procs : the procedures to erase
+	 */
+	void unwriteProcedures(std::map<std::string, Procedure*>* procs);
 
 	/** Decoder where instance is unwrite*/
 	Decoder* decoder;

@@ -128,11 +128,11 @@ void display_show_image(void) {
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 			case SDL_QUIT:
-				pthread_exit(NULL);
 				m_x = 0;
 				m_y = 0;
 				m_width = 0;
 				m_height = 0;
+				pthread_exit(NULL);
 				break;
 			default:
 				break;

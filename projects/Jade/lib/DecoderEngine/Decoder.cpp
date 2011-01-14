@@ -184,16 +184,26 @@ void Decoder::setStimulus(std::string file){
 }
 
 void Decoder::setNetwork(Network* network){
-	list<Actor*>::iterator it;
+	clearConnections();
+
+	this->network = network;
+
+	
+}
+
+void Decoder::clearConnections(){
+	list<Actor*>::iterator itActor;
 	IRUnwriter unwriter(this);
 	fifo->unsetConnections(this);
 
-	for (it = specificActors.begin(); it != specificActors.end(); it++){
+	for (itActor = specificActors.begin(); itActor != specificActors.end(); itActor++){
 		list<Instance*>::iterator itInst;
-		list<Instance*>* instances = (*it)->getInstances();
+		list<Instance*>* instances = (*itActor)->getInstances();
 
 		for (itInst = instances->begin(); itInst != instances->end(); itInst++){
 			unwriter.remove(*itInst);
-		}
+		} 
 	}
+
+	specificActors.erase(specificActors.begin(), specificActors.end());
 }

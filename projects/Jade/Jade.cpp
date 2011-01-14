@@ -291,7 +291,7 @@ void parseConsole(string cmd){
 				return;
 			}
 
-		/*	//Select network
+			//Select network
 			cout << "Select a new network : ";
 			cin >> file;
 
@@ -301,9 +301,9 @@ void parseConsole(string cmd){
 			if (network == NULL){
 				cout << "No network load. \n";
 				return;
-			}*/
+			}
 
-			engine->reconfigure(it->second, NULL);
+			engine->reconfigure(it->second, network);
 /*
 			networks.erase(id);
 			networks.insert(pair<int, Network*>(id, network));*/

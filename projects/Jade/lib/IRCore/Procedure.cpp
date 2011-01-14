@@ -42,13 +42,8 @@
 #include "llvm/Function.h"
 //------------------------------
 
-Procedure::~Procedure(){
-	//delete external;
-	if (function != NULL){
-		function->eraseFromParent();
-	}
-	
-	delete function;
+Procedure::~Procedure(){	
+
 }
 
 
