@@ -74,6 +74,9 @@ static int Filesize(){
 }
 
 RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, bool verbose): Context(C) {
+	this->scheduler = NULL;
+	this->initializeBB = NULL;
+	this->schedulerBB = NULL;
 	this->verbose = verbose;
 	verboseDisplay = verbose;
 }
@@ -109,30 +112,19 @@ void RoundRobinScheduler::createSchedulerFn(){
 										  
 
 	// Add a basic block entry to the scheduler.
-	BasicBlock* BBEntry = BasicBlock::Create(Context, "entry", scheduler);
+	initializeBB = BasicBlock::Create(Context, "entry", scheduler);
 
 	// Add a basic block to bb to the scheduler.
-	BasicBlock* BB = BasicBlock::Create(Context, "bb", scheduler);
+	schedulerBB = BasicBlock::Create(Context, "bb", scheduler);
 
-	//Add initialize scheduler
+	//Add instance in scheduler loop
 	for (it = instances->begin(); it != instances->end(); ++it){
-		Instance* instance = (*it).second;
-		ActionScheduler* scheduler = instance->getActionScheduler();
-		if (scheduler->hasInitializeScheduler()){
-			CallInst *Add1CallRes = CallInst::Create(scheduler->getInitializeFunction(), "", BBEntry);
-		}
+		addInstance(it->second);
 	}
 
+	
 	// Create a branch to bb
-	Instruction* brEntryInst = BranchInst::Create(BB, BBEntry);
- 
-	//Add action scheduler
-	for (it = instances->begin(); it != instances->end(); ++it){
-		Instance* instance = (*it).second;
-		ActionScheduler* scheduler = instance->getActionScheduler();
-		CallInst *Add1CallRes = CallInst::Create(scheduler->getSchedulerFunction(), "", BB);
-		Add1CallRes->setTailCall();
-	}
+	Instruction* brEntryInst = BranchInst::Create(schedulerBB, initializeBB);
 	
 	// Add a basic block return to the scheduler.
 	BasicBlock* BBReturn = BasicBlock::Create(Context, "return", scheduler);
@@ -140,8 +132,8 @@ void RoundRobinScheduler::createSchedulerFn(){
 	ReturnInst* returnInst = ReturnInst::Create(Context, one, BBReturn);
 
 	// Load stop value and test if the scheduler must be stop
-	LoadInst* stopVal = new LoadInst(stopGV, "", BB);
-	Instruction* brBbInst = BranchInst::Create(BBReturn, BB, stopVal, BB);
+	LoadInst* stopVal = new LoadInst(stopGV, "", schedulerBB);
+	Instruction* brBbInst = BranchInst::Create(BBReturn, schedulerBB, stopVal, schedulerBB);
 }
 
 void RoundRobinScheduler::execute(string stimulus){
@@ -251,4 +243,16 @@ void RoundRobinScheduler::setCompare(){
 		Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
 		yuvVar->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
 	}
+}
+
+void RoundRobinScheduler::addInstance(Instance* instance){
+	ActionScheduler* scheduler = instance->getActionScheduler();
+	
+	if (scheduler->hasInitializeScheduler()){
+		CallInst *Add1CallRes = CallInst::Create(scheduler->getInitializeFunction(), "", initializeBB);
+	}
+
+	CallInst *Add1CallRes = CallInst::Create(scheduler->getSchedulerFunction(), "", schedulerBB);
+	Add1CallRes->setTailCall();
+
 }

@@ -153,9 +153,9 @@ private:
 	 *
 	 * Write a list of actions for an Instance.
 	 * 
-	 * @param vars : the actions to write
+	 * @param actions : a list of Action to write
 	 *
-	 * @return a map of the actions in the decoder
+	 * @return a list of the actions in the decoder
 	 */
 	std::list<Action*>* writeActions(std::list<Action*>* actions);
 

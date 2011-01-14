@@ -81,6 +81,8 @@ public:
 
 	void setSource(std::string input);
 
+	void addInstance(Instance* instance);
+
 private:
 
 	void createSchedulerFn();
@@ -95,6 +97,10 @@ private:
 
 	/** Main scheduling function */
 	llvm::Function* scheduler;
+
+	/** Main scheduling component */
+	llvm::BasicBlock* initializeBB;
+	llvm::BasicBlock* schedulerBB;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

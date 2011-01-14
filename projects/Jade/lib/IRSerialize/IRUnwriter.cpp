@@ -60,5 +60,62 @@ IRUnwriter::~IRUnwriter(){
 
 int IRUnwriter::remove(Instance* instance){
 
+	unwriteActionScheduler(instance->getActionScheduler());
+	unwriteActions(instance->getActions());
+	unwritePorts(IRConstant::KEY_INPUTS, instance->getInputs());
+	unwritePorts(IRConstant::KEY_OUTPUTS, instance->getInputs());
+
 	return 0;
+}
+
+void IRUnwriter::unwriteActionScheduler(ActionScheduler* actionScheduler){
+	Function* function = actionScheduler->getSchedulerFunction();
+	function->eraseFromParent();
+}
+
+void IRUnwriter::unwriteFSM(FSM* fsm){
+
+}
+
+std::map<std::string, Port*>* IRUnwriter::unwritePorts(string key, map<string, Port*>* ports){
+	map<string, Port*>::iterator it;
+	map<string, Port*>* newPorts = new map<string, Port*>();
+
+	//Iterate though the given ports
+	for (it = ports->begin(); it != ports->end(); ++it){
+		string name = it->first;
+		Port* port = it->second;
+
+		//Create and store port for the instance
+		unwritePort(key, port);
+	}
+
+	return newPorts;
+}
+
+void IRUnwriter::unwritePort(string key, Port* port){
+	string name = port->getName();
+	GlobalVariable* portVar = port->getGlobalVariable();
+	portVar->eraseFromParent();
+}
+
+void IRUnwriter::unwriteActions(list<Action*>* actions){
+	list<Action*>::iterator it;
+	list<Action*>* newActions = new list<Action*>();
+
+	for (it = actions->begin(); it != actions->end(); ++it){
+		unwriteAction(*it);
+	}
+}
+
+void IRUnwriter::unwriteAction(Action* action){
+		//Write body and scheduler of the action
+		unwriteProcedure(action->getScheduler());
+		unwriteProcedure(action->getBody());
+
+}
+
+void IRUnwriter::unwriteProcedure(Procedure* procedure){
+	Function* function = procedure->getFunction();
+	function->eraseFromParent();
 }
