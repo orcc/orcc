@@ -65,8 +65,8 @@ int IRUnwriter::remove(Instance* instance){
 
 	unwriteActionScheduler(instance->getActionScheduler());
 	unwriteActions(instance->getActions());
-	//unwritePorts(IRConstant::KEY_INPUTS, instance->getInputs());
-	//unwritePorts(IRConstant::KEY_OUTPUTS, instance->getInputs());
+	unwritePorts(IRConstant::KEY_INPUTS, instance->getInputs());
+	unwritePorts(IRConstant::KEY_OUTPUTS, instance->getOutputs());
 
 	return 0;
 }

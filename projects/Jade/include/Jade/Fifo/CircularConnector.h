@@ -70,6 +70,8 @@ private:
 			this->fifo_buffer = fifo_buffer;
 		};
 
+		~FifoCircular();
+
 	private:
 		llvm::GlobalVariable *fifo;
 		llvm::Constant* size;

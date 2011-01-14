@@ -71,6 +71,8 @@ private:
 		 this->fifo_buffer = fifo_buffer;
 		 this->file = file;
 		};
+
+		~FifoTrace();
 	
 	private:
 		llvm::GlobalVariable *fifo;

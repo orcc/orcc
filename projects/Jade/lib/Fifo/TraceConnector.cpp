@@ -66,6 +66,24 @@ using namespace std;
 
 extern cl::opt<std::string> OutputDir;
 
+TraceConnector::FifoTrace::~FifoTrace(){
+	//Erase from module
+	fifo->eraseFromParent();
+	fifo_buffer->eraseFromParent();
+	contents->eraseFromParent();
+	file->eraseFromParent();
+	
+	//Delete fifo component
+	delete fifo;
+	delete size;
+	delete read_ind;
+	delete write_ind;
+	delete fill_count;
+	delete contents;
+	delete fifo_buffer;
+	delete file;
+}
+
 TraceConnector::TraceConnector(llvm::LLVMContext& C, string system): Context(C), AbstractConnector()
 {
 	//Initialize map

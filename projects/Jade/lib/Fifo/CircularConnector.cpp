@@ -57,6 +57,23 @@
 using namespace llvm;
 using namespace std;
 
+CircularConnector::FifoCircular::~FifoCircular(){
+	//Erase from module
+	fifo->eraseFromParent();
+	fifo_buffer->eraseFromParent();
+	contents->eraseFromParent();
+	
+	//Delete fifo component
+/*	delete fifo;
+	delete size;
+	delete read_ind;
+	delete write_ind;
+	delete fill_count;
+	delete contents;
+	delete fifo_buffer;*/
+}
+
+
 CircularConnector::CircularConnector(llvm::LLVMContext& C, string system): Context(C), AbstractConnector()
 {
 	// Set location of system
