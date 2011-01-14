@@ -35,6 +35,7 @@ import net.sf.orcc.plugins.BrowseFileOption;
 import net.sf.orcc.plugins.CheckboxOption;
 import net.sf.orcc.plugins.ComboBoxOption;
 import net.sf.orcc.plugins.PluginOption;
+import net.sf.orcc.plugins.TextBoxOption;
 import net.sf.orcc.ui.launching.OptionWidget;
 import net.sf.orcc.ui.launching.tabs.OrccAbstractSettingsTab;
 
@@ -47,6 +48,7 @@ import org.eclipse.swt.widgets.Composite;
  * This class defines an option widget manager.
  * 
  * @author Matthieu Wipliez
+ * @author Herve Yviquel
  * 
  */
 public class OptionWidgetManager {
@@ -61,6 +63,9 @@ public class OptionWidgetManager {
 					parent);
 		} else if (option instanceof ComboBoxOption) {
 			return new ComboBoxOptionWidget(tab, (ComboBoxOption) option,
+					parent);
+		} else if (option instanceof TextBoxOption) {
+			return new TextBoxOptionWidget(tab, (TextBoxOption) option,
 					parent);
 		} else {
 			return null;

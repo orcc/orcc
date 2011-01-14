@@ -39,6 +39,7 @@ import net.sf.orcc.plugins.impl.CheckboxOptionImpl;
 import net.sf.orcc.plugins.impl.ComboboxItemImpl;
 import net.sf.orcc.plugins.impl.ComboboxOptionImpl;
 import net.sf.orcc.plugins.impl.PluginOptionImpl;
+import net.sf.orcc.plugins.impl.TextBoxOptionImpl;
 import net.sf.orcc.plugins.simulators.Simulator;
 
 import org.eclipse.core.runtime.CoreException;
@@ -53,6 +54,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
+ * @author Herve Yviquel
  * 
  */
 public class PluginFactory {
@@ -191,7 +193,21 @@ public class PluginFactory {
 	}
 
 	/**
-	 * Parses the given configuration element as a "combobox" option.
+	 * Parses the given configuration element as a "textbox" option.
+	 * 
+	 * @param element
+	 *            a configuration element
+	 * @return a "textbox" option
+	 */
+	protected TextBoxOption parseTexbox(IConfigurationElement element) {
+		TextBoxOption option = new TextBoxOptionImpl();
+		List<PluginOption> options = parseOptions(element.getChildren());
+		option.setOptions(options);
+		return option;
+	}
+
+	/**
+	 * t Parses the given configuration element as a "combobox" option.
 	 * 
 	 * @param element
 	 *            a configuration element
@@ -203,26 +219,26 @@ public class PluginFactory {
 		option.setComboBoxItems(items);
 		return option;
 	}
-	
-	protected List<ComboBoxItem> parseItems(IConfigurationElement[] elements){
+
+	protected List<ComboBoxItem> parseItems(IConfigurationElement[] elements) {
 		List<ComboBoxItem> items = new ArrayList<ComboBoxItem>();
 		for (IConfigurationElement element : elements) {
 			ComboboxItemImpl comboBoxItem = new ComboboxItemImpl();
-			
-			//Parse id of combo item
+
+			// Parse id of combo item
 			String id = element.getAttribute("id");
 			comboBoxItem.setId(id);
-			
-			//Parse children options of comboBox
+
+			// Parse children options of comboBox
 			List<PluginOption> options = parseOptions(element.getChildren());
 			comboBoxItem.setOptions(options);
-			
+
 			items.add(comboBoxItem);
 		}
-		
+
 		return items;
 	}
-	
+
 	/**
 	 * Parses the given configuration elements as a list of options. The options
 	 * are added to the option map of this factory, and also returned as a list.
@@ -250,7 +266,11 @@ public class PluginFactory {
 					option = parseCheckbox(child);
 				} else if (type.equals("comboBox")) {
 					option = parseCombobox(child);
-				}else {
+				} else if (type.equals("textBox")) {
+					option = parseTexbox(child);
+				}
+
+				else {
 					continue;
 				}
 			} else {

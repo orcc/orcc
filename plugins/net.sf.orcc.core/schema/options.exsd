@@ -53,6 +53,7 @@
             <element ref="browseFile"/>
             <element ref="checkBox"/>
             <element ref="comboBox"/>
+            <element ref="textBox"/>
          </choice>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -139,6 +140,13 @@
                </documentation>
             </annotation>
          </attribute>
+      </complexType>
+   </element>
+
+   <element name="textBox">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+         </sequence>
       </complexType>
    </element>
 

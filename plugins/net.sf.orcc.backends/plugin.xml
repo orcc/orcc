@@ -19,9 +19,6 @@
                id="net.sf.orcc.backends.dynamicMapping">
          </option>
          <option
-               id="net.sf.orcc.backends.processorsNumber">
-         </option>
-         <option
                id="net.sf.orcc.backends.enableTrace">
          </option>
       </backend>
@@ -126,33 +123,15 @@
                description="Uses an experimental genetic algorithm to compute dynamic mapping of actors with processors"
                id="net.sf.orcc.backends.dynamicMapping"
                name="Use dynamic mapping (Only on linux)">
-            <checkBox></checkBox>
-         </option>
-         <option
-               defaultValue="1"
-               description="Select a representation for the VTL"
-               id="net.sf.orcc.backends.processorsNumber"
-               name="Processors/Cores number:">
-            <comboBox>
-               <comboBoxItem
-                     id="1">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="2">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="3">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="4">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="5">
-               </comboBoxItem>
-               <comboBoxItem
-                     id="6">
-               </comboBoxItem>
-            </comboBox>
+            <checkBox>
+            	<option
+	               		defaultValue="1"
+	               		description="Specify the number of CPU cores to use during execution"
+	               		id="net.sf.orcc.backends.processorsNumber"
+	               		name="Number of CPU cores">
+            		<textBox></textBox>
+         		</option>
+            </checkBox>
          </option>
          <option
                description="Whether Orcc should compile the given hierarchical XDF network"
