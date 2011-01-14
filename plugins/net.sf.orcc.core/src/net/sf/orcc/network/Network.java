@@ -253,6 +253,10 @@ public class Network {
 					Broadcast bcast = instance.getBroadcast();
 					computePredSucc(vertex, bcast.getInputs(),
 							bcast.getOutputs());
+				} else if (instance.isNetwork()) {
+					Network network = instance.getNetwork();
+					computePredSucc(vertex, network.getInputs(),
+							network.getOutputs());
 				}
 			}
 		}
