@@ -28,35 +28,32 @@
  */
 
 /**
-@brief Implementation of class FifoFnRemoval
+@brief Description of the FifoAbstract class interface
 @author Jerome Gorin
-@file FifoFnRemoval.cpp
+@file FifoAbstract.h
 @version 1.0
-@date 24/12/2010
+@date 15/11/2010
 */
 
 //------------------------------
+#ifndef FIFOABSTRACT_H
+#define FIFOABSTRACT_H
+
+#include <list>
 #include <map>
 
-#include "Jade/Fifo/AbstractConnector.h"
-#include "Jade/Optimize/FifoFnRemoval.h"
-
-#include "llvm/Function.h"
 
 //------------------------------
+/**
+ * @brief  This class defines an abstract fifo.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class FifoAbstract{
+public:
+	FifoAbstract(){};
+	virtual ~FifoAbstract(){};
+};
 
-using namespace std;
-using namespace llvm;
-
-void FifoFnRemoval::transform(Decoder* decoder){
-	AbstractConnector* fifo = decoder->getFifo();
-	decoder->getModule();
-	map<string,Function*>::iterator it;
-	map<string,Function*>* fifoAcesses = fifo->getFifoAccess();
-
-	for (it = fifoAcesses->begin(); it != fifoAcesses->end(); it++){
-		Function* function = it->second;
-		function->removeFromParent();
-	}
-	
-}
+#endif

@@ -50,7 +50,7 @@ namespace llvm {
 #include "Jade/Core/IRType.h"
 
 class Actor;
-class AbstractFifo;
+class AbstractConnector;
 //------------------------------
 
 
@@ -143,7 +143,7 @@ public:
 	 * @return ir::Type of the port
 	 *
 	 */
-	void addFifoConnection(AbstractFifo* fifo){fifos.push_back(fifo);};
+	void addFifoConnection(AbstractConnector* fifo){fifos.push_back(fifo);};
 
 	/**
 	 * @brief Get the number of fifo connected to this port
@@ -187,7 +187,7 @@ protected:
 	int tokensProduced;
 
 	/** Fifos bound to the port */
-	std::list<AbstractFifo*> fifos;
+	std::list<AbstractConnector*> fifos;
 	
 	/** Corresponding global variable*/
 	llvm::GlobalVariable* variable;

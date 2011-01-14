@@ -28,16 +28,16 @@
  */
 
 /**
-@brief Description of the FifoCircular class interface
+@brief Description of the AbstractConnector class interface
 @author Jerome Gorin
-@file FifoCircular.h
+@file AbstractConnector.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#ifndef CIRCULARFIFO_H
-#define CIRCULARFIFO_H
+#ifndef ABSTRACTCONNECTOR_H
+#define ABSTRACTCONNECTOR_H
 
 #include <list>
 #include <map>
@@ -63,7 +63,7 @@ class Connection;
  * @author Jerome Gorin
  * 
  */
-class AbstractFifo{
+class AbstractConnector{
 protected:
 	/** Fifo function name */
 	virtual std::map<std::string,std::string> fifoMap() = 0;
@@ -80,10 +80,10 @@ public:
 	 *  @param jit : JIT use to load bitcoder
 	 *
      */
-	AbstractFifo(){
+	AbstractConnector(){
 	};
 
-	~AbstractFifo(){};
+	~AbstractConnector(){};
 
 	/**
      *  @brief Getter of fifo structure

@@ -47,10 +47,10 @@ namespace llvm{
 	class LLVMContext;
 }
 
-class AbstractFifo;
+class AbstractConnector;
 class JIT;
 class Decoder;
-class FifoCircular;
+class CircularConnector;
 class Network;
 class Instance;
 class FuncUnit;
@@ -67,7 +67,7 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	DecoderEngine(llvm::LLVMContext& C, AbstractFifo* fifo, std::string library, std::string system = "", bool verbose = false);
+	DecoderEngine(llvm::LLVMContext& C, AbstractConnector* fifo, std::string library, std::string system = "", bool verbose = false);
 	~DecoderEngine();
 
 	/*!
@@ -156,7 +156,7 @@ private:
 	llvm::LLVMContext &Context;
 
 	/** Fifo of Jade */
-	AbstractFifo* fifo;
+	AbstractConnector* fifo;
 
 	/** Library location */
 	std::string library;

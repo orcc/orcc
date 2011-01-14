@@ -37,7 +37,7 @@
 
 //------------------------------
 #include "Jade/Decoder.h"
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMWriter.h"
 
 #include "llvm/Instructions.h"
@@ -175,7 +175,7 @@ bool LLVMWriter::linkProcedureBody(Function* function){
 void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
                              ValueToValueMapTy &VMap,
                              bool ModuleLevelChanges,
-                             SmallVectorImpl<ReturnInst*> &Returns, AbstractFifo* fifo,
+                             SmallVectorImpl<ReturnInst*> &Returns, AbstractConnector* fifo,
                              const char *NameSuffix, ClonedCodeInfo *CodeInfo) {
    // Clone any attributes.
   if (NewFunc->arg_size() == OldFunc->arg_size())

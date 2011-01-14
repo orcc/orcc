@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class FifoCircular
+@brief Implementation of class CircularConnector
 @author Jerome Gorin
-@file FifoCircular.cpp
+@file CircularConnector.cpp
 @version 1.0
 @date 15/11/2010
 */
@@ -44,7 +44,7 @@
 #include "llvm/Support/CommandLine.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Network.h"
@@ -54,7 +54,7 @@
 using namespace llvm;
 using namespace std;
 
-void AbstractFifo::refineActor(Actor* actor){
+void AbstractConnector::refineActor(Actor* actor){
 	map<string, Type*>::iterator it;
 	
 	for (it = structAcces.begin(); it != structAcces.end(); ++it){
@@ -75,7 +75,7 @@ void AbstractFifo::refineActor(Actor* actor){
 }
 
 
-void AbstractFifo::setFifoFunction(std::string name, llvm::Function* function){
+void AbstractConnector::setFifoFunction(std::string name, llvm::Function* function){
 		std::map<std::string,llvm::Function*>::iterator it;
 
 		it = fifoAccess.find(name);
@@ -88,7 +88,7 @@ void AbstractFifo::setFifoFunction(std::string name, llvm::Function* function){
 		(*it).second = function;
 }
 
-void AbstractFifo::createFifoMap (){
+void AbstractConnector::createFifoMap (){
 	std::map<std::string,std::string>::iterator it;
 
 	// Create a map that bound fifo access to their function name
@@ -100,7 +100,7 @@ void AbstractFifo::createFifoMap (){
 	}
 }
 
-void AbstractFifo::createStructMap (){
+void AbstractConnector::createStructMap (){
 	std::map<std::string,std::string>::iterator it;
 
 	// Create a map that bound fifo access to their function name
@@ -112,7 +112,7 @@ void AbstractFifo::createStructMap (){
 	}
 }
 
-void AbstractFifo::setFifoStruct(std::string name, llvm::Type* type){
+void AbstractConnector::setFifoStruct(std::string name, llvm::Type* type){
 		std::map<std::string,llvm::Type*>::iterator it;
 
 		it = structAcces.find(name);
@@ -125,7 +125,7 @@ void AbstractFifo::setFifoStruct(std::string name, llvm::Type* type){
 		(*it).second = type;
 }
 
-void AbstractFifo::addFifoType(Decoder* decoder){
+void AbstractConnector::addFifoType(Decoder* decoder){
 	LLVMWriter writer("", decoder);
 	
 	//Get fifos
@@ -136,12 +136,12 @@ void AbstractFifo::addFifoType(Decoder* decoder){
 	}
 }
 
-void AbstractFifo::addFifoHeader(Decoder* decoder){
+void AbstractConnector::addFifoHeader(Decoder* decoder){
 	addFifoType(decoder);
 	addFunctions(decoder);
 }
 
-string AbstractFifo::funcName(IntegerType* type, string func){
+string AbstractConnector::funcName(IntegerType* type, string func){
 	ostringstream name;
 
 	name << "i" <<type->getBitWidth()<< "_" << func;
@@ -149,35 +149,35 @@ string AbstractFifo::funcName(IntegerType* type, string func){
 	return name.str();
 }
 
-Function* AbstractFifo::getPeekFunction(Type* type){
+Function* AbstractConnector::getPeekFunction(Type* type){
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "peek")]];
 }
 
-Function* AbstractFifo::getReadFunction(Type* type){
+Function* AbstractConnector::getReadFunction(Type* type){
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "read")]];
 }
 
-Function* AbstractFifo::getWriteFunction(Type* type){
+Function* AbstractConnector::getWriteFunction(Type* type){
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "write")]];
 }
 
-Function* AbstractFifo::getHasTokenFunction(Type* type){
+Function* AbstractConnector::getHasTokenFunction(Type* type){
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "hasToken")]];
 }
 
-Function* AbstractFifo::getHasRoomFunction(Type* type){
+Function* AbstractConnector::getHasRoomFunction(Type* type){
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "hasRoom")]];
 }
 
-Function* AbstractFifo::getWriteEndFunction(Type* type){
+Function* AbstractConnector::getWriteEndFunction(Type* type){
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "writeEnd")]];
 }
 
-Function* AbstractFifo::getReadEndFunction(Type* type){	
+Function* AbstractConnector::getReadEndFunction(Type* type){	
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "readEnd")]];
 }
 
-void AbstractFifo::setConnections(Decoder* decoder){
+void AbstractConnector::setConnections(Decoder* decoder){
 	
 	Network* network = decoder->getNetwork();
 	HDAGGraph* graph = network->getGraph();
@@ -189,7 +189,7 @@ void AbstractFifo::setConnections(Decoder* decoder){
 	}
 }
 
-void AbstractFifo::unsetConnections(Decoder* decoder){
+void AbstractConnector::unsetConnections(Decoder* decoder){
 	
 	Network* network = decoder->getNetwork();
 	HDAGGraph* graph = network->getGraph();

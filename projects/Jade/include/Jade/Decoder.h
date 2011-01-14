@@ -49,7 +49,7 @@ namespace llvm{
 	class Module;
 }
 
-class AbstractFifo;
+class AbstractConnector;
 class Actor;
 class BroadcastActor;
 class Decoder;
@@ -77,7 +77,7 @@ public:
 	 * @param fifo : Fifo used in the decoder
 	 *
 	 */
-	Decoder(llvm::LLVMContext& C, Network* network, AbstractFifo* fifo);
+	Decoder(llvm::LLVMContext& C, Network* network, AbstractConnector* fifo);
 	~Decoder();
 	
 	/**
@@ -94,7 +94,7 @@ public:
 	 *  @return Fifo bound to this decoder
 	 *
      */
-	AbstractFifo* getFifo(){return fifo;};
+	AbstractConnector* getFifo(){return fifo;};
 
 
 	/**
@@ -103,7 +103,7 @@ public:
 	 *  @return a list of fifos in the decoder
 	 *
      */
-	std::list<AbstractFifo*>* getFifos(){return &fifos;};
+	std::list<AbstractConnector*>* getFifos(){return &fifos;};
 
 	/**
      *  @brief Getter of instances
@@ -284,13 +284,13 @@ private:
 	std::map<std::string, Instance*>* instances;
 	
 	/** List of Fifo in the decoder */
-	std::list<AbstractFifo*> fifos;
+	std::list<AbstractConnector*> fifos;
 
 	/** Scheduler of the decoder */
 	Scheduler* scheduler;
 
 	/** Fifo of the decoder */
-	AbstractFifo* fifo;
+	AbstractConnector* fifo;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

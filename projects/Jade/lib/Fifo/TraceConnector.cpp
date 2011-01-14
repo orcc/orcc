@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class FifoTrace
+@brief Implementation of class TraceConnector
 @author Jerome Gorin
-@file FifoTrace.cpp
+@file TraceConnector.cpp
 @version 1.0
 @date 15/11/2010
 */
@@ -51,7 +51,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
-#include "Jade/Fifo/FifoTrace.h"
+#include "Jade/Fifo/TraceConnector.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Connection.h"
 #include "Jade/Core/Network.h"
@@ -66,7 +66,7 @@ using namespace std;
 
 extern cl::opt<std::string> OutputDir;
 
-FifoTrace::FifoTrace(llvm::LLVMContext& C, string system): Context(C), AbstractFifo()
+TraceConnector::TraceConnector(llvm::LLVMContext& C, string system): Context(C), AbstractConnector()
 {
 	//Initialize map
 	createFifoMap();
@@ -82,18 +82,18 @@ FifoTrace::FifoTrace(llvm::LLVMContext& C, string system): Context(C), AbstractF
 	this->system = system;
 }
 
-FifoTrace::~FifoTrace (){
+TraceConnector::~TraceConnector (){
 
 }
 
-void FifoTrace::declareFifoHeader (){
+void TraceConnector::declareFifoHeader (){
 	parseHeader();
 	parseFifoStructs();
 	parseExternFunctions();
 	parseFifoFunctions();
 }
 
-void FifoTrace::parseHeader (){
+void TraceConnector::parseHeader (){
 	//Create the parser
 	LLVMParser parser(Context, system);
 	
@@ -112,7 +112,7 @@ void FifoTrace::parseHeader (){
 	}
 }
 
-void FifoTrace::parseExternFunctions(){
+void TraceConnector::parseExternFunctions(){
 	
 	// Iterate though functions of extern module 
 	for (Module::iterator I = externMod->begin(), E = externMod->end(); I != E; ++I) {
@@ -120,7 +120,7 @@ void FifoTrace::parseExternFunctions(){
 	}
 }
 
-void FifoTrace::parseFifoFunctions(){
+void TraceConnector::parseFifoFunctions(){
 	
 	// Iterate though functions of header 
 	for (Module::iterator I = header->begin(), E = header->end(); I != E; ++I) {
@@ -132,7 +132,7 @@ void FifoTrace::parseFifoFunctions(){
 	}
 }
 
-void FifoTrace::parseFifoStructs(){
+void TraceConnector::parseFifoStructs(){
 	map<string,string>::iterator it;
 	
 	// Iterate though structure
@@ -151,7 +151,7 @@ void FifoTrace::parseFifoStructs(){
 	}
 }
 
-void FifoTrace::addFunctions(Decoder* decoder){
+void TraceConnector::addFunctions(Decoder* decoder){
 	std::map<std::string,llvm::Function*>::iterator itMap;
 	LLVMWriter writer("", decoder);
 
@@ -167,7 +167,7 @@ void FifoTrace::addFunctions(Decoder* decoder){
 	}
 }
 
-void FifoTrace::setConnection(Connection* connection, Decoder* decoder){
+void TraceConnector::setConnection(Connection* connection, Decoder* decoder){
 	Module* module = decoder->getModule();
 	
 	// fifo name 
@@ -255,14 +255,14 @@ void FifoTrace::setConnection(Connection* connection, Decoder* decoder){
 	dstVar->setInitializer(NewFifo);
 
 	//Store fifo variable in connection
-	connection->setFifo(NewFifo);
+	connection->setFifo(new FifoTrace(NewFifo, size, read_ind, write_ind, fill_count, NewArrayContents, NewArrayFifoBuffer, GV));
 
 	// Increment fifo counter 
 	fifoCnt++;
 	
 }
 
-void FifoTrace::setConnections(Decoder* decoder){
+void TraceConnector::setConnections(Decoder* decoder){
 	
 	Network* network = decoder->getNetwork();
 	HDAGGraph* graph = network->getGraph();
@@ -275,7 +275,7 @@ void FifoTrace::setConnections(Decoder* decoder){
 	}
 }
 
-StructType* FifoTrace::getFifoType(IntegerType* type){
+StructType* TraceConnector::getFifoType(IntegerType* type){
 	map<string,Type*>::iterator it;
 
 	// Struct name 

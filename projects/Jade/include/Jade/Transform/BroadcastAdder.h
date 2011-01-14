@@ -49,7 +49,7 @@ class Network;
 class Port;
 class Vertex;
 struct ltstr;
-class FifoCircular;
+class CircularConnector;
 class BroadcastActor;
 class Decoder;
 class InstancedActor;
@@ -140,7 +140,7 @@ private:
 	std::map<std::string, Actor*>* actors;
 
 	/** fifo used in the decoder */
-	AbstractFifo* fifo;
+	AbstractConnector* fifo;
 
 	/** list of connections to be removed */
 	std::list<Connection*> toBeRemoved;

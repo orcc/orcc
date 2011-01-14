@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class UnprotectedFifo
+@brief Implementation of class UnprotectedConnector
 @author Jerome Gorin
-@file UnprotectedFifo.cpp
+@file UnprotectedConnector.cpp
 @version 1.0
 @date 15/11/2010
 */
@@ -48,7 +48,7 @@
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Fifo/UnprotectedFifo.h"
+#include "Jade/Fifo/UnprotectedConnector.h"
 #include "Jade/Core/Connection.h"
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Jit/LLVMWriter.h"
@@ -58,7 +58,7 @@ using namespace llvm;
 using namespace std;
 
 
-UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C, string system): Context(C), AbstractFifo()
+UnprotectedConnector::UnprotectedConnector(llvm::LLVMContext& C, string system): Context(C), AbstractConnector()
 {
 	//Initialize map
 	createFifoMap();
@@ -74,21 +74,21 @@ UnprotectedFifo::UnprotectedFifo(llvm::LLVMContext& C, string system): Context(C
 	this->system = system;
 }
 
-UnprotectedFifo::~UnprotectedFifo (){
+UnprotectedConnector::~UnprotectedConnector (){
 
 }
 
-void UnprotectedFifo::declareFifoHeader (){
+void UnprotectedConnector::declareFifoHeader (){
 	parseHeader();
 	parseFifoStructs();
 	parseFifoFunctions();
 }
 
-void UnprotectedFifo::parseHeader (){
+void UnprotectedConnector::parseHeader (){
 	//Create the parser
 	LLVMParser parser(Context, system);
 
-	header = parser.loadBitcode("System", "UnprotectedFifo");
+	header = parser.loadBitcode("System", "FifoUnprotected");
 
 	if (header == NULL){
 		cerr << "Unable to parse fifo header file";
@@ -96,7 +96,7 @@ void UnprotectedFifo::parseHeader (){
 	}
 }
 
-void UnprotectedFifo::parseFifoFunctions(){
+void UnprotectedConnector::parseFifoFunctions(){
 	
 	// Iterate though functions of header 
 	for (Module::iterator I = header->begin(), E = header->end(); I != E; ++I) {
@@ -111,7 +111,7 @@ void UnprotectedFifo::parseFifoFunctions(){
 	}
 }
 
-void UnprotectedFifo::parseFifoStructs(){
+void UnprotectedConnector::parseFifoStructs(){
 	map<string,string>::iterator it;
 	
 	// Iterate though structure
@@ -130,7 +130,7 @@ void UnprotectedFifo::parseFifoStructs(){
 	}
 }
 
-void UnprotectedFifo::addFunctions(Decoder* decoder){
+void UnprotectedConnector::addFunctions(Decoder* decoder){
 	std::list<llvm::Function*>::iterator itList;
 	LLVMWriter writer("", decoder);
 
@@ -149,7 +149,7 @@ void UnprotectedFifo::addFunctions(Decoder* decoder){
 	}
 }
 
-void UnprotectedFifo::setConnection(Connection* connection, Decoder* decoder){
+void UnprotectedConnector::setConnection(Connection* connection, Decoder* decoder){
 	Module* module = decoder->getModule();
 	
 	// fifo name 
@@ -208,7 +208,7 @@ void UnprotectedFifo::setConnection(Connection* connection, Decoder* decoder){
 	
 }
 
-StructType* UnprotectedFifo::getFifoType(IntegerType* type){
+StructType* UnprotectedConnector::getFifoType(IntegerType* type){
 	map<string,Type*>::iterator it;
 
 	// Struct name 

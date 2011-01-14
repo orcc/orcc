@@ -28,28 +28,58 @@
  */
 
 /**
-@brief Description of the FifoCircular class interface
+@brief Description of the CircularConnector class interface
 @author Jerome Gorin
-@file FifoCircular.h
+@file CircularConnector.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#ifndef FIFOCIRCULAR_H
-#define FIFOCIRCULAR_H
+#ifndef CIRCULARCONNECTOR_H
+#define CIRCULARCONNECTOR_H
 
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Fifo/FifoAbstract.h"
+#include "Jade/Fifo/AbstractConnector.h"
 //------------------------------
 
 /**
- * @brief  This class defines FifoCircular.
+ * @brief  This class defines CircularConnector.
  * 
  * @author Jerome Gorin
  * 
  */
-class FifoCircular: public AbstractFifo {
+class CircularConnector: public AbstractConnector {
 private:
+	/** Fifo structure */
+	class FifoCircular : public FifoAbstract {
+	public:
+		FifoCircular(llvm::GlobalVariable *fifo,
+					 llvm::Constant* size,
+					 llvm::Constant* read_ind,
+					 llvm::Constant* write_ind,
+					 llvm::Constant* fill_count,
+					 llvm::GlobalVariable* contents,
+					 llvm::GlobalVariable* fifo_buffer){
+			this->fifo = fifo;
+			this->size = size;
+			this->read_ind = read_ind;
+			this->write_ind = write_ind;
+			this->fill_count = fill_count;
+			this->contents = contents;
+			this->fifo_buffer = fifo_buffer;
+		};
+
+	private:
+		llvm::GlobalVariable *fifo;
+		llvm::Constant* size;
+		llvm::Constant* read_ind;
+		llvm::Constant* write_ind;
+		llvm::Constant* fill_count;
+		llvm::GlobalVariable* contents;
+		llvm::GlobalVariable* fifo_buffer;
+	};
+
 	/** Fifo function name */
 	std::map<std::string,std::string> fifoMap()
 	{
@@ -140,9 +170,9 @@ public:
 	 *	Declare fifo type
 	 *
      */
-	FifoCircular(llvm::LLVMContext& C, std::string system);
+	CircularConnector(llvm::LLVMContext& C, std::string system);
 	
-	~FifoCircular();
+	~CircularConnector();
 
 	void setConnection(Connection* connection, Decoder* decoder);
 

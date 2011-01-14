@@ -51,9 +51,9 @@
 
 #include "Jade/XDFParser.h"
 #include "Jade/DecoderEngine.h"
-#include "Jade/Fifo/FifoCircular.h"
-#include "Jade/Fifo/FifoTrace.h"
-#include "Jade/Fifo/UnprotectedFifo.h"
+#include "Jade/Fifo/CircularConnector.h"
+#include "Jade/Fifo/TraceConnector.h"
+#include "Jade/Fifo/UnprotectedConnector.h"
 #include "Jade/Util/OptionMng.h"
 //------------------------------
 
@@ -174,19 +174,19 @@ void clean_exit(int sig){
 	exit(0);
 }
 
-AbstractFifo* getFifo(LLVMContext &Context, string system){
+AbstractConnector* getFifo(LLVMContext &Context, string system){
 	//Select fifo according to options
 	switch (Fifo) {
 		case circular :
-			return new FifoCircular(Context, system);
+			return new CircularConnector(Context, system);
 			break;
 
 		case trace :
-			return new FifoTrace(Context, system);
+			return new TraceConnector(Context, system);
 			break;
 
 		case unprotected :
-			return new UnprotectedFifo(Context, system);
+			return new UnprotectedConnector(Context, system);
 			break;
 
 		default: 
@@ -244,7 +244,7 @@ void prepareNetwork(Network* network){
 	LLVMContext &Context = getGlobalContext();
 
 	//Load fifos
-	AbstractFifo* fifo = NULL;
+	AbstractConnector* fifo = NULL;
 	if (SystemDir.getValue().compare("") != 0){
 		fifo = getFifo(Context, SystemDir);
 	}else{

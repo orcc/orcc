@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class FifoCircular
+@brief Implementation of class CircularConnector
 @author Jerome Gorin
-@file FifoCircular.cpp
+@file CircularConnector.cpp
 @version 1.0
 @date 15/11/2010
 */
@@ -48,7 +48,7 @@
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Fifo/FifoCircular.h"
+#include "Jade/Fifo/CircularConnector.h"
 #include "Jade/Core/Connection.h"
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Jit/LLVMWriter.h"
@@ -57,7 +57,7 @@
 using namespace llvm;
 using namespace std;
 
-FifoCircular::FifoCircular(llvm::LLVMContext& C, string system): Context(C), AbstractFifo()
+CircularConnector::CircularConnector(llvm::LLVMContext& C, string system): Context(C), AbstractConnector()
 {
 	// Set location of system
 	this->system = system;
@@ -73,18 +73,18 @@ FifoCircular::FifoCircular(llvm::LLVMContext& C, string system): Context(C), Abs
 	fifoCnt = 0;
 }
 
-FifoCircular::~FifoCircular (){
+CircularConnector::~CircularConnector (){
 
 }
 
-void FifoCircular::declareFifoHeader (){
+void CircularConnector::declareFifoHeader (){
 	parseHeader();
 	parseFifoStructs();
 	parseExternFunctions();
 	parseFifoFunctions();
 }
 
-void FifoCircular::parseHeader (){
+void CircularConnector::parseHeader (){
 	//Create the parser
 	LLVMParser parser(Context, system);
 
@@ -103,7 +103,7 @@ void FifoCircular::parseHeader (){
 	}
 }
 
-void FifoCircular::parseExternFunctions(){
+void CircularConnector::parseExternFunctions(){
 	
 	// Iterate though functions of extern module 
 	for (Module::iterator I = externMod->begin(), E = externMod->end(); I != E; ++I) {
@@ -111,7 +111,7 @@ void FifoCircular::parseExternFunctions(){
 	}
 }
 
-void FifoCircular::parseFifoFunctions(){
+void CircularConnector::parseFifoFunctions(){
 	
 	// Iterate though functions of header 
 	for (Module::iterator I = header->begin(), E = header->end(); I != E; ++I) {
@@ -123,7 +123,7 @@ void FifoCircular::parseFifoFunctions(){
 	}
 }
 
-void FifoCircular::parseFifoStructs(){
+void CircularConnector::parseFifoStructs(){
 	map<string,string>::iterator it;
 	
 	// Iterate though structure
@@ -142,7 +142,7 @@ void FifoCircular::parseFifoStructs(){
 	}
 }
 
-void FifoCircular::addFunctions(Decoder* decoder){
+void CircularConnector::addFunctions(Decoder* decoder){
 	LLVMWriter writer("", decoder);
 
 	std::map<std::string,llvm::Function*>::iterator itMap;
@@ -159,7 +159,7 @@ void FifoCircular::addFunctions(Decoder* decoder){
 	}
 }
 
-void FifoCircular::setConnection(Connection* connection, Decoder* decoder){
+void CircularConnector::setConnection(Connection* connection, Decoder* decoder){
 	Module* module = decoder->getModule();
 	
 	// fifo name 
@@ -227,34 +227,33 @@ void FifoCircular::setConnection(Connection* connection, Decoder* decoder){
 	srcVar->setInitializer(NewFifo);
 	dstVar->setInitializer(NewFifo);
 
-	//Store fifo variable in connection
-	connection->setFifo(NewFifo);
+	//Store fifo in connection
+	FifoCircular* fifo = new FifoCircular(NewFifo, size, read_ind, write_ind, fill_count, NewArrayContents, NewArrayFifoBuffer);
+	connection->setFifo(fifo);
 
 	// Increment fifo counter 
 	fifoCnt++;
 	
 }
 
-void FifoCircular::unsetConnection(Connection* connection, Decoder* decoder){
+void CircularConnector::unsetConnection(Connection* connection, Decoder* decoder){
 	//Get information from connection
 	Port* src = connection->getSourcePort();
 	Port* dst = connection->getDestinationPort();
 	GlobalVariable* srcVar = src->getGlobalVariable();
 	GlobalVariable* dstVar = dst->getGlobalVariable();
-	GlobalVariable* fifo = connection->getFifo();
+	FifoAbstract* fifo = connection->getFifo();
 	
 	// Unset fifo from port
 	srcVar->setInitializer(NULL);
 	dstVar->setInitializer(NULL);
 
 	// Unset element of the fifo
-	
-
-	fifo->eraseFromParent();
+	delete fifo;
 	
 }
 
-StructType* FifoCircular::getFifoType(IntegerType* type){
+StructType* CircularConnector::getFifoType(IntegerType* type){
 	map<string,Type*>::iterator it;
 
 	// Struct name 

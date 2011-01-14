@@ -46,9 +46,9 @@
 #include "Instantiator.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Serialize/IRWriter.h"
 #include "Jade/Serialize/IRUnwriter.h"
@@ -60,7 +60,7 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, Network* network, AbstractFifo* fifo): Context(C){
+Decoder::Decoder(llvm::LLVMContext& C, Network* network, AbstractConnector* fifo): Context(C){
 	//Set property of the decoder
 	this->network = network;
 	this->fifo = fifo;

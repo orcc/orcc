@@ -115,7 +115,7 @@ private:
 		llvm::ValueToValueMapTy &VMap,
                        bool ModuleLevelChanges,
 					   llvm::SmallVectorImpl<llvm::ReturnInst*> &Returns,
-					   AbstractFifo* fifo,
+					   AbstractConnector* fifo,
                        const char *NameSuffix = "", 
 					   llvm::ClonedCodeInfo *CodeInfo = 0);
 

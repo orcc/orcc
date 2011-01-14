@@ -49,13 +49,13 @@
 #include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Fifo/AbstractConnector.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
-BroadcastActor::BroadcastActor(llvm::LLVMContext& C, string name, int numOutputs, Type* type, AbstractFifo* fifo): Actor(name, "", fifo->getFifoTypes(), 
+BroadcastActor::BroadcastActor(llvm::LLVMContext& C, string name, int numOutputs, Type* type, AbstractConnector* fifo): Actor(name, "", fifo->getFifoTypes(), 
 		  new map<string, Port*>(), new map<string, Port*>(), new map<string, Variable*>(), new map<string, Variable*>(), new map<string, Procedure*>(), new list<Action*> (),
 		  new list<Action*> (), NULL) , Context(C)
 {

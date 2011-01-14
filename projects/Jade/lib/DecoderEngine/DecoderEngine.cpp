@@ -47,7 +47,7 @@
 #include "Jade/DecoderEngine.h"
 #include "Jade/Serialize/IRParser.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Fifo/AbstractFifo.h"
+#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Jit/LLVMOptimizer.h"
@@ -62,7 +62,7 @@ using namespace llvm;
 extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
 
 DecoderEngine::DecoderEngine(llvm::LLVMContext& C, 
-							 AbstractFifo* fifo, 
+							 AbstractConnector* fifo, 
 							 string library, 
 							 string system, 
 							 bool verbose): Context(C) {	
