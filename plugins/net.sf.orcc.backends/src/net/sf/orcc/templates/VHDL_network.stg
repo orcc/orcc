@@ -1,7 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // print IOs of the TOP Network
 ///////////////////////////////////////////////////////////////////////////////
-
 printNetworkPorts(network) ::= <<
 $network.inputs.list: printNetPortsInput(); separator="\n"$
 $network.outputs.list: printNetPortsOutput(); separator="\n"$
@@ -27,11 +26,11 @@ $port.name$_send   : out std_logic;
 $port.name$_ack    : in  std_logic;
 >>
 
+
+
 //////////////////////////////////////////////////////////////////////////////
 // Print signals
 //////////////////////////////////////////////////////////////////////////////
-
-
 tryPrintSignals(outgoingMap) ::= <<
 $outgoingMap.keys: {instance | $checkInstanceType(instance)$}$
 >>
@@ -44,7 +43,7 @@ $printSignals(inputs=instance.actor.inputs.list,
 elseif (instance.broadcast)
 $                                            -- Broadcast : $instance.id$
 $printSignals(inputs=instance.broadcast.inputs.list,
-              outputs=broadcast.actor.outputs.list)$$
+              outputs=instance.broadcast.outputs.list)$$
 elseif (instance.network)
 $                                            -- Network : $instance.id$
 $printSignals(inputs=instance.network.inputs.list,
@@ -96,10 +95,12 @@ signal $instance.id$_$connection.source$_ack    : std_logic;
 $
 endif$
 >>
+
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Print FIFOs instantiation
 ///////////////////////////////////////////////////////////////////////////////
-
 assignFifos(edges) ::= << 
 $edges: assignFifo()$
 >> 
@@ -150,10 +151,10 @@ endif$
 >>
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // print actors and networks instantiation
 ///////////////////////////////////////////////////////////////////////////////
-
 PrintNetworksAndActors(outgoingMap) ::= <<
 $outgoingMap.keys: {instance | $checkNetworkOrActors(instance=instance)$}; separator="\n\n"$
 >>
@@ -242,7 +243,6 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 // print the network
 ///////////////////////////////////////////////////////////////////////////////
-
 network(debugFifos, fifoSize, network, options) ::= <<
 -------------------------------------------------------------------------------
 -- Title      : Configuration: $network.name$

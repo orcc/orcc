@@ -1,25 +1,28 @@
 ///////////////////////////////////////////////////////////////////////////////
-// FIFOs
+// Common applet
 ///////////////////////////////////////////////////////////////////////////////
-port_in(port) ::= <<
+portType(port, IOtype, dataType) ::=<<
 $if(port.type.bool)
-$$port.name$_data  : in  std_logic;$
+$$port.name$_$dataType$  :$IOtype$std_logic;$
 else
-$$port.name$_data  : in  std_logic_vector($port.type.size$ -1 downto 0);$
+$$port.name$_$dataType$  :$IOtype$std_logic_vector($port.type.size$ -1 downto 0);$
 endif$
+>>
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Print instance's ports
+///////////////////////////////////////////////////////////////////////////////
+PrintInputPorts(port) ::= <<
+$portType(port=port, IOtype=" in  ", dataType="data")$
 $port.name$_send  : in  std_logic;
 $port.name$_ack   : out  std_logic;
 
 >>
 
-port_out(port) ::= <<
-$if(port.type.bool)
-$$port.name$_data  : out std_logic;$
-else
-$$port.name$_data  : out std_logic_vector($port.type.size$ -1 downto 0);$
-endif$
-
+PrintOutputPorts(port) ::= <<
+$portType(port=port, IOtype=" out ", dataType="data")$
 $port.name$_send  : out std_logic;
 $if(last(port.name))
 $$port.name$_ack   : in  std_logic$
@@ -28,19 +31,10 @@ $$port.name$_ack   : in  std_logic;$
 endif$
 >>
 
-port_out_init(port) ::=<<
-
-$port.name$_isend <= '0';
-$if(port.type.bool)
-$$port.name$_idata  <= '0';$
-else
-$$port.name$_idata  <= (others => '0');$
-endif$
->>
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Types and variables
+// Print signal and constant
 ///////////////////////////////////////////////////////////////////////////////
 
 // the dimensions of a list: [dim1][dim2]...[dimn]
@@ -49,14 +43,11 @@ listSize(value) ::= <<
 $value : {$it$}; separator=" * "$
 >>
 
-internalSignalsDeclaration(port)::= <<
+// These signals are used by the IOs management processes
+IOsManagementSignals(port)::= <<
 signal $port.name$_rdy   : std_logic;
 signal $port.name$_isend : std_logic;
-$if(port.type.bool)
-$signal $port.name$_idata : std_logic;$
-else
-$signal $port.name$_idata : std_logic_vector ($port.type.size$ -1 downto 0);$
-endif$
+signal $portType(port=port, IOtype="", dataType="idata")$
 >>
 
 signalDeclaration(variable) ::= <<
@@ -65,7 +56,7 @@ signal $variable$ : $variable.type$;$
 else$
   $if(!variable.type.list)$
     $if(!variable.assignable)$
-constant $variable$ : $variable.type$ := $Constant(variable.initialValue)$;$
+constant $variable$ : $variable.type$ := $variable.initialValue$;$
     else
 $signal $variable$ : $variable.type$;$
     endif$$
@@ -73,7 +64,7 @@ $signal $variable$ : $variable.type$;$
     $if(!variable.assignable)
       $$if(variable.initialized)
 $type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
-constant $variable$ : memory_type_$variable$ := $Constant(variable.initialValue)$;$
+constant $variable$ : memory_type_$variable$ := $variable.initialValue$;$
       endif$$
     else
 $type memory_type_$variable$ is array (0 to $listSize(variable.type.dimensions)$ -1) of $variable.type$;
@@ -84,6 +75,10 @@ endif$
 >>
 
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Print variables
+///////////////////////////////////////////////////////////////////////////////
 variableDeclaration(variable) ::= <<
 $if(variable.type.list)
 $-- error !!!!! variable $variable$ : $variable.type$ (0 to $listSize(variable.type.dimensions)$ -1)$
@@ -93,36 +88,25 @@ endif
 $
 >>
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Init at reset
 ///////////////////////////////////////////////////////////////////////////////
-
 stateConst(variable) ::= <<
 $if(variable.initialized)
   $$if(variable.assignable)
-$    $variable$ <= $Constant(variable.initialValue)$;
+$    $variable$ <= $variable.initialValue$;
 $
   endif$$
 endif$
 >>
 
-///////////////////////////////////////////////////////////////////////////////
-// Constants and Signals
-///////////////////////////////////////////////////////////////////////////////
 
-Constant(constant) ::= <<
-$constant$
->>
-
-actorParameters(parameters) ::= <<
-$parameters.keys: { k | #define $k$ $Constant(parameters.(k))$
-}$
->>
 
 ///////////////////////////////////////////////////////////////////////////////
-// Cast
+// Print cast operations (when source.size != target.size)
 ///////////////////////////////////////////////////////////////////////////////
-
 CastStore(target, value, cast)::= <<
 $
 if(cast.extended)
@@ -161,10 +145,11 @@ $
 
 >>
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
-
 Assign(assign) ::= <<
 
 $if (assign.cast)
@@ -179,8 +164,6 @@ AssignIndex(AssignIndex) ::= <<
 
 $AssignIndex.target$ := to_integer(unsigned($AssignIndex.indexes: {std_logic_vector(to_unsigned($it$, $it.type.size$))}; separator=" & "$));
 >>
-
-
 
 Call(call) ::= <<
 
@@ -224,13 +207,13 @@ Peek(peek) ::= <<
 $if(peek.unit)
   $$
   if(peek.target.type.bool)
-$$peek.target$ := $peek.port$_data;    -- peek$
+$$peek.target$ := $peek.port$_data;$
   else
   $$
     if(peek.target.type.int)
-$$peek.target$ := to_integer(signed($peek.port$_data));    -- peek$
+$$peek.target$ := to_integer(signed($peek.port$_data));$
     else
-$$peek.target$ := to_integer(unsigned($peek.port$_data));    -- peek$
+$$peek.target$ := to_integer(unsigned($peek.port$_data));$
     endif
   $$
   endif
@@ -325,10 +308,10 @@ endif$
 >>
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
-
 instructions(instructions) ::= <<
 $instructions: {$(it.class.simpleName)(it)$}$
 >>
@@ -361,10 +344,11 @@ while ($whileNode.value$) loop
 end loop;
 >>
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Prints functions
 ///////////////////////////////////////////////////////////////////////////////
-
 function(procedure, transformReturn) ::= <<
 $if (!procedure.external)
   $$if (procedure.returnType.void)
@@ -429,10 +413,10 @@ endif$
 >>
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Action
 ///////////////////////////////////////////////////////////////////////////////
-
 procedure(procedure, transformReturn) ::= <<
 $procedure.nodes: {$(it.class.simpleName)(it)$}$
 >>
@@ -463,7 +447,6 @@ $procedure(procedure=action.body)$
 ///////////////////////////////////////////////////////////////////////////////
 // Management of Outputs 
 ///////////////////////////////////////////////////////////////////////////////
-
 OutputsManag() ::= <<
 out_management : process (clock, reset_n) is
 begin
@@ -529,7 +512,6 @@ $port.name$_send <= '0';
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Scheduler process
 ///////////////////////////////////////////////////////////////////////////////
-
 Actor_Scheduler(actor) ::= <<
 $actor.simpleName$_sceduler : process($sensitivity(actor)$)
   $actor.actions : printActionLocalSchedul()$--
@@ -622,10 +604,10 @@ actionFire(nextstate) ::= <<
 >>
 
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Actor VHDL Architecture - Execute process
 ///////////////////////////////////////////////////////////////////////////////
-
 Actor_Exec(actor) ::= <<
 $actor.simpleName$_execute : process (reset_n, clock) is
   $actor.actions: printActionLocalBody()$  --
@@ -666,6 +648,15 @@ $
 endif$
 >>
 
+port_out_init(port) ::=<<
+
+$port.name$_isend <= '0';
+$if(port.type.bool)
+$$port.name$_idata  <= '0';$
+else
+$$port.name$_idata  <= (others => '0');$
+endif$
+>>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Core of an action - NO FSM
@@ -673,7 +664,6 @@ endif$
 executeCore(actions) ::= <<
     if $executeIndent(actions)$
 >>
-
 
 // just to have a correct indentation
 executeIndent(actions) ::= <<
@@ -683,7 +673,6 @@ executeIndent(actions) ::= <<
 
 ///////////////////////////////////////////////////////////////////////////////
 // Core of an action - WITH FSM
-
 
 executeCoreFSM(actions, fsm) ::= <<
 $if(actions)
@@ -700,13 +689,11 @@ $    case FSM is
 endif$
 >>
 
-
 switchTransition(transition) ::= <<
     when s_$transition.sourceState$ =>
       if $transition.nextStateInfo: actionTestState(); separator="\n      elsif"$
       end if;
 >>
-
 
 actionTestState(nextState) ::= <<
       $actionTestSceduler(nextState.action)$
@@ -716,9 +703,8 @@ actionTestState(nextState) ::= <<
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Actor
+// Print the actor
 ///////////////////////////////////////////////////////////////////////////////
-
 actor(actor, options) ::= <<
 -------------------------------------------------------------------------------
 -- Title      : Actor: $actor.simpleName$
@@ -753,8 +739,8 @@ entity $actor.simpleName$ is
   -- Inputs
   clock    : in  std_logic;
   reset_n  : in  std_logic;
-  $actor.inputs.list: port_in()$  -- Outputs
-  $actor.outputs.list: port_out(); separator=";\n"$);  
+  $actor.inputs.list: PrintInputPorts()$  -- Outputs
+  $actor.outputs.list: PrintOutputPorts(); separator=";\n"$);  
 end $actor.simpleName$;
 
 
@@ -764,10 +750,9 @@ architecture rtl_$actor.simpleName$ of $actor.simpleName$ is
   ---------------------------------------------------------------------------
   -- Signal & constant declaration
   ---------------------------------------------------------------------------
-  $actorParameters(actor.parameters)$
   $actor.actions:       {action| signal $action$_go    : std_logic;}; separator="\n"$
   --
-  $actor.outputs.list :internalSignalsDeclaration(); separator="\n"$
+  $actor.outputs.list :IOsManagementSignals(); separator="\n"$
   --
   $actor.stateVars.list: signalDeclaration()$
 
