@@ -124,8 +124,7 @@ actor Algo_BlockExpand_AVC ()
 			Value :[Val]
 				==>
 		guard
-			ValLast = false,
-			ValRun  = 0
+			ValLast = false
 		do
 			ValCoeff[IdxValCoeff] := Val;
 			IdxValCoeff           := IdxValCoeff + 1;
@@ -349,7 +348,7 @@ actor Algo_BlockExpand_AVC ()
 	end
 
 	priority
-		NoLast_Run              > NoLast_NoRun                      > Last_equaltrue;
+		NoLast                  > Last_equaltrue;
 		SendLumaAC_16x16.Launch > SendLumaAC_16x16.LastBlock;
 		SendLumaAC_4x4.Launch   > SendLumaAC_4x4.LastBlock;
 		SendChromaAC.Launch     > SendChromaAC.LastBlock_UComponent > SendChromaAC.LastBlock_VComponent;
