@@ -50,6 +50,7 @@
 #include "Jade/Core/Network.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMExecution.h"
+#include "Jade/Reconfigure/ReconfigurationScenario.h"
 #include "Jade/Serialize/IRWriter.h"
 #include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
@@ -185,7 +186,10 @@ void Decoder::setStimulus(std::string file){
 
 void Decoder::setNetwork(Network* network){
 	clearConnections();
-
+	ReconfigurationScenario scenario(getNetwork(), network);
+	
+	scenario.compute();
+		
 	this->network = network;
 
 	
