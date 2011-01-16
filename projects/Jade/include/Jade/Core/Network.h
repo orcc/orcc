@@ -134,6 +134,15 @@ public:
 	Decoder* getDecoder() {return decoder;};
 
 	/**
+	 * @brief Get the package requiered by the decoder
+	 *
+	 * Returns the packages requiered to instanciate this decoder.
+	 * 
+	 * @return the package requiered for the decoder
+	 */
+	std::list<std::string>* getPackages() {return &packages;};
+
+	/**
 	 * @brief Setter of decoder
 	 *
 	 * Set the decoder bound to the network
@@ -175,6 +184,9 @@ private:
 	
 	/** instances of the network  */
 	std::map<std::string, Instance*> instances;
+
+	/** package used by the network  */
+	std::list<std::string> packages;
 
 	/** decoder of the instance */
 	Decoder* decoder;

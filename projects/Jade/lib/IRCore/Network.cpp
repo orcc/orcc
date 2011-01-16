@@ -40,6 +40,7 @@
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Graph/DotWriter.h"
 #include "Jade/Core/Vertex.h"
+#include "Jade/Util/PackageMng.h"
 //------------------------------
 
 using namespace std;
@@ -70,13 +71,25 @@ void Network::setNetwork(){
 		if(vertex->isInstance()){
 			Instance* instance = vertex->getInstance();
 			instances.insert(pair<string,Instance*>(instance->getId(), instance));
-			actorFiles.push_back(instance->getClasz());
+			
+			//Insert actor requiered for this network
+			string clasz = instance->getClasz();
+			actorFiles.push_back(clasz);
+			
+			//Insert package requiered for this network
+			string package = PackageMng::getFirstPackage(clasz);
+			packages.push_back(package);
 		}
 	}
 
 	//remove duplicate actors
 	actorFiles.sort();
 	actorFiles.unique();
+
+
+	//remove duplicate packages
+	packages.sort();
+	packages.unique();
 }
 
 void Network::print(std::string file){
