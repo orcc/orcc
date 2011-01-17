@@ -92,7 +92,12 @@ static int write_better_mapping(population *pop, struct genetic_s *genetic_info)
 }
 
 
-static int compare(void const *a, void const *b)
+static int check_individual_presence(individual* ind, individual** list, int size){
+	return 0;
+}
+
+
+static int compare_individual(void const *a, void const *b)
 {
 	individual const **pi1 = (individual const **) a;
 	individual const **pi2 = (individual const **) b;
@@ -108,6 +113,18 @@ static int compare(void const *a, void const *b)
     else{
     	return 0;
     }
+}
+
+
+static individual* selection(population *pop, struct genetic_s *genetic_info){
+	individual* i1 = pop->individuals[rand() % genetic_info->population_size];
+	individual* i2 = pop->individuals[rand() % genetic_info->population_size];
+	if(i1->fps >= i2->fps){
+		return i1;
+	}
+	else{
+		return i2;
+	}
 }
 
 
@@ -139,7 +156,7 @@ static void crossover(individual **children, individual **parents, struct geneti
 
 static individual* mutation(individual *original, struct genetic_s *genetic_info) {
 	individual *mutated = (individual*) malloc(sizeof(individual));
-	int i, mutatedIndex = rand() % genetic_info->actors_nb;
+	int i, mutated_index = rand() % genetic_info->actors_nb;
 
 	mutated->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
 	mutated->fps = -1;
@@ -149,7 +166,7 @@ static individual* mutation(individual *original, struct genetic_s *genetic_info
 		mutated->genes[i] = (gene*) malloc(sizeof(gene));
 
 		mutated->genes[i] = original->genes[i];
-		if (i == mutatedIndex) {
+		if (i == mutated_index) {
 			mutated->genes[i]->mapped_core = rand() % genetic_info->threads_nb;
 		}
 	}
@@ -182,7 +199,7 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 	nextPop->generation_nb = pop->generation_nb + 1;
 
 	// Sort population by descending fps value
-	qsort(pop->individuals, genetic_info->population_size, sizeof(individual*), compare);
+	qsort(pop->individuals, genetic_info->population_size, sizeof(individual*), compare_individual);
 
 	// Backup better individuals
 	for (i = 0; i < genetic_info->population_size * genetic_info->keep_ratio; i++) {
@@ -201,9 +218,8 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 		individual *children[2];
 		individual *parents[2];
 
-		// TOFIX: choose parents with tournament
-		parents[0] = pop->individuals[rand() % genetic_info->population_size];
-		parents[1] = pop->individuals[rand() % genetic_info->population_size];
+		parents[0] = selection(pop, genetic_info);
+		parents[1] = selection(pop, genetic_info);
 
 		crossover(children, parents, genetic_info);
 
@@ -213,7 +229,7 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 
 	// Mutation
 	for (; i < genetic_info->population_size; i++) {
-		nextPop->individuals[i] = mutation(pop->individuals[rand() % genetic_info->population_size], genetic_info);
+		nextPop->individuals[i] = mutation(selection(pop, genetic_info), genetic_info);
 	}
 
 	// TODO: Remove old population and unused individuals from memory
@@ -285,7 +301,6 @@ void *monitor(void *data) {
 		}
 		backup_partial_end_info();
 
-		// work process
 		population->individuals[evalIndNb]->fps = compute_partial_fps();
 		printf("Evaluation of mapping %i = %f fps",evalIndNb,population->individuals[evalIndNb]->fps);
 		if(population->individuals[evalIndNb]->old_fps == -1){
