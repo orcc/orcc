@@ -207,6 +207,13 @@
     <Port kind="Input" name="EnableRead">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="FrameNum">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -334,4 +341,5 @@
     <Connection dst="TEX_L" dst-port="SelectList" src="" src-port="SelectList"/>
     <Connection dst="TEX_L" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
     <Connection dst="TEX_L" dst-port="EnableRead" src="" src-port="EnableRead"/>
+    <Connection dst="TEX_L" dst-port="FrameNum" src="" src-port="FrameNum"/>
 </XDF>

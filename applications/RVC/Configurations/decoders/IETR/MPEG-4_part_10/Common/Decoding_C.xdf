@@ -204,6 +204,13 @@
     <Port kind="Input" name="EnableRead">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="FrameNum">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -312,4 +319,5 @@
     <Connection dst="PRED_C" dst-port="MbType4Pred" src="" src-port="MbType4Pred"/>
     <Connection dst="PRED_C" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
     <Connection dst="PRED_C" dst-port="EnableRead" src="" src-port="EnableRead"/>
+    <Connection dst="PRED_C" dst-port="FrameNum" src="" src-port="FrameNum"/>
 </XDF>

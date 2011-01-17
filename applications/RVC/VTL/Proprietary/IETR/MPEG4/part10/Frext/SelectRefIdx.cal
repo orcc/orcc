@@ -31,10 +31,10 @@ actor SelectRefIdx()
 
 	SendPocToRead.L0: action
 			SelectList   :[list_selected],
-			POCtoRead_l0 :[Poc0],
+			POCtoRead_l0 :[Poc0 , FrameNum0],
 			NewPic_l0    :[is_new_pic_l0]
 				==>
-			PocToRead    :[Poc0],
+			PocToRead    :[Poc0 , FrameNum0],
 			Read4MbPred  :[true]
 		guard
 			list_selected = PRED_L0,
@@ -43,10 +43,10 @@ actor SelectRefIdx()
 
 	SendPocToRead.L1: action
 			SelectList   :[list_selected],
-			POCtoRead_l1 :[Poc1],
+			POCtoRead_l1 :[Poc1 , FrameNum1],
 			NewPic_l1    :[is_new_pic_l1]
 				==>
-			PocToRead    :[Poc1],
+			PocToRead    :[Poc1 , FrameNum1],
 			Read4MbPred  :[true]
 		guard
 			list_selected = PRED_L1,
@@ -55,12 +55,12 @@ actor SelectRefIdx()
 
 	SendPocToRead.BiPred: action
 			SelectList   :[list_selected],
-			POCtoRead_l0 :[Poc0],
-			POCtoRead_l1 :[Poc1],
+			POCtoRead_l0 :[Poc0 , FrameNum0],
+			POCtoRead_l1 :[Poc1 , FrameNum1],
 			NewPic_l0    :[is_new_pic_l0],
 			NewPic_l1    :[is_new_pic_l1]
 				==>
-			PocToRead    :[Poc0,Poc1],
+			PocToRead    :[Poc0 , FrameNum0 , Poc1 , FrameNum1],
 			Read4MbPred  :[true,true]
 		guard
 			list_selected = BIPRED,

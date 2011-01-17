@@ -190,6 +190,13 @@
     <Port kind="Input" name="EnableRead">
         <Type name="bool"/>
     </Port>
+    <Port kind="Input" name="FrameNum">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="31"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -365,4 +372,5 @@
     <Connection dst="Inter" dst-port="SubMbType" src="" src-port="SubMbType"/>
     <Connection dst="Buffer_inter" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
     <Connection dst="Buffer_inter" dst-port="EnableRead" src="" src-port="EnableRead"/>
+    <Connection dst="Buffer_inter" dst-port="FrameNum" src="" src-port="FrameNum"/>
 </XDF>

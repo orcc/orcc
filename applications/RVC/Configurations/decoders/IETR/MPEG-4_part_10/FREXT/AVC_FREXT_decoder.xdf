@@ -290,4 +290,7 @@
     <Connection dst="Decoding_Y" dst-port="EnableRead" src="FUN_Parser" src-port="Read4MbPred"/>
     <Connection dst="Decode_U" dst-port="EnableRead" src="FUN_Parser" src-port="Read4MbPred"/>
     <Connection dst="Decode_V" dst-port="EnableRead" src="FUN_Parser" src-port="Read4MbPred"/>
+    <Connection dst="Decoding_Y" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum"/>
+    <Connection dst="Decode_U" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum"/>
+    <Connection dst="Decode_V" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum"/>
 </XDF>

@@ -25,6 +25,7 @@ actor Algo_RefIdxtoPOC()
 		:
 
 	List(type:uint(size=32), size=16) RefPoc;
+	List(type:uint(size=32), size=16) RefFrameNum;
 
 	uint(size=6)  SizeList;
 	uint(size=6)  CountRead;
@@ -33,7 +34,7 @@ actor Algo_RefIdxtoPOC()
 			NewList   :[ IsNewPic ],
 			RefIdx    :[ ListIdx  ]
 				==>
-			POCtoRead :[ValPoc]
+			POCtoRead :[ValPoc , RefFrameNum[ListIdx & 15]]
 		guard
 			not IsNewPic
 		var
@@ -60,13 +61,14 @@ actor Algo_RefIdxtoPOC()
 
 
 	ReadRefList: action
-			RefList :[ PocList ]
+			RefList :[ PocList , FrameNum]
 				==>
 		guard
 			CountRead < SizeList
 		do
-			RefPoc[CountRead] := PocList;
-			CountRead         := CountRead + 1;
+			RefPoc[CountRead]      := PocList;
+			RefFrameNum[CountRead] := FrameNum;
+			CountRead              := CountRead + 1;
 		end
 
 

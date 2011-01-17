@@ -31,9 +31,10 @@
       <vertex id="MbType4Pred" x="399" y="1038"/>
       <vertex id="SubMbType" x="385" y="954"/>
       <vertex id="IsNewPicOrSlice" x="231" y="779"/>
+      <vertex id="EnableRead" x="252" y="598"/>
       <vertex id="Display" x="916" y="986"/>
       <vertex id="PRED_C" x="660" y="958"/>
       <vertex id="RES_C" x="205" y="2060"/>
-      <vertex id="EnableRead" x="252" y="598"/>
+      <vertex id="FrameNum" x="224" y="849"/>
    </vertices>
 </layout>
