@@ -28,42 +28,27 @@
  */
 
 /**
-@brief Implementation of class FifoFnRemoval
+@brief Implementation of class Package
 @author Jerome Gorin
-@file FifoFnRemoval.cpp
+@file Package.cpp
 @version 1.0
-@date 24/12/2010
+@date 17/01/2011
 */
 
 //------------------------------
-#include <algorithm>
-#include <vector>
-
-#include "Jade/Core/Network.h"
-#include "Jade/Reconfigure/ReconfigurationScenario.h"
+#include "Jade/Core/Package.h"
 //------------------------------
 
 using namespace std;
 
-void ReconfigurationScenario::compute(){
-	int vSize;
-	list<string>*  refActors = refNetwork->getActorFiles();
-	list<string>*  newActors = curNetwork->getActorFiles();
-	
-	if (refActors->size() > newActors->size()){
-		vSize = refActors->size();
-	}else{
-		vSize = newActors->size();
+void Package::getAllUnderneathActors(std::map<std::string, Actor*>* underneathActors){
+	//Add actors of this package
+	underneathActors->insert(actors.begin(), actors.end());
+
+	//Iterate though all childs of the package
+	std::map<std::string, Package*>::iterator it;
+	for (it = childs.begin(); it != childs.end(); it++){
+		Package* child = it->second;
+		child->getAllUnderneathActors(underneathActors);
 	}
-
-	vector<string>::iterator it;
-	vector<string> unionActors(vSize);
-	vector<string> remActors(refActors->size());
-	vector<string> addActors(newActors->size());
-
-	it=set_intersection (refActors->begin(), refActors->end(), newActors->begin(), newActors->end(), unionActors.begin());
-	it=set_difference (refActors->begin(), refActors->end(), newActors->begin(), newActors->end(), remActors.begin());
-	it=set_difference (newActors->begin(), newActors->end(), refActors->begin(), refActors->end(), addActors.begin());
-
-	//it=set_symmetric_difference (refActors->begin(), refActors->end(), newActors->begin(), newActors->end(), v.begin());
-}
+};

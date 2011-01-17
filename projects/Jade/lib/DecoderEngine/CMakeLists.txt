@@ -6,6 +6,4 @@ add_library (DecoderEngine
   Constant.h
   Decoder.cpp
   DecoderEngine.cpp
-  Instantiator.cpp
-  Instantiator.h
  )

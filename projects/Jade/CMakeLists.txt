@@ -90,6 +90,7 @@ set(EXECUTABLE_OUTPUT_PATH bin/${CMAKE_BUILD_Type})
 
 
 # Add libraries
+add_subdirectory(lib/ConfigurationEngine)
 add_subdirectory(lib/DecoderEngine)
 add_subdirectory(lib/Graph)
 add_subdirectory(lib/Fifo)
@@ -97,7 +98,6 @@ add_subdirectory(lib/IRActor)
 add_subdirectory(lib/IRCore)
 add_subdirectory(lib/IRJit)
 add_subdirectory(lib/IROptimize)
-add_subdirectory(lib/IRReconfigure)
 add_subdirectory(lib/IRSerialize)
 add_subdirectory(lib/IRUtil)
 add_subdirectory(lib/IRTransform)
@@ -120,5 +120,5 @@ ENDIF(APPLE)
 add_executable(JadeToolbox Toolbox.cpp)
 
 # Library requiered
-target_link_libraries(Jade DecoderEngine XDFParser IROptimize IRSerialize Scheduler IRJit IRReconfigure IRTransform  IRActor Fifo IRCore IRUtil HDAGGraph TinyXml ${SDL_LIBRARY} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(Jade DecoderEngine ConfigurationEngine XDFParser IROptimize IRSerialize Scheduler IRJit IRTransform  IRActor Fifo IRCore IRUtil HDAGGraph TinyXml ${SDL_LIBRARY} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(JadeToolbox IRUtil ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})

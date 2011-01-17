@@ -11,5 +11,6 @@ add_library (IRCore
 	FSM.cpp
 	Instance.cpp
 	Network.cpp
+	Package.cpp
 	Procedure.cpp
  )

@@ -54,6 +54,7 @@
 #include "Jade/Optimize/FifoFnRemoval.h"
 #include "Jade/Optimize/InstanceInternalize.h"
 #include "llvm/Support/PassNameParser.h"
+#include "Jade/Util/PackageMng.h"
 //------------------------------
 
 using namespace std;
@@ -207,6 +208,9 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 	}
 
 	Decoder* decoder = it->second;
+
+	parseActors(newNetwork);
+
 	decoder->setNetwork(newNetwork);
 	
 	return 0;
@@ -215,13 +219,17 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 void DecoderEngine::parseActors(Network* network) {
 	list<string>::iterator it;
 	list<string>* files = network->getActorFiles();
-	
+	map<string, Actor*> netActors;
+
 	for ( it = files->begin(); it != files->end(); ++it ){
 		Actor* actor = irParser->parseActor(*it);
 		fifo->refineActor(actor);
 		
-		actors.insert(pair<string, Actor*>(*it, actor));
+		netActors.insert(pair<string, Actor*>(*it, actor));
 	}
+
+	network->setPackages(PackageMng::setPackages(&netActors));
+	actors.insert(netActors.begin(), netActors.end());
 }
 
 void DecoderEngine::doOptimizeDecoder(Decoder* decoder){

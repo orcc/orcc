@@ -143,8 +143,8 @@ return:                                           ; preds = %bb6
 !initializes = !{!26}
 !actions = !{!29}
 
-!0 = metadata !{metadata !"tools/Source.bc"}
-!1 = metadata !{metadata !"Source"}
+!0 = metadata !{metadata !"System/Source"}
+!1 = metadata !{metadata !"System.Source"}
 !2 = metadata !{ metadata !33 ,  null }
 !33 = metadata !{metadata !29}
 !3 = metadata !{metadata !4, metadata !"O", %struct.fifo_i8_s** @O}

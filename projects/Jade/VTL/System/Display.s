@@ -121,8 +121,8 @@ declare void @write_mb(i8*)
 !procedures = !{!12, !13, !14}
 !actions = !{!15}
 
-!0 = metadata !{metadata !"tools/Display.bc"}
-!1 = metadata !{metadata !"Display"}
+!0 = metadata !{metadata !"System/Display.bc"}
+!1 = metadata !{metadata !"System.Display"}
 !2 = metadata !{metadata !19, null}
 !19 = metadata !{metadata !15}
 !3 = metadata !{metadata !4, metadata !"B", %struct.fifo_i8_s** @B}

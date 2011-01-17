@@ -56,6 +56,7 @@ class Instance;
 class FuncUnit;
 class Actor;
 class IRParser;
+class Package;
 //------------------------------
 
 class DecoderEngine {
@@ -150,6 +151,8 @@ private:
 	void doOptimizeDecoder(Decoder* decoder);
 	
 	IRParser* irParser;
+
+	/** Map of actors loaded */
 	std::map<std::string, Actor*> actors;
 
 	/** LLVM Context */

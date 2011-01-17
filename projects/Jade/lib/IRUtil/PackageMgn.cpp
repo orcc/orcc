@@ -37,6 +37,7 @@
 
 //------------------------------
 #include "Jade/Util/PackageMng.h"
+#include "Jade/Core/Package.h"
 
 #include <algorithm>
 //------------------------------
@@ -67,6 +68,29 @@ string PackageMng::getPackages(string name){
 	return name.substr(0, index);
 }
 
+list<std::string> PackageMng::getPackageList(Actor* actor){
+	return getPackageList(actor->getName());
+}
+
+list<std::string> PackageMng::getPackageList(string name){
+	list<string> packageList;
+	string packages = getPackages(name);
+
+	int index = packages.find('.');
+
+	//Split string separate by a .
+	while (index != string::npos){
+		packageList.push_back(packages.substr(0, index));
+		packages = packages.substr(index+1, packages.size());
+		index = packages.find('.');
+	}
+
+	//Insert last package
+	packageList.push_back(packages);
+
+	return packageList;
+}
+
 string PackageMng::getFirstPackage(Actor* actor){
 	return getFirstPackage(actor->getName());
 }
@@ -93,4 +117,45 @@ string PackageMng::getSimpleName(string name){
 	}
 
 	return name.substr(index + 1);
+}
+
+map<string, Package*>* PackageMng::setPackages(map<string, Actor*>* actors){
+	map<string, Package*>::iterator itPack;
+	map<string, Actor*>::iterator itAct;
+
+	//Resulting map of package
+	map<string, Package*>* packages = new map<string, Package*>();
+
+	//Iterate though every actors to determine and order their package
+	for (itAct = actors->begin(); itAct != actors->end(); itAct++){
+		list<string>::iterator itStrPack;
+		list<string> packageStrs = getPackageList(itAct->second);
+		
+		//Current position of the package
+		map<string, Package*>* packagesPtr = packages;
+		Package* package = NULL;
+
+		//Iterate though the current package hierarchy
+		for (itStrPack = packageStrs.begin(); itStrPack != packageStrs.end(); itStrPack++){
+			itPack = packagesPtr->find(*itStrPack);
+
+			if (itPack == packagesPtr->end()){
+				//Package does not exist, creates one
+				package = new Package(*itStrPack, package);
+				packagesPtr->insert(pair<string, Package*>(*itStrPack, package));
+			}else{
+				//Package found
+				package = itPack->second;
+			}
+
+			//Loop though childs package
+			packagesPtr = package->getChilds();
+		}
+		
+		//Insert current actor into the last package
+		package->insertUnderneath(itAct->second);
+	}
+
+	//Return the resulting map of packages
+	return packages;
 }

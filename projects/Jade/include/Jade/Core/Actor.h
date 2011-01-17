@@ -53,11 +53,12 @@ namespace llvm{
 	class StructType;
 }
 
-class Variable;
-class Instance;
-class FuncUnit;
-class Procedure;
 class ActionScheduler;
+class FuncUnit;
+class Instance;
+class Package;
+class Procedure;
+class Variable;
 //------------------------------
 
 /**

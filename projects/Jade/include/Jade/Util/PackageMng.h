@@ -92,6 +92,26 @@ public:
      */
 	static std::string getPackages(std::string name);
 
+	/**
+     * @brief Get a list of package string from the given actor
+	 *
+	 * @param actor : the actor to get the package from
+	 *
+	 * @return the corresponding list of package
+	 *
+     */
+	static std::list<std::string> getPackageList(Actor* actor);
+
+	/**
+     * @brief Get a list of package string from the name of an actor
+	 *
+	 * @param name : name of the actor
+	 *
+	 * @return the corresponding list of package
+	 *
+     */
+	static std::list<std::string> getPackageList(std::string name);
+
 
 	/**
      * @brief Get first package from the given actor
@@ -132,6 +152,18 @@ public:
 	 *
      */
 	static std::string getSimpleName(std::string name);
+
+	/**
+     * @brief Set a map of packages
+	 *
+	 *	Create a map of package representing the dependance of a list of actors
+	 *
+	 * @param actors : a map of actor
+	 *
+	 * @return the corresponding requiered package
+	 *
+     */
+	static std::map<std::string, Package*>* setPackages(std::map<std::string, Actor*>* actors);
 };
 
 #endif

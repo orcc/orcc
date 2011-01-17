@@ -48,6 +48,7 @@ class Decoder;
 class Instance;
 class HDAGGraph;
 class Port;
+class Package;
 class Procedure;
 
 //------------------------------
@@ -134,13 +135,21 @@ public:
 	Decoder* getDecoder() {return decoder;};
 
 	/**
+	 * @brief Set the package requiered by the network
+	 * 
+	 * @param packages : the package requiered by the decoder
+	 */
+	void setPackages(std::map<std::string, Package*>* packages) {this->packages = packages;};
+
+
+	/**
 	 * @brief Get the package requiered by the decoder
 	 *
 	 * Returns the packages requiered to instanciate this decoder.
 	 * 
 	 * @return the package requiered for the decoder
 	 */
-	std::list<std::string>* getPackages() {return &packages;};
+	std::map<std::string, Package*>* getPackages() {return packages;};
 
 	/**
 	 * @brief Setter of decoder
@@ -179,14 +188,14 @@ private:
 	/** graph of the network  */
 	HDAGGraph* graph;
 
-	/** actors of the network  */
+	/** actors files of the network  */
 	std::list<std::string> actorFiles;
 	
 	/** instances of the network  */
 	std::map<std::string, Instance*> instances;
 
 	/** package used by the network  */
-	std::list<std::string> packages;
+	std::map<std::string, Package*>* packages;
 
 	/** decoder of the instance */
 	Decoder* decoder;

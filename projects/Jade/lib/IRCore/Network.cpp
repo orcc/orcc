@@ -75,21 +75,12 @@ void Network::setNetwork(){
 			//Insert actor requiered for this network
 			string clasz = instance->getClasz();
 			actorFiles.push_back(clasz);
-			
-			//Insert package requiered for this network
-			string package = PackageMng::getFirstPackage(clasz);
-			packages.push_back(package);
 		}
 	}
 
 	//remove duplicate actors
 	actorFiles.sort();
 	actorFiles.unique();
-
-
-	//remove duplicate packages
-	packages.sort();
-	packages.unique();
 }
 
 void Network::print(std::string file){

@@ -40,6 +40,7 @@
 #define RECONFIGURATIONSCENARIO_H
 
 class Network;
+class Package;
 //------------------------------
 
 /**
@@ -58,24 +59,58 @@ public:
 	 * @param network : the original network to reconfigure
 	 *
      */
-	ReconfigurationScenario(Network* refNetwork, Network* curNetwork){
-		this->refNetwork = refNetwork;
-		this->curNetwork = curNetwork;
-	};
-
-	/*!
-     *  @brief Compute the scenario
-     *
-	 * Compute the difference between two networks.
-	 *
-     */
-	void compute();
+	ReconfigurationScenario(Network* refNetwork, Network* curNetwork);
 
 private:
+	
+	/**
+     *  @brief Compare two packages
+	 *
+	 *  Compare two package and returns the actors contained in package ref but not in package cur.
+	 *    intersect defines the intersection between the two packages and can be NULL.
+	 *
+	 *	@param ref : the reference map of package
+	 *
+	 *	@param cur : the map of package to compare
+	 *
+	 *	@param diff : the resulting difference
+	 *
+	 *	@param intersect : the intersection between package, can be NULL.
+     */
+	void comparePackages(std::map<std::string, Package*>* ref, 
+						 std::map<std::string, Package*>* cur, 
+						 std::map<std::string, Actor*>* diff,
+						 std::map<std::string, Actor*>* intersect = NULL);
+
+	/**
+     *  @brief Compare a list of actors
+	 *
+	 *  Compare two list of actors and returns the actors contained in list ref but not in list cur.
+	 *    intersect defines the intersection between the two lists.
+	 *
+	 *	@param ref : the reference map of package
+	 *
+	 *	@param cur : the map of package to compare
+	 *
+	 *	@param diff : the resulting difference
+	 *
+	 *	@param intersect : the intersection between list, can be NULL.
+     */
+	void compareActors(std::map<std::string, Actor*>* ref, 
+					   std::map<std::string, Actor*>* cur,
+					   std::map<std::string, Actor*>* diff,
+					   std::map<std::string, Actor*>* intersect);
+
+	/** Reference network*/
 	Network* refNetwork;
+	
+	/** New network*/
 	Network* curNetwork;
 
-	std::list<std::string> actorDiff;
+	/** List of marked actors*/
+	std::map<std::string, Actor*> removed;
+	std::map<std::string, Actor*> added;
+	std::map<std::string, Actor*> intersect;
 };
 
 #endif
