@@ -17,10 +17,11 @@ Require-Bundle: org.eclipse.xtext;bundle-version="1.0.1",
  org.eclipse.emf.ecore,
  org.eclipse.emf.common,
  org.antlr.runtime,
- net.sf.orcc.core,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.jdt.core
+ org.eclipse.jdt.core,
+ org.ietr.libs,
+ net.sf.orcc.core
 Import-Package: org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: net.sf.orcc.cal,

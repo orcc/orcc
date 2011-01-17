@@ -14,11 +14,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.ui.console,
  org.eclipse.ui.editors,
- org.eclipse.ui.ide
+ org.eclipse.ui.ide,
+ org.ietr.libs
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .,
- lib/jgrapht-jdk1.6.jar,
  lib/net.sf.orcc.runtime.jar,
  lib/gson-1.5.jar
 Bundle-Vendor: IETR/INSA Rennes
@@ -48,9 +48,4 @@ Export-Package: net.sf.orcc,
  net.sf.orcc.tools.classifier,
  net.sf.orcc.tools.normalizer,
  net.sf.orcc.ui,
- net.sf.orcc.util,
- org.jgrapht,
- org.jgrapht.alg,
- org.jgrapht.ext,
- org.jgrapht.graph,
- org.jgrapht.traverse
+ net.sf.orcc.util

@@ -4,15 +4,15 @@ Bundle-Name: Orcc back-ends plug-in
 Bundle-SymbolicName: net.sf.orcc.backends;singleton:=true
 Bundle-Version: 0.9.2.v20101216
 Bundle-Vendor: IETR/INSA Rennes
-Require-Bundle: net.sf.orcc.core,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.emf.ecore,
  org.eclipse.debug.core,
- org.eclipse.ui
+ org.eclipse.ui,
+ net.sf.orcc.core,
+ org.ietr.libs
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/antlr-runtime-3.2.jar,
  lib/st4.jar
 Bundle-Activator: net.sf.orcc.backends.Activator
 Export-Package: net.sf.orcc.backends,
