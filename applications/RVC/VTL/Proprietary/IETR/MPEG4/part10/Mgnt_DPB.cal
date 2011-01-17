@@ -173,11 +173,11 @@ actor Mgnt_DPB ( int MB_WIDTH )
 				end
 			end
 			if(not found)then
-				println("Current Poc : "+ListPOC[pic_curr_idx]);
-				println("POC not found :"+poc2read);
+				println("\nCurrent Poc : "+ListPOC[pic_curr_idx]+" ; Current FrameNum : "+ListFrameNum[pic_curr_idx]);
+				println("POC not found :"+poc2read+" ; FrameNum : "+frame_num_to_read+"\n");
 					foreach int i in 0 .. NB_PIC-1
 					do
-						println("Idx n"+i+"; PocVal:"+ListPOC[i]+ " is a ref:"+IsAReference[i]);
+						println("Idx n"+i+"; PocVal:"+ListPOC[i]+ " ; Frame Num:"+ListFrameNum[i]+" ; is a ref:"+IsAReference[i]);
 					end
 				while(true)
 				do
@@ -339,14 +339,14 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		end
 
 	ReadDelList.Launch: action
-			DelList:[DelVal]
+			DelList:[DelPoc , DelFrame]
 				==>
 		guard
-			DelVal != SENT_DONE
+			DelPoc != SENT_DONE
 		do
 			foreach int i in 0 .. NB_PIC - 1
 			do
-				if(ListPOC[i]   = DelVal) then
+				if(ListPOC[i]   = DelPoc and ListFrameNum[i] = DelFrame) then
 					IsAReference[i] := false;
 				end
 			end

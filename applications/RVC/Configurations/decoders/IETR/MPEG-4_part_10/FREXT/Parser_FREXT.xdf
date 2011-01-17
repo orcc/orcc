@@ -573,7 +573,6 @@
     <Connection dst="" dst-port="CoefAC_L" src="BlockSplit" src-port="Coeff_Y_AC"/>
     <Connection dst="" dst-port="CoefDC_L" src="BlockSplit" src-port="Coeff_Y_DC"/>
     <Connection dst="" dst-port="PredMode" src="IntraPredSplit" src-port="PredMode"/>
-    <Connection dst="" dst-port="DelList" src="MMCO" src-port="DelList"/>
     <Connection dst="" dst-port="IsIDR" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="" dst-port="MV" src="MVReconstruct" src-port="MV"/>
     <Connection dst="" dst-port="PART_SZ" src="MVReconstruct" src-port="PartSZ"/>
@@ -703,7 +702,6 @@
     <Connection dst="MVReconstruct" dst-port="SubMbPredMvResL1"
         src="DecodePic" src-port="SubMbPredResMvL1"/>
     <Connection dst="MVReconstruct" dst-port="EmptyDPB" src="MMCO" src-port="EmptyDPB"/>
-    <Connection dst="MVReconstruct" dst-port="DelList" src="MMCO" src-port="DelList"/>
     <Connection dst="MVReconstruct" dst-port="LTList" src="MMCO" src-port="LongTermList"/>
     <Connection dst="MVReconstruct" dst-port="RefList1" src="RefList1" src-port="RefList"/>
     <Connection dst="MVReconstruct" dst-port="Poc" src="DecodePic" src-port="POC"/>
@@ -761,4 +759,6 @@
     <Connection dst="CheckIsNewSlice" dst-port="IsNewPic"
         src="DecodePic" src-port="IsNewPic"/>
     <Connection dst="" dst-port="FrameNum" src="DecodePic" src-port="FrameNum"/>
+    <Connection dst="" dst-port="DelList" src="MMCO" src-port="DelList"/>
+    <Connection dst="MVReconstruct" dst-port="DelList" src="MMCO" src-port="DelList"/>
 </XDF>

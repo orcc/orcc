@@ -67,8 +67,8 @@ actor Algo_MMCO ()
 	uint(size=32) POC
 		==>
 	int (size=32) DelList,
-	int(size=32) LongTermList,
-	int(size=32) ShortTermList,
+	int (size=32) LongTermList,
+	int (size=32) ShortTermList,
 	uint(size=5)  SzShortTermList,
 	bool          EmptyDPB
 		:
@@ -113,6 +113,7 @@ actor Algo_MMCO ()
 	uint(size=7)  IdxPocList       := 0;
 	bool          ValIsIDR         := false;
 	int (size=32) ValDelPoc        := 0;
+	uint(size=31) ValDelFrame      := 0;
 
 /*
 *
@@ -602,6 +603,7 @@ actor Algo_MMCO ()
 					if(FrameNumList[IdxPocList]   = DelListTab[NbFrameDel - 1])then
 						FrameNumList[IdxPocList] := -1;
 						ValDelPoc                := PocList[IdxPocList];
+						ValDelFrame              := DelListTab[NbFrameDel - 1];
 						IdxFound                 := true;
 					else
 						IdxPocList := IdxPocList + 1;
@@ -618,12 +620,12 @@ actor Algo_MMCO ()
 	//Send the DelList
 	SendDelList.PocValue : action
 				==>
-			DelList:[ValDelPoc]
+			DelList:[ValDelPoc , ValDelFrame]
 		guard
 			NbFrameDel > 0
 		do
 			if(DEBUG_OUTPUT)then
-				println("Output Mmco DelList: "+ValDelPoc);
+				println("Output Mmco DelList: "+ValDelPoc+" ; "+ValDelFrame);
 			end
 		end
 

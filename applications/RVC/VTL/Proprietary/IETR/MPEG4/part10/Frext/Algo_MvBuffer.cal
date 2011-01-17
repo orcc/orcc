@@ -75,8 +75,8 @@ actor Algo_MvBuffer()
 	int (size=16) MvL1,
 
 	bool          Empty_DPB,
-	int(size=32)  DelList,
-	int(size=32) LongTermList,
+	int (size=32) DelList,
+	int (size=32) LongTermList,
 
 	int (size=32) RefList1
 		==>
@@ -620,14 +620,14 @@ actor Algo_MvBuffer()
 		end
 
 	ReadDelList.Launch: action
-			DelList:[DelVal]
+			DelList:[DelPoc , DelFrame]
 				==>
 		guard
-			DelVal != SENT_DONE
+			DelPoc != SENT_DONE
 		do
 			foreach int i in 0 .. 15
 			do
-				if(DelVal = ListPoc[i])then
+				if(DelPoc = ListPoc[i])then
 					IsReference[i] := false;
 				end
 			end

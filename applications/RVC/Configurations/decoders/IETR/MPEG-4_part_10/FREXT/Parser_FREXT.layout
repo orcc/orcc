@@ -46,6 +46,7 @@
       <vertex id="SubMbType" x="1752" y="1282"/>
       <vertex id="IsNewPicOrSlice" x="1266" y="665"/>
       <vertex id="Read4MbPred" x="2697" y="1161"/>
+      <vertex id="FrameNum" x="1474" y="559"/>
       <vertex id="Algo_NALU" x="333" y="7"/>
       <vertex id="CheckNaluType" x="644" y="-22"/>
       <vertex id="DecodeSps" x="46" y="1239"/>
@@ -53,7 +54,7 @@
       <vertex id="PpsVLDecoding" x="464" y="230"/>
       <vertex id="DecodePps" x="327" y="686"/>
       <vertex id="PicVLDecoding" x="895" y="219"/>
-      <vertex id="MMCO" x="1367" y="1587"/>
+      <vertex id="MMCO" x="1288" y="1637"/>
       <vertex id="RefList0" x="1977" y="1157"/>
       <vertex id="IntraPredSplit" x="1409" y="325"/>
       <vertex id="MVReconstruct" x="1896" y="625"/>
@@ -69,6 +70,5 @@
       <vertex id="MergeSpsAsk" x="478" y="1069"/>
       <vertex id="SplitSpsInfos" x="504" y="1272"/>
       <vertex id="CheckIsNewSlice" x="1025" y="1760"/>
-      <vertex id="FrameNum" x="1474" y="559"/>
    </vertices>
 </layout>

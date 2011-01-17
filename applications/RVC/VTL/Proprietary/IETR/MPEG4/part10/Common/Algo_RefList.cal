@@ -603,7 +603,7 @@ actor Algo_RefList (bool DEBUG)
 			//	println("RefListSent:"+FrameNumList[ValMovedIdx]+" Poc:"+POCList[ValMovedIdx]);
 			end
 			if(DEBUG and DEBUG_OUTPUT)then 
-				println("Output RefList RefList: "+poc);
+				println("Output RefList RefList: "+poc + " ; " + frame_num);
 			end
 
 		end
@@ -647,7 +647,7 @@ actor Algo_RefList (bool DEBUG)
 		//	println("RefListSent; FrNu:"+FrameNumList[ValLTList[idx_LTList]]+" Poc:"+POCList[ValLTList[idx_LTList]]);
 			CounterRefListTab := CounterRefListTab + 1;
 			if(DEBUG and DEBUG_OUTPUT)then 
-				println("Output RefList RefList: "+poc);
+				println("Output RefList RefList: "+poc + " ; " + frame_num);
 			end
 		end
 
@@ -680,7 +680,7 @@ actor Algo_RefList (bool DEBUG)
 			//println("RefListSent:"+FrameNumList[RefIdx[CounterRefListTab]]);
 			CounterRefListTab := CounterRefListTab + 1;
 			if(DEBUG and DEBUG_OUTPUT) then
-				println("Output RefList RefList: "+poc);
+				println("Output RefList RefList: "+poc + " ; " + frame_num);
 			end
 		end
 
