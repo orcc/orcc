@@ -157,22 +157,22 @@ endif$
 // print actors and networks instantiation
 ///////////////////////////////////////////////////////////////////////////////
 PrintNetworksAndActors(outgoingMap) ::= <<
-$outgoingMap.keys: {instance | $checkNetworkOrActors(instance=instance)$}; separator="\n\n"$
+$outgoingMap.keys: {instance | $checkNetworkOrActors(instance=instance)$}$
 >>
 
 checkNetworkOrActors(instance) ::= <<
 $if (instance.actor)
 $$printInstances(name=instance.actor.simpleName,
 				 inputs=instance.actor.inputs.list,
-                 outputs=instance.actor.outputs.list)$$
-elseif (instance.broadcast)
-$$printInstances(name=instance.id,
-				 inputs=instance.broadcast.inputs.list,
-                 outputs=instance.broadcast.outputs.list)$$
+                 outputs=instance.actor.outputs.list)$
+                 
+                 $
 elseif (instance.network)
 $$printInstances(name=instance.id,
 				 inputs=instance.broadcast.inputs.list,
-                 outputs=instance.broadcast.outputs.list)$$
+                 outputs=instance.broadcast.outputs.list)$
+                 
+                 $
 endif$
 >>
 
@@ -199,7 +199,11 @@ printInputs(connection) ::= <<
 >>
 
 printPortsIn(connection, map, vmap) ::= <<
-$if(map.(connection.target))
+$if(map.(connection.target).broadcast)
+$$connection.target$_data   => broadcast_$map.(connection.target).id$_data,
+$connection.target$_send   => broadcast_$map.(connection.target).id$_send,
+$connection.target$_ack    => broadcast_$map.(connection.target).id$_ack,$
+elseif(map.(connection.target))
 $$connection.target$_data   => $instance.id$_$connection.target$_data,
 $connection.target$_send   => $instance.id$_$connection.target$_send,
 $connection.target$_ack    => $instance.id$_$connection.target$_ack,$
@@ -237,7 +241,73 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 // print broadcasts instantiation
 ///////////////////////////////////////////////////////////////////////////////
-// TODO
+printBroadcasts(outgoingMap) ::= <<
+$outgoingMap.keys: {instance | $checkBroadcast(instance=instance)$}; separator="\n\n"$
+>>
+
+checkBroadcast(instance) ::= <<
+$if (instance.broadcast)
+$$printBroadcast(name=instance.id,
+				 inputs=instance.broadcast.inputs.list,
+                 outputs=instance.broadcast.outputs.list)$$
+endif$
+>>
+
+printBroadcast(name, inputs, outputs) ::= <<
+broadcast_$name$ : entity work.broadcast
+    generic map (
+      width => $if(instance.broadcast.type.bool)$1$else$$instance.broadcast.type.size$$endif$,
+      size  => $instance.broadcast.numOutputs$)
+  port map (
+$if(!inputs.empty)
+$
+$network.incomingMap.(instance):printBroadcastInputs(); separator="\n"$
+$
+endif$$
+if(!outputs.empty)
+$
+    data_out   => broadcast_$name$_data,
+    send_out   => broadcast_$name$_send,
+    ack_out    => broadcast_$name$_ack,
+$
+endif$
+    reset_n   => reset_n);$
+if(!outputs.empty)
+$
+
+$outgoingMap.(instance) : printBroadcastOutputs(); separator="\n"$
+$
+endif$
+>>
+
+printBroadcastInputs(connection) ::= <<
+    $printBroadcastPortsIn(connection=connection, map=network.predecessorsMap.(instance), vmap=network.sourceMap.(connection))$  
+>>
+
+printBroadcastPortsIn(connection, map, vmap) ::= <<
+$if(map.(connection.target))
+$data_in   => broadcast_$name$_data_in,
+send_in   => broadcast_$name$_send_in,
+ack_in    => broadcast_$name$_ack_in,$
+else
+$data_in   => $vmap.port$_data,
+send_in   => $vmap.port$_send,
+ack_in    => $vmap.port$_ack,$
+endif$
+>>
+
+
+printBroadcastOutputs(connection) ::= <<
+    $printBroadcastPortsOut(connection=connection, map=network.successorsMap.(instance), vmap=network.targetMap.(connection))$  
+>>
+
+printBroadcastPortsOut(connection, map, vmap) ::= <<
+$if(!map.(connection.source))
+$$vmap.port$_data   <= broadcast_$name$_data;
+$vmap.port$_send   <= broadcast_$name$_send;
+$vmap.port$_ack   <= broadcast_$name$_ack;$
+endif$
+>>
 
 
 
@@ -294,10 +364,11 @@ begin
   -- Actors and Networks instantiation 
   ---------------------------------------------------------------------------
   $PrintNetworksAndActors(network.outgoingMap)$
-
   ---------------------------------------------------------------------------
   -- Broadcast and FIFO instantiation 
   --------------------------------------------------------------------------- 
+  $printBroadcasts(network.outgoingMap)$
+  --
   $assignFifos(network.connections)$
   ---------------------------------------------------------------------------
 
