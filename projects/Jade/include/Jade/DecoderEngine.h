@@ -164,8 +164,8 @@ private:
 	/** System package location */
 	std::string systemPackage;
 	
-	/** Decoder used by the decoder engine */
-	Decoder* decoder;
+	/** Map of decoder loaded in the decoder engine */
+	std::map<Network*, Decoder*> decoders;
 
 	/** Print all actions made by decoder engine*/
 	bool verbose;

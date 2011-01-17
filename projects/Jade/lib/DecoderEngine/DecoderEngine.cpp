@@ -97,7 +97,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	timer = clock ();
 
 	//Create decoder
-	decoder = new Decoder(Context, network, fifo);
+	Decoder* decoder = new Decoder(Context, network, fifo);
 
 	//Compile the decoder
 	decoder->make(&actors);
@@ -134,22 +134,56 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	timer = clock ();
 
 	decoder->compile();
-		
+	
+	decoders.insert(pair<Network*, Decoder*>(network, decoder));
+
 	return 0;
 }
 
 int DecoderEngine::unload(Network* network) {
-	delete decoder;
-	return 0;
+	map<Network*, Decoder*>::iterator it;
+
+	it = decoders.find(network);
+
+	if (it == decoders.end()){
+		cout << "No decoders load for this network.\n";
+		return 1;
+	}
+	
+	Decoder* decoder = it->second;
+	decoders.erase(it);
+	
+	return 0;	
 }
 
 
 int DecoderEngine::stop(Network* network){
+	map<Network*, Decoder*>::iterator it;
+
+	it = decoders.find(network);
+
+	if (it == decoders.end()){
+		cout << "No decoders found for this network.\n";
+		return 1;
+	}
+	
+	Decoder* decoder = it->second;
 	decoder->stop();
+
 	return 0;
 }
 
 int DecoderEngine::run(Network* network, string input, pthread_t* thread){	
+	map<Network*, Decoder*>::iterator it;
+
+	it = decoders.find(network);
+
+	if (it == decoders.end()){
+		cout << "No decoders found for this network.\n";
+		return 1;
+	}
+
+	Decoder* decoder = it->second;
 	decoder->setStimulus(input);
 
 	//Start decoding
@@ -163,6 +197,16 @@ int DecoderEngine::run(Network* network, string input, pthread_t* thread){
 }
 
 int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
+	map<Network*, Decoder*>::iterator it;
+
+	it = decoders.find(oldNetwork);
+
+	if (it == decoders.end()){
+		cout << "No decoders found for this network.\n";
+		return 1;
+	}
+
+	Decoder* decoder = it->second;
 	decoder->setNetwork(newNetwork);
 	
 	return 0;
@@ -195,7 +239,16 @@ void DecoderEngine::doOptimizeDecoder(Decoder* decoder){
 
 int DecoderEngine::printNetwork(Network* network, string outputFile){
 	LLVMUtility utility;
+	map<Network*, Decoder*>::iterator it;
 
+	it = decoders.find(network);
+
+	if (it == decoders.end()){
+		cout << "No decoders found for this network.\n";
+		return 1;
+	}
+
+	Decoder* decoder = it->second;
 	utility.printModule(outputFile, decoder);
 	return 0;
 }
