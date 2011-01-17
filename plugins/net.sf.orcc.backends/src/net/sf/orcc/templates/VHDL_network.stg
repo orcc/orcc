@@ -76,7 +76,9 @@ $printInSignal(connection=connection, map=network.predecessorsMap.(instance))$
 >>
 
 printInSignal(connection, map) ::= <<
-$if(map.(connection.target))
+$if(map.(connection.target).broadcast)
+$$
+elseif(map.(connection.target))
 $$SignalType(instance=instance, port=connection.target, dataType="data")$
 signal $instance.id$_$connection.target$_send   : std_logic;
 signal $instance.id$_$connection.target$_ack    : std_logic;
@@ -200,9 +202,9 @@ printInputs(connection) ::= <<
 
 printPortsIn(connection, map, vmap) ::= <<
 $if(map.(connection.target).broadcast)
-$$connection.target$_data   => broadcast_$map.(connection.target).id$_data,
-$connection.target$_send   => broadcast_$map.(connection.target).id$_send,
-$connection.target$_ack    => broadcast_$map.(connection.target).id$_ack,$
+$$connection.target$_data   => $map.(connection.target).id$_fromBroad_data,
+$connection.target$_send   => $map.(connection.target).id$_fromBroad_send,
+$connection.target$_ack    => $map.(connection.target).id$_fromBroad_ack,$
 elseif(map.(connection.target))
 $$connection.target$_data   => $instance.id$_$connection.target$_data,
 $connection.target$_send   => $instance.id$_$connection.target$_send,
@@ -220,7 +222,11 @@ printOutputs(connection) ::= <<
 >>
 
 printPortsOut(connection, map, vmap) ::= <<
-$if(map.(connection.source))
+$if(map.(connection.source).broadcast)
+$$connection.source$_data   => $map.(connection.source).id$_toBroad_data,
+$connection.source$_send   => $map.(connection.source).id$_toBroad_send,
+$connection.source$_ack    => $map.(connection.source).id$_toBroad_ack,$
+elseif(map.(connection.source))
 $$if(connection.attributes)
 $$connection.source$_data   => $instance.id$_$connection.source$_data,
 $connection.source$_send   => $instance.id$_$connection.source$_send,
@@ -266,9 +272,9 @@ $
 endif$$
 if(!outputs.empty)
 $
-    data_out   => broadcast_$name$_data,
-    send_out   => broadcast_$name$_send,
-    ack_out    => broadcast_$name$_ack,
+    data_out   => $name$_fromBroad_data,
+    send_out   => $name$_fromBroad_send,
+    ack_out    => $name$_fromBroad_ack,
 $
 endif$
     reset_n   => reset_n);$
@@ -286,9 +292,9 @@ printBroadcastInputs(connection) ::= <<
 
 printBroadcastPortsIn(connection, map, vmap) ::= <<
 $if(map.(connection.target))
-$data_in   => broadcast_$name$_data_in,
-send_in   => broadcast_$name$_send_in,
-ack_in    => broadcast_$name$_ack_in,$
+$data_in   => $name$_toBroad_data_in,
+send_in   => $name$_toBroad_send_in,
+ack_in    => $name$_toBroad_ack_in,$
 else
 $data_in   => $vmap.port$_data,
 send_in   => $vmap.port$_send,
@@ -303,10 +309,14 @@ printBroadcastOutputs(connection) ::= <<
 
 printBroadcastPortsOut(connection, map, vmap) ::= <<
 $if(!map.(connection.source))
-$$vmap.port$_data   <= broadcast_$name$_data;
-$vmap.port$_send   <= broadcast_$name$_send;
-$vmap.port$_ack   <= broadcast_$name$_ack;$
+$$vmap.port$_data   <= $name$_fromBroad_data;
+$vmap.port$_send   <= $name$_fromBroad_send;
+$vmap.port$_ack    <= $name$_fromBroad_ack;$
 endif$
+>>
+
+broadcastType(instance, port, dataType) ::=<<
+signal $instance.id$_$port.name$_toBroad_$dataType$   : std_logic_vector($instance.broadcast.numOutputs$ -1 downto 0);
 >>
 
 

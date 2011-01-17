@@ -60,6 +60,7 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.transformations.BroadcastAdder;
 
 /**
  * VHDL back-end.
@@ -221,6 +222,9 @@ public class VHDLBackendImpl extends AbstractBackend {
 
 		try {
 			printer.loadGroups("VHDL_network");
+
+			// Add broadcasts before printing
+			new BroadcastAdder().transform(network);
 
 			String outputName = path + File.separator + "Design"
 					+ File.separator + network.getName() + ".vhd";
