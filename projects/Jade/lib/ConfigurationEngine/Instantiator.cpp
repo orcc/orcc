@@ -40,9 +40,10 @@
 #include <string>
 #include <stdio.h>
 
+#include "Instantiator.h"
+
 #include "llvm/DerivedTypes.h"
 
-#include "Jade/Configuration/Instantiator.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Port.h"

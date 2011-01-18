@@ -47,10 +47,8 @@
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
-#include "Jade/Configuration/Configuration.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMExecution.h"
-#include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 //------------------------------
 
@@ -104,21 +102,3 @@ void* Decoder::threadStart( void* args ){
 void Decoder::setStimulus(std::string file){
 	this->stimulus = file;
 }
-
-/*
-void Decoder::clearConnections(){
-	list<Actor*>::iterator itActor;
-	IRUnwriter unwriter(this);
-	fifo->unsetConnections(this);
-
-	for (itActor = specificActors.begin(); itActor != specificActors.end(); itActor++){
-		list<Instance*>::iterator itInst;
-		list<Instance*>* instances = (*itActor)->getInstances();
-
-		for (itInst = instances->begin(); itInst != instances->end(); itInst++){
-			unwriter.remove(*itInst);
-		} 
-	}
-
-	specificActors.erase(specificActors.begin(), specificActors.end());
-}*/

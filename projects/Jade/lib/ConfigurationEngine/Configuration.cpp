@@ -36,6 +36,8 @@
 */
 
 //------------------------------
+#include "Instantiator.h"
+
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Graph/HDAGGraph.h"
@@ -48,7 +50,7 @@ Configuration::Configuration(Network* network, AbstractConnector* connector){
 	this->network = network;
 	this->connector = connector;
 
-	//Calculate Configuration from a network
+	//Set configuration property from network
 	setInstances();
 }
 
@@ -88,8 +90,11 @@ Actor* Configuration::getActor(std::string name){
 }
 
 void Configuration::setActors(std::map<std::string, Actor*>* actors){
-		this->actors = actors;
-		this->packages = PackageMng::setPackages(actors);
+	this->actors = actors;
+	this->packages = PackageMng::setPackages(actors);
+
+	// Instanciate the configuration
+	Instantiator instantiator(this);
 }
 
 void Configuration::insertSpecific(Actor* actor){

@@ -38,16 +38,16 @@
 //------------------------------
 #include <map>
 
+#include "Reconfiguration.h"
+
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
-#include "Jade/Configuration/Instantiator.h"
-#include "Jade/Configuration/Configuration.h"
-#include "Jade/Configuration/Reconfiguration.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Transform/BroadcastAdder.h"
 #include "Jade/Scheduler/Scheduler.h"
 #include "Jade/Serialize/IRWriter.h"
+#include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Transform/ActionSchedulerAdder.h"
 //------------------------------
 
@@ -64,9 +64,6 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	// Add Fifo function and fifo type into the decoder
 	AbstractConnector* connector = configuration->getConnector();
 	connector->addFifoHeader(decoder);
-	
-	// Instanciate the network
-	Instantiator instantiator(configuration);
 
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, configuration);
@@ -93,8 +90,48 @@ void ConfigurationEngine::configure(Decoder* decoder){
 }
 
 void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configuration){
+	list<Instance*>::iterator it;
+	
+	//Clear connections of the decoder
+	clearConnections(decoder);
+
+	//Process reconfiguration scenario
 	Reconfiguration reconfiguration(decoder, configuration);
 
+	//Remove unused instances
+	IRUnwriter unwriter(decoder);
+
+	//Iterate though all instances to remove
+	list<Instance*>* removes = reconfiguration.getToRemove();
+	for (it = removes->begin(); it != removes->end(); it++){
+		unwriter.remove(*it);
+	}
+
+}
+
+void ConfigurationEngine::clearConnections(Decoder* decoder){
+	//Retrieve orignal configuration from the decoder
+	Configuration* configuration = decoder->getConfiguration();
+
+	//Remove connections
+	AbstractConnector* connector = configuration->getConnector();
+	connector->unsetConnections(decoder);
+
+	//Unwrite broadcasts
+	list<Actor*>::iterator itActor;
+	IRUnwriter unwriter(decoder);
+	list<Actor*>* specificActors = configuration->getSpecifics();
+
+	for (itActor = specificActors->begin(); itActor != specificActors->end(); itActor++){
+		list<Instance*>::iterator itInst;
+		list<Instance*>* instances = (*itActor)->getInstances();
+
+		for (itInst = instances->begin(); itInst != instances->end(); itInst++){
+			unwriter.remove(*itInst);
+		} 
+	}
+
+	specificActors->erase(specificActors->begin(), specificActors->end());
 }
 
 

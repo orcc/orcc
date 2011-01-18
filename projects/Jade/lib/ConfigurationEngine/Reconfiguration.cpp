@@ -39,9 +39,9 @@
 #include <algorithm>
 #include <vector>
 
+#include "Reconfiguration.h"
+
 #include "Jade/Decoder.h"
-#include "Jade/Configuration/Configuration.h"
-#include "Jade/Configuration/Reconfiguration.h"
 //------------------------------
 
 using namespace std;

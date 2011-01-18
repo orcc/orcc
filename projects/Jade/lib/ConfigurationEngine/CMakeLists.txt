@@ -4,7 +4,9 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 
 add_library (ConfigurationEngine
 	Instantiator.cpp
+	Instantiator.h
 	ConfigurationEngine.cpp
 	Configuration.cpp
 	Reconfiguration.cpp
+	Reconfiguration.h
  )

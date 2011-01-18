@@ -158,16 +158,6 @@ public:
      */
 	void stop();
 
-	/**
-     *  @brief Clear connections of the decoder
-	 *
-	 *	Remove every connections created in the decoder 
-	 *   and broadcast from the decoder
-	 *
-     */
-	void clearConnections();
-
-
 private:
 	/**
      *  @brief Static method for launching decoder in a thread

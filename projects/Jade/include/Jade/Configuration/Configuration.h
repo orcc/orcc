@@ -125,6 +125,9 @@ public:
 	/**
      *  @brief set the actors contains in the configuration
 	 *
+	 *	Set list of actors used by the configuration, determine required
+	 *    package and instanciate the configuration.
+	 *
 	 *	@param name : a map of actors contains in the configuration
 	 *
      */

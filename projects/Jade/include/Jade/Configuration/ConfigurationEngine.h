@@ -86,6 +86,16 @@ public:
 	void reconfigure(Decoder* decoder, Configuration* configuration);
 
 private:
+
+	/**
+     *  @brief Clear connections of a decoder
+	 *
+	 *	Remove every connections and broadcast created in the decoder 
+	 *
+	 *	@param decoder : the decoder to clean
+     */
+	void clearConnections(Decoder* decoder);
+
 	/** Decoder to configure */
 	Decoder* decoder;
 

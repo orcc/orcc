@@ -39,8 +39,7 @@
 #ifndef RECONFIGURATION_H
 #define RECONFIGURATION_H
 
-class Decoder;
-class Configuration;
+#include "Jade/Configuration/Configuration.h"
 //------------------------------
 
 /**
@@ -67,7 +66,23 @@ public:
 	 *  @return a list of actor to remove
 	 *
      */
-	std::list<Instance*> getToRemove();
+	std::list<Instance*>* getToRemove(){return &toRemove;};
+
+	/**
+     *  @brief Get instance to add in the decoder
+	 *
+	 *  @return a list of actor to add
+	 *
+     */
+	std::list<Instance*>* getToAdd(){return &toAdd;};
+
+	/**
+     *  @brief Get instance to keep in the decoder
+	 *
+	 *  @return a list of actor to keep
+	 *
+     */
+	std::list<Instance*>* getToKeep(){return &toKeep;};
 
 private:
 	
