@@ -73,15 +73,15 @@ endif$
 
 printInSignals(connection) ::= <<
 $if (instance.broadcast)
-$$broadcastType(connection=connection, name=instance.id)$
-$broadcastType(connection=connection, name=instance.id, direction="fromBroad")$$
-else
-$$printInSignal(connection=connection, map=network.predecessorsMap.(instance))$$
+$
+$broadcastType(connection=connection, name=instance.id, direction="fromBroad")$
+$
 endif$
+$printInSignal(connection=connection, map=network.predecessorsMap.(instance))$
 >>
 
 printInSignal(connection, map) ::= <<
-$if(map.(connection.target) && !map.(connection.target).broadcast)
+$if(map.(connection.target))
 $$SignalType(instance=instance, port=connection.target, dataType="data")$
 signal $instance.id$_$connection.target$_send   : std_logic;
 signal $instance.id$_$connection.target$_ack    : std_logic;
@@ -177,7 +177,7 @@ $$printInstances(name=instance.actor.simpleName,
                  
                  $
 elseif (instance.network)
-$$printInstances(name=instance.id,
+$$printInstances(name=instance.network.name,
 				 inputs=instance.broadcast.inputs.list,
                  outputs=instance.broadcast.outputs.list)$
                  
@@ -191,11 +191,14 @@ $instance.id$ : entity work.$name$
   port map (
 $if(!inputs.empty)
 $
-$network.incomingMap.(instance):printInputs(); separator="\n"$
+    $network.incomingMap.(instance):{connection | $printInputs(connection=connection, map=network.predecessorsMap.(instance), 
+															vmap=network.sourceMap.(connection))$}; separator="\n"$
 $
 endif$$
 if(!outputs.empty)
-$$outgoingMap.(instance) : printOutputs(); separator="\n"$
+$
+    $outgoingMap.(instance) : {connection | $printOutputs(connection=connection, map=network.successorsMap.(instance), 
+															vmap=network.targetMap.(connection))$}; separator="\n"$
 $
 endif$
     clock     => clock, 
@@ -203,16 +206,8 @@ endif$
 >>
 
 
-printInputs(connection) ::= <<
-    $printPortsIn(connection=connection, map=network.predecessorsMap.(instance), vmap=network.sourceMap.(connection))$  
->>
-
-printPortsIn(connection, map, vmap) ::= <<
-$if(map.(connection.target).broadcast)
-$$connection.target$_data   => $map.(connection.target).id$_fromBroad_data,
-$connection.target$_send   => $map.(connection.target).id$_fromBroad_send,
-$connection.target$_ack    => $map.(connection.target).id$_fromBroad_ack,$
-elseif(map.(connection.target))
+printInputs(connection, map, vmap) ::= <<
+$if(map.(connection.target))
 $$connection.target$_data   => $instance.id$_$connection.target$_data,
 $connection.target$_send   => $instance.id$_$connection.target$_send,
 $connection.target$_ack    => $instance.id$_$connection.target$_ack,$
@@ -223,17 +218,8 @@ $connection.target$_ack    => $vmap.port$_ack,$
 endif$
 >>
 
-
-printOutputs(connection) ::= <<
-    $printPortsOut(connection=connection, map=network.successorsMap.(instance), vmap=network.targetMap.(connection))$  
->>
-
-printPortsOut(connection, map, vmap) ::= <<
-$if(map.(connection.source).broadcast)
-$$connection.source$_data   => $map.(connection.source).id$_toBroad_data,
-$connection.source$_send   => $map.(connection.source).id$_toBroad_send,
-$connection.source$_ack    => $map.(connection.source).id$_toBroad_ack,$
-elseif(map.(connection.source))
+printOutputs(connection, map, vmap) ::= <<
+$if(map.(connection.source))
 $$if(connection.attributes)
 $$connection.source$_data   => $instance.id$_$connection.source$_data,
 $connection.source$_send   => $instance.id$_$connection.source$_send,
@@ -255,7 +241,7 @@ endif$
 // print broadcasts instantiation
 ///////////////////////////////////////////////////////////////////////////////
 printBroadcasts(outgoingMap) ::= <<
-$outgoingMap.keys: {instance | $checkBroadcast(instance=instance)$}; separator="\n\n"$
+$outgoingMap.keys: {instance | $checkBroadcast(instance=instance)$}$
 >>
 
 checkBroadcast(instance) ::= <<
@@ -272,46 +258,24 @@ broadcast_$name$ : entity work.broadcast
       width => $if(instance.broadcast.type.bool)$1$else$$instance.broadcast.type.size$$endif$,
       size  => $instance.broadcast.numOutputs$)
   port map (
-$if(!inputs.empty)
-$
-$network.incomingMap.(instance):printBroadcastInputs(); separator="\n"$
-$
-endif$$
-if(!outputs.empty)
-$
-    data_out   => $name$_fromBroad_data,
-    send_out   => $name$_fromBroad_send,
-    ack_out    => $name$_fromBroad_ack,
-$
-endif$
-    reset_n   => reset_n);$
-if(!outputs.empty)
-$
-
+$if(!inputs.empty)$
+    $network.incomingMap.(instance):{connection | $printInputs(connection=connection, map=network.predecessorsMap.(instance), 
+															vmap=network.sourceMap.(connection))$}; separator="\n"$
+$endif$
+$if(!outputs.empty)$
+    output_data  => $name$_fromBroad_data,
+    output_send  => $name$_fromBroad_send,
+    output_ack   => $name$_fromBroad_ack,
+$endif$
+    reset_n   => reset_n);
+$if(!outputs.empty)$
 $outgoingMap.(instance) : printBroadcastOutputs(); separator="\n"$
-$
-endif$
->>
+$endif$
 
-printBroadcastInputs(connection) ::= <<
-    $printBroadcastPortsIn(connection=connection, map=network.predecessorsMap.(instance), vmap=network.sourceMap.(connection))$  
 >>
-
-printBroadcastPortsIn(connection, map, vmap) ::= <<
-$if(map.(connection.target))
-$data   => $name$_toBroad_data,
-send   => $name$_toBroad_send,
-ack    => $name$_toBroad_ack,$
-else
-$data   => $vmap.port$_data,
-send   => $vmap.port$_send,
-ack    => $vmap.port$_ack,$
-endif$
->>
-
 
 printBroadcastOutputs(connection) ::= <<
-    $printBroadcastPortsOut(connection=connection, map=network.successorsMap.(instance), vmap=network.targetMap.(connection))$  
+    $printBroadcastPortsOut(connection=connection, map=network.successorsMap.(instance), vmap=network.targetMap.(connection))$
 >>
 
 printBroadcastPortsOut(connection, map, vmap) ::= <<
@@ -323,26 +287,14 @@ endif$
 >>
 
 broadcastType(connection, name, direction) ::=<<
-$if(direction)
-  $$if(connection.target.type.bool)
-$signal $name$_$direction$_data : std_logic;
-$  else
+$if(connection.target.type.bool)
+$signal $name$_$direction$_data : std_logic_vector(0 downto 0);
+$else
 $signal $name$_$direction$_data : std_logic_vector($connection.target.type.size$ -1 downto 0);
-$  endif$
+$endif$
 signal $name$_$direction$_send : std_logic_vector($instance.broadcast.numOutputs$ -1 downto 0);
 signal $name$_$direction$_ack  : std_logic_vector($instance.broadcast.numOutputs$ -1 downto 0);
-$else
-  $$if(connection.target.type.bool)
-$signal $name$_toBroad_data   : std_logic;
-$  else
-$signal $name$_toBroad_data   : std_logic_vector($connection.target.type.size$ -1 downto 0);
-$  endif$
-signal $name$_toBroad_send   : std_logic;
-signal $name$_toBroad_ack    : std_logic;$
-endif$
 >>
-
-
 
 
 
