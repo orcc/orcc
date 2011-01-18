@@ -36,10 +36,59 @@
 */
 
 //------------------------------
+#include <map>
+
+#include "Jade/Decoder.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
+#include "Jade/Configuration/Instantiator.h"
+#include "Jade/Configuration/Scenario.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Fifo/AbstractConnector.h"
+#include "Jade/Transform/BroadcastAdder.h"
+#include "Jade/Scheduler/Scheduler.h"
+#include "Jade/Serialize/IRWriter.h"
+#include "Jade/Transform/ActionSchedulerAdder.h"
 //------------------------------
 
-ConfigurationEngine::ConfigurationEngine(Decoder* decoder){
+using namespace std;
+using namespace llvm;
+
+ConfigurationEngine::ConfigurationEngine(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
 	this->decoder = decoder;
 }
+
+void ConfigurationEngine::configure(Scenario* scenario, map<string, Actor*>* actors){
+	map<string, Instance*>::iterator it;
+
+	// Add Fifo function and fifo type into the decoder
+	AbstractConnector* connector = scenario->getConnector();
+	connector->addFifoHeader(decoder);
+	
+	// Instanciate the network
+	Instantiator Instantiator(scenario, actors);
+
+	// Adding broadcast 
+	BroadcastAdder broadAdder(Context, decoder);
+	broadAdder.transform();
+
+	//Write instance
+	map<string, Instance*>* instances = scenario->getInstances();
+
+	for (it = instances->begin(); it != instances->end(); it++){
+		IRWriter writer(it->second);
+		writer.write(decoder);
+	}
+
+	//Adding action scheduler
+	ActionSchedulerAdder actionSchedulerAdder(Context, decoder);
+	actionSchedulerAdder.transform();
+
+	// Setting connections of the decoder
+	connector->setConnections(decoder);
+
+	//Set the scheduler
+	Scheduler* scheduler = decoder->getScheduler();
+	scheduler->createScheduler(decoder);
+}
+
 

@@ -44,8 +44,9 @@
 
 using namespace std;
 
-Scenario::Scenario(Network* network){
+Scenario::Scenario(Network* network, AbstractConnector* connector){
 	this->network = network;
+	this->connector = connector;
 
 	//Calculate scenario from a network
 	setInstances();

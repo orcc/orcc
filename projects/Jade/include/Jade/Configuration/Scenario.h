@@ -42,6 +42,7 @@
 #include <list>
 #include <map>
 
+class AbstractConnector;
 class Instance;
 class Network;
 //------------------------------
@@ -59,7 +60,7 @@ public:
      *
 	 * Creates a new configuration engine.
      */
-	Scenario(Network* network);
+	Scenario(Network* network, AbstractConnector* connector);
 
 	/*!
      *  @brief Return a list of the Instance contained in the network.
@@ -87,6 +88,16 @@ public:
      */
 	Network* getNetwork(){return network;};
 
+	/**
+     *  @brief Getter of connector
+	 *
+	 *	Returns the connector used to connect the networ
+	 *
+	 *  @return A connector selected to connect the network
+	 *
+     */
+	AbstractConnector* getConnector(){return connector;};
+
 private:
 
 	/*!
@@ -104,6 +115,9 @@ private:
 
 	/** Actors files of the network  */
 	std::list<std::string> actorFiles;
+
+	/** The connector for the network  */
+	AbstractConnector* connector;
 
 };
 

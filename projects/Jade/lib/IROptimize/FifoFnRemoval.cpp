@@ -49,7 +49,7 @@ using namespace std;
 using namespace llvm;
 
 void FifoFnRemoval::transform(Decoder* decoder){
-	AbstractConnector* fifo = decoder->getFifo();
+/*	AbstractConnector* fifo = decoder->getFifo();
 	decoder->getModule();
 	map<string,Function*>::iterator it;
 	map<string,Function*>* fifoAcesses = fifo->getFifoAccess();
@@ -57,6 +57,6 @@ void FifoFnRemoval::transform(Decoder* decoder){
 	for (it = fifoAcesses->begin(); it != fifoAcesses->end(); it++){
 		Function* function = it->second;
 		function->removeFromParent();
-	}
+	}*/
 	
 }

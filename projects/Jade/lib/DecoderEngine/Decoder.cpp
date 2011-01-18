@@ -44,7 +44,6 @@
 #include "llvm/Module.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Configuration/Instantiator.h"
 #include "Jade/Configuration/ReconfigurationScenario.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
@@ -52,24 +51,22 @@
 #include "Jade/Configuration/Scenario.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMExecution.h"
-#include "Jade/Serialize/IRWriter.h"
 #include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
-#include "Jade/Transform/ActionSchedulerAdder.h"
-#include "Jade/Transform/BroadcastAdder.h"
 //------------------------------
 
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, Scenario* scenario, AbstractConnector* fifo): Context(C){
+Decoder::Decoder(llvm::LLVMContext& C, Scenario* scenario): Context(C){
 	//Set property of the decoder
 	this->scenario = scenario;
-	this->fifo = fifo;
 	this->thread = NULL;
 	this->executionEngine = NULL;
 	this->scheduler = new RoundRobinScheduler(Context);
 	this->instances = scenario->getInstances();
+	this->confEngine = new ConfigurationEngine(Context, this);
+	this->fifo = scenario->getConnector();
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
@@ -120,34 +117,8 @@ Instance* Decoder::getInstance(std::string name){
 }
 
 bool Decoder::make(map<string, Actor*>* actors){
-	map<string, Instance*>::iterator it;
 	this->actors = actors;
-
-	// Add Fifo function and fifo type into the decoder
-	fifo->addFifoHeader(this);
-	
-	// Instanciate the network
-	Instantiator Instantiator(scenario, actors);
-
-	// Adding broadcast 
-	BroadcastAdder broadAdder(Context, this);
-	broadAdder.transform();
-
-	//Write instance
-	for (it = instances->begin(); it != instances->end(); it++){
-		IRWriter writer(it->second);
-		writer.write(this);
-	}
-
-	//Adding action scheduler
-	ActionSchedulerAdder actionSchedulerAdder(Context, this);
-	actionSchedulerAdder.transform();
-
-	// Setting connections of the decoder
-	fifo->setConnections(this);
-
-	//Set the scheduler
-	scheduler->createScheduler(this);
+	confEngine->configure(scenario, actors);
 
 	return true;
 }
@@ -194,6 +165,7 @@ void Decoder::setNetwork(Network* network){
 	
 }*/
 
+/*
 void Decoder::clearConnections(){
 	list<Actor*>::iterator itActor;
 	IRUnwriter unwriter(this);
@@ -209,4 +181,4 @@ void Decoder::clearConnections(){
 	}
 
 	specificActors.erase(specificActors.begin(), specificActors.end());
-}
+}*/

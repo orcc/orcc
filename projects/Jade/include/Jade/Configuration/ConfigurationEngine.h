@@ -39,7 +39,14 @@
 #ifndef CONFIGURATIONENGINE_H
 #define CONFIGURATIONENGINE_H
 
+namespace llvm{
+	class LLVMContext;
+	class Module;
+}
+
+class Actor;
 class Decoder;
+class Scenario;
 //------------------------------
 
 /**
@@ -55,10 +62,23 @@ public:
      *
 	 * Creates a new configuration engine.
      */
-	ConfigurationEngine(Decoder* decoder);
+	ConfigurationEngine(llvm::LLVMContext& C, Decoder* decoder);
+
+	/*!
+     *  @brief Instanciate a configuration of decoder
+     *
+	 * Instanciate a configuration of decoder using the given scenario.
+	 *
+	 *	@param scenario : a Scenario for instanciating a configuration
+     */
+	void configure(Scenario* scenario, std::map<std::string, Actor*>* actors);
 
 private:
+	/** Decoder to configure */
 	Decoder* decoder;
+
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
 
 };
 

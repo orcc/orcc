@@ -90,7 +90,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	clock_t timer = clock ();
 
 	//Create a scenario
-	Scenario* scenario = new Scenario (network);
+	Scenario* scenario = new Scenario(network, fifo);
 
 	// Parsing actor
 	parseActors(scenario);
@@ -102,7 +102,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	timer = clock ();
 
 	//Create decoder
-	Decoder* decoder = new Decoder(Context, scenario, fifo);
+	Decoder* decoder = new Decoder(Context, scenario);
 
 	//Compile the decoder
 	decoder->make(&actors);

@@ -52,6 +52,7 @@ namespace llvm{
 class AbstractConnector;
 class Actor;
 class BroadcastActor;
+class ConfigurationEngine;
 class Decoder;
 class Instance;
 class JIT;
@@ -77,7 +78,7 @@ public:
 	 * @param fifo : Fifo used in the decoder
 	 *
 	 */
-	Decoder(llvm::LLVMContext& C, Scenario* scenario, AbstractConnector* fifo);
+	Decoder(llvm::LLVMContext& C, Scenario* scenario);
 	~Decoder();
 	
 	/**
@@ -311,6 +312,8 @@ private:
 
 	/** Current thread used by the decoder */
 	pthread_t* thread;
+
+	ConfigurationEngine* confEngine;
 
 };
 
