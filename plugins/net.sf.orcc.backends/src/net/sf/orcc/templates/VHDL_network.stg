@@ -52,7 +52,7 @@ $                                            -- Actor : $instance.id$
 $printSignals(inputs=instance.actor.inputs.list,
               outputs=instance.actor.outputs.list)$$
 elseif (instance.broadcast)
-$                                            -- Broadcast : $instance.id$
+$                                            -- Network : $instance.id$
 $printSignals(inputs=instance.broadcast.inputs.list,
               outputs=instance.broadcast.outputs.list)$$
 elseif (instance.network)
@@ -72,13 +72,16 @@ endif$
 >>
 
 printInSignals(connection) ::= <<
-$printInSignal(connection=connection, map=network.predecessorsMap.(instance))$
+$if (instance.broadcast)
+$$broadcastType(connection=connection, name=instance.id)$
+$broadcastType(connection=connection, name=instance.id, direction="fromBroad")$$
+else
+$$printInSignal(connection=connection, map=network.predecessorsMap.(instance))$$
+endif$
 >>
 
 printInSignal(connection, map) ::= <<
-$if(map.(connection.target).broadcast)
-$$
-elseif(map.(connection.target))
+$if(map.(connection.target) && !map.(connection.target).broadcast)
 $$SignalType(instance=instance, port=connection.target, dataType="data")$
 signal $instance.id$_$connection.target$_send   : std_logic;
 signal $instance.id$_$connection.target$_ack    : std_logic;
@@ -87,7 +90,11 @@ endif$
 >>
 
 printOutSignals(connection) ::= <<
-$printOutSignal(connection=connection, map=network.successorsMap.(instance))$
+$if (instance.broadcast)
+$$
+else
+$$printOutSignal(connection=connection, map=network.successorsMap.(instance))$$
+endif$
 >>
 
 printOutSignal(connection, map) ::= <<
@@ -292,13 +299,13 @@ printBroadcastInputs(connection) ::= <<
 
 printBroadcastPortsIn(connection, map, vmap) ::= <<
 $if(map.(connection.target))
-$data_in   => $name$_toBroad_data_in,
-send_in   => $name$_toBroad_send_in,
-ack_in    => $name$_toBroad_ack_in,$
+$data   => $name$_toBroad_data,
+send   => $name$_toBroad_send,
+ack    => $name$_toBroad_ack,$
 else
-$data_in   => $vmap.port$_data,
-send_in   => $vmap.port$_send,
-ack_in    => $vmap.port$_ack,$
+$data   => $vmap.port$_data,
+send   => $vmap.port$_send,
+ack    => $vmap.port$_ack,$
 endif$
 >>
 
@@ -315,9 +322,27 @@ $vmap.port$_ack    <= $name$_fromBroad_ack;$
 endif$
 >>
 
-broadcastType(instance, port, dataType) ::=<<
-signal $instance.id$_$port.name$_toBroad_$dataType$   : std_logic_vector($instance.broadcast.numOutputs$ -1 downto 0);
+broadcastType(connection, name, direction) ::=<<
+$if(direction)
+  $$if(connection.target.type.bool)
+$signal $name$_$direction$_data : std_logic;
+$  else
+$signal $name$_$direction$_data : std_logic_vector($connection.target.type.size$ -1 downto 0);
+$  endif$
+signal $name$_$direction$_send : std_logic_vector($instance.broadcast.numOutputs$ -1 downto 0);
+signal $name$_$direction$_ack  : std_logic_vector($instance.broadcast.numOutputs$ -1 downto 0);
+$else
+  $$if(connection.target.type.bool)
+$signal $name$_toBroad_data   : std_logic;
+$  else
+$signal $name$_toBroad_data   : std_logic_vector($connection.target.type.size$ -1 downto 0);
+$  endif$
+signal $name$_toBroad_send   : std_logic;
+signal $name$_toBroad_ack    : std_logic;$
+endif$
 >>
+
+
 
 
 
