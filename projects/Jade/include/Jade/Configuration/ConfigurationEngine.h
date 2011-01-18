@@ -39,6 +39,8 @@
 #ifndef CONFIGURATIONENGINE_H
 #define CONFIGURATIONENGINE_H
 
+#include "Jade/Configuration/Configuration.h"
+
 namespace llvm{
 	class LLVMContext;
 	class Module;
@@ -46,7 +48,6 @@ namespace llvm{
 
 class Actor;
 class Decoder;
-class Configuration;
 //------------------------------
 
 /**
@@ -62,7 +63,7 @@ public:
      *
 	 * Creates a new configuration engine.
      */
-	ConfigurationEngine(llvm::LLVMContext& C, Decoder* decoder);
+	ConfigurationEngine(llvm::LLVMContext& C);
 
 	/*!
      *  @brief Instanciate a configuration of decoder
@@ -71,7 +72,7 @@ public:
 	 *
 	 *	@param Configuration : a Configuration for instanciating a configuration
      */
-	void configure(Configuration* configuration, std::map<std::string, Actor*>* actors);
+	void configure(Decoder* decoder);
 
 private:
 	/** Decoder to configure */

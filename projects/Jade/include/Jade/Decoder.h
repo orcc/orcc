@@ -135,19 +135,6 @@ public:
 	void addSpecific(Actor* actor);
 
 	/**
-     *  @brief return the actor corresponding to the given name
-	 * 
-	 *	Return an actor corresponding to the given name if the current decoder is contained in the decoder,
-	 *   return NULL if the actor is not contained in the decoder
-	 *
-	 *	@param name : std::string name of the actor 
-	 *
-	 *  @return the actor if contained in the decoder otherwise NULL
-	 *
-     */
-	Actor* getActor(std::string name);
-
-	/**
      *  @brief Getter of an instance
 	 * 
 	 *	Return the instance with the given name
@@ -230,18 +217,6 @@ public:
 	void stop();
 
 	/**
-	 * @brief Make the decoder
-	 * 
-	 * Make the decoder using an XDF Network and the VTL. Compilation may include
-	 * instantiation, flattening, transforming, printing the network, or a subset of these steps.
-	 * 
-	 * @param actors : a map of loaded actors
-	 *
-	 * @return true if compilation ok, otherwise false
-	 */
-	bool make(std::map<std::string, Actor*>* actors);
-
-	/**
      *  @brief Compile the decoder
 	 *
 	 *	Compile the decoder to make it ready for execution.
@@ -312,9 +287,6 @@ private:
 
 	/** Current thread used by the decoder */
 	pthread_t* thread;
-
-	ConfigurationEngine* confEngine;
-
 };
 
 #endif

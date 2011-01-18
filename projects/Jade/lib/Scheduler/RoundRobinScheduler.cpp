@@ -50,6 +50,7 @@
 #include "llvm/Support/CommandLine.h"
 
 #include "Jade/Decoder.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/Procedure.h"
@@ -206,7 +207,8 @@ void RoundRobinScheduler::setSource(string input){
 
 void RoundRobinScheduler::setCompare(){
 	list<Instance*>::iterator it;
-	Actor* compare = decoder->getActor("Compare");
+	Configuration* configuration = decoder->getConfiguration();
+	Actor* compare = configuration->getActor("Compare");
 	
 	//Actor compare is not present in the decoder
 	if ((compare == NULL) && (YuvFile.compare("") != 0)){

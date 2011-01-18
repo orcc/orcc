@@ -65,11 +65,9 @@ public:
 	 * Instantiate actors and checks that connections actually point to ports defined in actors. Instantiating an
 	 * actor implies first loading it and then giving it the right parameters.
 	 * 
-	 * @param network : Network to instanciate
-	 *
-	 * @param actors : Map of actors used in the instance
+	 * @param configuration : Configuration to instanciate
 	 */
-	Instantiator(Configuration* configuration, std::map<std::string, Actor*>* actors);
+	Instantiator(Configuration* configuration);
 
 	~Instantiator(){};
 

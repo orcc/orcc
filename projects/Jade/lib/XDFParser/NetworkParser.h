@@ -38,6 +38,7 @@
 #ifndef NETPARSER_H
 #define NETPARSER_H
 
+#include <list>
 #include <stdio.h>
 #include "TypeParser.h"
 

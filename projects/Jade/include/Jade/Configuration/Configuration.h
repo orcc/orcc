@@ -42,9 +42,9 @@
 #include <list>
 #include <map>
 
-class AbstractConnector;
-class Instance;
-class Network;
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Network.h"
+#include "Jade/Core/Package.h"
 //------------------------------
 
 /**
@@ -98,6 +98,47 @@ public:
      */
 	AbstractConnector* getConnector(){return connector;};
 
+	/**
+     *  @brief return the actor corresponding to the given name
+	 * 
+	 *	Return an actor corresponding to the given name if the current actor is contained in the configuration,
+	 *   return NULL if the actor is not contained in the configuration
+	 *
+	 *	@param name : std::string name of the actor 
+	 *
+	 *  @return the actor if contained in the configuration otherwise NULL
+	 *
+     */
+	Actor* getActor(std::string name);
+
+	/**
+     *  @brief set the actors contains in the configuration
+	 *
+	 *	@param name : a map of actors contains in the configuration
+	 *
+     */
+	void setActors(std::map<std::string, Actor*>* actors);
+
+	/**
+     *  @brief get the actors contains in the configuration
+	 *
+	 *	@return a map of actors contains in the configuration
+	 *
+     */
+	std::map<std::string, Actor*>* getActors(){
+		return actors;
+	};
+
+	/**
+	 * @brief Get the package requiered by the decoder
+	 *
+	 * Returns the packages requiered to instanciate this decoder.
+	 * 
+	 * @return the package requiered for the decoder
+	 */
+	std::map<std::string, Package*>* getPackages() {return packages;};
+
+
 private:
 
 	/*!
@@ -113,11 +154,17 @@ private:
 	/** Instances to instanciate  */
 	std::map<std::string, Instance*> instances;
 
-	/** Actors files of the network  */
+	/** Actors files of the configuration  */
 	std::list<std::string> actorFiles;
+
+	/** Actors of the configuration */
+	std::map<std::string, Actor*>* actors;
 
 	/** The connector for the network  */
 	AbstractConnector* connector;
+
+	/** package used by the configuration  */
+	std::map<std::string, Package*>* packages;
 
 };
 

@@ -39,19 +39,9 @@
 #include "Jade/Core/Network.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Graph/DotWriter.h"
-#include "Jade/Core/Vertex.h"
-#include "Jade/Util/PackageMng.h"
 //------------------------------
 
 using namespace std;
-
-
-Network::Network(std::string name, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs, HDAGGraph* graph){
-	this->name = name;
-	this->inputs = inputs;
-	this->outputs = outputs;
-	this->graph = graph;
-}
 
 Network::~Network(){
 	delete graph;

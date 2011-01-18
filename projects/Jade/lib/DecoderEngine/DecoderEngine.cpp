@@ -46,7 +46,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Serialize/IRParser.h"
-#include "Jade/Configuration/Configuration.h"
+#include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
@@ -55,7 +55,6 @@
 #include "Jade/Optimize/FifoFnRemoval.h"
 #include "Jade/Optimize/InstanceInternalize.h"
 #include "llvm/Support/PassNameParser.h"
-#include "Jade/Util/PackageMng.h"
 //------------------------------
 
 using namespace std;
@@ -92,20 +91,21 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	//Create a Configuration
 	Configuration* configuration = new Configuration(network, fifo);
 
-	// Parsing actor
-	parseActors(configuration);
+	// Parsing actor and bound it to the configuration
+	map<string, Actor*>* requieredActors = parseActors(configuration);
+	configuration->setActors(requieredActors);
 
 	if (verbose){
 		cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	}
-
 	timer = clock ();
 
 	//Create decoder
 	Decoder* decoder = new Decoder(Context, configuration);
 
-	//Compile the decoder
-	decoder->make(&actors);
+	//Configure the decoder
+	ConfigurationEngine engine(Context);
+	engine.configure(decoder);
 	
 	if (verbose){
 		cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
@@ -220,20 +220,30 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 	return 0;
 }
 
-void DecoderEngine::parseActors(Configuration* Configuration) {
+map<string, Actor*>* DecoderEngine::parseActors(Configuration* Configuration) {
 	list<string>::iterator it;
-	list<string>* files = Configuration->getActorFiles();
-	map<string, Actor*> netActors;
+	
+	//Resulting map of actors
+	map<string, Actor*>* configurationActors = new map<string, Actor*>();
 
+	//Get files requiered by the configuration
+	list<string>* files = Configuration->getActorFiles();
+
+	//Iterate though files and parses actors if requiered
 	for ( it = files->begin(); it != files->end(); ++it ){
 		Actor* actor = irParser->parseActor(*it);
+
+		//Refine actors with the fifo used by the decoder engine
 		fifo->refineActor(actor);
 		
-		netActors.insert(pair<string, Actor*>(*it, actor));
+		//Set actors as requiered by the configuration
+		configurationActors->insert(pair<string, Actor*>(*it, actor));
 	}
 
-	//network->setPackages(PackageMng::setPackages(&netActors));
-	actors.insert(netActors.begin(), netActors.end());
+	//Insert all actors into the list of all parsed actor by the decoder engine
+	actors.insert(configurationActors->begin(), configurationActors->end());
+	
+	return configurationActors;
 }
 
 void DecoderEngine::doOptimizeDecoder(Decoder* decoder){

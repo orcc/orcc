@@ -38,8 +38,8 @@
 //------------------------------
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Network.h"
-#include "Jade/Core/Vertex.h"
 #include "Jade/Graph/HDAGGraph.h"
+#include "Jade/Util/PackageMng.h"
 //------------------------------
 
 using namespace std;
@@ -75,3 +75,19 @@ void Configuration::setInstances(){
 	actorFiles.unique();
 }
 
+Actor* Configuration::getActor(std::string name){
+	map<string, Actor*>::iterator it;
+
+	it = actors->find(name);
+
+	if(it != actors->end()){
+		return it->second;
+	}
+
+	return NULL;
+}
+
+void Configuration::setActors(std::map<std::string, Actor*>* actors){
+		this->actors = actors;
+		this->packages = PackageMng::setPackages(actors);
+}

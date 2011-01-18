@@ -43,11 +43,8 @@
 #include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Configuration/Configuration.h"
-#include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Instance.h"
 #include "Jade/Core/Network.h"
-#include "Jade/Core/Vertex.h"
-#include "Jade/Core/Connection.h"
 #include "Jade/Transform/BroadcastAdder.h"
 //------------------------------
 

@@ -53,19 +53,19 @@
 using namespace std;
 using namespace llvm;
 
-ConfigurationEngine::ConfigurationEngine(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
-	this->decoder = decoder;
+ConfigurationEngine::ConfigurationEngine(llvm::LLVMContext& C) : Context(C){
 }
 
-void ConfigurationEngine::configure(Configuration* configuration, map<string, Actor*>* actors){
+void ConfigurationEngine::configure(Decoder* decoder){
 	map<string, Instance*>::iterator it;
+	Configuration* configuration = decoder->getConfiguration();
 
 	// Add Fifo function and fifo type into the decoder
 	AbstractConnector* connector = configuration->getConnector();
 	connector->addFifoHeader(decoder);
 	
 	// Instanciate the network
-	Instantiator Instantiator(configuration, actors);
+	Instantiator instantiator(configuration);
 
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, decoder);

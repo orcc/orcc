@@ -64,7 +64,6 @@ Decoder::Decoder(llvm::LLVMContext& C, Configuration* configuration): Context(C)
 	this->executionEngine = NULL;
 	this->scheduler = new RoundRobinScheduler(Context);
 	this->instances = configuration->getInstances();
-	this->confEngine = new ConfigurationEngine(Context, this);
 	this->fifo = configuration->getConnector();
 
 	//Create a new module that contains the current decoder
@@ -90,17 +89,7 @@ void Decoder::addSpecific(Actor* actor){
 	specificActors.push_back(actor);
 }
 
-Actor* Decoder::getActor(std::string name){
-	map<string, Actor*>::iterator it;
 
-	it = actors->find(name);
-
-	if(it != actors->end()){
-		return it->second;
-	}
-
-	return NULL;
-}
 
 
 Instance* Decoder::getInstance(std::string name){
@@ -113,13 +102,6 @@ Instance* Decoder::getInstance(std::string name){
 	}
 
 	return it->second;
-}
-
-bool Decoder::make(map<string, Actor*>* actors){
-	this->actors = actors;
-	confEngine->configure(configuration, actors);
-
-	return true;
 }
 
 void Decoder::start(){

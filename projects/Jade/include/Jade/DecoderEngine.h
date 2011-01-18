@@ -134,13 +134,13 @@ public:
 
 private:
 	/*!
-     *  @brief Parse actors from the scenario
-     *
-     *  Parse the actors requiered to instanciate the given scenario.
+     *  @brief Parse and returns actors requiered by the configuration
 	 *   
-	 *  @param scenario : the scenario to instanciate
+	 *  @param configuration : the Configuration thats contains actors indication
+	 *
+	 *  @return a map of actors requiered by the configuration
      */
-	void parseActors(Configuration* configuration);
+	std::map<std::string, Actor*>* parseActors(Configuration* configuration);
 
 	/*!
      *  @brief Optimize decoder

@@ -40,17 +40,14 @@
 #define NETWORK_H
 
 #include <map>
-#include <list>
 #include <string>
 
-class Actor;
-class Decoder;
-class Instance;
+#include "Jade/Graph/HDAGGraph.h"
+#include "Jade/Core/Network/Connection.h"
+#include "Jade/Core/Network/Vertex.h"
+
 class HDAGGraph;
 class Port;
-class Package;
-class Procedure;
-
 //------------------------------
 
 /**
@@ -78,7 +75,12 @@ public:
 	 *
 	 * @param graph : graph representing network
 	 */
-	Network(std::string name, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs, HDAGGraph* graph);
+	Network(std::string name, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs, HDAGGraph* graph){
+		this->name = name;
+		this->inputs = inputs;
+		this->outputs = outputs;
+		this->graph = graph;
+	};
 
 
 	/*!
@@ -104,41 +106,6 @@ public:
 	 */
 	std::string getName() {	return name;};
 
-	/**
-	 * @brief Getter of decoder
-	 *
-	 * Returns the decoder bound to the network
-	 * 
-	 * @return the decoder bound to the network
-	 */
-	Decoder* getDecoder() {return decoder;};
-
-	/**
-	 * @brief Set the package requiered by the network
-	 * 
-	 * @param packages : the package requiered by the decoder
-	 */
-	void setPackages(std::map<std::string, Package*>* packages) {this->packages = packages;};
-
-
-	/**
-	 * @brief Get the package requiered by the decoder
-	 *
-	 * Returns the packages requiered to instanciate this decoder.
-	 * 
-	 * @return the package requiered for the decoder
-	 */
-	std::map<std::string, Package*>* getPackages() {return packages;};
-
-	/**
-	 * @brief Setter of decoder
-	 *
-	 * Set the decoder bound to the network
-	 * 
-	 * @param decoder : the decoder bound to the network
-	 */
-	void setDecoder(Decoder* decoder) {this->decoder = decoder;};
-
 	/*!
      *  @brief Print network in a dot file.
 	 *
@@ -161,13 +128,6 @@ private:
 
 	/** graph of the network  */
 	HDAGGraph* graph;
-
-	/** package used by the network  */
-	std::map<std::string, Package*>* packages;
-
-	/** decoder of the instance */
-	Decoder* decoder;
-
 };
 
 #endif

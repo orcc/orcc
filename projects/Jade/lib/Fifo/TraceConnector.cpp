@@ -54,9 +54,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Fifo/TraceConnector.h"
 #include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Core/Connection.h"
 #include "Jade/Core/Network.h"
-#include "Jade/Core/Vertex.h"
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Jit/LLVMWriter.h"
 //------------------------------

@@ -45,7 +45,7 @@
 //------------------------------
 
 using namespace std;
-
+/*
 ReconfigurationScenario::ReconfigurationScenario(Network* refNetwork, Network* curNetwork){
 	//Set properties
 	this->refNetwork = refNetwork;
@@ -112,4 +112,4 @@ void ReconfigurationScenario::compareActors(map<string, Actor*>* ref,
 		}
 	}
 
-}
+}*/

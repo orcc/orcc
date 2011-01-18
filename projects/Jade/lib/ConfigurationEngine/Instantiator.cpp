@@ -47,18 +47,15 @@
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Core/Vertex.h"
 #include "Jade/Core/Network.h"
-#include "Jade/Core/Connection.h"
-
 //------------------------------
 
 
 using namespace std;
 using namespace llvm;
 
-Instantiator::Instantiator(Configuration* configuration, map<string, Actor*>* actors){
-	this->actors = actors;
+Instantiator::Instantiator(Configuration* configuration){
+	this->actors = configuration->getActors();
 	this->configuration = configuration;
 	Network* network = configuration->getNetwork();
 	this->graph = network->getGraph();
