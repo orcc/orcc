@@ -56,7 +56,7 @@ class Decoder;
 class Instance;
 class JIT;
 class LLVMExecution;
-class Network;
+class Scenario;
 class BroadcastAdder;
 
 #include "Jade/Scheduler/Scheduler.h"
@@ -72,12 +72,12 @@ public:
 	 *            
 	 * @param jit : jit use in this decoder
 	 *            
-	 * @param network : Network that represents the decoder
+	 * @param scenario : Scenario to instanciate the decoder
 	 *
 	 * @param fifo : Fifo used in the decoder
 	 *
 	 */
-	Decoder(llvm::LLVMContext& C, Network* network, AbstractConnector* fifo);
+	Decoder(llvm::LLVMContext& C, Scenario* scenario, AbstractConnector* fifo);
 	~Decoder();
 	
 	/**
@@ -167,12 +167,14 @@ public:
 	void setActorList(std::map<std::string, Actor*>* actors){this->actors = actors;};
 
 	/**
-     *  @brief Getter of a network
+     *  @brief Getter of scenario
+	 *
+	 *	Return the scenario used to instanciate this decoder
 	 * 
-	 *  @return network of the decoder
+	 *  @return scenario used by the decoder
 	 *
      */
-	Network* getNetwork(){return network;};
+	Scenario* getScenario(){return scenario;};
 
 	/**
      *  @brief Getter of a specific actor
@@ -254,7 +256,7 @@ public:
 	 *	@param network : the new Network
 	 *
      */
-	void setNetwork(Network* network);
+	//void setNetwork(Network* network);
 
 	/**
      *  @brief Clear connections of the decoder
@@ -276,8 +278,8 @@ private:
 	/** Module containing the final decoder */
 	llvm::Module* module;
 
-	/** Input network */
-	Network* network;
+	/** Input scenario */
+	Scenario* scenario;
 
 	/** Input stimulus */
 	std::string stimulus;

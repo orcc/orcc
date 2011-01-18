@@ -28,11 +28,11 @@
  */
 
 /**
-@brief Implementation of class FifoFnRemoval
+@brief Implementation of class ReconfigurationScenario
 @author Jerome Gorin
-@file FifoFnRemoval.cpp
+@file ReconfigurationScenario.cpp
 @version 1.0
-@date 24/12/2010
+@date 18/01/2011
 */
 
 //------------------------------

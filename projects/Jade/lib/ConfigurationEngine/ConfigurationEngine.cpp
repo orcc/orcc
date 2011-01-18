@@ -28,39 +28,18 @@
  */
 
 /**
-@brief Implementation of class Network
+@brief Implementation of class ConfigurationEngine
 @author Jerome Gorin
-@file Instance.cpp
+@file ConfigurationEngine.cpp
 @version 1.0
-@date 15/11/2010
+@date 18/01/2011
 */
 
 //------------------------------
-#include "Jade/Core/Network.h"
-#include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Graph/DotWriter.h"
-#include "Jade/Core/Vertex.h"
-#include "Jade/Util/PackageMng.h"
+#include "Jade/Configuration/ConfigurationEngine.h"
 //------------------------------
 
-using namespace std;
-
-
-Network::Network(std::string name, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs, HDAGGraph* graph){
-	this->name = name;
-	this->inputs = inputs;
-	this->outputs = outputs;
-	this->graph = graph;
+ConfigurationEngine::ConfigurationEngine(Decoder* decoder){
+	this->decoder = decoder;
 }
 
-Network::~Network(){
-	delete graph;
-	delete inputs;
-	delete outputs;
-}
-
-void Network::print(std::string file){
-	DotWriter writer;
-	
-	writer.write(graph, (char*)file.c_str(), 0);
-}

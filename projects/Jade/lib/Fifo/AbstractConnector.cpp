@@ -46,6 +46,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Actor.h"
+#include "Jade/Configuration/Scenario.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMWriter.h"
@@ -178,8 +179,8 @@ Function* AbstractConnector::getReadEndFunction(Type* type){
 }
 
 void AbstractConnector::setConnections(Decoder* decoder){
-	
-	Network* network = decoder->getNetwork();
+	Scenario* scenario = decoder->getScenario();
+	Network* network = scenario->getNetwork();
 	HDAGGraph* graph = network->getGraph();
 	
 	int edges = graph->getNbEdges();
@@ -190,8 +191,8 @@ void AbstractConnector::setConnections(Decoder* decoder){
 }
 
 void AbstractConnector::unsetConnections(Decoder* decoder){
-	
-	Network* network = decoder->getNetwork();
+	Scenario* scenario = decoder->getScenario();
+	Network* network = scenario->getNetwork();
 	HDAGGraph* graph = network->getGraph();
 	
 	int edges = graph->getNbEdges();

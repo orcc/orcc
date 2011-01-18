@@ -28,39 +28,49 @@
  */
 
 /**
-@brief Implementation of class Network
+@brief Implementation of class Schenario
 @author Jerome Gorin
-@file Instance.cpp
+@file ConfigurationEngine.cpp
 @version 1.0
-@date 15/11/2010
+@date 18/01/2011
 */
 
 //------------------------------
+#include "Jade/Configuration/Scenario.h"
 #include "Jade/Core/Network.h"
-#include "Jade/Graph/HDAGGraph.h"
-#include "Jade/Graph/DotWriter.h"
 #include "Jade/Core/Vertex.h"
-#include "Jade/Util/PackageMng.h"
+#include "Jade/Graph/HDAGGraph.h"
 //------------------------------
 
 using namespace std;
 
+Scenario::Scenario(Network* network){
+	this->network = network;
 
-Network::Network(std::string name, std::map<std::string, Port*>* inputs, std::map<std::string, Port*>* outputs, HDAGGraph* graph){
-	this->name = name;
-	this->inputs = inputs;
-	this->outputs = outputs;
-	this->graph = graph;
+	//Calculate scenario from a network
+	setInstances();
 }
 
-Network::~Network(){
-	delete graph;
-	delete inputs;
-	delete outputs;
+void Scenario::setInstances(){
+	// Create list of instance and actor
+	HDAGGraph* graph = network->getGraph();
+	int vertices = graph->getNbVertices();
+
+	for (int i = 0; i < vertices; i++){
+		Vertex* vertex = (Vertex*)graph->getVertex(i);
+
+		if(vertex->isInstance()){
+			Instance* instance = vertex->getInstance();
+			instances.insert(pair<string,Instance*>(instance->getId(), instance));
+			
+			//Insert actor requiered for this network
+			string clasz = instance->getClasz();
+			actorFiles.push_back(clasz);
+		}
+	}
+
+	//remove duplicate actors
+	actorFiles.sort();
+	actorFiles.unique();
 }
 
-void Network::print(std::string file){
-	DotWriter writer;
-	
-	writer.write(graph, (char*)file.c_str(), 0);
-}

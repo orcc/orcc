@@ -57,6 +57,7 @@ class FuncUnit;
 class Actor;
 class IRParser;
 class Package;
+class Scenario;
 //------------------------------
 
 class DecoderEngine {
@@ -133,13 +134,13 @@ public:
 
 private:
 	/*!
-     *  @brief Parse actors
+     *  @brief Parse actors from the scenario
      *
-     *  Parse the actors of the given network.
+     *  Parse the actors requiered to instanciate the given scenario.
 	 *   
-	 *  @param network : the Network to parse
+	 *  @param scenario : the scenario to instanciate
      */
-	void parseActors(Network* network);
+	void parseActors(Scenario* scenario);
 
 	/*!
      *  @brief Optimize decoder

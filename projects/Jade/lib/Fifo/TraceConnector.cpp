@@ -48,9 +48,10 @@
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/Support/CommandLine.h"
 
-#include "Jade/Decoder.h"
+#include "Jade/Configuration/Scenario.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
+#include "Jade/Decoder.h"
 #include "Jade/Fifo/TraceConnector.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Connection.h"
@@ -281,8 +282,8 @@ void TraceConnector::setConnection(Connection* connection, Decoder* decoder){
 }
 
 void TraceConnector::setConnections(Decoder* decoder){
-	
-	Network* network = decoder->getNetwork();
+	Scenario* scenario = decoder->getScenario();
+	Network* network = scenario->getNetwork();
 	HDAGGraph* graph = network->getGraph();
 	
 	int edges = graph->getNbEdges();

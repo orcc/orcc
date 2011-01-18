@@ -66,27 +66,6 @@ class Network {
 public:
 
 	/*!
-     *  @brief Return a list of the Actor classz contained in the network.
-     *
-     *  Return all Actors of the current network.
-	 *   
-	 *
-     *  @return a map of Actor contained in the network
-     */
-	std::list<std::string>* getActorFiles(){return &actorFiles;};
-
-	/*!
-     *  @brief Return a list of the Instance contained in the network.
-     *
-     *  Return all Instance of the current network.
-	 *   
-	 *
-     *  @return a map of Actor contained in the network
-     */
-	std::map<std::string, Instance*>* getInstances(){return &instances;};
-
-
-	/*!
      *  @brief Create a network.
 	 *
 	 * Creates a new network with the given name, inputs, outputs, and graph.
@@ -171,11 +150,6 @@ public:
 
 private:
 
-	/*!
-     *  @brief Set list of instances and actors.
-	 */
-	void setNetwork();
-
 	/** name of the network  */
 	std::string name;
 
@@ -187,12 +161,6 @@ private:
 
 	/** graph of the network  */
 	HDAGGraph* graph;
-
-	/** actors files of the network  */
-	std::list<std::string> actorFiles;
-	
-	/** instances of the network  */
-	std::map<std::string, Instance*> instances;
 
 	/** package used by the network  */
 	std::map<std::string, Package*>* packages;

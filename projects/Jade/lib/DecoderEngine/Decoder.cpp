@@ -48,6 +48,8 @@
 #include "Jade/Configuration/ReconfigurationScenario.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
+#include "Jade/Configuration/ConfigurationEngine.h"
+#include "Jade/Configuration/Scenario.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Serialize/IRWriter.h"
@@ -60,13 +62,14 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, Network* network, AbstractConnector* fifo): Context(C){
+Decoder::Decoder(llvm::LLVMContext& C, Scenario* scenario, AbstractConnector* fifo): Context(C){
 	//Set property of the decoder
-	this->network = network;
+	this->scenario = scenario;
 	this->fifo = fifo;
-	this->instances = network->getInstances();
 	this->thread = NULL;
 	this->executionEngine = NULL;
+	this->scheduler = new RoundRobinScheduler(Context);
+	this->instances = scenario->getInstances();
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
@@ -124,7 +127,7 @@ bool Decoder::make(map<string, Actor*>* actors){
 	fifo->addFifoHeader(this);
 	
 	// Instanciate the network
-	Instantiator Instantiator(network, actors);
+	Instantiator Instantiator(scenario, actors);
 
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, this);
@@ -144,7 +147,6 @@ bool Decoder::make(map<string, Actor*>* actors){
 	fifo->setConnections(this);
 
 	//Set the scheduler
-	scheduler = new RoundRobinScheduler(Context);
 	scheduler->createScheduler(this);
 
 	return true;
@@ -182,7 +184,7 @@ void* Decoder::threadStart( void* args ){
 void Decoder::setStimulus(std::string file){
 	this->stimulus = file;
 }
-
+/*
 void Decoder::setNetwork(Network* network){
 	clearConnections();
 	ReconfigurationScenario scenario(getNetwork(), network);
@@ -190,7 +192,7 @@ void Decoder::setNetwork(Network* network){
 	this->network = network;
 
 	
-}
+}*/
 
 void Decoder::clearConnections(){
 	list<Actor*>::iterator itActor;

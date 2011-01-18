@@ -46,6 +46,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Serialize/IRParser.h"
+#include "Jade/Configuration/Scenario.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
@@ -88,8 +89,11 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 
+	//Create a scenario
+	Scenario* scenario = new Scenario (network);
+
 	// Parsing actor
-	parseActors(network);
+	parseActors(scenario);
 
 	if (verbose){
 		cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
@@ -98,7 +102,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	timer = clock ();
 
 	//Create decoder
-	Decoder* decoder = new Decoder(Context, network, fifo);
+	Decoder* decoder = new Decoder(Context, scenario, fifo);
 
 	//Compile the decoder
 	decoder->make(&actors);
@@ -198,7 +202,7 @@ int DecoderEngine::run(Network* network, string input, pthread_t* thread){
 }
 
 int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
-	map<Network*, Decoder*>::iterator it;
+	/*map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(oldNetwork);
 
@@ -211,14 +215,14 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 
 	parseActors(newNetwork);
 
-	decoder->setNetwork(newNetwork);
+	decoder->setNetwork(newNetwork);*/
 	
 	return 0;
 }
 
-void DecoderEngine::parseActors(Network* network) {
+void DecoderEngine::parseActors(Scenario* scenario) {
 	list<string>::iterator it;
-	list<string>* files = network->getActorFiles();
+	list<string>* files = scenario->getActorFiles();
 	map<string, Actor*> netActors;
 
 	for ( it = files->begin(); it != files->end(); ++it ){
@@ -228,7 +232,7 @@ void DecoderEngine::parseActors(Network* network) {
 		netActors.insert(pair<string, Actor*>(*it, actor));
 	}
 
-	network->setPackages(PackageMng::setPackages(&netActors));
+	//network->setPackages(PackageMng::setPackages(&netActors));
 	actors.insert(netActors.begin(), netActors.end());
 }
 
