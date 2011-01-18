@@ -71,6 +71,17 @@ public:
      */
 	std::map<std::string, Instance*>* getInstances(){return &instances;};
 
+	/**
+     *  @brief Get of an instance in the configuration
+	 * 
+	 *	Return the instance that correspond to the given name 
+	 *    in the configuration.
+	 *
+	 *  @return the instance if found, otherwise NULL
+	 *
+     */
+	Instance* getInstance(std::string name);
+
 	/*!
      *  @brief Return a list of the Actor classz contained in the network.
      *
@@ -138,6 +149,25 @@ public:
 	 */
 	std::map<std::string, Package*>* getPackages() {return packages;};
 
+	/**
+     *  @brief Get of a specific actor
+	 *
+	 *	Return the specifics actors created for this configuration,
+	 *   mostly broadcast actors
+	 * 
+	 *  @return a list of dedicated actors
+	 *
+     */
+	std::list<Actor*>* getSpecifics(){return &specificActors;};
+
+	/**
+     *  @brief Insert a specific actor in the configuration,
+	 *		all the instance of this specific actor are added in
+	 *      the instance list
+	 *
+	 *  @param actor: specific actor to add in the configuration
+     */
+	void insertSpecific(Actor* actor);
 
 private:
 
@@ -165,6 +195,9 @@ private:
 
 	/** package used by the configuration  */
 	std::map<std::string, Package*>* packages;
+
+	/** List of specific actors contained in the configuration */
+	std::list<Actor*> specificActors;
 
 };
 

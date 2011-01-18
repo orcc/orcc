@@ -91,3 +91,28 @@ void Configuration::setActors(std::map<std::string, Actor*>* actors){
 		this->actors = actors;
 		this->packages = PackageMng::setPackages(actors);
 }
+
+void Configuration::insertSpecific(Actor* actor){
+	//Add all instance of the actor
+	list<Instance*>::iterator it;
+	list<Instance*>* specifInstances = actor->getInstances();
+	for (it = specifInstances->begin(); it != specifInstances->end(); it++){
+		Instance* instance = *it;
+		instances.insert(pair<string, Instance*>(instance->getId(), instance));
+	}
+
+	//Insert actor
+	specificActors.push_back(actor);
+}
+
+Instance* Configuration::getInstance(std::string name){
+	map<string, Instance*>::iterator it;
+
+	it = instances.find(name);
+
+	if (it == instances.end()){
+		return NULL;
+	}
+
+	return it->second;
+}

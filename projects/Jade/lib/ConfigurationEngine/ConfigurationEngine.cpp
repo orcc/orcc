@@ -68,7 +68,7 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	Instantiator instantiator(configuration);
 
 	// Adding broadcast 
-	BroadcastAdder broadAdder(Context, decoder);
+	BroadcastAdder broadAdder(Context, configuration);
 	broadAdder.transform();
 
 	//Write instance

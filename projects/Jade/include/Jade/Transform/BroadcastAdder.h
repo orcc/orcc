@@ -51,7 +51,7 @@ class Vertex;
 struct ltstr;
 class CircularConnector;
 class BroadcastActor;
-class Decoder;
+class Configuration;
 class InstancedActor;
 //------------------------------
 
@@ -70,11 +70,11 @@ public:
 	 *    and insert broadcast actor to force port being connected 
 	 *     to an only port
 	 *
-	 *	@param network : Network to transform
-	 *
-	 *	@param decoder : Decoder to add the broadcast
+	 *	@param C : LLVMContext
+     *
+	 *	@param configuration : Configuration to transform
      */
-	BroadcastAdder(llvm::LLVMContext& C, Decoder* decoder);
+	BroadcastAdder(llvm::LLVMContext& C, Configuration* configuration);
 
 	void transform();
 
@@ -133,8 +133,8 @@ private:
 	/** graph of the network */
 	HDAGGraph* graph;
 
-	/** Decoder to apply the transformation */
-	Decoder* decoder;
+	/** Configuration to transform */
+	Configuration* configuration;
 
 	/** list of Actor in the decoder */
 	std::map<std::string, Actor*>* actors;

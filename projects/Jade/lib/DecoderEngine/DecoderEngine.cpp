@@ -97,9 +97,9 @@ int DecoderEngine::load(Network* network, int optLevel) {
 
 	if (verbose){
 		cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+		timer = clock ();
 	}
-	timer = clock ();
-
+	
 	//Create decoder
 	Decoder* decoder = new Decoder(Context, configuration);
 
@@ -109,22 +109,12 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	
 	if (verbose){
 		cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+		timer = clock ();
 	}
-	timer = clock ();
-
+	
 	//doOptimizeDecoder(decoder);
-
-
 	
-	LLVMUtility utility;
-	string outName;
-
-
-	if (verbose){
-		cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
-	}
-	timer = clock ();
-	
+	//Insert decoder into the list of created decoders
 	decoders.insert(pair<Network*, Decoder*>(network, decoder));
 
 	return 0;
@@ -165,7 +155,7 @@ int DecoderEngine::stop(Network* network){
 
 int DecoderEngine::verify(Network* network, std::string errorFile){
 	map<Network*, Decoder*>::iterator it;
-
+	clock_t	timer = clock ();
 	it = decoders.find(network);
 
 	if (it == decoders.end()){
@@ -176,6 +166,9 @@ int DecoderEngine::verify(Network* network, std::string errorFile){
 	LLVMUtility utility;
 	utility.verify(errorFile, it->second);
 
+	if (verbose){
+		cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	}
 	return 0;
 }
 

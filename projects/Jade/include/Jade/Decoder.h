@@ -107,54 +107,6 @@ public:
 	std::list<AbstractConnector*>* getFifos(){return &fifos;};
 
 	/**
-     *  @brief Getter of instances
-	 * 
-	 *	Return a map of instances link with their name in the decoder
-	 *
-	 *  @return a map of instances
-	 *
-     */
-	std::map<std::string, Instance*>* getInstances(){return instances;};
-
-	/**
-     *  @brief Add an instance
-	 * 
-	 *	Add an instance in the decoder
-	 *
-	 *  @param instance: Instance to add in the decoder
-     */
-	void addInstance(Instance* instance);
-
-	/**
-     *  @brief Add a specific actor in the decoder
-	 * 
-	 *	Add an actor specific to this decoder
-	 *
-	 *  @param actor: specific actor to add
-     */
-	void addSpecific(Actor* actor);
-
-	/**
-     *  @brief Getter of an instance
-	 * 
-	 *	Return the instance with the given name
-	 *
-	 *  @return the instance if found, otherwise NULL
-	 *
-     */
-	Instance* getInstance(std::string name);
-
-	/**
-     *  @brief Set actors contained in the decoder
-	 * 
-	 *	Set a map of actor that are contained in the decoder
-	 *
-	 *	@param actors : a map of actor 
-	 *
-     */
-	void setActorList(std::map<std::string, Actor*>* actors){this->actors = actors;};
-
-	/**
      *  @brief Getter of configuration
 	 *
 	 *	Return the configuration used by the decoder
@@ -163,16 +115,6 @@ public:
 	 *
      */
 	Configuration* getConfiguration(){return configuration;};
-
-	/**
-     *  @brief Getter of a specific actor
-	 *
-	 *	Return the specifics actors to this decoder
-	 * 
-	 *  @return a list of actors
-	 *
-     */
-	std::list<Actor*>* getSpecifics(){return &specificActors;};
 
 	/**
      *  @brief Getter of a stimulus file
@@ -251,16 +193,6 @@ private:
 
 	/** Input stimulus */
 	std::string stimulus;
-
-	/** List of actors contained in the decoder */
-	std::map<std::string, Actor*>* actors;
-
-
-	/** List of specific actors contained in the decoder */
-	std::list<Actor*> specificActors;
-
-	/** Map of instances in the decoder */
-	std::map<std::string, Instance*>* instances;
 	
 	/** List of Fifo in the decoder */
 	std::list<AbstractConnector*> fifos;

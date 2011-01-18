@@ -98,6 +98,7 @@ private:
 
 	/** Decoder bound to the round robin scheduler */
 	Decoder* decoder;
+	Configuration* configuration;
 
 	/** Main scheduling function */
 	llvm::Function* scheduler;

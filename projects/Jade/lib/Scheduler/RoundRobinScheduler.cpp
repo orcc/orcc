@@ -88,6 +88,7 @@ RoundRobinScheduler::~RoundRobinScheduler (){
 
 void RoundRobinScheduler::createScheduler(Decoder* decoder){
 	this->decoder = decoder;
+	this->configuration = decoder->getConfiguration();
 	
 	//Create the scheduler function
 	createSchedulerFn();
@@ -107,7 +108,7 @@ void RoundRobinScheduler::createSchedulerFn(){
 	stopGV->setInitializer(ConstantInt::get(Type::getInt1Ty(Context), 0));
 	
 	// create scheduler
-	map<string, Instance*>* instances = decoder->getInstances();
+	map<string, Instance*>* instances = configuration->getInstances();
 	scheduler = cast<Function>(module->getOrInsertFunction("main", Type::getInt32Ty(Context),
                                           (Type *)0));
 										  
@@ -161,7 +162,7 @@ void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 	exit_decoder = (void(*)(int))executionEngine->getExit();
 
 	if(YuvFile.compare("") != 0){
-		Instance* compare = decoder->getInstance("Compare");
+		Instance* compare = configuration->getInstance("Compare");
 
 		//Map fstat function used in compare actor
 		Procedure* filesize = compare->getProcedure("Filesize");
@@ -169,7 +170,7 @@ void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 	}
 
 	//Get display instance
-	Instance* display = decoder->getInstance("display");
+	Instance* display = configuration->getInstance("display");
 
 	//Get procedures from display
 	Procedure* setVideo = display->getProcedure("set_video");
@@ -192,7 +193,7 @@ void RoundRobinScheduler::setSource(string input){
 	Module* module = decoder->getModule();
 	
 	//Get source instance
-	Instance* source = decoder->getInstance("source");
+	Instance* source = configuration->getInstance("source");
 	
 	//Insert source file string
 	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),input.size()+1); 

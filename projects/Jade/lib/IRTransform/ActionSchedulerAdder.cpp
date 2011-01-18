@@ -43,6 +43,7 @@
 #include "llvm/Module.h"
 
 #include "Jade/Decoder.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/ActionTag.h"
@@ -63,7 +64,8 @@ ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decode
 
 void ActionSchedulerAdder::transform() {
 	map<string, Instance*>::iterator it;
-	map<string, Instance*>* instances = decoder->getInstances();
+	Configuration* configuration = decoder->getConfiguration();
+	map<string, Instance*>* instances = configuration->getInstances();
 	
 	for (it = instances->begin(); it != instances->end(); ++it){
 		setInstance(it->second);

@@ -39,23 +39,20 @@
 #include <map>
 #include <sstream>
 
-#include "Jade/Decoder.h"
 #include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Configuration/Configuration.h"
-#include "Jade/Core/Instance.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Transform/BroadcastAdder.h"
 //------------------------------
 
 using namespace std;
 
-BroadcastAdder::BroadcastAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
-	this->fifo = decoder->getFifo();
-	Configuration* Configuration = decoder->getConfiguration();
-	Network* network = Configuration->getNetwork();
+BroadcastAdder::BroadcastAdder(llvm::LLVMContext& C, Configuration* configuration) : Context(C){
+	this->fifo = configuration->getConnector();
+	this->configuration = configuration;
+	Network* network = configuration->getNetwork();
 	this->graph = network->getGraph();
-	this->decoder = decoder;
 }
 
 BroadcastAdder::~BroadcastAdder (){
@@ -121,11 +118,12 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				//Create a new actor for this broadcast
 				string name = "broadcast_"+ instance->getId()+"_"+ srcPort->getName();
 				BroadcastActor* actorBCast = new BroadcastActor(Context, name, numOuputs, srcPort->getType(), fifo);
-				decoder->addSpecific(actorBCast);
-
-				//Instanciate broadcast
-				Instance* newInstance = new Instance(name, actorBCast);		
-				decoder->addInstance(newInstance);
+				
+				//Create an instance for the broadcast
+				Instance* newInstance = new Instance(name, actorBCast);
+				
+				//Insert broadcast in configuration
+				configuration->insertSpecific(actorBCast);
 				
 				//Set a new vertex in the graph
 				Vertex* vertextBCast = new Vertex(newInstance);

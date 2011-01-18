@@ -40,6 +40,7 @@
 
 #include "llvm/Function.h"
 
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Instance.h"
 #include "Jade/Optimize/InstanceInternalize.h"
 
@@ -50,7 +51,8 @@ using namespace llvm;
 
 void InstanceInternalize::transform(Decoder* decoder){
 	map<string, Instance*>::iterator it;
-	map<string, Instance*>* instances = decoder->getInstances();
+	Configuration* configuration = decoder->getConfiguration();
+	map<string, Instance*>* instances = configuration->getInstances();
 
 	for (it = instances->begin(); it != instances->end(); it++){
 		doInternalize(it->second);

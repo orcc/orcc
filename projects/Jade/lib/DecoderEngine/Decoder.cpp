@@ -63,7 +63,6 @@ Decoder::Decoder(llvm::LLVMContext& C, Configuration* configuration): Context(C)
 	this->thread = NULL;
 	this->executionEngine = NULL;
 	this->scheduler = new RoundRobinScheduler(Context);
-	this->instances = configuration->getInstances();
 	this->fifo = configuration->getConnector();
 
 	//Create a new module that contains the current decoder
@@ -72,36 +71,7 @@ Decoder::Decoder(llvm::LLVMContext& C, Configuration* configuration): Context(C)
 
 Decoder::~Decoder (){
 	delete scheduler;
-
-	list<Actor*>::iterator it;
-	for (it = specificActors.begin(); it != specificActors.end(); it++){
-		delete *it;
-	}
-
 	delete module;
-}
-
-void Decoder::addInstance(Instance* instance){
-	instances->insert(std::pair<std::string, Instance*>(instance->getId(), instance));
-}
-
-void Decoder::addSpecific(Actor* actor){
-	specificActors.push_back(actor);
-}
-
-
-
-
-Instance* Decoder::getInstance(std::string name){
-	map<string, Instance*>::iterator it;
-
-	it = instances->find(name);
-
-	if (it == instances->end()){
-		return NULL;
-	}
-
-	return it->second;
 }
 
 void Decoder::start(){
