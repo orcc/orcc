@@ -67,20 +67,20 @@ class IRWriter{
 public:
 
 	/**
-	 * Creates an instance writer on the given actor.
+	 * @brief Creates an instance writer on the given decoder.
 	 * 
-	 * @param instance : Instance to write
+	 * @param decoder : Decoder to write instances into
 	 */
-	IRWriter(Instance* instance);
+	IRWriter(Decoder* decoder);
 
 	/**
-	 * Write the instance inside the given decoder.
+	 * @brief Write the given instance
 	 * 
-	 * @param decoder: the decoder to write the instance into
+	 * @param instance: instance to write
      *
 	 * @return true if the actor is written, otherwise false
 	 */
-	bool write(Decoder* decoder);
+	bool write(Instance* instance);
 
 	~IRWriter();
 
@@ -88,11 +88,13 @@ private:
 
 	/**
 	 * @brief Write the instance
+	 *
+	 * @param instance : the Instance to write
 	 */
-	void writeInstance(Decoder* decoder);
+	void writeInstance(Instance* instance);
 
 	/**
-	 * @brief Writer a list of ports
+	 * @brief Write a list of ports
 	 *
 	 * Writer a list of ports in the module
 	 *
@@ -279,8 +281,10 @@ private:
 	/**Procedures of the instance */
 	std::map<std::string, Procedure*>* procs;
 	
+	/** Destination decoder */
+	Decoder* decoder;
 
-	/** writer used to manage LLVM infrastructure */
+	/** Writer used to manage LLVM infrastructure */
 	LLVMWriter* writer;
 };
 

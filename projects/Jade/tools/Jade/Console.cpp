@@ -46,10 +46,12 @@ using namespace llvm;
 using namespace llvm::cl;
 
 extern cl::opt<std::string> VTLDir;
+extern cl::opt<std::string> InputDir;
 extern DecoderEngine* engine;
 
 //Console control
 map<int, Network*> networks;
+pthread_t t1;
 
 
 void parseConsole(string cmd){
@@ -90,8 +92,10 @@ void parseConsole(string cmd){
 			cout << "Select a new network : ";
 			cin >> file;
 
-			//Load a network
-			Network* network = loadNetwork(VTLDir + file);
+			//Load network
+			LLVMContext &Context = getGlobalContext();
+			XDFParser xdfParser(VTLDir + file);
+			Network* network = xdfParser.ParseXDF(Context);
 
 			if (network == NULL){
 				cout << "No network load. \n";
@@ -106,10 +110,15 @@ void parseConsole(string cmd){
 			string file;
 			int id;
 
-			//Load the network
+			//Select the network file
 			cout << "Select a network to load : ";
 			cin >> file;
-			Network* network = loadNetwork(VTLDir + file);
+			
+			//Load network
+			LLVMContext &Context = getGlobalContext();
+			XDFParser xdfParser(VTLDir + file);
+			Network* network = xdfParser.ParseXDF(Context);
+
 
 			if (network == NULL){
 				cout << "No network load. \n";
@@ -121,7 +130,7 @@ void parseConsole(string cmd){
 			cin >> id;
 			networks.insert(pair<int, Network*>(id, network));
 
-			prepareNetwork(network);
+			engine->load(network, 3);
 		}else if (cmd == "P"){
 			map<int, Network*>::iterator it;
 			string output;
@@ -164,7 +173,7 @@ void parseConsole(string cmd){
 			cout << "Select an input stimulus : ";
 			cin >> input;
 
-			runNetwork(it->second, input);
+			engine->run(it->second, InputDir + input, &t1);
 
 		}else if (cmd == "S"){
 			map<int, Network*>::iterator it;
@@ -183,7 +192,7 @@ void parseConsole(string cmd){
 			}
 
 			//Stop the given network
-			stopNetwork(it->second);
+			engine->stop(it->second);
 
 		}else if (cmd == "U"){
 			map<int, Network*>::iterator it;

@@ -70,11 +70,11 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	broadAdder.transform();
 
 	//Write instance
+	IRWriter writer(decoder);
 	map<string, Instance*>* instances = configuration->getInstances();
 
 	for (it = instances->begin(); it != instances->end(); it++){
-		IRWriter writer(it->second);
-		writer.write(decoder);
+		writer.write(it->second);
 	}
 
 	//Adding action scheduler

@@ -206,7 +206,6 @@ void setDirectory(std::string* dir){
 }
 
 int optLevel;
-pthread_t t1;
 DecoderEngine* engine;
 
 //Check options of the decoder engine
@@ -228,52 +227,8 @@ void setOptions(){
 	}
 }
 
-//Decoder engine managing
-Network* loadNetwork(string file){
-	LLVMContext &Context = getGlobalContext();
-
-	//Parsing XDF file
-	XDFParser xdfParser(file);
-	Network* network = xdfParser.ParseXDF(Context);
-
-	return network;
-}
-
-void prepareNetwork(Network* network){
-	LLVMContext &Context = getGlobalContext();
-
-	//Load fifos
-	AbstractConnector* fifo = NULL;
-	if (SystemDir.getValue().compare("") != 0){
-		fifo = getFifo(Context, SystemDir);
-	}else{
-		fifo = getFifo(Context, VTLDir);
-	}
-
-	//Load and execute the parsed network
-	engine = new DecoderEngine(Context, fifo , VTLDir, SystemDir, Verbose);
-	engine->load(network, optLevel);
-}
-
-int runNetwork(Network* network, string inputFile){
-	engine->run(network, InputDir + inputFile, &t1);
-
-	return 0;
-}
-
-int stopNetwork(Network* network){
-	if (engine == NULL){
-		cout << "No network are running.\n";
-		return 1;
-	}
-
-	engine->stop(network);
-}
-
-
 //Command line decoder control
 void startCmdLine(){
-
 	LLVMContext &Context = getGlobalContext();
 
 	for (unsigned int i =0 ; i < PassList.size(); i++ ){
@@ -285,19 +240,24 @@ void startCmdLine(){
 
 	//Parsing XDF file
 	std::cout << "Parsing file " << XDFFile.getValue() << ". \n";
-	Network* network = loadNetwork(XDFFile);
+
+	XDFParser xdfParser(XDFFile);
+	Network* network = xdfParser.ParseXDF(Context);
+
 	cout << "Network parsed in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms, start engine :\n";
 
-	prepareNetwork(network);
+	//Load network
+	engine->load(network, 3);
 
-	runNetwork(network, VidFile);
+	//Run network
+	engine->run(network, VidFile);
 
-	pthread_join (t1, NULL);
 	cout << "End of Jade:" << (clock () - timer) * 1000 / CLOCKS_PER_SEC;
 }
 
 int main(int argc, char **argv) {
-
+	LLVMContext &Context = getGlobalContext();
+	
 	// Print a stack trace if we signal out.
 	PrintStackTraceOnErrorSignal();
 	PrettyStackTraceProgram X(argc, argv);
@@ -306,13 +266,28 @@ int main(int argc, char **argv) {
     
 	//Initialize context
 	InitializeNativeTarget();
-
 	setOptions();
-	engine = NULL;
+	
+	//Load fifos
+	AbstractConnector* fifo = NULL;
+	if (SystemDir.getValue().compare("") != 0){
+		fifo = getFifo(Context, SystemDir);
+	}else{
+		fifo = getFifo(Context, VTLDir);
+	}
+
+	//Loading decoderEngine
+	engine = new DecoderEngine(Context, fifo , VTLDir, SystemDir, Verbose);
 
 	if (Console){
+
+		//Enter in console mode
+		llvm_start_multithreaded();	
 		startConsole();
+		llvm_stop_multithreaded();
 	} else {
+		
+		//Enter in command line mode
 		startCmdLine();
 	}
 }

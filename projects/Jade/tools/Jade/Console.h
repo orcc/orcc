@@ -45,10 +45,6 @@
 
 #include "llvm/Support/CommandLine.h"
 
-void prepareNetwork(Network* network);
-Network* loadNetwork(std::string file);
-int runNetwork(Network* network, std::string inputFile);
-int stopNetwork(Network* network);
 void startConsole();
 
 #endif

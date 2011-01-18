@@ -51,9 +51,8 @@
 using namespace std;
 using namespace llvm;
 
-IRWriter::IRWriter(Instance* instance){
-	this->instance = instance;
-	this->actor = instance->getActor();
+IRWriter::IRWriter(Decoder* decoder){
+	this->decoder = decoder;
 }
 
 IRWriter::~IRWriter(){
@@ -62,16 +61,22 @@ IRWriter::~IRWriter(){
 	}
 }
 
-bool IRWriter::write(Decoder* decoder){
-	writer = new LLVMWriter(instance->getId()+"_", decoder);
-	
-	writeInstance(decoder);
+bool IRWriter::write(Instance* instance){
+	this->instance = instance;
+	this->actor = instance->getActor();
 
-	// Instanciate actor
+	//Clear stored actions
+	actions.clear();
+	untaggedActions.clear();
+
+	//Write instance
+	writer = new LLVMWriter(instance->getId()+"_", decoder);	
+	writeInstance(instance);
+
 	return true;
 }
 
-void IRWriter::writeInstance(Decoder* decoder){
+void IRWriter::writeInstance(Instance* instance){
 	//Set the property of the instance
 	instance->setDecoder(decoder);
 	

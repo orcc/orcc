@@ -75,13 +75,10 @@ DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 	this->library = library;
 	this->systemPackage = system;
 	this->verbose = verbose;
-
-	llvm_start_multithreaded();
-
 }
 
 DecoderEngine::~DecoderEngine(){
-	llvm_stop_multithreaded();
+	
 }
 
 int DecoderEngine::load(Network* network, int optLevel) {
