@@ -107,13 +107,11 @@ Instance* Decoder::getInstance(std::string name){
 void Decoder::start(){
 	scheduler->setSource(stimulus);
 	
+	executionEngine = new LLVMExecution(Context, this);
+	
 	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine);
 	
 	executionEngine->run();
-}
-
-void Decoder::compile(){
-	executionEngine = new LLVMExecution(Context, this);
 }
 
 void Decoder::stop(){

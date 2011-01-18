@@ -130,7 +130,33 @@ public:
 	 *  @param outputFile : the name of the file to print into
 	 *
      */
-	int printNetwork(Network* network, std::string outputFile);
+	int print(Network* network, std::string outputFile);
+
+	/*!
+     *  @brief Verify the network
+	 *   
+	 *  Verify if the given network has been correctely compiled,
+	 *    otherwise, print error into the given filename
+	 *
+	 *  @param network : the Network to verify
+	 *
+	 *  @param errorFile : name of the error file if needed
+	 *
+     */
+	int verify(Network* network, std::string errorFile);
+
+	/*!
+     *  @brief Optimize a network
+	 *   
+	 *  Apply an optimisation to the network that corresponds to the given
+	 *    level.
+	 *
+	 *  @param network : the Network to optmize
+	 *
+	 *  @param optLevel : the level of optimization
+	 *
+     */
+	int optimize(Network* network, int optLevel);
 
 private:
 	/*!

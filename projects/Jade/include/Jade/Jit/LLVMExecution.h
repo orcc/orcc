@@ -46,6 +46,8 @@ namespace llvm{
 }
 
 #include "llvm/LLVMContext.h"
+
+class Procedure;
 //------------------------------
 
 /**

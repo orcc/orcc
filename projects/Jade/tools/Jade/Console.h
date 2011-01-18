@@ -28,62 +28,27 @@
  */
 
 /**
-@brief Implementation of class Connection
+@brief Description of the Jade header
 @author Jerome Gorin
-@file Connection.cpp
+@file Jade.h
 @version 1.0
-@date 15/11/2010
+@date 18/01/2011
 */
 
 //------------------------------
-#include <iostream>
-
-#include "llvm/Constants.h"
-#include "llvm/DerivedTypes.h"
-#include "llvm/Support/CommandLine.h"
-
-#include "Jade/Core/Network/Connection.h"
-#include "Jade/Core/Expression.h"
-#include "Jade/Core/Attribute/ValueAttribute.h"
+#ifndef JADE_H
+#define JADE_H
 //------------------------------
 
-using namespace std;
-using namespace llvm;
+#include "Jade/XDFParser.h"
+#include "Jade/DecoderEngine.h"
 
-extern cl::opt<int> FifoSize;
+#include "llvm/Support/CommandLine.h"
 
-Connection::Connection(Port* source, Port* target, std::map<std::string, IRAttribute*>* attributes): HDAGEdge()
-{	this->attributes = attributes; 
-	this->source = source;	
-	this->target = target;
-	this->fifo = NULL;
-}
+void prepareNetwork(Network* network);
+Network* loadNetwork(std::string file);
+int runNetwork(Network* network, std::string inputFile);
+int stopNetwork(Network* network);
+void startConsole();
 
-
-int Connection::getSize(){
-	IRAttribute* attribute = getAttribute("bufferSize");
-	
-	if (attribute == NULL){
-		return FifoSize;
-	}
-	
-	if (attribute->isValue()){
-		Expr* expr = ((ValueAttribute*)attribute)->getValue();
-		return expr->evaluateAsInteger();
-	}
-
-	cerr<< "Error when parsing type of a connection";
-	exit(0);
-}
-
-IRAttribute* Connection::getAttribute(std::string name){
-	map<string, IRAttribute*>::iterator it;
-
-	it = attributes->find(name);
-
-	if(it == attributes->end()){
-		return NULL;
-	}
-
-	return it->second;
-}
+#endif

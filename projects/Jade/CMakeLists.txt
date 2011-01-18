@@ -110,15 +110,5 @@ include_directories(${JADE_MAIN_INCLUDE_DIR} ${LLVM_INCLUDE_DIRS} ${SDL_INCLUDE_
  
 add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
  
-# Executable
-IF(APPLE)
-add_executable(Jade Jade.cpp /Library/Frameworks/SDL.framework/Resources/SDLMain.m)
-ELSE(APPLE)
-add_executable(Jade Jade.cpp)
-ENDIF(APPLE)
-
-add_executable(JadeToolbox Toolbox.cpp)
-
-# Library requiered
-target_link_libraries(Jade DecoderEngine ConfigurationEngine XDFParser IROptimize IRSerialize Scheduler IRJit IRTransform  IRActor Fifo IRCore IRUtil HDAGGraph TinyXml ${SDL_LIBRARY} ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS} ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(JadeToolbox IRUtil ${LLVM_LIBRARIES} ${LLVM_LD_FLAGS})
+# Tools
+add_subdirectory(tools)

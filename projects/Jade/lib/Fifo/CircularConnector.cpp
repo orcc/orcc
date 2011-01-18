@@ -49,7 +49,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Fifo/CircularConnector.h"
-#include "Jade/Core/Connection.h"
+#include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMParser.h"
 #include "Jade/Jit/LLVMWriter.h"
 //------------------------------

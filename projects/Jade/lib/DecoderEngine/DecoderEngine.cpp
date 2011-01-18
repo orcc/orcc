@@ -39,7 +39,7 @@
 #include <time.h>
 #include <iostream>
 
-#include "llvm/Constants.h"
+//#include "llvm/Constants.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/StandardPasses.h"
 
@@ -60,7 +60,7 @@
 using namespace std;
 using namespace llvm;
 
-extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
+//extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
 
 DecoderEngine::DecoderEngine(llvm::LLVMContext& C, 
 							 AbstractConnector* fifo, 
@@ -114,31 +114,16 @@ int DecoderEngine::load(Network* network, int optLevel) {
 
 	//doOptimizeDecoder(decoder);
 
-	LLVMOptimizer opt(decoder);
-	opt.optimize();
 
-	if (verbose){
-		cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
-	}
-	timer = clock ();
 	
 	LLVMUtility utility;
 	string outName;
 
-	if (PassList.size() > 0){
-		outName = PassList[0]->getPassArgument();
-	}else{
-		outName = "module";
-	}
-	
-	utility.verify("error.txt", decoder);
 
 	if (verbose){
 		cout << "--> Decoder verified in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 	}
 	timer = clock ();
-
-	decoder->compile();
 	
 	decoders.insert(pair<Network*, Decoder*>(network, decoder));
 
@@ -178,6 +163,22 @@ int DecoderEngine::stop(Network* network){
 	return 0;
 }
 
+int DecoderEngine::verify(Network* network, std::string errorFile){
+	map<Network*, Decoder*>::iterator it;
+
+	it = decoders.find(network);
+
+	if (it == decoders.end()){
+		cout << "No decoders found for this network.\n";
+		return 1;
+	}
+	
+	LLVMUtility utility;
+	utility.verify(errorFile, it->second);
+
+	return 0;
+}
+
 int DecoderEngine::run(Network* network, string input, pthread_t* thread){	
 	map<Network*, Decoder*>::iterator it;
 
@@ -199,6 +200,26 @@ int DecoderEngine::run(Network* network, string input, pthread_t* thread){
 	}
 
 	return 0;
+}
+
+int DecoderEngine::optimize(Network* network, int optLevel){
+	clock_t	timer = clock ();
+	
+	map<Network*, Decoder*>::iterator it;
+
+	it = decoders.find(network);
+
+	if (it == decoders.end()){
+		cout << "No decoders found for this network.\n";
+		return 1;
+	}
+
+	cout << "-> Start optimization of : " << network->getName().c_str();
+
+	LLVMOptimizer opt(it->second);
+	opt.optimize();
+	
+	cout << "--> Decoder optimized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
 }
 
 int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
@@ -259,7 +280,7 @@ void DecoderEngine::doOptimizeDecoder(Decoder* decoder){
 	removeFifo.transform(decoder);
 }
 
-int DecoderEngine::printNetwork(Network* network, string outputFile){
+int DecoderEngine::print(Network* network, string outputFile){
 	LLVMUtility utility;
 	map<Network*, Decoder*>::iterator it;
 

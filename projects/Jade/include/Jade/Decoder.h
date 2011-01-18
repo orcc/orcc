@@ -217,14 +217,6 @@ public:
 	void stop();
 
 	/**
-     *  @brief Compile the decoder
-	 *
-	 *	Compile the decoder to make it ready for execution.
-	 *
-     */
-	void compile();
-
-	/**
      *  @brief Set a new decoder
 	 *
 	 *	Change the network of the decoder into a new network

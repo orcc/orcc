@@ -41,16 +41,15 @@
 #include <iostream>
 #include <map>
 
+#include "Console.h"
+
 #include "llvm/LLVMContext.h"
 #include "llvm/Target/TargetSelect.h"
 #include "llvm/Support/PassNameParser.h"
 #include "llvm/Support/StandardPasses.h"
-#include "llvm/Support/CommandLine.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/System/Signals.h"
 
-#include "Jade/XDFParser.h"
-#include "Jade/DecoderEngine.h"
 #include "Jade/Fifo/CircularConnector.h"
 #include "Jade/Fifo/TraceConnector.h"
 #include "Jade/Fifo/UnprotectedConnector.h"
@@ -207,8 +206,8 @@ void setDirectory(std::string* dir){
 }
 
 int optLevel;
-DecoderEngine* engine;
 pthread_t t1;
+DecoderEngine* engine;
 
 //Check options of the decoder engine
 void setOptions(){
@@ -269,180 +268,6 @@ int stopNetwork(Network* network){
 	}
 
 	engine->stop(network);
-}
-
-//Console control
-map<int, Network*> networks;
-
-void parseConsole(string cmd){
-	if (cmd == "C"){
-			map<int, Network*>::iterator it;
-			string file;
-			int id;
-
-			//Select network
-			cout << "Select the id of the network to run : ";
-			cin >> id;
-
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
-
-			//Select network
-			cout << "Select a new network : ";
-			cin >> file;
-
-			//Load a network
-			Network* network = loadNetwork(VTLDir + file);
-
-			if (network == NULL){
-				cout << "No network load. \n";
-				return;
-			}
-
-			engine->reconfigure(it->second, network);
-/*
-			networks.erase(id);
-			networks.insert(pair<int, Network*>(id, network));*/
-	}else if (cmd == "L"){
-			string file;
-			int id;
-
-			//Load the network
-			cout << "Select a network to load : ";
-			cin >> file;
-			Network* network = loadNetwork(VTLDir + file);
-
-			if (network == NULL){
-				cout << "No network load. \n";
-				return;
-			}
-
-			//Store the network in an id
-			cout << "Select an id for this network : ";
-			cin >> id;
-			networks.insert(pair<int, Network*>(id, network));
-
-			prepareNetwork(network);
-		}else if (cmd == "P"){
-			map<int, Network*>::iterator it;
-			string output;
-			int id;
-
-			//Select network
-			cout << "Select the id of the network to run : ";
-			cin >> id;
-
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
-
-			//Select network
-			cout << "Select an ouput file : ";
-			cin >> output;
-
-			engine->printNetwork(it->second, output);
-
-		}else if (cmd == "R"){
-			map<int, Network*>::iterator it;
-			string input;
-			int id;
-
-			//Select network
-			cout << "Select the id of the network to run : ";
-			cin >> id;
-
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
-
-			//Select network
-			cout << "Select an input stimulus : ";
-			cin >> input;
-
-			runNetwork(it->second, input);
-
-		}else if (cmd == "S"){
-			map<int, Network*>::iterator it;
-			string input;
-			int id;
-
-			//Select network
-			cout << "Select the id of the network to stop : ";
-			cin >> id;
-
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
-
-			//Stop the given network
-			stopNetwork(it->second);
-
-		}else if (cmd == "U"){
-			map<int, Network*>::iterator it;
-			string input;
-			int id;
-
-			//Select network
-			cout << "Select the id of the network to unload : ";
-			cin >> id;
-
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
-
-			Network* network = it->second;
-			engine->unload(network);
-
-			networks.erase(id);
-
-			delete network;
-
-		}else if (cmd == "V"){
-			map<int, Network*>::iterator it;
-			string input;
-
-			for (it = networks.begin(); it != networks.end(); it++){
-				Network* network = it->second;
-				cout << it->first << " : " << network->getName() << "\n";
-			}
-		} else if (cmd == "help"){ 
-			cout << "Command line options :\n";
-			cout << "C : change a network to another\n";
-			cout << "L : load a network \n";
-			cout << "P : print a network \n";
-			cout << "R : run a network \n";
-			cout << "S : stop a network \n";
-			cout << "U : unload a network \n";
-			cout << "V : list view of the networks loads \n";
-			cout << "X : exit console \n";
-		}
-}
-
-void startConsole(){
-	string cmdLine;
-
-	while (cmdLine != "X"){
-		cmdLine = "";
-		cout << "Enter a command (help for documentation) : ";
-		cin >> cmdLine;
-		parseConsole(cmdLine);
-	}
 }
 
 
