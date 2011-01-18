@@ -42,6 +42,7 @@
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Configuration/Instantiator.h"
 #include "Jade/Configuration/Configuration.h"
+#include "Jade/Configuration/Reconfiguration.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Transform/BroadcastAdder.h"
@@ -89,6 +90,11 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	//Set the scheduler
 	Scheduler* scheduler = decoder->getScheduler();
 	scheduler->createScheduler(decoder);
+}
+
+void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configuration){
+	Reconfiguration reconfiguration(decoder, configuration);
+
 }
 
 

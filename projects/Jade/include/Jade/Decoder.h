@@ -159,16 +159,6 @@ public:
 	void stop();
 
 	/**
-     *  @brief Set a new decoder
-	 *
-	 *	Change the network of the decoder into a new network
-	 *
-	 *	@param network : the new Network
-	 *
-     */
-	//void setNetwork(Network* network);
-
-	/**
      *  @brief Clear connections of the decoder
 	 *
 	 *	Remove every connections created in the decoder 

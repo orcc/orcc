@@ -70,9 +70,20 @@ public:
      *
 	 * Instanciate a configuration of decoder using the given Configuration.
 	 *
-	 *	@param Configuration : a Configuration for instanciating a configuration
+	 *	@param configuration : a Configuration for instanciating a configuration
      */
 	void configure(Decoder* decoder);
+
+	/*!
+     *  @brief Reconfigure a decoder
+     *
+	 * Reconfigure a decoder with the given configuration
+	 *
+	 *	@param decoder : the Decoder to reconfigure
+	 *
+	 *	@param configuration : the new Configuration
+     */
+	void reconfigure(Decoder* decoder, Configuration* configuration);
 
 private:
 	/** Decoder to configure */

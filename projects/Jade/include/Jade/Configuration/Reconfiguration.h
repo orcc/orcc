@@ -28,28 +28,28 @@
  */
 
 /**
-@brief Description of the ReconfigurationScenario class interface
+@brief Description of the Reconfiguration class interface
 @author Jerome Gorin
-@file ReconfigurationScenario.h
+@file Reconfiguration.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#ifndef RECONFIGURATIONSCENARIO_H
-#define RECONFIGURATIONSCENARIO_H
+#ifndef RECONFIGURATION_H
+#define RECONFIGURATION_H
 
-class Network;
-class Package;
+class Decoder;
+class Configuration;
 //------------------------------
 
 /**
- * @brief  This class represents a scenario of reconfiguration
+ * @brief  This class represents a reconfiguration of a decoder
  * 
  * @author Jerome Gorin
  * 
  */
-class ReconfigurationScenario{
+class Reconfiguration{
 public:
 	/*!
      *  @brief Constructor
@@ -59,7 +59,15 @@ public:
 	 * @param network : the original network to reconfigure
 	 *
      */
-	ReconfigurationScenario(Network* refNetwork, Network* curNetwork);
+	Reconfiguration(Decoder* decoder, Configuration* configuration);
+
+	/**
+     *  @brief Get instance to remove from the decoder
+	 *
+	 *  @return a list of actor to remove
+	 *
+     */
+	std::list<Instance*> getToRemove();
 
 private:
 	
@@ -101,16 +109,33 @@ private:
 					   std::map<std::string, Actor*>* diff,
 					   std::map<std::string, Actor*>* intersect);
 
-	/** Reference network*/
-	Network* refNetwork;
-	
-	/** New network*/
-	Network* curNetwork;
+	/**
+     *  @brief Mark the instance to process
+	 *
+	 *  Store all instance from the actor in the list of instance
+	 *
+	 *	@param actors : map of actors to analyze
+	 *
+	 *	@param instance : list of instance to store childs of the given actors
+     */
+	void markInstances(std::map<std::string, Actor*>* actors, 
+					   std::list<Instance*>* instances);
 
-	/** List of marked actors*/
+	/** Reference configuration*/
+	Configuration* refConfiguration;
+	
+	/** New configuration*/
+	Configuration* curConfiguration;
+
+	/** Map of marked actors*/
 	std::map<std::string, Actor*> removed;
 	std::map<std::string, Actor*> added;
 	std::map<std::string, Actor*> intersect;
+
+	/** List of instance to process*/
+	std::list<Instance*> toRemove;
+	std::list<Instance*> toAdd;
+	std::list<Instance*> toKeep;
 };
 
 #endif

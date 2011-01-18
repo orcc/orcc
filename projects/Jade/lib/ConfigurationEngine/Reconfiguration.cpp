@@ -28,9 +28,9 @@
  */
 
 /**
-@brief Implementation of class ReconfigurationScenario
+@brief Implementation of class Reconfiguration
 @author Jerome Gorin
-@file ReconfigurationScenario.cpp
+@file Reconfiguration.cpp
 @version 1.0
 @date 18/01/2011
 */
@@ -39,28 +39,32 @@
 #include <algorithm>
 #include <vector>
 
-#include "Jade/Core/Network.h"
-#include "Jade/Core/Package.h"
-#include "Jade/Configuration/ReconfigurationScenario.h"
+#include "Jade/Decoder.h"
+#include "Jade/Configuration/Configuration.h"
+#include "Jade/Configuration/Reconfiguration.h"
 //------------------------------
 
 using namespace std;
-/*
-ReconfigurationScenario::ReconfigurationScenario(Network* refNetwork, Network* curNetwork){
+
+Reconfiguration::Reconfiguration(Decoder* decoder, Configuration* configuration){
 	//Set properties
-	this->refNetwork = refNetwork;
-	this->curNetwork = curNetwork;
+	this->refConfiguration = decoder->getConfiguration();
+	this->curConfiguration = configuration;
 
 	//Compare packages and underneath actors between the two networks
-	comparePackages(refNetwork->getPackages(), curNetwork->getPackages(), &removed, &intersect);
-	comparePackages(curNetwork->getPackages(), refNetwork->getPackages(), &added);
+	comparePackages(refConfiguration->getPackages(), curConfiguration->getPackages(), &removed, &intersect);
+	comparePackages(curConfiguration->getPackages(), refConfiguration->getPackages(), &added);
 
+	//Mark instance to process
+	markInstances(&removed, &toRemove);
+	markInstances(&added, &toAdd);
+	markInstances(&intersect, &toKeep);
 }
 
-void ReconfigurationScenario::comparePackages(map<string, Package*>* ref,
-											  map<string, Package*>* cur, 
-											  map<string, Actor*>* diff,
-											  map<string, Actor*>* intersect){
+void Reconfiguration::comparePackages(map<string, Package*>* ref,
+									  map<string, Package*>* cur, 
+									  map<string, Actor*>* diff,
+									  map<string, Actor*>* intersect){
 	map<string, Package*>::iterator itRef;
 
 	//Iterate though the package of reference network
@@ -88,10 +92,10 @@ void ReconfigurationScenario::comparePackages(map<string, Package*>* ref,
 	}
 }
 
-void ReconfigurationScenario::compareActors(map<string, Actor*>* ref, 
-											map<string, Actor*>* cur,
-											map<string, Actor*>* diff,
-											map<string, Actor*>* intersect){
+void Reconfiguration::compareActors(map<string, Actor*>* ref, 
+									map<string, Actor*>* cur,
+									map<string, Actor*>* diff,
+									map<string, Actor*>* intersect){
 	map<string, Actor*>::iterator itRef;
 
 	//Iterate though actors of the reference list
@@ -111,5 +115,21 @@ void ReconfigurationScenario::compareActors(map<string, Actor*>* ref,
 			intersect->insert(pair<string, Actor*>(name, refActor));
 		}
 	}
+}
 
-}*/
+void Reconfiguration::markInstances(map<string, Actor*>* actors, list<Instance*>* instances){
+	map<string, Actor*>::iterator it;
+
+	//Iterate though all marked actors
+	for (it = actors->begin(); it != actors->end(); it++){
+
+		//Get instances of the actor
+		Actor* actor = it->second;
+		list<Instance*>* childs = actor->getInstances();
+
+		//Store instances into marked list
+		list<Instance*>::iterator itInsert = instances->begin();
+		instances->insert(itInsert, childs->begin(), childs->end());
+	}
+
+}

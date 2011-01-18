@@ -104,15 +104,6 @@ void* Decoder::threadStart( void* args ){
 void Decoder::setStimulus(std::string file){
 	this->stimulus = file;
 }
-/*
-void Decoder::setNetwork(Network* network){
-	clearConnections();
-	ReconfigurationScenario Configuration(getNetwork(), network);
-		
-	this->network = network;
-
-	
-}*/
 
 /*
 void Decoder::clearConnections(){

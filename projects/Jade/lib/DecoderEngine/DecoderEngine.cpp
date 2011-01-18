@@ -88,7 +88,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 
-	//Create a Configuration
+	//Create the Configuration from the network
 	Configuration* configuration = new Configuration(network, fifo);
 
 	// Parsing actor and bound it to the configuration
@@ -216,7 +216,7 @@ int DecoderEngine::optimize(Network* network, int optLevel){
 }
 
 int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
-	/*map<Network*, Decoder*>::iterator it;
+	map<Network*, Decoder*>::iterator it;
 
 	it = decoders.find(oldNetwork);
 
@@ -227,10 +227,17 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 
 	Decoder* decoder = it->second;
 
-	parseActors(newNetwork);
+	//Create the new Configuration
+	Configuration* configuration = new Configuration(newNetwork, fifo);
 
-	decoder->setNetwork(newNetwork);*/
-	
+	// Parsing actor and bound it to the new configuration
+	map<string, Actor*>* requieredActors = parseActors(configuration);
+	configuration->setActors(requieredActors);
+
+	//Reconfigure the decoder
+	ConfigurationEngine engine(Context);
+	engine.reconfigure(decoder, configuration);
+
 	return 0;
 }
 
