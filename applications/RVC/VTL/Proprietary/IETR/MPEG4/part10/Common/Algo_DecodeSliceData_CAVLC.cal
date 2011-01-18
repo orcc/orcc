@@ -370,7 +370,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			bool        AMbExists,
 			int(size=8) Flags
 		do
-				if(((curr_mb_addr - first_mb_in_slice) mod PicWidthInMbs) != 0) then
+				if((curr_mb_addr mod PicWidthInMbs) != 0 and first_mb_in_slice != curr_mb_addr) then
 					NaTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 5],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][ 7],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_TOTALCOEFF)][13],
