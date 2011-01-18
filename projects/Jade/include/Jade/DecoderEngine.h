@@ -57,7 +57,7 @@ class FuncUnit;
 class Actor;
 class IRParser;
 class Package;
-class Scenario;
+class Configuration;
 //------------------------------
 
 class DecoderEngine {
@@ -140,7 +140,7 @@ private:
 	 *   
 	 *  @param scenario : the scenario to instanciate
      */
-	void parseActors(Scenario* scenario);
+	void parseActors(Configuration* configuration);
 
 	/*!
      *  @brief Optimize decoder

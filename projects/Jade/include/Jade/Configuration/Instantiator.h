@@ -44,7 +44,7 @@
 #include "Jade/Core/Actor.h"
 
 class Connection;
-class Scenario;
+class Configuration;
 class HDAGGraph;
 //------------------------------
 
@@ -60,7 +60,7 @@ class Instantiator {
 public:
 
 	/**
-	 * @brief instanciate a scenario.
+	 * @brief instanciate a Configuration.
 	 *
 	 * Instantiate actors and checks that connections actually point to ports defined in actors. Instantiating an
 	 * actor implies first loading it and then giving it the right parameters.
@@ -69,7 +69,7 @@ public:
 	 *
 	 * @param actors : Map of actors used in the instance
 	 */
-	Instantiator(Scenario* scenario, std::map<std::string, Actor*>* actors);
+	Instantiator(Configuration* configuration, std::map<std::string, Actor*>* actors);
 
 	~Instantiator(){};
 
@@ -106,8 +106,8 @@ private:
 	/* Graph to transform */
 	HDAGGraph* graph;
 	
-	/** Scenario to instanciate */
-	Scenario* scenario;
+	/** Configuration to instanciate */
+	Configuration* configuration;
 
 	/** List of actor from the network */
 	std::map<std::string, Actor*>* actors;

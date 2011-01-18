@@ -36,8 +36,8 @@
 */
 
 //------------------------------
-#ifndef SCENARIO_H
-#define SCENARIO_H
+#ifndef CONFIGURATION_H
+#define CONFIGURATION_H
 
 #include <list>
 #include <map>
@@ -48,19 +48,19 @@ class Network;
 //------------------------------
 
 /**
- * @brief  This class represents configuration engine
+ * @brief  This class represents configuration of a network
  * 
  * @author Jerome Gorin
  * 
  */
-class Scenario {
+class Configuration {
 public:
 	/*!
      *  @brief Constructor
      *
 	 * Creates a new configuration engine.
      */
-	Scenario(Network* network, AbstractConnector* connector);
+	Configuration(Network* network, AbstractConnector* connector);
 
 	/*!
      *  @brief Return a list of the Instance contained in the network.

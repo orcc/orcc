@@ -57,7 +57,7 @@ class Decoder;
 class Instance;
 class JIT;
 class LLVMExecution;
-class Scenario;
+class Configuration;
 class BroadcastAdder;
 
 #include "Jade/Scheduler/Scheduler.h"
@@ -78,7 +78,7 @@ public:
 	 * @param fifo : Fifo used in the decoder
 	 *
 	 */
-	Decoder(llvm::LLVMContext& C, Scenario* scenario);
+	Decoder(llvm::LLVMContext& C, Configuration* configuration);
 	~Decoder();
 	
 	/**
@@ -168,14 +168,14 @@ public:
 	void setActorList(std::map<std::string, Actor*>* actors){this->actors = actors;};
 
 	/**
-     *  @brief Getter of scenario
+     *  @brief Getter of configuration
 	 *
-	 *	Return the scenario used to instanciate this decoder
+	 *	Return the configuration used by the decoder
 	 * 
-	 *  @return scenario used by the decoder
+	 *  @return configuration used by the decoder
 	 *
      */
-	Scenario* getScenario(){return scenario;};
+	Configuration* getConfiguration(){return configuration;};
 
 	/**
      *  @brief Getter of a specific actor
@@ -279,8 +279,8 @@ private:
 	/** Module containing the final decoder */
 	llvm::Module* module;
 
-	/** Input scenario */
-	Scenario* scenario;
+	/** Configuration of the decoder */
+	Configuration* configuration;
 
 	/** Input stimulus */
 	std::string stimulus;

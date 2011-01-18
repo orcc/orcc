@@ -46,7 +46,7 @@ namespace llvm{
 
 class Actor;
 class Decoder;
-class Scenario;
+class Configuration;
 //------------------------------
 
 /**
@@ -67,11 +67,11 @@ public:
 	/*!
      *  @brief Instanciate a configuration of decoder
      *
-	 * Instanciate a configuration of decoder using the given scenario.
+	 * Instanciate a configuration of decoder using the given Configuration.
 	 *
-	 *	@param scenario : a Scenario for instanciating a configuration
+	 *	@param Configuration : a Configuration for instanciating a configuration
      */
-	void configure(Scenario* scenario, std::map<std::string, Actor*>* actors);
+	void configure(Configuration* configuration, std::map<std::string, Actor*>* actors);
 
 private:
 	/** Decoder to configure */

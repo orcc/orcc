@@ -44,11 +44,10 @@
 #include "llvm/Module.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Configuration/ReconfigurationScenario.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
-#include "Jade/Configuration/Scenario.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Serialize/IRUnwriter.h"
@@ -58,15 +57,15 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, Scenario* scenario): Context(C){
+Decoder::Decoder(llvm::LLVMContext& C, Configuration* configuration): Context(C){
 	//Set property of the decoder
-	this->scenario = scenario;
+	this->configuration = configuration;
 	this->thread = NULL;
 	this->executionEngine = NULL;
 	this->scheduler = new RoundRobinScheduler(Context);
-	this->instances = scenario->getInstances();
+	this->instances = configuration->getInstances();
 	this->confEngine = new ConfigurationEngine(Context, this);
-	this->fifo = scenario->getConnector();
+	this->fifo = configuration->getConnector();
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
@@ -118,7 +117,7 @@ Instance* Decoder::getInstance(std::string name){
 
 bool Decoder::make(map<string, Actor*>* actors){
 	this->actors = actors;
-	confEngine->configure(scenario, actors);
+	confEngine->configure(configuration, actors);
 
 	return true;
 }
@@ -158,7 +157,7 @@ void Decoder::setStimulus(std::string file){
 /*
 void Decoder::setNetwork(Network* network){
 	clearConnections();
-	ReconfigurationScenario scenario(getNetwork(), network);
+	ReconfigurationScenario Configuration(getNetwork(), network);
 		
 	this->network = network;
 

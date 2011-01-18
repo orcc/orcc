@@ -6,5 +6,5 @@ add_library (ConfigurationEngine
 	Instantiator.cpp
 	ReconfigurationScenario.cpp
 	ConfigurationEngine.cpp
-	Scenario.cpp
+	Configuration.cpp
  )

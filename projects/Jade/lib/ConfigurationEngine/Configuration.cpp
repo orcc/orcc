@@ -28,15 +28,15 @@
  */
 
 /**
-@brief Implementation of class Schenario
+@brief Implementation of class Configuration
 @author Jerome Gorin
-@file ConfigurationEngine.cpp
+@file Configuration.cpp
 @version 1.0
 @date 18/01/2011
 */
 
 //------------------------------
-#include "Jade/Configuration/Scenario.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Core/Vertex.h"
 #include "Jade/Graph/HDAGGraph.h"
@@ -44,15 +44,15 @@
 
 using namespace std;
 
-Scenario::Scenario(Network* network, AbstractConnector* connector){
+Configuration::Configuration(Network* network, AbstractConnector* connector){
 	this->network = network;
 	this->connector = connector;
 
-	//Calculate scenario from a network
+	//Calculate Configuration from a network
 	setInstances();
 }
 
-void Scenario::setInstances(){
+void Configuration::setInstances(){
 	// Create list of instance and actor
 	HDAGGraph* graph = network->getGraph();
 	int vertices = graph->getNbVertices();

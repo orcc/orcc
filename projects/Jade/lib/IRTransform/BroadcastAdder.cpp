@@ -42,7 +42,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Configuration/Scenario.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Graph/HDAGGraph.h"
 #include "Jade/Core/Instance.h"
 #include "Jade/Core/Network.h"
@@ -55,8 +55,8 @@ using namespace std;
 
 BroadcastAdder::BroadcastAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
 	this->fifo = decoder->getFifo();
-	Scenario* scenario = decoder->getScenario();
-	Network* network = scenario->getNetwork();
+	Configuration* Configuration = decoder->getConfiguration();
+	Network* network = Configuration->getNetwork();
 	this->graph = network->getGraph();
 	this->decoder = decoder;
 }

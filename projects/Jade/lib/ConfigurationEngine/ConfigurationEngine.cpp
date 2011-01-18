@@ -41,7 +41,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Configuration/Instantiator.h"
-#include "Jade/Configuration/Scenario.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Transform/BroadcastAdder.h"
@@ -57,22 +57,22 @@ ConfigurationEngine::ConfigurationEngine(llvm::LLVMContext& C, Decoder* decoder)
 	this->decoder = decoder;
 }
 
-void ConfigurationEngine::configure(Scenario* scenario, map<string, Actor*>* actors){
+void ConfigurationEngine::configure(Configuration* configuration, map<string, Actor*>* actors){
 	map<string, Instance*>::iterator it;
 
 	// Add Fifo function and fifo type into the decoder
-	AbstractConnector* connector = scenario->getConnector();
+	AbstractConnector* connector = configuration->getConnector();
 	connector->addFifoHeader(decoder);
 	
 	// Instanciate the network
-	Instantiator Instantiator(scenario, actors);
+	Instantiator Instantiator(configuration, actors);
 
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, decoder);
 	broadAdder.transform();
 
 	//Write instance
-	map<string, Instance*>* instances = scenario->getInstances();
+	map<string, Instance*>* instances = configuration->getInstances();
 
 	for (it = instances->begin(); it != instances->end(); it++){
 		IRWriter writer(it->second);

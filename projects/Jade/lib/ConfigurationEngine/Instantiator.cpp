@@ -43,7 +43,7 @@
 #include "llvm/DerivedTypes.h"
 
 #include "Jade/Configuration/Instantiator.h"
-#include "Jade/Configuration/Scenario.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Graph/HDAGGraph.h"
@@ -57,10 +57,10 @@
 using namespace std;
 using namespace llvm;
 
-Instantiator::Instantiator(Scenario* scenario, map<string, Actor*>* actors){
+Instantiator::Instantiator(Configuration* configuration, map<string, Actor*>* actors){
 	this->actors = actors;
-	this->scenario = scenario;
-	Network* network = scenario->getNetwork();
+	this->configuration = configuration;
+	Network* network = configuration->getNetwork();
 	this->graph = network->getGraph();
 	updateInstances();
 }
@@ -69,7 +69,7 @@ Instantiator::Instantiator(Scenario* scenario, map<string, Actor*>* actors){
 void Instantiator::updateInstances(){
 	//Update instances using actors
 	map<string, Instance*>::iterator it;
-	map<string, Instance*>* instances = scenario->getInstances();
+	map<string, Instance*>* instances = configuration->getInstances();
 		
 	for (it = instances->begin(); it != instances->end(); it++){
 		updateInstance(it->second);

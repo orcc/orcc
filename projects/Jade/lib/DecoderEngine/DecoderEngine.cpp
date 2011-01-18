@@ -46,7 +46,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Serialize/IRParser.h"
-#include "Jade/Configuration/Scenario.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
@@ -89,11 +89,11 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	map<string, Actor*>::iterator it;
 	clock_t timer = clock ();
 
-	//Create a scenario
-	Scenario* scenario = new Scenario(network, fifo);
+	//Create a Configuration
+	Configuration* configuration = new Configuration(network, fifo);
 
 	// Parsing actor
-	parseActors(scenario);
+	parseActors(configuration);
 
 	if (verbose){
 		cout << "--> Modules parsed in : "<<(clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
@@ -102,7 +102,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	timer = clock ();
 
 	//Create decoder
-	Decoder* decoder = new Decoder(Context, scenario);
+	Decoder* decoder = new Decoder(Context, configuration);
 
 	//Compile the decoder
 	decoder->make(&actors);
@@ -220,9 +220,9 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 	return 0;
 }
 
-void DecoderEngine::parseActors(Scenario* scenario) {
+void DecoderEngine::parseActors(Configuration* Configuration) {
 	list<string>::iterator it;
-	list<string>* files = scenario->getActorFiles();
+	list<string>* files = Configuration->getActorFiles();
 	map<string, Actor*> netActors;
 
 	for ( it = files->begin(); it != files->end(); ++it ){
