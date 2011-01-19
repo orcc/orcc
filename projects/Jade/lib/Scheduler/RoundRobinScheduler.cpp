@@ -63,7 +63,6 @@
 
 using namespace std;
 using namespace llvm;
-
 extern cl::opt<bool> nodisplay;
 extern cl::opt<std::string> YuvFile;
 
@@ -150,10 +149,12 @@ void RoundRobinScheduler::execute(string stimulus){
 	}
 }
 
-void RoundRobinScheduler::stop(){
+void RoundRobinScheduler::stop(pthread_t* thread){
 	SDL_Event sdlEvent;
 	sdlEvent.type = SDL_QUIT;
 	SDL_PushEvent(&sdlEvent);
+	pthread_join (*thread, NULL);
+	SDL_Quit();
 }
 
 void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){

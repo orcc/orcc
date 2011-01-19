@@ -104,7 +104,7 @@ public:
      *
 	 *	Stop the decoder
      */
-	void stop();
+	void stop(pthread_t* thread);
 
 	/**
      *  @brief cleart the current decoder

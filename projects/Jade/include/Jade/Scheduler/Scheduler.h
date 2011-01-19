@@ -63,7 +63,7 @@ public:
 	virtual ~Scheduler(){};
 	virtual void createScheduler(Decoder* decoder){};
 	virtual void execute(std::string stimulus){};
-	virtual void stop(){};
+	virtual void stop(pthread_t* thread){};
 	virtual llvm::Function* getMainFunction(){return NULL;};
 	virtual void setSource(std::string input){};
 	virtual void addInstance(Instance* instance){};

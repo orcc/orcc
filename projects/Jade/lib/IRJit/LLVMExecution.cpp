@@ -175,9 +175,9 @@ void LLVMExecution::run() {
 	GenericValue Result = EE->runFunction(func, noargs);
 }
 
-void LLVMExecution::stop() {
+void LLVMExecution::stop(pthread_t* thread) {
 	Scheduler* scheduler = decoder->getScheduler();
-	scheduler->stop();
+	scheduler->stop(thread);
 }
 
 void LLVMExecution::clear() {

@@ -74,7 +74,7 @@ public:
 
 	void createScheduler(Decoder* decoder);
 	void execute(std::string stimulus);
-	void stop();
+	void stop(pthread_t* thread);
 
 	llvm::Function* getMainFunction(){return scheduler;};
 	

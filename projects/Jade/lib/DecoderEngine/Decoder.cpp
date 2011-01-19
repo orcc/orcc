@@ -83,9 +83,7 @@ void Decoder::start(){
 }
 
 void Decoder::stop(){
-	executionEngine->stop();
-	pthread_join (*thread, NULL);
-	executionEngine->clear();
+	executionEngine->stop(thread);
 }
 
 void Decoder::startInThread(pthread_t* thread){
