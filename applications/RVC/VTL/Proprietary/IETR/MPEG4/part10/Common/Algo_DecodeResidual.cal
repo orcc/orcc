@@ -485,7 +485,7 @@ actor Algo_DecodeResidual()
 
 
 		CheckChromaAC               (ChromaAcComponentPresent         )--> CheckLoopiCbCr;
-		CheckChromaAC               (ChromaAcComponentNotPresent      )--> ChromaAcComponentNotPresent;
+		CheckChromaAC               (ChromaAcComponentNotPresent      )--> SendEndResidual;
 
 		CheckLoopiCbCr              (ChromaLoopiCbCr                  )--> CheckLoopi8x8;
 		CheckLoopiCbCr              (SendEndResidual                  )--> GetParameters;

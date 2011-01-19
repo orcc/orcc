@@ -356,7 +356,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			Mby_in_pix := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
 			Idx_CurrBlk   := Curr_Mb_Addr & MASK_TAB;
 
-			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0) then
+			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0 or (Curr_Mb_Addr = Fst_Mb)) then
 				Idx_mbAddrA := -1;
 			else
 				Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_TAB;
@@ -542,7 +542,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 				MvpL0 := [0,0];
 			else
 				//if mbAddrA is not available	
-				if( (Curr_Mb_Addr mod pic_width_in_mb) = 0) then
+				if( (Curr_Mb_Addr mod pic_width_in_mb) = 0 or (Curr_Mb_Addr = Fst_Mb)) then
 					MvpL0 := [0,0];
 				else
 					//if refIdxL0A is equal to 0 and both components of mvL0A are equal to 0
@@ -608,7 +608,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MvTab[Idx_CurrBlk]     := [[0,0]: for int i in 0 .. 15];
 			RefIdxTab[Idx_CurrBlk] := [-1: for int i in 0 .. 15];
 
-			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0) then
+			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0 or (Curr_Mb_Addr = Fst_Mb)) then
 				Idx_mbAddrA := -1;
 			else
 				Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_TAB;

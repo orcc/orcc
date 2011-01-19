@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="Z" x="57" y="79"/>
-      <vertex id="PicWidthInMb" x="57" y="176"/>
-      <vertex id="PicSizeInMb" x="57" y="273"/>
-      <vertex id="Mbtype" x="57" y="370"/>
-      <vertex id="Cbp_blk" x="57" y="467"/>
-      <vertex id="Alpha_offset" x="57" y="564"/>
-      <vertex id="Beta_offset" x="57" y="661"/>
-      <vertex id="QP" x="57" y="758"/>
-      <vertex id="MV" x="57" y="855"/>
-      <vertex id="RefIdx" x="57" y="952"/>
-      <vertex id="LFDisable" x="57" y="1049"/>
-      <vertex id="FirstMbInSlice" x="57" y="1146"/>
-      <vertex id="WD" x="523" y="502"/>
-      <vertex id="Algo_DBF" x="416" y="590"/>
-      <vertex id="Mgnt_DBF" x="223" y="469"/>
+      <vertex id="Z" x="258" y="442"/>
+      <vertex id="PicWidthInMb" x="211" y="352"/>
+      <vertex id="PicSizeInMb" x="217" y="322"/>
+      <vertex id="Mbtype" x="231" y="291"/>
+      <vertex id="Cbp_blk" x="229" y="164"/>
+      <vertex id="Alpha_offset" x="212" y="97"/>
+      <vertex id="Beta_offset" x="217" y="132"/>
+      <vertex id="QP" x="251" y="382"/>
+      <vertex id="MV" x="247" y="261"/>
+      <vertex id="RefIdx" x="240" y="413"/>
+      <vertex id="LFDisable" x="222" y="228"/>
+      <vertex id="FirstMbInSlice" x="207" y="196"/>
+      <vertex id="WD" x="589" y="217"/>
+      <vertex id="Algo_DBF" x="430" y="40"/>
+      <vertex id="Mgnt_DBF" x="413" y="147"/>
    </vertices>
 </layout>
