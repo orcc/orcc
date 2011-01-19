@@ -137,18 +137,6 @@ void RoundRobinScheduler::createSchedulerFn(){
 	Instruction* brBbInst = BranchInst::Create(BBReturn, schedulerBB, stopVal, schedulerBB);
 }
 
-void RoundRobinScheduler::execute(string stimulus){
-	//Set input file
-	setSource(stimulus);
-
-	clock_t timer = clock ();
-
-	if (verbose){
-		cout << "--> Engine initialized in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
-		cout << "-->  Start decoding :\n";
-	}
-}
-
 void RoundRobinScheduler::stop(pthread_t* thread){
 	SDL_Event sdlEvent;
 	sdlEvent.type = SDL_QUIT;
@@ -205,6 +193,9 @@ void RoundRobinScheduler::setSource(string input){
 	GlobalVariable* sourceFile = sourceFileVar->getGlobalVariable();
 	Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
 	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
+
+	//Todo : benchmark, to remove
+	cStart = clock ();
 }
 
 void RoundRobinScheduler::setCompare(){

@@ -99,10 +99,6 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	
 	//Create decoder
 	Decoder* decoder = new Decoder(Context, configuration);
-
-	//Configure the decoder
-	ConfigurationEngine engine(Context);
-	engine.configure(decoder);
 	
 	if (verbose){
 		cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";

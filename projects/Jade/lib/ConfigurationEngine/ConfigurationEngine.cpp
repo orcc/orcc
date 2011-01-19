@@ -46,8 +46,9 @@
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Transform/BroadcastAdder.h"
 #include "Jade/Scheduler/Scheduler.h"
-#include "Jade/Serialize/IRWriter.h"
+#include "Jade/Serialize/IRLinker.h"
 #include "Jade/Serialize/IRUnwriter.h"
+#include "Jade/Serialize/IRWriter.h"
 #include "Jade/Transform/ActionSchedulerAdder.h"
 //------------------------------
 
@@ -106,6 +107,22 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	for (it = removes->begin(); it != removes->end(); it++){
 		unwriter.remove(*it);
 	}
+
+	//Write new instances
+	IRWriter writer(decoder);
+
+	//Iterate though all instances to remove
+	list<Instance*>* adds = reconfiguration.getToAdd();
+	for (it = adds->begin(); it != adds->end(); it++){
+		writer.write(*it);
+	}
+
+	//Link instances to keep from one configuration to another
+	IRLinker linker(decoder);
+
+	//Iterate though all instances to remove
+	list<pair<Instance*, Instance*>>* keeps = reconfiguration.getToKeep();
+	linker.link(keeps);
 
 }
 

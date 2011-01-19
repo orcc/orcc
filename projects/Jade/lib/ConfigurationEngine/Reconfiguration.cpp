@@ -58,7 +58,9 @@ Reconfiguration::Reconfiguration(Decoder* decoder, Configuration* configuration)
 	//Mark instance to process
 	markInstances(&removed, &toRemove);
 	markInstances(&added, &toAdd);
-	markInstances(&intersect, &toKeep);
+
+	//Couple similar instances
+	detectInstances(&intersect, &toKeep);
 }
 
 void Reconfiguration::comparePackages(map<string, Package*>* ref,
@@ -130,6 +132,21 @@ void Reconfiguration::markInstances(map<string, Actor*>* actors, list<Instance*>
 		//Store instances into marked list
 		list<Instance*>::iterator itInsert = instances->begin();
 		instances->insert(itInsert, childs->begin(), childs->end());
+	}
+}
+
+void Reconfiguration::detectInstances(map<string, Actor*>* actors, list<pair<Instance*, Instance*>>* instances){
+	map<string, Actor*>::iterator it;
+
+	//Iterate though all marked actors
+	for (it = actors->begin(); it != actors->end(); it++){
+
+		//Get instances of the actor
+		Actor* actor = it->second;
+		list<Instance*>* childs = actor->getInstances();
+
+
+
 	}
 
 }

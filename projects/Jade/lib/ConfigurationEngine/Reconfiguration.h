@@ -82,7 +82,7 @@ public:
 	 *  @return a list of actor to keep
 	 *
      */
-	std::list<Instance*>* getToKeep(){return &toKeep;};
+	std::list<std::pair<Instance*, Instance*>>* getToKeep(){return &toKeep;};
 
 private:
 	
@@ -131,10 +131,22 @@ private:
 	 *
 	 *	@param actors : map of actors to analyze
 	 *
-	 *	@param instance : list of instance to store childs of the given actors
+	 *	@param instances : list of Instance to store childs of the given actors
      */
 	void markInstances(std::map<std::string, Actor*>* actors, 
 					   std::list<Instance*>* instances);
+
+	/**
+     *  @brief Detect the instance that can be link
+	 *
+	 *  Check instances with the closest property and store them in toKeep.
+	 *
+	 *	@param actors : map of actors to analyze
+	 *
+	 *	@param instance : list of couple similar Instances
+     */
+	void detectInstances(std::map<std::string, Actor*>* actors, 
+					   std::list<std::pair<Instance*, Instance*>>* instances);
 
 	/** Reference configuration*/
 	Configuration* refConfiguration;
@@ -150,7 +162,7 @@ private:
 	/** List of instance to process*/
 	std::list<Instance*> toRemove;
 	std::list<Instance*> toAdd;
-	std::list<Instance*> toKeep;
+	std::list<std::pair<Instance*, Instance*>> toKeep;
 };
 
 #endif

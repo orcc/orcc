@@ -28,79 +28,59 @@
  */
 
 /**
-@brief Implementation of class Decoder
+@brief Description of the IRLinker class interface
 @author Jerome Gorin
-@file Decoder.cpp
+@file IRLinker.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#include <list>
-#include <iostream>
-#include <fstream>
+#ifndef IRLINKER_H
+#define IRLINKER_H
 
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
+#include <map>
 
-#include "Jade/Decoder.h"
-#include "Jade/Fifo/AbstractConnector.h"
-#include "Jade/Core/Network.h"
-#include "Jade/Configuration/ConfigurationEngine.h"
-#include "Jade/Fifo/AbstractConnector.h"
-#include "Jade/Jit/LLVMExecution.h"
-#include "Jade/Scheduler/RoundRobinScheduler.h"
+#include "Jade/Core/Actor.h"
+#include "Jade/Core/Instance.h"
 //------------------------------
 
-using namespace llvm;
-using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, Configuration* configuration): Context(C){
-	//Set property of the decoder
-	this->configuration = configuration;
-	this->thread = NULL;
-	this->executionEngine = NULL;
-	this->scheduler = new RoundRobinScheduler(Context);
-	this->fifo = configuration->getConnector();
+/**
+ * @class IRLinker
+ *
+ * @brief This class defines a linker that links instance not instanced with an
+ *   an instanced instance if two instances have the same property
+ *
+ * @author Jerome Gorin
+ * 
+ */
+class IRLinker{
+public:
 
-	//Create a new module that contains the current decoder
-	module = new Module("decoder", C);
+	/**
+	 * @brief Creates an instance writer on the given actor.
+	 * 
+	 * @param instance : Instance to write
+	 */
+	IRLinker(Decoder* decoder);
 
-	//Configure the decoder
-	ConfigurationEngine engine(Context);
-	engine.configure(this);
+	/**
+	 * @brief Links instances.
+	 *
+	 * Links instances from a previous configuration in a new configuration
+	 * 
+	 * @param instances: a list of Instance to link
+     *
+	 * @return true if the actor is unwritten, otherwise false
+	 */
+	int link(std::list<std::pair<Instance*, Instance*>>* instances);
 
-	//Create execution engine
-	executionEngine = new LLVMExecution(Context, this);
-	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine); //Todo : simplify process
-}
+	~IRLinker();
 
-Decoder::~Decoder (){
-	delete scheduler;
-	delete module;
-}
+private:
+	/** Decoder where instance are linked */
+	Decoder* decoder;
+};
 
-void Decoder::start(){
-	scheduler->setSource(stimulus);
-		
-	executionEngine->run();
-}
-
-void Decoder::stop(){
-	executionEngine->stop(thread);
-}
-
-void Decoder::startInThread(pthread_t* thread){
-	this->thread = thread;
-	pthread_create( thread, NULL, &Decoder::threadStart, this );
-}
-
-void* Decoder::threadStart( void* args ){
-	Decoder* decoder = static_cast<Decoder*>(args);
-	decoder->start();
-	return NULL;
-}
-
-void Decoder::setStimulus(std::string file){
-	this->stimulus = file;
-}
+#endif

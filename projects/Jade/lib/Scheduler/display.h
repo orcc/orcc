@@ -67,6 +67,7 @@ static void press_a_key(int code) {
 }
 
 static Uint32 start_time;
+clock_t cStart;
 static int num_images_start;
 static int num_images_end;
 bool verboseDisplay;
@@ -110,8 +111,14 @@ void display_show_image(void) {
 	SDL_DisplayYUVOverlay(m_overlay, &rect);
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
+	
+	if (num_images_end == 0){
+		std::cout<< "\n First image arrived " << (clock () - cStart) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
+	}
+	
 	num_images_end++;
 	t2 = SDL_GetTicks();
+
 	if ((t2 - t > 3000)&&(verboseDisplay)) {
 		printf("%f images/sec\n",
 			1000.0f * (float)(num_images_end - num_images_start) / (float)(t2 - t));
@@ -132,6 +139,8 @@ void display_show_image(void) {
 				m_y = 0;
 				m_width = 0;
 				m_height = 0;
+				num_images_start = 0;
+				num_images_end = 0;
 				pthread_exit(NULL);
 				break;
 			default:

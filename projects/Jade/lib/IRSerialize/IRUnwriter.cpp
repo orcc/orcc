@@ -78,6 +78,13 @@ int IRUnwriter::remove(Instance* instance){
 }
 
 void IRUnwriter::unwriteActionScheduler(ActionScheduler* actionScheduler){
+	//Remove initialization of action scheduler
+	if (actionScheduler->hasInitializeScheduler()){
+		Function* initialize = actionScheduler->getInitializeFunction();
+		initialize->eraseFromParent();
+	}
+	
+	//Remove action scheduler
 	Function* function = actionScheduler->getSchedulerFunction();
 	function->eraseFromParent();
 }

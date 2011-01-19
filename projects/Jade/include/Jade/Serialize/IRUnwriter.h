@@ -59,7 +59,7 @@ class LLVMWriter;
 /**
  * @class IRUnwriter
  *
- * @brief This class defines a unwriter that removes an instance from a decoder.
+ * @brief This class defines a unwriter that removes instances from a decoder.
  *
  * @author Jerome Gorin
  * 
@@ -68,14 +68,14 @@ class IRUnwriter{
 public:
 
 	/**
-	 * Creates an instance writer on the given actor.
+	 * @brief Creates an instance remove for the given decoder.
 	 * 
-	 * @param instance : Instance to write
+	 * @param decoder : Decoder where instances are erased
 	 */
 	IRUnwriter(Decoder* decoder);
 
 	/**
-	 * Unwrite the instance from the given decoder.
+	 * @brief Unwrite the instance from the given decoder.
 	 * 
 	 * @param instance: the Instance to remove
      *

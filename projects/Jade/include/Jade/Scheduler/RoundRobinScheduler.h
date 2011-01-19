@@ -73,7 +73,6 @@ public:
 	~RoundRobinScheduler();
 
 	void createScheduler(Decoder* decoder);
-	void execute(std::string stimulus);
 	void stop(pthread_t* thread);
 
 	llvm::Function* getMainFunction(){return scheduler;};

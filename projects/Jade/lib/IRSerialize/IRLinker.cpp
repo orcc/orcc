@@ -28,79 +28,38 @@
  */
 
 /**
-@brief Implementation of class Decoder
+@brief Implementation of class IRLinker
 @author Jerome Gorin
-@file Decoder.cpp
+@file IRLinker.cpp
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#include <list>
 #include <iostream>
-#include <fstream>
-
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Fifo/AbstractConnector.h"
-#include "Jade/Core/Network.h"
-#include "Jade/Configuration/ConfigurationEngine.h"
-#include "Jade/Fifo/AbstractConnector.h"
-#include "Jade/Jit/LLVMExecution.h"
-#include "Jade/Scheduler/RoundRobinScheduler.h"
+#include "Jade/Core/Port.h"
+#include "Jade/Serialize/IRLinker.h"
+
+#include "llvm/Module.h"
+
+#include "IRConstant.h"
 //------------------------------
 
-using namespace llvm;
 using namespace std;
+using namespace llvm;
 
-Decoder::Decoder(llvm::LLVMContext& C, Configuration* configuration): Context(C){
-	//Set property of the decoder
-	this->configuration = configuration;
-	this->thread = NULL;
-	this->executionEngine = NULL;
-	this->scheduler = new RoundRobinScheduler(Context);
-	this->fifo = configuration->getConnector();
+IRLinker::IRLinker(Decoder* decoder){
+	this->decoder = decoder;
 
-	//Create a new module that contains the current decoder
-	module = new Module("decoder", C);
-
-	//Configure the decoder
-	ConfigurationEngine engine(Context);
-	engine.configure(this);
-
-	//Create execution engine
-	executionEngine = new LLVMExecution(Context, this);
-	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine); //Todo : simplify process
 }
 
-Decoder::~Decoder (){
-	delete scheduler;
-	delete module;
+IRLinker::~IRLinker(){
+
 }
 
-void Decoder::start(){
-	scheduler->setSource(stimulus);
-		
-	executionEngine->run();
-}
+int IRLinker::link(list<pair<Instance*, Instance*>>* instances){
 
-void Decoder::stop(){
-	executionEngine->stop(thread);
-}
-
-void Decoder::startInThread(pthread_t* thread){
-	this->thread = thread;
-	pthread_create( thread, NULL, &Decoder::threadStart, this );
-}
-
-void* Decoder::threadStart( void* args ){
-	Decoder* decoder = static_cast<Decoder*>(args);
-	decoder->start();
-	return NULL;
-}
-
-void Decoder::setStimulus(std::string file){
-	this->stimulus = file;
+	return 0;
 }
