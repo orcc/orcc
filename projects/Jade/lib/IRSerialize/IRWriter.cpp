@@ -42,6 +42,7 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Jit/LLVMWriter.h"
 #include "Jade/Serialize/IRWriter.h"
+#include "Jade/Scheduler/ActionSchedulerAdder.h"
 
 #include "llvm/Module.h"
 
@@ -51,11 +52,17 @@
 using namespace std;
 using namespace llvm;
 
-IRWriter::IRWriter(Decoder* decoder){
+IRWriter::IRWriter(LLVMContext& C, Decoder* decoder): Context(C){
 	this->decoder = decoder;
+
+	//Set the action scheduler adder
+	this->actionSchedulerAdder = new ActionSchedulerAdder(Context, decoder);
 }
 
 IRWriter::~IRWriter(){
+	
+	delete actionSchedulerAdder;
+	
 	if(!writer){
 		delete writer;
 	}
@@ -73,12 +80,17 @@ bool IRWriter::write(Instance* instance){
 	writer = new LLVMWriter(instance->getId()+"_", decoder);	
 	writeInstance(instance);
 
+	//Adding action scheduler
+	actionSchedulerAdder->transform(instance);
+
+	//Add the instance in the scheduler
+	Scheduler* scheduler = decoder->getScheduler();
+	scheduler->addInstance(instance);
+
 	return true;
 }
 
 void IRWriter::writeInstance(Instance* instance){
-	//Set the property of the instance
-	instance->setDecoder(decoder);
 	
 	//Get ports from the instance
 	inputs = instance->getInputs();
@@ -94,6 +106,7 @@ void IRWriter::writeInstance(Instance* instance){
 	list<Action*>* actions = writeActions(actor->getActions());
 	actionScheduler = writeActionScheduler(actor->getActionScheduler());
 
+	//Set properties of the instance
 	instance->setActions(actions);
 	instance->setStateVars(stateVars);
 	instance->setParameters(parameters);

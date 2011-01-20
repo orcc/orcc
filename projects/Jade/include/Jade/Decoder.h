@@ -69,7 +69,7 @@ public:
 	/**
 	 * Create a new decoder using an XDF network.
 	 * 
-	 * @param C : LLVMContext of LLVM JIT
+	 * @param C : the LLVMContext
 	 *            
 	 * @param jit : jit use in this decoder
 	 *            

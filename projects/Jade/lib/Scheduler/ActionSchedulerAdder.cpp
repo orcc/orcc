@@ -50,9 +50,9 @@
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 #include "Jade/Fifo/AbstractConnector.h"
-#include "Jade/Transform/ActionSchedulerAdder.h"
+#include "Jade/Scheduler/ActionSchedulerAdder.h"
 //------------------------------
 
 using namespace llvm;
@@ -62,19 +62,11 @@ ActionSchedulerAdder::ActionSchedulerAdder(llvm::LLVMContext& C, Decoder* decode
 	this->decoder = decoder;
 }
 
-void ActionSchedulerAdder::transform() {
-	map<string, Instance*>::iterator it;
-	Configuration* configuration = decoder->getConfiguration();
-	map<string, Instance*>* instances = configuration->getInstances();
-	
-	for (it = instances->begin(); it != instances->end(); ++it){
-		setInstance(it->second);
-	}
-}
-
-void ActionSchedulerAdder::setInstance(Instance* instance) {
+void ActionSchedulerAdder::transform(Instance* instance) {
+	//Create action scheduler
 	createScheduler(instance);
 
+	//Create an action scheduler initializer
 	if (instance->hasInitializes()){
 		createInitialize(instance);
 	}

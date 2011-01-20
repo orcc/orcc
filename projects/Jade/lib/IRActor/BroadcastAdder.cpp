@@ -40,10 +40,10 @@
 #include <sstream>
 
 #include "Jade/Actor/BroadcastActor.h"
+#include "Jade/Actor/BroadcastAdder.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Network.h"
-#include "Jade/Transform/BroadcastAdder.h"
 //------------------------------
 
 using namespace std;

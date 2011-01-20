@@ -60,7 +60,7 @@ Reconfiguration::Reconfiguration(Decoder* decoder, Configuration* configuration)
 	markInstances(&added, &toAdd);
 
 	//Couple similar instances
-	detectInstances(&intersect, &toKeep);
+	detectInstances(&intersect);
 }
 
 void Reconfiguration::comparePackages(map<string, Package*>* ref,
@@ -135,18 +135,35 @@ void Reconfiguration::markInstances(map<string, Actor*>* actors, list<Instance*>
 	}
 }
 
-void Reconfiguration::detectInstances(map<string, Actor*>* actors, list<pair<Instance*, Instance*>>* instances){
+void Reconfiguration::detectInstances(map<string, Actor*>* actors){
 	map<string, Actor*>::iterator it;
 
 	//Iterate though all marked actors
 	for (it = actors->begin(); it != actors->end(); it++){
-
-		//Get instances of the actor
 		Actor* actor = it->second;
-		list<Instance*>* childs = actor->getInstances();
+		
+		//Get the original instances
+		list<Instance*>::iterator itRef;
+		list<Instance*> refChilds = refConfiguration->getInstances(actor);
 
+		//And the new instances
+		list<Instance*>::iterator itCur;
+		list<Instance*> newChilds = curConfiguration->getInstances(actor);
 
+		//Couple instances
+		for (itRef = refChilds.begin(), itCur = newChilds.begin(); itRef != refChilds.end() && itCur != newChilds.end() ; itRef++, itCur++){
+			toKeep.push_back(pair<Instance*, Instance*>(*itRef, *itCur));
+		}
 
+		//Set remaining instance of reference configuration to remove
+		for (; itRef != refChilds.end(); itRef++){
+			toRemove.push_back(*itRef);
+		}
+
+		//Set remaining instance of current configuration to add
+		for (; itCur != newChilds.end(); itCur++){
+			toAdd.push_back(*itCur);
+		}
 	}
 
 }

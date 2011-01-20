@@ -39,7 +39,7 @@
 #ifndef INSTANCEINTERNALIZE_H
 #define INSTANCEINTERNALIZE_H
 
-#include "Jade/Transform/DecoderTransformation.h"
+#include "DecoderTransformation.h"
 //------------------------------
 
 class Instance;

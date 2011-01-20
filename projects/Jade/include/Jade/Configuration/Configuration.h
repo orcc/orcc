@@ -63,13 +63,22 @@ public:
 	Configuration(Network* network, AbstractConnector* connector);
 
 	/*!
-     *  @brief Return a list of the Instance contained in the network.
+     *  @brief Return a list of Instance contained in the configuration.
      *
-     *  Return all Instance of the current network to instanciate.
+     *  Return all Instance of the current configuration.
 	 *   
-     *  @return a map of Actor contained in the network
+     *  @return a map of Instance contained in the configuration.
      */
 	std::map<std::string, Instance*>* getInstances(){return &instances;};
+
+	/*!
+     *  @brief Return a list of Instance of an actor in the configuration.
+     *
+     *  Return all Instance of an actor contains in the configuration.
+	 *   
+     *  @return a list of Instance of an Actor contained in the configuration.
+     */
+	std::list<Instance*> getInstances(Actor* actor);
 
 	/**
      *  @brief Get of an instance in the configuration

@@ -42,7 +42,7 @@
 #include <map>
 
 #include "Jade/Core/Actor.h"
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 //------------------------------
 
 
@@ -79,6 +79,35 @@ public:
 	~IRLinker();
 
 private:
+	/**
+	 * @brief Link two instances
+	 *
+	 * @param refInstance : the reference Instance to link.
+	 *
+	 * @param instance : the destination Instance.
+	 */
+	void linkInstance(Instance* refinstance, Instance* instance);
+
+	/**
+	 * @brief Link a list of ports to an instance
+	 *
+	 * Link a list of ports from reference to new ports
+	 *
+	 * @param port : reference ports
+	 *
+	 * @param instance : destination Instance
+	 */
+	void linkPorts(std::map<std::string, Port*>* ports, Instance* instance);
+
+	/**
+	 * @brief Link a list of variable to an Instance
+	 * 
+	 * @param vars : the reference variables
+	 *
+	 * @param instance : destination Instance
+	 */
+	void linkVariables(std::map<std::string, Variable*>* vars, Instance* instance);
+
 	/** Decoder where instance are linked */
 	Decoder* decoder;
 };

@@ -40,6 +40,8 @@
 #define RECONFIGURATION_H
 
 #include "Jade/Configuration/Configuration.h"
+
+class Decoder;
 //------------------------------
 
 /**
@@ -145,8 +147,7 @@ private:
 	 *
 	 *	@param instance : list of couple similar Instances
      */
-	void detectInstances(std::map<std::string, Actor*>* actors, 
-					   std::list<std::pair<Instance*, Instance*>>* instances);
+	void detectInstances(std::map<std::string, Actor*>* actors);
 
 	/** Reference configuration*/
 	Configuration* refConfiguration;

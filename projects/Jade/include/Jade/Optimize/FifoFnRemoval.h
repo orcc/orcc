@@ -39,7 +39,7 @@
 #ifndef FIFOFNREMOVAL_H
 #define FIFOFNREMOVAL_H
 
-#include "Jade/Transform/DecoderTransformation.h"
+#include "Jade/Optimize/DecoderTransformation.h"
 //------------------------------
 
 /**

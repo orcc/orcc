@@ -60,6 +60,23 @@ IRLinker::~IRLinker(){
 }
 
 int IRLinker::link(list<pair<Instance*, Instance*>>* instances){
+	list<pair<Instance*, Instance*>>::iterator it;
+
+	//Iterate though instances to link
+	for (it = instances->begin(); it != instances->end(); it++){
+		linkInstance(it->first, it->second);
+	}
 
 	return 0;
 }
+
+void IRLinker::linkInstance(Instance* refinstance, Instance* instance){
+
+	instance->setActions(refinstance->getActions());
+	instance->setStateVars(refinstance->getStateVars());
+	instance->setParameters(refinstance->getParameters());
+	instance->setProcs(refinstance->getProcs());
+	instance->setInitializes(refinstance->getInitializes());
+	instance->setActionScheduler(refinstance->getActionScheduler());
+}
+

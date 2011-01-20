@@ -52,7 +52,7 @@ class JIT;
 class LLVMWriter;
 
 #include "Jade/Core/Actor.h"
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 //------------------------------
 
 

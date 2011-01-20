@@ -81,20 +81,13 @@ public:
 	~ActionSchedulerAdder(){};
 
 	/**
-     *  @brief Start the transformation
+     *  @brief Start the transformation on an instance
+	 *
+	 *  @param instance : the Instance to transform
      */
-	void transform();
+	void transform(Instance* instance);
 
 private:
-
-	/**
-     *  @brief Set an action scheduler to the instance
-	 *
-	 *	Add an action scheduler to the given instance
-	 *
-	 *  @param instance : the Instance to add the action scheduler
-     */
-	void setInstance(Instance* instance);
 	
 	/**
      *  @brief Create an action scheduler

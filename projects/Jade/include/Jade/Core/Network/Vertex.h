@@ -40,7 +40,7 @@
 #define VERTEX_H
 
 #include "Jade/Graph/HDAGVertex.h"
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 
 class Port;
 //------------------------------

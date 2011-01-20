@@ -55,16 +55,18 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(llvm::LLVMContext& C, Configuration* configuration): Context(C){
+Decoder::Decoder(LLVMContext& C, Configuration* configuration): Context(C){
 	//Set property of the decoder
 	this->configuration = configuration;
 	this->thread = NULL;
 	this->executionEngine = NULL;
-	this->scheduler = new RoundRobinScheduler(Context);
-	this->fifo = configuration->getConnector();
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
+
+	//Set elements of the decoder
+	this->scheduler = new RoundRobinScheduler(Context, this);
+	this->fifo = configuration->getConnector();
 
 	//Configure the decoder
 	ConfigurationEngine engine(Context);

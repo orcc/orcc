@@ -51,7 +51,8 @@ namespace llvm{
 
 
 class BroadcastActor;
-class Decoder;
+class Network;
+class Configuration;
 //------------------------------
 
 /**
@@ -82,7 +83,7 @@ public:
 		this->clasz = clasz;
 		this->parameterValues = parameterValues;
 		this->actor = NULL;
-		this->decoder = NULL;
+		this->configuration = NULL;
 		this->stateVars = NULL;
 		this->parameters = NULL;
 		this->procedures = NULL;
@@ -103,7 +104,7 @@ public:
 	Instance(std::string id, Actor* actor){
 		this->id = id;
 		this->actor = actor;
-		this->decoder = NULL;
+		this->configuration = NULL;
 		this->stateVars = NULL;
 		this->parameters = NULL;
 		this->procedures = NULL;
@@ -139,15 +140,6 @@ public:
      */
 	Actor* getActor(){return actor;};
 
-
-	/*!
-     * @brief Return true if this instance is concrete
-     *
-	 * @return true if the instance is concrete, otherwise false
-     *
-     */
-	bool isConcrete(){return decoder!=NULL;};
-
 	/*!
      *  @brief Setter of actor
      *
@@ -158,13 +150,22 @@ public:
 	void setActor(Actor* actor);
 
 	/*!
-     *  @brief Setter of decoder
+     *  @brief Set the configuration of instance
      *
-	 *	Set the decoder where this instance is written
+	 *	Set the configuration where this instance is references
 	 *
-	 *  @param decoder : The decoder where the instance is written
+	 *  @param configuration : the Configuration where instance is refered.
      */
-	void setDecoder(Decoder* decoder){this->decoder = decoder;};
+	void setConfiguration(Configuration* configuration){this->configuration = configuration;};
+
+	/*!
+     *  @brief Get the configuration of instance
+     *
+	 *	Get the configuration where this instance is references
+	 *
+	 *  @return the Configuration where instance is refered.
+     */
+	Configuration* getConfiguration(){return configuration;};
 
 	/**
      *  @brief get the Port corresponding to string name
@@ -390,16 +391,21 @@ private:
 	std::string clasz;	
 
 	/**
-	 * the actor referenced by this instance. May be null< if this
+	 * the actor referenced by this instance. May be null if this
 	 * instance references a network or a broadcast.
 	 */
 	Actor* actor;
 
+	/**
+	 * The network referenced by this instance. May be <code>null</code> if this
+	 * instance references an actor or a broadcast.
+	 */
+	Network* network;
 
 	/**
-	 * the decoder where the instance has been made concrete.
+	 * The configuration that references this instance.
 	 */
-	Decoder* decoder;
+	Configuration* configuration;
 
 	/** Port of the instance */
 	std::map<std::string, Port*> inputs;

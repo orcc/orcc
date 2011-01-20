@@ -66,6 +66,9 @@ void Configuration::setInstances(){
 			Instance* instance = vertex->getInstance();
 			instances.insert(pair<string,Instance*>(instance->getId(), instance));
 			
+			//Reference the configuration in the instance
+			instance->setConfiguration(this);
+
 			//Insert actor requiered for this network
 			string clasz = instance->getClasz();
 			actorFiles.push_back(clasz);
@@ -82,11 +85,13 @@ Actor* Configuration::getActor(std::string name){
 
 	it = actors->find(name);
 
-	if(it != actors->end()){
-		return it->second;
+	//Actor not found
+	if(it == actors->end()){
+		return NULL;
 	}
 
-	return NULL;
+	//Actor found
+	return it->second;
 }
 
 void Configuration::setActors(std::map<std::string, Actor*>* actors){
@@ -120,4 +125,24 @@ Instance* Configuration::getInstance(std::string name){
 	}
 
 	return it->second;
+}
+
+list<Instance*> Configuration::getInstances(Actor* actor){
+	list<Instance*>::iterator it;
+	
+	//Resulting list
+	list<Instance*> result;
+
+	//Loop other all instances of the actor
+	list<Instance*>* childs = actor->getInstances();
+
+	for (it = childs->begin(); it != childs->end(); it++){
+		//If configuration of the instance correspond to this configuration
+		if ((*it)->getConfiguration() == this){
+			//Store into the resulting list
+			result.push_back(*it);
+		}
+	}
+
+	return result;
 }

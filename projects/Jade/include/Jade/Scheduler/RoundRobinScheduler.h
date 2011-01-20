@@ -45,7 +45,6 @@ namespace llvm{
 	class LLVMContext;
 }
 
-class JIT;
 class Decoder;
 
 #include "Scheduler.h"
@@ -69,10 +68,9 @@ public:
 	 *
 	 *	@param decoder : the Decoder to insert the round robin scheduler into
      */
-	RoundRobinScheduler(llvm::LLVMContext& C, bool verbose = false);
+	RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool verbose = false);
 	~RoundRobinScheduler();
 
-	void createScheduler(Decoder* decoder);
 	void stop(pthread_t* thread);
 
 	llvm::Function* getMainFunction(){return scheduler;};
@@ -97,14 +95,13 @@ private:
 
 	/** Decoder bound to the round robin scheduler */
 	Decoder* decoder;
-	Configuration* configuration;
 
 	/** Main scheduling function */
 	llvm::Function* scheduler;
 
 	/** Main scheduling component */
-	llvm::BasicBlock* initializeBB;
-	llvm::BasicBlock* schedulerBB;
+	llvm::Instruction* initBrInst;
+	llvm::Instruction* schedBrInst;
 
 	/** Function calls */
 	std::map<llvm::Function*, llvm::CallInst*> functionCall;

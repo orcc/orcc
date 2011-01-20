@@ -49,9 +49,10 @@ namespace llvm{
 class Decoder;
 class JIT;
 class LLVMWriter;
+class ActionSchedulerAdder;
 
 #include "Jade/Core/Actor.h"
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 //------------------------------
 
 
@@ -69,9 +70,11 @@ public:
 	/**
 	 * @brief Creates an instance writer on the given decoder.
 	 * 
+	 * @param C : the LLVMContext
+	 *
 	 * @param decoder : Decoder to write instances into
 	 */
-	IRWriter(Decoder* decoder);
+	IRWriter(llvm::LLVMContext& C, Decoder* decoder);
 
 	/**
 	 * @brief Write the given instance
@@ -252,8 +255,14 @@ private:
 	 */
 	Action* getAction(Action* action);
 
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
+
 	/** Source actor */
 	Actor* actor;
+
+	/** Action scheduler adder */
+	ActionSchedulerAdder* actionSchedulerAdder;
 
 	/** Destinated instance */
 	Instance* instance;

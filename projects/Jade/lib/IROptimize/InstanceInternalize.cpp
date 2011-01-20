@@ -41,7 +41,7 @@
 #include "llvm/Function.h"
 
 #include "Jade/Configuration/Configuration.h"
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 #include "Jade/Optimize/InstanceInternalize.h"
 
 //------------------------------

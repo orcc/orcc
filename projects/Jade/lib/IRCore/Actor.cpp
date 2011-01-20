@@ -39,7 +39,7 @@
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Variable.h"
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 #include "Jade/Util/PackageMng.h"
 //------------------------------
 

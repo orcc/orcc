@@ -40,7 +40,7 @@
 #include "llvm/DerivedTypes.h"
 #include "llvm/GlobalVariable.h"
 
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 #include "Jade/Core/Variable.h"
 //------------------------------
 

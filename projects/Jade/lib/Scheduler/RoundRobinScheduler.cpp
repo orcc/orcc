@@ -55,7 +55,7 @@
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Variable.h"
-#include "Jade/Core/Instance.h"
+#include "Jade/Core/Network/Instance.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
 #include "display.h"
@@ -73,27 +73,24 @@ static int Filesize(){
 	return st.st_size;
 }
 
-RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, bool verbose): Context(C) {
-	this->scheduler = NULL;
-	this->initializeBB = NULL;
-	this->schedulerBB = NULL;
-	this->verbose = verbose;
-	verboseDisplay = verbose;
-}
-
-RoundRobinScheduler::~RoundRobinScheduler (){
-	scheduler->eraseFromParent();
-}
-
-void RoundRobinScheduler::createScheduler(Decoder* decoder){
+RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder, bool verbose): Context(C) {
 	this->decoder = decoder;
-	this->configuration = decoder->getConfiguration();
-	
+	this->scheduler = NULL;
+	this->initBrInst = NULL;
+	this->schedBrInst = NULL;
+	this->verbose = verbose;
+
 	//Create the scheduler function
 	createSchedulerFn();
 	
 	//Set compare file if needed
 	setCompare();
+
+	verboseDisplay = verbose;
+}
+
+RoundRobinScheduler::~RoundRobinScheduler (){
+	scheduler->eraseFromParent();
 }
 
 void RoundRobinScheduler::createSchedulerFn(){
@@ -106,26 +103,19 @@ void RoundRobinScheduler::createSchedulerFn(){
 	GlobalVariable* stopGV = (GlobalVariable*)module->getOrInsertGlobal("stop", Type::getInt1Ty(Context));
 	stopGV->setInitializer(ConstantInt::get(Type::getInt1Ty(Context), 0));
 	
-	// create scheduler
-	map<string, Instance*>* instances = configuration->getInstances();
+	// create main scheduler function
 	scheduler = cast<Function>(module->getOrInsertFunction("main", Type::getInt32Ty(Context),
                                           (Type *)0));
 										  
 
 	// Add a basic block entry to the scheduler.
-	initializeBB = BasicBlock::Create(Context, "entry", scheduler);
+	BasicBlock* initializeBB = BasicBlock::Create(Context, "entry", scheduler);
 
 	// Add a basic block to bb to the scheduler.
-	schedulerBB = BasicBlock::Create(Context, "bb", scheduler);
-
-	//Add instance in scheduler loop
-	for (it = instances->begin(); it != instances->end(); ++it){
-		addInstance(it->second);
-	}
-
+	BasicBlock* schedulerBB = BasicBlock::Create(Context, "bb", scheduler);
 	
-	// Create a branch to bb
-	Instruction* brEntryInst = BranchInst::Create(schedulerBB, initializeBB);
+	// Create a branch to bb and store it for later insertions
+	initBrInst = BranchInst::Create(schedulerBB, initializeBB);
 	
 	// Add a basic block return to the scheduler.
 	BasicBlock* BBReturn = BasicBlock::Create(Context, "return", scheduler);
@@ -134,7 +124,7 @@ void RoundRobinScheduler::createSchedulerFn(){
 
 	// Load stop value and test if the scheduler must be stop
 	LoadInst* stopVal = new LoadInst(stopGV, "", schedulerBB);
-	Instruction* brBbInst = BranchInst::Create(BBReturn, schedulerBB, stopVal, schedulerBB);
+	schedBrInst = BranchInst::Create(BBReturn, schedulerBB, stopVal, schedulerBB);
 }
 
 void RoundRobinScheduler::stop(pthread_t* thread){
@@ -146,6 +136,9 @@ void RoundRobinScheduler::stop(pthread_t* thread){
 }
 
 void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
+
+	//Get configuration of the decoder
+	Configuration* configuration = decoder->getConfiguration();
 
 	//Set exit function
 	exit_decoder = (void(*)(int))executionEngine->getExit();
@@ -181,6 +174,9 @@ void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 void RoundRobinScheduler::setSource(string input){
 	Module* module = decoder->getModule();
 	
+	//Get configuration of the decoder
+	Configuration* configuration = decoder->getConfiguration();
+
 	//Get source instance
 	Instance* source = configuration->getInstance("source");
 	
@@ -245,12 +241,12 @@ void RoundRobinScheduler::addInstance(Instance* instance){
 	
 	if (actionScheduler->hasInitializeScheduler()){
 		Function* initialize = actionScheduler->getInitializeFunction();
-		CallInst* CallInit = CallInst::Create(initialize, "", initializeBB);
+		CallInst* CallInit = CallInst::Create(initialize, "", initBrInst);
 		functionCall.insert(pair<Function*, CallInst*>(initialize, CallInit));
 	}
 
 	Function* scheduler = actionScheduler->getSchedulerFunction();
-	CallInst* CallSched = CallInst::Create(scheduler, "", schedulerBB);
+	CallInst* CallSched = CallInst::Create(scheduler, "", schedBrInst);
 	CallSched->setTailCall();
 	functionCall.insert(pair<Function*, CallInst*>(scheduler, CallSched));
 }

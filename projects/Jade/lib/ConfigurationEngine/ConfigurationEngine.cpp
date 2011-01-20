@@ -41,15 +41,14 @@
 #include "Reconfiguration.h"
 
 #include "Jade/Decoder.h"
+#include "Jade/Actor/BroadcastAdder.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Fifo/AbstractConnector.h"
-#include "Jade/Transform/BroadcastAdder.h"
 #include "Jade/Scheduler/Scheduler.h"
 #include "Jade/Serialize/IRLinker.h"
 #include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Serialize/IRWriter.h"
-#include "Jade/Transform/ActionSchedulerAdder.h"
 //------------------------------
 
 using namespace std;
@@ -71,23 +70,15 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	broadAdder.transform();
 
 	//Write instance
-	IRWriter writer(decoder);
+	IRWriter writer(Context, decoder);
 	map<string, Instance*>* instances = configuration->getInstances();
 
 	for (it = instances->begin(); it != instances->end(); it++){
 		writer.write(it->second);
 	}
 
-	//Adding action scheduler
-	ActionSchedulerAdder actionSchedulerAdder(Context, decoder);
-	actionSchedulerAdder.transform();
-
 	// Setting connections of the decoder
 	connector->setConnections(decoder);
-
-	//Set the scheduler
-	Scheduler* scheduler = decoder->getScheduler();
-	scheduler->createScheduler(decoder);
 }
 
 void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configuration){
@@ -109,7 +100,7 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	}
 
 	//Write new instances
-	IRWriter writer(decoder);
+	IRWriter writer(Context, decoder);
 
 	//Iterate though all instances to remove
 	list<Instance*>* adds = reconfiguration.getToAdd();
