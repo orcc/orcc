@@ -186,9 +186,6 @@ private:
 	/** module for extern functions */
 	llvm::Module* externMod;
 
-	/** Counter of fifo */
-	int fifoCnt;
-
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 	

@@ -187,7 +187,7 @@ public:
 
 	void setConnection(Connection* connection, Decoder* decoder);
 	
-	void setConnections(Decoder* decoder);
+	void setConnections(Configuration* configuration, Decoder* decoder);
 
 	void unsetConnection(Connection* connection, Decoder* decoder){};
 
@@ -195,9 +195,6 @@ private:
 
 	/** module for extern functions */
 	llvm::Module* externMod;
-
-	/** Counter of fifo */
-	int fifoCnt;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

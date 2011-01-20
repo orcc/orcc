@@ -121,7 +121,8 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				
 				//Create an instance for the broadcast
 				Instance* newInstance = new Instance(name, actorBCast);
-				
+				addedBroads.push_back(newInstance);
+
 				//Insert broadcast in configuration
 				configuration->insertSpecific(actorBCast);
 				

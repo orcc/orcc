@@ -78,7 +78,7 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	}
 
 	// Setting connections of the decoder
-	connector->setConnections(decoder);
+	connector->setConnections(configuration, decoder);
 }
 
 void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configuration){
@@ -99,10 +99,19 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 		unwriter.remove(*it);
 	}
 
+	
 	//Write new instances
 	IRWriter writer(Context, decoder);
 
-	//Iterate though all instances to remove
+	// Adding new broadcast 
+	BroadcastAdder broadAdder(Context, configuration);
+	broadAdder.transform();
+	list<Instance*>* broads = broadAdder.getBroads();
+	for (it = broads->begin(); it != broads->end(); it++){
+		writer.write(*it);
+	}
+	
+	//Iterate though all instances to add
 	list<Instance*>* adds = reconfiguration.getToAdd();
 	for (it = adds->begin(); it != adds->end(); it++){
 		writer.write(*it);
@@ -115,6 +124,10 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	list<pair<Instance*, Instance*>>* keeps = reconfiguration.getToKeep();
 	linker.link(keeps);
 
+	// Setting connections of the decoder
+	AbstractConnector* connector = configuration->getConnector();
+	connector->setConnections(configuration, decoder);
+
 }
 
 void ConfigurationEngine::clearConnections(Decoder* decoder){
@@ -123,7 +136,7 @@ void ConfigurationEngine::clearConnections(Decoder* decoder){
 
 	//Remove connections
 	AbstractConnector* connector = configuration->getConnector();
-	connector->unsetConnections(decoder);
+	connector->unsetConnections(configuration, decoder);
 
 	//Unwrite broadcasts
 	list<Actor*>::iterator itActor;

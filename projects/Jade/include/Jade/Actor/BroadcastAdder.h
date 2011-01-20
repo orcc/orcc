@@ -78,6 +78,13 @@ public:
 
 	void transform();
 
+	/**
+     *  @brief Get broadcast created
+	 *
+	 *  @return a list of instance created
+     */
+	std::list<Instance*>* getBroads(){return &addedBroads;};
+
 	~BroadcastAdder();
 
 private:
@@ -144,6 +151,9 @@ private:
 
 	/** list of connections to be removed */
 	std::list<Connection*> toBeRemoved;
+
+	/** list of broadcast added */
+	std::list<Instance*> addedBroads;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

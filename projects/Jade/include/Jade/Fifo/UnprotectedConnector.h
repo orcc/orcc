@@ -141,9 +141,6 @@ public:
 
 private:
 
-	/** Counter of fifo */
-	int fifoCnt;
-
 	/** Other functions declared in the header */
 	std::list<llvm::Function*> otherFunctions;
 

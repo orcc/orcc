@@ -279,9 +279,8 @@ void TraceConnector::setConnection(Connection* connection, Decoder* decoder){
 	
 }
 
-void TraceConnector::setConnections(Decoder* decoder){
-	Configuration* Configuration = decoder->getConfiguration();
-	Network* network = Configuration->getNetwork();
+void TraceConnector::setConnections(Configuration* configuration, Decoder* decoder){
+	Network* network = configuration->getNetwork();
 	HDAGGraph* graph = network->getGraph();
 	
 	int edges = graph->getNbEdges();

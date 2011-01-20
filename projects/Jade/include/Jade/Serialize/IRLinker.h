@@ -89,24 +89,15 @@ private:
 	void linkInstance(Instance* refinstance, Instance* instance);
 
 	/**
-	 * @brief Link a list of ports to an instance
+	 * @brief Link two list of ports
 	 *
-	 * Link a list of ports from reference to new ports
+	 * Link port's variable from a list of ports to destination ports
 	 *
-	 * @param port : reference ports
+	 * @param refPorts : reference ports
 	 *
-	 * @param instance : destination Instance
+	 * @param ports : the destination ports
 	 */
-	void linkPorts(std::map<std::string, Port*>* ports, Instance* instance);
-
-	/**
-	 * @brief Link a list of variable to an Instance
-	 * 
-	 * @param vars : the reference variables
-	 *
-	 * @param instance : destination Instance
-	 */
-	void linkVariables(std::map<std::string, Variable*>* vars, Instance* instance);
+	void linkPorts(std::map<std::string, Port*>* refPorts, std::map<std::string, Port*>* ports);
 
 	/** Decoder where instance are linked */
 	Decoder* decoder;

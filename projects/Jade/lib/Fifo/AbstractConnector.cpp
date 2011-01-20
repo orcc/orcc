@@ -178,9 +178,8 @@ Function* AbstractConnector::getReadEndFunction(Type* type){
 	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "readEnd")]];
 }
 
-void AbstractConnector::setConnections(Decoder* decoder){
-	Configuration* Configuration = decoder->getConfiguration();
-	Network* network = Configuration->getNetwork();
+void AbstractConnector::setConnections(Configuration* configuration, Decoder* decoder){
+	Network* network = configuration->getNetwork();
 	HDAGGraph* graph = network->getGraph();
 	
 	int edges = graph->getNbEdges();
@@ -190,9 +189,8 @@ void AbstractConnector::setConnections(Decoder* decoder){
 	}
 }
 
-void AbstractConnector::unsetConnections(Decoder* decoder){
-	Configuration* Configuration = decoder->getConfiguration();
-	Network* network = Configuration->getNetwork();
+void AbstractConnector::unsetConnections(Configuration* configuration, Decoder* decoder){
+	Network* network = configuration->getNetwork();
 	HDAGGraph* graph = network->getGraph();
 	
 	int edges = graph->getNbEdges();
@@ -200,5 +198,8 @@ void AbstractConnector::unsetConnections(Decoder* decoder){
 	for (int i = 0; i < edges; i++){
 		unsetConnection((Connection*)graph->getEdge(i), decoder);
 	}
+
+	//Reinitialize counter
+	fifoCnt = 0;
 }
 

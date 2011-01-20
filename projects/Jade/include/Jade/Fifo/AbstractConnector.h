@@ -50,6 +50,7 @@ namespace llvm{
 }
 
 class Actor;
+class Configuration;
 class Decoder;
 class JIT;
 class Connection;
@@ -252,13 +253,13 @@ public:
 	 * @brief print connections in the given decoder.
 	 *
 	 */
-	virtual void setConnections(Decoder* decoder);
+	virtual void setConnections(Configuration* configuration, Decoder* decoder);
 
 	/**
 	 * @brief remove connections from the given decoder.
 	 *
 	 */
-	virtual void unsetConnections(Decoder* decoder);
+	virtual void unsetConnections(Configuration* configuration, Decoder* decoder);
 
 protected:
 	/** module of the fifo */
@@ -281,6 +282,9 @@ protected:
 
 	/** Extern structs */
 	std::list<llvm::Function*> externStruct;
+
+	/** Counter of fifo */
+	int fifoCnt;
 
 	/**
     *  @brief Initialize fifo access map

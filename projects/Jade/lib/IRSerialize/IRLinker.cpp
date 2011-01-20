@@ -72,11 +72,38 @@ int IRLinker::link(list<pair<Instance*, Instance*>>* instances){
 
 void IRLinker::linkInstance(Instance* refinstance, Instance* instance){
 
+	//Link ports of the instance
+	linkPorts(refinstance->getInputs(), instance->getInputs());
+	linkPorts(refinstance->getOutputs(), instance->getOutputs());
+
 	instance->setActions(refinstance->getActions());
 	instance->setStateVars(refinstance->getStateVars());
 	instance->setParameters(refinstance->getParameters());
 	instance->setProcs(refinstance->getProcs());
 	instance->setInitializes(refinstance->getInitializes());
 	instance->setActionScheduler(refinstance->getActionScheduler());
+}
+
+void IRLinker::linkPorts(map<string, Port*>* refPorts, map<string, Port*>* ports){
+	map<string, Port*>::iterator it;
+
+	for (it = ports->begin(); it != ports->end(); it++){
+		map<string, Port*>::iterator itRef;
+
+		//Find the port occurence in reference ports
+		itRef = refPorts->find(it->first);
+
+		if (itRef == refPorts->end()){
+			cout << "Internal error of reconfiguration. \n";
+			exit(1);
+		}
+		
+		//Link variables
+		Port* port = it->second;
+		Port* refPort = itRef->second;
+
+		port->setGlobalVariable(refPort->getGlobalVariable());
+
+	}
 }
 
