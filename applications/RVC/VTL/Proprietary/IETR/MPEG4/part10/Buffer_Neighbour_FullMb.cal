@@ -21,6 +21,7 @@ gorinje@gmail.com
 package Proprietary.IETR.MPEG4.part10;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.* ;
+import MPEG.Common.Imp_PictureInfo.*;
 
 actor Buffer_Neighbour_FullMb ( int MB_WIDTH , bool IsChroma)
 	uint (size=6) Mb_Type,
@@ -34,23 +35,18 @@ actor Buffer_Neighbour_FullMb ( int MB_WIDTH , bool IsChroma)
   // Port size declaration
   int SAMPLE_SZ       = 16;
   int MB_WIDTH_MAX    = 16;
-  int MB_WIDTH_LUMA   = 16;
-  int MB_WIDTH_CHROMA = 8;
-  
-  	//FIXME! Maximum size of a line in macroclock
-  	uint(size=7) PICWIDTH =720/16;
-  	
+
   	// Index of the macroblock in the current line
   	uint(size=13) mb_Index := 0;
   	uint(size=6)  mb_type  :=0;
   	
 	//List containing edge pixel value 
-	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH_MAX) top_edge := [0 : for int i in 0 .. PICWIDTH * MB_WIDTH_MAX-1];
+	List( type:uint(size=SAMPLE_SZ), size=MAX_PICWIDTH_BLK * MB_WIDTH_MAX) top_edge := [0 : for int i in 0 .. MAX_PICWIDTH_BLK * MB_WIDTH_MAX-1];
 	List( type:uint(size=SAMPLE_SZ), size=MB_WIDTH_MAX ) left_edge := [ 0 : for int i in 0 .. MB_WIDTH_MAX-1];
 	uint(size=SAMPLE_SZ) topLeft_edge := 0;
 	
 	//FIXME! PICWIDTH used
-	List( type:uint(size=SAMPLE_SZ), size=PICWIDTH * MB_WIDTH_MAX) result := [0 : for int i in 0 .. PICWIDTH * MB_WIDTH_MAX-1];
+	List( type:uint(size=SAMPLE_SZ), size=MAX_PICWIDTH_BLK * MB_WIDTH_MAX) result := [0 : for int i in 0 .. MAX_PICWIDTH_BLK * MB_WIDTH_MAX-1];
 	
   
   	//Mb_Type_OK : Send value of edge needed and store the edge of macroblock decoded

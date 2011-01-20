@@ -7,6 +7,7 @@
 //Modified by Damien de Saint Jorre ; IETR/INSA of Rennes (France)
 
 package Proprietary.IETR.MPEG4.part10;
+import MPEG.Common.Imp_Math.*;
 
 actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	int (size=16) Mv,
@@ -29,21 +30,6 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
   List(type: List(type:int(size=16), size=21 ), size=21) TabPix;
   List( type:int(size=32), size=6 ) half_pel := [ 0 : for int i in 0 .. 5 ];
 
-	function Clip1(int x)
-				-->
-			int
-		:
-			if(x > 255)then
-				255
-			else
-				if(x < 0)then
-					0
-				else
-					x
-				end
-			end
-		end
-
 	function SixTapFilter(int a1, int b1, int c1, int c2, int b2, int a2)
 				-->
 			int
@@ -55,8 +41,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				-->
 			int
 		:
-			Clip1(
-				( SixTapFilter(a1,b1,c1,c2,b2,a2) + 16 ) >> 5
+			clip(
+				( SixTapFilter(a1,b1,c1,c2,b2,a2) + 16 ) >> 5,
+				0,255
 			)
 		end
 
@@ -64,8 +51,9 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				-->
 			int
 		:
-			Clip1(
-				(HalfPixel1 + HalfPixel2 + 1) >> 1
+			clip(
+				(HalfPixel1 + HalfPixel2 + 1) >> 1,
+				0,255
 			)
 		end
 
@@ -101,7 +89,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				end
 				temp := SixTapFilter(half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
 				temp := rshift ( temp + 512, 10);
-				temp := Clip1(temp);
+				temp := clip(temp , 0,255);
 			end
 			if xFrac = 2  and yFrac = 1 then 
 				foreach int n in 0 .. 5
@@ -111,7 +99,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				end
 				temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
 				temp  := rshift ( temp + 512 , 10);
-				temp  := Clip1(temp);
+				temp  := clip(temp , 0,255);
 				temp2 := ComputeHalfPixel( TabPix[x_idx][2 + y_idx]     , TabPix[1 + x_idx][2 + y_idx] , TabPix[2 + x_idx][2 + y_idx],
 				                           TabPix[3 + x_idx][2 + y_idx] , TabPix[4 + x_idx][2 + y_idx] , TabPix[5 + x_idx][2 + y_idx]);
 				temp := ComputeQuarterPixel(temp,temp2);
@@ -124,7 +112,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				end
 				temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
 				temp  := rshift ( temp + 512, 10);
-				temp  := Clip1(temp);
+				temp  := clip(temp , 0,255);
 				temp2 := ComputeHalfPixel( TabPix[x_idx][3 + y_idx]     , TabPix[1 + x_idx][3 + y_idx] , TabPix[2 + x_idx][3 + y_idx] ,
 				                           TabPix[3 + x_idx][3 + y_idx] , TabPix[4 + x_idx][3 + y_idx] , TabPix[5 + x_idx][3 + y_idx]);
 				temp  := ComputeQuarterPixel(temp,temp2);
@@ -142,7 +130,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				end
 				temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
 				temp  := rshift (temp + 512, 10);
-				temp  := Clip1(temp);
+				temp  := clip(temp , 0,255);
 				temp2 := ComputeHalfPixel( TabPix[2 + x_idx][y_idx]     , TabPix[2 + x_idx][1 + y_idx] , TabPix[2 + x_idx][2 + y_idx],
 				                           TabPix[2 + x_idx][3 + y_idx] , TabPix[2 + x_idx][4 + y_idx] , TabPix[2 + x_idx][5 + y_idx]);
 				temp  := ComputeQuarterPixel(temp,temp2);
@@ -174,7 +162,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 				end
 				temp  := SixTapFilter( half_pel[0] , half_pel[1] , half_pel[2] , half_pel[3] , half_pel[4] , half_pel[5]);
 				temp  := rshift (temp+512, 10);
-				temp  := Clip1(temp);
+				temp  := clip(temp , 0,255);
 				temp2 := ComputeHalfPixel( TabPix[3 + x_idx][y_idx]     , TabPix[3 + x_idx][1 + y_idx] , TabPix[3 + x_idx][2 + y_idx] ,
 				                           TabPix[3 + x_idx][3 + y_idx] , TabPix[3 + x_idx][4 + y_idx] , TabPix[3 + x_idx][5 + y_idx]);
 				temp  := ComputeQuarterPixel(temp,temp2);

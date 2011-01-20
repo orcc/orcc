@@ -85,9 +85,11 @@ actor Algo_DCR_Hadamard_LUMA_Scaling ()
     // qp_rem = 5
     18, 23, 18, 23, 23, 29, 23, 29, 18, 23, 18, 23, 23, 29, 23, 29
   ];
-  List( type:uint(size=4), size=16 )  t_Index = [
-    0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
-  ];
+
+  List( type:uint(size=4), size=16 )  t_Index =
+	  [
+	    0, 1, 5, 6, 2, 4, 7,12, 3, 8,11,13, 9,10,14,15
+	  ];
 
   List( type:int(size=16), size=96 ) t_LevelScale;
   int(size=8) qp;

@@ -21,6 +21,8 @@ gorinje@gmail.com
 //Modified by Damien de Saint Jorre IETR/INSA of Rennes (France)
 package Proprietary.IETR.MPEG4.part10;
 
+import MPEG.Common.Imp_PictureInfo.*;
+
 actor Mgnt_Intra_16x16 (int MB_WIDTH)
 	uint(size=13) FirstMbInSlice,
 	uint(size=7)  PicWidthInMb,
@@ -37,8 +39,6 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
 		int(size=16) Y_UpLeft
 		:  
 	int MB_WIDTH_MAX    = 16;
-	int MB_WIDTH_LUMA   = 16;
-	int MB_WIDTH_CHROMA = 8;
 	//List that contains the neighbouring pixel of the current 16x16 Mb, from bottom to top then left to right 
 	List( type:uint(size=16), size=MB_WIDTH_MAX ) left_16x16_edge := [ 0 : for int i in 0 .. MB_WIDTH_MAX-1];
   	List( type:uint(size=16), size=MB_WIDTH_MAX + 4 ) top_16x16_edge := [ 0 : for int i in 0 .. MB_WIDTH_MAX+3];

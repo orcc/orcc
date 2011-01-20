@@ -17,6 +17,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.Common.Imp_PictureInfo.*;
 
 actor Algo_DemuxParserInfoForBlocks_Chroma()
 	int (size=16) Coef_ACR,
@@ -37,20 +38,12 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 		:
 
 
-/*
-*
-* Constants
-*
-*/
-	uint(size=7) PICWIDTH = 64;
-
-
 	bool AcrSent;
 	bool FstMbSent;
 	bool CstrISent;
 	bool IsIntraSent;
 
-	List( type:bool, size=PICWIDTH) is_intra := [false : for int i in 0 .. PICWIDTH-1];
+	List( type:bool, size=MAX_PICWIDTH_BLK) is_intra := [false : for int i in 0 .. MAX_PICWIDTH_BLK-1];
 	bool          intra_top_left := false;	
 	uint(size=13) curr_pos       := 0;
 	bool          CurrValIsIntra := false;
