@@ -54,7 +54,11 @@ Copyright (c) ISO/IEC 2008.
 //Modified by Endri Bezati IETR/INSA Rennes
 
 //Added FSM to the actor
+
+//Delete me!!!
 package Proprietary.IETR.MPEG4.part10.Common;
+
+import MPEG.Common.Imp_PictureInfo.*;
 
 actor Algo_IntraPred_Split()
 	uint(size=1)  MbIntraFlag,
@@ -75,8 +79,6 @@ actor Algo_IntraPred_Split()
 	
 	bool DEBUG_INPUT = false;	
 
-//FIXME! number of MB per line of picture
-	int PICWIDTH = 1280 / 16;
 	//number of MB per lines
 	uint(size=4) mb_intra_type    := 0;
 	// Intra4x4 1, Intra8x8 2, Intra16x16 3
@@ -86,11 +88,11 @@ actor Algo_IntraPred_Split()
 	uint          pic_width_in_mb;
 	uint(size=13) curr_mb_addr;
 	uint(size=13) first_mb_in_slice;
-	List(type: List(type: int(size=5), size=16), size=PICWIDTH) intra4x4predmode:= [ [ 2 : for int j in 0 .. 15 ] : for int i in
-			0 .. PICWIDTH - 1 ];
+	List(type: List(type: int(size=5), size=16), size=MAX_PICWIDTH_BLK) intra4x4predmode:=
+		[ [ 2 : for int j in 0 .. 15 ] : for int i in 0 .. MAX_PICWIDTH_BLK - 1 ];
 	List(type: uint(size=4) , size=16)   InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
 	//FIXME! Maximum size of a line in macroclock
-	List(type: bool, size=PICWIDTH) is_constrained_i_flag := [ false : for int i in 0 .. PICWIDTH - 1 ];
+	List(type: bool, size=MAX_PICWIDTH_BLK) is_constrained_i_flag := [ false : for int i in 0 .. MAX_PICWIDTH_BLK - 1 ];
 
 
 	Get_MbType: action

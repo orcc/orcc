@@ -70,6 +70,8 @@ This copyright notice must be included in all copies or derivative works. Copyri
 
 package Proprietary.IETR.MPEG4.part10;
 
+import MPEG.Common.Imp_Math.*;
+
 actor Algo_IntraPred_CHROMA ()
 		int(size=16) C_LEFT,     // List
 		int(size=16) C_UP,       // List
@@ -89,11 +91,6 @@ actor Algo_IntraPred_CHROMA ()
       		res := res + list[i]; 
      	end
     end
-  end
- 
- 
-  function clip(int x)-->int :
-    if x > 255 then 255 else if x < 0 then 0 else x end end
   end
 
   uint(size=1) left_avail;
@@ -254,7 +251,7 @@ actor Algo_IntraPred_CHROMA ()
     b:= rshift( 34*H + 32, 6);
     c:= rshift( 34*V + 32, 6);
 
-    mpr := [clip( rshift(a + b*(i-3) + c*(j-3) + 16, 5) ): for int i in  0 .. 7, for int j in 0 .. 7];
+    mpr := [clip( rshift(a + b*(i-3) + c*(j-3) + 16, 5) , 0 , 255 ): for int i in  0 .. 7, for int j in 0 .. 7];
   end
 
 

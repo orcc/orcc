@@ -16,6 +16,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+import MPEG.Common.Imp_ByteOperation.*;
 
 actor Algo_DecodeSliceHeader()
 	int (size=32) ValVLD,
@@ -127,12 +128,6 @@ actor Algo_DecodeSliceHeader()
 
 	bool IsNewPic;
 
-	function GetFlag(int(size=32) Val, uint(size=5) Idx)
-				-->
-			bool
-		:
-			(Val & (1 << Idx)) != 0
-		end
 /*   
 *
 * Actions

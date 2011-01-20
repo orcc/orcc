@@ -53,18 +53,23 @@ Copyright (c) ISO/IEC 2008.
 *****************************************************************************/
 package MPEG.Common;
 
-unit Imp_PictureInfo :
+unit Imp_ByteOperation :
 
-	int (size=32) MAX_PICWIDTH_PX  = 1280;
-	int (size=32) MAX_PICHEIGHT_PX = 720;
+	function SetFlag(bool ValFlag, uint(size=5)Idx, int(size=32) Val)
+				-->
+			int(size=32)
+		:
+			if(ValFlag) then
+				Val | (1<<Idx)
+			else
+				Val & (0xFFFFFFFF ^ (1<<Idx))
+			end
+		end
 
-	int (size=32) MAX_PICWIDTH_BLK  = MAX_PICWIDTH_PX  / 16;
-	int (size=32) MAX_PICHEIGHT_BLK = MAX_PICHEIGHT_PX / 16;
-
-	int (size=32) POW2_PICWIDTH_BLK_PLUS1      = 128;
-	int (size=32) MASK_POW2_PICWIDTH_BLK_PLUS1 = 127;
-	int (size=32) LOG2_POW2_PICWIDTH_BLK_PLUS1 = 127;
-
-	int (size=32) MB_WIDTH_CHROMA = 8;
-	int (size=32) MB_WIDTH_LUMA   = 16;
+	function GetFlag(int(size=32) Val, uint(size=5) Idx)
+				-->
+			bool
+		:
+			(Val & (1 << Idx)) != 0
+		end
 end

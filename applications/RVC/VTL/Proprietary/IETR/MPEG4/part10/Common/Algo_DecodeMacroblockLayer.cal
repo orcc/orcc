@@ -17,6 +17,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.Common.Imp_ByteOperation.*;
 
 actor Algo_DecodeMacroblockLayer()
 	int (size=32) ValVLD,
@@ -179,24 +180,6 @@ actor Algo_DecodeMacroblockLayer()
 			else
 				false
 			end
-		end
-
-	function SetFlag(bool ValFlag, uint(size=5)Idx, int(size=32) Val)
-				-->
-			int(size=32)
-		:
-			if(ValFlag) then
-				Val | (1<<Idx)
-			else
-				Val & (0xFFFFFFFF ^ (1<<Idx))
-			end
-		end
-
-	function GetFlag(int(size=32) Val, uint(size=5) Idx)
-				-->
-			bool
-		:
-			(Val & (1 << Idx)) != 0
 		end
 
 	ReadMbType.Asked: action

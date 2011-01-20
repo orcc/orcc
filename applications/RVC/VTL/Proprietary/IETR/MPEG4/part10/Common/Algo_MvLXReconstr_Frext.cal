@@ -55,6 +55,8 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import MPEG.Common.Imp_Math.*;
+import MPEG.Common.Imp_PictureInfo.*;
+
 //Clean me !!!
 actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=6)  mb_type,
@@ -83,9 +85,6 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	bool          DirectPredLX_Out
 		:
 
-	int           SZ_TAB      = 128;
-	int           MASK_TAB    = 127;
-	uint(size=32) LOG2_SZ_TAB = 7;
 
 	List(type: uint(size=2), size=16) TabIdxToX =
 		[ 0, 1, 0, 1, 2, 3, 2, 3, 0, 1,
@@ -104,8 +103,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	];
 
 	//Size of MvTab must be >= PicWidthInMb + 1 and must be equal to pow(2,n) for masking bits easily.
-	List(type: List(type: List(type: int(size=16),size=2), size=16),size= SZ_TAB) MvTab;
-	List(type: List(type: int(size=5), size=16),size= SZ_TAB) RefIdxTab;
+	List(type: List(type: List(type: int(size=16),size=2), size=16),size= POW2_PICWIDTH_BLK_PLUS1) MvTab;
+	List(type: List(type: int(size=5), size=16),size= POW2_PICWIDTH_BLK_PLUS1) RefIdxTab;
 
 	uint(size=3)             MbPartIdxMax;
 	uint(size=3)             MbPartIdx;
@@ -115,13 +114,13 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	uint(size=3)             SizeSubMbMv;
 	uint(size=6)             MbType;
 	uint(size=4)             SubMbType;
-	uint(size=LOG2_SZ_TAB)   Idx_CurrBlk;
+	uint(size=LOG2_POW2_PICWIDTH_BLK_PLUS1)   Idx_CurrBlk;
 	uint(size=1)             Idx_Sub_Tab;
 	bool                     IsPred4SubMb;
-	int (size=LOG2_SZ_TAB+1) Idx_mbAddrA;
-	int (size=LOG2_SZ_TAB+1) Idx_mbAddrB;
-	int (size=LOG2_SZ_TAB+1) Idx_mbAddrC;
-	int (size=LOG2_SZ_TAB+1) Idx_mbAddrD;
+	int (size=LOG2_POW2_PICWIDTH_BLK_PLUS1+1) Idx_mbAddrA;
+	int (size=LOG2_POW2_PICWIDTH_BLK_PLUS1+1) Idx_mbAddrB;
+	int (size=LOG2_POW2_PICWIDTH_BLK_PLUS1+1) Idx_mbAddrC;
+	int (size=LOG2_POW2_PICWIDTH_BLK_PLUS1+1) Idx_mbAddrD;
 
 	bool          direct_spatial_mv_pred;
 	bool          direct_pred_lx;
@@ -354,28 +353,28 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		do
 			Mbx_in_pix := (Curr_Mb_Addr mod pic_width_in_mb)*16;
 			Mby_in_pix := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
-			Idx_CurrBlk   := Curr_Mb_Addr & MASK_TAB;
+			Idx_CurrBlk   := Curr_Mb_Addr & MASK_POW2_PICWIDTH_BLK_PLUS1;
 
 			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0 or (Curr_Mb_Addr = Fst_Mb)) then
 				Idx_mbAddrA := -1;
 			else
-				Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_TAB;
+				Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			end
 
 			if( (Curr_Mb_Addr - Fst_Mb) < pic_width_in_mb) then
 				Idx_mbAddrB := -1;
 			else
-				Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_TAB;
+				Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			end
 
 			if( (Curr_Mb_Addr + 1) >= pic_width_in_mb + Fst_Mb)then
 				if((Curr_Mb_Addr - pic_width_in_mb + 1) mod pic_width_in_mb != 0)then
-					Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_TAB;
+					Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 				else
 					Idx_mbAddrC := -1;
 				end
 				if((Curr_Mb_Addr >= (pic_width_in_mb + 1)) and Curr_Mb_Addr  >=  (pic_width_in_mb + 1 +Fst_Mb))then
-					Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_TAB;
+					Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 				else
 					Idx_mbAddrD := -1;
 				end
@@ -512,7 +511,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			PicWidthInMb   :[c]
 				==>
 		do
-			Idx_CurrBlk := Curr_Mb_Addr & MASK_TAB;
+			Idx_CurrBlk := Curr_Mb_Addr & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			RefIdxTab[Idx_CurrBlk] := [-1: for int i in 0 .. 15];
 			MvTab[Idx_CurrBlk]     := [[0,0]: for int i in 0 .. 15];	
 		end
@@ -533,9 +532,9 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		do
 			Mbx_in_pix := (Curr_Mb_Addr mod pic_width_in_mb)*16;
 			Mby_in_pix := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
-			Idx_CurrBlk :=  Curr_Mb_Addr      & MASK_TAB;
-			Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_TAB;
-			Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_TAB;
+			Idx_CurrBlk :=  Curr_Mb_Addr      & MASK_POW2_PICWIDTH_BLK_PLUS1;
+			Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
+			Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			RefIdxTab[Idx_CurrBlk] := [0: for int i in 0 .. 15];
 			//if mbAddrB is not available
 			if( Curr_Mb_Addr < Fst_Mb + pic_width_in_mb) then
@@ -556,14 +555,14 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 							if( (Curr_Mb_Addr + 1) >= pic_width_in_mb + Fst_Mb)then
 								if((Curr_Mb_Addr - pic_width_in_mb + 1) mod pic_width_in_mb != 0)then
 									Idx_C       := 10;
-									Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_TAB;
+									Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 									MvC         := [MvTab [Idx_mbAddrC][10][0],MvTab [Idx_mbAddrC][10][1]];
 									RefIdxC     := RefIdxTab[Idx_mbAddrC][10];
 								else
 									Idx_mbAddrC := -1;
 									if(Curr_Mb_Addr  >=  (pic_width_in_mb + 1 +Fst_Mb))then
 										Idx_C       := 15;
-										Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_TAB;
+										Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 										MvC         := [MvTab [Idx_mbAddrD][15][0],MvTab [Idx_mbAddrD][15][1]];
 										RefIdxC     := RefIdxTab[Idx_mbAddrD][15];
 									else
@@ -604,30 +603,30 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 		do
 			Mbx_in_pix             := (Curr_Mb_Addr mod pic_width_in_mb)*16;
 			Mby_in_pix             := (Curr_Mb_Addr  /  pic_width_in_mb)*16;
-			Idx_CurrBlk            := Curr_Mb_Addr & MASK_TAB;
+			Idx_CurrBlk            := Curr_Mb_Addr & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			MvTab[Idx_CurrBlk]     := [[0,0]: for int i in 0 .. 15];
 			RefIdxTab[Idx_CurrBlk] := [-1: for int i in 0 .. 15];
 
 			if( (Curr_Mb_Addr mod pic_width_in_mb) = 0 or (Curr_Mb_Addr = Fst_Mb)) then
 				Idx_mbAddrA := -1;
 			else
-				Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_TAB;
+				Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			end
 
 			if( (Curr_Mb_Addr - Fst_Mb) < pic_width_in_mb) then
 				Idx_mbAddrB := -1;
 			else
-				Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_TAB;
+				Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			end
 
 			if( (Curr_Mb_Addr + 1) >= pic_width_in_mb + Fst_Mb)then
 				if((Curr_Mb_Addr - pic_width_in_mb + 1) mod pic_width_in_mb != 0)then
-					Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_TAB;
+					Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 				else
 					Idx_mbAddrC := -1;
 				end
 				if((Curr_Mb_Addr >= (pic_width_in_mb + 1)) and Curr_Mb_Addr  >=  (pic_width_in_mb + 1 +Fst_Mb))then
-					Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_TAB;
+					Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 				else
 					Idx_mbAddrD := -1;
 				end

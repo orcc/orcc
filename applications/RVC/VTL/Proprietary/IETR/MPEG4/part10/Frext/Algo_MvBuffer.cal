@@ -54,6 +54,7 @@ Copyright (c) ISO/IEC 2008.
 package Proprietary.IETR.MPEG4.part10.Frext;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.Common.Imp_PictureInfo.*;
 
 actor Algo_MvBuffer()
 	uint(size=6)  MbType,
@@ -83,17 +84,14 @@ actor Algo_MvBuffer()
 	bool colZeroFlag
 		:
 
-	int (size=32) PIC_WIDTH_IN_PX        = 1280; //number of MB per lines
-	int (size=32) PIC_HEIGHT_IN_PX       = 720; //number of MB per columns
-
 	int (size=32) SENT_DONE = -2;
 
 	uint(size=4) B_DIRECT_8x8 = 0;
 
-	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdxL0;
-	List(type: List(type: List(type: int(size=5), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListRefIdxL1;
-	List(type: List(type: List(type: List(type: int(size=5), size=2), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListMvL0;
-	List(type: List(type: List(type: List(type: int(size=5), size=2), size=PIC_HEIGHT_IN_PX/4), size=PIC_WIDTH_IN_PX/4), size=16) ListMvL1;
+	List(type: List(type: List(type: int(size=5), size=MAX_PICHEIGHT_PX/4), size=MAX_PICWIDTH_PX/4), size=16) ListRefIdxL0;
+	List(type: List(type: List(type: int(size=5), size=MAX_PICHEIGHT_PX/4), size=MAX_PICWIDTH_PX/4), size=16) ListRefIdxL1;
+	List(type: List(type: List(type: List(type: int(size=5), size=2), size=MAX_PICHEIGHT_PX/4), size=MAX_PICWIDTH_PX/4), size=16) ListMvL0;
+	List(type: List(type: List(type: List(type: int(size=5), size=2), size=MAX_PICHEIGHT_PX/4), size=MAX_PICWIDTH_PX/4), size=16) ListMvL1;
 	List(type: bool,          size=16) IsReference;
 	List(type: uint(size=32), size=16) ListPoc;
 

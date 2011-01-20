@@ -17,6 +17,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+import MPEG.Common.Imp_ByteOperation.*;
 
 actor Algo_DecodeResidual()
 	uint(size=6)  Parameters,
@@ -75,13 +76,6 @@ actor Algo_DecodeResidual()
 	uint(size=5) maxNumCoeff;
 
 	uint(size=2) ResidualLumaOutput := 0;
-
-	function GetFlag(int(size=32) Val, uint(size=5) Idx)
-				-->
-			bool
-		:
-			(Val & (1 << Idx)) != 0
-		end
 
 	GetParameters: action
 			Parameters        :[Param] repeat 32

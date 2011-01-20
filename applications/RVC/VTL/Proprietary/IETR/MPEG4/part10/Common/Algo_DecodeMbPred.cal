@@ -17,6 +17,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+import MPEG.Common.Imp_ByteOperation.*;
 
 actor Algo_DecodeMbPred()
 	int (size=32) ValVLD,
@@ -76,13 +77,6 @@ actor Algo_DecodeMbPred()
 			else
 				false
 			end
-		end
-
-	function GetFlag(int(size=32) Val, uint(size=5) Idx)
-				-->
-			bool
-		:
-			(Val & (1 << Idx)) != 0
 		end
 
 	ReadParameters: action
