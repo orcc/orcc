@@ -18,6 +18,8 @@ This copyright notice must be included in all copies or derivative works. Copyri
 package Proprietary.IETR.MPEG4.part10;
 
 import MPEG.Common.Imp_Math.*;
+import MPEG.Common.Imp_PictureInfo.*;
+
 //Clean this actor (Delete and rewrite it)!!!
 actor Mgnt_DPB ( int MB_WIDTH )
 	uint(size=7)  PicWidthInMb, 
@@ -51,15 +53,10 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 	uint(size=32) NB_PIC          = 33;
 	uint(size=32) SZ_NBPIC        = 6; /* >= log2(NB_PIC) */
-
-	int (size=32) MB_WIDTH_CHROMA = 8;
-	int (size=32) MB_WIDTH_LUMA   = 16;
 	//FIXME! number of MB per line of picture
-	int (size=32) PICWIDTH        = 1280/16; //number of MB per lines
-	int (size=32) PICHEIGHT       = 720/16; //number of MB per columns
 
 
-	List(type :List( type:int(size=16), size=PICWIDTH*PICHEIGHT*256 ), size=NB_PIC) pic;
+	List(type :List( type:int(size=16), size=MAX_PICWIDTH_PX*MAX_PICHEIGHT_PX), size=NB_PIC) pic;
 	List(type:uint(size=32) ,size=NB_PIC) ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];
 	List(type:uint(size=31) ,size=NB_PIC) ListFrameNum  := [ 0    :for int s in 0 .. NB_PIC-1];
 	List(type:bool          ,size=NB_PIC) PictureReady  := [false :for int s in 0 .. NB_PIC-1];
