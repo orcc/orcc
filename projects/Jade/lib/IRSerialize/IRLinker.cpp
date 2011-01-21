@@ -59,8 +59,8 @@ IRLinker::~IRLinker(){
 
 }
 
-int IRLinker::link(list<pair<Instance*, Instance*>>* instances){
-	list<pair<Instance*, Instance*>>::iterator it;
+int IRLinker::link(list<pair<Instance*, Instance*> >* instances){
+	list<pair<Instance*, Instance*> >::iterator it;
 
 	//Iterate though instances to link
 	for (it = instances->begin(); it != instances->end(); it++){

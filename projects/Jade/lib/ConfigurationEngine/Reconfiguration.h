@@ -84,7 +84,9 @@ public:
 	 *  @return a list of actor to keep
 	 *
      */
-	std::list<std::pair<Instance*, Instance*>>* getToKeep(){return &toKeep;};
+	std::list<std::pair<Instance*, Instance*> >* getToKeep(){
+		return &toKeep;
+	};
 
 private:
 	
@@ -163,7 +165,7 @@ private:
 	/** List of instance to process*/
 	std::list<Instance*> toRemove;
 	std::list<Instance*> toAdd;
-	std::list<std::pair<Instance*, Instance*>> toKeep;
+	std::list<std::pair<Instance*, Instance*> > toKeep;
 };
 
 #endif

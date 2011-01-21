@@ -74,7 +74,7 @@ public:
      *
 	 * @return true if the actor is unwritten, otherwise false
 	 */
-	int link(std::list<std::pair<Instance*, Instance*>>* instances);
+	int link(std::list<std::pair<Instance*, Instance*> >* instances);
 
 	~IRLinker();
 

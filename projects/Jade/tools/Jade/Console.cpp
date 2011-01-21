@@ -38,7 +38,9 @@
 //------------------------------
 #include <iostream>
 
-#include "console.h"
+#include "llvm/Support/CommandLine.h"
+
+#include "Console.h"
 //------------------------------
 
 using namespace std;

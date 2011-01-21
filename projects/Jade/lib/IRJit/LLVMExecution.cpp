@@ -181,7 +181,7 @@ void LLVMExecution::stop(pthread_t* thread) {
 }
 
 void LLVMExecution::recompile(Function* function) {
-	//EE->recompileAndRelinkFunction(function);
+	EE->recompileAndRelinkFunction(function);
 }
 
 

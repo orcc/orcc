@@ -1,7 +1,7 @@
 IF(APPLE)
-add_executable(Jade Jade.cpp Console.cpp /Library/Frameworks/SDL.framework/Resources/SDLMain.m)
+add_executable(Jade Jade.cpp Console.cpp Console.h /Library/Frameworks/SDL.framework/Resources/SDLMain.m)
 ELSE(APPLE)
-add_executable(Jade Jade.cpp Console.cpp)
+add_executable(Jade Jade.cpp Console.cpp Console.h)
 ENDIF(APPLE)
 
 # Library requiered

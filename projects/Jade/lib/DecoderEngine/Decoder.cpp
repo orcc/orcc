@@ -88,8 +88,8 @@ void Decoder::setConfiguration(Configuration* configuration){
 	ConfigurationEngine engine(Context);
 	engine.reconfigure(this, configuration);
 
-	//executionEngine->recompile(scheduler->getMainFunction());
-	//executionEngine->run();
+	executionEngine->recompile(scheduler->getMainFunction());
+	executionEngine->run();
 }
 
 void Decoder::start(){

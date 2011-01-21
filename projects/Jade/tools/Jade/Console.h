@@ -38,12 +38,11 @@
 //------------------------------
 #ifndef JADE_H
 #define JADE_H
+
 //------------------------------
 
 #include "Jade/XDFParser.h"
 #include "Jade/DecoderEngine.h"
-
-#include "llvm/Support/CommandLine.h"
 
 void startConsole();
 

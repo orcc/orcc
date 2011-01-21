@@ -121,7 +121,7 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	IRLinker linker(decoder);
 
 	//Iterate though all instances to remove
-	list<pair<Instance*, Instance*>>* keeps = reconfiguration.getToKeep();
+	list<pair<Instance*, Instance*> >* keeps = reconfiguration.getToKeep();
 	linker.link(keeps);
 
 	// Setting connections of the decoder
