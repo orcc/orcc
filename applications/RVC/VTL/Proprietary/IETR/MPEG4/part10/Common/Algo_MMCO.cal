@@ -60,11 +60,11 @@ package Proprietary.IETR.MPEG4.part10.Common;
 import MPEG.Common.Imp_Math.*;
 
 actor Algo_MMCO () 
-	uint(size=31) MMCO,
+	uint(size=31) Mmco,
 	uint(size=31) FraNum,
 	uint(size=31) MaxFrameNum,
 	uint(size=5)  NumReferenceFrame,
-	uint(size=32) POC
+	uint(size=32) Poc
 		==>
 	int (size=32) DelList,
 	int (size=32) LongTermList,
@@ -126,7 +126,7 @@ actor Algo_MMCO ()
 			NumReferenceFrame :[ValNumRefFrame],
 			FraNum            :[ValFrame_Num],
 			MaxFrameNum       :[MaxFrNu],
-			POC               :[PicOrderCnt]
+			Poc               :[PicOrderCnt]
 				==>
 		var
 			int (size=6) NbFrameToDel,
@@ -275,7 +275,7 @@ actor Algo_MMCO ()
 
 
 	read_IDR: action
-			MMCO :[NotIdr , is_long_term]
+			Mmco :[NotIdr , is_long_term]
 				==>
 		guard 
 			NotIdr = 0
@@ -287,52 +287,52 @@ actor Algo_MMCO ()
 			LTList           := [-1 :for int s in 0 .. 15];
 			NbFrameDel       := 0;
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+NotIdr+" ; "+is_long_term);
+				println("input Mmco Mmco:"+NotIdr+" ; "+is_long_term);
 			end
 		end
 
 
 	read_not_IDR_not_MMCO: action
-			MMCO :[NotIdr , adaptive_ref_pic_marking_mode_flag]
+			Mmco :[NotIdr , adaptive_ref_pic_marking_mode_flag]
 				==>
 		guard
 			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 0)
 		do
 			FlagLongTerm := 0;
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+NotIdr+" ; "+adaptive_ref_pic_marking_mode_flag);
+				println("input Mmco Mmco:"+NotIdr+" ; "+adaptive_ref_pic_marking_mode_flag);
 			end
 		end
 
 
 	read_not_IDR_MMCO: action
-			MMCO :[NotIdr , adaptive_ref_pic_marking_mode_flag]
+			Mmco :[NotIdr , adaptive_ref_pic_marking_mode_flag]
 				==>
 		guard 
 			(NotIdr = 1) and (adaptive_ref_pic_marking_mode_flag = 1)
 		do
 			FlagLongTerm := 0;
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+NotIdr+" ; "+adaptive_ref_pic_marking_mode_flag);
+				println("input Mmco Mmco:"+NotIdr+" ; "+adaptive_ref_pic_marking_mode_flag);
 			end
 		end
 
 
 	MMCO_opcode.IsEqualTo0: action
-			MMCO :[opcode]
+			Mmco :[opcode]
 				==>
 		guard 
 			opcode = 0
 		do
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+opcode);
+				println("input Mmco Mmco:"+opcode);
 			end
 		end
 
 
 	// Mark a short term reference picture as "unused for reference "
 	MMCO_opcode.IsEqualTo1: action
-			MMCO :[opcode, difference_of_pic_nums_minus1]
+			Mmco :[opcode, difference_of_pic_nums_minus1]
 				==>
 		guard
 			opcode = 1
@@ -363,14 +363,14 @@ actor Algo_MMCO ()
 				i := i + 1;
 			end
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+opcode+" ; "+difference_of_pic_nums_minus1);
+				println("input Mmco Mmco:"+opcode+" ; "+difference_of_pic_nums_minus1);
 			end
 		end
 
 
 	// Mark a long term reference picture as "unused for reference "
 	MMCO_opcode.IsEqualTo2: action
-			MMCO:[opcode, IdxLTFrame ]
+			Mmco:[opcode, IdxLTFrame ]
 				==>
 		guard 
 			opcode = 2
@@ -384,14 +384,14 @@ actor Algo_MMCO ()
 				LongTermCount          := LongTermCount - 1;
 			end
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+opcode+" ; "+IdxLTFrame);
+				println("input Mmco Mmco:"+opcode+" ; "+IdxLTFrame);
 			end
 		end
 
 
 	// Mark a short term reference picture as long term
 	MMCO_opcode.IsEqualTo3: action
-			MMCO:[opcode, difference_of_pic_nums_minus1, IdxLTFrame]
+			Mmco:[opcode, difference_of_pic_nums_minus1, IdxLTFrame]
 				==>
 		guard 
 			opcode = 3
@@ -429,14 +429,14 @@ actor Algo_MMCO ()
 				i := i + 1;
 			end
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+opcode+" ; "+difference_of_pic_nums_minus1+" ; "+IdxLTFrame);
+				println("input Mmco Mmco:"+opcode+" ; "+difference_of_pic_nums_minus1+" ; "+IdxLTFrame);
 			end
 		end
 
 
 	// Specify the maximum long term frame index
 	MMCO_opcode.IsEqualTo4: action
-			MMCO:[opcode, long_term_max_idx]
+			Mmco:[opcode, long_term_max_idx]
 				==>
 		guard 
 			opcode = 4
@@ -453,14 +453,14 @@ actor Algo_MMCO ()
 				end
 			end
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+opcode+" ; "+long_term_max_idx);
+				println("input Mmco Mmco:"+opcode+" ; "+long_term_max_idx);
 			end
 		end
 
 
 	// Mark all reference picture as "unused for reference "
 	MMCO_opcode.IsEqualTo5: action
-			MMCO:[opcode]
+			Mmco:[opcode]
 				==>
 		guard 
 			opcode = 5
@@ -477,14 +477,14 @@ actor Algo_MMCO ()
 				FrameNumList[j] := -1;
 			end
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+opcode);
+				println("input Mmco Mmco:"+opcode);
 			end
 		end
 
 
 	// Mark the current picture as long term reference picture
 	MMCO_opcode.IsEqualTo6: action
-			MMCO:[opcode, IdxLTFrame]
+			Mmco:[opcode, IdxLTFrame]
 				==>
 		guard 
 			opcode = 6
@@ -493,7 +493,7 @@ actor Algo_MMCO ()
 			FlagLongTerm     := 1;
 			LongTermFrameIdx := bitand(LongTermFrameIdx,0x0F);
 			if(DEBUG_INPUT)then
-				println("input Mmco MMCO:"+opcode+" ; "+IdxLTFrame);
+				println("input Mmco Mmco:"+opcode+" ; "+IdxLTFrame);
 			end
 		end
 

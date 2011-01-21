@@ -2,73 +2,75 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="215" y="25"/>
-      <vertex id="Height" x="1227" y="1144"/>
-      <vertex id="IntraPredModeC" x="1712" y="738"/>
-      <vertex id="QP_Cb" x="1770" y="1198"/>
-      <vertex id="QP_Cr" x="1780" y="1227"/>
-      <vertex id="Width" x="1130" y="931"/>
-      <vertex id="ScalingList" x="1755" y="1340"/>
-      <vertex id="QP" x="1778" y="1165"/>
-      <vertex id="CurrMbAddr" x="1713" y="558"/>
-      <vertex id="slice_alpha_c0_offset" x="1731" y="1436"/>
-      <vertex id="slice_beta_offset" x="1741" y="1468"/>
-      <vertex id="LFDisable" x="1728" y="773"/>
-      <vertex id="CodedBlockPattern" x="1689" y="493"/>
-      <vertex id="ConstrainedIFlag" x="1694" y="526"/>
-      <vertex id="PicWidthInMb" x="1738" y="1134"/>
-      <vertex id="PicSizeInMb" x="1745" y="1091"/>
-      <vertex id="FirstMbInSlice" x="1710" y="595"/>
-      <vertex id="POC" x="1764" y="1040"/>
+      <vertex id="Height" x="1526" y="640"/>
+      <vertex id="IntraPredModeC" x="1492" y="778"/>
+      <vertex id="QP_Cb" x="1524" y="1324"/>
+      <vertex id="QP_Cr" x="1526" y="1362"/>
+      <vertex id="Width" x="1534" y="1743"/>
+      <vertex id="ScalingList" x="1517" y="1518"/>
+      <vertex id="QP" x="1536" y="1293"/>
+      <vertex id="CurrMbAddr" x="1504" y="517"/>
+      <vertex id="slice_alpha_c0_offset" x="1481" y="1776"/>
+      <vertex id="slice_beta_offset" x="1495" y="1807"/>
+      <vertex id="LFDisable" x="1513" y="842"/>
+      <vertex id="CodedBlockPattern" x="1480" y="457"/>
+      <vertex id="ConstrainedIFlag" x="1489" y="488"/>
+      <vertex id="PicWidthInMb" x="1503" y="1260"/>
+      <vertex id="PicSizeInMb" x="1505" y="1229"/>
+      <vertex id="FirstMbInSlice" x="1503" y="578"/>
+      <vertex id="Poc" x="1539" y="1195"/>
       <vertex id="CoefAC_Cb" x="2333" y="240"/>
       <vertex id="CoefDC_Cb" x="2332" y="272"/>
       <vertex id="CoefAC_Cr" x="2336" y="308"/>
       <vertex id="CoefDC_Cr" x="2335" y="349"/>
       <vertex id="CoefAC_L" x="2338" y="384"/>
       <vertex id="CoefDC_L" x="2339" y="415"/>
-      <vertex id="PredMode" x="1676" y="344"/>
-      <vertex id="DelList" x="1778" y="1601"/>
-      <vertex id="IsIDR" x="1777" y="1628"/>
-      <vertex id="MV" x="2260" y="712"/>
-      <vertex id="PART_SZ" x="2243" y="747"/>
-      <vertex id="mv_out" x="2259" y="821"/>
-      <vertex id="ref_idx" x="2259" y="855"/>
-      <vertex id="I_PCM_Y" x="1733" y="697"/>
-      <vertex id="I_PCM_U" x="1727" y="628"/>
-      <vertex id="I_PCM_V" x="1727" y="658"/>
-      <vertex id="MacroBlockType" x="1705" y="809"/>
-      <vertex id="TransformSize8x8" x="1738" y="1406"/>
-      <vertex id="PocToDisplay" x="1846" y="1821"/>
-      <vertex id="PocToRead" x="2659" y="1097"/>
-      <vertex id="ReadAddress_l" x="2633" y="715"/>
-      <vertex id="ReadAddress_c" x="2634" y="685"/>
-      <vertex id="MbType4Pred" x="1714" y="854"/>
-      <vertex id="SelectList" x="2244" y="789"/>
-      <vertex id="SubMbType" x="1752" y="1282"/>
-      <vertex id="IsNewPicOrSlice" x="1266" y="665"/>
-      <vertex id="Read4MbPred" x="2652" y="1126"/>
-      <vertex id="FrameNum" x="1474" y="559"/>
+      <vertex id="PredMode" x="1723" y="306"/>
+      <vertex id="I_PCM_Y" x="1517" y="742"/>
+      <vertex id="I_PCM_U" x="1524" y="675"/>
+      <vertex id="I_PCM_V" x="1523" y="708"/>
+      <vertex id="MacroBlockType" x="1486" y="874"/>
+      <vertex id="TransformSize8x8" x="1500" y="1709"/>
+      <vertex id="PocToDisplay" x="1924" y="1817"/>
+      <vertex id="MbType4Pred" x="1502" y="1041"/>
+      <vertex id="SubMbType" x="1523" y="1681"/>
+      <vertex id="IsNewPicOrSlice" x="1490" y="811"/>
+      <vertex id="FrameNum" x="1512" y="609"/>
       <vertex id="Algo_NALU" x="333" y="7"/>
       <vertex id="CheckNaluType" x="644" y="-22"/>
-      <vertex id="DecodeSps" x="46" y="1239"/>
+      <vertex id="DecodeSps" x="-42" y="1549"/>
       <vertex id="SpsVLDecoding" x="71" y="235"/>
       <vertex id="PpsVLDecoding" x="464" y="230"/>
       <vertex id="DecodePps" x="327" y="686"/>
       <vertex id="PicVLDecoding" x="895" y="219"/>
-      <vertex id="MMCO" x="1288" y="1637"/>
-      <vertex id="RefList0" x="1977" y="1157"/>
-      <vertex id="IntraPredSplit" x="1409" y="325"/>
-      <vertex id="MVReconstruct" x="1896" y="625"/>
+      <vertex id="IntraPredSplit" x="1434" y="270"/>
       <vertex id="BlockExpand" x="1899" y="484"/>
       <vertex id="BlockSplit" x="2101" y="260"/>
-      <vertex id="DecodePic" x="800" y="446"/>
-      <vertex id="RefList1" x="1982" y="1428"/>
+      <vertex id="DecodePic" x="800" y="490"/>
       <vertex id="Mgnt_Display" x="1686" y="1794"/>
-      <vertex id="RefIdxL0ToPoc" x="2248" y="960"/>
-      <vertex id="RefIdxL1ToPoc" x="2251" y="1174"/>
-      <vertex id="SelectRefIdx" x="2439" y="1081"/>
-      <vertex id="Mgnt_InterPred" x="2441" y="658"/>
       <vertex id="MergeSpsAsk" x="478" y="1069"/>
       <vertex id="SplitSpsInfos" x="504" y="1272"/>
-      <vertex id="CheckIsNewSlice" x="1025" y="1760"/>
+      <vertex id="CheckIsNewSlice" x="684" y="1692"/>
+      <vertex id="MaxFrameNum" x="1026" y="1738"/>
+      <vertex id="NumRefFrame" x="1029" y="1774"/>
+      <vertex id="Mmco" x="1526" y="1072"/>
+      <vertex id="NbRefFrameL0" x="1500" y="1106"/>
+      <vertex id="NbRefFrameL1" x="1498" y="1137"/>
+      <vertex id="RefList0Type" x="1505" y="1396"/>
+      <vertex id="RefList1Type" x="1508" y="1427"/>
+      <vertex id="RefReorderingL0" x="1494" y="1460"/>
+      <vertex id="RefReorderingL1" x="1497" y="1490"/>
+      <vertex id="Direct8x8Inference" x="423" y="1654"/>
+      <vertex id="DirectSpatialMvPred" x="1476" y="547"/>
+      <vertex id="SubMbPredRefIdxL1" x="1488" y="1585"/>
+      <vertex id="SubMbPredRefIdxL0" x="1483" y="1552"/>
+      <vertex id="SubMbPredMvResL1" x="1489" y="1648"/>
+      <vertex id="SubMbPredMvResL0" x="1485" y="1615"/>
+      <vertex id="NewPic" x="1522" y="1172"/>
+      <vertex id="MbPredRefIdxL1" x="1486" y="942"/>
+      <vertex id="MbPredRefIdxL0" x="1486" y="909"/>
+      <vertex id="MbPredMvResL1" x="1490" y="1010"/>
+      <vertex id="MbPredMvResL0" x="1489" y="977"/>
+      <vertex id="EmptyDpb" x="638" y="1538"/>
    </vertices>
 </layout>
