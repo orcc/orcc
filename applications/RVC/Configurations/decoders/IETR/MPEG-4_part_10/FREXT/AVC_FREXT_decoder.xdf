@@ -181,6 +181,27 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="Mgnt_Display">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_Display"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+        <Parameter name="Debug">
+            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
+        </Parameter>
+    </Instance>
+    <Instance id="IntraPredSplit">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_IntraPred_Split"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -189,7 +210,6 @@
     <Connection dst="Decoding_Y" dst-port="CurrMbAddr" src="FUN_Parser" src-port="CurrMbAddr"/>
     <Connection dst="Decoding_Y" dst-port="FirstMbInSlice"
         src="FUN_Parser" src-port="FirstMbInSlice"/>
-    <Connection dst="Decoding_Y" dst-port="PredMode" src="FUN_Parser" src-port="PredMode"/>
     <Connection dst="Decoding_Y" dst-port="QP" src="FUN_Parser" src-port="QP"/>
     <Connection dst="Decoding_Y" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
     <Connection dst="Decoding_Y" dst-port="PicWidthInMb"
@@ -253,10 +273,6 @@
         src="FUN_Parser" src-port="MacroBlockType"/>
     <Connection dst="Decode_V" dst-port="MacroBlockType"
         src="FUN_Parser" src-port="MacroBlockType"/>
-    <Connection dst="Decoding_Y" dst-port="PocToDisplay"
-        src="FUN_Parser" src-port="PocToDisplay"/>
-    <Connection dst="Decode_U" dst-port="PocToDisplay" src="FUN_Parser" src-port="PocToDisplay"/>
-    <Connection dst="Decode_V" dst-port="PocToDisplay" src="FUN_Parser" src-port="PocToDisplay"/>
     <Connection dst="Decoding_Y" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
     <Connection dst="Decoding_Y" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
     <Connection dst="Decode_U" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
@@ -380,8 +396,6 @@
         src="FUN_Parser" src-port="MbPredRefIdxL0"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbPredMvResL1"
         src="FUN_Parser" src-port="MbPredMvResL1"/>
-    <Connection dst="FUN_Parser" dst-port="EmptyDpb"
-        src="Generate_Inter_Info" src-port="EmptyDPB"/>
     <Connection dst="Generate_Inter_Info" dst-port="RefReorderingL0"
         src="FUN_Parser" src-port="RefReorderingL0"/>
     <Connection dst="Generate_Inter_Info" dst-port="RefReorderingL1"
@@ -400,4 +414,31 @@
     <Connection dst="Decode_U" dst-port="CoefDC" src="CavlcExpand" src-port="CoefDC_Cb"/>
     <Connection dst="Decode_V" dst-port="CoefDC" src="CavlcExpand" src-port="CoefDC_Cr"/>
     <Connection dst="Decoding_Y" dst-port="CoefDC_L" src="CavlcExpand" src-port="CoefDC_L"/>
+    <Connection dst="Decode_V" dst-port="PocToDisplay"
+        src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="Decode_U" dst-port="PocToDisplay"
+        src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="Decoding_Y" dst-port="PocToDisplay"
+        src="Mgnt_Display" src-port="POCtoDisplay"/>
+    <Connection dst="Mgnt_Display" dst-port="Poc" src="FUN_Parser" src-port="Poc"/>
+    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize"
+        src="FUN_Parser" src-port="MaxDpbSize"/>
+    <Connection dst="Mgnt_Display" dst-port="EmptyDpb"
+        src="Generate_Inter_Info" src-port="EmptyDPB"/>
+    <Connection dst="IntraPredSplit" dst-port="MbIntraFlag"
+        src="FUN_Parser" src-port="MbIntraFlag"/>
+    <Connection dst="IntraPredSplit" dst-port="IntraPredMode"
+        src="FUN_Parser" src-port="IntraPredMode"/>
+    <Connection dst="IntraPredSplit" dst-port="CurrMbAddr"
+        src="FUN_Parser" src-port="CurrMbAddr"/>
+    <Connection dst="IntraPredSplit" dst-port="FirstMBInSlice"
+        src="FUN_Parser" src-port="FirstMbInSlice"/>
+    <Connection dst="IntraPredSplit" dst-port="PicWidthInMb"
+        src="FUN_Parser" src-port="PicWidthInMb"/>
+    <Connection dst="IntraPredSplit" dst-port="ConstrainedIFlag"
+        src="FUN_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="FUN_Parser" dst-port="ResetPrevFrameNum"
+        src="Generate_Inter_Info" src-port="EmptyDPB"/>
+    <Connection dst="Decoding_Y" dst-port="PredMode"
+        src="IntraPredSplit" src-port="PredMode"/>
 </XDF>

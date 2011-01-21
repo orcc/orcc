@@ -10,7 +10,7 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="EmptyDpb">
+    <Port kind="Input" name="ResetPrevFrameNum">
         <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
@@ -131,13 +131,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="PredMode">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="I_PCM_Y">
         <Type name="int">
             <Entry kind="Expr" name="size">
@@ -168,13 +161,6 @@
     </Port>
     <Port kind="Output" name="TransformSize8x8">
         <Type name="bool"/>
-    </Port>
-    <Port kind="Output" name="PocToDisplay">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="32"/>
-            </Entry>
-        </Type>
     </Port>
     <Port kind="Output" name="MbType4Pred">
         <Type name="uint">
@@ -349,6 +335,27 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="MaxDpbSize">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="MbIntraFlag">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="1"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="IntraPredMode">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -421,15 +428,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="IntraPredSplit">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_IntraPred_Split"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="DecodePic">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -438,18 +436,6 @@
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-    </Instance>
-    <Instance id="Mgnt_Display">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_Display"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-        <Parameter name="Debug">
-            <Expr kind="Literal" literal-kind="Boolean" value="true"/>
-        </Parameter>
     </Instance>
     <Instance id="MergeSpsAsk">
         <!-- ************************* -->
@@ -502,7 +488,6 @@
         src="CheckNaluType" src-port="SpsNewNal"/>
     <Connection dst="SpsVLDecoding" dst-port="VLD_Param" src="DecodeSps" src-port="NbBitsToRead"/>
     <Connection dst="PpsVLDecoding" dst-port="VLD_Param" src="DecodePps" src-port="NbBitsToRead"/>
-    <Connection dst="" dst-port="PredMode" src="IntraPredSplit" src-port="PredMode"/>
     <Connection dst="CheckNaluType" dst-port="PpsSkipNal"
         src="DecodePps" src-port="DecodeNextNal"/>
     <Connection dst="CheckNaluType" dst-port="SpsSkipNal"
@@ -536,26 +521,12 @@
     <Connection dst="DecodePic" dst-port="NumRefIdxLXActive"
         src="DecodePps" src-port="NumRefIdxLXActive"/>
     <Connection dst="DecodePps" dst-port="PpsAsked" src="DecodePic" src-port="GetPps"/>
-    <Connection dst="IntraPredSplit" dst-port="ConstrainedIFlag"
-        src="DecodePic" src-port="ConstrainedIFlag"/>
-    <Connection dst="IntraPredSplit" dst-port="CurrMbAddr"
-        src="DecodePic" src-port="CurrMbAddr"/>
-    <Connection dst="IntraPredSplit" dst-port="FirstMBInSlice"
-        src="DecodePic" src-port="FirstMbInSlice"/>
-    <Connection dst="IntraPredSplit" dst-port="PicWidthInMb"
-        src="DecodePic" src-port="PicWidthInMb"/>
-    <Connection dst="IntraPredSplit" dst-port="IntraPredMode"
-        src="DecodePic" src-port="IntraPredMode"/>
-    <Connection dst="IntraPredSplit" dst-port="MbIntraFlag"
-        src="DecodePic" src-port="MbIntraFlag"/>
     <Connection dst="" dst-port="MacroBlockType" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="" dst-port="TransformSize8x8" src="DecodePic" src-port="TransformSize8x8"/>
     <Connection dst="DecodePic" dst-port="PpsParam4SliceHeader"
         src="DecodePps" src-port="SliceHeaderParameters"/>
     <Connection dst="DecodePic" dst-port="PpsParam4SliceData"
         src="DecodePps" src-port="SliceDataParameters"/>
-    <Connection dst="Mgnt_Display" dst-port="POC" src="DecodePic" src-port="POC"/>
-    <Connection dst="" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
     <Connection dst="" dst-port="MbType4Pred" src="DecodePic" src-port="MbType4Pred"/>
     <Connection dst="" dst-port="SubMbType" src="DecodePic" src-port="SubMbType"/>
     <Connection dst="" dst-port="Height" src="DecodePic" src-port="Height"/>
@@ -578,8 +549,6 @@
     <Connection dst="DecodePps" dst-port="Parameters"
         src="SplitSpsInfos" src-port="PpsParameters"/>
     <Connection dst="" dst-port="IsNewPicOrSlice" src="DecodePic" src-port="IsNewPicOrSlice"/>
-    <Connection dst="Mgnt_Display" dst-port="MaxDPBSize"
-        src="CheckIsNewSlice" src-port="MaxDPBSize_o"/>
     <Connection dst="CheckIsNewSlice" dst-port="MaxDPBSize_i"
         src="DecodeSps" src-port="SzDPB"/>
     <Connection dst="CheckIsNewSlice" dst-port="MaxFrameNum_i"
@@ -609,9 +578,11 @@
     <Connection dst="" dst-port="MbPredRefIdxL0" src="DecodePic" src-port="MbPredRefIdxL0"/>
     <Connection dst="" dst-port="MbPredMvResL1" src="DecodePic" src-port="MbPredResMvL1"/>
     <Connection dst="" dst-port="MbPredMvResL0" src="DecodePic" src-port="MbPredResMvL0"/>
-    <Connection dst="DecodePic" dst-port="ResetPrevFrameNum" src="" src-port="EmptyDpb"/>
-    <Connection dst="Mgnt_Display" dst-port="EmptyDpb" src="" src-port="EmptyDpb"/>
+    <Connection dst="DecodePic" dst-port="ResetPrevFrameNum" src="" src-port="ResetPrevFrameNum"/>
     <Connection dst="" dst-port="CavlcLast" src="DecodePic" src-port="Last"/>
     <Connection dst="" dst-port="CavlcValue" src="DecodePic" src-port="Value"/>
     <Connection dst="" dst-port="CavlcRun" src="DecodePic" src-port="Run"/>
+    <Connection dst="" dst-port="MaxDpbSize" src="CheckIsNewSlice" src-port="MaxDPBSize_o"/>
+    <Connection dst="" dst-port="MbIntraFlag" src="DecodePic" src-port="MbIntraFlag"/>
+    <Connection dst="" dst-port="IntraPredMode" src="DecodePic" src-port="IntraPredMode"/>
 </XDF>

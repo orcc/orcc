@@ -4,7 +4,7 @@
       <vertex id="ValDecoded" x="1100" y="312"/>
       <vertex id="IsAnIdr" x="13" y="140"/>
       <vertex id="NalRefIdc" x="10" y="193"/>
-      <vertex id="NumRefIdxLXActive" x="548" y="500"/>
+      <vertex id="NumRefIdxLXActive" x="537" y="514"/>
       <vertex id="ResetPrevFrameNum" x="10" y="402"/>
       <vertex id="PpsParam4SliceHeader" x="7" y="369"/>
       <vertex id="SpsParam4SliceHeader" x="6" y="434"/>
@@ -24,7 +24,7 @@
       <vertex id="PicWidthInMb" x="590" y="1088"/>
       <vertex id="PicSizeInMb" x="598" y="1058"/>
       <vertex id="FirstMbInSlice" x="600" y="924"/>
-      <vertex id="POC" x="586" y="385"/>
+      <vertex id="POC" x="586" y="451"/>
       <vertex id="I_PCM_Y" x="1261" y="1269"/>
       <vertex id="I_PCM_U" x="1267" y="1203"/>
       <vertex id="I_PCM_V" x="1265" y="1234"/>
@@ -59,10 +59,10 @@
       <vertex id="MbPredResMvL1" x="1693" y="1076"/>
       <vertex id="SubMbPredResMvL1" x="1671" y="1282"/>
       <vertex id="DirectSpatialMvPred" x="1108" y="419"/>
-      <vertex id="Width" x="588" y="417"/>
-      <vertex id="Height" x="581" y="459"/>
+      <vertex id="Width" x="596" y="557"/>
+      <vertex id="Height" x="579" y="384"/>
       <vertex id="IsNewPicOrSlice" x="584" y="957"/>
-      <vertex id="IsNewPic" x="610" y="638"/>
+      <vertex id="IsNewPic" x="571" y="416"/>
       <vertex id="Mgnt_DecodePic" x="1446" y="-92"/>
       <vertex id="DecodeSliceHeader" x="224" y="303"/>
       <vertex id="DecodeRefPicList" x="723" y="418"/>

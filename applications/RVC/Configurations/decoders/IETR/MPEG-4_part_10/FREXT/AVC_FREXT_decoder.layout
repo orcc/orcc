@@ -2,16 +2,18 @@
 <layout>
    <vertices>
       <vertex id="bits8" x="28" y="538"/>
-      <vertex id="Display_L" x="1187" y="51"/>
-      <vertex id="Display_Cb" x="1199" y="789"/>
-      <vertex id="Display_Cr" x="1185" y="1494"/>
-      <vertex id="Width" x="1050" y="1450"/>
+      <vertex id="Display_L" x="1537" y="7"/>
+      <vertex id="Display_Cb" x="1502" y="797"/>
+      <vertex id="Display_Cr" x="1545" y="1626"/>
+      <vertex id="Width" x="1022" y="1519"/>
       <vertex id="Height" x="1014" y="717"/>
       <vertex id="FUN_Parser" x="104" y="522"/>
-      <vertex id="Decoding_Y" x="935" y="-46"/>
-      <vertex id="Decode_U" x="964" y="750"/>
-      <vertex id="Decode_V" x="972" y="1485"/>
-      <vertex id="Generate_Inter_Info" x="522" y="892"/>
-      <vertex id="CavlcExpand" x="449" y="92"/>
+      <vertex id="Decoding_Y" x="1249" y="-22"/>
+      <vertex id="Decode_U" x="1258" y="771"/>
+      <vertex id="Decode_V" x="1256" y="1601"/>
+      <vertex id="Generate_Inter_Info" x="477" y="1973"/>
+      <vertex id="CavlcExpand" x="519" y="274"/>
+      <vertex id="Mgnt_Display" x="666" y="1443"/>
+      <vertex id="IntraPredSplit" x="494" y="100"/>
    </vertices>
 </layout>
