@@ -131,48 +131,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Output" name="CoefAC_Cb">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="CoefDC_Cb">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="CoefAC_Cr">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="CoefDC_Cr">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="CoefAC_L">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Output" name="CoefDC_L">
-        <Type name="int">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Output" name="PredMode">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -374,6 +332,23 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="CavlcLast">
+        <Type name="bool"/>
+    </Port>
+    <Port kind="Output" name="CavlcRun">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="4"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="CavlcValue">
+        <Type name="int">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="12"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -455,24 +430,6 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="BlockExpand">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_BlockExpand_AVC"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
-    <Instance id="BlockSplit">
-        <!-- ************************* -->
-        <!-- FU/Network refinement     -->
-        <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_BlockSplit_AVC"/>
-        <!-- ************************* -->
-        <!-- FU/Network Parameter      -->
-        <!-- ************************* -->
-    </Instance>
     <Instance id="DecodePic">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
@@ -545,13 +502,6 @@
         src="CheckNaluType" src-port="SpsNewNal"/>
     <Connection dst="SpsVLDecoding" dst-port="VLD_Param" src="DecodeSps" src-port="NbBitsToRead"/>
     <Connection dst="PpsVLDecoding" dst-port="VLD_Param" src="DecodePps" src-port="NbBitsToRead"/>
-    <Connection dst="BlockSplit" dst-port="Coeff" src="BlockExpand" src-port="Coeff"/>
-    <Connection dst="" dst-port="CoefAC_Cb" src="BlockSplit" src-port="Coeff_U_AC"/>
-    <Connection dst="" dst-port="CoefDC_Cb" src="BlockSplit" src-port="Coeff_U_DC"/>
-    <Connection dst="" dst-port="CoefAC_Cr" src="BlockSplit" src-port="Coeff_V_AC"/>
-    <Connection dst="" dst-port="CoefDC_Cr" src="BlockSplit" src-port="Coeff_V_DC"/>
-    <Connection dst="" dst-port="CoefAC_L" src="BlockSplit" src-port="Coeff_Y_AC"/>
-    <Connection dst="" dst-port="CoefDC_L" src="BlockSplit" src-port="Coeff_Y_DC"/>
     <Connection dst="" dst-port="PredMode" src="IntraPredSplit" src-port="PredMode"/>
     <Connection dst="CheckNaluType" dst-port="PpsSkipNal"
         src="DecodePps" src-port="DecodeNextNal"/>
@@ -598,9 +548,6 @@
         src="DecodePic" src-port="IntraPredMode"/>
     <Connection dst="IntraPredSplit" dst-port="MbIntraFlag"
         src="DecodePic" src-port="MbIntraFlag"/>
-    <Connection dst="BlockExpand" dst-port="Run" src="DecodePic" src-port="Run"/>
-    <Connection dst="BlockExpand" dst-port="Value" src="DecodePic" src-port="Value"/>
-    <Connection dst="BlockExpand" dst-port="Last" src="DecodePic" src-port="Last"/>
     <Connection dst="" dst-port="MacroBlockType" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="" dst-port="TransformSize8x8" src="DecodePic" src-port="TransformSize8x8"/>
     <Connection dst="DecodePic" dst-port="PpsParam4SliceHeader"
@@ -609,8 +556,6 @@
         src="DecodePps" src-port="SliceDataParameters"/>
     <Connection dst="Mgnt_Display" dst-port="POC" src="DecodePic" src-port="POC"/>
     <Connection dst="" dst-port="PocToDisplay" src="Mgnt_Display" src-port="POCtoDisplay"/>
-    <Connection dst="BlockSplit" dst-port="MbType" src="DecodePic" src-port="MacroBlockType"/>
-    <Connection dst="BlockExpand" dst-port="MbType" src="DecodePic" src-port="MacroBlockType"/>
     <Connection dst="" dst-port="MbType4Pred" src="DecodePic" src-port="MbType4Pred"/>
     <Connection dst="" dst-port="SubMbType" src="DecodePic" src-port="SubMbType"/>
     <Connection dst="" dst-port="Height" src="DecodePic" src-port="Height"/>
@@ -666,4 +611,7 @@
     <Connection dst="" dst-port="MbPredMvResL0" src="DecodePic" src-port="MbPredResMvL0"/>
     <Connection dst="DecodePic" dst-port="ResetPrevFrameNum" src="" src-port="EmptyDpb"/>
     <Connection dst="Mgnt_Display" dst-port="EmptyDpb" src="" src-port="EmptyDpb"/>
+    <Connection dst="" dst-port="CavlcLast" src="DecodePic" src-port="Last"/>
+    <Connection dst="" dst-port="CavlcValue" src="DecodePic" src-port="Value"/>
+    <Connection dst="" dst-port="CavlcRun" src="DecodePic" src-port="Run"/>
 </XDF>

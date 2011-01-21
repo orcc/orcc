@@ -172,6 +172,15 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
+    <Instance id="CavlcExpand">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="CavlcBlockExpand"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
@@ -181,10 +190,8 @@
     <Connection dst="Decoding_Y" dst-port="FirstMbInSlice"
         src="FUN_Parser" src-port="FirstMbInSlice"/>
     <Connection dst="Decoding_Y" dst-port="PredMode" src="FUN_Parser" src-port="PredMode"/>
-    <Connection dst="Decoding_Y" dst-port="CoefDC_L" src="FUN_Parser" src-port="CoefDC_L"/>
     <Connection dst="Decoding_Y" dst-port="QP" src="FUN_Parser" src-port="QP"/>
     <Connection dst="Decoding_Y" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
-    <Connection dst="Decoding_Y" dst-port="CoefAC_L" src="FUN_Parser" src-port="CoefAC_L"/>
     <Connection dst="Decoding_Y" dst-port="PicWidthInMb"
         src="FUN_Parser" src-port="PicWidthInMb"/>
     <Connection dst="" dst-port="Display_Cb" src="Decode_U" src-port="Display"/>
@@ -202,10 +209,6 @@
         src="FUN_Parser" src-port="FirstMbInSlice"/>
     <Connection dst="Decode_V" dst-port="PicWidthInMB" src="FUN_Parser" src-port="PicWidthInMb"/>
     <Connection dst="Decode_V" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
-    <Connection dst="Decode_U" dst-port="CoefAC" src="FUN_Parser" src-port="CoefAC_Cb"/>
-    <Connection dst="Decode_U" dst-port="CoefDC" src="FUN_Parser" src-port="CoefDC_Cb"/>
-    <Connection dst="Decode_V" dst-port="CoefDC" src="FUN_Parser" src-port="CoefDC_Cr"/>
-    <Connection dst="Decode_V" dst-port="CoefAC" src="FUN_Parser" src-port="CoefAC_Cr"/>
     <Connection dst="Decode_U" dst-port="PicSizeInMb" src="FUN_Parser" src-port="PicSizeInMb"/>
     <Connection dst="Decode_V" dst-port="PicSizeInMb" src="FUN_Parser" src-port="PicSizeInMb"/>
     <Connection dst="Decode_U" dst-port="QP" src="FUN_Parser" src-port="QP_Cb"/>
@@ -387,4 +390,14 @@
         src="FUN_Parser" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbPredMvResL0"
         src="FUN_Parser" src-port="MbPredMvResL0"/>
+    <Connection dst="CavlcExpand" dst-port="MbType" src="FUN_Parser" src-port="MacroBlockType"/>
+    <Connection dst="CavlcExpand" dst-port="Last" src="FUN_Parser" src-port="CavlcLast"/>
+    <Connection dst="CavlcExpand" dst-port="Run" src="FUN_Parser" src-port="CavlcRun"/>
+    <Connection dst="CavlcExpand" dst-port="Value" src="FUN_Parser" src-port="CavlcValue"/>
+    <Connection dst="Decode_U" dst-port="CoefAC" src="CavlcExpand" src-port="CoefAC_Cb"/>
+    <Connection dst="Decode_V" dst-port="CoefAC" src="CavlcExpand" src-port="CoefAC_Cr"/>
+    <Connection dst="Decoding_Y" dst-port="CoefAC_L" src="CavlcExpand" src-port="CoefAC_L"/>
+    <Connection dst="Decode_U" dst-port="CoefDC" src="CavlcExpand" src-port="CoefDC_Cb"/>
+    <Connection dst="Decode_V" dst-port="CoefDC" src="CavlcExpand" src-port="CoefDC_Cr"/>
+    <Connection dst="Decoding_Y" dst-port="CoefDC_L" src="CavlcExpand" src-port="CoefDC_L"/>
 </XDF>
