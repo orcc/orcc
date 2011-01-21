@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // include Actors
 includeActor(actor) ::= <<
-#include "$actor.simpleName$.h"
+#include "$actor.packageAsList; separator="/"$/$actor.simpleName$.h"
 >>
 
 includeActors(actors) ::= <<
@@ -238,7 +238,7 @@ $if (options.needSerDes)$
 $endif$
 
 extern "C" {
-#include "orcc_util.h"
+#include "System/orcc_util.h"
 }
 
 #include "traceaka.h"
