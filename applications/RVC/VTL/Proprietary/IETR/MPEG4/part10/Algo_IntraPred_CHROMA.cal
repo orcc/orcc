@@ -79,7 +79,7 @@ actor Algo_IntraPred_CHROMA ()
 		uint(size=1) AVAIL,              // up, left, up_left availability List
 		uint(size=4) PredMode
 				==> 
-				int(size=16) MPR:
+				int(size=9) MPR:
 
   int res;
 

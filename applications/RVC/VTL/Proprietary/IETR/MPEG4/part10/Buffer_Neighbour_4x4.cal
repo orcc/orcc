@@ -26,7 +26,7 @@ import MPEG.Common.Imp_PictureInfo.*;
 actor Buffer_Neighbour_4x4()
 	uint(size=6) Mb_Type,
 	uint(size=13) CurrMbAddr,
-	int(size=9) MB_IN,
+	uint(size=8) MB_IN,
 	uint(size=7) PicWidthInMb
 		==>
 	uint(size=16) EDGE :

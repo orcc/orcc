@@ -30,6 +30,7 @@
       <vertex id="SubMbType" x="3" y="552"/>
       <vertex id="IsNewPicOrSlice" x="979" y="204"/>
       <vertex id="EnableRead" x="999" y="114"/>
+      <vertex id="FrameNum" x="1002" y="145"/>
       <vertex id="Display_C" x="1397" y="119"/>
       <vertex id="Intra8x8" x="508" y="8"/>
       <vertex id="Inter" x="457" y="416"/>
@@ -37,6 +38,5 @@
       <vertex id="Select_chroma" x="730" y="313"/>
       <vertex id="Deblocking_Filter" x="1008" y="426"/>
       <vertex id="DemuxParserInfos" x="178" y="7"/>
-      <vertex id="FrameNum" x="1002" y="145"/>
    </vertices>
 </layout>

@@ -20,13 +20,13 @@ package Proprietary.IETR.MPEG4.part10;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
 actor Select () 
-	int (size=16) X0,
-	int (size=9)  X1,
-	int (size=9)  X2,
+	int (size=10) X0,
+	int (size=10)  X1,
+	int (size=10)  X2,
 	int (size=9)  X3,
 	uint(size=6)  Mb_Type
 		==>
-	int (size=9)  X
+	uint(size=8)  X
 		:
 
 

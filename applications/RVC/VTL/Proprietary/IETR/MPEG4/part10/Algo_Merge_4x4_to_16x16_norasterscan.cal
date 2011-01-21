@@ -20,7 +20,7 @@ This FU puts together 4*4 macroblock to generate a 16x16 macroblock.
 
 package Proprietary.IETR.MPEG4.part10;
 
-actor Algo_Merge_4x4_to_16x16_norasterscan () int(size=9) X ==> int(size=16) Y :
+actor Algo_Merge_4x4_to_16x16_norasterscan () int(size=10) X ==> int(size=10) Y :
 
   
   Reorder:action X:[ x ] repeat 64 ==> Y:[ buff] repeat 64

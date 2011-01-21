@@ -22,12 +22,12 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 	uint(size=2)  SelectList,
-	int (size=16) Interp
+	int (size=9) Interp
 		==>
-	int (size=16) MbPred
+	int(size=9) MbPred
 		:
 
-	List(type: List(type: int(size=16), size=16), size=16) ListInterp;
+	List(type: List(type: int(size=9), size=16), size=16) ListInterp;
 
 	uint(size=6) mb_type;
 

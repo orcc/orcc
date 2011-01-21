@@ -82,7 +82,7 @@ actor Algo_IntraPred_LUMA_16x16 ()
 
   uint(size = 4) PredMode
 
-  ==> int(size=16) MPR:
+  ==> int(size=9) MPR:
 
 
   // res variable used by procedure sum 

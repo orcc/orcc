@@ -60,7 +60,7 @@ actor Algo_IntraPred_LUMA_4x4 ()
   uint(size=1) AVAIL,              // up, left, up_left, up_right availability List
   uint(size=4) PredMode
 
-  ==> int(size=16) MPR:
+  ==> int(size=9) MPR:
 
   /* res variable used by procedure sum */
   int res;

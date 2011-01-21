@@ -4,9 +4,9 @@
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
     <Port kind="Input" name="Z">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>

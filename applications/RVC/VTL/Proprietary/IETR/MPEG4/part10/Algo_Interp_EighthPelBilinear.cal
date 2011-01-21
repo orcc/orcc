@@ -11,7 +11,7 @@ actor Algo_Interp_EighthPelBilinear()
 		int(size=16) RD, 
 		uint(size=6) PartSZ 
 				==> 
-				int(size=16) INTERP:
+				int(size=9) INTERP:
 
   int(size=32) x ;
   int(size=32) y ;

@@ -27,7 +27,7 @@
     <Port kind="Input" name="Coef_ACR">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
@@ -58,7 +58,7 @@
     <Port kind="Output" name="MB4x4Pred_C">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="10"/>
             </Entry>
         </Type>
     </Port>
@@ -90,12 +90,15 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_IntraPred_Add"/>
+        <Class name="MPEG.Common.Add_i9_clip"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="a">
-            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        <Parameter name="Max">
+            <Expr kind="Literal" literal-kind="Integer" value="255"/>
+        </Parameter>
+        <Parameter name="Min">
+            <Expr kind="Literal" literal-kind="Integer" value="0"/>
         </Parameter>
     </Instance>
     <Instance id="Algo_Interp_Reord">

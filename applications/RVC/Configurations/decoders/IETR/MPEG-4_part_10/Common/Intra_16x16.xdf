@@ -32,16 +32,16 @@
         </Type>
     </Port>
     <Port kind="Input" name="MB_IN">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Input" name="Coef_ACR">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+                <Expr kind="Literal" literal-kind="Integer" value="9"/>
             </Entry>
         </Type>
     </Port>
@@ -78,7 +78,7 @@
     <Port kind="Output" name="MB_intraPred16x16">
         <Type name="int">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="10"/>
             </Entry>
         </Type>
     </Port>
@@ -115,16 +115,19 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_Add_16x16">
+    <Instance id="Add_Clip">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_IntraPred_Add"/>
+        <Class name="MPEG.Common.Add_i9_clip"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
-        <Parameter name="a">
-            <Expr kind="Literal" literal-kind="Boolean" value="false"/>
+        <Parameter name="Max">
+            <Expr kind="Literal" literal-kind="Integer" value="255"/>
+        </Parameter>
+        <Parameter name="Min">
+            <Expr kind="Literal" literal-kind="Integer" value="0"/>
         </Parameter>
     </Instance>
     <Instance id="Buffer_Neighbour_FullMb">
@@ -147,8 +150,8 @@
     <!-- ************************************** -->
     <Connection dst="Mgnt_Intra_16x16" dst-port="PredMode" src="" src-port="PredMode"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
-    <Connection dst="" dst-port="MB_intraPred16x16" src="Algo_Add_16x16" src-port="Z"/>
-    <Connection dst="Algo_Add_16x16" dst-port="X"
+    <Connection dst="" dst-port="MB_intraPred16x16" src="Add_Clip" src-port="Z"/>
+    <Connection dst="Add_Clip" dst-port="X"
         src="Algo_IntraPred_LUMA_16x16" src-port="MPR"/>
     <Connection dst="Algo_IntraPred_LUMA_16x16" dst-port="AVAIL"
         src="Mgnt_Intra_16x16" src-port="Avail"/>
@@ -170,7 +173,7 @@
         src="Buffer_Neighbour_FullMb" src-port="EDGE"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="ConstrainedIFlag"
         src="" src-port="ConstrainedIFlag"/>
-    <Connection dst="Algo_Add_16x16" dst-port="Y" src="" src-port="Coef_ACR"/>
+    <Connection dst="Add_Clip" dst-port="Y" src="" src-port="Coef_ACR"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="IsIntraFlag" src="" src-port="IsIntraFlag"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>

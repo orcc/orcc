@@ -20,7 +20,7 @@ import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import MPEG.Common.Imp_PictureInfo.*;
 
 actor Algo_DemuxParserInfoForBlocks_Chroma()
-	int (size=16) Coef_ACR,
+	int (size=9)  Coef_ACR,
 	uint(size=6)  MBType,
 	uint(size=13) FirstMbInSlice,
 	bool          ConstrainedIFlag,
@@ -28,13 +28,14 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 	uint(size=13) CurrMbAddr
 	
 		==>
-	int (size=16) Coef_ACR_Intra,
+	int (size=9)  Coef_ACR_Intra,
 	uint(size=13) FstMbInSlice_Intra,
 	bool          IsIntraFlag,
 	bool          ConstrI_Intra,
 	uint(size=7)  PicWidthInMb_Intra,
 	uint(size=13) CurrMbAddr_Intra,
-	int (size=16) Coef_ACR_Inter
+
+	int (size=9)  Coef_ACR_Inter
 		:
 
 
