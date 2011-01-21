@@ -65,7 +65,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/EPFL/MPEG4_mgnt_Address"/>
+		<Class name="Proprietary.EPFL.MPEG4_mgnt_Address"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -86,7 +86,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_Framebuf"/>
+		<Class name="MPEG.MPEG4.part2.Mgnt_Framebuf"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -95,7 +95,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_Interpolation_halfpel"/>
+		<Class name="MPEG.MPEG4.part2.Algo_Interpolation_halfpel"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -104,7 +104,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/Xilinx/MPEG-4_part_2/Add"/>
+		<Class name="Proprietary.Xilinx.MPEG4_part2.Add"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

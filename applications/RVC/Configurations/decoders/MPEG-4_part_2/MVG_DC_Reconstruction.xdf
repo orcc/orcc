@@ -96,7 +96,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/MVG/Addressing_simple"/>
+        <Class name="Proprietary.MVG.Addressing_simple"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -105,7 +105,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/Proprietary/EPFL/MPEG4_algo_DCRinvpred"/>
+		<Class name="Proprietary.EPFL.MPEG4_algo_DCRinvpred"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

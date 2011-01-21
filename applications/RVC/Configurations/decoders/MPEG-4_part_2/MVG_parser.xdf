@@ -94,7 +94,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG4/part2/Algo_Synp_MPEG_4"/>
+		<Class name="MPEG.MPEG4.part2.Algo_Synp_MPEG_4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -133,7 +133,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_MVSequence"/>
+		<Class name="MPEG.MPEG4.part2.Mgnt_MVSequence"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -154,7 +154,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_BlockExpand"/>
+		<Class name="MPEG.MPEG4.part2.Mgnt_BlockExpand"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -163,7 +163,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../../VTL/MPEG/MPEG4/part2/Mgnt_MVReconstruct"/>
+		<Class name="MPEG.MPEG4.part2.Mgnt_MVReconstruct"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
