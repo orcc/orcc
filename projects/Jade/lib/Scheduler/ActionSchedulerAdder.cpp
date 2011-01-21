@@ -160,7 +160,10 @@ void ActionSchedulerAdder::createSchedulerFSM(Instance* instance, BasicBlock* BB
 	string name = instance->getId();
 	name.append("_FSM_state");
 	Function* outsideSchedulerFn = NULL;
+	
+	//Create state variable
 	GlobalVariable* stateVar = cast<GlobalVariable>(module->getOrInsertGlobal(name, Type::getInt32Ty(Context)));
+	fsm->setFsmState(stateVar);
 	
 	//Set initial state to the state variable
 	FSM::State* state = fsm->getInitialState();
@@ -174,6 +177,7 @@ void ActionSchedulerAdder::createSchedulerFSM(Instance* instance, BasicBlock* BB
 	
 	if (!actions->empty()){
 		outsideSchedulerFn = createSchedulerOutsideFSM(instance);
+		fsm->setOutFsmFn(outsideSchedulerFn);
 	}
 
 	//Create fsm scheduler

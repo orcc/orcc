@@ -82,13 +82,17 @@ Decoder::~Decoder (){
 	delete module;
 }
 
-void Decoder::setConfiguration(Configuration* configuration){
+void Decoder::setConfiguration(Configuration* newConfiguration){
 	
 	//Reconfigure the decoder
 	ConfigurationEngine engine(Context);
-	engine.reconfigure(this, configuration);
-
+	engine.reconfigure(this, newConfiguration);
+	
+	configuration = newConfiguration;
 	executionEngine->recompile(scheduler->getMainFunction());
+	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine);
+	scheduler->setSource(stimulus);
+
 	executionEngine->run();
 }
 

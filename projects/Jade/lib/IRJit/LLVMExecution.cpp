@@ -138,23 +138,6 @@ LLVMExecution::LLVMExecution(LLVMContext& C, Decoder* decoder): Context(C)  {
   Exit = (Function*) module->getOrInsertFunction("exit", Type::getVoidTy(Context),
                                                     Type::getInt32Ty(Context),
                                                     NULL);
-  
-  // Reset errno to zero on entry to main.
-  errno = 0;
-
-	clock_t timer = clock();
-
-	// Run static constructors.
-    EE->runStaticConstructorsDestructors(false);
-
-   if (NoLazyCompilation) {
-		for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
-			Function *Fn = &*I;
-			if (!Fn->isDeclaration())
-				EE->getPointerToFunction(Fn);
-		}
-		cout << "--> No lazy compilation enable, the decoder has been compiled in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms \n";
-	}
 }
 
 void* LLVMExecution::getExit() {
@@ -167,8 +150,22 @@ void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
 
 void LLVMExecution::run() {
 	std::string ErrorMsg;
+	Module* module = decoder->getModule();
+	clock_t timer = clock ();
+	
+	// Run static constructors.
+    EE->runStaticConstructorsDestructors(false);
 
-   Scheduler* scheduler = decoder->getScheduler();
+   if (NoLazyCompilation) {
+		for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
+			Function *Fn = &*I;
+			if (!Fn->isDeclaration())
+				EE->getPointerToFunction(Fn);
+		}
+		cout << "--> No lazy compilation enable, the decoder has been compiled in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms \n";
+	}
+   
+	Scheduler* scheduler = decoder->getScheduler();
 	Function* func = scheduler->getMainFunction();
 
 	std::vector<GenericValue> noargs;
@@ -189,6 +186,7 @@ void LLVMExecution::clear() {
 	Module* module = decoder->getModule();
 	EE->runStaticConstructorsDestructors(true);
 	EE->clearAllGlobalMappings();
+	
 /*
 	for (Module::iterator I = module->begin(), E = module->end(); I != E; ++I) {
 		EE->freeMachineCodeForFunction(I);

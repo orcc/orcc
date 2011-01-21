@@ -124,7 +124,7 @@ public:
 	 *  @param configuration : the new configuration
 	 *
      */
-	 void setConfiguration(Configuration* configuration);
+	 void setConfiguration(Configuration* newConfiguration);
 
 	/**
      *  @brief Getter of a stimulus file

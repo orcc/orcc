@@ -83,14 +83,26 @@ void IRUnwriter::unwriteActionScheduler(ActionScheduler* actionScheduler){
 		Function* initialize = actionScheduler->getInitializeFunction();
 		initialize->eraseFromParent();
 	}
-	
+
 	//Remove action scheduler
 	Function* function = actionScheduler->getSchedulerFunction();
 	function->eraseFromParent();
+
+	if (actionScheduler->hasFsm()){
+		unwriteFSM(actionScheduler->getFsm());
+	}
 }
 
 void IRUnwriter::unwriteFSM(FSM* fsm){
+	
+	//Remove the FSM state var
+	GlobalVariable* state = fsm->getFsmState();
+	state->eraseFromParent();
 
+	if (fsm->hasOutFsmFn()){
+		Function* outFsmFn = fsm->getOutFsmFn();
+		outFsmFn->eraseFromParent();
+	}
 }
 
 void IRUnwriter::unwriteVariables(map<string, Variable*>* vars){

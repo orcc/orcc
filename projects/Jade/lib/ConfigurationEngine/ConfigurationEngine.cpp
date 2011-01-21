@@ -127,7 +127,6 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	// Setting connections of the decoder
 	AbstractConnector* connector = configuration->getConnector();
 	connector->setConnections(configuration, decoder);
-
 }
 
 void ConfigurationEngine::clearConnections(Decoder* decoder){

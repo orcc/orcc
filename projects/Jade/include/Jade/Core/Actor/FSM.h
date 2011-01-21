@@ -102,25 +102,35 @@ public:
 	};
 
 	/**
-     *  @brief Set outside_fsm used by the fsm
+     *  @brief Set outside_fsm function used by the fsm
 	 *
 	 *  Set the llvm::Function outside_fsm used to manage actions outside the fsm.
 	 *   This function is set to null when no actions are outside the fsm.
 	 *
 	 *	@param function : llvm::Function used by the fsm
      */
-	void setOutFsm(llvm::Function* outFsm){
+	void setOutFsmFn(llvm::Function* outFsm){
 		this->outFsm = outFsm;
 	};
 
 	/**
-     *  @brief Get outside_fsm used by the fsm
+     *  @brief Return true if fms has an outside_fsm function
+	 *
+	 *  Return Tree if actions from the actor are outside this fsm, 
+	 *    otherwise return False
+	 *
+	 *	@return true if exist an outside_fsm function, otherwise False
+     */
+	bool hasOutFsmFn(){ return outFsm != NULL;}
+
+	/**
+     *  @brief Get outside_fsm function used by the fsm
 	 *
 	 *  Get the llvm::Function outside_fsm used to manage actions outside the fsm in llvm
 	 *
 	 *	@return llvm::Function corresponding to outside_fsm
      */
-	llvm::Function* getOutFsm(){ return outFsm;}
+	llvm::Function* getOutFsmFn(){ return outFsm;}
 
 	/**
      *  @brief Get fsm_state used by the fsm
