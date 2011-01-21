@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="RD_C" x="27" y="239"/>
+      <vertex id="ReadResult" x="11" y="235"/>
       <vertex id="MV" x="31" y="173"/>
       <vertex id="PartSZ" x="19" y="207"/>
       <vertex id="Coef_ACR" x="539" y="76"/>

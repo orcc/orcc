@@ -59,7 +59,7 @@ actor Mgnt_DBF (int LUMA_CHROMA)
 					==> 
 						uint(size=6) BS,
 						uint(size=8) DB_I,
-						int (size=9) WD:
+						uint(size=8) WD:
 
 ///////////////
 // Constants //

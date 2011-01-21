@@ -125,10 +125,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="I_PCM_Y">
-        <Type name="int">
+    <Port kind="Input" name="I_PCM">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
@@ -324,7 +324,6 @@
     <Connection dst="TEX_L" dst-port="LFDisable" src="" src-port="LFDisable"/>
     <Connection dst="TEX_L" dst-port="ref_idx_in" src="" src-port="ref_idx_in"/>
     <Connection dst="TEX_L" dst-port="mv_in" src="" src-port="mv_in"/>
-    <Connection dst="TEX_L" dst-port="I_PCM_Y" src="" src-port="I_PCM_Y"/>
     <Connection dst="TEX_L" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="TEX_L" dst-port="slice_alpha_c0_offset" src="" src-port="slice_alpha_c0_offset"/>
     <Connection dst="TEX_L" dst-port="slice_beta_offset" src="" src-port="slice_beta_offset"/>
@@ -342,4 +341,5 @@
     <Connection dst="TEX_L" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
     <Connection dst="TEX_L" dst-port="EnableRead" src="" src-port="EnableRead"/>
     <Connection dst="TEX_L" dst-port="FrameNum" src="" src-port="FrameNum"/>
+    <Connection dst="TEX_L" dst-port="I_PCM" src="" src-port="I_PCM"/>
 </XDF>

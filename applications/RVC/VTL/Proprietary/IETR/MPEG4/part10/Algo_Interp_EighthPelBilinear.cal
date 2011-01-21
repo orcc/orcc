@@ -8,10 +8,10 @@ package Proprietary.IETR.MPEG4.part10;
 
 actor Algo_Interp_EighthPelBilinear() 
 		int(size=16) Mv, 
-		int(size=16) RD, 
+		uint(size=8) ReadResult, 
 		uint(size=6) PartSZ 
 				==> 
-				int(size=9) INTERP:
+		uint(size=8) Interp:
 
   int(size=32) x ;
   int(size=32) y ;
@@ -23,7 +23,7 @@ actor Algo_Interp_EighthPelBilinear()
   int width;
   int height;
 
-  List( type:int(size=16), size=289 ) inbuf := [ 0 : for int i in 0 .. 288 ];
+  List( type:uint(size=8), size=289 ) inbuf := [ 0 : for int i in 0 .. 288 ];
 
   procedure compensate( )
   begin  
@@ -57,7 +57,7 @@ actor Algo_Interp_EighthPelBilinear()
   end
 
   // fetch (width+1)x(height+1) pixels
-  fetch: action RD:[d] ==>
+  fetch: action ReadResult:[d] ==>
   guard 
    x < (width+1) and y < (height+1)
   do
@@ -75,11 +75,11 @@ actor Algo_Interp_EighthPelBilinear()
   end
   
   // interpolation according to MODE
-  process: action ==> INTERP:[ p ]
+  process: action ==> Interp:[ p ]
   guard
     x = 0 and y = (height+1)
   var 
-	int p
+	uint(size=8) p
   do
    compensate();
    p := temp;

@@ -132,23 +132,23 @@
         </Type>
     </Port>
     <Port kind="Output" name="I_PCM_Y">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="I_PCM_U">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
     <Port kind="Output" name="I_PCM_V">
-        <Type name="int">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>

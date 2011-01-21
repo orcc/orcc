@@ -11,10 +11,10 @@ import MPEG.Common.Imp_Math.*;
 
 actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	int (size=16) Mv,
-	int (size=16) RD,
+	uint(size=8)  ReadResult,
 	uint(size=6)  PartSZ
 		==>
-	int(size=9) INTERP
+	uint(size=8)  Interp
 		:
 
   int(size=32) x ;
@@ -200,7 +200,7 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 	end
 
 	GetPixVal.Launch: action
-			RD:[d]
+			ReadResult:[d]
 				==>
 		guard
 			y < (height+5)
@@ -218,11 +218,11 @@ actor Algo_Interp_SeparableSixTapQuarterPelAVC ()
 			y >= height +5
 		end
 
-	Interpolate.Launch: action ==> INTERP:[ p ]
+	Interpolate.Launch: action ==> Interp:[ p ]
 		guard
 			o_y < height
 		var 
-			int p
+			uint(size=8) p
 		do
 			compensate(o_x,o_y);
 			p := temp;

@@ -111,10 +111,10 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="I_PCM_Y">
-        <Type name="int">
+    <Port kind="Input" name="I_PCM">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="9"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
@@ -263,7 +263,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Select"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.SelectMbForLuma"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -359,10 +359,6 @@
     <Connection dst="Buffer_inter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Buffer_inter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Buffer_inter" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Intra_16x16" dst-port="MB_IN" src="Select" src-port="X"/>
-    <Connection dst="Select" dst-port="X1" src="Intra_16x16" src-port="MB_intraPred16x16"/>
-    <Connection dst="Select" dst-port="X0" src="Intra_4x4" src-port="MBPred_intra_4x4"/>
-    <Connection dst="Deblocking_Filter" dst-port="Z" src="Select" src-port="X"/>
     <Connection dst="Deblocking_Filter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Deblocking_Filter" dst-port="QP" src="" src-port="QP"/>
@@ -373,7 +369,6 @@
     <Connection dst="Deblocking_Filter" dst-port="MV" src="" src-port="mv_in"/>
     <Connection dst="Deblocking_Filter" dst-port="RefIdx" src="" src-port="ref_idx_in"/>
     <Connection dst="Deblocking_Filter" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
-    <Connection dst="Select" dst-port="X3" src="" src-port="I_PCM_Y"/>
     <Connection dst="Buffer_inter" dst-port="DelList" src="" src-port="DelList"/>
     <Connection dst="Buffer_inter" dst-port="IsIDR" src="" src-port="IsIDR"/>
     <Connection dst="" dst-port="Display_L" src="Buffer_inter" src-port="Display"/>
@@ -386,7 +381,6 @@
     <Connection dst="Intra_16x16" dst-port="Coef_ACR"
         src="DemuxParserInfos" src-port="Coef_ACR_Intra_16x16"/>
     <Connection dst="Select" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
-    <Connection dst="Intra_4x4" dst-port="MB_IN" src="Select" src-port="X"/>
     <Connection dst="DemuxParserInfos" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Intra_4x4" dst-port="FirstMbInSlice"
         src="DemuxParserInfos" src-port="FstMbInSlice_Intra_4x4"/>
@@ -423,10 +417,8 @@
     <Connection dst="Intra_16x16" dst-port="CurrMb_Addr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
     <Connection dst="Inter" dst-port="Coef_ACR" src="DemuxParserInfos" src-port="Coef_ACR_Inter"/>
-    <Connection dst="Inter" dst-port="RD_L" src="Buffer_inter" src-port="RD"/>
     <Connection dst="Inter" dst-port="MV" src="" src-port="MV"/>
     <Connection dst="Inter" dst-port="PartSZ" src="" src-port="PartSZ"/>
-    <Connection dst="Select" dst-port="X2" src="Inter" src-port="MB4x4Pred_L"/>
     <Connection dst="Intra_4x4" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Intra_16x16" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
@@ -439,4 +431,13 @@
     <Connection dst="Buffer_inter" dst-port="IsNewPicOrSlice" src="" src-port="IsNewPicOrSlice"/>
     <Connection dst="Buffer_inter" dst-port="EnableRead" src="" src-port="EnableRead"/>
     <Connection dst="Buffer_inter" dst-port="FrameNum" src="" src-port="FrameNum"/>
+    <Connection dst="Inter" dst-port="ReadResult" src="Buffer_inter" src-port="ReadResult"/>
+    <Connection dst="Select" dst-port="MbFromInter" src="Inter" src-port="MB4x4Pred_L"/>
+    <Connection dst="Select" dst-port="MbFromIntra16x16"
+        src="Intra_16x16" src-port="MB_intraPred16x16"/>
+    <Connection dst="Select" dst-port="MbFromIntra4x4" src="Intra_4x4" src-port="MBPred_intra_4x4"/>
+    <Connection dst="Select" dst-port="MbFromPcm" src="" src-port="I_PCM"/>
+    <Connection dst="Deblocking_Filter" dst-port="Z" src="Select" src-port="MbOut"/>
+    <Connection dst="Intra_4x4" dst-port="MB_IN" src="Select" src-port="MbOut"/>
+    <Connection dst="Intra_16x16" dst-port="MB_IN" src="Select" src-port="MbOut"/>
 </XDF>

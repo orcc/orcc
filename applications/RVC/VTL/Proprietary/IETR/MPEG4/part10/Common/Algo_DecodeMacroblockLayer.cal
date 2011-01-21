@@ -45,9 +45,9 @@ actor Algo_DecodeMacroblockLayer()
 
 	uint(size=6)  MbType,
 	bool          MergeTransfSz8x8,
-	int(size=9)   pix_I_PCM_Y,
-	int(size=9)   pix_I_PCM_U,
-	int(size=9)   pix_I_PCM_V,
+	uint(size=8)   pix_I_PCM_Y,
+	uint(size=8)   pix_I_PCM_U,
+	uint(size=8)   pix_I_PCM_V,
 
 	uint(size=5)  NbCoeffInMB,
 	bool          SkipMacroBlk,

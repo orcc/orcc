@@ -17,7 +17,7 @@
       <vertex id="CodedBlockPattern" x="976" y="804"/>
       <vertex id="ref_idx_in" x="1031" y="976"/>
       <vertex id="mv_in" x="1028" y="869"/>
-      <vertex id="I_PCM_Y" x="760" y="995"/>
+      <vertex id="I_PCM" x="694" y="998"/>
       <vertex id="ConstrainedIFlag" x="19" y="824"/>
       <vertex id="DelList" x="1154" y="257"/>
       <vertex id="PocToDisplay" x="1146" y="448"/>
@@ -34,7 +34,7 @@
       <vertex id="FrameNum" x="1148" y="321"/>
       <vertex id="Display_L" x="1535" y="289"/>
       <vertex id="Buffer_inter" x="1346" y="260"/>
-      <vertex id="Select" x="889" y="887"/>
+      <vertex id="Select" x="817" y="907"/>
       <vertex id="Intra_16x16" x="597" y="618"/>
       <vertex id="Intra_4x4" x="595" y="1091"/>
       <vertex id="Deblocking_Filter" x="1176" y="718"/>

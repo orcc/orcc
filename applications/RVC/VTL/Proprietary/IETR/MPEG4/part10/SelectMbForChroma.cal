@@ -14,89 +14,51 @@ IETR/INSA of Rennes (France) retains full right to modify and use the code for i
 This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-//Modified by Damien de Saint Jorre IETR/INSA of Rennes (France)
 package Proprietary.IETR.MPEG4.part10;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Select () 
-	int (size=10) X0,
-	int (size=10)  X1,
-	int (size=10)  X2,
-	int (size=9)  X3,
-	uint(size=6)  Mb_Type
+actor SelectMbForChroma ()
+	uint(size=6)  Mb_Type,
+
+	int (size=10) MbFromIntra,
+	int (size=10) MbFromInter,
+	uint(size=8)  MbFromPcm
 		==>
-	uint(size=8)  X
+	uint(size=8)  MbOut
 		:
 
-
-  
-  	bool DEBUG_INPUT = false;
-  
-  
-	GetIntra4x4:action
-		Mb_Type :[MbType],
-		X0      :[x] repeat 16*16
-			==>
-		X          :[x] repeat 256
+  /*
+	GetIntra4x4:action X0:[x] repeat 8*8 ==> X:[x] repeat 8*8
 	guard
-    	MbType = BLOCK_TYPE_I_NxN
-    do
-		if(DEBUG_INPUT)then
-			foreach int i in 0 .. 16*16 - 1
-			do
-				println("Input Select X0:"+x[i]);
-			end
-		end
+    	sel = 0
 	end
-  
-	GetIntra16x16:action 
-		Mb_Type :[MbType],
-		X1      :[x] repeat 16*16
-			==>
-		X :[x] repeat 16*16 
-	guard
-    	MbType >= BLOCK_TYPE_INTRA_16x16_MIN,
-    	MbType <= BLOCK_TYPE_INTRA_16x16_MAX
-    do
-		if(DEBUG_INPUT)then
-			foreach int i in 0 .. 16*16 - 1
-			do
-				println("Input Select X1:"+x[i]);
-			end
+  */
+	GetIntra16x16:action
+			Mb_Type     :[MbType],
+			MbFromIntra :[x] repeat 64
+				==>
+			MbOut       :[x] repeat 64 
+		guard
+			MbType <= BLOCK_TYPE_INTRA_MAX,
+			MbType != BLOCK_TYPE_I_PCM
 		end
-	end
   
 	GetInter:action
-		Mb_Type :[MbType],
-		X2      :[x] repeat 16*16
-			==>
-		X :[x] repeat 16*16
-	guard
-    	MbType > BLOCK_TYPE_INTRA_MAX
-    do
-		if(DEBUG_INPUT)then
-			foreach int i in 0 .. 16*16 - 1
-			do
-				println("Input Select X2:"+x[i]);
-			end
+			Mb_Type     :[MbType],
+			MbFromInter :[x] repeat 64
+				==>
+			MbOut       :[x] repeat 64
+		guard
+	    	MbType > BLOCK_TYPE_INTRA_MAX
 		end
-	end
 	
 	GetPCM: action
-		Mb_Type :[MbType],
-		X3      :[x] repeat 16*16
-			==>
-		X:[x] repeat 16*16
-	guard
-    	MbType = BLOCK_TYPE_I_PCM
-    do
-		if(DEBUG_INPUT)then
-			foreach int i in 0 .. 16*16 - 1
-			do
-				println("Input Select X3:"+x[i]);
-			end
+			Mb_Type   :[MbType],
+			MbFromPcm :[x] repeat 64
+				==>
+			MbOut     :[x] repeat 64
+		guard
+			MbType = BLOCK_TYPE_I_PCM
 		end
-	end
-	
 end

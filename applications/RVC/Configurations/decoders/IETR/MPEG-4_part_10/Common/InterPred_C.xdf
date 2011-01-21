@@ -3,10 +3,10 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="RD_C">
-        <Type name="int">
+    <Port kind="Input" name="ReadResult">
+        <Type name="uint">
             <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="16"/>
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
@@ -116,7 +116,6 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="RD" src="" src-port="RD_C"/>
     <Connection dst="Algo_Interp_EighthPelBilinear" dst-port="PartSZ"
         src="" src-port="PartSZ"/>
     <Connection dst="" dst-port="MB4x4Pred_C" src="Algo_Add" src-port="Z"/>
@@ -125,7 +124,9 @@
     <Connection dst="Algo_Interp_Reord" dst-port="SubMbType" src="" src-port="SubMbType"/>
     <Connection dst="Algo_Interp_Reord" dst-port="SelectList" src="" src-port="SelectList"/>
     <Connection dst="Algo_Interp_Reord" dst-port="MbType" src="" src-port="MbType"/>
-    <Connection dst="Algo_Interp_Reord" dst-port="Interp"
-        src="Algo_Interp_EighthPelBilinear" src-port="INTERP"/>
     <Connection dst="Algo_Add" dst-port="X" src="Algo_Interp_Reord" src-port="MbPred"/>
+    <Connection dst="Algo_Interp_EighthPelBilinear"
+        dst-port="ReadResult" src="" src-port="ReadResult"/>
+    <Connection dst="Algo_Interp_Reord" dst-port="Interp"
+        src="Algo_Interp_EighthPelBilinear" src-port="Interp"/>
 </XDF>
