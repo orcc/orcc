@@ -82,7 +82,7 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="FUN_Parser">
+    <Instance id="Syn_Parser">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -205,89 +205,89 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="FUN_Parser" dst-port="bits8" src="" src-port="bits8"/>
+    <Connection dst="Syn_Parser" dst-port="bits8" src="" src-port="bits8"/>
     <Connection dst="" dst-port="Display_L" src="Decoding_Y" src-port="Display_L"/>
-    <Connection dst="Decoding_Y" dst-port="CurrMbAddr" src="FUN_Parser" src-port="CurrMbAddr"/>
+    <Connection dst="Decoding_Y" dst-port="CurrMbAddr" src="Syn_Parser" src-port="CurrMbAddr"/>
     <Connection dst="Decoding_Y" dst-port="FirstMbInSlice"
-        src="FUN_Parser" src-port="FirstMbInSlice"/>
-    <Connection dst="Decoding_Y" dst-port="QP" src="FUN_Parser" src-port="QP"/>
-    <Connection dst="Decoding_Y" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
+    <Connection dst="Decoding_Y" dst-port="QP" src="Syn_Parser" src-port="QP"/>
+    <Connection dst="Decoding_Y" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
     <Connection dst="Decoding_Y" dst-port="PicWidthInMb"
-        src="FUN_Parser" src-port="PicWidthInMb"/>
+        src="Syn_Parser" src-port="PicWidthInMb"/>
     <Connection dst="" dst-port="Display_Cb" src="Decode_U" src-port="Display"/>
     <Connection dst="" dst-port="Display_Cr" src="Decode_V" src-port="Display"/>
-    <Connection dst="" dst-port="Width" src="FUN_Parser" src-port="Width"/>
-    <Connection dst="" dst-port="Height" src="FUN_Parser" src-port="Height"/>
-    <Connection dst="Decoding_Y" dst-port="PicSizeInMb" src="FUN_Parser" src-port="PicSizeInMb"/>
-    <Connection dst="Decode_U" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
-    <Connection dst="Decode_U" dst-port="PicWidthInMB" src="FUN_Parser" src-port="PicWidthInMb"/>
+    <Connection dst="" dst-port="Width" src="Syn_Parser" src-port="Width"/>
+    <Connection dst="" dst-port="Height" src="Syn_Parser" src-port="Height"/>
+    <Connection dst="Decoding_Y" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
+    <Connection dst="Decode_U" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
+    <Connection dst="Decode_U" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
     <Connection dst="Decode_U" dst-port="FirstMbInSlice"
-        src="FUN_Parser" src-port="FirstMbInSlice"/>
-    <Connection dst="Decode_U" dst-port="CurrMbAddr" src="FUN_Parser" src-port="CurrMbAddr"/>
-    <Connection dst="Decode_V" dst-port="CurrMbAddr" src="FUN_Parser" src-port="CurrMbAddr"/>
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
+    <Connection dst="Decode_U" dst-port="CurrMbAddr" src="Syn_Parser" src-port="CurrMbAddr"/>
+    <Connection dst="Decode_V" dst-port="CurrMbAddr" src="Syn_Parser" src-port="CurrMbAddr"/>
     <Connection dst="Decode_V" dst-port="FirstMbInSlice"
-        src="FUN_Parser" src-port="FirstMbInSlice"/>
-    <Connection dst="Decode_V" dst-port="PicWidthInMB" src="FUN_Parser" src-port="PicWidthInMb"/>
-    <Connection dst="Decode_V" dst-port="ScalingList" src="FUN_Parser" src-port="ScalingList"/>
-    <Connection dst="Decode_U" dst-port="PicSizeInMb" src="FUN_Parser" src-port="PicSizeInMb"/>
-    <Connection dst="Decode_V" dst-port="PicSizeInMb" src="FUN_Parser" src-port="PicSizeInMb"/>
-    <Connection dst="Decode_U" dst-port="QP" src="FUN_Parser" src-port="QP_Cb"/>
-    <Connection dst="Decode_V" dst-port="QP" src="FUN_Parser" src-port="QP_Cr"/>
-    <Connection dst="Decode_U" dst-port="PredMode" src="FUN_Parser" src-port="IntraPredModeC"/>
-    <Connection dst="Decode_V" dst-port="PredMode" src="FUN_Parser" src-port="IntraPredModeC"/>
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
+    <Connection dst="Decode_V" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
+    <Connection dst="Decode_V" dst-port="ScalingList" src="Syn_Parser" src-port="ScalingList"/>
+    <Connection dst="Decode_U" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
+    <Connection dst="Decode_V" dst-port="PicSizeInMb" src="Syn_Parser" src-port="PicSizeInMb"/>
+    <Connection dst="Decode_U" dst-port="QP" src="Syn_Parser" src-port="QP_Cb"/>
+    <Connection dst="Decode_V" dst-port="QP" src="Syn_Parser" src-port="QP_Cr"/>
+    <Connection dst="Decode_U" dst-port="PredMode" src="Syn_Parser" src-port="IntraPredModeC"/>
+    <Connection dst="Decode_V" dst-port="PredMode" src="Syn_Parser" src-port="IntraPredModeC"/>
     <Connection dst="Decoding_Y" dst-port="CodedBlockPattern"
-        src="FUN_Parser" src-port="CodedBlockPattern"/>
-    <Connection dst="Decoding_Y" dst-port="LFDisable" src="FUN_Parser" src-port="LFDisable"/>
+        src="Syn_Parser" src-port="CodedBlockPattern"/>
+    <Connection dst="Decoding_Y" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
     <Connection dst="Decoding_Y" dst-port="slice_alpha_c0_offset"
-        src="FUN_Parser" src-port="slice_alpha_c0_offset"/>
+        src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
     <Connection dst="Decoding_Y" dst-port="slice_beta_offset"
-        src="FUN_Parser" src-port="slice_beta_offset"/>
+        src="Syn_Parser" src-port="slice_beta_offset"/>
     <Connection dst="Decode_U" dst-port="slice_beta_offset"
-        src="FUN_Parser" src-port="slice_beta_offset"/>
+        src="Syn_Parser" src-port="slice_beta_offset"/>
     <Connection dst="Decode_U" dst-port="CodedBlockPattern"
-        src="FUN_Parser" src-port="CodedBlockPattern"/>
-    <Connection dst="Decode_U" dst-port="LFDisable" src="FUN_Parser" src-port="LFDisable"/>
+        src="Syn_Parser" src-port="CodedBlockPattern"/>
+    <Connection dst="Decode_U" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
     <Connection dst="Decode_U" dst-port="slice_alpha_c0_offset"
-        src="FUN_Parser" src-port="slice_alpha_c0_offset"/>
+        src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
     <Connection dst="Decode_V" dst-port="slice_alpha_c0_offset"
-        src="FUN_Parser" src-port="slice_alpha_c0_offset"/>
+        src="Syn_Parser" src-port="slice_alpha_c0_offset"/>
     <Connection dst="Decode_V" dst-port="slice_beta_offset"
-        src="FUN_Parser" src-port="slice_beta_offset"/>
-    <Connection dst="Decode_V" dst-port="LFDisable" src="FUN_Parser" src-port="LFDisable"/>
+        src="Syn_Parser" src-port="slice_beta_offset"/>
+    <Connection dst="Decode_V" dst-port="LFDisable" src="Syn_Parser" src-port="LFDisable"/>
     <Connection dst="Decode_V" dst-port="CodedBlockPattern"
-        src="FUN_Parser" src-port="CodedBlockPattern"/>
-    <Connection dst="Decoding_Y" dst-port="I_PCM_Y" src="FUN_Parser" src-port="I_PCM_Y"/>
-    <Connection dst="Decode_U" dst-port="I_PCM_C" src="FUN_Parser" src-port="I_PCM_U"/>
-    <Connection dst="Decode_V" dst-port="I_PCM_C" src="FUN_Parser" src-port="I_PCM_V"/>
+        src="Syn_Parser" src-port="CodedBlockPattern"/>
+    <Connection dst="Decoding_Y" dst-port="I_PCM_Y" src="Syn_Parser" src-port="I_PCM_Y"/>
+    <Connection dst="Decode_U" dst-port="I_PCM_C" src="Syn_Parser" src-port="I_PCM_U"/>
+    <Connection dst="Decode_V" dst-port="I_PCM_C" src="Syn_Parser" src-port="I_PCM_V"/>
     <Connection dst="Decoding_Y" dst-port="ConstrainedIFlag"
-        src="FUN_Parser" src-port="ConstrainedIFlag"/>
+        src="Syn_Parser" src-port="ConstrainedIFlag"/>
     <Connection dst="Decode_U" dst-port="ConstrainedIFlag"
-        src="FUN_Parser" src-port="ConstrainedIFlag"/>
+        src="Syn_Parser" src-port="ConstrainedIFlag"/>
     <Connection dst="Decode_V" dst-port="ConstrainedIFlag"
-        src="FUN_Parser" src-port="ConstrainedIFlag"/>
+        src="Syn_Parser" src-port="ConstrainedIFlag"/>
     <Connection dst="Decoding_Y" dst-port="MacroBlockType"
-        src="FUN_Parser" src-port="MacroBlockType"/>
+        src="Syn_Parser" src-port="MacroBlockType"/>
     <Connection dst="Decoding_Y" dst-port="TransformSize8x8"
-        src="FUN_Parser" src-port="TransformSize8x8"/>
+        src="Syn_Parser" src-port="TransformSize8x8"/>
     <Connection dst="Decode_U" dst-port="MacroBlockType"
-        src="FUN_Parser" src-port="MacroBlockType"/>
+        src="Syn_Parser" src-port="MacroBlockType"/>
     <Connection dst="Decode_V" dst-port="MacroBlockType"
-        src="FUN_Parser" src-port="MacroBlockType"/>
-    <Connection dst="Decoding_Y" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
-    <Connection dst="Decoding_Y" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
-    <Connection dst="Decode_U" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
-    <Connection dst="Decode_V" dst-port="MbType4Pred" src="FUN_Parser" src-port="MbType4Pred"/>
-    <Connection dst="Decode_U" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
-    <Connection dst="Decode_V" dst-port="SubMbType" src="FUN_Parser" src-port="SubMbType"/>
+        src="Syn_Parser" src-port="MacroBlockType"/>
+    <Connection dst="Decoding_Y" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decoding_Y" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
+    <Connection dst="Decode_U" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decode_V" dst-port="MbType4Pred" src="Syn_Parser" src-port="MbType4Pred"/>
+    <Connection dst="Decode_U" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
+    <Connection dst="Decode_V" dst-port="SubMbType" src="Syn_Parser" src-port="SubMbType"/>
     <Connection dst="Decoding_Y" dst-port="IsNewPicOrSlice"
-        src="FUN_Parser" src-port="IsNewPicOrSlice"/>
+        src="Syn_Parser" src-port="IsNewPicOrSlice"/>
     <Connection dst="Decode_U" dst-port="IsNewPicOrSlice"
-        src="FUN_Parser" src-port="IsNewPicOrSlice"/>
+        src="Syn_Parser" src-port="IsNewPicOrSlice"/>
     <Connection dst="Decode_V" dst-port="IsNewPicOrSlice"
-        src="FUN_Parser" src-port="IsNewPicOrSlice"/>
-    <Connection dst="Decoding_Y" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum"/>
-    <Connection dst="Decode_U" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum"/>
-    <Connection dst="Decode_V" dst-port="FrameNum" src="FUN_Parser" src-port="FrameNum"/>
+        src="Syn_Parser" src-port="IsNewPicOrSlice"/>
+    <Connection dst="Decoding_Y" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
+    <Connection dst="Decode_U" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
+    <Connection dst="Decode_V" dst-port="FrameNum" src="Syn_Parser" src-port="FrameNum"/>
     <Connection dst="Decode_V" dst-port="DelList"
         src="Generate_Inter_Info" src-port="DelList"/>
     <Connection dst="Decode_U" dst-port="DelList"
@@ -346,68 +346,68 @@
     <Connection dst="Decoding_Y" dst-port="EnableRead"
         src="Generate_Inter_Info" src-port="Read4MbPred"/>
     <Connection dst="Generate_Inter_Info" dst-port="CurrMbAddr"
-        src="FUN_Parser" src-port="CurrMbAddr"/>
+        src="Syn_Parser" src-port="CurrMbAddr"/>
     <Connection dst="Generate_Inter_Info" dst-port="FrameNum"
-        src="FUN_Parser" src-port="FrameNum"/>
+        src="Syn_Parser" src-port="FrameNum"/>
     <Connection dst="Generate_Inter_Info" dst-port="MaxFrameNum"
-        src="FUN_Parser" src-port="MaxFrameNum"/>
+        src="Syn_Parser" src-port="MaxFrameNum"/>
     <Connection dst="Generate_Inter_Info" dst-port="NumRefFrame"
-        src="FUN_Parser" src-port="NumRefFrame"/>
+        src="Syn_Parser" src-port="NumRefFrame"/>
     <Connection dst="Generate_Inter_Info" dst-port="Poc"
-        src="FUN_Parser" src-port="Poc"/>
-    <Connection dst="Decode_V" dst-port="POC" src="FUN_Parser" src-port="Poc"/>
-    <Connection dst="Decode_U" dst-port="POC" src="FUN_Parser" src-port="Poc"/>
-    <Connection dst="Decoding_Y" dst-port="POC" src="FUN_Parser" src-port="Poc"/>
+        src="Syn_Parser" src-port="Poc"/>
+    <Connection dst="Decode_V" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
+    <Connection dst="Decode_U" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
+    <Connection dst="Decoding_Y" dst-port="POC" src="Syn_Parser" src-port="Poc"/>
     <Connection dst="Generate_Inter_Info" dst-port="Mmco"
-        src="FUN_Parser" src-port="Mmco"/>
+        src="Syn_Parser" src-port="Mmco"/>
     <Connection dst="Generate_Inter_Info" dst-port="NbRefFrameL0"
-        src="FUN_Parser" src-port="NbRefFrameL0"/>
+        src="Syn_Parser" src-port="NbRefFrameL0"/>
     <Connection dst="Generate_Inter_Info" dst-port="NbRefFrameL1"
-        src="FUN_Parser" src-port="NbRefFrameL1"/>
+        src="Syn_Parser" src-port="NbRefFrameL1"/>
     <Connection dst="Generate_Inter_Info" dst-port="RefList0Type"
-        src="FUN_Parser" src-port="RefList0Type"/>
+        src="Syn_Parser" src-port="RefList0Type"/>
     <Connection dst="Generate_Inter_Info" dst-port="RefList1Type"
-        src="FUN_Parser" src-port="RefList1Type"/>
+        src="Syn_Parser" src-port="RefList1Type"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbType"
-        src="FUN_Parser" src-port="MacroBlockType"/>
+        src="Syn_Parser" src-port="MacroBlockType"/>
     <Connection dst="Generate_Inter_Info" dst-port="SubMbType"
-        src="FUN_Parser" src-port="SubMbType"/>
+        src="Syn_Parser" src-port="SubMbType"/>
     <Connection dst="Generate_Inter_Info" dst-port="Direct8x8Inference"
-        src="FUN_Parser" src-port="Direct8x8Inference"/>
+        src="Syn_Parser" src-port="Direct8x8Inference"/>
     <Connection dst="Generate_Inter_Info" dst-port="DirectSpatialMvPred"
-        src="FUN_Parser" src-port="DirectSpatialMvPred"/>
+        src="Syn_Parser" src-port="DirectSpatialMvPred"/>
     <Connection dst="Generate_Inter_Info" dst-port="FirstMbInSlice"
-        src="FUN_Parser" src-port="FirstMbInSlice"/>
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
     <Connection dst="Generate_Inter_Info" dst-port="SubMbPredRefIdxL1"
-        src="FUN_Parser" src-port="SubMbPredRefIdxL1"/>
+        src="Syn_Parser" src-port="SubMbPredRefIdxL1"/>
     <Connection dst="Generate_Inter_Info" dst-port="SubMbPredMvResL1"
-        src="FUN_Parser" src-port="SubMbPredMvResL1"/>
+        src="Syn_Parser" src-port="SubMbPredMvResL1"/>
     <Connection dst="Generate_Inter_Info" dst-port="SubMbPredMvResL0"
-        src="FUN_Parser" src-port="SubMbPredMvResL0"/>
+        src="Syn_Parser" src-port="SubMbPredMvResL0"/>
     <Connection dst="Generate_Inter_Info" dst-port="PicWidthInMb"
-        src="FUN_Parser" src-port="PicWidthInMb"/>
+        src="Syn_Parser" src-port="PicWidthInMb"/>
     <Connection dst="Generate_Inter_Info" dst-port="NewPic"
-        src="FUN_Parser" src-port="NewPic"/>
+        src="Syn_Parser" src-port="NewPic"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbType4Prediction"
-        src="FUN_Parser" src-port="MbType4Pred"/>
+        src="Syn_Parser" src-port="MbType4Pred"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbPredRefIdxL1"
-        src="FUN_Parser" src-port="MbPredRefIdxL1"/>
+        src="Syn_Parser" src-port="MbPredRefIdxL1"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbPredRefIdxL0"
-        src="FUN_Parser" src-port="MbPredRefIdxL0"/>
+        src="Syn_Parser" src-port="MbPredRefIdxL0"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbPredMvResL1"
-        src="FUN_Parser" src-port="MbPredMvResL1"/>
+        src="Syn_Parser" src-port="MbPredMvResL1"/>
     <Connection dst="Generate_Inter_Info" dst-port="RefReorderingL0"
-        src="FUN_Parser" src-port="RefReorderingL0"/>
+        src="Syn_Parser" src-port="RefReorderingL0"/>
     <Connection dst="Generate_Inter_Info" dst-port="RefReorderingL1"
-        src="FUN_Parser" src-port="RefReorderingL1"/>
+        src="Syn_Parser" src-port="RefReorderingL1"/>
     <Connection dst="Generate_Inter_Info" dst-port="SubMbPredRefIdxL0"
-        src="FUN_Parser" src-port="SubMbPredRefIdxL0"/>
+        src="Syn_Parser" src-port="SubMbPredRefIdxL0"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbPredMvResL0"
-        src="FUN_Parser" src-port="MbPredMvResL0"/>
-    <Connection dst="CavlcExpand" dst-port="MbType" src="FUN_Parser" src-port="MacroBlockType"/>
-    <Connection dst="CavlcExpand" dst-port="Last" src="FUN_Parser" src-port="CavlcLast"/>
-    <Connection dst="CavlcExpand" dst-port="Run" src="FUN_Parser" src-port="CavlcRun"/>
-    <Connection dst="CavlcExpand" dst-port="Value" src="FUN_Parser" src-port="CavlcValue"/>
+        src="Syn_Parser" src-port="MbPredMvResL0"/>
+    <Connection dst="CavlcExpand" dst-port="MbType" src="Syn_Parser" src-port="MacroBlockType"/>
+    <Connection dst="CavlcExpand" dst-port="Last" src="Syn_Parser" src-port="CavlcLast"/>
+    <Connection dst="CavlcExpand" dst-port="Run" src="Syn_Parser" src-port="CavlcRun"/>
+    <Connection dst="CavlcExpand" dst-port="Value" src="Syn_Parser" src-port="CavlcValue"/>
     <Connection dst="Decode_U" dst-port="CoefAC" src="CavlcExpand" src-port="CoefAC_Cb"/>
     <Connection dst="Decode_V" dst-port="CoefAC" src="CavlcExpand" src-port="CoefAC_Cr"/>
     <Connection dst="Decoding_Y" dst-port="CoefAC_L" src="CavlcExpand" src-port="CoefAC_L"/>
@@ -420,24 +420,24 @@
         src="Mgnt_Display" src-port="POCtoDisplay"/>
     <Connection dst="Decoding_Y" dst-port="PocToDisplay"
         src="Mgnt_Display" src-port="POCtoDisplay"/>
-    <Connection dst="Mgnt_Display" dst-port="Poc" src="FUN_Parser" src-port="Poc"/>
+    <Connection dst="Mgnt_Display" dst-port="Poc" src="Syn_Parser" src-port="Poc"/>
     <Connection dst="Mgnt_Display" dst-port="MaxDPBSize"
-        src="FUN_Parser" src-port="MaxDpbSize"/>
+        src="Syn_Parser" src-port="MaxDpbSize"/>
     <Connection dst="Mgnt_Display" dst-port="EmptyDpb"
         src="Generate_Inter_Info" src-port="EmptyDPB"/>
     <Connection dst="IntraPredSplit" dst-port="MbIntraFlag"
-        src="FUN_Parser" src-port="MbIntraFlag"/>
+        src="Syn_Parser" src-port="MbIntraFlag"/>
     <Connection dst="IntraPredSplit" dst-port="IntraPredMode"
-        src="FUN_Parser" src-port="IntraPredMode"/>
+        src="Syn_Parser" src-port="IntraPredMode"/>
     <Connection dst="IntraPredSplit" dst-port="CurrMbAddr"
-        src="FUN_Parser" src-port="CurrMbAddr"/>
+        src="Syn_Parser" src-port="CurrMbAddr"/>
     <Connection dst="IntraPredSplit" dst-port="FirstMBInSlice"
-        src="FUN_Parser" src-port="FirstMbInSlice"/>
+        src="Syn_Parser" src-port="FirstMbInSlice"/>
     <Connection dst="IntraPredSplit" dst-port="PicWidthInMb"
-        src="FUN_Parser" src-port="PicWidthInMb"/>
+        src="Syn_Parser" src-port="PicWidthInMb"/>
     <Connection dst="IntraPredSplit" dst-port="ConstrainedIFlag"
-        src="FUN_Parser" src-port="ConstrainedIFlag"/>
-    <Connection dst="FUN_Parser" dst-port="ResetPrevFrameNum"
+        src="Syn_Parser" src-port="ConstrainedIFlag"/>
+    <Connection dst="Syn_Parser" dst-port="ResetPrevFrameNum"
         src="Generate_Inter_Info" src-port="EmptyDPB"/>
     <Connection dst="Decoding_Y" dst-port="PredMode"
         src="IntraPredSplit" src-port="PredMode"/>
