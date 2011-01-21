@@ -54,6 +54,19 @@ Configuration::Configuration(Network* network, AbstractConnector* connector){
 	setInstances();
 }
 
+Configuration::~Configuration(){
+	//Erase specific actors and instances
+	eraseSpecifics();
+
+	//Erase instances
+	map<string, Instance*>::iterator itInst;
+	for(itInst = instances.begin(); itInst != instances.end(); itInst++){
+		Instance* instance = itInst->second;
+
+		delete instance;
+	}
+}
+
 void Configuration::setInstances(){
 	// Create list of instance and actor
 	HDAGGraph* graph = network->getGraph();
@@ -145,4 +158,28 @@ list<Instance*> Configuration::getInstances(Actor* actor){
 	}
 
 	return result;
+}
+
+void Configuration::eraseSpecifics(){
+	list<Actor*>::iterator it;
+
+	for (it = specificActors.begin(); it != specificActors.end(); it++){
+		list<Instance*>::iterator itChilds;
+		
+		list<Instance*>* childs = (*it)->getInstances();
+		for (itChilds = childs->begin(); itChilds != childs->end(); itChilds++){
+			map<string, Instance*>::iterator itChild;
+			
+			itChild = instances.find((*itChilds)->getId());
+			
+			if (itChild != instances.end()){
+				instances.erase(itChild);
+			}
+		}
+	}
+
+	list<Actor*>::iterator itSpec;
+	for(itSpec = specificActors.begin(); itSpec != specificActors.end(); itSpec++){
+		delete (*itSpec);
+	}
 }

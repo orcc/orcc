@@ -63,6 +63,13 @@ public:
 	Configuration(Network* network, AbstractConnector* connector);
 
 	/*!
+     *  @brief Destructor
+     *
+	 * Delete the configuration.
+     */
+	~Configuration();
+
+	/*!
      *  @brief Return a list of Instance contained in the configuration.
      *
      *  Return all Instance of the current configuration.
@@ -171,6 +178,12 @@ public:
 	 *
      */
 	std::list<Actor*>* getSpecifics(){return &specificActors;};
+
+	/**
+     *  @brief Erase specific actors and instances from the configuration
+	 *
+     */
+	void eraseSpecifics();
 
 	/**
      *  @brief Insert a specific actor in the configuration,

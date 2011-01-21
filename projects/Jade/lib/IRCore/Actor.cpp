@@ -66,7 +66,10 @@ Actor::Actor(string name, string file, map<string, Type*>* fifoTypes, map<string
 Actor::~Actor (){
 	list<Instance*>::iterator it;
 
-	for (it = instances.begin(); it != instances.end(); it++){
+	for (it = instances.begin(); it != instances.end(); it++){		
+		//Avoid recursive call of destructors
+		(*it)->setActor(NULL);
+
 		delete(*it);
 	}
 }
@@ -76,6 +79,10 @@ void Actor::addInstance(Instance* instance){
 		instance->setActor(this);
 	}
 	instances.push_back(instance);
+}
+
+void Actor::remInstance(Instance* instance){
+	instances.remove(instance);
 }
 
 Port* Actor::getPort(string portName){

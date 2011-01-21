@@ -136,9 +136,12 @@ private:
 	 *	@param actors : map of actors to analyze
 	 *
 	 *	@param instances : list of Instance to store childs of the given actors
+	 *
+	 *	@param configuration : the Configuration to get the instance from
      */
 	void markInstances(std::map<std::string, Actor*>* actors, 
-					   std::list<Instance*>* instances);
+					   std::list<Instance*>* instances,
+					   Configuration* configuration);
 
 	/**
      *  @brief Detect the instance that can be link

@@ -154,6 +154,11 @@ void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 	//Get display instance
 	Instance* display = configuration->getInstance("display");
 
+	//Display is not contains in the current decoder
+	if (display == NULL){
+		return;
+	}
+
 	//Get procedures from display
 	Procedure* setVideo = display->getProcedure("set_video");
 	Procedure* setInit = display->getProcedure("set_init");
@@ -179,6 +184,11 @@ void RoundRobinScheduler::setSource(string input){
 
 	//Get source instance
 	Instance* source = configuration->getInstance("source");
+	
+	//Source is not contains in the current decoder
+	if (source == NULL){
+		return;
+	}
 	
 	//Insert source file string
 	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),input.size()+1); 

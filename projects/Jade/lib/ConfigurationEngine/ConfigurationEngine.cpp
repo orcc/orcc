@@ -98,7 +98,6 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	for (it = removes->begin(); it != removes->end(); it++){
 		unwriter.remove(*it);
 	}
-
 	
 	//Write new instances
 	IRWriter writer(Context, decoder);
@@ -150,8 +149,6 @@ void ConfigurationEngine::clearConnections(Decoder* decoder){
 			unwriter.remove(*itInst);
 		} 
 	}
-
-	specificActors->erase(specificActors->begin(), specificActors->end());
 }
 
 

@@ -47,8 +47,9 @@
 
 #include "Jade/Decoder.h"
 #include "Jade/Actor/BroadcastActor.h"
-#include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Port.h"
+#include "Jade/Core/Actor/ActionScheduler.h"
+#include "Jade/Core/Network/Instance.h"
 #include "Jade/Fifo/AbstractConnector.h"
 //------------------------------
 

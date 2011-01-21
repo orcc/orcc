@@ -111,6 +111,13 @@ public:
 	 *
      */
 	void addInstance(Instance* instance);
+
+	/**
+     *  @brief Remove an instance possibly bound to this actor
+     *
+	 * @param instance : Instance to remove
+     */
+	void remInstance(Instance* instance);
 	
 	/**
      *  @brief Return parameters of actor

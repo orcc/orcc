@@ -56,8 +56,8 @@ Reconfiguration::Reconfiguration(Decoder* decoder, Configuration* configuration)
 	comparePackages(curConfiguration->getPackages(), refConfiguration->getPackages(), &added);
 
 	//Mark instance to process
-	markInstances(&removed, &toRemove);
-	markInstances(&added, &toAdd);
+	markInstances(&removed, &toRemove, refConfiguration);
+	markInstances(&added, &toAdd, curConfiguration);
 
 	//Couple similar instances
 	detectInstances(&intersect);
@@ -119,7 +119,7 @@ void Reconfiguration::compareActors(map<string, Actor*>* ref,
 	}
 }
 
-void Reconfiguration::markInstances(map<string, Actor*>* actors, list<Instance*>* instances){
+void Reconfiguration::markInstances(map<string, Actor*>* actors, list<Instance*>* instances, Configuration* configuration){
 	map<string, Actor*>::iterator it;
 
 	//Iterate though all marked actors
@@ -127,11 +127,11 @@ void Reconfiguration::markInstances(map<string, Actor*>* actors, list<Instance*>
 
 		//Get instances of the actor
 		Actor* actor = it->second;
-		list<Instance*>* childs = actor->getInstances();
+		list<Instance*> childs = configuration->getInstances(actor);
 
 		//Store instances into marked list
 		list<Instance*>::iterator itInsert = instances->begin();
-		instances->insert(itInsert, childs->begin(), childs->end());
+		instances->insert(itInsert, childs.begin(), childs.end());
 	}
 }
 
@@ -149,7 +149,7 @@ void Reconfiguration::detectInstances(map<string, Actor*>* actors){
 		//And the new instances
 		list<Instance*>::iterator itCur;
 		list<Instance*> newChilds = curConfiguration->getInstances(actor);
-
+/*
 		if ((actor->getName() == "System.Source")||
 			(actor->getName() == "System.Display")){
 				list<Instance*>::iterator itInsert = toRemove.begin();
@@ -157,7 +157,7 @@ void Reconfiguration::detectInstances(map<string, Actor*>* actors){
 
 				itInsert = toAdd.begin();
 				toAdd.insert(itInsert, newChilds.begin(), newChilds.end());
-		}else{
+		}else{*/
 
 		//Couple instances
 		for (itRef = refChilds.begin(), itCur = newChilds.begin(); itRef != refChilds.end() && itCur != newChilds.end() ; itRef++, itCur++){
@@ -173,7 +173,7 @@ void Reconfiguration::detectInstances(map<string, Actor*>* actors){
 		for (; itCur != newChilds.end(); itCur++){
 			toAdd.push_back(*itCur);
 		}
-		}
+		//}
 	}
 
 }

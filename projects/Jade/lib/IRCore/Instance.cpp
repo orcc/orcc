@@ -48,7 +48,10 @@ using namespace std;
 using namespace llvm;
 
 Instance::~Instance(){
-
+	//Remove the instance from its parent
+	if (actor != NULL){
+		actor->remInstance(this);
+	}
 }
 
 Port* Instance::getPort(string portName){
@@ -119,7 +122,11 @@ Procedure* Instance::getProcedure(string name){
 
 void Instance::setActor(Actor* actor){
 	this->actor = actor;
-	actor->addInstance(this);
+	
+	//Insert this instance as a child of its parent
+	if (actor != NULL){
+		actor->addInstance(this);
+	}
 }
 
 void Instance::setAsInput(Port* port) {

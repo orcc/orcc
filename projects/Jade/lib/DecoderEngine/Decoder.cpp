@@ -88,12 +88,12 @@ void Decoder::setConfiguration(Configuration* newConfiguration){
 	ConfigurationEngine engine(Context);
 	engine.reconfigure(this, newConfiguration);
 	
+	//Delete old configuration and set the new one
+	delete configuration;
 	configuration = newConfiguration;
+
 	executionEngine->recompile(scheduler->getMainFunction());
 	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine);
-	scheduler->setSource(stimulus);
-
-	executionEngine->run();
 }
 
 void Decoder::start(){
