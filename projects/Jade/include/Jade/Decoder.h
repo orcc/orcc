@@ -117,6 +117,16 @@ public:
 	Configuration* getConfiguration(){return configuration;};
 
 	/**
+     *  @brief Set a new configuration
+	 *
+	 *	Reconfigure a decoder with a new configuration
+	 * 
+	 *  @param configuration : the new configuration
+	 *
+     */
+	 void setConfiguration(Configuration* configuration);
+
+	/**
      *  @brief Getter of a stimulus file
 	 * 
 	 *  @return the stimulus file

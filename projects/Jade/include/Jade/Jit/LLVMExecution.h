@@ -114,6 +114,7 @@ public:
 	void clear();
 
 	void* getExit(); 
+	void recompile(llvm::Function* function);
 
 private:
 

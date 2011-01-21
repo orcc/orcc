@@ -180,6 +180,11 @@ void LLVMExecution::stop(pthread_t* thread) {
 	scheduler->stop(thread);
 }
 
+void LLVMExecution::recompile(Function* function) {
+	//EE->recompileAndRelinkFunction(function);
+}
+
+
 void LLVMExecution::clear() {
 	Module* module = decoder->getModule();
 	EE->runStaticConstructorsDestructors(true);

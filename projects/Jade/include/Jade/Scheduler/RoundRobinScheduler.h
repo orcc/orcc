@@ -82,6 +82,8 @@ public:
 	void addInstance(Instance* instance);
 	void removeInstance(Instance* instance);
 
+	void refresh();
+
 
 private:
 

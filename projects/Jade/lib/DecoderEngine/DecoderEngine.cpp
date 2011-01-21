@@ -46,7 +46,7 @@
 #include "Jade/Decoder.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Serialize/IRParser.h"
-#include "Jade/Configuration/ConfigurationEngine.h"
+#include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
@@ -227,9 +227,8 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 	map<string, Actor*>* requieredActors = parseActors(configuration);
 	configuration->setActors(requieredActors);
 
-	//Reconfigure the decoder
-	ConfigurationEngine engine(Context);
-	engine.reconfigure(decoder, configuration);
+	// Set the new configuration
+	decoder->setConfiguration(configuration);
 
 	return 0;
 }

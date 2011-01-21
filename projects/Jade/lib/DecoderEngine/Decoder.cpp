@@ -82,6 +82,16 @@ Decoder::~Decoder (){
 	delete module;
 }
 
+void Decoder::setConfiguration(Configuration* configuration){
+	
+	//Reconfigure the decoder
+	ConfigurationEngine engine(Context);
+	engine.reconfigure(this, configuration);
+
+	//executionEngine->recompile(scheduler->getMainFunction());
+	//executionEngine->run();
+}
+
 void Decoder::start(){
 	scheduler->setSource(stimulus);
 		
