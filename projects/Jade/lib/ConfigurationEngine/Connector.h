@@ -28,34 +28,94 @@
  */
 
 /**
-@brief Implementation of class FifoFnRemoval
+@brief Description of the Connector class interface
 @author Jerome Gorin
-@file FifoFnRemoval.cpp
+@file Connector.h
 @version 1.0
-@date 24/12/2010
+@date 15/11/2010
 */
 
 //------------------------------
-#include <map>
+#ifndef CONNECTOR_H
+#define CONNECTOR_H
 
-#include "Jade/Optimize/FifoFnRemoval.h"
+namespace llvm{
+	class Module;
+}
 
-#include "llvm/Function.h"
+class Connection;
+class Configuration;
+class Decoder;
 
+#include "llvm/LLVMContext.h"
+
+#include "Jade/Fifo/AbstractFifo.h"
 //------------------------------
 
-using namespace std;
-using namespace llvm;
+/**
+ * @class Connector
+ *
+ * @brief This class connects instance from a network to fifos.
+ *
+ * @author Jerome Gorin
+ * 
+ */
+class Connector {
+public:
 
-void FifoFnRemoval::transform(Decoder* decoder){
-/*	AbstractConnector* fifo = decoder->getFifo();
-	decoder->getModule();
-	map<string,Function*>::iterator it;
-	map<string,Function*>* fifoAcesses = fifo->getFifoAccess();
+	/**
+	 * @brief Constructor of connector.
+	 *
+	 * 
+	 * @param C : the LLVMContext
+	 *
+	 * @param decoder : the Decoder where connections are printed
+	 *
+	 */
+	Connector(llvm::LLVMContext& C, Decoder* decoder);
 
-	for (it = fifoAcesses->begin(); it != fifoAcesses->end(); it++){
-		Function* function = it->second;
-		function->removeFromParent();
-	}*/
+	~Connector();
+
+	/**
+	 * @brief print connections in the given configuration.
+	 *
+	 */
+	void setConnections(Configuration* configuration);
+
+	/**
+	 * @brief Remove connections
+	 *
+	 * Remove connections from the given configuration.
+	 * 
+	 * @param configuration : the Configuration where connections are removed
+	 */
+	void unsetConnections(Configuration* configuration);
+
+
+private:
+	/**
+	 * @brief Print a connection
+	 * 
+	 * @param connection : the Connection to print
+	 */
+	void setConnection(Connection* connection);
+
+	/**
+	 * @brief Remove a connection
+	 * 
+	 * @param connection : the Connection to remove
+	 */
+	void unsetConnection(Connection* connection);
 	
-}
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
+
+	/** Decoder to print connection */
+	Decoder* decoder;
+
+	/** Counter of fifo */
+	int fifoCnt;
+
+};
+
+#endif

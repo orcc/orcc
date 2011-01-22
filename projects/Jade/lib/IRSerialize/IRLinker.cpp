@@ -85,24 +85,23 @@ void IRLinker::linkInstance(Instance* refinstance, Instance* instance){
 }
 
 void IRLinker::linkPorts(map<string, Port*>* refPorts, map<string, Port*>* ports){
-	map<string, Port*>::iterator it;
+	map<string, Port*>::iterator itRef;
 
-	for (it = ports->begin(); it != ports->end(); it++){
-		map<string, Port*>::iterator itRef;
+	for (itRef = refPorts->begin(); itRef != refPorts->end(); itRef++){
+		map<string, Port*>::iterator it;
 
 		//Find the port occurence in reference ports
-		itRef = refPorts->find(it->first);
+		it = ports->find(itRef->first);
 
-		if (itRef == refPorts->end()){
-			cout << "Internal error of reconfiguration. \n";
-			exit(1);
+		if (it == ports->end()){
+			ports->insert(*itRef);
+		}else{
+			//Link variables
+			Port* port = it->second;
+			Port* refPort = itRef->second;
+
+			port->setGlobalVariable(refPort->getGlobalVariable());
 		}
-		
-		//Link variables
-		Port* port = it->second;
-		Port* refPort = itRef->second;
-
-		port->setGlobalVariable(refPort->getGlobalVariable());
 
 	}
 }

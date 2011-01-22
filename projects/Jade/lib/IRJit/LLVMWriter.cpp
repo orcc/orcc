@@ -37,7 +37,6 @@
 
 //------------------------------
 #include "Jade/Decoder.h"
-#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMWriter.h"
 
 #include "llvm/Instructions.h"
@@ -163,7 +162,7 @@ bool LLVMWriter::linkProcedureBody(Function* function){
 	
 		SmallVector<ReturnInst*, 8> Returns;  // Ignore returns cloned.
 
-		linkFunctionBody(F, function, ValueMap, /*ModuleLevelChanges=*/true, Returns,  decoder->getFifo());
+		linkFunctionBody(F, function, ValueMap, /*ModuleLevelChanges=*/true, Returns/*,  decoder->getFifo()*/);
 
 	}
 
@@ -175,7 +174,7 @@ bool LLVMWriter::linkProcedureBody(Function* function){
 void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
                              ValueToValueMapTy &VMap,
                              bool ModuleLevelChanges,
-                             SmallVectorImpl<ReturnInst*> &Returns, AbstractConnector* fifo,
+                             SmallVectorImpl<ReturnInst*> &Returns,/* AbstractConnector* fifo,*/
                              const char *NameSuffix, ClonedCodeInfo *CodeInfo) {
    // Clone any attributes.
   if (NewFunc->arg_size() == OldFunc->arg_size())
@@ -223,17 +222,17 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
 	  // Remap operands.
 	  for (User::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
 		Value *V;
-		
+	/*	
 		if (fifo->isFifoFunction((*op)->getName())){
 			//If this function is a fifo function, this function already exist in the module
 			V = fifo->getFifoFunction((*op)->getName());
 		} else if(fifo->isExternFunction((*op)->getName())){
 			//Same for external function
 			V = fifo->getExternFunction((*op)->getName());
-		} else {
+		} else {*/
 			V= MapValue(*op, VMap, ModuleLevelChanges);
 			assert(V && "Referenced value not in value map!");
-		}
+		//}
 		*op = V;
 	  }
 

@@ -60,7 +60,7 @@ public:
      *
 	 * Creates a new configuration engine.
      */
-	Configuration(Network* network, AbstractConnector* connector);
+	Configuration(Network* network);
 
 	/*!
      *  @brief Destructor
@@ -114,16 +114,6 @@ public:
 	 *  @return network of the scenario
      */
 	Network* getNetwork(){return network;};
-
-	/**
-     *  @brief Getter of connector
-	 *
-	 *	Returns the connector used to connect the networ
-	 *
-	 *  @return A connector selected to connect the network
-	 *
-     */
-	AbstractConnector* getConnector(){return connector;};
 
 	/**
      *  @brief return the actor corresponding to the given name
@@ -214,9 +204,6 @@ private:
 
 	/** Actors of the configuration */
 	std::map<std::string, Actor*>* actors;
-
-	/** The connector for the network  */
-	AbstractConnector* connector;
 
 	/** package used by the configuration  */
 	std::map<std::string, Package*>* packages;

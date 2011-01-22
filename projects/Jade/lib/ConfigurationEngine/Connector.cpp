@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2010, IETR/INSA of Rennes
+ * Copyright (c) 2009, IETR/INSA of Rennes
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -27,17 +27,36 @@
  * SUCH DAMAGE.
  */
 
-/** lock free fifo ring buffer structure */
-struct FIFO_S(T) {
-	int size; /** size of the ringbuffer */
-	T *contents; /** the memory containing the ringbuffer */
-	
-	int read_ind; /** the current position of the reader */
-	int write_ind; /** the current position of the writer */
-	int fill_count; /** the fill count */
-	
-	FILE * pFile;
-	T fifo_buffer[1024];
-};
+/**
+@brief Implementation of class Connector
+@author Jerome Gorin
+@file Connector.cpp
+@version 1.0
+@date 15/11/2010
+*/
 
-#include "fifoTrace_generic.inl"
+//------------------------------
+#include <iostream>
+
+#include "Connector.h"
+#include "Jade/Util/FifoMng.h"
+//------------------------------
+
+using namespace std;
+
+Connector::Connector(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
+	// Initialize fifo counter
+	fifoCnt = 0;
+}
+
+Connector::~Connector(){
+
+}
+
+void Connector::setConnections(Configuration* configuration){
+
+}
+
+void Connector::unsetConnections(Configuration* configuration){
+
+}

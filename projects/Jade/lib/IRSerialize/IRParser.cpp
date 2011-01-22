@@ -56,7 +56,6 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Actor/Procedure.h"
-#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMParser.h"
 
 
@@ -81,8 +80,7 @@ const std::string IRConstant::KEY_SOURCE_FILE= "source_file";
 const std::string IRConstant::KEY_STATE_VARS= "state_variables";
 
 
-IRParser::IRParser(llvm::LLVMContext& C, AbstractConnector* fifo) : Context(C){
-	this->fifo = fifo;
+IRParser::IRParser(llvm::LLVMContext& C) : Context(C){
 	this->inputs = NULL;
 	this->outputs = NULL;
 	this->parser = 	new LLVMParser(Context, VTLDir);
@@ -130,7 +128,7 @@ Actor* IRParser::parseActor(string classz){
 	list<Action*>* actions = parseActions(IRConstant::KEY_ACTIONS, module);
 	ActionScheduler* actionScheduler = parseActionScheduler(module);
 
-	return new Actor(name->getString(), classz, fifos, inputs, outputs, stateVars, 
+	return new Actor(name->getString(), classz, /*fifos,*/ inputs, outputs, stateVars, 
 						parameters, procs, initializes, actions, actionScheduler);
 }
 
@@ -178,13 +176,13 @@ map<string, Port*>* IRParser::parsePorts(string key, Module* module){
 map<string, Type*>* IRParser::parseFifos(Module* module){
 	map<string,Type*>* fifos = new map<string,Type*>();
 	std::map<std::string, llvm::Type*>::iterator it;
-
+/*
 	std::map<std::string, llvm::Type*>* AbstractConnectorTypes = fifo->getFifoTypes();
 	
 	for (it = AbstractConnectorTypes->begin(); it != AbstractConnectorTypes->end(); it++){
 		string structName = it->first;
 		fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-	}	
+	}	*/
 
 	return fifos;
 }

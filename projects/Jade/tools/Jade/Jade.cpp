@@ -50,9 +50,7 @@
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/System/Signals.h"
 
-#include "Jade/Fifo/CircularConnector.h"
-#include "Jade/Fifo/TraceConnector.h"
-#include "Jade/Fifo/UnprotectedConnector.h"
+#include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Util/OptionMng.h"
 //------------------------------
 
@@ -64,9 +62,6 @@ using namespace std;
 using namespace llvm;
 using namespace llvm::cl;
 using namespace llvm::sys;
-
-//Fifos
-enum FifoTy { circular, trace, unprotected };
 
 cl::opt<FifoTy> 
 Fifo("fifo", CommaSeparated,
@@ -173,28 +168,6 @@ void clean_exit(int sig){
 	exit(0);
 }
 
-AbstractConnector* getFifo(LLVMContext &Context, string system){
-	//Select fifo according to options
-	switch (Fifo) {
-		case circular :
-			return new CircularConnector(Context, system);
-			break;
-
-		case trace :
-			return new TraceConnector(Context, system);
-			break;
-
-		case unprotected :
-			return new UnprotectedConnector(Context, system);
-			break;
-
-		default: 
-			cout <<"Fifo selection error: type undefined.\n";
-			exit(0);
-			break;
-	}
-}
-
 //Verify if directory is well formed
 void setDirectory(std::string* dir){
 	if (dir->compare("") != 0){
@@ -216,6 +189,7 @@ void setOptions(){
 	OptionMng::setDirectory(&OutputDir);
 	OptionMng::setDirectory(&InputDir);
 
+	//Set an optimization level
 	if (OptLevelO1){
 		optLevel = 1;
 	}else if (OptLevelO2){
@@ -268,16 +242,8 @@ int main(int argc, char **argv) {
 	InitializeNativeTarget();
 	setOptions();
 	
-	//Load fifos
-	AbstractConnector* fifo = NULL;
-	if (SystemDir.getValue().compare("") != 0){
-		fifo = getFifo(Context, SystemDir);
-	}else{
-		fifo = getFifo(Context, VTLDir);
-	}
-
 	//Loading decoderEngine
-	engine = new DecoderEngine(Context, fifo , VTLDir, SystemDir, Verbose);
+	engine = new DecoderEngine(Context, VTLDir, Fifo, SystemDir, Verbose);
 
 	if (Console){
 

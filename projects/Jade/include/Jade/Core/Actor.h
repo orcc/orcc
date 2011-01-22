@@ -98,7 +98,7 @@ public:
 	 * @param actions : a list of actions
 	 *
      */
-	Actor(std::string name, std::string file, std::map<std::string, llvm::Type*>* fifoTypes, std::map<std::string, Port*>* inputs, 
+	Actor(std::string name, std::string file, /*std::map<std::string, llvm::Type*>* fifoTypes,*/ std::map<std::string, Port*>* inputs, 
 		std::map<std::string, Port*>* outputs, std::map<std::string, Variable*>* stateVars, 
 		std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures, 
 		std::list<Action*>* initializes, std::list<Action*>* actions, ActionScheduler* actionScheduler);

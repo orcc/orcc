@@ -46,9 +46,8 @@
 
 using namespace std;
 
-Configuration::Configuration(Network* network, AbstractConnector* connector){
+Configuration::Configuration(Network* network){
 	this->network = network;
-	this->connector = connector;
 
 	//Set configuration property from network
 	setInstances();

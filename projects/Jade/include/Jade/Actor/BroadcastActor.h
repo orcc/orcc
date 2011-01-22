@@ -65,7 +65,7 @@ class InstancedActor;
  */
 class BroadcastActor  : public Actor {
 public:
-	BroadcastActor(llvm::LLVMContext& C, std::string name, int numOutputs, llvm::Type* type, AbstractConnector* fifo);
+	BroadcastActor(llvm::LLVMContext& C, std::string name, int numOutputs, llvm::Type* type);
 	~BroadcastActor();
 
 	/**

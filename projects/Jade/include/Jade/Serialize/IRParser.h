@@ -75,7 +75,7 @@ public:
 	 * @param fifo : AbstractFifo used in actors of the VTL
 	 *
      */
-	IRParser(llvm::LLVMContext& C, AbstractConnector* fifo);
+	IRParser(llvm::LLVMContext& C);
 
 	~IRParser();
 
@@ -296,9 +296,6 @@ private:
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
-
-	/** Abstract fifos of actors */
-	AbstractConnector* fifo;
 
 	/** Parser of LLVM modules */
 	LLVMParser* parser;

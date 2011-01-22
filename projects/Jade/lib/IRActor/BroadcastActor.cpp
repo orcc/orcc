@@ -50,13 +50,13 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/ActionScheduler.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/Fifo/AbstractConnector.h"
+#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace std;
 using namespace llvm;
 
-BroadcastActor::BroadcastActor(llvm::LLVMContext& C, string name, int numOutputs, Type* type, AbstractConnector* fifo): Actor(name, "", fifo->getFifoTypes(), 
+BroadcastActor::BroadcastActor(llvm::LLVMContext& C, string name, int numOutputs, Type* type): Actor(name, "", /*fifo->getFifoTypes(), */
 		  new map<string, Port*>(), new map<string, Port*>(), new map<string, Variable*>(), new map<string, Variable*>(), new map<string, Procedure*>(), new list<Action*> (),
 		  new list<Action*> (), NULL) , Context(C)
 {
@@ -78,7 +78,7 @@ BroadcastActor::~BroadcastActor(){
 
 void BroadcastActor::createActor(){
 	// Getting type of fifo
-	StructType* structType = fifo->getFifoType(cast<IntegerType>(type));
+	StructType* structType = FifoMng::getFifoType(cast<IntegerType>(type));
 	PointerType* fifoType = (PointerType*)structType->getPointerTo();
 	Constant* portValue = ConstantPointerNull::get(cast<PointerType>(fifoType));
 
@@ -187,7 +187,7 @@ Value* BroadcastActor::createHasTokenTest(Port* port, BasicBlock* current){
 	vector.push_back(inputStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getHasTokenFunction(port->getType()), vector.begin(), vector.end(), "c"+port->getName(), current);
+	CallInst* retVal = CallInst::Create(/*fifo->getHasTokenFunction(port->getType())*/ NULL, vector.begin(), vector.end(), "c"+port->getName(), current);
 	TruncInst* truncInst = new TruncInst(retVal, Type::getInt1Ty(Context), "t"+port->getName(), current);
 
 	//Return the result
@@ -204,7 +204,7 @@ Value* BroadcastActor::createReadFifo(Port* port, BasicBlock* current){
 	vector.push_back(inputStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getReadFunction(port->getType()), vector.begin(), vector.end(), "tokenPtr", current);
+	CallInst* retVal = CallInst::Create(NULL/*fifo->getReadFunction(port->getType())*/, vector.begin(), vector.end(), "tokenPtr", current);
 	
 	//Return token value
 	return new LoadInst(retVal,"token", current);
@@ -220,13 +220,13 @@ void BroadcastActor::createWriteFifo(Port* port, Value* token ,BasicBlock* curre
 	vector.push_back(portStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getWriteFunction(port->getType()), vector.begin(), vector.end(), "w"+port->getName(), current);
+	CallInst* retVal = CallInst::Create(NULL /*fifo->getWriteFunction(port->getType())*/, vector.begin(), vector.end(), "w"+port->getName(), current);
 	
 	//Store token value
 	StoreInst* storeInst = new StoreInst (token, retVal, current);
 
 	// Call setWriteEnd
-	CallInst::Create(fifo->getWriteEndFunction(port->getType()), vector.begin(), vector.end(), "", current);
+	CallInst::Create(NULL/*fifo->getWriteEndFunction(port->getType())*/, vector.begin(), vector.end(), "", current);
 
 }
 
@@ -239,5 +239,5 @@ void BroadcastActor::createSetReadEnd(Port* port, BasicBlock* current){
 	vector.push_back(inputStruct);
 	vector.push_back(ConstantInt::get(Type::getInt32Ty(Context), 1));
 
-	CallInst* retVal = CallInst::Create(fifo->getReadEndFunction(port->getType()), vector.begin(), vector.end(), "", current);
+	CallInst* retVal = CallInst::Create(NULL /*fifo->getReadEndFunction(port->getType())*/, vector.begin(), vector.end(), "", current);
 }

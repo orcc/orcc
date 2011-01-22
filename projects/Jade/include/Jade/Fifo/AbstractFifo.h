@@ -28,34 +28,69 @@
  */
 
 /**
-@brief Implementation of class FifoFnRemoval
+@brief Description of the AbstractFifo class interface
 @author Jerome Gorin
-@file FifoFnRemoval.cpp
+@file AbstractFifo.h
 @version 1.0
-@date 24/12/2010
+@date 15/11/2010
 */
 
 //------------------------------
+#ifndef ABSTRACTFIFO_H
+#define ABSTRACTFIFO_H
+#include <string>
 #include <map>
 
-#include "Jade/Optimize/FifoFnRemoval.h"
+#include "Jade/Core/Network/Connection.h"
 
-#include "llvm/Function.h"
 
 //------------------------------
+/**
+ * @brief  This class defines an abstract fifo.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class AbstractFifo{
+public:
+	/**
+     *  @brief Constructor of fifo
+	 *
+	 *  @param connection : the Connection representing the fifo
+	 *
+     */
+	AbstractFifo(Connection* connection){
+		this->connection;
 
-using namespace std;
-using namespace llvm;
+		//Call connection creator
+		createConnection();
+	};
 
-void FifoFnRemoval::transform(Decoder* decoder){
-/*	AbstractConnector* fifo = decoder->getFifo();
-	decoder->getModule();
-	map<string,Function*>::iterator it;
-	map<string,Function*>* fifoAcesses = fifo->getFifoAccess();
+	virtual ~AbstractFifo(){};
 
-	for (it = fifoAcesses->begin(); it != fifoAcesses->end(); it++){
-		Function* function = it->second;
-		function->removeFromParent();
-	}*/
-	
-}
+	/**
+     *  @brief Return the filename of the fifo
+	 *
+	 *  @return filename of the fifo
+	 *
+     */
+	std::string getFilename(){
+		return filename;
+	};
+
+	virtual std::map<std::string,std::string> fifoMap();
+
+	virtual std::map<std::string,std::string> structMap();
+
+private:
+
+	virtual void createConnection(){};
+
+	/** Connection representing the fifo*/
+	Connection* connection;
+
+	/** Filename of the fifo */
+	std::string filename;
+};
+
+#endif

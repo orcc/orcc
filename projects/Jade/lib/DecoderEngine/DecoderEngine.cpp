@@ -42,13 +42,12 @@
 //#include "llvm/Constants.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/StandardPasses.h"
-
+#include "Jade/Util/FifoMng.h"
 #include "Jade/Decoder.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Serialize/IRParser.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Port.h"
-#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Jit/LLVMUtility.h"
 #include "Jade/Jit/LLVMOptimizer.h"
@@ -62,19 +61,22 @@ using namespace llvm;
 
 //extern cl::list<const PassInfo*, bool, PassNameParser> PassList;
 
-DecoderEngine::DecoderEngine(llvm::LLVMContext& C, 
-							 AbstractConnector* fifo, 
+DecoderEngine::DecoderEngine(llvm::LLVMContext& C,
 							 string library, 
+							 FifoTy fifo, 
 							 string system, 
 							 bool verbose): Context(C) {	
-	//Set properties
-	this->fifo = fifo;
-	
-	//Load IR Parser
-	irParser = new IRParser(C, fifo);	
+	//Set properties	
 	this->library = library;
 	this->systemPackage = system;
 	this->verbose = verbose;
+	this->fifoty = fifoty;
+
+	//Select the fifo used
+	FifoMng::setFifoTy(fifo, library);
+
+	//Load IR Parser
+	irParser = new IRParser(C);
 }
 
 DecoderEngine::~DecoderEngine(){
@@ -86,7 +88,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	clock_t timer = clock ();
 
 	//Create the Configuration from the network
-	Configuration* configuration = new Configuration(network, fifo);
+	Configuration* configuration = new Configuration(network);
 
 	// Parsing actor and bound it to the configuration
 	map<string, Actor*>* requieredActors = parseActors(configuration);
@@ -221,7 +223,7 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 	Decoder* decoder = it->second;
 
 	//Create the new Configuration
-	Configuration* configuration = new Configuration(newNetwork, fifo);
+	Configuration* configuration = new Configuration(newNetwork);
 
 	// Parsing actor and bound it to the new configuration
 	map<string, Actor*>* requieredActors = parseActors(configuration);
@@ -255,7 +257,7 @@ map<string, Actor*>* DecoderEngine::parseActors(Configuration* Configuration) {
 			actor = irParser->parseActor(*it);
 			
 			//Refine actors with the fifo used by the decoder engine
-			fifo->refineActor(actor);
+			//fifo->refineActor(actor);
 		}else{
 			//Actor has been parsed
 			actor = itAct->second;

@@ -39,12 +39,12 @@
 #include <map>
 
 #include "Reconfiguration.h"
+#include "Connector.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Actor/BroadcastAdder.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Core/Actor.h"
-#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Scheduler/Scheduler.h"
 #include "Jade/Serialize/IRLinker.h"
 #include "Jade/Serialize/IRUnwriter.h"
@@ -62,8 +62,8 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	Configuration* configuration = decoder->getConfiguration();
 
 	// Add Fifo function and fifo type into the decoder
-	AbstractConnector* connector = configuration->getConnector();
-	connector->addFifoHeader(decoder);
+	//AbstractConnector* connector = configuration->getConnector();
+	//connector->addFifoHeader(decoder);
 
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, configuration);
@@ -78,7 +78,8 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	}
 
 	// Setting connections of the decoder
-	connector->setConnections(configuration, decoder);
+	Connector connector(Context, decoder);
+	connector.setConnections(configuration);
 }
 
 void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configuration){
@@ -124,8 +125,8 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	linker.link(keeps);
 
 	// Setting connections of the decoder
-	AbstractConnector* connector = configuration->getConnector();
-	connector->setConnections(configuration, decoder);
+	Connector connector(Context, decoder);
+	connector.setConnections(configuration);
 }
 
 void ConfigurationEngine::clearConnections(Decoder* decoder){
@@ -133,8 +134,8 @@ void ConfigurationEngine::clearConnections(Decoder* decoder){
 	Configuration* configuration = decoder->getConfiguration();
 
 	//Remove connections
-	AbstractConnector* connector = configuration->getConnector();
-	connector->unsetConnections(configuration, decoder);
+	Connector connector(Context, decoder);
+	connector.unsetConnections(configuration);
 
 	//Unwrite broadcasts
 	list<Actor*>::iterator itActor;

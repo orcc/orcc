@@ -51,7 +51,6 @@
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
-#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Scheduler/ActionSchedulerAdder.h"
 //------------------------------
 
@@ -363,8 +362,8 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
 	
 	//Call hasRoom function
-	AbstractConnector* fifo = decoder->getFifo();
-	Function* hasRoomFn = fifo->getHasRoomFunction(port->getType());
+	//AbstractConnector* fifo = decoder->getFifo();
+	Function* hasRoomFn = NULL;//fifo->getHasRoomFunction(port->getType());
 	Value* hasRoomArgs[] = { loadPort, numTokens};
 	CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs, hasRoomArgs+2,"",  BB);
 
@@ -376,8 +375,8 @@ CallInst* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numToke
 	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
 	
 	//Call hasRoom function
-	AbstractConnector* fifo = decoder->getFifo();
-	Function* hasTokenFn = fifo->getHasTokenFunction(port->getType());
+	//AbstractConnector* fifo = decoder->getFifo();
+	Function* hasTokenFn = NULL;//fifo->getHasTokenFunction(port->getType());
 	Value* hasTokenArgs[] = { loadPort, numTokens};
 	CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs, hasTokenArgs+2,"",  BB);
 

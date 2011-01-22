@@ -146,9 +146,6 @@ private:
 	/** list of Actor in the decoder */
 	std::map<std::string, Actor*>* actors;
 
-	/** fifo used in the decoder */
-	AbstractConnector* fifo;
-
 	/** list of connections to be removed */
 	std::list<Connection*> toBeRemoved;
 

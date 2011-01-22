@@ -44,10 +44,8 @@
 #include "llvm/Module.h"
 
 #include "Jade/Decoder.h"
-#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Core/Network.h"
 #include "Jade/Configuration/ConfigurationEngine.h"
-#include "Jade/Fifo/AbstractConnector.h"
 #include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 //------------------------------
@@ -66,7 +64,6 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration): Context(C){
 
 	//Set elements of the decoder
 	this->scheduler = new RoundRobinScheduler(Context, this);
-	this->fifo = configuration->getConnector();
 
 	//Configure the decoder
 	ConfigurationEngine engine(Context);

@@ -90,23 +90,6 @@ public:
 	llvm::Module* getModule(){return module;};
 
 	/**
-     *  @brief Getter of fifo
-	 *
-	 *  @return Fifo bound to this decoder
-	 *
-     */
-	AbstractConnector* getFifo(){return fifo;};
-
-
-	/**
-     *  @brief Getter of fifos
-	 *
-	 *  @return a list of fifos in the decoder
-	 *
-     */
-	std::list<AbstractConnector*>* getFifos(){return &fifos;};
-
-	/**
      *  @brief Getter of configuration
 	 *
 	 *	Return the configuration used by the decoder
@@ -189,9 +172,6 @@ private:
 
 	/** Scheduler of the decoder */
 	Scheduler* scheduler;
-
-	/** Fifo of the decoder */
-	AbstractConnector* fifo;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

@@ -38,16 +38,10 @@
 //------------------------------
 #ifndef DECODERENGINE_H
 #define DECODERENGINE_H
-
-#include <map>
-#include <string>
-#include <pthread.h>
-
 namespace llvm{
 	class LLVMContext;
 }
 
-class AbstractConnector;
 class JIT;
 class Decoder;
 class CircularConnector;
@@ -58,6 +52,12 @@ class Actor;
 class IRParser;
 class Package;
 class Configuration;
+
+#include <map>
+#include <string>
+#include <pthread.h>
+
+#include "Jade/Fifo/FifoSelection.h"
 //------------------------------
 
 class DecoderEngine {
@@ -69,7 +69,7 @@ public:
 	 *   
 	 *  @param C : the LLVM Context used by JIT
      */
-	DecoderEngine(llvm::LLVMContext& C, AbstractConnector* fifo, std::string library, std::string system = "", bool verbose = false);
+	DecoderEngine(llvm::LLVMContext& C, std::string library, FifoTy fifo, std::string system = "", bool verbose = false);
 	~DecoderEngine();
 
 	/*!
@@ -185,8 +185,8 @@ private:
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 
-	/** Fifo of Jade */
-	AbstractConnector* fifo;
+	/** Fifo type of the decoder */
+	FifoTy fifoty;
 
 	/** Library location */
 	std::string library;

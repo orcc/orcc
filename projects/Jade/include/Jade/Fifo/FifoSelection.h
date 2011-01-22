@@ -28,32 +28,22 @@
  */
 
 /**
-@brief Description of the FifoAbstract class interface
+@brief Description of the Fifo Selection possibility
 @author Jerome Gorin
-@file FifoAbstract.h
+@file FifoSelection.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#ifndef FIFOABSTRACT_H
-#define FIFOABSTRACT_H
+#ifndef FIFOSELECTION_H
+#define FIFOSELECTION_H
 
-#include <list>
 #include <map>
 
-
-//------------------------------
-/**
- * @brief  This class defines an abstract fifo.
- * 
- * @author Jerome Gorin
- * 
- */
-class FifoAbstract{
-public:
-	FifoAbstract(){};
-	virtual ~FifoAbstract(){};
-};
+//Fifos Types
+enum FifoTy { circular,
+			  trace , 
+			  unprotected};
 
 #endif
