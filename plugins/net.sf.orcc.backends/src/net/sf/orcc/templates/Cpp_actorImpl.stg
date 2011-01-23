@@ -122,7 +122,7 @@ endif$
 
 Call(call) ::= <<
 
-$if(call.print)$std::cout << $call.parameters: PrintParameter(); separator=" << "$;$
+$if(call.print)$std::cout \<\< $call.parameters: PrintParameter(); separator=" << "$;$
 else
 $$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
 endif$
@@ -146,9 +146,9 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 Peek(peek) ::= <<
 
 $if(peek.unit)$
-m_poTabIn[$actor.simpleName$_$peek.port$]->peek($peek.target$);$\n$
+m_poTabIn[$actor.simpleName$_$peek.port$]-\>peek($peek.target$);$\n$
 $else$
-m_poTabIn[$actor.simpleName$_$peek.port$]->peek($peek.target$, $peek.numTokens$);$\n$
+m_poTabIn[$actor.simpleName$_$peek.port$]-\>peek($peek.target$, $peek.numTokens$);$\n$
 $endif$
 >>
 
@@ -156,14 +156,14 @@ Read(read) ::= <<
 
 $if (read.target)$
 $if(read.unit)$
-m_poTabIn[$actor.simpleName$_$read.port$]->get($read.target$);$\n$
+m_poTabIn[$actor.simpleName$_$read.port$]-\>get($read.target$);$\n$
 m_arrAvailStatus[$actor.simpleName$_$read.port$] --;
 $else$
-m_poTabIn[$actor.simpleName$_$read.port$]->get($read.target$, $read.numTokens$);$\n$
+m_poTabIn[$actor.simpleName$_$read.port$]-\>get($read.target$, $read.numTokens$);$\n$
 m_arrAvailStatus[$actor.simpleName$_$read.port$] -= $read.numTokens$;
 $endif$
 $else$
-m_poTabIn[$actor.simpleName$_$read.port$]->skip($read.numTokens$);$\n$
+m_poTabIn[$actor.simpleName$_$read.port$]-\>skip($read.numTokens$);$\n$
 m_arrAvailStatus[$actor.simpleName$_$read.port$] -= $read.numTokens$;
 $endif$
 >>
@@ -191,10 +191,10 @@ $store.target$$store.indexes : {[$it$]}$ = $store.value$;
 Write(write) ::= <<
 
 $if(write.unit)$
-m_poTabOut[$actor.simpleName$_$write.port$]->put($write.target$);$\n$
+m_poTabOut[$actor.simpleName$_$write.port$]-\>put($write.target$);$\n$
 m_arrRoomStatus[$actor.simpleName$_$write.port$]--;
 $else$
-m_poTabOut[$actor.simpleName$_$write.port$]->put($write.target$, $write.numTokens$);$\n$
+m_poTabOut[$actor.simpleName$_$write.port$]-\>put($write.target$, $write.numTokens$);$\n$
 m_arrRoomStatus[$actor.simpleName$_$write.port$] -= $write.numTokens$;
 
 $endif$
@@ -378,7 +378,7 @@ $transitions: {case state_$it.sourceState$:
 	break;
 }$
 default:
-	std::cout << "unknown state: " << _FSM_state << std::endl;
+	std::cout \<\< "unknown state: " \<\< _FSM_state \<\< std::endl;
 	break;
 }
 if (res){i++;}
@@ -463,8 +463,8 @@ $actor.packageAsList; separator="::"$
 ///////////////////////////////////////////////////////////////////////////////
 
 actor(actor, options) ::= <<
-#include <iostream>
-#include <string.h>
+#include \<iostream\>
+#include \<string.h\>
 
 #include "$actor.simpleName$.h"
 
@@ -520,15 +520,15 @@ $endif$
 void $actor.simpleName$::getFifoStatus()
 {
 $if(actor.inputs.list)$
-  	for(int i=0; i<$actor.simpleName$_nbInputs; i++) 
+  	for(int i=0; i\<$actor.simpleName$_nbInputs; i++) 
 	{
-		m_arrAvailStatus[i] = m_poTabIn[i]->getCount();
+		m_arrAvailStatus[i] = m_poTabIn[i]-\>getCount();
 	}
 $endif$
 $if(actor.outputs.list)$
-	for(int i=0; i<$actor.simpleName$_nbOutputs; i++) 
+	for(int i=0; i\<$actor.simpleName$_nbOutputs; i++) 
 	{
-		m_arrRoomStatus[i] = m_poTabOut[i]->getRooms();
+		m_arrRoomStatus[i] = m_poTabOut[i]-\>getRooms();
 	}
 $endif$
 }

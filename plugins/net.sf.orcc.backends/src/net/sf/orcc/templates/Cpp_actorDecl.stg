@@ -120,7 +120,7 @@ actor(actor, options) ::= <<
 #ifndef __ACTOR_$actor.packageAsList; separator="_"$_$actor.simpleName$_H__
 #define __ACTOR_$actor.packageAsList; separator="_"$_$actor.simpleName$_H__
 
-#include <fstream>
+#include \<fstream\>
 #include "actoraka.h"
 
 $actor.packageAsList: startNamespace()$
@@ -173,10 +173,10 @@ $endif$
 
 	private:
 $if(actor.inputs.list)$
-	const bool hasTokens(int port, int iSize) const {return  (m_arrAvailStatus[port] >= iSize);};
+	const bool hasTokens(int port, int iSize) const {return  (m_arrAvailStatus[port] \>= iSize);};
 $endif$
 $if(actor.outputs.list)$
-	const bool hasRooms(int port, int iSize) const {return  (m_arrRoomStatus[port] >= iSize);};
+	const bool hasRooms(int port, int iSize) const {return  (m_arrRoomStatus[port] \>= iSize);};
 $endif$
 
 	void getFifoStatus();

@@ -3,19 +3,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 fifoName(port) ::= <<
-$if(port.type.uint)
-$ %struct.fifo_$fifoType(port)$_s* $
+<if(port.type.uint)
+> %struct.fifo_<fifoType(port)>_s* <
 else
-$ %struct.fifo_$fifoType(port)$_s* $
-endif$
+> %struct.fifo_<fifoType(port)>_s* <
+endif>
 >>
 
 fifoType(port) ::= <<
-i$port.type.size$
+i<port.type.size>
 >>
 
 fifo(port) ::= <<
-@$port.name$ = global $fifoName(port)$ null
+@<port.name> = global <fifoName(port)> null
 
 >>
 
@@ -23,73 +23,73 @@ fifo(port) ::= <<
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
 Var(var) ::= <<
-$if(var.global)$@$else$%$endif$$var$
+<if(var.global)>@<else>%<endif><var>
 >>
 
 Expr(expr, type) ::= <<
-$if(expr.varExpr)$$Var(expr.var.variable)$$else$$ConstantValue(const=expr, type=type)$$endif$
+<if(expr.varExpr)><Var(expr.var.variable)><else><ConstantValue(const=expr, type=type)><endif>
 >>
 
 ExprType(expr) ::= <<
-$expr.type$
+<expr.type>
 >>
 
 VarType(var) ::= <<
-$var.type$
+<var.type>
 >>
 
 ListType(list) ::= <<
-$list.type.elementType$
+<list.type.elementType>
 >>
 
 variableDeclaration(variable) ::= <<
-$if(!variable.port)
-$$if(variable.type.list)
-$$if(variable.instruction.store || !variable.instruction)$
-$AllocaOp(result={%$variable$}, type=variable.type)$
-$endif$
-$endif$$
-endif$
+<if(!variable.port)
+><if(variable.type.list)
+><if(variable.instruction.store || !variable.instruction)>
+<AllocaOp(result={%<variable>}, type=variable.type)>
+<endif>
+<endif><
+endif>
 >>
 
 indexes(indexes) ::= <<
-$indexes: { index | $if(index.type)$$index.type$$else$i32$endif$ $Expr(expr=index, type=index.type)$ }; separator=", "$
+<indexes: { index | <if(index.type)><index.type><else>i32<endif> <Expr(expr=index, type=index.type)> }; separator=", ">
 >>
 
 indexesName(indexes) ::= <<
-$indexes: {index |$index$}; separator="_"$
+<indexes: {index |<index>}; separator="_">
 >>
 
 parametersDeclaration(arguments, parameters, casts, location) ::= <<
-$arguments, parameters, casts: { arg, param, cast | $parameters(type = arg.type, variable= param, cast =cast, location=location)$}; separator=", "$
+<arguments, parameters, casts: { arg, param, cast | <parameters(type = arg.type, variable= param, cast =cast, location=location)>}; separator=", ">
 >>
 
 parameters(type, variable, cast, location) ::= <<
-$if(variable.intExpr)$$type$ $elseif(type.list)$$type$* $elseif(variable.booleanExpr)$i1 $else$$variable.type$ $endif$$if(cast)$%$variable$$location$_cast$else$$Expr(expr=variable, type=variable.type)$$endif$
+<if(variable.intExpr)><type> <elseif(type.list)><type>* <elseif(variable.booleanExpr)>i1 <else><variable.type> <endif><if(cast)>%<variable><location>_cast<else><Expr(expr=variable, type=variable.type)><endif>
 >>
 
 argumentDeclaration(variable) ::= <<
-$if(variable.type.list)
-$$variable.type$* %$variable$$
+<if(variable.type.list)
+><variable.type>* %<variable><
 else
-$$variable.type$ %$variable$$
-endif$
+><variable.type> %<variable><
+endif>
 >>
 
 argumentTypeDeclaration(variable) ::= <<
-$if(variable.type.list)
-$$variable.type$*$
+<if(variable.type.list)
+><variable.type>*<
 else
-$$variable.type$$
-endif$
+><variable.type><
+endif>
 >>
 
 Location(location) ::= <<
-$location.startLine$$location.startColumn$$location.endColumn$
+<location.startLine><location.startColumn><location.endColumn>
 >>
 
 ConstantValue(type, const) ::= <<
-$if(type.list)$ $Constant(constant = const, type = type, iterator = type.sizeIterator)$ $else$ $Constant(constant = const)$ $endif$
+<if(type.list)> <Constant(constant = const, type = type, iterator = type.sizeIterator)> <else> <Constant(constant = const)> <endif>
 >>
 
 
@@ -98,42 +98,40 @@ $if(type.list)$ $Constant(constant = const, type = type, iterator = type.sizeIte
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant, type, iterator) ::= <<
-$(constant.class.simpleName)(constant = constant, type = type, iterator = iterator)$
+<(constant.class.simpleName)(constant = constant, type = type, iterator = iterator)>
 >>
 
 BoolExpr(constant, type, iterator) ::= <<
-$if (constant.value)$1$else$0$endif$
+<if (constant.value)>1<else>0<endif>
 >>
 
 IntExpr(constant, type, iterator) ::= <<
-$constant$
+<constant>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
 ListExpr(constant, type, iterator) ::= <<
-[$iterator, constant.value: {iterator, value | $type.type$ $if(value)$ $Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)$ $else$ zeroinitializer $endif$ }; wrap, separator=", "$]
+[<iterator, constant.value: {iterator, value | <type.type> <if(value)> <Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)> <else> zeroinitializer <endif> }; wrap, separator=", ">]
 >>
 
 StringExpr(constant, type, iterator) ::= <<
-c"$constant$"
+c"<constant>"
 >>
-
-ArrayList(constant, type, iterator) ::= <<$List(constant = constant, type = type, iterator=iterator)$>>
 
 // phi definition
 phiPair(value, label) ::= <<
-[$value$, %$label$]
+[<value>, %<label>]
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-@$variable$ = $if(variable.assignable)$ global $
-else$ constant $endif$ $variable.type$ $
-if(variable.initialValue)$ $ConstantValue(type=variable.type, const=variable.initialValue)$
-$else$ zeroinitializer, align 32 
-$endif$
+@<variable> = <if(variable.assignable)> global <
+else> constant <endif> <variable.type> <
+if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)>
+<else> zeroinitializer, align 32 
+<endif>
 
 >>
 
@@ -142,58 +140,58 @@ $endif$
 // LLVM Operations
 ///////////////////////////////////////////////////////////////////////////////
 LoadOp(ty, pointer, alignment) ::= <<
-load $ty$* $pointer$ $if(alignment)$ [, align <alignment>] $endif$
+load <ty>* <pointer> <if(alignment)> [, align <alignment>] <endif>
 >>
 
 AndOp(result, ty, op1, op2) ::= <<
-$result$ = and $ty$ $op1$, $op2$
+<result> = and <ty> <op1>, <op2>
 >>
 
 IcmpOp(result, cond, ty, op1, op2) ::= <<
-$result$ = icmp $cond$ $ty$ $op1$, $op2$
+<result> = icmp <cond> <ty> <op1>, <op2>
 >>
  
 GetElementPtrOp(pty, ptrval, idx0, idx) ::= <<
-getelementptr $pty$* $ptrval$$if(idx0)$, i32 $idx0$$endif$ $if(idx)$, $indexes(idx)$$endif$
+getelementptr <pty>* <ptrval><if(idx0)>, i32 <idx0><endif> <if(idx)>, <indexes(idx)><endif>
 >>
 
 BitcastOp(result, ty, value, ty2) ::= <<
-$result$ = bitcast $ty$ $value$ to $ty2$
+<result> = bitcast <ty> <value> to <ty2>
 >>
 
 AllocaOp(result, type, NumElements, alignment) ::= <<
-$result$ = alloca $type$ $if(NumElements)
-$[, i32 <NumElements>]$
-endif$$
-if(alignment)$
-[, align <alignment>]$
-endif$
+<result> = alloca <type> <if(NumElements)
+>[, i32 <NumElements>]<
+endif><
+if(alignment)>
+[, align <alignment>]<
+endif>
 >>
 
 BrOp(cond, iftrue, iffalse, dest) ::= <<
-$if(cond)
-$br i1 $cond$, label $iftrue$, label $iffalse$$
+<if(cond)
+>br i1 <cond>, label <iftrue>, label <iffalse><
 else
-$br label $dest$$
-endif$
+>br label <dest><
+endif>
 >>
 
 RetOp(type, value) ::= <<
-$if(value)
-$ret $type$ $value$$
+<if(value)
+>ret <type> <value><
 else
-$ret void$
-endif$
+>ret void<
+endif>
 >>
 
 CallOp(tail, cconv, ret_attrs, ty, fnty, fnptrval, function_args, fn_attrs) ::= <<
-$if(tail)$ [tail] $endif$call$
-if(cconv)$ [cconv] $endif
-$$if(ret_attrs)$ [ret_attrs] $
-endif$ $ty$$
-if(fnty)$ [<fnty>*] $endif
-$ @$fnptrval$ ($if(function_args)$$function_args$$endif$) $
-if(fn_attrs)$ [fn_attrs] $endif$
+<if(tail)> [tail] <endif>call<
+if(cconv)> [cconv] <endif
+><if(ret_attrs)> [ret_attrs] <
+endif> <ty><
+if(fnty)> [<fnty>*] <endif
+> @<fnptrval> (<if(function_args)><function_args><endif>) <
+if(fn_attrs)> [fn_attrs] <endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -201,24 +199,24 @@ if(fn_attrs)$ [fn_attrs] $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 StoreInstr(ty, value, pty, ptr, cast) ::= <<
-$if(value.intExpr || value.booleanExpr)
-$store $pty$ $value$$cast$, $pty$* $ptr$$
+<if(value.intExpr || value.booleanExpr)
+>store <pty> <value><cast>, <pty>* <ptr><
 else
-$store $ty$ $Expr(expr=value, type=ty)$$cast$, $pty$* $ptr$$
-endif$
+>store <ty> <Expr(expr=value, type=ty)><cast>, <pty>* <ptr><
+endif>
 >>
 
 PrintInstr(parameters) ::= <<
-call i32 (i8*, ...)* @printf($parameters: PrintParameter(); separator=", "$)
+call i32 (i8*, ...)* @printf(<parameters: PrintParameter(); separator=", ">)
 
 >>
 
 PrintParameter(parameter) ::= <<
-$if (parameter.type.string)
-$ i8* noalias getelementptr inbounds ($parameter.type$* @$parameter$, i64 0, i64 0) $
+<if (parameter.type.string)
+> i8* noalias getelementptr inbounds (<parameter.type>* @<parameter>, i64 0, i64 0) <
 else
-$$parameter.type$ $Expr(expr=parameter, type=parameter.type)$$
-endif$
+><parameter.type> <Expr(expr=parameter, type=parameter.type)><
+endif>
 
 >>
 
@@ -227,49 +225,49 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 CastParameter(casts, args, params, location )::= <<
-$casts, args, params: { cast, arg, param | $if(cast)$ 
-$BitcastOp(result={%$param$$location$_cast}, ty={$param.type$*}, value=Expr(expr=param, type=param.type), ty2={$arg.type$*})$
-$endif$}$
+<casts, args, params: { cast, arg, param | <if(cast)> 
+<BitcastOp(result={%<param><location>_cast}, ty={<param.type>*}, value=Expr(expr=param, type=param.type), ty2={<arg.type>*})>
+<endif>}>
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
-	$BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.elseNodes)$})$
+	<BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.elseNodes)>})>
 
-b$label(ifNode.thenNodes)$: 
-$Nodes_cond(first(ifNode.thenNodes))$ $Nodes(rest(ifNode.thenNodes))$
-	br label %b$label(ifNode.joinNode)$
+b<label(ifNode.thenNodes)>: 
+<Nodes_cond(first(ifNode.thenNodes))> <Nodes(rest(ifNode.thenNodes))>
+	br label %b<label(ifNode.joinNode)>
 
-b$label(ifNode.elseNodes)$:
-$Nodes_cond(first(ifNode.elseNodes))$ $Nodes(rest(ifNode.elseNodes))$
-	br label %b$label(ifNode.joinNode)$
+b<label(ifNode.elseNodes)>:
+<Nodes_cond(first(ifNode.elseNodes))> <Nodes(rest(ifNode.elseNodes))>
+	br label %b<label(ifNode.joinNode)>
 
-b$label(ifNode.joinNode)$:
+b<label(ifNode.joinNode)>:
 
 >>
 
 IfWithThenNode(ifNode) ::= <<
-	$BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b$label(ifNode.thenNodes)$}, iffalse={%b$label(ifNode.joinNode)$})$
+	<BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.joinNode)>})>
 
-b$label(ifNode.thenNodes)$: 
-$Nodes_cond(first(ifNode.thenNodes))$ $Nodes(rest(ifNode.thenNodes))$
-	br label %b$label(ifNode.joinNode)$
+b<label(ifNode.thenNodes)>: 
+<Nodes_cond(first(ifNode.thenNodes))> <Nodes(rest(ifNode.thenNodes))>
+	br label %b<label(ifNode.joinNode)>
 
-b$label(ifNode.joinNode)$:
+b<label(ifNode.joinNode)>:
 
 >>
 
 LoadLocalPort(instr) ::= <<
-%local_$instr.port$$instr.block.label$ = $LoadOp(ty=fifoName(instr.port), pointer={@$instr.port$})$
+%local_<instr.port><instr.block.label> = <LoadOp(ty=fifoName(instr.port), pointer={@<instr.port>})>
 >>
 
-label(nodes) ::= "b$first(nodes):{ x | $x.label$}$"
+label(nodes) ::= "b<first(nodes):{ x | <x.label>}>"
 
 phiPairs(phi) ::= <<
-$phiExpr(expr=first(phi.values), type=phi.target.type , node = first(phi.block.predecessors))$, $phiExpr(expr=first(rest(phi.values)), type=phi.target.type, node = rest(phi.block.predecessors))$
+<phiExpr(expr=first(phi.values), type=phi.target.type , node = first(phi.block.predecessors))>, <phiExpr(expr=first(rest(phi.values)), type=phi.target.type, node = rest(phi.block.predecessors))>
 >>
 
 phiExpr(expr, type, node) ::= <<
-[$Expr(expr=expr, type=type)$ , %b$label(node)$ ]
+[<Expr(expr=expr, type=type)> , %b<label(node)> ]
 >>
 
 
@@ -279,119 +277,119 @@ phiExpr(expr, type, node) ::= <<
 
 
 Call(call) ::= <<
-$if(call.print)$ 
-$PrintInstr(call.parameters)$ 
-$else$
-$CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=Location(call.location))$
-$if(call.target)$
-%$call.target$ = $CallOp(ty=call.procedure.returnType,
+<if(call.print)> 
+<PrintInstr(call.parameters)> 
+<else>
+<CastParameter(casts=call.paramCast, args=call.procedure.parameters.list, params=call.parameters, location=Location(call.location))>
+<if(call.target)>
+%<call.target> = <CallOp(ty=call.procedure.returnType,
 fnptrval=call.procedure,
-function_args=parametersDeclaration(arguments=call.procedure.parameters.list, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
-$else$
-$CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))$
-$endif$
-$endif$
+function_args=parametersDeclaration(arguments=call.procedure.parameters.list, parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
+<else>
+<CallOp(ty=call.procedure.returnType, fnptrval=call.procedure, function_args=parametersDeclaration(arguments=call.procedure.parameters.list ,parameters=call.parameters, casts=call.paramCast, location=Location(call.location)))>
+<endif>
+<endif>
 >>
 
 Cast(target, value, cast)::= <<
-$if(cast.extended)$
-$if(cast.signed)
-$%$target$ = sext $value.type$ %$value$ to $target.type$$
+<if(cast.extended)>
+<if(cast.signed)
+>%<target> = sext <value.type> %<value> to <target.type><
 else
-$%$target$ = zext $value.type$ %$value$ to $target.type$$
-endif$
-$else$
-%$target$ = trunc $value.type$ %$value$ to $target.type$
-$endif$
+>%<target> = zext <value.type> %<value> to <target.type><
+endif>
+<else>
+%<target> = trunc <value.type> %<value> to <target.type>
+<endif>
 >>
 
 Assign(assign) ::= <<
-$if(assign.cast)$
-$Cast(target = assign.target, value = assign.value, cast = assign.cast)$
-$else$ 
-%$assign.target$ = $assign.value$
-$endif$
+<if(assign.cast)>
+<Cast(target = assign.target, value = assign.value, cast = assign.cast)>
+<else> 
+%<assign.target> = <assign.value>
+<endif>
 >>
 
 PhiAssignment(phi) ::= <<
 
-%$phi.target$ = phi $phi.target.type$ $phiPairs(phi)$
+%<phi.target> = phi <phi.target.type> <phiPairs(phi)>
 >>
 
 Read(read) ::= <<
 
-$LoadLocalPort(read)$
-%$read.port$_ptr = $CallOp(ty ={$read.port.type$*}, fnptrval={fifo_$fifoType(read.port)$_read}, function_args={$fifoName(read.port)$ %local_$read.target$$read.block.label$, i32 $read.numTokens$})$
-$BitcastOp(result=Var(read.target) , ty={$read.port.type$*}, value={%$read.port$_ptr}, ty2={$VarType(read.target)$*})$
+<LoadLocalPort(read)>
+%<read.port>_ptr = <CallOp(ty ={<read.port.type>*}, fnptrval={fifo_<fifoType(read.port)>_read}, function_args={<fifoName(read.port)> %local_<read.target><read.block.label>, i32 <read.numTokens>})>
+<BitcastOp(result=Var(read.target) , ty={<read.port.type>*}, value={%<read.port>_ptr}, ty2={<VarType(read.target)>*})>
 
 >>
 
 
 Peek(peek) ::= <<
 
-$LoadLocalPort(peek)$
-%$peek.port$_ptr = $CallOp(ty ={$peek.port.type$*}, fnptrval={fifo_$fifoType(peek.port)$_peek}, function_args={$fifoName(peek.port)$ %local_$peek.target$$peek.block.label$, i32 $peek.numTokens$})$
-$BitcastOp(result=Var(peek.target) , ty={$peek.port.type$*}, value={%$peek.port$_ptr}, ty2={$VarType(peek.target)$*})$
+<LoadLocalPort(peek)>
+%<peek.port>_ptr = <CallOp(ty ={<peek.port.type>*}, fnptrval={fifo_<fifoType(peek.port)>_peek}, function_args={<fifoName(peek.port)> %local_<peek.target><peek.block.label>, i32 <peek.numTokens>})>
+<BitcastOp(result=Var(peek.target) , ty={<peek.port.type>*}, value={%<peek.port>_ptr}, ty2={<VarType(peek.target)>*})>
 
 >>
 
 Write(write) ::= <<
 
-$LoadLocalPort(write)$
-%$write.port$_ptr = $CallOp(ty ={$write.port.type$*}, fnptrval={fifo_$fifoType(write.port)$_write}, function_args={$fifoName(write.port)$ %local_$write.target$$write.block.label$, i32 $write.numTokens$})$
-$BitcastOp(result=Var(write.target) , ty={$write.port.type$*}, value={%$write.port$_ptr}, ty2={$VarType(write.target)$*})$
+<LoadLocalPort(write)>
+%<write.port>_ptr = <CallOp(ty ={<write.port.type>*}, fnptrval={fifo_<fifoType(write.port)>_write}, function_args={<fifoName(write.port)> %local_<write.target><write.block.label>, i32 <write.numTokens>})>
+<BitcastOp(result=Var(write.target) , ty={<write.port.type>*}, value={%<write.port>_ptr}, ty2={<VarType(write.target)>*})>
 
 >>
 
 HasRoom(result, action, port, numToken) ::= <<
 
-%$port$_$action$ = $LoadOp(ty=fifoName(port), pointer={@$port$})$
-%$result$32 = $CallOp(ty="i32", fnptrval={fifo_$fifoType(port)$_has_room}, function_args={$fifoName(port)$ %$port$_$action$, i32 $numToken$})$
-%$result$ = trunc i32 %$result$32 to i1
+%<port>_<action> = <LoadOp(ty=fifoName(port), pointer={@<port>})>
+%<result>32 = <CallOp(ty="i32", fnptrval={fifo_<fifoType(port)>_has_room}, function_args={<fifoName(port)> %<port>_<action>, i32 <numToken>})>
+%<result> = trunc i32 %<result>32 to i1
 >>
 
 HasTokens(hasTokens) ::= <<
 
-$LoadLocalPort(hasTokens)$
-%$hasTokens.target$32 = $CallOp(ty="i32", fnptrval={fifo_$fifoType(hasTokens.port)$_has_tokens}, function_args={$fifoName(hasTokens.port)$ %local_$hasTokens.port$$hasTokens.block.label$, i32 $hasTokens.numTokens$})$
-%$hasTokens.target$ = trunc i32 %$hasTokens.target$32 to i1
+<LoadLocalPort(hasTokens)>
+%<hasTokens.target>32 = <CallOp(ty="i32", fnptrval={fifo_<fifoType(hasTokens.port)>_has_tokens}, function_args={<fifoName(hasTokens.port)> %local_<hasTokens.port><hasTokens.block.label>, i32 <hasTokens.numTokens>})>
+%<hasTokens.target> = trunc i32 %<hasTokens.target>32 to i1
 >>
 
 WriteEnd(writeEnd) ::= <<
 
-%end_$writeEnd.port$ = $LoadOp(ty=fifoName(writeEnd.port), pointer={@$writeEnd.port$})$
-$CallOp(ty ="void", fnptrval={fifo_$fifoType(writeEnd.port)$_write_end}, function_args={$fifoName(writeEnd.port)$ %end_$writeEnd.port$, i32 $writeEnd.numTokens$})$
+%end_<writeEnd.port> = <LoadOp(ty=fifoName(writeEnd.port), pointer={@<writeEnd.port>})>
+<CallOp(ty ="void", fnptrval={fifo_<fifoType(writeEnd.port)>_write_end}, function_args={<fifoName(writeEnd.port)> %end_<writeEnd.port>, i32 <writeEnd.numTokens>})>
 >>
 
 
 ReadEnd(readEnd) ::= <<
 
-%end_$readEnd.port$ = $LoadOp(ty=fifoName(readEnd.port), pointer={@$readEnd.port$})$
-$CallOp(ty ="void", fnptrval={fifo_$fifoType(readEnd.port)$_read_end}, function_args={$fifoName(readEnd.port)$ %end_$readEnd.port$, i32 $readEnd.numTokens$})$
+%end_<readEnd.port> = <LoadOp(ty=fifoName(readEnd.port), pointer={@<readEnd.port>})>
+<CallOp(ty ="void", fnptrval={fifo_<fifoType(readEnd.port)>_read_end}, function_args={<fifoName(readEnd.port)> %end_<readEnd.port>, i32 <readEnd.numTokens>})>
 >>
 
 Return(return) ::= <<
 
-$if(return.value)$$
-RetOp(type=return.value.type, value=Expr(expr=return.value, type=return.value.type))$$
+<if(return.value)><
+RetOp(type=return.value.type, value=Expr(expr=return.value, type=return.value.type))><
 else
-$$RetOp()$$
-endif$
+><RetOp()><
+endif>
 >>
 
 Store(store) ::= <<
 
-$StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target), ptr=Var(store.target))$
+<StoreInstr(ty=store.value.type, value=store.value, pty=VarType(store.target), ptr=Var(store.target))>
 
 >>
 
 Load(load) ::= <<
-$Var(load.target)$ = $LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))$
+<Var(load.target)> = <LoadOp(ty=VarType(load.source.variable), pointer=Var(load.source.variable))>
 
 >>
 
 GEP(gep) ::= <<
-$Var(gep.target)$ = $GetElementPtrOp(idx0="0",  pty=VarType(gep.source.variable), ptrval=Var(gep.source.variable), idx=gep.indexes)$
+<Var(gep.target)> = <GetElementPtrOp(idx0="0",  pty=VarType(gep.source.variable), ptrval=Var(gep.source.variable), idx=gep.indexes)>
 
 >>
 
@@ -401,29 +399,29 @@ $Var(gep.target)$ = $GetElementPtrOp(idx0="0",  pty=VarType(gep.source.variable)
 
 // if node
 IfNode(ifNode) ::= <<
-$if(ifNode.thenNodes)$
-$if(ifNode.elseNodes)$
-$IfWithThenElseNodes(ifNode)$
-$else$
-$IfWithThenNode(ifNode)$	
-$endif$
-$endif$
-$Nodes_cond(first(ifNode.joinNode))$
-$Nodes(rest(ifNode.joinNode))$
+<if(ifNode.thenNodes)>
+<if(ifNode.elseNodes)>
+<IfWithThenElseNodes(ifNode)>
+<else>
+<IfWithThenNode(ifNode)>	
+<endif>
+<endif>
+<Nodes_cond(first(ifNode.joinNode))>
+<Nodes(rest(ifNode.joinNode))>
 
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
-$BlockNode(whileNode.joinNode)$
-	$BrOp(cond=Expr(expr=whileNode.value, type=whileNode.value.type), iftrue={%b$label(whileNode.Nodes)$}, iffalse={%b$label(whileNode.joinNode.successors)$})$
+<BlockNode(whileNode.joinNode)>
+	<BrOp(cond=Expr(expr=whileNode.value, type=whileNode.value.type), iftrue={%b<label(whileNode.Nodes)>}, iffalse={%b<label(whileNode.joinNode.successors)>})>
 
-b$label(whileNode.nodes)$:
-$Nodes_cond(first(whileNode.nodes))$
-$Nodes(rest(whileNode.nodes))$
-	br label %b$label(whileNode.joinNode)$
+b<label(whileNode.nodes)>:
+<Nodes_cond(first(whileNode.nodes))>
+<Nodes(rest(whileNode.nodes))>
+	br label %b<label(whileNode.joinNode)>
 
-b$label(whileNode.joinNode.successors)$:
+b<label(whileNode.joinNode.successors)>:
 
 >>
 
@@ -432,47 +430,47 @@ b$label(whileNode.joinNode.successors)$:
 ///////////////////////////////////////////////////////////////////////////////
 
 Instruction(instruction) ::= <<
-$(instruction.class.simpleName)(instruction)$
+<(instruction.class.simpleName)(instruction)>
 >>
 
 Instructions(instructions) ::= <<
-$instructions: Instruction()$
+<instructions: Instruction()>
 >>
 
 Node(node) ::= <<
-$(node.class.simpleName)(node)$
+<(node.class.simpleName)(node)>
 >>
 
 Nodes(nodes) ::= <<
-$nodes: Node()$
+<nodes: Node()>
 >>
 
 Node_cond(node) ::= <<
-$({$node.class.simpleName$_cond})(node)$
+<({<node.class.simpleName>_cond})(node)>
 >>
 
 Nodes_cond(nodes) ::= <<
-$nodes: Node_cond()$
+<nodes: Node_cond()>
 >>
 
 WhileNode_cond(nodes) ::= <<
-$WhileNode(nodes)$
+<WhileNode(nodes)>
 >>
 
 IfNode_cond(nodes) ::= <<
-$IfNode(nodes)$
+<IfNode(nodes)>
 >>
 
 BlockNode_cond(blockNode) ::= <<
-	$Instructions(blockNode.instructions)$
+	<Instructions(blockNode.instructions)>
 >>
 
 // if node
 BlockNode(blockNode) ::= <<
-	br label %b$label(blockNode)$
+	br label %b<label(blockNode)>
 
-b$label(blockNode)$:
-	$Instructions(blockNode.instructions)$
+b<label(blockNode)>:
+	<Instructions(blockNode.instructions)>
 	
 >>
 
@@ -481,16 +479,16 @@ b$label(blockNode)$:
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-$if(!procedure.external)$
-define $procedure.returnType$ @$procedure$($procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", "$) nounwind {
+<if(!procedure.external)>
+define <procedure.returnType> @<procedure>(<procedure.parameters.list: argumentDeclaration(); wrap, anchor, separator=", ">) nounwind {
 entry:
-$if(procedure.locals.list)$
-	$procedure.locals.list: variableDeclaration()$
-$endif$
-$Nodes(trunc(procedure.nodes))$
-$Node(last(procedure.nodes))$
+<if(procedure.locals.list)>
+	<procedure.locals.list: variableDeclaration()>
+<endif>
+<Nodes(trunc(procedure.nodes))>
+<Node(last(procedure.nodes))>
 }
-$endif$
+<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -498,7 +496,7 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 actorParameter(parameter) ::= <<
-@$parameter$ = global $parameter.type$ undef
+@<parameter> = global <parameter.type> undef
 
 >>
 
@@ -507,7 +505,7 @@ actorParameter(parameter) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 action(action) ::= <<
-$procedure(action.body)$$procedure(action.scheduler)$
+<procedure(action.body)><procedure(action.scheduler)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -516,35 +514,35 @@ $procedure(action.body)$$procedure(action.scheduler)$
 
 actor(actor, options) ::= <<
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Generated from "$actor.name$"
+; Generated from "<actor.name>"
 declare i32 @printf(i8* noalias , ...) nounwind 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Input FIFOs
-$actor.inputs.list: fifo()$
+<actor.inputs.list: fifo()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Output FIFOs
-$actor.outputs.list: fifo()$
+<actor.outputs.list: fifo()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-$actor.parameters.list: actorParameter()$
+<actor.parameters.list: actorParameter()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
-$actor.stateVars.list: stateVar()$
+<actor.stateVars.list: stateVar()>
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
-$actor.procs.list: procedure()$
+<actor.procs.list: procedure()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Actions
-$actor.actions: action()$
+<actor.actions: action()>
 
 ; Initializes
-$if(actor.initializes)$
-$actor.initializes: action()$
-$endif$
+<if(actor.initializes)>
+<actor.initializes: action()>
+<endif>
 
-$decl_MD(actor)$
+<decl_MD(actor)>
 
-$header()$
+<header()>
 >>

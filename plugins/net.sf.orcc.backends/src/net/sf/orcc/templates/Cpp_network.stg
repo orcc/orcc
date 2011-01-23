@@ -36,7 +36,7 @@ $instances: initializeInstance(); wrap, separator=", "$
 
 
 doDeclareFifo(edge, src, tgt, kind) ::= <<
-FifoAPI * fifo_$network.connectionMap.(edge)$ = FifoFactory<$edge.source.type$>::allocateFifo($if(edge.size)$$edge.size$$else$SIZE$endif$, $kind$);
+FifoAPI * fifo_$network.connectionMap.(edge)$ = FifoFactory\<$edge.source.type$\>::allocateFifo($if(edge.size)$$edge.size$$else$SIZE$endif$, $kind$);
 
 >>
 
