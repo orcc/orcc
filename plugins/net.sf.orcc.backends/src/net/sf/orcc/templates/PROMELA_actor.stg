@@ -120,7 +120,7 @@ $load.target$ = $load.source$$load.indexes : {[$it$]}$;
 >>
 
 Peek(peek) ::= <<
-chan_$instance.id$_$peek.port$?<$peek.target$>;
+chan_$instance.id$_$peek.port$?\<$peek.target$\>;
 >>
 
 Read(read) ::= <<
@@ -170,9 +170,9 @@ $instructions(blockNode.instructions)$
 IfNode(ifNode) ::= <<
 
 if 
-:: ($ifNode.value$) ->
+:: ($ifNode.value$) -\>
 	$nodes(ifNode.thenNodes)$
-$if(ifNode.elseNodes)$:: else ->
+$if(ifNode.elseNodes)$:: else -\>
 	$nodes(ifNode.elseNodes)$
 $endif$
 fi;
@@ -183,9 +183,9 @@ $BlockNode(ifNode.joinNode)$
 WhileNode(whileNode) ::= <<
 
 do 
-:: $whileNode.value$ ->
+:: $whileNode.value$ -\>
 	$nodes(whileNode.nodes)$
-:: else -> break;
+:: else -\> break;
 od
 }
 $BlockNode(whileNode.joinNode)$
@@ -210,7 +210,7 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 newState() ::= << 
-:: state == state_$fsm_trans.SourceState$ -> {
+:: state == state_$fsm_trans.SourceState$ -\> {
 	$fsm_trans.NextStateInfo: { fsm_nsi | $fsm_nsi.action: peeks()$}$
 	if
 	$fsm_trans.NextStateInfo: {
@@ -222,7 +222,7 @@ newState() ::= <<
 schedulerFSM(action) ::= <<
 	/* $action.name$ */ atomic { 
 	$guardFSM()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
-	-> 
+	-\> 
 	/* Temp variables*/
 	$if(action.body.locals.list)$
 	$action.body.locals.list: { var | $if(!var.port)$ $variableDeclaration(var)$;$\n$$endif$}$
@@ -245,7 +245,7 @@ $endif$
 
 peeks(action) ::= <<
 	$options.loads.(action): { p | $p.Target.type$ $p.Target$;}$
-	$options.peeks.(action): { p | chan_$instance.id$_$p.port$?<$p.port$[0]>;}$
+	$options.peeks.(action): { p | chan_$instance.id$_$p.port$?\<$p.port$[0]\>;}$
 	$options.loads.(action): { p | $p.Target$ = $p.Source$[0];}$
 
 >>
@@ -258,7 +258,7 @@ peeks(action) ::= <<
 scheduler(action) ::= <<
 :: /* $action.name$ */ atomic { 
 	$guard()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
-	->
+	-\>
 	/* Temp variables*/
 	$if(action.body.locals.list)$
 	$action.body.locals.list: {var | $if(!var.port)$$variableDeclaration(var)$;$\n$$endif$}$

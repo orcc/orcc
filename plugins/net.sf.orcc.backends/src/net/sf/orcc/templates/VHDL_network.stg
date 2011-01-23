@@ -132,31 +132,31 @@ doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
 $if(edge.size)
 $fifo_$count$ : entity work.fifo_generic 
 generic map (
-  depth => $edge.size$,
+  depth =\> $edge.size$,
   $if(targetPort.type.bool)
-$  width => 1)$
+$  width =\> 1)$
   else
-$  width => $targetPort.type.size$)$
+$  width =\> $targetPort.type.size$)$
   endif$
 
 port map (
-  wr_data    => $source.id$_$sourcePort.name$_send, 
+  wr_data    =\> $source.id$_$sourcePort.name$_send, 
   $if(targetPort.type.bool)
-$  data_in(0) => $source.id$_$sourcePort.name$_data,$\n$$
+$  data_in(0) =\> $source.id$_$sourcePort.name$_data,$\n$$
   else
-$  data_in    => $source.id$_$sourcePort.name$_data,$\n$$
+$  data_in    =\> $source.id$_$sourcePort.name$_data,$\n$$
   endif$
-  wr_clk     => clock, 
-  wr_ack     => $source.id$_$sourcePort.name$_ack, 
+  wr_clk     =\> clock, 
+  wr_ack     =\> $source.id$_$sourcePort.name$_ack, 
   $if(targetPort.type.bool)
-$  data_out(0)=> $target.id$_$targetPort.name$_data,$\n$$
+$  data_out(0)=\> $target.id$_$targetPort.name$_data,$\n$$
   else
-$  data_out   => $target.id$_$targetPort.name$_data,$\n$$
+$  data_out   =\> $target.id$_$targetPort.name$_data,$\n$$
   endif
-$  rd_clk     => clock, 
-  send       => $target.id$_$targetPort.name$_send, 
-  rd_ack     => $target.id$_$targetPort.name$_ack,  
-  reset_n    => reset_n);$
+$  rd_clk     =\> clock, 
+  send       =\> $target.id$_$targetPort.name$_send, 
+  rd_ack     =\> $target.id$_$targetPort.name$_ack,  
+  reset_n    =\> reset_n);$
 endif$
 >>
 
@@ -201,38 +201,38 @@ $
 															vmap=network.targetMap.(connection))$}; separator="\n"$
 $
 endif$
-    clock     => clock, 
-    reset_n   => reset_n);
+    clock     =\> clock, 
+    reset_n   =\> reset_n);
 >>
 
 
 printInputs(connection, map, vmap) ::= <<
 $if(map.(connection.target))
-$$connection.target$_data   => $instance.id$_$connection.target$_data,
-$connection.target$_send   => $instance.id$_$connection.target$_send,
-$connection.target$_ack    => $instance.id$_$connection.target$_ack,$
+$$connection.target$_data   =\> $instance.id$_$connection.target$_data,
+$connection.target$_send   =\> $instance.id$_$connection.target$_send,
+$connection.target$_ack    =\> $instance.id$_$connection.target$_ack,$
 else
-$$connection.target$_data   => $vmap.port$_data,
-$connection.target$_send   => $vmap.port$_send,
-$connection.target$_ack    => $vmap.port$_ack,$
+$$connection.target$_data   =\> $vmap.port$_data,
+$connection.target$_send   =\> $vmap.port$_send,
+$connection.target$_ack    =\> $vmap.port$_ack,$
 endif$
 >>
 
 printOutputs(connection, map, vmap) ::= <<
 $if(map.(connection.source))
 $$if(connection.attributes)
-$$connection.source$_data   => $instance.id$_$connection.source$_data,
-$connection.source$_send   => $instance.id$_$connection.source$_send,
-$connection.source$_ack    => $instance.id$_$connection.source$_ack,$
+$$connection.source$_data   =\> $instance.id$_$connection.source$_data,
+$connection.source$_send   =\> $instance.id$_$connection.source$_send,
+$connection.source$_ack    =\> $instance.id$_$connection.source$_ack,$
 else
-$$connection.source$_data   => $map.(connection.source).id$_$connection.target$_data,
-$connection.source$_send   => $map.(connection.source).id$_$connection.target$_send,
-$connection.source$_ack    => $map.(connection.source).id$_$connection.target$_ack,$
+$$connection.source$_data   =\> $map.(connection.source).id$_$connection.target$_data,
+$connection.source$_send   =\> $map.(connection.source).id$_$connection.target$_send,
+$connection.source$_ack    =\> $map.(connection.source).id$_$connection.target$_ack,$
 endif$$
 else
-$$connection.source$_data   => $vmap.port$_data,
-$connection.source$_send   => $vmap.port$_send,
-$connection.source$_ack    => $vmap.port$_ack,$
+$$connection.source$_data   =\> $vmap.port$_data,
+$connection.source$_send   =\> $vmap.port$_send,
+$connection.source$_ack    =\> $vmap.port$_ack,$
 endif$
 >>
 
@@ -255,19 +255,19 @@ endif$
 printBroadcast(name, inputs, outputs) ::= <<
 broadcast_$name$ : entity work.broadcast
     generic map (
-      width => $if(instance.broadcast.type.bool)$1$else$$instance.broadcast.type.size$$endif$,
-      size  => $instance.broadcast.numOutputs$)
+      width =\> $if(instance.broadcast.type.bool)$1$else$$instance.broadcast.type.size$$endif$,
+      size  =\> $instance.broadcast.numOutputs$)
   port map (
 $if(!inputs.empty)$
     $network.incomingMap.(instance):{connection | $printInputs(connection=connection, map=network.predecessorsMap.(instance), 
 															vmap=network.sourceMap.(connection))$}; separator="\n"$
 $endif$
 $if(!outputs.empty)$
-    output_data  => $name$_fromBroad_data,
-    output_send  => $name$_fromBroad_send,
-    output_ack   => $name$_fromBroad_ack,
+    output_data  =\> $name$_fromBroad_data,
+    output_send  =\> $name$_fromBroad_send,
+    output_ack   =\> $name$_fromBroad_ack,
 $endif$
-    reset_n   => reset_n);
+    reset_n   =\> reset_n);
 $if(!outputs.empty)$
 $outgoingMap.(instance) : printBroadcastOutputs(); separator="\n"$
 $endif$
@@ -280,9 +280,9 @@ printBroadcastOutputs(connection) ::= <<
 
 printBroadcastPortsOut(connection, map, vmap) ::= <<
 $if(!map.(connection.source))
-$$vmap.port$_data   <= $name$_fromBroad_data;
-$vmap.port$_send   <= $name$_fromBroad_send;
-$vmap.port$_ack    <= $name$_fromBroad_ack;$
+$$vmap.port$_data   \<= $name$_fromBroad_data;
+$vmap.port$_send   \<= $name$_fromBroad_send;
+$vmap.port$_ack    \<= $name$_fromBroad_ack;$
 endif$
 >>
 

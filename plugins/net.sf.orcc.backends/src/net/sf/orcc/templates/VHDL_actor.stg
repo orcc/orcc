@@ -2,11 +2,11 @@
 // Common applet
 ///////////////////////////////////////////////////////////////////////////////
 portType(port, IOtype, dataType) ::=<<
-$if(port.type.bool)
-$$port.name$_$dataType$  :$IOtype$std_logic;$
+<if(port.type.bool)
+><port.name>_<dataType>  :<IOtype>std_logic;<
 else
-$$port.name$_$dataType$  :$IOtype$std_logic_vector($port.type.size$ -1 downto 0);$
-endif$
+><port.name>_<dataType>  :<IOtype>std_logic_vector(<port.type.size> -1 downto 0);<
+endif>
 >>
 
 
@@ -15,20 +15,20 @@ endif$
 // Print instance's ports
 ///////////////////////////////////////////////////////////////////////////////
 PrintInputPorts(port) ::= <<
-$portType(port=port, IOtype=" in  ", dataType="data")$
-$port.name$_send  : in  std_logic;
-$port.name$_ack   : out  std_logic;
+<portType(port=port, IOtype=" in  ", dataType="data")>
+<port.name>_send  : in  std_logic;
+<port.name>_ack   : out  std_logic;
 
 >>
 
 PrintOutputPorts(port) ::= <<
-$portType(port=port, IOtype=" out ", dataType="data")$
-$port.name$_send  : out std_logic;
-$if(last(port.name))
-$$port.name$_ack   : in  std_logic$
+<portType(port=port, IOtype=" out ", dataType="data")>
+<port.name>_send  : out std_logic;
+<if(last(port.name))
+><port.name>_ack   : in  std_logic<
 else
-$$port.name$_ack   : in  std_logic;$
-endif$
+><port.name>_ack   : in  std_logic;<
+endif>
 >>
 
 
@@ -38,7 +38,7 @@ endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 // the dimensions of a list: [dim1][dim2]...[dimn]
-// does not output anything if $value$ is empty
+// does not output anything if <value> is empty
 listSize(value) ::= <<
 $value : {$it$}; separator=" * "$
 >>
@@ -94,12 +94,12 @@ $
 // Init at reset
 ///////////////////////////////////////////////////////////////////////////////
 stateConst(variable) ::= <<
-$if(variable.initialized)
-  $$if(variable.assignable)
-$    $variable$ <= $variable.initialValue$;
-$
-  endif$$
-endif$
+<if(variable.initialized)
+  ><if(variable.assignable)
+>    <variable> \<= <variable.initialValue>;
+<
+  endif><
+endif>
 >>
 
 
@@ -279,31 +279,31 @@ $$store.target$ := $store.value$;$
   $$
   else
 $
-$store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
+$store.target$(<store.indexes : {index | <index>}; separator=", ">) \<= <store.value>;$
   endif
 $$
 else
 $
-$store.target$ <= $store.value$;$
+<store.target> \<= <store.value>;$
 endif$
 >>
 
 PrintIndexes(indexes) ::= <<
 $if(indexes.type.int)
-$-- nop $store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
+$-- nop $store.target$($store.indexes : {$it$}; separator=", "$) \<= $store.value$;$
 else
-$$store.target$($store.indexes : {$it$}; separator=", "$) <= $store.value$;$
+$$store.target$($store.indexes : {$it$}; separator=", "$) \<= $store.value$;$
 endif$
 >>
 
 Write(write) ::= <<
 
 $if(write.target.type.bool)
-$$write.port$_idata <= $write.target$;$
+$$write.port$_idata \<= $write.target$;$
 elseif(write.target.type.int)
-$$write.port$_idata <= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
+$$write.port$_idata \<= std_logic_vector(to_signed($write.target$, $write.port.type.size$));$
 else
-$$write.port$_idata <= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
+$$write.port$_idata \<= std_logic_vector(to_unsigned($write.target$, $write.port.type.size$));$
 endif$
 >>
 
@@ -453,7 +453,7 @@ begin
   if reset_n = '0' then
     $actor.outputs.list : OutputsReset(); separator="\n"$
     --
-    $actor.outputs.list : {port|$port.name$FSM_out <= waitSend;}; separator="\n"$
+    $actor.outputs.list : {port|$port.name$FSM_out \<= waitSend;}; separator="\n"$
   --
   elsif rising_edge(clock) then
     $actor.outputs.list : FSM_outputs(); separator="\n\n"$
@@ -463,48 +463,48 @@ end process out_management;
 
 FSM_outputs(port) ::= <<
 case $port.name$FSM_out is
-  when waitSend =>
+  when waitSend =\>
     if $port.name$_isend = '1' then
-      $port.name$_rdy    <= '1';
-      $port.name$_send   <= '1';
-      $port.name$_data   <= $port.name$_idata;      
-      $port.name$FSM_out <= waitAck;
+      $port.name$_rdy    \<= '1';
+      $port.name$_send   \<= '1';
+      $port.name$_data   \<= $port.name$_idata;      
+      $port.name$FSM_out \<= waitAck;
     else
-      $port.name$_rdy    <= '1';
-      $port.name$_send   <= '0';
-      $port.name$FSM_out <= waitSend;
+      $port.name$_rdy    \<= '1';
+      $port.name$_send   \<= '0';
+      $port.name$FSM_out \<= waitSend;
     end if;
   --
-  when waitAck =>
+  when waitAck =\>
     if $port.name$_ack = '1' and $port.name$_isend = '1' then
-      $port.name$_rdy    <= '1';
-      $port.name$_send   <= '1';
-      $port.name$_data   <= $port.name$_idata;            
-      $port.name$FSM_out <= waitAck;
+      $port.name$_rdy    \<= '1';
+      $port.name$_send   \<= '1';
+      $port.name$_data   \<= $port.name$_idata;            
+      $port.name$FSM_out \<= waitAck;
     elsif $port.name$_ack = '1' then
-      $port.name$_rdy    <= '1';
-      $port.name$_send   <= '0';
-      $port.name$FSM_out <= waitSend;
+      $port.name$_rdy    \<= '1';
+      $port.name$_send   \<= '0';
+      $port.name$FSM_out \<= waitSend;
     else
-      $port.name$_rdy    <= '0';
-      $port.name$_send   <= '1';
-      $port.name$_data   <= $port.name$_idata;            
-      $port.name$FSM_out <= waitAck;
+      $port.name$_rdy    \<= '0';
+      $port.name$_send   \<= '1';
+      $port.name$_data   \<= $port.name$_idata;            
+      $port.name$FSM_out \<= waitAck;
     end if;
   --
-  when others => null;
+  when others =\> null;
 end case;
 >>
 
 OutputsReset(port) ::= <<
 $if(port.type.bool)
-$$port.name$_data <= '0';$
+$$port.name$_data \<= '0';$
 else
-$$port.name$_data <= (others => '0');$
+$$port.name$_data \<= (others =\> '0');$
 endif$
 
-$port.name$_rdy  <= '0';     
-$port.name$_send <= '0';
+$port.name$_rdy  \<= '0';     
+$port.name$_send \<= '0';
 >>
 
 
@@ -520,8 +520,8 @@ begin
 
   --
   -- Test the action's inputs to fire (or not) an action  
-  $actor.actions : {actions|$actions$_go  <= '0';}; separator="\n"$
-  $actor.inputs.list :{port|$port.name$_ack <= '0';}; separator="\n"$  
+  $actor.actions : {actions|$actions$_go \<= '0';}; separator="\n"$
+  $actor.inputs.list :{port|$port.name$_ack \<= '0';}; separator="\n"$  
 $if(actor.actionScheduler.fsm)    
 $  $printActionFireFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
 else  
@@ -566,15 +566,15 @@ printActionFire(action) ::= <<
 ((isSchedulable_$action$_go $action.inputPattern.keys : {port| and $port.name$_send }$) = '1') then
 $if(action.inputPattern.keys)
 $$ if(action.outputPattern.keys)
-$    $action$_go  <= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$;
+$    $action$_go  \<= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$;
     $action.inputPattern.keys : {
-      port|$port.name$_ack <= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$} ; separator=";\n"$;$
+      port|$port.name$_ack \<= isSchedulable_$action$_go and $action.outputPattern.keys : {port|$port.name$_rdy}; separator=" and "$} ; separator=";\n"$;$
   else
-$    $action$_go  <= isSchedulable_$action$_go;
-    $action.inputPattern.keys : {port|$port.name$_ack <= isSchedulable_$action$_go;} ; separator="\n"$$
+$    $action$_go  \<= isSchedulable_$action$_go;
+    $action.inputPattern.keys : {port|$port.name$_ack \<= isSchedulable_$action$_go;} ; separator="\n"$$
   endif$$
 else
-$    $action$_go  <= isSchedulable_$action$_go;$
+$    $action$_go  \<= isSchedulable_$action$_go;$
 endif$  
 >>
 
@@ -594,7 +594,7 @@ endif$
 >>
 
 TransitionFire(transition) ::= <<
-    when s_$transition.sourceState$ =>
+    when s_$transition.sourceState$ =\>
       if $transition.nextStateInfo: actionFire(); separator="\n      elsif"$
       end if;
 >>
@@ -618,11 +618,11 @@ $$actor.stateVars.list: stateConst()$    --$
 endif$
     $actor.outputs.list : port_out_init()$
 $if(actor.actionScheduler.fsm)    
-$    FSM    <= s_$actor.actionScheduler.fsm.initialState$;
+$    FSM    \<= s_$actor.actionScheduler.fsm.initialState$;
 $
 endif$  --
   elsif rising_edge(clock) then
-    $actor.outputs.list :{port|$port.name$_isend <= '0';}; separator="\n"$
+    $actor.outputs.list :{port|$port.name$_isend \<= '0';}; separator="\n"$
     --  
 $if(actor.actionScheduler.fsm)    
 $    $executeCoreFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$$
@@ -644,17 +644,17 @@ actionTestSceduler(action) ::= <<
 writeManagement(port) ::= <<
 $if(action.outputPattern.(port))
 $
-  $port.name$_isend <= '1';$
+  $port.name$_isend \<= '1';$
 endif$
 >>
 
 port_out_init(port) ::=<<
 
-$port.name$_isend <= '0';
+$port.name$_isend \<= '0';
 $if(port.type.bool)
-$$port.name$_idata  <= '0';$
+$$port.name$_idata  \<= '0';$
 else
-$$port.name$_idata  <= (others => '0');$
+$$port.name$_idata  \<= (others =\> '0');$
 endif$
 >>
 
@@ -690,14 +690,14 @@ endif$
 >>
 
 switchTransition(transition) ::= <<
-    when s_$transition.sourceState$ =>
+    when s_$transition.sourceState$ =\>
       if $transition.nextStateInfo: actionTestState(); separator="\n      elsif"$
       end if;
 >>
 
 actionTestState(nextState) ::= <<
       $actionTestSceduler(nextState.action)$
-        FSM <= s_$nextState.targetState$;
+        FSM \<= s_$nextState.targetState$;
 >>
 
 

@@ -1,46 +1,46 @@
 decl_MD(actor) ::= <<
-!source = !{$source_decl_MD(actor)$}
-!name = !{$name_decl_MD(actor)$}
-!action_scheduler = !{$actionScheduler_decl_MD(actor)$}
-$if(actor.inputs.list)$
-!inputs = !{$actor.inputs.list: {$port_decl_MD(actor=actor, port=it)$}; separator=", "$}
-$endif$
-$if(actor.outputs.list)$
-!outputs = !{$actor.outputs.list: {$port_decl_MD(actor=actor, port=it)$}; separator=", "$}
-$endif$
-$if(actor.parameters.list)$
-!parameters = !{$actor.parameters.list: {$var_decl_MD(actor=actor, var=it)$}; separator=", "$}
-$endif$
-$if(actor.stateVars.list)$
-!state_variables = !{$actor.stateVars.list: {$var_decl_MD(actor=actor, var =it)$}; separator=", "$}
-$endif$
-$if(actor.procs.list)$ 
-!procedures = !{$actor.procs.list: {$proc_decl_MD(actor=actor, proc=it)$}; separator=", "$}
-$endif$
-$if(actor.initializes)$
-!initializes = !{$actor.initializes: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
-$endif$
-$if(actor.actions)$
-!actions = !{$actor.actions: {$action_decl_MD(actor=actor, action=it)$}; separator=", "$}
-$endif$
-$if(actor.MoC)$
-!MoC = !{$MoC_decl_MD(actor=actor)$}
-$endif$
+!source = !{<source_decl_MD(actor)>}
+!name = !{<name_decl_MD(actor)>}
+!action_scheduler = !{<actionScheduler_decl_MD(actor)>}
+<if(actor.inputs.list)>
+!inputs = !{<actor.inputs.list: {port | <port_decl_MD(actor=actor, port=port)>}; separator=", ">}
+<endif>
+<if(actor.outputs.list)>
+!outputs = !{<actor.outputs.list: {port | <port_decl_MD(actor=actor, port=port)>}; separator=", ">}
+<endif>
+<if(actor.parameters.list)>
+!parameters = !{<actor.parameters.list: {port | <var_decl_MD(actor=actor, var=port)>}; separator=", ">}
+<endif>
+<if(actor.stateVars.list)>
+!state_variables = !{<actor.stateVars.list: {var | <var_decl_MD(actor=actor, var=var)>}; separator=", ">}
+<endif>
+<if(actor.procs.list)> 
+!procedures = !{<actor.procs.list: {proc | <proc_decl_MD(actor=actor, proc=proc)>}; separator=", ">}
+<endif>
+<if(actor.initializes)>
+!initializes = !{<actor.initializes: {init | <action_decl_MD(actor=actor, action=init)>}; separator=", ">}
+<endif>
+<if(actor.actions)>
+!actions = !{<actor.actions: {action | <action_decl_MD(actor=actor, action=action)>}; separator=", ">}
+<endif>
+<if(actor.MoC)>
+!MoC = !{<MoC_decl_MD(actor=actor)>}
+<endif>
 
-$source_MD(actor)$
-$name_MD(actor)$
-$actionScheduler_MD(actor)$
-$actor.inputs.list: {$port_MD(actor= actor, port=it)$}$
-$actor.outputs.list: {$port_MD(actor= actor, port=it)$}$
-$actor.parameters.list: {$var_MD(actor=actor, var=it)$}$
-$actor.stateVars.list: {$var_MD(actor=actor, var=it)$}$
-$actor.procs.list: {$proc_MD(actor=actor, proc=it)$}$
-$actor.initializes: {$action_MD(actor=actor, action=it)$}$
-$actor.actions: {$action_MD(actor=actor, action=it)$}$
-$actor.templateData.patterns.keys: {$patterns_MD(actor=actor, patterns=it)$}$
-$if(actor.MoC)$
-$MoC_MD(actor)$
-$endif$
+<source_MD(actor)>
+<name_MD(actor)>
+<actionScheduler_MD(actor)>
+<actor.inputs.list: {port | <port_MD(actor= actor, port=port)>}>
+<actor.outputs.list: {port | <port_MD(actor= actor, port=port)>}>
+<actor.parameters.list: {param | <var_MD(actor=actor, var=param)>}>
+<actor.stateVars.list: {var | <var_MD(actor=actor, var=var)>}>
+<actor.procs.list: {proc | <proc_MD(actor=actor, proc=proc)>}>
+<actor.initializes: {action | <action_MD(actor=actor, action=action)>}>
+<actor.actions: {action | <action_MD(actor=actor, action=action)>}>
+<actor.templateData.patterns.keys: {pattern | <patterns_MD(actor=actor, patterns=pattern)>}>
+<if(actor.MoC)>
+<MoC_MD(actor)>
+<endif>
 
 >>
 
@@ -50,89 +50,89 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 source_decl_MD(actor) ::= <<
-!$actor.templateData.names.(actor.file)$
+!<actor.templateData.names.(actor.file)>
 >>
 
 
 name_decl_MD(actor) ::= <<
-!$actor.templateData.names.(actor.name)$
+!<actor.templateData.names.(actor.name)>
 >>
 
 
 actionScheduler_decl_MD(actor) ::= <<
-!$actor.templateData.actionScheduler.(actor.actionScheduler)$
+!<actor.templateData.actionScheduler.(actor.actionScheduler)>
 >>
 
 FSM_decl_MD(actor) ::= <<
-!$actor.templateData.actionScheduler.(actor.actionScheduler.fsm)$
+!<actor.templateData.actionScheduler.(actor.actionScheduler.fsm)>
 >>
 
 var_decl_MD(actor, var) ::= <<
-!$actor.templateData.vars.(var)$
+!<actor.templateData.vars.(var)>
 >>
 
 port_decl_MD(actor, port) ::= <<
-!$actor.templateData.ports.(port)$
+!<actor.templateData.ports.(port)>
 >>
 
 action_decl_MD(actor, action) ::= <<
-!$actor.templateData.actions.(action)$
+!<actor.templateData.actions.(action)>
 >>
 
 proc_decl_MD(actor, proc) ::= <<
-!$actor.templateData.procs.(proc)$
+!<actor.templateData.procs.(proc)>
 >>
 
 actions_decl_MD(actor) ::= <<
-!$actor.templateData.actionScheduler.(actor.actionScheduler.actions)$
+!<actor.templateData.actionScheduler.(actor.actionScheduler.actions)>
 >>
 
 State_decl_MD(actor) ::= <<
-!$actor.templateData.actionScheduler.(actor.actionScheduler.fsm.states)$
+!<actor.templateData.actionScheduler.(actor.actionScheduler.fsm.states)>
 >>
 
 Transitions_decl_MD() ::= <<
-!$actor.templateData.actionScheduler.(actor.actionScheduler.fsm.transitions)$
+!<actor.templateData.actionScheduler.(actor.actionScheduler.fsm.transitions)>
 >>
 
 Transition_decl_MD(actor, transition) ::= <<
-!$actor.templateData.actionScheduler.(transition)$
+!<actor.templateData.actionScheduler.(transition)>
 >>
 
 NextStates_decl_MD(actor, nextStates) ::= <<
-!$actor.templateData.actionScheduler.(nextStates)$
+!<actor.templateData.actionScheduler.(nextStates)>
 >>
 
 NextState_decl_MD(actor, nextState) ::= <<
-!$actor.templateData.actionScheduler.(nextState)$
+!<actor.templateData.actionScheduler.(nextState)>
 >>
 
 Sched_decl_MD(actor, action) ::= <<
-!$actor.templateData.actions.(action.scheduler)$
+!<actor.templateData.actions.(action.scheduler)>
 >>
 
 Body_decl_MD(actor, action) ::= <<
-!$actor.templateData.actions.(action.body)$
+!<actor.templateData.actions.(action.body)>
 >>
 
 Tag_decl_MD(actor, tag) ::= <<
-!$actor.templateData.actions.(tag)$
+!<actor.templateData.actions.(tag)>
 >>
 
 Type_decl_MD(actor, var) ::= <<
-!$actor.templateData.types.(var.type)$
+!<actor.templateData.types.(var.type)>
 >>
 
 VarDef_decl_MD(actor, var) ::= <<
-!$actor.templateData.names.(var.name)$
+!<actor.templateData.names.(var.name)>
 >>
 
 patterns_decl_MD(actor, patterns) ::= <<
-!$actor.templateData.patterns.(patterns)$
+!<actor.templateData.patterns.(patterns)>
 >>
 
 MoC_decl_MD(actor) ::= <<
-!$actor.templateData.mocs.(actor.MoC)$
+!<actor.templateData.mocs.(actor.MoC)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,27 +140,27 @@ MoC_decl_MD(actor) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 source_MD(actor) ::= <<
-$source_decl_MD(actor)$ = metadata !{$file_MD(actor)$}
+<source_decl_MD(actor)> = metadata !{<file_MD(actor)>}
 >>
 
 
 name_MD(actor) ::= <<
-$name_decl_MD(actor)$ = metadata !{$varName_MD(actor)$}
+<name_decl_MD(actor)> = metadata !{<varName_MD(actor)>}
 >>
 
 
 actionScheduler_MD(actor) ::= <<
-$actionScheduler_decl_MD(actor)$ = metadata !{$
-if(!actor.actionScheduler.actions.empty)$ metadata $actions_decl_MD(actor)$ $else$ null $endif$, $
-if(actor.actionScheduler.fsm)$ metadata $FSM_decl_MD(actor)$ $else$ null $endif$}
+<actionScheduler_decl_MD(actor)> = metadata !{<
+if(!actor.actionScheduler.actions.empty)> metadata <actions_decl_MD(actor)> <else> null <endif>, <
+if(actor.actionScheduler.fsm)> metadata <FSM_decl_MD(actor)> <else> null <endif>}
 
-$if(!actor.actionScheduler.actions.empty)$
-$actions_MD(actor)$
-$endif$
+<if(!actor.actionScheduler.actions.empty)>
+<actions_MD(actor)>
+<endif>
 
-$if(actor.actionScheduler.fsm)$
-$FSM_MD(actor)$
-$endif$
+<if(actor.actionScheduler.fsm)>
+<FSM_MD(actor)>
+<endif>
 >>
 
 actions_MD(actor) ::= <<
@@ -224,9 +224,9 @@ $Type_MD(actor=actor, var=var)$
 >>
 
 FSM_MD(actor) ::= <<
-$FSM_decl_MD(actor)$ = metadata !{$varState_MD(actor.actionScheduler.fsm.initialState)$, metadata $State_decl_MD(actor)$, metadata $Transitions_decl_MD(actor)$}
-$State_MD(actor)$
-$Transitions_MD(actor)$
+<FSM_decl_MD(actor)> = metadata !{<varState_MD(actor.actionScheduler.fsm.initialState)>, metadata <State_decl_MD(actor)>, metadata <Transitions_decl_MD(actor)>}
+<State_MD(actor)>
+<Transitions_MD(actor)>
 >>
 
 State_MD(actor) ::= <<
