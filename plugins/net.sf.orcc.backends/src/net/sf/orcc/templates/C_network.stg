@@ -1,92 +1,92 @@
 GetInstanceId(instance) ::= <<
-$if (instance.broadcast)$bcast_$endif$$instance.id$
+<if (instance.broadcast)>bcast_<endif><instance.id>
 >>
 
 BroadcastWrite(n) ::= <<
-tok_output_$n$ = fifo_$instance.broadcast.type$_write($GetInstanceId(instance)$_output_$n$, output_$n$_buf, 1);
-*tok_output_$n$ = *tok_input;
+tok_output_<n> = fifo_<instance.broadcast.type>_write(<GetInstanceId(instance)>_output_<n>, output_<n>_buf, 1);
+*tok_output_<n> = *tok_input;
 >>
 
 BroadcastWriteEnd(n) ::= <<
-fifo_$instance.broadcast.type$_write_end($GetInstanceId(instance)$_output_$n$, output_$n$_buf, 1);
+fifo_<instance.broadcast.type>_write_end(<GetInstanceId(instance)>_output_<n>, output_<n>_buf, 1);
 >>
 
 outputPatternPort(num) ::= <<
-if (!fifo_$instance.broadcast.type$_has_room($GetInstanceId(instance)$_output_$num$, 1)) {
-	ports |= (1 << $num$);
+if (!fifo_<instance.broadcast.type>_has_room(<GetInstanceId(instance)>_output_<num>, 1)) {
+	ports |= (1 \<\< <num>);
 }
 >>
 
 outputPattern(outputs) ::= <<
 int ports = 0;
-$outputs: outputPatternPort(); separator="\n"$
+<outputs: outputPatternPort(); separator="\n">
 if (ports != 0) {
 >>
 
 declareBroadcast(instance) ::= <<
-$if (instance.broadcast)
-$
-void $GetInstanceId(instance)$_scheduler(struct schedinfo_s *si) {
+<if (instance.broadcast)
+>
+void <GetInstanceId(instance)>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
-	$instance.broadcast.type$ *tok_input, input_buf[1],
-	$instance.broadcast.outputList: { n | output_$n$_buf[1], *tok_output_$n$}; separator=",\n"$;
+	<instance.broadcast.type> *tok_input, input_buf[1],
+	<instance.broadcast.outputList: { n | output_<n>_buf[1], *tok_output_<n>}; separator=",\n">;
 
-	while (fifo_$instance.broadcast.type$_has_tokens($GetInstanceId(instance)$_input, 1)) {
-		$outputPattern(instance.broadcast.outputList)$
-			si->num_firings = i;
-			si->reason = full;
-			si->ports = ports;
+	while (fifo_<instance.broadcast.type>_has_tokens(<GetInstanceId(instance)>_input, 1)) {
+		<outputPattern(instance.broadcast.outputList)>
+			si-\>num_firings = i;
+			si-\>reason = full;
+			si-\>ports = ports;
 			return;
 		}
 
-		tok_input = fifo_$instance.broadcast.type$_read($GetInstanceId(instance)$_input, input_buf, 1);
-		$instance.broadcast.outputList: BroadcastWrite(); separator="\n"$
-		fifo_$instance.broadcast.type$_read_end($GetInstanceId(instance)$_input, 1);
-		$instance.broadcast.outputList: BroadcastWriteEnd(); separator="\n"$
+		tok_input = fifo_<instance.broadcast.type>_read(<GetInstanceId(instance)>_input, input_buf, 1);
+		<instance.broadcast.outputList: BroadcastWrite(); separator="\n">
+		fifo_<instance.broadcast.type>_read_end(<GetInstanceId(instance)>_input, 1);
+		<instance.broadcast.outputList: BroadcastWriteEnd(); separator="\n">
 		i++;
 	}
 
-	si->reason = starved;
-	si->num_firings = i;
-	si->ports = 0x01;
-}$
-endif$
+	si-\>reason = starved;
+	si-\>num_firings = i;
+	si-\>ports = 0x01;
+}<
+endif>
 
 >>
 
 declareBroadcasts(instances) ::= <<
-$instances: declareBroadcast()$
+<instances: declareBroadcast()>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
 allocateFifoType(type, size, count) ::= <<
-DECLARE_FIFO($type$, $if(size)$$size$$else$SIZE$endif$, $count$)
+DECLARE_FIFO(<type>, <if(size)><size><else>SIZE<endif>, <count>)
 >>
 
 doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
-$if (source.broadcast)$
-$allocateFifoType(
-  type=targetPort.type, size=edge.size, count=network.connectionMap.(edge))$$else$
-$allocateFifoType(
-  type=sourcePort.type, size=edge.size, count=network.connectionMap.(edge))$$endif$
+<if (source.broadcast)>
+<allocateFifoType(
+  type=targetPort.type, size=edge.size, count=network.connectionMap.(edge))><else>
+<allocateFifoType(
+  type=sourcePort.type, size=edge.size, count=network.connectionMap.(edge))><endif>
 >>
 
 tryAllocateFifo(edge, src, tgt) ::= <<
-$if (src.instance && tgt.instance)$
-$doAllocateFifo(
+<if (src.instance && tgt.instance)>
+<doAllocateFifo(
   edge=edge,
   source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target)$$endif$
+  target=tgt.instance, targetPort=edge.target)><endif>
 >>
 
 allocateFifo(edge) ::= <<
-$tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+<tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
 >>
 
 allocateFifos(edges) ::= <<
-$edges: allocateFifo()$
+<edges: allocateFifo()>
 >>
 
 
@@ -94,124 +94,124 @@ $edges: allocateFifo()$
 // assigns FIFOs
 
 doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
-struct fifo_$sourcePort.type$_s *$GetInstanceId(source)$_$sourcePort.name$ = &fifo_$count$;
-struct fifo_$sourcePort.type$_s *$GetInstanceId(target)$_$targetPort.name$ = &fifo_$count$;
+struct fifo_<sourcePort.type>_s *<GetInstanceId(source)>_<sourcePort.name> = &fifo_<count>;
+struct fifo_<sourcePort.type>_s *<GetInstanceId(target)>_<targetPort.name> = &fifo_<count>;
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$if (src.instance && tgt.instance)$
-$doAssignFifo(
+<if (src.instance && tgt.instance)>
+<doAssignFifo(
   source=src.instance, sourcePort=edge.source,
   target=tgt.instance, targetPort=edge.target,
-  count=network.connectionMap.(edge))$$endif$
+  count=network.connectionMap.(edge))><endif>
 >>
 
 assignFifo(edge) ::= <<
-$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+<tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
 >>
 
 assignFifos(edges) ::= <<
-$edges: assignFifo()$
+<edges: assignFifo()>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Declare actors
 
-declareActor(instance) ::= "$GetInstanceId(instance)$"
+declareActor(instance) ::= "<GetInstanceId(instance)>"
 declareActors(instances) ::= <<
-struct actor_s $instances: declareActor(); wrap, separator=", "$;
+struct actor_s <instances: declareActor(); wrap, separator=", ">;
 
 >>
 
-declareActorArray(instance) ::= "&$GetInstanceId(instance)$"
+declareActorArray(instance) ::= "&<GetInstanceId(instance)>"
 
 declareActorsArray(thread,instances) ::= <<
-struct actor_s *actors$if(thread)$_$thread$$endif$[] = {$instances: declareActorArray(); wrap, separator=", "$};
+struct actor_s *actors<if(thread)>_<thread><endif>[] = {<instances: declareActorArray(); wrap, separator=", ">};
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define actors
 
 NumInputs(instance) ::= <<
-$if (instance.actor)
-$$instance.actor.inputs.length$$
-elseif (instance.broadcast)$1$else$0$endif$
+<if (instance.actor)
+><instance.actor.inputs.length><
+elseif (instance.broadcast)>1<else>0<endif>
 >>
 
 NumOutputs(instance) ::= <<
-$if (instance.actor)
-$$instance.actor.outputs.length$$
-elseif (instance.broadcast)$$instance.broadcast.numOutputs$$else$0$endif$
+<if (instance.actor)
+><instance.actor.outputs.length><
+elseif (instance.broadcast)><instance.broadcast.numOutputs><else>0<endif>
 >>
 
 fillActorStruct(instance) ::= <<
 
-struct actor_s $GetInstanceId(instance)$ = {"$GetInstanceId(instance)$", $GetInstanceId(instance)$_scheduler, $
-NumInputs(instance)$, $NumOutputs(instance)$, NULL, NULL};
+struct actor_s <GetInstanceId(instance)> = {"<GetInstanceId(instance)>", <GetInstanceId(instance)>_scheduler, <
+NumInputs(instance)>, <NumOutputs(instance)>, NULL, NULL};
 >>
 
 fillActorsStructs(instances) ::= <<
-$instances: fillActorStruct()$
+<instances: fillActorStruct()>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // declares initialize and scheduler functions
 
 initialize(instance) ::= <<
-$if (instance.actor && !instance.actor.initializes.empty)$
-extern void $instance.id$_initialize();
-$endif$
+<if (instance.actor && !instance.actor.initializes.empty)>
+extern void <instance.id>_initialize();
+<endif>
 >>
 
 declareInitializes(instances) ::= <<
-$instances: initialize()$
+<instances: initialize()>
 >>
 
 declareSchedulers(instances) ::= <<
-$instances: {extern void $it.id$_scheduler(struct schedinfo_s *si);}; separator="\n"$
+<instances: {inst | extern void <inst.id>_scheduler(struct schedinfo_s *si);}; separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // print calls to initialize() and scheduler()
 
 printInitialize(instance) ::= <<
-$if (instance.actor && !instance.actor.initializes.empty)
-$$instance.id$_initialize();
-$endif$
+<if (instance.actor && !instance.actor.initializes.empty)
+><instance.id>_initialize();
+<endif>
 >>
 
 printInitializes(instances) ::= <<
-$instances: printInitialize()$
+<instances: printInitialize()>
 >>
 
 printSchedulers(isPointer) ::= <<
 struct actor_s *my_actor;
 struct schedinfo_s si;
-$if(options.needDynamicMapping)$
+<if(options.needDynamicMapping)>
 clock_t start, end;
 start = clock ();
 
-sem_wait(&sched->sync->sem_threads); 
+sem_wait(&sched-\>sync-\>sem_threads); 
 start = clock ();
-$endif$
+<endif>
 
 while (1) {
-	my_actor = sched_get_next($if(!isPointer)$&$endif$sched);    
+	my_actor = sched_get_next(<if(!isPointer)>&<endif>sched);    
 	si.num_firings = 0;
-	my_actor->sched_func(&si);
+	my_actor-\>sched_func(&si);
 #ifdef PRINT_FIRINGS
-	printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor->name);
+	printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
 #endif
-$if(options.needDynamicMapping)$
-	if(sched->sync->active_sync){
+<if(options.needDynamicMapping)>
+	if(sched-\>sync-\>active_sync){
 		end = clock ();
-		if((((end - start) / (double)CLOCKS_PER_SEC) >= SYNC_DELAY)){
-			sem_post(&sched->sync->sem_monitor);
-			sem_wait(&sched->sync->sem_threads);
+		if((((end - start) / (double)CLOCKS_PER_SEC) \>= SYNC_DELAY)){
+			sem_post(&sched-\>sync-\>sem_monitor);
+			sem_wait(&sched-\>sync-\>sem_threads);
 			start = clock ();
 		}
 	}
-$endif$
+<endif>
 }
 >>
 
@@ -221,7 +221,7 @@ $endif$
 printThread() ::= <<
 void *thread_scheduler(void *data) {
   struct scheduler_s *sched = data;
-  $printSchedulers("true")$
+  <printSchedulers("true")>
 }
 >>
 
@@ -243,12 +243,12 @@ void clear_cpu_set(cpu_set_t *cpuset) {
 
 void orcc_set_affinity(cpu_set_t *cpuset, int proc_num, pthread_t tid) {
 #ifdef _WIN32
-	*cpuset = 1 << proc_num;
+	*cpuset = 1 \<\< proc_num;
 	// need to get the handle
 	// SetThreadAffinityMask(tid, cpuset);
 #else
 	CPU_SET(proc_num, cpuset);
-	if (pthread_setaffinity_np(tid, sizeof(cpu_set_t), cpuset) < 0) {
+	if (pthread_setaffinity_np(tid, sizeof(cpu_set_t), cpuset) \< 0) {
 		perror("pthread_setaffinity_np");
 	}
 #endif
@@ -274,34 +274,34 @@ int main(int argc, char *argv[]) {
 ///////////////////////////////////////////////////////////////////////////////
 // print network
 network(debugFifos, fifoSize, network, options) ::= <<
-// Generated from "$network.name$"
+// Generated from "<network.name>"
 
-#include <locale.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include \<locale.h\>
+#include \<stdio.h\>
+#include \<stdlib.h\>
 #ifdef __APPLE__
 #include "SDL.h"
 #endif
 
-$if (options.needPthreads)$
+<if (options.needPthreads)>
 #ifndef _WIN32
 #define __USE_GNU
 #endif
-#include <pthread.h>
-$endif$
-$if (options.needDynamicMapping)$
+#include \<pthread.h\>
+<endif>
+<if (options.needDynamicMapping)>
 #ifndef _WIN32
 #define __USE_GNU
 #endif
-#include <pthread.h>
-#include <semaphore.h>
-$endif$
+#include \<pthread.h\>
+#include \<semaphore.h\>
+<endif>
 
 #include "orcc.h"
 #include "orcc_fifo.h"
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
-$if(options.needDynamicMapping)$
+<if(options.needDynamicMapping)>
 #include "orcc_thread.h"
 #include "orcc_genetic.h"
 
@@ -312,83 +312,83 @@ $if(options.needDynamicMapping)$
 
 #define KEEP_RATIO 0.5
 #define CROSSOVER_RATIO 0.6
-$endif$
+<endif>
 
-#define SIZE $fifoSize$
+#define SIZE <fifoSize>
 // #define PRINT_FIRINGS
 
-$if(options.needDynamicMapping)$
-$printThreadManagment()$
-$endif$
-$if(options.needPthreads)$
-$printThreadManagment()$
-$endif$
+<if(options.needDynamicMapping)>
+<printThreadManagment()>
+<endif>
+<if(options.needPthreads)>
+<printThreadManagment()>
+<endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
-$allocateFifos(network.connections)$
+<allocateFifos(network.connections)>
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO pointer assignments
-$assignFifos(network.connections)$
+<assignFifos(network.connections)>
 
 ////////////////////////////////////////////////////////////////////////////////
-$declareBroadcasts(network.instances)$
+<declareBroadcasts(network.instances)>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Action schedulers
-$declareInitializes(network.instances)$
-$declareSchedulers(network.instances)$
+<declareInitializes(network.instances)>
+<declareSchedulers(network.instances)>
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of a struct actor for each actor
 
-$declareActors(network.instances)$
+<declareActors(network.instances)>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Declaration of the actors array
 
-$fillActorsStructs(network.instances)$
+<fillActorsStructs(network.instances)>
 
-$if(options.needPthreads)$
+<if(options.needPthreads)>
 
-$options.threads.keys: {$declareActorsArray(thread=it,instances=options.threads.(it))$}; separator="\n"$
+<options.threads.keys: {th | <declareActorsArray(thread=th,instances=options.threads.(th))>}; separator="\n">
 
-$printThread()$
+<printThread()>
 
 static void scheduler() {
 	cpu_set_t cpuset;
-	pthread_t $options.threads.keys: {thread_$it$}; separator=", "$;
-	struct scheduler_s $options.threads.keys: {sched_$it$}; separator=", "$;
+	pthread_t <options.threads.keys: {th | thread_<th>}; separator=", ">;
+	struct scheduler_s <options.threads.keys: {th | sched_<th>}; separator=", ">;
 	
-	$printInitializes(network.instances)$
+	<printInitializes(network.instances)>
 	
-	$options.threads.keys: {sched_init(&sched_$it$, sizeof(actors_$it$) / sizeof(actors_$it$[0]), actors_$it$, NULL);}; separator="\n"$
+	<options.threads.keys: {th | sched_init(&sched_<th>, sizeof(actors_<th>) / sizeof(actors_<th>[0]), actors_<th>, NULL);}; separator="\n">
 	
-	$options.threads.keys: {pthread_create(&thread_$it$, NULL, thread_scheduler, (void *) &sched_$it$);}; separator="\n"$
+	<options.threads.keys: {th | pthread_create(&thread_<th>, NULL, thread_scheduler, (void *) &sched_<th>);}; separator="\n">
 
 	clear_cpu_set(&cpuset);
-	$options.threads.keys: {orcc_set_affinity(&cpuset, $i0$, thread_$it$);}; separator="\n"$
+	<options.threads.keys: {th | orcc_set_affinity(&cpuset, <i0>, thread_<th>);}; separator="\n">
 
-	$options.threads.keys: {pthread_join(thread_$it$, NULL);}; separator="\n"$
+	<options.threads.keys: {th | pthread_join(thread_<th>, NULL);}; separator="\n">
 }
 
-$elseif(options.needDynamicMapping)$
+<elseif(options.needDynamicMapping)>
 
-$declareActorsArray(instances=network.instances)$
+<declareActorsArray(instances=network.instances)>
 
 extern void remove_fps_printing();
 
 
-$printThread()$
+<printThread()>
 
 static void scheduler() {
 	int i;
 	
 	cpu_set_t cpuset;
-	pthread_t threads[$options.threadsNb$], thread_monitor;
+	pthread_t threads[<options.threadsNb>], thread_monitor;
 	
-	struct scheduler_s *schedulers[$options.threadsNb$];
+	struct scheduler_s *schedulers[<options.threadsNb>];
 	struct sync_s sched_sync;
 	struct genetic_s genetic_info = {
 		.population_size = POPULATION_SIZE,
@@ -398,7 +398,7 @@ static void scheduler() {
 		.actors = actors,
 		.schedulers = schedulers,
 		.actors_nb = sizeof(actors) / sizeof(actors[0]),
-		.threads_nb = $options.threadsNb$
+		.threads_nb = <options.threadsNb>
 	};
 	struct monitor_s monitoring = {
 		.sync = &sched_sync,
@@ -407,11 +407,11 @@ static void scheduler() {
 	
 	sync_init(&sched_sync);
 	
-	$printInitializes(network.instances)$
+	<printInitializes(network.instances)>
 	
 	remove_fps_printing();
 	
-	for(i=0; i<$options.threadsNb$; i++){
+	for(i=0; i \< <options.threadsNb>; i++){
 		schedulers[i] = malloc(sizeof(struct scheduler_s));
 		sched_init(schedulers[i], sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);
 		pthread_create(&threads[i], NULL, thread_scheduler, (void *) schedulers[i]); 
@@ -419,35 +419,37 @@ static void scheduler() {
 	pthread_create(&thread_monitor, NULL, monitor, (void *) &monitoring);
 
 	clear_cpu_set(&cpuset);
-	for(i=0; i<$options.threadsNb$; i++){
+	for(i=0; i \< <options.threadsNb>; i++){
 		orcc_set_affinity(&cpuset, i, threads[i]);
 	}
 	
-	for(i=0; i<$options.threadsNb$; i++){
+	for(i=0; i \< <options.threadsNb>; i++){
 		pthread_join(threads[i], NULL);
 	}
 	pthread_join(thread_monitor,NULL);
 }
 
-$else$
+<else>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Actor scheduler
 
-$declareActorsArray(instances=network.instances)$
+<declareActorsArray(instances=network.instances)>
 
 static void scheduler() {
-	$printInitializes(network.instances)$
 	struct scheduler_s sched;
-  sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
-  
-	$printSchedulers()$
+	<printInitializes(network.instances)>
+
+	sched_init(&sched, sizeof(actors) / sizeof(actors[0]), actors, NULL);
+	{
+		<printSchedulers()>
+	}
 }
-$endif$
+<endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 
-$printMain()$
+<printMain()>
 
 >>
 

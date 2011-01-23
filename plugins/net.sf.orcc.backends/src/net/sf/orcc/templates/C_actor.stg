@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(port) ::= <<
-extern struct fifo_$port.type$_s *$instance.id$_$port.name$;
+extern struct fifo_<port.type>_s *<instance.id>_<port.name>;
 
 >>
 
@@ -12,20 +12,20 @@ extern struct fifo_$port.type$_s *$instance.id$_$port.name$;
 ///////////////////////////////////////////////////////////////////////////////
 
 // the dimensions of a list: [dim1][dim2]...[dimn]
-// does not output anything if $value$ is empty
-listSize(value) ::= <<
-$value : {[$it$]} $
+// does not output anything if <value> is empty
+listSize(values) ::= <<
+<values : {value | [<value>]} >
 >>
 
-variableDeclaration(variable) ::= <<
-$
+varDecl(variable) ::= <<
+<
 if(variable.port)
-$$variable.type$ $variable$_buf$listSize(variable.type.dimensions)$;
-$variable.type$ *$variable$$
+><variable.type> <variable>_buf<listSize(variable.type.dimensions)>;
+<variable.type> *<variable><
 else
-$$variable.type$ $variable$$listSize(variable.type.dimensions)$$
+><variable.type> <variable><listSize(variable.type.dimensions)><
 endif
-$
+>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -33,39 +33,39 @@ $
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-$(constant.class.simpleName)(constant)$
+<(constant.class.simpleName)(constant)>
 >>
 
 BoolExpr(constant) ::= <<
-$if (constant.value)$1$else$0$endif$
+<if (constant.value)>1<else>0<endif>
 >>
 
 IntExpr(number) ::= <<
-$number$$if (number.long)$L$endif$
+<number><if (number.long)>L<endif>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
 ListExpr(constant) ::= <<
-{$constant.value: Constant(); wrap, separator=", "$}
+{<constant.value: Constant(); wrap, separator=", ">}
 >>
 
 StringExpr(constant) ::= <<
-"$constant$"
+"<constant>"
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 stateVar(variable) ::= <<
-$if(variable.initialized)$
-$if(!variable.assignable && !variable.type.list)$
-#define $variable$ $Constant(variable.initialValue)$
-$else$
-static $variableDeclaration(variable)$ = $Constant(variable.initialValue)$;
-$endif$
-$else$
-static $variableDeclaration(variable)$;
-$endif$
+<if(variable.initialized)>
+<if(!variable.assignable && !variable.type.list)>
+#define <variable> <Constant(variable.initialValue)>
+<else>
+static <varDecl(variable)> = <Constant(variable.initialValue)>;
+<endif>
+<else>
+static <varDecl(variable)>;
+<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,127 +74,127 @@ $endif$
 
 Assign(assign) ::= <<
 
-$assign.target$ = $assign.value$;
+<assign.target> = <assign.value>;
 >>
 
 PrintFormatType(type) ::= <<
-$if (type.bool)
-$i$
+<if (type.bool)
+>i<
 elseif (type.float)
-$f$
+>f<
 elseif (type.int)
-$$if (type.long)$ll$endif$i$
+><if (type.long)>ll<endif>i<
 elseif (type.list)
-$p$
+>p<
 elseif (type.string)
-$s$
+>s<
 elseif (type.uint)
-$$if (type.long)$ll$endif$u$
+><if (type.long)>ll<endif>u<
 elseif (type.void)
-$p$
-endif$
+>p<
+endif>
 >>
 
 PrintFormat(parameter) ::= <<
-$if (parameter.stringExpr)
-$"$parameter$"$
+<if (parameter.stringExpr)
+>"<parameter>"<
 else
-$ "%$PrintFormatType(parameter.type)$" $
-endif$
+> "%<PrintFormatType(parameter.type)>" <
+endif>
 >>
 
 PrintParameter(parameter) ::= <<
-$if (!parameter.stringExpr)$, $parameter$$endif$
+<if (!parameter.stringExpr)>, <parameter><endif>
 >>
 
 Call(call) ::= <<
 
-$if(call.print)$printf($call.parameters: PrintFormat()$$call.parameters: PrintParameter()$);$
+<if(call.print)>printf(<call.parameters: PrintFormat()><call.parameters: PrintParameter()>);<
 else
-$$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
-endif$
+><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
+endif>
 >>
 
 Load(load) ::= <<
 
-$load.target$ = $load.source$$load.indexes : {[$it$]}$;
+<load.target> = <load.source><load.indexes : {index | [<index>]}>;
 >>
 
 Peek(peek) ::= <<
 
-$peek.target$ = fifo_$peek.port.type$_peek($instance.id$_$peek.port$, $peek.target$_buf, $peek.numTokens$);
+<peek.target> = fifo_<peek.port.type>_peek(<instance.id>_<peek.port>, <peek.target>_buf, <peek.numTokens>);
 >>
 
 Read(read) ::= <<
 
-$if (read.target)
-$$read.target$ = fifo_$read.port.type$_read($instance.id$_$read.port$, $read.target$_buf, $read.numTokens$);$
-endif$
+<if (read.target)
+><read.target> = fifo_<read.port.type>_read(<instance.id>_<read.port>, <read.target>_buf, <read.numTokens>);<
+endif>
 >>
 
 ReadEnd(readEnd) ::= <<
 
-fifo_$readEnd.port.type$_read_end($instance.id$_$readEnd.port$, $readEnd.numTokens$);
+fifo_<readEnd.port.type>_read_end(<instance.id>_<readEnd.port>, <readEnd.numTokens>);
 >>
 
 Return(return) ::= <<
-$if(return.value)$
-return $return.value$;$
-endif$
+<if(return.value)>
+return <return.value>;<
+endif>
 >>
 
 Store(store) ::= <<
 
-$store.target$$store.indexes : {[$it$]}$ = $store.value$;
+<store.target><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
 Write(write) ::= <<
 
-$write.target$ = fifo_$write.port.type$_write($instance.id$_$write.port$, $write.target$_buf, $write.numTokens$);
+<write.target> = fifo_<write.port.type>_write(<instance.id>_<write.port>, <write.target>_buf, <write.numTokens>);
 >>
 
 WriteEnd(writeEnd) ::= <<
-$if(options.("net.sf.orcc.backends.enableTrace"))$
-fifo_$writeEnd.port.type$_trace($instance.id$_$writeEnd.port$, $writeEnd.target$_buf, "$instance.id$_$writeEnd.port$.txt", $writeEnd.numTokens$);
-$endif$
-fifo_$writeEnd.port.type$_write_end($instance.id$_$writeEnd.port$, $writeEnd.target$_buf, $writeEnd.numTokens$);
+<if(options.("net.sf.orcc.backends.enableTrace"))>
+fifo_<writeEnd.port.type>_trace(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, "<instance.id>_<writeEnd.port>.txt", <writeEnd.numTokens>);
+<endif>
+fifo_<writeEnd.port.type>_write_end(<instance.id>_<writeEnd.port>, <writeEnd.target>_buf, <writeEnd.numTokens>);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Nodes
 ///////////////////////////////////////////////////////////////////////////////
 
-instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
+printInstructions(instructions) ::= <<
+<instructions: {instr | <(instr.class.simpleName)(instr)>}>
 >>
 
-nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}$
+printNodes(nodes) ::= <<
+<nodes: {node | <(node.class.simpleName)(node)>}>
 >>
 
-// if node
+// block node
 BlockNode(blockNode) ::= <<
-$instructions(blockNode.instructions)$
+<printInstructions(blockNode.instructions)>
 >>
 
 // if node
 IfNode(ifNode) ::= <<
 
-if ($ifNode.value$) {
-	$nodes(ifNode.thenNodes)$
-}$if(ifNode.elseNodes)$ else {
-	$nodes(ifNode.elseNodes)$
-}$endif$
-$BlockNode(ifNode.joinNode)$
+if (<ifNode.value>) {
+	<printNodes(ifNode.thenNodes)>
+}<if(ifNode.elseNodes)> else {
+	<printNodes(ifNode.elseNodes)>
+}<endif>
+<BlockNode(ifNode.joinNode)>
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
 
-while ($whileNode.value$) {
-	$nodes(whileNode.nodes)$
+while (<whileNode.value>) {
+	<printNodes(whileNode.nodes)>
 }
-$BlockNode(whileNode.joinNode)$
+<BlockNode(whileNode.joinNode)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,16 +202,17 @@ $BlockNode(whileNode.joinNode)$
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-$if(!procedure.external)$
+<if(!procedure.external)>
 
-static $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
-$if(procedure.locals.list)$
-	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
-$endif$
-	$procedure.nodes: {$(it.class.simpleName)(it)$}$
+static <procedure.returnType> <procedure>(<
+  procedure.parameters.list: {param | <varDecl(param)>}; wrap, anchor, separator=", ">) {
+<if(procedure.locals.list)>
+	<procedure.locals.list: {local | <varDecl(local)>;<\n>}>
+<endif>
+	<printNodes(procedure.nodes)>
 }
 
-$endif$
+<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,7 +220,7 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 action(action) ::= <<
-$procedure(action.body)$$procedure(action.scheduler)$
+<procedure(action.body)><procedure(action.scheduler)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -227,59 +228,59 @@ $procedure(action.body)$$procedure(action.scheduler)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPatternPort(port) ::= <<
-if (!fifo_$port.type$_has_room($instance.id$_$port$, $pattern.(port)$)) {
-	ports |= 0x0$instance.actor.templateData.maskOutput.(port)$;
+if (!fifo_<port.type>_has_room(<instance.id>_<port>, <pattern.(port)>)) {
+	ports |= 0x0<instance.actor.templateData.maskOutput.(port)>;
 }
 >>
 
 outputPattern(pattern) ::= <<
 int ports = 0;
-$pattern.keys: outputPatternPort(); separator="\n"$
+<pattern.keys: outputPatternPort(); separator="\n">
 if (ports != 0) {
 >>
 
 checkInputPatternPort(port) ::= <<
-fifo_$port.type$_has_tokens($instance.id$_$port$, $pattern.(port)$)
+fifo_<port.type>_has_tokens(<instance.id>_<port>, <pattern.(port)>)
 >>
 
 checkInputPattern(pattern) ::= <<
-$pattern.keys: { port | $checkInputPatternPort(port)$ && }$
+<pattern.keys: { port | <checkInputPatternPort(port)> && }>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-$action.body$();
+<action.body>();
 i++;
 >>
 
 actionTest(action) ::= <<
-if ($checkInputPattern(action.inputPattern)$isSchedulable_$action$()) {
-	$if(action.outputPattern)$
-	$outputPattern(pattern=action.outputPattern)$
-		si->num_firings = i;
-		si->reason = full;
-		si->ports = ports;
+if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
+	<if(action.outputPattern)>
+	<outputPattern(pattern=action.outputPattern)>
+		si-\>num_firings = i;
+		si-\>reason = full;
+		si-\>ports = ports;
 		break;
 	}
-	$endif$
-	$actionCall(action)$
+	<endif>
+	<actionCall(action)>
 }>>
 
 schedulingTest(actions) ::= <<
-$actions: actionTest(); separator=" else "$
+<actions: actionTest(); separator=" else ">
 >>
 
 scheduler(actions) ::= <<
-void $instance.id$_scheduler(struct schedinfo_s *si) {
+void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
   
 	while (1) {
-		$if(actions)$$schedulingTest(actions)$$endif$ else {
-			si->num_firings = i;
-			si->reason = starved;
-			si->ports = 0x0$instance.actor.templateData.maskInputs$;
+		<if(actions)><schedulingTest(actions)><endif> else {
+			si-\>num_firings = i;
+			si-\>reason = starved;
+			si-\>ports = 0x0<instance.actor.templateData.maskInputs>;
 			break;
 		}
 	}
@@ -291,68 +292,68 @@ void $instance.id$_scheduler(struct schedinfo_s *si) {
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-$nextState.action.body$();
+<nextState.action.body>();
 i++;
-goto l_$nextState.targetState$;
+goto l_<nextState.targetState>;
 >>
 
 actionTestState(nextState) ::= <<
-if ($checkInputPattern(nextState.action.inputPattern)$isSchedulable_$nextState.action$()) {
-	$if(nextState.action.outputPattern)$
-	$outputPattern(nextState.action.outputPattern)$
-		_FSM_state = s_$transition.sourceState$;
-		si->num_firings = i;
-		si->reason = full;
-		si->ports = ports;
+if (<checkInputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action>()) {
+	<if(nextState.action.outputPattern)>
+	<outputPattern(nextState.action.outputPattern)>
+		_FSM_state = s_<transition.sourceState>;
+		si-\>num_firings = i;
+		si-\>reason = full;
+		si-\>ports = ports;
 		return;
 	}
-	$endif$
-	$actionCallState(nextState)$
+	<endif>
+	<actionCallState(nextState)>
 }>>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(); separator=" else "$
+<nextStates: actionTestState(); separator=" else ">
 >>
 
 Transition(transition) ::= <<
 
 
-l_$transition.sourceState$:
-	$if (actions)$
+l_<transition.sourceState>:
+	<if (actions)>
 	while (outside_FSM_scheduler()) {
 		i++;
 	}
-	$endif$
-	$if (transition.nextStateInfo.empty)$
-	printf("stuck in state \"$transition.sourceState$\" in the instance $instance.id$\n");
+	<endif>
+	<if (transition.nextStateInfo.empty)>
+	printf("stuck in state \"<transition.sourceState>\" in the instance <instance.id>\n");
 	wait_for_key();
 	exit(1);
-	$else$
-	$schedulingTestState(nextStates=transition.nextStateInfo)$ else {
-		_FSM_state = s_$transition.sourceState$;
-		si->num_firings = i;
-		si->reason = starved;
-		si->ports = 0x0$instance.actor.templateData.maskInputsTransition.(transition)$;
+	<else>
+	<schedulingTestState(nextStates=transition.nextStateInfo)> else {
+		_FSM_state = s_<transition.sourceState>;
+		si-\>num_firings = i;
+		si-\>reason = starved;
+		si-\>ports = 0x0<instance.actor.templateData.maskInputsTransition.(transition)>;
 		return;
 	}
-	$endif$
+	<endif>
 >>
 
 Transitions(actions, transitions) ::= <<
-$transitions: Transition()$
+<transitions: Transition()>
 >>
 
 switchTransition(transition) ::= <<
 
-case s_$transition.sourceState$:
-	goto l_$transition.sourceState$;
+case s_<transition.sourceState>:
+	goto l_<transition.sourceState>;
 >>
 
 switch(transitions) ::= <<
 switch (_FSM_state) {
-$transitions: switchTransition()$
+<transitions: switchTransition()>
 default:
-	printf("unknown state in $instance.id$.c : %s\n", stateNames[_FSM_state]);
+	printf("unknown state in <instance.id>.c : %s\n", stateNames[_FSM_state]);
 	wait_for_key();
 	exit(1);
 }
@@ -360,41 +361,41 @@ default:
 
 schedulerFSM(actions, fsm) ::= <<
 enum states {
-	s_$first(fsm.states)$ = 0,
-	$rest(fsm.states) : {s_$it$}; separator=",\n"$
+	s_<first(fsm.states)> = 0,
+	<rest(fsm.states) : {state | s_<state>}; separator=",\n">
 };
 
 static char *stateNames[] = {
-	$fsm.states : {"s_$it$"}; separator=",\n"$
+	<fsm.states : {"s_<it>"}; separator=",\n">
 };
 
-static enum states _FSM_state = s_$fsm.initialState$;
+static enum states _FSM_state = s_<fsm.initialState>;
 
-$if(actions)$
+<if(actions)>
 static int outside_FSM_scheduler() {
 	int i = 0;
-	$schedulingTest(actions)$ else {
+	<schedulingTest(actions)> else {
 		return 0;
 	}
 	return 1;
 }
-$endif$
+<endif>
 
-void $instance.id$_scheduler(struct schedinfo_s *si) {
+void <instance.id>_scheduler(struct schedinfo_s *si) {
 	int i = 0;
 
 	// jump to FSM state 
-	$switch(fsm.transitions)$
+	<switch(fsm.transitions)>
 
 	// FSM transitions
-$Transitions(actions=actions, transitions=fsm.transitions)$
+<Transitions(actions=actions, transitions=fsm.transitions)>
 }
 
 >>
 
 parameters(parameters) ::= <<
-$parameters.keys: { k | #define $k$ $Constant(parameters.(k))$
-}$
+<parameters.keys: { k | #define <k> <Constant(parameters.(k))>
+}>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -402,60 +403,60 @@ $parameters.keys: { k | #define $k$ $Constant(parameters.(k))$
 ///////////////////////////////////////////////////////////////////////////////
 
 instance(instance, options) ::= <<
-// $instance.hierarchicalPath$
-// Source file is "$instance.actor.file$"
+// <instance.hierarchicalPath>
+// Source file is "<instance.actor.file>"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include \<stdio.h\>
+#include \<stdlib.h\>
 
 #include "orcc.h"
 #include "orcc_fifo.h"
 #include "orcc_util.h"
-$if(options.("net.sf.orcc.backends.enableTrace"))$
+<if(options.("net.sf.orcc.backends.enableTrace"))>
 #include "orcc_trace.h"
-$endif$
+<endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Input FIFOs
-$instance.actor.inputs.list: fifo()$
+<instance.actor.inputs.list: fifo()>
 ////////////////////////////////////////////////////////////////////////////////
 // Output FIFOs
-$instance.actor.outputs.list: fifo()$
+<instance.actor.outputs.list: fifo()>
 
 ////////////////////////////////////////////////////////////////////////////////
 // Parameter values of the instance
-$parameters(instance.parameters)$
+<parameters(instance.parameters)>
 ////////////////////////////////////////////////////////////////////////////////
 // State variables of the actor
-$instance.actor.stateVars.list: stateVar()$
+<instance.actor.stateVars.list: stateVar()>
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-$instance.actor.procs.list: procedure()$
+<instance.actor.procs.list: procedure()>
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-$instance.actor.actions: action()$
-$if(instance.actor.initializes)$
+<instance.actor.actions: action()>
+<if(instance.actor.initializes)>
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-$instance.actor.initializes: action()$
-void $instance.id$_initialize(struct schedinfo_s *si) {
+<instance.actor.initializes: action()>
+void <instance.id>_initialize(struct schedinfo_s *si) {
 	int res = 1;
 	int i = 0;
 
-	$if(instance.actor.initializes)$
+	<if(instance.actor.initializes)>
 	do {
-		$schedulingTest(instance.actor.initializes)$
+		<schedulingTest(instance.actor.initializes)>
 	} while (0);
-	$endif$
+	<endif>
 }
 
-$endif$
+<endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
-$if(instance.actor.actionScheduler.fsm)$
-$schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)$
-$else$
-$scheduler(actions=instance.actor.actionScheduler.actions)$
-$endif$
+<if(instance.actor.actionScheduler.fsm)>
+<schedulerFSM(actions=instance.actor.actionScheduler.actions, fsm=instance.actor.actionScheduler.fsm)>
+<else>
+<scheduler(actions=instance.actor.actionScheduler.actions)>
+<endif>
 
 >>
