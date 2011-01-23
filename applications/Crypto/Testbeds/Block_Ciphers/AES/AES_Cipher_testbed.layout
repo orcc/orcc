@@ -2,7 +2,7 @@
 <layout>
    <vertices>
       <vertex id="Source" x="57" y="71"/>
-      <vertex id="Validator" x="341" y="91"/>
-      <vertex id="AES_Cipher" x="183" y="70"/>
+      <vertex id="Validator" x="417" y="111"/>
+      <vertex id="AES_Cipher" x="200" y="71"/>
    </vertices>
 </layout>

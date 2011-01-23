@@ -69,4 +69,4 @@ AES_CTR_Cipher.xdf: AES encipher/decipher
 
 
 
-Note: CBC, CFB, OFB and CTR modes have external dependencies on the CAL files in Block_Ciphers\!Modes folder.
+Note: CBC, CFB, OFB and CTR modes have external dependencies on the CAL files are located under package CTL.Block_Ciphers.Modes.

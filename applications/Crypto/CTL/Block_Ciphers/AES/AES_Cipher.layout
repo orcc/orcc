@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="Plaintext" x="156" y="97"/>
-      <vertex id="Key" x="57" y="155"/>
-      <vertex id="Ciphertext" x="480" y="70"/>
+      <vertex id="IP1_Plaintext" x="113" y="145"/>
+      <vertex id="IP3_Key" x="125" y="185"/>
+      <vertex id="IP2_KeySize" x="9" y="165"/>
+      <vertex id="Ciphertext" x="608" y="145"/>
       <vertex id="AddRoundKey" x="303" y="125"/>
       <vertex id="SubBytes" x="480" y="165"/>
       <vertex id="ShiftRows" x="614" y="233"/>

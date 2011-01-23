@@ -1,29 +1,29 @@
 /**
  * This FU is part of the testbed of a CAL implementation of AES (Rijndael) running at CCB mode.
- * It sends a key, an inialization vector, a sequence of ciphertext and the golden response (plaintext) for the enciphers in CFB mode.
+ * It sends a key, an inialization vector, a sequence of ciphertext and the golden response (plaintext) for the deciphers in CFB mode.
  * The test vectors and golden responses are taken from the following reference:
  * Morris Dworkin, "Recommendation for Block Cipher Modes of Operation: Methods and Techniques,"
  *  				NIST Special Publication 800-38A, December 2001
  * http://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf
  * 
  * FU ID: Source_AES_CBC_InvCipher
- * Four output ports:
- *   1) uint(size=8) OP1_IV: the initialization vector
- *   2) uint(size=8) OP2_Key: the key (the first byte is the key size)
- *   3) uint(size=8) OP3_CT: the ciphertext
- *   4) uint(size=8) OP4_GR: the golden response
+ * Five output ports:
+ *   1) uint(size=8) OP1_IV: the initialization vector (counter)
+ *   2) uint(size=8) OP2_KeySize: the key size
+ *   3) uint(size=8) OP3_Key: the key
+ *   4) uint(size=8) OP4_CT: the ciphertext
+ *   5) uint(size=8) OP5_GR: the golden response
  *
  * Developers: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
 package Block_Ciphers.Modes;
 
-actor Source_AES_CBC_InvCipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key, uint(size=8) OP3_CT, uint(size=8) OP4_GR:
+actor Source_AES_CBC_InvCipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_KeySize, uint(size=8) OP3_Key, uint(size=8) OP4_CT, uint(size=8) OP5_GR:
 
 	// Test vectors for AES-128 (F.2.2 CBC-AES128.Decrypt).
 	int KEY_SIZE = 16;
-	List(type:uint(size=8), size=KEY_SIZE+1) k = [ // Key
-		KEY_SIZE,
+	List(type:uint(size=8), size=KEY_SIZE) k = [ // Key
 		0x2b,0x7e,0x15,0x16,0x28,0xae,0xd2,0xa6,0xab,0xf7,0x15,0x88,0x09,0xcf,0x4f,0x3c
 	];
 
@@ -44,8 +44,7 @@ actor Source_AES_CBC_InvCipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key,
 
 	// Test vectors for AES-192 (F.2.4 CBC-AES192.Decrypt).
 /*	int KEY_SIZE = 24;
-	List(type:uint(size=8), size=KEY_SIZE+1) k = [ // Key
-		KEY_SIZE,
+	List(type:uint(size=8), size=KEY_SIZE) k = [ // Key
 		0x8e,0x73,0xb0,0xf7,0xda,0x0e,0x64,0x52,0xc8,0x10,0xf3,0x2b,0x80,0x90,0x79,0xe5,0x62,0xf8,0xea,0xd2,0x52,0x2c,0x6b,0x7b
 	];
 
@@ -66,8 +65,7 @@ actor Source_AES_CBC_InvCipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key,
 
 	// Test vectors for AES-256 (F.2.6 CBC-AES256.Decrypt).
 /*	int KEY_SIZE = 32;
-	List(type:uint(size=8), size=KEY_SIZE+1) k = [ // Key
-		KEY_SIZE,
+	List(type:uint(size=8), size=KEY_SIZE) k = [ // Key
 		0x60,0x3d,0xeb,0x10,0x15,0xca,0x71,0xbe,0x2b,0x73,0xae,0xf0,0x85,0x7d,0x77,0x81,
 		0x1f,0x35,0x2c,0x07,0x3b,0x61,0x08,0xd7,0x2d,0x98,0x10,0xa3,0x09,0x14,0xdf,0xf4
 	];
@@ -87,33 +85,15 @@ actor Source_AES_CBC_InvCipher () ==> uint(size=8) OP1_IV, uint(size=8) OP2_Key,
 		0xae,0x2d,0x8a,0x57,0x1e,0x03,0xac,0x9c,0x9e,0xb7,0x6f,0xac,0x45,0xaf,0x8e,0x51
 	]; */
 
-	// Due to the lack of support by ORCC on #, we cannot send the whole list alone as a token to the next FU. 
-	int kCounter := 0;
-	action ==> OP2_Key:[k[kCounter-1]]
-	guard kCounter < KEY_SIZE+1
-	do
-		kCounter := kCounter + 1;
-	end	
-
-	int ivCounter := 0;
-	action ==> OP1_IV:[iv[ivCounter-1]]
-	guard ivCounter < BLOCK_SIZE
-	do
-		ivCounter := ivCounter + 1;
-	end
-
-	int ctCounter := 0;
-	action ==> OP3_CT:[ct[ctCounter-1]]
-	guard ctCounter < TEXT_SIZE
-	do
-		ctCounter := ctCounter + 1;
-	end
-
-	int grCounter := 0;
-	action ==> OP4_GR:[gr[grCounter-1]]
-	guard grCounter < TEXT_SIZE
-	do
-		grCounter := grCounter + 1;
-	end
-
+	bool dataSent := false;
+	sendData:
+	action ==> OP1_IV:[iv] repeat BLOCK_SIZE,
+               OP2_KeySize:[KEY_SIZE],
+               OP3_Key:[k] repeat KEY_SIZE,
+               OP4_CT:[ct] repeat TEXT_SIZE,               
+               OP5_GR:[gr] repeat TEXT_SIZE
+    guard not dataSent
+    do
+    	dataSent := true;	
+    end
 end

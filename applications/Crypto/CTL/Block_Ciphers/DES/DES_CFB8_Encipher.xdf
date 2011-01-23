@@ -53,7 +53,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../!Modes/CFB"/>
+        <Class name="Block_Ciphers.Modes.CFB"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

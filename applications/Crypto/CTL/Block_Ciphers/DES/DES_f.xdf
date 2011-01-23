@@ -44,7 +44,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="DES_f_E"/>
+        <Class name="Block_Ciphers.DES.DES_f_E"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -53,7 +53,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="DES_f_XOR"/>
+        <Class name="Block_Ciphers.DES.DES_f_XOR"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -62,7 +62,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="DES_f_P"/>
+        <Class name="Block_Ciphers.DES.DES_f_P"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

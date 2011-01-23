@@ -44,7 +44,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../Utilities/Smaller2Bigger"/>
+        <Class name="Utilities.Smaller2Bigger"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -56,7 +56,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../Utilities/Smaller2Bigger"/>
+        <Class name="Utilities.Smaller2Bigger"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -68,7 +68,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../Utilities/Bigger2Smaller"/>
+        <Class name="Utilities.Bigger2Smaller"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -80,7 +80,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Rabbit"/>
+        <Class name="Stream_Ciphers.Rabbit.Rabbit"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

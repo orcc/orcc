@@ -1,0 +1,57 @@
+/**
+ * This FU is part of a CAL Cryptographic Tool Library (CTL) Utilities.
+ * It transforms a byte/word/double-word/quad-word token into a number of bit tokens.
+ * 
+ * FU ID: Any2Bits
+ * One FU parameter:
+ * 	 1) bool IS_BIG_ENDIAN: output bits in big-endian? (true = big-endian, false = little-endian)
+ * One Constant:
+ * Note: Constants are being used instead of FU parameters because FU parameters are currently not fully 
+ *       supported by Orcc. These constants will become FU parameters later. 
+ *	 1) int IP_SIZE: input port size in bits (default: 8 = byte; possible values: 8, 16, 32, 64).
+ * One input port:
+ * 	 1) uint(size=IP_PORT_SIZE) IP: the input
+ * One output port:
+ * 	 1) uint(size=1) OP: the output (as a sequence of bit tokens)
+ *
+ * Developers: Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz 2010
+ */
+
+package Utilities;
+
+actor Any2Bits (bool IS_BIG_ENDIAN = true) uint(size=IP_SIZE) IP ==> uint(size=1) OP:
+
+	// Input port size in bits.
+	int IP_SIZE = 8;
+	int IP_SIZE_1 = IP_SIZE - 1;
+
+	Any2Bits:
+	action IP:[v] ==> OP:[bits] repeat IP_SIZE
+	var
+		int counter,
+		List(type:uint(size=1), size=IP_SIZE) bits 
+	do
+		if IS_BIG_ENDIAN then // big-endian
+			counter := IP_SIZE_1;
+			while v>0 do
+				bits[counter] := (v & 1);
+				v := (v >> 1);
+				counter := counter - 1;
+			end
+			foreach int i in 0 .. counter do
+				bits[i] := 0;
+			end
+		else // little-endian
+			counter := 0;
+			while v>0 do
+				bits[counter] := (v & 1);
+				v := (v >> 1);
+				counter := counter + 1;
+			end
+			foreach int i in counter .. IP_SIZE_1 do
+				bits[i] := 0;
+			end
+		end
+	end
+
+end

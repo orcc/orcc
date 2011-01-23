@@ -3,30 +3,28 @@
  * It sends a key to the AES encipher and decipher for testing purpose.
  * 
  * FU ID: KeyGenerator_AES
- * One output port:
- * 1) uint(size=8) Key: the key (the first byte is the key size)
+ * Two output port:
+ * 1) uint(size=8) KeySize: the key size
+ * 2) uint(size=8) Key: the key
  *
- * Developer: Shujun Li @ Uni-Konstanz 2010
+ * Developer: Shujun Li, Junaid Jameel Ahmad @ Uni-Konstanz 2010
  */
 
 package Block_Ciphers.AES;
 
-actor KeyGenerator_AES () ==> uint(size=8) Key :
+actor KeyGenerator_AES () ==> uint(size=8) OP1_KeySize, uint(size=8) OP2_Key:
 
 	int KEY_SIZE = 16;
-	List(type:uint(size=8), size=KEY_SIZE+1) k = [ // Key
-		KEY_SIZE,
+	List(type:uint(size=8), size=KEY_SIZE) k = [ // Key
 		0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f
 	];
 	
 	bool keySent := false;
-
-	// Orcc does not allow a list sent out as a single token.
-	// So we have to send a number of bytes instead.
-	action ==> Key:[k] repeat KEY_SIZE+1
-	guard not keySent
-	do
-		keySent := true;
-	end
-	
+	sendData:
+	action ==> OP1_KeySize:[KEY_SIZE],
+               OP2_Key:[k] repeat KEY_SIZE
+    guard not keySent
+    do
+    	keySent := true;
+    end
 end

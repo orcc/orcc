@@ -44,7 +44,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../!Modes/CBC"/>
+        <Class name="Block_Ciphers.Modes.CBC"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

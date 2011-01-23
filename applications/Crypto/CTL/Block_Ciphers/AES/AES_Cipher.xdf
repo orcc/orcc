@@ -3,14 +3,21 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="Plaintext">
+    <Port kind="Input" name="IP1_Plaintext">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="8"/>
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="Key">
+    <Port kind="Input" name="IP3_Key">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="IP2_KeySize">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="8"/>
@@ -37,7 +44,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="AddRoundKey"/>
+        <Class name="Block_Ciphers.AES.AddRoundKey"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -49,7 +56,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="SubBytes"/>
+        <Class name="Block_Ciphers.AES.SubBytes"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -58,7 +65,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="ShiftRows"/>
+        <Class name="Block_Ciphers.AES.ShiftRows"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -67,7 +74,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="MixColumns"/>
+        <Class name="Block_Ciphers.AES.MixColumns"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -77,10 +84,11 @@
     <!-- ************************************** -->
     <Connection dst="SubBytes" dst-port="IP" src="AddRoundKey" src-port="OP2_FD"/>
     <Connection dst="ShiftRows" dst-port="IP" src="SubBytes" src-port="OP"/>
-    <Connection dst="AddRoundKey" dst-port="IP3_FD" src="MixColumns" src-port="OP"/>
-    <Connection dst="AddRoundKey" dst-port="IP2_Key" src="" src-port="Key"/>
-    <Connection dst="AddRoundKey" dst-port="IP1_Text" src="" src-port="Plaintext"/>
+    <Connection dst="AddRoundKey" dst-port="IP1_Text" src="" src-port="IP1_Plaintext"/>
     <Connection dst="" dst-port="Ciphertext" src="AddRoundKey" src-port="OP1_Text"/>
     <Connection dst="MixColumns" dst-port="IP2_IT" src="ShiftRows" src-port="OP"/>
-    <Connection dst="MixColumns" dst-port="IP1_KeySize" src="" src-port="Key"/>
+    <Connection dst="MixColumns" dst-port="IP1_KeySize" src="" src-port="IP2_KeySize"/>
+    <Connection dst="AddRoundKey" dst-port="IP3_Key" src="" src-port="IP3_Key"/>
+    <Connection dst="AddRoundKey" dst-port="IP2_KeySize" src="" src-port="IP2_KeySize"/>
+    <Connection dst="AddRoundKey" dst-port="IP4_FD" src="MixColumns" src-port="OP"/>
 </XDF>

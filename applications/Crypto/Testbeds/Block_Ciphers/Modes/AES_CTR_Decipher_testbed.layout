@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="Source" x="25" y="111"/>
-      <vertex id="Validator" x="429" y="171"/>
-      <vertex id="AES_CTR_Encipher" x="191" y="111"/>
+      <vertex id="Source" x="63" y="112"/>
+      <vertex id="Validator" x="467" y="192"/>
+      <vertex id="AES_CTR_Encipher" x="229" y="112"/>
    </vertices>
 </layout>

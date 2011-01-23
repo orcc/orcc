@@ -6,10 +6,11 @@
  * FU ID: AddRoundKey
  * One actor parameter:
  *   1) bool IS_ENCIPHER: true = encipher mode (default), false = decipher mode
- * Three input ports:
+ * Four input ports:
  *   1) uint(size=8) IP1_Text: the plaintext/ciphertext
- *   2) uint(size=8) IP2_Key: the key (the first byte should be the key size)
- *   3) uint(size=8) IP3_FD: feedback from other component of the AES cipher
+ *   2) uint(size=8) IP2_KeySize: the key size
+ *   3) uint(size=8) IP3_Key: the key
+ *   4) uint(size=8) IP4_FD: feedback from other component of the AES cipher
  * Two output ports:
  *   1) uint(size=8) OP1_Text: final output as ciphertext/plaintext
  *   2) uint(size=8) OP2_FD: temporary output sent to other FU of the AES encipher/decipher
@@ -23,7 +24,7 @@
 
 package Block_Ciphers.AES;
 
-actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP2_Key, uint(size=8) IP3_FD ==> 
+actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP2_KeySize, uint(size=8) IP3_Key, uint(size=8) IP4_FD ==> 
 		uint(size=8) OP1_Text, uint(size=8) OP2_FD :
 
 	// The following variables are values for AES-256.
@@ -130,7 +131,8 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	bool keyExpanded := false;
 
 	// Read the key size and update other parameters.
-	action IP2_Key:[K] ==>
+	readKeyInfo:
+	action IP2_KeySize:[K] ==>
 	guard not keyInfoUpdated
 	do
 		keySize := K;
@@ -142,7 +144,8 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	end
 	
 	// Read the key according to the value of KeySize.
-	action IP2_Key:[k] ==>
+	keyExpansion:
+	action IP3_Key:[k] ==>
 	guard keyInfoUpdated and keyCounter<keySize
 	do
 		key[keyCounter] := k;
@@ -186,7 +189,7 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 
 	// For a normal round, output the round number x[0] and a 16-byte block to OP2_FD.
 	normalRound:
-	action IP3_FD:[x] repeat 17 ==> OP2_FD:[y] repeat 17
+	action IP4_FD:[x] repeat 17 ==> OP2_FD:[y] repeat 17
 	guard keyExpanded and x[0]<Nr
 	do
 		AddRoundKey(x,17);
@@ -194,7 +197,7 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	
 	// For the last round, output a 16-byte ciphertext block to OP1_CT.
 	lastRound:
-	action IP3_FD:[x] repeat 17 ==> OP1_Text:[ [y[i] : for int i in 1 .. 16] ] repeat 16
+	action IP4_FD:[x] repeat 17 ==> OP1_Text:[ [y[i] : for int i in 1 .. 16] ] repeat 16
 	guard keyExpanded and x[0]=Nr
 	do
 		AddRoundKey(x,17);
@@ -202,7 +205,9 @@ actor AddRoundKey (bool IS_ENCIPHER=true) uint(size=8) IP1_Text, uint(size=8) IP
 	
 	priority
 		// lastRound helps reduce the waiting queue, so it has the highest priority.
-		// initialRound can increase the waiting queue, so it has the lowest priority. 
-		lastRound > normalRound > initialRound;
+		// initialRound can increase the waiting queue, so it has the lowest priority.
+		// readKeyInfo and keyExpansion have the least priority as they will only 
+		// fire once at the start.
+		lastRound > normalRound > initialRound > readKeyInfo > keyExpansion;
 	end
 end

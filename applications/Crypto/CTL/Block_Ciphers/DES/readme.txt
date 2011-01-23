@@ -62,7 +62,7 @@ Demux2.cal
 Demux8.cal
 XOR_1b.cal
 
-Note: These cal files are located in CTL\Utilities folder.
+Note: These cal files are located under package CTL.Utilities.
 
 == DES encipher and decipher as FU networks ==
 
@@ -96,4 +96,4 @@ DES_CTR_Cipher.xdf: DES encipher/decipher
 
 
 
-Note: CBC, CFB, OFB and CTR modes have external dependencies on the CAL files in CTL\Block_Ciphers\!Modes folder.
+Note: CBC, CFB, OFB and CTR modes have external dependencies on the CAL files under package CTL.Block_Ciphers.Modes.

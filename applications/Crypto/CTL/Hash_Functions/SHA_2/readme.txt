@@ -15,23 +15,23 @@ and is composed of the following files.
 
 All basic FUs were written to be compliant with the subset of RVC-CAL supported by Orcc.
 
--- Common Kernel FUs --
+-- Common Kernel FUs used--
 
 Preprocessor64.cal
 TruncateHash.cal
 
-Note: These FUs are located in ../common.
+Note: These FUs are located under package CTL.Hash_Functions.common.
 
 -- Utility FUs used--
 
 Smaller2Bigger.cal
 
-Note: Utilities are located in CTL\Utilities folder.
+Note: Utilities are located under package CTL.Utilities.
 
 == SHA-2 FU network ==
 
 SHA-224.xdf
 SHA-256.xdf
 
-Note: SHA-384 and SHA-512 are not yet implemented because of the big integers support in Orcc. 
+Note: SHA-384 and SHA-512 are not yet implemented because of the lack of big integers support in Orcc. 
 They will be implemented after implementing a library for BigIntegers in CAL.

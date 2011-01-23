@@ -2,7 +2,7 @@
 <layout>
    <vertices>
       <vertex id="Source" x="63" y="112"/>
-      <vertex id="Validator" x="466" y="172"/>
+      <vertex id="Validator" x="467" y="192"/>
       <vertex id="AES_CTR_Encipher" x="229" y="112"/>
    </vertices>
 </layout>

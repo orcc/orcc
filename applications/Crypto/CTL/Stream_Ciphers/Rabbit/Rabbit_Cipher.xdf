@@ -51,7 +51,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../../Utilities/XOR_8b"/>
+        <Class name="Utilities.XOR_8b"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

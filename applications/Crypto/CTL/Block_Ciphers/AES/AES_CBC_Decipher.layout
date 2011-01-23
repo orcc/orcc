@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="IP3_Ciphertext" x="49" y="276"/>
-      <vertex id="IP1_IV" x="293" y="151"/>
-      <vertex id="IP2_Key" x="68" y="196"/>
-      <vertex id="Plaintext" x="490" y="236"/>
-      <vertex id="CBC" x="369" y="216"/>
-      <vertex id="AES_InvCipher" x="169" y="208"/>
+      <vertex id="IP4_Ciphertext" x="154" y="194"/>
+      <vertex id="IP1_IV" x="360" y="48"/>
+      <vertex id="IP3_Key" x="107" y="165"/>
+      <vertex id="Plaintext" x="557" y="133"/>
+      <vertex id="CBC" x="436" y="113"/>
+      <vertex id="AES_InvCipher" x="236" y="105"/>
+      <vertex id="IP2_KeySize" x="24" y="145"/>
    </vertices>
 </layout>

@@ -8,7 +8,7 @@ Junaid Jameel Ahmad, Shujun Li @ Uni-Konstanz
 
 **********************************************************
 
-This RVC-CAL implementation of TDES (FIPS 46-3, NIST SP 800-67) is based on DES implementation in ../DES/*.
+This RVC-CAL implementation of TDES (FIPS 46-3, NIST SP 800-67) is based on DES implementation (available under package CTL.Block_Ciphers.DES).
 Therefore, folder Only have the XDF networks for all TDES encipher/decipher.
 
 == TDES encipher and decipher as FU networks ==
@@ -43,4 +43,4 @@ TDES_CTR_Cipher.xdf (encipher/decipher)
 
 
 
-Note: CBC, CFB, OFB and CTR modes have external dependencies on the CAL files in Block_Ciphers\!Modes folder.
+Note: CBC, CFB, OFB and CTR modes have external dependencies on the CAL files in CAL.Block_Ciphers.Modes.

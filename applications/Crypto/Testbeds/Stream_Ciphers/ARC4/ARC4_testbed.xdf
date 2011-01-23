@@ -1,59 +1,60 @@
-<?xml version="1.0" encoding="UTF-8"?><XDF name="ARC4_testbed">
-   <!-- ************************************** -->
-   <!-- Input ports of the Graph               -->
-   <!-- ************************************** -->
-   <!-- ************************************** -->
-   <!-- Output ports of the Graph              -->
-   <!-- ************************************** -->
-   <!-- ************************************** -->
-   <!-- Variables and Parameters of the Graph  -->
-   <!-- ************************************** -->
-   <!-- ************************************** -->
-   <!-- Instances of the Graph                 -->
-   <!-- ************************************** -->
-   <Instance id="ARC4">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Stream_Ciphers.ARC4.ARC4"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <Instance id="Source">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Stream_Ciphers.ARC4.Source_ARC4"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <Instance id="XOR">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="Utilities.XOR_8b"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <Instance id="Validator">
-      <!-- ************************* -->
-      <!-- FU/Network refinement     -->
-      <!-- ************************* -->
-      <Class name="../../System/Validator_16B"/>
-      <!-- ************************* -->
-      <!-- FU/Network Parameter      -->
-      <!-- ************************* -->
-   </Instance>
-   <!-- ************************************** -->
-   <!-- Connections of the Graph               -->
-   <!-- ************************************** -->
-   <Connection dst="ARC4" dst-port="IP1_Key" src="Source" src-port="OP1_Key"/>
-   <Connection dst="ARC4" dst-port="IP2_Text" src="Source" src-port="OP2_PT"/>
-   <Connection dst="XOR" dst-port="IP1" src="ARC4" src-port="OP"/>
-   <Connection dst="XOR" dst-port="IP2" src="Source" src-port="OP2_PT"/>
-   <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP3_GR"/>
-   <Connection dst="Validator" dst-port="IP1_Data" src="XOR" src-port="OP"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="ARC4_testbed">
+    <!-- ************************************** -->
+    <!-- Input ports of the Graph               -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Output ports of the Graph              -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Variables and Parameters of the Graph  -->
+    <!-- ************************************** -->
+    <!-- ************************************** -->
+    <!-- Instances of the Graph                 -->
+    <!-- ************************************** -->
+    <Instance id="ARC4">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Stream_Ciphers.ARC4.ARC4"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Source">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Stream_Ciphers.ARC4.Source_ARC4"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="XOR">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="Utilities.XOR_8b"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <Instance id="Validator">
+        <!-- ************************* -->
+        <!-- FU/Network refinement     -->
+        <!-- ************************* -->
+        <Class name="System.Validator_16B"/>
+        <!-- ************************* -->
+        <!-- FU/Network Parameter      -->
+        <!-- ************************* -->
+    </Instance>
+    <!-- ************************************** -->
+    <!-- Connections of the Graph               -->
+    <!-- ************************************** -->
+    <Connection dst="ARC4" dst-port="IP1_Key" src="Source" src-port="OP1_Key"/>
+    <Connection dst="ARC4" dst-port="IP2_Text" src="Source" src-port="OP2_PT"/>
+    <Connection dst="XOR" dst-port="IP1" src="ARC4" src-port="OP"/>
+    <Connection dst="XOR" dst-port="IP2" src="Source" src-port="OP2_PT"/>
+    <Connection dst="Validator" dst-port="IP2_GR" src="Source" src-port="OP3_GR"/>
+    <Connection dst="Validator" dst-port="IP1_Data" src="XOR" src-port="OP"/>
 </XDF>

@@ -53,7 +53,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="../!Modes/OFB"/>
+        <Class name="Block_Ciphers.Modes.OFB"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

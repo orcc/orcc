@@ -41,7 +41,7 @@ actor Validator_16B () uint(size=8) IP1_Data, uint(size=8) IP2_GR ==> : // GR = 
 	function list2hex (List(type:uint(size=8), size=BLOCK_SIZE) x) --> List(type:String, size=BLOCK_SIZE):
 		[byte2hex(x[i]) : for int i in 0 .. BLOCK_SIZE-1]
 	end */
-	
+
 	int blockCounter := 0;
 	int errorCounter := 0;
 
