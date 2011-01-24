@@ -81,6 +81,8 @@ public class XlimBackendImpl extends AbstractBackend {
 	private STPrinter printer;
 
 	private boolean hardwareGen;
+	
+	private String fpgaType;
 
 	@Override
 	protected void doTransformActor(Actor actor) throws OrccException {
@@ -120,8 +122,10 @@ public class XlimBackendImpl extends AbstractBackend {
 		hardwareGen = getAttribute("net.sf.orcc.backends.xlimHard", true);
 
 		printer = new STPrinter();
-
+		printer.setOptions(getAttributes());
 		if (hardwareGen) {
+			fpgaType = getAttribute("net.sf.orcc.backends.xlimFpgaType", "xc2vp30-7-ff1152");			
+			printer.getOptions().put("fpgaType", fpgaType);
 			printer.loadGroups("XLIM_sw_actor", "XLIM_hw_actor");
 		} else {
 			printer.loadGroups("XLIM_sw_actor");
