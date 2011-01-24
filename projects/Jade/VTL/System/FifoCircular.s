@@ -6,10 +6,6 @@ target triple = "i386-mingw32"
 %struct.fifo_i32_s = type { i32, i32*, i32*, i32, i32, i32 }
 %struct.fifo_i64_s = type { i32, i64*, i64*, i32, i32, i32 }
 %struct.fifo_i8_s = type { i32, i8*, i8*, i32, i32, i32 }
-%struct.fifo_u16_s = type { i32, i16*, i16*, i32, i32, i32 }
-%struct.fifo_u32_s = type { i32, i32*, i32*, i32, i32, i32 }
-%struct.fifo_u64_s = type { i32, i64*, i64*, i32, i32, i32 }
-%struct.fifo_u8_s = type { i32, i8*, i8*, i32, i32, i32 }
 
 define i32 @fifo_i8_has_tokens(%struct.fifo_i8_s* %fifo, i32 %n) nounwind {
 entry:
@@ -3676,3 +3672,24 @@ bb8:                                              ; preds = %bb7, %bb2, %bb
 return:                                           ; preds = %bb8
   ret void
 }
+
+!fifo = !{!0, !4, !8, !12}
+!0 = metadata !{ i32 8,  metadata !1,  metadata !2, metadata !3}
+!1 = metadata !{metadata !"struct.fifo_i8_s", %struct.fifo_i8_s* null}
+!2 = metadata !{i32(%struct.fifo_i8_s*, i32)* @fifo_i8_has_tokens, i32(%struct.fifo_i8_s*, i32)* @fifo_i8_has_room, i32(%struct.fifo_i8_s*)* @fifo_i8_get_room, i8*(%struct.fifo_i8_s*, i32)* @fifo_i8_peek, i8*(%struct.fifo_i8_s*, i32)* @fifo_i8_read, void(%struct.fifo_i8_s*, i32)* @fifo_i8_read_end, i8*(%struct.fifo_i8_s*, i32)* @fifo_i8_write, void(%struct.fifo_i8_s*, i32)* @fifo_i8_write_end}
+!3 = metadata !{i32(%struct.fifo_i8_s*, i32)* @fifo_u8_has_tokens, i32(%struct.fifo_i8_s*, i32)* @fifo_u8_has_room, i32(%struct.fifo_i8_s*)* @fifo_u8_get_room, i8*(%struct.fifo_i8_s*, i32)* @fifo_u8_peek, i8*(%struct.fifo_i8_s*, i32)* @fifo_u8_read, void(%struct.fifo_i8_s*, i32)* @fifo_u8_read_end, i8*(%struct.fifo_i8_s*, i32)* @fifo_u8_write, void(%struct.fifo_i8_s*, i32)* @fifo_u8_write_end}
+
+!4 = metadata !{ i32 16, metadata !5,  metadata !6, metadata !7}
+!5 = metadata !{metadata !"struct.fifo_i16_s", %struct.fifo_i16_s* null}
+!6 = metadata !{i32(%struct.fifo_i16_s*, i32)* @fifo_i16_has_tokens, i32(%struct.fifo_i16_s*, i32)* @fifo_i16_has_room, i32(%struct.fifo_i16_s*)* @fifo_i16_get_room, i16*(%struct.fifo_i16_s*, i32)* @fifo_i16_peek, i16*(%struct.fifo_i16_s*, i32)* @fifo_i16_read, void(%struct.fifo_i16_s*, i32)* @fifo_i16_read_end, i16*(%struct.fifo_i16_s*, i32)* @fifo_i16_write, void(%struct.fifo_i16_s*, i32)* @fifo_i16_write_end}
+!7 = metadata !{i32(%struct.fifo_i16_s*, i32)* @fifo_u16_has_tokens, i32(%struct.fifo_i16_s*, i32)* @fifo_u16_has_room, i32(%struct.fifo_i16_s*)* @fifo_u16_get_room, i16*(%struct.fifo_i16_s*, i32)* @fifo_u16_peek, i16*(%struct.fifo_i16_s*, i32)* @fifo_u16_read, void(%struct.fifo_i16_s*, i32)* @fifo_u16_read_end, i16*(%struct.fifo_i16_s*, i32)* @fifo_u16_write, void(%struct.fifo_i16_s*, i32)* @fifo_u16_write_end}
+
+!8 = metadata !{ i32 32, metadata !9,  metadata !10, metadata !11}
+!9 = metadata !{metadata !"struct.fifo_i32_s", %struct.fifo_i32_s* null}
+!10 = metadata !{i32(%struct.fifo_i32_s*, i32)* @fifo_i32_has_tokens, i32(%struct.fifo_i32_s*, i32)* @fifo_i32_has_room, i32(%struct.fifo_i32_s*)* @fifo_i32_get_room, i32*(%struct.fifo_i32_s*, i32)* @fifo_i32_peek, i32*(%struct.fifo_i32_s*, i32)* @fifo_i32_read, void(%struct.fifo_i32_s*, i32)* @fifo_i32_read_end, i32*(%struct.fifo_i32_s*, i32)* @fifo_i32_write, void(%struct.fifo_i32_s*, i32)* @fifo_i32_write_end}
+!11 = metadata !{i32(%struct.fifo_i32_s*, i32)* @fifo_u32_has_tokens, i32(%struct.fifo_i32_s*, i32)* @fifo_u32_has_room, i32(%struct.fifo_i32_s*)* @fifo_u32_get_room, i32*(%struct.fifo_i32_s*, i32)* @fifo_u32_peek, i32*(%struct.fifo_i32_s*, i32)* @fifo_u32_read, void(%struct.fifo_i32_s*, i32)* @fifo_u32_read_end, i32*(%struct.fifo_i32_s*, i32)* @fifo_u32_write, void(%struct.fifo_i32_s*, i32)* @fifo_u32_write_end}
+
+!12 = metadata !{ i32 64, metadata !13,  metadata !14, metadata !15}
+!13 = metadata !{metadata !"struct.fifo_i64_s", %struct.fifo_i64_s* null}
+!14 = metadata !{i32(%struct.fifo_i64_s*, i32)* @fifo_i64_has_tokens, i32(%struct.fifo_i64_s*, i32)* @fifo_i64_has_room, i32(%struct.fifo_i64_s*)* @fifo_i64_get_room, i64*(%struct.fifo_i64_s*, i32)* @fifo_i64_peek, i64*(%struct.fifo_i64_s*, i32)* @fifo_i64_read, void(%struct.fifo_i64_s*, i32)* @fifo_i64_read_end, i64*(%struct.fifo_i64_s*, i32)* @fifo_i64_write, void(%struct.fifo_i64_s*, i32)* @fifo_i64_write_end}
+!15 = metadata !{i32(%struct.fifo_i64_s*, i32)* @fifo_u64_has_tokens, i32(%struct.fifo_i64_s*, i32)* @fifo_u64_has_room, i32(%struct.fifo_i64_s*)* @fifo_u64_get_room, i64*(%struct.fifo_i64_s*, i32)* @fifo_u64_peek, i64*(%struct.fifo_i64_s*, i32)* @fifo_u64_read, void(%struct.fifo_i64_s*, i32)* @fifo_u64_read_end, i64*(%struct.fifo_i64_s*, i32)* @fifo_u64_write, void(%struct.fifo_i64_s*, i32)* @fifo_u64_write_end}

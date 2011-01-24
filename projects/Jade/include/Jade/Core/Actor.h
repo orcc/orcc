@@ -49,6 +49,7 @@
 #include "Jade/Core/Actor/Procedure.h"
 
 namespace llvm{
+	class Module;
 	class Type;
 	class StructType;
 }
@@ -98,7 +99,7 @@ public:
 	 * @param actions : a list of actions
 	 *
      */
-	Actor(std::string name, std::string file, std::map<std::string, llvm::Type*>* fifoTypes, std::map<std::string, Port*>* inputs, 
+	Actor(std::string name, llvm::Module* module, std::string file, std::map<std::string, Port*>* inputs, 
 		std::map<std::string, Port*>* outputs, std::map<std::string, Variable*>* stateVars, 
 		std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures, 
 		std::list<Action*>* initializes, std::list<Action*>* actions, ActionScheduler* actionScheduler);
@@ -134,6 +135,14 @@ public:
 	 *
      */
 	Variable* getParameter(std::string name);
+
+	/**
+     *  @brief Return the llvm::Module of the Actor
+	 *
+	 *  @return the llvm::Module of the Actor
+	 *
+     */
+	llvm::Module* getModule(){return module;};
 
 	/**
      *  @brief Return the Parameter corresponding to the given name
@@ -288,28 +297,6 @@ public:
 	}
 
 	/**
-	 * @brief Getter of fifo types
-	 *
-	 * Returns a map of llvm::Type for fifos of this actor.
-	 * 
-	 * @return a map of llvm::Type for fifos of this actor
-	 */
-	std::map<std::string, llvm::Type*>* getFifoTypes() {
-		return fifoTypes;
-	}
-
-	/**
-	 * @brief Getter of a fifo type
-	 *
-	 * Returns the llvm::Type of fifo corresponding to the given name
-	 * 
-	 * @param name: std::string of the fifo struct
-	 *
-	 * @return the corresponding llvm::Type
-	 */
-	llvm::Type* getFifoType(std::string name);
-
-	/**
 	 * @brief Getter of procedures
 	 *
 	 * Returns a map of procedure of this actor.
@@ -385,6 +372,9 @@ protected:
 	/** Name of the actor */
 	std::string name;
 
+	/** llvm::Module of the actor */
+	llvm::Module* module;
+
 	/** Location of the actor */
 	std::string file;
 
@@ -414,9 +404,6 @@ protected:
 
 	/** Action scheduler of this actor */
 	ActionScheduler* actionScheduler;
-
-	/** Structure types from fifo of this actor */
-	std::map<std::string, llvm::Type*>* fifoTypes;
 };
 
 #endif

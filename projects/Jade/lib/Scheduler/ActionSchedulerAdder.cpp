@@ -363,7 +363,7 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
 	
 	//Call hasRoom function
-	Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType());
+	Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType(), decoder);
 	Value* hasRoomArgs[] = { loadPort, numTokens};
 	CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs, hasRoomArgs+2,"",  BB);
 
@@ -375,7 +375,7 @@ CallInst* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numToke
 	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
 	
 	//Call hasToken function
-	Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType());
+	Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType(), decoder);
 	Value* hasTokenArgs[] = { loadPort, numTokens};
 	CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs, hasTokenArgs+2,"",  BB);
 

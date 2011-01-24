@@ -49,7 +49,6 @@
 #include "Jade/Serialize/IRLinker.h"
 #include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Serialize/IRWriter.h"
-#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace std;
@@ -62,11 +61,8 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	map<string, Instance*>::iterator it;
 	Configuration* configuration = decoder->getConfiguration();
 
-	// Add Fifo function and fifo type into the decoder
-	FifoMng::addFifoHeader(decoder);
-
 	// Adding broadcast 
-	BroadcastAdder broadAdder(Context, configuration);
+	BroadcastAdder broadAdder(Context, decoder);
 	broadAdder.transform();
 
 	//Write instance
@@ -104,7 +100,7 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	IRWriter writer(Context, decoder);
 
 	// Adding new broadcast 
-	BroadcastAdder broadAdder(Context, configuration);
+	BroadcastAdder broadAdder(Context, decoder);
 	broadAdder.transform();
 	list<Instance*>* broads = broadAdder.getBroads();
 	for (it = broads->begin(); it != broads->end(); it++){

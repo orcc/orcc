@@ -39,6 +39,7 @@
 #include <map>
 #include <sstream>
 
+#include "Jade/Decoder.h"
 #include "Jade/Actor/BroadcastActor.h"
 #include "Jade/Actor/BroadcastAdder.h"
 #include "Jade/Core/Port.h"
@@ -48,8 +49,9 @@
 
 using namespace std;
 
-BroadcastAdder::BroadcastAdder(llvm::LLVMContext& C, Configuration* configuration) : Context(C){
-	this->configuration = configuration;
+BroadcastAdder::BroadcastAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
+	this->decoder = decoder;
+	this->configuration = decoder->getConfiguration();
 	Network* network = configuration->getNetwork();
 	this->graph = network->getGraph();
 }
@@ -116,7 +118,7 @@ void BroadcastAdder::examineConnections(Vertex* vertex, Connection** connections
 				
 				//Create a new actor for this broadcast
 				string name = "broadcast_"+ instance->getId()+"_"+ srcPort->getName();
-				BroadcastActor* actorBCast = new BroadcastActor(Context, name, numOuputs, srcPort->getType()/*, fifo*/);
+				BroadcastActor* actorBCast = new BroadcastActor(Context, decoder, name, numOuputs, srcPort->getType()/*, fifo*/);
 				
 				//Create an instance for the broadcast
 				Instance* newInstance = new Instance(name, actorBCast);

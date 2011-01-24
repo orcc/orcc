@@ -48,6 +48,7 @@
 #include "Jade/Configuration/ConfigurationEngine.h"
 #include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
+#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace llvm;
@@ -58,12 +59,16 @@ Decoder::Decoder(LLVMContext& C, Configuration* configuration): Context(C){
 	this->configuration = configuration;
 	this->thread = NULL;
 	this->executionEngine = NULL;
+	this->fifoFn = NULL;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
 
 	//Set elements of the decoder
 	this->scheduler = new RoundRobinScheduler(Context, this);
+
+	// Add Fifo function and fifo type into the decoder
+	this->fifoFn = FifoMng::addFifoHeader(this);
 
 	//Configure the decoder
 	ConfigurationEngine engine(Context);

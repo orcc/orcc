@@ -98,9 +98,9 @@ void Instantiator::updateInstance(Instance* instance){
 }
 
 void Instantiator::updateConnection(Connection* connection){
-	Type* srcPortType;
+	IntegerType* srcPortType;
 	string sourceString;
-	Type* dstPortType;
+	IntegerType* dstPortType;
 	string targetString;
 	
 	// Get vertex of the connection

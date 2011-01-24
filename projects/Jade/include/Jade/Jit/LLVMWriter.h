@@ -127,6 +127,7 @@ private:
 
 	Decoder* decoder;
 	std::string prefix;
+	std::map<std::string, llvm::Function*>* fifoFns;
 
 };
 

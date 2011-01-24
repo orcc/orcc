@@ -151,6 +151,7 @@ public:
      */
 	void stop();
 
+	std::map<std::string, llvm::Function*>* getFifoFn(){return fifoFn;};
 private:
 	/**
      *  @brief Static method for launching decoder in a thread
@@ -166,9 +167,6 @@ private:
 
 	/** Input stimulus */
 	std::string stimulus;
-	
-	/** List of Fifo in the decoder */
-	std::list<AbstractConnector*> fifos;
 
 	/** Scheduler of the decoder */
 	Scheduler* scheduler;
@@ -178,6 +176,9 @@ private:
 
 	/** Execution engine of the decoder */
 	LLVMExecution* executionEngine;
+
+	/** Common fifo functions */
+	std::map<std::string, llvm::Function*>* fifoFn;
 
 	/** Current thread used by the decoder */
 	pthread_t* thread;

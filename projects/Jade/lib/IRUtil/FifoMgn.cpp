@@ -40,6 +40,7 @@
 #include <sstream>
 
 #include "llvm/LLVMContext.h"
+#include "llvm/Linker.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Actor.h"
@@ -61,28 +62,21 @@ string FifoMng::externFnFile;
 string FifoMng::packageFolder;
 Module* FifoMng::headerMd;
 Module* FifoMng::externFnMd;
-map<string,string> FifoMng::structName;
-map<string,Type*> FifoMng::structAcces;
-map<string,string> FifoMng::fifoFunct;
 map<string, Function*> FifoMng::externFunct;
-list<Function*> FifoMng::externStruct;
-map<string,Function*> FifoMng::fifoAccess;
+map<int, FifoMng::FifoAccess*> FifoMng::fifoAccesses;
+map<string, const StructType*> FifoMng::fifoStructs;
+
 
 void FifoMng::setFifoTy(FifoTy fifoTy, std::string packageFld){
 		FifoMng::fifoTy =  fifoTy;
 		FifoMng::packageFolder = packageFld;
 
-		//Create name map of fifo and structure
-		fifoMap();
-		structMap();
-
+		parseModules();
 		parseFifos();
-		parseFifoStructs();
 		parseExternFunctions();
-		parseFifoFunctions();
 }
 
-void FifoMng::parseFifos(){
+void FifoMng::parseModules(){
 	LLVMContext &Context = getGlobalContext();
 	
 	//Create the parser
@@ -104,6 +98,52 @@ void FifoMng::parseFifos(){
 		exit(0);
 	}
 }
+void FifoMng::parseFifos(){
+	NamedMDNode* fifoNMD = headerMd->getNamedMetadata("fifo");
+
+	// Parse all MD elements of fifo MD
+	for (unsigned i = 0, e = fifoNMD->getNumOperands(); i != e; ++i) {
+		FifoMng::FifoAccess* access = parseFifo(fifoNMD->getOperand(i));
+		fifoAccesses.insert(pair<int, FifoMng::FifoAccess*>(access->getTokenSize(), access));
+	}
+}
+
+FifoMng::FifoAccess* FifoMng::parseFifo(MDNode* node){
+	//Get token size
+	ConstantInt* tokenSizeCI = cast<ConstantInt>(node->getOperand(0));
+	int tokenSize = tokenSizeCI->getLimitedValue();
+	
+	//Get fifo information
+	pair<string, StructType*> structType = parseFifoStruct(cast<MDNode>(node->getOperand(1)));
+	map<string, Function*>* signedFn = parseFifoFn(cast<MDNode>(node->getOperand(2)));
+	map<string, Function*>* unsignedFn = parseFifoFn(cast<MDNode>(node->getOperand(3)));
+
+	return new FifoAccess(tokenSize, structType.first, structType.second, signedFn, unsignedFn);
+}
+
+map<string, Function*>* FifoMng::parseFifoFn(MDNode* functionMD){
+	map<string, Function*>* fifoFns = new map<string, Function*>();
+
+	for (unsigned i = 0, e = functionMD->getNumOperands(); i != e; ++i) {
+		Function* function = cast<Function>(functionMD->getOperand(i));
+		
+		//Store function
+		fifoFns->insert(pair<string, Function*>(function->getNameStr(), function));
+	}
+
+	return fifoFns;
+}
+
+pair<string, StructType*> FifoMng::parseFifoStruct(llvm::MDNode* structMD){
+	MDString* name = cast<MDString>(structMD->getOperand(0));
+
+	ConstantPointerNull* pointer = cast<ConstantPointerNull>(structMD->getOperand(1));
+	const Type* type = pointer->getType();
+	StructType* structType = (StructType*)cast<StructType>(type->getContainedType(0));
+
+	fifoStructs.insert(pair<string, StructType*>(name->getString(), structType));
+	return pair<string, StructType*>(name->getString(), structType);
+}
 
 void FifoMng::parseExternFunctions(){
 	
@@ -113,283 +153,178 @@ void FifoMng::parseExternFunctions(){
 	}
 }
 
-void FifoMng::setFifoStruct(std::string name, llvm::Type* type){
-		std::map<std::string,llvm::Type*>::iterator it;
-
-		it = structAcces.find(name);
-
-		if (it == structAcces.end()){
-			cerr << "Error when setting structure of fifo";
-			exit(0);
-		}
-	
-		(*it).second = type;
-}
-
 AbstractFifo* FifoMng::getFifo(LLVMContext& C, Decoder* decoder, Type* type, int size){
 	//Todo : implement static class in fifo for creation
 	return new FifoCircular(C, decoder->getModule(), type, size);
 }
 
-void FifoMng::parseFifoStructs(){
-	map<string,string>::iterator it;
-	
-	// Iterate though structure
-	for (it = structName.begin(); it != structName.end(); ++it) {
-		string name = it->second;
-
-		Type* type = (Type*)headerMd->getTypeByName(name);
-
-		if (type == NULL){
-			cerr << "Error when parsing fifo, structure "<< name << " has not beend found";
-			exit(0);
-		}
-
-		setFifoStruct(name, type);
-		
-	}
-}
-
-void FifoMng::parseFifoFunctions(){
-	
-	// Iterate though functions of header 
-	for (Module::iterator I = headerMd->begin(), E = headerMd->end(); I != E; ++I) {
-		string name = I->getName();
-		
-		if (isFifoFunction(name)){
-			setFifoFunction(name, I);
-		}
-	}
-}
-
 StructType* FifoMng::getFifoType(IntegerType* type){
-	map<string,Type*>::iterator it;
-
-	// Struct name 
-	ostringstream structName;
-	structName << "struct.fifo_i" << type->getBitWidth() << "_s";
-
-	it = structAcces.find(structName.str());
-		
-	return cast<StructType>(it->second);
+	//Return corresponding structure
+	return getFifoAccess(type)->getStructType();
 }
 
-
-bool FifoMng::isFifoFunction(string name){
-	if (fifoAccess.find(name)==fifoAccess.end())
-		return false;
-	
-	return true;
-};
-
-void FifoMng::setFifoFunction(std::string name, llvm::Function* function){
-		std::map<std::string,llvm::Function*>::iterator it;
-
-		it = fifoAccess.find(name);
-
-		if (it == fifoAccess.end()){
-			cerr << "Error when setting circular fifo";
-			exit(0);
-		}
-		
-		(*it).second = function;
-}
-
-string FifoMng::funcName(IntegerType* type, string func){
-	ostringstream name;
-
-	name << "i" <<type->getBitWidth()<< "_" << func;
-
-	return name.str();
-}
-
-void FifoMng::addFifoHeader(Decoder* decoder){
+std::map<std::string, llvm::Function*>* FifoMng::addFifoHeader(Decoder* decoder){
 	addFifoType(decoder);
-	addFunctions(decoder);
+	return addFifoFunctions(decoder);
 }
 
 void FifoMng::addFifoType(Decoder* decoder){
 	LLVMWriter writer("", decoder);
 	
 	//Get fifos
-	map<string, Type*>::iterator it;
+	map<string,const StructType*>::iterator it;
 
-	for (it = structAcces.begin(); it != structAcces.end(); ++it){
+	for (it = fifoStructs.begin(); it != fifoStructs.end(); ++it){
 		writer.addType(it->first, it->second);
 	}
 }
 
-void FifoMng::addFunctions(Decoder* decoder){
+map<string, Function*>* FifoMng::addFifoFunctions(Decoder* decoder){
 	LLVMWriter writer("", decoder);
+	
+	map<string, Function*>* functions = new map<string, Function*>();
 
-	std::map<std::string,llvm::Function*>::iterator itMap;
-
+	map<string, Function*>::iterator itMap;
+	
 	for(itMap = externFunct.begin(); itMap != externFunct.end(); ++itMap){
 		Function* function = writer.addFunctionProtosExternal((*itMap).second);
-		(*itMap).second = function;
+		functions->insert(pair<string, Function*>(itMap->first, function));
 	}
 
-	for(itMap = fifoAccess.begin(); itMap != fifoAccess.end(); ++itMap){
-		Function* function = writer.addFunctionProtosInternal((*itMap).second);
-		writer.linkProcedureBody((*itMap).second);
-		(*itMap).second = function;
+	map<int, FifoAccess*>::iterator itAcc;
+	for (itAcc = fifoAccesses.begin(); itAcc != fifoAccesses.end(); itAcc++){
+		FifoAccess* fifoAccess  = itAcc->second;
+
+		//Write signed functions
+		map<string, Function*>* signedFns = fifoAccess->getSignedFn();
+		for(itMap = signedFns->begin(); itMap != signedFns->end(); ++itMap){
+			Function* function = writer.addFunctionProtosInternal((*itMap).second);
+			writer.linkProcedureBody((*itMap).second);
+			functions->insert(pair<string, Function*>(itMap->first, function));
+		}
+
+		//Write unsigned functions
+		map<string, Function*>* unsignedFns = fifoAccess->getUnsignedFn();
+		for(itMap = unsignedFns->begin(); itMap != unsignedFns->end(); ++itMap){
+			Function* function = writer.addFunctionProtosInternal((*itMap).second);
+			writer.linkProcedureBody((*itMap).second);
+			functions->insert(pair<string, Function*>(itMap->first, function));
+		}
 	}
+
+	return functions;
+}
+FifoMng::FifoAccess* FifoMng::getFifoAccess(llvm::IntegerType* type){
+	map<int, FifoAccess*>::iterator itAcc;
+	
+	itAcc = fifoAccesses.find(type->getBitWidth());
+	if (itAcc == fifoAccesses.end()){
+		cout << "Error : Fifo for tokens of size " << type->getBitWidth() << "does not exist.";
+		exit(1);
+	}
+
+	return itAcc->second;
 }
 
-Function* FifoMng::getPeekFunction(Type* type){
-	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "peek")]];
+Function* FifoMng::getPeekFunction(IntegerType* type, Decoder* decoder){
+	//Todo : this is a fast programming solution, should be rewrite later
+	map<string, Function*>::iterator it;
+	map<string, Function*>* fifoFns = decoder->getFifoFn();
+	stringstream name;
+	name << "fifo_i"<<type->getBitWidth()<< "_peek";
+	it = fifoFns->find(name.str());
+
+	return it->second;
 }
 
-Function* FifoMng::getReadFunction(Type* type){
-	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "read")]];
+Function* FifoMng::getReadFunction(IntegerType* type, Decoder* decoder){
+	//Todo : this is a fast programming solution, should be rewrite later
+	map<string, Function*>::iterator it;
+	map<string, Function*>* fifoFns = decoder->getFifoFn();
+	stringstream name;
+	name << "fifo_i"<<type->getBitWidth()<< "_read";
+	it = fifoFns->find(name.str());
+
+	return it->second;
 }
 
-Function* FifoMng::getWriteFunction(Type* type){
-	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "write")]];
+Function* FifoMng::getWriteFunction(IntegerType* type, Decoder* decoder){
+	//Todo : this is a fast programming solution, should be rewrite later
+	map<string, Function*>::iterator it;
+	map<string, Function*>* fifoFns = decoder->getFifoFn();
+	stringstream name;
+	name << "fifo_i"<<type->getBitWidth()<< "_write";
+	it = fifoFns->find(name.str());
+
+	return it->second;
 }
 
-Function* FifoMng::getHasTokenFunction(Type* type){
-	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "hasToken")]];
+Function* FifoMng::getHasTokenFunction(IntegerType* type, Decoder* decoder){
+	
+	//Todo : this is a fast programming solution, should be rewrite later
+	map<string, Function*>::iterator it;
+	map<string, Function*>* fifoFns = decoder->getFifoFn();
+	stringstream name;
+	name << "fifo_i"<<type->getBitWidth()<< "_has_tokens";
+	it = fifoFns->find(name.str());
+
+	return it->second;
 }
 
-Function* FifoMng::getHasRoomFunction(Type* type){
-	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "hasRoom")]];
+Function* FifoMng::getHasRoomFunction(IntegerType* type, Decoder* decoder){
+	//Todo : this is a fast programming solution, should be rewrite later
+	map<string, Function*>::iterator it;
+	map<string, Function*>* fifoFns = decoder->getFifoFn();
+	stringstream name;
+	name << "fifo_i"<<type->getBitWidth()<< "_has_room";
+	it = fifoFns->find(name.str());
+
+	return it->second;
 }
 
-Function* FifoMng::getWriteEndFunction(Type* type){
-	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "writeEnd")]];
+Function* FifoMng::getWriteEndFunction(IntegerType* type, Decoder* decoder){
+	//Todo : this is a fast programming solution, should be rewrite later
+	map<string, Function*>::iterator it;
+	map<string, Function*>* fifoFns = decoder->getFifoFn();
+	stringstream name;
+	name << "fifo_i"<<type->getBitWidth()<< "_write_end";
+	it = fifoFns->find(name.str());
+
+	return it->second;
 }
 
-Function* FifoMng::getReadEndFunction(Type* type){	
-	return fifoAccess[fifoFunct[funcName(cast<IntegerType>(type), "readEnd")]];
+Function* FifoMng::getReadEndFunction(IntegerType* type, Decoder* decoder){	
+	//Todo : this is a fast programming solution, should be rewrite later
+	map<string, Function*>::iterator it;
+	map<string, Function*>* fifoFns = decoder->getFifoFn();
+	stringstream name;
+	name << "fifo_i"<<type->getBitWidth()<< "_read_end";
+	it = fifoFns->find(name.str());
+
+	return it->second;
 }
 
 void FifoMng::refineActor(Actor* actor){
 	refineStructures(actor);
-	refineFunctions(actor);
 }
 
 void FifoMng::refineStructures(Actor* actor){
-	map<string, Type*>::iterator it;
 	
-	for (it = structAcces.begin(); it != structAcces.end(); ++it){
+	map<string, const StructType*>::iterator it;
+	Module* module = actor->getModule();
+
+	for (it = fifoStructs.begin(); it != fifoStructs.end(); ++it){
 		
 		//Get opaquetype of the current fifo in the actor
-		Type* type = actor->getFifoType(it->first);
+		const Type* type = module->getTypeByName(it->first);
 		if (type == NULL){
 			continue;
 		}
 
-		if (isa<OpaqueType>(type)){
-			OpaqueType* opaqueFifoType = cast<OpaqueType>(type);
-
+		if (type->isAbstract()){	
 			//Refine opaque type of the corresponding fifo structure
-			opaqueFifoType->refineAbstractTypeTo(it->second);
+			PATypeHolder Ty(type);
+			cast<DerivedType>(Ty.get())->refineAbstractTypeTo(it->second);
 		}
-	}
-}
-
-void FifoMng::refineFunctions(Actor* actor){
-	/*map<string, Type*>::iterator it;
-	
-	for (it = fifoAccess.begin(); it != fifoAccess.end(); ++it){
-		
-		//Get opaquetype of the current fifo in the actor
-		Type* type = actor->getFifoType(it->first);
-		if (type == NULL){
-			continue;
-		}
-
-		if (isa<OpaqueType>(type)){
-			OpaqueType* opaqueFifoType = cast<OpaqueType>(type);
-
-			//Refine opaque type of the corresponding fifo structure
-			opaqueFifoType->refineAbstractTypeTo(it->second);
-		}
-	}*/
-}
-
-void FifoMng::fifoMap(){
-	fifoFunct["i8_peek"] = "fifo_i8_peek";
-	fifoFunct["i8_write"] = "fifo_i8_write";
-	fifoFunct["i8_read"] = "fifo_i8_read";
-	fifoFunct["i8_hasToken"] = "fifo_i8_has_tokens";
-	fifoFunct["i8_hasRoom"] = "fifo_i8_has_room";
-	fifoFunct["i8_writeEnd"] = "fifo_i8_write_end";
-	fifoFunct["i8_readEnd"] = "fifo_i8_read_end";
-
-	fifoFunct["i16_peek"] = "fifo_i16_peek";
-	fifoFunct["i16_write"] = "fifo_i16_write";
-	fifoFunct["i16_read"] = "fifo_i16_read";
-	fifoFunct["i16_hasToken"] = "fifo_i16_has_tokens";
-	fifoFunct["i16_hasRoom"] = "fifo_i16_has_room";
-	fifoFunct["i16_writeEnd"] = "fifo_i16_write_end";
-	fifoFunct["i16_readEnd"] = "fifo_i16_read_end";
-
-	fifoFunct["i32_peek"] = "fifo_i32_peek";
-	fifoFunct["i32_write"] = "fifo_i32_write";
-	fifoFunct["i32_read"] = "fifo_i32_read";
-	fifoFunct["i32_hasToken"] = "fifo_i32_has_tokens";
-	fifoFunct["i32_hasRoom"] = "fifo_i32_has_room";
-	fifoFunct["i32_writeEnd"] = "fifo_i32_write_end";
-	fifoFunct["i32_readEnd"] = "fifo_i32_read_end";
-
-	fifoFunct["i64_peek"] = "fifo_i64_peek";
-	fifoFunct["i64_write"] = "fifo_i64_write";
-	fifoFunct["i64_read"] = "fifo_i64_read";
-	fifoFunct["i64_hasToken"] = "fifo_i64_has_tokens";
-	fifoFunct["i64_hasRoom"] = "fifo_i64_has_room";
-	fifoFunct["i64_writeEnd"] = "fifo_i64_write_end";
-	fifoFunct["i64_readEnd"] = "fifo_i64_read_end";
-
-	fifoFunct["u8_peek"] = "fifo_u8_peek";
-	fifoFunct["u8_write"] = "fifo_u8_write";
-	fifoFunct["u8_read"] = "fifo_u8_read";
-	fifoFunct["u8_hasToken"] = "fifo_u8_has_tokens";
-	fifoFunct["u8_hasRoom"] = "fifo_u8_has_room";
-	fifoFunct["u8_writeEnd"] = "fifo_u8_write_end";
-	fifoFunct["u8_readEnd"] = "fifo_u8_read_end";
-
-	fifoFunct["u16_peek"] = "fifo_u16_peek";
-	fifoFunct["u16_write"] = "fifo_u16_write";
-	fifoFunct["u16_read"] = "fifo_u16_read";
-	fifoFunct["u16_hasToken"] = "fifo_u16_has_tokens";
-	fifoFunct["u16_hasRoom"] = "fifo_u16_has_room";
-	fifoFunct["u16_writeEnd"] = "fifo_u16_write_end";
-	fifoFunct["u16_readEnd"] = "fifo_u16_read_end";
-
-	fifoFunct["u32_peek"] = "fifo_u32_peek";
-	fifoFunct["u32_write"] = "fifo_u32_write";
-	fifoFunct["u32_read"] = "fifo_u32_read";
-	fifoFunct["u32_hasToken"] = "fifo_u32_has_tokens";
-	fifoFunct["u32_hasRoom"] = "fifo_u32_has_room";
-	fifoFunct["u32_writeEnd"] = "fifo_u32_write_end";
-	fifoFunct["u32_readEnd"] = "fifo_u32_read_end";
-
-	fifoFunct["u64_peek"] = "fifo_u64_peek";
-	fifoFunct["u64_write"] = "fifo_u64_write";
-	fifoFunct["u64_read"] = "fifo_u64_read";
-	fifoFunct["u64_hasToken"] = "fifo_u64_has_tokens";
-	fifoFunct["u64_hasRoom"] = "fifo_u64_has_room";
-	fifoFunct["u64_writeEnd"] = "fifo_u64_write_end";
-	fifoFunct["u64_readEnd"] = "fifo_u64_read_end";
-
-	// Initialized element 
-	map<string, string>::iterator it;
-	for(it = fifoFunct.begin(); it != fifoFunct.end(); ++it){
-		fifoAccess.insert(pair<string,Function*>((*it).second,NULL));
-	}
-}
-
-void FifoMng::structMap(){
-	structName["char_s"] = "struct.fifo_i8_s";
-	structName["short_s"] = "struct.fifo_i16_s";
-	structName["int_s"] = "struct.fifo_i32_s";
-	structName["long_s"] = "struct.fifo_i64_s";
-
-	// Initialized element
-	map<string, string>::iterator it;
-	for(it = structName.begin(); it != structName.end(); ++it){
-		structAcces.insert(pair<string,Type*>((*it).second,NULL));
 	}
 }

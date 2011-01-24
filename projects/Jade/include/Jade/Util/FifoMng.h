@@ -49,6 +49,7 @@
 #include "Jade/Fifo/AbstractFifo.h"
 
 namespace llvm{
+	class MDNode;
 	class Module;
 }
 
@@ -65,88 +66,149 @@ class Decoder;
  * 
  */
 class FifoMng {
+private:
+	/**
+	* @class FifoMng
+	*
+	*  This class is internal to FifoMng and is used to store every fifo access
+	*
+	* @author Jerome Gorin
+	* 
+	*/
+	class FifoAccess{
+	public:
+		FifoAccess(int tokenSize, std::string structName, llvm::StructType* structType, std::map<std::string, llvm::Function*>* signedFn, std::map<std::string, llvm::Function*>* unsignedFn){
+			this->tokenSize = tokenSize;
+			this->structType = structType;
+			this->structName = structName;
+			this->signedFn = signedFn;
+			this->unsignedFn = unsignedFn;
+		}
+
+		int getTokenSize(){return tokenSize;};
+
+		std::map<std::string, llvm::Function*>* getSignedFn(){return signedFn;};
+		std::map<std::string, llvm::Function*>* getUnsignedFn(){return unsignedFn;};
+		llvm::StructType* getStructType(){return structType;};
+
+	private:
+		int tokenSize;
+		std::string structName;
+		llvm::StructType* structType;
+		std::map<std::string, llvm::Function*>* signedFn;	
+		std::map<std::string, llvm::Function*>* unsignedFn;
+	};
+
 public:
 
+	/**
+     *  @brief Initializer of FifoMng
+	 *
+	 *	This class MUST be called before any call to static elements,
+	 *    it initializes all structure needed to manage fifos
+     *
+	 *	@param fifoTy : the FifoTy to use for decoders
+	 *
+	 *	@param packageFld : the VTL folder
+     */
 	static void setFifoTy(FifoTy fifoTy, std::string packageFld);
 
+	/**
+     *  @brief Filename of the fifo to parse
+	 *
+	 *	@return filename of the fifo to parse
+     */
 	static std::string getFifoFilename(){return fifoFiles[fifoTy];};
 
+	/**
+     *  @brief Filename of the extern function module to parse
+	 *
+	 *	@return filename of the extern function module to parse
+     */
 	static std::string getExternFnFilename(){return externFnFile;};
 
+	/**
+     *  @brief Return the folder of the VTL
+	 *
+	 *	@return folder of the VTL
+     */
 	static std::string getPackageFolder(){return packageFolder;};
 
-	static llvm::StructType* getFifoType(llvm::IntegerType* type);
-
 	/**
-     *  @brief return true if the given name correspong to a function name
-     *
-	 *  @param name : std::string of function to look for
+     *  @brief Return the llvm::StructType for a fifo
 	 *
-	 *	@Return true if the given name correspond to a fifo function, otherwise false.
+	 *   Return the llvm::StructType for fifo corresponding to the given llvm::IntegerType
+	 *
+	 *	@param type : the llvm::IntegerType token size of the fifo
+	 *
+	 *	@return the corresponding llvm::StructType
      */
-	static bool isFifoFunction(std::string name);
+	static llvm::StructType* getFifoType(llvm::IntegerType* type);
 
 	/**
      *  @brief Getter of peek function
      *
 	 *	@Return the llvm::Function of peek function in the final decoder
      */
-	static llvm::Function* getPeekFunction(llvm::Type* type);
+	static llvm::Function* getPeekFunction(llvm::IntegerType* type, Decoder* decoder);
 
 	/**
      *  @brief Getter of read function
      *
 	 *	@Return the llvm::Function of read function in the final decoder
      */
-	static llvm::Function* getReadFunction(llvm::Type* type);
+	static llvm::Function* getReadFunction(llvm::IntegerType* type, Decoder* decoder);
 
 	/**
      *  @brief Getter of write function
      *
 	 *	@Return the llvm::Function of write function in the final decoder
      */
-	static llvm::Function* getWriteFunction(llvm::Type* type);
+	static llvm::Function* getWriteFunction(llvm::IntegerType* type, Decoder* decoder);
 
 	/**
      *  @brief Getter of hasToken function
      *
 	 *	@Return the llvm::Function of hasToken function in the final decoder
      */
-	static llvm::Function* getHasTokenFunction(llvm::Type* type);
+	static llvm::Function* getHasTokenFunction(llvm::IntegerType* type, Decoder* decoder);
 
 	/**
      *  @brief Getter of hasRoom function
      *
 	 *	@Return the llvm::Function of hasRoom function in the final decoder
      */
-	static llvm::Function* getHasRoomFunction(llvm::Type* type);
+	static llvm::Function* getHasRoomFunction(llvm::IntegerType* type, Decoder* decoder);
 
 	/**
      *  @brief Getter of writeEnd function
      *
 	 *	@Return the llvm::Function of writeEnd function in the final decoder
      */
-	static llvm::Function* getWriteEndFunction(llvm::Type* type);
+	static llvm::Function* getWriteEndFunction(llvm::IntegerType* type, Decoder* decoder);
 
 	/**
      *  @brief Getter of readEnd function
      *
 	 *	@Return the llvm::Function of readEnd function in the final decoder
      */
-	static llvm::Function* getReadEndFunction(llvm::Type* type);
+	static llvm::Function* getReadEndFunction(llvm::IntegerType* type, Decoder* decoder);
 
 	/**
-	 *  @brief Getter of fifo structure
+     *  @brief Create a new fifo
 	 *
-	 *      Return the llvm::Type of the fifo structure
+	 *	Return a new fifo corresponding to the one selected with the given parameter
+     *
+	 *	@param C : the llvm::LLVMContext
 	 *
-	 *  @return llvm::Type of the fifo
+	 *  @param decoder : the Decoder used
 	 *
-	 */
-	static std::map<std::string, llvm::Type*>* getFifoTypes(){
-		return &structAcces;
-	};
-
+	 *  @param type : the llvm::Type of the fifo
+	 *
+	 *  @param size : the number of token the fifo can contain
+	 *
+	 *	@Return the new Fifo
+     */
 	static AbstractFifo* getFifo(llvm::LLVMContext& C, Decoder* decoder, llvm::Type* type, int size);
 
 	/**
@@ -157,29 +219,64 @@ public:
 	 *  @param actor: the Actor to refine
 	 */
 	static void refineActor(Actor* actor);
-	static void addFifoHeader(Decoder* decoder);
-	static void addFifoType(Decoder* decoder);
-	static void addFunctions(Decoder* decoder);
+	
+	/**
+	 *  @brief Add fifo header
+	 *     
+	 *  Add fifo header in the given decoder
+	 *
+	 *  @param decoder: the Decoder where header is add
+	 *
+	 *	@return the corresponding functions in the decoder
+	 */
+	static std::map<std::string, llvm::Function*>* addFifoHeader(Decoder* decoder);
 
 private:
-
+	/**
+	 *  @brief Add fifo functions
+	 *     
+	 *  Add fifo functions in the given decoder
+	 *
+	 *  @param decoder: the Decoder where functions are add
+	 *
+	 *	@return the corresponding functions in the decoder
+	 */
+	static std::map<std::string, llvm::Function*>* addFifoFunctions(Decoder* decoder);
+	/**
+	 *  @brief Add fifo type
+	 *     
+	 *  Add fifo types in the given decoder
+	 *
+	 *  @param decoder: the Decoder where types are add
+	 */
+	static void addFifoType(Decoder* decoder);
 
 	/**
-    * @brief parses Fifos
+    * @brief parses the Modules required
 	*
 	* Parse modules declared in an Abstract Fifo to get the fifo information
+    */
+	static void parseModules();
+
+	/**
+    * @brief parses the Fifos contained in the module
     */
 	static void parseFifos();
 
 	/**
-    * @brief Fifo function name
+    * @brief parses the FifoFunction
     */
-	static void fifoMap();
+	static std::map<std::string, llvm::Function*>* parseFifoFn(llvm::MDNode* functionMD);
 
 	/**
-    * @brief Fifo structure name
+    * @brief parses the FifoStruct
     */
-	static void structMap();
+	static std::pair<std::string, llvm::StructType*> parseFifoStruct(llvm::MDNode* structMD);
+
+	/**
+    * @brief parses a Fifo
+    */
+	static FifoAccess* parseFifo(llvm::MDNode* node);
 
 	/**
     * @brief Parse extern functions
@@ -187,39 +284,14 @@ private:
 	static void parseExternFunctions();
 
 	/**
-    * @brief Parse fifo structures
-    */
-	static void parseFifoStructs();
-
-	/**
-    * @brief Parse fifo functions
-    */
-	static void parseFifoFunctions();
-
-	/**
-    * @brief Set a fifo structure
-    */
-	static void setFifoStruct(std::string name, llvm::Type* type);
-
-	/**
-    * @brief Set a fifo function
-    */
-	static void setFifoFunction(std::string name, llvm::Function* function);
-
-	/**
     * @brief Defines the name of a fifo according to the bitwidth
     */
-	static std::string funcName(llvm::IntegerType* type, std::string func);
+	static FifoMng::FifoAccess* getFifoAccess(llvm::IntegerType* type);
 
 	/**
 	 *  @brief refine fifo structures of the actor
 	 */
 	static void refineStructures(Actor* actor);
-
-	/**
-	 *  @brief refine fifo functions of the actor
-	 */
-	static void refineFunctions(Actor* actor);
 
 	/** Fifo type */
 	static FifoTy fifoTy;
@@ -245,17 +317,11 @@ private:
 	/** Extern structs */
 	static std::list<llvm::Function*> externStruct;
 
-	/** Fifo structs and their corresponding name*/
-	static std::map<std::string,std::string> structName;
-
 	/** Fifo structs and their corresponding llvm::struct */
-	static std::map<std::string,llvm::Type*> structAcces;
-
-	/** Fifo functions and their corresponding name */
-	static std::map<std::string,std::string> fifoFunct;
+	static std::map<std::string, const llvm::StructType*> fifoStructs;
 
 	/**Fifo functions and their corresponding llvm::function */
-	static std::map<std::string,llvm::Function*> fifoAccess;
+	static std::map<int, FifoAccess*> fifoAccesses;
 };
 
 #endif

@@ -51,6 +51,7 @@ LLVMWriter::LLVMWriter(string prefix, Decoder* decoder){
 	this->decoder = decoder;
 	this->module = decoder->getModule();
 	this->prefix = prefix;
+	this->fifoFns = decoder->getFifoFn();
 }
 
 GlobalVariable* LLVMWriter::createVariable(GlobalVariable* variable){
@@ -224,16 +225,22 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
 	  for (User::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
 		Value *V;
 		
-		/*if (FifoMng::isFifoFunction((*op)->getName())){
-			//If this function is a fifo function, this function already exist in the module
-			V = FifoMng::getFifoFunction((*op)->getName());
-		} else if(FifoMng::isExternFunction((*op)->getName())){
-			//Same for external function
-			V = FifoMng::getExternFunction((*op)->getName());
-		} else {*/
+		if (isa<Function>(*op) && (fifoFns!=NULL)){
+			map<string, Function*>::iterator it;
+			it = fifoFns->find((*op)->getName());
+
+			if (it != fifoFns->end()){
+				//Link with the corresponding fifo function
+				V = it->second;
+			}else{
+				//Not fifo function, behave normaly
+				V= MapValue(*op, VMap, ModuleLevelChanges);
+				assert(V && "Referenced value not in value map!");
+			}
+		}else{
 			V= MapValue(*op, VMap, ModuleLevelChanges);
 			assert(V && "Referenced value not in value map!");
-		//}
+		}
 		*op = V;
 	  }
 

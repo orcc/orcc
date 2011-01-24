@@ -42,7 +42,7 @@
 #include <string>
 #include <list>
 namespace llvm {
-	class Type;
+	class IntegerType;
 	class StringRef;
 	class GlobalVariable;
 }
@@ -77,7 +77,7 @@ public:
 	 * @param name		:	the Port name
 	 * @param variable	:	the llvm variable corresponding to this port
 	 */
-	Port(std::string name, llvm::Type* type, llvm::GlobalVariable* variable){
+	Port(std::string name, llvm::IntegerType* type, llvm::GlobalVariable* variable){
 		this->name = name; 
 		this->type = type; 
 		this->variable = variable;
@@ -91,7 +91,7 @@ public:
 	 * @param Type		:	the Port Type
 	 * @param name		:	the Port name
 	 */
-	Port(std::string name, llvm::Type* type){
+	Port(std::string name, llvm::IntegerType* type){
 		this->name = name; 
 		this->type = type; 
 		this->variable = NULL;
@@ -122,7 +122,7 @@ public:
 	 * @return Type of the port
 	 *
 	 */
-	llvm::Type* getType(){return type;};
+	llvm::IntegerType* getType(){return type;};
 
 	/**
 	 * @brief Setter of type
@@ -132,7 +132,7 @@ public:
 	 * @param type : llvm::Type of the port
 	 *
 	 */
-	void setType(llvm::Type* type){this->type = type;};
+	void setType(llvm::IntegerType* type){this->type = type;};
 
 
 	/**
@@ -178,7 +178,7 @@ protected:
 	std::string name;
 	
 	/** type of this port. */
-	llvm::Type* type;
+	llvm::IntegerType* type;
 
 	/** the number of tokens consumed by this port. */
 	int tokensConsumed;

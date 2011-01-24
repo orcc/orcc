@@ -65,7 +65,7 @@ class InstancedActor;
  */
 class BroadcastActor  : public Actor {
 public:
-	BroadcastActor(llvm::LLVMContext& C, std::string name, int numOutputs, llvm::Type* type);
+	BroadcastActor(llvm::LLVMContext& C, Decoder* decoder, std::string name, int numOutputs, llvm::IntegerType* type);
 	~BroadcastActor();
 
 	/**
@@ -83,7 +83,7 @@ public:
 	 *  @return llvm::Type of the broadcast
 	 *
      */
-	llvm::Type* getType() {
+	llvm::IntegerType* getType() {
 		return type;
 	};
 
@@ -109,7 +109,7 @@ private:
 	int numOutputs;
 
 	/** Port type of the broadcast */
-	llvm::Type* type;
+	llvm::IntegerType* type;
 	
 	/** Fifo type of the broadcast */
 	AbstractConnector* fifo;

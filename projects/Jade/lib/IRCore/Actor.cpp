@@ -46,11 +46,12 @@
 using namespace std;
 using namespace llvm;
 
-Actor::Actor(string name, string file, map<string, Type*>* fifoTypes, map<string, Port*>* inputs, 
+Actor::Actor(string name, Module* module, string file, map<string, Port*>* inputs, 
 		     map<string, Port*>* outputs, map<string, Variable*>* stateVars,
 			 std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures,
 			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler){
 	this->name = name;
+	this->module = module;
 	this->file = file;
 	this->inputs = inputs;
 	this->outputs = outputs;
@@ -60,7 +61,6 @@ Actor::Actor(string name, string file, map<string, Type*>* fifoTypes, map<string
 	this->parameters = parameters;
 	this->procedures = procedures;
 	this->actionScheduler = actionScheduler;
-	this->fifoTypes = fifoTypes;
 }
 
 Actor::~Actor (){
@@ -119,18 +119,6 @@ Port* Actor::getInput(string portName){
 	it = inputs->find(portName);
 
 	if(it == inputs->end()){
-		return NULL;
-	}
-
-	return (*it).second;
-}
-
-Type* Actor::getFifoType(string name) {
-	map<string, Type*>::iterator it;
-
-	it = fifoTypes->find(name);
-
-	if(it == fifoTypes->end()){
 		return NULL;
 	}
 

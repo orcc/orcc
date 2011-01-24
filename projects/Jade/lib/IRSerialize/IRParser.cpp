@@ -119,7 +119,6 @@ Actor* IRParser::parseActor(string classz){
 	MDString* name = cast<MDString>(nameMD->getOperand(0));
 
 	// Parse actor elements
-	map<string, Type*>* fifos = parseFifos(module);
 	inputs = parsePorts(IRConstant::KEY_INPUTS, module);
 	outputs = parsePorts(IRConstant::KEY_OUTPUTS, module);
 	map<string, Variable*>* parameters =  parseParameters(module);
@@ -129,7 +128,7 @@ Actor* IRParser::parseActor(string classz){
 	list<Action*>* actions = parseActions(IRConstant::KEY_ACTIONS, module);
 	ActionScheduler* actionScheduler = parseActionScheduler(module);
 
-	return new Actor(name->getString(), classz, fifos, inputs, outputs, stateVars, 
+	return new Actor(name->getString(), module, classz, inputs, outputs, stateVars, 
 						parameters, procs, initializes, actions, actionScheduler);
 }
 
@@ -172,33 +171,6 @@ map<string, Port*>* IRParser::parsePorts(string key, Module* module){
 
 	return ports;
 }
-
-
-map<string, Type*>* IRParser::parseFifos(Module* module){
-	map<string,Type*>* fifos = new map<string,Type*>();
-	std::map<std::string, llvm::Type*>::iterator it;
-
-	std::map<std::string, llvm::Type*>* AbstractConnectorTypes = FifoMng::getFifoTypes();
-	
-	for (it = AbstractConnectorTypes->begin(); it != AbstractConnectorTypes->end(); it++){
-		string structName = it->first;
-		fifos->insert(pair<string, Type*>(structName, parseFifo(structName, module)));
-	}	
-
-	return fifos;
-}
-
-Type* IRParser::parseFifo(std::string name, Module* module){
-	Type* type = (Type*)module->getTypeByName(name);
-
-/*	if (type == NULL){
-		fprintf(stderr,"Structure %s hasn't been found in a parsed actor.", name.c_str());
-		exit(0);
-	}
-*/
-	return type;
-}
-
 
 map<string, Procedure*>* IRParser::parseProcs(Module* module){
 	map<string, Procedure*>* procedures = new map<string, Procedure*>();
