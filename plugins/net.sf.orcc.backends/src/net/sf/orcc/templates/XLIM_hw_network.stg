@@ -7,13 +7,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 PrintActorsInstantiation(network) ::=<<
-$network.instances: {instance | $Operations(actorInstance=instance, numberOfReaders=network.numberOfReadersMap.(instance))$}; separator="\n"$
+<network.instances: {instance | <Operations(actorInstance=instance, numberOfReaders=network.numberOfReadersMap.(instance))>}; separator="\n">
 >>
 
 
 Operations(actorInstance, numberOfReaders) ::=<<
-$printActorsPortsInstantiation(actorInstance); separator="\n"$
-$OutputPortFanOut(numberOfReaders); separator="\n"$
+<printActorsPortsInstantiation(actorInstance); separator="\n">
+<OutputPortFanOut(numberOfReaders); separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,13 +21,13 @@ $OutputPortFanOut(numberOfReaders); separator="\n"$
 
 
 printActorsPortsInstantiation(actorInstance) ::=<<
--- $actorInstance.id$
-i_$actorInstance.id$ : component $actorInstance.id$
+-- <actorInstance.id>
+i_<actorInstance.id> : component <actorInstance.id>
 port map(
-	-- $instance.id$ Input(s)
-	$actorInstance.actor.inputs.list: printActorsPortsInstantiationInputs(); separator="\n"$
-	-- $actorInstance.id$ Ouput(s)
-	$actorInstance.actor.outputs.list: printActorsPortsInstantiationOutputs(); separator="\n"$
+	-- <instance.id> Input(s)
+	<actorInstance.actor.inputs.list: printActorsPortsInstantiationInputs(); separator="\n">
+	-- <actorInstance.id> Ouput(s)
+	<actorInstance.actor.outputs.list: printActorsPortsInstantiationOutputs(); separator="\n">
 	
 	CLK	=\> clocks(0),
 	RESET	=\> resets(0)   
@@ -39,10 +39,10 @@ port map(
 // Print Actors Ports Inputs Instantiation 
 
 printActorsPortsInstantiationInputs(port) ::=<<
-$port.name$_DATA =\> ai_$actorInstance.id$_$port.name$_DATA,
-$port.name$_SEND =\>	ai_$actorInstance.id$_$port.name$_SEND,
-$port.name$_ACK =\> ai_$actorInstance.id$_$port.name$_ACK,
-$port.name$_COUNT =\> ai_$actorInstance.id$_$port.name$_COUNT,
+<port.name>_DATA =\> ai_<actorInstance.id>_<port.name>_DATA,
+<port.name>_SEND =\>	ai_<actorInstance.id>_<port.name>_SEND,
+<port.name>_ACK =\> ai_<actorInstance.id>_<port.name>_ACK,
+<port.name>_COUNT =\> ai_<actorInstance.id>_<port.name>_COUNT,
 
 >>
 
@@ -50,11 +50,11 @@ $port.name$_COUNT =\> ai_$actorInstance.id$_$port.name$_COUNT,
 // Print Actors Ports Outputs Instantiation 
 
 printActorsPortsInstantiationOutputs(port) ::=<<
-$port.name$_DATA =\> ao_$actorInstance.id$_$port.name$_DATA,
-$port.name$_SEND =\> ao_$actorInstance.id$_$port.name$_SEND,
-$port.name$_ACK =\> ao_$actorInstance.id$_$port.name$_ACK,
-$port.name$_COUNT =\> ao_$actorInstance.id$_$port.name$_COUNT,
-$port.name$_RDY =\> ao_$actorInstance.id$_$port.name$_RDY,
+<port.name>_DATA =\> ao_<actorInstance.id>_<port.name>_DATA,
+<port.name>_SEND =\> ao_<actorInstance.id>_<port.name>_SEND,
+<port.name>_ACK =\> ao_<actorInstance.id>_<port.name>_ACK,
+<port.name>_COUNT =\> ao_<actorInstance.id>_<port.name>_COUNT,
+<port.name>_RDY =\> ao_<actorInstance.id>_<port.name>_RDY,
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,32 +62,32 @@ $port.name$_RDY =\> ao_$actorInstance.id$_$port.name$_RDY,
 
 
 OutputPortFanOut(numberOfReaders) ::=<<
-$actorInstance.actor.outputs.list : {port | $printActorsFanOutOutput(port=port, numberOfReaders=numberOfReaders)$}; separator="\n"$
+<actorInstance.actor.outputs.list : {port | <printActorsFanOutOutput(port=port, numberOfReaders=numberOfReaders)>}; separator="\n">
 >>
 
 printActorsFanOutOutput(port, numberOfReaders) ::=<<
-f_ao_$actorInstance.id$_$port.name$ : entity SystemBuilder.Fanout( behavioral )
-generic map ( fanout =\> $numberOfReaders.(port)$, width =\> $if(port.type.size)$$port.type.size$$else$1$endif$ )
+f_ao_<actorInstance.id>_<port.name> : entity SystemBuilder.Fanout( behavioral )
+generic map ( fanout =\> <numberOfReaders.(port)>, width =\> <if(port.type.size)><port.type.size><else>1<endif> )
 port map (
-	$if(port.type.bool)$
-	In_DATA(0) =\> ao_$actorInstance.id$_$port.name$_DATA,
-	$else$
-	In_DATA =\> ao_$actorInstance.id$_$port.name$_DATA,
-	$endif$
-	In_SEND =\> ao_$actorInstance.id$_$port.name$_SEND,
-	In_ACK =\> ao_$actorInstance.id$_$port.name$_ACK,
-	In_COUNT =\>	ao_$actorInstance.id$_$port.name$_COUNT,
-	In_RDY =\> ao_$actorInstance.id$_$port.name$_RDY,
+<if(port.type.bool)>
+	In_DATA(0) =\> ao_<actorInstance.id>_<port.name>_DATA,
+<else>
+	In_DATA =\> ao_<actorInstance.id>_<port.name>_DATA,
+<endif>
+	In_SEND =\> ao_<actorInstance.id>_<port.name>_SEND,
+	In_ACK =\> ao_<actorInstance.id>_<port.name>_ACK,
+	In_COUNT =\> ao_<actorInstance.id>_<port.name>_COUNT,
+	In_RDY =\> ao_<actorInstance.id>_<port.name>_RDY,
 
-	$if(port.type.bool)$
-	Out_DATA(0) =\> aof_$actorInstance.id$_$port.name$_DATA,
-	$else$
-	Out_DATA =\> aof_$actorInstance.id$_$port.name$_DATA,
-	$endif$
-	Out_SEND =\> aof_$actorInstance.id$_$port.name$_SEND,
-	Out_ACK	=\> aof_$actorInstance.id$_$port.name$_ACK,
-	Out_COUNT =\> aof_$actorInstance.id$_$port.name$_COUNT,
-	Out_RDY =\> aof_$actorInstance.id$_$port.name$_RDY,
+<if(port.type.bool)>
+	Out_DATA(0) =\> aof_<actorInstance.id>_<port.name>_DATA,
+<else>
+	Out_DATA =\> aof_<actorInstance.id>_<port.name>_DATA,
+<endif>
+	Out_SEND =\> aof_<actorInstance.id>_<port.name>_SEND,
+	Out_ACK	=\> aof_<actorInstance.id>_<port.name>_ACK,
+	Out_COUNT =\> aof_<actorInstance.id>_<port.name>_COUNT,
+	Out_RDY =\> aof_<actorInstance.id>_<port.name>_RDY,
 
 	CLK =\> clocks(0),
 	RESET =\> resets(0)
@@ -95,32 +95,32 @@ port map (
 >>
 
 NetworkInputFanoutInstantiation(network) ::=<<
-$network.inputs.list: printNetworkFanOutInputInstantiation(); separator="\n"$
+<network.inputs.list: printNetworkFanOutInputInstantiation(); separator="\n">
 >>
 
 printNetworkFanOutInputInstantiation(port) ::=<<
-f_ni_$port.name$ : entity SystemBuilder.Fanout( behavioral )
-generic map ( fanout =\> $network.inputNumberOfReadersMap.(port)$, width =\> $if(port.type.size)$$port.type.size$$else$1$endif$ )
+f_ni_<port.name> : entity SystemBuilder.Fanout( behavioral )
+generic map ( fanout =\> <network.inputNumberOfReadersMap.(port)>, width =\> <if(port.type.size)><port.type.size><else>1<endif> )
 port map (
-	$if(port.type.bool)$
-	In_DATA(0) =\> ni_$port.name$_DATA,
-	$else$
-	In_DATA =\> ni_$port.name$_DATA,
-	$endif$
-	In_SEND =\> ni_$port.name$_SEND,
-	In_ACK =\> ni_$port.name$_ACK,
-	In_COUNT =\>	ni_$port.name$_COUNT,
-	In_RDY =\> ni_$port.name$_RDY,
+<if(port.type.bool)>
+	In_DATA(0) =\> ni_<port.name>_DATA,
+<else>
+	In_DATA =\> ni_<port.name>_DATA,
+<endif>
+	In_SEND =\> ni_<port.name>_SEND,
+	In_ACK =\> ni_<port.name>_ACK,
+	In_COUNT =\> ni_<port.name>_COUNT,
+	In_RDY =\> ni_<port.name>_RDY,
 
-	$if(port.type.bool)$
-	Out_DATA(0) =\> nif_$port.name$_DATA,
-	$else$
-	Out_DATA =\>	nif_$port.name$_DATA,
-	$endif$
-	Out_SEND =\>	nif_$port.name$_SEND,
-	Out_ACK =\> nif_$port.name$_ACK,
-	Out_COUNT =\> nif_$port.name$_COUNT,
-	Out_RDY =\> nif_$port.name$_RDY,
+<if(port.type.bool)>
+	Out_DATA(0) =\> nif_<port.name>_DATA,
+<else>
+	Out_DATA =\> nif_<port.name>_DATA,
+<endif>
+	Out_SEND =\> nif_<port.name>_SEND,
+	Out_ACK =\> nif_<port.name>_ACK,
+	Out_COUNT =\> nif_<port.name>_COUNT,
+	Out_RDY =\> nif_<port.name>_RDY,
 
 	CLK   =\> clocks(0),
 	RESET =\> resets(0)
@@ -132,62 +132,62 @@ port map (
 // Assign FIFOs
 ///////////////////////////////////////////////////////////////////////////////
 AssignFifos(edges) ::= <<
-$edges: assignFifo()$
+<edges: assignFifo()>
 >>
 
 assignFifo(edge) ::= <<
-$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+<tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$
+<
 if (src.instance)
 
-$$
+><
   if (tgt.instance)
-$
-$doAssignFifo(
+>
+<doAssignFifo(
   source=src.instance, sourcePort=edge.source,
-  target=tgt.instance, targetPort=edge.target)$$
+  target=tgt.instance, targetPort=edge.target)><
   else
-  $
-$assignIn(source=src.instance, sourcePort=edge.source)$$
+  >
+<assignIn(source=src.instance, sourcePort=edge.source)><
   endif
-$$
+><
 else
-$$
+><
   if (tgt.instance)
-  $
-$assignOut(target=tgt.instance, targetPort=edge.target)$$
+  >
+<assignOut(target=tgt.instance, targetPort=edge.target)><
   endif
-  $$
+  ><
 endif
-$
+>
 
 >>
 
 doAssignFifo(source, sourcePort, target, targetPort) ::= <<
-q_ai_$target.id$_$targetPort.name$ : entity SystemBuilder.Queue( behavioral )
-generic map( length =\> $if(edge.size)$$edge.size$$else$1$endif$, width =\> $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
+q_ai_<target.id>_<targetPort.name> : entity SystemBuilder.Queue( behavioral )
+generic map( length =\> <if(edge.size)><edge.size><else>1<endif>, width =\> <if(sourcePort.type.size)><sourcePort.type.size><else>1<endif> )
 port map (
-	$if(sourcePort.type.bool)$
-	Out_DATA(0) =\> ai_$target.id$_$targetPort$_DATA,
-	$else$
-	Out_DATA =\> ai_$target.id$_$targetPort$_DATA,
-	$endif$
-	Out_SEND =\> ai_$target.id$_$targetPort$_SEND,
-	Out_ACK =\> ai_$target.id$_$targetPort$_ACK,
-	Out_COUNT =\> ai_$target.id$_$targetPort$_COUNT,
+<if(sourcePort.type.bool)>
+	Out_DATA(0) =\> ai_<target.id>_<targetPort>_DATA,
+<else>
+	Out_DATA =\> ai_<target.id>_<targetPort>_DATA,
+<endif>
+	Out_SEND =\> ai_<target.id>_<targetPort>_SEND,
+	Out_ACK =\> ai_<target.id>_<targetPort>_ACK,
+	Out_COUNT =\> ai_<target.id>_<targetPort>_COUNT,
 
-	$if(sourcePort.type.bool)$
-	In_DATA(0) =\> aof_$source.id$_$sourcePort.name$_DATA,
-	$else$
-	In_DATA =\> aof_$source.id$_$sourcePort.name$_DATA,
-	$endif$
-	In_SEND =\> aof_$source.id$_$sourcePort.name$_SEND( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
-	In_ACK =\> aof_$source.id$_$sourcePort.name$_ACK( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
-	In_COUNT =\> aof_$source.id$_$sourcePort.name$_COUNT,
- 	In_RDY =\> aof_$source.id$_$sourcePort.name$_RDY( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
+<if(sourcePort.type.bool)>
+	In_DATA(0) =\> aof_<source.id>_<sourcePort.name>_DATA,
+<else>
+	In_DATA =\> aof_<source.id>_<sourcePort.name>_DATA,
+<endif>
+	In_SEND =\> aof_<source.id>_<sourcePort.name>_SEND( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
+	In_ACK =\> aof_<source.id>_<sourcePort.name>_ACK( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
+	In_COUNT =\> aof_<source.id>_<sourcePort.name>_COUNT,
+ 	In_RDY =\> aof_<source.id>_<sourcePort.name>_RDY( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
 
 	clk =\> clocks(0),
 	reset =\> resets(0)
@@ -197,27 +197,27 @@ port map (
 >>
 
 assignIn(source, sourcePort) ::= <<
-q_no_$tgt.port$ : entity SystemBuilder.Queue( behavioral )
-generic map( length =\> $if(edge.size)$$edge.size$$else$1$endif$, width =\> $if(sourcePort.type.size)$$sourcePort.type.size$$else$1$endif$ )
+q_no_<tgt.port> : entity SystemBuilder.Queue( behavioral )
+generic map( length =\> <if(edge.size)><edge.size><else>1<endif>, width =\> <if(sourcePort.type.size)><sourcePort.type.size><else>1<endif> )
 port map (
- 	$if(sourcePort.type.bool)$
- 	Out_DATA(0) =\> no_$tgt.port$_DATA,
-	$else$
-	Out_DATA =\> no_$tgt.port$_DATA,
-	$endif$
-	Out_SEND =\> no_$tgt.port$_SEND,
-	Out_ACK =\> no_$tgt.port$_ACK,
-	Out_COUNT =\> no_$tgt.port$_COUNT,
+ 	<if(sourcePort.type.bool)>
+ 	Out_DATA(0) =\> no_<tgt.port>_DATA,
+	<else>
+	Out_DATA =\> no_<tgt.port>_DATA,
+	<endif>
+	Out_SEND =\> no_<tgt.port>_SEND,
+	Out_ACK =\> no_<tgt.port>_ACK,
+	Out_COUNT =\> no_<tgt.port>_COUNT,
 	
-	$if(sourcePort.type.bool)$
-	In_DATA(0) =\> aof_$source.id$_$sourcePort.name$_DATA,
-	$else$
-	In_DATA =\> aof_$source.id$_$sourcePort.name$_DATA,
-	$endif$
-	In_SEND =\> aof_$source.id$_$sourcePort.name$_SEND( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
-	In_ACK =\> aof_$source.id$_$sourcePort.name$_ACK( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
-	In_COUNT =\> aof_$source.id$_$sourcePort.name$_COUNT,
-	In_RDY =\> aof_$source.id$_$sourcePort.name$_RDY( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
+	<if(sourcePort.type.bool)>
+	In_DATA(0) =\> aof_<source.id>_<sourcePort.name>_DATA,
+	<else>
+	In_DATA =\> aof_<source.id>_<sourcePort.name>_DATA,
+	<endif>
+	In_SEND =\> aof_<source.id>_<sourcePort.name>_SEND( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
+	In_ACK =\> aof_<source.id>_<sourcePort.name>_ACK( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
+	In_COUNT =\> aof_<source.id>_<sourcePort.name>_COUNT,
+	In_RDY =\> aof_<source.id>_<sourcePort.name>_RDY( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
 
 	clk =\> clocks(0),
 	reset =\> resets(0)
@@ -226,28 +226,28 @@ port map (
 >>
 
 assignOut(target, targetPort) ::= <<
-q_ai_$target.id$_$targetPort.name$ : entity SystemBuilder.Queue( behavioral )
-generic map( length =\> $if(edge.size)$$edge.size$$else$1$endif$, width =\> $if(targetPort.type.size)$$targetPort.type.size$$else$1$endif$ )
+q_ai_<target.id>_<targetPort.name> : entity SystemBuilder.Queue( behavioral )
+generic map( length =\> <if(edge.size)><edge.size><else>1<endif>, width =\> <if(targetPort.type.size)><targetPort.type.size><else>1<endif> )
 
 port map (
-	$if(targetPort.type.bool)$
-	Out_DATA(0) =\> ai_$target.id$_$targetPort.name$_DATA,
-	$else$
-	Out_DATA =\> ai_$target.id$_$targetPort.name$_DATA,
-	$endif$
-	Out_SEND =\> ai_$target.id$_$targetPort.name$_SEND,
-	Out_ACK =\> ai_$target.id$_$targetPort.name$_ACK,
-	Out_COUNT =\> ai_$target.id$_$targetPort.name$_COUNT,
+	<if(targetPort.type.bool)>
+	Out_DATA(0) =\> ai_<target.id>_<targetPort.name>_DATA,
+	<else>
+	Out_DATA =\> ai_<target.id>_<targetPort.name>_DATA,
+	<endif>
+	Out_SEND =\> ai_<target.id>_<targetPort.name>_SEND,
+	Out_ACK =\> ai_<target.id>_<targetPort.name>_ACK,
+	Out_COUNT =\> ai_<target.id>_<targetPort.name>_COUNT,
 	
-	$if(targetPort.type.bool)$
-	In_DATA(0) =\> nif_$src.port$_DATA,
-	$else$
-	In_DATA =\> nif_$src.port$_DATA,
-	$endif$
-	In_SEND =\> nif_$src.port$_SEND( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
-	In_ACK =\> nif_$src.port$_ACK( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
-	In_COUNT =\>	nif_$src.port$_COUNT,
-	In_RDY =\> nif_$src.port$_RDY( $if(network.numberOfConnectionReadersMap.(edge))$$network.numberOfConnectionReadersMap.(edge)$$else$0$endif$ ),
+	<if(targetPort.type.bool)>
+	In_DATA(0) =\> nif_<src.port>_DATA,
+	<else>
+	In_DATA =\> nif_<src.port>_DATA,
+	<endif>
+	In_SEND =\> nif_<src.port>_SEND( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
+	In_ACK =\> nif_<src.port>_ACK( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
+	In_COUNT =\> nif_<src.port>_COUNT,
+	In_RDY =\> nif_<src.port>_RDY( <if(network.numberOfConnectionReadersMap.(edge))><network.numberOfConnectionReadersMap.(edge)><else>0<endif> ),
 
 	clk =\> clocks(0),
 	reset =\> resets(0)
@@ -260,32 +260,32 @@ port map (
 
 PrintNetworkPortsInstantiation(network) ::=<<
 -- Network Output Port(s) Instantiation
-$network.outputs.list: printNetworkOutputPortsInstantiation(); separator="\n"$
+<network.outputs.list: printNetworkOutputPortsInstantiation(); separator="\n">
 
 -- Network Intput Port(s) Instantiation
-$network.inputs.list: printNetworkInputPortsInstantiation(); separator="\n"$
+<network.inputs.list: printNetworkInputPortsInstantiation(); separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print Network Output Port(s) Instantiation
 
 printNetworkOutputPortsInstantiation(port) ::=<<
-$port.name$_DATA \<=	no_$port.name$_DATA;
-$port.name$_SEND \<= no_$port.name$_SEND;
-no_$port.name$_ACK \<= $port.name$_ACK;
-$port.name$_COUNT \<= no_$port.name$_COUNT;
-no_$port.name$_RDY \<= $port.name$_RDY;$\n$
+<port.name>_DATA \<=	no_<port.name>_DATA;
+<port.name>_SEND \<= no_<port.name>_SEND;
+no_<port.name>_ACK \<= <port.name>_ACK;
+<port.name>_COUNT \<= no_<port.name>_COUNT;
+no_<port.name>_RDY \<= <port.name>_RDY;<\n>
 >> 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print Network Input Port(s) Instantiation
 
 printNetworkInputPortsInstantiation(port) ::=<<
-ni_$port.name$_DATA \<= $port.name$_DATA;
-ni_$port.name$_SEND \<= $port.name$_SEND;
-$port.name$_ACK \<= ni_$port.name$_ACK;
-ni_$port.name$_COUNT \<=	$port.name$_COUNT;
-$port.name$_RDY \<= ni_$port.name$_RDY;$\n$
+ni_<port.name>_DATA \<= <port.name>_DATA;
+ni_<port.name>_SEND \<= <port.name>_SEND;
+<port.name>_ACK \<= ni_<port.name>_ACK;
+ni_<port.name>_COUNT \<= <port.name>_COUNT;
+<port.name>_RDY \<= ni_<port.name>_RDY;<\n>
 >> 
 
 
@@ -294,23 +294,23 @@ $port.name$_RDY \<= ni_$port.name$_RDY;$\n$
 ///////////////////////////////////////////////////////////////////////////////
 
 PrintComponents(network) ::=<<
-$network.instances: printActorsComponents(); separator="\n"$
+<network.instances: printActorsComponents(); separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print Actors Components
 
 printActorsComponents(instance) ::=<<
-component $instance.id$ is
+component <instance.id> is
 port(
-	-- $instance.id$ Input(s)
-	$instance.actor.inputs.list: printActorsComponentsInputs(); separator="\n"$
-	-- $instance.id$ Ouput(s)
-	$instance.actor.outputs.list: printActorsComponentsOutputs(); separator="\n"$
+	-- <instance.id> Input(s)
+	<instance.actor.inputs.list: printActorsComponentsInputs(); separator="\n">
+	-- <instance.id> Ouput(s)
+	<instance.actor.outputs.list: printActorsComponentsOutputs(); separator="\n">
 	
 	CLK: in std_logic;
-	RESET: in std_logic   );
-end component $instance.id$;
+	RESET: in std_logic );
+end component <instance.id>;
 
 >>
 
@@ -318,41 +318,41 @@ end component $instance.id$;
 // Print the Inputs of the Actor Components
 
 printActorsComponentsInputs(port) ::=<<
-$
+<
 if(port.type.bool)
-$
-$port.name$_DATA : in std_logic;
-$
+>
+<port.name>_DATA : in std_logic;
+<
 else
-$
-$port.name$_DATA : in std_logic_vector($port.type.size$ - 1 downto 0);
-$
+>
+<port.name>_DATA : in std_logic_vector(<port.type.size> - 1 downto 0);
+<
 endif
-$
-$port.name$_SEND : in std_logic;
-$port.name$_ACK : out std_logic;
-$port.name$_COUNT : in std_logic_vector(15 downto 0);
+>
+<port.name>_SEND : in std_logic;
+<port.name>_ACK : out std_logic;
+<port.name>_COUNT : in std_logic_vector(15 downto 0);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Print the Outputs of the Actor Components
 
 printActorsComponentsOutputs(port) ::=<<
-$
+<
 if(port.type.bool)
-$
-$port.name$_DATA : out std_logic;
-$
+>
+<port.name>_DATA : out std_logic;
+<
 else
-$
-$port.name$_DATA : out std_logic_vector($port.type.size$ - 1 downto 0);
-$
+>
+<port.name>_DATA : out std_logic_vector(<port.type.size> - 1 downto 0);
+<
 endif
-$
-$port.name$_SEND : out std_logic;
-$port.name$_ACK : in std_logic;
-$port.name$_COUNT : out std_logic_vector(15 downto 0);
-$port.name$_RDY : in std_logic;
+>
+<port.name>_SEND : out std_logic;
+<port.name>_ACK : in std_logic;
+<port.name>_COUNT : out std_logic_vector(15 downto 0);
+<port.name>_RDY : in std_logic;
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -361,40 +361,36 @@ $port.name$_RDY : in std_logic;
 
 PrintSignals(network) ::= <<
 -- Input Port Signals
-$network.inputs.list: printInputPortsSignals(); separator="\n"$
+<network.inputs.list:{ port | <printInputPortsSignals(port=port)>}; separator="\n">
 -- Output Port Signals
-$network.outputs.list: printOutputPortsSignals(); separator="\n"$
+<network.outputs.list:{ port | printOutputPortsSignals(port=port)>}; separator="\n">
 -- Actors I/O Signals
-$network.instances: {instance | $printActorsSignals(instance=instance,numberOfReaders=network.numberOfReadersMap.(instance))$}; separator="\n"$
+<network.instances: { instance | <printActorsSignals(instance=instance,numberOfReaders=network.numberOfReadersMap.(instance))>}; separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Network Input Signals
 
 printInputPortsSignals(port) ::=<<
-$
-if(port.type.bool)
-$signal ni_$port.name$_DATA : std_logic;$\n$$
-else
-$signal ni_$port.name$_DATA : std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
-endif
-$
-signal ni_$port.name$_SEND : std_logic;
-signal ni_$port.name$_ACK : std_logic;
-signal ni_$port.name$_COUNT : std_logic_vector(15 downto 0);
-signal ni_$port.name$_RDY : std_logic;
+<if(port.type.bool)>
+signal ni_<port.name>_DATA : std_logic;<\n>
+<else>
+signal ni_<port.name>_DATA : std_logic_vector(<port.type.size> - 1 downto 0);<\n>
+<endif>
+signal ni_<port.name>_SEND : std_logic;
+signal ni_<port.name>_ACK : std_logic;
+signal ni_<port.name>_COUNT : std_logic_vector(15 downto 0);
+signal ni_<port.name>_RDY : std_logic;
 
-$if(port.type.bool)$
-signal nif_$port.name$_DATA : std_logic;
-$else$
-signal nif_$port.name$_DATA : std_logic_vector($port.type.size$ - 1 downto 0);
-$
-endif
-$ 
-signal nif_$port.name$_SEND : std_logic_vector($if(network.inputNumberOfReadersMap.(port))$$network.inputNumberOfReadersMap.(port)$$else$1$endif$ - 1 downto 0);
-signal nif_$port.name$_ACK : std_logic_vector($if(network.inputNumberOfReadersMap.(port))$$network.inputNumberOfReadersMap.(port)$$else$1$endif$ - 1 downto 0);
-signal nif_$port.name$_COUNT : std_logic_vector(15 downto 0);
-signal nif_$port.name$_RDY : std_logic_vector($if(network.inputNumberOfReadersMap.(port))$$network.inputNumberOfReadersMap.(port)$$else$1$endif$ - 1 downto 0);$\n$
+<if(port.type.bool)>
+signal nif_<port.name>_DATA : std_logic;
+<else>
+signal nif_<port.name>_DATA : std_logic_vector(<port.type.size> - 1 downto 0);
+<endif> 
+signal nif_<port.name>_SEND : std_logic_vector(<if(network.inputNumberOfReadersMap.(port))><network.inputNumberOfReadersMap.(port)><else>1<endif> - 1 downto 0);
+signal nif_<port.name>_ACK : std_logic_vector(<if(network.inputNumberOfReadersMap.(port))><network.inputNumberOfReadersMap.(port)><else>1<endif> - 1 downto 0);
+signal nif_<port.name>_COUNT : std_logic_vector(15 downto 0);
+signal nif_<port.name>_RDY : std_logic_vector(<if(network.inputNumberOfReadersMap.(port))><network.inputNumberOfReadersMap.(port)><else>1<endif> - 1 downto 0);<\n>
 
 >>
 
@@ -402,82 +398,79 @@ signal nif_$port.name$_RDY : std_logic_vector($if(network.inputNumberOfReadersMa
 // Network Output Signals
 
 printOutputPortsSignals(port) ::=<<
-$if(port.type.bool)$
-signal no_$port.name$_DATA : std_logic;$\n$
-$else$
-signal no_$port.name$_DATA : std_logic_vector($port.type.size$ - 1 downto 0);$\n$
-$
-endif
-$
-signal no_$port.name$_SEND : std_logic;
-signal no_$port.name$_ACK : std_logic;
-signal no_$port.name$_COUNT : std_logic_vector(15 downto 0);
-signal no_$port.name$_RDY : std_logic;$\n$
+<if(port.type.bool)>
+signal no_<port.name>_DATA : std_logic;<\n>
+<else>
+signal no_<port.name>_DATA : std_logic_vector(<port.type.size> - 1 downto 0);<\n>
+<endif>
+signal no_<port.name>_SEND : std_logic;
+signal no_<port.name>_ACK : std_logic;
+signal no_<port.name>_COUNT : std_logic_vector(15 downto 0);
+signal no_<port.name>_RDY : std_logic;<\n>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actors Input / Output Signals
 
 printActorsSignals(instance,numberOfReaders) ::=<<
-$instance.actor.outputs.list: {port | $printActorSigOutput(port=port,numberOfReaders=numberOfReaders)$};  separator="\n"$
-$instance.actor.inputs.list: printActorSigInput()$
+<instance.actor.outputs.list: {port | <printActorSigOutput(port=port,numberOfReaders=numberOfReaders)>};  separator="\n">
+<instance.actor.inputs.list: printActorSigInput()>
 >> 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actors Input Signals
 
 printActorSigInput(port) ::= <<
-$
+<
 if(port.type.bool)
-$
-signal ai_$instance.id$_$port.name$_DATA : std_logic;
-$
+>
+signal ai_<instance.id>_<port.name>_DATA : std_logic;
+<
 else
-$
-signal ai_$instance.id$_$port.name$_DATA : std_logic_vector($port.type.size$ - 1 downto 0);
-$
+>
+signal ai_<instance.id>_<port.name>_DATA : std_logic_vector(<port.type.size> - 1 downto 0);
+<
 endif
-$
-signal ai_$instance.id$_$port.name$_SEND : std_logic;
-signal ai_$instance.id$_$port.name$_ACK : std_logic;
-signal ai_$instance.id$_$port.name$_COUNT : std_logic_vector(15 downto 0);$\n$
+>
+signal ai_<instance.id>_<port.name>_SEND : std_logic;
+signal ai_<instance.id>_<port.name>_ACK : std_logic;
+signal ai_<instance.id>_<port.name>_COUNT : std_logic_vector(15 downto 0);<\n>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actors Ouput Signals
 
 printActorSigOutput(port,numberOfReaders) ::= <<
-$
+<
 if(port.type.bool)
-$
-signal ao_$instance.id$_$port.name$_DATA : std_logic;
-$
+>
+signal ao_<instance.id>_<port.name>_DATA : std_logic;
+<
 else
-$
-signal ao_$instance.id$_$port.name$_DATA : std_logic_vector($port.type.size$ - 1 downto 0);
-$
+>
+signal ao_<instance.id>_<port.name>_DATA : std_logic_vector(<port.type.size> - 1 downto 0);
+<
 endif
-$
-signal ao_$instance.id$_$port.name$_SEND : std_logic;
-signal ao_$instance.id$_$port.name$_ACK : std_logic;
-signal ao_$instance.id$_$port.name$_COUNT : std_logic_vector(15 downto 0);
-signal ao_$instance.id$_$port.name$_RDY : std_logic;
+>
+signal ao_<instance.id>_<port.name>_SEND : std_logic;
+signal ao_<instance.id>_<port.name>_ACK : std_logic;
+signal ao_<instance.id>_<port.name>_COUNT : std_logic_vector(15 downto 0);
+signal ao_<instance.id>_<port.name>_RDY : std_logic;
 
-$
-if(port.type.bool)
-$
-signal aof_$instance.id$_$port.name$_DATA : std_logic;
-$
+
+<if(port.type.bool)>
+signal aof_<instance.id>_<port.name>_DATA : std_logic;
+<
 else
-$
-signal aof_$instance.id$_$port.name$_DATA : std_logic_vector($port.type.size$ - 1 downto 0);
-$
+>
+signal aof_<instance.id>_<port.name>_DATA : std_logic_vector(<port.type.size> - 1 downto 0);
+<
 endif
-$ 
-signal aof_$instance.id$_$port.name$_SEND : std_logic_vector($if(numberOfReaders.(port))$$numberOfReaders.(port)$$else$1$endif$ - 1 downto 0);
-signal aof_$instance.id$_$port.name$_ACK : std_logic_vector($if(numberOfReaders.(port))$$numberOfReaders.(port)$$else$1$endif$ - 1 downto 0);
-signal aof_$instance.id$_$port.name$_COUNT : std_logic_vector(15 downto 0);
-signal aof_$instance.id$_$port.name$_RDY : std_logic_vector($if(numberOfReaders.(port))$$numberOfReaders.(port)$$else$1$endif$ - 1 downto 0);$\n$
+> 
+signal aof_<instance.id>_<port.name>_SEND : std_logic_vector(<if(numberOfReaders.(port))><numberOfReaders.(port)><else>1<endif> - 1 downto 0);
+signal aof_<instance.id>_<port.name>_ACK : std_logic_vector(<if(numberOfReaders.(port))><numberOfReaders.(port)><else>1<endif> - 1 downto 0);
+signal aof_<instance.id>_<port.name>_COUNT : std_logic_vector(15 downto 0);
+signal aof_<instance.id>_<port.name>_RDY : std_logic_vector(<if(numberOfReaders.(port))><numberOfReaders.(port)><else>1<endif> - 1 downto 0);<\n>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -485,22 +478,20 @@ signal aof_$instance.id$_$port.name$_RDY : std_logic_vector($if(numberOfReaders.
 ///////////////////////////////////////////////////////////////////////////////
 
 printNetworkPorts(network) ::= <<
-$network.inputs.list: {port | $ printNetPorts(port=port, dir1="in",dir2="out")$}; separator="\n"$
-$network.outputs.list: {port | $ printNetPorts(port=port, dir1="out",dir2="in")$}; separator="\n"$
+<network.inputs.list: {port | <printNetPorts(port=port, dir1="in",dir2="out")>}; separator="\n">
+<network.outputs.list: {port | <printNetPorts(port=port, dir1="out",dir2="in")>}; separator="\n">
 >>
 
 printNetPorts(port, dir1, dir2) ::= <<
-$
-if(port.type.bool)
-$$port.name$_DATA : $dir1$ std_logic;$\n$$
-else
-$$port.name$_DATA : $dir1$ std_logic_vector($port.type.size$ - 1 downto 0);$\n$$
-endif
-$
-$port.name$_SEND : $dir1$ std_logic;
-$port.name$_ACK : $dir2$ std_logic;
-$port.name$_COUNT : $dir1$ std_logic_vector(15 downto 0);
-$port.name$_RDY : $dir2$ std_logic;
+<if(port.type.bool)>
+<port.name>_DATA : <dir1> std_logic;<\n>
+<else>
+<port.name>_DATA : <dir1> std_logic_vector(<port.type.size> - 1 downto 0);<\n>
+<endif>
+<port.name>_SEND : <dir1> std_logic;
+<port.name>_ACK : <dir2> std_logic;
+<port.name>_COUNT : <dir1> std_logic_vector(15 downto 0);
+<port.name>_RDY : <dir2> std_logic;
 
 >>
 
@@ -510,34 +501,34 @@ $port.name$_RDY : $dir2$ std_logic;
 
 printNetworkInformation(network) ::=<<
 -- ----------------------------------------------------------------------------------
--- Top level model for $network.name$
+-- Top level model for <network.name>
 -- ----------------------------------------------------------------------------------
 
 -- ----------------------------------------------------------------------------------
 --
--- Clock domain report for network Test (1 clock domains detected)
+-- Clock domain report for network <network.name> (1 clock domains detected)
 --    CLK
 --
 --  Clock domains for top-level network ports:
-$network.inputs.list: {port|$printNetworkInformationPorts(port=port, type="Input")$}; separator="\n"$
-$network.outputs.list: {port|$printNetworkInformationPorts(port=port, type="Ouput")$}; separator="\n"$
+<network.inputs.list: {port|<printNetworkInformationPorts(port=port, type="Input")>}; separator="\n">
+<network.outputs.list: {port|<printNetworkInformationPorts(port=port, type="Ouput")>}; separator="\n">
 --
 --  Clock domains for all actor instances:
-$network.instances: printInsancesName(); separator="\n"$
+<network.instances: printInsancesName(); separator="\n">
 --
 -- ----------------------------------------------------------------------------------
 >>
 
 printNetworkInformationPorts(port,type) ::=<<
---    $port.name$ ($type$) --\> CLK
+--    <port.name> (<type>) --\> CLK
 >>
 
 printInsancesName(instance) ::=<<
---    $instance.id$ ($instance.actor.name$) --\> CLK
+--    <instance.id> (<instance.actor.name>) --\> CLK
 >>
 
 network(debugFifos, fifoSize, network, options) ::= <<
-$printNetworkInformation(network)$
+<printNetworkInformation(network)>
 
 library ieee, SystemBuilder;
 use ieee.std_logic_1164.all;
@@ -546,19 +537,19 @@ use ieee.std_logic_1164.all;
 -- Entity Declaration
 -- ----------------------------------------------------------------------------------
 
-entity $network.name$ is
+entity <network.name> is
 port(
-	$printNetworkPorts(network)$
+	<printNetworkPorts(network)>
 	
 	CLK:  	in std_logic;
 	RESET:	in std_logic);
-end entity $network.name$;
+end entity <network.name>;
 
 -- ----------------------------------------------------------------------------------
 -- Architecture Declaration
 -- ----------------------------------------------------------------------------------
 
-architecture rtl of $network.name$ is
+architecture rtl of <network.name> is
 	
 	-- ----------------------------------------------------------------------------------
 	-- Signal Instantiation
@@ -567,13 +558,13 @@ architecture rtl of $network.name$ is
 	-- Clock and Reset signal
 	signal clocks, resets: std_logic_vector(0 downto 0);
 	
-	$PrintSignals(network); separator="\n"$
+	<PrintSignals(network); separator="\n">
 	
 	-- ----------------------------------------------------------------------------------
 	-- Components of Actors found in the Network
 	-- ----------------------------------------------------------------------------------
 	
-	$PrintComponents(network); separator="\n"$
+	<PrintComponents(network); separator="\n">
 	
 begin
 	rcon: entity SystemBuilder.resetController( behavioral )
@@ -586,15 +577,15 @@ begin
 	-- Actors Instantiation 
 	---------------------------------------------------------------------------
   	
-  	$PrintActorsInstantiation(network)$
-  	$AssignFifos(network.connections)$
-  	$NetworkInputFanoutInstantiation(network)$
+  	<PrintActorsInstantiation(network)>
+  	<AssignFifos(network.connections)>
+  	<NetworkInputFanoutInstantiation(network)>
   	
   	---------------------------------------------------------------------------
 	-- Network Ports Instantiation 
 	---------------------------------------------------------------------------
 	
-	$PrintNetworkPortsInstantiation(network); separator="\n"$
+	<PrintNetworkPortsInstantiation(network); separator="\n">
 
 end architecture rtl;
 

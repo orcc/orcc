@@ -2,30 +2,30 @@
 // Override XLIM Templates For XLIM Hardware Generation
 
 initVariable(type, value) ::= <<
-$if(value.listExpr)$\<initValue typeName="List"\> 
-  $value.value: {value | $initVariable(type=type.type, value=value)$}; separator=""$\</initValue\>
-$else$\<initValue size="$if (type.bool)$1$else$$type.size$$endif$" typeName="$type$" value="$if (value)$$value$$else$0$endif$"/\>
-$endif$
+<if(value.listExpr)>\<initValue typeName="List"\> 
+  <value.value: {value | <initVariable(type=type.type, value=value)>}; separator="">\</initValue\>
+<else>\<initValue size="<if (type.bool)>1<else><type.size><endif>" typeName="<type>" value="<if (value)><value><else>0<endif>"/\>
+<endif>
 >>
 
 stateVar(var) ::= <<
-\<stateVar name="$var.name$" sourceName="$var.name$"\>
-  $initVariable(type=var.type, value=var.initialValue)$\</stateVar\>
+\<stateVar name="<var.name>" sourceName="<var.name>"\>
+  <initVariable(type=var.type, value=var.initialValue)>\</stateVar\>
 >>
 
 // Input and output pattern
 patternPortPinAvail(dir, port)::= <<
-\<!--  $dir$putPattern --\>
+\<!--  <dir>putPattern --\>
 \<operation kind="noop"\>
-	\<port dir="in" source="$port$_pinStatus"/\>
-	\<port dir="out" size="1" source="$dir$putPattern_$instance.id$_$action.name$_$port$" typeName="bool"/\>
+	\<port dir="in" source="<port>_pinStatus"/\>
+	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_<port>" typeName="bool"/\>
 \</operation\>
 >>
 
 
 declarePinAvailableVariable(port) ::= <<
-\<operation kind="pinStatus" portName="$port$"\>
-  \<port dir="out" source="$port$_pinStatus" typeName="bool"/\>
+\<operation kind="pinStatus" portName="<port>"\>
+  \<port dir="out" source="<port>_pinStatus" typeName="bool"/\>
 \</operation\>
 >>
 
@@ -34,7 +34,7 @@ declarePinAvailableVariable(port) ::= <<
 Transitions(actions, transitions) ::= <<
 \<!-- All transitions --\>
 \<module kind="block" mutex="true"\>
-	$transitions:{transition | $Transition(transition=transition)$}; separator="\n"$
+	<transitions:{transition | <Transition(transition=transition)>}; separator="\n">
 \</module\>
 >>
 

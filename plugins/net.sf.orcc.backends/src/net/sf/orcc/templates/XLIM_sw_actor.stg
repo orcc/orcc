@@ -2,30 +2,30 @@ BinOp ::= [
 	"BITAND":"bitand",
 	"BITOR":"bitor",
 	"BITXOR":"bitxor",
-	"DIV":"$div",
-	"DIV_INT":"$div",
-	"EQ":"$eq",
+	"DIV":"\$div",
+	"DIV_INT":"\$div",
+	"EQ":"\$eq",
 	"EXP":"exp",
-	"GE":"$ge",
-	"GT":"$gt",
-	"LE":"$le",
+	"GE":"\$ge",
+	"GT":"\$gt",
+	"LE":"\$le",
 	"LOGIC_AND":"$and",
 	"LOGIC_OR":"$or",
-	"LT":"$lt",
+	"LT":"\$lt",
 	"MINUS":"$sub",
-	"MOD":"$mod",
-	"NE":"$ne",
+	"MOD":"\$mod",
+	"NE":"\$ne",
 	"PLUS":"$add",
 	"SHIFT_LEFT":"lshift",
 	"SHIFT_RIGHT":"rshift",
-	"TIMES":"$mul"
+	"TIMES":"\$mul"
 ]
 
 UnaryOp ::= [
 	"BITNOT":"bitnot",
-	"LOGIC_NOT":"$not",
-	"MINUS":"$negate",
-	"NUM_ELTS":"$size"
+	"LOGIC_NOT":"\$not",
+	"MINUS":"\$negate",
+	"NUM_ELTS":"\$size"
 ]
 
 
@@ -106,13 +106,13 @@ UnaryExpr(expr) ::= <<
 >>
 
 IntExpr(expr) ::= <<
-\<operation kind="$literal_Integer" value="<expr>"\>
+\<operation kind="\$literal_Integer" value="<expr>"\>
 	<port(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 >>
 
 BoolExpr(expr) ::= <<
-\<operation kind="$literal_Integer" value="<expr>"\>
+\<operation kind="\$literal_Integer" value="<expr>"\>
 	<port(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 >>
@@ -164,7 +164,7 @@ Call(call) ::= <<
 >>
 
 Peek(peek) ::= <<
-\<operation kind="$literal_Integer" value="0"\>
+\<operation kind="\$literal_Integer" value="0"\>
 	\<port dir="out" size="32" source="peek_<instance.id>_<procedure>_0_<peek.target>" typeName="int"/\>
 \</operation\>
 \<operation kind="pinPeek" portName="<peek.port.name>" removable="no"\>
@@ -174,7 +174,7 @@ Peek(peek) ::= <<
 >>
 
 CustomPeek(customPeek) ::= <<
-\<operation kind="$literal_Integer" value="<customPeek.tokenIndex>"\>
+\<operation kind="\$literal_Integer" value="<customPeek.tokenIndex>"\>
   \<port dir="out" size="32" source="customPeek_<instance.id>_<procedure>_<customPeek.tokenIndex>_<customPeek.target>" typeName="int"/\>
 \</operation\>
 \<operation kind="pinPeek" portName="<customPeek.port.name>" removable="no"\>
@@ -270,7 +270,7 @@ AssignIndex(assignIndex) ::= <<
 >>
 
 TernaryOperation(ternaryOperation) ::= <<
-\<operation kind="$selector"\>
+\<operation kind="\$selector"\>
   <port(dir="in", source=ternaryOperation.conditionValue)>
   <port(dir="in", source=ternaryOperation.trueValue)>
   <port(dir="in", source=ternaryOperation.falseValue)>
@@ -283,12 +283,12 @@ TernaryOperation(ternaryOperation) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
-\<operation kind="$mul"\>
+\<operation kind="\$mul"\>
   \<port dir="in" source="<target>_tmp_<lastIndex>"/\>
   \<port dir="in" source="<target>_size_<indexMap.(first(indexes))>"/\>
   \<port dir="out" size="32" source="<target>_tmpMul_<indexMap.(first(indexes))>" typeName="int"/\>
 \</operation\>
-\<operation kind="$add"\>
+\<operation kind="\$add"\>
   \<port dir="in" source="<target>_tmpMul_<indexMap.(first(indexes))>"/\>
   \<port dir="in" source="<first(indexes)>"/\>
   \<port dir="out" size="32" source="<target>_tmp_<indexMap.(first(indexes))>" typeName="int"/\>
@@ -305,7 +305,7 @@ flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
 
 sizeDeclare(target,type) ::= <<
 <type.dimensions:{dimension|
-\<operation kind="$literal_Integer" value="<dimension>"\>
+\<operation kind="\$literal_Integer" value="<dimension>"\>
   \<port dir="out" size="32" source="<target>_size_<i0>" typeName="int"/\>
 \</operation\>}>
 >>
@@ -442,7 +442,7 @@ endif>
 localInitialize(local) ::= <<
 <if(local.type.list)
 ><if(!local.instruction || local.instruction.write)>
-\<operation kind="$valloc"\>
+\<operation kind="\$valloc"\>
 	<port(dir="out", type=local.type, source=local)>
 \</operation\>
 <endif
@@ -465,10 +465,10 @@ action(action) ::= <<
 // Input and output pattern
 patternPortPinAvail(dir, port)::= <<
 \<!--  <dir>putPattern --\>
-\<operation kind="$literal_Integer" value="<pattern.(port)>"\>
+\<operation kind="\$literal_Integer" value="<pattern.(port)>"\>
 	\<port dir="out" size="32" source="<dir>putPattern_<instance.id>_<action.name>_<port>_tokenCount" typeName="int"/\>
 \</operation\>
-\<operation kind="$ge"\>
+\<operation kind="\$ge"\>
 	\<port dir="in" source="<port>_pinAvail"/\>
 	\<port dir="in" source="<dir>putPattern_<instance.id>_<action.name>_<port>_tokenCount"/\>
 	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_<port>" typeName="bool"/\>
@@ -477,7 +477,7 @@ patternPortPinAvail(dir, port)::= <<
 
 patternPort(dir, port, index, index0) ::= <<
 <patternPortPinAvail(dir=dir, port=port)>
-\<operation kind="$and"\>
+\<operation kind="\$and"\>
 	\<port dir="in" source="<dir>putPattern_<instance.id>_<action.name>_<port>"/\>
 	\<port dir="in" source="<dir>putPattern_<instance.id>_<action.name>_res_<index0>"/\>
 	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_res_<index>" typeName="bool"/\>
@@ -502,7 +502,7 @@ inputPatternDecision(index) ::= <<
 >>
 
 pattern(dir, pattern, action) ::= <<
-\<operation kind="$literal_Integer" value="1"\>
+\<operation kind="\$literal_Integer" value="1"\>
 	\<port dir="out" size="1" source="<dir>putPattern_<instance.id>_<action.name>_res_0" typeName="bool"/\>
 \</operation\>
 <pattern.keys: {port | <patternPort(dir=dir, port=port, index=i, index0=i0)>}; separator="\n">
@@ -563,7 +563,7 @@ schedulingTest(actions) ::= <<
 
 scheduler(actions) ::= <<
 \<module autostart="true" kind="action-scheduler" name="<instance.id>_scheduler" sourcename="<instance.id>_scheduler"\>
-	\<operation kind="$literal_Integer" value="1"\>
+	\<operation kind="\$literal_Integer" value="1"\>
 		\<port dir="out" size="1" source="var_<instance.id>_sched" typeName="bool"/\>
 	\</operation\>
 	\<module kind="loop"\>
@@ -635,7 +635,7 @@ Transition(transition) ::= <<
 \<!-- State s_<transition.sourceState> --\>
 \<module kind="if"\>
 	\<module decision="s_<transition.sourceState>_enabled" kind="test"\>
-		\<operation kind="$eq"\>
+		\<operation kind="\$eq"\>
 			\<port dir="in" source="s_<transition.sourceState>"/\>
 			\<port dir="in" source="currentState"/\>
 			\<port dir="out" size="1" source="s_<transition.sourceState>_enabled" typeName="bool"/\>
@@ -663,7 +663,7 @@ outputPatternTest(action) ::= <<
 inputPatternTest(action) ::= <<
 <if(action.inputPattern)>
 <inputPattern(pattern=action.inputPattern,action=action)>
-\<operation kind="$and"\>
+\<operation kind="\$and"\>
   \<port dir="in" source="inputPattern_<instance.id>_<action>_decision"/\>
   \<port dir="in" source="isSchedulable_<action>_go"/\>
   \<port dir="out" size="1" source="isSchedulable_<action>_goWithToken" typeName="bool"/\>
@@ -683,7 +683,7 @@ Transitions(actions, transitions) ::= <<
 >>
 
 enumStates(transition)::= <<
-\<operation kind="$literal_Integer" value="<transition.sourceState.index>"\>
+\<operation kind="\$literal_Integer" value="<transition.sourceState.index>"\>
 	\<port dir="out" size="32" source="s_<transition.sourceState>" typeName="int"/\>
 \</operation\>
 >>
@@ -695,7 +695,7 @@ schedulerFSM(actions, fsm) ::= <<
 	\<initValue size="32" typeName="int" value="<fsm.initialState.index>"/\>
 \</stateVar\>
 \<module autostart="true" kind="action-scheduler" name="<instance.id>_scheduler" sourcename="<instance.id>_scheduler"\>
-	\<operation kind="$literal_Integer" value="1"\>
+	\<operation kind="\$literal_Integer" value="1"\>
 		\<port dir="out" size="1" source="var_<instance.id>_sched" typeName="bool"/\>
 	\</operation\>
 	\<!-- enumerate states --\>
