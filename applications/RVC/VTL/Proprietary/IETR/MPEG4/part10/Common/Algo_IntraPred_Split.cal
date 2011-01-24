@@ -64,6 +64,7 @@ actor Algo_IntraPred_Split()
 	uint(size=1)  MbIntraFlag,
 	uint(size=4)  IntraPredMode,
 	uint(size=7)  MbLocation,
+	bool          NeighbourAvail,
 	bool          ConstrainedIFlag
 		==>
 	uint(size=4)  PredMode
@@ -81,8 +82,10 @@ actor Algo_IntraPred_Split()
 	uint(size=3)  mb_intra_flag;
 	uint(size=5)  count            := 0;
 	uint          MbLocationxInPic := 0;
-	uint(size=7)  MbLocationyInSlc := 0;
-	uint(size=7)  MbLocationxInSlc := 0;
+	bool Is_MbA_Avail;
+	bool Is_MbB_Avail;
+
+
 	List(type: List(type: int(size=5), size=16), size=MAX_PICWIDTH_BLK) intra4x4predmode:=
 		[ [ 2 : for int j in 0 .. 15 ] : for int i in 0 .. MAX_PICWIDTH_BLK - 1 ];
 	List(type: uint(size=4) , size=16)   InverseScan4x4Tab := [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
@@ -99,15 +102,16 @@ actor Algo_IntraPred_Split()
 
 
 	get_inter: action
-			MbLocation       :[MbLocxInPic , MbLocyInPic , MbLocxInSlc , MbLocyInSlc],
+			MbLocation       :[MbLocxInPic , MbLocyInPic],
+			NeighbourAvail   :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
 			ConstrainedIFlag :[ Constrained_I_Flag ]
 				==>
 		guard
 			mb_intra_flag = 0
 		do
 			MbLocationxInPic   := MbLocxInPic;
-			MbLocationxInSlc   := MbLocxInSlc;
-			MbLocationyInSlc   := MbLocyInSlc;
+			Is_MbA_Avail := NeighbourA_Avail;
+			Is_MbB_Avail := NeighbourB_Avail;
 			intra4x4predmode[MbLocationxInPic]      := [ 2 : for int j in 0 .. 15 ];
 			is_constrained_i_flag[MbLocationxInPic] := not (Constrained_I_Flag);
 		end
@@ -115,15 +119,16 @@ actor Algo_IntraPred_Split()
 
 	get_intratype: action
 			IntraPredMode  :[ Mb_Type ],
-			MbLocation     :[MbLocxInPic , MbLocyInPic , MbLocxInSlc , MbLocyInSlc]
+			NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
+			MbLocation     :[MbLocxInPic , MbLocyInPic]
 				==>
 		guard
 			mb_intra_flag = 1
 		do
 			mb_intra_type     := Mb_Type;
 			MbLocationxInPic  := MbLocxInPic;
-			MbLocationxInSlc  := MbLocxInSlc;
-			MbLocationyInSlc  := MbLocyInSlc;
+			Is_MbA_Avail := NeighbourA_Avail;
+			Is_MbB_Avail := NeighbourB_Avail;
 		end
 
 
@@ -137,7 +142,7 @@ actor Algo_IntraPred_Split()
 			int(size=5) top , int(size=5) left , int(size=5) predicted ,
 			int(size=5) pred_mode
 		do
-			if MbLocationyInSlc = 0 and
+			if not Is_MbB_Avail and
 			InverseScan4x4Tab[count] < 4 then
 			// MB 4x4 current situated on the first line of MBs 4x4, so there is no MB 4x4 above  
 				top := -1;
@@ -152,7 +157,7 @@ actor Algo_IntraPred_Split()
 					top := intra4x4predmode[MbLocationxInPic][InverseScan4x4Tab[count] - 4];
 				end
 			end
-			if (MbLocationxInSlc = 0 and MbLocationyInSlc = 0 or MbLocationxInPic = 0) and
+			if not Is_MbA_Avail and
 			InverseScan4x4Tab[count] mod 4 = 0 then
 			// MB 4x4 current situated on the first column of MBs 4x4, so there is no MB 4x4 at left  
 				left := -1;

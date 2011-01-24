@@ -363,6 +363,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="NeighbourAvail">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -593,4 +596,5 @@
     <Connection dst="" dst-port="MbIntraFlag" src="DecodePic" src-port="MbIntraFlag"/>
     <Connection dst="" dst-port="IntraPredMode" src="DecodePic" src-port="IntraPredMode"/>
     <Connection dst="" dst-port="MbLocation" src="DecodePic" src-port="MbLocation"/>
+    <Connection dst="" dst-port="NeighbourAvail" src="DecodePic" src-port="NeighbourAvail"/>
 </XDF>

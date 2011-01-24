@@ -411,6 +411,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="NeighbourAvail">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -741,4 +744,6 @@
     <Connection dst="DecodeSliceData_Cavlc" dst-port="QpFeedback"
         src="DecodeMacroBlockLayer" src-port="QpFeedback"/>
     <Connection dst="" dst-port="MbLocation" src="DecodeSliceData_Cavlc" src-port="MbLocation"/>
+    <Connection dst="" dst-port="NeighbourAvail"
+        src="DecodeSliceData_Cavlc" src-port="NeighbourAvail"/>
 </XDF>

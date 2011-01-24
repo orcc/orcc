@@ -64,6 +64,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 	bool          NewPic_i,
 
 	uint(size=7)  MbLocation,
+	bool          NeighbourAvail,
 	uint(size=13) CurrMbAddr,
 	uint(size=13) FirstMbInSlice,
 	uint(size=7)  PicWidthInMb,
@@ -341,7 +342,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			NewPic_i         :[IsNewPic],
 			colZeroFlag      :[TabColZero] repeat 4,
 			CurrMbAddr       :[Curr_Mb_Addr],
-			MbLocation       :[MbLocxInPic , MbLocyInPic , MbLocxInSlc , MbLocyInSlc],
+			MbLocation       :[MbLocxInPic , MbLocyInPic],
+			NeighbourAvail   :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
 			FirstMbInSlice   :[Fst_Mb],
 			PicWidthInMb     :[pic_width_in_mb]
 				==>
@@ -357,31 +359,26 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			Mby_in_pix  := MbLocyInPic*16;
 			Idx_CurrBlk := Curr_Mb_Addr & MASK_POW2_PICWIDTH_BLK_PLUS1;
 
-			if(MbLocxInPic = 0 or (MbLocxInSlc = 0 and MbLocyInSlc = 0)) then
+			if(not NeighbourA_Avail) then
 				Idx_mbAddrA := -1;
 			else
 				Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			end
 
-			if(MbLocyInSlc = 0) then
+			if(not NeighbourB_Avail) then
 				Idx_mbAddrB := -1;
 			else
 				Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			end
 
-			if(MbLocyInSlc >= 1)then
-				if(MbLocxInPic + 1 <  pic_width_in_mb)then
-					Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
-				else
-					Idx_mbAddrC := -1;
-				end
-				if(MbLocxInPic > 0 and (MbLocyInSlc > 1 or MbLocyInSlc = 1 and MbLocxInSlc > 0))then
-					Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
-				else
-					Idx_mbAddrD := -1;
-				end
+			if(NeighbourC_Avail)then
+				Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			else
 				Idx_mbAddrC := -1;
+			end
+			if(NeighbourD_Avail)then
+				Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
+			else
 				Idx_mbAddrD := -1;
 			end
 
@@ -509,7 +506,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	EatTokens: action
 			CurrMbAddr     :[Curr_Mb_Addr],
-			MbLocation     :[MbLocxInPic , MbLocyInPic , MbLocxInSlc , MbLocyInSlc],
+			MbLocation     :[MbLocxInPic , MbLocyInPic],
+			NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
 			FirstMbInSlice :[b],
 			PicWidthInMb   :[c]
 				==>
@@ -521,7 +519,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	GetMbInfos.P_Skip: action
 			CurrMbAddr     :[Curr_Mb_Addr],
-			MbLocation     :[MbLocxInPic , MbLocyInPic , MbLocxInSlc , MbLocyInSlc],
+			MbLocation     :[MbLocxInPic , MbLocyInPic],
+			NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
 			FirstMbInSlice :[Fst_Mb],
 			PicWidthInMb   :[pic_width_in_mb]
 				==>
@@ -541,11 +540,11 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			RefIdxTab[Idx_CurrBlk] := [0: for int i in 0 .. 15];
 			//if mbAddrB is not available
-			if(MbLocyInSlc = 0) then
+			if(not NeighbourB_Avail) then
 				MvpL0 := [0,0];
 			else
 				//if mbAddrA is not available	
-				if(MbLocxInPic = 0 or (MbLocxInSlc = 0 and MbLocyInSlc = 0)) then
+				if(not NeighbourA_Avail) then
 					MvpL0 := [0,0];
 				else
 					//if refIdxL0A is equal to 0 and both components of mvL0A are equal to 0
@@ -556,29 +555,23 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 						if(RefIdxTab[Idx_mbAddrB][10] = 0 and MvTab[Idx_mbAddrB][10][0] = 0 and MvTab[Idx_mbAddrB][10][1] = 0) then
 							MvpL0 := [0,0];	
 						else
-							if(MbLocyInSlc >= 1)then
-								if(MbLocxInPic + 1 <  pic_width_in_mb)then
-									Idx_C       := 10;
-									Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
-									MvC         := [MvTab [Idx_mbAddrC][10][0],MvTab [Idx_mbAddrC][10][1]];
-									RefIdxC     := RefIdxTab[Idx_mbAddrC][10];
-								else
-									Idx_mbAddrC := -1;
-									if(MbLocxInPic > 0 and (MbLocyInSlc > 1 or MbLocyInSlc = 1 and MbLocxInSlc > 0))then
-										Idx_C       := 15;
-										Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
-										MvC         := [MvTab [Idx_mbAddrD][15][0],MvTab [Idx_mbAddrD][15][1]];
-										RefIdxC     := RefIdxTab[Idx_mbAddrD][15];
-									else
-										Idx_C   := -1;
-										MvC     := [0,0];
-										RefIdxC := -1;
-									end
-								end
+							if(NeighbourC_Avail)then
+								Idx_C       := 10;
+								Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
+								MvC         := [MvTab [Idx_mbAddrC][10][0],MvTab [Idx_mbAddrC][10][1]];
+								RefIdxC     := RefIdxTab[Idx_mbAddrC][10];
 							else
-								Idx_C   := -1;
-								MvC     := [0,0];
-								RefIdxC := -1;
+								Idx_mbAddrC := -1;
+								if(NeighbourD_Avail)then
+									Idx_C       := 15;
+									Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
+									MvC         := [MvTab [Idx_mbAddrD][15][0],MvTab [Idx_mbAddrD][15][1]];
+									RefIdxC     := RefIdxTab[Idx_mbAddrD][15];
+								else
+									Idx_C   := -1;
+									MvC     := [0,0];
+									RefIdxC := -1;
+								end
 							end
 							Idx_A   := 5;	
 							RefIdxA := RefIdxTab[Idx_mbAddrA][5];
@@ -601,7 +594,8 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 
 	GetMbInfos.Others: action
 			CurrMbAddr     :[Curr_Mb_Addr],
-			MbLocation     :[MbLocxInPic , MbLocyInPic , MbLocxInSlc , MbLocyInSlc],
+			MbLocation     :[MbLocxInPic , MbLocyInPic],
+			NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
 			FirstMbInSlice :[Fst_Mb],
 			PicWidthInMb   :[pic_width_in_mb]	
 				==>
@@ -612,31 +606,25 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			MvTab[Idx_CurrBlk]     := [[0,0]: for int i in 0 .. 15];
 			RefIdxTab[Idx_CurrBlk] := [-1: for int i in 0 .. 15];
 
-			if(MbLocxInPic = 0 or (MbLocxInSlc = 0 and MbLocyInSlc = 0)) then
+			if(not NeighbourA_Avail) then
 				Idx_mbAddrA := -1;
 			else
 				Idx_mbAddrA := (Curr_Mb_Addr - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			end
 
-			if(MbLocyInSlc = 0) then
+			if(not NeighbourB_Avail) then
 				Idx_mbAddrB := -1;
 			else
 				Idx_mbAddrB := (Curr_Mb_Addr - pic_width_in_mb) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			end
-
-			if(MbLocyInSlc >= 1)then
-				if(MbLocxInPic + 1 <  pic_width_in_mb)then
-					Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
-				else
-					Idx_mbAddrC := -1;
-				end
-				if(MbLocxInPic > 0 and (MbLocyInSlc > 1 or MbLocyInSlc = 1 and MbLocxInSlc > 0))then
-					Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
-				else
-					Idx_mbAddrD := -1;
-				end
+			if(NeighbourC_Avail)then
+				Idx_mbAddrC := (Curr_Mb_Addr - pic_width_in_mb + 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
 			else
 				Idx_mbAddrC := -1;
+			end
+			if(NeighbourD_Avail)then
+				Idx_mbAddrD := (Curr_Mb_Addr - pic_width_in_mb - 1) & MASK_POW2_PICWIDTH_BLK_PLUS1;
+			else
 				Idx_mbAddrD := -1;
 			end
 		end

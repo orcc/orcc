@@ -439,4 +439,8 @@
         src="Syn_Parser" src-port="MbLocation"/>
     <Connection dst="Generate_Inter_Info" dst-port="MbLoc"
         src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="IntraPredSplit" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
+    <Connection dst="Generate_Inter_Info" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
 </XDF>

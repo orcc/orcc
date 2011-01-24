@@ -194,6 +194,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="NeighbourAvail">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -439,4 +442,5 @@
     <Connection dst="MVReconstruct" dst-port="MbPredMvResL0" src="" src-port="MbPredMvResL0"/>
     <Connection dst="MVReconstruct" dst-port="MbPredRefIdxL1" src="" src-port="MbPredRefIdxL1"/>
     <Connection dst="MVReconstruct" dst-port="MbLoc" src="" src-port="MbLoc"/>
+    <Connection dst="MVReconstruct" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
 </XDF>

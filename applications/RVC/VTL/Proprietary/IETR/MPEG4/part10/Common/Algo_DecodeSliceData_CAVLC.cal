@@ -55,6 +55,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=13) CurrMbAddr,
 	uint(size=7)  PicWidthInMb,
 	uint(size=7)  MbLocation,
+	bool          NeighbourAvail,
 	uint(size=13) PicSizeInMb,
 	uint(size=13) FirstMbInSlice,
 	uint(size=2)  LFDisable,
@@ -122,8 +123,11 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	uint(size=32) curr_mb_addr := 0;
 	uint(size=7)  MbLocxInPic := 0;
 	uint(size=7)  MbLocyInPic := 0;
-	uint(size=7)  MbLocxInSlc := 0;
-	uint(size=7)  MbLocyInSlc := 0;
+	bool Is_MbA_Avail;
+	bool Is_MbB_Avail;
+	bool Is_MbC_Avail;
+	bool Is_MbD_Avail;
+
 	uint(size=4)  slice_type;
 	bool          MbaffFrameFlag;
 	uint(size=13) first_mb_in_slice;
@@ -146,12 +150,19 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	List( type: List( type: List(type: uint(size=5), size=16),size= POW2_PICWIDTH_BLK_PLUS1), size=2) TotalCoeffTabChroma := [[[0:for int s in 0 .. 15]: for int s in 0 .. POW2_PICWIDTH_BLK_PLUS1-1]: for int i in 0 .. 1];
 
 	procedure NextMbAddress()
+		var
+			uint(size=7)  MbLocxInSlc ,
+			uint(size=7)  MbLocyInSlc
 		begin
-			curr_mb_addr        := curr_mb_addr + 1;
-			MbLocxInPic         := curr_mb_addr mod PicWidthInMbs;
-			MbLocyInPic         := curr_mb_addr  /  PicWidthInMbs;
-			MbLocxInSlc         := (curr_mb_addr - first_mb_in_slice) mod PicWidthInMbs;
-			MbLocyInSlc         := (curr_mb_addr - first_mb_in_slice)  /  PicWidthInMbs;
+			curr_mb_addr := curr_mb_addr + 1;
+			MbLocxInPic  := curr_mb_addr mod PicWidthInMbs;
+			MbLocyInPic  := curr_mb_addr  /  PicWidthInMbs;
+			MbLocxInSlc  := (curr_mb_addr - first_mb_in_slice) mod PicWidthInMbs;
+			MbLocyInSlc  := (curr_mb_addr - first_mb_in_slice)  /  PicWidthInMbs;
+			Is_MbA_Avail := MbLocxInPic != 0 and (MbLocxInSlc != 0 or MbLocyInSlc != 0);
+			Is_MbB_Avail := MbLocyInSlc != 0;
+			Is_MbC_Avail := (MbLocyInSlc >= 1) and (MbLocxInPic + 1 <  PicWidthInMbs);
+			Is_MbD_Avail := (MbLocyInSlc >= 1) and (MbLocxInPic > 0 and (MbLocyInSlc > 1 or MbLocyInSlc = 1 and MbLocxInSlc > 0));
 			TotalCoeffTabLuma[bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)]      := [0: for int i in 0 .. 15];
 			TotalCoeffTabChroma[0][bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)] := [0: for int i in 0 .. 15];
 			TotalCoeffTabChroma[1][bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)] := [0: for int i in 0 .. 15];
@@ -173,6 +184,9 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				==>
 		guard
 			Is_CBP = false
+		var
+			uint(size=7)  MbLocxInSlc,
+			uint(size=7)  MbLocyInSlc
 		do
 			bit_depth_chroma              := SpsParam[0];
 			bit_depth_luma                := SpsParam[1];
@@ -217,6 +231,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			MbLocyInPic    := curr_mb_addr  /  PicWidthInMbs;
 			MbLocxInSlc    := (curr_mb_addr - first_mb_in_slice) mod PicWidthInMbs;
 			MbLocyInSlc    := (curr_mb_addr - first_mb_in_slice)  /  PicWidthInMbs;
+			Is_MbA_Avail := MbLocxInPic != 0 and (MbLocxInSlc != 0 or MbLocyInSlc != 0);
+			Is_MbB_Avail := MbLocyInSlc != 0;
+			Is_MbC_Avail := (MbLocyInSlc >= 1) and (MbLocxInPic + 1 <  PicWidthInMbs);
+			Is_MbD_Avail := (MbLocyInSlc >= 1) and (MbLocxInPic > 0 and (MbLocyInSlc > 1 or MbLocyInSlc = 1 and MbLocxInSlc > 0));
 			moreDataFlag   := true;
 			prevMbSkipped  := false;
 
@@ -274,7 +292,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				==>
 			ConstraindedIntraPredFlag :[constrained_intra_pred_flag],
 			CurrMbAddr                :[curr_mb_addr - 1],
-			MbLocation                :[prevMbLocxInPic , prevMbLocyInPic , prevMbLocxInSlc , prevMbLocyInSlc],
+			MbLocation                :[prevMbLocxInPic , prevMbLocyInPic],
+			NeighbourAvail            :[PrevNeighbourValues]repeat 4,
 			PicWidthInMb              :[PicWidthInMbs],
 			PicSizeInMb               :[PicSizeInMbs],
 			FirstMbInSlice            :[first_mb_in_slice],
@@ -292,8 +311,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 		var
 			uint(size=7) prevMbLocxInPic = MbLocxInPic,
 			uint(size=7) prevMbLocyInPic = MbLocyInPic,
-			uint(size=7) prevMbLocxInSlc = MbLocxInSlc,
-			uint(size=7) prevMbLocyInSlc = MbLocyInSlc
+			List(type: bool , size=4) PrevNeighbourValues =[Is_MbA_Avail , Is_MbB_Avail , Is_MbC_Avail , Is_MbD_Avail]
 		do
 			foreach int i in 0 .. 15
 			do
@@ -371,7 +389,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			bool        AMbExists,
 			int(size=8) Flags
 		do
-				if(MbLocxInPic != 0 and (MbLocxInSlc != 0 or MbLocyInSlc != 0)) then
+				if(Is_MbA_Avail) then
 					NaTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 5],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 7],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][13],
@@ -390,7 +408,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 					NaTab     := [0:for int i in 0 .. 11];
 					LMbExists := false;
 				end
-				if(MbLocyInSlc != 0)then
+				if(Is_MbB_Avail)then
 					AMbExists := true;
 					NbTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][10],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][11],
@@ -441,7 +459,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 			ConstraindedIntraPredFlag :[constrained_intra_pred_flag],
 			CurrMbAddr                :[curr_mb_addr],
-			MbLocation                :[MbLocxInPic , MbLocyInPic , MbLocxInSlc , MbLocyInSlc],
+			MbLocation                :[MbLocxInPic , MbLocyInPic],
+			NeighbourAvail            :[Is_MbA_Avail , Is_MbB_Avail , Is_MbC_Avail , Is_MbD_Avail],
 			PicWidthInMb              :[PicWidthInMbs],
 			PicSizeInMb               :[PicSizeInMbs],
 			FirstMbInSlice            :[first_mb_in_slice],

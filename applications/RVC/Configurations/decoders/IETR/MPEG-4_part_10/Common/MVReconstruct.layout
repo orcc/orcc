@@ -23,6 +23,7 @@
       <vertex id="Poc" x="644" y="687"/>
       <vertex id="Direct8x8InferenceFlag" x="617" y="468"/>
       <vertex id="DirectSpatialMvPred" x="17" y="280"/>
+      <vertex id="MbLoc" x="63" y="190"/>
       <vertex id="MV" x="997" y="135"/>
       <vertex id="LOCATION" x="972" y="99"/>
       <vertex id="PartSZ" x="1211" y="249"/>
@@ -38,6 +39,6 @@
       <vertex id="SelectMvLX" x="738" y="79"/>
       <vertex id="MvL1_Reconstr" x="230" y="476"/>
       <vertex id="MvBuffer" x="973" y="374"/>
-      <vertex id="MbLoc" x="63" y="190"/>
+      <vertex id="NeighbourAvail" x="28" y="164"/>
    </vertices>
 </layout>

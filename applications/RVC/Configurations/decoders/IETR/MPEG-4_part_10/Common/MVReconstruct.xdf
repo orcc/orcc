@@ -148,6 +148,9 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="NeighbourAvail">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -357,4 +360,6 @@
         src="MvBuffer" src-port="colZeroFlag"/>
     <Connection dst="MvL0_Reconstr" dst-port="MbLocation" src="" src-port="MbLoc"/>
     <Connection dst="MvL1_Reconstr" dst-port="MbLocation" src="" src-port="MbLoc"/>
+    <Connection dst="MvL0_Reconstr" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
+    <Connection dst="MvL1_Reconstr" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
 </XDF>
