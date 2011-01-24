@@ -122,10 +122,10 @@ endif$
 
 Call(call) ::= <<
 
-$if(call.print)$std::cout \<\< $call.parameters: PrintParameter(); separator=" << "$;$
+<if(call.print)>std::cout \<\< <call.parameters: PrintParameter(); separator=" << ">;<
 else
-$$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
-endif$
+><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
+endif>
 >>
 
 Decrement(decrement) ::= <<

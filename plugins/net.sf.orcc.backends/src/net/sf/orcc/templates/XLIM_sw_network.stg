@@ -7,9 +7,9 @@ network(debugFifos, fifoSize, network, options) ::= <<
   #include \<stdlib.h\>
   #include "actors-config.h"
   
-  $initNetwork(network)$
+  <initNetwork(network)>
   
-  $printMain()$
+  <printMain()>
   
 >>
 
@@ -33,18 +33,18 @@ int main(int argc, char *argv[]) {
 initNetwork(network) ::= <<
 static void initNetwork(AbstractActorInstance ***pInstances, int *pNumberOfInstances) {
 
-  int numberOfInstances = $length(network.instances)$;
+  int numberOfInstances = <length(network.instances)>;
   AbstractActorInstance **actorInstances = (AbstractActorInstance **) malloc(numberOfInstances * sizeof(AbstractActorInstance *));
 
   *pInstances=actorInstances;
 
   *pNumberOfInstances=numberOfInstances;
 
-  $network.instances : {instance | $declareActorInstance(actorInstance=instance)$}; separator="\n\n"$
+  <network.instances : {instance | <declareActorInstance(actorInstance=instance)>}; separator="\n\n">
   
-  $network.instances : {instance | $initializeActorInstance(actorInstance=instance,numberOfReaders=network.numberOfReadersMap.(instance),localFifoSize=network.portToFiFoSizeMap.(instance),index=i0)$}; separator="\n\n"$
+  <network.instances : {instance | <initializeActorInstance(actorInstance=instance,numberOfReaders=network.numberOfReadersMap.(instance),localFifoSize=network.portToFiFoSizeMap.(instance),index=i0)>}; separator="\n\n">
   
-  $network.connections : {connection | $connectPorts(source=connection.source, idSource=network.sourceMap.(connection).instance.id, target=connection.target, idTarget=network.targetMap.(connection).instance.id)$}; separator="\n"$
+  <network.connections : {connection | <connectPorts(source=connection.source, idSource=network.sourceMap.(connection).instance.id, target=connection.target, idTarget=network.targetMap.(connection).instance.id)>}; separator="\n">
 }
 >>
 
@@ -53,18 +53,18 @@ static void initNetwork(AbstractActorInstance ***pInstances, int *pNumberOfInsta
 /////////////////////////////
 
 declareActorInstance(actorInstance) ::= <<
-$if(actorInstance.actor.system)$
-extern ActorClass ActorClass_$actorInstance.actor.simpleName$;
-$else$
-extern ActorClass ActorClass_$actorInstance.id$;
-$endif$
-AbstractActorInstance *p$actorInstance.id$;
-$actorInstance.actor.inputs.list : {port|$declarePort(dir="In", port=port, id=actorInstance.id)$}; separator="\n"$
-$actorInstance.actor.outputs.list : {port|$declarePort(dir="Out", port=port, id=actorInstance.id)$}; separator="\n"$
+<if(actorInstance.actor.system)>
+extern ActorClass ActorClass_<actorInstance.actor.simpleName>;
+<else>
+extern ActorClass ActorClass_<actorInstance.id>;
+<endif>
+AbstractActorInstance *p<actorInstance.id>;
+<actorInstance.actor.inputs.list : {port|<declarePort(dir="In", port=port, id=actorInstance.id)>}; separator="\n">
+<actorInstance.actor.outputs.list : {port|<declarePort(dir="Out", port=port, id=actorInstance.id)>}; separator="\n">
 >>
 
 declarePort(dir,port,id) ::= <<
-$dir$putPort *p$id$_$port$;
+<dir>putPort *p<id>_<port>;
 >>
 
 /////////////////////////////
@@ -72,23 +72,23 @@ $dir$putPort *p$id$_$port$;
 /////////////////////////////
 
 initializeActorInstance(actorInstance,numberOfReaders,localFifoSize,index) ::= <<
-$if(actorInstance.actor.system)$
-p$actorInstance.id$ = createActorInstance(&ActorClass_$actorInstance.actor.simpleName$);
-$else$
-p$actorInstance.id$ = createActorInstance(&ActorClass_$actorInstance.id$);
-$endif$
-$actorInstance.actor.inputs.list : {port | $if(localFifoSize.(port))$$initializePort(dir="In",port=port,id=actorInstance.id,n=localFifoSize.(port))$$else$$initializePort(dir="In",port=port,id=actorInstance.id,n=fifoSize)$$endif$}; separator="\n"$
-$actorInstance.actor.outputs.list : {port | $initializePort(dir="Out",port=port,id=actorInstance.id,n=numberOfReaders.(port))$}; separator="\n"$
-$actorInstance.actor.parameters.list : {parameter | $initializeParameter(parameter=parameter,value=actorInstance.parameters.(parameter.name),id=actorInstance.id)$}; separator="\n"$
-actorInstances[$index$] = p$actorInstance.id$;
+<if(actorInstance.actor.system)>
+p<actorInstance.id> = createActorInstance(&ActorClass_<actorInstance.actor.simpleName>);
+<else>
+p<actorInstance.id> = createActorInstance(&ActorClass_<actorInstance.id>);
+<endif>
+<actorInstance.actor.inputs.list : {port | <if(localFifoSize.(port))><initializePort(dir="In",port=port,id=actorInstance.id,n=localFifoSize.(port))><else><initializePort(dir="In",port=port,id=actorInstance.id,n=fifoSize)><endif>}; separator="\n">
+<actorInstance.actor.outputs.list : {port | <initializePort(dir="Out",port=port,id=actorInstance.id,n=numberOfReaders.(port))>}; separator="\n">
+<actorInstance.actor.parameters.list : {parameter | <initializeParameter(parameter=parameter,value=actorInstance.parameters.(parameter.name),id=actorInstance.id)>}; separator="\n">
+actorInstances[<index>] = p<actorInstance.id>;
 >>
 
 initializePort(dir,port,id,n) ::= <<
-p$id$_$port$ = create$dir$putPort(p$id$, "$port$", $n$);
+p<id>_<port> = create<dir>putPort(p<id>, "<port>", <n>);
 >>
 
 initializeParameter(parameter,value,id) ::= <<
-setParameter(p$id$, "$parameter$", "$Constant(value)$");
+setParameter(p<id>, "<parameter>", "<Constant(value)>");
 >>
 
 /////////////////////////////
@@ -96,7 +96,7 @@ setParameter(p$id$, "$parameter$", "$Constant(value)$");
 /////////////////////////////
 
 connectPorts(source,idSource,target,idTarget) ::= <<
-connectPorts(p$idSource$_$source$, p$idTarget$_$target$);
+connectPorts(p<idSource>_<source>, p<idTarget>_<target>);
 >>
 
 
@@ -105,22 +105,22 @@ connectPorts(p$idSource$_$source$, p$idTarget$_$target$);
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-$(constant.class.simpleName)(constant)$
+<(constant.class.simpleName)(constant)>
 >>
 
 BoolExpr(constant) ::= <<
-$if (constant.value)$1$else$0$endif$
+<if (constant.value)>1<else>0<endif>
 >>
 
 IntExpr(number) ::= <<
-$number$$if (number.long)$L$endif$
+<number><if (number.long)>L<endif>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
 ListExpr(constant) ::= <<
-{$constant.value: Constant(); wrap, separator=", "$}
+{<constant.value: Constant(); wrap, separator=", ">}
 >>
 
 StringExpr(constant) ::= <<
-$constant$
+<constant>
 >>

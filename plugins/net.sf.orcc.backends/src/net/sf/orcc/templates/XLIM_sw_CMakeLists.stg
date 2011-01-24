@@ -1,26 +1,26 @@
 
 printInstance(instance) ::= <<
-$if(instance.actor)$
-$if(!instance.actor.system)$
-$instance.id$.c
-$endif$
-$endif$
+<if(instance.actor)>
+<if(!instance.actor.system)>
+<instance.id>.c
+<endif>
+<endif>
 >>
 
 printXlim2c(instance) ::= <<
-$if(instance.actor)$
-$if(!instance.actor.system)$
-run_xlim2c($instance.id$)
-$endif$
-$endif$
+<if(instance.actor)>
+<if(!instance.actor.system)>
+run_xlim2c(<instance.id>)
+<endif>
+<endif>
 >>
 
 
 CMakeLists(network) ::= <<
-# Generated from $network.name$
+# Generated from <network.name>
 
 cmake_minimum_required (VERSION 2.8)
-project ($network.name$)
+project (<network.name>)
 
 # If the user specifies -DCMAKE_BUILD_TYPE on the command line take their definition,
 # otherwise set CMAKE_BUILD_TYPE to Release
@@ -35,30 +35,30 @@ find_package(SDL REQUIRED)
 find_package(LibXml2)
 
 # Common include directories
-include_directories(\${ACTORS}/include \${SDL_INCLUDE_DIR})
+include_directories(${ACTORS}/include ${SDL_INCLUDE_DIR})
 
 macro (run_xlim2c actor) 
   add_custom_command (
-    OUTPUT \${CMAKE_SOURCE_DIR}/\${actor}.c
-    DEPENDS \${CMAKE_SOURCE_DIR}/\${actor}.xlim
-    COMMAND \${ACTORS}/bin/xlim2c \${CMAKE_SOURCE_DIR}/\${actor}.xlim \${CMAKE_SOURCE_DIR}/\${actor}.c
+    OUTPUT ${CMAKE_SOURCE_DIR}/${actor}.c
+    DEPENDS ${CMAKE_SOURCE_DIR}/${actor}.xlim
+    COMMAND ${ACTORS}/bin/xlim2c ${CMAKE_SOURCE_DIR}/${actor}.xlim ${CMAKE_SOURCE_DIR}/${actor}.c
   )
 endmacro(run_xlim2c)
 
-$network.instances: printXlim2c()$
+<network.instances: printXlim2c()>
 
 set(filenames
-\${ACTORS}/share/sysactors/c/display-sdl.c
-$network.instances: printInstance()$
-$network.name$.c
+${ACTORS}/share/sysactors/c/display-sdl.c
+<network.instances: printInstance()>
+<network.name>.c
 )
 
 set(ORCC_C_FLAGS "-DORCC")
 
-add_definitions(\${ORCC_C_FLAGS})
+add_definitions(${ORCC_C_FLAGS})
 
-add_executable($network.name$ \${filenames})
+add_executable(<network.name> ${filenames})
 
-target_link_libraries($network.name$ \${ACTORS}/lib/libactors-rts.a \${SDL_LIBRARY} \${LIBXML2_LIBRARIES})
+target_link_libraries(<network.name> ${ACTORS}/lib/libactors-rts.a ${SDL_LIBRARY} ${LIBXML2_LIBRARIES})
 
 >>
