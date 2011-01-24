@@ -190,14 +190,14 @@ Store(store) ::= <<
 
 Write(write) ::= <<
 
-$if(write.unit)$
-m_poTabOut[$actor.simpleName$_$write.port$]-\>put($write.target$);$\n$
-m_arrRoomStatus[$actor.simpleName$_$write.port$]--;
-$else$
-m_poTabOut[$actor.simpleName$_$write.port$]-\>put($write.target$, $write.numTokens$);$\n$
-m_arrRoomStatus[$actor.simpleName$_$write.port$] -= $write.numTokens$;
+<if(write.unit)>
+m_poTabOut[<actor.simpleName>_<write.port>]-\>put(<write.target>);<\n>
+m_arrRoomStatus[<actor.simpleName>_<write.port>]--;
+<else>
+m_poTabOut[<actor.simpleName>_<write.port>]-\>put(<write.target>, <write.numTokens>);<\n>
+m_arrRoomStatus[<actor.simpleName>_<write.port>] -= <write.numTokens>;
 
-$endif$
+<endif>
 
 >>
 
@@ -210,37 +210,37 @@ WriteEnd(writeEnd) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
+<instructions: {instruction | <(instruction.class.simpleName)(instruction)>}>
 >>
 
 nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}$
+<nodes: {node | <(node.class.simpleName)(node)>}>
 >>
 
 // if node
 BlockNode(blockNode) ::= <<
 
-$instructions(blockNode.instructions)$
+<instructions(blockNode.instructions)>
 >>
 
 // if node
 IfNode(ifNode) ::= <<
 
-if ($ifNode.value$) {
-	$nodes(ifNode.thenNodes)$
-}$if(ifNode.elseNodes)$ else {
-	$nodes(ifNode.elseNodes)$
-}$endif$
-$BlockNode(ifNode.joinNode)$
+if (<ifNode.value>) {
+	<nodes(ifNode.thenNodes)>
+}<if(ifNode.elseNodes)> else {
+	<nodes(ifNode.elseNodes)>
+}<endif>
+<BlockNode(ifNode.joinNode)>
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
 
-while ($whileNode.value$) {
-	$nodes(whileNode.nodes)$
+while (<whileNode.value>) {
+	<nodes(whileNode.nodes)>
 }
-$BlockNode(whileNode.joinNode)$
+<BlockNode(whileNode.joinNode)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -249,13 +249,13 @@ $BlockNode(whileNode.joinNode)$
 
 procedure(procedure) ::= <<
 
-$procedure.returnType$ $actor.simpleName$::$procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$)
+<procedure.returnType> <actor.simpleName>::<procedure>(<procedure.parameters.list: {param | <variableDeclaration(param)>}; wrap, anchor, separator=", ">)
 {
-$if(procedure.locals.list)$
-	$procedure.locals.list: {$variableDeclaration(it)$;$\n$}$
+<if(procedure.locals.list)>
+	<procedure.locals.list: {local | <variableDeclaration(local)>;<\n>}>
 
-$endif$
-	$procedure.nodes: {$(it.class.simpleName)(it)$}$}
+<endif>
+	<procedure.nodes: {node | <(node.class.simpleName)(node)>}>}
 
 >>
 
@@ -264,12 +264,12 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 action(action) ::= <<
-$procedure(action.body)$$procedure(action.scheduler)$
+<procedure(action.body)><procedure(action.scheduler)>
 >>
 
 actionTrace(action) ::= <<
 #ifdef __TRACE_CAPTURE__
-g_oTracer.captureAction(this, "$action.name$");
+g_oTracer.captureAction(this, "<action.name>");
 #endif
 >>
 
@@ -278,43 +278,43 @@ g_oTracer.captureAction(this, "$action.name$");
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|hasRooms($actor.simpleName$_$port$, $pattern.(port)$)}; wrap, anchor, separator=" && "$
+<pattern.keys:{port | hasRooms(<actor.simpleName>_<port>, <pattern.(port)>)}; wrap, anchor, separator=" && ">
 >>
 
 inputPattern(pattern) ::= <<
-$pattern.keys:{port|hasTokens($actor.simpleName$_$port$, $pattern.(port)$) && }$
+<pattern.keys:{port | hasTokens(<actor.simpleName>_<port>, <pattern.(port)>) && }>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-$actionTrace(action)$
-$action.body$();
+<actionTrace(action)>
+<action.body>();
 res = true;
 i++;
 >>
 
 actionTest(action) ::= <<
-if($inputPattern(action.inputPattern)$isSchedulable_$action$())
+if(<inputPattern(action.inputPattern)>isSchedulable_<action>())
 {
-	$if(action.outputPattern)$
-	if($outputPattern(pattern=action.outputPattern)$)
+	<if(action.outputPattern)>
+	if(<outputPattern(pattern=action.outputPattern)>)
 	{
-		$actionCall(action)$
+		<actionCall(action)>
 	}
-	$else$
-	$actionCall(action)$
-	$endif$
+	<else>
+	<actionCall(action)>
+	<endif>
 }
 >>
 
 schedulingTest(actions) ::= <<
-$actions: actionTest(); separator="\nelse "$
+<actions: actionTest(); separator="\nelse ">
 >>
 
 scheduler(actions) ::= <<
-int $actor.simpleName$::schedule()
+int <actor.simpleName>::schedule()
 {
 	getFifoStatus();
 
@@ -324,9 +324,9 @@ int $actor.simpleName$::schedule()
 	while (res) 
 	{
 		res = false;
-		$if(actions)$
-		$schedulingTest(actions)$
-		$endif$
+		<if(actions)>
+		<schedulingTest(actions)>
+		<endif>
 	}
 	return i;
 }
@@ -337,34 +337,34 @@ int $actor.simpleName$::schedule()
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-$actionTrace(nextState.action)$
-$nextState.action.body$();
-_FSM_state = state_$nextState.targetState$;
+<actionTrace(nextState.action)>
+<nextState.action.body>();
+_FSM_state = state_<nextState.targetState>;
 res = true;
 >>
 
 actionTestState(nextState) ::= <<
-if($inputPattern(nextState.action.inputPattern)$isSchedulable_$nextState.action$())
+if(<inputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action>())
 {
-	$if(nextState.action.outputPattern)$
-	if($outputPattern(nextState.action.outputPattern)$)
+	<if(nextState.action.outputPattern)>
+	if(<outputPattern(nextState.action.outputPattern)>)
 	{
-		$actionCallState(nextState)$
+		<actionCallState(nextState)>
 	}
-	$else$
-	$actionCallState(nextState)$
-	$endif$
+	<else>
+	<actionCallState(nextState)>
+	<endif>
 }>>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(); separator=" else "$
+<nextStates: actionTestState(); separator=" else ">
 >>
 
 stateScheduler(transition) ::= <<
-bool $actor.simpleName$::$transition.sourceState$_state_scheduler()
+bool <actor.simpleName>::<transition.sourceState>_state_scheduler()
 {
 	bool res = false;
-	$schedulingTestState(nextStates=transition.nextStateInfo)$
+	<schedulingTestState(nextStates=transition.nextStateInfo)>
 	return res;
 }
 
@@ -373,10 +373,10 @@ bool $actor.simpleName$::$transition.sourceState$_state_scheduler()
 switch(transitions) ::= <<
 switch (_FSM_state)
 {
-$transitions: {case state_$it.sourceState$:
-	res = $it.sourceState$_state_scheduler();
+<transitions: {transition | case state_<transition.sourceState>:
+	res = <transition.sourceState>_state_scheduler();
 	break;
-}$
+}>
 default:
 	std::cout \<\< "unknown state: " \<\< _FSM_state \<\< std::endl;
 	break;
@@ -385,19 +385,19 @@ if (res){i++;}
 >>
 
 schedulerFSM(actions, fsm) ::= <<
-$if(actions)$
-bool $actor.simpleName$::outside_FSM_scheduler()
+<if(actions)>
+bool <actor.simpleName>::outside_FSM_scheduler()
 {
 	bool res = false;
 	int i = 0;
-	$schedulingTest(actions)$
+	<schedulingTest(actions)>
 	return res;
 }
 
 
-$endif$
-$fsm.transitions: stateScheduler(); separator="\n"$
-int $actor.simpleName$::schedule()
+<endif>
+<fsm.transitions: stateScheduler(); separator="\n">
+int <actor.simpleName>::schedule()
 {
 	getFifoStatus();
 
@@ -408,7 +408,7 @@ int $actor.simpleName$::schedule()
 	{
 		res = false;
 		
-		$if(actions)$
+		<if(actions)>
 		if(outside_FSM_scheduler())
 		{
 			res = true;
@@ -416,11 +416,11 @@ int $actor.simpleName$::schedule()
 		}
 		else
 		{
-			$switch(fsm.transitions)$
+			<switch(fsm.transitions)>
 		}
-		$else$
-		$switch(fsm.transitions)$
-		$endif$
+		<else>
+		<switch(fsm.transitions)>
+		<endif>
 	}
 	return i;
 }
@@ -428,35 +428,32 @@ int $actor.simpleName$::schedule()
 >>
 
 constructor(parameters, stateVars) ::= <<
-$if (actor.parameters.list)$
-$actor.simpleName$::$actor.simpleName$(const char* instanceName, $parameters: {$it.type$ $it$}; separator=", "$, AKA_PROFILING_MODE eProfilingMode)
-$else$
-$actor.simpleName$::$actor.simpleName$(const char* instanceName, AKA_PROFILING_MODE eProfilingMode)
-$endif$
+<if (actor.parameters.list)>
+<actor.simpleName>::<actor.simpleName>(const char* instanceName, <parameters: {param | <param.type> <param>}; separator=", ">, AKA_PROFILING_MODE eProfilingMode)
+<else>
+<actor.simpleName>::<actor.simpleName>(const char* instanceName, AKA_PROFILING_MODE eProfilingMode)
+<endif>
 :
-$parameters: {$it$($it$),}; wrap, separator="\n"$
-$if(actor.actionScheduler.fsm)$
-_FSM_state(state_$actor.actionScheduler.fsm.initialState$),
-$endif$
-$stateVars : StateVarAllocation()$
-ActorAKA("$actor.simpleName$", instanceName, $length(actor.inputs.list)$, $length(actor.outputs.list)$, eProfilingMode)
+<parameters: {param | <param>(<param>),}; wrap, separator="\n">
+<if(actor.actionScheduler.fsm)>
+_FSM_state(state_<actor.actionScheduler.fsm.initialState>),
+<endif>
+<stateVars : StateVarAllocation()>
+ActorAKA("<actor.simpleName>", instanceName, <length(actor.inputs.list)>, <length(actor.outputs.list)>, eProfilingMode)
 {
-$stateVars : ListStateVarInitialization()$
+<stateVars : ListStateVarInitialization()>
 }
 
 >>
 
 destructor(stateVars) ::= <<
-$actor.simpleName$::~$actor.simpleName$()
+<actor.simpleName>::~<actor.simpleName>()
 {
-	$stateVars: StateVarDestruction()$
+	<stateVars: StateVarDestruction()>
 }
 
 >>
 
-namespace()::= <<
-$actor.packageAsList; separator="::"$
->>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Actor
@@ -466,71 +463,71 @@ actor(actor, options) ::= <<
 #include \<iostream\>
 #include \<string.h\>
 
-#include "$actor.simpleName$.h"
+#include "<actor.simpleName>.h"
 
-using namespace $namespace()$;
+using namespace <actor.packageAsList; separator="::">;
 
 #ifdef __TRACE_CAPTURE__
 extern TraceAka g_oTracer;
 #endif
 
-const char* $actor.simpleName$::className = "$actor.simpleName$";
+const char* <actor.simpleName>::className = "<actor.simpleName>";
 
-$defineConstantVars(actor.stateVars.list)$
+<defineConstantVars(actor.stateVars.list)>
 
-$constructor(parameters=actor.parameters.list, stateVars=actor.stateVars.list)$
+<constructor(parameters=actor.parameters.list, stateVars=actor.stateVars.list)>
 
-$destructor(stateVars=actor.stateVars.list)$
+<destructor(stateVars=actor.stateVars.list)>
 
-void $actor.simpleName$::initializeActor()
+void <actor.simpleName>::initializeActor()
 {
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // Functions/procedures
-$actor.procs.list: procedure()$
+<actor.procs.list: procedure()>
 ////////////////////////////////////////////////////////////////////////////////
 // Actions
-$actor.actions: action()$
-$if(actor.initializes)$
+<actor.actions: action()>
+<if(actor.initializes)>
 ////////////////////////////////////////////////////////////////////////////////
 // Initializes
-$actor.initializes: action()$
-void $actor.simpleName$::initialize()
+<actor.initializes: action()>
+void <actor.simpleName>::initialize()
 {
 	bool res = true;
 	int i = 0;
 
-	$if(actor.initializes)$
-	$schedulingTest(actor.initializes)$
-	$endif$
+	<if(actor.initializes)>
+	<schedulingTest(actor.initializes)>
+	<endif>
 }
 
-$endif$
+<endif>
 ////////////////////////////////////////////////////////////////////////////////
 // Action scheduler
-$if(actor.actionScheduler.fsm)$
-$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
-$else$
-$scheduler(actions=actor.actionScheduler.actions)$
-$endif$
+<if(actor.actionScheduler.fsm)>
+<schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)>
+<else>
+<scheduler(actions=actor.actionScheduler.actions)>
+<endif>
 
 
-void $actor.simpleName$::getFifoStatus()
+void <actor.simpleName>::getFifoStatus()
 {
-$if(actor.inputs.list)$
-  	for(int i=0; i\<$actor.simpleName$_nbInputs; i++) 
+<if(actor.inputs.list)>
+  	for(int i=0; i\<<actor.simpleName>_nbInputs; i++) 
 	{
 		m_arrAvailStatus[i] = m_poTabIn[i]-\>getCount();
 	}
-$endif$
-$if(actor.outputs.list)$
-	for(int i=0; i\<$actor.simpleName$_nbOutputs; i++) 
+<endif>
+<if(actor.outputs.list)>
+	for(int i=0; i\<<actor.simpleName>_nbOutputs; i++) 
 	{
 		m_arrRoomStatus[i] = m_poTabOut[i]-\>getRooms();
 	}
-$endif$
+<endif>
 }
 
 >>

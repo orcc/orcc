@@ -1,8 +1,7 @@
 addActor(actor) ::= <<
-$if (!actor.system)
-$
-$actor.packageAsList; separator="/"$/$actor.simpleName$.cpp
-$endif$
+<if (!actor.system)>
+<actor.packageAsList; separator="/">/<actor.simpleName>.cpp
+<endif>
 >>
 
 
@@ -13,7 +12,7 @@ Cpp_CMakeLists(network, needSerDes) ::= <<
 # Generated from $network.name$
 
 cmake_minimum_required (VERSION 2.8)
-project ($network.name$)
+project (<network.name>)
 
 if(MSVC)
 set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /ZI /Ob0 /Od /RTC1")
@@ -35,11 +34,11 @@ find_path(CAL_INCLUDE_DIR actoraka.h HINTS $ENV{CALDIR} PATH_SUFFIXES include in
 
 find_package(SDL REQUIRED)
 
-$if(needSerDes)$
+<if(needSerDes)>
 find_path(CAL_SOURCE_DIR wrapperaka.cpp HINTS $ENV{CALDIR} PATH_SUFFIXES src src/CAL)
 find_library(AdaptorFactory_LIBRARY AdaptorFactory HINTS $ENV{CALDIR} PATH_SUFFIXES lib)
 add_library(Wrapper STATIC "${CAL_SOURCE_DIR}/wrapperaka.cpp")
-$endif$
+<endif>
 
 include_directories(
 	${CMAKE_SOURCE_DIR}
@@ -48,20 +47,20 @@ include_directories(
 )
 
 
-add_executable ($network.name$
-$network.name$.cpp
-$network.actors : addActor()$
+add_executable (<network.name>
+<network.name>.cpp
+<network.actors : addActor()>
 )
 
-$if(needSerDes)$
-add_dependencies($network.name$ Wrapper)
-$endif$
+<if(needSerDes)>
+add_dependencies(<network.name> Wrapper)
+<endif>
 
-target_link_libraries($network.name$
-$if(needSerDes)$
+target_link_libraries(<network.name>
+<if(needSerDes)>
 Wrapper
 ${AdaptorFactory_LIBRARY}
-$endif$
+<endif>
 ${CALaka_LIBRARY}
 ${SystemActor_LIBRARY}
 ${Thread_LIBRARY}
