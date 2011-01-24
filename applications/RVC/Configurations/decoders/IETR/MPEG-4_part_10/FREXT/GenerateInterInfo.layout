@@ -1,6 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
+      <vertex id="CurrMbAddr" x="381" y="24"/>
+      <vertex id="FrameNum" x="97" y="569"/>
+      <vertex id="MaxFrameNum" x="81" y="530"/>
+      <vertex id="NumRefFrame" x="7" y="823"/>
+      <vertex id="Poc" x="109" y="591"/>
+      <vertex id="Mmco" x="43" y="787"/>
+      <vertex id="NbRefFrameL0" x="539" y="687"/>
+      <vertex id="NbRefFrameL1" x="531" y="948"/>
+      <vertex id="RefList0Type" x="537" y="715"/>
+      <vertex id="RefList1Type" x="536" y="981"/>
+      <vertex id="RefReorderingL0" x="530" y="767"/>
+      <vertex id="RefReorderingL1" x="521" y="1013"/>
+      <vertex id="MbType" x="392" y="507"/>
+      <vertex id="SubMbType" x="376" y="538"/>
+      <vertex id="Direct8x8Inference" x="360" y="52"/>
+      <vertex id="DirectSpatialMvPred" x="354" y="82"/>
+      <vertex id="FirstMbInSlice" x="377" y="119"/>
+      <vertex id="SubMbPredRefIdxL1" x="350" y="475"/>
+      <vertex id="SubMbPredRefIdxL0" x="350" y="445"/>
+      <vertex id="SubMbPredMvResL1" x="350" y="415"/>
+      <vertex id="SubMbPredMvResL0" x="351" y="386"/>
+      <vertex id="PicWidthInMb" x="379" y="351"/>
+      <vertex id="NewPic" x="401" y="323"/>
+      <vertex id="MbType4Prediction" x="362" y="294"/>
+      <vertex id="MbPredRefIdxL1" x="371" y="265"/>
+      <vertex id="MbPredRefIdxL0" x="372" y="235"/>
+      <vertex id="MbPredMvResL1" x="371" y="206"/>
+      <vertex id="MbPredMvResL0" x="372" y="175"/>
       <vertex id="DelList" x="563" y="812"/>
       <vertex id="EmptyDPB" x="549" y="857"/>
       <vertex id="Mv" x="976" y="103"/>
@@ -20,33 +48,6 @@
       <vertex id="RefIdxL1ToPoc" x="1044" y="573"/>
       <vertex id="SelectRefIdx" x="1207" y="232"/>
       <vertex id="Mgnt_InterPred" x="1206" y="61"/>
-      <vertex id="CurrMbAddr" x="382" y="50"/>
-      <vertex id="FrameNum" x="97" y="569"/>
-      <vertex id="MaxFrameNum" x="81" y="530"/>
-      <vertex id="NumRefFrame" x="7" y="823"/>
-      <vertex id="Poc" x="109" y="591"/>
-      <vertex id="Mmco" x="43" y="787"/>
-      <vertex id="NbRefFrameL0" x="539" y="687"/>
-      <vertex id="NbRefFrameL1" x="531" y="948"/>
-      <vertex id="RefList0Type" x="537" y="715"/>
-      <vertex id="RefList1Type" x="536" y="981"/>
-      <vertex id="RefReorderingL0" x="530" y="767"/>
-      <vertex id="RefReorderingL1" x="521" y="1013"/>
-      <vertex id="MbType" x="392" y="507"/>
-      <vertex id="SubMbType" x="376" y="538"/>
-      <vertex id="Direct8x8Inference" x="361" y="78"/>
-      <vertex id="DirectSpatialMvPred" x="355" y="108"/>
-      <vertex id="FirstMbInSlice" x="378" y="145"/>
-      <vertex id="SubMbPredRefIdxL1" x="350" y="475"/>
-      <vertex id="SubMbPredRefIdxL0" x="350" y="445"/>
-      <vertex id="SubMbPredMvResL1" x="350" y="415"/>
-      <vertex id="SubMbPredMvResL0" x="351" y="386"/>
-      <vertex id="PicWidthInMb" x="379" y="351"/>
-      <vertex id="NewPic" x="401" y="323"/>
-      <vertex id="MbType4Prediction" x="362" y="294"/>
-      <vertex id="MbPredRefIdxL1" x="371" y="265"/>
-      <vertex id="MbPredRefIdxL0" x="372" y="235"/>
-      <vertex id="MbPredMvResL1" x="371" y="206"/>
-      <vertex id="MbPredMvResL0" x="372" y="175"/>
+      <vertex id="MbLoc" x="404" y="147"/>
    </vertices>
 </layout>

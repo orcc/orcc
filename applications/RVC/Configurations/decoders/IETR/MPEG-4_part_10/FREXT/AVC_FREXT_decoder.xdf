@@ -437,4 +437,6 @@
     <Connection dst="Decoding_Y" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_Y"/>
     <Connection dst="IntraPredSplit" dst-port="MbLocation"
         src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="Generate_Inter_Info" dst-port="MbLoc"
+        src="Syn_Parser" src-port="MbLocation"/>
 </XDF>

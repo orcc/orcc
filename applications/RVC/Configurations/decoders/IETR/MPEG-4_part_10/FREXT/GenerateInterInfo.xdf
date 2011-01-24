@@ -187,6 +187,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="MbLoc">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -431,4 +438,5 @@
     <Connection dst="MVReconstruct" dst-port="MbPredMvResL1" src="" src-port="MbPredMvResL1"/>
     <Connection dst="MVReconstruct" dst-port="MbPredMvResL0" src="" src-port="MbPredMvResL0"/>
     <Connection dst="MVReconstruct" dst-port="MbPredRefIdxL1" src="" src-port="MbPredRefIdxL1"/>
+    <Connection dst="MVReconstruct" dst-port="MbLoc" src="" src-port="MbLoc"/>
 </XDF>
