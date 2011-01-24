@@ -3,7 +3,7 @@
    <vertices>
       <vertex id="CurrMbAddr" x="57" y="640"/>
       <vertex id="PicWidthInMb" x="46" y="687"/>
-      <vertex id="PredMode" x="39" y="885"/>
+      <vertex id="PredMode" x="33" y="906"/>
       <vertex id="FirstMbInSlice" x="59" y="601"/>
       <vertex id="PicSizeInMb" x="955" y="509"/>
       <vertex id="Coef_ACR" x="52" y="789"/>
@@ -40,5 +40,7 @@
       <vertex id="Deblocking_Filter" x="1176" y="718"/>
       <vertex id="DemuxParserInfos" x="191" y="774"/>
       <vertex id="Inter" x="586" y="231"/>
+      <vertex id="MbLocation" x="498" y="436"/>
+      <vertex id="NeighbourAvail" x="13" y="874"/>
    </vertices>
 </layout>

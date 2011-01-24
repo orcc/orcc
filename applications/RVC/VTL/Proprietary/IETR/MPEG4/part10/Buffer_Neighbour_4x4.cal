@@ -25,9 +25,8 @@ import MPEG.Common.Imp_PictureInfo.*;
 
 actor Buffer_Neighbour_4x4()
 	uint(size=6) Mb_Type,
-	uint(size=13) CurrMbAddr,
 	uint(size=8) MB_IN,
-	uint(size=7) PicWidthInMb
+	uint(size=7) MbLocation
 		==>
 	uint(size=16) EDGE :
 	// Index of the macroblock in the current line
@@ -46,12 +45,12 @@ actor Buffer_Neighbour_4x4()
 	List(type: uint(size=16), size=MAX_PICWIDTH_BLK * 16) result :=
 		[ 0 : for int i in 0 .. MAX_PICWIDTH_BLK * 16 - 1 ];
 	//Mb_Type_OK : Send value of edge needed and store the edge of macroblock decoded
-	Mb_Type_OK: action Mb_Type:[ MbType ], PicWidthInMb:[ b ], CurrMbAddr:[ c ] ==>
+	Mb_Type_OK: action
+		Mb_Type    :[MbType],
+		MbLocation :[MbxInPic , MbyInPic]
+			==>
 	do
-	//println("4 :Mb_Type_OK : "+ c); 		
-
-	// position of the current macroblock in the line
-		mb_Index := c mod b;
+		mb_Index := MbxInPic;
 		mb_type := MbType;
 	end
 	//Receive pixel value from current decoded macroblock

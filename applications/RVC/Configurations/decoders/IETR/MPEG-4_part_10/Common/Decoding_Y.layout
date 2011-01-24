@@ -5,37 +5,39 @@
       <vertex id="CoefDC_L" x="94" y="74"/>
       <vertex id="CurrMbAddr" x="481" y="113"/>
       <vertex id="FirstMbInSlice" x="476" y="203"/>
-      <vertex id="PredMode" x="497" y="656"/>
+      <vertex id="PredMode" x="498" y="715"/>
       <vertex id="QP" x="125" y="634"/>
       <vertex id="ScalingList" x="82" y="124"/>
-      <vertex id="PicWidthInMb" x="483" y="559"/>
-      <vertex id="PicSizeInMb" x="492" y="522"/>
+      <vertex id="PicWidthInMb" x="484" y="618"/>
+      <vertex id="PicSizeInMb" x="493" y="581"/>
       <vertex id="MV" x="519" y="399"/>
-      <vertex id="PartSZ" x="509" y="487"/>
-      <vertex id="POC" x="519" y="455"/>
+      <vertex id="PartSZ" x="510" y="546"/>
+      <vertex id="POC" x="520" y="514"/>
       <vertex id="CodedBlockPattern" x="459" y="9"/>
       <vertex id="LFDisable" x="492" y="361"/>
-      <vertex id="slice_alpha_c0_offset" x="460" y="871"/>
-      <vertex id="slice_beta_offset" x="476" y="904"/>
-      <vertex id="ref_idx_in" x="503" y="842"/>
-      <vertex id="mv_in" x="517" y="814"/>
+      <vertex id="slice_alpha_c0_offset" x="461" y="930"/>
+      <vertex id="slice_beta_offset" x="477" y="963"/>
+      <vertex id="ref_idx_in" x="504" y="901"/>
+      <vertex id="mv_in" x="518" y="873"/>
       <vertex id="I_PCM" x="494" y="265"/>
       <vertex id="ConstrainedIFlag" x="465" y="81"/>
       <vertex id="DelList" x="498" y="144"/>
-      <vertex id="PocToDisplay" x="479" y="592"/>
+      <vertex id="PocToDisplay" x="480" y="651"/>
       <vertex id="IsIDR" x="505" y="298"/>
       <vertex id="MacroBlockType" x="67" y="356"/>
-      <vertex id="TransformSize8x8" x="476" y="782"/>
-      <vertex id="PocToRead" x="490" y="623"/>
-      <vertex id="ReadAddress" x="482" y="692"/>
-      <vertex id="SubMbType" x="496" y="752"/>
-      <vertex id="MbType4Pred" x="486" y="431"/>
-      <vertex id="SelectList" x="498" y="721"/>
+      <vertex id="TransformSize8x8" x="477" y="841"/>
+      <vertex id="PocToRead" x="491" y="682"/>
+      <vertex id="ReadAddress" x="483" y="751"/>
+      <vertex id="SubMbType" x="497" y="811"/>
+      <vertex id="MbType4Pred" x="487" y="462"/>
+      <vertex id="SelectList" x="499" y="780"/>
       <vertex id="IsNewPicOrSlice" x="470" y="328"/>
       <vertex id="EnableRead" x="482" y="174"/>
       <vertex id="FrameNum" x="486" y="233"/>
       <vertex id="Display_L" x="969" y="138"/>
       <vertex id="TEX_L" x="711" y="116"/>
       <vertex id="RES_L" x="246" y="13"/>
+      <vertex id="MbLocation" x="498" y="436"/>
+      <vertex id="NeighbourAvail" x="489" y="491"/>
    </vertices>
 </layout>

@@ -443,4 +443,7 @@
         src="Syn_Parser" src-port="NeighbourAvail"/>
     <Connection dst="Generate_Inter_Info" dst-port="NeighbourAvail"
         src="Syn_Parser" src-port="NeighbourAvail"/>
+    <Connection dst="Decoding_Y" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="Decoding_Y" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
 </XDF>

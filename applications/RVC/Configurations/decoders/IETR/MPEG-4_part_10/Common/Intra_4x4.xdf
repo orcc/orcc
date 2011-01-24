@@ -3,31 +3,10 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="CurrMbAddr">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicWidthInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="7"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PredMode">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="FirstMbInSlice">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
@@ -58,19 +37,15 @@
     <Port kind="Input" name="IsIntraFlag">
         <Type name="bool"/>
     </Port>
-    <Port kind="Input" name="pic_width_in_mb">
+    <Port kind="Input" name="MbLocation">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="7"/>
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="curr_mb_addr">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
+    <Port kind="Input" name="NeighbourAvail">
+        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
@@ -158,7 +133,6 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="Mgnt_Intra4x4" dst-port="PredMode" src="" src-port="PredMode"/>
-    <Connection dst="Mgnt_Intra4x4" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Algo_IntraPred_LUMA_4x4" dst-port="Y_LEFT"
         src="Mgnt_Intra4x4" src-port="Y_Left4"/>
     <Connection dst="Algo_IntraPred_LUMA_4x4" dst-port="Y_UP"
@@ -186,9 +160,6 @@
     <Connection dst="Algo_Split_16x16_to_4x4_norasterscan" dst-port="X"
         src="" src-port="Coef_ACR"/>
     <Connection dst="Mgnt_Intra4x4" dst-port="IsIntraFlag" src="" src-port="IsIntraFlag"/>
-    <Connection dst="Buffer_Neighbour_4x4" dst-port="PicWidthInMb"
-        src="" src-port="pic_width_in_mb"/>
-    <Connection dst="Buffer_Neighbour_4x4" dst-port="CurrMbAddr" src="" src-port="curr_mb_addr"/>
-    <Connection dst="Mgnt_Intra4x4" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="Mgnt_Intra4x4" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
+    <Connection dst="Buffer_Neighbour_4x4" dst-port="MbLocation" src="" src-port="MbLocation"/>
+    <Connection dst="Mgnt_Intra4x4" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
 </XDF>

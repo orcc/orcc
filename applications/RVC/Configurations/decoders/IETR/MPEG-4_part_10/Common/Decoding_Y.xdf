@@ -214,6 +214,16 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Input" name="MbLocation">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="NeighbourAvail">
+        <Type name="bool"/>
+    </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
     <!-- ************************************** -->
@@ -342,4 +352,6 @@
     <Connection dst="TEX_L" dst-port="EnableRead" src="" src-port="EnableRead"/>
     <Connection dst="TEX_L" dst-port="FrameNum" src="" src-port="FrameNum"/>
     <Connection dst="TEX_L" dst-port="I_PCM" src="" src-port="I_PCM"/>
+    <Connection dst="TEX_L" dst-port="MbLocation" src="" src-port="MbLocation"/>
+    <Connection dst="TEX_L" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
 </XDF>
