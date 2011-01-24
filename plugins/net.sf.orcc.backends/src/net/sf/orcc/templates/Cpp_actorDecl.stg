@@ -5,24 +5,24 @@
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
 listSize(value) ::= <<
-$value : {[$it$]} $
+<value : {[$it$]} >
 >>
 
 variableDeclaration(variable) ::= <<
-$if (variable.type.dimensions)
-$$variable.type$ (*$variable$)$listSize(rest(variable.type.dimensions))$$
+<if (variable.type.dimensions)
+><variable.type> (*<variable>)<listSize(rest(variable.type.dimensions)) ><
 else
-$$variable.type$ $variable$$
-endif$
+><variable.type> <variable><
+endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Non-const state variables
 ///////////////////////////////////////////////////////////////////////////////
 nonConstStateVar(variable) ::= <<
-$if(variable.assignable)$
-$variableDeclaration(variable)$;$\n$
-$endif$
+<if(variable.assignable)>
+<variableDeclaration(variable)>;<\n>
+<endif>
 >>
 
 
@@ -34,7 +34,7 @@ $endif$
 
 procedure(procedure) ::= <<
 
-$procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$);
+<procedure.returnType> <procedure>(<procedure.parameters.list: variableDeclaration(); wrap, anchor, separator=", ">);
 
 >>
 
@@ -43,7 +43,7 @@ $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclara
 ///////////////////////////////////////////////////////////////////////////////
 
 action(action) ::= <<
-$procedure(action.body)$$procedure(action.scheduler)$
+<procedure(action.body)><procedure(action.scheduler)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ $procedure(action.body)$$procedure(action.scheduler)$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|hasRoom($actor.name$_$port$, $pattern.(port)$)}; separator=" && "$
+<pattern.keys:{port | hasRoom(<actor.name>_<port>, <pattern.(port)>)}; separator=" && ">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,44 +65,46 @@ int schedule();
 // Scheduler with FSM
 
 stateScheduler(transition) ::= <<
-bool $transition.sourceState$_state_scheduler();
+bool <transition.sourceState>_state_scheduler();
 
 >>
+
+getState(state) ::= <<state_<state> >>
 
 schedulerFSM(actions, fsm) ::= <<
 enum states 
 {
-	state_$first(fsm.states)$ = 0,
-	$rest(fsm.states) : {state_$it$}; separator=",\n"$
+	state_<first(fsm.states)> = 0,
+	<rest(fsm.states) : getState(); separator=",\n">
 };
 
 int _FSM_state;
 
 
-$if(actions)$
+<if(actions)>
 bool outside_FSM_scheduler();
 
-$endif$
-$fsm.transitions: stateScheduler(); separator="\n"$
+<endif>
+<fsm.transitions: stateScheduler(); separator="\n">
 int schedule();
 
 >>
 
 constructor(parameters) ::= <<
-$if (actor.parameters.list)$
-$actor.simpleName$(const char*, $parameters: {$it.type$}; separator=", "$, AKA_PROFILING_MODE );
-$else$
-$actor.simpleName$(const char*, AKA_PROFILING_MODE);
-$endif$
+<if (actor.parameters.list)>
+<actor.simpleName>(const char*, <parameters: {input | <input.type>}; separator=", ">, AKA_PROFILING_MODE );
+<else>
+<actor.simpleName>(const char*, AKA_PROFILING_MODE);
+<endif>
 >>
 
 parameters(parameters) ::= <<
-$parameters: { $it.type$ $it$;}; separator="\n"$
+<parameters: {input | <input.type> <input>;}; separator="\n">
 
 >>
 
 startNamespace(namespace) ::= <<
-namespace $namespace$ 
+namespace <namespace> 
 {
 
 >>
@@ -117,67 +119,67 @@ endNamespace() ::= <<
 
 actor(actor, options) ::= <<
 
-#ifndef __ACTOR_$actor.packageAsList; separator="_"$_$actor.simpleName$_H__
-#define __ACTOR_$actor.packageAsList; separator="_"$_$actor.simpleName$_H__
+#ifndef __ACTOR_<actor.packageAsList; separator="_">_<actor.simpleName>_H__
+#define __ACTOR_<actor.packageAsList; separator="_">_<actor.simpleName>_H__
 
 #include \<fstream\>
 #include "actoraka.h"
 
-$actor.packageAsList: startNamespace()$
+<actor.packageAsList: startNamespace()>
 	////////////////////////////////////////////////////////////////////////////////
 	// Input FIFOs
 	enum
 	{
-		$actor.inputs.list: {$actor.simpleName$_$it.name$,}; separator="\n"$
-		$actor.simpleName$_nbInputs
+		<actor.inputs.list: {input | <actor.simpleName>_<input.name>,}; separator="\n">
+		<actor.simpleName>_nbInputs
 	};
 	////////////////////////////////////////////////////////////////////////////////
 	// Output FIFOs
 	enum
 	{
-		$actor.outputs.list: {$actor.simpleName$_$it.name$,}; separator="\n"$
-		$actor.simpleName$_nbOutputs
+		<actor.outputs.list: {input | <actor.simpleName>_<input.name>,}; separator="\n">
+		<actor.simpleName>_nbOutputs
 	};
 
 
-	class $actor.simpleName$ : public ActorAKA 
+	class <actor.simpleName> : public ActorAKA 
 	{
 
 	public:
-		$constructor(actor.parameters.list)$
-		~$actor.simpleName$();
+		<constructor(actor.parameters.list)>
+		~<actor.simpleName>();
 	
 		void initializeActor();
 	////////////////////////////////////////////////////////////////////////////////
 	// Functions/procedures
-		$actor.procs.list: procedure()$
+		<actor.procs.list: procedure()>
 	////////////////////////////////////////////////////////////////////////////////
 	// Actions
-		$actor.actions: action()$
+		<actor.actions: action()>
 
 	public:
-		$if(actor.initializes)$
+		<if(actor.initializes)>
 	////////////////////////////////////////////////////////////////////////////////
 	// Initializes
-		$actor.initializes: action()$
+		<actor.initializes: action()>
 		void initialize();
 	
-	$endif$
+	<endif>
 	////////////////////////////////////////////////////////////////////////////////
 	// Action scheduler
-$if(actor.actionScheduler.fsm)$
-	$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
-$else$
-	$scheduler(actions=actor.actionScheduler.actions)$
-$endif$
+<if(actor.actionScheduler.fsm)>
+	<schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)>
+<else>
+	<scheduler(actions=actor.actionScheduler.actions)>
+<endif>
 
 	private:
-$if(actor.inputs.list)$
+<if(actor.inputs.list)>
 	const bool hasTokens(int port, int iSize) const {return  (m_arrAvailStatus[port] \>= iSize);};
-$endif$
-$if(actor.outputs.list)$
+<endif>
+<if(actor.outputs.list)>
 	const bool hasRooms(int port, int iSize) const {return  (m_arrRoomStatus[port] \>= iSize);};
-$endif$
+<endif>
 
 	void getFifoStatus();
 
@@ -186,21 +188,21 @@ $endif$
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Parameters
-	$parameters(actor.parameters.list)$
+	<parameters(actor.parameters.list)>
 	////////////////////////////////////////////////////////////////////////////////
 	// Non-const state variables of the actor
-	$actor.stateVars.list: nonConstStateVar()$
+	<actor.stateVars.list: nonConstStateVar()>
 	////////////////////////////////////////////////////////////////////////////////
 	// Fifo Status members
-$if(actor.inputs.list)$
-	int m_arrAvailStatus[$actor.simpleName$_nbInputs];
-$endif$
-$if(actor.outputs.list)$
-	int m_arrRoomStatus[$actor.simpleName$_nbOutputs];
-$endif$
+<if(actor.inputs.list)>
+	int m_arrAvailStatus[<actor.simpleName>_nbInputs];
+<endif>
+<if(actor.outputs.list)>
+	int m_arrRoomStatus[<actor.simpleName>_nbOutputs];
+<endif>
 	};
 
-$actor.packageAsList: endNamespace()$
+<actor.packageAsList: endNamespace()>
 #endif
 
 >>

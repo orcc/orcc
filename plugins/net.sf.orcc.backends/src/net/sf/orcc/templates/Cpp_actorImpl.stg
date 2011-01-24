@@ -4,17 +4,17 @@
 
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
-listSize(value) ::= <<
-$value : {[$it$]} $
+listSize(values) ::= <<
+<values : {value | [<value>]} >
 >>
 
 // the values of a list: {val1, val2, ..., valn}
-listValue(value) ::= <<
-{$value; wrap, separator=", "$}
+listValue(values) ::= <<
+{<values; wrap, separator=", ">}
 >>
 
 variableDeclaration(variable) ::= <<
-$variable.type$ $variable$$listSize(variable.type.dimensions)$
+<variable.type> <variable><listSize(variable.type.dimensions)>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,25 +22,25 @@ $variable.type$ $variable$$listSize(variable.type.dimensions)$
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-$(constant.class.simpleName)(constant)$
+<(constant.class.simpleName)(constant)>
 >>
 
 
 BoolExpr(constant) ::= <<
-$if (constant.value)$true$else$false$endif$
+<if (constant.value)>true<else>false<endif>
 >>
 
 IntExpr(number) ::= <<
-$number$$if (number.long)$L$endif$
+<number><if (number.long)>L<endif>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
 ListExpr(constant) ::= <<
-{$constant.value: Constant(); wrap, separator=", "$}
+{<constant.value: Constant(); wrap, separator=", ">}
 >>
 
 StringExpr(constant) ::= <<
-"$constant$"
+"<constant>"
 >>
 
 
@@ -51,27 +51,27 @@ StringExpr(constant) ::= <<
 defineConstantVars(variables) ::= <<
 namespace
 {
-	$variables:defineConstantVar()$}
+	<variables:defineConstantVar()>}
 >>
 
 defineConstantVar(variable) ::= <<
-$if(!variable.assignable)$
-const $variableDeclaration(variable)$ = $Constant(variable.initialValue)$;$\n$$endif$
+<if(!variable.assignable)>
+const <variableDeclaration(variable)> = <Constant(variable.initialValue)>;<\n><endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 StateVarAllocation(variable) ::= <<
-$if(variable.assignable)$
-$if (variable.type.dimensions)$
-$variable$(new $variable.type$$listSize(variable.type.dimensions)$),
-$else$
-$if (variable.initialized)$
-$variable$($Constant(variable.initialValue)$),
-$endif$
-$endif$
-$endif$
+<if(variable.assignable)>
+<if (variable.type.dimensions)>
+<variable>(new <variable.type><listSize(variable.type.dimensions)>),
+<else>
+<if (variable.initialized)>
+<variable>(<Constant(variable.initialValue)>),
+<endif>
+<endif>
+<endif>
 
 >>
 
@@ -80,11 +80,11 @@ $endif$
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 StateVarDestruction(variable) ::= <<
-$if(variable.assignable)
-$$if (variable.type.dimensions)
-$delete [] $variable$;$
-endif$$
-endif$
+<if(variable.assignable)
+><if (variable.type.dimensions)
+>delete [] <variable>;<
+endif><
+endif>
 
 >>
 
@@ -93,14 +93,14 @@ endif$
 // State variables
 ///////////////////////////////////////////////////////////////////////////////
 ListStateVarInitialization(variable) ::= <<
-$if(variable.assignable)$
-$if (variable.type.dimensions)$
-$if (variable.initialized)$
-const $variable.type$ tmp_$variable$[$variable.type.dimensions$] = $Constant(variable.initialValue)$;
-memcpy($variable$, tmp_$variable$, $variable.type.dimensions$ * sizeof($variable.type$));
-$endif$
-$endif$
-$endif$
+<if(variable.assignable)>
+<if (variable.type.dimensions)>
+<if (variable.initialized)>
+const <variable.type> tmp_<variable>[<variable.type.dimensions>] = <Constant(variable.initialValue)>;
+memcpy(<variable>, tmp_<variable>, <variable.type.dimensions> * sizeof(<variable.type>));
+<endif>
+<endif>
+<endif>
 
 >>
 ///////////////////////////////////////////////////////////////////////////////
@@ -109,15 +109,15 @@ $endif$
 
 Assign(assign) ::= <<
 
-$assign.target$ = $assign.value$;
+<assign.target> = <assign.value>;
 >>
 
 PrintParameter(parameter)::= <<
-$if (parameter.stringExpr)
-$"$parameter$"$
+<if (parameter.stringExpr)
+>"<parameter>"<
 else
-$$parameter$$
-endif$
+><parameter><
+endif>
 >>
 
 Call(call) ::= <<
@@ -130,42 +130,42 @@ endif>
 
 Decrement(decrement) ::= <<
 
-$decrement.target$--;
+<decrement.target>--;
 >>
 
 Increment(increment) ::= <<
 
-$increment.target$++;
+<increment.target>++;
 >>
 
 Load(load) ::= <<
 
-$load.target$ = $load.source$$load.indexes : {[$it$]}$;
+<load.target> = <load.source><load.indexes : {index | [<index>]}>;
 >>
 
 Peek(peek) ::= <<
 
-$if(peek.unit)$
-m_poTabIn[$actor.simpleName$_$peek.port$]-\>peek($peek.target$);$\n$
-$else$
-m_poTabIn[$actor.simpleName$_$peek.port$]-\>peek($peek.target$, $peek.numTokens$);$\n$
-$endif$
+<if(peek.unit)>
+m_poTabIn[<actor.simpleName>_<peek.port>]-\>peek(<peek.target>);<\n>
+<else>
+m_poTabIn[<actor.simpleName>_<peek.port>]-\>peek(<peek.target>, <peek.numTokens>);<\n>
+<endif>
 >>
 
 Read(read) ::= <<
 
-$if (read.target)$
-$if(read.unit)$
-m_poTabIn[$actor.simpleName$_$read.port$]-\>get($read.target$);$\n$
-m_arrAvailStatus[$actor.simpleName$_$read.port$] --;
-$else$
-m_poTabIn[$actor.simpleName$_$read.port$]-\>get($read.target$, $read.numTokens$);$\n$
-m_arrAvailStatus[$actor.simpleName$_$read.port$] -= $read.numTokens$;
-$endif$
-$else$
-m_poTabIn[$actor.simpleName$_$read.port$]-\>skip($read.numTokens$);$\n$
-m_arrAvailStatus[$actor.simpleName$_$read.port$] -= $read.numTokens$;
-$endif$
+<if (read.target)>
+<if(read.unit)>
+m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>);$\n$
+m_arrAvailStatus[<actor.simpleName>_<read.port>] --;
+<else>
+m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>, <read.numTokens>);<\n>
+m_arrAvailStatus[<actor.simpleName>_<read.port>] -= <read.numTokens>;
+<endif>
+<else>
+m_poTabIn[<actor.simpleName>_<read.port>]-\>skip(<read.numTokens>);<\n>
+m_arrAvailStatus[<actor.simpleName>_<read.port>] -= <read.numTokens>;
+<endif>
 >>
 
 ReadEnd(readEnd) ::= <<
@@ -173,19 +173,19 @@ ReadEnd(readEnd) ::= <<
 
 Return(return) ::= <<
 
-$if(return.value)$
-return $return.value$;
-$endif$
+<if(return.value)>
+return <return.value>;
+<endif>
 >>
 
 SelfAssignment(selfAssign) ::= <<
 
-$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
+<selfAssign.target> <selfAssign.op.text>= <selfAssign.value>;
 >>
 
 Store(store) ::= <<
 
-$store.target$$store.indexes : {[$it$]}$ = $store.value$;
+<store.target><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
 Write(write) ::= <<
