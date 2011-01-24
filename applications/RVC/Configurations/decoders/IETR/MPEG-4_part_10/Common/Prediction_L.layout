@@ -32,15 +32,15 @@
       <vertex id="IsNewPicOrSlice" x="1137" y="387"/>
       <vertex id="EnableRead" x="1140" y="290"/>
       <vertex id="FrameNum" x="1148" y="321"/>
+      <vertex id="MbLocation" x="94" y="447"/>
+      <vertex id="NeighbourAvail" x="13" y="874"/>
       <vertex id="Display_L" x="1535" y="289"/>
       <vertex id="Buffer_inter" x="1346" y="260"/>
       <vertex id="Select" x="817" y="907"/>
-      <vertex id="Intra_16x16" x="597" y="618"/>
+      <vertex id="Intra_16x16" x="602" y="610"/>
       <vertex id="Intra_4x4" x="595" y="1091"/>
       <vertex id="Deblocking_Filter" x="1176" y="718"/>
-      <vertex id="DemuxParserInfos" x="191" y="774"/>
+      <vertex id="DemuxParserInfos" x="167" y="816"/>
       <vertex id="Inter" x="586" y="231"/>
-      <vertex id="MbLocation" x="498" y="436"/>
-      <vertex id="NeighbourAvail" x="13" y="874"/>
    </vertices>
 </layout>

@@ -58,14 +58,7 @@
     <Port kind="Input" name="IsIntraFlag">
         <Type name="bool"/>
     </Port>
-    <Port kind="Input" name="CurrMb_Addr">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicWidth_InMb">
+    <Port kind="Input" name="MbLocation">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="7"/>
@@ -169,10 +162,8 @@
     <Connection dst="Mgnt_Intra_8x8" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Algo_Add" dst-port="Y" src="" src-port="Coef_ACR"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="IsIntraFlag" src="" src-port="IsIntraFlag"/>
-    <Connection dst="Buffer_Neighbour_FullMb" dst-port="PicWidthInMb"
-        src="" src-port="PicWidth_InMb"/>
-    <Connection dst="Buffer_Neighbour_FullMb" dst-port="CurrMbAddr"
-        src="" src-port="CurrMb_Addr"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="Buffer_Neighbour_FullMb" dst-port="MbLocation"
+        src="" src-port="MbLocation"/>
 </XDF>

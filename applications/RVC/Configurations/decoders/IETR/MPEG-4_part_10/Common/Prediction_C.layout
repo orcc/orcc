@@ -38,5 +38,6 @@
       <vertex id="Select_chroma" x="730" y="313"/>
       <vertex id="Deblocking_Filter" x="1008" y="426"/>
       <vertex id="DemuxParserInfos" x="178" y="7"/>
+      <vertex id="MbLocation" x="354" y="307"/>
    </vertices>
 </layout>

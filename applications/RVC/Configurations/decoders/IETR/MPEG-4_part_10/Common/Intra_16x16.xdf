@@ -3,20 +3,6 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="CurrMb_Addr">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="Pic_WidthInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="7"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PredMode">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -66,6 +52,13 @@
         </Type>
     </Port>
     <Port kind="Input" name="PicWidthInMb">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="MbLocation">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="7"/>
@@ -165,10 +158,6 @@
         src="Mgnt_Intra_16x16" src-port="PredMode_I"/>
     <Connection dst="Buffer_Neighbour_FullMb" dst-port="MB_IN" src="" src-port="MB_IN"/>
     <Connection dst="Buffer_Neighbour_FullMb" dst-port="Mb_Type" src="" src-port="Mb_Type"/>
-    <Connection dst="Buffer_Neighbour_FullMb" dst-port="PicWidthInMb"
-        src="" src-port="Pic_WidthInMb"/>
-    <Connection dst="Buffer_Neighbour_FullMb" dst-port="CurrMbAddr"
-        src="" src-port="CurrMb_Addr"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="EDGE"
         src="Buffer_Neighbour_FullMb" src-port="EDGE"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="ConstrainedIFlag"
@@ -177,4 +166,6 @@
     <Connection dst="Mgnt_Intra_16x16" dst-port="IsIntraFlag" src="" src-port="IsIntraFlag"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
+    <Connection dst="Buffer_Neighbour_FullMb" dst-port="MbLocation"
+        src="" src-port="MbLocation"/>
 </XDF>

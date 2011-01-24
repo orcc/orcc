@@ -36,5 +36,6 @@
       <vertex id="Display" x="991" y="149"/>
       <vertex id="PRED_C" x="735" y="121"/>
       <vertex id="RES_C" x="294" y="8"/>
+      <vertex id="MbLocation" x="354" y="307"/>
    </vertices>
 </layout>

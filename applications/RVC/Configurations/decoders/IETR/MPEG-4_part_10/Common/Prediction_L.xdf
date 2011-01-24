@@ -415,8 +415,6 @@
         src="DemuxParserInfos" src-port="PicWidthInMb_16x16"/>
     <Connection dst="Intra_16x16" dst-port="CurrMbAddr"
         src="DemuxParserInfos" src-port="CurrMbAddr_16x16"/>
-    <Connection dst="Intra_16x16" dst-port="Pic_WidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="Intra_16x16" dst-port="CurrMb_Addr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
     <Connection dst="Inter" dst-port="Coef_ACR" src="DemuxParserInfos" src-port="Coef_ACR_Inter"/>
     <Connection dst="Inter" dst-port="MV" src="" src-port="MV"/>
@@ -446,4 +444,5 @@
     <Connection dst="DemuxParserInfos" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
     <Connection dst="Intra_4x4" dst-port="NeighbourAvail"
         src="DemuxParserInfos" src-port="NeighbourAvail4x4"/>
+    <Connection dst="Intra_16x16" dst-port="MbLocation" src="" src-port="MbLocation"/>
 </XDF>

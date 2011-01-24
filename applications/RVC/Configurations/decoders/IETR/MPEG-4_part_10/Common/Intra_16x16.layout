@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMb_Addr" x="27" y="249"/>
-      <vertex id="Pic_WidthInMb" x="18" y="338"/>
       <vertex id="PredMode" x="218" y="186"/>
       <vertex id="FirstMbInSlice" x="208" y="93"/>
-      <vertex id="MB_IN" x="44" y="279"/>
+      <vertex id="MB_IN" x="86" y="250"/>
       <vertex id="Coef_ACR" x="926" y="70"/>
-      <vertex id="Mb_Type" x="37" y="309"/>
+      <vertex id="Mb_Type" x="82" y="311"/>
       <vertex id="ConstrainedIFlag" x="202" y="27"/>
       <vertex id="IsIntraFlag" x="222" y="123"/>
       <vertex id="CurrMbAddr" x="217" y="60"/>
@@ -17,5 +15,6 @@
       <vertex id="Algo_IntraPred_LUMA_16x16" x="717" y="16"/>
       <vertex id="Add_Clip" x="1026" y="26"/>
       <vertex id="Buffer_Neighbour_FullMb" x="207" y="241"/>
+      <vertex id="MbLocation" x="71" y="281"/>
    </vertices>
 </layout>
