@@ -39,10 +39,6 @@
 #ifndef FIFOMNG_H
 #define FIFOMNG_H
 
-namespace llvm{
-	class Module;
-}
-
 #include <string>
 #include <list>
 
@@ -50,6 +46,14 @@ namespace llvm{
 #include "llvm/Function.h"
 
 #include "Jade/Fifo/FifoSelection.h"
+#include "Jade/Fifo/AbstractFifo.h"
+
+namespace llvm{
+	class Module;
+}
+
+class Actor;
+class Decoder;
 //------------------------------
 
 /**
@@ -63,18 +67,7 @@ namespace llvm{
 class FifoMng {
 public:
 
-	static void setFifoTy(FifoTy fifoTy, std::string packageFld){
-		FifoMng::fifoTy =  fifoTy;
-		FifoMng::packageFolder = packageFld;
-
-		//Create the fifo map
-		fifoMap();
-
-		parseFifos();
-		parseFifoStructs();
-		parseExternFunctions();
-		parseFifoFunctions();
-	};
+	static void setFifoTy(FifoTy fifoTy, std::string packageFld);
 
 	static std::string getFifoFilename(){return fifoFiles[fifoTy];};
 
@@ -142,6 +135,32 @@ public:
      */
 	static llvm::Function* getReadEndFunction(llvm::Type* type);
 
+	/**
+	 *  @brief Getter of fifo structure
+	 *
+	 *      Return the llvm::Type of the fifo structure
+	 *
+	 *  @return llvm::Type of the fifo
+	 *
+	 */
+	static std::map<std::string, llvm::Type*>* getFifoTypes(){
+		return &structAcces;
+	};
+
+	static AbstractFifo* getFifo(llvm::LLVMContext& C, Decoder* decoder, llvm::Type* type, int size);
+
+	/**
+	 *  @brief refine Fifos of the actor
+	 *     
+	 *  Set Abstract fifos from the current actor into the Fifo
+	 *
+	 *  @param actor: the Actor to refine
+	 */
+	static void refineActor(Actor* actor);
+	static void addFifoHeader(Decoder* decoder);
+	static void addFifoType(Decoder* decoder);
+	static void addFunctions(Decoder* decoder);
+
 private:
 
 
@@ -156,6 +175,11 @@ private:
     * @brief Fifo function name
     */
 	static void fifoMap();
+
+	/**
+    * @brief Fifo structure name
+    */
+	static void structMap();
 
 	/**
     * @brief Parse extern functions
@@ -187,9 +211,19 @@ private:
     */
 	static std::string funcName(llvm::IntegerType* type, std::string func);
 
+	/**
+	 *  @brief refine fifo structures of the actor
+	 */
+	static void refineStructures(Actor* actor);
+
+	/**
+	 *  @brief refine fifo functions of the actor
+	 */
+	static void refineFunctions(Actor* actor);
+
 	/** Fifo type */
 	static FifoTy fifoTy;
-
+	
 	/** Fifo filename */
 	static std::string fifoFiles[];
 	

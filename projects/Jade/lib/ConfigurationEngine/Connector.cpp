@@ -39,24 +39,50 @@
 #include <iostream>
 
 #include "Connector.h"
+#include "Jade/Configuration/Configuration.h"
+#include "Jade/Core/Network.h"
 #include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace std;
 
 Connector::Connector(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
-	// Initialize fifo counter
-	fifoCnt = 0;
+	this->decoder = decoder;
 }
 
 Connector::~Connector(){
 
 }
 
-void Connector::setConnections(Configuration* configuration){
 
+void Connector::setConnections(Configuration* configuration){
+	Network* network = configuration->getNetwork();
+	HDAGGraph* graph = network->getGraph();
+	
+	int edges = graph->getNbEdges();
+	
+	for (int i = 0; i < edges; i++){
+		setConnection((Connection*)graph->getEdge(i));
+	}
 }
 
 void Connector::unsetConnections(Configuration* configuration){
+	Network* network = configuration->getNetwork();
+	HDAGGraph* graph = network->getGraph();
+	
+	int edges = graph->getNbEdges();
+	
+	for (int i = 0; i < edges; i++){
+		Connection* connection = ((Connection*)graph->getEdge(i));
+		connection->unsetFifo();
+	}
+}
 
+void Connector::setConnection(Connection* connection){
+	//Source port is choosen as the reference type
+	Port* src = connection->getSourcePort();
+	
+	//Create a fifo and set it to the connection
+	AbstractFifo* fifo = FifoMng::getFifo(Context, decoder, src->getType(), connection->getSize());
+	connection->setFifo(fifo);
 }

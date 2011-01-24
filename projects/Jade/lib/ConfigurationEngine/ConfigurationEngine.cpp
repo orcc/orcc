@@ -49,6 +49,7 @@
 #include "Jade/Serialize/IRLinker.h"
 #include "Jade/Serialize/IRUnwriter.h"
 #include "Jade/Serialize/IRWriter.h"
+#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace std;
@@ -62,8 +63,7 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	Configuration* configuration = decoder->getConfiguration();
 
 	// Add Fifo function and fifo type into the decoder
-	//AbstractConnector* connector = configuration->getConnector();
-	//connector->addFifoHeader(decoder);
+	FifoMng::addFifoHeader(decoder);
 
 	// Adding broadcast 
 	BroadcastAdder broadAdder(Context, configuration);

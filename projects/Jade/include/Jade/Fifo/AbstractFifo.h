@@ -41,9 +41,16 @@
 #include <string>
 #include <map>
 
-#include "Jade/Core/Network/Connection.h"
+#include "llvm/GlobalVariable.h"
 
+namespace llvm{
+	class LLVMContext;
+	class Type;
+	class GlobalVariable;
+	class Module;
+}
 
+class Connection;
 //------------------------------
 /**
  * @brief  This class defines an abstract fifo.
@@ -59,38 +66,49 @@ public:
 	 *  @param connection : the Connection representing the fifo
 	 *
      */
-	AbstractFifo(Connection* connection){
+	AbstractFifo(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size) : Context(C){
 		this->connection;
-
-		//Call connection creator
-		createConnection();
+		this->module = module;
+		this->fifoType = type;
+		this->fifoSize = size;
 	};
-
-	virtual ~AbstractFifo(){};
 
 	/**
-     *  @brief Return the filename of the fifo
+     *  @brief Get the llvm::GlobalVariable that represents the fifo
 	 *
-	 *  @return filename of the fifo
+	 *  @return the llvm::GlobalVariable of the fifo
 	 *
      */
-	std::string getFilename(){
-		return filename;
+	llvm::GlobalVariable* getGV(){
+		return fifoGV;
+	}
+
+	virtual ~AbstractFifo(){
+		delete fifoGV;
 	};
 
-	virtual std::map<std::string,std::string> fifoMap();
 
-	virtual std::map<std::string,std::string> structMap();
-
-private:
-
+protected:
+	/** Fifo builder */
 	virtual void createConnection(){};
+
+	/** Size of the fifo */
+	int fifoSize;
+
+	/** llvm::Type of the fifo */
+	llvm::Type* fifoType;
+
+	/** llvm::GlobalVariable of the fifo */
+	llvm::GlobalVariable* fifoGV;
+		
+	/** Module where fifo is instancied */
+	llvm::Module* module;
 
 	/** Connection representing the fifo*/
 	Connection* connection;
 
-	/** Filename of the fifo */
-	std::string filename;
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
 };
 
 #endif

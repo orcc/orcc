@@ -39,7 +39,11 @@
 #ifndef FIFOCIRCULAR_H
 #define FIFOCIRCULAR_H
 
-#include "Jade/Fifo/FifoAbstract.h"
+namespace llvm{
+	class Constant;
+}
+
+#include "Jade/Fifo/AbstractFifo.h"
 //------------------------------
 
 /**
@@ -49,117 +53,19 @@
  * 
  */
 
-class FifoCircular : public FifoAbstract {
+class FifoCircular : public AbstractFifo {
 	public:
-		FifoCircular(llvm::GlobalVariable *fifo,
-					 llvm::Constant* size,
-					 llvm::Constant* read_ind,
-					 llvm::Constant* write_ind,
-					 llvm::Constant* fill_count,
-					 llvm::GlobalVariable* contents,
-					 llvm::GlobalVariable* fifo_buffer){
-			this->fifo = fifo;
-			this->size = size;
-			this->read_ind = read_ind;
-			this->write_ind = write_ind;
-			this->fill_count = fill_count;
-			this->contents = contents;
-			this->fifo_buffer = fifo_buffer;
+		FifoCircular(llvm::LLVMContext& C, llvm::Module* module, llvm::Type* type, int size) : AbstractFifo(C, module, type, size){
+			createConnection();
 		};
 
 		~FifoCircular();
 
-		/** Fifo function name */
-		std::map<std::string,std::string> fifoMap()
-		{
-			std::map<std::string,std::string> fifo;
-		
-			fifo["i8_peek"] = "fifo_i8_peek";
-			fifo["i8_write"] = "fifo_i8_write";
-			fifo["i8_read"] = "fifo_i8_read";
-			fifo["i8_hasToken"] = "fifo_i8_has_tokens";
-			fifo["i8_hasRoom"] = "fifo_i8_has_room";
-			fifo["i8_writeEnd"] = "fifo_i8_write_end";
-			fifo["i8_readEnd"] = "fifo_i8_read_end";
+	protected:
+		llvm::GlobalVariable* ArrayFifoBuffer;
+		llvm::GlobalVariable* ArrayContent;
 
-			fifo["i16_peek"] = "fifo_i16_peek";
-			fifo["i16_write"] = "fifo_i16_write";
-			fifo["i16_read"] = "fifo_i16_read";
-			fifo["i16_hasToken"] = "fifo_i16_has_tokens";
-			fifo["i16_hasRoom"] = "fifo_i16_has_room";
-			fifo["i16_writeEnd"] = "fifo_i16_write_end";
-			fifo["i16_readEnd"] = "fifo_i16_read_end";
-
-			fifo["i32_peek"] = "fifo_i32_peek";
-			fifo["i32_write"] = "fifo_i32_write";
-			fifo["i32_read"] = "fifo_i32_read";
-			fifo["i32_hasToken"] = "fifo_i32_has_tokens";
-			fifo["i32_hasRoom"] = "fifo_i32_has_room";
-			fifo["i32_writeEnd"] = "fifo_i32_write_end";
-			fifo["i32_readEnd"] = "fifo_i32_read_end";
-
-			fifo["i64_peek"] = "fifo_i64_peek";
-			fifo["i64_write"] = "fifo_i64_write";
-			fifo["i64_read"] = "fifo_i64_read";
-			fifo["i64_hasToken"] = "fifo_i64_has_tokens";
-			fifo["i64_hasRoom"] = "fifo_i64_has_room";
-			fifo["i64_writeEnd"] = "fifo_i64_write_end";
-			fifo["i64_readEnd"] = "fifo_i64_read_end";
-
-			fifo["u8_peek"] = "fifo_u8_peek";
-			fifo["u8_write"] = "fifo_u8_write";
-			fifo["u8_read"] = "fifo_u8_read";
-			fifo["u8_hasToken"] = "fifo_u8_has_tokens";
-			fifo["u8_hasRoom"] = "fifo_u8_has_room";
-			fifo["u8_writeEnd"] = "fifo_u8_write_end";
-			fifo["u8_readEnd"] = "fifo_u8_read_end";
-
-			fifo["u16_peek"] = "fifo_u16_peek";
-			fifo["u16_write"] = "fifo_u16_write";
-			fifo["u16_read"] = "fifo_u16_read";
-			fifo["u16_hasToken"] = "fifo_u16_has_tokens";
-			fifo["u16_hasRoom"] = "fifo_u16_has_room";
-			fifo["u16_writeEnd"] = "fifo_u16_write_end";
-			fifo["u16_readEnd"] = "fifo_u16_read_end";
-
-			fifo["u32_peek"] = "fifo_u32_peek";
-			fifo["u32_write"] = "fifo_u32_write";
-			fifo["u32_read"] = "fifo_u32_read";
-			fifo["u32_hasToken"] = "fifo_u32_has_tokens";
-			fifo["u32_hasRoom"] = "fifo_u32_has_room";
-			fifo["u32_writeEnd"] = "fifo_u32_write_end";
-			fifo["u32_readEnd"] = "fifo_u32_read_end";
-
-			fifo["u64_peek"] = "fifo_u64_peek";
-			fifo["u64_write"] = "fifo_u64_write";
-			fifo["u64_read"] = "fifo_u64_read";
-			fifo["u64_hasToken"] = "fifo_u64_has_tokens";
-			fifo["u64_hasRoom"] = "fifo_u64_has_room";
-			fifo["u64_writeEnd"] = "fifo_u64_write_end";
-			fifo["u64_readEnd"] = "fifo_u64_read_end";
-
-			return fifo;
-		}
-
-		/** Fifo function name */
-		std::map<std::string,std::string> structMap()
-		{
-			std::map<std::string,std::string> fifoStruct;	
-			fifoStruct["char_s"] = "struct.fifo_i8_s";
-			fifoStruct["short_s"] = "struct.fifo_i16_s";
-			fifoStruct["int_s"] = "struct.fifo_i32_s";
-			fifoStruct["long_s"] = "struct.fifo_i64_s";
-			return fifoStruct;
-		}
-
-	private:
-		llvm::GlobalVariable *fifo;
-		llvm::Constant* size;
-		llvm::Constant* read_ind;
-		llvm::Constant* write_ind;
-		llvm::Constant* fill_count;
-		llvm::GlobalVariable* contents;
-		llvm::GlobalVariable* fifo_buffer;
+		void createConnection();
 };
 
 #endif

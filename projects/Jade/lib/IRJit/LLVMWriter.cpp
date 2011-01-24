@@ -38,6 +38,7 @@
 //------------------------------
 #include "Jade/Decoder.h"
 #include "Jade/Jit/LLVMWriter.h"
+#include "Jade/Util/FifoMng.h"
 
 #include "llvm/Instructions.h"
 #include "llvm/Transforms/Utils/Cloning.h"
@@ -222,13 +223,13 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
 	  // Remap operands.
 	  for (User::op_iterator op = II->op_begin(), E = II->op_end(); op != E; ++op) {
 		Value *V;
-	/*	
-		if (fifo->isFifoFunction((*op)->getName())){
+		
+		/*if (FifoMng::isFifoFunction((*op)->getName())){
 			//If this function is a fifo function, this function already exist in the module
-			V = fifo->getFifoFunction((*op)->getName());
-		} else if(fifo->isExternFunction((*op)->getName())){
+			V = FifoMng::getFifoFunction((*op)->getName());
+		} else if(FifoMng::isExternFunction((*op)->getName())){
 			//Same for external function
-			V = fifo->getExternFunction((*op)->getName());
+			V = FifoMng::getExternFunction((*op)->getName());
 		} else {*/
 			V= MapValue(*op, VMap, ModuleLevelChanges);
 			assert(V && "Referenced value not in value map!");

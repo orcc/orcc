@@ -44,7 +44,8 @@
 #include <string>
 
 #include "Jade/Core/IRAttribute.h"
-#include "Jade/Fifo/FifoAbstract.h"
+#include "Jade/Core/Port.h"
+#include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Graph/HDAGEdge.h"
 
 namespace llvm{
@@ -53,7 +54,6 @@ namespace llvm{
 	class GlobalVariable;
 }
 
-class Port;
 class Expr;
 
 #define SIZE 10000
@@ -152,7 +152,7 @@ public:
 	 *  @return a llvm::GlobalVariable representing the fifo of the connection
      *
      */
-	FifoAbstract* getFifo(){return fifo;};
+	AbstractFifo* getFifo(){return fifo;};
 
 	/*!
      *  @brief set the fifo bound to the connection
@@ -160,7 +160,13 @@ public:
 	 *  @param fifo: a llvm::GlobalVariable representing the fifo of the connection
      *
      */
-	 void setFifo(FifoAbstract* fifo){this->fifo = fifo;};
+	 void setFifo(AbstractFifo* fifo);
+
+	 /*!
+	 *  @brief unset the fifo bound to the connection
+     *
+     */
+	 void unsetFifo();
 
 	 /**
 	 * @brief  return an attribute
@@ -174,9 +180,9 @@ public:
 
 private:
 	std::map<std::string, IRAttribute*>* attributes;	/** Map of attributes */
-	Port* source;						/** Source Port */
-	Port* target;						/** Destination Port */
-	FifoAbstract* fifo;			/** Fifo of the connection */
+	Port* source;				/** Source Port */
+	Port* target;				/** Destination Port */
+	AbstractFifo* fifo;			/** Fifo of the connection */
 };
 
 #endif

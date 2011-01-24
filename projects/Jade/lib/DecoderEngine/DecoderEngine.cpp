@@ -257,7 +257,7 @@ map<string, Actor*>* DecoderEngine::parseActors(Configuration* Configuration) {
 			actor = irParser->parseActor(*it);
 			
 			//Refine actors with the fifo used by the decoder engine
-			//fifo->refineActor(actor);
+			FifoMng::refineActor(actor);
 		}else{
 			//Actor has been parsed
 			actor = itAct->second;
@@ -274,7 +274,7 @@ map<string, Actor*>* DecoderEngine::parseActors(Configuration* Configuration) {
 }
 
 void DecoderEngine::doOptimizeDecoder(Decoder* decoder){
-
+//TODO : add CFGSimplification and mem2reg
 	InstanceInternalize internalize;
 	internalize.transform(decoder);
 	

@@ -36,7 +36,7 @@
 */
 
 //------------------------------
-
+#include <iostream>
 #include "llvm/DerivedTypes.h"
 #include "llvm/Instructions.h"
 #include "llvm/LLVMContext.h"
@@ -52,6 +52,7 @@
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Scheduler/ActionSchedulerAdder.h"
+#include "Jade/Util/FifoMng.h"
 //------------------------------
 
 using namespace llvm;
@@ -362,8 +363,7 @@ CallInst* ActionSchedulerAdder::createOutputTest(Port* port, ConstantInt* numTok
 	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
 	
 	//Call hasRoom function
-	//AbstractConnector* fifo = decoder->getFifo();
-	Function* hasRoomFn = NULL;//fifo->getHasRoomFunction(port->getType());
+	Function* hasRoomFn = FifoMng::getHasRoomFunction(port->getType());
 	Value* hasRoomArgs[] = { loadPort, numTokens};
 	CallInst* callInst = CallInst::Create(hasRoomFn, hasRoomArgs, hasRoomArgs+2,"",  BB);
 
@@ -374,9 +374,8 @@ CallInst* ActionSchedulerAdder::createInputTest(Port* port, ConstantInt* numToke
 	//Load selected port
 	LoadInst* loadPort = new LoadInst(port->getGlobalVariable(), "", BB);
 	
-	//Call hasRoom function
-	//AbstractConnector* fifo = decoder->getFifo();
-	Function* hasTokenFn = NULL;//fifo->getHasTokenFunction(port->getType());
+	//Call hasToken function
+	Function* hasTokenFn = FifoMng::getHasTokenFunction(port->getType());
 	Value* hasTokenArgs[] = { loadPort, numTokens};
 	CallInst* callInst = CallInst::Create(hasTokenFn, hasTokenArgs, hasTokenArgs+2,"",  BB);
 

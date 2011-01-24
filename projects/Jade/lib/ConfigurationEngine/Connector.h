@@ -99,22 +99,12 @@ private:
 	 * @param connection : the Connection to print
 	 */
 	void setConnection(Connection* connection);
-
-	/**
-	 * @brief Remove a connection
-	 * 
-	 * @param connection : the Connection to remove
-	 */
-	void unsetConnection(Connection* connection);
 	
 	/** LLVM Context */
 	llvm::LLVMContext &Context;
 
 	/** Decoder to print connection */
 	Decoder* decoder;
-
-	/** Counter of fifo */
-	int fifoCnt;
 
 };
 
