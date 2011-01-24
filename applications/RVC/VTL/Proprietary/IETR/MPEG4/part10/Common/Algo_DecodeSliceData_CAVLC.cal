@@ -53,7 +53,8 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 	bool          ConstraindedIntraPredFlag,
 	uint(size=13) CurrMbAddr,
-	uint(size=7)  PicWidthInMb, 
+	uint(size=7)  PicWidthInMb,
+	uint(size=7)  MbLocation,
 	uint(size=13) PicSizeInMb,
 	uint(size=13) FirstMbInSlice,
 	uint(size=2)  LFDisable,
@@ -119,6 +120,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	int (size=5)  second_chroma_qp_index_offset;
 	//Slice Header Parameters
 	uint(size=32) curr_mb_addr := 0;
+	uint(size=7)  MbLocxInPic := 0;
+	uint(size=7)  MbLocyInPic := 0;
+	uint(size=7)  MbLocxInSlc := 0;
+	uint(size=7)  MbLocyInSlc := 0;
 	uint(size=4)  slice_type;
 	bool          MbaffFrameFlag;
 	uint(size=13) first_mb_in_slice;
@@ -143,6 +148,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 	procedure NextMbAddress()
 		begin
 			curr_mb_addr        := curr_mb_addr + 1;
+			MbLocxInPic         := curr_mb_addr mod PicWidthInMbs;
+			MbLocyInPic         := curr_mb_addr  /  PicWidthInMbs;
+			MbLocxInSlc         := (curr_mb_addr - first_mb_in_slice) mod PicWidthInMbs;
+			MbLocyInSlc         := (curr_mb_addr - first_mb_in_slice)  /  PicWidthInMbs;
 			TotalCoeffTabLuma[bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)]      := [0: for int i in 0 .. 15];
 			TotalCoeffTabChroma[0][bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)] := [0: for int i in 0 .. 15];
 			TotalCoeffTabChroma[1][bitand(curr_mb_addr ,MASK_POW2_PICWIDTH_BLK_PLUS1)] := [0: for int i in 0 .. 15];
@@ -204,6 +213,10 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				else
 					ValFirstMbInSlice * (1 + 1)
 				end;
+			MbLocxInPic    := curr_mb_addr mod PicWidthInMbs;
+			MbLocyInPic    := curr_mb_addr  /  PicWidthInMbs;
+			MbLocxInSlc    := (curr_mb_addr - first_mb_in_slice) mod PicWidthInMbs;
+			MbLocyInSlc    := (curr_mb_addr - first_mb_in_slice)  /  PicWidthInMbs;
 			moreDataFlag   := true;
 			prevMbSkipped  := false;
 
@@ -261,6 +274,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 				==>
 			ConstraindedIntraPredFlag :[constrained_intra_pred_flag],
 			CurrMbAddr                :[curr_mb_addr - 1],
+			MbLocation                :[prevMbLocxInPic , prevMbLocyInPic , prevMbLocxInSlc , prevMbLocyInSlc],
 			PicWidthInMb              :[PicWidthInMbs],
 			PicSizeInMb               :[PicSizeInMbs],
 			FirstMbInSlice            :[first_mb_in_slice],
@@ -275,6 +289,11 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			IsNewPicOrSlice           :[IS_NEW_MB]
 		guard
 			mb_skip_run > 0
+		var
+			uint(size=7) prevMbLocxInPic = MbLocxInPic,
+			uint(size=7) prevMbLocyInPic = MbLocyInPic,
+			uint(size=7) prevMbLocxInSlc = MbLocxInSlc,
+			uint(size=7) prevMbLocyInSlc = MbLocyInSlc
 		do
 			foreach int i in 0 .. 15
 			do
@@ -352,7 +371,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 			bool        AMbExists,
 			int(size=8) Flags
 		do
-				if((curr_mb_addr mod PicWidthInMbs) != 0 and first_mb_in_slice != curr_mb_addr) then
+				if(MbLocxInPic != 0 and (MbLocxInSlc != 0 or MbLocyInSlc != 0)) then
 					NaTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 5],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][ 7],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - 1 ,MASK_POW2_PICWIDTH_BLK_PLUS1)][13],
@@ -371,7 +390,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 					NaTab     := [0:for int i in 0 .. 11];
 					LMbExists := false;
 				end
-				if((curr_mb_addr - first_mb_in_slice) / PicWidthInMbs != 0)then
+				if(MbLocyInSlc != 0)then
 					AMbExists := true;
 					NbTab := [ TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][10],
 					           TotalCoeffTabLuma  [ bitand(curr_mb_addr - PicWidthInMbs,MASK_POW2_PICWIDTH_BLK_PLUS1)][11],
@@ -422,6 +441,7 @@ actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
 
 			ConstraindedIntraPredFlag :[constrained_intra_pred_flag],
 			CurrMbAddr                :[curr_mb_addr],
+			MbLocation                :[MbLocxInPic , MbLocyInPic , MbLocxInSlc , MbLocyInSlc],
 			PicWidthInMb              :[PicWidthInMbs],
 			PicSizeInMb               :[PicSizeInMbs],
 			FirstMbInSlice            :[first_mb_in_slice],

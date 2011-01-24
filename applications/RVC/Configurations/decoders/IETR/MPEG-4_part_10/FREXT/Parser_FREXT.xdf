@@ -356,6 +356,13 @@
             </Entry>
         </Type>
     </Port>
+    <Port kind="Output" name="MbLocation">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -585,4 +592,5 @@
     <Connection dst="" dst-port="MaxDpbSize" src="CheckIsNewSlice" src-port="MaxDPBSize_o"/>
     <Connection dst="" dst-port="MbIntraFlag" src="DecodePic" src-port="MbIntraFlag"/>
     <Connection dst="" dst-port="IntraPredMode" src="DecodePic" src-port="IntraPredMode"/>
+    <Connection dst="" dst-port="MbLocation" src="DecodePic" src-port="MbLocation"/>
 </XDF>

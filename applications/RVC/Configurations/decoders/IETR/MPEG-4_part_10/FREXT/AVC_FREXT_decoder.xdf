@@ -426,12 +426,6 @@
         src="Syn_Parser" src-port="MbIntraFlag"/>
     <Connection dst="IntraPredSplit" dst-port="IntraPredMode"
         src="Syn_Parser" src-port="IntraPredMode"/>
-    <Connection dst="IntraPredSplit" dst-port="CurrMbAddr"
-        src="Syn_Parser" src-port="CurrMbAddr"/>
-    <Connection dst="IntraPredSplit" dst-port="FirstMBInSlice"
-        src="Syn_Parser" src-port="FirstMbInSlice"/>
-    <Connection dst="IntraPredSplit" dst-port="PicWidthInMb"
-        src="Syn_Parser" src-port="PicWidthInMb"/>
     <Connection dst="IntraPredSplit" dst-port="ConstrainedIFlag"
         src="Syn_Parser" src-port="ConstrainedIFlag"/>
     <Connection dst="Syn_Parser" dst-port="ResetPrevFrameNum"
@@ -441,4 +435,6 @@
     <Connection dst="Decode_U" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_U"/>
     <Connection dst="Decode_V" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_V"/>
     <Connection dst="Decoding_Y" dst-port="I_PCM" src="Syn_Parser" src-port="I_PCM_Y"/>
+    <Connection dst="IntraPredSplit" dst-port="MbLocation"
+        src="Syn_Parser" src-port="MbLocation"/>
 </XDF>

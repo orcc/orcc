@@ -404,6 +404,13 @@
     <Port kind="Output" name="IsNewPic">
         <Type name="bool"/>
     </Port>
+    <Port kind="Output" name="MbLocation">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="7"/>
+            </Entry>
+        </Type>
+    </Port>
     <!-- ************************************** -->
     <!-- Variables and Parameters of the Graph  -->
     <!-- ************************************** -->
@@ -733,4 +740,5 @@
     <Connection dst="" dst-port="IsNewPic" src="DecodeSliceHeader" src-port="Others_IsNewPic"/>
     <Connection dst="DecodeSliceData_Cavlc" dst-port="QpFeedback"
         src="DecodeMacroBlockLayer" src-port="QpFeedback"/>
+    <Connection dst="" dst-port="MbLocation" src="DecodeSliceData_Cavlc" src-port="MbLocation"/>
 </XDF>
