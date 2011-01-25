@@ -3,31 +3,10 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="CurrMbAddr">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicWidthInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="7"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PredMode">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="4"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="FirstMbInSlice">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
             </Entry>
         </Type>
     </Port>
@@ -64,6 +43,9 @@
                 <Expr kind="Literal" literal-kind="Integer" value="7"/>
             </Entry>
         </Type>
+    </Port>
+    <Port kind="Input" name="NeighbourAvail">
+        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
@@ -157,13 +139,11 @@
     <Connection dst="Algo_IntraPred_CHROMA" dst-port="PredMode"
         src="Mgnt_Intra_8x8" src-port="PredMode_I"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="PredMode" src="" src-port="PredMode"/>
-    <Connection dst="Mgnt_Intra_8x8" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="Algo_Add" dst-port="X" src="Algo_IntraPred_CHROMA" src-port="MPR"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="ConstrainedIFlag" src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Algo_Add" dst-port="Y" src="" src-port="Coef_ACR"/>
     <Connection dst="Mgnt_Intra_8x8" dst-port="IsIntraFlag" src="" src-port="IsIntraFlag"/>
-    <Connection dst="Mgnt_Intra_8x8" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Mgnt_Intra_8x8" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Buffer_Neighbour_FullMb" dst-port="MbLocation"
         src="" src-port="MbLocation"/>
+    <Connection dst="Mgnt_Intra_8x8" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
 </XDF>

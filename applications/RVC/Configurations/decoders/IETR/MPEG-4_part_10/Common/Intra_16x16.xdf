@@ -10,13 +10,6 @@
             </Entry>
         </Type>
     </Port>
-    <Port kind="Input" name="FirstMbInSlice">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MB_IN">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -44,26 +37,15 @@
     <Port kind="Input" name="IsIntraFlag">
         <Type name="bool"/>
     </Port>
-    <Port kind="Input" name="CurrMbAddr">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
-    <Port kind="Input" name="PicWidthInMb">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="7"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="MbLocation">
         <Type name="uint">
             <Entry kind="Expr" name="size">
                 <Expr kind="Literal" literal-kind="Integer" value="7"/>
             </Entry>
         </Type>
+    </Port>
+    <Port kind="Input" name="NeighbourAvail">
+        <Type name="bool"/>
     </Port>
     <!-- ************************************** -->
     <!-- Output ports of the Graph              -->
@@ -142,7 +124,6 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="Mgnt_Intra_16x16" dst-port="PredMode" src="" src-port="PredMode"/>
-    <Connection dst="Mgnt_Intra_16x16" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="" dst-port="MB_intraPred16x16" src="Add_Clip" src-port="Z"/>
     <Connection dst="Add_Clip" dst-port="X"
         src="Algo_IntraPred_LUMA_16x16" src-port="MPR"/>
@@ -164,8 +145,7 @@
         src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Add_Clip" dst-port="Y" src="" src-port="Coef_ACR"/>
     <Connection dst="Mgnt_Intra_16x16" dst-port="IsIntraFlag" src="" src-port="IsIntraFlag"/>
-    <Connection dst="Mgnt_Intra_16x16" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
-    <Connection dst="Mgnt_Intra_16x16" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
     <Connection dst="Buffer_Neighbour_FullMb" dst-port="MbLocation"
         src="" src-port="MbLocation"/>
+    <Connection dst="Mgnt_Intra_16x16" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
 </XDF>

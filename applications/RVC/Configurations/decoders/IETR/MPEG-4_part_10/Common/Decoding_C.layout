@@ -33,9 +33,10 @@
       <vertex id="IsNewPicOrSlice" x="527" y="305"/>
       <vertex id="EnableRead" x="528" y="139"/>
       <vertex id="FrameNum" x="541" y="202"/>
+      <vertex id="MbLocation" x="354" y="307"/>
       <vertex id="Display" x="991" y="149"/>
       <vertex id="PRED_C" x="735" y="121"/>
       <vertex id="RES_C" x="294" y="8"/>
-      <vertex id="MbLocation" x="354" y="307"/>
+      <vertex id="NeighbourAvail" x="361" y="200"/>
    </vertices>
 </layout>

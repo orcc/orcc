@@ -25,15 +25,14 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 	uint(size=13) FirstMbInSlice,
 	bool          ConstrainedIFlag,
 	uint(size=7)  PicWidthInMb,
-	uint(size=13) CurrMbAddr
+	uint(size=13) CurrMbAddr,
+	bool          NeighbourAvail
 	
 		==>
 	int (size=9)  Coef_ACR_Intra,
-	uint(size=13) FstMbInSlice_Intra,
 	bool          IsIntraFlag,
 	bool          ConstrI_Intra,
-	uint(size=7)  PicWidthInMb_Intra,
-	uint(size=13) CurrMbAddr_Intra,
+	bool          NeighbourAvail_Intra,
 
 	int (size=9)  Coef_ACR_Inter
 		:
@@ -43,6 +42,7 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 	bool FstMbSent;
 	bool CstrISent;
 	bool IsIntraSent;
+	bool IsNeighbourSent;
 
 	List( type:bool, size=MAX_PICWIDTH_BLK) is_intra := [false : for int i in 0 .. MAX_PICWIDTH_BLK-1];
 	bool          intra_top_left := false;	
@@ -63,9 +63,10 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 		guard
 			ValMBType = BLOCK_TYPE_I_PCM
 		do
-			AcrSent     := true;
-			FstMbSent   := true;
-			CstrISent   := true;
+			AcrSent         := true;
+			FstMbSent       := true;
+			CstrISent       := true;
+			IsNeighbourSent := true;
 			IsIntraSent := false;
 
 			CurrValIsIntra := true;
@@ -79,10 +80,11 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 			ValMBType <= BLOCK_TYPE_INTRA_MAX,
 			ValMBType != BLOCK_TYPE_I_PCM
 		do
-			AcrSent   := false;
-			FstMbSent := false;
-			CstrISent := false;
-			IsIntraSent    := false;
+			AcrSent         := false;
+			FstMbSent       := false;
+			CstrISent       := false;
+			IsIntraSent     := false;
+			IsNeighbourSent := false;
 
 			CurrValIsIntra := true;	
 			
@@ -101,7 +103,6 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 	SendFstMbIntra: action
 			FirstMbInSlice     :[FirstMb]
 				==>
-			FstMbInSlice_Intra :[FirstMb]
 		guard
 			not FstMbSent
 		do
@@ -122,9 +123,7 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 			PicWidthInMb :[PicWidth],
 			CurrMbAddr   :[CurrMb]
 				==>
-			IsIntraFlag        :[ is_intra[(curr_pos-1) & 0x3F] , is_intra[curr_pos & 0x3F] , intra_top_left ],
-			PicWidthInMb_Intra :[PicWidth],
-			CurrMbAddr_Intra   :[CurrMb]
+			IsIntraFlag        :[ is_intra[(curr_pos-1) & 0x3F] , is_intra[curr_pos & 0x3F] , intra_top_left ]
 		guard
 			not IsIntraSent
 		do
@@ -132,12 +131,23 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 			IsIntraSent := true;
 		end
 
+	SendNeighbourIntra: action
+			NeighbourAvail :[NeighbourA , NeighbourB , NeighbourC , NeighbourD]
+				==>
+			NeighbourAvail_Intra  :[NeighbourA , NeighbourB , NeighbourC , NeighbourD]
+		guard
+			not IsNeighbourSent
+		do
+			IsNeighbourSent := true;
+		end
+
 	SendInfosDone: action ==>
 		guard
 			AcrSent,
 			FstMbSent,
 			CstrISent,
-			IsIntraSent
+			IsIntraSent,
+			IsNeighbourSent
 		do
 			intra_top_left     := is_intra[curr_pos];
 			is_intra[curr_pos] := CurrValIsIntra;
@@ -149,10 +159,11 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 		guard
 			ValMBType > BLOCK_TYPE_INTRA_MAX
 		do
-			AcrSent   := false;
-			FstMbSent := false;
-			CstrISent := false;
-			IsIntraSent    := false;
+			AcrSent         := false;
+			FstMbSent       := false;
+			CstrISent       := false;
+			IsIntraSent     := false;
+			IsNeighbourSent := true;
 
 			CurrValIsIntra := false;
 		end
@@ -179,8 +190,9 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 		end	
 
 	UpdateIsIntra: action
-			PicWidthInMb :[PicWidth],
-			CurrMbAddr   :[CurrMb]
+			PicWidthInMb   :[PicWidth],
+			CurrMbAddr     :[CurrMb],
+			NeighbourAvail :[NeighbourA , NeighbourB , NeighbourC , NeighbourD]
 				==>
 		guard
 			not IsIntraSent
@@ -190,14 +202,15 @@ actor Algo_DemuxParserInfoForBlocks_Chroma()
 		end	
 
 	schedule fsm CheckMbType:
-		CheckMbType    (MBTypeIsInter           )--> SendInterInfos;	
+		CheckMbType    (MBTypeIsInter           )--> SendInterInfos;
 		CheckMbType    (MBTypeIsPCM             )--> SendPCMInfos;
 		CheckMbType    (MBTypeIsIntra           )--> SendIntraInfos;
 
 		SendIntraInfos (SendAcrIntra            )--> SendIntraInfos;
 		SendIntraInfos (SendFstMbIntra          )--> SendIntraInfos;
-		SendIntraInfos (SendConstrIFlagIntra    )--> SendIntraInfos;	
-		SendIntraInfos (SendIsIntra             )--> SendIntraInfos;	
+		SendIntraInfos (SendConstrIFlagIntra    )--> SendIntraInfos;
+		SendIntraInfos (SendIsIntra             )--> SendIntraInfos;
+		SendIntraInfos (SendNeighbourIntra      )--> SendIntraInfos;
 		SendIntraInfos (SendInfosDone           )--> CheckMbType;
 
 		SendInterInfos (SendAcrInter            )--> SendInterInfos;

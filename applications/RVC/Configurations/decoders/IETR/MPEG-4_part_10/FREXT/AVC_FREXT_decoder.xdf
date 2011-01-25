@@ -448,4 +448,8 @@
         src="Syn_Parser" src-port="NeighbourAvail"/>
     <Connection dst="Decode_U" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
     <Connection dst="Decode_V" dst-port="MbLocation" src="Syn_Parser" src-port="MbLocation"/>
+    <Connection dst="Decode_U" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
+    <Connection dst="Decode_V" dst-port="NeighbourAvail"
+        src="Syn_Parser" src-port="NeighbourAvail"/>
 </XDF>

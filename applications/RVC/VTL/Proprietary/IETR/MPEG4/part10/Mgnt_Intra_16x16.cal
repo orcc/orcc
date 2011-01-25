@@ -24,9 +24,7 @@ package Proprietary.IETR.MPEG4.part10;
 import MPEG.Common.Imp_PictureInfo.*;
 
 actor Mgnt_Intra_16x16 (int MB_WIDTH)
-	uint(size=13) FirstMbInSlice,
-	uint(size=7)  PicWidthInMb,
-	uint(size=13) CurrMbAddr,
+	bool          NeighbourAvail,
 	bool          IsIntraFlag,
 	uint(size=4)  PredMode,
 	uint(size=16) EDGE,
@@ -59,38 +57,25 @@ actor Mgnt_Intra_16x16 (int MB_WIDTH)
   
 	//Mb_Type_OK : Enable the prediction 
 	MbTypeOK:action
-		FirstMbInSlice:[b],
-		PicWidthInMb:[c],
+		NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail],
 		ConstrainedIFlag:[c_intra_flag],
-		CurrMbAddr:[d],
 		PredMode:[v],
 		IsIntraFlag :[is_intra_flag] repeat 3
 			==>
 		PredMode_I:[v]
 	var
 		uint(size=2) CURR_POS = 1,
-
-	  	uint(size=13) first_mb_in_slice,
-	  	uint(size=13) mbcurr,
-	  	uint(size=7) picwidth,
-  		uint(size=13) curr_pos,
   		bool intra_top_left
 	do
-		//Store token value
-		mbcurr := d;
-		first_mb_in_slice := b;
-		picwidth := c; 
-		curr_pos:=d mod c;
-
 		intra_top_left:=is_intra_flag[2];
 		//Set 16x16 the available edge
-		left_16x16_avail := if (mbcurr = first_mb_in_slice) or (curr_pos = 0) then 0 else 
+		left_16x16_avail := if not NeighbourA_Avail then 0 else 
 								if (is_intra_flag[CURR_POS-1] or c_intra_flag=false) then 1 else 0 end   
 							end;
-		top_16x16_avail := if (mbcurr - first_mb_in_slice < picwidth) then 0 else 
+		top_16x16_avail := if not NeighbourB_Avail then 0 else 
 								if (is_intra_flag[CURR_POS] or c_intra_flag=false) then 1 else 0 end   
 							end;
-		topLeft_16x16_avail :=  if (mbcurr - first_mb_in_slice < picwidth +1) then 0 else 
+		topLeft_16x16_avail :=  if not NeighbourD_Avail then 0 else 
 									if (intra_top_left or c_intra_flag=false) then 1 else 0 end   
 								end;
 

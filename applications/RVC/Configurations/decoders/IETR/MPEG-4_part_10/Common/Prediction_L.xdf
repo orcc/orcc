@@ -392,8 +392,6 @@
         src="DemuxParserInfos" src-port="Coef_ACR_Intra_16x16"/>
     <Connection dst="Select" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="DemuxParserInfos" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
-    <Connection dst="Intra_16x16" dst-port="FirstMbInSlice"
-        src="DemuxParserInfos" src-port="FstMbInSlice_Intra_16x16"/>
     <Connection dst="DemuxParserInfos" dst-port="ConstrainedIFlag"
         src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Intra_4x4" dst-port="ConstrainedIFlag"
@@ -411,10 +409,6 @@
         src="DemuxParserInfos" src-port="IsIntraFlag_4x4"/>
     <Connection dst="Intra_16x16" dst-port="IsIntraFlag"
         src="DemuxParserInfos" src-port="IsIntraFlag_16x16"/>
-    <Connection dst="Intra_16x16" dst-port="PicWidthInMb"
-        src="DemuxParserInfos" src-port="PicWidthInMb_16x16"/>
-    <Connection dst="Intra_16x16" dst-port="CurrMbAddr"
-        src="DemuxParserInfos" src-port="CurrMbAddr_16x16"/>
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
     <Connection dst="Inter" dst-port="Coef_ACR" src="DemuxParserInfos" src-port="Coef_ACR_Inter"/>
     <Connection dst="Inter" dst-port="MV" src="" src-port="MV"/>
@@ -445,4 +439,6 @@
     <Connection dst="Intra_4x4" dst-port="NeighbourAvail"
         src="DemuxParserInfos" src-port="NeighbourAvail4x4"/>
     <Connection dst="Intra_16x16" dst-port="MbLocation" src="" src-port="MbLocation"/>
+    <Connection dst="Intra_16x16" dst-port="NeighbourAvail"
+        src="DemuxParserInfos" src-port="NeighbourAvail16x16"/>
 </XDF>

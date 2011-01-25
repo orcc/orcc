@@ -37,12 +37,10 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 	bool          NeighbourAvail4x4,
 
 	int (size=9)  Coef_ACR_Intra_16x16,
-	uint(size=13) FstMbInSlice_Intra_16x16,
 	bool          ConstrI_Intra_16x16,
 	uint(size=4)  PredMode_16x16,
 	bool          IsIntraFlag_16x16,
-	uint(size=7)  PicWidthInMb_16x16,
-	uint(size=13) CurrMbAddr_16x16,
+	bool          NeighbourAvail16x16,
 
 	int (size=9)  Coef_ACR_Inter
 		:
@@ -221,7 +219,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 	SendFstMb16x16: action
 			FirstMbInSlice           :[FirstMb]
 				==>
-			FstMbInSlice_Intra_16x16 :[FirstMb]
 		guard
 			not FirstMbSent
 		do
@@ -252,9 +249,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			PicWidthInMb :[PicWidth],
 			CurrMbAddr   :[CurrMb]
 				==>
-			IsIntraFlag_16x16  :[ is_intra[(curr_pos-1) & 0x3F] , is_intra[curr_pos & 0x3F], intra_top_left ],
-			PicWidthInMb_16x16 :[PicWidth],
-			CurrMbAddr_16x16   :[CurrMb]
+			IsIntraFlag_16x16  :[ is_intra[(curr_pos-1) & 0x3F] , is_intra[curr_pos & 0x3F], intra_top_left ]
 		guard
 			not IsIntraSent
 		do
@@ -265,7 +260,7 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 	SendNeighbourg16x16: action
 			NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail]
 				==>
-//			NeighbourAvail16x16 :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail]
+			NeighbourAvail16x16 :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail]
 		guard
 			not IsNeighbourSent
 		do
