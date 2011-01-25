@@ -46,7 +46,7 @@ variableDeclaration(variable) ::= <<
 <if(!variable.port)
 ><if(variable.type.list)
 ><if(variable.instruction.store || !variable.instruction)>
-<AllocaOp(result={%<variable>}, type=variable.type, NumElements="", alignment="")>
+<AllocaOp(result={%<variable>}, type=variable.type)>
 <endif>
 <endif><
 endif>
@@ -143,8 +143,8 @@ if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.ini
 ///////////////////////////////////////////////////////////////////////////////
 // LLVM Operations
 ///////////////////////////////////////////////////////////////////////////////
-LoadOp(ty, pointer, alignment) ::= <<
-load <ty>* <pointer> <if(alignment)> [, align <alignment>] <endif>
+LoadOp(ty, pointer) ::= <<
+load <ty>* <pointer>
 >>
 
 AndOp(result, ty, op1, op2) ::= <<
@@ -163,13 +163,8 @@ BitcastOp(result, ty, value, ty2) ::= <<
 <result> = bitcast <ty> <value> to <ty2>
 >>
 
-AllocaOp(result, type, NumElements, alignment) ::= <<
-<result> = alloca <type> <if(NumElements)
->[, i32 <NumElements>]<
-endif><
-if(alignment)>
-[, align <alignment>]<
-endif>
+AllocaOp(result, type) ::= <<
+<result> = alloca <type>
 >>
 
 BrOp(cond, iftrue, iffalse, dest) ::= <<
@@ -188,25 +183,19 @@ else
 endif>
 >>
 
-CallOp(tail, cconv, ret_attrs, ty, fnty, fnptrval, function_args, fn_attrs) ::= <<
-<if(tail)> [tail] <endif>call<
-if(cconv)> [cconv] <endif
-><if(ret_attrs)> [ret_attrs] <
-endif> <ty><
-if(fnty)> [<fnty>*] <endif
-> @<fnptrval> (<if(function_args)><function_args><endif>) <
-if(fn_attrs)> [fn_attrs] <endif>
+CallOp(ty, fnptrval, function_args) ::= <<
+call <ty> @<fnptrval> <function_args>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Instructions
 ///////////////////////////////////////////////////////////////////////////////
 
-StoreInstr(ty, value, pty, ptr, cast) ::= <<
+StoreInstr(ty, value, pty, ptr) ::= <<
 <if(value.intExpr || value.booleanExpr)
->store <pty> <value><cast>, <pty>* <ptr><
+>store <pty> <value>, <pty>* <ptr><
 else
->store <ty> <Expr(expr=value, type=ty)><cast>, <pty>* <ptr><
+>store <ty> <Expr(expr=value, type=ty)>, <pty>* <ptr><
 endif>
 >>
 
@@ -235,7 +224,7 @@ CastParameter(casts, args, params, location )::= <<
 >>
 
 IfWithThenElseNodes(ifNode) ::= <<
-	<BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.elseNodes)>})>
+	<BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.elseNodes)>}, dest="")>
 
 b<label(ifNode.thenNodes)>: 
 <Nodes_cond(first(ifNode.thenNodes))> <Nodes(rest(ifNode.thenNodes))>
@@ -250,7 +239,7 @@ b<label(ifNode.joinNode)>:
 >>
 
 IfWithThenNode(ifNode) ::= <<
-	<BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.joinNode)>})>
+	<BrOp(cond=Expr(expr=ifNode.value, type=ifNode.value.type), iftrue={%b<label(ifNode.thenNodes)>}, iffalse={%b<label(ifNode.joinNode)>}, dest="")>
 
 b<label(ifNode.thenNodes)>: 
 <Nodes_cond(first(ifNode.thenNodes))> <Nodes(rest(ifNode.thenNodes))>
@@ -377,7 +366,7 @@ Return(return) ::= <<
 <if(return.value)><
 RetOp(type=return.value.type, value=Expr(expr=return.value, type=return.value.type))><
 else
-><RetOp()><
+><RetOp(type="void", value="")><
 endif>
 >>
 
@@ -418,7 +407,7 @@ IfNode(ifNode) ::= <<
 // while node
 WhileNode(whileNode) ::= <<
 <BlockNode(whileNode.joinNode)>
-	<BrOp(cond=Expr(expr=whileNode.value, type=whileNode.value.type), iftrue={%b<label(whileNode.Nodes)>}, iffalse={%b<label(whileNode.joinNode.successors)>})>
+	<BrOp(cond=Expr(expr=whileNode.value, type=whileNode.value.type), iftrue={%b<label(whileNode.Nodes)>}, iffalse={%b<label(whileNode.joinNode.successors)>}, dest="")>
 
 b<label(whileNode.nodes)>:
 <Nodes_cond(first(whileNode.nodes))>
@@ -434,11 +423,11 @@ b<label(whileNode.joinNode.successors)>:
 ///////////////////////////////////////////////////////////////////////////////
 
 Instruction(instruction) ::= <<
-<!<(instruction.class.simpleName)(instruction)>!>
+<(instruction.class.simpleName)(instruction)>
 >>
 
 Instructions(instructions) ::= <<
-<!<instructions: Instruction()>!>
+<instructions: Instruction()>
 >>
 
 Node(node) ::= <<
@@ -450,32 +439,32 @@ Nodes(nodes) ::= <<
 >>
 
 Node_cond(node) ::= <<
-<!<({<node.class.simpleName>_cond})(node)>!>
+<({<node.class.simpleName>_cond})(node)>
 >>
 
 Nodes_cond(nodes) ::= <<
-<!<nodes: Node_cond()>!>
+<nodes: Node_cond()>
 >>
 
 WhileNode_cond(nodes) ::= <<
-<!<WhileNode(nodes)>!>
+<WhileNode(nodes)>
 >>
 
 IfNode_cond(nodes) ::= <<
-<!<IfNode(nodes)>!>
+<IfNode(nodes)>
 >>
 
 BlockNode_cond(blockNode) ::= <<
-<!	<Instructions(blockNode.instructions)> !>
+	<Instructions(blockNode.instructions)> 
 >>
 
 // if node
 BlockNode(blockNode) ::= <<
-<!	br label %b<label(blockNode)>
+	br label %b<label(blockNode)>
 
 b<label(blockNode)>:
 	<Instructions(blockNode.instructions)>
-	!>
+	
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
