@@ -55,16 +55,22 @@ package MPEG.Common;
 
 unit Imp_PictureInfo :
 
-	int (size=32) MAX_PICWIDTH_PX  = 1280;
-	int (size=32) MAX_PICHEIGHT_PX = 720;
+	uint (size=32) MAX_PICWIDTH_PX  = 1280;
+	uint (size=32) MAX_PICHEIGHT_PX = 720;
 
-	int (size=32) MAX_PICWIDTH_BLK  = MAX_PICWIDTH_PX  / 16;
-	int (size=32) MAX_PICHEIGHT_BLK = MAX_PICHEIGHT_PX / 16;
+	uint (size=32) MAX_PICWIDTH_BLK  = MAX_PICWIDTH_PX  / 16;
+	uint (size=32) MAX_PICHEIGHT_BLK = MAX_PICHEIGHT_PX / 16;
 
-	int (size=32) POW2_PICWIDTH_BLK_PLUS1      = 128;
-	int (size=32) MASK_POW2_PICWIDTH_BLK_PLUS1 = 127;
-	int (size=32) LOG2_POW2_PICWIDTH_BLK_PLUS1 = 127;
+	uint (size=32) POW2_PICWIDTH_BLK_PLUS1      = 128;
+	uint (size=32) MASK_POW2_PICWIDTH_BLK_PLUS1 = 127;
+	uint (size=32) LOG2_POW2_PICWIDTH_BLK_PLUS1 = 127;
 
-	int (size=32) MB_WIDTH_CHROMA = 8;
-	int (size=32) MB_WIDTH_LUMA   = 16;
+	uint (size=32) POW2_PICWIDTH_PIX_PLUS1      = 2048;
+	uint (size=32) MASK_POW2_PICWIDTH_PIX_PLUS1 = 2047;
+
+	uint (size=32) POW2_PICHEIGHT_PIX_PLUS1      = 1024;
+	uint (size=32) MASK_POW2_PICHEIGHT_PIX_PLUS1 = 1023;
+
+	uint (size=32) MB_WIDTH_CHROMA = 8;
+	uint (size=32) MB_WIDTH_LUMA   = 16;
 end

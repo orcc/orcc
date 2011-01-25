@@ -22,8 +22,8 @@ import MPEG.Common.Imp_PictureInfo.*;
 
 //Clean this actor (Delete and rewrite it)!!!
 actor Mgnt_DPB ( int MB_WIDTH )
-	uint(size=7)  PicWidthInMb, 
-	uint(size=13) CurrMbAddr, 
+	uint(size=7)  PicWidthInMb,
+	uint(size=7)  MbLocation,
 	uint(size=13) PicSizeInMb, 
 	uint          POC, 
 	int( size=32) POCtoDisplay,
@@ -56,7 +56,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	//FIXME! number of MB per line of picture
 
 
-	List(type :List( type:uint(size=8), size=MAX_PICWIDTH_PX*MAX_PICHEIGHT_PX), size=NB_PIC) pic;
+	List(type :List(type: List( type:uint(size=8), size=MAX_PICWIDTH_PX), size=MAX_PICHEIGHT_PX), size=NB_PIC) pic;
 	List(type:uint(size=32) ,size=NB_PIC) ListPOC       := [ 0    :for int s in 0 .. NB_PIC-1];
 	List(type:uint(size=31) ,size=NB_PIC) ListFrameNum  := [ 0    :for int s in 0 .. NB_PIC-1];
 	List(type:bool          ,size=NB_PIC) PictureReady  := [false :for int s in 0 .. NB_PIC-1];
@@ -70,8 +70,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 	/*Write information*/
 	bool          write_done       := true;
-	uint(size=16) currmbaddr       := 0;
 	uint(size=21) wa_offset        := 0;
+	uint(size=21) wa_x_offset      := 0;
+	uint(size=21) wa_y_offset      := 0;
 	uint(size=11) wa_W             := 0;
 	uint(size=11) wa_H             := 0;
 	uint(size=11) wa_x             := 0;
@@ -96,10 +97,15 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	/*Delete information*/
 	bool          ValIsIDR := false;
 
+	GetIsNewPic: action 
+			IsNewPicOrSlice :[is_new_mb_or_slice]
+				==>
+		end
+
 	get_writeAddr: action
+			MbLocation      :[MbLocxInPic , MbLocyInPic],
 			PicWidthInMb    :[PICwidthInMb],
 			PicSizeInMb     :[PICSizeInMb],
-			CurrMbAddr      :[CurrMacroBAddr],
 			IsNewPicOrSlice :[is_new_pic_or_slice]
 				==>
 		guard
@@ -111,10 +117,11 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		do
 			PicWidthInMacroB := PICwidthInMb;
 			PicSizeInMacroB  := PICSizeInMb;
-			currmbaddr       := CurrMacroBAddr;
-			XinMb      := CurrMacroBAddr mod PicWidthInMacroB;
-			YinMb      := CurrMacroBAddr  /  PicWidthInMacroB;
+			XinMb      := MbLocxInPic;
+			YinMb      := MbLocyInPic;
 			wa_offset  := YinMb * MB_WIDTH * (MB_WIDTH * PicWidthInMacroB) + XinMb * MB_WIDTH;
+			wa_x_offset := XinMb * MB_WIDTH;
+			wa_y_offset := YinMb * MB_WIDTH;
 			wa_W       := MB_WIDTH;
 			wa_H       := MB_WIDTH;
 			wa_x       := 0;
@@ -130,7 +137,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard 
 			write_done = false
 		do
-			pic[pic_curr_idx][wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
+			//pic[pic_curr_idx][wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
+			pic[pic_curr_idx][wa_x_offset + wa_x][wa_y_offset + wa_y] := wd;
 			wa_x := wa_x +1;
 			if(wa_x = wa_W) then
 				wa_y := wa_y +1;
@@ -195,7 +203,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		do
 			Read_addr_x := min( max(ra_off_x + ra_x , 0) , PicWidthInMacroB  * MB_WIDTH - 1);
 			Read_addr_y := min( max(ra_off_y + ra_y , 0) , PicHeightInMacroB * MB_WIDTH - 1);
-			rd   := pic[Ref_idx][Read_addr_x + Read_addr_y * PicWidthInMacroB * MB_WIDTH];
+//			rd   := pic[Ref_idx][Read_addr_x + Read_addr_y * PicWidthInMacroB * MB_WIDTH];
+			rd   := pic[Ref_idx][Read_addr_x][Read_addr_y];
 			ra_x := ra_x +1;
 			if(ra_x = ra_W) then
 				ra_y := ra_y +1;
@@ -209,15 +218,16 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			end
 		end
 
-	write_picture_done: action ==>
+	write_picture_done: action
+			IsNewPicOrSlice :[is_new_mb_or_slice]
+				==>
 		guard 
 			write_done = true,
-			currmbaddr = PicSizeInMacroB - 1
+			is_new_mb_or_slice = IS_NEW_PIC
 		do
 			PictureReady[pic_curr_idx] := true;
 			wa_x        := 0;
 			wa_y        := 0;
-			currmbaddr  :=0;
 			PicHeightInMacroB := PicSizeInMacroB / PicWidthInMacroB;
 		end
 
@@ -225,11 +235,9 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			POC             :[Valpoc],
 			FrameNum        :[frame_num],
 			IsIDR           :[IsIDRPic],
-			IsNewPicOrSlice :[is_new_mb_or_slice],
 			EnableRead      :[enabled_read]
 				==>
 		guard
-			is_new_mb_or_slice = IS_NEW_PIC,
 			not enabled_read
 		var
 			bool         idx_selected := false,
@@ -279,12 +287,14 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			List(type:int(size=16),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA + 1) buff := [ 0 :for int t in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ] 
 		do
 			CurrAddrInPix := nbMBdisplayForXaxis * MB_WIDTH_CHROMA + nbMBdisplayForYaxis * MB_WIDTH_CHROMA * MB_WIDTH_CHROMA * PicWidthInMacroB;
+			
 			CurrAddrYaxis := 0;
 			foreach int y in 0 .. (MB_WIDTH_CHROMA-1)
 			do
 				foreach int x in 0 .. (MB_WIDTH_CHROMA-1)
 				do
-					buff[x + y * MB_WIDTH_CHROMA] := pic[IdxNextPOCtoDisplay][CurrAddrInPix + x + CurrAddrYaxis];
+					//buff[x + y * MB_WIDTH_CHROMA] := pic[IdxNextPOCtoDisplay][CurrAddrInPix + x + CurrAddrYaxis];
+					buff[x + y * MB_WIDTH_CHROMA] := pic[IdxNextPOCtoDisplay][nbMBdisplayForXaxis * MB_WIDTH_CHROMA + x][nbMBdisplayForYaxis * MB_WIDTH_CHROMA + y];
 				end
 				CurrAddrYaxis := CurrAddrYaxis + MB_WIDTH_CHROMA * PicWidthInMacroB;
 			end
@@ -313,7 +323,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			do
 				foreach int x in 0 .. (MB_WIDTH_LUMA-1)
 				do
-					buff[x + y * MB_WIDTH_LUMA] := pic[IdxNextPOCtoDisplay][CurrAddrInPix + x + CurrAddrYaxis];
+					buff[x + y * MB_WIDTH_LUMA] := pic[IdxNextPOCtoDisplay][nbMBdisplayForXaxis * MB_WIDTH_LUMA + x][nbMBdisplayForYaxis * MB_WIDTH_LUMA + y];
 				end
 				CurrAddrYaxis := CurrAddrYaxis + MB_WIDTH_LUMA * PicWidthInMacroB;
 			end
@@ -398,7 +408,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			end
 		end
   
-	schedule fsm  read_ref_parameters:
+	schedule fsm  GetIsNewPic:
+		GetIsNewPic (GetIsNewPic )--> read_ref_parameters;
 
 		read_ref_parameters (read_ref_parameters      )--> read_write;
 

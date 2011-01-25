@@ -3,13 +3,6 @@
     <!-- ************************************** -->
     <!-- Input ports of the Graph               -->
     <!-- ************************************** -->
-    <Port kind="Input" name="CurrMbAddr">
-        <Type name="uint">
-            <Entry kind="Expr" name="size">
-                <Expr kind="Literal" literal-kind="Integer" value="13"/>
-            </Entry>
-        </Type>
-    </Port>
     <Port kind="Input" name="PicWidthInMb">
         <Type name="uint">
             <Entry kind="Expr" name="size">
@@ -328,7 +321,6 @@
     <Connection dst="Buffer_inter" dst-port="POC" src="" src-port="POC"/>
     <Connection dst="Buffer_inter" dst-port="PicSizeInMb" src="" src-port="PicSizeInMb"/>
     <Connection dst="Buffer_inter" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="Buffer_inter" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Deblocking_Filter" dst-port="Beta_offset" src="" src-port="slice_beta_offset"/>
     <Connection dst="Deblocking_Filter" dst-port="LFDisable" src="" src-port="LFDisable"/>
     <Connection dst="Deblocking_Filter" dst-port="Cbp_blk" src="" src-port="CodedBlockPattern"/>
@@ -378,4 +370,5 @@
         src="DemuxParserInfos" src-port="NeighbourAvail_Intra"/>
     <Connection dst="DemuxParserInfos" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
     <Connection dst="DemuxParserInfos" dst-port="MbLocation" src="" src-port="MbLocation"/>
+    <Connection dst="Buffer_inter" dst-port="MbLocation" src="" src-port="MbLocation"/>
 </XDF>

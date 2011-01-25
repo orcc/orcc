@@ -3,7 +3,6 @@
    <vertices>
       <vertex id="CoefAC_L" x="91" y="39"/>
       <vertex id="CoefDC_L" x="94" y="74"/>
-      <vertex id="CurrMbAddr" x="481" y="113"/>
       <vertex id="FirstMbInSlice" x="476" y="203"/>
       <vertex id="PredMode" x="498" y="715"/>
       <vertex id="QP" x="125" y="634"/>
@@ -34,10 +33,10 @@
       <vertex id="IsNewPicOrSlice" x="470" y="328"/>
       <vertex id="EnableRead" x="482" y="174"/>
       <vertex id="FrameNum" x="486" y="233"/>
+      <vertex id="MbLocation" x="498" y="436"/>
+      <vertex id="NeighbourAvail" x="489" y="491"/>
       <vertex id="Display_L" x="969" y="138"/>
       <vertex id="TEX_L" x="711" y="116"/>
       <vertex id="RES_L" x="246" y="13"/>
-      <vertex id="MbLocation" x="498" y="436"/>
-      <vertex id="NeighbourAvail" x="489" y="491"/>
    </vertices>
 </layout>

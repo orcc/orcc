@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CurrMbAddr" x="1130" y="214"/>
       <vertex id="PicWidthInMb" x="848" y="597"/>
       <vertex id="PredMode" x="39" y="969"/>
       <vertex id="FirstMbInSlice" x="992" y="802"/>

@@ -207,7 +207,6 @@
     <!-- ************************************** -->
     <Connection dst="Syn_Parser" dst-port="bits8" src="" src-port="bits8"/>
     <Connection dst="" dst-port="Display_L" src="Decoding_Y" src-port="Display_L"/>
-    <Connection dst="Decoding_Y" dst-port="CurrMbAddr" src="Syn_Parser" src-port="CurrMbAddr"/>
     <Connection dst="Decoding_Y" dst-port="FirstMbInSlice"
         src="Syn_Parser" src-port="FirstMbInSlice"/>
     <Connection dst="Decoding_Y" dst-port="QP" src="Syn_Parser" src-port="QP"/>
@@ -223,8 +222,6 @@
     <Connection dst="Decode_U" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
     <Connection dst="Decode_U" dst-port="FirstMbInSlice"
         src="Syn_Parser" src-port="FirstMbInSlice"/>
-    <Connection dst="Decode_U" dst-port="CurrMbAddr" src="Syn_Parser" src-port="CurrMbAddr"/>
-    <Connection dst="Decode_V" dst-port="CurrMbAddr" src="Syn_Parser" src-port="CurrMbAddr"/>
     <Connection dst="Decode_V" dst-port="FirstMbInSlice"
         src="Syn_Parser" src-port="FirstMbInSlice"/>
     <Connection dst="Decode_V" dst-port="PicWidthInMB" src="Syn_Parser" src-port="PicWidthInMb"/>
