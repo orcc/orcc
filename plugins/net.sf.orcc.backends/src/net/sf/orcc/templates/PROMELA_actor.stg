@@ -1,8 +1,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Functions for generating schedules
 ///////////////////////////////////////////////////////////////////////////////
+
+arrayDim(values) ::= <<
+<values : {value | [0]} >
+>>
+
 printActionName() ::= <<
-printf("$instance.Id$.$action.name$();\n");
+printf("<instance.Id>.<action.name>();");
+>>
+
+printActionState() ::= <<
+printf("/*<actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>=%d}; separator=";">*/\n", <actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>}; separator=",">);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -12,7 +21,7 @@ printf("$instance.Id$.$action.name$();\n");
 // TODO: the [1] is not OK, it did not work with the "port.type.dimensions"
 
 portDeclaration(port) ::= <<
-	$port.type$ $port$[1];
+	<port.type> <port>[1];
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,19 +29,19 @@ portDeclaration(port) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 // the dimensions of a list: [dim1][dim2]...[dimn]
-// does not output anything if $value$ is empty
-listSize(value) ::= <<
-$value : {[$it$]} $
+// does not output anything if <value> is empty
+listSize(values) ::= <<
+<values : { value | [<value>]} >
 >>
 
 variableDeclaration(variable) ::= <<
-$
+<
 if(variable.port)
-$$
+><
 else
-$$variable.type$ $variable$$listSize(variable.type.dimensions)$$
+><variable.type> <variable><listSize(variable.type.dimensions)><
 endif
-$
+>
 >>
 
 
@@ -41,24 +50,24 @@ $
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant) ::= <<
-$(constant.class.simpleName)(constant)$
+<(constant.class.simpleName)(constant)>
 >>
 
 BoolExpr(constant) ::= <<
-$if (constant.value)$1$else$0$endif$
+<if (constant.value)>1<else>0<endif>
 >>
 
 IntExpr(number) ::= <<
-$number$$if (number.long)$L$endif$
+<number><if (number.long)>L<endif>
 >>
 
 // the values of a list: {val1, val2, ..., valn}
 ListExpr(constant) ::= <<
-{$constant.value: Constant(); wrap, separator=", "$}
+{<constant.value: Constant(); wrap, separator=", ">}
 >>
 
 StringExpr(constant) ::= <<
-"$constant$"
+"<constant>"
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,82 +76,86 @@ StringExpr(constant) ::= <<
 
 Assign(assign) ::= <<
 
-$assign.target$ = $assign.value$;
+<assign.target> = <assign.value>;
 >>
 
 PrintFormatType(type) ::= <<
-$if (type.bool)
-$i$
+<if (type.bool)
+>i<
 elseif (type.float)
-$f$
+>f<
 elseif (type.int)
-$$if (type.long)$ll$endif$i$
+><if (type.long)>ll<endif>i<
 elseif (type.list)
-$p$
+>p<
 elseif (type.string)
-$s$
+>s<
 elseif (type.uint)
-$$if (type.long)$ll$endif$u$
+><if (type.long)>ll<endif>u<
 elseif (type.void)
-$p$
-endif$
+>p<
+endif>
 >>
 
 PrintFormat(parameter) ::= <<
-$if (parameter.stringExpr)
-$"$parameter$"$
+<if (parameter.stringExpr)
+>"$parameter$"<
 else
-$ "%$PrintFormatType(parameter.type)$" $
-endif$
+> "%<PrintFormatType(parameter.type)>" <
+endif>
 >>
 
 PrintParameter(parameter) ::= <<
-$if (!parameter.stringExpr)$, $parameter$$endif$
+<if (!parameter.stringExpr)>, <parameter><endif>
 >>
 
 Call(call) ::= << 
-//ERROR this function call must be removed
+//ERROR this function call must be removed, in this case we give a 1, it is OK if it is "data"
+<if(call.print)>printf(<call.parameters: PrintFormat()><call.parameters: PrintParameter()>);<
+else
+><if(call.target)><call.target> = <endif> 1;<
+endif>
 >>
 
 Decrement(decrement) ::= <<
 
-$decrement.target$--;
+<decrement.target>--;
 >>
 
 Increment(increment) ::= <<
 
-$increment.target$++;
+<increment.target>++;
 >>
 
 Load(load) ::= <<
 
-$load.target$ = $load.source$$load.indexes : {[$it$]}$;
+<load.target> = <load.source><load.indexes : {index | [<index>]}>;
 >>
 
 Peek(peek) ::= <<
-chan_$instance.id$_$peek.port$?\<$peek.target$\>;
+chan_<instance.id>_<peek.port>?\<<peek.target>\>;
 >>
 
 Read(read) ::= <<
 
-$if (read.target)$
-chan_$instance.id$_$read.port$?$read.target$[0];
-$endif$
+<if (read.target)>
+chan_<instance.id>_<read.port>?<read.target>[0];
+<endif>
 >>
 
 SelfAssignment(selfAssign) ::= <<
 
-$selfAssign.target$ $selfAssign.op.text$= $selfAssign.value$;
+<selfAssign.target> <selfAssign.op.text>= <selfAssign.value>;
 >>
 
 Store(store) ::= <<
 
-$store.target$$store.indexes : {[$it$]}$ = $store.value$;
+<store.target><store.indexes : {index | [<index>]}> = <store.value>;
 >>
 
 Write(write) ::= <<
 
-chan_$instance.id$_$write.port$!$write.target$[0];
+chan_<instance.id>_<write.port>!<write.target>[0];
 >>
 
 Return(return) ::= <<
@@ -154,41 +167,41 @@ Return(return) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 instructions(instructions) ::= <<
-$instructions: {$(it.class.simpleName)(it)$}$
+<instructions: {instr | <(instr.class.simpleName)(instr)>}>
 >>
 
 nodes(nodes) ::= <<
-$nodes: {$(it.class.simpleName)(it)$}$
+<nodes: { node | <(node.class.simpleName)(node)>}>
 >>
 
 // if node
 BlockNode(blockNode) ::= <<
-$instructions(blockNode.instructions)$
+<instructions(blockNode.instructions)>
 >>
 
 // if node
 IfNode(ifNode) ::= <<
 
 if 
-:: ($ifNode.value$) -\>
-	$nodes(ifNode.thenNodes)$
-$if(ifNode.elseNodes)$:: else -\>
-	$nodes(ifNode.elseNodes)$
-$endif$
+:: (<ifNode.value>) -\>
+	<nodes(ifNode.thenNodes)>
+<if(ifNode.elseNodes)>:: else -\>
+	<nodes(ifNode.elseNodes)>
+<endif>
 fi;
-$BlockNode(ifNode.joinNode)$
+<BlockNode(ifNode.joinNode)>
 >>
 
 // while node
 WhileNode(whileNode) ::= <<
 
 do 
-:: $whileNode.value$ -\>
-	$nodes(whileNode.nodes)$
+:: <whileNode.value> -\>
+	<nodes(whileNode.nodes)>
 :: else -\> break;
 od
 }
-$BlockNode(whileNode.joinNode)$
+<BlockNode(whileNode.joinNode)>
 >>
 
 
@@ -197,11 +210,11 @@ $BlockNode(whileNode.joinNode)$
 ///////////////////////////////////////////////////////////////////////////////
 
 stateVar(var) ::= <<
-$if (var.initialized)$
-$variableDeclaration(var)$ = $Constant(var.initialValue)$;
-$else$
-$variableDeclaration(var)$;
-$endif$
+<if (var.initialized)>
+<variableDeclaration(var)> = <Constant(var.initialValue)>;
+<else>
+<variableDeclaration(var)>;
+<endif>
 >>
 
 
@@ -210,43 +223,43 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 newState() ::= << 
-:: state == state_$fsm_trans.SourceState$ -\> {
-	$fsm_trans.NextStateInfo: { fsm_nsi | $fsm_nsi.action: peeks()$}$
+:: state == state_<fsm_trans.SourceState> -\> {
+	<fsm_trans.NextStateInfo: { fsm_nsi | <fsm_nsi.action: peeks()>}>
 	if
-	$fsm_trans.NextStateInfo: {
+	<fsm_trans.NextStateInfo: {
 			fsm_nsi|
-:: $fsm_nsi.action: schedulerFSM(); separator="\n"$ }$
+:: <fsm_nsi.action: schedulerFSM(); separator="\n"> }>
 	fi;}
 >>
 
 schedulerFSM(action) ::= <<
-	/* $action.name$ */ atomic { 
-	$guardFSM()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
+	/* <action.name> */ atomic { 
+	<guardFSM()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
 	-\> 
 	/* Temp variables*/
-	$if(action.body.locals.list)$
-	$action.body.locals.list: { var | $if(!var.port)$ $variableDeclaration(var)$;$\n$$endif$}$
-	$endif$ 
-	$printActionName()$
-	$inputPattern(action.inputPattern)$
-	$action.body.nodes: {$(it.class.simpleName)(it)$}$
-	$outputPattern(action.outputPattern)$
-	state = state_$fsm_nsi.targetState$;
+	<if(action.body.locals.list)>
+	<action.body.locals.list: { var | <if(!var.port)> <variableDeclaration(var)>;<\n><endif>}>
+	<endif> 
+	<inputPattern(action.inputPattern)>
+	<action.body.nodes: { node | <(node.class.simpleName)(node)>}>
+	<outputPattern(action.outputPattern)>
+	state = state_<fsm_nsi.targetState>;
+	<printActionName()><printActionState()>
 }
 >>
 
 guardFSM() ::= <<
-$if (options.guards.(action))$
- $options.guards.(action); separator=" && "$
-$else$
+<if (options.guards.(action))>
+ <options.guards.(action); separator=" && ">
+<else>
 skip
-$endif$
+<endif>
 >>
 
 peeks(action) ::= <<
-	$options.loads.(action): { p | $p.Target.type$ $p.Target$;}$
-	$options.peeks.(action): { p | chan_$instance.id$_$p.port$?\<$p.port$[0]\>;}$
-	$options.loads.(action): { p | $p.Target$ = $p.Source$[0];}$
+	<options.loads.(action): { p | <p.Target.type> <p.Target>;}>
+	<options.peeks.(action): { p | chan_<instance.id>_<p.port>?\<<p.port>[0]\>;}>
+	<options.loads.(action): { p | <p.Target> = <p.Source>[0];}>
 
 >>
 
@@ -256,22 +269,22 @@ peeks(action) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 scheduler(action) ::= <<
-:: /* $action.name$ */ atomic { 
-	$guard()$ $inputChannelCheck(action.inputPattern)$ $outputChannelCheck(action.outputPattern)$
+:: /* <action.name> */ atomic { 
+	<guard()> <inputChannelCheck(action.inputPattern)> <outputChannelCheck(action.outputPattern)>
 	-\>
 	/* Temp variables*/
-	$if(action.body.locals.list)$
-	$action.body.locals.list: {var | $if(!var.port)$$variableDeclaration(var)$;$\n$$endif$}$
-	$endif$ 
-	$printActionName()$
-	$inputPattern(action.inputPattern)$
-	$action.body.nodes: {$(it.class.simpleName)(it)$}$
-	$outputPattern(action.outputPattern)$
+	<if(action.body.locals.list)>
+	<action.body.locals.list: {var | <if(!var.port)><variableDeclaration(var)>;<\n><endif>}>
+	<endif> 
+	<inputPattern(action.inputPattern)>
+	<action.body.nodes: { node | <(node.class.simpleName)(node)>}>
+	<outputPattern(action.outputPattern)>
+	<printActionName()><printActionState()>
 }	
 >>
 
 guard() ::= <<
-$options.guards.(action); separator=" && "$
+<options.guards.(action); separator=" && ">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -279,33 +292,33 @@ $options.guards.(action); separator=" && "$
 ///////////////////////////////////////////////////////////////////////////////
 
 priorities() ::= << 
-$if (rest(options.guards.(action)))$
- /*priority*/ && !( $rest(options.guards.(action)); separator=" && "$ )
-$endif$
+<if (rest(options.guards.(action)))>
+ /*priority*/ && !( <rest(options.guards.(action)); separator=" && "> )
+<endif>
 >> 
 
 inputPatternPort(port) ::= <<
-/*chan_$port.name$?trash;*/
+/*chan_<port.name>?trash;*/
 >>
 
 inputPattern(pattern) ::= <<
-$pattern.keys: inputPatternPort(); separator="\n"$
+<pattern.keys: inputPatternPort(); separator="\n">
 >>
 
 outputPatternPort(port) ::= <<
-/*chan_$port$!trash;*/
+/*chan_<port>!trash;*/
 >>
 
 outputPattern(pattern) ::= <<
-$pattern.keys: outputPatternPort(); separator="\n"$
+<pattern.keys: outputPatternPort(); separator="\n">
 >>
 
 inputChannelCheck(pattern) ::= <<
-$pattern.keys: {key | && nempty(chan_$instance.id$_$key$)} $
+<pattern.keys: {key | && nempty(chan_<instance.id>_<key>)} >
 >>
 
 outputChannelCheck(pattern) ::= <<
-$pattern.keys: {key | && nfull(chan_$instance.id$_$key$)} $
+<pattern.keys: {key | && nfull(chan_<instance.id>_<key>)} >
 >>
 
 
@@ -315,29 +328,29 @@ $pattern.keys: {key | && nfull(chan_$instance.id$_$key$)} $
 ///////////////////////////////////////////////////////////////////////////////
 
 proctype(instance, actor) ::= <<
-proctype $instance.id$($actor.parameters.list: variableDeclaration(); wrap, separator=", "$) {
+proctype <instance.id>(<actor.parameters.list: variableDeclaration(); wrap, separator=", ">) {
 
 	/* State variables */
-	$actor.stateVars.list : stateVar(); separator="\n"$
+	<actor.stateVars.list : stateVar(); separator="\n">
 	
 	/* Ports */
-    $ [instance.actor.inputs.list, instance.actor.outputs.list] : portDeclaration(); separator="\n"$
+    < [instance.actor.inputs.list, instance.actor.outputs.list] : portDeclaration(); separator="\n">
 
-	$if (actor.actionScheduler.fsm)$
+	<if (actor.actionScheduler.fsm)>
 	/* States of the FSM */
-	$actor.actionScheduler.fsm.states: {s | int state_$s$ = $i0$;}; separator="\n"$
+	<actor.actionScheduler.fsm.states: {s | int state_<s> = <i0>;}; separator="\n">
 	
 	/* Initial State */
-	int state = state_$actor.actionScheduler.fsm.initialState$;
+	int state = state_<actor.actionScheduler.fsm.initialState>;
 	
 	do
-	$actor.actionScheduler.fsm.transitions: { fsm_trans| $newState()$ }$
+	<actor.actionScheduler.fsm.transitions: { fsm_trans| <newState()> }>
 	od;
-	$else$
+	<else>
 	do
-	$actor.actionScheduler.actions: scheduler(); separator="\n"$
+	<actor.actionScheduler.actions: scheduler(); separator="\n">
 	od;
-	$endif$
+	<endif>
 }
 >>
 
@@ -346,6 +359,6 @@ instance(instance, options) ::= <<
 
 
 /* Process */
-$proctype(instance=instance, actor=instance.actor)$
+<proctype(instance=instance, actor=instance.actor)>
 
 >>

@@ -1,62 +1,62 @@
 GetInstanceId(instance) ::= <<
-$if (instance.broadcast)$bcast_$endif$$instance.id$
+<if (instance.broadcast)>bcast_<endif><instance.id>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
 allocateFifoType(type, size, count) ::= <<
-chan chan_$count$ = [$if(size)$$size$$else$SIZE$endif$] of {$type$};
+chan chan_<count> = [SIZE] of {<type>};
 >>
 
 tryAllocateFifo(edge, src, tgt) ::= <<
-$if (src.instance)$
-$allocateFifoType(
+<if (src.instance)>
+<allocateFifoType(
   count=network.connectionMap.(edge),
   type=edge.source.type,
-  size=edge.size)$$else$
-$allocateFifoType(
+  size=edge.size)><else>
+<allocateFifoType(
   count=network.connectionMap.(edge),
   type=edge.target.type,
-  size=edge.size)$$endif$
+  size=edge.size)><endif>
 >>
 
 
 allocateFifo(edge) ::= <<
-$tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+<tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
 >>
 
 allocateFifos(edges) ::= <<
-$edges: allocateFifo()$
+<edges: allocateFifo()>
 >>
 ///////////////////////////////////////////////////////////////////////////////
 // assigns FIFOs
 
 doAssignFifoSrc(source, sourcePort, count) ::= <<
-#define chan_$GetInstanceId(source)$_$sourcePort.name$ chan_$count$
+#define chan_<GetInstanceId(source)>_<sourcePort.name> chan_<count>
 >>
 
 doAssignFifoTgt(target, targetPort, count) ::= <<
-#define chan_$GetInstanceId(target)$_$targetPort.name$ chan_$count$
+#define chan_<GetInstanceId(target)>_<targetPort.name> chan_<count>
 >>
 
 tryAssignFifo(edge, src, tgt) ::= <<
-$if (src.instance)$
-$doAssignFifoSrc(
+<if (src.instance)>
+<doAssignFifoSrc(
   source=src.instance, sourcePort=edge.source,
-  count=network.connectionMap.(edge))$$endif$
-$if (tgt.instance)$
-$doAssignFifoTgt(
+  count=network.connectionMap.(edge))><endif>
+<if (tgt.instance)>
+<doAssignFifoTgt(
   target=tgt.instance, targetPort=edge.target,
-  count=network.connectionMap.(edge))$$endif$
+  count=network.connectionMap.(edge))><endif>
 >>
 
 assignFifo(edge) ::= <<
-$tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))$
+<tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
 >>
 
 assignFifos(edges) ::= <<
-$edges: assignFifo()$
+<edges: assignFifo()>
 >>
 
 
@@ -64,21 +64,26 @@ $edges: assignFifo()$
 // print network
 
 network(debugFifos, fifoSize, network, options) ::= <<
-// Generated from "$network.name$"
+// Generated from "<network.name>"
 
 #define SIZE 1
 
 // FIFO allocation
-$allocateFifos(network.connections)$
+<allocateFifos(network.connections)>
 
 // FIFO assignment
-$assignFifos(network.connections)$
+<assignFifos(network.connections)>
 
 // Include the actors
-$network.Instances: {instance | #include "$instance.id$.pml"}; separator="\n"$
+<network.Instances: {instance | #include "<instance.id>.pml"}; separator="\n">
 
 init {
-	$network.Instances: {instance | run $instance.id$(/*init_state*/);}; separator="\n"$	
+	/*Inputs here*/
+	
+	/*Start processes*/
+	atomic{
+		<network.Instances: {instance | run <instance.id>(/*init_state*/);}; separator="\n">
+	}	
 }
 
 >>
