@@ -219,8 +219,8 @@ public abstract class AbstractSimulator implements Simulator {
 			// Instantiate simulator actors from the graph
 			instantiateNetwork(graph);
 			// Build the network according to the specified topology.
-			initializeNetwork();
 			connectNetwork(graph);
+			initializeNetwork();
 		} catch (OrccException e) {
 			throw new OrccRuntimeException(e.getMessage());
 		} catch (FileNotFoundException e) {
