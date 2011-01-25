@@ -1,9 +1,9 @@
 printEntity(entity) ::= <<
-vcom -93 -reportprogress 30 -work work \$Design/$entity$.vhd
+vcom -93 -reportprogress 30 -work work \$Design/<entity>.vhd
 >>
 
 TCLLists(name, entities) ::= <<
-# Generated from $name$
+# Generated from <name>
 set SRC "../src"
 set Design "../src/Design"
 set Testbench "../src/Testbench"
@@ -18,11 +18,11 @@ vcom -93 -reportprogress 30 -work work \$SRC/FIFO/counter.vhd
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/control.vhd 
 vcom -93 -reportprogress 30 -work work \$SRC/FIFO/fifo_generic.vhd 
 # Compile actors and networks
-$entities: printEntity(); separator="\n"$
-vcom -93 -reportprogress 30 -work work \$Testbench/$name$_tb.vhd
+<entities: printEntity(); separator="\n">
+vcom -93 -reportprogress 30 -work work \$Testbench/<name>_tb.vhd
 
 # Simulate
-vsim $name$_testbench
+vsim -novopt <name>_testbench
 do wave.do
 run 10 us
 
