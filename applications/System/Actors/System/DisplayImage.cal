@@ -33,6 +33,6 @@
 package System;
 
 actor DisplayImage()
-  uint(size=8) R, uint(size=8) G, uint(size=8) B, int WIDTH, int HEIGHT ==> :
+  uint(size=8) R, uint(size=8) G, uint(size=8) B, uint(size=16) SizeOfImage ==> :
 
 end
