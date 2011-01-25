@@ -10,9 +10,9 @@
       <vertex id="texture_Y" x="436" y="261"/>
       <vertex id="texture_U" x="436" y="450"/>
       <vertex id="texture_V" x="436" y="639"/>
-      <vertex id="motion_Y" x="568" y="366"/>
+      <vertex id="motion_Y" x="584" y="301"/>
       <vertex id="motion_U" x="566" y="520"/>
-      <vertex id="motion_V" x="568" y="681"/>
+      <vertex id="motion_V" x="626" y="671"/>
       <vertex id="Merger420" x="705" y="534"/>
    </vertices>
 </layout>

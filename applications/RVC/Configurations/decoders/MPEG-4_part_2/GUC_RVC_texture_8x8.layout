@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="QFS" x="57" y="274"/>
-      <vertex id="QP" x="158" y="163"/>
-      <vertex id="BLOCKTYPE" x="80" y="108"/>
-      <vertex id="NEW_VOP" x="89" y="215"/>
-      <vertex id="WIDTH" x="92" y="162"/>
-      <vertex id="f" x="1114" y="88"/>
-      <vertex id="DCsplit" x="158" y="256"/>
-      <vertex id="DCRecontruction" x="277" y="93"/>
-      <vertex id="IS" x="476" y="256"/>
-      <vertex id="IAP" x="675" y="169"/>
-      <vertex id="IQ" x="868" y="124"/>
-      <vertex id="idct2d" x="993" y="70"/>
+      <vertex id="QFS" x="57" y="660"/>
+      <vertex id="QP" x="158" y="70"/>
+      <vertex id="NEW_VOP" x="158" y="165"/>
+      <vertex id="WIDTH" x="158" y="260"/>
+      <vertex id="ACCODED" x="158" y="355"/>
+      <vertex id="BTYPE" x="158" y="450"/>
+      <vertex id="ACPRED" x="158" y="545"/>
+      <vertex id="f" x="1145" y="317"/>
+      <vertex id="DCsplit" x="158" y="640"/>
+      <vertex id="DCRecontruction" x="293" y="380"/>
+      <vertex id="IS" x="506" y="571"/>
+      <vertex id="IAP" x="706" y="463"/>
+      <vertex id="IQ" x="899" y="375"/>
+      <vertex id="idct2d" x="1024" y="297"/>
    </vertices>
 </layout>
