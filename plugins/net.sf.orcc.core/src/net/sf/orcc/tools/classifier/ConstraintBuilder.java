@@ -39,6 +39,7 @@ import net.sf.orcc.OrccRuntimeException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Type;
 import net.sf.orcc.ir.TypeInt;
@@ -215,12 +216,20 @@ public class ConstraintBuilder extends AbstractNodeInterpreter {
 				throw new OrccRuntimeException("unknown variable");
 			}
 
-			Expression value = variable.getValue();
-			if (value != null && value.isIntExpr()) {
-				return value;
-			} else {
-				return getIntVariable(variable);
+			Variable source = variables.get(variable);
+			if (source == null) {
+				source = variable;
 			}
+
+			// if the source is a constant retrieve its value
+			if (source.isGlobal() && !source.isAssignable()) {
+				Expression value = ((GlobalVariable) source).getInitialValue();
+				if (value != null && value.isIntExpr()) {
+					return value;
+				}
+			}
+
+			return getIntVariable(variable);
 		}
 
 	}
