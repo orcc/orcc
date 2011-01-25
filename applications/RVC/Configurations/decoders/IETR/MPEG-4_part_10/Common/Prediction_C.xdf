@@ -348,15 +348,12 @@
     <Connection dst="Intra8x8" dst-port="Coef_ACR"
         src="DemuxParserInfos" src-port="Coef_ACR_Intra"/>
     <Connection dst="Select_chroma" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
-    <Connection dst="DemuxParserInfos" dst-port="FirstMbInSlice" src="" src-port="FirstMbInSlice"/>
     <Connection dst="DemuxParserInfos" dst-port="ConstrainedIFlag"
         src="" src-port="ConstrainedIFlag"/>
     <Connection dst="Intra8x8" dst-port="ConstrainedIFlag"
         src="DemuxParserInfos" src-port="ConstrI_Intra"/>
     <Connection dst="Intra8x8" dst-port="IsIntraFlag"
         src="DemuxParserInfos" src-port="IsIntraFlag"/>
-    <Connection dst="DemuxParserInfos" dst-port="PicWidthInMb" src="" src-port="PicWidthInMb"/>
-    <Connection dst="DemuxParserInfos" dst-port="CurrMbAddr" src="" src-port="CurrMbAddr"/>
     <Connection dst="Buffer_inter" dst-port="POCtoDisplay" src="" src-port="PocToDisplay"/>
     <Connection dst="Intra8x8" dst-port="Mb_Type" src="" src-port="MacroBlockType"/>
     <Connection dst="Deblocking_Filter" dst-port="Mbtype" src="" src-port="MacroBlockType"/>
@@ -380,4 +377,5 @@
     <Connection dst="Intra8x8" dst-port="NeighbourAvail"
         src="DemuxParserInfos" src-port="NeighbourAvail_Intra"/>
     <Connection dst="DemuxParserInfos" dst-port="NeighbourAvail" src="" src-port="NeighbourAvail"/>
+    <Connection dst="DemuxParserInfos" dst-port="MbLocation" src="" src-port="MbLocation"/>
 </XDF>

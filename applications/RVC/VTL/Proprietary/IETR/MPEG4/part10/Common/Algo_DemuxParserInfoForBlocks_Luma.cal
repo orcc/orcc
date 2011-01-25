@@ -23,11 +23,9 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 	uint(size=6)  MBType,
 	bool          TransformSize8x8,
 	int (size=9)  Coef_ACR,
-	uint(size=13) FirstMbInSlice,
 	bool          ConstrainedIFlag,
 	uint(size=4)  PredMode,
-	uint(size=7)  PicWidthInMb,
-	uint(size=13) CurrMbAddr,
+	uint(size=7)  MbLocation,
 	bool          NeighbourAvail
 		==>
 	int (size=9)  Coef_ACR_Intra_4x4,
@@ -48,7 +46,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 
 
 	bool AcrSent;
-	bool FirstMbSent;
 	bool ConstrISent;
 	bool PredModeSent;
 	bool IsIntraSent;
@@ -67,14 +64,12 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 
 	MBTypeIsPCM: action
 			MBType           :[ValMBType],
-			FirstMbInSlice   :[FirstMb],
 			ConstrainedIFlag :[c_intra_flag]
 				==>
 		guard
 			ValMBType = BLOCK_TYPE_I_PCM
 		do
 			AcrSent         := true;
-			FirstMbSent     := true;
 			ConstrISent     := true;
 			PredModeSent    := true;
 			IsIntraSent     := false;
@@ -93,7 +88,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			Is8x8        = false
 		do
 			AcrSent         := false;
-			FirstMbSent     := false;
 			ConstrISent     := false;
 			PredModeSent    := false;
 			IsIntraSent     := false;
@@ -110,15 +104,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			not AcrSent
 		do
 			AcrSent := true;
-		end
-
-	SendFstMb4x4: action
-			FirstMbInSlice         :[FirstMb]
-				==>
-		guard
-			not FirstMbSent
-		do
-			FirstMbSent := true;
 		end
 
 	SendCnstrI4x4: action
@@ -143,14 +128,13 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 
 
 	SendIsIntra4x4: action
-			PicWidthInMb :[PicWidth],
-			CurrMbAddr   :[CurrMb]
+			MbLocation   :[MbLocxInPic , MbLocyInPic]
 				==>
 			IsIntraFlag_4x4 :[ is_intra[(curr_pos-1) & 0x3F] , is_intra[curr_pos & 0x3F] , is_intra[(curr_pos+1) & 0x3F] , intra_top_left ]
 		guard
 			not IsIntraSent
 		do
-			curr_pos    := CurrMb mod PicWidth;
+			curr_pos    := MbLocxInPic;
 			IsIntraSent := true;
 		end
 
@@ -167,7 +151,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 	SendInfosDone: action ==>
 		guard
 			AcrSent,
-			FirstMbSent,
 			ConstrISent,
 			PredModeSent,
 			IsIntraSent,
@@ -197,7 +180,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			ValMBType <= BLOCK_TYPE_INTRA_16x16_MAX
 		do
 			AcrSent         := false;
-			FirstMbSent     := false;
 			ConstrISent     := false;
 			PredModeSent    := false;
 			IsIntraSent     := false;
@@ -214,15 +196,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			not AcrSent
 		do
 			AcrSent := true;
-		end
-
-	SendFstMb16x16: action
-			FirstMbInSlice           :[FirstMb]
-				==>
-		guard
-			not FirstMbSent
-		do
-			FirstMbSent := true;
 		end
 
 	SendCnstrI16x16: action
@@ -246,14 +219,13 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 		end
 
 	SendIsIntra16x16: action
-			PicWidthInMb :[PicWidth],
-			CurrMbAddr   :[CurrMb]
+			MbLocation   :[MbLocxInPic , MbLocyInPic]
 				==>
 			IsIntraFlag_16x16  :[ is_intra[(curr_pos-1) & 0x3F] , is_intra[curr_pos & 0x3F], intra_top_left ]
 		guard
 			not IsIntraSent
 		do
-			curr_pos    := CurrMb mod PicWidth;
+			curr_pos    := MbLocxInPic;
 			IsIntraSent := true;
 		end
 
@@ -275,7 +247,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 			ValMBType > BLOCK_TYPE_INTRA_MAX
 		do
 			AcrSent         := false;
-			FirstMbSent     := false;
 			ConstrISent     := false;
 			IsIntraSent     := false;
 			PredModeSent    := true;
@@ -295,25 +266,22 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 		end
 
 	GetCnstrIAndFstMbInter: action
-			ConstrainedIFlag :[c_intra_flag],
-			FirstMbInSlice   :[FirstMb]
+			ConstrainedIFlag :[c_intra_flag]
 				==>
 		guard
-			not FirstMbSent
+			not ConstrISent
 		do
-			FirstMbSent := true;
 			ConstrISent := true;
 		end
 
 	UpdateIsIntra: action
-			PicWidthInMb   :[PicWidth],
-			CurrMbAddr     :[CurrMb],
+			MbLocation     :[MbLocxInPic , MbLocyInPic],
 			NeighbourAvail :[NeighbourA_Avail , NeighbourB_Avail , NeighbourC_Avail , NeighbourD_Avail]
 				==>
 		guard
 			not IsIntraSent
 		do
-			curr_pos        := CurrMb mod PicWidth;
+			curr_pos        := MbLocxInPic;
 			IsIntraSent     := true;
 			IsNeighbourSent := true;
 		end	
@@ -326,7 +294,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 		CheckMbType         (MBTypeIsInter           )--> SendInterInfos;
 
 		SendIntra4x4Infos   (SendAcr4x4              )--> SendIntra4x4Infos;
-		SendIntra4x4Infos   (SendFstMb4x4            )--> SendIntra4x4Infos;
 		SendIntra4x4Infos   (SendCnstrI4x4           )--> SendIntra4x4Infos;
 		SendIntra4x4Infos   (SendPredMode4x4         )--> SendIntra4x4Infos;
 		SendIntra4x4Infos   (SendIsIntra4x4          )--> SendIntra4x4Infos;
@@ -334,7 +301,6 @@ actor Algo_DemuxParserInfoForBlocks_Luma()
 		SendIntra4x4Infos   (SendInfosDone           )--> CheckMbType;
 
 		SendIntra16x16Infos (SendAcr16x16            )--> SendIntra16x16Infos;
-		SendIntra16x16Infos (SendFstMb16x16          )--> SendIntra16x16Infos;
 		SendIntra16x16Infos (SendCnstrI16x16         )--> SendIntra16x16Infos;
 		SendIntra16x16Infos (SendPredMode16x16       )--> SendIntra16x16Infos;	
 		SendIntra16x16Infos (SendIsIntra16x16        )--> SendIntra16x16Infos;	
