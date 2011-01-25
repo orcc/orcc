@@ -51,23 +51,24 @@ signal <portType(port=port, IOtype="", dataType="idata")>
 >>
 
 signalDeclaration(variable) ::= <<
-<if(variable.port)>
+<if(variable.port)
+>
 signal <variable> : <variable.type>;<
-else>
-  <if(!variable.type.list)>
-    <if(!variable.assignable)>
-constant <variable> : <variable.type> := <variable.initialValue>;<
+else
+><if(!variable.type.list)
+  ><if(!variable.assignable)
+    >constant <variable> : <variable.type> := <variable.initialValue>;<
     else
->signal <variable> : <variable.type>;<
+    >signal <variable> : <variable.type>;<
     endif><
-  else>
-    <if(!variable.assignable)
-      ><if(variable.initialized)
->type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
+  else
+  ><if(!variable.assignable)
+    ><if(variable.initialized)
+      >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
 constant <variable> : memory_type_<variable> := <variable.initialValue>;<
       endif><
     else
->type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
+    >type memory_type_<variable> is array (0 to <listSize(variable.type.dimensions)> -1) of <variable.type>;
 signal <variable> : memory_type_<variable>;<
     endif><
   endif><
@@ -84,8 +85,7 @@ variableDeclaration(variable) ::= <<
 >-- error !!!!! variable <variable> : <variable.type> (0 to <listSize(variable.type.dimensions)> -1)<
 else
 >variable <variable> : <variable.type><
-endif
->
+endif>
 >>
 
 
@@ -349,7 +349,7 @@ function(procedure, transformReturn) ::= <<
 >function <procedure>(<VarUsed(procedure)><parameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType) > is<
   endif>
   <if(procedure.locals.list)
-><procedure.locals.list: {<VarInFctDeclaration()>;<\n>}><
+><procedure.locals.list: <VarInFctDeclaration(); separator=";\n">;<
   endif>
 begin
   <printNodes(procedure.nodes)>
@@ -415,8 +415,8 @@ procedure(procedure, transformReturn) ::= <<
 
 printLocals(procedure) ::= <<
 <if(procedure.locals.list)
-><procedure.locals.list: {<variableDeclaration()>;<\n>}><
-endif>
+><procedure.locals.list: <variableDeclaration(); separator=";\n">;
+<endif>
 >>
 
 printActionLocalSchedul(action) ::= <<
@@ -431,7 +431,7 @@ printActionLocalBody(action) ::= <<
 
 // prints the body of the given action "inline" (ie not within a function)
 printActionBodyInline(action) ::= <<
-<procedure(procedure=action.body)>
+<procedure(procedure=action.body, transformReturn="true")>
 >>
 
 
