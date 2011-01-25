@@ -270,7 +270,7 @@ PrintNetworkPortsInstantiation(network) ::=<<
 // Print Network Output Port(s) Instantiation
 
 printNetworkOutputPortsInstantiation(port) ::=<<
-<port.name>_DATA \<=	no_<port.name>_DATA;
+<port.name>_DATA \<= no_<port.name>_DATA;
 <port.name>_SEND \<= no_<port.name>_SEND;
 no_<port.name>_ACK \<= <port.name>_ACK;
 <port.name>_COUNT \<= no_<port.name>_COUNT;
@@ -363,7 +363,7 @@ PrintSignals(network) ::= <<
 -- Input Port Signals
 <network.inputs.list:{ port | <printInputPortsSignals(port=port)>}; separator="\n">
 -- Output Port Signals
-<network.outputs.list:{ port | printOutputPortsSignals(port=port)>}; separator="\n">
+<network.outputs.list:{ port | <printOutputPortsSignals(port=port)>}; separator="\n">
 -- Actors I/O Signals
 <network.instances: { instance | <printActorsSignals(instance=instance,numberOfReaders=network.numberOfReadersMap.(instance))>}; separator="\n">
 >>
