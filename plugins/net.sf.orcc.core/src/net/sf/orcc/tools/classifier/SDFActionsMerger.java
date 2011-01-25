@@ -33,11 +33,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.orcc.ir.Action;
-import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.CFGNode;
 import net.sf.orcc.ir.Expression;
-import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.State;
 import net.sf.orcc.ir.IrFactory;
 import net.sf.orcc.ir.LocalVariable;
@@ -136,6 +134,7 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 		return procedure;
 	}
 
+	@SuppressWarnings("unused")
 	private void examineState(DirectedGraph<State, UniqueEdge> graph,
 			State source) {
 		Iterator<UniqueEdge> it = graph.outgoingEdgesOf(source).iterator();
@@ -249,23 +248,23 @@ public class SDFActionsMerger extends AbstractActorTransformation {
 
 	@Override
 	public void transform(Actor actor) {
-		this.actor = actor;
-		this.file = actor.getFile();
-
-		ActionScheduler scheduler = actor.getActionScheduler();
-		FSM fsm = scheduler.getFsm();
-		if (fsm == null) {
-			List<Action> actions = scheduler.getActions();
-			List<Action> mergedActions = tryAndMerge(scheduler.getActions());
-			actions.clear();
-			actions.addAll(mergedActions);
-		} else {
-			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
-			for (State state : graph.vertexSet()) {
-				examineState(graph, state);
-			}
-			fsm.setGraph(graph);
-		}
+//		this.actor = actor;
+//		this.file = actor.getFile();
+//
+//		ActionScheduler scheduler = actor.getActionScheduler();
+//		FSM fsm = scheduler.getFsm();
+//		if (fsm == null) {
+//			List<Action> actions = scheduler.getActions();
+//			List<Action> mergedActions = tryAndMerge(scheduler.getActions());
+//			actions.clear();
+//			actions.addAll(mergedActions);
+//		} else {
+//			DirectedGraph<State, UniqueEdge> graph = fsm.getGraph();
+//			for (State state : graph.vertexSet()) {
+//				examineState(graph, state);
+//			}
+//			fsm.setGraph(graph);
+//		}
 	}
 
 	/**
