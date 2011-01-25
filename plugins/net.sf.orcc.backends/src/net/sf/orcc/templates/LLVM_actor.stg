@@ -184,7 +184,7 @@ endif>
 >>
 
 CallOp(ty, fnptrval, function_args) ::= <<
-call <ty> @<fnptrval> <function_args>
+call <ty> @<fnptrval> (<function_args>)
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -519,7 +519,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <actor.outputs.list: fifo()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<actor.parameters.list: actorParameter()>!>
+<actor.parameters.list: actorParameter()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
 <actor.stateVars.list: stateVar()>

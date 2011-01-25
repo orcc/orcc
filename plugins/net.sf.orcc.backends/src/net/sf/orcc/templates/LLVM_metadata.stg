@@ -164,63 +164,58 @@ if(actor.actionScheduler.fsm)> metadata <FSM_decl_MD(actor)> <else> null <endif>
 >>
 
 actions_MD(actor) ::= <<
-$actions_decl_MD(actor)$ = metadata !{$actor.actionScheduler.actions: {metadata $action_decl_MD(actor=actor, action=it)$}; separator=", "$}
+<actions_decl_MD(actor)> = metadata !{<actor.actionScheduler.actions: {metadata $action_decl_MD(actor=actor, action=it)$}; separator=", ">}
 >>
 
 patterns_MD(actor, patterns) ::= <<
-$patterns_decl_MD(actor=actor, patterns=patterns)$ = metadata !{$patterns.keys: {metadata $port_decl_MD(actor=actor, port=it)$, i32 $patterns.(it)$}; separator=", "$}
+<patterns_decl_MD(actor=actor, patterns=patterns)> = metadata !{<patterns.keys: {key | metadata <port_decl_MD(actor=actor, port=key)>, i32 <patterns.(key)>}; separator=", ">}
 
 >>
 
 action_MD(actor, action) ::= <<
-$action_decl_MD(actor=actor, action=action)$ = metadata !{$
+<action_decl_MD(actor=actor, action=action)> = metadata !{<
 	if(action.tag.identifiers.empty)
-		$ null $
+		> null <
 	else
-		$ metadata $Tag_decl_MD(actor=actor, tag=action.tag)
-	$$endif
-	$,$if(first(action.inputPattern.keys))
-		$ metadata $patterns_decl_MD(actor=actor, patterns=action.inputPattern)$$
+		> metadata <Tag_decl_MD(actor=actor, tag=action.tag)
+	><endif
+	>,<if(first(action.inputPattern.keys))
+		> metadata <patterns_decl_MD(actor=actor, patterns=action.inputPattern)><
 	else
-		$ null $
-	endif$,$
+		> null <
+	endif>,<
 	if(first(action.outputPattern.keys))
-		$ metadata $patterns_decl_MD(actor=actor, patterns=action.outputPattern)$$
+		> metadata <patterns_decl_MD(actor=actor, patterns=action.outputPattern)><
 	else
-		$ null$
+		> null<
 	endif
-	$, metadata $Sched_decl_MD(actor=actor, action=action)
-	$, metadata $Body_decl_MD(actor=actor, action=action)$}
+	>, metadata <Sched_decl_MD(actor=actor, action=action)
+	>, metadata <Body_decl_MD(actor=actor, action=action)>}
 
-$if(!action.tag.identifiers.empty)$
-$Tag_MD(actor=actor, tag=action.tag)$
-$endif$
-$!$if(first(action.inputPattern.keys))$
-$Patterns_MD(actor=actor, patterns=action.inputPattern)$
-$endif$
-$if(first(action.outputPattern.keys))$
-$Patterns_MD(actor=actor, patterns=action.outputPattern)$
-$endif$!$
-$Sched_MD(actor=actor, action=action)$
-$Body_MD(actor=actor, action=action)$
+<if(!action.tag.identifiers.empty)>
+<Tag_MD(actor=actor, tag=action.tag)>
+<endif>
+
+<Sched_MD(actor=actor, action=action)>
+<Body_MD(actor=actor, action=action)>
 >>
 
 
 port_MD(actor, port) ::= <<
-$port_decl_MD(actor=actor, port=port)$ = metadata !{metadata $Type_decl_MD(actor=actor, var=port)$, $varName_MD(port)$, $fifoName(port)$* @$port.name$}
-$Type_MD(actor=actor, var=port)$
+<port_decl_MD(actor=actor, port=port)> = metadata !{metadata <Type_decl_MD(actor=actor, var=port)>, <varName_MD(port)>, <fifoName(port)>* @<port.name>}
+<Type_MD(actor=actor, var=port)>
 
 >>
 
 proc_MD(actor, proc) ::= <<
-$proc_decl_MD(actor=actor, proc=proc)$ = metadata !{$varName_MD(proc)$, $procExtern_MD(proc)$, $proc.returnType$($proc.parameters.list: argumentTypeDeclaration(); wrap, anchor, separator=", "$)* @$proc$}
+<proc_decl_MD(actor=actor, proc=proc)> = metadata !{<varName_MD(proc)>, <procExtern_MD(proc)>, <proc.returnType>(<proc.parameters.list: argumentTypeDeclaration(); wrap, anchor, separator=", ">)* @<proc>}
 
 >>
 
 var_MD(actor, var) ::= <<
-$var_decl_MD(actor=actor, var=var)$ = metadata !{metadata $VarDef_decl_MD(actor=actor, var=var)$, metadata $Type_decl_MD(actor=actor, var=var)$, $var.type$* @$var$}
-$VarDef_MD(actor=actor, var=var)$
-$Type_MD(actor=actor, var=var)$
+<var_decl_MD(actor=actor, var=var)> = metadata !{metadata <VarDef_decl_MD(actor=actor, var=var)>, metadata <Type_decl_MD(actor=actor, var=var)>, <var.type>* @<var>}
+<VarDef_MD(actor=actor, var=var)>
+<Type_MD(actor=actor, var=var)>
 >>
 
 FSM_MD(actor) ::= <<
@@ -230,56 +225,56 @@ FSM_MD(actor) ::= <<
 >>
 
 State_MD(actor) ::= <<
-$State_decl_MD(actor)$ = metadata  !{$actor.actionScheduler.fsm.states: varState_MD() ; separator=", "$}
+<State_decl_MD(actor)> = metadata  !{<actor.actionScheduler.fsm.states: varState_MD() ; separator=", ">}
 >>
 
 Transitions_MD(actor) ::= <<
-$Transitions_decl_MD(actor)$ = metadata  !{$actor.actionScheduler.fsm.transitions: {metadata $Transition_decl_MD(actor=actor, transition=it)$}; separator=", "$}
-$actor.actionScheduler.fsm.transitions: { $Transition_MD(actor=actor, transition = it)$}$
+<Transitions_decl_MD(actor)> = metadata  !{<actor.actionScheduler.fsm.transitions: {transition | metadata <Transition_decl_MD(actor=actor, transition=transition)>}; separator=", ">}
+<actor.actionScheduler.fsm.transitions: {transition | <Transition_MD(actor=actor, transition = transition)>}>
 >>
 
 Transition_MD(actor, transition) ::= <<
-$if(transition.nextStateInfo.empty)$
-$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, null}
-$else$
-$Transition_decl_MD(actor=actor, transition = transition)$ = metadata  !{ $varState_MD(transition.sourceState)$, metadata $NextStates_decl_MD(actor=actor, nextStates=transition.nextStateInfo)$}
-$NextStates_MD(actor= actor, nextStates=transition.nextStateInfo)$
-$endif$
+<if(transition.nextStateInfo.empty)>
+<Transition_decl_MD(actor=actor, transition = transition)> = metadata  !{ <varState_MD(transition.sourceState)>, null}
+<else>
+<Transition_decl_MD(actor=actor, transition = transition)> = metadata  !{ <varState_MD(transition.sourceState)>, metadata <NextStates_decl_MD(actor=actor, nextStates=transition.nextStateInfo)>}
+<NextStates_MD(actor= actor, nextStates=transition.nextStateInfo)>
+<endif>
 >>
 
 NextStates_MD(actor, nextStates) ::= <<
-$NextStates_decl_MD(actor=actor, nextStates = nextStates)$ = metadata !{$nextStates: { metadata $NextState_decl_MD(actor =actor, nextState=it)$}; separator=", "$}
-$nextStates: {$NextState_MD(actor=actor, nextState=it)$}$
+<NextStates_decl_MD(actor=actor, nextStates = nextStates)> = metadata !{<nextStates: { nextState | metadata <NextState_decl_MD(actor =actor, nextState=nextState)>}; separator=", ">}
+<nextStates: {nextState | <NextState_MD(actor=actor, nextState=nextState)>}>
 >>
 
 NextState_MD(actor, nextState) ::= <<
-$NextState_decl_MD(actor = actor, nextState = nextState)$ = metadata !{metadata $action_decl_MD(actor=actor, action=nextState.action)$, $varState_MD(nextState.targetState)$}
+<NextState_decl_MD(actor = actor, nextState = nextState)> = metadata !{metadata <action_decl_MD(actor=actor, action=nextState.action)>, <varState_MD(nextState.targetState)>}
 
 >>
 
 Type_MD(actor, var) ::= <<
-$Type_decl_MD(actor=actor, var=var)$ = metadata  !{$varType_MD(var.type)$, $varSize_MD(var.type)$}
+<Type_decl_MD(actor=actor, var=var)> = metadata  !{<varType_MD(var.type)>, <varSize_MD(var.type)>}
 
 >>
 
 Sched_MD(actor, action) ::= <<
-$Sched_decl_MD(actor=actor, action=action)$ = metadata  !{$varName_MD(action.scheduler)$, $procExtern_MD(action.scheduler)$, i1()* @$action.scheduler$}
+<Sched_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.scheduler)>, <procExtern_MD(action.scheduler)>, i1()* @<action.scheduler>}
 
 >>
 
 Tag_MD(actor, tag)::=<<
-$Tag_decl_MD(actor=actor, tag=tag)$ = metadata  !{$tag.identifiers: varIdentifier_MD() ; separator=", "$}
+<Tag_decl_MD(actor=actor, tag=tag)> = metadata  !{<tag.identifiers: varIdentifier_MD() ; separator=", ">}
 >>
 
 
 VarDef_MD(actor, var) ::= <<
-$VarDef_decl_MD(actor=actor, var=var)$ = metadata !{$varName_MD(var)$, $varAssignable_MD(var)$, $varSuffix_MD(var)$,  $varIndex_MD(var)$}
+<VarDef_decl_MD(actor=actor, var=var)> = metadata !{<varName_MD(var)>, <varAssignable_MD(var)>, <varSuffix_MD(var)>,  <varIndex_MD(var)>}
 
 >>
 
 
 Body_MD(actor, action) ::= <<
-$Body_decl_MD(actor=actor, action=action)$ = metadata  !{$varName_MD(action.body)$, $procExtern_MD(action.body)$, void()* @$action.body$}
+<Body_decl_MD(actor=actor, action=action)> = metadata  !{<varName_MD(action.body)>, <procExtern_MD(action.body)>, void()* @<action.body>}
 
 >>
 
@@ -288,22 +283,22 @@ $Body_decl_MD(actor=actor, action=action)$ = metadata  !{$varName_MD(action.body
 ///////////////////////////////////////////////////////////////////////////////
 
 MoC_MD(actor)::= <<
-$MoC_decl_MD(actor=actor)$ = metadata !{$MoCName_MD(actor.MoC)$}
+<MoC_decl_MD(actor=actor)> = metadata !{<MoCName_MD(actor.MoC)>}
 >>
 
 MoCName_MD(MoC)::= <<
-metadata !$
-if(MoC.quasiStatic)$ "QuasiStatic"$
-endif$$
-if(MoC.CSDF)$$
-	if(MoC.SDF)$"SDF"$
-	else$"CSDF"$
-	endif$$
-endif$$
-if(MoC.DPN)$"DPN"$
-endif$$
-if(MoC.KPN)$"KPN"$
-endif$
+metadata !<
+if(MoC.quasiStatic)> "QuasiStatic"<
+endif><
+if(MoC.CSDF)><
+	if(MoC.SDF)>"SDF"<
+	else>"CSDF"<
+	endif><
+endif><
+if(MoC.DPN)>"DPN"<
+endif><
+if(MoC.KPN)>"KPN"<
+endif>
 >>
 ///////////////////////////////////////////////////////////////////////////////
 // Actor MD data
@@ -311,28 +306,28 @@ endif$
 
 
 varType_MD(type) ::= <<
-$if(type.int)$ i32 $type.size$ $
-elseif(type.uint)$ i32 $type.size$ $
-elseif(type.bool)$ i32 1 $ 
-elseif(type.list)$$varType_MD(type.elementType)$$
-elseif(type.string)$ i32 8 $
-endif$
+<if(type.int)> i32 <type.size> <
+elseif(type.uint)> i32 <type.size> <
+elseif(type.bool)> i32 1 < 
+elseif(type.list)><varType_MD(type.elementType)><
+elseif(type.string)> i32 8 <
+endif>
 >>
 
 varAssignable_MD(var) ::= <<
-i1 $if(var.assignable)$1$else$0$endif$
+i1 <if(var.assignable)>1<else>0<endif>
 >>
 
 varSuffix_MD(var) ::= <<
-i32 $if(var.suffix)$$var.suffix$$else$0$endif$
+i32 <if(var.suffix)><var.suffix><else>0<endif>
 >>
 
 varIndex_MD(var) ::= <<
-i32 $if(var.index)$$var.index$$else$0$endif$
+i32 <if(var.index)><var.index><else>0<endif>
 >>
 
 procExtern_MD(proc) ::= <<
-$if(proc.external)$i1 1$else$i1 0$endif$
+<if(proc.external)>i1 1<else>i1 0<endif>
 >>
 
 procRetType_MD(proc) ::= <<
@@ -341,25 +336,25 @@ metadata !"$proc.returnType$"
 
 
 varSize_MD(type) ::= <<
-$if(type.list)$ $type.dimensions: {dim | i32 $dim$}; separator=", "$ $
-else$ null $endif$
+<if(type.list)> <type.dimensions: {dim | i32 $dim$}; separator=", "> <
+else> null <endif>
 >>
 
 varName_MD(var) ::= <<
-metadata !"$var.name$"
+metadata !"<var.name>"
 >>
 
 
 file_MD(actor) ::= <<
-metadata !"$actor.file$"
+metadata !"<actor.file>"
 >>
 
 varState_MD(state) ::= <<
-metadata !"$state$"
+metadata !"<state>"
 >>
 
 varIdentifier_MD(identifier) ::= <<
-metadata !"$identifier$"
+metadata !"<identifier>"
 >>
 
 
