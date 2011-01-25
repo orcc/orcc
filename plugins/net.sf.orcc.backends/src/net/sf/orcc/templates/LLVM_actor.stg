@@ -89,7 +89,7 @@ Location(location) ::= <<
 >>
 
 ConstantValue(type, const) ::= <<
-<if(type.list)> <Constant(constant = const, type = type, iterator = type.sizeIterator)> <else> <Constant(constant = const)> <endif>
+<if(type.list)> <Constant(constant = const, type = type, iterator = type.sizeIterator)> <else> <Constant(constant = const, type="", iterator="")> <endif>
 >>
 
 
@@ -129,7 +129,7 @@ phiPair(value, label) ::= <<
 stateVar(variable) ::= <<
 @<variable> = <if(variable.assignable)> global <
 else> constant <endif> <variable.type> <
-if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)>
+if(variable.hasInitialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)>
 <else> zeroinitializer, align 32 
 <endif>
 
@@ -513,6 +513,7 @@ action(action) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 actor(actor, options) ::= <<
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Generated from "<actor.name>"
 declare i32 @printf(i8* noalias , ...) nounwind 
@@ -529,7 +530,7 @@ declare i32 @printf(i8* noalias , ...) nounwind
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
 <actor.stateVars.list: stateVar()>
-
+<!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
 <actor.procs.list: procedure()>
@@ -544,5 +545,5 @@ declare i32 @printf(i8* noalias , ...) nounwind
 
 <decl_MD(actor)>
 
-<header()>
+<header()> !>
 >>

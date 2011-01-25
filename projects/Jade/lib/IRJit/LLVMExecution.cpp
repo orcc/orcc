@@ -155,7 +155,10 @@ void LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
 	
 	//Port has already been compiled
 	if (portGV != NULL){
+		//Initialize fifo
 		void* fifoGV = EE->getOrEmitGlobalVariable(fifo->getGV());
+
+		//Connect to compiled port
 		*portGV = fifoGV;
 	}
 	
