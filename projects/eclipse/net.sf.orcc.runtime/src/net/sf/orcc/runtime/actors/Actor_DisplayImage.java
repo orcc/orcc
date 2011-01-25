@@ -85,9 +85,7 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 
 	private Fifo_int fifo_B;
 
-	private Fifo_int fifo_HEIGHT;
-
-	private Fifo_int fifo_WIDTH;
+	private Fifo_int fifo_SizeOfImage;
 
 	private JFrame frame;
 
@@ -112,11 +110,11 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 	public boolean imageDone;
 
 	public Actor_DisplayImage() {
-		frame = new JFrame("display");
+		frame = new JFrame("display image");
 
 		canvas = new Canvas();
 		frame.add(canvas);
-		frame.setVisible(true);
+		//frame.setVisible(true);
 
 		frame.addWindowListener(new WindowAdapter() {
 
@@ -147,7 +145,7 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 	}
 
 	public String getNextSchedulableAction() {
-		if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
+		if (fifo_SizeOfImage.hasTokens(2)) {
 			return "setImageSize";
 		}
 
@@ -182,7 +180,7 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 
 			if (sizeDone == false) {
 				imageDone = false;
-				if (fifo_WIDTH.hasTokens(1) && fifo_HEIGHT.hasTokens(1)) {
+				if (fifo_SizeOfImage.hasTokens(2)) {
 					setImageSize();
 					res = true;
 					i++;
@@ -197,6 +195,12 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 					i++;
 				}
 			}
+			
+			// scb@epfl : 2010.01.25, GNU/Linux bug
+			// frame must be displayed when the image is already available
+			if(imageDone == true) frame.setVisible(true);
+			
+			
 		} while (res);
 
 		return i;
@@ -210,10 +214,8 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 			fifo_G = (Fifo_int) fifo;
 		} else if ("B".equals(portName)) {
 			fifo_B = (Fifo_int) fifo;
-		} else if ("WIDTH".equals(portName)) {
-			fifo_WIDTH = (Fifo_int) fifo;
-		} else if ("HEIGHT".equals(portName)) {
-			fifo_HEIGHT = (Fifo_int) fifo;
+		} else if ("SizeOfImage".equals(portName)) {
+			fifo_SizeOfImage = (Fifo_int) fifo;
 		} else {
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
@@ -221,13 +223,11 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 	}
 
 	private void setImageSize() {
-		int[] Width = fifo_WIDTH.getReadArray(1);
-		int width_Index = fifo_WIDTH.getReadIndex(1);
-		int[] Height = fifo_HEIGHT.getReadArray(1);
-		int height_Index = fifo_HEIGHT.getReadIndex(1);
 
-		int newWidth = Width[width_Index];
-		int newHeight = Height[height_Index];
+		int[] SizeOfImage = fifo_SizeOfImage.getReadArray(2);
+		int newWidth = SizeOfImage[0];
+		int newHeight = SizeOfImage[1];
+		fifo_SizeOfImage.readEnd(2);
 
 		if (newWidth != this.width || newHeight != this.height) {
 			this.width = newWidth;
@@ -236,15 +236,18 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 			canvas.setSize(this.width, this.height);
 			frame.pack();
 
-			canvas.createBufferStrategy(2);
+			try{
+				canvas.createBufferStrategy(2);
+			}
+			catch(IllegalStateException e){
+				System.out.println("Image not displayable: "+e);
+			}
+			
 			buffer = canvas.getBufferStrategy();
 
 			image = new BufferedImage(this.width, this.height,
 					BufferedImage.TYPE_INT_RGB);
 		}
-
-		fifo_WIDTH.readEnd(1);
-		fifo_HEIGHT.readEnd(1);
 
 		sizeDone = true;
 	}
@@ -286,6 +289,7 @@ public class Actor_DisplayImage implements IActor, ActionListener {
 			startTime = t;
 			imageDone = true;
 			sizeDone = false;
+			
 		}
 	}
 

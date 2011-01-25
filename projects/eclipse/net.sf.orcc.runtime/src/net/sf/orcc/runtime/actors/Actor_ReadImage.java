@@ -73,7 +73,7 @@ public class Actor_ReadImage implements IActor {
 	}
 
 	public String getNextSchedulableAction() {
-		if (fifo_SizeOfImage.hasRoom(1)) {
+		if (fifo_SizeOfImage.hasRoom(2)) {
 			return "setImageSize";
 		}
 
@@ -104,7 +104,7 @@ public class Actor_ReadImage implements IActor {
 		do {
 			res = false;
 			if (sizeDone == false) {
-				if (fifo_SizeOfImage.hasRoom(1)) {
+				if (fifo_SizeOfImage.hasRoom(2)) {
 					setImageSize();
 					res = true;
 					i++;
@@ -140,13 +140,15 @@ public class Actor_ReadImage implements IActor {
 	}
 
 	private void setImageSize() {
-		width = image.getWidth() & (-2);
-		height = image.getHeight() & (-2);
 
-		int[] SizeOfImage = fifo_SizeOfImage.getWriteArray(1);
-		int SizeOfImage_Index = fifo_SizeOfImage.getWriteIndex(1);
-		SizeOfImage[SizeOfImage_Index] = (height << 16) + (width & 0xFFFF);
-		fifo_SizeOfImage.writeEnd(1, SizeOfImage);
+		width = image.getWidth();
+		height = image.getHeight();
+
+		int[] sizeOfImage = fifo_SizeOfImage.getWriteArray(2);
+		int sizeOfImageIndex = fifo_SizeOfImage.getWriteIndex(2);
+		sizeOfImage[sizeOfImageIndex] = width;
+		sizeOfImage[sizeOfImageIndex + 1] = height;
+		fifo_SizeOfImage.writeEnd(2, sizeOfImage);
 
 		sizeDone = true;
 	}
