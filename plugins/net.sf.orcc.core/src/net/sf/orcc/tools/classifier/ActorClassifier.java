@@ -51,6 +51,13 @@ import net.sf.orcc.moc.QSDFMoC;
 import net.sf.orcc.moc.SDFMoC;
 import net.sf.orcc.util.UniqueEdge;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.alg.ConnectivityInspector;
 import org.jgrapht.traverse.DepthFirstIterator;
@@ -78,6 +85,22 @@ public class ActorClassifier implements ActorTransformation {
 	 * @return the class of the actor
 	 */
 	public void classify() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IFile file = workspace.getRoot().getFileForLocation(
+				new Path(actor.getFile()));
+
+		try {
+			IMarker[] markers = file.findMarkers(IMarker.PROBLEM, true,
+					IResource.DEPTH_INFINITE);
+			for (IMarker marker : markers) {
+				if (marker.getAttribute(IMarker.SEVERITY,
+						IMarker.SEVERITY_ERROR) == IMarker.SEVERITY_INFO) {
+					marker.delete();
+				}
+			}
+		} catch (CoreException e) {
+		}
+
 		// checks for empty actors
 		List<Action> actions = actor.getActions();
 		if (actions.isEmpty()) {
@@ -92,6 +115,7 @@ public class ActorClassifier implements ActorTransformation {
 		TimeDependencyAnalyzer tdAnalyzer = new TimeDependencyAnalyzer();
 		if (tdAnalyzer.isTimeDependent(actor)) {
 			moc = new DPNMoC();
+			showMarker();
 		} else {
 			// merges actions with the same input/output pattern together
 			new SDFActionsMerger().transform(actor);
@@ -152,14 +176,19 @@ public class ActorClassifier implements ActorTransformation {
 
 		// loops until the actor goes back to the initial state, or there is a
 		// data-dependent condition
+		final int MAX_PHASES = 16384;
 		String initialState = interpreter.getFsmState();
 		do {
-			//TODO : Limit the loop in the case of actor never return to initial state
 			interpreter.schedule();
 			csdfMoc.addAction(interpreter.getScheduledAction());
 			nbPhases++;
-		} while (!state.isInitialState()
-				|| !interpreter.getFsmState().equals(initialState));
+		} while ((!state.isInitialState() || !interpreter.getFsmState().equals(
+				initialState))
+				&& nbPhases < MAX_PHASES);
+
+		if (nbPhases == MAX_PHASES) {
+			return new KPNMoC();
+		}
 
 		// set token rates
 		csdfMoc.setTokenConsumptions(actor);
@@ -188,11 +217,19 @@ public class ActorClassifier implements ActorTransformation {
 		// schedule the actor
 		String initialState = actor.getActionScheduler().getFsm()
 				.getInitialState().getName();
+		int nbPhases = 0;
+		final int MAX_PHASES = 16384;
 		do {
 			interpretedActor.schedule();
 			Action latest = interpretedActor.getScheduledAction();
 			sdfMoc.addAction(latest);
-		} while (!interpretedActor.getFsmState().equals(initialState));
+			nbPhases++;
+		} while (!interpretedActor.getFsmState().equals(initialState)
+				&& nbPhases < MAX_PHASES);
+
+		if (nbPhases == MAX_PHASES) {
+			throw new OrccRuntimeException("too many phases");
+		}
 
 		// set token rates
 		sdfMoc.setTokenConsumptions(actor);
@@ -347,6 +384,20 @@ public class ActorClassifier implements ActorTransformation {
 		interpretedActor.initialize();
 
 		return interpretedActor;
+	}
+
+	private void showMarker() {
+		try {
+			IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			IFile file = workspace.getRoot().getFileForLocation(
+					new Path(actor.getFile()));
+
+			IMarker marker = file.createMarker(IMarker.PROBLEM);
+			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_INFO);
+			marker.setAttribute(IMarker.MESSAGE,
+					"Actor " + actor.getSimpleName() + " is time-dependent");
+		} catch (CoreException e) {
+		}
 	}
 
 	@Override
