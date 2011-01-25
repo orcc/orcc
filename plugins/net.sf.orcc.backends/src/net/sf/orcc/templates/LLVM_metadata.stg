@@ -91,7 +91,7 @@ State_decl_MD(actor) ::= <<
 !<actor.templateData.actionScheduler.(actor.actionScheduler.fsm.states)>
 >>
 
-Transitions_decl_MD() ::= <<
+Transitions_decl_MD(actor) ::= <<
 !<actor.templateData.actionScheduler.(actor.actionScheduler.fsm.transitions)>
 >>
 

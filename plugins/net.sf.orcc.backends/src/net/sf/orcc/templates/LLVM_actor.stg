@@ -46,7 +46,7 @@ variableDeclaration(variable) ::= <<
 <if(!variable.port)
 ><if(variable.type.list)
 ><if(variable.instruction.store || !variable.instruction)>
-<AllocaOp(result={%<variable>}, type=variable.type)>
+<AllocaOp(result={%<variable>}, type=variable.type, NumElements="", alignment="")>
 <endif>
 <endif><
 endif>
@@ -98,14 +98,18 @@ ConstantValue(type, const) ::= <<
 ///////////////////////////////////////////////////////////////////////////////
 
 Constant(constant, type, iterator) ::= <<
-<(constant.class.simpleName)(constant = constant, type = type, iterator = iterator)>
+<if(constant.listExpr)
+> <ListExpr(constant = constant, type = type, iterator = iterator)> <
+else
+> <(constant.class.simpleName)(constant)> <
+endif>
 >>
 
-BoolExpr(constant, type, iterator) ::= <<
+BoolExpr(constant) ::= <<
 <if (constant.value)>1<else>0<endif>
 >>
 
-IntExpr(constant, type, iterator) ::= <<
+IntExpr(constant) ::= <<
 <constant>
 >>
 
@@ -114,7 +118,7 @@ ListExpr(constant, type, iterator) ::= <<
 [<iterator, constant.value: {iterator, value | <type.type> <if(value)> <Constant(constant = value, type=type.type, iterator = type.type.sizeIterator)> <else> zeroinitializer <endif> }; wrap, separator=", ">]
 >>
 
-StringExpr(constant, type, iterator) ::= <<
+StringExpr(constant) ::= <<
 c"<constant>"
 >>
 
@@ -129,7 +133,7 @@ phiPair(value, label) ::= <<
 stateVar(variable) ::= <<
 @<variable> = <if(variable.assignable)> global <
 else> constant <endif> <variable.type> <
-if(variable.hasInitialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)>
+if(variable.initialValue)> <ConstantValue(type=variable.type, const=variable.initialValue)> 
 <else> zeroinitializer, align 32 
 <endif>
 
@@ -430,11 +434,11 @@ b<label(whileNode.joinNode.successors)>:
 ///////////////////////////////////////////////////////////////////////////////
 
 Instruction(instruction) ::= <<
-<(instruction.class.simpleName)(instruction)>
+<!<(instruction.class.simpleName)(instruction)>!>
 >>
 
 Instructions(instructions) ::= <<
-<instructions: Instruction()>
+<!<instructions: Instruction()>!>
 >>
 
 Node(node) ::= <<
@@ -446,32 +450,32 @@ Nodes(nodes) ::= <<
 >>
 
 Node_cond(node) ::= <<
-<({<node.class.simpleName>_cond})(node)>
+<!<({<node.class.simpleName>_cond})(node)>!>
 >>
 
 Nodes_cond(nodes) ::= <<
-<nodes: Node_cond()>
+<!<nodes: Node_cond()>!>
 >>
 
 WhileNode_cond(nodes) ::= <<
-<WhileNode(nodes)>
+<!<WhileNode(nodes)>!>
 >>
 
 IfNode_cond(nodes) ::= <<
-<IfNode(nodes)>
+<!<IfNode(nodes)>!>
 >>
 
 BlockNode_cond(blockNode) ::= <<
-	<Instructions(blockNode.instructions)>
+<!	<Instructions(blockNode.instructions)> !>
 >>
 
 // if node
 BlockNode(blockNode) ::= <<
-	br label %b<label(blockNode)>
+<!	br label %b<label(blockNode)>
 
 b<label(blockNode)>:
 	<Instructions(blockNode.instructions)>
-	
+	!>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -526,11 +530,11 @@ declare i32 @printf(i8* noalias , ...) nounwind
 <actor.outputs.list: fifo()>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Parameter values of the instance
-<actor.parameters.list: actorParameter()>
+<actor.parameters.list: actorParameter()>!>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; State variables of the actor
 <actor.stateVars.list: stateVar()>
-<!
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Functions/procedures
 <actor.procs.list: procedure()>
@@ -545,5 +549,5 @@ declare i32 @printf(i8* noalias , ...) nounwind
 
 <decl_MD(actor)>
 
-<header()> !>
+<header()> 
 >>
