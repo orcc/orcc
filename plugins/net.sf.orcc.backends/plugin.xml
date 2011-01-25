@@ -93,7 +93,7 @@
                defaultValue="false"
                id="net.sf.orcc.backends.classify"
                description="This option enables optimizations such as transformation to higher-level and actor merging"
-               name="(BROKEN) Classify actors">
+               name="Classify actors">
             <checkBox>
                <option
                      defaultValue="false"
