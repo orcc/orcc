@@ -54,7 +54,9 @@
 #include "llvm/Target/TargetSelect.h"
 
 #include "Jade/Decoder.h"
+#include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
+#include "Jade/Fifo/AbstractFifo.h"
 #include "Jade/Jit/LLVMExecution.h"
 //------------------------------
 
@@ -146,6 +148,17 @@ void* LLVMExecution::getExit() {
 
 void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
 	EE->addGlobalMapping(procedure->getFunction(), Addr);
+}
+
+void LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
+	void **portGV = (void**)EE->getPointerToGlobalIfAvailable(port->getGlobalVariable());
+	
+	//Port has already been compiled
+	if (portGV != NULL){
+		void* fifoGV = EE->getOrEmitGlobalVariable(fifo->getGV());
+		*portGV = fifoGV;
+	}
+	
 }
 
 void LLVMExecution::run() {

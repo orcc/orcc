@@ -41,6 +41,7 @@
 #include "Connector.h"
 #include "Jade/Configuration/Configuration.h"
 #include "Jade/Core/Network.h"
+#include "Jade/Jit/LLVMExecution.h"
 #include "Jade/Util/FifoMng.h"
 //------------------------------
 
@@ -85,4 +86,23 @@ void Connector::setConnection(Connection* connection){
 	//Create a fifo and set it to the connection
 	AbstractFifo* fifo = FifoMng::getFifo(Context, decoder, src->getType(), connection->getSize());
 	connection->setFifo(fifo);
+}
+
+void Connector::setConnections(Configuration* configuration, LLVMExecution* executionEngine){
+	Network* network = configuration->getNetwork();
+	HDAGGraph* graph = network->getGraph();
+	
+	int edges = graph->getNbEdges();
+	
+	for (int i = 0; i < edges; i++){
+		setConnection((Connection*)graph->getEdge(i), executionEngine);
+	}
+}
+
+void Connector::setConnection(Connection* connection, LLVMExecution* executionEngine){
+	setConnection(connection);
+	
+	//Source port is choosen as the reference type
+	executionEngine->mapFifo(connection->getSourcePort(), connection->getFifo());
+	executionEngine->mapFifo(connection->getDestinationPort(), connection->getFifo());
 }

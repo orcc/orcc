@@ -151,6 +151,13 @@ public:
      */
 	void stop();
 
+	/**
+     *  @brief Stop the execution of the decoder
+	 *
+     */
+	LLVMExecution* getEE(){return executionEngine;};
+
+
 	std::map<std::string, llvm::Function*>* getFifoFn(){return fifoFn;};
 private:
 	/**

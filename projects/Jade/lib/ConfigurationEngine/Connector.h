@@ -46,6 +46,7 @@ namespace llvm{
 class Connection;
 class Configuration;
 class Decoder;
+class LLVMExecution;
 
 #include "llvm/LLVMContext.h"
 
@@ -79,8 +80,18 @@ public:
 	/**
 	 * @brief print connections in the given configuration.
 	 *
+	 * @param configuration : the Configuration where connections are printed.
 	 */
 	void setConnections(Configuration* configuration);
+
+	/**
+	 * @brief print connections in the given configuration using an execution engine.
+	 *
+	 * @param configuration : the Configuration where connections are printed.
+	 *
+	 * @param executionEngine : the Execution Engine that can retrieve fifo pointer
+	 */
+	void setConnections(Configuration* configuration, LLVMExecution* executionEngine);
 
 	/**
 	 * @brief Remove connections
@@ -99,6 +110,15 @@ private:
 	 * @param connection : the Connection to print
 	 */
 	void setConnection(Connection* connection);
+
+	/**
+	 * @brief Print a connection
+	 * 
+	 * @param connection : the Connection to print
+	 *
+	 * LLVMExecution* executionEngine
+	 */
+	void setConnection(Connection* connection, LLVMExecution* executionEngine);
 	
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

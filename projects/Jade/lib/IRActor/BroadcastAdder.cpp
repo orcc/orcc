@@ -49,9 +49,9 @@
 
 using namespace std;
 
-BroadcastAdder::BroadcastAdder(llvm::LLVMContext& C, Decoder* decoder) : Context(C){
+BroadcastAdder::BroadcastAdder(llvm::LLVMContext& C, Configuration* configuration, Decoder* decoder) : Context(C){
 	this->decoder = decoder;
-	this->configuration = decoder->getConfiguration();
+	this->configuration = configuration;
 	Network* network = configuration->getNetwork();
 	this->graph = network->getGraph();
 }

@@ -62,7 +62,7 @@ void ConfigurationEngine::configure(Decoder* decoder){
 	Configuration* configuration = decoder->getConfiguration();
 
 	// Adding broadcast 
-	BroadcastAdder broadAdder(Context, decoder);
+	BroadcastAdder broadAdder(Context,configuration, decoder);
 	broadAdder.transform();
 
 	//Write instance
@@ -100,7 +100,7 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	IRWriter writer(Context, decoder);
 
 	// Adding new broadcast 
-	BroadcastAdder broadAdder(Context, decoder);
+	BroadcastAdder broadAdder(Context, configuration, decoder);
 	broadAdder.transform();
 	list<Instance*>* broads = broadAdder.getBroads();
 	for (it = broads->begin(); it != broads->end(); it++){
@@ -122,7 +122,7 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 
 	// Setting connections of the decoder
 	Connector connector(Context, decoder);
-	connector.setConnections(configuration);
+	connector.setConnections(configuration, decoder->getEE());
 }
 
 void ConfigurationEngine::clearConnections(Decoder* decoder){

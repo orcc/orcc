@@ -83,9 +83,7 @@ public:
 		return fifoGV;
 	}
 
-	virtual ~AbstractFifo(){
-		delete fifoGV;
-	};
+	virtual ~AbstractFifo(){};
 
 
 protected:

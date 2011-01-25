@@ -95,7 +95,7 @@ void FifoCircular::createConnection(){
 
 FifoCircular::~FifoCircular(){
 	//Erase fifo elements
-	 ArrayFifoBuffer->eraseFromParent();
-	 ArrayContent->eraseFromParent();
-	
+	fifoGV->eraseFromParent();
+	ArrayContent->eraseFromParent();
+	ArrayFifoBuffer->eraseFromParent();
 }

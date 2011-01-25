@@ -74,7 +74,7 @@ public:
      *
 	 *	@param configuration : Configuration to transform
      */
-	BroadcastAdder(llvm::LLVMContext& C, Decoder* decoder);
+	BroadcastAdder(llvm::LLVMContext& C, Configuration* configuration, Decoder* decoder);
 
 	void transform();
 

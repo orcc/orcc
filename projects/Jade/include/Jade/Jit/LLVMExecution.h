@@ -45,9 +45,13 @@ namespace llvm{
 	class Module;
 }
 
+#include <pthread.h>
+
 #include "llvm/LLVMContext.h"
 
+class AbstractFifo;
 class Procedure;
+class Port;
 //------------------------------
 
 /**
@@ -115,6 +119,7 @@ public:
 
 	void* getExit(); 
 	void recompile(llvm::Function* function);
+	void mapFifo(Port* port, AbstractFifo* fifo);
 
 private:
 
