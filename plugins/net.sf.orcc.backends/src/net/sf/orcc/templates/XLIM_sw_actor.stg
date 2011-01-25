@@ -355,7 +355,7 @@ IfNode(ifNode) ::= <<
 	\</module\>
 <if(ifNode.elseNodes)>
 	\<module kind="else"\>
-		<printNodes(ifNode.elseNodes)>k
+		<printNodes(ifNode.elseNodes)>
 	\</module\>
 <endif>
 	\<!-- joinnode --\>
