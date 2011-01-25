@@ -1,103 +1,162 @@
-declareBroadcast(instance) ::= <<
-$if (instance.broadcast)$
-private Broadcast_$instance.broadcast.type$ actor_$instance.id$;
-$endif$
->>
-
-createBroadcast(instance) ::= <<
-$if (instance.broadcast)$
-actor_$instance.id$ = new Broadcast_$instance.broadcast.type$($length(instance.broadcast.outputList)$);
-$endif$
->>
-
-doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
-actor_$source.id$.setFifo("$sourcePort.name$", fifo_$count$);
-actor_$target.id$.setFifo("$targetPort.name$", fifo_$count$);
->>
-
-allocateFifoType(type, size, count) ::= <<
-private Fifo_$type$ fifo_$count$ = new Fifo_$type$($if(size)$$size$$else$SIZE$endif$);
->>
-
-printInitialize(instance) ::= <<
-$if (instance.actor && !instance.actor.initializes.empty)$
-actor_$instance.id$.initialize();
-$endif$
->>
-
-declareActor(instance) ::= <<
-$if (instance.actor)$
-private IActor actor_$instance.id$;
-$endif$
->>
-
 parameter(param) ::= <<
-/* $param$ */ $instance.parameters.(param)$
+/* $param$ */ <instance.parameters.(param)>
 >>
 
 parameters(parameters) ::= <<
-$parameters: parameter(); wrap, separator=", "$
+<parameters: parameter(); wrap, separator=", ">
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// declaration() and scheduler()
+//////////////////////////////////////////////////////////////////////////////
+
+declareBroadcast(instance) ::= <<
+<if (instance.broadcast)>
+private Broadcast_<instance.broadcast.type> actor_<instance.id>;
+<endif>
+>>
+
+createBroadcast(instance) ::= <<
+<if (instance.broadcast)>
+actor_<instance.id> = new Broadcast_<instance.broadcast.type>(<length(instance.broadcast.outputList)>);
+<endif>
+>>
+
+declareActor(instance) ::= <<
+<if (instance.actor)>
+private IActor actor_<instance.id>;
+<endif>
 >>
 
 constructActor(instance) ::= <<
-$if (instance.actor)$
-$if(instance.actor.system)$
-actor_$instance.id$ = new Actor_$instance.actor.simpleName$($parameters(instance.actor.parameters.list)$);
-$else$
-actor_$instance.id$ = new net.sf.orcc.generated.$instance.actor.package$.Actor_$instance.actor.simpleName$($parameters(instance.actor.parameters.list)$);
-$endif$
-$endif$
+<if (instance.actor)>
+<if(instance.actor.system)>
+actor_<instance.id> = new Actor_<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
+<else>
+actor_<instance.id> = new net.sf.orcc.generated.<instance.actor.package>.Actor_<instance.actor.simpleName>(<parameters(instance.actor.parameters.list)>);
+<endif>
+<endif>
 >>
 
 scheduleActor(instance) ::= <<
-$if (instance.actor || instance.broadcast)$
-nbOfFiredActions = actor_$instance.id$.schedule();
+<if (instance.actor || instance.broadcast)>
+nbOfFiredActions = actor_<instance.id>.schedule();
 if (nbOfFiredActions \< 0)
 	stop = true;
 else
 	i += nbOfFiredActions;
-$endif$
+<endif>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// print calls to initialize() and scheduler()
+///////////////////////////////////////////////////////////////////////////////
+
+printInitializes(instances) ::= <<
+<instances: printInitialize()>
+>>
+
+printInitialize(instance) ::= <<
+<if (instance.actor && !instance.actor.initializes.empty)>
+actor_<instance.id>.initialize();
+<endif>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// allocates FIFOs
+///////////////////////////////////////////////////////////////////////////////
+
+allocateFifoType(type, size, count) ::= <<
+private Fifo_<type> fifo_<count> = new Fifo_<type>(<if(size)><size><else>SIZE<endif>);
+>>
+
+doAllocateFifo(edge, source, sourcePort, target, targetPort) ::= <<
+<if (source.broadcast)>
+<allocateFifoType(
+  type=targetPort.type, size=edge.size, count=network.connectionMap.(edge))><else>
+<allocateFifoType(
+  type=sourcePort.type, size=edge.size, count=network.connectionMap.(edge))><endif>
+>>
+
+tryAllocateFifo(edge, src, tgt) ::= <<
+<if (src.instance && tgt.instance)>
+<doAllocateFifo(
+  edge=edge,
+  source=src.instance, sourcePort=edge.source,
+  target=tgt.instance, targetPort=edge.target)><endif>
+>>
+
+allocateFifo(edge) ::= <<
+<tryAllocateFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
+>>
+
+allocateFifos(edges) ::= <<
+<edges: allocateFifo()>
+>>
+
+///////////////////////////////////////////////////////////////////////////////
+// assigns FIFOs
+///////////////////////////////////////////////////////////////////////////////
+
+doAssignFifo(source, sourcePort, target, targetPort, count) ::= <<
+actor_<source.id>.setFifo("<sourcePort.name>", fifo_<count>);
+actor_<target.id>.setFifo("<targetPort.name>", fifo_<count>);
+>>
+
+tryAssignFifo(edge, src, tgt) ::= <<
+<doAssignFifo(
+  source=src.instance, sourcePort=edge.source,
+  target=tgt.instance, targetPort=edge.target,
+  count=network.connectionMap.(edge))>
+>>
+
+assignFifo(edge) ::= <<
+<tryAssignFifo(edge=edge, src=network.sourceMap.(edge), tgt=network.targetMap.(edge))>
+>>
+
+assignFifos(edges) ::= <<
+<edges: assignFifo(); separator="\n">
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // print network
 network(debugFifos, fifoSize, network, options) ::= <<
 /**
- * Generated from "$network.name$"
+ * Generated from "<network.name>"
  */
 package net.sf.orcc.generated;
 
 import net.sf.orcc.runtime.*;
 import net.sf.orcc.runtime.actors.*;
 
-public class Network_$network.name$ implements IScheduler {
+public class Network_<network.name> implements IScheduler {
 
-	public static final int SIZE = $fifoSize$;
+	public static final int SIZE = <fifoSize>;
 
 	// FIFO declarations
-	$allocateFifos(network.connections)$
+	<allocateFifos(network.connections)>
 	// Actors
-	$network.instances: declareActor()$
+	<network.instances: declareActor()>
 	// Broadcasts
-	$network.instances: declareBroadcast()$
+	<network.instances: declareBroadcast()>
 
 	@Override
 	public void initialize() {
-		$network.instances: constructActor()$
-		$network.instances: createBroadcast()$
+		<network.instances: constructActor()>
+		<network.instances: createBroadcast()>
 
-		$assignFifos(network.connections)$
+		<assignFifos(network.connections)>
 	}
 
 	@Override
 	public void schedule() {
-		$printInitializes(network.instances)$
+		<printInitializes(network.instances)>
 		int i = 1;
 		boolean stop = false;
 		int nbOfFiredActions = 0;
 		while ((i \> 0) && (!stop)) {
 			i = 0;
-			$network.instances: scheduleActor()$
+			<network.instances: scheduleActor()>
 		}
 	}
 	
@@ -109,7 +168,7 @@ public class Network_$network.name$ implements IScheduler {
 		String[] args = new String[1];
 		args[0] = sourceFilename;
 		CLIParameters.getInstance().setArguments(args);
-		IScheduler scheduler = new Network_$network.name$();
+		IScheduler scheduler = new Network_<network.name>();
 		scheduler.initialize();
 		Actor_Display.setOutputStreamProxy(displayOutputStreamProxy);
 		scheduler.schedule();
@@ -122,7 +181,7 @@ public class Network_$network.name$ implements IScheduler {
 	 */
 	public static void main(String[] args) {
 		CLIParameters.getInstance().setArguments(args);
-		IScheduler scheduler = new Network_$network.name$();
+		IScheduler scheduler = new Network_<network.name>();
 		scheduler.initialize();
 		scheduler.schedule();
 		Actor_Display.closeDisplay();
@@ -131,4 +190,6 @@ public class Network_$network.name$ implements IScheduler {
 }
 
 >>
+
+
 

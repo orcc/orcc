@@ -4,92 +4,100 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 fifo(port) ::= <<
-private Fifo_$port.type$ fifo_$port.name$;
+private Fifo_<port.type> fifo_<port.name>;
 
 >>
 
 setFifo(port) ::= <<
-if ("$port.name$".equals(portName)) {
-	fifo_$port.name$ = (Fifo_$port.type$) fifo;
+if ("<port.name>".equals(portName)) {
+	fifo_<port.name> = (Fifo_<port.type>) fifo;
 } else 
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Types and variables
 ///////////////////////////////////////////////////////////////////////////////
+// the dimensions of a list: [dim1][dim2]...[dimn]
+// does not output anything if $value$ is empty
+listSize(values) ::= <<
+<values : {value | [<value>]} >
+>>
 
 // the dimensions of a list: [][]...[]
-// does not output anything if $value$ is empty
+// does not output anything if <value> is empty
 // differs from inherited listSize because this one does not print any size
 // information.
 listDim(value) ::= <<
-$value : {[]} $
+<value : {[]} >
 >>
 
 // a variable definition
 // called by "function parameter", or "state variable with value"
 variableDeclaration(variable) ::= <<
-$variable.type$$listDim(variable.type.dimensions)$ $variable.name$
+<variable.type><listDim(variable.type.dimensions)> <variable.name>
 >>
 
 // a variable definition with initialization
 // called by "local variable", or "state variable with no value"
 variableDeclarationInit(variable) ::= <<
-$if(variable.port)$
-$variable.type$[] $variable$$
+<if(variable.port)>
+<variable.type>[] <variable><
 else
-$$variable.type$$listDim(variable.type.dimensions)$ $variable$$
+><variable.type><listDim(variable.type.dimensions)> <variable><
 if(variable.type.dimensions)
-$ = new $variable.type$$listSize(variable.type.dimensions)$$
+> = new <variable.type><listSize(variable.type.dimensions)><
 endif
-$$
-endif$>>
+><endif> >>
 
 parameter(parameter) ::= <<
-private $variableDeclarationInit(parameter)$;
+private <variableDeclarationInit(parameter)>;
 
 >>
 
 parameters(parameters) ::= <<
-$parameters: parameter()$
+<parameters: parameter()>
 >>
 
 declareParameters(parameters) ::= <<
-$parameters: variableDeclaration(); wrap, separator=", "$
+<parameters: variableDeclaration(); wrap, separator=", ">
 >>
 
 setParameter(parameter) ::= <<
-this.$parameter$ = $parameter$;
+this.<parameter> = <parameter>;
 
 >>
 
 setParameters(parameters) ::= <<
-$parameters: setParameter()$
+<parameters: setParameter()>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Constants
 ///////////////////////////////////////////////////////////////////////////////
 
+Constant(constant) ::= <<
+<(constant.class.simpleName)(constant)>
+>>
+
 BoolExpr(expr) ::= <<
-$expr.value$
+<expr.value>
 >>
 
 BinaryExpr(expr) ::= <<
-($expr$)
+(<expr>)
 >>
 
 VarExpr(expr) ::= <<
-$expr$
+<expr>
 >>
 
 // a state variable
 stateVar(variable) ::= <<
-$if(variable.initialized)$
-private $variableDeclaration(variable)$ = $Constant(variable.initialValue)$;
-$else$
-private $variableDeclarationInit(variable)$;
-$endif$
+<if(variable.initialized)>
+private <variableDeclaration(variable)> = <Constant(variable.initialValue)>;
+<else>
+private <variableDeclarationInit(variable)>;
+<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,68 +105,68 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 PrintParameter(parameter) ::= <<
-$if (parameter.stringExpr)
-$"$parameter$"$
+<if (parameter.stringExpr)
+>"<parameter>"<
 else
-$$Constant(parameter)$$
-endif$
+><Constant(parameter)><
+endif>
 >>
 
 Call(call) ::= <<
 
-$if(call.print)$System.out.print($call.parameters: PrintParameter(); separator=" + "$);$
+<if(call.print)>System.out.print(<call.parameters: PrintParameter(); separator=" + ">);<
 else
-$$if(call.target)$$call.target$ = $endif$$call.procedure$($call.parameters; separator=", "$);$
-endif$
+><if(call.target)><call.target> = <endif><call.procedure>(<call.parameters; separator=", ">);<
+endif>
 >>
 
 Load(load) ::= <<
 
-$if (load.source.variable.port && !load.indexes.empty)
-$$load.target$ = $load.source$[$load.source$_Index + $first(load.indexes)$]$rest(load.indexes) : {[$it$]}$;$
+<if (load.source.variable.port && !load.indexes.empty)
+><load.target> = <load.source>[<load.source>_Index + <first(load.indexes)>]<rest(load.indexes) : {index | [<index>]}>;<
 else
-$$load.target$ = $load.source$$load.indexes : {[$it$]}$;$endif$
+><load.target> = <load.source><load.indexes : {index | [<index>]}>;<endif>
 >>
 
 // peek instruction
 Peek(peek) ::= <<
-$Read(peek)$
+<Read(peek)>
 >>
 
 // read instruction
 Read(read) ::= <<
 
-$if (read.target)
-$int $read.port$_Index = fifo_$read.port$.getReadIndex($read.numTokens$);
-$read.target$ = fifo_$read.port$.getReadArray($read.numTokens$);$
+<if (read.target)
+>int <read.port>_Index = fifo_<read.port>.getReadIndex(<read.numTokens>);
+<read.target> = fifo_<read.port>.getReadArray(<read.numTokens>);<
 else
-$fifo_$read.port$.getReadIndex($read.numTokens$);
-fifo_$read.port$.getReadArray($read.numTokens$);$endif$
+>fifo_<read.port>.getReadIndex(<read.numTokens>);
+fifo_<read.port>.getReadArray(<read.numTokens>);<endif>
 >>
 
 ReadEnd(readEnd) ::= <<
 
-fifo_$readEnd.port$.readEnd($readEnd.numTokens$);
+fifo_<readEnd.port>.readEnd(<readEnd.numTokens>);
 >>
 
 Store(store) ::= <<
 
-$if (store.target.port && !store.indexes.empty)
-$$store.target$[$store.target$_Index + $first(store.indexes)$]$rest(store.indexes) : {[$it$]}$ = $store.value$;$
+<if (store.target.port && !store.indexes.empty)
+><store.target>[<store.target>_Index + <first(store.indexes)>]<rest(store.indexes) : {index | [<index>]}> = <store.value>;<
 else
-$$store.target$$store.indexes : {[$it$]}$ = $store.value$;$endif$
+><store.target><store.indexes : {index | [<index>]}> = <store.value>;<endif>
 >>
 
 // write instruction
 Write(write) ::= <<
 
-$write.target$ = fifo_$write.port$.getWriteArray($write.numTokens$);
-int $write.port$_Index = fifo_$write.port$.getWriteIndex($write.numTokens$);
+<write.target> = fifo_<write.port>.getWriteArray(<write.numTokens>);
+int <write.port>_Index = fifo_<write.port>.getWriteIndex(<write.numTokens>);
 >>
 
 WriteEnd(writeEnd) ::= <<
 
-fifo_$writeEnd.port$.writeEnd($writeEnd.numTokens$, $writeEnd.target$);
+fifo_<writeEnd.port>.writeEnd(<writeEnd.numTokens>, <writeEnd.target>);
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,16 +174,16 @@ fifo_$writeEnd.port$.writeEnd($writeEnd.numTokens$, $writeEnd.target$);
 ///////////////////////////////////////////////////////////////////////////////
 
 procedure(procedure) ::= <<
-$if(!procedure.external)$
+<if(!procedure.external)>
 
-private $procedure.returnType$ $procedure$($procedure.parameters.list: {$variableDeclaration(it)$}; wrap, anchor, separator=", "$) {
-$if(procedure.locals.list)$
-	$procedure.locals.list: {$variableDeclarationInit(it)$;$\n$}$
-$endif$
-	$procedure.nodes: {$(it.class.simpleName)(it)$}$
+private <procedure.returnType> <procedure>(<procedure.parameters.list: {parameter | <variableDeclaration(parameter)>}; wrap, anchor, separator=", ">) {
+<if(procedure.locals.list)>
+	<procedure.locals.list: {local | <variableDeclarationInit(local)>;<\n>}>
+<endif>
+	<procedure.nodes: {node | <(node.class.simpleName)(node)>}>
 }
 
-$endif$
+<endif>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,39 +191,39 @@ $endif$
 ///////////////////////////////////////////////////////////////////////////////
 
 outputPattern(pattern) ::= <<
-$pattern.keys:{port|fifo_$port$.hasRoom($pattern.(port)$)}; separator=" && "$
+<pattern.keys:{port|fifo_<port>.hasRoom(<pattern.(port)>)}; separator=" && ">
 >>
 
 checkInputPatternPort(port) ::= <<
-fifo_$port$.hasTokens($pattern.(port)$)
+fifo_<port>.hasTokens(<pattern.(port)>)
 >>
 
 checkInputPattern(pattern) ::= <<
-$pattern.keys: { port | $checkInputPatternPort(port)$ && }$
+<pattern.keys: { port | <checkInputPatternPort(port)> && }>
 >>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Scheduler without FSM
 
 actionCall(action) ::= <<
-$action$();
+<action>();
 res = true;
 i++;
 >>
 
 actionTest(action) ::= <<
-if ($checkInputPattern(action.inputPattern)$isSchedulable_$action$()) {
-	$if(action.outputPattern)$
-	if ($outputPattern(action.outputPattern)$) {
-		$actionCall(action)$
+if (<checkInputPattern(action.inputPattern)>isSchedulable_<action>()) {
+	<if(action.outputPattern)>
+	if (<outputPattern(action.outputPattern)>) {
+		<actionCall(action)>
 	}
-	$else$
-	$actionCall(action)$
-	$endif$
+	<else>
+	<actionCall(action)>
+	<endif>
 }>>
 
 schedulingTest(actions) ::= <<
-$actions: actionTest(); separator=" else "$
+<actions: actionTest(); separator=" else ">
 >>
 
 scheduler(actions) ::= <<
@@ -226,9 +234,9 @@ public int schedule() {
 
 	while (res) {
 		res = false;
-		$if(actions)$
-		$schedulingTest(actions)$
-		$endif$
+		<if(actions)>
+		<schedulingTest(actions)>
+		<endif>
 	}
 
 	return i;
@@ -240,38 +248,38 @@ public int schedule() {
 // Scheduler with FSM
 
 actionCallState(nextState) ::= <<
-$nextState.action$();
-_FSM_state = States.s_$nextState.targetState$;
+<nextState.action>();
+_FSM_state = States.s_<nextState.targetState>;
 res = true;
 >>
 
 actionTestState(nextState) ::= <<
-if ($checkInputPattern(nextState.action.inputPattern)$isSchedulable_$nextState.action$()) {
-	$if(nextState.action.outputPattern)$
-	if ($outputPattern(nextState.action.outputPattern)$) {
-		$actionCallState(nextState)$
+if (<checkInputPattern(nextState.action.inputPattern)>isSchedulable_<nextState.action>()) {
+	<if(nextState.action.outputPattern)>
+	if (<outputPattern(nextState.action.outputPattern)>) {
+		<actionCallState(nextState)>
 	}
-	$else$
-	$actionCallState(nextState)$
-	$endif$
+	<else>
+	<actionCallState(nextState)>
+	<endif>
 }>>
 
 schedulingTestState(nextStates) ::= <<
-$nextStates: actionTestState(); separator=" else "$
+<nextStates: actionTestState(); separator=" else ">
 >>
 
 stateScheduler(transition) ::= <<
-private boolean stateScheduler_$transition.sourceState$() {
+private boolean stateScheduler_<transition.sourceState>() {
 	boolean res = false;
-	$schedulingTestState(transition.nextStateInfo)$
+	<schedulingTestState(transition.nextStateInfo)>
 	return res;
 }
 
 >>
 
 transition(transition) ::= <<
-case s_$transition.sourceState$:
-	res = stateScheduler_$transition.sourceState$();
+case s_<transition.sourceState>:
+	res = stateScheduler_<transition.sourceState>();
 	if (res) {
 		i++;
 	}
@@ -280,7 +288,7 @@ case s_$transition.sourceState$:
 
 switch(transitions) ::= <<
 switch (_FSM_state) {
-$transitions: transition()$
+<transitions: transition()>
 default:
 	System.out.println("unknown state: %s\n" + _FSM_state);
 	break;
@@ -289,22 +297,22 @@ default:
 
 schedulerFSM(actions, fsm) ::= <<
 private enum States {
-	$fsm.states : {s_$it$}; separator=",\n"$
+	<fsm.states : {state | s_<state>}; separator=",\n">
 };
 
-private States _FSM_state = States.s_$fsm.initialState$;
+private States _FSM_state = States.s_<fsm.initialState>;
 
-$if(actions)$
+<if(actions)>
 private boolean outside_FSM_scheduler() {
 	boolean res = false;
 	int i = 0;
-	$schedulingTest(actions)$
+	<schedulingTest(actions)>
 	return res;
 }
 
 
-$endif$
-$fsm.transitions: stateScheduler(); separator="\n"$
+<endif>
+<fsm.transitions: stateScheduler(); separator="\n">
 @Override
 public int schedule() {
 	boolean res = true;
@@ -312,16 +320,16 @@ public int schedule() {
 
 	while (res) {
 		res = false;
-		$if(actions)$
+		<if(actions)>
 		if (outside_FSM_scheduler()) {
 			res = true;
 			i++;
 		} else {
-			$switch(fsm.transitions)$
+			<switch(fsm.transitions)>
 		}
-		$else$
-		$switch(fsm.transitions)$
-		$endif$
+		<else>
+		<switch(fsm.transitions)>
+		<endif>
 	}
 
 	return i;
@@ -335,64 +343,74 @@ public int schedule() {
 
 actor(actor, options) ::= <<
 /**
- * Generated from "$actor.name$"
+ * Generated from "<actor.name>"
  */
-package net.sf.orcc.generated.$actor.package$;
+package net.sf.orcc.generated.<actor.package>;
 
 import net.sf.orcc.runtime.*;
 import net.sf.orcc.runtime.actors.IActor;
 
-public class Actor_$actor.simpleName$ implements IActor {
+public class Actor_<actor.simpleName> implements IActor {
 
 
 	// Input FIFOs
-	$actor.inputs.list: fifo()$
+	<actor.inputs.list: fifo()>
 	// Output FIFOs
-	$actor.outputs.list: fifo()$
+	<actor.outputs.list: fifo()>
 	// Parameters of the actor
-	$parameters(actor.parameters.list)$
+	<parameters(actor.parameters.list)>
 	// State variables of the actor
-	$actor.stateVars.list: stateVar()$
+	<actor.stateVars.list: stateVar()>
 	
-	public Actor_$actor.simpleName$($declareParameters(actor.parameters.list)$) {
-		$setParameters(actor.parameters.list)$
+	public Actor_<actor.simpleName>(<declareParameters(actor.parameters.list)>) {
+		<setParameters(actor.parameters.list)>
 	}
 	
 	// Functions/procedures
-	$actor.procs.list: procedure()$
+	<actor.procs.list: procedure()>
 	// Actions
-	$actor.actions: action()$
-$if(actor.initializes)$
+	<actor.actions: action()>
+<if(actor.initializes)>
 	// Initializes
-	$actor.initializes: action()$
-$endif$
+	<actor.initializes: action()>
+<endif>
 	@Override
 	public void initialize() {
-$if(actor.initializes)$
+<if(actor.initializes)>
 		boolean res = false;
 		int i = 0;
 		if (res){
 		}
 
-		$schedulingTest(actor.initializes)$
-$endif$
+		<schedulingTest(actor.initializes)>
+<endif>
 	}
 
 	@Override
 	public void setFifo(String portName, Fifo fifo) {
-		$actor.inputs.list: setFifo()$$actor.outputs.list: setFifo()${
+		<actor.inputs.list: setFifo()><actor.outputs.list: setFifo()>{
 			String msg = "unknown port \"" + portName + "\"";
 			throw new IllegalArgumentException(msg);
 		}
 	}
 
 	// Action scheduler
-$if(actor.actionScheduler.fsm)$
-	$schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)$
-$else$
-	$scheduler(actor.actionScheduler.actions)$
-$endif$
+<if(actor.actionScheduler.fsm)>
+	<schedulerFSM(actions=actor.actionScheduler.actions, fsm=actor.actionScheduler.fsm)>
+<else>
+	<scheduler(actor.actionScheduler.actions)>
+<endif>
 
 }
 
 >>
+
+///////////////////////////////////////////////////////////////////////////////
+// Action
+///////////////////////////////////////////////////////////////////////////////
+
+action(action) ::= <<
+<procedure(action.body)><procedure(action.scheduler)>
+>>
+
+
