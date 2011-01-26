@@ -30,6 +30,7 @@
       <vertex id="MbPredMvResL1" x="371" y="206"/>
       <vertex id="MbPredMvResL0" x="372" y="175"/>
       <vertex id="MbLoc" x="404" y="147"/>
+      <vertex id="NeighbourAvail" x="374" y="324"/>
       <vertex id="DelList" x="563" y="812"/>
       <vertex id="EmptyDPB" x="549" y="857"/>
       <vertex id="Mv" x="976" y="103"/>
@@ -42,13 +43,12 @@
       <vertex id="SelectList" x="961" y="189"/>
       <vertex id="Read4MbPred" x="1420" y="283"/>
       <vertex id="MMCO" x="145" y="735"/>
-      <vertex id="RefList0" x="721" y="574"/>
+      <vertex id="RefList0" x="726" y="619"/>
       <vertex id="MVReconstruct" x="669" y="10"/>
-      <vertex id="RefList1" x="751" y="855"/>
+      <vertex id="RefList1" x="756" y="905"/>
       <vertex id="RefIdxL0ToPoc" x="1018" y="377"/>
       <vertex id="RefIdxL1ToPoc" x="1044" y="573"/>
       <vertex id="SelectRefIdx" x="1207" y="232"/>
       <vertex id="Mgnt_InterPred" x="1206" y="61"/>
-      <vertex id="NeighbourAvail" x="374" y="324"/>
    </vertices>
 </layout>

@@ -40,6 +40,20 @@ actor Algo_VariableLengthDecoding()
 
 /*
 *
+* Procedure
+*
+*/
+	uint(size=32) Out_ReadNBits;
+	procedure ReadNBitsInWorkingByte(uint(size=32) InitialValue, uint(size=4) NbBitsToRead)
+	begin
+			Out_ReadNBits    := InitialValue << NbBitsToRead;
+			Out_ReadNBits    := Out_ReadNBits + MaskBits(WorkingByte >> (8-NbBitsToRead) , NbBitsToRead);
+			WorkingByte     := WorkingByte << NbBitsToRead;
+			CountBufferRbsp := CountBufferRbsp - NbBitsToRead;
+	end
+
+/*
+*
 * State variables
 *
 */
@@ -385,7 +399,7 @@ actor Algo_VariableLengthDecoding()
 				while( ((WorkingByte & 0x80) = 0) and (CountBufferRbsp > 0))
 				do
 					CountBufferRbsp := CountBufferRbsp - 1;
-					WorkingByte     := lshift(WorkingByte,1);
+					WorkingByte     := WorkingByte << 1;
 					leadingZeroBits := leadingZeroBits + 1;
 				end
 				if(CountBufferRbsp > 0)then
@@ -400,11 +414,9 @@ actor Algo_VariableLengthDecoding()
 					else
 						leadingZeroBits
 					end;
-				CodeNum         := CodeNum << NbBitsToAdd;
-				CodeNum         := CodeNum + MaskBits(WorkingByte >> (8-NbBitsToAdd) , NbBitsToAdd);
+				ReadNBitsInWorkingByte(CodeNum,NbBitsToAdd);
+				CodeNum         := Out_ReadNBits;
 				leadingZeroBits := leadingZeroBits - NbBitsToAdd;
-				WorkingByte     := WorkingByte << NbBitsToAdd;
-				CountBufferRbsp := CountBufferRbsp - NbBitsToAdd;
 			end
 		end
 
@@ -452,11 +464,9 @@ actor Algo_VariableLengthDecoding()
 				else
 					BitsCount
 				end;
-			ReadValue       := ReadValue << NbBitsToAdd;
-			ReadValue       := ReadValue + MaskBits( WorkingByte >> (8-NbBitsToAdd) , NbBitsToAdd);
+			ReadNBitsInWorkingByte(ReadValue,NbBitsToAdd);
+			ReadValue       := Out_ReadNBits;
 			BitsCount       := BitsCount - NbBitsToAdd;
-			WorkingByte     := WorkingByte << NbBitsToAdd;
-			CountBufferRbsp := CountBufferRbsp - NbBitsToAdd;
 		end
 
 
@@ -487,19 +497,15 @@ actor Algo_VariableLengthDecoding()
 			//delete me! (Bug in the front-end)
 			bool titi
 		do
-			coeff_token     := coeff_token << 1;
-			coeff_token     := coeff_token + MaskBits(WorkingByte >> 7 , 1);
-			WorkingByte     := WorkingByte << 1;
-			CountBufferRbsp := CountBufferRbsp - 1;
-			NbBitsRead      := NbBitsRead + 1;
+			ReadNBitsInWorkingByte(coeff_token,1);
+			coeff_token := Out_ReadNBits;
+			NbBitsRead  := NbBitsRead + 1;
 			titi := TotalCoeffValid[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F];
 			while((not titi) and (CountBufferRbsp > 0))
 			do
-				coeff_token     := coeff_token << 1;
-				coeff_token     := coeff_token + MaskBits(WorkingByte >> 7 , 1);
-				WorkingByte     := WorkingByte << 1;
-				CountBufferRbsp := CountBufferRbsp - 1;
-				NbBitsRead      := NbBitsRead + 1;
+				ReadNBitsInWorkingByte(coeff_token,1);
+				coeff_token := Out_ReadNBits;
+				NbBitsRead  := NbBitsRead + 1;
 				titi := TotalCoeffValid[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F];
 			end
 		end
@@ -555,19 +561,15 @@ actor Algo_VariableLengthDecoding()
 			//delete me!
 			bool titi
 		do
-			ValRead         := ValRead << 1;
-			ValRead         := ValRead + MaskBits(WorkingByte >> 7 , 1);
-			WorkingByte     := WorkingByte << 1;
-			CountBufferRbsp := CountBufferRbsp - 1;
+			ReadNBitsInWorkingByte(ValRead,1);
+			ValRead := Out_ReadNBits;
 			NbBitsRead      := NbBitsRead + 1;
 			titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07];
 			while((not titi) and (CountBufferRbsp > 0))
 			do
-				ValRead         := ValRead << 1;
-				ValRead         := ValRead + MaskBits(WorkingByte >> 7 , 1);
-				WorkingByte     := WorkingByte << 1;
-				CountBufferRbsp := CountBufferRbsp - 1;
-				NbBitsRead      := NbBitsRead + 1;
+				ReadNBitsInWorkingByte(ValRead,1);
+				ValRead    := Out_ReadNBits;
+				NbBitsRead := NbBitsRead + 1;
 				titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07];
 			end
 		end
@@ -592,19 +594,15 @@ actor Algo_VariableLengthDecoding()
 			//delete me!
 			bool titi
 		do
-			ValRead         := ValRead << 1;
-			ValRead         := ValRead + MaskBits(WorkingByte >> 7 , 1);
-			WorkingByte     := WorkingByte << 1;
-			CountBufferRbsp := CountBufferRbsp - 1;
-			NbBitsRead      := NbBitsRead + 1;
+			ReadNBitsInWorkingByte(ValRead,1);
+			ValRead    := Out_ReadNBits;
+			NbBitsRead := NbBitsRead + 1;
 			titi := RunBeforeValid[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07];
 			while((not titi) and (CountBufferRbsp > 0))
 			do
-				ValRead         := ValRead << 1;
-				ValRead         := ValRead + MaskBits(WorkingByte >> 7 , 1);
-				WorkingByte     := WorkingByte << 1;
-				CountBufferRbsp := CountBufferRbsp - 1;
-				NbBitsRead      := NbBitsRead + 1;
+				ReadNBitsInWorkingByte(ValRead,1);
+				ValRead    := Out_ReadNBits;
+				NbBitsRead := NbBitsRead + 1;
 				titi := RunBeforeValid[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07];
 			end
 		end
