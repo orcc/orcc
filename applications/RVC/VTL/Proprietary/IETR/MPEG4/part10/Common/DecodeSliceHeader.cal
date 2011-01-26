@@ -18,7 +18,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import MPEG.Common.Imp_ByteOperation.*;
 
-actor Algo_DecodeSliceHeader()
+actor DecodeSliceHeader()
 	int (size=32) ValVLD,
 	bool          IsAnIdrPic,
 	uint(size=2)  NalRefIdc,

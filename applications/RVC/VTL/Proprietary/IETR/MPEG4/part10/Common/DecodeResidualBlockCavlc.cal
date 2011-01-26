@@ -18,7 +18,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import MPEG.Common.Imp_Math.*;
 
-actor Algo_DecodeResidualBlock_Cavlc()
+actor DecodeResidualBlockCavlc()
 	int (size=32) ValVLD,
 	int (size=8)  Parameters
 		==>

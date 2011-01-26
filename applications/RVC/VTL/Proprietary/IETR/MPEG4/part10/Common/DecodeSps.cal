@@ -18,7 +18,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import MPEG.Common.Imp_ByteOperation.*;
 
-actor Algo_DecodeSps()
+actor DecodeSps()
 	int (size=32) ValVLD,
 	uint(size=5)  NumSpsAsked,
 	uint(size=2)  SenderOfRequest
@@ -29,8 +29,8 @@ actor Algo_DecodeSps()
 
 	uint(size=8)  SzDPB,
 
-	uint(size=31) MMCO_MaxFrameNum,
-	uint(size=5)  MMCO_NumRefFrame,
+	uint(size=31) MaxFrameNum,
+	uint(size=5)  NumRefFrame,
 
 	bool          Direct8x8Inference,
 
@@ -151,12 +151,12 @@ actor Algo_DecodeSps()
 			SenderOfRequest :[Sender],
 			NumSpsAsked     :[ValSps]
 				==>
-			SpsParameters         :[parameters_to_send]repeat 11,
-			SzDPB                 :[MaxDPBSz[ValSps]],
-			Direct8x8Inference    :[ValDirect8x8Inference],
+			SpsParameters      :[parameters_to_send]repeat 11,
+			SzDPB              :[MaxDPBSz[ValSps]],
+			Direct8x8Inference :[ValDirect8x8Inference],
 
-			MMCO_MaxFrameNum      :[max_frame_num[ValSps]],
-			MMCO_NumRefFrame      :[num_ref_frames[ValSps]]
+			MaxFrameNum        :[max_frame_num[ValSps]],
+			NumRefFrame        :[num_ref_frames[ValSps]]
 		guard
 			Sender = GET_SPS_FROM_PIC
 		var

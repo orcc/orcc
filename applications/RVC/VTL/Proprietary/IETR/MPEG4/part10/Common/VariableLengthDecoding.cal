@@ -19,7 +19,7 @@ import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_CavlcLookUpTables.*;
 import MPEG.Common.Imp_ByteOperation.*;
 
-actor Algo_VariableLengthDecoding()
+actor VariableLengthDecoding()
 	uint(size=8)  RbspByte,
 	bool          NewNal,
 

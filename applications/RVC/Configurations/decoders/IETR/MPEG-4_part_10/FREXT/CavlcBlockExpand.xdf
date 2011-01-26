@@ -82,7 +82,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_BlockExpand_AVC"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.CavlcBlockExpand"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -91,7 +91,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_BlockSplit_AVC"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.CavlcBlockSplit"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

@@ -372,11 +372,11 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="Algo_NALU">
+    <Instance id="RemoveBytesPattern">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_NALU"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.RemoveBytesPattern"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -394,7 +394,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_DecodeSps"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.DecodeSps"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -403,7 +403,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_VariableLengthDecoding"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.VariableLengthDecoding"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -412,7 +412,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_VariableLengthDecoding"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.VariableLengthDecoding"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -421,7 +421,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_DecodePps"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.DecodePps"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -433,7 +433,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_VariableLengthDecoding"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.VariableLengthDecoding"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -477,9 +477,11 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Algo_NALU" dst-port="bits8" src="" src-port="bits8"/>
-    <Connection dst="CheckNaluType" dst-port="NewNal" src="Algo_NALU" src-port="NewNal"/>
-    <Connection dst="CheckNaluType" dst-port="RbspByte" src="Algo_NALU" src-port="RbspByte"/>
+    <Connection dst="RemoveBytesPattern" dst-port="bits8" src="" src-port="bits8"/>
+    <Connection dst="CheckNaluType" dst-port="NewNal"
+        src="RemoveBytesPattern" src-port="NewNal"/>
+    <Connection dst="CheckNaluType" dst-port="RbspByte"
+        src="RemoveBytesPattern" src-port="RbspByte"/>
     <Connection dst="SpsVLDecoding" dst-port="RbspByte"
         src="CheckNaluType" src-port="SpsRbsp"/>
     <Connection dst="SpsVLDecoding" dst-port="TypeOfVLD" src="DecodeSps" src-port="TypeOfVLD"/>
@@ -561,10 +563,6 @@
     <Connection dst="" dst-port="IsNewPicOrSlice" src="DecodePic" src-port="IsNewPicOrSlice"/>
     <Connection dst="CheckIsNewSlice" dst-port="MaxDPBSize_i"
         src="DecodeSps" src-port="SzDPB"/>
-    <Connection dst="CheckIsNewSlice" dst-port="MaxFrameNum_i"
-        src="DecodeSps" src-port="MMCO_MaxFrameNum"/>
-    <Connection dst="CheckIsNewSlice" dst-port="NumRefFrame_i"
-        src="DecodeSps" src-port="MMCO_NumRefFrame"/>
     <Connection dst="CheckIsNewSlice" dst-port="IsNewPic"
         src="DecodePic" src-port="IsNewPic"/>
     <Connection dst="" dst-port="FrameNum" src="DecodePic" src-port="FrameNum"/>
@@ -597,4 +595,8 @@
     <Connection dst="" dst-port="IntraPredMode" src="DecodePic" src-port="IntraPredMode"/>
     <Connection dst="" dst-port="MbLocation" src="DecodePic" src-port="MbLocation"/>
     <Connection dst="" dst-port="NeighbourAvail" src="DecodePic" src-port="NeighbourAvail"/>
+    <Connection dst="CheckIsNewSlice" dst-port="MaxFrameNum_i"
+        src="DecodeSps" src-port="MaxFrameNum"/>
+    <Connection dst="CheckIsNewSlice" dst-port="NumRefFrame_i"
+        src="DecodeSps" src-port="NumRefFrame"/>
 </XDF>

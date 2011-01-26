@@ -19,7 +19,7 @@ import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import MPEG.Common.Imp_ByteOperation.*;
 
-actor Algo_DecodeMacroblockLayer()
+actor DecodeMacroblockLayer()
 	int (size=32) ValVLD,
 	int (size=8)  Parameters,
 

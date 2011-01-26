@@ -17,7 +17,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 
-actor Algo_DecodeDecRefPicMarking()
+actor DecodeDecRefPicMarking()
 	int (size=32) ValVLD,
 
 	uint(size=2) PicNalRefIdc,

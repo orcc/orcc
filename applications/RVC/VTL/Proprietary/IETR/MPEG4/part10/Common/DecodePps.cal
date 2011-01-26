@@ -18,7 +18,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import MPEG.Common.Imp_ByteOperation.*;
 
-actor Algo_DecodePps(bool IsCBP)
+actor DecodePps(bool IsCBP)
 	int (size=32) ValVLD,
 	uint(size=8)  PpsAsked,
 

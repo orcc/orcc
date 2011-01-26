@@ -19,7 +19,7 @@
       <vertex id="slice_alpha_c0_offset" x="574" y="1176"/>
       <vertex id="slice_beta_offset" x="586" y="1203"/>
       <vertex id="LFDisable" x="610" y="996"/>
-      <vertex id="CodedBlockPattern" x="2184" y="894"/>
+      <vertex id="CodedBlockPattern" x="2186" y="867"/>
       <vertex id="ConstrainedIFlag" x="601" y="866"/>
       <vertex id="PicWidthInMb" x="595" y="1148"/>
       <vertex id="PicSizeInMb" x="603" y="1118"/>
@@ -41,7 +41,7 @@
       <vertex id="MbIntraFlag" x="2246" y="1141"/>
       <vertex id="Run" x="2153" y="663"/>
       <vertex id="Value" x="2145" y="755"/>
-      <vertex id="Last" x="2229" y="859"/>
+      <vertex id="Last" x="2231" y="832"/>
       <vertex id="MacroBlockType" x="2235" y="1109"/>
       <vertex id="TransformSize8x8" x="2232" y="1289"/>
       <vertex id="NbRefFrame_l1" x="1131" y="499"/>
@@ -64,18 +64,18 @@
       <vertex id="IsNewPicOrSlice" x="584" y="957"/>
       <vertex id="IsNewPic" x="571" y="416"/>
       <vertex id="MbLocation" x="594" y="1028"/>
+      <vertex id="NeighbourAvail" x="591" y="1059"/>
       <vertex id="Mgnt_DecodePic" x="1446" y="-92"/>
       <vertex id="DecodeSliceHeader" x="224" y="303"/>
       <vertex id="DecodeRefPicList" x="723" y="418"/>
       <vertex id="DecodeDecRefPicMarking" x="581" y="144"/>
-      <vertex id="DecodeSliceData_Cavlc" x="172" y="850"/>
+      <vertex id="DecodeSliceData" x="172" y="850"/>
       <vertex id="DecodeMacroBlockLayer" x="859" y="849"/>
       <vertex id="DecodeMbPred" x="1394" y="943"/>
       <vertex id="DecodeResidual" x="1394" y="559"/>
-      <vertex id="DecodeResidualBlock_Cavlc" x="1911" y="626"/>
+      <vertex id="DecodeResidualBlockCavlc" x="1912" y="592"/>
       <vertex id="DecodeSubMbPred" x="1433" y="1238"/>
       <vertex id="MergeDataFromSDataAndMbLayer" x="1901" y="1066"/>
-      <vertex id="GenerateSkipBlockInformation" x="1909" y="846"/>
-      <vertex id="NeighbourAvail" x="591" y="1059"/>
+      <vertex id="GenerateSkipBlockInformation" x="1913" y="814"/>
    </vertices>
 </layout>

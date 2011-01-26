@@ -57,7 +57,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor Algo_BlockExpand_AVC ()
+actor CavlcBlockExpand ()
 	uint(size=6)  MbType,
 	int (size=12) Value,
 	uint(size=4)  Run,

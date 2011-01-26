@@ -15,7 +15,7 @@ This copyright notice must be included in all copies or derivative works. Copyri
 ***********************************************************************/
 package Proprietary.IETR.MPEG4.part10.Common;
 
-actor Algo_NALU ()
+actor RemoveBytesPattern()
 		uint(size = 8) bits8
 			==>
 		uint(size = 8) RbspByte,

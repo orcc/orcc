@@ -29,7 +29,7 @@ import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import MPEG.Common.Imp_ByteOperation.*;
 import MPEG.Common.Imp_PictureInfo.*;
 
-actor Algo_DecodeSliceData_CAVLC(bool Is_CBP)
+actor DecodeSliceData(bool Is_CBP)
 	int (size=32) ValVLD,
 
 	int(size=5)   PpsParameters,
