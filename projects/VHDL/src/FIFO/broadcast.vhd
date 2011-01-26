@@ -6,7 +6,7 @@
 -- Author     : Nicolas Siret (nicolas.siret@live.fr)
 -- Company    : Lead Tech Design
 -- Created    : 
--- Last update: 2011-01-06
+-- Last update: 2011-01-18
 -- Platform   : 
 -- Standard   : VHDL'93
 -------------------------------------------------------------------------------
@@ -57,13 +57,13 @@ entity broadcast is
     (
       reset_n  : in  std_logic;
       --
-      data_in  : in  std_logic_vector (width -1 downto 0);
-      send_in  : in  std_logic;
-      ack_in   : out std_logic;
+      input_data  : in  std_logic_vector (width -1 downto 0);
+      input_send  : in  std_logic;
+      input_ack   : out std_logic;
       --
-      data_out : out std_logic_vector (width -1 downto 0);
-      send_out : out std_logic_vector (size -1 downto 0);
-      ack_out  : in  std_logic_vector (size -1 downto 0)
+      output_data : out std_logic_vector (width -1 downto 0);
+      output_send : out std_logic_vector (size -1 downto 0);
+      output_ack  : in  std_logic_vector (size -1 downto 0)
       );
 end broadcast;
 
@@ -82,34 +82,34 @@ architecture arch_broadcast of broadcast is
   
 begin
 
-  data_out <= data_in;
+  output_data <= input_data;
 
   -- Management of the external SEND (destination actor)
   externalSend : for i in 0 to size -1 generate
-    send_out(i) <= send_in and not internalAck(i);
+    output_send(i) <= input_send and not internalAck(i);
   end generate externalSend;
 
 
   -- Management of the external ACK (source actor)
-  externalAck : process (ack_out, internalAck, send_in) is
+  externalAck : process (output_ack, internalAck, input_send) is
   begin
-    if (send_in = '1' and (ack_out or internalAck) = ones) then
-      ack_in <= '1';
+    if (input_send = '1' and (output_ack or internalAck) = ones) then
+      input_ack <= '1';
     else
-      ack_in <= '0';
+      input_ack <= '0';
     end if;
   end process externalAck;
 
 
   -- Management of the internal ACK (source actor)
   counterGen : for i in 0 to size -1 generate
-    process (ack_out, internalAck, send_in) is
+    process (output_ack, internalAck, input_send) is
     begin
       if reset_n = '0' then
         internalAck(i) <= '0';
-      elsif (send_in = '1' and (ack_out or internalAck) = ones) then
+      elsif (input_send = '1' and (output_ack or internalAck) = ones) then
         internalAck(i) <= '0';
-      elsif (send_in = '1' and ack_out(i) = '1') then
+      elsif (input_send = '1' and output_ack(i) = '1') then
         internalAck(i) <= '1';
       end if;
     end process;
