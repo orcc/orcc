@@ -424,7 +424,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_Slice_layer_without_partitioning"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Cbp.SliceLayerWithoutPartitioning"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -442,7 +442,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Frext.DecodeRefPicList_Frext"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Frext.DecodeRefPicList"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

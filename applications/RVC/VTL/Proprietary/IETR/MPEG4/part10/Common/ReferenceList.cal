@@ -58,7 +58,7 @@ Copyright (c) ISO/IEC 2008.
 
 package Proprietary.IETR.MPEG4.part10.Common;
 
-actor Algo_RefList (bool DEBUG)
+actor ReferenceList (bool DEBUG)
 	uint(size=31) RefReordering,
 	uint(size=31) FraNum,
 	uint(size=31) MaxFrameNum,

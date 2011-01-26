@@ -60,7 +60,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import MPEG.Common.Imp_PictureInfo.*;
 
-actor Algo_IntraPred_Split()
+actor IntraPredSplit()
 	uint(size=1)  MbIntraFlag,
 	uint(size=4)  IntraPredMode,
 	uint(size=7)  MbLocation,

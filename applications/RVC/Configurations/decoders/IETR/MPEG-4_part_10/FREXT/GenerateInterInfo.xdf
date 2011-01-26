@@ -279,7 +279,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_MMCO"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.MemoryManagementControlOperation"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -288,7 +288,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_RefList"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.ReferenceList"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -309,7 +309,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_RefList"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.ReferenceList"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -321,7 +321,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_RefIdxtoPOC"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.RefIdxtoPoc"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -330,7 +330,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_RefIdxtoPOC"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.RefIdxtoPoc"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -344,11 +344,11 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Mgnt_InterPred">
+    <Instance id="MvComponent2PicLocation">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_InterPred"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.MvComponent2PicLocation"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -388,13 +388,16 @@
     <Connection dst="MVReconstruct" dst-port="EmptyDPB" src="MMCO" src-port="EmptyDPB"/>
     <Connection dst="MVReconstruct" dst-port="LTList" src="MMCO" src-port="LongTermList"/>
     <Connection dst="MVReconstruct" dst-port="RefList1" src="RefList1" src-port="RefList"/>
-    <Connection dst="Mgnt_InterPred" dst-port="MV" src="MVReconstruct" src-port="MV"/>
-    <Connection dst="Mgnt_InterPred" dst-port="PartSZ"
+    <Connection dst="MvComponent2PicLocation" dst-port="MV"
+        src="MVReconstruct" src-port="MV"/>
+    <Connection dst="MvComponent2PicLocation" dst-port="PartSZ"
         src="MVReconstruct" src-port="PartSZ"/>
-    <Connection dst="Mgnt_InterPred" dst-port="Location"
+    <Connection dst="MvComponent2PicLocation" dst-port="Location"
         src="MVReconstruct" src-port="LOCATION"/>
-    <Connection dst="" dst-port="ReadAddress_l" src="Mgnt_InterPred" src-port="ReadAddr_l"/>
-    <Connection dst="" dst-port="ReadAddress_c" src="Mgnt_InterPred" src-port="ReadAddr_c"/>
+    <Connection dst="" dst-port="ReadAddress_l"
+        src="MvComponent2PicLocation" src-port="ReadAddr_l"/>
+    <Connection dst="" dst-port="ReadAddress_c"
+        src="MvComponent2PicLocation" src-port="ReadAddr_c"/>
     <Connection dst="" dst-port="SelectList" src="MVReconstruct" src-port="SelectList"/>
     <Connection dst="" dst-port="PocToRead" src="SelectRefIdx" src-port="PocToRead"/>
     <Connection dst="SelectRefIdx" dst-port="NewPic_l0"

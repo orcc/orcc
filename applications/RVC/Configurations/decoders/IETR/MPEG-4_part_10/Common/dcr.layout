@@ -6,7 +6,7 @@
       <vertex id="ScalingList" x="431" y="313"/>
       <vertex id="MbType" x="444" y="253"/>
       <vertex id="CoefDCR_L" x="664" y="445"/>
-      <vertex id="Algo_IS_Zigzag_4x4_DC" x="163" y="25"/>
+      <vertex id="Zigzag_4x4_DC" x="163" y="25"/>
       <vertex id="Algo_DCR_Hadamard_LUMA_IHT1d_0" x="378" y="79"/>
       <vertex id="Algo_DC_Transpose4x4_0" x="48" y="195"/>
       <vertex id="Algo_DCR_Hadamard_LUMA_IHT1d_1" x="282" y="199"/>

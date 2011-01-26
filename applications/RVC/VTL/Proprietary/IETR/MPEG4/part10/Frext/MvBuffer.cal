@@ -56,7 +56,7 @@ package Proprietary.IETR.MPEG4.part10.Frext;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 import MPEG.Common.Imp_PictureInfo.*;
 
-actor Algo_MvBuffer()
+actor MvBuffer()
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 

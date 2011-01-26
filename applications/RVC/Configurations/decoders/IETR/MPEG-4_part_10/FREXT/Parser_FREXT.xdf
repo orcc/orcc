@@ -460,7 +460,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Frext.SplitSpsInfo"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.SplitSpsInfo"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

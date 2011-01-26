@@ -52,7 +52,7 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2008.
 
 *****************************************************************************/
-package Proprietary.IETR.MPEG4.part10.Frext;
+package Proprietary.IETR.MPEG4.part10.Common;
 
 actor CheckNaluType()
 	uint(size=8) RbspByte,
@@ -73,7 +73,7 @@ actor CheckNaluType()
 	uint(size=8) PicRbsp,
 	bool         PicNewNal,
 	bool         PicIsAnIdr,
-	uint(size=2) PicNalRefIdc	
+	uint(size=2) PicNalRefIdc
 	
 		:
 

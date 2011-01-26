@@ -59,7 +59,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import MPEG.Common.Imp_Math.*;
 
-actor Algo_MMCO () 
+actor MemoryManagementControlOperation () 
 	uint(size=31) Mmco,
 	uint(size=31) FraNum,
 	uint(size=31) MaxFrameNum,

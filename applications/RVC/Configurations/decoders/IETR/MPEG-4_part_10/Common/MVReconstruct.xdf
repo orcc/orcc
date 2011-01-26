@@ -226,7 +226,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Frext.MvLXReconstr"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -238,7 +238,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_MvComponentReorder"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Cbp.MvComponentReorder"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -247,7 +247,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Frext.SelectMvpLX"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Frext.SelectMvLX"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -256,7 +256,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_MvLXReconstr_Frext"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Frext.MvLXReconstr"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -268,7 +268,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Frext.Algo_MvBuffer"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Frext.MvBuffer"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

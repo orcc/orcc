@@ -55,7 +55,7 @@ package Proprietary.IETR.MPEG4.part10.Frext;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
 
-actor SelectMvpLX()
+actor SelectMvLX()
 	uint(size=6)  MbType,
 	uint(size=4)  SubMbType,
 	int (size=16) MvL0,

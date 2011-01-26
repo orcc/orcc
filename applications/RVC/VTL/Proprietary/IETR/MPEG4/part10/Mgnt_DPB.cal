@@ -153,7 +153,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 	get_readAddr: action
 			ReadAddress :[Ra_off_x , Ra_off_y , RAWidth , RAHeight],
-			POCtoRead   :[poc2read , frame_num_to_read],
+			POCtoRead   :[poc2read , frame_num_to_read],//poc2read is not very usefull :( (if framenum is correctly managed in this actor...)
 			EnableRead  :[read_enabled]
 				==>
 		guard
