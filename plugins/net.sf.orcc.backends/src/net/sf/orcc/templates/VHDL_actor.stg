@@ -36,7 +36,6 @@ endif>
 ///////////////////////////////////////////////////////////////////////////////
 // Print signal and constant
 ///////////////////////////////////////////////////////////////////////////////
-
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if <value> is empty
 listSize(values) ::= <<
@@ -45,9 +44,9 @@ listSize(values) ::= <<
 
 // These signals are used by the IOs management processes
 IOsManagementSignals(port)::= <<
-signal <port.name>_rdy   : std_logic;
-signal <port.name>_isend : std_logic;
-signal <portType(port=port, IOtype="", dataType="idata")>
+signal <port.name>_rdy    : std_logic;
+signal <port.name>_isend  : std_logic;
+signal <portType(port=port, IOtype=" ", dataType="idata")>
 >>
 
 signalDeclaration(variable) ::= <<
@@ -346,10 +345,10 @@ function(procedure, transformReturn) ::= <<
   ><if (procedure.returnType.void)
 >procedure <procedure>(<parameters(procedure.parameters.list)>dummy : std_logic) is<
   else
->function <procedure>(<VarUsed(procedure)><parameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType) > is<
+>function <procedure>(<VarUsed(procedure)><parameters(procedure)>dummy : std_logic) <returnFunction(procedure.returnType)> is<
   endif>
   <if(procedure.locals.list)
-><procedure.locals.list: <VarInFctDeclaration(); separator=";\n">;<
+><procedure.locals.list: {variable| <VarInFctDeclaration(variable)>;<\n>}><
   endif>
 begin
   <printNodes(procedure.nodes)>
@@ -377,11 +376,11 @@ endif
 
 VarInFctDeclaration(variable) ::= <<
 <if(variable.port)
->  variable <variable> : <typeFunction(variable.type)><
+>variable <variable> : <typeFunction(variable.type)><
 elseif(!variable.type.list)
->  variable <variable> : <typeFunction(variable.type)><
+>variable <variable> : <typeFunction(variable.type)><
 else
->  -- error !!!!! type memory_type<
+>-- error !!!!! type memory_type<
 endif>
 >>
 
@@ -415,8 +414,8 @@ procedure(procedure, transformReturn) ::= <<
 
 printLocals(procedure) ::= <<
 <if(procedure.locals.list)
-><procedure.locals.list: <variableDeclaration(); separator=";\n">;
-<endif>
+><procedure.locals.list: {variable| <VarInFctDeclaration(variable)>;<\n>}><
+endif>
 >>
 
 printActionLocalSchedul(action) ::= <<
