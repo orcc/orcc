@@ -45,10 +45,11 @@ actor Algo_NALU ()
 		do
 			fifo_msb   := fifo_lsb;
 			fifo_lsb   := b;
-		end /* fill_fifo */
+		end
 
 
-
+	//Detecting Byte stuffing.
+	//The two first bytes belong to rbsp.
 	Pattern.Is003Bytes: action
 			bits8:[b]
 				==>
@@ -56,9 +57,10 @@ actor Algo_NALU ()
 			NewNal   :[false,false]
 		guard
 			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
-		end 
+		end
 
 
+	//Detecting start code
 	Pattern.Is001Bytes: action
 			bits8:[b]
 				==>
@@ -77,6 +79,7 @@ actor Algo_NALU ()
 		var
 			uint(size=8) ValRbsp
 		do
+			//We shift the value in the fifo
 			ValRbsp  := fifo_msb;
 			fifo_msb := fifo_lsb;
 			fifo_lsb := b;
@@ -89,7 +92,7 @@ actor Algo_NALU ()
 			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 0)
 		end
 
-
+	//Start code detected.
 	PatternFor000.Is0001Bytes: action
 			bits8:[b]
 				==>
@@ -146,6 +149,6 @@ actor Algo_NALU ()
 	priority
 		NoPattern                 > Pattern.Is001Bytes        > Pattern.Is003Bytes;
 		PatternFor000.Is0001Bytes > PatternFor000.Is0000Bytes > NoPatternFor000;
-	end /* priority */
+	end
 
-end /* actor */
+end

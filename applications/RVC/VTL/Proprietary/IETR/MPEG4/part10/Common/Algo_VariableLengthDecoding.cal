@@ -17,6 +17,7 @@ package Proprietary.IETR.MPEG4.part10.Common;
 
 import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
 import Proprietary.IETR.MPEG4.part10.Common.Imp_CavlcLookUpTables.*;
+import MPEG.Common.Imp_ByteOperation.*;
 
 actor Algo_VariableLengthDecoding()
 	uint(size=8)  RbspByte,
@@ -35,7 +36,6 @@ actor Algo_VariableLengthDecoding()
 *
 */
 
-	bool DEBUG_VAL_DECODED  = false;
 	bool DEBUG_FLAG_DECODED = false;
 
 /*
@@ -43,16 +43,19 @@ actor Algo_VariableLengthDecoding()
 * State variables
 *
 */
-
+	//Contains the Byte which is currently read.
 	uint(size=16) WorkingByte      := 0;
+	//Contains the number of bit which are not read yet in WorkingByte
 	uint(size=4)  CountBufferRbsp  := 0;
-	uint(size=3)  SizeBufferRbsp   := 0;
 
+	//Contains up to 4 next byte in the flow. It helps for more_rbsp_data()
+	uint(size=3)  SizeBufferRbsp   := 0;
 	List(type: uint(size=8), size=4) BufferRbsp := [0: for int s in 0 .. 3];
 
 	/* ue(v) and Cavlc coeff_token()*/
 	bool          Bit1Found       := false;
 	uint(size=5)  leadingZeroBits := 0;
+
 	/* ue(v) only */
 	int (size=31) CodeNum         := 0;
 
@@ -83,21 +86,10 @@ actor Algo_VariableLengthDecoding()
 
 /*
 *
-* Function
-*
-*/
-
-	function mask_bits( int(size=32)v, int(size=32)n ) --> int :
-		bitand( v, lshift(1,n)-1 )
-	end
-
-
-/*
-*
 * Actions
 *
 */
-
+	//Syntaxe decoding have finished the decoding of this Nal
 	IsEndOfNal: action
 			TypeOfVLD :[Func]
 				==>
@@ -108,17 +100,14 @@ actor Algo_VariableLengthDecoding()
 			SizeBufferRbsp  := 0;
 		end
 
-
+	//We skip all bytes in the current nal
 	WaitForNewNal: action
 			NewNal       :[IsNewNal],
 			RbspByte     :[ValRbsp]
 				==>
 		guard
 			IsNewNal = false
-		do
-			println("\t\t\t\tSkip:"+ValRbsp);
 		end
-
 
 	NewNalDetected: action
 			NewNal :[IsNewNal]
@@ -127,11 +116,7 @@ actor Algo_VariableLengthDecoding()
 			IsNewNal = true
 		do
 			SizeBufferRbsp := 0;
-			if(DEBUG_VAL_DECODED)then
-				println("NewNalDetected");	
-			end
 		end
-
 
 	NewNalHasBeenSent: action ==>
 		guard
@@ -142,7 +127,6 @@ actor Algo_VariableLengthDecoding()
 		do
 			NewNalAlreadyDetected := false;
 		end
-
 
 	IsMoreRbspData: action
 			TypeOfVLD :[ValTypeOfVLD]
@@ -159,7 +143,6 @@ actor Algo_VariableLengthDecoding()
 			SizeBufferRbsp >= 2
 		end
 
-
 	CheckSizeBufferRbsp.IsEqualTo1: action
 				==>
 			ValDecoded :[IsMoreDataInRbsp]
@@ -168,13 +151,12 @@ actor Algo_VariableLengthDecoding()
 		var
 			uint(size=1) IsMoreDataInRbsp
 		do
-			if( ((WorkingByte = 0 and bitand(BufferRbsp[0],255) = 3) or (bitand(BufferRbsp[0],255) = 0x80)) and (CountBufferRbsp = 0) )then
+			if( ((WorkingByte = 0 and (BufferRbsp[0] & 0xFF) = 0x03) or ((BufferRbsp[0] & 0xFF) = 0x80)) and (CountBufferRbsp = 0) )then
 				IsMoreDataInRbsp := 0;
 			else
 				IsMoreDataInRbsp := 1;
 			end
 		end
-
 
 	CheckSizeBufferRbsp.IsEqualTo0: action
 				==>
@@ -184,7 +166,7 @@ actor Algo_VariableLengthDecoding()
 		var
 			uint(size=1) IsMoreDataInRbsp
 		do
-			if( bitand(WorkingByte,0xFF) = 0x80 )then
+			if( (WorkingByte & 0xFF) = 0x80 )then
 				IsMoreDataInRbsp := 0;
 			else
 				IsMoreDataInRbsp := 1;
@@ -229,9 +211,6 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
-			if(DEBUG_VAL_DECODED)then
-				println("IsVldUe");
-			end
 		end
 
 
@@ -244,9 +223,6 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
-			if(DEBUG_VAL_DECODED)then
-				println("IsVldSe");
-			end
 		end
 
 
@@ -260,9 +236,6 @@ actor Algo_VariableLengthDecoding()
 			BitsCount := ValNbBits;
 			ReadValue := 0;
 			TeVal     := 0;
-			if(DEBUG_VAL_DECODED)then
-				println("IsReadBits");
-			end
 		end
 
 
@@ -277,9 +250,6 @@ actor Algo_VariableLengthDecoding()
 			BitsCount := 1;
 			ReadValue := 0;
 			TeVal     := 1;
-			if(DEBUG_VAL_DECODED)then
-				println("IsVldTeu");
-			end
 		end
 
 
@@ -294,9 +264,6 @@ actor Algo_VariableLengthDecoding()
 			Bit1Found       := false;
 			leadingZeroBits := 0;
 			CodeNum         := 0;
-			if(DEBUG_VAL_DECODED)then
-				println("IsVldTeue");
-			end
 		end
 
 
@@ -320,7 +287,7 @@ actor Algo_VariableLengthDecoding()
 					if(nC >=4)then
 						Idx_nC := 2;
 					else
-						Idx_nC := rshift(nC,1);
+						Idx_nC := nC/2;
 					end
 				end
 			end
@@ -348,7 +315,7 @@ actor Algo_VariableLengthDecoding()
 				end;
 			NbBitsRead      := 0;
 			ValRead         := 0;
-			TotalCoeffParam := bitand(TotalCoeff,0x0F);
+			TotalCoeffParam := TotalCoeff & 0x0F;
 		end
 
 
@@ -360,7 +327,7 @@ actor Algo_VariableLengthDecoding()
 			ValTypeOfVLD = CAVLC_RUN_BEFORE
 		do
 			IdxzerosLeft :=
-				if(zerosLeft <= 6 and zerosLeft > 0) then
+				if(zerosLeft > 0 and zerosLeft <= 6) then
 					zerosLeft - 1
 				else
 					6
@@ -390,14 +357,10 @@ actor Algo_VariableLengthDecoding()
 			if(CountBufferRbsp != 8)then
 				CountBufferRbsp := 0;
 			end
-			if(DEBUG_VAL_DECODED)then
-				println("IsByteAligned");
-			end
 		end
 
 
-	Buffer.IsEmpty: action
-				==>
+	Buffer.IsEmpty: action ==>
 		guard
 			CountBufferRbsp = 0,
 			SizeBufferRbsp  > 0
@@ -419,7 +382,7 @@ actor Algo_VariableLengthDecoding()
 			uint(size=5) NbBitsToAdd
 		do
 			if(not Bit1Found)then
-				while( (bitand(WorkingByte,0x80) = 0) and (CountBufferRbsp > 0))
+				while( ((WorkingByte & 0x80) = 0) and (CountBufferRbsp > 0))
 				do
 					CountBufferRbsp := CountBufferRbsp - 1;
 					WorkingByte     := lshift(WorkingByte,1);
@@ -437,10 +400,10 @@ actor Algo_VariableLengthDecoding()
 					else
 						leadingZeroBits
 					end;
-				CodeNum         := lshift(CodeNum,NbBitsToAdd);
-				CodeNum         := CodeNum + mask_bits( rshift(WorkingByte,8-NbBitsToAdd) , NbBitsToAdd);
+				CodeNum         := CodeNum << NbBitsToAdd;
+				CodeNum         := CodeNum + MaskBits(WorkingByte >> (8-NbBitsToAdd) , NbBitsToAdd);
 				leadingZeroBits := leadingZeroBits - NbBitsToAdd;
-				WorkingByte     := lshift(WorkingByte,NbBitsToAdd);
+				WorkingByte     := WorkingByte << NbBitsToAdd;
 				CountBufferRbsp := CountBufferRbsp - NbBitsToAdd;
 			end
 		end
@@ -463,9 +426,6 @@ actor Algo_VariableLengthDecoding()
 			ValDecoded :[CodeNum]
 		do
 			CodeNum := CodeNum - 1;
-			if(DEBUG_VAL_DECODED)then
-				println("\tUeValue:"+CodeNum);
-			end
 		end
 
 
@@ -478,9 +438,6 @@ actor Algo_VariableLengthDecoding()
 				CodeNum := CodeNum / 2;
 			else
 				CodeNum := -CodeNum / 2;
-			end
-			if(DEBUG_VAL_DECODED)then
-				println("\tSeValue:"+CodeNum);
 			end
 		end
 
@@ -495,10 +452,10 @@ actor Algo_VariableLengthDecoding()
 				else
 					BitsCount
 				end;
-			ReadValue       := lshift(ReadValue,NbBitsToAdd);
-			ReadValue       := ReadValue + mask_bits( rshift(WorkingByte,8-NbBitsToAdd) , NbBitsToAdd);
+			ReadValue       := ReadValue << NbBitsToAdd;
+			ReadValue       := ReadValue + MaskBits( WorkingByte >> (8-NbBitsToAdd) , NbBitsToAdd);
 			BitsCount       := BitsCount - NbBitsToAdd;
-			WorkingByte     := lshift(WorkingByte,NbBitsToAdd);
+			WorkingByte     := WorkingByte << NbBitsToAdd;
 			CountBufferRbsp := CountBufferRbsp - NbBitsToAdd;
 		end
 
@@ -521,43 +478,40 @@ actor Algo_VariableLengthDecoding()
 		var
 			uint(size=31) ValueDec
 		do
-			ValueDec := bitxor(ReadValue,TeVal);
-			if(DEBUG_VAL_DECODED)then
-				println("\t\tRead Value u(n):"+ValueDec+" IsTe:"+TeVal);
-			end
+			ValueDec := ReadValue ^ TeVal;
 		end
 
 
 	GetCavlcCoeffToken.Launch: action ==>
 		var
-			//delete me!
+			//delete me! (Bug in the front-end)
 			bool titi
 		do
-			coeff_token     := lshift(coeff_token, 1);
-			coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
-			WorkingByte     := lshift(WorkingByte,1);
+			coeff_token     := coeff_token << 1;
+			coeff_token     := coeff_token + MaskBits(WorkingByte >> 7 , 1);
+			WorkingByte     := WorkingByte << 1;
 			CountBufferRbsp := CountBufferRbsp - 1;
 			NbBitsRead      := NbBitsRead + 1;
-			titi := TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)];
+			titi := TotalCoeffValid[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F];
 			while((not titi) and (CountBufferRbsp > 0))
 			do
-				coeff_token     := lshift(coeff_token, 1);
-				coeff_token     := coeff_token + mask_bits(rshift(WorkingByte,7),1);
-				WorkingByte     := lshift(WorkingByte,1);
+				coeff_token     := coeff_token << 1;
+				coeff_token     := coeff_token + MaskBits(WorkingByte >> 7 , 1);
+				WorkingByte     := WorkingByte << 1;
 				CountBufferRbsp := CountBufferRbsp - 1;
 				NbBitsRead      := NbBitsRead + 1;
-				titi := TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)];
+				titi := TotalCoeffValid[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F];
 			end
 		end
 
 	GetCavlcCoeffToken.NotFinished: action ==>
 		guard
-			TotalCoeffValid[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)] = false
+			TotalCoeffValid[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F] = false
 		end
 
 	GetCavlcCoeffToken.Finished: action
-			==>
-			ValDecoded :[TotalCoeffValue[Idx_nC][bitand(NbBitsRead - 1,0x0F)][bitand(coeff_token,63)]]
+				==>
+			ValDecoded :[TotalCoeffValue[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F]]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("Cavlc CoeffToken; Idx_nc :" + Idx_nC + " ; NbBitsRead : "+NbBitsRead+ " ; coeff_token : "+coeff_token);
@@ -567,17 +521,17 @@ actor Algo_VariableLengthDecoding()
 
 	GetCavlcLevelPrefix.Launch: action ==>
 		do
-			while( (bitand(WorkingByte,0x80) = 0) and (CountBufferRbsp > 0))
+			while( ((WorkingByte & 0x80) = 0) and (CountBufferRbsp > 0))
 			do
 				CountBufferRbsp := CountBufferRbsp - 1;
-				WorkingByte     := lshift(WorkingByte,1);
+				WorkingByte     := WorkingByte << 1;
 				leadingZeroBits := leadingZeroBits + 1;
 			end
 			if(CountBufferRbsp > 0)then
 				Bit1Found       := true;
 				/* We read the one bit value */
 				CountBufferRbsp := CountBufferRbsp - 1;
-				WorkingByte     := lshift(WorkingByte,1);
+				WorkingByte     := WorkingByte << 1;
 			end
 		end
 
@@ -601,31 +555,31 @@ actor Algo_VariableLengthDecoding()
 			//delete me!
 			bool titi
 		do
-			ValRead         := lshift(ValRead, 1);
-			ValRead         := ValRead + mask_bits(rshift(WorkingByte,7),1);
-			WorkingByte     := lshift(WorkingByte,1);
+			ValRead         := ValRead << 1;
+			ValRead         := ValRead + MaskBits(WorkingByte >> 7 , 1);
+			WorkingByte     := WorkingByte << 1;
 			CountBufferRbsp := CountBufferRbsp - 1;
 			NbBitsRead      := NbBitsRead + 1;
-			titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)];
+			titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07];
 			while((not titi) and (CountBufferRbsp > 0))
 			do
-				ValRead         := lshift(ValRead, 1);
-				ValRead         := ValRead + mask_bits(rshift(WorkingByte,7),1);
-				WorkingByte     := lshift(WorkingByte,1);
+				ValRead         := ValRead << 1;
+				ValRead         := ValRead + MaskBits(WorkingByte >> 7 , 1);
+				WorkingByte     := WorkingByte << 1;
 				CountBufferRbsp := CountBufferRbsp - 1;
 				NbBitsRead      := NbBitsRead + 1;
-				titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)];
+				titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07];
 			end
 		end
 
 	GetCavlcTotalZeros.NotFinished: action ==>
 		guard
-			not TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]
+			not TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07]
 		end
 
 	GetCavlcTotalZeros.Finished: action
 				==>
-			ValDecoded :[TotalZerosValue[IdxmaxNumCoeff][TotalCoeffParam][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]]
+			ValDecoded :[TotalZerosValue[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07]]
 		do
 			if(DEBUG_FLAG_DECODED)then
 				println("Cavlc TotalZeros; Idx :" + IdxmaxNumCoeff +" ; TotalCoeff :"+TotalCoeffParam+ " ; NbBitsRead : "+NbBitsRead+ " ; Codeword : "+ValRead);
@@ -638,33 +592,31 @@ actor Algo_VariableLengthDecoding()
 			//delete me!
 			bool titi
 		do
-			ValRead         := lshift(ValRead, 1);
-			ValRead         := ValRead + mask_bits(rshift(WorkingByte,7),1);
-			WorkingByte     := lshift(WorkingByte,1);
+			ValRead         := ValRead << 1;
+			ValRead         := ValRead + MaskBits(WorkingByte >> 7 , 1);
+			WorkingByte     := WorkingByte << 1;
 			CountBufferRbsp := CountBufferRbsp - 1;
 			NbBitsRead      := NbBitsRead + 1;
-			titi := RunBeforeValid[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)];
+			titi := RunBeforeValid[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07];
 			while((not titi) and (CountBufferRbsp > 0))
 			do
-				ValRead         := lshift(ValRead, 1);
-				ValRead         := ValRead + mask_bits(rshift(WorkingByte,7),1);
-				WorkingByte     := lshift(WorkingByte,1);
+				ValRead         := ValRead << 1;
+				ValRead         := ValRead + MaskBits(WorkingByte >> 7 , 1);
+				WorkingByte     := WorkingByte << 1;
 				CountBufferRbsp := CountBufferRbsp - 1;
 				NbBitsRead      := NbBitsRead + 1;
-				titi := RunBeforeValid[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)];
+				titi := RunBeforeValid[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07];
 			end
 		end
 
 	GetCavlcRunBefore.NotFinished: action ==>
 		guard
-			not RunBeforeValid[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]
+			not RunBeforeValid[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07]
 		end
 
 	GetCavlcRunBefore.Finished: action
 				==>
-			ValDecoded :[RunBeforeValue[IdxzerosLeft][bitand(NbBitsRead,0x0F)][bitand(ValRead,7)]]
-		do
-		//	println("run:"+IdxzerosLeft+";"+NbBitsRead+";"+ValRead);
+			ValDecoded :[RunBeforeValue[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07]]
 		end
 
 /*
@@ -707,6 +659,7 @@ actor Algo_VariableLengthDecoding()
 		WaitForNewNal2  (NewNalDetected                      )--> CheckVLDType;
 
 		/* ue(v) decoding process */
+			/*Fill in the WorkingByte if it's empty*/
 		VLDecoding_Ue   (Buffer                              )--> GetCodeNum4ue;
 		VLDecoding_Ue   (FillBufferRbsp                      )--> VLDecoding_Ue;
 
@@ -719,6 +672,7 @@ actor Algo_VariableLengthDecoding()
 
 
 		/* se(v) decoding process */
+			/*Fill in the WorkingByte if it's empty*/
 		VLDecoding_Se   (Buffer                              )--> GetCodeNum4se;
 		VLDecoding_Se   (FillBufferRbsp                      )--> VLDecoding_Se;
 
@@ -731,6 +685,7 @@ actor Algo_VariableLengthDecoding()
 
 
 		/* u(n) decoding process */
+			/*Fill in the WorkingByte if it's empty*/
 		Decode_u        (Buffer                              )--> Get_u;
 		Decode_u        (FillBufferRbsp                      )--> Decode_u;
 
@@ -743,6 +698,7 @@ actor Algo_VariableLengthDecoding()
 
 
 		/* Cavlc coeff_token() decoding process */
+			/*Fill in the WorkingByte if it's empty*/
 		DecCavlcCofTkn  (Buffer                              )--> GetCavlcCofTkn;
 		DecCavlcCofTkn  (FillBufferRbsp                      )--> DecCavlcCofTkn;
 
@@ -752,6 +708,7 @@ actor Algo_VariableLengthDecoding()
 		ChckCavlcCofTkn (GetCavlcCoeffToken.Finished         )--> CheckVLDType;
 
 		/* Cavlc level_prefix decoding process */
+			/*Fill in the WorkingByte if it's empty*/
 		DecCavlcLevPre  (Buffer                              )--> GetCavlcLevPre;
 		DecCavlcLevPre  (FillBufferRbsp                      )--> DecCavlcLevPre;
 
@@ -761,6 +718,7 @@ actor Algo_VariableLengthDecoding()
 		ChckCavlcLevPre (GetCavlcLevelPrefix.Finished        )--> CheckVLDType;
 
 		/* Cavlc total_zeros decoding process */
+			/*Fill in the WorkingByte if it's empty*/
 		DecCavlcTotZer  (Buffer                              )--> GetCavlcTotZer;
 		DecCavlcTotZer  (FillBufferRbsp                      )--> DecCavlcTotZer;
 
@@ -770,6 +728,7 @@ actor Algo_VariableLengthDecoding()
 		ChckCavlcTotZer (GetCavlcTotalZeros.Finished        )--> CheckVLDType;
 
 		/* Cavlc run_before decoding process */
+			/*Fill in the WorkingByte if it's empty*/
 		DecCavlcRunBef  (Buffer                              )--> GetCavlcRunBef;
 		DecCavlcRunBef  (FillBufferRbsp                      )--> DecCavlcRunBef;
 

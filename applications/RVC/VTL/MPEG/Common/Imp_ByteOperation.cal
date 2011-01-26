@@ -72,4 +72,11 @@ unit Imp_ByteOperation :
 		:
 			(Val & (1 << Idx)) != 0
 		end
+
+	function MaskBits( int(size=32)v, int(size=32)n )
+				-->
+			int
+		:
+			v & ((1<<n)-1)
+		end
 end
