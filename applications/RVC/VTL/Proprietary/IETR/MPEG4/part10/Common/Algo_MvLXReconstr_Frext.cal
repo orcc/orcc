@@ -165,7 +165,7 @@ actor Algo_MvLXReconstr_Frext(bool IsPredL0)
 			int (size=5) Idx_B;
 			int (size=5) Idx_C;
 
-	procedure GetNeighbourBlockParameters (uint(size=4) IdxBlk, uint(size=2) SzBlkMv)
+	procedure GetNeighbourBlockParameters (int(size=6) IdxBlk, uint(size=5) SzBlkMv)
 	var
 			int (size=4) loc_x,
 			int (size=4) loc_y
