@@ -156,7 +156,7 @@ Read(read) ::= <<
 
 <if (read.target)>
 <if(read.unit)>
-m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>);$\n$
+m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>);<\n>
 m_arrAvailStatus[<actor.simpleName>_<read.port>] --;
 <else>
 m_poTabIn[<actor.simpleName>_<read.port>]-\>get(<read.target>, <read.numTokens>);<\n>

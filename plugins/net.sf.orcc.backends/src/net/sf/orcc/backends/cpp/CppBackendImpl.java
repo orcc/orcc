@@ -96,7 +96,6 @@ public class CppBackendImpl extends AbstractBackend {
 			}
 		}
 		printer.getOptions().put("threads", threads);
-		printer.getOptions().put("needThreads", (threads.keySet().size() > 1));
 	}
 
 	private void computeFifoKind(Network network) throws OrccException {
