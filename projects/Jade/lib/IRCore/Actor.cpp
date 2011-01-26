@@ -38,7 +38,7 @@
 //------------------------------
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Actor/Action.h"
-#include "Jade/Core/Variable.h"
+#include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Util/PackageMng.h"
 //------------------------------
@@ -47,7 +47,7 @@ using namespace std;
 using namespace llvm;
 
 Actor::Actor(string name, Module* module, string file, map<string, Port*>* inputs, 
-		     map<string, Port*>* outputs, map<string, Variable*>* stateVars,
+		     map<string, Port*>* outputs, map<string, StateVar*>* stateVars,
 			 std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures,
 			 list<Action*>* initializes, list<Action*>* actions, ActionScheduler* actionScheduler){
 	this->name = name;
@@ -160,8 +160,8 @@ Variable* Actor::getParameter(std::string name){
 	return (*it).second;
 }
 
-Variable* Actor::getStateVar(std::string name){
-	map<string, Variable*>::iterator it;
+StateVar* Actor::getStateVar(std::string name){
+	map<string, StateVar*>::iterator it;
 	it = stateVars->find(name);
 
 	if(it == stateVars->end()){

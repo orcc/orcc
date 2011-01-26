@@ -105,6 +105,15 @@ public:
 
 	~StateVar();
 
+	/**
+	 * @brief Returns the initial expression of this variable.
+	 * 
+	 * @return the initial expression of this variable
+	 */
+	Expr* getInitialValue() {
+		return initialValue;
+	}
+
 protected:
 	/** Initial value */
 	Expr* initialValue;

@@ -109,6 +109,24 @@ private:
 	void unwritePort(std::string key, Port* port);
 
 	/**
+	 * @brief Unwrite a list of state variable
+	 *
+	 * Erase a list of statevariable from a decoder.
+	 * 
+	 * @param vars : a list of state variable to erase
+	 */
+	void unwriteStateVariables(std::map<std::string, StateVar*>* vars);
+
+	/**
+	 * @brief Unwrite a variable
+	 *
+	 * Erase the given state variable from the decoder.
+	 * 
+	 * @param var : the state variable to erase
+	 */
+	void unwriteStateVariable(StateVar* var);
+
+	/**
 	 * @brief Unwrite a list of variable
 	 *
 	 * Erase a list of variable from a decoder.

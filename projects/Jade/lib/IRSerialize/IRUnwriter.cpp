@@ -69,7 +69,7 @@ int IRUnwriter::remove(Instance* instance){
 	unwriteActions(instance->getActions());
 	unwriteInitializes(instance->getInitializes());
 	unwriteProcedures(instance->getProcs());
-	unwriteVariables(instance->getStateVars());
+	unwriteStateVariables(instance->getStateVars());
 	unwriteVariables(instance->getParameters());
 	unwritePorts(IRConstant::KEY_INPUTS, instance->getInputs());
 	unwritePorts(IRConstant::KEY_OUTPUTS, instance->getOutputs());
@@ -103,6 +103,21 @@ void IRUnwriter::unwriteFSM(FSM* fsm){
 		Function* outFsmFn = fsm->getOutFsmFn();
 		outFsmFn->eraseFromParent();
 	}
+}
+
+void IRUnwriter::unwriteStateVariables(map<string, StateVar*>* vars){
+	map<string, StateVar*>::iterator it;
+
+	for (it = vars->begin(); it != vars->end(); ++it){
+
+		//Create and store new variable for the instance
+		unwriteStateVariable(it->second);
+	}
+}
+
+void IRUnwriter::unwriteStateVariable(StateVar* var){
+	GlobalVariable* GV = var->getGlobalVariable();
+	GV->eraseFromParent();
 }
 
 void IRUnwriter::unwriteVariables(map<string, Variable*>* vars){

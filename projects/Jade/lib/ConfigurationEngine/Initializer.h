@@ -28,7 +28,7 @@
  */
 
 /**
-@brief Description of the Instantiator class interface
+@brief Description of the Initializer class interface
 @author Jerome Gorin
 @file Instantiator.h
 @version 1.0
@@ -36,80 +36,50 @@
 */
 
 //------------------------------
-#ifndef INSTANTIATOR_H
-#define INSTANTIATOR_H
+#ifndef INITIALIZER_H
+#define INITIALIZER_H
 
-#include <map>
-
-#include "Jade/Core/Actor.h"
-
-class Connection;
-class Configuration;
-class HDAGGraph;
+class Decoder;
+class Instance;
+class LLVMExecution;
 //------------------------------
 
 /**
  * @class Instantiator
  *
- * @brief This class is used by network transformation to process the instanciation.
+ * @brief This class is used by the configuration engine to reinitialized 
+ *    already compiled instances.
  *
  * @author Jerome Gorin
  * 
  */
-class Instantiator {
+class Initializer {
 public:
 
 	/**
-	 * @brief instanciate a Configuration.
+	 * @brief Constructor.
 	 *
-	 * Instantiate actors and checks that connections actually point to ports defined in actors. Instantiating an
-	 * actor implies first loading it and then giving it the right parameters.
-	 * 
-	 * @param configuration : Configuration to instanciate
+	 *	Set a new initializer for a decoder
+	 *
+	 * @param decoder : Decoder where instance has to be reinitialized
 	 */
-	Instantiator(Configuration* configuration);
+	Initializer(Decoder* decoder);
 
-	~Instantiator(){};
+	/**
+	 * @brief Initialize an instance.
+	 *
+	 *	Initialize an already compiled instance
+	 *
+	 * @param instance : Instance to reinitialize
+	 */
+	void initialize(Instance* instance);
+
+	~Initializer(){};
 
 private:
 
-	/**
-	 * @brief Update instance and connections of the network.
-	 *
-	 * Updates the connections of this network. MUST be called before actors are
-	 * instantiated.
-	 * 
-	 */
-	void updateInstances();
-
-	/**
-	 * @brief Update instance of the network.
-	 *
-	 * Updates the instance of this network using its corresponding actor
-	 * 
-	 */
-	void updateInstance(Instance* instance);
-
-	/**
-	 * @brief Update a connection in the network.
-	 *
-	 * Updates instance using the given connection's source and target port by getting the
-	 * ports from the source and target instances, after checking the ports
-	 * exist and have compatible types.
-	 * 
-	 * @param connection : Connection to update
-	 */
-	void updateConnection(Connection* connection);
-
-	/* Graph to transform */
-	HDAGGraph* graph;
-	
-	/** Configuration to instanciate */
-	Configuration* configuration;
-
-	/** List of actor from the network */
-	std::map<std::string, Actor*>* actors;
-
+	/** LLVMExecution that compiled the given decoder */
+	LLVMExecution* executionEngine;
 };
 
 #endif

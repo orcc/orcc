@@ -97,8 +97,8 @@ Port* Instance::getOutput(string portName){
 	return (*it).second;
 }
 
-Variable* Instance::getStateVar(std::string name){
-	map<string, Variable*>::iterator it;
+StateVar* Instance::getStateVar(std::string name){
+	map<string, StateVar*>::iterator it;
 	it = stateVars->find(name);
 
 	if(it == stateVars->end()){

@@ -124,7 +124,7 @@ Actor* IRParser::parseActor(string classz){
 	inputs = parsePorts(IRConstant::KEY_INPUTS, module);
 	outputs = parsePorts(IRConstant::KEY_OUTPUTS, module);
 	map<string, Variable*>* parameters =  parseParameters(module);
-	map<string, Variable*>* stateVars = parseStateVars(module);
+	map<string, StateVar*>* stateVars = parseStateVars(module);
 	map<string, Procedure*>* procs = parseProcs(module);
 	list<Action*>* initializes = parseActions(IRConstant::KEY_INITIALIZES, module);
 	list<Action*>* actions = parseActions(IRConstant::KEY_ACTIONS, module);
@@ -246,8 +246,8 @@ map<string, Variable*>* IRParser::parseParameters(Module* module){
 }
 
 
-map<string, Variable*>*  IRParser::parseStateVars(Module* module){
-	map<string, Variable*>* stateVars = new map<string, Variable*>();
+map<string, StateVar*>*  IRParser::parseStateVars(Module* module){
+	map<string, StateVar*>* stateVars = new map<string, StateVar*>();
 
 	NamedMDNode* stateVarsMD =  module->getNamedMetadata(IRConstant::KEY_STATE_VARS);
 	
@@ -256,15 +256,15 @@ map<string, Variable*>*  IRParser::parseStateVars(Module* module){
 	}
 	
 	for (unsigned i = 0, e = stateVarsMD->getNumOperands(); i != e; ++i) {
-		 Variable* var = parseStateVar(stateVarsMD->getOperand(i));
-		 stateVars->insert(pair<string,Variable*>(var->getName(), var));
+		 StateVar* var = parseStateVar(stateVarsMD->getOperand(i));
+		 stateVars->insert(pair<string, StateVar*>(var->getName(), var));
 	}
 
 	return stateVars;
 }
 
 
-Variable* IRParser::parseStateVar(MDNode* node){
+StateVar* IRParser::parseStateVar(MDNode* node){
 	// Parsing VarDef
 	MDNode* varDefMD = cast<MDNode>(node->getOperand(0));
 	

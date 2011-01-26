@@ -103,7 +103,7 @@ private:
 	 *
 	 * @return the corresponding Variable.
 	 */
-	Variable* parseStateVar(llvm::MDNode* node);
+	StateVar* parseStateVar(llvm::MDNode* node);
 
 	/**
      * @brief parse state variables
@@ -114,7 +114,7 @@ private:
 	 *
 	 * @return A map of Variable.
 	 */
-	std::map<std::string, Variable*>* parseStateVars(llvm::Module* module);
+	std::map<std::string, StateVar*>* parseStateVars(llvm::Module* module);
 
 	/**
      * @brief parse an action scheduler

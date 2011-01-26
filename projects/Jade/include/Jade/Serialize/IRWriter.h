@@ -132,6 +132,28 @@ private:
 	std::map<std::string, Variable*>* writeVariables(std::map<std::string, Variable*>* vars);
 
 	/**
+	 * @brief Write a list of state variable
+	 *
+	 * Write a list of state variable for an Instance.
+	 * 
+	 * @param vars : the state variables to write
+	 *
+	 * @return a map of the corresponding state variables in the decoder
+	 */
+	std::map<std::string, StateVar*>* writeStateVariables(std::map<std::string, StateVar*>* vars);
+
+	/**
+	 * @brief Write a state variable
+	 *
+	 * Write the given state variable for an Instance.
+	 * 
+	 * @param var : the state variable to write
+	 *
+	 * @return the corresponding state variable in the decoder
+	 */
+	StateVar* writeStateVariable(StateVar* var);
+
+	/**
 	 * @brief Write a variable
 	 *
 	 * Write the given variable for an Instance.
@@ -284,7 +306,7 @@ private:
 	std::map<std::string, Port*>* outputs;
 
 	/** Variables of the instance */
-	std::map<std::string, Variable*>* stateVars;
+	std::map<std::string, StateVar*>* stateVars;
 	std::map<std::string, Variable*>* parameters;
 
 	/**Procedures of the instance */

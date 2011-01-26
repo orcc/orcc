@@ -99,7 +99,7 @@ void IRWriter::writeInstance(Instance* instance){
 	//Write instance elements
 	writePorts(IRConstant::KEY_INPUTS, actor->getInputs());
 	writePorts(IRConstant::KEY_OUTPUTS, actor->getOutputs());
-	stateVars = writeVariables(actor->getStateVars());
+	stateVars = writeStateVariables(actor->getStateVars());
 	parameters = writeVariables(actor->getParameters());
 	procs = writeProcedures(actor->getProcs());
 	initializes = writeInitializes(actor->getInitializes());
@@ -170,6 +170,28 @@ map<string, Variable*>* IRWriter::writeVariables(map<string, Variable*>* vars){
 	}
 
 	return newVars;
+}
+
+map<string, StateVar*>* IRWriter::writeStateVariables(map<string, StateVar*>* vars){
+	map<string, StateVar*>::iterator it;
+	map<string, StateVar*>* newVars = new map<string, StateVar*>();
+
+	for (it = vars->begin(); it != vars->end(); ++it){
+		string name = it->first;
+		StateVar* var = it->second;
+
+		//Create and store new variable for the instance
+		StateVar* newVar = writeStateVariable(var);
+		newVars->insert(pair<string, StateVar*>(name, newVar));
+	}
+
+	return newVars;
+}
+
+StateVar* IRWriter::writeStateVariable(StateVar* var){
+	GlobalVariable* newVar = writer->createVariable(var->getGlobalVariable());
+
+	return new StateVar(var->getType(), var->getName(), var->isAssignable(), newVar, var->getInitialValue());
 }
 
 Variable* IRWriter::writeVariable(Variable* var){

@@ -226,7 +226,7 @@ public:
 	 * 
 	 * @return a map of state variables
 	 */
-	std::map<std::string, Variable*>* getStateVars() {return stateVars;}
+	std::map<std::string, StateVar*>* getStateVars() {return stateVars;}
 
 
 	/**
@@ -236,7 +236,7 @@ public:
 	 * 
 	 * @param stateVars : a map of state variables
 	 */
-	void setStateVars(std::map<std::string, Variable*>* stateVars) {this->stateVars = stateVars;}
+	void setStateVars(std::map<std::string, StateVar*>* stateVars) {this->stateVars = stateVars;}
 
 	/**
 	 * @brief Getter of a state variable
@@ -247,7 +247,7 @@ public:
 	 * 
 	 * @return the corresponding state variable
 	 */
-	Variable* getStateVar(std::string name);
+	StateVar* getStateVar(std::string name);
 
 	/**
 	 * @brief Getter of procedures
@@ -415,7 +415,7 @@ private:
 	std::map<std::string, Variable*>* parameters;
 
 	/** State variables of this actor */
-	std::map<std::string, Variable*>* stateVars;
+	std::map<std::string, StateVar*>* stateVars;
 
 	/** Procedures of this actor */
 	std::map<std::string, Procedure*>* procedures;

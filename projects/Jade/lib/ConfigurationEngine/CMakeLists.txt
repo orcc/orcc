@@ -5,6 +5,8 @@ add_definitions(${LLVM_CPP_FLAGS} ${JADE_CPP_FLAGS})
 add_library (ConfigurationEngine
 	Connector.cpp
 	Connector.h
+	Initializer.cpp
+	Initializer.h
 	Instantiator.cpp
 	Instantiator.h
 	ConfigurationEngine.cpp

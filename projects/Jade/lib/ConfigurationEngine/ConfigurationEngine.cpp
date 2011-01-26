@@ -40,6 +40,7 @@
 
 #include "Reconfiguration.h"
 #include "Connector.h"
+#include "Initializer.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Actor/BroadcastAdder.h"
@@ -113,12 +114,17 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 		writer.write(*it);
 	}
 
-	//Link instances to keep from one configuration to another
-	IRLinker linker(decoder);
-
-	//Iterate though all instances to remove
+	//Link and initialize instances to keep from one configuration to another
+	list<pair<Instance*, Instance*> >::iterator itKeep;
 	list<pair<Instance*, Instance*> >* keeps = reconfiguration.getToKeep();
+	
+	IRLinker linker(decoder);
 	linker.link(keeps);
+	
+	Initializer initializer(decoder);
+	for (itKeep = keeps->begin(); itKeep != keeps->end(); itKeep++){
+		initializer.initialize((*itKeep).second);
+	}
 
 	// Setting connections of the decoder
 	Connector connector(Context, decoder);

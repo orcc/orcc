@@ -43,7 +43,7 @@
 #include<map>
 #include<list>
 
-#include "Jade/Core/Variable.h"
+#include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Action.h"
 #include "Jade/Core/Actor/Procedure.h"
@@ -100,7 +100,7 @@ public:
 	 *
      */
 	Actor(std::string name, llvm::Module* module, std::string file, std::map<std::string, Port*>* inputs, 
-		std::map<std::string, Port*>* outputs, std::map<std::string, Variable*>* stateVars, 
+		std::map<std::string, Port*>* outputs, std::map<std::string, StateVar*>* stateVars, 
 		std::map<std::string, Variable*>* parameters, std::map<std::string, Procedure*>* procedures, 
 		std::list<Action*>* initializes, std::list<Action*>* actions, ActionScheduler* actionScheduler);
 	virtual ~Actor();
@@ -271,7 +271,7 @@ public:
 	 * 
 	 * @return a map of state variables
 	 */
-	std::map<std::string, Variable*>* getStateVars() {
+	std::map<std::string, StateVar*>* getStateVars() {
 		return stateVars;
 	}
 
@@ -282,7 +282,7 @@ public:
 	 * 
 	 * @return the corresponding state variable
 	 */
-	Variable* getStateVar(std::string name);
+	StateVar* getStateVar(std::string name);
 
 
 	/**
@@ -397,7 +397,7 @@ protected:
 	std::map<std::string, Port*>* outputs;
 
 	/** State variables of this actor */
-	std::map<std::string, Variable*>* stateVars;
+	std::map<std::string, StateVar*>* stateVars;
 
 	/** Procedures of this actor */
 	std::map<std::string, Procedure*>* procedures;
