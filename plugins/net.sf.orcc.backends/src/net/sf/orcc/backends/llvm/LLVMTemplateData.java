@@ -37,6 +37,7 @@ import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.FSM;
 import net.sf.orcc.ir.FSM.NextStateInfo;
 import net.sf.orcc.ir.FSM.Transition;
+import net.sf.orcc.ir.GlobalVariable;
 import net.sf.orcc.ir.Pattern;
 import net.sf.orcc.ir.Port;
 import net.sf.orcc.ir.Procedure;
@@ -68,6 +69,11 @@ public class LLVMTemplateData {
 	 * Actor to compute
 	 */
 	private Actor actor;
+
+	/**
+	 * Medata container of expressions
+	 */
+	private Map<Object, Integer> exprs;
 
 	/**
 	 * Medata identifier counter
@@ -119,6 +125,7 @@ public class LLVMTemplateData {
 		types = new HashMap<Object, Integer>();
 		names = new HashMap<Object, Integer>();
 		mocs = new HashMap<Object, Integer>();
+		exprs = new HashMap<Object, Integer>();
 		this.actor = actor;
 		this.id = 0;
 
@@ -190,8 +197,8 @@ public class LLVMTemplateData {
 		}
 
 		// Insert statevars
-		for (Variable var : actor.getStateVars()) {
-			computeVar(var);
+		for (GlobalVariable var : actor.getStateVars()) {
+			computeStateVar(var);
 		}
 
 		// Insert parameters
@@ -234,7 +241,7 @@ public class LLVMTemplateData {
 			for (Action action : qsdfMoc.getActions()) {
 				computeCSDFMoC(qsdfMoc.getStaticClass(action));
 			}
-		} else if(moc.isDPN()||moc.isKPN()){
+		} else if (moc.isDPN() || moc.isKPN()) {
 			mocs.put(moc, id++);
 		}
 	}
@@ -252,6 +259,13 @@ public class LLVMTemplateData {
 
 	private void computeProc(Procedure proc) {
 		procs.put(proc, id++);
+	}
+
+	private void computeStateVar(GlobalVariable var) {
+		computeVar(var);
+		if (var.isInitialized()) {
+			exprs.put(var.getName(), id++);
+		}
 	}
 
 	private void computeVar(Variable var) {
@@ -276,6 +290,24 @@ public class LLVMTemplateData {
 	 */
 	public Map<Object, Integer> getActionScheduler() {
 		return actionScheduler;
+	}
+
+	/**
+	 * get expression map
+	 * 
+	 * @return a map of expression information.
+	 */
+	public Map<Object, Integer> getExprs() {
+		return exprs;
+	}
+
+	/**
+	 * get Model of Computations map
+	 * 
+	 * @return a map of MoC information.
+	 */
+	public Map<Object, Integer> getMocs() {
+		return mocs;
 	}
 
 	/**
@@ -312,15 +344,6 @@ public class LLVMTemplateData {
 	 */
 	public Map<Object, Integer> getProcs() {
 		return procs;
-	}
-	
-	/**
-	 * get Model of Computations map
-	 * 
-	 * @return a map of MoC information.
-	 */
-	public Map<Object, Integer> getMocs() {
-		return mocs;
 	}
 
 	/**

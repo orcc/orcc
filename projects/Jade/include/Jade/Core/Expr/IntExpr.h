@@ -59,7 +59,7 @@ public:
 	/*!
      *  @brief Constructor
      *
-	 * Creates a new integer expression.
+	 * Creates a new integer expression with an int value.
 	 *
 	 *  @param C : llvm::LLVMContext.
 	 *
@@ -68,6 +68,20 @@ public:
      */
 	IntExpr(llvm::LLVMContext &C, int value) : Expr(C){
 		this->value = value;
+	};
+
+	/*!
+     *  @brief Constructor
+     *
+	 * Creates a new integer expression with a ConstantInt value.
+	 *
+	 *  @param C : llvm::LLVMContext.
+	 *
+	 *  @param value : llvm::ConstantInt value of the IntExpr.
+     *
+     */
+	IntExpr(llvm::LLVMContext &C, llvm::ConstantInt* value) : Expr(C){
+		this->constantVal = value;
 	};
 
 	~IntExpr();
@@ -107,6 +121,8 @@ public:
 private:
 	/** Value of IntExpr */
 	int value;
+	
+	llvm::Constant* constantVal;
 };
 
 #endif

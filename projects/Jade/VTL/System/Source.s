@@ -146,32 +146,31 @@ return:                                           ; preds = %bb6
 !0 = metadata !{metadata !"System/Source"}
 !1 = metadata !{metadata !"System.Source"}
 !2 = metadata !{ metadata !33 ,  null }
-!33 = metadata !{metadata !29}
 !3 = metadata !{metadata !4, metadata !"O", %struct.fifo_i8_s** @O}
 !4 = metadata  !{ i32 8 ,  null }
-!5 = metadata !{metadata !6, metadata !7, i8** @input_file}
+!5 = metadata !{metadata !6, metadata !7, null, i8** @input_file}
 !6 = metadata !{metadata !"input_file", i1 0, i32 0,  i32 0}
 !7 = metadata  !{ i32 8 ,  null }
-!8 = metadata !{metadata !9, metadata !10, %struct.FILE** @F}
+!8 = metadata !{metadata !9, metadata !10, null, %struct.FILE** @F}
 !9 = metadata !{metadata !"File", i1 0, i32 0,  i32 0}
 !10 = metadata  !{ i32 8 ,  null }
-!11 = metadata !{metadata !12, metadata !13, i32* @cnt}
+!11 = metadata !{metadata !12, metadata !13, metadata !34,i32* @cnt}
 !12 = metadata !{metadata !"cnt", i1 0, i32 0,  i32 0}
 !13 = metadata  !{ i32 32 ,  null }
 
-!14 = metadata !{metadata !15, metadata !16, [3 x i8]* @.str2}
+!14 = metadata !{metadata !15, metadata !16, null, [3 x i8]* @.str2}
 !15 = metadata !{metadata !".str2", i1 0, i32 0,  i32 0}
 !16 = metadata  !{ i32 8 ,  null }
 
-!17 = metadata !{metadata !18, metadata !19, [26 x i8]* @.str4}
+!17 = metadata !{metadata !18, metadata !19, null, [26 x i8]* @.str4}
 !18 = metadata !{metadata !".str4", i1 0, i32 0,  i32 0}
 !19 = metadata  !{ i32 8 ,  null }
 
-!20 = metadata !{metadata !21, metadata !22, [21 x i8]* @.str1}
+!20 = metadata !{metadata !21, metadata !22, null, [21 x i8]* @.str1}
 !21 = metadata !{metadata !".str1", i1 0, i32 0,  i32 0}
 !22 = metadata  !{ i32 8 ,  null }
 
-!23 = metadata !{metadata !24, metadata !25, [7 x i8]* @.str3}
+!23 = metadata !{metadata !24, metadata !25, null, [7 x i8]* @.str3}
 !24 = metadata !{metadata !".str3", i1 0, i32 0,  i32 0}
 !25 = metadata  !{ i32 8 ,  null }
 !26 = metadata !{ null , null , null, metadata !27, metadata !28}
@@ -181,6 +180,8 @@ return:                                           ; preds = %bb6
 !30 = metadata !{metadata !3, i32 1}
 !31 = metadata  !{metadata !"isSchedulable_send_data", i1 0, i1()* @isSchedulable_send_data}
 !32 = metadata  !{metadata !"send_data", i1 0, i32()* @send_data}
+!33 = metadata !{metadata !29}
+!34 = metadata !{i32 0}
 
 declare i32 @fseek(%struct.FILE*, i32, i32) nounwind
 declare i32 @fread(i8*, i32, i32, %struct.FILE*) nounwind

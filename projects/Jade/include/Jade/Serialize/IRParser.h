@@ -51,7 +51,7 @@ namespace llvm{
 
 
 class LLVMParser;
-
+class Expr;
 
 
 /**
@@ -138,7 +138,6 @@ private:
 	 */
 	std::map<std::string, Variable*>* parseParameters(llvm::Module* module);
 
-
 	/**
      * @brief parse pattern of a module
 	 *
@@ -175,15 +174,26 @@ private:
 	Procedure* parseProc(llvm::MDNode* node);
 
 	/**
-	 * @brief Parses a list of ports
+     * @brief parse an MDNode as an Expression
 	 *
-	 * Parses the given module to produce a list of ports.
+	 * Parses the given MDNode as an Expression.
 	 * 
-	 * @param key : whether ports are input or output ports
+	 * @param node : the llvm::MDNode to parse
+	 *
+	 * @return the coresponding Expression.
+	 */
+	Expr* IRParser::parseExpr(llvm::MDNode* node);
+
+	/**
+	 * @brief Parses a list of Port
+	 *
+	 * Parses the given module to produce a list of Port.
+	 * 
+	 * @param key : whether ports are input or output Port
 	 *
 	 * @param module : llvm::Module to parse
 	 *
-	 * @return a map of ports
+	 * @return a map of Port
 	 */
 	std::map<std::string, Port*>* parsePorts(std::string key, llvm::Module* module);
 
@@ -228,12 +238,22 @@ private:
 	 *
 	 * Parses the given node as an llvm::Type definition.
 	 * 
-	 * @param module : llvm::MDNode representing a type
+	 * @param node : llvm::MDNode representing a type
 	 *
 	 * @return the corresponging llvm::IntegerType
 	 */
 	llvm::Type* parseType(llvm::MDNode* node);
 
+	/**
+	 *  @brief Parse an expression
+	 *
+	 * Parses the given node as an Expression.
+	 * 
+	 * @param node : the llvm::MDNode representing an expression
+	 *
+	 * @return the corresponging Expr
+	 */
+	Expr* parseExpression(llvm::MDNode* node);
 
 	/**
 	 *  @brief Parse actions

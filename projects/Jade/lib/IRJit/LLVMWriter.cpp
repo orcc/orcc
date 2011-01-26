@@ -217,6 +217,7 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
    // Loop over all of the instructions in the function, fixing up operand
   // references as we go.  This uses VMap to do all the hard work.
   //
+  map<string, Function*>::iterator it;
   for (Function::iterator BB = cast<BasicBlock>(VMap[OldFunc->begin()]),
          BE = NewFunc->end(); BB != BE; ++BB)
     // Loop over all instructions, fixing each one as we find it...
@@ -226,7 +227,6 @@ void LLVMWriter::linkFunctionBody(Function *NewFunc, const Function *OldFunc,
 		Value *V;
 		
 		if (isa<Function>(*op) && (fifoFns!=NULL)){
-			map<string, Function*>::iterator it;
 			it = fifoFns->find((*op)->getName());
 
 			if (it != fifoFns->end()){

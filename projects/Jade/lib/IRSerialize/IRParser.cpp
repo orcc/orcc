@@ -52,11 +52,13 @@
 #include "Jade/Core/Actor/ActionTag.h"
 #include "Jade/Core/Actor.h"
 #include "Jade/Core/Actor/FSM.h"
-#include "Jade/Serialize/IRParser.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/StateVariable.h"
 #include "Jade/Core/Actor/Procedure.h"
+#include "Jade/Core/Expr/IntExpr.h"
+#include "Jade/Core/Expr/ListExpr.h"
 #include "Jade/Jit/LLVMParser.h"
+#include "Jade/Serialize/IRParser.h"
 #include "Jade/Util/FifoMng.h"
 
 
@@ -269,11 +271,36 @@ Variable* IRParser::parseStateVar(MDNode* node){
 	MDString* name = cast<MDString>(varDefMD->getOperand(0));
 	ConstantInt* assignable = cast<ConstantInt>(varDefMD->getOperand(1));
 
+	//Parse StateVar properties
 	IntegerType* type = (IntegerType*)parseType(cast<MDNode>(node->getOperand(1)));
-	GlobalVariable* variable = cast<GlobalVariable>(node->getOperand(2));
+	
 
+	//Parse initialize
+	Value* MDExpr = node->getOperand(2);
+	Expr* init = NULL;
 
-	return new StateVar(type, name->getString(), assignable->getValue().getBoolValue(), variable);
+	if (MDExpr != NULL){
+		init = parseExpr(cast<MDNode>(MDExpr));
+	}
+	
+	//Link with llvm global variable
+	GlobalVariable* variable = cast<GlobalVariable>(node->getOperand(3));
+
+	return new StateVar(type, name->getString(), assignable->getValue().getBoolValue(), variable, init);
+}
+
+Expr* IRParser::parseExpr(MDNode* node){
+	Value* value = node->getOperand(0);
+	if (isa<ConstantInt>(value)){
+		return new IntExpr(Context, cast<ConstantInt>(value));
+	}else if (isa<ConstantArray>(value)){
+		return new ListExpr(Context, cast<ConstantArray>(value));
+	}else{
+		cout << "Unsupported type of expression \n";
+		exit(1);
+	}
+	
+	return NULL;
 }
 
 list<Action*>* IRParser::parseActions(string key, Module* module){

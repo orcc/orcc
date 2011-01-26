@@ -68,11 +68,12 @@ public:
 	 *
 	 * @param name :	string on the variable name
 	 */
-	Variable(llvm::Type* type, std::string name, bool global, llvm::GlobalVariable* variable){
+	Variable(llvm::Type* type, std::string name, bool global, bool assignable, llvm::GlobalVariable* variable){
 		this->type = type;
 		this->name = name;
 		this->global = global;
 		this->variable = variable;
+		this->assignable = assignable;
 	};
 
 	~Variable();
@@ -120,7 +121,15 @@ public:
 	 */
 	bool isGlobal() {return global;};
 
-private:
+	/**
+	 * Returns true if this variable is assignable.
+	 * 
+	 * @return true if this variable is assignable
+	 */
+	bool isAssignable() {return assignable;};
+
+
+protected:
 	/** variable type */
 	llvm::Type* type;
 
@@ -129,6 +138,9 @@ private:
 
 	/** true if this variable is global */
 	bool global;
+
+	/** true if this variable is global */
+	bool assignable;
 
 	/** llvm::GlobalVariable bounds to this Variable */
 	llvm::GlobalVariable* variable;

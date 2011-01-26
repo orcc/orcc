@@ -28,86 +28,101 @@
  */
 
 /**
-@brief Description of the StateVar class interface
+@brief Description of the ListExpr class interface
 @author Jerome Gorin
-@file StateVar.h
+@file ListExpr.h
 @version 1.0
 @date 15/11/2010
 */
 
 //------------------------------
-#ifndef STATEVARIABLE_H
-#define STATEVARIABLE_H
+#ifndef LISTEXPR_H
+#define LISTEXPR_H
+
+#include <list>
 
 #include "Jade/Core/Expression.h"
-#include "Jade/Core/Variable.h"
 //------------------------------
 
 /**
- * @class Variable
+ * @class ListExpr
  *
- * @brief  This class defines a state variable
- *
- * This class represents a state variable. A state variable is a global variable
- * that can be assigned.
+ * @brief  This class defines a list of Expression.
  * 
  * @author Jerome Gorin
  * 
  */
-class StateVar : public Variable {
+
+class ListExpr : public Expr {
 public:
-
-	/**
-	 * @brief create a state variable
+	/*!
+     *  @brief Constructor
+     *
+	 * Creates a new integer expression with an int value.
 	 *
-	 * Creates a new state variable with the given type and name.
-	 * 
-	 * @param location : the state variable location
+	 *  @param C : llvm::LLVMContext.
 	 *
-	 * @param type : the state variable type
-	 *
-	 * @param name : the state variable name
-	 *
-	 * @param assignable : whether this state variable is assignable or not.
-	 *
-	 * @param variable : llvm::GlobalVariable bound to this variable.
-	 */
-	StateVar(llvm::Type* type, std::string name, bool assignable, llvm::GlobalVariable* variable) 
-		: Variable(type, name, true, assignable, variable)
-	{
-		this->initialValue = NULL;
+	 *  @param value : integer value of the IntExpr.
+     *
+     */
+	ListExpr(llvm::LLVMContext &C, std::list<Expr*>* value) : Expr(C){
+		this->expressions = value;
 	};
 
-	/**
-	 * @brief create a state variable with an initial value
+	/*!
+     *  @brief Constructor
+     *
+	 * Creates a new list expression with a ConstantArray value.
 	 *
-	 *  Creates a new state variable with the given location, type, name and
-	 *     initial value.
-	 * 
-	 * @param location : the state variable location
+	 *  @param C : llvm::LLVMContext.
 	 *
-	 * @param type : the state variable type
-	 *
-	 * @param name : the state variable name
-	 *
-	 * @param assignable : whether this state variable is assignable or not.
-	 *
-	 * @param variable : llvm::GlobalVariable bound to this variable.
-	 *
-	 * @param initialValue : the initial value
-	 */
-	StateVar(llvm::Type* type, std::string name, bool assignable, llvm::GlobalVariable* variable, Expr* initialValue) 
-		: Variable(type, name, true, assignable, variable)
-	{
-		this->initialValue = initialValue;
+	 *  @param values : llvm::ConstantArray value of the ListExpr.
+     *
+     */
+	ListExpr(llvm::LLVMContext &C, llvm::ConstantArray* values) : Expr(C){
+		this->constantArray = values;
 	};
 
+	~ListExpr();
 
-	~StateVar();
+	/*!
+     *  @brief Return IRType of the list expression
+     *
+	 *  @return IRType of the list expression.
+     *
+     */
+	IRType* getIRType(){
+		//Todo : implement ListType	
+		return NULL;
+	};
 
-protected:
-	/** Initial value */
-	Expr* initialValue;
+	/*!
+     *  @brief Getter of expression value
+     *
+	 *  @return value of the expression.
+     *
+     */
+	std::list<Expr*>* getValue(){return expressions;};
+
+	/**
+	 * @brief Returns llvm::Constant corresponding to the llvm value of this expression.
+	 * 
+	 * @return llvm::Constant of this expression
+	 */
+	llvm::Constant* getConstant();
+
+	/**
+	 * @brief Returns true if the expression is an instance of ListExpr
+	 * 
+	 * @return True if the expression is an instance of ListExpr
+	 */
+	bool isListExpr(){return true;};
+
+private:
+	/** Value of IntExpr */
+	std::list<Expr*>* expressions;
+	
+	llvm::Constant* constantArray;
 };
 
 #endif

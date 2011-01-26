@@ -124,14 +124,14 @@ declare void @write_mb(i8*)
 !0 = metadata !{metadata !"System/Display.bc"}
 !1 = metadata !{metadata !"System.Display"}
 !2 = metadata !{metadata !19, null}
-!19 = metadata !{metadata !15}
+
 !3 = metadata !{metadata !4, metadata !"B", %struct.fifo_i8_s** @B}
 !4 = metadata  !{ i32 8 ,  null }
 !5 = metadata !{metadata !6, metadata !"WIDTH", %struct.fifo_i16_s** @WIDTH}
 !6 = metadata  !{ i32 16 ,  null }
 !7 = metadata !{metadata !8, metadata !"HEIGHT", %struct.fifo_i16_s** @HEIGHT}
 !8 = metadata  !{ i32 16 ,  null }
-!9 = metadata !{metadata !10, metadata !11, i32* @init}
+!9 = metadata !{metadata !10, metadata !11, metadata !20, i32* @init}
 !10 = metadata !{metadata !"init", i1 0, i32 0,  i32 0}
 !11 = metadata  !{ i32 32 ,  null }
 !12 = metadata !{metadata !"set_video", i1 1 , void(i32, i32)* @set_video}
@@ -141,6 +141,8 @@ declare void @write_mb(i8*)
 !16 = metadata !{metadata !3, i32 1}
 !17 = metadata  !{metadata !"isSchedulable_get_data", i1 0, i1()* @isSchedulable_get_data}
 !18 = metadata  !{metadata !"get_data", i1 0, void()* @get_data}
+!19 = metadata !{metadata !15}
+!20 = metadata  !{i32 0}
 
 %struct.FILE = type { i8*, i32, i8*, i32, i32, i32, i32, i8* }
 

@@ -44,6 +44,7 @@
 #include "Jade/Core/Expr/BoolExpr.h"
 #include "Jade/Core/Expr/BinaryExpr.h"
 #include "Jade/Core/Expr/IntExpr.h"
+#include "Jade/Core/Expr/ListExpr.h"
 //------------------------------
 
 using namespace std;
@@ -90,6 +91,10 @@ Constant* BoolExpr::getConstant(){
 
 Constant* IntExpr::getConstant(){
 	return ConstantInt::get(Type::getInt32Ty(Context), value);
+}
+
+Constant* ListExpr::getConstant(){
+	return NULL;
 }
 
 Constant* BinaryExpr::getConstant(){

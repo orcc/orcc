@@ -175,7 +175,7 @@ map<string, Variable*>* IRWriter::writeVariables(map<string, Variable*>* vars){
 Variable* IRWriter::writeVariable(Variable* var){
 	GlobalVariable* newVar = writer->createVariable(var->getGlobalVariable());
 
-	return new Variable(var->getType(), var->getName(), var->isGlobal(), newVar);
+	return new Variable(var->getType(), var->getName(), var->isGlobal(), var->isAssignable(), newVar);
 }
 
 list<Action*>* IRWriter::writeInitializes(list<Action*>* actions){
