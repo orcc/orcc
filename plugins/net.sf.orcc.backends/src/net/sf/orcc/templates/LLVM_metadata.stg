@@ -164,7 +164,7 @@ if(actor.actionScheduler.fsm)> metadata <FSM_decl_MD(actor)> <else> null <endif>
 >>
 
 actions_MD(actor) ::= <<
-<actions_decl_MD(actor)> = metadata !{<actor.actionScheduler.actions: {metadata $action_decl_MD(actor=actor, action=it)$}; separator=", ">}
+<actions_decl_MD(actor)> = metadata !{<actor.actionScheduler.actions: {action | metadata <action_decl_MD(actor=actor, action=action)>}; separator=", ">}
 >>
 
 patterns_MD(actor, patterns) ::= <<
@@ -331,12 +331,12 @@ procExtern_MD(proc) ::= <<
 >>
 
 procRetType_MD(proc) ::= <<
-metadata !"$proc.returnType$"
+metadata !"<proc.returnType>"
 >>
 
 
 varSize_MD(type) ::= <<
-<if(type.list)> <type.dimensions: {dim | i32 $dim$}; separator=", "> <
+<if(type.list)> <type.dimensions: {dim | i32 <dim>}; separator=", "> <
 else> null <endif>
 >>
 
