@@ -4,8 +4,8 @@
 
 // the dimensions of a list: [dim1][dim2]...[dimn]
 // does not output anything if $value$ is empty
-listSize(value) ::= <<
-<value : {[$it$]} >
+listSize(values) ::= <<
+<values : {value | [<value>]} >
 >>
 
 variableDeclaration(variable) ::= <<
