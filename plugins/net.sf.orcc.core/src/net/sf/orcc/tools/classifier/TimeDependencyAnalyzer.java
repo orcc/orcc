@@ -82,7 +82,8 @@ public class TimeDependencyAnalyzer {
 		DefaultSolver solver = new DefaultSolver(builder.getNetwork());
 		Solution solution = solver.findFirst();
 		if (solution != null) {
-			System.out.println(actor + ": guards are compatible");
+			System.out.println(actor + ": guards of actions " + previous
+					+ " and " + action + " are compatible");
 			return true;
 		}
 
