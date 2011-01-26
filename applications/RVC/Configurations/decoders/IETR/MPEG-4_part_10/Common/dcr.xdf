@@ -62,20 +62,20 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_DCR_Hadamard_LUMA_IHT1d_0">
+    <Instance id="DcResHadamardLumaIHT1d_0">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_DCR_Hadamard_LUMA_IHT1d"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.DcResHadamardLumaIHT1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_DC_Transpose4x4_0">
+    <Instance id="DC_Transpose4x4_0">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_Transpose4x4"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.Transpose4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -84,7 +84,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_DCR_Hadamard_LUMA_IHT1d"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.DcResHadamardLumaIHT1d"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -98,11 +98,11 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_DC_Transpose4x4_1">
+    <Instance id="DC_Transpose4x4_1">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_Transpose4x4"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.Transpose4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -124,18 +124,18 @@
         src="" src-port="QP"/>
     <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling"
         dst-port="ScalingList" src="" src-port="ScalingList"/>
-    <Connection dst="Algo_DCR_Hadamard_LUMA_IHT1d_0" dst-port="X"
+    <Connection dst="DcResHadamardLumaIHT1d_0" dst-port="X"
         src="Zigzag_4x4_DC" src-port="Lev2d"/>
-    <Connection dst="Algo_DC_Transpose4x4_0" dst-port="X"
-        src="Algo_DCR_Hadamard_LUMA_IHT1d_0" src-port="Y"/>
+    <Connection dst="DC_Transpose4x4_0" dst-port="X"
+        src="DcResHadamardLumaIHT1d_0" src-port="Y"/>
     <Connection dst="Algo_DCR_Hadamard_LUMA_IHT1d_1" dst-port="X"
-        src="Algo_DC_Transpose4x4_0" src-port="Y"/>
+        src="DC_Transpose4x4_0" src-port="Y"/>
     <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling" dst-port="I"
         src="Algo_DCR_Hadamard_LUMA_IHT1d_1" src-port="Y"/>
-    <Connection dst="Algo_DC_Transpose4x4_1" dst-port="X"
+    <Connection dst="DC_Transpose4x4_1" dst-port="X"
         src="Algo_DCR_Hadamard_LUMA_Scaling" src-port="O"/>
     <Connection dst="Algo_DCR_Hadamard_LUMA_Reordering" dst-port="X"
-        src="Algo_DC_Transpose4x4_1" src-port="Y"/>
+        src="DC_Transpose4x4_1" src-port="Y"/>
     <Connection dst="" dst-port="CoefDCR_L"
         src="Algo_DCR_Hadamard_LUMA_Reordering" src-port="Y"/>
     <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling" dst-port="MbType"

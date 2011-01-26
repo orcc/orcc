@@ -51,9 +51,34 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-package Proprietary.IETR.MPEG4.part10;
+package Proprietary.IETR.MPEG4.part10.Common;
 
-actor Algo_Transpose4x4 () int(size=16) X ==> int(size=16) Y :
-  action X:[ x ] repeat 16 ==> Y: [ [ x[ 4 * c + r ] : for int r in 0 .. 3, for int c in 0 .. 3 ] ] repeat 16
-  end
+actor DcResHadamardLumaIHT1d()
+	int(size=16) X
+		==>
+	int(size=16) Y
+		:
+
+	action
+			X:[x] repeat 4
+				==>
+			Y:[y] repeat 4
+		var
+			List( type:int(size=16), size=4 ) buf,
+			List( type:int(size=16), size=4 ) y
+		do
+			buf := [
+				x[0] + x[2],
+				x[0] - x[2],
+				x[1] - x[3],
+				x[1] + x[3]
+			];
+			
+			y :=[
+				buf[0] + buf[3],
+				buf[1] + buf[2],
+				buf[1] - buf[2],
+				buf[0] - buf[3]
+			];
+		end
 end
