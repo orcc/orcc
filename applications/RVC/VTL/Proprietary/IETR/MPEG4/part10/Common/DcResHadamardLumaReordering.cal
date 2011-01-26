@@ -51,12 +51,25 @@ This copyright notice must be included in all copies or derivative works.
 Copyright (c) ISO/IEC 2007.
 *************************************************************************/
 
-package Proprietary.IETR.MPEG4.part10;
+package Proprietary.IETR.MPEG4.part10.Common;
 
-actor Algo_DCR_Hadamard_LUMA_Reordering () int(size=16) X ==> int(size=16) Y :
+actor DcResHadamardLumaReordering()
+	int(size=16) X
+		==>
+	int(size=16) Y
+		:
 
-  List( type:uint(size=4), size=16 )  t_scan2_Index = [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15];
+	List( type:uint(size=4), size=16 )  t_scan2_Index =
+		[
+			 0,  1,  4,  5,
+			 2,  3,  6,  7,
+			 8,  9, 12, 13,
+			10, 11, 14, 15
+		];
 
-  action X:[ x ] repeat 16 ==> Y:[ [ x[t_scan2_Index[s]] : for int s in 0 .. 15 ] ] repeat 16
-  end
+	action
+		X :[ x ] repeat 16
+			==>
+		Y :[[ x[t_scan2_Index[s]] : for int s in 0 .. 15 ]] repeat 16
+	end
 end

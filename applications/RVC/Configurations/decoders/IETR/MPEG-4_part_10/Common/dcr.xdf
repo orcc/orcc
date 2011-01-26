@@ -71,7 +71,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="DC_Transpose4x4_0">
+    <Instance id="DcTranspose4x4_0">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -80,7 +80,7 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_DCR_Hadamard_LUMA_IHT1d_1">
+    <Instance id="DCResHadamardLumaIHT1d_1">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -89,16 +89,16 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_DCR_Hadamard_LUMA_Scaling">
+    <Instance id="DcResHadamardLumaScaling">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_DCR_Hadamard_LUMA_Scaling"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.DcResHadamardLumaScaling"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="DC_Transpose4x4_1">
+    <Instance id="DcTranspose4x4_1">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
@@ -107,11 +107,11 @@
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
     </Instance>
-    <Instance id="Algo_DCR_Hadamard_LUMA_Reordering">
+    <Instance id="DcResHadamardLumaReordering">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Algo_DCR_Hadamard_LUMA_Reordering"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.DcResHadamardLumaReordering"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -120,24 +120,22 @@
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
     <Connection dst="Zigzag_4x4_DC" dst-port="levarr" src="" src-port="CoefDC_L"/>
-    <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling" dst-port="QP"
-        src="" src-port="QP"/>
-    <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling"
-        dst-port="ScalingList" src="" src-port="ScalingList"/>
+    <Connection dst="DcResHadamardLumaScaling" dst-port="QP" src="" src-port="QP"/>
+    <Connection dst="DcResHadamardLumaScaling" dst-port="ScalingList"
+        src="" src-port="ScalingList"/>
     <Connection dst="DcResHadamardLumaIHT1d_0" dst-port="X"
         src="Zigzag_4x4_DC" src-port="Lev2d"/>
-    <Connection dst="DC_Transpose4x4_0" dst-port="X"
+    <Connection dst="DcTranspose4x4_0" dst-port="X"
         src="DcResHadamardLumaIHT1d_0" src-port="Y"/>
-    <Connection dst="Algo_DCR_Hadamard_LUMA_IHT1d_1" dst-port="X"
-        src="DC_Transpose4x4_0" src-port="Y"/>
-    <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling" dst-port="I"
-        src="Algo_DCR_Hadamard_LUMA_IHT1d_1" src-port="Y"/>
-    <Connection dst="DC_Transpose4x4_1" dst-port="X"
-        src="Algo_DCR_Hadamard_LUMA_Scaling" src-port="O"/>
-    <Connection dst="Algo_DCR_Hadamard_LUMA_Reordering" dst-port="X"
-        src="DC_Transpose4x4_1" src-port="Y"/>
+    <Connection dst="DCResHadamardLumaIHT1d_1" dst-port="X"
+        src="DcTranspose4x4_0" src-port="Y"/>
+    <Connection dst="DcResHadamardLumaScaling" dst-port="I"
+        src="DCResHadamardLumaIHT1d_1" src-port="Y"/>
+    <Connection dst="DcTranspose4x4_1" dst-port="X"
+        src="DcResHadamardLumaScaling" src-port="O"/>
+    <Connection dst="DcResHadamardLumaReordering" dst-port="X"
+        src="DcTranspose4x4_1" src-port="Y"/>
     <Connection dst="" dst-port="CoefDCR_L"
-        src="Algo_DCR_Hadamard_LUMA_Reordering" src-port="Y"/>
-    <Connection dst="Algo_DCR_Hadamard_LUMA_Scaling" dst-port="MbType"
-        src="" src-port="MbType"/>
+        src="DcResHadamardLumaReordering" src-port="Y"/>
+    <Connection dst="DcResHadamardLumaScaling" dst-port="MbType" src="" src-port="MbType"/>
 </XDF>
