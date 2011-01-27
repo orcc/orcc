@@ -90,7 +90,10 @@ Constant* BoolExpr::getConstant(){
 }
 
 Constant* IntExpr::getConstant(){
-	return ConstantInt::get(Type::getInt32Ty(Context), value);
+	if (constantVal == NULL){
+		constantVal = ConstantInt::get(Type::getInt32Ty(Context), value);
+	}
+	return constantVal;
 }
 
 Constant* ListExpr::getConstant(){

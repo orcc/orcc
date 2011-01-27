@@ -36,7 +36,14 @@
 */
 
 //------------------------------
+#include <iostream>
+
 #include "Initializer.h"
+
+#include "llvm/Function.h"
+#include "llvm/DerivedTypes.h"
+#include "llvm/GlobalVariable.h"
+#include "llvm/Support/IRBuilder.h"
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Network/Instance.h"
@@ -47,12 +54,38 @@
 using namespace std;
 using namespace llvm;
 
-Initializer::Initializer(Decoder* decoder){
+Initializer::Initializer( LLVMContext& C, Decoder* decoder) : Context(C){
 	this->executionEngine = decoder->getEE();
+	this->decoder = decoder;
+	this->initFn = NULL;
+}
+
+void Initializer::createInitializeFn(Module* module){
+	if (initFn != NULL){
+		initFn->eraseFromParent();
+	}
+	
+	FunctionType* FTY = FunctionType::get(Type::getVoidTy(Context), (Type*)NULL);
+	initFn = Function::Create(FTY, Function::ExternalLinkage, "init", module);
+	
+	// Add a basic block entry to init.
+	entryBB = BasicBlock::Create(Context, "entry", initFn);
+	
 }
 
 void Initializer::initialize(Instance* instance){
+	createInitializeFn(decoder->getModule());
+	
 	initializeStateVariables(instance->getStateVars());
+
+	runInitializer();
+}
+
+void Initializer::runInitializer(){
+	//Close function
+	ReturnInst::Create(Context, 0, entryBB);
+
+	executionEngine->runFunction(initFn);
 }
 
 void Initializer::initializeStateVariables(map<string, StateVar*>* vars){
@@ -62,17 +95,27 @@ void Initializer::initializeStateVariables(map<string, StateVar*>* vars){
 		StateVar* var = it->second;
 
 		if (var->hasInitialValue()){
-			//Variable has an initialize value
-			void* ptrVar = executionEngine->isCompiledPtr(var->getGlobalVariable());
-
-			if (ptrVar != NULL){
+			if (executionEngine->isCompiledGV(var->getGlobalVariable())){
 				//Variable has been previously compiled
-				initializeStateVariable(var, ptrVar);
+				initializeStateVariable(var);
 			}
 		}
 	}
 }
 
-void Initializer::initializeStateVariable(StateVar* vars, void* ptr){
+void Initializer::initializeStateVariable(StateVar* var){
+	Expr* initVal = var->getInitialValue();
+	
+	if (initVal->isIntExpr()){
+		initializeIntExpr(var->getGlobalVariable(), (IntExpr*)initVal);
+	}/*else{
+		cout<< "Initialize only support initialization of integer \n";
+		exit(1);
+	}*/
+	
+	
+}
 
+void Initializer::initializeIntExpr(GlobalVariable* var, IntExpr* expr){
+	new StoreInst(expr->getConstant(), var, entryBB);
 }

@@ -114,7 +114,7 @@ void Decoder::stop(){
 }
 
 void Decoder::startInThread(pthread_t* thread){
-	clock_t start;
+	clock_t start = clock ();
 	
 	this->thread = thread;
 	
@@ -125,7 +125,6 @@ void Decoder::startInThread(pthread_t* thread){
 	pthread_mutex_lock( &mutex );
 	pthread_cond_wait( &cond_mutex, &mutex );
 	pthread_mutex_unlock( &mutex );
-
 
 	if (verbose){
 		cout<< "\n First image arrived " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";

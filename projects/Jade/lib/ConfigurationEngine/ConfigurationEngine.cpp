@@ -121,7 +121,7 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	IRLinker linker(decoder);
 	linker.link(keeps);
 	
-	Initializer initializer(decoder);
+	Initializer initializer(Context, decoder);
 	for (itKeep = keeps->begin(); itKeep != keeps->end(); itKeep++){
 		initializer.initialize((*itKeep).second);
 	}

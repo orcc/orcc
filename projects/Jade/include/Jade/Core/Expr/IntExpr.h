@@ -122,7 +122,7 @@ private:
 	/** Value of IntExpr */
 	int value;
 	
-	llvm::Constant* constantVal;
+	llvm::ConstantInt* constantVal;
 };
 
 #endif

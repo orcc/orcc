@@ -105,6 +105,12 @@ public:
 	void run();
 
 	/**
+     *  @brief run a specific function of the current decoder
+     *
+	 *	@param function : the llvm::Function to run
+     */
+	void runFunction(llvm::Function* function);
+	/**
      *  @brief stop the current decoder
      *
 	 *	Stop the decoder
@@ -119,16 +125,15 @@ public:
 	void clear();
 
 	/**
-     *  @brief get a pointer from a global
+     *  @brief Check if a globalvariable has been compiled
 	 *
-	 *   Return the ptr to llvm::GlobalValue (or a llvm::Function) or if this
-	 *    variable has not been compiled by this execution engine NULL
+	 *   Return true if the given llvm::GlobalValue (or a llvm::Function) has been previously compiled.
      *
-	 *	@param gv : the llvm::GlobalVariable to get the pointer from
+	 *	@param gv : the llvm::GlobalVariable to verify
 	 *
-	 *	@return an Adress if gv has been compiled otherwise 
+	 *	@return true if gv has been compiled otherwise false
      */
-	void* isCompiledPtr(llvm::GlobalVariable* gv);
+	bool isCompiledGV(llvm::GlobalVariable* gv);
 
 	/**
      *  @brief map a port to a fifo

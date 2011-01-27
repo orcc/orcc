@@ -41,7 +41,11 @@
 #include <map>
 
 #include "Jade/Core/Network/Instance.h"
+#include "Jade/Core/Expr/IntExpr.h"
 
+namespace llvm{
+	class BasicBlock;
+}
 class Decoder;
 class Instance;
 class LLVMExecution;
@@ -66,7 +70,7 @@ public:
 	 *
 	 * @param decoder : Decoder where instance has to be reinitialized
 	 */
-	Initializer(Decoder* decoder);
+	Initializer(llvm::LLVMContext& C, Decoder* decoder);
 
 	/**
 	 * @brief Initialize an instance.
@@ -82,6 +86,18 @@ public:
 private:
 
 	/**
+	 * @brief Create an initialize function
+	 *
+	 *	@param module : the Module to write the function
+	 */
+	void createInitializeFn(llvm::Module* module);
+
+	/**
+	 * @brief Run the initializer
+	 */
+	void runInitializer();
+
+	/**
 	 * @brief Initialize a list of state variable
 	 * 
 	 * @param vars : the state variables to initialize
@@ -93,10 +109,30 @@ private:
 	 * 
 	 * @param var : the state variable to initialize
 	 */
-	void initializeStateVariable(StateVar* var, void* ptr);
+	void initializeStateVariable(StateVar* var);
+
+	/**
+	 * @brief Initialize an integer expression
+	 * 
+	 * @param var : the GlobalVariable to initialize
+	 *
+	 * @param expr : the initial value
+	 */
+	void initializeIntExpr(llvm::GlobalVariable* var, IntExpr* expr);
+
+
+	/** Decoder to initialize */
+	Decoder* decoder;
 
 	/** LLVMExecution that compiled the given decoder */
 	LLVMExecution* executionEngine;
+
+	/** Initialization function and its entry BB*/
+	llvm::Function* initFn;
+	llvm::BasicBlock* entryBB;
+
+	/** LLVM Context */
+	llvm::LLVMContext &Context;
 };
 
 #endif

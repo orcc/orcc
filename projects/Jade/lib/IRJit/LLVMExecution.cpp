@@ -192,6 +192,11 @@ void LLVMExecution::run() {
 	GenericValue Result = EE->runFunction(func, noargs);
 }
 
+void LLVMExecution::runFunction(Function* function) {
+	std::vector<GenericValue> noargs;
+	GenericValue Result = EE->runFunction(function, noargs);
+}
+
 void LLVMExecution::stop(pthread_t* thread) {
 	Scheduler* scheduler = decoder->getScheduler();
 	scheduler->stop(thread);
@@ -201,8 +206,8 @@ void LLVMExecution::recompile(Function* function) {
 	EE->recompileAndRelinkFunction(function);
 }
 
-void* LLVMExecution::isCompiledPtr(llvm::GlobalVariable* gv){
-	return EE->getPointerToGlobalIfAvailable(gv);
+bool LLVMExecution::isCompiledGV(llvm::GlobalVariable* gv){
+	return EE->getPointerToGlobalIfAvailable(gv) != NULL;
 }
 
 void LLVMExecution::clear() {
