@@ -31,6 +31,8 @@
 #include "orcc.h"
 #include "orcc_fifo.h"
 
+//#define NO_DISPLAY
+
 #ifdef BENCHMARK
 #include <locale.h>
 #include <time.h>
@@ -121,13 +123,11 @@ void display_show_image(void) {
 		fprintf(stderr, "Can't lock screen: %s\n", SDL_GetError());
 		press_a_key(-1);
 	}
-#endif
 
 	memcpy(m_overlay->pixels[0], img_buf_y, m_width * m_height );
 	memcpy(m_overlay->pixels[1], img_buf_u, m_width * m_height / 4 );
 	memcpy(m_overlay->pixels[2], img_buf_v, m_width * m_height / 4 );
 
-#ifndef NO_DISPLAY
 	SDL_UnlockYUVOverlay(m_overlay);
 	SDL_DisplayYUVOverlay(m_overlay, &rect);
 #endif
@@ -215,6 +215,14 @@ static int init = 0;
 static int sizeinit = 0;
 
 static void display_init() {
+	
+#ifdef NO_DISPLAY
+	// First, initialize SDL's subsystem.
+	if (SDL_Init( SDL_INIT_TIMER ) < 0) {
+		fprintf(stderr, "Timer initialization failed: %s\n", SDL_GetError());
+		press_a_key(-1);
+	}
+#else
 	// First, initialize SDL's video subsystem.
 	if (SDL_Init( SDL_INIT_VIDEO ) < 0) {
 		fprintf(stderr, "Video initialization failed: %s\n", SDL_GetError());
@@ -222,6 +230,7 @@ static void display_init() {
 	}
 
 	SDL_WM_SetCaption("display", NULL);
+#endif
 
 	start_time = SDL_GetTicks();
 	t = start_time;
@@ -264,6 +273,8 @@ static void display_set_video(int width, int height) {
 
 	m_width = width;
 	m_height = height;
+	
+#ifndef NO_DISPLAY
 	printf("set display to %ix%i\n", width, height);
 
 	m_screen = SDL_SetVideoMode(m_width, m_height, 24, SDL_HWSURFACE | SDL_DOUBLEBUF);
@@ -282,6 +293,7 @@ static void display_set_video(int width, int height) {
 		fprintf(stderr, "Couldn't create overlay: %s\n", SDL_GetError());
 		press_a_key(-1);
 	}
+#endif
 
 	sizeinit = 1;
 }
