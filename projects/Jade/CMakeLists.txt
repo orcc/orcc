@@ -101,6 +101,7 @@ add_subdirectory(lib/IROptimize)
 add_subdirectory(lib/IRSerialize)
 add_subdirectory(lib/IRUtil)
 add_subdirectory(lib/Scheduler)
+add_subdirectory(lib/Scenario)
 add_subdirectory(lib/TinyXml)
 add_subdirectory(lib/XDFParser)
 

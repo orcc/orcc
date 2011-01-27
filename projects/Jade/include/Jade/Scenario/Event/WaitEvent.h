@@ -28,75 +28,61 @@
  */
 
 /**
-@brief Description of the Initializer class interface
+@brief Description of the WaitEvent class interface
 @author Jerome Gorin
-@file Instantiator.h
+@file WaitEvent.h
 @version 1.0
-@date 15/11/2010
+@date 26/01/2011
 */
 
 //------------------------------
-#ifndef INITIALIZER_H
-#define INITIALIZER_H
-#include <map>
-
-#include "Jade/Core/Network/Instance.h"
-
-class Decoder;
-class Instance;
-class LLVMExecution;
+#ifndef WAITEVENT_H
+#define WAITEVENT_H
+#include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @class Instantiator
- *
- * @brief This class is used by the configuration engine to reinitialized 
- *    already compiled instances.
- *
+ * @brief  This class defines a start event.
+ * 
  * @author Jerome Gorin
  * 
  */
-class Initializer {
+class WaitEvent : public Event {
 public:
-
-	/**
-	 * @brief Constructor.
+	/*!
+     * @brief Create a new Start event
+     *
+	 * @param id : the id of the generated decoder.
 	 *
-	 *	Set a new initializer for a decoder
-	 *
-	 * @param decoder : Decoder where instance has to be reinitialized
-	 */
-	Initializer(Decoder* decoder);
+	 * @param threaded : start in threaded mode or not.
+     */
+	WaitEvent(int time) : Event(0) {
+		this->time = time;
+	};
 
-	/**
-	 * @brief Initialize an instance.
-	 *
-	 *	Initialize an already compiled instance
-	 *
-	 * @param instance : Instance to reinitialize
-	 */
-	void initialize(Instance* instance);
+	/*!
+     *  @brief Destructor
+     *
+	 * Delete an event.
+     */
+	~WaitEvent(){};
 
-	~Initializer(){};
+	/*!
+     * @brief Return true if the Event is a WaitEvent
+     *
+	 * @return true if Event is a WaitEvent otherwise false
+     */
+	bool isWaitEvent(){return true;};
 
+	/*!
+     * @brief Get time to wait in ms
+     *
+	 * @return time to wait in ms
+     */
+	int getTime(){return time;};
 private:
-
-	/**
-	 * @brief Initialize a list of state variable
-	 * 
-	 * @param vars : the state variables to initialize
-	 */
-	void initializeStateVariables(std::map<std::string, StateVar*>* vars);
-
-	/**
-	 * @brief Initialize a state variable
-	 * 
-	 * @param var : the state variable to initialize
-	 */
-	void initializeStateVariable(StateVar* var, void* ptr);
-
-	/** LLVMExecution that compiled the given decoder */
-	LLVMExecution* executionEngine;
+	/** Start in a threaded mode */
+	int time;
 };
 
 #endif

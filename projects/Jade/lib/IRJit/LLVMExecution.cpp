@@ -150,7 +150,7 @@ void LLVMExecution::mapProcedure(Procedure* procedure, void *Addr) {
 	EE->addGlobalMapping(procedure->getFunction(), Addr);
 }
 
-void LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
+bool LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
 	void **portGV = (void**)EE->getPointerToGlobalIfAvailable(port->getGlobalVariable());
 	
 	//Port has already been compiled
@@ -160,7 +160,11 @@ void LLVMExecution::mapFifo(Port* port, AbstractFifo* fifo) {
 
 		//Connect to compiled port
 		*portGV = fifoGV;
+
+		return true;
 	}
+
+	return false;
 	
 }
 
@@ -197,6 +201,9 @@ void LLVMExecution::recompile(Function* function) {
 	EE->recompileAndRelinkFunction(function);
 }
 
+void* LLVMExecution::isCompiledPtr(llvm::GlobalVariable* gv){
+	return EE->getPointerToGlobalIfAvailable(gv);
+}
 
 void LLVMExecution::clear() {
 	Module* module = decoder->getModule();

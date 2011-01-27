@@ -40,6 +40,7 @@
 
 #include "Jade/Decoder.h"
 #include "Jade/Core/Network/Instance.h"
+#include "Jade/Jit/LLVMExecution.h"
 //------------------------------
 
 
@@ -51,5 +52,30 @@ Initializer::Initializer(Decoder* decoder){
 }
 
 void Initializer::initialize(Instance* instance){
+	initializeStateVariables(instance->getStateVars());
+}
+
+void Initializer::initializeStateVariables(map<string, StateVar*>* vars){
+	map<string, StateVar*>::iterator it;
+
+	for (it = vars->begin(); it != vars->end(); ++it){
+		StateVar* var = it->second;
+
+		if (var->hasInitialValue()){
+			//Variable has an initialize value
+			void* ptrVar = executionEngine->isCompiledPtr(var->getGlobalVariable());
+
+			if (ptrVar != NULL){
+				//Variable has been previously compiled
+				initializeStateVariable(var, ptrVar);
+			}
+		}
+	}
+}
+
+void Initializer::initializeStateVariable(StateVar* vars, void* ptr){
 	
+	int i = (int)ptr;
+	int test = 0;
+
 }

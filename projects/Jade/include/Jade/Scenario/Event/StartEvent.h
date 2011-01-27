@@ -28,75 +28,72 @@
  */
 
 /**
-@brief Description of the Initializer class interface
+@brief Description of the StartEvent class interface
 @author Jerome Gorin
-@file Instantiator.h
+@file Event.h
 @version 1.0
-@date 15/11/2010
+@date 26/01/2011
 */
 
 //------------------------------
-#ifndef INITIALIZER_H
-#define INITIALIZER_H
-#include <map>
-
-#include "Jade/Core/Network/Instance.h"
-
-class Decoder;
-class Instance;
-class LLVMExecution;
+#ifndef STARTEVENT_H
+#define STARTEVENT_H
+#include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @class Instantiator
- *
- * @brief This class is used by the configuration engine to reinitialized 
- *    already compiled instances.
- *
+ * @brief  This class defines a start event.
+ * 
  * @author Jerome Gorin
  * 
  */
-class Initializer {
+class StartEvent : public Event {
 public:
-
-	/**
-	 * @brief Constructor.
+	/*!
+     * @brief Create a new Start event
+     *
+	 * @param id : the id of the generated decoder.
 	 *
-	 *	Set a new initializer for a decoder
-	 *
-	 * @param decoder : Decoder where instance has to be reinitialized
-	 */
-	Initializer(Decoder* decoder);
+	 * @param threaded : start in threaded mode or not.
+     */
+	StartEvent(int id, std::string input, bool threaded) : Event(id) {
+		this->input = input;
+		this->threaded = threaded;
+	};
 
-	/**
-	 * @brief Initialize an instance.
-	 *
-	 *	Initialize an already compiled instance
-	 *
-	 * @param instance : Instance to reinitialize
-	 */
-	void initialize(Instance* instance);
+	/*!
+     *  @brief Destructor
+     *
+	 * Delete an event.
+     */
+	~StartEvent(){};
 
-	~Initializer(){};
+	/*!
+     * @brief Return true if the Event is a StartEvent
+     *
+	 * @return true if Event is a StartEvent otherwise false
+     */
+	bool isStartEvent(){return true;};
+	
+	/*!
+     * @brief Return the input file of the decoder
+     *
+	 * @return the input file
+     */
+	std::string getInput(){return input;};
 
+	/*!
+     * @brief Return true if event is threaded
+     *
+	 * @return true if event is threaded
+     */
+	bool isThreaded(){return threaded;};
 private:
+	/** Start in a threaded mode */
+	bool threaded;
 
-	/**
-	 * @brief Initialize a list of state variable
-	 * 
-	 * @param vars : the state variables to initialize
-	 */
-	void initializeStateVariables(std::map<std::string, StateVar*>* vars);
-
-	/**
-	 * @brief Initialize a state variable
-	 * 
-	 * @param var : the state variable to initialize
-	 */
-	void initializeStateVariable(StateVar* var, void* ptr);
-
-	/** LLVMExecution that compiled the given decoder */
-	LLVMExecution* executionEngine;
+	/** Input file */
+	std::string input;
 };
 
 #endif

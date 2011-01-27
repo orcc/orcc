@@ -28,75 +28,50 @@
  */
 
 /**
-@brief Description of the Initializer class interface
+@brief Description of the StopEvent class interface
 @author Jerome Gorin
-@file Instantiator.h
+@file StopEvent.h
 @version 1.0
-@date 15/11/2010
+@date 26/01/2011
 */
 
 //------------------------------
-#ifndef INITIALIZER_H
-#define INITIALIZER_H
-#include <map>
-
-#include "Jade/Core/Network/Instance.h"
-
-class Decoder;
-class Instance;
-class LLVMExecution;
+#ifndef STOPEVENT_H
+#define STOPEVENT_H
+#include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @class Instantiator
- *
- * @brief This class is used by the configuration engine to reinitialized 
- *    already compiled instances.
- *
+ * @brief  This class defines a stop event.
+ * 
  * @author Jerome Gorin
  * 
  */
-class Initializer {
+class StopEvent : public Event {
 public:
-
-	/**
-	 * @brief Constructor.
+	/*!
+     * @brief Create a new Start event
+     *
+	 * @param id : the id of the generated decoder.
 	 *
-	 *	Set a new initializer for a decoder
-	 *
-	 * @param decoder : Decoder where instance has to be reinitialized
-	 */
-	Initializer(Decoder* decoder);
+	 * @param threaded : start in threaded mode or not.
+     */
+	StopEvent(int id) : Event(id) {
+	};
 
-	/**
-	 * @brief Initialize an instance.
-	 *
-	 *	Initialize an already compiled instance
-	 *
-	 * @param instance : Instance to reinitialize
-	 */
-	void initialize(Instance* instance);
+	/*!
+     *  @brief Destructor
+     *
+	 * Delete an event.
+     */
+	~StopEvent(){};
 
-	~Initializer(){};
-
-private:
-
-	/**
-	 * @brief Initialize a list of state variable
-	 * 
-	 * @param vars : the state variables to initialize
-	 */
-	void initializeStateVariables(std::map<std::string, StateVar*>* vars);
-
-	/**
-	 * @brief Initialize a state variable
-	 * 
-	 * @param var : the state variable to initialize
-	 */
-	void initializeStateVariable(StateVar* var, void* ptr);
-
-	/** LLVMExecution that compiled the given decoder */
-	LLVMExecution* executionEngine;
+	/*!
+     * @brief Return true if the Event is a StopEvent
+     *
+	 * @return true if Event is a StopEvent otherwise false
+     */
+	bool isStopEvent(){return true;};
 };
 
 #endif

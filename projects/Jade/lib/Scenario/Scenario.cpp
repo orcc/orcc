@@ -28,75 +28,13 @@
  */
 
 /**
-@brief Description of the Initializer class interface
+@brief Implementation of class Scenario
 @author Jerome Gorin
-@file Instantiator.h
+@file Scenario.cpp
 @version 1.0
-@date 15/11/2010
+@date 26/01/2011
 */
 
 //------------------------------
-#ifndef INITIALIZER_H
-#define INITIALIZER_H
-#include <map>
-
-#include "Jade/Core/Network/Instance.h"
-
-class Decoder;
-class Instance;
-class LLVMExecution;
+#include "Scenario.h"
 //------------------------------
-
-/**
- * @class Instantiator
- *
- * @brief This class is used by the configuration engine to reinitialized 
- *    already compiled instances.
- *
- * @author Jerome Gorin
- * 
- */
-class Initializer {
-public:
-
-	/**
-	 * @brief Constructor.
-	 *
-	 *	Set a new initializer for a decoder
-	 *
-	 * @param decoder : Decoder where instance has to be reinitialized
-	 */
-	Initializer(Decoder* decoder);
-
-	/**
-	 * @brief Initialize an instance.
-	 *
-	 *	Initialize an already compiled instance
-	 *
-	 * @param instance : Instance to reinitialize
-	 */
-	void initialize(Instance* instance);
-
-	~Initializer(){};
-
-private:
-
-	/**
-	 * @brief Initialize a list of state variable
-	 * 
-	 * @param vars : the state variables to initialize
-	 */
-	void initializeStateVariables(std::map<std::string, StateVar*>* vars);
-
-	/**
-	 * @brief Initialize a state variable
-	 * 
-	 * @param var : the state variable to initialize
-	 */
-	void initializeStateVariable(StateVar* var, void* ptr);
-
-	/** LLVMExecution that compiled the given decoder */
-	LLVMExecution* executionEngine;
-};
-
-#endif

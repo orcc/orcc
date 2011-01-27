@@ -51,6 +51,7 @@
 #include "llvm/System/Signals.h"
 
 #include "Jade/Fifo/FifoSelection.h"
+#include "Jade/Scenario/Manager.h"
 #include "Jade/Util/OptionMng.h"
 //------------------------------
 
@@ -102,6 +103,11 @@ SystemDir("S", desc("Specifiy a specify location for package System"),
 cl::opt<std::string> 
 YuvFile("o", desc("Decoded YUV video file for compare mode"), 
 			  value_desc("YUV filename"), 
+			  init(""));
+
+cl::opt<std::string> 
+ScFile("scenario", desc("Use a decoding scenario"), 
+			  value_desc("decoding scenario"), 
 			  init(""));
 
 cl::opt<std::string> 
@@ -251,8 +257,10 @@ int main(int argc, char **argv) {
 		llvm_start_multithreaded();	
 		startConsole();
 		llvm_stop_multithreaded();
-	} else {
-		
+	} else if (ScFile != ""){
+		Manager manager(engine);
+		manager.start(ScFile);
+	}else{
 		//Enter in command line mode
 		startCmdLine();
 	}

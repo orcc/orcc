@@ -41,6 +41,7 @@
 
 namespace llvm{
 	class Function;
+	class GlobalValue;
 	class ExecutionEngine;
 	class Module;
 }
@@ -117,9 +118,32 @@ public:
      */
 	void clear();
 
+	/**
+     *  @brief get a pointer from a global
+	 *
+	 *   Return the ptr to llvm::GlobalValue (or a llvm::Function) or if this
+	 *    variable has not been compiled by this execution engine NULL
+     *
+	 *	@param gv : the llvm::GlobalVariable to get the pointer from
+	 *
+	 *	@return an Adress if gv has been compiled otherwise 
+     */
+	void* isCompiledPtr(llvm::GlobalVariable* gv);
+
+	/**
+     *  @brief map a port to a fifo
+	 *
+	 *   Map a port to a fifo if only the Port has already been compiled by the execution engine
+     *
+	 *	@param gv : the llvm::GlobalValue to et the pointer from
+	 *
+	 *	@return true if the port has been compiled, false otherwise
+     */
+	bool mapFifo(Port* port, AbstractFifo* fifo);
+
 	void* getExit(); 
 	void recompile(llvm::Function* function);
-	void mapFifo(Port* port, AbstractFifo* fifo);
+	
 
 private:
 

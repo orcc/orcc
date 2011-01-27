@@ -28,75 +28,62 @@
  */
 
 /**
-@brief Description of the Initializer class interface
+@brief Description of the SetEvent class interface
 @author Jerome Gorin
-@file Instantiator.h
+@file SetEvent.h
 @version 1.0
-@date 15/11/2010
+@date 26/01/2011
 */
 
 //------------------------------
-#ifndef INITIALIZER_H
-#define INITIALIZER_H
-#include <map>
-
-#include "Jade/Core/Network/Instance.h"
-
-class Decoder;
-class Instance;
-class LLVMExecution;
+#ifndef SETEVENT_H
+#define SETEVENT_H
+#include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @class Instantiator
- *
- * @brief This class is used by the configuration engine to reinitialized 
- *    already compiled instances.
- *
+ * @brief  This class defines a set event.
+ * 
  * @author Jerome Gorin
  * 
  */
-class Initializer {
+class SetEvent : public Event {
 public:
-
-	/**
-	 * @brief Constructor.
+	/*!
+     * @brief Create a new set event
+     *
+	 * @param xdfFile : the xdf file.
 	 *
-	 *	Set a new initializer for a decoder
-	 *
-	 * @param decoder : Decoder where instance has to be reinitialized
-	 */
-	Initializer(Decoder* decoder);
+	 * @param id : the id of the decoder to be set.
+     */
+	SetEvent(int id, std::string xdfFile) : Event(id){
+		this->file = xdfFile;
+	};
 
-	/**
-	 * @brief Initialize an instance.
-	 *
-	 *	Initialize an already compiled instance
-	 *
-	 * @param instance : Instance to reinitialize
-	 */
-	void initialize(Instance* instance);
+	/*!
+     *  @brief Destructor
+     *
+	 * Delete an event.
+     */
+	~SetEvent(){};
 
-	~Initializer(){};
+	/*!
+     * @brief Return true if the Event is a SetEvent
+     *
+	 * @return true if Event is a SetEvent otherwise false
+     */
+	 bool isSetEvent(){return true;};
 
+	 /*!
+     * @brief Return the network file to load
+     *
+	 * @return the network file to load
+     */
+	std::string getFile(){return file;};
 private:
 
-	/**
-	 * @brief Initialize a list of state variable
-	 * 
-	 * @param vars : the state variables to initialize
-	 */
-	void initializeStateVariables(std::map<std::string, StateVar*>* vars);
-
-	/**
-	 * @brief Initialize a state variable
-	 * 
-	 * @param var : the state variable to initialize
-	 */
-	void initializeStateVariable(StateVar* var, void* ptr);
-
-	/** LLVMExecution that compiled the given decoder */
-	LLVMExecution* executionEngine;
+	/** File to set */
+	std::string file;
 };
 
 #endif

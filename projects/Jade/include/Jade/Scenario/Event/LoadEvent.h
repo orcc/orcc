@@ -28,75 +28,61 @@
  */
 
 /**
-@brief Description of the Initializer class interface
+@brief Description of the LoadEvent class interface
 @author Jerome Gorin
-@file Instantiator.h
+@file Event.h
 @version 1.0
-@date 15/11/2010
+@date 26/01/2011
 */
 
 //------------------------------
-#ifndef INITIALIZER_H
-#define INITIALIZER_H
-#include <map>
-
-#include "Jade/Core/Network/Instance.h"
-
-class Decoder;
-class Instance;
-class LLVMExecution;
+#ifndef LOADEVENT_H
+#define LOADEVENT_H
+#include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @class Instantiator
- *
- * @brief This class is used by the configuration engine to reinitialized 
- *    already compiled instances.
- *
+ * @brief  This class defines a load event.
+ * 
  * @author Jerome Gorin
  * 
  */
-class Initializer {
+class LoadEvent : public Event {
 public:
+	/*!
+     * @brief Create a new Load event
+     *
+	 * @param xdfFile : the xdf file.
+	 *
+	 * @param id : the id of the generated decoder.
+     */
+	LoadEvent(std::string xdfFile, int id) : Event(id){
+		this->file = xdfFile;
+	};
 
-	/**
-	 * @brief Constructor.
-	 *
-	 *	Set a new initializer for a decoder
-	 *
-	 * @param decoder : Decoder where instance has to be reinitialized
-	 */
-	Initializer(Decoder* decoder);
+	/*!
+     *  @brief Destructor
+     *
+	 * Delete an event.
+     */
+	~LoadEvent(){};
 
-	/**
-	 * @brief Initialize an instance.
-	 *
-	 *	Initialize an already compiled instance
-	 *
-	 * @param instance : Instance to reinitialize
-	 */
-	void initialize(Instance* instance);
+	/*!
+     * @brief Return true if the Event is a LoadEvent
+     *
+	 * @return true if Event is a LoadEvent otherwise false
+     */
+	bool isLoadEvent(){return true;};
 
-	~Initializer(){};
+	/*!
+     * @brief Return the network file to load
+     *
+	 * @return the network file to load
+     */
+	std::string getFile(){return file;};
 
 private:
-
-	/**
-	 * @brief Initialize a list of state variable
-	 * 
-	 * @param vars : the state variables to initialize
-	 */
-	void initializeStateVariables(std::map<std::string, StateVar*>* vars);
-
-	/**
-	 * @brief Initialize a state variable
-	 * 
-	 * @param var : the state variable to initialize
-	 */
-	void initializeStateVariable(StateVar* var, void* ptr);
-
-	/** LLVMExecution that compiled the given decoder */
-	LLVMExecution* executionEngine;
+	std::string file;
 };
 
 #endif

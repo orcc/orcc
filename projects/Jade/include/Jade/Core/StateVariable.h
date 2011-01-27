@@ -114,6 +114,15 @@ public:
 		return initialValue;
 	}
 
+	/**
+	 * @brief Returns true if the variable has an initial value.
+	 * 
+	 * @return true if the variable has an initial value otherwise false
+	 */
+	bool hasInitialValue() {
+		return initialValue != NULL;
+	}
+
 protected:
 	/** Initial value */
 	Expr* initialValue;

@@ -28,75 +28,76 @@
  */
 
 /**
-@brief Description of the Initializer class interface
+@brief Description of the Scenario class interface
 @author Jerome Gorin
-@file Instantiator.h
+@file Scenario.h
 @version 1.0
-@date 15/11/2010
+@date 26/01/2011
 */
 
 //------------------------------
-#ifndef INITIALIZER_H
-#define INITIALIZER_H
-#include <map>
+#ifndef SCENARIO_H
+#define SCENARIO_H
+#include <list>
 
-#include "Jade/Core/Network/Instance.h"
-
-class Decoder;
-class Instance;
-class LLVMExecution;
+#include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @class Instantiator
- *
- * @brief This class is used by the configuration engine to reinitialized 
- *    already compiled instances.
- *
+ * @brief  This class represents a scenario for decoder engine.
+ * 
  * @author Jerome Gorin
  * 
  */
-class Initializer {
+class Scenario {
 public:
+	/*!
+     *  @brief Constructor
+     *
+	 * Creates a new scenario .
+     */
+	Scenario(){};
 
-	/**
-	 * @brief Constructor.
-	 *
-	 *	Set a new initializer for a decoder
-	 *
-	 * @param decoder : Decoder where instance has to be reinitialized
-	 */
-	Initializer(Decoder* decoder);
+	/*!
+     *  @brief Destructor
+     *
+	 * Delete the scenario.
+     */
+	~Scenario(){};
 
-	/**
-	 * @brief Initialize an instance.
-	 *
-	 *	Initialize an already compiled instance
-	 *
-	 * @param instance : Instance to reinitialize
-	 */
-	void initialize(Instance* instance);
+	/*!
+     * @brief Add an event to the scenario
+     *
+	 * @param scEvent : the Event to add
+     */
+	void addEvent(Event* scEvent){
+		events.push_back(scEvent);
+	}
 
-	~Initializer(){};
+	/*!
+     * @brief Return true if the scenario finished
+	 *
+	 *	Return true if all elements of the scenario has been consumed
+     *
+	 * @return true if the scenario is finished otherwise false
+     */
+	bool end(){
+		return events.empty();
+	}
+
+	/*!
+     * @brief Get an event from the scenario pool
+     *
+	 * @param scEvent : the Event to add
+     */
+	Event* getEvent(){
+		Event* curEvent = events.front();
+		events.pop_front();
+		return curEvent;
+	}
 
 private:
-
-	/**
-	 * @brief Initialize a list of state variable
-	 * 
-	 * @param vars : the state variables to initialize
-	 */
-	void initializeStateVariables(std::map<std::string, StateVar*>* vars);
-
-	/**
-	 * @brief Initialize a state variable
-	 * 
-	 * @param var : the state variable to initialize
-	 */
-	void initializeStateVariable(StateVar* var, void* ptr);
-
-	/** LLVMExecution that compiled the given decoder */
-	LLVMExecution* executionEngine;
+	std::list<Event*> events;
 };
 
 #endif
