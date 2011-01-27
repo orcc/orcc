@@ -45,8 +45,8 @@ actor Algo_Interp_Reord(uint(size=8) SzSidePerPart)
 	uint(size=9) NbValueToRead;
 	uint(size=9) ReadIdx;
 
-	uint(size=4) x_idx;
-	uint(size=4) y_idx;
+	uint(size=5) x_idx;
+	uint(size=5) y_idx;
 
 	bool IsBiPred;
 
