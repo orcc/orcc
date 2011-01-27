@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <layout>
    <vertices>
-      <vertex id="CoefDC_L" x="22" y="40"/>
-      <vertex id="QP" x="41" y="186"/>
-      <vertex id="ScalingList" x="15" y="216"/>
-      <vertex id="MbType" x="28" y="156"/>
-      <vertex id="CoefDCR_L" x="894" y="162"/>
-      <vertex id="Zigzag_4x4_DC" x="151" y="17"/>
-      <vertex id="DcResHadamardLumaIHT1d_0" x="293" y="16"/>
-      <vertex id="DcTranspose4x4_0" x="555" y="16"/>
-      <vertex id="DCResHadamardLumaIHT1d_1" x="743" y="16"/>
-      <vertex id="DcResHadamardLumaScaling" x="165" y="138"/>
-      <vertex id="DcTranspose4x4_1" x="424" y="138"/>
-      <vertex id="DcResHadamardLumaReordering" x="597" y="138"/>
+      <vertex id="CoefDC_L" x="21" y="36"/>
+      <vertex id="QP" x="457" y="283"/>
+      <vertex id="ScalingList" x="431" y="313"/>
+      <vertex id="MbType" x="444" y="253"/>
+      <vertex id="CoefDCR_L" x="664" y="445"/>
+      <vertex id="Algo_IS_Zigzag_4x4_DC" x="163" y="25"/>
+      <vertex id="Algo_DCR_Hadamard_LUMA_IHT1d_0" x="378" y="79"/>
+      <vertex id="Algo_DC_Transpose4x4_0" x="48" y="195"/>
+      <vertex id="Algo_DCR_Hadamard_LUMA_IHT1d_1" x="282" y="199"/>
+      <vertex id="Algo_DCR_Hadamard_LUMA_Scaling" x="600" y="218"/>
+      <vertex id="Algo_DC_Transpose4x4_1" x="86" y="434"/>
+      <vertex id="Algo_DCR_Hadamard_LUMA_Reordering" x="329" y="434"/>
    </vertices>
 </layout>

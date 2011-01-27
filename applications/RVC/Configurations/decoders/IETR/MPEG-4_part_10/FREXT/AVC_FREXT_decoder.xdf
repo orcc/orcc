@@ -185,7 +185,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Mgnt_Display"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Mgnt_Display"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -197,7 +197,7 @@
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.IntraPredSplit"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Common.Algo_IntraPred_Split"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->

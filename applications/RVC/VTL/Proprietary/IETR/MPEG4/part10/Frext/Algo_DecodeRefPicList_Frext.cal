@@ -1,0 +1,597 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Frext;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+
+actor Algo_DecodeRefPicList_Frext()
+	int (size=32) ValVLD,
+
+	uint(size=4)  Slice_Type,
+	bool          IsNewPic,
+
+	uint(size=5)  NumRefIdxLXActive
+		==>
+	uint(size=5)  TypeOfVLD,
+	int (size=32) NbBitsToRead,
+	uint(size=5)  SDataNumRefIdxLXActive,
+
+	uint(size=2)  RefList0Type,
+	uint(size=5)  NbRefFrame_l0,
+	uint(size=31) RefReordering_l0,
+
+	uint(size=2)  RefList1Type,
+	uint(size=5)  NbRefFrame_l1,
+	uint(size=31) RefReordering_l1,
+
+	bool          DirectSpatialMvPredFlag
+		:
+
+/*   
+*
+* Constants
+*
+*/
+
+	uint(size=4) SLICE_TYPE_P  = 0;
+	uint(size=4) SLICE_TYPE_B  = 1;
+//	uint(size=4) SLICE_TYPE_I  = 2;
+	uint(size=4) SLICE_TYPE_SP = 3;
+//	uint(size=4) SLICE_TYPE_SI = 4;
+
+	uint(size=2) REFLIST0_PRED    = 0;
+	uint(size=2) REFLIST0_BI_PRED = 1;
+	uint(size=2) REFLIST1_BI_PRED = 2;
+
+	bool DEBUG_FLAG_DECODED = false;
+
+	bool num_ref_idx_active_override_flag := false;
+	uint(size=5) num_ref_idx_l0_active := 0;
+	uint(size=5) num_ref_idx_l1_active := 0;
+	bool         ref_pic_list_reordering_flag;
+
+	uint(size=4)  slice_type := 2;
+	bool          is_new_pic;
+
+	ReadSliceType: action
+			Slice_Type        :[ValSliceType],
+			IsNewPic          :[ValIsNewPic],
+			NumRefIdxLXActive :[ValRefIdxAct] repeat 2
+				==>
+		do
+			slice_type            := ValSliceType;
+			is_new_pic            := ValIsNewPic;
+			num_ref_idx_l0_active := ValRefIdxAct[0];
+			num_ref_idx_l1_active := ValRefIdxAct[1];
+		end
+
+	SliceType.IsEqualToP.IsNewPic: action
+				==>
+			//  num_ref_idx_active_override_flag   
+			TypeOfVLD    :[READ_BITS],
+			NbBitsToRead :[    1    ],
+
+			RefList0Type     :[REFLIST0_PRED],
+			RefList1Type     :[0],
+			RefReordering_l1 :[0],
+
+			DirectSpatialMvPredFlag :[false]
+		guard
+			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP),
+			is_new_pic
+		do
+			num_ref_idx_l1_active := 0;
+		end
+
+	SliceType.IsEqualToP.IsNewSlice: action
+				==>
+			//  num_ref_idx_active_override_flag   
+			TypeOfVLD    :[READ_BITS],
+			NbBitsToRead :[    1    ]
+		guard
+			(slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP),
+			not is_new_pic
+		do
+			num_ref_idx_l1_active := 0;
+		end
+
+	SliceType.IsEqualToI.IsNewPic: action
+				==>
+			RefList0Type     :[0],
+			NbRefFrame_l0    :[0],
+			RefReordering_l0 :[0],
+
+			RefList1Type     :[0],
+			NbRefFrame_l1    :[0],
+			RefReordering_l1 :[0],
+
+			DirectSpatialMvPredFlag :[false]
+		guard
+			is_new_pic
+		end
+
+	SliceType.IsEqualToI.IsNewSlice: action ==>
+		guard
+			not is_new_pic
+		end
+
+	ReadNumRefIdxAct.Done: action
+			ValVLD     :[ValueOfVLD]
+				==>
+		do
+			num_ref_idx_active_override_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tnum_ref_idx_active_override_flag: "+num_ref_idx_active_override_flag);
+			end
+		end
+
+
+	CheckNumRefIdxActOverRide.SliceTypeP: action
+				==>
+			//    num_ref_idx_l0_active_minus1
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			num_ref_idx_active_override_flag = true
+		end
+
+	ReadNumRefIdxOverRide.L0: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tnum_ref_idx_l0_active_minus1: "+ValueOfVLD);
+			end
+			num_ref_idx_l0_active := ValueOfVLD + 1;
+		end
+
+
+	SliceType.IsEqualToB.IsNewPic: action
+			==>
+			//              direct_sp , num_ref_i
+			TypeOfVLD    :[ READ_BITS , READ_BITS ],
+			NbBitsToRead :[     1     ,     1     ],
+
+			RefList0Type  :[REFLIST0_BI_PRED],
+			RefList1Type  :[REFLIST1_BI_PRED]
+		guard
+			slice_type = SLICE_TYPE_B,
+			is_new_pic
+		end
+
+	SliceType.IsEqualToB.IsNewSlice: action
+			==>
+			//              direct_sp , num_ref_i
+			TypeOfVLD    :[ READ_BITS , READ_BITS ],
+			NbBitsToRead :[     1     ,     1     ]
+		guard
+			slice_type = SLICE_TYPE_B,
+			not is_new_pic
+		end
+
+	Read_DirecSpat_NumRefIdxAct.Done: action
+			ValVLD     :[ValueOfVLD] repeat 2
+				==>
+			DirectSpatialMvPredFlag :[direct_spatial_mv_pred_flag]
+		var
+			bool direct_spatial_mv_pred_flag
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tdirect_spatial_mv_pred_flag: "+ValueOfVLD[0]);
+				println("\t\tnum_ref_idx_active_override_flag: "+ValueOfVLD[1]);
+			end
+			direct_spatial_mv_pred_flag :=
+				if(ValueOfVLD[0] = 0)then
+					false
+				else
+					true
+				end;
+			num_ref_idx_active_override_flag :=
+				if(ValueOfVLD[1] = 0)then
+					false
+				else
+					true
+				end;
+		end
+
+
+	CheckNumRefIdxActOverRide.SliceTypeB: action
+				==>
+			//              num_re  num_ref
+			TypeOfVLD    :[ VLD_UE , VLD_UE ]
+		guard
+			num_ref_idx_active_override_flag = true
+		end
+
+
+	ReadNumRefIdxOverRide.L0_L1: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tnum_ref_idx_l0_active_minus1: "+ValueOfVLD[0]);
+				println("\t\tnum_ref_idx_l1_active_minus1: "+ValueOfVLD[1]);
+			end
+			num_ref_idx_l0_active := ValueOfVLD[0] + 1;
+			num_ref_idx_l1_active := ValueOfVLD[1] + 1;
+		end
+
+	SendNumRefIdxlXActive.IsNewPic: action
+				==>
+			NbRefFrame_l0 :[num_ref_idx_l0_active],
+			NbRefFrame_l1 :[num_ref_idx_l1_active]
+		guard
+			is_new_pic
+		end
+
+	SendNumRefIdxlXActive.IsNewSlice: action ==>
+		guard
+			not is_new_pic
+		end
+
+
+	ReadRefPicListXReord.Asked: action
+				==>
+			//   ref_pic_list_reordering_flag_lX
+			TypeOfVLD     :[READ_BITS],
+			NbBitsToRead  :[    1    ]
+		end
+
+
+	ReadRefPicList0Reord.Done.IsNewPic: action
+			ValVLD           :[ValueOfVLD]
+				==>
+			RefReordering_l0 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
+			end
+			ref_pic_list_reordering_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+		end
+
+
+	ReadRefPicList0Reord.Done.IsNewSlice: action
+			ValVLD           :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
+			end
+			ref_pic_list_reordering_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+		end
+
+
+	ReadRefPicList1Reord.Done.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			RefReordering_l1 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
+			end
+			ref_pic_list_reordering_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+		end
+
+	ReadRefPicList1Reord.Done.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tref_pic_list_reordering_flag: "+ValueOfVLD);
+			end
+			ref_pic_list_reordering_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+		end
+
+
+	CheckRefPicLXReord.IsEqualToTrue: action
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			ref_pic_list_reordering_flag
+		end
+
+
+	ReordPicNumIdcL0.IsNotEqualTo3.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      abs_diff_pic_num_minus1
+			//                or
+			//        long_term_pic_num
+			TypeOfVLD        :[ VLD_UE ],
+
+			RefReordering_l0 :[ValueOfVLD]
+		guard
+			ValueOfVLD != 3,
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+	ReordPicNumIdcL0.IsNotEqualTo3.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      abs_diff_pic_num_minus1
+			//                or
+			//        long_term_pic_num
+			TypeOfVLD        :[ VLD_UE ]
+		guard
+			ValueOfVLD != 3,
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+
+	ReordPicNumIdcL1.IsNotEqualTo3.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      abs_diff_pic_num_minus1
+			//                or
+			//        long_term_pic_num
+			TypeOfVLD        :[ VLD_UE ],
+
+			RefReordering_l1 :[ValueOfVLD]
+		guard
+			ValueOfVLD != 3,
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+	ReordPicNumIdcL1.IsNotEqualTo3.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      abs_diff_pic_num_minus1
+			//                or
+			//        long_term_pic_num
+			TypeOfVLD        :[ VLD_UE ]
+		guard
+			ValueOfVLD != 3,
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+
+	ReordPicNumIdcL0.IsEqualTo3.IsNewPic: action
+			ValVLD           :[ValueOfVLD]
+				==>
+			RefReordering_l0 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+	ReordPicNumIdcL0.IsEqualTo3.IsNewSlice: action
+			ValVLD           :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+
+	ReordPicNumIdcL1.IsEqualTo3.IsNewPic: action
+			ValVLD           :[ValueOfVLD]
+				==>
+			RefReordering_l1 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+	ReordPicNumIdcL1.IsEqualTo3.IsNewSlice: action
+			ValVLD           :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc: "+ValueOfVLD);
+			end
+		end
+
+
+	ReadPicNumIdcParamL0.Done.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD        :[ VLD_UE ],
+
+			RefReordering_l0 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
+			end
+		end
+
+	ReadPicNumIdcParamL0.Done.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD        :[ VLD_UE ]
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
+			end
+		end
+
+
+	ReadPicNumIdcParamL1.Done.IsNewPic: action
+			ValVLD           :[ValueOfVLD]
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD        :[ VLD_UE ],
+
+			RefReordering_l1 :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
+			end
+		end
+
+	ReadPicNumIdcParamL1.Done.IsNewSlice: action
+			ValVLD           :[ValueOfVLD]
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD        :[ VLD_UE ]
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\treordering_of_pic_nums_idc Param: "+ValueOfVLD);
+			end
+		end
+
+
+	SendEndSliceHeader: action
+				==>
+			TypeOfVLD              :[SKIP_NAL],
+			SDataNumRefIdxLXActive :[num_ref_idx_l0_active , num_ref_idx_l1_active]
+		end
+
+
+	schedule fsm ReadSliceTypeDone:
+		ReadSliceTypeDone               (ReadSliceType                        )--> CheckSliceType;
+
+		CheckSliceType                  (SliceType.IsEqualToP                 )--> ReadNumRefIdxActDone;
+		CheckSliceType                  (SliceType.IsEqualToB                 )--> Read_DirecSpat_NumRefIdxActDone;
+		CheckSliceType                  (SliceType.IsEqualToI                 )--> EndRefPicList;
+
+		/* slice_type = P */
+		ReadNumRefIdxActDone            (ReadNumRefIdxAct.Done                )--> CheckNumRefIdxActOverRide4P;
+
+		CheckNumRefIdxActOverRide4P     (CheckNumRefIdxActOverRide.SliceTypeP )--> ReadNumRefIdxOverRideL0;
+		CheckNumRefIdxActOverRide4P     (SendNumRefIdxlXActive                )--> ReadRefPicL0ReordAsked4P;
+
+		ReadNumRefIdxOverRideL0         (ReadNumRefIdxOverRide.L0             )--> SendNumRefIdxl0Active4P;
+
+		SendNumRefIdxl0Active4P         (SendNumRefIdxlXActive                )--> ReadRefPicL0ReordAsked4P;
+
+		ReadRefPicL0ReordAsked4P        (ReadRefPicListXReord.Asked           )--> ReadRefPicL0ReordDone4P;
+
+		ReadRefPicL0ReordDone4P         (ReadRefPicList0Reord.Done            )--> CheckRefPicL0Reord4P;
+
+		CheckRefPicL0Reord4P            (CheckRefPicLXReord.IsEqualToTrue     )--> CheckReordPicNumIdc4P;
+		CheckRefPicL0Reord4P            (SendEndSliceHeader                   )--> ReadSliceTypeDone;
+
+		CheckReordPicNumIdc4P           (ReordPicNumIdcL0.IsNotEqualTo3       )--> ReadPicNumIdcParamDone4P;
+		CheckReordPicNumIdc4P           (ReordPicNumIdcL0.IsEqualTo3          )--> EndRefPicList;
+
+		ReadPicNumIdcParamDone4P        (ReadPicNumIdcParamL0.Done            )--> CheckReordPicNumIdc4P;
+
+		/* slice_type = B */
+		Read_DirecSpat_NumRefIdxActDone (Read_DirecSpat_NumRefIdxAct.Done     )--> CheckNumRefIdxActOverRide4B;
+
+		CheckNumRefIdxActOverRide4B     (CheckNumRefIdxActOverRide.SliceTypeB )--> ReadNumRefIdxOverRideL0_L1;
+		CheckNumRefIdxActOverRide4B     (SendNumRefIdxlXActive                )--> ReadRefPicL0ReordAsked4B;
+
+		ReadNumRefIdxOverRideL0_L1      (ReadNumRefIdxOverRide.L0_L1          )--> SendNumRefIdxl0Active4B;
+
+		SendNumRefIdxl0Active4B         (SendNumRefIdxlXActive                )--> ReadRefPicL0ReordAsked4B;
+			/* List 0 */
+		ReadRefPicL0ReordAsked4B        (ReadRefPicListXReord.Asked           )--> ReadRefPicL0ReordDone4B;
+
+		ReadRefPicL0ReordDone4B         (ReadRefPicList0Reord.Done            )--> CheckRefPicL0Reord4B;
+
+		CheckRefPicL0Reord4B            (CheckRefPicLXReord.IsEqualToTrue     )--> CheckReordPicNumIdcL04B;
+		CheckRefPicL0Reord4B            (ReadRefPicListXReord.Asked           )--> ReadRefPicL1ReordDone4B;
+
+		CheckReordPicNumIdcL04B         (ReordPicNumIdcL0.IsNotEqualTo3       )--> ReadPicNumIdcParamDoneL04B;
+		CheckReordPicNumIdcL04B         (ReordPicNumIdcL0.IsEqualTo3          )--> ReadRefPicL1ReordAsked4B;
+
+		ReadPicNumIdcParamDoneL04B      (ReadPicNumIdcParamL0.Done            )--> CheckReordPicNumIdcL04B;
+			/* List 1 */
+		ReadRefPicL1ReordAsked4B        (ReadRefPicListXReord.Asked           )--> ReadRefPicL1ReordDone4B;
+
+		ReadRefPicL1ReordDone4B         (ReadRefPicList1Reord.Done            )--> CheckRefPicL1Reord4B;
+
+		CheckRefPicL1Reord4B            (CheckRefPicLXReord.IsEqualToTrue     )--> CheckReordPicNumIdcL14B;
+		CheckRefPicL1Reord4B            (SendEndSliceHeader                   )--> ReadSliceTypeDone;
+
+		CheckReordPicNumIdcL14B         (ReordPicNumIdcL1.IsNotEqualTo3       )--> ReadPicNumIdcParamDoneL14B;
+		CheckReordPicNumIdcL14B         (ReordPicNumIdcL1.IsEqualTo3          )--> EndRefPicList;
+
+		ReadPicNumIdcParamDoneL14B      (ReadPicNumIdcParamL1.Done            )--> CheckReordPicNumIdcL14B;
+
+		EndRefPicList                   (SendEndSliceHeader                   )--> ReadSliceTypeDone;
+	end
+
+	priority
+		SliceType.IsEqualToP             > SliceType.IsEqualToB        > SliceType.IsEqualToI;
+		CheckNumRefIdxActOverRide        > SendNumRefIdxlXActive;
+		CheckRefPicLXReord.IsEqualToTrue > SendEndSliceHeader;
+		ReordPicNumIdcL0.IsNotEqualTo3   > ReordPicNumIdcL0.IsEqualTo3;
+		ReordPicNumIdcL1.IsNotEqualTo3   > ReordPicNumIdcL1.IsEqualTo3;
+	end
+
+end

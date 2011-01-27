@@ -1,0 +1,645 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import MPEG.Common.Imp_ByteOperation.*;
+
+actor Algo_DecodeMacroblockLayer()
+	int (size=32) ValVLD,
+	int (size=8)  Parameters,
+
+	uint(size=4) SubMbType,
+
+	uint(size=5)  Total_CoeffLuma,
+	uint(size=5)  Total_CoeffChroma
+		==>
+	int (size=6)  TypeOfVLD,
+	int (size=32) VLDParam,
+
+	//MbPred parameters
+	uint(size=6)  MbPredParameters,
+
+	//SubMbPred parameters
+	uint(size=6)  SubMbPredParameters,
+
+	//Residual Parameters
+	uint(size=6)  ResParameters,
+
+	uint(size=5)  SData_Total_CoeffLuma,
+	uint(size=5)  SData_Total_CoeffChroma,
+
+	uint(size=6)  MbType,
+	bool          MergeTransfSz8x8,
+	uint(size=8)   pix_I_PCM_Y,
+	uint(size=8)   pix_I_PCM_U,
+	uint(size=8)   pix_I_PCM_V,
+
+	uint(size=5)  NbCoeffInMB,
+	bool          SkipMacroBlk,
+	bool          IsIPCM,
+	uint(size=16) cbp_blk,
+	int (size=8)  Qp_Y_Cb_Cr,
+	int (size=8)  QpFeedback
+		:
+
+
+/*
+*
+* Constants
+*
+*/
+
+	uint(size=4) SLICE_TYPE_P  = 0;
+	uint(size=4) SLICE_TYPE_B  = 1;
+	uint(size=4) SLICE_TYPE_I  = 2;
+	uint(size=4) SLICE_TYPE_SP = 3;
+	uint(size=4) SLICE_TYPE_SI = 4;
+
+	List(type: uint(size=4), size=8) TabCodedBlockPatternChroma = [  0,  1,  2,  0,  1,  2,  0,  0];
+	List(type: uint(size=4), size=8) TabCodedBlockPatternLuma   = [  0,  0,  0, 15, 15, 15,  0,  0];
+	List(type: uint(size=4), size=16) InverseScan4x4Tab         = [ 0, 1, 4, 5, 2, 3, 6, 7, 8, 9, 12, 13, 10, 11, 14, 15 ];
+
+	List(type: int (size=4), size=64) NumMbPart =
+		[
+		  1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
+		  1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 , 1 ,
+		  1 , 1 , 1 , 1 , 1 , 1 , 1 , 2 , 2 , 4 ,
+		  4 ,-1 , 1 , 1 , 1 , 2 , 2 , 2 , 2 , 2 ,
+		  2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 , 2 ,
+		  2 , 2 , 2 , 4 ,-1 ,-1 ,-1 ,-1 ,-1 ,-1 ,
+		 -1 ,-1 ,-1 ,-1
+		];
+
+	List ( type: List ( type: List ( type: uint(size=6), size=2), size=48 ), size=4) VLD_ME_TABLE =
+		[
+			[[15, 0], [ 0, 1], [ 7, 2], [11, 4], [13, 8], [14, 3], [ 3, 5], [ 5,10], [10,12], [12,15],
+			 [ 1, 7], [ 2,11], [ 4,13], [ 8,14], [ 6, 6], [ 9, 9], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0],
+			 [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0],
+			 [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0],
+			 [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0]
+			],
+			[[47, 0], [31,16], [15, 1], [ 0, 2], [23, 4], [27, 8], [29,32], [30, 3], [ 7, 5], [11, 10],
+			 [13,12], [14,15], [39,47], [43, 7], [45,11], [46,13], [16,14], [ 3, 6], [ 5, 9], [10,31],
+			 [12,35], [19,37], [21,42], [26,44], [28,33], [35,34], [37,36], [42,40], [44,39], [ 1,43],
+			 [ 2,45], [ 4,46], [ 8,17], [17,18], [18,20], [20,24], [24,19], [ 6,21], [ 9,26], [22,28],
+			 [25,23], [32,27], [33,29], [34,30], [36,22], [40,25], [38,38], [41,41]
+			],
+			[[47, 0], [31,16], [15, 1], [ 0, 2], [23, 4], [27, 8], [29,32], [30, 3], [ 7, 5], [11, 10],
+			 [13,12], [14,15], [39,47], [43, 7], [45,11], [46,13], [16,14], [ 3, 6], [ 5, 9], [10,31],
+			 [12,35], [19,37], [21,42], [26,44], [28,33], [35,34], [37,36], [42,40], [44,39], [ 1,43],
+			 [ 2,45], [ 4,46], [ 8,17], [17,18], [18,20], [20,24], [24,19], [ 6,21], [ 9,26], [22,28],
+			 [25,23], [32,27], [33,29], [34,30], [36,22], [40,25], [38,38], [41,41]
+			],
+			[[15, 0], [ 0, 1], [ 7, 2], [11, 4], [13, 8], [14, 3], [ 3, 5], [ 5,10], [10,12], [12,15],
+			 [ 1, 7], [ 2,11], [ 4,13], [ 8,14], [ 6, 6], [ 9, 9], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0],
+			 [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0],
+			 [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0],
+			 [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0], [ 0, 0]
+			]
+		];
+
+	List (type:uint(size=6),size=64) QP_TAB := 
+		[
+			 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+			10,11,12,13,14,15,16,17,18,19,
+			20,21,22,23,24,25,26,27,28,29,
+			29,30,31,32,32,33,34,34,35,35,
+			36,36,37,37,37,38,38,38,39,39,
+			39,39,39,39,39,39,39,39,42,42,
+			42,42,42,42
+		];
+
+	bool DEBUG_FLAG_DECODED = false;
+
+
+	uint(size=6)  mb_type                        := 0;
+	bool          noSubMbPartSizeLessThan8x8Flag := true;
+	bool          transform_size_8x8_flag        := true;
+	uint(size=6)  coded_block_pattern            := 0;
+	uint(size=6)  CodedBlockPatternLuma          := 0;
+	uint(size=6)  CodedBlockPatternChroma        := 0;
+	//int (size=32) mb_qp_delta                    := 0;
+	bool          entropy_coding_mode_flag;
+	//SliceData Parameters
+	uint(size=4)  slice_type;
+	uint(size=4)  bit_depth_luma;
+	uint(size=4)  bit_depth_chroma;
+	bool          direct_8x8_inference_flag;
+	bool          transform_8x8_mode_flag;
+	uint(size=2)  Chroma_Array_Type;
+	uint(size=5)  num_ref_idx_l0_active;
+	uint(size=5)  num_ref_idx_l1_active;
+	bool          mb_field_decoding;
+	List(type: uint(size=5), size=12) nATab;
+	List(type: uint(size=5), size=12) nBTab;
+	bool          LeftMb_Exists;
+	bool          AboveMb_Exists;
+	uint(size=2)  NumC8x8;
+	int (size=8)  QpValue;
+	int (size=8)  Qp_CbValue;
+	int (size=8)  Qp_CrValue;
+	int (size=5)  chroma_qp_index_offset;
+	int (size=5)  second_chroma_qp_index_offset;
+
+	uint(size=9)  NbCoeffChroma;
+	uint(size=9)  ChromaReadIdx  := 0;
+	uint(size=9)  ChromaWriteIdx := 0;
+
+	function Is_Intra_8x8(uint MbType)
+				-->
+			bool
+		:
+			if( (MbType = BLOCK_TYPE_I_NxN) and transform_size_8x8_flag ) then
+				true
+			else
+				false
+			end
+		end
+
+	function Is_Intra_4x4(uint MbType)
+				-->
+			bool
+		:
+			if( (MbType = BLOCK_TYPE_I_NxN) and  (not transform_size_8x8_flag) ) then
+				true
+			else
+				false
+			end
+		end
+
+	ReadMbType.Asked: action
+				==>
+			//              mb_type
+			TypeOfVLD    :[  VLD_UE  ]
+		end
+
+	ReadParameters: action
+			Parameters         :[Param] repeat 37
+				==>
+			MergeTransfSz8x8   :[transform_8x8_mode_flag]
+		do
+			direct_8x8_inference_flag     := GetFlag(Param[0], 0);
+			transform_8x8_mode_flag       := GetFlag(Param[0], 1);
+			mb_field_decoding             := GetFlag(Param[0], 2);
+			entropy_coding_mode_flag      := GetFlag(Param[0], 3);
+			LeftMb_Exists                 := GetFlag(Param[0], 4);
+			AboveMb_Exists                := GetFlag(Param[0], 5);
+
+			slice_type                    := Param[1];
+			bit_depth_luma                := Param[2];
+			bit_depth_chroma              := Param[3];
+			Chroma_Array_Type             := Param[4];
+			num_ref_idx_l0_active         := Param[5];
+			num_ref_idx_l1_active         := Param[6];
+			NumC8x8                       := Param[7];
+			QpValue                       := Param[8];
+			chroma_qp_index_offset        := Param[9];
+			second_chroma_qp_index_offset := Param[10];
+			Qp_CbValue                    := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
+			Qp_CrValue                    := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
+			foreach int i in 0 .. 11
+			do
+				nATab[i] := Param[11 + i];
+				nBTab[i] := Param[23 + i];
+			end
+			NbCoeffChroma := Param[35] * Param[36];
+		end
+
+	ReadMbType.Done: action
+			ValVLD             :[ValueOfVLD]
+				==>
+			MbType             :[mb_type]
+		var
+			uint         Idx
+		do
+			mb_type                       :=
+				if((slice_type = SLICE_TYPE_SI) or (slice_type = SLICE_TYPE_I))then
+					ValueOfVLD
+				else
+					if((slice_type = SLICE_TYPE_SP) or (slice_type = SLICE_TYPE_P))then
+						if(ValueOfVLD >= 5) then
+							if(ValueOfVLD < 31)then
+								ValueOfVLD - 5
+							else
+								0
+							end
+						else
+							ValueOfVLD + 26
+						end
+					else
+						if(ValueOfVLD < 23) then
+							ValueOfVLD + 26 + 5
+						else
+							if(ValueOfVLD < 49) then
+								ValueOfVLD - 23
+							else
+								0
+							end
+						end
+					end
+				end;
+
+			transform_size_8x8_flag        := false;
+			noSubMbPartSizeLessThan8x8Flag := true;
+			if(DEBUG_FLAG_DECODED)then
+				println("mb_type : "+ValueOfVLD);
+			end
+			Idx := 
+				if(slice_type = SLICE_TYPE_I or slice_type = SLICE_TYPE_SI)then
+					(ValueOfVLD-1)/4
+				else
+					if(slice_type != SLICE_TYPE_B)then
+						(ValueOfVLD-1-5)/4
+					else
+						(ValueOfVLD-1 - 5 - 23)/4
+					end
+				end;
+			CodedBlockPatternLuma   := TabCodedBlockPatternLuma[Idx & 7];
+			CodedBlockPatternChroma := TabCodedBlockPatternChroma[Idx & 7];
+			coded_block_pattern     := CodedBlockPatternLuma + CodedBlockPatternChroma * 16;
+		end
+
+	CheckMbType.IsIPCM: action
+				==>
+			//    pcm_alignment_zero_bit , pcm_sample_luma[ i ]
+			TypeOfVLD :[   ValTypeOfVLD    ] repeat 257,
+			//Orcc doesn't support it yet :
+			//TypeOfVLD    :[ [BYTE_ALIGNED_REQUIRED] +  [ValTypeOfVLDecod]repeat 256 ],
+			VLDParam  :[ BitDepthChromaTab ] repeat 256,
+
+			SData_Total_CoeffLuma   :[[16: for int s in 0 .. 15]] repeat 16,	
+			SData_Total_CoeffChroma :[[16: for int s in 0 .. 31]] repeat 32,
+			QpFeedback              :[QpValue , Qp_CbValue , Qp_CrValue],
+
+			IsIPCM :[true]
+		guard
+			mb_type = BLOCK_TYPE_I_PCM
+		var
+			List(type: uint(size=3), size=257) ValTypeOfVLD      := [READ_BITS        : for int s in 0 .. 256],
+			//List(type: uint(size=3), size=256) ValTypeOfVLDecod   = [READ_BITS        : for int s in 0 .. 255],
+			List(type: uint(size=5), size=256) BitDepthChromaTab  = [bit_depth_chroma : for int s in 0 .. 255]
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("IsIPCM");
+			end
+			ValTypeOfVLD[0] := BYTE_ALIGNED_REQUIRED;
+		end
+
+	ReadPcmSampleLuma.Done: action
+			ValVLD       :[ValueOfVLD] repeat 256
+				==>
+			pix_I_PCM_Y  :[ValueOfVLD] repeat 256
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("");
+				/* Forward to the output for the pcm decoding */
+				foreach int a in 0 .. 255
+				do
+					println("\t\tpcm_sample_luma[" + a + "] : " + ValueOfVLD[a]);
+				end
+				println("");
+			end
+		end
+
+	ReadPcmSampleChroma.Asked: action
+				==>
+			//            pcm_sample_chroma[ i ]
+			TypeOfVLD :[     READ_BITS    ],
+			VLDParam  :[ bit_depth_chroma ]
+		guard
+			ChromaWriteIdx < NbCoeffChroma
+		do
+			ChromaWriteIdx  := ChromaWriteIdx + 1;
+		end
+
+	ReadPcmSampleChroma.UComponent: action
+			ValVLD      :[ValueOfVLD]
+				==>
+			pix_I_PCM_U :[ValueOfVLD]
+		guard
+			ChromaReadIdx < ChromaWriteIdx
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tpcm_sample_chroma1[" + ChromaReadIdx + "] : " + ValueOfVLD);
+			end
+			ChromaReadIdx := ChromaReadIdx + 1;
+		end
+
+	ReadPcmSampleChroma.VComponent: action
+			ValVLD      :[ValueOfVLD]
+				==>
+			pix_I_PCM_V :[ValueOfVLD]
+		guard
+			ChromaReadIdx < ChromaWriteIdx
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tpcm_sample_chroma2[" + ChromaReadIdx + "] : " + ValueOfVLD);
+			end
+			ChromaReadIdx := ChromaReadIdx + 1;
+		end
+
+	ReadPcmSampleChroma.Done: action ==>
+		guard
+			ChromaReadIdx = NbCoeffChroma
+		do
+			ChromaReadIdx  := 0;
+			ChromaWriteIdx := 0;
+			if(DEBUG_FLAG_DECODED)then
+				println("");
+			end
+		end
+
+	CheckMbType.IsNotIPCM: action
+				==>
+			NbCoeffInMB :[NbCoeff],
+			IsIPCM      :[false]
+		var
+			uint(size=5) NbCoeff
+		do
+			NbCoeff := 16 + 1 + 1 + 4 + 4; // 16 Luma AC + 1 * 2 Chroma DC + 4 * 2 Chroma AC
+			if(Is_Intra_16x16(mb_type))then
+				NbCoeff := NbCoeff + 1;// 1 Luma DC
+			end
+		end
+
+	LaunchSubMbPred: action
+				==>
+			TypeOfVLD :[LAUNCH_ACTOR],
+			VLDParam  :[SUB_MB_PRED],
+
+			SubMbPredParameters :[mb_type,num_ref_idx_l0_active,num_ref_idx_l1_active,
+			                      SetFlag(mb_field_decoding,0,0)]
+		guard
+			NumMbPart[mb_type & 0x3F] = 4
+		end
+
+	CheckSubMbType: action
+			SubMbType :[sub_mb_type] repeat 4
+				==>
+		do
+			if(slice_type = SLICE_TYPE_B) then
+				foreach int mbPartIdx in 0 .. 3
+				do
+					if(sub_mb_type[mbPartIdx] > 3)then
+						noSubMbPartSizeLessThan8x8Flag := false;
+					else
+						if((sub_mb_type[mbPartIdx] = 0) and (not direct_8x8_inference_flag))then
+							noSubMbPartSizeLessThan8x8Flag := false;
+						end
+					end
+				end
+			else
+				if((slice_type = SLICE_TYPE_P) or (slice_type = SLICE_TYPE_SP))then
+					foreach int mbPartIdx in 0 .. 3
+					do
+						if(sub_mb_type[mbPartIdx] != 0)then
+							noSubMbPartSizeLessThan8x8Flag := false;
+						end
+					end
+				end
+			end
+		end
+
+	ReadTransformSize.Asked: action
+			==>
+			//        transform_size_8x8_flag
+			TypeOfVLD :[ READ_BITS ],
+			VLDParam  :[     1     ]
+		guard
+			transform_8x8_mode_flag = true,
+			mb_type = BLOCK_TYPE_I_NxN
+		do
+			println("ReadTransformSize.Asked not implemented yet");
+		end
+
+	LaunchMbPred: action
+				==>
+			TypeOfVLD               :[LAUNCH_ACTOR],
+			VLDParam                :[MB_PRED],
+
+			MbPredParameters :[mb_type               , Chroma_Array_Type , 
+			                   num_ref_idx_l0_active , num_ref_idx_l1_active ,
+			                   SetFlag(transform_size_8x8_flag,1,SetFlag(mb_field_decoding,0,0))]
+		end
+
+	ReadCodedBlockPattern.Asked: action
+				==>
+			//        coded_block_pattern
+			TypeOfVLD    :[  VLD_UE  ] //VLD_ME
+		guard
+			not(Is_Intra_16x16(mb_type))
+		end
+
+	ReadCodedBlockPattern.Done: action
+			ValVLD :[CodeNum]
+				==>
+		do
+			coded_block_pattern :=
+				if( Is_Intra_4x4(mb_type) or Is_Intra_8x8(mb_type) )then
+					VLD_ME_TABLE[Chroma_Array_Type][CodeNum][0]
+				else
+					VLD_ME_TABLE[Chroma_Array_Type][CodeNum][1]
+				end;
+			CodedBlockPatternLuma   := coded_block_pattern mod 16;
+			CodedBlockPatternChroma := coded_block_pattern  /  16;
+			if(DEBUG_FLAG_DECODED)then
+				println("coded_block_pattern : "+coded_block_pattern);
+			end
+		end
+
+	ReadTransformSize8x8.Asked: action
+				==>
+			//        transform_size_8x8_flag
+			TypeOfVLD :[ READ_BITS ],
+			VLDParam  :[     1     ]
+		guard
+			CodedBlockPatternLuma  > 0,
+			mb_type               != BLOCK_TYPE_I_NxN,
+			transform_8x8_mode_flag,
+			noSubMbPartSizeLessThan8x8Flag,
+			(mb_type != BLOCK_TYPE_B_DIRECT_16x16) or direct_8x8_inference_flag
+		end
+
+	ReadTransformSize8x8.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+		do
+			transform_size_8x8_flag :=
+				if(ValueOfVLD = 0) then
+					false
+				else
+					true
+				end;
+		end
+
+	ReadMbQpDelta.Asked: action
+				==>
+			//            mb_qp_delta
+			TypeOfVLD    :[  VLD_SE  ]
+		guard
+			   (CodedBlockPatternLuma   > 0)
+			or (CodedBlockPatternChroma > 0)
+			or Is_Intra_16x16(mb_type)
+		end
+
+	ReadMbQpDelta.Done: action
+			ValVLD :[ValueOfVLD]
+				==>
+			Qp_Y_Cb_Cr :[QpValue , Qp_CbValue , Qp_CrValue],
+			QpFeedback              :[QpValue , Qp_CbValue , Qp_CrValue]
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("mb_qp_delta : "+ValueOfVLD);
+			end
+			//mb_qp_delta := ValueOfVLD;
+			QpValue      := (QpValue + ValueOfVLD + 52) mod 52;
+			Qp_CbValue := QP_TAB[(QpValue + chroma_qp_index_offset) & 0x3F];
+			Qp_CrValue := QP_TAB[(QpValue + second_chroma_qp_index_offset) & 0x3F];
+		end
+
+	LaunchResidual: action
+				==>
+			TypeOfVLD            :[LAUNCH_ACTOR],
+			VLDParam             :[RESIDUAL],
+
+			ResParameters        :[Parameters] repeat 32,
+
+			SkipMacroBlk         :[false]
+		var
+			List(type: uint(size=6), size=32) Parameters,
+			uint(size=6) Flag
+		do
+			Flag := SetFlag(entropy_coding_mode_flag , 0 , SetFlag( transform_size_8x8_flag, 1 , 0    ) );
+			Flag := SetFlag( false /*BmFlag*/        , 2 , SetFlag( LeftMb_Exists          , 3 , Flag ) );
+			Flag := SetFlag( AboveMb_Exists          , 4 ,  Flag );
+			Parameters[0] := Flag;
+			Parameters[1] := mb_type;
+			Parameters[2] := 0;//StartIdx
+			Parameters[3] := 15;//EndIdx
+			Parameters[4] := CodedBlockPatternLuma;
+			Parameters[5] := CodedBlockPatternChroma;
+			Parameters[6] := Chroma_Array_Type;
+			Parameters[7] := NumC8x8;
+			foreach int i in 0 .. 11
+			do
+				Parameters[8  + i] := nATab[i];
+				Parameters[20 + i] := nBTab[i];
+			end
+		end
+
+	GetResidualCoeffToken: action
+			Total_CoeffLuma  :[CoLu]    repeat 16,
+			Total_CoeffChroma:[CoLuChe] repeat 32//It's the story of a guy, a normal guy ...
+				==>
+			SData_Total_CoeffLuma  :[CoLu]    repeat 16,
+			SData_Total_CoeffChroma:[CoLuChe] repeat 32,
+
+			cbp_blk :[CbpBlk]
+		var
+			uint(size=16) CbpBlk := 0
+		do
+			foreach int i in 0 .. 15
+			do
+				CbpBlk := CbpBlk << 1;
+				if(CoLu[InverseScan4x4Tab[15 - i]] > 0)then
+					CbpBlk := CbpBlk + 1;
+				end
+			end
+		end
+
+	NoResidual: action
+				==>
+			SData_Total_CoeffLuma   :[[0: for int s in 0 .. 15]] repeat 16,
+			SData_Total_CoeffChroma :[[0: for int s in 0 .. 31]] repeat 32,
+			SkipMacroBlk            :[true],
+			Qp_Y_Cb_Cr              :[QpValue , Qp_CbValue , Qp_CrValue],
+			QpFeedback              :[QpValue , Qp_CbValue , Qp_CrValue]
+		end
+
+	SendEndSliceHeader: action
+				==>
+			TypeOfVLD :[SKIP_NAL]
+		end
+
+	schedule fsm ReadMbType_Asked:
+		ReadMbType_Asked          (ReadMbType.Asked               )--> ReadParameters;
+
+		ReadParameters            (ReadParameters                 )--> ReadMbType;
+
+		ReadMbType                (ReadMbType.Done                )--> CheckMbType;
+
+		CheckMbType               (CheckMbType.IsIPCM             )--> ReadPcmSampleLuma;
+		CheckMbType               (CheckMbType.IsNotIPCM          )--> CheckMbPred;
+
+		CheckMbPred               (LaunchSubMbPred                )--> CheckSubMbType;
+		CheckMbPred               (ReadTransformSize.Asked        )--> ReadTransformSize8x8_1;
+		CheckMbPred               (LaunchMbPred                   )--> Check4CodedBlockPattern;
+
+		/* PCM Macroblock */
+		ReadPcmSampleLuma         (ReadPcmSampleLuma.Done         )--> ReadPcmSampleChroma1;
+
+		ReadPcmSampleChroma1      (ReadPcmSampleChroma.Asked      )--> ReadPcmSampleChroma1;
+		ReadPcmSampleChroma1      (ReadPcmSampleChroma.UComponent )--> ReadPcmSampleChroma1;
+		ReadPcmSampleChroma1      (ReadPcmSampleChroma.Done       )--> ReadPcmSampleChroma2;
+
+		ReadPcmSampleChroma2      (ReadPcmSampleChroma.Asked      )--> ReadPcmSampleChroma2;
+		ReadPcmSampleChroma2      (ReadPcmSampleChroma.VComponent )--> ReadPcmSampleChroma2;
+		ReadPcmSampleChroma2      (ReadPcmSampleChroma.Done       )--> SendEndSliceHeader;
+
+		/* Other Macroblock */
+		CheckSubMbType            (CheckSubMbType                 )--> Check4CodedBlockPattern;
+
+		ReadTransformSize8x8_1    (ReadTransformSize8x8.Done      )--> LaunchMbPred;
+
+		LaunchMbPred              (LaunchMbPred                   )--> Check4CodedBlockPattern;
+
+		Check4CodedBlockPattern   (ReadCodedBlockPattern.Asked    )--> ReadCodedBlockPattern;
+		Check4CodedBlockPattern   (ReadMbQpDelta.Asked            )--> ReadMbQpDelta;
+		Check4CodedBlockPattern   (NoResidual                     )--> SendEndSliceHeader;
+	
+		ReadCodedBlockPattern     (ReadCodedBlockPattern.Done     )--> Check4TransformSize8x8;
+
+		Check4TransformSize8x8    (ReadTransformSize8x8.Asked     )--> ReadTransformSize8x8_2;
+		Check4TransformSize8x8    (ReadMbQpDelta.Asked            )--> ReadMbQpDelta;
+		Check4TransformSize8x8    (NoResidual                     )--> SendEndSliceHeader;
+
+		ReadTransformSize8x8_2    (ReadTransformSize8x8.Done      )--> Check4MbQpDelta;
+
+		Check4MbQpDelta           (ReadMbQpDelta.Asked            )--> ReadMbQpDelta;
+		Check4MbQpDelta           (NoResidual                     )--> SendEndSliceHeader;
+
+		ReadMbQpDelta             (ReadMbQpDelta.Done             )--> LaunchResidual;
+
+		LaunchResidual            (LaunchResidual                 )--> GetResidualCoeffToken;
+
+		GetResidualCoeffToken     (GetResidualCoeffToken          )--> SendEndSliceHeader;
+
+		SendEndSliceHeader        (SendEndSliceHeader             )--> ReadMbType_Asked;
+	end
+
+	priority
+		CheckMbType.IsIPCM             > CheckMbType.IsNotIPCM;
+		LaunchSubMbPred                > ReadTransformSize.Asked > LaunchMbPred;
+		ReadCodedBlockPattern.Asked    > ReadMbQpDelta.Asked;
+		ReadTransformSize8x8.Asked     > ReadMbQpDelta.Asked;
+		ReadMbQpDelta.Asked            > NoResidual;
+		ReadPcmSampleChroma.VComponent > ReadPcmSampleChroma.Asked;
+		ReadPcmSampleChroma.UComponent > ReadPcmSampleChroma.Asked;
+		ReadPcmSampleChroma.Asked      > ReadPcmSampleChroma.Done;
+	end
+end

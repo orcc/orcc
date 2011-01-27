@@ -1,0 +1,520 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_MacroBlockInfo.*;
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+import MPEG.Common.Imp_ByteOperation.*;
+
+actor Algo_DecodeResidual()
+	uint(size=6)  Parameters,
+
+	uint(size=5) Total_Coeff
+		==>
+	int (size=6)  TypeOfVLD,
+	int (size=32) ActorLaunched,
+
+	int (size=8) ResBlkParameters,
+
+	uint(size=5) DecMbLayerTotal_CoeffLuma,
+	uint(size=5) DecMbLayerTotal_CoeffChroma,
+
+	bool         Skip_Block
+		:
+
+	bool         CAVLC_ENTROPY = false;
+//	bool         CABAC_ENTROPY = true;
+
+	uint(size=2) LUMA_COMPONENT      = 0;
+	uint(size=2) CHROMA_DC_COMPONENT = 1;
+	uint(size=2) CHROMA_AC_COMPONENT = 2;
+
+	uint(size=1) iCb = 0;
+	uint(size=1) iCr = 1;
+
+	uint(size=2) RESIDUAL_LUMA_LUMA_OUTPUT := 0;
+//	uint(size=2) RESIDUAL_LUMA_CHROMA1_OUTPUT := 0;
+//	uint(size=2) RESIDUAL_LUMA_CHROMA2_OUTPUT := 0;
+
+
+	bool          bmFlag;
+	int (size=5)  startIdx;
+	uint(size=4)  endIdx;
+	uint(size=4)  StartIdxSent;
+	uint(size=4)  EndIdxSent;
+	uint(size=2)  chroma_array_type;
+	uint(size=2)  NumC8x8;	
+
+	bool          entropy_coding_mode_flag;
+	uint(size=6)  mb_type;
+	bool          transform_size_8x8_flag;
+	uint(size=6)  CodedBlockPatternLuma;
+	uint(size=6)  CodedBlockPatternChroma;
+	uint(size=4)  ActorSelected;
+	List(type: uint(size=5), size = 24 ) TotalCoeffTabLuma;
+	List(type: List(type: uint(size=5), size = 24 ), size=2) TotalCoeffTabChroma;
+	List(type: bool        , size = 24 ) MbExists := [true : for int s in 0 .. 23];
+	List(type: uint(size=5), size = 16 ) IdxLeftNeighbour  = [16, 0,17, 2, 1, 4, 3, 6,18, 8,19,10, 9,12,11,14];
+	List(type: uint(size=5), size = 16 ) IdxAboveNeighbour = [20,21, 0, 1,22,23, 4, 5, 2, 3, 8, 9, 6, 7,12,13];
+	uint(size=5) IdxCurrMb := 0;
+	uint(size=3) i8x8Loop;
+	uint(size=3) iCbCrLoop;
+	uint(size=2) Component_type := 0;
+	uint(size=5) maxNumCoeff;
+
+	uint(size=2) ResidualLumaOutput := 0;
+
+	GetParameters: action
+			Parameters        :[Param] repeat 32
+				==>
+		var
+			bool LeftMbExists,
+			bool AboveMbExists
+		do
+			entropy_coding_mode_flag := GetFlag(Param[0],0);
+			transform_size_8x8_flag  := GetFlag(Param[0],1);
+			bmFlag                   := GetFlag(Param[0],2);
+			LeftMbExists             := GetFlag(Param[0],3);
+			AboveMbExists            := GetFlag(Param[0],4);
+			mb_type                  := Param[1];
+			startIdx                 := Param[2];
+			endIdx                   := Param[3];
+			CodedBlockPatternLuma    := Param[4];
+			CodedBlockPatternChroma  := Param[5];
+			chroma_array_type        := Param[6];
+			NumC8x8                  := Param[7];
+			ActorSelected :=
+				if(entropy_coding_mode_flag = CAVLC_ENTROPY)then
+					RESIDUAL_BLOCK_CAVLC
+				else
+					RESIDUAL_BLOCK_CABAC
+				end;
+			TotalCoeffTabLuma   :=  [0: for int i in 0 .. 23];
+			TotalCoeffTabChroma := [[0: for int i in 0 .. 23]: for int j in 0 .. 1];
+			foreach int i in 0 .. 3
+			do
+				TotalCoeffTabLuma  [16+i]      := Param[8 + i];
+				TotalCoeffTabChroma[iCb][16+i] := Param[8 + 4 + i];
+				TotalCoeffTabChroma[iCr][16+i] := Param[8 + 8 + i];
+				MbExists           [16+i]      := LeftMbExists;
+
+				TotalCoeffTabLuma  [20+i]      := Param[20 + i];
+				TotalCoeffTabChroma[iCb][20+i] := Param[20 + 4 + i];
+				TotalCoeffTabChroma[iCr][20+i] := Param[20 + 8 + i];
+				MbExists           [20+i]      := AboveMbExists;
+			end
+			ResidualLumaOutput := RESIDUAL_LUMA_LUMA_OUTPUT;
+			i8x8Loop      := 1;
+			IdxCurrMb     := 0;
+		end
+
+	ResLumaOutput.IsLuma: action
+				==>
+			DecMbLayerTotal_CoeffLuma:[TotalCoeffTabLuma] repeat 16
+		guard
+			ResidualLumaOutput = RESIDUAL_LUMA_LUMA_OUTPUT
+		do
+			i8x8Loop := 0;
+		end
+
+	ResLuma_Launch16x16DCResBlock: action
+				==>
+			TypeOfVLD     :[LAUNCH_ACTOR],
+			ActorLaunched :[RESIDUAL_BLOCK_CAVLC]
+		guard
+			bmFlag   = false,
+			startIdx = 0,
+			Is_Intra_16x16(mb_type)
+		do
+			Component_type := LUMA_COMPONENT;
+			maxNumCoeff    := 16;
+			StartIdxSent   :=  0;
+			EndIdxSent     :=  15;
+		end
+
+	ResLuma_CheckTransfSzAndCavlc: action ==>
+		guard
+			   transform_size_8x8_flag  = false
+			or entropy_coding_mode_flag = CAVLC_ENTROPY
+		do
+			IdxCurrMb      := 0;
+		end
+
+	ResLuma_CheckCodedBlockPattern: action ==>
+		guard
+			bitand(CodedBlockPatternLuma,1) = 1
+		end
+
+	ResLuma_CheckBmFlagAndEndIdxAndMbType: action
+				==>
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ]
+		guard
+			not bmFlag,
+			endIdx > 0,
+			Is_Intra_16x16(mb_type)
+		do
+			Component_type := LUMA_COMPONENT;
+			maxNumCoeff    := 15;
+			StartIdxSent   :=
+				if(0 > startIdx - 1) then
+					0
+				else
+					startIdx - 1
+				end;
+			EndIdxSent     :=  endIdx - 1;
+		end
+
+	ResLuma_LaunchResBlk_1: action
+				==>
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ]
+		do
+			Component_type := LUMA_COMPONENT;
+			maxNumCoeff    := 16;
+			StartIdxSent   := startIdx;
+			EndIdxSent     := endIdx;
+		end
+
+	ResetLevelTab: action
+				==>
+			Skip_Block :[ true , true , true , true ]
+		do
+			TotalCoeffTabLuma[IdxCurrMb    ]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb + 1]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb + 2]   := 0;
+			TotalCoeffTabLuma[IdxCurrMb + 3]   := 0;
+			IdxCurrMb := IdxCurrMb + 4;
+			/*
+			foreach int i4x4 in 0 .. 3
+			do
+				foreach int i in 0 .. 15
+				do
+					level[i8x8Loop*4 + i4x4][i] := 0:
+				end
+			end
+			*/
+		end
+
+	EndLoop8x8.IsEqualToFalse: action ==>
+		guard
+			i8x8Loop < 4
+		do
+			i8x8Loop := i8x8Loop + 1;
+			CodedBlockPatternLuma := rshift(CodedBlockPatternLuma, 1);
+		end
+
+	ResLuma_CheckCavlc8x8: action ==>
+		guard
+			entropy_coding_mode_flag = CAVLC_ENTROPY,
+			transform_size_8x8_flag  = true
+		do
+			/*
+			foreach int i8x8 in 0 .. 3
+			do
+				foreach int i4x4 in 0 .. 3
+				do
+					foreach int i in 0 .. 15
+					do
+						level8x8[ i8x8 ][ 4 * i + i4x4 ] = level[ i8x8 * 4 + i4x4 ][ i ]
+					end
+				end
+			end
+			*/
+		end
+
+
+
+
+	/*Not implemented yet: CABAC
+	else
+		for(i8x8=0;i8x8<4;i8x8++)
+		{
+			if(CodeBlockPatternLuma & (1<<i8x8)) // ==> action CheckCodedBlockPattern
+				residual_block(...);
+			else
+				for(i=0;i<64;i++)
+					level8x8[i8x8][i]=0;
+		}
+*/
+
+	SendResBlockParameters: action
+				==>
+			ResBlkParameters  :[nC , maxNumCoeff , StartIdxSent , EndIdxSent],
+
+			Skip_Block        :[false]
+		var
+			int(size=8) nC
+		do
+			if(Component_type = LUMA_COMPONENT)then
+				//println("\t\t Idx : "+(IdxCurrMb-1)+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]]);
+				nC :=
+					if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
+						rshift(TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]] +1, 1)
+					else
+						TotalCoeffTabLuma[IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabLuma[IdxAboveNeighbour[IdxCurrMb]]
+					end;
+			else
+				if(Component_type = CHROMA_DC_COMPONENT) then
+					nC :=
+						if(chroma_array_type = 1) then
+							-1
+						else
+							-2
+						end;
+				else
+					//println("\t\t Idx : "+(IdxCurrMb-1)+ " ; IdxLeftNeighbour : "+IdxLeftNeighbour[IdxCurrMb] + ","+IdxAboveNeighbour[IdxCurrMb]+" ; TotalCoeffTab 1 and 2: "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]]+ " ; "+TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]]);
+					nC :=
+						if(MbExists[IdxLeftNeighbour[IdxCurrMb]] and MbExists[IdxAboveNeighbour[IdxCurrMb]])then
+							rshift(TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]] + 1, 1)
+						else
+							TotalCoeffTabChroma[iCbCrLoop - 1][IdxLeftNeighbour[IdxCurrMb]] + TotalCoeffTabChroma[iCbCrLoop - 1][IdxAboveNeighbour[IdxCurrMb]]
+						end;
+				end
+			end
+			IdxCurrMb := IdxCurrMb + 1;
+		end
+
+	GetTotalCoeff: action
+			Total_Coeff:[ValTotal_Coeff]
+				==>
+		do
+			if(Component_type = LUMA_COMPONENT)then
+				TotalCoeffTabLuma[IdxCurrMb - 1]   := ValTotal_Coeff;
+			else
+				if(Component_type = CHROMA_AC_COMPONENT)then
+					TotalCoeffTabChroma[iCbCrLoop - 1][IdxCurrMb - 1] := ValTotal_Coeff;
+				end
+			end
+		end
+
+	ChromaArrayTypeVal.IsEqualTo1or2: action
+				==>
+		guard
+			   chroma_array_type = 1
+			or chroma_array_type= 2
+		do
+//			for( iCbCr = 0; iCbCr < 2; iCbCr++ )
+//				for( i = 0; i < 4 * NumC8x8; i++ )
+//					ChromaDCLevel[ iCbCr ][ i ] = 0;
+			iCbCrLoop := 0;
+			i8x8Loop  := 0;
+		end
+
+	ChromaDCResBlk: action
+				==>
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected ]
+		guard
+			bitand(CodedBlockPatternChroma, 3) != 0,
+			startIdx = 0
+		do
+			Component_type := CHROMA_DC_COMPONENT;
+			StartIdxSent   := 0;
+			EndIdxSent     := 4 * NumC8x8 - 1;
+			maxNumCoeff    := 4 * NumC8x8;
+		end
+
+	ChromaAcComponentPresent: action ==>
+		guard
+			bitand(CodedBlockPatternChroma, 2) != 0,
+			endIdx > 0
+		do
+			Component_type := CHROMA_AC_COMPONENT;
+			StartIdxSent :=
+				if(0 > startIdx - 1) then
+					0
+				else
+					startIdx - 1
+				end;
+			EndIdxSent   := endIdx - 1;
+			maxNumCoeff  := 15;
+		end
+
+	ChromaLoopiCbCr: action ==>
+		guard
+			iCbCrLoop < 2
+		do
+			iCbCrLoop := iCbCrLoop + 1;
+			i8x8Loop  := 0;
+			IdxCurrMb := 0;
+		end
+
+	SendChromaCoeffToken: action
+				==>
+			DecMbLayerTotal_CoeffChroma:[TotCoefChrm] repeat 16
+		var
+			List(type:uint(size=5), size=16) TotCoefChrm
+		do
+			if(NumC8x8 = 1)then
+				foreach int i in 0 .. 3
+				do
+					TotCoefChrm[i]    := TotalCoeffTabChroma[iCbCrLoop - 1][i];
+					TotCoefChrm[4+i]  := TotalCoeffTabChroma[iCbCrLoop - 1][i];
+					TotCoefChrm[8+i]  := TotalCoeffTabChroma[iCbCrLoop - 1][i];
+					TotCoefChrm[12+i] := TotalCoeffTabChroma[iCbCrLoop - 1][i];
+				end
+			else
+				println("NumC8x8 != 1 :"+NumC8x8+" not implemented yet in a lot of actor !");
+				while true do end
+			end
+		end
+
+	ChromaAcLoopi8x8: action
+			==>
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ]
+		guard
+			i8x8Loop < NumC8x8
+		do
+			i8x8Loop := i8x8Loop + 1;
+		end
+
+	ChromaAcLoopi4x4: action
+				==>
+			TypeOfVLD     :[ LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  , LAUNCH_ACTOR  ],
+			ActorLaunched :[ ActorSelected , ActorSelected , ActorSelected , ActorSelected ]
+		end
+
+	SendSkipChromaDc: action
+				==>
+			Skip_Block :[ true , true ]
+		end
+
+	ChromaAcComponentNotPresent: action
+				==>
+			DecMbLayerTotal_CoeffChroma :[[0: for int i in 0 .. 31]]repeat 32,
+			Skip_Block :[[true: for int i in 0 .. 7]] repeat 8
+		guard
+			i8x8Loop < NumC8x8
+		do
+			i8x8Loop := i8x8Loop + 1;
+		end
+
+	ChromaArrayTypeVal.IsEqualTo3: action
+				==>
+		guard
+			chroma_array_type = 3
+		do
+			println("ChromaArrayTypeVal.IsEqualTo3 not implemented yet !");
+		end
+
+	a:action ==>
+	do
+		println("DecodeResidual not finished yet !");
+	end
+
+
+	SendEndResidual: action
+				==>
+			TypeOfVLD :[SKIP_NAL]
+		end
+
+	schedule fsm GetParameters:
+		GetParameters (GetParameters )--> ResLumaCheckIntra16x16;
+
+				/* residual_luma()*/
+				ResLumaCheckIntra16x16       (ResLuma_Launch16x16DCResBlock         )--> ResLumaSendResBlkPar1;
+				ResLumaCheckIntra16x16       (ResLuma_CheckTransfSzAndCavlc         )--> CheckCodeBlockBmFlag;
+				ResLumaCheckIntra16x16 (a)--> undefined;//Cabac stuff not implemented yet
+	
+				ResLumaSendResBlkPar1        (SendResBlockParameters                )--> ResLumaGetTotalCoeff1;
+	
+				ResLumaGetTotalCoeff1        ( GetTotalCoeff                        )--> ResLumaCheckTrnsSzAndEntropy;
+	
+				ResLumaCheckTrnsSzAndEntropy (ResLuma_CheckTransfSzAndCavlc         )--> CheckCodeBlockBmFlag;
+				ResLumaCheckTrnsSzAndEntropy (a)--> undefined;//Cabac stuff not implemented yet
+	
+				CheckCodeBlockBmFlag         (ResLuma_CheckCodedBlockPattern        )--> CheckBmFlagEndIx;
+				CheckCodeBlockBmFlag         (ResetLevelTab                         )--> CheckEndLoop8x8;
+	
+				CheckBmFlagEndIx             (ResLuma_CheckBmFlagAndEndIdxAndMbType )--> ResLumaSendResBlkPar2_0;
+				CheckBmFlagEndIx             (ResLuma_LaunchResBlk_1                )--> ResLumaSendResBlkPar2_0;
+	
+				ResLumaSendResBlkPar2_0      (SendResBlockParameters                )--> ResLumaGetTotalCoeff2_0;
+				ResLumaGetTotalCoeff2_0      (GetTotalCoeff                         )--> ResLumaSendResBlkPar2_1;
+				ResLumaSendResBlkPar2_1      (SendResBlockParameters                )--> ResLumaGetTotalCoeff2_1;
+				ResLumaGetTotalCoeff2_1      (GetTotalCoeff                         )--> ResLumaSendResBlkPar2_2;
+				ResLumaSendResBlkPar2_2      (SendResBlockParameters                )--> ResLumaGetTotalCoeff2_2;
+				ResLumaGetTotalCoeff2_2      (GetTotalCoeff                         )--> ResLumaSendResBlkPar2_3;
+				ResLumaSendResBlkPar2_3      (SendResBlockParameters                )--> ResLumaGetTotalCoeff2_3;
+				ResLumaGetTotalCoeff2_3      (GetTotalCoeff                         )--> CheckEndLoop8x8;
+	
+				CheckEndLoop8x8              (EndLoop8x8.IsEqualToFalse             )--> CheckCodeBlockBmFlag;
+				CheckEndLoop8x8              (ResLuma_CheckCavlc8x8                 )--> ResidualLumaFinished;
+
+
+			CheckEndLoop8x8 (ResLumaOutput.IsLuma      )--> CheckChromaArrayType;
+			CheckEndLoop8x8 (a )--> undefined;
+
+			ResidualLumaFinished (ResLumaOutput.IsLuma )--> CheckChromaArrayType;
+			ResidualLumaFinished (a )-->undefined;
+
+
+		CheckChromaArrayType        (ChromaArrayTypeVal.IsEqualTo1or2 )--> CheckChromaDc;
+		CheckChromaArrayType        (ChromaArrayTypeVal.IsEqualTo3    )--> undefined;
+		CheckChromaArrayType        (SendEndResidual                  )--> GetParameters;
+
+
+		CheckChromaDc               (ChromaDCResBlk                   )--> ChromaDCSendResBlockParam_1;
+		CheckChromaDc               (SendSkipChromaDc                 )--> CheckChromaAC;
+
+		ChromaDCSendResBlockParam_1 (SendResBlockParameters           )--> ChromaDCGetTotalCoeff_1;
+		ChromaDCGetTotalCoeff_1     (GetTotalCoeff                    )--> ChromaDCSendResBlockParam_2;
+		ChromaDCSendResBlockParam_2 (SendResBlockParameters           )--> ChromaDCGetTotalCoeff_2;
+		ChromaDCGetTotalCoeff_2     (GetTotalCoeff                    )--> CheckChromaAC;
+
+
+		CheckChromaAC               (ChromaAcComponentPresent         )--> CheckLoopiCbCr;
+		CheckChromaAC               (ChromaAcComponentNotPresent      )--> SendEndResidual;
+
+		CheckLoopiCbCr              (ChromaLoopiCbCr                  )--> CheckLoopi8x8;
+		CheckLoopiCbCr              (SendEndResidual                  )--> GetParameters;
+
+		CheckLoopi8x8               (ChromaAcLoopi8x8                 )--> ChromaAcSendResBlockPar_1;
+		CheckLoopi8x8               (SendChromaCoeffToken             )--> CheckLoopiCbCr;
+	
+		ChromaAcSendResBlockPar_1   (SendResBlockParameters           )--> ChromaAcGetTotalCoeff_1;
+		ChromaAcGetTotalCoeff_1     (GetTotalCoeff                    )--> ChromaAcSendResBlockPar_2;
+		ChromaAcSendResBlockPar_2   (SendResBlockParameters           )--> ChromaAcGetTotalCoeff_2;
+		ChromaAcGetTotalCoeff_2     (GetTotalCoeff                    )--> ChromaAcSendResBlockPar_3;
+		ChromaAcSendResBlockPar_3   (SendResBlockParameters           )--> ChromaAcGetTotalCoeff_3;
+		ChromaAcGetTotalCoeff_3     (GetTotalCoeff                    )--> ChromaAcSendResBlockPar_4;
+		ChromaAcSendResBlockPar_4   (SendResBlockParameters           )--> ChromaAcGetTotalCoeff_4;
+		ChromaAcGetTotalCoeff_4     (GetTotalCoeff                    )--> CheckLoopi8x8;
+
+		ChromaAcComponentNotPresent (ChromaAcComponentNotPresent      )--> ChromaAcComponentNotPresent;
+		ChromaAcComponentNotPresent (SendEndResidual                  )--> GetParameters;
+
+		SendEndResidual             (SendEndResidual )--> GetParameters;
+	a(a)-->undefined;
+	end
+
+	priority
+		ResLuma_Launch16x16DCResBlock         > ResLuma_CheckTransfSzAndCavlc;
+		ResLuma_CheckTransfSzAndCavlc         > a;
+		ResLuma_CheckCodedBlockPattern        > ResetLevelTab;
+		ResLuma_CheckBmFlagAndEndIdxAndMbType > ResLuma_LaunchResBlk_1;
+		EndLoop8x8.IsEqualToFalse             > ResLuma_CheckCavlc8x8           > ResLumaOutput.IsLuma;
+		ResLumaOutput.IsLuma                  > a;
+		ChromaArrayTypeVal.IsEqualTo1or2      > ChromaArrayTypeVal.IsEqualTo3   > SendEndResidual;
+		ChromaDCResBlk                        > SendSkipChromaDc;
+		ChromaAcComponentPresent              > ChromaAcComponentNotPresent;
+		ChromaAcLoopi8x8                      > SendChromaCoeffToken;
+		ChromaLoopiCbCr                       > SendEndResidual;
+		ChromaAcComponentNotPresent           > SendEndResidual;
+	end
+end

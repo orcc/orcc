@@ -1,0 +1,401 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+
+actor Algo_DecodeDecRefPicMarking()
+	int (size=32) ValVLD,
+
+	uint(size=2) PicNalRefIdc,
+	bool         IdrPic,
+
+	bool          IsNewPic
+		==>
+	uint(size=5)  TypeOfVLD,
+	int (size=32) NbBitsToRead,
+
+	uint(size=31) Mmco
+		:
+
+
+	bool DEBUG_FLAG_DECODED = false;
+
+	bool is_new_pic;
+
+	bool adaptive_ref_pic_marking_mode_flag;
+	//CheckNaluType Parameters
+	uint(size=2) nal_ref_idc;
+	bool         IdrPicFlag;
+
+	ReadNalRefIdc.IsNewPic: action
+			PicNalRefIdc :[ValNalRefIdc],
+			IdrPic       :[IsAnIdr],
+			IsNewPic     :[ValIsNewPic]
+				==>
+			Mmco         :[ValIdr]
+		guard
+			ValIsNewPic
+		var
+			uint(size=31) ValIdr
+		do
+			is_new_pic  := ValIsNewPic;
+			nal_ref_idc := ValNalRefIdc;
+			IdrPicFlag  := IsAnIdr;
+			ValIdr :=
+				if(not IsAnIdr )then
+					1
+				else
+					0
+				end;
+		end
+
+	ReadNalRefIdc.IsNewSlice: action
+			PicNalRefIdc :[ValNalRefIdc],
+			IdrPic       :[IsAnIdr],
+			IsNewPic     :[ValIsNewPic]
+				==>
+		guard
+			not ValIsNewPic
+		var
+			uint(size=31) ValIdr
+		do
+			is_new_pic  := ValIsNewPic;
+			nal_ref_idc := ValNalRefIdc;
+			IdrPicFlag  := IsAnIdr;
+			ValIdr :=
+				if(not IsAnIdr )then
+					1
+				else
+					0
+				end;
+		end
+
+	NalRefIdc.IsEqualTo0.IsNewPic: action
+				==>
+			Mmco :[NotIdr , adaptive_ref_pic_marking_mode_flag]
+		guard
+			nal_ref_idc = 0,
+			is_new_pic
+		var
+			uint(size=31) NotIdr = 1,
+			uint(size=31) adaptive_ref_pic_marking_mode_flag = 0
+		end
+
+	NalRefIdc.IsEqualTo0.IsNewSlice: action ==>
+		guard
+			nal_ref_idc = 0,
+			not is_new_pic
+		end
+
+	IsAnIdrPic.IsEqualToFalse: action
+				==>
+			//     adaptive_ref_pic_marking_mode_flag
+			TypeOfVLD    :[ READ_BITS ],
+			NbBitsToRead :[     1     ]
+		guard
+			IdrPicFlag = false
+		end
+
+	IsAnIdrPic.IsEqualToTrue: action
+				==>
+			//              no_output , long_term
+			TypeOfVLD    :[ READ_BITS , READ_BITS ],
+			NbBitsToRead :[     1     ,     1     ]
+		guard
+			IdrPicFlag = true
+		end
+
+	ReadIdrParam.Done.IsNewPic: action
+			ValVLD     :[no_output_of_prior_pics_flag, long_term_reference_flag]
+				==>
+			Mmco         :[long_term_reference_flag]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tno_output_of_prior_pics_flag: "+no_output_of_prior_pics_flag);
+				println("\t\tlong_term_reference_flag: "+long_term_reference_flag);
+			end
+		end
+
+	ReadIdrParam.Done.IsNewSlice: action
+			ValVLD     :[no_output_of_prior_pics_flag, long_term_reference_flag]
+				==>
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tno_output_of_prior_pics_flag: "+no_output_of_prior_pics_flag);
+				println("\t\tlong_term_reference_flag: "+long_term_reference_flag);
+			end
+		end
+
+	ReadAdaptRefPicMarkMode.Done.IsNewPic: action
+			ValVLD     :[ValueOfVLD]
+				==>
+			Mmco       :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			adaptive_ref_pic_marking_mode_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tadaptive_ref_pic_marking_mode_flag: "+adaptive_ref_pic_marking_mode_flag);
+			end
+		end
+
+	ReadAdaptRefPicMarkMode.Done.IsNewSlice: action
+			ValVLD     :[ValueOfVLD]
+				==>
+		guard
+			not is_new_pic
+		do
+			adaptive_ref_pic_marking_mode_flag :=
+				if(ValueOfVLD = 0)then
+					false
+				else
+					true
+				end;
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tadaptive_ref_pic_marking_mode_flag: "+adaptive_ref_pic_marking_mode_flag);
+			end
+		end
+
+	AdaptRefPicMarkMode.IsEqualToTrue: action
+				==>
+			//  memory_management_control_operation
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			adaptive_ref_pic_marking_mode_flag = true
+		end
+
+	MMCO.IsEqualTo1_2_4_6.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			TypeOfVLD    :[ VLD_UE ],
+
+			Mmco         :[ValueOfVLD]
+		guard
+			   ValueOfVLD = 1
+			or ValueOfVLD = 2
+			or ValueOfVLD = 4
+			or ValueOfVLD = 6,
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
+		end
+
+	MMCO.IsEqualTo1_2_4_6.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			   ValueOfVLD = 1
+			or ValueOfVLD = 2
+			or ValueOfVLD = 4
+			or ValueOfVLD = 6,
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
+		end
+
+	MMCO.IsEqualTo3.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//              differ , long_te
+			TypeOfVLD    :[ VLD_UE , VLD_UE ],
+
+			Mmco         :[ValueOfVLD]
+		guard
+			ValueOfVLD = 3,
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
+		end
+
+	MMCO.IsEqualTo3.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//              differ , long_te
+			TypeOfVLD    :[ VLD_UE , VLD_UE ]
+		guard
+			ValueOfVLD = 3,
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
+		end
+
+	MMCO.IsEqualTo5.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//   memory_management_control_operation
+			TypeOfVLD    :[ VLD_UE ],
+
+			Mmco         :[ValueOfVLD]
+		guard
+			ValueOfVLD = 5,
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
+		end
+
+	MMCO.IsEqualTo5.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//   memory_management_control_operation
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			ValueOfVLD = 5,
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
+		end
+
+	MMCO.IsEqualTo0.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			Mmco         :[ValueOfVLD]
+		guard
+			ValueOfVLD = 0,
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
+		end
+
+	MMCO.IsEqualTo0.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+		guard
+			ValueOfVLD = 0,
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation: "+ValueOfVLD);
+			end
+		end
+
+	ReadMMCOParam.Byte1.IsNewPic: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD    :[ VLD_UE ],
+
+			Mmco         :[ValueOfVLD]
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD);
+			end
+		end
+
+	ReadMMCOParam.Byte1.IsNewSlice: action
+			ValVLD :[ValueOfVLD]
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD);
+			end
+		end
+
+	ReadMMCOParam.Byte2.IsNewPic: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD    :[ VLD_UE ],
+
+			Mmco         :[ValueOfVLD] repeat 2
+		guard
+			is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[0]);
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[1]);
+			end
+		end
+
+	ReadMMCOParam.Byte2.IsNewSlice: action
+			ValVLD :[ValueOfVLD] repeat 2
+				==>
+			//      reordering_of_pic_nums_idc
+			TypeOfVLD    :[ VLD_UE ]
+		guard
+			not is_new_pic
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[0]);
+				println("\t\tmemory_management_control_operation Param: "+ValueOfVLD[1]);
+			end
+		end
+
+	SendEndSliceHeader: action
+				==>
+			TypeOfVLD :[SKIP_NAL]
+		end
+
+	schedule fsm ReadNalRefIdc:
+		ReadNalRefIdc            (ReadNalRefIdc                     )--> CheckNalRefIdcAndIdr;
+
+		CheckNalRefIdcAndIdr     (NalRefIdc.IsEqualTo0              )--> EndSliceHeader;
+		CheckNalRefIdcAndIdr     (IsAnIdrPic.IsEqualToFalse         )--> ReadAdaptRefPicMarkMode;
+		CheckNalRefIdcAndIdr     (IsAnIdrPic.IsEqualToTrue          )--> ReadIdrParamDone;
+
+		ReadIdrParamDone         (ReadIdrParam.Done                 )--> EndSliceHeader;
+
+		ReadAdaptRefPicMarkMode  (ReadAdaptRefPicMarkMode.Done      )--> CheckAdaptRefPicMarkMode;
+
+		CheckAdaptRefPicMarkMode (AdaptRefPicMarkMode.IsEqualToTrue )--> CheckMMCO;
+		CheckAdaptRefPicMarkMode (SendEndSliceHeader                )--> ReadNalRefIdc;
+
+		CheckMMCO                (MMCO.IsEqualTo1_2_4_6             )--> MMCORead1Byte;
+		CheckMMCO                (MMCO.IsEqualTo3                   )--> MMCORead2Bytes;
+		CheckMMCO                (MMCO.IsEqualTo5                   )--> CheckMMCO;
+		CheckMMCO                (MMCO.IsEqualTo0                   )--> EndSliceHeader;
+
+		MMCORead1Byte            (ReadMMCOParam.Byte1               )--> CheckMMCO;
+		MMCORead2Bytes           (ReadMMCOParam.Byte2               )--> CheckMMCO;
+
+		EndSliceHeader           (SendEndSliceHeader                )--> ReadNalRefIdc;
+	end
+	priority
+		NalRefIdc.IsEqualTo0              > IsAnIdrPic.IsEqualToFalse > IsAnIdrPic.IsEqualToTrue;
+		AdaptRefPicMarkMode.IsEqualToTrue > SendEndSliceHeader;
+		MMCO.IsEqualTo1_2_4_6             > MMCO.IsEqualTo3           > MMCO.IsEqualTo0            > MMCO.IsEqualTo5;
+	end
+end

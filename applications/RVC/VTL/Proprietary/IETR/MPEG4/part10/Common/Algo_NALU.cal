@@ -1,0 +1,154 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
+actor Algo_NALU ()
+		uint(size = 8) bits8
+			==>
+		uint(size = 8) RbspByte,
+		bool           NewNal
+			:
+
+
+/*
+*
+* State variables
+*
+*/
+
+	uint(size = 8) fifo_lsb := 0;
+	uint(size = 8) fifo_msb := 0;
+
+
+/*
+*
+* Actions
+*
+*/
+
+	fill_fifo: action 
+			bits8:[b]
+				==>
+		do
+			fifo_msb   := fifo_lsb;
+			fifo_lsb   := b;
+		end
+
+
+	//Detecting Byte stuffing.
+	//The two first bytes belong to rbsp.
+	Pattern.Is003Bytes: action
+			bits8:[b]
+				==>
+			RbspByte :[  0  ,  0  ],
+			NewNal   :[false,false]
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 3)
+		end
+
+
+	//Detecting start code
+	Pattern.Is001Bytes: action
+			bits8:[b]
+				==>
+			NewNal     :[true]
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 1)
+		end
+
+	NoPattern: action
+			bits8:[b]
+				==>
+			RbspByte :[ValRbsp],
+			NewNal   :[false]
+		guard
+			not( (fifo_msb = 0) and (fifo_lsb = 0)  and  ((b = 3) or (b = 1) or (b = 0)) )
+		var
+			uint(size=8) ValRbsp
+		do
+			//We shift the value in the fifo
+			ValRbsp  := fifo_msb;
+			fifo_msb := fifo_lsb;
+			fifo_lsb := b;
+		end
+
+	Pattern.Is000Bytes: action
+			bits8:[b]
+				==>
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 0)
+		end
+
+	//Start code detected.
+	PatternFor000.Is0001Bytes: action
+			bits8:[b]
+				==>
+			NewNal     :[true]
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 1)
+		end
+
+
+	PatternFor000.Is0000Bytes: action
+			bits8:[b]
+				==>
+			RbspByte :[0],
+			NewNal   :[false]
+		guard
+			(fifo_msb = 0) and (fifo_lsb = 0)  and  (b = 0)
+		end
+
+	NoPatternFor000: action
+			bits8:[b]
+				==>
+			RbspByte :[0,0],
+			NewNal   :[false,false]
+		guard
+			not( (fifo_msb = 0) and (fifo_lsb = 0)  and  ((b = 3) or (b = 1) or (b = 0)) )
+		var
+			uint(size=8) ValRbsp
+		do
+			ValRbsp  := fifo_msb;
+			fifo_msb := fifo_lsb;
+			fifo_lsb := b;
+		end
+/*
+*
+* Scheduler
+*
+*/
+
+	schedule fsm fill_fifo1:
+		fill_fifo1 (fill_fifo                 )--> fill_fifo2;
+
+		fill_fifo2 (fill_fifo                 )--> fifo_full;
+	
+		fifo_full  (NoPattern                 )--> fifo_full;
+		fifo_full  (Pattern.Is003Bytes        )--> fill_fifo1;
+		fifo_full  (Pattern.Is001Bytes        )--> fill_fifo1;
+		fifo_full  (Pattern.Is000Bytes        )--> fifo_full2;
+
+		fifo_full2 (PatternFor000.Is0001Bytes )--> fill_fifo1;
+		fifo_full2 (PatternFor000.Is0000Bytes )--> fifo_full2; //Impossible state (but impossible isn't a french word ;))
+		fifo_full2 (NoPatternFor000           )--> fifo_full;  //Impossible state
+	end
+
+	priority
+		NoPattern                 > Pattern.Is001Bytes        > Pattern.Is003Bytes;
+		PatternFor000.Is0001Bytes > PatternFor000.Is0000Bytes > NoPatternFor000;
+	end
+
+end

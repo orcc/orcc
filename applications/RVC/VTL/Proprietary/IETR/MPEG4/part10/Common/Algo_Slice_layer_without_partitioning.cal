@@ -1,0 +1,480 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+
+actor Algo_Slice_layer_without_partitioning()
+	int (size=32) ValVLD,
+
+	int (size=6)  HeaderTypeOfVLD,
+	int (size=32) HeaderVLDParam,
+
+	uint(size=5)  DecRefPicMarkingTypeOfVLD,
+	int (size=32) DecRefPicMarkingNbBitsToRead,
+
+	uint(size=5)  RefPicListTypeOfVLD,
+	int (size=32) RefPicListNbBitsToRead,
+
+	int (size=6)  DataTypeOfVLD,
+	int (size=32) DataVLDParam,
+
+	int (size=6)  MbLayerTypeOfVLD,
+	int (size=32) MbLayerVLDParam,
+
+	uint(size=5)  MbPredTypeOfVLD,
+	int (size=32) MbPredNbBitsToRead,
+
+	uint(size=5)  SubMbPredTypeOfVLD,
+	int (size=32) SubMbPredNbBitsToRead,
+
+	int (size=6)  ResTypeOfVLD,
+	int (size=32) ResActorLaunched,
+
+	uint(size=5)  ResBlkCavlcTypeOfVLD,
+	int (size=32) ResBlkCavlcVLD_Param
+		==>
+	uint(size=5)  TypeOfVLD,
+	int (size=32) VLD_Param,
+
+	int (size=32) HeaderValVLD,
+
+	int (size=32) DecRefPicMarkingValVLD,
+
+	int (size=32) RefPicListValVLD,
+
+	int (size=32) DataValVLD,
+
+	int (size=32) MbLayerValVLD,
+
+	int (size=32) MbPredValVLD,
+
+	int (size=32) SubMbPredValVLD,
+
+	int (size=32) ResBlkCavlcValVLD
+		:
+
+	SliceHeader.GetVLDVal: action
+			ValVLD       :[VLDecoding]
+				==>
+			HeaderValVLD :[VLDecoding]
+		end
+
+
+	SliceHeader.FunctionWithoutParam: action
+			HeaderTypeOfVLD :[ValTypeOfVLD]
+				==>
+			TypeOfVLD       :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	SliceHeader.FunctionWith1Param: action
+			HeaderTypeOfVLD :[ValTypeOfVLD],
+			HeaderVLDParam  :[Param]
+				==>
+			TypeOfVLD       :[ValTypeOfVLD],
+			VLD_Param       :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	SliceHeader.LaunchRefPicMark: action
+			HeaderTypeOfVLD :[Function],
+			HeaderVLDParam  :[Actor]
+				==>
+		guard
+			Function = LAUNCH_ACTOR,
+			Actor    = DEC_REF_PIC_MARKING
+		end
+
+	SliceHeader.LaunchRefPicList: action
+			HeaderTypeOfVLD :[Function],
+			HeaderVLDParam  :[Actor]
+				==>
+		guard
+			Function = LAUNCH_ACTOR,
+			Actor    = REF_PIC_LIST
+		end
+
+	SliceHeader.Done: action
+			HeaderTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	RefPicMark.GetVLDVal: action
+			ValVLD                 :[VLDecoding]
+				==>
+			DecRefPicMarkingValVLD :[VLDecoding]
+		end
+
+	RefPicMark.FunctionWithoutParam: action
+			DecRefPicMarkingTypeOfVLD :[ValTypeOfVLD]
+				==>
+			TypeOfVLD                 :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	RefPicMark.FunctionWith1Param: action
+			DecRefPicMarkingTypeOfVLD    :[ValTypeOfVLD],
+			DecRefPicMarkingNbBitsToRead :[Param]
+				==>
+			TypeOfVLD :[ValTypeOfVLD],
+			VLD_Param :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	RefPicMark.Done: action
+			DecRefPicMarkingTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	RefPicList.GetVLDVal: action
+			ValVLD           :[VLDecoding]
+				==>
+			RefPicListValVLD :[VLDecoding]
+		end
+
+	RefPicList.FunctionWithoutParam: action
+			RefPicListTypeOfVLD :[ValTypeOfVLD]
+				==>
+			TypeOfVLD           :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	RefPicList.FunctionWith1Param: action
+			RefPicListTypeOfVLD    :[ValTypeOfVLD],
+			RefPicListNbBitsToRead :[Param]
+				==>
+			TypeOfVLD              :[ValTypeOfVLD],
+			VLD_Param              :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	RefPicList.Done: action
+			RefPicListTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	SliceData.GetVLDVal: action
+			ValVLD     :[VLDecoding]
+				==>
+			DataValVLD :[VLDecoding]
+		end
+
+	SliceData.FunctionWithoutParam: action
+			DataTypeOfVLD :[ValTypeOfVLD]
+				==>
+			TypeOfVLD     :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	SliceData.FunctionWith1Param: action
+			DataTypeOfVLD :[ValTypeOfVLD],
+			DataVLDParam  :[Param]
+				==>
+			TypeOfVLD     :[ValTypeOfVLD],
+			VLD_Param     :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	SliceData.LaunchMbLayer: action
+			DataTypeOfVLD :[Function],
+			DataVLDParam  :[Actor]
+				==>
+		guard
+			Function = LAUNCH_ACTOR,
+			Actor    = MB_LAYER
+		end
+
+	SliceData.Done: action
+			DataTypeOfVLD :[Function]
+				==>
+			TypeOfVLD     :[SKIP_NAL]
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	MbLayer.GetVLDVal: action
+			ValVLD        :[VLDecoding]
+				==>
+			MbLayerValVLD :[VLDecoding]
+		end
+
+	MbLayer.FunctionWithoutParam: action
+			MbLayerTypeOfVLD :[ValTypeOfVLD]
+				==>
+			TypeOfVLD        :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	MbLayer.FunctionWith1Param: action
+			MbLayerTypeOfVLD :[ValTypeOfVLD],
+			MbLayerVLDParam  :[Param]
+				==>
+			TypeOfVLD        :[ValTypeOfVLD],
+			VLD_Param        :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	MbLayer.LaunchSubMbPred: action
+			MbLayerTypeOfVLD :[Function],
+			MbLayerVLDParam  :[Actor]
+				==>
+		guard
+			Function = LAUNCH_ACTOR,
+			Actor    = SUB_MB_PRED
+		end
+
+	MbLayer.LaunchMbPred: action
+			MbLayerTypeOfVLD :[Function],
+			MbLayerVLDParam  :[Actor]
+				==>
+		guard
+			Function = LAUNCH_ACTOR,
+			Actor    = MB_PRED
+		end
+
+	MbLayer.LaunchResidual: action
+			MbLayerTypeOfVLD :[Function],
+			MbLayerVLDParam  :[Actor]
+				==>
+		guard
+			Function = LAUNCH_ACTOR,
+			Actor    = RESIDUAL
+		end
+
+	MbLayer.Done: action
+			MbLayerTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	MbPred.GetVLDVal: action
+			ValVLD       :[VLDecoding]
+				==>
+			MbPredValVLD :[VLDecoding]
+		end
+
+	MbPred.FunctionWithoutParam: action
+			MbPredTypeOfVLD :[ValTypeOfVLD]
+				==>
+			TypeOfVLD       :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	MbPred.FunctionWith1Param: action
+			MbPredTypeOfVLD    :[ValTypeOfVLD],
+			MbPredNbBitsToRead :[VldParam]
+				==>
+			TypeOfVLD          :[ValTypeOfVLD],
+			VLD_Param          :[VldParam]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	MbPred.Done: action
+			MbPredTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	SubMbPred.GetVLDVal: action
+			ValVLD          :[VLDecoding]
+				==>
+			SubMbPredValVLD :[VLDecoding]
+		end
+
+	SubMbPred.FunctionWithoutParam: action
+			SubMbPredTypeOfVLD :[ValTypeOfVLD]
+				==>
+			TypeOfVLD          :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD  != SKIP_NAL
+		end
+
+	SubMbPred.FunctionWith1Param: action
+			SubMbPredTypeOfVLD    :[ValTypeOfVLD],
+			SubMbPredNbBitsToRead :[VldParam]
+				==>
+			TypeOfVLD             :[ValTypeOfVLD],
+			VLD_Param             :[VldParam]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	SubMbPred.Done: action
+			SubMbPredTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	Residual.LaunchResBlkCavlc: action
+			ResTypeOfVLD     :[Function],
+			ResActorLaunched :[Actor]
+				==>
+		guard
+			Function = LAUNCH_ACTOR,
+			Actor    = RESIDUAL_BLOCK_CAVLC
+		end
+
+	Residual.Done: action
+			ResTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+	ResBlkCavlc.GetVLDVal: action
+			ValVLD            :[VLDecoding]
+				==>
+			ResBlkCavlcValVLD :[VLDecoding]
+		end
+
+	ResBlkCavlc.FunctionWithoutParam: action
+			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD]
+				==>
+			TypeOfVLD            :[ValTypeOfVLD]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 0,
+			ValTypeOfVLD != SKIP_NAL
+		end
+
+	ResBlkCavlc.FunctionWith1Param: action
+			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
+			ResBlkCavlcVLD_Param :[Param]
+				==>
+			TypeOfVLD            :[ValTypeOfVLD],
+			VLD_Param            :[Param]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 1
+		end
+
+	ResBlkCavlc.FunctionWith2Param: action
+			ResBlkCavlcTypeOfVLD :[ValTypeOfVLD],
+			ResBlkCavlcVLD_Param :[Param1 , Param2]
+				==>
+			TypeOfVLD            :[ValTypeOfVLD],
+			VLD_Param            :[Param1 , Param2]
+		guard
+			NbParamForFunction(ValTypeOfVLD) = 2
+		end
+
+	ResBlkCavlc.Done: action
+			ResBlkCavlcTypeOfVLD :[Function]
+				==>
+		guard
+			Function = SKIP_NAL
+		end
+
+
+	schedule fsm LaunchSliceHeader:
+		LaunchSliceHeader (SliceHeader.FunctionWithoutParam )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.FunctionWith1Param   )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.GetVLDVal            )--> LaunchSliceHeader;
+		LaunchSliceHeader (SliceHeader.LaunchRefPicMark     )--> LaunchRefPicMark;
+		LaunchSliceHeader (SliceHeader.LaunchRefPicList     )--> LaunchRefPicList;
+		LaunchSliceHeader (SliceHeader.Done                 )--> LaunchSliceData;
+
+			LaunchRefPicMark (RefPicMark.FunctionWithoutParam )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.FunctionWith1Param   )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.GetVLDVal            )--> LaunchRefPicMark;
+			LaunchRefPicMark (RefPicMark.Done                 )--> LaunchSliceHeader;
+	
+			LaunchRefPicList (RefPicList.FunctionWithoutParam )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.FunctionWith1Param   )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.GetVLDVal            )--> LaunchRefPicList;
+			LaunchRefPicList (RefPicList.Done                 )--> LaunchSliceHeader;
+
+		LaunchSliceData   (SliceData.FunctionWithoutParam   )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.FunctionWith1Param     )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.GetVLDVal              )--> LaunchSliceData;
+		LaunchSliceData   (SliceData.LaunchMbLayer          )--> LaunchMbLayer;
+		LaunchSliceData   (SliceData.Done                   )--> LaunchSliceHeader;
+	
+			LaunchMbLayer    (MbLayer.FunctionWithoutParam    )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.FunctionWith1Param      )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.GetVLDVal               )--> LaunchMbLayer;
+			LaunchMbLayer    (MbLayer.Done                    )--> LaunchSliceData;
+			LaunchMbLayer    (MbLayer.LaunchSubMbPred         )--> LaunchSubMbPred;
+			LaunchMbLayer    (MbLayer.LaunchMbPred            )--> LaunchMbPred;
+			LaunchMbLayer    (MbLayer.LaunchResidual          )--> LaunchResidual;
+	
+				LaunchMbPred    (MbPred.FunctionWithoutParam    )--> LaunchMbPred;
+				LaunchMbPred    (MbPred.FunctionWith1Param      )--> LaunchMbPred;
+				LaunchMbPred    (MbPred.GetVLDVal               )--> LaunchMbPred;
+				LaunchMbPred    (MbPred.Done                    )--> LaunchMbLayer;
+	
+				LaunchSubMbPred (SubMbPred.FunctionWithoutParam )--> LaunchSubMbPred;
+				LaunchSubMbPred (SubMbPred.FunctionWith1Param   )--> LaunchSubMbPred;
+				LaunchSubMbPred (SubMbPred.GetVLDVal            )--> LaunchSubMbPred;
+				LaunchSubMbPred (SubMbPred.Done                 )--> LaunchMbLayer;
+
+				LaunchResidual  (Residual.Done                  )--> LaunchMbLayer;
+				LaunchResidual  (Residual.LaunchResBlkCavlc     )--> LaunchResBlkCavlc;
+
+	
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWithoutParam )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWith1Param   )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.FunctionWith2Param   )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.GetVLDVal            )--> LaunchResBlkCavlc;
+					LaunchResBlkCavlc (ResBlkCavlc.Done                 )--> LaunchResidual;
+	end
+
+	priority
+		SliceHeader.GetVLDVal        > SliceHeader.FunctionWithoutParam > SliceHeader.FunctionWith1Param > SliceHeader.LaunchRefPicMark;
+		SliceHeader.LaunchRefPicMark > SliceHeader.LaunchRefPicList     > SliceHeader.Done;
+		RefPicMark.GetVLDVal         > RefPicMark.FunctionWithoutParam  > RefPicMark.FunctionWith1Param  > RefPicMark.Done;
+		RefPicList.GetVLDVal         > RefPicList.FunctionWithoutParam  > RefPicList.FunctionWith1Param  > RefPicList.Done;
+		SliceData.GetVLDVal          > SliceData.FunctionWithoutParam   > SliceData.FunctionWith1Param   > SliceData.LaunchMbLayer        > SliceData.Done;
+		MbLayer.GetVLDVal            > MbLayer.FunctionWithoutParam     > MbLayer.FunctionWith1Param     > MbLayer.LaunchMbPred;
+		MbLayer.LaunchMbPred         > MbLayer.LaunchSubMbPred          > MbLayer.LaunchResidual         > MbLayer.Done;
+		MbPred.GetVLDVal             > MbPred.FunctionWithoutParam      > MbPred.FunctionWith1Param      > MbPred.Done;
+		ResBlkCavlc.GetVLDVal        > ResBlkCavlc.FunctionWithoutParam > ResBlkCavlc.FunctionWith1Param > ResBlkCavlc.FunctionWith2Param > ResBlkCavlc.Done;
+	end
+end

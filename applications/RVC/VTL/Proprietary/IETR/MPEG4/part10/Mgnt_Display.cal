@@ -1,0 +1,158 @@
+/********************************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+
+*****************************************************************************/
+
+package Proprietary.IETR.MPEG4.part10;
+
+actor Mgnt_Display (bool Debug)
+	uint(size=32) Poc,
+	uint(size=8)  MaxDPBSize,
+	bool          EmptyDpb
+	
+		==>
+  	int(size=32) POCtoDisplay
+		:
+
+	bool DEBUG_INPUT = false;
+
+
+	List(type:int (size=32),size=16) ListPOC    := [-1    :for int s in 0 .. 15];
+	List(type:bool         ,size=16) IsUsed     := [false :for int s in 0 .. 15];
+	
+	int (size=5)  IdxNextPOC      := -1;
+	uint(size=4)  CurrentIdx      := 0;
+	int (size=32) NextPOC         := 0;
+	uint(size=5)  NbPic           := 0;
+	uint(size=5)  SizeDPBMax      := 16;
+
+
+	GetPOC: action
+			Poc        :[ValPOC],
+			MaxDPBSize :[ValMaxDPBSize],
+			EmptyDpb      :[IsIDR_Picture]
+				==>
+		var
+			bool         idx_selected := false
+		do
+			if(DEBUG_INPUT and Debug)then
+				println("Input Mgnt_Display Poc:"+ValPOC);
+				println("Input Mgnt_Display MaxDPBSize:"+ValMaxDPBSize);
+				println("Input Mgnt_Display EmptyDpb:"+IsIDR_Picture);
+			end
+			CurrentIdx := 0;
+			while( (CurrentIdx < 16) and (not idx_selected) )
+			do
+				if(IsUsed[CurrentIdx] = false) then
+					if(IsIDR_Picture)then
+						ListPOC[CurrentIdx] := 0;
+					else
+						ListPOC[CurrentIdx] := ValPOC;
+					end
+					IsUsed[CurrentIdx] := true;
+					idx_selected       := true;
+				end
+				CurrentIdx := CurrentIdx + 1;
+			end
+			SizeDPBMax      := ValMaxDPBSize;
+			CurrentIdx      := CurrentIdx - 1;
+			NbPic           := NbPic + 1;
+		end
+
+	SearchForNextPOC.BufferFull_or_IDR: action ==>
+		do
+			IdxNextPOC := -1;	
+			
+			foreach int i in 0 .. 15
+			do
+				if((ListPOC[i] >= NextPOC) and (IsUsed[i] = true)) then
+					if(IdxNextPOC != -1) then
+						if((ListPOC[i] < ListPOC[IdxNextPOC]) )then
+							IdxNextPOC := i;
+						end
+					else
+						IdxNextPOC := i;
+					end
+				end
+			end
+			if(IdxNextPOC = -1) then
+				foreach int i in 0 .. 15
+				do
+					if((ListPOC[i] >= 0) and(IsUsed[i] = true)) then
+						if(IdxNextPOC != -1) then
+							if(ListPOC[i]<ListPOC[IdxNextPOC])then
+								IdxNextPOC := i;
+								NextPOC := ListPOC[i];
+							end
+						else
+							IdxNextPOC := i;
+							NextPOC := ListPOC[i];
+						end
+					end
+				end
+				if(IdxNextPOC != -1) then
+					NextPOC := NextPOC + 1;
+				end
+			else
+				NextPOC := ListPOC[IdxNextPOC] + 1;
+			end
+		end
+
+	SearchForNextPOC.BufferNotFull: action ==>
+		guard
+			NbPic < SizeDPBMax,
+			ListPOC[CurrentIdx] != 0
+		do
+			IdxNextPOC := -1;
+			foreach int i in 0 .. 15
+			do
+				if((ListPOC[i] = NextPOC) and (IsUsed[i] = true)) then
+					if(IdxNextPOC = -1) then
+						IdxNextPOC := i;
+						NextPOC := NextPOC + 1;
+					end
+				end
+			end
+		end
+
+	SendNextPOC.launch: action
+				==>
+			POCtoDisplay :[ ListPOC[IdxNextPOC] ]
+		guard
+			IdxNextPOC >= 0
+		do
+			IsUsed[IdxNextPOC] := false;
+			NbPic              := NbPic - 1;
+		end
+
+
+	SendNextPOC.skip: action
+				==>
+			POCtoDisplay :[ -1 ]
+		end
+
+
+	schedule fsm GetPOC:
+		GetPOC           (GetPOC             )-->SearchForNextPOC;
+		SearchForNextPOC (SearchForNextPOC   )-->SendNextPOC;
+		SendNextPOC      (SendNextPOC.launch )-->SearchForNextPOC;
+		SendNextPOC      (SendNextPOC.skip   )-->GetPOC;
+	end
+
+	priority
+		SearchForNextPOC.BufferNotFull > SearchForNextPOC.BufferFull_or_IDR;
+		SendNextPOC.launch             > SendNextPOC.skip;
+	end
+end

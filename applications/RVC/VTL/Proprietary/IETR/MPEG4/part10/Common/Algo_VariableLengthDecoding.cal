@@ -1,0 +1,754 @@
+/***********************************************************************
+
+This software module was originally developed by Damien de Saint Jorre IETR/INSA of Rennes (France), in the course of development of the <standard> for reference purposes and its performance may not have been optimized. This software module is an implementation of one or more tools as specified by the MPEG-C part 4.
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works of this software module or modifications thereof for use in implementations of the <standard>  in products that satisfy conformance criteria (if any).
+Those intending to use this software module in products are advised that its use may infringe existing patents. ISO/IEC have no liability for use of this software module or modifications thereof.
+Copyright is not released for products that do not conform to audiovisual and image-coding related ITU Recommendations and/or ISO/IEC International Standards.
+Assurance that the originally developed software module can be used (1) in the <standard> once the <standard> has been adopted; and (2) to develop the MPEG-C part 4:
+
+IETR/INSA of Rennes (France) grants ISO/IEC all rights necessary to include the originally developed software module or modifications thereof in the <standard> and to permit ISO/IEC to offer You a royalty-free, worldwide, non-exclusive, copyright license to copy, distribute, and make derivative works for use in implementations of the MPEG-C part 4 in products that satisfy conformance criteria (if any), and to the extent that such originally developed software module or portions of it are included in the MPEG-C part 4.  To the extent that IETR/INSA of Rennes (France) owns patent rights that would be required to make, use, or sell the originally developed software module or portions thereof included in the MPEG-C part 4 in a conforming product,  IETR/INSA of Rennes (France) will assure the ISO/IEC that it is willing to negotiate licenses under reasonable and non-discriminatory terms and conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications thereof for the sole  purpose of developing the MPEG-C part 4
+
+IETR/INSA of Rennes (France) retains full right to modify and use the code for its own purpose, assign or donate the code to a third party and to inhibit third parties from using the code for products that do not conform to MPEG-related ITU Recommendations and/or ISO/IEC International Standards.
+This copyright notice must be included in all copies or derivative works. Copyright (c) ISO/IEC 2008.
+***********************************************************************/
+package Proprietary.IETR.MPEG4.part10.Common;
+
+import Proprietary.IETR.MPEG4.part10.Common.Imp_DecodingFunctions.*;
+import Proprietary.IETR.MPEG4.part10.Common.Imp_CavlcLookUpTables.*;
+import MPEG.Common.Imp_ByteOperation.*;
+
+actor Algo_VariableLengthDecoding()
+	uint(size=8)  RbspByte,
+	bool          NewNal,
+
+	uint(size=5)   TypeOfVLD,
+	int (size=32)  VLD_Param
+		==>
+	int (size=32)  ValDecoded
+		:
+
+
+/*
+*
+* Constants
+*
+*/
+
+	bool DEBUG_FLAG_DECODED = false;
+
+/*
+*
+* Procedure
+*
+*/
+	uint(size=32) Out_ReadNBits;
+	procedure ReadNBitsInWorkingByte(uint(size=32) InitialValue, uint(size=4) NbBitsToRead)
+	begin
+			Out_ReadNBits    := InitialValue << NbBitsToRead;
+			Out_ReadNBits    := Out_ReadNBits + MaskBits(WorkingByte >> (8-NbBitsToRead) , NbBitsToRead);
+			WorkingByte     := WorkingByte << NbBitsToRead;
+			CountBufferRbsp := CountBufferRbsp - NbBitsToRead;
+	end
+
+/*
+*
+* State variables
+*
+*/
+	//Contains the Byte which is currently read.
+	uint(size=16) WorkingByte      := 0;
+	//Contains the number of bit which are not read yet in WorkingByte
+	uint(size=4)  CountBufferRbsp  := 0;
+
+	//Contains up to 4 next byte in the flow. It helps for more_rbsp_data()
+	uint(size=3)  SizeBufferRbsp   := 0;
+	List(type: uint(size=8), size=4) BufferRbsp := [0: for int s in 0 .. 3];
+
+	/* ue(v) and Cavlc coeff_token()*/
+	bool          Bit1Found       := false;
+	uint(size=5)  leadingZeroBits := 0;
+
+	/* ue(v) only */
+	int (size=31) CodeNum         := 0;
+
+	/* u(n) */
+	uint(size=5)  BitsCount       := 0;
+	uint(size=31) ReadValue       := 0;
+	uint(size=1)  TeVal           := 0;
+
+	/* more_rbsp_data() */
+	bool          NewNalAlreadyDetected  := false;
+
+	/* Cavlc */
+	uint(size=5) NbBitsRead;
+
+	/* Cavlc coeff_token */
+	uint(size=3) Idx_nC;
+	uint(size=6) coeff_token;
+
+	/* Cavlc total_zeros and run_before */
+	uint(size=3) ValRead         := 0;
+
+	/* Cavlc total_zeros */
+	uint(size=2) IdxmaxNumCoeff  := 0;
+	uint(size=4) TotalCoeffParam := 0;
+
+	/* Cavlc run_before */
+	uint(size=8) IdxzerosLeft    := 0;
+
+/*
+*
+* Actions
+*
+*/
+	//Syntaxe decoding have finished the decoding of this Nal
+	IsEndOfNal: action
+			TypeOfVLD :[Func]
+				==>
+		guard
+			Func    = SKIP_NAL
+		do
+			CountBufferRbsp := 0;
+			SizeBufferRbsp  := 0;
+		end
+
+	//We skip all bytes in the current nal
+	WaitForNewNal: action
+			NewNal       :[IsNewNal],
+			RbspByte     :[ValRbsp]
+				==>
+		guard
+			IsNewNal = false
+		end
+
+	NewNalDetected: action
+			NewNal :[IsNewNal]
+				==>
+		guard
+			IsNewNal = true
+		do
+			SizeBufferRbsp := 0;
+		end
+
+	NewNalHasBeenSent: action ==>
+		guard
+			NewNalAlreadyDetected = true
+		end
+
+	ResetNewNalAlreadyDetected: action ==>
+		do
+			NewNalAlreadyDetected := false;
+		end
+
+	IsMoreRbspData: action
+			TypeOfVLD :[ValTypeOfVLD]
+				==>
+		guard
+			ValTypeOfVLD = MORE_RBSP_DATA
+		end
+
+
+	CheckSizeBufferRbsp.IsEqualOrSupTo2: action
+				==>
+			ValDecoded :[1]
+		guard
+			SizeBufferRbsp >= 2
+		end
+
+	CheckSizeBufferRbsp.IsEqualTo1: action
+				==>
+			ValDecoded :[IsMoreDataInRbsp]
+		guard
+			SizeBufferRbsp = 1
+		var
+			uint(size=1) IsMoreDataInRbsp
+		do
+			if( ((WorkingByte = 0 and (BufferRbsp[0] & 0xFF) = 0x03) or ((BufferRbsp[0] & 0xFF) = 0x80)) and (CountBufferRbsp = 0) )then
+				IsMoreDataInRbsp := 0;
+			else
+				IsMoreDataInRbsp := 1;
+			end
+		end
+
+	CheckSizeBufferRbsp.IsEqualTo0: action
+				==>
+			ValDecoded :[IsMoreDataInRbsp]
+		guard
+			SizeBufferRbsp = 0
+		var
+			uint(size=1) IsMoreDataInRbsp
+		do
+			if( (WorkingByte & 0xFF) = 0x80 )then
+				IsMoreDataInRbsp := 0;
+			else
+				IsMoreDataInRbsp := 1;
+			end
+		end
+
+
+	FillBufferRbsp: action
+			RbspByte :[ValRbspByte],
+			NewNal   :[ValNewNal]
+				==>
+		guard
+			SizeBufferRbsp        < 4,
+			ValNewNal             = false,
+			NewNalAlreadyDetected = false
+		do
+			BufferRbsp[3]  := BufferRbsp[2];
+			BufferRbsp[2]  := BufferRbsp[1];
+			BufferRbsp[1]  := BufferRbsp[0];
+			BufferRbsp[0]  := ValRbspByte;
+			SizeBufferRbsp := SizeBufferRbsp + 1;
+		end
+
+
+	FutureNewNalDetected: action
+			NewNal :[IsNewNal]
+				==>
+		guard
+			IsNewNal              = true,
+			NewNalAlreadyDetected = false
+		do
+			NewNalAlreadyDetected := true;
+		end
+
+
+	IsVldUe: action
+			TypeOfVLD :[ValTypeOfVLD]
+				==>
+		guard
+			ValTypeOfVLD = VLD_UE
+		do
+			Bit1Found       := false;
+			leadingZeroBits := 0;
+			CodeNum         := 0;
+		end
+
+
+	IsVldSe: action
+			TypeOfVLD :[ValTypeOfVLD]
+				==>
+		guard
+			ValTypeOfVLD = VLD_SE
+		do
+			Bit1Found       := false;
+			leadingZeroBits := 0;
+			CodeNum         := 0;
+		end
+
+
+	IsReadBits: action
+			TypeOfVLD :[ValTypeOfVLD],
+			VLD_Param :[ValNbBits]
+				==>
+		guard
+			ValTypeOfVLD = READ_BITS
+		do
+			BitsCount := ValNbBits;
+			ReadValue := 0;
+			TeVal     := 0;
+		end
+
+
+	IsVldTe.u: action
+			TypeOfVLD :[ValTypeOfVLD],
+			VLD_Param :[TypeOfVld]
+				==>
+		guard
+			ValTypeOfVLD = VLD_TE,
+			TypeOfVld    = 1
+		do
+			BitsCount := 1;
+			ReadValue := 0;
+			TeVal     := 1;
+		end
+
+
+	IsVldTe.ue: action
+			TypeOfVLD :[ValTypeOfVLD],
+			VLD_Param :[TypeOfVld]
+				==>
+		guard
+			ValTypeOfVLD = VLD_TE,
+			TypeOfVld    > 1
+		do
+			Bit1Found       := false;
+			leadingZeroBits := 0;
+			CodeNum         := 0;
+		end
+
+
+	IsCavlcCoeffToken: action
+			TypeOfVLD :[ValTypeOfVLD],
+			VLD_Param :[nC]
+				==>
+		guard
+			ValTypeOfVLD = CAVLC_COEFF_TOKEN
+		do
+			if(nC < 0)then
+				if(nC = -1)then
+					Idx_nC := 4;
+				else
+					Idx_nC := 5;
+				end
+			else
+				if(nC >=8)then
+					Idx_nC := 3;
+				else
+					if(nC >=4)then
+						Idx_nC := 2;
+					else
+						Idx_nC := nC/2;
+					end
+				end
+			end
+			coeff_token := 0;
+			NbBitsRead := 0;
+		end
+
+
+	IsCavlcTotalZeros: action
+			TypeOfVLD :[ValTypeOfVLD],
+			VLD_Param :[maxNumCoeff , TotalCoeff]
+				==>
+		guard
+			ValTypeOfVLD = CAVLC_TOTAL_ZEROS
+		do
+			IdxmaxNumCoeff :=
+				if(maxNumCoeff = 4) then
+					0
+				else
+					if(maxNumCoeff=8) then
+						1
+					else
+						2
+					end
+				end;
+			NbBitsRead      := 0;
+			ValRead         := 0;
+			TotalCoeffParam := TotalCoeff & 0x0F;
+		end
+
+
+	IsCavlcRunBefore: action
+			TypeOfVLD :[ValTypeOfVLD],
+			VLD_Param :[zerosLeft]
+				==>
+		guard
+			ValTypeOfVLD = CAVLC_RUN_BEFORE
+		do
+			IdxzerosLeft :=
+				if(zerosLeft > 0 and zerosLeft <= 6) then
+					zerosLeft - 1
+				else
+					6
+				end;
+			NbBitsRead      := 0;
+			ValRead         := 0;
+		end
+
+
+	IsCavlcLevelPrefix: action
+			TypeOfVLD :[ValTypeOfVLD]
+				==>
+		guard
+			ValTypeOfVLD = CAVLC_LEVEL_PREFIX
+		do
+			Bit1Found       := false;
+			leadingZeroBits := 0;
+		end
+
+
+	IsByteAligned: action
+			TypeOfVLD    :[ValTypeOfVLD]
+				==>
+		guard
+			ValTypeOfVLD = BYTE_ALIGNED_REQUIRED
+		do
+			if(CountBufferRbsp != 8)then
+				CountBufferRbsp := 0;
+			end
+		end
+
+
+	Buffer.IsEmpty: action ==>
+		guard
+			CountBufferRbsp = 0,
+			SizeBufferRbsp  > 0
+		do
+			CountBufferRbsp := 8;
+			SizeBufferRbsp  := SizeBufferRbsp - 1;
+			WorkingByte     := BufferRbsp[SizeBufferRbsp];
+		end
+
+
+	Buffer.IsNotEmpty: action ==>
+		guard
+			CountBufferRbsp > 0
+		end
+
+
+	GetCodeNum.Launch: action ==>
+		var
+			uint(size=5) NbBitsToAdd
+		do
+			if(not Bit1Found)then
+				while( ((WorkingByte & 0x80) = 0) and (CountBufferRbsp > 0))
+				do
+					CountBufferRbsp := CountBufferRbsp - 1;
+					WorkingByte     := WorkingByte << 1;
+					leadingZeroBits := leadingZeroBits + 1;
+				end
+				if(CountBufferRbsp > 0)then
+					leadingZeroBits := leadingZeroBits + 1;
+					Bit1Found       := true;
+				end
+			end
+			if(Bit1Found)then
+				NbBitsToAdd :=
+					if(CountBufferRbsp < leadingZeroBits)then
+						CountBufferRbsp
+					else
+						leadingZeroBits
+					end;
+				ReadNBitsInWorkingByte(CodeNum,NbBitsToAdd);
+				CodeNum         := Out_ReadNBits;
+				leadingZeroBits := leadingZeroBits - NbBitsToAdd;
+			end
+		end
+
+
+	GetCodeNum.Finished: action ==>
+		guard
+			leadingZeroBits = 0
+		end
+
+
+	GetCodeNum.NotFinished: action ==>
+		guard
+			leadingZeroBits != 0
+		end
+
+
+	SendUeValue: action
+				==>
+			ValDecoded :[CodeNum]
+		do
+			CodeNum := CodeNum - 1;
+		end
+
+
+	SendSeValue: action
+				==>
+			ValDecoded :[CodeNum]
+		do
+			//CodeNum computed is equal to CodeNum + 1
+			if( (CodeNum mod 2) = 0 )then
+				CodeNum := CodeNum / 2;
+			else
+				CodeNum := -CodeNum / 2;
+			end
+		end
+
+
+	Get_u.Launch: action ==>
+		var
+			uint(size=5) NbBitsToAdd
+		do
+			NbBitsToAdd :=
+				if(CountBufferRbsp < BitsCount)then
+					CountBufferRbsp
+				else
+					BitsCount
+				end;
+			ReadNBitsInWorkingByte(ReadValue,NbBitsToAdd);
+			ReadValue       := Out_ReadNBits;
+			BitsCount       := BitsCount - NbBitsToAdd;
+		end
+
+
+	Get_u.Finished: action ==>
+		guard
+			BitsCount = 0
+		end
+
+
+	Get_u.NotFinished: action ==>
+		guard
+			BitsCount != 0
+		end
+
+
+	SendUValue: action
+				==>
+			ValDecoded :[ValueDec]
+		var
+			uint(size=31) ValueDec
+		do
+			ValueDec := ReadValue ^ TeVal;
+		end
+
+
+	GetCavlcCoeffToken.Launch: action ==>
+		var
+			//delete me! (Bug in the front-end)
+			bool titi
+		do
+			ReadNBitsInWorkingByte(coeff_token,1);
+			coeff_token := Out_ReadNBits;
+			NbBitsRead  := NbBitsRead + 1;
+			titi := TotalCoeffValid[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F];
+			while((not titi) and (CountBufferRbsp > 0))
+			do
+				ReadNBitsInWorkingByte(coeff_token,1);
+				coeff_token := Out_ReadNBits;
+				NbBitsRead  := NbBitsRead + 1;
+				titi := TotalCoeffValid[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F];
+			end
+		end
+
+	GetCavlcCoeffToken.NotFinished: action ==>
+		guard
+			TotalCoeffValid[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F] = false
+		end
+
+	GetCavlcCoeffToken.Finished: action
+				==>
+			ValDecoded :[TotalCoeffValue[Idx_nC][(NbBitsRead - 1) & 0x0F][coeff_token & 0x3F]]
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("Cavlc CoeffToken; Idx_nc :" + Idx_nC + " ; NbBitsRead : "+NbBitsRead+ " ; coeff_token : "+coeff_token);
+			end
+		end
+
+
+	GetCavlcLevelPrefix.Launch: action ==>
+		do
+			while( ((WorkingByte & 0x80) = 0) and (CountBufferRbsp > 0))
+			do
+				CountBufferRbsp := CountBufferRbsp - 1;
+				WorkingByte     := WorkingByte << 1;
+				leadingZeroBits := leadingZeroBits + 1;
+			end
+			if(CountBufferRbsp > 0)then
+				Bit1Found       := true;
+				/* We read the one bit value */
+				CountBufferRbsp := CountBufferRbsp - 1;
+				WorkingByte     := WorkingByte << 1;
+			end
+		end
+
+
+	GetCavlcLevelPrefix.NotFinished: action ==>
+		guard
+			not Bit1Found
+		end
+
+
+	GetCavlcLevelPrefix.Finished: action
+				==>
+			ValDecoded :[leadingZeroBits]
+		guard
+			Bit1Found
+		end
+
+
+	GetCavlcTotalZeros.Launch: action ==>
+		var
+			//delete me!
+			bool titi
+		do
+			ReadNBitsInWorkingByte(ValRead,1);
+			ValRead := Out_ReadNBits;
+			NbBitsRead      := NbBitsRead + 1;
+			titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07];
+			while((not titi) and (CountBufferRbsp > 0))
+			do
+				ReadNBitsInWorkingByte(ValRead,1);
+				ValRead    := Out_ReadNBits;
+				NbBitsRead := NbBitsRead + 1;
+				titi := TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07];
+			end
+		end
+
+	GetCavlcTotalZeros.NotFinished: action ==>
+		guard
+			not TotalZerosValid[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07]
+		end
+
+	GetCavlcTotalZeros.Finished: action
+				==>
+			ValDecoded :[TotalZerosValue[IdxmaxNumCoeff][TotalCoeffParam][NbBitsRead & 0x0F][ValRead & 0x07]]
+		do
+			if(DEBUG_FLAG_DECODED)then
+				println("Cavlc TotalZeros; Idx :" + IdxmaxNumCoeff +" ; TotalCoeff :"+TotalCoeffParam+ " ; NbBitsRead : "+NbBitsRead+ " ; Codeword : "+ValRead);
+			end
+		end
+
+
+	GetCavlcRunBefore.Launch: action ==>
+		var
+			//delete me!
+			bool titi
+		do
+			ReadNBitsInWorkingByte(ValRead,1);
+			ValRead    := Out_ReadNBits;
+			NbBitsRead := NbBitsRead + 1;
+			titi := RunBeforeValid[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07];
+			while((not titi) and (CountBufferRbsp > 0))
+			do
+				ReadNBitsInWorkingByte(ValRead,1);
+				ValRead    := Out_ReadNBits;
+				NbBitsRead := NbBitsRead + 1;
+				titi := RunBeforeValid[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07];
+			end
+		end
+
+	GetCavlcRunBefore.NotFinished: action ==>
+		guard
+			not RunBeforeValid[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07]
+		end
+
+	GetCavlcRunBefore.Finished: action
+				==>
+			ValDecoded :[RunBeforeValue[IdxzerosLeft][NbBitsRead & 0x0F][ValRead & 0x07]]
+		end
+
+/*
+*
+* Scheduler
+*
+*/
+
+	schedule fsm CheckVLDType:
+		CheckVLDType    (IsEndOfNal                          )--> WaitForNewNal;
+		CheckVLDType    (IsByteAligned                       )--> CheckVLDType;
+		CheckVLDType    (IsVldUe                             )--> VLDecoding_Ue;
+		CheckVLDType    (IsVldSe                             )--> VLDecoding_Se;
+		CheckVLDType    (IsVldTe.ue                          )--> VLDecoding_Ue;
+		CheckVLDType    (IsVldTe.u                           )--> Decode_u;
+		CheckVLDType    (IsReadBits                          )--> Decode_u;
+		CheckVLDType    (IsMoreRbspData                      )--> FillBuffer;
+		CheckVLDType    (IsCavlcLevelPrefix                  )--> DecCavlcLevPre;
+		CheckVLDType    (IsCavlcCoeffToken                   )--> DecCavlcCofTkn;
+		CheckVLDType    (IsCavlcTotalZeros                   )--> DecCavlcTotZer;
+		CheckVLDType    (IsCavlcRunBefore                    )--> DecCavlcRunBef;
+		CheckVLDType    (FillBufferRbsp                      )--> CheckVLDType;
+
+		/* more_rbsp_data() */
+		FillBuffer      (FillBufferRbsp                      )--> FillBuffer;
+		FillBuffer      (FutureNewNalDetected                )--> CheckBuffer;
+		FillBuffer      (CheckSizeBufferRbsp.IsEqualOrSupTo2 )--> CheckVLDType;
+		FillBuffer      (NewNalHasBeenSent                   )--> CheckBuffer;
+
+		CheckBuffer     (CheckSizeBufferRbsp                 )--> CheckVLDType;
+
+		/* Skip the others values of the Rbsp */
+		WaitForNewNal   (NewNalHasBeenSent                   )--> ResetNewNal;
+		WaitForNewNal   (WaitForNewNal                       )--> WaitForNewNal2;
+		WaitForNewNal   (NewNalDetected                      )--> CheckVLDType;
+
+		ResetNewNal     (ResetNewNalAlreadyDetected          )--> CheckVLDType;
+
+		WaitForNewNal2  (WaitForNewNal                       )--> WaitForNewNal2;
+		WaitForNewNal2  (NewNalDetected                      )--> CheckVLDType;
+
+		/* ue(v) decoding process */
+			/*Fill in the WorkingByte if it's empty*/
+		VLDecoding_Ue   (Buffer                              )--> GetCodeNum4ue;
+		VLDecoding_Ue   (FillBufferRbsp                      )--> VLDecoding_Ue;
+
+		GetCodeNum4ue   (GetCodeNum.Launch                   )--> CheckCodeNum4ue;
+
+		CheckCodeNum4ue (GetCodeNum.NotFinished              )--> VLDecoding_Ue;
+		CheckCodeNum4ue (GetCodeNum.Finished                 )--> SendUeValue;
+
+		SendUeValue     (SendUeValue                         )--> CheckVLDType;
+
+
+		/* se(v) decoding process */
+			/*Fill in the WorkingByte if it's empty*/
+		VLDecoding_Se   (Buffer                              )--> GetCodeNum4se;
+		VLDecoding_Se   (FillBufferRbsp                      )--> VLDecoding_Se;
+
+		GetCodeNum4se   (GetCodeNum.Launch                   )--> CheckCodeNum4se;
+
+		CheckCodeNum4se (GetCodeNum.NotFinished              )--> VLDecoding_Se;
+		CheckCodeNum4se (GetCodeNum.Finished                 )--> SendUeValse;
+
+		SendUeValse     (SendSeValue                         )--> CheckVLDType;
+
+
+		/* u(n) decoding process */
+			/*Fill in the WorkingByte if it's empty*/
+		Decode_u        (Buffer                              )--> Get_u;
+		Decode_u        (FillBufferRbsp                      )--> Decode_u;
+
+		Get_u           (Get_u.Launch                        )--> Check_u_Val;
+
+		Check_u_Val     (Get_u.NotFinished                   )--> Decode_u;
+		Check_u_Val     (Get_u.Finished                      )--> SendUValue;
+
+		SendUValue      (SendUValue                          )--> CheckVLDType;
+
+
+		/* Cavlc coeff_token() decoding process */
+			/*Fill in the WorkingByte if it's empty*/
+		DecCavlcCofTkn  (Buffer                              )--> GetCavlcCofTkn;
+		DecCavlcCofTkn  (FillBufferRbsp                      )--> DecCavlcCofTkn;
+
+		GetCavlcCofTkn   (GetCavlcCoeffToken.Launch          )--> ChckCavlcCofTkn;
+
+		ChckCavlcCofTkn (GetCavlcCoeffToken.NotFinished      )--> DecCavlcCofTkn;
+		ChckCavlcCofTkn (GetCavlcCoeffToken.Finished         )--> CheckVLDType;
+
+		/* Cavlc level_prefix decoding process */
+			/*Fill in the WorkingByte if it's empty*/
+		DecCavlcLevPre  (Buffer                              )--> GetCavlcLevPre;
+		DecCavlcLevPre  (FillBufferRbsp                      )--> DecCavlcLevPre;
+
+		GetCavlcLevPre  (GetCavlcLevelPrefix.Launch          )--> ChckCavlcLevPre;
+
+		ChckCavlcLevPre (GetCavlcLevelPrefix.NotFinished     )--> DecCavlcLevPre;
+		ChckCavlcLevPre (GetCavlcLevelPrefix.Finished        )--> CheckVLDType;
+
+		/* Cavlc total_zeros decoding process */
+			/*Fill in the WorkingByte if it's empty*/
+		DecCavlcTotZer  (Buffer                              )--> GetCavlcTotZer;
+		DecCavlcTotZer  (FillBufferRbsp                      )--> DecCavlcTotZer;
+
+		GetCavlcTotZer  (GetCavlcTotalZeros.Launch          )--> ChckCavlcTotZer;
+
+		ChckCavlcTotZer (GetCavlcTotalZeros.NotFinished     )--> DecCavlcTotZer;
+		ChckCavlcTotZer (GetCavlcTotalZeros.Finished        )--> CheckVLDType;
+
+		/* Cavlc run_before decoding process */
+			/*Fill in the WorkingByte if it's empty*/
+		DecCavlcRunBef  (Buffer                              )--> GetCavlcRunBef;
+		DecCavlcRunBef  (FillBufferRbsp                      )--> DecCavlcRunBef;
+
+		GetCavlcRunBef  (GetCavlcRunBefore.Launch            )--> ChckCavlcRunBef;
+
+		ChckCavlcRunBef (GetCavlcRunBefore.NotFinished     )--> DecCavlcRunBef;
+		ChckCavlcRunBef (GetCavlcRunBefore.Finished        )--> CheckVLDType;
+
+	end
+	
+	priority
+		NewNalHasBeenSent               > WaitForNewNal                        > NewNalDetected;
+		IsVldUe                         > IsReadBits                           > IsCavlcLevelPrefix;  
+		IsCavlcLevelPrefix              > IsCavlcRunBefore > IsCavlcCoeffToken > IsVldSe;
+		IsVldSe                         > IsVldTe.ue       > IsVldTe.u         > FillBufferRbsp;
+		FillBufferRbsp                  > IsMoreRbspData   > IsByteAligned     > IsEndOfNal;
+		CheckSizeBufferRbsp             > FillBufferRbsp                       > FutureNewNalDetected > NewNalHasBeenSent;
+		GetCodeNum.NotFinished          > GetCodeNum.Finished;
+		Buffer.IsNotEmpty               > FillBufferRbsp                       > Buffer.IsEmpty;
+		GetCavlcCoeffToken.NotFinished  > GetCavlcCoeffToken.Finished;
+		GetCavlcLevelPrefix.NotFinished > GetCavlcLevelPrefix.Finished;
+		GetCavlcTotalZeros.NotFinished  > GetCavlcTotalZeros.Finished;
+		GetCavlcRunBefore.NotFinished   > GetCavlcRunBefore.Finished;
+	end
+end

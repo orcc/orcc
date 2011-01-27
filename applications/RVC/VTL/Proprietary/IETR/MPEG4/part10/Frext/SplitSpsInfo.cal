@@ -1,0 +1,153 @@
+/********************************************************************************
+
+This software module was originally developed by 
+Damien de Saint Jorre (IETR/INSA of Rennes), 
+in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+for reference purposes and its performance may not have been optimized. 
+This software module is an implementation of one or more tools as 
+specified by the ISO/IEC 23002-4.
+
+ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+license to copy, distribute, and make derivative works of this software 
+module or modifications thereof for use in implementations of the 
+ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+
+Those intending to use this software module in products are advised that 
+its use may infringe existing patents. ISO/IEC have no liability for use 
+of this software module or modifications thereof.
+
+Copyright is not released for products that do not conform to audiovisual 
+and image-coding related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+Assurance that the originally developed software module can be used 
+(1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+(2) to develop the ISO/IEC 23002-4: 
+
+IETR/INSA of Rennes grants ISO/IEC all rights necessary to 
+include the originally developed software module or modifications thereof 
+in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+worldwide, non-exclusive, copyright license to copy, distribute, and make 
+derivative works for use in implementations of the ISO/IEC 23002-4 in 
+products that satisfy conformance criteria (if any), and to the extent 
+that such originally developed software module or portions of it are 
+included in the ISO/IEC 23002-4.  To the extent that IETR/INSA of Rennes
+owns patent rights that would be required to make, use, or 
+sell the originally developed software module or portions thereof 
+included in the ISO/IEC 23002-4 in a conforming product, IETR/INSA of
+Rennes will assure the ISO/IEC that it is willing to 
+negotiate licenses under reasonable and non-discriminatory terms and 
+conditions with applicants throughout the world.
+
+ISO/IEC gives You a free license to this software module or modifications 
+thereof for the sole  purpose of developing theISO/IEC 23002-4
+
+IETR/INSA of Rennes retains full right to modify and use the 
+code for its own purpose, assign or donate the code to a third party and 
+to inhibit third parties from using the code for products that do not 
+conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+Standards. 
+
+This copyright notice must be included in all copies or derivative works. 
+Copyright (c) ISO/IEC 2008.
+*****************************************************************************/
+package Proprietary.IETR.MPEG4.part10.Frext;
+
+actor SplitSpsInfo()
+	uint(size=2) SenderOfRequest,
+	int (size=32) Parameters
+		==>
+	uint(size=32) PpsParameters,
+	int (size=32) HeaderParameters,
+	uint(size=32) DataParameters
+		:
+
+	uint(size=2) GET_SPS_FROM_PIC = 0;
+	uint(size=2) GET_SPS_FROM_PPS = 1;
+
+	uint(size=32) NbValLeft;
+
+	SelectOutput.Pic: action
+			SenderOfRequest :[sender],
+			Parameters      :[SizeOfHeaderList]
+				==>
+		guard
+			sender = GET_SPS_FROM_PIC
+		do
+			NbValLeft := SizeOfHeaderList;
+		end
+
+	SelectOutput.Pps: action
+			SenderOfRequest :[sender],
+			Parameters      :[SizeOfList]
+				==>
+		guard
+			sender = GET_SPS_FROM_PPS
+		do
+			NbValLeft := SizeOfList;
+		end
+
+	GetInfoForPps.Launch: action
+			Parameters    :[ParameterValue]
+				==>
+			PpsParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForPps.Done: action ==>
+		guard
+			NbValLeft = 0
+		end
+
+	GetInfoForHeader.Launch: action
+			Parameters       :[ParameterValue]
+				==>
+			HeaderParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForHeader.Done: action
+			Parameters      :[SizeOfDataList]
+				==>
+		guard
+			NbValLeft = 0
+		do
+			NbValLeft := SizeOfDataList;
+		end
+
+	GetInfoForData.Launch: action
+			Parameters     :[ParameterValue]
+				==>
+			DataParameters :[ParameterValue]
+		guard
+			NbValLeft > 0
+		do
+			NbValLeft := NbValLeft - 1;
+		end
+
+	GetInfoForData.Done: action
+				==>
+		guard
+			NbValLeft = 0
+		end
+
+	schedule fsm SelectOutput:
+		SelectOutput     (SelectOutput.Pic        )--> GetInfoForHeader;
+		SelectOutput     (SelectOutput.Pps        )--> GetInfoForPps;
+
+		GetInfoForPps    (GetInfoForPps.Launch    )--> GetInfoForPps;
+		GetInfoForPps    (GetInfoForPps.Done      )--> SelectOutput;
+
+		GetInfoForHeader (GetInfoForHeader.Launch )--> GetInfoForHeader;
+		GetInfoForHeader (GetInfoForHeader.Done   )--> GetInfoForData;
+
+		GetInfoForData   (GetInfoForData.Launch   )--> GetInfoForData;
+		GetInfoForData   (GetInfoForData.Done     )--> SelectOutput;
+	end
+end

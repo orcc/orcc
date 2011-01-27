@@ -49,6 +49,6 @@
       <vertex id="RefIdxL0ToPoc" x="1018" y="377"/>
       <vertex id="RefIdxL1ToPoc" x="1044" y="573"/>
       <vertex id="SelectRefIdx" x="1207" y="232"/>
-      <vertex id="MvComponent2PicLocation" x="1206" y="61"/>
+      <vertex id="Mgnt_InterPred" x="1206" y="61"/>
    </vertices>
 </layout>

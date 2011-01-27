@@ -6,7 +6,7 @@
       <vertex id="CoefDCR_C" x="163" y="85"/>
       <vertex id="CoefAC_C" x="13" y="50"/>
       <vertex id="CoefACR_C" x="937" y="37"/>
-      <vertex id="Zigzag_4x4" x="114" y="29"/>
+      <vertex id="Algo_IS_Zigzag_4x4" x="114" y="29"/>
       <vertex id="Mgnt_IQ_Chroma" x="296" y="29"/>
       <vertex id="Algo_IQ_QSAndSLAndIDCTScaler_4x4" x="576" y="16"/>
       <vertex id="IT4x4" x="875" y="15"/>

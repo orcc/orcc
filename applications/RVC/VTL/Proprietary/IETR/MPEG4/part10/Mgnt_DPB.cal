@@ -25,7 +25,7 @@ actor Mgnt_DPB ( int MB_WIDTH )
 	uint(size=7)  PicWidthInMb,
 	uint(size=7)  MbLocation,
 	uint(size=13) PicSizeInMb, 
-	uint          POC, 
+	uint          POC,
 	int( size=32) POCtoDisplay,
 	uint(size=32) POCtoRead,
 	int(size=32)  DelList,
@@ -70,11 +70,8 @@ actor Mgnt_DPB ( int MB_WIDTH )
 
 	/*Write information*/
 	bool          write_done       := true;
-	uint(size=21) wa_offset        := 0;
 	uint(size=21) wa_x_offset      := 0;
 	uint(size=21) wa_y_offset      := 0;
-	uint(size=11) wa_W             := 0;
-	uint(size=11) wa_H             := 0;
 	uint(size=11) wa_x             := 0;
 	uint(size=11) wa_y             := 0;
 
@@ -111,19 +108,11 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard
 			write_done = true,
 			is_new_pic_or_slice = IS_NEW_MB
-		var
-			uint(size=16) XinMb,
-			uint(size=16) YinMb
 		do
 			PicWidthInMacroB := PICwidthInMb;
 			PicSizeInMacroB  := PICSizeInMb;
-			XinMb      := MbLocxInPic;
-			YinMb      := MbLocyInPic;
-			wa_offset  := YinMb * MB_WIDTH * (MB_WIDTH * PicWidthInMacroB) + XinMb * MB_WIDTH;
-			wa_x_offset := XinMb * MB_WIDTH;
-			wa_y_offset := YinMb * MB_WIDTH;
-			wa_W       := MB_WIDTH;
-			wa_H       := MB_WIDTH;
+			wa_x_offset := MbLocxInPic * MB_WIDTH;
+			wa_y_offset := MbLocyInPic * MB_WIDTH;
 			wa_x       := 0;
 			wa_y       := 0;
 			write_done := false;
@@ -137,23 +126,19 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		guard 
 			write_done = false
 		do
-			//pic[pic_curr_idx][wa_offset + wa_x + wa_y * PicWidthInMacroB * MB_WIDTH] := wd;
 			pic[pic_curr_idx][wa_x_offset + wa_x][wa_y_offset + wa_y] := wd;
 			wa_x := wa_x +1;
-			if(wa_x = wa_W) then
+			if(wa_x = MB_WIDTH) then
 				wa_y := wa_y +1;
-				if(wa_y != wa_H) then
-					wa_x := 0;
-				else
-					write_done :=true;
-				end
+				wa_x := 0;
+				write_done := (wa_y = MB_WIDTH);
 			end
 		end
 
 
 	get_readAddr: action
 			ReadAddress :[Ra_off_x , Ra_off_y , RAWidth , RAHeight],
-			POCtoRead   :[poc2read , frame_num_to_read],//poc2read is not very usefull :( (if framenum is correctly managed in this actor...)
+			POCtoRead   :[poc2read , frame_num_to_read],
 			EnableRead  :[read_enabled]
 				==>
 		guard
@@ -203,7 +188,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 		do
 			Read_addr_x := min( max(ra_off_x + ra_x , 0) , PicWidthInMacroB  * MB_WIDTH - 1);
 			Read_addr_y := min( max(ra_off_y + ra_y , 0) , PicHeightInMacroB * MB_WIDTH - 1);
-//			rd   := pic[Ref_idx][Read_addr_x + Read_addr_y * PicWidthInMacroB * MB_WIDTH];
 			rd   := pic[Ref_idx][Read_addr_x][Read_addr_y];
 			ra_x := ra_x +1;
 			if(ra_x = ra_W) then
@@ -293,7 +277,6 @@ actor Mgnt_DPB ( int MB_WIDTH )
 			do
 				foreach int x in 0 .. (MB_WIDTH_CHROMA-1)
 				do
-					//buff[x + y * MB_WIDTH_CHROMA] := pic[IdxNextPOCtoDisplay][CurrAddrInPix + x + CurrAddrYaxis];
 					buff[x + y * MB_WIDTH_CHROMA] := pic[IdxNextPOCtoDisplay][nbMBdisplayForXaxis * MB_WIDTH_CHROMA + x][nbMBdisplayForYaxis * MB_WIDTH_CHROMA + y];
 				end
 				CurrAddrYaxis := CurrAddrYaxis + MB_WIDTH_CHROMA * PicWidthInMacroB;

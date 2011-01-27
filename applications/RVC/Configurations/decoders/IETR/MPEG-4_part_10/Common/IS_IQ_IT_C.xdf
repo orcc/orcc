@@ -56,11 +56,11 @@
     <!-- ************************************** -->
     <!-- Instances of the Graph                 -->
     <!-- ************************************** -->
-    <Instance id="Zigzag_4x4">
+    <Instance id="Algo_IS_Zigzag_4x4">
         <!-- ************************* -->
         <!-- FU/Network refinement     -->
         <!-- ************************* -->
-        <Class name="Proprietary.IETR.MPEG4.part10.Common.Zigzag_4x4"/>
+        <Class name="Proprietary.IETR.MPEG4.part10.Algo_IS_Zigzag_4x4"/>
         <!-- ************************* -->
         <!-- FU/Network Parameter      -->
         <!-- ************************* -->
@@ -101,7 +101,7 @@
     <!-- ************************************** -->
     <!-- Connections of the Graph               -->
     <!-- ************************************** -->
-    <Connection dst="Zigzag_4x4" dst-port="levarr" src="" src-port="CoefAC_C"/>
+    <Connection dst="Algo_IS_Zigzag_4x4" dst-port="levarr" src="" src-port="CoefAC_C"/>
     <Connection dst="Mgnt_IQ_Chroma" dst-port="CoefDCR_C" src="" src-port="CoefDCR_C"/>
     <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4" dst-port="QP"
         src="" src-port="QP_C"/>
@@ -109,7 +109,7 @@
         dst-port="ScalingList" src="" src-port="ScalingList"/>
     <Connection dst="" dst-port="CoefACR_C" src="IT4x4" src-port="Y"/>
     <Connection dst="Mgnt_IQ_Chroma" dst-port="CoefAC_C"
-        src="Zigzag_4x4" src-port="Lev2d"/>
+        src="Algo_IS_Zigzag_4x4" src-port="Lev2d"/>
     <Connection dst="Algo_IQ_QSAndSLAndIDCTScaler_4x4" dst-port="Lev2d"
         src="Mgnt_IQ_Chroma" src-port="Lev2d"/>
     <Connection dst="IT4x4" dst-port="X"
