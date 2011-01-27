@@ -28,51 +28,50 @@
  */
 
 /**
-@brief Implementation of class Instantiator
+@brief Description of the WaitEvent class interface
 @author Jerome Gorin
-@file Instantiator.cpp
+@file PauseEvent.h
 @version 1.0
-@date 15/11/2010
+@date 26/01/2011
 */
 
 //------------------------------
-#include "Initializer.h"
-
-#include "Jade/Decoder.h"
-#include "Jade/Core/Network/Instance.h"
-#include "Jade/Jit/LLVMExecution.h"
+#ifndef PAUSEEVENT_H
+#define PAUSEEVENT_H
+#include "Jade/Scenario/Event.h"
 //------------------------------
 
+/**
+ * @brief  This class defines a pause event.
+ * 
+ * @author Jerome Gorin
+ * 
+ */
+class PauseEvent : public Event {
+public:
+	/*!
+     * @brief Create a new Start event
+     *
+	 * @param id : the id of the generated decoder.
+	 *
+	 * @param threaded : start in threaded mode or not.
+     */
+	PauseEvent() : Event(0) {
+	};
 
-using namespace std;
-using namespace llvm;
+	/*!
+     *  @brief Destructor
+     *
+	 * Delete an event.
+     */
+	~PauseEvent(){};
 
-Initializer::Initializer(Decoder* decoder){
-	this->executionEngine = decoder->getEE();
-}
+	/*!
+     * @brief Return true if the Event is a PauseEvent
+     *
+	 * @return true if Event is a PauseEvent otherwise false
+     */
+	virtual bool isPauseEvent(){return true;};
+};
 
-void Initializer::initialize(Instance* instance){
-	initializeStateVariables(instance->getStateVars());
-}
-
-void Initializer::initializeStateVariables(map<string, StateVar*>* vars){
-	map<string, StateVar*>::iterator it;
-
-	for (it = vars->begin(); it != vars->end(); ++it){
-		StateVar* var = it->second;
-
-		if (var->hasInitialValue()){
-			//Variable has an initialize value
-			void* ptrVar = executionEngine->isCompiledPtr(var->getGlobalVariable());
-
-			if (ptrVar != NULL){
-				//Variable has been previously compiled
-				initializeStateVariable(var, ptrVar);
-			}
-		}
-	}
-}
-
-void Initializer::initializeStateVariable(StateVar* vars, void* ptr){
-
-}
+#endif

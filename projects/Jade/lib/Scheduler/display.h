@@ -28,7 +28,9 @@
 */
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <pthread.h>
 #include "SDL.h"
+
 
 #include "llvm/Support/CommandLine.h"
 
@@ -59,6 +61,9 @@ extern llvm::cl::opt<int> StopAt;
 //Exit function of the decoder
 void (*exit_decoder)(int);
 
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond_mutex = PTHREAD_COND_INITIALIZER;
+
 static void press_a_key(int code) {
 	char buf[2];
 	printf("Press enter to continue\n");
@@ -67,7 +72,6 @@ static void press_a_key(int code) {
 }
 
 static Uint32 start_time;
-clock_t cStart;
 static int num_images_start;
 static int num_images_end;
 bool verboseDisplay;
@@ -113,7 +117,9 @@ void display_show_image(void) {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	
 	if (num_images_end == 0){
-		std::cout<< "\n First image arrived " << (clock () - cStart) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
+		 	pthread_mutex_lock( &mutex );
+			pthread_cond_signal( &cond_mutex);
+			pthread_mutex_unlock( &mutex );
 	}
 	
 	num_images_end++;

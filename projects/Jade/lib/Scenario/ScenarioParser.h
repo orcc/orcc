@@ -119,9 +119,16 @@ private:
 	/*!
      *  @brief Parses the given TiXmlElement as a Wait event.
 	 *
-     *  @param setEvent : TiXmlElement representation of SetEvent element 
+     *  @param waitEvent : TiXmlElement representation of WaitEvent element 
      */
 	Event* parseWaitEvent(TiXmlElement* waitEvent);
+
+	/*!
+     *  @brief Parses the given TiXmlElement as a Pause event.
+	 *
+     *  @param pauseEvent : TiXmlElement representation of pauseEvent element 
+     */
+	Event* parsePauseEvent(TiXmlElement* pauseEvent);
 
 	/** Xml elements of Scenario */
 	static const char* JSC_ROOT;
@@ -130,6 +137,7 @@ private:
 	static const char* JSC_STOP;
 	static const char* JSC_SET;
 	static const char* JSC_WAIT;
+	static const char* JSC_PAUSE;
 	static const char* JSC_XDF;
 	static const char* JSC_ID;
 	static const char* JSC_IN;

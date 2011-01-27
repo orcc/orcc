@@ -199,9 +199,6 @@ void RoundRobinScheduler::setSource(string input){
 	GlobalVariable* sourceFile = sourceFileVar->getGlobalVariable();
 	Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
 	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
-
-	//Todo : benchmark, to remove
-	cStart = clock ();
 }
 
 void RoundRobinScheduler::setCompare(){

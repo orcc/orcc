@@ -100,6 +100,13 @@ public:
 	virtual bool isWaitEvent(){return false;};
 
 	/*!
+     * @brief Return true if the Event is a PauseEvent
+     *
+	 * @return true if Event is a PauseEvent otherwise false
+     */
+	virtual bool isPauseEvent(){return false;};
+
+	/*!
      * @brief Return the id of the decoder
 	 *
 	 *  Return the id of the decoder this event is pointing on

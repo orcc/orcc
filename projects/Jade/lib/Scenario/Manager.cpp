@@ -68,17 +68,15 @@ bool Manager::start(std::string scFile){
 		return false;
 	}
 
-	//Get a first event
-	Event* curEvent = scenario->getEvent();
 	while (!scenario->end()){
+		//Get a first event
+		Event* curEvent = scenario->getEvent();
+
 		//Execute event
 		if (!startEvent(curEvent)){
 			cerr << "Getting an while running events. \n ";
 			return false;
 		}
-		
-		//Get a new event
-		curEvent = scenario->getEvent();
 	}
 
 	//Manager executed all events properly
@@ -96,6 +94,8 @@ bool Manager::startEvent(Event* newEvent){
 		return runStopEvent((StopEvent*)newEvent);
 	}else if (newEvent->isWaitEvent()){
 		return runWaitEvent((WaitEvent*)newEvent);
+	}else if (newEvent->isPauseEvent()){
+		return runPauseEvent((PauseEvent*)newEvent);
 	}else{
 		cerr << "Unrecognize event. \n ";
 		return false;
@@ -145,6 +145,14 @@ bool Manager::runStartEvent(StartEvent* startEvent){
 
 bool Manager::runWaitEvent(WaitEvent* waitEvent){
 	sys::Sleep(waitEvent->getTime());
+	return true;
+}
+
+bool Manager::runPauseEvent(PauseEvent* waitEvent){
+	std::string crs;
+	cout << "Scenario pause, press any key to continue. \n";
+	cin >> crs;
+	//getchar();
 	return true;
 }
 

@@ -54,9 +54,14 @@
 using namespace llvm;
 using namespace std;
 
-Decoder::Decoder(LLVMContext& C, Configuration* configuration): Context(C){
+//Todo : Mutex of decoder, higly experimental
+extern pthread_mutex_t mutex;
+extern pthread_cond_t cond_mutex;
+
+Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Context(C){
 	//Set property of the decoder
 	this->configuration = configuration;
+	this->verbose = verbose;
 	this->thread = NULL;
 	this->executionEngine = NULL;
 	this->fifoFn = NULL;
@@ -109,8 +114,22 @@ void Decoder::stop(){
 }
 
 void Decoder::startInThread(pthread_t* thread){
+	clock_t start;
+	
 	this->thread = thread;
+	
+	//Lock display mutex until the first image arrive
 	pthread_create( thread, NULL, &Decoder::threadStart, this );
+
+	//Wait for the first image to be display
+	pthread_mutex_lock( &mutex );
+	pthread_cond_wait( &cond_mutex, &mutex );
+	pthread_mutex_unlock( &mutex );
+
+
+	if (verbose){
+		cout<< "\n First image arrived " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
+	}
 }
 
 void* Decoder::threadStart( void* args ){

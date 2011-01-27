@@ -39,6 +39,7 @@
 #include <iostream>
 
 #include "Jade/Scenario/Event/LoadEvent.h"
+#include "Jade/Scenario/Event/PauseEvent.h"
 #include "Jade/Scenario/Event/StartEvent.h"
 #include "Jade/Scenario/Event/StopEvent.h"
 #include "Jade/Scenario/Event/SetEvent.h"
@@ -57,6 +58,7 @@ const char* ScenarioParser::JSC_START = "Start";
 const char* ScenarioParser::JSC_STOP = "Stop";
 const char* ScenarioParser::JSC_SET = "Set";
 const char* ScenarioParser::JSC_WAIT = "Wait";
+const char* ScenarioParser::JSC_PAUSE = "Pause";
 const char* ScenarioParser::JSC_XDF = "xdf";
 const char* ScenarioParser::JSC_IN = "input";
 const char* ScenarioParser::JSC_ID = "id";
@@ -113,6 +115,8 @@ bool ScenarioParser::parseEvents(TiXmlElement* root){
 				curEvent = parseSetEvent(element);
 			}else if (name == JSC_WAIT){
 				curEvent = parseWaitEvent(element);
+			}else if (name == JSC_PAUSE){
+				curEvent = parsePauseEvent(element);
 			}else{
 				cerr << "Invalid node "<< name.c_str() <<"\n";
 				return false;
@@ -165,4 +169,8 @@ Event* ScenarioParser::parseWaitEvent(TiXmlElement* waitEvent){
 	const char* time = waitEvent->Attribute(JSC_TIME);
 
 	return new WaitEvent(atoi(time));
+}
+
+Event* ScenarioParser::parsePauseEvent(TiXmlElement* waitEvent){
+	return new PauseEvent();
 }

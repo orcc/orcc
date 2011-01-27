@@ -71,14 +71,12 @@ public:
 	 * 
 	 * @param C : the LLVMContext
 	 *            
-	 * @param jit : jit use in this decoder
+	 * @param configuration : Configuration of the decoder
 	 *            
-	 * @param scenario : Scenario to instanciate the decoder
-	 *
-	 * @param fifo : Fifo used in the decoder
+	 * @param verbose : whether or not print message
 	 *
 	 */
-	Decoder(llvm::LLVMContext& C, Configuration* configuration);
+	Decoder(llvm::LLVMContext& C, Configuration* configuration, bool verbose = false);
 	~Decoder();
 	
 	/**
@@ -189,6 +187,9 @@ private:
 
 	/** Current thread used by the decoder */
 	pthread_t* thread;
+
+	/** print message */
+	bool verbose;
 };
 
 #endif

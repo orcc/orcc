@@ -45,6 +45,7 @@
 #include "Jade/Scenario/Event/StopEvent.h"
 #include "Jade/Scenario/Event/SetEvent.h"
 #include "Jade/Scenario/Event/WaitEvent.h"
+#include "Jade/Scenario/Event/PauseEvent.h"
 
 class DecoderEngine;
 class Network;
@@ -141,6 +142,16 @@ private:
 	 * @return true if event finished correctly, otherwise false
      */
 	bool runSetEvent(SetEvent* setEvent);
+
+	/*!
+     *  @brief run a pause event
+	 *
+	 * @param pauseEvent : the PauseEvent to run.
+	 *
+	 * @return true if event finished correctly, otherwise false
+     */
+	bool runPauseEvent(PauseEvent* setEvent);
+
 
 	/** Decoder engine to manage*/
 	DecoderEngine* engine;

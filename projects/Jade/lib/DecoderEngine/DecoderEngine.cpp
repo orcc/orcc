@@ -100,7 +100,7 @@ int DecoderEngine::load(Network* network, int optLevel) {
 	}
 	
 	//Create decoder
-	Decoder* decoder = new Decoder(Context, configuration);
+	Decoder* decoder = new Decoder(Context, configuration, verbose);
 	
 	if (verbose){
 		cout << "--> Decoder created in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
@@ -231,6 +231,10 @@ int DecoderEngine::reconfigure(Network* oldNetwork, Network* newNetwork){
 
 	// Set the new configuration
 	decoder->setConfiguration(configuration);
+
+	//Set the new decoder
+	decoders.erase(it);
+	decoders.insert(pair<Network*, Decoder*>(newNetwork, decoder));
 
 	return 0;
 }
