@@ -60,6 +60,12 @@ Initializer::Initializer( LLVMContext& C, Decoder* decoder) : Context(C){
 	this->initFn = NULL;
 }
 
+Initializer::~Initializer(){
+	if (initFn != NULL){
+		initFn->eraseFromParent();
+	}	
+}
+
 void Initializer::createInitializeFn(Module* module){
 	if (initFn != NULL){
 		initFn->eraseFromParent();

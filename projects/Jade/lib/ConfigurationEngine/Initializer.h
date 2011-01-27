@@ -81,7 +81,7 @@ public:
 	 */
 	void initialize(Instance* instance);
 
-	~Initializer(){};
+	~Initializer();
 
 private:
 
