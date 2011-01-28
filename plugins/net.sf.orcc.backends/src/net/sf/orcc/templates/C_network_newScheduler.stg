@@ -46,6 +46,27 @@ if(instance.actor.inputs.list.empty)>NULL<else><GetInstanceId(instance)>_predece
 if(instance.actor.outputs.list.empty)>NULL<else><GetInstanceId(instance)>_successors<endif>};
 >>
 
+printSchedulers(isPointer) ::= <<
+
+struct actor_s *my_actor;
+struct schedinfo_s si;
+while (1) {
+	my_actor = sched_get_next_schedulable(sched);
+	if(my_actor != NULL){
+		si.num_firings = 0;
+		my_actor-\>sched_func(&si);
+#ifdef PRINT_FIRINGS
+		printf("%5i\t%s\t%s\n", si.num_firings, si.reason == starved ? "starved" : "full", my_actor-\>name);
+#endif
+		if (si.reason == full) {
+			sched_add_successors(sched, my_actor, si.ports);
+		} else if (si.reason == starved) {
+			sched_add_predecessors(sched, my_actor, si.ports);
+		}
+	}
+}
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // print network
 network(debugFifos, fifoSize, network, options) ::= <<
@@ -55,10 +76,19 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #include \<stdio.h\>
 #include \<stdlib.h\>
 
+<if (options.needPthreads)>
+#ifndef _WIN32
+#define __USE_GNU
+#endif
+<endif>
+
 #include "orcc.h"
 #include "orcc_fifo.h"
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
+<if (options.needPthreads)>
+#include "orcc_thread.h"
+<endif>
 
 #define SIZE <fifoSize>
 
@@ -87,6 +117,34 @@ network(debugFifos, fifoSize, network, options) ::= <<
 // Declaration of the actors array
 
 <fillActorsStructs(network.instances)>
+
+<if(options.needPthreads)>
+
+<options.threads.keys: {th | <declareActorsArray(thread=th,instances=options.threads.(th))>}; separator="\n">
+
+<printThread()>
+
+static void scheduler() {
+	cpu_set_t cpuset;
+	thread_struct <options.threads.keys: {th | thread_<th>}; separator=", ">;
+	thread_id_struct <options.threads.keys: {th | thread_id_<th>}; separator=", ">;
+	struct scheduler_s <options.threads.keys: {th | sched_<th>}; separator=", ">;
+	
+	<printInitializes(network.instances)>
+	
+	<options.threads.keys: {th | sched_init(&sched_<th>, sizeof(actors_<th>) / sizeof(actors_<th>[0]), actors_<th>, NULL);}; separator="\n">
+	
+	sched_add_schedulable(source.sched, &source);
+	
+	<options.threads.keys: {th | threadCreate(thread_<th>, thread_scheduler, sched_<th>, thread_id_<th>);}; separator="\n">
+
+	clear_cpu_set(cpuset);
+	<options.threads.keys: {th | set_affinity(cpuset, <i0>, thread_<th>);}; separator="\n">
+
+	<options.threads.keys: {th | threadJoin(thread_<th>);}; separator="\n">
+}
+
+<else>
 
 <declareActorsArray(instances=network.instances)>
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,6 +186,8 @@ static void scheduler() {
 		}
 	}
 }
+
+<endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 

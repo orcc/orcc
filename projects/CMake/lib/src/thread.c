@@ -26,15 +26,14 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include <semaphore.h>
 #include <stdio.h>
 
 #include "orcc.h"
 #include "orcc_thread.h"
 
 void sync_init(struct sync_s *sync) {
-	sem_init(&sync->sem_monitor, 0, 0);
-	sem_init(&sync->sem_threads, 0, 0);
+	semaphoreCreate(sync->sem_monitor, 0);
+	semaphoreCreate(sync->sem_threads, 0);
 	sync->active_sync = 1;
 }
 

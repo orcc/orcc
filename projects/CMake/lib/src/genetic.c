@@ -26,6 +26,8 @@
  * WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -34,16 +36,17 @@
 #include "orcc.h"
 #include "orcc_genetic.h"
 #include "orcc_thread.h"
+#include "orcc_scheduler.h"
 
 
 static struct mapping_s* compute_mapping(individual *individual, struct genetic_s *genetic_info){
 	int i, j, k;
-	struct mapping_s *mapping = malloc(sizeof(struct mapping_s));
-	mapping->actors_per_threads = malloc(genetic_info->threads_nb * sizeof(int));
-	mapping->actors_mapping = malloc(genetic_info->threads_nb * sizeof(struct actor_s **));
+	struct mapping_s *mapping = (struct mapping_s*) malloc(sizeof(struct mapping_s));
+	mapping->actors_per_threads = (int*) malloc(genetic_info->threads_nb * sizeof(int));
+	mapping->actors_mapping = (struct actor_s***) malloc(genetic_info->threads_nb * sizeof(struct actor_s **));
 
 	for (i = 0; i < genetic_info->threads_nb; i++) {
-		struct actor_s *actors_tmp[genetic_info->actors_nb];
+		struct actor_s **actors_tmp = (struct actor_s**) malloc(genetic_info->actors_nb * sizeof(struct actor_s *));
 		k = 0;
 
 		for (j = 0; j < genetic_info->actors_nb; j++) {
@@ -53,9 +56,10 @@ static struct mapping_s* compute_mapping(individual *individual, struct genetic_
 			}
 		}
 
-		mapping->actors_mapping[i] = malloc(k * sizeof(struct actor_s*));
+		mapping->actors_mapping[i] = (struct actor_s**) malloc(k * sizeof(struct actor_s*));
 		memcpy(mapping->actors_mapping[i], actors_tmp, k * sizeof(struct actor_s*));
 		mapping->actors_per_threads[i] = k;
+		free(actors_tmp);
 	}
 
 	return mapping;
@@ -76,7 +80,7 @@ static int write_better_mapping(population *pop, struct genetic_s *genetic_info)
 				fprintf (mappingFile, "<Partition id=\"%i\">\n", j);
 
 				for(k = 0; k < mapping->actors_per_threads[j]; k++){
-					fprintf (mappingFile, "\t<Instance actor-id=\"%s/0\"/>\n", get_actor_name(mapping->actors_mapping[j][k]));
+					fprintf (mappingFile, "\t<Instance actor-id=\"%s/0\"/>\n", mapping->actors_mapping[j][k]->name);
 				}
 
 				fprintf (mappingFile, "</Partition>\n\n");
@@ -99,8 +103,8 @@ static int check_individual_presence(individual* ind, individual** list, int siz
 
 static int compare_individual(void const *a, void const *b)
 {
-	individual const **pi1 = (individual const **) a;
-	individual const **pi2 = (individual const **) b;
+	individual const **pi1 = (individual const**) a;
+	individual const **pi2 = (individual const**) b;
 	individual const *i1 = *pi1;
 	individual const *i2 = *pi2;
 
@@ -181,16 +185,16 @@ static void map_actors_on_threads(individual *individual, struct genetic_s *gene
 	struct actor_s **actors = mapping->actors_mapping[0];
 
 	for (i = 0; i < genetic_info->threads_nb; i++) {
-		sched_reinit(genetic_info->schedulers[i], mapping->actors_per_threads[i], mapping->actors_mapping[i]);
+		sched_reinit(&genetic_info->schedulers[i], mapping->actors_per_threads[i], mapping->actors_mapping[i]);
 	}
 }
 
 
 static population* compute_next_population(population *pop, struct genetic_s *genetic_info) {
-	int i;
+	int i, free, last;
 
 	// Allocate memory to store the new population
-	population *nextPop = malloc(sizeof(population));
+	population *nextPop = (population*) malloc(sizeof(population));
 	individual **individuals = (individual**) malloc(genetic_info->population_size
 			* sizeof(individual*));
 
@@ -209,8 +213,8 @@ static population* compute_next_population(population *pop, struct genetic_s *ge
 	}
 
 	// Crossover
-	int free = genetic_info->population_size - i;
-	int last = free * genetic_info->crossover_ratio + i;
+	free = genetic_info->population_size - i;
+	last = ((int) (free * genetic_info->crossover_ratio)) + i;
 	if ((last - free) % 2 == 1) {
 		last = last - 1;
 	}
@@ -242,7 +246,7 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 	int i, j;
 
 	// Allocate memory to store the new population
-	population *pop = (population *) malloc(sizeof(population));
+	population *pop = (population*) malloc(sizeof(population));
 	individual **individuals = (individual**) malloc(genetic_info->population_size
 			* sizeof(individual*));
 
@@ -251,18 +255,18 @@ static population* initialize_population(struct genetic_s *genetic_info) {
 	pop->generation_nb = 0;
 
 	// Initialize random function
-	srand(time(NULL));
+	srand((unsigned)time(NULL));
 
 	// Initialize first generation of individuals
 	for (i = 0; i < genetic_info->population_size; i++) {
-		pop->individuals[i] = malloc(sizeof(individual));
-		pop->individuals[i]->genes = malloc(genetic_info->actors_nb * sizeof(gene*));
+		pop->individuals[i] = (individual*) malloc(sizeof(individual));
+		pop->individuals[i]->genes = (gene**) malloc(genetic_info->actors_nb * sizeof(gene*));
 		pop->individuals[i]->fps = -1;
 		pop->individuals[i]->old_fps = -1;
 
 		// Initialize genes randomly
 		for (j = 0; j < genetic_info->actors_nb; j++) {
-			pop->individuals[i]->genes[j] = malloc(sizeof(gene));
+			pop->individuals[i]->genes[j] = (gene*) malloc(sizeof(gene));
 			pop->individuals[i]->genes[j]->actor = genetic_info->actors[j];
 			pop->individuals[i]->genes[j]->mapped_core = rand() % genetic_info->threads_nb;
 		}
@@ -284,20 +288,18 @@ void *monitor(void *data) {
 	map_actors_on_threads(population->individuals[evalIndNb], monitoring->genetic_info);
 
 	while (population->generation_nb < monitoring->genetic_info->generation_nb) {
-		float fps;
-
 		// Backup informations to compute partial fps except first time
 		if(evalIndNb != 0 || population->generation_nb != 0){
 			backup_partial_start_info();
 		}
 		// wakeup all threads
 		for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-			sem_post(&monitoring->sync->sem_threads);
+			semaphoreSet(monitoring->sync->sem_threads);
 		}
 
 		// wait threads synchro
 		for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-			sem_wait(&monitoring->sync->sem_monitor);
+			semaphoreWait(monitoring->sync->sem_monitor);
 		}
 		backup_partial_end_info();
 
@@ -324,9 +326,24 @@ void *monitor(void *data) {
 	active_fps_printing();
 
 	for (i = 0; i < monitoring->genetic_info->threads_nb; i++) {
-		sem_post(&monitoring->sync->sem_threads);
+		semaphoreSet(monitoring->sync->sem_threads);
 	}
 
 	return NULL;
 }
 
+void genetic_init(struct genetic_s *genetic_info, int population_size, int generation_nb, double keep_ratio, double crossover_ratio, struct actor_s **actors, struct scheduler_s *schedulers, int actors_nb, int threads_nb){
+	genetic_info->population_size = population_size;
+	genetic_info->generation_nb = generation_nb;
+	genetic_info->keep_ratio = keep_ratio;
+	genetic_info->crossover_ratio = crossover_ratio;
+	genetic_info->actors = actors;
+	genetic_info->schedulers = schedulers;
+	genetic_info->actors_nb = actors_nb;
+	genetic_info->threads_nb = threads_nb;
+}
+
+void monitor_init(struct monitor_s *monitoring, struct sync_s *sync, struct genetic_s *genetic_info){
+	monitoring->sync = sync;
+	monitoring->genetic_info = genetic_info;
+}

@@ -48,14 +48,18 @@ static struct actor_s *sched_get_next(struct scheduler_s *sched) {
 * The actor is removed from the schedulable list.
 */
 static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
-	struct actor_s *actor = sched->schedulable[sched->next_schedulable];
-	sched->next_schedulable++;
-	if (sched->next_schedulable >= MAX_ACTORS) {
-		sched->next_schedulable = 0;
+	struct actor_s *actor;
+	semaphoreWait(sched->sem_schedulable);
+	actor = sched->schedulable[sched->next_schedulable];
+	if(actor != NULL){
+		sched->next_schedulable++;
+		if (sched->next_schedulable >= MAX_ACTORS) {
+			sched->next_schedulable = 0;
+		}
+		// actor is not a member of the list anymore
+		actor->in_list = 0;
 	}
-
-	// actor is not a member of the list anymore
-	actor->in_list = 0;
+	semaphoreSet(sched->sem_schedulable);
 	return actor;
 }
 
@@ -66,13 +70,26 @@ static void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *act
 	// only add the actor in the schedulable list if it is not already there
 	// like a list.contains(actor) but in O(1) instead of O(n)
 	if (!actor->in_list) {
-		sched->schedulable[sched->next_entry] = actor;
-		sched->next_entry++;
-		if (sched->next_entry >= MAX_ACTORS) {
-			sched->next_entry = 0;
-		}
+		if(sched == actor->sched){
+			sched->schedulable[sched->next_entry] = actor;
+			sched->next_entry++;
+			if (sched->next_entry >= MAX_ACTORS) {
+				sched->next_entry = 0;
+			}
 
-		actor->in_list = 1;
+			actor->in_list = 1;
+		}
+		else{
+			semaphoreWait(actor->sched->sem_schedulable);
+			actor->sched->schedulable[actor->sched->next_entry] = actor;
+			actor->sched->next_entry++;
+			if (actor->sched->next_entry >= MAX_ACTORS) {
+				actor->sched->next_entry = 0;
+			}
+
+			actor->in_list = 1;
+			semaphoreSet(actor->sched->sem_schedulable);
+		}
 	}
 }
 

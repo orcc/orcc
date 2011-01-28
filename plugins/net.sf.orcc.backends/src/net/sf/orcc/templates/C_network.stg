@@ -191,7 +191,7 @@ struct schedinfo_s si;
 clock_t start, end;
 start = clock ();
 
-sem_wait(&sched-\>sync-\>sem_threads); 
+semaphoreWait(sched-\>sync-\>sem_threads); 
 start = clock ();
 <endif>
 
@@ -206,8 +206,8 @@ while (1) {
 	if(sched-\>sync-\>active_sync){
 		end = clock ();
 		if((((end - start) / (double)CLOCKS_PER_SEC) \>= SYNC_DELAY)){
-			sem_post(&sched-\>sync-\>sem_monitor);
-			sem_wait(&sched-\>sync-\>sem_threads);
+			semaphoreSet(sched-\>sync-\>sem_monitor);
+			semaphoreWait(sched-\>sync-\>sem_threads);
 			start = clock ();
 		}
 	}
@@ -220,38 +220,8 @@ while (1) {
 
 printThread() ::= <<
 void *thread_scheduler(void *data) {
-  struct scheduler_s *sched = data;
+  struct scheduler_s *sched = (struct scheduler_s *) data;
   <printSchedulers("true")>
-}
->>
-
-printThreadManagment() ::= <<
-////////////////////////////////////////////////////////////////////////////////
-// Threads
-
-#ifdef _WIN32
-typedef long cpu_set_t;
-#endif
-
-void clear_cpu_set(cpu_set_t *cpuset) {
-#ifdef _WIN32
-	*cpuset = 0;
-#else
-	CPU_ZERO(cpuset);
-#endif
-}
-
-void orcc_set_affinity(cpu_set_t *cpuset, int proc_num, pthread_t tid) {
-#ifdef _WIN32
-	*cpuset = 1 \<\< proc_num;
-	// need to get the handle
-	// SetThreadAffinityMask(tid, cpuset);
-#else
-	CPU_SET(proc_num, cpuset);
-	if (pthread_setaffinity_np(tid, sizeof(cpu_set_t), cpuset) \< 0) {
-		perror("pthread_setaffinity_np");
-	}
-#endif
 }
 >>
 
@@ -279,6 +249,10 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #include \<locale.h\>
 #include \<stdio.h\>
 #include \<stdlib.h\>
+<if (options.needDynamicMapping)>
+#include \<time.h\>
+<endif>
+
 #ifdef __APPLE__
 #include "SDL.h"
 #endif
@@ -287,20 +261,20 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #ifndef _WIN32
 #define __USE_GNU
 #endif
-#include \<pthread.h\>
 <endif>
 <if (options.needDynamicMapping)>
 #ifndef _WIN32
 #define __USE_GNU
 #endif
-#include \<pthread.h\>
-#include \<semaphore.h\>
 <endif>
 
 #include "orcc.h"
 #include "orcc_fifo.h"
 #include "orcc_scheduler.h"
 #include "orcc_util.h"
+<if (options.needPthreads)>
+#include "orcc_thread.h"
+<endif>
 <if(options.needDynamicMapping)>
 #include "orcc_thread.h"
 #include "orcc_genetic.h"
@@ -317,12 +291,6 @@ network(debugFifos, fifoSize, network, options) ::= <<
 #define SIZE <fifoSize>
 // #define PRINT_FIRINGS
 
-<if(options.needDynamicMapping)>
-<printThreadManagment()>
-<endif>
-<if(options.needPthreads)>
-<printThreadManagment()>
-<endif>
 
 ////////////////////////////////////////////////////////////////////////////////
 // FIFO allocation
@@ -358,19 +326,20 @@ network(debugFifos, fifoSize, network, options) ::= <<
 
 static void scheduler() {
 	cpu_set_t cpuset;
-	pthread_t <options.threads.keys: {th | thread_<th>}; separator=", ">;
+	thread_struct <options.threads.keys: {th | thread_<th>}; separator=", ">;
+	thread_id_struct <options.threads.keys: {th | thread_id_<th>}; separator=", ">;
 	struct scheduler_s <options.threads.keys: {th | sched_<th>}; separator=", ">;
 	
 	<printInitializes(network.instances)>
 	
 	<options.threads.keys: {th | sched_init(&sched_<th>, sizeof(actors_<th>) / sizeof(actors_<th>[0]), actors_<th>, NULL);}; separator="\n">
 	
-	<options.threads.keys: {th | pthread_create(&thread_<th>, NULL, thread_scheduler, (void *) &sched_<th>);}; separator="\n">
+	<options.threads.keys: {th | threadCreate(thread_<th>, thread_scheduler, sched_<th>, thread_id_<th>);}; separator="\n">
 
-	clear_cpu_set(&cpuset);
-	<options.threads.keys: {th | orcc_set_affinity(&cpuset, <i0>, thread_<th>);}; separator="\n">
+	clear_cpu_set(cpuset);
+	<options.threads.keys: {th | set_affinity(cpuset, <i0>, thread_<th>);}; separator="\n">
 
-	<options.threads.keys: {th | pthread_join(thread_<th>, NULL);}; separator="\n">
+	<options.threads.keys: {th | threadJoin(thread_<th>);}; separator="\n">
 }
 
 <elseif(options.needDynamicMapping)>
@@ -386,47 +355,37 @@ static void scheduler() {
 	int i;
 	
 	cpu_set_t cpuset;
-	pthread_t threads[<options.threadsNb>], thread_monitor;
+	thread_struct threads[<options.threadsNb>], thread_monitor;
+	thread_id_struct threads_id[<options.threadsNb>], thread_monitor_id;
 	
-	struct scheduler_s *schedulers[<options.threadsNb>];
+	struct scheduler_s schedulers[<options.threadsNb>];
 	struct sync_s sched_sync;
-	struct genetic_s genetic_info = {
-		.population_size = POPULATION_SIZE,
-		.generation_nb = GENERATION_NB,
-		.keep_ratio = KEEP_RATIO,
-		.crossover_ratio = CROSSOVER_RATIO,
-		.actors = actors,
-		.schedulers = schedulers,
-		.actors_nb = sizeof(actors) / sizeof(actors[0]),
-		.threads_nb = <options.threadsNb>
-	};
-	struct monitor_s monitoring = {
-		.sync = &sched_sync,
-		.genetic_info = &genetic_info
-	};
+	struct genetic_s genetic_info;
+	struct monitor_s monitoring;
 	
 	sync_init(&sched_sync);
+	genetic_init(&genetic_info, POPULATION_SIZE, GENERATION_NB, KEEP_RATIO, CROSSOVER_RATIO, actors, schedulers, sizeof(actors) / sizeof(actors[0]), sizeof(schedulers) / sizeof(schedulers[0]));
+	monitor_init(&monitoring, &sched_sync, &genetic_info);
 	
 	<printInitializes(network.instances)>
 	
 	remove_fps_printing();
 	
 	for(i=0; i \< <options.threadsNb>; i++){
-		schedulers[i] = malloc(sizeof(struct scheduler_s));
-		sched_init(schedulers[i], sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);
-		pthread_create(&threads[i], NULL, thread_scheduler, (void *) schedulers[i]); 
+		sched_init(&schedulers[i], sizeof(actors) / sizeof(actors[0]), NULL, &sched_sync);
+		threadCreate(threads[i], thread_scheduler, schedulers[i], threads_id[i]);
 	}
-	pthread_create(&thread_monitor, NULL, monitor, (void *) &monitoring);
+	threadCreate(thread_monitor, monitor, monitoring, thread_monitor_id);
 
-	clear_cpu_set(&cpuset);
+	clear_cpu_set(cpuset);
 	for(i=0; i \< <options.threadsNb>; i++){
-		orcc_set_affinity(&cpuset, i, threads[i]);
+		set_affinity(cpuset, i, threads[i]);
 	}
 	
 	for(i=0; i \< <options.threadsNb>; i++){
-		pthread_join(threads[i], NULL);
+		threadJoin(threads[i]);
 	}
-	pthread_join(thread_monitor,NULL);
+	threadJoin(thread_monitor);
 }
 
 <else>
