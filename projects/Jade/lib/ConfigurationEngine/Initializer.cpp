@@ -81,10 +81,19 @@ void Initializer::createInitializeFn(Module* module){
 
 void Initializer::initialize(Instance* instance){
 	createInitializeFn(decoder->getModule());
+	ActionScheduler* actionScheduler = instance->getActionScheduler();
 	
+	if (actionScheduler->hasFsm()){
+		initializeFSM(actionScheduler->getFsm());
+	}
+
 	initializeStateVariables(instance->getStateVars());
 
 	runInitializer();
+}
+
+void Initializer::initializeFSM(FSM* fsm){
+
 }
 
 void Initializer::runInitializer(){

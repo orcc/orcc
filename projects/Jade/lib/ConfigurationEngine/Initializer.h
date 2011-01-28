@@ -98,6 +98,13 @@ private:
 	void runInitializer();
 
 	/**
+	 * @brief Initialize an FSM
+	 * 
+	 * @param fsm : the FSM to initialize
+	 */
+	void initializeFSM(FSM* fsm);
+
+	/**
 	 * @brief Initialize a list of state variable
 	 * 
 	 * @param vars : the state variables to initialize
