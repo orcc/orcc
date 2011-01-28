@@ -43,7 +43,9 @@
 #include "Jade/Scenario/Event/StartEvent.h"
 #include "Jade/Scenario/Event/StopEvent.h"
 #include "Jade/Scenario/Event/SetEvent.h"
+#include "Jade/Scenario/Event/VerifyEvent.h"
 #include "Jade/Scenario/Event/WaitEvent.h"
+#include "Jade/Scenario/Event/PrintEvent.h"
 #include "Jade/TinyXml/TinyStr.h"
 
 #include "ScenarioParser.h"
@@ -59,8 +61,11 @@ const char* ScenarioParser::JSC_STOP = "Stop";
 const char* ScenarioParser::JSC_SET = "Set";
 const char* ScenarioParser::JSC_WAIT = "Wait";
 const char* ScenarioParser::JSC_PAUSE = "Pause";
+const char* ScenarioParser::JSC_PRINT = "Print";
+const char* ScenarioParser::JSC_VERIFY = "Verify";
 const char* ScenarioParser::JSC_XDF = "xdf";
 const char* ScenarioParser::JSC_IN = "input";
+const char* ScenarioParser::JSC_OUT = "output";
 const char* ScenarioParser::JSC_ID = "id";
 const char* ScenarioParser::JSC_TIME = "time";
 const char* ScenarioParser::JSC_THREADED = "threaded";
@@ -117,6 +122,10 @@ bool ScenarioParser::parseEvents(TiXmlElement* root){
 				curEvent = parseWaitEvent(element);
 			}else if (name == JSC_PAUSE){
 				curEvent = parsePauseEvent(element);
+			}else if (name == JSC_PRINT){
+				curEvent = parsePrintEvent(element);
+			}else if (name == JSC_VERIFY){
+				curEvent = parseVerifyEvent(element);
 			}else{
 				cerr << "Invalid node "<< name.c_str() <<"\n";
 				return false;
@@ -173,4 +182,18 @@ Event* ScenarioParser::parseWaitEvent(TiXmlElement* waitEvent){
 
 Event* ScenarioParser::parsePauseEvent(TiXmlElement* waitEvent){
 	return new PauseEvent();
+}
+
+Event* ScenarioParser::parseVerifyEvent(TiXmlElement* verifyEvent){
+	const char* id = verifyEvent->Attribute(JSC_ID);
+	const char* file = verifyEvent->Attribute(JSC_OUT);
+	
+	return new VerifyEvent(atoi(id), string(file));
+}
+
+Event* ScenarioParser::parsePrintEvent(TiXmlElement* verifyEvent){
+	const char* id = verifyEvent->Attribute(JSC_ID);
+	const char* file = verifyEvent->Attribute(JSC_OUT);
+	
+	return new PrintEvent(atoi(id), string(file));
 }

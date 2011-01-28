@@ -126,9 +126,23 @@ private:
 	/*!
      *  @brief Parses the given TiXmlElement as a Pause event.
 	 *
-     *  @param pauseEvent : TiXmlElement representation of pauseEvent element 
+     *  @param pauseEvent : TiXmlElement representation of PauseEvent element 
      */
 	Event* parsePauseEvent(TiXmlElement* pauseEvent);
+
+	/*!
+     *  @brief Parses the given TiXmlElement as a Verify event.
+	 *
+     *  @param pauseEvent : TiXmlElement representation of VerifyEvent element 
+     */
+	Event* parseVerifyEvent(TiXmlElement* verifyEvent);
+
+	/*!
+     *  @brief Parses the given TiXmlElement as a Print event.
+	 *
+     *  @param printEvent : TiXmlElement representation of PrintEvent element 
+     */
+	Event* parsePrintEvent(TiXmlElement* verifyEvent);
 
 	/** Xml elements of Scenario */
 	static const char* JSC_ROOT;
@@ -138,11 +152,14 @@ private:
 	static const char* JSC_SET;
 	static const char* JSC_WAIT;
 	static const char* JSC_PAUSE;
+	static const char* JSC_PRINT;
+	static const char* JSC_VERIFY;
 	static const char* JSC_XDF;
 	static const char* JSC_ID;
 	static const char* JSC_IN;
 	static const char* JSC_TIME;
 	static const char* JSC_THREADED;
+	static const char* JSC_OUT;
 
 
 	/** File to parse */

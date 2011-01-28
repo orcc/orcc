@@ -50,6 +50,9 @@
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/System/Signals.h"
 
+
+#include "Jade/XDFParser.h"
+#include "Jade/DecoderEngine.h"
 #include "Jade/Fifo/FifoSelection.h"
 #include "Jade/Scenario/Manager.h"
 #include "Jade/Util/OptionMng.h"

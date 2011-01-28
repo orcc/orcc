@@ -131,6 +131,19 @@ void ConfigurationEngine::reconfigure(Decoder* decoder, Configuration* configura
 	connector.setConnections(configuration, decoder->getEE());
 }
 
+void ConfigurationEngine::reinit(Decoder* decoder){
+	Initializer initializer(Context, decoder);
+	Configuration* configuration = decoder->getConfiguration();
+	
+	//Get all instances of the decoder
+	map<string, Instance*>::iterator it;
+	map<string, Instance*>* instances = configuration->getInstances();
+
+	for (it = instances->begin(); it != instances->end(); it++){
+		initializer.initialize(it->second);
+	}
+}
+
 void ConfigurationEngine::clearConnections(Decoder* decoder){
 	//Retrieve orignal configuration from the decoder
 	Configuration* configuration = decoder->getConfiguration();

@@ -107,6 +107,20 @@ public:
 	virtual bool isPauseEvent(){return false;};
 
 	/*!
+     * @brief Return true if the Event is a VerifyEvent
+     *
+	 * @return true if Event is a VerifyEvent otherwise false
+     */
+	virtual bool isVerifyEvent(){return false;};
+
+	/*!
+     * @brief Return true if the Event is a PrintEvent
+     *
+	 * @return true if Event is a PrintEvent otherwise false
+     */
+	virtual bool isPrintEvent(){return false;};
+
+	/*!
      * @brief Return the id of the decoder
 	 *
 	 *  Return the id of the decoder this event is pointing on

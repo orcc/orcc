@@ -111,6 +111,9 @@ void Decoder::start(){
 
 void Decoder::stop(){
 	executionEngine->stop(thread);
+	
+	ConfigurationEngine engine(Context);
+	engine.reinit(this);
 }
 
 void Decoder::startInThread(pthread_t* thread){

@@ -96,6 +96,8 @@ bool Manager::startEvent(Event* newEvent){
 		return runWaitEvent((WaitEvent*)newEvent);
 	}else if (newEvent->isPauseEvent()){
 		return runPauseEvent((PauseEvent*)newEvent);
+	}else if (newEvent->isVerifyEvent()){
+		return runVerifyEvent((VerifyEvent*)newEvent);
 	}else{
 		cerr << "Unrecognize event. \n ";
 		return false;
@@ -145,6 +147,33 @@ bool Manager::runStartEvent(StartEvent* startEvent){
 
 bool Manager::runWaitEvent(WaitEvent* waitEvent){
 	sys::Sleep(waitEvent->getTime());
+	return true;
+}
+
+bool Manager::runVerifyEvent(VerifyEvent* verifyEvent){
+	//Get network
+	netPtr = networks.find(verifyEvent->getId());
+	
+	if(netPtr == networks.end()){
+		cerr << "Event error ! No network loads at id " << verifyEvent->getId();
+		return false;
+	}
+
+	engine->verify(netPtr->second, verifyEvent->getFile());
+
+	return true;
+}
+
+bool Manager::runPrintEvent(PrintEvent* printEvent){
+	//Get network
+	netPtr = networks.find(printEvent->getId());
+	
+	if(netPtr == networks.end()){
+		cerr << "Event error ! No network loads at id " << printEvent->getId();
+		return false;
+	}
+
+	engine->print(netPtr->second, printEvent->getFile());
 	return true;
 }
 

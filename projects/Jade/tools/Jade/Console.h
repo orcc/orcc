@@ -28,21 +28,18 @@
  */
 
 /**
-@brief Description of the Jade header
+@brief Description of the Console header
 @author Jerome Gorin
-@file Jade.h
+@file Console.h
 @version 1.0
 @date 18/01/2011
 */
 
 //------------------------------
-#ifndef JADE_H
-#define JADE_H
+#ifndef CONSOLE_H
+#define CONSOLE_H
 
 //------------------------------
-
-#include "Jade/XDFParser.h"
-#include "Jade/DecoderEngine.h"
 
 void startConsole();
 

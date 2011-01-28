@@ -28,89 +28,62 @@
  */
 
 /**
-@brief Description of the ConfigurationEngine class interface
+@brief Description of the VerifyEvent class interface
 @author Jerome Gorin
-@file ConfigurationEngine.h
+@file WaitEvent.h
 @version 1.0
-@date 18/01/2011
+@date 26/01/2011
 */
 
 //------------------------------
-#ifndef CONFIGURATIONENGINE_H
-#define CONFIGURATIONENGINE_H
-
-#include "Jade/Configuration/Configuration.h"
-
-namespace llvm{
-	class LLVMContext;
-	class Module;
-}
-
-class Actor;
-class Decoder;
+#ifndef VERIFYEVENT_H
+#define VERIFYEVENT_H
+#include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @brief  This class represents configuration engine
+ * @brief  This class defines a verify event.
  * 
  * @author Jerome Gorin
  * 
  */
-class ConfigurationEngine {
+class VerifyEvent : public Event {
 public:
 	/*!
-     *  @brief Constructor
+     * @brief Create a new Verify event
      *
-	 * Creates a new configuration engine.
+	 * @param id : the id of the decoder to verify.
+	 *
+	 * @param file : the file where error are printed in case of error.
      */
-	ConfigurationEngine(llvm::LLVMContext& C);
+	VerifyEvent(int id, std::string file) : Event(id) {
+		this->file = file;
+	};
 
 	/*!
-     *  @brief Instanciate a configuration of decoder
+     *  @brief Destructor
      *
-	 * Instanciate a configuration of decoder using the given Configuration.
-	 *
-	 *	@param configuration : a Configuration for instanciating a configuration
+	 * Delete an event.
      */
-	void configure(Decoder* decoder);
+	~VerifyEvent(){};
 
 	/*!
-     *  @brief Reconfigure a decoder
+     * @brief Return true if the Event is a VerifyEvent
      *
-	 * Reconfigure a decoder with the given configuration
-	 *
-	 *	@param decoder : the Decoder to reconfigure
-	 *
-	 *	@param configuration : the new Configuration
+	 * @return true if Event is a VerifyEvent otherwise false
      */
-	void reconfigure(Decoder* decoder, Configuration* configuration);
+	bool isVerifyEvent(){return true;};
 
 	/*!
-     *  @brief Reinitialize a decoder
+     * @brief Return the error file.
      *
-	 *  Reinitialize a decoder
-	 *
-	 *	@param decoder : the Decoder to reinitialize
+	 * @return the error file
      */
-	void reinit(Decoder* decoder);
+	std::string getFile(){return file;};
 
 private:
-
-	/**
-     *  @brief Clear connections of a decoder
-	 *
-	 *	Remove every connections and broadcast created in the decoder 
-	 *
-	 *	@param decoder : the decoder to clean
-     */
-	void clearConnections(Decoder* decoder);
-
-	/** Decoder to configure */
-	Decoder* decoder;
-
-	/** LLVM Context */
-	llvm::LLVMContext &Context;
-
+	/** File where error are printed */
+	std::string file;
 };
 
 #endif

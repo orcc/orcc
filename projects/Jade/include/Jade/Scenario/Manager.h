@@ -46,6 +46,8 @@
 #include "Jade/Scenario/Event/SetEvent.h"
 #include "Jade/Scenario/Event/WaitEvent.h"
 #include "Jade/Scenario/Event/PauseEvent.h"
+#include "Jade/Scenario/Event/PrintEvent.h"
+#include "Jade/Scenario/Event/VerifyEvent.h"
 
 class DecoderEngine;
 class Network;
@@ -150,7 +152,25 @@ private:
 	 *
 	 * @return true if event finished correctly, otherwise false
      */
-	bool runPauseEvent(PauseEvent* setEvent);
+	bool runPauseEvent(PauseEvent* pauseEvent);
+
+	/*!
+     *  @brief run a print event
+	 *
+	 * @param printEvent : the PrintEvent to run.
+	 *
+	 * @return true if event finished correctly, otherwise false
+     */
+	bool runPrintEvent(PrintEvent* printEvent);
+
+	/*!
+     *  @brief run a verify event
+	 *
+	 * @param verifyEvent : the VerifyEvent to run.
+	 *
+	 * @return true if event finished correctly, otherwise false
+     */
+	bool runVerifyEvent(VerifyEvent* verifyEvent);
 
 
 	/** Decoder engine to manage*/

@@ -40,6 +40,10 @@
 
 #include "llvm/Support/CommandLine.h"
 
+#include "Jade/XDFParser.h"
+#include "Jade/DecoderEngine.h"
+#include "Jade/Scenario/Manager.h"
+
 #include "Console.h"
 //------------------------------
 
@@ -54,7 +58,7 @@ extern DecoderEngine* engine;
 //Console control
 map<int, Network*> networks;
 pthread_t t1;
-
+Manager* manager;
 
 void parseConsole(string cmd){
 		if (cmd == "A"){
@@ -243,7 +247,7 @@ void parseConsole(string cmd){
 
 void startConsole(){
 	string cmdLine;
-
+	manager = new Manager(engine);
 	while (cmdLine != "X"){
 		cout << "Enter a command (help for documentation) : ";
 		cin >> cmdLine;
