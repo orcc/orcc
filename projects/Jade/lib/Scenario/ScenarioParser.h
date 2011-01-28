@@ -133,7 +133,7 @@ private:
 	/*!
      *  @brief Parses the given TiXmlElement as a Verify event.
 	 *
-     *  @param pauseEvent : TiXmlElement representation of VerifyEvent element 
+     *  @param verifyEvent : TiXmlElement representation of VerifyEvent element 
      */
 	Event* parseVerifyEvent(TiXmlElement* verifyEvent);
 
@@ -142,7 +142,21 @@ private:
 	 *
      *  @param printEvent : TiXmlElement representation of PrintEvent element 
      */
-	Event* parsePrintEvent(TiXmlElement* verifyEvent);
+	Event* parsePrintEvent(TiXmlElement* printEvent);
+
+	/*!
+     *  @brief Parses the given TiXmlElement as a Remove event.
+	 *
+     *  @param removeEvent : TiXmlElement representation of RemoveEvent element 
+     */
+	Event* parseRemoveEvent(TiXmlElement* removeEvent);
+
+	/*!
+     *  @brief Parses the given TiXmlElement as a List event.
+	 *
+     *  @param listEvent : TiXmlElement representation of ListEvent element 
+     */
+	Event* parseListEvent(TiXmlElement* removeEvent);
 
 	/** Xml elements of Scenario */
 	static const char* JSC_ROOT;
@@ -153,7 +167,9 @@ private:
 	static const char* JSC_WAIT;
 	static const char* JSC_PAUSE;
 	static const char* JSC_PRINT;
+	static const char* JSC_REMOVE;
 	static const char* JSC_VERIFY;
+	static const char* JSC_LIST;
 	static const char* JSC_XDF;
 	static const char* JSC_ID;
 	static const char* JSC_IN;

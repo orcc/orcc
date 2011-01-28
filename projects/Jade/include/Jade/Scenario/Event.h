@@ -121,6 +121,20 @@ public:
 	virtual bool isPrintEvent(){return false;};
 
 	/*!
+     * @brief Return true if the Event is a RemoveEvent
+     *
+	 * @return true if Event is a RemoveEvent otherwise false
+     */
+	virtual bool isRemoveEvent(){return false;};
+
+	/*!
+     * @brief Return true if the Event is a ListEvent
+     *
+	 * @return true if Event is a ListEvent otherwise false
+     */
+	virtual bool isListEvent(){return false;};
+
+	/*!
      * @brief Return the id of the decoder
 	 *
 	 *  Return the id of the decoder this event is pointing on

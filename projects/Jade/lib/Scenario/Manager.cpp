@@ -98,6 +98,12 @@ bool Manager::startEvent(Event* newEvent){
 		return runPauseEvent((PauseEvent*)newEvent);
 	}else if (newEvent->isVerifyEvent()){
 		return runVerifyEvent((VerifyEvent*)newEvent);
+	}else if (newEvent->isPrintEvent()){
+		return runPrintEvent((PrintEvent*)newEvent);
+	}else if (newEvent->isRemoveEvent()){
+		return runRemoveEvent((RemoveEvent*)newEvent);
+	}else if (newEvent->isListEvent()){
+		return runListEvent((ListEvent*)newEvent);
 	}else{
 		cerr << "Unrecognize event. \n ";
 		return false;
@@ -224,6 +230,36 @@ bool Manager::runSetEvent(SetEvent* setEvent){
 	//Set the new network
 	networks.erase(id);
 	networks.insert(pair<int, Network*>(id, network));
+
+	return true;
+}
+
+bool Manager::runRemoveEvent(RemoveEvent* removeEvent){
+	//Get the network
+	int id = removeEvent->getId();
+	netPtr = networks.find(id);
+
+	if(netPtr == networks.end()){
+		cout << "Event error ! No network loads at the given id.\n";
+		return false;
+	}
+
+	//Remove network
+	engine->unload(netPtr->second);
+	networks.erase(netPtr);
+	delete netPtr->second;
+
+	return true;
+}
+
+bool Manager::runListEvent(ListEvent* listEvent){
+	map<int, Network*>::iterator it;
+	string input;
+
+	for (it = networks.begin(); it != networks.end(); it++){
+		Network* network = it->second;
+		cout << it->first << " : " << network->getName() << "\n";
+	}
 
 	return true;
 }

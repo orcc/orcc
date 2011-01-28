@@ -28,35 +28,33 @@
  */
 
 /**
-@brief Description of the WaitEvent class interface
+@brief Description of the VerifyEvent class interface
 @author Jerome Gorin
-@file PauseEvent.h
+@file WaitEvent.h
 @version 1.0
 @date 26/01/2011
 */
 
 //------------------------------
-#ifndef PAUSEEVENT_H
-#define PAUSEEVENT_H
+#ifndef REMOVEEVENT_H
+#define REMOVEEVENT_H
 #include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @brief  This class defines a pause event.
+ * @brief  This class defines a remove event.
  * 
  * @author Jerome Gorin
  * 
  */
-class PauseEvent : public Event {
+class RemoveEvent : public Event {
 public:
 	/*!
-     * @brief Create a new Start event
+     * @brief Create a new remove event
      *
-	 * @param id : the id of the generated decoder.
-	 *
-	 * @param threaded : start in threaded mode or not.
+	 * @param id : the id of the decoder to remove.
      */
-	PauseEvent() : Event(0) {
+	RemoveEvent(int id) : Event(id) {
 	};
 
 	/*!
@@ -64,14 +62,15 @@ public:
      *
 	 * Delete an event.
      */
-	~PauseEvent(){};
+	~RemoveEvent(){};
 
 	/*!
-     * @brief Return true if the Event is a PauseEvent
+     * @brief Return true if the Event is a RemoveEvent
      *
-	 * @return true if Event is a PauseEvent otherwise false
+	 * @return true if Event is a RemoveEvent otherwise false
      */
-	bool isPauseEvent(){return true;};
+	bool isRemoveEvent(){return true;};
+
 };
 
 #endif

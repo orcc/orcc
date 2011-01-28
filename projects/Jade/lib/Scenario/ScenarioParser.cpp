@@ -46,6 +46,8 @@
 #include "Jade/Scenario/Event/VerifyEvent.h"
 #include "Jade/Scenario/Event/WaitEvent.h"
 #include "Jade/Scenario/Event/PrintEvent.h"
+#include "Jade/Scenario/Event/RemoveEvent.h"
+#include "Jade/Scenario/Event/ListEvent.h"
 #include "Jade/TinyXml/TinyStr.h"
 
 #include "ScenarioParser.h"
@@ -62,7 +64,9 @@ const char* ScenarioParser::JSC_SET = "Set";
 const char* ScenarioParser::JSC_WAIT = "Wait";
 const char* ScenarioParser::JSC_PAUSE = "Pause";
 const char* ScenarioParser::JSC_PRINT = "Print";
+const char* ScenarioParser::JSC_REMOVE = "Remove";
 const char* ScenarioParser::JSC_VERIFY = "Verify";
+const char* ScenarioParser::JSC_LIST= "List";
 const char* ScenarioParser::JSC_XDF = "xdf";
 const char* ScenarioParser::JSC_IN = "input";
 const char* ScenarioParser::JSC_OUT = "output";
@@ -124,6 +128,8 @@ bool ScenarioParser::parseEvents(TiXmlElement* root){
 				curEvent = parsePauseEvent(element);
 			}else if (name == JSC_PRINT){
 				curEvent = parsePrintEvent(element);
+			}else if (name == JSC_REMOVE){
+				curEvent = parseRemoveEvent(element);
 			}else if (name == JSC_VERIFY){
 				curEvent = parseVerifyEvent(element);
 			}else{
@@ -196,4 +202,14 @@ Event* ScenarioParser::parsePrintEvent(TiXmlElement* verifyEvent){
 	const char* file = verifyEvent->Attribute(JSC_OUT);
 	
 	return new PrintEvent(atoi(id), string(file));
+}
+
+Event* ScenarioParser::parseRemoveEvent(TiXmlElement* removeEvent){
+	const char* id = removeEvent->Attribute(JSC_ID);
+
+	return new RemoveEvent(atoi(id));
+}
+
+Event* ScenarioParser::parseListEvent(TiXmlElement* removeEvent){
+	return new ListEvent();
 }

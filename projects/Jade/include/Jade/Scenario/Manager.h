@@ -48,6 +48,8 @@
 #include "Jade/Scenario/Event/PauseEvent.h"
 #include "Jade/Scenario/Event/PrintEvent.h"
 #include "Jade/Scenario/Event/VerifyEvent.h"
+#include "Jade/Scenario/Event/RemoveEvent.h"
+#include "Jade/Scenario/Event/ListEvent.h"
 
 class DecoderEngine;
 class Network;
@@ -171,6 +173,24 @@ private:
 	 * @return true if event finished correctly, otherwise false
      */
 	bool runVerifyEvent(VerifyEvent* verifyEvent);
+
+	/*!
+     *  @brief run a remove event
+	 *
+	 * @param removeEvent : the RemoveEvent to run.
+	 *
+	 * @return true if event finished correctly, otherwise false
+     */
+	bool runRemoveEvent(RemoveEvent* removeEvent);
+
+	/*!
+     *  @brief run a list event
+	 *
+	 * @param listEvent : the ListEvent to run.
+	 *
+	 * @return true if event finished correctly, otherwise false
+     */
+	bool runListEvent(ListEvent* listEvent);
 
 
 	/** Decoder engine to manage*/

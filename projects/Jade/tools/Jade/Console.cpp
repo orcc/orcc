@@ -43,6 +43,14 @@
 #include "Jade/XDFParser.h"
 #include "Jade/DecoderEngine.h"
 #include "Jade/Scenario/Manager.h"
+#include "Jade/Scenario/Event/LoadEvent.h"
+#include "Jade/Scenario/Event/StartEvent.h"
+#include "Jade/Scenario/Event/StopEvent.h"
+#include "Jade/Scenario/Event/SetEvent.h"
+#include "Jade/Scenario/Event/WaitEvent.h"
+#include "Jade/Scenario/Event/PauseEvent.h"
+#include "Jade/Scenario/Event/PrintEvent.h"
+#include "Jade/Scenario/Event/VerifyEvent.h"
 
 #include "Console.h"
 //------------------------------
@@ -51,138 +59,85 @@ using namespace std;
 using namespace llvm;
 using namespace llvm::cl;
 
+extern opt<std::string> OutputDir;
 extern cl::opt<std::string> VTLDir;
 extern cl::opt<std::string> InputDir;
 extern DecoderEngine* engine;
 
 //Console control
-map<int, Network*> networks;
-pthread_t t1;
 Manager* manager;
 
 void parseConsole(string cmd){
-		if (cmd == "A"){
-			map<int, Network*>::iterator it;
+		if (cmd == "Verify"){
 			int id;
+			string file;
 
 			//Select network
 			cout << "Select the id of the network to verify : ";
 			cin >> id;
 
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
+			//Select network
+			cout << "Select an output file in case of error : ";
+			cin >> file;
 
-			engine->verify(it->second, "error.txt");
+			manager->startEvent(new VerifyEvent(id, OutputDir + file));
 
-		}else if (cmd == "C"){
-			map<int, Network*>::iterator it;
+		}else if (cmd == "Set"){
 			string file;
 			int id;
 
 			//Select network
-			cout << "Select the id of the network to run : ";
+			cout << "Select the id of the network to change : ";
 			cin >> id;
-
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
 
 			//Select network
 			cout << "Select a new network : ";
 			cin >> file;
 
-			//Load network
-			LLVMContext &Context = getGlobalContext();
-			XDFParser xdfParser(VTLDir + file);
-			Network* network = xdfParser.ParseXDF(Context);
-
-			if (network == NULL){
-				cout << "No network load. \n";
-				return;
-			}
-
-			engine->reconfigure(it->second, network);
-/*
-			networks.erase(id);
-			networks.insert(pair<int, Network*>(id, network));*/
-	}else if (cmd == "L"){
+			manager->startEvent(new SetEvent(id, VTLDir + file));
+	}else if (cmd == "Load"){
 			string file;
 			int id;
+
 
 			//Select the network file
 			cout << "Select a network to load : ";
 			cin >> file;
 			
-			//Load network
-			LLVMContext &Context = getGlobalContext();
-			XDFParser xdfParser(VTLDir + file);
-			Network* network = xdfParser.ParseXDF(Context);
-
-
-			if (network == NULL){
-				cout << "No network load. \n";
-				return;
-			}
-
 			//Store the network in an id
 			cout << "Select an id for this network : ";
 			cin >> id;
-			networks.insert(pair<int, Network*>(id, network));
 
-			engine->load(network, 3);
-		}else if (cmd == "P"){
-			map<int, Network*>::iterator it;
+			manager->startEvent(new LoadEvent(VTLDir + file, id));
+		}else if (cmd == "Print"){
 			string output;
 			int id;
 
 			//Select network
-			cout << "Select the id of the network to run : ";
+			cout << "Select the id of the network to print : ";
 			cin >> id;
-
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
 
 			//Select network
 			cout << "Select an ouput file : ";
 			cin >> output;
 
-			engine->print(it->second, output);
+			manager->startEvent(new PrintEvent(id, OutputDir + output));
 
-		}else if (cmd == "R"){
-			map<int, Network*>::iterator it;
+		}else if (cmd == "Start"){
 			string input;
 			int id;
 
 			//Select network
-			cout << "Select the id of the network to run : ";
+			cout << "Select the id of the network to start : ";
 			cin >> id;
-
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
 
 			//Select network
 			cout << "Select an input stimulus : ";
 			cin >> input;
 
-			engine->run(it->second, InputDir + input, &t1);
+			manager->startEvent(new StartEvent(id, InputDir + input, true));
 
-		}else if (cmd == "S"){
-			map<int, Network*>::iterator it;
+		}else if (cmd == "Stop"){
 			string input;
 			int id;
 
@@ -190,57 +145,30 @@ void parseConsole(string cmd){
 			cout << "Select the id of the network to stop : ";
 			cin >> id;
 
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
-
-			//Stop the given network
-			engine->stop(it->second);
-
-		}else if (cmd == "U"){
-			map<int, Network*>::iterator it;
+			manager->startEvent(new StopEvent(id));
+		}else if (cmd == "Remove"){
 			string input;
 			int id;
 
 			//Select network
-			cout << "Select the id of the network to unload : ";
+			cout << "Select the id of the network to remove : ";
 			cin >> id;
 
-			//Look for the network
-			it = networks.find(id);
-			if(it == networks.end()){
-				cout << "No network loads at the given id.\n";
-				return;
-			}
-
-			Network* network = it->second;
-			engine->unload(network);
-
-			networks.erase(id);
-
-			delete network;
+			manager->startEvent(new RemoveEvent(id));
 
 		}else if (cmd == "V"){
-			map<int, Network*>::iterator it;
-			string input;
+			manager->startEvent(new ListEvent());
 
-			for (it = networks.begin(); it != networks.end(); it++){
-				Network* network = it->second;
-				cout << it->first << " : " << network->getName() << "\n";
-			}
 		} else if (cmd == "help"){ 
 			cout << "Command line options :\n";
-			cout << "A : verify a network\n";
-			cout << "C : change a network to another\n";
-			cout << "L : load a network \n";
-			cout << "P : print a network \n";
-			cout << "R : run a network \n";
-			cout << "S : stop a network \n";
-			cout << "U : unload a network \n";
-			cout << "V : list view of the networks loads \n";
+			cout << "List : view a list of the networks loads \n";
+			cout << "Load : load a network \n";
+			cout << "Print : print a network \n";
+			cout << "Remove : remove a network \n";
+			cout << "Set : change a network to another\n";
+			cout << "Start : start a network \n";
+			cout << "Stop : stop a network \n";
+			cout << "Verify : verify a network\n";
 			cout << "X : exit console \n";
 		}
 }

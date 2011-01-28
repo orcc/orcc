@@ -28,35 +28,31 @@
  */
 
 /**
-@brief Description of the WaitEvent class interface
+@brief Description of the ListEvent class interface
 @author Jerome Gorin
-@file PauseEvent.h
+@file ListEvent.h
 @version 1.0
 @date 26/01/2011
 */
 
 //------------------------------
-#ifndef PAUSEEVENT_H
-#define PAUSEEVENT_H
+#ifndef LISTEVENT_H
+#define LISTEVENT_H
 #include "Jade/Scenario/Event.h"
 //------------------------------
 
 /**
- * @brief  This class defines a pause event.
+ * @brief  This class defines a list event.
  * 
  * @author Jerome Gorin
  * 
  */
-class PauseEvent : public Event {
+class ListEvent : public Event {
 public:
 	/*!
-     * @brief Create a new Start event
-     *
-	 * @param id : the id of the generated decoder.
-	 *
-	 * @param threaded : start in threaded mode or not.
+     * @brief Create a new List event
      */
-	PauseEvent() : Event(0) {
+	ListEvent() : Event(0) {
 	};
 
 	/*!
@@ -64,14 +60,14 @@ public:
      *
 	 * Delete an event.
      */
-	~PauseEvent(){};
+	~ListEvent(){};
 
 	/*!
-     * @brief Return true if the Event is a PauseEvent
+     * @brief Return true if the Event is a ListEvent
      *
-	 * @return true if Event is a PauseEvent otherwise false
+	 * @return true if Event is a ListEvent otherwise false
      */
-	bool isPauseEvent(){return true;};
+	bool isListEvent(){return true;};
 };
 
 #endif
