@@ -136,6 +136,18 @@ public:
 	bool isCompiledGV(llvm::GlobalVariable* gv);
 
 	/**
+     *  @brief Return the pointer of a compiled GlobalVariable
+	 *
+	 *   Return the address of a llvm::GlobalVariable (or a llvm::Function) previously compiled,
+	 *     if GlobalVariable has not been compiled return NULL.
+     *
+	 *	@param gv : the llvm::GlobalVariable to get pointer from.
+	 *
+	 *	@return adress if gv has been compiled otherwise NULL
+     */
+	void* getGVPtr(llvm::GlobalVariable* gv);
+
+	/**
      *  @brief map a port to a fifo
 	 *
 	 *   Map a port to a fifo if only the Port has already been compiled by the execution engine

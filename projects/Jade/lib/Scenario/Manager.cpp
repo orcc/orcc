@@ -152,7 +152,6 @@ bool Manager::runPauseEvent(PauseEvent* waitEvent){
 	std::string crs;
 	cout << "Scenario pause, press any key to continue. \n";
 	cin >> crs;
-	//getchar();
 	return true;
 }
 

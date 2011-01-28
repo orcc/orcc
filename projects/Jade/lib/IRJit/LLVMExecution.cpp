@@ -210,6 +210,10 @@ bool LLVMExecution::isCompiledGV(llvm::GlobalVariable* gv){
 	return EE->getPointerToGlobalIfAvailable(gv) != NULL;
 }
 
+void* LLVMExecution::getGVPtr(llvm::GlobalVariable* gv){
+	return EE->getPointerToGlobalIfAvailable(gv);
+}
+
 void LLVMExecution::clear() {
 	Module* module = decoder->getModule();
 	EE->runStaticConstructorsDestructors(true);

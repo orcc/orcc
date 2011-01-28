@@ -93,7 +93,13 @@ void Initializer::initialize(Instance* instance){
 }
 
 void Initializer::initializeFSM(FSM* fsm){
+	
+	FSM::State* state = fsm->getInitialState();
+	int stateIndex = state->getIndex();
 
+	GlobalVariable* fsmVar = fsm->getFsmState();
+	int* fsmPtr = (int*)executionEngine->getGVPtr(fsmVar);
+	*fsmPtr = stateIndex;
 }
 
 void Initializer::runInitializer(){
@@ -109,7 +115,7 @@ void Initializer::initializeStateVariables(map<string, StateVar*>* vars){
 	for (it = vars->begin(); it != vars->end(); ++it){
 		StateVar* var = it->second;
 
-		if (var->hasInitialValue()){
+		if (var->isAssignable() && var->hasInitialValue()){
 			if (executionEngine->isCompiledGV(var->getGlobalVariable())){
 				//Variable has been previously compiled
 				initializeStateVariable(var);
@@ -123,10 +129,10 @@ void Initializer::initializeStateVariable(StateVar* var){
 	
 	if (initVal->isIntExpr()){
 		initializeIntExpr(var->getGlobalVariable(), (IntExpr*)initVal);
-	}/*else{
+	}else{
 		cout<< "Initialize only support initialization of integer \n";
 		exit(1);
-	}*/
+	}
 	
 	
 }
