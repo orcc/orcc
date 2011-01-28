@@ -135,6 +135,10 @@ void ConfigurationEngine::reinit(Decoder* decoder){
 	Initializer initializer(Context, decoder);
 	Configuration* configuration = decoder->getConfiguration();
 	
+	//Remove connections
+	Connector connector(Context, decoder);
+	connector.unsetConnections(configuration);
+
 	//Get all instances of the decoder
 	map<string, Instance*>::iterator it;
 	map<string, Instance*>* instances = configuration->getInstances();
@@ -142,6 +146,9 @@ void ConfigurationEngine::reinit(Decoder* decoder){
 	for (it = instances->begin(); it != instances->end(); it++){
 		initializer.initialize(it->second);
 	}
+
+	// Reset connections of the decoder
+	connector.setConnections(configuration, decoder->getEE());
 }
 
 void ConfigurationEngine::clearConnections(Decoder* decoder){
