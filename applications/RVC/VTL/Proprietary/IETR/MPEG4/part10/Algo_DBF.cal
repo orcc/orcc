@@ -1,47 +1,99 @@
-// AVC_algo_loopFilter_noMBAFF.cal
-//
-// Author: Paul Schumacher, Xilinx Research Labs 
-//         (Email: paul.schumacher@xilinx.com)
-//
-// Copyright (c) 2006-2007 Xilinx Inc.
-// All Rights Reserved
-//
-// Description:
-//   This design performs the in-loop deblocking filter for an AVC video 
-//   coder.  Tokens on the inputs and outputs of this block contain maps 
-//   (similar to structures) for easier interfacing.  One token on 'mbIn' is 
-//   assumed to contain the contents of a single macroblock (MB) including the 
-//   input YUV values as well as the MB parameters.  This design assumes raster 
-//   order of MBs (see below).  One token on 'imgParams' contains a map of 
-//   parameters for one frame or field.
-//
-//   The 'mbDataOut' and 'StrengthOut' outputs each produce one token per MB.
-//   One token on 'mbDataOut' is a map containing the (x,y) position (in MB
-//   coordinates) as well as arrays of YUV 4:2:0 output data.  'StrengthOut'
-//   should be used for debug only and produces a map of strength values and
-//   important parameters for debug purposes.
-//
-//   Note that the following modes are not supported by this revision of the 
-//   design:
-//     * MBAFF (Macroblock Adaptive Field/Frame mode)
-//     * only 4:2:0 format is supported
-//     * > 8-bit video
+/**
+ * This software module was originally developed by 
+ * Paul Schumacher (Xilinx Inc.), 
+ * in the course of development of the ISO/IEC 23002-4 (Video Tool Library) 
+ * for reference purposes and its performance may not have been optimized. 
+ * This software module is an implementation of one or more tools as 
+ * specified by the ISO/IEC 23002-4.
+ * 
+ * ISO/IEC gives You a royalty-free, worldwide, non-exclusive, copyright 
+ * license to copy, distribute, and make derivative works of this software 
+ * module or modifications thereof for use in implementations of the 
+ * ISO/IEC 23002-4 in products that satisfy conformance criteria (if any). 
+ * 
+ * Those intending to use this software module in products are advised that 
+ * its use may infringe existing patents. ISO/IEC have no liability for use 
+ * of this software module or modifications thereof.
+ * 
+ * Copyright is not released for products that do not conform to audiovisual 
+ * and image-coding related ITU Recommendations and/or ISO/IEC International 
+ * Standards. 
+ * 
+ * Assurance that the originally developed software module can be used 
+ * (1) in the ISO/IEC 23002-4 once the ISO/IEC 23002-4 has been adopted; and 
+ * (2) to develop the ISO/IEC 23002-4: 
+ *
+ *
+ * Xilinx Inc. grants ISO/IEC all rights necessary to 
+ * include the originally developed software module or modifications thereof 
+ * in the ISO/IEC 23002-4 and to permit ISO/IEC to offer You a royalty-free, 
+ * worldwide, non-exclusive, copyright license to copy, distribute, and make 
+ * derivative works for use in implementations of the ISO/IEC 23002-4 in 
+ * products that satisfy conformance criteria (if any), and to the extent 
+ * that such originally developed software module or portions of it are 
+ * included in the ISO/IEC 23002-4.  To the extent that NCKU
+ * owns patent rights that would be required to make, use, or 
+ * sell the originally developed software module or portions thereof 
+ * included in the ISO/IEC 23002-4 in a conforming product, NCKU will assure the ISO/IEC that it is willing to 
+ * negotiate licenses under reasonable and non-discriminatory terms and 
+ * conditions with applicants throughout the world.
+ *
+ * ISO/IEC gives You a free license to this software module or modifications 
+ * thereof for the sole  purpose of developing the ISO/IEC 23002-4.
+ * 
+ * NCKU retains full right to modify and use the 
+ * code for its own purpose, assign or donate the code to a third party and 
+ * to inhibit third parties from using the code for products that do not 
+ * conform to MPEG-related ITU Recommendations and/or ISO/IEC International 
+ * Standards. 
+ * 
+ * This copyright notice must be included in all copies or derivative works. 
+ * Copyright (c) ISO/IEC 2006-2010.
+ */
 
-// Revised:
-//  Author: Jia-Wei Liang, MSOC Lab, NCKU
-//  (E-mail: n2697181@mail.ncku.edu.tw)
-//  This loop filter has a bug and is fixed.
-//  The bug is that the loop filter does not perform deblocking on the right and
-//  bottom boundaries of a macroblock before outputting it out.
-//  The codes have been modified to output macroblocks at correct time.
+/*
+* Author: Paul Schumacher, Xilinx Research Labs 
+*         (Email: paul.schumacher@xilinx.com)
+*
+*
+*
+* Description:
+*   This design performs the in-loop deblocking filter for an AVC video 
+*   coder.  Tokens on the inputs and outputs of this block contain maps 
+*   (similar to structures) for easier interfacing.  One token on 'mbIn' is 
+*   assumed to contain the contents of a single macroblock (MB) including the 
+*   input YUV values as well as the MB parameters.  This design assumes raster 
+*   order of MBs (see below).  One token on 'imgParams' contains a map of 
+*   parameters for one frame or field.
+*
+*   The 'mbDataOut' and 'StrengthOut' outputs each produce one token per MB.
+*   One token on 'mbDataOut' is a map containing the (x,y) position (in MB
+*   coordinates) as well as arrays of YUV 4:2:0 output data.  'StrengthOut'
+*   should be used for debug only and produces a map of strength values and
+*   important parameters for debug purposes.
+*
+*   Note that the following modes are not supported by this revision of the 
+*   design:
+*     * MBAFF (Macroblock Adaptive Field/Frame mode)
+*     * only 4:2:0 format is supported
+*     * > 8-bit video
+*/
 
-//  Algo_DBF.cal
-//  Description: The algorithm part of deblocking filter without mbaff
+/* Revised:
+*  Author: Jia-Wei Liang, MSOC Lab, NCKU
+*  (E-mail: n2697181@mail.ncku.edu.tw)
+*  This loop filter has a bug and is fixed.
+*  The bug is that the loop filter does not perform deblocking on the right and
+*  bottom boundaries of a macroblock before outputting it out.
+*  The codes have been modified to output macroblocks at correct time.
 
+*  Algo_DBF.cal
+*  Description: The algorithm part of deblocking filter without mbaff
+* Last modification RVC-CAL compliancy:
+* Micka‘l Raulet (INSA/Rennes)
+*/
 
 package Proprietary.IETR.MPEG4.part10;
-
-import MPEG.Common.Imp_PictureInfo.*;
 
 actor Algo_DBF (int LUMA_CHROMA) uint(size=8)DB_I,uint(size=6)BS ==> uint(size=8)DB_O : //LUMA_CHROMA luma:=0, chroma:=1
       
@@ -50,7 +102,8 @@ actor Algo_DBF (int LUMA_CHROMA) uint(size=8)DB_I,uint(size=6)BS ==> uint(size=8
 ///////////////
 int SAMPLE_SZ = 8;
 int MB_BLOCK_SIZE_MAX     = 16;
-int MB_BLOCK_SIZE;
+int MB_BLOCK_SIZE_LUMA    = 16;
+int MB_BLOCK_SIZE_CHROMA  = 8;
 int MAXVAL_LUMA           = 255;
 int MAXVAL_CHROMA         = 255;  
 /////////////////////
@@ -176,12 +229,12 @@ begin
   useLeft := 0;
   useUp := 0;
   if (xN < 0) then       // only used when dir=0 & edge=0
-    xP := MB_BLOCK_SIZE + xN; // -1 becomes 15, -2 becomes 14, etc.
+    xP := LUMA_CHROMA + xN; // -1 becomes 15, -2 becomes 14, etc.
     yP := yN;
     useLeft := 1;
   else if (yN < 0) then  // only used when dir=1 & edge=0
       xP := xN;
-      yP := MB_BLOCK_SIZE + yN;
+      yP := LUMA_CHROMA + yN;
       useUp := 1;
     else
       xP := xN;
@@ -196,40 +249,37 @@ end
  *************************************************************
  *************************************************************/
  
- initialize ==>
- 	do
- 		MB_BLOCK_SIZE := LUMA_CHROMA;
- 	end
+
  
 // Read Macroblock data
-StartMB_CHROMA: action DB_I:[v] repeat (MB_WIDTH_CHROMA+4)*(MB_WIDTH_CHROMA+4), BS:[u] repeat 38==>
+StartMB_CHROMA: action DB_I:[v] repeat (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4), BS:[u] repeat 38==>
 guard
-	MB_BLOCK_SIZE = MB_WIDTH_CHROMA
+	LUMA_CHROMA = MB_BLOCK_SIZE_CHROMA
 var
-    List(type:int(size=SAMPLE_SZ),size =4*MB_WIDTH_CHROMA) upbuf := [0 : for int k in 0 .. 4*MB_WIDTH_CHROMA-1 ],
-    List(type:int(size=SAMPLE_SZ),size =4*MB_WIDTH_CHROMA) leftbuf := [0 : for int l in 0 .. 4*MB_WIDTH_CHROMA-1 ],
-    List(type:int(size=SAMPLE_SZ),size =MB_WIDTH_CHROMA*MB_WIDTH_CHROMA) currbuf := [0 : for int m in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int k in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int l in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int m in 0 .. MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1 ],
 	int uc:=0,
 	int lc:=0,
 	int cc:=0     
-do
-    foreach int i in 0 .. (MB_WIDTH_CHROMA+4)*(MB_WIDTH_CHROMA+4)-1 do
-      if (i<4*(MB_WIDTH_CHROMA+4)) then  if((i mod (MB_WIDTH_CHROMA+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
-      else  if((i mod (MB_WIDTH_CHROMA+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
+do  
+    foreach int i in 0 .. (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1 do
+      if (i<4*(MB_BLOCK_SIZE_CHROMA+4)) then  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
+      else  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
     end        
-    foreach int y in 0 .. MB_WIDTH_CHROMA-1 do
-        foreach int x in 0 .. MB_WIDTH_CHROMA-1 do  
-        	curr_mb[y][x]:= currbuf[x + y * MB_WIDTH_CHROMA]; 
+    foreach int y in 0 .. MB_BLOCK_SIZE_CHROMA-1 do
+        foreach int x in 0 .. MB_BLOCK_SIZE_CHROMA-1 do  
+        	curr_mb[y][x]:= currbuf[x + y * MB_BLOCK_SIZE_CHROMA]; 
         end
     end			   
-    foreach int y in 0 .. MB_WIDTH_CHROMA-1 do
-        foreach int x in MB_WIDTH_CHROMA-4 .. MB_WIDTH_CHROMA-1 do  
+    foreach int y in 0 .. MB_BLOCK_SIZE_CHROMA-1 do
+        foreach int x in MB_BLOCK_SIZE_CHROMA-4 .. MB_BLOCK_SIZE_CHROMA-1 do  
         	left_mb[y][x]:= leftbuf[(x mod 4)+y*4]; 
     	end
     end			   
-    foreach int y in MB_WIDTH_CHROMA-4 .. MB_WIDTH_CHROMA-1 do
-        foreach int x in 0 .. MB_WIDTH_CHROMA-1 do  
-        	up_mb[y][x]:= upbuf[x+((y mod 4)* MB_WIDTH_CHROMA)]; 
+    foreach int y in MB_BLOCK_SIZE_CHROMA-4 .. MB_BLOCK_SIZE_CHROMA-1 do
+        foreach int x in 0 .. MB_BLOCK_SIZE_CHROMA-1 do  
+        	up_mb[y][x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE_CHROMA)]; 
     	end
     end         
     StrengthNotZero :=0;    
@@ -241,32 +291,32 @@ do
 end 
 
 // Read Macroblock data
-StartMB_LUMA: action DB_I:[v] repeat (MB_WIDTH_LUMA+4)*(MB_WIDTH_LUMA+4), BS:[u] repeat 38==>
+StartMB_LUMA: action DB_I:[v] repeat (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4), BS:[u] repeat 38==>
 var
-    List(type:int(size=SAMPLE_SZ),size =4*MB_WIDTH_LUMA) upbuf := [0 : for int k in 0 .. 4*MB_WIDTH_LUMA-1 ],
-    List(type:int(size=SAMPLE_SZ),size =4*MB_WIDTH_LUMA) leftbuf := [0 : for int l in 0 .. 4*MB_WIDTH_LUMA-1 ],
-    List(type:int(size=SAMPLE_SZ),size =MB_WIDTH_LUMA*MB_WIDTH_LUMA) currbuf := [0 : for int m in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) upbuf := [0 : for int k in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) leftbuf := [0 : for int l in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ],
+    List(type:int(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int m in 0 .. MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1 ],
 	int uc:=0,
 	int lc:=0,
 	int cc:=0     
 do  
-    foreach int i in 0 .. (MB_WIDTH_LUMA+4)*(MB_WIDTH_LUMA+4)-1 do
-      if (i<4*(MB_WIDTH_LUMA+4)) then  if((i mod (MB_WIDTH_LUMA+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
-      else  if((i mod (MB_WIDTH_LUMA+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
+    foreach int i in 0 .. (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1 do
+      if (i<4*(MB_BLOCK_SIZE_LUMA+4)) then  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then upbuf[uc]:=v[i]; uc:=uc+1; end
+      else  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then currbuf[cc]:=v[i]; cc:=cc+1; else leftbuf[lc]:=v[i]; lc:=lc+1; end  end
     end        
-    foreach int y in 0 .. MB_WIDTH_LUMA-1 do
-        foreach int x in 0 .. MB_WIDTH_LUMA-1 do  
-        	curr_mb[y][x]:= currbuf[x + y * MB_WIDTH_LUMA]; 
+    foreach int y in 0 .. MB_BLOCK_SIZE_LUMA-1 do
+        foreach int x in 0 .. MB_BLOCK_SIZE_LUMA-1 do  
+        	curr_mb[y][x]:= currbuf[x + y * MB_BLOCK_SIZE_LUMA]; 
         end
     end			   
-    foreach int y in 0 .. MB_WIDTH_LUMA-1 do
-        foreach int x in MB_WIDTH_LUMA-4 .. MB_WIDTH_LUMA-1 do  
+    foreach int y in 0 .. MB_BLOCK_SIZE_LUMA-1 do
+        foreach int x in MB_BLOCK_SIZE_LUMA-4 .. MB_BLOCK_SIZE_LUMA-1 do  
         	left_mb[y][x]:= leftbuf[(x mod 4)+y*4]; 
     	end
     end			   
-    foreach int y in MB_WIDTH_LUMA-4 .. MB_WIDTH_LUMA-1 do
-        foreach int x in 0 .. MB_WIDTH_LUMA-1 do  
-        	up_mb[y][x]:= upbuf[x+((y mod 4)* MB_WIDTH_LUMA)]; 
+    foreach int y in MB_BLOCK_SIZE_LUMA-4 .. MB_BLOCK_SIZE_LUMA-1 do
+        foreach int x in 0 .. MB_BLOCK_SIZE_LUMA-1 do  
+        	up_mb[y][x]:= upbuf[x+((y mod 4)* MB_BLOCK_SIZE_LUMA)]; 
     	end
     end         
     StrengthNotZero :=0;    
@@ -283,7 +333,7 @@ ZeroStrengths: action ==>
 EdgeLoops: action ==>
   var
     int indexA,int indexB,int StrengthIdx,
-    int pel,int PelNum := MB_BLOCK_SIZE,
+    int pel,int PelNum := LUMA_CHROMA,
     int ap := 0,int aq := 0,int small_gap := 0,
     int L3, int L2, int L1, int L0, int R3, int R2, int R1, int R0, int RL0, int C0,
     int dif,int Delta,int AbsDelta,
@@ -376,40 +426,40 @@ EdgeLoops: action ==>
 	  end // while (dir<2)
   end // EdgeLoops
  
- OutMB_CHROMA: action ==> DB_O:[buff] repeat (MB_WIDTH_CHROMA+4) * (MB_WIDTH_CHROMA+4)
+ OutMB_CHROMA: action ==> DB_O:[buff] repeat (MB_BLOCK_SIZE_CHROMA+4) * (MB_BLOCK_SIZE_CHROMA+4)
   guard
-    MB_BLOCK_SIZE = MB_WIDTH_CHROMA
+    LUMA_CHROMA = MB_BLOCK_SIZE_CHROMA
   var 
-  	List(type:uint(size=SAMPLE_SZ),size =(MB_WIDTH_CHROMA+4)*(MB_WIDTH_CHROMA+4)) buff := [0:for int s in 0 .. (MB_WIDTH_CHROMA+4)*(MB_WIDTH_CHROMA+4)-1],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_WIDTH_CHROMA) upbuf := [0 : for int j in 0 .. 4*MB_WIDTH_CHROMA-1 ],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_WIDTH_CHROMA) leftbuf := [0 : for int k in 0 .. 4*MB_WIDTH_CHROMA-1 ],
-    List(type:uint(size=SAMPLE_SZ),size =MB_WIDTH_CHROMA*MB_WIDTH_CHROMA) currbuf := [0 : for int l in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA-1 ],
+  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)) buff := [0:for int s in 0 .. (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) upbuf := [0 : for int j in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_CHROMA) leftbuf := [0 : for int k in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ],
+    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA) currbuf := [0 : for int l in 0 .. MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1 ],
     int uc:=0,int lc:=0,int cc:=0     
   do
-    upbuf   := [up_mb[ MB_WIDTH_CHROMA - 4 + i / MB_WIDTH_CHROMA ][i mod MB_WIDTH_CHROMA] : for int i in 0 .. 4*MB_WIDTH_CHROMA-1 ];
-    leftbuf := [left_mb[i / 4 ][MB_WIDTH_CHROMA - 4 + (i mod 4)] : for int i in 0 .. 4*MB_WIDTH_CHROMA-1 ];
-    currbuf := [curr_mb[i / MB_WIDTH_CHROMA][i mod MB_WIDTH_CHROMA] : for int i in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA-1];
-    foreach int i in 0 .. (MB_WIDTH_CHROMA+4)*(MB_WIDTH_CHROMA+4)-1 do
-        if (i<4*(MB_WIDTH_CHROMA+4)) then  if((i mod (MB_WIDTH_CHROMA+4))>3) then buff[i]:=upbuf[uc]; uc:=uc+1; end
-        else  if((i mod (MB_WIDTH_CHROMA+4))>3) then buff[i]:=currbuf[cc]; cc:=cc+1; else buff[i]:=leftbuf[lc]; lc:=lc+1; end  end
+    upbuf   := [up_mb[ MB_BLOCK_SIZE_CHROMA - 4 + i / MB_BLOCK_SIZE_CHROMA ][i mod MB_BLOCK_SIZE_CHROMA] : for int i in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ];
+    leftbuf := [left_mb[i / 4 ][MB_BLOCK_SIZE_CHROMA - 4 + (i mod 4)] : for int i in 0 .. 4*MB_BLOCK_SIZE_CHROMA-1 ];
+    currbuf := [curr_mb[i / MB_BLOCK_SIZE_CHROMA][i mod MB_BLOCK_SIZE_CHROMA] : for int i in 0 .. MB_BLOCK_SIZE_CHROMA*MB_BLOCK_SIZE_CHROMA-1];
+    foreach int i in 0 .. (MB_BLOCK_SIZE_CHROMA+4)*(MB_BLOCK_SIZE_CHROMA+4)-1 do
+        if (i<4*(MB_BLOCK_SIZE_CHROMA+4)) then  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then buff[i]:=upbuf[uc]; uc:=uc+1; end
+        else  if((i mod (MB_BLOCK_SIZE_CHROMA+4))>3) then buff[i]:=currbuf[cc]; cc:=cc+1; else buff[i]:=leftbuf[lc]; lc:=lc+1; end  end
     end      
     count:=count+1;
  end
  
- OutMB_LUMA: action ==> DB_O:[buff] repeat (MB_WIDTH_LUMA+4) * (MB_WIDTH_LUMA+4)
+ OutMB_LUMA: action ==> DB_O:[buff] repeat (MB_BLOCK_SIZE_LUMA+4) * (MB_BLOCK_SIZE_LUMA+4)
   var 
-  	List(type:uint(size=SAMPLE_SZ),size =(MB_WIDTH_LUMA+4)*(MB_WIDTH_LUMA+4)) buff := [0:for int s in 0 .. (MB_WIDTH_LUMA+4)*(MB_WIDTH_LUMA+4)-1],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_WIDTH_LUMA) upbuf := [0 : for int j in 0 .. 4*MB_WIDTH_LUMA-1 ],
-    List(type:uint(size=SAMPLE_SZ),size =4*MB_WIDTH_LUMA) leftbuf := [0 : for int k in 0 .. 4*MB_WIDTH_LUMA-1 ],
-    List(type:uint(size=SAMPLE_SZ),size =MB_WIDTH_LUMA*MB_WIDTH_LUMA) currbuf := [0 : for int l in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA-1 ],
+  	List(type:uint(size=SAMPLE_SZ),size =(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)) buff := [0:for int s in 0 .. (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) upbuf := [0 : for int j in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ],
+    List(type:uint(size=SAMPLE_SZ),size =4*MB_BLOCK_SIZE_LUMA) leftbuf := [0 : for int k in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ],
+    List(type:uint(size=SAMPLE_SZ),size =MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA) currbuf := [0 : for int l in 0 .. MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1 ],
     int uc:=0,int lc:=0,int cc:=0     
   do
-    upbuf   := [up_mb[ MB_WIDTH_LUMA - 4 + i / MB_BLOCK_SIZE ][i mod MB_BLOCK_SIZE] : for int i in 0 .. 4*MB_WIDTH_LUMA-1 ];
-    leftbuf := [left_mb[i / 4 ][MB_WIDTH_LUMA - 4 + (i mod 4)] : for int i in 0 .. 4*MB_WIDTH_LUMA-1 ];
-    currbuf := [curr_mb[i / MB_WIDTH_LUMA][i mod MB_WIDTH_LUMA] : for int i in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA-1];
-    foreach int i in 0 .. (MB_WIDTH_LUMA+4)*(MB_WIDTH_LUMA+4)-1 do
-        if (i<4*(MB_WIDTH_LUMA+4)) then  if((i mod (MB_WIDTH_LUMA+4))>3) then buff[i]:=upbuf[uc]; uc:=uc+1; end
-        else  if((i mod (MB_WIDTH_LUMA+4))>3) then buff[i]:=currbuf[cc]; cc:=cc+1; else buff[i]:=leftbuf[lc]; lc:=lc+1; end  end
+    upbuf   := [up_mb[ MB_BLOCK_SIZE_LUMA - 4 + i / LUMA_CHROMA ][i mod LUMA_CHROMA] : for int i in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ];
+    leftbuf := [left_mb[i / 4 ][MB_BLOCK_SIZE_LUMA - 4 + (i mod 4)] : for int i in 0 .. 4*MB_BLOCK_SIZE_LUMA-1 ];
+    currbuf := [curr_mb[i / MB_BLOCK_SIZE_LUMA][i mod MB_BLOCK_SIZE_LUMA] : for int i in 0 .. MB_BLOCK_SIZE_LUMA*MB_BLOCK_SIZE_LUMA-1];
+    foreach int i in 0 .. (MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)-1 do
+        if (i<4*(MB_BLOCK_SIZE_LUMA+4)) then  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then buff[i]:=upbuf[uc]; uc:=uc+1; end
+        else  if((i mod (MB_BLOCK_SIZE_LUMA+4))>3) then buff[i]:=currbuf[cc]; cc:=cc+1; else buff[i]:=leftbuf[lc]; lc:=lc+1; end  end
     end      
     count:=count+1;
  end

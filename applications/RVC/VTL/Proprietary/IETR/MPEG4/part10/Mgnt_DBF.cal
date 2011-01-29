@@ -67,7 +67,6 @@ actor Mgnt_DBF (int LUMA_CHROMA)
 //FIXME! number of MB per line of picture
 int SAMPLE_SZ = 16; 
 int MB_BLOCK_SIZE_MAX    = 16;
-int MB_BLOCK_SIZE;
 int INT64_MIN            = -32768;
 int MIN_QP               =  0;
 int MAX_QP               = 51;
@@ -202,7 +201,7 @@ procedure setNeighbour( int xN, int yN, int sth )
 var 
 	int width_mb
 begin
-  if (sth = 0) then  width_mb := MB_BLOCK_SIZE; else width_mb := 16; end
+  if (sth = 0) then  width_mb := LUMA_CHROMA; else width_mb := 16; end
   useLeft := 0;
   useUp := 0;
   if (xN < 0) then       // only used when dir=0 & edge=0
@@ -237,11 +236,6 @@ end
  *************************************************************
  *************************************************************/
  
- initialize ==>
- 	do
- 		MB_BLOCK_SIZE := LUMA_CHROMA;
- 	end
- 
 read_pic_parameters: action  ==>
   do           
     mb_x:=0;
@@ -254,7 +248,7 @@ ReadMB.Inter: action FirstMbInSlice:[mb0],PicWidthInMb:[width], PicSizeInMb:[hei
   guard
 	not(Mbtype >= BLOCK_TYPE_INTRA_MIN and Mbtype <= BLOCK_TYPE_INTRA_MAX)
   do
-/*	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
+/*	if(DEBUG_INPUT and LUMA_CHROMA != MB_BLOCK_SIZE_CHROMA)then
 //		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
 //		println("Input Mgnt_DBF PicWidthInMb:"+width);	
 //		println("Input Mgnt_DBF PicSizeInMb:"+height);	
@@ -299,7 +293,7 @@ ReadMB.Intra: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[he
 	Mbtype >= BLOCK_TYPE_INTRA_MIN and Mbtype <= BLOCK_TYPE_INTRA_MAX,
 	Mbtype != BLOCK_TYPE_I_PCM
   do
-/*	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
+/*	if(DEBUG_INPUT and LUMA_CHROMA != MB_BLOCK_SIZE_CHROMA)then
 //		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
 //		println("Input Mgnt_DBF PicWidthInMb:"+width);	
 //		println("Input Mgnt_DBF PicSizeInMb:"+height);	
@@ -333,7 +327,7 @@ ReadMB.IPCM: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[hei
   guard
   	Mbtype = BLOCK_TYPE_I_PCM
   do       
-/*  	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then
+/*  	if(DEBUG_INPUT and LUMA_CHROMA != MB_BLOCK_SIZE_CHROMA)then
 //		println("Input Mgnt_DBF FistMbInSlice:"+mb0);
 //		println("Input Mgnt_DBF PicWidthInMb:"+width);	
 //		println("Input Mgnt_DBF PicSizeInMb:"+height);	
@@ -360,9 +354,9 @@ ReadMB.IPCM: action FirstMbInSlice:[mb0], PicWidthInMb:[width], PicSizeInMb:[hei
   
 StartMB_CHROMA: action Z:[v] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ==>  
   guard
-  	MB_BLOCK_SIZE = MB_WIDTH_CHROMA
+  	LUMA_CHROMA = MB_WIDTH_CHROMA
   do   
-/*  	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then  
+/*  	if(DEBUG_INPUT and LUMA_CHROMA != MB_BLOCK_SIZE_CHROMA)then  
 	  	foreach int i in 0 ..MB_BLOCK_SIZE_CHROMA * MB_BLOCK_SIZE_CHROMA -1
 	  	do
 	  		println("Input Mgnt_DBF Z:"+v[i]);
@@ -429,7 +423,7 @@ StartMB_CHROMA: action Z:[v] repeat MB_WIDTH_CHROMA*MB_WIDTH_CHROMA ==>
   
 StartMB_LUMA: action Z:[v] repeat MB_WIDTH_LUMA*MB_WIDTH_LUMA ==>  
   do    
-/*  	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then  
+/*  	if(DEBUG_INPUT and LUMA_CHROMA != MB_BLOCK_SIZE_CHROMA)then  
 	  	foreach int i in 0 ..MB_BLOCK_SIZE_LUMA * MB_BLOCK_SIZE_LUMA -1
 	  	do
 	  		println("Input Mgnt_DBF Z:"+v[i]);
@@ -574,7 +568,7 @@ ZeroStrengths: action ==> BS:[[0:for int i in 0 .. 5]] repeat 6
 EdgeLoops: action ==> BS:[Alist[0],Alist[1],Alist[2],Blist[0],Blist[1],Blist[2]]
   var
     uint pel := 0,
-    int PelNum := MB_BLOCK_SIZE,    
+    int PelNum := LUMA_CHROMA,    
     int indexA, int indexB,int QP_avg
   do
     Alist := [ 0 : for int i in 0 .. 3-1 ]; 
@@ -617,7 +611,7 @@ EdgeLoops: action ==> BS:[Alist[0],Alist[1],Alist[2],Blist[0],Blist[1],Blist[2]]
 
 DBI_CHROMA: action ==> DB_I:[buff] repeat (MB_WIDTH_CHROMA+4) * (MB_WIDTH_CHROMA+4)
   guard
-  	MB_BLOCK_SIZE = MB_WIDTH_CHROMA
+  	LUMA_CHROMA = MB_WIDTH_CHROMA
   var 
   	List(type:uint(size=SAMPLE_SZ),size=(MB_WIDTH_CHROMA+4)*(MB_WIDTH_CHROMA+4))buff := [0:for int s in 0 .. (MB_WIDTH_CHROMA+4)*(MB_WIDTH_CHROMA+4)-1],
     List(type:uint(size=SAMPLE_SZ),size =4*MB_WIDTH_CHROMA) upbuf := [0 : for int o in 0 .. 4*MB_WIDTH_CHROMA-1 ],
@@ -653,7 +647,7 @@ DBI_LUMA: action ==> DB_I:[buff] repeat (MB_WIDTH_LUMA+4) * (MB_WIDTH_LUMA+4)
 
 DBO_CHROMA: action DB_O:[v] repeat (MB_WIDTH_CHROMA+4)*(MB_WIDTH_CHROMA+4) ==> 
 guard
-	MB_BLOCK_SIZE = MB_WIDTH_CHROMA
+	LUMA_CHROMA = MB_WIDTH_CHROMA
 var
 	List(type:uint(size=SAMPLE_SZ),size =4*MB_WIDTH_CHROMA) upbuf := [0 : for int os in 0 .. 4*MB_WIDTH_CHROMA-1 ],
 	List(type:uint(size=SAMPLE_SZ),size =4*MB_WIDTH_CHROMA) leftbuf := [0 : for int l in 0 .. 4*MB_WIDTH_CHROMA-1 ],
@@ -698,7 +692,7 @@ var
     List(type:uint(size=SAMPLE_SZ),size =MB_WIDTH_LUMA*MB_WIDTH_LUMA) currbuf := [0 : for int m in 0 .. MB_WIDTH_LUMA*MB_WIDTH_LUMA-1 ],
     int uc:=0, int lc:=0, int cc:=0     
 do    
-  /*	if(DEBUG_INPUT and MB_BLOCK_SIZE != MB_BLOCK_SIZE_CHROMA)then  
+  /*	if(DEBUG_INPUT and LUMA_CHROMA != MB_BLOCK_SIZE_CHROMA)then  
 	  	foreach int i in 0 ..(MB_BLOCK_SIZE_LUMA+4)*(MB_BLOCK_SIZE_LUMA+4)  -1
 	  	do
 	  		println("Input Mgnt_DBF DB_O:"+v[i]);
@@ -730,7 +724,7 @@ SkipOut: action ==> end
 OutMB_CHROMA: action ==>  WD:[buff] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA
   guard 
     (mb_y>0) and mb_y<MB_Height,
-    MB_BLOCK_SIZE = MB_WIDTH_CHROMA
+    LUMA_CHROMA = MB_WIDTH_CHROMA
   var 
       List(type:uint(size=SAMPLE_SZ),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA) buff := [ 0 :for int s in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA-1 ] 
   do    
@@ -759,8 +753,8 @@ OutMB_LUMA: action ==>  WD:[buff] repeat MB_WIDTH_LUMA * MB_WIDTH_LUMA
 //
 DoneMB: action ==>
   do
-    foreach int y in 0 .. MB_BLOCK_SIZE-1 do
-      foreach int x in 0 .. MB_BLOCK_SIZE-1 do  
+    foreach int y in 0 .. LUMA_CHROMA-1 do
+      foreach int x in 0 .. LUMA_CHROMA-1 do  
   	    upFifo_mb[mb_x][y][x]:= curr_mb[y][x];
   	  end
     end        
@@ -783,8 +777,8 @@ DoneMB: action ==>
 DB_done: action  ==> 
   guard mb_x=MB_Width -1 and mb_y=MB_Height-1
   do
-    foreach int y in 0 .. MB_BLOCK_SIZE-1 do
-      foreach int x in 0 .. MB_BLOCK_SIZE-1 do  
+    foreach int y in 0 .. LUMA_CHROMA-1 do
+      foreach int x in 0 .. LUMA_CHROMA-1 do  
   	    upFifo_mb[mb_x][y][x]:= curr_mb[y][x];
   	  end
     end 
@@ -793,7 +787,7 @@ end
 
 flush_fifo_CHROMA: action  ==>  WD:[buff] repeat MB_WIDTH_CHROMA * MB_WIDTH_CHROMA 
   guard
-    MB_BLOCK_SIZE = MB_WIDTH_CHROMA
+    LUMA_CHROMA = MB_WIDTH_CHROMA
   var 
       List(type:uint(size=SAMPLE_SZ),size = MB_WIDTH_CHROMA * MB_WIDTH_CHROMA) buff := [ 0 :for int s in 0 .. MB_WIDTH_CHROMA*MB_WIDTH_CHROMA-1 ] 
   do    
