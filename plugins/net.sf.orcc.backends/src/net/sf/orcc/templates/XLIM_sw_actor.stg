@@ -92,28 +92,28 @@ expression(expr) ::= <<
 
 BinaryExpr(expr) ::= <<
 \<operation kind="<BinOp.(expr.op)>"\>
-	<port(dir="in", source=expr.e1)>
-	<port(dir="in", source=expr.e2)>
-	<port(dir="out", type=op.target.type, source=op.target)>
+	<untypedPort(dir="in", source=expr.e1)>
+	<untypedPort(dir="in", source=expr.e2)>
+	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 >>
 
 UnaryExpr(expr) ::= <<
 \<operation kind="<UnaryOp.(expr.op)>"\>
-	<port(dir="in", source=expr.expr)>
-	<port(dir="out", type=op.target.type, source=op.target)>
+	<untypedPort(dir="in", source=expr.expr)>
+	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 >>
 
 IntExpr(expr) ::= <<
 \<operation kind="$literal_Integer" value="<expr>"\>
-	<port(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 >>
 
 BoolExpr(expr) ::= <<
 \<operation kind="$literal_Integer" value="<expr>"\>
-	<port(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 >>
 
@@ -123,7 +123,7 @@ VarExpr(expr) ::= <<
 <else>
 \<operation kind="noop"\>
 	\<port dir="in" source="<expr>"/\>
-	<port(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 <endif>
 >>
@@ -132,15 +132,15 @@ VarExpr(expr) ::= <<
 // XLIM Port
 ///////////////////////////////////////////////////////////////////////////////
 
-port(dir, type, source) ::= <<
-<if (!type)
->\<port dir="<dir>" source="<source>"/\><
-else
-><if(!type.list || source.global)
+untypedPort(dir, source) ::= <<
+\<port dir="<dir>" source="<source>"/\>
+>>
+
+typedPort(dir, type, source) ::= <<
+<if(!type.list || source.global)
 >\<port dir="<dir>" size="<if (type.bool)>1<else><type.size><endif>" source="<source>" typeName="<type>"/\><
 else
 >\<port dir="<dir>" source="<source>" typeName="<source>_typedef"/\><
-endif><
 endif>
 >>
 
@@ -154,8 +154,8 @@ instruction(op) ::= <<
 
 Cast(target,value,cast) ::= << 
 \<operation kind="cast"\> 
-  <port(dir="in",source=value.var.variable)> 
-  <port(dir="out",type=target.type,source=target)> 
+  <untypedPort(dir="in",source=value.var.variable)> 
+  <typedPort(dir="out",type=target.type,source=target)> 
 \</operation\> 
 >> 
 
@@ -169,7 +169,7 @@ Peek(peek) ::= <<
 \</operation\>
 \<operation kind="pinPeek" portName="<peek.port.name>" removable="no"\>
 	\<port dir="in" source="peek_<instance.id>_<procedure>_0_<peek.target>"/\>
-	<port(dir="out", type=peek.port.type, source=peek.target)>
+	<typedPort(dir="out", type=peek.port.type, source=peek.target)>
 \</operation\>
 >>
 
@@ -179,14 +179,14 @@ CustomPeek(customPeek) ::= <<
 \</operation\>
 \<operation kind="pinPeek" portName="<customPeek.port.name>" removable="no"\>
   \<port dir="in" source="customPeek_<instance.id>_<procedure>_<customPeek.tokenIndex>_<customPeek.target>"/\>
-  <port(dir="out", type=customPeek.port.type, source=customPeek.target)>
+  <typedPort(dir="out", type=customPeek.port.type, source=customPeek.target)>
 \</operation\>
 >>
 
 Read(op) ::= <<
 \<note kind="consumptionRates" name="<op.port.name>" value="<op.numTokens>"/\>
 \<operation kind="pinRead" portName="<op.port.name>" removable="no" style="simple"\>
-	<port(dir="out", type=op.target.type, source=op.target)>
+	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\>
 >>
 
@@ -202,13 +202,13 @@ Load(op) ::= <<
 \<!-- Load <op> --\>
 <if(op.source.variable.type.list)
 >\<operation kind="var_ref" name="<op.source>"\>
-	<op.indexes: {index|<port(dir="in", source=index.var)>}; separator="\n">
-	<port(dir="out", type=op.target.type, source=op.target)>
+	<op.indexes: {index|<untypedPort(dir="in", source=index.var)>}; separator="\n">
+	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\><
 else
 >\<operation kind="noop"\>
-	<port(dir="in", source=op.source)>
-	<port(dir="out", type=op.target.type, source=op.target)>
+	<untypedPort(dir="in", source=op.source)>
+	<typedPort(dir="out", type=op.target.type, source=op.target)>
 \</operation\><endif>
 >>
 
@@ -216,13 +216,13 @@ Store(op) ::= <<
 \<!-- Store <op> --\>
 <if (op.target.global || op.target.type.list)
 >\<operation kind="assign" target="<op.target>"\>
-	<op.indexes: {index|<port(dir="in", source=index.var)>}; separator="\n">
-	<port(dir="in", source=op.value.var)>
+	<op.indexes: {index|<untypedPort(dir="in", source=index.var)>}; separator="\n">
+	<untypedPort(dir="in", source=op.value.var)>
 \</operation\><
 else
 >\<operation kind="noop"\>
-	<port(dir="in", source=op.value.var)>
-	<port(dir="out", type=op.value.type, source=op.target)>
+	<untypedPort(dir="in", source=op.value.var)>
+	<typedPort(dir="out", type=op.value.type, source=op.target)>
 \</operation\><endif>
 >>
 
@@ -236,14 +236,14 @@ PhiAssignment(phi) ::= <<
 \<PHI\>
 	\<port dir="in" source="<first(phi.values)>"/\>
 	\<port dir="in" source="<rest(phi.values)>"/\>
-	<port(dir="out", type=phi.target.type, source=phi.target)>
+	<typedPort(dir="out", type=phi.target.type, source=phi.target)>
 \</PHI\>
 >>
 
 Return(return) ::= <<
 <if (return.value)
 >\<operation kind="noop"\>
-	<port(dir="in", source=return.value)>
+	<untypedPort(dir="in", source=return.value)>
 	\<port dir="out" size="1" source="<procedure>_go" typeName="bool"/\>
 \</operation\><
 endif>
@@ -264,17 +264,17 @@ AssignIndex(assignIndex) ::= <<
 <else>
 \<operation kind="noop"\>
   \<port dir="in" source="<first(assignIndex.indexes)>"/\>
-  <port(dir="out", type=assignIndex.target.type, source=assignIndex.target)>
+  <typedPort(dir="out", type=assignIndex.target.type, source=assignIndex.target)>
 \</operation\>
 <endif>
 >>
 
 TernaryOperation(ternaryOperation) ::= <<
 \<operation kind="$selector"\>
-  <port(dir="in", source=ternaryOperation.conditionValue)>
-  <port(dir="in", source=ternaryOperation.trueValue)>
-  <port(dir="in", source=ternaryOperation.falseValue)>
-  <port(dir="out", type=ternaryOperation.target.type, source=ternaryOperation.target)>
+  <untypedPort(dir="in", source=ternaryOperation.conditionValue)>
+  <untypedPort(dir="in", source=ternaryOperation.trueValue)>
+  <untypedPort(dir="in", source=ternaryOperation.falseValue)>
+  <typedPort(dir="out", type=ternaryOperation.target.type, source=ternaryOperation.target)>
 \</operation\>
 >>
 
@@ -298,7 +298,7 @@ flatIndexes(indexes,target,lastIndex,indexMap) ::= <<
 <else>
 \<operation kind="noop"\>
   \<port dir="in" source="<target>_tmp_<indexMap.(first(indexes))>"/\>
-  <port(dir="out", type=target.type, source=target)>
+  <typedPort(dir="out", type=target.type, source=target)>
 \</operation\>
 <endif>
 >>
@@ -346,7 +346,7 @@ IfNode(ifNode) ::= <<
 \<module kind="if"\>
 	\<module decision="decision_<ifNode.value>_<ifNode.location.startLine>_<ifNode.location.startColumn>" kind="test"\>
 		\<operation kind="noop"\>
-			<port(dir="in", source=ifNode.value)>
+			<untypedPort(dir="in", source=ifNode.value)>
 			\<port dir="out" size="1" source="decision_<ifNode.value>_<ifNode.location.startLine>_<ifNode.location.startColumn>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
@@ -375,7 +375,7 @@ WhileNode(whileNode) ::= <<
 		<NotPhiNodes(whileNode.joinNode)>
 		\<!-- End joinnode --\>
 		\<operation kind="noop"\>
-			<port(dir="in", source=whileNode.value)>
+			<untypedPort(dir="in", source=whileNode.value)>
 			\<port dir="out" size="1" source="decision_<whileNode.value>" typeName="bool"/\>
 		\</operation\>
 	\</module\>
@@ -443,7 +443,7 @@ localInitialize(local) ::= <<
 <if(local.type.list)
 ><if(!local.instruction || local.instruction.write)>
 \<operation kind="$valloc"\>
-	<port(dir="out", type=local.type, source=local)>
+	<typedPort(dir="out", type=local.type, source=local)>
 \</operation\>
 <endif
 ><endif> 
