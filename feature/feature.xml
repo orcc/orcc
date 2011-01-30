@@ -2,7 +2,7 @@
 <feature
       id="net.sf.orcc"
       label="Orcc"
-      version="0.9.2.v20101219"
+      version="0.9.2.v201101301811"
       provider-name="IETR/INSA Rennes">
 
    <description url="http://orcc.sf.net/eclipse/updates/">
@@ -15,16 +15,16 @@ generated from RVC-CAL actors and XDF networks.
    </description>
 
    <copyright>
-      Copyright (c) 2009-2010, IETR/INSA of Rennes
-Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
-Copyright (c) 2009-2010, EPFL
+      Copyright (c) 2009-2011, IETR/INSA of Rennes
+Copyright (c) 2009-2011, LEAD TECH DESIGN Rennes - France
+Copyright (c) 2009-2011, EPFL
 All rights reserved.
    </copyright>
 
    <license>
-      Copyright (c) 2009-2010, IETR/INSA of Rennes
-Copyright (c) 2009-2010, LEAD TECH DESIGN Rennes - France
-Copyright (c) 2009-2010, EPFL
+      Copyright (c) 2009-2011, IETR/INSA of Rennes
+Copyright (c) 2009-2011, LEAD TECH DESIGN Rennes - France
+Copyright (c) 2009-2011, EPFL
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions
@@ -58,49 +58,49 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
    </url>
 
    <requires>
-      <import feature="net.sf.graphiti" version="1.2.0.v20101216" match="greaterOrEqual"/>
+      <import feature="net.sf.graphiti" version="1.2.0.v20110118" match="greaterOrEqual"/>
    </requires>
 
    <plugin
          id="net.sf.orcc.core"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.9.2.v201101301811"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.backends"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.9.2.v201101301811"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.cal"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.9.2.v201101301811"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.cal.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.9.2.v201101301811"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.simulators"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.9.2.v201101301811"
          unpack="false"/>
 
    <plugin
          id="net.sf.orcc.ui"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="0.9.2.v201101301811"
          unpack="false"/>
 
 </feature>
