@@ -165,7 +165,7 @@ public final class STPrinter {
 		group = TemplateGroupLoader.loadGroup(groupNames);
 
 		// set to "true" to inspect template
-		group.debug = false;
+		STGroup.debug = false;
 
 		// register renderers
 		AttributeRenderer renderer;
@@ -207,7 +207,7 @@ public final class STPrinter {
 				return true;
 			}
 
-			if (group.debug) {
+			if (STGroup.debug) {
 				DebugST template = (DebugST) group.getInstanceOf("actor");
 				template.add("actor", actor);
 				template.add("options", options);
