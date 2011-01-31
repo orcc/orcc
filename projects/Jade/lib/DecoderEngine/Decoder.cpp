@@ -59,12 +59,15 @@ extern pthread_mutex_t mutex;
 extern pthread_cond_t cond_mutex;
 
 Decoder::Decoder(LLVMContext& C, Configuration* configuration, bool verbose): Context(C){
+	clock_t timer = clock ();
+	
 	//Set property of the decoder
 	this->configuration = configuration;
 	this->verbose = verbose;
 	this->thread = NULL;
 	this->executionEngine = NULL;
 	this->fifoFn = NULL;
+	this->running = false;
 
 	//Create a new module that contains the current decoder
 	module = new Module("decoder", C);
@@ -90,28 +93,46 @@ Decoder::~Decoder (){
 }
 
 void Decoder::setConfiguration(Configuration* newConfiguration){
-	
+	clock_t start = clock ();
+	if (running){
+		//Decoder is currently running
+		cout << "Can't set a configuration, the decoder is currently running.";
+		exit(1);
+	}
+
 	//Reconfigure the decoder
 	ConfigurationEngine engine(Context);
 	engine.reconfigure(this, newConfiguration);
-	
+	if (verbose){
+		cout<< "---> Reconfiguring times of engines takes " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+		start = clock();
+	}
+
 	//Delete old configuration and set the new one
 	delete configuration;
 	configuration = newConfiguration;
 
 	executionEngine->recompile(scheduler->getMainFunction());
 	((RoundRobinScheduler*)scheduler)->setExternalFunctions(executionEngine);
+
+	if (verbose){
+		cout<< "---> Scheduling recompilation takes " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	}
 }
 
 void Decoder::start(){
-	scheduler->setSource(stimulus);
-		
+	executionEngine->setInputStimulus(stimulus);
+	
+	running = true;
+
 	executionEngine->run();
 }
 
 void Decoder::stop(){
 	executionEngine->stop(thread);
 	
+	running = false;
+
 	ConfigurationEngine engine(Context);
 	engine.reinit(this);
 }
@@ -130,7 +151,7 @@ void Decoder::startInThread(pthread_t* thread){
 	pthread_mutex_unlock( &mutex );
 
 	if (verbose){
-		cout<< "\n First image arrived " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
+		cout<< "---> First image arrived after " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms after decoder start.\n";
 	}
 }
 

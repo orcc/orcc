@@ -115,6 +115,13 @@ public:
 	std::string getStimulus(){return stimulus;};
 
 	/**
+     *  @brief Return true if the decoder is currently running
+	 * 
+	 *  @return true if the decoder is currently running
+     */
+	bool isRunning(){return running;};
+
+	/**
      *  @brief Getter of scheduler
 	 *
 	 *  Returns the scheduler used in the decoder
@@ -187,6 +194,9 @@ private:
 
 	/** Current thread used by the decoder */
 	pthread_t* thread;
+
+	/** Decoder is currently running */
+	bool running;
 
 	/** print message */
 	bool verbose;

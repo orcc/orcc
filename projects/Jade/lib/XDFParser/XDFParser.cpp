@@ -87,7 +87,8 @@ const char* XDFNetwork::TYPE_STRING = "String";
 const char* XDFNetwork::TYPE_UINT = "uint";
 
 
-XDFParser::XDFParser (string filename){
+XDFParser::XDFParser (string filename, bool verbose){
+	this->verbose = verbose;
 	xdfFile = filename; 
 }
 

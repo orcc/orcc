@@ -71,7 +71,7 @@ public:
 	 *
 	 * @param engine : the DecoderEngine to manage
      */
-	Manager(DecoderEngine* engine);
+	Manager(DecoderEngine* engine, bool verbose = false);
 
 	/*!
      *  @brief Start the manager
@@ -201,6 +201,9 @@ private:
 
 	/** Network pointer */
 	std::map<int, Network*>::iterator netPtr;
+
+	/** Verbose events */
+	bool verbose;
 };
 
 #endif

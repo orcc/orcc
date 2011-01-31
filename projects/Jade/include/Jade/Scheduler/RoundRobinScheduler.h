@@ -77,7 +77,7 @@ public:
 	
 	void setExternalFunctions(LLVMExecution* executionEngine);
 
-	void setSource(std::string input);
+	llvm::GlobalVariable* getSource();
 
 	void addInstance(Instance* instance);
 	void removeInstance(Instance* instance);

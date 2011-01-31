@@ -51,18 +51,19 @@
 using namespace std;
 using namespace llvm;
 
-NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename){
-	/* Initialize attributes */
-	xdfDoc = new TiXmlDocument (filename.c_str());
-    network = NULL;
-
-	Connections = new list<Connection*>();
+NetworkParser::NetworkParser (llvm::LLVMContext& C, string filename, bool verbose){
+	// Initialize attributes
+	this->xdfDoc = new TiXmlDocument (filename.c_str());
+    this->network = NULL;
+	this->verbose = verbose;
+	
+	this->Connections = new list<Connection*>();
 
 	/* Xml type parser */
-	typeParser = new TypeParser(C);
+	this->typeParser = new TypeParser(C);
 
 	/** XDF expression parser. */
-	exprParser = new ExprParser(C);
+	this->exprParser = new ExprParser(C);
 }
 
 NetworkParser::~NetworkParser (){

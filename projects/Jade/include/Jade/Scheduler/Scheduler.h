@@ -41,6 +41,7 @@
 
 namespace llvm{
 	class Function;
+	class GlobalVariable;
 }
 
 #include <string>
@@ -64,7 +65,7 @@ public:
 	virtual void execute(std::string stimulus){};
 	virtual void stop(pthread_t* thread){};
 	virtual llvm::Function* getMainFunction(){return NULL;};
-	virtual void setSource(std::string input){};
+	virtual llvm::GlobalVariable* getSource(){return NULL;};
 	virtual void addInstance(Instance* instance){};
 	virtual void removeInstance(Instance* instance){};
 };

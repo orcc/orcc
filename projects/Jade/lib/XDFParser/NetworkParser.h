@@ -78,8 +78,10 @@ public:
      *  Constructor of the class NetworkParser
      *
      *  @param filename : name of the network file to parse
+	 *
+	 *  @param verbose : verbose actions taken
      */
-	NetworkParser (llvm::LLVMContext& C, std::string filename);
+	NetworkParser (llvm::LLVMContext& C, std::string filename, bool verbose = false);
 
 	/*!
      *  @brief Destructor
@@ -119,9 +121,11 @@ private:
 	/** map of instances ports  */
 	std::map<std::string, Instance*>* instances;
 
-
 	/** graph of the network  */
 	HDAGGraph* graph;
+
+	/** Verboses actions taken */
+	bool verbose;
 
 	/*!
      *  @brief Parses the body of the XDF document.

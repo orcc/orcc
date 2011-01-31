@@ -40,6 +40,8 @@
 #include <errno.h>
 #include <time.h>
 
+#include "llvm/Constants.h"
+#include "llvm/DerivedTypes.h"
 #include "llvm/Module.h"
 #include "llvm/Type.h"
 #include "llvm/ADT/Triple.h"
@@ -227,8 +229,23 @@ void LLVMExecution::clear() {
 
 
 void LLVMExecution::setInputStimulus(std::string input){
-	
-	decoder->getScheduler()->setSource(input);
+	Module* module = decoder->getModule();
+
+	//Insert source file string
+	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),input.size()+1); 
+	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, input), "fileName", 0, false, 0);
+
+	//Store adress in input GV
+	GlobalVariable* sourceFile= decoder->getScheduler()->getSource();
+	Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
+	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
+
+	//Check if source has been previously compiled
+	void* sourcePr = getGVPtr(sourceFile);
+
+	if (sourcePr != NULL){
+		EE->updateGlobalMapping(sourceFile, (void*)input.c_str());
+	}
 }
 
 LLVMExecution::~LLVMExecution(){

@@ -68,7 +68,7 @@ public:
      *
      *  @param	filename : name of the XDF file to parse
      */
-	XDFParser (std::string filename);
+	XDFParser (std::string filename, bool verbose = false);
 
 	 /**
      *  @brief Destructor of the class XDFParser
@@ -83,6 +83,10 @@ public:
      */
 	Network* ParseXDF (llvm::LLVMContext& C);
 
+private:
+
+	/** Verbose actions taken */
+	bool verbose;
 };
 
 #endif

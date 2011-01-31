@@ -239,6 +239,7 @@ void startCmdLine(){
 }
 
 int main(int argc, char **argv) {
+	clock_t start = clock ();
 	LLVMContext &Context = getGlobalContext();
 	
 	// Print a stack trace if we signal out.
@@ -247,6 +248,10 @@ int main(int argc, char **argv) {
 	ParseCommandLineOptions(argc, argv, "Just-In-Time Adaptive Decoder Engine (Jade) \n");
 	(void) signal(SIGINT, clean_exit);
     
+	if (Verbose){
+		cout << "> Preparing core of Jade :\n";
+	}
+
 	//Initialize context
 	InitializeNativeTarget();
 	setOptions();
@@ -254,15 +259,32 @@ int main(int argc, char **argv) {
 	//Loading decoderEngine
 	engine = new DecoderEngine(Context, VTLDir, Fifo, SystemDir, Verbose);
 
+	if (Verbose){
+		cout << "> Core preparation finished in " << (clock () - start) * 1000 / CLOCKS_PER_SEC <<" ms.\n";
+	}
+
 	if (Console){
 
+		if (Verbose){
+			cout << "> Starting console mode :\n";
+		}
 		//Enter in console mode
 		llvm_start_multithreaded();	
 		startConsole();
 		llvm_stop_multithreaded();
+		if (Verbose){
+			cout << "> Exiting console mode.\n";
+		}
 	} else if (ScFile != ""){
-		Manager manager(engine);
+		if (Verbose){
+			cout << "> Starting scenario mode :\n";
+		}
+		Manager manager(engine, Verbose);
 		manager.start(ScFile);
+
+		if (Verbose){
+			cout << "> Exiting scenario mode.\n";
+		}
 	}else{
 		//Enter in command line mode
 		startCmdLine();

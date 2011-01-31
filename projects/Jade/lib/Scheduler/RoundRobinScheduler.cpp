@@ -176,7 +176,7 @@ void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 	}
 }
 
-void RoundRobinScheduler::setSource(string input){
+GlobalVariable* RoundRobinScheduler::getSource(){
 	Module* module = decoder->getModule();
 	
 	//Get configuration of the decoder
@@ -187,18 +187,11 @@ void RoundRobinScheduler::setSource(string input){
 	
 	//Source is not contains in the current decoder
 	if (source == NULL){
-		return;
+		return NULL;
 	}
 	
-	//Insert source file string
-	ArrayType *Ty = ArrayType::get(Type::getInt8Ty(Context),input.size()+1); 
-	GlobalVariable *GV = new llvm::GlobalVariable(*module, Ty, true, GlobalVariable::InternalLinkage , ConstantArray::get(Context, input), "fileName", 0, false, 0);
-
-	//Store adress in input file of source
 	Variable* sourceFileVar = source->getStateVar("input_file");
-	GlobalVariable* sourceFile = sourceFileVar->getGlobalVariable();
-	Constant *Indices[2] = {ConstantInt::get(Type::getInt32Ty(Context), 0), ConstantInt::get(Type::getInt32Ty(Context), 0)};
-	sourceFile->setInitializer(ConstantExpr::getGetElementPtr(GV, Indices, 2));
+	return  sourceFileVar->getGlobalVariable();
 }
 
 void RoundRobinScheduler::setCompare(){
