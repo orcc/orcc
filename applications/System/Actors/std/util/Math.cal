@@ -1,0 +1,8 @@
+package std.util;
+
+/**
+ * Definition of common math functions.
+ */
+unit Math :
+
+end

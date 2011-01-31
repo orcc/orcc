@@ -1,0 +1,274 @@
+package std.util;
+
+/**
+ * Implementation of the basic operations defined by ITU-T G.191
+ * These operations are also commonly referred to as "ETSI math operations",
+ * since they are based on the GSM HR (Half-Rate) ETSI standard
+ * EN 300 969.
+ */
+unit G_191 :
+
+	int(size=32) MAX_32 = 0x7fffffff;
+	int(size=32) MIN_32 = 0x80000000;
+
+	int(size=16) MAX_16 = 0x7fff;
+	int(size=16) MIN_16 = 0x8000;
+
+	/**
+	 * Return the 16 LSB of L_var1.
+	 */
+	function extract_l(int(size=32) L_var1) --> int(size=16) : L_var1 end
+
+	/**
+	 * Return the 16 MSB of L_var1.
+	 */
+	function extract_h(int(size=32) L_var1) --> int(size=16) : L_var1 >> 16 end
+
+	/**
+	 * Limit the 32 bit input to the range of a 16 bit word.
+	 * Must NOT be referenced from outside applications.
+	 */
+	function saturate(int(size=32) L_var1) --> int(size=16) :
+		if L_var1 > 0X00007fff then
+			MAX_16
+		else
+			if L_var1 < 0xffff8000 then
+				MIN_16
+			else
+				extract_l (L_var1)
+			end
+		end
+	end
+
+	/**
+	 * Performs the addition (var1+var2) with overflow control and saturation;
+	 * the 16 bit result is set at +32767 when overflow occurs or at -32768
+	 * when underflow occurs.
+	 */
+	function add(int(size=16) var1, int(size=16) var2) --> int(size=16)
+	var
+		int(size=32) L_sum = var1 + var2 :
+		saturate(L_sum)
+	end
+
+	/**
+	 * Performs the subtraction (var1-var2) with overflow control and saturation;
+	 * the 16 bit result is set at +32767 when overflow occurs or at -32768
+	 * when underflow occurs.
+	 */
+	function sub(int(size=16) var1, int(size=16) var2) --> int(size=16)
+	var
+		int(size=32) L_diff = var1 - var2 :
+		saturate(L_diff)
+	end
+
+	/**
+	 * Absolute value of var1; abs_s(-32768) = 32767.
+	 */
+	function abs_s(int(size=16) var1) --> int(size=16) :
+		if var1 = MIN_16 then
+			MAX_16
+		else
+			if var1 < 0 then
+				-var1
+			else
+				var1
+			end
+		end
+	end
+
+	/**
+	 * Arithmetically shift the 16 bit input var1 left var2 positions.Zero fill
+	 * the var2 LSB of the result. If var2 is negative, arithmetically shift
+	 * var1 right by -var2 with sign extension. Saturate the result in case of
+	 * underflows or overflows.
+	 */
+	function shl(int(size=16) var1, int(size=16) var2) --> int(size=16)
+	var
+		int(size=32) result = var1 * (1 << var2) :
+		if var2 < 0 then
+			shr(var1,
+				if var2 < -16 then
+					16
+				else
+					-var2
+				end)
+		else
+			if ((var2 > 15 && var1 != 0) || (result > MAX_16 || result < MIN_16)) then
+				if var1 > 0 then
+					MAX_16
+				else
+					MIN_16
+				end
+			else
+				extract_l(result)
+			end
+		end
+	end
+
+	/**
+	 * Arithmetically shift the 16 bit input var1 right var2 positions with
+	 * sign extension. If var2 is negative, arithmetically shift var1 left by
+	 * -var2 with sign extension. Saturate the result in case of underflows or
+	 * overflows.
+	 */
+	function shr(int(size=16) var1, int(size=16) var2) --> int(size=16) :
+		if (var2 < 0) then
+			shl(var1,
+				if var2 < -16 then
+					16
+				else
+					-var2
+				end)
+		else
+			if var2 >= 15 then
+				if var1 < 0 then
+					-1
+				else
+					0
+				end
+			else
+				if var1 < 0 then
+					~((~var1) >> var2)
+				else
+					var1 >> var2
+				end
+			end
+		end
+	end
+
+	/**
+	 * Negate var1 with saturation, saturate in the case where input is -32768:
+	 * negate(var1) = sub(0,var1).
+	 */
+	function negate(int(size=16) var1) --> int(size=16) :
+		if var1 = MIN_16 then
+			MAX_16
+		else
+			-var1
+		end
+	end
+
+	/**
+	 * Compares var1 and var2 and returns the maximum value.
+	 */
+	function s_max(int(size=16) var1, int(size=16) var2) --> int(size=16) :
+		if var1 >= var2 then
+			var1
+		else
+			var2
+		end
+	end
+
+	/**
+	 * Compares var1 and var2 and returns the minimum value.
+	 */
+	function s_min(int(size=16) var1, int(size=16) var2) --> int(size=16) :
+		if var1 <= var2 then
+			var1
+		else
+			var2
+		end
+	end
+
+	/**
+	 * internal norm function. Translated from "for" loop.
+	 */
+	function norm_int(int(size=16) var1) --> int(size=16) :
+		if var1 < 0x4000 then
+			1 + norm_int(var1 << 1)
+		else
+			0
+		end
+	end
+
+	/**
+	 * Produces the number of left shift needed to normalize the 16 bit varia-
+	 * ble var1 for positive values on the interval with minimum of 16384 and
+	 * maximum of 32767, and for negative values on the interval with minimum
+	 * of -32768 and maximum of -16384; in order to normalize the result, the
+	 * following operation must be done :
+	 *                     norm_var1 = shl(var1,norm_s(var1)).
+	 */
+	function norm_s(int(size=16) var1) --> int(size=16) :
+		if var1 = 0 then
+			0
+		else
+			if var1 = 0xffff then
+				15
+			else
+				norm_int(if var1 < 0 then ~var1 else var1 end)
+			end
+		end
+	end
+	
+	/**
+	 * 32 bits addition of the two 32 bits variables (L_var1+L_var2) with
+	 * overflow control and saturation; the result is set at +2147483647 when
+	 * overflow occurs or at -2147483648 when underflow occurs.
+	 */
+	function L_add(int(size=32) L_var1, int(size=32) L_var2) --> int(size=32)
+	var
+		int(size=32) L_var_out = L_var1 + L_var2 :
+		if (((L_var1 ^ L_var2) & MIN_32) = 0) && (((L_var_out ^ L_var1) & MIN_32) != 0) then
+        	if L_var1 < 0 then
+        		MIN_32
+        	else
+        		MAX_32
+        	end
+		else
+			L_var_out
+		end
+	end
+	
+	/*
+	 * TODO: sub, abs, shl, shr, negate for 32-bits
+	 */
+
+	/**
+	 * L_mult is the 32 bit result of the multiplication of var1 times var2
+	 * with one shift left i.e.:
+	 *      L_mult(var1,var2) = L_shl((var1 times var2),1) and
+	 *      L_mult(-32768,-32768) = 2147483647.
+	 */
+	function L_mult(int(size=16) var1, int(size=16) var2) --> int(size=32)
+	var
+		int(size=32) L_var_out = var1 * var2 :
+		if L_var_out != 0x40000000 then
+	    	L_var_out * 2
+	    else
+			MAX_32
+		end
+	end
+
+	/**
+	 * L_mult0 is the 32 bit result of the multiplication of var1 times var2
+	 * without one left shift.
+	 */
+	function L_mult0(int(size=16) var1, int(size=16) var2) --> int(size=32) :
+		var1 * var2
+	end
+
+	/**
+	 * Multiply var1 by var2 and shift the result left by 1. Add the 32 bit
+	 * result to L_var3 with saturation, return a 32 bit result:
+	 *      L_mac(L_var3,var1,var2) = L_add(L_var3,L_mult(var1,var2)).
+	 */
+	function L_mac(int(size=32) L_var3, int(size=16) var1, int(size=16) var2) --> int(size=32)
+	var
+		int(size=32) L_product = L_mult(var1,var2) :
+		L_add(L_var3,L_product)
+	end
+
+	/**
+	 * Multiply var1 by var2 (without left shift) and add the 32 bit result to
+	 * L_var3 with saturation, return a 32 bit result:
+	 *      L_mac0(L_var3,var1,var2) = L_add(L_var3,(L_mult0(var1,var2)).
+	 */
+	function L_mac0(int(size=32) L_var3, int(size=16) var1, int(size=16) var2) --> int(size=32)
+	var
+		int(size=32) L_product = L_mult0(var1,var2) :
+		L_add(L_var3,L_product)
+	end
+
+end
