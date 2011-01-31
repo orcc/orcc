@@ -278,13 +278,13 @@ begin
     port map (
       clock      =\> clock,
       reset_n    =\> reset_n,
-      $instance.network.inputs.list: signalsInstanciation(); separator=",\n">,
-      $instance.network.outputs.list: signalsInstanciation(); separator=",\n">);
+      <instance.network.inputs.list: signalsInstanciation(); separator=",\n">,
+      <instance.network.outputs.list: signalsInstanciation(); separator=",\n">);
       
     <init_process()>
     <waveform_process_in(input=instance.network.inputs)>
     <waveform_process_out(output=instance.network.outputs)>
 <endif>
 
-end architecture rtl;
+end architecture arch_tb_<instance.id>;
 >>
