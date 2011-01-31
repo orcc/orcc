@@ -31,10 +31,12 @@ package net.sf.orcc.cal.ui.labeling;
 import java.util.Iterator;
 
 import net.sf.orcc.cal.cal.AstAction;
+import net.sf.orcc.cal.cal.AstActor;
 import net.sf.orcc.cal.cal.AstInequality;
 import net.sf.orcc.cal.cal.AstState;
 import net.sf.orcc.cal.cal.AstTag;
 import net.sf.orcc.cal.cal.AstTransition;
+import net.sf.orcc.cal.cal.AstUnit;
 import net.sf.orcc.util.OrccUtil;
 
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
@@ -64,6 +66,10 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		}
 	}
 
+	public String text(AstActor actor) {
+		return null;
+	}
+
 	public String text(AstInequality inequality) {
 		Iterator<AstTag> it = inequality.getTags().iterator();
 		StringBuilder builder = new StringBuilder();
@@ -91,6 +97,10 @@ public class CalLabelProvider extends DefaultEObjectLabelProvider {
 		return getText(transition.getSource()) + " ("
 				+ getText(transition.getTag()) + ") --> "
 				+ getText(transition.getTarget());
+	}
+
+	public String text(AstUnit unit) {
+		return null;
 	}
 
 }

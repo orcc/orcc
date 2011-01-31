@@ -32,13 +32,16 @@ import java.util.List;
 
 import net.sf.orcc.cal.cal.AstAction;
 import net.sf.orcc.cal.cal.AstActor;
+import net.sf.orcc.cal.cal.AstEntity;
 import net.sf.orcc.cal.cal.AstPriority;
 import net.sf.orcc.cal.cal.AstSchedule;
+import net.sf.orcc.cal.cal.AstUnit;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.ui.editor.outline.ContentOutlineNode;
 import org.eclipse.xtext.ui.editor.outline.CreateNode;
+import org.eclipse.xtext.ui.editor.outline.GetChildren;
 import org.eclipse.xtext.ui.editor.outline.transformer.AbstractDeclarativeSemanticModelTransformer;
 
 /**
@@ -73,6 +76,29 @@ public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer 
 		return node;
 	}
 
+	@CreateNode
+	public ContentOutlineNode createNode(AstEntity entity,
+			ContentOutlineNode parentNode) {
+		AstActor actor = entity.getActor();
+		if (actor == null) {
+			AstUnit unit = entity.getUnit();
+			return createNode(unit, parentNode);
+		} else {
+			return createNode(actor, parentNode);
+		}
+	}
+
+	@CreateNode
+	public ContentOutlineNode createNode(AstUnit unit,
+			ContentOutlineNode parentNode) {
+		ContentOutlineNode node = super.newOutlineNode(unit, parentNode);
+
+		createNodes(node, "Functions", unit.getFunctions());
+		createNodes(node, "Constants", unit.getVariables());
+
+		return node;
+	}
+
 	private void createNodes(ContentOutlineNode parent, String name,
 			EList<?> objects) {
 		if (!objects.isEmpty()) {
@@ -84,11 +110,29 @@ public class CalTransformer extends AbstractDeclarativeSemanticModelTransformer 
 		}
 	}
 
+	@GetChildren
 	public List<EObject> getChildren(AstAction action) {
 		return NO_CHILDREN;
 	}
 
+	@GetChildren
 	public List<EObject> getChildren(AstActor actor) {
+		return NO_CHILDREN;
+	}
+
+	@GetChildren
+	public List<EObject> getChildren(AstEntity entity) {
+		AstActor actor = entity.getActor();
+		if (actor == null) {
+			AstUnit unit = entity.getUnit();
+			return getChildren(unit);
+		} else {
+			return getChildren(actor);
+		}
+	}
+
+	@GetChildren
+	public List<EObject> getChildren(AstUnit unit) {
 		return NO_CHILDREN;
 	}
 
