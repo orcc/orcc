@@ -49,7 +49,7 @@ static struct actor_s *sched_get_next(struct scheduler_s *sched) {
 */
 static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 	struct actor_s *actor;
-	semaphoreWait(sched->sem_schedulable);
+	//semaphoreWait(sched->sem_schedulable);
 	actor = sched->schedulable[sched->next_schedulable];
 	if(actor != NULL){
 		sched->next_schedulable++;
@@ -59,7 +59,7 @@ static struct actor_s *sched_get_next_schedulable(struct scheduler_s *sched) {
 		// actor is not a member of the list anymore
 		actor->in_list = 0;
 	}
-	semaphoreSet(sched->sem_schedulable);
+	//semaphoreSet(sched->sem_schedulable);
 	return actor;
 }
 
@@ -80,7 +80,7 @@ static void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *act
 			actor->in_list = 1;
 		}
 		else{
-			semaphoreWait(actor->sched->sem_schedulable);
+			//semaphoreWait(actor->sched->sem_schedulable);
 			actor->sched->schedulable[actor->sched->next_entry] = actor;
 			actor->sched->next_entry++;
 			if (actor->sched->next_entry >= MAX_ACTORS) {
@@ -88,7 +88,7 @@ static void sched_add_schedulable(struct scheduler_s *sched, struct actor_s *act
 			}
 
 			actor->in_list = 1;
-			semaphoreSet(actor->sched->sem_schedulable);
+			//semaphoreSet(actor->sched->sem_schedulable);
 		}
 	}
 }
