@@ -31,6 +31,7 @@ package net.sf.orcc.backends.vhdl.transformations;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.ActionScheduler;
@@ -40,6 +41,7 @@ import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
 import net.sf.orcc.ir.instructions.Load;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 
 /**
@@ -71,6 +73,38 @@ public class MultipleArrayAccessTransformation extends
 		}
 
 		@Override
+		public void visit(IfNode ifNode) {
+			// the idea is that branches of a "if" are exclusive
+			// so the number of accesses to consider is the max in each branch
+			// rather than the sum
+
+			Map<Variable, Integer> before = new HashMap<Variable, Integer>(
+					numRW);
+			visit(ifNode.getThenNodes());
+			Map<Variable, Integer> numThen = numRW;
+
+			numRW = new HashMap<Variable, Integer>(before);
+			visit(ifNode.getElseNodes());
+			Map<Variable, Integer> numElse = numRW;
+			numRW = before;
+
+			for (Entry<Variable, Integer> entryT : numThen.entrySet()) {
+				Variable var = entryT.getKey();
+				if (numElse.containsKey(var)) {
+					numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
+				}
+			}
+			for (Entry<Variable, Integer> entryE : numElse.entrySet()) {
+				Variable var = entryE.getKey();
+				if (numThen.containsKey(var)) {
+					numRW.put(var, Math.max(numThen.get(var), numElse.get(var)));
+				}
+			}
+
+			visit(ifNode.getJoinNode());
+		}
+
+		@Override
 		public void visit(Load load) {
 			visitLoadStore(load.getSource().getVariable(), load.getIndexes());
 		}
@@ -90,11 +124,11 @@ public class MultipleArrayAccessTransformation extends
 		 */
 		private void visitLoadStore(Variable variable, List<Expression> indexes) {
 			if (!indexes.isEmpty()) {
-				Integer numReads = numRW.get(variable);
-				if (numReads == null) {
+				Integer numAccesses = numRW.get(variable);
+				if (numAccesses == null) {
 					numRW.put(variable, 1);
 				} else {
-					numRW.put(variable, numReads + 1);
+					numRW.put(variable, numAccesses + 1);
 				}
 			}
 		}
