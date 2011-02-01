@@ -53,6 +53,8 @@ namespace llvm{
 class AbstractFifo;
 class Procedure;
 class Port;
+class Display;
+class Source;
 //------------------------------
 
 /**
@@ -163,6 +165,11 @@ public:
 	
 
 private:
+
+	void setIO();
+
+	Source* source;
+	Display* display;
 
 	/** LLVM Context */
 	llvm::LLVMContext &Context;

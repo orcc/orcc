@@ -1,4 +1,3 @@
-@init = global i32 0                     ; <i32*> [#uses=1]
 @WIDTH = external global %struct.fifo_i16_s*      ; <%struct.fifo_i16_s**> [#uses=3]
 @HEIGHT = external global %struct.fifo_i16_s*     ; <%struct.fifo_i16_s**> [#uses=3]
 @B = external global %struct.fifo_i8_s*           ; <%struct.fifo_i8_s**> [#uses=3]
@@ -77,30 +76,18 @@ bb3:                                              ; preds = %bb2, %bb1, %bb
   %30 = load %struct.fifo_i8_s** @B, align 4      ; <%struct.fifo_i8_s*> [#uses=1]
   %31 = call i32 @fifo_u8_has_tokens(%struct.fifo_i8_s* %30, i32 384) nounwind ; <i32> [#uses=1]
   %32 = icmp ne i32 %31, 0                        ; <i1> [#uses=1]
-  br i1 %32, label %bb4, label %bb7
+  br i1 %32, label %bb4, label %bb5
 
-bb4:                                              ; preds = %bb3
-  %33 = load i32* @init, align 4                  ; <i32> [#uses=1]
-  %34 = icmp eq i32 %33, 0                        ; <i1> [#uses=1]
-  br i1 %34, label %bb5, label %bb6
-
-bb5:                                              ; preds = %bb4
-  call void (...)* @set_init() nounwind
-  store i32 1, i32* @init, align 4
-  br label %bb6
-
-bb6:                                              ; preds = %bb5, %bb4
-  %35 = load %struct.fifo_i8_s** @B, align 4      ; <%struct.fifo_i8_s*> [#uses=1]
-  %36 = call i8* @fifo_u8_read(%struct.fifo_i8_s* %35, i32 384) nounwind ; <i8*> [#uses=1]
-  call void @write_mb(i8* %36) nounwind
-  %37 = load %struct.fifo_i8_s** @B, align 4      ; <%struct.fifo_i8_s*> [#uses=1]
-  call void @fifo_u8_read_end(%struct.fifo_i8_s* %37, i32 384) nounwind
-  %38 = load i32* %i, align 4                     ; <i32> [#uses=1]
-  %39 = add nsw i32 %38, 1                        ; <i32> [#uses=1]
-  store i32 %39, i32* %i, align 4
+bb4:                                              ; preds = %bb5, %bb4
+  %33 = call i8* @fifo_u8_read(%struct.fifo_i8_s* %30, i32 384) nounwind ; <i8*> [#uses=1]
+  call void @write_mb(i8* %33) nounwind
+  call void @fifo_u8_read_end(%struct.fifo_i8_s* %30, i32 384) nounwind
+  %34 = load i32* %i, align 4                     ; <i32> [#uses=1]
+  %35 = add nsw i32 %34, 1                        ; <i32> [#uses=1]
+  store i32 %35, i32* %i, align 4
   br label %bb
 
-bb7:                                              ; preds = %bb3
+bb5:                                              ; preds = %bb3
   br label %return
 
 return:                                           ; preds = %bb7
@@ -109,16 +96,13 @@ return:                                           ; preds = %bb7
 
 declare void @set_video(i32, i32)
 
-declare void @set_init(...)
-
 declare void @write_mb(i8*)
 
 !source = !{!0}
 !name = !{!1}
 !action_scheduler = !{!2}
 !inputs = !{!3, !5, !7}
-!state_variables = !{!9}
-!procedures = !{!12, !13, !14}
+!procedures = !{!12, !14}
 !actions = !{!15}
 
 !0 = metadata !{metadata !"System/Display.bc"}
@@ -131,18 +115,13 @@ declare void @write_mb(i8*)
 !6 = metadata  !{ i32 16 ,  null }
 !7 = metadata !{metadata !8, metadata !"HEIGHT", %struct.fifo_i16_s** @HEIGHT}
 !8 = metadata  !{ i32 16 ,  null }
-!9 = metadata !{metadata !10, metadata !11, metadata !20, i32* @init}
-!10 = metadata !{metadata !"init", i1 0, i32 0,  i32 0}
-!11 = metadata  !{ i32 32 ,  null }
 !12 = metadata !{metadata !"set_video", i1 1 , void(i32, i32)* @set_video}
-!13 = metadata !{metadata !"set_init", i1 1 , void(...)* @set_init}
 !14 = metadata !{metadata !"write_mb", i1 1 , void(i8*)* @write_mb}
 !15 = metadata !{ null, metadata !16, null, metadata !17, metadata !18}
 !16 = metadata !{metadata !3, i32 1}
 !17 = metadata  !{metadata !"isSchedulable_get_data", i1 0, i1()* @isSchedulable_get_data}
 !18 = metadata  !{metadata !"get_data", i1 0, void()* @get_data}
 !19 = metadata !{metadata !15}
-!20 = metadata  !{i32 0}
 
 %struct.FILE = type { i8*, i32, i8*, i32, i32, i32, i32, i8* }
 

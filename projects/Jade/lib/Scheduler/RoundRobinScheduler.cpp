@@ -39,6 +39,7 @@
 #include <time.h>
 #include <iostream>
 #include <map>
+#include <sys/stat.h> 
 
 #include "llvm/LLVMContext.h"
 #include "llvm/Module.h"
@@ -58,7 +59,7 @@
 #include "Jade/Core/Network/Instance.h"
 #include "Jade/Scheduler/RoundRobinScheduler.h"
 
-#include "display.h"
+#include "Jade/Actor/display.h"
 //------------------------------
 
 using namespace std;
@@ -85,8 +86,6 @@ RoundRobinScheduler::RoundRobinScheduler(llvm::LLVMContext& C, Decoder* decoder,
 	
 	//Set compare file if needed
 	setCompare();
-
-	verboseDisplay = verbose;
 }
 
 RoundRobinScheduler::~RoundRobinScheduler (){
@@ -128,11 +127,8 @@ void RoundRobinScheduler::createSchedulerFn(){
 }
 
 void RoundRobinScheduler::stop(pthread_t* thread){
-	SDL_Event sdlEvent;
-	sdlEvent.type = SDL_QUIT;
-	SDL_PushEvent(&sdlEvent);
-	pthread_join (*thread, NULL);
-	SDL_Quit();
+
+	stop(thread);
 }
 
 void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
@@ -141,7 +137,7 @@ void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 	Configuration* configuration = decoder->getConfiguration();
 
 	//Set exit function
-	exit_decoder = (void(*)(int))executionEngine->getExit();
+	//exit_decoder = (void(*)(int))executionEngine->getExit();
 
 	if(YuvFile.compare("") != 0){
 		Instance* compare = configuration->getInstance("Compare");
@@ -163,17 +159,18 @@ void RoundRobinScheduler::setExternalFunctions(LLVMExecution* executionEngine){
 	Procedure* setVideo = display->getProcedure("set_video");
 	Procedure* setInit = display->getProcedure("set_init");
 	Procedure* writeMb = display->getProcedure("write_mb");
-
+	Display* displayTest = new Display();
+/*
 	if(nodisplay){
 		executionEngine->mapProcedure(setVideo, (void *)emptyFunc);
 		executionEngine->mapProcedure(setInit, (void *)initT);
 		executionEngine->mapProcedure(writeMb, (void *)display_write_mb);
-	}else{
+	}else{*/
 		//Map procedure to display
-		executionEngine->mapProcedure(setVideo, (void *)display_set_video);
-		executionEngine->mapProcedure(setInit, (void *)display_init);
-		executionEngine->mapProcedure(writeMb, (void *)display_write_mb);
-	}
+		//executionEngine->mapProcedure(setVideo, (void *)display_set_video);
+		//executionEngine->mapProcedure(setInit, (void *)display_init);
+		//executionEngine->mapProcedure(writeMb, (void *)displayTest->display_set_video);
+	//}
 }
 
 GlobalVariable* RoundRobinScheduler::getSource(){

@@ -56,6 +56,7 @@
 #include "llvm/Target/TargetSelect.h"
 
 #include "Jade/Decoder.h"
+#include "Jade/Actor/Display.h"
 #include "Jade/Core/Port.h"
 #include "Jade/Core/Actor/Procedure.h"
 #include "Jade/Fifo/AbstractFifo.h"
@@ -73,6 +74,9 @@ extern cl::opt<bool> NoLazyCompilation;
 extern cl::list<std::string> MAttrs;
 extern cl::opt<std::string> MCPU;
 extern cl::opt<std::string> TargetTriple;
+
+extern "C" void (*write_mb(Display*))();
+extern "C" void (*set_video(Display*))(int, int);
 
 //===----------------------------------------------------------------------===//
 // main Driver function
@@ -186,12 +190,18 @@ void LLVMExecution::run() {
 		}
 		cout << "--> No lazy compilation enable, the decoder has been compiled in : "<< (clock () - timer) * 1000 / CLOCKS_PER_SEC << " ms \n";
 	}
+
+	setIO();
    
 	Scheduler* scheduler = decoder->getScheduler();
 	Function* func = scheduler->getMainFunction();
 
 	std::vector<GenericValue> noargs;
 	GenericValue Result = EE->runFunction(func, noargs);
+}
+
+void LLVMExecution::setIO(){
+
 }
 
 void LLVMExecution::runFunction(Function* function) {
