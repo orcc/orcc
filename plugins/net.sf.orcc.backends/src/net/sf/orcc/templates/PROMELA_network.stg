@@ -2,6 +2,30 @@ GetInstanceId(instance) ::= <<
 <if (instance.broadcast)>bcast_<endif><instance.id>
 >>
 
+declareBroadcast(instance) ::= <<
+<if (instance.broadcast)
+>
+proctype <GetInstanceId(instance)> (){
+	<instance.broadcast.type> temp = 0;
+	do
+	::	atomic{ nempty(chan_<GetInstanceId(instance)>_input) -> 
+			chan_<GetInstanceId(instance)>_input?\<temp\>;
+			<instance.broadcast.outputList: { n | chan_<GetInstanceId(instance)>_output_<n>!temp;}; separator="\n">
+			<instance.broadcast.outputList: { n | nfull(chan_<GetInstanceId(instance)>_output_<n>);}; separator="\n">
+			chan_<GetInstanceId(instance)>_input?temp;
+		}
+		
+	od
+
+}<
+endif>
+
+>>
+
+declareBroadcasts(instances) ::= <<
+<instances: declareBroadcast()>
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // allocates FIFOs
 
@@ -74,15 +98,18 @@ network(debugFifos, fifoSize, network, options) ::= <<
 // FIFO assignment
 <assignFifos(network.connections)>
 
+// Declear Broadcasts
+<declareBroadcasts(network.instances)>
+
 // Include the actors
-<network.Instances: {instance | #include "<instance.id>.pml"}; separator="\n">
+<network.Instances: {instance | <if (!instance.broadcast)>#include "<instance.id>.pml"<endif>}; separator="\n">
 
 init {
 	/*Inputs here*/
 	
 	/*Start processes*/
 	atomic{
-		<network.Instances: {instance | run <instance.id>(/*init_state*/);}; separator="\n">
+		<network.Instances: {instance | run <GetInstanceId(instance)>(/*init_state*/);}; separator="\n">
 	}	
 }
 

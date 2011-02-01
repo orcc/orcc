@@ -14,6 +14,10 @@ printActionState() ::= <<
 printf("/*<actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>=%d}; separator=";">*/\n", <actor.stateVars.list : {var | <var.name><arrayDim(var.type.dimensions)>}; separator=",">);
 >>
 
+printFSMState() ::= <<
+printf("/*state = state_<fsm_nsi.targetState>;*/");
+>>
+
 ///////////////////////////////////////////////////////////////////////////////
 // Port declaration
 ///////////////////////////////////////////////////////////////////////////////
@@ -244,7 +248,7 @@ schedulerFSM(action) ::= <<
 	<action.body.nodes: { node | <(node.class.simpleName)(node)>}>
 	<outputPattern(action.outputPattern)>
 	state = state_<fsm_nsi.targetState>;
-	<printActionName()><printActionState()>
+	<printActionName()><printFSMState()><printActionState()>
 }
 >>
 

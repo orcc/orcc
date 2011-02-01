@@ -48,6 +48,7 @@ import net.sf.orcc.ir.transformations.DeadVariableRemoval;
 import net.sf.orcc.ir.transformations.PhiRemoval;
 import net.sf.orcc.network.Instance;
 import net.sf.orcc.network.Network;
+import net.sf.orcc.network.transformations.BroadcastAdder;
 
 /**
  * This class defines a template-based PROMELA back-end.
@@ -104,6 +105,7 @@ public class PromelaBackendImpl extends AbstractBackend {
 		List<Actor> actors = network.getActors();
 		transformActors(actors);
 		printInstances(network);
+		new BroadcastAdder().transform(network);
 		printNetwork(network);
 	}
 
