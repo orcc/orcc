@@ -340,7 +340,7 @@ end loop;
 ///////////////////////////////////////////////////////////////////////////////
 // Prints functions
 ///////////////////////////////////////////////////////////////////////////////
-function(procedure, transformReturn) ::= <<
+function(procedure) ::= <<
 <if (!procedure.external)
   ><if (procedure.returnType.void)
 >procedure <procedure>(<parameters(procedure.parameters.list)>dummy : std_logic) is<

@@ -52,7 +52,7 @@ checkInstanceType(instance) ::= <<
 <printSignals(inputs=instance.actor.inputs.list,
               outputs=instance.actor.outputs.list)><
 elseif (instance.broadcast)
->                                            -- Network : <instance.id>
+>                                            -- Broadcast : <instance.id>
 <printSignals(inputs=instance.broadcast.inputs.list,
               outputs=instance.broadcast.outputs.list)><
 elseif (instance.network)
@@ -208,31 +208,43 @@ endif>
 
 printInputs(connection, map, vmap) ::= <<
 <if(map.(connection.target))
-><connection.target>_data   =\> <instance.id>_<connection.target>_data,
-<connection.target>_send   =\> <instance.id>_<connection.target>_send,
-<connection.target>_ack    =\> <instance.id>_<connection.target>_ack,<
+><if(map.(connection.target).broadcast)
+><connection.target>_data     =\> <map.(connection.target).id>_fromBroad_data,
+<else
+><if(instance.broadcast && connection.target.type.bool)
+><connection.target>_data(0)  =\> <instance.id>_<connection.target>_data,
+<else
+><connection.target>_data     =\> <instance.id>_<connection.target>_data,
+<endif>
+<endif>
+<connection.target>_send     =\> <instance.id>_<connection.target>_send,
+<connection.target>_ack      =\> <instance.id>_<connection.target>_ack,<
 else
-><connection.target>_data   =\> <vmap.port>_data,
-<connection.target>_send   =\> <vmap.port>_send,
-<connection.target>_ack    =\> <vmap.port>_ack,<
+><if(instance.broadcast && connection.target.type.bool)
+><connection.target>_data(0)  =\> <vmap.port>_data,
+<else
+><connection.target>_data     =\> <vmap.port>_data,
+<endif>
+<connection.target>_send     =\> <vmap.port>_send,
+<connection.target>_ack      =\> <vmap.port>_ack,<
 endif>
 >>
 
 printOutputs(connection, map, vmap) ::= <<
 <if(map.(connection.source))
 ><if(connection.attributes)
-><connection.source>_data   =\> <instance.id>_<connection.source>_data,
-<connection.source>_send   =\> <instance.id>_<connection.source>_send,
-<connection.source>_ack    =\> <instance.id>_<connection.source>_ack,<
+><connection.source>_data     =\> <instance.id>_<connection.source>_data,
+<connection.source>_send     =\> <instance.id>_<connection.source>_send,
+<connection.source>_ack      =\> <instance.id>_<connection.source>_ack,<
 else
-><connection.source>_data   =\> <map.(connection.source).id>_<connection.target>_data,
-<connection.source>_send   =\> <map.(connection.source).id>_<connection.target>_send,
-<connection.source>_ack    =\> <map.(connection.source).id>_<connection.target>_ack,<
+><connection.source>_data     =\> <map.(connection.source).id>_<connection.target>_data,
+<connection.source>_send     =\> <map.(connection.source).id>_<connection.target>_send,
+<connection.source>_ack      =\> <map.(connection.source).id>_<connection.target>_ack,<
 endif><
 else
-><connection.source>_data   =\> <vmap.port>_data,
-<connection.source>_send   =\> <vmap.port>_send,
-<connection.source>_ack    =\> <vmap.port>_ack,<
+><connection.source>_data     =\> <vmap.port>_data,
+<connection.source>_send     =\> <vmap.port>_send,
+<connection.source>_ack      =\> <vmap.port>_ack,<
 endif>
 >>
 
@@ -263,37 +275,37 @@ broadcast_<name> : entity work.broadcast
 															vmap=network.sourceMap.(connection))>}; separator="\n">
 <endif>
 <if(!outputs.empty)>
-    output_data  =\> <name>_fromBroad_data,
-    output_send  =\> <name>_fromBroad_send,
-    output_ack   =\> <name>_fromBroad_ack,
+<if(last(outputs).type.bool)
+>    output_data(0) =\> <name>_fromBroad_data,
+<else
+>    output_data    =\> <name>_fromBroad_data,
 <endif>
-    reset_n   =\> reset_n);
-<if(!outputs.empty)>
-<outgoingMap.(instance) : printBroadcastOutputs(); separator="\n">
+    <outgoingMap.(instance) : {connection | <printBroadcastOutputs( connection=connection, i0=i0, map=network.successorsMap.(instance),
+    																vmap=network.targetMap.(connection), control="send")>}; separator="\n">
+    <outgoingMap.(instance) : {connection | <printBroadcastOutputs( connection=connection, i0=i0, map=network.successorsMap.(instance),
+    																vmap=network.targetMap.(connection), control="ack")>}; separator="\n">
 <endif>
-
+    reset_n       =\> reset_n);
 >>
 
-printBroadcastOutputs(connection) ::= <<
-    <printBroadcastPortsOut(connection=connection, map=network.successorsMap.(instance), vmap=network.targetMap.(connection))>
->>
-
-printBroadcastPortsOut(connection, map, vmap) ::= <<
-<if(!map.(connection.source))
-><vmap.port>_data   \<= <name>_fromBroad_data;
-<vmap.port>_send   \<= <name>_fromBroad_send;
-<vmap.port>_ack    \<= <name>_fromBroad_ack;<
+printBroadcastOutputs(connection, i0, map, vmap, control) ::= <<
+<if(map.(connection.source))
+><if(connection.attributes)
+>output_<control>(<i0>) =\> <instance.id>_<connection.source>_<control>,<
+else
+>output_<control>(<i0>) =\> <map.(connection.source).id>_<connection.target>_<control>,<
+endif><
+else
+>output_<control>(<i0>) =\> <vmap.port>_<control>,<
 endif>
 >>
 
 broadcastType(connection, name, direction) ::=<<
 <if(connection.target.type.bool)
->signal <name>_<direction>_data : std_logic_vector(0 downto 0);
-<else
->signal <name>_<direction>_data : std_logic_vector(<connection.target.type.size> -1 downto 0);
-<endif>
-signal <name>_<direction>_send : std_logic_vector(<instance.broadcast.numOutputs> -1 downto 0);
-signal <name>_<direction>_ack  : std_logic_vector(<instance.broadcast.numOutputs> -1 downto 0);
+>signal <name>_<direction>_data : std_logic;<
+else
+>signal <name>_<direction>_data : std_logic_vector(<connection.target.type.size> -1 downto 0);<
+endif>
 >>
 
 
