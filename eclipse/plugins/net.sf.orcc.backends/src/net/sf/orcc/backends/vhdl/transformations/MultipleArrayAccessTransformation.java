@@ -28,6 +28,7 @@
  */
 package net.sf.orcc.backends.vhdl.transformations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,10 +40,18 @@ import net.sf.orcc.ir.ActionScheduler;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.FSM;
+import net.sf.orcc.ir.Tag;
 import net.sf.orcc.ir.FSM.State;
+import net.sf.orcc.ir.IrFactory;
+import net.sf.orcc.ir.Location;
+import net.sf.orcc.ir.Pattern;
+import net.sf.orcc.ir.Procedure;
 import net.sf.orcc.ir.Variable;
+import net.sf.orcc.ir.expr.BoolExpr;
 import net.sf.orcc.ir.instructions.Load;
+import net.sf.orcc.ir.instructions.Return;
 import net.sf.orcc.ir.instructions.Store;
+import net.sf.orcc.ir.nodes.BlockNode;
 import net.sf.orcc.ir.nodes.IfNode;
 import net.sf.orcc.ir.transformations.AbstractActorTransformation;
 import net.sf.orcc.util.UniqueEdge;
@@ -91,11 +100,64 @@ public class MultipleArrayAccessTransformation extends
 		actionScheduler.setFsm(fsm);
 	}
 
+	/**
+	 * Creates a unique action/state name.
+	 * 
+	 * @return a unique action/state name
+	 */
+	private String createName() {
+		// get unique state name
+		String stateName = targetName + "_" + action.getName();
+		Integer count = stateNames.get(stateName);
+		if (count == null) {
+			count = 1;
+		}
+		stateNames.put(stateName, count + 1);
+		return stateName + "_" + count;
+	}
+
+	/**
+	 * Creates a new empty action with the given name.
+	 * 
+	 * @param name
+	 *            action name
+	 * @return a new empty action with the given name
+	 */
+	private Action createNewAction(String name) {
+		// scheduler
+		Procedure scheduler = new Procedure(name, new Location(),
+				IrFactory.eINSTANCE.createTypeBool());
+		BlockNode block = new BlockNode(scheduler);
+		block.add(new Return(new BoolExpr(true)));
+		scheduler.getNodes().add(block);
+
+		// body
+		Procedure body = new Procedure(name, new Location(),
+				IrFactory.eINSTANCE.createTypeVoid());
+		block = new BlockNode(scheduler);
+		block.add(new Return(null));
+		scheduler.getNodes().add(block);
+
+		// tag
+		Tag tag = new Tag();
+		tag.add(name);
+
+		Action action = new Action(new Location(), tag, new Pattern(),
+				new Pattern(), scheduler, body);
+		return action;
+	}
+
 	@Override
 	public void transform(Actor actor) {
+		this.actor = actor;
+		numRW = new HashMap<Variable, Integer>();
+		stateNames = new HashMap<String, Integer>();
+
 		fsm = actor.getActionScheduler().getFsm();
 		if (fsm == null) {
-			for (Action action : actor.getActionScheduler().getActions()) {
+			List<Action> actions = new ArrayList<Action>(actor
+					.getActionScheduler().getActions());
+			for (Action action : actions) {
 				sourceName = "init";
 				targetName = "init";
 				visit(action);
@@ -116,28 +178,23 @@ public class MultipleArrayAccessTransformation extends
 		}
 	}
 
-	private void updateTransitions() {
+	private void updateTransitions(Action newAction) {
 		// add an FSM if the actor does not have one
 		if (fsm == null) {
 			addFsm(actor.getActionScheduler());
 		}
 
-		// get unique state name
-		String stateName = targetName + "_" + action.getName();
-		Integer count = stateNames.get(stateName);
-		if (count == null) {
-			count = 1;
-		}
-		stateNames.put(stateName, count + 1);
-		stateName = stateName + "_" + count;
-
 		// add state
+		String stateName = newAction.getName();
 		fsm.addState(stateName);
 
 		// update transitions
 		fsm.removeTransition(sourceName, targetName, action);
 		fsm.addTransition(sourceName, stateName, action);
-		fsm.addTransition(stateName, targetName, action);
+		fsm.addTransition(stateName, targetName, newAction);
+		
+		// set new source state to the new state name
+		sourceName = stateName;
 	}
 
 	@Override
@@ -205,11 +262,16 @@ public class MultipleArrayAccessTransformation extends
 				// need to cut here!
 				numRW.put(variable, numAccesses + 1);
 
-				updateTransitions();
+				// new name for action/state
+				String newActionName = createName();
 
-				// move this instruction and all following blocks to another
-				// action
-				// Action newAction = createNewAction();
+				// create new action
+				Action newAction = createNewAction(newActionName);
+				
+				// CUT!
+
+				// update transitions
+				updateTransitions(newAction);
 			}
 		}
 	}
