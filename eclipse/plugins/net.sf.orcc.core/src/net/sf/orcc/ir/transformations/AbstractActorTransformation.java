@@ -31,7 +31,6 @@ package net.sf.orcc.ir.transformations;
 import java.util.List;
 import java.util.ListIterator;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Action;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
@@ -68,23 +67,29 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 
 	protected ListIterator<Instruction> instructionIterator;
 
+	protected ListIterator<Action> itAction;
+
 	protected ListIterator<CFGNode> nodeIterator;
 
 	protected Procedure procedure;
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		this.actor = actor;
 
 		for (Procedure proc : actor.getProcs()) {
 			visit(proc);
 		}
 
-		for (Action action : actor.getActions()) {
+		itAction = actor.getActions().listIterator();
+		while (itAction.hasNext()) {
+			Action action = itAction.next();
 			visit(action);
 		}
 
-		for (Action action : actor.getInitializes()) {
+		itAction = actor.getInitializes().listIterator();
+		while (itAction.hasNext()) {
+			Action action = itAction.next();
 			visit(action);
 		}
 	}
@@ -154,6 +159,18 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 	public void visit(PhiAssignment phi) {
 	}
 
+	/**
+	 * Visits the given procedure.
+	 * 
+	 * @param procedure
+	 *            a procedure
+	 */
+	public void visit(Procedure procedure) {
+		this.procedure = procedure;
+		List<CFGNode> nodes = procedure.getNodes();
+		visit(nodes);
+	}
+
 	@Override
 	public void visit(Read read) {
 	}
@@ -179,18 +196,6 @@ public abstract class AbstractActorTransformation implements NodeVisitor,
 
 	@Override
 	public void visit(Write write) {
-	}
-
-	/**
-	 * Visits the given procedure.
-	 * 
-	 * @param procedure
-	 *            a procedure
-	 */
-	public void visit(Procedure procedure) {
-		this.procedure = procedure;
-		List<CFGNode> nodes = procedure.getNodes();
-		visit(nodes);
 	}
 
 }

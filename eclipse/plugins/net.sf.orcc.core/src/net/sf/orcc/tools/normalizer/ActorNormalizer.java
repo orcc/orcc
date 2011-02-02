@@ -28,14 +28,13 @@
  */
 package net.sf.orcc.tools.normalizer;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.ActorTransformation;
 import net.sf.orcc.moc.MoC;
 
 /**
- * This class defines an actor transformation that normalizes actors so they
- * can later be merged together.
+ * This class defines an actor transformation that normalizes actors so they can
+ * later be merged together.
  * 
  * @author Matthieu Wipliez
  * @author Jerome Gorin
@@ -50,7 +49,7 @@ public class ActorNormalizer implements ActorTransformation {
 	}
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		MoC clasz = actor.getMoC();
 		if (clasz.isCSDF()) {
 			new StaticActorNormalizer(actor).normalize();

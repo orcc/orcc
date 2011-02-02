@@ -31,7 +31,6 @@ package net.sf.orcc.tools.normalizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.orcc.OrccException;
 import net.sf.orcc.ir.Actor;
 import net.sf.orcc.ir.Expression;
 import net.sf.orcc.ir.GlobalVariable;
@@ -61,7 +60,7 @@ public class ChangeFifoArrayAccess extends AbstractActorTransformation {
 	private OrderedMap<String, GlobalVariable> stateVars;
 
 	@Override
-	public void transform(Actor actor) throws OrccException {
+	public void transform(Actor actor) {
 		stateVars = actor.getStateVars();
 		super.transform(actor);
 	}

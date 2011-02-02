@@ -46,6 +46,6 @@ public interface ActorTransformation {
 	 * @throws OrccException
 	 *             if the transformation fails
 	 */
-	public void transform(Actor actor) throws OrccException;
+	public void transform(Actor actor);
 
 }

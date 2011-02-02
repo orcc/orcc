@@ -35,6 +35,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -297,7 +298,7 @@ public class FSM {
 
 		return graph;
 	}
-	
+
 	/**
 	 * Returns the initial state.
 	 * 
@@ -359,29 +360,54 @@ public class FSM {
 	}
 
 	/**
-	 * Refresh this FSM with the corresponding a graph representation of this FSM. 
+	 * Removes the transition from the state whose name is given by
+	 * <code>source</code> to the state whose name is given by
+	 * <code>target</code> and whose action equals to the given action.
 	 * 
-	 * @param graph : a graph representation of this FSM
+	 * @param source
+	 *            name of source state
+	 * @param target
+	 *            name of target state
+	 * @param action
+	 *            action associated with the transition
 	 */
-	public void setGraph(DirectedGraph<State, UniqueEdge>  graph) {
-		
-		//Clear fsm
+	public void removeTransition(String source, String target, Action action) {
+		Transition transition = transitions.get(source);
+		Iterator<NextStateInfo> it = transition.getNextStateInfo().iterator();
+		while (it.hasNext()) {
+			NextStateInfo info = it.next();
+			if (info.getAction() == action
+					&& info.getTargetState().getName().equals(target)) {
+				it.remove();
+			}
+		}
+	}
+
+	/**
+	 * Refresh this FSM with the corresponding a graph representation of this
+	 * FSM.
+	 * 
+	 * @param graph
+	 *            : a graph representation of this FSM
+	 */
+	public void setGraph(DirectedGraph<State, UniqueEdge> graph) {
+		// Clear fsm
 		states.clear();
 		transitions.clear();
-		
-		//TODO : Initial state from graph not taken in account
+
+		// TODO : Initial state from graph not taken in account
 		setInitialState(getInitialState().getName());
-		
-		//Set states of the fsm
+
+		// Set states of the fsm
 		for (State state : graph.vertexSet()) {
 			addState(state.getName());
 		}
-		
-		//Set transitions of the fsm
+
+		// Set transitions of the fsm
 		for (UniqueEdge edge : graph.edgeSet()) {
 			State source = graph.getEdgeSource(edge);
 			State target = graph.getEdgeTarget(edge);
-			Action action = (Action)edge.getObject();
+			Action action = (Action) edge.getObject();
 			addTransition(source.getName(), target.getName(), action);
 		}
 	}

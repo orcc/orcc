@@ -102,7 +102,7 @@ public class ActorMerger implements INetworkTransformation {
 		}
 
 		@Override
-		public void transform(Actor actor) throws OrccException {
+		public void transform(Actor actor) {
 			for (Procedure proc : actor.getProcs()) {
 				loads = new HashMap<Variable, Integer>();
 				stores = new HashMap<Variable, Integer>();
